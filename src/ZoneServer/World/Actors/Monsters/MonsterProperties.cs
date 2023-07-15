@@ -40,6 +40,9 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// </summary>
 		private void AddDefaultProperties()
 		{
+			this.Create(new FloatProperty(PropertyName.Level, this.Monster.Data.Level));
+			this.Create(new FloatProperty(PropertyName.Lv, this.Monster.Data.Level));
+
 			this.Create(new CFloatProperty(PropertyName.MHP, () => this.CalculateProperty("SCR_Get_MON_MHP")));
 			this.Create(new FloatProperty(PropertyName.HP, min: 0));
 
