@@ -158,6 +158,11 @@ namespace Melia.Zone.World.Actors.Characters
 		public PersonalStorage PersonalStorage { get; }
 
 		/// <summary>
+		/// Account's team storage
+		/// </summary>
+		public TeamStorage TeamStorage { get; }
+
+		/// <summary>
 		/// The character's inventory.
 		/// </summary>
 		public InventoryComponent Inventory { get; }

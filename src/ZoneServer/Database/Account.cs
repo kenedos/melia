@@ -3,8 +3,10 @@ using System.Linq;
 using Melia.Shared.Network.Helpers;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
+using Melia.Zone.Network;
 using Melia.Zone.World;
 using Melia.Zone.World.Maps;
+using Melia.Zone.World.Storage;
 
 namespace Melia.Zone.Database
 {
@@ -29,6 +31,11 @@ namespace Melia.Zone.Database
 		public long Id { get; set; }
 
 		/// <summary>
+		/// Connection this account uses.
+		/// </summary>
+		public IZoneConnection Connection { get; set; }
+
+		/// <summary>
 		/// Account name
 		/// </summary>
 		public string Name { get; set; }
@@ -37,6 +44,11 @@ namespace Melia.Zone.Database
 		/// Account's team name
 		/// </summary>
 		public string TeamName { get; set; }
+
+		/// <summary>
+		/// Account's team storage
+		/// </summary>
+		public TeamStorage TeamStorage { get; }
 
 		/// <summary>
 		/// The account's authority level, used to determine if a character
@@ -92,6 +104,7 @@ namespace Melia.Zone.Database
 			// TODO: Remove the selected barrack once those are saved to the database.
 			this.SelectedBarrack = 11;
 			this.Settings = new AccountSettings();
+			this.TeamStorage = new TeamStorage(this);
 			_chatMacros = new List<ChatMacro>();
 			_revealedMaps = new Dictionary<int, RevealedMap>();
 

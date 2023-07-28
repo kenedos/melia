@@ -45,6 +45,7 @@ namespace Melia.Zone.Database
 					return false;
 			}
 
+			this.SaveAccountStorage(account);
 			this.SaveVariables(account.Variables.Perm, "vars_accounts", "accountId", account.Id);
 			this.SaveProperties("account_properties", "accountId", account.Id, account.Properties);
 			this.SaveChatMacros(account);
@@ -84,6 +85,7 @@ namespace Melia.Zone.Database
 				}
 			}
 
+			this.LoadAccountStorage(account);
 			this.LoadVars(account.Variables.Perm, "vars_accounts", "accountId", account.Id);
 			this.LoadProperties("account_properties", "accountId", account.Id, account.Properties);
 			this.LoadChatMacros(account);
@@ -707,6 +709,83 @@ namespace Melia.Zone.Database
 						cmd.Set("characterId", character.DbId);
 						cmd.Set("itemId", newId);
 						cmd.Set("position", storageItem.Key);
+
+						cmd.Execute();
+					}
+				}
+
+				trans.Commit();
+			}
+		}
+
+		/// <summary>
+		/// Load team storage for an account.
+		/// </summary>
+		/// <param name="account"></param>
+		/// <returns></returns>
+		private void LoadAccountStorage(Account account)
+		{
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("SELECT `i`.*, `stg`.`itemId` FROM `storage_team` AS `stg` INNER JOIN `items` AS `i` ON `stg`.`itemId` = `i`.`itemUniqueId` WHERE `accountId` = @accountId", conn))
+			{
+				mc.Parameters.AddWithValue("@accountId", account.Id);
+
+				using (var reader = mc.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						var itemId = reader.GetInt32("itemId");
+						var amount = reader.GetInt32("amount");
+
+						// Check item, in case its data was removed
+						if (!ZoneServer.Instance.Data.ItemDb.Contains(itemId))
+						{
+							Log.Warning("ZoneDb.LoadAccountItems: Item '{0}' not found, removing it from storage.", itemId);
+							continue;
+						}
+
+						var item = new Item(itemId, amount);
+
+						account.TeamStorage.Add(item, out var addedAmount);
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Saves team storage for an account.
+		/// </summary>
+		/// <param name="account"></param>
+		/// <returns></returns>
+		public void SaveAccountStorage(Account account)
+		{
+			using (var conn = this.GetConnection())
+			using (var trans = conn.BeginTransaction())
+			{
+				using (var mc = new MySqlCommand("DELETE FROM `storage_team` WHERE `accountId` = @accountId", conn, trans))
+				{
+					mc.Parameters.AddWithValue("@accountId", account.Id);
+					mc.ExecuteNonQuery();
+				}
+
+				foreach (var storageItem in account.TeamStorage.GetStorage())
+				{
+					var newId = 0L;
+
+					using (var cmd = new InsertCommand("INSERT INTO `items` {0}", conn, trans))
+					{
+						cmd.Set("itemId", storageItem.Value.Id);
+						cmd.Set("amount", storageItem.Value.Amount);
+
+						cmd.Execute();
+
+						newId = cmd.LastId;
+					}
+
+					using (var cmd = new InsertCommand("INSERT INTO `storage_team` {0}", conn, trans))
+					{
+						cmd.Set("accountId", account.Id);
+						cmd.Set("itemId", newId);
 
 						cmd.Execute();
 					}

@@ -255,6 +255,7 @@
     <Compile Include="World\Quests\Rewards\ItemReward.cs" />
     <Compile Include="World\Spawning\SpawnArea.cs" />
     <Compile Include="World\Spawning\SpawnAreaCollection.cs" />
+    <Compile Include="World\Storage\TeamStorage.cs" />
     <Compile Include="World\Storage\PersonalStorage.cs" />
     <Compile Include="World\Storage\Storage.cs" />
     <Compile Include="World\WorldManager.cs" />

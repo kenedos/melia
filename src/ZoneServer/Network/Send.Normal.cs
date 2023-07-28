@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using Melia.Shared.Network;
 using Melia.Shared.Network.Helpers;
 using Melia.Shared.Tos.Const;
@@ -392,6 +394,26 @@ namespace Melia.Zone.Network
 				packet.PutLpString(conn.SessionKey);
 
 				conn.Send(packet);
+			}
+
+			/// <summary>
+			/// Registers a silver transaction for storage
+			/// </summary>
+			/// <param name="character"></param>
+			public static void StorageSilverTransaction(Character character, StorageInteraction interaction, int silverTransacted, int silverTotal)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutInt(NormalOp.Zone.StorageSilverTransaction);
+				packet.PutBin(0, 0, 0);
+				packet.PutInt(1);
+				packet.PutByte((byte)interaction);
+				packet.PutLong(Convert.ToInt64(silverTransacted));
+				packet.PutLong(Convert.ToInt64(silverTotal));
+				var currentTimeUtc = DateTime.UtcNow;
+				var filetime = currentTimeUtc.ToFileTimeUtc();
+				packet.PutLong(filetime);
+
+				character.Connection.Send(packet);
 			}
 
 			/// <summary>

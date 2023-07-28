@@ -22,6 +22,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
+using Melia.Zone.World.Storage;
 using Yggdrasil.Logging;
 
 namespace Melia.Zone.Network
@@ -69,8 +70,8 @@ namespace Melia.Zone.Network
 			// TODO: Check session key or something.
 
 			// Get account
-			conn.Account = ZoneServer.Instance.Database.GetAccount(accountName);
-			if (conn.Account == null)
+			var account = ZoneServer.Instance.Database.GetAccount(accountName);
+			if (account == null)
 			{
 				Log.Warning("Stopped attempt to login with invalid account '{0}'. Closing connection.", accountName);
 				conn.Close();
@@ -78,7 +79,7 @@ namespace Melia.Zone.Network
 			}
 
 			// Get character
-			var character = ZoneServer.Instance.Database.GetCharacter(conn.Account.Id, characterId);
+			var character = ZoneServer.Instance.Database.GetCharacter(account.Id, characterId);
 			if (character == null)
 			{
 				// Don't punish, could be used to auto-ban other people.
@@ -91,14 +92,16 @@ namespace Melia.Zone.Network
 			var map = ZoneServer.Instance.World.GetMap(character.MapId);
 			if (map == null)
 			{
-				Log.Warning("CZ_GAME_READY: User '{0}' logged on with invalid map '{1}'.", conn.Account.Name, character.MapId);
+				Log.Warning("CZ_GAME_READY: User '{0}' logged on with invalid map '{1}'.", account.Name, character.MapId);
 				conn.Close();
 				return;
 			}
 
 			character.Connection = conn;
 			conn.SelectedCharacter = character;
-
+			account.Connection = conn;
+			conn.Account = account;
+			
 			ZoneServer.Instance.ServerEvents.OnPlayerLoggedIn(character);
 
 			map.AddCharacter(character);
@@ -1397,31 +1400,52 @@ namespace Melia.Zone.Network
 
 			var character = conn.SelectedCharacter;
 			var inventory = character.Inventory;
-			var storage = character.PersonalStorage;
+			var personalStorage = character.PersonalStorage;
+			var teamStorage = conn.Account.TeamStorage;
 
 			if (type == StorageType.PersonalStorage)
 			{
-				// Server allowance check
-				if (storage.IsBrowsing)
+				if (!personalStorage.IsBrowsing)
 				{
-					var storageItems = storage.GetStorage();
-					var itemList = storageItems.Values.ToList();
-					var itemPositions = storageItems.Keys.ToList();
-
-					// If items in storage have no properties the client will crash.
-					// For that reason, we get all items that do not have 'CoolDown'
-					// property and set it to zero. We chose this property because it seems
-					// official behaviour always sends this property by default.
-					var noPropertyList = itemList.Where(item => item.Properties.Get("CoolDown") == null).ToList();
-					noPropertyList.ForEach(item => item.Properties.Modify("CoolDown", 0));
-
-					Send.ZC_SOLD_ITEM_DIVISION_LIST(character, (byte)type, itemList, itemPositions);
+					Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to manage their personal storage without it being open.", conn.Account.Name);
+					return;
 				}
+
+				var storageItems = personalStorage.GetStorage();
+				var itemList = storageItems.Values.ToList();
+				var itemPositions = storageItems.Keys.ToList();
+
+				// If items in storage have no properties the client will crash.
+				// For that reason, we get all items that do not have 'CoolDown'
+				// property and set it to zero. We chose this property because it seems
+				// official behaviour always sends this property by default.
+				var noPropertyList = itemList.Where(item => item.Properties.Get("CoolDown") == null).ToList();
+				noPropertyList.ForEach(item => item.Properties.Modify("CoolDown", 0));
+
+				Send.ZC_SOLD_ITEM_DIVISION_LIST(character, (byte)type, itemList, itemPositions);
 			}
 			else if (type == StorageType.TeamStorage)
 			{
-				Log.Warning("CZ_REQ_ITEM_LIST: Team storage not yet implemented");
-				character.ServerMessage(Localization.Get("This action has not been implemented yet."));
+				if (!teamStorage.IsBrowsing)
+				{
+					Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to manage their team storage without it being open.", conn.Account.Name);
+					return;
+				}
+
+				var itemList = teamStorage.GetStorage().Values.ToList();
+				var silver = teamStorage.GetSilver();
+				if (silver != null)
+					itemList.Add(silver);
+
+				// If items in storage have no properties the client will crash.
+				// For that reason, we get all items that do not have 'CoolDown'
+				// property and set it to zero. We chose this property because it seems
+				// official behaviour always sends this property by default.
+				var noPropertyList = itemList.Where(item => item.Properties.Get("CoolDown") == null).ToList();
+				noPropertyList.ForEach(item => item.Properties.Modify("CoolDown", 0));
+
+				Send.ZC_SOLD_ITEM_DIVISION_LIST(character, (byte)type, itemList);
+
 			}
 		}
 
@@ -1434,7 +1458,7 @@ namespace Melia.Zone.Network
 		public void CZ_WAREHOUSE_CMD(IZoneConnection conn, Packet packet)
 		{
 			var type = (StorageType)packet.GetByte();
-			var worldId = packet.GetLong();
+			var objectId = packet.GetLong();
 			var i1 = packet.GetInt();
 			var amount = packet.GetInt();
 			var i2 = packet.GetInt();
@@ -1442,7 +1466,8 @@ namespace Melia.Zone.Network
 
 			var character = conn.SelectedCharacter;
 			var inventory = character.Inventory;
-			var storage = character.PersonalStorage;
+			var personalStorage = character.PersonalStorage;
+			var teamStorage = conn.Account.TeamStorage;
 
 			if ( (interaction != StorageInteraction.Store) && (interaction != StorageInteraction.Retrieve) )
 			{
@@ -1450,9 +1475,15 @@ namespace Melia.Zone.Network
 				return;
 			}
 
+			if ((type != StorageType.PersonalStorage) && (type != StorageType.TeamStorage))
+			{
+				Log.Warning("CZ_WAREHOUSE_CMD: No valid storage type for value: '{0}'", type);
+				return;
+			}
+
 			if (type == StorageType.PersonalStorage)
 			{
-				if (!storage.IsBrowsing)
+				if (!personalStorage.IsBrowsing)
 				{
 					Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to manage their personal storage without it being open.", conn.Account.Name);
 					return;
@@ -1470,28 +1501,87 @@ namespace Melia.Zone.Network
 					return;
 				}
 
-				// Storing items
+				// Storing
 				if (interaction == StorageInteraction.Store)
 				{
-					if (storage.StoreItem(worldId, amount) == StorageResult.Success)
+					if (personalStorage.StoreItem(objectId, amount) == StorageResult.Success)
 						inventory.Remove(ItemId.Silver, 20, InventoryItemRemoveMsg.Given);
 				}
-				// Retrieving items
+				// Retrieving
 				else if (interaction == StorageInteraction.Retrieve)
 				{
-					if (storage.RetrieveItem(worldId, amount) == StorageResult.Success)
+					if (personalStorage.RetrieveItem(objectId, amount) == StorageResult.Success)
 						inventory.Remove(ItemId.Silver, 20, InventoryItemRemoveMsg.Given);
 				}
 			}
 			else if (type == StorageType.TeamStorage)
 			{
-				Log.Warning("CZ_WAREHOUSE_CMD: Team storage not yet implemented");
-				character.ServerMessage(Localization.Get("This action has not been implemented yet."));
+				if (!teamStorage.IsBrowsing)
+				{
+					Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to manage their team storage without it being open.", conn.Account.Name);
+					return;
+				}
+
+				// Storing
+				if (interaction == StorageInteraction.Store)
+				{
+					if (inventory.GetItem(objectId).Id == ItemId.Silver)
+						teamStorage.StoreSilver(amount);
+					else
+						teamStorage.StoreItem(objectId, amount);
+				}
+				// Retrieving
+				else if (interaction == StorageInteraction.Retrieve)
+				{
+					if (teamStorage.GetSilver().ObjectId == objectId)
+						teamStorage.RetrieveSilver(amount);
+					else
+						teamStorage.RetrieveItem(objectId, amount);
+				}
 			}
-			else
+		}
+
+		/// <summary>
+		/// Sent when retrieving items in team storage
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_WAREHOUSE_TAKE_LIST)]
+		public void CZ_WAREHOUSE_TAKE_LIST(IZoneConnection conn, Packet packet)
+		{
+			var s1 = packet.GetShort();
+			var type = (StorageType)packet.GetByte();
+			var count = packet.GetLong();
+			var objectIds = new List<long>();
+			var amounts = new List<int>();
+			for (var i = 0; i < count; i++)
 			{
-				Log.Warning("CZ_WAREHOUSE_CMD: No valid storage type for value: '{0}'", type);
+				var objectId = packet.GetLong();
+				var amount = packet.GetInt();
+				var i1 = packet.GetInt();
+
+				objectIds.Add(objectId);
+				amounts.Add(amount);
 			}
+
+			var teamStorage = conn.Account.TeamStorage;
+
+			if (type != StorageType.TeamStorage)
+			{
+				Log.Warning("CZ_WAREHOUSE_TAKE_LIST: User '{0}' tried to take item from an invalid storage type.", conn.Account.Name);
+				return;
+			}
+
+			if (!teamStorage.IsBrowsing)
+			{
+				Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to manage their team storage without it being open.", conn.Account.Name);
+				return;
+			}
+
+			if (s1 == 49)
+				teamStorage.RetrieveSilver(amounts[0]);
+			else
+				teamStorage.RetrieveItems(objectIds, amounts);
 		}
 
 		/// <summary>

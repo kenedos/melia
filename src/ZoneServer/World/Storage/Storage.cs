@@ -26,6 +26,8 @@ namespace Melia.Zone.World.Storage
 		private SortedList<int, Item> _storageItems;
 		private int _maxStorage = 0;
 
+		private Item _silver;
+
 		/// <summary>
 		/// Storage's unique Id
 		/// </summary>
@@ -195,11 +197,11 @@ namespace Melia.Zone.World.Storage
 		/// Adds the available amount of an item to storage.
 		/// Updates client.
 		/// </summary>
-		/// <param name="interactingChar">Character to update</param>
+		/// <param name="character">Character to update</param>
 		/// <param name="itemToStore">Item to store</param>
 		/// <param name="invType">Type of storage inventory</param>
 		/// <returns></returns>
-		private StorageResult AddItemAvailableAmount(Character interactingChar, Item itemToStore, InventoryType invType)
+		private StorageResult AddItemAvailableAmount(Character character, Item itemToStore, InventoryType invType)
 		{
 			// For stackable items, add item to existing stacks.
 			if (itemToStore.IsStackable)
@@ -212,7 +214,7 @@ namespace Melia.Zone.World.Storage
 					addedAmount += stackedAmount;
 
 					if (stackedAmount > 0)
-						Send.ZC_ITEM_ADD(interactingChar, existingStorageItem.Value, existingStorageItem.Key, stackedAmount, InventoryAddType.New, invType);
+						Send.ZC_ITEM_ADD(character, existingStorageItem.Value, existingStorageItem.Key, stackedAmount, InventoryAddType.New, invType);
 				}
 
 				// If all items have been stored, return success
@@ -227,7 +229,7 @@ namespace Melia.Zone.World.Storage
 			var storageResult = this.Add(itemToStore, out var addedPosition);
 			if (storageResult != StorageResult.Success)
 				return storageResult;
-			Send.ZC_ITEM_ADD(interactingChar, itemToStore, addedPosition, itemToStore.Amount, InventoryAddType.New, invType);
+			Send.ZC_ITEM_ADD(character, itemToStore, addedPosition, itemToStore.Amount, InventoryAddType.New, invType);
 
 			return storageResult;
 		}
@@ -271,22 +273,24 @@ namespace Melia.Zone.World.Storage
 
 		/// <summary>
 		/// Adds a list of items to storage and removes from given character.
-		/// The amount added is always the maximum item amount.
 		/// Updates client.
 		/// </summary>
 		/// <param name="character">Character that is performing interaction</param>
-		/// <param name="objectId">ObjectId of item to store</param>
+		/// <param name="objectIds">ObjectId of items to store</param>
 		/// <param name="invType">Storage inventory type</param>
 		/// <returns></returns>
-		protected StorageResult StoreItems(Character character, List<long> objectIds, InventoryType invType)
+		protected StorageResult StoreItems(Character character, List<long> objectIds, List<int> amounts, InventoryType invType)
 		{
-			foreach (var objectId in objectIds)
+			if (objectIds.Count != amounts.Count)
+				return StorageResult.InvalidOperation;
+
+			for (var i = 0; i < objectIds.Count; i++)
 			{
-				var item = character.Inventory.GetItem(objectId);
+				var item = character.Inventory.GetItem(objectIds[i]);
 				if (item == null)
 					return StorageResult.ItemNotFound;
 
-				var result = StoreItem(character, objectId, item.Amount, invType);
+				var result = StoreItem(character, objectIds[i], amounts[i], invType);
 				if (result != StorageResult.Success)
 					return result;
 			}
@@ -298,10 +302,10 @@ namespace Melia.Zone.World.Storage
 		/// Removes an item from storage and gives to a character.
 		/// Updates client.
 		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="objectId"></param>
-		/// <param name="amount"></param>
-		/// <param name="invType"></param>
+		/// <param name="character">Character that is performing interaction</param>
+		/// <param name="objectId">ObjectId of item to retrieve</param>
+		/// <param name="amount">Amount of item to retrieve</param>
+		/// <param name="invType">Storage inventory type</param>
 		/// <returns></returns>
 		protected StorageResult RetrieveItem(Character character, long objectId, int amount, InventoryType invType)
 		{
@@ -326,27 +330,99 @@ namespace Melia.Zone.World.Storage
 		}
 
 		/// <summary>
-		/// Removes a list of item from storage and gives to a character.
-		/// The amount removed is always the maximum item amount.
+		/// Removes a list of items from storage and gives to a character.
 		/// Updates client.
 		/// </summary>
-		/// <param name="character"></param>
-		/// <param name="objectId"></param>
-		/// <param name="amount"></param>
-		/// <param name="invType"></param>
+		/// <param name="character">Character that is performing interaction</param>
+		/// <param name="objectIds">ObjectId of items to retrieve</param>
+		/// <param name="amounts">Amount of items to retrieve</param>
+		/// <param name="invType">Storage inventory type</param>
 		/// <returns></returns>
-		protected StorageResult RetrieveItems(Character character, List<long> objectIds, InventoryType invType)
+		protected StorageResult RetrieveItems(Character character, List<long> objectIds, List<int> amounts, InventoryType invType)
 		{
-			foreach(var objectId in objectIds)
+			if (objectIds.Count != amounts.Count)
+				return StorageResult.InvalidOperation;
+
+			for (var i = 0; i < objectIds.Count; i++)
 			{
-				var result = this.TryGetItem(objectId, out var item, out var itemPosition);
+				var result = this.TryGetItem(objectIds[i], out var item, out var itemPosition);
 				if (result != StorageResult.Success)
 					return result;
 
-				result = RetrieveItem(character, objectId, item.Amount, invType);
+				result = RetrieveItem(character, objectIds[i], amounts[i], invType);
 				if (result != StorageResult.Success)
 					return result;
 			}
+			return StorageResult.Success;
+		}
+
+		/// <summary>
+		/// Adds an amount of silver to storage.
+		/// </summary>
+		/// <param name="character">Character that is performing interaction</param>
+		/// <param name="amount">Amount of silver to store</param>
+		/// <param name="invType">Storage inventory type</param>
+		/// <returns></returns>
+		protected StorageResult StoreSilver(Character character, int amount, InventoryType invType)
+		{
+			if (amount <= 0)
+				return StorageResult.InvalidOperation;
+
+			var inventory = character.Inventory;
+
+			// Transaction limit
+			amount = Math.Min(inventory.CountItem(ItemId.Silver), amount);
+			if (_silver != null)
+				amount = Math.Min(_silver.Data.MaxStack - _silver.Amount, amount);
+
+			// Storing
+			inventory.Remove(ItemId.Silver, amount, InventoryItemRemoveMsg.Given);
+			if (_silver == null)
+				_silver = new Item(ItemId.Silver);
+			_silver.Amount += amount;
+			Send.ZC_ITEM_ADD(character, _silver, 0, amount, InventoryAddType.New, invType);
+
+			// Updates transaction list
+			Send.ZC_NORMAL.AccountProperties(character);
+			Send.ZC_NORMAL.StorageSilverTransaction(character, StorageInteraction.Store, amount, _silver.Amount);
+
+			return StorageResult.Success;
+		}
+
+		/// <summary>
+		/// Removes an amount of silver to storage.
+		/// </summary>
+		/// <param name="character">Character that is performing interaction</param>
+		/// <param name="amount">Amount of silver to retrieve</param>
+		/// <param name="invType">Storage inventory type</param>
+		/// <returns></returns>
+		protected StorageResult RetrieveSilver(Character character, int amount, InventoryType invType)
+		{
+			if (amount <= 0)
+				return StorageResult.InvalidOperation;
+
+			if (_silver == null)
+				return StorageResult.InvalidOperation;
+
+			var inventory = character.Inventory;
+
+			amount = Math.Min(_silver.Amount, amount);
+			amount = Math.Min(_silver.Data.MaxStack, amount);
+
+			inventory.Add(ItemId.Silver, amount, InventoryAddType.New);
+			Send.ZC_ITEM_REMOVE(character, _silver.ObjectId, amount, InventoryItemRemoveMsg.Given, invType);
+			if ((_silver.Amount - amount) <= 0)
+				_silver = null;
+			else
+				_silver.Amount -= amount;
+
+			// Updates transaction list
+			Send.ZC_NORMAL.AccountProperties(character);
+			if (_silver != null)
+				Send.ZC_NORMAL.StorageSilverTransaction(character, StorageInteraction.Retrieve, amount, _silver.Amount);
+			else
+				Send.ZC_NORMAL.StorageSilverTransaction(character, StorageInteraction.Retrieve, amount, 0);
+
 			return StorageResult.Success;
 		}
 
@@ -604,6 +680,16 @@ namespace Melia.Zone.World.Storage
 		public int GetStorageSize()
 		{
 			return _maxStorage;
+		}
+
+		/// <summary>
+		/// Returns the silver item in this storage.
+		/// Returns null if no silver is in storage.
+		/// </summary>
+		/// <returns></returns>
+		public Item GetSilver()
+		{
+			return _silver;
 		}
 
 		/// <summary>
