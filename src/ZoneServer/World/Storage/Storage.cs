@@ -24,7 +24,7 @@ namespace Melia.Zone.World.Storage
 		private readonly object _syncLock = new object();
 
 		private SortedList<int, Item> _storageItems;
-		private int _maxStorageSize = 0;
+		private int _storageSize = 0;
 
 		/// <summary>
 		/// Storage's unique Id
@@ -51,7 +51,7 @@ namespace Melia.Zone.World.Storage
 					}
 				}
 
-				if (i < _maxStorageSize)
+				if (i < _storageSize)
 					return i;
 			}
 			return -1;
@@ -438,7 +438,7 @@ namespace Melia.Zone.World.Storage
 		{
 			addedAmount = 0;
 
-			if ((position < 0) || (position >= _maxStorageSize))
+			if ((position < 0) || (position >= _storageSize))
 				return StorageResult.InvalidOperation;
 
 			var existingItem = this.TryGetItemAtPosition(position);
@@ -536,7 +536,7 @@ namespace Melia.Zone.World.Storage
 		public bool CheckStorageFull()
 		{
 			lock (_syncLock)
-				return _storageItems.Count() >= _maxStorageSize;
+				return _storageItems.Count() >= _storageSize;
 		}
 
 		/// <summary>
@@ -607,7 +607,7 @@ namespace Melia.Zone.World.Storage
 		/// <returns></returns>
 		public int GetStorageSize()
 		{
-			return _maxStorageSize;
+			return _storageSize;
 		}
 
 		/// <summary>
@@ -621,7 +621,7 @@ namespace Melia.Zone.World.Storage
 			if (size <= 0)
 				return StorageResult.InvalidOperation;
 
-			_maxStorageSize += size;
+			_storageSize += size;
 
 			return StorageResult.Success;
 		}

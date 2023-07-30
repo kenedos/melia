@@ -3256,6 +3256,7 @@ namespace Melia.Zone.Network
 
 		/// <summary>
 		/// Not too sure what this does, maybe for store purchases?
+		/// after zone load.
 		/// </summary>
 		/// <param name="conn"></param>
 		public static void ZC_SET_WEBSERVICE_URL(IZoneConnection conn)

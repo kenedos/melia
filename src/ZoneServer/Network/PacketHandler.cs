@@ -1651,16 +1651,18 @@ namespace Melia.Zone.Network
 		public void CZ_EXTEND_WAREHOUSE(IZoneConnection conn, Packet packet)
 		{
 			var character = conn.SelectedCharacter;
+			var account = conn.Account;
 			var type = (StorageType)packet.GetByte();
 
 			if (type == StorageType.PersonalStorage)
 			{
-				// TODO: Implement
+				if (character.PersonalStorage.TryExtendStorage(10) != StorageResult.Success)
+					Log.Warning("CZ_EXTEND_WAREHOUSE: Failed to extend personal storage for user '{0}'.", account.Name);
 			}
 			else if (type == StorageType.TeamStorage)
 			{
-				if (conn.Account.TeamStorage.TryExtendStorage(1) != StorageResult.Success)
-					Log.Warning("CZ_EXTEND_WAREHOUSE: Failed to extend team storage for user '{0}'.", conn.Account.Name);
+				if (account.TeamStorage.TryExtendStorage(1) != StorageResult.Success)
+					Log.Warning("CZ_EXTEND_WAREHOUSE: Failed to extend team storage for user '{0}'.", account.Name);
 			}
 			else
 			{

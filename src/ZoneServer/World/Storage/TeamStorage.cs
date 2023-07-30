@@ -22,8 +22,7 @@ namespace Melia.Zone.World.Storage
 		private Queue<StorageSilverTransaction> _silverTransactions;
 		private int _maxSilverTransactions = 5; // Client limit
 
-		private int _defaultMaxStorageSize = 5;
-		private int _maxExtendSilverPrice = 2000000;
+		private int _defaultStorageSize = 5;
 
 		// This is necessary because the client identifies the
 		// silver in storage by its objectId
@@ -111,20 +110,22 @@ namespace Melia.Zone.World.Storage
 		}
 
 		/// <summary>
-		/// Checks if character has the necessary silver to increase
-		/// given amount of storage size. Returns true if character has
-		/// enough silver and returns the price via out.
+		/// Attempts to remove the extend storage cost from character.
 		/// </summary>
-		/// <returns></returns>
-		private bool CheckExtendStorageCost(Character character, int size, out int price)
+		/// <param name="character">Character to check</param>
+		/// <param name="size">Size to expand</param>
+		/// <returns>True if successful</returns>
+		private bool TryRemoveExtendStorageCost(Character character, int size)
 		{
-			var dynamicPrice = (int)Math.Pow(2,  this.GetStorageSize() - _defaultMaxStorageSize + size) * 100000;
-			price = Math.Min(dynamicPrice, _maxExtendSilverPrice);
+			var dynamicPrice = (int)Math.Pow(2,  this.GetStorageSize() - _defaultStorageSize + size) * 100000;
+			var _maxExtendSilverPrice = 2000000;
+			var price = Math.Min(dynamicPrice, _maxExtendSilverPrice);
 
 			if (character.Inventory.CountItem(ItemId.Silver) < price)
 				return false;
-			else
-				return true;
+			
+			character.Inventory.Remove(ItemId.Silver, price, InventoryItemRemoveMsg.Given);
+			return true;
 		}
 
 		/// <summary>
@@ -135,7 +136,7 @@ namespace Melia.Zone.World.Storage
 		{
 			this.Owner = owner;
 			this.IsBrowsing = false;
-			this.AddSize(_defaultMaxStorageSize);
+			this.AddSize(_defaultStorageSize);
 			_silverDummyItem = new Item(ItemId.Silver);
 			_silverMax = _silverDummyItem.Data.MaxStack;
 			_silverTransactions = new Queue<StorageSilverTransaction>();
@@ -255,30 +256,6 @@ namespace Melia.Zone.World.Storage
 		}
 
 		/// <summary>
-		/// Checks if owner can extend storage by given size
-		/// and removes silver from owner.
-		/// Updates client for owner.
-		/// </summary>
-		/// <param name="size"></param>
-		/// <returns></returns>
-		public StorageResult TryExtendStorage(int size)
-		{
-			var character = this.Owner.Connection.SelectedCharacter;
-			if (CheckExtendStorageCost(character, size, out var price))
-			{
-				character.Inventory.Remove(ItemId.Silver, price, InventoryItemRemoveMsg.Given);
-				this.AddSize(size);
-				this.Owner.Properties.Modify(PropertyName.AccountWareHouseExtend, size);
-				Send.ZC_NORMAL.AccountProperties(character);
-				Send.ZC_ADDON_MSG(character, "ACCOUNT_WAREHOUSE_ITEM_LIST", 0, null);
-				Send.ZC_ADDON_MSG(character, "ACCOUNT_UPDATE", 0, null);
-				return StorageResult.Success;
-			}
-
-			return StorageResult.InvalidOperation;
-		}
-
-		/// <summary>
 		/// Retrieves multiple items from storage.
 		/// Updates client for owner.
 		/// </summary>
@@ -310,6 +287,29 @@ namespace Melia.Zone.World.Storage
 		public StorageResult RetrieveSilver(int amount)
 		{
 			return this.RetrieveSilver(this.Owner.Connection.SelectedCharacter, amount, InventoryType.AccountWarehouse);
+		}
+
+		/// <summary>
+		/// Checks if owner can extend storage by given size
+		/// and removes silver from owner.
+		/// Updates client for owner.
+		/// </summary>
+		/// <param name="size"></param>
+		/// <returns></returns>
+		public StorageResult TryExtendStorage(int size)
+		{
+			var character = this.Owner.Connection.SelectedCharacter;
+			if (TryRemoveExtendStorageCost(character, size))
+			{
+				this.AddSize(size);
+				this.Owner.Properties.Modify(PropertyName.AccountWareHouseExtend, size);
+				Send.ZC_NORMAL.AccountProperties(character);
+				Send.ZC_ADDON_MSG(character, "ACCOUNT_WAREHOUSE_ITEM_LIST", 0, null);
+				Send.ZC_ADDON_MSG(character, "ACCOUNT_UPDATE", 0, null);
+				return StorageResult.Success;
+			}
+
+			return StorageResult.InvalidOperation;
 		}
 	}
 }
