@@ -3561,10 +3561,7 @@ namespace Melia.Zone.Network
 
 						zpacket.PutInt(items[i].Id);
 						zpacket.PutInt(propertiesSize);
-						if (items[i].Id != 900011)
-							zpacket.PutLong(items[i].ObjectId);
-						else
-							zpacket.PutLong(0);
+						zpacket.PutLong(items[i].ObjectId);
 						zpacket.PutInt(items[i].Amount);
 						zpacket.PutInt(items[i].Price);
 						zpacket.PutInt(1);

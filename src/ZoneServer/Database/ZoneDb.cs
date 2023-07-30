@@ -17,7 +17,9 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 using Melia.Zone.World.Quests;
+using Melia.Zone.World.Storage;
 using MySql.Data.MySqlClient;
+using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
@@ -90,6 +92,9 @@ namespace Melia.Zone.Database
 			this.LoadProperties("account_properties", "accountId", account.Id, account.Properties);
 			this.LoadChatMacros(account);
 			this.LoadRevealedMaps(account);
+
+			// Initialize Properties
+			account.InitProperties();
 
 			return account;
 		}
@@ -662,7 +667,7 @@ namespace Melia.Zone.Database
 						// Check item, in case its data was removed
 						if (!ZoneServer.Instance.Data.ItemDb.Contains(itemId))
 						{
-							Log.Warning("ZoneDb.LoadStorageItems: Item '{0}' not found, removing it from storage.", itemId);
+							Log.Warning("ZoneDb.LoadCharacterStorage: Item '{0}' not found, removing it from storage.", itemId);
 							continue;
 						}
 
@@ -725,28 +730,64 @@ namespace Melia.Zone.Database
 		/// <returns></returns>
 		private void LoadAccountStorage(Account account)
 		{
+			var teamStorage = account.TeamStorage;
+
 			using (var conn = this.GetConnection())
-			using (var mc = new MySqlCommand("SELECT `i`.*, `stg`.`itemId` FROM `storage_team` AS `stg` INNER JOIN `items` AS `i` ON `stg`.`itemId` = `i`.`itemUniqueId` WHERE `accountId` = @accountId", conn))
 			{
-				mc.Parameters.AddWithValue("@accountId", account.Id);
-
-				using (var reader = mc.ExecuteReader())
+				// Load Items
+				using (var mc = new MySqlCommand("SELECT `i`.*, `stg`.`itemId` FROM `storage_team` AS `stg` INNER JOIN `items` AS `i` ON `stg`.`itemId` = `i`.`itemUniqueId` WHERE `accountId` = @accountId", conn))
 				{
-					while (reader.Read())
-					{
-						var itemId = reader.GetInt32("itemId");
-						var amount = reader.GetInt32("amount");
+					mc.Parameters.AddWithValue("@accountId", account.Id);
 
-						// Check item, in case its data was removed
-						if (!ZoneServer.Instance.Data.ItemDb.Contains(itemId))
+					using (var reader = mc.ExecuteReader())
+					{
+						while (reader.Read())
 						{
-							Log.Warning("ZoneDb.LoadAccountItems: Item '{0}' not found, removing it from storage.", itemId);
-							continue;
+							var itemId = reader.GetInt32("itemId");
+							var amount = reader.GetInt32("amount");
+
+							// Check item, in case its data was removed
+							if (!ZoneServer.Instance.Data.ItemDb.Contains(itemId))
+							{
+								Log.Warning("ZoneDb.LoadAccountStorage: Item '{0}' not found, removing it from storage.", itemId);
+								continue;
+							}
+
+							var item = new Item(itemId, amount);
+
+							teamStorage.Add(item, out var addedAmount);
+						}
+					}
+				}
+				// Load Silver Transactions
+				using (var mc = new MySqlCommand("SELECT * FROM `storage_team_silver` WHERE `accountId` = @accountId ORDER BY entryDateTime;", conn))
+				{
+					mc.Parameters.AddWithValue("@accountId", account.Id);
+
+					using (var reader = mc.ExecuteReader())
+					{
+						int silverTotal = 0;
+						while (reader.Read())
+						{
+							var entryId = reader.GetInt32("entryId");							
+							var interaction = (StorageInteraction)reader.GetByte("interaction");
+							var silverTransacted = reader.GetInt32("silverTransacted");
+							silverTotal = reader.GetInt32("silverTotal");
+							var dateTime = reader.GetDateTime("entryDateTime");
+							var fileTime = DateTime.Now.Add(TimeZone.CurrentTimeZone.GetUtcOffset(dateTime)).ToFileTime();
+
+							// Check item, in case its data was removed
+							if (!ZoneServer.Instance.Data.ItemDb.Contains(ItemId.Silver))
+							{
+								Log.Warning("ZoneDb.LoadAccountStorage: Silver Item not found, removing it from storage.");
+								continue;
+							}
+
+							teamStorage.AddSilverTransaction(interaction, silverTransacted, silverTotal, fileTime);
 						}
 
-						var item = new Item(itemId, amount);
-
-						account.TeamStorage.Add(item, out var addedAmount);
+						// Last transaction total is current silver in storage
+						teamStorage.SetSilver(silverTotal);
 					}
 				}
 			}
@@ -767,7 +808,12 @@ namespace Melia.Zone.Database
 					mc.Parameters.AddWithValue("@accountId", account.Id);
 					mc.ExecuteNonQuery();
 				}
-
+				using (var mc = new MySqlCommand("DELETE FROM `storage_team_silver` WHERE `accountId` = @accountId", conn, trans))
+				{
+					mc.Parameters.AddWithValue("@accountId", account.Id);
+					mc.ExecuteNonQuery();
+				}
+				// Save Items
 				foreach (var storageItem in account.TeamStorage.GetStorage())
 				{
 					var newId = 0L;
@@ -786,6 +832,20 @@ namespace Melia.Zone.Database
 					{
 						cmd.Set("accountId", account.Id);
 						cmd.Set("itemId", newId);
+
+						cmd.Execute();
+					}
+				}
+				// Save Silver Transactions
+				foreach (var silverTrans in account.TeamStorage.GetSilverTransactions())
+				{
+					using (var cmd = new InsertCommand("INSERT INTO `storage_team_silver` {0}", conn, trans))
+					{
+						cmd.Set("accountId", account.Id);
+						cmd.Set("interaction", (byte)silverTrans.Interaction);
+						cmd.Set("silverTransacted", silverTrans.SilverTransacted);
+						cmd.Set("silverTotal", silverTrans.SilverTotal);
+						cmd.Set("entryDateTime", DateTime.FromFileTime(silverTrans.Filetime));
 
 						cmd.Execute();
 					}

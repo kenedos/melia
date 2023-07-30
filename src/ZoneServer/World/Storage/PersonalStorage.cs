@@ -35,7 +35,7 @@ namespace Melia.Zone.World.Storage
 		{
 			this.Owner = owner;
 			this.IsBrowsing = false;
-			this.AddStorageSize(60);
+			this.AddSize(60);
 		}
 
 		/// <summary>

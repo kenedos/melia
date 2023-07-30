@@ -597,7 +597,7 @@ namespace Melia.Shared.Network
 		public const int CZ_PC_COMMENT_CHANGE = 0xE06; // Size: 0
 		public const int CZ_AUTTOSELLER_BUYER_CLOSE = 0xE07; // Size: 30
 		public const int CZ_REQ_ITEM_LIST = 0xE08; // Size: 23
-		public const int CZ_REQ_ACC_WARE_VIS_LOG = 0xE09; // Size: 22
+		public const int CZ_REQ_ACC_WARE_VIS_LOG = 0xE09; // Size: 0
 		public const int CZ_HIT_MISSILE = 0xE0A; // Size: 26
 		public const int CZ_PARTY_JOIN_BY_LINK = 0xE0B; // Size: 39
 		public const int CZ_PVP_ZONE_CMD = 0xE0C; // Size: 39
@@ -1811,7 +1811,7 @@ namespace Melia.Shared.Network
 			Sizes[CZ_PC_COMMENT_CHANGE] = 0;
 			Sizes[CZ_AUTTOSELLER_BUYER_CLOSE] = 30;
 			Sizes[CZ_REQ_ITEM_LIST] = 23;
-			Sizes[CZ_REQ_ACC_WARE_VIS_LOG] = 22;
+			Sizes[CZ_REQ_ACC_WARE_VIS_LOG] = 0;
 			Sizes[CZ_HIT_MISSILE] = 26;
 			Sizes[CZ_PARTY_JOIN_BY_LINK] = 39;
 			Sizes[CZ_PVP_ZONE_CMD] = 39;

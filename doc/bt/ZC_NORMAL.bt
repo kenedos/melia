@@ -1477,12 +1477,21 @@ switch (type)
 
     // Account Warehouse (Silver Trade)
     case 0x171:
-        byte bin[3]; // 00 00 00
-        int i2; // 1
-        WAREHOUSE_INTERACTION interaction; // Deposit (0) or Withdrawl (1)
-        int64 silverTransacted; // Silver Transacted
-        int64 silverTotal; // Silver Total
-        FILETIME transactionDate;
+		typedef struct
+		{
+			WAREHOUSE_INTERACTION interaction; // Deposit (0) or Withdrawl (1)
+			int64 silverTransacted;
+			int64 silverTotal;
+			FILETIME transactionDate;
+		} StorageSilverTransaction <optimize=false>;
+		
+        if (!checkCompression())
+		{
+			byte init;
+			int count;
+			if (count > 0)
+				StorageSilverTransaction transactions[count];
+		}
         break;
 
     // Market Item Min/Max Prices?

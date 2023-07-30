@@ -24,9 +24,7 @@ namespace Melia.Zone.World.Storage
 		private readonly object _syncLock = new object();
 
 		private SortedList<int, Item> _storageItems;
-		private int _maxStorage = 0;
-
-		private Item _silver;
+		private int _maxStorageSize = 0;
 
 		/// <summary>
 		/// Storage's unique Id
@@ -53,7 +51,7 @@ namespace Melia.Zone.World.Storage
 					}
 				}
 
-				if (i < _maxStorage)
+				if (i < _maxStorageSize)
 					return i;
 			}
 			return -1;
@@ -357,76 +355,6 @@ namespace Melia.Zone.World.Storage
 		}
 
 		/// <summary>
-		/// Adds an amount of silver to storage.
-		/// </summary>
-		/// <param name="character">Character that is performing interaction</param>
-		/// <param name="amount">Amount of silver to store</param>
-		/// <param name="invType">Storage inventory type</param>
-		/// <returns></returns>
-		protected StorageResult StoreSilver(Character character, int amount, InventoryType invType)
-		{
-			if (amount <= 0)
-				return StorageResult.InvalidOperation;
-
-			var inventory = character.Inventory;
-
-			// Transaction limit
-			amount = Math.Min(inventory.CountItem(ItemId.Silver), amount);
-			if (_silver != null)
-				amount = Math.Min(_silver.Data.MaxStack - _silver.Amount, amount);
-
-			// Storing
-			inventory.Remove(ItemId.Silver, amount, InventoryItemRemoveMsg.Given);
-			if (_silver == null)
-				_silver = new Item(ItemId.Silver);
-			_silver.Amount += amount;
-			Send.ZC_ITEM_ADD(character, _silver, 0, amount, InventoryAddType.New, invType);
-
-			// Updates transaction list
-			Send.ZC_NORMAL.AccountProperties(character);
-			Send.ZC_NORMAL.StorageSilverTransaction(character, StorageInteraction.Store, amount, _silver.Amount);
-
-			return StorageResult.Success;
-		}
-
-		/// <summary>
-		/// Removes an amount of silver to storage.
-		/// </summary>
-		/// <param name="character">Character that is performing interaction</param>
-		/// <param name="amount">Amount of silver to retrieve</param>
-		/// <param name="invType">Storage inventory type</param>
-		/// <returns></returns>
-		protected StorageResult RetrieveSilver(Character character, int amount, InventoryType invType)
-		{
-			if (amount <= 0)
-				return StorageResult.InvalidOperation;
-
-			if (_silver == null)
-				return StorageResult.InvalidOperation;
-
-			var inventory = character.Inventory;
-
-			amount = Math.Min(_silver.Amount, amount);
-			amount = Math.Min(_silver.Data.MaxStack, amount);
-
-			inventory.Add(ItemId.Silver, amount, InventoryAddType.New);
-			Send.ZC_ITEM_REMOVE(character, _silver.ObjectId, amount, InventoryItemRemoveMsg.Given, invType);
-			if ((_silver.Amount - amount) <= 0)
-				_silver = null;
-			else
-				_silver.Amount -= amount;
-
-			// Updates transaction list
-			Send.ZC_NORMAL.AccountProperties(character);
-			if (_silver != null)
-				Send.ZC_NORMAL.StorageSilverTransaction(character, StorageInteraction.Retrieve, amount, _silver.Amount);
-			else
-				Send.ZC_NORMAL.StorageSilverTransaction(character, StorageInteraction.Retrieve, amount, 0);
-
-			return StorageResult.Success;
-		}
-
-		/// <summary>
 		/// Creates a new storage.
 		/// </summary>
 		/// <param name="account"></param>
@@ -510,7 +438,7 @@ namespace Melia.Zone.World.Storage
 		{
 			addedAmount = 0;
 
-			if ((position < 0) || (position >= _maxStorage))
+			if ((position < 0) || (position >= _maxStorageSize))
 				return StorageResult.InvalidOperation;
 
 			var existingItem = this.TryGetItemAtPosition(position);
@@ -608,7 +536,7 @@ namespace Melia.Zone.World.Storage
 		public bool CheckStorageFull()
 		{
 			lock (_syncLock)
-				return _storageItems.Count() >= _maxStorage;
+				return _storageItems.Count() >= _maxStorageSize;
 		}
 
 		/// <summary>
@@ -679,30 +607,21 @@ namespace Melia.Zone.World.Storage
 		/// <returns></returns>
 		public int GetStorageSize()
 		{
-			return _maxStorage;
-		}
-
-		/// <summary>
-		/// Returns the silver item in this storage.
-		/// Returns null if no silver is in storage.
-		/// </summary>
-		/// <returns></returns>
-		public Item GetSilver()
-		{
-			return _silver;
+			return _maxStorageSize;
 		}
 
 		/// <summary>
 		/// Increases max storage size by the given number.
 		/// Storages can never decrease in size.
+		/// Does not update client.
 		/// </summary>
 		/// <param name="size"></param>
-		public StorageResult AddStorageSize(int size)
+		public StorageResult AddSize(int size)
 		{
 			if (size <= 0)
 				return StorageResult.InvalidOperation;
 
-			_maxStorage += size;
+			_maxStorageSize += size;
 
 			return StorageResult.Success;
 		}

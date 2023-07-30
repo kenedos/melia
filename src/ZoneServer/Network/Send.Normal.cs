@@ -9,6 +9,7 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Storage;
 
 namespace Melia.Zone.Network
 {
@@ -397,21 +398,28 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
-			/// Registers a silver transaction for storage
+			/// Updates silver transactions for storage
 			/// </summary>
-			/// <param name="character"></param>
-			public static void StorageSilverTransaction(Character character, StorageInteraction interaction, int silverTransacted, int silverTotal)
+			/// <param name="character">Character browsing storage</param>
+			/// <param name="transactions">Silver transaction list</param>
+			/// <param name="init">'True' will erase previous transactions.</param>
+			public static void StorageSilverTransaction(Character character, StorageSilverTransaction[] transactions, bool init)
 			{
 				var packet = new Packet(Op.ZC_NORMAL);
 				packet.PutInt(NormalOp.Zone.StorageSilverTransaction);
-				packet.PutBin(0, 0, 0);
-				packet.PutInt(1);
-				packet.PutByte((byte)interaction);
-				packet.PutLong(Convert.ToInt64(silverTransacted));
-				packet.PutLong(Convert.ToInt64(silverTotal));
-				var currentTimeUtc = DateTime.UtcNow;
-				var filetime = currentTimeUtc.ToFileTimeUtc();
-				packet.PutLong(filetime);
+				
+				packet.Zlib(true, zpacket =>
+				{
+					zpacket.PutByte(init);
+					zpacket.PutInt(transactions.Length);
+					foreach (var trans in transactions)
+					{
+						zpacket.PutByte((byte)trans.Interaction);
+						zpacket.PutLong(trans.SilverTransacted);
+						zpacket.PutLong(trans.SilverTotal);
+						zpacket.PutLong(trans.Filetime);
+					}
+				});
 
 				character.Connection.Send(packet);
 			}

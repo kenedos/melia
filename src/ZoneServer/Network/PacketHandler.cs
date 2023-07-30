@@ -1407,7 +1407,7 @@ namespace Melia.Zone.Network
 			{
 				if (!personalStorage.IsBrowsing)
 				{
-					Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to manage their personal storage without it being open.", conn.Account.Name);
+					Log.Warning("CZ_REQ_ITEM_LIST: User '{0}' tried to manage their personal storage without it being open.", conn.Account.Name);
 					return;
 				}
 
@@ -1428,11 +1428,12 @@ namespace Melia.Zone.Network
 			{
 				if (!teamStorage.IsBrowsing)
 				{
-					Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to manage their team storage without it being open.", conn.Account.Name);
+					Log.Warning("CZ_REQ_ITEM_LIST: User '{0}' tried to manage their team storage without it being open.", conn.Account.Name);
 					return;
 				}
 
 				var itemList = teamStorage.GetStorage().Values.ToList();
+				// Client expects silver to have an object Id and be in this list.
 				var silver = teamStorage.GetSilver();
 				if (silver != null)
 					itemList.Add(silver);
@@ -1445,8 +1446,34 @@ namespace Melia.Zone.Network
 				noPropertyList.ForEach(item => item.Properties.Modify("CoolDown", 0));
 
 				Send.ZC_SOLD_ITEM_DIVISION_LIST(character, (byte)type, itemList);
-
 			}
+			else
+			{
+				Log.Warning("CZ_REQ_ITEM_LIST: No valid storage type for value: '{0}'", type);
+				return;
+			}
+		}
+
+		/// <summary>
+		/// Sent when requesting for silver transaction logs in team storage.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_REQ_ACC_WARE_VIS_LOG)]
+		public void CZ_REQ_ACC_WARE_VIS_LOG(IZoneConnection conn, Packet packet)
+		{
+			var character = conn.SelectedCharacter;
+			var teamStorage = conn.Account.TeamStorage;
+
+			if (!teamStorage.IsBrowsing)
+			{
+				Log.Warning("CZ_REQ_ACC_WARE_VIS_LOG: User '{0}' tried to manage their team storage without it being open.", conn.Account.Name);
+				return;
+			}
+
+			var transList = teamStorage.GetSilverTransactions();
+
+			Send.ZC_NORMAL.StorageSilverTransaction(character, transList, true);
 		}
 
 		/// <summary>
@@ -1472,12 +1499,6 @@ namespace Melia.Zone.Network
 			if ( (interaction != StorageInteraction.Store) && (interaction != StorageInteraction.Retrieve) )
 			{
 				Log.Warning("CZ_WAREHOUSE_CMD: No valid interaction type for value: '{0}'", interaction);
-				return;
-			}
-
-			if ((type != StorageType.PersonalStorage) && (type != StorageType.TeamStorage))
-			{
-				Log.Warning("CZ_WAREHOUSE_CMD: No valid storage type for value: '{0}'", type);
 				return;
 			}
 
@@ -1525,19 +1546,25 @@ namespace Melia.Zone.Network
 				// Storing
 				if (interaction == StorageInteraction.Store)
 				{
-					if (inventory.GetItem(objectId).Id == ItemId.Silver)
+					Item item = inventory.GetItem(objectId);
+					// TODO: Add filtering for untradeable items
+
+					if (item.Id == ItemId.Silver)
 						teamStorage.StoreSilver(amount);
 					else
 						teamStorage.StoreItem(objectId, amount);
 				}
-				// Retrieving
 				else if (interaction == StorageInteraction.Retrieve)
 				{
-					if (teamStorage.GetSilver().ObjectId == objectId)
-						teamStorage.RetrieveSilver(amount);
-					else
-						teamStorage.RetrieveItem(objectId, amount);
+					// Note: Retrieving from team storage is through
+					// CZ_WAREHOUSE_TAKE_LIST
+					Log.Warning("CZ_WAREHOUSE_CMD: User '{0}' tried to retrieve from team storage with wrong packet.", conn.Account.Name);
 				}
+			}
+			else
+			{
+				Log.Warning("CZ_WAREHOUSE_CMD: No valid storage type for value: '{0}'", type);
+				return;
 			}
 		}
 
@@ -1578,10 +1605,20 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			if (s1 == 49)
-				teamStorage.RetrieveSilver(amounts[0]);
-			else
-				teamStorage.RetrieveItems(objectIds, amounts);
+			// Retrieve silver
+			var silverItem = teamStorage.GetSilver();
+			for (var i = 0; i < count; i++)
+			{
+				if (objectIds[i] == silverItem.ObjectId)
+				{
+					teamStorage.RetrieveSilver(amounts[i]);
+					amounts.RemoveAt(i);
+					objectIds.RemoveAt(i);
+				}
+			}
+			
+			// Retrieve items
+			teamStorage.RetrieveItems(objectIds, amounts);
 		}
 
 		/// <summary>
@@ -1602,6 +1639,33 @@ namespace Melia.Zone.Network
 			if (character.PersonalStorage.IsBrowsing)
 			{
 				character.PersonalStorage.Swap(fromSlot, toSlot);
+			}
+		}
+
+		/// <summary>
+		/// Expands storage size
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_EXTEND_WAREHOUSE)]
+		public void CZ_EXTEND_WAREHOUSE(IZoneConnection conn, Packet packet)
+		{
+			var character = conn.SelectedCharacter;
+			var type = (StorageType)packet.GetByte();
+
+			if (type == StorageType.PersonalStorage)
+			{
+				// TODO: Implement
+			}
+			else if (type == StorageType.TeamStorage)
+			{
+				if (conn.Account.TeamStorage.TryExtendStorage(1) != StorageResult.Success)
+					Log.Warning("CZ_EXTEND_WAREHOUSE: Failed to extend team storage for user '{0}'.", conn.Account.Name);
+			}
+			else
+			{
+				Log.Warning("CZ_EXTEND_WAREHOUSE: No valid storage type for value: '{0}'", type);
+				return;
 			}
 		}
 

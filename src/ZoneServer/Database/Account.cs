@@ -3,6 +3,8 @@ using System.Linq;
 using Melia.Shared.Network.Helpers;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
+using Melia.Shared.Tos.Const;
+using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.World;
 using Melia.Zone.World.Maps;
@@ -48,7 +50,7 @@ namespace Melia.Zone.Database
 		/// <summary>
 		/// Account's team storage
 		/// </summary>
-		public TeamStorage TeamStorage { get; }
+		public TeamStorage TeamStorage { get; set; }
 
 		/// <summary>
 		/// The account's authority level, used to determine if a character
@@ -109,6 +111,16 @@ namespace Melia.Zone.Database
 			_revealedMaps = new Dictionary<int, RevealedMap>();
 
 			this.LoadDefaultChatMacros();
+		}
+
+		/// <summary>
+		/// Initializes account properties
+		/// </summary>
+		public void InitProperties()
+		{
+			this.Properties.SetFloat(PropertyName.AccountWareHouseExtend, 0);
+
+			this.Properties.InvalidateAll();
 		}
 
 		/// <summary>
