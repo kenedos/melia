@@ -153,6 +153,7 @@ namespace Melia.Zone.Network
 			character.SendPCEtcProperties(); // Quick Hack to send required packets
 			Send.ZC_START_GAME(conn);
 			Send.ZC_UPDATE_ALL_STATUS(character, 0);
+			Send.ZC_SET_WEBSERVICE_URL(conn);
 			Send.ZC_MOVE_SPEED(character);
 			Send.ZC_STAMINA(character, character.Stamina);
 			Send.ZC_UPDATE_SP(character, character.Sp, false);

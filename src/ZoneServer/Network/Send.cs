@@ -23,6 +23,7 @@ using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 using Yggdrasil.Extensions;
+using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
 namespace Melia.Zone.Network
@@ -3237,15 +3238,33 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Not too sure what this does, maybe for store purchases?
+		/// Configures client to connect to web servers
 		/// </summary>
 		/// <param name="conn"></param>
 		public static void ZC_SET_WEBSERVICE_URL(IZoneConnection conn)
 		{
+			if (!ZoneServer.Instance.ServerList.TryGetWebServers(out var webServers))
+			{
+				Log.Error("ZC_SET_WEBSERVICE_URL: Web server not found.");
+				return;
+			}
+			else if (webServers.Count > 2)
+			{
+				Log.Warning("ZC_SET_WEBSERVICE_URL: Using only first 2 web servers.");
+			}
+
 			var packet = new Packet(Op.ZC_SET_WEBSERVICE_URL);
 
-			packet.PutString("https://52.58.92.141:9004", 128);
-			packet.PutString("https://52.29.227.229:9005", 128);
+			// This packet is hardcoded on client for exact 2 web servers
+			webServers = webServers.Take(2).ToList();
+			foreach (var server in webServers)
+			{
+				var url = "https://" + server.Ip + ":" + server.Port;
+				packet.PutString(url, 128);
+			}
+
+			if (webServers.Count == 1)
+				packet.PutString("", 128);
 
 			conn.Send(packet);
 		}
