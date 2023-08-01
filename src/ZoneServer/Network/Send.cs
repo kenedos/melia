@@ -3238,7 +3238,7 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Configures client to connect to web servers
+		/// Configures client to connect to web servers.
 		/// </summary>
 		/// <param name="conn"></param>
 		public static void ZC_SET_WEBSERVICE_URL(IZoneConnection conn)
@@ -3257,14 +3257,20 @@ namespace Melia.Zone.Network
 
 			// This packet is hardcoded on client for exact 2 web servers
 			webServers = webServers.Take(2).ToList();
-			foreach (var server in webServers)
+			string url;
+			if (webServers.Count == 2)
 			{
-				var url = "https://" + server.Ip + ":" + server.Port;
+				url = "http://" + webServers[0].Ip + ":" + webServers[0].Port;
+				packet.PutString(url, 128);
+				url = "http://" + webServers[1].Ip + ":" + webServers[1].Port;
 				packet.PutString(url, 128);
 			}
-
-			if (webServers.Count == 1)
-				packet.PutString("", 128);
+			else if (webServers.Count == 1)
+			{
+				url = "http://" + webServers[0].Ip + ":" + webServers[0].Port;
+				packet.PutString(url, 128);
+				packet.PutString(url, 128);
+			}
 
 			conn.Send(packet);
 		}
