@@ -94,6 +94,23 @@ namespace Melia.Shared.Network
 		}
 
 		/// <summary>
+		/// Returns all web servers found via out. 
+		/// Returns false if no matching server was found.
+		/// </summary>
+		/// <returns></returns>
+		public bool TryGetWebServers(out List<ServerInfo> serversInfo)
+		{
+			serversInfo = null;
+
+			serversInfo = _servers.Where(a => a.Type == ServerType.Web).ToList();
+
+			if (serversInfo == null)
+				return false;
+			else
+				return true;
+		}
+
+		/// <summary>
 		/// Updates the server list with the given update information.
 		/// </summary>
 		/// <param name="serverUpdateMessage"></param>
