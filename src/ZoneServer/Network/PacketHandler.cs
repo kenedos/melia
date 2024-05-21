@@ -15,6 +15,7 @@ using Melia.Zone.Network.Helpers;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -23,6 +24,7 @@ using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 using Yggdrasil.Logging;
+using Yggdrasil.Geometry;
 
 namespace Melia.Zone.Network
 {
@@ -246,6 +248,15 @@ namespace Melia.Zone.Network
 
 			Send.ZC_CHAT(character, msg);
 			ZoneServer.Instance.ServerEvents.OnPlayerChat(character, msg);
+
+			// Communicate to nearby NPCs
+			Position center = character.GetLocation().Position;
+			var area = new Circle(center, 200f);
+			var nearbyNpcs = character.Map.GetActorsIn<Npc>(area);
+			foreach (var npc in nearbyNpcs)
+			{
+				npc.Ai.ReceiveDialog(character.Name, msg);
+			}
 		}
 
 		/// <summary>
@@ -262,8 +273,6 @@ namespace Melia.Zone.Network
 		{
 			var len = packet.GetShort();
 			var msg = packet.GetString();
-
-			// ...
 		}
 
 		/// <summary>

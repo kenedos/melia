@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Melia.Shared.Configuration.Files;
+using Melia.Shared.Data.Database;
 using Melia.Shared.L10N;
 using Melia.Shared.Tos.Const;
 using Melia.Shared.World;
@@ -10,7 +12,9 @@ using Melia.Zone.Commands;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.MachineLearning;
 using Yggdrasil.Geometry;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Util;
@@ -75,6 +79,30 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static string LNF(string key, string keyPlural, int n, params object[] args)
 			=> string.Format(Localization.GetPlural(key, keyPlural, n), args);
+
+		/// <summary>
+		/// Adds NPC with certain persona to the world.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="persona">Description of the NPC personaltiy</param>
+		/// <exception cref="ArgumentException"></exception>
+		public static Npc AddAiNpc(int monsterId, string name, string map, double x, double z, double direction, string persona)
+		{
+			var uniqueId = Interlocked.Increment(ref UniqueNpcNameId);
+			var uniqueName = $"__NPC{uniqueId}__";
+
+			var npc = AddNpc(monsterId, name, uniqueName, map, x, z, direction);
+			npc.SetAiEngine(new AiEngine(npc, persona));
+			var movement = new MovementComponent(npc);
+			npc.Components.Add(new MovementComponent(npc));
+
+			return npc;
+		}
 
 		/// <summary>
 		/// Adds new NPC to the world.

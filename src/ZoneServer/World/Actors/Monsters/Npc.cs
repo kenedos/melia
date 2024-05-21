@@ -4,6 +4,7 @@ using Melia.Shared.Tos.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.MachineLearning;
 using Yggdrasil.Geometry;
 using Yggdrasil.Util;
 
@@ -12,7 +13,7 @@ namespace Melia.Zone.World.Actors.Monsters
 	/// <summary>
 	/// A non-player character that supports dialogues.
 	/// </summary>
-	public class Npc : MonsterInName, ITriggerableArea
+	public class Npc : Mob, ITriggerableArea
 	{
 		// TODO: Determine whether NPCs and mobs should actually be
 		//   separate classes. NPCs don't typically fight, and many
@@ -48,13 +49,9 @@ namespace Melia.Zone.World.Actors.Monsters
 		public IShapeF Area { get; private set; }
 
 		/// <summary>
-		/// Returns the NPC's variables.
+		/// This NPC's AI engine
 		/// </summary>
-		/// <remarks>
-		/// NPC variables are temporary and are not saved across server
-		/// restarts.
-		/// </remarks>
-		public Variables Vars { get; } = new Variables();
+		public AiEngine Ai { get; private set; }
 
 		/// <summary>
 		/// Creates new NPC.
@@ -64,7 +61,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="location"></param>
 		/// <param name="direction"></param>
 		public Npc(int monsterClassId, string name, Location location, Direction direction)
-			: base(monsterClassId)
+			: base(monsterClassId, MonsterType.NPC)
 		{
 			this.Name = name;
 			this.Position = location.Position;
@@ -124,6 +121,16 @@ namespace Melia.Zone.World.Actors.Monsters
 		public void SetTriggerArea(IShapeF area)
 		{
 			this.Area = area;
+		}
+
+		/// <summary>
+		/// Sets the AI engine for this NPC.
+		/// This can be changed during runtime.
+		/// </summary>
+		/// <param name="ai"></param>
+		public void SetAiEngine(AiEngine ai)
+		{
+			this.Ai = ai;
 		}
 	}
 

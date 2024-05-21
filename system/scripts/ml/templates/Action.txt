@@ -1,0 +1,6 @@
+﻿Associate one of the following actions with the given dialogue. If no actions match the dialogue the answer is "Do Nothing".
+Write only one word for the action without further explanations.
+Actions: Move, Stay, Attack, Do Nothing
+Dialogue: "<DIALOG>"
+
+Answer:

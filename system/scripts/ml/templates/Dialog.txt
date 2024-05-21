@@ -1,0 +1,3 @@
+﻿# Template for dialogs
+<PERSONA>
+<MEMORY>

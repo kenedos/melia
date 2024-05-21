@@ -68,13 +68,21 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="custom\shepquests\quests\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="content\r1\mobs\scripts.txt" />
     <Content Include="content\r1\scripts.txt" />
     <Content Include="content\r1\warps\scripts.txt" />
+    <Content Include="custom\shepquests\scripts.txt" />
     <Content Include="content\test\scripts.txt" />
+    <Content Include="ml\personas\Lycomedes.txt" />
+    <Content Include="ml\personas\Gabija.txt" />
+    <Content Include="ml\templates\Action.txt" />
+    <Content Include="ml\templates\Dialog.txt" />
+    <Content Include="ml\templates\Opinion.txt" />
+    <Content Include="ml\templates\Reply.txt" />
     <Content Include="scripts_custom.txt" />
     <Content Include="scripts_content.txt" />
     <Content Include="scripts_zone.txt" />
@@ -572,6 +580,7 @@
     <Compile Include="content\r1\warps\others\mission_test.cs" />
     <Compile Include="content\r1\warps\others\p_catacomb_1.cs" />
     <Compile Include="content\r1\warps\others\p_cathedral_1.cs" />
+    <Compile Include="custom\shepquests\npcs\fields\f_siauliai_west.cs" />
     <Compile Include="custom\client\concise_sysmenu\main.cs" />
     <Compile Include="content\test\mobs\fields\f_siauliai_west.cs" />
     <Compile Include="content\test\npcs\cities\c_klaipe.cs" />

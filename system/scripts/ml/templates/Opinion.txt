@@ -1,0 +1,8 @@
+﻿# Summarizes what ACTOR1 thought of ACTOR2 during a dialog.
+Here is the conversation that happened between <ACTOR1> and <ACTOR2>. 
+
+<DIALOG>
+
+Summarize what <ACTOR1> thought about <ACTOR2> in one short sentence. The sentence needs to be in third person.
+
+Answer:
