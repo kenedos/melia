@@ -600,6 +600,23 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
+		/// Updates character actively blocking (pressing default 'C' key)
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="active"></param>
+		/// <param name="dir"></param>
+		public static void ZC_GUARD(Character character, bool active, Direction dir)
+		{
+			var packet = new Packet(Op.ZC_SKILLMAP_LIST);
+
+			packet.PutInt(93586);
+			packet.PutByte(active);
+			packet.PutDirection(dir);
+
+			character.Connection.Send(packet);
+		}
+
+		/// <summary>
 		/// Sends ZC_OPTION_LIST to client, containing the saved
 		/// account options, like "Show Exp Aquired".
 		/// </summary>

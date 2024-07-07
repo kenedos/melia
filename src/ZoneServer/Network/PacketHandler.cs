@@ -1385,6 +1385,25 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
+		/// Sent after pressing block button (default 'C' key)
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_GUARD)]
+		public void CZ_GUARD(IZoneConnection conn, Packet packet)
+		{
+			var handle = packet.GetInt();
+			var unk1 = packet.GetInt();
+			var unk2 = packet.GetInt();
+			var active = packet.GetByte();
+			var dir = packet.GetDirection();
+
+			var character = conn.SelectedCharacter;
+
+			Send.ZC_GUARD(character, true, dir);
+		}
+
+		/// <summary>
 		/// Sent when clicking Confirm in a shop, with items in the "Bought" list.
 		/// </summary>
 		/// <param name="conn"></param>
