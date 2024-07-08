@@ -137,6 +137,8 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Create(PropertyName.MovingShotable, "SCR_Get_Character_MovingShotable");
 			this.Create(PropertyName.MovingShot, "SCR_Get_Character_MovingShot");
 
+			this.Create(PropertyName.Guardable, "SCR_Get_Character_Guardable");
+
 			this.Create(PropertyName.SkillRange, "SCR_Get_SkillRange");
 
 			// TODO: Update damage bonus properties based on equipment and

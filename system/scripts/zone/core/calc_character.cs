@@ -1391,6 +1391,20 @@ public class CharacterCalculationsScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Returns 1 if the character is able to block/guard with a shield.
+	/// 0 otherwise.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Character_Guardable(Character character)
+	{
+		//var equip = character.Inventory.GetEquip();
+		//return equip[EquipSlot.LeftHand].Data.Category == InventoryCategory.Armor_Shield ? 1 : 0;
+		return 1;
+	}
+
+	/// <summary>
 	/// Returns character's skill range, which adds potentially to the
 	/// skill's splash range.
 	/// </summary>

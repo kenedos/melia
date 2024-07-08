@@ -607,7 +607,7 @@ namespace Melia.Zone.Network
 		/// <param name="dir"></param>
 		public static void ZC_GUARD(Character character, bool active, Direction dir)
 		{
-			var packet = new Packet(Op.ZC_SKILLMAP_LIST);
+			var packet = new Packet(Op.ZC_GUARD);
 
 			packet.PutInt(93586);
 			packet.PutByte(active);

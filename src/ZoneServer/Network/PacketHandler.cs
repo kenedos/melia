@@ -1392,15 +1392,12 @@ namespace Melia.Zone.Network
 		[PacketHandler(Op.CZ_GUARD)]
 		public void CZ_GUARD(IZoneConnection conn, Packet packet)
 		{
-			var handle = packet.GetInt();
-			var unk1 = packet.GetInt();
-			var unk2 = packet.GetInt();
 			var active = packet.GetByte();
-			var dir = packet.GetDirection();
+			var direction = packet.GetDirection();
 
 			var character = conn.SelectedCharacter;
 
-			Send.ZC_GUARD(character, true, dir);
+			Send.ZC_GUARD(character, true, direction);
 		}
 
 		/// <summary>

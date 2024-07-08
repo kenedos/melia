@@ -3,7 +3,7 @@
 //
 //      File: ZC_GUARD.bt
 //   Authors: Kenedos
-//   Version: i346841
+//   Version:
 //   Purpose: 
 //  Category: 
 // File Mask: 
@@ -18,5 +18,5 @@ ServerHeaderFixed header;
 int handle;
 int i1;
 int i2;
-byte active;
-direction dir; // 0.707107, -0.707107 
+byte active; // 0 = not guarding, 1 = guarding
+direction dir;
