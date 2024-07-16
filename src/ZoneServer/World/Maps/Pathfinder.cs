@@ -129,11 +129,14 @@ namespace Melia.Zone.World.Maps
 				var result = p1.F.CompareTo(p2.F);
 				if (result == 0)
 				{
-					// Ignore Y coord
 					result = p1.Pos.X.CompareTo(p2.Pos.X);
 					if (result == 0)
 					{
-						result = p1.Pos.Z.CompareTo(p2.Pos.Z);
+						result = p1.Pos.Y.CompareTo(p2.Pos.Y);
+						if (result == 0)
+						{
+							result = p1.Pos.Z.CompareTo(p2.Pos.Z);
+						}
 					}
 				}
 				return result;
@@ -193,16 +196,9 @@ namespace Melia.Zone.World.Maps
 				// Neighbour is valid in grid
 				if (this.IsValidGridPosition(gridX, gridZ) && _grid[gridX, gridZ])
 				{
-					// Neighbour is valid walkable position
-					if (_ground.TryGetHeightAt(neighbor, out var y))
-					{
-						// Clear path to neighbour
-						if (_ground.GetLastValidPosition(pos, neighbor) == neighbor)
-						{
-						
-							neighbors.Add(new Position(neighbor.X, y, neighbor.Z));
-						}
-					}
+					// Closest walkable point to neighbour
+					var valid = _ground.GetLastValidPosition(pos, neighbor);
+					neighbors.Add(valid);
 				}
 			}
 
