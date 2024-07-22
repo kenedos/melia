@@ -51,6 +51,18 @@ namespace Melia.Shared.World
 		}
 
 		/// <summary>
+		/// Returns a new position with the same direction but a length of 1.
+		/// </summary>
+		/// <returns></returns>
+		public Position Normalized()
+		{
+			var length = (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+			if (length < float.Epsilon)
+				return Position.Zero;
+			return new Position(X / length, Y / length, Z / length);
+		}
+
+		/// <summary>
 		/// Returns distance between this and another position in 2D space (X,Z).
 		/// </summary>
 		/// <param name="otherPos"></param>
@@ -213,6 +225,29 @@ namespace Melia.Shared.World
 		}
 
 		/// <summary>
+		/// Returns target, if within distance, or the furthest position
+		/// within distance to target.
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="distance"></param>
+		/// <returns></returns>
+		public Position GetNearestPositionWithinDistance(Position target, float distance)
+		{
+			var currentDistance = this.Get2DDistance(target);
+
+			if (currentDistance <= distance)
+				return target;
+
+			var directionVector = target - this;
+
+			directionVector = directionVector.Normalized();
+
+			var nearestPosition = this + (directionVector * distance);
+
+			return nearestPosition;
+		}
+
+		/// <summary>
 		/// Implicitly converts the position to a vector.
 		/// </summary>
 		/// <param name="pos"></param>
@@ -228,6 +263,70 @@ namespace Melia.Shared.World
 		public static implicit operator Vector2F(Position pos)
 		{
 			return new Vector2F(pos.X, pos.Z);
+		}
+
+		/// <summary>
+		/// Returns the same position.
+		/// </summary>
+		/// <param name="pos1"></param>
+		/// <returns></returns>
+		public static Position operator +(Position pos1)
+		{
+			return pos1;
+		}
+
+		/// <summary>
+		/// Negates the position.
+		/// </summary>
+		/// <param name="pos1"></param>
+		/// <returns></returns>
+		public static Position operator -(Position pos1)
+		{
+			return new Position(-pos1.X, -pos1.Y, -pos1.Z);
+		}
+
+		/// <summary>
+		/// Sums two positions.
+		/// </summary>
+		/// <param name="pos1"></param>
+		/// <param name="pos2"></param>
+		/// <returns></returns>
+		public static Position operator +(Position pos1, Position pos2)
+		{
+			return new Position(pos1.X + pos2.X, pos1.Y + pos2.Y, pos1.Z + pos2.Z);
+		}
+
+		/// <summary>
+		/// Subtracts the second position from the first position.
+		/// </summary>
+		/// <param name="pos1"></param>
+		/// <param name="pos2"></param>
+		/// <returns></returns>
+		public static Position operator -(Position pos1, Position pos2)
+		{
+			return new Position(pos1.X - pos2.X, pos1.Y - pos2.Y, pos1.Z - pos2.Z);
+		}
+
+		/// <summary>
+		/// Multiplies two positions element-wise.
+		/// </summary>
+		/// <param name="pos1"></param>
+		/// <param name="pos2"></param>
+		/// <returns></returns>
+		public static Position operator *(Position pos1, Position pos2)
+		{
+			return new Position(pos1.X * pos2.X, pos1.Y * pos2.Y, pos1.Z * pos2.Z);
+		}
+
+		/// <summary>
+		/// Multiplies a position by a scalar.
+		/// </summary>
+		/// <param name="pos1"></param>
+		/// <param name="scalar"></param>
+		/// <returns></returns>
+		public static Position operator *(Position pos1, float scalar)
+		{
+			return new Position(pos1.X * scalar, pos1.Y * scalar, pos1.Z * scalar);
 		}
 
 		/// <summary>
