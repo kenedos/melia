@@ -38,7 +38,7 @@ public class KillHanamings1QuestScript : QuestScript
 	{
 		var character = dialog.Player;
 
-		if (character.Quests.IsPossible(this.QuestId))
+		//if (character.Quests.IsPossible(this.QuestId))
 		{
 			if (character.Gender == Gender.Male)
 				AddReward(new ItemReward(ItemId.HAIR_M_130, 1));
@@ -48,7 +48,7 @@ public class KillHanamings1QuestScript : QuestScript
 			return HookResult.Break;
 		}
 
-		if (character.Inventory.HasItem(ItemId.Leaf_Hanaming, 5))
+		//if (character.Inventory.HasItem(ItemId.Leaf_Hanaming, 5))
 		{
 			await dialog.Msg("Oh, you received my quest? Thank you very much for helping out with these pests.{nl}It was about time someone did something about them. Here's your reward.");
 

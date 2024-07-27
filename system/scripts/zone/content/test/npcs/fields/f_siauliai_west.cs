@@ -8,6 +8,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using static Melia.Zone.Scripting.Shortcuts;
 
+/*
 public class FSiauliaiWestNpcScript : GeneralScript
 {
 	public override void Load()
@@ -29,3 +30,4 @@ public class FSiauliaiWestNpcScript : GeneralScript
 		});
 	}
 }
+*/

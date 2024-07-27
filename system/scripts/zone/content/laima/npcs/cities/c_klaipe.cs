@@ -6,7 +6,7 @@
 
 using Melia.Zone.Scripting;
 using static Melia.Zone.Scripting.Shortcuts;
-
+/*
 public class CKlaipeNpcScript : GeneralScript
 {
 	public override void Load()
@@ -114,3 +114,4 @@ public class CKlaipeNpcScript : GeneralScript
 		});
 	}
 }
+*/

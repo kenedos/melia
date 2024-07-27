@@ -12,7 +12,7 @@ public class FSiauliaiWestNpcScript : GeneralScript
 {
 	public override void Load()
 	{
-		AddNpc(20113, "[Templar Master] Knight Commander Uska", "Uska", "f_siauliai_west", -576, -719, 254, async dialog =>
+		AddNpc(20113, "[Templar Master] Knight Commander Uska", "Uska", "f_siauliai_west", -303, 422, 254, async dialog =>
 		{
 			if (await dialog.Hooks("BeforeDialog"))
 				await dialog.Msg("We need your help. The monsters have overrun Klaipeda and this the final defense line.");

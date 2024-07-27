@@ -6,4 +6,5 @@
 divert "/user/scripts/zone/scripts_content.txt"
 
 require "content/r1/scripts.txt"
+require "content/laima/scripts.txt"
 require "content/test/scripts.txt"

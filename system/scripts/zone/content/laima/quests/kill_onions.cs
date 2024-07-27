@@ -12,6 +12,7 @@ using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 
+/*
 public class KillOnions1TestQuestScript : QuestScript
 {
 	protected override void Load()
@@ -71,3 +72,4 @@ public class KillOnions2TestQuestScript : QuestScript
 		return HookResult.Break;
 	}
 }
+*/
