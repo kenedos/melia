@@ -60,9 +60,10 @@ public class BasicMonsterAiScript : AiScript
 				continue;
 			}
 
-			yield return MoveToAttack(target, skill.GetAttackRange());
-			yield return UseSkill(skill, target);
-			yield return Wait(skill.Properties.Delay);
+			yield return MoveToAttack(target, GetAttackRange(skill));
+
+			if (InRangeOf(target, GetAttackRange(skill)))
+				yield return UseSkill(skill, target);
 		}
 
 		yield break;

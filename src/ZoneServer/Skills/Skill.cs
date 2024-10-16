@@ -244,7 +244,7 @@ namespace Melia.Zone.Skills
 		/// can be used.
 		/// </summary>
 		/// <returns></returns>
-		public float GetAttackRange()
+		public float GetSkillCastRange()
 		{
 			// Guessed, see GetSplashArea. Take a little off the top,
 			// so entities actually have to get into the splash area.

@@ -85,8 +85,12 @@ namespace Melia.Zone.Scripting.AI
 		{
 			var movementWasLocked = false;
 			var lastAttackMovePos = Position.Invalid;
+			var rangeOffset = 10;
 
-			while (!this.InRangeOf(target, attackRange))
+			var movement = this.Entity.Components.Get<MovementComponent>();
+			var destination = movement.Destination;
+
+			while (!target.Position.InRange2D(destination, attackRange))
 			{
 				// Wait while movement is locked and resume chase once it's
 				// unlocked, calculating a new path to wherever the target's
@@ -105,21 +109,12 @@ namespace Melia.Zone.Scripting.AI
 					lastAttackMovePos = Position.Invalid;
 				}
 
-				var targetMoved = (lastAttackMovePos == Position.Invalid || !target.Position.InRange2D(lastAttackMovePos, 10));
-
-				if (!targetMoved)
-				{
-					yield return this.Wait(100);
-					continue;
-				}
-
 				// Adjust the destination if the target moved. Reduce the attack
 				// range a little, so we're guaranteed to get into attack range.
-				lastAttackMovePos = this.GetAdjacentPosition(target, attackRange - 5);
+				lastAttackMovePos = this.GetAdjacentPosition(target, attackRange - rangeOffset);
+				destination = lastAttackMovePos;
 				yield return this.MoveTo(lastAttackMovePos, wait: false);
 			}
-
-			yield return this.StopMove();
 		}
 
 		/// <summary>
@@ -237,6 +232,8 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected virtual IEnumerable UseSkill(Skill skill, ICombatEntity target)
 		{
+			yield return this.StopMove();
+
 			if (this.Entity.IsLocked(LockType.Attack))
 				yield break;
 
@@ -256,6 +253,17 @@ namespace Melia.Zone.Scripting.AI
 
 			var useTime = skill.Properties.ShootTime;
 			yield return this.Wait(useTime);
+		}
+
+		/// <summary>
+		/// Gets the attack range of a skill considering the entity's
+		/// agent radius
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <returns></returns>
+		protected float GetAttackRange(Skill skill)
+		{
+			return this.Entity.AgentRadius + skill.GetSkillCastRange();
 		}
 
 		/// <summary>
