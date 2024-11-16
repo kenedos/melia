@@ -1255,6 +1255,10 @@ namespace Melia.Zone.World.Actors.Characters
 			var rightHand = this.Inventory.GetItem(EquipSlot.RightHand).Data.EquipType1;
 			var leftHand = this.Inventory.GetItem(EquipSlot.LeftHand).Data.EquipType1;
 
+			// Trinkets are considered "None" by the client.
+			if (leftHand == EquipType.Trinket)
+				leftHand = EquipType.None;
+
 			this.Stance = ZoneServer.Instance.Data.StanceConditionDb.FindStanceId(jobId, riding, rightHand, leftHand);
 
 			return this.Stance;
