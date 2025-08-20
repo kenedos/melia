@@ -361,6 +361,27 @@ namespace Melia.Zone.World
 		}
 
 		/// <summary>
+		/// Returns the character that matches the given character object id
+		/// or null if not found.
+		/// </summary>
+		public Character GetCharacter(long characterObjectId)
+			=> this.GetCharacters(c => c.ObjectId == characterObjectId);
+
+		/// <summary>
+		/// Returns the character that matches the given predicate.
+		/// </summary>
+		public Character GetCharacter(Func<Character, bool> predicate)
+			=> this.Maps.GetCharacter(predicate);
+
+		/// <summary>
+		/// Returns a party if found by id or null
+		/// </summary>
+		/// <param name="partyId"></param>
+		/// <returns></returns>
+		public Party GetParty(long partyId)
+			=> this.Parties.GetParty(partyId);
+
+		/// <summary>
 		/// Broadcasts packet on all maps.
 		/// </summary>
 		/// <param name="packet"></param>
