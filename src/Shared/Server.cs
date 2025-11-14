@@ -244,6 +244,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.ItemMonsterDb, "db/itemmonsters.txt");
 					this.LoadDb(this.Data.JobDb, "db/jobs.txt");
 					this.LoadDb(this.Data.MapDb, "db/maps.txt");
+					this.LoadDb(this.Data.MinigameSpawnPointDb, "db/minigame_spawn_points.txt");
 					this.LoadDb(this.Data.MonsterDb, "db/monsters.txt");
 					this.LoadDb(this.Data.NormalTxDb, "db/normal_tx_scripts.txt");
 					this.LoadDb(this.Data.PacketStringDb, "db/packetstrings.txt");

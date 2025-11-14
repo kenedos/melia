@@ -14,5 +14,10 @@ other/character_init.cs
 other/character_adv.cs
 other/kill_events.cs
 
+user/scripts/zone/minigames/minigame_base.cs
+user/scripts/zone/minigames/defend_the_torch.cs
+user/scripts/zone/minigames/marble_shooter.cs
+user/scripts/zone/minigames/minigame_spawner_init.cs
+
 require "scripts_content.txt"
 require "scripts_custom.txt"

@@ -54,6 +54,11 @@ namespace Melia.Zone.World.Spawning
 		public int Id { get; }
 
 		/// <summary>
+		/// Returns the map ids associated with this spawner.
+		/// </summary>
+		public HashSet<int> Maps { get; } = new HashSet<int>();
+
+		/// <summary>
 		/// Returns the min amount of monsters this spawner spawns at a time.
 		/// </summary>
 		public int MinAmount { get; }
@@ -174,6 +179,9 @@ namespace Melia.Zone.World.Spawning
 			{
 				if (!_spawnAreas.TryGetRandomLocation(out var map, out var pos))
 					return;
+
+				if (!this.Maps.Contains(map.Id))
+					this.Maps.Add(map.Id);
 
 				var monster = new Mob(_monsterData.Id, MonsterType.Mob);
 				monster.Position = pos;

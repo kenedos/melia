@@ -93,6 +93,32 @@ namespace Melia.Shared.Configuration.Files
 		public float RedOrbJackpotRate { get; protected set; }
 		public float RedOrbEliteRate { get; protected set; }
 
+		// Minigame Configuration
+		public bool MinigamesEnabled { get; protected set; }
+		public int MinigameMaxPopulation { get; protected set; }
+		public int MinigameRespawnCooldownSeconds { get; protected set; }
+		public int DefendTorchWaveMonsterCount { get; protected set; }
+		public float DefendTorchMinAvgSpawnCount { get; protected set; }
+		public int DefendTorchDurationMinutes { get; protected set; }
+		public int DefendTorchWaveIntervalSeconds { get; protected set; }
+		public float DefendTorchActivationRange { get; protected set; }
+		public float DefendTorchRewardRange { get; protected set; }
+		public int DefendTorchHp { get; protected set; }
+		public int MarbleShooterDurationMinutes { get; protected set; }
+		public float MarbleShooterActivationRange { get; protected set; }
+		public float MarbleShooterRewardRange { get; protected set; }
+		public int MarbleShooterRequiredHits { get; protected set; }
+		public int MarbleShooterMarbleCount { get; protected set; }
+		public float MarbleShooterMarbleMinRange { get; protected set; }
+		public float MarbleShooterMarbleMaxRange { get; protected set; }
+		public float MarbleShooterFireballMinRange { get; protected set; }
+		public float MarbleShooterFireballMaxRange { get; protected set; }
+		public float MarbleShooterFireballSpeedMultiplier { get; protected set; }
+		public float MarbleShooterMarbleSpeedMultiplier { get; protected set; }
+		public float MarbleShooterInteractionDistance { get; protected set; }
+		public float MarbleShooterMarbleBaseSpeed { get; protected set; }
+		public int MarbleShooterMonsterWaveIntervalSeconds { get; protected set; }
+
 		/// <summary>
 		/// Loads conf file and its options from the given path.
 		/// </summary>
@@ -172,6 +198,32 @@ namespace Melia.Shared.Configuration.Files
 			this.EliteAlwaysAggressive = this.GetBool("elite_always_aggressive", true);
 			this.RedOrbJackpotRate = this.GetFloat("red_orb_jackpot_rate", 10000);
 			this.RedOrbEliteRate = this.GetFloat("red_orb_elite_rate", 1000);
+
+			// Minigame Configuration
+			this.MinigamesEnabled = this.GetBool("minigames_enabled", false);
+			this.MinigameMaxPopulation = this.GetInt("minigame_max_population", 3);
+			this.MinigameRespawnCooldownSeconds = this.GetInt("minigame_respawn_cooldown_seconds", 600);
+			this.DefendTorchWaveMonsterCount = this.GetInt("defend_torch_wave_monster_count", 15);
+			this.DefendTorchMinAvgSpawnCount = this.GetFloat("defend_torch_min_avg_spawn_count", 3.0f);
+			this.DefendTorchDurationMinutes = this.GetInt("defend_torch_duration_minutes", 5);
+			this.DefendTorchWaveIntervalSeconds = this.GetInt("defend_torch_wave_interval_seconds", 15);
+			this.DefendTorchActivationRange = this.GetFloat("defend_torch_activation_range", 200.0f);
+			this.DefendTorchRewardRange = this.GetFloat("defend_torch_reward_range", 400.0f);
+			this.DefendTorchHp = this.GetInt("defend_torch_hp", 100);
+			this.MarbleShooterDurationMinutes = this.GetInt("marble_shooter_duration_minutes", 3);
+			this.MarbleShooterActivationRange = this.GetFloat("marble_shooter_activation_range", 300.0f);
+			this.MarbleShooterRewardRange = this.GetFloat("marble_shooter_reward_range", 400.0f);
+			this.MarbleShooterRequiredHits = this.GetInt("marble_shooter_required_hits", 5);
+			this.MarbleShooterMarbleCount = this.GetInt("marble_shooter_marble_count", 10);
+			this.MarbleShooterMarbleMinRange = this.GetFloat("marble_shooter_marble_min_range", 100.0f);
+			this.MarbleShooterMarbleMaxRange = this.GetFloat("marble_shooter_marble_max_range", 150.0f);
+			this.MarbleShooterFireballMinRange = this.GetFloat("marble_shooter_fireball_min_range", 30.0f);
+			this.MarbleShooterFireballMaxRange = this.GetFloat("marble_shooter_fireball_max_range", 80.0f);
+			this.MarbleShooterFireballSpeedMultiplier = this.GetFloat("marble_shooter_fireball_speed_multiplier", 2.0f);
+			this.MarbleShooterMarbleSpeedMultiplier = this.GetFloat("marble_shooter_marble_speed_multiplier", 2.0f);
+			this.MarbleShooterInteractionDistance = this.GetFloat("marble_shooter_interaction_distance", 30.0f);
+			this.MarbleShooterMarbleBaseSpeed = this.GetFloat("marble_shooter_marble_base_speed", 50.0f);
+			this.MarbleShooterMonsterWaveIntervalSeconds = this.GetInt("marble_shooter_monster_wave_interval_seconds", 20);
 
 			this.ManualAdjustments();
 		}

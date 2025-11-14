@@ -60,6 +60,15 @@ namespace Melia.Zone.World.Actors.Monsters
 		public Variables Vars { get; } = new Variables();
 
 		/// <summary>
+		/// Gets or sets whether this NPC can move.
+		/// </summary>
+		/// <remarks>
+		/// Most NPCs are stationary, but some (like interactive objects in minigames)
+		/// may need to be able to move.
+		/// </remarks>
+		public bool AllowMovement { get; set; } = false;
+
+		/// <summary>
 		/// Creates new NPC.
 		/// </summary>
 		/// <param name="monsterClassId"></param>
@@ -154,6 +163,15 @@ namespace Melia.Zone.World.Actors.Monsters
 		{
 			var message = args?.Length == 0 ? format : string.Format(format, args);
 			Send.ZC_CHAT(this, message);
+		}
+
+		/// <summary>
+		/// Returns true if this NPC can move.
+		/// </summary>
+		/// <returns>Returns true if AllowMovement is enabled, false otherwise.</returns>
+		public bool CanMove()
+		{
+			return this.AllowMovement;
 		}
 	}
 

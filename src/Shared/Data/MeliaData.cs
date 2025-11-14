@@ -31,6 +31,7 @@ namespace Melia.Shared.Data
 		public ItemMonsterDb ItemMonsterDb = new();
 		public JobDb JobDb = new();
 		public MapDb MapDb = new();
+		public MinigameSpawnPointDb MinigameSpawnPointDb = new();
 		public MonsterDb MonsterDb = new();
 		public NormalTxDb NormalTxDb = new();
 		public PacketStringDb PacketStringDb = new();

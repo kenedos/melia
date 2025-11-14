@@ -5,6 +5,7 @@ using Melia.Shared.ObjectProperties;
 using Melia.Shared.World;
 using Melia.Zone.Buffs;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.AI;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Wizards.Wizard;
@@ -290,6 +291,17 @@ namespace Melia.Zone.World.Actors
 		/// <param name="entity"></param>
 		public static void StopMove(this ICombatEntity entity)
 			=> entity.Components.Get<MovementComponent>()?.Stop();
+
+		/// <summary>
+		/// Inserts hate/aggro towards the specified target for this entity.
+		/// </summary>
+		/// <param name="entity">The entity that should gain hate.</param>
+		/// <param name="targetToHate">The target to hate.</param>
+		/// <param name="hateToAdd">The amount of hate to add (default 999).</param>
+		public static void InsertHate(this ICombatEntity entity, ICombatEntity targetToHate, int hateToAdd = 999)
+		{
+			entity.Components.Get<AiComponent>()?.Script.QueueEventAlert(new HateIncreaseAlert(targetToHate, hateToAdd));
+		}
 
 		/// <summary>
 		/// Starts the buff with the given id. If the buff is already active,
