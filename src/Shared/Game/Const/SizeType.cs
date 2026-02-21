@@ -118,6 +118,8 @@
 					return 0f;
 				case SizeType.S:
 					return 12f;
+				case SizeType.PC:
+					return 15f;
 				case SizeType.M:
 					return 15f;
 				case SizeType.L:

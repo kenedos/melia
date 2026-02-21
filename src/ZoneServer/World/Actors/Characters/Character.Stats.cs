@@ -176,9 +176,9 @@ namespace Melia.Zone.World.Actors.Characters
 		public bool IsMissionInst { get; set; }
 
 		/// <summary>
-		/// Returns the character's effective size (always M for players).
+		/// Returns the character's effective size (always PC for players).
 		/// </summary>
-		public SizeType EffectiveSize => SizeType.M;
+		public SizeType EffectiveSize => SizeType.PC;
 
 		/// <summary>
 		/// Returns the character's monster rank (always Normal for players).

@@ -90,6 +90,7 @@ namespace Melia.Zone.World.Actors
 		float AgentRadius => this.EffectiveSize switch
 		{
 			SizeType.S => 12,
+			SizeType.PC => 5,
 			SizeType.M => 15,
 			SizeType.L => 20,
 			SizeType.XL => 40,
