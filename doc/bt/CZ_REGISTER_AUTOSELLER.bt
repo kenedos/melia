@@ -31,13 +31,32 @@ string readAutoSellerItem(AutoSellerItem& v)
     return result;
 }
 
+typedef struct
+{
+    int classId;
+    int index;
+    int i1;
+    int price;
+    int amount;
+    byte unk1[256];
+}
+AutoSellerBuff <optimize=false, read=readAutoSellerBuff>;
+
+string readAutoSellerBuff(AutoSellerBuff& v)
+{
+    string result;
+    SPrintf(result, "%d, %d for %d each", v.classId, v.amount, v.price);
+    return result;
+}
+
 ClientHeaderDynamic header;
 
 char shopName[64];
 int count; // -1 = close shop
 int group; // see packeteffects.xml, PersonalShop = 270065, 690006 = RepairShop
+int skillId;
 
-if (count > 0)
+if (count > 0 && (skillId != 40805 && skillId != 40804))
     AutoSellerItem items[count];
 else
-    int i1;
+    AutoSellerBuff buffs[count];

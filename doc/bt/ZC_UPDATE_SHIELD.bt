@@ -9,6 +9,7 @@
 // File Mask: 
 //  ID Bytes: 
 //   History: 
+//          - Shield at somepoint was a short, then an int, now an int64 with a byte at the end.
 //------------------------------------------------
 
 #include "inc/common.bt"
@@ -16,4 +17,5 @@
 ServerHeaderFixed header;
 
 int handle;
-int shield;
+int64 shield;
+byte b1;

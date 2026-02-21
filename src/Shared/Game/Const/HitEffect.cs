@@ -21,5 +21,20 @@
 		/// Displays a more pronounced impact effect.
 		/// </summary>
 		ImpactHard = 3,
+
+		/// <summary>
+		/// Displays a more pronounced impact effect.
+		/// </summary>
+		EXCEL = 4,
+
+		/// <summary>
+		/// Displays a more pronounced impact effect.
+		/// </summary>
+		COUNTER = 5,
+
+		/// <summary>
+		/// Displays a more pronounced impact effect.
+		/// </summary>
+		SAFETY = 6,
 	}
 }

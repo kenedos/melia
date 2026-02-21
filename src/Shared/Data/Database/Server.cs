@@ -12,6 +12,7 @@ namespace Melia.Shared.Data.Database
 	{
 		public int Id { get; set; }
 		public string Name { get; set; }
+		public string Nation { get; set; }
 		public List<ServerData> Servers { get; set; }
 	}
 
@@ -22,10 +23,13 @@ namespace Melia.Shared.Data.Database
 		public int Id { get; set; }
 		public string Ip { get; set; }
 		public int Port { get; set; }
+		public string InterIp { get; set; }
 		public int InterPort { get; set; }
 		public int[] MapIds { get; set; }
 
 		public bool ServesAllMaps => this.MapIds.Length == 1 && this.MapIds[0] == -1;
+
+		public string Name { get; set; }
 	}
 
 	/// <summary>
@@ -56,6 +60,7 @@ namespace Melia.Shared.Data.Database
 
 			groupData.Id = entry.ReadInt("groupId");
 			groupData.Name = entry.ReadString("name");
+			groupData.Nation = entry.ReadString("nation", "GLOBAL");
 
 			groupData.Servers = new List<ServerData>();
 			foreach (var serverEntry in entry.ReadArray<JObject>("servers"))
@@ -66,9 +71,10 @@ namespace Melia.Shared.Data.Database
 
 				serverData.Type = serverEntry.ReadEnum<ServerType>("type");
 				serverData.Id = serverEntry.ReadInt("id");
-				serverData.Ip = serverEntry.ReadString("ip");
+				serverData.Ip = serverEntry.ReadString("ip", "127.0.0.1");
 				serverData.Port = serverEntry.ReadInt("port");
-				serverData.InterPort = serverEntry.ReadInt("interPort", 0);
+				serverData.InterIp = serverEntry.ReadString("interIp", "127.0.0.1");
+				serverData.InterPort = serverEntry.ReadInt("interPort", 6001);
 
 				if (serverData.Type == ServerType.Zone)
 				{
@@ -89,7 +95,7 @@ namespace Melia.Shared.Data.Database
 				}
 				else
 				{
-					serverData.MapIds = [];
+					serverData.MapIds = new int[0];
 				}
 
 				groupData.Servers.Add(serverData);
@@ -105,5 +111,8 @@ namespace Melia.Shared.Data.Database
 		Zone,
 		Web,
 		Social,
+		ISC,
+		Lada,
+		Editor,
 	}
 }

@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: ZC_COLL_DAMAGE.bt
+//   Authors: Salman T. Khan
+//   Version: i358471
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+int casterHandle;
+byte b1; // On or Off?

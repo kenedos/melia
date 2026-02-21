@@ -101,11 +101,34 @@
 		PC,
 
 		/// <summary>
-		/// ?
+		/// Extremely large actor.
 		/// </summary>
-		/// <remarks>
-		/// First seen in i402363.
-		/// </remarks>
 		EX,
+	}
+
+	public static class SizeTypeRadius
+	{
+		public static float GetRadius(SizeType sizeType)
+		{
+			switch (sizeType)
+			{
+				case SizeType.None:
+					return 0f;
+				case SizeType.Hidden:
+					return 0f;
+				case SizeType.S:
+					return 12f;
+				case SizeType.M:
+					return 15f;
+				case SizeType.L:
+					return 20f;
+				case SizeType.XL:
+					return 40f;
+				case SizeType.XXL:
+					return 40f;
+				default:
+					return 0f;
+			}
+		}
 	}
 }

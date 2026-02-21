@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
+using Melia.Shared.IES;
+using Melia.Shared.Versioning;
 using Yggdrasil.Util;
 
 namespace Melia.Shared.Network
@@ -10,6 +14,15 @@ namespace Melia.Shared.Network
 	public class Packet
 	{
 		private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+
+		/// <summary>
+		/// The max length packets may have.
+		/// </summary>
+		/// <remarks>
+		/// This is the presumed official max length of packets and can
+		/// be used as reference for deciding when to cut off packets.
+		/// </remarks>
+		public const int MaxLength = 1024 * 12;
 
 		private readonly BufferReaderWriter _buffer;
 		private readonly int _bodyStart;
@@ -25,6 +38,14 @@ namespace Melia.Shared.Network
 		public int Op { get; protected set; }
 
 		/// <summary>
+		/// Packet's sub op.
+		/// </summary>
+		/// <remarks>
+		/// Used with "X"C_NORMAL packets
+		/// </remarks>
+		public int SubOp { get; protected set; } = -1;
+
+		/// <summary>
 		/// Creates packet from buffer coming from client.
 		/// </summary>
 		/// <param name="buffer"></param>
@@ -35,17 +56,37 @@ namespace Melia.Shared.Network
 
 			this.Op = this.GetShort();
 			var index = this.GetInt();
-			var checksum = this.GetInt();
+			int checksum;
+			if (this.Op < OpTable.GetOp(Network.Op.CS_LOGIN) || this.Op >= OpTable.GetOp(Network.Op.CZ_CONNECT) || Versions.Protocol > 500)
+				checksum = this.GetInt();
 
 			// [i339427]
 			// Unknown values that appeared in the header of
 			// all client packets at some point.
 			// Social server packets don't have the extra bin
 			// so we can skip reading it.
-			if (this.Op < Network.Op.CS_LOGIN)
+			var size = OpTable.GetSize(this.Op);
+			var readBinCheck = size == 0 || size > 16;
+			if (this.Op < OpTable.GetOp(Network.Op.CS_LOGIN) && Versions.Protocol > 500
+				&& (Versions.Protocol > 500 && readBinCheck)
+				&& this.Op != OpTable.GetOp(Network.Op.CZ_OBJECT_MOVE))
 				this.GetBin(12);
 
 			_bodyStart = _buffer.Index;
+		}
+
+		/// <summary>
+		/// Creates new packet with given op.
+		/// </summary>
+		/// <param name="op"></param>
+		public Packet(Op op)
+		{
+			this.Op = OpTable.GetOp(op);
+
+			_buffer = new BufferReaderWriter();
+			_buffer.Endianness = Endianness.LittleEndian;
+
+			_bodyStart = 0;
 		}
 
 		/// <summary>
@@ -63,8 +104,28 @@ namespace Melia.Shared.Network
 		}
 
 		/// <summary>
+		/// Returns the byte offset the packet writer is currently pointing
+		/// to, starting from the body.
+		/// </summary>
+		/// <returns></returns>
+		public int GetCurrentIndex()
+		{
+			return _buffer.Index;
+		}
+
+		/// <summary>
+		/// Moves the packet reader/writer to the given offset in the packet.
+		/// </summary>
+		/// <param name="offset"></param>
+		/// <param name="origin"></param>
+		public void Seek(int offset, SeekOrigin origin)
+		{
+			_buffer.Seek(offset, origin);
+		}
+
+		/// <summary>
 		/// Sets the reading and writing pointer back to the start of
-		/// the packet.
+		/// the packet's body.
 		/// </summary>
 		public void Rewind()
 		{
@@ -490,6 +551,27 @@ namespace Melia.Shared.Network
 		}
 
 		/// <summary>
+		/// Writes the version-specific sub-opcode to the packet.
+		/// </summary>
+		/// <param name="type">The type of normal operation (e.g., Barracks, Zone).</param>
+		/// <param name="canonicalSubOp">The canonical sub-opcode value from NormalOp constants.</param>
+		public void PutSubOp(NormalOpType type, int canonicalSubOp)
+		{
+			this.SubOp = SubOpcodeMapper.GetVersionedSubOp(type, canonicalSubOp, Versions.Client);
+			this.PutInt(this.SubOp);
+		}
+
+		/// <summary>
+		/// Writes the version-specific sub-opcode to the packet.
+		/// </summary>
+		/// <param name="canonicalSubOp">The canonical sub-opcode value from NormalOp constants.</param>
+		public void PutSubOp(int canonicalSubOp)
+		{
+			this.SubOp = canonicalSubOp;
+			this.PutInt(this.SubOp);
+		}
+
+		/// <summary>
 		/// Compresses value and write it to packet, prefixed with its
 		/// length as an int.
 		/// </summary>
@@ -504,7 +586,10 @@ namespace Melia.Shared.Network
 
 				var compressed = ms.ToArray();
 
-				this.PutInt(compressed.Length);
+				if (Versions.Protocol > 500)
+					this.PutInt(compressed.Length);
+				else
+					this.PutShort(compressed.Length);
 				this.PutBin(compressed);
 			}
 		}
@@ -622,12 +707,16 @@ namespace Melia.Shared.Network
 			var sb = new StringBuilder();
 			var buffer = _buffer.Copy();
 			var length = this.Length;
-			var tableSize = Network.Op.GetSize(this.Op);
-			var opName = Network.Op.GetName(this.Op);
+			var tableSize = OpTable.GetSize(this.Op);
+			var opName = OpTable.GetName(this.Op);
 			var spacer = "".PadLeft(78, '-');
 
 			sb.AppendLine(spacer);
 			sb.AppendFormat("Op: {0:X4} {1}, Size: {2}", this.Op, opName, length);
+			if (opName.Equals("BC_NORMAL") || opName.Equals("SC_NORMAL") || opName.Equals("ZC_NORMAL"))
+			{
+				sb.AppendFormat(" SubOp: {0:X4}", this.SubOp);
+			}
 			if (tableSize != 0)
 				sb.AppendFormat(" (Table: {0}, Garbage: {1})", tableSize, length - tableSize);
 			sb.AppendLine();

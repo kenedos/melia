@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
@@ -11,14 +12,14 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	/// Handler for the Highlander skill Cross Guard.
 	/// </summary>
 	[SkillHandler(SkillId.Highlander_CrossGuard)]
-	public class Highlander_CrossGuard : IGroundSkillHandler, IDynamicCasted
+	public class Highlander_CrossGuard : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		/// <summary>
 		/// Called when the user starts casting the skill.
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StartBuff(BuffId.CrossGuard_Buff, skill.Level, 0, TimeSpan.Zero, caster);
 		}
@@ -28,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopBuff(BuffId.CrossGuard_Buff);
 		}
@@ -40,8 +41,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			Send.ZC_SKILL_CAST_CANCEL(caster);
 		}
 	}

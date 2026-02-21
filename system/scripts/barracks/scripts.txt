@@ -3,3 +3,5 @@
 //---------------------------------------------------------------------------
 
 divert "/user/scripts/barracks/scripts.txt"
+
+require "scripts_packages.txt"

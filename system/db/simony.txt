@@ -1,0 +1,67 @@
+// Melia
+// Database file
+//
+// Simony Scroll Crafting Data
+// Defines which skills can be crafted into scrolls by Pardoner's Simony skill.
+//
+// Values: skillType, className, name, [canMake], [requiredLevel], [baseCost], [costPerLevel], 
+//         [materialClassName], [materialCount], [materialPerLevel], [craftTime], [buffId], [buffDuration]
+//---------------------------------------------------------------------------
+[
+// Paladin Skills
+//---------------------------------------------------------------------------
+{ skillType: 40301, className: "Paladin_Barrier", name: "Barrier", canMake: true, requiredLevel: 1, baseCost: 5000, costPerLevel: 1000, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 1, craftTime: 5.0, buffId: "Barrier_Buff", buffDuration: 1800000 },
+{ skillType: 40302, className: "Paladin_ResistElements", name: "Resist Elements", canMake: true, requiredLevel: 1, baseCost: 4000, costPerLevel: 800, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "ResistElements_Buff", buffDuration: 1800000 },
+{ skillType: 40303, className: "Paladin_StoneSkin", name: "Stone Skin", canMake: true, requiredLevel: 1, baseCost: 4000, costPerLevel: 800, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "StoneSkin_Buff", buffDuration: 1800000 },
+{ skillType: 40304, className: "Paladin_Restoration", name: "Restoration", canMake: true, requiredLevel: 1, baseCost: 3500, costPerLevel: 700, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "None", buffDuration: 0 },
+
+// Pardoner Skills
+//---------------------------------------------------------------------------
+{ skillType: 40401, className: "Pardoner_IncreaseMagicDEF", name: "Increase Magic DEF", canMake: true, requiredLevel: 1, baseCost: 3000, costPerLevel: 600, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "IncreaseMagicDEF_Buff", buffDuration: 1800000 },
+{ skillType: 40402, className: "Pardoner_Indulgentia", name: "Indulgentia", canMake: true, requiredLevel: 1, baseCost: 2500, costPerLevel: 500, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Indulgentia_Buff", buffDuration: 10000 },
+{ skillType: 40403, className: "Pardoner_DiscernEvil", name: "Discern Evil", canMake: false, requiredLevel: 1, baseCost: 2000, costPerLevel: 400, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "DiscernEvil_Buff", buffDuration: 10000 },
+
+// Priest Skills
+//---------------------------------------------------------------------------
+{ skillType: 40501, className: "Priest_Blessing", name: "Blessing", canMake: true, requiredLevel: 1, baseCost: 2000, costPerLevel: 400, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Blessing_Buff", buffDuration: 1800000 },
+{ skillType: 40502, className: "Priest_Sacrament", name: "Sacrament", canMake: true, requiredLevel: 1, baseCost: 2500, costPerLevel: 500, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Sacrament_Buff", buffDuration: 1800000 },
+{ skillType: 40503, className: "Priest_AspersionHoly", name: "Aspersion", canMake: true, requiredLevel: 1, baseCost: 2000, costPerLevel: 400, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Aspersion_Buff", buffDuration: 1800000 },
+{ skillType: 40504, className: "Priest_Monstrance", name: "Monstrance", canMake: true, requiredLevel: 1, baseCost: 2500, costPerLevel: 500, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Monstrance_Buff", buffDuration: 1800000 },
+
+// Krivis Skills
+//---------------------------------------------------------------------------
+{ skillType: 40601, className: "Krivis_Zalciai", name: "Zalciai", canMake: true, requiredLevel: 1, baseCost: 2500, costPerLevel: 500, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Zalciai_Buff", buffDuration: 1800000 },
+{ skillType: 40602, className: "Krivis_Daino", name: "Daino", canMake: true, requiredLevel: 1, baseCost: 2500, costPerLevel: 500, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Daino_Buff", buffDuration: 1800000 },
+{ skillType: 40603, className: "Krivis_Aukuras", name: "Aukuras", canMake: true, requiredLevel: 1, baseCost: 3000, costPerLevel: 600, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "None", buffDuration: 0 },
+
+// Dievdirbys Skills
+//---------------------------------------------------------------------------
+{ skillType: 40701, className: "Dievdirbys_Laima", name: "Statue of Goddess Laima", canMake: true, requiredLevel: 1, baseCost: 3000, costPerLevel: 600, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "None", buffDuration: 0 },
+{ skillType: 40702, className: "Dievdirbys_Zemyna", name: "Statue of Goddess Zemyna", canMake: true, requiredLevel: 1, baseCost: 3000, costPerLevel: 600, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "None", buffDuration: 0 },
+
+// Oracle Skills
+//---------------------------------------------------------------------------
+{ skillType: 40801, className: "Oracle_Prophecy", name: "Prophecy", canMake: true, requiredLevel: 1, baseCost: 3500, costPerLevel: 700, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "Prophecy_Buff", buffDuration: 1800000 },
+{ skillType: 40802, className: "Oracle_Arcane_Energy", name: "Arcane Energy", canMake: true, requiredLevel: 1, baseCost: 3000, costPerLevel: 600, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.5, buffId: "ArcaneEnergy_Buff", buffDuration: 1800000 },
+
+// Cleric Base Skills
+//---------------------------------------------------------------------------
+{ skillType: 40101, className: "Cleric_Heal", name: "Heal", canMake: true, requiredLevel: 1, baseCost: 1000, costPerLevel: 200, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 2.0, buffId: "None", buffDuration: 0 },
+{ skillType: 40102, className: "Cleric_Cure", name: "Cure", canMake: true, requiredLevel: 1, baseCost: 1500, costPerLevel: 300, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 2.5, buffId: "None", buffDuration: 0 },
+{ skillType: 40103, className: "Cleric_SafetyZone", name: "Safety Zone", canMake: true, requiredLevel: 1, baseCost: 2500, costPerLevel: 500, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "None", buffDuration: 0 },
+
+// Druid Skills
+//---------------------------------------------------------------------------
+{ skillType: 40901, className: "Druid_Chortasmata", name: "Chortasmata", canMake: true, requiredLevel: 1, baseCost: 2500, costPerLevel: 500, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.0, buffId: "Chortasmata_Buff", buffDuration: 1800000 },
+{ skillType: 40902, className: "Druid_Sterea_Trofh", name: "Sterea Trofh", canMake: true, requiredLevel: 1, baseCost: 3000, costPerLevel: 600, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "StereaTrofh_Buff", buffDuration: 1800000 },
+
+// Kabbalist Skills
+//---------------------------------------------------------------------------
+{ skillType: 41001, className: "Kabbalist_Ayin_sof", name: "Ein Sof", canMake: true, requiredLevel: 1, baseCost: 4000, costPerLevel: 800, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 1, craftTime: 5.0, buffId: "Ayin_sof_Buff", buffDuration: 1800000 },
+
+// Plague Doctor Skills
+//---------------------------------------------------------------------------
+{ skillType: 41101, className: "PlagueDoctor_HealingFactor", name: "Healing Factor", canMake: true, requiredLevel: 1, baseCost: 3500, costPerLevel: 700, materialClassName: "misc_scrollpaper", materialCount: 2, materialPerLevel: 0, craftTime: 4.0, buffId: "HealingFactor_Buff", buffDuration: 1800000 },
+{ skillType: 41102, className: "PlagueDoctor_Bloodletting", name: "Bloodletting", canMake: true, requiredLevel: 1, baseCost: 3000, costPerLevel: 600, materialClassName: "misc_scrollpaper", materialCount: 1, materialPerLevel: 0, craftTime: 3.5, buffId: "Bloodletting_Buff", buffDuration: 60000 },
+
+]

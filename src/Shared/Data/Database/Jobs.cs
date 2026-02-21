@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Melia.Shared.Game.Const;
 using Newtonsoft.Json.Linq;
+using Yggdrasil.Data;
 using Yggdrasil.Data.JSON;
 
 namespace Melia.Shared.Data.Database
@@ -40,6 +42,7 @@ namespace Melia.Shared.Data.Database
 		public float AtkSpeedRate { get; set; }
 		public float MoveSpeedRate { get; set; }
 		public int BarrackStance { get; set; }
+		public bool IsHidden { get; set; }
 	}
 
 	/// <summary>
@@ -47,6 +50,22 @@ namespace Melia.Shared.Data.Database
 	/// </summary>
 	public class JobDb : DatabaseJsonIndexed<JobId, JobData>
 	{
+
+		public bool TryFind(string name, out JobData data)
+		{
+			data = default;
+			foreach (var entry in this.Entries.Values)
+			{
+				if (string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase))
+					data = entry;
+				if (string.Equals(entry.ClassName, name, StringComparison.OrdinalIgnoreCase))
+					data = entry;
+				if (data != null)
+					break;
+			}
+			return data != null;
+		}
+
 		/// <summary>
 		/// Reads given entry and adds it to the database.
 		/// </summary>

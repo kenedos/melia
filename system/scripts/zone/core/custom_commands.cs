@@ -124,18 +124,9 @@ public class CustomCommandFunctionsScript : GeneralScript
 			return CustomCommandResult.Fail;
 		}
 
-		var newJob = new Job(character, jobId, skillPoints: 1);
+		character.ChangeJob(jobId);
 
-		Send.ZC_PC(character, PcUpdateType.Job, (int)newJob.Id, newJob.Level);
-		Send.ZC_NORMAL.PlayEffect(character, "F_pc_class_change");
-
-		character.JobId = jobId;
-		character.Jobs.Add(newJob);
-
-		// Should the event happen regardless of how the job
-		// change happened? Should this code be cleaned up to
-		// use one simple function to accomplish all this? TBD.
-		ZoneServer.Instance.ServerEvents.PlayerAdvancedJob.Raise(new PlayerEventArgs(character));
+		Send.ZC_PC(character, PcUpdateType.Job, (int)character.Job.Id, character.Job.Level);
 
 		return CustomCommandResult.Okay;
 	}

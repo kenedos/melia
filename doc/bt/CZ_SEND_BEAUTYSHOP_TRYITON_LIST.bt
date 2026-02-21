@@ -24,4 +24,3 @@ typedef struct {
 
 int count;
 BeautyStyle styles[count];
-int i1;

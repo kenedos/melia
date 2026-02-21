@@ -25,9 +25,15 @@
 //				Updated 0xDB, 0x135 -> 0x136
 //   - i367254: Added 0x5A, 0x88, 0x1BD
 //   - i370844: Looks like a shift 0x1BC -> 0x1BF (2 or 3 Bytes)
+//   - i383368: Added 0x1CE
+//   - i387655: Discovered 0x109, 0x03
+//   - i400769: Noticed a shift of +2 (0x1A8 -> 0x1AA).
+//              Added 0x14
 //------------------------------------------------
 
 #include "inc/common.bt"
+
+#define PROPERTY_NAMES
 
 typedef struct
 {
@@ -58,14 +64,16 @@ typedef struct
     short jobId;
     short level;
     int i1;
-    int totalExp;
-    int i2;
+    int64 totalExp;
     byte unusedSkillPoints;
-    ushort s2;
-    byte bin1[4];
     byte b1;
-    FILETIME advancedDate;
-    int64 l2;
+    byte b2;
+    byte b3;
+    byte b4;
+    byte b5;
+    short s3;
+    FILETIME advancementDate;
+    FILETIME selectionDate;
 }
 Job;
 
@@ -90,24 +98,240 @@ typedef struct
     int i2;
 } MarketItem <optimize=false>;
 
+typedef enum
+{
+    SkillProjectile = 0x06,
+    FadeOut = 0x38,
+    BarrackSlotCount = 0x3C,
+    UnkDynamicCastStart = 0x4F,
+    UnkDynamicCastEnd = 0x50,
+    PadUpdate = 0x59,
+    ParticleEffect = 0x61,
+    PadMoveTo = 0x64,
+    Unknown_A1 = 0xA1,
+    Unknown_E4 = 0xE4,
+
+    TimeActionStart = 0x00,
+    TimeActionEnd = 0x01,
+    TimeActionOnlyTarget = 0x02,
+    NpcStateType = 0x04,
+    Skill_MissileThrow = 0x06,
+    SkillFallingProjectile = 0x07,
+    SkillMonsterToss = 0x08,
+    SkillItemToss = 0x09,
+    UpdateCharacterLook = 0x0D,
+    PlayEquipItem = 0x0E,
+    PlayEffectAtPosition = 0x0F,
+    AttachEffect = 0x12,
+    ClearEffects = 0x13,
+    PlayEffectNode = 0x14,
+    PlayEffect = 0x16,
+    PlayForceEffect = 0x17,
+    DetachEffect = 0x1B,
+    ShowComboEffect = 0x1E,
+    UpdateSkillEffect = 0x1F,
+    SetActorColor = 0x20,
+    SetActorShadow = 0x23,
+    Skill_CallLuaFunc = 0x26,
+    SetSkillProperties = 0x2B,
+    SetScale = 0x2E,
+    PlaySound = 0x2F,
+    PlayArrowEffect = 0x34,
+    RemoveGroundEffect = 0x3C,
+    TextEffect = 0x3D,
+    SkillChangeAnimation = 0x40,
+    SkillResetAnimation = 0x41,
+    SkillTargetAnimation = 0x42,
+    SkillTargetAnimationEnd = 0x43,
+    AttackCancelBow = 0x44,
+    Skill_45 = 0x45,
+    SkillCancel = 0x46,
+    MonsterMapMarker = 0x47,
+    CharacterMapMarker = 0x48,
+    RemoveMapMarker = 0x49,
+    AccountProperty = 0x4D,
+    Skill_DynamicCastStart = 0x4F,
+    Skill_DynamicCastEnd = 0x50,
+    NPC_PlayTrack = 0x53,
+    SetNPCTrackPosition = 0x54,
+    MiniGame = 0x55,
+    IndunAddonMsg = 0x56,
+    IndunAddonMsgParam = 0x58,
+    SkillRunScript = 0x59,
+    PadSetMonsterAltitude = 0x5C,
+    PadCreateObstacle = 0x5D,
+    Skill_5F = 0x5F,
+    Skill_EffectMovement = 0x64,
+    Unknown_64 = 0x66,
+    Skill_6D = 0x6D,
+    SetupCutscene = 0x6E,
+    Unknown_6D = 0x6F,
+    Unknown_6E = 0x70,
+    LoadCutscene = 0x78,
+//    SetSkillSpeed = 0x77,
+    SetHitDelay = 0x7A,
+    SetSkillSpeed = 0x7B,
+    SetSkillUseOverHeat = 0x7C,
+    SkillCancelCancel = 0x7D,
+    Skill_7F = 0x81,
+    SetMainAttackSkill = 0x87,
+    SkillToggle = 0x88,
+    SpinThrow = 0x89,
+    SpinObject = 0x8A,
+    SkillCollisionToGround = 0x8B,
+    CollisionAndBack = 0x8C,
+    ThrowAttachedMonster = 0x8E,
+    StopAnimation = 0x8F,
+    PetPlayAnimation = 0x90,
+    CutsceneTrack = 0x96,
+    SetTrackFrame = 0x97,
+    DelayEnterWorld = 0x99,
+    ShowItemBalloon = 0x9C,
+// PlayItemGetAnim(pc, ani, item, / nodeName(def:None))
+// Attach the item to the node while ordering the PC to ani.
+    PlayItemGetAnim = 0x9D,
+    ShowBook = 0x9E,
+    ShowScroll = 0x9F,
+    JumpToPosition = 0xA2,
+    CompanionInfo = 0xA4,
+    Pet_AssociateWorldId = 0xA7,
+    Pet_AssociateHandleWorldId = 0xA9,
+    PetExpUp = 0xAA,
+    MakeLink = 0xAC,
+    DestructLink = 0xAD,
+    PetBuff = 0xB4,
+    RidePet = 0xB5,
+    PetOwner = 0xB6,
+    OffsetY = 0xB7,
+    PetFlying = 0xB9,
+    AutoDetachWhenTargetMove = 0xBD,
+    Skill_MoveJump = 0xC2,
+    EnterDelayedActor = 0xC8,
+    Skill_Unknown_C7 = 0xC9,
+    PlayGatherCorpseParts = 0xCC,
+    Skill_Unknown_D4 = 0xD4,
+    PlayCorpsePartsRing = 0xD8,
+    RemoveEffect = 0xDA,
+    DropCorpseParts = 0xDB,
+    PlayThrowCorpseParts = 0xDC,
+    ItemCollectionList = 0xDD,
+    UnlockCollection = 0xDF,
+    UpdateCollection = 0xE0,
+    Unknown_E0 = 0xE2,
+    PlayTextEffect = 0xE3,
+    Unknown_E5 = 0xE7,
+    Notice = 0xF0,
+    GlobalJobCount = 0xF2,
+    PartyMemberData = 0xF4,
+    PartyLeaderChange = 0xF6,
+    PartyNameChange = 0xF7,
+    PartyInvite = 0xF8,
+    PartyPropertyChange = 0xF9,
+    PartyMemberPropertyChange = 0xFA,
+    Unknown_FB = 0xFB,
+    MarketRetrievalItems = 0xFC,
+    MarketRegisterItem = 0xFD,
+    MarketBuyItem = 0xFE,
+    MarketCancelItem = 0xFF,
+    SummonPlayAnimation = 0x108,
+    ShowHookEffect = 0x109,
+    MakeHookEffect = 0x109,
+    ApplyBuff = 0x10B,
+    RemoveBuff = 0x10C,
+    Skill_10D = 0x10D,
+    Skill_10E = 0x10E,
+    Unknown_10F = 0x112,
+    CancelDynamicCast = 0x113,
+    Unknown_11A = 0x11C,
+    Shop_Unknown11C = 0x11E,
+    Transmutation = 0x120,
+    Unknown_121 = 0x121,
+    Skill_122 = 0x122,
+    RunJumpRope = 0x123,
+    ShootChainEffect = 0x125,
+    Skill_124 = 0x126,
+    Skill_127 = 0x129,
+    ChannelTraffic = 0x12D,
+    Unknown_130 = 0x130,
+    SetActorLabel = 0x132,
+    Unknown_134 = 0x137,
+    SetGreetingMessage = 0x138,
+    ShowParty = 0x13C,
+    Revive = 0x13E,
+    ShopAnimation = 0x13F,
+    SetSessionKey = 0x146,
+    FlyWithObject = 0x147,
+    Unknown_14A = 0x14A,
+    StatusEffect = 0x14D,
+    DisconnectError = 0x151,
+    ItemDrop = 0x152,
+    Unknown_153 = 0x153,
+    RequestDuel = 0x154,
+    FightState = 0x157,
+    NGSCallback = 0x170,
+    StorageSilverTransaction = 0x171,
+    MarketMinMaxInfo = 0x172,
+    MemberMapStatusUpdate = 0x17A,
+    HeadgearVisibilityUpdate = 0x17C,
+    WorldClientMessage = 0x17D,
+    WorldMessage = 0x17E,
+    SetSkillsProperties = 0x181,
+    InstanceStart = 0x185,
+    UpdateSkillUI = 0x189,
+    InstanceDungeonMatchMaking = 0x18E,
+    FishingRankData = 0x190,
+    AdventureBook = 0x197,
+    AdventureBookRank = 0x198,
+    Unknown_198 = 0x19A,
+    Unknown_19B = 0x19E,
+    Unknown_19D_SetTime = 0x19F,
+    PetIsInactive = 0x1A6,
+    SetSubAttackSkill = 0x1A7,
+    Unknown_1A6 = 0x1A8,
+    PadSetModel = 0x1AB,
+    WigVisibilityUpdate = 0x1AC,
+    UsedMedalTotal = 0x1B7,
+    Unknown_1B6 = 0x1B8,
+    SteamAchievement = 0x1BE,
+    ActorRotate = 0x1BF,
+    SubWeaponVisibilityUpdate = 0x1C5,
+} SubOp;
+
 ServerHeaderDynamic header;
 
-int type;
+SubOp type;
 switch (type)
 {
     // NPC Time Action
     case 0x00:
         int handle;
-        lpString lpStr1; // !@#$Auto_KyeongBae_Jung#@!, @dicID_^*$QUEST_LV_0100_20160323_014891$*^, !@#$F_CASTLE_97_MQ_03_MSG4#@!, !@#$EP12_2_D_DCAPITAL_108_MQ05_MSG2#@!, !@#$Auto_Hwagin_Jung#@!, !@#$D_CASTLE_19_1_MQ_03_MSG2#@!
-        lpString lpStr2; // WORSHIP, TALK, #SITGROPESET, ABSORB, read
+        lpString displayText; // !@#$Auto_KyeongBae_Jung#@!, @dicID_^*$QUEST_LV_0100_20160323_014891$*^, !@#$F_CASTLE_97_MQ_03_MSG4#@!, !@#$EP12_2_D_DCAPITAL_108_MQ05_MSG2#@!, !@#$Auto_Hwagin_Jung#@!, !@#$D_CASTLE_19_1_MQ_03_MSG2#@!
+        lpString animationName; // WORSHIP, TALK, #SITGROPESET, ABSORB, read
         float duration; // 1.0 or 2.0, 1.0, 3.0
         byte b1; // 1 (Exec suggested that this might be a bool), 1, 1
-        lpString lpStr3; // None, None, None
+        lpString buttonText; // None, None, None
         break;
 
     case 0x01:
         int handle;
         byte b1; // Time Action Started/Stopped?
+        break;
+        
+    case 0x02:
+        int handle;
+        lpString displayText; // !@#$Auto_KyeongBae_Jung#@!, @dicID_^*$QUEST_LV_0100_20160323_014891$*^, !@#$F_CASTLE_97_MQ_03_MSG4#@!, !@#$EP12_2_D_DCAPITAL_108_MQ05_MSG2#@!, !@#$Auto_Hwagin_Jung#@!, !@#$D_CASTLE_19_1_MQ_03_MSG2#@!
+        lpString animationName; // WORSHIP, TALK, #SITGROPESET, ABSORB, read
+        float duration; // 1.0 or 2.0, 1.0, 3.0
+        break;
+        
+    case 0x03:
+        int i1; // 1249
+        int i2; // 111
+        int i3; // 2
+        short s1; // 0
+        lpString str; // BORN
+        short s2; // 2
+        lpString str2; // ON
         break;
 
     // Sent After Some Monster Spawn?
@@ -116,60 +340,76 @@ switch (type)
         int genType; // 10006 (GenType?)
         break;
 
+    // Skill Projectile
     case 0x06:
         int handle;
-        int animationId1;
-        float duration1;
-        int animationId2;
-        float duration2;
+        int effectId;
+        float effectScale;
+        int endEffectId;
+        float endEffectScale;
         position pos;
+        float range;
+        float flyTime;
+        float delayTime;
+        float gravity;
+        float speed;
+        int dcDelay;
+        int dcEffectScale;
+        lpString dcEffectName;
+        break;
+
+    // Skill Falling Projectile
+    case 0x07:
+        int casterHandle; // Handle? 168197
+        lpString str; // Matross_ArtilleryCall
+        int fallEffectId; // I_archer_canon_force3 ? / 6836
+        float fallEffectScale; // 2 / 0.5
+        int groundEffectId; // 66 / 15113
+        float groundEffectScale; // 3 / 0.5
+        position pos; // X: 366.019531, Y: 82.859558, Z: 158.280228
+        float range; // 150 / 60
+        float delayTime; // 0 / 0
+        float flyTime; // 0.3
+        float height; // 300
+        float easing; // 1
+        float startEasing; // 0
+        break;
+        
+    case 0x08:
+        int handle;
+        int i1;
         float f1;
+        position pos;
         float f2;
         float f3;
         float f4;
         float f5;
-        int64 l1;
-        lpString str1;
+        float f6;
         break;
 
-    // ?
-    case 0x07:
-        int i1; // Handle? 168197
-        lpString str; // Matross_ArtilleryCall
-        int packetString; // I_archer_canon_force3 ?
-        float f1; // 2
-        int i2; // 66
-        float f2; // 3
-        position pos; // X: 366.019531, Y: 82.859558, Z: 158.280228
-        float f3; // 150
-        float f4; // 0
-        float f5; // 0.3
-        float f6; // 300
-        float f7; // 1
-        float f8; // 0
-        break;
-
+    // Throw Item
     case 0x09:
-        int i1; // Handle? 50353
-        lpString str; // warrior_f_
-        lpString str2; // RH
+        int handle; // Handle? 50353
+        lpString xacHeadName; // warrior_f_
+        lpString handType; // RH
         position pos; // X: 145.758011, Y: 0.000000, Z: 57.035698
-        int packetString; // 1830024:F_smoke177
-        float f1; // 3
-        float f2; // 0.2
-        float f3; // 0
-        float f4; // 600
-        float f5; // 1
-        float f6; // 230
-        float f7; // 290
+        int endEftName; // 1830024:F_smoke177
+        float endScale; // 3
+        float flyTime; // 0.2
+        float delayTime; // 0
+        float gravity; // 600
+        float easing; // 1
+        float startRotateBillboard; // 230
+        float endRotateBillboard; // 290
         float f8; // 0
         float f9; // 0
         break;
 
     // ?
     // Jaguar Skill
+    /**
     case 0x0D:
-        int i1; // 80148
+        int handle; // 80148
         byte b1; // 0
         short s1; // 1
         short s2; // 1
@@ -179,6 +419,61 @@ switch (type)
         int i3; // 2
         int i4; // 0
         byte b2; // 0
+        if (b2 > 0)
+        {
+            switch(b2)
+            {
+                case 8:
+                    short s4;
+                    byte b3;
+                    int i1;
+                    int i2;
+                break;
+            }
+        }
+        break;
+     **/
+     
+     // Illusionist skill
+    case 0x0D:
+    {
+        typedef struct
+        {
+            int itemId; // 
+            int equipSlot; // 2
+            switch (equipSlot)
+            {
+                case 999:
+            byte visible;
+            int hairIndex; // 483
+            if (hairIndex > 0)
+            {
+                int itemId;
+                int i3;
+            }
+            break;
+            }
+        } EquipInfo <optimize=false>;
+        
+        int handle; // 80148
+        byte b1; // 0
+        short s1; // 1
+        int count;
+        EquipInfo equip[count];
+        byte isPcInfoSet;
+        if (isPcInfoSet == 1)
+            int pcInfoPartsNode2Id;
+        int i1;
+        
+        break;
+    }
+    
+    // Sent after Companion Feed Request
+    case 0x0E:
+        int handle;
+        byte b1;
+        lpString str;
+        byte b2;
         break;
 
     case 0x0F:
@@ -215,22 +510,28 @@ switch (type)
         float time; // 5
         lpString str1; // Dummy_R_HAND
         lpString str2; // None
+        int i1; // 0
+        int i2; // 4
         break;
 
-    // Play effect
+    // Class lv up effect
+    // Play effect?
+    // Packet got longer? Noticed 396447, Added i4 and i5
     case 0x16:
         int handle;
         byte b1;
-        int location; // 0 = top, 1 = middle, 2 = bottom
+        int heightOffset;
         byte b2;
         float effectSize;
         int packetStringId;
-        int i3;
+        int i3; // 0
+        int i4; // 0
+        int i5; // 0
         break;
 
     // ?
     case 0x17:
-        int i1;
+        int forceId;
         int casterHandle;
         int handle1;
         int handle2;
@@ -242,20 +543,26 @@ switch (type)
         int packetStringId4;
         int packetStringId5;
         float speed;
+        float f1;
+        float f2;
+        float f3;
+        int i2;
+        float f4;
         float f5;
         float f6;
-        float f7;
-        int i2;
-        float f9;
-        float f10;
-        float f11;
         int i3;
         break;
 
     case 0x1B:
-        int i1; // handle
+        int handle; // handle
         byte b1; // 1
-        int i2; // 390060
+        int i1; // 390060
+        break;
+        
+    case 0x1E:
+        int comboCount; // 1,2,3..,33
+        float comboDuration; // 5
+        int i1; // 101
         break;
 
     case 0x1F:
@@ -269,6 +576,16 @@ switch (type)
         position targetPosition;
         break;
 
+    // Added i370844 (Could be 0x1C before this)
+    case 0x1F:
+        int handle;
+        int i1; // 0
+        int i2;
+        int i3;
+        position pos;
+        direction dir;
+        break;
+		
 	// Set Monster Color (YMCA)?
     case 0x20:
         int handle; // npc/monster handle?
@@ -279,6 +596,11 @@ switch (type)
         byte b5; // 1
         float f1; // 1 | 2 | 0
         byte b6; // 1 | 1 | 0 -> 1 (Packet sent twice)
+        break;
+    
+    case 0x23:
+        int handle;
+        float f1;
         break;
 
 	// Skill CallLuaFunc
@@ -301,13 +623,14 @@ switch (type)
         break;
 
     // Assister Summon Skill Related?
+    // Set Scale
     case 0x2E:
         int handle;
-        int i1; // 11217 / 989 / 908
-        float f1; // 1 / 1.5 / 0.65
-        float f2; // 0 / 1 / 0
+        int i1; // 11217 / 989 / 908 / 33
+        float scale; // 1 / 1.5 / 0.65
+        float scaleTransitionSpeed; // 0 / 1 / 0
         byte b1; // 0 / 0 / 0
-        short s1; // 1 / 0 / 0
+        short s1; // 1 / 0 / 0 (Could be 2 bytes)
         break;
         
     // Play sound?
@@ -319,13 +642,20 @@ switch (type)
     case 0x34:
         position pos1;
         position pos2;
-        direction dir;
-        float f1; // 25
-        float f2; // 0.01
-        float f3; // 1
+        int arrowEffectId;
+        float effectScale;
+        float arrowSpace; // 25
+        float arrowSpaceTime; // 0.01
+        float arrowLife; // 1
         float f4; // 0
         int handle;
         byte b1; // 0
+        break;
+
+    case 0x35:
+        int handle;
+        int syncKey; // 6945 (ZC_SYNC_START / ZC_SYNC_END id)
+        byte b1; // 2 or 3
         break;
 
     // Fades out monster
@@ -333,6 +663,14 @@ switch (type)
         int mapId;
         int genType;
         float seconds;
+        break;
+
+    // Sent skill effect ending?
+    // Seen with Lightning Tower (Engineer Skill)
+    case 0x3C:
+        int i1;
+        float f1;
+        int casterHandle;
         break;
 
     // Used while recovering HP?
@@ -347,10 +685,11 @@ switch (type)
         int count;
         break;
 
-    // ?
+    // Used with specific skills
     case 0x3F:
         int handle; // 57701
-        lpString str; // Freeze
+        lpString str; // Freeze / bigheadmode
+        byte b1; // ? / 1
         break;
 		
 	// Finestra
@@ -382,6 +721,11 @@ switch (type)
     case 0x43:
         int handle;
         break;
+        
+    // Pet Companion (Cancel Attack?)
+    case 0x44:
+        int handle;
+        break;
 
     // Skill related? Cancel Pistol Attack?
     case 0x45:
@@ -394,7 +738,33 @@ switch (type)
         int skillId;
         break;
 
+    // Monster Minimap Marker
+    case 0x47:
+        int handle;
+        int monsterId;
+        byte b1; // 1
+        byte b2; // 1
+        float x; // 912
+        float z; // -697
+        byte b3; // 0
+        break;
+
+    // Player Minimap Marker
     case 0x48:
+        int handle;
+        short visualJobId;
+        byte b1;
+        float x;
+        float z;
+        byte b2;
+        break;
+        
+    // Remove Minimap Marker
+    case 0x49:
+        int handle;
+        break;
+
+    case 0x4A:
         int i1;
         int i2;
         FILETIME time;
@@ -454,8 +824,7 @@ switch (type)
         byte bin[10]; // 0s / 0s
         int64 l1; // 1 / 1
         byte bin2[5]; // 0s / 0s
-        byte b12; // 1 / 1
-        short s1; // 0 / 0
+        lpString str2;
         break;
 
     // ? Instance Dungeon or Weekly Boss Related?
@@ -468,10 +837,10 @@ switch (type)
     // ? Instance Dungeon or Weekly Boss Related?
     // Script/Addon Message?
     case 0x58:
-        int i1; // 2 / ? / 0 / 2 (Parameter Count)?
-        int packetString; // 1410037 / 1300078 / 2561958 / 1370094 (Packet String)
+        int i1; // 2 / ? / 0 / 2 (Parameter Count)? / 0 / 2 / 0
+        int packetString; // 1410037 / 1300078 / 2561958 / 1370094 (Packet String) / 4852 / 12919 / "Start"
         if (i1 > 0)
-            int i3; // 1 /?/?/ 0
+            int i3; // 1 /?/?/ 0 / 0 / 1 / 0
         break;
 
     // Skill related? Seen when casting Lethargy or Mon_weekly_pattern_Skill_36
@@ -480,16 +849,35 @@ switch (type)
         int handle;
         int packetString; // 570003 or 390162 (Packet String)
         int skillId; // 20002 or 163853
-        int i1; // count? 1
+        int skillLevel; // count? 1
         position targetPosition;
         direction targetDirection;
-        float f1; // 0
-        float f2; // duration? 0
-        int skillHandle; // 109539
-        int i4; // 1
+        float posAngle; // 0
+        float posDist; // duration? 0
+        int padHandle; // 109539
+        int isVisible; // 1
         byte bin1[13]; // 0s
-        float f3; // 20 or 50
+        float numArg3; // 20 or 50
         byte bin2[16]; // 0s
+        break;
+        
+    // Pad Related (Used in Spike Shooter Skill)
+    case 0x5A:
+        int padHandle; // 33
+        position pos1;
+        position pos2;
+        int packetString; // SpikeShooter
+        int monsterId; // 57710
+        break;
+        
+    // Pad Related
+    case 0x5B:
+        int padHandle; // 33
+        int i0; // 0
+        float f1; // 0
+        float f2; // 0
+        int i1; // 844
+        int i2; // 864
         break;
 
     // Skill related? Seen when casting Shield Lob
@@ -501,9 +889,20 @@ switch (type)
         byte b1; // 1
         break;
 
+    // Pad Create Obstacle
+    // Make's the pad impassable on non-city maps.
     case 0x5D:
-        int skillHandle; // 2698?
-        int64 l1; // 0
+        int padHandle; // 2698?
+        float x;
+        float y;
+        break;
+        
+    // Seen before ZC_BUFF_REMOVE TELHARSHA_LIGHT_BUFF
+    case 0x5F:
+        int i1; // 72100
+        float f1; // 0.99
+        float f2; // 0
+        byte b1;
         break;
 
     // Skill related (Hwarang PyeonJeon)
@@ -511,8 +910,8 @@ switch (type)
         int i1; // 7947 (Skill Handle?) / ? / 8866
         position pos; // X: -1827.782349, Y: 54.911945, Z: -295.520996
         byte b1; // 1 / 0 / 1
-        float f1; // 100 / 10 / 600
-        float f2; // 100 / 0 / 50
+        float movementSpeed; // 100 / 10 / 600
+        float accel; // 100 / 0 / 50
         break;
 
     // Seen after casting Cleric Fade Skill
@@ -522,7 +921,7 @@ switch (type)
         break;
 
     // Seen after TELHARSHA_STOP_BUFF and before ZC_SKILL_RANGE_DBG
-    case 0x6B:
+    case 0x6D:
         int i1; // 185554
         byte b1; // 1
         break;
@@ -585,6 +984,14 @@ switch (type)
         int handle;
         break;
 
+    case 0x80:
+        byte b1;
+        int i1;
+        int i2;
+        float f1;
+        int handle;
+        break;
+        
     case 0x81:
         int i1;
         int packetString;
@@ -604,25 +1011,51 @@ switch (type)
         int handle;
         int skillId;
         break;
-
+    
+    // Seen with Dust Devils Skill
+    // Spin Object?
     case 0x8A:
         int handle;
-        float f1; // 0
-        float f2; // -1
-        float f3; // 0.2
-        float f4; // 0
+        float spinDelay; // 0
+        int spinCount; // 5
+        // I don't see this float.
+        //float f2; // -1
+        float rotationPerSecond; // 0.2
+        float velocityChangeTerm; // 0
         break;
-
+        
     // Sent during Barbarian Stomping Kick
     // SKL_COLL_TO_GROUND
-    case 0x89:
+    case 0x8B:
         int handle;
         position pos;
-        float f1; // 200
-        float f2; // 5
-        int i1; // 963
-        int i2; // 0
-        float f3; // 0.5
+        float speed; // 200
+        float easing; // 5
+        int skillKey; // 963
+        int anim; // 0
+        float animSec; // 0.5
+        break;
+        
+    // Companion Skill Related?
+    case 0x8C:
+        int   casterHandle;
+        int   targetHandle;
+        int   syncKey;
+        int   animationStringId; // String IDs are usually 4-byte hashes/indices
+        float goTime;            // Approach duration
+        float goEasing;          // Approach easing curve
+        float backTime;          // Return duration
+        float backEasing;        // Return easing curve
+        float collisionOffset;   // Offset from target on hit
+        byte  returnToOriginal;  // 1 = Return, 0 = Stay at target
+        break;
+    
+    case 0x8E:
+        int handle;
+        int packetStr;
+        position pos;
+        float throwSpd;
+        float hideTime;
         break;
 
     case 0x8F:
@@ -638,7 +1071,7 @@ switch (type)
         break;
 
     // Start a track (Client Side Cutscene)
-    case 0x94:
+    case 0x96:
         lpString trackName;
         int64 l1;
         int count;
@@ -648,7 +1081,7 @@ switch (type)
 
     // NPC Related?
     // Set Track (Cutscene) Frame
-    case 0x95:
+    case 0x97:
         int frame; // 7, 74, -2, 16
         break;
 
@@ -667,6 +1100,7 @@ switch (type)
         break;
 
     // Item Appraised (Identified)
+    // ShowItemBalloon
     case 0x9C:
         byte b0;
         int npcHandle;
@@ -698,7 +1132,7 @@ switch (type)
         lpString scroll; //EP14_3LINE_TUTO_MQ_13_scroll
         break;
 
-    // Spawn Pet?
+    // Pet Info
     case 0xA4:
         int i1;
         int petCount;
@@ -717,22 +1151,66 @@ switch (type)
         }
         break;
     
+    // Old
+    /**
     case 0xA5:
         int companionHandle;
         int64 worldId; // Associated Unique Id?
         short s3;
         byte b1;
         break;
+        **/
+    case 0xA5:
+        int64 worldId; // Associated Unique Id?
+        int64 l1;
+        getProperties(8);
+        break;
 
     case 0xA7:
         int handle;
-        int64 worldId; // Associated Unique Id?
+        short s1;
+        float f1;
+        int i1;
         byte b1;
         break;
 
     case 0xA8:
         int64 worldId; // Associated Unique Id?
         int64 exp;
+        break;
+
+    case 0xA9:
+        int handle;
+        int64 worldId; // Associated Unique Id?
+        byte b1;
+        break;
+        
+        // Linker List
+    case 0xAC:
+        int casterHandle;
+        int linkerId;
+        int linkerCablePacketStrId; // Linker_cable_basic (5051)
+        byte b1; // Bool?
+        int linkedCount; // Link Count
+        int linkedHandles[linkedCount];
+        float f1; // 0.2
+        int linkerHitEffectStrId; // F_scout_JointPenalty_hit (4767)
+        float f2; // 0.4
+        int linkerSoundEffectStrId; // swd_blow_cloth2 (14663)
+        break;
+        
+    case 0xAD:
+        int casterHandle;
+        int linkerId;        
+        break;
+        
+    case 0xAE:
+        int casterHandle;
+        int linkerId;
+        int i3;
+        int i4;
+        int i5;
+        int i6;
         break;
 
     case 0xB2:
@@ -744,11 +1222,32 @@ switch (type)
         int packetString; // 1430012 (SnowRolling_Buff)
         byte b4; // 0
         break;
+    
+    // Seen after Gravity Pole after Vibrate
+    case 0xB3:
+        int targetHandle;
+        byte b1; // 2
+        break;
 
     // Associate Pet or Companion?
-    case 0xB3:
-        int entityHandle;
-        int characterHandle;
+    // Previously B3 but now it doesn't match
+    // 07/23/2024 (Snowrolling Buff Packet String Id)
+    case 0xB4:
+        int casterHandle;
+        int summonHandle;
+        byte b1; // 1
+        byte b2; // 1
+        byte b3; // 1
+        int packetString; // 1086 ("SnowRolling_Buff")
+        byte b4;
+        
+        //lpString str; // RidePet_ep13raincoat_1
+        break;
+    
+    // Ride Pet
+    case 0xB5:
+        int handle;
+        int petHandle;
         byte b1; // 1
         byte b2; // 1
         lpString str; // RidePet_ep13raincoat_1
@@ -760,27 +1259,34 @@ switch (type)
         int characterHandle;
         break;
 
+    // Offset Y
     case 0xB7:
         int entityHandle;
-        float f1; // 10.4
+        float f1; // 10.4 or 0
+        break;
+    
+    // Is this the same 0xB7 (Just shifted? Probably)
+    case 0xB9:
+        int handle;
+        float f1;
         break;
 
     // Flying Pet Related?
-    case 0xB9:
+    case 0xBB:
         int entityHandle;
         int i2; // 0
         break;
 
     // Pet or Companion animation state?
-    case 0xBB:
-        int entityHandle;
-        byte b1; // 1
-        int animationId; // 2562221 - SIT
+    case 0xBD:
+        int  actorHandle;       // The actor being configured
+        byte isEnabled;         // 1 = Detach on movement, 0 = Stay attached
+        int  detachAnimationId; // Animation played when forced off
         break;
 
     // Skill Related?
     // Skill Move Jump (Jaguar Wild Rush)
-    case 0xC0:
+    case 0xC2:
         int handle;
         position pos;
         float distance;
@@ -791,26 +1297,25 @@ switch (type)
         float f5;
         break;
 
-    // Leap Jump
-    case 0xC2:
-        int handle;
+    // Monster related? Summoned?
+    case 0xC4:
+        int casterHandle;
+        int targetHandle;
         position targetPos;
-        float jumpHeight;
-        float f2;
-        float f3;
-        float f4;
-        float f5;
-        float f6;
+        float f1;
+        int i1;
+        float gameTimeOffSet;
         break;
 
-    case 0xC6:
+    // Seen with Corpse Tower Skill (Sent After SetInvisible 0x99)
+    case 0xC8:
         int handle; // 231902
         byte b1; // 1
         break;
 
     // Skill Related?
     // Seen with Krivis Divine Stigma
-    case 0xC7:
+    case 0xC9:
         int casterHandle;
         int targetHandle;
         float f1; // 0.25
@@ -821,9 +1326,19 @@ switch (type)
         int i3; // 0
         float f3; // 1
         break;
+    
+    // Gather corpse parts
+    case 0xCC:
+        int casterHandle; // 21548
+        int targetHandle; // 20939
+        break;
+        
+    // Seen when using Bokor's Zombify
+    case 0xD4:
+        int casterHandle;
+        break;
 
     // ?
-    case 0xDA:
     case 0xD6:
         if (!checkCompression())
         {
@@ -831,38 +1346,86 @@ switch (type)
             int i1;
         }
         break;
+    
+    // Seen with Flesh Cannon
+    case 0xD8:
+        typedef struct
+        {
+            int monsterId;
+            byte b1; // 0,1,2,3,4,5... Index?
+            int i1; // 9
+            int i2; // 9
+        } CorpsePart <optimize=false>;
+    
+        int casterHandle;
+        int i1;
+        float f1;
+        float f2;
+        float f3;
+        int i2;
+        CorpsePart parts[i2];
+        break;
+    
+    case 0xDA:
+        int casterHandle;
+        int effectHandle;
+        break;
+    
+    // Drop part of the corpse ring
+    case 0xDB:
+        int casterHandle;
+        int i1; // 29607?
+        byte b1; // 1
+        int i2; // 400981
+        byte b2; // 0
+        int i3; // 1
+        int i4; // 2
+        break;
+    
+    // Seen with Flesh Cannon
+    case 0xDC:
+        int i1; // 29389
+        position pos;
+        float f1;
+        float f2;
+        float f3;
+        float f4;
+        float f5;
+        int i1;
+        break;
 
     // Collections
-    case 0xDB:
+    case 0xDD:        
+        typedef struct
+        {
+            int itemId;
+            int64 worldId;
+            short s1;
+        } CollectionItem <optimize=false>;
+        typedef struct
+        {
+            short collectionId;
+            int itemCount;
+            if (itemCount > 0)
+                CollectionItem items[itemCount];
+        } Collection <optimize=false>;
         if (!checkCompression())
         {
             int64 characterId;
             int collectionCount;
-            local int j;
-            for (j = 0; j < collectionCount; j++)
-            {
-                short collectionId;
-                int itemCount;
-                local int i;
-                for (i = 0; i < itemCount; i++)
-                {
-                    int itemId;
-                    int64 worldId;
-                    short s1;
-                }
-            }
+            Collection collections[collectionCount];
         }
         break;
 
     // Collection Related? (Unlock Collection?)
-    case 0xDD:
-        int64 l1;
+    case 0xDF:
+        int64 characterId;
         short collectionId;
         break;
 
     // Collection Related? (Add Item to Collection?)
-    case 0xDE:
-        int64 l1; // Character Id?
+    case 0xE0:
+        int64 characterId; // Character Id?
         int collectionId; // 118
         int i1; // Item Id
         int64 l1; // World Id?
@@ -891,7 +1454,6 @@ switch (type)
     
     // ?
     case 0xE4:
-    case 0xE5:
         typedef struct
         {
             lpString str;
@@ -901,6 +1463,13 @@ switch (type)
 
         int count;
         entry entries[count] <optimize=false>;
+        break;
+        
+    // Used in Mini Games? (Tel Hersha)
+    // Set Script Values?
+    case 0xE5:
+        lpString str; // MGAME_TOTAL_SCORE
+        int val; // 0
         break;
         
     // Job ranks?
@@ -961,6 +1530,12 @@ switch (type)
     case 0xEE:
         lpString str; // EP14_3LINE_TUTO_MQ_2_DLG_RUN_EM / F_CASTLE_99_MQ_03_DLG_PRE
         float duration; // 3 / 10
+        break;
+
+    case 0xF1:
+        int handle;
+        float f1; // 3
+        float f2; // 0.3
         break;
 
     // Looks like a count of classes?
@@ -1053,22 +1628,30 @@ switch (type)
         JobF2 jobs[count];
         break;
 
+    // Update Party Leader
+    case 0xF6:
+        PartyType partyType;
+        int64 partyId;
+        int64 leader;
+        break;
+
     // Update Party/Quest Property
-    case 0xF7:
+    // Guild Property 8907 Val: 11254#1#-35#68#507#202312522175736 (New Guild Tower Hidden Passage on Channel 1)
+    case 0xF9:
         PartyType type;
         int64 partyId;
         getProperties(8);
         break;
     
     // Invite to party
-    case 0xF8:
-    	PartyType type; // Party Type
-    	int64 inviterAccountId;
-    	lpString inviterteamName;
-    	break;
+    //case 0xF9:
+    //	PartyType type; // Party Type
+    //	int64 inviterAccountId;
+    //	lpString inviterteamName;
+    //	break;
 
     // Share Quest/Party Property Update for Specific Member
-    case 0xF9:
+    case 0xFA:
         PartyType type; // Party Type
         int64 partyId; // Party Id
         int64 accountId; // ?
@@ -1110,30 +1693,66 @@ switch (type)
         lpString marketWorldId;
         int i1; // 0
         break;
+    
+    // Chronomaster Backmasking
+    case 0x106:
+        int casterHandle;
+        float f1; // 60
+        float f2; // 40
+        break;
 
     // Summoner Play Animation
-    case 0x107:
+    case 0x108:
         int handle; // Handle
-        int animationId; // Animation Id?
+        int animationId; // "SORCERER_SUMMONSALOON"
         float f1; // 1
+        break;
+    
+    case 0x109:
+        int handle;
+        int targetHandle;
+        if (targetHandle > 0)
+        {
+            int effectId; // 0
+            float effectScale; // 1
+            int linkTexture; // 13738 ("Warrior_Pull")
+            int actorNode; // 13647 ("Dummy_R_HAND)
+            int targetNode; // 8481 ("Bip01 Spine2")
+            float speed; // 500
+            float easing; // 2
+        }
+        else
+            byte b0;
+        break;
+        
+    case 0x10A:
+        int handle;
+        int effectId; // 0
+        float effectScale; // 1
+        int linkTexture; // 13738 ("Warrior_Pull")
+        int actorNode; // 13647 ("Dummy_R_HAND)
+        float speed; // 500
+        float easing; // 2
+        position pos;
         break;
 
     // Sent when entering Assister Dungeon (Ancient Dungeon)
-    case 0x10A:
+    case 0x10B:
         int handle;
         lpString str; //Ancient_Dungeon_Buff
-        int i1; // Skill
+        int skillId; // Skill
         byte b1; // 1
         break;
 
     // Cryomancer's Rolling Snow skill
     // Disables Regular Skills Hotkeys?
-    case 0x10B:
-        int handle;
-        lpString str; //SnowRolling_Buff
-        int skillId; // 2159 (Common_StateClear)
-        byte b1; // 1
-        break;
+    //
+    //case 0x10C:
+    //    int handle;
+    //    lpString str; //SnowRolling_Buff
+    //    int skillId; // 2159 (Common_StateClear)
+    //    byte b1; // 1
+    //    break;
     
     // Sent when entering Assister Dungeon (Ancient Dungeon)
     // Cryomancer's Rolling Snow skill also calls this
@@ -1144,9 +1763,14 @@ switch (type)
         break;
 
     // Sent when using Hoplite Stabbing skill
-    case 0x10B:
+    // Previously 0x10B        
+    case 0x10D:
         int handle;
         int skillId;
+        break; 
+        
+    case 0x10E:
+        int casterHandle; // target handle
         break;
 
     case 0x10F:
@@ -1160,47 +1784,94 @@ switch (type)
 
     typedef struct
     {
-        int i1;
+        int tpShopItemId;
         int i2;
         int i3;
-    } Temp_118 <optimize=false>;
+    } TpShopItem <optimize=false>;
 
     // Related to TP Shop
-    case 0x118:
+    case 0x11A:
         int count;
         local int tpCount = 0;
-        for (tpCount = 0; tpCount < count; tpCount++)
-        {
-            int tpShopItemId;
-            int i2;
-            int i3;
-        }
+        TpShopItem items[count];
         break;
 
     // Related to TP Shop
-    case 0x119:
-        int i1; // 1
-        short s1; // 1
-        byte b1; // 0
-        short s2; // 1
-        byte b2; // 0
+    case 0x11B:
+        //int i1; // 1
+        //short s1; // 1
+        //byte b1; // 0
+        //short s2; // 1
+        //byte b2; // 0
+        lpString str1;
+        lpString str2;
+        lpString str3;
         break;
 
     // ? Sent on Login
-    case 0x11A:
+    case 0x11C:
         int i1; // 0
         break;
 
     // AutoSeller Shop
-    case 0x11C:
-        int packetString; // 690006
-        int i1; // 2
-        int i2; // 0
+    case 0x11E:
+        int packetString; // 690006 / 5529
+        int i1; // 2 / 2
+        int i2; // 0 / 1
+        if (i2 > 0)
+        {
+            int i3;
+            int i4;
+            int i5;
+            lpString str;
+        }
+        break;
+        
+    case 0x11F:
+        int target;
+        byte b1;
+        int caster;
+        break;
+
+	// Transmutation (Change Model to a different Model)
+    case 0x120:
+        int handle;
+        int monsterId;
+        int i3; // 0
+        int i4; // 0
+        if (monsterId > 0)
+        byte b1; // 1
+        break;
+        
+    case 0x122:
+        int i1;
+        int handle;
+        break;
+        
+    case 0x123:
+        int effectHandle;
+        int casterHandle;
+        if (casterHandle != 0)
+        {
+            int i1;
+            int packetString;
+            float effectSize;
+            position pos;
+            float radius;
+            float width;
+            int ropeCount;
+            float readySec;
+            float loopCount;
+            int i2;
+            float loopSec;
+            float height;
+        }
         break;
 
     // Sent on Pyromancer's Skill Prominence
     case 0x124:
         int effectHandle;
+        // Not sent when canceling 0x123 for Sapper Trap Skill
         byte b1;
         switch (b1)
         {
@@ -1228,8 +1899,26 @@ switch (type)
         }
         break;
 
-    // Seen with Coursing Skill
+    // Seen with Lightning Tower Skill for Engineer
+    case 0x125:
+        typedef struct
+        {
+            int handle; // 12159 Target Handle?
+            int syncKey; // 900 ?
+        } HitKeyActor <optimize=false>;
     
+        int casterHandle; // Could be monster or character
+        int packetString; // 3397 (I_wizard_electrocute_rize#Dummy_effect_electrocute) / 7010
+        float effectScale; // 10 / 4
+        float chainTime; // 0.05 / 0.2
+        int hitKeyListCount; // 0 / 1
+        if (hitKeyListCount > 0)
+        {
+            HitKeyActor hitKeyActor[hitKeyListCount];
+        }
+        break;
+
+    // Seen with Coursing Skill
     case 0x127:
         int petHandle;
         int targetHandle;
@@ -1266,10 +1955,20 @@ switch (type)
             short s2;
         }
         break;
+    
+    case 0x130:
+        int handle;
+        break;
+    
+    case 0x131:
+        int i1;
+        int i2;
+        int i3;
+        break;
 
     // Show's 0/50 to 50/50 over an pot to fill
     // Used for fillables/collectable counts
-    case 0x130:
+    case 0x132:
         int handle;
         lpString message; // 0/50
         break;
@@ -1321,29 +2020,21 @@ switch (type)
         byte bin1[16]; // no idea what this could be
         break;
 
+    case 0x13A:
+        float f1; // 1 / 1
+        float f2; // 494282.6 / 495482.6
+        FILETIME time; // 06/04/2023 17:43:30 / 06/04/2023 18:03:30
+        break;
+
     // Party?
     case 0x13C:
         int handle;
-        byte type; // type? 3 = Guild name?
-        switch (type)
-        {
-            // Only Party
-            case 1:
-                lpString partyName;
-                byte type1;
-                break;
-            // Only Guild
-            case 3:
-                byte type1; // type? 3 = Guild name?
-                lpString guildName;
-                break;
-            // Both
-            default:
-                lpString partyName;
-                byte type2; // type? 3 = Guild name?
-                lpString guildName;
-                break;
-        }
+        byte b1; // type? 3 = No value
+        if (b1 != 3)
+            lpString partyName;
+        byte b2;
+        if (b2 != 3)
+            lpString guildName;
         break;
 
     // ?
@@ -1352,7 +2043,7 @@ switch (type)
         byte b1; // 1
         break;
 
-    case 0x13F:
+    case 0x141:
         int handle; // NPC Id? Handle? 3065
         lpString name; //Script? Function? Squire_Repair
         byte b1; // 0
@@ -1379,28 +2070,74 @@ switch (type)
         FoodShopItem items[i4]; // [-45, 1, 6, 1, 976, 10, 2, 977, 10, 3, 980, 10, 4, 982, 10, 5, 977, 0, 6, 980, 0]
         break;
         
+    // 
+    case 0x144:
+        int handle;
+        int i1;
+        int i2;
+        break;
+        
+    // Hanging Shot (25-12-25)
+    case 0x147:
+        int casterHandle;
+        int petHandle;
+        if (petHandle != 0)
+        {
+            lpString name;
+            float f1;
+        }
+        break;
+        
     // Sets the session key.
     // Used for Web Requests (Guild/Party Search/Market)
-    case 0x146:
+    case 0x148:
         lpString sessionKey;
         byte b1;
         break;
 
     // Guild Skill Invite
-    case 0x147:
+    case 0x149:
         short s1; // 0
         lpString message; // GUILD_MEMBER_SKILL_INVITE
         lpString params; //76561198023169014#11501 (AccountId#SkillId)
         break;
+        
+    typedef struct
+    {
+        int64 accountId;
+        byte b1;
+        char name[64];
+        char team[65];
+        byte b2; // 2
+        short job; // 1025
+        int job; // 1001
+        int jobLevel; // 45
+        short gender; // 2
+        short hair; // 11
+        // 628333,628341,11006112,18015,0
+        int visualEquipIds[5];
+        int mapId; // 1001
+        int level; // 510
+        ubyte color[4];
+        short jobs[4];
+        int64 l1;
+    } Battler <optimize=false>;
+        
+    // Team Battle League (Team Members)
+    case 0x14A:
+        byte b1;
+        int count;
+        Battler battlers[count];
+        break;
 
     // ?
-    case 0x14A:
+    case 0x14C:
         int i1; // 1
         int i2; // 1
         break;
 
     // Cryomancer's Ice Bolt "Freeze" Effect?
-    case 0x14B:
+    case 0x14D:
         int handle;
         float duration; // Duration?
         lpString effectName;
@@ -1428,6 +2165,12 @@ switch (type)
         int dropAngle; // 232
         float distance; //1.420368
         break;
+    
+    // Team Battle League (TBL) Related?
+    // Seen during TBL
+    case 0x153:
+        byte b1; // 0
+        break;
 
     // Request Friendly Fight
     case 0x154:
@@ -1446,9 +2189,24 @@ switch (type)
         int i1;
         float f1;
         break;
+        
+    // Seen with some skill (41204?)
+    case 0x15B:
+        int i1; // Effect "Handle"?
+        byte bin[12]; // 0s
+        int i2; // 1
+        char name[64];
+        int i3; // 0 (or could be apart of the name)
+        break;
 
-    // Unknown purpose sent with 0x6D -> 0x165 (now 0x6E -> 0x166)
-    case 0x166:
+    // Seen after ZC_ENTER_PC
+    case 0x15E:
+        int handle;
+        byte b1; // 0
+        break;
+
+    // Unknown purpose sent with 0x6D -> 0x165 (now 0x6E -> 0x166 -> 0x168)
+    case 0x168:
         int64 l1; // 0
         break;
 
@@ -1465,7 +2223,7 @@ switch (type)
         break;
 
     // Guild Tower NPC related
-    case 0x169:
+    case 0x16B:
         int handle; // 911 / 25800 
         lpString function; // GET_GUILDTOWER_NAME
         lpString parameter; // Guild Name (TOS_SupportGuild)
@@ -1477,12 +2235,20 @@ switch (type)
 
     // Account Warehouse (Silver Trade)
     case 0x171:
-        byte bin[3]; // 00 00 00
-        int i2; // 1
-        WAREHOUSE_INTERACTION interaction; // Deposit (0) or Withdrawl (1)
-        int64 silverTransacted; // Silver Transacted
-        int64 silverTotal; // Silver Total
-        FILETIME transactionDate;
+        typedef struct
+        {
+            WAREHOUSE_INTERACTION interaction; // Deposit (0) or Withdrawl (1)
+            int64 silverTransacted; // Silver Transacted
+            int64 silverTotal; // Silver Total
+            FILETIME transactionDate;
+        } SilverTransaction <optimize=false>;
+        if (!checkCompression())
+        {
+            byte b1;
+            int transactionCount; // 1
+            if (transactionCount > 0)
+              SilverTransaction transactions[transactionCount];
+        }
         break;
 
     // Market Item Min/Max Prices?
@@ -1499,10 +2265,32 @@ switch (type)
     case 0x174:
         int i1; // 0
         break;
+        
+    case 0x177:
+        int dungeonId;
+        if (dungeonId > 0)
+            byte b1;
+        break;
+    
+    // DungeonAutoMatchPartyCount
+    case 0x178:
+        int partyCount; // 1
+        int level; // 480
+        int maxLevel; // 999?
+        int i4; // 80
+        lpString str; // @dicID_^*$ETC_20151224_017833$*^ -> Monument of Desire Dungeon
+        break;
+    
+    // ZC
+    case 0x179:
+        int partyCount; // 1
+        lpString str; // 76561198023169014/3005/480/528409826427476/NO/
+        int i1; // 0
+        break;
 
     // Member Location? Map/Channel?
-    case 0x179:
-        byte b1; // 1
+    case 0x17A:
+        PartyType type;
         int64 accountId;
         short mapId;
         short channel; // channel? status? 0 or 1
@@ -1548,9 +2336,9 @@ switch (type)
         break;
 
     // Skill Properties
-    case 0x181:
-        int i1;
-        SkillProps skills[i1];
+    case 0x183:
+        int count;
+        SkillProps skills[count];
         break;
     
     // ?
@@ -1559,29 +2347,29 @@ switch (type)
         int i1;
         break;
     
+    // Seen with instance dungeons
+    case 0x185:
+        lpString instanceType; // Indun
+        break;
+    
     // Updates the skill UI
     // Job History?
-    case 0x189:
+    // Shifted +2 (401257)
+    case 0x18B:
         int64 characterId;
         int jobCount;
         Job jobs[jobCount];
-        break;
-
-    case 0x18A:
-        int64 characterId;
-        int jobCount;
-        Job jobs[jobCount];
-        short sbin[16];
         break;
 
     // Instance Dungeon
-    case 0x18C:
+    // ShowIndunEnterDialog(pc, indunType, isAlreadyPlaying, enableAutoMatch, enableEnterRight, enablePartyMatch, growthSupportGuildParty)
+    case 0x18E:
         int instanceDungeonId; // 644 or 646
         int allowAutoMatchReenter; // 0
         int allowAutoMatch; // 0 or 1
         int allowEnter; // 0 or 1
         int allowAutoMatchParty; // 1
-        byte b1; // 0
+        byte growthSupportGuildParty; // 0
         break;
 
     typedef struct
@@ -1622,9 +2410,9 @@ switch (type)
     case 0x197:
         lpString str1; // AdventureBook
         lpString str2;
-        int i1;
+        int nextRank;
         int i2; // i1+2=id?
-        int i3;
+        int rankPoints;
         byte b1;
         break;
 
@@ -1647,13 +2435,14 @@ switch (type)
         int currentRank; // Current Rank
         int i2;
         int currentPoints; // Current Points
-        int i4;
-        AdventureBookRanker2 topRankers[i4];
+        int topRankerCount;
+        AdventureBookRanker2 topRankers[topRankerCount];
         AdventureBookNearestRanks nearestRanks[5];
-        int i[2];
-        int64 l1;
+        int currentPoints1;
         int i5;
+        int64 l1;
         int i6;
+        int i7;
         break;
         
     // Adventure Book Item Page
@@ -1681,12 +2470,16 @@ switch (type)
         FILETIME date;
         byte b1; // 1
         break;
-
-    // ?
+        
     case 0x19C:
-        byte b1; // 1
-        int64 l1; // 100
+        int i0;
         break;
+
+    // ? (Disabled, could be different SubOp now 0x19C is sent in response to CZ_REQ_QUEST_COMPLETE)
+    //case 0x19C:
+    //    byte b1; // 1
+    //    int64 l1; // 100
+    //    break;
 
     // ?
     case 0x19D:
@@ -1723,19 +2516,19 @@ switch (type)
         break;
 
     // Related to Lama Pose Skill???
-    case 0x1A7:
+    case 0x1A6:
         int handle;
         byte b1; // 0
         break;
 
     // Related to Lama Pose Skill?
-    case 0x1A8:
+    case 0x1A7:
         int handle;
         int skillId; // 42016
         break;
 
     // ?
-    case 0x1A9:
+    case 0x1AA:
         short s1; // 1
         int i[4]; // 50, 50, 100, 100
         float f1; // 0.3
@@ -1743,19 +2536,36 @@ switch (type)
         int i5; // 5000
         break;
 
-    case 0x1AA:
+    case 0x1AC:
         int handle; // 118258
         int i2; // 29, 22
         break;
 
 	// Skill related, seen during Spear Throw (Hoplite)
-    case 0x1AB:
+    case 0x1AD:
         int handle;
         lpString str;
         int itemId;
         break;
 
-    // ?
+    // Sent after toggling wig visibility
+    case 0x1AE:
+        int handle;
+        byte wigVisibility;
+        break;
+
+    // Party Buffs?
+    case 0x1AF:
+        int64 characterId;
+        int i1; // 432, 4531, -1
+        int i2;
+        int i3;
+        //int64 l1; // 0 or -1
+        byte b1; // 0 or 1
+        break;
+
+    // Indun Info
+    // Moved to ZC_CHARACTER_INDUN_INFO_RESPONSE.bt
     case 0x1B5:
         typedef struct
         {
@@ -1777,10 +2587,14 @@ switch (type)
             int indunCount;
             IndunInfo infos[indunCount];
         } Indun <optimize=false>;
-        int characterCount;
-        CharacterInfo characters[characterCount];
-        int inDunCount;
-        Indun indun[inDunCount];
+        // If end of file then data is sent via ZC_CHARACTER_INDUN_INFO_RESPONSE packet.
+        if (!FEof())
+        {
+            int characterCount;
+            CharacterInfo characters[characterCount];
+            int inDunCount;
+            Indun indun[inDunCount];
+        }
         break;
 
     // ? Sent on Login
@@ -1799,21 +2613,27 @@ switch (type)
     case 0x1B8:
         int i[3]; // [0, 0, 0]
         break;
+
+    typedef struct
+    {
+        lpString name; // TCPBroadcastLogicChange
+        byte isEnabled; // 1
+    } SysFuncCall <optimize=false>;
     
     // Collect System Info
-    case 0x1BA:
-        int i1;
-        lpString lpstring;
-        byte b1;
+    case 0x1BD:
+        int count;
+        SysFuncCall calls[count];
         break;
 
     // ToS Steam Achievements
-    case 0x1BC:
+    // Previously 0x1BE
+    case 0x1C0:
         lpString script; // TOS_STEAM_ACHIEVEMENT_ADVENTURE_BOOK, TOS_STEAM_ACHIEVEMENT_CLASS_CHANGE
         break;
 
     // Seen during Shield Lob Skill
-    case 0x1BD:
+    case 0x1C1:
         int handle; // Shield Monster's Handle
         float f1;
         float f2;
@@ -1821,8 +2641,40 @@ switch (type)
         break;
 
     // Hide subweapon    
-    case 0x1C6:
+    case 0x1C7:
         int handle;
         byte isOn;
+        break;
+    
+    // Illusionist Skill?
+    case 0x1C9:
+        int handle;
+        int i1; // 53
+        float f1; // 1.2
+        float f2; // 60
+        float f3; // 0
+        float f4; // -90
+        lpString str1; // bip01
+        lpString str2; // None
+        int i2; // 0
+        break;
+        
+    // Desprado Skills
+    case 0x1CE:
+        int handle;
+        position pos; // X: 38.213612, Y: 18.892786, Z: -5.276674
+        int i1; // 1366
+        float f2; // 0.5
+        float f3; // 225
+        float f4; // -50
+        float f5; // 225
+        byte bin[20]; // 0s
+        position pos2;
+        float f6; // 0
+        float f7; // 2
+        int64 l1; // 0
+        float f8; // 1
+        int64 l2; // 0
+        lpString str; // None
         break;
 }

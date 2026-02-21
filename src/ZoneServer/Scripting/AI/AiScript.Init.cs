@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Monsters;
 
 namespace Melia.Zone.Scripting.AI
 {
@@ -47,6 +50,14 @@ namespace Melia.Zone.Scripting.AI
 
 			AiScriptTypes[aiName] = aiType;
 		}
+
+		/// <summary>
+		/// Returns true if an AI script exists.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public static bool Exists(string name)
+			=> AiScriptTypes.ContainsKey(name);
 
 		/// <summary>
 		/// Attempts to create an AI script for the given entity and returns

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Ardito
 	/// Handler for the Ardito skill Tre Granata.
 	/// </summary>
 	[SkillHandler(SkillId.Arditi_TreGranata)]
-	public class Arditi_TreGranata : IGroundSkillHandler
+	public class Arditi_TreGranata : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -28,9 +29,11 @@ namespace Melia.Zone.Skills.Handlers.Ardito
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -62,9 +65,9 @@ namespace Melia.Zone.Skills.Handlers.Ardito
 		/// <param name="direction"></param>
 		private async Task CreateAttackArea(Skill skill, ICombatEntity caster, Position farPos, Direction direction)
 		{
-			var pos1 = farPos.GetRelative2D(direction, 50);
-			var pos2 = pos1.GetRelative2D(direction, 50);
-			var pos3 = pos2.GetRelative2D(direction, 50);
+			var pos1 = farPos.GetRelative(direction, 50);
+			var pos2 = pos1.GetRelative(direction, 50);
+			var pos3 = pos2.GetRelative(direction, 50);
 
 			var circle1 = new Circle(pos1, 50);
 			var circle2 = new Circle(pos2, 50);
@@ -72,10 +75,10 @@ namespace Melia.Zone.Skills.Handlers.Ardito
 
 			await Task.Delay(TimeSpan.FromMilliseconds(100));
 
-			Send.ZC_NORMAL.SkillProjectile(caster, "E_scout_TreGranata#Dummy_R_HAND", 0.75f, "F_explosion125_explosion2", 2.5f, pos1, 70f, 0.3f, 0, 600);
-			Send.ZC_NORMAL.SkillProjectile(caster, "E_scout_TreGranata#Dummy_R_HAND", 0.75f, "F_explosion125_explosion2", 2.5f, pos2, 70f, 0.3f, 0, 600);
-			Send.ZC_NORMAL.SkillProjectile(caster, "E_scout_TreGranata#Dummy_R_HAND", 0.75f, "F_explosion125_explosion2", 2.5f, pos3, 70f, 0.3f, 0, 600);
-			Send.ZC_NORMAL.SkillProjectile(caster, "", 0.75f, "", 2.5f, pos2, 70f, 0.3f, 0, 600);
+			Send.ZC_NORMAL.SkillProjectile(caster, pos1, "E_scout_TreGranata#Dummy_R_HAND", 0.75f, "F_explosion125_explosion2", 2.5f, 70f, TimeSpan.FromSeconds(0.3f), TimeSpan.Zero, 600);
+			Send.ZC_NORMAL.SkillProjectile(caster, pos2, "E_scout_TreGranata#Dummy_R_HAND", 0.75f, "F_explosion125_explosion2", 2.5f, 70f, TimeSpan.FromSeconds(0.3f), TimeSpan.Zero, 600);
+			Send.ZC_NORMAL.SkillProjectile(caster, pos3, "E_scout_TreGranata#Dummy_R_HAND", 0.75f, "F_explosion125_explosion2", 2.5f, 70f, TimeSpan.FromSeconds(0.3f), TimeSpan.Zero, 600);
+			Send.ZC_NORMAL.SkillProjectile(caster, pos2, "", 0.75f, "", 2.5f, 70f, TimeSpan.FromSeconds(0.3f), TimeSpan.Zero, 600);
 
 			await Task.Delay(TimeSpan.FromMilliseconds(400));
 
@@ -95,7 +98,7 @@ namespace Melia.Zone.Skills.Handlers.Ardito
 			pad3.Trigger.MaxActorCount = 15;
 			pad3.Trigger.UpdateInterval = TimeSpan.FromSeconds(1);
 
-			var pad4Position = farPos.GetRelative2D(direction, 25);
+			var pad4Position = farPos.GetRelative(direction, 25);
 
 			var pad4 = new Pad(PadName.Arditi_TreGranata_DamagePad, caster, skill, new Square(pad4Position, caster.Direction, 150, 50));
 			pad4.Position = new Position(pad4.Trigger.Area.Center.X, pad4Position.Y, pad4.Trigger.Area.Center.Y);

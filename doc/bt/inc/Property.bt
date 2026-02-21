@@ -3,7 +3,7 @@
 //
 //      File: Property.bt
 //   Authors: 
-//   Version: 
+//   Version: i398704
 //   Purpose: 
 //  Category: 
 // File Mask: 
@@ -27,8 +27,7 @@ typedef struct
             FILETIME val;
             break;
     }
-}
-property <read=propertyRead, optimize=false>;
+} property <read=propertyRead, optimize=false>;
 
 string propertyRead(property &p)
 {
@@ -99,63 +98,521 @@ void getSimpleProperties(int id)
 
 int getPropertyType(int id)
 {
-    switch(id) {
-        case 3:
+    switch(id)
+    {
+    	case 3:
         //case 4:
         case 5:
         case 41:
-        case 48:
+        //case 48:
         case 60:
+        case 129:
+        case 130:
+        case 131:
+        case 132:
+        case 134:
+        case 135:
+        case 136:
+        case 137:
+        case 138:
+        case 140:
+        case 141:
+        case 144:
+        case 148:
+        case 152:
+        case 157:
+        case 158:
+        case 163:
+        case 170:
+        case 174:
+        case 181:
+        case 186:
+        case 189:
+        case 195:
+        case 198:
+        case 206:
+        case 210:
+        case 223:
+        case 232:
+        case 233:
+        case 235:
+        case 237:
+        case 238:
+        case 240:
+        case 241:
+        case 245:
+        case 249:
+        case 258:
+        case 262:
+        case 264:
+        case 269:
+        case 271:
+        case 274:
+        case 276:
+        case 279:
+        case 285:
+        case 288:
+        case 291:
+        case 294:
+        case 297:
+        case 303:
+        case 305:
+        case 307:
+        case 309:
+        case 312:
+        case 315:
+        case 319:
+        case 322:
+        case 328:
+        case 332:
+        case 334:
+        case 337:
+        case 339:
+        case 341:
+        case 342:
+        case 343:
+        case 344:
+        case 345:
+        case 347:
+        case 348:
+        case 349:
+        case 350:
+        case 352:
+        case 355:
+        case 356:
+        case 359:
+        case 361:
+        case 362:
+        case 363:
+        case 385:
+        case 386:
+        case 390:
+        case 416:
         case 421:
+        case 441:
         case 449:
+        case 471:
+        case 474:
+        case 498:
+        case 522:
+        case 562:
+        case 589:
+        case 605:
+        case 643:
+        case 651:
+        case 665:
+        case 672:
+        case 676:
         case 705:
+        case 717:
+        case 729:
+        case 747:
+        case 751:
+        case 760:
+        case 801:
+        case 843:
+        case 884:
+        case 922:
+        case 967:
+        case 1014:
+        case 1054:
+        case 1090:
+        case 1095:
+        case 1138:
+        case 1177:
+        case 1209:
+        case 1253:
         case 1328:
+        case 1420:
         case 1967:
         case 3927:
         case 3970:
         case 4591:
         case 6303:
+        case 6308:
+        case 6309:
+        case 6311:
+        case 6312:
+        case 6313:
+        case 6315:
+        case 6316:
+        case 6318:
+        case 6319:
+        case 6320:
+        case 6323:
+        case 6324:
+        case 6326:
+        case 6327:
+        case 6329:
+        case 6330:
+        case 6331:
+        case 6333:
+        case 6335:
+        case 6336:
+        case 6337:
+        case 6338:
+        case 6339:
+        case 6340:
+        case 6346:
+        case 6347:
+        case 6348:
+        case 6349:
+        case 6351:
+        case 6352:
+        case 6355:
+        case 6357:
+        case 6359:
+        case 6363:
+        case 6366:
+        case 6367:
+        case 6368:
+        case 6371:
+        case 6372:
+        case 6374:
+        case 6376:
+        case 6377:
+        case 6383:
+        case 6384:
+        case 6388:
+        case 6390:
+        case 6394:
+        case 6395:
+        case 6396:
+        case 6400:
+        case 6401:
+        case 6402:
+        case 6403:
+        case 6412:
+        case 6413:
+        case 6414:
+        case 6415:
+        case 6417:
+        case 6418:
+        case 6419:
+        case 6420:
+        case 6421:
+        case 6422:
+        case 6423:
+        case 6425:
+        case 6426:
+        case 6428:
+        case 6430:
+        case 6432:
+        case 6435:
+        case 6437:
+        case 6441:
+        case 6443:
+        case 6446:
+        case 6450:
+        case 6452:
+        case 6455:
+        case 6456:
+        case 6457:
+        case 6458:
+        case 6460:
+        case 6462:
+        case 6463:
+        case 6469:
+        case 6470:
+        case 6472:
+        case 6475:
+        case 6476:
+        case 6477:
+        case 6483:
+        case 6485:
+        case 6488:
+        case 6491:
+        case 6492:
+        case 6494:
+        case 6496:
+        case 6500:
+        case 6502:
+        case 6504:
+        case 6505:
+        case 6507:
+        case 6509:
+        case 6511:
+        case 6512:
+        case 6514:
+        case 6519:
+        case 6520:
+        case 6522:
+        case 6525:
+        case 6527:
+        case 6528:
+        case 6529:
+        case 6531:
+        case 6532:
+        case 6539:
+        case 6540:
+        case 6680:
+        case 6685:
+        case 6690:
+        case 6691:
+        case 6692:
+        case 6693:
+        case 6694:
+        case 6697:
+        case 6698:
+        case 6700:
+        case 6701:
+        case 6703:
+        case 6704:
+        case 6706:
+        case 6707:
+        case 6709:
+        case 6713:
+        case 6714:
+        case 6715:
+        case 6718:
+        case 6719:
+        case 6720:
+        case 6721:
+        case 6724:
+        case 6726:
+        case 6727:
+        case 6730:
+        case 6732:
+        case 6734:
+        case 6737:
+        case 6740:
+        case 6741:
+        case 6742:
+        case 6743:
+        case 6746:
+        case 6749:
+        case 6750:
+        case 6752:
+        case 6755:
+        case 6756:
+        case 6757:
+        case 6758:
+        case 6763:
+        case 6764:
+        case 6768:
+        case 6770:
+        case 6774:
+        case 6775:
+        case 6776:
+        case 6778:
+        case 6779:
+        case 6783:
+        case 6784:
+        case 6786:
+        case 6790:
+        case 6791:
+        case 6794:
+        case 6795:
+        case 6799:
+        case 6809:
+        case 6811:
+        case 6812:
+        case 6813:
+        case 6814:
+        case 6818:
+        case 6819:
+        case 6821:
+        case 6822:
+        case 6827:
+        case 6828:
+        case 6830:
+        case 6831:
+        case 6834:
+        case 6837:
+        case 6838:
+        case 6841:
+        case 6842:
+        case 6844:
+        case 6846:
+        case 6849:
+        case 6853:
+        case 6857:
         case 7118:
         case 7122:
+        case 7227:
+        case 7228:
+        case 7229:
+        case 7230:
+        case 7232:
+        case 7241:
+        case 7242:
+        case 7243:
+        case 7245:
+        case 7250:
+        case 7257:
+        case 7258:
+        case 7259:
+        case 7272:
+        case 7273:
         case 7276:
+        case 7281:
+        case 7286:
+        case 7297:
+        case 7298:
+        case 7299:
+        case 7300:
+        case 7303:
+        case 7304:
+        case 7306:
+        case 7307:
+        case 7308:
+        case 7309:
+        case 7310:
+        case 7311:
+        case 7312:
         case 7314:
+        case 7315:
+        case 7316:
+        case 7318:
+        case 7319:
+        case 7321:
+        case 7323:
+        case 7325:
+        case 7326:
+        case 7328:
+        case 7329:
+        case 7331:
+        case 7332:
+        case 7333:
+        case 7335:
+        case 7340:
+        case 7342:
+        case 7348:
+        case 7354:
+        case 7363:
+        case 7369:
+        case 7417:
+        case 7420:
+        case 7421:
+        case 7425:
         case 7428:
+        case 7429:
+        case 7430:
+        case 7432:
+        case 7433:
+        case 7436:
+        case 7441:
+        case 7443:
+        case 7445:
+        case 7447:
+        case 7448:
+        case 7460:
+        case 7461:
+        case 7465:
         case 7473:
         case 7488:
         case 7491:
         case 7494:
+        case 7500:
         case 7692:
+        case 8425:
+        case 8426:
+        case 8553:
         case 8907:
         case 8993:
-        //case 8997:
-        //case 9004:
+        
+        //
+        case 9070:
+        case 9071:
+        
+        case 9079:
+        case 9080:
+        case 9081:
+        case 9082:
+        case 9083:
+        case 9084:
+        case 9085:
+        case 9086:
+        case 9087:
+        case 9088:
+        case 9089:
+        case 9090:
+        case 9091:
+        case 9092:
+        case 9093:
+        case 9094:
+        case 9095:
+        case 9096:
+        case 9097:
+        case 9098:
+        case 9099:
+        case 9100:
+        case 9101:
+        case 9102:
+        case 9103:
+        case 9104:
+        case 9105:
+        case 9106:
+        case 9107:
+        case 9108:
+        case 9109:
+        case 9110:
+        case 9111:
+        case 9112:
+        case 9113:
+        case 9295:
         case 10022:
+        case 10097:
         case 10100:
         case 10618: // coordinates? (-1246/-648)
         case 10620:
         case 10988:
         case 10990:
         case 10992:
+        case 10980:
+        case 11585:
+        case 11586:
+        case 12558:
+        case 31585:
         case 31587:
         case 31625:
         case 32311:
         case 32315:
         case 32316:
         case 32319:
+        case 32557:
+        case 32561:
         case 32575:
         case 32593:
         case 32594:
+        case 32596:
+        case 32598:
+        case 32601:
+        case 32602:
+        case 32603:
         case 33612: // YES
+        case 34271:
+        case 34272:
+        case 34273:
+        case 34636:
         case 33674:
         case 33681:
         case 33684:
         case 33688:
         case 33691:
+        case 100131:
+        case 100207:
+        case 100208:
+        case 100209:
+        case 100210:
+        case 100212:
+        case 100217:
+        case 100222:
+        case 100225:
+        case 100229:
+        case 100233:
+        case 100420:
+        case 100421:
+        case 100830:
+        case 100894:
         case 100896:
+        case 100946:
+        case 100947:
         case 100964:
-        case 101000:
-        //case 101209: // 1
+        case 101000: // Trusted
+        case 101052:
         case 101229: // None
+        case 101241:
         case 101242:
         case 101243:
         case 101244:
@@ -178,21 +635,37 @@ int getPropertyType(int id)
         case 101941:
         case 102025: // d_thorn_39_1
         case 102050:
+        case 102228:
+        case 102229:
+        case 102230:
         case 102231:
         case 102232:
         case 102315:
         case 102318:
         case 102319:
+        case 102426:
+        case 102477:
+        case 102774:
+        case 102775:
         case 102969:
+        case 103015:
+        case 103016:
         case 103075:
+        case 103088:
         case 103096:
         case 103116:
+        case 103120:
+        case 103125:
         case 103139:
         case 103168:
         case 103180:
+        case 103194:
+        case 103195:
+        case 103196:
         case 103216:
         case 103224:
         case 103245:
+		case 103301:
         case 103327:
         case 103328:
         case 103329:
@@ -208,7 +681,10 @@ int getPropertyType(int id)
         case 103385:
         case 103386:
         case 103387:
+        case 103861:
         case 103948:
+        case 103958:
+        case 104080:
         case 104082:
         case 104084:
         case 104085:
@@ -231,6 +707,9 @@ int getPropertyType(int id)
         case 105178:
         case 105193:
         case 105365:
+        case 105398:
+        case 105402:
+        case 105461:
         case 105561:
         case 105563:
         case 105564:
@@ -244,17 +723,30 @@ int getPropertyType(int id)
         case 106467:
         case 106468:
         case 106470:
+        case 106494:
+        case 106801:
         case 106826:
+        case 106946:
         case 107234:
+        case 107256:
         case 107259:
+        case 107257:
         case 107574:
         case 107577:
         case 107579:
+        case 107605:
+        case 107721:
+        case 107859:
         case 108117:
+        case 108353:
         case 108384:
         case 108385:
         case 108388:
         case 108393:
+        case 108958:
+        case 108959:
+        case 109140:
+        case 110560:
         case 108399:
         case 108496:
         case 108749:
@@ -358,7 +850,33 @@ int getPropertyType(int id)
         case 110709: // GuideQuest_7
         case 110719:
         case 110932: // Char2_20
+        case 110916:
+        case 110919:
+        case 110920:
+        case 110921:
+        case 110923:
+        case 110924:
+        case 110925:
+        case 110926:
+        case 110927:
+        case 110928:
+        case 110930:
+        case 110931:
+        case 110932:
         case 110936:
+        case 110937:
+        case 110938:
+        case 110940:
+        case 110941:
+        case 110942:
+        case 110944:
+        case 110946:
+        case 110947:
+        case 110948:
+        case 110949:
+        case 110950:
+        case 110951:
+        case 110952:
         case 110958:
         case 110960:
         case 111023:
@@ -370,17 +888,21 @@ int getPropertyType(int id)
         case 111334:
         case 111338: // None
         case 111339: // None
+        case 111176:
         case 112205: // None
         // GUIDE_STEPXXXX
+        case 112270:
+        case 112295:
+        case 112300:
         case 112315: // InProgress
         case 112332:
-        case 112295:
-        case 112365:
-        case 112300:
-        case 112270:
-        case 112410:
         case 112356:
+        case 112365:
+        case 112410:
+        case 112538:
         case 112848:
+        case 113123:
+        case 113126:
         // Class Snapshot (Title/Ability/Skill)
         case 113127:
         case 113128:
@@ -476,11 +998,35 @@ int getPropertyType(int id)
         case 113795:
         case 113796:
         case 113798:
-        case 113950:
+        case 113865:
+        case 113866:
+        case 113929:
+        case 113930:
         case 113949:
+        case 113950:
         case 113951:
         case 113952:
+        case 113953:
         case 113954:
+        case 114028:
+        case 114071:
+        case 114072:
+        case 114073:
+        case 114278:
+        case 114532:
+        case 114659:
+        case 114869: // true (Popo Event Related?)
+        case 115284:
+        case 115336:
+        case 115337:
+        case 115338:
+        case 115455:
+        case 115456:
+        case 115457:
+        case 115458:
+        case 115459:
+        case 115460:
+        case 116438:
             return OBJP_STRING;
 			
         case 107249:

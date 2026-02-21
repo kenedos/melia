@@ -45,7 +45,7 @@
 		/// <summary>
 		/// Normal hit, but without hit sound.
 		/// </summary>
-		Unk8 = 8,
+		NoHitScript = 8,
 
 		/// <summary>
 		/// Same as Unk4? Seen with Magic Missile.

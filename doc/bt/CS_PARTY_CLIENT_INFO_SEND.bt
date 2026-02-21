@@ -1,0 +1,50 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.2 Binary Template
+//
+//      File: CS_PARTY_CLIENT_INFO_SEND.bt
+//   Authors: Salman T. Khan
+//   Version: i373230
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef struct
+{
+    int key;
+    int value;
+} IntValuePair<optimize=false>;
+
+#include "inc/common.bt"
+
+ClientHeaderDynamic header;
+
+PartyType type; // 0 (Party Type?) if guild then 1?
+int64 partyId; // 554643486671500 (Party Id) if guild id then 552311319482590?
+byte subType; // 2
+int64 accountId; // 76561198023169014
+int64 l2; // 0
+int i1; // 90000 (Main Session Object?)
+int i2; // Properties Size
+switch (subType)
+{
+    // Silver Gained by Party Member?
+    case 1:
+    break;
+    // Session Object Update?
+    case 2:
+    if (i2 > 0)
+        IntValuePair properties[i2];
+    break;
+    // Some other party related update?
+    case 3:
+        byte b2; // 19
+        int i3; // 0
+        short s1; // 0
+        int i4; // 10
+        int i5; // 0
+        byte b3; // 0
+        break;
+}

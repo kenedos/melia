@@ -1,0 +1,9 @@
+// Melia
+// Database file
+// 
+// Values: skillId, className, name, [basicSp], [basicCast], [splashType], [splashRange], [splashHeight], [splashAngle], [splashRate], [maxRange], [factor], [factorByLevel], [atkAdd], [atkAddByLevel], [cooldownTime], [overheatCount], [overheatDelay], [overheatGroup], [enableCastMove], [castInterruptible]
+//---------------------------------------------------------------------------
+
+[
+
+]

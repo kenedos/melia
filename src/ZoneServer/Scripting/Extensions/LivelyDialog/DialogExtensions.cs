@@ -15,7 +15,7 @@ namespace Melia.Zone.Scripting.Extensions.LivelyDialog
 		/// <returns></returns>
 		public static async Task Intro(this Dialog dialog, string text)
 		{
-			var varName = $"Ashen.Npcs.{dialog.Npc.UniqueName}.IntroSeen";
+			var varName = $"Melia.Npcs.{dialog.Npc.UniqueName}.IntroSeen";
 			var seenIntro = dialog.Player.Variables.Perm.GetBool(varName, false);
 
 			if (seenIntro)

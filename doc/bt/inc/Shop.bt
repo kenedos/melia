@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.2 Binary Template
+//
+//      File: 
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+enum ShopType 
+{
+    SpellShop = 1,
+    SquireEquip = 2,
+    Oblation = 4,
+};

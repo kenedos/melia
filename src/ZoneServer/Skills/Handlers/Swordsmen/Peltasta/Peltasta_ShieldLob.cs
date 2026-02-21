@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// Handler for the Peltasta skill Shield Lob.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_ShieldLob)]
-	public class Peltasta_ShieldLob : IGroundSkillHandler
+	public class Peltasta_ShieldLob : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -28,8 +29,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -44,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
 			var pad = new Pad(PadName.Peltasta_ShieldLob, caster, skill, new Circle(caster.Position, 40));
-			pad.Position = caster.Position.GetRelative2D(caster.Direction, 25);
+			pad.Position = caster.Position.GetRelative(caster.Direction, 25);
 			pad.Trigger.Subscribe(TriggerType.Enter, this.OnShieldCollision);
 
 			caster.Map.AddPad(pad);

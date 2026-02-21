@@ -1,4 +1,5 @@
-﻿using Yggdrasil.Configuration;
+﻿using System.IO;
+using Yggdrasil.Configuration;
 
 namespace Melia.Shared.Configuration.Files
 {
@@ -9,18 +10,21 @@ namespace Melia.Shared.Configuration.Files
 	{
 		public string Authentication { get; protected set; }
 
-		public const string AuthenticationDefault = "change_me";
-		public bool IsUsingDefaultAuthentication => this.Authentication == AuthenticationDefault;
-
 		/// <summary>
 		/// Loads conf file and its options from the given path.
 		/// </summary>
 		/// <param name="filePath"></param>
-		public void Load(string filePath)
+		public void Load(string filePath, params string[] extraIncludes)
 		{
 			this.Include(filePath);
 
-			this.Authentication = this.GetString("authentication", AuthenticationDefault);
+			foreach (var path in extraIncludes)
+			{
+				if (File.Exists(path))
+					this.Include(path);
+			}
+
+			this.Authentication = this.GetString("authentication", "change_me");
 		}
 	}
 }

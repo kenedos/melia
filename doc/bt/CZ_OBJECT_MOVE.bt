@@ -15,8 +15,9 @@
 
 ServerHeaderFixed header;
 
-int handle; // 4237
-int attachToHandle; // 4235 / 0
-int packetString1; // 270089 - Dummy_pet_hawk_R (Packet Id String for Animation?) / 0
-int i1; // 0 / 0
+int handle; // 4237 / 0 / 0
+int attachToHandle; // 4235 / 0 / 0
+int packetString1; // 270089 - Dummy_pet_hawk_R (Packet Id String for Animation?) / 0 / 0
+// Snow Rolling Monster Handle
+int handleAttachedTo; // 0 / 0 / 4406
 position pos;

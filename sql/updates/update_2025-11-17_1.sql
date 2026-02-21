@@ -1,0 +1,1 @@
+ALTER TABLE `companions` ADD COLUMN `totalExp` BIGINT(20) NOT NULL DEFAULT '0';

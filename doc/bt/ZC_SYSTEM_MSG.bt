@@ -22,8 +22,8 @@ ServerHeaderDynamic header;
 
 int clientMessage;
 byte paramCount;
-byte displayType; // 0 = chat + red notice, 1 = chat only
-int64 l1;
+byte type; // 0 = also show in red letters on screen, 1 = don't
+char color[8];
 byte b1;
 byte b2;
 int i1;

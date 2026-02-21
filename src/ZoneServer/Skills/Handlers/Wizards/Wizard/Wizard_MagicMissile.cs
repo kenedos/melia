@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// Handles the Wizard skill Magic Missile.
 	/// </summary>
 	[SkillHandler(SkillId.Wizard_MagicMissile)]
-	public class Wizard_MagicMissile : IGroundSkillHandler
+	public class Wizard_MagicMissile : IMeleeGroundSkillHandler
 	{
 		private const int BulletsPerUse = 3;
 		private const float SubSplashAreaSize = 200;
@@ -31,9 +31,11 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
 		{
+			var initialTarget = designatedTargets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -46,7 +48,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 130, width: 60, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var damageDelay = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = skill.Properties.HitDelay;
 
@@ -77,7 +79,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				// ricochet bullets going pretty far, so it can't be off by
 				// too much.
 				var subSplashArea = Square.Centered(target.Position, caster.Direction, SubSplashAreaSize, SubSplashAreaSize / 2);
-				var subTargets = caster.Map.GetAttackableEntitiesIn(caster, subSplashArea).Where(a => a != target);
+				var subTargets = caster.Map.GetAttackableEnemiesIn(caster, subSplashArea).Where(a => a != target);
 
 				if (!subTargets.Any())
 					continue;

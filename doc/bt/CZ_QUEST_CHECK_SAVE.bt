@@ -15,4 +15,6 @@
 
 ClientHeaderFixed header;
 
-int questIds[10];
+int questIds[5];
+byte bin[20];
+short s1;

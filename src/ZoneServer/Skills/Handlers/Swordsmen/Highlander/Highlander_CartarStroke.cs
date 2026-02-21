@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,14 +20,14 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	/// Handler for the Highlander skill Cartar Stroke.
 	/// </summary>
 	[SkillHandler(SkillId.Highlander_CartarStroke)]
-	public class Highlander_CartarStroke : IGroundSkillHandler, IDynamicCasted
+	public class Highlander_CartarStroke : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		/// <summary>
 		/// Called when the user starts casting the skill.
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_PLAY_SOUND(caster, "voice_war_atk_long_cast");
 		}
@@ -36,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_STOP_SOUND(caster, "voice_war_atk_long_cast");
 		}
@@ -48,8 +49,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -88,7 +90,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 
 			for (var i = 0; i < 3; i++)
 			{
-				targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+				targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 				foreach (var target in targets.LimitBySDR(caster, skill))
 				{
@@ -107,7 +109,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 				await Task.Delay(delayBetweenHits);
 			}
 
-			targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
@@ -116,7 +118,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
 
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 				skillHit.ApplyKnockBack(target);
 
 				// At one point, this skill was not a knockdown, but instead

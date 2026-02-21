@@ -53,6 +53,12 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		public bool TryExecute(Character character, string message)
 		{
+			if (character == null)
+			{
+				message = "";
+				return true;
+			}
+
 			var prefix = ZoneServer.Instance.Conf.Commands.SelfPrefix;
 
 			if (!message.StartsWith(prefix) && !message.StartsWith(ClientCommandPrefix))
@@ -67,7 +73,8 @@ namespace Melia.Zone.Commands
 			var command = this.GetCommand(commandName);
 			if (command == null)
 			{
-				character.ServerMessage(Localization.Get("Unknown command '{0}'."), commandName);
+				character.ServerMessage(Localization.Get("Unknown command."));
+				Log.Warning(Localization.Get("Unknown command: {0}, message: {1}."), commandName, message);
 				return true;
 			}
 

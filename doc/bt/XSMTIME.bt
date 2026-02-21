@@ -1,0 +1,193 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: XSMTIME.bt
+//   Authors: Claude AI
+//   Version: 1.0
+//   Purpose: Parses .xsmtime animation timing files
+//  Category: 3D Animation
+// File Mask: *.xsmtime
+//   History:
+//   1.0 2024-12-19 - Initial version with multi-format support
+//------------------------------------------------
+
+// The .xsmtime file can have multiple formats:
+// 1. Text "empty" marker (5 bytes) - indicates no timing override
+// 2. Text duration value (e.g., "1.5")
+// 3. Text "start,end" or "duration,fps" pairs
+// 4. Binary formats (various possible structures)
+
+LittleEndian();
+
+local int64 fileSize = FileSize();
+local string fileContent = "";
+local int isTextFile = 0;
+local int isEmpty = 0;
+
+//------------------------------------------------
+// Helper function to check if data is printable text
+//------------------------------------------------
+int IsPrintableText(int startPos, int length) {
+    local int i;
+    local uchar c;
+    for (i = 0; i < length; i++) {
+        c = ReadUByte(startPos + i);
+        // Allow printable ASCII, newlines, tabs
+        if (!((c >= 0x20 && c <= 0x7E) || c == 0x0A || c == 0x0D || c == 0x09)) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+//------------------------------------------------
+// Detect format and parse accordingly
+//------------------------------------------------
+
+Printf("XsmTime file size: %d bytes\n", fileSize);
+
+if (fileSize == 0) {
+    Warning("Empty file");
+    return;
+}
+
+// Check if the file is small enough to be a text marker
+if (fileSize <= 64 && IsPrintableText(0, fileSize)) {
+    isTextFile = 1;
+    
+    // Read as text
+    typedef struct {
+        char text[fileSize];
+    } TextContent <read=ReadTextContent>;
+    
+    string ReadTextContent(TextContent &t) {
+        local string s = "";
+        local int i;
+        for (i = 0; i < sizeof(t.text); i++) {
+            if (t.text[i] == 0) break;
+            s += t.text[i];
+        }
+        return s;
+    }
+    
+    TextContent content <name="Text Content", bgcolor=cLtGreen>;
+    
+    // Check for "empty" marker
+    fileContent = ReadTextContent(content);
+    Printf("Text content: '%s'\n", fileContent);
+    
+    if (Stricmp(fileContent, "empty") == 0 || Stricmp(fileContent, "empty\n") == 0) {
+        isEmpty = 1;
+        Printf("File indicates 'empty' - no timing override\n");
+    }
+} else {
+    isTextFile = 0;
+    Printf("Parsing as binary format...\n");
+    
+    // Try various binary format interpretations
+    
+    //------------------------------------------------
+    // Format A: Simple float duration (4 bytes)
+    //------------------------------------------------
+    if (fileSize == 4) {
+        typedef struct {
+            float duration <name="Duration (seconds)">;
+        } SimpleDuration;
+        
+        SimpleDuration data <name="Simple Duration", bgcolor=cLtBlue>;
+        Printf("Duration: %f seconds\n", data.duration);
+    }
+    //------------------------------------------------
+    // Format B: Duration + FPS (8 bytes)
+    //------------------------------------------------
+    else if (fileSize == 8) {
+        typedef struct {
+            float duration <name="Duration (seconds)">;
+            float fps <name="FPS">;
+        } DurationFps;
+        
+        DurationFps data <name="Duration with FPS", bgcolor=cLtBlue>;
+        Printf("Duration: %f seconds, FPS: %f\n", data.duration, data.fps);
+    }
+    //------------------------------------------------
+    // Format C: Start/End time + optional FPS (12 bytes)
+    //------------------------------------------------
+    else if (fileSize == 12) {
+        typedef struct {
+            float startTime <name="Start Time">;
+            float endTime <name="End Time">;
+            float fps <name="FPS">;
+        } TimingRange;
+        
+        TimingRange data <name="Timing Range", bgcolor=cLtBlue>;
+        Printf("Start: %f, End: %f, FPS: %f\n", data.startTime, data.endTime, data.fps);
+        Printf("Calculated duration: %f seconds\n", data.endTime - data.startTime);
+    }
+    //------------------------------------------------
+    // Format D: Header + data structure
+    //------------------------------------------------
+    else if (fileSize >= 16) {
+        // Try to detect magic number
+        local uint magic = ReadUInt(0);
+        Printf("Magic/First uint: 0x%08X (%d)\n", magic, magic);
+        
+        typedef struct {
+            uint magic <name="Magic/Version", format=hex>;
+            uint flags <name="Flags", format=hex>;
+            float duration <name="Duration">;
+            float fps <name="FPS">;
+            
+            if (FileSize() > 16) {
+                float startTime <name="Start Time">;
+                float endTime <name="End Time">;
+            }
+            
+            if (FileSize() > 24) {
+                uint frameCount <name="Frame Count">;
+            }
+            
+            // Read any remaining data as raw bytes
+            if (FTell() < FileSize()) {
+                uchar remainingData[FileSize() - FTell()] <name="Remaining Data">;
+            }
+        } HeaderedFormat;
+        
+        HeaderedFormat data <name="Headered Format", bgcolor=cLtYellow>;
+    }
+    //------------------------------------------------
+    // Unknown format - show raw interpretation
+    //------------------------------------------------
+    else {
+        Printf("Unknown format, showing raw data interpretations...\n");
+        
+        typedef struct {
+            // Show first values as different types
+            if (FileSize() >= 4) {
+                local int64 pos = FTell();
+                uint asUint <name="As uint32">;
+                FSeek(pos);
+                float asFloat <name="As float32">;
+                FSeek(pos);
+                int asInt <name="As int32">;
+                FSeek(pos + 4);
+            }
+            if (FileSize() > FTell()) {
+                uchar rawBytes[FileSize() - FTell()] <name="Raw Bytes">;
+            }
+        } UnknownFormat;
+        
+        UnknownFormat data <name="Unknown Format", bgcolor=cLtRed>;
+    }
+}
+
+//------------------------------------------------
+// Summary
+//------------------------------------------------
+Printf("\n=== XSMTIME Summary ===\n");
+Printf("File size: %d bytes\n", fileSize);
+Printf("Is text file: %s\n", isTextFile ? "Yes" : "No");
+Printf("Is empty marker: %s\n", isEmpty ? "Yes" : "No");
+if (isTextFile && !isEmpty) {
+    Printf("Text content: '%s'\n", fileContent);
+}
+Printf("=======================\n");

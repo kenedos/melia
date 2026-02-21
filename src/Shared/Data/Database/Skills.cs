@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Versioning;
 using Newtonsoft.Json.Linq;
 using Yggdrasil.Data.JSON;
 
@@ -19,9 +20,13 @@ namespace Melia.Shared.Data.Database
 		public SkillAttackType AttackType { get; set; }
 		public AttributeType Attribute { get; set; }
 		public SkillClassType ClassType { get; set; }
+		public SkillType Type { get; set; }
+		public SkillTargetType TargetType { get; set; }
 		public Tags Tags { get; set; }
+		public SkillCastingType CastingType { get; set; } = SkillCastingType.Normal;
 
 		public float BasicSp { get; set; }
+		public float BasicCast { get; set; }
 		public float BasicStamina { get; set; }
 
 		public float EnableAngle { get; set; }
@@ -54,11 +59,13 @@ namespace Melia.Shared.Data.Database
 		public bool SpeedRateAffectedByBuff { get; set; }
 
 		public bool EnableCastMove { get; set; }
+		public bool CastInterruptible { get; set; }
 
 		public HitType KnockDownHitType { get; set; }
 		public int KnockDownVelocity { get; set; }
 		public int KnockDownHAngle { get; set; }
 		public int KnockDownVAngle { get; set; }
+		public int KnockDownBound { get; set; }
 
 		public AbilityId ReinforceAbility { get; set; }
 		public AbilityId HiddenReinforceAbility { get; set; }
@@ -70,6 +77,51 @@ namespace Melia.Shared.Data.Database
 		public CooldownId OverheatGroup { get; set; }
 		public int OverheatCount { get; set; }
 		public TimeSpan OverHeatDelay { get; set; }
+		// Ask exec what's the custom SkillAttackType he's using.
+		// This Attack Type is the client defined values.
+		public HitAttackType HitAttackType { get; set; }
+		public List<int> RequiredStance { get; internal set; }
+		public int IdValue { get; internal set; }
+	}
+
+	public enum SkillType
+	{
+		Attack,
+		Buff,
+		Magic,
+	}
+
+	public enum SkillCastingType
+	{
+		/// <summary>
+		/// Normal casting, no special effects.
+		/// </summary>
+		Normal,
+		/// <summary>
+		/// Casting with a delay, where the skill is prepared before use.
+		/// </summary>
+		Casting,
+		/// <summary>
+		/// Dynamic casting, where the skill can be used while moving or changing direction.
+		/// </summary>
+		DynamicCasting,
+		/// <summary>
+		/// Channeling casting, where the skill is channeled over time.
+		/// </summary>
+		Channeling,
+		/// <summary>
+		/// Instant casting, where the skill is used immediately without delay.
+		/// </summary>
+		Instant,
+	}
+
+	public enum SkillTargetType
+	{
+		None,
+		Actor,
+		Front,
+		Ground,
+		Self
 	}
 
 	public enum SplashType
@@ -121,7 +173,7 @@ namespace Melia.Shared.Data.Database
 	// and in case we might actually want or need separate enums.
 	// The only difference of note is that the skill data uses a "Magic"
 	// attribute, which doesn't appear to exist as a monster attribute.
-	//public enum SkillAttribute
+	//public enum AttributeType
 	//{
 	//	None,
 	//	Fire,
@@ -147,6 +199,32 @@ namespace Melia.Shared.Data.Database
 		Missile,
 		Magic,
 		Responsive,
+		TrueDamage,
+		AbsoluteDamage,
+	}
+
+	public enum HitAttackType
+	{
+		None = 0,
+		Magic = 0,
+		Pad = 0,
+		Fire = 1,
+		Ice = 2,
+		Lightning = 3,
+		Earth = 4,
+		Poison = 5,
+		Dark = 6,
+		Holy = 7,
+		Soul = 8,
+		Melee = 9,
+		Slash = 101,
+		Aries = 102,
+		Strike = 103,
+		Arrow = 104,
+		Gun = 105,
+		Cannon = 106,
+		Missile = 301,
+		Cleric_Cure = 501,
 	}
 
 	/// <summary>
@@ -180,6 +258,28 @@ namespace Melia.Shared.Data.Database
 			=> this.Find(a => a.ClassName == className);
 
 		/// <summary>
+		/// Returns the skill data entry if found
+		/// otherwise if null returns false.
+		/// </summary>
+		/// <param name="className"></param>
+		/// <param name="skillData"></param>
+		/// <returns></returns>
+		public bool TryFind(string className, out SkillData skillData)
+		{
+			skillData = this.Find(className);
+			return skillData != null;
+		}
+
+		/// <summary>
+		/// Returns first skill data entry with given overheat group, or null
+		/// if it wasn't found.
+		/// </summary>
+		/// <param name="overheatGroup"></param>
+		/// <returns></returns>
+		public SkillData FindByOverheatGroup(CooldownId overheatGroup)
+			=> this.Find(a => a.OverheatGroup == overheatGroup);
+
+		/// <summary>
 		/// Reads given entry and adds it to the database.
 		/// </summary>
 		/// <param name="entry"></param>
@@ -189,17 +289,22 @@ namespace Melia.Shared.Data.Database
 
 			var data = new SkillData();
 
+			data.IdValue = entry.ReadInt("skillId");
 			data.Id = (SkillId)entry.ReadInt("skillId");
 			data.ClassName = entry.ReadString("className");
 			data.Name = entry.ReadString("name");
 
-			data.ActivationType = entry.ReadEnum<SkillActivationType>("activationType");
+			data.ActivationType = entry.ReadEnum("activationType", SkillActivationType.ActiveSkill);
 			data.UseType = entry.ReadEnum<SkillUseType>("useType");
 			data.AttackType = entry.ReadEnum<SkillAttackType>("attackType");
+			data.HitAttackType = entry.ReadEnum<HitAttackType>("attackType");
 			data.Attribute = entry.ReadEnum<AttributeType>("attribute");
 			data.ClassType = entry.ReadEnum<SkillClassType>("classType");
+			data.Type = entry.ReadEnum<SkillType>("type");
+			data.TargetType = entry.ReadEnum<SkillTargetType>("target");
 
 			data.BasicSp = entry.ReadFloat("basicSp", 0);
+			data.BasicCast = entry.ReadFloat("basicCast", 0);
 			data.BasicStamina = entry.ReadFloat("basicStamina", 0);
 
 			data.EnableAngle = entry.ReadFloat("enableAngle");
@@ -232,22 +337,34 @@ namespace Melia.Shared.Data.Database
 			data.SpeedRateAffectedByBuff = entry.ReadBool("speedRateAffectedByBuff");
 
 			data.EnableCastMove = entry.ReadBool("enableCastMove");
+			data.CastInterruptible = entry.ReadBool("castInterruptible");
 
-			data.KnockDownHitType = entry.ReadEnum<HitType>("knockDownType", HitType.Normal);
+			data.KnockDownHitType = entry.ReadEnum("knockDownType", HitType.Normal);
 			data.KnockDownVelocity = entry.ReadInt("knockDownVelocity", 0);
 			data.KnockDownHAngle = entry.ReadInt("knockDownHAngle", 0);
 			data.KnockDownVAngle = entry.ReadInt("knockDownVAngle", 0);
 
-			data.ReinforceAbility = entry.ReadEnum<AbilityId>("reinforceAbility", 0);
-			data.HiddenReinforceAbility = entry.ReadEnum<AbilityId>("hiddenReinforceAbility", 0);
+			var reinforceStr = entry.ReadString("reinforceAbility", "");
+			data.ReinforceAbility = string.IsNullOrEmpty(reinforceStr) ? 0 : entry.ReadEnum<AbilityId>("reinforceAbility", 0);
+			var hiddenReinforceStr = entry.ReadString("hiddenReinforceAbility", "");
+			data.HiddenReinforceAbility = string.IsNullOrEmpty(hiddenReinforceStr) ? 0 : entry.ReadEnum<AbilityId>("hiddenReinforceAbility", 0);
 			data.HiddenReinforceAbilityFactorByLevel = entry.ReadFloat("hiddenReinforceAbilityFactorByLevel", 0);
 
-			data.CooldownGroup = entry.ReadEnum<CooldownId>("cooldownGroup", CooldownId.Default);
+			var cooldownGroup = entry.ReadString("cooldownGroup");
+			if (!string.IsNullOrEmpty(cooldownGroup))
+				data.CooldownGroup = entry.ReadEnum("cooldownGroup", CooldownId.Default);
+			else
+				data.CooldownGroup = CooldownId.Global;
 			data.CooldownTime = entry.ReadTimeSpan("cooldownTime", TimeSpan.Zero);
 
-			data.OverheatGroup = entry.ReadEnum<CooldownId>("overheatGroup", CooldownId.Default);
+			if (Versions.Protocol > 500)
+				data.OverheatGroup = entry.ReadEnum("overheatGroup", CooldownId.Default);
+			else
+				data.OverheatGroup = entry.ReadEnum("overheatGroup", CooldownId.Global);
 			data.OverheatCount = entry.ReadInt("overheatCount", 0);
 			data.OverHeatDelay = entry.ReadTimeSpan("overheatDelay", TimeSpan.Zero);
+
+			data.RequiredStance = entry.ReadList<int>("requiredStance");
 
 			data.Tags = new Tags(entry.ReadList<string>("tags", []));
 

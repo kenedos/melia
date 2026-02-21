@@ -19,7 +19,7 @@ namespace Melia.Zone.World.Actors.Components
 	/// This component is currently primarily intended for usage with pads
 	/// and some features might not work with other actor types.
 	/// </remarks>
-	public class TriggerComponent : IActorComponent, IUpdateable
+	public class TriggerComponent : ActorComponent, IUpdateable
 	{
 		private readonly static TimeSpan DefaultUpdateInterval = TimeSpan.FromSeconds(1);
 
@@ -28,23 +28,22 @@ namespace Melia.Zone.World.Actors.Components
 		private List<IActor> _actorsInside = new();
 		private int _actorCount = 0;
 		private int _maxActorCount = short.MaxValue;
+		private int _maxConcurrentUse = short.MaxValue;
 		private int _useCount;
 
 		private DateTime _creationTime;
 		private TimeSpan _updateTimer;
 		private TimeSpan _lifetimeTimer;
 		private bool _elapsedInitalized;
-		private bool _destroyed;
 
-		/// <summary>
-		/// Returns the component's owner.
-		/// </summary>
-		public IActor Owner { get; }
+		private int _activateCount = 0;
+
+		private bool _destroyed;
 
 		/// <summary>
 		/// Returns the trigger area.
 		/// </summary>
-		public IShapeF Area { get; }
+		public IShapeF Area { get; set; }
 
 		/// <summary>
 		/// Gets or sets the interval in which the trigger's interval update event
@@ -88,9 +87,33 @@ namespace Melia.Zone.World.Actors.Components
 		}
 
 		/// <summary>
+		/// Returns the numbers of times activated.
+		/// </summary>
+		public int ActivateCount
+		{
+			get => _activateCount;
+			set => _activateCount = Math.Max(0, value);
+		}
+
+		/// <summary>
+		/// Returns the maximum number of actors that can be inside the pad
+		/// at a time.
+		/// </summary>
+		/// <remarks>
+		/// The enter and leave events will not be raised if the pad has
+		/// reached its maximum actor count. But as actors leave the pad,
+		/// new ones will be considered again.
+		/// </remarks>
+		public int MaxConcurrentUseCount
+		{
+			get => _maxConcurrentUse;
+			set => _maxConcurrentUse = Math.Max(0, value);
+		}
+
+		/// <summary>
 		/// Returns true if the max actor count has been reached.
 		/// </summary>
-		public bool AtCapacity => this.ActorCount >= this.MaxActorCount;
+		public bool AtCapacity => this.ActivateCount >= this.MaxConcurrentUseCount || this.ActorCount >= this.MaxActorCount;
 
 		/// <summary>
 		/// Gets or sets the maximum number of "uses" for the trigger.
@@ -144,9 +167,8 @@ namespace Melia.Zone.World.Actors.Components
 		/// </summary>
 		/// <param name="actor"></param>
 		/// <param name="area"></param>
-		public TriggerComponent(IActor actor, IShapeF area)
+		public TriggerComponent(IActor actor, IShapeF area) : base(actor)
 		{
-			this.Owner = actor;
 			this.Area = area;
 		}
 
@@ -157,7 +179,7 @@ namespace Melia.Zone.World.Actors.Components
 		public List<IActor> GetActors()
 		{
 			lock (_syncLock)
-				return _actorsInside.ToList();
+				return _actorsInside.Take(this.MaxActorCount).ToList();
 		}
 
 		/// <summary>
@@ -182,6 +204,20 @@ namespace Melia.Zone.World.Actors.Components
 		{
 			lock (_syncLock)
 				return _actorsInside.OfType<ICombatEntity>().Where(attacker.CanAttack).ToList();
+		}
+
+		/// <summary>
+		/// Returns a list of actors currently inside the trigger area
+		/// that are allied to the given actor.
+		/// </summary>
+		/// <param name="ally"></param>
+		/// <returns></returns>
+		public List<ICombatEntity> GetAlliedEntities(ICombatEntity ally)
+		{
+			lock (_syncLock)
+				return _actorsInside.OfType<ICombatEntity>()
+					.Where(target => target != ally && !target.IsDead && ally.IsAlly(target))
+					.ToList();
 		}
 
 		/// <summary>
@@ -211,9 +247,24 @@ namespace Melia.Zone.World.Actors.Components
 			// better. For simplicity we'll keep it here for the moment
 			// though.
 
-			this.Area.UpdatePosition(this.Owner.Position);
+			if (this.Actor is Pad pad)
+			{
+				if (pad.IsDead)
+				{
+					pad.Destroy();
+					return;
+				}
 
-			var nowInside = this.Owner.Map.GetActorsIn<IActor>(this.Area, this.IsValidTriggerer);
+				if (pad.Creator is ICombatEntity creator && creator.IsDead)
+				{
+					pad.Destroy();
+					return;
+				}
+			}
+
+			this.Area.UpdatePosition(this.Actor.Position);
+
+			var nowInside = this.Actor.Map.GetActorsIn<IActor>(this.Area, this.IsValidTriggerer);
 
 			lock (_syncLock)
 			{
@@ -223,10 +274,10 @@ namespace Melia.Zone.World.Actors.Components
 				var left = wereInside.Except(nowInside);
 
 				foreach (var actor in entered)
-					this.Entered?.Invoke(this, new TriggerActorArgs(TriggerType.Enter, this.Owner, actor));
+					this.Entered?.Invoke(this, new TriggerActorArgs(TriggerType.Enter, this.Actor, actor));
 
 				foreach (var actor in left)
-					this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Owner, actor));
+					this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
 
 				_actorsInside = nowInside;
 				this.ActorCount = nowInside.Count;
@@ -236,7 +287,7 @@ namespace Melia.Zone.World.Actors.Components
 
 			if (_updateTimer >= this.UpdateInterval)
 			{
-				this.Updated?.Invoke(this, new TriggerArgs(TriggerType.Update, this.Owner));
+				this.Updated?.Invoke(this, new TriggerArgs(TriggerType.Update, this.Actor));
 				_updateTimer = TimeSpan.Zero;
 			}
 
@@ -268,6 +319,16 @@ namespace Melia.Zone.World.Actors.Components
 		}
 
 		/// <summary>
+		/// Resets the lifetime timer back to zero, effectively refreshing
+		/// the trigger's remaining duration to its full LifeTime value.
+		/// Used by Chronomancer's Backmasking skill to reset pad durations.
+		/// </summary>
+		public void ResetLifeTime()
+		{
+			_lifetimeTimer = TimeSpan.Zero;
+		}
+
+		/// <summary>
 		/// Increases the trigger's use count and automatically destroys
 		/// the owner if the max use count is reached. Returns true if
 		/// the max use count was reached.
@@ -290,14 +351,14 @@ namespace Melia.Zone.World.Actors.Components
 		{
 			// TODO: Make more generic, so we don't need explicit conversions.
 
-			switch (this.Owner)
+			switch (this.Actor)
 			{
 				case Pad pad: pad.Destroy(); return;
 				case IMonster monster: monster.Map.RemoveMonster(monster); return;
 				case Character character: character.Map.RemoveCharacter(character); return;
 			}
 
-			throw new InvalidOperationException($"Unknown owner type '{this.Owner.GetType()}'.");
+			throw new InvalidOperationException($"Unknown owner type '{this.Actor.GetType()}'.");
 		}
 
 		/// <summary>
@@ -308,7 +369,7 @@ namespace Melia.Zone.World.Actors.Components
 			_destroyed = false;
 			_creationTime = DateTime.Now;
 
-			this.Created?.Invoke(this, new TriggerArgs(TriggerType.Create, this.Owner));
+			this.Created?.Invoke(this, new TriggerArgs(TriggerType.Create, this.Actor));
 		}
 
 		/// <summary>
@@ -321,7 +382,25 @@ namespace Melia.Zone.World.Actors.Components
 
 			_destroyed = true;
 
-			this.Destroyed?.Invoke(this, new TriggerArgs(TriggerType.Destroy, this.Owner));
+			foreach (var actor in this.GetActors())
+				this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
+			this.Destroyed?.Invoke(this, new TriggerArgs(TriggerType.Destroy, this.Actor));
+
+			this.ClearEventHandlers();
+			_actorsInside.Clear();
+		}
+
+		/// <summary>
+		/// Clears all event handlers to prevent memory leaks.
+		/// Called when the trigger is being removed from the map.
+		/// </summary>
+		private void ClearEventHandlers()
+		{
+			this.Created = null;
+			this.Destroyed = null;
+			this.Entered = null;
+			this.Left = null;
+			this.Updated = null;
 		}
 
 		/// <summary>

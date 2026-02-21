@@ -1,0 +1,645 @@
+//------------------------------------------------
+//--- 010 Editor v15.0 Binary Template
+//
+//      File: IPF.bt
+//   Authors: AI Assistant
+//   Version: 1.2
+//   Purpose: Parses IPF (Internet Patch Format) archive files used by Tree of Savior.
+//  Category: Archive
+// File Mask: *.ipf
+//  ID Bytes: 50 4B 05 06 // "PK\x05\x06" at EOF-12
+//   History:
+//   1.2 2024-12-23 - Better detection of files without valid footer (raw/extracted IPFs).
+//   1.1 2024-12-23 - Added PKWARE traditional encryption/decryption support.
+//   1.0 2024-12-23 - Initial version based on IPFBrowser C# implementation.
+//
+//   Notes:
+//   - IPF files are ZIP-like archives with a custom structure
+//   - Footer is located at the end of the file (last 24 bytes)
+//   - File table is located at FileTableOffset from the footer
+//   - File data is compressed with DEFLATE and optionally encrypted
+//   - Encryption uses PKWARE traditional encryption with password: "ofO1a0ueXA? [\xFFs h %?"
+//   - Only files with NewVersion > 11000 or NewVersion == 0 are encrypted
+//   - Only even-indexed bytes are encrypted; odd bytes pass through unchanged
+//
+//   Configuration:
+//   - To force encryption OFF (for pre-decrypted files): set g_forceEncryption = 0 (around line 270)
+//   - To force encryption ON: set g_forceEncryption = 1
+//   - Auto-detect (default): g_forceEncryption = -1
+//
+//------------------------------------------------
+
+// --- Main Setup ---
+LittleEndian();
+
+//------------------------------------------------
+//--- Color Definitions for Visual Clarity
+//------------------------------------------------
+local int COLOR_FOOTER    = 0xA0FFA0;  // Light green
+local int COLOR_HEADER    = 0xA0A0FF;  // Light blue
+local int COLOR_DATA      = 0xFFA0A0;  // Light red
+local int COLOR_STRING    = 0xFFFF80;  // Yellow
+local int COLOR_ENCRYPTED = 0xFFC0FF;  // Light purple
+
+//------------------------------------------------
+//--- CRC32 Table (Precomputed with polynomial 0xEDB88320)
+//------------------------------------------------
+local uint crc32Table[256] = {
+    0x00000000, 0x77073096, 0xEE0E612C, 0x990951BA, 0x076DC419, 0x706AF48F, 0xE963A535, 0x9E6495A3,
+    0x0EDB8832, 0x79DCB8A4, 0xE0D5E91E, 0x97D2D988, 0x09B64C2B, 0x7EB17CBD, 0xE7B82D07, 0x90BF1D91,
+    0x1DB71064, 0x6AB020F2, 0xF3B97148, 0x84BE41DE, 0x1ADAD47D, 0x6DDDE4EB, 0xF4D4B551, 0x83D385C7,
+    0x136C9856, 0x646BA8C0, 0xFD62F97A, 0x8A65C9EC, 0x14015C4F, 0x63066CD9, 0xFA0F3D63, 0x8D080DF5,
+    0x3B6E20C8, 0x4C69105E, 0xD56041E4, 0xA2677172, 0x3C03E4D1, 0x4B04D447, 0xD20D85FD, 0xA50AB56B,
+    0x35B5A8FA, 0x42B2986C, 0xDBBBC9D6, 0xACBCF940, 0x32D86CE3, 0x45DF5C75, 0xDCD60DCF, 0xABD13D59,
+    0x26D930AC, 0x51DE003A, 0xC8D75180, 0xBFD06116, 0x21B4F4B5, 0x56B3C423, 0xCFBA9599, 0xB8BDA50F,
+    0x2802B89E, 0x5F058808, 0xC60CD9B2, 0xB10BE924, 0x2F6F7C87, 0x58684C11, 0xC1611DAB, 0xB6662D3D,
+    0x76DC4190, 0x01DB7106, 0x98D220BC, 0xEFD5102A, 0x71B18589, 0x06B6B51F, 0x9FBFE4A5, 0xE8B8D433,
+    0x7807C9A2, 0x0F00F934, 0x9609A88E, 0xE10E9818, 0x7F6A0DBB, 0x086D3D2D, 0x91646C97, 0xE6635C01,
+    0x6B6B51F4, 0x1C6C6162, 0x856530D8, 0xF262004E, 0x6C0695ED, 0x1B01A57B, 0x8208F4C1, 0xF50FC457,
+    0x65B0D9C6, 0x12B7E950, 0x8BBEB8EA, 0xFCB9887C, 0x62DD1DDF, 0x15DA2D49, 0x8CD37CF3, 0xFBD44C65,
+    0x4DB26158, 0x3AB551CE, 0xA3BC0074, 0xD4BB30E2, 0x4ADFA541, 0x3DD895D7, 0xA4D1C46D, 0xD3D6F4FB,
+    0x4369E96A, 0x346ED9FC, 0xAD678846, 0xDA60B8D0, 0x44042D73, 0x33031DE5, 0xAA0A4C5F, 0xDD0D7CC9,
+    0x5005713C, 0x270241AA, 0xBE0B1010, 0xC90C2086, 0x5768B525, 0x206F85B3, 0xB966D409, 0xCE61E49F,
+    0x5EDEF90E, 0x29D9C998, 0xB0D09822, 0xC7D7A8B4, 0x59B33D17, 0x2EB40D81, 0xB7BD5C3B, 0xC0BA6CAD,
+    0xEDB88320, 0x9ABFB3B6, 0x03B6E20C, 0x74B1D29A, 0xEAD54739, 0x9DD277AF, 0x04DB2615, 0x73DC1683,
+    0xE3630B12, 0x94643B84, 0x0D6D6A3E, 0x7A6A5AA8, 0xE40ECF0B, 0x9309FF9D, 0x0A00AE27, 0x7D079EB1,
+    0xF00F9344, 0x8708A3D2, 0x1E01F268, 0x6906C2FE, 0xF762575D, 0x806567CB, 0x196C3671, 0x6E6B06E7,
+    0xFED41B76, 0x89D32BE0, 0x10DA7A5A, 0x67DD4ACC, 0xF9B9DF6F, 0x8EBEEFF9, 0x17B7BE43, 0x60B08ED5,
+    0xD6D6A3E8, 0xA1D1937E, 0x38D8C2C4, 0x4FDFF252, 0xD1BB67F1, 0xA6BC5767, 0x3FB506DD, 0x48B2364B,
+    0xD80D2BDA, 0xAF0A1B4C, 0x36034AF6, 0x41047A60, 0xDF60EFC3, 0xA867DF55, 0x316E8EEF, 0x4669BE79,
+    0xCB61B38C, 0xBC66831A, 0x256FD2A0, 0x5268E236, 0xCC0C7795, 0xBB0B4703, 0x220216B9, 0x5505262F,
+    0xC5BA3BBE, 0xB2BD0B28, 0x2BB45A92, 0x5CB36A04, 0xC2D7FFA7, 0xB5D0CF31, 0x2CD99E8B, 0x5BDEAE1D,
+    0x9B64C2B0, 0xEC63F226, 0x756AA39C, 0x026D930A, 0x9C0906A9, 0xEB0E363F, 0x72076785, 0x05005713,
+    0x95BF4A82, 0xE2B87A14, 0x7BB12BAE, 0x0CB61B38, 0x92D28E9B, 0xE5D5BE0D, 0x7CDCEFB7, 0x0BDBDF21,
+    0x86D3D2D4, 0xF1D4E242, 0x68DDB3F8, 0x1FDA836E, 0x81BE16CD, 0xF6B9265B, 0x6FB077E1, 0x18B74777,
+    0x88085AE6, 0xFF0F6A70, 0x66063BCA, 0x11010B5C, 0x8F659EFF, 0xF862AE69, 0x616BFFD3, 0x166CCF45,
+    0xA00AE278, 0xD70DD2EE, 0x4E048354, 0x3903B3C2, 0xA7672661, 0xD06016F7, 0x4969474D, 0x3E6E77DB,
+    0xAED16A4A, 0xD9D65ADC, 0x40DF0B66, 0x37D83BF0, 0xA9BCAE53, 0xDEBB9EC5, 0x47B2CF7F, 0x30B5FFE9,
+    0xBDBDF21C, 0xCABAC28A, 0x53B39330, 0x24B4A3A6, 0xBAD03605, 0xCDD70693, 0x54DE5729, 0x23D967BF,
+    0xB3667A2E, 0xC4614AB8, 0x5D681B02, 0x2A6F2B94, 0xB40BBE37, 0xC30C8EA1, 0x5A05DF1B, 0x2D02EF8D
+};
+
+//------------------------------------------------
+//--- PKWARE Traditional Encryption
+//------------------------------------------------
+
+// Global encryption key state
+local uint g_Key0, g_Key1, g_Key2;
+
+// Global encryption flag (set after reading footer)
+local int g_isEncrypted = 0;
+
+// Encryption password used by IPF files: "ofO1a0ueXA? [\xFFs h %?"
+local uchar IPF_PASSWORD[20] = { 
+    0x6F, 0x66, 0x4F, 0x31, 0x61, 0x30, 0x75, 0x65, 
+    0x58, 0x41, 0x3F, 0x20, 0x5B, 0xFF, 0x73, 0x20, 
+    0x68, 0x20, 0x25, 0x3F
+};
+
+// CRC32 single byte computation (used for key updates)
+uint ComputeCrc32(uint w, ubyte b) {
+    return crc32Table[(w ^ b) & 0xFF] ^ (w >> 8);
+}
+
+// Update the encryption keys with a byte value
+void UpdateKeys(ubyte byteValue) {
+    g_Key0 = ComputeCrc32(g_Key0, byteValue);
+    g_Key1 = g_Key1 + (ubyte)g_Key0;
+    g_Key1 = g_Key1 * 0x08088405 + 1;
+    g_Key2 = ComputeCrc32(g_Key2, (ubyte)(g_Key1 >> 24));
+}
+
+// Get the magic byte for decryption
+ubyte GetMagicByte() {
+    local ushort t = (ushort)((g_Key2 & 0xFFFF) | 2);
+    return (ubyte)(((t * (t ^ 1)) >> 8) & 0xFF);
+}
+
+// Initialize encryption keys with the IPF password
+void InitializeKeys() {
+    // Initial key values
+    g_Key0 = 0x12345678;
+    g_Key1 = 0x23456789;
+    g_Key2 = 0x34567890;
+    
+    // Process password bytes (20 characters)
+    local int i;
+    for (i = 0; i < 20; i++) {
+        UpdateKeys(IPF_PASSWORD[i]);
+    }
+}
+
+// Decrypt a single byte at the given index
+// Only even-indexed bytes are decrypted; odd bytes pass through
+ubyte DecryptByte(ubyte cipherByte, int index) {
+    if ((index % 2) != 0) {
+        // Odd index - pass through unchanged
+        return cipherByte;
+    } else {
+        // Even index - decrypt
+        local ubyte plainByte = cipherByte ^ GetMagicByte();
+        UpdateKeys(plainByte);
+        return plainByte;
+    }
+}
+
+//------------------------------------------------
+//--- Struct Definitions
+//------------------------------------------------
+
+// IPF Footer - Located at the last 24 bytes of the file
+typedef struct {
+    ushort  FileCount;              // Number of files in the archive
+    uint    FileTableOffset;        // Offset to the file table
+    ushort  FileRemovedCount;       // Number of removed files (usually 0)
+    uint    RemovedFileTableOffset; // Offset to removed file table (usually 0)
+    char    Signature[4];           // "PK\x05\x06"
+    uint    OldVersion;             // Base version
+    uint    NewVersion;             // Patch version
+} IPF_FOOTER <read=ReadIpfFooter, bgcolor=COLOR_FOOTER>;
+
+string ReadIpfFooter(IPF_FOOTER &f) {
+    local string s;
+    local string encStatus = "Unencrypted";
+    if (f.NewVersion > 11000 || f.NewVersion == 0) {
+        encStatus = "Encrypted";
+    }
+    SPrintf(s, "Files: %d, Version: %d -> %d (%s)", 
+            f.FileCount, f.OldVersion, f.NewVersion, encStatus);
+    return s;
+}
+
+// IPF File Entry - Describes a single file in the archive
+typedef struct {
+    local int64 entryStart = FTell();
+    
+    ushort  PathLength;             // Length of the relative path
+    uint    Checksum;               // CRC32 checksum of compressed data
+    uint    SizeCompressed;         // Compressed size in bytes
+    uint    SizeUncompressed;       // Uncompressed size in bytes
+    uint    DataOffset;             // Offset to the file data
+    ushort  PackFileNameLength;     // Length of the pack filename
+    
+    if (PackFileNameLength > 0 && PackFileNameLength < 4096) {
+        char PackFileName[PackFileNameLength] <bgcolor=COLOR_STRING>;
+    }
+    
+    if (PathLength > 0 && PathLength < 4096) {
+        char Path[PathLength] <bgcolor=COLOR_STRING>;
+    }
+} IPF_FILE_ENTRY <read=ReadIpfFileEntry, optimize=false, bgcolor=COLOR_HEADER>;
+
+string ReadIpfFileEntry(IPF_FILE_ENTRY &e) {
+    local string fullPath;
+    local string packName = "";
+    local string path = "";
+    
+    if (exists(e.PackFileName))
+        packName = e.PackFileName;
+    if (exists(e.Path))
+        path = e.Path;
+    
+    local string compType = GetCompressionType(path);
+    
+    SPrintf(fullPath, "%s/%s [%s] (%d -> %d bytes)", 
+            packName, path, compType, e.SizeCompressed, e.SizeUncompressed);
+    return fullPath;
+}
+
+// IPF File Data Block - The actual compressed/encrypted data
+typedef struct(uint size, int isEncrypted) {
+    local int _isEnc = isEncrypted;
+    if (size > 0) {
+        if (isEncrypted) {
+            ubyte Data[size] <bgcolor=COLOR_ENCRYPTED, comment="PKWARE Encrypted + DEFLATE">;
+        } else {
+            ubyte Data[size] <bgcolor=COLOR_DATA, comment="Raw/Unencrypted">;
+        }
+    }
+} IPF_FILE_DATA <read=ReadIpfFileData, optimize=false>;
+
+string ReadIpfFileData(IPF_FILE_DATA &d) {
+    local string s;
+    if (d._isEnc) {
+        SPrintf(s, "Encrypted Data (%d bytes)", sizeof(d.Data));
+    } else {
+        SPrintf(s, "Raw Data (%d bytes)", sizeof(d.Data));
+    }
+    return s;
+}
+
+//------------------------------------------------
+//--- Helper Functions
+//------------------------------------------------
+
+// Check if the file has a valid IPF signature
+int IsValidIpf() {
+    local int64 pos = FTell();
+    local int64 fileSize = FileSize();
+    
+    if (fileSize < 24) {
+        Printf("File too small: %Ld bytes (minimum 24 required)\n", fileSize);
+        return 0;
+    }
+    
+    // Footer structure (24 bytes from EOF):
+    //   FileCount (2) + FileTableOffset (4) + FileRemovedCount (2) + 
+    //   RemovedFileTableOffset (4) + Signature (4) + OldVersion (4) + NewVersion (4)
+    // Signature is at offset 12 from footer start = EOF - 12
+    FSeek(fileSize - 12);
+    local uchar sig[4];
+    sig[0] = ReadUByte(FTell());
+    sig[1] = ReadUByte(FTell() + 1);
+    sig[2] = ReadUByte(FTell() + 2);
+    sig[3] = ReadUByte(FTell() + 3);
+    
+    Printf("Signature check at 0x%LX: %02X %02X %02X %02X (expected: 50 4B 05 06)\n", 
+           fileSize - 12, sig[0], sig[1], sig[2], sig[3]);
+    
+    FSeek(pos);
+    
+    // Signature should be "PK\x05\x06"
+    if (sig[0] == 0x50 && sig[1] == 0x4B && 
+        sig[2] == 0x05 && sig[3] == 0x06) {
+        return 1;
+    }
+    return 0;
+}
+
+// Check if file data is encrypted based on version
+// Set this to 0 to force no encryption, 1 to force encryption, -1 for auto-detect
+local int g_forceEncryption = -1;  // Change this manually if needed
+
+int IsEncrypted(uint newVersion) {
+    if (g_forceEncryption == 0) return 0;  // Force no encryption
+    if (g_forceEncryption == 1) return 1;  // Force encryption
+    // Auto-detect based on version
+    return (newVersion > 11000 || newVersion == 0);
+}
+
+// Try to detect if data looks like valid DEFLATE (starts with common zlib/deflate headers)
+int LooksLikeDeflate(int64 offset) {
+    local ubyte b0 = ReadUByte(offset);
+    local ubyte b1 = ReadUByte(offset + 1);
+    
+    // Common DEFLATE stream starts (no zlib header, raw deflate)
+    // Deflate blocks typically start with bits indicating block type
+    // This is a heuristic - encrypted data rarely starts with these patterns
+    
+    // Check for zlib header (78 01, 78 5E, 78 9C, 78 DA)
+    if (b0 == 0x78 && (b1 == 0x01 || b1 == 0x5E || b1 == 0x9C || b1 == 0xDA)) {
+        return 1;
+    }
+    
+    return 0;  // Can't determine
+}
+
+// Get compression type description based on file extension
+string GetCompressionType(string path) {
+    local int len = Strlen(path);
+    if (len < 4) return "DEFLATE";
+    
+    local string ext = SubStr(path, len - 4, 4);
+    
+    // These extensions are stored uncompressed and unencrypted
+    if (ext == ".jpg" || ext == "jpeg" || ext == ".fsb" || ext == ".mp3") {
+        return "Raw";
+    }
+    return "DEFLATE";
+}
+
+// Check if file extension means no compression/encryption
+int IsRawFile(string path) {
+    local int len = Strlen(path);
+    if (len < 4) return 0;
+    
+    local string ext = SubStr(path, len - 4, 4);
+    
+    if (ext == ".jpg" || ext == "jpeg" || ext == ".fsb" || ext == ".mp3") {
+        return 1;
+    }
+    return 0;
+}
+
+//------------------------------------------------
+//--- Decryption Functions (callable from Output/Script)
+//------------------------------------------------
+
+// Decrypt and display file data
+void DecryptFileData(int64 offset, uint size) {
+    local int64 pos = FTell();
+    local int i;
+    local ubyte c, p;
+    
+    Printf("\n=== Decrypting %d bytes at offset 0x%LX ===\n", size, offset);
+    
+    InitializeKeys();
+    FSeek(offset);
+    
+    // Determine how many bytes to show
+    local int showBytes = 256;
+    if (size < showBytes) showBytes = size;
+    
+    Printf("\nFirst %d decrypted bytes (hex):\n", showBytes);
+    for (i = 0; i < showBytes; i++) {
+        c = ReadUByte(offset + i);
+        p = DecryptByte(c, i);
+        Printf("%02X ", p);
+        if ((i + 1) % 16 == 0) Printf("\n");
+    }
+    if (showBytes % 16 != 0) Printf("\n");
+    
+    // Try to show as text if printable
+    Printf("\nFirst %d decrypted bytes (ASCII):\n", showBytes);
+    InitializeKeys();  // Reset keys for second pass
+    for (i = 0; i < showBytes; i++) {
+        c = ReadUByte(offset + i);
+        p = DecryptByte(c, i);
+        if (p >= 32 && p < 127) {
+            Printf("%c", p);
+        } else {
+            Printf(".");
+        }
+        if ((i + 1) % 64 == 0) Printf("\n");
+    }
+    Printf("\n");
+    
+    FSeek(pos);
+}
+
+// Extract and decrypt a file by index
+void ExtractFile(int fileIndex);  // Forward declaration
+
+//------------------------------------------------
+//--- Main Parsing Logic
+//------------------------------------------------
+
+// Validate the file (always try to parse, just warn if signature doesn't match)
+local int64 fileSize = FileSize();
+if (fileSize < 24) {
+    Warning("File too small to be a valid IPF archive (%Ld bytes, minimum 24).", fileSize);
+    return -1;
+}
+
+// Check signature but don't fail - just inform
+local int sigValid = IsValidIpf();
+if (!sigValid) {
+    Printf("Note: Signature check failed. File may still be a valid IPF with different signature.\n");
+    Printf("Continuing with parsing attempt...\n\n");
+}
+Printf("╔══════════════════════════════════════════════════════════════╗\n");
+Printf("║           IPF Archive Parser v1.2 (with Decryption)         ║\n");
+Printf("╚══════════════════════════════════════════════════════════════╝\n");
+Printf("File Size: %Ld bytes (0x%LX)\n\n", fileSize, fileSize);
+
+// Step 1: Read the footer (last 24 bytes)
+Printf("┌─── Footer ───────────────────────────────────────────────────┐\n");
+FSeek(fileSize - 24);
+IPF_FOOTER footer;
+
+// Validate footer looks reasonable
+local int footerValid = 1;
+local string footerIssues = "";
+
+if (footer.FileTableOffset >= fileSize) {
+    Printf("│ WARNING: FileTableOffset (0x%X) >= FileSize!               │\n", footer.FileTableOffset);
+    footerValid = 0;
+    footerIssues += "FileTableOffset out of bounds. ";
+}
+if (footer.FileCount > 100000) {  // Sanity check
+    Printf("│ WARNING: FileCount (%d) seems unreasonably large!          │\n", footer.FileCount);
+    footerValid = 0;
+    footerIssues += "FileCount too large. ";
+}
+
+// Validate signature bytes (warn but continue if invalid)
+local int validSignature = (footer.Signature[0] == 0x50 && footer.Signature[1] == 0x4B && 
+                            footer.Signature[2] == 0x05 && footer.Signature[3] == 0x06);
+if (!validSignature) {
+    Printf("│ WARNING: Non-standard signature: %02X %02X %02X %02X             │\n",
+            footer.Signature[0], footer.Signature[1], footer.Signature[2], footer.Signature[3]);
+    Printf("│          (ASCII: '%c%c%c%c')                                  │\n",
+            footer.Signature[0] >= 32 ? footer.Signature[0] : '.',
+            footer.Signature[1] >= 32 ? footer.Signature[1] : '.',
+            footer.Signature[2] >= 32 ? footer.Signature[2] : '.',
+            footer.Signature[3] >= 32 ? footer.Signature[3] : '.');
+    Printf("│          Expected: 50 4B 05 06 (PK\\x05\\x06)                 │\n");
+    footerIssues += "Invalid signature. ";
+}
+
+// Check if this looks like file content rather than a footer
+// If FileTableOffset points outside file AND signature is ASCII text, this is likely not an IPF
+local int looksLikeContent = (footer.Signature[0] >= 0x20 && footer.Signature[0] < 0x7F &&
+                               footer.Signature[1] >= 0x20 && footer.Signature[1] < 0x7F &&
+                               footer.Signature[2] >= 0x20 && footer.Signature[2] < 0x7F &&
+                               footer.Signature[3] >= 0x20 && footer.Signature[3] < 0x7F);
+
+if (!footerValid) {
+    Printf("│                                                                  │\n");
+    Printf("│ ⚠ FOOTER VALIDATION FAILED                                      │\n");
+    Printf("│ Issues: %-52s│\n", footerIssues);
+    
+    if (looksLikeContent && footer.FileTableOffset >= fileSize) {
+        Printf("│                                                              │\n");
+        Printf("│ This file appears to have NO VALID FOOTER.                   │\n");
+        Printf("│ The last 24 bytes look like file content, not metadata.      │\n");
+        Printf("│                                                              │\n");
+        Printf("│ Possible causes:                                             │\n");
+        Printf("│  - File is a raw/extracted archive without footer            │\n");
+        Printf("│  - File uses a different/older IPF format                    │\n");
+        Printf("│  - File is corrupted or truncated                            │\n");
+        Printf("│                                                              │\n");
+        Printf("│ Cannot parse this file with the standard IPF template.       │\n");
+        Printf("└──────────────────────────────────────────────────────────────┘\n");
+        
+        // Show the last 64 bytes for debugging
+        Printf("\n--- Last 64 bytes of file (for debugging) ---\n");
+        local int64 debugStart = fileSize - 64;
+        if (debugStart < 0) debugStart = 0;
+        FSeek(debugStart);
+        local int i;
+        local ubyte b;
+        Printf("Hex:   ");
+        for (i = 0; i < 64 && debugStart + i < fileSize; i++) {
+            b = ReadUByte(debugStart + i);
+            Printf("%02X ", b);
+            if ((i + 1) % 16 == 0) Printf("\n       ");
+        }
+        Printf("\nASCII: ");
+        FSeek(debugStart);
+        for (i = 0; i < 64 && debugStart + i < fileSize; i++) {
+            b = ReadUByte(debugStart + i);
+            if (b >= 32 && b < 127) Printf("%c", b);
+            else Printf(".");
+            if ((i + 1) % 16 == 0) Printf("\n       ");
+        }
+        Printf("\n");
+        
+        Warning("File does not have a valid IPF footer. Cannot parse.");
+        return -1;
+    }
+    
+    Printf("│ Parsing will continue but results may be incorrect.        │\n");
+}
+
+// Set global encryption flag
+g_isEncrypted = IsEncrypted(footer.NewVersion);
+
+// Heuristic: Check if first file's data looks like it's already deflate (not encrypted)
+if (g_isEncrypted && footer.FileCount > 0 && footer.FileTableOffset > 0) {
+    // Peek at offset 0 (first file usually starts there)
+    if (LooksLikeDeflate(0)) {
+        Printf("│ NOTE: Data appears to be unencrypted DEFLATE despite version  │\n");
+        Printf("│       Set g_forceEncryption = 0 at line ~270 to disable       │\n");
+    }
+}
+
+Printf("│ File Count:        %-10d                               │\n", footer.FileCount);
+Printf("│ File Table Offset: 0x%-8X                              │\n", footer.FileTableOffset);
+Printf("│ Removed Files:     %-10d                               │\n", footer.FileRemovedCount);
+Printf("│ Old Version:       %-10d                               │\n", footer.OldVersion);
+Printf("│ New Version:       %-10d                               │\n", footer.NewVersion);
+Printf("│ Signature:         %02X %02X %02X %02X                              │\n", 
+       footer.Signature[0], footer.Signature[1], footer.Signature[2], footer.Signature[3]);
+if (g_isEncrypted) {
+    Printf("│ Encryption:        PKWARE Traditional                       │\n");
+    Printf("│ Password:          ofO1a0ueXA? [\\xFFs h %%?                  │\n");
+} else {
+    Printf("│ Encryption:        None                                     │\n");
+}
+Printf("└──────────────────────────────────────────────────────────────┘\n\n");
+
+// Step 2: Read the file table
+Printf("┌─── File Table ───────────────────────────────────────────────┐\n");
+FSeek(footer.FileTableOffset);
+
+// Create a struct to hold all file entries
+typedef struct {
+    local int i;
+    for (i = 0; i < footer.FileCount; i++) {
+        IPF_FILE_ENTRY entry;
+    }
+} IPF_FILE_TABLE <read=ReadIpfFileTable>;
+
+string ReadIpfFileTable(IPF_FILE_TABLE &t) {
+    local string s;
+    SPrintf(s, "%d files", footer.FileCount);
+    return s;
+}
+
+IPF_FILE_TABLE fileTable;
+Printf("│ Loaded %d file entries                                       │\n", footer.FileCount);
+Printf("└──────────────────────────────────────────────────────────────┘\n\n");
+
+// Step 3: Display file summary
+Printf("┌─── File Entries ─────────────────────────────────────────────┐\n");
+local int j;
+local string currentPath;
+local string packName;
+local int fileEncrypted;
+
+for (j = 0; j < footer.FileCount; j++) {
+    packName = "";
+    currentPath = "";
+    
+    if (exists(fileTable.entry[j].PackFileName)) {
+        packName = fileTable.entry[j].PackFileName;
+    }
+    if (exists(fileTable.entry[j].Path)) {
+        currentPath = fileTable.entry[j].Path;
+    }
+    
+    fileEncrypted = g_isEncrypted && !IsRawFile(currentPath);
+    
+    Printf("│ [%3d] %s/%s\n", j, packName, currentPath);
+    Printf("│       Offset: 0x%08X  Size: %d -> %d  CRC: 0x%08X",
+           fileTable.entry[j].DataOffset,
+           fileTable.entry[j].SizeCompressed,
+           fileTable.entry[j].SizeUncompressed,
+           fileTable.entry[j].Checksum);
+    if (fileEncrypted) {
+        Printf(" [ENC]");
+    }
+    Printf("\n");
+}
+Printf("└──────────────────────────────────────────────────────────────┘\n\n");
+
+// Step 4: Map file data blocks with encryption awareness
+local int k;
+local string filePath;
+local int isFileEncrypted;
+
+for (k = 0; k < footer.FileCount; k++) {
+    if (fileTable.entry[k].SizeCompressed > 0) {
+        FSeek(fileTable.entry[k].DataOffset);
+        
+        filePath = "";
+        if (exists(fileTable.entry[k].Path)) {
+            filePath = fileTable.entry[k].Path;
+        }
+        
+        isFileEncrypted = g_isEncrypted && !IsRawFile(filePath);
+        IPF_FILE_DATA fileData(fileTable.entry[k].SizeCompressed, isFileEncrypted);
+    }
+}
+
+// Print summary
+Printf("┌─── Summary ──────────────────────────────────────────────────┐\n");
+Printf("│ Total Files: %-10d                                      │\n", footer.FileCount);
+Printf("│ Data Region: 0x0 - 0x%-8X                                │\n", footer.FileTableOffset);
+Printf("│ File Table:  0x%-8X - 0x%-8LX                        │\n", footer.FileTableOffset, fileSize - 24);
+Printf("│ Footer:      0x%-8LX - 0x%-8LX                        │\n", fileSize - 24, fileSize);
+Printf("└──────────────────────────────────────────────────────────────┘\n\n");
+
+Printf("┌─── Usage ────────────────────────────────────────────────────┐\n");
+Printf("│ To decrypt a file's data, run in Script window:             │\n");
+Printf("│   ExtractFile(index)    - e.g., ExtractFile(0)              │\n");
+Printf("│   DecryptFileData(offset, size)                             │\n");
+Printf("└──────────────────────────────────────────────────────────────┘\n");
+
+// Define ExtractFile function (after fileTable is available)
+void ExtractFile(int fileIndex) {
+    if (fileIndex < 0 || fileIndex >= footer.FileCount) {
+        Printf("Error: Invalid file index %d (valid range: 0-%d)\n", fileIndex, footer.FileCount - 1);
+        return;
+    }
+    
+    local string path = "";
+    local string packName = "";
+    if (exists(fileTable.entry[fileIndex].Path)) {
+        path = fileTable.entry[fileIndex].Path;
+    }
+    if (exists(fileTable.entry[fileIndex].PackFileName)) {
+        packName = fileTable.entry[fileIndex].PackFileName;
+    }
+    
+    local uint offset = fileTable.entry[fileIndex].DataOffset;
+    local uint compSize = fileTable.entry[fileIndex].SizeCompressed;
+    local uint uncompSize = fileTable.entry[fileIndex].SizeUncompressed;
+    local int encrypted = g_isEncrypted && !IsRawFile(path);
+    
+    Printf("\n╔══════════════════════════════════════════════════════════════╗\n");
+    Printf("║ Extracting File %d                                           \n", fileIndex);
+    Printf("╚══════════════════════════════════════════════════════════════╝\n");
+    Printf("Pack:             %s\n", packName);
+    Printf("Path:             %s\n", path);
+    Printf("Data Offset:      0x%X\n", offset);
+    Printf("Compressed Size:  %d bytes\n", compSize);
+    Printf("Uncompressed:     %d bytes\n", uncompSize);
+    Printf("Checksum:         0x%08X\n", fileTable.entry[fileIndex].Checksum);
+    Printf("Encrypted:        %s\n", encrypted ? "Yes (PKWARE)" : "No");
+    Printf("Compression:      %s\n", GetCompressionType(path));
+    
+    if (encrypted) {
+        DecryptFileData(offset, compSize);
+        Printf("\nNote: After decryption, data is still DEFLATE compressed.\n");
+        Printf("Use a DEFLATE decompressor to get the original file content.\n");
+    } else {
+        Printf("\nFile is not encrypted.\n");
+        if (IsRawFile(path)) {
+            Printf("File type (.jpg/.fsb/.mp3) is stored without compression.\n");
+        } else {
+            Printf("Data is DEFLATE compressed (without encryption).\n");
+        }
+    }
+}

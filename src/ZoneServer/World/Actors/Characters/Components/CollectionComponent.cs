@@ -75,6 +75,17 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Check if a collection already exists.
+		/// </summary>
+		/// <param name="collectionId"></param>
+		/// <returns></returns>
+		public bool Has(int collectionId)
+		{
+			lock (_syncLock)
+				return _collections.ContainsKey(collectionId);
+		}
+
+		/// <summary>
 		/// Adds the given collection or overrides it if it already exists.
 		/// </summary>
 		/// <remarks>
@@ -159,6 +170,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// Grants all rewards of all collections they are eligible for to the
 		/// current character.
 		/// </summary>
+		/// <param name="character"></param>
 		public void GrantEligibleRewards()
 		{
 			foreach (var collection in this.GetList().Where(a => a.IsComplete))

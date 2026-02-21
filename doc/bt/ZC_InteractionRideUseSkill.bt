@@ -1,0 +1,31 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.1 Binary Template
+//
+//      File: ZC_InteractionRideUseSkill.bt
+//   Authors: Salman T. Khan
+//   Version: i391219
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderDynamic header;
+
+int i1;
+int i2;
+int i3;
+int i4;
+float f1;
+float f2;
+float f3;
+float f4;
+float f5;
+float f6;
+float f7;
+float f8;
+float f9;
+float f10;

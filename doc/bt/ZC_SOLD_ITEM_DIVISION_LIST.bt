@@ -31,7 +31,10 @@ typedef struct
         {
             short s1;
             int64 worldId2;
-            short s2;
+            short count;
+
+            if (count > 0)
+                SocketInfo socket[count];
         }
     }
 }

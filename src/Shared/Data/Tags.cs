@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -7,7 +8,7 @@ namespace Melia.Shared.Data
 	/// <summary>
 	/// Collection of tags that may classify some of a data object's properties.
 	/// </summary>
-	public class Tags
+	public class Tags : IEnumerable<string>
 	{
 		private readonly HashSet<string> _tags = new();
 		private readonly ReaderWriterLockSlim _lock = new();
@@ -108,6 +109,30 @@ namespace Melia.Shared.Data
 		/// <returns></returns>
 		public override string ToString()
 			=> string.Join(";", _tags);
+
+		/// <summary>
+		/// Returns an enumerator that iterates through the collection.
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerator<string> GetEnumerator()
+		{
+			List<string> tagsCopy;
+			_lock.EnterReadLock();
+			try
+			{
+				tagsCopy = new List<string>(_tags);
+			}
+			finally
+			{
+				_lock.ExitReadLock();
+			}
+			return tagsCopy.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator()
+		{
+			return GetEnumerator();
+		}
 	}
 
 	/// <summary>

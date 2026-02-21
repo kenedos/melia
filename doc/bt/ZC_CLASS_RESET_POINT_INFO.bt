@@ -15,5 +15,5 @@
 
 ServerHeaderFixed header;
 
-int i1;
-int i2;
+int totalPoints; // 60
+int weekly; // 15

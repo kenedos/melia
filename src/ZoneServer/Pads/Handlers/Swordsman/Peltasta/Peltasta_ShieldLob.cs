@@ -45,7 +45,7 @@ namespace Melia.Zone.Pads.Handlers.Swordsman.Peltasta
 			//   by pads? Does this happen so often that we'll need it? Let's wait
 			//   and see for now.
 
-			var shieldMonster = new Mob(57001, MonsterType.Friendly);
+			var shieldMonster = new Mob(57001, RelationType.Friendly);
 			shieldMonster.Components.Add(new MovementComponent(shieldMonster));
 			shieldMonster.Position = pad.Position;
 			shieldMonster.Direction = pad.Direction;
@@ -110,7 +110,7 @@ namespace Melia.Zone.Pads.Handlers.Swordsman.Peltasta
 		/// <returns></returns>
 		private async Task FlyForward(Pad pad, ICombatEntity creator)
 		{
-			var dest = creator.Position.GetRelative2D(creator.Direction, ShieldFlyDistance);
+			var dest = creator.Position.GetRelative(creator.Direction, ShieldFlyDistance);
 			var moveTime = pad.Movement.MoveTo(dest);
 			await Task.Delay(moveTime);
 		}
@@ -134,7 +134,7 @@ namespace Melia.Zone.Pads.Handlers.Swordsman.Peltasta
 
 				// Aim past the creator to ensure smooth movement if they're
 				// moving away during the wait time
-				var dest = pad.Position.GetRelative3D(creator.Position, 300);
+				var dest = pad.Position.GetRelative(creator.Position, 300);
 				pad.Movement.MoveTo(dest);
 
 				await Task.Delay(HomingTickTime);
@@ -145,7 +145,7 @@ namespace Melia.Zone.Pads.Handlers.Swordsman.Peltasta
 			// the shield will disappear
 			var finalDest = creator.Position;
 			if (creator.Components.TryGet<MovementComponent>(out var movement) && movement.IsMoving)
-				finalDest = creator.Position.GetRelative2D(creator.Direction, 50);
+				finalDest = creator.Position.GetRelative(creator.Direction, 50);
 
 			var moveTime = pad.Movement.MoveTo(finalDest);
 			await Task.Delay(moveTime);

@@ -13,11 +13,7 @@
 #include "inc/common.bt"
 
 ServerHeaderFixed header;
-byte b1;
-ubyte b2;
-short s2;
-int64 l1;
-short s3;
-ushort s4;
-int i1;
-short s5;
+
+int handle;
+int chatBalloonId;
+ShortDate date;

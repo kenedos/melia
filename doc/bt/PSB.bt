@@ -1,0 +1,160 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: PSB.bt
+//   Authors: Salman T. Khan, Adjusted by AI
+//   Version: 3.2
+//   Purpose: Dynamic Parser for Tree of Savior Fork Particles (.psb)
+//            - Fixed logic for 1488 chunks (1 Texture, No Tail).
+//            - Supports 6160 (Extra Data), 5840 (Standard), 2352 (3 Tex), 3504 (7 Tex).
+//------------------------------------------------
+
+RequiresVersion( 7 );
+LittleEndian(); 
+
+// --- Configuration ---
+const int CLR_HEADER    = 0xAAEEDD;
+const int CLR_CHUNK_HDR = 0xE0E0E0;
+const int CLR_PROPS     = 0xFEFEFE;
+const int CLR_TEXTURE   = 0xAAFFaa;
+const int CLR_EXTRA     = 0xDDAAFF;
+const int CLR_TAIL      = 0xFFCCAA; 
+
+// --- Structure Definitions ---
+
+typedef struct
+{
+    int flag;               // 1
+    char textureName[256];  // butterfly_blue2.dds
+    
+    float uvOffsets[3]; 
+    float uScale;           
+    float vScale;           
+    float padding[2];       // 0s
+} TextureInfo <read=ReadTextureInfo, optimize=false, bgcolor=CLR_TEXTURE>;
+
+string ReadTextureInfo(TextureInfo &t) {
+    if (t.flag == 0 && t.textureName[0] == 0) return "Empty Slot";
+    string s;
+    SPrintf(s, "%s (Scale: %.2f, %.2f)", t.textureName, t.uScale, t.vScale);
+    return s;
+}
+
+typedef struct {
+    float f1; 
+    float f2; 
+    float f3; 
+    float f4; 
+    float f5; 
+    float f6; // 2.0
+    int64 iBig; 
+} ChunkTail <bgcolor=CLR_TAIL>;
+
+typedef struct
+{
+    local int64 startPos = FTell();
+
+    // 1. Chunk Header
+    char chunkName[256] <bgcolor=CLR_CHUNK_HDR>;
+    int chunkSize       <bgcolor=CLR_CHUNK_HDR>;
+
+    // Boundary Check
+    local int64 expectedEnd = startPos + chunkSize;
+
+    // 2. Standard Properties (Fixed Size ~948 bytes)
+    struct {
+        int header;
+        int i1; int i2; int i3; int i4; int i5; int i6;
+        float matrixMaybe[22]; 
+        byte flag1;
+        byte flag2;
+        byte flag3;
+        byte flag4;
+        float f2[31];
+        byte b1; byte b2; byte b3; byte b4;
+        float bounds[6]; 
+        int i8; float f4; int i9; float f5;
+        char unknownBlob[280];
+        int i10; int i11;
+        char customData[296];
+        float f6[17];
+    } props <bgcolor=CLR_PROPS>;
+
+    // 3. Size Calculation
+    local int64 currentPos = FTell();
+    local int64 bytesRemaining = expectedEnd - currentPos;
+    
+    local int TAIL_SIZE = 32;
+    local int TEX_SIZE = 288;
+    
+    // Logic: 
+    // 1488 Chunk: 1200 props + 288 (1 tex) = 1488. Remainder 0. NO TAIL.
+    // 5840 Chunk: 1200 props + 4608 (16 tex) + 32 (tail) = 5840.
+    // 6160 Chunk: 1200 props + 320 (extra) + 4608 (16 tex) + 32 (tail).
+
+    // Check for Extra Data (Large Chunk)
+    // If we have more space than Max Textures (16) + Tail can fit, assume extra data.
+    if (bytesRemaining > (16 * TEX_SIZE + TAIL_SIZE)) {
+        struct {
+            int i12;
+            char unknown2[316];
+        } extraData <bgcolor=CLR_EXTRA, comment="Present in Chunk Type 1 (6160)">;
+        
+        // Update position
+        currentPos = FTell();
+        bytesRemaining = expectedEnd - currentPos;
+    }
+
+    // 4. Calculate Texture Count
+    // FIX: Do NOT subtract tail size first. See if textures fit perfectly.
+    local int texCount = bytesRemaining / TEX_SIZE;
+    
+    // Clamp
+    if (texCount > 16) texCount = 16;
+    if (texCount < 0) texCount = 0;
+
+    // 5. Read Textures
+    if (texCount > 0) {
+        TextureInfo textures[texCount];
+    }
+
+    // 6. Read Tail (Only if space remains)
+    if (FTell() + TAIL_SIZE <= expectedEnd) {
+        ChunkTail tail;
+    }
+
+    // 7. Final Alignment
+    currentPos = FTell();
+    if (currentPos < expectedEnd) {
+        byte padding[expectedEnd - currentPos] <bgcolor=0xCCCCCC, comment="Padding / Alignment">;
+    } else if (currentPos > expectedEnd) {
+        Printf("Warning: Chunk %s overflowed by %d bytes.\n", chunkName, currentPos - expectedEnd);
+    }
+
+} PsbChunk <read=ReadChunk, optimize=false>;
+
+string ReadChunk(PsbChunk &c) {
+    string s;
+    SPrintf(s, "%s [%d Textures] (Size: %d)", c.chunkName, c.texCount, c.chunkSize);
+    return s;
+}
+
+// --- Main Execution ---
+
+struct Header {
+    char    signature[4];
+    if( signature != "PSB" && signature != "PSB " ) {
+        Warning("File is not a valid PSB file.");
+        Exit(-1);
+    }
+    int     version;
+    int     fileSize;
+    int     dataOffset <format=hex>;
+    int     count;
+    byte    gap[44];
+} header <bgcolor=CLR_HEADER>;
+
+while( !FEof() ) {
+    if (FileSize() - FTell() < 260) break;
+    PsbChunk chunk;
+}

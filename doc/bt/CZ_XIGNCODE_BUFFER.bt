@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v12.0.1 Binary Template
+//
+//      File: CZ_XIGNCODE_BUFFER.bt
+//   Authors: Salman T. Khan
+//   Version: p375125
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+char buffer[512]; // ECHOTEST
+short buffLen; // 512

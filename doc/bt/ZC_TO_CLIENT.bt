@@ -19,6 +19,10 @@ int type; // type?
 int64 accountId;
 switch (type)
 {
+    case 0x03:
+        int i1; // 1
+        int i2; // 1
+        break;
     case 0x10:
         lpString message;
         break;

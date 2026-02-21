@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Melia.Shared.Network;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Yggdrasil.Scheduling;
@@ -59,7 +60,7 @@ namespace Melia.Zone.World
 		/// <param name="e"></param>
 		private void OnPlayerReady(object sender, PlayerEventArgs e)
 		{
-			if (!ZoneServer.Instance.Conf.World.EnableDayNightCycle)
+			if (!ZoneServer.Instance.Conf.World.EnableDayNightCycle || !OpTable.Exists(Op.ZC_DAYLIGHT_FIXED))
 				return;
 
 			Send.ZC_DAYLIGHT_FIXED(e.Character, true, this.CurrentParameters);
@@ -72,7 +73,7 @@ namespace Melia.Zone.World
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
-			if (!ZoneServer.Instance.Conf.World.EnableDayNightCycle)
+			if (!ZoneServer.Instance.Conf.World.EnableDayNightCycle || !OpTable.Exists(Op.ZC_DAYLIGHT_FIXED))
 				return;
 
 			if (this.IsFixed)

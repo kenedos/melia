@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -13,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// Handler for the Wizard skill Lethargy.
 	/// </summary>
 	[SkillHandler(SkillId.Wizard_Lethargy)]
-	public class Wizard_Lethargy : IGroundSkillHandler
+	public class Wizard_Lethargy : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, debuffing enemies in target area.
@@ -23,8 +24,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
 		{
+			var initialTarget = designatedTargets.FirstOrDefault();
+
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
 				caster.ServerMessage(Localization.Get("No target location specified."));
@@ -49,7 +52,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, null);
 
 			var splashArea = new Circle(targetPos, skill.Properties.GetFloat(PropertyName.SklSplRange));
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets)
 			{

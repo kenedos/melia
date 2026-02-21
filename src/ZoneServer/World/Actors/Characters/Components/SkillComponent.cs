@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
+using Melia.Shared.ObjectProperties;
 using Melia.Zone.Network;
 using Melia.Zone.Skills;
-using Yggdrasil.Scheduling;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 
 namespace Melia.Zone.World.Actors.Characters.Components
 {
 	/// <summary>
 	/// Character skills.
 	/// </summary>
-	public class SkillComponent : CharacterComponent, IUpdateable
+	public class SkillComponent : BaseSkillComponent
 	{
-		private readonly Dictionary<SkillId, Skill> _skills = new();
+		public Character Character { get; }
 
 		/// <summary>
 		/// Creates new instance for character.
@@ -21,22 +22,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="character"></param>
 		public SkillComponent(Character character) : base(character)
 		{
-		}
-
-		/// <summary>
-		/// Returns the amount of skills in the collection.
-		/// </summary>
-		public int Count { get { lock (_skills) return _skills.Count; } }
-
-		/// <summary>
-		/// Adds given without updating the client. Replaces existing
-		/// skills.
-		/// </summary>
-		/// <param name="skill"></param>
-		public void AddSilent(Skill skill)
-		{
-			lock (_skills)
-				_skills[skill.Id] = skill;
+			this.Character = character;
 		}
 
 		/// <summary>
@@ -47,19 +33,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public void Add(Skill skill)
 		{
 			this.AddSilent(skill);
-			Send.ZC_SKILL_ADD(this.Character, skill);
-		}
 
-		/// <summary>
-		/// Removes skill with given id, returns false if it
-		/// didn't exist. Doesn't update the client.
-		/// </summary>
-		/// <param name="skillId"></param>
-		/// <returns></returns>
-		public bool RemoveSilent(SkillId skillId)
-		{
-			lock (_skills)
-				return _skills.Remove(skillId);
+			Send.ZC_SKILL_ADD(this.Character, skill);
+			Send.ZC_UPDATE_SKL_SPDRATE_LIST(this.Character, skill);
 		}
 
 		/// <summary>
@@ -76,78 +52,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_SKILL_REMOVE(this.Character, skillId);
 
 			return true;
-		}
-
-		/// <summary>
-		/// Returns skill with given id, or null if it didn't
-		/// exist.
-		/// </summary>
-		/// <param name="skillId"></param>
-		/// <returns></returns>
-		public Skill Get(SkillId skillId)
-		{
-			lock (_skills)
-			{
-				_skills.TryGetValue(skillId, out var result);
-				return result;
-			}
-		}
-
-		/// <summary>
-		/// Returns skill with given id via out, returns false if the
-		/// skill wasn't found.
-		/// </summary>
-		/// <param name="skillId"></param>
-		/// <param name="skill"></param>
-		/// <returns></returns>
-		public bool TryGet(SkillId skillId, out Skill skill)
-		{
-			skill = this.Get(skillId);
-			return skill != null;
-		}
-
-		/// <summary>
-		/// Returns skill with given class name, or null if it didn't
-		/// exist.
-		/// </summary>
-		/// <param name="skillId"></param>
-		/// <returns></returns>
-		public Skill Get(string skillClassName)
-		{
-			lock (_skills)
-				return _skills.Values.FirstOrDefault(a => a.Data.ClassName == skillClassName);
-		}
-
-		/// <summary>
-		/// Returns a list with all skills.
-		/// </summary>
-		/// <returns></returns>
-		public Skill[] GetList()
-		{
-			lock (_skills)
-				return _skills.Values.ToArray();
-		}
-
-		/// <summary>
-		/// Returna a list of all skills that match the given predicate.
-		/// </summary>
-		/// <param name="predicate"></param>
-		/// <returns></returns>
-		public Skill[] GetList(Func<Skill, bool> predicate)
-		{
-			lock (_skills)
-				return _skills.Values.Where(predicate).ToArray();
-		}
-
-		/// <summary>
-		/// Returns true if the skill exists.
-		/// </summary>
-		/// <param name="skillId"></param>
-		/// <returns></returns>
-		public bool Has(SkillId skillId)
-		{
-			lock (_skills)
-				return _skills.ContainsKey(skillId);
 		}
 
 		/// <summary>
@@ -169,7 +73,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// Returns the max level the character can currently reach on the
 		/// given skill.
 		/// </summary>
-		/// <param name="character"></param>
 		/// <param name="skillId"></param>
 		/// <returns></returns>
 		public int GetMaxLevel(SkillId skillId)
@@ -197,15 +100,21 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Updates the skills and their overheats.
+		/// Invalidates all calculated properties, to update them when
+		/// they're accessed next.
 		/// </summary>
-		/// <param name="elapsed"></param>
-		public void Update(TimeSpan elapsed)
+		public void InvalidateAll()
 		{
-			lock (_skills)
+			foreach (var skill in this.GetList())
 			{
-				foreach (var skill in _skills.Values)
-					skill.Update(elapsed);
+				var properties = skill.Properties.GetAll();
+
+				foreach (var property in properties)
+				{
+					if (property is CFloatProperty calcProperty)
+						calcProperty.Invalidate();
+				}
+				Send.ZC_OBJECT_PROPERTY(this.Character.Connection, skill);
 			}
 		}
 	}

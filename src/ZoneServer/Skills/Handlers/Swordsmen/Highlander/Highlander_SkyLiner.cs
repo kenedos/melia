@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -20,11 +21,11 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	/// Handler for the Highlander skill SkyLiner.
 	/// </summary>
 	[SkillHandler(SkillId.Highlander_SkyLiner)]
-	public class Highlander_SkyLiner : IGroundSkillHandler, IDynamicCasted
+	public class Highlander_SkyLiner : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		private const int TotalHits = 4;
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_PLAY_SOUND(caster, "voice_war_atk_medium");
 		}
@@ -34,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_STOP_SOUND(caster, "voice_war_atk_medium");
 		}
@@ -47,8 +48,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -88,7 +90,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 			{
 				await Task.Delay(hitDelay);
 
-				var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 				foreach (var target in targets.LimitBySDR(caster, skill))
 				{

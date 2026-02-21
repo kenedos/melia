@@ -76,7 +76,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, target.Position, null);
 
-			var targetPos = caster.Position.GetRelative2D(caster.Direction.Backwards, JumpDistance);
+			var targetPos = caster.Position.GetRelative(caster.Direction.Backwards, JumpDistance);
 			targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 
 			caster.Position = targetPos;
@@ -89,7 +89,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			var hit = new HitInfo(caster, target, skill, skillHitResult);
 			hit.ForceId = ForceId.GetNew();
-			hit.ResultType = HitResultType.Unk8;
+			hit.ResultType = HitResultType.NoHitScript;
 
 			Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, caster, target, animationName, 1.3f, "arrow_cast", "F_hit_good", 1, "arrow_blow", "SLOW", 400);
 			Send.ZC_HIT_INFO(caster, target, hit);

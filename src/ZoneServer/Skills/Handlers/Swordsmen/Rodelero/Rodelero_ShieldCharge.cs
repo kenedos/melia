@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -58,7 +58,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopBuff(BuffId.ShieldCharge_Buff);
 		}
@@ -96,7 +96,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
 
-			skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+			skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 			skillHit.ApplyKnockBack(target);
 
 			if (caster.IsBuffActive(BuffId.DashRun))

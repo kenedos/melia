@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Yggdrasil.Network.Communication;
 
 namespace Melia.Shared.Network.Inter.Messages
@@ -18,14 +23,23 @@ namespace Melia.Shared.Network.Inter.Messages
 		/// Returns the message text.
 		/// </summary>
 		public string Text { get; }
+		
+		/// <summary>
+		/// Returns the message server type.
+		/// </summary>
+		public string ServerType { get; }
 
 		/// <summary>
 		/// Creates new message.
 		/// </summary>
-		public ShoutMessage(string teamName, string text)
+		/// <param name="teamName"></param>
+		/// <param name="text"></param>
+		/// <param name="serverType"></param>
+		public ShoutMessage(string teamName, string text, string serverType = "GLOBAL")
 		{
 			this.TeamName = teamName;
 			this.Text = text;
+			this.ServerType = serverType;
 		}
 	}
 }

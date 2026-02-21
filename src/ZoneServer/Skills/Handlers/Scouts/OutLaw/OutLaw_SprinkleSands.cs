@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 	/// Handler for the Assassin skill Throw Sand
 	/// </summary>
 	[SkillHandler(SkillId.OutLaw_SprinkleSands)]
-	public class OutLaw_SprinkleSands : IGroundSkillHandler
+	public class OutLaw_SprinkleSands : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill
@@ -28,9 +29,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -64,7 +67,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 			await Task.Delay(hitDelay);
 
 			var hits = new List<SkillHitInfo>();
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			var hitTargets = targets.LimitBySDR(caster, skill);
 

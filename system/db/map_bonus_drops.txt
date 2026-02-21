@@ -1,0 +1,4 @@
+// Map Bonus Drops
+// Entries can be overridden by packages and user files.
+[
+]

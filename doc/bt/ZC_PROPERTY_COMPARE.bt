@@ -122,7 +122,7 @@ byte addLike;
 int adventurerIndex; // -1 if Index = 0
 int adventurerRank; // -1 if unranked
 int achievementCount;
-int i1;
+int achievements;
 
 char teamName[64];
 char name2[65];
@@ -131,9 +131,10 @@ short jobId;
 int i2;
 int jobLevel;
 short gender;
-int hair;
-byte bin1[6];
-int i7[5];
+short hair;
+int visualEquipIds[5];
+int mapId;
+int level;
 uint skinColor <format=hex>;
 short jobIds[4];
 int64 l1;

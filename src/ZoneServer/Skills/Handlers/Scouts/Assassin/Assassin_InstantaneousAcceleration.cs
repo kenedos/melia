@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 	/// Handler for the Assassin skill Instant Acceleration
 	/// </summary>
 	[SkillHandler(SkillId.Assassin_InstantaneousAcceleration)]
-	public class Assassin_InstantaneousAcceleration : IGroundSkillHandler
+	public class Assassin_InstantaneousAcceleration : IMeleeGroundSkillHandler
 	{
 		private const float DashDistance = 100f;
 		/// <summary>
@@ -29,8 +30,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -40,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var endingPosition = caster.Position.GetRelative2D(caster.Direction, DashDistance);
+			var endingPosition = caster.Position.GetRelative(caster.Direction, DashDistance);
 			endingPosition = caster.Map.Ground.GetLastValidPosition(caster.Position, endingPosition);
 			var actualDistance = (float)endingPosition.Get2DDistance(caster.Position);
 
@@ -70,7 +72,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 
 			await Task.Delay(hitTime);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))

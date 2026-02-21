@@ -1,0 +1,37 @@
+//------------------------------------------------
+//--- 010 Editor v14.0beta1 Binary Template
+//
+//      File: ZC_SKILL_FORCE_GROUND.bt
+//   Authors: Salman T. Khan
+//   Version: i336041
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//   - i336041: i11 added, secondary part of the packet is damage data
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderDynamic header;
+
+int skillId;
+int characterHandle;
+direction dir;
+int i1;
+float shootTime;
+float f1;
+int i2;
+int forceId;
+float f2;
+int i3;
+int mainTargetHandle;
+position pos;
+int i4;
+float f3;
+int i5;
+byte hitCount;
+
+//if (hitCount  > 0)
+//    SkillHitInfo hits[hitCount];

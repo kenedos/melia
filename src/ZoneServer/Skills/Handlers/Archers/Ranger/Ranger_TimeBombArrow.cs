@@ -137,9 +137,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				// the bomb was placed. The latter would require storing the impact
 				// point and could be a little confusing during gameplay. Though it
 				// would also be interesting and realistic.
-				var explosionPos = target.Position.GetRelative2D(target.Direction, 2f);
+				var explosionPos = target.Position.GetRelative(target.Direction, 2f);
 
-				skillHit.KnockBackInfo = new KnockBackInfo(explosionPos, target.Position, HitType.KnockDown, 150, 60);
+				skillHit.KnockBackInfo = new KnockBackInfo(explosionPos, target, HitType.KnockDown, 150, 60);
 				skillHit.ApplyKnockBack(target);
 			}
 
@@ -160,7 +160,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var damageDelay = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			// Exclude main target from potential splash targets
 			targets.Remove(target);
@@ -184,7 +184,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				var skillHit = new SkillHitInfo(caster, blastTarget, skill, skillHitResult, damageDelay, skillHitDelay);
 				if (!caster.IsAbilityActive(AbilityId.Ranger35))
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(target.Position, blastTarget.Position, HitType.KnockDown, 150, 60);
+					skillHit.KnockBackInfo = new KnockBackInfo(target.Position, blastTarget, HitType.KnockDown, 150, 60);
 					skillHit.ApplyKnockBack(blastTarget);
 				}
 

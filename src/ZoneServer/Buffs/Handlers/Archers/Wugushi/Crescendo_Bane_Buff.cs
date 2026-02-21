@@ -24,12 +24,15 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Wugushi
 		/// <returns></returns>
 		public static void TryApply(Buff buff)
 		{
+			if (buff.Caster is not ICombatEntity caster)
+				return;
+
 			if (buff.Vars.GetBool("CrescendoBaneBuff"))
 				return;
 
 			var updateTime = buff.Data.UpdateTime;
 
-			if (TryApply(buff.Caster, ref updateTime))
+			if (TryApply(caster, ref updateTime))
 			{
 				buff.UpdateTime = updateTime;
 				buff.Vars.SetBool("CrescendoBaneBuff", true);

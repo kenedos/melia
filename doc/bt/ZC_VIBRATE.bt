@@ -14,3 +14,10 @@
 #include "inc/common.bt"
 
 ServerHeaderFixed header;
+
+int handle;
+float f1;
+float f2;
+float f3;
+float f4;
+int i1;

@@ -2,9 +2,6 @@
 
 namespace Melia.Shared.ObjectProperties
 {
-	/// <summary>
-	/// A float-type property.
-	/// </summary>
 	public class FloatProperty : Properties.FloatVariable, IProperty
 	{
 		/// <summary>
@@ -19,7 +16,6 @@ namespace Melia.Shared.ObjectProperties
 		{
 		}
 	}
-
 	/// <summary>
 	/// A float-type property that is calculated as needed.
 	/// </summary>

@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -69,12 +69,13 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopBuff(BuffId.Taglio_Buff);
 
-			if (caster is Character casterCharacter)
-				Send.ZC_NORMAL.UnkDynamicCastEnd(casterCharacter, skill.Id, 2.1f);
+			// TODO: UnkDynamicCastEnd not implemented
+			//if (caster is Character casterCharacter)
+			//	Send.ZC_NORMAL.UnkDynamicCastEnd(casterCharacter, skill.Id, 2.1f);
 
 			Send.ZC_STOP_SOUND_Gendered(caster, "voice_war_atk_long_cast", "voice_atk_long_cast_f");
 
@@ -124,11 +125,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 			// Ability - Taglio: Remove Knockback
 			if (!caster.IsAbilityActive(AbilityId.Arditi8))
 			{
-				var kb = new KnockBackInfo(caster.Position, target.Position, skill);
+				var kb = new KnockBackInfo(caster.Position, target, skill);
 				target.Position = kb.ToPosition;
 				target.AddState(StateType.KnockedBack, kb.Time);
 
-				Send.ZC_KNOCKDOWN_INFO(caster, target, kb);
+				Send.ZC_KNOCKDOWN_INFO(caster, kb);
 			}
 		}
 

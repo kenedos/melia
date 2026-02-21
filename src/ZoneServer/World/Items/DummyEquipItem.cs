@@ -1,4 +1,5 @@
-﻿using Melia.Shared.Game.Const;
+﻿using System;
+using Melia.Shared.Game.Const;
 
 namespace Melia.Zone.World.Items
 {
@@ -28,15 +29,17 @@ namespace Melia.Zone.World.Items
 		/// <param name="slot"></param>
 		public DummyEquipItem(EquipSlot slot) : base(InventoryDefaults.EquipItems[(int)slot], 1)
 		{
+			this.Amount = 0;
 		}
 
-		/// <summary>
-		/// Called to load the item's default properties based on its data.
-		/// </summary>
-		protected override void LoadDataProperties()
+		protected override void LoadData()
 		{
-			// Don't load any data or properties for dummy items, as the client
-			// tends to dislike it when dummy items have properties.
+			if (this.Id == 0)
+				throw new InvalidOperationException("Item id wasn't set before calling LoadData.");
+
+			this.Data = ZoneServer.Instance.Data.ItemDb.Find(this.Id);
+			if (this.Data == null)
+				throw new NullReferenceException("No item data found for '" + this.Id + "'.");
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 	/// Handler for the Rodelero skill Montano.
 	/// </summary>
 	[SkillHandler(SkillId.Rodelero_TargeSmash)]
-	public class Rodelero_TargeSmash : IGroundSkillHandler
+	public class Rodelero_TargeSmash : IMeleeGroundSkillHandler
 	{
 		private readonly static TimeSpan FireDuration = TimeSpan.FromSeconds(10);
 		private const float ShockDamageBonusMultiplier = 1f;
@@ -33,8 +34,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -68,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			var hitTargets = targets.LimitBySDR(caster, skill);
@@ -167,7 +169,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// <param name="splashArea"></param>
 		private List<ICombatEntity> GetTargetsForBreak(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			targets.RemoveAll(target => !target.Components.TryGet<BuffComponent>(out var buffs) || buffs.CountActive(a => a.Data.Type == BuffType.Debuff) == 0);
 
 			return targets;

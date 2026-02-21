@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Melia.Zone.Scripting;
+using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Quests
 {
@@ -24,12 +26,14 @@ namespace Melia.Zone.World.Quests
 		public string Description { get; set; }
 
 		/// <summary>
-		/// Gets or sets the quest's type.
+		/// Gets or sets the quest's location (map class name).
 		/// </summary>
-		/// <remarks>
-		/// Currently used primarily for UI filtering purposes.
-		/// </remarks>
-		public QuestType Type { get; set; } = QuestType.Sub;
+		public string Location { get; set; }
+
+		/// <summary>
+		/// Gets or sets the map class name where the quest giver is located.
+		/// </summary>
+		public string QuestGiverLocation { get; set; }
 
 		/// <summary>
 		/// Gets or sets the recommended level for the quest.
@@ -79,6 +83,29 @@ namespace Melia.Zone.World.Quests
 		/// met to receive the quest automatically.
 		/// </summary>
 		public List<QuestPrerequisite> Prerequisites { get; } = new List<QuestPrerequisite>();
+
+		/// <summary>
+		/// Returns a list of the quest's modifiers.
+		/// </summary>
+		public List<QuestModifier> Modifiers { get; } = new List<QuestModifier>();
+
+		/// <summary>
+		/// Returns the quest giver npc.
+		/// </summary>
+		public string StartNpcUniqueName { get; set; } = null;
+		/// <summary>
+		/// Returns the quest receiver npc.
+		/// </summary>
+		public string EndNpcUniqueName { get; set; } = null;
+
+		/// <summary>
+		/// Returns the Quest's variables.
+		/// </summary>
+		/// <remarks>
+		/// Quest variables are temporary and are not saved across server
+		/// restarts.
+		/// </remarks>
+		public Variables Vars { get; } = new Variables();
 	}
 
 	/// <summary>
@@ -116,38 +143,46 @@ namespace Melia.Zone.World.Quests
 		Auto,
 	}
 
-	/// <summary>
-	/// Specifies a quest's type.
-	/// </summary>
-	/// <remarks>
-	/// The names of these types mirror the names used in the client and should
-	/// not be changed unless the client is updated.
-	/// </remarks>
-	public enum QuestType
+	public enum QuestRepeatability
 	{
-		/// <summary>
-		/// A main story quest.
-		/// </summary>
-		Main,
+		None,         // Cannot be repeated
+		Simple,       // Can be repeated immediately after completion (like many examples)
+		Daily,        // Can be repeated once per day (server reset time based)
+		Weekly,       // Can be repeated once per week (server reset time based)
+		Cooldown      // Can be repeated after a specific cooldown period
+	}
 
-		/// <summary>
-		/// A side quest that is not part of the main story.
-		/// </summary>
-		Sub,
+	public enum PrerequisiteType
+	{
+		Level,
+		Class,          // Player's base or current class
+		QuestCompleted,
+		QuestActive,
+		QuestNotCompleted, // Useful for mutually exclusive quests
+		ItemOwned,
+		Reputation,     // Requires a separate Faction/Reputation system
+		PlayerVariable, // Check a custom variable on the player
+		Gender
+	}
 
-		/// <summary>
-		/// A quest that can be repeated multiple times,
-		/// </summary>
-		Repeat,
+	public enum ObjectiveType
+	{
+		CollectItem,
+		KillMob,
+		TalkToNPC,
+		VisitLocation,
+		UseItem,
+		InteractObject,
+		Custom // For objectives handled entirely by QuestScript logic
+	}
 
-		/// <summary>
-		/// A quest that is to be completed with a party.
-		/// </summary>
-		Party,
-
-		/// <summary>
-		/// ?
-		/// </summary>
-		KeyItem,
+	public enum RewardType
+	{
+		Item,
+		Experience,
+		Currency,      // e.g., Silver (Vis)
+		Reputation,    // Requires Faction system
+		TriggerScript, // Execute a specific script function
+		Custom         // For rewards handled entirely by QuestScript logic
 	}
 }

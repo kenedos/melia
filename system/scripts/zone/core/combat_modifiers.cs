@@ -12,6 +12,7 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Yggdrasil.Logging;
 
 public class CombatModifierCalculationsScript : GeneralScript
 {

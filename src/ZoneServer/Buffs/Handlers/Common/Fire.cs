@@ -1,22 +1,31 @@
-﻿using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.World.Actors;
+using Melia.Zone.Network;
 
 namespace Melia.Zone.Buffs.Handlers.Common
 {
 	/// <summary>
-	/// Buff handler for Fire, which deals damage in regular intervals.
+	/// Buff handler for Fire, which deals fire damage in regular intervals.
 	/// </summary>
-	[BuffHandler(BuffId.Fire)]
-	public class Fire : BuffHandler
+	/// <remarks>
+	/// NumArg2: Snapshotted damage per tick (pre-calculated by skill handler)
+	/// </remarks>
+	[BuffHandler(BuffId.Fire, BuffId.UC_flame, BuffId.Mon_FireWall)]
+	public class Fire : DamageOverTimeBuffHandler
 	{
-		public override void WhileActive(Buff buff)
+		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			var attacker = buff.Caster;
-			var target = buff.Target;
-			var damage = buff.NumArg2;
+			// Call base to snapshot damage from NumArg2
+			base.OnActivate(buff, activationType);
 
-			target.TakeSimpleHit(damage, attacker, SkillId.None);
+			// Show flame emoticon
+			var target = buff.Target;
+			Send.ZC_SHOW_EMOTICON(target, "I_emo_flame", buff.Duration);
+		}
+
+		protected override HitType GetHitType(Buff buff)
+		{
+			return HitType.Fire;
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 	/// Handler for the Assassin skill Brick Smash
 	/// </summary>
 	[SkillHandler(SkillId.OutLaw_BreakBrick)]
-	public class OutLaw_BreakBrick : IGroundSkillHandler
+	public class OutLaw_BreakBrick : IMeleeGroundSkillHandler
 	{
 		public const float JumpDistance = 60f;
 
@@ -31,9 +32,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -77,7 +80,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 			var hitDelay = TimeSpan.FromMilliseconds(400);
 
 			// First perform the jump
-			var targetPos = caster.Position.GetRelative2D(caster.Direction, JumpDistance);
+			var targetPos = caster.Position.GetRelative(caster.Direction, JumpDistance);
 			targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 
 			caster.Position = targetPos;
@@ -90,7 +93,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 			await Task.Delay(hitDelay);
 
 			var hits = new List<SkillHitInfo>();
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
@@ -155,7 +158,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			var hits = new List<SkillHitInfo>();
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
@@ -183,7 +186,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 
 			// The second hitbox is identical to the first			
 
-			targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
@@ -211,7 +214,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 			splashParam = skill.GetSplashParameters(caster, caster.Position, farPos, length: 150, width: 100, angle: 78);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 
-			targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{

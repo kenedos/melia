@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: CZ_GUILD_MEMBER_INVITE_BY_WEB.bt
+//   Authors: Salman T. Khan
+//   Version: 386576
+//   Purpose: Used to invite a character to a guild.
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+char teamName[64];

@@ -1,0 +1,257 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: XAC.bt
+//   Authors: Salman T. Khan, improved by AI
+//   Version: 1.3
+//   Purpose: Parses XAC (Actor) files from the EMotion FX engine.
+//  Category: 3D Model
+// File Mask: *.xac
+//  ID Bytes: 58 41 43 20 // "XAC "
+//   History:
+//   1.3 2024-05-21 - Renamed all read functions to be unique to prevent overloading errors.
+//   1.2 2024-05-21 - Corrected script structure: defined all structs before read functions.
+//                  - Fixed pass-by-reference syntax in function definitions.
+//   1.1 2024-05-21 - Added read functions for all structs and set optimize=false.
+//   1.0 2023-10-27 - Initial version based on Rust parser.
+//
+//------------------------------------------------
+
+#include "inc/EmotionFx.bt"
+
+// --- Main Setup ---
+LittleEndian();
+
+//------------------------------------------------
+//--- Main File Parsing Logic
+//------------------------------------------------
+
+// Global lookup table for dependencies.
+const int MAX_NODES = 4096;
+local uint g_node_to_org_verts[MAX_NODES];
+
+// --- Pass 1: Pre-scan to find dependencies ---
+void PreScanForDependencies(int64 start_pos) {
+  FSeek(start_pos);
+  local int64 chunk_start;
+  while (FTell() < FileSize()) {
+    chunk_start = FTell();
+    FileChunk chunk_header;
+
+    // Only care about mesh chunks for this pre-scan
+    if (chunk_header.chunk_id == XacChunkMesh) {
+      if (chunk_header.version == 1) {
+        local uint node_idx = ReadUInt(FTell());
+        local uint num_verts = ReadUInt(FTell() + 4);
+        if (node_idx < MAX_NODES) g_node_to_org_verts[node_idx] = num_verts;
+      } else if (chunk_header.version == 2) {
+        local uint node_idx = ReadUInt(FTell());
+        local uint num_verts = ReadUInt(FTell() + 8); // Skip LOD
+        if (node_idx < MAX_NODES) g_node_to_org_verts[node_idx] = num_verts;
+      }
+    }
+
+    // Seek to the start of the next chunk
+    if (chunk_header.size_in_bytes > 0 || (chunk_start + 12 < FileSize())) {
+      FSeek(chunk_start + 12 + chunk_header.size_in_bytes);
+    } else {
+      break; // Break if chunk size is 0 or on other errors
+    }
+  }
+}
+
+// --- Pass 2: Main Parsing Logic ---
+XacHeader header;
+if (header.fourcc != "XAC ") {
+  Warning("File does not appear to be an XAC file.");
+  return -1;
+}
+
+// Get start of chunks and run pre-scan
+local int64 start_of_chunks = FTell();
+Printf("--- Starting Pre-scan for Dependencies ---\n");
+PreScanForDependencies(start_of_chunks);
+Printf("--- Pre-scan Complete, Starting Main Parse ---\n");
+FSeek(start_of_chunks);
+
+// Read chunks until EOF
+local int64 current_chunk_pos, chunk_data_end;
+while (!FEof()) {
+  current_chunk_pos = FTell();
+  if (current_chunk_pos >= FileSize()) break;
+
+  FileChunk chunk;
+  chunk_data_end = current_chunk_pos + 12 + chunk.size_in_bytes;
+
+  Printf("Parsing Chunk: %s\n", readFileChunk(chunk));
+
+  switch (chunk.chunk_id) {
+  case XacChunkInfo:
+    switch (chunk.version) {
+    case 1:
+      XacInfo1 info;
+      break;
+    case 2:
+      XacInfo2 info;
+      break;
+    case 3:
+      XacInfo3 info;
+      break;
+    case 4:
+      XacInfo4 info;
+      break;
+    default:
+      Warning("Unknown XacChunkInfo version %d", chunk.version);
+    }
+    break;
+  case XacChunkNode:
+    switch (chunk.version) {
+    case 1:
+      XacNode1 node;
+      break;
+    case 2:
+      XacNode2 node;
+      break;
+    case 3:
+      XacNode3 node;
+      break;
+    case 4:
+      XacNode4 node;
+      break;
+    default:
+      Warning("Unknown XacChunkNode version %d", chunk.version);
+    }
+    break;
+  case XacChunkNodes:
+    if (chunk.version == 1) XACNodes1 nodes;
+    else Warning("Unknown XacChunkNodes version %d", chunk.version);
+    break;
+  case XacChunkMaterialinfo:
+    switch (chunk.version) {
+    case 1:
+      XACMaterialInfo1 mat_info;
+      break;
+    case 2:
+      XACMaterialInfo2 mat_info;
+      break;
+    default:
+      Warning("Unknown XacChunkMaterialinfo version %d", chunk.version);
+    }
+    break;
+  case XacChunkStdmaterial:
+    switch (chunk.version) {
+    case 1:
+      XacStandardMaterial1 std_mat;
+      break;
+    case 2:
+      XacStandardMaterial2 std_mat;
+      break;
+    case 3:
+      XacStandardMaterial3 std_mat;
+      break;
+    default:
+      Warning("Unknown XacChunkStdmaterial version %d", chunk.version);
+    }
+    break;
+  case XacChunkStdmateriallayer:
+    switch (chunk.version) {
+    case 1:
+      XACStandardMaterialLayer1 layer;
+      break;
+    case 2:
+      XACStandardMaterialLayer2 layer;
+      break;
+    default:
+      Warning("Unknown XacChunkStdmateriallayer version %d", chunk.version);
+    }
+    break;
+  case XacChunkFxmaterial:
+    switch (chunk.version) {
+    case 1:
+      XACFXMaterial1 fx_mat;
+      break;
+    case 2:
+      XACFXMaterial2 fx_mat;
+      break;
+    case 3:
+      XACFXMaterial3 fx_mat;
+      break;
+    default:
+      Warning("Unknown XacChunkFxmaterial version %d", chunk.version);
+    }
+    break;
+  case XacChunkMesh:
+    switch (chunk.version) {
+    case 1:
+      XACMesh1 mesh;
+      break;
+    case 2:
+      XACMesh2 mesh;
+      break;
+    default:
+      Warning("Unknown XacChunkMesh version %d", chunk.version);
+    }
+    break;
+  case XacChunkSkinninginfo:
+    local uint node_idx = ReadUInt(FTell());
+    local uint num_verts = (node_idx < MAX_NODES) ? g_node_to_org_verts[node_idx] : 0;
+    if (num_verts == 0) Warning("Could not find num_org_verts for node %d. Skinning info may be incorrect.", node_idx);
+    switch (chunk.version) {
+    case 1:
+      XacSkinningInfo1 skin_info;
+      break;
+    case 2:
+      XacSkinningInfo2 skin_info(num_verts);
+      break;
+    case 3:
+      XacSkinningInfo3 skin_info(num_verts);
+      break;
+    case 4:
+      XacSkinningInfo4 skin_info(num_verts);
+      break;
+    default:
+      Warning("Unknown XacChunkSkinninginfo version %d", chunk.version);
+    }
+    break;
+  case XacLimit:
+    if (chunk.version == 1) XACLimit1 limit;
+    else Warning("Unknown XacLimit version %d", chunk.version);
+    break;
+  case XacChunkStdprogmorphtarget:
+    if (chunk.version == 1) XACPMorphTarget1 morph_target;
+    else Warning("Unknown XacChunkStdprogmorphtarget version %d", chunk.version);
+    break;
+  case XacChunkStdpmorphtargets:
+    if (chunk.version == 1) XACPMorphTargets1 morph_targets;
+    else Warning("Unknown XacChunkStdpmorphtargets version %d", chunk.version);
+    break;
+  case XacChunkNodegroups:
+    if (chunk.version == 1) XACNodeGroup1 node_group;
+    else Warning("Unknown XacChunkNodegroups version %d", chunk.version);
+    break;
+  case XacChunkMeshlodlevels:
+    if (chunk.version == 1) XACMeshLodLevel1 lod_level;
+    else Warning("Unknown XacChunkMeshlodlevels version %d", chunk.version);
+    break;
+  case XacChunkNodemotionsources:
+    if (chunk.version == 1) XACNodeMotionSources1 motion_sources;
+    else Warning("Unknown XacChunkNodemotionsources version %d", chunk.version);
+    break;
+  case XacChunkAttachmentnodes:
+    if (chunk.version == 1) XACAttachmentNodes1 attachment_nodes;
+    else Warning("Unknown XacChunkAttachmentnodes version %d", chunk.version);
+    break;
+  default:
+    Warning("Unknown chunk ID %d found.", chunk.chunk_id);
+    break;
+  }
+
+  // Ensure we are at the start of the next chunk
+  if (FTell() != chunk_data_end) {
+    Warning("Parser position mismatch after chunk %s. Expected 0x%LX, but at 0x%LX. Correcting.",
+      EnumToString(chunk.chunk_id), chunk_data_end, FTell());
+    FSeek(chunk_data_end);
+  }
+}
+
+Printf("--- End of File Reached ---\n");

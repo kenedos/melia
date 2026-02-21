@@ -1,6 +1,6 @@
 namespace Melia.Shared.Game.Const
 {
-	public enum FactionType : int
+	public enum FactionType
 	{
 		Law = 1,
 		Chaos = 2,

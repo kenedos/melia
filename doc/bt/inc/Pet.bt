@@ -9,6 +9,7 @@
 // File Mask: 
 //  ID Bytes: 
 //   History: 
+//          - Pet Armor and Pet Weapon were removed at some point.
 //------------------------------------------------
 
 #define PROPERTY_NAMES
@@ -31,30 +32,40 @@ typedef struct
 {
     int id;
     int64 petId;
-    int64 ownerId;
+    int64 ownerId; // 528409826427476 or 0
     int64 exp;
     lpString petName;
     byte b1;
     position pos;
     direction dir;
     int petHandle;
-    int i1; // new
-    byte b2;
-    int weaponSlots;
-    if (weaponSlots > 0)
-        PetEquip weapons[weaponSlots];
-    byte b3;
-    short armorSlots; // new
     short propertyCount;
-    if (armorSlots > 0)
-    {
-        PetEquip armors[armorSlots];
-    }
     if (propertyCount > 0)
         getProperties(propertyCount);
-    byte b6;
-    int i4;
-    byte b7;
+    // When the pet's character id is 0 (Left in Barracks vs brought along)
+    if (petHandle == 0)
+    {
+        short s1; // 1
+        int64 l1; // 528409826427476 (Character Id?)
+        short s2; // 2
+        local int i;
+        for(i = 0; i < s2; i++)
+        {
+            int propId;
+            lpString propValue;
+        }
+    } else {
+        short s1; // 0
+    }
+    byte b2; // 1
+    byte b3; // 1
+    byte bin[3]; // 0s
+    byte b4; // 0 or 1
+    int i2; // 1
+    byte b5; // 0
+    byte b6; // 1
+    byte b7; // 1
+    int i3;
     int64 stamina; // Stamina?
     
 } PetInfo <read=petInfoRead, optimize=false>;

@@ -1,4 +1,5 @@
-﻿using Yggdrasil.Configuration;
+﻿using System.IO;
+using Yggdrasil.Configuration;
 
 namespace Melia.Shared.Configuration.Files
 {
@@ -11,19 +12,27 @@ namespace Melia.Shared.Configuration.Files
 		public string User { get; protected set; }
 		public string Pass { get; protected set; }
 		public string Db { get; protected set; }
+		public int MaxAutoSaveConcurrency { get; set; }
 
 		/// <summary>
 		/// Loads conf file and its options from the given path.
 		/// </summary>
 		/// <param name="filePath"></param>
-		public void Load(string filePath)
+		public void Load(string filePath, params string[] extraIncludes)
 		{
 			this.Include(filePath);
+
+			foreach (var path in extraIncludes)
+			{
+				if (File.Exists(path))
+					this.Include(path);
+			}
 
 			this.Host = this.GetString("host", "127.0.0.1");
 			this.User = this.GetString("user", "root");
 			this.Pass = this.GetString("pass", "");
 			this.Db = this.GetString("database", "melia");
+			this.MaxAutoSaveConcurrency = this.GetInt("max_auto_save_concurrency", 10);
 		}
 	}
 }

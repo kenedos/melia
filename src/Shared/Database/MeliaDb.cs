@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Text.RegularExpressions;
 using Melia.Shared.Game.Properties;
 using Melia.Shared.ObjectProperties;
+using Melia.Shared.Util;
 using MySqlConnector;
 using Yggdrasil.Logging;
 using Yggdrasil.Security.Hashing;
@@ -25,14 +29,14 @@ namespace Melia.Shared.Database
 		/// <exception cref="Exception">Thrown if connection couldn't be established.</exception>
 		public void Init(string host, string user, string pass, string db)
 		{
-			_connectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; charset=utf8; pooling=true; min pool size=0; max pool size=100;", host, db, user, pass);
+			_connectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; charset=utf8; pooling=true; min pool size=0; max pool size=200; connection timeout=30; default command timeout=30;", host, db, user, pass);
 			this.TestConnection();
 		}
 
 		/// <summary>
 		/// Returns a valid connection.
 		/// </summary>
-		protected MySqlConnection GetConnection()
+		public MySqlConnection GetConnection()
 		{
 			if (_connectionString == null)
 				throw new Exception("MeliaDb has not been initialized.");
@@ -60,7 +64,7 @@ namespace Melia.Shared.Database
 		}
 
 		/// <summary>
-		/// Returns true if an account with the given username exists.
+		/// Returns true if accounts exists.
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
@@ -77,13 +81,46 @@ namespace Melia.Shared.Database
 		}
 
 		/// <summary>
+		/// Returns true if email exists.
+		/// </summary>
+		/// <param name="email"></param>
+		/// <returns></returns>
+		public bool EmailExists(string email)
+		{
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("SELECT `email` FROM `accounts` WHERE `email` = @email", conn))
+			{
+				mc.Parameters.AddWithValue("@email", email);
+
+				using (var reader = mc.ExecuteReader())
+					return reader.HasRows;
+			}
+		}
+
+		/// <summary>
+		/// Returns true if account exists with an email.
+		/// </summary>
+		/// <param name="email"></param>
+		/// <returns></returns>
+		public bool AccountExistsByEmail(string email)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new MySqlCommand("SELECT 1 FROM `accounts` WHERE `email` = @email", conn))
+			{
+				cmd.Parameters.AddWithValue("@email", email);
+				using (var reader = cmd.ExecuteReader())
+					return reader.HasRows;
+			}
+		}
+
+		/// <summary>
 		/// Creates new account with given information.
 		/// </summary>
 		/// <param name="name"></param>
 		/// <param name="password"></param>
 		/// <returns></returns>
 		/// <exception cref="ArgumentNullException">Thrown if name or password is empty.</exception>
-		public bool CreateAccount(string name, string password)
+		public bool CreateAccount(string name, string password, string email = "")
 		{
 			if (string.IsNullOrWhiteSpace(name))
 				throw new ArgumentNullException(nameof(name));
@@ -99,6 +136,8 @@ namespace Melia.Shared.Database
 			{
 				cmd.Set("name", name);
 				cmd.Set("password", password);
+				if (!string.IsNullOrEmpty(email))
+					cmd.Set("email", email);
 
 				try
 				{
@@ -115,9 +154,8 @@ namespace Melia.Shared.Database
 		}
 
 		/// <summary>
-		/// Returns true if a character with the given name exists on the account.
+		/// Returns true if a character with the given name exists on account.
 		/// </summary>
-		/// <param name="accountId"></param>
 		/// <param name="name"></param>
 		/// <returns></returns>
 		public bool CharacterExists(long accountId, string name)
@@ -134,9 +172,9 @@ namespace Melia.Shared.Database
 		}
 
 		/// <summary>
-		/// Returns true if the given team name exists.
+		/// Returns true if team name exists.
 		/// </summary>
-		/// <param name="teamName"></param>
+		/// <param name="name"></param>
 		/// <returns></returns>
 		public bool TeamNameExists(string teamName)
 		{
@@ -151,10 +189,26 @@ namespace Melia.Shared.Database
 		}
 
 		/// <summary>
-		/// Changes the account's team name to the given one.
+		/// Returns true if a guild with the given name exists.
 		/// </summary>
-		/// <param name="accountId"></param>
-		/// <param name="teamName"></param>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public bool GuildNameExists(string name)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new MySqlCommand("SELECT `guildId` FROM `guilds` WHERE `name` = @name", conn))
+			{
+				cmd.Parameters.AddWithValue("@name", name);
+
+				using (var reader = cmd.ExecuteReader())
+					return reader.HasRows;
+			}
+		}
+
+		/// <summary>
+		/// Changes team name for account.
+		/// </summary>
+		/// <param name="account"></param>
 		/// <returns></returns>
 		public bool UpdateTeamName(long accountId, string teamName)
 		{
@@ -176,7 +230,7 @@ namespace Melia.Shared.Database
 		/// <param name="idName"></param>
 		/// <param name="id"></param>
 		/// <param name="properties"></param>
-		protected void LoadProperties(string databaseName, string idName, long id, Properties properties)
+		protected bool LoadProperties(string databaseName, string idName, long id, Properties properties)
 		{
 			using (var conn = this.GetConnection())
 			using (var cmd = new MySqlCommand($"SELECT * FROM `{databaseName}` WHERE `{idName}` = @id", conn))
@@ -229,6 +283,7 @@ namespace Melia.Shared.Database
 							property.Deserialize(valueStr);
 						}
 					}
+					return reader.HasRows;
 				}
 			}
 		}
@@ -245,29 +300,85 @@ namespace Melia.Shared.Database
 			using (var conn = this.GetConnection())
 			using (var trans = conn.BeginTransaction())
 			{
-				using (var cmd = new MySqlCommand($"DELETE FROM `{databaseName}` WHERE `{idName}` = @id", conn, trans))
+				this.SaveProperties(databaseName, idName, id, properties, conn, trans);
+				trans.Commit();
+			}
+		}
+
+		/// <summary>
+		/// Saves properties to the given database, with the id.
+		/// </summary>
+		/// <param name="databaseName"></param>
+		/// <param name="idName"></param>
+		/// <param name="id"></param>
+		/// <param name="properties"></param>
+		protected void SaveProperties(string databaseName, string idName, long id, Properties properties, MySqlConnection conn, MySqlTransaction trans)
+		{
+			var allProperties = properties.GetAll().ToList();
+
+			if (!allProperties.Any())
+				return;
+
+			// UPSERT properties (avoids gap lock deadlocks from DELETE-all + INSERT-all)
+			var propNamesInMemory = new HashSet<string>();
+			foreach (var property in allProperties)
+			{
+				var typeStr = property is FloatProperty ? "f" : "s";
+				var valueStr = property.Serialize();
+				propNamesInMemory.Add(property.Ident);
+
+				using (var cmd = new MySqlCommand(
+					$"INSERT INTO `{databaseName}` (`{idName}`, `name`, `type`, `value`) VALUES (@id, @name, @type, @value) " +
+					$"ON DUPLICATE KEY UPDATE `type` = VALUES(`type`), `value` = VALUES(`value`)", conn, trans))
 				{
 					cmd.Parameters.AddWithValue("@id", id);
+					cmd.Parameters.AddWithValue("@name", property.Ident);
+					cmd.Parameters.AddWithValue("@type", typeStr);
+					cmd.Parameters.AddWithValue("@value", valueStr);
 					cmd.ExecuteNonQuery();
 				}
+			}
 
-				foreach (var property in properties.GetAll())
+			// Only delete properties that were removed from memory
+			var propNamesInDb = new HashSet<string>();
+			using (var cmd = new MySqlCommand($"SELECT `name` FROM `{databaseName}` WHERE `{idName}` = @id", conn, trans))
+			{
+				cmd.Parameters.AddWithValue("@id", id);
+				using (var reader = cmd.ExecuteReader())
 				{
-					var typeStr = property is FloatProperty ? "f" : "s";
-					var valueStr = property.Serialize();
-
-					using (var cmd = new InsertCommand($"INSERT INTO `{databaseName}` {{0}}", conn, trans))
-					{
-						cmd.Set(idName, id);
-						cmd.Set("name", property.Ident);
-						cmd.Set("type", typeStr);
-						cmd.Set("value", valueStr);
-
-						cmd.Execute();
-					}
+					while (reader.Read())
+						propNamesInDb.Add(reader.GetString(0));
 				}
+			}
 
-				trans.Commit();
+			var propsToDelete = propNamesInDb.Except(propNamesInMemory).ToList();
+			if (propsToDelete.Any())
+			{
+				var deleteParams = propsToDelete.Select((name, i) => $"@name{i}").ToArray();
+				using (var cmd = new MySqlCommand($"DELETE FROM `{databaseName}` WHERE `{idName}` = @id AND `name` IN ({string.Join(",", deleteParams)})", conn, trans))
+				{
+					cmd.Parameters.AddWithValue("@id", id);
+					for (var i = 0; i < propsToDelete.Count; i++)
+						cmd.Parameters.AddWithValue(deleteParams[i], propsToDelete[i]);
+					cmd.ExecuteNonQuery();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Updates the last known ip of the given account.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="ip"></param>
+		public void UpdateLastLoginIP(long accountId, string ip)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `accountId` = @accountId", conn))
+			{
+				cmd.AddParameter("@accountId", accountId);
+				cmd.Set("lastIP", ip.ToInt32());
+
+				cmd.Execute();
 			}
 		}
 
@@ -285,7 +396,10 @@ namespace Melia.Shared.Database
 				cmd.AddParameter("@accountId", accountId);
 				cmd.Set("loginState", (int)state);
 				cmd.Set("loginCharacter", characterDbId);
-
+				if (state != LoginState.LoggedOut)
+				{
+					cmd.Set("lastLogin", DateTime.Now);
+				}
 				cmd.Execute();
 			}
 		}
@@ -316,6 +430,9 @@ namespace Melia.Shared.Database
 		/// <returns></returns>
 		public bool CheckSessionKey(long accountId, string sessionKey)
 		{
+			if (accountId <= 0 || string.IsNullOrEmpty(sessionKey))
+				return false;
+
 			using (var conn = this.GetConnection())
 			using (var cmd = new MySqlCommand("SELECT `sessionKey` FROM `accounts` WHERE `accountId` = @accountId", conn))
 			{
@@ -415,6 +532,7 @@ namespace Melia.Shared.Database
 		/// <exception cref="ArgumentException"></exception>
 		public void BanIp(string ipMask, DateTime from, DateTime to, string reason)
 		{
+			ipMask = ipMask.Trim();
 			if (!IpMaskRegex.IsMatch(ipMask))
 				throw new ArgumentException("Invalid IP address mask.", nameof(ipMask));
 
@@ -426,6 +544,20 @@ namespace Melia.Shared.Database
 				cmd.Set("toDate", to);
 				cmd.Set("reason", reason);
 
+				cmd.Execute();
+			}
+		}
+
+		/// <summary>
+		/// Resets the login states of all accounts.
+		/// </summary>
+		public void ClearLoginStates()
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0}", conn))
+			{
+				cmd.Set("loginState", (int)LoginState.LoggedOut);
+				cmd.Set("loginCharacter", 0);
 				cmd.Execute();
 			}
 		}

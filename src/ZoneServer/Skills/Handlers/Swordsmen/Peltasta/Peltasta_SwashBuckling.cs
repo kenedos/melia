@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -15,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// Handler for the Peltasta skill Swash Buckling.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_SwashBuckling)]
-	public class Peltasta_SwashBuckling : IGroundSkillHandler
+	public class Peltasta_SwashBuckling : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, giving the caster a buff and debuffing enemies
@@ -26,8 +27,10 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
 		{
+			var target = designatedTargets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -48,24 +51,24 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			var splashParam = skill.GetSplashParameters(caster, caster.Position, caster.Position, length: 0, width: 400, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var maxTargets = Math.Min(targets.Count, 6 + 3 * skill.Level);
 
 			for (var i = 0; i < maxTargets; i++)
 			{
-				var target = targets[i];
-				if (target.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
+				var hitTarget = targets[i];
+				if (hitTarget.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
 					continue;
 
-				target.StartBuff(BuffId.SwashBuckling_Debuff, skill.Level, 0, duration, caster);
-				target.StartBuff(BuffId.ProvocationImmunity_Debuff, skill.Level, 0, duration, caster);
+				hitTarget.StartBuff(BuffId.SwashBuckling_Debuff, skill.Level, 0, duration, caster);
+				hitTarget.StartBuff(BuffId.ProvocationImmunity_Debuff, skill.Level, 0, duration, caster);
 
-				if (target.Components.TryGet<AiComponent>(out var component))
+				if (hitTarget.Components.TryGet<AiComponent>(out var component))
 				{
 					// Reset hate and simulate a hit to build a small amount
 					// of threat
 					component.Script.QueueEventAlert(new HateResetAlert(caster));
-					component.Script.QueueEventAlert(new HitEventAlert(target, caster, 0));
+					component.Script.QueueEventAlert(new HitEventAlert(hitTarget, caster, 0));
 				}
 			}
 		}

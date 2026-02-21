@@ -9,5 +9,8 @@
 		City,
 		Dungeon,
 		Instance,
+
+		// Legacy
+		Mission,
 	}
 }

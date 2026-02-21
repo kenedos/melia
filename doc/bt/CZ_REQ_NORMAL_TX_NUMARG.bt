@@ -48,4 +48,7 @@ else if (txType == 28)
     int i1; // 1
     int i2; // 1,2
     byte b[4];
+} else {
+    int count;
+    int ints[count];
 }

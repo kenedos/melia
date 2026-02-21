@@ -19,4 +19,6 @@ byte len;
 int argNum;
 byte notUsed;
 char functionName[len];
-char argStr[header.size-(len+sizeof(header)+sizeof(short)+sizeof(int))];
+local int argSize = header.size-(len+sizeof(header)+sizeof(short)+sizeof(int));
+if (argSize > 0)
+char argStr[argSize];

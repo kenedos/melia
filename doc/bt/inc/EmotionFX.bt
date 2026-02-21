@@ -1,0 +1,874 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: EmotionFX.bt
+//   Authors: AI Assistant
+//   Version: 1.1
+//   Purpose: Shared data structures for Emotion FX file formats (XAC, XPM, XSM).
+//  Category: Common
+//   History:
+//   1.1 2025-12-19 - Fixed readFileQuaternion for File16Quaternion, fixed XacString references
+//   1.0 2025-05-22 - Initial version
+//
+//------------------------------------------------
+
+// --- Main Setup ---
+// This is assumed to be set by the parent template, but is safe to include.
+LittleEndian();
+
+// --- Enums ---
+typedef enum < uint > {
+  XacChunkNode = 0,
+  XacChunkMesh = 1,
+  XacChunkSkinninginfo = 2,
+  XacChunkStdmaterial = 3,
+  XacChunkStdmateriallayer = 4,
+  XacChunkFxmaterial = 5,
+  XacLimit = 6,
+  XacChunkInfo = 7,
+  XacChunkMeshlodlevels = 8,
+  XacChunkStdprogmorphtarget = 9,
+  XacChunkNodegroups = 10,
+  XacChunkNodes = 11,
+  XacChunkStdpmorphtargets = 12,
+  XacChunkMaterialinfo = 13,
+  XacChunkNodemotionsources = 14,
+  XacChunkAttachmentnodes = 15,
+}
+XacChunkID;
+
+typedef enum < ubyte > {
+  MULORDER_SCALE_ROT_TRANS = 0,
+  MULORDER_ROT_SCALE_TRANS = 1
+}
+MatrixMulOrder;
+
+typedef enum < uint > {
+  AttribPositions = 0,
+  AttribNormals = 1,
+  AttribTangents = 2,
+  AttribUvcoords = 3,
+  AttribColors32 = 4,
+  AttribOrgvtxnumbers = 5,
+  AttribColors128 = 6,
+  AttribBitangents = 7,
+}
+XacAttribute;
+
+typedef enum < ubyte > {
+  XAC_LAYERID_UNKNOWN = 0,
+  XAC_LAYERID_AMBIENT = 1,
+  XAC_LAYERID_DIFFUSE = 2,
+  XAC_LAYERID_SPECULAR = 3,
+  XAC_LAYERID_OPACITY = 4,
+  XAC_LAYERID_BUMP = 5,
+  XAC_LAYERID_SELF_ILLUM = 6,
+  XAC_LAYERID_SHINE = 7,
+  XAC_LAYERID_SHINE_STRENGTH = 8,
+  XAC_LAYERID_FILTER_COLOR = 9,
+  XAC_LAYERID_REFLECT = 10,
+  XAC_LAYERID_REFRACT = 11,
+  XAC_LAYERID_ENVIRONMENT = 12,
+  XAC_LAYERID_DISPLACEMENT = 13
+}
+XacMaterialLayer;
+
+//------------------------------------------------
+//--- All Struct Definitions
+//------------------------------------------------
+
+// --- Basic Data Structures ---
+typedef struct {
+  float r, g, b, a;
+}
+FileColor < read = readFileColor, optimize = false > ;
+
+typedef struct {
+  float x, y, z;
+}
+FileVector3 < read = readFileVector3, optimize = false > ;
+
+typedef struct {
+  ushort x, y, z;
+}
+File16BitVector3 < read = readFile16BitVector3, optimize = false > ;
+
+typedef struct {
+  ubyte x, y, z;
+}
+File8BitVector3 < read = readFile8BitVector3, optimize = false > ;
+
+typedef struct {
+  float x, y, z, w;
+}
+FileQuaternion < read = readFileQuaternion, optimize = false > ;
+
+typedef struct {
+  short x, y, z, w;
+}
+File16Quaternion < read = readFile16Quaternion, optimize = false > ;
+
+typedef struct {
+  uint length;
+  if (length > 0 && length < 4096) char data[length];
+}
+XacString < read = readXacString, optimize = false > ;
+
+// --- File Header for XSM files ---
+typedef struct {
+    char magic[4];
+    ubyte hi_version;
+    ubyte lo_version;
+    ubyte endian_type;
+    ubyte mul_order;
+} XsmFileHeader <read=readXsmFileHeader>;
+
+string readXsmFileHeader(XsmFileHeader &h) {
+    return Str("XSM v%d.%d", h.hi_version, h.lo_version);
+}
+
+// --- Info Chunks ---
+typedef struct {
+  uint repositioning_mask, repositioning_node_index;
+  ubyte exporter_high_version, exporter_low_version;
+  ushort padding;
+  XacString source_app, original_filename, compilation_date, actor_name;
+}
+XacInfo1 < read = readXacInfo1, optimize = false > ;
+
+typedef struct {
+  uint repositioning_mask, repositioning_node_index;
+  ubyte exporter_high_version, exporter_low_version;
+  float retarget_root_offset;
+  ushort padding;
+  XacString source_app, original_filename, compilation_date, actor_name;
+}
+XacInfo2 < read = readXacInfo2, optimize = false > ;
+
+typedef struct {
+  uint trajectory_node_index, motion_extraction_node_index, motion_extraction_mask;
+  ubyte exporter_high_version, exporter_low_version;
+  float retarget_root_offset;
+  ushort padding;
+  XacString source_app, original_filename, compilation_date, actor_name;
+}
+XacInfo3 < read = readXacInfo3, optimize = false > ;
+
+typedef struct {
+  uint num_lods, trajectory_node_index, motion_extraction_node_index;
+  ubyte exporter_high_version, exporter_low_version;
+  float retarget_root_offset;
+  ushort padding;
+  XacString source_app, original_filename, compilation_date, actor_name;
+}
+XacInfo4 < read = readXacInfo4, optimize = false > ;
+
+// --- Node Chunks ---
+typedef struct {
+  FileQuaternion local_quat, scale_rot;
+  FileVector3 local_pos, local_scale, shear;
+  uint skeletal_lods, parent_index;
+  XacString node_name;
+}
+XacNode1 < read = readXacNode1, optimize = false > ;
+
+typedef struct {
+  FileQuaternion local_quat, scale_rot;
+  FileVector3 local_pos, local_scale, shear;
+  uint skeletal_lods, parent_index;
+  ubyte node_flags, padding[3];
+  XacString node_name;
+}
+XacNode2 < read = readXacNode2, optimize = false > ;
+
+typedef struct {
+  FileQuaternion local_quat, scale_rot;
+  FileVector3 local_pos, local_scale, shear;
+  uint skeletal_lods, parent_index;
+  ubyte node_flags;
+  float obb[16];
+  ubyte padding[3];
+  XacString node_name;
+}
+XacNode3 < read = readXacNode3, optimize = false > ;
+
+typedef struct {
+  FileQuaternion local_quat, scale_rot;
+  FileVector3 local_pos, local_scale, shear;
+  uint skeletal_lods, motion_lods, parent_index, num_children;
+  ubyte node_flags;
+  float obb[16];
+  float importance_factor;
+  ubyte padding[3];
+  XacString node_name;
+}
+XacNode4 < read = readXacNode4, optimize = false > ;
+
+typedef struct {
+  uint num_nodes, num_root_nodes;
+  XacNode4 nodes[num_nodes];
+}
+XACNodes1 < read = readXACNodes1, optimize = false > ;
+
+// --- Material Chunks ---
+typedef struct {
+  float amount, u_offset, v_offset, u_tiling, v_tiling, rotation_radians;
+  ushort material_number;
+  XacMaterialLayer map_type;
+  ubyte padding;
+  XacString texture_name;
+}
+XACStandardMaterialLayer1 < read = readXACStandardMaterialLayer1, optimize = false > ;
+
+typedef struct {
+  float amount, u_offset, v_offset, u_tiling, v_tiling, rotation_radians;
+  ushort material_number;
+  XacMaterialLayer map_type;
+  ubyte blend_mode;
+  XacString texture_name;
+}
+XACStandardMaterialLayer2 < read = readXACStandardMaterialLayer2, optimize = false > ;
+
+typedef struct {
+  FileColor ambient, diffuse, specular, emissive;
+  float shine, shine_strength, opacity, ior;
+  ubyte double_sided, wireframe, transparency_type, padding;
+  XacString material_name;
+}
+XacStandardMaterial1 < read = readXacStandardMaterial1, optimize = false > ;
+
+typedef struct {
+  FileColor ambient, diffuse, specular, emissive;
+  float shine, shine_strength, opacity, ior;
+  ubyte double_sided, wireframe, transparency_type, num_layers;
+  XacString material_name;
+  if (num_layers > 0) XACStandardMaterialLayer2 layers[num_layers];
+}
+XacStandardMaterial2 < read = readXacStandardMaterial2, optimize = false > ;
+
+typedef struct {
+  uint lod;
+  FileColor ambient, diffuse, specular, emissive;
+  float shine, shine_strength, opacity, ior;
+  ubyte double_sided, wireframe, transparency_type, num_layers;
+  XacString material_name;
+  if (num_layers > 0) XACStandardMaterialLayer2 layers[num_layers];
+}
+XacStandardMaterial3 < read = readXacStandardMaterial3, optimize = false > ;
+
+// FX Material structures
+typedef struct {
+  int value;
+  XacString name;
+}
+XACFXIntParameter < read = readXACFXIntParameter, optimize = false > ;
+typedef struct {
+  float value;
+  XacString name;
+}
+XACFXFloatParameter < read = readXACFXFloatParameter, optimize = false > ;
+typedef struct {
+  FileColor value;
+  XacString name;
+}
+XACFXColorParameter < read = readXACFXColorParameter, optimize = false > ;
+typedef struct {
+  FileVector3 value;
+  XacString name;
+}
+XACFXVector3Parameter < read = readXACFXVector3Parameter, optimize = false > ;
+typedef struct {
+  ubyte value;
+  XacString name;
+}
+XACFXBoolParameter < read = readXACFXBoolParameter, optimize = false > ;
+typedef struct {
+  XacString name, value_name;
+}
+XACFXBitmapParameter < read = readXACFXBitmapParameter, optimize = false > ;
+typedef struct {
+  uint num_int_params, num_float_params, num_color_params, num_bitmap_params;
+  XacString name, effect_file, shader_technique;
+  if (num_int_params > 0) XACFXIntParameter int_params[num_int_params];
+  if (num_float_params > 0) XACFXFloatParameter float_params[num_float_params];
+  if (num_color_params > 0) XACFXColorParameter color_params[num_color_params];
+  if (num_bitmap_params > 0) XACFXBitmapParameter bitmap_params[num_bitmap_params];
+}
+XACFXMaterial1 < read = readXACFXMaterial1, optimize = false > ;
+typedef struct {
+  uint num_int_params, num_float_params, num_color_params, num_bool_params, num_vector3_params, num_bitmap_params;
+  XacString name, effect_file, shader_technique;
+  if (num_int_params > 0) XACFXIntParameter int_params[num_int_params];
+  if (num_float_params > 0) XACFXFloatParameter float_params[num_float_params];
+  if (num_color_params > 0) XACFXColorParameter color_params[num_color_params];
+  if (num_bool_params > 0) XACFXBoolParameter bool_params[num_bool_params];
+  if (num_vector3_params > 0) XACFXVector3Parameter vector3_params[num_vector3_params];
+  if (num_bitmap_params > 0) XACFXBitmapParameter bitmap_params[num_bitmap_params];
+}
+XACFXMaterial2 < read = readXACFXMaterial2, optimize = false > ;
+typedef struct {
+  uint lod, num_int_params, num_float_params, num_color_params, num_bool_params, num_vector3_params, num_bitmap_params;
+  XacString name, effect_file, shader_technique;
+  if (num_int_params > 0) XACFXIntParameter int_params[num_int_params];
+  if (num_float_params > 0) XACFXFloatParameter float_params[num_float_params];
+  if (num_color_params > 0) XACFXColorParameter color_params[num_color_params];
+  if (num_bool_params > 0) XACFXBoolParameter bool_params[num_bool_params];
+  if (num_vector3_params > 0) XACFXVector3Parameter vector3_params[num_vector3_params];
+  if (num_bitmap_params > 0) XACFXBitmapParameter bitmap_params[num_bitmap_params];
+}
+XACFXMaterial3 < read = readXACFXMaterial3, optimize = false > ;
+typedef struct {
+  uint num_total_materials, num_standard_materials, num_fx_materials;
+}
+XACMaterialInfo1 < read = readXACMaterialInfo1, optimize = false > ;
+typedef struct {
+  uint lod, num_total_materials, num_standard_materials, num_fx_materials;
+}
+XACMaterialInfo2 < read = readXACMaterialInfo2, optimize = false > ;
+
+// --- Mesh, Skinning, and Vertex Data Chunks ---
+typedef struct(uint total_verts) {
+  XacAttribute layer_type_id;
+  uint attrib_size_in_bytes;
+  ubyte enable_deformations, is_scale, padding[2];
+  ubyte mesh_data[attrib_size_in_bytes * total_verts];
+}
+XACVertexAttributeLayer < read = readXACVertAttrLayer, optimize = false > ;
+typedef struct {
+  uint num_indices, num_verts, material_index, num_bones;
+  uint indices[num_indices];
+  if (num_bones > 0)
+    uint bones[num_bones];
+  else
+    Printf("No bones found\n");
+}
+XACSubMesh < read = readXACSubMesh, optimize = false > ;
+typedef struct {
+  uint node_index, num_org_verts, total_verts, total_indices, num_sub_meshes, num_layers;
+  ubyte is_collision_mesh, padding[3];
+  XACVertexAttributeLayer vertex_attribute_layer(total_verts)[num_layers];
+  XACSubMesh sub_meshes[num_sub_meshes];
+}
+XACMesh1 < read = readXACMesh1, optimize = false > ;
+typedef struct {
+  uint node_index, lod, num_org_verts, total_verts, total_indices, num_sub_meshes, num_layers;
+  ubyte is_collision_mesh, padding[3];
+  XACVertexAttributeLayer vertex_attribute_layer(total_verts)[num_layers];
+  XACSubMesh sub_meshes[num_sub_meshes];
+}
+XACMesh2 < read = readXACMesh2, optimize = false > ;
+typedef struct {
+  float weight;
+  uint node_number;
+}
+XacSkinInfluence < read = readXacSkinInfluence, optimize = false > ;
+typedef struct {
+  uint start_index, num_elements;
+}
+XacSkinningInfoTableEntry < read = readXacSkinInfoEntry, optimize = false > ;
+typedef struct {
+  uint node_index;
+  ubyte is_for_collision_mesh, padding[3];
+}
+XacSkinningInfo1 < read = readXacSkinningInfo1, optimize = false > ;
+typedef struct(uint num_org_verts) {
+  uint node_index, num_total_influences;
+  ubyte is_for_collision_mesh, padding[3];
+  XacSkinInfluence skinning_influence[num_total_influences];
+  if (num_org_verts > 0) XacSkinningInfoTableEntry skinning_info_table_entry[num_org_verts];
+}
+XacSkinningInfo2 < read = readXacSkinningInfo2, optimize = false > ;
+typedef struct(uint num_org_verts) {
+  uint node_index, num_local_bones, num_total_influences;
+  ubyte is_for_collision_mesh, padding[3];
+  XacSkinInfluence skinning_influence[num_total_influences];
+  if (num_org_verts > 0) XacSkinningInfoTableEntry skinning_info_table_entry[num_org_verts];
+}
+XacSkinningInfo3 < read = readXacSkinningInfo3, optimize = false > ;
+typedef struct(uint num_org_verts) {
+  uint node_index, lod, num_local_bones, num_total_influences;
+  ubyte is_for_collision_mesh, padding[3];
+  XacSkinInfluence skinning_influence[num_total_influences];
+  if (num_org_verts > 0) XacSkinningInfoTableEntry skinning_info_table_entry[num_org_verts];
+}
+XacSkinningInfo4 < read = readXacSkinningInfo4, optimize = false > ;
+
+// --- Other Chunks ---
+typedef struct {
+  FileVector3 translation_min, translation_max, rotation_min, rotation_max, scale_min, scale_max;
+  ubyte limit_flags[9];
+  uint node_number;
+}
+XACLimit1 < read = readXACLimit1, optimize = false > ;
+typedef struct {
+  uint node_index;
+  float min_value, max_value;
+  uint num_vertices;
+  File16BitVector3 delta_position_values[num_vertices];
+  File8BitVector3 delta_normal_values[num_vertices];
+  File8BitVector3 delta_tangent_values[num_vertices];
+  uint vertex_numbers[num_vertices];
+}
+XACPMorphTargetMeshDeltas < read = readXACPMorphMeshDeltas, optimize = false > ;
+typedef struct {
+  uint node_index;
+  FileQuaternion rotation;
+  FileQuaternion scale_rotation;
+  FileVector3 pos;
+  FileVector3 scale;
+}
+XACPMorphTargetTransform < read = readXACPMorphTransform, optimize = false > ;
+typedef struct {
+  float range_min, range_max;
+  uint lod, num_mesh_deform_deltas, num_transformations, phoneme_sets;
+  XacString name;
+  XACPMorphTargetMeshDeltas morph_target_mesh_deltas[num_mesh_deform_deltas];
+  XACPMorphTargetTransform morph_target_transform[num_transformations];
+}
+XACPMorphTarget1 < read = readXACPMorphTarget1, optimize = false > ;
+typedef struct {
+  uint num_morph_targets, lod;
+  XACPMorphTarget1 morph_targets[num_morph_targets];
+}
+XACPMorphTargets1 < read = readXACPMorphTargets1, optimize = false > ;
+typedef struct {
+  ushort num_nodes;
+  ubyte disabled_on_default, padding;
+  XacString name;
+  ushort data[num_nodes];
+}
+XACNodeGroup1 < read = readXACNodeGroup1, optimize = false > ;
+typedef struct {
+  uint lod_level, size_in_bytes;
+  ubyte lod_model_data[size_in_bytes];
+}
+XACMeshLodLevel1 < read = readXACMeshLodLevel1, optimize = false > ;
+typedef struct {
+  uint num_nodes;
+  ushort node_indices[num_nodes];
+}
+XACNodeMotionSources1 < read = readXACNodeMotionSources1, optimize = false > ;
+typedef struct {
+  uint num_nodes;
+  ushort attachment_indices[num_nodes];
+}
+XACAttachmentNodes1 < read = readXACAttachmentNodes1, optimize = false > ;
+
+// --- File Header and Chunk Structure ---
+typedef struct {
+  char fourcc[4];
+  ubyte hi_version, lo_version, endian_type;
+  MatrixMulOrder mul_order;
+}
+XacHeader < read = readXacHeader, optimize = false > ;
+
+typedef struct {
+  XacChunkID chunk_id;
+  uint size_in_bytes, version;
+}
+FileChunk < read = readFileChunk, optimize = false > ;
+
+
+//------------------------------------------------
+//--- XPM Specific Struct Definitions
+//------------------------------------------------
+
+typedef struct {
+    uint    motionFPS;
+    ubyte   exporterHighVersion;
+    ubyte   exporterLowVersion;
+    XacString sourceApp;
+    XacString originalFilename;
+    XacString compilationDate;
+    XacString motionName;
+} XPM_Info <read=readXpmInfo, optimize=false>;
+
+
+typedef struct {
+    float   time;
+    ushort  value;
+    ushort padding;
+} XPM_UnsignedShortKey <read=readXpmUnsignedShortKey, optimize=false>;
+
+
+typedef struct {
+    float   poseWeight;
+    float   minWeight;
+    float   maxWeight;
+    uint    phonemeSet;
+    uint    numKeys;
+    XacString name;
+    XPM_UnsignedShortKey keys[numKeys];
+} XPM_ProgressiveSubMotion <read=readXpmProgressiveSubMotion, optimize=false>;
+
+
+typedef struct {
+    uint numSubMotions;
+    XPM_ProgressiveSubMotion subMotions[numSubMotions];
+} XPM_SubMotions <read=readXpmSubMotions, optimize=false>;
+
+// --- XPM Read Functions ---
+string readXpmInfo(XPM_Info &s) {
+    return Str("FPS: %d, Name: '%s'", s.motionFPS, readXacString(s.motionName));
+}
+
+string readXpmUnsignedShortKey(XPM_UnsignedShortKey &k) {
+    return Str("Time: %.3fs, Value: %d", k.time, k.value);
+}
+
+string readXpmProgressiveSubMotion(XPM_ProgressiveSubMotion &s) {
+    return Str("Name: '%s', Keys: %d, Weight: %.2f (%.2f-%.2f)", readXacString(s.name), s.numKeys, s.poseWeight, s.minWeight, s.maxWeight);
+}
+
+string readXpmSubMotions(XPM_SubMotions &s) {
+    return Str("Sub-Motions: %d", s.numSubMotions);
+}
+
+//------------------------------------------------
+//--- All Read Functions
+//------------------------------------------------
+
+// --- Read Functions for Basic Data Structures ---
+string readFileColor(FileColor &c) {
+  return Str("R:%.2f G:%.2f B:%.2f A:%.2f", c.r, c.g, c.b, c.a);
+}
+string readFileVector3(FileVector3 &v) {
+  return Str("X:%.2f Y:%.2f Z:%.2f", v.x, v.y, v.z);
+}
+string readFile16BitVector3(File16BitVector3 &v) {
+  return Str("X:%d Y:%d Z:%d", v.x, v.y, v.z);
+}
+string readFile8BitVector3(File8BitVector3 &v) {
+  return Str("X:%d Y:%d Z:%d", v.x, v.y, v.z);
+}
+string readFileQuaternion(FileQuaternion &q) {
+  return Str("X:%.2f Y:%.2f Z:%.2f W:%.2f", q.x, q.y, q.z, q.w);
+}
+
+string readFile16Quaternion(File16Quaternion &q) {
+  local float fx = q.x / 32767.0;
+  local float fy = q.y / 32767.0;
+  local float fz = q.z / 32767.0;
+  local float fw = q.w / 32767.0;
+  return Str("(%.4f, %.4f, %.4f, %.4f)", fx, fy, fz, fw);
+}
+
+string readXacString(XacString &s) {
+  if (s.length > 0 && s.length < 4096) return s.data;
+  return "<empty>";
+}
+
+// --- Read Functions for Chunk-Specific Structures ---
+// Info Chunks
+string readXacInfo1(XacInfo1 &s) {
+  return Str("Actor: '%s', Source: '%s'", readXacString(s.actor_name), readXacString(s.source_app));
+}
+string readXacInfo2(XacInfo2 &s) {
+  return Str("Actor: '%s', Source: '%s'", readXacString(s.actor_name), readXacString(s.source_app));
+}
+string readXacInfo3(XacInfo3 &s) {
+  return Str("Actor: '%s', Source: '%s'", readXacString(s.actor_name), readXacString(s.source_app));
+}
+string readXacInfo4(XacInfo4 &s) {
+  return Str("LODs: %d, Actor: '%s'", s.num_lods, readXacString(s.actor_name));
+}
+
+
+// Node Chunks
+string readXacNode1(XacNode1 &s) {
+  return Str("Name: '%s', Parent: %d", readXacString(s.node_name), s.parent_index);
+}
+string readXacNode2(XacNode2 &s) {
+  return Str("Name: '%s', Parent: %d, Flags: 0x%X", readXacString(s.node_name), s.parent_index, s.node_flags);
+}
+string readXacNode3(XacNode3 &s) {
+  return Str("Name: '%s', Parent: %d, Flags: 0x%X", readXacString(s.node_name), s.parent_index, s.node_flags);
+}
+string readXacNode4(XacNode4 &s) {
+  return Str("Name: '%s', Parent: %d, Children: %d", readXacString(s.node_name), s.parent_index, s.num_children);
+}
+string readXACNodes1(XACNodes1 &s) {
+  return Str("Nodes: %d, Root Nodes: %d", s.num_nodes, s.num_root_nodes);
+}
+
+// Material Chunks
+string readXACStandardMaterialLayer1(XACStandardMaterialLayer1 &s) {
+  return Str("Type: %s, Tex: '%s'", EnumToString(s.map_type), readXacString(s.texture_name));
+}
+
+string readXACStandardMaterialLayer2(XACStandardMaterialLayer2 &s) {
+  return Str("Type: %s, Tex: '%s'", EnumToString(s.map_type), readXacString(s.texture_name));
+}
+
+string readXacStandardMaterial1(XacStandardMaterial1 &s) {
+  return Str("Name: '%s'", readXacString(s.material_name));
+}
+
+string readXacStandardMaterial2(XacStandardMaterial2 &s) {
+  return Str("Name: '%s', Layers: %d", readXacString(s.material_name), s.num_layers);
+}
+
+string readXacStandardMaterial3(XacStandardMaterial3 &s) {
+  return Str("Name: '%s', LOD: %d, Layers: %d", readXacString(s.material_name), s.lod, s.num_layers);
+}
+
+// FX Material Chunks
+string readXACFXIntParameter(XACFXIntParameter &s) {
+  return Str("'%s': %d", readXacString(s.name), s.value);
+}
+
+string readXACFXFloatParameter(XACFXFloatParameter &s) {
+  return Str("'%s': %.3f", readXacString(s.name), s.value);
+}
+
+string readXACFXColorParameter(XACFXColorParameter &s) {
+  return Str("'%s': %s", readXacString(s.name), readFileColor(s.value));
+}
+
+string readXACFXVector3Parameter(XACFXVector3Parameter &s) {
+  return Str("'%s': %s", readXacString(s.name), readFileVector3(s.value));
+}
+
+string readXACFXBoolParameter(XACFXBoolParameter &s) {
+  return Str("'%s': %s", readXacString(s.name), s.value ? "true" : "false");
+}
+
+string readXACFXBitmapParameter(XACFXBitmapParameter &s) {
+  return Str("'%s': '%s'", readXacString(s.name), readXacString(s.value_name));
+}
+
+string readXACFXMaterial1(XACFXMaterial1 &s) {
+  return Str("Name: '%s', Effect: '%s'", readXacString(s.name), readXacString(s.effect_file));
+}
+
+string readXACFXMaterial2(XACFXMaterial2 &s) {
+  return Str("Name: '%s', Effect: '%s'", readXacString(s.name), readXacString(s.effect_file));
+}
+
+string readXACFXMaterial3(XACFXMaterial3 &s) {
+  return Str("Name: '%s', LOD: %d, Effect: '%s'", readXacString(s.name), s.lod, readXacString(s.effect_file));
+}
+
+// Material Info Chunks
+string readXACMaterialInfo1(XACMaterialInfo1 &s) {
+  return Str("Total: %d, Std: %d, FX: %d", s.num_total_materials, s.num_standard_materials, s.num_fx_materials);
+}
+
+string readXACMaterialInfo2(XACMaterialInfo2 &s) {
+  return Str("LOD: %d, Total: %d, Std: %d, FX: %d", s.lod, s.num_total_materials, s.num_standard_materials, s.num_fx_materials);
+}
+
+// Mesh, Skinning, Vertex Chunks
+string readXACVertAttrLayer(XACVertexAttributeLayer &s) {
+  return Str("Type: %s, Size/Vtx: %d", EnumToString(s.header.layer_type_id), s.header.attrib_size_in_bytes);
+}
+
+string readXACSubMesh(XACSubMesh &s) {
+  return Str("Material: %d, Verts: %d, Indices: %d, Bones: %d", s.header.material_index, s.header.num_verts, s.header.num_indices, s.header.num_bones);
+}
+
+string readXACMesh1(XACMesh1 &s) {
+  return Str("Node: %d, Verts: %d, SubMeshes: %d, Layers: %d", s.node_index, s.total_verts, s.num_sub_meshes, s.num_layers);
+}
+
+string readXACMesh2(XACMesh2 &s) {
+  return Str("Node: %d, LOD: %d, Verts: %d, SubMeshes: %d", s.node_index, s.lod, s.total_verts, s.num_sub_meshes);
+}
+
+string readXacSkinInfluence(XacSkinInfluence &s) {
+  return Str("Node: %d, Weight: %.3f", s.node_number, s.weight);
+}
+
+string readXacSkinInfoEntry(XacSkinningInfoTableEntry &s) {
+  return Str("Start: %d, Count: %d", s.start_index, s.num_elements);
+}
+
+string readXacSkinningInfo1(XacSkinningInfo1 &s) {
+  return Str("Node: %d", s.node_index);
+}
+
+string readXacSkinningInfo2(XacSkinningInfo2 &s) {
+  return Str("Node: %d, Total Influences: %d", s.node_index, s.num_total_influences);
+}
+
+string readXacSkinningInfo3(XacSkinningInfo3 &s) {
+  return Str("Node: %d, Local Bones: %d, Influences: %d", s.node_index, s.num_local_bones, s.num_total_influences);
+}
+
+string readXacSkinningInfo4(XacSkinningInfo4 &s) {
+  return Str("Node: %d, LOD: %d, Local Bones: %d, Influences: %d", s.node_index, s.lod, s.num_local_bones, s.num_total_influences);
+}
+
+// Other Chunks
+string readXACLimit1(XACLimit1 &s) {
+  return Str("Node: %d", s.node_number);
+}
+
+string readXACPMorphMeshDeltas(XACPMorphTargetMeshDeltas &s) {
+  return Str("Node: %d, Vertices: %d", s.node_index, s.num_vertices);
+}
+
+string readXACPMorphTransform(XACPMorphTargetTransform &s) {
+  return Str("Node: %d", s.node_index);
+}
+
+string readXACPMorphTarget1(XACPMorphTarget1 &s) {
+  return Str("Name: '%s', LOD: %d, Meshes: %d, Transforms: %d", readXacString(s.name), s.lod, s.num_mesh_deform_deltas, s.num_transformations);
+}
+
+string readXACPMorphTargets1(XACPMorphTargets1 &s) {
+  return Str("LOD: %d, Morph Targets: %d", s.lod, s.num_morph_targets);
+}
+
+string readXACNodeGroup1(XACNodeGroup1 &s) {
+  return Str("Name: '%s', Nodes: %d", readXacString(s.name), s.num_nodes);
+}
+
+string readXACMeshLodLevel1(XACMeshLodLevel1 &s) {
+  return Str("LOD: %d, Size: %d bytes", s.lod_level, s.size_in_bytes);
+}
+
+string readXACNodeMotionSources1(XACNodeMotionSources1 &s) {
+  return Str("Nodes: %d", s.num_nodes);
+}
+
+string readXACAttachmentNodes1(XACAttachmentNodes1 &s) {
+  return Str("Nodes: %d", s.num_nodes);
+}
+
+// Header and Chunk Structure
+string readXacHeader(XacHeader &h) {
+  return Str("Version: %d.%d, Endian: %s", h.hi_version, h.lo_version, h.endian_type == 0 ? "Little" : "Big");
+}
+
+string readFileChunk(FileChunk &c) {
+  return Str("ID: %s, Version: %d, Size: %d", EnumToString(c.chunk_id), c.version, c.size_in_bytes);
+}
+
+// ------------------------------------------------------------------------
+// XSM-Specific Structures
+// Chunk 0xC9: Motion Metadata (v2)
+// ------------------------------------------------------------------------
+
+// XSM Info Chunk v2 - FIXED structure matching actual file format
+typedef struct {
+    float  unused_1_0;           // Usually 1.0
+    float  maxAcceptableError;   // Large float value
+    int    fps;                  // Frames per second (e.g., 30)
+    ubyte  exporterMajorVersion;
+    ubyte  exporterMinorVersion;
+    ubyte  pad[2];
+    XacString sourceApp;
+    XacString originalFileName;
+    XacString exportDate;
+    XacString motionName;
+} XsmInfo2 <read=ReadXsmInfo2, optimize=false>;
+
+string ReadXsmInfo2(XsmInfo2 &info) {
+    if (exists(info.motionName.data))
+        return info.motionName.data;
+    return "";
+}
+
+// ------------------------------------------------------------------------
+// Chunk 0xCA: Skeletal Motion (v2)
+// ------------------------------------------------------------------------
+
+// --- Keyframe Structs &Read Functions ---
+typedef struct {
+    FileVector3  pos;
+    float time;
+} PosKey <read=ReadPosKey, optimize=false>;
+
+string ReadPosKey(PosKey &k) {
+    local string s;
+    SPrintf(s, "t=%.3fs pos=(%.2f,%.2f,%.2f)", k.time, k.pos.x, k.pos.y, k.pos.z);
+    return s;
+}
+
+typedef struct {
+    File16Quaternion rot;
+    float  time;
+} RotKey <read=ReadRotKey, optimize=false>;
+
+string ReadRotKey(RotKey &k) {
+    local string s;
+    SPrintf(s, "t=%.3fs", k.time);
+    return s;
+}
+
+typedef struct {
+    FileVector3  scale;
+    float time;
+} ScaleKey <read=ReadScaleKey, optimize=false>;
+
+string ReadScaleKey(ScaleKey &k) {
+    local string s;
+    SPrintf(s, "t=%.3fs scale=(%.2f,%.2f,%.2f)", k.time, k.scale.x, k.scale.y, k.scale.z);
+    return s;
+}
+
+typedef struct {
+    File16Quaternion rot;
+    float  time;
+} ScaleRotKey <read=ReadScaleRotKey, optimize=false>;
+
+string ReadScaleRotKey(ScaleRotKey &k) {
+    local string s;
+    SPrintf(s, "t=%.3fs", k.time);
+    return s;
+}
+
+// SkeletalSubMotion
+typedef struct(uint parentStart) {
+    // Printf is useful for debugging the template itself
+    // local int64 currentPos = FTell();
+    // Printf("  - Parsing SubMotion at offset 0x%LX\n", currentPos - parentStart);
+
+    File16Quaternion  poseRot;
+    File16Quaternion  bindPoseRot;
+    File16Quaternion  poseScaleRot;
+    File16Quaternion  bindPoseScaleRot;
+    FileVector3    posePos;
+    FileVector3    poseScale;
+    FileVector3    bindPosePos;
+    FileVector3    bindPoseScale;
+
+    uint    numPosKeys;
+    uint    numRotKeys;
+    uint    numScaleKeys;
+    uint    numScaleRotKeys;
+    float   maxError;
+
+    XacString  nodeName;
+
+    if (numPosKeys > 0)      PosKey      posKeys[numPosKeys];
+    if (numRotKeys > 0)      RotKey      rotKeys[numRotKeys];
+    if (numScaleKeys > 0)    ScaleKey    scaleKeys[numScaleKeys];
+    if (numScaleRotKeys > 0) ScaleRotKey scaleRotKeys[numScaleRotKeys] <comment="Scale Rotation keys are usually empty">;
+        
+} SkeletalSubMotion <read=ReadSkeletalSubMotion, optimize=false>;
+
+string ReadSkeletalSubMotion(SkeletalSubMotion &m) {
+    local string s;
+    local string name = readXacString(m.nodeName);
+    SPrintf(s, "'%s' (Pos: %d, Rot: %d, Scale: %d)",
+            name, m.numPosKeys, m.numRotKeys, m.numScaleKeys);
+    return s;
+}
+
+
+// --- Main SkeletalMotion Chunk ---
+typedef struct {
+    local int64 start = FTell();
+    uint numSubMotions;
+
+    SkeletalSubMotion subMotions(start)[numSubMotions];
+
+} Chunk_SkeletalMotion_v2 <read=ReadChunkSkeletalMotion, optimize=false>;
+
+string ReadChunkSkeletalMotion(Chunk_SkeletalMotion_v2 &m) {
+    string s;
+    SPrintf(s, "%d Animation Tracks", m.numSubMotions);
+    return s;
+}

@@ -35,7 +35,7 @@ namespace Melia.Shared.Data.Database
 	public class SessionObjectDb : DatabaseJsonIndexed<int, SessionObjectData>
 	{
 		/// <summary>
-		/// Returns first skill data entry with given class name, or null
+		/// Returns first session object data entry with given class name, or null
 		/// if it wasn't found.
 		/// </summary>
 		/// <param name="className"></param>
@@ -43,6 +43,18 @@ namespace Melia.Shared.Data.Database
 		public SessionObjectData Find(string className)
 		{
 			return this.Entries.Values.FirstOrDefault(a => a.ClassName == className);
+		}
+
+		/// <summary>
+		/// Returns first skill data entry with given class name, or null
+		/// if it wasn't found.
+		/// </summary>
+		/// <param name="className"></param>
+		/// <returns></returns>
+		public bool TryFind(string className, out SessionObjectData sessionObjectData)
+		{
+			sessionObjectData = this.Entries.Values.FirstOrDefault(a => a.ClassName == className);
+			return sessionObjectData != null;
 		}
 
 		/// <summary>

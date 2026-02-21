@@ -1,0 +1,34 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.1 Binary Template
+//
+//      File: ZC_WEEKLY_BOSS_RANKING_REWARD_LIST.bt
+//   Authors: Salman T. Khan
+//   Version: i395869
+//   Purpose: Sends the item rewards for a specific rank achieved in boss battle.
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+typedef struct
+{
+    lpString itemClassName;
+    int amount;
+} RewardItem <optimize=false>;
+
+typedef struct
+{
+    int rank;
+    int count;
+    RewardItem rewardItem[count];
+} RewardEntry <optimize=false>;
+
+ServerHeaderDynamic header;
+
+int weekNum;
+int count;
+
+RewardEntry rewardEntry[count];

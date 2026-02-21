@@ -68,7 +68,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.OutLaw
 				// For Pain Barrier buff, the maximum increase is 2 seconds
 				if (target.TryGetActiveAbilityLevel(AbilityId.Outlaw12, out var level))
 				{
-					buff.ExtendDuration(TimeSpan.FromSeconds(Math.Max(level, 2)));
+					buff.ExtendDuration();
 				}
 			}
 		}

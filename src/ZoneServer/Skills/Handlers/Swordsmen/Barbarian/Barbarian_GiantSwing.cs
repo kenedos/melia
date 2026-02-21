@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 	/// Handler for the Barbarian skill Giant Swing.
 	/// </summary>
 	[SkillHandler(SkillId.Barbarian_GiantSwing)]
-	public class Barbarian_GiantSwing : IGroundSkillHandler
+	public class Barbarian_GiantSwing : IMeleeGroundSkillHandler
 	{
 		public const float TossDistance = 150;
 		public const float ChainLength = 80;
@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
@@ -42,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 				return;
 			}
 
-			var chainPos = caster.Position.GetRelative2D(caster.Direction, ChainLength);
+			var chainPos = caster.Position.GetRelative(caster.Direction, ChainLength);
 			if (!caster.Map.Ground.IsValidPosition(chainPos))
 			{
 				caster.ServerMessage(Localization.Get("Invalid Location."));
@@ -78,7 +78,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			if (!targets.Any())
 			{
@@ -95,7 +95,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			target.AddState(StateType.Stunned);
 
 			Send.ZC_NORMAL.PlayEffect(target, "F_hit_bad", 0.7f);
-			Send.ZC_ATTACH_TO_OBJ(target, caster, "Bone_chain13", "ChainTest", TimeSpan.Zero, 100, null, 0, 0, 0);
+			Send.ZC_ATTACH_TO_OBJ(target, caster, "Bone_chain13", "ChainTest", 0, 100, 0, 0);
 
 			await Task.Delay(rotateDelay);
 
@@ -113,7 +113,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			caster.TurnTowards(chainDirection);
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
 
-			Send.ZC_ATTACH_TO_OBJ(target, null, null, null, TimeSpan.Zero, 0, null, 0, 0, 0);
+			Send.ZC_ATTACH_TO_OBJ(target, null, null, null, 0, 0, 0, 0);
 			Send.ZC_NORMAL.ClearEffects(target);
 
 			target.RemoveState(StateType.Stunned);
@@ -121,7 +121,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 
 			this.Hit(skill, caster, target);
 
-			var targetPos = caster.Position.GetRelative2D(chainDirection, TossDistance);
+			var targetPos = caster.Position.GetRelative(chainDirection, TossDistance);
 			targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 			target.Position = targetPos;
 
@@ -156,7 +156,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+			skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 			skillHit.ApplyKnockBack(target);
 
 			Send.ZC_SKILL_HIT_INFO(caster, skillHit);

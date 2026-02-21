@@ -52,7 +52,7 @@ public class SummoningItemScripts : GeneralScript
 			}
 		}
 
-		var monster = CreateMonster(monsterData.Id, MonsterType.NPC, "BasicMonster", character);
+		var monster = CreateMonster(monsterData.Id, RelationType.Neutral, "BasicMonster", character);
 		monster.Components.Get<AiComponent>()?.Script.SetMaster(character);
 		character.Map.AddMonster(monster);
 
@@ -75,7 +75,7 @@ public class SummoningItemScripts : GeneralScript
 			return ItemUseResult.Fail;
 		}
 
-		var monster = CreateMonster(monsterData.Id, MonsterType.Mob, "BasicMonster", character);
+		var monster = CreateMonster(monsterData.Id, RelationType.Enemy, "BasicMonster", character);
 		character.Map.AddMonster(monster);
 
 		var worldconf = ZoneServer.Instance.Conf.World;
@@ -113,7 +113,7 @@ public class SummoningItemScripts : GeneralScript
 			}
 		}
 
-		var monster = CreateMonster(monsterClassId, MonsterType.NPC, "BasicMonster", character);
+		var monster = CreateMonster(monsterClassId, RelationType.Neutral, "BasicMonster", character);
 		monster.Components.Get<AiComponent>()?.Script.SetMaster(character);
 
 		if (character.Variables.Perm.TryGet<DateTime>("Melia.BlueOrbSummon.DisappearTime", out disappearTime))
@@ -159,14 +159,14 @@ public class SummoningItemScripts : GeneralScript
 	/// <param name="aiName">The name of the AI to use for the monster.</param>
 	/// <param name="itemUser">The character that spawned the monster, used as reference for position and property overrides.</param>
 	/// <returns></returns>
-	private static Mob CreateMonster(int monsterClassId, MonsterType monsterType, string aiName, Character itemUser)
+	private static Mob CreateMonster(int monsterClassId, RelationType monsterType, string aiName, Character itemUser)
 	{
 		var pos = GetRandomSpawnPosition(itemUser);
 
 		var monster = new Mob(monsterClassId, monsterType);
 		monster.Position = itemUser.Position;
 
-		if (!ZoneServer.Instance.Conf.World.BlueOrbPetSystem || monsterType == MonsterType.Mob)
+		if (!ZoneServer.Instance.Conf.World.BlueOrbPetSystem || monsterType == RelationType.Enemy)
 			monster.DisappearTime = DateTime.Now + TimeSpan.FromSeconds(180);
 
 		if (itemUser.Map.TryGetPropertyOverrides(monsterClassId, out var propertyOverrides))

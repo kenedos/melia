@@ -15,7 +15,7 @@
 
 ServerHeaderDynamic header;
 
-int i0; // 90, rank week?
+int weekNum; // 90, rank week?
 int count; // count
 
 typedef struct

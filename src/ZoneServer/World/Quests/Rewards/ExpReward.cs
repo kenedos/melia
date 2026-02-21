@@ -24,6 +24,16 @@ namespace Melia.Zone.World.Quests.Rewards
 		public override string Icon => "expup_img";
 
 		/// <summary>
+		/// Creates a quest reward for EXP and Job EXP.
+		/// </summary>
+		/// <param name="expAmount"></param>
+		public ExpReward(long expAmount)
+		{
+			this.ExpAmount = expAmount;
+			this.JobExpAmount = expAmount;
+		}
+
+		/// <summary>
 		/// Creates a quest reward for EXP.
 		/// </summary>
 		/// <param name="expAmount"></param>

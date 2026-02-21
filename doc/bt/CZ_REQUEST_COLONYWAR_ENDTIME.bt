@@ -1,0 +1,16 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: CZ_REQUEST_COLONYWAR_ENDTIME.bt
+//   Authors: Salman T. Khan
+//   Version: i386576
+//   Purpose: Seen with GTW (Sent every 5 seconds)
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;

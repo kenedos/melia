@@ -1,4 +1,6 @@
-﻿namespace Melia.Shared.Network.Crypto
+﻿using System;
+
+namespace Melia.Shared.Network.Crypto
 {
 	/// <summary>
 	/// Encrypter/decrypter for the network protocol.
@@ -82,6 +84,7 @@
 		#endregion
 
 		public readonly Blowfish _bf;
+		public readonly Blowfish _patchBF;
 
 		/// <summary>
 		/// Creates new instance.
@@ -89,6 +92,13 @@
 		public Codec()
 		{
 			_bf = new Blowfish(SBox, Key);
+
+			uint[] patchSBox = new uint[1042];
+			for (var i = 0; i < patchSBox.Length; i++)
+			{
+				patchSBox[i] = 0x5F5F5F5F;
+			}
+			_patchBF = new Blowfish(patchSBox);
 		}
 
 		/// <summary>
@@ -131,6 +141,72 @@
 		public void Encrypt(byte[] packet)
 		{
 			_bf.Encipher(packet, 0, packet.Length);
+		}
+
+		/// <summary>
+		/// Decrypts an encrypted file and returns a byte array for the result.
+		/// </summary>
+		/// <param name="data"></param>
+		public byte[] DecryptFile(byte[] data)
+		{
+			var unencryptedSize = BitConverter.ToInt32(data, 0);
+			var encryptedSize = BitConverter.ToInt32(data, 4);
+
+			_patchBF.Decipher(data, 8, encryptedSize);
+
+			var buffer = new byte[unencryptedSize];
+			Buffer.BlockCopy(data, 8, buffer, 0, buffer.Length);
+			return buffer;
+		}
+
+		/// <summary>
+		/// Encrypts an unencrypted byte array and returns the result.
+		/// </summary>
+		/// <param name="data"></param>
+		public byte[] EncryptFile(byte[] data)
+		{
+			var unencryptedSize = data.Length;
+			var paddedSize = (unencryptedSize % 8 == 0) ? unencryptedSize : ((unencryptedSize / 8) + 1) * 8;
+			var paddedData = new byte[paddedSize];
+
+			Buffer.BlockCopy(data, 0, paddedData, 0, unencryptedSize);
+
+			_patchBF.Encipher(paddedData, 0, paddedSize);
+
+			var buffer = new byte[paddedSize + 8];
+			Buffer.BlockCopy(BitConverter.GetBytes(unencryptedSize), 0, buffer, 0, 4);
+			Buffer.BlockCopy(BitConverter.GetBytes(paddedSize), 0, buffer, 4, 4);
+			Buffer.BlockCopy(paddedData, 0, buffer, 8, paddedSize);
+
+			return buffer;
+		}
+
+		/// <summary>
+		/// Encrypts a unencrypted file and returns a byte array for the result.
+		/// </summary>
+		/// <param name="data"></param>
+		public byte[] EncryptFile_Old(byte[] data)
+		{
+			var unencryptedSize = data.Length;
+			var encryptedSize = unencryptedSize;
+			if (encryptedSize % 8 != 0)
+				encryptedSize += 8 - (unencryptedSize % 8);
+
+			var buffer = new byte[encryptedSize + 8];
+
+			Buffer.BlockCopy(BitConverter.GetBytes(unencryptedSize), 0, buffer, 0, 4);
+			Buffer.BlockCopy(BitConverter.GetBytes(encryptedSize), 0, buffer, 4, 4);
+			Buffer.BlockCopy(data, 0, buffer, 8, data.Length);
+
+			_patchBF.Encipher(buffer, 8, encryptedSize);
+
+			var buffer2 = new byte[buffer.Length];
+
+			Buffer.BlockCopy(BitConverter.GetBytes(unencryptedSize), 0, buffer2, 0, 4);
+			Buffer.BlockCopy(BitConverter.GetBytes(encryptedSize), 0, buffer2, 4, 4);
+			Buffer.BlockCopy(buffer, 8, buffer2, 8, buffer.Length - 8);
+
+			return buffer2;
 		}
 	}
 }

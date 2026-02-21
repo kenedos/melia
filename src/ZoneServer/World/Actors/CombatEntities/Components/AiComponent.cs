@@ -20,12 +20,29 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="entity"></param>
 		/// <param name="aiName"></param>
 		/// <exception cref="ArgumentException"></exception>
-		public AiComponent(ICombatEntity entity, string aiName) : base(entity)
+		public AiComponent(ICombatEntity entity, string aiName, ICombatEntity owner = null) : base(entity)
 		{
 			if (!AiScript.TryCreate(aiName, entity, out var aiScript))
 				throw new ArgumentException($"No AI script with name '{aiName}' exists.");
 
 			this.Script = aiScript;
+			if (aiName.Contains("_Debug"))
+				aiScript.ShowDebug = true;
+			if (owner != null)
+				this.Script.SetMaster(owner);
+		}
+
+		/// <summary>
+		/// Creates new component and loads the given AI script.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="aiName"></param>
+		/// <exception cref="ArgumentException"></exception>
+		public AiComponent(ICombatEntity entity, AiScript aiScript, ICombatEntity owner = null) : base(entity)
+		{
+			this.Script = aiScript;
+			if (owner != null)
+				this.Script.SetMaster(owner);
 		}
 
 		/// <summary>

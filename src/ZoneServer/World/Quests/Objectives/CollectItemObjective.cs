@@ -1,4 +1,5 @@
 ﻿using System;
+using Melia.Zone.Events;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.World.Actors.Characters;
 
@@ -22,7 +23,22 @@ namespace Melia.Zone.World.Quests.Objectives
 		/// <param name="amount"></param>
 		public CollectItemObjective(int itemId, int amount)
 		{
+			if (!ZoneServer.Instance.Data.ItemDb.TryFind(itemId, out var data))
+				throw new ArgumentException($"CollectItemObjective: Unknown item '{itemId}'.");
 			this.ItemId = itemId;
+			this.TargetCount = amount;
+		}
+
+		/// <summary>
+		/// Creates new instance.
+		/// </summary>
+		/// <param name="itemId"></param>
+		/// <param name="amount"></param>
+		public CollectItemObjective(string itemId, int amount)
+		{
+			if (!ZoneServer.Instance.Data.ItemDb.TryFind(itemId, out var data))
+				throw new ArgumentException($"CollectItemObjective: Unknown item '{itemId}'.");
+			this.ItemId = data.Id;
 			this.TargetCount = amount;
 		}
 
@@ -48,10 +64,10 @@ namespace Melia.Zone.World.Quests.Objectives
 		/// Called when a player gets and starts a quest with this objective.
 		/// </summary>
 		/// <param name="character"></param>
-		/// <param name="newQuest"></param>
-		public override void OnStart(Character character, Quest newQuest)
+		/// <param name="quest"></param>
+		public override void OnStart(Character character, Quest quest)
 		{
-			newQuest.UpdateObjectives<CollectItemObjective>((quest, objective, progress) =>
+			quest.UpdateObjectives<CollectItemObjective>((quest, objective, progress) =>
 			{
 				progress.Count = Math.Min(objective.TargetCount, character.Inventory.CountItem(objective.ItemId));
 				progress.Done = progress.Count >= objective.TargetCount;

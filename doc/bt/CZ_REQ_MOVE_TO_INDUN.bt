@@ -13,7 +13,13 @@
 
 #include "inc/common.bt"
 
+enum DungeonEnterType
+{
+    None,
+    EnterNow,
+    AutoMatch,
+    AutoMatchWithParty
+};
+
 ClientHeaderFixed header;
-int i1; // 2
-int i2; // 0
-short s1; //
+DungeonEnterType enterType; // 2

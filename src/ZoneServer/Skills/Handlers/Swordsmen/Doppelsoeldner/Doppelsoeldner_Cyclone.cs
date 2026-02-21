@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,9 +20,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	/// Handler for the Doppelsoldner skill Cyclone.
 	/// </summary>
 	[SkillHandler(SkillId.Doppelsoeldner_Cyclone)]
-	public class Doppelsoeldner_Cyclone : IGroundSkillHandler, IDynamicCasted
+	public class Doppelsoeldner_Cyclone : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StartBuff(BuffId.Cyclone_EnableMovingShot_Buff, 1, 0, TimeSpan.Zero, caster);
 
@@ -42,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopBuff(BuffId.Cyclone_EnableMovingShot_Buff);
 			caster.StopBuff(BuffId.Cyclone_Buff_ImmuneAbil);
@@ -62,8 +63,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -109,7 +111,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 
 				var splashParam = skill.GetSplashParameters(caster, caster.Position, caster.Position, length: 0, width: attackWidth, angle: 0);
 				var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-				var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 				foreach (var target in targets.LimitBySDR(caster, skill))
 				{

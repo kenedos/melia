@@ -53,7 +53,7 @@ namespace Melia.Shared.Network
 			var op = packet.Op;
 
 			// Get size from table
-			var tableSize = Op.GetSize(op);
+			var tableSize = OpTable.GetSize(op);
 			if (tableSize == -1)
 				throw new ArgumentException("Size for op '" + packet.Op.ToString("X4") + "' unknown.");
 
@@ -75,7 +75,7 @@ namespace Melia.Shared.Network
 				// rather not do that.
 				if (packetSize > tableSize)
 				{
-					Log.Warning("Packet is bigger than specified in the packet size table. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, fixHeaderSize, tableSize, Op.GetName(op));
+					Log.Warning("Packet is bigger than specified in the packet size table. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, fixHeaderSize, tableSize, OpTable.GetName(op));
 					throw new Exception("Packet is bigger than specified in the packet size table. (op: {3} ({0:X4}), size: {1}, expected: {2})");
 				}
 
@@ -85,7 +85,7 @@ namespace Melia.Shared.Network
 				// terminate the connection.
 				if (packetSize < tableSize)
 				{
-					Log.Warning("Packet size doesn't match packet table size. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, packetSize, tableSize, Op.GetName(op));
+					Log.Warning("Packet size doesn't match packet table size. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, packetSize, tableSize, OpTable.GetName(op));
 					packetSize = tableSize;
 				}
 			}
@@ -137,7 +137,7 @@ namespace Melia.Shared.Network
 					if (_bytesReceived == _headerLength)
 					{
 						var opCode = BitConverter.ToUInt16(_headerBuffer, 0);
-						var messageSize = Op.GetSize(opCode);
+						var messageSize = OpTable.GetSize(opCode);
 
 						// If the packet size is 0, the size is dynamic and
 						// we have to read it from the packet. Increase the

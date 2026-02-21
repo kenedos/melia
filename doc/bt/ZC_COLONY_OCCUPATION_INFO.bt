@@ -15,8 +15,8 @@
 
 typedef struct
 {
-    int64 l1;
-    short s1;
+    int64 guildId;
+    short mapId;
     char guildName[54];
 } ColonyOccupationInfo <optimize=false>;
 

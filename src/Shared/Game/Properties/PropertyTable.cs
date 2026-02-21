@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Melia.Shared.Data.Database;
 
 namespace Melia.Shared.Game.Properties
@@ -43,6 +44,20 @@ namespace Melia.Shared.Game.Properties
 		}
 
 		/// <summary>
+		/// Returns true if the property exists in the any namespace.
+		/// </summary>
+		/// <param name="namespaceName"></param>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
+		public static bool Exists(string propertyName)
+		{
+			if (!Loaded)
+				throw new InvalidOperationException("Properties not loaded.");
+
+			return NsNames.Values.Any(ns => ns.ContainsKey(propertyName));
+		}
+
+		/// <summary>
 		/// Returns true if the property exists in the given namespace.
 		/// </summary>
 		/// <param name="namespaceName"></param>
@@ -58,6 +73,7 @@ namespace Melia.Shared.Game.Properties
 
 			return ns.ContainsKey(propertyName);
 		}
+
 		/// <summary>
 		/// Returns the id of the given property in the given namespace.
 		/// </summary>

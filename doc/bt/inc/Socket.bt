@@ -1,0 +1,36 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: SocketInfo.bt
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+
+typedef struct
+{
+    short index;
+    int64 worldId;
+    int exp;
+    int i2;
+    int itemId;
+    int i4;
+    short s1;
+    short propertiesSize;
+    int i5;
+    if (i5 > 0)
+    {
+        local int i = 0;
+        for (i = 0; i < i5; i++)
+        {
+            lpString str1;
+            lpString str2;
+            int i6;
+        }
+    }
+} SocketInfo <optimize=false>;

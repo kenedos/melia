@@ -1,0 +1,112 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: XPM.bt
+//   Authors: AI Assistant
+//   Version: 3.0 (Corrected)
+//   Purpose: Parses XPM (Progressive Morph Motion) files.
+//  Category: 3D Animation
+// File Mask: *.xpm
+//  ID Bytes: 58 50 4D 20 // "XPM "
+//   History:
+//   3.0 2024-05-23 - Corrected format based on official XPMFileFormat.h header.
+//   2.0 2024-05-22 - Refactored to include a comprehensive EmotionFX.bt file.
+//   1.0 2024-05-22 - Initial version.
+//------------------------------------------------
+
+// --- Main Setup ---
+LittleEndian();
+#include "inc/EmotionFX.bt" // Include all shared structs and functions
+
+//------------------------------------------------
+//--- XPM Specific Definitions
+//------------------------------------------------
+
+// Define a local enum for the chunk IDs found in XPM files.
+typedef enum <uint> {
+    XPM_CHUNK_SUBMOTION         = 100,
+    XPM_CHUNK_INFO              = 101,
+    XPM_CHUNK_MOTIONEVENTTABLE  = 50, // Reuses shared ID
+    XPM_CHUNK_SUBMOTIONS        = 102,
+} XpmChunkID;
+
+// Define the XPM specific header.
+typedef struct {
+    char    fourcc[4];
+    ubyte   hiVersion;
+    ubyte   loVersion;
+    ubyte   endianType;
+    ubyte   mulOrder; // Corresponds to MatrixMulOrder
+} XpmHeader <read=readXpmHeader, optimize=false>;
+
+// Define a local FileChunk struct that uses our XpmChunkID enum.
+typedef struct {
+    XpmChunkID chunk_id;
+    uint size_in_bytes, version;
+} XpmFileChunk <read=readXpmFileChunk, optimize=false>;
+
+//------------------------------------------------
+//--- XPM Specific Read Functions
+//------------------------------------------------
+string readXpmHeader(XpmHeader &h) {
+    return Str("Magic: %s, Version: %d.%d, Endian: %s", h.fourcc, h.hiVersion, h.loVersion, h.endianType == 0 ? "Little" : "Big");
+}
+
+string readXpmFileChunk(XpmFileChunk &c) {
+    return Str("ID: %s, Version: %d, Size: %d", EnumToString(c.chunk_id), c.version, c.size_in_bytes);
+}
+
+//------------------------------------------------
+//--- Main File Parsing Logic
+//------------------------------------------------
+
+// --- Read Header and Validate ---
+XpmHeader header <name="XPM File Header">;
+if (header.fourcc != "XPM ") {
+    Warning("File does not appear to be an XPM file. Expected 'XPM ' signature.");
+    return -1;
+}
+
+// Read chunks until the end of the file.
+local int64 current_chunk_pos, chunk_data_end;
+while (!FEof()) {
+    current_chunk_pos = FTell();
+    if (current_chunk_pos >= FileSize()) break;
+
+    XpmFileChunk chunk;
+    chunk_data_end = current_chunk_pos + 12 + chunk.size_in_bytes;
+    Printf("Parsing Chunk: %s\n", readXpmFileChunk(chunk));
+
+    // All struct definitions are in EmotionFX.bt
+    switch (chunk.chunk_id) {
+        case XPM_CHUNK_INFO:
+            if (chunk.version == 1) XPM_Info info;
+            else Warning("Unknown XPM_CHUNK_INFO version %d", chunk.version);
+            break;
+
+        case XPM_CHUNK_SUBMOTIONS:
+            if (chunk.version == 1) XPM_SubMotions subMotions;
+            else Warning("Unknown XPM_CHUNK_SUBMOTIONS version %d", chunk.version);
+            break;
+        
+        // Note: XPM_CHUNK_SUBMOTION (100) is deprecated and handled by the container chunk 102.
+        // If a file used it, it would contain a single XPM_ProgressiveSubMotion.
+        case XPM_CHUNK_SUBMOTION:
+             if (chunk.version == 1) XPM_ProgressiveSubMotion subMotion;
+             else Warning("Unsupported legacy XPM_CHUNK_SUBMOTION found.");
+             break;
+
+        default:
+            Warning("Unknown or unhandled chunk ID %d found.", chunk.chunk_id);
+            break;
+    }
+
+    // Ensure we are at the start of the next chunk for robust parsing.
+    if (FTell() != chunk_data_end) {
+        Warning("Parser position mismatch after chunk %s. Expected 0x%LX, but at 0x%LX. Correcting.",
+            EnumToString(chunk.chunk_id), chunk_data_end, FTell());
+        FSeek(chunk_data_end);
+    }
+}
+
+Printf("--- End of File Reached ---\n");

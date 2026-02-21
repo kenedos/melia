@@ -1,0 +1,2 @@
+ALTER TABLE `companions` ADD COLUMN `level` int(11) NOT NULL DEFAULT '1';
+ALTER TABLE `companions` ADD COLUMN `maxExp` BIGINT(20) NOT NULL DEFAULT '1000';

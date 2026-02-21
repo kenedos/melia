@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -15,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 	/// Handler for the Cleric skill Cure.
 	/// </summary>
 	[SkillHandler(SkillId.Cleric_Cure)]
-	public class Cleric_Cure : IGroundSkillHandler
+	public class Cleric_Cure : IMeleeGroundSkillHandler
 	{
 		private const float RemoveChancePerLevel = 10; // %
 
@@ -26,8 +27,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

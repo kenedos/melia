@@ -19,10 +19,10 @@ ServerHeaderFixed header;
 int handle;
 int packetString; // 600262
 position pos;
-float f1; // 1
-float f2; // 0
-float f3; // 0
-float f4; // 0
+float scale; // 1
+float duration; // 0
+float delay; // 0
+float angle; // 0
 //short s1;
 short s1; // 0
 short s2; // -2

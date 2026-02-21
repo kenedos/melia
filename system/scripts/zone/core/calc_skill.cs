@@ -10,10 +10,12 @@ using Melia.Shared.Game.Const;
 using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Yggdrasil.Logging;
 
 public class SkillCalculationsScript : GeneralScript
 {
@@ -23,7 +25,7 @@ public class SkillCalculationsScript : GeneralScript
 	/// <param name="skill"></param>
 	/// <returns></returns>
 	[ScriptableFunction]
-	public float SCR_GET_SR_LV(Skill skill)
+	public float SCR_Get_SR_LV(Skill skill)
 	{
 		var baseValue = skill.Properties.GetFloat(PropertyName.SklSR);
 
@@ -34,6 +36,35 @@ public class SkillCalculationsScript : GeneralScript
 		return Math.Max(1, baseValue + byOwner);
 	}
 
+
+	/// <summary>
+	/// Returns the effective skill level, accounting for fixed levels
+	/// and bonus levels from buffs/gems.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_SkillLv(Skill skill)
+	{
+		var fixedLevel = skill.Vars.GetFloat("FixedLevel");
+		if (fixedLevel > 0)
+			return fixedLevel;
+
+		var value = skill.Properties.GetFloat(PropertyName.LevelByDB, 1);
+
+		if (!skill.IsExpertSkill || !skill.LimitedInstanceLevelUp)
+			value += skill.Properties.GetFloat(PropertyName.Level_BM, 0);
+
+		value += skill.Properties.GetFloat(PropertyName.GemLevel_BM, 0);
+
+		if (value == 0)
+			return 0;
+
+		if (value < 1)
+			value = 1;
+
+		return value;
+	}
 
 	/// <summary>
 	/// Returns skill factor, which is a multiplier typically applied
@@ -80,7 +111,7 @@ public class SkillCalculationsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Returns skill's skill factor, which in most cases in equivilant
+	/// Returns skill's skill factor, which in most cases in equivalent
 	/// to the skill's damage in percentage.
 	/// </summary>
 	/// <example>
@@ -182,6 +213,27 @@ public class SkillCalculationsScript : GeneralScript
 
 		var byAbilityRate = 0; // TODO: Add ability multiplier support
 		value += value * (byAbilityRate / 100f);
+
+		return (int)Math.Max(0, value);
+	}
+
+	/// <summary>
+	/// Returns the amount of SP spent when using a magic skill,
+	/// applying buff modifiers.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_SpendSP_Magic(Skill skill)
+	{
+		var value = SCR_Get_SpendSP(skill);
+		var owner = skill.Owner;
+
+		if (owner.IsBuffActive(BuffId.Wizard_Wild_buff))
+			return (int)MathF.Floor(value * 1.5f);
+
+		if (owner.IsBuffActive(BuffId.MalleusMaleficarum_Debuff))
+			return (int)MathF.Floor(value * 2);
 
 		return (int)Math.Max(0, value);
 	}
@@ -395,9 +447,25 @@ public class SkillCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_GET_ShootTime(Skill skill)
 	{
-		var sklSpdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate);
+		var sklSpdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate, 1);
 		var baseValue = skill.Data.ShootTime.TotalMilliseconds;
 
 		return (float)(baseValue / sklSpdRate);
+	}
+
+	/// <summary>
+	/// Calculates and returns the skill's cooldown time in milliseconds.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_COOLDOWN(Skill skill)
+	{
+		var basicCooldown = (float)skill.Data.CooldownTime.TotalMilliseconds;
+
+		if (skill.Data.Tags.Has(SkillTag.BasicSkill))
+			return basicCooldown;
+
+		return (int)Math.Floor(Math.Floor(basicCooldown / 1000f) * 1000f);
 	}
 }

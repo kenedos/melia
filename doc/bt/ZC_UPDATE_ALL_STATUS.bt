@@ -9,6 +9,7 @@
 // File Mask: 
 //  ID Bytes: 
 //   History: 
+//   - i336041: sp and maxSp is an int
 //------------------------------------------------
 
 #include "inc/common.bt"

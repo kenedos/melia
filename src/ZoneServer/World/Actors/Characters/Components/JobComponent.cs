@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Versioning;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Actors.Characters.Components
@@ -17,6 +19,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private static readonly Regex JobClassName = new(@"^Char(?<class>[1-4])_(?<index>[0-9]{1,2})$", RegexOptions.Compiled);
 
 		private readonly Dictionary<JobId, Job> _jobs = new();
+
+		// Cache for job ranks, invalidated when jobs are added/removed
+		private Dictionary<JobId, int> _jobRanks = null;
 
 		/// <summary>
 		/// Creates new instance for character.
@@ -39,7 +44,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public void AddSilent(Job job)
 		{
 			lock (_jobs)
+			{
 				_jobs[job.Id] = job;
+				_jobRanks = null; // Invalidate rank cache
+			}
 		}
 
 		/// <summary>
@@ -50,7 +58,13 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public void Add(Job job)
 		{
 			this.AddSilent(job);
+			Send.ZC_PC(this.Character, PcUpdateType.Job, (int)job.Id, 0);
 			Send.ZC_NORMAL.UpdateSkillUI(this.Character);
+			this.Character.Properties.SetFloat(PropertyName.Job, (int)job.Id);
+			Send.ZC_OBJECT_PROPERTY(this.Character, PropertyName.JobName);
+			this.Character.AddonMessage(AddonMessage.JOB_UPDATE);
+			this.Character.InvalidateProperties();
+			//this.Character.AddonMessage(AddonMessage.START_JOB_CHANGE);
 		}
 
 		/// <summary>
@@ -66,6 +80,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				var removed = _jobs.Remove(jobId);
 				if (!removed)
 					return false;
+
+				_jobRanks = null; // Invalidate rank cache
 
 				// Switch character's job to another one if the active
 				// one was removed. We'll use the last one in the list
@@ -91,7 +107,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// XXX: Seems like this is not enough to get rid of the jobs at
 			//   run-time. Is there a way for us to refresh the UI?
+			Send.ZC_PC(this.Character, PcUpdateType.Job, (int)this.Character.JobId, _jobs.Last().Value.SkillPoints);
 			Send.ZC_NORMAL.UpdateSkillUI(this.Character);
+			this.Character.AddonMessage(AddonMessage.JOB_UPDATE);
+			this.Character.InvalidateProperties();
 
 			return true;
 		}
@@ -170,6 +189,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// </summary>
 		/// <param name="jobId"></param>
 		/// <param name="circle"></param>
+		/// <remarks>Job Circles are a legacy feature, now jobs don't have circle levels.</remarks>
 		public bool ChangeCircle(JobId jobId, JobCircle circle)
 		{
 			var job = this.Get(jobId);
@@ -251,7 +271,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// which, I assume returns the rank the character is on with its
 		/// jobs, which is kind of based on the amount of jobs, or rather
 		/// the circle sum.
-		/// 
+		///
 		/// For example:
 		/// - Swordman Circle 1 = 1
 		/// - Swordman Circle 2 = 2
@@ -268,8 +288,44 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Even if _jobs is empty right now for some reason, rank 1
 			// is always the minimum.
-
 			return Math.Max(1, rank);
+		}
+
+		/// <summary>
+		/// Returns the rank for a specific job based on its position in
+		/// the character's job progression (ordered by selection date).
+		/// </summary>
+		/// <remarks>
+		/// Each job has its own rank for EXP table lookups:
+		/// - Rank 1: Base Job (e.g., Cleric)
+		/// - Rank 2: First Job Advancement (e.g., Priest)
+		/// - Rank 3: Second Job Advancement (e.g., Paladin)
+		/// This ensures each job uses the correct EXP curve regardless
+		/// of other jobs the character has.
+		/// </remarks>
+		/// <param name="jobId"></param>
+		/// <returns></returns>
+		public int GetJobRank(JobId jobId)
+		{
+			lock (_jobs)
+			{
+				// Build cache if needed
+				if (_jobRanks == null)
+				{
+					_jobRanks = new Dictionary<JobId, int>();
+					var orderedJobs = _jobs.Values.OrderBy(j => j.SelectionDate).ToList();
+					for (var i = 0; i < orderedJobs.Count; i++)
+					{
+						_jobRanks[orderedJobs[i].Id] = i + 1;
+					}
+				}
+
+				if (_jobRanks.TryGetValue(jobId, out var rank))
+					return rank;
+
+				// Job not found, return max rank as fallback
+				return Math.Max(1, _jobRanks.Count);
+			}
 		}
 	}
 
@@ -292,6 +348,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// Gets or sets the circle this job is on.
 		/// </summary>
 		public JobCircle Circle { get; set; }
+
+		public DateTime AdvancementDate { get; set; }
 
 		/// <summary>
 		/// Gets or sets skill points available for this job.
@@ -323,22 +381,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <summary>
 		/// Returns the total maximum EXP that can be collected on this job.
 		/// </summary>
-		public long TotalMaxExp => ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Character.Jobs.GetCurrentRank(), this.MaxLevel);
+		public long TotalMaxExp => ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Character.Jobs.GetJobRank(this.Id), this.MaxLevel);
 
 		/// <summary>
 		/// Returns the level reached on this job based on the
-		/// current rank and total EXP.
+		/// job's individual rank and total EXP.
 		/// </summary>
 		public int Level
 		{
 			get
 			{
-				// TODO: This should be improved, but I'll be lazy
-				//   for the moment, in case all this doesn't work out the
-				//   way I expect it to.
-
-				var jobId = this.Id;
-				var rank = this.Character.Jobs.GetCurrentRank();
+				// Use job-specific rank (position in job progression) for
+				// EXP table lookup, not the global character rank.
+				var rank = this.Character.Jobs.GetJobRank(this.Id);
 				var totalExp = this.TotalExp;
 				var max = this.MaxLevel;
 
@@ -363,14 +418,17 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			get
 			{
-				// If the current rank is 1, we're still on the base job
-				// and this will return 15. If the rank is above 1, it will
-				// return 45, which is the max level for all other ranks.
-				// Maybe it would make more sense to determine the job's
-				// max level based on the rank it was added on.
+				// Use job-specific rank (position in job progression) to
+				// determine max level. Base job (rank 1) caps at 15,
+				// advanced jobs (rank 2+) cap at 45.
+				if (Versions.Client <= KnownVersions.PreReBuild)
+					return 15;
 
-				var rank = this.Character.Jobs.GetCurrentRank();
-				return ZoneServer.Instance.Data.ExpDb.GetMaxJobLevel(rank);
+				var rank = this.Character.Jobs.GetJobRank(this.Id);
+				if (rank > 1)
+					return ZoneServer.Instance.Conf.World.MaxAdvanceJobLevel;
+				else
+					return ZoneServer.Instance.Conf.World.MaxBaseJobLevel;
 			}
 		}
 
@@ -406,6 +464,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			this.Circle = circle;
 			this.SkillPoints = skillPoints;
 			this.TotalExp = totalExp;
+			this.AdvancementDate = DateTime.Now;
 			this.Data = ZoneServer.Instance.Data.JobDb.Find(jobId) ?? throw new ArgumentException($"Unknown job '{jobId}'.");
 		}
 

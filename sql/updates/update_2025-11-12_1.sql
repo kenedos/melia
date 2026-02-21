@@ -1,0 +1,1 @@
+ALTER TABLE `companions` ADD COLUMN `hp` int(11) NOT NULL DEFAULT '0';

@@ -56,7 +56,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 				var center = caster.Position;
 				var splashArea = new Circle(center, radius);
 
-				var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea).LimitRandom(maxTargets);
+				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea).LimitRandom(maxTargets);
 
 				foreach (var target in targets)
 				{

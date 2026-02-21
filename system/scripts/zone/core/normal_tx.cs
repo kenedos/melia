@@ -5,7 +5,10 @@
 //---------------------------------------------------------------------------
 
 using System.Linq;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Properties;
+using Melia.Shared.Versioning;
 using Melia.Zone;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
@@ -72,16 +75,15 @@ public class NormalTxFunctionsScript : GeneralScript
 				break;
 			}
 
-			//characterProperties.UsedStat += stat;
-			character.Properties.Modify("UsedStat", addPoints);
+			character.Properties.Modify(PropertyName.UsedStat, addPoints);
 
 			switch (i)
 			{
-				case 0: character.Properties.Modify("STR_STAT", addPoints); break;
-				case 1: character.Properties.Modify("CON_STAT", addPoints); break;
-				case 2: character.Properties.Modify("INT_STAT", addPoints); break;
-				case 3: character.Properties.Modify("MNA_STAT", addPoints); break;
-				case 4: character.Properties.Modify("DEX_STAT", addPoints); break;
+				case 0: character.Properties.Modify(PropertyName.STR_STAT, addPoints); break;
+				case 1: character.Properties.Modify(PropertyName.CON_STAT, addPoints); break;
+				case 2: character.Properties.Modify(PropertyName.INT_STAT, addPoints); break;
+				case 3: character.Properties.Modify(PropertyName.MNA_STAT, addPoints); break;
+				case 4: character.Properties.Modify(PropertyName.DEX_STAT, addPoints); break;
 			}
 		}
 
@@ -91,16 +93,22 @@ public class NormalTxFunctionsScript : GeneralScript
 		// but presumably the PROP_UPDATE below. Why send more
 		// packets than necessary though?
 		Send.ZC_OBJECT_PROPERTY(character,
-			"STR", "STR_STAT", "CON", "CON_STAT", "INT",
-			"INT_STAT", "MNA", "MNA_STAT", "DEX", "DEX_STAT",
-			"UsedStat", "MINPATK", "MAXPATK", "MINMATK",
-			"MAXMATK", "MINPATK_SUB", "MAXPATK_SUB", "CRTATK",
-			"HR", "DR", "BLK_BREAK", "RHP", "RSP",
-			"MHP", "MSP"
+			PropertyName.STR, PropertyName.STR_STAT, PropertyName.CON, PropertyName.CON_STAT, PropertyName.INT,
+			PropertyName.INT_STAT, PropertyName.MNA, PropertyName.MNA_STAT, PropertyName.DEX, PropertyName.DEX_STAT,
+			PropertyName.UsedStat, PropertyName.MINPATK, PropertyName.MAXPATK, PropertyName.MINMATK,
+			PropertyName.MAXMATK, PropertyName.MINPATK_SUB, PropertyName.MAXPATK_SUB, PropertyName.CRTATK,
+			PropertyName.HR, PropertyName.DR, PropertyName.BLK_BREAK, PropertyName.RHP, PropertyName.RSP,
+			PropertyName.MHP, PropertyName.MSP
 		);
 
 		//Send.ZC_PC_PROP_UPDATE(character, ObjectProperty.PC.STR_STAT, 0);
 		//Send.ZC_PC_PROP_UPDATE(character, ObjectProperty.PC.UsedStat, 0);
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PC", PropertyName.UsedStat), 0);
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PC", PropertyName.STR_STAT), 0);
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PC", PropertyName.CON_STAT), 0);
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PC", PropertyName.INT_STAT), 0);
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PC", PropertyName.DEX_STAT), 0);
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PC", PropertyName.MNA_STAT), 0);
 
 		return NormalTxResult.Okay;
 	}
@@ -124,7 +132,11 @@ public class NormalTxFunctionsScript : GeneralScript
 		// skill, incl. the skills the player shouldn't be able to
 		// put points into yet, so we need to use the job's MaxLevel
 		// for getting all available skills.
-		var skillTreeData = ZoneServer.Instance.Data.SkillTreeDb.FindSkills(job.Id, job.MaxLevel);
+		SkillTreeData[] skillTreeData;
+		if (Versions.Protocol > 500)
+			skillTreeData = ZoneServer.Instance.Data.SkillTreeDb.FindSkills(job.Id, job.MaxLevel);
+		else
+			skillTreeData = ZoneServer.Instance.Data.SkillTreeDb.FindSkills(job.Id, job.Circle);
 		if (amounts.Length != skillTreeData.Length)
 		{
 			Log.Warning("SCR_TX_SKILL_UP: User '{0}' sent an unexpected number of skill level changes. Got {1}, expected {2}.", character.Username, amounts.Length, skillTreeData.Length);
@@ -153,6 +165,10 @@ public class NormalTxFunctionsScript : GeneralScript
 			var currentLevel = character.Skills.GetLevel(skillId);
 			var newLevel = (currentLevel + addLevels);
 
+			// Safety check.
+			if (job.Level < data.UnlockLevel)
+				continue;
+
 			if (newLevel > maxLevel)
 			{
 				// Don't warn about this, since the client doesn't
@@ -171,7 +187,8 @@ public class NormalTxFunctionsScript : GeneralScript
 			}
 			else
 			{
-				skill.Level = newLevel;
+				skill.LevelByDB = newLevel;
+				skill.Properties.InvalidateAll();
 				Send.ZC_OBJECT_PROPERTY(character.Connection, skill);
 			}
 

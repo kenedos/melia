@@ -1,0 +1,104 @@
+// Melia
+// Database file
+//---------------------------------------------------------------------------
+// Item Set Database
+//
+// When a character equips multiple pieces from the same set,
+// they receive bonus effects. The script function handles all
+// piece threshold logic internally.
+//
+// The script is called with (character, setData, oldPieceCount, newPieceCount)
+// when the equipped piece count changes.
+//
+// Format:
+// {
+//   id: <unique set id>,
+//   className: "<set class name>",
+//   name: "<display name>",
+//   items: ["<item1>", "<item2>", ...],
+//   script: { function: "<base script name>" }
+// }
+//
+// The script function (e.g., "SET_CHAR1_1") should be implemented in
+// user/scripts/zone/core/item_sets.cs and handle all threshold bonuses.
+//---------------------------------------------------------------------------
+
+[
+{ id: 1, className: "set_001", name: "Light Plate Set", items: ["LEG02_110", "TOP02_110"], script: { function: "SCR_set_001" } },
+{ id: 2, className: "set_002", name: "Zega Set", items: ["SPR02_106", "TOP02_111"], script: { function: "SCR_set_002" } },
+{ id: 3, className: "set_003", name: "Magi Set", items: ["LEG02_112", "TOP02_112"], script: { function: "SCR_set_003" } },
+{ id: 4, className: "set_004", name: "Jude Set", items: ["LEG02_113", "TOP02_113"], script: { function: "SCR_set_004" } },
+{ id: 5, className: "set_005", name: "Ismin Set", items: ["LEG02_114", "TOP02_114"], script: { function: "SCR_set_005" } },
+{ id: 7, className: "set_007", name: "Cafrisun Set", items: ["HAND02_123", "FOOT02_123", "LEG02_123", "TOP02_123"], script: { function: "SCR_set_007" } },
+{ id: 8, className: "set_008", name: "Riena Set", items: ["TOP02_150", "LEG02_150"], script: { function: "SCR_set_008" } },
+{ id: 9, className: "set_009", name: "Riena Set", items: ["TOP02_151", "LEG02_151"], script: { function: "SCR_set_009" } },
+{ id: 10, className: "set_010", name: "Riena Set", items: ["TOP02_152", "LEG02_152"], script: { function: "SCR_set_010" } },
+{ id: 11, className: "set_011", name: "Watcher Set", items: ["HAND02_153", "FOOT02_153", "LEG02_153", "TOP02_153"], script: { function: "SCR_set_011" } },
+{ id: 12, className: "set_012", name: "Abomination Set", items: ["BRC03_106", "NECK03_105"], script: { function: "SCR_set_012" } },
+{ id: 13, className: "set_013", name: "Earth Cloth Armor Set", items: ["HAND02_154", "FOOT02_154", "LEG02_154", "TOP02_154"], script: { function: "SCR_set_013" } },
+{ id: 14, className: "set_014", name: "Earth Leather Armor Set", items: ["HAND02_155", "FOOT02_155", "LEG02_155", "TOP02_155"], script: { function: "SCR_set_013" } },
+{ id: 15, className: "set_015", name: "Earth Plate Armor Set", items: ["HAND02_156", "FOOT02_156", "LEG02_156", "TOP02_156"], script: { function: "SCR_set_013" } },
+{ id: 16, className: "set_016", name: "Legwyn Family's Cloth Armor Set", items: ["HAND02_157", "FOOT02_157", "LEG02_157", "TOP02_157"], script: { function: "SCR_set_016" } },
+{ id: 17, className: "set_017", name: "Legwyn Family's Leather Armor Set", items: ["HAND02_158", "FOOT02_158", "LEG02_158", "TOP02_158"], script: { function: "SCR_set_016" } },
+{ id: 18, className: "set_018", name: "Legwyn Family's Plate Armor Set", items: ["HAND02_159", "FOOT02_159", "LEG02_159", "TOP02_159"], script: { function: "SCR_set_016" } },
+{ id: 20, className: "set_020", name: "Velnia Monkey Set", items: ["LEG02_187", "TOP02_187"], script: { function: "SCR_set_020" } },
+{ id: 21, className: "set_021", name: "Elgos Set", items: ["HAND02_188", "FOOT02_188", "LEG02_188", "TOP02_188"], script: { function: "SCR_set_021" } },
+{ id: 22, className: "set_022", name: "Ibre Set", items: ["HAND02_189", "FOOT02_189", "LEG02_189", "TOP02_189"], script: { function: "SCR_set_022" } },
+{ id: 23, className: "set_023", name: "Grynas Set", items: ["HAND02_190", "FOOT02_190", "LEG02_190", "TOP02_190"], script: { function: "SCR_set_023" } },
+{ id: 24, className: "set_024", name: "Poratore Set", items: ["BRC03_103", "BRC03_104"], script: { function: "SCR_set_024" } },
+{ id: 25, className: "set_025", name: "Virtov Set", items: ["HAND03_114", "FOOT03_114", "LEG03_114", "TOP03_114"], script: { function: "SCR_set_025" } },
+{ id: 26, className: "set_026", name: "Virtov Leather Set", items: ["HAND03_115", "FOOT03_115", "LEG03_115", "TOP03_115"], script: { function: "SCR_set_026" } },
+{ id: 27, className: "set_027", name: "Virtov Plate Set", items: ["HAND03_116", "FOOT03_116", "LEG03_116", "TOP03_116"], script: { function: "SCR_set_027" } },
+{ id: 28, className: "set_028", name: "Lolopanther Set", items: ["HAND04_106", "FOOT04_106", "LEG04_106", "TOP04_106"], script: { function: "SCR_set_028" } },
+{ id: 29, className: "set_029", name: "Lolopanther Leather Set", items: ["HAND04_107", "FOOT04_107", "LEG04_107", "TOP04_107"], script: { function: "SCR_set_029" } },
+{ id: 30, className: "set_030", name: "Lolopanther Plate Set", items: ["HAND04_108", "FOOT04_108", "LEG04_108", "TOP04_108"], script: { function: "SCR_set_030" } },
+{ id: 31, className: "set_031", name: "Bronza Set", items: ["NECK02_119", "BRC02_116", "BRC02_116"], script: { function: "SCR_set_031" } },
+{ id: 32, className: "set_032", name: "Argint Set", items: ["NECK02_120", "BRC02_117", "BRC02_117"], script: { function: "SCR_set_032" } },
+{ id: 33, className: "set_033", name: "Auru Set", items: ["NECK02_121", "BRC02_118", "BRC02_118"], script: { function: "SCR_set_033" } },
+{ id: 34, className: "set_034", name: "Platina Set", items: ["NECK02_122", "BRC02_119", "BRC02_119"], script: { function: "SCR_set_034" } },
+{ id: 35, className: "set_035", name: "Manahas Set", items: ["HAND02_208", "FOOT02_208", "LEG02_208", "TOP02_208"], script: { function: "SCR_set_035" } },
+{ id: 36, className: "set_036", name: "Solmiki Cloth Set", items: ["TOP04_109", "LEG04_109", "FOOT04_109", "HAND04_109", "NECK04_106", "BRC04_104", "BRC04_104"], script: { function: "SCR_set_036" } },
+{ id: 37, className: "set_037", name: "Solmiki Leather Set", items: ["TOP04_110", "LEG04_110", "FOOT04_110", "HAND04_110", "NECK04_107", "BRC04_105", "BRC04_105"], script: { function: "SCR_set_036" } },
+{ id: 38, className: "set_038", name: "Solmiki Plate Set", items: ["TOP04_111", "LEG04_111", "FOOT04_111", "HAND04_111", "NECK04_108", "BRC04_106", "BRC04_106"], script: { function: "SCR_set_036" } },
+{ id: 39, className: "set_039", name: "Varpas Set", items: ["NECK04_109", "BRC04_107", "BRC04_107"], script: { function: "SCR_set_039" } },
+{ id: 40, className: "set_040", name: "Verijo Set", items: ["NECK04_110", "BRC04_108", "BRC04_108"], script: { function: "SCR_set_040" } },
+{ id: 41, className: "set_041", name: "Guild Battle 1st Place Set", items: ["ABAND01_119"], script: { function: "SCR_set_041" } },
+{ id: 42, className: "set_042", name: "Guild Battle 2nd Place Set", items: ["ABAND01_120"], script: { function: "SCR_set_042" } },
+{ id: 43, className: "set_043", name: "Guild Battle 3rd Place Set", items: ["ABAND01_121"], script: { function: "SCR_set_043" } },
+{ id: 44, className: "set_044", name: "Sugar Accessory Set", items: ["NECK99_110", "BRC99_114", "BRC99_115"], script: { function: "SCR_set_044_WHITE2" } },
+{ id: 45, className: "set_045", name: "Kite Moor Set", items: ["NECK04_112", "BRC04_110", "BRC04_110"], script: { function: "SCR_set_045" } },
+{ id: 46, className: "set_046", name: "Frieno Set", items: ["NECK04_114", "BRC04_112", "BRC04_112"], script: { function: "SCR_set_046" } },
+{ id: 47, className: "set_047", name: "Pasiuteset", items: ["NECK04_113", "BRC04_111", "BRC04_111"], script: { function: "SCR_set_047" } },
+{ id: 48, className: "set_048", name: "Lynnki Sit Set", items: ["NECK04_111", "BRC04_109", "BRC04_109"], script: { function: "SCR_set_048" } },
+{ id: 52, className: "set_052", name: "2018 White Day Set", items: ["NECK99_110_7d_1", "NECK99_110_7d_2", "BRC99_114_7d", "BRC99_114_7d", "BRC99_115_7d", "BRC99_115_7d"], script: { function: "SCR_set_052_WHITE2" } },
+{ id: 53, className: "set_053", name: "Velcoffer Costume Set", items: ["helmet_velcoffer", "costume_Com_93"], script: { function: "SCR_VELCOFFER_COSTUME_SET01" } },
+{ id: 54, className: "set_054", name: "Territory Wars Beta Set", items: ["ABAND01_119_COLONY_30"], script: { function: "SCR_set_054_COLONY" } },
+{ id: 55, className: "set_055", name: "Territory Wars Beta Set", items: ["ABAND01_119_COLONY_90"], script: { function: "SCR_set_055_COLONY" } },
+{ id: 56, className: "set_056", name: "Nepagristas Set", items: ["NECK04_115", "BRC04_115", "BRC04_115"], script: { function: "SCR_set_056_NEPAGRITAS" } },
+{ id: 57, className: "set_057", name: "Nematomas Set", items: ["NECK04_116", "BRC04_116", "BRC04_116"], script: { function: "SCR_set_057_NEMATOMAS" } },
+{ id: 58, className: "set_058", name: "Rangovas Set", items: ["NECK04_117", "BRC04_117", "BRC04_117"], script: { function: "SCR_set_058_RANGOVAS" } },
+{ id: 59, className: "set_059", name: "Drakonas Kite Moor Set", items: ["NECK05_002", "BRC05_002", "BRC05_002"], script: { function: "SCR_set_059_piece2" } },
+{ id: 60, className: "set_060", name: "Drakonas Frieno Set", items: ["NECK05_004", "BRC05_004", "BRC05_004"], script: { function: "SCR_set_060_piece2" } },
+{ id: 61, className: "set_061", name: "Drakonas Pasiutes Set", items: ["NECK05_003", "BRC05_003", "BRC05_003"], script: { function: "SCR_set_061_piece2" } },
+{ id: 62, className: "set_062", name: "Drakonas Lynnki Sit Set", items: ["NECK05_001", "BRC05_001", "BRC05_001"], script: { function: "SCR_set_062_piece2" } },
+{ id: 63, className: "set_063", name: "Abyss Irredian Set", items: ["NECK04_118", "BRC04_118", "BRC04_118", "Event_NECK04_118", "Event_BRC04_118", "Event_BRC04_118"], script: { function: "SCR_set_063_piece3" } },
+{ id: 64, className: "set_064", name: "Cevisa Irredian Set", items: ["NECK04_119", "BRC04_119", "BRC04_119", "Event_NECK04_119", "Event_BRC04_119", "Event_BRC04_119"], script: { function: "SCR_set_064_piece3" } },
+{ id: 67, className: "set_067", name: "Velcoffer Costume Set", items: ["helmet_baniclips", "costume_Com_216"], script: { function: "SCR_SKIACLIPS_COSTUME_SET01" } },
+{ id: 68, className: "set_068", name: "Carnas Magija Set", items: ["NECK05_005", "BRC05_005", "BRC05_005"], script: { function: "SCR_set_068_piece3" } },
+{ id: 69, className: "set_069", name: "Carnas Zeisty Set", items: ["NECK05_006", "BRC05_006", "BRC05_006"], script: { function: "SCR_set_069_piece3" } },
+{ id: 70, className: "set_070", name: "Carnas Pyginis Set", items: ["NECK05_007", "BRC05_007", "BRC05_007"], script: { function: "SCR_set_070_piece3" } },
+{ id: 71, className: "set_071", name: "Pyktis Set", items: ["NECK05_008", "BRC05_008", "BRC05_008"], script: { function: "SCR_set_071_piece3" } },
+{ id: 72, className: "set_072", name: "Kantribe Set", items: ["NECK05_009", "BRC05_009", "BRC05_009"], script: { function: "SCR_set_072_piece3" } },
+{ id: 73, className: "set_073", name: "Juoda Set", items: ["NECK05_010", "BRC05_010", "BRC05_010"], script: { function: "SCR_set_073_piece3" } },
+{ id: 74, className: "set_074", name: "Pyrmas Tantalizer Costume Set", items: ["costume_Com_253", "helmet_tantaliser1", "wing_tantaliser1"], script: { function: "SCR_set_074_piece2" } },
+{ id: 75, className: "set_075", name: "Antras Tantalizer Costume Set", items: ["costume_Com_264", "helmet_tantaliser2", "wing_tantaliser2"], script: { function: "SCR_set_075_piece2" } },
+{ id: 76, className: "set_076", name: "Pyrmas Moringponia Costume Set", items: ["costume_Com_254", "helmet_moth1", "wing_moth1"], script: { function: "SCR_set_076_piece2" } },
+{ id: 77, className: "set_077", name: "Antras Moringponia Costume Set", items: ["costume_Com_265", "helmet_moth2", "wing_moth2"], script: { function: "SCR_set_077_piece2" } },
+{ id: 78, className: "set_078", name: "Isbikimas Set", items: ["NECK04_123", "BRC04_123", "BRC04_123"], script: { function: "SCR_set_078_piece3" } },
+{ id: 79, className: "set_079", name: "Triukas Set", items: ["NECK05_011", "BRC05_011", "BRC05_011"], script: { function: "SCR_set_079_piece3" } },
+{ id: 80, className: "set_080", name: "Isgarinti Set", items: ["NECK05_012", "BRC05_012", "BRC05_012"], script: { function: "SCR_set_080_piece3" } },
+{ id: 81, className: "set_081", name: "[Event] Abyss Irredian Set", items: ["Event_NECK04_118", "Event_BRC04_118", "Event_BRC04_118", "NECK04_118", "BRC04_118", "BRC04_118"], script: { function: "SCR_set_063_piece3" } },
+{ id: 82, className: "set_082", name: "[Event] Cevisa Irredian Set", items: ["Event_NECK04_119", "Event_BRC04_119", "Event_BRC04_119", "NECK04_119", "BRC04_119", "BRC04_119"], script: { function: "SCR_set_064_piece3" } },
+{ id: 90, className: "set_090", name: "2020 Botanic Set", items: ["2020_ARBORDAY_NECK05", "2020_ARBORDAY_BRC05", "2020_ARBORDAY_BRC05"], script: { function: "SCR_set_090_piece2" } },
+{ id: 92, className: "set_092", name: "2021 Botanic Set", items: ["2021_ARBORDAY_NECK05", "2021_ARBORDAY_BRC05", "2021_ARBORDAY_BRC05"], script: { function: "SCR_set_092_piece2" } },
+]

@@ -18,6 +18,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Yggdrasil.Extensions;
+using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
 public class CombatCalculationsScript : GeneralScript
@@ -114,6 +115,7 @@ public class CombatCalculationsScript : GeneralScript
 		// meaningless.
 		var defPropertyName = skill.Data.ClassType != SkillClassType.Magic ? PropertyName.DEF : PropertyName.MDEF;
 		var def = target.Properties.GetFloat(defPropertyName);
+		def += def * modifier.BonusDefense;
 		def -= Math2.Clamp(0, def, def * modifier.DefensePenetrationRate);
 		skillHitResult.Damage = Math.Max(1, skillHitResult.Damage - def);
 
@@ -283,7 +285,7 @@ public class CombatCalculationsScript : GeneralScript
 		if (modifier.DefenseAttribute != AttributeType.None)
 			targetAttr = modifier.DefenseAttribute;
 
-		if (!Feature.IsEnabled("AttributeBonusRevamp"))
+		if (!Feature.IsEnabled(FeatureId.AttributeBonusRevamp))
 		{
 			if (attackerAttr == AttributeType.Fire)
 			{
@@ -424,7 +426,7 @@ public class CombatCalculationsScript : GeneralScript
 				if (targetArmor == ArmorMaterialType.Iron) return 1.05f;
 			}
 		}
-		else if (Feature.IsEnabled("AttackTypeBonusRevamp1"))
+		else if (Feature.IsEnabled(FeatureId.AttackTypeBonusRevamp1))
 		{
 			if (attackType == SkillAttackType.Slash)
 			{
@@ -575,7 +577,7 @@ public class CombatCalculationsScript : GeneralScript
 		// looked more promising, but seemed rather arbitrary. Our current
 		// approach is now a combination of the two.
 
-		var dodgeChance = Math2.Clamp(0, 80, Math.Pow(Math.Max(0, dr - hr), 0.65f));
+		var dodgeChance = Math2.Clamp(0, 80, Math.Pow(Math.Max(0, dr - hr), 0.65f) + modifier.BonusDodgeChance);
 
 		return (float)dodgeChance;
 	}
@@ -650,16 +652,72 @@ public class CombatCalculationsScript : GeneralScript
 			return 100;
 
 		var critDodgeRate = target.Properties.GetFloat(PropertyName.CRTDR);
-		var critHitRate = attacker.Properties.GetFloat(PropertyName.CRTHR);
+		var critHitRate = attacker.Properties.GetFloat(PropertyName.CRTHR) + modifier.BonusCritChance;
 
 		// Based on: https://treeofsavior.com/page/news/view.php?n=951​
 		var critChance = Math.Pow(Math.Max(0, Math.Max(0, critHitRate - critDodgeRate)), 0.6f);
 
-		critChance *= modifier.CritChanceMultiplier;
-		critChance += modifier.BonusCritChance;
-
 		critChance = Math2.Clamp(modifier.MinCritChance, 100, critChance);
 
 		return (float)critChance;
+	}
+
+	/// <summary>
+	/// Calculates the final chance of a status effect being applied,
+	/// taking the target's resistances into account.
+	/// </summary>
+	[ScriptableFunction]
+	public float SCR_Calc_Status_Chance(ICombatEntity caster, ICombatEntity target, Skill skill, BuffId buffId, float initialValue)
+	{
+		if (!ZoneServer.Instance.Data.BuffDb.TryFind(buffId, out var buffData))
+			return initialValue;
+
+		var maxResistance = 0f;
+
+		foreach (var tag in buffData.Tags)
+		{
+			var resistancePropName = $"Res_{tag}_Debuff_BM";
+			if (target.Properties.TryGetFloat(resistancePropName, out var resistanceValue))
+			{
+				maxResistance = Math.Max(maxResistance, resistanceValue);
+			}
+		}
+
+		var resistanceMultiplier = 1f - (maxResistance / 100f);
+
+		var finalValue = initialValue * resistanceMultiplier;
+		if (resistanceMultiplier != 1f)
+			Log.Debug($"Resistance Chance applied to {initialValue} * {resistanceMultiplier} = {finalValue}");
+		return Math.Max(0, finalValue);
+	}
+
+	/// <summary>
+	/// Calculates the final duration of a status effect, taking the
+	/// target's resistances into account.
+	/// </summary>
+	[ScriptableFunction]
+	public float SCR_Calc_Status_Duration(ICombatEntity caster, ICombatEntity target, Skill skill, BuffId buffId, float initialValue)
+	{
+		if (!ZoneServer.Instance.Data.BuffDb.TryFind(buffId, out var buffData))
+			return initialValue;
+
+		var maxResistance = 0f;
+
+		foreach (var tag in buffData.Tags)
+		{
+			var resistancePropName = $"Res_{tag}_Debuff_BM";
+			if (target.Properties.TryGetFloat(resistancePropName, out var resistanceValue))
+			{
+				maxResistance = Math.Max(maxResistance, resistanceValue);
+			}
+		}
+
+		var resistanceMultiplier = 1f - (maxResistance / 100f);
+
+		var finalValue = initialValue * resistanceMultiplier;
+
+		if (resistanceMultiplier != 1f)
+			Log.Debug($"Resistance Duration applied to {initialValue} * {resistanceMultiplier} = {finalValue}");
+		return Math.Max(0, finalValue);
 	}
 }

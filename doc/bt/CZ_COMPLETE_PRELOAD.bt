@@ -1,0 +1,16 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: CZ_COMPLETE_PRELOAD.bt
+//   Authors: Salman T. Khan
+//   Version: i10593
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;

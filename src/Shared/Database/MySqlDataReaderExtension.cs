@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MySqlConnector;
 
 namespace Melia.Shared.Database
@@ -42,6 +42,21 @@ namespace Melia.Shared.Database
 		public static DateTime GetDateTimeSafe(this MySqlDataReader reader, string index)
 		{
 			return reader[index] as DateTime? ?? DateTime.MinValue;
+		}
+
+		/// <summary>
+		/// Same as GetInt32, except for a null check. Returns defaultValue if NULL.
+		/// </summary>
+		/// <param name="reader"></param>
+		/// <param name="index"></param>
+		/// <param name="defaultValue">Value to return if the column is null</param>
+		/// <returns></returns>
+		public static int GetInt32Safe(this MySqlDataReader reader, string index, int defaultValue = 0)
+		{
+			if (IsDBNull(reader, index))
+				return defaultValue;
+			else
+				return reader.GetInt32(index);
 		}
 	}
 

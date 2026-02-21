@@ -16,7 +16,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// Initializes component's properties.
 		/// </summary>
 		/// <param name="entity"></param>
-		public CombatEntityComponent(ICombatEntity entity)
+		protected CombatEntityComponent(ICombatEntity entity)
 		{
 			this.Entity = entity;
 		}
@@ -25,8 +25,20 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 	/// <summary>
 	/// A component for an actor.
 	/// </summary>
-	public interface IActorComponent : IComponent
+	public abstract class ActorComponent : IComponent
 	{
-		IActor Owner { get; }
+		/// <summary>
+		/// Returns the owner of this component.
+		/// </summary>
+		public IActor Actor { get; }
+
+		/// <summary>
+		/// Initializes component's properties.
+		/// </summary>
+		/// <param name="actor"></param>
+		protected ActorComponent(IActor actor)
+		{
+			this.Actor = actor;
+		}
 	}
 }

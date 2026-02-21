@@ -1,6 +1,13 @@
 ﻿using System;
+using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Properties;
+using Melia.Zone.Buffs;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+using Newtonsoft.Json.Linq;
+using Yggdrasil.Logging;
 
 namespace Melia.Zone.Buffs.Base
 {
@@ -9,6 +16,11 @@ namespace Melia.Zone.Buffs.Base
 	/// </summary>
 	public abstract class BuffHandler : IBuffHandler
 	{
+		/// <summary>
+		/// Prefix used for storing property modifiers in buff Vars.
+		/// </summary>
+		public const string ModifierVarPrefix = "Melia.Modifier.";
+
 		/// <summary>
 		/// Initializes buff handler.
 		/// </summary>
@@ -84,7 +96,56 @@ namespace Melia.Zone.Buffs.Base
 		/// <param name="propertyName"></param>
 		/// <returns></returns>
 		private static string GetModifierVarName(string propertyName)
-			=> "Melia.Modifier." + propertyName;
+			=> ModifierVarPrefix + propertyName;
+
+		/// <summary>
+		/// Returns true if the property is a transient buff modifier that should
+		/// not be persisted to the database. This prevents desync issues where
+		/// buff modifiers could persist even after the buff expires.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
+		public static bool IsBuffTransientProperty(string propertyName)
+			=> propertyName.EndsWith("_BM");
+
+		/// <summary>
+		/// Modifies the property on the target and saves the value in the buff,
+		/// to be able to later undo the change.
+		/// </summary>
+		/// <remarks>
+		/// Repeated calls to this method will stack the modifications, while
+		/// one call to RemovePropertyModifier will undo all of them.
+		/// </remarks>
+		/// <param name="buff"></param>
+		/// <param name="target"></param>
+		/// <param name="modifierName"></param>
+		/// <param name="value"></param>
+		protected static void AddModifier(Buff buff, ICombatEntity target, string modifierName, float value)
+		{
+			var varName = GetModifierVarName(modifierName);
+
+			if (buff.Vars.TryGetFloat(varName, out var oldValue))
+				value += oldValue;
+
+			buff.Vars.SetFloat(varName, value);
+		}
+
+		/// <summary>
+		/// Undoes the modifications done to the property on target from
+		/// ApplyModifier.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <param name="target"></param>
+		/// <param name="modifierName"></param>
+		protected static void RemoveModifier(Buff buff, ICombatEntity target, string modifierName)
+		{
+			var varName = GetModifierVarName(modifierName);
+
+			if (buff.Vars.TryGetFloat(varName, out var value))
+			{
+				buff.Vars.Remove(varName);
+			}
+		}
 
 		/// <summary>
 		/// Modifies the property on the target and saves the value in the buff,
@@ -100,12 +161,19 @@ namespace Melia.Zone.Buffs.Base
 		/// <param name="value"></param>
 		protected static void AddPropertyModifier(Buff buff, ICombatEntity target, string propertyName, float value)
 		{
+			if (!PropertyTable.Exists(target.Properties.Namespace, propertyName))
+			{
+				Log.Warning($"AddPropertyModifier: {buff.Id} tried to add to property {propertyName} but doesn't exist in id namespace: {target.Properties.Namespace}.");
+				return;
+			}
+
 			var varName = GetModifierVarName(propertyName);
 
-			var totalModifier = buff.Vars.GetFloat(varName, 0);
-			buff.Vars.SetFloat(varName, totalModifier + value);
+			if (buff.Vars.TryGetFloat(varName, out var oldValue))
+				value += oldValue;
 
-			target.Properties.Modify(propertyName, value);
+			buff.Vars.SetFloat(varName, value);
+			target.Properties.Modify(propertyName, value - oldValue);
 		}
 
 		/// <summary>
@@ -117,11 +185,17 @@ namespace Melia.Zone.Buffs.Base
 		/// <param name="propertyName"></param>
 		protected static void RemovePropertyModifier(Buff buff, ICombatEntity target, string propertyName)
 		{
+			if (!PropertyTable.Exists(target.Properties.Namespace, propertyName))
+			{
+				Log.Warning($"RemovePropertyModifier: {buff.Id} tried to remove to property {propertyName} but doesn't exist in id namespace: {target.Properties.Namespace}.");
+				return;
+			}
+
 			var varName = GetModifierVarName(propertyName);
 
-			if (buff.Vars.TryGetFloat(varName, out var totalModifier))
+			if (buff.Vars.TryGetFloat(varName, out var value))
 			{
-				target.Properties.Modify(propertyName, -totalModifier);
+				target.Properties.Modify(propertyName, -value);
 				buff.Vars.Remove(varName);
 			}
 		}
@@ -155,6 +229,9 @@ namespace Melia.Zone.Buffs.Base
 		/// <param name="value"></param>
 		protected static void SetPropertyModifier(Buff buff, ICombatEntity target, string propertyName, float value)
 		{
+			if (!PropertyTable.Exists(propertyName))
+				return;
+
 			RemovePropertyModifier(buff, target, propertyName);
 			AddPropertyModifier(buff, target, propertyName, value);
 		}

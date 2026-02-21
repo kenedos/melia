@@ -4,6 +4,8 @@ namespace Melia.Shared.Game.Const
 {
 	public enum JobId : short
 	{
+		None = 0,
+
 		// Swordsman
 		Swordsman = 1001,
 		Highlander = 1002,
@@ -30,7 +32,6 @@ namespace Melia.Shared.Game.Const
 		Vanquisher = 1026,
 		SledgerS = 1027,
 		BonemancerS = 1028,
-		GrimmarkS = 1029,
 
 		// Wizard
 		Wizard = 2001,
@@ -58,7 +59,6 @@ namespace Melia.Shared.Game.Const
 		BonemancerW = 2027,
 		AetherBladerW = 2028,
 		HermitW = 2029,
-		KnellerW = 2030,
 
 		// Archer
 		Archer = 3001,
@@ -85,7 +85,6 @@ namespace Melia.Shared.Game.Const
 		BonemancerA = 3109,
 		BlitzHunterA = 3110,
 		HermitA = 3111,
-		GrimmarkA = 3112,
 
 		// Cleric
 		Cleric = 4001,
@@ -113,7 +112,6 @@ namespace Melia.Shared.Game.Const
 		BonemancerC = 4025,
 		AetherBladerC = 4026,
 		HermitC = 4027,
-		KnellerC = 4028,
 
 		// Scout
 		Scout = 5001,
@@ -138,7 +136,6 @@ namespace Melia.Shared.Game.Const
 		VultureT = 5020,
 		BlitzHunterT = 5021,
 		AetherBladerT = 5022,
-		GrimmarkT = 5023,
 
 		// GM
 		GM = 9001,

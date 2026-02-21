@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v15.0 Binary Template
+//
+//      File: CB_CHAT.bt
+//   Authors: Salman T. Khan
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderDynamic header;
+
+byte msgSize;
+string msg;

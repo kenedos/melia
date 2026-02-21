@@ -15,5 +15,3 @@
 
 ClientHeaderFixed header;
 float f1;
-float f2;
-short s1;

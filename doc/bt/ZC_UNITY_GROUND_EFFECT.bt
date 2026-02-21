@@ -1,0 +1,27 @@
+//------------------------------------------------
+//--- 010 Editor v14.0 Binary Template
+//
+//      File: ZC_UNITY_GROUND_EFFECT.bt
+//   Authors: Salman T. Khan
+//   Version: i381165
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+int handle;
+uint i1;
+int packetString;
+float f1;
+position pos;
+position rotation;
+direction dir;
+byte b1;
+
+//11104031

@@ -161,6 +161,7 @@ namespace Melia.Barracks.Network
 			//Send.BC_NORMAL.SetBarrack(conn, conn.Account.SelectedBarrack);
 			Send.BC_COMMANDER_LIST(conn);
 			Send.BC_NORMAL.CharacterInfo(conn);
+			Send.BC_NORMAL.CompanionInfo(conn);
 			Send.BC_NORMAL.TeamUI(conn);
 			Send.BC_NORMAL.ZoneTraffic(conn);
 
@@ -198,6 +199,21 @@ namespace Melia.Barracks.Network
 			var dy = packet.GetFloat();
 
 			// Seems like there's no response to this.
+		}
+
+		/// <summary>
+		/// Sent when chatting in the barracks.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CB_CHAT)]
+		public void CB_CHAT(IBarracksConnection conn, Packet packet)
+		{
+			var size = packet.GetShort();
+			var characterIndex = packet.GetByte();
+			var message = packet.GetString();
+
+			Send.BC_CHAT(conn, characterIndex, message);
 		}
 
 		/// <summary>
@@ -430,6 +446,7 @@ namespace Melia.Barracks.Network
 			}
 
 			Send.BC_COMMANDER_DESTROY(conn, character.Index);
+			Send.BC_COMMANDER_LIST(conn);
 			Send.BC_NORMAL.TeamUI(conn);
 
 			BarracksServer.Instance.ServerEvents.OnCharacterRemoved(new CharacterEventArgs(conn, character));
@@ -516,7 +533,7 @@ namespace Melia.Barracks.Network
 		[PacketHandler(Op.CB_BUY_THEMA)]
 		public void CB_BUY_THEMA(IBarracksConnection conn, Packet packet)
 		{
-			var type = packet.GetInt(); // 0 = Buy, 1 = Use
+			var type = packet.GetInt(); // 0 = Buy, 1 = Use, 2 = New Slot
 			var newMapId = packet.GetInt();
 			var oldMapId = packet.GetInt();
 
@@ -545,14 +562,27 @@ namespace Melia.Barracks.Network
 					return;
 				}
 			}
-			else
+			else if (type != 2)
 			{
 				Log.Debug("CB_BUY_THEMA: User '{0}' sent unknown type '{1}'.", conn.Account.Name, type);
 				return;
 			}
 
-			conn.Account.SelectedBarrack = newMapId;
-			conn.Account.Themas.Add(newMapId);
+			switch (type)
+			{
+				case 2:
+					if (!conn.Account.Charge(33))
+					{
+						Log.Warning("CB_BUY_THEMA: User '{0}' tried to buy character slot without having the necessary TP.", conn.Account.Name);
+						return;
+					}
+					conn.Account.AdditionalSlotCount++;
+					break;
+				default:
+					conn.Account.SelectedBarrack = newMapId;
+					conn.Account.Themas.Add(newMapId);
+					break;
+			}
 
 			// XXX: There's currently an issue where you might get stuck
 			//   in the thema buying screen if you preview a thema, don't
@@ -677,7 +707,18 @@ namespace Melia.Barracks.Network
 			var companionId = packet.GetLong();
 			var characterId = packet.GetLong();
 
-			// ...
+			var companion = conn.Account.GetCompanionById(companionId);
+			var character = conn.Account.GetCharacterById(characterId);
+
+			if (companion == null)
+			{
+				Log.Warning("CB_PET_PC: Companion not found by id '{0}' received from '{1}'.", companionId, conn.Account.Name);
+				return;
+			}
+
+			companion.CharacterDbId = character?.DbId ?? 0;
+			BarracksServer.Instance.Database.SetCompanionCharacter(companion.DbId, companion.CharacterDbId);
+			Send.BC_NORMAL.SetCompanion(conn, companion.ObjectId, character?.ObjectId ?? 0);
 		}
 
 		/// <summary>
@@ -692,7 +733,23 @@ namespace Melia.Barracks.Network
 			var characterId = packet.GetLong();
 			var command = packet.GetByte(); // 0 : revive request; 1 : delete pet request.
 
-			// ...
+			var companion = conn.Account.GetCompanionById(companionId);
+			if (companion == null)
+			{
+				Log.Warning("CB_PET_COMMAND: Companion not found by id '{0}' received from '{1}'.", companionId, conn.Account.Name);
+				return;
+			}
+
+			switch (command)
+			{
+				case 1:
+					if (BarracksServer.Instance.Database.DeleteCompanion(companion.DbId))
+					{
+						Send.BC_NORMAL.DeleteCompanion(conn, companionId);
+						Send.BC_NORMAL.TeamUI(conn);
+					}
+					break;
+			}
 		}
 
 		/// <summary>
@@ -975,6 +1032,78 @@ namespace Melia.Barracks.Network
 
 			Send.BC_CHARACTER_SLOT_SWAP_SUCCESS(conn);
 			Send.BC_COMMANDER_LIST(conn);
+		}
+
+		/// <summary>
+		/// Sent when a companion moves in the barracks.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CB_COMPANION_MOVE)]
+		public void CB_COMPANION_MOVE(IBarracksConnection conn, Packet packet)
+		{
+			var companionId = packet.GetLong();
+			var position = packet.GetPosition();
+			var direction = packet.GetDirection();
+
+			var companion = conn.Account.GetCompanionById(companionId);
+			if (companion != null)
+			{
+				companion.BarracksPosition = position;
+				companion.BarracksDirection = direction;
+				Send.BC_NORMAL.SetCompanionPosition(conn, companionId, position);
+			}
+		}
+
+		/// <summary>
+		/// Sent when a companion requests to jump in barracks.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CB_JUMP)]
+		public void CB_JUMP(IBarracksConnection conn, Packet packet)
+		{
+			var accountId = packet.GetLong();
+
+			if (conn.Account.Id == accountId)
+				Send.BC_JUMP(conn);
+		}
+
+		/// <summary>
+		/// Request for the price of an additional character slot.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CB_REQ_SLOT_PRICE)]
+		public void CB_REQ_SLOT_PRICE(IBarracksConnection conn, Packet packet)
+		{
+			var characterSlotPrice = 33;
+
+			Send.BC_REQ_SLOT_PRICE(conn, characterSlotPrice);
+		}
+
+		/// <summary>
+		/// Sent when chatting publicly.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_CHAT)]
+		public void CZ_CHAT(IBarracksConnection conn, Packet packet)
+		{
+			var len = packet.GetShort();
+			var msg = packet.GetString();
+		}
+
+		/// <summary>
+		/// Sent when chatting (log).
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_CHAT_LOG)]
+		public void CZ_CHAT_LOG(IBarracksConnection conn, Packet packet)
+		{
+			var len = packet.GetShort();
+			var msg = packet.GetString();
 		}
 	}
 }

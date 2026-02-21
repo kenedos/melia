@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
+using Melia.Shared.ObjectProperties;
 using Melia.Zone.Network;
 using Melia.Zone.Skills;
 
@@ -36,6 +37,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			lock (_abilities)
 				_abilities[ability.Id] = ability;
+
+			// Activate property handler for passive abilities or active toggleable ones
+			if (ability.Data.Passive || ability.Active)
+				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, this.Character);
 		}
 
 		/// <summary>
@@ -56,8 +61,20 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public bool Remove(AbilityId abilityId)
 		{
+			Ability ability;
 			lock (_abilities)
-				return _abilities.Remove(abilityId);
+			{
+				if (!_abilities.TryGetValue(abilityId, out ability))
+					return false;
+
+				_abilities.Remove(abilityId);
+			}
+
+			// Deactivate property handler
+			if (ability.Data.Passive || ability.Active)
+				ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, this.Character);
+
+			return true;
 		}
 
 		/// <summary>
@@ -183,12 +200,30 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			lock (_abilities)
 			{
 				if (_abilities.TryGetValue(abilityId, out var ability))
-					ability.Level = level;
-				else
-					_abilities[abilityId] = new Ability(abilityId, level);
-			}
+				{
+					// Deactivate with old level, then reactivate with new level
+					if (ability.Data.Passive || ability.Active)
+						ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, this.Character);
 
-			Send.ZC_ABILITY_LIST(this.Character);
+					ability.Level = level;
+
+					if (ability.Data.Passive || ability.Active)
+						ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, this.Character);
+
+					Send.ZC_OBJECT_PROPERTY(this.Character.Connection, ability, PropertyName.Level);
+				}
+				else
+				{
+					var newAbility = new Ability(abilityId, level);
+					_abilities[abilityId] = newAbility;
+
+					// Activate property handler for new passive abilities
+					if (newAbility.Data.Passive || newAbility.Active)
+						ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(newAbility, this.Character);
+
+					Send.ZC_ABILITY_LIST(this.Character);
+				}
+			}
 		}
 
 		/// <summary>
@@ -207,12 +242,38 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (ability == null)
 				return false;
 
+			// Deactivate before toggling off, activate after toggling on
+			if (ability.Active)
+				ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, this.Character);
+
 			ability.Active = !ability.Active;
+
+			if (ability.Active)
+				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, this.Character);
 
 			Send.ZC_OBJECT_PROPERTY(this.Character.Connection, ability);
 			Send.ZC_ADDON_MSG(this.Character, AddonMessage.RESET_ABILITY_ACTIVE, 0, "Swordman28");
 
 			return true;
+		}
+
+		/// <summary>
+		/// Invalidates all calculated properties, to update them when
+		/// they're accessed next.
+		/// </summary>
+		public void InvalidateAll()
+		{
+			foreach (var ability in this.GetList())
+			{
+				var properties = ability.Properties.GetAll();
+
+				foreach (var property in properties)
+				{
+					if (property is CFloatProperty calcProperty)
+						calcProperty.Invalidate();
+				}
+				Send.ZC_OBJECT_PROPERTY(this.Character.Connection, ability);
+			}
 		}
 	}
 }

@@ -78,7 +78,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 
 				var hit = new HitInfo(caster, bounceTarget, skill, skillHitResult);
 				hit.ForceId = ForceId.GetNew();
-				hit.ResultType = HitResultType.Unk8;
+				hit.ResultType = HitResultType.NoHitScript;
 
 				Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, target, bounceTarget, "I_arrow009_red", 0.7f, "arrow_cast", "F_hit_good", 1, "arrow_blow", "SLOW", 800);
 				Send.ZC_HIT_INFO(caster, bounceTarget, hit);
@@ -100,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 			var splashRadius = 100;
 			var splashArea = new Circle(mainTarget.Position, splashRadius);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			if (!targets.Any())
 			{
 				bounceTarget = null;

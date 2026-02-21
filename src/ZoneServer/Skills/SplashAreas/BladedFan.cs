@@ -9,7 +9,7 @@ using Yggdrasil.Geometry.Shapes;
 namespace Melia.Zone.Skills.SplashAreas
 {
 	/// <summary>
-	/// A splash area that consists of a number of blades arrangedevenly
+	/// A splash area that consists of a number of blades arranged evenly
 	/// around a center position.
 	/// </summary>
 	public class BladedFan : ISplashArea, IRotatableF
@@ -104,7 +104,7 @@ namespace Melia.Zone.Skills.SplashAreas
 
 			_blades = new PolygonF[bladeCount];
 
-			var blade1Center = centerPos.GetRelative2D(Direction.North, bladeLength / 2);
+			var blade1Center = centerPos.GetRelative(Direction.North, bladeLength / 2);
 
 			var size = new Vector2F(bladeWidth, bladeLength);
 
@@ -182,7 +182,7 @@ namespace Melia.Zone.Skills.SplashAreas
 			var newCenterPoint = PointUtil.Rotate(pos, pivot, degreeAngle);
 			var newPos = new Position(newCenterPoint.X, pos.Y, newCenterPoint.Y);
 
-			this.Position = pos;
+			this.Position = newPos;
 
 			_edgePoints = null;
 			_outlines = null;
@@ -194,6 +194,8 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <param name="position"></param>
 		public void UpdatePosition(Vector2F position)
 		{
+			if (this.Position.X == position.X && this.Position.Z == position.Y)
+				return;
 			this.Position = new Position(position.X, this.Position.Y, position.Y);
 			_edgePoints = null;
 			_outlines = null;

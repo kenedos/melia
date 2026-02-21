@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.2 Binary Template
+//
+//      File: CZ_CREATE_ARROW_CRAFT.bt
+//   Authors: 
+//   Version: 
+//   Purpose: Craft Arrows?
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+int itemId;

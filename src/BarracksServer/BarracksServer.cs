@@ -25,6 +25,11 @@ namespace Melia.Barracks
 	public class BarracksServer : Server
 	{
 		/// <summary>
+		/// Returns this server's type.
+		/// </summary>
+		public override ServerType Type => ServerType.Barracks;
+
+		/// <summary>
 		/// Returns global instance of the barracks server.
 		/// </summary>
 		public readonly static BarracksServer Instance = new();
@@ -74,11 +79,14 @@ namespace Melia.Barracks
 			this.NavigateToRoot();
 
 			this.LoadConf();
+			this.LoadPackages();
+			this.LoadVersionInfo();
 			this.LoadLocalization(this.Conf);
 			this.LoadData(ServerType.Barracks);
 			this.LoadServerList(this.Data.ServerDb, ServerType.Barracks, groupId, serverId);
 			this.InitDatabase(this.Database, this.Conf);
 			this.CheckDatabaseUpdates();
+			this.Database.ClearLoginStates();
 			this.LoadIesMods();
 			this.LoadScripts("barracks");
 
@@ -213,7 +221,17 @@ namespace Melia.Barracks
 		{
 			switch (requestMessage.Message)
 			{
-				case ReqServerListMessage reqMessage:
+				case ReqPlayerCountMessage:
+				{
+					var playerCount = this.ServerList.GetAll(ServerType.Zone).Sum(server => server.CurrentPlayers);
+
+					var message = new ResPlayerCountMessage(playerCount);
+					var responseMessage = new ResponseMessage(requestMessage.Id, message);
+
+					this.Communicator.Send(sender, responseMessage);
+					break;
+				}
+				case ReqServerListMessage:
 				{
 					var servers = this.ServerList.GetAll();
 

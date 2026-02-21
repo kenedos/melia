@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_PLAY_SOUND_Gendered(caster, "voice_war_atk_long_cast", "voice_atk_long_cast_f");
 		}
@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_STOP_SOUND_Gendered(caster, "voice_war_atk_long_cast", "voice_atk_long_cast_f");
 		}
@@ -87,7 +87,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var skillHits = new List<SkillHitInfo>();
 
 			var hitTargets = targets.LimitBySDR(caster, skill);
@@ -99,7 +99,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
 
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 				skillHit.ApplyKnockBack(target);
 
 				skillHits.Add(skillHit);

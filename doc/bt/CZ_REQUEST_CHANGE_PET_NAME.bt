@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.2 Binary Template
+//
+//      File: CZ_REQUEST_CHANGE_PET_NAME.bt
+//   Authors: Salman T. Khan
+//   Version: i374325
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+int64 petWorldId;
+char name[16]; // Character Limit Client Side?

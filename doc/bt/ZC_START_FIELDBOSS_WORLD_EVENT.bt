@@ -1,0 +1,24 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: ZC_START_FIELDBOSS_WORLD_EVENT.bt
+//   Authors: alman T. Khan
+//   Version: i370431
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History:
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderDynamic header;
+
+ShortDate date1;
+ShortDate date2;
+int i1; // 50000
+int i2; // 3
+int rewardCount;
+int rewardItems[rewardCount];
+int i3;

@@ -3,17 +3,25 @@
 //
 //      File: ZC_SEND_PC_EXPROP.bt
 //   Authors: Salman T. Khan
-//   Version: 351705
+//   Version: i373765
 //   Purpose: 
 //  Category: 
 // File Mask: 
 //  ID Bytes: 
 //   History: 
+//      - [i373765] They replaced the char array with a lpString.
 //------------------------------------------------
 
 #include "inc/common.bt"
 
-ServerHeaderFixed header;
+ServerHeaderDynamic header;
 
-char buff[128];
-float amount; // Cost?
+int count; // 1
+local int i = 0;
+for (i = 0; i < count; i++)
+{
+lpString str; // Hwarang_Target_Debuff
+//char buff[128];
+float amount; // 1
+// Garbage Data after this?
+}

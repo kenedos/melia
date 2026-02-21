@@ -16,14 +16,15 @@
 typedef struct
 {
     direction dir;
-    position pos;
     float f1;
+    position pos1;
+    position pos2;
     float f2;
 } DirPos <optimize=false>;
 
 ClientHeaderDynamic header;
 
-local int i = (header.size - 24) / 28;
+local int i = (header.size - 24) / 43;
 DirPos dpos[i];
 //float f[64];
 //float f1;

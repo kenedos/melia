@@ -1,0 +1,18 @@
+// Version configuration
+// Change VERSION to match your Tree of Savior client version.
+// Override in user/versions/version.txt to avoid modifying this file.
+// Melia Version: 402363
+// Laima Version: 390044
+
+#define VERSION 390044
+#define REGION NA
+
+#include "/user/versions/version.txt"
+
+#if VERSION < 11097
+	#define PROTOCOL_VERSION 0
+#elif VERSION == 234929
+	#define PROTOCOL_VERSION 201
+#else
+	#define PROTOCOL_VERSION 1000
+#endif

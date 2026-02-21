@@ -21,17 +21,15 @@ public class CollectionItemScripts : GeneralScript
 	{
 		var collectionName = strArg;
 
-		if (ZoneServer.Instance.Data.CollectionDb.TryFindByClassName(collectionName, out var collectionData))
+		if (ZoneServer.Instance.Data.CollectionDb.TryFindByClassName(collectionName, out var collectionData)
+			&& character.Collections.Add(collectionData.Id))
 		{
-			if (character.Collections.Add(collectionData.Id))
-			{
-				character.SystemMessage("GetCollection");
+			character.SystemMessage("GetCollection");
 
-				Send.ZC_NORMAL.UnlockCollection(character, collectionData.Id);
-				Send.ZC_ADDON_MSG(character, AddonMessage.UPDATE_READ_COLLECTION_COUNT, 0, null);
+			Send.ZC_NORMAL.UnlockCollection(character, collectionData.Id);
+			Send.ZC_ADDON_MSG(character, AddonMessage.UPDATE_READ_COLLECTION_COUNT, 0, null);
 
-				return ItemUseResult.Okay;
-			}
+			return ItemUseResult.Okay;
 		}
 
 		return ItemUseResult.Fail;
@@ -64,6 +62,6 @@ public class CollectionItemScripts : GeneralScript
 		// are some they didn't get yet. This needs to be done on login,
 		// but after the character, account, and connection were set up,
 		// in case we need them.
-		e.Character.Collections.GrantEligibleRewards();
+		e.Character?.Collections?.GrantEligibleRewards();
 	}
 }

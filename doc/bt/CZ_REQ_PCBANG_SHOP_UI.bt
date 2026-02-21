@@ -15,5 +15,4 @@
 
 ClientHeaderFixed header;
 
-int i1; // 3
-ushort s1;
+int shopType; // 3

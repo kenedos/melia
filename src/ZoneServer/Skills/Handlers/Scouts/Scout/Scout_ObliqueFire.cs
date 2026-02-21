@@ -112,7 +112,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			var splashRadius = 50; // SplashHeight * 2?
 			var splashArea = new Circle(mainTarget.Position, splashRadius);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			if (targets.Count == 0)
 			{
 				bounceTarget = null;

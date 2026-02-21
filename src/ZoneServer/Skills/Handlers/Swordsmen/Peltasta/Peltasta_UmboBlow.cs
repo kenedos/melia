@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// Handler for the Peltasta Skill Umbo Blow.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_UmboBlow)]
-	public class Peltasta_UmboBlow : IGroundSkillHandler
+	public class Peltasta_UmboBlow : IMeleeGroundSkillHandler
 	{
 		private readonly static TimeSpan StunDuration = TimeSpan.FromSeconds(3);
 		private const int BuffRemoveChancePerLevel = 8;
@@ -35,8 +36,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -69,7 +71,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -98,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 				if (caster.TryGetActiveAbilityLevel(AbilityId.Peltasta8, out var knockdownLevel))
 				{
 					// Knockback power is 40 * level
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 					skillHit.ApplyKnockBack(target);
 				}
 				else

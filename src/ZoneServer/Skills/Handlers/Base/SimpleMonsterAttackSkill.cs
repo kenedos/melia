@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,7 +8,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
-using static Melia.Shared.Util.TaskHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Base
@@ -24,9 +23,9 @@ namespace Melia.Zone.Skills.Handlers.Base
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
+		public virtual void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
-			CallSafe(this.Attack(skill, caster, target));
+			skill.Run(this.Attack(skill, caster, target));
 		}
 
 		/// <summary>
@@ -34,8 +33,13 @@ namespace Melia.Zone.Skills.Handlers.Base
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		private async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity designatedTarget)
+		protected virtual async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity designatedTarget)
 		{
+			if (!caster.TrySpendSp(skill))
+				return;
+
+			skill.IncreaseOverheat();
+
 			var splashArea = this.GetSplashArea(skill, caster, designatedTarget);
 			var damageDelay = this.GetDamageDelay(skill);
 			var hitDelay = this.GetHitDelay(skill);
@@ -56,10 +60,10 @@ namespace Melia.Zone.Skills.Handlers.Base
 			// target to move out of harms way before the skill hits,
 			// such as with the poison cloud in the Kepa attack skill.
 
-			Debug.ShowShape(caster.Map, splashArea, edgePoints: false, duration: damageDelay + TimeSpan.FromSeconds(3));
+			Debug.ShowShape(caster.Map, splashArea, edgePoints: false, duration: damageDelay);
 
 			if (hitDelay > TimeSpan.Zero)
-				await Task.Delay(hitDelay);
+				await skill.Wait(hitDelay);
 
 			// Check if attacker is still able to fight after the delay.
 			// Update: This check was primarily added to see if the caster
@@ -75,7 +79,36 @@ namespace Melia.Zone.Skills.Handlers.Base
 				return;
 			}
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+			var hits = new List<SkillHitInfo>();
+
+			foreach (var target in targets.LimitBySDR(caster, skill))
+			{
+				var skillHitResult = SCR_SkillHit(caster, target, skill);
+				target.TakeDamage(skillHitResult.Damage, caster);
+
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				hits.Add(skillHit);
+
+				this.OnHit(caster, target, skill, skillHitResult);
+			}
+
+			Send.ZC_SKILL_HIT_INFO(caster, hits);
+		}
+
+		public async Task SkillHitInfo(Skill skill, ICombatEntity caster, ISplashArea splashArea, TimeSpan damageDelay)
+		{
+			var hitDelay = this.GetHitDelay(skill);
+
+			if (hitDelay > TimeSpan.Zero)
+				await skill.Wait(hitDelay);
+
+			// Check if attacker is still able to fight after the delay
+			if (!caster.CanFight())
+				return;
+
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+			var skillHitDelay = skill.Properties.HitDelay;
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))

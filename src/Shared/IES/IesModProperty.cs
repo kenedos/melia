@@ -15,7 +15,7 @@ namespace Melia.Shared.IES
 		/// <summary>
 		/// Returns the changed to the property.
 		/// </summary>
-		public List<IesModPropertyChange> Changes { get; } = new();
+		public List<IesModPropertyChange> Changes { get; } = new List<IesModPropertyChange>();
 
 		/// <summary>
 		/// Creates new property.

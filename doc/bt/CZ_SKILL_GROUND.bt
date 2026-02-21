@@ -17,11 +17,11 @@ ClientHeaderFixed header;
 
 byte b1;
 int skillId;
-int i3;
+int i1; // 0
 position originPosition;
 position castPosition;
 direction castDirection;
 int targetHandle;
-int i1;
-byte b2;
-int i2;
+int i2; // 0
+byte b2; // 0
+int i3; // 0

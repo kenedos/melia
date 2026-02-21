@@ -1,0 +1,15 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: CZ_REQ_CURRENT_HUD_SKIN.bt
+//   Authors: Salman T. Khan
+//   Version: i378059
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+#include "inc/common.bt"
+
+ClientHeaderFixed header;

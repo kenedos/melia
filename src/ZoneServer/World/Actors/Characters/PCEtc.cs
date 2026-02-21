@@ -1,6 +1,6 @@
 ﻿using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
-using Melia.Zone.World.Storage;
+using Melia.Zone.World.Storages;
 
 namespace Melia.Zone.World.Actors.Characters
 {

@@ -47,7 +47,7 @@ namespace Melia.Shared.Network
 		/// <returns></returns>
 		public bool TryGet(ServerType type, int serverId, out ServerInfo server)
 		{
-			server = _servers.FirstOrDefault(a => a.Type == type && a.Id == serverId);
+			server = _servers.Find(a => a.Type == type && a.Id == serverId);
 			return server != null;
 		}
 
@@ -70,7 +70,7 @@ namespace Melia.Shared.Network
 		/// </summary>
 		/// <param name="serverType"></param>
 		/// <returns></returns>
-		public ServerInfo[] GetAll(ServerType serverType)
+		public ServerInfo[] GetAll(ServerType serverType, ServerStatus status = ServerStatus.Online)
 			=> _servers.Where(a => a.Type == serverType).ToArray();
 
 		/// <summary>
@@ -79,6 +79,17 @@ namespace Melia.Shared.Network
 		/// <returns></returns>
 		public ServerInfo[] GetAll()
 			=> _servers.ToArray();
+
+		/// <summary>
+		/// Returns a list of social servers.
+		/// </summary>
+		/// <returns></returns>
+		public ServerInfo[] GetSocialServers()
+		{
+			var socialServers = _servers.Where(a => a.Type == ServerType.Social);
+
+			return socialServers.ToArray();
+		}
 
 		/// <summary>
 		/// Returns the zone server with the given index that serves the
@@ -106,11 +117,11 @@ namespace Melia.Shared.Network
 		/// <param name="serverUpdateMessage"></param>
 		public void Update(ServerUpdateMessage serverUpdateMessage)
 		{
-			if (!this.TryGet(ServerType.Zone, serverUpdateMessage.ServerId, out var serverInfo))
+			if (!this.TryGet(serverUpdateMessage.ServerType, serverUpdateMessage.ServerId, out var serverInfo))
 				return;
-
-			serverInfo.CurrentPlayers = serverUpdateMessage.PlayerCount;
 			serverInfo.Status = serverUpdateMessage.Status;
+			serverInfo.CurrentPlayers = serverUpdateMessage.PlayerCount;
+			serverInfo.Rates = serverUpdateMessage.Rates;
 		}
 	}
 
@@ -140,6 +151,11 @@ namespace Melia.Shared.Network
 		public int Port { get; set; }
 
 		/// <summary>
+		/// Returns the server's internal IP address.
+		/// </summary>
+		public string InterIp { get; }
+
+		/// <summary>
 		/// Returns the port the server is listening on internally.
 		/// </summary>
 		public int InterPort { get; set; }
@@ -150,7 +166,7 @@ namespace Melia.Shared.Network
 		public int CurrentPlayers { get; set; }
 
 		/// <summary>
-		/// Returns the mayimum number of players that can be connected to
+		/// Returns the maximum number of players that can be connected to
 		/// the server.
 		/// </summary>
 		public int MaxPlayers { get; set; } = 100;
@@ -164,6 +180,11 @@ namespace Melia.Shared.Network
 		/// Gets or sets the server's status.
 		/// </summary>
 		public ServerStatus Status { get; set; }
+
+		/// <summary>
+		/// Gets or sets the server's rate.
+		/// </summary>
+		public ServerRates Rates { get; set; }
 
 		/// <summary>
 		/// Creates empty server info.
@@ -182,24 +203,29 @@ namespace Melia.Shared.Network
 			this.Id = data.Id;
 			this.Ip = data.Ip;
 			this.Port = data.Port;
+			this.InterIp = data.InterIp;
 			this.InterPort = data.InterPort;
 			this.MapIds = data.MapIds;
 		}
 	}
 
 	/// <summary>
-	/// Represents the operational status of a server.
+	/// Represents the server's experience rates.
 	/// </summary>
+	[Serializable]
+	public class ServerRates
+	{
+		public float ExpRate { get; set; }
+		public float JobExpRate { get; set; }
+		public float DropRate { get; set; }
+		public float EquipRate { get; set; }
+		public float GemRate { get; set; }
+		public float RecipeRate { get; set; }
+	}
+
 	public enum ServerStatus
 	{
-		/// <summary>
-		/// The server is currently offline and can't be connected to.
-		/// </summary>
 		Offline,
-
-		/// <summary>
-		/// The server is currently online and can be connected to.
-		/// </summary>
 		Online,
 	}
 }

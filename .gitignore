@@ -6,6 +6,8 @@
 /logs/
 /cache/
 
+/system/scripts/zone/scripts_override.txt
+
 /user/**
 
 !/user/conf/database-example.conf
@@ -34,7 +36,6 @@
 # Mono user-preferences file
 *.userprefs
 .vs/
-packages/
 
 # Build results
 

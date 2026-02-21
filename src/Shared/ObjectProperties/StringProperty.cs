@@ -2,9 +2,6 @@
 
 namespace Melia.Shared.ObjectProperties
 {
-	/// <summary>
-	/// A string-type property.
-	/// </summary>
 	public class StringProperty : Properties.StringVariable, IProperty
 	{
 		/// <summary>
@@ -16,8 +13,17 @@ namespace Melia.Shared.ObjectProperties
 			: base(ident, value)
 		{
 		}
-	}
 
+		/// <summary>
+		/// Creates new property.
+		/// </summary>
+		/// <param name="ident"></param>
+		/// <param name="value"></param>
+		public StringProperty(string ident, Enum value)
+			: base(ident, value.ToString())
+		{
+		}
+	}
 	/// <summary>
 	/// A string-type property that references the result of a function.
 	/// </summary>
@@ -39,7 +45,7 @@ namespace Melia.Shared.ObjectProperties
 		/// </summary>
 		/// <param name="ident"></param>
 		/// <param name="getter"></param>
-		public RStringProperty(string ident, Func<string> getter) : base(ident, null)
+		public RStringProperty(string ident, Func<string> getter) : base(ident, string.Empty)
 		{
 			_getter = getter;
 		}

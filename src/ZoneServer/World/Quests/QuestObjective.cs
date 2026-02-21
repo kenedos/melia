@@ -1,4 +1,6 @@
-﻿using Melia.Shared.World;
+﻿using System;
+using Melia.Shared.World;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.World.Quests
@@ -9,9 +11,14 @@ namespace Melia.Zone.World.Quests
 	public abstract class QuestObjective
 	{
 		/// <summary>
+		/// Shared quest objective id
+		/// </summary>
+		public int Id { get; internal set; }
+
+		/// <summary>
 		/// Gets or sets the objective's description.
 		/// </summary>
-		public string Text { get; internal set; }
+		public string Text { get; set; }
 
 		/// <summary>
 		/// Get or sets the location at which this objective may be worked
@@ -24,13 +31,26 @@ namespace Melia.Zone.World.Quests
 		/// Returns the objective's identifier, which is unique on a per
 		/// quest basis.
 		/// </summary>
-		public string Ident { get; internal set; }
+		public string Ident { get; set; }
 
 		/// <summary>
 		/// Returns the amount of goals to reach for this objective,
 		/// like the number of monsters to kill or items to collect.
 		/// </summary>
-		public int TargetCount { get; internal set; } = 1;
+		public int TargetCount { get; protected set; } = 1;
+
+		/// <summary>
+		/// Returns the current progress towards the goal for this objective.
+		/// </summary>
+		public int Progress { get; protected set; }
+
+		/// <summary>
+		/// Returns the current progress of this objective.
+		/// </summary>
+		public virtual bool IsCompleted => this.Progress >= this.TargetCount;
+
+		public Action<Character, QuestObjective> Started { get; set; }
+		public Action<Character, QuestObjective> Completed { get; set; }
 
 		/// <summary>
 		/// Called when a quest that uses this objective is initially loaded.
@@ -63,6 +83,31 @@ namespace Melia.Zone.World.Quests
 		/// <param name="quest"></param>
 		public virtual void OnStart(Character character, Quest quest)
 		{
+		}
+
+		/// <summary>
+		/// Called when a quest with this objective is completed.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="quest"></param>
+		public virtual void OnCompleted(Character character, Quest quest)
+		{
+		}
+
+		/// <summary>
+		/// Increments the progress of this objective by one.
+		/// </summary>
+		public void IncrementProgress()
+		{
+			if (this.Progress < this.TargetCount)
+			{
+				this.Progress++;
+			}
+		}
+
+		public void SetCompleted()
+		{
+			this.Progress = this.TargetCount;
 		}
 	}
 }

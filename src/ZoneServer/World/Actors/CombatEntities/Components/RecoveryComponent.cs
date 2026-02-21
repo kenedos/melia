@@ -1,9 +1,8 @@
 ﻿using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.ObjectProperties;
-using Melia.Zone.Buffs.Handlers;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
 
@@ -18,6 +17,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private TimeSpan _rhpTime;
 		private TimeSpan _rspTime;
 		private TimeSpan _staminaTime;
+		private TimeSpan _shieldTime;
 
 		/// <summary>
 		/// Creates new component.
@@ -37,8 +37,15 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				return;
 
 			this.UpdateHp(elapsed);
-			this.UpdateSp(elapsed);
-			this.UpdateStamina(elapsed);
+			if (this.Entity is Character)
+			{
+				this.UpdateSp(elapsed);
+				this.UpdateStamina(elapsed);
+			}
+			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss)
+			{
+				this.UpdateShield(elapsed);
+			}
 		}
 
 		/// <summary>
@@ -87,6 +94,24 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Updates entity's shields.
+		/// </summary>
+		/// <param name="elapsed"></param>
+		private void UpdateShield(TimeSpan elapsed)
+		{
+			_shieldTime -= elapsed;
+
+			if (_shieldTime <= TimeSpan.Zero)
+			{
+				if (this.Entity is Mob mob && !mob.CombatState.AttackState)
+					this.RecoverShield();
+
+				// Using HP Regen time
+				_shieldTime = TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.RHPTIME));
+			}
+		}
+
+		/// <summary>
 		/// Recovers some HP.
 		/// </summary>
 		private void RecoverHp()
@@ -110,6 +135,22 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			if (rec > 0 && cur < max)
 				this.Entity.Heal(0, rec);
+		}
+
+		/// <summary>
+		/// Recovers some Shield.
+		/// </summary>
+		private void RecoverShield()
+		{
+			if (this.Entity is not Mob mob)
+				return;
+
+			var cur = mob.Shield;
+			var max = mob.MaxShield;
+			var rec = (int)this.Entity.Properties.GetFloat(PropertyName.RHP);
+
+			if (rec > 0 && cur < max)
+				mob.HealShield(rec);
 		}
 
 		/// <summary>
@@ -145,6 +186,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			character.Properties.Stamina = stamina;
 			Send.ZC_STAMINA(character, stamina);
+		}
+
+		internal void ResetSpRecoveryTime()
+		{
+			_rspTime = TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.RSPTIME));
 		}
 	}
 }

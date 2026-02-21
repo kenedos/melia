@@ -1,21 +1,27 @@
-﻿using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 
 namespace Melia.Zone.Buffs.Handlers.Common
 {
 	/// <summary>
-	/// Handle for the Freeze Debuff
+	/// Handle for the Freeze Debuff. Frozen solid.
 	/// </summary>
-	[BuffHandler(BuffId.Freeze)]
+	[BuffHandler(BuffId.Freeze, BuffId.UC_freeze)]
 	public class Freeze : BuffHandler, IBuffCombatDefenseBeforeCalcHandler
 	{
-		public override void OnExtend(Buff buff)
+		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			buff.Target.AddState(StateType.Stunned, buff.Duration);
+			buff.Target.AddState(StateType.Frozen);
+		}
+
+		public override void OnEnd(Buff buff)
+		{
+			buff.Target.RemoveState(StateType.Frozen);
 		}
 
 		/// <summary>

@@ -14,11 +14,17 @@ namespace Melia.Barracks.Database
 	{
 		private readonly object _moneyLock = new();
 		private readonly List<Character> _characters = new();
+		private readonly List<Companion> _companions = new();
 
 		/// <summary>
 		/// Gets or sets account's id.
 		/// </summary>
 		public long Id { get; set; }
+
+		/// <summary>
+		/// Returns the account's globally unique object id.
+		/// </summary>
+		public long ObjectId => ObjectIdRanges.Accounts + this.Id;
 
 		/// <summary>
 		/// Gets or sets account's name.
@@ -196,6 +202,48 @@ namespace Melia.Barracks.Database
 		}
 
 		/// <summary>
+		/// Returns list of all companions on account.
+		/// </summary>
+		/// <returns></returns>
+		public Companion[] GetCompanions()
+		{
+			lock (_companions)
+				return _companions.ToArray();
+		}
+
+		/// <summary>
+		/// Adds companion to account object and assigns index.
+		/// </summary>
+		/// <param name="companion"></param>
+		private void AddCompanion(Companion companion)
+		{
+			lock (_companions)
+			{
+				for (byte i = 1; i <= byte.MaxValue; ++i)
+				{
+					if (!_companions.Any(a => a.Index == i))
+					{
+						companion.Index = i;
+						break;
+					}
+				}
+
+				_companions.Add(companion);
+			}
+		}
+
+		/// <summary>
+		/// Returns companion by companion id, or null if it doesn't exist.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		public Companion GetCompanionById(long id)
+		{
+			lock (_companions)
+				return _companions.FirstOrDefault(a => a.ObjectId == id);
+		}
+
+		/// <summary>
 		/// Loads account with given name from database, incl. characters,
 		/// and returns it.
 		/// </summary>
@@ -210,6 +258,10 @@ namespace Melia.Barracks.Database
 			var characters = BarracksServer.Instance.Database.GetCharacters(account.Id);
 			foreach (var character in characters)
 				account.AddCharacter(character);
+
+			var companions = BarracksServer.Instance.Database.GetCompanions(account.Id);
+			foreach (var companion in companions)
+				account.AddCompanion(companion);
 
 			BarracksServer.Instance.Database.LoadMailbox(account);
 
@@ -228,6 +280,9 @@ namespace Melia.Barracks.Database
 				if (!_characters.Contains(character))
 					return false;
 			}
+
+			if (BarracksServer.Instance.Database.HasActiveMarketItems(character.DbId))
+				return false;
 
 			// If the deletion on the db fails, the character shouldn't
 			// have been shown to begin with and should be removed.
@@ -328,6 +383,12 @@ namespace Melia.Barracks.Database
 			{
 				foreach (var character in _characters)
 					BarracksServer.Instance.Database.SaveCharacter(character);
+			}
+
+			lock (_companions)
+			{
+				foreach (var companion in _companions)
+					BarracksServer.Instance.Database.SaveCompanion(companion);
 			}
 		}
 	}

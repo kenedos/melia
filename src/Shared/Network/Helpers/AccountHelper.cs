@@ -1,10 +1,9 @@
-﻿using Melia.Shared.ObjectProperties;
+﻿using Melia.Shared.Game.Const;
+using Melia.Shared.ObjectProperties;
+using Melia.Shared.Versioning;
 
 namespace Melia.Shared.Network.Helpers
 {
-	/// <summary>
-	/// Extension methods for writing account-related information to packets.
-	/// </summary>
 	public static class AccountHelper
 	{
 		/// <summary>
@@ -18,11 +17,18 @@ namespace Melia.Shared.Network.Helpers
 			var size = propertyList.GetByteCount();
 
 			packet.PutShort(size);
-			packet.PutShort(100); // This is the server group ID found in serverlist.xml. Update: Is it though? Looks more like the enter limit.
-			packet.PutShort(0); // [i373230] Value: 1003. Server group id?
-			packet.PutInt(account.SelectedBarrackLayer);
-			packet.PutByte(1);
-			packet.PutByte(1);
+			if (Versions.Protocol > 500)
+			{
+				packet.PutShort(100); // This is the server group ID found in serverlist.xml. Update: Is it though? Looks more like the enter limit.
+				packet.PutShort(0); // [i373230] Value: 1003. Server group id?
+				packet.PutInt(account.SelectedBarrackLayer);
+				packet.PutByte(1);
+				packet.PutByte(1);
+			}
+			else if (Versions.Client >= 11310)
+			{
+				packet.PutShort(0);
+			}
 
 			packet.AddProperties(propertyList);
 		}
@@ -31,7 +37,7 @@ namespace Melia.Shared.Network.Helpers
 	/// <summary>
 	/// Common interface for accounts, for use with account helpers.
 	/// </summary>
-	public interface IAccount
+	public interface IAccount : IPropertyObject
 	{
 		/// <summary>
 		/// Returns the number of medals (TP) the account has.
@@ -57,10 +63,5 @@ namespace Melia.Shared.Network.Helpers
 		/// Returns the selected barrack layer.
 		/// </summary>
 		int SelectedBarrackLayer { get; }
-
-		/// <summary>
-		/// Returns a reference to the account's properties.
-		/// </summary>
-		Properties Properties { get; }
 	}
 }

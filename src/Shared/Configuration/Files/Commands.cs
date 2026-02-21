@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Melia.Shared.Game.Const;
 using Yggdrasil.Configuration;
+using Yggdrasil.Logging;
 
 namespace Melia.Shared.Configuration.Files
 {
@@ -37,9 +40,15 @@ namespace Melia.Shared.Configuration.Files
 		/// Loads conf file and its options from the given path.
 		/// </summary>
 		/// <param name="filePath"></param>
-		public void Load(string filePath)
+		public void Load(string filePath, params string[] extraIncludes)
 		{
 			this.Include(filePath);
+
+			foreach (var path in extraIncludes)
+			{
+				if (File.Exists(path))
+					this.Include(path);
+			}
 
 			this.SelfPrefix = this.GetString("prefix", "/").Substring(0, 1);
 			this.TargetPrefix = this.SelfPrefix + this.SelfPrefix;

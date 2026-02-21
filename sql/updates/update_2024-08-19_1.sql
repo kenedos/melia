@@ -1,0 +1,1 @@
+ALTER TABLE `market_items` CHANGE `buyerId` `buyerId` BIGINT(20) NULL DEFAULT NULL;

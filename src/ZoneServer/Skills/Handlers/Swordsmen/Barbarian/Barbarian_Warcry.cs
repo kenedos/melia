@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			var splashParam = skill.GetSplashParameters(caster, caster.Position, caster.Position, length: 0, width: 100, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			var maxTargets = 10;
 			if (caster.TryGetActiveAbilityLevel(AbilityId.Barbarian1, out var barbarian1Level))

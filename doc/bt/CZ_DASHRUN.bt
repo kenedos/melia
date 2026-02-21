@@ -16,4 +16,4 @@
 ClientHeaderFixed header;
 
 byte b1;
-byte b2;
+byte start; // 1 = start dash, 0 = stop dash

@@ -1,54 +1,104 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
+using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Const.Web;
+using Melia.Shared.Game.Properties;
 using Melia.Shared.L10N;
 using Melia.Shared.Network.Helpers;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
+using Melia.Shared.Versioning;
 using Melia.Shared.World;
-using Melia.Zone.Buffs.Handlers.Common;
-using Melia.Zone.Buffs.Handlers.Scouts.Assassin;
+using Melia.Zone.Buffs.Handlers;
+using Melia.Zone.Buffs.Handlers.Scout.Assassin;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.AI;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.Skills;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Melia.Zone.World.Storage;
-using Yggdrasil.Composition;
+using Melia.Zone.World.Actors.Pads;
+using Melia.Zone.World.Items;
+using Melia.Zone.World.Maps;
+using Melia.Zone.World.Storages;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
+using static Melia.Shared.Util.TaskHelper;
 
 namespace Melia.Zone.World.Actors.Characters
 {
 	/// <summary>
 	/// Represents a player character.
 	/// </summary>
-	public class Character : Actor, IActor, ICombatEntity, ICommander, IPropertyObject, IUpdateable
+	public partial class Character : Actor, ICombatEntity, ICommander, IPropertyObject, IUpdateable
 	{
-		private bool _warping;
-		private int _destinationChannelId;
+		#region Private Fields
+		private const int MaxMonsterAppearPerTick = 8;
 
+		private int _destinationChannelId;
+		private readonly object _warpLock = new();
 		private readonly object _lookAroundLock = new();
 		private readonly object _hpLock = new();
 		private IMonster[] _visibleMonsters = [];
 		private Character[] _visibleCharacters = [];
-
+		private Pad[] _visiblePads = [];
+		private readonly HashSet<Pad> _observedPads = [];
 		private readonly static TimeSpan ResurrectDialogDelay = TimeSpan.FromSeconds(2);
 		private TimeSpan _resurrectDialogTimer = ResurrectDialogDelay;
+		private Localizer _localizer;
+		private Companion _companionToReactivate;
+		private DateTime _pendingCompanionActivation = DateTime.MinValue;
+		private readonly static TimeSpan CompanionActivationDelay = TimeSpan.FromSeconds(2);
+		#endregion
+
+		#region Core Properties
+		private Position _position;
+
+		/// <summary>
+		/// Returns the character's position on its current map.
+		/// Setting this property automatically updates the spatial index.
+		/// </summary>
+		public override Position Position
+		{
+			get => _position;
+			set
+			{
+				var oldPosition = _position;
+				_position = value;
+				this.Map?.UpdateEntitySpatialPosition(this, oldPosition, value);
+			}
+		}
+
+		/// <summary>
+		/// Returns when the character was last saved.
+		/// </summary>
+		public DateTime LastSaved { get; set; } = DateTime.UtcNow;
+
+		/// <summary>
+		/// Returns whether the character is travelling between maps.
+		/// </summary>
+		public bool IsWarping { get; set; } = true;
 
 		/// <summary>
 		/// Returns true if the character was just saved before a warp.
 		/// </summary>
-		internal bool SavedForWarp { get; private set; }
+		public bool SavedForWarp { get; internal set; }
 
 		/// <summary>
 		/// Connection this character uses.
 		/// </summary>
-		public IZoneConnection Connection { get; set; }
+		public virtual IZoneConnection Connection { get; set; }
 
 		/// <summary>
 		/// Returns the name of the character's account.
@@ -58,54 +108,27 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <summary>
 		/// Gets or sets the character's unique database id.
 		/// </summary>
-		/// <remarks>
-		/// Represents the id the character is known by in the database.
-		/// This is different from the ObjectId, which is used in the game.
-		/// </remarks>
 		public long DbId { get; set; }
 
 		/// <summary>
 		/// Returns the character's globally unique id.
 		/// </summary>
-		/// <remarks>
-		/// Represents the id the character is known by in the game, applying
-		/// an offset to the database id.
-		/// </remarks>
 		public long ObjectId => ObjectIdRanges.Characters + this.DbId;
 
 		/// <summary>
 		/// Returns the character's globally unique id on the social server.
 		/// </summary>
-		/// <remarks>
-		/// This id might not actually be the social user id, or at least not
-		/// solely, seeing how it's used as the id of the etc property object.
-		/// </remarks>
 		public long SocialUserId => ObjectIdRanges.SocialUser + this.DbId;
 
 		/// <summary>
 		/// Id of the character's account.
 		/// </summary>
-		public long AccountId { get; set; }
+		public long AccountDbId { get; set; }
 
 		/// <summary>
-		/// Returns the character's faction.
+		/// Id of the character's account.
 		/// </summary>
-		public FactionType Faction => FactionType.Law;
-
-		/// <summary>
-		/// Returns the character's race.
-		/// </summary>
-		public RaceType Race => RaceType.None;
-
-		/// <summary>
-		/// Returns the character's element/attribute.
-		/// </summary>
-		public AttributeType Attribute => (AttributeType)(int)this.Properties.GetFloat(PropertyName.Attribute, (int)AttributeType.None);
-
-		/// <summary>
-		/// Returns the character's mode of movement.
-		/// </summary>
-		public MoveType MoveType => MoveType.Normal;
+		public long AccountObjectId => ObjectIdRanges.Accounts + this.AccountDbId;
 
 		/// <summary>
 		/// Character's name.
@@ -116,36 +139,9 @@ namespace Melia.Zone.World.Actors.Characters
 		/// Character's team name.
 		/// </summary>
 		public string TeamName { get; set; }
+		#endregion
 
-		/// <summary>
-		/// Gets or sets the character's current job id.
-		/// </summary>
-		/// <remarks>
-		/// This should essentially and presumably always be the id of the
-		/// last job the character changed to.
-		/// </remarks>
-		public JobId JobId { get; set; }
-
-		/// <summary>
-		/// Returns the class of the character's current job.
-		/// </summary>
-		public JobClass JobClass => this.JobId.ToClass();
-
-		/// <summary>
-		/// Returns the character's current job.
-		/// </summary>
-		public Job Job => this.Jobs.Get(this.JobId);
-
-		/// <summary>
-		/// Returns a reference to the character's job list.
-		/// </summary>
-		/// <remarks>
-		/// A character has one main job which determines, for example,
-		/// what items they can equip, but they can have various jobs,
-		/// that all come with their own skills and abilities.
-		/// </remarks>
-		public JobComponent Jobs { get; }
-
+		#region Character Appearance & State
 		/// <summary>
 		/// Character's gender.
 		/// </summary>
@@ -162,14 +158,14 @@ namespace Melia.Zone.World.Actors.Characters
 		public uint SkinColor { get; set; }
 
 		/// <summary>
+		/// Character's pose.
+		/// </summary>
+		public byte Pose { get; set; }
+
+		/// <summary>
 		/// Returns stance, based on job and other factors.
 		/// </summary>
 		public int Stance { get; protected set; }
-
-		/// <summary>
-		/// The map the character is in.
-		/// </summary>
-		public int MapId { get; set; }
 
 		/// <summary>
 		/// Character's head's direction.
@@ -182,33 +178,9 @@ namespace Melia.Zone.World.Actors.Characters
 		public bool IsSitting { get; set; }
 
 		/// <summary>
-		/// Returns the character's personal storage.
+		/// Specifies which hats are visible on the character.
 		/// </summary>
-		public PersonalStorage PersonalStorage { get; }
-
-		/// <summary>
-		/// Returns the character's account's team storage.
-		/// </summary>
-		public PersonalStorage TeamStorage { get; }
-
-		/// <summary>
-		/// Returns a reference to the character's current storage.
-		/// </summary>
-		/// <remarks>
-		/// The result of this method depends on the character's variables,
-		/// to support the dynamic opening of arbitrary storages. If no
-		/// special storage was set, it defaults to the personal storage.
-		/// </remarks>
-		public PersonalStorage CurrentStorage
-		{
-			get => this.Variables.Temp.Get<PersonalStorage>("Melia.Storage") ?? this.PersonalStorage;
-			set => this.Variables.Temp.Set("Melia.Storage", value);
-		}
-
-		/// <summary>
-		/// The character's inventory.
-		/// </summary>
-		public InventoryComponent Inventory { get; }
+		public VisibleEquip VisibleEquip { get; set; } = VisibleEquip.All;
 
 		/// <summary>
 		/// Gets or set the character's greeting message.
@@ -216,106 +188,203 @@ namespace Melia.Zone.World.Actors.Characters
 		public string GreetingMessage { get; set; }
 
 		/// <summary>
-		/// Holds the order of successive changes in character HP.
-		/// A higher value indicates the latest HP amount.
+		/// Gets or sets the character's chat balloon.
 		/// </summary>
-		/// TODO: I'm not sure when this gets rolled over;
-		///   More investigation is needed.
-		public int HpChangeCounter { get; private set; }
+		public int ChatBalloon { get; set; } = 1;
 
 		/// <summary>
-		/// Specifies whether the character currently updates the visible
-		/// entities around the character.
+		/// Get or set the character's chat balloon expiration
 		/// </summary>
-		public bool EyesOpen { get; private set; }
+		public DateTime ChatBalloonExpiration { get; set; } = new DateTime(2999, 12, 31, 23, 59, 59, DateTimeKind.Local);
 
 		/// <summary>
-		/// Character's scripting variables.
+		/// Character's Balloon Id
 		/// </summary>
-		public VariablesContainer Variables { get; } = new VariablesContainer();
+		public int BalloonId { get; set; }
 
 		/// <summary>
-		/// Specifies which hats are visible on the character.
+		/// Animation Pairing
 		/// </summary>
-		public VisibleEquip VisibleEquip { get; set; } = VisibleEquip.All;
+		public bool IsPaired { get; set; }
 
 		/// <summary>
-		/// Current experience points.
+		/// Character is riding a "vehicle" (Companion)
 		/// </summary>
-		public long Exp { get; set; }
+		public bool IsRiding { get; set; }
 
 		/// <summary>
-		/// Current maximum experience points.
+		/// Character's online status.
 		/// </summary>
-		public long MaxExp { get; set; }
+		public bool IsOnline { get; set; } = false;
 
 		/// <summary>
-		/// Total number of accumulated experience points.
+		/// Returns true if the character is autotrading (offline vending).
+		/// When autotrading, the character remains in the world with their
+		/// shop open while the player is disconnected.
 		/// </summary>
-		public long TotalExp { get; set; }
+		public bool IsAutoTrading { get; set; } = false;
+		#endregion
+
+		#region Game System Properties
+		/// <summary>
+		/// Returns the character's race.
+		/// </summary>
+		public RaceType Race => RaceType.None;
 
 		/// <summary>
-		/// Returns the character's current job level.
+		/// Returns the character's element/attribute.
 		/// </summary>
-		public int JobLevel
-		{
-			get
-			{
-				var job = this.Jobs.Get(this.JobId);
-				return job.Level;
-			}
-		}
+		public AttributeType Attribute => (AttributeType)(int)this.Properties.GetFloat(PropertyName.Attribute, (int)AttributeType.None);
 
 		/// <summary>
-		/// Returns the character's current level.
+		/// Returns the character's armor material.
 		/// </summary>
-		public int Level => (int)this.Properties.GetFloat(PropertyName.Lv);
+		public ArmorMaterialType ArmorMaterial => (ArmorMaterialType)(int)this.Properties.GetFloat(PropertyName.ArmorMaterial, (int)ArmorMaterialType.None);
 
 		/// <summary>
-		/// Returns the character's current HP.
+		/// Returns the character's mode of movement.
 		/// </summary>
-		public int Hp => (int)this.Properties.GetFloat(PropertyName.HP);
+		public MoveType MoveType { get; set; } = MoveType.Normal;
 
 		/// <summary>
-		/// Returns the character's max HP.
+		/// Gets or sets the character's tendency
 		/// </summary>
-		public int MaxHp => (int)this.Properties.GetFloat(PropertyName.MHP);
+		public TendencyType Tendency { get; set; } = TendencyType.Peaceful;
 
 		/// <summary>
-		/// Returns the character's current SP.
+		/// The map the character is in.
 		/// </summary>
-		public int Sp => (int)this.Properties.GetFloat(PropertyName.SP);
+		public int MapId { get; set; }
 
 		/// <summary>
-		/// Returns the character's max SP.
-		/// </summary>
-		public int MaxSp => (int)this.Properties.GetFloat(PropertyName.MSP);
-
-		/// <summary>
-		/// Returns the character's current stamina.
-		/// </summary>
-		public int Stamina => this.Properties.Stamina;
-
-		/// <summary>
-		/// Returns the character's max stamina.
-		/// </summary>
-		public int MaxStamina => this.Properties.MaxStamina;
-
-		/// <summary>
-		/// Returns true if the character has run out of HP and died.
-		/// </summary>
-		public bool IsDead => (this.Hp == 0);
-
-		/// <summary>
-		/// Returns the character's game permission level, based on the
-		/// account's authority.
+		/// Returns the character's game permission level, based on the account's authority.
 		/// </summary>
 		public PermissionLevel PermissionLevel => this.Connection?.Account?.PermissionLevel ?? PermissionLevel.User;
 
 		/// <summary>
-		/// Returns the character's component collection.
+		/// Returns the character's party id.
 		/// </summary>
-		public ComponentCollection Components { get; } = new ComponentCollection();
+		public long PartyId { get; set; }
+
+		/// <summary>
+		/// Returns the character's guild id.
+		/// </summary>
+		public long GuildId { get; set; }
+
+		/// <summary>
+		/// Character's class change reset points
+		/// </summary>
+		public int ResetPoints { get; set; }
+		#endregion
+
+		#region Components & Managers
+		/// <summary>
+		/// Returns a reference to the character's job list.
+		/// </summary>
+		public JobComponent Jobs { get; protected set; }
+
+		/// <summary>
+		/// The character's inventory.
+		/// </summary>
+		public InventoryComponent Inventory { get; protected set; }
+
+		/// <summary>
+		/// Character's skills.
+		/// </summary>
+		public SkillComponent Skills { get; protected set; }
+
+		/// <summary>
+		/// Character's abilities.
+		/// </summary>
+		public AbilityComponent Abilities { get; protected set; }
+
+		/// <summary>
+		/// Character's buffs.
+		/// </summary>
+		public BuffComponent Buffs { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's quests manager.
+		/// </summary>
+		public QuestComponent Quests { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's collection manager.
+		/// </summary>
+		public CollectionComponent Collections { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's item set manager.
+		/// </summary>
+		public ItemSetComponent ItemSets { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's time actions.
+		/// </summary>
+		public TimeActionComponent TimeActions { get; protected set; }
+
+		/// <summary>
+		/// Character's timed events.
+		/// </summary>
+		public TimedEventComponent TimedEvents { get; protected set; }
+
+		/// <summary>
+		/// Character's track manager.
+		/// </summary>
+		public TrackComponent Tracks { get; protected set; }
+
+		/// <summary>
+		/// Character's achievement manager.
+		/// </summary>
+		public AchievementComponent Achievements { get; protected set; }
+
+		/// <summary>
+		/// The character's equipped achievement title id, or -1 if none.
+		/// </summary>
+		public int EquippedTitleId { get; set; } = -1;
+
+		/// <summary>
+		/// Character's adventure book manager.
+		/// </summary>
+		public AdventureBookComponent AdventureBook { get; protected set; }
+
+		/// <summary>
+		/// Character's attendance events/rewards manager.
+		/// </summary>
+		public AttendanceComponent Attendance { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's companion component.
+		/// </summary>
+		public CompanionComponent Companions { get; protected set; }
+
+		/// <summary>
+		/// Character's dungeon manager.
+		/// </summary>
+		public DungeonComponent Dungeon { get; protected set; }
+
+		/// <summary>
+		/// Gets the component that manages the effects applied to the entity.
+		/// </summary>
+		/// <remarks>The <see cref="EffectsComponent"/> provides functionality for managing and querying the active
+		/// effects on the entity. This property is read-only outside the class and can only be modified within the class or
+		/// its derived types.</remarks>
+		public EffectsComponent Effects { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's movement component.
+		/// </summary>
+		public MovementComponent Movement { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's summoned monsters.
+		/// </summary>
+		public SummonComponent Summons { get; protected set; }
+
+		/// <summary>
+		/// Returns the character's tutorials viewed.
+		/// </summary>
+		public TutorialComponent Tutorials { get; protected set; }
 
 		/// <summary>
 		/// Character's session objects.
@@ -323,44 +392,42 @@ namespace Melia.Zone.World.Actors.Characters
 		public SessionObjects SessionObjects { get; } = new SessionObjects();
 
 		/// <summary>
-		/// Character's skills.
+		/// Character's scripting variables.
 		/// </summary>
-		public SkillComponent Skills { get; }
+		public VariablesContainer Variables { get; } = new VariablesContainer();
+		#endregion
+
+		#region Storage Properties
+		/// <summary>
+		/// Returns the character's personal storage.
+		/// </summary>
+		public PersonalStorage PersonalStorage { get; }
 
 		/// <summary>
-		/// Character's abilities.
+		/// Returns the character's team storage.
 		/// </summary>
-		public AbilityComponent Abilities { get; }
+		public TeamStorage TeamStorage => this.Connection.Account.TeamStorage;
 
 		/// <summary>
-		/// Character's buffs.
+		/// Returns a reference to the character's current storage.
 		/// </summary>
-		public BuffComponent Buffs { get; }
+		public Storages.Storage CurrentStorage
+		{
+			get => this.Variables.Temp.Get<Storages.Storage>("Melia.Storage") ?? this.PersonalStorage;
+			set => this.Variables.Temp.Set("Melia.Storage", value);
+		}
+		#endregion
 
-		/// <summary>
-		/// Returns the character's quests manager.
-		/// </summary>
-		public QuestComponent Quests { get; }
-
-		/// <summary>
-		/// Returns the character's collection manager.
-		/// </summary>
-		public CollectionComponent Collections { get; }
-
-		/// <summary>
-		/// Returns the character's movement component.
-		/// </summary>
-		public MovementComponent Movement { get; }
-
+		#region Properties Objects
 		/// <summary>
 		/// Character's properties.
 		/// </summary>
-		/// <remarks>
-		/// Beware, some of these are reference properties that can't be
-		/// set directly. Use this object's actual properties whenever
-		/// possible.
-		/// </remarks>
-		public CharacterProperties Properties { get; }
+		public CharacterProperties Properties { get; protected set; }
+
+		/// <summary>
+		/// GuildMember Properties
+		/// </summary>
+		public Properties GuildMemberProperties { get; } = new Properties("GuildMember");
 
 		/// <summary>
 		/// Returns a reference to the character's properties.
@@ -370,7 +437,7 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <summary>
 		/// Returns the character's PCEtc properties.
 		/// </summary>
-		public PCEtc Etc { get; }
+		public PCEtc Etc { get; protected set; }
 
 		/// <summary>
 		/// Gets or sets the player's localizer.
@@ -380,102 +447,128 @@ namespace Melia.Zone.World.Actors.Characters
 			get => _localizer ?? ZoneServer.Instance.MultiLocalization.GetDefault();
 			private set => _localizer = value;
 		}
-		private Localizer _localizer;
+		#endregion
 
-		/// <summary>
-		/// Raised when the character died.
-		/// </summary>
-		public event Action<ICombatEntity, ICombatEntity> Died;
-
+		#region Events
 		/// <summary>
 		/// Raised when the characters sits down or stands up.
 		/// </summary>
 		public event Action<Character> SitStatusChanged;
 
 		/// <summary>
+		/// Raised when the characters stats change.
+		/// </summary>
+		public event Action<Character> StatChanged;
+
+		/// <summary>
+		/// Raised when the character dies.
+		/// </summary>
+		public Action<Character, ICombatEntity> Died { get; set; }
+
+		/// <summary>
+		/// Raised when the character takes damage.
+		/// </summary>
+		public Action<Character, float, ICombatEntity> Damaged { get; set; }
+
+		/// <summary>
+		/// Manages the character's HP/SP recovery ticks.
+		/// </summary>
+		public RecoveryComponent Recovery { get; protected set; }
+
+		/// <summary>
+		/// Manages the character's combat state (targeting, attack state, etc.).
+		/// </summary>
+		public CombatComponent Combat { get; protected set; }
+
+		/// <summary>
+		/// Manages the character's skill cooldowns.
+		/// </summary>
+		public CooldownComponent Cooldowns { get; protected set; }
+
+		/// <summary>
+		/// Manages the character's state locks (frozen, knocked down, etc.).
+		/// </summary>
+		public StateLockComponent States { get; protected set; }
+		#endregion
+
+		#region Constructors
+		/// <summary>
 		/// Creates new character.
 		/// </summary>
 		public Character() : base()
+		{
+			this.Faction = FactionType.Law;
+			this.InitializeComponents();
+			this.Properties = new CharacterProperties(this);
+			this.Etc = new PCEtc(this);
+			this.PersonalStorage = new PersonalStorage(this);
+			this.AddSessionObjects();
+		}
+
+		/// <summary>
+		/// Used to create a dummy character (Dummy PC).
+		/// </summary>
+		/// <param name="copyFrom"></param>
+		public Character(Character copyFrom)
+		{
+			this.CopyFromCharacter(copyFrom);
+			this.Components.Add(new CombatComponent(this));
+		}
+
+		private void InitializeComponents()
 		{
 			this.Components.Add(this.Inventory = new InventoryComponent(this));
 			this.Components.Add(this.Jobs = new JobComponent(this));
 			this.Components.Add(this.Skills = new SkillComponent(this));
 			this.Components.Add(this.Abilities = new AbilityComponent(this));
 			this.Components.Add(this.Buffs = new BuffComponent(this));
-			this.Components.Add(new RecoveryComponent(this));
-			this.Components.Add(new CombatComponent(this));
-			this.Components.Add(new CooldownComponent(this));
-			this.Components.Add(new TimeActionComponent(this));
-			this.Components.Add(new StateLockComponent(this));
+			this.Components.Add(this.Recovery = new RecoveryComponent(this));
+			this.Components.Add(this.Combat = new CombatComponent(this));
+			this.Components.Add(this.Cooldowns = new CooldownComponent(this));
+			this.Components.Add(this.TimeActions = new TimeActionComponent(this));
+			this.Components.Add(this.States = new StateLockComponent(this));
 			this.Components.Add(this.Quests = new QuestComponent(this));
 			this.Components.Add(this.Collections = new CollectionComponent(this));
+			this.Components.Add(this.ItemSets = new ItemSetComponent(this));
 			this.Components.Add(this.Movement = new MovementComponent(this));
-
-			this.Properties = new CharacterProperties(this);
-			this.Etc = new PCEtc(this);
-
-			// Init storage after etc, since it uses etc properties
-			this.PersonalStorage = new PersonalStorage(this);
-			this.TeamStorage = new PersonalStorage(this);
-
-			this.AddSessionObjects();
+			this.Components.Add(new AttachmentComponent(this));
+			this.Components.Add(this.TimedEvents = new TimedEventComponent(this));
+			this.Components.Add(this.Tracks = new TrackComponent(this));
+			this.Components.Add(this.Achievements = new AchievementComponent(this));
+			this.Components.Add(this.AdventureBook = new AdventureBookComponent(this));
+			this.Components.Add(this.Attendance = new AttendanceComponent(this));
+			this.Components.Add(this.Companions = new CompanionComponent(this));
+			this.Components.Add(this.Summons = new SummonComponent(this));
+			this.Components.Add(this.Tutorials = new TutorialComponent(this));
+			this.Components.Add(this.Dungeon = new DungeonComponent(this));
+			this.Components.Add(this.Effects = new EffectsComponent(this));
 		}
 
-		/// <summary>
-		/// Adds default session objects.
-		/// </summary>
-		private void AddSessionObjects()
+		private void CopyFromCharacter(Character copyFrom)
 		{
-			// The exact purpose of those objects is unknown right now,
-			// but apparently they hold some properties of importance.
-			// For now we'll add only one, to be able to get rid of the
-			// message "You can buy items from a shop", which has been
-			// bugging me. I know I can buy items! I coded that!
-			// 
-			// Update: Disabling this for now so we can take a fresh
-			//   look at session objects. Curiously, I don't get the
-			//   aformentioned tooltip anymore right now, even if this
-			//   object is missing.
-			//this.SessionObjects.Add(new SessionObject(SessionObjectId.Jansori));
+			this.DbId = copyFrom.DbId;
+			this.AccountDbId = copyFrom.AccountDbId;
+			this.Name = copyFrom.Name;
+			this.TeamName = copyFrom.TeamName;
+			this.Stance = copyFrom.Stance;
+			this.Gender = copyFrom.Gender;
+			this.Exp = copyFrom.Exp;
+			this.JobId = copyFrom.JobId;
+			this.Hair = copyFrom.Hair;
+			this.SkinColor = copyFrom.SkinColor;
+			this.SetFaction(copyFrom.Faction);
+			this.Properties = copyFrom.Properties;
+			this.Jobs = copyFrom.Jobs;
+			this.Inventory = copyFrom.Inventory;
+			this.VisibleEquip = copyFrom.VisibleEquip;
+
+			SetPosition(copyFrom.Position);
+			SetDirection(copyFrom.Direction);
+			this.Pose = copyFrom.Pose;
 		}
+		#endregion
 
-		/// <summary>
-		/// Gives character its initial properties if they're missing,
-		/// such as on a newly created character.
-		/// </summary>
-		public void InitProperties()
-		{
-			if (this.Job == null)
-				throw new InvalidOperationException("Character's jobs need to be loaded before initializing the properties.");
-
-			// We need something to check whether the properties were
-			// already initialized. Let's just use a variable for that.
-			if (!this.Variables.Perm.Has("Melia.PropertiesInitialized"))
-			{
-				this.Exp = 0;
-				this.TotalExp = 0;
-				this.MaxExp = ZoneServer.Instance.Data.ExpDb.GetNextExp(1);
-
-				// Invalidate max properties so we get the correct values
-				// when using them here
-				this.Properties.Invalidate(PropertyName.MHP, PropertyName.MSP, PropertyName.MaxSta);
-
-				// Set HP, SP and stamina to max
-				this.Properties.SetFloat(PropertyName.HP, this.Properties.GetFloat(PropertyName.MHP));
-				this.Properties.SetFloat(PropertyName.SP, this.Properties.GetFloat(PropertyName.MSP));
-				this.Properties.Stamina = (int)this.Properties.GetFloat(PropertyName.MaxSta);
-
-				// Only do this once, as we will have saved property values
-				// next time we come here
-				this.Variables.Perm.SetBool("Melia.PropertiesInitialized", true);
-			}
-
-			// Invalidate all properties so they get updated and then set
-			// up the auto-updates
-			this.Properties.InvalidateAll();
-			this.Properties.InitAutoUpdates();
-		}
-
+		#region Core Update Method
 		/// <summary>
 		/// Updates character and its components.
 		/// </summary>
@@ -484,1014 +577,208 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			this.Components.Update(elapsed);
 			this.UpdateResurrection(elapsed);
+			this.UpdatePendingCompanion();
 		}
 
 		/// <summary>
-		/// Sends the resurrection dialog as nexessary.
+		/// Activates pending companion after scripts have had time to set layer.
+		/// </summary>
+		private void UpdatePendingCompanion()
+		{
+			if (_pendingCompanionActivation == DateTime.MinValue)
+				return;
+
+			if (DateTime.Now < _pendingCompanionActivation)
+				return;
+
+			_pendingCompanionActivation = DateTime.MinValue;
+
+			if (!this.HasCompanions)
+				return;
+
+			foreach (var companion in this.Companions.GetList())
+			{
+				if (companion.IsActivated && companion.Map != this.Map)
+					companion.SetCompanionState(true);
+			}
+		}
+
+		/// <summary>
+		/// Schedules companion activation after a delay.
+		/// </summary>
+		public void ScheduleCompanionActivation()
+		{
+			_pendingCompanionActivation = DateTime.Now + CompanionActivationDelay;
+		}
+
+		/// <summary>
+		/// Sends the resurrection dialog as necessary.
 		/// </summary>
 		/// <param name="elapsed"></param>
 		private void UpdateResurrection(TimeSpan elapsed)
 		{
-			// Why are we sending the resurrection dialog over and over on
-			// the update? Well, because certain packets sent to the client,
-			// such as hits, can cause it to close this dialog, which then
-			// leaves players with having to relog to get it again to be
-			// able to resurrect. Spamming isn't a great hotfix, but it is
-			// an effective one, as it will ensure that the dialog is always
-			// there when it should be. And of course, as you would expect,
-			// it appears that this is normal, based on the packet logs.
-			if (this.IsDead)
+			if ((this.IsDead) && ((!this.Map.IsPVP) || Feature.IsEnabled("AllowPVPResurrection")))
 			{
 				_resurrectDialogTimer -= elapsed;
 				if (_resurrectDialogTimer <= TimeSpan.Zero)
 				{
-					// TODO: Get a list of the appropriate resurrection
-					//   options and save them, to sanity check the coming
-					//   resurrection request.
-
-					var options = ResurrectOptions.NearestRevivalPoint;
+					ResurrectOptions options = 0;
 
 					if (ZoneServer.Instance.Conf.World.ResurrectCityOption)
+					{
 						options |= ResurrectOptions.NearestCity;
+					}
+					if (ZoneServer.Instance.Conf.World.ResurrectRevivalPointOption)
+					{
+						options |= ResurrectOptions.NearestRevivalPoint;
+					}
+					if (ZoneServer.Instance.Conf.World.ResurrectRevivalPointOption)
+					{
+						if (this.HasItem("RestartCristal"))
+						{
+							options |= ResurrectOptions.SoulCrystal;
+						}
+					}
 
 					Send.ZC_RESURRECT_DIALOG(this, options);
 					_resurrectDialogTimer = ResurrectDialogDelay;
 				}
 			}
 		}
+		#endregion
 
+		#region Session Objects Management
 		/// <summary>
-		/// Returns character's jump type.
+		/// Adds default session objects.
 		/// </summary>
-		/// <returns></returns>
-		public int GetJumpType()
+		private void AddSessionObjects()
 		{
-			return 1;
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.Drop));
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.MapEventReward));
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.SmartGen));
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.Raid));
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.NpcDialogCount));
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.Request));
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.Shop));
+			this.SessionObjects.Add(new SessionObject(SessionObjectId.ExpCardUse));
+
+			var sessionObject = new SessionObject(SessionObjectId.Main);
+			sessionObject.Properties.SetString(PropertyName.QSTARTZONETYPE, "StartLine1");
+			this.SessionObjects.Add(sessionObject);
 		}
 
 		/// <summary>
-		/// Sets character's position.
+		/// Sends a message to the character and closes the connection
+		/// after a short delay.
 		/// </summary>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="z"></param>
-		public void SetPosition(float x, float y, float z)
-			=> this.SetPosition(new Position(x, y, z));
-
-		/// <summary>
-		/// Sets character's position.
-		/// </summary>
-		/// <param name="pos"></param>
-		public void SetPosition(Position pos)
+		public void Disconnect(string message)
 		{
-			this.Position = pos;
+			this.MsgBox(message);
+			this.Connection?.Close(ZoneServer.Instance.Conf.World.ConnectionCloseDelay);
 		}
 
 		/// <summary>
-		/// Sets character's direction.
+		/// Clones the character within it's same appearance and
+		/// spawns it on the current map at a given position.
 		/// </summary>
-		/// <param name="cos"></param>
-		/// <param name="sin"></param>
-		public void SetDirection(float cos, float sin)
-			=> this.SetDirection(new Direction(cos, sin));
-
-		/// <summary>
-		/// Sets character's direction.
-		/// </summary>
-		/// <param name="dir"></param>
-		public void SetDirection(Direction dir)
+		/// <param name="position"></param>
+		public Character Clone(Position position)
 		{
-			this.Direction = dir;
-		}
+			var dummyCharacter = new DummyCharacter();
 
-		/// <summary>
-		/// Sets character's direction.
-		/// </summary>
-		/// <param name="cos"></param>
-		/// <param name="sin"></param>
-		public void SetHeadDirection(float cos, float sin)
-			=> this.SetHeadDirection(new Direction(cos, sin));
+			dummyCharacter.Owner = this;
+			dummyCharacter.Name = this.Name;
+			dummyCharacter.TeamName = this.TeamName;
+			dummyCharacter.JobId = this.JobId;
+			dummyCharacter.Gender = this.Gender;
+			dummyCharacter.Hair = this.Hair;
+			dummyCharacter.SkinColor = this.SkinColor;
+			dummyCharacter.MapId = this.MapId;
 
-		/// <summary>
-		/// Sets character's direction.
-		/// </summary>
-		/// <param name="dir"></param>
-		public void SetHeadDirection(Direction dir)
-		{
-			this.HeadDirection = dir;
-		}
+			dummyCharacter.Position = position;
+			dummyCharacter.Direction = this.Direction;
 
-		/// <summary>
-		/// Warps character to given location.
-		/// </summary>
-		/// <param name="location"></param>
-		public void Warp(Location location)
-			=> this.Warp(location.MapId, location.Position);
-
-		/// <summary>
-		/// Warps character to given location.
-		/// </summary>
-		/// <param name="mapName"></param>
-		/// <param name="pos"></param>
-		/// <exception cref="ArgumentException">Thrown if map doesn't exist in data.</exception>
-		public void Warp(string mapName, Position pos)
-		{
-			if (!ZoneServer.Instance.Data.MapDb.TryFind(mapName, out var map))
-				throw new ArgumentException("Map '" + mapName + "' not found in data.");
-
-			this.Warp(map.Id, pos);
-		}
-
-		/// <summary>
-		/// Warps character to given location.
-		/// </summary>
-		/// <param name="mapId"></param>
-		/// <param name="pos"></param>
-		/// <exception cref="ArgumentException">Thrown if map doesn't exist in data.</exception>
-		public void Warp(int mapId, Position pos)
-		{
-			if (!ZoneServer.Instance.Data.MapDb.TryFind(mapId, out var map))
-				throw new ArgumentException("Map '" + mapId + "' not found in data.");
-
-			this.Position = pos;
-
-			if (this.MapId == mapId)
+			foreach (var item in this.Inventory.GetEquip())
 			{
-				Send.ZC_SET_POS(this);
-			}
-			else
-			{
-				this.MapId = mapId;
-				_warping = true;
-
-				Send.ZC_MOVE_ZONE(this.Connection);
-			}
-		}
-
-		/// <summary>
-		/// Makes character warp to the same map on another, previously
-		/// selected channel.
-		/// </summary>
-		internal void WarpChannel(int channelId)
-		{
-			_warping = true;
-			_destinationChannelId = channelId;
-
-			Send.ZC_SAVE_INFO(this.Connection);
-			Send.ZC_MOVE_ZONE(this.Connection);
-		}
-
-		/// <summary>
-		/// Finalizes warp, after client announced readiness.
-		/// </summary>
-		internal void FinalizeWarp()
-		{
-			// Check permission
-			if (!_warping)
-			{
-				Log.Warning("Character.FinalizeWarp: Player '{0}' tried to warp without permission.", this.AccountId);
-				return;
+				var newItem = new Item(item.Value.Id, item.Value.Amount);
+				dummyCharacter.Inventory.SetEquipSilent(item.Key, newItem);
 			}
 
-			// Find an available zone server for the target map
-			var availableZones = ZoneServer.Instance.ServerList.GetZoneServers(this.MapId);
-			if (availableZones.Length == 0)
-				throw new Exception($"No suitable zone server found for map '{this.MapId}'");
-
-			var channelId = Math2.Clamp(0, availableZones.Length, _destinationChannelId);
-			var serverInfo = availableZones[channelId];
-
-			this.Connection.SaveAccountAndCharacter();
-			this.SavedForWarp = true;
-
-			// Instruct client to initiate warp
-			Send.ZC_MOVE_ZONE_OK(this, channelId, serverInfo.Ip, serverInfo.Port, this.MapId);
-
-			_warping = false;
-		}
-
-		/// <summary>
-		/// Increases character's level by the given amount.
-		/// </summary>
-		/// <param name="amount"></param>
-		public void LevelUp(int amount = 1)
-		{
-			if (amount < 1)
-				throw new ArgumentException("Amount can't be lower than 1.");
-
-			var newLevel = this.Properties.Modify(PropertyName.Lv, amount);
-			this.Properties.Modify(PropertyName.StatByLevel, amount);
-
-			this.MaxExp = ZoneServer.Instance.Data.ExpDb.GetNextExp((int)newLevel);
-			this.FullHeal();
-
-			Send.ZC_MAX_EXP_CHANGED(this, 0);
-			Send.ZC_PC_LEVELUP(this);
-			Send.ZC_OBJECT_PROPERTY(this);
-			Send.ZC_ADDON_MSG(this, "NOTICE_Dm_levelup_base", 3, "!@#$Auto_KaeLigTeo_LeBeli_SangSeungHayeossSeupNiDa#@!");
-			Send.ZC_NORMAL.PlayEffect(this, "F_pc_level_up", 3);
-		}
-
-		/// <summary>
-		/// Increases character's job level by the given amount. Returns the amount
-		/// of levels actually gained.
-		/// </summary>
-		/// <param name="amount"></param>
-		/// <returns></returns>
-		public int JobLevelUp(int amount)
-		{
-			// TODO: Should the whole job leveling up perhaps take place in
-			//   the job, instead of the character? That would seem to make
-			//   more sense, given that we exclusively operate on job props
-			//   in here.
-
-			if (amount < 1)
-				throw new ArgumentException("Amount can't be lower than 1.");
-
-			if (this.Job.Level == this.Job.MaxLevel)
-				return 0;
-
-			if (this.Job.Level + amount > this.Job.MaxLevel)
-				amount = this.Job.MaxLevel - this.Job.Level;
-
-			var prevLevel = this.Job.Level;
-			var prevExp = this.Job.TotalExp;
-
-			this.Job.TotalExp = ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Jobs.GetCurrentRank(), prevLevel + amount - 1);
-
-			var expGained = (this.Job.TotalExp - prevExp);
-			var levelsGained = (this.Job.Level - prevLevel);
-
-			Send.ZC_JOB_EXP_UP(this, expGained);
-
-			if (levelsGained > 0)
-				this.FinishJobLevelUp(levelsGained);
-
-			return levelsGained;
-		}
-
-		/// <summary>
-		/// Gives skill points to job, heals character, and notifies client
-		/// about the job level up.
-		/// </summary>
-		/// <param name="amount"></param>
-		private void FinishJobLevelUp(int amount)
-		{
-			if (amount < 1)
-				throw new ArgumentException("Amount can't be lower than 1.");
-
-			this.Jobs.ModifySkillPoints(this.JobId, amount);
-			this.FullHeal();
-
-			Send.ZC_OBJECT_PROPERTY(this);
-			Send.ZC_ADDON_MSG(this, "NOTICE_Dm_levelup_skill", 3, "!@#$Auto_KeulLeSeu_LeBeli_SangSeungHayeossSeupNiDa#@!");
-			Send.ZC_NORMAL.PlayEffect(this, "F_pc_joblevel_up", 3);
-		}
-
-		/// <summary>
-		/// Heals character's HP, SP, and Stamina fully and updates
-		/// the client.
-		/// </summary>
-		public void FullHeal()
-		{
-			// Use the modifiers, so we actually get a full heal, unaffected by
-			// potential (de)buffs in Heal.
-			this.ModifyHp(this.MaxHp);
-			this.ModifySp(this.MaxSp);
-		}
-
-		/// <summary>
-		/// Heals character's HP and SP by the given amounts and updates
-		/// the client. Applies potential (de)buffs that affect healing.
-		/// </summary>
-		/// <remarks>
-		/// For healing unaffected by (de)buffs, use FullHeal or ModifyHp/Sp.
-		/// </remarks>
-		/// <param name="hpAmount"></param>
-		/// <param name="spAmount"></param>
-		public void Heal(float hpAmount, float spAmount)
-		{
-			if (hpAmount == 0 && spAmount == 0)
-				return;
-
-			// TODO: Move this somewhere else, perhaps with a hook/event?
-			DecreaseHeal_Debuff.TryApply(this, ref hpAmount);
-			PiercingHeart_Debuff.TryApply(this, ref hpAmount);
-
-			this.ModifyHpSafe(hpAmount, out var hp, out var priority);
-			this.Properties.Modify(PropertyName.SP, spAmount);
-
-			Send.ZC_UPDATE_ALL_STATUS(this, priority);
-		}
-
-		/// <summary>
-		/// Modifies character's HP by the given amount without updating
-		/// the client. Returns the new HP value and the priority number
-		/// of this modification.
-		/// </summary>
-		/// <remarks>
-		/// There are several packets in this game that require the HP
-		/// to be set synchronized, to ensure that it's only set from
-		/// one source and to identify the latest amount based on the
-		/// "priority".
-		/// </remarks>
-		/// <param name="amount"></param>
-		public void ModifyHpSafe(float amount, out float newHp, out int priority)
-		{
-			// Make sure it's not possible for two calls to interfere
-			// with each other, so that the correct amount makes it to
-			// the client, with the correct priority.
-			lock (_hpLock)
-			{
-				newHp = (int)this.Properties.Modify(PropertyName.HP, amount);
-				priority = (this.HpChangeCounter += 1);
-			}
-		}
-
-		/// <summary>
-		/// Modifies character's HP by the given amount and updates the
-		/// client with ZC_ADD_HP.
-		/// </summary>
-		/// <param name="amount"></param>
-		public void ModifyHp(float amount)
-		{
-			this.ModifyHpSafe(amount, out var hp, out var priority);
-			Send.ZC_ADD_HP(this, amount, hp, priority);
-		}
-
-		/// <summary>
-		/// Modifies character's SP by the given amount and updates the
-		/// client with ZC_UPDATE_SP.
-		/// </summary>
-		/// <param name="amount"></param>
-		public void ModifySp(float amount)
-		{
-			var sp = this.Properties.Modify(PropertyName.SP, amount);
-			Send.ZC_UPDATE_SP(this, sp, true);
-		}
-
-		/// <summary>
-		/// Modifies character's current stamina and updates the client.
-		/// </summary>
-		/// <param name="amount"></param>
-		public void ModifyStamina(int amount)
-		{
-			this.Properties.Stamina += amount;
-			Send.ZC_STAMINA(this, this.Properties.Stamina);
-		}
-
-		/// <summary>
-		/// Modifies the character's ability points by the given amount
-		/// and updates the respective property on the client.
-		/// </summary>
-		/// <param name="amount"></param>
-		public void ModifyAbilityPoints(int amount)
-		{
-			var abilityPoints = int.Parse(this.Properties.GetString(PropertyName.AbilityPoint));
-			abilityPoints += amount;
-			this.Properties.SetString(PropertyName.AbilityPoint, abilityPoints.ToString());
-
-			// For some reason the client no longer reads the ability
-			// point property when updating the amount. Instead there's
-			// the commander info now.
-
-			//Send.ZC_OBJECT_PROPERTY(this, PropertyName.AbilityPoint);
-			Send.ZC_CUSTOM_COMMANDER_INFO(this, CommanderInfoType.AbilityPoints, abilityPoints);
-		}
-
-		/// <summary>
-		/// Grants exp to character and handles level ups.
-		/// </summary>
-		/// <param name="exp"></param>
-		/// <param name="jobExp"></param>
-		/// <param name="monster"></param>
-		public void GiveExp(long exp, long jobExp, IMonster monster)
-		{
-			// Base EXP
-			this.Exp += exp;
-			this.TotalExp += exp;
-
-			Send.ZC_EXP_UP_BY_MONSTER(this, exp, jobExp, monster);
-			Send.ZC_EXP_UP(this, exp, jobExp); // Not always sent? Might be quest related?
-
-			var level = this.Level;
-			var levelUps = 0;
-			var maxExp = this.MaxExp;
-			var maxLevel = ZoneServer.Instance.Data.ExpDb.GetMaxLevel();
-
-			// Consume EXP as many times as possible to reach new levels
-			while (this.Exp >= maxExp && level < maxLevel)
-			{
-				this.Exp -= maxExp;
-
-				level++;
-				levelUps++;
-				maxExp = ZoneServer.Instance.Data.ExpDb.GetNextExp(level);
-			}
-
-			// Execute level up only once to avoid client lag on multiple
-			// level ups. Leveling up a thousand times in a loop is not
-			// fun for the client =D"
-			if (levelUps > 0)
-				this.LevelUp(levelUps);
-
-			// Job EXP
-			// Increase the total EXP and check whether the job level,
-			// which is calculcated from that value, has changed.
-			var jobLevel = this.JobLevel;
-			var rank = this.Jobs.GetCurrentRank();
-			var job = this.Job;
-
-			// Limit EXP to the total max, otherwise the client will
-			// display level 1 with 0%.
-			job.TotalExp = Math.Min(job.TotalMaxExp, (job.TotalExp + jobExp));
-
-			var newJobLevel = this.JobLevel;
-			var jobLevelsGained = (newJobLevel - jobLevel);
-
-			Send.ZC_JOB_EXP_UP(this, jobExp);
-
-			if (jobLevelsGained > 0)
-				this.FinishJobLevelUp(jobLevelsGained);
-		}
-
-		/// <summary>
-		/// Returns ids of equipped items.
-		/// </summary>
-		/// <returns></returns>
-		public int[] GetEquipIds()
-		{
-			return this.Inventory.GetEquipIds();
-		}
-
-		/// <summary>
-		/// Updates visible entities around character.
-		/// </summary>
-		public void LookAround()
-		{
-			if (!this.EyesOpen)
-				return;
-
-			lock (_lookAroundLock)
-			{
-				// Get lists
-				var currentlyVisibleMonsters = this.Map.GetVisibleMonsters(this);
-				var currentlyVisibleCharacters = this.Map.GetVisibleCharacters(this);
-
-				// Appears
-				var appearMonsters = currentlyVisibleMonsters.Except(_visibleMonsters);
-				var appearCharacters = currentlyVisibleCharacters.Except(_visibleCharacters);
-
-				// Disappears
-				var disappearMonsters = _visibleMonsters.Except(currentlyVisibleMonsters);
-				var disappearCharacters = _visibleCharacters.Except(currentlyVisibleCharacters);
-
-				// Monsters
-				foreach (var monster in appearMonsters)
-				{
-					Send.ZC_ENTER_MONSTER(this.Connection, monster);
-
-					if (!monster.AttachableEffects.IsEmpty)
-					{
-						foreach (var effect in monster.AttachableEffects)
-							Send.ZC_NORMAL.AttachEffect(this.Connection, monster, effect.PacketString, effect.Scale);
-					}
-
-					if (monster is ICombatEntity entity)
-					{
-						Send.ZC_FACTION(this.Connection, monster, entity.Faction);
-
-						if (entity.Components.Get<BuffComponent>()?.Count != 0)
-							Send.ZC_BUFF_LIST(this.Connection, entity);
-
-						// Send a movement update to the client if the monster
-						// is currently moving, otherwise it will just stand
-						// there until the next movement starts.
-						// This could be done prettier, but it's a start
-						if (entity.Components.TryGet<MovementComponent>(out var movement))
-						{
-							if (movement.IsMoving && movement.MoveTarget == MoveTargetType.Position)
-							{
-								var fromCellPos = entity.Map.Ground.GetCellPosition(entity.Position);
-								var toCellPos = entity.Map.Ground.GetCellPosition(movement.Destination);
-								var speed = entity.Properties.GetFloat(PropertyName.MSPD);
-
-								Send.ZC_MOVE_PATH(this, entity, fromCellPos, toCellPos, speed);
-							}
-						}
-					}
-				}
-
-				foreach (var monster in disappearMonsters)
-					Send.ZC_LEAVE(this.Connection, monster);
-
-				// Characters
-				foreach (var character in appearCharacters)
-				{
-					Send.ZC_ENTER_PC(this.Connection, character);
-
-					Send.ZC_SEND_APPLY_HUD_SKIN_OTHER(this.Connection, character);
-					//Send.ZC_SEND_MODE_HUD_SKIN(this.Connection, character);
-
-					if (!character.AttachableEffects.IsEmpty)
-					{
-						foreach (var effect in character.AttachableEffects)
-							Send.ZC_NORMAL.AttachEffect(this.Connection, character, effect.PacketString, effect.Scale);
-					}
-
-					if (character.Components.Get<BuffComponent>()?.Count != 0)
-						Send.ZC_BUFF_LIST(this.Connection, character);
-				}
-
-				foreach (var character in disappearCharacters)
-					Send.ZC_LEAVE(this.Connection, character);
-
-				// Save lists for next run
-				_visibleMonsters = currentlyVisibleMonsters;
-				_visibleCharacters = currentlyVisibleCharacters;
-			}
-		}
-
-		/// <summary>
-		/// Starts auto-updates of visible entities.
-		/// </summary>
-		public void OpenEyes()
-		{
-			this.EyesOpen = true;
-			this.LookAround();
-		}
-
-		/// <summary>
-		/// Stops auto-updates of visible entities.
-		/// </summary>
-		public void CloseEyes()
-		{
-			this.EyesOpen = false;
-
-			lock (_lookAroundLock)
-			{
-				foreach (var monster in _visibleMonsters)
-					Send.ZC_LEAVE(this.Connection, monster);
-
-				foreach (var character in _visibleCharacters)
-					Send.ZC_LEAVE(this.Connection, character);
-
-				_visibleMonsters = [];
-				_visibleCharacters = [];
-			}
-		}
-
-		/// <summary>
-		/// Sets direction and updates clients.
-		/// </summary>
-		/// <param name="dir"></param>
-		public void Rotate(Direction dir)
-		{
-			if (this.Direction != dir)
-				this.SetDirection(dir);
-
-			Send.ZC_ROTATE(this);
-		}
-
-		/// <summary>
-		/// Sets direction and updates clients.
-		/// </summary>
-		/// <param name="d1"></param>
-		/// <param name="d2"></param>
-		public void RotateHead(Direction dir)
-		{
-			if (this.HeadDirection != dir)
-				this.SetHeadDirection(dir);
-
-			Send.ZC_HEAD_ROTATE(this);
-		}
-
-		/// <summary>
-		/// Returns the character's current location.
-		/// </summary>
-		/// <returns></returns>
-		public Location GetLocation()
-		{
-			return new Location(this.MapId, this.Position);
-		}
-
-		/// <summary>
-		/// Displays server message in character's chat.
-		/// </summary>
-		/// <remarks>
-		/// Abuses a certain system message that takes two parameters,
-		/// which are then output, separated by a colon. Since there's
-		/// no customizable server message packet I know of, this will
-		/// serve as the next best thing for now, and is certainly an
-		/// improvement over using ZC_CHAT.
-		/// </remarks>
-		/// <param name="format"></param>
-		/// <param name="args"></param>
-		public void ServerMessage(string format, params object[] args)
-		{
-			if (args.Length > 0)
-				format = string.Format(format, args);
-
-			// Since there doesn't seem to be a way to send custom system
-			// messages, we're abusing clientmessage 21254, which has the
-			// format "X:Y", where we replace X and Y with a prefix and
-			// our custom message.
-			this.SystemMessage("{Hour}:{Min}", new MsgParameter("Hour", "Server "), new MsgParameter("Min", " " + format));
-		}
-
-		/// <summary>
-		/// Displays system message in character's chat.
-		/// </summary>
-		/// <remarks>
-		/// Uses pre-defined, argument-supporting system messages found
-		/// in the clientmessage.xml file. The class name corresponds to
-		/// the class name in said XML, with arguments found inside those
-		/// messages, wrapped in curly braces.
-		/// </remarks>
-		/// <example>
-		/// ClassName="{Day}days"
-		/// SystemMessage("{Day}days", new MsgParameter("Day", "5 "))
-		/// -> "5 days"
-		/// </example>
-		/// <param name="className"></param>
-		/// <param name="args"></param>
-		public void SystemMessage(string className, params MsgParameter[] args)
-			=> this.SystemMessage(className, SystemMessageDisplayType.ChatOnly, args);
-
-		/// <summary>
-		/// Displays system message in character's chat.
-		/// </summary>
-		/// <remarks>
-		/// Uses pre-defined, argument-supporting system messages found
-		/// in the clientmessage.xml file. The class name corresponds to
-		/// the class name in said XML, with arguments found inside those
-		/// messages, wrapped in curly braces.
-		/// </remarks>
-		/// <example>
-		/// ClassName="{Day}days"
-		/// SystemMessage("{Day}days", new MsgParameter("Day", "5 "))
-		/// -> "5 days"
-		/// </example>
-		/// <param name="clientMessage"></param>
-		/// <param name="displayType"></param>
-		/// <param name="args"></param>
-		public void SystemMessage(string clientMessage, SystemMessageDisplayType displayType, params MsgParameter[] args)
-		{
-			Send.ZC_SYSTEM_MSG(this, clientMessage, displayType, args);
-		}
-
-		/// <summary>
-		/// Sends server message to character.
-		/// </summary>
-		/// <param name="format"></param>
-		/// <param name="args"></param>
-		public void MsgBox(string format, params object[] args)
-		{
-			if (args.Length > 0)
-				format = string.Format(format, args);
-
-			if (format.Contains('\''))
-				format = format.Replace("'", "\\'");
-
-			Send.ZC_EXEC_CLIENT_SCP(this.Connection, "ui.MsgBox('" + format + "')");
-		}
-
-		/// <summary>
-		/// Adds amount to character's stat points and updates the client.
-		/// </summary>
-		/// <param name="amount"></param>
-		public void AddStatPoints(int amount)
-		{
-			if (amount < 1)
-				throw new ArgumentException("Amount can't be negative.");
-
-			this.Properties.Modify(PropertyName.StatByBonus, amount);
-			Send.ZC_OBJECT_PROPERTY(this, PropertyName.StatByBonus);
-		}
-
-		/// <summary>
-		/// Resets the character's stats.
-		/// </summary>
-		/// <remarks>
-		/// Sets all stats to 1 (some level bonuses might still apply,
-		/// raising the default value above 1) and gives back the points
-		/// that were put into the stats. Also resets the points the
-		/// character got from its job on creation.
-		/// </remarks>
-		public void ResetStats()
-		{
-			var character = this;
-
-			// The three properties that control the stat points are
-			// StatByLevel, StatByBonus, and UsedStat. The first two
-			// get added together and UsedStat is subtracted to arrive
-			// at the number of available stat points. To reset the
-			// stat points that were used, all we have to do is reset
-			// UsedStat and the *_STAT properties. For a full reset,
-			// however, that allows for distributing the initial stats
-			// from the chosen job, we need to give the player the points
-			// that went into the *_JOB properties, which we'll just add
-			// to StatByBonus.
-
-			var jobStatPoints = character.Properties.Sum(PropertyName.STR_JOB, PropertyName.CON_JOB, PropertyName.INT_JOB, PropertyName.MNA_JOB, PropertyName.DEX_JOB) - 5;
-			character.Properties.Modify(PropertyName.StatByBonus, jobStatPoints);
-
-			character.Properties.SetFloat(PropertyName.UsedStat, 0);
-
-			character.Properties.SetFloat(PropertyName.STR_STAT, 0);
-			character.Properties.SetFloat(PropertyName.CON_STAT, 0);
-			character.Properties.SetFloat(PropertyName.INT_STAT, 0);
-			character.Properties.SetFloat(PropertyName.MNA_STAT, 0);
-			character.Properties.SetFloat(PropertyName.DEX_STAT, 0);
-
-			character.Properties.SetFloat(PropertyName.STR_JOB, 1);
-			character.Properties.SetFloat(PropertyName.CON_JOB, 1);
-			character.Properties.SetFloat(PropertyName.INT_JOB, 1);
-			character.Properties.SetFloat(PropertyName.MNA_JOB, 1);
-			character.Properties.SetFloat(PropertyName.DEX_JOB, 1);
-
-			// TODO: Add semi-automatic updating of all properties that
-			//   changed.
-			//Send.ZC_OBJECT_PROPERTY(character,
-			//	"STR", "STR_STAT", "STR_JOB", "CON", "CON_STAT", "CON_JOB",
-			//	"INT", "INT_STAT", "INT_JOB", "MNA", "MNA_STAT", "MNA_JOB",
-			//	"DEX", "DEX_STAT", "DEX_JOB",
-			//	"UsedStat", "StatByLevel", "StatByBonus",
-			//	"MINPATK", "MAXPATK", "MINMATK", "MAXMATK", "MINPATK_SUB", "MAXPATK_SUB",
-			//	"CRTATK", "HR", "DR", "BLK_BREAK", "BLK", "RHP",
-			//	"RSP", "MHP", "MSP"
-			//);
-
-			// I don't trust that we will always get the updated properties
-			// right and creating semi-auto updating is difficult with this
-			// game's property system, so we'll just update all of them
-			// That might not actually be necessary in all cases, but it's
-			// much simpler and safer. It's also not like we reset characters
-			// all the time anyway.
-			character.Properties.InvalidateAll();
-			Send.ZC_OBJECT_PROPERTY(character);
-		}
-
-		/// <summary>
-		/// Resets the character's skills.
-		/// </summary>
-		/// <remarks>
-		/// Resets the levels of all skills the character has and returns
-		/// the points that were put into them to the jobs.
-		/// </remarks>
-		public void ResetSkills()
-		{
-			// Remove all skills
-			foreach (var skill in this.Skills.GetList())
-				this.Skills.Remove(skill.Id);
-
-			// Reset jobs' skill points, so they're equal to their level,
-			// minus 1, because 1 is the default level.
 			foreach (var job in this.Jobs.GetList())
-				job.SetSkillPoints(job.Level - 1);
-		}
-
-		/// <summary>
-		/// Sets and returns the currently correct stance, based on this
-		/// character's properties. Does not update client.
-		/// </summary>
-		public int UpdateStance()
-		{
-			var jobId = this.JobId;
-			var riding = false;
-			var rightHand = this.Inventory.GetItem(EquipSlot.RightHand).Data.EquipType1;
-			var leftHand = this.Inventory.GetItem(EquipSlot.LeftHand).Data.EquipType1;
-
-			this.Stance = ZoneServer.Instance.Data.StanceConditionDb.FindStanceId(jobId, riding, rightHand, leftHand);
-
-			return this.Stance;
-		}
-
-		/// <summary>
-		/// Makes character take damage and kills them if their HP reached 0.
-		/// Returns true if the character is dead.
-		/// </summary>
-		/// <param name="damage"></param>
-		/// <param name="attacker"></param>
-		/// <returns></returns>
-		public bool TakeDamage(float damage, ICombatEntity attacker)
-		{
-			// Don't hit an already dead character
-			if (this.IsDead)
-				return true;
-
-			if (this.IsBuffActive(BuffId.Skill_NoDamage_Buff))
-				return false;
-
-			this.Components.Get<CombatComponent>().SetAttackState(true);
-			this.ModifyHpSafe(-damage, out _, out _);
-
-			this.Components.Get<CombatComponent>()?.RegisterHit(attacker, damage);
-
-			if (this.Hp == 0)
-				this.Kill(attacker);
-
-			this.Map.AlertNearbyAis(this, new HitEventAlert(this, attacker, damage));
-
-			return this.IsDead;
-		}
-
-		/// <summary>
-		/// Kills character.
-		/// </summary>
-		/// <param name="killer"></param>
-		public void Kill(ICombatEntity killer)
-		{
-			this.Properties.SetFloat(PropertyName.HP, 0);
-
-			this.Died?.Invoke(this, killer);
-			ZoneServer.Instance.ServerEvents.EntityKilled.Raise(new CombatEventArgs(this, killer));
-
-			Send.ZC_DEAD(this);
-
-			_resurrectDialogTimer = ResurrectDialogDelay;
-		}
-
-		/// <summary>
-		/// Resurrects the character if its dead.
-		/// </summary>
-		/// <param name="option"></param>
-		public void Resurrect(ResurrectOptions option)
-		{
-			var startHp = this.Properties.GetFloat(PropertyName.MHP) * 0.50f;
-			this.Heal(startHp, 0);
-
-			switch (option)
 			{
-				default:
-				case ResurrectOptions.NearestRevivalPoint:
-				{
-					var safePos = this.Map.GetSafePositionNear(this.Position, true);
-					this.Warp(this.MapId, safePos);
-					break;
-				}
-				case ResurrectOptions.NearestCity:
-				{
-					var location = this.GetCityReturnLocation();
-					this.Warp(location);
-					break;
-				}
+				dummyCharacter.Jobs.AddSilent(new Job(dummyCharacter, job.Id));
 			}
 
-			Send.ZC_RESURRECT_SAVE_POINT_ACK(this);
-			Send.ZC_RESURRECT(this);
-		}
-
-		/// <summary>
-		/// Returns the city return location for the actor.
-		/// </summary>
-		/// <remarks>
-		/// The return city map is retrieved from the map data by default.
-		/// Alternatively, a return location can be set via SetCityReturnLocation
-		/// or manually via the variables "Melia.CityReturnLocation.Map", ".X",
-		/// ".Y", and ".Z".
-		/// </remarks>
-		/// <returns></returns>
-		public Location GetCityReturnLocation()
-		{
-			MapData mapData;
-
-			if (this.Variables.Perm.Has("Melia.CityReturnLocation.Map"))
+			foreach (var skill in this.Skills.GetList())
 			{
-				var mapName = this.Variables.Perm.GetString("Melia.CityReturnLocation.Map");
-
-				if (!ZoneServer.Instance.Data.MapDb.TryFind(mapName, out mapData))
-					throw new ArgumentException($"Map '{mapName}' not found in data.");
-
-				var x = this.Variables.Perm.GetFloat("Melia.CityReturnLocation.X", 0);
-				var y = this.Variables.Perm.GetFloat("Melia.CityReturnLocation.Y", 0);
-				var z = this.Variables.Perm.GetFloat("Melia.CityReturnLocation.Z", 0);
-
-				if (x == 0 && y == 0 && z == 0)
-				{
-					x = mapData.DefaultPosition.X;
-					y = mapData.DefaultPosition.Y;
-					z = mapData.DefaultPosition.Z;
-				}
-
-				return new Location(mapData.Id, x, y, z);
+				var newSkill = new Skill(dummyCharacter, skill.Id, skill.Level);
+				dummyCharacter.Skills.AddSilent(newSkill);
 			}
 
-			if (!ZoneServer.Instance.Data.MapDb.TryFind(this.Map.Data.NearbyCity, out mapData))
+			dummyCharacter.InitProperties();
+			dummyCharacter.Properties.Stamina = (int)this.Properties.GetFloat(PropertyName.MaxSta);
+			dummyCharacter.UpdateStance();
+			dummyCharacter.ModifyHpSafe(this.MaxHp, out var hp, out var priority);
+
+			this.Map.AddCharacter(dummyCharacter);
+
+			Send.ZC_ENTER_PC(this.Connection, dummyCharacter);
+			Send.ZC_OWNER(this, dummyCharacter);
+			Send.ZC_UPDATED_PCAPPEARANCE(dummyCharacter);
+
+			Send.ZC_NORMAL.HeadgearVisibilityUpdate(dummyCharacter);
+
+			return dummyCharacter;
+		}
+
+		private static readonly BuffId[] OobeBuffIds = new[]
+		{
+			BuffId.OOBE_Soulmaster_Buff,
+			BuffId.OOBE_Prakriti_Buff,
+			BuffId.OOBE_Anila_Buff,
+			BuffId.OOBE_Possession_Buff,
+			BuffId.OOBE_Patati_Buff,
+			BuffId.OOBE_Moksha_Buff,
+			BuffId.OOBE_Tanoti_Buff,
+			BuffId.OOBE_Strong_Buff,
+			BuffId.OOBE_Stack_Buff
+		};
+
+		/// <summary>
+		/// Return true in case of the character has used Out Of Body Skill
+		/// </summary>
+		/// <returns></returns>
+		public bool IsOutOfBody()
+		{
+			foreach (var buffId in OobeBuffIds)
 			{
-				if (!ZoneServer.Instance.Data.MapDb.TryFind("c_Klaipe", out mapData))
-					throw new InvalidOperationException($"No nearby city found for map '{this.Map.ClassName}' and no fallback city found either.");
+				if (this.IsBuffActive(buffId))
+					return true;
 			}
 
-			return new Location(mapData.Id, mapData.DefaultPosition);
+			return false;
 		}
 
 		/// <summary>
-		/// Sets the character's city return location, affecting where they will
-		/// respawn if they choose to ressurrect in the nearest city.
+		/// Cancels any active Out Of Body Experience buffs, forcing
+		/// the character to return to their body and cleaning up the
+		/// dummy character.
 		/// </summary>
-		/// <param name="location"></param>
-		public void SetCityReturnLocation(Location location)
+		public void CancelOutOfBody()
 		{
-			if (!ZoneServer.Instance.Data.MapDb.TryFind(location.MapId, out var mapData))
-				throw new ArgumentException($"Map '{location.MapId}' not found in data.");
-
-			this.Variables.Perm.SetString("Melia.CityReturnLocation.Map", mapData.ClassName);
-			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.X", location.X);
-			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.Y", location.Y);
-			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.Z", location.Z);
+			foreach (var buffId in OobeBuffIds)
+				this.StopBuff(buffId);
 		}
+		#endregion
 
-		/// <summary>
-		/// Returns true if the character can attack others.
-		/// </summary>
-		/// <returns></returns>
-		public bool CanFight()
-		{
-			if (this.IsDead)
-				return false;
-
-			if (this.IsLocked(LockType.Attack))
-				return false;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Returns true if the character can attack the entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns></returns>
-		public bool CanAttack(ICombatEntity entity)
-		{
-			if (entity == this)
-				return false;
-
-			if (entity.IsDead)
-				return false;
-
-			if (entity.IsBuffActive(BuffId.Skill_NoDamage_Buff))
-				return false;
-
-			// For now, let's specify that characters can attack actual
-			// monsters.
-			var isHostileMonster = (entity is IMonster monster && monster.MonsterType == MonsterType.Mob);
-			if (!isHostileMonster)
-				return false;
-
-			return true;
-		}
-
-		/// <summary>
-		/// Turns item monster into an item and adds it to the character's
-		/// inventory.
-		/// </summary>
-		/// <param name="itemMonster"></param>
-		public void PickUp(ItemMonster itemMonster)
-		{
-			itemMonster.PickedUp = true;
-			itemMonster.Item.ClearProtections();
-
-			// Play pickup animation. This is what actually makes the item
-			// disappear, the client doesn't seem to react to ZC_LEAVE in
-			// the case of items. Or at least not reliably? It's weird.
-			Send.ZC_ITEM_GET(this, itemMonster);
-
-			// Add the item to the inventory
-			this.Inventory.Add(itemMonster.Item, InventoryAddType.PickUp);
-
-			// Remove it from the map, so it can't be picked up again.
-			this.Map.RemoveMonster(itemMonster);
-		}
-
-		/// <summary>
-		/// Toggles whether the character is sitting or not.
-		/// </summary>
-		public void ToggleSitting()
-		{
-			this.IsSitting = !this.IsSitting;
-			this.SitStatusChanged?.Invoke(this);
-
-			Send.ZC_REST_SIT(this);
-		}
-
-		/// <summary>
-		/// Plays effect for the character.
-		/// </summary>
-		/// <param name="packetString"></param>
-		public void PlayEffect(string packetString)
-		{
-			Send.ZC_NORMAL.PlayEffect(this, packetString);
-		}
-
-		/// <summary>
-		/// Changes the character's hair and updates nearby clients.
-		/// </summary>
-		/// <param name="hairTypeIndex"></param>
-		public void ChangeHair(int hairTypeIndex)
-		{
-			this.Hair = hairTypeIndex;
-			Send.ZC_UPDATED_PCAPPEARANCE(this);
-		}
+		// Additional partial class files will contain:
+		// - CharacterStats.cs (level, exp, stats management)
+		// - CharacterCombat.cs (combat, damage, healing)
+		// - CharacterMovement.cs (position, warping, visibility)
+		// - CharacterItems.cs (inventory management)
+		// - CharacterSocial.cs (party, guild, messaging)
+		// - CharacterJobSkills.cs (job and skill management)
+		// - CharacterDialog.cs (NPC interactions)
+		// - CharacterUtilities.cs (helper methods)
 	}
 }

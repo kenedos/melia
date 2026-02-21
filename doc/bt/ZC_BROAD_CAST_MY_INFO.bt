@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: ZC_BROAD_CAST_MY_INFO.bt
+//   Authors: Salman T. Khan
+//   Version: i386576
+//   Purpose: Seen with GTW (Sent every 5 seconds)
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+int monsterId; // 156150
+int handle; // 11
+position pos;
+byte b1; // 0

@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 	/// Handler for the Barbarian skill Embowel.
 	/// </summary>
 	[SkillHandler(SkillId.Barbarian_Embowel)]
-	public class Barbarian_Embowel : IGroundSkillHandler
+	public class Barbarian_Embowel : IMeleeGroundSkillHandler
 	{
 		public const float JumpDistance = 24.914738f;
 
@@ -33,8 +33,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -71,7 +72,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -100,7 +101,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 				target.TakeDamage(skillHitResult.Damage, caster);
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 				skillHit.HitInfo.Type = HitType.KnockBack;
 				target.Position = skillHit.KnockBackInfo.ToPosition;
 
@@ -119,7 +120,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 
 			// Caster performs a small backwards leap at the end.
 			// You seem to jump only half the indicated distance.
-			var targetPos = caster.Position.GetRelative2D(caster.Direction.Backwards, JumpDistance);
+			var targetPos = caster.Position.GetRelative(caster.Direction.Backwards, JumpDistance);
 			targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 
 			caster.Position = targetPos;

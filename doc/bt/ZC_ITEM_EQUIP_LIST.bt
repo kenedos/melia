@@ -48,16 +48,12 @@ typedef struct
     {
         short s2;
         int64 worldId2;
-        short s3;
+        short socketCount;
 
-        if (s3 > 0)
+        if (socketCount > 0)
         {
-            Gem gems[s3];
-        }
-
-        if (s1 > 0)
-        {
-            Socket sockets[s1];
+            SocketInfo sockets[socketCount];
+            SocketInfo sockets[socketCount];
         }
     }
 }

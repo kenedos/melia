@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 	/// Handler for the Scout skill Dagger Slash.
 	/// </summary>
 	[SkillHandler(SkillId.Scout_DaggerSlash)]
-	public class Scout_DaggerSlash : IGroundSkillHandler
+	public class Scout_DaggerSlash : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, do a slash attack to the nearby enemies.
@@ -28,9 +29,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -38,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			}
 
 			skill.IncreaseOverheat();
-			caster.TurnTowards(designatedTarget);
+			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 55, width: 30, angle: 0);
@@ -64,7 +67,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			var hitDelay = TimeSpan.FromMilliseconds(100);
 
 			var hits = new List<SkillHitInfo>();
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{

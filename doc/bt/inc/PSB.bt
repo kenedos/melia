@@ -1,0 +1,41 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: PSB.bt
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+char fileFormat[4];
+int i2;
+int fileSize;
+int i3;
+int count;
+byte bin[44];
+char name[256];
+int i[8];
+float float_array1[54];
+int i4;
+float float_array2[8];
+int i5;
+float f2;
+float f3;
+int int_array1[28];
+float float_array3[4];
+int int_array2[4];
+float float_array4[22];
+char str[32];
+int int_array3[5];
+
+
+typedef struct
+{
+    char name[256];
+} PSBData <optimize=false>;
+
+PSBData data;

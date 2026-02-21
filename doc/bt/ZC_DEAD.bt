@@ -26,7 +26,7 @@ ExpInfo;
 ServerHeaderDynamic header;
 
 int handle;
-byte b1;
+byte showCorpse;
 byte expInfoCount;
 byte isOverkill;
 byte specialDrop;

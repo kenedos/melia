@@ -33,6 +33,8 @@ namespace Melia.Shared.Network.Inter.Messages
 		/// </summary>
 		public ServerStatus Status { get; set; }
 
+		public ServerRates Rates { get; set; }
+
 		/// <summary>
 		/// Creates a new message.
 		/// </summary>
@@ -40,12 +42,13 @@ namespace Melia.Shared.Network.Inter.Messages
 		/// <param name="serverId"></param>
 		/// <param name="playerCount"></param>
 		/// <param name="status"></param>
-		public ServerUpdateMessage(ServerType serverType, int serverId, int playerCount, ServerStatus status)
+		public ServerUpdateMessage(ServerType serverType, int serverId, int playerCount, ServerStatus status, ServerRates rates = null)
 		{
 			this.ServerType = serverType;
 			this.ServerId = serverId;
 			this.PlayerCount = playerCount;
 			this.Status = status;
+			this.Rates = rates;
 		}
 	}
 }

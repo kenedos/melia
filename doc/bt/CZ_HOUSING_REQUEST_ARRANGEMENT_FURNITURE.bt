@@ -15,7 +15,7 @@
 
 ClientHeaderDynamic header;
 
-byte b1;
+byte dir;
 int column;
 int row;
 int count;

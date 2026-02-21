@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.2 Binary Template
+//
+//      File: CZ_SUMMON_COMMAND.bt
+//   Authors: Salman T. Khan
+//   Version: i373765
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+int i1; // 2

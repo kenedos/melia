@@ -1,0 +1,29 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.2 Binary Template
+//
+//      File: CS_REQ_BLOCK_FRIEND.bt
+//   Authors: Salman T. Khan
+//   Version: i373765
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixedOld header;
+
+char teamName[64];
+/**
+float f1;
+int i1;
+int64 l1;
+int64 l2;
+float f2;
+int i3;
+float f3;
+int i4;
+int i5;
+**/

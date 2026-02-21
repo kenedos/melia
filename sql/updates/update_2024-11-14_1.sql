@@ -1,0 +1,1 @@
+ALTER TABLE `accounts` ADD `email` VARCHAR(255) NULL DEFAULT NULL AFTER `lastIP`;

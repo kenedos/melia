@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.World.Spawning;
 using Yggdrasil.Geometry;
 using Yggdrasil.Geometry.Shapes;
@@ -31,6 +33,8 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static SpawnArea AddSpawnPoint(string identifier, string mapClassName, IShapeF area)
 		{
+			GetMapOrThrow(mapClassName);
+
 			if (!ZoneServer.Instance.World.TryGetSpawnAreas(identifier, out var spc))
 			{
 				spc = new SpawnAreaCollection(identifier);
@@ -40,14 +44,127 @@ namespace Melia.Zone.Scripting
 			return spc.AddSpawnPoint(mapClassName, area);
 		}
 
+
 		/// <summary>
 		/// Adds a spawner to the world.
 		/// </summary>
 		/// <param name="monsterClassId">Id of the monster to spawn.</param>
 		/// <param name="amount">Amount of monsters to spawn at a time. The minimum will default to 50% of the max.</param>
-		/// <param name="respawn">Constant delay until killed monsters respawn.</param>
+		/// <param name="mapName">Class name of the map to spawn monsters one.</param>
+		/// <param name="minRespawn">Minimum delay until killed monsters respawn.</param>
+		/// <param name="maxRespawn">Maximum delay until killed monsters respawn.</param>
+		/// <returns></returns>
+		public static EventMonsterSpawner AddEventSpawner(int monsterClassId, string mapName, int amount, TimeSpan minRespawn, TimeSpan maxRespawn = default)
+		{
+			if (!ZoneServer.Instance.Data.MapDb.TryFind(mapName, out var map))
+				return null;
+			if (maxRespawn == default)
+				maxRespawn = minRespawn;
+			var spawner = new EventMonsterSpawner(monsterClassId, map.Id, amount, amount, TimeSpan.Zero, minRespawn, maxRespawn, TendencyType.Aggressive);
+			ZoneServer.Instance.World.AddSpawner(spawner);
+			return spawner;
+		}
+
+		/// <summary>
+		/// Adds a spawner to the world.
+		/// </summary>
+		/// <param name="monsterClassId">Id of the monster to spawn.</param>
+		/// <param name="amount">Amount of monsters to spawn at a time. The minimum will default to 50% of the max.</param>
+		/// <param name="mapName">Class name of the map to spawn monsters one.</param>
+		/// <param name="minRespawn">Minimum delay until killed monsters respawn.</param>
+		/// <param name="maxRespawn">Maximum delay until killed monsters respawn.</param>
+		/// <returns></returns>
+		public static EventMonsterSpawner AddBossSpawner(int monsterClassId, string mapName, int amount, TimeSpan minRespawn, TimeSpan maxRespawn = default)
+		{
+			if (!ZoneServer.Instance.Data.MapDb.TryFind(mapName, out var map))
+				return null;
+			if (maxRespawn == default)
+				maxRespawn = minRespawn;
+			var spawner = new EventMonsterSpawner(monsterClassId, map.Id, amount, amount, TimeSpan.Zero, minRespawn, maxRespawn, TendencyType.Aggressive);
+			ZoneServer.Instance.World.AddSpawner(spawner);
+			return spawner;
+		}
+
+		/// <summary>
+		/// Adds a treasure chest spawner to the world
+		/// </summary>
+		/// <param name="uniqueName"></param>
+		/// <param name="dropDb"></param>
+		/// <param name="mapClassName"></param>
+		/// <param name="maxPopulation"></param>
+		/// <param name="respawnDelay"></param>
+		/// <param name="spawnPoints"></param>
+		/// <returns></returns>
+		public static TreasureChestSpawner AddTreasureChestSpawner(
+			string uniqueName,
+			TreasureDropDb dropDb,
+			int maxPopulation = 10,
+			TimeSpan? respawnDelay = null,
+			params TreasureSpawnPointData[] spawnPoints)
+		{
+			if (spawnPoints == null || spawnPoints.Length == 0)
+				return null;
+
+			// Validate that all spawn points reference valid maps
+			foreach (var spawnPoint in spawnPoints)
+			{
+				if (!ZoneServer.Instance.Data.MapDb.TryFind(spawnPoint.MapClassName, out var map))
+					return null;
+			}
+
+			var spawner = new TreasureChestSpawner(
+				uniqueName,
+				dropDb,
+				maxPopulation,
+				respawnDelay ?? TimeSpan.FromSeconds(5),
+				spawnPoints
+			);
+
+			ZoneServer.Instance.World.AddSpawner(spawner);
+			return spawner;
+		}
+
+		/// <summary>
+		/// Adds a treasure chest spawner to the world using map class name
+		/// and spawn point data from database
+		/// </summary>
+		/// <param name="uniqueName"></param>
+		/// <param name="dropDb"></param>
+		/// <param name="mapClassName"></param>
+		/// <param name="maxPopulation"></param>
+		/// <param name="respawnDelay"></param>
+		/// <returns></returns>
+		public static TreasureChestSpawner AddTreasureChestSpawnerForMap(
+			string uniqueName,
+			TreasureDropDb dropDb,
+			string mapClassName,
+			int maxPopulation,
+			TimeSpan? respawnDelay = null)
+		{
+			if (!ZoneServer.Instance.Data.MapDb.TryFind(mapClassName, out var map))
+				return null;
+
+			var spawnPoints = ZoneServer.Instance.Data.TreasureSpawnPointDb.Find(mapClassName);
+			if (spawnPoints == null || spawnPoints.Length == 0)
+				return null;
+
+			return AddTreasureChestSpawner(
+				uniqueName,
+				dropDb,
+				maxPopulation,
+				respawnDelay,
+				spawnPoints
+			);
+		}
+
+		/// <summary>
+		/// Adds a spawner to the world.
+		/// </summary>
+		/// <param name="monsterClassId">Id of the monster to spawn.</param>
+		/// <param name="amount">Amount of monsters to spawn at a time. The minimum will default to 50% of the max.</param>
 		/// <param name="map">Class name of the map to spawn monsters one.</param>
 		/// <param name="area">Area in which to spawn monsters in.</param>
+		/// <param name="respawn">Constant delay until killed monsters respawn.</param>
 		/// <returns></returns>
 		public static MonsterSpawner AddSpawner(int monsterClassId, int amount, TimeSpan respawn, string map, IShapeF area)
 			=> AddSpawner(monsterClassId, amount, respawn, map, area, TendencyType.Peaceful);
@@ -146,6 +263,13 @@ namespace Melia.Zone.Scripting
 			var minRespawnDelay = respawn;
 			var maxRespawnDelay = respawn;
 
+			// Until we have a proper root crystal spawn handler, only spawn 1 per spawn point.
+			if (monsterClassId >= 45110 && monsterClassId <= 45137)
+			{
+				min = 1;
+				max = 1;
+			}
+
 			return AddSpawner(identifier, monsterClassId, min, max, initialSpawnDelay, minRespawnDelay, maxRespawnDelay, tendency);
 		}
 
@@ -163,10 +287,14 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static MonsterSpawner AddSpawner(string identifier, int monsterClassId, int min, int max, TimeSpan initialSpawn, TimeSpan minRespawn, TimeSpan maxRespawn, TendencyType tendency)
 		{
-			var spawner = new MonsterSpawner(monsterClassId, min, max, identifier, initialSpawn, minRespawn, maxRespawn, tendency);
-			ZoneServer.Instance.World.AddSpawner(spawner);
+			if (ZoneServer.Instance.Data.MonsterDb.Entries.ContainsKey(monsterClassId))
+			{
+				var spawner = new MonsterSpawner(monsterClassId, min, max, identifier, initialSpawn, minRespawn, maxRespawn, tendency);
+				ZoneServer.Instance.World.AddSpawner(spawner);
 
-			return spawner;
+				return spawner;
+			}
+			return null;
 		}
 
 		/// <summary>
@@ -180,9 +308,7 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static void AddPropertyOverrides(string mapClassName, int monsterClassId, PropertyOverrides propertyOverrides)
 		{
-			if (!ZoneServer.Instance.World.TryGetMap(mapClassName, out var map))
-				throw new ArgumentException($"Map '{mapClassName}' not found.");
-
+			var map = GetMapOrThrow(mapClassName);
 			map.AddPropertyOverrides(monsterClassId, propertyOverrides);
 		}
 

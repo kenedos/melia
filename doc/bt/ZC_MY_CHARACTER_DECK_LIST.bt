@@ -16,4 +16,4 @@
 ServerHeaderDynamic header;
 int i1; // 1
 int i2; // 0 - count?
-int64 l1;
+int64 characterId;

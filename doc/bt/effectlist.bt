@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: effectlist.bt
+//   Authors: Salman T. Khan
+//   Version: 0.1
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+int i1;
+lpString str;
+int i2;
+lpString name;
+byte b1;
+int i2;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 	/// Handler for the Cleric skill Heal.
 	/// </summary>
 	[SkillHandler(SkillId.Cleric_Heal)]
-	public class Cleric_Heal : IGroundSkillHandler
+	public class Cleric_Heal : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -30,8 +31,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -118,7 +120,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 				12,  6,  3,  9,  15,
 			};
 
-			var refPos = caster.Position.GetRelative2D(caster.Direction, 30);
+			var refPos = caster.Position.GetRelative(caster.Direction, 30);
 
 			var level = skill.Level;
 
@@ -141,8 +143,8 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 					if (level < minLevel)
 						continue;
 
-					var pos = refPos.GetRelative2D(caster.Direction.Left, (xi - 2) * size);
-					pos = pos.GetRelative2D(caster.Direction, yi * size);
+					var pos = refPos.GetRelative(caster.Direction.Left, (xi - 2) * size);
+					pos = pos.GetRelative(caster.Direction, yi * size);
 
 					var area = PolygonF.Rectangle(pos, new Vector2F(size, size), caster.Direction.NormalDegreeAngle);
 

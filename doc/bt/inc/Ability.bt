@@ -2,7 +2,7 @@
 //--- 010 Editor v8.0 Binary Template
 //
 //      File: Ability.bt
-//   Authors: exec
+//   Authors: exec, Salman T. Khan
 //   Version: 
 //   Purpose: 
 //  Category: 
@@ -17,7 +17,17 @@ typedef struct
     int id;
     short propertiesSize;
     short s1;
-    int i1;
+    int propertyCount;
+    if (propertyCount > 0)
+    {
+        local int i;
+        for (i = 0; i < propertyCount; i++)
+        {
+            int propId;
+            byte b1;
+            float propValue;
+        }
+    }
     if (propertiesSize > 0)
         getProperties(propertiesSize);
 }

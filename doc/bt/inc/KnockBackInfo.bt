@@ -18,13 +18,16 @@ typedef struct
     int velocity;
     int hAngle;
     int vAngle;
-    int i1;
+    int bounceCount;
     short timeMs;
-    short s1;
+    byte b1;
+    byte b2;
     float f1;
     float f2;
-    int i2;
-    byte b1;
-    byte gap1[3];
+    int i1;
+    byte b3;
+    byte b4;
+    byte b5;
+    byte b6;
 }
 KnockBackInfo;

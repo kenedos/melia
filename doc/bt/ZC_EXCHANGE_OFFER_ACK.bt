@@ -11,6 +11,8 @@
 //   History: 
 //------------------------------------------------
 
+// #define PROPERTY_NAMES
+
 #include "inc/common.bt"
 
 ServerHeaderDynamic header;
@@ -25,4 +27,9 @@ short props;
 getProperties(props);
 short s1;
 int64 itemWorldId;
-short s2;
+short gemCount;
+
+if (gemCount > 0)
+{
+    SocketInfo socketInfo[gemCount];
+}

@@ -11,8 +11,5 @@
 
 		Shield,
 		Aries,
-
-		// First seen in i402363
-		Widling,
 	}
 }

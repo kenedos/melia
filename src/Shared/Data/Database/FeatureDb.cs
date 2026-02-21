@@ -78,13 +78,36 @@ namespace Melia.Shared.Data.Database
 			node.Enabled = entry.ReadBool("enabled");
 
 			// Next, see if we already read this feature before. If so,
-			// we want to override its status and that of all of its
-			// children. Then we return with null to tell the caller
-			// that this element should not be considered a new child,
-			// in case a feature was disabled in a later update.
+			// we want to override its status. We then process children
+			// to allow child-level overrides, and return null to tell
+			// the caller that this element should not be considered a
+			// new child.
 			if (this.TryFind(node.Name, out var existingNode))
 			{
-				existingNode.Enable(node.Enabled);
+				// Update this node's enabled state without toggling children
+				existingNode.Enabled = node.Enabled;
+
+				// Process children if they exist in the override file
+				if (entry.ContainsKey("children"))
+				{
+					foreach (var childEntry in entry.ForEachObject("children"))
+					{
+						// Recursively process child nodes to apply overrides
+						var childNode = this.ReadEntryRecursive(childEntry);
+						if (childNode != null)
+						{
+							// This is a new child that didn't exist before
+							childNode.Parent = existingNode;
+							existingNode.Children.Add(childNode);
+
+							// If the child is enabled, but the parent is not,
+							// the child should be disabled as well.
+							if (childNode.Enabled && !existingNode.Enabled)
+								childNode.Enable(false);
+						}
+					}
+				}
+
 				return null;
 			}
 

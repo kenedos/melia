@@ -18,14 +18,31 @@ namespace Melia.Zone.Network.Helpers
 			packet.PutInt(knockBackInfo.Velocity);
 			packet.PutInt(knockBackInfo.HAngle);
 			packet.PutInt(knockBackInfo.VAngle);
-			packet.PutInt(0);
+			packet.PutInt(knockBackInfo.BounceCount);
 			packet.PutShort((short)knockBackInfo.Time.TotalMilliseconds);
 			packet.PutShort(0);
-			packet.PutFloat(1);
-			packet.PutFloat(1);
+			packet.PutFloat(knockBackInfo.Speed);
+			packet.PutFloat(knockBackInfo.VPow);
 			packet.PutInt(0);
 			packet.PutByte(0);
-			packet.PutGap(3);
+			packet.PutByte(0);
+			if (knockBackInfo.HitType == Shared.Game.Const.HitType.KnockDown)
+			{
+				packet.PutByte(40);
+				packet.PutByte(64);
+			}
+			else
+			{
+				packet.PutByte(0);
+				packet.PutByte(0);
+			}
+
+		}
+
+		public static void AddKnockdownInfo(this Packet packet, KnockBackInfo knockdownInfo)
+		{
+			packet.AddKnockbackInfo(knockdownInfo);
+			packet.PutByte((byte)knockdownInfo.HitType);
 		}
 	}
 }

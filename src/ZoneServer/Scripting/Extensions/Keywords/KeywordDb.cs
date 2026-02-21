@@ -23,6 +23,14 @@ namespace Melia.Zone.Scripting.Extensions.Keywords
 		}
 
 		/// <summary>
+		/// Clears registered keywords.
+		/// </summary>
+		public static void Clear()
+		{
+			Keywords.Clear();
+		}
+
+		/// <summary>
 		/// Returns true if the keyword exists in the database.
 		/// </summary>
 		/// <param name="code"></param>

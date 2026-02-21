@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Newtonsoft.Json.Linq;
 using Yggdrasil.Data.JSON;
 
@@ -18,6 +19,12 @@ namespace Melia.Shared.Data.Database
 	/// </summary>
 	public class AchievementPointDb : DatabaseJsonIndexed<int, AchievementPointData>
 	{
+		public bool TryFind(string className, out AchievementPointData pointData)
+		{
+			pointData = this.Entries.Values.FirstOrDefault(a => a.ClassName == className);
+			return pointData != null;
+		}
+
 		/// <summary>
 		/// Reads given entry and adds it to the database.
 		/// </summary>

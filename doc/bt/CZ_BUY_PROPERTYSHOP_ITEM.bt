@@ -1,0 +1,22 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.2 Binary Template
+//
+//      File: CZ_BUY_PROPERTYSHOP_ITEM.bt
+//   Authors: Salman T. Khan, Kennedos
+//   Version: i399006
+//   Purpose: Point shop from Uphill Defense Ranking
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+short s1;
+char shop[32];
+int itemIndex;
+int cost;
+int amount;

@@ -13,6 +13,7 @@ namespace Melia.Shared.Data.Database
 		public string ProductClassName { get; set; }
 		public int ProductAmount { get; set; }
 		public List<RecipeIngredientData> Ingredients { get; set; }
+		public int Level { get; set; } = 0;
 	}
 
 	[Serializable]
@@ -27,6 +28,13 @@ namespace Melia.Shared.Data.Database
 	/// </summary>
 	public class RecipeDb : DatabaseJsonIndexed<int, RecipeData>
 	{
+		private readonly ItemDb _itemDb;
+
+		public RecipeDb(ItemDb itemDb)
+		{
+			this._itemDb = itemDb;
+		}
+
 		/// <summary>
 		/// Reads given entry and adds it to the database.
 		/// </summary>
@@ -55,6 +63,9 @@ namespace Melia.Shared.Data.Database
 
 				data.Ingredients.Add(ingredientData);
 			}
+
+			if (this._itemDb.TryFind(data.ProductClassName, out var item))
+				data.Level = item.MinLevel;
 
 			this.AddOrReplace(data.Id, data);
 		}

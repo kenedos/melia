@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Network.Crypto;
 using Yggdrasil.Logging;
 using Yggdrasil.Network.TCP;
+using Yggdrasil.Util;
 
 namespace Melia.Shared.Network
 {
@@ -21,6 +22,11 @@ namespace Melia.Shared.Network
 		/// Gets or sets the session key associated with the connection.
 		/// </summary>
 		string SessionKey { get; set; }
+
+		/// <summary>
+		/// Randomly generated value used for checking the integrity of IPF archives.
+		/// </summary>
+		int IntegritySeed { get; }
 
 		/// <summary>
 		/// Sends packet to client.
@@ -64,11 +70,17 @@ namespace Melia.Shared.Network
 		public string SessionKey { get; set; }
 
 		/// <summary>
+		/// Randomly generated value used for checking the integrity of IPF archives.
+		/// </summary>
+		public int IntegritySeed { get; }
+
+		/// <summary>
 		/// Creates new connection.
 		/// </summary>
 		public Connection()
 		{
 			_framer.MessageReceived += this.OnMessageReceived;
+			this.IntegritySeed = RandomProvider.Get().Next();
 		}
 
 		/// <summary>
@@ -78,7 +90,15 @@ namespace Melia.Shared.Network
 		/// <param name="length"></param>
 		protected override void ReceiveData(byte[] buffer, int length)
 		{
-			_framer.ReceiveData(buffer, length);
+			try
+			{
+				_framer.ReceiveData(buffer, length);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Error while framing data: {0}", ex);
+				this.Close();
+			}
 		}
 
 		/// <summary>
@@ -92,7 +112,7 @@ namespace Melia.Shared.Network
 			var packet = new Packet(buffer);
 
 			// Check login state
-			if (packet.Op != Op.CB_LOGIN && packet.Op != Op.CB_LOGIN_BY_PASSPORT && packet.Op != Op.CS_LOGIN && packet.Op != Op.CZ_CONNECT)
+			if (packet.Op != OpTable.GetOp(Op.CB_LOGIN) && packet.Op != OpTable.GetOp(Op.CB_LOGIN_BY_PASSPORT) && packet.Op != OpTable.GetOp(Op.CS_LOGIN) && packet.Op != OpTable.GetOp(Op.CZ_CONNECT))
 			{
 				if (!this.LoggedIn)
 				{
@@ -117,15 +137,27 @@ namespace Melia.Shared.Network
 		/// <param name="packet"></param>
 		public void Send(Packet packet)
 		{
+			// Don't send undefined packets
+			if (packet.Op == -1)
+				return;
+
+			// Don't send undefined Op to OpCode
+			if (!OpTable.Exists(packet.Op))
+				return;
+
 			var buffer = _framer.Frame(packet);
-
 			var op = packet.Op;
+			var name = OpTable.GetName(packet.Op);
+			var tableSize = OpTable.GetSize(op);
 
-			var tableSize = Op.GetSize(op);
+			if (OpTable.GetOp(packet.Op) == Op.ZC_NORMAL && packet.SubOp == -1)
+			{
+				Log.Warning("Connection.Send: Invalid packet sub op for ZC_NORMAL '{0:X4}' ({1}) ({2}).", op, name, buffer.Length, packet.SubOp);
+				return;
+			}
+
 			if (tableSize != TosFramer.DynamicPacketSize && buffer.Length != tableSize)
 			{
-				var name = Op.GetName(packet.Op);
-
 				Log.Warning("Connection.Send: Invalid packet size for '{0:X4}' ({1}) ({2} != {3}).", op, name, buffer.Length, tableSize);
 
 				// We can't send a packet that's not the correct size, as

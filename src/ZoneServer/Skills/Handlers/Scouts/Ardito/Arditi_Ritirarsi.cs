@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -17,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 	/// Handler for the Ardito skill Ritirarsi.
 	/// </summary>
 	[SkillHandler(SkillId.Arditi_Ritirarsi)]
-	public class Arditi_Ritirarsi : IGroundSkillHandler
+	public class Arditi_Ritirarsi : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -26,9 +27,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -76,16 +79,16 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		private async Task Attack(Skill skill, ICombatEntity caster, Position originPos, Position farPos)
 		{
 			var direction = (originPos == farPos) ? caster.Direction : originPos.GetDirection(farPos);
-			var effectPosition = caster.Position.GetRelative2D(direction, 40);
+			var effectPosition = caster.Position.GetRelative(direction, 40);
 
 			await Task.Delay(TimeSpan.FromMilliseconds(150));
 
-			Send.ZC_NORMAL.SkillProjectile(caster, "I_archer_Lachrymator_force_mash002#Dummy_R_HAND", 0.75f, "F_scout_Ritirarsi", 4, effectPosition, 70f, 0.3f, 0, 600);
+			Send.ZC_NORMAL.SkillProjectile(caster, effectPosition, "I_archer_Lachrymator_force_mash002#Dummy_R_HAND", 0.75f, "F_scout_Ritirarsi", 4f, 70f, TimeSpan.FromSeconds(0.3f), TimeSpan.Zero, 600);
 
 			await Task.Delay(TimeSpan.FromMilliseconds(600));
 
 			var distance = this.GetJumpDistance();
-			var targetPos = caster.Position.GetRelative2D(caster.Direction.Backwards, distance);
+			var targetPos = caster.Position.GetRelative(caster.Direction.Backwards, distance);
 
 			targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 			caster.Position = targetPos;
@@ -93,7 +96,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 			Send.ZC_NORMAL.LeapJump(caster, targetPos, 0, 0, 0.5f, 0.35f, 0.7f, 30);
 
 			var splashArea = new Circle(effectPosition, 50);
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{

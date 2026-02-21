@@ -1,0 +1,11 @@
+// Melia
+// Database file
+// 
+// Values: id, className, engName, maxLevel
+//---------------------------------------------------------------------------
+
+[
+{ id: 1, className: "MemberExtend", name: "Increase Maximum Members", maxLevel: 15 },
+{ id: 2, className: "Taming", name: "Taming", maxLevel: 5 },
+{ id: 3, className: "Farming", name: "Farming", maxLevel: 5 },
+]

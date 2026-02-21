@@ -1,6 +1,6 @@
 ﻿namespace Melia.Shared.Game.Const
 {
-	public enum AttributeType : int
+	public enum AttributeType
 	{
 		// The values were ordered for consistency in the code base, while
 		// their values are based on what the client expects for monster

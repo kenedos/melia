@@ -1,0 +1,20 @@
+//------------------------------------------------
+//--- 010 Editor v14.0beta1 Binary Template
+//
+//      File: CZ_ITEM_USE_TO_ITEM.bt
+//   Authors: Salman T. Khan
+//   Version: i382805
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+int64 itemWorldId1;
+int64 itemWorldId2;
+int i1; // 0

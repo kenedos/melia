@@ -21,8 +21,8 @@ using static Melia.Shared.Util.TaskHelper;
 
 public class CampfireActionScript : GeneralScript
 {
-	private const int CampfireMonsterId = 46011;
-	private const int FirewoodItemId = 645337;
+	private const int CampfireMonsterId = MonsterId.Bonfire_1;
+	private const int FirewoodItemId = ItemId.Misc_CampfireKit;
 	private const int AreaOfEffectSize = 150;
 	private const int MinDistanceToFires = 150;
 	private const int MaxDistanceToCreator = 50;
@@ -74,19 +74,32 @@ public class CampfireActionScript : GeneralScript
 		var area = new Circle(pos, MinDistanceToFires);
 		var monsters = map.GetActorsIn<Mob>(area);
 
-		var anyCampfires = monsters.Any(a => a.Id == CampfireMonsterId);
+		var anyCampfires = monsters.Exists(a => a.Id == CampfireMonsterId);
 		return anyCampfires;
 	}
 
 	private static void CreateCampfire(Character creator, Position pos)
 	{
-		var campfire = new Mob(CampfireMonsterId, MonsterType.NPC);
+		var campfireHandle = creator.Variables.Temp.GetInt("Melia.CampFire.Handle");
+		if (campfireHandle != 0 && creator.Map.TryGetMonster(campfireHandle, out var previousCampfire))
+		{
+			creator.Map.RemoveMonster(previousCampfire);
+		}
+
+		var campfire = new Mob(CampfireMonsterId, RelationType.Party);
 		campfire.Faction = FactionType.Neutral;
 		campfire.Position = pos;
 		campfire.Direction = creator.Direction;
+		campfire.Layer = creator.Layer;
 		campfire.AttachEffect("F_bg_fire003");
+		campfire.DisappearTime = DateTime.Now.Add(CampfireDuration);
+		campfire.OnDisappear += () =>
+		{
+			creator.Variables.Temp.SetInt("Melia.CampFire.Handle", 0);
+		};
 
 		creator.Map.AddMonster(campfire);
+		creator.Variables.Temp.SetInt("Melia.CampFire.Handle", campfire.Handle);
 
 		CallSafe(ApplyBuff(creator, campfire));
 	}

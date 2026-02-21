@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 	/// Handler for the Assassin skill Behead.
 	/// </summary>
 	[SkillHandler(SkillId.Assassin_Behead)]
-	public class Assassin_Behead : IGroundSkillHandler
+	public class Assassin_Behead : IMeleeGroundSkillHandler
 	{
 		private const float JumpBehindDistance = 10;
 		private const float MaxJumpDistance = 150;
@@ -32,8 +33,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -87,7 +89,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 			var casterPos = caster.Position;
 			var targetPos = target.Position;
 
-			var jumpDest = casterPos.GetRelative3D(targetPos, JumpBehindDistance);
+			var jumpDest = casterPos.GetRelative(targetPos, JumpBehindDistance);
 			var isValidDest = caster.Map.Ground.IsValidPosition(jumpDest);
 			if (!isValidDest)
 				return;
@@ -120,7 +122,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -151,7 +153,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 			await Task.Delay(delayBetweenHits);
 			hits.Clear();
 
-			targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.Default;

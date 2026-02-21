@@ -21,9 +21,8 @@ typedef struct
 }
 WarehouseItem <optimize=false>; //Same Sell Item
 
-ClientHeaderFixed header;
+ClientHeaderDynamic header;
 
-short s1; // 31/41 ?
 byte type; // 6
 int64 count;
 WarehouseItem items[count];

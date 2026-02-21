@@ -13,9 +13,16 @@ namespace Melia.Zone.Scripting
 		/// Initializes script.
 		/// </summary>
 		/// <returns></returns>
-		public bool Init()
+		public virtual bool Init()
 		{
-			this.Load();
+			try
+			{
+				this.Load();
+			}
+			catch (MapNotLoadedException)
+			{
+				return true;
+			}
 
 			OnAttribute.Load(this, ZoneServer.Instance.ServerEvents);
 			ScriptableFunctions.Load(this);
@@ -26,7 +33,7 @@ namespace Melia.Zone.Scripting
 		/// <summary>
 		/// Called when the script is being removed before a reload.
 		/// </summary>
-		public void Dispose()
+		public virtual void Dispose()
 		{
 			OnAttribute.Unload(this, ZoneServer.Instance.ServerEvents);
 		}

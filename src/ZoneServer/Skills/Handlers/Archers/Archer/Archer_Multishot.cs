@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 	/// Handler for the Archer skill Multishot.
 	/// </summary>
 	[SkillHandler(SkillId.Archer_Multishot)]
-	public class Archer_Multishot : IGroundSkillHandler, IDynamicCasted
+	public class Archer_Multishot : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		private const float SplashRadius = 30;
 		private const int TotalHits = 10;
@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_PLAY_SOUND(caster, "voice_archer_multishot_cast");
 		}
@@ -42,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_STOP_SOUND(caster, "voice_archer_multishot_cast");
 		}
@@ -54,7 +54,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -93,7 +93,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 			{
 				// TODO: Try to optimize this to not get all targets
 				//   every time, though we might want/need that?
-				var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 				var targetPos = splashArea.OriginPos;
 
 				if (targets.Count != 0)
@@ -116,7 +116,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 				// are actually handled by the client instead of
 				// sending them on precise timers, though timers
 				// also seem to get employed... Needs more research.
-				Send.ZC_NORMAL.SkillProjectile(caster, "I_arrow013_mash_yellow#Dummy_Force", 0.6f, "F_explosion092_hit", 0.6f, targetPos, 30, 0.2f, 0, 0);
+				Send.ZC_NORMAL.SkillProjectile(caster, targetPos, "I_arrow013_mash_yellow#Dummy_Force", 0.6f, "F_explosion092_hit", 0.6f, 30, TimeSpan.FromSeconds(0.2f), TimeSpan.Zero, 0);
 
 				if (i < TotalHits - 1)
 					await Task.Delay(DelayBetweenHits);

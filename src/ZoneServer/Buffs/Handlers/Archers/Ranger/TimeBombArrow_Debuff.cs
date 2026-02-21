@@ -18,10 +18,13 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Ranger
 	{
 		public override void OnEnd(Buff buff)
 		{
-			if (buff.Target.IsDead || !buff.Caster.TryGetSkill(SkillId.Ranger_TimeBombArrow, out var skill))
+			if (buff.Caster is not ICombatEntity caster)
 				return;
 
-			var attacker = buff.Caster;
+			if (buff.Target.IsDead || !caster.TryGetSkill(SkillId.Ranger_TimeBombArrow, out var skill))
+				return;
+
+			var attacker = caster;
 			var target = buff.Target;
 			var damage = buff.NumArg1;
 			var damageMultiplier = buff.NumArg2;

@@ -19,10 +19,13 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Wugushi
 			if (buff.Target.IsDead)
 				return;
 
-			if (!buff.Caster.TryGetSkill(buff.SkillId, out var skill))
+			if (buff.Caster is not ICombatEntity caster)
 				return;
 
-			buff.Target.TakeSkillHit(buff.Caster, skill);
+			if (!caster.TryGetSkill(buff.SkillId, out var skill))
+				return;
+
+			buff.Target.TakeSkillHit(caster, skill);
 			Crescendo_Bane_Buff.TryApply(buff);
 		}
 	}

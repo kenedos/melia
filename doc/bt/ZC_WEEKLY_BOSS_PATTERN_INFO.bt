@@ -15,7 +15,7 @@
 
 ServerHeaderDynamic header;
 
-char pattern[48]; // weekly_boss_lucy
+char bossClassName[48]; // weekly_boss_lucy
 short s1; // 0
 byte b1; // 0
 char str1[20]; // Earth

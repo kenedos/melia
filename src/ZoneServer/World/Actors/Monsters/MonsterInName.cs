@@ -1,6 +1,7 @@
 ﻿using System;
-using Melia.Shared.ObjectProperties;
 using Melia.Shared.Game.Const;
+using Melia.Shared.ObjectProperties;
+using Melia.Shared.World;
 
 namespace Melia.Zone.World.Actors.Monsters
 {
@@ -18,7 +19,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <summary>
 		/// Returns the monster's type.
 		/// </summary>
-		public MonsterType MonsterType => MonsterType.NPC;
+		public RelationType MonsterType => RelationType.Neutral;
 
 		/// <summary>
 		/// Returns the monster's race.
@@ -43,7 +44,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <summary>
 		/// Returns the monster's level.
 		/// </summary>
-		public int Level => 1;
+		public int Level { get; set; } = 1;
 
 		/// <summary>
 		/// Returns the monster's AoE Defense Ratio.
@@ -51,25 +52,19 @@ namespace Melia.Zone.World.Actors.Monsters
 		public float SDR => 0;
 
 		/// <summary>
+		/// Returns the monster's movement speed.
+		/// </summary>
+		public float WalkSpeed => 16;
+
+		/// <summary>
 		/// Returns whether the monster emerged from the ground.
 		/// </summary>
 		public bool FromGround { get; set; }
 
 		/// <summary>
-		/// Returns the monster's faction.
-		/// </summary>
-		public FactionType Faction => FactionType.Peaceful;
-
-		/// <summary>
-		/// Gets or sets the time the monster will be removed from
-		/// the map its on.
-		/// </summary>
-		public DateTime DisappearTime { get; set; } = DateTime.MaxValue;
-
-		/// <summary>
 		/// Returns the monster's gen type.
 		/// </summary>
-		public int GenType { get; } = ZoneServer.Instance.World.CreateGenType();
+		public int GenType { get; }
 
 		/// <summary>
 		/// Returns a reference to the monster's properties.
@@ -100,17 +95,38 @@ namespace Melia.Zone.World.Actors.Monsters
 
 		/// <summary>
 		/// Gets or sets the name of the function to call when someone
+		/// is inside the monster's trigger area.
+		/// </summary>
+		public string WhileInsideName { get; set; }
+
+		/// <summary>
+		/// Gets or sets the name of the function to call when someone
 		/// leaves the monster's trigger area.
 		/// </summary>
 		public string LeaveName { get; set; }
 
 		/// <summary>
+		/// Gets or sets the spawn position.
+		/// </summary>
+		public Position SpawnPosition { get; set; } = Position.Zero;
+
+		public NpcState State { get; set; } = NpcState.Normal;
+
+		public int Shield => 0;
+
+		public int MaxShield => 0;
+
+		/// <summary>
 		/// Initializes the monster's properties.
 		/// </summary>
 		/// <param name="monsterClassId"></param>
-		public MonsterInName(int monsterClassId)
+		protected MonsterInName(int monsterClassId, int genType = 0)
 		{
 			this.Id = monsterClassId;
+			if (genType == 0)
+				this.GenType = ZoneServer.Instance.World.CreateGenType();
+			else
+				this.GenType = genType;
 		}
 	}
 }

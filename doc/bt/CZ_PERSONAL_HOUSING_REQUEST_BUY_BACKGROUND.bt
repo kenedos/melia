@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.2 Binary Template
+//
+//      File: CZ_PERSONAL_HOUSING_REQUEST_BUY_BACKGROUND.bt
+//   Authors: Salman T. Khan
+//   Version: i386576
+//   Purpose: Seen with GTW (Sent every 5 seconds)
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+int i1;

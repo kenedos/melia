@@ -1,2536 +1,1418 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using Melia.Shared.Data.Database;
+using Yggdrasil.Logging;
 
 namespace Melia.Shared.Network
 {
 	/// <summary>
 	/// Packet op code enum
 	/// </summary>
-	public static class Op
+	public enum Op
 	{
-		public const int CB_LOGIN = 0x03; // Size: 570
-		public const int CB_LOGIN_BY_PASSPORT = 0x04; // Size: 1242
-		public const int CB_LOGOUT = 0x05; // Size: 22
-		public const int CB_START_BARRACK = 0x06; // Size: 87
-		public const int CB_COMMANDER_CREATE = 0x07; // Size: 117
-		public const int BC_COMMANDER_CREATE_SLOTID = 0x08; // Size: 11
-		public const int CB_COMMANDER_DESTROY = 0x09; // Size: 30
-		public const int CB_CHECK_CLIENT_INTEGRITY = 0x0A; // Size: 86
-		public const int CB_CLIENT_INTEGRITY_FAIL = 0x0B; // Size: 1047
-		public const int CB_START_GAME = 0x0C; // Size: 26
-		public const int CB_BARRACKNAME_CHECK = 0x0D; // Size: 344
-		public const int BC_BARRACKNAME_CHECK_RESULT = 0x0E; // Size: 334
-		public const int CB_BARRACKNAME_CHANGE = 0x0F; // Size: 86
-		public const int CB_COMMANDER_MOVE = 0x10; // Size: 43
-		public const int CB_COMPANION_MOVE = 0x11; // Size: 50
-		public const int CB_ECHO = 0x12; // Size: 42
-		public const int BC_LOGINOK = 0x13; // Size: 156
-		public const int BC_CYOU_LOGIN_FAIL = 0x14; // Size: 10
-		public const int BC_LOGIN_PACKET_RECEIVED = 0x15; // Size: 10
-		public const int BC_LOGOUTOK = 0x16; // Size: 10
-		public const int BC_COMMANDER_LIST = 0x17; // Size: 0
-		public const int BC_SPLIT_COMMANDER_INFO_LIST = 0x18; // Size: 0
-		public const int BC_COMMANDER_CREATE = 0x19; // Size: 618
-		public const int BC_COMMANDER_DESTROY = 0x1A; // Size: 11
-		public const int BC_START_GAMEOK = 0x1B; // Size: 37
-		public const int BC_SINGLE_INFO = 0x1C; // Size: 457
-		public const int BC_MESSAGE = 0x1D; // Size: 0
-		public const int BC_ECHO = 0x1E; // Size: 30
-		public const int BC_MYPAGE_MAP = 0x1F; // Size: 0
-		public const int BC_BARRACKNAME_CHANGE = 0x20; // Size: 79
-		public const int BC_IES_MODIFY_INFO = 0x32; // Size: 0
-		public const int BC_IES_MODIFY_LIST = 0x33; // Size: 0
-		public const int CB_IES_REVISION_DELETE = 0x34; // Size: 0
-		public const int BC_IES_REVISION_DELETE = 0x35; // Size: 0
-		public const int CB_SCREENSHOT_HASH = 0x36; // Size: 54
-		public const int CB_REQ_CHANNEL_TRAFFIC = 0x37; // Size: 26
-		public const int CB_VISIT = 0x38; // Size: 88
-		public const int CB_BUY_THEMA = 0x39; // Size: 34
-		public const int BC_ACCOUNT_PROP = 0x3A; // Size: 0
-		public const int CB_CURRENT_BARRACK = 0x3B; // Size: 51
-		public const int BC_NORMAL = 0x3C; // Size: 0
-		public const int CB_POSE = 0x3D; // Size: 27
-		public const int CB_PLACE_CMD = 0x3E; // Size: 58
-		public const int CB_CHAT = 0x3F; // Size: 0
-		public const int BC_CHAT = 0x40; // Size: 0
-		public const int CB_ECHO_NORMAL = 0x41; // Size: 0
-		public const int CB_REQ_SLOT_PRICE = 0x42; // Size: 22
-		public const int BC_REQ_SLOT_PRICE = 0x43; // Size: 14
-		public const int CB_CHANGE_BARRACK_LAYER = 0x44; // Size: 34
-		public const int CB_CHANGE_BARRACK_TARGET_LAYER = 0x45; // Size: 35
-		public const int CB_SELECT_BARRACK_LAYER = 0x46; // Size: 26
-		public const int BC_LAYER_CHANGE_SYSTEM_MESSAGE = 0x47; // Size: 78
-		public const int CB_JUMP = 0x48; // Size: 31
-		public const int BC_JUMP = 0x49; // Size: 31
-		public const int BC_SERVER_ENTRY = 0x4A; // Size: 22
-		public const int CB_PET_PC = 0x4B; // Size: 38
-		public const int CB_PET_COMMAND = 0x4C; // Size: 39
-		public const int CB_REQ_CHANGE_POSTBOX_STATE = 0x4D; // Size: 35
-		public const int CB_REQ_GET_POSTBOX_ITEM = 0x4E; // Size: 1063
-		public const int CB_REQ_GET_POSTBOX_ITEM_LIST = 0x4F; // Size: 191
-		public const int CB_REQ_POSTBOX_PAGE = 0x50; // Size: 26
-		public const int BC_WAIT_QUEUE_ORDER = 0x51; // Size: 14
-		public const int CB_CANCEL_SERVER_WAIT_QUEUE = 0x52; // Size: 22
-		public const int CB_GEMSCOOL_PCINFO = 0x53; // Size: 1302
-		public const int CB_NOT_AUTHORIZED_ADDON_LIST = 0x54; // Size: 1051
-		public const int CB_DEBUG_LOG_FILE = 0x55; // Size: 0
-		public const int BC_FAIL_TO_GET_AUTHCODE = 0x56; // Size: 10
-		public const int CB_CLIENT_REMOTE_LOG = 0x57; // Size: 2584
-		public const int CB_CHECK_MARKET_REGISTERED = 0x58; // Size: 30
-		public const int BC_RETURN_PC_MARKET_REGISTERED = 0x59; // Size: 20
-		public const int BC_CHARACTER_SLOT_SWAP_SUCCESS = 0x5A; // Size: 10
-		public const int CB_CHARACTER_SWAP_SLOT = 0x5B; // Size: 38
-		public const int BC_CHARACTER_SLOT_SWAP_FAIL = 0x5C; // Size: 10
-		public const int BC_DISCONNECT_PACKET_LOG_COUNT = 0x5D; // Size: 14
-		public const int CB_REQ_POSTBOX_REFRESH = 0x5E; // Size: 22
-		public const int CB_TEAM_DESTROY = 0x5F; // Size: 22
-		public const int BC_REQ_SYSTEMINFO = 0x60; // Size: 19
-		public const int CB_RESPONSE_SYSTEMINFO = 0x61; // Size: 0
-		public const int CB_OS_INFO = 0x62; // Size: 24
-		public const int CB_REQ_MOVE_ACCOUNT_DATA = 0x63; // Size: 62
-		public const int BC_FAILED_MOVE_ACCOUNT_DATA = 0x64; // Size: 20
-		public const int BC_SUCCESS_MOVE_ACCOUNT_DATA = 0x65; // Size: 10
-		public const int BC_CHECK_MOVE_ACCOUNT_DATA = 0x66; // Size: 14
-		public const int CB_RELOAD_BARRACK_CAHR_INFO = 0x67; // Size: 22
-		public const int CB_SELECTED_LANGUAGE = 0x68; // Size: 24
-		public const int CZ_CONNECT = 0xBB9; // Size: 1269
-		public const int ZC_CONNECT_OK = 0xBBA; // Size: 0
-		public const int ZC_MOVE_ZONE = 0xBBB; // Size: 11
-		public const int CZ_MOVE_ZONE_OK = 0xBBC; // Size: 22
-		public const int ZC_CONNECT_FAILED = 0xBBD; // Size: 0
-		public const int CZ_GAME_READY = 0xBBE; // Size: 22
-		public const int ZC_MOVE_ZONE_OK = 0xBBF; // Size: 69
-		public const int CZ_LOGOUT = 0xBC0; // Size: 23
-		public const int CZ_MOVE_BARRACK = 0xBC1; // Size: 31
-		public const int ZC_MOVE_BARRACK = 0xBC2; // Size: 10
-		public const int ZC_LOGOUT_OK = 0xBC3; // Size: 10
-		public const int ZC_MESSAGE = 0xBC4; // Size: 0
-		public const int ZC_RESET_VIEW = 0xBC5; // Size: 10
-		public const int ZC_START_GAME = 0xBC6; // Size: 51
-		public const int ZC_QUIET = 0xBC7; // Size: 11
-		public const int ZC_ENTER_PC = 0xC1D; // Size: 623
-		public const int ZC_ENTER_MONSTER = 0xC1E; // Size: 0
-		public const int ZC_ENTER_DUMMYPC = 0xC1F; // Size: 576
-		public const int ZC_UPDATED_DUMMYPC = 0xC20; // Size: 534
-		public const int ZC_ENTER_ITEM = 0xC21; // Size: 107
-		public const int ZC_LEAVE = 0xC22; // Size: 16
-		public const int ZC_MOVE_PATH = 0xC23; // Size: 43
-		public const int ZC_MOVE_POS = 0xC24; // Size: 50
-		public const int ZC_MOVE_BEZIER = 0xC25; // Size: 79
-		public const int ZC_MOVE_DIR = 0xC26; // Size: 76
-		public const int ZC_EXPECTED_STOPPOS = 0xC27; // Size: 39
-		public const int ZC_MSPD = 0xC28; // Size: 26
-		public const int ZC_MOVE_SPEED = 0xC29; // Size: 31
-		public const int ZC_MOVE_STOP = 0xC2A; // Size: 27
-		public const int ZC_REST_SIT = 0xC2B; // Size: 16
-		public const int ZC_JUMP = 0xC2C; // Size: 71
-		public const int ZC_JUMP_DIR = 0xC2D; // Size: 63
-		public const int ZC_ORDER_SKILL_JUMP = 0xC2E; // Size: 14
-		public const int ZC_SKILL_JUMP = 0xC2F; // Size: 42
-		public const int ZC_SET_POS = 0xC30; // Size: 27
-		public const int ZC_FILE_MOVE = 0xC31; // Size: 50
-		public const int ZC_UPDATED_PCAPPEARANCE = 0xC32; // Size: 534
-		public const int ZC_UPDATED_MONSTERAPPEARANCE = 0xC33; // Size: 0
-		public const int ZC_CHAT = 0xC34; // Size: 0
-		public const int ZC_CHAT_WITH_TEXTCODE = 0xC35; // Size: 18
-		public const int ZC_STANCE_CHANGE = 0xC36; // Size: 18
-		public const int ZC_ADD_HP = 0xC37; // Size: 26
-		public const int ZC_SKILL_CAST_CANCEL = 0xC38; // Size: 14
-		public const int ZC_SKILL_CAST = 0xC39; // Size: 42
-		public const int ZC_SKILL_READY = 0xC3A; // Size: 54
-		public const int ZC_SKILL_DISABLE = 0xC3B; // Size: 19
-		public const int ZC_SKILL_USE_CANCEL = 0xC3C; // Size: 14
-		public const int ZC_SKILL_MELEE_TARGET = 0xC3D; // Size: 0
-		public const int ZC_SKILL_MELEE_GROUND = 0xC3E; // Size: 0
-		public const int ZC_SKILL_FORCE_TARGET = 0xC3F; // Size: 0
-		public const int ZC_SKILL_FORCE_GROUND = 0xC40; // Size: 0
-		public const int ZC_SKILL_HIT_INFO = 0xC41; // Size: 0
-		public const int ZC_BUFF_LIST = 0xC42; // Size: 0
-		public const int ZC_BUFF_ADD = 0xC43; // Size: 0
-		public const int ZC_BUFF_UPDATE = 0xC44; // Size: 0
-		public const int ZC_BUFF_REMOVE = 0xC45; // Size: 24
-		public const int ZC_BUFF_CLEAR = 0xC46; // Size: 15
-		public const int CZ_BUFF_REMOVE = 0xC47; // Size: 26
-		public const int CZ_INTE_WARP = 0xC48; // Size: 26
-		public const int ZC_ROTATE = 0xC49; // Size: 28
-		public const int ZC_ROTATE_RESERVED = 0xC4A; // Size: 22
-		public const int ZC_HEAD_ROTATE = 0xC4B; // Size: 22
-		public const int ZC_TARGET_ROTATE = 0xC4C; // Size: 22
-		public const int ZC_QUICK_ROTATE = 0xC4D; // Size: 22
-		public const int ZC_POSE = 0xC4E; // Size: 39
-		public const int ZC_DEAD = 0xC4F; // Size: 0
-		public const int ZC_RESURRECT = 0xC50; // Size: 22
-		public const int ZC_CHANGE_RELATION = 0xC51; // Size: 15
-		public const int ZC_RESURRECT_DIALOG = 0xC52; // Size: 527
-		public const int ZC_HIT_INFO = 0xC53; // Size: 82
-		public const int ZC_HEAL_INFO = 0xC54; // Size: 38
-		public const int ZC_CAUTION_DAMAGE_INFO = 0xC56; // Size: 19
-		public const int ZC_CAUTION_DAMAGE_RELEASE = 0xC57; // Size: 14
-		public const int ZC_KNOCKBACK_INFO = 0xC58; // Size: 74
-		public const int ZC_KNOCKDOWN_INFO = 0xC59; // Size: 75
-		public const int CZ_RESURRECT = 0xC5A; // Size: 31
-		public const int ZC_RESURRECT_SAVE_POINT_ACK = 0xC5B; // Size: 11
-		public const int ZC_RESURRECT_HERE_ACK = 0xC5C; // Size: 11
-		public const int CZ_CLICK_TRIGGER = 0xC5D; // Size: 27
-		public const int CZ_KEYBOARD_MOVE = 0xC5E; // Size: 73
-		public const int CZ_EXPECTED_STOP_POS = 0xC5F; // Size: 43
-		public const int CZ_JUMP = 0xC60; // Size: 71
-		public const int CZ_DASHRUN = 0xC61; // Size: 24
-		public const int CZ_SKILL_JUMP_REQ = 0xC62; // Size: 42
-		public const int CZ_MOVE_PATH = 0xC63; // Size: 36
-		public const int CZ_MOVE_STOP = 0xC64; // Size: 71
-		public const int CZ_UPDATE_POS = 0xC65; // Size: 72
-		public const int CZ_REST_SIT = 0xC66; // Size: 22
-		public const int CZ_ON_AIR = 0xC67; // Size: 22
-		public const int CZ_ON_GROUND = 0xC68; // Size: 22
-		public const int CZ_MOVEMENT_INFO = 0xC69; // Size: 63
-		public const int CZ_SKILL_TARGET = 0xC6A; // Size: 33
-		public const int CZ_SKILL_TARGET_ANI = 0xC6B; // Size: 37
-		public const int CZ_SKILL_GROUND = 0xC6C; // Size: 79
-		public const int CZ_SKILL_SELF = 0xC6D; // Size: 48
-		public const int CZ_SKILL_CANCEL = 0xC6E; // Size: 24
-		public const int CZ_HOLD = 0xC6F; // Size: 23
-		public const int CZ_ROTATE = 0xC70; // Size: 34
-		public const int CZ_HEAD_ROTATE = 0xC71; // Size: 34
-		public const int CZ_TARGET_ROTATE = 0xC72; // Size: 30
-		public const int CZ_POSE = 0xC73; // Size: 47
-		public const int CZ_CHAT = 0xC74; // Size: 0
-		public const int CZ_SELF_CHAT = 0xC75; // Size: 0
-		public const int CZ_CHAT_LOG = 0xC76; // Size: 0
-		public const int CZ_SHOUT = 0xC77; // Size: 0
-		public const int CZ_ITEM_DROP = 0xC78; // Size: 34
-		public const int CZ_ITEM_DELETE = 0xC79; // Size: 38
-		public const int CZ_ITEM_USE = 0xC7A; // Size: 34
-		public const int CZ_ITEM_USE_TO_ITEM = 0xC7B; // Size: 42
-		public const int CZ_ITEM_USE_TO_GROUND = 0xC7C; // Size: 42
-		public const int CZ_ITEM_BUY = 0xC7D; // Size: 0
-		public const int CZ_ITEM_SELL = 0xC7E; // Size: 0
-		public const int CZ_ITEM_EQUIP = 0xC7F; // Size: 31
-		public const int CZ_ITEM_UNEQUIP = 0xC80; // Size: 23
-		public const int CZ_REQ_DELETE_EXPIRED_ITEMS = 0xC81; // Size: 30
-		public const int ZC_CHECK_INVINDEX = 0xC82; // Size: 34
-		public const int CZ_PREMIUM_ENCHANTCHIP = 0xC83; // Size: 38
-		public const int CZ_PREMIUM_GACHACUBE = 0xC84; // Size: 22
-		public const int CZ_PREMIUM_GACHACUBE_LEGEND = 0xC85; // Size: 23
-		public const int ZC_ITEM_INVENTORY_LIST = 0xC86; // Size: 0
-		public const int ZC_ITEM_INVENTORY_DIVISION_LIST = 0xC87; // Size: 0
-		public const int ZC_ITEM_INVENTORY_INDEX_LIST = 0xC88; // Size: 0
-		public const int ZC_ITEM_EQUIP_LIST = 0xC89; // Size: 0
-		public const int ZC_ITEM_ADD = 0xC8A; // Size: 0
-		public const int ZC_ITEM_REMOVE = 0xC8B; // Size: 28
-		public const int ZC_ITEM_USE = 0xC8C; // Size: 18
-		public const int ZC_ITEM_USE_TO_GROUND = 0xC8D; // Size: 26
-		public const int ZC_QUICK_SLOT_LIST = 0xC8E; // Size: 0
-		public const int ZC_SKILL_LIST = 0xC8F; // Size: 0
-		public const int ZC_SKILL_ADD = 0xC90; // Size: 0
-		public const int ZC_SKILL_REMOVE = 0xC91; // Size: 18
-		public const int ZC_ABILITY_LIST = 0xC92; // Size: 0
-		public const int CZ_DISPEL_DEBUFF_TOGGLE = 0xC93; // Size: 26
-		public const int CZ_JUNGTAN_TOGGLE = 0xC94; // Size: 36
-		public const int ZC_EXP_UP = 0xC95; // Size: 34
-		public const int ZC_EXP_UP_BY_MONSTER = 0xC96; // Size: 38
-		public const int ZC_PC_LEVELUP = 0xC97; // Size: 18
-		public const int ZC_PC_STAT_AVG = 0xC98; // Size: 34
-		public const int ZC_MAX_EXP_CHANGED = 0xC99; // Size: 38
-		public const int ZC_TEXT = 0xC9A; // Size: 0
-		public const int ZC_UPDATE_SP = 0xC9B; // Size: 19
-		public const int ZC_RESTORATION = 0xC9C; // Size: 16
-		public const int ZC_UPDATE_MHP = 0xC9D; // Size: 18
-		public const int CZ_DIALOG_ACK = 0xC9E; // Size: 26
-		public const int CZ_DIALOG_SELECT = 0xC9F; // Size: 23
-		public const int CZ_DIALOG_STRINGINPUT = 0xCA0; // Size: 150
-		public const int ZC_DIALOG_OK = 0xCA1; // Size: 0
-		public const int ZC_DIALOG_NEXT = 0xCA2; // Size: 0
-		public const int ZC_DIALOG_SELECT = 0xCA3; // Size: 0
-		public const int ZC_DIALOG_ITEM_SELECT = 0xCA4; // Size: 0
-		public const int ZC_DIALOG_CLOSE = 0xCA5; // Size: 10
-		public const int ZC_DIALOG_TRADE = 0xCA6; // Size: 43
-		public const int ZC_DIALOG_COMMON_TRADE = 0xCA7; // Size: 43
-		public const int ZC_DIALOG_NUMBERRANGE = 0xCA8; // Size: 0
-		public const int ZC_DIALOG_STRINGINPUT = 0xCA9; // Size: 0
-		public const int ZC_ADDON_MSG = 0xCAA; // Size: 0
-		public const int ZC_ADDON_EVENT_MSG = 0xCAB; // Size: 0
-		public const int CZ_UI_EVENT = 0xCAC; // Size: 0
-		public const int ZC_PLAY_SOUND = 0xCAD; // Size: 24
-		public const int ZC_STOP_SOUND = 0xCAE; // Size: 18
-		public const int ZC_PLAY_MUSICQUEUE = 0xCAF; // Size: 21
-		public const int ZC_STOP_MUSICQUEUE = 0xCB0; // Size: 18
-		public const int ZC_PLAY_ANI = 0xCB1; // Size: 30
-		public const int ZC_PLAY_FIX_ANI = 0xCB2; // Size: 34
-		public const int ZC_PLAY_ANI_SELFISH = 0xCB3; // Size: 23
-		public const int ZC_CHANGE_ANI = 0xCB4; // Size: 48
-		public const int CZ_MOVE_CAMP = 0xCB5; // Size: 30
-		public const int CZ_CAMPINFO = 0xCB6; // Size: 30
-		public const int ZC_CAMPINFO = 0xCB7; // Size: 22
-		public const int ZC_FIX_ANIM = 0xCB8; // Size: 78
-		public const int ZC_MOVE_ANIM = 0xCB9; // Size: 16
-		public const int ZC_STD_ANIM = 0xCBA; // Size: 15
-		public const int ZC_PLAY_ALARMSOUND = 0xCBC; // Size: 87
-		public const int ZC_STOP_ALARMSOUND = 0xCBD; // Size: 14
-		public const int ZC_PLAY_EXP_TEXT = 0xCBE; // Size: 18
-		public const int ZC_PLAY_NAVI_EFFECT = 0xCBF; // Size: 154
-		public const int ZC_UPDATE_ALL_STATUS = 0xCC0; // Size: 34
-		public const int ZC_OBJECT_PROPERTY = 0xCC1; // Size: 0
-		public const int ZC_DUMP_PROPERTY = 0xCC2; // Size: 0
-		public const int ZC_SHOUT = 0xCC3; // Size: 0
-		public const int ZC_SHOUT_FAILED = 0xCC4; // Size: 11
-		public const int CZ_EXCHANGE_REQUEST = 0xCC5; // Size: 26
-		public const int ZC_EXCHANGE_REQUEST_ACK = 0xCC6; // Size: 76
-		public const int ZC_EXCHANGE_REQUEST_RECEIVED = 0xCC7; // Size: 75
-		public const int CZ_EXCHANGE_ACCEPT = 0xCC8; // Size: 22
-		public const int CZ_EXCHANGE_DECLINE = 0xCC9; // Size: 22
-		public const int ZC_EXCHANGE_DECLINE_ACK = 0xCCA; // Size: 10
-		public const int ZC_EXCHANGE_START = 0xCCB; // Size: 76
-		public const int CZ_EXCHANGE_OFFER = 0xCCC; // Size: 42
-		public const int ZC_EXCHANGE_OFFER_ACK = 0xCCD; // Size: 0
-		public const int CZ_EXCHANGE_AGREE = 0xCCE; // Size: 22
-		public const int ZC_EXCHANGE_AGREE_ACK = 0xCCF; // Size: 11
-		public const int CZ_EXCHANGE_FINALAGREE = 0xCD0; // Size: 22
-		public const int ZC_EXCHANGE_FINALAGREE_ACK = 0xCD1; // Size: 11
-		public const int CZ_EXCHANGE_CANCEL = 0xCD2; // Size: 22
-		public const int ZC_EXCHANGE_CANCEL_ACK = 0xCD3; // Size: 10
-		public const int ZC_EXCHANGE_SUCCESS = 0xCD4; // Size: 10
-		public const int ZC_COOLDOWN_LIST = 0xCD5; // Size: 0
-		public const int ZC_COOLDOWN_CHANGED = 0xCD6; // Size: 31
-		public const int ZC_OVERHEAT_CHANGED = 0xCD7; // Size: 46
-		public const int ZC_TEST_AGENT = 0xCD8; // Size: 22
-		public const int ZC_TIME_FACTOR = 0xCD9; // Size: 14
-		public const int ZC_PARTY_ENTER = 0xCDA; // Size: 0
-		public const int ZC_PARTY_OUT = 0xCDB; // Size: 28
-		public const int CZ_PARTY_OUT = 0xCDC; // Size: 22
-		public const int ZC_PARTY_DESTROY = 0xCDD; // Size: 19
-		public const int ZC_PARTY_INFO = 0xCDE; // Size: 0
-		public const int ZC_PARTY_LIST = 0xCDF; // Size: 0
-		public const int ZC_PARTY_INST_INFO = 0xCE0; // Size: 0
-		public const int ZC_CHANGE_EQUIP_DURABILITY = 0xCE1; // Size: 15
-		public const int ZC_UPDATE_REPRESENTATION_CLASS = 0xCE2; // Size: 22
-		public const int CZ_DIALOG_TX = 0xCE3; // Size: 0
-		public const int CZ_REQ_RECIPE = 0xCE4; // Size: 0
-		public const int ZC_CUSTOM_DIALOG = 0xCE5; // Size: 79
-		public const int ZC_SESSION_OBJECTS = 0xCE6; // Size: 0
-		public const int ZC_SESSION_OBJ_ADD = 0xCE7; // Size: 0
-		public const int ZC_SESSION_OBJ_REMOVE = 0xCE8; // Size: 14
-		public const int ZC_SESSION_OBJ_TIME = 0xCE9; // Size: 18
-		public const int CZ_S_OBJ_VALUE_C = 0xCEA; // Size: 38
-		public const int CZ_REQ_NORMAL_TX = 0xCEB; // Size: 57
-		public const int ZC_COMMANDER_LOADER_INFO = 0xCEC; // Size: 0
-		public const int ZC_MOVE_SINGLE_ZONE = 0xCED; // Size: 22
-		public const int ZC_BACKTO_ORIGINAL_SERVER = 0xCEE; // Size: 12
-		public const int CZ_BACKTO_ORIGINAL_SERVER = 0xCEF; // Size: 24
-		public const int CZ_REQ_NORMAL_TX_NUMARG = 0xCF0; // Size: 0
-		public const int ZC_UI_OPEN = 0xCF1; // Size: 43
-		public const int ZC_ENABLE_CONTROL = 0xCF2; // Size: 79
-		public const int ZC_CHANGE_CAMERA = 0xCF3; // Size: 35
-		public const int ZC_MONSTER_SDR_CHANGED = 0xCF4; // Size: 15
-		public const int ZC_MOVE_IGNORE_COLLISION = 0xCF5; // Size: 34
-		public const int ZC_CHANGE_CAMERA_ZOOM = 0xCF6; // Size: 42
-		public const int ZC_PLAY_SKILL_ANI = 0xCF7; // Size: 86
-		public const int ZC_PLAY_SKILL_CAST_ANI = 0xCF8; // Size: 34
-		public const int CZ_REQ_ITEM_GET = 0xCF9; // Size: 26
-		public const int ZC_ITEM_GET = 0xCFA; // Size: 22
-		public const int CZ_GUARD = 0xCFB; // Size: 31
-		public const int ZC_GUARD = 0xCFC; // Size: 23
-		public const int ZC_STAMINA = 0xCFD; // Size: 14
-		public const int ZC_ADD_STAMINA = 0xCFE; // Size: 14
-		public const int ZC_GM_ORDER = 0xCFF; // Size: 14
-		public const int ZC_MYPC_ENTER = 0xD00; // Size: 28
-		public const int ZC_LOCK_KEY = 0xD01; // Size: 79
-		public const int ZC_SAVE_INFO = 0xD02; // Size: 10
-		public const int CZ_SAVE_INFO = 0xD03; // Size: 0
-		public const int ZC_OPTION_LIST = 0xD04; // Size: 0
-		public const int ZC_SKILLMAP_LIST = 0xD05; // Size: 0
-		public const int CZ_GIVEITEM_TO_DUMMYPC = 0xD06; // Size: 34
-		public const int CZ_FOOD_TABLE_TITLE = 0xD07; // Size: 91
-		public const int CZ_USE_TP_AND_ENTER_INDUN = 0xD08; // Size: 534
-		public const int CZ_USE_RANKRESET_ITEM = 0xD09; // Size: 32
-		public const int CZ_REQ_RANKRESET_SYSTEM = 0xD0A; // Size: 26
-		public const int CZ_REQ_MULTIPLE_RANKRESET_SYSTEM = 0xD0B; // Size: 34
-		public const int ZC_SET_LAYER = 0xD0C; // Size: 15
-		public const int ZC_CREATE_LAYERBOX = 0xD0D; // Size: 42
-		public const int ZC_RESET_BOX = 0xD0E; // Size: 15
-		public const int ZC_CREATE_SCROLLLOCKBOX = 0xD0F; // Size: 42
-		public const int ZC_REMOVE_SCROLLLOCKBOX = 0xD10; // Size: 14
-		public const int CZ_DYNAMIC_CASTING_START = 0xD11; // Size: 53
-		public const int CZ_DYNAMIC_CASTING_END = 0xD12; // Size: 34
-		public const int ZC_CASTING_SPEED = 0xD13; // Size: 26
-		public const int CZ_SKILL_CANCEL_SCRIPT = 0xD14; // Size: 26
-		public const int ZC_LEAVE_TRIGGER = 0xD15; // Size: 10
-		public const int ZC_BORN = 0xD16; // Size: 14
-		public const int ZC_ACHIEVE_POINT_LIST = 0xD17; // Size: 0
-		public const int ZC_SPLIT_ACHIEVE_POINT_LIST = 0xD18; // Size: 0
-		public const int ZC_SPLIT_ACHIEVE_SET = 0xD19; // Size: 0
-		public const int ZC_ACHIEVE_POINT = 0xD1A; // Size: 22
-		public const int CZ_ACHIEVE_EQUIP = 0xD1B; // Size: 26
-		public const int ZC_ACHIEVE_EQUIP = 0xD1C; // Size: 34
-		public const int CZ_ACHIEVE_REWARD = 0xD1D; // Size: 27
-		public const int CZ_ACHIEVE_EXCHANGE_EVENT_REWARD = 0xD1E; // Size: 26
-		public const int CZ_ACHIEVE_LEVEL_REWARD = 0xD1F; // Size: 26
-		public const int CZ_CHANGE_CONFIG = 0xD20; // Size: 30
-		public const int CZ_CHANGE_CONFIG_STR = 0xD21; // Size: 46
-		public const int ZC_WORLD_MSG = 0xD22; // Size: 91
-		public const int ZC_ENABLE_SHOW_ITEM_GET = 0xD23; // Size: 12
-		public const int ZC_LOGIN_TIME = 0xD24; // Size: 18
-		public const int ZC_GIVE_EXP_TO_PC = 0xD25; // Size: 50
-		public const int ZC_LAYER_PC_LIST = 0xD26; // Size: 0
-		public const int ZC_LAYER_PC_SOBJ_PROP = 0xD27; // Size: 0
-		public const int CZ_CUSTOM_COMMAND = 0xD28; // Size: 38
-		public const int ZC_LAYER_INFO = 0xD29; // Size: 14
-		public const int CZ_CHAT_MACRO = 0xD2A; // Size: 158
-		public const int ZC_CHAT_MACRO_LIST = 0xD2B; // Size: 0
-		public const int ZC_RULLET_LIST = 0xD2C; // Size: 0
-		public const int ZC_QUICKSLOT_REGISTER = 0xD2D; // Size: 50
-		public const int CZ_QUICKSLOT_LIST = 0xD2E; // Size: 0
-		public const int CZ_DOUBLE_ITEM_EQUIP = 0xD2F; // Size: 40
-		public const int ZC_TRICK_PACKET = 0xD30; // Size: 0
-		public const int ZC_COOLDOWN_RATE = 0xD31; // Size: 26
-		public const int ZC_MAP_REVEAL_LIST = 0xD32; // Size: 0
-		public const int CZ_MAP_REVEAL_INFO = 0xD33; // Size: 158
-		public const int CZ_MAP_SEARCH_INFO = 0xD34; // Size: 67
-		public const int ZC_EXEC_CLIENT_SCP = 0xD35; // Size: 0
-		public const int ZC_SET_NPC_STATE = 0xD36; // Size: 22
-		public const int ZC_NPC_STATE_LIST = 0xD37; // Size: 0
-		public const int CZ_QUEST_NPC_STATE_CHECK = 0xD38; // Size: 26
-		public const int ZC_RANK_ACHIEVE_ADD = 0xD39; // Size: 18
-		public const int CZ_IES_MODIFY_INFO = 0xD3A; // Size: 0
-		public const int ZC_IES_MODIFY_INFO = 0xD3B; // Size: 0
-		public const int ZC_IES_MODIFY_LIST = 0xD3C; // Size: 0
-		public const int CZ_IES_REVISION_DELETE = 0xD3D; // Size: 0
-		public const int ZC_IES_REVISION_DELETE = 0xD3E; // Size: 0
-		public const int ZC_EQUIP_ITEM_REMOVE = 0xD3F; // Size: 22
-		public const int ZC_SOLD_ITEM_LIST = 0xD40; // Size: 0
-		public const int ZC_SOLD_ITEM_DIVISION_LIST = 0xD41; // Size: 0
-		public const int CZ_SOLD_ITEM = 0xD42; // Size: 31
-		public const int CZ_WAREHOUSE_CMD = 0xD43; // Size: 48
-		public const int CZ_SWAP_ETC_INV_CHANGE_INDEX = 0xD44; // Size: 47
-		public const int CZ_SORT_INV = 0xD45; // Size: 24
-		public const int CZ_EXTEND_WAREHOUSE = 0xD46; // Size: 23
-		public const int CZ_CAST_CONTROL_SHOT = 0xD47; // Size: 22
-		public const int ZC_PC_PROP_UPDATE = 0xD48; // Size: 15
-		public const int ZC_SHOP_POINT_UPDATE = 0xD49; // Size: 58
-		public const int CZ_SHOP_POINT_GET = 0xD4A; // Size: 54
-		public const int CZ_CLIENT_DAMAGE = 0xD4B; // Size: 26
-		public const int CZ_CLIENT_ATTACK = 0xD4C; // Size: 27
-		public const int ZC_SYSTEM_MSG = 0xD4D; // Size: 0
-		public const int ZC_FSM_MOVE = 0xD4E; // Size: 0
-		public const int CZ_QUEST_CHECK_SAVE = 0xD4F; // Size: 62
-		public const int CZ_ACHIEVE_CHASE_SAVE = 0xD50; // Size: 42
-		public const int ZC_MONSTER_LIFETIME = 0xD51; // Size: 18
-		public const int ZC_SHARED_MSG = 0xD52; // Size: 14
-		public const int CZ_REQ_TX_ITEM = 0xD53; // Size: 0
-		public const int CZ_REQ_TX_ITEM_STRING = 0xD54; // Size: 538
-		public const int ZC_TEST_DBG = 0xD55; // Size: 0
-		public const int ZC_MONSTER_DIST = 0xD56; // Size: 0
-		public const int ZC_RESET_SKILL_FORCEID = 0xD57; // Size: 14
-		public const int ZC_EMOTICON = 0xD58; // Size: 22
-		public const int ZC_SHOW_EMOTICON = 0xD59; // Size: 22
-		public const int ZC_TREASUREMARK_BY_MAP = 0xD5A; // Size: 0
-		public const int ZC_SHOW_LOCAL_MAP = 0xD5B; // Size: 0
-		public const int CZ_FLEE_OBSTACLE = 0xD5C; // Size: 38
-		public const int ZC_HOLD_MOVE_PATH = 0xD5D; // Size: 15
-		public const int ZC_ENTER_HOOK = 0xD5E; // Size: 14
-		public const int ZC_LEAVE_HOOK = 0xD5F; // Size: 14
-		public const int ZC_GROUND_EFFECT = 0xD60; // Size: 56
-		public const int ZC_FLY = 0xD61; // Size: 22
-		public const int ZC_FLY_OPTION = 0xD62; // Size: 18
-		public const int ZC_FLY_MATH = 0xD63; // Size: 27
-		public const int ZC_FLY_HEIGHT = 0xD64; // Size: 18
-		public const int ZC_UPDATE_SHIELD = 0xD65; // Size: 23
-		public const int ZC_SHOW_MODEL = 0xD66; // Size: 19
-		public const int ZC_SHOW_SCENE_MODEL = 0xD67; // Size: 15
-		public const int ZC_SKILL_RANGE_DBG = 0xD68; // Size: 74
-		public const int ZC_SKILL_RANGE_FAN = 0xD69; // Size: 50
-		public const int ZC_SKILL_RANGE_SQUARE = 0xD6A; // Size: 52
-		public const int ZC_SKILL_RANGE_CIRCLE = 0xD6B; // Size: 40
-		public const int ZC_POS_DBG = 0xD6C; // Size: 38
-		public const int ZC_TEAMID = 0xD6D; // Size: 15
-		public const int ZC_PC = 0xD6E; // Size: 0
-		public const int CZ_LOG = 0xD6F; // Size: 0
-		public const int ZC_MOTIONBLUR = 0xD70; // Size: 15
-		public const int ZC_PLAY_FORCE = 0xD71; // Size: 82
-		public const int ZC_CAST_TARGET = 0xD72; // Size: 18
-		public const int ZC_START_INFO = 0xD73; // Size: 0
-		public const int ZC_JOB_EXP_UP = 0xD74; // Size: 26
-		public const int ZC_JOB_PTS = 0xD75; // Size: 22
-		public const int ZC_ADDITIONAL_SKILL_POINT = 0xD76; // Size: 0
-		public const int ZC_MON_STAMINA = 0xD77; // Size: 26
-		public const int CZ_CUSTOM_SCP = 0xD78; // Size: 26
-		public const int ZC_VIEW_FOCUS = 0xD79; // Size: 29
-		public const int ZC_HARDCODED_SKILL = 0xD7A; // Size: 30
-		public const int CZ_HARDCODED_SKILL = 0xD7B; // Size: 46
-		public const int ZC_FORCE_MOVE = 0xD7C; // Size: 34
-		public const int ZC_HSKILL_CONTROL = 0xD7D; // Size: 26
-		public const int ZC_CANCEL_DEADEVENT = 0xD7E; // Size: 14
-		public const int ZC_ACTION_PKS = 0xD7F; // Size: 39
-		public const int CZ_HARDCODED_ITEM = 0xD80; // Size: 34
-		public const int CZ_CANCEL_TRANSFORM_SKILL = 0xD81; // Size: 22
-		public const int CZ_BRIQUET = 0xD82; // Size: 0
-		public const int ZC_VIBRATE = 0xD83; // Size: 34
-		public const int ZC_COUNTER_MOVE = 0xD84; // Size: 14
-		public const int CZ_COUNTER_ATTACK = 0xD85; // Size: 26
-		public const int CZ_CLIENT_DIRECT = 0xD86; // Size: 42
-		public const int ZC_CLIENT_DIRECT = 0xD87; // Size: 34
-		public const int ZC_OWNER = 0xD88; // Size: 18
-		public const int ZC_GD_RANK = 0xD89; // Size: 14
-		public const int CZ_RUN_BGEVENT = 0xD8A; // Size: 86
-		public const int ZC_ADD_SKILL_EFFECT = 0xD8B; // Size: 22
-		public const int ZC_ITEM_DROPABLE = 0xD8C; // Size: 14
-		public const int CZ_ITEM_DROP_TO_OBJECT = 0xD8D; // Size: 38
-		public const int ZC_NORMAL = 0xD8E; // Size: 0
-		public const int CZ_G_QUEST_CHECK = 0xD8F; // Size: 26
-		public const int ZC_MOVE_PATH_MATH = 0xD90; // Size: 38
-		public const int CZ_MYPAGE_COMMENT_ADD = 0xD91; // Size: 290
-		public const int CZ_MYPAGE_COMMENT_DELETE = 0xD92; // Size: 30
-		public const int CZ_GUESTPAGE_COMMENT_ADD = 0xD93; // Size: 290
-		public const int CZ_GET_TARGET_MYPAGE = 0xD94; // Size: 26
-		public const int CZ_ON_MYPAGE_MODE = 0xD95; // Size: 26
-		public const int CZ_RESET_SOCIAL_MODE = 0xD96; // Size: 22
-		public const int CZ_GET_TARGET_GUESTPAGE = 0xD97; // Size: 26
-		public const int CZ_ADD_SELLMODE_ITEM = 0xD98; // Size: 42
-		public const int CZ_DELETE_SELLMODE_ITEM = 0xD99; // Size: 30
-		public const int CZ_ON_SELLITEM_MODE = 0xD9A; // Size: 26
-		public const int ZC_MYPAGE_MAP = 0xD9B; // Size: 0
-		public const int ZC_GUESTPAGE_MAP = 0xD9C; // Size: 0
-		public const int ZC_ON_MYPAGE_MODE = 0xD9D; // Size: 0
-		public const int ZC_RESET_SOCIAL_MODE = 0xD9E; // Size: 14
-		public const int CZ_ON_ITEMBUY_MODE = 0xD9F; // Size: 0
-		public const int ZC_ON_BUYITEM_MODE = 0xDA0; // Size: 0
-		public const int ZC_SHOW_GROUND_ITEM_MARK = 0xDA1; // Size: 34
-		public const int ZC_HELP_LIST = 0xDA2; // Size: 0
-		public const int ZC_HELP_ADD = 0xDA3; // Size: 15
-		public const int CZ_CLIENT_HIT_LIST = 0xDA4; // Size: 0
-		public const int ZC_PC_ATKSTATE = 0xDA5; // Size: 15
-		public const int ZC_SEND_PREMIUM_STATE = 0xDA6; // Size: 20
-		public const int CZ_HELP_READ_TYPE = 0xDA7; // Size: 30
-		public const int CZ_MOVE_PATH_END = 0xDA8; // Size: 22
-		public const int ZC_COLL_DAMAGE = 0xDA9; // Size: 15
-		public const int CZ_KEYBOARD_BEAT = 0xDAA; // Size: 22
-		public const int CZ_MOVEHIT_SCP = 0xDAB; // Size: 34
-		public const int ZC_SYNC_START = 0xDAC; // Size: 18
-		public const int ZC_SYNC_END = 0xDAD; // Size: 18
-		public const int ZC_SYNC_EXEC = 0xDAE; // Size: 14
-		public const int ZC_SYNC_EXEC_BY_SKILL_TIME = 0xDAF; // Size: 22
-		public const int CZ_STOP_TIMEACTION = 0xDB0; // Size: 23
-		public const int CZ_REQ_DUMMYPC_INFO = 0xDB1; // Size: 30
-		public const int CZ_VISIT_BARRACK = 0xDB2; // Size: 86
-		public const int CZ_SPC_SKILL_POS = 0xDB3; // Size: 34
-		public const int CZ_CHANGE_HEAD = 0xDB4; // Size: 86
-		public const int CZ_CHANGE_DESIGNCUT = 0xDB5; // Size: 86
-		public const int CZ_CREATE_ARROW_CRAFT = 0xDB6; // Size: 26
-		public const int CZ_EXCHANGE_ANTIQUE = 0xDB7; // Size: 34
-		public const int CZ_EXCHANGE_WEAPONTYPE = 0xDB8; // Size: 34
-		public const int CZ_REQ_MINITEXT = 0xDB9; // Size: 278
-		public const int ZC_PC_MOVE_STOP = 0xDBA; // Size: 63
-		public const int CZ_STOP_ALLPC = 0xDBB; // Size: 22
-		public const int CZ_COMPLETE_PRELOAD = 0xDBC; // Size: 26
-		public const int CZ_MGAME_JOIN_CMD = 0xDBD; // Size: 58
-		public const int CZ_ADD_HELP = 0xDBE; // Size: 26
-		public const int ZC_ATTACH_TO_OBJ = 0xDBF; // Size: 61
-		public const int ZC_DETACH_FROM_OBJ = 0xDC0; // Size: 18
-		public const int ZC_RUN_FROM = 0xDC1; // Size: 18
-		public const int ZC_LOOKAT_OBJ = 0xDC2; // Size: 18
-		public const int CZ_SKILL_CELL_LIST = 0xDC3; // Size: 0
-		public const int CZ_SKILL_TOOL_GROUND_POS = 0xDC4; // Size: 39
-		public const int CZ_DIRECTION_PROCESS = 0xDC5; // Size: 34
-		public const int CZ_DIRECTION_MOVE_STATE = 0xDC6; // Size: 0
-		public const int ZC_TO_ALL_CLIENT = 0xDC7; // Size: 0
-		public const int ZC_TO_CLIENT = 0xDC8; // Size: 0
-		public const int CZ_REWARD_CMD = 0xDC9; // Size: 26
-		public const int CZ_PROPERTY_COMPARE = 0xDCA; // Size: 28
-		public const int ZC_PROPERTY_COMPARE = 0xDCB; // Size: 0
-		public const int ZC_PROPERTY_COMPARE_FOR_ACT = 0xDCC; // Size: 0
-		public const int ZC_PROPERTY_COMPARE_FOR_REP_CLASS = 0xDCD; // Size: 0
-		public const int ZC_FACTION = 0xDCE; // Size: 18
-		public const int ZC_SEND_CASH_VALUE = 0xDCF; // Size: 0
-		public const int ZC_BEGIN_KILL_LOG = 0xDD0; // Size: 10
-		public const int ZC_END_KILL_LOG = 0xDD1; // Size: 10
-		public const int ZC_CLEAR_KILL_LOG = 0xDD2; // Size: 10
-		public const int CZ_NPC_AUCTION_CMD = 0xDD3; // Size: 42
-		public const int ZC_DIRECTION_APC = 0xDD4; // Size: 30
-		public const int ZC_BGMODEL_ANIM_INFO = 0xDD5; // Size: 19
-		public const int ZC_ATTACH_BY_KNOCKBACK = 0xDD6; // Size: 42
-		public const int CZ_OBJECT_MOVE = 0xDD7; // Size: 39
-		public const int CZ_CONTROL_OBJECT_ROTATE = 0xDD8; // Size: 34
-		public const int CZ_SUMMON_COMMAND = 0xDD9; // Size: 30
-		public const int CZ_VEHICLE_RIDE = 0xDDA; // Size: 27
-		public const int CZ_REQ_ACHIEVE_RANK_PAGE_INFO = 0xDDB; // Size: 90
-		public const int ZC_SPC_TRIGGER_EXEC = 0xDDC; // Size: 34
-		public const int CZ_REQ_MGAME_VIEW = 0xDDD; // Size: 30
-		public const int CZ_REQ_MGAME_CHAT = 0xDDE; // Size: 0
-		public const int CZ_TOURNAMENT_GIFT = 0xDDF; // Size: 30
-		public const int CZ_PARTY_INVITE_ACCEPT = 0xDE0; // Size: 99
-		public const int CZ_PARTY_INVITE_CANCEL = 0xDE1; // Size: 103
-		public const int CZ_PARTY_PROP_CHANGE = 0xDE2; // Size: 159
-		public const int CZ_REQ_MARKET_REGISTER = 0xDE3; // Size: 70
-		public const int CZ_REQ_MARKET_MINMAX_INFO = 0xDE4; // Size: 30
-		public const int CZ_REQ_MARKET_BUY = 0xDE5; // Size: 0
-		public const int CZ_REQ_CABINET_LIST = 0xDE6; // Size: 22
-		public const int CZ_REQ_GET_CABINET_ITEM = 0xDE7; // Size: 42
-		public const int CZ_REQ_CANCEL_MARKET_ITEM = 0xDE8; // Size: 30
-		public const int CZ_INV_ITEM_LOCK = 0xDE9; // Size: 31
-		public const int CZ_OBJ_RECORD_POS = 0xDEA; // Size: 0
-		public const int CZ_FORMATION_CMD = 0xDEB; // Size: 44
-		public const int CZ_REGISTER_AUTOSELLER = 0xDEC; // Size: 0
-		public const int CZ_OPEN_AUTOSELLER = 0xDED; // Size: 94
-		public const int CZ_BUY_AUTOSELLER_ITEMS = 0xDEE; // Size: 0
-		public const int CZ_SELL_MY_AUTOSELLER_ITEMS = 0xDEF; // Size: 0
-		public const int CZ_PUZZLE_CRAFT = 0xDF0; // Size: 0
-		public const int CZ_PET_EQUIP = 0xDF1; // Size: 46
-		public const int CZ_PET_AUTO_ATK = 0xDF2; // Size: 23
-		public const int ZC_PET_AUTO_ATK = 0xDF3; // Size: 23
-		public const int ZC_TO_SOMEWHERE_CLIENT = 0xDF4; // Size: 0
-		public const int CZ_REVEAL_NPC_STATE = 0xDF5; // Size: 26
-		public const int CZ_CHANGE_CHANNEL = 0xDF6; // Size: 24
-		public const int CZ_REQ_CHANNEL_TRAFFICS = 0xDF7; // Size: 24
-		public const int CZ_BUY_PROPERTYSHOP_ITEM = 0xDF8; // Size: 0
-		public const int CZ_SKILL_USE_HEIGHT = 0xDF9; // Size: 26
-		public const int CZ_CHANGE_GUILD_NEUTRALITY = 0xDFA; // Size: 22
-		public const int CZ_SAVE_GUILD_BOARD = 0xDFB; // Size: 122
-		public const int CZ_DELETE_PARTY_EVENT = 0xDFC; // Size: 32
-		public const int CZ_PING = 0xDFD; // Size: 22
-		public const int ZC_PING = 0xDFE; // Size: 22
-		public const int CZ_REQ_REMAIN_NEXONCASH = 0xDFF; // Size: 22
-		public const int CZ_REQ_OPEN_INGAMESHOP_UI = 0xE00; // Size: 22
-		public const int CZ_REQ_BUY_INGAMESHOP_ITEM = 0xE01; // Size: 90
-		public const int CZ_REQ_BUY_ALL_INGAMESHOP_ITEM = 0xE02; // Size: 22
-		public const int CZ_REQ_PICKUP_CASHITEM = 0xE03; // Size: 49
-		public const int CZ_REQ_REFUND_CASHITEM = 0xE04; // Size: 45
-		public const int ZC_XIGNCODE_BUFFER = 0xE05; // Size: 536
-		public const int CZ_XIGNCODE_BUFFER = 0xE06; // Size: 536
-		public const int CZ_SYSTEM_LOG_SAVE_TO_MONGODB = 0xE07; // Size: 292
-		public const int CZ_CHANGE_TITLE = 0xE08; // Size: 86
-		public const int CZ_PC_COMMENT_CHANGE = 0xE09; // Size: 0
-		public const int CZ_AUTTOSELLER_BUYER_CLOSE = 0xE0A; // Size: 30
-		public const int CZ_REQ_ITEM_LIST = 0xE0B; // Size: 23
-		public const int CZ_REQ_ACC_WARE_VIS_LOG = 0xE0C; // Size: 22
-		public const int CZ_HIT_MISSILE = 0xE0D; // Size: 26
-		public const int CZ_PARTY_JOIN_BY_LINK = 0xE0E; // Size: 39
-		public const int CZ_PVP_ZONE_CMD = 0xE0F; // Size: 39
-		public const int CZ_PVP_CHAT = 0xE10; // Size: 0
-		public const int CZ_CARDBATTLE_CMD = 0xE11; // Size: 38
-		public const int CZ_REQ_UPDATE_CONTENTS_SESSION = 0xE12; // Size: 22
-		public const int CZ_REQ_FRIENDLY_FIGHT = 0xE13; // Size: 27
-		public const int CZ_REQ_ANCIENT_FRIENDLY_FIGHT = 0xE14; // Size: 27
-		public const int CZ_HARDSKILL_POS_LIST = 0xE15; // Size: 0
-		public const int CZ_CART_POSITION = 0xE16; // Size: 38
-		public const int CZ_REQ_RIDE_CART = 0xE17; // Size: 30
-		public const int CZ_DUMMYPC_SKILL_POS = 0xE18; // Size: 38
-		public const int CZ_NGS = 0xE19; // Size: 0
-		public const int ZC_NGS = 0xE1A; // Size: 0
-		public const int CZ_PARTY_MEMBER_SKILL_USE = 0xE1B; // Size: 0
-		public const int CZ_PARTY_MEMBER_SKILL_ACCEPT = 0xE1C; // Size: 35
-		public const int CZ_SYSTEM_LOG_TO_SERVER = 0xE1D; // Size: 1111
-		public const int CZ_UDP_RTT_CHECK = 0xE21; // Size: 26
-		public const int ZC_UDP_RTT_CHECK = 0xE22; // Size: 18
-		public const int CZ_UDP_RTT_CHECK_ACK = 0xE23; // Size: 30
-		public const int CZ_HEARTBEAT = 0xE24; // Size: 26
-		public const int CZ_CANCEL_INDUN_MATCHING = 0xE25; // Size: 22
-		public const int CZ_CANCEL_INDUN_PARTY_MATCHING = 0xE26; // Size: 22
-		public const int CZ_REQ_GM_ORDER = 0xE27; // Size: 214
-		public const int CZ_REQ_GM_ORDER_DUMMY_KICK = 0xE28; // Size: 26
-		public const int CZ_REPORT_AUTOBOT = 0xE29; // Size: 86
-		public const int CZ_REPORT_PVP_ZOOM = 0xE2A; // Size: 22
-		public const int CZ_PARTY_INVENTORY_LOAD = 0xE2B; // Size: 24
-		public const int CZ_PARTY_SHARED_QUEST = 0xE2C; // Size: 290
-		public const int CZ_REQ_MOVE_PARTYINV_TO_ACCOUNT = 0xE2D; // Size: 0
-		public const int CZ_PVP_COMMAND = 0xE2E; // Size: 35
-		public const int CZ_REQ_CancelGachaCube = 0xE2F; // Size: 22
-		public const int CZ_WAREHOUSE_TAKE_LIST = 0xE30; // Size: 0
-		public const int CZ_SAVE_AUTO_MACRO = 0xE31; // Size: 0
-		public const int CZ_REQUEST_LOAD_ITEM_BUY_LIMIT = 0xE32; // Size: 22
-		public const int CZ_AUTO_STATE = 0xE33; // Size: 23
-		public const int CZ_RUN_GAMEEXIT_TIMER = 0xE34; // Size: 86
-		public const int CZ_FIXED_NOTICE_SHOW = 0xE35; // Size: 22
-		public const int CZ_SAGE_SKILL_GO_FRIEND = 0xE36; // Size: 102
-		public const int CZ_REQUEST_CHANGE_NAME = 0xE37; // Size: 78
-		public const int CZ_REQUEST_CHANGE_PET_NAME = 0xE38; // Size: 94
-		public const int ZC_ADD_BARRACK_CHARACTER_SLOT_SUCCESS = 0xE39; // Size: 14
-		public const int CZ_SELF_INVITE_NEWBIE_GUILD = 0xE3A; // Size: 22
-		public const int CZ_CYOU_CTU_CLIENT_MSG = 0xE3B; // Size: 1054
-		public const int ZC_CYOU_KICK_USER_EXIT_CLIENT = 0xE3D; // Size: 10
-		public const int ZC_HOLD_EXP_BOOK_TIME = 0xE3E; // Size: 37
-		public const int CZ_HOLD_EXP_BOOK_TIME = 0xE3F; // Size: 26
-		public const int ZC_BUFF_UPDATE_TIME = 0xE40; // Size: 34
-		public const int CZ_SCREENSHOT_HASH = 0xE41; // Size: 55
-		public const int CZ_REQ_MOVE_TO_INDUN = 0xE42; // Size: 31
-		public const int CZ_CLEAR_INDUN_REG = 0xE43; // Size: 22
-		public const int CZ_REQ_REGISTER_TO_INDUN = 0xE44; // Size: 26
-		public const int CZ_REQ_GUILD_MEMBER_AUTHORITY = 0xE45; // Size: 35
-		public const int CZ_TPSHOP_RTPP_FOR_TEST = 0xE46; // Size: 22
-		public const int CZ_REQ_FORGERY = 0xE47; // Size: 42
-		public const int CZ_REQ_UNDERSTAFF_ENTER_ALLOW = 0xE48; // Size: 22
-		public const int CZ_REQ_UNDERSTAFF_ENTER_ALLOW_WITH_PARTY = 0xE49; // Size: 26
-		public const int CZ_REQ_BUILD_FOODTABLE = 0xE4A; // Size: 94
-		public const int ZC_PLAY_PAIR_ANIMATION = 0xE4B; // Size: 341
-		public const int CZ_REQ_FISHING = 0xE4C; // Size: 35
-		public const int CZ_REQ_GET_FISHING_ITEM = 0xE4D; // Size: 22
-		public const int ZC_PLAY_ATTACH_MODEL_ANIM = 0xE4E; // Size: 26
-		public const int CZ_RUN_FUNCTION_DUMP = 0xE4F; // Size: 0
-		public const int ZC_RUN_FUNCTION_DUMP = 0xE50; // Size: 0
-		public const int ZC_RUN_FUNCTION_DUMP_ERROR = 0xE51; // Size: 0
-		public const int ZC_RUN_FUNCTION_DUMP_PRINT = 0xE52; // Size: 0
-		public const int ZC_ATTACH_TO_SLOT = 0xE53; // Size: 26
-		public const int ZC_FISHING_ITEM_LIST = 0xE54; // Size: 0
-		public const int CZ_REQ_FISHING_RANK = 0xE55; // Size: 90
-		public const int ZC_ENABLE_ROTATE = 0xE56; // Size: 79
-		public const int CZ_SYNC_POS = 0xE57; // Size: 38
-		public const int ZC_ADVENTURE_BOOK_INFO = 0xE58; // Size: 0
-		public const int CZ_DISCONNECT_REASON_FOR_LOG = 0xE59; // Size: 0
-		public const int CZ_REQ_ADVENTURE_BOOK_RANK = 0xE5A; // Size: 154
-		public const int CZ_REQ_ADVENTURE_BOOK_REWARD = 0xE5B; // Size: 86
-		public const int CZ_REQ_GUILD_NEUTRALITY_ALARM = 0xE5C; // Size: 26
-		public const int CZ_REQ_QUEST_COMPLETE = 0xE5D; // Size: 26
-		public const int CZ_REQ_GUILD_ASSET_LOG = 0xE5E; // Size: 22
-		public const int ZC_CANCEL_MOUSE_MOVE = 0xE5F; // Size: 14
-		public const int ZC_BROAD_CAST_MY_INFO = 0xE60; // Size: 31
-		public const int CZ_LOAD_COMPLETE = 0xE61; // Size: 22
-		public const int ZC_LOAD_COMPLETE = 0xE62; // Size: 10
-		public const int ZC_UPDATE_CHALLENGE_MODE_WARP_PORTAL_MARK = 0xE63; // Size: 24
-		public const int ZC_ATTENDANCE_RECEIPT_REWARD = 0xE64; // Size: 0
-		public const int CZ_ATTENDANCE_REWARD_CLICK = 0xE65; // Size: 26
-		public const int ZC_ATTENDANCE_REWARD_CHECK_UI_ON = 0xE66; // Size: 12
-		public const int ZC_CHANGE_DYNAMICCASTING_MAX_CHANGING_TIME = 0xE67; // Size: 18
-		public const int ZC_DELAYED_ROTATE_MOVE_START = 0xE68; // Size: 26
-		public const int ZC_DELAYED_ROTATE_MOVE_END = 0xE69; // Size: 14
-		public const int ZC_SEND_PC_EXPROP = 0xE6A; // Size: 0
-		public const int ZC_COLONY_OCCUPATION_INFO = 0xE6B; // Size: 0
-		public const int CZ_REQ_RETURN_TO_CITY_FROM_COLONY_WAR = 0xE6C; // Size: 22
-		public const int CZ_REQUEST_COLONYWAR_ENDTIME = 0xE6D; // Size: 22
-		public const int ZC_RESPONSE_COLONYWAR_ENDTIME = 0xE6E; // Size: 26
-		public const int ZC_SEND_COLONY_MARKET_FEE_PAYMENT_LIST = 0xE6F; // Size: 0
-		public const int CZ_REQ_COLONY_MARKET_FEE_PAYMENT = 0xE70; // Size: 42
-		public const int ZC_SET_COLONY_TIME_CHEAT_FAIL = 0xE71; // Size: 10
-		public const int ZC_SET_COLONY_TIME_CHEAT_SUCCESS = 0xE72; // Size: 10
-		public const int ZC_USER_BATTLE_INFO_LIST = 0xE73; // Size: 0
-		public const int ZC_COLONY_TAX_TOTAL_AMOUNT = 0xE74; // Size: 50
-		public const int ZC_COLONY_TAX_RATE_LIST = 0xE75; // Size: 0
-		public const int ZC_COLONY_TAX_LORD_READY = 0xE76; // Size: 99
-		public const int ZC_COLONY_TAX_LORD_START = 0xE77; // Size: 38
-		public const int ZC_COLONY_TAX_LORD_END = 0xE78; // Size: 14
-		public const int ZC_COLONY_TAX_RATE_SET = 0xE79; // Size: 42
-		public const int CZ_COLONY_TAX_RATE_REQ_SET = 0xE7A; // Size: 30
-		public const int ZC_COLONY_TAX_CHEQUE_LIST = 0xE7B; // Size: 0
-		public const int CZ_COLONY_TAX_CHEQUE_REQ_LIST = 0xE7C; // Size: 22
-		public const int CZ_COLONY_TAX_CHEQUE_REQ_SEND = 0xE7D; // Size: 0
-		public const int CZ_COLONY_TAX_HISTORY_REQ_LIST = 0xE7E; // Size: 22
-		public const int ZC_COLONY_TAX_HISTORY_LIST = 0xE7F; // Size: 0
-		public const int ZC_COLONY_TAX_PAYMENT_LIST = 0xE80; // Size: 0
-		public const int CZ_COLONY_TAX_PAYMENT_REQ_RECV = 0xE81; // Size: 30
-		public const int CZ_COLONY_TAX_PAYMENT_REQ_LIST = 0xE82; // Size: 22
-		public const int CZ_REQUEST_RVR_ENDTIME = 0xE83; // Size: 22
-		public const int ZC_RESPONSE_RVR_ENDTIME = 0xE84; // Size: 26
-		public const int CZ_REGISTER_NEW_GUILD_EMBLEM = 0xE85; // Size: 20107
-		public const int CZ_CHANGE_GUILD_EMBLEM = 0xE86; // Size: 20108
-		public const int ZC_UPDATE_GUILD_EMBLEM = 0xE87; // Size: 24
-		public const int CZ_REQUEST_CERTAIN_GUILD_EMBLEM = 0xE88; // Size: 32
-		public const int ZC_RESPONSE_CERTAIN_GUILD_EMBLEM = 0xE89; // Size: 20040
-		public const int CZ_REQUEST_GUILD_EMBLEM_INFO = 0xE8A; // Size: 32
-		public const int ZC_RESPONSE_GUILD_EMBLEM_INFO = 0xE8B; // Size: 102
-		public const int CZ_REQUEST_GUILD_INDEX = 0xE8C; // Size: 30
-		public const int ZC_RESPONSE_GUILD_INDEX = 0xE8D; // Size: 24
-		public const int CZ_REPORT_GUILDEMBLEM = 0xE8E; // Size: 86
-		public const int ZC_DELETE_GUILD_EMBLEM = 0xE8F; // Size: 24
-		public const int CZ_DELETE_GUILD_EMBLEM = 0xE90; // Size: 22
-		public const int ZC_NXA_REQ_TICKET = 0xE91; // Size: 10
-		public const int CZ_NXA_TICKET = 0xE92; // Size: 1046
-		public const int CZ_NXA_REQ_BALANCE = 0xE93; // Size: 22
-		public const int ZC_NXA_BALANCE = 0xE94; // Size: 40
-		public const int CZ_NXA_REQ_ITEMLIST = 0xE95; // Size: 23
-		public const int ZC_NXA_ITEMLIST = 0xE96; // Size: 0
-		public const int CZ_NXA_REQ_PURCHASE = 0xE97; // Size: 27
-		public const int ZC_NXA_PURCHASE = 0xE98; // Size: 4106
-		public const int CZ_NXA_REQ_PICKUP_READY_ITEMS = 0xE99; // Size: 2071
-		public const int CZ_NXA_REQ_PURCHASE_CANCEL = 0xE9A; // Size: 22
-		public const int ZC_NXA_SELLITEMLIST = 0xE9B; // Size: 0
-		public const int CZ_REQ_PARTY_INFO = 0xE9C; // Size: 22
-		public const int CZ_REQ_RETURN_ORIGIN_SERVER = 0xE9D; // Size: 22
-		public const int CZ_ANS_GIVEUP_PREV_PLAYING_INDUN = 0xE9E; // Size: 23
-		public const int ZC_FOLLOW_TO_ACTOR = 0xE9F; // Size: 39
-		public const int ZC_STOP_FOLLOW_TO_ACTOR = 0xEA0; // Size: 14
-		public const int ZC_SET_WEBSERVICE_URL = 0xEA1; // Size: 266
-		public const int CZ_CREATE_GUILD_BY_WEB = 0xEA2; // Size: 71
-		public const int CZ_GUILD_MEMBER_INVITE_BY_WEB = 0xEA3; // Size: 95
-		public const int ZC_GUILD_MEMBER_INVITE_BY_WEB = 0xEA4; // Size: 91
-		public const int CZ_WEEKLY_BOSS_INDUN_ENTER = 0xEA5; // Size: 23
-		public const int CZ_FIELD_BOSS_INDUN_ENTER = 0xEA6; // Size: 22
-		public const int CZ_SOLO_INDUN_ENTER = 0xEA7; // Size: 34
-		public const int CZ_GUILD_MEMBER_INVITE_ACCEPT_BY_WEB = 0xEA8; // Size: 102
-		public const int CZ_GUILD_APPLICATION_USER_ACCEPT = 0xEA9; // Size: 127
-		public const int ZC_DECREASE_SILVER = 0xEAA; // Size: 14
-		public const int CZ_POST_GUILE_EMBLEM = 0xEAB; // Size: 20026
-		public const int CZ_REQUEST_CERTAIN_WEBSERVICE_URL = 0xEAC; // Size: 24
-		public const int ZC_RESPONSE_CERTAIN_WEBSERVICE_URL = 0xEAD; // Size: 268
-		public const int CZ_GUILD_AGIT_ENTER = 0xEAE; // Size: 159
-		public const int ZC_RELOAD_SELL_LIST = 0xEAF; // Size: 10
-		public const int ZC_NOTCIE_BROKEN_SYNC_MARKET_ITEM = 0xEB0; // Size: 18
-		public const int CZ_BADPLAYER_REPORT = 0xEB1; // Size: 158
-		public const int ZC_ERROR_INFO = 0xEB2; // Size: 0
-		public const int ZC_SEND_JSON_DUMP = 0xEB3; // Size: 0
-		public const int CZ_SEND_JSON_DUMP = 0xEB4; // Size: 0
-		public const int CZ_CLIENT_REMOTE_LOG = 0xEB5; // Size: 2584
-		public const int CZ_REQ_COMMON_SKILL_LIST = 0xEB6; // Size: 22
-		public const int ZC_COMMON_SKILL_LIST = 0xEB7; // Size: 0
-		public const int CZ_REG_EXP_ORB_ITEM = 0xEB8; // Size: 34
-		public const int CZ_REQ_QUICKSLOT_LIST = 0xEB9; // Size: 22
-		public const int ZC_REG_EXP_ORB_ITEM = 0xEBA; // Size: 22
-		public const int ZC_REG_EXP_SUB_ORB_ITEM = 0xEBB; // Size: 22
-		public const int ZC_FILL_EXP_ORB = 0xEBC; // Size: 22
-		public const int ZC_FILL_EXP_SUB_ORB = 0xEBD; // Size: 22
-		public const int ZC_FIXCAMERA = 0xEBE; // Size: 26
-		public const int ZC_CANCEL_FIXCAMERA = 0xEBF; // Size: 10
-		public const int CZ_SWAP_ITEM_IN_WAREHOUSE = 0xEC0; // Size: 46
-		public const int ZC_SWAP_ITEM_IN_WAREHOUSE_FAIL = 0xEC1; // Size: 18
-		public const int CZ_REQ_PCBANG_SHOP_UI = 0xEC2; // Size: 26
-		public const int CZ_REQ_PCBANG_SHOP_CONNECT_REWARD = 0xEC3; // Size: 86
-		public const int CZ_REQ_PCBANG_SHOP_TOTAL_REWARD = 0xEC4; // Size: 26
-		public const int CZ_REQ_PCBANG_SHOP_PURCHASE = 0xEC5; // Size: 30
-		public const int CZ_REQ_PCBANG_SHOP_RENTAL = 0xEC6; // Size: 26
-		public const int CZ_REQ_PCBANG_SHOP_REFRESH = 0xEC7; // Size: 22
-		public const int ZC_PCBANG_SHOP_COMMON = 0xEC8; // Size: 66
-		public const int ZC_PCBANG_SHOP_MAIN = 0xEC9; // Size: 0
-		public const int ZC_PCBANG_SHOP_POINTSHOP_CATALOG = 0xECA; // Size: 0
-		public const int ZC_PCBANG_SHOP_POINTSHOP_BUY_COUNT = 0xECB; // Size: 0
-		public const int ZC_PCBANG_SHOP_RENTAL = 0xECC; // Size: 0
-		public const int ZC_PCBANG_SHOP_GUIDE = 0xECD; // Size: 0
-		public const int ZC_PCBANG_SHOP_REWARD = 0xECE; // Size: 0
-		public const int ZC_PCBANG_STATE = 0xECF; // Size: 15
-		public const int ZC_PCBANG_POINT = 0xED0; // Size: 22
-		public const int CZ_SEND_BEAUTYSHOP_PURCHASE_LIST = 0xED1; // Size: 0
-		public const int CZ_REQ_BEAUTYSHOP_INFO = 0xED2; // Size: 23
-		public const int ZC_RES_BEAUTYSHOP_PURCHASED_HAIR_LIST = 0xED3; // Size: 0
-		public const int CZ_SEND_BEAUTYSHOP_TRYITON_LIST = 0xED4; // Size: 0
-		public const int CZ_SEND_BEAUTYSHOP_TRYITON_CANCEL = 0xED5; // Size: 22
-		public const int CZ_ITEMPROPCHANGE = 0xED6; // Size: 38
-		public const int CZ_ITEMPROPCHANGE_GEM_ADD = 0xED7; // Size: 26
-		public const int CZ_ITEMPROPCHANGE_GEM_DROP = 0xED8; // Size: 50
-		public const int CZ_ITEMPROPCHANGE_GEM_POP = 0xED9; // Size: 34
-		public const int CZ_ITEMPROPCHANGE_GEM_ALL_SLOT = 0xEDA; // Size: 30
-		public const int CZ_ITEMPROPCHANGE_ICHOR_RANDOM_OPTION = 0xEDB; // Size: 1198
-		public const int CZ_ITEMPROPCHANGE_ICHOR_RANDOM_OPTION_MAX_VALUE = 0xEDC; // Size: 98
-		public const int CZ_ITEMPROPCHANGE_OPTION_CHANGE = 0xEDD; // Size: 94
-		public const int CZ_ITEMPROPCHANGE_ENCHANT = 0xEDE; // Size: 222
-		public const int CZ_ITEMPROPCHANGE_ENCHANT_MAX_VALUE = 0xEDF; // Size: 158
-		public const int CZ_TOKEN_WARP = 0xEE0; // Size: 86
-		public const int CZ_REGISTER_FAVORITE_MAP = 0xEE1; // Size: 86
-		public const int CZ_UNREGISTER_FAVORITE_MAP = 0xEE2; // Size: 86
-		public const int ZC_VERTICAL_MOTION = 0xEE3; // Size: 23
-		public const int CZ_REQ_PLAY_FLUTING = 0xEE4; // Size: 31
-		public const int ZC_PLAY_FLUTING = 0xEE5; // Size: 24
-		public const int CZ_REQ_READY_FLUTING = 0xEE6; // Size: 23
-		public const int ZC_READY_FLUTING = 0xEE7; // Size: 15
-		public const int CZ_REQ_STOP_FLUTING = 0xEE8; // Size: 31
-		public const int ZC_STOP_FLUTING = 0xEE9; // Size: 23
-		public const int ZC_STOP_FLUTING_ALL = 0xEEA; // Size: 14
-		public const int CZ_REQ_CLOSE_INSTRUMENT = 0xEEB; // Size: 87
-		public const int ZC_READY_INSTRUMENT = 0xEEC; // Size: 79
-		public const int CZ_REQ_PLAY_INSTRUMENT = 0xEED; // Size: 100
-		public const int ZC_PLAY_INSTRUMENT = 0xEEE; // Size: 93
-		public const int CZ_REQ_STOP_INSTRUMENT = 0xEEF; // Size: 95
-		public const int ZC_STOP_INSTRUMENT = 0xEF0; // Size: 87
-		public const int ZC_STOP_INSTRUMENT_ALL = 0xEF1; // Size: 14
-		public const int ZC_RESERVE_PROPERTY = 0xEF2; // Size: 0
-		public const int CZ_REQ_SOLO_DUNGEON_REWARD = 0xEF3; // Size: 22
-		public const int CZ_REQ_SOLO_DUNGEON_RANKING_PAGE = 0xEF4; // Size: 22
-		public const int ZC_SOLO_DUNGEON_STAGE_SCORE = 0xEF5; // Size: 34
-		public const int ZC_SOLO_DUNGEON_RANKING = 0xEF6; // Size: 0
-		public const int ZC_SOLO_DUNGEON_MY_RANKING = 0xEF7; // Size: 0
-		public const int ZC_REDIS_RANKING_INFO = 0xEF8; // Size: 0
-		public const int ZC_CUSTOM_WHEEL_ZOOM = 0xEF9; // Size: 23
-		public const int ZC_MGAME_POSITION = 0xEFA; // Size: 0
-		public const int ZC_ITEM_LOCK_STATE = 0xEFB; // Size: 19
-		public const int ZC_ALTER_HIT_RADIUS = 0xEFC; // Size: 26
-		public const int ZC_CASH_INVENTORY_LIST = 0xEFD; // Size: 0
-		public const int CZ_NEXON_PAYMENT_PAGE = 0xEFE; // Size: 22
-		public const int ZC_NEXON_PAYMENT_PAGE = 0xEFF; // Size: 522
-		public const int ZC_SOLD_ITEM_NOTICE = 0xF00; // Size: 158
-		public const int CZ_REQ_GUILD_ASSET = 0xF01; // Size: 22
-		public const int ZC_GUILD_BUILDING_OBJECT_ADD = 0xF02; // Size: 0
-		public const int ZC_GUILD_BUILDING_OBJECT_REMOVE = 0xF03; // Size: 0
-		public const int CZ_CHANGE_REPRESENTATION_CLASS = 0xF04; // Size: 26
-		public const int CZ_REQ_COMMANDER_INFO = 0xF05; // Size: 24
-		public const int ZC_CUSTOM_COMMANDER_INFO = 0xF06; // Size: 32
-		public const int ZC_TRUST_INFO = 0xF07; // Size: 62
-		public const int ZC_GUILD_COOLDOWN_LIST = 0xF08; // Size: 0
-		public const int ZC_CLASS_RESET_POINT_INFO = 0xF09; // Size: 18
-		public const int ZC_EQUIP_CARD_INFO = 0xF0A; // Size: 0
-		public const int ZC_EQUIP_GEM_INFO = 0xF0B; // Size: 0
-		public const int ZC_FADE_IN = 0xF0C; // Size: 14
-		public const int ZC_OBJECT_PROPERTY_BY_NAMES = 0xF0D; // Size: 0
-		public const int CZ_REQ_LEARN_ABILITY = 0xF0E; // Size: 0
-		public const int CZ_NOTICE_GUILD_APPLICATION_REQUEST = 0xF0F; // Size: 32
-		public const int ZC_START_IMITATING_ANIMATION = 0xF10; // Size: 18
-		public const int ZC_STOP_IMITATING_ANIMATION = 0xF11; // Size: 14
-		public const int CZ_START_IMITATING_ANIMATION_ACK = 0xF12; // Size: 22
-		public const int CZ_FOLLOW_TO_ACTOR_ACK = 0xF13; // Size: 22
-		public const int CZ_REQUEST_EVENT_USER_TYPE_INFO = 0xF14; // Size: 22
-		public const int CZ_REQUEST_USED_MEDAL_TOTAL = 0xF15; // Size: 22
-		public const int ZC_ZOMBIE_ALIVE = 0xF16; // Size: 10
-		public const int CZ_ZOMBIE_ALIVE_ACK = 0xF17; // Size: 22
-		public const int ZC_FRIENDLY_STATE = 0xF18; // Size: 11
-		public const int ZC_ANCIENT_FRIENDLY_STATE = 0xF19; // Size: 11
-		public const int ZC_CHANGE_SKIN_COLOR = 0xF1A; // Size: 18
-		public const int ZC_SET_FACE_RENDER_OPTION = 0xF1B; // Size: 79
-		public const int CZ_DPK_QUEST_DESTORY_SESSIONOBJ = 0xF1D; // Size: 286
-		public const int CZ_REQUEST_BLACK_MARKET_BID = 0xF1E; // Size: 30
-		public const int CZ_REQUEST_BLACK_MARKET_BID_INFO = 0xF1F; // Size: 22
-		public const int ZC_NOTICE_FAILURE_IN_BIDDING = 0xF20; // Size: 14
-		public const int ZC_NOTICE_BIDDING_SUCCESS = 0xF21; // Size: 30
-		public const int ZC_NOTICE_DUPLICATE_BIDDING = 0xF22; // Size: 22
-		public const int ZC_NOTICE_NOTICE_BLACK_MARKET_END_TO_USER = 0xF23; // Size: 22
-		public const int ZC_CONFUSE_STATE = 0xF24; // Size: 15
-		public const int ZC_ADDONUI_MSG = 0xF25; // Size: 0
-		public const int CZ_COLONY_REWARD_REQ = 0xF26; // Size: 51
-		public const int ZC_COLONY_REWARD_DETAILLIST_UPDATE = 0xF27; // Size: 22
-		public const int ZC_COLONY_SECONDLEAGUE_REWARD_START = 0xF28; // Size: 38
-		public const int ZC_COLONY_SECONDLEAGUE_REWARD_END = 0xF29; // Size: 38
-		public const int CZ_COLONY_TAXINQUIRELIST_REQ = 0xF2A; // Size: 22
-		public const int ZC_COLONY_TAXINQUIRELIST_REQ = 0xF2B; // Size: 0
-		public const int ZC_START_FIELDBOSS_WORLD_EVENT = 0xF2C; // Size: 0
-		public const int ZC_END_FIELDBOSS_WORLD_EVENT = 0xF2D; // Size: 10
-		public const int ZC_FIELDBOSS_REMOVE_ITEM = 0xF2E; // Size: 14
-		public const int CZ_BID_FIELDBOSS_WORLD_EVENT = 0xF2F; // Size: 26
-		public const int ZC_WIN_FIELDBOSS_WORLD_EVENT_ITEM = 0xF30; // Size: 14
-		public const int ZC_LOSE_FIELDBOSS_WORLD_EVENT_ITEM = 0xF31; // Size: 14
-		public const int ZC_SILVER_GACHA_DECREASE_ITEM_COUNT = 0xF32; // Size: 26
-		public const int CZ_REQUEST_SILVER_GACHA_GAMBLE = 0xF33; // Size: 35
-		public const int CZ_REQUEST_SILVER_GACHA_INFO = 0xF34; // Size: 22
-		public const int ZC_RESPONSE_SILVER_GACHA_INFO = 0xF35; // Size: 0
-		public const int CZ_MAKE_ITEM_FROM_DRESS_ROOM = 0xF36; // Size: 150
-		public const int ZC_START_CASUAL_GAMBLE = 0xF37; // Size: 0
-		public const int ZC_CASUAL_GAMBLE_ITEM_GET = 0xF38; // Size: 18
-		public const int CZ_REQUEST_CASUAL_GAMBLE = 0xF39; // Size: 22
-		public const int ZC_END_CASUAL_GAMBLE = 0xF3A; // Size: 10
-		public const int CZ_REQUEST_COMMON_GAMBLE = 0xF3B; // Size: 158
-		public const int ZC_COMMON_GAMBLE_ITEM_GET = 0xF3C; // Size: 18
-		public const int ZC_WEEKLY_BOSS_RANK_INFO = 0xF3D; // Size: 0
-		public const int ZC_WEEKLY_BOSS_RANK_MY_DAMAGE = 0xF3E; // Size: 22
-		public const int ZC_WEEKLY_BOSS_ACCUMULATED_DAMAGE = 0xF3F; // Size: 22
-		public const int ZC_WEEKLY_BOSS_ABSOLUTE_REWARD_LIST = 0xF40; // Size: 0
-		public const int ZC_WEEKLY_BOSS_RECEIVED_ABSOLUTE_REWARD_LIST = 0xF41; // Size: 0
-		public const int CZ_REQUEST_WEEKLY_BOSS_ABSOLUTE_REWARD_LIST = 0xF42; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_RECEIVE_ABSOLUTE_REWARD = 0xF43; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_CLASS_RANKING_REWARD = 0xF44; // Size: 30
-		public const int ZC_WEEKLY_BOSS_RECEIVED_RANKING_REWARD = 0xF45; // Size: 18
-		public const int ZC_WEEKLY_BOSS_RANKING_REWARD_LIST = 0xF46; // Size: 0
-		public const int ZC_WEEKLY_BOSS_CLASS_RANKING_REWARD_LIST = 0xF47; // Size: 0
-		public const int CZ_REQUEST_WEEKLY_BOSS_RANKING_REWARD_LIST = 0xF48; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_RECEIVE_RANKING_REWARD = 0xF49; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_ACCEPT_ABSOLUTE_REWARD = 0xF4A; // Size: 34
-		public const int CZ_REQUEST_WEEKLY_BOSS_ACCEPT_ABSOLUTE_REWARD_ALL = 0xF4B; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_ACCEPT_RANKING_REWARD = 0xF4C; // Size: 30
-		public const int CZ_REQUEST_WEEKLY_BOSS_ACCEPT_CLASS_RANKING_REWARD = 0xF4D; // Size: 34
-		public const int CZ_REQUEST_WEEKLY_BOSS_RANKING_INFO_LIST = 0xF4E; // Size: 28
-		public const int CZ_REQUEST_WEEKLY_BOSS_NOW_WEEK_NUM = 0xF4F; // Size: 22
-		public const int CZ_REQUEST_WEEKLY_BOSS_START_TIME = 0xF50; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_END_TIME = 0xF51; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_PATTERN_INFO = 0xF52; // Size: 26
-		public const int ZC_WEEKLY_BOSS_NOW_WEEK_NUM = 0xF53; // Size: 14
-		public const int ZC_WEEKLY_BOSS_START_TIME = 0xF54; // Size: 26
-		public const int ZC_WEEKLY_BOSS_END_TIME = 0xF55; // Size: 26
-		public const int ZC_WEEKLY_BOSS_PATTERN_INFO = 0xF56; // Size: 0
-		public const int ZC_WEEKLY_BOSS_RECEIVED_CLASS_RANKING_REWARD = 0xF57; // Size: 0
-		public const int CZ_REQUEST_WEEKLY_BOSS_RECEIVE_CLASS_RANKING_REWARD = 0xF58; // Size: 26
-		public const int CZ_REQUEST_WEEKLY_BOSS_ENABLE_CLASS_RANKING_SEASON = 0xF59; // Size: 26
-		public const int ZC_REQUEST_WEEKLY_BOSS_ENABLE_CLASS_RANKING_SEASON = 0xF5A; // Size: 11
-		public const int CZ_REQUEST_DPS_START = 0xF5B; // Size: 22
-		public const int ZC_REQUEST_DPS_START = 0xF5C; // Size: 26
-		public const int CZ_MYTHIC_DUNGEON_REQUEST_RANK_INFO = 0xF5D; // Size: 29
-		public const int CZ_MYTHIC_DUNGEON_REQUEST_PATTERN = 0xF5E; // Size: 24
-		public const int ZC_MYTHIC_DUNGEON_RANK_INFO = 0xF5F; // Size: 0
-		public const int CZ_MYTHIC_DUNGEON_REQUEST_CURRENT_SEASON = 0xF60; // Size: 22
-		public const int ZC_MYTHIC_DUNGEON_CURRENT_SEASON = 0xF61; // Size: 44
-		public const int ZC_MYTHIC_DUNGEON_PATTERN_INFO = 0xF62; // Size: 0
-		public const int ZC_FIELD_BOSS_PATTERN_INFO = 0xF63; // Size: 0
-		public const int CZ_REQUEST_FIELD_BOSS_PATTERN_INFO = 0xF64; // Size: 38
-		public const int CZ_REQUEST_FIELD_BOSS_RANKING_INFO = 0xF65; // Size: 38
-		public const int ZC_FIELD_BOSS_RANKING_INFO = 0xF66; // Size: 0
-		public const int CZ_REQUEST_BORUTA_REWARD = 0xF67; // Size: 30
-		public const int ZC_SEND_BORUTA_RANK_LIST = 0xF68; // Size: 0
-		public const int CZ_REQUEST_BORUTA_RANK_LIST = 0xF69; // Size: 30
-		public const int CZ_REQUEST_ACCEPT_REWARD_INFO = 0xF6A; // Size: 30
-		public const int ZC_RESPONSE_ACCEPT_REWARD_INFO = 0xF6B; // Size: 15
-		public const int CZ_REQUEST_BORUTA_NOW_WEEK_NUM = 0xF6C; // Size: 22
-		public const int ZC_RESPONSE_BORUTA_NOW_WEEK_NUM = 0xF6D; // Size: 14
-		public const int CZ_REQUEST_BORUTA_START_TIME = 0xF6E; // Size: 26
-		public const int ZC_BORUTA_START_TIME = 0xF6F; // Size: 26
-		public const int CZ_REQUEST_BORUTA_END_TIME = 0xF70; // Size: 26
-		public const int ZC_BORUTA_END_TIME = 0xF71; // Size: 26
-		public const int CZ_RECEIVE_PERSONAL_RANK_REWARD = 0xF72; // Size: 38
-		public const int CZ_ADD_PARTY_INFO = 0xF73; // Size: 310
-		public const int CZ_UPDATE_PARTY_INFO = 0xF74; // Size: 310
-		public const int CZ_REMOVE_PARTY_INFO = 0xF75; // Size: 22
-		public const int CZ_REQUEST_FIND_PARTY_JOIN = 0xF76; // Size: 87
-		public const int ZC_CONFIRM_FIND_PARTY_JOIN = 0xF77; // Size: 103
-		public const int CZ_CONFIRM_FIND_PARTY_JOIN = 0xF78; // Size: 88
-		public const int CZ_HOUSING_OPEN_EDIT_MODE = 0xF79; // Size: 10
-		public const int CZ_HOUSING_CLOSE_EDIT_MODE = 0xF7A; // Size: 10
-		public const int CZ_HOUSING_REQUEST_GRID_ARRANGED_FURNITURE = 0xF7B; // Size: 22
-		public const int CZ_HOUSING_REQUEST_ARRANGED_FURNITURE = 0xF7C; // Size: 22
-		public const int ZC_HOUSING_READY_GRID = 0xF7D; // Size: 0
-		public const int ZC_HOUSING_READY_ARRANGED_FURNITURE = 0xF7E; // Size: 0
-		public const int ZC_HOUSING_ANSWER_ARRANGED_FURNITURE = 0xF7F; // Size: 0
-		public const int ZC_HOUSING_START_ARRANGEMENT_FURNITURE = 0xF80; // Size: 14
-		public const int CZ_HOUSING_REQUEST_ARRANGEMENT_FURNITURE = 0xF81; // Size: 0
-		public const int CZ_HOUSING_CANCEL_ARRANGEMENT_FURNITURE = 0xF82; // Size: 23
-		public const int CZ_HOUSING_REQUEST_REMOVE_FURNITURE = 0xF83; // Size: 30
-		public const int CZ_HOUSING_REQUEST_REMOVE_FURNITURE_ALOT = 0xF84; // Size: 0
-		public const int CZ_HOUSING_REQUEST_REMOVE_ALL_FURNITURE = 0xF85; // Size: 22
-		public const int ZC_HOUSING_ANSWER_REMOVE_FURNITURE = 0xF86; // Size: 18
-		public const int CZ_HOUSING_REQUEST_ENABLE_MOVE_FURNITURE = 0xF87; // Size: 30
-		public const int ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE = 0xF88; // Size: 18
-		public const int CZ_HOUSING_REQUEST_MOVE_FURNITURE = 0xF89; // Size: 0
-		public const int CZ_HOUSING_REQUEST_GUILD_AGIT_INFO = 0xF8A; // Size: 158
-		public const int ZC_HOUSING_ANSWER_GUILD_AGIT_INFO = 0xF8B; // Size: 154
-		public const int CZ_HOUSING_REQUEST_GUILD_AGIT_EXTENSION = 0xF8C; // Size: 150
-		public const int CZ_HOUSING_REQUEST_GUILD_LAB_USE_RESEARCH = 0xF8D; // Size: 27
-		public const int CZ_HOUSING_REQUEST_GUILD_LAB_LEVEL_UP = 0xF8E; // Size: 27
-		public const int CZ_HOUSING_REQUEST_GUILD_LAB_RESEARCH_LEVEL_UP = 0xF8F; // Size: 26
-		public const int CZ_HOUSING_REQUEST_GUILD_CONTRIBUTION_TO_MILEAGE = 0xF90; // Size: 26
-		public const int CZ_HOUSING_REQUEST_GUILD_MILEAGE_TO_CONTRIBUTION = 0xF91; // Size: 26
-		public const int CZ_HOUSING_REQUEST_GUILD_CONTIRUBTION_DISTRIBUTE = 0xF92; // Size: 0
-		public const int CZ_HOUSING_REQUEST_GUILD_POINT_UP = 0xF93; // Size: 166
-		public const int CZ_HOUSING_REQUEST_HOUSING_SHOP_TRADE = 0xF94; // Size: 0
-		public const int ZC_HOUSING_CREATE_BG_FURNITURE = 0xF95; // Size: 31
-		public const int ZC_HOUSING_MOVE_BG_FURNITURE = 0xF96; // Size: 27
-		public const int ZC_HOUSING_REMOVE_BG_FURNITURE = 0xF97; // Size: 14
-		public const int CZ_HOUSING_PAGE_SAVE = 0xF98; // Size: 90
-		public const int CZ_HOUSING_PAGE_LOAD = 0xF99; // Size: 26
-		public const int CZ_HOUSING_PAGE_DELETE = 0xF9A; // Size: 26
-		public const int CZ_PERSONAL_HOUSING_REQUEST_LEAVE = 0xF9B; // Size: 22
-		public const int CZ_PERSONAL_HOUSING_REQUEST_BUY_BACKGROUND = 0xF9C; // Size: 26
-		public const int CZ_PERSONAL_HOUSING_REQUEST_APPLY_BACKGROUND = 0xF9D; // Size: 26
-		public const int CZ_HOUSING_REQUEST_PREVIEW = 0xF9E; // Size: 39
-		public const int ZC_HOUSING_ANSWER_PREVIEW = 0xF9F; // Size: 0
-		public const int CZ_HOUSING_REQUEST_POST_HOUSE_WARP = 0xFA0; // Size: 34
-		public const int CZ_PERSONAL_HOUSING_REQUEST_GROUP_LIST = 0xFA1; // Size: 22
-		public const int ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST = 0xFA2; // Size: 0
-		public const int ZC_REBUILD_POPUP = 0xFA3; // Size: 10
-		public const int ZC_ANCIENT_CARD_ADD = 0xFA4; // Size: 0
-		public const int ZC_ANCIENT_CARD_REMOVE = 0xFA5; // Size: 30
-		public const int ZC_ANCIENT_CARD_COMBINE = 0xFA6; // Size: 0
-		public const int ZC_ANCIENT_CARD_EVOLVE = 0xFA7; // Size: 0
-		public const int ZC_ANCIENT_CARD_LOCK = 0xFA8; // Size: 31
-		public const int ZC_ANCIENT_CARD_UPDATE = 0xFA9; // Size: 0
-		public const int ZC_ANCIENT_CARD_RESET = 0xFAA; // Size: 22
-		public const int ZC_ANCIENT_CARD_LOAD = 0xFAB; // Size: 0
-		public const int ZC_ANCIENT_CARD_EXP_UP = 0xFAC; // Size: 42
-		public const int ZC_ANCIENT_MONSTER_SUMMON = 0xFAD; // Size: 42
-		public const int ZC_ANCIENT_MONSTER_DEAD = 0xFAE; // Size: 30
-		public const int CZ_ANCIENT_CARD_SELL = 0xFAF; // Size: 30
-		public const int CZ_ANCIENT_CARD_SWAP = 0xFB0; // Size: 34
-		public const int CZ_ANCIENT_MON_ALLKILL = 0xFB1; // Size: 22
-		public const int CZ_ANCIENT_CARD_COMBINE = 0xFB2; // Size: 0
-		public const int CZ_ANCIENT_CARD_EVOLVE = 0xFB3; // Size: 0
-		public const int CZ_ANCIENT_CARD_LOCK = 0xFB4; // Size: 30
-		public const int CZ_FORCE_SKILL_RANGE = 0xFB5; // Size: 54
-		public const int CZ_VARIABLE_RANGE_RESULT = 0xFB6; // Size: 38
-		public const int CZ_CANCEL_PAIR_ANIMATION = 0xFB7; // Size: 22
-		public const int ZC_SET_DAYLIGHT_INFO = 0xFB8; // Size: 0
-		public const int ZC_DAYLIGHT_SYNCHRONIZE_TIME = 0xFB9; // Size: 14
-		public const int ZC_DAYLIGHT_FIXED = 0xFBA; // Size: 36
-		public const int CZ_SELECTED_LANGUAGE = 0xFBB; // Size: 24
-		public const int CZ_ACCEPT_FIELD_DUNGEON_REJOIN = 0xFBC; // Size: 22
-		public const int CZ_UDP_MOVE_INFO = 0xFBD; // Size: 80
-		public const int ZC_UDP_MOVE_INFO = 0xFBE; // Size: 79
-		public const int ZC_UDP_MULTI_PACKET = 0xFBF; // Size: 12810
-		public const int ZC_MAIN_SECTOR_INFO = 0xFC0; // Size: 0
-		public const int ZC_ADD_CHATBALLOON_SKIN = 0xFC1; // Size: 0
-		public const int CZ_SET_CHATBALLOON_SKIN = 0xFC2; // Size: 26
-		public const int ZC_SET_CHATBALLOON_SKIN = 0xFC3; // Size: 34
-		public const int ZC_UPDATE_CHATBALLOON_SKIN = 0xFC4; // Size: 10
-		public const int ZC_AUTOSELLER_LIST = 0xFC5; // Size: 0
-		public const int ZC_AUTOSELLER_TITLE = 0xFC6; // Size: 91
-		public const int CZ_DO_CLIENT_MOVE_CHECK = 0xFC7; // Size: 22
-		public const int ZC_IS_SUMMONING_MONSTER = 0xFC8; // Size: 15
-		public const int ZC_IS_SUMMON_SORCERER_MONSTER = 0xFC9; // Size: 15
-		public const int CZ_SUMMON_PET = 0xFCA; // Size: 38
-		public const int CZ_SELECT_GROUND_POS_START = 0xFCB; // Size: 22
-		public const int CZ_SELECT_GROUND_POS_END = 0xFCC; // Size: 22
-		public const int CZ_REQ_DAMAGEFONT_SKIN = 0xFCD; // Size: 26
-		public const int CZ_SET_DAMAGEFONT_SKIN = 0xFCE; // Size: 30
-		public const int ZC_RES_DAMAGEFONT_SKIN = 0xFCF; // Size: 30
-		public const int CZ_REQ_DAMAGEEFFECT_SKIN = 0xFD0; // Size: 26
-		public const int CZ_SET_DAMAGEEFFECT_SKIN = 0xFD1; // Size: 30
-		public const int ZC_RES_DAMAGEEFFECT_SKIN = 0xFD2; // Size: 30
-		public const int CZ_SUMMON_CUPOLE = 0xFD3; // Size: 30
-		public const int CZ_CUPOLE_SLOT_SWAP = 0xFD4; // Size: 34
-		public const int ZC_SUMMON_CUPOLE = 0xFD5; // Size: 30
-		public const int ZC_UNSUMMON_CUPOLE = 0xFD6; // Size: 30
-		public const int CZ_CUPOLE_FAVORITE = 0xFD7; // Size: 27
-		public const int ZC_CUPOLE_FAVORITE = 0xFD8; // Size: 0
-		public const int CZ_REQUEST_GODDESS_ROULETT = 0xFD9; // Size: 26
-		public const int CZ_REQUEST_GODDESS_ROULETT_STATE = 0xFDA; // Size: 26
-		public const int ZC_OVERHEAT_RESET_TIME = 0xFDB; // Size: 26
-		public const int CZ_PERSONAL_HOUSING_SHOP_PAYMENT = 0xFDC; // Size: 0
-		public const int CZ_START_SERVER_TRACING = 0xFDD; // Size: 22
-		public const int CZ_PERSONAL_HOUSING_BOARD_LOG = 0xFDE; // Size: 2082
-		public const int ZC_TAUNT_START = 0xFDF; // Size: 23
-		public const int ZC_TAUNT_END = 0xFE0; // Size: 14
-		public const int CZ_CHECK_USE_NAME = 0xFE1; // Size: 470
-		public const int CZ_REQ_FIELD_BOSS_EXIST = 0xFE2; // Size: 22
-		public const int ZC_RESPONSE_FIELD_BOSS_EXIST = 0xFE3; // Size: 0
-		public const int CZ_ACCOUNT_ABILITY_LEVELUP = 0xFE4; // Size: 90
-		public const int CZ_ACCOUNT_ABILITY_RESET = 0xFE5; // Size: 86
-		public const int ZC_BREATH_ATTACK_TARGET_CAHSE = 0xFE6; // Size: 78
-		public const int CZ_BREATH_ATTACK_TARGET_CAHSE_RESULT = 0xFE7; // Size: 294
-		public const int CZ_OPEN_SHOP_LOG = 0xFE8; // Size: 55
-		public const int CZ_SELECT_PARTY_BUFF = 0xFE9; // Size: 26
-		public const int CZ_SELECT_SOLO_BUFF = 0xFEA; // Size: 30
-		public const int CZ_REPUTATION_SHOP_TRADE = 0xFEB; // Size: 0
-		public const int ZC_RELIC_RP_CHANGE = 0xFEC; // Size: 14
-		public const int CZ_REQUEST_RANK_SYSTEM_TIME_TABLE = 0xFED; // Size: 26
-		public const int ZC_RESPONSE_RANK_SYSTEM_TIME_TABLE = 0xFEE; // Size: 0
-		public const int CZ_REQUEST_RANK_SYSTEM_RANK_LIST = 0xFEF; // Size: 42
-		public const int ZC_RESPONSE_RANK_SYSTEM_RANK_LIST = 0xFF0; // Size: 0
-		public const int CZ_REQUEST_RANK_SYSTEM_MY_DATA = 0xFF1; // Size: 42
-		public const int ZC_RESPONSE_RANK_SYSTEM_MY_DATA = 0xFF2; // Size: 0
-		public const int ZC_RANK_SYSTEM_RECEIVED_REWARD_INFO_LIST = 0xFF3; // Size: 0
-		public const int ZC_RANK_SYSTEM_RECEIVED_REWARD_INFO = 0xFF4; // Size: 38
-		public const int CZ_REQUEST_DRAW_TOSHERO_EMBLEM = 0xFF5; // Size: 26
-		public const int ZC_RESPONSE_DRAW_TOSHERO_EMBLEM = 0xFF6; // Size: 0
-		public const int CZ_UDP_HOLEPUNCH = 0xFF7; // Size: 22
-		public const int ZC_UDP_HOLEPUNCH_ACK = 0xFF8; // Size: 10
-		public const int CZ_REQ_CHALLENGE_AUTOMATCH_UI_OPEN = 0xFF9; // Size: 26
-		public const int ZC_MONSTER_CANCEL_CASTING_UI = 0xFFA; // Size: 26
-		public const int CZ_DIALOG_SELECT_MULTIPLE = 0xFFB; // Size: 0
-		public const int CZ_REQ_RAID_AUTOMATCH_UI_OPEN = 0xFFC; // Size: 26
-		public const int CZ_REQ_RAID_SOLO_UI_OPEN = 0xFFD; // Size: 26
-		public const int CZ_REQ_TOSHERO_ENTER = 0xFFE; // Size: 26
-		public const int CZ_REQ_EARRING_RAID_ENTER = 0xFFF; // Size: 26
-		public const int CZ_REQ_DEMON_LAIR_ENTER = 0x1000; // Size: 26
-		public const int CZ_REQ_PILGRIM_ENTER = 0x1001; // Size: 26
-		public const int CZ_REQ_LEVEL_DUNGEON_ENTER = 0x1002; // Size: 26
-		public const int CZ_REQ_USE_RAID_AUTO_SWEEP = 0x1003; // Size: 26
-		public const int CZ_REQ_BRIDGE_WAILING = 0x1004; // Size: 26
-		public const int CZ_REQUEST_CARD_PRESET = 0x1005; // Size: 26
-		public const int ZC_RESPONSE_CARD_PRESET = 0x1006; // Size: 0
-		public const int CZ_SET_CARD_PRESET = 0x1007; // Size: 0
-		public const int CZ_SET_CARD_PRESET_TITLE = 0x1008; // Size: 90
-		public const int ZC_TOSHERO_INFO = 0x1009; // Size: 58
-		public const int ZC_TOSHERO_POINT_INFO = 0x100A; // Size: 14
-		public const int ZC_TOSHERO_BUFFSHOP_INFO = 0x100B; // Size: 0
-		public const int CZ_TOSHERO_BUY_BUFF = 0x100C; // Size: 26
-		public const int CZ_TOSHERO_SELL_BUFF = 0x100D; // Size: 26
-		public const int CZ_TOSHERO_SELECT_BUFF = 0x100E; // Size: 26
-		public const int CZ_TOSHERO_UPGRADE_BUFF = 0x100F; // Size: 26
-		public const int CZ_TOSHERO_DESELECT_BUFF = 0x1010; // Size: 22
-		public const int CZ_TOSHERO_COMBINE_THREE_BUFF = 0x1011; // Size: 46
-		public const int CZ_TOSHERO_CHANGE_ATTRIBUTE = 0x1012; // Size: 26
-		public const int CZ_TOSHERO_RUN_LOTTERY = 0x1013; // Size: 26
-		public const int CZ_TOSHERO_REINFORCE = 0x1014; // Size: 30
-		public const int CZ_TOSHERO_CHANGE_EQUIP_OPTION = 0x1015; // Size: 34
-		public const int CZ_TOSHERO_READY = 0x1016; // Size: 26
-		public const int ZC_START_RANGE_PREVIEW = 0x1017; // Size: 151
-		public const int ZC_END_RANGE_PREVIEW = 0x1018; // Size: 74
-		public const int ZC_CLEAR_RANGE_PREVIEW = 0x1019; // Size: 10
-		public const int ZC_FIX_DIRECTION = 0x101A; // Size: 78
-		public const int ZC_FIX_DIRECTION_END = 0x101B; // Size: 14
-		public const int CZ_REQ_TOGGLE_ABILITY = 0x101C; // Size: 26
-		public const int ZC_MY_CHARACTER_LIST = 0x101D; // Size: 0
-		public const int CZ_REG_CHANGE_CHARACTER_SLOT = 0x101E; // Size: 30
-		public const int CZ_DEREG_CHANGE_CHARACTER_SLOT = 0x101F; // Size: 34
-		public const int ZC_START_CHARACTER_CHANGE = 0x1020; // Size: 26
-		public const int ZC_FINISH_CHARACTER_CHANGE = 0x1021; // Size: 30
-		public const int CZ_REQ_CHARACTER_CHANGE = 0x1022; // Size: 34
-		public const int ZC_CHARACTER_CHANGE_REGIST_COMPLETE = 0x1023; // Size: 22
-		public const int ZC_CHARACTER_CHANGE_DEREGIST_COMPLETE = 0x1024; // Size: 14
-		public const int ZC_MY_CHARACTER_DECK_LIST = 0x1025; // Size: 0
-		public const int CZ_REQ_FAVORITE_INDUN_SET = 0x1026; // Size: 55
-		public const int ZC_EQUIP_DUMMY_FOR_SKILL = 0x1027; // Size: 22
-		public const int CZ_REQUEST_AETHER_GEM_REINFORCE = 0x1028; // Size: 38
-		public const int ZC_SET_AURA_INFO = 0x1029; // Size: 279
-		public const int CZ_OPEN_HELP = 0x102A; // Size: 86
-		public const int CZ_REQ_UNKNOWN_SANTUARTY_BUFF = 0x102B; // Size: 346
-		public const int ZC_SEND_CURRENT_JOIN_MGAME_NAME = 0x102C; // Size: 266
-		public const int CZ_REQ_SUMMON_RIDE_PET = 0x102D; // Size: 26
-		public const int CZ_REQ_SELECT_RIDE_PET = 0x102E; // Size: 26
-		public const int CZ_ANS_GIVEUP_PREV_PLAYING_INDUN_PARTY = 0x102F; // Size: 23
-		public const int CZ_LOCK_COLONY_ZONE_ENTER = 0x1030; // Size: 24
-		public const int CZ_DICE = 0x1031; // Size: 27
-		public const int ZC_SET_PLAYER_CONTENTS_RECORD_RESULT = 0x1032; // Size: 150
-		public const int ZC_SEND_TEAM_BATTLE_LEAGUE_RESULT_LIST = 0x1033; // Size: 0
-		public const int ZC_SEND_TEAM_BATTLE_LEAGUE_DETAIL_DAMAGE_LIST = 0x1034; // Size: 0
-		public const int ZC_SEND_TEAM_BATTLE_LEAGUE_DETAIL_HEAL_LIST = 0x1035; // Size: 0
-		public const int ZC_TEAM_BATTLE_LEAGUE_OBSERVE_RELEASE_LOCK_MOVE_KEY = 0x1036; // Size: 10
-		public const int ZC_START_COMBO_INPUT_CMD = 0x1037; // Size: 0
-		public const int ZC_END_COMBO_INPUT_CMD = 0x1038; // Size: 14
-		public const int CZ_END_COMBO_INPUT = 0x1039; // Size: 27
-		public const int ZC_START_ESCAPE_INPUT_CMD = 0x103A; // Size: 0
-		public const int ZC_END_ESCAPE_INPUT_CMD = 0x103B; // Size: 14
-		public const int CZ_CONTENTS_ALERT_MOVE = 0x103C; // Size: 22
-		public const int ZC_TIMING_GAUGE_START = 0x103D; // Size: 54
-		public const int ZC_TIMING_GAUGE_END = 0x103E; // Size: 15
-		public const int ZC_CHARGING_GAUGE_START = 0x103F; // Size: 59
-		public const int ZC_CHARGING_GAUGE_END = 0x1040; // Size: 15
-		public const int ZC_INTERACTION_RIDE = 0x1041; // Size: 555
-		public const int ZC_INTERACTION_COOL_TIME = 0x1042; // Size: 23
-		public const int ZC_SQUAD_INFO = 0x1043; // Size: 0
-		public const int CZ_INVITE_SQUAD_MEMBER = 0x1044; // Size: 91
-		public const int ZC_INVITE_SQUAD_MEMBER = 0x1045; // Size: 217
-		public const int CZ_RESPONSE_INVITED_SQUAD = 0x1046; // Size: 88
-		public const int CZ_LEAVE_SQUAD = 0x1047; // Size: 95
-		public const int CZ_CREATE_SQUAD = 0x1048; // Size: 91
-		public const int CZ_DISBAND_SQUAD = 0x1049; // Size: 26
-		public const int CZ_REQ_EARRING_RAID_PARTY_SKILL = 0x104A; // Size: 26
-		public const int ZC_CUSTOM_CAMERA_ZOOM = 0x104B; // Size: 22
-		public const int ZC_SHOW_SCENE_MODEL_LOCAL = 0x104C; // Size: 19
-		public const int ZC_ADD_PAD_VISIBLE_OPTION = 0x104D; // Size: 16
-		public const int ZC_REMOVE_PAD_VISIBLE_OPTION = 0x104E; // Size: 14
-		public const int ZC_MGAME_USER_DAMAGE_LIST = 0x104F; // Size: 0
-		public const int ZC_SEND_TRIBULATION_INFO = 0x1050; // Size: 0
-		public const int CZ_REQ_TRIBULATION_INFO = 0x1051; // Size: 539
-		public const int CZ_SEND_SELECTED_TRIBULATION_INFO = 0x1052; // Size: 0
-		public const int ZC_SEND_SELECTED_TRIBULATION_INFO = 0x1053; // Size: 0
-		public const int ZC_SEND_TRIBULATION_CLEAR = 0x1054; // Size: 282
-		public const int CZ_SAVE_CLASS_SNAPSHOT = 0x1055; // Size: 52
-		public const int CZ_RENAME_CLASS_SNAPSHOT = 0x1056; // Size: 50
-		public const int CZ_UNEQUIP_ITEM_ALL = 0x1057; // Size: 22
-		public const int CZ_APPLY_CLASS_SNAPSHOT = 0x1058; // Size: 26
-		public const int CZ_REMOVE_CLASS_SNAPSHOT = 0x1059; // Size: 26
-		public const int CZ_REQ_RUNSCRIPT = 0x105A; // Size: 22
-		public const int CZ_REQ_TRANSLATE_MSG = 0x105B; // Size: 2107
-		public const int ZC_SEND_TRANSLATED_MSG = 0x105C; // Size: 2111
-		public const int ZC_SET_SOUND_MUTE = 0x105D; // Size: 16
-		public const int ZC_SET_MUSIC_MUTE = 0x105E; // Size: 16
-		public const int ZC_BREAK_SHIELD = 0x105F; // Size: 14
-		public const int ZC_SHOW_MON_CASTING_UI = 0x1060; // Size: 538
-		public const int CZ_REQ_RAID_GIVE_UP = 0x1061; // Size: 26
-		public const int CZ_REQ_APPLY_HUD_SKIN = 0x1062; // Size: 26
-		public const int CZ_REQ_CURRENT_HUD_SKIN = 0x1063; // Size: 23
-		public const int ZC_SEND_MODE_HUD_SKIN = 0x1064; // Size: 15
-		public const int ZC_SEND_APPLY_HUD_SKIN_MYSELF = 0x1065; // Size: 18
-		public const int ZC_SEND_APPLY_HUD_SKIN_PARTY = 0x1066; // Size: 26
-		public const int ZC_SEND_APPLY_HUD_SKIN_OTHER = 0x1067; // Size: 18
-		public const int CZ_REQ_FIELD_BOSS_INDUN_REENTER_CHECK = 0x1068; // Size: 26
-		public const int ZC_SEND_FIELD_BOSS_INDUN_REENTER_CHECK = 0x1069; // Size: 19
-		public const int CZ_REQ_FULLSCREEN_MOVE_NPC = 0x106A; // Size: 2200
-		public const int ZC_VERTIGO_GAMES_USER_BALANCE = 0x106B; // Size: 30
-		public const int CZ_BUY_VERTIGO_GAMES_PRODUCT = 0x106C; // Size: 170
-		public const int ZC_CHANGE_QUICKSLOT_INIT = 0x106D; // Size: 1046
-		public const int CZ_REQ_QUICKSLOT_REFRESH = 0x106E; // Size: 22
-		public const int ZC_SET_AURA_INTENSIVE_INFO = 0x106F; // Size: 18
-		public const int ZC_UPDATE_SKL_SPDRATE_LIST = 0x1070; // Size: 0
-		public const int ZC_CHARACTER_INDUN_INFO_RESPONSE = 0x1071; // Size: 0
-		public const int ZC_ON_AFTER_IMAGE = 0x1072; // Size: 38
-		public const int ZC_OFF_AFTER_IMAGE = 0x1073; // Size: 14
-		public const int ZC_SEND_NONE_TARGETING_LIST = 0x1074; // Size: 0
-		public const int ZC_UNITY_GROUND_EFFECT = 0x1075; // Size: 59
-		public const int ZC_MON_LEADER_SHOW_ICON = 0x1076; // Size: 531
-		public const int ZC_SET_FACE_STATE = 0x1077; // Size: 526
-		public const int ZC_UPDATE_FAINT = 0x1078; // Size: 30
-		public const int CZ_REQUEST_DIALOG_UI = 0x107A; // Size: 26
-		public const int CZ_USE_INVITE_EVENT_CODE = 0x107B; // Size: 54
-		public const int CZ_GET_INVITE_EVENT_REWARD = 0x107C; // Size: 26
-		public const int ZC_ONLY_ROTATE_MODE = 0x107D; // Size: 787
-		public const int ZC_PLAY_FULLSCREEN_EFFECT = 0x107E; // Size: 274
-		public const int CZ_REQ_DEMONLAIR_STATUS_INFO = 0x107F; // Size: 26
-		public const int CZ_APPLY_DEMONLAIR_BUFF_AND_PENALTY = 0x1080; // Size: 38
-		public const int CZ_REQ_CRAFT_TIME_REDUCE_BUFF = 0x1081; // Size: 26
-		public const int CZ_REQ_GUILD_AGIT_MOVE = 0x1082; // Size: 26
-		public const int CZ_REQ_GUILD_TOWER_REMOVE = 0x1083; // Size: 26
-		public const int CZ_REQ_GUILD_QUEST_REWARD_INFO = 0x1084; // Size: 26
-		public const int ZC_SEND_GUILD_QUEST_REWARD_INFO = 0x1085; // Size: 0
-		public const int CS_LOGIN = 0x3E1D; // Size: 411
-		public const int SC_NORMAL = 0x3E1E; // Size: 0
-		public const int SC_FROM_INTEGRATE = 0x3E1F; // Size: 0
-		public const int CS_REQ_ADD_FRIEND = 0x3E20; // Size: 74
-		public const int CS_REQ_BLOCK_FRIEND = 0x3E21; // Size: 74
-		public const int CS_FRIEND_CMD = 0x3E22; // Size: 32
-		public const int CS_FRIEND_SET_ADDINFO = 0x3E23; // Size: 168
-		public const int CS_CHAT = 0x3E24; // Size: 0
-		public const int CS_GROUP_CHAT_INVITE = 0x3E25; // Size: 114
-		public const int CS_GROUP_CHAT_INVITE_BY_TAG = 0x3E26; // Size: 26
-		public const int CS_ALLOW_GROUP_CHAT_TAG_INVITE = 0x3E27; // Size: 50
-		public const int CS_REFRESH_GROUP_CHAT = 0x3E28; // Size: 10
-		public const int CS_CREATE_GROUP_CHAT = 0x3E29; // Size: 10
-		public const int CS_REQ_CHAT_HISTORY = 0x3E2A; // Size: 26
-		public const int CS_REQ_OUT_ROOM = 0x3E2B; // Size: 18
-		public const int CS_REQ_RELATED_PC_SESSION = 0x3E2C; // Size: 24
-		public const int CS_REDIS_SKILLPOINT = 0x3E2D; // Size: 26
-		public const int CS_PARTY_CLIENT_INFO_SEND = 0x3E2E; // Size: 0
-		public const int CS_NORMAL_GAME_START = 0x3E2F; // Size: 10
-		public const int CS_REQUEST_PVP_RANKING = 0x3E30; // Size: 92
-		public const int CS_REQUEST_ALL_SEASON_TOP_PVP_RANKING = 0x3E31; // Size: 84
-		public const int CS_INVITE_PARTY_PVP = 0x3E32; // Size: 14
-		public const int CS_ACCEPT_PARTY_PVP = 0x3E33; // Size: 23
-		public const int CS_LIKE_IT = 0x3E34; // Size: 96
-		public const int CS_UNLIKE_IT = 0x3E35; // Size: 32
-		public const int CS_LIKE_IT_CONFIRM = 0x3E36; // Size: 24
-		public const int CS_ADD_RELATION_SCORE = 0x3E37; // Size: 96
-		public const int CS_GET_LIKE_COUNT = 0x3E38; // Size: 24
-		public const int CS_REQ_MEMBER_LOGOUT_TIME = 0x3E39; // Size: 10
-		public const int CS_INVITE_GROUPCHAT_ACCEPT = 0x3E3A; // Size: 135
-		public const int SC_LOGIN_OK = 0x3E3B; // Size: 10
-		public const int CS_DICE = 0x3E3C; // Size: 15
-		public const int SC_SYSTEM_MSG = 0x3E3D; // Size: 0
-		public const int ZC_InteractionInfo = 0x5209; // Size: 0
-		public const int CZ_InteractionCancel = 0x520A; // Size: 64
-		public const int ZC_InteractionRideUseSkill = 0x520B; // Size: 0
+		Undefined = -1,
+		CB_LOGIN,
+		CB_LOGIN_BY_PASSPORT,
+		CB_LOGOUT,
+		CB_START_BARRACK,
+		CB_COMMANDER_CREATE,
+		BC_COMMANDER_CREATE_SLOTID,
+		CB_COMMANDER_DESTROY,
+		CB_CHECK_CLIENT_INTEGRITY,
+		CB_CLIENT_INTEGRITY_FAIL,
+		CB_START_GAME,
+		CB_BARRACKNAME_CHECK,
+		BC_BARRACKNAME_CHECK_RESULT,
+		CB_BARRACKNAME_CHANGE,
+		CB_COMMANDER_MOVE,
+		CB_COMPANION_MOVE,
+		CB_ECHO,
+		BC_LOGINOK,
+		BC_CYOU_LOGIN_FAIL,
+		BC_LOGIN_PACKET_RECEIVED,
+		BC_LOGOUTOK,
+		BC_COMMANDER_LIST,
+		BC_SPLIT_COMMANDER_INFO_LIST,
+		BC_COMMANDER_CREATE,
+		BC_COMMANDER_DESTROY,
+		BC_START_GAMEOK,
+		BC_SINGLE_INFO,
+		BC_MESSAGE,
+		BC_ECHO,
+		BC_MYPAGE_MAP,
+		BC_BARRACKNAME_CHANGE,
+		BC_IES_MODIFY_INFO,
+		BC_IES_MODIFY_LIST,
+		CB_IES_REVISION_DELETE,
+		BC_IES_REVISION_DELETE,
+		CB_SCREENSHOT_HASH,
+		CB_REQ_CHANNEL_TRAFFIC,
+		CB_VISIT,
+		CB_BUY_THEMA,
+		BC_ACCOUNT_PROP,
+		CB_CURRENT_BARRACK,
+		BC_NORMAL,
+		CB_POSE,
+		CB_PLACE_CMD,
+		CB_CHAT,
+		BC_CHAT,
+		CB_ECHO_NORMAL,
+		CB_REQ_SLOT_PRICE,
+		BC_REQ_SLOT_PRICE,
+		CB_CHANGE_BARRACK_LAYER,
+		CB_CHANGE_BARRACK_TARGET_LAYER,
+		CB_SELECT_BARRACK_LAYER,
+		BC_LAYER_CHANGE_SYSTEM_MESSAGE,
+		CB_JUMP,
+		BC_JUMP,
+		BC_SERVER_ENTRY,
+		CB_PET_PC,
+		CB_PET_COMMAND,
+		CB_REQ_CHANGE_POSTBOX_STATE,
+		CB_REQ_GET_POSTBOX_ITEM,
+		CB_REQ_GET_POSTBOX_ITEM_LIST,
+		CB_REQ_POSTBOX_PAGE,
+		BC_WAIT_QUEUE_ORDER,
+		CB_CANCEL_SERVER_WAIT_QUEUE,
+		CB_GEMSCOOL_PCINFO,
+		CB_NOT_AUTHORIZED_ADDON_LIST,
+		CB_DEBUG_LOG_FILE,
+		BC_FAIL_TO_GET_AUTHCODE,
+		CB_CLIENT_REMOTE_LOG,
+		CB_CHECK_MARKET_REGISTERED,
+		BC_RETURN_PC_MARKET_REGISTERED,
+		BC_CHARACTER_SLOT_SWAP_SUCCESS,
+		CB_CHARACTER_SWAP_SLOT,
+		BC_CHARACTER_SLOT_SWAP_FAIL,
+		BC_DISCONNECT_PACKET_LOG_COUNT,
+		CB_REQ_POSTBOX_REFRESH,
+		CB_TEAM_DESTROY,
+		BC_REQ_SYSTEMINFO,
+		CB_RESPONSE_SYSTEMINFO,
+		CB_OS_INFO,
+		// Added 389826
+		CB_REQ_MOVE_ACCOUNT_DATA,
+		BC_FAILED_MOVE_ACCOUNT_DATA,
+		BC_SUCCESS_MOVE_ACCOUNT_DATA,
+		BC_CHECK_MOVE_ACCOUNT_DATA,
+		// End 389826
+		CB_SELECTED_LANGUAGE,
+		CZ_CONNECT,
+		ZC_CONNECT_OK,
+		ZC_MOVE_ZONE,
+		CZ_MOVE_ZONE_OK,
+		ZC_CONNECT_FAILED,
+		CZ_GAME_READY,
+		ZC_MOVE_ZONE_OK,
+		CZ_LOGOUT,
+		CZ_MOVE_BARRACK,
+		ZC_MOVE_BARRACK,
+		ZC_LOGOUT_OK,
+		ZC_MESSAGE,
+		ZC_RESET_VIEW,
+		ZC_START_GAME,
+		ZC_QUIET,
+		ZC_ENTER_PC,
+		ZC_ENTER_MONSTER,
+		ZC_ENTER_DUMMYPC,
+		ZC_UPDATED_DUMMYPC,
+		ZC_ENTER_ITEM,
+		ZC_LEAVE,
+		ZC_MOVE_PATH,
+		ZC_MOVE_POS,
+		ZC_MOVE_BEZIER,
+		ZC_MOVE_DIR,
+		ZC_EXPECTED_STOPPOS,
+		ZC_MSPD,
+		ZC_MOVE_SPEED,
+		ZC_MOVE_STOP,
+		ZC_REST_SIT,
+		ZC_JUMP,
+		ZC_JUMP_DIR,
+		ZC_ORDER_SKILL_JUMP,
+		ZC_SKILL_JUMP,
+		ZC_SET_POS,
+		ZC_FILE_MOVE,
+		ZC_UPDATED_PCAPPEARANCE,
+		ZC_UPDATED_MONSTERAPPEARANCE,
+		ZC_CHAT,
+		ZC_CHAT_WITH_TEXTCODE,
+		ZC_STANCE_CHANGE,
+		ZC_ADD_HP,
+		ZC_SKILL_CAST_CANCEL,
+		ZC_SKILL_CAST,
+		ZC_SKILL_READY,
+		ZC_SKILL_DISABLE,
+		ZC_SKILL_USE_CANCEL,
+		ZC_SKILL_MELEE_TARGET,
+		ZC_SKILL_MELEE_GROUND,
+		ZC_SKILL_FORCE_TARGET,
+		ZC_SKILL_FORCE_GROUND,
+		ZC_SKILL_HIT_INFO,
+		ZC_BUFF_LIST,
+		ZC_BUFF_ADD,
+		ZC_BUFF_UPDATE,
+		ZC_BUFF_REMOVE,
+		ZC_BUFF_CLEAR,
+		CZ_BUFF_REMOVE,
+		CZ_INTE_WARP,
+		ZC_ROTATE,
+		ZC_ROTATE_RESERVED,
+		ZC_HEAD_ROTATE,
+		ZC_TARGET_ROTATE,
+		ZC_QUICK_ROTATE,
+		ZC_POSE,
+		ZC_DEAD,
+		ZC_RESURRECT,
+		ZC_CHANGE_RELATION,
+		ZC_RESURRECT_DIALOG,
+		ZC_HIT_INFO,
+		ZC_HEAL_INFO,
+		ZC_CAUTION_DAMAGE_INFO,
+		ZC_CAUTION_DAMAGE_RELEASE,
+		ZC_KNOCKBACK_INFO,
+		ZC_KNOCKDOWN_INFO,
+		CZ_RESURRECT,
+		ZC_RESURRECT_SAVE_POINT_ACK,
+		ZC_RESURRECT_HERE_ACK,
+		CZ_CLICK_TRIGGER,
+		CZ_KEYBOARD_MOVE,
+		CZ_EXPECTED_STOP_POS,
+		CZ_JUMP,
+		CZ_DASHRUN,
+		CZ_SKILL_JUMP_REQ,
+		CZ_MOVE_PATH,
+		CZ_MOVE_STOP,
+		CZ_REST_SIT,
+		CZ_ON_AIR,
+		CZ_ON_GROUND,
+		CZ_MOVEMENT_INFO,
+		CZ_SKILL_TARGET,
+		CZ_SKILL_TARGET_ANI,
+		CZ_SKILL_GROUND,
+		CZ_SKILL_SELF,
+		CZ_SKILL_CANCEL,
+		CZ_HOLD,
+		CZ_ROTATE,
+		CZ_HEAD_ROTATE,
+		CZ_TARGET_ROTATE,
+		CZ_POSE,
+		CZ_CHAT,
+		CZ_SELF_CHAT,
+		CZ_CHAT_LOG,
+		CZ_SHOUT,
+		CZ_ITEM_DROP,
+		CZ_ITEM_DELETE,
+		CZ_ITEM_USE,
+		CZ_ITEM_USE_TO_ITEM,
+		CZ_ITEM_USE_TO_GROUND,
+		CZ_ITEM_BUY,
+		CZ_ITEM_SELL,
+		CZ_ITEM_EQUIP,
+		CZ_ITEM_UNEQUIP,
 
+		// 2760
+		CZ_SWAP_INVITEM,
+
+		CZ_REQ_DELETE_EXPIRED_ITEMS,
+		ZC_CHECK_INVINDEX,
+		CZ_PREMIUM_ENCHANTCHIP,
+		CZ_PREMIUM_GACHACUBE,
+		CZ_PREMIUM_GACHACUBE_LEGEND,
+		ZC_ITEM_INVENTORY_LIST,
+		ZC_ITEM_INVENTORY_DIVISION_LIST,
+		ZC_ITEM_INVENTORY_INDEX_LIST,
+		ZC_ITEM_EQUIP_LIST,
+		ZC_ITEM_ADD,
+		ZC_ITEM_REMOVE,
+		ZC_ITEM_USE,
+		ZC_ITEM_USE_TO_GROUND,
+		ZC_QUICK_SLOT_LIST,
+		ZC_SKILL_LIST,
+		ZC_SKILL_ADD,
+		ZC_SKILL_REMOVE,
+		ZC_ABILITY_LIST,
+		CZ_DISPEL_DEBUFF_TOGGLE,
+		CZ_JUNGTAN_TOGGLE,
+		ZC_EXP_UP,
+		ZC_EXP_UP_BY_MONSTER,
+
+		// 2760 (Removed Later)
+		CZ_EXP_UP_BY_MONSTER,
+
+		ZC_PC_LEVELUP,
+		ZC_PC_STAT_AVG,
+		ZC_MAX_EXP_CHANGED,
+		ZC_TEXT,
+		ZC_UPDATE_SP,
+		ZC_RESTORATION,
+		ZC_UPDATE_MHP,
+		CZ_DIALOG_ACK,
+		CZ_DIALOG_SELECT,
+		CZ_DIALOG_STRINGINPUT,
+		ZC_DIALOG_OK,
+		ZC_DIALOG_NEXT,
+		ZC_DIALOG_SELECT,
+		ZC_DIALOG_ITEM_SELECT,
+		ZC_DIALOG_CLOSE,
+		ZC_DIALOG_TRADE,
+		ZC_DIALOG_COMMON_TRADE,
+		ZC_DIALOG_NUMBERRANGE,
+		ZC_DIALOG_STRINGINPUT,
+		ZC_ADDON_MSG,
+		ZC_ADDON_EVENT_MSG,
+		CZ_UI_EVENT,
+		ZC_PLAY_SOUND,
+		ZC_STOP_SOUND,
+		ZC_PLAY_MUSICQUEUE,
+		ZC_STOP_MUSICQUEUE,
+		ZC_PLAY_ANI,
+		ZC_PLAY_ANI_SELFISH,
+		ZC_CHANGE_ANI,
+		CZ_MOVE_CAMP,
+		CZ_CAMPINFO,
+		ZC_CAMPINFO,
+		ZC_FIX_ANIM,
+		ZC_MOVE_ANIM,
+		ZC_STD_ANIM,
+		ZC_PLAY_ALARMSOUND,
+		ZC_STOP_ALARMSOUND,
+		ZC_PLAY_EXP_TEXT,
+		ZC_PLAY_NAVI_EFFECT,
+		ZC_UPDATE_ALL_STATUS,
+		ZC_OBJECT_PROPERTY,
+		ZC_DUMP_PROPERTY,
+		ZC_SHOUT,
+		ZC_SHOUT_FAILED,
+		CZ_EXCHANGE_REQUEST,
+		ZC_EXCHANGE_REQUEST_ACK,
+		ZC_EXCHANGE_REQUEST_RECEIVED,
+		CZ_EXCHANGE_ACCEPT,
+		CZ_EXCHANGE_DECLINE,
+		ZC_EXCHANGE_DECLINE_ACK,
+		ZC_EXCHANGE_START,
+		CZ_EXCHANGE_OFFER,
+		ZC_EXCHANGE_OFFER_ACK,
+		CZ_EXCHANGE_AGREE,
+		ZC_EXCHANGE_AGREE_ACK,
+		CZ_EXCHANGE_FINALAGREE,
+		ZC_EXCHANGE_FINALAGREE_ACK,
+		CZ_EXCHANGE_CANCEL,
+		ZC_EXCHANGE_CANCEL_ACK,
+		ZC_EXCHANGE_SUCCESS,
+		ZC_COOLDOWN_LIST,
+		ZC_COOLDOWN_CHANGED,
+		ZC_OVERHEAT_CHANGED,
+		ZC_TEST_AGENT,
+		ZC_TIME_FACTOR,
+		ZC_PARTY_ENTER,
+		ZC_PARTY_OUT,
+		CZ_PARTY_OUT,
+		ZC_PARTY_DESTROY,
+		ZC_PARTY_INFO,
+		ZC_PARTY_LIST,
+		ZC_PARTY_INST_INFO,
+		ZC_CHANGE_EQUIP_DURABILITY,
+		ZC_UPDATE_REPRESENTATION_CLASS,
+		CZ_DIALOG_TX,
+		CZ_REQ_RECIPE,
+		ZC_CUSTOM_DIALOG,
+		ZC_SESSION_OBJECTS,
+		ZC_SESSION_OBJ_ADD,
+		ZC_SESSION_OBJ_REMOVE,
+		ZC_SESSION_OBJ_TIME,
+		CZ_S_OBJ_VALUE_C,
+		CZ_REQ_NORMAL_TX,
+		ZC_COMMANDER_LOADER_INFO,
+		ZC_MOVE_SINGLE_ZONE,
+		ZC_BACKTO_ORIGINAL_SERVER,
+		CZ_BACKTO_ORIGINAL_SERVER,
+		CZ_REQ_NORMAL_TX_NUMARG,
+		ZC_UI_OPEN,
+		ZC_ENABLE_CONTROL,
+		ZC_CHANGE_CAMERA,
+		ZC_MONSTER_SDR_CHANGED,
+		ZC_MOVE_IGNORE_COLLISION,
+		ZC_CHANGE_CAMERA_ZOOM,
+		ZC_PLAY_SKILL_ANI,
+		ZC_PLAY_SKILL_CAST_ANI,
+		CZ_REQ_ITEM_GET,
+		ZC_ITEM_GET,
+		CZ_GUARD,
+		ZC_GUARD,
+		ZC_STAMINA,
+		ZC_ADD_STAMINA,
+		ZC_GM_ORDER,
+		ZC_MYPC_ENTER,
+		ZC_LOCK_KEY,
+		ZC_SAVE_INFO,
+		CZ_SAVE_INFO,
+		ZC_OPTION_LIST,
+		ZC_SKILLMAP_LIST,
+		CZ_GIVEITEM_TO_DUMMYPC,
+		CZ_FOOD_TABLE_TITLE,
+		CZ_USE_TP_AND_ENTER_INDUN,
+		CZ_USE_RANKRESET_ITEM,
+		CZ_REQ_RANKRESET_SYSTEM,
+		CZ_REQ_MULTIPLE_RANKRESET_SYSTEM,
+		ZC_SET_LAYER,
+		ZC_CREATE_LAYERBOX,
+		ZC_RESET_BOX,
+		ZC_CREATE_SCROLLLOCKBOX,
+		ZC_REMOVE_SCROLLLOCKBOX,
+		CZ_DYNAMIC_CASTING_START,
+		CZ_DYNAMIC_CASTING_END,
+		ZC_CASTING_SPEED,
+		CZ_SKILL_CANCEL_SCRIPT,
+		ZC_LEAVE_TRIGGER,
+		ZC_BORN,
+		ZC_ACHIEVE_POINT_LIST,
+		ZC_SPLIT_ACHIEVE_POINT_LIST,
+		ZC_SPLIT_ACHIEVE_SET,
+		ZC_ACHIEVE_POINT,
+		CZ_ACHIEVE_EQUIP,
+		ZC_ACHIEVE_EQUIP,
+		CZ_ACHIEVE_REWARD,
+		CZ_ACHIEVE_EXCHANGE_EVENT_REWARD,
+		CZ_ACHIEVE_LEVEL_REWARD,
+		CZ_CHANGE_CONFIG,
+		CZ_CHANGE_CONFIG_STR,
+		ZC_WORLD_MSG,
+		ZC_ENABLE_SHOW_ITEM_GET,
+		ZC_LOGIN_TIME,
+		ZC_GIVE_EXP_TO_PC,
+		ZC_LAYER_PC_LIST,
+		ZC_LAYER_PC_SOBJ_PROP,
+		CZ_CUSTOM_COMMAND,
+		ZC_LAYER_INFO,
+		CZ_CHAT_MACRO,
+		ZC_CHAT_MACRO_LIST,
+		ZC_RULLET_LIST,
+		ZC_QUICKSLOT_REGISTER,
+		CZ_QUICKSLOT_LIST,
+		CZ_DOUBLE_ITEM_EQUIP,
+		ZC_TRICK_PACKET,
+		ZC_COOLDOWN_RATE,
+		ZC_MAP_REVEAL_LIST,
+		CZ_MAP_REVEAL_INFO,
+		CZ_MAP_SEARCH_INFO,
+		ZC_EXEC_CLIENT_SCP,
+		ZC_SET_NPC_STATE,
+		ZC_NPC_STATE_LIST,
+		CZ_QUEST_NPC_STATE_CHECK,
+		ZC_RANK_ACHIEVE_ADD,
+		CZ_IES_MODIFY_INFO,
+		ZC_IES_MODIFY_INFO,
+		ZC_IES_MODIFY_LIST,
+		CZ_IES_REVISION_DELETE,
+		ZC_IES_REVISION_DELETE,
+		ZC_EQUIP_ITEM_REMOVE,
+		ZC_SOLD_ITEM_LIST,
+		ZC_SOLD_ITEM_DIVISION_LIST,
+		CZ_SOLD_ITEM,
+		CZ_WAREHOUSE_CMD,
+		CZ_SWAP_ETC_INV_CHANGE_INDEX,
+		CZ_SORT_INV,
+		CZ_EXTEND_WAREHOUSE,
+		CZ_CAST_CONTROL_SHOT,
+		ZC_PC_PROP_UPDATE,
+		ZC_SHOP_POINT_UPDATE,
+		CZ_SHOP_POINT_GET,
+		CZ_CLIENT_DAMAGE,
+		CZ_CLIENT_ATTACK,
+		ZC_SYSTEM_MSG,
+		ZC_FSM_MOVE,
+		CZ_QUEST_CHECK_SAVE,
+		CZ_ACHIEVE_CHASE_SAVE,
+		ZC_MONSTER_LIFETIME,
+		ZC_SHARED_MSG,
+		CZ_REQ_TX_ITEM,
+		ZC_TEST_DBG,
+		ZC_MONSTER_DIST,
+		ZC_RESET_SKILL_FORCEID,
+		ZC_EMOTICON,
+		ZC_SHOW_EMOTICON,
+		ZC_TREASUREMARK_BY_MAP,
+		ZC_SHOW_LOCAL_MAP,
+		CZ_FLEE_OBSTACLE,
+		ZC_HOLD_MOVE_PATH,
+		ZC_ENTER_HOOK,
+		ZC_LEAVE_HOOK,
+		ZC_GROUND_EFFECT,
+		ZC_FLY,
+		ZC_FLY_OPTION,
+		ZC_FLY_MATH,
+		ZC_FLY_HEIGHT,
+		ZC_UPDATE_SHIELD,
+		ZC_SHOW_MODEL,
+		ZC_SHOW_SCENE_MODEL,
+		ZC_SKILL_RANGE_DBG,
+		ZC_SKILL_RANGE_FAN,
+		ZC_SKILL_RANGE_SQUARE,
+		ZC_SKILL_RANGE_CIRCLE,
+		ZC_POS_DBG,
+		ZC_TEAMID,
+		ZC_PC,
+		CZ_LOG,
+		ZC_MOTIONBLUR,
+		ZC_PLAY_FORCE,
+		ZC_CAST_TARGET,
+		ZC_START_INFO,
+		ZC_JOB_EXP_UP,
+		ZC_JOB_PTS,
+		ZC_ADDITIONAL_SKILL_POINT,
+		ZC_MON_STAMINA,
+		CZ_CUSTOM_SCP,
+		ZC_VIEW_FOCUS,
+		ZC_HARDCODED_SKILL,
+		CZ_HARDCODED_SKILL,
+		ZC_FORCE_MOVE,
+		ZC_HSKILL_CONTROL,
+		ZC_CANCEL_DEADEVENT,
+		ZC_ACTION_PKS,
+		CZ_HARDCODED_ITEM,
+		CZ_CANCEL_TRANSFORM_SKILL,
+		CZ_BRIQUET,
+		ZC_VIBRATE,
+		ZC_COUNTER_MOVE,
+		CZ_COUNTER_ATTACK,
+		CZ_CLIENT_DIRECT,
+		ZC_CLIENT_DIRECT,
+		ZC_OWNER,
+		ZC_GD_RANK,
+		CZ_RUN_BGEVENT,
+		ZC_ADD_SKILL_EFFECT,
+		ZC_ITEM_DROPABLE,
+		CZ_ITEM_DROP_TO_OBJECT,
+		ZC_NORMAL,
+		CZ_G_QUEST_CHECK,
+
+		// 2760 (Removed Later)
+		ZC_WARP_MOVE,
+
+		ZC_MOVE_PATH_MATH,
+		CZ_MYPAGE_COMMENT_ADD,
+		CZ_MYPAGE_COMMENT_DELETE,
+		CZ_GUESTPAGE_COMMENT_ADD,
+		CZ_GET_TARGET_MYPAGE,
+		CZ_ON_MYPAGE_MODE,
+		CZ_RESET_SOCIAL_MODE,
+		CZ_GET_TARGET_GUESTPAGE,
+		CZ_ADD_SELLMODE_ITEM,
+		CZ_DELETE_SELLMODE_ITEM,
+		CZ_ON_SELLITEM_MODE,
+		ZC_MYPAGE_MAP,
+		ZC_GUESTPAGE_MAP,
+		ZC_ON_MYPAGE_MODE,
+		ZC_RESET_SOCIAL_MODE,
+		CZ_ON_ITEMBUY_MODE,
+		ZC_ON_BUYITEM_MODE,
+		ZC_SHOW_GROUND_ITEM_MARK,
+		ZC_HELP_LIST,
+		ZC_HELP_ADD,
+		CZ_CLIENT_HIT_LIST,
+		ZC_PC_ATKSTATE,
+		ZC_SEND_PREMIUM_STATE,
+		CZ_HELP_READ_TYPE,
+		CZ_MOVE_PATH_END,
+		ZC_COLL_DAMAGE,
+		CZ_KEYBOARD_BEAT,
+		CZ_MOVEHIT_SCP,
+		ZC_SYNC_START,
+		ZC_SYNC_END,
+		ZC_SYNC_EXEC,
+		ZC_SYNC_EXEC_BY_SKILL_TIME,
+		CZ_STOP_TIMEACTION,
+		CZ_REQ_DUMMYPC_INFO,
+		CZ_VISIT_BARRACK,
+		CZ_SPC_SKILL_POS,
+		CZ_CHANGE_HEAD,
+		CZ_CHANGE_DESIGNCUT,
+		CZ_CREATE_ARROW_CRAFT,
+		CZ_EXCHANGE_ANTIQUE,
+		CZ_EXCHANGE_WEAPONTYPE,
+		CZ_REQ_MINITEXT,
+		ZC_PC_MOVE_STOP,
+		CZ_STOP_ALLPC,
+		CZ_COMPLETE_PRELOAD,
+		CZ_MGAME_JOIN_CMD,
+		CZ_ADD_HELP,
+		ZC_ATTACH_TO_OBJ,
+		ZC_DETACH_FROM_OBJ,
+		ZC_RUN_FROM,
+		ZC_LOOKAT_OBJ,
+		CZ_SKILL_CELL_LIST,
+		CZ_SKILL_TOOL_GROUND_POS,
+		CZ_DIRECTION_PROCESS,
+		CZ_DIRECTION_MOVE_STATE,
+		ZC_TO_ALL_CLIENT,
+		ZC_TO_CLIENT,
+		CZ_REWARD_CMD,
+		CZ_PROPERTY_COMPARE,
+		ZC_PROPERTY_COMPARE,
+		ZC_PROPERTY_COMPARE_FOR_ACT,
+		ZC_PROPERTY_COMPARE_FOR_REP_CLASS,
+		ZC_FACTION,
+		ZC_SEND_CASH_VALUE,
+		ZC_BEGIN_KILL_LOG,
+		ZC_END_KILL_LOG,
+		ZC_CLEAR_KILL_LOG,
+		CZ_NPC_AUCTION_CMD,
+		ZC_DIRECTION_APC,
+		ZC_BGMODEL_ANIM_INFO,
+		ZC_ATTACH_BY_KNOCKBACK,
+		CZ_OBJECT_MOVE,
+		CZ_CONTROL_OBJECT_ROTATE,
+		CZ_SUMMON_COMMAND,
+		CZ_VEHICLE_RIDE,
+		CZ_REQ_ACHIEVE_RANK_PAGE_INFO,
+		ZC_SPC_TRIGGER_EXEC,
+		CZ_REQ_MGAME_VIEW,
+		CZ_REQ_MGAME_CHAT,
+		CZ_TOURNAMENT_GIFT,
+		CZ_PARTY_INVITE_ACCEPT,
+		CZ_PARTY_INVITE_CANCEL,
+		CZ_PARTY_PROP_CHANGE,
+		CZ_REQ_MARKET_REGISTER,
+		CZ_REQ_MARKET_MINMAX_INFO,
+		CZ_REQ_MARKET_BUY,
+		CZ_REQ_CABINET_LIST,
+		CZ_REQ_GET_CABINET_ITEM,
+		CZ_REQ_CANCEL_MARKET_ITEM,
+		CZ_INV_ITEM_LOCK,
+		CZ_OBJ_RECORD_POS,
+		CZ_FORMATION_CMD,
+		CZ_REGISTER_AUTOSELLER,
+		CZ_OPEN_AUTOSELLER,
+		CZ_BUY_AUTOSELLER_ITEMS,
+		CZ_SELL_MY_AUTOSELLER_ITEMS,
+		CZ_PUZZLE_CRAFT,
+		CZ_PET_EQUIP,
+		CZ_PET_AUTO_ATK,
+		ZC_PET_AUTO_ATK,
+		ZC_TO_SOMEWHERE_CLIENT,
+		CZ_REVEAL_NPC_STATE,
+		CZ_CHANGE_CHANNEL,
+		CZ_REQ_CHANNEL_TRAFFICS,
+		CZ_BUY_PROPERTYSHOP_ITEM,
+		CZ_SKILL_USE_HEIGHT,
+		CZ_CHANGE_GUILD_NEUTRALITY,
+		CZ_SAVE_GUILD_BOARD,
+		CZ_DELETE_PARTY_EVENT,
+		CZ_PING,
+		ZC_PING,
+
+		// 2760 (Removed later)
+		ZC_HACKSHIELD_BUFFER,
+		CZ_HACKSHIELD_BUFFER,
+
+		CZ_REQ_REMAIN_NEXONCASH,
+		CZ_REQ_OPEN_INGAMESHOP_UI,
+		CZ_REQ_BUY_INGAMESHOP_ITEM,
+		CZ_REQ_BUY_ALL_INGAMESHOP_ITEM,
+		CZ_REQ_PICKUP_CASHITEM,
+		CZ_REQ_REFUND_CASHITEM,
+		ZC_XIGNCODE_BUFFER,
+		CZ_XIGNCODE_BUFFER,
+		CZ_SYSTEM_LOG_SAVE_TO_MONGODB,
+		CZ_CHANGE_TITLE,
+		CZ_PC_COMMENT_CHANGE,
+		CZ_AUTTOSELLER_BUYER_CLOSE,
+		CZ_REQ_ITEM_LIST,
+		CZ_REQ_ACC_WARE_VIS_LOG,
+		CZ_HIT_MISSILE,
+		CZ_PARTY_JOIN_BY_LINK,
+		CZ_PVP_ZONE_CMD,
+		CZ_PVP_CHAT,
+		CZ_CARDBATTLE_CMD,
+		CZ_REQ_UPDATE_CONTENTS_SESSION,
+		CZ_REQ_FRIENDLY_FIGHT,
+		CZ_REQ_ANCIENT_FRIENDLY_FIGHT,
+		CZ_HARDSKILL_POS_LIST,
+		CZ_CART_POSITION,
+		CZ_REQ_RIDE_CART,
+		CZ_DUMMYPC_SKILL_POS,
+		CZ_NGS,
+		ZC_NGS,
+		CZ_PARTY_MEMBER_SKILL_USE,
+		CZ_PARTY_MEMBER_SKILL_ACCEPT,
+		CZ_SYSTEM_LOG_TO_SERVER,
+		CZ_UDP_RTT_CHECK,
+		ZC_UDP_RTT_CHECK,
+		CZ_UDP_RTT_CHECK_ACK,
+		CZ_HEARTBEAT,
+		/// <summary>
+		/// Added in PreBuild Client with 234929
+		/// </summary>
+		ZC_HEARTBEAT,
+
+		CZ_CANCEL_INDUN_MATCHING,
+		CZ_CANCEL_INDUN_PARTY_MATCHING,
+		CZ_REQ_GM_ORDER,
+		CZ_REQ_GM_ORDER_DUMMY_KICK,
+		CZ_REPORT_AUTOBOT,
+		CZ_REPORT_PVP_ZOOM,
+		CZ_PARTY_INVENTORY_LOAD,
+		CZ_PARTY_SHARED_QUEST,
+		CZ_REQ_MOVE_PARTYINV_TO_ACCOUNT,
+		CZ_PVP_COMMAND,
+		CZ_REQ_CancelGachaCube,
+		CZ_WAREHOUSE_TAKE_LIST,
+		CZ_SAVE_AUTO_MACRO,
+		CZ_REQUEST_LOAD_ITEM_BUY_LIMIT,
+		CZ_AUTO_STATE,
+		CZ_RUN_GAMEEXIT_TIMER,
+		CZ_FIXED_NOTICE_SHOW,
+		CZ_SAGE_SKILL_GO_FRIEND,
+		CZ_REQUEST_CHANGE_NAME,
+		CZ_REQUEST_CHANGE_PET_NAME,
+		ZC_ADD_BARRACK_CHARACTER_SLOT_SUCCESS,
+		CZ_SELF_INVITE_NEWBIE_GUILD,
+		CZ_CYOU_CTU_CLIENT_MSG,
+		ZC_CYOU_KICK_USER_EXIT_CLIENT,
+		ZC_HOLD_EXP_BOOK_TIME,
+		CZ_HOLD_EXP_BOOK_TIME,
+		ZC_BUFF_UPDATE_TIME,
+		CZ_SCREENSHOT_HASH,
+		CZ_REQ_MOVE_TO_INDUN,
+		CZ_CLEAR_INDUN_REG,
+		CZ_REQ_REGISTER_TO_INDUN,
+		CZ_REQ_GUILD_MEMBER_AUTHORITY,
+		CZ_TPSHOP_RTPP_FOR_TEST,
+		CZ_REQ_FORGERY,
+		CZ_REQ_UNDERSTAFF_ENTER_ALLOW,
+		CZ_REQ_UNDERSTAFF_ENTER_ALLOW_WITH_PARTY,
+		CZ_REQ_BUILD_FOODTABLE,
+		ZC_PLAY_PAIR_ANIMATION,
+		CZ_REQ_FISHING,
+		CZ_REQ_GET_FISHING_ITEM,
+		ZC_PLAY_ATTACH_MODEL_ANIM,
+		CZ_RUN_FUNCTION_DUMP,
+		ZC_RUN_FUNCTION_DUMP,
+		ZC_RUN_FUNCTION_DUMP_ERROR,
+		ZC_RUN_FUNCTION_DUMP_PRINT,
+		ZC_ATTACH_TO_SLOT,
+		ZC_FISHING_ITEM_LIST,
+		CZ_REQ_FISHING_RANK,
+		ZC_ENABLE_ROTATE,
+		CZ_SYNC_POS,
+		ZC_ADVENTURE_BOOK_INFO,
+		CZ_DISCONNECT_REASON_FOR_LOG,
+		CZ_REQ_ADVENTURE_BOOK_RANK,
+		CZ_REQ_ADVENTURE_BOOK_REWARD,
+		CZ_REQ_GUILD_NEUTRALITY_ALARM,
+		CZ_REQ_QUEST_COMPLETE,
+		CZ_REQ_GUILD_ASSET_LOG,
+		ZC_CANCEL_MOUSE_MOVE,
+		ZC_BROAD_CAST_MY_INFO,
+		CZ_LOAD_COMPLETE,
+		ZC_LOAD_COMPLETE,
+
+		/// Added in 234929
+		CZ_ACCEPT_CHALLENGE_MODE,
+		CZ_ACCEPT_NEXT_LEVEL_CHALLENGE_MODE,
+		CZ_ACCEPT_STOP_LEVEL_CHALLENGE_MODE,
+		CZ_ACCEPT_CHALLENGE_MODE_BY_PCBANG,
+		ZC_HISTORY_MSG,
+		/// End
+
+		ZC_UPDATE_CHALLENGE_MODE_WARP_PORTAL_MARK,
+		ZC_ATTENDANCE_RECEIPT_REWARD,
+		CZ_ATTENDANCE_REWARD_CLICK,
+		ZC_ATTENDANCE_REWARD_CHECK_UI_ON,
+		ZC_CHANGE_DYNAMICCASTING_MAX_CHANGING_TIME,
+		ZC_DELAYED_ROTATE_MOVE_START,
+		ZC_DELAYED_ROTATE_MOVE_END,
+		ZC_SEND_PC_EXPROP,
+		ZC_COLONY_OCCUPATION_INFO,
+		CZ_REQ_RETURN_TO_CITY_FROM_COLONY_WAR,
+		CZ_REQUEST_COLONYWAR_ENDTIME,
+		ZC_RESPONSE_COLONYWAR_ENDTIME,
+		ZC_SEND_COLONY_MARKET_FEE_PAYMENT_LIST,
+		CZ_REQ_COLONY_MARKET_FEE_PAYMENT,
+		ZC_SET_COLONY_TIME_CHEAT_FAIL,
+		ZC_SET_COLONY_TIME_CHEAT_SUCCESS,
+		ZC_USER_BATTLE_INFO_LIST,
+		ZC_COLONY_TAX_TOTAL_AMOUNT,
+		ZC_COLONY_TAX_RATE_LIST,
+		ZC_COLONY_TAX_LORD_READY,
+		ZC_COLONY_TAX_LORD_START,
+		ZC_COLONY_TAX_LORD_END,
+		ZC_COLONY_TAX_RATE_SET,
+		CZ_COLONY_TAX_RATE_REQ_SET,
+		ZC_COLONY_TAX_CHEQUE_LIST,
+		CZ_COLONY_TAX_CHEQUE_REQ_LIST,
+		CZ_COLONY_TAX_CHEQUE_REQ_SEND,
+		CZ_COLONY_TAX_HISTORY_REQ_LIST,
+		ZC_COLONY_TAX_HISTORY_LIST,
+		ZC_COLONY_TAX_PAYMENT_LIST,
+		CZ_COLONY_TAX_PAYMENT_REQ_RECV,
+		CZ_COLONY_TAX_PAYMENT_REQ_LIST,
+		CZ_REQUEST_RVR_ENDTIME,
+		ZC_RESPONSE_RVR_ENDTIME,
+		CZ_REGISTER_NEW_GUILD_EMBLEM,
+		CZ_CHANGE_GUILD_EMBLEM,
+		ZC_UPDATE_GUILD_EMBLEM,
+		CZ_REQUEST_CERTAIN_GUILD_EMBLEM,
+		ZC_RESPONSE_CERTAIN_GUILD_EMBLEM,
+		CZ_REQUEST_GUILD_EMBLEM_INFO,
+		ZC_RESPONSE_GUILD_EMBLEM_INFO,
+		CZ_REQUEST_GUILD_INDEX,
+		ZC_RESPONSE_GUILD_INDEX,
+		CZ_REPORT_GUILDEMBLEM,
+		ZC_DELETE_GUILD_EMBLEM,
+		CZ_DELETE_GUILD_EMBLEM,
+		ZC_NXA_REQ_TICKET,
+		CZ_NXA_TICKET,
+		CZ_NXA_REQ_BALANCE,
+		ZC_NXA_BALANCE,
+		CZ_NXA_REQ_ITEMLIST,
+		ZC_NXA_ITEMLIST,
+		CZ_NXA_REQ_PURCHASE,
+		ZC_NXA_PURCHASE,
+		CZ_NXA_REQ_PICKUP_READY_ITEMS,
+		CZ_NXA_REQ_PURCHASE_CANCEL,
+		ZC_NXA_SELLITEMLIST,
+		CZ_REQ_PARTY_INFO,
+		CZ_REQ_RETURN_ORIGIN_SERVER,
+		CZ_ANS_GIVEUP_PREV_PLAYING_INDUN,
+		ZC_FOLLOW_TO_ACTOR,
+		ZC_STOP_FOLLOW_TO_ACTOR,
+		ZC_SET_WEBSERVICE_URL,
+		CZ_CREATE_GUILD_BY_WEB,
+		CZ_GUILD_MEMBER_INVITE_BY_WEB,
+		ZC_GUILD_MEMBER_INVITE_BY_WEB,
+		CZ_WEEKLY_BOSS_INDUN_ENTER,
+		CZ_FIELD_BOSS_INDUN_ENTER,
+		CZ_SOLO_INDUN_ENTER,
+		CZ_GUILD_MEMBER_INVITE_ACCEPT_BY_WEB,
+		CZ_GUILD_APPLICATION_USER_ACCEPT,
+		ZC_DECREASE_SILVER,
+		CZ_POST_GUILE_EMBLEM,
+		CZ_REQUEST_CERTAIN_WEBSERVICE_URL,
+		ZC_RESPONSE_CERTAIN_WEBSERVICE_URL,
+		CZ_GUILD_AGIT_ENTER,
+		ZC_RELOAD_SELL_LIST,
+		ZC_NOTCIE_BROKEN_SYNC_MARKET_ITEM,
+		CZ_BADPLAYER_REPORT,
+		ZC_ERROR_INFO,
+		ZC_SEND_JSON_DUMP,
+		CZ_SEND_JSON_DUMP,
+		CZ_CLIENT_REMOTE_LOG,
+		CZ_REQ_COMMON_SKILL_LIST,
+		ZC_COMMON_SKILL_LIST,
+		CZ_REG_EXP_ORB_ITEM,
+		CZ_REQ_QUICKSLOT_LIST,
+		ZC_REG_EXP_ORB_ITEM,
+		ZC_REG_EXP_SUB_ORB_ITEM,
+		ZC_FILL_EXP_ORB,
+		ZC_FILL_EXP_SUB_ORB,
+		ZC_FIXCAMERA,
+		ZC_CANCEL_FIXCAMERA,
+		CZ_SWAP_ITEM_IN_WAREHOUSE,
+		ZC_SWAP_ITEM_IN_WAREHOUSE_FAIL,
+		CZ_REQ_PCBANG_SHOP_UI,
+		CZ_REQ_PCBANG_SHOP_CONNECT_REWARD,
+		CZ_REQ_PCBANG_SHOP_TOTAL_REWARD,
+		CZ_REQ_PCBANG_SHOP_PURCHASE,
+		CZ_REQ_PCBANG_SHOP_RENTAL,
+		CZ_REQ_PCBANG_SHOP_REFRESH,
+		ZC_PCBANG_SHOP_COMMON,
+		ZC_PCBANG_SHOP_MAIN,
+		ZC_PCBANG_SHOP_POINTSHOP_CATALOG,
+		ZC_PCBANG_SHOP_POINTSHOP_BUY_COUNT,
+		ZC_PCBANG_SHOP_RENTAL,
+		ZC_PCBANG_SHOP_GUIDE,
+		ZC_PCBANG_SHOP_REWARD,
+		ZC_PCBANG_STATE,
+		ZC_PCBANG_POINT,
+		CZ_SEND_BEAUTYSHOP_PURCHASE_LIST,
+		CZ_REQ_BEAUTYSHOP_INFO,
+		ZC_RES_BEAUTYSHOP_PURCHASED_HAIR_LIST,
+		CZ_SEND_BEAUTYSHOP_TRYITON_LIST,
+		CZ_SEND_BEAUTYSHOP_TRYITON_CANCEL,
+		CZ_ITEMPROPCHANGE,
+		CZ_ITEMPROPCHANGE_GEM_ADD,
+		CZ_ITEMPROPCHANGE_GEM_DROP,
+		CZ_ITEMPROPCHANGE_GEM_POP,
+		CZ_ITEMPROPCHANGE_GEM_ALL_SLOT,
+		CZ_ITEMPROPCHANGE_ICHOR_RANDOM_OPTION,
+		CZ_ITEMPROPCHANGE_ICHOR_RANDOM_OPTION_MAX_VALUE,
+		CZ_ITEMPROPCHANGE_OPTION_CHANGE,
+		CZ_ITEMPROPCHANGE_ENCHANT,
+		CZ_ITEMPROPCHANGE_ENCHANT_MAX_VALUE,
+		CZ_TOKEN_WARP,
+		CZ_REGISTER_FAVORITE_MAP,
+		CZ_UNREGISTER_FAVORITE_MAP,
+		ZC_VERTICAL_MOTION,
+		CZ_REQ_PLAY_FLUTING,
+		ZC_PLAY_FLUTING,
+		CZ_REQ_READY_FLUTING,
+		ZC_READY_FLUTING,
+		CZ_REQ_STOP_FLUTING,
+		ZC_STOP_FLUTING,
+		ZC_STOP_FLUTING_ALL,
+		CZ_REQ_CLOSE_INSTRUMENT,
+		ZC_READY_INSTRUMENT,
+		CZ_REQ_PLAY_INSTRUMENT,
+		ZC_PLAY_INSTRUMENT,
+		CZ_REQ_STOP_INSTRUMENT,
+		ZC_STOP_INSTRUMENT,
+		ZC_STOP_INSTRUMENT_ALL,
+		ZC_RESERVE_PROPERTY,
+		CZ_REQ_SOLO_DUNGEON_REWARD,
+		CZ_REQ_SOLO_DUNGEON_RANKING_PAGE,
+		ZC_SOLO_DUNGEON_STAGE_SCORE,
+		ZC_SOLO_DUNGEON_RANKING,
+		ZC_SOLO_DUNGEON_MY_RANKING,
+		ZC_REDIS_RANKING_INFO,
+		ZC_CUSTOM_WHEEL_ZOOM,
+		ZC_MGAME_POSITION,
+		ZC_ITEM_LOCK_STATE,
+		ZC_ALTER_HIT_RADIUS,
+		ZC_CASH_INVENTORY_LIST,
+		CZ_NEXON_PAYMENT_PAGE,
+		ZC_NEXON_PAYMENT_PAGE,
+		ZC_SOLD_ITEM_NOTICE,
+		CZ_REQ_GUILD_ASSET,
+		ZC_GUILD_BUILDING_OBJECT_ADD,
+		ZC_GUILD_BUILDING_OBJECT_REMOVE,
+		CZ_CHANGE_REPRESENTATION_CLASS,
+		CZ_REQ_COMMANDER_INFO,
+		ZC_CUSTOM_COMMANDER_INFO,
+		ZC_TRUST_INFO,
+		ZC_GUILD_COOLDOWN_LIST,
+		ZC_CLASS_RESET_POINT_INFO,
+		ZC_EQUIP_CARD_INFO,
+		ZC_EQUIP_GEM_INFO,
+		ZC_FADE_IN,
+		ZC_OBJECT_PROPERTY_BY_NAMES,
+		CZ_REQ_LEARN_ABILITY,
+		CZ_NOTICE_GUILD_APPLICATION_REQUEST,
+		ZC_START_IMITATING_ANIMATION,
+		ZC_STOP_IMITATING_ANIMATION,
+		CZ_START_IMITATING_ANIMATION_ACK,
+		CZ_FOLLOW_TO_ACTOR_ACK,
+		CZ_REQUEST_EVENT_USER_TYPE_INFO,
+		CZ_REQUEST_USED_MEDAL_TOTAL,
+		ZC_ZOMBIE_ALIVE,
+		CZ_ZOMBIE_ALIVE_ACK,
+		ZC_FRIENDLY_STATE,
+		ZC_ANCIENT_FRIENDLY_STATE,
+		ZC_CHANGE_SKIN_COLOR,
+		ZC_SET_FACE_RENDER_OPTION,
+		ZC_SET_FACE_STATE,
+		CZ_DPK_QUEST_DESTORY_SESSIONOBJ,
+		CZ_REQUEST_BLACK_MARKET_BID,
+		CZ_REQUEST_BLACK_MARKET_BID_INFO,
+		ZC_NOTICE_FAILURE_IN_BIDDING,
+		ZC_NOTICE_BIDDING_SUCCESS,
+		ZC_NOTICE_DUPLICATE_BIDDING,
+		ZC_NOTICE_NOTICE_BLACK_MARKET_END_TO_USER,
+		ZC_CONFUSE_STATE,
+		ZC_ADDONUI_MSG,
+		CZ_COLONY_REWARD_REQ,
+		ZC_COLONY_REWARD_DETAILLIST_UPDATE,
+		ZC_COLONY_SECONDLEAGUE_REWARD_START,
+		ZC_COLONY_SECONDLEAGUE_REWARD_END,
+		CZ_COLONY_TAXINQUIRELIST_REQ,
+		ZC_COLONY_TAXINQUIRELIST_REQ,
+		ZC_START_FIELDBOSS_WORLD_EVENT,
+		ZC_END_FIELDBOSS_WORLD_EVENT,
+		ZC_FIELDBOSS_REMOVE_ITEM,
+		CZ_BID_FIELDBOSS_WORLD_EVENT,
+		ZC_WIN_FIELDBOSS_WORLD_EVENT_ITEM,
+		ZC_LOSE_FIELDBOSS_WORLD_EVENT_ITEM,
+		ZC_SILVER_GACHA_DECREASE_ITEM_COUNT,
+		CZ_REQUEST_SILVER_GACHA_GAMBLE,
+		CZ_REQUEST_SILVER_GACHA_INFO,
+		ZC_RESPONSE_SILVER_GACHA_INFO,
+		CZ_MAKE_ITEM_FROM_DRESS_ROOM,
+		ZC_START_CASUAL_GAMBLE,
+		ZC_CASUAL_GAMBLE_ITEM_GET,
+		CZ_REQUEST_CASUAL_GAMBLE,
+		ZC_END_CASUAL_GAMBLE,
+		CZ_REQUEST_COMMON_GAMBLE,
+		ZC_COMMON_GAMBLE_ITEM_GET,
+		ZC_WEEKLY_BOSS_RANK_INFO,
+		ZC_WEEKLY_BOSS_RANK_MY_DAMAGE,
+		ZC_WEEKLY_BOSS_ACCUMULATED_DAMAGE,
+		ZC_WEEKLY_BOSS_ABSOLUTE_REWARD_LIST,
+		ZC_WEEKLY_BOSS_RECEIVED_ABSOLUTE_REWARD_LIST,
+		CZ_REQUEST_WEEKLY_BOSS_ABSOLUTE_REWARD_LIST,
+		CZ_REQUEST_WEEKLY_BOSS_RECEIVE_ABSOLUTE_REWARD,
+		CZ_REQUEST_WEEKLY_BOSS_CLASS_RANKING_REWARD,
+		ZC_WEEKLY_BOSS_RECEIVED_RANKING_REWARD,
+		ZC_WEEKLY_BOSS_RANKING_REWARD_LIST,
+		ZC_WEEKLY_BOSS_CLASS_RANKING_REWARD_LIST,
+		CZ_REQUEST_WEEKLY_BOSS_RANKING_REWARD_LIST,
+		CZ_REQUEST_WEEKLY_BOSS_RECEIVE_RANKING_REWARD,
+		CZ_REQUEST_WEEKLY_BOSS_ACCEPT_ABSOLUTE_REWARD,
+		CZ_REQUEST_WEEKLY_BOSS_ACCEPT_ABSOLUTE_REWARD_ALL,
+		CZ_REQUEST_WEEKLY_BOSS_ACCEPT_RANKING_REWARD,
+		CZ_REQUEST_WEEKLY_BOSS_ACCEPT_CLASS_RANKING_REWARD,
+		CZ_REQUEST_WEEKLY_BOSS_RANKING_INFO_LIST,
+		CZ_REQUEST_WEEKLY_BOSS_NOW_WEEK_NUM,
+		CZ_REQUEST_WEEKLY_BOSS_START_TIME,
+		CZ_REQUEST_WEEKLY_BOSS_END_TIME,
+		CZ_REQUEST_WEEKLY_BOSS_PATTERN_INFO,
+		ZC_WEEKLY_BOSS_NOW_WEEK_NUM,
+		ZC_WEEKLY_BOSS_START_TIME,
+		ZC_WEEKLY_BOSS_END_TIME,
+		ZC_WEEKLY_BOSS_PATTERN_INFO,
+		ZC_WEEKLY_BOSS_RECEIVED_CLASS_RANKING_REWARD,
+		CZ_REQUEST_WEEKLY_BOSS_RECEIVE_CLASS_RANKING_REWARD,
+		CZ_REQUEST_WEEKLY_BOSS_ENABLE_CLASS_RANKING_SEASON,
+		ZC_REQUEST_WEEKLY_BOSS_ENABLE_CLASS_RANKING_SEASON,
+		CZ_REQUEST_DPS_START,
+		ZC_REQUEST_DPS_START,
+		CZ_MYTHIC_DUNGEON_REQUEST_RANK_INFO,
+		CZ_MYTHIC_DUNGEON_REQUEST_PATTERN,
+		ZC_MYTHIC_DUNGEON_RANK_INFO,
+		CZ_MYTHIC_DUNGEON_REQUEST_CURRENT_SEASON,
+		ZC_MYTHIC_DUNGEON_CURRENT_SEASON,
+		ZC_MYTHIC_DUNGEON_PATTERN_INFO,
+		ZC_FIELD_BOSS_PATTERN_INFO,
+		CZ_REQUEST_FIELD_BOSS_PATTERN_INFO,
+		CZ_REQUEST_FIELD_BOSS_RANKING_INFO,
+		ZC_FIELD_BOSS_RANKING_INFO,
+		CZ_REQUEST_BORUTA_REWARD,
+		ZC_SEND_BORUTA_RANK_LIST,
+		CZ_REQUEST_BORUTA_RANK_LIST,
+		CZ_REQUEST_ACCEPT_REWARD_INFO,
+		ZC_RESPONSE_ACCEPT_REWARD_INFO,
+		CZ_REQUEST_BORUTA_NOW_WEEK_NUM,
+		ZC_RESPONSE_BORUTA_NOW_WEEK_NUM,
+		CZ_REQUEST_BORUTA_START_TIME,
+		ZC_BORUTA_START_TIME,
+		CZ_REQUEST_BORUTA_END_TIME,
+		ZC_BORUTA_END_TIME,
+		CZ_RECEIVE_PERSONAL_RANK_REWARD,
+		CZ_ADD_PARTY_INFO,
+		CZ_UPDATE_PARTY_INFO,
+		CZ_REMOVE_PARTY_INFO,
+		CZ_REQUEST_FIND_PARTY_JOIN,
+		ZC_CONFIRM_FIND_PARTY_JOIN,
+		CZ_CONFIRM_FIND_PARTY_JOIN,
+		CZ_HOUSING_OPEN_EDIT_MODE,
+		CZ_HOUSING_CLOSE_EDIT_MODE,
+		CZ_HOUSING_REQUEST_GRID_ARRANGED_FURNITURE,
+		CZ_HOUSING_REQUEST_ARRANGED_FURNITURE,
+		ZC_HOUSING_READY_GRID,
+		ZC_HOUSING_READY_ARRANGED_FURNITURE,
+		ZC_HOUSING_ANSWER_ARRANGED_FURNITURE,
+		ZC_HOUSING_START_ARRANGEMENT_FURNITURE,
+		CZ_HOUSING_REQUEST_ARRANGEMENT_FURNITURE,
+		CZ_HOUSING_CANCEL_ARRANGEMENT_FURNITURE,
+		CZ_HOUSING_REQUEST_REMOVE_FURNITURE,
+		CZ_HOUSING_REQUEST_REMOVE_FURNITURE_ALOT,
+		CZ_HOUSING_REQUEST_REMOVE_ALL_FURNITURE,
+		ZC_HOUSING_ANSWER_REMOVE_FURNITURE,
+		CZ_HOUSING_REQUEST_ENABLE_MOVE_FURNITURE,
+		ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE,
+		CZ_HOUSING_REQUEST_MOVE_FURNITURE,
+		CZ_HOUSING_REQUEST_GUILD_AGIT_INFO,
+		ZC_HOUSING_ANSWER_GUILD_AGIT_INFO,
+		CZ_HOUSING_REQUEST_GUILD_AGIT_EXTENSION,
+		CZ_HOUSING_REQUEST_GUILD_LAB_USE_RESEARCH,
+		CZ_HOUSING_REQUEST_GUILD_LAB_LEVEL_UP,
+		CZ_HOUSING_REQUEST_GUILD_LAB_RESEARCH_LEVEL_UP,
+		CZ_HOUSING_REQUEST_GUILD_CONTRIBUTION_TO_MILEAGE,
+		CZ_HOUSING_REQUEST_GUILD_MILEAGE_TO_CONTRIBUTION,
+		CZ_HOUSING_REQUEST_GUILD_CONTIRUBTION_DISTRIBUTE,
+		CZ_HOUSING_REQUEST_GUILD_POINT_UP,
+		CZ_HOUSING_REQUEST_HOUSING_SHOP_TRADE,
+		ZC_HOUSING_CREATE_BG_FURNITURE,
+		ZC_HOUSING_MOVE_BG_FURNITURE,
+		ZC_HOUSING_REMOVE_BG_FURNITURE,
+		CZ_HOUSING_PAGE_SAVE,
+		CZ_HOUSING_PAGE_LOAD,
+		CZ_HOUSING_PAGE_DELETE,
+		CZ_PERSONAL_HOUSING_REQUEST_LEAVE,
+		CZ_PERSONAL_HOUSING_REQUEST_BUY_BACKGROUND,
+		CZ_PERSONAL_HOUSING_REQUEST_APPLY_BACKGROUND,
+		CZ_HOUSING_REQUEST_PREVIEW,
+		ZC_HOUSING_ANSWER_PREVIEW,
+		CZ_HOUSING_REQUEST_POST_HOUSE_WARP,
+		CZ_PERSONAL_HOUSING_REQUEST_GROUP_LIST,
+		ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST,
+		ZC_REBUILD_POPUP,
+		ZC_ANCIENT_CARD_ADD,
+		ZC_ANCIENT_CARD_REMOVE,
+		ZC_ANCIENT_CARD_COMBINE,
+		ZC_ANCIENT_CARD_EVOLVE,
+		ZC_ANCIENT_CARD_LOCK,
+		ZC_ANCIENT_CARD_UPDATE,
+		ZC_ANCIENT_CARD_RESET,
+		ZC_ANCIENT_CARD_LOAD,
+		ZC_ANCIENT_CARD_EXP_UP,
+		ZC_ANCIENT_MONSTER_SUMMON,
+		ZC_ANCIENT_MONSTER_DEAD,
+		CZ_ANCIENT_CARD_SELL,
+		CZ_ANCIENT_CARD_SWAP,
+		CZ_ANCIENT_MON_ALLKILL,
+		CZ_ANCIENT_CARD_COMBINE,
+		CZ_ANCIENT_CARD_EVOLVE,
+		CZ_ANCIENT_CARD_LOCK,
+		CZ_FORCE_SKILL_RANGE,
+		CZ_VARIABLE_RANGE_RESULT,
+		CZ_CANCEL_PAIR_ANIMATION,
+		ZC_SET_DAYLIGHT_INFO,
+		ZC_DAYLIGHT_SYNCHRONIZE_TIME,
+		ZC_DAYLIGHT_FIXED,
+		CZ_SELECTED_LANGUAGE,
+		CZ_ACCEPT_FIELD_DUNGEON_REJOIN,
+		CZ_UDP_MOVE_INFO,
+		ZC_UDP_MOVE_INFO,
+		ZC_UDP_MULTI_PACKET,
+		ZC_MAIN_SECTOR_INFO,
+		ZC_ADD_CHATBALLOON_SKIN,
+		CZ_SET_CHATBALLOON_SKIN,
+		ZC_SET_CHATBALLOON_SKIN,
+		ZC_UPDATE_CHATBALLOON_SKIN,
+		ZC_AUTOSELLER_LIST,
+		ZC_AUTOSELLER_TITLE,
+		CZ_DO_CLIENT_MOVE_CHECK,
+		ZC_IS_SUMMONING_MONSTER,
+		ZC_IS_SUMMON_SORCERER_MONSTER,
+		CZ_SUMMON_PET,
+		CZ_SELECT_GROUND_POS_START,
+		CZ_SELECT_GROUND_POS_END,
+		CZ_REQ_DAMAGEFONT_SKIN,
+		CZ_SET_DAMAGEFONT_SKIN,
+		ZC_RES_DAMAGEFONT_SKIN,
+		CZ_REQ_DAMAGEEFFECT_SKIN,
+		CZ_SET_DAMAGEEFFECT_SKIN,
+		ZC_RES_DAMAGEEFFECT_SKIN,
+		CZ_SUMMON_CUPOLE,
+		CZ_CUPOLE_SLOT_SWAP,
+		ZC_SUMMON_CUPOLE,
+		ZC_UNSUMMON_CUPOLE,
+		CZ_CUPOLE_FAVORITE,
+		ZC_CUPOLE_FAVORITE,
+		CZ_REQUEST_GODDESS_ROULETT,
+		CZ_REQUEST_GODDESS_ROULETT_STATE,
+		ZC_OVERHEAT_RESET_TIME,
+		CZ_PERSONAL_HOUSING_SHOP_PAYMENT,
+		CZ_START_SERVER_TRACING,
+		CZ_PERSONAL_HOUSING_BOARD_LOG,
+		ZC_TAUNT_START,
+		ZC_TAUNT_END,
+		CZ_CHECK_USE_NAME,
+		CZ_REQ_FIELD_BOSS_EXIST,
+		ZC_RESPONSE_FIELD_BOSS_EXIST,
+		CZ_ACCOUNT_ABILITY_LEVELUP,
+		CZ_ACCOUNT_ABILITY_RESET,
+		ZC_BREATH_ATTACK_TARGET_CAHSE,
+		CZ_BREATH_ATTACK_TARGET_CAHSE_RESULT,
+		CZ_OPEN_SHOP_LOG,
+		CZ_SELECT_PARTY_BUFF,
+		CZ_SELECT_SOLO_BUFF,
+		CZ_REPUTATION_SHOP_TRADE,
+		ZC_RELIC_RP_CHANGE,
+		CZ_REQUEST_RANK_SYSTEM_TIME_TABLE,
+		ZC_RESPONSE_RANK_SYSTEM_TIME_TABLE,
+		CZ_REQUEST_RANK_SYSTEM_RANK_LIST,
+		ZC_RESPONSE_RANK_SYSTEM_RANK_LIST,
+		CZ_REQUEST_RANK_SYSTEM_MY_DATA,
+		ZC_RESPONSE_RANK_SYSTEM_MY_DATA,
+		ZC_RANK_SYSTEM_RECEIVED_REWARD_INFO_LIST,
+		ZC_RANK_SYSTEM_RECEIVED_REWARD_INFO,
+		CZ_REQUEST_DRAW_TOSHERO_EMBLEM,
+		ZC_RESPONSE_DRAW_TOSHERO_EMBLEM,
+		CZ_UDP_HOLEPUNCH,
+		ZC_UDP_HOLEPUNCH_ACK,
+		CZ_REQ_CHALLENGE_AUTOMATCH_UI_OPEN,
+		ZC_MONSTER_CANCEL_CASTING_UI,
+		CZ_DIALOG_SELECT_MULTIPLE,
+		CZ_REQ_RAID_AUTOMATCH_UI_OPEN,
+		CZ_REQ_RAID_SOLO_UI_OPEN,
+		CZ_REQ_TOSHERO_ENTER,
+		CZ_REQ_EARRING_RAID_ENTER,
+		CZ_REQ_PILGRIM_ENTER,
+		CZ_REQ_LEVEL_DUNGEON_ENTER,
+		CZ_REQ_USE_RAID_AUTO_SWEEP,
+		CZ_REQ_BRIDGE_WAILING,
+		CZ_REQUEST_CARD_PRESET,
+		ZC_RESPONSE_CARD_PRESET,
+		CZ_SET_CARD_PRESET,
+		CZ_SET_CARD_PRESET_TITLE,
+		ZC_TOSHERO_INFO,
+		ZC_TOSHERO_POINT_INFO,
+		ZC_TOSHERO_BUFFSHOP_INFO,
+		CZ_TOSHERO_BUY_BUFF,
+		CZ_TOSHERO_SELL_BUFF,
+		CZ_TOSHERO_SELECT_BUFF,
+		CZ_TOSHERO_UPGRADE_BUFF,
+		CZ_TOSHERO_DESELECT_BUFF,
+		CZ_TOSHERO_COMBINE_THREE_BUFF,
+		CZ_TOSHERO_CHANGE_ATTRIBUTE,
+		CZ_TOSHERO_RUN_LOTTERY,
+		CZ_TOSHERO_REINFORCE,
+		CZ_TOSHERO_CHANGE_EQUIP_OPTION,
+		CZ_TOSHERO_READY,
+		ZC_START_RANGE_PREVIEW,
+		ZC_END_RANGE_PREVIEW,
+		ZC_CLEAR_RANGE_PREVIEW,
+		ZC_FIX_DIRECTION,
+		ZC_FIX_DIRECTION_END,
+		CZ_REQ_TOGGLE_ABILITY,
+		ZC_MY_CHARACTER_LIST,
+		CZ_REG_CHANGE_CHARACTER_SLOT,
+		CZ_DEREG_CHANGE_CHARACTER_SLOT,
+		ZC_START_CHARACTER_CHANGE,
+		ZC_FINISH_CHARACTER_CHANGE,
+		CZ_REQ_CHARACTER_CHANGE,
+		ZC_CHARACTER_CHANGE_REGIST_COMPLETE,
+		ZC_CHARACTER_CHANGE_DEREGIST_COMPLETE,
+		ZC_MY_CHARACTER_DECK_LIST,
+		CZ_REQ_FAVORITE_INDUN_SET,
+		ZC_EQUIP_DUMMY_FOR_SKILL,
+		CZ_REQUEST_AETHER_GEM_REINFORCE,
+		ZC_SET_AURA_INFO,
+		CZ_OPEN_HELP,
+		CZ_REQ_UNKNOWN_SANTUARTY_BUFF,
+		ZC_SEND_CURRENT_JOIN_MGAME_NAME,
+		CZ_REQ_SUMMON_RIDE_PET,
+		CZ_REQ_SELECT_RIDE_PET,
+		CZ_ANS_GIVEUP_PREV_PLAYING_INDUN_PARTY,
+		CZ_LOCK_COLONY_ZONE_ENTER,
+		CZ_DICE,
+		ZC_SET_PLAYER_CONTENTS_RECORD_RESULT,
+		ZC_SEND_TEAM_BATTLE_LEAGUE_RESULT_LIST,
+		ZC_SEND_TEAM_BATTLE_LEAGUE_DETAIL_DAMAGE_LIST,
+		ZC_SEND_TEAM_BATTLE_LEAGUE_DETAIL_HEAL_LIST,
+		ZC_TEAM_BATTLE_LEAGUE_OBSERVE_RELEASE_LOCK_MOVE_KEY,
+		ZC_START_COMBO_INPUT_CMD,
+		ZC_END_COMBO_INPUT_CMD,
+		CZ_END_COMBO_INPUT,
+		CZ_CONTENTS_ALERT_MOVE,
+		ZC_TIMING_GAUGE_START,
+		ZC_TIMING_GAUGE_END,
+		ZC_CHARGING_GAUGE_START,
+		ZC_CHARGING_GAUGE_END,
+		ZC_INTERACTION_RIDE,
+		ZC_INTERACTION_COOL_TIME,
+		ZC_SQUAD_INFO,
+		CZ_INVITE_SQUAD_MEMBER,
+		ZC_INVITE_SQUAD_MEMBER,
+		CZ_RESPONSE_INVITED_SQUAD,
+		CZ_LEAVE_SQUAD,
+		CZ_CREATE_SQUAD,
+		CZ_DISBAND_SQUAD,
+		CZ_REQ_EARRING_RAID_PARTY_SKILL,
+		ZC_CUSTOM_CAMERA_ZOOM,
+		ZC_SHOW_SCENE_MODEL_LOCAL,
+		ZC_ADD_PAD_VISIBLE_OPTION,
+		ZC_REMOVE_PAD_VISIBLE_OPTION,
+		ZC_MGAME_USER_DAMAGE_LIST,
+		ZC_SEND_TRIBULATION_INFO,
+		CZ_REQ_TRIBULATION_INFO,
+		CZ_SEND_SELECTED_TRIBULATION_INFO,
+		ZC_SEND_SELECTED_TRIBULATION_INFO,
+		ZC_SEND_TRIBULATION_CLEAR,
+		CZ_SAVE_CLASS_SNAPSHOT,
+		CZ_RENAME_CLASS_SNAPSHOT,
+		CZ_UNEQUIP_ITEM_ALL,
+		CZ_APPLY_CLASS_SNAPSHOT,
+		CZ_REMOVE_CLASS_SNAPSHOT,
+		CZ_REQ_RUNSCRIPT,
+		CZ_REQ_TRANSLATE_MSG,
+		ZC_SEND_TRANSLATED_MSG,
+		ZC_SET_SOUND_MUTE,
+		ZC_SET_MUSIC_MUTE,
+		ZC_BREAK_SHIELD,
+		ZC_SHOW_MON_CASTING_UI,
+		CZ_REQ_RAID_GIVE_UP,
+		CZ_REQ_APPLY_HUD_SKIN,
+		CZ_REQ_CURRENT_HUD_SKIN,
+		ZC_SEND_MODE_HUD_SKIN,
+		ZC_SEND_APPLY_HUD_SKIN_MYSELF,
+		ZC_SEND_APPLY_HUD_SKIN_PARTY,
+		ZC_SEND_APPLY_HUD_SKIN_OTHER,
+		CZ_REQ_FIELD_BOSS_INDUN_REENTER_CHECK,
+		ZC_SEND_FIELD_BOSS_INDUN_REENTER_CHECK,
+		CZ_REQ_FULLSCREEN_MOVE_NPC,
+		ZC_VERTIGO_GAMES_USER_BALANCE,
+		CZ_BUY_VERTIGO_GAMES_PRODUCT,
+		ZC_CHANGE_QUICKSLOT_INIT,
+		CZ_REQ_QUICKSLOT_REFRESH,
+		ZC_SET_AURA_INTENSIVE_INFO,
+		ZC_UPDATE_SKL_SPDRATE_LIST,
+		ZC_CHARACTER_INDUN_INFO_RESPONSE,
+		ZC_ON_AFTER_IMAGE,
+		ZC_OFF_AFTER_IMAGE,
+		ZC_SEND_NONE_TARGETING_LIST,
+		ZC_UNITY_GROUND_EFFECT,
+		ZC_MON_LEADER_SHOW_ICON,
+		ZC_UPDATE_FAINT,
+		CZ_REQUEST_DIALOG_UI,
+		CZ_USE_INVITE_EVENT_CODE,
+		CZ_GET_INVITE_EVENT_REWARD,
+		ZC_ONLY_ROTATE_MODE,
+		CS_LOGIN,
+		SC_NORMAL,
+		SC_FROM_INTEGRATE,
+		CS_REQ_ADD_FRIEND,
+		CS_REQ_BLOCK_FRIEND,
+		CS_FRIEND_CMD,
+		CS_FRIEND_SET_ADDINFO,
+		CS_CHAT,
+		CS_GROUP_CHAT_INVITE,
+		CS_GROUP_CHAT_INVITE_BY_TAG,
+		CS_ALLOW_GROUP_CHAT_TAG_INVITE,
+		CS_REFRESH_GROUP_CHAT,
+		CS_CREATE_GROUP_CHAT,
+		CS_REQ_CHAT_HISTORY,
+		CS_REQ_OUT_ROOM,
+		CS_REQ_RELATED_PC_SESSION,
+		CS_REDIS_SKILLPOINT,
+		CS_PARTY_CLIENT_INFO_SEND,
+		CS_NORMAL_GAME_START,
+		CS_REQUEST_PVP_RANKING,
+		CS_REQUEST_ALL_SEASON_TOP_PVP_RANKING,
+		CS_INVITE_PARTY_PVP,
+		CS_ACCEPT_PARTY_PVP,
+		CS_LIKE_IT,
+		CS_UNLIKE_IT,
+		CS_LIKE_IT_CONFIRM,
+		CS_ADD_RELATION_SCORE,
+		CS_GET_LIKE_COUNT,
+		CS_REQ_MEMBER_LOGOUT_TIME,
+		CS_INVITE_GROUPCHAT_ACCEPT,
+		SC_LOGIN_OK,
+		CS_DICE,
+		SC_SYSTEM_MSG,
+		ZC_InteractionInfo,
+		CZ_InteractionCancel,
+		ZC_InteractionRideUseSkill,
+
+		// 10539
+		CB_DELETE_PET,
+		CS_REQ_MARKET_LIST,
+		CS_REQ_MY_SELL_LIST,
+		CS_PC_INTERACTION,
+		CS_PC_INTERACTION_HISTORY,
+		CZ_SORT_ETC_INV_CHANGE_INDEX,
+		CZ_SORT_INV_CHANGE_INDEX,
+		ZC_UPDATE_MSHIELD,
+
+		// 11097
+		CB_IES_MODIFY_INFO,
+		CB_NGS,
+		ZC_TREASUREMARK_LIST_MAP,
+		CS_REGISTER_SNS_ID,
+		CS_REQ_SNS_PC_INFO,
+		CS_CHAT_HISTORY,
+		CS_CHAT_READ,
+		CS_REMOVE_GROUP_MEMBER,
+		CS_PVP_COMMAND,
+		CZ_LEAVE_TO_DUNGEON,
+		CZ_REQ_CHAR_SLOT,
+		CZ_ITEM_ADD_WIKI,
+		CZ_ACTIVE_ABILITY,
+		ZC_ACTIVE_ABILITY,
+		CZ_REQ_OPEN_ITEM_DUNGEON,
+		CZ_ANSWER_OPEN_ITEM_DUNGEON,
+		CZ_SEND_ITEM_PROP_TO_ALCHMIST,
+		CZ_EXCUTE_ITEM_DUNGEON,
+		ZC_RECIVE_ITEM_PROP_TO_TARGET,
+		CZ_TARGET_JOB_INFO,
+		ZC_TARGET_JOB_INFO,
+		CZ_COMMON_SHOP_LIST,
+		ZC_COMMON_SHOP_LIST,
+		ZC_PARTY_CHAT,
+		ZC_WIKI_LIST,
+		ZC_WIKI_ADD,
+		CZ_WIKI_GET,
+		CZ_WIKI_RECIPE_UPDATE,
+		ZC_UI_INFO_LIST,
+		CZ_GET_MAP_REVEAL_ACHIEVE,
+		CZ_SPRAY_REQ_INFO,
+		CZ_SPRAY_DRAW_INFO,
+		ZC_SPRAY_ID,
+		ZC_SPRAY_DRAW_INFO,
+		ZC_SPRAY_LIKE_LIST,
+		ZC_WIKI_COUNT_UPDATE,
+		ZC_WIKI_INT_PROP_UPDATE,
+		ZC_WIKI_BOOL_PROP_UPDATE,
+		CZ_REQ_WIKI_RANK,
+		ZC_WIKI_RANK_LIST,
+		CZ_REQ_WIKI_PROP_RANK,
+		CZ_GET_WIKI_REWARD,
+		ZC_SHOW_MAP,
+		ZC_MONSTER_PROPERTY,
+		ZC_SKILL_RANGE_DONUTS,
+		CZ_REQ_CHANGEJOB,
+		CZ_REQ_WIKI_CATEGORY_RANK_PAGE_INFO,
+		CZ_REQ_MONSTER_RANK_INFO,
+		CZ_REQ_MARKET_LIST,
+		CZ_REQ_MY_SELL_LIST,
+		ZC_FOUND_PARTY_LIST,
+		ZC_NEAR_PARTY_LIST,
+		ZC_RECOMMEND_PARTY_INFO,
+		CZ_REQUEST_SOME_PARTY,
+		CZ_REFRESH_MEMBERRECOMMEND_LIST,
+		CZ_ACCEPT_PARTY_QUEST,
+		CZ_ACCEPT_GUILD_EVENT,
+		CZ_ACCEPT_GUILD_EVENT_RAID,
+		CZ_ACCEPT_PARTY_EVENT,
+		ZC_RECOMMEND_PARTYMEMBER_INFO,
+		CZ_I_NEED_PARTY,
+		CZ_CHECK_PING,
+
+		// 395872
+		CB_RELOAD_BARRACK_CAHR_INFO,
+		CZ_UPDATE_POS,
+		ZC_PLAY_FIX_ANI,
+		ZC_START_ESCAPE_INPUT_CMD,
+		ZC_END_ESCAPE_INPUT_CMD,
+
+		// 397072
+		ZC_PLAY_FULLSCREEN_EFFECT,
+
+		// 398686
+		CZ_REQ_TX_ITEM_STRING,
+		CZ_REQ_DEMON_LAIR_ENTER,
+		CZ_REQ_DEMONLAIR_STATUS_INFO,
+		CZ_APPLY_DEMONLAIR_BUFF_AND_PENALTY,
+		CZ_REQ_CRAFT_TIME_REDUCE_BUFF,
+		CZ_REQ_GUILD_AGIT_MOVE,
+		CZ_REQ_GUILD_TOWER_REMOVE,
+		CZ_REQ_GUILD_QUEST_REWARD_INFO,
+		ZC_SEND_GUILD_QUEST_REWARD_INFO,
+
+	}
+	public static class OpTable
+	{
+
+		private static readonly Dictionary<Op, int> Ops = new();
+		private static readonly Dictionary<int, Op> Codes = new();
 		private static readonly Dictionary<int, int> Sizes = new();
 		private static readonly Dictionary<int, string> Names = new();
 
-		static Op()
-		{
-			Sizes[CB_LOGIN] = 570;
-			Sizes[CB_LOGIN_BY_PASSPORT] = 1242;
-			Sizes[CB_LOGOUT] = 22;
-			Sizes[CB_START_BARRACK] = 87;
-			Sizes[CB_COMMANDER_CREATE] = 117;
-			Sizes[BC_COMMANDER_CREATE_SLOTID] = 11;
-			Sizes[CB_COMMANDER_DESTROY] = 30;
-			Sizes[CB_CHECK_CLIENT_INTEGRITY] = 86;
-			Sizes[CB_CLIENT_INTEGRITY_FAIL] = 1047;
-			Sizes[CB_START_GAME] = 26;
-			Sizes[CB_BARRACKNAME_CHECK] = 344;
-			Sizes[BC_BARRACKNAME_CHECK_RESULT] = 334;
-			Sizes[CB_BARRACKNAME_CHANGE] = 86;
-			Sizes[CB_COMMANDER_MOVE] = 43;
-			Sizes[CB_COMPANION_MOVE] = 50;
-			Sizes[CB_ECHO] = 42;
-			Sizes[BC_LOGINOK] = 156;
-			Sizes[BC_CYOU_LOGIN_FAIL] = 10;
-			Sizes[BC_LOGIN_PACKET_RECEIVED] = 10;
-			Sizes[BC_LOGOUTOK] = 10;
-			Sizes[BC_COMMANDER_LIST] = 0;
-			Sizes[BC_SPLIT_COMMANDER_INFO_LIST] = 0;
-			Sizes[BC_COMMANDER_CREATE] = 618;
-			Sizes[BC_COMMANDER_DESTROY] = 11;
-			Sizes[BC_START_GAMEOK] = 37;
-			Sizes[BC_SINGLE_INFO] = 457;
-			Sizes[BC_MESSAGE] = 0;
-			Sizes[BC_ECHO] = 30;
-			Sizes[BC_MYPAGE_MAP] = 0;
-			Sizes[BC_BARRACKNAME_CHANGE] = 79;
-			Sizes[BC_IES_MODIFY_INFO] = 0;
-			Sizes[BC_IES_MODIFY_LIST] = 0;
-			Sizes[CB_IES_REVISION_DELETE] = 0;
-			Sizes[BC_IES_REVISION_DELETE] = 0;
-			Sizes[CB_SCREENSHOT_HASH] = 54;
-			Sizes[CB_REQ_CHANNEL_TRAFFIC] = 26;
-			Sizes[CB_VISIT] = 88;
-			Sizes[CB_BUY_THEMA] = 34;
-			Sizes[BC_ACCOUNT_PROP] = 0;
-			Sizes[CB_CURRENT_BARRACK] = 51;
-			Sizes[BC_NORMAL] = 0;
-			Sizes[CB_POSE] = 27;
-			Sizes[CB_PLACE_CMD] = 58;
-			Sizes[CB_CHAT] = 0;
-			Sizes[BC_CHAT] = 0;
-			Sizes[CB_ECHO_NORMAL] = 0;
-			Sizes[CB_REQ_SLOT_PRICE] = 22;
-			Sizes[BC_REQ_SLOT_PRICE] = 14;
-			Sizes[CB_CHANGE_BARRACK_LAYER] = 34;
-			Sizes[CB_CHANGE_BARRACK_TARGET_LAYER] = 35;
-			Sizes[CB_SELECT_BARRACK_LAYER] = 26;
-			Sizes[BC_LAYER_CHANGE_SYSTEM_MESSAGE] = 78;
-			Sizes[CB_JUMP] = 31;
-			Sizes[BC_JUMP] = 31;
-			Sizes[BC_SERVER_ENTRY] = 22;
-			Sizes[CB_PET_PC] = 38;
-			Sizes[CB_PET_COMMAND] = 39;
-			Sizes[CB_REQ_CHANGE_POSTBOX_STATE] = 35;
-			Sizes[CB_REQ_GET_POSTBOX_ITEM] = 1063;
-			Sizes[CB_REQ_GET_POSTBOX_ITEM_LIST] = 191;
-			Sizes[CB_REQ_POSTBOX_PAGE] = 26;
-			Sizes[BC_WAIT_QUEUE_ORDER] = 14;
-			Sizes[CB_CANCEL_SERVER_WAIT_QUEUE] = 22;
-			Sizes[CB_GEMSCOOL_PCINFO] = 1302;
-			Sizes[CB_NOT_AUTHORIZED_ADDON_LIST] = 1051;
-			Sizes[CB_DEBUG_LOG_FILE] = 0;
-			Sizes[BC_FAIL_TO_GET_AUTHCODE] = 10;
-			Sizes[CB_CLIENT_REMOTE_LOG] = 2584;
-			Sizes[CB_CHECK_MARKET_REGISTERED] = 30;
-			Sizes[BC_RETURN_PC_MARKET_REGISTERED] = 20;
-			Sizes[BC_CHARACTER_SLOT_SWAP_SUCCESS] = 10;
-			Sizes[CB_CHARACTER_SWAP_SLOT] = 38;
-			Sizes[BC_CHARACTER_SLOT_SWAP_FAIL] = 10;
-			Sizes[BC_DISCONNECT_PACKET_LOG_COUNT] = 14;
-			Sizes[CB_REQ_POSTBOX_REFRESH] = 22;
-			Sizes[CB_TEAM_DESTROY] = 22;
-			Sizes[BC_REQ_SYSTEMINFO] = 19;
-			Sizes[CB_RESPONSE_SYSTEMINFO] = 0;
-			Sizes[CB_OS_INFO] = 24;
-			Sizes[CB_REQ_MOVE_ACCOUNT_DATA] = 62;
-			Sizes[BC_FAILED_MOVE_ACCOUNT_DATA] = 20;
-			Sizes[BC_SUCCESS_MOVE_ACCOUNT_DATA] = 10;
-			Sizes[BC_CHECK_MOVE_ACCOUNT_DATA] = 14;
-			Sizes[CB_RELOAD_BARRACK_CAHR_INFO] = 22;
-			Sizes[CB_SELECTED_LANGUAGE] = 24;
-			Sizes[CZ_CONNECT] = 1269;
-			Sizes[ZC_CONNECT_OK] = 0;
-			Sizes[ZC_MOVE_ZONE] = 11;
-			Sizes[CZ_MOVE_ZONE_OK] = 22;
-			Sizes[ZC_CONNECT_FAILED] = 0;
-			Sizes[CZ_GAME_READY] = 22;
-			Sizes[ZC_MOVE_ZONE_OK] = 69;
-			Sizes[CZ_LOGOUT] = 23;
-			Sizes[CZ_MOVE_BARRACK] = 31;
-			Sizes[ZC_MOVE_BARRACK] = 10;
-			Sizes[ZC_LOGOUT_OK] = 10;
-			Sizes[ZC_MESSAGE] = 0;
-			Sizes[ZC_RESET_VIEW] = 10;
-			Sizes[ZC_START_GAME] = 51;
-			Sizes[ZC_QUIET] = 11;
-			Sizes[ZC_ENTER_PC] = 623;
-			Sizes[ZC_ENTER_MONSTER] = 0;
-			Sizes[ZC_ENTER_DUMMYPC] = 576;
-			Sizes[ZC_UPDATED_DUMMYPC] = 534;
-			Sizes[ZC_ENTER_ITEM] = 107;
-			Sizes[ZC_LEAVE] = 16;
-			Sizes[ZC_MOVE_PATH] = 43;
-			Sizes[ZC_MOVE_POS] = 50;
-			Sizes[ZC_MOVE_BEZIER] = 79;
-			Sizes[ZC_MOVE_DIR] = 76;
-			Sizes[ZC_EXPECTED_STOPPOS] = 39;
-			Sizes[ZC_MSPD] = 26;
-			Sizes[ZC_MOVE_SPEED] = 31;
-			Sizes[ZC_MOVE_STOP] = 27;
-			Sizes[ZC_REST_SIT] = 16;
-			Sizes[ZC_JUMP] = 71;
-			Sizes[ZC_JUMP_DIR] = 63;
-			Sizes[ZC_ORDER_SKILL_JUMP] = 14;
-			Sizes[ZC_SKILL_JUMP] = 42;
-			Sizes[ZC_SET_POS] = 27;
-			Sizes[ZC_FILE_MOVE] = 50;
-			Sizes[ZC_UPDATED_PCAPPEARANCE] = 534;
-			Sizes[ZC_UPDATED_MONSTERAPPEARANCE] = 0;
-			Sizes[ZC_CHAT] = 0;
-			Sizes[ZC_CHAT_WITH_TEXTCODE] = 18;
-			Sizes[ZC_STANCE_CHANGE] = 18;
-			Sizes[ZC_ADD_HP] = 26;
-			Sizes[ZC_SKILL_CAST_CANCEL] = 14;
-			Sizes[ZC_SKILL_CAST] = 42;
-			Sizes[ZC_SKILL_READY] = 54;
-			Sizes[ZC_SKILL_DISABLE] = 19;
-			Sizes[ZC_SKILL_USE_CANCEL] = 14;
-			Sizes[ZC_SKILL_MELEE_TARGET] = 0;
-			Sizes[ZC_SKILL_MELEE_GROUND] = 0;
-			Sizes[ZC_SKILL_FORCE_TARGET] = 0;
-			Sizes[ZC_SKILL_FORCE_GROUND] = 0;
-			Sizes[ZC_SKILL_HIT_INFO] = 0;
-			Sizes[ZC_BUFF_LIST] = 0;
-			Sizes[ZC_BUFF_ADD] = 0;
-			Sizes[ZC_BUFF_UPDATE] = 0;
-			Sizes[ZC_BUFF_REMOVE] = 24;
-			Sizes[ZC_BUFF_CLEAR] = 15;
-			Sizes[CZ_BUFF_REMOVE] = 26;
-			Sizes[CZ_INTE_WARP] = 26;
-			Sizes[ZC_ROTATE] = 28;
-			Sizes[ZC_ROTATE_RESERVED] = 22;
-			Sizes[ZC_HEAD_ROTATE] = 22;
-			Sizes[ZC_TARGET_ROTATE] = 22;
-			Sizes[ZC_QUICK_ROTATE] = 22;
-			Sizes[ZC_POSE] = 39;
-			Sizes[ZC_DEAD] = 0;
-			Sizes[ZC_RESURRECT] = 22;
-			Sizes[ZC_CHANGE_RELATION] = 15;
-			Sizes[ZC_RESURRECT_DIALOG] = 527;
-			Sizes[ZC_HIT_INFO] = 82;
-			Sizes[ZC_HEAL_INFO] = 38;
-			Sizes[ZC_CAUTION_DAMAGE_INFO] = 19;
-			Sizes[ZC_CAUTION_DAMAGE_RELEASE] = 14;
-			Sizes[ZC_KNOCKBACK_INFO] = 74;
-			Sizes[ZC_KNOCKDOWN_INFO] = 75;
-			Sizes[CZ_RESURRECT] = 31;
-			Sizes[ZC_RESURRECT_SAVE_POINT_ACK] = 11;
-			Sizes[ZC_RESURRECT_HERE_ACK] = 11;
-			Sizes[CZ_CLICK_TRIGGER] = 27;
-			Sizes[CZ_KEYBOARD_MOVE] = 73;
-			Sizes[CZ_EXPECTED_STOP_POS] = 43;
-			Sizes[CZ_JUMP] = 71;
-			Sizes[CZ_DASHRUN] = 24;
-			Sizes[CZ_SKILL_JUMP_REQ] = 42;
-			Sizes[CZ_MOVE_PATH] = 36;
-			Sizes[CZ_MOVE_STOP] = 71;
-			Sizes[CZ_UPDATE_POS] = 72;
-			Sizes[CZ_REST_SIT] = 22;
-			Sizes[CZ_ON_AIR] = 22;
-			Sizes[CZ_ON_GROUND] = 22;
-			Sizes[CZ_MOVEMENT_INFO] = 63;
-			Sizes[CZ_SKILL_TARGET] = 33;
-			Sizes[CZ_SKILL_TARGET_ANI] = 37;
-			Sizes[CZ_SKILL_GROUND] = 79;
-			Sizes[CZ_SKILL_SELF] = 48;
-			Sizes[CZ_SKILL_CANCEL] = 24;
-			Sizes[CZ_HOLD] = 23;
-			Sizes[CZ_ROTATE] = 34;
-			Sizes[CZ_HEAD_ROTATE] = 34;
-			Sizes[CZ_TARGET_ROTATE] = 30;
-			Sizes[CZ_POSE] = 47;
-			Sizes[CZ_CHAT] = 0;
-			Sizes[CZ_SELF_CHAT] = 0;
-			Sizes[CZ_CHAT_LOG] = 0;
-			Sizes[CZ_SHOUT] = 0;
-			Sizes[CZ_ITEM_DROP] = 34;
-			Sizes[CZ_ITEM_DELETE] = 38;
-			Sizes[CZ_ITEM_USE] = 34;
-			Sizes[CZ_ITEM_USE_TO_ITEM] = 42;
-			Sizes[CZ_ITEM_USE_TO_GROUND] = 42;
-			Sizes[CZ_ITEM_BUY] = 0;
-			Sizes[CZ_ITEM_SELL] = 0;
-			Sizes[CZ_ITEM_EQUIP] = 31;
-			Sizes[CZ_ITEM_UNEQUIP] = 23;
-			Sizes[CZ_REQ_DELETE_EXPIRED_ITEMS] = 30;
-			Sizes[ZC_CHECK_INVINDEX] = 34;
-			Sizes[CZ_PREMIUM_ENCHANTCHIP] = 38;
-			Sizes[CZ_PREMIUM_GACHACUBE] = 22;
-			Sizes[CZ_PREMIUM_GACHACUBE_LEGEND] = 23;
-			Sizes[ZC_ITEM_INVENTORY_LIST] = 0;
-			Sizes[ZC_ITEM_INVENTORY_DIVISION_LIST] = 0;
-			Sizes[ZC_ITEM_INVENTORY_INDEX_LIST] = 0;
-			Sizes[ZC_ITEM_EQUIP_LIST] = 0;
-			Sizes[ZC_ITEM_ADD] = 0;
-			Sizes[ZC_ITEM_REMOVE] = 28;
-			Sizes[ZC_ITEM_USE] = 18;
-			Sizes[ZC_ITEM_USE_TO_GROUND] = 26;
-			Sizes[ZC_QUICK_SLOT_LIST] = 0;
-			Sizes[ZC_SKILL_LIST] = 0;
-			Sizes[ZC_SKILL_ADD] = 0;
-			Sizes[ZC_SKILL_REMOVE] = 18;
-			Sizes[ZC_ABILITY_LIST] = 0;
-			Sizes[CZ_DISPEL_DEBUFF_TOGGLE] = 26;
-			Sizes[CZ_JUNGTAN_TOGGLE] = 36;
-			Sizes[ZC_EXP_UP] = 34;
-			Sizes[ZC_EXP_UP_BY_MONSTER] = 38;
-			Sizes[ZC_PC_LEVELUP] = 18;
-			Sizes[ZC_PC_STAT_AVG] = 34;
-			Sizes[ZC_MAX_EXP_CHANGED] = 38;
-			Sizes[ZC_TEXT] = 0;
-			Sizes[ZC_UPDATE_SP] = 19;
-			Sizes[ZC_RESTORATION] = 16;
-			Sizes[ZC_UPDATE_MHP] = 18;
-			Sizes[CZ_DIALOG_ACK] = 26;
-			Sizes[CZ_DIALOG_SELECT] = 23;
-			Sizes[CZ_DIALOG_STRINGINPUT] = 150;
-			Sizes[ZC_DIALOG_OK] = 0;
-			Sizes[ZC_DIALOG_NEXT] = 0;
-			Sizes[ZC_DIALOG_SELECT] = 0;
-			Sizes[ZC_DIALOG_ITEM_SELECT] = 0;
-			Sizes[ZC_DIALOG_CLOSE] = 10;
-			Sizes[ZC_DIALOG_TRADE] = 43;
-			Sizes[ZC_DIALOG_COMMON_TRADE] = 43;
-			Sizes[ZC_DIALOG_NUMBERRANGE] = 0;
-			Sizes[ZC_DIALOG_STRINGINPUT] = 0;
-			Sizes[ZC_ADDON_MSG] = 0;
-			Sizes[ZC_ADDON_EVENT_MSG] = 0;
-			Sizes[CZ_UI_EVENT] = 0;
-			Sizes[ZC_PLAY_SOUND] = 24;
-			Sizes[ZC_STOP_SOUND] = 18;
-			Sizes[ZC_PLAY_MUSICQUEUE] = 21;
-			Sizes[ZC_STOP_MUSICQUEUE] = 18;
-			Sizes[ZC_PLAY_ANI] = 30;
-			Sizes[ZC_PLAY_FIX_ANI] = 34;
-			Sizes[ZC_PLAY_ANI_SELFISH] = 23;
-			Sizes[ZC_CHANGE_ANI] = 48;
-			Sizes[CZ_MOVE_CAMP] = 30;
-			Sizes[CZ_CAMPINFO] = 30;
-			Sizes[ZC_CAMPINFO] = 22;
-			Sizes[ZC_FIX_ANIM] = 78;
-			Sizes[ZC_MOVE_ANIM] = 16;
-			Sizes[ZC_STD_ANIM] = 15;
-			Sizes[ZC_PLAY_ALARMSOUND] = 87;
-			Sizes[ZC_STOP_ALARMSOUND] = 14;
-			Sizes[ZC_PLAY_EXP_TEXT] = 18;
-			Sizes[ZC_PLAY_NAVI_EFFECT] = 154;
-			Sizes[ZC_UPDATE_ALL_STATUS] = 34;
-			Sizes[ZC_OBJECT_PROPERTY] = 0;
-			Sizes[ZC_DUMP_PROPERTY] = 0;
-			Sizes[ZC_SHOUT] = 0;
-			Sizes[ZC_SHOUT_FAILED] = 11;
-			Sizes[CZ_EXCHANGE_REQUEST] = 26;
-			Sizes[ZC_EXCHANGE_REQUEST_ACK] = 76;
-			Sizes[ZC_EXCHANGE_REQUEST_RECEIVED] = 75;
-			Sizes[CZ_EXCHANGE_ACCEPT] = 22;
-			Sizes[CZ_EXCHANGE_DECLINE] = 22;
-			Sizes[ZC_EXCHANGE_DECLINE_ACK] = 10;
-			Sizes[ZC_EXCHANGE_START] = 76;
-			Sizes[CZ_EXCHANGE_OFFER] = 42;
-			Sizes[ZC_EXCHANGE_OFFER_ACK] = 0;
-			Sizes[CZ_EXCHANGE_AGREE] = 22;
-			Sizes[ZC_EXCHANGE_AGREE_ACK] = 11;
-			Sizes[CZ_EXCHANGE_FINALAGREE] = 22;
-			Sizes[ZC_EXCHANGE_FINALAGREE_ACK] = 11;
-			Sizes[CZ_EXCHANGE_CANCEL] = 22;
-			Sizes[ZC_EXCHANGE_CANCEL_ACK] = 10;
-			Sizes[ZC_EXCHANGE_SUCCESS] = 10;
-			Sizes[ZC_COOLDOWN_LIST] = 0;
-			Sizes[ZC_COOLDOWN_CHANGED] = 31;
-			Sizes[ZC_OVERHEAT_CHANGED] = 46;
-			Sizes[ZC_TEST_AGENT] = 22;
-			Sizes[ZC_TIME_FACTOR] = 14;
-			Sizes[ZC_PARTY_ENTER] = 0;
-			Sizes[ZC_PARTY_OUT] = 28;
-			Sizes[CZ_PARTY_OUT] = 22;
-			Sizes[ZC_PARTY_DESTROY] = 19;
-			Sizes[ZC_PARTY_INFO] = 0;
-			Sizes[ZC_PARTY_LIST] = 0;
-			Sizes[ZC_PARTY_INST_INFO] = 0;
-			Sizes[ZC_CHANGE_EQUIP_DURABILITY] = 15;
-			Sizes[ZC_UPDATE_REPRESENTATION_CLASS] = 22;
-			Sizes[CZ_DIALOG_TX] = 0;
-			Sizes[CZ_REQ_RECIPE] = 0;
-			Sizes[ZC_CUSTOM_DIALOG] = 79;
-			Sizes[ZC_SESSION_OBJECTS] = 0;
-			Sizes[ZC_SESSION_OBJ_ADD] = 0;
-			Sizes[ZC_SESSION_OBJ_REMOVE] = 14;
-			Sizes[ZC_SESSION_OBJ_TIME] = 18;
-			Sizes[CZ_S_OBJ_VALUE_C] = 38;
-			Sizes[CZ_REQ_NORMAL_TX] = 57;
-			Sizes[ZC_COMMANDER_LOADER_INFO] = 0;
-			Sizes[ZC_MOVE_SINGLE_ZONE] = 22;
-			Sizes[ZC_BACKTO_ORIGINAL_SERVER] = 12;
-			Sizes[CZ_BACKTO_ORIGINAL_SERVER] = 24;
-			Sizes[CZ_REQ_NORMAL_TX_NUMARG] = 0;
-			Sizes[ZC_UI_OPEN] = 43;
-			Sizes[ZC_ENABLE_CONTROL] = 79;
-			Sizes[ZC_CHANGE_CAMERA] = 35;
-			Sizes[ZC_MONSTER_SDR_CHANGED] = 15;
-			Sizes[ZC_MOVE_IGNORE_COLLISION] = 34;
-			Sizes[ZC_CHANGE_CAMERA_ZOOM] = 42;
-			Sizes[ZC_PLAY_SKILL_ANI] = 86;
-			Sizes[ZC_PLAY_SKILL_CAST_ANI] = 34;
-			Sizes[CZ_REQ_ITEM_GET] = 26;
-			Sizes[ZC_ITEM_GET] = 22;
-			Sizes[CZ_GUARD] = 31;
-			Sizes[ZC_GUARD] = 23;
-			Sizes[ZC_STAMINA] = 14;
-			Sizes[ZC_ADD_STAMINA] = 14;
-			Sizes[ZC_GM_ORDER] = 14;
-			Sizes[ZC_MYPC_ENTER] = 28;
-			Sizes[ZC_LOCK_KEY] = 79;
-			Sizes[ZC_SAVE_INFO] = 10;
-			Sizes[CZ_SAVE_INFO] = 0;
-			Sizes[ZC_OPTION_LIST] = 0;
-			Sizes[ZC_SKILLMAP_LIST] = 0;
-			Sizes[CZ_GIVEITEM_TO_DUMMYPC] = 34;
-			Sizes[CZ_FOOD_TABLE_TITLE] = 91;
-			Sizes[CZ_USE_TP_AND_ENTER_INDUN] = 534;
-			Sizes[CZ_USE_RANKRESET_ITEM] = 32;
-			Sizes[CZ_REQ_RANKRESET_SYSTEM] = 26;
-			Sizes[CZ_REQ_MULTIPLE_RANKRESET_SYSTEM] = 34;
-			Sizes[ZC_SET_LAYER] = 15;
-			Sizes[ZC_CREATE_LAYERBOX] = 42;
-			Sizes[ZC_RESET_BOX] = 15;
-			Sizes[ZC_CREATE_SCROLLLOCKBOX] = 42;
-			Sizes[ZC_REMOVE_SCROLLLOCKBOX] = 14;
-			Sizes[CZ_DYNAMIC_CASTING_START] = 53;
-			Sizes[CZ_DYNAMIC_CASTING_END] = 34;
-			Sizes[ZC_CASTING_SPEED] = 26;
-			Sizes[CZ_SKILL_CANCEL_SCRIPT] = 26;
-			Sizes[ZC_LEAVE_TRIGGER] = 10;
-			Sizes[ZC_BORN] = 14;
-			Sizes[ZC_ACHIEVE_POINT_LIST] = 0;
-			Sizes[ZC_SPLIT_ACHIEVE_POINT_LIST] = 0;
-			Sizes[ZC_SPLIT_ACHIEVE_SET] = 0;
-			Sizes[ZC_ACHIEVE_POINT] = 22;
-			Sizes[CZ_ACHIEVE_EQUIP] = 26;
-			Sizes[ZC_ACHIEVE_EQUIP] = 34;
-			Sizes[CZ_ACHIEVE_REWARD] = 27;
-			Sizes[CZ_ACHIEVE_EXCHANGE_EVENT_REWARD] = 26;
-			Sizes[CZ_ACHIEVE_LEVEL_REWARD] = 26;
-			Sizes[CZ_CHANGE_CONFIG] = 30;
-			Sizes[CZ_CHANGE_CONFIG_STR] = 46;
-			Sizes[ZC_WORLD_MSG] = 91;
-			Sizes[ZC_ENABLE_SHOW_ITEM_GET] = 12;
-			Sizes[ZC_LOGIN_TIME] = 18;
-			Sizes[ZC_GIVE_EXP_TO_PC] = 50;
-			Sizes[ZC_LAYER_PC_LIST] = 0;
-			Sizes[ZC_LAYER_PC_SOBJ_PROP] = 0;
-			Sizes[CZ_CUSTOM_COMMAND] = 38;
-			Sizes[ZC_LAYER_INFO] = 14;
-			Sizes[CZ_CHAT_MACRO] = 158;
-			Sizes[ZC_CHAT_MACRO_LIST] = 0;
-			Sizes[ZC_RULLET_LIST] = 0;
-			Sizes[ZC_QUICKSLOT_REGISTER] = 50;
-			Sizes[CZ_QUICKSLOT_LIST] = 0;
-			Sizes[CZ_DOUBLE_ITEM_EQUIP] = 40;
-			Sizes[ZC_TRICK_PACKET] = 0;
-			Sizes[ZC_COOLDOWN_RATE] = 26;
-			Sizes[ZC_MAP_REVEAL_LIST] = 0;
-			Sizes[CZ_MAP_REVEAL_INFO] = 158;
-			Sizes[CZ_MAP_SEARCH_INFO] = 67;
-			Sizes[ZC_EXEC_CLIENT_SCP] = 0;
-			Sizes[ZC_SET_NPC_STATE] = 22;
-			Sizes[ZC_NPC_STATE_LIST] = 0;
-			Sizes[CZ_QUEST_NPC_STATE_CHECK] = 26;
-			Sizes[ZC_RANK_ACHIEVE_ADD] = 18;
-			Sizes[CZ_IES_MODIFY_INFO] = 0;
-			Sizes[ZC_IES_MODIFY_INFO] = 0;
-			Sizes[ZC_IES_MODIFY_LIST] = 0;
-			Sizes[CZ_IES_REVISION_DELETE] = 0;
-			Sizes[ZC_IES_REVISION_DELETE] = 0;
-			Sizes[ZC_EQUIP_ITEM_REMOVE] = 22;
-			Sizes[ZC_SOLD_ITEM_LIST] = 0;
-			Sizes[ZC_SOLD_ITEM_DIVISION_LIST] = 0;
-			Sizes[CZ_SOLD_ITEM] = 31;
-			Sizes[CZ_WAREHOUSE_CMD] = 48;
-			Sizes[CZ_SWAP_ETC_INV_CHANGE_INDEX] = 47;
-			Sizes[CZ_SORT_INV] = 24;
-			Sizes[CZ_EXTEND_WAREHOUSE] = 23;
-			Sizes[CZ_CAST_CONTROL_SHOT] = 22;
-			Sizes[ZC_PC_PROP_UPDATE] = 15;
-			Sizes[ZC_SHOP_POINT_UPDATE] = 58;
-			Sizes[CZ_SHOP_POINT_GET] = 54;
-			Sizes[CZ_CLIENT_DAMAGE] = 26;
-			Sizes[CZ_CLIENT_ATTACK] = 27;
-			Sizes[ZC_SYSTEM_MSG] = 0;
-			Sizes[ZC_FSM_MOVE] = 0;
-			Sizes[CZ_QUEST_CHECK_SAVE] = 62;
-			Sizes[CZ_ACHIEVE_CHASE_SAVE] = 42;
-			Sizes[ZC_MONSTER_LIFETIME] = 18;
-			Sizes[ZC_SHARED_MSG] = 14;
-			Sizes[CZ_REQ_TX_ITEM] = 0;
-			Sizes[CZ_REQ_TX_ITEM_STRING] = 538;
-			Sizes[ZC_TEST_DBG] = 0;
-			Sizes[ZC_MONSTER_DIST] = 0;
-			Sizes[ZC_RESET_SKILL_FORCEID] = 14;
-			Sizes[ZC_EMOTICON] = 22;
-			Sizes[ZC_SHOW_EMOTICON] = 22;
-			Sizes[ZC_TREASUREMARK_BY_MAP] = 0;
-			Sizes[ZC_SHOW_LOCAL_MAP] = 0;
-			Sizes[CZ_FLEE_OBSTACLE] = 38;
-			Sizes[ZC_HOLD_MOVE_PATH] = 15;
-			Sizes[ZC_ENTER_HOOK] = 14;
-			Sizes[ZC_LEAVE_HOOK] = 14;
-			Sizes[ZC_GROUND_EFFECT] = 56;
-			Sizes[ZC_FLY] = 22;
-			Sizes[ZC_FLY_OPTION] = 18;
-			Sizes[ZC_FLY_MATH] = 27;
-			Sizes[ZC_FLY_HEIGHT] = 18;
-			Sizes[ZC_UPDATE_SHIELD] = 23;
-			Sizes[ZC_SHOW_MODEL] = 19;
-			Sizes[ZC_SHOW_SCENE_MODEL] = 15;
-			Sizes[ZC_SKILL_RANGE_DBG] = 74;
-			Sizes[ZC_SKILL_RANGE_FAN] = 50;
-			Sizes[ZC_SKILL_RANGE_SQUARE] = 52;
-			Sizes[ZC_SKILL_RANGE_CIRCLE] = 40;
-			Sizes[ZC_POS_DBG] = 38;
-			Sizes[ZC_TEAMID] = 15;
-			Sizes[ZC_PC] = 0;
-			Sizes[CZ_LOG] = 0;
-			Sizes[ZC_MOTIONBLUR] = 15;
-			Sizes[ZC_PLAY_FORCE] = 82;
-			Sizes[ZC_CAST_TARGET] = 18;
-			Sizes[ZC_START_INFO] = 0;
-			Sizes[ZC_JOB_EXP_UP] = 26;
-			Sizes[ZC_JOB_PTS] = 22;
-			Sizes[ZC_ADDITIONAL_SKILL_POINT] = 0;
-			Sizes[ZC_MON_STAMINA] = 26;
-			Sizes[CZ_CUSTOM_SCP] = 26;
-			Sizes[ZC_VIEW_FOCUS] = 29;
-			Sizes[ZC_HARDCODED_SKILL] = 30;
-			Sizes[CZ_HARDCODED_SKILL] = 46;
-			Sizes[ZC_FORCE_MOVE] = 34;
-			Sizes[ZC_HSKILL_CONTROL] = 26;
-			Sizes[ZC_CANCEL_DEADEVENT] = 14;
-			Sizes[ZC_ACTION_PKS] = 39;
-			Sizes[CZ_HARDCODED_ITEM] = 34;
-			Sizes[CZ_CANCEL_TRANSFORM_SKILL] = 22;
-			Sizes[CZ_BRIQUET] = 0;
-			Sizes[ZC_VIBRATE] = 34;
-			Sizes[ZC_COUNTER_MOVE] = 14;
-			Sizes[CZ_COUNTER_ATTACK] = 26;
-			Sizes[CZ_CLIENT_DIRECT] = 42;
-			Sizes[ZC_CLIENT_DIRECT] = 34;
-			Sizes[ZC_OWNER] = 18;
-			Sizes[ZC_GD_RANK] = 14;
-			Sizes[CZ_RUN_BGEVENT] = 86;
-			Sizes[ZC_ADD_SKILL_EFFECT] = 22;
-			Sizes[ZC_ITEM_DROPABLE] = 14;
-			Sizes[CZ_ITEM_DROP_TO_OBJECT] = 38;
-			Sizes[ZC_NORMAL] = 0;
-			Sizes[CZ_G_QUEST_CHECK] = 26;
-			Sizes[ZC_MOVE_PATH_MATH] = 38;
-			Sizes[CZ_MYPAGE_COMMENT_ADD] = 290;
-			Sizes[CZ_MYPAGE_COMMENT_DELETE] = 30;
-			Sizes[CZ_GUESTPAGE_COMMENT_ADD] = 290;
-			Sizes[CZ_GET_TARGET_MYPAGE] = 26;
-			Sizes[CZ_ON_MYPAGE_MODE] = 26;
-			Sizes[CZ_RESET_SOCIAL_MODE] = 22;
-			Sizes[CZ_GET_TARGET_GUESTPAGE] = 26;
-			Sizes[CZ_ADD_SELLMODE_ITEM] = 42;
-			Sizes[CZ_DELETE_SELLMODE_ITEM] = 30;
-			Sizes[CZ_ON_SELLITEM_MODE] = 26;
-			Sizes[ZC_MYPAGE_MAP] = 0;
-			Sizes[ZC_GUESTPAGE_MAP] = 0;
-			Sizes[ZC_ON_MYPAGE_MODE] = 0;
-			Sizes[ZC_RESET_SOCIAL_MODE] = 14;
-			Sizes[CZ_ON_ITEMBUY_MODE] = 0;
-			Sizes[ZC_ON_BUYITEM_MODE] = 0;
-			Sizes[ZC_SHOW_GROUND_ITEM_MARK] = 34;
-			Sizes[ZC_HELP_LIST] = 0;
-			Sizes[ZC_HELP_ADD] = 15;
-			Sizes[CZ_CLIENT_HIT_LIST] = 0;
-			Sizes[ZC_PC_ATKSTATE] = 15;
-			Sizes[ZC_SEND_PREMIUM_STATE] = 20;
-			Sizes[CZ_HELP_READ_TYPE] = 30;
-			Sizes[CZ_MOVE_PATH_END] = 22;
-			Sizes[ZC_COLL_DAMAGE] = 15;
-			Sizes[CZ_KEYBOARD_BEAT] = 22;
-			Sizes[CZ_MOVEHIT_SCP] = 34;
-			Sizes[ZC_SYNC_START] = 18;
-			Sizes[ZC_SYNC_END] = 18;
-			Sizes[ZC_SYNC_EXEC] = 14;
-			Sizes[ZC_SYNC_EXEC_BY_SKILL_TIME] = 22;
-			Sizes[CZ_STOP_TIMEACTION] = 23;
-			Sizes[CZ_REQ_DUMMYPC_INFO] = 30;
-			Sizes[CZ_VISIT_BARRACK] = 86;
-			Sizes[CZ_SPC_SKILL_POS] = 34;
-			Sizes[CZ_CHANGE_HEAD] = 86;
-			Sizes[CZ_CHANGE_DESIGNCUT] = 86;
-			Sizes[CZ_CREATE_ARROW_CRAFT] = 26;
-			Sizes[CZ_EXCHANGE_ANTIQUE] = 34;
-			Sizes[CZ_EXCHANGE_WEAPONTYPE] = 34;
-			Sizes[CZ_REQ_MINITEXT] = 278;
-			Sizes[ZC_PC_MOVE_STOP] = 63;
-			Sizes[CZ_STOP_ALLPC] = 22;
-			Sizes[CZ_COMPLETE_PRELOAD] = 26;
-			Sizes[CZ_MGAME_JOIN_CMD] = 58;
-			Sizes[CZ_ADD_HELP] = 26;
-			Sizes[ZC_ATTACH_TO_OBJ] = 61;
-			Sizes[ZC_DETACH_FROM_OBJ] = 18;
-			Sizes[ZC_RUN_FROM] = 18;
-			Sizes[ZC_LOOKAT_OBJ] = 18;
-			Sizes[CZ_SKILL_CELL_LIST] = 0;
-			Sizes[CZ_SKILL_TOOL_GROUND_POS] = 39;
-			Sizes[CZ_DIRECTION_PROCESS] = 34;
-			Sizes[CZ_DIRECTION_MOVE_STATE] = 0;
-			Sizes[ZC_TO_ALL_CLIENT] = 0;
-			Sizes[ZC_TO_CLIENT] = 0;
-			Sizes[CZ_REWARD_CMD] = 26;
-			Sizes[CZ_PROPERTY_COMPARE] = 28;
-			Sizes[ZC_PROPERTY_COMPARE] = 0;
-			Sizes[ZC_PROPERTY_COMPARE_FOR_ACT] = 0;
-			Sizes[ZC_PROPERTY_COMPARE_FOR_REP_CLASS] = 0;
-			Sizes[ZC_FACTION] = 18;
-			Sizes[ZC_SEND_CASH_VALUE] = 0;
-			Sizes[ZC_BEGIN_KILL_LOG] = 10;
-			Sizes[ZC_END_KILL_LOG] = 10;
-			Sizes[ZC_CLEAR_KILL_LOG] = 10;
-			Sizes[CZ_NPC_AUCTION_CMD] = 42;
-			Sizes[ZC_DIRECTION_APC] = 30;
-			Sizes[ZC_BGMODEL_ANIM_INFO] = 19;
-			Sizes[ZC_ATTACH_BY_KNOCKBACK] = 42;
-			Sizes[CZ_OBJECT_MOVE] = 39;
-			Sizes[CZ_CONTROL_OBJECT_ROTATE] = 34;
-			Sizes[CZ_SUMMON_COMMAND] = 30;
-			Sizes[CZ_VEHICLE_RIDE] = 27;
-			Sizes[CZ_REQ_ACHIEVE_RANK_PAGE_INFO] = 90;
-			Sizes[ZC_SPC_TRIGGER_EXEC] = 34;
-			Sizes[CZ_REQ_MGAME_VIEW] = 30;
-			Sizes[CZ_REQ_MGAME_CHAT] = 0;
-			Sizes[CZ_TOURNAMENT_GIFT] = 30;
-			Sizes[CZ_PARTY_INVITE_ACCEPT] = 99;
-			Sizes[CZ_PARTY_INVITE_CANCEL] = 103;
-			Sizes[CZ_PARTY_PROP_CHANGE] = 159;
-			Sizes[CZ_REQ_MARKET_REGISTER] = 70;
-			Sizes[CZ_REQ_MARKET_MINMAX_INFO] = 30;
-			Sizes[CZ_REQ_MARKET_BUY] = 0;
-			Sizes[CZ_REQ_CABINET_LIST] = 22;
-			Sizes[CZ_REQ_GET_CABINET_ITEM] = 42;
-			Sizes[CZ_REQ_CANCEL_MARKET_ITEM] = 30;
-			Sizes[CZ_INV_ITEM_LOCK] = 31;
-			Sizes[CZ_OBJ_RECORD_POS] = 0;
-			Sizes[CZ_FORMATION_CMD] = 44;
-			Sizes[CZ_REGISTER_AUTOSELLER] = 0;
-			Sizes[CZ_OPEN_AUTOSELLER] = 94;
-			Sizes[CZ_BUY_AUTOSELLER_ITEMS] = 0;
-			Sizes[CZ_SELL_MY_AUTOSELLER_ITEMS] = 0;
-			Sizes[CZ_PUZZLE_CRAFT] = 0;
-			Sizes[CZ_PET_EQUIP] = 46;
-			Sizes[CZ_PET_AUTO_ATK] = 23;
-			Sizes[ZC_PET_AUTO_ATK] = 23;
-			Sizes[ZC_TO_SOMEWHERE_CLIENT] = 0;
-			Sizes[CZ_REVEAL_NPC_STATE] = 26;
-			Sizes[CZ_CHANGE_CHANNEL] = 24;
-			Sizes[CZ_REQ_CHANNEL_TRAFFICS] = 24;
-			Sizes[CZ_BUY_PROPERTYSHOP_ITEM] = 0;
-			Sizes[CZ_SKILL_USE_HEIGHT] = 26;
-			Sizes[CZ_CHANGE_GUILD_NEUTRALITY] = 22;
-			Sizes[CZ_SAVE_GUILD_BOARD] = 122;
-			Sizes[CZ_DELETE_PARTY_EVENT] = 32;
-			Sizes[CZ_PING] = 22;
-			Sizes[ZC_PING] = 22;
-			Sizes[CZ_REQ_REMAIN_NEXONCASH] = 22;
-			Sizes[CZ_REQ_OPEN_INGAMESHOP_UI] = 22;
-			Sizes[CZ_REQ_BUY_INGAMESHOP_ITEM] = 90;
-			Sizes[CZ_REQ_BUY_ALL_INGAMESHOP_ITEM] = 22;
-			Sizes[CZ_REQ_PICKUP_CASHITEM] = 49;
-			Sizes[CZ_REQ_REFUND_CASHITEM] = 45;
-			Sizes[ZC_XIGNCODE_BUFFER] = 536;
-			Sizes[CZ_XIGNCODE_BUFFER] = 536;
-			Sizes[CZ_SYSTEM_LOG_SAVE_TO_MONGODB] = 292;
-			Sizes[CZ_CHANGE_TITLE] = 86;
-			Sizes[CZ_PC_COMMENT_CHANGE] = 0;
-			Sizes[CZ_AUTTOSELLER_BUYER_CLOSE] = 30;
-			Sizes[CZ_REQ_ITEM_LIST] = 23;
-			Sizes[CZ_REQ_ACC_WARE_VIS_LOG] = 22;
-			Sizes[CZ_HIT_MISSILE] = 26;
-			Sizes[CZ_PARTY_JOIN_BY_LINK] = 39;
-			Sizes[CZ_PVP_ZONE_CMD] = 39;
-			Sizes[CZ_PVP_CHAT] = 0;
-			Sizes[CZ_CARDBATTLE_CMD] = 38;
-			Sizes[CZ_REQ_UPDATE_CONTENTS_SESSION] = 22;
-			Sizes[CZ_REQ_FRIENDLY_FIGHT] = 27;
-			Sizes[CZ_REQ_ANCIENT_FRIENDLY_FIGHT] = 27;
-			Sizes[CZ_HARDSKILL_POS_LIST] = 0;
-			Sizes[CZ_CART_POSITION] = 38;
-			Sizes[CZ_REQ_RIDE_CART] = 30;
-			Sizes[CZ_DUMMYPC_SKILL_POS] = 38;
-			Sizes[CZ_NGS] = 0;
-			Sizes[ZC_NGS] = 0;
-			Sizes[CZ_PARTY_MEMBER_SKILL_USE] = 0;
-			Sizes[CZ_PARTY_MEMBER_SKILL_ACCEPT] = 35;
-			Sizes[CZ_SYSTEM_LOG_TO_SERVER] = 1111;
-			Sizes[CZ_UDP_RTT_CHECK] = 26;
-			Sizes[ZC_UDP_RTT_CHECK] = 18;
-			Sizes[CZ_UDP_RTT_CHECK_ACK] = 30;
-			Sizes[CZ_HEARTBEAT] = 26;
-			Sizes[CZ_CANCEL_INDUN_MATCHING] = 22;
-			Sizes[CZ_CANCEL_INDUN_PARTY_MATCHING] = 22;
-			Sizes[CZ_REQ_GM_ORDER] = 214;
-			Sizes[CZ_REQ_GM_ORDER_DUMMY_KICK] = 26;
-			Sizes[CZ_REPORT_AUTOBOT] = 86;
-			Sizes[CZ_REPORT_PVP_ZOOM] = 22;
-			Sizes[CZ_PARTY_INVENTORY_LOAD] = 24;
-			Sizes[CZ_PARTY_SHARED_QUEST] = 290;
-			Sizes[CZ_REQ_MOVE_PARTYINV_TO_ACCOUNT] = 0;
-			Sizes[CZ_PVP_COMMAND] = 35;
-			Sizes[CZ_REQ_CancelGachaCube] = 22;
-			Sizes[CZ_WAREHOUSE_TAKE_LIST] = 0;
-			Sizes[CZ_SAVE_AUTO_MACRO] = 0;
-			Sizes[CZ_REQUEST_LOAD_ITEM_BUY_LIMIT] = 22;
-			Sizes[CZ_AUTO_STATE] = 23;
-			Sizes[CZ_RUN_GAMEEXIT_TIMER] = 86;
-			Sizes[CZ_FIXED_NOTICE_SHOW] = 22;
-			Sizes[CZ_SAGE_SKILL_GO_FRIEND] = 102;
-			Sizes[CZ_REQUEST_CHANGE_NAME] = 78;
-			Sizes[CZ_REQUEST_CHANGE_PET_NAME] = 94;
-			Sizes[ZC_ADD_BARRACK_CHARACTER_SLOT_SUCCESS] = 14;
-			Sizes[CZ_SELF_INVITE_NEWBIE_GUILD] = 22;
-			Sizes[CZ_CYOU_CTU_CLIENT_MSG] = 1054;
-			Sizes[ZC_CYOU_KICK_USER_EXIT_CLIENT] = 10;
-			Sizes[ZC_HOLD_EXP_BOOK_TIME] = 37;
-			Sizes[CZ_HOLD_EXP_BOOK_TIME] = 26;
-			Sizes[ZC_BUFF_UPDATE_TIME] = 34;
-			Sizes[CZ_SCREENSHOT_HASH] = 55;
-			Sizes[CZ_REQ_MOVE_TO_INDUN] = 31;
-			Sizes[CZ_CLEAR_INDUN_REG] = 22;
-			Sizes[CZ_REQ_REGISTER_TO_INDUN] = 26;
-			Sizes[CZ_REQ_GUILD_MEMBER_AUTHORITY] = 35;
-			Sizes[CZ_TPSHOP_RTPP_FOR_TEST] = 22;
-			Sizes[CZ_REQ_FORGERY] = 42;
-			Sizes[CZ_REQ_UNDERSTAFF_ENTER_ALLOW] = 22;
-			Sizes[CZ_REQ_UNDERSTAFF_ENTER_ALLOW_WITH_PARTY] = 26;
-			Sizes[CZ_REQ_BUILD_FOODTABLE] = 94;
-			Sizes[ZC_PLAY_PAIR_ANIMATION] = 341;
-			Sizes[CZ_REQ_FISHING] = 35;
-			Sizes[CZ_REQ_GET_FISHING_ITEM] = 22;
-			Sizes[ZC_PLAY_ATTACH_MODEL_ANIM] = 26;
-			Sizes[CZ_RUN_FUNCTION_DUMP] = 0;
-			Sizes[ZC_RUN_FUNCTION_DUMP] = 0;
-			Sizes[ZC_RUN_FUNCTION_DUMP_ERROR] = 0;
-			Sizes[ZC_RUN_FUNCTION_DUMP_PRINT] = 0;
-			Sizes[ZC_ATTACH_TO_SLOT] = 26;
-			Sizes[ZC_FISHING_ITEM_LIST] = 0;
-			Sizes[CZ_REQ_FISHING_RANK] = 90;
-			Sizes[ZC_ENABLE_ROTATE] = 79;
-			Sizes[CZ_SYNC_POS] = 38;
-			Sizes[ZC_ADVENTURE_BOOK_INFO] = 0;
-			Sizes[CZ_DISCONNECT_REASON_FOR_LOG] = 0;
-			Sizes[CZ_REQ_ADVENTURE_BOOK_RANK] = 154;
-			Sizes[CZ_REQ_ADVENTURE_BOOK_REWARD] = 86;
-			Sizes[CZ_REQ_GUILD_NEUTRALITY_ALARM] = 26;
-			Sizes[CZ_REQ_QUEST_COMPLETE] = 26;
-			Sizes[CZ_REQ_GUILD_ASSET_LOG] = 22;
-			Sizes[ZC_CANCEL_MOUSE_MOVE] = 14;
-			Sizes[ZC_BROAD_CAST_MY_INFO] = 31;
-			Sizes[CZ_LOAD_COMPLETE] = 22;
-			Sizes[ZC_LOAD_COMPLETE] = 10;
-			Sizes[ZC_UPDATE_CHALLENGE_MODE_WARP_PORTAL_MARK] = 24;
-			Sizes[ZC_ATTENDANCE_RECEIPT_REWARD] = 0;
-			Sizes[CZ_ATTENDANCE_REWARD_CLICK] = 26;
-			Sizes[ZC_ATTENDANCE_REWARD_CHECK_UI_ON] = 12;
-			Sizes[ZC_CHANGE_DYNAMICCASTING_MAX_CHANGING_TIME] = 18;
-			Sizes[ZC_DELAYED_ROTATE_MOVE_START] = 26;
-			Sizes[ZC_DELAYED_ROTATE_MOVE_END] = 14;
-			Sizes[ZC_SEND_PC_EXPROP] = 0;
-			Sizes[ZC_COLONY_OCCUPATION_INFO] = 0;
-			Sizes[CZ_REQ_RETURN_TO_CITY_FROM_COLONY_WAR] = 22;
-			Sizes[CZ_REQUEST_COLONYWAR_ENDTIME] = 22;
-			Sizes[ZC_RESPONSE_COLONYWAR_ENDTIME] = 26;
-			Sizes[ZC_SEND_COLONY_MARKET_FEE_PAYMENT_LIST] = 0;
-			Sizes[CZ_REQ_COLONY_MARKET_FEE_PAYMENT] = 42;
-			Sizes[ZC_SET_COLONY_TIME_CHEAT_FAIL] = 10;
-			Sizes[ZC_SET_COLONY_TIME_CHEAT_SUCCESS] = 10;
-			Sizes[ZC_USER_BATTLE_INFO_LIST] = 0;
-			Sizes[ZC_COLONY_TAX_TOTAL_AMOUNT] = 50;
-			Sizes[ZC_COLONY_TAX_RATE_LIST] = 0;
-			Sizes[ZC_COLONY_TAX_LORD_READY] = 99;
-			Sizes[ZC_COLONY_TAX_LORD_START] = 38;
-			Sizes[ZC_COLONY_TAX_LORD_END] = 14;
-			Sizes[ZC_COLONY_TAX_RATE_SET] = 42;
-			Sizes[CZ_COLONY_TAX_RATE_REQ_SET] = 30;
-			Sizes[ZC_COLONY_TAX_CHEQUE_LIST] = 0;
-			Sizes[CZ_COLONY_TAX_CHEQUE_REQ_LIST] = 22;
-			Sizes[CZ_COLONY_TAX_CHEQUE_REQ_SEND] = 0;
-			Sizes[CZ_COLONY_TAX_HISTORY_REQ_LIST] = 22;
-			Sizes[ZC_COLONY_TAX_HISTORY_LIST] = 0;
-			Sizes[ZC_COLONY_TAX_PAYMENT_LIST] = 0;
-			Sizes[CZ_COLONY_TAX_PAYMENT_REQ_RECV] = 30;
-			Sizes[CZ_COLONY_TAX_PAYMENT_REQ_LIST] = 22;
-			Sizes[CZ_REQUEST_RVR_ENDTIME] = 22;
-			Sizes[ZC_RESPONSE_RVR_ENDTIME] = 26;
-			Sizes[CZ_REGISTER_NEW_GUILD_EMBLEM] = 20107;
-			Sizes[CZ_CHANGE_GUILD_EMBLEM] = 20108;
-			Sizes[ZC_UPDATE_GUILD_EMBLEM] = 24;
-			Sizes[CZ_REQUEST_CERTAIN_GUILD_EMBLEM] = 32;
-			Sizes[ZC_RESPONSE_CERTAIN_GUILD_EMBLEM] = 20040;
-			Sizes[CZ_REQUEST_GUILD_EMBLEM_INFO] = 32;
-			Sizes[ZC_RESPONSE_GUILD_EMBLEM_INFO] = 102;
-			Sizes[CZ_REQUEST_GUILD_INDEX] = 30;
-			Sizes[ZC_RESPONSE_GUILD_INDEX] = 24;
-			Sizes[CZ_REPORT_GUILDEMBLEM] = 86;
-			Sizes[ZC_DELETE_GUILD_EMBLEM] = 24;
-			Sizes[CZ_DELETE_GUILD_EMBLEM] = 22;
-			Sizes[ZC_NXA_REQ_TICKET] = 10;
-			Sizes[CZ_NXA_TICKET] = 1046;
-			Sizes[CZ_NXA_REQ_BALANCE] = 22;
-			Sizes[ZC_NXA_BALANCE] = 40;
-			Sizes[CZ_NXA_REQ_ITEMLIST] = 23;
-			Sizes[ZC_NXA_ITEMLIST] = 0;
-			Sizes[CZ_NXA_REQ_PURCHASE] = 27;
-			Sizes[ZC_NXA_PURCHASE] = 4106;
-			Sizes[CZ_NXA_REQ_PICKUP_READY_ITEMS] = 2071;
-			Sizes[CZ_NXA_REQ_PURCHASE_CANCEL] = 22;
-			Sizes[ZC_NXA_SELLITEMLIST] = 0;
-			Sizes[CZ_REQ_PARTY_INFO] = 22;
-			Sizes[CZ_REQ_RETURN_ORIGIN_SERVER] = 22;
-			Sizes[CZ_ANS_GIVEUP_PREV_PLAYING_INDUN] = 23;
-			Sizes[ZC_FOLLOW_TO_ACTOR] = 39;
-			Sizes[ZC_STOP_FOLLOW_TO_ACTOR] = 14;
-			Sizes[ZC_SET_WEBSERVICE_URL] = 266;
-			Sizes[CZ_CREATE_GUILD_BY_WEB] = 71;
-			Sizes[CZ_GUILD_MEMBER_INVITE_BY_WEB] = 95;
-			Sizes[ZC_GUILD_MEMBER_INVITE_BY_WEB] = 91;
-			Sizes[CZ_WEEKLY_BOSS_INDUN_ENTER] = 23;
-			Sizes[CZ_FIELD_BOSS_INDUN_ENTER] = 22;
-			Sizes[CZ_SOLO_INDUN_ENTER] = 34;
-			Sizes[CZ_GUILD_MEMBER_INVITE_ACCEPT_BY_WEB] = 102;
-			Sizes[CZ_GUILD_APPLICATION_USER_ACCEPT] = 127;
-			Sizes[ZC_DECREASE_SILVER] = 14;
-			Sizes[CZ_POST_GUILE_EMBLEM] = 20026;
-			Sizes[CZ_REQUEST_CERTAIN_WEBSERVICE_URL] = 24;
-			Sizes[ZC_RESPONSE_CERTAIN_WEBSERVICE_URL] = 268;
-			Sizes[CZ_GUILD_AGIT_ENTER] = 159;
-			Sizes[ZC_RELOAD_SELL_LIST] = 10;
-			Sizes[ZC_NOTCIE_BROKEN_SYNC_MARKET_ITEM] = 18;
-			Sizes[CZ_BADPLAYER_REPORT] = 158;
-			Sizes[ZC_ERROR_INFO] = 0;
-			Sizes[ZC_SEND_JSON_DUMP] = 0;
-			Sizes[CZ_SEND_JSON_DUMP] = 0;
-			Sizes[CZ_CLIENT_REMOTE_LOG] = 2584;
-			Sizes[CZ_REQ_COMMON_SKILL_LIST] = 22;
-			Sizes[ZC_COMMON_SKILL_LIST] = 0;
-			Sizes[CZ_REG_EXP_ORB_ITEM] = 34;
-			Sizes[CZ_REQ_QUICKSLOT_LIST] = 22;
-			Sizes[ZC_REG_EXP_ORB_ITEM] = 22;
-			Sizes[ZC_REG_EXP_SUB_ORB_ITEM] = 22;
-			Sizes[ZC_FILL_EXP_ORB] = 22;
-			Sizes[ZC_FILL_EXP_SUB_ORB] = 22;
-			Sizes[ZC_FIXCAMERA] = 26;
-			Sizes[ZC_CANCEL_FIXCAMERA] = 10;
-			Sizes[CZ_SWAP_ITEM_IN_WAREHOUSE] = 46;
-			Sizes[ZC_SWAP_ITEM_IN_WAREHOUSE_FAIL] = 18;
-			Sizes[CZ_REQ_PCBANG_SHOP_UI] = 26;
-			Sizes[CZ_REQ_PCBANG_SHOP_CONNECT_REWARD] = 86;
-			Sizes[CZ_REQ_PCBANG_SHOP_TOTAL_REWARD] = 26;
-			Sizes[CZ_REQ_PCBANG_SHOP_PURCHASE] = 30;
-			Sizes[CZ_REQ_PCBANG_SHOP_RENTAL] = 26;
-			Sizes[CZ_REQ_PCBANG_SHOP_REFRESH] = 22;
-			Sizes[ZC_PCBANG_SHOP_COMMON] = 66;
-			Sizes[ZC_PCBANG_SHOP_MAIN] = 0;
-			Sizes[ZC_PCBANG_SHOP_POINTSHOP_CATALOG] = 0;
-			Sizes[ZC_PCBANG_SHOP_POINTSHOP_BUY_COUNT] = 0;
-			Sizes[ZC_PCBANG_SHOP_RENTAL] = 0;
-			Sizes[ZC_PCBANG_SHOP_GUIDE] = 0;
-			Sizes[ZC_PCBANG_SHOP_REWARD] = 0;
-			Sizes[ZC_PCBANG_STATE] = 15;
-			Sizes[ZC_PCBANG_POINT] = 22;
-			Sizes[CZ_SEND_BEAUTYSHOP_PURCHASE_LIST] = 0;
-			Sizes[CZ_REQ_BEAUTYSHOP_INFO] = 23;
-			Sizes[ZC_RES_BEAUTYSHOP_PURCHASED_HAIR_LIST] = 0;
-			Sizes[CZ_SEND_BEAUTYSHOP_TRYITON_LIST] = 0;
-			Sizes[CZ_SEND_BEAUTYSHOP_TRYITON_CANCEL] = 22;
-			Sizes[CZ_ITEMPROPCHANGE] = 38;
-			Sizes[CZ_ITEMPROPCHANGE_GEM_ADD] = 26;
-			Sizes[CZ_ITEMPROPCHANGE_GEM_DROP] = 50;
-			Sizes[CZ_ITEMPROPCHANGE_GEM_POP] = 34;
-			Sizes[CZ_ITEMPROPCHANGE_GEM_ALL_SLOT] = 30;
-			Sizes[CZ_ITEMPROPCHANGE_ICHOR_RANDOM_OPTION] = 1198;
-			Sizes[CZ_ITEMPROPCHANGE_ICHOR_RANDOM_OPTION_MAX_VALUE] = 98;
-			Sizes[CZ_ITEMPROPCHANGE_OPTION_CHANGE] = 94;
-			Sizes[CZ_ITEMPROPCHANGE_ENCHANT] = 222;
-			Sizes[CZ_ITEMPROPCHANGE_ENCHANT_MAX_VALUE] = 158;
-			Sizes[CZ_TOKEN_WARP] = 86;
-			Sizes[CZ_REGISTER_FAVORITE_MAP] = 86;
-			Sizes[CZ_UNREGISTER_FAVORITE_MAP] = 86;
-			Sizes[ZC_VERTICAL_MOTION] = 23;
-			Sizes[CZ_REQ_PLAY_FLUTING] = 31;
-			Sizes[ZC_PLAY_FLUTING] = 24;
-			Sizes[CZ_REQ_READY_FLUTING] = 23;
-			Sizes[ZC_READY_FLUTING] = 15;
-			Sizes[CZ_REQ_STOP_FLUTING] = 31;
-			Sizes[ZC_STOP_FLUTING] = 23;
-			Sizes[ZC_STOP_FLUTING_ALL] = 14;
-			Sizes[CZ_REQ_CLOSE_INSTRUMENT] = 87;
-			Sizes[ZC_READY_INSTRUMENT] = 79;
-			Sizes[CZ_REQ_PLAY_INSTRUMENT] = 100;
-			Sizes[ZC_PLAY_INSTRUMENT] = 93;
-			Sizes[CZ_REQ_STOP_INSTRUMENT] = 95;
-			Sizes[ZC_STOP_INSTRUMENT] = 87;
-			Sizes[ZC_STOP_INSTRUMENT_ALL] = 14;
-			Sizes[ZC_RESERVE_PROPERTY] = 0;
-			Sizes[CZ_REQ_SOLO_DUNGEON_REWARD] = 22;
-			Sizes[CZ_REQ_SOLO_DUNGEON_RANKING_PAGE] = 22;
-			Sizes[ZC_SOLO_DUNGEON_STAGE_SCORE] = 34;
-			Sizes[ZC_SOLO_DUNGEON_RANKING] = 0;
-			Sizes[ZC_SOLO_DUNGEON_MY_RANKING] = 0;
-			Sizes[ZC_REDIS_RANKING_INFO] = 0;
-			Sizes[ZC_CUSTOM_WHEEL_ZOOM] = 23;
-			Sizes[ZC_MGAME_POSITION] = 0;
-			Sizes[ZC_ITEM_LOCK_STATE] = 19;
-			Sizes[ZC_ALTER_HIT_RADIUS] = 26;
-			Sizes[ZC_CASH_INVENTORY_LIST] = 0;
-			Sizes[CZ_NEXON_PAYMENT_PAGE] = 22;
-			Sizes[ZC_NEXON_PAYMENT_PAGE] = 522;
-			Sizes[ZC_SOLD_ITEM_NOTICE] = 158;
-			Sizes[CZ_REQ_GUILD_ASSET] = 22;
-			Sizes[ZC_GUILD_BUILDING_OBJECT_ADD] = 0;
-			Sizes[ZC_GUILD_BUILDING_OBJECT_REMOVE] = 0;
-			Sizes[CZ_CHANGE_REPRESENTATION_CLASS] = 26;
-			Sizes[CZ_REQ_COMMANDER_INFO] = 24;
-			Sizes[ZC_CUSTOM_COMMANDER_INFO] = 32;
-			Sizes[ZC_TRUST_INFO] = 62;
-			Sizes[ZC_GUILD_COOLDOWN_LIST] = 0;
-			Sizes[ZC_CLASS_RESET_POINT_INFO] = 18;
-			Sizes[ZC_EQUIP_CARD_INFO] = 0;
-			Sizes[ZC_EQUIP_GEM_INFO] = 0;
-			Sizes[ZC_FADE_IN] = 14;
-			Sizes[ZC_OBJECT_PROPERTY_BY_NAMES] = 0;
-			Sizes[CZ_REQ_LEARN_ABILITY] = 0;
-			Sizes[CZ_NOTICE_GUILD_APPLICATION_REQUEST] = 32;
-			Sizes[ZC_START_IMITATING_ANIMATION] = 18;
-			Sizes[ZC_STOP_IMITATING_ANIMATION] = 14;
-			Sizes[CZ_START_IMITATING_ANIMATION_ACK] = 22;
-			Sizes[CZ_FOLLOW_TO_ACTOR_ACK] = 22;
-			Sizes[CZ_REQUEST_EVENT_USER_TYPE_INFO] = 22;
-			Sizes[CZ_REQUEST_USED_MEDAL_TOTAL] = 22;
-			Sizes[ZC_ZOMBIE_ALIVE] = 10;
-			Sizes[CZ_ZOMBIE_ALIVE_ACK] = 22;
-			Sizes[ZC_FRIENDLY_STATE] = 11;
-			Sizes[ZC_ANCIENT_FRIENDLY_STATE] = 11;
-			Sizes[ZC_CHANGE_SKIN_COLOR] = 18;
-			Sizes[ZC_SET_FACE_RENDER_OPTION] = 79;
-			Sizes[CZ_DPK_QUEST_DESTORY_SESSIONOBJ] = 286;
-			Sizes[CZ_REQUEST_BLACK_MARKET_BID] = 30;
-			Sizes[CZ_REQUEST_BLACK_MARKET_BID_INFO] = 22;
-			Sizes[ZC_NOTICE_FAILURE_IN_BIDDING] = 14;
-			Sizes[ZC_NOTICE_BIDDING_SUCCESS] = 30;
-			Sizes[ZC_NOTICE_DUPLICATE_BIDDING] = 22;
-			Sizes[ZC_NOTICE_NOTICE_BLACK_MARKET_END_TO_USER] = 22;
-			Sizes[ZC_CONFUSE_STATE] = 15;
-			Sizes[ZC_ADDONUI_MSG] = 0;
-			Sizes[CZ_COLONY_REWARD_REQ] = 51;
-			Sizes[ZC_COLONY_REWARD_DETAILLIST_UPDATE] = 22;
-			Sizes[ZC_COLONY_SECONDLEAGUE_REWARD_START] = 38;
-			Sizes[ZC_COLONY_SECONDLEAGUE_REWARD_END] = 38;
-			Sizes[CZ_COLONY_TAXINQUIRELIST_REQ] = 22;
-			Sizes[ZC_COLONY_TAXINQUIRELIST_REQ] = 0;
-			Sizes[ZC_START_FIELDBOSS_WORLD_EVENT] = 0;
-			Sizes[ZC_END_FIELDBOSS_WORLD_EVENT] = 10;
-			Sizes[ZC_FIELDBOSS_REMOVE_ITEM] = 14;
-			Sizes[CZ_BID_FIELDBOSS_WORLD_EVENT] = 26;
-			Sizes[ZC_WIN_FIELDBOSS_WORLD_EVENT_ITEM] = 14;
-			Sizes[ZC_LOSE_FIELDBOSS_WORLD_EVENT_ITEM] = 14;
-			Sizes[ZC_SILVER_GACHA_DECREASE_ITEM_COUNT] = 26;
-			Sizes[CZ_REQUEST_SILVER_GACHA_GAMBLE] = 35;
-			Sizes[CZ_REQUEST_SILVER_GACHA_INFO] = 22;
-			Sizes[ZC_RESPONSE_SILVER_GACHA_INFO] = 0;
-			Sizes[CZ_MAKE_ITEM_FROM_DRESS_ROOM] = 150;
-			Sizes[ZC_START_CASUAL_GAMBLE] = 0;
-			Sizes[ZC_CASUAL_GAMBLE_ITEM_GET] = 18;
-			Sizes[CZ_REQUEST_CASUAL_GAMBLE] = 22;
-			Sizes[ZC_END_CASUAL_GAMBLE] = 10;
-			Sizes[CZ_REQUEST_COMMON_GAMBLE] = 158;
-			Sizes[ZC_COMMON_GAMBLE_ITEM_GET] = 18;
-			Sizes[ZC_WEEKLY_BOSS_RANK_INFO] = 0;
-			Sizes[ZC_WEEKLY_BOSS_RANK_MY_DAMAGE] = 22;
-			Sizes[ZC_WEEKLY_BOSS_ACCUMULATED_DAMAGE] = 22;
-			Sizes[ZC_WEEKLY_BOSS_ABSOLUTE_REWARD_LIST] = 0;
-			Sizes[ZC_WEEKLY_BOSS_RECEIVED_ABSOLUTE_REWARD_LIST] = 0;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_ABSOLUTE_REWARD_LIST] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_RECEIVE_ABSOLUTE_REWARD] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_CLASS_RANKING_REWARD] = 30;
-			Sizes[ZC_WEEKLY_BOSS_RECEIVED_RANKING_REWARD] = 18;
-			Sizes[ZC_WEEKLY_BOSS_RANKING_REWARD_LIST] = 0;
-			Sizes[ZC_WEEKLY_BOSS_CLASS_RANKING_REWARD_LIST] = 0;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_RANKING_REWARD_LIST] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_RECEIVE_RANKING_REWARD] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_ACCEPT_ABSOLUTE_REWARD] = 34;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_ACCEPT_ABSOLUTE_REWARD_ALL] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_ACCEPT_RANKING_REWARD] = 30;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_ACCEPT_CLASS_RANKING_REWARD] = 34;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_RANKING_INFO_LIST] = 28;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_NOW_WEEK_NUM] = 22;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_START_TIME] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_END_TIME] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_PATTERN_INFO] = 26;
-			Sizes[ZC_WEEKLY_BOSS_NOW_WEEK_NUM] = 14;
-			Sizes[ZC_WEEKLY_BOSS_START_TIME] = 26;
-			Sizes[ZC_WEEKLY_BOSS_END_TIME] = 26;
-			Sizes[ZC_WEEKLY_BOSS_PATTERN_INFO] = 0;
-			Sizes[ZC_WEEKLY_BOSS_RECEIVED_CLASS_RANKING_REWARD] = 0;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_RECEIVE_CLASS_RANKING_REWARD] = 26;
-			Sizes[CZ_REQUEST_WEEKLY_BOSS_ENABLE_CLASS_RANKING_SEASON] = 26;
-			Sizes[ZC_REQUEST_WEEKLY_BOSS_ENABLE_CLASS_RANKING_SEASON] = 11;
-			Sizes[CZ_REQUEST_DPS_START] = 22;
-			Sizes[ZC_REQUEST_DPS_START] = 26;
-			Sizes[CZ_MYTHIC_DUNGEON_REQUEST_RANK_INFO] = 29;
-			Sizes[CZ_MYTHIC_DUNGEON_REQUEST_PATTERN] = 24;
-			Sizes[ZC_MYTHIC_DUNGEON_RANK_INFO] = 0;
-			Sizes[CZ_MYTHIC_DUNGEON_REQUEST_CURRENT_SEASON] = 22;
-			Sizes[ZC_MYTHIC_DUNGEON_CURRENT_SEASON] = 44;
-			Sizes[ZC_MYTHIC_DUNGEON_PATTERN_INFO] = 0;
-			Sizes[ZC_FIELD_BOSS_PATTERN_INFO] = 0;
-			Sizes[CZ_REQUEST_FIELD_BOSS_PATTERN_INFO] = 38;
-			Sizes[CZ_REQUEST_FIELD_BOSS_RANKING_INFO] = 38;
-			Sizes[ZC_FIELD_BOSS_RANKING_INFO] = 0;
-			Sizes[CZ_REQUEST_BORUTA_REWARD] = 30;
-			Sizes[ZC_SEND_BORUTA_RANK_LIST] = 0;
-			Sizes[CZ_REQUEST_BORUTA_RANK_LIST] = 30;
-			Sizes[CZ_REQUEST_ACCEPT_REWARD_INFO] = 30;
-			Sizes[ZC_RESPONSE_ACCEPT_REWARD_INFO] = 15;
-			Sizes[CZ_REQUEST_BORUTA_NOW_WEEK_NUM] = 22;
-			Sizes[ZC_RESPONSE_BORUTA_NOW_WEEK_NUM] = 14;
-			Sizes[CZ_REQUEST_BORUTA_START_TIME] = 26;
-			Sizes[ZC_BORUTA_START_TIME] = 26;
-			Sizes[CZ_REQUEST_BORUTA_END_TIME] = 26;
-			Sizes[ZC_BORUTA_END_TIME] = 26;
-			Sizes[CZ_RECEIVE_PERSONAL_RANK_REWARD] = 38;
-			Sizes[CZ_ADD_PARTY_INFO] = 310;
-			Sizes[CZ_UPDATE_PARTY_INFO] = 310;
-			Sizes[CZ_REMOVE_PARTY_INFO] = 22;
-			Sizes[CZ_REQUEST_FIND_PARTY_JOIN] = 87;
-			Sizes[ZC_CONFIRM_FIND_PARTY_JOIN] = 103;
-			Sizes[CZ_CONFIRM_FIND_PARTY_JOIN] = 88;
-			Sizes[CZ_HOUSING_OPEN_EDIT_MODE] = 10;
-			Sizes[CZ_HOUSING_CLOSE_EDIT_MODE] = 10;
-			Sizes[CZ_HOUSING_REQUEST_GRID_ARRANGED_FURNITURE] = 22;
-			Sizes[CZ_HOUSING_REQUEST_ARRANGED_FURNITURE] = 22;
-			Sizes[ZC_HOUSING_READY_GRID] = 0;
-			Sizes[ZC_HOUSING_READY_ARRANGED_FURNITURE] = 0;
-			Sizes[ZC_HOUSING_ANSWER_ARRANGED_FURNITURE] = 0;
-			Sizes[ZC_HOUSING_START_ARRANGEMENT_FURNITURE] = 14;
-			Sizes[CZ_HOUSING_REQUEST_ARRANGEMENT_FURNITURE] = 0;
-			Sizes[CZ_HOUSING_CANCEL_ARRANGEMENT_FURNITURE] = 23;
-			Sizes[CZ_HOUSING_REQUEST_REMOVE_FURNITURE] = 30;
-			Sizes[CZ_HOUSING_REQUEST_REMOVE_FURNITURE_ALOT] = 0;
-			Sizes[CZ_HOUSING_REQUEST_REMOVE_ALL_FURNITURE] = 22;
-			Sizes[ZC_HOUSING_ANSWER_REMOVE_FURNITURE] = 18;
-			Sizes[CZ_HOUSING_REQUEST_ENABLE_MOVE_FURNITURE] = 30;
-			Sizes[ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE] = 18;
-			Sizes[CZ_HOUSING_REQUEST_MOVE_FURNITURE] = 0;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_AGIT_INFO] = 158;
-			Sizes[ZC_HOUSING_ANSWER_GUILD_AGIT_INFO] = 154;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_AGIT_EXTENSION] = 150;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_LAB_USE_RESEARCH] = 27;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_LAB_LEVEL_UP] = 27;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_LAB_RESEARCH_LEVEL_UP] = 26;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_CONTRIBUTION_TO_MILEAGE] = 26;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_MILEAGE_TO_CONTRIBUTION] = 26;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_CONTIRUBTION_DISTRIBUTE] = 0;
-			Sizes[CZ_HOUSING_REQUEST_GUILD_POINT_UP] = 166;
-			Sizes[CZ_HOUSING_REQUEST_HOUSING_SHOP_TRADE] = 0;
-			Sizes[ZC_HOUSING_CREATE_BG_FURNITURE] = 31;
-			Sizes[ZC_HOUSING_MOVE_BG_FURNITURE] = 27;
-			Sizes[ZC_HOUSING_REMOVE_BG_FURNITURE] = 14;
-			Sizes[CZ_HOUSING_PAGE_SAVE] = 90;
-			Sizes[CZ_HOUSING_PAGE_LOAD] = 26;
-			Sizes[CZ_HOUSING_PAGE_DELETE] = 26;
-			Sizes[CZ_PERSONAL_HOUSING_REQUEST_LEAVE] = 22;
-			Sizes[CZ_PERSONAL_HOUSING_REQUEST_BUY_BACKGROUND] = 26;
-			Sizes[CZ_PERSONAL_HOUSING_REQUEST_APPLY_BACKGROUND] = 26;
-			Sizes[CZ_HOUSING_REQUEST_PREVIEW] = 39;
-			Sizes[ZC_HOUSING_ANSWER_PREVIEW] = 0;
-			Sizes[CZ_HOUSING_REQUEST_POST_HOUSE_WARP] = 34;
-			Sizes[CZ_PERSONAL_HOUSING_REQUEST_GROUP_LIST] = 22;
-			Sizes[ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST] = 0;
-			Sizes[ZC_REBUILD_POPUP] = 10;
-			Sizes[ZC_ANCIENT_CARD_ADD] = 0;
-			Sizes[ZC_ANCIENT_CARD_REMOVE] = 30;
-			Sizes[ZC_ANCIENT_CARD_COMBINE] = 0;
-			Sizes[ZC_ANCIENT_CARD_EVOLVE] = 0;
-			Sizes[ZC_ANCIENT_CARD_LOCK] = 31;
-			Sizes[ZC_ANCIENT_CARD_UPDATE] = 0;
-			Sizes[ZC_ANCIENT_CARD_RESET] = 22;
-			Sizes[ZC_ANCIENT_CARD_LOAD] = 0;
-			Sizes[ZC_ANCIENT_CARD_EXP_UP] = 42;
-			Sizes[ZC_ANCIENT_MONSTER_SUMMON] = 42;
-			Sizes[ZC_ANCIENT_MONSTER_DEAD] = 30;
-			Sizes[CZ_ANCIENT_CARD_SELL] = 30;
-			Sizes[CZ_ANCIENT_CARD_SWAP] = 34;
-			Sizes[CZ_ANCIENT_MON_ALLKILL] = 22;
-			Sizes[CZ_ANCIENT_CARD_COMBINE] = 0;
-			Sizes[CZ_ANCIENT_CARD_EVOLVE] = 0;
-			Sizes[CZ_ANCIENT_CARD_LOCK] = 30;
-			Sizes[CZ_FORCE_SKILL_RANGE] = 54;
-			Sizes[CZ_VARIABLE_RANGE_RESULT] = 38;
-			Sizes[CZ_CANCEL_PAIR_ANIMATION] = 22;
-			Sizes[ZC_SET_DAYLIGHT_INFO] = 0;
-			Sizes[ZC_DAYLIGHT_SYNCHRONIZE_TIME] = 14;
-			Sizes[ZC_DAYLIGHT_FIXED] = 36;
-			Sizes[CZ_SELECTED_LANGUAGE] = 24;
-			Sizes[CZ_ACCEPT_FIELD_DUNGEON_REJOIN] = 22;
-			Sizes[CZ_UDP_MOVE_INFO] = 80;
-			Sizes[ZC_UDP_MOVE_INFO] = 79;
-			Sizes[ZC_UDP_MULTI_PACKET] = 12810;
-			Sizes[ZC_MAIN_SECTOR_INFO] = 0;
-			Sizes[ZC_ADD_CHATBALLOON_SKIN] = 0;
-			Sizes[CZ_SET_CHATBALLOON_SKIN] = 26;
-			Sizes[ZC_SET_CHATBALLOON_SKIN] = 34;
-			Sizes[ZC_UPDATE_CHATBALLOON_SKIN] = 10;
-			Sizes[ZC_AUTOSELLER_LIST] = 0;
-			Sizes[ZC_AUTOSELLER_TITLE] = 91;
-			Sizes[CZ_DO_CLIENT_MOVE_CHECK] = 22;
-			Sizes[ZC_IS_SUMMONING_MONSTER] = 15;
-			Sizes[ZC_IS_SUMMON_SORCERER_MONSTER] = 15;
-			Sizes[CZ_SUMMON_PET] = 38;
-			Sizes[CZ_SELECT_GROUND_POS_START] = 22;
-			Sizes[CZ_SELECT_GROUND_POS_END] = 22;
-			Sizes[CZ_REQ_DAMAGEFONT_SKIN] = 26;
-			Sizes[CZ_SET_DAMAGEFONT_SKIN] = 30;
-			Sizes[ZC_RES_DAMAGEFONT_SKIN] = 30;
-			Sizes[CZ_REQ_DAMAGEEFFECT_SKIN] = 26;
-			Sizes[CZ_SET_DAMAGEEFFECT_SKIN] = 30;
-			Sizes[ZC_RES_DAMAGEEFFECT_SKIN] = 30;
-			Sizes[CZ_SUMMON_CUPOLE] = 30;
-			Sizes[CZ_CUPOLE_SLOT_SWAP] = 34;
-			Sizes[ZC_SUMMON_CUPOLE] = 30;
-			Sizes[ZC_UNSUMMON_CUPOLE] = 30;
-			Sizes[CZ_CUPOLE_FAVORITE] = 27;
-			Sizes[ZC_CUPOLE_FAVORITE] = 0;
-			Sizes[CZ_REQUEST_GODDESS_ROULETT] = 26;
-			Sizes[CZ_REQUEST_GODDESS_ROULETT_STATE] = 26;
-			Sizes[ZC_OVERHEAT_RESET_TIME] = 26;
-			Sizes[CZ_PERSONAL_HOUSING_SHOP_PAYMENT] = 0;
-			Sizes[CZ_START_SERVER_TRACING] = 22;
-			Sizes[CZ_PERSONAL_HOUSING_BOARD_LOG] = 2082;
-			Sizes[ZC_TAUNT_START] = 23;
-			Sizes[ZC_TAUNT_END] = 14;
-			Sizes[CZ_CHECK_USE_NAME] = 470;
-			Sizes[CZ_REQ_FIELD_BOSS_EXIST] = 22;
-			Sizes[ZC_RESPONSE_FIELD_BOSS_EXIST] = 0;
-			Sizes[CZ_ACCOUNT_ABILITY_LEVELUP] = 90;
-			Sizes[CZ_ACCOUNT_ABILITY_RESET] = 86;
-			Sizes[ZC_BREATH_ATTACK_TARGET_CAHSE] = 78;
-			Sizes[CZ_BREATH_ATTACK_TARGET_CAHSE_RESULT] = 294;
-			Sizes[CZ_OPEN_SHOP_LOG] = 55;
-			Sizes[CZ_SELECT_PARTY_BUFF] = 26;
-			Sizes[CZ_SELECT_SOLO_BUFF] = 30;
-			Sizes[CZ_REPUTATION_SHOP_TRADE] = 0;
-			Sizes[ZC_RELIC_RP_CHANGE] = 14;
-			Sizes[CZ_REQUEST_RANK_SYSTEM_TIME_TABLE] = 26;
-			Sizes[ZC_RESPONSE_RANK_SYSTEM_TIME_TABLE] = 0;
-			Sizes[CZ_REQUEST_RANK_SYSTEM_RANK_LIST] = 42;
-			Sizes[ZC_RESPONSE_RANK_SYSTEM_RANK_LIST] = 0;
-			Sizes[CZ_REQUEST_RANK_SYSTEM_MY_DATA] = 42;
-			Sizes[ZC_RESPONSE_RANK_SYSTEM_MY_DATA] = 0;
-			Sizes[ZC_RANK_SYSTEM_RECEIVED_REWARD_INFO_LIST] = 0;
-			Sizes[ZC_RANK_SYSTEM_RECEIVED_REWARD_INFO] = 38;
-			Sizes[CZ_REQUEST_DRAW_TOSHERO_EMBLEM] = 26;
-			Sizes[ZC_RESPONSE_DRAW_TOSHERO_EMBLEM] = 0;
-			Sizes[CZ_UDP_HOLEPUNCH] = 22;
-			Sizes[ZC_UDP_HOLEPUNCH_ACK] = 10;
-			Sizes[CZ_REQ_CHALLENGE_AUTOMATCH_UI_OPEN] = 26;
-			Sizes[ZC_MONSTER_CANCEL_CASTING_UI] = 26;
-			Sizes[CZ_DIALOG_SELECT_MULTIPLE] = 0;
-			Sizes[CZ_REQ_RAID_AUTOMATCH_UI_OPEN] = 26;
-			Sizes[CZ_REQ_RAID_SOLO_UI_OPEN] = 26;
-			Sizes[CZ_REQ_TOSHERO_ENTER] = 26;
-			Sizes[CZ_REQ_EARRING_RAID_ENTER] = 26;
-			Sizes[CZ_REQ_DEMON_LAIR_ENTER] = 26;
-			Sizes[CZ_REQ_PILGRIM_ENTER] = 26;
-			Sizes[CZ_REQ_LEVEL_DUNGEON_ENTER] = 26;
-			Sizes[CZ_REQ_USE_RAID_AUTO_SWEEP] = 26;
-			Sizes[CZ_REQ_BRIDGE_WAILING] = 26;
-			Sizes[CZ_REQUEST_CARD_PRESET] = 26;
-			Sizes[ZC_RESPONSE_CARD_PRESET] = 0;
-			Sizes[CZ_SET_CARD_PRESET] = 0;
-			Sizes[CZ_SET_CARD_PRESET_TITLE] = 90;
-			Sizes[ZC_TOSHERO_INFO] = 58;
-			Sizes[ZC_TOSHERO_POINT_INFO] = 14;
-			Sizes[ZC_TOSHERO_BUFFSHOP_INFO] = 0;
-			Sizes[CZ_TOSHERO_BUY_BUFF] = 26;
-			Sizes[CZ_TOSHERO_SELL_BUFF] = 26;
-			Sizes[CZ_TOSHERO_SELECT_BUFF] = 26;
-			Sizes[CZ_TOSHERO_UPGRADE_BUFF] = 26;
-			Sizes[CZ_TOSHERO_DESELECT_BUFF] = 22;
-			Sizes[CZ_TOSHERO_COMBINE_THREE_BUFF] = 46;
-			Sizes[CZ_TOSHERO_CHANGE_ATTRIBUTE] = 26;
-			Sizes[CZ_TOSHERO_RUN_LOTTERY] = 26;
-			Sizes[CZ_TOSHERO_REINFORCE] = 30;
-			Sizes[CZ_TOSHERO_CHANGE_EQUIP_OPTION] = 34;
-			Sizes[CZ_TOSHERO_READY] = 26;
-			Sizes[ZC_START_RANGE_PREVIEW] = 151;
-			Sizes[ZC_END_RANGE_PREVIEW] = 74;
-			Sizes[ZC_CLEAR_RANGE_PREVIEW] = 10;
-			Sizes[ZC_FIX_DIRECTION] = 78;
-			Sizes[ZC_FIX_DIRECTION_END] = 14;
-			Sizes[CZ_REQ_TOGGLE_ABILITY] = 26;
-			Sizes[ZC_MY_CHARACTER_LIST] = 0;
-			Sizes[CZ_REG_CHANGE_CHARACTER_SLOT] = 30;
-			Sizes[CZ_DEREG_CHANGE_CHARACTER_SLOT] = 34;
-			Sizes[ZC_START_CHARACTER_CHANGE] = 26;
-			Sizes[ZC_FINISH_CHARACTER_CHANGE] = 30;
-			Sizes[CZ_REQ_CHARACTER_CHANGE] = 34;
-			Sizes[ZC_CHARACTER_CHANGE_REGIST_COMPLETE] = 22;
-			Sizes[ZC_CHARACTER_CHANGE_DEREGIST_COMPLETE] = 14;
-			Sizes[ZC_MY_CHARACTER_DECK_LIST] = 0;
-			Sizes[CZ_REQ_FAVORITE_INDUN_SET] = 55;
-			Sizes[ZC_EQUIP_DUMMY_FOR_SKILL] = 22;
-			Sizes[CZ_REQUEST_AETHER_GEM_REINFORCE] = 38;
-			Sizes[ZC_SET_AURA_INFO] = 279;
-			Sizes[CZ_OPEN_HELP] = 86;
-			Sizes[CZ_REQ_UNKNOWN_SANTUARTY_BUFF] = 346;
-			Sizes[ZC_SEND_CURRENT_JOIN_MGAME_NAME] = 266;
-			Sizes[CZ_REQ_SUMMON_RIDE_PET] = 26;
-			Sizes[CZ_REQ_SELECT_RIDE_PET] = 26;
-			Sizes[CZ_ANS_GIVEUP_PREV_PLAYING_INDUN_PARTY] = 23;
-			Sizes[CZ_LOCK_COLONY_ZONE_ENTER] = 24;
-			Sizes[CZ_DICE] = 27;
-			Sizes[ZC_SET_PLAYER_CONTENTS_RECORD_RESULT] = 150;
-			Sizes[ZC_SEND_TEAM_BATTLE_LEAGUE_RESULT_LIST] = 0;
-			Sizes[ZC_SEND_TEAM_BATTLE_LEAGUE_DETAIL_DAMAGE_LIST] = 0;
-			Sizes[ZC_SEND_TEAM_BATTLE_LEAGUE_DETAIL_HEAL_LIST] = 0;
-			Sizes[ZC_TEAM_BATTLE_LEAGUE_OBSERVE_RELEASE_LOCK_MOVE_KEY] = 10;
-			Sizes[ZC_START_COMBO_INPUT_CMD] = 0;
-			Sizes[ZC_END_COMBO_INPUT_CMD] = 14;
-			Sizes[CZ_END_COMBO_INPUT] = 27;
-			Sizes[ZC_START_ESCAPE_INPUT_CMD] = 0;
-			Sizes[ZC_END_ESCAPE_INPUT_CMD] = 14;
-			Sizes[CZ_CONTENTS_ALERT_MOVE] = 22;
-			Sizes[ZC_TIMING_GAUGE_START] = 54;
-			Sizes[ZC_TIMING_GAUGE_END] = 15;
-			Sizes[ZC_CHARGING_GAUGE_START] = 59;
-			Sizes[ZC_CHARGING_GAUGE_END] = 15;
-			Sizes[ZC_INTERACTION_RIDE] = 555;
-			Sizes[ZC_INTERACTION_COOL_TIME] = 23;
-			Sizes[ZC_SQUAD_INFO] = 0;
-			Sizes[CZ_INVITE_SQUAD_MEMBER] = 91;
-			Sizes[ZC_INVITE_SQUAD_MEMBER] = 217;
-			Sizes[CZ_RESPONSE_INVITED_SQUAD] = 88;
-			Sizes[CZ_LEAVE_SQUAD] = 95;
-			Sizes[CZ_CREATE_SQUAD] = 91;
-			Sizes[CZ_DISBAND_SQUAD] = 26;
-			Sizes[CZ_REQ_EARRING_RAID_PARTY_SKILL] = 26;
-			Sizes[ZC_CUSTOM_CAMERA_ZOOM] = 22;
-			Sizes[ZC_SHOW_SCENE_MODEL_LOCAL] = 19;
-			Sizes[ZC_ADD_PAD_VISIBLE_OPTION] = 16;
-			Sizes[ZC_REMOVE_PAD_VISIBLE_OPTION] = 14;
-			Sizes[ZC_MGAME_USER_DAMAGE_LIST] = 0;
-			Sizes[ZC_SEND_TRIBULATION_INFO] = 0;
-			Sizes[CZ_REQ_TRIBULATION_INFO] = 539;
-			Sizes[CZ_SEND_SELECTED_TRIBULATION_INFO] = 0;
-			Sizes[ZC_SEND_SELECTED_TRIBULATION_INFO] = 0;
-			Sizes[ZC_SEND_TRIBULATION_CLEAR] = 282;
-			Sizes[CZ_SAVE_CLASS_SNAPSHOT] = 52;
-			Sizes[CZ_RENAME_CLASS_SNAPSHOT] = 50;
-			Sizes[CZ_UNEQUIP_ITEM_ALL] = 22;
-			Sizes[CZ_APPLY_CLASS_SNAPSHOT] = 26;
-			Sizes[CZ_REMOVE_CLASS_SNAPSHOT] = 26;
-			Sizes[CZ_REQ_RUNSCRIPT] = 22;
-			Sizes[CZ_REQ_TRANSLATE_MSG] = 2107;
-			Sizes[ZC_SEND_TRANSLATED_MSG] = 2111;
-			Sizes[ZC_SET_SOUND_MUTE] = 16;
-			Sizes[ZC_SET_MUSIC_MUTE] = 16;
-			Sizes[ZC_BREAK_SHIELD] = 14;
-			Sizes[ZC_SHOW_MON_CASTING_UI] = 538;
-			Sizes[CZ_REQ_RAID_GIVE_UP] = 26;
-			Sizes[CZ_REQ_APPLY_HUD_SKIN] = 26;
-			Sizes[CZ_REQ_CURRENT_HUD_SKIN] = 23;
-			Sizes[ZC_SEND_MODE_HUD_SKIN] = 15;
-			Sizes[ZC_SEND_APPLY_HUD_SKIN_MYSELF] = 18;
-			Sizes[ZC_SEND_APPLY_HUD_SKIN_PARTY] = 26;
-			Sizes[ZC_SEND_APPLY_HUD_SKIN_OTHER] = 18;
-			Sizes[CZ_REQ_FIELD_BOSS_INDUN_REENTER_CHECK] = 26;
-			Sizes[ZC_SEND_FIELD_BOSS_INDUN_REENTER_CHECK] = 19;
-			Sizes[CZ_REQ_FULLSCREEN_MOVE_NPC] = 2200;
-			Sizes[ZC_VERTIGO_GAMES_USER_BALANCE] = 30;
-			Sizes[CZ_BUY_VERTIGO_GAMES_PRODUCT] = 170;
-			Sizes[ZC_CHANGE_QUICKSLOT_INIT] = 1046;
-			Sizes[CZ_REQ_QUICKSLOT_REFRESH] = 22;
-			Sizes[ZC_SET_AURA_INTENSIVE_INFO] = 18;
-			Sizes[ZC_UPDATE_SKL_SPDRATE_LIST] = 0;
-			Sizes[ZC_CHARACTER_INDUN_INFO_RESPONSE] = 0;
-			Sizes[ZC_ON_AFTER_IMAGE] = 38;
-			Sizes[ZC_OFF_AFTER_IMAGE] = 14;
-			Sizes[ZC_SEND_NONE_TARGETING_LIST] = 0;
-			Sizes[ZC_UNITY_GROUND_EFFECT] = 59;
-			Sizes[ZC_MON_LEADER_SHOW_ICON] = 531;
-			Sizes[ZC_SET_FACE_STATE] = 526;
-			Sizes[ZC_UPDATE_FAINT] = 30;
-			Sizes[CZ_REQUEST_DIALOG_UI] = 26;
-			Sizes[CZ_USE_INVITE_EVENT_CODE] = 54;
-			Sizes[CZ_GET_INVITE_EVENT_REWARD] = 26;
-			Sizes[ZC_ONLY_ROTATE_MODE] = 787;
-			Sizes[ZC_PLAY_FULLSCREEN_EFFECT] = 274;
-			Sizes[CZ_REQ_DEMONLAIR_STATUS_INFO] = 26;
-			Sizes[CZ_APPLY_DEMONLAIR_BUFF_AND_PENALTY] = 38;
-			Sizes[CZ_REQ_CRAFT_TIME_REDUCE_BUFF] = 26;
-			Sizes[CZ_REQ_GUILD_AGIT_MOVE] = 26;
-			Sizes[CZ_REQ_GUILD_TOWER_REMOVE] = 26;
-			Sizes[CZ_REQ_GUILD_QUEST_REWARD_INFO] = 26;
-			Sizes[ZC_SEND_GUILD_QUEST_REWARD_INFO] = 0;
-			Sizes[CS_LOGIN] = 411;
-			Sizes[SC_NORMAL] = 0;
-			Sizes[SC_FROM_INTEGRATE] = 0;
-			Sizes[CS_REQ_ADD_FRIEND] = 74;
-			Sizes[CS_REQ_BLOCK_FRIEND] = 74;
-			Sizes[CS_FRIEND_CMD] = 32;
-			Sizes[CS_FRIEND_SET_ADDINFO] = 168;
-			Sizes[CS_CHAT] = 0;
-			Sizes[CS_GROUP_CHAT_INVITE] = 114;
-			Sizes[CS_GROUP_CHAT_INVITE_BY_TAG] = 26;
-			Sizes[CS_ALLOW_GROUP_CHAT_TAG_INVITE] = 50;
-			Sizes[CS_REFRESH_GROUP_CHAT] = 10;
-			Sizes[CS_CREATE_GROUP_CHAT] = 10;
-			Sizes[CS_REQ_CHAT_HISTORY] = 26;
-			Sizes[CS_REQ_OUT_ROOM] = 18;
-			Sizes[CS_REQ_RELATED_PC_SESSION] = 24;
-			Sizes[CS_REDIS_SKILLPOINT] = 26;
-			Sizes[CS_PARTY_CLIENT_INFO_SEND] = 0;
-			Sizes[CS_NORMAL_GAME_START] = 10;
-			Sizes[CS_REQUEST_PVP_RANKING] = 92;
-			Sizes[CS_REQUEST_ALL_SEASON_TOP_PVP_RANKING] = 84;
-			Sizes[CS_INVITE_PARTY_PVP] = 14;
-			Sizes[CS_ACCEPT_PARTY_PVP] = 23;
-			Sizes[CS_LIKE_IT] = 96;
-			Sizes[CS_UNLIKE_IT] = 32;
-			Sizes[CS_LIKE_IT_CONFIRM] = 24;
-			Sizes[CS_ADD_RELATION_SCORE] = 96;
-			Sizes[CS_GET_LIKE_COUNT] = 24;
-			Sizes[CS_REQ_MEMBER_LOGOUT_TIME] = 10;
-			Sizes[CS_INVITE_GROUPCHAT_ACCEPT] = 135;
-			Sizes[SC_LOGIN_OK] = 10;
-			Sizes[CS_DICE] = 15;
-			Sizes[SC_SYSTEM_MSG] = 0;
-			Sizes[ZC_InteractionInfo] = 0;
-			Sizes[CZ_InteractionCancel] = 64;
-			Sizes[ZC_InteractionRideUseSkill] = 0;
 
+		static OpTable()
+		{
 			foreach (var field in typeof(Op).GetFields(BindingFlags.Public | BindingFlags.Static))
 				Names[(int)field.GetValue(null)] = field.Name;
+		}
+
+		public static Op GetOp(int opCode)
+		{
+			if (Codes.TryGetValue(opCode, out var op))
+				return op;
+			Log.Warning("Unknown Op Name: {0}", opCode);
+			return Op.Undefined;
+		}
+
+		public static int GetOp(Op opName)
+		{
+			if (Ops.TryGetValue(opName, out var op))
+				return op;
+			Log.Warning("Unknown Op Name: {0}", opName);
+			return -1;
 		}
 
 		public static int GetSize(int op)
@@ -2545,6 +1427,24 @@ namespace Melia.Shared.Network
 			if (!Names.TryGetValue(op, out var name))
 				return "?";
 			return name;
+		}
+
+		public static void AddOp(OpData opData)
+		{
+			Ops[opData.Op] = opData.Code;
+			Codes[opData.Code] = opData.Op;
+			Names[opData.Code] = opData.Name;
+			Sizes[opData.Code] = opData.Size;
+		}
+
+		public static bool Exists(Op op)
+		{
+			return Ops.ContainsKey(op);
+		}
+
+		public static bool Exists(int opCode)
+		{
+			return Codes.ContainsKey(opCode);
 		}
 	}
 }

@@ -1,0 +1,4 @@
+// Minigame Spawn Points
+// Entries can be overridden by packages and user files.
+[
+]

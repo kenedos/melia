@@ -47,4 +47,22 @@ namespace Melia.Zone
 			feature.Enable(false);
 		}
 	}
+
+	public static class FeatureId
+	{
+		public static readonly string AbilityCostRevamp = "AbilityCostRevamp";
+		public static readonly string AttackTypeBonusRevamp1 = "AttackTypeBonusRevamp1";
+		public static readonly string AttendanceRewardSystem = "AttendanceRewardSystem";
+		public static readonly string AttributeBonusRevamp = "AttributeBonusRevamp";
+		public static readonly string BattleManager = "BattleManager";
+		public static readonly string BountyHunterSystem = "BountyHunterSystem";
+		public static readonly string CenturionRemoved = "CenturionRemoved";
+		public static readonly string ClericHealPartySelect = "ClericHealPartySelect";
+		public static readonly string CraftingTable = "CraftingTable";
+		public static readonly string DashingForAll = "DashingForAll";
+		public static readonly string DayNightCycle = "DayNightCycle";
+		public static readonly string GrowthEquipOnStart = "GrowthEquipOnStart";
+		public static readonly string IncreasedStatRatio = "IncreasedStatRatio";
+		public static readonly string TerritoryWarSystem = "TerritoryWarSystem";
+	}
 }

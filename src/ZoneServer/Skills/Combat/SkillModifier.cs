@@ -46,6 +46,33 @@ namespace Melia.Zone.Skills.Combat
 		public float BlockPenetrationMultiplier { get; set; } = 1;
 
 		/// <summary>
+		/// Gets or sets flat crit rate bonus.
+		/// </summary>
+		/// <remarks>
+		/// The value is in percent. For example, setting it to 20 increases the
+		/// crit chance by 20%.
+		/// </remarks>
+		public float BonusCritChance { get; set; }
+
+		/// <summary>
+		/// Gets or sets flat dodge bonus.
+		/// </summary>
+		/// <remarks>
+		/// The value is in percent. For example, setting it to 20 increases the
+		/// dodge chance by 20%.
+		/// </remarks>
+		public float BonusDodgeChance { get; set; }
+
+		/// <summary>
+		/// Gets or sets flat defense bonus.
+		/// </summary>
+		/// <remarks>
+		/// The value is in percent. For example, setting it to 20 increases the
+		/// defense by 20%.
+		/// </remarks>
+		public float BonusDefense { get; set; }
+
+		/// <summary>
 		/// Gets or sets percentage-based defense penetration for DEF and MDEF.
 		/// </summary>
 		/// <remarks>
@@ -66,6 +93,22 @@ namespace Melia.Zone.Skills.Combat
 		public float DamageMultiplier { get; set; } = 1;
 
 		/// <summary>
+		/// Gets or sets the Crit Rate multiplier
+		/// </summary>
+		/// <remarks>
+		/// This is applied before anything else that modifies crit rate
+		/// </remarks>
+		public float CritRateMultiplier { get; set; } = 1;
+
+		/// <summary>
+		/// Gets or sets the Crit Damage multiplier
+		/// </summary>
+		/// <remarks>
+		/// This increases damage dealt on critical hits
+		/// </remarks>
+		public float CritDamageMultiplier { get; set; } = 1;
+
+		/// <summary>
 		/// Gets or sets the minimum critical chance.
 		/// </summary>
 		/// <remarks>
@@ -73,26 +116,6 @@ namespace Melia.Zone.Skills.Combat
 		/// to occur.  It's in percent, so 20 = 20% crit rate minimum.
 		/// </remarks>
 		public float MinCritChance { get; set; } = 0;
-
-		/// <summary>
-		/// Gets or sets the crit chance multiplier.
-		/// </summary>
-		/// <remarks>
-		/// The multiplier gets applied to the crit chance before other bonuses,
-		/// such as BonusCritChance. For example, with a base crit chance of 10%,
-		/// a multiplier of 1.5 and a bonus of 20%, the final crit chance would be:
-		/// 10 * 1.5 + 20 = 35%.
-		/// </remarks>
-		public float CritChanceMultiplier { get; set; } = 1;
-
-		/// <summary>
-		/// Gets or sets flat crit chance bonus.
-		/// </summary>
-		/// <remarks>
-		/// The value is in percent. For example, setting it to 20 increases the
-		/// crit chance by 20%.
-		/// </remarks>
-		public float BonusCritChance { get; set; }
 
 		/// <summary>
 		/// Gets or sets damage multiplier applied to skill damage after
@@ -117,7 +140,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <summary>
 		/// Gets or sets whether the attack can be blocked. Beats out ForcedBlock.
 		/// </summary>
-		public bool Unblockable { get; set; }		
+		public bool Unblockable { get; set; }
 
 		/// <summary>
 		/// Gets or sets forced block status.
@@ -154,6 +177,28 @@ namespace Melia.Zone.Skills.Combat
 		public bool ForcedCritical { get; set; }
 
 		/// <summary>
+		/// Gets or sets forced back attack status.
+		/// </summary>
+		/// <remarks>
+		/// If this is true, the attack is treated as a back attack,
+		/// triggering back attack bonuses even if the attacker isn't
+		/// physically behind the target.
+		/// </remarks>
+		public bool ForcedBackAttack { get; set; }
+
+		/// <summary>
+		/// Gets or sets additional back attack damage bonus.
+		/// </summary>
+		/// <remarks>
+		/// Skills that deal extra damage on back attacks should set this
+		/// value instead of applying the bonus directly. This allows the
+		/// combat system to properly apply the bonus when ForcedBackAttack
+		/// is true (e.g., from Werewolf card).
+		/// Value is additive to DamageMultiplier (0.5 = +50% damage).
+		/// </remarks>
+		public float BackAttackDamageBonus { get; set; }
+
+		/// <summary>
 		/// Gets or sets the attack's attribute.
 		/// </summary>
 		/// <remarks>
@@ -170,9 +215,46 @@ namespace Melia.Zone.Skills.Combat
 		public AttributeType DefenseAttribute { get; set; } = AttributeType.None;
 
 		/// <summary>
+		/// Gets or sets the attack's attack type.
+		/// </summary>
+		/// <remarks>
+		/// If this is set to None, the skill's attack type is used.
+		/// </remarks>
+		public SkillAttackType AttackType { get; set; } = SkillAttackType.None;
+
+		/// <summary>
+		/// Gets or sets the target's armor type.
+		/// </summary>
+		/// <remarks>
+		/// If this is set to None, the target's armor type is used.
+		/// </remarks>
+		public ArmorMaterialType DefenseArmorType { get; set; } = ArmorMaterialType.None;
+
+		/// <summary>
 		/// Returns a new skill modifier with default values.
 		/// </summary>
 		public static SkillModifier Default => new();
+
+		/// <summary>
+		/// Returns a new skill modifier with the half damage.
+		/// </summary>
+		/// <returns></returns>
+		public static SkillModifier HalfDamage()
+			=> DamageModifier(0.5f);
+
+		/// <summary>
+		/// Creates a <see cref="SkillModifier"/> that applies a specified damage multiplier.
+		/// </summary>
+		/// <param name="multiplier">The factor by which to multiply damage. Must be greater than zero; values less than one reduce damage, values
+		/// greater than one increase damage.</param>
+		/// <returns>A <see cref="SkillModifier"/> instance with its damage multiplier set to <paramref name="multiplier"/>.</returns>
+		public static SkillModifier DamageModifier(float multiplier)
+		{
+			var result = new SkillModifier();
+			result.DamageMultiplier = multiplier;
+
+			return result;
+		}
 
 		/// <summary>
 		/// Returns a new skill modifier with the given hit count.

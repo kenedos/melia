@@ -13,8 +13,17 @@
 
 #include "inc/common.bt"
 
+typedef struct
+{
+int i3; // 500
+int64 l1;
+int64 l2;
+int i4;
+lpString name;
+} BorutaRank <optimize=false>;
+
 ServerHeaderDynamic header;
 
-int i1; // 0
+int count; // 0
 int i2; // 82
-int i3; // 500
+BorutaRank ranks[count];

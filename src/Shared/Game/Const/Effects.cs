@@ -5,5 +5,6 @@
 		Top,
 		Middle,
 		Bottom,
+		Unknown,
 	}
 }

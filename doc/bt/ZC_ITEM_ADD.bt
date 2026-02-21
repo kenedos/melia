@@ -40,12 +40,12 @@ bool b2;
 if(propertiesSize > 0)
     getProperties(propertiesSize);
 
-if (worldId > 0)
+if (objectId > 0)
 {
     short s1;
     int64 objectId2;
     short count;
 
     if (count > 0)
-        byte bin[count * 30];
+        SocketInfo socket[count];
 }

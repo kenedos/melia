@@ -357,6 +357,53 @@ namespace Melia.Barracks.Network
 		}
 
 		/// <summary>
+		/// Sends a chat message to the client.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="characterIndex"></param>
+		/// <param name="message"></param>
+		public static void BC_CHAT(IBarracksConnection conn, byte characterIndex, string message)
+		{
+			var packet = new Packet(Op.BC_CHAT);
+
+			packet.PutLong(conn.Account.ObjectId);
+			packet.PutByte(characterIndex);
+			packet.PutLpString(message);
+
+			conn.Send(packet);
+		}
+
+		/// <summary>
+		/// Response to CB_JUMP, when a companion requests to jump.
+		/// </summary>
+		/// <param name="conn"></param>
+		public static void BC_JUMP(IBarracksConnection conn)
+		{
+			var packet = new Packet(Op.BC_JUMP);
+
+			packet.PutLong(0);
+			packet.PutInt(0);
+			packet.PutLong(conn.Account.ObjectId);
+			packet.PutByte(0);
+
+			conn.Send(packet);
+		}
+
+		/// <summary>
+		/// Sends additional character slot price.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="characterSlotPrice"></param>
+		public static void BC_REQ_SLOT_PRICE(IBarracksConnection conn, int characterSlotPrice)
+		{
+			var packet = new Packet(Op.BC_REQ_SLOT_PRICE);
+
+			packet.PutInt(characterSlotPrice);
+
+			conn.Send(packet);
+		}
+
+		/// <summary>
 		/// Sends IES mod list to client.
 		/// </summary>
 		/// <param name="conn"></param>

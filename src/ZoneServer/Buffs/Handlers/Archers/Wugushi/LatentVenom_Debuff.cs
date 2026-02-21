@@ -16,13 +16,16 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Wugushi
 	{
 		public override void WhileActive(Buff buff)
 		{
+			if (buff.Caster is not ICombatEntity caster)
+				return;
+
 			if (buff.Target.IsDead)
 				return;
 
-			if (!buff.Caster.TryGetSkill(buff.SkillId, out var skill))
+			if (!caster.TryGetSkill(buff.SkillId, out var skill))
 				return;
 
-			buff.Target.TakeSkillHit(buff.Caster, skill);
+			buff.Target.TakeSkillHit(caster, skill);
 			Crescendo_Bane_Buff.TryApply(buff);
 		}
 	}

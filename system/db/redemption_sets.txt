@@ -1,0 +1,18 @@
+// Melia
+// Database file
+//---------------------------------------------------------------------------
+
+[
+  { 
+    setName: "Hanaming Set", 
+    materialItem: "leaf_hanaming", 
+    requiredAmounts: { "HAIR_M_130": 100, "costume_Com_27": 300 },
+    rewardItems: [ { gender: "Male", "HAIR_M_130": 1, "costume_Com_27": 1 }, { gender: "Female", "HAIR_F_131": 1, "costume_Com_31": 1 }]
+  },
+  { 
+    setName: "Kepa Set", 
+    materialItem: "misc_0001", 
+    requiredAmounts: { "Hat_628054": 100 },
+    rewardItems: [ { "Hat_628054": 1 } ]
+  },
+]

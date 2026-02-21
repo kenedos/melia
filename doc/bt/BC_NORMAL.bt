@@ -20,15 +20,88 @@ typedef struct
     short propertiesSize;
     if (propertiesSize > 0) {
         getProperties(propertiesSize);
-        int64 id2;
-        byte bin2[10];
+        int64 l1;
+        short optionSize;
+        if (optionSize > 0)
+        {
+            local int halfCount = optionSize / 2;
+            local int i = 0;
+            for (i = 0; i < halfCount; i++)
+            {
+                lpString optionName; // SealOption_2
+                byte b1; // 1
+                lpString optionType; // MATK;PATK
+                lpString optionValue; // SealOptionValue_2
+                byte b2; // 0
+                int value; // 357
+            }
+        }
     }
-} BARRACK_PROPERTY <optimize=false>;
+}
+EquipProperties <optimize=false>;
+
+typedef struct
+{
+    EquipProperties properties[EquipSlotCount];
+}
+Equip <optimize=false>;
+
+typedef struct
+{
+    lpString name;
+    lpString resetTime;
+}
+ResetTimeEntry <optimize=false>;
+
+typedef struct
+{
+    int64 worldId;
+    int i1;
+    int i2;
+    int i3;
+    int i4;
+    short s1;
+    short propertiesSize;
+    int i5;
+    if (i5 > 0)
+    {
+        local int i = 0;
+        for (i = 0; i < i5; i++)
+        {
+            lpString str1;
+            lpString str2;
+            int i6;
+        }
+    }
+} SocketInfoEnd <optimize=false>;
+
+typedef struct
+{
+    int64 l1;
+    short count;
+    //byte bin[count*30];
+    SocketInfo socketInfo[count];
+}
+Socket <optimize=false>;
 
 typedef struct
 {
     APPEARANCE_BARRACK_PC abpc;
-    BARRACK_PROPERTY properties[19];
+    Equip equip;
+    //byte bin[8];
+    short socketCount;
+    if (socketCount > 0)
+    {
+        switch(socketCount)
+        {
+            case 1:
+                Socket socket;
+                break;
+            default:
+                Socket sockets[socketCount];
+                break;
+        }
+    }
     byte b1;
     byte b2;
     byte b3;
@@ -39,14 +112,6 @@ typedef struct
     
     int i1;
     int i2;
-    int64 characterId;
-    short s2;
-    if (s2 > 0) {
-        lpString lpS1;
-        lpString lpS2;
-        lpString lpS3;
-        lpString lpS4;
-    }
 }
 BARRACK_PC <read=readBARRACK_PC>;
 
@@ -211,6 +276,7 @@ switch(type)
     // Client integrity check failure.
     // The client will respond with CB_CLIENT_INTEGRITY_FAIL
     case 0x18:
+        int i1;
         break;
 
     // Update the number of purchased character slots in the barrack.

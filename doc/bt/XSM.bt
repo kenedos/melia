@@ -1,0 +1,100 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.2 Binary Template
+//
+//      File: XSM.bt
+//   Authors: Gemini 2.5, Salman T. Khan
+//   Version: 3.0 (Refactored)
+//   Purpose: Parses XSM (Skeletal Motion) files.
+//  Category: 3D Animation
+// File Mask: *.xsm
+//  ID Bytes: 58 53 4D 20 // "XSM "
+//   History:
+//   3.0 2024-05-22 - Refactored to include a comprehensive EmotionFX.bt file.
+//   2.1 2024-05-21 - Corrected non-unique ReadKey function names.
+//   2.0 2024-05-21 - Added custom read functions for all structs.
+//   1.0 2023-10-27 - Initial version.
+//------------------------------------------------
+
+// --- Main Setup ---
+LittleEndian();
+#include "inc/EmotionFX.bt" // Include all shared structs and functions
+
+//------------------------------------------------
+//--- XSM Specific Definitions
+//------------------------------------------------
+
+// The XSM format uses its own set of chunk IDs.
+typedef enum <uint> {
+    XsmChunkInfo           = 201, // 0xC9
+    XsmChunkSkeletalmotion = 202, // 0xCA
+} XsmChunkID;
+
+// Define a local FileChunk struct that uses our XsmChunkID enum.
+// The structure (ID, size, version) is identical, but the enum is specific.
+typedef struct {
+    XsmChunkID chunk_id;
+    uint size_in_bytes, version;
+} XsmFileChunk <read=readXsmFileChunk, optimize=false>;
+
+// Note: The XsmFileHeader, Chunk_Info_v2, and Chunk_SkeletalMotion_v2 structs
+// are already defined in the included EmotionFX.bt file.
+
+//------------------------------------------------
+//--- XSM Specific Read Functions
+//------------------------------------------------
+
+// Read function for our local XSM chunk header.
+string readXsmFileChunk(XsmFileChunk &c) {
+    return Str("ID: %s, Version: %d, Size: %d", EnumToString(c.chunk_id), c.version, c.size_in_bytes);
+}
+
+//------------------------------------------------
+//--- Main File Parsing Logic
+//------------------------------------------------
+
+// --- Read Header and Validate ---
+// The XsmFileHeader struct is defined in EmotionFX.bt.
+XsmFileHeader header <name="XSM File Header">;
+if (header.magic != "XSM ") {
+    Warning("File does not appear to be an XSM file. Expected 'XSM ' signature.");
+    return -1;
+}
+
+// --- Read Chunks Until End of File ---
+local int64 current_chunk_pos, chunk_data_end;
+while (!FEof()) {
+    current_chunk_pos = FTell();
+    if (current_chunk_pos >= FileSize()) break;
+
+    XsmFileChunk chunk;
+    chunk_data_end = current_chunk_pos + 12 + chunk.size_in_bytes;
+
+    Printf("Parsing Chunk: %s\n", readXsmFileChunk(chunk));
+
+    switch (chunk.chunk_id) {
+        case XsmChunkInfo:
+            // The struct Chunk_Info_v2 is defined in EmotionFX.bt
+            if (chunk.version == 2) XacInfo2 info;
+            else Warning("Unknown XsmChunkInfo version %d", chunk.version);
+            break;
+
+        case XsmChunkSkeletalmotion:
+            // The struct Chunk_SkeletalMotion_v2 is defined in EmotionFX.bt
+            if (chunk.version == 2) Chunk_SkeletalMotion_v2 motion;
+            else Warning("Unknown XsmChunkSkeletalmotion version %d", chunk.version);
+            break;
+
+        default:
+            Warning("Unknown or unhandled chunk ID %d found.", chunk.chunk_id);
+            break;
+    }
+
+    // Ensure we are at the start of the next chunk for robust parsing
+    if (FTell() != chunk_data_end) {
+        Warning("Parser position mismatch after chunk %s. Expected 0x%LX, but at 0x%LX. Correcting.",
+            EnumToString(chunk.chunk_id), chunk_data_end, FTell());
+        FSeek(chunk_data_end);
+    }
+}
+
+Printf("--- End of File Reached ---\n");

@@ -7,6 +7,7 @@
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
 using Melia.Zone;
+using Melia.Zone.Events;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
@@ -23,7 +24,7 @@ public class CharacterInitializationScript : GeneralScript
 		UpdateAccount(args.Character);
 	}
 
-	private static void UpdateAccount(Character character)
+	private void UpdateAccount(Character character)
 	{
 		// Unlock special classes by default if the respective class feature
 		// is enabled, but vouchers are disabled.
@@ -50,8 +51,6 @@ public class CharacterInitializationScript : GeneralScript
 		props.SetFloat("UnlockQuest_Char4_25", 1); // Bonemancer [C]
 		props.SetFloat("UnlockQuest_Char3_27", 1); // Blitz Hunter [A]
 		props.SetFloat("UnlockQuest_Char5_21", 1); // Blitz Hunter [T]
-		props.SetFloat("UnlockQuest_Char2_28", 1); // Aether Blader [W]
-		props.SetFloat("UnlockQuest_Char4_26", 1); // Aether Blader [C]
 	}
 
 	private static void InitCharacter(Character character)
@@ -71,7 +70,7 @@ public class CharacterInitializationScript : GeneralScript
 		}
 	}
 
-	private static void UpdateCharacter(Character character)
+	private void UpdateCharacter(Character character)
 	{
 		if (character.JobClass == JobClass.Cleric)
 		{
@@ -108,7 +107,7 @@ public class CharacterInitializationScript : GeneralScript
 		GiveItem(character, ItemId.Escape_Orb, 1);
 		GiveItem(character, ItemId.EscapeStone_Klaipeda, 1);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.Top, ItemId.TOP01_101);
 			EquipItem(character, EquipSlot.Pants, ItemId.LEG01_101);
@@ -134,7 +133,7 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.Staff);
 		LearnAbility(character, AbilityId.Mace);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.SWD01_101);
 		}
@@ -157,7 +156,7 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.Mace);
 		LearnAbility(character, AbilityId.THStaff);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.STF01_101);
 		}
@@ -181,7 +180,7 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.THBow);
 		LearnAbility(character, AbilityId.Bow);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.TBW01_101);
 		}
@@ -204,7 +203,7 @@ public class CharacterInitializationScript : GeneralScript
 		LearnAbility(character, AbilityId.THMace);
 		LearnAbility(character, AbilityId.Cleric36);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			EquipItem(character, EquipSlot.RightHand, ItemId.MAC01_101);
 		}
@@ -228,7 +227,7 @@ public class CharacterInitializationScript : GeneralScript
 
 		LearnAbility(character, AbilityId.Sword);
 
-		if (!Feature.IsEnabled("GrowthEquipOnStart"))
+		if (!Feature.IsEnabled(FeatureId.GrowthEquipOnStart))
 		{
 			// It's difficult to find information on what kind of
 			// equipment Scout got by default before growth items,

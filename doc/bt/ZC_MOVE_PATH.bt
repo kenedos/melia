@@ -35,4 +35,4 @@ int handle;
 CellPosition cellPos1;
 CellPosition cellPos2;
 float speed;
-byte b1;
+byte b1; // Seems to mess with actors rotation; 2 means actors don't auto-rotate

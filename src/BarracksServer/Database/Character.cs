@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Melia.Barracks.Network.Helpers;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Shared.ObjectProperties;
@@ -36,6 +37,31 @@ namespace Melia.Barracks.Database
 		public long AccountId { get; set; }
 
 		/// <summary>
+		/// Returns the character's account database id.
+		/// </summary>
+		public long AccountDbId => this.AccountId;
+
+		/// <summary>
+		/// Returns the character's globally unique account object id.
+		/// </summary>
+		public long AccountObjectId => ObjectIdRanges.Accounts + this.AccountId;
+
+		/// <summary>
+		/// Returns the character's pose.
+		/// </summary>
+		public byte Pose { get; set; }
+
+		/// <summary>
+		/// Returns the character's chat balloon id.
+		/// </summary>
+		public int ChatBalloon { get; set; } = 1;
+
+		/// <summary>
+		/// Gets or sets the character's equipped achievement title id.
+		/// </summary>
+		public int EquippedTitleId { get; set; } = -1;
+
+		/// <summary>
 		/// Gets or sets index of character in character list.
 		/// </summary>
 		public byte Index { get; set; }
@@ -60,10 +86,11 @@ namespace Melia.Barracks.Database
 		/// </summary>
 		public Gender Gender { get; set; }
 
+		private int _hair;
 		/// <summary>
 		/// Gets or sets id of the character's hair style.
 		/// </summary>
-		public int Hair { get; set; }
+		public int Hair { get { return this.GetHair(); } set { _hair = value; } }
 
 		/// <summary>
 		/// Gets or sets the character's skin color.
@@ -273,6 +300,21 @@ namespace Melia.Barracks.Database
 		public JobId[] GetJobIds()
 		{
 			return this.Jobs.OrderBy(a => a).ToArray();
+		}
+
+		internal int GetHair()
+		{
+			if (this.Equipment[(int)EquipSlot.Hair].Id != 12101)
+			{
+				if (BarracksServer.Instance.Data.ItemDb.TryFind(this.Equipment[(int)EquipSlot.Hair].Id, out var item))
+				{
+					if (BarracksServer.Instance.Data.HairTypeDb.TryFind(this.Gender, item.Script.StrArg, out var hairData))
+						return hairData.Index;
+					else if (BarracksServer.Instance.Data.HeadTypeDb.TryFind(this.Gender, item.Script.StrArg, out var headData))
+						return headData.Index;
+				}
+			}
+			return this._hair;
 		}
 	}
 

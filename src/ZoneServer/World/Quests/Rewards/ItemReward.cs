@@ -31,6 +31,23 @@ namespace Melia.Zone.World.Quests.Rewards
 		public override string Icon => "Item:" + this.ItemClassId;
 
 		/// <summary>
+		/// Creates new instance.
+		/// </summary>
+		/// <param name="itemId"></param>
+		/// <param name="amount"></param>
+		public ItemReward(string itemClassName, int amount = 1)
+		{
+			var itemData = ZoneServer.Instance.Data.ItemDb.FindByClass(itemClassName);
+
+			if (itemData == null)
+				throw new ArgumentException($"Unknown item '{itemClassName}'.");
+
+			this.ItemClassId = itemData.Id;
+			this.Amount = amount;
+			this.ItemName = itemData.Name;
+		}
+
+		/// <summary>
 		/// Creates a quest reward for an item.
 		/// </summary>
 		/// <param name="itemId"></param>

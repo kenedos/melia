@@ -14,13 +14,13 @@
 #include "inc/common.bt"
 
 ClientHeaderDynamic header;
-int i1; // 0
+ShopType shopType; // 0
 int buyerHandle; // 8519
 int itemCount; // 1
 local int i;
 for (i = 0; i < itemCount; i++)
 {
-    int index;
+    int indexOrSkillId;
     int64 worldId; // Item World Id?
     int amount;
     int i0;

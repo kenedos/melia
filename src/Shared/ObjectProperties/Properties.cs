@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Melia.Shared.Game.Const;
 using Melia.Shared.Game.Properties;
 using Yggdrasil.Variables;
 
@@ -10,13 +12,24 @@ namespace Melia.Shared.ObjectProperties
 	/// </summary>
 	public class Properties : VariableContainer<string>
 	{
-		private readonly Dictionary<string, List<string>> _maxProperties = new Dictionary<string, List<string>>();
+		private readonly Dictionary<string, List<string>> _maxProperties = new();
 		private readonly bool _checkNamespaceValidity;
 
 		/// <summary>
 		/// Returns the namespace of the properties in this collection.
 		/// </summary>
 		public string Namespace { get; }
+
+		/// <summary>
+		/// Returns a property
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
+		public float this[string propertyName]
+		{
+			get { return this.GetFloat(propertyName); }
+			set { this.SetFloat(propertyName, value); }
+		}
 
 		/// <summary>
 		/// Creates new property collection with the given namespace.
@@ -47,14 +60,11 @@ namespace Melia.Shared.ObjectProperties
 		/// <exception cref="ArgumentException"></exception>
 		public override TVariable Create<TVariable>(TVariable variable)
 		{
-			if (!(variable is IProperty))
+			if (variable is not IProperty)
 				throw new ArgumentException($"The given variable '{variable.Ident}' is not a property.");
 
-			if (_checkNamespaceValidity)
-			{
-				if (!PropertyTable.Exists(this.Namespace, variable.Ident))
-					throw new ArgumentException($"The property '{variable.Ident}' doesn't exist in the namespace '{this.Namespace}'.");
-			}
+			if (_checkNamespaceValidity && !PropertyTable.Exists(this.Namespace, variable.Ident))
+				throw new ArgumentException($"The property '{variable.Ident}' doesn't exist in the namespace '{this.Namespace}'.");
 
 			return base.Create(variable);
 		}
@@ -202,6 +212,22 @@ namespace Melia.Shared.ObjectProperties
 		}
 
 		/// <summary>
+		/// Returns the value of the given property, or the default value
+		/// if the property wasn't defined. For certain methods where the
+		/// value is used a divisor.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <param name="defaultValue"></param>
+		/// <returns></returns>
+		public float GetFloatSafe(string propertyName, float defaultValue = 1)
+		{
+			if (!this.TryGet<FloatProperty>(propertyName, out var property))
+				return defaultValue;
+
+			return property.Value;
+		}
+
+		/// <summary>
 		/// Returns the value of the given property via out. Returns false
 		/// if the property wasn't set yet.
 		/// </summary>
@@ -221,6 +247,25 @@ namespace Melia.Shared.ObjectProperties
 		}
 
 		/// <summary>
+		/// Returns the value of the given property via out. Returns false
+		/// if the property wasn't set yet.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public bool TryGetString(string propertyName, out string value)
+		{
+			if (!this.TryGet<StringProperty>(propertyName, out var property))
+			{
+				value = "";
+				return false;
+			}
+
+			value = property.Value;
+			return true;
+		}
+
+		/// <summary>
 		/// Returns the value of the given property, or the default value
 		/// if the property wasn't defined.
 		/// </summary>
@@ -231,6 +276,21 @@ namespace Melia.Shared.ObjectProperties
 		{
 			if (!this.TryGet<StringProperty>(propertyName, out var property))
 				return defaultValue;
+
+			return property.Value;
+		}
+
+		/// <summary>
+		/// Returns the value of the given property, or the default value
+		/// if the property wasn't defined.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <param name="defaultValue"></param>
+		/// <returns></returns>
+		public string GetString(string propertyName, Enum defaultValue)
+		{
+			if (!this.TryGet<StringProperty>(propertyName, out var property))
+				return defaultValue.ToString();
 
 			return property.Value;
 		}
@@ -264,6 +324,22 @@ namespace Melia.Shared.ObjectProperties
 				return this.Create(new StringProperty(propertyName, value));
 
 			property.Value = value;
+			return property;
+		}
+
+		/// <summary>
+		/// Sets the value of the given property. If the property doesn't
+		/// exist yet it will be created.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		public StringProperty SetString(string propertyName, Enum value)
+		{
+			if (!this.TryGet<StringProperty>(propertyName, out var property))
+				return this.Create(new StringProperty(propertyName, value.ToString()));
+
+			property.Value = value.ToString();
 			return property;
 		}
 
@@ -315,10 +391,13 @@ namespace Melia.Shared.ObjectProperties
 		/// </remarks>
 		/// <param name="parentPropertyName"></param>
 		/// <param name="dependencyPropertyNames"></param>
-		public void AutoUpdate(string parentPropertyName, string[] dependencyPropertyNames)
+		public void AutoUpdate(string parentPropertyName, params string[] dependencyPropertyNames)
 		{
 			if (dependencyPropertyNames == null || dependencyPropertyNames.Length == 0)
 				throw new ArgumentException($"No dependencies defined.");
+
+			if (!PropertyTable.Exists(parentPropertyName))
+				return;
 
 			if (!this.TryGet<CFloatProperty>(parentPropertyName, out var parentProperty))
 				throw new ArgumentException($"Property '{parentPropertyName}' not found.");

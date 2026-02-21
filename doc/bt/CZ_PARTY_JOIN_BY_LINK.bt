@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.2 Binary Template
+//
+//      File: CZ_PARTY_JOIN_BY_LINK.bt
+//   Authors: Salman T. Khan
+//   Version: i399874
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+PartyType type;
+int64 partyId;
+int64 charId;

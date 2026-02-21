@@ -16,5 +16,6 @@
 ServerHeaderFixed header;
 
 int handle; // 102929
-position pos; // 80.0, 1.0, 1.5
+//position pos; // 80.0, 1.0, 1.5
+float maxHeight, duration, easing;
 byte b1; // 1

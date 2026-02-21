@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 	/// Handler for the Ardito skill Granata.
 	/// </summary>
 	[SkillHandler(SkillId.Arditi_Granata)]
-	public class Arditi_Granata : IGroundSkillHandler
+	public class Arditi_Granata : IMeleeGroundSkillHandler
 	{
 		private const int CastLength = 70;
 
@@ -32,9 +33,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -51,7 +54,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 			caster.SetAttackState(true);
 
 			var direction = (originPos == farPos) ? caster.Direction : originPos.GetDirection(farPos);
-			var castPosition = caster.Position.GetRelative2D(direction, CastLength);
+			var castPosition = caster.Position.GetRelative(direction, CastLength);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, originPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Position.GetDirection(castPosition), Position.Zero);
@@ -71,11 +74,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		{
 			await Task.Delay(TimeSpan.FromMilliseconds(200));
 
-			Send.ZC_NORMAL.SkillProjectile(caster, "I_archer_Lachrymator_force_mash_short#Dummy_R_HAND", 0.6f, "F_scout_Granata_explosion", 3, castPosition, 70f, 0.3f, 0, 600);
+			Send.ZC_NORMAL.SkillProjectile(caster, castPosition, "I_archer_Lachrymator_force_mash_short#Dummy_R_HAND", 0.6f, "F_scout_Granata_explosion", 3f, 70f, TimeSpan.FromSeconds(0.3f), TimeSpan.Zero, 600);
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: CastLength, width: 45, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			await Task.Delay(TimeSpan.FromMilliseconds(300));
 
@@ -89,11 +92,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 				var hit = new HitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(100));
 				Send.ZC_HIT_INFO(caster, target, hit);
 
-				var kb = new KnockBackInfo(caster.Position, target.Position, skill);
+				var kb = new KnockBackInfo(caster.Position, target, skill);
 				target.Position = kb.ToPosition;
 				target.AddState(StateType.KnockedBack, kb.Time);
 
-				Send.ZC_KNOCKDOWN_INFO(caster, target, kb);
+				Send.ZC_KNOCKDOWN_INFO(caster, kb);
 			}
 		}
 	}

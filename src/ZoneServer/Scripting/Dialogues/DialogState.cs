@@ -21,6 +21,11 @@
 		Waiting,
 
 		/// <summary>
+		/// The dialog is waiting for input from the client to close the store.
+		/// </summary>
+		Shopping,
+
+		/// <summary>
 		/// The dialog has ended.
 		/// </summary>
 		Ended,

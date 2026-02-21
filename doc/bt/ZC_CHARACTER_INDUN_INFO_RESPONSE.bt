@@ -1,0 +1,49 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.2 Binary Template
+//
+//      File: ZC_CHARACTER_INDUN_INFO_RESPONSE.bt
+//   Authors: Salman T. Khan
+//   Version: i373765
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History:
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderDynamic header;
+
+// Re-using old struct from ZC_NORMAL (0x1B2)
+typedef struct
+{
+    lpString type;
+    lpString val;
+} IndunInfo <optimize=false>;
+
+typedef struct
+{
+    int64 characterId;
+    int indunCount;
+    IndunInfo infos[indunCount];
+} Indun <optimize=false>;
+
+typedef struct
+{
+    int i1; // 1
+    int64 characterId;
+    char characterName[64];
+    //byte bin[24]; // Has some data in it.
+    int64 l1; // exp?
+    int64 l2; // max exp?
+    int64 l3; // 0
+    int inDunCount;
+Indun indun[inDunCount];
+} CharacterInfo <optimize=false>;
+
+int characterCount;
+if (!checkCompression())
+{
+    CharacterInfo characters[characterCount];
+}

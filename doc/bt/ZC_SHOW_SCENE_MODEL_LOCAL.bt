@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v15.0 Binary Template
+//
+//      File: ZC_SHOW_SCENE_MODEL_LOCAL.bt
+//   Authors: 
+//   Version: 
+//   Purpose: Unknown Purpose, seen during Delmore Raid.
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+int i1; // 152900
+int i2; // 152905
+byte b1; // 1

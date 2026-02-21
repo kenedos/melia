@@ -1,0 +1,19 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: CZ_CHANGE_GUILD_EMBLEM.bt
+//   Authors: Salman T. Khan
+//   Version: 386576
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+int64 guildId1;
+int64 guildId2;

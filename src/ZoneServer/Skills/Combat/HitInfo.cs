@@ -1,4 +1,5 @@
 ﻿using System;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -60,6 +61,18 @@ namespace Melia.Zone.Skills.Combat
 		/// </summary>
 		public int HitCount { get; set; } = 1;
 
+		public HitAttackType AttackType { get; set; } = HitAttackType.None;
+
+		/// <summary>
+		/// Gets or sets the hit's unknown float 1.
+		/// </summary>
+		public float UnkFloat1 { get; set; } = 0f;
+
+		/// <summary>
+		/// Gets or sets the hit's unknown float 2.
+		/// </summary>
+		public float UnkFloat2 { get; set; } = 0f;
+
 		/// <summary>
 		/// Gets or sets the delay before the damage is shown.
 		/// </summary>
@@ -113,6 +126,57 @@ namespace Melia.Zone.Skills.Combat
 			this.ResultType = resultType;
 			this.HitCount = hitCount;
 			this.DamageDelay = damageDelay == default ? TimeSpan.Zero : damageDelay;
+			this.Type = HitType.Normal;
+			this.AttackType = HitAttackType.None;
+
+			if (ZoneServer.Instance.Data.SkillDb.TryFind(skillId, out var skillData))
+			{
+				switch (resultType)
+				{
+					case HitResultType.Block:
+						this.Type = HitType.Block;
+						break;
+					case HitResultType.Dodge:
+						this.Type = HitType.NoHit;
+						break;
+					default:
+						this.Type = skillData.Attribute switch
+						{
+							AttributeType.Fire => HitType.Fire,
+							AttributeType.Ice => HitType.Ice,
+							AttributeType.Poison => HitType.Poison,
+							AttributeType.Lightning => HitType.Lightning,
+							AttributeType.Earth => HitType.Earth,
+							AttributeType.Soul => HitType.Soul,
+							AttributeType.Holy => HitType.Holy,
+							AttributeType.Dark => HitType.Dark,
+							_ => HitType.Normal,
+						};
+						break;
+				}
+				this.AttackType = skillData.HitAttackType;
+			}
+
+			this.Hp = target.Hp;
+			this.HpPriority = target.HpChangeCounter;
+		}
+
+		/// <summary>
+		/// Creates new hit.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="damage"></param>
+		/// <param name="resultType"></param>
+		public HitInfo(ICombatEntity attacker, ICombatEntity target, float damage, HitResultType resultType)
+		{
+			this.Attacker = attacker;
+			this.Target = target;
+			this.SkillId = SkillId.Normal_Attack;
+
+			this.Damage = damage;
+			this.ResultType = resultType;
+			this.Type = HitType.Normal;
 
 			this.Hp = target.Hp;
 			this.HpPriority = target.HpChangeCounter;

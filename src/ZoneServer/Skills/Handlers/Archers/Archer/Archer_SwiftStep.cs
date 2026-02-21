@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -12,7 +13,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 	/// Handler for the Archer skill Concentration.
 	/// </summary>
 	[SkillHandler(SkillId.Archer_SwiftStep)]
-	public class Archer_SwiftStep : IGroundSkillHandler
+	public class Archer_SwiftStep : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying buff to the caster.
@@ -22,8 +23,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

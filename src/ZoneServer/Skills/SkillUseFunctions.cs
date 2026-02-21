@@ -76,6 +76,17 @@ namespace Melia.Zone.Skills
 			=> Call("SCR_CalculateDamage", caster, target, skill, modifier, skillHitResult);
 
 		/// <summary>
+		/// Returns the healing value of caster on target using given skill.
+		/// </summary>
+		/// <param name="caster"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="skillHitResult"></param>
+		/// <returns></returns>
+		public static float SCR_CalculateHeal(ICombatEntity caster, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+			=> Call("SCR_CalculateHeal", caster, target, skill, modifier, skillHitResult);
+
+		/// <summary>
 		/// Determines the result of skill hitting the target.
 		/// </summary>
 		/// <param name="caster"></param>

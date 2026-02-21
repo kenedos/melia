@@ -17,5 +17,3 @@ ClientHeaderFixed header;
 
 int64 accountId;
 int i1;
-ushort s1; // Handle?
-short s2;

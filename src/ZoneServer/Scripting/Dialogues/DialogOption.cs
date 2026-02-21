@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using Yggdrasil.Util;
 
@@ -21,6 +22,11 @@ namespace Melia.Zone.Scripting.Dialogues
 		public string Key { get; set; }
 
 		/// <summary>
+		/// Gets or sets a function that determines whether the option is enabled.
+		/// </summary>
+		public Func<bool> Enabled { get; set; }
+
+		/// <summary>
 		/// Creates new instance.
 		/// </summary>
 		/// <param name="text"></param>
@@ -29,6 +35,7 @@ namespace Melia.Zone.Scripting.Dialogues
 		{
 			this.Text = text;
 			this.Key = key;
+			this.Enabled = () => true;
 		}
 	}
 
@@ -75,6 +82,13 @@ namespace Melia.Zone.Scripting.Dialogues
 
 			_options.Insert(index, option);
 		}
+
+		/// <summary>
+		/// Removes the option at the given index.
+		/// </summary>
+		/// <param name="index"></param>
+		public void Remove(int index)
+			=> _options.RemoveAt(index);
 
 		/// <summary>
 		/// Removes the option with the given key.

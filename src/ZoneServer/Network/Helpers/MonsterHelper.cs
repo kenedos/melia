@@ -3,6 +3,7 @@ using Melia.Shared.Network;
 using Melia.Shared.Network.Helpers;
 using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Shared.Versioning;
 
 namespace Melia.Zone.Network.Helpers
 {
@@ -13,9 +14,9 @@ namespace Melia.Zone.Network.Helpers
 		/// </summary>
 		/// <param name="packet"></param>
 		/// <param name="monster"></param>
-		public static void AddMonster(this Packet packet, IMonsterBase monster)
+		public static void AddMonster(this Packet packet, IMonster monster)
 		{
-			var propertyList = monster.Properties.GetAll();
+			var propertyList = monster.Properties.GetSelect(PropertyName.Range, PropertyName.Scale);
 			var propertiesSize = propertyList.GetByteCount();
 			var appearanceSize = monster.GetByteCount();
 
@@ -26,39 +27,50 @@ namespace Melia.Zone.Network.Helpers
 			packet.PutByte(monster.FromGround);
 			packet.PutInt(monster.Hp);
 			packet.PutInt(monster.MaxHp);
-			packet.PutShort(0);
-
-			// [i11025 (2016-02-26)] ?
+			if (Versions.Protocol > 500)
 			{
-				packet.PutShort(16832);
+				packet.PutInt(monster.Shield);
+				packet.PutInt(monster.MaxShield);
 			}
-
-			// [i364857 (2022-10-22)] ?
+			else if (Versions.Client >= KnownVersions.OpenBeta)
 			{
-				packet.PutInt(0); // 0 | 1098907648
+				packet.PutShort(monster.Shield);
+				packet.PutShort(monster.MaxShield);
+			}
+			else
+			{
+				packet.PutShort(0);
 			}
 
 			packet.PutFloat(monster.Properties.GetFloat(PropertyName.MSPD));
 
-			// [i398XXX (2025-09-XX)]
-			// Around this time, the packet was restructured a little after
-			// this point. Check the commit history for details.
+			packet.AddMonsterAppearanceBase(monster);
 
-			packet.AddMonsterApperanceBase(monster);
+			if (Versions.Protocol > 500)
+			{
+				packet.PutInt((int)monster.Attribute);
+				packet.PutInt((int)monster.Race);
+			}
 
-			packet.PutInt((int)monster.Attribute);
-			packet.PutInt((int)monster.Race);
-
-			packet.AddMonsterApperance(monster);
+			if (Versions.Client < 398686)
+				packet.PutInt(appearanceSize);
+			else
+				packet.AddMonsterAppearance(monster);
 
 			packet.PutShort(propertiesSize);
 
-			packet.PutInt(0);
-			packet.PutInt(0);
+			if (Versions.Protocol > 500)
+			{
+				packet.PutInt(monster.AssociatedHandle);
+				packet.PutInt(monster.OwnerHandle);
 
-			packet.PutShort(0);
-			packet.PutByte(0);
 
+				packet.PutShort(0);
+				packet.PutByte(0);
+			}
+
+			if (Versions.Client < 398686)
+				packet.AddMonsterAppearance(monster);
 			packet.AddProperties(propertyList);
 		}
 
@@ -67,16 +79,17 @@ namespace Melia.Zone.Network.Helpers
 		/// </summary>
 		/// <param name="packet"></param>
 		/// <param name="monster"></param>
-		public static void AddMonsterApperanceBase(this Packet packet, IMonsterAppearanceBase monster)
+		public static void AddMonsterAppearanceBase(this Packet packet, IMonsterAppearanceBase monster)
 		{
 			packet.PutInt(monster.Id);
 			packet.PutInt(0); // 600?
 			packet.PutInt(monster.MaxHp);
 
 			// [i11025 (2016-02-26)] Removed?
+			if (Versions.Client < 11025)
 			{
-				//packet.PutShort(0); // MaxShield?
-				//packet.PutEmptyBin(2);
+				packet.PutShort(0); // MaxShield?
+				packet.PutEmptyBin(2);
 			}
 
 			packet.PutInt(monster.Level);
@@ -91,24 +104,24 @@ namespace Melia.Zone.Network.Helpers
 		/// </summary>
 		/// <param name="packet"></param>
 		/// <param name="monster"></param>
-		public static void AddMonsterApperance(this Packet packet, IMonsterAppearance monster)
+		public static void AddMonsterAppearance(this Packet packet, IMonsterAppearance monster)
 		{
-			// [i398XXX (2025-09-XX)]
-			// Names changed from length-prefixed to fixed-length strings.
-			// Good decision, IMC. Well over a kilobyte per monster is
-			// much better than 150 byte =)
-
-			//packet.PutLpString(monster.Name);
-			//packet.PutLpString(monster.UniqueName);
-			//packet.PutLpString(monster.DialogName);
-			//packet.PutLpString(monster.EnterName);
-			//packet.PutLpString(monster.LeaveName);
-
-			packet.PutString(monster.Name, 256);
-			packet.PutString(monster.UniqueName, 256);
-			packet.PutString(monster.DialogName, 256);
-			packet.PutString(monster.EnterName, 256);
-			packet.PutString(monster.LeaveName, 256);
+			if (Versions.Client < 398686)
+			{
+				packet.PutLpString(monster.Name);
+				packet.PutLpString(monster.UniqueName);
+				packet.PutLpString(monster.DialogName);
+				packet.PutLpString(monster.EnterName);
+				packet.PutLpString(monster.LeaveName);
+			}
+			else
+			{
+				packet.PutString(monster.Name, 256);
+				packet.PutString(monster.UniqueName, 256);
+				packet.PutString(monster.DialogName, 256);
+				packet.PutString(monster.EnterName, 256);
+				packet.PutString(monster.LeaveName, 256);
+			}
 		}
 
 		/// <summary>

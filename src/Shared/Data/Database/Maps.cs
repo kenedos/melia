@@ -17,6 +17,8 @@ namespace Melia.Shared.Data.Database
 		public int Level { get; set; }
 		public string NearbyCity { get; set; }
 		public Position DefaultPosition { get; set; }
+		public HashSet<int> SpawnedMonsterIds { get; } = new();
+		public Tags Tags { get; set; }
 	}
 
 	/// <summary>
@@ -67,6 +69,8 @@ namespace Melia.Shared.Data.Database
 
 			var defaultPosEntry = (JObject)entry["defaultPosition"];
 			data.DefaultPosition = new Position(defaultPosEntry.ReadFloat("x"), defaultPosEntry.ReadFloat("y"), defaultPosEntry.ReadFloat("z"));
+
+			data.Tags = new Tags(entry.ReadList<string>("tags", []));
 
 			_nameIndex[data.ClassName.ToLowerInvariant()] = data;
 

@@ -17,4 +17,5 @@ ServerHeaderFixed header;
 
 int64 l1; // 0
 int i1; // 0
-char shop[36]; // uphill_defense_shoppoint
+char shop[32]; // uphill_defense_shoppoint
+int points; // 1915

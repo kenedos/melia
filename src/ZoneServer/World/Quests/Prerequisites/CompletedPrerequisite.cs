@@ -1,4 +1,5 @@
-﻿using Melia.Zone.Scripting;
+﻿using System;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.World.Quests.Prerequisites
@@ -21,6 +22,18 @@ namespace Melia.Zone.World.Quests.Prerequisites
 		public CompletedPrerequisite(string questNamespace, long id)
 		{
 			this.QuestId = new QuestId(questNamespace, id);
+		}
+
+		/// <summary>
+		/// Creates new instance.
+		/// </summary>
+		/// <param name="questId"></param>
+		[Obsolete("Use CompletedPrerequisite(string questNamespace, long id)")]
+		public CompletedPrerequisite(string questId)
+		{
+			if (!ZoneServer.Instance.Data.QuestDb.TryFind(questId, out var quest))
+				throw new ArgumentException($"Unknown quest '{questId}'.");
+			this.QuestId = new QuestId(quest.Id);
 		}
 
 		/// <summary>

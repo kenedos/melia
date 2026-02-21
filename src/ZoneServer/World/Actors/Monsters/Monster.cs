@@ -1,30 +1,19 @@
 ﻿using System;
-using Melia.Shared.ObjectProperties;
+using System.Globalization;
 using Melia.Shared.Game.Const;
-using Melia.Shared.World;
-using Melia.Zone.World.Maps;
+using Melia.Shared.Game.Properties;
+using Melia.Shared.ObjectProperties;
+using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 
 namespace Melia.Zone.World.Actors.Monsters
 {
-	/// <summary>
-	/// Represents a "monster" in the world, or in other words, an entity
-	/// that is not a player, but can exist on a map.
-	/// </summary>
-	public interface IMonster : IMonsterBase
-	{
-		/// <summary>
-		/// Gets or sets the time the actor will be removed from the
-		/// map it's on.
-		/// </summary>
-		DateTime DisappearTime { get; }
-	}
-
-	public interface IMonsterBase : IActor, IMonsterAppearance, IMonsterAppearanceBase
+	public interface IMonster : ISubActor, IMonsterAppearance, IMonsterAppearanceBase, ISpawn
 	{
 		/// <summary>
 		/// Returns the monster's type.
 		/// </summary>
-		MonsterType MonsterType { get; }
+		RelationType MonsterType { get; }
 
 		/// <summary>
 		/// Returns the monster's race.
@@ -50,6 +39,8 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// </summary>
 		int Hp { get; }
 
+		int Shield { get; }
+
 		/// <summary>
 		/// Returns a reference to the monster's properties.
 		/// </summary>
@@ -74,6 +65,11 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Returns the monster's maximum HP.
 		/// </summary>
 		int MaxHp { get; }
+
+		/// <summary>
+		/// Returns the monster's maximum shield.
+		/// </summary>
+		int MaxShield { get; }
 
 		/// <summary>
 		/// Returns the monster's level.
@@ -139,5 +135,47 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// client-side, similar to DialogName.
 		/// </remarks>
 		string LeaveName { get; }
+	}
+
+	public static class MobExtensions
+	{
+		/// <summary>
+		/// Applies a property list string to the monster's properties.
+		/// Format: PropertyName#Value#PropertyName2#Value2...
+		/// </summary>
+		public static void ApplyPropList(this Mob mob, string propertyList, DungeonScript owner, object skill)
+		{
+			if (string.IsNullOrEmpty(propertyList))
+				return;
+
+			var props = propertyList.Split('#');
+
+			for (var i = 0; i < props.Length - 1; i += 2)
+			{
+				var propName = props[i].Trim();
+				var propValue = props[i + 1].Trim();
+
+				if (propName == "Name")
+					mob.Name = propValue;
+				if (propName == "Faction")
+				{
+					if (Enum.TryParse<FactionType>(propValue, out var faction))
+						mob.SetFaction(faction);
+				}
+
+				// Skip if property doesn't exist in the property table
+				if (!PropertyTable.Exists(mob.Properties.Namespace, propName))
+					continue;
+
+				// Try to parse as float first, then string
+				if (float.TryParse(propValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var floatValue))
+					mob.Properties.SetFloat(propName, floatValue);
+				else
+					mob.Properties.SetString(propName, propValue);
+			}
+
+			// Invalidate calculated properties after applying changes
+			mob.Properties.InvalidateAll();
+		}
 	}
 }

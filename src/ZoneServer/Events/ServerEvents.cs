@@ -130,6 +130,21 @@ namespace Melia.Zone.Events
 		/// </summary>
 		public readonly Event<PlayerDialogEventArgs> PlayerDialog = new();
 
+		/// <summary>
+		/// Raised when a player leaves a party.
+		/// </summary>
+		public readonly Event<PlayerEventArgs> PlayerLeftParty = new();
+
+		/// <summary>
+		/// Raised when a player enters a map.
+		/// </summary>
+		public readonly Event<PlayerEventArgs> PlayerEnteredMap = new();
+
+		/// <summary>
+		/// Raised when a player leaves a map.
+		/// </summary>
+		public readonly Event<PlayerEventArgs> PlayerLeftMap = new();
+
 		// Combat Events
 		//-------------------------------------------------------------------
 
@@ -140,6 +155,21 @@ namespace Melia.Zone.Events
 
 		// Monster Events
 		//-------------------------------------------------------------------
+
+		/// <summary>
+		/// Raised when a player uses an item.
+		/// </summary>
+		public readonly Event<PlayerUsedItemEventArgs> PlayerUsedItem = new();
+
+		/// <summary>
+		/// Raised when a player completes a quest.
+		/// </summary>
+		public readonly Event<PlayerCompletedQuestEventArgs> PlayerCompletedQuest = new();
+
+		/// <summary>
+		/// Raised when a player's reputation with a faction changes.
+		/// </summary>
+		public readonly Event<ReputationEventArgs> PlayerReputationChanged = new();
 
 		/// <summary>
 		/// Raised when a monster is about to disappear.

@@ -1,0 +1,187 @@
+// Melia
+// Database file
+//---------------------------------------------------------------------------
+
+[
+// Second Closed Beta Phase, which ran between Winter 2015 and Spring 2016.
+{ name: "iCBT2", enabled: true, children: [
+	// Removes Centurion from the Swordman job tree
+	{ name: "CenturionRemoved", enabled: true },
+]},
+
+// Release Version, released in Spring 2016, after the closed beta.
+{ name: "Release", enabled: true, children: [
+	// Add features added after iCBT2 and before ReBuild here.
+]},
+
+// Re:Build was a large update in late 2018, most notably changing how
+// the class system worked.
+{ name: "ReBuild", enabled: true, children: [
+
+	// Enables movement-related changes
+	{ name: "MovementRevamp", enabled: true, children: [
+		// Disables stamina drain while running
+		{ name: "FreeRunning", enabled: true },
+		
+		// Disables stamina drain while dashing in cities
+		{ name: "FreeDashingInCities", enabled: true },
+		
+		// Enables dashing for all classes
+		{ name: "DashingForAll", enabled: true },
+		
+		// Disables jumping costing stamina
+		{ name: "FreeJumping", enabled: true },
+	]},
+	
+	// Enables job-related changes
+	{ name: "JobRevamp", enabled: true, children: [
+		// Enables the Scout job as an option for character creation
+		{ name: "ScoutJob", enabled: true },
+		
+		// Shuffles jobs and skills around to, quote, "maximize compatibility
+		// between classes and synergy between players."
+		//{ name: "JobTreeReassignment", enabled: true },
+	]},
+	
+	// Enables changes to the way max weight is calculated
+	{ name: "InventoryWeightRevamp", enabled: true, children: [
+		// Raises default max weight
+		{ name: "IncreasedMaxWeight", enabled: true },
+		
+		// Removes stats adding to the max weight
+		{ name: "StaticInventoryWeight", enabled: true },
+	]},
+	
+	// Enables changes to how player stats are calculated
+	{ name: "PlayerStatsRevamp", enabled: true, children: [
+		// Disables stat points per level, removing the ability to freely
+		// assign points to stats
+		{ name: "NoStatByLevel", enabled: false },
+		
+		// Enables increased base stats per job and level, increasing
+		// stats automatically over time
+		{ name: "IncreasedStatRatio", enabled: false },
+	
+		// Enables new STR formula.
+		{ name: "NewSTRFormula", enabled: false },
+		
+		// Enables new CON formula.
+		{ name: "NewCONFormula", enabled: false },
+		
+		// Enables new INT formula.
+		{ name: "NewINTFormula", enabled: false },
+		
+		// Enables new SPR formula.
+		{ name: "NewSPRFormula", enabled: false },
+		
+		// Enables new DEX formula.
+		{ name: "NewDEXFormula", enabled: false },
+		
+		// Enables new Defense formula.
+		{ name: "NewDefenseFormula", enabled: true },
+	]},
+	
+	// Lowers ability costs
+	{ name: "AbilityCostRevamp", enabled: true },
+	
+	// Simplifies attribute bonuses
+	{ name: "AttributeBonusRevamp", enabled: true },
+	
+	// Simplified and both buffed and nerfed attack bonuses
+	{ name: "AttackTypeBonusRevamp1", enabled: false },
+	
+	// Changed attack type bonuses for the absolute worst
+	{ name: "AttackTypeBonusRevamp2", enabled: false },
+	
+	// Changes how blocks behave
+	{ name: "BlockRevamp", enabled: true, children: [
+		// Changes blocks to not nullify damage
+		{ name: "NonNullifyBlocks", enabled: false },
+		
+		// Increases max block chance to compensate for not nullifying damage
+		{ name: "IncreasedBlockRate", enabled: true },
+		
+		// Changes guard bonus for active blocking to a flat number
+		{ name: "FlatGuardBonus", enabled: true },
+	]},
+
+	// Gives Clerics the Guard skill, allowing them to use shields actively
+	{ name: "GuardingClerics", enabled: true },
+]},
+
+// Latest Version, that reflects the current state of iToS.
+{ name: "Latest", enabled: true, children: [
+	// Add features here that were added after the initial Re:Build.
+	
+	// Noteworthy skill changes between Re:Build and the latest version
+	{ name: "LatestSkillChanges", enabled: true, children: [
+		// Removes potion requirement for using Hasisas
+		{ name: "HasisasNoPotion", enabled: true },
+		
+		// Removes HP loss while using Hasisas
+		{ name: "HasisasNoHpLoss", enabled: true },
+		
+		// Changes Hasisas to not base crit bonus on HP lost
+		{ name: "HasisasNoHpCritBonus", enabled: true },
+
+		// Changes Pierce to not base its hit count on target size
+		{ name: "PierceNoSizeEffect", enabled: false },
+
+		// Barbarian_Cleave applies Aggressor instead of Cleave_Debuff
+		// and Aggressor has a much weaker effect
+		{ name: "CleaveApplyAggressor", enabled: false },
+	]},
+	
+	// Enables special classes, such as Desperado
+	{ name: "SpecialClasses", enabled: true, children: [
+		// If enabled, special classes need to be unlocked via vouchers.
+		// If disabled, the classes are freely available.
+		{ name: "SpecialClassVouchers", enabled: true },
+	]},
+]},
+
+// Miscellaneous changes that don't belong to a specific update or are yet
+// to get categorized.
+{ name: "Misc", enabled: true, children: [
+
+	// Enables new characters receiving growth equipment
+	{ name: "GrowthEquipOnStart", enabled: true },
+	
+	// Enables overriding properties of monsters added via spawners
+	{ name: "SpawnPropertyOverrides", enabled: true },
+	
+	// Enables direct healing for the Cleric Heal skill instead of
+	// spawning heal pads on the ground
+	{ name: "DirectClericHeal", enabled: false, children: [
+		// Switches Heal from getting casted instantly to using a party
+		// member target selection wheel
+		{ name: "ClericHealPartySelect", enabled: false },
+	]},
+	// 
+	// Enables overriding skintones available at character creation
+	{ name: "OverrideSkintones", enabled: false },
+	
+	// Enables day and night cycle
+	{ name: "DayNightCycle", enabled: true },
+	
+	// Enables custom quest system
+	{ name: "CustomQuestSystem", enabled: true },
+	
+	// Enables custom random options based off item grade.
+	{ name: "GradeRandomOptions", enabled: true },
+	
+	// Allows character resurrection in PvP Maps
+	{ name: "AllowPVPResurrection", enabled: true},
+	
+	// Enables Crafting Table system
+	{ name: "CraftingTable", enabled: false },
+]},
+
+// Let's disable certain features for now to hide things that aren't
+// fully implemented
+{ name: "GrowthEquipOnStart", enabled: false },
+{ name: "BattleManager", enabled: false },
+{ name: "BountyHunterSystem", enabled: false },
+{ name: "MobaSystem", enabled: false },
+{ name: "TerritoryWarSystem", enabled: false },
+]

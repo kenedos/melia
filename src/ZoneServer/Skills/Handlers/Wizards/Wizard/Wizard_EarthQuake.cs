@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// Handler for the Wizard skill Earthquake.
 	/// </summary>
 	[SkillHandler(SkillId.Wizard_EarthQuake)]
-	public class Wizard_EarthQuake : IGroundSkillHandler
+	public class Wizard_EarthQuake : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -26,8 +26,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
 		{
+			var initialTarget = designatedTargets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -41,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 
 			// Attack targets
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var damageDelay = TimeSpan.FromMilliseconds(200);
 
 			var skillHits = new List<SkillHitInfo>();
@@ -58,7 +60,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				// Ability "Earthquake: Remove Knockdown"
 				if (!caster.IsAbilityActive(AbilityId.Wizard23))
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 					skillHit.ApplyKnockBack(target);
 				}
 

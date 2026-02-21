@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Melia.Shared.Game.Const;
+using Melia.Shared.Packages;
 
 namespace Melia.Zone.Pads.Handlers
 {
@@ -11,24 +13,36 @@ namespace Melia.Zone.Pads.Handlers
 	public class PadHandlers
 	{
 		private readonly Dictionary<string, IPadHandler> _handlers = new();
-		private readonly Dictionary<string, int> _priorities = new();
+		private readonly Dictionary<string, HandlerPriority> _priorities = new();
 
 		/// <summary>
 		/// Initializes the pad handlers, loading all it can find in
 		/// the executing assembly.
 		/// </summary>
-		public PadHandlers()
+		/// <param name="packages"></param>
+		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly();
+			this.LoadHandlersFromAssembly(packages);
 		}
 
 		/// <summary>
 		/// Loads pad handlers marked with a pad handler attribute in
 		/// the current assembly.
 		/// </summary>
-		private void LoadHandlersFromAssembly()
+		/// <param name="packages"></param>
+		private void LoadHandlersFromAssembly(PackageManager packages)
 		{
-			foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(a => typeof(IPadHandler).IsAssignableFrom(a) && !a.IsInterface))
+			var handlerTypes = Assembly.GetExecutingAssembly().GetTypes()
+				.Where(a => typeof(IPadHandler).IsAssignableFrom(a) && !a.IsInterface)
+				.Where(a => packages.ShouldRegister(a));
+
+			// Process non-package types first, then package types, so
+			// that package handlers naturally override base handlers
+			// at equal priority.
+			var ordered = handlerTypes
+				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
+
+			foreach (var type in ordered)
 			{
 				foreach (var attr in type.GetCustomAttributes<PadHandlerAttribute>())
 				{
@@ -37,11 +51,8 @@ namespace Melia.Zone.Pads.Handlers
 
 					foreach (var padName in padNames)
 					{
-						if (_priorities.TryGetValue(padName, out var priority))
-						{
-							if (priority > attr.Priority)
-								continue;
-						}
+						if (_priorities.TryGetValue(padName, out var priority) && priority > attr.Priority)
+							continue;
 
 						_handlers[padName] = handler;
 						_priorities[padName] = attr.Priority;

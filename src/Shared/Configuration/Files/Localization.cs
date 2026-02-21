@@ -1,4 +1,5 @@
-﻿using Yggdrasil.Configuration;
+﻿using System.IO;
+using Yggdrasil.Configuration;
 
 namespace Melia.Shared.Configuration.Files
 {
@@ -15,9 +16,15 @@ namespace Melia.Shared.Configuration.Files
 		/// Loads conf file and its options from the given path.
 		/// </summary>
 		/// <param name="filePath"></param>
-		public void Load(string filePath)
+		public void Load(string filePath, params string[] extraIncludes)
 		{
 			this.Include(filePath);
+
+			foreach (var path in extraIncludes)
+			{
+				if (File.Exists(path))
+					this.Include(path);
+			}
 
 			this.Language = this.GetString("language", "en-US");
 			this.Culture = this.GetString("culture", "en-US");

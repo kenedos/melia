@@ -37,4 +37,4 @@ float f2;
 int attackCount;
 byte align1;
 float f3;
-int i3;
+int damageDelay;

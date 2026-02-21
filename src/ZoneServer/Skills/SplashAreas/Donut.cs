@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <summary>
 		/// Returns the center of the donut.
 		/// </summary>
-		public Position Center { get; }
+		public Position Center => new Position(_baseOuter.Center.X, 0, _baseOuter.Center.Y);
 
 		/// <summary>
 		/// Returns the donut's outer radius.
@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <summary>
 		/// Returns the center of the donut.
 		/// </summary>
-		Vector2F IShapeF.Center => this.Center;
+		Vector2F IShapeF.Center => _baseOuter.Center;
 
 		/// <summary>
 		/// Returns the splash area's type.
@@ -67,7 +67,6 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <param name="radiusInner"></param>
 		public Donut(Position originPos, float radiusOuter, float radiusInner)
 		{
-			this.Center = originPos;
 			this.RadiusOuter = radiusOuter;
 			this.RadiusInner = radiusInner;
 

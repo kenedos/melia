@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: ZC_ANCIENT_CARD_REMOVE.bt
+//   Authors: Salman T. Khan
+//   Version: i378059
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+byte bin[12]; // 0s
+int64 cardWorldId;

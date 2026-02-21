@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Packages;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
-using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
+using Yggdrasil.Logging;
+using Yggdrasil.Extensions;
 
 namespace Melia.Zone.Buffs
 {
@@ -17,32 +20,51 @@ namespace Melia.Zone.Buffs
 	public class BuffHandlers
 	{
 		private readonly Dictionary<BuffId, IBuffHandler> _buffHandlers = new();
+		private readonly Dictionary<BuffId, HandlerPriority> _priorities = new();
 
 		/// <summary>
-		/// Creates a new buff handler manager.
+		/// Initializes the buff handlers, loading all it can find in
+		/// the executing assembly.
 		/// </summary>
-		public BuffHandlers()
+		/// <param name="packages"></param>
+		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly();
+			this.LoadHandlersFromAssembly(packages);
 		}
 
 		/// <summary>
 		/// Loads buff handlers marked with a buff handler attribute in
 		/// the current assembly.
 		/// </summary>
-		private void LoadHandlersFromAssembly()
+		/// <param name="packages"></param>
+		private void LoadHandlersFromAssembly(PackageManager packages)
 		{
-			foreach (var type in Assembly.GetExecutingAssembly().GetTypes())
+			var handlerTypes = Assembly.GetExecutingAssembly().GetTypes()
+				.Where(t => typeof(IBuffHandler).IsAssignableFrom(t) && !t.IsInterface)
+				.Where(t => packages.ShouldRegister(t));
+
+			// Process non-package types first, then package types, so
+			// that package handlers naturally override base handlers
+			// at equal priority.
+			var ordered = handlerTypes
+				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
+
+			foreach (var type in ordered)
 			{
-				var attributes = type.GetCustomAttributes(typeof(BuffHandlerAttribute), false);
-				if (attributes == null || attributes.Length == 0)
-					continue;
+				foreach (var attr in type.GetCustomAttributes<BuffHandlerAttribute>())
+				{
+					var handler = (IBuffHandler)Activator.CreateInstance(type);
+					var buffIds = attr.BuffIds;
 
-				var handler = Activator.CreateInstance(type) as IBuffHandler;
-				var buffIds = (attributes.First() as BuffHandlerAttribute).BuffIds;
+					foreach (var buffId in buffIds)
+					{
+						if (_priorities.TryGetValue(buffId, out var priority) && priority > attr.Priority)
+							continue;
 
-				foreach (var buffId in buffIds)
-					this.Register(buffId, handler);
+						this.Register(buffId, handler);
+						_priorities[buffId] = attr.Priority;
+					}
+				}
 			}
 		}
 
@@ -70,6 +92,10 @@ namespace Melia.Zone.Buffs
 			// handler for now. In terms of performance this isn't the absolute
 			// best solution, but it is very flexible, and using scriptable
 			// functions is idiomatic inside our combat scripting system.
+
+			// Remove any existing combat hooks for this buff first to ensure
+			// override handlers completely replace base handlers
+			this.RemoveCombatEvents(buffId);
 
 			void registerAttackFunc(string name, CombatCalcHookFunction func)
 			{
@@ -104,6 +130,46 @@ namespace Melia.Zone.Buffs
 
 			if (handler is IBuffCombatAttackAfterBonusesHandler afterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_Attack_" + buffId, afterBonusesAttackHandler.OnAttackAfterBonuses);
 			if (handler is IBuffCombatDefenseAfterBonusesHandler afterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_Defense_" + buffId, afterBonusesDefenseHandler.OnDefenseAfterBonuses);
+
+			// Companion-specific combat hooks
+			if (handler is IBuffCombatCompanionAttackBeforeCalcHandler companionBeforeCalcAttackHandler) registerAttackFunc("SCR_Combat_BeforeCalc_CompanionAttack_" + buffId, companionBeforeCalcAttackHandler.OnCompanionAttackBeforeCalc);
+			if (handler is IBuffCombatCompanionDefenseBeforeCalcHandler companionBeforeCalcDefenseHandler) registerDefenseFunc("SCR_Combat_BeforeCalc_CompanionDefense_" + buffId, companionBeforeCalcDefenseHandler.OnCompanionDefenseBeforeCalc);
+
+			if (handler is IBuffCombatCompanionAttackAfterCalcHandler companionAfterCalcAttackHandler) registerAttackFunc("SCR_Combat_AfterCalc_CompanionAttack_" + buffId, companionAfterCalcAttackHandler.OnCompanionAttackAfterCalc);
+			if (handler is IBuffCombatCompanionDefenseAfterCalcHandler companionAfterCalcDefenseHandler) registerDefenseFunc("SCR_Combat_AfterCalc_CompanionDefense_" + buffId, companionAfterCalcDefenseHandler.OnCompanionDefenseAfterCalc);
+
+			if (handler is IBuffCombatCompanionAttackBeforeBonusesHandler companionBeforeBonusesAttackHandler) registerAttackFunc("SCR_Combat_BeforeBonuses_CompanionAttack_" + buffId, companionBeforeBonusesAttackHandler.OnCompanionAttackBeforeBonuses);
+			if (handler is IBuffCombatCompanionDefenseBeforeBonusesHandler companionBeforeBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_BeforeBonuses_CompanionDefense_" + buffId, companionBeforeBonusesDefenseHandler.OnCompanionDefenseBeforeBonuses);
+
+			if (handler is IBuffCombatCompanionAttackAfterBonusesHandler companionAfterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_CompanionAttack_" + buffId, companionAfterBonusesAttackHandler.OnCompanionAttackAfterBonuses);
+			if (handler is IBuffCombatCompanionDefenseAfterBonusesHandler companionAfterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_CompanionDefense_" + buffId, companionAfterBonusesDefenseHandler.OnCompanionDefenseAfterBonuses);
+		}
+
+		/// <summary>
+		/// Removes all combat event hooks for the given buff.
+		/// </summary>
+		/// <param name="buffId"></param>
+		private void RemoveCombatEvents(BuffId buffId)
+		{
+			// Remove all possible combat hook functions that may have been registered
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Attack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Defense_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Attack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Defense_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_Attack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_Defense_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Attack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Defense_" + buffId);
+
+			// Companion hooks
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_CompanionAttack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_CompanionDefense_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_CompanionAttack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_CompanionDefense_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_CompanionAttack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_CompanionDefense_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_CompanionAttack_" + buffId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_CompanionDefense_" + buffId);
 		}
 
 		private delegate void CombatCalcHookFunction(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult);

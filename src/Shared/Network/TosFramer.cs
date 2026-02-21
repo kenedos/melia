@@ -1,4 +1,5 @@
 ﻿using System;
+using Melia.Shared.Versioning;
 using Yggdrasil.Logging;
 using Yggdrasil.Network.Framing;
 
@@ -54,7 +55,7 @@ namespace Melia.Shared.Network
 			var op = packet.Op;
 
 			// Get size from table
-			var tableSize = Op.GetSize(op);
+			var tableSize = OpTable.GetSize(op);
 			if (tableSize == -1)
 				throw new ArgumentException("Size for op '" + packet.Op.ToString("X4") + "' unknown.");
 
@@ -74,12 +75,16 @@ namespace Melia.Shared.Network
 			// Check table length
 			if (tableSize == DynamicPacketSize)
 			{
-				var dynHeaderSize = sizeof(short) + sizeof(int) + sizeof(int) + sizeof(short);
+				var dynHeaderSize = (Versions.Client >= 174236) ?
+					sizeof(short) + sizeof(int) + sizeof(int) + sizeof(short) :
+					sizeof(short) + sizeof(int) + sizeof(short);
 				packetSize = dynHeaderSize + packet.Length;
 			}
 			else
 			{
-				var fixHeaderSize = sizeof(short) + sizeof(int) + sizeof(int);
+				var fixHeaderSize = (Versions.Client >= 174236) ?
+					sizeof(short) + sizeof(int) + sizeof(int) :
+					sizeof(short) + sizeof(int);
 				packetSize = fixHeaderSize + packet.Length;
 
 				// If the packet is bigger than the table size, we'd have
@@ -87,7 +92,7 @@ namespace Melia.Shared.Network
 				// rather not do that.
 				if (packetSize > tableSize)
 				{
-					Log.Warning("Packet is bigger than specified in the packet size table. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, packetSize, tableSize, Op.GetName(op));
+					Log.Warning("Packet is bigger than specified in the packet size table. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, packetSize, tableSize, OpTable.GetName(op));
 					throw new ArgumentException("Packet is bigger than specified in the packet size table.");
 				}
 
@@ -97,7 +102,7 @@ namespace Melia.Shared.Network
 				// terminate the connection.
 				if (packetSize < tableSize)
 				{
-					Log.Warning("Packet size doesn't match packet table size. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, packetSize, tableSize, Op.GetName(op));
+					Log.Warning("Packet size doesn't match packet table size. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, packetSize, tableSize, OpTable.GetName(op));
 					packetSize = tableSize;
 				}
 			}
@@ -107,7 +112,9 @@ namespace Melia.Shared.Network
 			Buffer.BlockCopy(BitConverter.GetBytes((short)op), 0, buffer, 0, sizeof(short));
 			Buffer.BlockCopy(BitConverter.GetBytes(-1), 0, buffer, sizeof(short), sizeof(int)); // checksum?
 
-			var offset = (sizeof(short) + sizeof(int) + sizeof(int));
+			var offset = (Versions.Client >= 174236) ?
+				sizeof(short) + sizeof(int) + sizeof(int) :
+				sizeof(short) + sizeof(int);
 			if (tableSize == 0)
 			{
 				Buffer.BlockCopy(BitConverter.GetBytes((short)packetSize), 0, buffer, offset, sizeof(short));

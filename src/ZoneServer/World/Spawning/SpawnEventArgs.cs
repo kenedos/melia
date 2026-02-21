@@ -8,19 +8,19 @@ namespace Melia.Zone.World.Spawning
 		/// <summary>
 		/// Returns the spawner that is spawning the monster.
 		/// </summary>
-		public MonsterSpawner Spawner { get; }
+		public ISpawner Spawner { get; }
 
 		/// <summary>
 		/// Returns the monster that is being spawned.
 		/// </summary>
-		public Mob Monster { get; }
+		public IMonster Monster { get; }
 
 		/// <summary>
 		/// Creates new instance.
 		/// </summary>
 		/// <param name="spawner"></param>
 		/// <param name="monster"></param>
-		public SpawnEventArgs(MonsterSpawner spawner, Mob monster)
+		public SpawnEventArgs(ISpawner spawner, IMonster monster)
 		{
 			this.Monster = monster;
 		}

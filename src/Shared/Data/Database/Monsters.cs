@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Yggdrasil.Data;
 using Yggdrasil.Data.JSON;
 
 namespace Melia.Shared.Data.Database
 {
 	[Serializable]
-	public class MonsterData
+	public class MonsterData : PropertizedData
 	{
 		public int Id { get; set; }
 		public string ClassName { get; set; }
@@ -23,12 +25,21 @@ namespace Melia.Shared.Data.Database
 		public MonsterRank Rank { get; set; }
 
 		public MoveType MoveType { get; set; }
+		[Property(PropertyName.WlkMSPD)]
 		public int WalkSpeed { get; set; }
+		[Property(PropertyName.RunMSPD)]
 		public int RunSpeed { get; set; }
-
+		[Property(PropertyName.Lv)]
 		public int Level { get; set; }
 		public int Exp { get; set; }
 		public int JobExp { get; set; }
+
+		public int STR { get; set; }
+		public int DEX { get; set; }
+		public int CON { get; set; }
+		public int INT { get; set; }
+		public int MNA { get; set; }
+
 
 		public float Hp { get; set; }
 		public float Sp { get; set; }
@@ -47,7 +58,11 @@ namespace Melia.Shared.Data.Database
 		public float CritAttack { get; set; }
 
 		public string AiName { get; set; }
+		public string Dialog { get; set; }
+		public string Journal { get; set; }
+		public bool CanRotate { get; set; } = true;
 
+		[JsonIgnore]
 		public BoundingBox BoundingBox { get; set; }
 		public bool HasBoundingBox => !this.BoundingBox.IsEmpty;
 
@@ -97,7 +112,7 @@ namespace Melia.Shared.Data.Database
 		/// <returns></returns>
 		public bool TryFind(string className, out MonsterData data)
 		{
-			data = this.Entries.Values.FirstOrDefault(a => a.ClassName == className);
+			data = this.Entries.Values.FirstOrDefault(a => a.ClassName.ToLower() == className.ToLower());
 			return data != null;
 		}
 
@@ -110,7 +125,7 @@ namespace Melia.Shared.Data.Database
 		public List<MonsterData> FindAll(string searchString)
 		{
 			searchString = searchString.ToLower();
-			return this.Entries.Values.Where(a => a.Name.ToLower().Contains(searchString)).ToList();
+			return this.Entries.Values.Where(a => a.Name.ToLower().Contains(searchString) || a.ClassName.ToLower().Contains(searchString)).ToList();
 		}
 
 		/// <summary>
@@ -159,8 +174,16 @@ namespace Melia.Shared.Data.Database
 			data.Exp = entry.ReadInt("exp");
 			data.JobExp = entry.ReadInt("jobExp");
 
+			data.STR = entry.ReadInt("str");
+			data.DEX = entry.ReadInt("dex");
+			data.CON = entry.ReadInt("con");
+			data.INT = entry.ReadInt("int");
+			data.MNA = entry.ReadInt("mna");
+
 			data.Hp = entry.ReadInt("hp");
 			data.Sp = entry.ReadInt("sp");
+
+
 			data.PhysicalAttackMin = entry.ReadInt("pAttackMin");
 			data.PhysicalAttackMax = entry.ReadInt("pAttackMax");
 			data.MagicalAttackMin = entry.ReadInt("mAttackMin");
@@ -176,8 +199,12 @@ namespace Melia.Shared.Data.Database
 			data.CritAttack = entry.ReadInt("critAttack");
 
 			// We'll set a default AI for now to quickly and easily get all
-			// monsters to move and attack.
-			data.AiName = entry.ReadString("ai", "BasicMonster");
+			// monsters to move and attack. 
+			// Disabled default value - Salman
+			data.AiName = entry.ReadString("ai");
+			data.Dialog = entry.ReadString("dialog");
+			data.Journal = entry.ReadString("journal");
+			data.CanRotate = entry.ReadBool("canRotate", true);
 
 			if (entry.TryGetObject("obb", out var obbEntry))
 			{
@@ -199,7 +226,12 @@ namespace Melia.Shared.Data.Database
 					var skillData = new MonsterSkillData();
 
 					skillData.Name = skillEntry.ReadString("name");
-					skillData.SkillId = skillEntry.ReadEnum<SkillId>("skillId");
+
+					var skillIdStr = skillEntry.ReadString("skillId");
+					if (!Enum.TryParse<SkillId>(skillIdStr, out var skillId))
+						throw new DatabaseWarningException(null, $"Unknown SkillId '{skillIdStr}' for monster '{data.ClassName}', skipping skill.");
+
+					skillData.SkillId = skillId;
 
 					data.Skills.Add(skillData);
 				}

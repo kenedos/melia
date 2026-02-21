@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -13,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// Handler for the Wizard skill Teleportation.
 	/// </summary>
 	[SkillHandler(SkillId.Wizard_Teleportation)]
-	public class Wizard_Teleportation : IGroundSkillHandler
+	public class Wizard_Teleportation : IMeleeGroundSkillHandler
 	{
 		private const float TeleportationDistance = 100;
 		private static readonly TimeSpan ReUseTime = TimeSpan.FromSeconds(2);
@@ -26,8 +27,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -62,7 +64,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			}
 			else
 			{
-				targetPos = caster.Position.GetRelative2D(caster.Direction, TeleportationDistance);
+				targetPos = caster.Position.GetRelative(caster.Direction, TeleportationDistance);
 				targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 			}
 

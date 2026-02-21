@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Packages;
 using Melia.Zone.Buffs;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
@@ -26,18 +27,31 @@ namespace Melia.Zone.Skills.Handlers
 		/// Initializes the skill handlers, loading all it can find in
 		/// the executing assembly.
 		/// </summary>
-		public void Init()
+		/// <param name="packages"></param>
+		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly();
+			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly(), packages);
 		}
 
 		/// <summary>
-		/// Loads skill handlers marked with a skill handler attribute in
-		/// the current assembly.
+		/// Loads skill handlers marked with a skill handler attribute
+		/// from the given assembly.
 		/// </summary>
-		private void LoadHandlersFromAssembly()
+		/// <param name="assembly"></param>
+		/// <param name="packages"></param>
+		public void LoadHandlersFromAssembly(Assembly assembly, PackageManager packages = null)
 		{
-			foreach (var type in Assembly.GetExecutingAssembly().GetTypes().Where(a => typeof(ISkillHandler).IsAssignableFrom(a) && !a.IsInterface))
+			var handlerTypes = assembly.GetTypes()
+				.Where(a => typeof(ISkillHandler).IsAssignableFrom(a) && !a.IsInterface)
+				.Where(a => packages == null || packages.ShouldRegister(a));
+
+			// Process non-package types first, then package types, so
+			// that package handlers naturally override base handlers
+			// at equal priority.
+			var ordered = handlerTypes
+				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
+
+			foreach (var type in ordered)
 			{
 				foreach (var attr in type.GetCustomAttributes<SkillHandlerAttribute>())
 				{
@@ -52,6 +66,7 @@ namespace Melia.Zone.Skills.Handlers
 								continue;
 						}
 
+						this.RemoveCombatEvents(skillId);
 						this.Register(skillId, handler);
 						_priorities[skillId] = attr.Priority;
 					}
@@ -122,6 +137,23 @@ namespace Melia.Zone.Skills.Handlers
 		private delegate void CombatCalcHookFunction(Skill skill, ICombatEntity attacker, ICombatEntity target, Skill attackerSkill, SkillModifier modifier, SkillHitResult skillHitResult);
 
 		/// <summary>
+		/// Removes any previously registered combat events for the given
+		/// skill id, allowing override handlers to completely replace them.
+		/// </summary>
+		/// <param name="skillId"></param>
+		private void RemoveCombatEvents(SkillId skillId)
+		{
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Defense_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Defense_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_Defense_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Attack_" + skillId);
+			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Defense_" + skillId);
+		}
+
+		/// <summary>
 		/// Returns the handler for the given skill. If no handlers was
 		/// set up, null is returned.
 		/// </summary>
@@ -162,6 +194,19 @@ namespace Melia.Zone.Skills.Handlers
 		{
 			handler = this.GetHandler<TSkillHandler>(skillId);
 			return handler != null;
+		}
+
+		/// <summary>
+		/// Returns the passive handler for the given skill via out.
+		/// Returns false if no handler was set up or it doesn't match the type.
+		/// </summary>
+		public bool TryGetPassiveSkillHandler<TSkillHandler>(SkillId skillId, out TSkillHandler handler) where TSkillHandler : ISkillHandler
+		{
+			if (!_handlers.TryGetValue(skillId, out var iHandler) || iHandler is not TSkillHandler tHandler)
+				tHandler = default;
+			handler = tHandler;
+
+			return tHandler != null;
 		}
 	}
 }

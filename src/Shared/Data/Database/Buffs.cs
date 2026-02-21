@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Newtonsoft.Json.Linq;
 using Yggdrasil.Data.JSON;
@@ -36,6 +37,21 @@ namespace Melia.Shared.Data.Database
 	/// </summary>
 	public class BuffDb : DatabaseJsonIndexed<BuffId, BuffData>
 	{
+
+		/// <summary>
+		/// Returns the buff with the given class name or null if there was no
+		/// matching buff.
+		/// </summary>
+		/// <param name="name">Class name of the buff</param>
+		/// <returns></returns>
+		public bool TryFind(string name, out BuffData buffData)
+		{
+			name = name.ToLower();
+			buffData = this.Entries.Values.FirstOrDefault(a => a.ClassName.ToLower() == name.ToLower());
+
+			return buffData != null;
+		}
+
 		/// <summary>
 		/// Reads given entry and adds it to the database.
 		/// </summary>

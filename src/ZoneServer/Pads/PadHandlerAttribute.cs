@@ -1,4 +1,5 @@
 ﻿using System;
+using Melia.Shared.Game.Const;
 
 namespace Melia.Zone.Pads.Handlers
 {
@@ -19,7 +20,7 @@ namespace Melia.Zone.Pads.Handlers
 		/// Returns the priority of the handler. Handlers with higher
 		/// priority are preferred over handlers with lower priority.
 		/// </summary>
-		public int Priority { get; }
+		public HandlerPriority Priority { get; }
 
 		/// <summary>
 		/// Creates new attribute for the pad names.
@@ -28,7 +29,17 @@ namespace Melia.Zone.Pads.Handlers
 		public PadHandlerAttribute(params string[] padNames)
 		{
 			this.PadNames = padNames ?? [];
-			this.Priority = 100;
+			this.Priority = HandlerPriority.Normal;
+		}
+
+		/// <summary>
+		/// Creates new attribute for the pad names.
+		/// </summary>
+		/// <param name="padNames"></param>
+		public PadHandlerAttribute(HandlerPriority priority, params string[] padNames)
+		{
+			this.PadNames = padNames ?? [];
+			this.Priority = priority;
 		}
 	}
 }

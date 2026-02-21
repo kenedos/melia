@@ -2,6 +2,7 @@
 // Script List File
 //---------------------------------------------------------------------------
 
+divert "scripts_content_override.txt"
 divert "/user/scripts/zone/scripts_content.txt"
 
 require "content/r1/scripts.txt"

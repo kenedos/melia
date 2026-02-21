@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.2 Binary Template
+//
+//      File: ZC_VERTIGO_GAMES_USER_BALANCE.bt
+//   Authors: Salman T. Khan
+//   Version: i374025 (Papaya)
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+int64 l1; // 0
+int64 l2; // 0
+int i1; // 0
+// or could byte bin[20]; // 0s

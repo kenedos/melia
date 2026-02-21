@@ -1,4 +1,6 @@
-﻿namespace Melia.Shared.Game.Const
+﻿using System;
+
+namespace Melia.Shared.Game.Const
 {
 	public enum TeamNameChangeResult : int
 	{
@@ -45,5 +47,27 @@
 		/// Unknown purpose
 		/// </summary>
 		Count = 5,
+	}
+
+	/// <summary>
+	/// Effects sent when leaving
+	/// </summary>
+	public enum LeaveType
+	{
+		Warp = 0,
+		NoEffect = 1,
+		Item = 2,
+		Companion = 4,
+	}
+
+	[Flags]
+	public enum MarketItemStatus
+	{
+		Listed = 1,
+		Sold = 2,
+		SilverReceived = 4,
+		ItemReceived = 8,
+		Expired = 16,
+		Cancelled = 32,
 	}
 }

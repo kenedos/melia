@@ -2,7 +2,9 @@
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
 
@@ -31,12 +33,17 @@ namespace Melia.Zone.Buffs
 		/// </remarks>
 		public readonly static TimeSpan InfiniteDuration = TimeSpan.Zero;
 
+		/// <summary>
+		/// Raised when any buff is activated.
+		/// </summary>
+		public static event Action<Buff> BuffActivated;
+
 		private int _overbuffCounter;
 
 		/// <summary>
 		/// Returns the entity that casted the buff.
 		/// </summary>
-		public ICombatEntity Caster { get; }
+		public IActor Caster { get; }
 
 		/// <summary>
 		/// Returns the entity that received the buff.
@@ -111,6 +118,11 @@ namespace Melia.Zone.Buffs
 		public bool IsFullyOverbuffed => _overbuffCounter >= this.MaxOverbuffCount;
 
 		/// <summary>
+		/// Returns the time at which the buff is started.
+		/// </summary>
+		public DateTime StartTime { get; private set; }
+
+		/// <summary>
 		/// Returns the time at which the buff is removed.
 		/// </summary>
 		public DateTime RemovalTime { get; private set; }
@@ -144,17 +156,34 @@ namespace Melia.Zone.Buffs
 		/// <summary>
 		/// Returns the buff's handler, that handles its behavior.
 		/// </summary>
-		private IBuffHandler Handler { get; }
+		internal IBuffHandler Handler { get; }
 
 		/// <summary>
 		/// Returns the first argument the buff was started with.
 		/// </summary>
-		public float NumArg1 { get; }
+		public float NumArg1 { get; set; }
 
 		/// <summary>
 		/// Returns the second argument the buff was started with.
 		/// </summary>
-		public float NumArg2 { get; }
+		public float NumArg2 { get; set; }
+
+		/// <summary>
+		/// Returns the third argument the buff was started with.
+		/// </summary>
+		public float NumArg3 { get; set; }
+
+		/// <summary>
+		/// Returns the fourth argument the buff was started with.
+		/// </summary>
+		public float NumArg4 { get; set; }
+
+		/// <summary>
+		/// Returns the fifth argument the buff was started with.
+		/// </summary>
+		public float NumArg5 { get; set; }
+
+		public BuffOrigin Source { get; set; }
 
 		/// <summary>
 		/// Creates a new instance.
@@ -168,7 +197,7 @@ namespace Melia.Zone.Buffs
 		/// <param name="target"></param>
 		/// <param name="caster"></param>
 		/// <param name="skillId">Id of the skill associated with this buff.</param>
-		public Buff(BuffId buffId, float numArg1, float numArg2, TimeSpan duration, TimeSpan runTime, ICombatEntity target, ICombatEntity caster, SkillId skillId)
+		public Buff(BuffId buffId, float numArg1, float numArg2, TimeSpan duration, TimeSpan runTime, ICombatEntity target, IActor caster, SkillId skillId = SkillId.Normal_Attack)
 		{
 			this.Id = buffId;
 			this.NumArg1 = numArg1;
@@ -187,6 +216,9 @@ namespace Melia.Zone.Buffs
 			this.Handle = ZoneServer.Instance.World.CreateBuffHandle();
 			this.Data = ZoneServer.Instance.Data.BuffDb.Find(buffId) ?? throw new ArgumentException($"Unknown buff '{buffId}'.");
 			this.Handler = ZoneServer.Instance.BuffHandlers.GetHandler(buffId);
+
+			if (caster == target)
+				this.Source = BuffOrigin.Self;
 
 			// Getting messages about missing handlers could be useful,
 			// but since there are buffs that literally do nothing on
@@ -212,6 +244,27 @@ namespace Melia.Zone.Buffs
 		}
 
 		/// <summary>
+		/// Sets update time in milliseconds
+		/// </summary>
+		/// <param name="updateTime"></param>
+		public void SetUpdateTime(int updateTime)
+		{
+			this.UpdateTime = TimeSpan.FromMilliseconds(updateTime);
+			this.NextUpdateTime = DateTime.Now.Add(this.UpdateTime);
+		}
+
+		/// <summary>
+		/// Increases the buff's duration by a given amount.
+		/// </summary>
+		internal void IncreaseDuration(TimeSpan amount)
+		{
+			if (this.HasDuration)
+			{
+				this.RemovalTime = DateTime.Now.Add(amount);
+			}
+		}
+
+		/// <summary>
 		/// Increase overbuff counter, capped to the buff's max overbuff
 		/// value.
 		/// </summary>
@@ -221,19 +274,67 @@ namespace Melia.Zone.Buffs
 		}
 
 		/// <summary>
+		/// Decrease overbuff counter, clamped to 0.
+		/// value.
+		/// </summary>
+		public void DecreaseOverbuff()
+		{
+			this.OverbuffCounter--;
+		}
+
+		/// <summary>
+		/// Notifies the client of buff updates (e.g., stack changes).
+		/// </summary>
+		public void NotifyUpdate()
+		{
+			if (this.Target.Components.TryGet<BuffComponent>(out var buffComponent))
+			{
+				buffComponent.NotifyBuffUpdate(this);
+			}
+		}
+
+		/// <summary>
+		/// Returns true if the buff modifies movement speed properties.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <returns></returns>
+		public bool AffectsMovementSpeed()
+		{
+			var mspdProperties = new[]
+			{
+				PropertyName.MSPD_BM,
+				PropertyName.FIXMSPD_BM,
+				PropertyName.MSPD_Bonus,
+				PropertyName.MountMSPD,
+				PropertyName.WlkMSPD,
+				PropertyName.RunMSPD
+			};
+
+			foreach (var propertyName in mspdProperties)
+			{
+				var varName = "Melia.Modifier." + propertyName;
+				if (this.Vars.TryGetFloat(varName, out _))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Extends the buff's duration and executes the buff handler's
 		/// activation behavior.
 		/// </summary>
 		/// <param name="activationType"></param>
-		internal void Activate(ActivationType activationType)
+		public void Activate(ActivationType activationType)
 		{
-			this.RefreshDuration();
+			this.ExtendDuration();
 
 #pragma warning disable CS0618
 			// Temporarily call OnStart for backwards compatibility until users
 			// had time to update their buff handlers.
 			this.Handler?.OnStart(this);
 			this.Handler?.OnActivate(this, activationType);
+			BuffActivated?.Invoke(this);
 			this.Handler?.OnExtend(this);
 #pragma warning restore CS0618
 		}
@@ -242,21 +343,20 @@ namespace Melia.Zone.Buffs
 		/// Extends the buff's duration and executes the buff handler's
 		/// extension behavior.
 		/// </summary>
-		internal void Extend()
+		public void Extend()
 		{
-			this.RefreshDuration();
+			this.ExtendDuration();
 			this.Handler?.OnExtend(this);
 		}
 
 		/// <summary>
-		/// Refreshes the buff's removal and update times if applicable.
+		/// Extends the buff's removal and update times if applicable.
 		/// </summary>
 		/// <remarks>
-		/// Effectively restarts the buff's duration and resets the update time,
-		/// so it ticks again after the update time has passed. This would usually
-		/// occur if the buff is applied again.
+		/// Effectively extends the buff's duration and resets the update time,
+		/// so it ticks again after the update time has passed.
 		/// </remarks>
-		internal void RefreshDuration()
+		public void ExtendDuration()
 		{
 			if (this.HasDuration)
 			{
@@ -265,22 +365,7 @@ namespace Melia.Zone.Buffs
 			}
 
 			if (this.HasUpdateTime)
-				this.NextUpdateTime = DateTime.Now.Add(this.UpdateTime);
-		}
-
-		/// <summary>
-		/// Extends the buff's duration by the given amount of time.
-		/// </summary>
-		/// <remarks>
-		/// Unlike RefreshDuration, this only extends the buff's duration,
-		/// starting from the current time. No other changes are made,
-		/// the buff will simply keep ticking for the given amount of
-		/// time.
-		/// </remarks>
-		internal void ExtendDuration(TimeSpan amount)
-		{
-			if (this.HasDuration)
-				this.RemovalTime = DateTime.Now.Add(amount);
+				this.NextUpdateTime = DateTime.Now.Add(this.Data.UpdateTime);
 		}
 
 		/// <summary>
@@ -309,5 +394,12 @@ namespace Melia.Zone.Buffs
 				this.RunTime += this.UpdateTime;
 			}
 		}
+	}
+
+	public enum BuffOrigin
+	{
+		Self = 0,
+		Other = 1,
+		FromAutoSeller = 2,
 	}
 }

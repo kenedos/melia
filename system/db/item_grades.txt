@@ -1,0 +1,23 @@
+// Melia
+// Database file
+// 
+// For reference only.
+// Values: id, className, name
+//---------------------------------------------------------------------------
+
+[
+{ id: 1, className: "", name: "Basic" },
+{ id: 2, className: "Normal", name: "Normal", grade: 1, basicRatio: 90, reinforceRatio: 100, reinforceCostRatio: 300, transcendCostRatio: 100 },
+{ id: 3, className: "Magic", name: "Magic", grade: 2, basicRatio: 100, reinforceRatio: 120, reinforceCostRatio: 400, transcendCostRatio: 110 },
+{ id: 4, className: "Rare", name: "Rare", grade: 3, basicRatio: 110, reinforceRatio: 150, reinforceCostRatio: 500, transcendCostRatio: 115 },
+{ id: 5, className: "Unique", name: "Unique", grade: 4, basicRatio: 125, reinforceRatio: 200, reinforceCostRatio: 600, transcendCostRatio: 125 },
+{ id: 6, className: "Legend", name: "Legend", grade: 5, basicRatio: 160, reinforceRatio: 250, reinforceCostRatio: 700, transcendCostRatio: 140 },
+{ id: 7, className: "Goddess", name: "Goddess", grade: 6, basicRatio: 160, reinforceRatio: 250, reinforceCostRatio: 700, transcendCostRatio: 28 },
+{ id: 10, className: "armorMaterial_DEF", name: "Physical DEF ratio by item type", cloth: 1, leather: 1.5, iron: 2, shield: 2, ghost: 1 },
+{ id: 11, className: "armorMaterial_MDEF", name: "Magic DEF ratio by item type", cloth: 2, leather: 1.5, iron: 1, shield: 2, ghost: 1 },
+{ id: 20, className: "ArmorClassTypeRatio", name: "Ratio by item ClassType", shield: 0.6, shirt: 0.3, pants: 0.3, boots: 0.2, gloves: 0.2 },
+{ id: 30, className: "WeaponClassTypeRatio", name: "Ratio by weapon ClassType", shield: 1, sword: 1.1, thsword: 1.3, staff: 1.1, thstaff: 1.3, bow: 1.1, thbow: 1.3, mace: 1.1, thmace: 1.3, spear: 1.1, thspear: 1.3, dagger: 1.1, rapier: 1.1, pistol: 1.1, cannon: 1.3, musket: 1.3, trinket: 0.12, neck: 0.06, ring: 0.06 },
+{ id: 40, className: "WeaponDamageRange", name: "DamageRange by weapon ClassType", shield: 1, sword: 1.03, thsword: 1.2, staff: 1, thstaff: 1, bow: 1.03, thbow: 1.2, mace: 1.01, thmace: 1.1, spear: 1.1, thspear: 1.3, dagger: 1.08, rapier: 1, pistol: 1.08, cannon: 1.5, musket: 1.35, trinket: 1, neck: 1, ring: 1 },
+{ id: 60, className: "Upper440LevelClassTypeRatioIncrease", name: "Item with Lv.440 or more ClassType bonus ratio (One-handed 12%, Two-handed and Trinket 10%, Shield 8%), additionally multiplied to WeaponClassTypeRatio", shield: 1.08, shirt: 1.2, pants: 1.2, boots: 1.2, gloves: 1.2, sword: 1.12, thsword: 1.1, staff: 1.12, thstaff: 1.1, bow: 1.12, thbow: 1.1, mace: 1.12, thmace: 1.1, spear: 1.12, thspear: 1.1, dagger: 1.12, rapier: 1.12, pistol: 1.12, cannon: 1.1, musket: 1.1, trinket: 1.1, neck: 1.1, ring: 1.1 },
+{ id: 70, className: "TOSHeroEquipProp", name: "Equipment for Heroic Tale Workshop value, Reinforce_ is Workshop value of each ENH value", shield: 1000, sword: 1000, thsword: 1000, staff: 1000, thstaff: 1000, bow: 1000, thbow: 1000, mace: 1000, thmace: 1000, spear: 1000, thspear: 1000, dagger: 1000, rapier: 1000, pistol: 1000, cannon: 1000, musket: 1000, trinket: 1000, swordReinforce1: 1500, swordReinforce2: 2000, swordReinforce3: 2500, thswordReinforce1: 1500, thswordReinforce2: 2000, thswordReinforce3: 2500, staffReinforce1: 1500, staffReinforce2: 2000, staffReinforce3: 2500, thstaffReinforce1: 1500, thstaffReinforce2: 2000, thstaffReinforce3: 2500, bowReinforce1: 1500, bowReinforce2: 2000, bowReinforce3: 2500, thbowReinforce1: 1500, thbowReinforce2: 2000, thbowReinforce3: 2500, maceReinforce1: 1500, maceReinforce2: 2000, maceReinforce3: 2500, thmaceReinforce1: 1500, thmaceReinforce2: 2000, thmaceReinforce3: 2500, spearReinforce1: 1500, spearReinforce2: 2000, spearReinforce3: 2500, thspearReinforce1: 1500, thspearReinforce2: 2000, thspearReinforce3: 2500, daggerReinforce1: 1500, daggerReinforce2: 2000, daggerReinforce3: 2500, pistolReinforce1: 1500, pistolReinforce2: 2000, pistolReinforce3: 2500, rapierReinforce1: 1500, rapierReinforce2: 2000, rapierReinforce3: 2500, cannonReinforce1: 1500, cannonReinforce2: 2000, cannonReinforce3: 2500, musketReinforce1: 1500, musketReinforce2: 2000, musketReinforce3: 2500, shieldReinforce1: 1500, shieldReinforce2: 2000, shieldReinforce3: 2500, trinketReinforce1: 1500, trinketReinforce2: 2000, trinketReinforce3: 2500 },
+]

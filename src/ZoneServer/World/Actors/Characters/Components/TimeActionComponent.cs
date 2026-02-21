@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Yggdrasil.Scheduling;
 
@@ -103,6 +104,26 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public void End(TimeActionResult result)
 		{
 			TimeAction timeAction;
+
+			lock (_syncLock)
+			{
+				if (_activeTimeAction == null)
+					return;
+
+				timeAction = _activeTimeAction;
+			}
+
+			timeAction.Result = result;
+
+			if (this.Character.IsSitting)
+				Send.ZC_PLAY_ANI(this.Character, AnimationName.Rest);
+
+			Send.ZC_NORMAL.TimeActionEnd(this.Character, result);
+		}
+
+		public void Resume()
+		{
+			TimeAction timeAction;
 			TimeActionCallback callback;
 			SemaphoreSlim resumeSignal;
 
@@ -121,12 +142,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				_resumeSignal = null;
 			}
 
-			timeAction.Result = result;
-
-			callback?.Invoke(this.Character, timeAction);
 			resumeSignal?.Release();
-
-			Send.ZC_NORMAL.TimeActionEnd(this.Character);
+			callback?.Invoke(this.Character, timeAction);
 		}
 
 		/// <summary>
@@ -216,9 +233,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		Cancelled,
 
 		/// <summary>
-		/// The time action was cancelled.
+		/// The time action was cancelled by movement.
 		/// </summary>
 		CancelledByMove,
+
+		/// <summary>
+		/// The time action was cancelled by taking damage.
+		/// </summary>
+		CancelledByHit,
 	}
 
 	/// <summary>

@@ -2,7 +2,7 @@
 //--- 010 Editor v12.0.1 Binary Template
 //
 //      File: ZC_KNOCKDOWN_INFO.bt
-//   Authors: Salman T. Khan, exec
+//   Authors: Salman T. Khan
 //   Version: i355949
 //   Purpose: 
 //  Category: 
@@ -15,6 +15,6 @@
 
 ServerHeaderFixed header;
 
-int handle;
-KnockBackInfo kbInfo;
+int handle; // 196142
+KnockBackInfo kdInfo;
 byte b1;

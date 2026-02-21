@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 	/// Handler for the Hoplite Skill Synchro Thrusting.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_Langort)]
-	public class Peltasta_Langort : IGroundSkillHandler
+	public class Peltasta_Langort : IMeleeGroundSkillHandler
 	{
 		private readonly static TimeSpan BlockDuration = TimeSpan.FromMilliseconds(750);
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(10);
@@ -33,8 +34,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -80,7 +82,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 
 			for (var i = 0; i < 4; i++)
 			{
-				var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 				foreach (var target in targets.LimitBySDR(caster, skill))
 				{

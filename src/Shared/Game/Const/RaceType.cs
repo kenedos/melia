@@ -41,5 +41,10 @@
 		// For Melia we corrected these typos and hence disabled this
 		// value.
 		//Velnais,
+
+		/// <summary>
+		/// Human
+		/// </summary>
+		Human = 7,
 	}
 }

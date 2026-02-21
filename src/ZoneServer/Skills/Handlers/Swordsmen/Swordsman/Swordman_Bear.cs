@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -13,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 	/// Handler for the Swordman skill Bear.
 	/// </summary>
 	[SkillHandler(SkillId.Swordman_Bear)]
-	public class Swordman_Bear : IGroundSkillHandler
+	public class Swordman_Bear : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.
@@ -22,8 +23,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="dir"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

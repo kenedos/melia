@@ -1,0 +1,20 @@
+//------------------------------------------------
+//--- 010 Editor v8.0.1 Binary Template
+//
+//      File: CZ_SET_DAMAGEFONT_SKIN.bt
+//   Authors: Salman T. Khan
+//   Version: i377055
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//   - i377055: Added
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+
+int i1; // Handle?
+int i2; // Skin Index?

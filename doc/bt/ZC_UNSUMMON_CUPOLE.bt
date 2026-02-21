@@ -1,0 +1,20 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: ZC_UNSUMMON_CUPOLE.bt
+//   Authors: Salman T. Khan
+//   Version: i386973
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+int64 l1; // 0
+int i1; // 0
+int handle; // 14236
+int i3; // 0

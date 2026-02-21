@@ -18,7 +18,7 @@ namespace Melia.Shared.Data.Database
 		Item,
 		ItemArg,
 		ItemList,
-		Item_String,
+		Item_String
 	}
 
 	/// <summary>

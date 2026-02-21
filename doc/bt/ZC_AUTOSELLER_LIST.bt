@@ -43,12 +43,23 @@ typedef struct
     //int i[34];
 } SellerItem <optimize=false>;
 
+typedef struct
+{
+    int i1;
+    byte b1;
+    if (b1 == 1)
+    lpString str;
+    else
+    float f1;
+} SellerProp <optimize=false>;
+
 if (sellerItemCount > 0)
 {
     SellerItem items[sellerItemCount];
 }
 if (!FEof())
 {
-int64 l1;
-int i1;
+    int i1;
+    if (i1 > 0)
+    SellerProp properties[i1];
 }

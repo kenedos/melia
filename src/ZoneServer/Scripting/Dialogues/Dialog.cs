@@ -6,14 +6,23 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
+using Melia.Shared.Game.Const;
+using Melia.Shared.World;
+using Melia.Zone.Events;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.Hooking;
+using Melia.Zone.World;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
+using Yggdrasil.Extensions;
+using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
+using static Melia.Zone.Scripting.Hooking.DialogHook;
+using static Melia.Zone.Scripting.Shortcuts;
 
 namespace Melia.Zone.Scripting.Dialogues
 {
@@ -21,7 +30,7 @@ namespace Melia.Zone.Scripting.Dialogues
 	/// Manages a dialog between a player and an NPC and allows sending
 	/// of messages to the player.
 	/// </summary>
-	public class Dialog
+	public class Dialog : IAsyncDisposable
 	{
 		private const string NpcNameSeperator = "*@*";
 		private const string NpcDialogTextSeperator = "\\";
@@ -30,6 +39,8 @@ namespace Melia.Zone.Scripting.Dialogues
 		private string _response;
 		private readonly SemaphoreSlim _resumeSignal = new(0);
 		private readonly CancellationTokenSource _cancellation = new();
+		private readonly IZoneConnection _connection;
+		private readonly object _resumeLock = new();
 
 		/// <summary>
 		/// Returns a reference to the actor that initiated the trigger.
@@ -40,6 +51,11 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// Returns a reference to the actor that was triggered.
 		/// </summary>
 		public IActor Trigger { get; }
+
+		/// <summary>
+		/// Returns a reference to the item that was triggered.
+		/// </summary>
+		public Item Item { get; }
 
 		/// <summary>
 		/// Returns a reference to the character that initiated the dialog.
@@ -58,26 +74,28 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// <summary>
 		/// Returns a reference to the NPC the player is talking to.
 		/// </summary>
-		public Npc Npc
-		{
-			get
-			{
-				if (this.Trigger is not Npc npc)
-					throw new InvalidOperationException($"The trigger is not of type Npc, but {this.Initiator.GetType().Name}.");
+		public Npc Npc => this.Trigger as Npc;
 
-				return npc;
-			}
-		}
+		/// <summary>
+		/// Gets or sets the dialog's initiation type.
+		/// </summary>
+		public DialogStartType StartType { get; set; }
 
 		/// <summary>
 		/// Gets or sets the dialog's current state.
 		/// </summary>
-		internal DialogState State { get; set; }
+		public DialogState State { get; set; }
+
+		/// <summary>
+		/// Gets the type of response the dialog is currently expecting.
+		/// Used to prevent stale packets from being processed.
+		/// </summary>
+		public DialogResponseType ExpectedResponseType { get; private set; }
 
 		/// <summary>
 		/// Returns the data for a potentially open shop.
 		/// </summary>
-		internal ShopData Shop { get; private set; }
+		public ShopData Shop { get; private set; }
 
 		/// <summary>
 		/// Returns the title that's display on the dialog window.
@@ -100,66 +118,58 @@ namespace Melia.Zone.Scripting.Dialogues
 		{
 			this.Initiator = initiator;
 			this.Trigger = trigger;
+
+			if (initiator is Character character)
+			{
+				_connection = character.Connection;
+
+				if (_connection.CurrentDialog != null)
+				{
+					// Prevent starting a new dialog if one is already in progress.
+					throw new InvalidOperationException($"Character '{character.Name}' tried to start a dialog while another was already active.");
+				}
+				_connection.CurrentDialog = this;
+			}
 		}
 
 		/// <summary>
-		/// Starts dialog by calling the NPC's dialog function.
+		/// Creates and prepares a new dialog between the initiator
+		/// and the trigger.
 		/// </summary>
-		/// <exception cref="InvalidOperationException"></exception>
-		internal void Start()
+		/// <param name="initiator"></param>
+		/// <param name="triggerItem"></param>
+		public Dialog(IActor initiator, IActor trigger, Item triggerItem) : this(initiator, trigger)
 		{
-			if (this.Npc.DialogFunc == null)
-				throw new InvalidOperationException($"NPC '{this.Npc.Name}' doesn't have a dialog function assigned to it.");
-
-			this.Start(this.Npc.DialogFunc);
-		}
-
-		/// <summary>
-		/// Starts dialog by calling the given function.
-		/// </summary>
-		/// <param name="dialogFunc"></param>
-		internal async void Start(DialogFunc dialogFunc)
-		{
-			if (this.State != DialogState.NotStarted)
-				throw new InvalidOperationException("Dialog was already started.");
-
-			this.State = DialogState.Active;
-
-			try
-			{
-				await dialogFunc(this);
-				this.Close();
-			}
-			catch (OperationCanceledException)
-			{
-				// Thrown to get out of the async chain.
-			}
-			catch (Exception ex)
-			{
-				Log.Error("Dialog: During dialog between player '{0}' and NPC '{1}': {2}", this.Player.Name, this.Npc.Name, ex);
-			}
-
-			this.State = DialogState.Ended;
+			this.Item = triggerItem;
 		}
 
 		/// <summary>
 		/// Sets response and resumes dialog after a Select.
 		/// </summary>
 		/// <param name="response"></param>
-		internal void Resume(string response)
+		/// <param name="responseType">The type of response being provided.</param>
+		internal void Resume(string response, DialogResponseType responseType)
 		{
-			if (this.State != DialogState.Waiting)
-				throw new InvalidOperationException($"The dialog is not paused and waiting for a response.");
+			lock (_resumeLock)
+			{
+				if (this.State != DialogState.Waiting)
+					return;
 
-			_response = response;
-			_resumeSignal.Release();
+				// Validate that the response type matches what we're expecting.
+				// This prevents stale packets (e.g., CZ_DIALOG_ACK arriving when
+				// expecting CZ_DIALOG_SELECT) from being processed incorrectly.
+				if (this.ExpectedResponseType != responseType)
+					return;
 
-			// The selection window doesn't disappear on its own,
-			// so we have to close it manually before continuing.
-			// We'll assume we're in the process of selecting
-			// something if we actually got a response.
+				this.State = DialogState.Active;
+				this.ExpectedResponseType = DialogResponseType.None;
+				_response = response;
+			}
+
 			if (response != null)
 				Send.ZC_DIALOG_CLOSE(this.Player.Connection);
+
+			_resumeSignal.Release();
 		}
 
 		/// <summary>
@@ -206,10 +216,42 @@ namespace Melia.Zone.Scripting.Dialogues
 			if (IsLocalizationKey(message))
 				return WrapLocalizationKey(message);
 
+			if (this.IsClientDialog(message))
+				return message;
+
+			message = this.InsertNewLine(message);
 			message = this.ReplaceCustomCodes(message);
-			message = this.AddNpcIdenty(message);
+			message = this.AddNpcIdentity(message);
 
 			return message;
+		}
+
+		public string InsertNewLine(string text)
+		{
+			var formattedText = new StringBuilder();
+			var currentLength = 0;
+
+			foreach (var word in text.Split(' '))
+			{
+				formattedText.Append(word);
+				currentLength += word.Length;
+
+				//if (currentLength + word.Length > 120 || word.EndsWith('.') || word.EndsWith('!') || word.EndsWith('?'))
+
+				if (currentLength > 0)
+				{
+					formattedText.Append(' ');
+					currentLength++;
+				}
+
+				if (currentLength > 80)
+				{
+					formattedText.Append("{nl}");
+					currentLength = 0;
+				}
+			}
+
+			return formattedText.ToString();
 		}
 
 		/// <summary>
@@ -217,11 +259,14 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// </summary>
 		/// <param name="message"></param>
 		/// <returns></returns>
-		private string AddNpcIdenty(string message)
+		private string AddNpcIdentity(string message)
 		{
+			if (this.IsClientDialog(message))
+				return message;
+
 			// If the title was set to a valid dialog entry, we'll use that
 			// one to get the title and portrait from the dialog database
-			if (this.Title != null && this.Portrait == null && ZoneServer.Instance.Data.DialogDb.Contains(this.Title))
+			if (this.Npc != null && this.Title != null && this.Portrait == null && ZoneServer.Instance.Data.DialogDb.Contains(this.Title))
 			{
 				message = this.Title + NpcDialogTextSeperator + message;
 				return message;
@@ -232,12 +277,15 @@ namespace Melia.Zone.Scripting.Dialogues
 			if (!message.Contains(NpcNameSeperator) && !message.Contains(NpcDialogTextSeperator))
 			{
 				var dialogTitle = this.GetNpcDialogTitle();
-				message = dialogTitle + NpcNameSeperator + message;
+				if (!string.IsNullOrEmpty(dialogTitle))
+				{
+					message = dialogTitle + NpcNameSeperator + message;
+				}
 			}
 
 			// Prepend dialog class name if one was set. This controls the
 			// portrait and also the title if no custom title was set.
-			if (!message.Contains(NpcDialogTextSeperator) && this.Portrait != null)
+			if (this.Npc != null && !message.Contains(NpcDialogTextSeperator) && this.Portrait != null)
 			{
 				message = this.Portrait + NpcDialogTextSeperator + message;
 			}
@@ -253,6 +301,9 @@ namespace Melia.Zone.Scripting.Dialogues
 		{
 			if (this.Title != null)
 				return this.Title;
+
+			if (this.Npc == null)
+				return string.Empty;
 
 			// If not title was set, we use the NPC's name, and
 			// since NPCs often times use a two line name, with a
@@ -303,6 +354,14 @@ namespace Melia.Zone.Scripting.Dialogues
 		}
 
 		/// <summary>
+		/// Returns true if value is a known client-side dialog name.
+		/// </summary>
+		/// <param name="value"></param>
+		/// <returns></returns>
+		private bool IsClientDialog(string value)
+			=> ZoneServer.Instance.Data.DialogDb.Exists(value);
+
+		/// <summary>
 		/// Wraps key with dictonary id code.
 		/// </summary>
 		/// <param name="key"></param>
@@ -341,8 +400,18 @@ namespace Melia.Zone.Scripting.Dialogues
 			text = this.FrameMessage(text);
 			Send.ZC_DIALOG_OK(this.Player.Connection, text);
 
+			this.ExpectedResponseType = DialogResponseType.Ack;
 			await this.GetClientResponse();
 		}
+
+		/// <summary>
+		/// Returns a mutable list of options to be passed to the Select
+		/// method.
+		/// </summary>
+		/// <param name="options"></param>
+		/// <returns></returns>
+		public List<DialogOption> CreateOptions(params DialogOption[] options)
+			=> options.Where(option => option.Enabled()).ToList();
 
 		/// <summary>
 		/// Creates a mutable list of options that can be modified before
@@ -381,11 +450,11 @@ namespace Melia.Zone.Scripting.Dialogues
 		{
 			// Go through SelectSimple to get the integer response
 			// and then look up the key in the options to return it.
-
-			var optionsTexts = options.Select(a => a.Text);
+			var enabledOptions = options.Where(a => a.Enabled());
+			var optionsTexts = enabledOptions.Select(a => a.Text);
 			var selectedIndex = await this.Select(text, optionsTexts);
 
-			var response = options.ElementAt(selectedIndex - 1).Key;
+			var response = enabledOptions.ElementAt(selectedIndex - 1).Key;
 			return response;
 		}
 
@@ -410,7 +479,10 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// <returns></returns>
 		public async Task<int> Select(string text, IEnumerable<string> options)
 		{
-			ZoneServer.Instance.ServerEvents.PlayerDialog.Raise(new PlayerDialogEventArgs(this.Player, this.Npc, this.GetNpcDialogTitle(), text));
+			if (this.Npc != null)
+			{
+				ZoneServer.Instance.ServerEvents.PlayerDialog.Raise(new PlayerDialogEventArgs(this.Player, this.Npc, this.GetNpcDialogTitle(), text));
+			}
 
 			text = this.FrameMessage(text);
 
@@ -420,22 +492,40 @@ namespace Melia.Zone.Scripting.Dialogues
 
 			Send.ZC_DIALOG_SELECT(this.Player.Connection, arguments);
 
+			this.ExpectedResponseType = DialogResponseType.Select;
 			var response = await this.GetClientResponse();
 
 			// Parse selected index
-			if (!int.TryParse(_response, out var selectedIndex))
+			if (!int.TryParse(response, out var selectedIndex))
 			{
-				Log.Warning("Dialog.SelectSimple: Unexpected non-integer response '{0}'.", _response);
+				Log.Warning("Dialog.SelectSimple: Unexpected non-integer response '{0}'.", response);
 				selectedIndex = 0;
+				this.Close();
 			}
 			// Check range
 			else if (selectedIndex < 0 || selectedIndex > options.Count())
 			{
 				Log.Warning("Dialog.SelectSimple: Unexpected out-of-range response '{0}/{1}'.", selectedIndex, options.Count());
 				selectedIndex = 0;
+				this.Close();
 			}
 
 			return selectedIndex;
+		}
+
+		/// <summary>
+		/// Shows a dialog with "Yes" and "No" options.
+		/// </summary>
+		/// <param name="text">The question to ask the player.</param>
+		/// <returns>True if the player selected "Yes", false otherwise.</returns>
+		public async Task<bool> YesNo(string text)
+		{
+			// The keys "1" and "2" are what the client sends back for the first and second option respectively.
+			// Using the integer Select method and checking the result is the most direct way.
+			var result = await this.Select(text, L("Yes"), L("No"));
+
+			// result will be 1 for "Yes", 2 for "No", and 0 if the dialog was closed/cancelled.
+			return result == 1;
 		}
 
 		/// <summary>
@@ -449,6 +539,7 @@ namespace Melia.Zone.Scripting.Dialogues
 			message = this.FrameMessage(message);
 			Send.ZC_DIALOG_STRINGINPUT(this.Player.Connection, message);
 
+			this.ExpectedResponseType = DialogResponseType.StringInput;
 			var response = await this.GetClientResponse();
 			return response;
 		}
@@ -485,9 +576,35 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// </summary>
 		/// <param name="hookName"></param>
 		/// <returns></returns>
+		public async Task<bool> HooksByDialogName(string hookName)
+		{
+			return await this.Hooks(this.Npc.DialogName, hookName);
+		}
+
+		/// <summary>
+		/// Executes the given hooks, if any, and returns true if any were
+		/// executed.
+		/// </summary>
+		/// <param name="hookName"></param>
+		/// <returns></returns>
 		public async Task<bool> Hooks(string hookName)
 		{
-			var hooks = ScriptHooks.GetAll<DialogHook>(this.Npc.UniqueName, hookName);
+			return await this.Hooks(this.Npc.UniqueName, hookName);
+		}
+
+		/// <summary>
+		/// Executes the given hooks, if any, and returns true if any were
+		/// executed.
+		/// </summary>
+		/// <param name="hookName"></param>
+		/// <returns></returns>
+		public async Task<bool> Hooks(string owner, string hookName)
+		{
+			// Skip hooks for mobs.
+			if (this.Initiator is Mob)
+				return false;
+
+			var hooks = ScriptHooks.GetAll<DialogHook>(owner, hookName);
 			if (hooks.Length == 0)
 				return false;
 
@@ -516,16 +633,70 @@ namespace Melia.Zone.Scripting.Dialogues
 		}
 
 		/// <summary>
+		/// Executes the given hooks sequentially until one returns Break.
+		/// Returns the HookResult of the *last executed* hook that didn't return Skip,
+		/// or Skip if all hooks returned Skip. Prioritizes returning Break if encountered.
+		/// </summary>
+		/// <param name="hooks">The hook functions to execute.</param>
+		/// <returns>The final HookResult (Skip, Continue, or Break).</returns>
+		public async Task<HookResult> Hooks(params DialogHookFunc[] hooks) // Assuming DialogHookFunc is Func<Dialog, Task<HookResult>>
+		{
+			// Skip hooks for mobs - Keep this check if desired
+			if (this.Initiator is Mob)
+				return HookResult.Skip;
+
+			if (hooks == null || hooks.Length == 0)
+				return HookResult.Skip;
+
+			HookResult finalResult = HookResult.Skip; // Default to Skip
+
+			foreach (var hook in hooks)
+			{
+				if (hook == null) continue; // Skip null hooks
+
+				var result = await hook(this);
+
+				// Update finalResult based on the current hook's outcome
+				if (result == HookResult.Continue)
+				{
+					finalResult = HookResult.Continue; // Mark that at least one hook continued
+				}
+				else if (result == HookResult.Break)
+				{
+					finalResult = HookResult.Break; // Break is prioritized
+					break; // Stop executing further hooks
+				}
+				// If result is Skip, finalResult remains unchanged unless it was already Continue/Break
+			}
+
+			return finalResult;
+		}
+
+		/// <summary>
 		/// Waits for the client to respond and returns the response.
 		/// </summary>
 		/// <returns></returns>
 		private async Task<string> GetClientResponse()
 		{
-			this.State = DialogState.Waiting;
+			lock (_resumeLock)
+			{
+				this.State = DialogState.Waiting;
+			}
+
 			await _resumeSignal.WaitAsync(_cancellation.Token);
-			this.State = DialogState.Active;
 
 			return _response;
+		}
+
+		/// <summary>
+		/// Cancels a waiting dialog by signaling its cancellation token.
+		/// This unblocks any pending GetClientResponse() call so the
+		/// dialog task can exit cleanly via OperationCanceledException.
+		/// </summary>
+		internal void Cancel()
+		{
+			try { _cancellation.Cancel(); }
+			catch (ObjectDisposedException) { }
 		}
 
 		/// <summary>
@@ -544,7 +715,10 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// <returns></returns>
 		public async Task OpenPersonalStorage()
 		{
-			this.Player.PersonalStorage.Open();
+			var result = this.Player.PersonalStorage.Open();
+			if (result != StorageResult.Success)
+				return;
+			this.ExpectedResponseType = DialogResponseType.Ack;
 			await this.GetClientResponse();
 		}
 
@@ -554,7 +728,10 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// <returns></returns>
 		public async Task OpenTeamStorage()
 		{
-			this.Player.TeamStorage.Open();
+			var result = this.Player.TeamStorage.Open();
+			if (result != StorageResult.Success)
+				return;
+			this.ExpectedResponseType = DialogResponseType.Ack;
 			await this.GetClientResponse();
 		}
 
@@ -582,6 +759,43 @@ namespace Melia.Zone.Scripting.Dialogues
 			// by executing some custom Lua code.
 			if (shopData.IsCustom)
 			{
+				// --- Calculate Reputation Discount ---
+				var discountMultiplier = 1.0f; // 1.0 means no discount (100% price)
+				var shopFactionId = this.Npc.GetRegionFaction(); // Determine shop's faction
+				var factionDisplayName = "The Local Authorities"; // Default display name
+
+				if (!string.IsNullOrEmpty(shopFactionId))
+				{
+					factionDisplayName = ZoneServer.Instance.World.Factions.GetFactionDisplayName(shopFactionId);
+					var reputation = ZoneServer.Instance.World.Factions.GetReputation(this.Player, shopFactionId);
+					var tier = ZoneServer.Instance.World.Factions.GetTier(reputation);
+
+					// Define discounts per tier (as multipliers: 0.90 = 10% discount)
+					switch (tier)
+					{
+						case ReputationTier.Hated: discountMultiplier = 1.25f; break;
+						case ReputationTier.Disliked: discountMultiplier = 1.10f; break;
+						case ReputationTier.Neutral: break;
+						case ReputationTier.Liked: discountMultiplier = 0.90f; break;
+						case ReputationTier.Honored: discountMultiplier = 0.75f; break;
+						default: discountMultiplier = 1.0f; break;
+					}
+
+					// Notify player of discount/markup (only if not neutral)
+					if (discountMultiplier < 1.0f)
+					{
+						var discountPercent = (int)((1.0f - discountMultiplier) * 100);
+						// Use a non-blocking message or send after shop opens if possible
+						this.Player.ServerMessage(L($"Your {tier} standing with {factionDisplayName} grants you a {discountPercent}% discount here!"));
+					}
+					else if (discountMultiplier > 1.0f)
+					{
+						var markupPercent = (int)((discountMultiplier - 1.0f) * 100);
+						this.Player.ServerMessage(L($"Your {tier} standing with {factionDisplayName} results in a {markupPercent}% price increase here!"));
+					}
+				}
+				// --- End Calculate Reputation Discount ---
+
 				// Start receival of the shop data
 				Send.ZC_EXEC_CLIENT_SCP(this.Player.Connection, "Melia.Comm.BeginRecv('CustomShop')");
 
@@ -590,7 +804,22 @@ namespace Melia.Zone.Scripting.Dialogues
 				var sb = new StringBuilder();
 				foreach (var productData in shopData.Products.Values)
 				{
-					sb.AppendFormat("{{ {0},{1},{2},{3} }},", productData.Id, productData.ItemId, productData.Amount, productData.PriceMultiplier);
+					var meetsRequirement = true;
+					if (!string.IsNullOrEmpty(productData.RequiredFactionId))
+					{
+						// Compare player's current integer rep with the required integer value
+						var playerRep = ZoneServer.Instance.World.Factions.GetReputation(this.Player, productData.RequiredFactionId);
+						if (playerRep < productData.RequiredTierValue) // Check against stored integer value
+						{
+							meetsRequirement = false; // Player doesn't meet reputation requirement
+						}
+					}
+
+					if (!meetsRequirement)
+						continue;
+
+					var basePrice = (int)(productData.Price * productData.PriceMultiplier * discountMultiplier);
+					sb.AppendFormat("{{ {0},{1},{2},{3} }},", productData.Id, productData.ItemId, productData.Amount, basePrice);
 
 					if (sb.Length > ClientScript.ScriptMaxLength * 0.8)
 					{
@@ -620,7 +849,241 @@ namespace Melia.Zone.Scripting.Dialogues
 				Send.ZC_DIALOG_TRADE(this.Player.Connection, shopData.Name);
 			}
 
+			this.ExpectedResponseType = DialogResponseType.Ack;
 			await this.GetClientResponse();
+		}
+
+		/// <summary>
+		/// Opens a custom companion shop with the given name.
+		/// </summary>
+		/// <param name="shopName"></param>
+		public async Task OpenCustomCompanionShop(string shopName)
+		{
+			if (!ZoneServer.Instance.Data.CompanionShopDb.TryFind(shopName, out var shopData))
+				throw new ArgumentException($"Companion shop '{shopName}' not found.");
+
+			// Start receival of companion data
+			Send.ZC_EXEC_CLIENT_SCP(this.Player.Connection, "Melia.Comm.BeginRecv('CustomCompanionShop')");
+
+			// Send companion data
+			var sb = new StringBuilder();
+			foreach (var productData in shopData.Products.Values)
+			{
+				sb.AppendFormat("{{\"{0}\",{1}}},", productData.CompanionClassName, productData.Price);
+
+				if (sb.Length > ClientScript.ScriptMaxLength * 0.8)
+				{
+					Send.ZC_EXEC_CLIENT_SCP(this.Player.Connection, $"Melia.Comm.Recv('CustomCompanionShop', {{ {sb} }})");
+					sb.Clear();
+				}
+			}
+
+			// Send remaining companions
+			if (sb.Length > 0)
+			{
+				Send.ZC_EXEC_CLIENT_SCP(this.Player.Connection, $"Melia.Comm.Recv('CustomCompanionShop', {{ {sb} }})");
+				sb.Clear();
+			}
+
+			// End receival and set the companion shop
+			Send.ZC_EXEC_CLIENT_SCP(this.Player.Connection, "Melia.Comm.ExecData('CustomCompanionShop', M_SET_CUSTOM_COMPANION_SHOP)");
+  
+			Send.ZC_EXEC_CLIENT_SCP(this.Player.Connection, "Melia.Comm.EndRecv('CustomCompanionShop')");
+
+			// Open the companion shop UI
+			Send.ZC_ADDON_MSG(this.Player, "OPEN_DLG_COMPANIONSHOP", 0, "Normal");
+
+			this.ExpectedResponseType = DialogResponseType.Ack;
+			await this.GetClientResponse();
+		}
+
+		/// <summary>
+		/// Saves the respawn location of the player in their current position.
+		/// </summary>
+		/// <returns></returns>
+		public async Task SaveLocation()
+		{
+			this.Player.SetCityReturnLocation(new Location(this.Player.Map.Id, this.Player.Position));
+
+			await Task.Yield();
+		}
+
+		/// <summary>
+		/// Execute a client side script
+		/// </summary>
+		/// <param name="script"></param>
+		/// <param name="args">arguments for the script</param>
+		public async Task ExecuteScript(string script, params object[] args)
+		{
+			this.State = DialogState.Ended;
+			this.Player.ExecuteClientScript(script, args);
+
+			await Task.Yield();
+		}
+
+		/// <summary>
+		/// Execute a client side script
+		/// </summary>
+		/// <param name="script"></param>
+		/// <param name="stringParameter">arguments for the script</param>
+		/// /// <param name="intParameter">arguments for the script</param>
+		public void OpenAddon(string script, string stringParameter = null, int intParameter = 0)
+		{
+			this.State = DialogState.Ended;
+			Task.Delay(100)
+				.ContinueWith(_ => this.Player.AddonMessage(script, stringParameter, intParameter));
+		}
+
+		/// <summary>
+		/// Custom dialog, predefined dialogs in the client
+		/// </summary>
+		/// <param name="function"></param>
+		/// <param name="dialog"></param>
+		/// <param name="argCount"></param>
+		public async Task OpenCustomDialog(string function, string dialog = "", int argCount = 0)
+		{
+			Send.ZC_CUSTOM_DIALOG(this.Player.Connection, function, dialog, argCount);
+
+			this.ExpectedResponseType = DialogResponseType.Ack;
+			await this.GetClientResponse();
+		}
+
+		/// <summary>
+		/// Open/Close predefined UIs in the client
+		/// </summary>
+		/// <param name="function"></param>
+		/// <param name="isOpen"></param>
+		public void OpenUI(string function, bool isOpen = true)
+		{
+			Send.ZC_UI_OPEN(this.Player.Connection, function, isOpen);
+		}
+
+		/// <summary>
+		/// Leave the dialog trigger
+		/// </summary>
+		/// <remarks>
+		/// Not too sure if this is used for anything - @SalmanTKhan
+		/// </remarks>
+		public void Leave()
+		{
+			Send.ZC_LEAVE_TRIGGER(this.Player.Connection);
+		}
+
+		/// <summary>
+		/// Play an animation only visible to the dialog's 
+		/// target player.
+		/// </summary>
+		/// <param name="animationId"></param>
+		public void PlayAnimation(string animationId, bool stopOnLastFrame = false)
+		{
+			Send.ZC_PLAY_ANI(this.Player.Connection, this.Npc, animationId, stopOnLastFrame);
+		}
+
+		/// <summary>
+		/// Play an animation only visible to the dialog's 
+		/// target player.
+		/// </summary>
+		/// <param name="animationId"></param>
+		public void PlayAnimation(IActor actor, string animationId, bool stopOnLastFrame = false)
+		{
+			Send.ZC_PLAY_ANI(this.Player.Connection, actor, animationId, stopOnLastFrame);
+		}
+
+		/// <summary>
+		/// Show a chat bubble only visible to the dialog's 
+		/// target player.
+		/// </summary>
+		/// <param name="format"></param>
+		/// <param name="args"></param>
+		public void Chat(string format, params object[] args)
+		{
+			Send.ZC_CHAT(this.Player.Connection, this.Npc, format, args);
+		}
+
+		/// <summary>
+		/// Show a help message to the dialog's 
+		/// target player.
+		/// </summary>
+		/// <param name="helpName"></param>
+		public void ShowHelp(string helpName)
+		{
+			this.Player.ShowHelp(helpName);
+		}
+
+		/// <summary>
+		/// Show a book to a player with given text.
+		/// </summary>
+		/// <param name="bookText"></param>
+		public void ShowBook(string bookText)
+		{
+			Send.ZC_NORMAL.ShowBook(this.Player, bookText);
+		}
+
+		/// <summary>
+		/// Show a scroll to a player with given text.
+		/// </summary>
+		/// <param name="scrollText"></param>
+		public void ShowScroll(string scrollText)
+		{
+			Send.ZC_NORMAL.ShowScroll(this.Player, scrollText);
+		}
+
+		/// <summary>
+		/// Unhide an NPC for a specific player
+		/// </summary>
+		/// <param name="npcName"></param>
+		public void UnHideNPC(string npcName)
+		{
+			this.Player.UnHideNPC(npcName);
+		}
+
+		public void HideNPC(string npcName)
+		{
+			this.Player.HideNPC(npcName);
+		}
+
+		/// <summary>
+		/// Attach an effect to an actor, only visible to dialog's player.
+		/// </summary>
+		/// <param name="actor"></param>
+		/// <param name="packetString"></param>
+		/// <param name="scale"></param>
+		/// <param name="heightOffset"></param>
+		public void AttachEffect(IActor actor, string packetString, float scale, EffectLocation heightOffset)
+		{
+			actor.AttachEffect(this.Player.Connection, packetString, scale, heightOffset);
+		}
+
+		/// <summary>
+		/// Detach an effect from an actor, only visible to dialog's player.
+		/// </summary>
+		/// <param name="actor"></param>
+		/// <param name="packetString"></param>
+		public void DetachEffect(IActor actor, string packetString)
+		{
+			actor.DetachEffect(this.Player.Connection, packetString);
+		}
+
+		/// <summary>
+		/// Implements IAsyncDisposable. This method is automatically called
+		/// at the end of an 'await using' block.
+		/// </summary>
+		public ValueTask DisposeAsync()
+		{
+			// Cancel any pending semaphore waits so the dialog task
+			// can exit instead of hanging forever.
+			try { _cancellation.Cancel(); } catch (ObjectDisposedException) { }
+
+			// Dispose unmanaged resources held by the CTS and semaphore.
+			_cancellation.Dispose();
+			_resumeSignal.Dispose();
+
+			// Clean up the connection state.
+			if (_connection?.CurrentDialog == this)
+			{
+				_connection.CurrentDialog = null;
+			}
+			return ValueTask.CompletedTask;
 		}
 	}
 
@@ -639,4 +1102,14 @@ namespace Melia.Zone.Scripting.Dialogues
 	/// <param name="options"></param>
 	/// <returns></returns>
 	public delegate Task<int> DialogSelectFunc(params string[] options);
+
+	/// <summary>
+	/// Defines how the dialog was initiated
+	/// </summary>
+	public enum DialogStartType
+	{
+		Trigger,
+		Enter,
+		Leave,
+	}
 }

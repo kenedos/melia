@@ -6,7 +6,7 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AssemblyTitle>ZoneServer</AssemblyTitle>
     <Product>ZoneServer</Product>
-    <Copyright>Copyright ©  2023</Copyright>
+    <Copyright>Copyright © 2023</Copyright>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <FileVersion>1.0.0.0</FileVersion>
   </PropertyGroup>
@@ -20,12 +20,17 @@
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ExecTails.Yggdrasil" Version="1.4.1" />
+    <PackageReference Include="DotRecast.Detour" Version="2025.2.1" />
+    <PackageReference Include="DotRecast.Recast" Version="2025.2.1" />
+    <PackageReference Include="DotRecast.Recast.Toolset" Version="2025.2.1" />
+    <PackageReference Include="ExecTails.Yggdrasil" Version="1.4.0" />
     <PackageReference Include="ExecTails.Yggdrasil.Ai" Version="1.0.1" />
     <PackageReference Include="ExecTails.Yggdrasil.Data.JSON" Version="1.0.1" />
     <PackageReference Include="ExecTails.Yggdrasil.Scripting" Version="1.0.1" />
-    <PackageReference Include="geometry3Sharp" Version="1.0.324" />
+    <PackageReference Include="ExecTails.Yggdrasil.Structures" Version="1.0.1" />
+    <PackageReference Include="geometry4Sharp" Version="1.0.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.7" />
   </ItemGroup>
 </Project>

@@ -17,12 +17,28 @@ namespace Melia.Zone.Abilities
 		public AbilityId[] Ids { get; }
 
 		/// <summary>
+		/// Returns the priority of the handler. Handlers with higher
+		/// priority are preferred over handlers with lower priority.
+		/// </summary>
+		public HandlerPriority Priority { get; }
+
+		/// <summary>
 		/// Creates new attribute for the ability ids.
 		/// </summary>
 		/// <param name="ids"></param>
 		public AbilityHandlerAttribute(params AbilityId[] ids)
 		{
 			this.Ids = ids;
+		}
+
+		/// <summary>
+		/// Creates new attribute for the ability ids.
+		/// </summary>
+		/// <param name="ids"></param>
+		public AbilityHandlerAttribute(HandlerPriority priority, params AbilityId[] ids)
+		{
+			this.Ids = ids;
+			this.Priority = priority;
 		}
 	}
 }

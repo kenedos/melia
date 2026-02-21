@@ -1,0 +1,28 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: ZC_ANCIENT_CARD_COMBINE.bt
+//   Authors: Salman T. Khan
+//   Version: i378059
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+#include "inc/common.bt"
+
+ServerHeaderDynamic header;
+
+int count;
+if (!checkCompression())
+{
+    lpString cardName;
+    int64 l1;
+    int64 newCardWorldId;
+    int i1;
+    int i2;
+    int i3;
+    byte b1;
+    int64 cardWorldIds[count];
+}

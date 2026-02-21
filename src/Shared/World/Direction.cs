@@ -2,6 +2,14 @@
 
 namespace Melia.Shared.World
 {
+	public enum CardinalDirection
+	{
+		South = 0,
+		East = 1,
+		North = 2,
+		West = 3,
+	}
+
 	/// <summary>
 	/// Describes the direction an entity is looking at.
 	/// </summary>
@@ -175,6 +183,61 @@ namespace Melia.Shared.World
 		public readonly Direction GetNormal()
 			=> new(this.NormalDegreeAngle);
 
+		public static Direction operator +(Direction direction)
+			=> direction;
+		public static Direction operator -(Direction direction)
+			=> new(-direction.Cos, -direction.Sin);
+
+		public static Direction operator +(Direction dir1, Direction dir2)
+			=> new(dir1.Cos + dir2.Cos, dir1.Sin + dir2.Sin);
+		public static Direction operator -(Direction dir1, Direction dir2)
+			=> dir1 + -(dir2);
+
+		public static Position operator *(Direction direction, float scalar)
+			=> new(direction.Cos * scalar, 0, direction.Sin * scalar);
+
+		public static Position operator *(float scalar, Direction direction)
+			=> direction * scalar;
+
+		/// <summary>
+		/// Converts Direction to a CardinalDirection (adjusted for isometric 90° rotation)
+		/// </summary>
+		/// <returns>
+		/// 0 = South
+		/// 1 = East
+		/// 2 = North
+		/// 3 = West
+		/// </returns>
+		public CardinalDirection ToCardinalDirection()
+		{
+			if (this == Direction.East)
+				return CardinalDirection.South;
+			else if (this == Direction.South)
+				return CardinalDirection.West;
+			else if (this == Direction.West)
+				return CardinalDirection.North;
+			else
+				return CardinalDirection.East; // North
+		}
+
+		/// <summary>
+		/// Converts CardinalDirection to Direction (adjusted for isometric 90° rotation)
+		/// </summary>
+		public static Direction FromCardinalDirection(CardinalDirection cardinalDirection)
+		{
+			switch (cardinalDirection)
+			{
+				case CardinalDirection.South:
+					return Direction.East;
+				case CardinalDirection.West:
+					return Direction.South;
+				case CardinalDirection.North:
+					return Direction.West;
+				default:
+					return Direction.North;
+			}
+		}
+
 		/// <summary>
 		/// Returns true if the directions have the same cos and sin
 		/// values.
@@ -217,6 +280,11 @@ namespace Melia.Shared.World
 		public override readonly int GetHashCode()
 		{
 			return HashCode.Combine(this.Cos, this.Sin);
+		}
+
+		public override string ToString()
+		{
+			return $"Cos: {Cos} Sin: {Sin} Angle: {DegreeAngle} Radian Angle: {RadianAngle} Normal Degree Angle: {NormalDegreeAngle}";
 		}
 	}
 }

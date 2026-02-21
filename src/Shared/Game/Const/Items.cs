@@ -1,4 +1,5 @@
 ﻿using System;
+using Melia.Shared.Versioning;
 
 namespace Melia.Shared.Game.Const
 {
@@ -20,6 +21,7 @@ namespace Melia.Shared.Game.Const
 		Look_Wig,
 		Premium_Helmet,
 		Look_Lens,
+		Weapon,
 		Weapon_Bow,
 		Weapon_Mace,
 		Weapon_Musket,
@@ -35,6 +37,7 @@ namespace Melia.Shared.Game.Const
 		Weapon_Cannon,
 		Weapon_Dagger,
 		Weapon_Pistol,
+		Armor,
 		Armor_Boots,
 		Armor_Gloves,
 		Armor_Pants,
@@ -63,6 +66,7 @@ namespace Melia.Shared.Game.Const
 		ChangeEquip_THSword,
 		Look_Toy,
 		OPTMisc_Jewel,
+		Consume,
 		Consume_ConsumeSp,
 		Consume_Potion,
 		Consume_Scroll,
@@ -164,6 +168,7 @@ namespace Melia.Shared.Game.Const
 		Weapon_Arcane,
 		Gem_High_Color,
 		Accessory_Earring,
+		Accessory_Core,
 		Pharmacy_Material,
 		Pharmacy_Additive,
 		Pharmacy_PharmacyRecipe,
@@ -171,7 +176,36 @@ namespace Melia.Shared.Game.Const
 		OPTMisc_GoddessIcorWeapon,
 		OPTMisc_GoddessIcorArmor,
 		Armor_Shoulder,
-		Accessory_Core,
+		SubWeapon,
+		Accessory,
+		Collection,
+		Book,
+		Etc,
+		Premium,
+	}
+
+	public enum CardUseType
+	{
+		Always,
+		Attack,
+		Attacked,
+		BeforeAttack,
+		Dead,
+		Kill,
+		UseItem,
+	}
+
+	public enum CardGroup
+	{
+		None,
+		ATK,
+		DEF,
+		GODDESS,
+		LEG,
+		REINFORCE_CARD,
+		REINFORCE_GODDESS_CARD,
+		STAT,
+		UTIL,
 	}
 
 	/// <summary>
@@ -240,8 +274,8 @@ namespace Melia.Shared.Game.Const
 		Earring,
 		BELT,
 		SHOULDER,
-		Item_Consume,
 		CORE,
+		Item_Consume,
 	}
 
 	/// <summary>
@@ -300,7 +334,76 @@ namespace Melia.Shared.Game.Const
 		BELT,
 		SHOULDER,
 		CORE,
+		// Legacy
+		Wand,
 	}
+
+	/// <summary>
+	/// An item's equip exp group.
+	/// </summary>
+	/// <remarks>
+	/// Field "equipExpGroup" in our data, "EquipXpGroup" in the client.
+	/// </remarks>
+	public enum EquipExpGroup
+	{
+		None,
+		Blessed,
+		Card,
+		Card_dummy01,
+		Card_dummy01_Event,
+		Card_Fish_300,
+		Card_Gacha_dummy01,
+		Card_xp_100,
+		Equip,
+		Gem,
+		GemExp_5000,
+		GemExp_randomQuest1,
+		GemExp_randomQuest2,
+		GemExp_randomQuest3,
+		GemExp_randomQuest4,
+		GemExp_randomQuest5,
+		GemExp_Talt01,
+		GemExpStone01,
+		GemExpStone02,
+		GemExpStone03,
+		GemExpStone04,
+		GemExpStone05,
+		GemExpStone07,
+		GemExpStone09,
+		GemExpStone10,
+		GemExpStone11,
+		GemExpStone12,
+		Gem_Skill,
+		Goddess_Card,
+		Goddess_ReinForce_Card,
+		hethran_material,
+		KQ_token_hethran_1,
+		KQ_token_hethran_2,
+		KQ_token_hethran_3,
+		Legend_Card,
+		Legend_Reinforce_Card_MaxLv4,
+		Legend_Reinforce_Card_MaxLv6,
+		Legend_Reinforce_Card_MaxLv8,
+		Legend_Reinforce_Card_MaxLv10,
+		Lv10_Card_TP,
+		Misc,
+		Old_Card_TP,
+	}
+
+	public enum ReinforceType
+	{
+		None,
+		Card,
+		Gem,
+		Goddess,
+		GoddessCard,
+		GoddessReinForceCard,
+		Hethran,
+		LegendCard,
+		Moru,
+		ReinForceCard,
+	}
+
 
 	/// <remarks>
 	/// We're using this enum to save which slot an item is equipped on,
@@ -310,7 +413,8 @@ namespace Melia.Shared.Game.Const
 	/// </remarks>
 	public enum EquipSlot : byte
 	{
-		HairAccessory, // HAT
+		None = 0xFF,
+		HairAccessory = 0, // HAT
 		SubsidiaryAccessory, // HAT_L
 		Hair, // HAIR
 		Top, // SHIRT
@@ -345,7 +449,8 @@ namespace Melia.Shared.Game.Const
 		Earring, // EARRING
 		Belt, // BELT
 		Shoulder, // SHOULDER
-		CORE, // CORE
+		Core, // CORE
+		Last,
 	}
 
 	public enum InventoryItemRemoveMsg : byte
@@ -361,7 +466,10 @@ namespace Melia.Shared.Game.Const
 	public enum InventoryType : byte
 	{
 		Inventory = 0,
-		Warehouse = 1,
+		PersonalStorage = 1,
+		Sold = 3,
+		TeamStorage = 6,
+		Guild = 7,
 	}
 
 	public enum InventoryAddType : byte
@@ -387,17 +495,73 @@ namespace Melia.Shared.Game.Const
 		/// [i337645] 25->30
 		/// [i339415] 30->32
 		/// [i354444] 32->33
-		/// [i361296] 33->34, belt
+		/// [i361296] 33->34
 		/// [i367470] 34->35, shoulder
-		/// [i398686] 35->36, core
+		/// [i398704] 35->36, core
 		/// </remarks>
-		public const int EquipSlotCount = 36;
+		public static int EquipSlotCount
+		{
+			get
+			{
+				if (Versions.Client < 11025)
+					return 20;
+				else if (Versions.Client >= 11025 && Versions.Client < 170175)
+					return 21;
+				else if (Versions.Client >= 170175 && Versions.Client < 171032)
+					return 22;
+				else if (Versions.Client >= 171032 && Versions.Client < 184075)
+					return 23;
+				else if (Versions.Client >= 184075 && Versions.Client < 186893)
+					return 24;
+				else if (Versions.Client >= 186893 && Versions.Client < 337645)
+					return 25;
+				else if (Versions.Client >= 337645 && Versions.Client < 339415)
+					return 30;
+				else if (Versions.Client >= 339415 && Versions.Client < 354245)
+					return 32;
+				else if (Versions.Client >= 354245 && Versions.Client < 361296)
+					return 33;
+				else if (Versions.Client >= 361296 && Versions.Client < 367470)
+					return 34;
+				else if (Versions.Client >= 367470 && Versions.Client < 398686)
+					return 35;
+				else
+					return 36;
+			}
+		}
 
 		/// <summary>
 		/// Ids of the items equipped by default.
 		/// (Literally empty items, NoHat, NoWeapon, etc.)
 		/// </summary>
-		public static readonly int[] EquipItems = [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4, 4, 4, 4];
+		public static int[] EquipItems
+		{
+			get
+			{
+				if (Versions.Client < 11025)
+					return [2, 4, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 9, 9, 9, 9, 9, 10, 2];
+				else if (Versions.Client >= 11025 && Versions.Client < 170175)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 9, 9, 9, 9, 9, 10, 2];
+				else if (Versions.Client >= 170175 && Versions.Client < 171032)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4];
+				else if (Versions.Client >= 171032 && Versions.Client < 184075)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4];
+				else if (Versions.Client >= 184075 && Versions.Client < 186893)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4];
+				else if (Versions.Client >= 186893 && Versions.Client < 337645)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4];
+				else if (Versions.Client >= 337645 && Versions.Client < 339415)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4];
+				else if (Versions.Client >= 354245 && Versions.Client < 361296)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4];
+				else if (Versions.Client >= 365941 && Versions.Client < 367470)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4, 4];
+				else if (Versions.Client >= 367470 && Versions.Client < 398686)
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4, 4, 4];
+				else
+					return [2, 2, 12101, 8, 6, 7, 10000, 11000, 9999996, 9999996, 4, 9, 9, 4, 5, 9, 9, 9, 9, 10, 2, 4, 4, 4, 4, 4, 4, 4, 4, 4, 9999996, 9999996, 4, 4, 4, 4];
+			}
+		}
 	}
 
 	public enum InventoryOrder : byte
@@ -411,13 +575,29 @@ namespace Melia.Shared.Game.Const
 	}
 
 	/// <summary>
+	/// Item grades, used with equips.
+	/// </summary>
+	public enum ItemGrade
+	{
+		None = 0,
+		Normal = 1,
+		Magic = 2,
+		Rare = 3,
+		Unique = 4,
+		Legend = 5,
+		Goddess = 6,
+	}
+
+	/// <summary>
 	/// Ids of commonly used items.
 	/// </summary>
 	public static class ItemId
 	{
 		public const int Mic = 645001;
+		public const int Talt = 645268;
 		public const int Silver = 900011;
 		public const int Gold = 900012;
+		public const int Misc_Soil = 645621;
 	}
 
 	/// <summary>

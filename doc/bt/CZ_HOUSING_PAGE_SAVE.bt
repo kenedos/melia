@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.2 Binary Template
+//
+//      File: CZ_HOUSING_PAGE_SAVE.bt
+//   Authors: Salman T. Khan
+//   Version: i370431
+//   Purpose: Save furniture setup to a housing page?
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;
+int pageIndex;
+char pageName[64];

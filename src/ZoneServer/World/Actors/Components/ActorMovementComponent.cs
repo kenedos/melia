@@ -14,16 +14,11 @@ namespace Melia.Zone.World.Actors.Components
 	/// also use it for pads. During this ongoing update we will have two
 	/// movement components.
 	/// </remarks>
-	public abstract class ActorMovementComponent : IActorComponent, IUpdateable
+	public abstract class ActorMovementComponent : ActorComponent, IUpdateable
 	{
 		private readonly object _positionSyncLock = new();
 		private double _moveX, _moveZ;
 		private TimeSpan _moveTime;
-
-		/// <summary>
-		/// Returns the component's owner.
-		/// </summary>
-		public IActor Owner { get; }
 
 		/// <summary>
 		/// Returns the actor's current destination, if it's moving to
@@ -49,10 +44,9 @@ namespace Melia.Zone.World.Actors.Components
 		/// <summary>
 		/// Creates new movement component.
 		/// </summary>
-		/// <param name="actor"></param>
-		public ActorMovementComponent(IActor actor) : base()
+		/// <param name="owner"></param>
+		public ActorMovementComponent(IActor owner) : base(owner)
 		{
-			this.Owner = actor;
 		}
 
 		/// <summary>
@@ -95,11 +89,11 @@ namespace Melia.Zone.World.Actors.Components
 			lock (_positionSyncLock)
 			{
 				// Don't move if the actor is already at the destination
-				if (destination == this.Owner.Position)
+				if (destination == this.Actor.Position)
 					return TimeSpan.Zero;
 
 				// Get distance to destination
-				var position = this.Owner.Position;
+				var position = this.Actor.Position;
 				var diffX = destination.X - position.X;
 				var diffZ = destination.Z - position.Z;
 				var distance = Math.Sqrt(diffX * diffX + diffZ * diffZ);
@@ -127,7 +121,7 @@ namespace Melia.Zone.World.Actors.Components
 					this.MoveTarget = MoveTargetType.Position;
 
 					// Set direction relative to current position
-					this.Owner.Direction = position.GetDirection(destination);
+					this.Actor.Direction = position.GetDirection(destination);
 
 					//var fromCellPos = this.Entity.Map.Ground.GetCellPosition(this.Entity.Position);
 					//var toCellPos = this.Entity.Map.Ground.GetCellPosition(this.Destination);
@@ -147,7 +141,7 @@ namespace Melia.Zone.World.Actors.Components
 		/// <returns></returns>
 		public Position Stop()
 		{
-			var pos = this.Owner.Position;
+			var pos = this.Actor.Position;
 
 			if (this.IsMoving)
 			{
@@ -191,7 +185,7 @@ namespace Melia.Zone.World.Actors.Components
 				// and stop moving.
 				if ((_moveTime -= elapsed) <= TimeSpan.Zero)
 				{
-					this.Owner.Position = this.Destination;
+					this.Actor.Position = this.Destination;
 
 					this.IsMoving = false;
 					_moveTime = TimeSpan.Zero;
@@ -199,16 +193,16 @@ namespace Melia.Zone.World.Actors.Components
 				// If there's still move time left, update the current position.
 				else
 				{
-					var position = this.Owner.Position;
+					var position = this.Actor.Position;
 					position.X += (float)(_moveX * elapsed.TotalSeconds);
 					position.Z += (float)(_moveZ * elapsed.TotalSeconds);
 
-					if (!this.Owner.Map.Ground.TryGetHeightAt(position, out var height))
+					if (!this.Actor.Map.Ground.TryGetHeightAt(position, out var height))
 						height = 0;
 
 					position.Y = height;
 
-					this.Owner.Position = position;
+					this.Actor.Position = position;
 				}
 			}
 		}

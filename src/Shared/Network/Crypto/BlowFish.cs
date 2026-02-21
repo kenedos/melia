@@ -236,13 +236,14 @@ namespace Melia.Shared.Network.Crypto
 		/// </summary>
 		/// <param name="schedule"></param>
 		/// <param name="key"></param>
-		public Blowfish(uint[] schedule, byte[] key)
+		public Blowfish(uint[] schedule, byte[] key = null)
 		{
 			P = new uint[18];
 			S = new uint[4, 256];
 			Buffer.BlockCopy(schedule, 0, P, 0, 18 * 4);
 			Buffer.BlockCopy(schedule, 18 * 4, S, 0, 1024 * 4);
-			Init(key);
+			if (key != null)
+				this.Init(key);
 		}
 
 		public Blowfish(uint[] schedule, string key)
@@ -349,7 +350,7 @@ namespace Melia.Shared.Network.Crypto
 
 		public void Encipher(byte[] data, int length)
 		{
-			Encipher(data, 0, length);
+			this.Encipher(data, 0, length);
 		}
 
 		/// <summary>
@@ -362,12 +363,12 @@ namespace Melia.Shared.Network.Crypto
 			uint xl, xr;
 			if ((length % 8) != 0)
 				throw new Exception("Invalid Length");
-			for (int i = offset; i < length + offset; i += 8)
+			for (var i = offset; i < length + offset; i += 8)
 			{
 				// Encode the data in 8 byte blocks.
 				xl = (uint)((data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3]);
 				xr = (uint)((data[i + 4] << 24) | (data[i + 5] << 16) | (data[i + 6] << 8) | data[i + 7]);
-				Encipher(ref xl, ref xr);
+				this.Encipher(ref xl, ref xr);
 				// Now Replace the data.
 				data[i] = (byte)(xl >> 24);
 				data[i + 1] = (byte)(xl >> 16);
@@ -421,10 +422,10 @@ namespace Melia.Shared.Network.Crypto
 		/// </summary>
 		/// <param name="data">The string to encrypt</param>
 		/// <returns>Encrypted string</returns>
-		public String Encipher(String data)
+		public string Encipher(string data)
 		{
-			byte[] b = Encoding.Unicode.GetBytes(data);
-			Encipher(b, b.Length);
+			var b = Encoding.Unicode.GetBytes(data);
+			this.Encipher(b, b.Length);
 
 			return Convert.ToBase64String(b);
 		}
@@ -432,7 +433,7 @@ namespace Melia.Shared.Network.Crypto
 
 		public void Decipher(byte[] data, int length)
 		{
-			Decipher(data, 0, length);
+			this.Decipher(data, 0, length);
 		}
 
 		/// <summary>
@@ -446,12 +447,12 @@ namespace Melia.Shared.Network.Crypto
 
 			if ((length % 8) != 0)
 				throw new Exception("Invalid Length");
-			for (int i = offset; i < length + offset; i += 8)
+			for (var i = offset; i < length + offset; i += 8)
 			{
 				// Encode the data in 8 byte blocks.
 				xl = (uint)((data[i] << 24) | (data[i + 1] << 16) | (data[i + 2] << 8) | data[i + 3]);
 				xr = (uint)((data[i + 4] << 24) | (data[i + 5] << 16) | (data[i + 6] << 8) | data[i + 7]);
-				Decipher(ref xl, ref xr);
+				this.Decipher(ref xl, ref xr);
 				// Now Replace the data.
 				data[i] = (byte)(xl >> 24);
 				data[i + 1] = (byte)(xl >> 16);
@@ -482,7 +483,7 @@ namespace Melia.Shared.Network.Crypto
 			for (i = N + 1; i > 1; --i)
 			{
 				Xl = Xl ^ P[i];
-				Xr = F(Xl) ^ Xr;
+				Xr = this.F(Xl) ^ Xr;
 
 				/* Exchange Xl and Xr */
 				temp = Xl;
@@ -509,8 +510,8 @@ namespace Melia.Shared.Network.Crypto
 		/// <returns>Decrypted string</returns>
 		public String Decipher(String data)
 		{
-			byte[] b = Convert.FromBase64String(data);
-			Decipher(b, b.Length);
+			var b = Convert.FromBase64String(data);
+			this.Decipher(b, b.Length);
 
 			return Encoding.Unicode.GetString(b);
 		}

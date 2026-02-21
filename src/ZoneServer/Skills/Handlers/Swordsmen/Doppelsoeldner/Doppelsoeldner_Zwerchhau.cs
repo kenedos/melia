@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 	/// Handler for the Doppelsoeldner skill Zwerchhau.
 	/// </summary>
 	[SkillHandler(SkillId.Doppelsoeldner_Zwerchhau)]
-	public class Doppelsoeldner_Zwerchhau : IGroundSkillHandler
+	public class Doppelsoeldner_Zwerchhau : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -28,8 +29,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -64,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 
 			var hits = new List<SkillHitInfo>();
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hitSomething = false;
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -82,7 +84,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				if (caster.IsAbilityActive(AbilityId.Doppelsoeldner38))
 				{
 					// TODO: This knockdown effect pulls the enemies towards you
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 					skillHit.ApplyKnockBack(target);
 				}
 				else

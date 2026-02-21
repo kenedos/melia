@@ -15,4 +15,6 @@
 
 ServerHeaderFixed header;
 
-int64 l1;
+int handle;
+int weaponItemId;
+int subWeaponItemId;

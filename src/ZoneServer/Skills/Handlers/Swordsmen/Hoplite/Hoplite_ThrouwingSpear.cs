@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -22,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 	/// Handler for the Hoplite skill Throwing Spear
 	/// </summary>
 	[SkillHandler(SkillId.Hoplite_ThrouwingSpear)]
-	public class Hoplite_ThrouwingSpear : IGroundSkillHandler, IDynamicCasted
+	public class Hoplite_ThrouwingSpear : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		private static readonly TimeSpan HitDelay = TimeSpan.FromMilliseconds(435);
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(5);
@@ -32,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 		}
 
@@ -41,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 		}
 
@@ -52,8 +53,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -67,7 +69,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
 			if (caster is Character character)
-				Send.ZC_NORMAL.SkillItemToss(caster, "warrior_f_", "RH", farPos, "F_smoke177", 3, 0.2f, 0, 600, 1, 240, 295, 0, TimeSpan.FromSeconds(3));
+				Send.ZC_NORMAL.SkillItemToss(caster, "warrior_f_", "RH", farPos, "F_smoke177", 3, 0.2f, 0, 600, 1, 240, 295, 0, 3f);
 
 			CallSafe(this.Attack(skill, caster, new Circle(farPos, 50)));
 			CallSafe(this.Explosion(caster, skill, farPos));
@@ -86,7 +88,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 
 			await Task.Delay(HitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -104,7 +106,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 				}
 				else
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 					skillHit.ApplyKnockBack(target);
 				}
 

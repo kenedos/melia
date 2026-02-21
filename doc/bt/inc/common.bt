@@ -55,3 +55,7 @@
 #include "inc/TxItemType.bt"
 #include "inc/WorldId.bt"
 #include "inc/AccountPrivilege.bt"
+#include "inc/Friends.bt"
+#include "inc/Socket.bt"
+#include "inc/Shop.bt"
+#include "inc/EmotionFx.bt"

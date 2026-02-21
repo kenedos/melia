@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -16,15 +17,17 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// Handles the Ranger skill Strafe.
 	/// </summary>
 	[SkillHandler(SkillId.Ranger_Strafe)]
-	public class Ranger_Strafe : IGroundSkillHandler
+	public class Ranger_Strafe : IMeleeGroundSkillHandler
 	{
 		public const float JumpDistance = 40f;
 
 		/// <summary>
 		/// Handles the skill
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position targetPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -67,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			caster.StopBuff(BuffId.Ranger_StrapingShot);
 
 			// First perform the jump
-			var targetPos = caster.Position.GetRelative2D(caster.Direction, JumpDistance);
+			var targetPos = caster.Position.GetRelative(caster.Direction, JumpDistance);
 			targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 
 			caster.Position = targetPos;
@@ -85,7 +88,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			target.TakeDamage(skillHitResult.Damage, caster);
 			var hit = new HitInfo(caster, target, skill, skillHitResult);
 			hit.ForceId = ForceId.GetNew();
-			hit.ResultType = HitResultType.Unk8;
+			hit.ResultType = HitResultType.NoHitScript;
 
 			Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, caster, target, "I_arrow009_red", 0.2f, "arrow_cast", "F_hit_good", 1, "arrow_blow", "SLOW", 800);
 			Send.ZC_HIT_INFO(caster, target, hit);

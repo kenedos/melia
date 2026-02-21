@@ -35,7 +35,7 @@ namespace Melia.Zone.Buffs.Handlers.Common
 				target.Heal(maxHp * HpSpRecoveryRate, 0);
 
 			if (target is Character character && character.Sp < maxSp)
-				character.ModifySp(maxSp * HpSpRecoveryRate);
+				character.Heal(0, maxSp * HpSpRecoveryRate);
 		}
 	}
 }

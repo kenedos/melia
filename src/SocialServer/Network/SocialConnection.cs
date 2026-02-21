@@ -56,7 +56,7 @@ namespace Melia.Social.Network
 		{
 			var packet = new Packet(buffer);
 
-			if (packet.Op != Op.CS_LOGIN && !this.LoggedIn)
+			if (packet.Op != OpTable.GetOp(Op.CS_LOGIN) && !this.LoggedIn)
 			{
 				Log.Warning("Non-login packet ({0:X4}) sent before login from '{1}'. Killing connection.", packet.Op, this.Address);
 				this.Close();
@@ -76,10 +76,10 @@ namespace Melia.Social.Network
 
 			var op = packet.Op;
 
-			var tableSize = Op.GetSize(op);
+			var tableSize = OpTable.GetSize(op);
 			if (tableSize != TosSocialFramer.DynamicPacketSize && buffer.Length != tableSize)
 			{
-				var name = Op.GetName(packet.Op);
+				var name = OpTable.GetName(packet.Op);
 
 				Log.Warning("Connection.Send: Invalid packet size for '{0:X4}' ({1}) ({2} != {3}).", op, name, buffer.Length, tableSize);
 

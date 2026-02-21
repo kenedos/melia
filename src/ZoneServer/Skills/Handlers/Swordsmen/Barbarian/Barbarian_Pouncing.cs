@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -69,7 +69,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopBuff(BuffId.Pouncing_Buff);
 		}
@@ -125,7 +125,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 
 			if (caster.IsAbilityActive(AbilityId.Barbarian4))
 			{
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 				skillHit.ApplyKnockBack(target);
 			}
 			else

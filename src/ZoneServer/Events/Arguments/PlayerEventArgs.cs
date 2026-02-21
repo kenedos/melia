@@ -2,6 +2,7 @@
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 
 namespace Melia.Zone.Events.Arguments
 {
@@ -124,5 +125,48 @@ namespace Melia.Zone.Events.Arguments
 		/// Returns the dialog text.
 		/// </summary>
 		public string DialogText { get; } = dialogText;
+	}
+
+	/// <summary>
+	/// Arguments for when a player uses an item.
+	/// </summary>
+	public class PlayerUsedItemEventArgs(Character character, Item item) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the item that was used.
+		/// </summary>
+		public Item Item { get; } = item;
+	}
+
+	/// <summary>
+	/// Arguments for when a player completes a quest.
+	/// </summary>
+	public class PlayerCompletedQuestEventArgs(Character character, int questId) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the id of the completed quest.
+		/// </summary>
+		public int QuestId { get; } = questId;
+	}
+
+	/// <summary>
+	/// Arguments for when a player's reputation changes.
+	/// </summary>
+	public class ReputationEventArgs(Character character, string factionId, int oldValue, int newValue) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the faction whose reputation changed.
+		/// </summary>
+		public string FactionId { get; } = factionId;
+
+		/// <summary>
+		/// Returns the old reputation value.
+		/// </summary>
+		public int OldValue { get; } = oldValue;
+
+		/// <summary>
+		/// Returns the new reputation value.
+		/// </summary>
+		public int NewValue { get; } = newValue;
 	}
 }

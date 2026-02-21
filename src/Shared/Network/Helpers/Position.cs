@@ -37,6 +37,18 @@ namespace Melia.Shared.Network.Helpers
 		}
 
 		/// <summary>
+		/// Writes position into packet as 2 floats (X,Z).
+		/// </summary>
+		/// <param name="packet"></param>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		public static void PutPosition2D(this Packet packet, Position pos)
+		{
+			packet.PutFloat(pos.X);
+			packet.PutFloat(pos.Z);
+		}
+
+		/// <summary>
 		/// Reads cosinus and sinus as floats from packet and returns
 		/// them as a Direction.
 		/// </summary>

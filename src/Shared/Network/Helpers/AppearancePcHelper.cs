@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Drawing;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Versioning;
 
 namespace Melia.Shared.Network.Helpers
 {
@@ -20,15 +22,27 @@ namespace Melia.Shared.Network.Helpers
 			packet.PutString(appearancePc.Name, 65);
 			packet.PutString(appearancePc.TeamName, 65);
 			packet.PutEmptyBin(6);
-			packet.PutLong(appearancePc.AccountId);
-			packet.PutInt(appearancePc.Stance);
+			packet.PutLong(appearancePc.AccountObjectId);
+
+			if (Versions.Protocol > 500)
+				packet.PutInt(appearancePc.Stance);
+			else
+			{
+				packet.PutShort(appearancePc.Stance);
+				packet.PutShort(0);
+			}
+
 			packet.PutShort((short)appearancePc.JobId);
 			packet.PutByte((byte)appearancePc.Gender);
 			packet.PutByte(0);
 			packet.PutInt(appearancePc.Level);
-			packet.PutInt(1022); // i1. 5001 on Scout, maybe display job?
-			packet.PutUInt(appearancePc.SkinColor);
-			packet.PutInt(0); // i2 1 or 0
+
+			if (Versions.Protocol > 500)
+			{
+				packet.PutInt((int)appearancePc.JobId); // i1. 5001 on Scout, maybe display job?
+				packet.PutUInt(appearancePc.SkinColor);
+				packet.PutInt(appearancePc.ChatBalloon); // i2 1 or 0
+			}
 
 			// Items
 			var equipIds = appearancePc.GetEquipIds();
@@ -39,17 +53,23 @@ namespace Melia.Shared.Network.Helpers
 				packet.PutInt(equipIds[i]);
 
 			// [i10671, 2015-10-26 iCBT2] ?
+			if (Versions.Client >= 10671)
 			{
-				packet.PutInt(0);
 				packet.PutInt(0);
 				packet.PutInt(0);
 			}
 
-			// Visual Equip Ids?
-			for (var i = 0; i < InventoryDefaults.EquipItems.Length; ++i)
-				packet.PutInt(InventoryDefaults.EquipItems[i]);
+			if (Versions.Protocol > 500)
+			{
+				packet.PutInt(0);
+
+				// Visual Equip Ids?
+				for (var i = 0; i < InventoryDefaults.EquipItems.Length; ++i)
+					packet.PutInt(InventoryDefaults.EquipItems[i]);
+			}
 
 			// [i336041, 2021-07-25]
+			if (Versions.Client >= 336041)
 			{
 				packet.PutInt(0);
 				packet.PutInt(0);
@@ -62,11 +82,22 @@ namespace Melia.Shared.Network.Helpers
 			// but they actually contain the visible hats, so we either
 			// had them wrong, or they changed. This was first noticed in
 			// i170175.
+			if (Versions.Client <= 171032)
+			{
+				packet.PutShort(appearancePc.Pose); // Pose
+
+				// [i11025 (2016-02-26)] ?
+				if (Versions.Client >= 11025)
+				{
+					packet.PutInt(0);
+				}
+			}
+			else
 			{
 				//packet.PutShort(0); // Pose
 				//packet.PutInt(0); // Team ID
 
-				packet.PutByte(0);
+				packet.PutByte(appearancePc.Pose);
 				packet.PutByte((appearancePc.VisibleEquip & VisibleEquip.Headgear1) != 0);
 				packet.PutByte((appearancePc.VisibleEquip & VisibleEquip.Headgear2) != 0);
 				packet.PutByte((appearancePc.VisibleEquip & VisibleEquip.Headgear3) != 0);
@@ -77,6 +108,7 @@ namespace Melia.Shared.Network.Helpers
 			// [i373230 (2023-05-10)] Might've been added before
 			// Depending on what was added when, the sub-weapon visibility
 			// might have been part of the above byte block.
+			if (Versions.Client >= 373230)
 			{
 				packet.PutByte((appearancePc.VisibleEquip & VisibleEquip.SubWeapon) != 0);
 				packet.PutEmptyBin(7);
@@ -84,6 +116,7 @@ namespace Melia.Shared.Network.Helpers
 
 			// [i387215 (2024-07-09)]
 			// Might be a 24 byte block at the end, or part of the above bytes.
+			if (Versions.Client >= 387215)
 			{
 				packet.PutEmptyBin(24);
 			}
@@ -98,7 +131,12 @@ namespace Melia.Shared.Network.Helpers
 		/// <summary>
 		/// Returns the character's account id.
 		/// </summary>
-		long AccountId { get; }
+		long AccountDbId { get; }
+
+		/// <summary>
+		/// Returns the character's account id.
+		/// </summary>
+		long AccountObjectId { get; }
 
 		/// <summary>
 		/// Returns the character's name.
@@ -139,6 +177,16 @@ namespace Melia.Shared.Network.Helpers
 		/// Returns the character's skin color.
 		/// </summary>
 		uint SkinColor { get; }
+
+		/// <summary>
+		/// Returns the character's pose.
+		/// </summary>
+		byte Pose { get; }
+
+		/// <summary>
+		/// Returns the character's chat balloon id.
+		/// </summary>
+		int ChatBalloon { get; }
 
 		/// <summary>
 		/// Returns a bitmask specifying the visibility of certain

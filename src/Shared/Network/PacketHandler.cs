@@ -11,7 +11,7 @@ namespace Melia.Shared.Network
 	/// <typeparam name="TConnection"></typeparam>
 	public class PacketHandler<TConnection>
 	{
-		protected Dictionary<int, PacketHandlerFunc> _handlerFuncs = new Dictionary<int, PacketHandlerFunc>();
+		protected readonly Dictionary<Op, PacketHandlerFunc> _handlerFuncs = new();
 
 		/// <summary>
 		/// Creates new packet handler and loads handler methods on itself.
@@ -42,7 +42,7 @@ namespace Melia.Shared.Network
 		/// </summary>
 		/// <param name="op"></param>
 		/// <param name="func"></param>
-		public void Add(int op, PacketHandlerFunc func)
+		public void Add(Op op, PacketHandlerFunc func)
 		{
 			lock (_handlerFuncs)
 				_handlerFuncs[op] = func;
@@ -64,7 +64,7 @@ namespace Melia.Shared.Network
 
 			PacketHandlerFunc func;
 			lock (_handlerFuncs)
-				_handlerFuncs.TryGetValue(packet.Op, out func);
+				_handlerFuncs.TryGetValue(OpTable.GetOp(packet.Op), out func);
 
 			if (func == null)
 			{
@@ -83,7 +83,7 @@ namespace Melia.Shared.Network
 		/// <param name="packet"></param>
 		protected virtual void OnUnknownPacket(TConnection conn, Packet packet)
 		{
-			Log.Debug("PacketHandler: No handler found for '{0:X4}', {1}.\n{2}", packet.Op, Op.GetName(packet.Op), packet.ToString());
+			Log.Debug("PacketHandler: No handler found for '{0:X4}', {1}.\n{2}", packet.Op, OpTable.GetName(packet.Op), packet.ToString());
 		}
 
 		/// <summary>
@@ -103,13 +103,13 @@ namespace Melia.Shared.Network
 		/// <summary>
 		/// Returns the opcodes this handler handles.
 		/// </summary>
-		public int[] Ops { get; private set; }
+		public Op[] Ops { get; private set; }
 
 		/// <summary>
 		/// Creates new attribute.
 		/// </summary>
 		/// <param name="ops"></param>
-		public PacketHandlerAttribute(params int[] ops)
+		public PacketHandlerAttribute(params Op[] ops)
 		{
 			this.Ops = ops;
 		}

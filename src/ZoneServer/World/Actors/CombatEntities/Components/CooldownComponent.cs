@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
+using Melia.Zone.Skills;
 using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
@@ -16,6 +17,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 	{
 		private readonly object _syncLock = new object();
 		private readonly Dictionary<CooldownId, Cooldown> _cooldowns = new Dictionary<CooldownId, Cooldown>();
+		private readonly Dictionary<SkillId, TimeSpan> _cooldownReductions = new Dictionary<SkillId, TimeSpan>();
 		private readonly List<Cooldown> _over = new List<Cooldown>();
 
 		/// <summary>
@@ -32,7 +34,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		/// <param name="cooldownId"></param>
 		/// <param name="duration"></param>
-		public void Start(CooldownId cooldownId, TimeSpan duration)
+		public Cooldown Start(CooldownId cooldownId, TimeSpan duration)
 		{
 			var cooldown = new Cooldown(cooldownId, duration);
 
@@ -51,7 +53,34 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			if (this.Entity is Character character)
 				Send.ZC_COOLDOWN_CHANGED(character, cooldown);
+
+			return cooldown;
 		}
+
+		/// <summary>
+		/// Starts a cooldown for a specific skill, applying any active reductions.
+		/// </summary>
+		/// <param name="skill">The skill to start the cooldown for.</param>
+		/// <returns>The started Cooldown instance.</returns>
+		public Cooldown Start(Skill skill)
+		{
+			var duration = skill.Data.CooldownTime;
+
+			// Apply any reductions specific to this skill.
+			if (_cooldownReductions.TryGetValue(skill.Id, out var reduction))
+			{
+				duration = Math2.Max(TimeSpan.Zero, duration - reduction);
+			}
+
+			var cdrRate = this.Entity.GetTempVar("Melia.Skill.CooldownReduction");
+			if (cdrRate > 0)
+			{
+				duration *= (1 - cdrRate);
+			}
+
+			return this.Start(skill.Data.CooldownGroup, duration);
+		}
+
 
 		/// <summary>
 		/// Reduces an existing cooldown by the given amount.
@@ -77,7 +106,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// existing cooldowns.
 		/// </summary>
 		/// <param name="cooldown"></param>
-		internal void Restore(Cooldown cooldown)
+		public void Restore(Cooldown cooldown)
 		{
 			lock (_syncLock)
 				_cooldowns[cooldown.Id] = cooldown;
@@ -131,6 +160,42 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Remove a given cooldown id and reset it's cooldown.
+		/// </summary>
+		/// <param name="cooldownId"></param>
+		public bool Remove(CooldownId cooldownId)
+		{
+			var isRemoved = false;
+			lock (_syncLock)
+			{
+				isRemoved = _cooldowns.Remove(cooldownId);
+			}
+
+			if (this.Entity is Character character)
+				Send.ZC_COOLDOWN_CHANGED(character, cooldownId);
+
+			return isRemoved;
+		}
+
+		public void RemoveAll()
+		{
+			var removedCooldowns = new List<CooldownId>();
+			lock (_syncLock)
+			{
+				foreach (var cooldown in _cooldowns.Values)
+				{
+					removedCooldowns.Add(cooldown.Id);
+				}
+				_cooldowns.Clear();
+			}
+			if (this.Entity is Character character)
+			{
+				foreach (var cooldownId in removedCooldowns)
+					Send.ZC_COOLDOWN_CHANGED(character, cooldownId);
+			}
+		}
+
+		/// <summary>
 		/// Updates the cooldowns and removes them when they're over.
 		/// </summary>
 		/// <param name="elapsed"></param>
@@ -149,7 +214,37 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				}
 
 				foreach (var cooldown in _over)
+				{
 					_cooldowns.Remove(cooldown.Id);
+					cooldown.OnCooldownChanged?.Invoke();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Applies a flat time reduction to a specific skill's cooldown.
+		/// This reduction is considered when the skill's cooldown is next started.
+		/// If a reduction already exists, this will overwrite it.
+		/// </summary>
+		/// <param name="skillId">The ID of the skill to apply the reduction to.</param>
+		/// <param name="reduction">The amount of time to reduce the cooldown by.</param>
+		public void AddReduction(SkillId skillId, TimeSpan reduction)
+		{
+			lock (_syncLock)
+			{
+				_cooldownReductions[skillId] = reduction;
+			}
+		}
+
+		/// <summary>
+		/// Removes a previously applied cooldown reduction for a specific skill.
+		/// </summary>
+		/// <param name="skillId">The ID of the skill to remove the reduction from.</param>
+		public void ResetReduction(SkillId skillId)
+		{
+			lock (_syncLock)
+			{
+				_cooldownReductions.Remove(skillId);
 			}
 		}
 	}
@@ -180,6 +275,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// Returns the time when the cooldown will be over.
 		/// </summary>
 		public DateTime EndTime => this.StartTime + this.Duration;
+
+		/// <summary>
+		/// Returns an event on cooldown finishing.
+		/// </summary>
+		public Action OnCooldownChanged { get; set; }
 
 		/// <summary>
 		/// Creates new cooldown.

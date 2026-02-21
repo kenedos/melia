@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v14.0beta1 Binary Template
+//
+//      File: ZC_HARDCODED_SKILL.bt
+//   Authors: Salman T. Khan
+//   Version: i375917
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+int i1; // 1
+int casterHandle;
+int summonHandle;
+int monsterId; // 103019
+int i3; // 1 or 0

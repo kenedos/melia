@@ -1,6 +1,5 @@
 ﻿using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.Network;
 
 namespace Melia.Zone.Buffs.Handlers.Common
 {
@@ -21,7 +20,6 @@ namespace Melia.Zone.Buffs.Handlers.Common
 			var target = buff.Target;
 
 			AddPropertyModifier(buff, target, PropertyName.MSPD_BM, MspdBonus);
-			Send.ZC_MSPD(target);
 
 			// TODO: Seems like it should also set the PCEtc property AdditionalExpRate
 		}
@@ -33,7 +31,6 @@ namespace Melia.Zone.Buffs.Handlers.Common
 		public override void OnEnd(Buff buff)
 		{
 			RemovePropertyModifier(buff, buff.Target, PropertyName.MSPD_BM);
-			Send.ZC_MSPD(buff.Target);
 		}
 	}
 }

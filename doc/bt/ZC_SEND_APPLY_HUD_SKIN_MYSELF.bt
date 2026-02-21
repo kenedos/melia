@@ -2,13 +2,14 @@
 //--- 010 Editor v8.0 Binary Template
 //
 //      File: ZC_SEND_APPLY_HUD_SKIN_MYSELF.bt
-//   Authors: exec
-//   Version: i379687
+//   Authors: Salman T. Khan
+//   Version: i374025 (Papaya)
 //   Purpose: 
 //  Category: 
 // File Mask: 
 //  ID Bytes: 
 //   History: 
+//   i378059: hudSkin, hudInfo, and hudOther removed, replaced with skinId
 //------------------------------------------------
 
 #include "inc/common.bt"

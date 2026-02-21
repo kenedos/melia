@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v14.0 Binary Template
+//
+//      File: ZC_OFF_AFTER_IMAGE.bt
+//   Authors: Salman T. Khan
+//   Version: i381165
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+int casterHandle;

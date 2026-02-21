@@ -37,7 +37,9 @@ namespace Melia.Zone.Buffs.Handlers.Common
 			// system.
 
 			// Set dash property and add movement speed bonus
-			target.Properties.SetFloat(PropertyName.DashRun, 1);
+			// DashRun = 1 for normal dash, DashRun = 3 for mounted dash
+			var dashValue = target.IsRiding ? 3f : 1f;
+			target.Properties.SetFloat(PropertyName.DashRun, dashValue);
 			target.Properties.Modify(PropertyName.MSPD_BM, speedBonus);
 
 			Send.ZC_MOVE_SPEED(target);

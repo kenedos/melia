@@ -1,7 +1,10 @@
 ﻿using System;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Buffs.Base;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 
 namespace Melia.Zone.Skills.Combat
@@ -44,7 +47,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <summary>
 		/// Gets or sets the hit effect displayed on the target.
 		/// </summary>
-		public HitEffect HitEffect { get; set; } = HitEffect.Impact;
+		public HitEffect HitEffect { get; set; }
 
 		/// <summary>
 		/// Gets or sets the force id, which is used to synchronize
@@ -53,11 +56,33 @@ namespace Melia.Zone.Skills.Combat
 		/// </summary>
 		public int ForceId { get; set; }
 
+		public SkillAttackType AttackType
+		{
+			get
+			{
+				var attribute = SkillAttackType.Melee;
+				if (this.Skill.Data.AttackType != SkillAttackType.None)
+					attribute = this.Skill.Data.AttackType;
+				else
+				{
+					if (this.Attacker is Character character && character.Inventory.GetEquip(EquipSlot.RightHand)?.Data.AttackType != SkillAttackType.None)
+						attribute = character.Inventory.GetEquip(EquipSlot.RightHand)?.Data.AttackType ?? SkillAttackType.Melee;
+
+				}
+				return attribute;
+			}
+		}
+
 		/// <summary>
 		/// Gets or sets the number of hits that are displayed. The damage
 		/// is split evenly between the hits.
 		/// </summary>
-		public int HitCount { get; set; } = 1;
+		public int HitCount { get; set; }
+
+		/// <summary>
+		/// Variable Info Count
+		/// </summary>
+		public byte VarInfoCount { get; set; } = 2;
 
 		/// <summary>
 		/// Gets or sets the knock back information. Leave empty for none.
@@ -68,6 +93,23 @@ namespace Melia.Zone.Skills.Combat
 		/// Returns true if the knock back info was set.
 		/// </summary>
 		public bool IsKnockBack => this.KnockBackInfo != null;
+
+		/// <summary>
+		/// Unknown float.
+		/// </summary>
+		public float UnkFloat { get; set; } = 0f;
+
+		/// <summary>
+		/// Creates new skill hit.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="result"></param>
+		public SkillHitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillHitResult result)
+		: this(attacker, target, skill, result, TimeSpan.Zero, TimeSpan.Zero)
+		{
+		}
 
 		/// <summary>
 		/// Creates new skill hit.
@@ -91,6 +133,27 @@ namespace Melia.Zone.Skills.Combat
 		}
 
 		/// <summary>
+		/// Creates new skill hit.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="result"></param>
+		/// <param name="damageDelay"></param>
+		/// <param name="skillHitDelay"></param>
+		public SkillHitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillHitResult result, HitInfo hitInfo)
+		{
+			this.Attacker = attacker;
+			this.Target = target;
+			this.Skill = skill;
+			this.HitInfo = hitInfo;
+			this.DamageDelay = TimeSpan.Zero;
+			this.SkillHitDelay = TimeSpan.Zero;
+			this.HitEffect = result.Effect;
+			this.HitCount = result.HitCount;
+		}
+
+		/// <summary>
 		/// Applies the knock back to the target and updates the hit type.
 		/// </summary>
 		/// <param name="target"></param>
@@ -100,36 +163,53 @@ namespace Melia.Zone.Skills.Combat
 				throw new InvalidOperationException("Knock back info is not set.");
 
 			// Knockback immunity check - may need to move this
-			if (target.IsBuffActive(BuffId.BullyPainBarrier_Buff))
+			if (
+				target.IsBuffActive(BuffId.PainBarrier_Buff) ||
+				target.IsBuffActive(BuffId.BullyPainBarrier_Buff) ||
+				target.IsBuffActive(BuffId.Marschierendeslied_Buff)
+				)
 			{
 				this.KnockBackInfo = null;
 				return;
 			}
 
-			var isKnockBack = this.KnockBackInfo.HitType == HitType.KnockBack;
 			var isKnockDown = this.KnockBackInfo.HitType == HitType.KnockDown;
 
-			if (isKnockBack && target.IsLocked(LockType.GetKnockedBack))
+			// Check buff hooks for knockback/knockdown prevention
+			var buffs = target.Components.Get<BuffComponent>()?.GetList();
+			if (buffs != null)
 			{
-				this.KnockBackInfo = null;
-				return;
-			}
-			else if (isKnockDown && target.IsLocked(LockType.GetKnockedDown))
-			{
-				this.KnockBackInfo = null;
-				return;
+				foreach (var buff in buffs)
+				{
+					if (isKnockDown)
+					{
+						if (buff.Handler is IBuffBeforeKnockdownHandler kdHandler && kdHandler.OnBeforeKnockdown(buff, this.Attacker, target) == KnockResult.Prevent)
+						{
+							this.KnockBackInfo = null;
+							return;
+						}
+					}
+					else
+					{
+						if (buff.Handler is IBuffBeforeKnockbackHandler kbHandler && kbHandler.OnBeforeKnockback(buff, this.Attacker, target) == KnockResult.Prevent)
+						{
+							this.KnockBackInfo = null;
+							return;
+						}
+					}
+				}
 			}
 
 			this.HitInfo.Type = this.KnockBackInfo.HitType;
-			target.Position = this.KnockBackInfo.ToPosition;
 
+			target.Position = this.KnockBackInfo.ToPosition;
 			target.AddState(StateType.KnockedBack, this.KnockBackInfo.Time);
 
 			// Set knock down state as well if applicable, so we can check for
 			// both KB and KD as necessary. We can't consider them to be the
 			// same because some skills and buffs have special behavior for
 			// knock downs.
-			if (isKnockDown)
+			if (this.HitInfo.Type == HitType.KnockDown)
 				target.AddState(StateType.KnockedDown, this.KnockBackInfo.Time);
 		}
 	}

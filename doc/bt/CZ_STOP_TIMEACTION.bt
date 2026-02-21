@@ -14,3 +14,6 @@
 #include "inc/common.bt"
 
 ClientHeaderFixed header;
+
+byte b1; // 0
+byte b2; // 121

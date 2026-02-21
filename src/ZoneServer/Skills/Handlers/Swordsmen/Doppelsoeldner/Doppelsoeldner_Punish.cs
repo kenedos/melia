@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 	/// Handler for the Doppelsoeldner skill Punish.
 	/// </summary>
 	[SkillHandler(SkillId.Doppelsoeldner_Punish)]
-	public class Doppelsoeldner_Punish : IGroundSkillHandler
+	public class Doppelsoeldner_Punish : IMeleeGroundSkillHandler
 	{
 		private const float MaxTargetDistance = 30f;
 		private const float MaxMoveDistance = 140f;
@@ -33,8 +34,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			// Punish will attempt to move you towards the target before
 			// it activates. The position is just in front of the target.
 			var attackPosDist = caster.Position.Get2DDistance(target.Position) - MaxTargetDistance;
@@ -56,7 +58,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			// If the caster is already in range, they won't move.
 			if (attackPosDist > 0)
 			{
-				var endingPosition = caster.Position.GetRelative2D(caster.Direction, (float)attackPosDist);
+				var endingPosition = caster.Position.GetRelative(caster.Direction, (float)attackPosDist);
 				endingPosition = caster.Map.Ground.GetLastValidPosition(caster.Position, endingPosition);
 
 				caster.Position = endingPosition;
@@ -91,7 +93,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))

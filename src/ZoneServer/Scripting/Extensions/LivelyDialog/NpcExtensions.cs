@@ -288,7 +288,7 @@ namespace Melia.Zone.Scripting.Extensions.LivelyDialog
 		/// <param name="valueName"></param>
 		/// <returns></returns>
 		private static string GetRelationVarPrefix(Npc npc, string valueName)
-			=> $"Ashen.Npcs.{npc.UniqueName}.Relation.{valueName}";
+			=> $"Melia.Npcs.{npc.UniqueName}.Relation.{valueName}";
 
 		/// <summary>
 		/// Returns the current value for the given relation value.

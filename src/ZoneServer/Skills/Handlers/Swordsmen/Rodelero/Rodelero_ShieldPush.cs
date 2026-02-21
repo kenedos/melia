@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 	/// Handler for the Rodelero skill Shield Push.
 	/// </summary>
 	[SkillHandler(SkillId.Rodelero_ShieldPush)]
-	public class Rodelero_ShieldPush : IGroundSkillHandler
+	public class Rodelero_ShieldPush : IMeleeGroundSkillHandler
 	{
 		private readonly static TimeSpan DefDownDuration = TimeSpan.FromSeconds(10);
 		private readonly static TimeSpan UnbalanceDuration = TimeSpan.FromSeconds(3);
@@ -33,8 +34,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -67,7 +69,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))

@@ -1,15 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
+using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.Skills;
 using Melia.Zone.Skills.SplashAreas;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Maps;
-using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Formats.Png;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using Yggdrasil.Geometry;
@@ -19,6 +26,32 @@ namespace Melia.Zone
 	public static class Debug
 	{
 		/// <summary>
+		/// Gets or sets whether performance profiling logs are enabled.
+		/// Can be controlled via server configuration or console commands.
+		/// </summary>
+		public static bool IsProfilingEnabled { get; set; } = true;
+
+		/// <summary>
+		/// Starts a profiling block that will be timed and logged upon disposal.
+		/// Returns a disposable object, designed to be used in a 'using' statement.
+		/// If profiling is disabled, returns a dummy object that does nothing.
+		/// </summary>
+		/// <param name="actionName">The name of the action to profile.</param>
+		/// <param name="warningThresholdMs">The threshold in milliseconds to log a WARNING for.</param>
+		/// <returns>An IDisposable to wrap the code block.</returns>
+		public static IDisposable Profile(string actionName, long warningThresholdMs = 1000)
+		{
+			if (IsProfilingEnabled)
+			{
+				return new ActionProfiler(actionName, warningThresholdMs);
+			}
+			else
+			{
+				return NullProfiler.Instance;
+			}
+		}
+
+		/// <summary>
 		/// Temporarily visualizes the shape on the map using friendly
 		/// monsters and range previews.
 		/// </summary>
@@ -27,20 +60,28 @@ namespace Melia.Zone
 		/// <param name="duration"></param>
 		/// <param name="edgePoints"></param>
 		/// <param name="rangePreview"></param>
-		public static void ShowShape(Map map, IShapeF shape, TimeSpan? duration = null, bool edgePoints = true, bool rangePreview = true)
+		public static void ShowShape(Map map, IShapeF shape, TimeSpan? duration = null, bool edgePoints = false, bool rangePreview = true)
 		{
+			if (Versions.Client == KnownVersions.ClosedBeta1)
+			{
+				edgePoints = true;
+				rangePreview = false;
+			}
 			if (duration == null)
 				duration = TimeSpan.FromSeconds(5);
 
 			if (edgePoints)
 			{
+				var monsterId = 41094;
+				if (Versions.Client == KnownVersions.ClosedBeta1)
+					monsterId = 10005;
 				foreach (var point in shape.GetEdgePoints())
 				{
 					var pos = new Position(point.X, 0, point.Y);
 					var height = map.Ground.GetHeightAt(pos);
 					pos.Y = height;
 
-					var monster = new Mob(41094, MonsterType.NPC);
+					var monster = new Mob(monsterId, RelationType.Neutral);
 					monster.Position = pos;
 					monster.DisappearTime = DateTime.Now.Add((TimeSpan)duration);
 					map.AddMonster(monster);
@@ -50,7 +91,33 @@ namespace Melia.Zone
 			if (rangePreview)
 			{
 				if (shape is ISplashArea splashArea)
+				{
 					Send.ZC_START_RANGE_PREVIEW(map, 0, null, (TimeSpan)duration, splashArea);
+				}
+				else
+				{
+					var center = shape.Center;
+					var centerPos = new Position(center.X, 0, center.Y);
+					centerPos.Y = map.Ground.GetHeightAt(centerPos);
+
+					var edgePointsArray = shape.GetEdgePoints();
+					if (edgePointsArray.Length > 0)
+					{
+						var maxDistance = 0f;
+						foreach (var point in edgePointsArray)
+						{
+							var distance = (float)center.GetDistance(point);
+							if (distance > maxDistance)
+								maxDistance = distance;
+						}
+
+						var splashType = SplashType.Circle;
+						var height = maxDistance;
+						var width = 0f;
+
+						Send.ZC_START_RANGE_PREVIEW(map, 0, null, (TimeSpan)duration, splashType, centerPos, Direction.Zero, height, width);
+					}
+				}
 			}
 		}
 
@@ -65,10 +132,34 @@ namespace Melia.Zone
 			if (duration == null)
 				duration = TimeSpan.FromSeconds(5);
 
-			var monster = new Mob(10005, MonsterType.Friendly);
+			var monster = new Mob(10005, RelationType.Friendly);
 			monster.Position = pos;
 			monster.DisappearTime = DateTime.Now.Add((TimeSpan)duration);
 			map.AddMonster(monster);
+		}
+
+		/// <summary>
+		/// Temporarily places monsters at list of positions.
+		/// </summary>
+		/// <param name="map"></param>
+		/// <param name="positionList"></param>
+		/// <param name="duration"></param>
+		public static void ShowPositions(Map map, List<Position> positionList, TimeSpan? duration = null)
+		{
+			foreach (var position in positionList)
+			{
+				Debug.ShowPosition(map, position, duration);
+			}
+		}
+
+		/// <summary>
+		/// Announces the skill being used by a mob via chat message.
+		/// </summary>
+		/// <param name="caster"></param>
+		/// <param name="skill"></param>
+		public static void MobSkillAnnounce(ICombatEntity caster, Skill skill)
+		{
+			Send.ZC_CHAT(caster, "Watch out! I'm using {0}!", skill.Data.ClassName);
 		}
 
 		/// <summary>
@@ -77,12 +168,12 @@ namespace Melia.Zone
 		/// </summary>
 		/// <param name="filePath"></param>
 		/// <param name="map"></param>
-		public static void DrawMap(string filePath, Map map)
+		public static void DrawMap(string filePath, Map map, float scale = 1.0f, float rotateAngle = 0)
 		{
 			var drawBorderBoxes = false;
 			var drawCellsColored = false;
 			var drawTriangles = false;
-			var drawSpawners = true;
+			var drawSpawners = false;
 
 			var borderBoxColorOffset = 0x30;
 			var imageMarginSize = 100;
@@ -105,8 +196,7 @@ namespace Melia.Zone
 			var offsetY = -bottom + imageMarginSize;
 
 			using var image = new Image<Rgba32>(width, height);
-
-			image.Mutate(ctx => ctx.Fill(Color.White));
+			image.Mutate(ctx => ctx.Clear(Color.Transparent));
 
 			foreach (var polygon in polygons)
 			{
@@ -164,13 +254,37 @@ namespace Melia.Zone
 				}
 			}
 
+			// Apply rotation if specified
+			if (rotateAngle != 0)
+			{
+				// Calculate new dimensions after rotation
+				var radians = rotateAngle * Math.PI / 180;
+				var cos = Math.Abs(Math.Cos(radians));
+				var sin = Math.Abs(Math.Sin(radians));
+				var newWidth = (int)(width * cos + height * sin);
+				var newHeight = (int)(width * sin + height * cos);
+
+				// Apply rotation directly to the image
+				image.Mutate(ctx => ctx
+					.Pad(newWidth, newHeight, Color.Transparent)
+					.Rotate(rotateAngle));
+			}
+
+			// Apply scaling if needed
+			if (scale != 1.0f)
+			{
+				var newWidth = (int)(image.Width * scale);
+				var newHeight = (int)(image.Height * scale);
+				image.Mutate(ctx => ctx.Resize(newWidth, newHeight));
+			}
+
 			filePath = Path.GetFullPath(filePath);
 
 			var folderPath = System.IO.Path.GetDirectoryName(filePath);
 			if (!Directory.Exists(folderPath))
 				Directory.CreateDirectory(folderPath);
 
-			image.Save(filePath);
+			image.Save(filePath, new PngEncoder());
 		}
 	}
 }

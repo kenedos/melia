@@ -1,0 +1,17 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: ZC_GUILD_BUILDING_OBJECT_REMOVE.bt
+//   Authors: Salman T. Khan
+//   Version: i386576
+//   Purpose: Seen with GTW
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderDynamic header;
+int i1;

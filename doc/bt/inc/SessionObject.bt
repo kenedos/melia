@@ -39,7 +39,7 @@ typedef struct
     int64 objectId; // 72247
     float param; // 46? (parameter?)
     SessionProperties properties;
-    int sessionId2;
+    int questId;
 } AddSessionObject <read=readAddSessionObject, optimize=false>;
 
 string readAddSessionObject(AddSessionObject &v)

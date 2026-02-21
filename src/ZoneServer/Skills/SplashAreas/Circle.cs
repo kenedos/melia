@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <summary>
 		/// Returns the center of the circle.
 		/// </summary>
-		public Position Center { get; }
+		public Position Center => new Position(_base.Center.X, 0, _base.Center.Y);
 
 		/// <summary>
 		/// Returns the circle's radius.
@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <summary>
 		/// Returns the center of the circle.
 		/// </summary>
-		Vector2F IShapeF.Center => this.Center;
+		Vector2F IShapeF.Center => _base.Center;
 
 		/// <summary>
 		/// Returns the splash area's type.
@@ -60,9 +60,7 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <param name="radius"></param>
 		public Circle(Position originPos, float radius)
 		{
-			this.Center = originPos;
 			this.Radius = radius;
-
 			_base = new CircleF(originPos, radius);
 		}
 

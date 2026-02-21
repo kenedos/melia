@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.1 Binary Template
+//
+//      File: ZC_VERTICAL_MOTION.bt
+//   Authors: Salman T. Khan
+//   Version: i392613
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;
+
+int handle;
+bool isOn;
+float maxHeight;
+float speed;

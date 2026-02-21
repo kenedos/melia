@@ -2,18 +2,20 @@
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.World;
+using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Maps.Pathfinding
 {
 	/// <summary>
-	/// A pathfinder that uses a dynamic grid to find paths.
+	/// A pathfinder that uses a dynamic grid with the A* algorithm.
 	/// </summary>
 	public class DynamicGridPathfinder : IPathfinder
 	{
-		private readonly static int MaxNodeExpand = 500;
+		private readonly static int MaxNodeExpand = 20000;
 
 		private readonly Ground _ground;
+		private readonly Map _map;
 
 		/// <summary>
 		/// Creates a new instance for the given map.
@@ -22,68 +24,60 @@ namespace Melia.Zone.World.Maps.Pathfinding
 		public DynamicGridPathfinder(Map map)
 		{
 			_ground = map.Ground;
+			_map = map;
 		}
 
 		/// <summary>
-		/// Finds a path that leads from the start position to the destination,
-		/// returning it via out. Returns false if no path could be found.
+		/// Finds a path using a dynamic-resolution A* algorithm and smoothes the result.
 		/// </summary>
-		/// <remarks>
-		/// Uses A* algorithm and a dynamic grid to find the path between the
-		/// two positions. The first element is always the start and the last one
-		/// is the position closest to the destination.
-		/// </remarks>
-		/// <param name="start"></param>
-		/// <param name="goal"></param>
-		/// <param name="entitySize"></param>
-		/// <param name="path"></param>
-		/// <returns></returns>
+		/// <param name="start">The starting position for the path.</param>
+		/// <param name="goal">The desired destination for the path.</param>
+		/// <param name="actorRadius">The radius of the actor, used for clearance checks.</param>
+		/// <param name="path">When this method returns, contains the sequence of waypoints for the path, or an empty list if no path was found.</param>
+		/// <returns>True if a path was found; otherwise, false.</returns>
 		public bool TryFindPath(Position start, Position goal, float actorRadius, out List<Position> path)
 		{
 			path = new List<Position>();
 
-			if (_ground == null)
+			if (_ground == null || !_ground.HasData())
 				return false;
 
-			// Initial dynamic grid size
-			var distance = start.Get2DDistance(goal);
-			var gridScale = this.GetGridScale(distance, actorRadius);
-
-			// Finds path
-			var roughPath = this.FindPathScale(start, goal, gridScale, actorRadius);
-
-			// Removes repeated positions
-			var visited = new HashSet<Position>();
-			var intermediatePath = new List<Position>();
-
-			foreach (var pos in roughPath)
+			// Validate start position. If it's invalid, find the nearest walkable one.
+			if (!_map.IsWalkablePosition(start, actorRadius))
 			{
-				// Adds only nonrepeating positions
-				if (!visited.Contains(pos))
+				if (!_ground.TryGetNearestValidPosition(start, actorRadius, out start, 50f))
 				{
-					intermediatePath.Add(pos);
-					visited.Add(pos);
+					Log.Warning($"Pathfinder: Could not find a walkable start position near {start} for actor with radius {actorRadius}.");
+					return false; // Pathfinding is impossible if we can't find a valid place to start.
 				}
 			}
 
-			// Merge nodes
-			if (intermediatePath.Count > 0)
-				path.AddRange(this.MergePathNodes(intermediatePath, actorRadius));
+			// Validate goal position. If it's invalid, find the nearest walkable one.
+			// If we can't find a valid spot near the goal, we don't fail; A* will find a path to the closest reachable node.
+			_ground.TryGetNearestValidPosition(goal, actorRadius, out goal, 50f);
 
-			// Positive result if path is not empty
+			var distance = start.Get2DDistance(goal);
+			var gridScale = this.GetGridScale(distance, actorRadius);
+
+			var roughPath = this.FindPathScale(start, goal, gridScale, actorRadius);
+
+			// Merge nodes to create a smoother, more direct path
+			if (roughPath.Count > 0)
+			{
+				var distinctPath = roughPath.Distinct().ToList();
+				path.AddRange(this.MergePathNodes(distinctPath, actorRadius));
+			}
+
+#if DEBUG
+			Debug.ShowPositions(_map, path, TimeSpan.FromMilliseconds(200));
+#endif
+
 			return path.Count != 0;
 		}
 
 		/// <summary>
-		/// Finds a path from start position to the goal position using
-		/// A* algorithm and a path node scale.
-		/// Returns empty list if no path can be found.
+		/// Finds a path from start to goal using a recursive A* with a variable grid scale.
 		/// </summary>
-		/// <param name="start"></param>
-		/// <param name="goal"></param>
-		/// <param name="gridScale"></param>
-		/// <param name="actorRadius"></param>
-		/// <returns></returns>
 		private List<Position> FindPathScale(Position start, Position goal, int gridScale, float actorRadius)
 		{
 			var path = new List<Position>();
@@ -91,175 +85,113 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			var cameFrom = new Dictionary<Position, Position>();
 			var gScore = new Dictionary<Position, float> { [start] = 0 };
 			var fScore = new Dictionary<Position, float> { [start] = this.Heuristic(start, goal) };
-			var radius = actorRadius;
 
-			// Stopping condition
-			if (gridScale <= 10 || start.Get2DDistance(goal) < radius)
+			// Base case for recursion: if we are very close, return a direct path.
+			if (gridScale <= 10 || start.Get2DDistance(goal) < actorRadius)
 			{
-				if (_ground.IsValidCirclePosition(start, radius))
+				if (_ground.IsValidCirclePosition(start, actorRadius))
 					path.Add(start);
 
 				return path;
 			}
 
-			// Start A*
 			openSet.Enqueue(start, fScore[start]);
 			while (openSet.Count > 0 && openSet.Count < MaxNodeExpand)
 			{
 				var current = openSet.Dequeue();
 				var distance = current.Get2DDistance(goal);
 
-				// Make our grid scale smaller as we approach target.
+				// As we approach the target, recursively call with a smaller, more refined grid scale.
 				if (distance < gridScale * 2)
 				{
 					path.AddRange(this.ReconstructPath(cameFrom, current));
-					gridScale = this.GetGridScale(distance, actorRadius);
-					path.AddRange(this.FindPathScale(current, goal, gridScale, actorRadius));
+					var newGridScale = this.GetGridScale(distance, actorRadius);
+					path.AddRange(this.FindPathScale(current, goal, newGridScale, actorRadius));
 					return path;
 				}
 
-				// Adjacent neighbors
 				var neighbors = this.GetNeighbors(current, actorRadius, gridScale);
 
-				// Always add one neighbor in last valid position towards goal
-				var direction = current.GetDirection(goal);
-				var neighborTowardsGoal = current.GetRelative2D(direction, gridScale);
-				neighbors.Add(_ground.GetLastValidCirclePosition(current, radius, neighborTowardsGoal));
-
-				// Update scores
 				foreach (var neighbor in neighbors)
 				{
-					var tentativeGScore = gScore[current] + gridScale;
-
+					var tentativeGScore = gScore[current] + (float)current.Get3DDistance(neighbor);
 					if (!gScore.ContainsKey(neighbor) || tentativeGScore < gScore[neighbor])
 					{
 						cameFrom[neighbor] = current;
 						gScore[neighbor] = tentativeGScore;
-						fScore[neighbor] = gScore[neighbor] + this.Heuristic(neighbor, goal);
-
-						if (!openSet.UnorderedItems.Any(item => item.Element.Equals(neighbor)))
-						{
-							openSet.Enqueue(neighbor, fScore[neighbor]);
-						}
+						fScore[neighbor] = tentativeGScore + this.Heuristic(neighbor, goal);
+						openSet.Enqueue(neighbor, fScore[neighbor]);
 					}
 				}
 			}
 
-			// No path found
+			// If goal was not reached, return a path to the closest node we found.
+			if (cameFrom.Count > 0)
+			{
+				var closestNode = fScore.MinBy(kv => kv.Value).Key;
+				path.AddRange(this.ReconstructPath(cameFrom, closestNode));
+			}
+
 			return path;
 		}
 
-		/// <summary>
-		/// Gets the dynamic grid scale.
-		/// </summary>
-		/// <param name="distance"></param>
-		/// <param name="actorRadius"></param>
-		/// <returns></returns>
 		private int GetGridScale(double distance, float actorRadius)
 		{
-			// radius * 2 is the maximum guaranteed value to not cause entities
-			// to go through objects. The client cannot handle this, so it
-			// displays as if entities are teleporting around. Values higher
-			// may cause this visual issue but it may also be desirable due
-			// to computational reasons.
-
-			// We use a constant here to prevent monsters with small radius
-			// from stuttering
-			var constant = 5;
-
-			return (int)Math.Min(distance / 2, actorRadius * 2 + constant);
+			// This heuristic determines the distance between pathfinding nodes.
+			// A smaller value is more accurate but computationally expensive.
+			// actorRadius * 2 is a safe value to prevent clipping through thin obstacles.
+			const int minStep = 5;
+			return (int)Math.Min(distance / 2, actorRadius * 2 + minStep);
 		}
 
-		/// <summary>
-		/// Reconstructs the path from the given position.
-		/// </summary>
-		/// <param name="cameFrom"></param>
-		/// <param name="position"></param>
-		/// <returns></returns>
-		private List<Position> ReconstructPath(Dictionary<Position, Position> cameFrom, Position position)
+		private List<Position> ReconstructPath(Dictionary<Position, Position> cameFrom, Position current)
 		{
-			var totalPath = new List<Position>();
-			totalPath.Add(position);
-
-			while (cameFrom.ContainsKey(position))
+			var totalPath = new List<Position> { current };
+			while (cameFrom.ContainsKey(current))
 			{
-				var nextNode = cameFrom[position];
-
-				position = nextNode;
-				totalPath.Add(position);
+				current = cameFrom[current];
+				totalPath.Add(current);
 			}
-
 			totalPath.Reverse();
 			return totalPath;
 		}
 
-		/// <summary>
-		/// Calculates the heuristic cost from position a to position b.
-		/// </summary>
-		/// <param name="a"></param>
-		/// <param name="b"></param>
-		/// <returns></returns>
 		private float Heuristic(Position a, Position b)
 		{
-			// Applying a height penalty makes the algorithm attempt to
-			// equalize the height distance first (i.e. go up a ladder).
-			var heightPenalty = 3f;
-
-			// Euclidean Distance
+			// Euclidean distance with a penalty for height differences to encourage
+			// finding paths on similar elevations first.
+			const float heightPenalty = 3f;
 			var dx = Math.Abs(a.X - b.X);
 			var dy = Math.Abs(a.Y - b.Y) * heightPenalty;
 			var dz = Math.Abs(a.Z - b.Z);
 
-			return (float)Math.Sqrt(Math.Pow(dx, 2) + Math.Pow(dy, 2) + Math.Pow(dz, 2));
+			return (float)Math.Sqrt(dx * dx + dy * dy + dz * dz);
 		}
 
-		/// <summary>
-		/// Gets the neighboring positions for a given position under a given
-		/// grid scale.
-		/// </summary>
-		/// <param name="pos"></param>
-		/// <param name="actorRadius"></param>
-		/// <param name="gridScale"></param>
-		/// <returns>A list of neighboring positions.</returns>
 		private List<Position> GetNeighbors(Position pos, float actorRadius, int gridScale, int angleSubdivisions = 1)
 		{
-			// Scale is too low
-			if (gridScale <= 0)
-				return new List<Position>();
+			if (gridScale <= 0) return new List<Position>();
 
-			var radius = actorRadius;
 			var neighbors = new List<Position>();
-			var d = gridScale;
+			var directions = this.GenerateDirections(gridScale, angleSubdivisions);
 
-			// Generate directions based on angle subdivisions
-			var directions = this.GenerateDirections(d, angleSubdivisions);
-
-			// Search in all generated directions
 			foreach (var dir in directions)
 			{
 				var neighbor = new Position(pos.X + dir.X, 0, pos.Z + dir.Z);
-
-				// Position at neighbor is valid
-				if (_ground.TryGetHeightAt(neighbor, out var height))
+				if (_map.IsWalkablePosition(neighbor, actorRadius) && _ground.TryGetHeightAt(neighbor, out var height))
 				{
-					// Our entity can stand there
-					if (_ground.IsValidCirclePosition(neighbor, radius))
-					{
-						neighbor.Y = height;
-						neighbors.Add(neighbor);
-					}
+					neighbors.Add(neighbor.WithHeight(height));
 				}
 			}
 
-			// Too little neighbors found, try again with
-			// more angle subdivisions
+			// If we are in a tight spot with few options, increase search resolution.
 			if (neighbors.Count <= 3 && angleSubdivisions < 8)
 			{
 				return this.GetNeighbors(pos, actorRadius, gridScale, angleSubdivisions * 2);
 			}
 
-			// If still no neighbors, try with lower scale
-			if (neighbors.Count == 0)
+			// If still no neighbors, try again with a smaller step distance.
+			if (neighbors.Count == 0 && gridScale > 1)
 			{
 				return this.GetNeighbors(pos, actorRadius, gridScale / 2);
 			}
@@ -267,19 +199,13 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			return neighbors;
 		}
 
-		/// <summary>
-		/// Generates a list of directions based on a specified distance
-		/// and number of subdivisions.
-		/// </summary>
-		/// <param name="distance"></param>
-		/// <param name="subdivisions"></param>
-		/// <returns></returns>
 		private List<(int X, int Z)> GenerateDirections(int distance, int subdivisions)
 		{
 			var directions = new List<(int X, int Z)>();
-			var angleStep = 2 * Math.PI / (8 * subdivisions);
+			var totalDirections = 8 * subdivisions;
+			var angleStep = 2 * Math.PI / totalDirections;
 
-			for (var i = 0; i < 8 * subdivisions; i++)
+			for (var i = 0; i < totalDirections; i++)
 			{
 				var angle = i * angleStep;
 				var x = (int)Math.Round(distance * Math.Cos(angle));
@@ -287,40 +213,37 @@ namespace Melia.Zone.World.Maps.Pathfinding
 				directions.Add((x, z));
 			}
 
-			return directions;
+			return directions.Distinct().ToList();
 		}
 
 		/// <summary>
-		/// Merge together path nodes that are visible to eachother.
-		/// Returns the improved path.
+		/// Simplifies a path by removing intermediate nodes that have a clear line of sight. (Path smoothing)
 		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
 		private List<Position> MergePathNodes(List<Position> path, float actorRadius)
 		{
-			var mergedPath = new List<Position>();
-			var currentIndex = 0;
+			if (path.Count < 3) return path;
 
-			while (currentIndex < path.Count)
+			var mergedPath = new List<Position> { path.First() };
+			var currentAnchorIndex = 0;
+
+			while (currentAnchorIndex < path.Count - 1)
 			{
-				mergedPath.Add(path[currentIndex]);
-
-				var farthestVisibleIndex = currentIndex;
-				for (var i = currentIndex + 1; i < path.Count; i++)
+				var farthestVisibleIndex = currentAnchorIndex + 1;
+				for (var i = currentAnchorIndex + 2; i < path.Count; i++)
 				{
-					if (_ground.GetLastValidCirclePosition(path[currentIndex], actorRadius, path[i]) == path[i])
+					if (_map.IsLineOfSightWalkable(path[currentAnchorIndex], path[i], actorRadius))
 					{
 						farthestVisibleIndex = i;
 					}
 					else
 					{
-						break;
+						break; // Obstacle found, the previous node was the last visible one.
 					}
 				}
 
-				currentIndex = farthestVisibleIndex + 1;
+				mergedPath.Add(path[farthestVisibleIndex]);
+				currentAnchorIndex = farthestVisibleIndex;
 			}
-			mergedPath.Add(path.Last());
 
 			return mergedPath;
 		}

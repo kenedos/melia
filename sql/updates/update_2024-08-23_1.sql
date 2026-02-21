@@ -1,0 +1,1 @@
+ALTER TABLE `accounts` ADD `lastIP` INT UNSIGNED NULL DEFAULT NULL AFTER `lastLogin`;

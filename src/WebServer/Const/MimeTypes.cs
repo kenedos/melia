@@ -11,6 +11,7 @@
 		public static class Application
 		{
 			public const string Binary = "application/octet-stream";
+			public const string Ipf = "application/vnd.imc.ipf";
 			public const string Json = "application/json";
 			public const string Xml = "application/xml";
 		}

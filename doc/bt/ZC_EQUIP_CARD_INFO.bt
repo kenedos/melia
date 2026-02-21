@@ -15,3 +15,12 @@
 
 ServerHeaderDynamic header;
 short count;
+
+local int i;
+for (i = 0; i < count; i++)
+{
+    lpString str;
+    int64 exp;
+    int slot;
+    short level;
+}

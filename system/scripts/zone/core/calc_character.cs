@@ -35,9 +35,9 @@ public class CharacterCalculationsScript : GeneralScript
 		var byStat = properties.GetFloat(PropertyName.STR_STAT);
 		var byBonus = properties.GetFloat(PropertyName.STR_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.STR_ADD);
-		var byTemp = 0; // properties.GetFloat(PropertyName.STR_TEMP);
+		var byTemp = character.Variables.Temp.GetFloat(PropertyName.STR_TEMP);
 
-		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.STR);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -57,9 +57,9 @@ public class CharacterCalculationsScript : GeneralScript
 		var byStat = properties.GetFloat(PropertyName.CON_STAT);
 		var byBonus = properties.GetFloat(PropertyName.CON_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.CON_ADD);
-		var byTemp = 0; // properties.GetFloat(PropertyName.CON_TEMP);
+		var byTemp = character.Variables.Temp.GetFloat(PropertyName.CON_TEMP);
 
-		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.CON);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -79,9 +79,9 @@ public class CharacterCalculationsScript : GeneralScript
 		var byStat = properties.GetFloat(PropertyName.INT_STAT);
 		var byBonus = properties.GetFloat(PropertyName.INT_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.INT_ADD);
-		var byTemp = 0; // properties.GetFloat(PropertyName.INT_TEMP);
+		var byTemp = character.Variables.Temp.GetFloat(PropertyName.INT_TEMP);
 
-		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.INT);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -101,9 +101,9 @@ public class CharacterCalculationsScript : GeneralScript
 		var byStat = properties.GetFloat(PropertyName.MNA_STAT);
 		var byBonus = properties.GetFloat(PropertyName.MNA_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.MNA_ADD);
-		var byTemp = 0; // properties.GetFloat(PropertyName.MNA_TEMP);
+		var byTemp = character.Variables.Temp.GetFloat(PropertyName.MNA_TEMP);
 
-		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.MNA);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -123,9 +123,9 @@ public class CharacterCalculationsScript : GeneralScript
 		var byStat = properties.GetFloat(PropertyName.DEX_STAT);
 		var byBonus = properties.GetFloat(PropertyName.DEX_Bonus);
 		var byAdd = properties.GetFloat(PropertyName.DEX_ADD);
-		var byTemp = 0; // properties.GetFloat(PropertyName.DEX_TEMP);
+		var byTemp = character.Variables.Temp.GetFloat(PropertyName.DEX_TEMP);
 
-		var rewardProperty = 0; // GET_REWARD_PROPERTY(self, statString);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.DEX);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -498,7 +498,7 @@ public class CharacterCalculationsScript : GeneralScript
 		// not apply if character is in a city and FreeDashingInCities is
 		// enabled.
 		var isDashRun = properties.GetFloat("DashRun", 0);
-		if (isDashRun > 0 && (!Feature.IsEnabled("FreeDashingInCities") || character.Map.Data.Type != MapType.City))
+		if (isDashRun > 0 && (!Feature.IsEnabled("FreeDashingInCities") || character.Map?.Data?.Type != MapType.City))
 		{
 			var dashAmount = 500f;
 			if (isDashRun == 2)
@@ -706,7 +706,10 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var byBuffs = properties.GetFloat(PropertyName.MaxWeight_BM);
 		var byBonus = properties.GetFloat(PropertyName.MaxWeight_Bonus);
-		value += byBuffs + byBonus;
+		// TODO: Decide to use just fixed base value or new calculated base value with stats.
+		var byRateBuff = properties.GetFloat(PropertyName.MaxWeight_RATE_BM);
+		byRateBuff = (value * byRateBuff);
+		value += byBuffs + byBonus + byRateBuff;
 
 		return value;
 	}
@@ -1346,12 +1349,13 @@ public class CharacterCalculationsScript : GeneralScript
 		var baseValue = 30;
 		var byBuff = properties.GetFloat(PropertyName.MSPD_BM);
 		var byBonus = properties.GetFloat(PropertyName.MSPD_Bonus);
-		var value = (baseValue + byBuff + byBonus);
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.MSPD);
+		var value = (baseValue + byBuff + byItem + byBonus);
 
 		var nowWeight = properties.GetFloat(PropertyName.NowWeight);
 		var maxWeight = properties.GetFloat(PropertyName.MaxWeight);
 
-		if (nowWeight > maxWeight)
+		if (nowWeight > maxWeight && ZoneServer.Instance.World.TryGetMap(character.MapId, out var map) && !map.IsCity)
 			value /= 3;
 
 		return value;
@@ -1484,5 +1488,666 @@ public class CharacterCalculationsScript : GeneralScript
 		var value = byItem + byBuff;
 
 		return (int)value;
+	}
+
+	/// <summary>
+	/// Returns character's total ALLSTAT.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Character_ALLSTAT(Character character)
+	{
+		var properties = character.Properties;
+
+		var byStat = properties.GetFloat(PropertyName.ALLSTAT_STAT);
+		var byAdd = properties.GetFloat(PropertyName.ALLSTAT_ADD);
+
+		var result = byStat + byAdd;
+		return (float)Math.Floor(Math.Max(1, result));
+	}
+
+	/// <summary>
+	/// Returns character's ALLSTAT bonus from items and buffs.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Character_ALLSTAT_ADD(Character character)
+	{
+		var properties = character.Properties;
+
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ALLSTAT);
+		var byBuffs = properties.GetFloat(PropertyName.ALLSTAT_BM);
+		var byItemBuff = properties.GetFloat(PropertyName.ALLSTAT_ITEM_BM);
+
+		var value = byItem + byBuffs + byItemBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Returns heal power.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Character_HEAL_PWR(Character character)
+	{
+		var properties = character.Properties;
+
+		var statINT = properties.GetFloat(PropertyName.INT);
+		var statSPR = properties.GetFloat(PropertyName.MNA);
+
+		var level = properties.GetFloat(PropertyName.Lv);
+
+		var byLevel = level;
+
+		var byStat = 0d;
+		if (!Feature.IsEnabled("NewINTFormula"))
+			byStat += (statINT * 0.26f) + ((float)Math.Floor(statINT / 10f) * 10.4f);
+
+		if (!Feature.IsEnabled("NewSPRFormula"))
+			byStat += (statSPR * 0.65f) + ((float)Math.Floor(statSPR / 10f) * 26f);
+		else
+			byStat += (statSPR) + (Math.Floor(statSPR / 10f) * (byLevel * 0.03f));
+
+		var value = byLevel + byStat;
+
+		var byBuffs = character.Properties.GetFloat(PropertyName.HEAL_PWR_BM);
+
+		var rate = character.Properties.GetFloat(PropertyName.HEAL_PWR_RATE_BM);
+		var byRateBuffs = (float)Math.Floor(value * rate);
+
+		value += byBuffs + byRateBuffs;
+
+		return (int)value;
+	}
+
+	/// <summary>
+	/// Returns character's attack speed bonus.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Character_AttackSpeed(Character character)
+	{
+		var byBuff = character.Properties.GetFloat(PropertyName.NormalASPD_BM);
+
+		var value = byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Returns character's skill range, which adds potentially to the
+	/// skill's splash range.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Character_SkillRange(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.SkillRange);
+		var byBuff = character.Properties.GetFloat(PropertyName.SkillRange_BM);
+
+		var value = byItem + byBuff;
+		return value;
+	}
+
+	/// <summary>
+	/// Character's additional slash attack.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_ATK_SLASH(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.Slash);
+		var byBuff = character.Properties.GetFloat(PropertyName.Slash_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's additional piercing attack.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_ATK_ARIES(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.Aries);
+		var byBuff = character.Properties.GetFloat(PropertyName.Aries_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's additional bludgeon attack.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_ATK_STRIKE(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.Strike);
+		var byBuff = character.Properties.GetFloat(PropertyName.Strike_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's additional slash defense.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_DEF_SLASH(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.SlashDEF);
+		var byBuff = character.Properties.GetFloat(PropertyName.DefSlash_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's additional piercing defense.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_DEF_ARIES(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.AriesDEF);
+		var byBuff = character.Properties.GetFloat(PropertyName.DefAries_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's additional bludgeon defense.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_DEF_STRIKE(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.StrikeDEF);
+		var byBuff = character.Properties.GetFloat(PropertyName.DefStrike_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Fire.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_FIRE_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_FIRE);
+		var byBuff = character.Properties.GetFloat(PropertyName.Fire_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Ice.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_ICE_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_ICE);
+		var byBuff = character.Properties.GetFloat(PropertyName.Ice_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Lightning.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_LIGHTNING_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_LIGHTNING);
+		var byBuff = character.Properties.GetFloat(PropertyName.Lightning_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Poison.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_POISON_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_POISON);
+		var byBuff = character.Properties.GetFloat(PropertyName.Poison_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Earth.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_EARTH_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_EARTH);
+		var byBuff = character.Properties.GetFloat(PropertyName.Earth_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Holy.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_HOLY_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_HOLY);
+		var byBuff = character.Properties.GetFloat(PropertyName.Holy_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Dark.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_DARK_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_DARK);
+		var byBuff = character.Properties.GetFloat(PropertyName.Dark_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental attack - Soul.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_SOUL_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_SOUL);
+		var byBuff = character.Properties.GetFloat(PropertyName.Soul_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's size attack - Small.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_SmallSize_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_SMALLSIZE);
+		var byBuff = character.Properties.GetFloat(PropertyName.SmallSize_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's size attack - Medium.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_MiddleSize_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_MIDDLESIZE);
+		var byBuff = character.Properties.GetFloat(PropertyName.MiddleSize_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's size attack - Large.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_LargeSize_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_LARGESIZE);
+		var byBuff = character.Properties.GetFloat(PropertyName.LargeSize_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's size attack - Boss.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_BOSS_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_BOSS_ATK);
+		var byBuff = character.Properties.GetFloat(PropertyName.BOSS_ATK_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's race attack - Demon.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Velnias_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_VELIAS);
+		var byBuff = character.Properties.GetFloat(PropertyName.Velnias_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's race attack - Beast.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Widling_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_WIDLING);
+		var byBuff = character.Properties.GetFloat(PropertyName.Widling_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's race attack - Mutant.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Paramune_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_PARAMUNE);
+		var byBuff = character.Properties.GetFloat(PropertyName.Paramune_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's race attack - Plant.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Forester_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_FORESTER);
+		var byBuff = character.Properties.GetFloat(PropertyName.Forester_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's race attack - Insect.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Klaida_ATK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.ADD_KLAIDA);
+		var byBuff = character.Properties.GetFloat(PropertyName.Klaida_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's armor material attack - Cloth.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Cloth_ATK(Character character)
+	{
+		return character.Inventory.GetEquipProperties(PropertyName.ADD_CLOTH);
+	}
+
+	/// <summary>
+	/// Character's armor material attack - Leather.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Leather_ATK(Character character)
+	{
+		return character.Inventory.GetEquipProperties(PropertyName.ADD_LEATHER);
+	}
+
+	/// <summary>
+	/// Character's armor material attack - Iron.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Iron_ATK(Character character)
+	{
+		return character.Inventory.GetEquipProperties(PropertyName.ADD_IRON);
+	}
+
+	/// <summary>
+	/// Character's armor material attack - Ghost.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Ghost_ATK(Character character)
+	{
+		return character.Inventory.GetEquipProperties(PropertyName.ADD_GHOST);
+	}
+
+	/// <summary>
+	/// Character's additional damage attack.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_Add_Damage_Atk(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.Add_Damage_Atk);
+		var byBuff = character.Properties.GetFloat(PropertyName.Add_Damage_Atk_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Fire.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_FIRE(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_FIRE);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResFire_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Ice.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_ICE(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_ICE);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResIce_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Lightning.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_LIGHTNING(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_LIGHTNING);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResLightning_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Earth.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_EARTH(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_EARTH);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResEarth_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Poison.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_POISON(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_POISON);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResPoison_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Holy.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_HOLY(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_HOLY);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResHoly_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Dark.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_DARK(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_DARK);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResDark_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
+	}
+
+	/// <summary>
+	/// Character's elemental resistance - Soul.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_RES_SOUL(Character character)
+	{
+		var byItem = character.Inventory.GetEquipProperties(PropertyName.RES_SOUL);
+		var byBuff = character.Properties.GetFloat(PropertyName.ResSoul_BM);
+
+		var value = byItem + byBuff;
+
+		return (float)Math.Floor(value);
 	}
 }

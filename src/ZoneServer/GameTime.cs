@@ -96,7 +96,7 @@ namespace Melia.Zone
 			var daysPerMonth = ZoneServer.Instance.Conf.World.DaysPerMonth;
 			var monthsPerYear = ZoneServer.Instance.Conf.World.MonthsPerYear;
 
-			var ticksPassed = (this.DateTime.Ticks - BeginOfTime.Ticks);
+			var ticksPassed = this.DateTime.Ticks - BeginOfTime.Ticks;
 			var minutesPassed = ticksPassed / ticksPerMinute;
 
 			this.Year = (int)(minutesPassed / minutesPerHour / hoursPerDay / daysPerMonth / monthsPerYear) + 1;

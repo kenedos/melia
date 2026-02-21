@@ -12,6 +12,16 @@ namespace Melia.Zone.World
 	{
 		private bool _initialized = false;
 		private readonly VariablesContainer _variables = new();
+		private readonly string _tableName;
+		private readonly string _ownerField;
+		private readonly long _ownerId;
+
+		public GlobalVariables(string tableName = "vars_global", string ownerField = null, long ownerId = 0)
+		{
+			_tableName = tableName;
+			this._ownerField = ownerField;
+			this._ownerId = ownerId;
+		}
 
 		/// <summary>
 		/// Returns the variable containers.
@@ -35,7 +45,7 @@ namespace Melia.Zone.World
 			if (_initialized)
 				throw new InvalidOperationException("The global variables were initialized already.");
 
-			ZoneServer.Instance.Database.LoadVars(_variables.Perm, "vars_global", null, 0);
+			ZoneServer.Instance.Database.LoadVars(_variables.Perm, _tableName, _ownerField, _ownerId);
 			ZoneServer.Instance.ServerEvents.MinuteTick.Subscribe(this.OnMinuteTick);
 
 			_initialized = true;
@@ -47,7 +57,7 @@ namespace Melia.Zone.World
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void OnMinuteTick(object sender, TimeEventArgs e)
+		private void OnMinuteTick(object? sender, TimeEventArgs e)
 		{
 			if (!_initialized)
 				return;
@@ -56,8 +66,10 @@ namespace Melia.Zone.World
 			//   changed and only save if necessary, but I'm not gonna
 			//   bother with that for now.
 
-			ZoneServer.Instance.Database.SaveVariables(this.Variables.Perm, "vars_global", null, 0);
-			Log.Info("Global variables saved to database.");
+			ZoneServer.Instance.Database.SaveVariables(this.Variables.Perm, _tableName, _ownerField, _ownerId);
+
+			// Disabled due to spam.
+			// Log.Info($"Global {this.Variables.Perm.Count} variables saved to database.");
 		}
 	}
 }

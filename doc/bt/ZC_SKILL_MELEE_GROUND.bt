@@ -21,11 +21,12 @@ direction dir;
 int i2;
 float shootTime;
 float f2;
-int i3;
+byte castMove;
+byte b2;
+short s1;
 int forceId;
 float f5;
-int i5;
-
+int targetHandle;
 position pos;
 short hitCount;
 

@@ -2,6 +2,7 @@
 {
 	public enum MoveType
 	{
+		None,
 		Normal,
 
 		// Note sure if there's a difference between these. Pets use "Fly"

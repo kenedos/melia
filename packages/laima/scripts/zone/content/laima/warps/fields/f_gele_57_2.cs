@@ -1,0 +1,23 @@
+//--- Melia Script ----------------------------------------------------------
+// Warps
+//--- Description -----------------------------------------------------------
+// Sets up warps in Gele Plateau
+//---------------------------------------------------------------------------
+
+using Melia.Zone.Scripting;
+using static Melia.Zone.Scripting.Shortcuts;
+
+public class f_gele_57_2WarpsScript : GeneralScript
+{
+	protected override void Load()
+	{
+		// Gele Plateau to Srautas Gorge
+		AddWarp(101, "GELE572_GELE571", 0, From("f_gele_57_2", 35, -1102), To("f_gele_57_1", 642, 1364));
+
+		// Gele Plateau to Nefritas Cliff
+		AddWarp(102, "GELE572_GELE573", 180, From("f_gele_57_2", 100, 1532), To("f_gele_57_3", -508, -1507));
+
+		// Gele Plateau to Grynas Hills
+		AddWarp(151, "GELE57_2_KATYN45_3", 135, From("f_gele_57_2", 1582, -340), To("f_katyn_45_3", -2035, 1833));
+	}
+}

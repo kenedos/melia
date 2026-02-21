@@ -1,0 +1,18 @@
+//------------------------------------------------
+//--- 010 Editor v14.0beta1 Binary Template
+//
+//      File: CZ_PUZZLE_CRAFT.bt
+//   Authors: Salman T. Khan
+//   Version: i375757
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+#include "inc/common.bt"
+
+ClientHeaderDynamic header;
+
+int i1; // 1
+byte b1; // 0

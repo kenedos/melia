@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v14.0.1 Binary Template
+//
+//      File: CS_REQUEST_PVP_RANKING.bt
+//   Authors: i373230
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixedOld header;
+
+int i1; // 1
+int i2; // 0
+int i3; // -1
+int i4; // 1
+// Lots of 0s

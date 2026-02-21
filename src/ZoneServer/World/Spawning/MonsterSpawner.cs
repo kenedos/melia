@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.AI;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
@@ -19,8 +21,10 @@ namespace Melia.Zone.World.Spawning
 	/// <summary>
 	/// Spawns and respawns monsters.
 	/// </summary>
-	public class MonsterSpawner : IUpdateable
+	public class MonsterSpawner : ISpawner
 	{
+		private const int MaxSpawnsPerTick = 5;
+
 		private const float FlexIncreaseLimit = 100;
 		private const float FlexDecreaseLimit = -100;
 		private const float FlexMeterDefault = 0;
@@ -54,6 +58,11 @@ namespace Melia.Zone.World.Spawning
 		public int Id { get; }
 
 		/// <summary>
+		/// Returns the map ids associated with this spawner.
+		/// </summary>
+		public HashSet<int> Maps { get; } = new HashSet<int>();
+
+		/// <summary>
 		/// Returns the min amount of monsters this spawner spawns at a time.
 		/// </summary>
 		public int MinAmount { get; }
@@ -64,11 +73,16 @@ namespace Melia.Zone.World.Spawning
 		public int MaxAmount { get; }
 
 		/// <summary>
-		/// Returns the  amount of monsters this spawner currently spawns at
+		/// Returns the amount of monsters this spawner currently spawns at
 		/// a time. This number may change based on how frequently monsters
 		/// are killed.
 		/// </summary>
 		public int FlexAmount { get; private set; }
+
+		/// <summary>
+		/// Returns the monster data currently being used for this spawner.
+		/// </summary>
+		public MonsterData MonsterData { get { return _monsterData; } }
 
 		/// <summary>
 		/// Returns the amount of monsters currently spawned.
@@ -175,28 +189,63 @@ namespace Melia.Zone.World.Spawning
 				if (!_spawnAreas.TryGetRandomLocation(out var map, out var pos))
 					return;
 
-				var monster = new Mob(_monsterData.Id, MonsterType.Mob);
+				if (!this.Maps.Contains(map.Id))
+					this.Maps.Add(map.Id);
+
+				var monster = new Mob(_monsterData.Id, RelationType.Enemy);
 				monster.Position = pos;
 				monster.FromGround = true;
 				monster.Tendency = this.Tendency;
 				monster.Died += this.OnMonsterDied;
+
+				// Set spawn position early for any initialization that needs it
+				monster.SpawnPosition = pos;
 
 				this.OverrideProperties(monster, map);
 
 				monster.Components.Add(new MovementComponent(monster));
 
 				if (!string.IsNullOrWhiteSpace(monster.Data.AiName) && monster.Data.AiName != "None")
-					monster.Components.Add(new AiComponent(monster, monster.Data.AiName));
+				{
+					var aiName = monster.Data.AiName;
+					if (!AiScript.Exists(aiName))
+						aiName = "BasicMonster";
+					monster.Components.Add(new AiComponent(monster, aiName));
+				}
 
 				this.Spawning?.Invoke(this, new SpawnEventArgs(this, monster));
 
+				this.HandleRareMonsterLogic(monster, map);
+
+				// Now add the monster to the map (which may be queued)
 				map.AddMonster(monster);
-				monster.PossiblyBecomeRare();
+				map.Data.SpawnedMonsterIds.Add(_monsterData.Id);
 
 				this.Spawned?.Invoke(this, new SpawnEventArgs(this, monster));
 			}
 
 			this.Amount += amount;
+		}
+
+		/// <summary>
+		/// Handles rare monster logic before the monster is added to the map.
+		/// This is necessary because the Map.AddMonster is now asynchronous.
+		/// </summary>
+		/// <param name="monster">The monster to potentially make rare.</param>
+		/// <param name="map">The map the monster will be added to.</param>
+		private void HandleRareMonsterLogic(Mob monster, Map map)
+		{
+			// Set the map reference temporarily so PossiblyBecomeRare can access map data
+			monster.Map = map;
+			try
+			{
+				monster.PossiblyBecomeRare();
+			}
+			finally
+			{
+				// Clear the map reference since it will be set properly when actually added
+				monster.Map = null;
+			}
 		}
 
 		/// <summary>
@@ -219,11 +268,8 @@ namespace Melia.Zone.World.Spawning
 			// if there are none, check the overrides for the
 			// map the spawner is on.
 			var propertyOverrides = this.PropertyOverrides;
-			if (propertyOverrides == null)
-			{
-				if (!map.TryGetPropertyOverrides(_monsterData.Id, out propertyOverrides))
-					return;
-			}
+			if (propertyOverrides == null && !map.TryGetPropertyOverrides(_monsterData.Id, out propertyOverrides))
+				return;
 
 			monster.ApplyOverrides(propertyOverrides);
 		}
@@ -234,7 +280,7 @@ namespace Melia.Zone.World.Spawning
 		/// </summary>
 		/// <param name="monster"></param>
 		/// <param name="killer"></param>
-		private void OnMonsterDied(ICombatEntity monster, ICombatEntity killer)
+		private void OnMonsterDied(Mob monster, ICombatEntity killer)
 		{
 			this.Amount--;
 			_flexMeter += FlexMeterIncreasePerDeath;
@@ -303,7 +349,24 @@ namespace Melia.Zone.World.Spawning
 				if (expiredDelayCount == 0)
 					return;
 
-				_respawnDelays.RemoveAll(d => d <= TimeSpan.Zero);
+				// Only remove up to MaxSpawnsPerTick expired entries per tick.
+				// Excess expired entries remain with negative TimeSpan values
+				// and get picked up on subsequent ticks.
+				var removeCount = Math.Min(expiredDelayCount, MaxSpawnsPerTick);
+				var removed = 0;
+				_respawnDelays.RemoveAll(d =>
+				{
+					if (removed >= removeCount)
+						return false;
+					if (d <= TimeSpan.Zero)
+					{
+						removed++;
+						return true;
+					}
+					return false;
+				});
+
+				expiredDelayCount = removed;
 			}
 
 			var spawnAmount = Math.Min(expiredDelayCount, this.FlexAmount - this.Amount);

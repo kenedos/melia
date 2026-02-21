@@ -1,4 +1,6 @@
 ﻿using System;
+using Melia.Shared.Game.Const;
+using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
 
 namespace Melia.Zone.World.Actors.Monsters
@@ -17,6 +19,11 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Gets or sets whether the item was picked up.
 		/// </summary>
 		public bool PickedUp { get; set; }
+
+		/// <summary>
+		/// Returns if the item's associated monster it was dropped from.
+		/// </summary>
+		public int MonsterId { get; set; }
 
 		/// <summary>
 		/// Creates new instance.
@@ -43,24 +50,63 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
+		/// Creates item monster from item.
+		/// </summary>
+		/// <param name="item"></param>
+		/// <param name="monsterLevel">Level of the monster that dropped the item.</param>
+		/// <returns></returns>
+		public static ItemMonster Create(Item item, int monsterLevel)
+		{
+			if (!ZoneServer.Instance.Data.ItemMonsterDb.TryFind(item.Id, out var data))
+				throw new ArgumentException($"No monster id found for item '{item.Id}'.");
+
+			var monster = new ItemMonster(item, data.MonsterId);
+
+			if (ZoneServer.Instance.Conf.World.EnableMonsterLevelItemBonus)
+				GenerateAdditionalProperties(item, monsterLevel);
+
+			return monster;
+		}
+
+		/// <summary>
+		/// Generates additional item properties based on the monster's level.
+		/// </summary>
+		/// <param name="item"></param>
+		/// <param name="monsterLevel"></param>
+		private static void GenerateAdditionalProperties(Item item, int monsterLevel)
+		{
+			if (monsterLevel <= 0)
+				return;
+
+			var levelBonus = monsterLevel * 0.01f; // 2% bonus per level
+
+			var properties = item.Data.GetMainStatProperties();
+
+			foreach (var prop in properties)
+			{
+				item.Properties.Modify(prop, item.Properties[prop] * levelBonus);
+			}
+			item.GenerateRandomOptions(1, 1);
+		}
+
+		/// <summary>
 		/// Returns true if the entity is allowed to pick up the item.
 		/// </summary>
-		/// <param name="actor"></param>
+		/// <param name="actor">The actor attempting to pick up the item.</param>
 		/// <returns></returns>
 		public bool CanBePickedUpBy(IActor actor)
 		{
-			// If the entity is the original owner, we want them to have
-			// to make more of an effort to get the item, otherwise it
-			// would be easy to accidentally pick it right back up.
-			// Items are dropped in a 30 unit range, so let's have them
-			// get right on top of it to pick it back up.
-			// Alternatives:
-			// - A confirmation box could work, though it would constantly
-			//   activate and end up being annoying.
-			// - We could disable pick ups for a certain amount of time,
-			//   but if you drop something and want to pick it right back
-			//   up for whatever reason, a delay would be annoying.
-			if (this.Item.OriginalOwnerHandle == actor.Handle)
+			var isOriginalOwner = false;
+			if (actor is Character character && this.Item.OriginalOwnerCharacterId != 0)
+			{
+				isOriginalOwner = (this.Item.OriginalOwnerCharacterId == character.ObjectId);
+			}
+			else
+			{
+				isOriginalOwner = (this.Item.OriginalOwnerHandle == actor.Handle);
+			}
+
+			if (isOriginalOwner)
 			{
 				if (DateTime.Now < this.Item.RePickUpTime)
 					return false;
@@ -69,10 +115,19 @@ namespace Melia.Zone.World.Actors.Monsters
 					return false;
 			}
 
-			// If the loot protection is active, only the owner can pick
-			// up the item.
 			if (DateTime.Now < this.Item.LootProtectionEnd)
-				return this.Item.OwnerHandle == actor.Handle;
+			{
+				var isLootOwner = false;
+				if (actor is Character possibleOwner && this.Item.OwnerCharacterId != 0)
+				{
+					isLootOwner = (this.Item.OwnerCharacterId == possibleOwner.ObjectId);
+				}
+				else
+				{
+					isLootOwner = (this.Item.OwnerHandle == actor.Handle);
+				}
+				return isLootOwner;
+			}
 
 			return true;
 		}

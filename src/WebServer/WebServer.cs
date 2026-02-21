@@ -14,9 +14,11 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Network.Inter.Messages;
 using Melia.Web.Controllers;
 using Melia.Web.Controllers.Api;
+using Melia.Shared.Configuration;
 using Melia.Web.Database;
 using Melia.Web.Logging;
 using Melia.Web.Modules;
+using Melia.Web.Services;
 using Yggdrasil.Logging;
 using Yggdrasil.Network.Communication;
 using Yggdrasil.Util;
@@ -26,9 +28,15 @@ namespace Melia.Web
 {
 	public class WebServer : Server
 	{
+		/// <summary>
+		/// Returns this server's type.
+		/// </summary>
+		public override ServerType Type => ServerType.Web;
+
 		public readonly static WebServer Instance = new();
 
 		private EmbedIO.WebServer _server;
+		private EmbedIO.WebServer _guildServer;
 
 		/// <summary>
 		/// Returns the server's inter-server communicator.
@@ -39,6 +47,11 @@ namespace Melia.Web
 		/// Returns reference to the server's database interface.
 		/// </summary>
 		public WebDb Database { get; } = new();
+
+		/// <summary>
+		/// Returns the server's email service.
+		/// </summary>
+		public EmailService EmailService { get; private set; }
 
 		/// <summary>
 		/// Runs the server.
@@ -54,17 +67,43 @@ namespace Melia.Web
 
 			this.NavigateToRoot();
 			this.LoadConf(this.Conf);
+			this.LoadPackages();
+			this.LoadVersionInfo();
 			this.LoadData(ServerType.Web);
 			this.LoadServerList(this.Data.ServerDb, ServerType.Web, groupId, serverId);
 			this.InitDatabase(this.Database, this.Conf);
+			this.InitEmail(this.Conf);
 			this.CheckDependencies();
 
 			this.StartWebServer();
+			this.StartGuildWebServer();
 			this.StartCommunicator();
 
 			ConsoleUtil.RunningTitle();
 
 			new ConsoleCommands().Wait();
+		}
+
+		/// <summary>
+		/// Initializes the email service from configuration.
+		/// </summary>
+		/// <param name="conf"></param>
+		private void InitEmail(ConfFiles conf)
+		{
+			var emailSettings = new EmailSettings
+			{
+				Enabled = conf.Web.EnableEmailService,
+				SmtpHost = conf.Web.SmtpHost,
+				SmtpPort = conf.Web.SmtpPort,
+				SmtpUsername = conf.Web.SmtpUsername,
+				SmtpPassword = conf.Web.SmtpPassword,
+				UseSsl = conf.Web.SmtpUseSsl,
+				SenderEmail = conf.Web.SmtpSenderEmail,
+				SenderName = conf.Web.SmtpSenderName,
+				BaseUrl = conf.Web.SmtpBaseUrl,
+			};
+
+			this.EmailService = new EmailService(emailSettings);
 		}
 
 		/// <summary>
@@ -364,6 +403,54 @@ namespace Melia.Web
 			catch (Exception ex)
 			{
 				Log.Error("Failed to start web server: {0}", ex);
+				ConsoleUtil.Exit(1);
+			}
+		}
+
+		/// <summary>
+		/// Starts guild web server.
+		/// </summary>
+		private void StartGuildWebServer()
+		{
+			try
+			{
+				var url = string.Format("http://*:{0}/", this.Conf.Web.GuildPort);
+
+				Swan.Logging.Logger.NoLogging();
+				Swan.Logging.Logger.RegisterLogger(new YggdrasilLogger(this.Conf.Log.Filter));
+
+				EndPointManager.UseIpv6 = false;
+
+				var options = new WebServerOptions()
+					.WithMode(HttpListenerMode.EmbedIO)
+					.WithUrlPrefix(url);
+				_guildServer = new EmbedIO.WebServer(options);
+
+				var webFolder = "system/web/";
+				if (Directory.Exists("user/web/"))
+					webFolder = "user/web/";
+
+				_guildServer
+					.WithWebApi("/", m => m.WithController<TosGuildController>())
+					.WithStaticFolder("/", webFolder, false, fm =>
+					{
+						fm.DefaultDocument = "index.htm";
+						fm.OnMappingFailed = FileRequestHandler.PassThrough;
+						fm.OnDirectoryNotListable = FileRequestHandler.PassThrough;
+					});
+				_guildServer.RunAsync();
+
+				if (_guildServer.State == WebServerState.Stopped)
+				{
+					Log.Error("Failed to start guild server, make sure there's only one instance running.");
+					ConsoleUtil.Exit(1);
+				}
+
+				Log.Status("Guild Server now running on '{0}'", url);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Failed to start guild web server: {0}", ex);
 				ConsoleUtil.Exit(1);
 			}
 		}

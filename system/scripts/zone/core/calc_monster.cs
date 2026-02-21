@@ -461,4 +461,36 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 
 		return (int)value;
 	}
+
+	[ScriptableFunction]
+	public float SCR_Get_MON_RHP(Mob monster)
+	{
+		if (monster.Properties.GetFloat(PropertyName.HPCount) > 0)
+			return 0;
+
+		if (monster.Properties.Has(PropertyName.FixedLife))
+			return 0;
+
+		if (monster.IsBuffActiveByKeyword(BuffTag.Curse))
+			return 0;
+
+		var value = monster.MaxHp * 0.02f;
+		var byBuffs = monster.Properties.GetFloat(PropertyName.RHP_BM);
+
+		return MathF.Floor(value + byBuffs);
+	}
+
+	[ScriptableFunction]
+	public float SCR_Get_MON_RHPTIME(Mob monster)
+	{
+		if (monster.CombatState.AttackState)
+			return 10000;
+		return 500;
+	}
+
+	[ScriptableFunction]
+	public float SCR_Get_MON_MSHIELD(Mob monster)
+	{
+		return monster.Properties.GetFloat(PropertyName.ShieldRate) / 100 * monster.MaxHp;
+	}
 }

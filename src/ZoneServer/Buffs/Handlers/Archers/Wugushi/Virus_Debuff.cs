@@ -21,25 +21,28 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Wugushi
 
 		public override void WhileActive(Buff buff)
 		{
+			if (buff.Caster is not ICombatEntity caster)
+				return;
+
 			// Once the target is dead we spread the virus to nearby entities once
 			if (buff.Target.IsDead)
 			{
 				if (!buff.Vars.ActivateOnce("Spread"))
-					this.SpreadVirus(buff);
+					this.SpreadVirus(buff, caster);
 
 				return;
 			}
 
-			if (!buff.Caster.TryGetSkill(buff.SkillId, out var skill))
+			if (!caster.TryGetSkill(buff.SkillId, out var skill))
 				return;
 
-			buff.Target.TakeSkillHit(buff.Caster, skill);
+			buff.Target.TakeSkillHit(caster, skill);
 			Crescendo_Bane_Buff.TryApply(buff);
 		}
 
-		private void SpreadVirus(Buff buff)
+		private void SpreadVirus(Buff buff, ICombatEntity caster)
 		{
-			var targetsInRange = buff.Target.Map.GetAttackableEntitiesInRange(buff.Caster, buff.Target.Position, SpreadRange);
+			var targetsInRange = buff.Target.Map.GetAttackableEnemiesInPosition(caster, buff.Target.Position, SpreadRange);
 			var spreadTargets = targetsInRange.Where(a => !a.IsBuffActive(BuffId.Virus_Debuff));
 
 			foreach (var spreadTarget in spreadTargets.LimitRandom(MaxSpreadAmount))

@@ -1,0 +1,16 @@
+//------------------------------------------------
+//--- 010 Editor v16.0.2 Binary Template
+//
+//      File: CZ_REQ_GUILD_NEUTRALITY_ALARM.bt
+//   Authors: Salman T. Khan
+//   Version: i369838
+//   Purpose: Guild Cancel Neutrality Request
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ClientHeaderFixed header;

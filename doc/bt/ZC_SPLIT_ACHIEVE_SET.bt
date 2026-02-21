@@ -17,4 +17,5 @@ ServerHeaderDynamic header;
 short s1;
 byte b1;
 byte b2;
-int i1;
+if (s1 > 0)
+    int achievementIds[s1];

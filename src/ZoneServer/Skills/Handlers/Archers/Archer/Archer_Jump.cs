@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -12,7 +13,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 	/// Handler for the Archer skill Leap.
 	/// </summary>
 	[SkillHandler(SkillId.Archer_Jump)]
-	public class Archer_Jump : IGroundSkillHandler
+	public class Archer_Jump : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, moving the character back.
@@ -22,8 +23,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -39,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 			caster.StartBuff(BuffId.Skill_NoDamage_Buff, 0, 0, duration, caster);
 
 			var distance = this.GetJumpDistance(caster, skill);
-			var targetPos = caster.Position.GetRelative2D(caster.Direction.Backwards, distance);
+			var targetPos = caster.Position.GetRelative(caster.Direction.Backwards, distance);
 			targetPos = caster.Map.Ground.GetLastValidPosition(caster.Position, targetPos);
 
 			caster.Position = targetPos;

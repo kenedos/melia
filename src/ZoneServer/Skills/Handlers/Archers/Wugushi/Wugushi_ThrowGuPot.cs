@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	/// Handler for the Wugushi skill Poison Pot (Throw Gu Pot).
 	/// </summary>
 	[SkillHandler(SkillId.Wugushi_ThrowGuPot)]
-	public class Wugushi_ThrowGuPot : IGroundSkillHandler
+	public class Wugushi_ThrowGuPot : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, creates an area of effect that damages the enemies inside
@@ -28,9 +29,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -49,7 +52,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			Send.ZC_SKILL_READY(caster, skill, caster.Position, caster.Position);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, farPos, caster.Position.GetDirection(farPos), Position.Zero);
 
-			Send.ZC_NORMAL.SkillProjectile(caster, "I_archer_poison_pot_force#Bip01 R Hand", 0.5f, "", 1, farPos, 10, 0.6f, 0, 500);
+			Send.ZC_NORMAL.SkillProjectile(caster, farPos, "I_archer_poison_pot_force#Bip01 R Hand", 0.5f, "", 1, 10, TimeSpan.FromSeconds(0.6f), TimeSpan.Zero, 500);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 

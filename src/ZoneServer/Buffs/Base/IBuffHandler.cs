@@ -81,4 +81,45 @@ namespace Melia.Zone.Buffs.Base
 
 	public interface IBuffCombatAttackAfterBonusesHandler { void OnAttackAfterBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
 	public interface IBuffCombatDefenseAfterBonusesHandler { void OnDefenseAfterBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+
+	// Companion-specific combat hook interfaces - only called when a companion attacks/defends and the owner has this active buff
+	public interface IBuffCombatCompanionAttackBeforeCalcHandler { void OnCompanionAttackBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+	public interface IBuffCombatCompanionDefenseBeforeCalcHandler { void OnCompanionDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+
+	public interface IBuffCombatCompanionAttackAfterCalcHandler { void OnCompanionAttackAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+	public interface IBuffCombatCompanionDefenseAfterCalcHandler { void OnCompanionDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+
+	public interface IBuffCombatCompanionAttackBeforeBonusesHandler { void OnCompanionAttackBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+	public interface IBuffCombatCompanionDefenseBeforeBonusesHandler { void OnCompanionDefenseBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+
+	public interface IBuffCombatCompanionAttackAfterBonusesHandler { void OnCompanionAttackAfterBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+	public interface IBuffCombatCompanionDefenseAfterBonusesHandler { void OnCompanionDefenseAfterBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
+
+	/// <summary>
+	/// Result of a knockback/knockdown prevention check.
+	/// </summary>
+	public enum KnockResult
+	{
+		/// <summary>
+		/// Allow the knockback/knockdown to proceed normally.
+		/// </summary>
+		Allow,
+
+		/// <summary>
+		/// Prevent the knockback/knockdown from being applied.
+		/// </summary>
+		Prevent,
+	}
+
+	/// <summary>
+	/// Called on the target before a knockback is applied.
+	/// Return KnockResult.Prevent to block the knockback.
+	/// </summary>
+	public interface IBuffBeforeKnockbackHandler { KnockResult OnBeforeKnockback(Buff buff, ICombatEntity attacker, ICombatEntity target); }
+
+	/// <summary>
+	/// Called on the target before a knockdown is applied.
+	/// Return KnockResult.Prevent to block the knockdown.
+	/// </summary>
+	public interface IBuffBeforeKnockdownHandler { KnockResult OnBeforeKnockdown(Buff buff, ICombatEntity attacker, ICombatEntity target); }
 }

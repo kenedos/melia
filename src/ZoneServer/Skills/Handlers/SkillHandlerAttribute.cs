@@ -32,7 +32,18 @@ namespace Melia.Zone.Skills.Handlers
 		public SkillHandlerAttribute(params SkillId[] skillIds)
 		{
 			this.SkillIds = skillIds ?? [];
-			this.Priority = 100;
+			this.Priority = (int)HandlerPriority.Normal;
+		}
+
+		/// <summary>
+		/// Creates new attribute for the skill ids with the given priority.
+		/// </summary>
+		/// <param name="priority"></param>
+		/// <param name="skillIds"></param>
+		public SkillHandlerAttribute(HandlerPriority priority, params SkillId[] skillIds)
+		{
+			this.SkillIds = skillIds ?? [];
+			this.Priority = (int)priority;
 		}
 
 		/// <summary>

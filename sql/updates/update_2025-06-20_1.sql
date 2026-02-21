@@ -1,0 +1,2 @@
+-- For etc properties
+-- RENAME TABLE etc_properties_log TO character_etc_properties_log;

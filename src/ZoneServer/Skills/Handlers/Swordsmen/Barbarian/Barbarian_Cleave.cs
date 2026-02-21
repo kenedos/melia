@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 	/// Handler for the Barbarian skill Cleave.
 	/// </summary>
 	[SkillHandler(SkillId.Barbarian_Cleave)]
-	public class Barbarian_Cleave : IGroundSkillHandler
+	public class Barbarian_Cleave : IMeleeGroundSkillHandler
 	{
 		public const float StunDamageBonus = 1.5f;
 
@@ -30,8 +31,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -65,7 +67,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -94,7 +96,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 				}
 				else
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 					skillHit.ApplyKnockBack(target);
 				}
 

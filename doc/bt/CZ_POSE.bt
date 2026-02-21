@@ -17,11 +17,6 @@
 
 ClientHeaderFixed header;
 
-byte extra[12];
 int pose;
 position pos;
-float f1;
-short s1;
-byte b1;
-byte b2;
-int handle;
+direction dir;

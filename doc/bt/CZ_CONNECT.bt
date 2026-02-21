@@ -23,7 +23,7 @@ byte bin1[1024]; // Some kind of auth key?
 char sessionKey[64];
 char accountName[56];
 char mac[48];
-int64 l2;
+int64 l0;
 int64 l1; // same object id (?) that appears in BC_LOGINOK
 int64 accountId;
 int64 characterId;

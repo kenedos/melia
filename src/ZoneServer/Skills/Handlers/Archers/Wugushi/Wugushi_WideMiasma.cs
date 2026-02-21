@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -16,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	/// Handler for the Wugushi skill Wide Miasma.
 	/// </summary>
 	[SkillHandler(SkillId.Wugushi_WideMiasma)]
-	public class Wugushi_WideMiasma : IGroundSkillHandler
+	public class Wugushi_WideMiasma : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, insert debuffs to enemies inside of the effect area
@@ -25,9 +26,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -59,7 +62,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		{
 			await Task.Delay(TimeSpan.FromSeconds(1));
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			foreach (var target in targets.LimitRandom(10))
 			{

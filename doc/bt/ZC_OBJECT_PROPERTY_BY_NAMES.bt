@@ -16,6 +16,11 @@
 ServerHeaderDynamic header;
 int64 worldId;
 int count; // 1
-lpString objectName; // GemLevel
-byte type; // 0
-int value; // 1
+
+local int i = 0;
+for (i = 0; i < count; i++)
+{
+    lpString objectName; // GemLevel
+    byte type; // 0
+    int value; // 1
+}

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
@@ -80,6 +82,40 @@ namespace Melia.Zone.Skills.Combat
 				if (++i >= maxAmount)
 					break;
 			}
+		}
+
+		/// <summary>
+		/// Returns a random target near the main target to bounce the attack off to.
+		/// </summary>
+		/// <param name="caster"></param>
+		/// <param name="mainTarget"></param>
+		/// <param name="skill"></param>
+		/// <param name="bounceTarget"></param>
+		/// <returns></returns>
+		public static bool TryGetBounceTarget(this ICombatEntity mainTarget, ICombatEntity caster, Skill skill, out ICombatEntity bounceTarget)
+		{
+			var splashPos = caster.Position;
+			var splashParam = skill.GetSplashParameters(caster, splashPos, mainTarget.Position, length: 130, width: 60, angle: 0);
+			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+			var eligibleTargets = targets.Where(a => a != mainTarget).ToList();
+
+			if (!eligibleTargets.Any())
+			{
+				bounceTarget = null;
+				return false;
+			}
+
+			// Sort targets by distance, but only consider the closest 50% of targets
+			var sortedTargets = eligibleTargets.OrderBy(a => a.Position.Get2DDistance(mainTarget.Position)).ToList();
+			var consideredTargetsCount = Math.Max(1, (int)(sortedTargets.Count * 0.5));
+			var consideredTargets = sortedTargets.Take(consideredTargetsCount).ToList();
+
+			// Randomly select one of the considered targets
+			var rnd = new Random();
+			bounceTarget = consideredTargets[rnd.Next(consideredTargets.Count)];
+			return true;
 		}
 	}
 }

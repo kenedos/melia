@@ -23,6 +23,7 @@ typedef struct
     int sequence;
     int checksum;
 
+    if (op < 0x3E1D)
     if (NEW_HEADERS)
         byte bin[12];
 }
@@ -34,6 +35,7 @@ typedef struct
     int sequence;
     int checksum;
 
+    if (op < 0x3E1D)
     if (NEW_HEADERS)
         byte bin[12];
 

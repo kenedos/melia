@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 	/// Handler for the Hoplite skill Long Stride
 	/// </summary>
 	[SkillHandler(SkillId.Hoplite_LongStride)]
-	public class Hoplite_LongStride : IGroundSkillHandler, IDynamicCasted
+	public class Hoplite_LongStride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		public const int MaxDistance = 100;
 
@@ -27,7 +28,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 		}
 
@@ -36,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 		}
 
@@ -47,8 +48,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
 				caster.ServerMessage(Localization.Get("No target location specified."));
@@ -85,7 +87,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			Send.ZC_NORMAL.LeapJump(caster, targetPos, 0, 0, 0.5f, 0.7f, 0.7f, 90);
 			caster.Position = targetPos;
 
-			var splashArea = new Circle(targetPos.GetRelative2D(caster.Direction, 15f), 30);
+			var splashArea = new Circle(targetPos.GetRelative(caster.Direction, 15f), 30);
 
 			CallSafe(this.Attack(skill, caster, splashArea));
 		}
@@ -105,7 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -115,7 +117,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
 
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target.Position, skill);
+				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 				skillHit.ApplyKnockBack(target);
 
 				hits.Add(skillHit);

@@ -58,5 +58,10 @@ namespace Melia.Shared.Network.Inter.Messages
 		/// Kicks all players on the receiving zone server(s).
 		/// </summary>
 		Zone,
+
+		/// <summary>
+		/// Kicks all characters for the specified account ID.
+		/// </summary>
+		Account,
 	}
 }

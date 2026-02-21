@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Melia.Shared.Game;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Network.Helpers;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
 using Melia.Zone.World;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Maps;
+using Melia.Zone.World.Storages;
 
 namespace Melia.Zone.Database
 {
@@ -28,9 +31,19 @@ namespace Melia.Zone.Database
 		private readonly Dictionary<int, RevealedMap> _revealedMaps = new();
 
 		/// <summary>
+		/// Track Popo Points (PCBANG_Points)
+		/// </summary>
+		public int PopoPoints { get; set; } = 0;
+
+		/// <summary>
 		/// Gets or sets account's id.
 		/// </summary>
 		public long Id { get; set; }
+
+		/// <summary>
+		/// Gets account's object id.
+		/// </summary>
+		public long ObjectId => this.Id;
 
 		/// <summary>
 		/// Gets or sets account's name.
@@ -52,27 +65,10 @@ namespace Melia.Zone.Database
 		/// Returns the game permission level, based on the account's
 		/// authority.
 		/// </summary>
-		public PermissionLevel PermissionLevel
-		{
-			get
-			{
-				//var auth = this.Authority;
+		public PermissionLevel PermissionLevel { get; set; } = PermissionLevel.User;
 
-				//if (auth >= 99)
-				//	return PermissionLevel.Operator;
-				//else if (auth >= 50)
-				//	return PermissionLevel.GM;
-				//else
-				//	return PermissionLevel.User;
 
-				// We'll return User for now, as running around with GM
-				// permissions changes the game's behavior and UI to a
-				// degree. We'll need to implement a way to choose the
-				// permission we want to use at run-time.
-
-				return PermissionLevel.User;
-			}
-		}
+		public DateTime CreationDate { get; set; } = DateTime.MinValue;
 
 		/// <summary>
 		/// Amount of Free TP.
@@ -92,7 +88,12 @@ namespace Melia.Zone.Database
 		/// <summary>
 		/// Id of the barrack map.
 		/// </summary>
-		public int SelectedBarrack { get; set; }
+		public int SelectedBarrack { get; set; } = 11;
+
+		/// <summary>
+		/// Assister's Enabled
+		/// </summary>
+		public bool IsAssistersEnabled => this.Properties.GetFloat(PropertyName.ANCIENT_UNLOCK_UI, 0) == 1;
 
 		/// <summary>
 		/// Barrack Layer
@@ -120,16 +121,23 @@ namespace Melia.Zone.Database
 		public PremiumStatus Premium { get; } = new();
 
 		/// <summary>
+		/// Returns the account's team storage.
+		/// </summary>
+		public TeamStorage TeamStorage { get; set; }
+
+		/// <summary>
 		/// Creates new account.
 		/// </summary>
 		public Account()
 		{
-			// TODO: Remove the selected barrack once those are saved to the database.
-			this.SelectedBarrack = 11;
+			this.Settings = new AccountSettings();
+			_chatMacros = new List<ChatMacro>();
+			_revealedMaps = new Dictionary<int, RevealedMap>();
 
 			this.Properties.Create(new RFloatProperty(PropertyName.Medal, () => this.Medals));
 			this.Properties.Create(new RFloatProperty(PropertyName.GiftMedal, () => this.GiftMedals));
 			this.Properties.Create(new RFloatProperty(PropertyName.PremiumMedal, () => this.PremiumMedals));
+			this.Properties.Create(new RFloatProperty(PropertyName.SelectedBarrack, () => this.SelectedBarrack));
 
 			this.LoadDefaultChatMacros();
 		}
@@ -278,7 +286,7 @@ namespace Melia.Zone.Database
 		/// </summary>
 		public void Save()
 		{
-			ZoneServer.Instance.Database.SaveAccount(this);
+			ZoneServer.Instance.Database.SaveAccountData(this);
 		}
 	}
 }

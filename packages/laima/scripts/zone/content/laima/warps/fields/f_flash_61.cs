@@ -1,0 +1,26 @@
+//--- Melia Script ----------------------------------------------------------
+// Warps
+//--- Description -----------------------------------------------------------
+// Sets up warps in Ruklys Street
+//---------------------------------------------------------------------------
+
+using Melia.Zone.Scripting;
+using static Melia.Zone.Scripting.Shortcuts;
+
+public class f_flash_61WarpsScript : GeneralScript
+{
+	protected override void Load()
+	{
+		// Ruklys Street to Roxona Market
+		AddWarp(1, "FLASH61_FLASH60", 180, From("f_flash_61", -100, 1555), To("f_flash_60", 924, 1567));
+
+		// Ruklys Street to Verkti Square
+		AddWarp(2, "FLASH61_FLASH59", 360, From("f_flash_61", -875, -378), To("f_flash_59", 1371, 1003));
+
+		// Ruklys Street to Vedas Plateau
+		AddWarp(34, "FLASH61_TABLELAND11_1", 132, From("f_flash_61", 452.1687, 1631.381), To("f_tableland_11_1", 583, -1462));
+
+		// Ruklys Street to Tatenye Prison
+		// AddWarpPortal(From("f_flash_61", -613, 1451), To("d_velniasprison_77_1", -776, -976));
+	}
+}

@@ -44,7 +44,7 @@ typedef struct
         // Seen with hitting two targets with
         // one energy bolt and double attack.
         case 0:
-            int i1;
+            int hitCount;
             
             // This byte and int combo is guessed, but without it
             // this variable info array approach doesn't work.
@@ -100,7 +100,7 @@ string readAdditionalPacket(AdditionalPacket &val)
 typedef struct
 {
 	byte b9;
-	byte b10; // 4 = hands/sword? 9 = magic? 102 = dagger, 103 = Onion attack, potentially related to AttackType.Aries/Strike in skill attributes
+	byte attribute; // 4 = hands/sword? 9 = magic? 102 = dagger, 103 = Onion attack, potentially related to AttackType.Aries/Strike in skill attributes
     byte b1;
     byte b2;
 

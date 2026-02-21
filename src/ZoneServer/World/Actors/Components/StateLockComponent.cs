@@ -17,7 +17,7 @@ namespace Melia.Zone.World.Actors.Components
 	/// to prevent actors from taking certain actions, with the ability
 	/// to register states that apply their associated locks automatically,
 	/// simplifying the process of applying series' of lock combinations.
-	/// 
+	///
 	/// Both locks and states can be set freely, allowing sources such as
 	/// buffs to quickly disable an actor's ability to move for example.
 	/// Both also stack, making it easy to extend a timed lock or state
@@ -48,10 +48,19 @@ namespace Melia.Zone.World.Actors.Components
 		{
 			this.Owner = owner;
 
-			this.RegisterState(new(StateType.Stunned, [LockType.Movement, LockType.Attack]));
+			this.RegisterState(new(StateType.Blind, [LockType.Attack]));
+			this.RegisterState(new(StateType.Dancing, [LockType.Movement, LockType.Attack]));
+			this.RegisterState(new(StateType.Fluting, [LockType.Attack]));
+			this.RegisterState(new(StateType.Frozen, [LockType.Movement, LockType.Attack]));
+			this.RegisterState(new(StateType.Held, [LockType.Movement]));
 			this.RegisterState(new(StateType.KnockedBack, [LockType.Movement, LockType.Attack]));
 			this.RegisterState(new(StateType.KnockedDown, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
-			this.RegisterState(new(StateType.Held, [LockType.Movement]));
+			this.RegisterState(new(StateType.Silenced, [LockType.Attack]));
+			this.RegisterState(new(StateType.Staggered, [LockType.Movement, LockType.Attack]));
+			this.RegisterState(new(StateType.Stunned, [LockType.Movement, LockType.Attack]));
+			this.RegisterState(new(StateType.Sleep, [LockType.Movement, LockType.Attack]));
+			this.RegisterState(new(StateType.Petrified, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
+			this.RegisterState(new(StateType.Raised, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
 		}
 
 		/// <summary>
@@ -103,26 +112,10 @@ namespace Melia.Zone.World.Actors.Components
 		public void Lock(string lockType, TimeSpan duration)
 		{
 			lock (_syncLock)
-			{
-				if (_lockCounts.TryGetValue(lockType, out var value))
-					_lockCounts[lockType] = ++value;
-				else
-					_lockCounts[lockType] = 1;
+				this.LockCore(lockType, duration);
 
-				if (duration != TimeSpan.MaxValue)
-				{
-					var endTime = DateTime.Now.Add(duration);
-					_lockEnds.Add(new(lockType, endTime));
-				}
-			}
-
-			if (lockType == LockType.Movement && this.Owner is ICombatEntity entity)
-			{
-				if (entity.Components.TryGet<MovementComponent>(out var movement))
-					movement.Stop();
-
-				entity.Properties.Invalidate(PropertyName.MSPD);
-			}
+			if (lockType == LockType.Movement)
+				this.ApplyMovementLockEffects();
 		}
 
 		/// <summary>
@@ -136,17 +129,53 @@ namespace Melia.Zone.World.Actors.Components
 		public void Unlock(string lockType)
 		{
 			lock (_syncLock)
+				this.UnlockCore(lockType);
+
+			if (lockType == LockType.Movement)
+				this.ApplyMovementLockEffects();
+		}
+
+		/// <summary>
+		/// Adds a lock without executing movement side effects.
+		/// Must be called from within a lock(_syncLock) block.
+		/// </summary>
+		private void LockCore(string lockType, TimeSpan duration)
+		{
+			if (_lockCounts.TryGetValue(lockType, out var value))
+				_lockCounts[lockType] = ++value;
+			else
+				_lockCounts[lockType] = 1;
+
+			if (duration != TimeSpan.MaxValue)
 			{
-				if (!_lockCounts.TryGetValue(lockType, out var value))
-					return;
-
-				_lockCounts[lockType] = --value;
-
-				if (_lockCounts[lockType] <= 0)
-					_lockCounts.Remove(lockType);
+				var endTime = DateTime.Now.Add(duration);
+				_lockEnds.Add(new(lockType, endTime));
 			}
+		}
 
-			if (lockType == LockType.Movement && this.Owner is ICombatEntity entity)
+		/// <summary>
+		/// Releases a lock without executing movement side effects.
+		/// Must be called from within a lock(_syncLock) block.
+		/// </summary>
+		private void UnlockCore(string lockType)
+		{
+			if (!_lockCounts.TryGetValue(lockType, out var value))
+				return;
+
+			_lockCounts[lockType] = --value;
+
+			if (_lockCounts[lockType] <= 0)
+				_lockCounts.Remove(lockType);
+		}
+
+		/// <summary>
+		/// Applies movement side effects (stop movement, invalidate MSPD).
+		/// Must be called outside of lock(_syncLock) to avoid deadlock
+		/// with MovementComponent's position lock.
+		/// </summary>
+		private void ApplyMovementLockEffects()
+		{
+			if (this.Owner is ICombatEntity entity)
 			{
 				if (entity.Components.TryGet<MovementComponent>(out var movement))
 					movement.Stop();
@@ -198,10 +227,7 @@ namespace Melia.Zone.World.Actors.Components
 		/// <exception cref="ArgumentException"></exception>
 		public void AddState(string stateType, TimeSpan duration)
 		{
-			// Technically we could do away with tracking states, now that they're
-			// mostly glorified lock lists. We could just get the locks to apply
-			// on add and remove. But we'll leave it like this for now, in case
-			// we need to be able to tell whether a specific state is active.
+			var movementLockChanged = false;
 
 			lock (_syncLock)
 			{
@@ -209,7 +235,11 @@ namespace Melia.Zone.World.Actors.Components
 					throw new ArgumentException($"Unknown state '{stateType}'.");
 
 				foreach (var lockType in state.Locks)
-					this.Lock(lockType);
+				{
+					this.LockCore(lockType, TimeSpan.MaxValue);
+					if (lockType == LockType.Movement)
+						movementLockChanged = true;
+				}
 
 				if (_stateCounts.TryGetValue(stateType, out var value))
 					_stateCounts[stateType] = ++value;
@@ -222,6 +252,9 @@ namespace Melia.Zone.World.Actors.Components
 					_stateEnds.Add(new(stateType, endTime));
 				}
 			}
+
+			if (movementLockChanged)
+				this.ApplyMovementLockEffects();
 		}
 
 		/// <summary>
@@ -231,6 +264,8 @@ namespace Melia.Zone.World.Actors.Components
 		/// <exception cref="ArgumentException"></exception>
 		public void RemoveState(string stateType)
 		{
+			var movementLockChanged = false;
+
 			lock (_syncLock)
 			{
 				if (!_states.TryGetValue(stateType, out var state))
@@ -245,8 +280,15 @@ namespace Melia.Zone.World.Actors.Components
 					_stateCounts.Remove(stateType);
 
 				foreach (var lockType in state.Locks)
-					this.Unlock(lockType);
+				{
+					this.UnlockCore(lockType);
+					if (lockType == LockType.Movement)
+						movementLockChanged = true;
+				}
 			}
+
+			if (movementLockChanged)
+				this.ApplyMovementLockEffects();
 		}
 
 		/// <summary>
@@ -256,11 +298,7 @@ namespace Melia.Zone.World.Actors.Components
 		public void Update(TimeSpan elapsed)
 		{
 			var now = DateTime.Now;
-
-			if (this.Owner.Map.ClassName.StartsWith("c_high") && this.Owner is Mob mob && mob.Id == 400001)
-			{
-				Log.Debug("locks: {0}", string.Join(", ", _lockCounts.Keys));
-			}
+			var movementLockChanged = false;
 
 			lock (_syncLock)
 			{
@@ -270,7 +308,24 @@ namespace Melia.Zone.World.Actors.Components
 
 					if (now >= stateEnd.EndTime)
 					{
-						this.RemoveState(stateEnd.Type);
+						if (_states.TryGetValue(stateEnd.Type, out var state))
+						{
+							if (_stateCounts.TryGetValue(stateEnd.Type, out var value))
+							{
+								_stateCounts[stateEnd.Type] = --value;
+
+								if (_stateCounts[stateEnd.Type] <= 0)
+									_stateCounts.Remove(stateEnd.Type);
+
+								foreach (var lockType in state.Locks)
+								{
+									this.UnlockCore(lockType);
+									if (lockType == LockType.Movement)
+										movementLockChanged = true;
+								}
+							}
+						}
+
 						_stateEnds.RemoveAt(i);
 					}
 				}
@@ -281,11 +336,17 @@ namespace Melia.Zone.World.Actors.Components
 
 					if (now >= lockEnd.EndTime)
 					{
-						this.Unlock(lockEnd.Type);
+						this.UnlockCore(lockEnd.Type);
+						if (lockEnd.Type == LockType.Movement)
+							movementLockChanged = true;
+
 						_lockEnds.RemoveAt(i);
 					}
 				}
 			}
+
+			if (movementLockChanged)
+				this.ApplyMovementLockEffects();
 		}
 	}
 
@@ -336,10 +397,19 @@ namespace Melia.Zone.World.Actors.Components
 	/// </summary>
 	public static class StateType
 	{
-		public const string Stunned = nameof(Stunned);
+		public const string Blind = nameof(Blind);
+		public const string Dancing = nameof(Dancing);
+		public const string Fluting = nameof(Fluting);
+		public const string Frozen = nameof(Frozen);
+		public const string Held = nameof(Held);
 		public const string KnockedBack = nameof(KnockedBack);
 		public const string KnockedDown = nameof(KnockedDown);
-		public const string Held = nameof(Held);
+		public const string Petrified = nameof(Petrified);
+		public const string Raised = nameof(Raised);
+		public const string Silenced = nameof(Silenced);
+		public const string Staggered = nameof(Staggered);
+		public const string Stunned = nameof(Stunned);
+		public const string Sleep = nameof(Sleep);
 	}
 
 	/// <summary>

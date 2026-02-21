@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 	/// Handler for the Rodelero skill High Kick.
 	/// </summary>
 	[SkillHandler(SkillId.Rodelero_HighKick)]
-	public class Rodelero_HighKick : IGroundSkillHandler
+	public class Rodelero_HighKick : IMeleeGroundSkillHandler
 	{
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(10);
 
@@ -30,8 +31,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
+			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -64,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
 			var hitTargets = targets.LimitBySDR(caster, skill);

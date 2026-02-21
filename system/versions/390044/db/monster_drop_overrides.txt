@@ -1,0 +1,10 @@
+// Melia
+// Database file
+// 
+// Values: monsterId, className, name, [drops]
+// Drop Values: itemId, chance, [minAmount], [maxAmount]
+//---------------------------------------------------------------------------
+
+[
+
+]

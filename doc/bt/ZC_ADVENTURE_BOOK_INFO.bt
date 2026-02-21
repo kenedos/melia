@@ -1,7 +1,7 @@
 //------------------------------------------------
 //--- 010 Editor v8.0 Binary Template
 //
-//      File: ZC_ADVENTURE_BOOK_INFO
+//      File: ZC_ADVENTURE_BOOK_INFO.bt
 //   Authors: exec, Salman T. Khan
 //   Version: i350756
 //   Purpose: 
@@ -10,15 +10,20 @@
 //  ID Bytes: 
 //   History: 
 //  - i350756 added i2 and i3
+//  - i377415 noticed s1 (could be two bytes)
 //------------------------------------------------
 
 #include "inc/common.bt"
 
 typedef enum<short>
 {
-    Monster1 = 1,
-    Monster2 = 2,
+    Monster0 = 0,
+    Items1 = 1,
+    Items = 2,
     Monster3 = 3,
+    ItemCrafted = 5,
+    Fishing = 6,
+    Unknown3 = 7,
     Achievement = 8,
     Job = 9,
 } AdventureBookType;
@@ -47,6 +52,54 @@ typedef struct
 
 typedef struct
 {
+    int itemId;
+    int obtainedAmount;
+} ItemObtainedInfo <optimize=false>;
+
+typedef struct
+{
+    int monsterId;
+    int dropCount;
+    
+    ItemObtainedInfo dropInfo[dropCount];
+} MonsterDropInfo <optimize=false>;
+
+typedef struct
+{
+    int itemId;
+    int i0;
+    int itemObtained;
+    int itemUsed;
+} ItemBookInfo <optimize=false>;
+
+typedef struct
+{
+    int itemId;
+    int amount;
+} ItemCraftedBookInfo <optimize=false>;
+
+typedef struct
+{
+    int itemId;
+    int amount;
+} FishingBookInfo <optimize=false>;
+
+typedef struct
+{
+    int itemId;
+    int64 l1;
+    char str[64];
+    int i3;
+} ItemUnknown <optimize=false>;
+
+typedef struct
+{
+    int achievementId;
+	FILETIME unlockDate;   
+} AchievementInfo <optimize=false>;
+
+typedef struct
+{
     lpString name;
     int level;
     int jobCount;
@@ -54,7 +107,7 @@ typedef struct
 
     for (i = 0; i < jobCount; i++)
     {
-        int i2;
+        int index;
         int jobId;
     }
 }
@@ -66,22 +119,31 @@ int count;
 AdventureBookType type;
 byte b1;
 byte b2;
+short s1;
 if (!checkCompression())
 {
 	switch(type)
 	{
 	    case 0:
+            MonsterBookInfo info[count];
+            break;
 	    case 1:
-	    case 2:
-	        MonsterBookInfo info[count];
-	        if (type == 1)
-	        {
-	            MonsterBookInfo info[count];
-	        }
+            MonsterDropInfo info [count];
 	        break;
+        case 2:
+            ItemBookInfo info[count];
+            break;
+        case 5:
+            ItemCraftedBookInfo info[count];
+            break;
+        case 6:
+            FishingBookInfo info[count];
+            break;
+        case 7:
+            ItemUnknown info[count];
+            break;
 	    case 8:
-	        int id;
-	        FILETIME unlockDate;
+	        AchievementInfo info[count];
 	        break;
 	    case 9:
 	        Adventurer adventurers[count];

@@ -30,6 +30,11 @@ namespace Melia.Shared.World
 		public readonly Position Position => new(this.X, this.Y, this.Z);
 
 		/// <summary>
+		/// Default dummy location.
+		/// </summary>
+		public static Location Limbo => new(0, Position.Zero);
+
+		/// <summary>
 		/// Creates new location from given data.
 		/// </summary>
 		/// <param name="mapId"></param>
@@ -48,7 +53,7 @@ namespace Melia.Shared.World
 		/// Creates new location from map id and position.
 		/// </summary>
 		/// <param name="mapId"></param>
-		/// <param name="position"></param>
+		/// <param name="pos"></param>
 		public Location(int mapId, Position pos)
 		{
 			this.MapId = mapId;

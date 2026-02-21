@@ -1,0 +1,61 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Melia.Shared.Packages;
+using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
+using Melia.Shared.World;
+using Melia.Zone.Network;
+using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+
+namespace Melia.Zone.Skills.Handlers.Clerics.Monk
+{
+	/// <summary>
+	/// Handler for the Monk skill Iron Skin.
+	/// </summary>
+	[Package("laima")]
+	[SkillHandler(SkillId.Monk_IronSkin)]
+	public class Monk_IronSkinOverride : IMeleeGroundSkillHandler
+	{
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		{
+			if (caster is Character character && !character.IsWearingArmorOfType(ArmorMaterialType.Cloth))
+			{
+				caster.ServerMessage(Localization.Get("Can only use while wearing [Cloth] armor."));
+				Send.ZC_SKILL_DISABLE(caster);
+				return;
+			}
+
+			if (caster.IsBuffActive(BuffId.Ironskin_Buff))
+			{
+				caster.StopBuff(BuffId.Ironskin_Buff);
+				Send.ZC_SKILL_DISABLE(caster);
+				return;
+			}
+
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+			skill.IncreaseOverheat();
+			caster.SetAttackState(true);
+
+			var targetHandle = targets?.FirstOrDefault()?.Handle ?? 0;
+			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
+
+			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
+		}
+
+		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		{
+			await skill.Wait(TimeSpan.FromMilliseconds(700));
+			caster.StartBuff(BuffId.Ironskin_Buff, skill.Level, 0, TimeSpan.FromMilliseconds(300000), caster);
+		}
+	}
+}

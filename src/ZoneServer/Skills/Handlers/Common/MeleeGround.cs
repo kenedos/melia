@@ -9,19 +9,19 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
-using static Melia.Shared.Util.TaskHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
+using Melia.Zone.World.Actors.Characters;
+using System.Linq;
 
 namespace Melia.Zone.Skills.Handlers.Common
 {
 	/// <summary>
 	/// Handles melee skills targeting the ground in front of the caster.
 	/// </summary>
-	[SkillHandler(SkillId.Normal_Attack, SkillId.Normal_Attack_TH, SkillId.Hammer_Attack, SkillId.Common_DaggerAries)]
+	[SkillHandler(SkillId.Normal_Attack, SkillId.Normal_Attack_TH, SkillId.Hammer_Attack, SkillId.Hammer_Attack_TH, SkillId.Common_DaggerAries,
+		SkillId.Sword_Attack, SkillId.SpearMaster_Attack, SkillId.SpearMaster_Attack_TH)]
 	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler
 	{
-		private const int DoubleAttackRate = 40;
-
 		/// <summary>
 		/// Handles usage of the skill.
 		/// </summary>
@@ -30,7 +30,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, IList<ICombatEntity> targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -41,9 +41,12 @@ namespace Melia.Zone.Skills.Handlers.Common
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			CallSafe(this.Attack(skill, caster, originPos, farPos, targets));
+			if (caster is Character character && Feature.IsEnabled("BattleManager"))
+				ZoneServer.Instance.World.BattleManager.StartBattle(character, targets.FirstOrDefault());
+
+			this.Attack(skill, caster, originPos, farPos, targets);
 		}
 
 		/// <summary>
@@ -54,7 +57,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 		/// <param name="castPosition"></param>
 		/// <param name="targetPosition"></param>
 		/// <param name="targets"></param>
-		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IEnumerable<ICombatEntity> targets)
+		private async void Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IEnumerable<ICombatEntity> targets)
 		{
 			// Based on Normal_Attack posessing a hit delay of 100ms,
 			// and Common_DaggerAries one of 50ms, and these two values
@@ -71,11 +74,11 @@ namespace Melia.Zone.Skills.Handlers.Common
 			// handle very high attack speeds. Granted, they need to be
 			// higher than the devs might have ever intended for this to
 			// happen, but I still kinda want them to work.
-			damageDelay /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
-			skillHitDelay /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
+			damageDelay = TimeSpan.FromMilliseconds(damageDelay.TotalMilliseconds / skill.Properties.GetFloat(PropertyName.SklSpdRate));
+			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / skill.Properties.GetFloat(PropertyName.SklSpdRate));
 
 			if (skillHitDelay > TimeSpan.Zero)
-				await Task.Delay(skillHitDelay);
+				await skill.Wait(skillHitDelay);
 
 			var hits = new List<SkillHitInfo>();
 			var rnd = RandomProvider.Get();
@@ -85,11 +88,9 @@ namespace Melia.Zone.Skills.Handlers.Common
 				var modifier = SkillModifier.Default;
 
 				// Random chance to trigger double hit with dagger while buff is active
-				if (skill.Id == SkillId.Common_DaggerAries && caster.IsBuffActive(BuffId.DoubleAttack_Buff))
-				{
-					if (rnd.Next(100) < DoubleAttackRate)
-						modifier.HitCount = 2;
-				}
+				if (caster.TryGetBuff(BuffId.DoubleAttack_Buff, out var doubleAttackBuff)
+					&& rnd.Next(100) < doubleAttackBuff.NumArg2)
+					modifier.HitCount += 1;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);

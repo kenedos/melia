@@ -23,7 +23,7 @@ TxItem;
 
 ClientHeaderDynamic header;
 
-int type; // classId in tx_item
+TxItemType type; // classId in tx_item
 short itemCount;
 short numArgCount;
 short strArgCount;

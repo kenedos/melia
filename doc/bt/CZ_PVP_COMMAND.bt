@@ -15,7 +15,8 @@
 
 ClientHeaderFixed header;
 
-byte b1; // 2
-int64 l1; // 0
-int i1; // 0 
+int i1; // 2, 6
+int i2; // 0, 1
+int i3; // 0 
+byte b1; // 0
 byte b[3]; // 0x3B, 0x4B, 0xAC

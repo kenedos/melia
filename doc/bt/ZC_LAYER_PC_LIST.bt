@@ -13,8 +13,36 @@
 
 #include "inc/common.bt"
 
+typedef struct
+    {
+        int i1;
+        int i2;
+        int i3;
+        int64 accountId;
+        char name[64];
+        int i4;
+        char team[64];
+        char name2[64];
+        short s1;
+        short visualJob; //D1 07
+        int job; //01
+        int jobLevel; // 45
+        short gender; // 2
+        short hair; // 11
+        // 628333,628341,11006112,18015,0
+        int visualEquipIds[5];
+        int mapId; // 1001
+        int level; // 510
+        ubyte color[4];
+        short jobs[4];
+        int64 l1;
+        int i5;
+        int i6;
+    } LayerPC <optimize=false>;
+
 ServerHeaderDynamic header;
 
 int i1;
-int i2;
-int i3;
+int count;
+
+LayerPC pcs[count];

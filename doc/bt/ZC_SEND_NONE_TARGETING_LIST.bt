@@ -1,0 +1,23 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.1 Binary Template
+//
+//      File: ZC_SEND_NONE_TARGETING_LIST.bt
+//   Authors: Salman T. Khan
+//   Version: i377415
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderDynamic header;
+
+int handle;
+
+int count; // 8
+
+if (count > 0)
+    int monsterIds[count];

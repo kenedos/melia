@@ -1,0 +1,21 @@
+//------------------------------------------------
+//--- 010 Editor v13.0.2 Binary Template
+//
+//      File: FriendType.bt
+//   Authors: 
+//   Version: 
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+typedef enum <byte>
+{
+	Requested = 0,
+	Accepted,
+	Delete,
+	Rejected,
+	Blocked,
+} FriendState;

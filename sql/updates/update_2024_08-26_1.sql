@@ -1,0 +1,1 @@
+ALTER TABLE `friends` CHANGE `state` `state` TINYINT(3) NOT NULL DEFAULT '0';

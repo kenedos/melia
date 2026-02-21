@@ -350,6 +350,9 @@ namespace Melia.Barracks.Database
 								var itemId = reader.GetInt32("itemId");
 								var equipSlot = reader.GetByte("equipSlot");
 
+								if (!BarracksServer.Instance.Data.ItemDb.Exists(itemId) || equipSlot >= InventoryDefaults.EquipSlotCount)
+									continue;
+
 								character.Equipment[equipSlot] = new EquipItem(itemId, (EquipSlot)equipSlot);
 							}
 						}
@@ -365,6 +368,9 @@ namespace Melia.Barracks.Database
 							while (reader.Read())
 							{
 								var jobId = (JobId)reader.GetInt32("jobId");
+
+								if (!BarracksServer.Instance.Data.JobDb.TryFind(jobId, out _))
+									continue;
 
 								character.Jobs.Add(jobId);
 							}
@@ -547,6 +553,135 @@ namespace Melia.Barracks.Database
 			}
 		}
 
+
+		/// <summary>
+		/// Checks if a character has any active market items (Listed status).
+		/// </summary>
+		/// <param name="characterId">The character's database ID.</param>
+		/// <returns>True if the character has active market listings.</returns>
+		public bool HasActiveMarketItems(long characterId)
+		{
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("SELECT COUNT(*) FROM `market_items` WHERE `sellerId` = @characterId AND `status` = 1", conn))
+			{
+				mc.Parameters.AddWithValue("@characterId", characterId);
+
+				var count = Convert.ToInt32(mc.ExecuteScalar());
+				return count > 0;
+			}
+		}
+
+		/// <summary>
+		/// Returns all companions on given account.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <returns></returns>
+		public List<Companion> GetCompanions(long accountId)
+		{
+			var result = new List<Companion>();
+
+			using (var conn = this.GetConnection())
+			{
+				using (var mc = new MySqlCommand("SELECT * FROM `companions` WHERE `accountId` = @accountId ORDER BY `slot`", conn))
+				{
+					mc.Parameters.AddWithValue("@accountId", accountId);
+
+					using (var reader = mc.ExecuteReader())
+					{
+						while (reader.Read())
+						{
+							var characterId = reader.IsDBNull(2) ? 0 : reader.GetInt64("characterId");
+							var companion = new Companion(reader.GetInt64("companionId"), reader.GetInt64("accountId"), characterId);
+							companion.MonsterId = reader.GetInt32("monsterId");
+							companion.Name = reader.GetStringSafe("name");
+							companion.Index = (byte)reader.GetInt32("slot");
+							companion.BarracksLayer = reader.GetInt32("barrackLayer");
+							companion.Exp = reader.GetInt64("exp");
+
+							var bx = reader.GetFloat("bx");
+							var by = reader.GetFloat("by");
+							var bz = reader.GetFloat("bz");
+							companion.BarracksPosition = new Position(bx, by, bz);
+
+							var dx = reader.GetFloat("dx");
+							var dy = reader.GetFloat("dy");
+							companion.BarracksDirection = new Direction(dx, dy);
+
+							result.Add(companion);
+						}
+					}
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Set the current character associated with a companion.
+		/// </summary>
+		/// <param name="companionId"></param>
+		/// <param name="characterId"></param>
+		public void SetCompanionCharacter(long companionId, long characterId)
+		{
+			using (var conn = this.GetConnection())
+			using (var trans = conn.BeginTransaction())
+			{
+				using (var cmd = new UpdateCommand("UPDATE `companions` SET {0} WHERE `companionId` = @companionId", conn, trans))
+				{
+					cmd.AddParameter("@companionId", companionId);
+					if (characterId > 0)
+						cmd.Set("characterId", characterId);
+					else
+						cmd.Set("characterId", null);
+
+					cmd.Execute();
+				}
+				trans.Commit();
+			}
+		}
+
+		/// <summary>
+		/// Deletes a companion.
+		/// </summary>
+		/// <param name="companionId"></param>
+		/// <returns></returns>
+		public bool DeleteCompanion(long companionId)
+		{
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("DELETE FROM `companions` WHERE `companionId` = @companionId", conn))
+			{
+				mc.Parameters.AddWithValue("@companionId", companionId);
+
+				return mc.ExecuteNonQuery() > 0;
+			}
+		}
+
+		/// <summary>
+		/// Saves companion information.
+		/// </summary>
+		/// <param name="companion"></param>
+		public void SaveCompanion(Companion companion)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new UpdateCommand("UPDATE `companions` SET {0} WHERE `companionId` = @companionId", conn))
+			{
+				cmd.AddParameter("@companionId", companion.DbId);
+				if (companion.CharacterDbId > 0)
+					cmd.Set("characterId", companion.CharacterDbId);
+				else
+					cmd.Set("characterId", null);
+				cmd.Set("bx", companion.BarracksPosition.X);
+				cmd.Set("by", companion.BarracksPosition.Y);
+				cmd.Set("bz", companion.BarracksPosition.Z);
+				cmd.Set("dx", companion.BarracksDirection.Cos);
+				cmd.Set("dy", companion.BarracksDirection.Sin);
+				cmd.Set("barrackLayer", companion.BarracksLayer);
+				cmd.Set("slot", companion.Index);
+				cmd.Set("exp", companion.Exp);
+
+				cmd.Execute();
+			}
+		}
 
 		/// <summary>
 		/// Adds an item to the character's inventory.

@@ -1,0 +1,1 @@
+ALTER TABLE `jobs` ADD `advDate` DATE NULL AFTER `totalExp`;

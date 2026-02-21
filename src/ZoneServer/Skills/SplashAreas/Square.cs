@@ -60,18 +60,48 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <param name="direction"></param>
 		/// <param name="height"></param>
 		/// <param name="width"></param>
-		public Square(Position originPos, Direction direction, float height, float width)
+		public Square(Position originPos, Direction direction, float height, float width = 0)
 		{
 			this.OriginPos = originPos;
 			this.Direction = direction;
-			this.Height = height;
-			this.Width = width;
+			if (height != 0)
+				this.Height = height;
+			else
+				this.Height = width;
+			if (width != 0)
+				this.Width = width;
+			else
+				this.Width = height;
 
-			this.FarSidePos = originPos.GetRelative2D(direction, height);
+			this.FarSidePos = originPos.GetRelative(direction, height);
 
 			// Double the width, as the width defined by the game is
 			// basically the "radius" of the square
-			_base = PolygonF.RectangleBetween(originPos, this.FarSidePos, width * 2);
+			_base = PolygonF.RectangleBetween(originPos, this.FarSidePos, this.Width * 2);
+		}
+
+		/// <summary>
+		/// Creates new square that starts at origin and extends in
+		/// direction by the given height.
+		/// </summary>
+		/// <param name="originPos"></param>
+		/// <param name="endPos"></param>
+		/// <param name="height"></param>
+		/// <param name="width"></param>
+		public Square(Position originPos, Position endPos, float height, float width = 0)
+		{
+			this.OriginPos = originPos;
+			this.FarSidePos = endPos;
+			this.Direction = originPos.GetDirection(endPos);
+			this.Height = height;
+			if (width != 0)
+				this.Width = width;
+			else
+				this.Width = height;
+
+			// Double the width, as the width defined by the game is
+			// basically the "radius" of the square
+			_base = PolygonF.RectangleBetween(originPos, this.FarSidePos, this.Width * 2);
 		}
 
 		/// <summary>
@@ -82,12 +112,12 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <param name="height"></param>
 		/// <param name="width"></param>
 		/// <returns></returns>
-		public static Square Centered(Position centerPos, Direction direction, float height, float width)
+		public static Square Centered(Position centerPos, Direction direction, float height, float width = 0)
 		{
 			var halfHeight = height / 2f;
 
-			var originPos = centerPos.GetRelative2D(direction, -halfHeight);
-			var farSidePos = centerPos.GetRelative2D(direction, halfHeight);
+			var originPos = centerPos.GetRelative(direction, -halfHeight);
+			var farSidePos = centerPos.GetRelative(direction, halfHeight);
 
 			return new Square(originPos, direction, height, width);
 		}
@@ -125,8 +155,14 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <summary>
 		/// Moves area to the given position and recalculates its properties.
 		/// </summary>
-		/// <param name="position"></param>
+		/// <param name="position">The new origin position (point A) for the rectangle</param>
 		public void UpdatePosition(Vector2F position)
-			=> _base.UpdatePosition(position);
+		{
+			var halfHeight = this.Height / 2f;
+			var centerX = position.X + halfHeight * this.Direction.Cos;
+			var centerZ = position.Y + halfHeight * this.Direction.Sin;
+
+			_base.UpdatePosition(new Vector2F(centerX, centerZ));
+		}
 	}
 }

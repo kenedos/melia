@@ -15,3 +15,5 @@
 
 ClientHeaderFixed header;
 int64 characterId;
+char name[32];
+string type;

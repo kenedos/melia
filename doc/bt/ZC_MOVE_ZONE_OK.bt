@@ -9,6 +9,7 @@
 // File Mask: 
 //  ID Bytes: 
 //   History: 
+// - i373230: position has been replaced by i2-i4, and renamed to posX, posY, posZ, renamed b1 to channelId
 //------------------------------------------------
 
 #include "inc/common.bt"

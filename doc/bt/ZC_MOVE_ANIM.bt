@@ -16,4 +16,4 @@
 ServerHeaderFixed header;
 int handle;
 byte animationId; // 13 (Could be a short)?
-byte b2; // 0
+byte b1; // 0

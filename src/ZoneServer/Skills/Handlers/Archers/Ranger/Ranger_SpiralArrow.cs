@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_PLAY_SOUND_Gendered(caster, "voice_war_atk_long_cast", "voice_atk_long_cast_f");
 		}
@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			Send.ZC_STOP_SOUND_Gendered(caster, "voice_war_atk_long_cast", "voice_atk_long_cast_f");
 		}
@@ -152,7 +152,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			await Task.Delay(hitDelay);
 
-			var targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var results = new List<SkillHitResult>();
 			var hitTargets = new List<ICombatEntity>();
 
@@ -176,7 +176,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 				var hit = new HitInfo(caster, target, skill, skillHitResult);
 				hit.ForceId = ForceId.GetNew();
-				hit.ResultType = HitResultType.Unk8;
+				hit.ResultType = HitResultType.NoHitScript;
 
 				if (skillHitResult.Damage > 0)
 				{

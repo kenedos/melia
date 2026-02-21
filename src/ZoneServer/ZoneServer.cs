@@ -1,10 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Text;
 using System.Threading;
 using Melia.Shared;
 using Melia.Shared.Data.Database;
+using Melia.Shared.Game.Const;
 using Melia.Shared.IES;
 using Melia.Shared.L10N;
 using Melia.Shared.Network;
@@ -12,18 +16,24 @@ using Melia.Shared.Network.Inter.Messages;
 using Melia.Zone.Abilities;
 using Melia.Zone.Buffs;
 using Melia.Zone.Commands;
+using Melia.Zone.Data;
 using Melia.Zone.Database;
 using Melia.Zone.Events;
 using Melia.Zone.Network;
 using Melia.Zone.Pads.Handlers;
+using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Shared;
+using Melia.Zone.Services;
 using Melia.Zone.Skills.Handlers;
+using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Spawning;
+using Melia.Zone.Util;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
-using Yggdrasil.Logging;
 using Yggdrasil.Network.Communication;
 using Yggdrasil.Network.TCP;
 using Yggdrasil.Util;
-using Yggdrasil.Util.Commands;
+using Log = Yggdrasil.Logging.Log;
 
 namespace Melia.Zone
 {
@@ -35,11 +45,10 @@ namespace Melia.Zone
 		public readonly static ZoneServer Instance = new();
 
 		private TcpConnectionAcceptor<ZoneConnection> _acceptor;
+		private AutoSaveService _autoSaveService;
+		private OrphanCleanupService _orphanCleanupService;
 
-		/// <summary>
-		/// Returns the server's inter-server communicator.
-		/// </summary>
-		public Communicator Communicator { get; private set; }
+		public override ServerType Type => ServerType.Zone;
 
 		/// <summary>
 		/// Returns a reference to the server's packet handlers.
@@ -72,6 +81,11 @@ namespace Melia.Zone
 		public AbilityHandlers AbilityHandlers { get; } = new();
 
 		/// <summary>
+		/// Returns reference to the server's item handlers.
+		/// </summary>
+		//public ItemHandlers ItemHandlers { get; } = new();
+
+		/// <summary>
 		/// Returns reference to the server's pad handlers.
 		/// </summary>
 		public PadHandlers PadHandlers { get; } = new();
@@ -87,9 +101,37 @@ namespace Melia.Zone
 		public ServerEvents ServerEvents { get; } = new();
 
 		/// <summary>
+		/// Returns a reference to the server's game event manager.
+		/// </summary>
+		public GameEventManager GameEvents { get; } = new GameEventManager();
+
+		/// <summary>
+		/// Manager for achievements and point tracking.
+		/// </summary>
+		public AchievementService Achievements { get; } = new AchievementService();
+
+		/// <summary>
+		/// Manager for periodic dungeon reset tasks.
+		/// </summary>
+		public DungeonResetService DungeonReset { get; } = new DungeonResetService();
+
+		/// <summary>
+		/// Returns the dialog function handlers.
+		/// </summary>
+		public DialogFunctions DialogFunctions { get; } = new DialogFunctions();
+
+		/// <summary>
+		/// Returns the trigger function handlers.
+		/// </summary>
+		public TriggerFunctions TriggerFunctions { get; } = new TriggerFunctions();
+
+		/// <summary>
 		/// Returns reference to the server's IES mods.
 		/// </summary>
 		public IesModList IesMods { get; } = new();
+
+		public Stopwatch ServerTime { get; } = new Stopwatch();
+
 
 		/// <summary>
 		/// Runs the server.
@@ -106,26 +148,42 @@ namespace Melia.Zone
 			// Set up zone server specific logging or we might run into
 			// issues with multiple servers trying to write files at the
 			// same time.
-			Log.Init("ZoneServer" + serverId);
+			Log.Init($"ZoneServer_{groupId}_{serverId}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss-fff}");
 
 			this.NavigateToRoot();
 
 			this.LoadConf();
+			this.LoadPackages();
+			this.LoadVersionInfo();
+			if (this.Data.OpDb != null)
+				this.PacketHandler.LoadMethods();
 			this.LoadLocalization(this.Conf);
-			this.LoadData(ServerType.Zone);
-			this.LoadServerList(this.Data.ServerDb, ServerType.Zone, groupId, serverId);
+			this.LoadData(this.Type);
+			this.LoadServerList(this.Data.ServerDb, this.Type, groupId, serverId);
 			this.InitDatabase(this.Database, this.Conf);
 			this.InitSkills();
 			this.InitWorld();
+			this.LoadDialogFunctions();
+			this.LoadTriggerFunctions();
 			this.LoadScripts("zone");
 			this.LoadIesMods();
 			this.StartWorld();
+
+			SaveQueue.Start();
+			this.StartAutoSaveService();
+			this.StartOrphanCleanupService();
+			if (this.Conf.World.EnableProceduralQuests)
+			{
+				NpcSpawnManager.LoadSpawnData();
+				ResourceNodeSpawnManager.LoadAllNodeData();
+				PoiDataManager.LoadPoiData();
+			}
 
 			this.StartCommunicator();
 			this.StartAcceptor();
 
 			ConsoleUtil.RunningTitle();
-			new ConsoleCommands().Wait();
+			new ZoneConsoleCommands().Wait();
 		}
 
 		/// <summary>
@@ -150,7 +208,7 @@ namespace Melia.Zone
 		{
 			Log.Info("Attempting to connect to coordinator...");
 
-			var commName = "" + this.ServerInfo.Type + this.ServerInfo.Id;
+			var commName = $"{this.ServerInfo.Type}:{this.ServerList.GroupData.Id}:{this.ServerInfo.Id}";
 
 			this.Communicator = new Communicator(commName);
 			this.Communicator.Disconnected += this.Communicator_OnDisconnected;
@@ -169,19 +227,21 @@ namespace Melia.Zone
 
 			try
 			{
-				this.Communicator.Connect("Coordinator", authentication, barracksServerInfo.Ip, barracksServerInfo.InterPort);
+				this.Communicator.Connect("Coordinator", authentication, barracksServerInfo.InterIp, barracksServerInfo.InterPort);
 
 				this.Communicator.Subscribe("Coordinator", "ServerUpdates");
 				this.Communicator.Subscribe("Coordinator", "AllServers");
 				this.Communicator.Subscribe("Coordinator", "AllZones");
 
+				this.ServerInfo.Status = ServerStatus.Online;
 				this.UpdateServerInfo();
 
 				Log.Info("Successfully connected to coordinator.");
 			}
-			catch
+			catch (Exception ex)
 			{
 				Log.Error("Failed to connect to coordinator, trying again in 5 seconds...");
+				Log.Error(ex.Message);
 				Thread.Sleep(5000);
 
 				this.ConnectToCoordinator();
@@ -209,10 +269,15 @@ namespace Melia.Zone
 		{
 			//Log.Debug("Message received from '{0}': {1}", sender, message);
 
-			// TODO: Would be nice to have a proper message handler system.
-
 			switch (message)
 			{
+				case ShutdownMessage shutdownMessage:
+				{
+					// Delegate to the ServerShutdownManager for graceful shutdown handling
+					// This supports immediate, graceful (with countdown), and cancel operations
+					ServerShutdownManager.Instance.HandleShutdownMessage(shutdownMessage);
+					break;
+				}
 				case ServerUpdateMessage serverUpdateMessage:
 				{
 					this.ServerList.Update(serverUpdateMessage);
@@ -227,14 +292,10 @@ namespace Melia.Zone
 				{
 					IEnumerable<Character> characters;
 
-					// XXX: Should kicking exclude the origin character? Whether you
-					//   might want to kick yourself is debatable.
-
-					Log.Info("Received kick request for '{0}' from '{1}'.", kickMessage.TargetName, kickMessage.OriginName);
-
 					if (kickMessage.TargetType == KickTargetType.Player)
 					{
-						if (!this.World.TryGetCharacterByTeamName(kickMessage.TargetName, out var targetCharacter))
+						var targetCharacter = this.World.GetCharacterByTeamName(kickMessage.TargetName);
+						if (targetCharacter == null)
 							break;
 
 						characters = [targetCharacter];
@@ -246,10 +307,6 @@ namespace Melia.Zone
 
 						characters = map.GetCharacters();
 					}
-					else if (kickMessage.TargetType == KickTargetType.Zone)
-					{
-						characters = this.World.GetCharacters();
-					}
 					else
 					{
 						throw new InvalidDataException($"Invalid kick target type '{kickMessage.TargetType}'.");
@@ -258,31 +315,127 @@ namespace Melia.Zone
 					foreach (var character in characters)
 					{
 						character.MsgBox(Localization.Get("You were kicked by {0}."), kickMessage.OriginName);
-						character.Connection.Close(100);
+						character.Connection.Close(this.Conf.World.ConnectionCloseDelay);
 					}
 					break;
 				}
 				case ForceLogOutMessage logoutMessage:
 				{
-					var connection = this.World.GetCharacters().Select(a => a.Connection).FirstOrDefault(a => a?.Account?.Id == logoutMessage.AccountId);
-					connection?.Close();
+					var character = this.World.GetCharacter(c => c.Connection?.Account?.Id == logoutMessage.AccountId && !c.IsAutoTrading);
+					character?.Connection?.Close();
+					break;
+				}
+				case GuildUpdateMessage guildUpdateMessage:
+				{
+					Log.Debug("Received guild update from '{0}': Type={1}, GuildId={2}, CharacterId={3}",
+						sender, guildUpdateMessage.UpdateType, guildUpdateMessage.GuildId, guildUpdateMessage.CharacterId);
+					break;
+				}
+				case MarketUpdateMessage marketUpdateMessage:
+				{
+					// Zone Server ignores market updates
+					break;
+				}
+				case ForceLogOutEveryoneMessage logoutMessage:
+				{
+					var characters = this.World.GetCharacters();
+					foreach (var character in characters)
+					{
+						character.MsgBox(Localization.Get("Logging Out: {0}."), logoutMessage.Reason);
+						character.Connection?.Close(this.Conf.World.ConnectionCloseDelay);
+					}
+					break;
+				}
+				case InitAutoMatchContentMessage initAutoMatchContentMessage:
+				{
+					this.HandleInitAutoMatchContent(initAutoMatchContentMessage);
+					break;
+				}
+				case AutoMatchMembersUpdateMessage autoMatchMembersUpdateMessage:
+				{
+					this.World.AutoMatch.HandleMembersUpdate(autoMatchMembersUpdateMessage);
 					break;
 				}
 			}
 		}
 
 		/// <summary>
+		/// Handles the auto match content initialization message from SocialServer.
+		/// Creates a party for matched players and warps them to the dungeon.
+		/// </summary>
+		private void HandleInitAutoMatchContent(InitAutoMatchContentMessage message)
+		{
+			// Find all characters on this zone server that are part of the match
+			var matchedCharacters = new List<Character>();
+			foreach (var characterDbId in message.CharacterDbIds)
+			{
+				var character = this.World.GetCharacter(c => c.DbId == characterDbId);
+				if (character != null)
+					matchedCharacters.Add(character);
+			}
+
+			if (matchedCharacters.Count == 0)
+			{
+				Log.Debug("InitAutoMatchContentMessage: No matched characters found on this zone server.");
+				return;
+			}
+
+			// Remove all matched characters from their existing parties
+			foreach (var character in matchedCharacters)
+			{
+				if (character.HasParty)
+				{
+					var existingParty = character.Connection.Party;
+					existingParty.RemoveMember(character);
+				}
+			}
+
+			// Use the first matched character as the leader
+			var leader = matchedCharacters[0];
+
+			// Create a dungeon session with the AutoMatchZoneManager
+			var session = this.World.AutoMatch.CreateDungeonSession(leader, message.AutoMatchId, message.DungeonId);
+
+			// Add remaining characters to the session/party
+			for (var i = 1; i < matchedCharacters.Count; i++)
+			{
+				session.AddMember(matchedCharacters[i]);
+			}
+
+			// Store player count and clear any stale instance references on all characters
+			foreach (var character in matchedCharacters)
+			{
+				character.Variables.Temp.SetInt(AutoMatchZoneManager.PlayersCountVarName, message.CharacterDbIds.Count);
+				character.Variables.Perm.SetString(DungeonScript.ActiveInstanceVarName, null);
+			}
+
+			Log.Info("InitAutoMatchContentMessage: Created party for {0} players for dungeon id '{1}' (AutoMatchId: {2}).",
+				matchedCharacters.Count, message.DungeonId, message.AutoMatchId);
+
+			// Warp all players to the dungeon using the centralized dungeon warp method
+			DungeonScript.WarpPartyToDungeon(matchedCharacters, message.DungeonId);
+		}
+
+		/// <summary>
 		/// Sends an update about the server's status to the coordinator.
 		/// </summary>
-		internal void UpdateServerInfo()
+		public void UpdateServerInfo()
 		{
-			var zoneServer = this;
+			var playerCount = this.World.GetCharacterCount();
 
-			var serverId = zoneServer.ServerInfo.Id;
-			var playerCount = zoneServer.World.GetCharacterCount();
+			var rates = new ServerRates
+			{
+				ExpRate = this.Conf.World.ExpRate,
+				JobExpRate = this.Conf.World.ExpRate,
+				DropRate = this.Conf.World.GeneralDropRate,
+				EquipRate = this.Conf.World.EquipmentDropRate,
+				GemRate = this.Conf.World.GemDropRate,
+				RecipeRate = this.Conf.World.RecipeDropRate,
+			};
 
-			var message = new ServerUpdateMessage(ServerType.Zone, serverId, playerCount, ServerStatus.Online);
-			zoneServer.Communicator.Send("Coordinator", message);
+			//var message = new ServerUpdateMessage(this.Type, serverId, playerCount, ServerStatus.Online, rates);
+			//zoneServer.Communicator.Send("Coordinator", message);
+			base.UpdateServerInfo(this.ServerInfo.Status, playerCount, rates);
 		}
 
 		/// <summary>
@@ -290,17 +443,38 @@ namespace Melia.Zone
 		/// </summary>
 		private void InitSkills()
 		{
-			Log.Info("Initializing skills...");
-			this.SkillHandlers.Init();
+			Log.Info("Initializing handlers...");
+			this.SkillHandlers.Init(this.Packages);
+			this.BuffHandlers.Init(this.Packages);
+			this.PadHandlers.Init(this.Packages);
+			this.AbilityHandlers.Init(this.Packages);
 		}
 
 		/// <summary>
-		/// Loads maps ad initializes them.
+		/// Loads maps and initializes them.
 		/// </summary>
 		private void InitWorld()
 		{
-			Log.Info("Initializing world...");
-			this.World.Initialize();
+			using (Debug.Profile($"Initializing World", 5000))
+			{
+				Log.Info("Initializing world...");
+				this.World.Initialize();
+			}
+			using (Debug.Profile($"Initializing Game Events", 500))
+			{
+				Log.Info("Initializing game events...");
+				this.GameEvents.Initialize();
+			}
+			using (Debug.Profile($"Initializing Dungeon Reset Service", 100))
+			{
+				Log.Info("Initializing dungeon reset service...");
+				this.DungeonReset.Initialize();
+			}
+			using (Debug.Profile($"Initializing Achievement Service", 100))
+			{
+				Log.Info("Initializing achievement service...");
+				this.Achievements.Initialize();
+			}
 			Log.Info("  done loading {0} maps.", this.World.Count);
 		}
 
@@ -309,6 +483,7 @@ namespace Melia.Zone
 		/// </summary>
 		private void StartWorld()
 		{
+			this.ServerTime.Start();
 			Log.Info("Starting world update...");
 			this.World.Start();
 		}
@@ -326,7 +501,7 @@ namespace Melia.Zone
 			// get added back in on a higher rank, that never happened (?).
 			// To enable it, we need to adjust the job rank to make it
 			// selectable and give the skills a max level.
-			if (!Feature.IsEnabled("CenturionRemoved"))
+			if (!Feature.IsEnabled(FeatureId.CenturionRemoved))
 			{
 				this.IesMods.Add("Job", 1005, "Rank", 2);
 				this.IesMods.Add("SkillTree", 10502, "MaxLevel", 5);
@@ -341,8 +516,76 @@ namespace Melia.Zone
 
 			this.IesMods.Add("SharedConst", 177, "Value", this.Conf.World.StorageFee); // WAREHOUSE_PRICE
 			this.IesMods.Add("SharedConst", 10004, "Value", this.Conf.World.StorageExtCost); // WAREHOUSE_EXTEND_PRICE
+			this.IesMods.Add("SharedConst", 10006, "Value", this.Conf.World.StorageExtCount); // WAREHOUSE_EXTEND_SLOT_COUNT
 			this.IesMods.Add("SharedConst", 10010, "Value", this.Conf.World.StorageMaxExtensions); // WAREHOUSE_MAX_COUNT
+			this.IesMods.Add("SharedConst", 10012, "Value", this.Conf.World.TeamStorageExtCost); // ACCOUNT_WAREHOUSE_EXTEND_PRICE
+			this.IesMods.Add("SharedConst", 10013, "Value", this.Conf.World.TeamStorageMaxSilverExpands); // ACCOUNT_WAREHOUSE_MAX_EXTEND_COUNT
+			this.IesMods.Add("SharedConst", 10021, "Value", this.Conf.World.TeamStorageMinimumLevelRequired); // ACCOUNT_WAREHOUSE_LIMIT_LEVEL
+
+			this.IesMods.Add("SharedConst", 102, "Value", this.Conf.World.MaxLevel);
+			this.IesMods.Add("SharedConst", 103, "Value", this.Conf.World.MaxCompanionLevel);
+			this.IesMods.Add("SharedConst", 104, "Value", this.Conf.World.MaxBaseJobLevel);
+			this.IesMods.Add("SharedConst", 105, "Value", this.Conf.World.MaxAdvanceJobLevel);
 			this.IesMods.Add("SharedConst", 100050, "Value", this.Conf.World.JobMaxRank); // JOB_CHANGE_MAX_RANK
+
+			// Magical Amulets are invisible by default, this makes them visible.
+			if (Feature.IsEnabled("MagicalAmulet"))
+			{
+				for (var i = 0; i < 26; i++)
+					this.IesMods.Add("Item", 648001 + i, "MarketCategory", "Misc_Usual");
+			}
+
+			if (Feature.IsEnabled("UnlockAllCompanions"))
+			{
+				foreach (var companion in Instance.Data.CompanionDb.Entries.Values)
+				{
+					if (companion.Id == 1 || !Instance.Data.MonsterDb.TryFind(companion.ClassName, out _))
+						continue;
+					this.IesMods.Add("Companion", companion.Id, "SellPrice", "SCR_GET_VELHIDER_PRICE");
+					this.IesMods.Add("Companion", companion.Id, "ShopGroup", "Normal");
+				}
+			}
+
+			//foreach (var item in this.Data.ItemDb.Entries.Values)
+			//	this.IesMods.Add("Item", item.Id, "UserTrade", "YES");
+		}
+
+		/// <summary>
+		/// Sets up Dialog Functions.
+		/// </summary>
+		private void LoadDialogFunctions()
+		{
+			Log.Info("Loading dialog functions...");
+
+			try
+			{
+				this.DialogFunctions.LoadMethods();
+				Log.Info("  loaded {0} dialog functions.", this.DialogFunctions.Count);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Failed to load dialog functions: {0}", ex);
+				ConsoleUtil.Exit(1);
+			}
+		}
+
+		/// <summary>
+		/// Sets up Trigger Functions.
+		/// </summary>
+		private void LoadTriggerFunctions()
+		{
+			Log.Info("Loading trigger functions...");
+
+			try
+			{
+				this.TriggerFunctions.LoadMethods();
+				Log.Info("  loaded {0} trigger functions.", this.TriggerFunctions.Count);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Failed to load dialog functions: {0}", ex);
+				ConsoleUtil.Exit(1);
+			}
 		}
 
 		/// <summary>
@@ -362,6 +605,79 @@ namespace Melia.Zone
 		private void OnConnectionRejected(ZoneConnection conn, string reason)
 		{
 			Log.Info("Connection rejected from '{0}'.", conn.Address);
+		}
+
+		private void StartAutoSaveService()
+		{
+			try
+			{
+				var autoSaveSlots = this.Conf.World.AutoSaveSlots;
+				var autoSaveIntervalPerSlot = TimeSpan.FromMinutes(this.Conf.World.AutoSaveIntervalMinutes);
+				var orphanCleanupCycles = this.Conf.World.OrphanCleanupEnabled ? this.Conf.World.OrphanCleanupCycles : 0;
+
+				_autoSaveService = new AutoSaveService(this, this.Database, autoSaveSlots, autoSaveIntervalPerSlot, orphanCleanupCycles);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Failed to initialize AutoSave Service: {0}", ex);
+			}
+		}
+
+		private void StartOrphanCleanupService()
+		{
+			if (!this.Conf.World.OrphanCleanupEnabled)
+			{
+				Log.Info("OrphanCleanupService is disabled in configuration.");
+				return;
+			}
+
+			try
+			{
+				var batchSize = this.Conf.World.OrphanCleanupBatchSize;
+
+				_orphanCleanupService = new OrphanCleanupService(this.Database, batchSize);
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Failed to initialize OrphanCleanup Service: {0}", ex);
+			}
+		}
+
+		/// <summary>
+		/// Gets the orphan cleanup service instance for triggering cleanup.
+		/// </summary>
+		public OrphanCleanupService OrphanCleanupService => _orphanCleanupService;
+
+		private void StopServices()
+		{
+			Log.Info("Stopping server services...");
+
+			// Stop accepting new connections
+			this._acceptor?.Stop();
+			Log.Info("Acceptor stopped.");
+
+			// Stop world update loop (gracefully if possible)
+			this.World?.Heartbeat.Stop();
+			Log.Info("World stopped.");
+
+			// Stop SaveQueue (drain remaining saves)
+			SaveQueue.Stop();
+			Log.Info("SaveQueue stopped.");
+
+			// Dispose AutoSave Service
+			_autoSaveService?.Dispose();
+			Log.Info("AutoSave Service stopped.");
+
+			// Dispose OrphanCleanup Service
+			_orphanCleanupService?.Dispose();
+			Log.Info("OrphanCleanup Service stopped.");
+
+			// Disconnect communicator
+			//Communicator?.Disconnect();
+			Log.Info("Communicator disconnected.");
+
+			// Other cleanup...
+			Log.Info("Server services stopped.");
 		}
 	}
 }

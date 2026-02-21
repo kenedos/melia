@@ -1,0 +1,13 @@
+// Melia
+// Script List File
+//---------------------------------------------------------------------------
+
+dungeons/**/*
+items/**/*
+//jobs/**/*
+mobs/**/*
+npcs/**/*
+quests/**/*
+tracks/**/*
+warps/**/*
+treasures/**/*

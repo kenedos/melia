@@ -1,0 +1,16 @@
+//------------------------------------------------
+//--- 010 Editor v15.0.1 Binary Template
+//
+//      File: CZ_CANCEL_TRANSFORM_SKILL.bt
+//   Authors: Salman T. Khan
+//   Version: i396447
+//   Purpose: 
+//  Category: 
+// File Mask: 
+//  ID Bytes: 
+//   History: 
+//------------------------------------------------
+
+#include "inc/common.bt"
+
+ServerHeaderFixed header;

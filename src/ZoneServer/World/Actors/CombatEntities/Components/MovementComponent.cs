@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Scheduling;
 
@@ -50,7 +52,18 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// Returns whether the entity is currently on the ground or
 		/// in the air.
 		/// </summary>
-		public bool IsGrounded { get; private set; }
+		public bool IsGrounded { get; private set; } = true;
+
+		/// <summary>
+		/// Returns whether the entity is currently on the flying or
+		/// not
+		/// </summary>
+		public bool IsFlying { get; private set; } = false;
+
+		/// <summary>
+		/// Enable or disable a minimap marker being shown when the entity moves.
+		/// </summary>
+		public bool ShowMinimapMarker { get; set; } = false;
 
 		/// <summary>
 		/// Returns the entity's current movement speed type.
@@ -58,11 +71,71 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public MoveSpeedType MoveSpeedType { get; private set; }
 
 		/// <summary>
+		/// When true, use ZC_MOVE_POS instead of ZC_PC_MOVE_STOP for position updates.
+		/// Used when entity is attached and movement should be position-based only.
+		/// </summary>
+		public bool UsePositionOnlyMovement { get; set; } = false;
+
+
+		/// <summary>
+		/// Enables or disables movement debug packets being sent.
+		/// </summary>
+		public bool ShowDebug { get; set; }
+
+		/// <summary>
 		/// Creates new movement component.
 		/// </summary>
 		/// <param name="entity"></param>
 		public MovementComponent(ICombatEntity entity) : base(entity)
 		{
+		}
+
+		/// <summary>
+		/// Moves the entity from the starting position to the ending position after a delay and within a specified timespan.
+		/// </summary>
+		/// <param name="startPos">The starting position.</param>
+		/// <param name="endPos">The ending position.</param>
+		/// <param name="delay">The delay before starting the movement.</param>
+		/// <param name="timespan">The duration of the movement.</param>
+		public async Task MoveToWithDelay(Position startPos, Position endPos, TimeSpan delay, TimeSpan timespan)
+		{
+			if (!this.Entity.CanMove())
+				return;
+
+			await Task.Delay(delay);
+
+			lock (_positionSyncLock)
+			{
+				// Don't move if the entity is already at the destination
+				if (endPos == this.Entity.Position)
+					return;
+
+				// Set initial position
+				this.Entity.Position = startPos;
+
+				// Calculate movement parameters
+				var diffX = endPos.X - startPos.X;
+				var diffZ = endPos.Z - startPos.Z;
+				var totalDistance = Math.Sqrt(diffX * diffX + diffZ * diffZ);
+				var speed = totalDistance / timespan.TotalSeconds;
+
+				_moveTime = timespan;
+				_moveX = diffX / _moveTime.TotalSeconds;
+				_moveZ = diffZ / _moveTime.TotalSeconds;
+
+				this.IsMoving = true;
+				this.Destination = endPos;
+				this.MoveTarget = MoveTargetType.Position;
+
+				// Set direction relative to current position
+				this.Entity.Direction = startPos.GetDirection(endPos);
+
+				var fromCellPos = this.Entity.Map.Ground.GetCellPosition(startPos);
+				var toCellPos = this.Entity.Map.Ground.GetCellPosition(endPos);
+
+				// Update clients
+				Send.ZC_MOVE_PATH(this.Entity, fromCellPos, toCellPos, (float)speed);
+			}
 		}
 
 		/// <summary>
@@ -106,6 +179,18 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				return TimeSpan.Zero;
 
 			return this.MovePath([destination], true);
+		}
+
+		/// <summary>
+		/// Calculates and returns the time it would take the entity
+		/// to move to the destination from its current position.
+		/// </summary>
+		/// <param name="destination"></param>
+		/// <param name="walk"></param>
+		/// <returns></returns>
+		public TimeSpan CalcMoveToTime(Position destination)
+		{
+			return this.MoveToConditional(destination, false);
 		}
 
 		/// <summary>
@@ -154,6 +239,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				}
 
 				var speed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+
+				// Prevent division by zero
+				if (speed < 1f)
+					return TimeSpan.MaxValue;
+
 				var totalMoveTime = TimeSpan.FromSeconds(totalDistance / speed);
 
 				if (executeMove)
@@ -218,6 +308,15 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				var distance = Math.Sqrt(diffX * diffX + diffZ * diffZ);
 
 				var speed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+
+				if (speed <= 0)
+				{
+					_moveTime = TimeSpan.Zero;
+					_moveX = 0;
+					_moveZ = 0;
+					return;
+				}
+
 				_moveTime = TimeSpan.FromSeconds(distance / speed);
 				_moveX = (diffX / _moveTime.TotalSeconds);
 				_moveZ = (diffZ / _moveTime.TotalSeconds);
@@ -230,6 +329,82 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 				Send.ZC_MOVE_PATH(this.Entity, fromCellPos, toCellPos, speed);
 			}
+		}
+
+		/// <summary>
+		/// Starts movement to destination if execution is requested,
+		/// returns the amount of time it will/would take the entity
+		/// to get there.
+		/// </summary>
+		/// <param name="destination"></param>
+		/// <param name="executeMove"></param>
+		private TimeSpan MoveToConditional(Position destination, bool executeMove)
+		{
+			if (!this.Entity.CanMove())
+				return TimeSpan.Zero;
+
+			lock (_positionSyncLock)
+			{
+				// Don't move if the entity is already at the destination
+				if (destination == this.Entity.Position)
+					return TimeSpan.Zero;
+
+				// Get distance to destination
+				var position = this.Entity.Position;
+				var diffX = destination.X - position.X;
+				var diffZ = destination.Z - position.Z;
+				var distance = Math.Sqrt(diffX * diffX + diffZ * diffZ);
+
+				// Get speed
+				var speed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+
+				// With 0 speed, we can't move anywhere
+				if (speed == 0)
+					return TimeSpan.Zero;
+
+				// Don't move if too close to destination
+				if (distance <= 10)
+					return TimeSpan.Zero;
+
+				// Calculate movement and move time
+				_moveTime = TimeSpan.FromSeconds(distance / speed);
+				_moveX = (diffX / _moveTime.TotalSeconds);
+				_moveZ = (diffZ / _moveTime.TotalSeconds);
+
+				if (executeMove)
+				{
+					this.IsMoving = true;
+					this.Destination = destination;
+					this.MoveTarget = MoveTargetType.Position;
+
+					// Set direction relative to current position
+					this.Entity.Direction = position.GetDirection(destination);
+
+					var fromCellPos = this.Entity.Map.Ground.GetCellPosition(this.Entity.Position);
+					var toCellPos = this.Entity.Map.Ground.GetCellPosition(this.Destination);
+
+					// Update clients
+					Send.ZC_MOVE_PATH(this.Entity, fromCellPos, toCellPos, speed);
+				}
+
+				return _moveTime;
+			}
+		}
+
+		public void AddMarker()
+		{
+			this.ShowMinimapMarker = true;
+			if (this.Entity is IMonster monster)
+				Send.ZC_NORMAL.MinimapMarker(monster, 1, 1, 0);
+			else if (this.Entity is Character character)
+				Send.ZC_NORMAL.MinimapMarker(character, 2, 0);
+		}
+
+		public void RemoveMarker()
+		{
+			if (this.ShowMinimapMarker)
+				Send.ZC_NORMAL.RemoveMapMarker(this.Entity);
+			this.ShowMinimapMarker = false;
 		}
 
 		/// <summary>
@@ -247,6 +422,17 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				this.Destination = pos;
 
 				Send.ZC_MOVE_STOP(this.Entity, pos);
+			}
+
+			// Clear any remaining path waypoints to prevent resuming movement
+			// This is critical for knockback to work properly
+			lock (_positionSyncLock)
+			{
+				_path?.Clear();
+				_moveTime = TimeSpan.Zero;
+				_moveX = 0;
+				_moveZ = 0;
+				this.FinalDestination = pos;
 			}
 
 			return pos;
@@ -295,6 +481,19 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			this.IsGrounded = grounded;
 		}
 
+		public void NotifyFlying(bool flying, float height = 0, float raiseTime = 1, float easing = 0)
+		{
+			this.IsFlying = flying;
+			if (this.Entity is Character character)
+			{
+				Send.ZC_FLY(character, height, 5);
+			}
+			else
+			{
+				Send.ZC_FLY_MATH(this.Entity, height, raiseTime, easing);
+			}
+		}
+
 		/// <summary>
 		/// Updates current position and direction of the entity.
 		/// </summary>
@@ -308,13 +507,35 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="unkFloat"></param>
 		internal void NotifyMove(Position pos, Direction dir, float unkFloat)
 		{
+			var fromPos = this.Entity.Position;
 			this.Entity.Position = pos;
 			this.Entity.Direction = dir;
 
 			this.IsMoving = true;
 			this.MoveTarget = MoveTargetType.Direction;
 
-			Send.ZC_MOVE_DIR(this.Entity, pos, dir, unkFloat);
+			if (!UsePositionOnlyMovement)
+				Send.ZC_MOVE_DIR(this.Entity, pos, dir, unkFloat);
+			else
+				Send.ZC_MOVE_POS(this.Entity, fromPos, pos, 60, 0, 1);
+			if (this.Entity is Character character)
+			{
+				// Check if character is attached to something
+				if (character.Components.TryGet<AttachmentComponent>(out var attachment) && attachment.IsAttached)
+				{
+					// Notify attachment component that we moved - it will sync hawk position
+					attachment.OnAttachedEntityMoved(pos);
+				}
+
+				character.Connection.Party?.UpdateMemberInfo(character);
+				// character.Connection.Guild?.UpdateMemberInfo(character); // Removed: Guild type deleted
+
+				if (character.IsRiding && character.ActiveCompanion != null)
+					character.ActiveCompanion.Position = pos;
+
+				if (this.ShowMinimapMarker)
+					Send.ZC_NORMAL.MinimapMarker(character, 2, 0);
+			}
 		}
 
 		/// <summary>
@@ -338,17 +559,26 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			if (this.Entity is Character character)
 			{
+				// Check if character is attached to something (e.g., hanging from hawk)
+				if (character.Components.TryGet<AttachmentComponent>(out var attachment) && attachment.IsAttached)
+				{
+					// Notify attachment component that we moved - it will sync hawk position
+					attachment.OnAttachedEntityMoved(pos);
+				}
+
 				// Sending ZC_MOVE_STOP works as well, but it doesn't have
 				// a direction, so the character stops and looks north
 				// on others' screens.
 				Send.ZC_PC_MOVE_STOP(character, character.Position, character.Direction);
+				if (this.ShowMinimapMarker)
+					Send.ZC_NORMAL.MinimapMarker(character, 2, 0);
 			}
 			else
 			{
 				Send.ZC_MOVE_STOP(this.Entity, pos);
 			}
 
-			this.Entity.Components.Get<BuffComponent>().Remove(BuffId.DashRun);
+			this.Entity.Components.Get<BuffComponent>()?.Remove(BuffId.DashRun);
 			this.CheckWarp();
 
 			return pos;
@@ -361,6 +591,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private void CheckWarp()
 		{
 			if (this.Entity is not Character character)
+				return;
+
+			if (character.IsOutOfBody())
 				return;
 
 			var prevPos = character.Position;
@@ -393,6 +626,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					return;
 
 				character.Warp(warpNpc.WarpLocation);
+				warpNpc.IncreaseUseCount();
 			});
 		}
 
@@ -404,7 +638,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="type"></param>
 		public void SetMoveSpeedType(MoveSpeedType type)
 		{
-			if (this.Entity is Mob mob && this.MoveSpeedType != type)
+			if (this.MoveSpeedType != type)
 			{
 				this.MoveSpeedType = type;
 				this.Entity.Properties.Invalidate(PropertyName.MSPD);
@@ -439,7 +673,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public void Update(TimeSpan elapsed)
 		{
 			this.UpdateMove(elapsed);
-			this.UpdateTriggerAreas();
+			this.UpdateTriggerAreas(elapsed);
 		}
 
 		/// <summary>
@@ -454,6 +688,17 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				if (!this.IsMoving)
 					return;
 
+				// Don't update movement if the entity is movement locked (e.g., knocked back)
+				// This prevents resuming movement during knockback states
+				if (this.Entity.IsLocked(LockType.Movement))
+				{
+					// Stop and clear any remaining movement to prevent resumption
+					this.IsMoving = false;
+					_path?.Clear();
+					_moveTime = TimeSpan.Zero;
+					return;
+				}
+
 				// Don't update the position this way for directional
 				// movement for now. That will require a bit more
 				// research to get right.
@@ -465,10 +710,20 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				if (!arrived)
 				{
 					this.UpdateEntityPosition(elapsed);
-					return;
 				}
-
-				this.QueueNextMove();
+				else
+					this.QueueNextMove();
+				if (this.ShowMinimapMarker)
+				{
+					if (this.Entity is IMonster monster)
+						Send.ZC_NORMAL.MinimapMarker(monster, 1, 1, 0);
+					else if (this.Entity is Character character)
+						Send.ZC_NORMAL.MinimapMarker(character, 2, 0);
+				}
+				if (this.ShowDebug)
+				{
+					Send.ZC_TEST_DBG(this.Entity);
+				}
 			}
 		}
 
@@ -501,7 +756,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			position.Z += (float)(_moveZ * elapsed.TotalSeconds);
 
 			if (!this.Entity.Map.Ground.TryGetHeightAt(position, out var height))
-				height = 0;
+				height = position.Y;
 
 			position.Y = height;
 
@@ -511,7 +766,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <summary>
 		/// Updates trigger areas and triggers relevant ones.
 		/// </summary>
-		private void UpdateTriggerAreas()
+		private void UpdateTriggerAreas(TimeSpan elapsed)
 		{
 			// TODO: It's technically possible for an entity to move so
 			//   quickly that they zap past a trigger area before we see
@@ -535,7 +790,19 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			foreach (var triggerArea in leftTriggerAreas)
 				triggerArea.LeaveFunc?.Invoke(new TriggerActorArgs(TriggerType.Leave, triggerArea, this.Entity));
 
+			foreach (var triggerArea in triggerAreas)
+				triggerArea.WhileInsideFunc?.Invoke(new TriggerActorArgs(TriggerType.Update, triggerArea, this.Entity));
+
 			_triggerAreas = triggerAreas;
+		}
+
+		/// <summary>
+		/// Sets the movement mode for attached state.
+		/// </summary>
+		/// <param name="usePositionOnly">If true, uses ZC_MOVE_POS instead of directional movement.</param>
+		public void SetAttachmentMovementMode(bool usePositionOnly)
+		{
+			this.UsePositionOnlyMovement = usePositionOnly;
 		}
 	}
 

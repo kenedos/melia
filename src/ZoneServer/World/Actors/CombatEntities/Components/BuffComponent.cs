@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Versioning;
 using Melia.Zone.Buffs;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Extensions;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
+using Melia.Zone.Items.Effects;
 
 namespace Melia.Zone.World.Actors.CombatEntities.Components
 {
@@ -19,10 +22,14 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 	{
 		private readonly Dictionary<BuffId, Buff> _buffs = new();
 
-		/// <summary>
-		/// Returns the amount of buffs in the collection.
-		/// </summary>
-		public int Count { get { lock (_buffs) return _buffs.Count; } }
+		private readonly HashSet<BuffId> _noTextEffect =
+		[
+			BuffId.Rest,
+			BuffId.SitRest,
+			BuffId.DashRun,
+			BuffId.RidingCompanion,
+			BuffId.TakingOwner,
+		];
 
 		/// <summary>
 		/// Raised when a buff starts.
@@ -35,26 +42,22 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public event Action<ICombatEntity, Buff> BuffEnded;
 
 		/// <summary>
+		/// Raised when a buff is updated (e.g., stack count changes).
+		/// </summary>
+		public event Action<ICombatEntity, Buff> BuffUpdated;
+
+		/// <summary>
 		/// Creates new instance for character.
 		/// </summary>
 		/// <param name="entity"></param>
 		public BuffComponent(ICombatEntity entity) : base(entity)
 		{
-			// XXX: Should there perhaps be an attach and detach callback for
-			//   components? This would allow us to clean up subscriptions if
-			//   a component is later removed for some reason.
-			entity.Died += this.OnEntityDied;
 		}
 
 		/// <summary>
-		/// Called if this component's entity dies.
+		/// Returns the amount of buffs in the collection.
 		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="killer"></param>
-		private void OnEntityDied(ICombatEntity entity, ICombatEntity killer)
-		{
-			this.RemoveAll(static a => a.Data.RemoveOnDeath);
-		}
+		public int Count { get { lock (_buffs) return _buffs.Count; } }
 
 		/// <summary>
 		/// Adds given buff and updates the client, replaces the
@@ -100,6 +103,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			}
 
 			Send.ZC_BUFF_UPDATE(this.Entity, buff);
+
+			// Fire event to update properties on client (same as Add does)
+			this.BuffStarted?.Invoke(this.Entity, buff);
 		}
 
 		/// <summary>
@@ -123,10 +129,32 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// Use for restoring saved buffs on load.
 		/// </summary>
 		/// <param name="buff"></param>
-		internal void Restore(Buff buff)
+		public void Restore(Buff buff)
 		{
 			lock (_buffs)
 				_buffs[buff.Id] = buff;
+
+			// Apply stored modifiers from buff Vars to entity properties.
+			// This is needed because buff modifier properties are not persisted
+			// to avoid desync issues between property and buff state.
+			this.RestoreModifiersFromVars(buff);
+		}
+
+		/// <summary>
+		/// Restores property modifiers from buff's stored Vars.
+		/// Called after loading a buff from database to reapply its effects.
+		/// </summary>
+		/// <param name="buff"></param>
+		private void RestoreModifiersFromVars(Buff buff)
+		{
+			foreach (var entry in buff.Vars.GetList())
+			{
+				if (entry.Key.StartsWith(BuffHandler.ModifierVarPrefix) && entry.Value is float value)
+				{
+					var propertyName = entry.Key.Substring(BuffHandler.ModifierVarPrefix.Length);
+					buff.Target.Properties.Modify(propertyName, value);
+				}
+			}
 		}
 
 		/// <summary>
@@ -135,7 +163,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		/// <param name="buff"></param>
 		/// <returns></returns>
-		private bool Remove(Buff buff)
+		private bool Remove(Buff buff, bool silently = false)
 		{
 			lock (_buffs)
 			{
@@ -143,11 +171,20 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					return false;
 			}
 
+			// Need to do this before buff.End because this method checks
+			// for variables inside the buff, which are removed when the
+			// buff ends.
+			var affectsSpeed = buff.AffectsMovementSpeed();
+
 			buff.End();
 
-			Send.ZC_BUFF_REMOVE(this.Entity, buff);
-
 			this.BuffEnded?.Invoke(this.Entity, buff);
+
+			if (!silently)
+			{
+				Send.ZC_BUFF_REMOVE(this.Entity, buff);
+				Send.ZC_MSPD(this.Entity);
+			}
 
 			return true;
 		}
@@ -164,6 +201,35 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				return false;
 
 			return this.Remove(buff);
+		}
+
+		/// <summary>
+		/// Removes buff with given id, returns false if it
+		/// didn't exist. Updates the client on success.
+		/// </summary>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
+		public bool Remove(Func<Buff, bool> predicate)
+		{
+			var removableBuffs = this.GetAll(predicate);
+			if (removableBuffs.Count == 0)
+				return false;
+
+			this.RemoveAll(predicate);
+			return true;
+		}
+
+		/// <summary>
+		/// Removes buff with given tags.
+		/// </summary>
+		public void RemoveBuff(params string[] buffTag)
+		{
+			var removableBuffs = this.GetAll(a => a.Data.Tags.HasAny(buffTag));
+			if (removableBuffs.Count == 0)
+				return;
+
+			foreach (var buff in removableBuffs)
+				this.Remove(buff);
 		}
 
 		/// <summary>
@@ -215,7 +281,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		{
 			var buffs = this.GetList();
 			foreach (var buff in buffs)
-				this.Remove(buff);
+				this.Remove(buff, true);
+			Send.ZC_BUFF_CLEAR(this.Entity);
 		}
 
 		/// <summary>
@@ -225,18 +292,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public void RemoveAll(Func<Buff, bool> predicate)
 		{
 			var buffs = this.GetList();
-			foreach (var buff in buffs)
+			foreach (var buff in buffs.Where(buff => predicate(buff)))
 			{
-				if (predicate(buff))
-					this.Remove(buff);
+				this.Remove(buff);
 			}
 		}
-
-		/// <summary>
-		/// Removes buffs that aren't to be saved on disconnect or map change.
-		/// </summary>
-		public void RemoveTempBuffs()
-			=> this.RemoveAll(static a => !a.Data.Save);
 
 		/// <summary>
 		/// Returns buff with given id, or null if it didn't
@@ -270,7 +330,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// Returns buff with given class name, or null if it didn't
 		/// exist.
 		/// </summary>
-		/// <param name="buffId"></param>
+		/// <param name="buffClassName"></param>
 		/// <returns></returns>
 		public Buff Get(string buffClassName)
 		{
@@ -293,6 +353,17 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		/// <param name="predicate"></param>
 		/// <returns></returns>
+		public bool Exists(Func<Buff, bool> predicate)
+		{
+			lock (_buffs)
+				return _buffs.Values.Any(predicate);
+		}
+
+		/// <summary>
+		/// Returns a list of all active buffs that match the given predicate.
+		/// </summary>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
 		public List<Buff> GetAll(Func<Buff, bool> predicate)
 		{
 			lock (_buffs)
@@ -308,6 +379,19 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		{
 			lock (_buffs)
 				return _buffs.Values.Count(predicate);
+		}
+
+		/// <summary>
+		/// Returns true if any buff exists.
+		/// </summary>
+		/// <param name="buffIds"></param>
+		/// <returns></returns>
+		public bool HasAny(params BuffId[] buffIds)
+		{
+			lock (_buffs)
+			{
+				return Array.Exists(buffIds, _buffs.ContainsKey);
+			}
 		}
 
 		/// <summary>
@@ -336,10 +420,65 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Starts the buff with the given name or overbuffs it if it's
+		/// already active. Returns the new or modified buff.
+		/// </summary>
+		/// <param name="buffClassName"></param>
+		/// <param name="numArg1"></param>
+		/// <param name="numArg2"></param>
+		/// <param name="duration"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException">
+		/// Thrown if the buff doesn't exist in the data.
+		/// </exception>
+		/// <exception cref="InvalidOperationException">
+		/// Thrown if the buff doesn't have a handler.
+		/// </exception>
+		public Buff Start(string buffClassName, float numArg1, float numArg2, TimeSpan duration, ICombatEntity caster)
+		{
+			if (!ZoneServer.Instance.Data.BuffDb.TryFind(a => a.ClassName == buffClassName, out var buffData))
+				throw new ArgumentException($"Buff with class name '{buffClassName}' not found.");
+
+			// I'm split on whether we should let buffs run without a
+			// handler, but this method will primarily used from item
+			// scripts, and we don't want items to be used when they
+			// start a buff that isn't implemented.
+			if (!ZoneServer.Instance.BuffHandlers.Has(buffData.Id))
+				throw new BuffNotImplementedException(buffData.Id);
+
+			return this.Start(buffData.Id, numArg1, numArg2, duration, caster);
+		}
+
+		/// <summary>
+		/// Starts the buff with the given id, returns the created buff.
+		/// If the buff was already active, it gets overbuffed.
+		/// </summary>
+		/// <remarks>
+		/// Uses the duration from the buff's data by default.
+		/// </remarks>
+		/// <param name="buffId"></param>
+		/// <returns></returns>
+		public Buff Start(BuffId buffId)
+			=> this.Start(buffId, TimeSpan.MinValue);
+
+		/// <summary>
+		/// Starts the buff with the given id. If the buff is already active,
+		/// it gets overbuffed. Returns the created or modified buff.
+		/// </summary>
+		/// <param name="buffId"></param>
+		/// <param name="duration">Custom duration of the buff.</param>
+		/// <returns></returns>
+		public Buff Start(BuffId buffId, TimeSpan duration)
+			=> this.Start(buffId, 0, 0, duration, this.Entity);
+
+		/// <summary>
 		/// Starts the buff with the given id. If the buff is already active,
 		/// it gets overbuffed. Returns the created or modified buff. May
 		/// return null if the buff was resisted for some reason.
 		/// </summary>
+		/// <remarks>
+		/// May return null if buff cannot be applied
+		/// </remarks>
 		/// <param name="buffId"></param>
 		/// <param name="numArg1"></param>
 		/// <param name="numArg2"></param>
@@ -347,19 +486,84 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="caster">The entity that casted the buff.</param>
 		/// <param name="skillId">The id of the skill associated with the buff.</param>
 		/// <returns></returns>
-		public Buff Start(BuffId buffId, float numArg1, float numArg2, TimeSpan duration, ICombatEntity caster, SkillId skillId)
+		public Buff Start(BuffId buffId, float numArg1, float numArg2, TimeSpan duration, IActor caster, SkillId skillId = SkillId.Normal_Attack)
+			=> this.Start(buffId, numArg1, numArg2, duration, caster, skillId, null);
+
+		/// <summary>
+		/// Starts the buff with the given id. If the buff is already active,
+		/// it gets overbuffed. Returns the created or modified buff. May
+		/// return null if the buff was resisted for some reason.
+		/// </summary>
+		/// <remarks>
+		/// May return null if buff cannot be applied
+		/// </remarks>
+		/// <param name="buffId"></param>
+		/// <param name="numArg1"></param>
+		/// <param name="numArg2"></param>
+		/// <param name="duration">Custom duration of the buff.</param>
+		/// <param name="caster">The entity that casted the buff.</param>
+		/// <param name="skillId">The id of the skill associated with the buff.</param>
+		/// <param name="initializer">Optional action to initialize buff variables before activation.</param>
+		/// <returns></returns>
+		public Buff Start(BuffId buffId, float numArg1, float numArg2, TimeSpan duration, IActor caster, SkillId skillId, Action<Buff> initializer)
 		{
+			if (Versions.Protocol < 200 && !ZoneServer.Instance.Data.BuffDb.TryFind(a => a.Id == buffId, out var _))
+				return null;
+
 			if (this.TryResistDebuff(buffId, caster))
 				return null;
 
-			if (!this.TryGet(buffId, out var buff))
+			if (!ZoneServer.Instance.Data.BuffDb.TryFind(a => a.Id == buffId, out var buffData))
+				throw new ArgumentException($"Buff Id '{buffId}' not found.");
+
+			Buff buff;
+			lock (_buffs)
 			{
-				buff = new Buff(buffId, numArg1, numArg2, duration, TimeSpan.Zero, this.Entity, caster ?? this.Entity, skillId);
-				this.Add(buff);
+				if (!_buffs.TryGetValue(buffId, out buff))
+				{
+					buff = new Buff(buffId, numArg1, numArg2, duration, TimeSpan.Zero, this.Entity, caster ?? this.Entity, skillId);
+					_buffs[buff.Id] = buff;
+					buff.IncreaseOverbuff();
+					initializer?.Invoke(buff);
+					buff.Activate(ActivationType.Start);
+				}
+				else
+				{
+					var overbuff = buff.OverbuffCounter;
+					buff.IncreaseOverbuff();
+
+					// Store the new numArg2 value so handlers can access it
+					// (e.g., for DoT stacking where damage should be added)
+					buff.NumArg2 = numArg2;
+
+					initializer?.Invoke(buff);
+
+					if (overbuff != buff.OverbuffCounter)
+					{
+						buff.Activate(ActivationType.Overbuff);
+					}
+					else
+					{
+						buff.Extend();
+					}
+				}
 			}
-			else
+
+			// Send packets after releasing the lock to avoid potential deadlocks
+			if (buff != null)
 			{
-				this.Overbuff(buff);
+				if (!_buffs.ContainsKey(buffId) || buff.OverbuffCounter == 1)
+				{
+					if (!_noTextEffect.Contains(buffId))
+						Send.ZC_NORMAL.PlayTextEffect(this.Entity, caster, "SHOW_BUFF_TEXT", (int)buffId, "");
+					Send.ZC_BUFF_ADD(this.Entity, buff);
+				}
+				else
+				{
+					Send.ZC_BUFF_UPDATE(this.Entity, buff);
+				}
+
+				this.BuffStarted?.Invoke(this.Entity, buff);
 			}
 
 			return buff;
@@ -372,7 +576,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="buffId"></param>
 		/// <param name="caster"></param>
 		/// <returns></returns>
-		private bool TryResistDebuff(BuffId buffId, ICombatEntity caster)
+		private bool TryResistDebuff(BuffId buffId, IActor caster)
 		{
 			// TODO: Ideally, this should happen from the buff handler,
 			//   and we might also want to move the check somewhere else,
@@ -392,10 +596,35 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (this.Has(BuffId.Rampage_Buff) && buffData.Removable)
 				return true;
 
-			if (this.TryGet(BuffId.Cyclone_Buff_ImmuneAbil, out var cycloneImmuneBuff))
+			if (this.Has(BuffId.Cure_Buff))
+				return true;
+
+			// Cannot apply debuffs to bosses when they have shield
+			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss && mob.Shield > 0)
+				return true;
+
+			if (this.TryGet(BuffId.Cyclone_Buff_ImmuneAbil, out var cycloneImmuneBuff)
+				&& RandomProvider.Get().Next(100) < cycloneImmuneBuff.NumArg1 * 15)
+				return true;
+
+			if (this.TryGet(BuffId.Ausirine_Buff, out var ausirineBuff))
 			{
-				if (RandomProvider.Get().Next(100) < cycloneImmuneBuff.NumArg1 * 15)
+				var skillLevel = ausirineBuff.NumArg1;
+				var resistanceChance = 30 + (3 * skillLevel);
+				if (RandomProvider.Get().Next(100) < resistanceChance)
 					return true;
+			}
+
+			// Check card/item debuff resistance
+			if (this.Entity is Characters.Character character)
+			{
+				var resistRate = ItemHookRegistry.Instance.GetDebuffResistance(character, buffId);
+				if (resistRate > 0f)
+				{
+					var roll = RandomProvider.Get().NextDouble();
+					if (roll < resistRate)
+						return true;
+				}
 			}
 
 			return false;
@@ -404,11 +633,12 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <summary>
 		/// Stops the buff with the given id.
 		/// </summary>
-		/// <param name="buffId"></param>
-		public void Stop(BuffId buffId)
+		/// <param name="buffIds"></param>
+		public void Stop(params BuffId[] buffIds)
 		{
-			if (this.TryGet(buffId, out var buff))
-				this.Remove(buff);
+			foreach (var buffId in buffIds)
+				if (this.TryGet(buffId, out var buff))
+					this.Remove(buff);
 		}
 
 		/// <summary>
@@ -426,12 +656,50 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				{
 					if (buff.HasUpdateTime)
 					{
-						if (toUpdate == null)
-							toUpdate = new List<Buff>();
-
+						toUpdate ??= new List<Buff>();
 						toUpdate.Add(buff);
 					}
 					if (buff.HasDuration && now >= buff.RemovalTime)
+					{
+						toRemove ??= new List<Buff>();
+						toRemove.Add(buff);
+					}
+					if (buff.Target.IsDead && buff.Data.RemoveOnDeath)
+					{
+						toRemove ??= new List<Buff>();
+						toRemove.Add(buff);
+					}
+				}
+			}
+
+			if (toUpdate != null)
+			{
+				foreach (var buff in toUpdate)
+				{
+					if (this.Has(buff.Id))
+						buff.Update(elapsed);
+				}
+			}
+
+			if (toRemove != null)
+			{
+				foreach (var buff in toRemove)
+					this.Remove(buff);
+			}
+		}
+
+		/// <summary>
+		/// Removes buffs that aren't saved on disconnect or map change.
+		/// </summary>
+		public void StopTempBuffs()
+		{
+			List<Buff> toRemove = null;
+
+			lock (_buffs)
+			{
+				foreach (var buff in _buffs.Values)
+				{
+					if (!buff.Data.Save)
 					{
 						if (toRemove == null)
 							toRemove = new List<Buff>();
@@ -441,17 +709,44 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				}
 			}
 
-			if (toUpdate != null)
-			{
-				foreach (var buff in toUpdate)
-					buff.Update(elapsed);
-			}
-
 			if (toRemove != null)
 			{
 				foreach (var buff in toRemove)
 					this.Remove(buff);
 			}
+		}
+
+		/// <summary>
+		/// Notifies that a buff has been updated (e.g., stack count changed).
+		/// Sends update packet and raises BuffUpdated event.
+		/// </summary>
+		/// <param name="buff"></param>
+		public void NotifyBuffUpdate(Buff buff)
+		{
+			Send.ZC_BUFF_UPDATE(this.Entity, buff);
+
+			// Fire event to update properties on client
+			this.BuffUpdated?.Invoke(this.Entity, buff);
+		}
+	}
+
+	/// <summary>
+	/// Exception for when a buff handler is not implemented.
+	/// </summary>
+	public class BuffNotImplementedException : Exception
+	{
+		/// <summary>
+		/// Returns the id of the buff that wasn't implemented.
+		/// </summary>
+		public BuffId BuffId { get; }
+
+		/// <summary>
+		/// Creates new instance.
+		/// </summary>
+		/// <param name="buffId"></param>
+		public BuffNotImplementedException(BuffId buffId) : base($"Buff handler for '{buffId}' not implemented.")
+		{
+			this.BuffId = buffId;
 		}
 	}
 }

@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Items;
 using Yggdrasil.Logging;
 
 public class TradeSelectItemScript : GeneralScript
@@ -43,7 +44,7 @@ public class TradeSelectItemScript : GeneralScript
 		var item = character.Inventory.GetItem(itemObjectId);
 		if (item == null)
 		{
-			Log.Warning("SCR_TX_TRADE_SELECT_ITEM_RANOPT: User '{0}' tried to use a non-existant item.", character.Username);
+			Log.Warning("SCR_TX_TRADE_SELECT_ITEM_RANOPT: User '{0}' tried to use a non-exitant item.", character.Username);
 			return NormalTxResult.Fail;
 		}
 

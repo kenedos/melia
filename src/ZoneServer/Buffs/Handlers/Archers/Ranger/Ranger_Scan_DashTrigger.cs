@@ -21,7 +21,8 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Ranger
 
 		public override void WhileActive(Buff buff)
 		{
-			var caster = buff.Caster;
+			if (buff.Caster is not ICombatEntity caster)
+				return;
 
 			if (!caster.TryGetSkill(SkillId.Ranger_Scan, out var scanSkill))
 				return;

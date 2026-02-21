@@ -35,10 +35,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 
 			if (target == null)
 			{
-				Send.ZC_NORMAL.Skill_42(caster, skill.Id, caster.Direction, ForceId.GetNew());
+				// TODO: Skill_42 not implemented
+				//Send.ZC_NORMAL.Skill_42(caster, skill.Id, caster.Direction, ForceId.GetNew());
 				Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
 				Send.ZC_SKILL_FORCE_TARGET(caster, null, skill, null);
-				Send.ZC_NORMAL.Skill_43(caster);
+				// TODO: Skill_43 not implemented
+				//Send.ZC_NORMAL.Skill_43(caster);
 				return;
 			}
 
