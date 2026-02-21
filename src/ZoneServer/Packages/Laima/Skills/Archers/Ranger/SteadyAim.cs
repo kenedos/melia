@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// </remarks>
 	[Package("laima")]
 	[SkillHandler(SkillId.Ranger_SteadyAim)]
-	public class Ranger_SteadyAim : ISelfSkillHandler
+	public class Ranger_SteadyAimOverride : ISelfSkillHandler
 	{
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Direction dir)
 		{
