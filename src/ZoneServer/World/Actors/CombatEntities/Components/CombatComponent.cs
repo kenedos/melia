@@ -144,18 +144,22 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <returns></returns>
 		public ICombatEntity GetTopAttackerByDamage()
 		{
+			int[] handles;
+
 			lock (_hitLock)
 			{
-				foreach (var handle in from kv in _damageTaken.OrderByDescending(a => a.Value)
-									   let handle = kv.Key
-									   select handle)
-				{
-					if (!this.Entity.Map.TryGetCombatEntity(handle, out var attacker))
-						continue;
-					if (attacker.IsDead)
-						continue;
-					return attacker;
-				}
+				handles = _damageTaken.OrderByDescending(a => a.Value)
+					.Select(kv => kv.Key)
+					.ToArray();
+			}
+
+			foreach (var handle in handles)
+			{
+				if (!this.Entity.Map.TryGetCombatEntity(handle, out var attacker))
+					continue;
+				if (attacker.IsDead)
+					continue;
+				return attacker;
 			}
 
 			return null;
@@ -169,23 +173,25 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <returns>List of tuples containing the attacker and their total damage dealt.</returns>
 		public List<(ICombatEntity Attacker, float Damage)> GetTopAttackersByDamage(int count)
 		{
-			var result = new List<(ICombatEntity, float)>();
+			KeyValuePair<int, float>[] snapshot;
 
 			lock (_hitLock)
+				snapshot = _damageTaken.OrderByDescending(a => a.Value).ToArray();
+
+			var result = new List<(ICombatEntity, float)>();
+
+			foreach (var kv in snapshot)
 			{
-				foreach (var kv in _damageTaken.OrderByDescending(a => a.Value))
-				{
-					if (result.Count >= count)
-						break;
+				if (result.Count >= count)
+					break;
 
-					if (!this.Entity.Map.TryGetCombatEntity(kv.Key, out var attacker))
-						continue;
+				if (!this.Entity.Map.TryGetCombatEntity(kv.Key, out var attacker))
+					continue;
 
-					if (attacker.IsDead)
-						continue;
+				if (attacker.IsDead)
+					continue;
 
-					result.Add((attacker, kv.Value));
-				}
+				result.Add((attacker, kv.Value));
 			}
 
 			return result;
@@ -198,18 +204,22 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <returns></returns>
 		public ICombatEntity GetTopAttackerByHits()
 		{
+			int[] handles;
+
 			lock (_hitLock)
 			{
-				foreach (var handle in from kv in _hitsTaken.OrderByDescending(a => a.Value)
-									   let handle = kv.Key
-									   select handle)
-				{
-					if (!this.Entity.Map.TryGetCombatEntity(handle, out var attacker))
-						continue;
-					if (attacker.IsDead)
-						continue;
-					return attacker;
-				}
+				handles = _hitsTaken.OrderByDescending(a => a.Value)
+					.Select(kv => kv.Key)
+					.ToArray();
+			}
+
+			foreach (var handle in handles)
+			{
+				if (!this.Entity.Map.TryGetCombatEntity(handle, out var attacker))
+					continue;
+				if (attacker.IsDead)
+					continue;
+				return attacker;
 			}
 
 			return null;
@@ -324,12 +334,16 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 		public ICombatEntity[] GetTargets()
 		{
-			var results = new List<ICombatEntity>();
+			int[] handles;
+
 			lock (_targets)
+				handles = _targets.ToArray();
+
+			var results = new List<ICombatEntity>();
+			foreach (var targetHandle in handles)
 			{
-				foreach (var targetHandle in _targets)
-					if (this.Entity.Map.TryGetCombatEntity(targetHandle, out var entity))
-						results.Add(entity);
+				if (this.Entity.Map.TryGetCombatEntity(targetHandle, out var entity))
+					results.Add(entity);
 			}
 
 			return results.ToArray();
@@ -337,11 +351,14 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 		public ICombatEntity GetRandomTarget()
 		{
+			int handle;
+
 			lock (_targets)
-			{
-				if (this.Entity.Map.TryGetCombatEntity(_targets.Random(), out var entity))
-					return entity;
-			}
+				handle = _targets.Random();
+
+			if (this.Entity.Map.TryGetCombatEntity(handle, out var entity))
+				return entity;
+
 			return null;
 		}
 

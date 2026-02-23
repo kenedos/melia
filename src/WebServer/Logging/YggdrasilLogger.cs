@@ -37,6 +37,9 @@ namespace Melia.Web.Logging
 		/// <param name="logEvent"></param>
 		public void Log(LogMessageReceivedEventArgs logEvent)
 		{
+			if (logEvent.MessageType == LogLevel.Debug || logEvent.MessageType == LogLevel.Trace)
+				return;
+
 			var yggdrasilLevel = GetYggdrasilLogLevel(logEvent.MessageType);
 			if ((_filter & yggdrasilLevel) != 0)
 				return;

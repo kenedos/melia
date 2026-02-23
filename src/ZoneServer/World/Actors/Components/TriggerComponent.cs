@@ -266,22 +266,25 @@ namespace Melia.Zone.World.Actors.Components
 
 			var nowInside = this.Actor.Map.GetActorsIn<IActor>(this.Area, this.IsValidTriggerer);
 
+			List<IActor> entered;
+			List<IActor> left;
+
 			lock (_syncLock)
 			{
 				var wereInside = _actorsInside;
 
-				var entered = nowInside.Except(wereInside);
-				var left = wereInside.Except(nowInside);
-
-				foreach (var actor in entered)
-					this.Entered?.Invoke(this, new TriggerActorArgs(TriggerType.Enter, this.Actor, actor));
-
-				foreach (var actor in left)
-					this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
+				entered = nowInside.Except(wereInside).ToList();
+				left = wereInside.Except(nowInside).ToList();
 
 				_actorsInside = nowInside;
 				this.ActorCount = nowInside.Count;
 			}
+
+			foreach (var actor in entered)
+				this.Entered?.Invoke(this, new TriggerActorArgs(TriggerType.Enter, this.Actor, actor));
+
+			foreach (var actor in left)
+				this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
 
 			_updateTimer += elapsed;
 

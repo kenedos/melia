@@ -517,6 +517,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				throw new ArgumentException($"Buff Id '{buffId}' not found.");
 
 			Buff buff;
+			bool isNew;
+			bool overbuffChanged = false;
+
 			lock (_buffs)
 			{
 				if (!_buffs.TryGetValue(buffId, out buff))
@@ -525,7 +528,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					_buffs[buff.Id] = buff;
 					buff.IncreaseOverbuff();
 					initializer?.Invoke(buff);
-					buff.Activate(ActivationType.Start);
+					isNew = true;
 				}
 				else
 				{
@@ -538,33 +541,34 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 					initializer?.Invoke(buff);
 
-					if (overbuff != buff.OverbuffCounter)
-					{
-						buff.Activate(ActivationType.Overbuff);
-					}
-					else
-					{
+					overbuffChanged = (overbuff != buff.OverbuffCounter);
+					if (!overbuffChanged)
 						buff.Extend();
-					}
+
+					isNew = false;
 				}
 			}
 
-			// Send packets after releasing the lock to avoid potential deadlocks
-			if (buff != null)
+			// Activate outside the lock to avoid deadlocks with
+			// ItemHookRegistry, as activation can trigger combat
+			// calculations that invoke item hooks.
+			if (isNew)
+				buff.Activate(ActivationType.Start);
+			else if (overbuffChanged)
+				buff.Activate(ActivationType.Overbuff);
+
+			if (isNew)
 			{
-				if (!_buffs.ContainsKey(buffId) || buff.OverbuffCounter == 1)
-				{
-					if (!_noTextEffect.Contains(buffId))
-						Send.ZC_NORMAL.PlayTextEffect(this.Entity, caster, "SHOW_BUFF_TEXT", (int)buffId, "");
-					Send.ZC_BUFF_ADD(this.Entity, buff);
-				}
-				else
-				{
-					Send.ZC_BUFF_UPDATE(this.Entity, buff);
-				}
-
-				this.BuffStarted?.Invoke(this.Entity, buff);
+				if (!_noTextEffect.Contains(buffId))
+					Send.ZC_NORMAL.PlayTextEffect(this.Entity, caster, "SHOW_BUFF_TEXT", (int)buffId, "");
+				Send.ZC_BUFF_ADD(this.Entity, buff);
 			}
+			else
+			{
+				Send.ZC_BUFF_UPDATE(this.Entity, buff);
+			}
+
+			this.BuffStarted?.Invoke(this.Entity, buff);
 
 			return buff;
 		}

@@ -97,6 +97,8 @@ namespace Melia.Zone.Items.Effects
 			if (attacker is not Character character)
 				return;
 
+			List<(Item item, ItemCombatHook hook)> toInvoke = null;
+
 			lock (_hooks)
 			{
 				if (!_hooks.TryGetValue(character, out var characterHooks))
@@ -107,10 +109,8 @@ namespace Melia.Zone.Items.Effects
 					if (!hooksByType.TryGetValue(hookType, out var hooks))
 						continue;
 
-					// Get the item instance - check inventory first, then cards
 					if (!character.Inventory.TryGetItem(itemObjectId, out var item))
 					{
-						// Check if it's a card
 						var cards = character.Inventory.GetCards();
 						if (!cards.Any(kvp => kvp.Value.ObjectId == itemObjectId))
 							continue;
@@ -118,10 +118,18 @@ namespace Melia.Zone.Items.Effects
 						item = cards.First(kvp => kvp.Value.ObjectId == itemObjectId).Value;
 					}
 
-					// Invoke all hooks for this item
 					foreach (var hook in hooks)
-						hook(item, attacker, target, skill, modifier, skillHitResult);
+					{
+						toInvoke ??= new();
+						toInvoke.Add((item, hook));
+					}
 				}
+			}
+
+			if (toInvoke != null)
+			{
+				foreach (var (item, hook) in toInvoke)
+					hook(item, attacker, target, skill, modifier, skillHitResult);
 			}
 		}
 
@@ -133,6 +141,8 @@ namespace Melia.Zone.Items.Effects
 			if (target is not Character character)
 				return;
 
+			List<(Item item, ItemCombatHook hook)> toInvoke = null;
+
 			lock (_hooks)
 			{
 				if (!_hooks.TryGetValue(character, out var characterHooks))
@@ -143,10 +153,8 @@ namespace Melia.Zone.Items.Effects
 					if (!hooksByType.TryGetValue(hookType, out var hooks))
 						continue;
 
-					// Get the item instance - check inventory first, then cards
 					if (!character.Inventory.TryGetItem(itemObjectId, out var item))
 					{
-						// Check if it's a card
 						var cards = character.Inventory.GetCards();
 						if (!cards.Any(kvp => kvp.Value.ObjectId == itemObjectId))
 							continue;
@@ -155,8 +163,17 @@ namespace Melia.Zone.Items.Effects
 					}
 
 					foreach (var hook in hooks)
-						hook(item, attacker, target, skill, modifier, skillHitResult);
+					{
+						toInvoke ??= new();
+						toInvoke.Add((item, hook));
+					}
 				}
+			}
+
+			if (toInvoke != null)
+			{
+				foreach (var (item, hook) in toInvoke)
+					hook(item, attacker, target, skill, modifier, skillHitResult);
 			}
 		}
 
@@ -165,29 +182,36 @@ namespace Melia.Zone.Items.Effects
 		/// </summary>
 		public void InvokeKillHooks(Character character, ICombatEntity target)
 		{
+			List<(Item item, ItemCombatHook hook)> toInvoke = null;
+
 			lock (_hooks)
 			{
 				if (!_hooks.TryGetValue(character, out var characterHooks))
 					return;
 
-				// Get cards from inventory
 				var cards = character.Inventory.GetCards();
 
-				// Iterate through all registered hooks for this character
 				foreach (var (itemObjectId, hooksByType) in characterHooks)
 				{
 					if (!hooksByType.TryGetValue(ItemHookType.Kill, out var hooks))
 						continue;
 
-					// Get the card item
 					var card = cards.Values.FirstOrDefault(c => c.ObjectId == itemObjectId);
 					if (card == null)
 						continue;
 
-					// Invoke all Kill hooks for this card
 					foreach (var hook in hooks)
-						hook(card, character, target, null, null, null);
+					{
+						toInvoke ??= new();
+						toInvoke.Add((card, hook));
+					}
 				}
+			}
+
+			if (toInvoke != null)
+			{
+				foreach (var (item, hook) in toInvoke)
+					hook(item, character, target, null, null, null);
 			}
 		}
 
@@ -196,29 +220,36 @@ namespace Melia.Zone.Items.Effects
 		/// </summary>
 		public void InvokeDeadHooks(Character character, ICombatEntity killer)
 		{
+			List<(Item item, ItemCombatHook hook)> toInvoke = null;
+
 			lock (_hooks)
 			{
 				if (!_hooks.TryGetValue(character, out var characterHooks))
 					return;
 
-				// Get cards from inventory
 				var cards = character.Inventory.GetCards();
 
-				// Iterate through all registered hooks for this character
 				foreach (var (itemObjectId, hooksByType) in characterHooks)
 				{
 					if (!hooksByType.TryGetValue(ItemHookType.Dead, out var hooks))
 						continue;
 
-					// Get the card item
 					var card = cards.Values.FirstOrDefault(c => c.ObjectId == itemObjectId);
 					if (card == null)
 						continue;
 
-					// Invoke all Dead hooks for this card
 					foreach (var hook in hooks)
-						hook(card, killer, character, null, null, null);
+					{
+						toInvoke ??= new();
+						toInvoke.Add((card, hook));
+					}
 				}
+			}
+
+			if (toInvoke != null)
+			{
+				foreach (var (item, hook) in toInvoke)
+					hook(item, killer, character, null, null, null);
 			}
 		}
 
@@ -241,6 +272,8 @@ namespace Melia.Zone.Items.Effects
 			if (!isPotionUse)
 				return;
 
+			List<(Item item, ItemCombatHook hook)> toInvoke = null;
+
 			lock (_hooks)
 			{
 				if (!_hooks.TryGetValue(character, out var characterHooks))
@@ -251,23 +284,29 @@ namespace Melia.Zone.Items.Effects
 					if (!hooksByType.TryGetValue(ItemHookType.ItemUse, out var hooks))
 						continue;
 
-					// Get the card item from cards collection
 					var cards = character.Inventory.GetCards();
 					var item = cards.Values.FirstOrDefault(c => c.ObjectId == itemObjectId);
 					if (item == null)
 						continue;
 
-					// Check if card condition matches the used item
 					if (!CardMetadataRegistry.Instance.TryGet(itemObjectId, out var metadata))
 						continue;
 
 					if (!this.CheckItemUseCondition(metadata, usedItem))
 						continue;
 
-					// Invoke all PotionUse hooks for this item
 					foreach (var hook in hooks)
-						hook(item, character, character, null, null, null);
+					{
+						toInvoke ??= new();
+						toInvoke.Add((item, hook));
+					}
 				}
+			}
+
+			if (toInvoke != null)
+			{
+				foreach (var (item, hook) in toInvoke)
+					hook(item, character, character, null, null, null);
 			}
 		}
 
@@ -320,7 +359,7 @@ namespace Melia.Zone.Items.Effects
 		/// </summary>
 		public float GetDebuffResistance(Character character, Shared.Game.Const.BuffId buffId)
 		{
-			var totalResistRate = 0f;
+			List<(Item item, ItemDebuffResistHook hook)> toInvoke = null;
 
 			lock (_debuffResistHooks)
 			{
@@ -329,10 +368,8 @@ namespace Melia.Zone.Items.Effects
 
 				foreach (var (itemObjectId, hooks) in characterDebuffHooks)
 				{
-					// Get the item instance - check inventory first, then cards
 					if (!character.Inventory.TryGetItem(itemObjectId, out var item))
 					{
-						// Check if it's a card
 						var cards = character.Inventory.GetCards();
 						if (!cards.Any(kvp => kvp.Value.ObjectId == itemObjectId))
 							continue;
@@ -340,14 +377,21 @@ namespace Melia.Zone.Items.Effects
 						item = cards.First(kvp => kvp.Value.ObjectId == itemObjectId).Value;
 					}
 
-					// Invoke all debuff resist hooks for this item
 					foreach (var hook in hooks)
 					{
-						var resistRate = hook(item, buffId);
-						totalResistRate += resistRate;
+						toInvoke ??= new();
+						toInvoke.Add((item, hook));
 					}
 				}
 			}
+
+			if (toInvoke == null)
+				return 0f;
+
+			var totalResistRate = 0f;
+
+			foreach (var (item, hook) in toInvoke)
+				totalResistRate += hook(item, buffId);
 
 			// Cap at 100% resistance
 			return Math.Min(totalResistRate, 1.0f);

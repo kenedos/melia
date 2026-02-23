@@ -23,7 +23,7 @@ namespace Melia.Zone.Pads.Handlers
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
 			pad.SetRange(70f);
 			pad.SetUpdateInterval(500);
-			pad.Trigger.LifeTime = skill.Data.ShootTime > TimeSpan.Zero ? skill.Data.ShootTime : TimeSpan.FromMilliseconds(10000);
+			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(700);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -43,7 +43,7 @@ namespace Melia.Zone.Pads.Handlers
 
 			var buffTime = 5000 + (int)(skill.Level * 500);
 
-			PadTargetBuffAfterBuffCheck(pad, initiator, RelationType.Enemy, 0, 0, BuffId.Stop_Debuff, BuffId.Stop_Debuff, skill.Level, 0, buffTime, 0, 100, false);
+			//PadTargetBuffAfterBuffCheck(pad, initiator, RelationType.Enemy, 0, 0, BuffId.Stop_Debuff, BuffId.Stop_Debuff, skill.Level, 0, buffTime, 0, 100, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

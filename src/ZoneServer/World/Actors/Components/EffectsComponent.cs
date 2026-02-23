@@ -34,17 +34,17 @@ namespace Melia.Zone.World.Actors.Components
 			{
 				var effectName = $"{_effects.Count}";
 				_effects.Add(effectName, effect);
-				this.BroadcastEffectAddition(effect);
 			}
+
+			this.BroadcastEffectAddition(effect);
 		}
 
 		public void AddEffect(string effectName, Effect effect)
 		{
 			lock (_effects)
-			{
 				_effects.Add(effectName, effect);
-				this.BroadcastEffectAddition(effect);
-			}
+
+			this.BroadcastEffectAddition(effect);
 		}
 
 		/// <summary>
@@ -71,11 +71,13 @@ namespace Melia.Zone.World.Actors.Components
 
 		public void ShowEffects(IZoneConnection connection)
 		{
+			Effect[] snapshot;
+
 			lock (_effects)
-			{
-				foreach (var effect in _effects.Values)
-					effect.ShowEffect(connection, this.Actor);
-			}
+				snapshot = _effects.Values.ToArray();
+
+			foreach (var effect in snapshot)
+				effect.ShowEffect(connection, this.Actor);
 		}
 
 		/// <summary>
@@ -87,14 +89,18 @@ namespace Melia.Zone.World.Actors.Components
 			if (string.IsNullOrEmpty(effectName))
 				return;
 
+			Effect removed = null;
+
 			lock (_effects)
 			{
 				if (_effects.TryGetValue(effectName, out var effect))
 				{
-					effect.OnRemove(this.Actor);
+					removed = effect;
 					_effects.Remove(effectName);
 				}
 			}
+
+			removed?.OnRemove(this.Actor);
 		}
 
 		/// <summary>
@@ -103,13 +109,15 @@ namespace Melia.Zone.World.Actors.Components
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
+			Effect[] snapshot;
+
 			lock (_effects)
+				snapshot = _effects.Values.ToArray();
+
+			foreach (var effect in snapshot)
 			{
-				foreach (var effect in _effects.Values)
-				{
-					if (effect is IUpdateable updateable)
-						updateable.Update(elapsed);
-				}
+				if (effect is IUpdateable updateable)
+					updateable.Update(elapsed);
 			}
 		}
 	}

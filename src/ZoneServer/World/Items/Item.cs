@@ -1599,9 +1599,13 @@ namespace Melia.Zone.World.Items
 			if (other == null)
 				return;
 
-			lock (this._gemSockets)
+			// Use consistent lock ordering by ObjectId to prevent ABBA deadlock
+			var first = this.ObjectId <= other.ObjectId ? this._gemSockets : other._gemSockets;
+			var second = this.ObjectId <= other.ObjectId ? other._gemSockets : this._gemSockets;
+
+			lock (first)
 			{
-				lock (other._gemSockets)
+				lock (second)
 				{
 					this._gemSockets.Clear();
 					for (var i = 0; i < other._gemSockets.Count; i++)
@@ -1609,13 +1613,11 @@ namespace Melia.Zone.World.Items
 						var gem = other._gemSockets[i];
 						if (gem != null)
 						{
-							// Create a copy of the gem
 							var gemCopy = new Item(gem);
 							this._gemSockets.Add(gemCopy);
 						}
 						else
 						{
-							// Add empty socket
 							this._gemSockets.Add(null);
 						}
 					}
