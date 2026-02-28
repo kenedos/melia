@@ -24,6 +24,7 @@ namespace Melia.Zone.Pads.Handlers
 			pad.SetRange(70f);
 			pad.SetUpdateInterval(500);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(700);
+			pad.Trigger.MaxActorCount = 9;
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -40,10 +41,6 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var initiator = args.Initiator;
 			var skill = pad.Skill;
-
-			var buffTime = 5000 + (int)(skill.Level * 500);
-
-			//PadTargetBuffAfterBuffCheck(pad, initiator, RelationType.Enemy, 0, 0, BuffId.Stop_Debuff, BuffId.Stop_Debuff, skill.Level, 0, buffTime, 0, 100, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)
@@ -52,7 +49,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			var buffTime = 5000 + (int)(skill.Level * 500);
+			var buffTime = (int)((4f + 0.4f * skill.Level) * 1000);
 
 			PadBuffEnemyMonster(pad, RelationType.Enemy, 0, 0, BuffId.Stop_Debuff, skill.Level, 0, buffTime, 0, 100);
 		}

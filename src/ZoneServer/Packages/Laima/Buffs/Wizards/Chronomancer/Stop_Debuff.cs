@@ -15,6 +15,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 			buff.Target.AddState(StateType.Held, buff.Duration);
 			buff.Target.Lock(LockType.Attack, buff.Duration);
 			buff.Target.Lock(LockType.GetHit, buff.Duration);
+			buff.Target.SetSafeState(true);
 		}
 
 		public override void OnExtend(Buff buff)
@@ -22,6 +23,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 			buff.Target.AddState(StateType.Held, buff.Duration);
 			buff.Target.Lock(LockType.Attack, buff.Duration);
 			buff.Target.Lock(LockType.GetHit, buff.Duration);
+			buff.Target.SetSafeState(true);
 		}
 
 		public override void OnEnd(Buff buff)
@@ -29,6 +31,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 			buff.Target.RemoveState(StateType.Held);
 			buff.Target.Unlock(LockType.Attack);
 			buff.Target.Unlock(LockType.GetHit);
+			buff.Target.SetSafeState(false);
 		}
 	}
 }
