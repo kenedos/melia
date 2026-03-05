@@ -6,9 +6,11 @@ using Melia.Shared.L10N;
 using Melia.Shared.Packages;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.AI;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Util;
 
@@ -64,8 +66,18 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 						continue;
 
 					var hpRate = Math.Max(0.50f, 1f - 0.03f * skill.Level);
-				clone.Properties.SetFloat(PropertyName.HP, (int)(clone.Properties.GetFloat(PropertyName.MHP) * hpRate));
+					clone.Properties.SetFloat(PropertyName.HP, (int)(clone.Properties.GetFloat(PropertyName.MHP) * hpRate));
 					clone.Vars.SetBool(VarCreatedBySamsara, true);
+
+					clone.SpawnPosition = clone.Position;
+					clone.Tendency = TendencyType.Aggressive;
+					clone.Components.Add(new MovementComponent(clone));
+
+					var aiName = deadMob.Data?.AiName;
+					if (!string.IsNullOrEmpty(aiName) && AiScript.Exists(aiName))
+						clone.Components.Add(new AiComponent(clone, aiName));
+					else
+						clone.Components.Add(new AiComponent(clone, "BasicMonster"));
 
 					deadMob.Map.AddMonster(clone);
 

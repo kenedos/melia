@@ -94,7 +94,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
-			Send.ZC_SKILL_RANGE_CIRCLE(caster, originPos, 50);
+
 			if (Versions.Protocol > 500)
 				Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, skillHits);
 			else

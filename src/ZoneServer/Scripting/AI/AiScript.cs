@@ -56,9 +56,6 @@ namespace Melia.Zone.Scripting.AI
 		protected int _currentPhase = 0;
 		protected float[] _phaseThresholds = [];
 
-		protected float _helpCallRange = 200;
-		protected float _helpCallChance = 0.01f; // 1% chance
-		protected TimeSpan _helpCallCooldown = TimeSpan.FromSeconds(30);
 		protected DateTime _lastHelpCallTime = DateTime.MinValue;
 
 		protected int MaxChaseDistance = 400;
@@ -598,9 +595,11 @@ namespace Melia.Zone.Scripting.AI
 			if (this.Entity is Summon summon)
 				return;
 
+			var helpCallRange = 200f;
+
 			// Determine call chance and cooldown based on monster rank
-			var actualCallChance = _helpCallChance;
-			var actualCooldown = _helpCallCooldown;
+			var actualCallChance = 0.003f; // 0.3% chance;
+			var actualCooldown = TimeSpan.FromSeconds(30);
 
 			if (this.Entity is Mob mob)
 			{
@@ -628,7 +627,7 @@ namespace Melia.Zone.Scripting.AI
 				return;
 
 			// Find nearby allies of same type
-			var allies = this.Entity.Map.GetAttackableEnemiesInPosition(attacker, this.Entity.Position, _helpCallRange)
+			var allies = this.Entity.Map.GetAttackableEnemiesInPosition(attacker, this.Entity.Position, helpCallRange)
 				.OfType<Mob>()
 				.Where(m =>
 					m.Id == ((Mob)this.Entity).Id &&

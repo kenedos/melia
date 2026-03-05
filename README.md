@@ -12,7 +12,7 @@ with any services provided by game developers or publishers, and we don't
 endorse such actions. We're here to learn and create, not to steal or
 destroy.
 
-This branch (`laima-merge`) integrates the Laima expansion into Melia
+This branch (`laima`) integrates the Laima expansion into Melia
 via a package system. Laima adds hundreds of implemented skills, buffs,
 instanced dungeons, a party system, player trading, and much more. All
 Laima content is toggled by a single config option, so you can run
@@ -25,7 +25,7 @@ Melia does not have a client of its own at this time. Instead, it's designed
 to be network compatible with the latest client of the international
 version of ToS, which is freely available on Steam.
 The Laima package additionally supports client version 390044 via
-the versioning system.
+the versioning system, which is the version this branch should be used with.
 
 Features
 -----------------------------------------------------------------------------
@@ -55,8 +55,8 @@ of skill, buff, pad, and ability handlers.
 **Swordsman tree** — Swordsman, Barbarian, Cataphract, Highlander,
 Hoplite, Peltasta, Rodelero
 
-**Archer tree** — Archer, Fletcher, Hunter, Quarrel Shooter, Ranger,
-Sapper, Wugushi
+**Archer tree** — Archer, Hunter, Quarrel Shooter, Ranger, Sapper,
+Wugushi, Fletcher (WIP)
 
 **Cleric tree** — Cleric, Dievdirbys, Krivis, Monk, Paladin, Priest,
 Sadhu
@@ -64,8 +64,8 @@ Sadhu
 **Scout tree** — Scout, Assassin, Corsair, Linker, Outlaw,
 Rogue, Thaumaturge
 
-**Wizard tree** — Wizard, Bokor, Chronomancer, Cryomancer, Elementalist,
-Psychokino, Pyromancer
+**Wizard tree** — Wizard, Bokor, Cryomancer, Elementalist,
+Psychokino, Pyromancer, Chronomancer (WIP)
 
 **Monsters** — Extensive monster skill handlers covering boss and field
 monster abilities
@@ -76,7 +76,6 @@ A full stage-based dungeon framework with multiple stage types:
 
 - **Boss Stage** — Boss encounter sequences
 - **Wave Survival** — Defend against waves of enemies
-- **Uphill Wave Survival** — Specialized wave defense variant
 - **Timed Survival** — Survive for a set duration
 - **Kill Monsters** — Clear all monsters to progress
 - **Conditional Stage** — Progression gated by conditions
@@ -120,7 +119,6 @@ Multiple AI behavior scripts:
 - Basic monster, boss, attacker, and magical caster behaviors
 - Player pet AI (general, hawk variants)
 - Summon AI (minions, player summons)
-- Specialized dungeon AI (Uphill healer, kamikaze, ranged gimmicks)
 - Track/wait and dummy behaviors
 
 #### Content
@@ -137,7 +135,6 @@ Multiple AI behavior scripts:
 
 - **Achievement Service** — Tracks kills, items, quests and awards points
 - **AutoSave Service** — Distributes character saves across time slots
-- **Orphan Cleanup** — Removes orphaned items from the database
 - **Map Content Service** — Queries map-specific spawnable content
 - **Server Shutdown Manager** — Graceful shutdown handling
 - **Game Event Manager** — Infrastructure for server-wide events
