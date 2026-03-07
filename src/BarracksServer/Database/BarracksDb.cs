@@ -131,6 +131,7 @@ namespace Melia.Barracks.Database
 					account.Name = reader.GetStringSafe("name");
 					account.TeamName = reader.GetStringSafe("teamName");
 					account.Authority = reader.GetInt32("authority");
+					account.PermissionLevel = (PermissionLevel)reader.GetByte("type");
 					account.Password = reader.GetStringSafe("password");
 					account.Medals = reader.GetInt32("medals");
 					account.GiftMedals = reader.GetInt32("giftMedals");

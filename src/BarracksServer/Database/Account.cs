@@ -59,6 +59,11 @@ namespace Melia.Barracks.Database
 		public int Authority { get; set; }
 
 		/// <summary>
+		/// Returns the permission levels of an account.
+		/// </summary>
+		public PermissionLevel PermissionLevel { get; set; }
+
+		/// <summary>
 		/// Amount of Free TP.
 		/// </summary>
 		public int Medals { get; set; } = 500;

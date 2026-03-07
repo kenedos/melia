@@ -38,7 +38,7 @@ namespace Melia.Barracks.Network
 			packet.PutLong(conn.Account.Id);
 			packet.PutString(conn.Account.Name, 33);
 			packet.PutEmptyBin(23);
-			packet.PutInt(3); // accountPrivileges? <= 3 enables a kind of debug context menu
+			packet.PutInt((int)conn.Account.PermissionLevel); // accountPrivileges? <= 3 enables a kind of debug context menu
 			packet.PutString(conn.SessionKey, 64);
 			packet.PutInt(4475);
 			packet.PutLong(0);
