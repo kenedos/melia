@@ -35,54 +35,54 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 			caster.TurnTowards(farPos);
 			caster.SetAttackState(true);
 
-			var maxTargets = 3 + skill.Level / 2;
-			var deadTargets = GetDeadEnemies(caster, farPos, maxTargets);
+			var deadTargets = GetDeadEnemies(caster, farPos, 15);
 
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, caster.Position, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 
+			var abilityMultiplier = 1f;
+			if (caster is Character character
+				&& character.TryGetActiveAbilityLevel(AbilityId.Chronomancer3, out var abilityLevel))
+			{
+				abilityMultiplier += abilityLevel * 0.005f;
+			}
+
+			var reincarnateChance = Math.Min(100f, (30f + 3f * skill.Level) * abilityMultiplier);
+
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
 			foreach (var deadMob in deadTargets)
 			{
 				deadMob.Vars.SetBool(VarReincarnated, true);
 
-				var createCount = 1;
-				if (caster is Character character
-					&& character.TryGetActiveAbilityLevel(AbilityId.Chronomancer3, out var abilityLevel)
-					&& RandomProvider.Next(1, 101) <= abilityLevel)
-				{
-					createCount++;
-				}
+				if (RandomProvider.Next(1, 101) > reincarnateChance)
+					continue;
 
-				for (var i = 0; i < createCount; i++)
-				{
-					if (!deadMob.Map.TryGetRandomPositionInRange(deadMob.Position, 10, out var position))
-						position = deadMob.Position.GetRandomInRange2D(10);
+				if (!deadMob.Map.TryGetRandomPositionInRange(deadMob.Position, 10, out var position))
+					position = deadMob.Position.GetRandomInRange2D(10);
 
-					var clone = Mob.CopyFrom(deadMob, position);
-					if (clone == null)
-						continue;
+				var clone = Mob.CopyFrom(deadMob, position);
+				if (clone == null)
+					continue;
 
-					var hpRate = Math.Max(0.50f, 1f - 0.03f * skill.Level);
-					clone.Properties.SetFloat(PropertyName.HP, (int)(clone.Properties.GetFloat(PropertyName.MHP) * hpRate));
-					clone.Vars.SetBool(VarCreatedBySamsara, true);
+				var hpRate = Math.Max(0.50f, 1f - 0.03f * skill.Level);
+				clone.Properties.SetFloat(PropertyName.HP, (int)(clone.Properties.GetFloat(PropertyName.MHP) * hpRate));
+				clone.Vars.SetBool(VarCreatedBySamsara, true);
 
-					clone.SpawnPosition = clone.Position;
-					clone.Tendency = TendencyType.Aggressive;
-					clone.Components.Add(new MovementComponent(clone));
+				clone.SpawnPosition = clone.Position;
+				clone.Tendency = TendencyType.Aggressive;
+				clone.Components.Add(new MovementComponent(clone));
 
-					var aiName = deadMob.Data?.AiName;
-					if (!string.IsNullOrEmpty(aiName) && AiScript.Exists(aiName))
-						clone.Components.Add(new AiComponent(clone, aiName));
-					else
-						clone.Components.Add(new AiComponent(clone, "BasicMonster"));
+				var aiName = deadMob.Data?.AiName;
+				if (!string.IsNullOrEmpty(aiName) && AiScript.Exists(aiName))
+					clone.Components.Add(new AiComponent(clone, aiName));
+				else
+					clone.Components.Add(new AiComponent(clone, "BasicMonster"));
 
-					deadMob.Map.AddMonster(clone);
+				deadMob.Map.AddMonster(clone);
 
-					clone.StartBuff(BuffId.Samsara_Buff, TimeSpan.FromSeconds(1), caster);
-				}
+				clone.StartBuff(BuffId.Samsara_Buff, TimeSpan.FromSeconds(1), caster);
 			}
 			Send.ZC_SYNC_END(caster, skillHandle, 0);
 			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, TimeSpan.FromMilliseconds(300));
