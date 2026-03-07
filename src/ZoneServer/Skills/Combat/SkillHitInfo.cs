@@ -30,6 +30,11 @@ namespace Melia.Zone.Skills.Combat
 		public Skill Skill { get; }
 
 		/// <summary>
+		/// Returns the result of the combat calculations.
+		/// </summary>
+		private SkillHitResult HitResult { get; }
+
+		/// <summary>
 		/// Returns the hit's damage information.
 		/// </summary>
 		public HitInfo HitInfo { get; }
@@ -125,11 +130,15 @@ namespace Melia.Zone.Skills.Combat
 			this.Attacker = attacker;
 			this.Target = target;
 			this.Skill = skill;
+			this.HitResult = result;
 			this.HitInfo = new HitInfo(attacker, target, skill, result.Damage, result.Result);
 			this.DamageDelay = damageDelay;
 			this.SkillHitDelay = skillHitDelay;
 			this.HitEffect = result.Effect;
 			this.HitCount = result.HitCount;
+
+			if (skill.Data.HitType == SkillHitType.Force)
+				this.ForceId = Melia.Zone.Skills.Combat.ForceId.GetNew();
 		}
 
 		/// <summary>
@@ -139,13 +148,13 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="target"></param>
 		/// <param name="skill"></param>
 		/// <param name="result"></param>
-		/// <param name="damageDelay"></param>
-		/// <param name="skillHitDelay"></param>
+		/// <param name="hitInfo"></param>
 		public SkillHitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillHitResult result, HitInfo hitInfo)
 		{
 			this.Attacker = attacker;
 			this.Target = target;
 			this.Skill = skill;
+			this.HitResult = result;
 			this.HitInfo = hitInfo;
 			this.DamageDelay = TimeSpan.Zero;
 			this.SkillHitDelay = TimeSpan.Zero;
@@ -154,13 +163,44 @@ namespace Melia.Zone.Skills.Combat
 		}
 
 		/// <summary>
+		/// Applies the calculated damage to the target of the hit.
+		/// </summary>
+		public void ApplyDamage()
+		{
+			this.Target.TakeDamage(this.HitInfo.Damage, this.Attacker);
+		}
+
+		/// <summary>
+		/// Applies the knock back to the hit's target and updates the hit
+		/// type.
+		/// </summary>
+		public void ApplyKnockBack()
+			=> this.ApplyKnockBack(this.Target);
+
+		/// <summary>
 		/// Applies the knock back to the target and updates the hit type.
 		/// </summary>
 		/// <param name="target"></param>
 		public void ApplyKnockBack(ICombatEntity target)
 		{
+			// Create knock back info if it wasn't yet set from the
+			// outside. This way we don't get knock back information into
+			// the combat packets if we don't set or apply the knock back.
+			// The option to set it manually is primarily for backwards
+			// compatibility.
 			if (this.KnockBackInfo == null)
-				throw new InvalidOperationException("Knock back info is not set.");
+			{
+				var result = this.HitResult;
+
+				if (result.KnockBack.Type == KnockBackType.None)
+					return;
+
+				var type = result.KnockBack.Type;
+				var velocity = result.KnockBack.Velocity;
+				var vAngle = result.KnockBack.VAngle;
+
+				this.KnockBackInfo = new KnockBackInfo(this.Attacker.Position, target, type, velocity, vAngle);
+			}
 
 			// Knockback immunity check - may need to move this
 			if (
@@ -173,7 +213,8 @@ namespace Melia.Zone.Skills.Combat
 				return;
 			}
 
-			var isKnockDown = this.KnockBackInfo.HitType == HitType.KnockDown;
+			var isKnockBack = this.KnockBackInfo.HitType == KnockBackType.KnockBack;
+			var isKnockDown = this.KnockBackInfo.HitType == KnockBackType.KnockDown;
 
 			// Check buff hooks for knockback/knockdown prevention
 			var buffs = target.Components.Get<BuffComponent>()?.GetList();
@@ -200,16 +241,18 @@ namespace Melia.Zone.Skills.Combat
 				}
 			}
 
-			this.HitInfo.Type = this.KnockBackInfo.HitType;
+			this.HitInfo.KnockBackType = this.KnockBackInfo.HitType;
 
-			target.Position = this.KnockBackInfo.ToPosition;
+			// Set state first, which also stops movement, then set the
+			// new position.
 			target.AddState(StateType.KnockedBack, this.KnockBackInfo.Time);
+			target.Position = this.KnockBackInfo.ToPosition;
 
 			// Set knock down state as well if applicable, so we can check for
 			// both KB and KD as necessary. We can't consider them to be the
 			// same because some skills and buffs have special behavior for
 			// knock downs.
-			if (this.HitInfo.Type == HitType.KnockDown)
+			if (isKnockDown)
 				target.AddState(StateType.KnockedDown, this.KnockBackInfo.Time);
 		}
 	}

@@ -809,9 +809,9 @@ namespace Melia.Zone.Skills.Helpers
 
 					if (hasKnock)
 					{
-						if (skill.Data.KnockDownHitType == HitType.KnockBack || skill.Data.KnockDownHitType == HitType.Motion)
+						if (skill.Data.KnockDownHitType == KnockBackType.KnockBack || skill.Data.KnockDownHitType == KnockBackType.Motion)
 							target.ApplyKnockback(caster, skill, skillHit);
-						else if (skill.Data.KnockDownHitType == HitType.KnockDown)
+						else if (skill.Data.KnockDownHitType == KnockBackType.KnockDown)
 							target.ApplyKnockdown(caster, skill, skillHit);
 					}
 
@@ -821,9 +821,9 @@ namespace Melia.Zone.Skills.Helpers
 					Send.ZC_HIT_INFO(caster, target, skillHit.HitInfo);
 					if (hasKnock)
 					{
-						if (skill.Data.KnockDownHitType == HitType.KnockBack || skill.Data.KnockDownHitType == HitType.Motion)
+						if (skill.Data.KnockDownHitType == KnockBackType.KnockBack || skill.Data.KnockDownHitType == KnockBackType.Motion)
 							Send.ZC_KNOCKBACK_INFO(target, skillHit.KnockBackInfo);
-						else if (skill.Data.KnockDownHitType == HitType.KnockDown)
+						else if (skill.Data.KnockDownHitType == KnockBackType.KnockDown)
 							Send.ZC_KNOCKDOWN_INFO(target, skillHit.KnockBackInfo);
 					}
 				}

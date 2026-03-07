@@ -70,8 +70,8 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 					var hit = hits[i];
 					if (hit.HitInfo.Damage > 0 && hit.Target.IsKnockdownable())
 					{
-						hit.KnockBackInfo = new KnockBackInfo(caster.Position, hit.Target, HitType.KnockDown, 180, 15);
-						hit.HitInfo.Type = HitType.KnockDown;
+						hit.KnockBackInfo = new KnockBackInfo(caster.Position, hit.Target, KnockBackType.KnockDown, 180, 15);
+						hit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 						hit.Target.ApplyKnockdown(caster, skill, hit);
 					}
 				}

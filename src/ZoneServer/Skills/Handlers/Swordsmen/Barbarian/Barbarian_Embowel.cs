@@ -102,7 +102,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
 				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-				skillHit.HitInfo.Type = HitType.KnockBack;
+				skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 				target.Position = skillHit.KnockBackInfo.ToPosition;
 
 				hits.Add(skillHit);

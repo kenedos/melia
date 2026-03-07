@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +7,8 @@ using Melia.Shared.Packages;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Handlers;
+using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
@@ -22,33 +24,29 @@ namespace Melia.Zone.Abilities
 		private readonly Dictionary<AbilityId, IAbilityPropertyHandler> _propertyHandlers = new();
 
 		/// <summary>
-		/// Initializes the ability handlers, loading all it can find in
-		/// the executing assembly.
+		/// Creates a new ability handler manager and loads all handlers
+		/// found in the current assembly.
 		/// </summary>
 		/// <param name="packages"></param>
 		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly(packages);
+			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly());
 		}
 
 		/// <summary>
-		/// Loads ability handlers marked with an ability handler attribute in
-		/// the current assembly.
+		/// Loads ability handlers marked with an ability handler
+		/// attribute in the given assembly.
 		/// </summary>
-		/// <param name="packages"></param>
-		private void LoadHandlersFromAssembly(PackageManager packages)
+		/// <remarks>
+		/// Searches the given assembly for classes implementing the <see
+		/// cref="IAbilityHandler"/> interface and marked with the <see
+		/// cref="AbilityHandlerAttribute"/>. The handlers are then
+		/// registered for the ability ids specified in the attribute.
+		/// </remarks>
+		/// <param name="assembly">Assembly to search for handlers.</param>
+		public void LoadHandlersFromAssembly(Assembly assembly)
 		{
-			var handlerTypes = Assembly.GetExecutingAssembly().GetTypes()
-				.Where(t => typeof(IAbilityHandler).IsAssignableFrom(t) && !t.IsInterface)
-				.Where(t => packages.ShouldRegister(t));
-
-			// Process non-package types first, then package types, so
-			// that package handlers naturally override base handlers
-			// at equal priority.
-			var ordered = handlerTypes
-				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
-
-			foreach (var type in ordered)
+			foreach (var type in assembly.GetTypes().Where(a => typeof(IAbilityHandler).IsAssignableFrom(a) && !a.IsInterface))
 			{
 				foreach (var attr in type.GetCustomAttributes<AbilityHandlerAttribute>())
 				{
@@ -56,13 +54,7 @@ namespace Melia.Zone.Abilities
 					var abilityIds = attr.Ids;
 
 					foreach (var abilityId in abilityIds)
-					{
-						if (_priorities.TryGetValue(abilityId, out var priority) && priority > attr.Priority)
-							continue;
-
 						this.Register(abilityId, handler);
-						_priorities[abilityId] = attr.Priority;
-					}
 				}
 			}
 		}
@@ -85,6 +77,7 @@ namespace Melia.Zone.Abilities
 			}
 
 			this.LoadCombatEvents(abilityId, handler);
+			ScriptableFunctions.Load(handler);
 		}
 
 		/// <summary>

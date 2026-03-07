@@ -59,12 +59,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 
 			if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 			{
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, HitType.KnockBack, 65, 10);
-				skillHit.HitInfo.Type = HitType.KnockBack;
+				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockBack, 65, 10);
+				skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 				target.ApplyKnockback(caster, skill, skillHit);
 			}
 

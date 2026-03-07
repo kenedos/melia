@@ -40,6 +40,10 @@ using Yggdrasil.Logging;
 using Yggdrasil.Network.Communication;
 using Yggdrasil.Util;
 using Yggdrasil.Util.Commands;
+using System.Threading.Tasks;
+using System.Net.Http.Headers;
+using Melia.Zone.World.Gacha;
+using Melia.Zone.Scripting;
 using static Melia.Zone.Scripting.Shortcuts;
 
 namespace Melia.Zone.Commands
@@ -66,6 +70,7 @@ namespace Melia.Zone.Commands
 			this.Add("intewarp", "<warp id> 0", "", this.HandleInteWarp);
 			this.Add("intewarpByToken", "<destination>", "", this.HandleTokenWarp);
 			this.Add("mic", "<message>", "", this.HandleMic);
+			this.Add("hairgacha", "<type>", "", this.HandleHairGacha);
 
 			// Client Party Commands
 			this.Add("memberinfoForAct", "<team name>", "", this.HandleMemberInfoForAct);
@@ -151,6 +156,7 @@ namespace Melia.Zone.Commands
 			this.Add("removejob", "<job id>", "Removes a job from character.", this.HandleRemoveJob);
 			this.Add("skillpoints", "[job id] <modifier>", "Modifies character's skill points. If no job id is given, adds skill points to all jobs character has.", this.HandleSkillPoints);
 			this.Add("statpoints", "<amount>", "Modifies character's stat points.", this.HandleStatPoints);
+			this.Add("abilitypoints", "<modifier>", "Modifies character's ability points.", this.HandleAbilityPoints);
 			this.Add("resetstats", "", "Resets character's allocated stat points.", this.HandleStatReset);
 			this.Add("str", "<+/- amount>", "Modifies character's STR stat.", this.HandleStr);
 			this.Add("dex", "<+/- amount>", "Modifies character's DEX stat.", this.HandleDex);
@@ -181,6 +187,7 @@ namespace Melia.Zone.Commands
 			this.Add("ai", "[ai name]", "Activates AI for character.", this.HandleAi);
 			this.Add("updatedata", "", "Updates data.", this.HandleUpdateData);
 			this.Add("updatedatacom", "", "Updates data.", this.HandleUpdateDataCom);
+			this.Add("jobinfo", "", "Display information about character's jobs.", this.HandleJobInfo);
 			this.Add("feature", "<feature name> <enabled>", "Toggles a feature.", this.HandleFeature);
 			this.Add("resetcd", "", "Resets all skill cooldowns.", this.HandleResetSkillCooldown);
 			this.Add("nosave", "<enabled>", "Toggles whether the character will be saved on logout.", this.NoSave);
@@ -3544,6 +3551,29 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
+		/// Modifies the target's ability points.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleAbilityPoints(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (!int.TryParse(args.Get(0), out var modifier))
+				return CommandResult.InvalidArgument;
+
+			target.ModifyAbilityPoints(modifier);
+
+			sender.ServerMessage(Localization.Get("The ability points were modified."));
+			if (target != sender)
+				sender.ServerMessage(Localization.Get("Your ability points were modified by {0}."), sender.Name);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
 		/// Resets allocated stat points of a character.
 		/// </summary>
 		/// <param name="sender"></param>
@@ -4108,6 +4138,37 @@ namespace Melia.Zone.Commands
 				sender.ServerMessage(Localization.Get("Enabled feature '{0}'."), featureName);
 			else
 				sender.ServerMessage(Localization.Get("Disabled feature '{0}'."), featureName);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Display's target's job information.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleJobInfo(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			var sb = new StringBuilder();
+
+			sb.AppendLine(Localization.Get("{0}'s Jobs ({1})"), target.Name, target.Jobs.Count);
+
+			foreach (var job in target.Jobs.GetList())
+			{
+				var maxExp = job.MaxExp;
+				var exp = Math.Min(maxExp, job.Exp);
+				var percent = 100f / maxExp * exp;
+
+				sb.AppendLine(" {0}", job.Id);
+				sb.AppendLine("   Rank: {0}, Level: {0}, SkillPoints: {0}", job.Rank, job.Level, job.SkillPoints);
+				sb.AppendLine("   Exp: {0} / {1} ({2:0.0}%)", exp, maxExp, percent);
+			}
+
+			sender.ServerMessage(sb.ToString().Replace(Environment.NewLine, "{nl}"));
 
 			return CommandResult.Okay;
 		}
@@ -5236,6 +5297,66 @@ namespace Melia.Zone.Commands
 
 			// Start 30-second cooldown
 			target.StartCooldown(CooldownId.Shout, TimeSpan.FromSeconds(30));
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Uses a selected gacha item, aka goddess' blessed cube.
+		/// </summary>
+		/// <remarks>
+		/// Used by items with the assigned client script
+		/// 'CLIENT_GACHA_SCP'.
+		/// </remarks>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleHairGacha(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			if (args.Count < 2)
+			{
+				var argsStr = string.Join(", ", args.GetAll());
+				if (string.IsNullOrWhiteSpace(argsStr))
+					argsStr = "None";
+
+				Log.Warning("HandleGachaItem: Not enough arguments given by user '{0}'. Args: {1}", sender.TeamName, argsStr);
+				return CommandResult.Okay;
+			}
+
+			// Example arguments: "Gacha_HairAcc_001", "NO"
+
+			var className = args.Get(0);
+			var skipAnimation = args.Get(1) == "YES";
+
+			if (!sender.Inventory.TryFindItem(className, out var item))
+			{
+				sender.MsgBox(Localization.Get("Item not found."));
+				Log.Warning("HandleHairGacha: User '{0}' tried to use command with an item they don't own ('{1}').", sender.TeamName, className);
+				return CommandResult.Okay;
+			}
+
+			var gachaClassName = item.Data.Script.StrArg;
+			var pullCount = (int)item.Data.Script.NumArg1;
+
+			if (string.IsNullOrWhiteSpace(gachaClassName))
+				gachaClassName = className;
+
+			if (pullCount != 1 && pullCount != 10 && pullCount != 11)
+				pullCount = 1;
+
+			var functionName = "GACHA_SCP_" + gachaClassName;
+
+			if (!ScriptableFunctions.GachaScp.TryGet(functionName, out var func))
+			{
+				sender.MsgBox(Localization.Get("This item has not been implemented yet."));
+				Log.Debug("HandleHairGacha: Scriptable function '{0}' not found.", functionName);
+				return CommandResult.Okay;
+			}
+
+			func(sender, item, gachaClassName, skipAnimation, pullCount);
 
 			return CommandResult.Okay;
 		}

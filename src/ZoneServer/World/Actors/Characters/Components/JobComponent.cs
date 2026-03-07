@@ -43,9 +43,24 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="job"></param>
 		public void AddSilent(Job job)
 		{
+			// Setting the rank based on the order jobs are added was the
+			// simplest solution to add the Rank property after the fact,
+			// but this works out well, because we don't have to worry
+			// about getting and setting the correct rank manually this
+			// way.
+
 			lock (_jobs)
 			{
+				var rank = 1;
+
+				if (_jobs.Count > 0)
+					rank = this.GetCurrentRank() + 1;
+
+				if (_jobs.TryGetValue(job.Id, out var existing))
+					rank = existing.Rank;
+
 				_jobs[job.Id] = job;
+				job.Rank = rank;
 				_jobRanks = null; // Invalidate rank cache
 			}
 		}
@@ -367,14 +382,13 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public JobData Data { get; }
 
 		/// <summary>
-		/// Total EXP collected for this job.
+		/// Gets or sets the total EXP collected for this job.
 		/// </summary>
 		/// <remarks>
-		/// Every job has its own total EXP count, which the client uses
-		/// in combination with the character's current job and rank to
-		/// determine the level. There doesn't seem to be a way
-		/// to change the max job EXP from the server, as it is with
-		/// the base EXP.
+		/// Every job has its own EXP count, which the client uses in
+		/// combination with the job and its rank to determine the level.
+		/// There doesn't seem to be a way to change the max job EXP from
+		/// the server, as it is with the base EXP.
 		/// </remarks>
 		public long TotalExp { get; set; }
 
@@ -384,6 +398,39 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public long TotalMaxExp => ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Character.Jobs.GetJobRank(this.Id), this.MaxLevel);
 
 		/// <summary>
+		/// Returns the EXP collected on the job's current level.
+		/// </summary>
+		public long Exp
+		{
+			get
+			{
+				if (this.Level == 1 || this.Level == this.MaxLevel)
+					return this.TotalExp;
+
+				return this.TotalExp - ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Character.Jobs.GetJobRank(this.Id), Math.Max(1, this.Level - 1));
+			}
+		}
+
+		/// <summary>
+		/// Returns the EXP necessary for leveling up at the current
+		/// level.
+		/// </summary>
+		public long MaxExp
+		{
+			get
+			{
+				var curLevelExp = ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Character.Jobs.GetJobRank(this.Id), Math.Min(this.MaxLevel, this.Level));
+
+				if (this.Level == 1 || this.Level == this.MaxLevel)
+					return curLevelExp;
+
+				var lastLevelExp = ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(this.Character.Jobs.GetJobRank(this.Id), Math.Max(1, this.Level - 1));
+
+				return curLevelExp - lastLevelExp;
+			}
+		}
+
+		/// <summary>
 		/// Returns the level reached on this job based on the
 		/// job's individual rank and total EXP.
 		/// </summary>
@@ -391,8 +438,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			get
 			{
-				// Use job-specific rank (position in job progression) for
-				// EXP table lookup, not the global character rank.
 				var rank = this.Character.Jobs.GetJobRank(this.Id);
 				var totalExp = this.TotalExp;
 				var max = this.MaxLevel;
@@ -436,6 +481,15 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// Gets or sets the date the character chose this job.
 		/// </summary>
 		public DateTime SelectionDate { get; set; } = DateTime.Now;
+
+		/// <summary>
+		/// Gets or sets the rank the job was added on.
+		/// </summary>
+		/// <remarks>
+		/// This value is used to determine the job's (max) level and is
+		/// assigned automatically based on the order the jobs were added.
+		/// </remarks>
+		public int Rank { get; set; }
 
 		/// <summary>
 		/// Creates new instance for character.

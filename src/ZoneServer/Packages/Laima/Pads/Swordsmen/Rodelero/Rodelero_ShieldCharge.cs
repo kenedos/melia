@@ -82,8 +82,8 @@ namespace Melia.Zone.Pads.Handlers
 
 			if (skillHitResult.Damage > 0 && initiator.IsKnockdownable())
 			{
-				skillHit.KnockBackInfo = new KnockBackInfo(creator.Position, initiator, HitType.KnockDown, 120, 80);
-				skillHit.HitInfo.Type = HitType.KnockDown;
+				skillHit.KnockBackInfo = new KnockBackInfo(creator.Position, initiator, KnockBackType.KnockDown, 120, 80);
+				skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 				initiator.ApplyKnockdown(creator, skill, skillHit);
 			}
 

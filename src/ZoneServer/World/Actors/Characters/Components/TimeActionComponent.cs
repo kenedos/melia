@@ -233,7 +233,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		Cancelled,
 
 		/// <summary>
-		/// The time action was cancelled by movement.
+		/// The time action was cancelled by the actor moving.
 		/// </summary>
 		CancelledByMove,
 

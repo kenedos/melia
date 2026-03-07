@@ -1,12 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
-using Melia.Zone.Buffs;
-using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
@@ -30,28 +27,23 @@ namespace Melia.Zone.Skills.Handlers
 		/// <param name="packages"></param>
 		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly(), packages);
+			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly());
 		}
 
 		/// <summary>
-		/// Loads skill handlers marked with a skill handler attribute
-		/// from the given assembly.
+		/// Loads skill handlers marked with a skill handler attribute in
+		/// the given assembly.
 		/// </summary>
-		/// <param name="assembly"></param>
-		/// <param name="packages"></param>
-		public void LoadHandlersFromAssembly(Assembly assembly, PackageManager packages = null)
+		/// <remarks>
+		/// Searches the given assembly for classes implementing the <see
+		/// cref="ISkillHandler"/> interface and marked with the <see
+		/// cref="SkillHandlerAttribute"/>. The handlers are then
+		/// registered for the skill ids specified in the attribute.
+		/// </remarks>
+		/// <param name="assembly">Assembly to search for handlers.</param>
+		public void LoadHandlersFromAssembly(Assembly assembly)
 		{
-			var handlerTypes = assembly.GetTypes()
-				.Where(a => typeof(ISkillHandler).IsAssignableFrom(a) && !a.IsInterface)
-				.Where(a => packages == null || packages.ShouldRegister(a));
-
-			// Process non-package types first, then package types, so
-			// that package handlers naturally override base handlers
-			// at equal priority.
-			var ordered = handlerTypes
-				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
-
-			foreach (var type in ordered)
+			foreach (var type in assembly.GetTypes().Where(a => typeof(ISkillHandler).IsAssignableFrom(a) && !a.IsInterface))
 			{
 				foreach (var attr in type.GetCustomAttributes<SkillHandlerAttribute>())
 				{
@@ -85,6 +77,7 @@ namespace Melia.Zone.Skills.Handlers
 				_handlers[skillId] = handler;
 
 			this.LoadCombatEvents(skillId, handler);
+			ScriptableFunctions.Load(handler);
 		}
 
 		/// <summary>
@@ -121,6 +114,7 @@ namespace Melia.Zone.Skills.Handlers
 				});
 			}
 
+#pragma warning disable CS0618 // Type or member is obsolete
 			if (handler is ISkillCombatAttackBeforeCalcHandler beforeCalcAttackHandler) registerAttackFunc("SCR_Combat_BeforeCalc_Attack_" + skillId, beforeCalcAttackHandler.OnAttackBeforeCalc);
 			if (handler is ISkillCombatDefenseBeforeCalcHandler beforeCalcDefenseHandler) registerDefenseFunc("SCR_Combat_BeforeCalc_Defense_" + skillId, beforeCalcDefenseHandler.OnDefenseBeforeCalc);
 
@@ -132,6 +126,7 @@ namespace Melia.Zone.Skills.Handlers
 
 			if (handler is ISkillCombatAttackAfterBonusesHandler afterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_Attack_" + skillId, afterBonusesAttackHandler.OnAttackAfterBonuses);
 			if (handler is ISkillCombatDefenseAfterBonusesHandler afterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_Defense_" + skillId, afterBonusesDefenseHandler.OnDefenseAfterBonuses);
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 
 		private delegate void CombatCalcHookFunction(Skill skill, ICombatEntity attacker, ICombatEntity target, Skill attackerSkill, SkillModifier modifier, SkillHitResult skillHitResult);

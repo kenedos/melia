@@ -75,7 +75,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <summary>
 		/// Returns the hit type of the knock back.
 		/// </summary>
-		public HitType HitType { get; }
+		public KnockBackType HitType { get; }
 
 		/// <summary>
 		/// Returns the velocity by which the target moves back.
@@ -135,7 +135,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="vAngle">Vertical angle</param>
 		/// <param name="knockDirection">Direction type for the knockback</param>
 		/// <param name="formulaType">Type of knockback formula to use</param>
-		public KnockBackInfo(ICombatEntity caster, ICombatEntity target, HitType knockDownHitType, int velocity, int vAngle, KnockDirection knockDirection, KnockBackFormulaType formulaType = KnockBackFormulaType.Standard)
+		public KnockBackInfo(ICombatEntity caster, ICombatEntity target, KnockBackType knockDownHitType, int velocity, int vAngle, KnockDirection knockDirection, KnockBackFormulaType formulaType = KnockBackFormulaType.Standard)
 			: this(GetKnockbackOrigin(caster, target, knockDirection), target, knockDownHitType, velocity, vAngle, formulaType)
 		{
 		}
@@ -165,7 +165,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="vAngle">Vertical angle</param>
 		/// <param name="forcedDirection">The exact direction to knock the target</param>
 		/// <param name="formulaType">Type of knockback formula to use</param>
-		public KnockBackInfo(ICombatEntity target, HitType knockDownHitType, int velocity, int vAngle, Direction forcedDirection, KnockBackFormulaType formulaType = KnockBackFormulaType.Standard)
+		public KnockBackInfo(ICombatEntity target, KnockBackType knockDownHitType, int velocity, int vAngle, Direction forcedDirection, KnockBackFormulaType formulaType = KnockBackFormulaType.Standard)
 			: this(target.Position.GetRelative(forcedDirection.Backwards, 100f), target, knockDownHitType, velocity, vAngle, formulaType)
 		{
 		}
@@ -182,7 +182,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="velocity"></param>
 		/// <param name="vAngle"></param>
 		/// <param name="formulaType">Type of knockback formula to use (Standard for RimBlow-type, Short for most other skills)</param>
-		public KnockBackInfo(Position attackerPosition, ICombatEntity target, HitType knockDownHitType, int velocity, int vAngle, KnockBackFormulaType formulaType = KnockBackFormulaType.Standard)
+		public KnockBackInfo(Position attackerPosition, ICombatEntity target, KnockBackType knockDownHitType, int velocity, int vAngle, KnockBackFormulaType formulaType = KnockBackFormulaType.Standard)
 		{
 			var targetPosition = target.Position;
 			this.Direction = attackerPosition.GetDirection(targetPosition);
@@ -200,7 +200,7 @@ namespace Melia.Zone.Skills.Combat
 			float distance;
 			var g = 240.0f;
 			var vAngleRad = MathF.PI * this.VAngle / 180f;
-			if (knockDownHitType == HitType.KnockDown)
+			if (knockDownHitType == KnockBackType.KnockDown)
 			{
 				// KnockDown uses projectile motion physics: Range = v² * sin(2θ) / g
 				// This gives the theoretical maximum range assuming no energy loss
@@ -265,7 +265,7 @@ namespace Melia.Zone.Skills.Combat
 			var baseTimeSeconds = 2 * velocity * MathF.Sin(vAngleRad) / g;
 
 			// Set ToPosition with wall bounce calculation for KnockDown
-			if (knockDownHitType == HitType.KnockDown)
+			if (knockDownHitType == KnockBackType.KnockDown)
 			{
 				var (finalPos, actualDistance) = this.CalculatePositionWithWallBounce(target, this.FromPosition, this.Direction, distance);
 				this.ToPosition = finalPos;
@@ -438,7 +438,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="knockDownHitType"></param>
 		/// <param name="velocity"></param>
 		/// <param name="vAngle"></param>
-		//public KnockBackInfo(Position attackerPosition, ICombatEntity target, HitType knockDownHitType, int velocity, int vAngle)
+		//public KnockBackInfo(Position attackerPosition, ICombatEntity target, KnockBackType knockDownHitType, int velocity, int vAngle)
 		//{
 		//	var targetPosition = target.Position;
 		//	this.Direction = attackerPosition.GetDirection(targetPosition);
@@ -569,5 +569,26 @@ namespace Melia.Zone.Skills.Combat
 		// 
 		// 	return pos.GetRelative(dir, distance);
 		// }
+	}
+
+	/// <summary>
+	/// Simple collection of the parameters defining a knock back.
+	/// </summary>
+	public class KnockBackParameters
+	{
+		/// <summary>
+		/// Gets or sets the type of hit/knock back.
+		/// </summary>
+		public KnockBackType Type { get; set; }
+
+		/// <summary>
+		/// Gets or sets the velocity by which to knock back the target.
+		/// </summary>
+		public int Velocity { get; set; }
+
+		/// <summary>
+		/// Gets or sets the vertical angle to knock back the target at.
+		/// </summary>
+		public int VAngle { get; set; }
 	}
 }

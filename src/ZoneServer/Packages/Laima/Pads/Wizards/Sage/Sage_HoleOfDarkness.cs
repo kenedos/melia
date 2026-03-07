@@ -70,10 +70,10 @@ namespace Melia.Zone.Pads.HandlersOverride.Wizards.Sage
 					var pullDirection = target.Position.GetDirection(padCenter);
 					var pullFromPos = target.Position.GetRelative(pullDirection.Backwards, PullDistance);
 
-					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, HitType.KnockBack, 80, 10);
+					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, KnockBackType.KnockBack, 80, 10);
 					skillHit.KnockBackInfo.Speed = 1;
 					skillHit.KnockBackInfo.VPow = 1;
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 
 					target.ApplyKnockback(creator, skill, skillHit);
 				}

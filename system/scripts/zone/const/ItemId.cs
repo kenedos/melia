@@ -4093,6 +4093,14 @@ public static class ItemId
 	public const int EP17_Kalentis_BRC_03 = 11100076;
 	public const int EP17_Kalentis_NECK_04 = 11100077;
 	public const int EP17_Kalentis_BRC_04 = 11100078;
+	public const int EP18_NECK_01 = 11100079;
+	public const int EP18_BRC_01 = 11100080;
+	public const int EP18_NECK_02 = 11100081;
+	public const int EP18_BRC_02 = 11100082;
+	public const int EP18_NECK_03 = 11100083;
+	public const int EP18_BRC_03 = 11100084;
+	public const int EP18_NECK_04 = 11100085;
+	public const int EP18_BRC_04 = 11100086;
 	public const int EP14_Goddess_Noble_1_TOP = 11100100;
 	public const int EP14_Goddess_Noble_1_LEG = 11100101;
 	public const int EP14_Goddess_Noble_1_FOOT = 11100102;

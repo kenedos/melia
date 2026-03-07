@@ -6,6 +6,7 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
@@ -53,16 +54,15 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				var targetLethargic = target.IsBuffActive(BuffId.Lethargy_Debuff);
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHitIf(2, targetLethargic));
-				target.TakeDamage(skillHitResult.Damage, caster);
+
+				// Ability "Earthquake: Remove Knockdown"
+				if (caster.IsAbilityActive(AbilityId.Wizard23))
+					skillHitResult.KnockBack.Type = KnockBackType.None;
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, TimeSpan.Zero);
 
-				// Ability "Earthquake: Remove Knockdown"
-				if (!caster.IsAbilityActive(AbilityId.Wizard23))
-				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-					skillHit.ApplyKnockBack(target);
-				}
+				skillHit.ApplyDamage();
+				skillHit.ApplyKnockBack();
 
 				skillHits.Add(skillHit);
 			}

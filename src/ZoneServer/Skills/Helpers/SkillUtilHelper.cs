@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (target == null || target.IsDead || !target.IsKnockdownable())
 				return;
 
-			var hitType = knockType == KnockType.KnockDown ? HitType.KnockDown : HitType.KnockBack;
+			var hitType = knockType == KnockType.KnockDown ? KnockBackType.KnockDown : KnockBackType.KnockBack;
 			var kb = new KnockBackInfo(caster, target, hitType, (int)power, (int)verticalAngle, knockDirection);
 
 			target.Position = kb.ToPosition;

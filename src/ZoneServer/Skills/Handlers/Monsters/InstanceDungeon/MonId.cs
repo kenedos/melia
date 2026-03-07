@@ -3242,7 +3242,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
@@ -3468,7 +3467,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
@@ -3577,7 +3575,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
@@ -3779,7 +3776,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);

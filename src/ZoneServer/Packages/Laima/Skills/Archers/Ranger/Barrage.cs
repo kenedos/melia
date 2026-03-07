@@ -67,7 +67,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 			skillHit.UnkFloat = 8;
 			skillHit.VarInfoCount = 1;
 
@@ -76,8 +75,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			if (skillHitResult.Damage > 0 && caster.TryGetActiveAbilityLevel(AbilityId.Ranger1, out var level) && skill.OverheatCounter == 0 && target.IsKnockdownable())
 			{
 				// TODO: The knockback power / scaling of this ability is unknown.
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, HitType.KnockBack, 50 + 5 * level, 10);
-				skillHit.HitInfo.Type = HitType.KnockBack;
+				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockBack, 50 + 5 * level, 10);
+				skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 				target.ApplyKnockback(caster, skill, skillHit);
 			}
 

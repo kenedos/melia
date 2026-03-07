@@ -140,10 +140,11 @@ namespace Melia.Zone.World.Actors
 		bool CanFight();
 
 		/// <summary>
-		/// Returns true if this entity can attack the given one.
+		/// Returns true if the given entity can be attacked by this one.
 		/// </summary>
 		/// <param name="entity"></param>
 		/// <returns></returns>
+		[Obsolete("Use CanTarget and CanDamage instead.")]
 		bool CanAttack(ICombatEntity entity);
 
 		/// <summary>
@@ -169,6 +170,34 @@ namespace Melia.Zone.World.Actors
 		/// </summary>
 		/// <returns></returns>
 		bool IsKnockdownable();
+
+		/// <summary>
+		/// Returns true if this entity can hit the given one in a general
+		/// sense.
+		/// </summary>
+		/// <remarks>
+		/// Checks general purpose factors, such as whether the entity is
+		/// alive and a potentiel hostile target. Does not check
+		/// specialized states, such as locks.
+		/// </remarks>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		bool CanHit(ICombatEntity entity);
+
+		/// <summary>
+		/// Returns true if the given entity can be targeted by this one.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		bool CanTarget(ICombatEntity entity);
+
+		/// <summary>
+		/// Returns true if the given entity can receive damage by this
+		/// one.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		bool CanDamage(ICombatEntity entity);
 
 		/// <summary>
 		/// Heals the entity's HP and SP by the given amounts.
@@ -1370,7 +1399,7 @@ namespace Melia.Zone.World.Actors
 			if (skillHit.KnockBackInfo == null)
 			{
 				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-				skillHit.HitInfo.Type = skill.Data.KnockDownHitType;
+				skillHit.HitInfo.KnockBackType = skill.Data.KnockDownHitType;
 			}
 
 			target.Position = skillHit.KnockBackInfo.ToPosition;
@@ -1397,7 +1426,7 @@ namespace Melia.Zone.World.Actors
 			if (skillHit.KnockBackInfo == null)
 			{
 				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-				skillHit.HitInfo.Type = skill.Data.KnockDownHitType;
+				skillHit.HitInfo.KnockBackType = skill.Data.KnockDownHitType;
 			}
 
 			target.Position = skillHit.KnockBackInfo.ToPosition;
@@ -1442,6 +1471,16 @@ namespace Melia.Zone.World.Actors
 
 			return false;
 		}
+
+		/// <summary>
+		/// Returns the overbuff counter for the given buff. Returns 0
+		/// if the buff isn't active.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="buffId"></param>
+		/// <returns></returns>
+		public static int GetOverbuffCount(this ICombatEntity entity, BuffId buffId)
+			=> entity.Components.Get<BuffComponent>()?.GetOverbuffCount(buffId) ?? 0;
 
 		/// <summary>
 		/// Gets if the entity's knocked back.
@@ -1907,6 +1946,23 @@ namespace Melia.Zone.World.Actors
 				entity.Components.Get<BaseSkillComponent>()?.TryGet(skillId, out skill);
 			level = skill?.Level ?? 0;
 			return level > 0;
+		}
+
+		/// <summary>
+		/// Returns the item in the given slot via out if it exists.
+		/// Returns false if the entity doesn't have an inventory
+		/// or the slot is empty. Returns dummy items if they exist.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="slot"></param>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		public static bool TryGetItem(this ICombatEntity entity, EquipSlot slot, out Item item)
+		{
+			var inventory = entity.Components.Get<InventoryComponent>();
+
+			item = inventory?.GetItem(slot);
+			return item != null;
 		}
 
 		/// <summary>

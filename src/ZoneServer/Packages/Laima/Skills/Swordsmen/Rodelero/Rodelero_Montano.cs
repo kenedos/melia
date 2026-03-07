@@ -78,8 +78,8 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 				{
 					if (target.IsKnockdownable())
 					{
-						skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, HitType.KnockDown, 120, 90);
-						skillHit.HitInfo.Type = HitType.KnockDown;
+						skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockDown, 120, 90);
+						skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 						target.ApplyKnockdown(caster, skill, skillHit);
 					}
 

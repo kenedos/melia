@@ -77,7 +77,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 					target.TakeDamage(skillHitResult.Damage, caster);
 
 					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-					skillHit.ForceId = ForceId.GetNew();
 					skillHits.Add(skillHit);
 				}
 			}

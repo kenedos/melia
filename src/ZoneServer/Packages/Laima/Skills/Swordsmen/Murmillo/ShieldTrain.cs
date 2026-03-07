@@ -66,8 +66,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Murmillo
 
 				if (target.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, HitType.KnockBack, 200, 10);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockBack, 200, 10);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					target.ApplyKnockback(caster, skill, skillHit);
 				}
 
@@ -93,8 +93,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Murmillo
 					var pullDirection = target.Position.GetDirection(centerPos);
 					var pullFromPos = target.Position.GetRelative(pullDirection.Backwards, 50);
 
-					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, HitType.KnockBack, 200, 10);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, KnockBackType.KnockBack, 200, 10);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					target.ApplyKnockback(caster, skill, skillHit);
 				}
 

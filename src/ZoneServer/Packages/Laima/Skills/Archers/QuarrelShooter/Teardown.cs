@@ -58,8 +58,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 						if (enemy.IsKnockdownable())
 						{
 							var direction = pavise.Position.GetDirection(enemy.Position);
-							skillHit.KnockBackInfo = new KnockBackInfo(pavise.Position, enemy, HitType.KnockBack, 20, 10);
-							skillHit.HitInfo.Type = HitType.KnockBack;
+							skillHit.KnockBackInfo = new KnockBackInfo(pavise.Position, enemy, KnockBackType.KnockBack, 20, 10);
+							skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 							enemy.ApplyKnockback(caster, skill, skillHit);
 						}
 

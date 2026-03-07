@@ -5945,7 +5945,8 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Unknown purpose, sent when changing map and tutorial related?
+		/// Toggles client's control over the character, locking or
+		/// unlocking movement and usage of skills.
 		/// </summary>
 		/// <param name="conn"></param>
 		/// <param name="controlScript"></param>
@@ -5974,7 +5975,41 @@ namespace Melia.Zone.Network
 			packet.PutFloat(time);
 			packet.PutFloat(easing);
 
-			conn.Send(packet);
+			character.Connection.Send(packet);
+		}
+
+		/// <summary>
+		/// Toggles client's control over the character, enabling or
+		/// disabling movement and usage of skills.
+		/// </summary>
+		/// <remarks>
+		/// Functions like a single-layer locking mechanism. Regardless of
+		/// how often control gets disabled using a certain identifier, it
+		/// only needs one enable to regain control.
+		///
+		/// While control is disabled, the skill icons in the hotkeys are
+		/// grayed out.
+		///
+		/// This packet is routinely sent together with ZC_LOCK_KEY,
+		/// even though they appear to essentially do the same thing.
+		/// Reason unknown.
+		/// </remarks>
+		/// <param name="character">Character to toggle controls for.</param>
+		/// <param name="ident">Identifier for the lock.</param>
+		/// <param name="enabled">Whether to enable (true) or disable (false) control.</param>
+		public static void ZC_ENABLE_CONTROL(Character character, string ident, bool enabled)
+		{
+			var packet = new Packet(Op.ZC_ENABLE_CONTROL);
+
+			// The integer is definitely a handle, though its purpose is
+			// currently unclear, since it appears to always be 0 in the
+			// logs.
+
+			packet.PutInt(0);
+			packet.PutString(ident, 64);
+			packet.PutByte(enabled);
+
+			character.Connection.Send(packet);
 		}
 
 		/// <summary>
@@ -7870,6 +7905,69 @@ namespace Melia.Zone.Network
 		/// <summary>
 		/// Shakes the actor up and down.
 		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="target"></param>
+		/// <param name="knockBackInfo"></param>
+		public static void ZC_KNOCKDOWN_INFO(ICombatEntity entity, ICombatEntity target, KnockBackInfo knockBackInfo)
+		{
+			var packet = new Packet(Op.ZC_KNOCKDOWN_INFO);
+
+			packet.PutInt(target.Handle);
+			packet.AddKnockbackInfo(knockBackInfo);
+			packet.PutByte(0);
+
+			entity.Map.Broadcast(packet, entity);
+		}
+
+		/// <summary>
+		/// Attaches actor to a given node on the other actor's model on clients
+		/// in range of actor.
+		/// </summary>
+		/// <param name="actor">Actor to attach to another actor.</param>
+		/// <param name="attachTo">Other actor to attach to. Use null to unset attachment.</param>
+		/// <param name="nodeName"></param>
+		/// <param name="unkStr1"></param>
+		/// <param name="duration"></param>
+		/// <param name="distance"></param>
+		/// <param name="packetString2"></param>
+		/// <param name="b1"></param>
+		/// <param name="b2"></param>
+		/// <param name="b3"></param>
+		public static void ZC_ATTACH_TO_OBJ(IActor actor, IActor attachTo, string nodeName, string unkStr1, TimeSpan duration, float distance, string packetString2, byte b1, byte b2, byte b3)
+		{
+			var packet = new Packet(Op.ZC_ATTACH_TO_OBJ);
+
+			packet.PutInt(actor.Handle);
+			packet.PutInt(attachTo?.Handle ?? 0);
+			packet.AddStringId(nodeName);
+			packet.AddStringId(unkStr1);
+			packet.PutFloat((float)duration.TotalSeconds);
+			packet.PutFloat(0);
+			packet.PutFloat(0);
+			packet.PutFloat(0);
+			packet.PutFloat(distance);
+			packet.AddStringId(packetString2);
+			packet.PutByte(b1);
+			packet.PutByte(b2);
+			packet.PutByte(b3);
+
+			// [i402363] 8 unkown bytes, first seen in this patch.
+			// Purpose and exact position unknown, but old packets
+			// appear to work like this.
+			{
+				packet.PutEmptyBin(8);
+			}
+
+			actor.Map.Broadcast(packet);
+		}
+
+		/// <summary>
+		/// Detaches actor from other actor.
+		/// </summary>
+		/// <remarks>
+		/// It appears as if ZC_ATTACH_TO_OBJ is also used for this purpose,
+		/// by simply sending a null attachment actor.
+		/// </remarks>
 		/// <param name="actor"></param>
 		/// <param name="isOn"></param>
 		/// <param name="maxHeight"></param>

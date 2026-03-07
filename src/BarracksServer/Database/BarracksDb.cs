@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -380,6 +378,8 @@ namespace Melia.Barracks.Database
 
 					if (character.Jobs.Count == 0)
 						character.Jobs.Add(character.JobId);
+
+					this.LoadVars(character.Variables.Perm, "vars_characters", "characterId", character.DbId);
 				}
 			}
 

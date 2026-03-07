@@ -76,7 +76,7 @@ namespace Melia.Shared.Network.Helpers
 				packet.PutInt(0);
 			}
 
-			packet.PutShort(appearancePc.Hair);
+			packet.PutShort(appearancePc.DisplayHair);
 
 			// Up until i171032 we had these as "pose" and "team id",
 			// but they actually contain the visible hats, so we either
@@ -171,7 +171,7 @@ namespace Melia.Shared.Network.Helpers
 		/// <summary>
 		/// Returns the character's hair id.
 		/// </summary>
-		int Hair { get; }
+		int DisplayHair { get; }
 
 		/// <summary>
 		/// Returns the character's skin color.

@@ -98,8 +98,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 
 				if (skillHitResult.Damage > 0 && !caster.TryGetActiveAbility(AbilityId.Peltasta35, out var abilityLevel) && target.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, HitType.Normal, 115, 10, formulaType: KnockBackFormulaType.Extended);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, KnockBackType.KnockBack, 115, 10, formulaType: KnockBackFormulaType.Extended);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					target.ApplyKnockback(caster, skill, skillHit);
 				}
 

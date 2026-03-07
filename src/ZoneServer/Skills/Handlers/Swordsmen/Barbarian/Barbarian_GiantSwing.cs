@@ -92,7 +92,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			var target = targets.Random();
 
 			target.StopMove();
-			target.AddState(StateType.Stunned);
+			target.AddState(StateType.Captured);
 
 			Send.ZC_NORMAL.PlayEffect(target, "F_hit_bad", 0.7f);
 			Send.ZC_ATTACH_TO_OBJ(target, caster, "Bone_chain13", "ChainTest", 0, 100, 0, 0);
@@ -104,7 +104,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			var rotationTime = TimeSpan.FromSeconds(rotationCount * rotationDuration);
 
 			Send.ZC_NORMAL.SpinObject(caster, 0, rotationCount, rotationDuration, 1);
-			Send.ZC_NORMAL.AttachEffect(target, "I_smoke004", 1.5f);
+			Send.ZC_NORMAL.AttachEffect(target, new AttachableEffect("I_smoke004", 1.5f));
 
 			await Task.Delay(rotationTime + rotateDelay);
 
@@ -116,7 +116,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			Send.ZC_ATTACH_TO_OBJ(target, null, null, null, 0, 0, 0, 0);
 			Send.ZC_NORMAL.ClearEffects(target);
 
-			target.RemoveState(StateType.Stunned);
+			target.RemoveState(StateType.Captured);
 			target.StartBuff(BuffId.giantswing_Debuff, skill.Level, 0, TimeSpan.FromSeconds(10), caster);
 
 			this.Hit(skill, caster, target);

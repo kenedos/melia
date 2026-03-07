@@ -28,6 +28,7 @@ namespace Melia.Shared.Data.Database
 		public float BasicSp { get; set; }
 		public float BasicCast { get; set; }
 		public float BasicStamina { get; set; }
+		public string SpendSpScript { get; set; }
 
 		public float EnableAngle { get; set; }
 		public float MaxRange { get; set; }
@@ -61,7 +62,8 @@ namespace Melia.Shared.Data.Database
 		public bool EnableCastMove { get; set; }
 		public bool CastInterruptible { get; set; }
 
-		public HitType KnockDownHitType { get; set; }
+		public SkillHitType HitType { get; set; }
+		public KnockBackType KnockDownHitType { get; set; }
 		public int KnockDownVelocity { get; set; }
 		public int KnockDownHAngle { get; set; }
 		public int KnockDownVAngle { get; set; }
@@ -306,6 +308,7 @@ namespace Melia.Shared.Data.Database
 			data.BasicSp = entry.ReadFloat("basicSp", 0);
 			data.BasicCast = entry.ReadFloat("basicCast", 0);
 			data.BasicStamina = entry.ReadFloat("basicStamina", 0);
+			data.SpendSpScript = entry.ReadString("spendSpScript", "SCR_Get_SpendSP");
 
 			data.EnableAngle = entry.ReadFloat("enableAngle");
 			data.MaxRange = entry.ReadFloat("maxRange");
@@ -339,7 +342,8 @@ namespace Melia.Shared.Data.Database
 			data.EnableCastMove = entry.ReadBool("enableCastMove");
 			data.CastInterruptible = entry.ReadBool("castInterruptible");
 
-			data.KnockDownHitType = entry.ReadEnum("knockDownType", HitType.Normal);
+			data.HitType = entry.ReadEnum("hitType", SkillHitType.Melee);
+			data.KnockDownHitType = entry.ReadEnum("knockDownType", KnockBackType.None);
 			data.KnockDownVelocity = entry.ReadInt("knockDownVelocity", 0);
 			data.KnockDownHAngle = entry.ReadInt("knockDownHAngle", 0);
 			data.KnockDownVAngle = entry.ReadInt("knockDownVAngle", 0);

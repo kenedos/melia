@@ -61,6 +61,7 @@ namespace Melia.Zone.World.Actors.Components
 			this.RegisterState(new(StateType.Sleep, [LockType.Movement, LockType.Attack]));
 			this.RegisterState(new(StateType.Petrified, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
 			this.RegisterState(new(StateType.Raised, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
+			this.RegisterState(new(StateType.Captured, [LockType.Movement, LockType.Attack, LockType.GetTargeted]));
 		}
 
 		/// <summary>
@@ -368,13 +369,35 @@ namespace Melia.Zone.World.Actors.Components
 		/// <summary>
 		/// Prevents other actors from attacking this one.
 		/// </summary>
+		[Obsolete("User GetTargeted and GetDamaged instead.")]
 		public const string GetHit = nameof(GetHit);
+
+		/// <summary>
+		/// Prevents other actors from targeting this one.
+		/// </summary>
+		/// <remarks>
+		/// An actor that can't be targeted can't become a target for a
+		/// new attack, but they can still be affected by hits that aren't
+		/// targeted, such as damage over time effects.
+		/// </remarks>
+		public const string GetTargeted = nameof(GetTargeted);
+
+		/// <summary>
+		/// Prevents other actors from damaging this one.
+		/// </summary>
+		/// <remarks>
+		/// An actor that can't be damaged may still be targeted by
+		/// attacks, but the attacks won't deal damage. It's effectively
+		/// an invulnerability state.
+		/// </remarks>
+		public const string GetDamaged = nameof(GetDamaged);
 
 		/// <summary>
 		/// Prevents the actor from being knocked back.
 		/// </summary>
 		/// <remarks>
-		/// Getting knocked back and knock down are separate actions and states.
+		/// Getting knocked back and knock down are separate actions and
+		/// states.
 		/// </remarks>
 		public const string GetKnockedBack = nameof(GetKnockedBack);
 
@@ -382,7 +405,8 @@ namespace Melia.Zone.World.Actors.Components
 		/// Prevents the actor from being knocked down.
 		/// </summary>
 		/// <remarks>
-		/// Getting knocked back and knock down are separate actions and states.
+		/// Getting knocked back and knock down are separate actions and
+		/// states.
 		/// </remarks>
 		public const string GetKnockedDown = nameof(GetKnockedDown);
 
@@ -402,7 +426,12 @@ namespace Melia.Zone.World.Actors.Components
 		public const string Fluting = nameof(Fluting);
 		public const string Frozen = nameof(Frozen);
 		public const string Held = nameof(Held);
+
 		public const string KnockedBack = nameof(KnockedBack);
+
+		/// <summary>
+		/// Entity is unable to act or get knocked back further.
+		/// </summary>
 		public const string KnockedDown = nameof(KnockedDown);
 		public const string Petrified = nameof(Petrified);
 		public const string Raised = nameof(Raised);
@@ -410,6 +439,7 @@ namespace Melia.Zone.World.Actors.Components
 		public const string Staggered = nameof(Staggered);
 		public const string Stunned = nameof(Stunned);
 		public const string Sleep = nameof(Sleep);
+		public const string Captured = nameof(Captured);
 	}
 
 	/// <summary>

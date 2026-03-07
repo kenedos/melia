@@ -53,12 +53,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 
 			if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 			{
 				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-				skillHit.HitInfo.Type = HitType.KnockBack;
+				skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 				target.ApplyKnockback(caster, skill, skillHit);
 			}
 

@@ -1820,9 +1820,13 @@ namespace Melia.Zone.Network
 					continue;
 				}
 
-				if (!character.CanAttack(target))
+				if (!character.CanTarget(target))
 				{
-					Log.Warning("CZ_CLIENT_HIT_LIST: User '{0}' tried to attack invalid target '{1}'.", conn.Account.Name, handle);
+					// Don't warn about this, as the client might send
+					// invalid targets for various reasons, including lag
+					// or not being aware of server-side locks and checks.
+
+					//Log.Warning("CZ_CLIENT_HIT_LIST: User '{0}' tried to attack invalid target '{1}'.", conn.Account.Name, handle);
 					continue;
 				}
 
@@ -1912,6 +1916,12 @@ namespace Melia.Zone.Network
 			{
 				Log.Warning("CZ_SKILL_TARGET: User '{0}' tried to use a skill on a non-existing target.", conn.Account.Name);
 				return;
+			}
+
+			if (!character.CanTarget(target))
+			{
+				target = null;
+				character.ServerMessage(Localization.Get("The target can't be attacked in its current state."));
 			}
 
 			// Try to use skill
@@ -2089,8 +2099,24 @@ namespace Melia.Zone.Network
 
 			// Check target
 			ICombatEntity target = null;
-			if (targetHandle != 0 && character.Map.TryGetActor(targetHandle, out var actor) && actor is ICombatEntity ce)
-				target = ce;
+			if (targetHandle != 0)
+			{
+				if (!character.Map.TryGetActor(targetHandle, out var actor))
+				{
+					Log.Warning("CZ_SKILL_GROUND: User '{0}' tried to use skill '{1}' on a non-existing target.", conn.Account.Name, skill.Id);
+					return;
+				}
+
+				// The client sends a handle even if you target a friendly
+				// monster, such as an NPC. We'll ignore that case for
+				// now and leave target as null, under the assumption
+				// that you never use skills on non-combatants.
+				if (actor is ICombatEntity ce)
+				{
+					if (character.CanTarget(ce))
+						target = ce;
+				}
+			}
 
 			// Try to use skill
 			try
@@ -4731,7 +4757,9 @@ namespace Melia.Zone.Network
 					var canLearn = unlockFunc(character, abilityTreeData.UnlockScriptArgStr, abilityTreeData.UnlockScriptArgNum, abilityData);
 					if (!canLearn)
 					{
-						Log.Warning("CZ_REQ_LEARN_ABILITY: User '{0}' tried to learn an ability they haven't unlocked yet (Ability: {1}, Unlock: {2}).", character.Username, abilityData.ClassName, abilityTreeData.UnlockScriptName);
+						var callStr = string.Format("{0}('{1}', {2})", abilityTreeData.UnlockScriptName, abilityTreeData.UnlockScriptArgStr, abilityTreeData.UnlockScriptArgNum);
+
+						Log.Warning("CZ_REQ_LEARN_ABILITY: User '{0}' tried to learn an ability they haven't unlocked yet (Ability: {1}, Unlock: {2}).", character.Username, abilityData.ClassName, callStr);
 						return;
 					}
 				}

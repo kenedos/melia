@@ -59,7 +59,6 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero);
-			skillHit.ForceId = ForceId.GetNew();
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 
 			var splashArea = new Circle(farPos, 70);

@@ -432,9 +432,56 @@ namespace Melia.Zone.World.Maps
 		public IMonster GetMonster(int handle) => _monsters.TryGetValue(handle, out var monster) ? monster : null;
 
 		/// <summary>
+		/// Returns all attackable combat entities within the given range.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="position"></param>
+		/// <param name="radius"></param>
+		/// <returns></returns>
+		public List<ICombatEntity> GetAttackableEntitiesInRange(ICombatEntity attacker, Position position, float radius)
+		{
+			var result = new List<ICombatEntity>();
+
+			lock (_combatEntities)
+			{
+				var entities = _combatEntities.Values.Where(a => a.Position.InRange2D(position, radius) && attacker.CanDamage(a));
+				result.AddRange(entities);
+			}
+
+			return result;
+		}
+
+		/// <summary>
 		/// Returns the first monster matching the predicate, or null.
 		/// </summary>
 		public IMonster GetMonster(Func<IMonster, bool> predicate) => _monsters.Values.FirstOrDefault(predicate);
+
+		/// <summary>
+		/// Returns all attackable combat entities within the given shape.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="shape"></param>
+		/// <returns></returns>
+		public List<ICombatEntity> GetAttackableEntitiesIn(ICombatEntity attacker, IShapeF shape)
+		{
+			var result = new List<ICombatEntity>();
+
+			lock (_combatEntities)
+			{
+				foreach (var entity in _combatEntities.Values)
+				{
+					if (!attacker.CanDamage(entity))
+						continue;
+
+					if (!shape.IsInside(entity.Position))
+						continue;
+
+					result.Add(entity);
+				}
+			}
+
+			return result;
+		}
 
 		/// <summary>
 		/// Returns the monster with the given handle via out.

@@ -114,7 +114,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 
 			if (skillHitResult.Damage > 0)
 			{

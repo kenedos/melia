@@ -86,8 +86,8 @@ namespace Melia.Zone.Pads.Handlers
 			var skillHitResult = new SkillHitResult { Damage = 0, Result = HitResultType.Hit };
 			var skillHit = new SkillHitInfo(creator, initiator, skill, skillHitResult);
 
-			skillHit.KnockBackInfo = new KnockBackInfo(pad.Position, initiator, HitType.KnockBack, knockbackVelocity, 10);
-			skillHit.HitInfo.Type = HitType.KnockBack;
+			skillHit.KnockBackInfo = new KnockBackInfo(pad.Position, initiator, KnockBackType.KnockBack, knockbackVelocity, 10);
+			skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 
 			initiator.ApplyKnockback(creator, skill, skillHit);
 

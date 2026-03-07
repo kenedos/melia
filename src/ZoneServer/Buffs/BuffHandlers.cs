@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
+using Melia.Zone.Abilities;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills.Combat;
@@ -29,27 +30,23 @@ namespace Melia.Zone.Buffs
 		/// <param name="packages"></param>
 		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly(packages);
+			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly());
 		}
 
 		/// <summary>
-		/// Loads buff handlers marked with a buff handler attribute in
-		/// the current assembly.
+		/// Loads ability handlers marked with an ability handler
+		/// attribute in the given assembly.
 		/// </summary>
-		/// <param name="packages"></param>
-		private void LoadHandlersFromAssembly(PackageManager packages)
+		/// <remarks>
+		/// Searches the given assembly for classes implementing the <see
+		/// cref="IAbilityHandler"/> interface and marked with the <see
+		/// cref="AbilityHandlerAttribute"/>. The handlers are then
+		/// registered for the ability ids specified in the attribute.
+		/// </remarks>
+		/// <param name="assembly">Assembly to search for handlers.</param>
+		public void LoadHandlersFromAssembly(Assembly assembly)
 		{
-			var handlerTypes = Assembly.GetExecutingAssembly().GetTypes()
-				.Where(t => typeof(IBuffHandler).IsAssignableFrom(t) && !t.IsInterface)
-				.Where(t => packages.ShouldRegister(t));
-
-			// Process non-package types first, then package types, so
-			// that package handlers naturally override base handlers
-			// at equal priority.
-			var ordered = handlerTypes
-				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
-
-			foreach (var type in ordered)
+			foreach (var type in assembly.GetTypes().Where(a => typeof(IBuffHandler).IsAssignableFrom(a) && !a.IsInterface))
 			{
 				foreach (var attr in type.GetCustomAttributes<BuffHandlerAttribute>())
 				{
@@ -57,13 +54,7 @@ namespace Melia.Zone.Buffs
 					var buffIds = attr.BuffIds;
 
 					foreach (var buffId in buffIds)
-					{
-						if (_priorities.TryGetValue(buffId, out var priority) && priority > attr.Priority)
-							continue;
-
 						this.Register(buffId, handler);
-						_priorities[buffId] = attr.Priority;
-					}
 				}
 			}
 		}
@@ -79,6 +70,7 @@ namespace Melia.Zone.Buffs
 				_buffHandlers[buffId] = handler;
 
 			this.LoadCombatEvents(buffId, handler);
+			ScriptableFunctions.Load(handler);
 		}
 
 		/// <summary>

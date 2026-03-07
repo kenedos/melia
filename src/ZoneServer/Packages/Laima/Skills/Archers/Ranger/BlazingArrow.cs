@@ -104,7 +104,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			var damageDelay = TimeSpan.FromMilliseconds(0);
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 			//Send.ZC_HIT_INFO(caster, target, hit);

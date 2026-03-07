@@ -96,10 +96,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 					var pullDirection = target.Position.GetDirection(pad.Position);
 					var pullFromPos = target.Position.GetRelative(pullDirection.Backwards, 40);
 
-					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, HitType.KnockBack, 60, 10);
+					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, KnockBackType.KnockBack, 60, 10);
 					skillHit.KnockBackInfo.Speed = 1;
 					skillHit.KnockBackInfo.VPow = 1;
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 
 					target.ApplyKnockback(caster, skill, skillHit);
 				}

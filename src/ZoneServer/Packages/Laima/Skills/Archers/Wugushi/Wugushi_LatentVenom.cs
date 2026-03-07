@@ -60,7 +60,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero);
-			skillHit.ForceId = ForceId.GetNew();
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 
@@ -75,7 +74,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			var hits = new List<SkillHitInfo>();
 
 			var primaryHit = new SkillHitInfo(caster, primaryTarget, skill, primaryHitResult, TimeSpan.FromMilliseconds(DamageDelayMs), TimeSpan.Zero);
-			primaryHit.ForceId = ForceId.GetNew();
 			hits.Add(primaryHit);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(DamageDelayMs));

@@ -47,9 +47,14 @@ namespace Melia.Zone.Skills.Combat
 		public HitResultType ResultType { get; set; }
 
 		/// <summary>
-		/// Returns the type of the hit, affecting the hit effect.
+		/// Returns the visual type of the hit, affecting the hit effect.
 		/// </summary>
 		public HitType Type { get; set; }
+
+		/// <summary>
+		/// Returns the knock back type of the hit.
+		/// </summary>
+		public KnockBackType KnockBackType { get; set; }
 
 		/// <summary>
 		/// Gets or sets the hit's force id.
@@ -84,10 +89,24 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="attacker"></param>
 		/// <param name="target"></param>
 		/// <param name="skill"></param>
-		/// <param name="damageDelay"></param>
 		/// <param name="skillHitResult"></param>
+		/// <param name="damageDelay"></param>
 		public HitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillHitResult skillHitResult, TimeSpan damageDelay = default)
-			: this(attacker, target, skill, skillHitResult.Damage, skillHitResult.Result, skillHitResult.HitCount, damageDelay)
+			: this(attacker, target, skill.Id, skillHitResult.Damage, skill.Data.HitType, skillHitResult.Result, skillHitResult.HitCount, damageDelay)
+		{
+		}
+
+		/// <summary>
+		/// Creates new hit.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="skillHitResult"></param>
+		/// <param name="resultType"></param>
+		/// <param name="damageDelay"></param>
+		public HitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillHitResult skillHitResult, HitResultType resultType, TimeSpan damageDelay = default)
+			: this(attacker, target, skill.Id, skillHitResult.Damage, skill.Data.HitType, resultType, skillHitResult.HitCount, damageDelay)
 		{
 		}
 
@@ -102,7 +121,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="hitCount"></param>
 		/// <param name="damageDelay"></param>
 		public HitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, float damage, HitResultType resultType, int hitCount = 0, TimeSpan damageDelay = default)
-			: this(attacker, target, skill.Id, damage, resultType, hitCount, damageDelay)
+			: this(attacker, target, skill.Id, damage, skill.Data.HitType, resultType, hitCount, damageDelay)
 		{
 		}
 
@@ -114,9 +133,10 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="skillId"></param>
 		/// <param name="damage"></param>
 		/// <param name="resultType"></param>
+		/// <param name="hitType"></param>
 		///	<param name="hitCount"></param>
 		///	<param name="damageDelay"></param>
-		public HitInfo(ICombatEntity attacker, ICombatEntity target, SkillId skillId, float damage, HitResultType resultType, int hitCount = 0, TimeSpan damageDelay = default)
+		public HitInfo(ICombatEntity attacker, ICombatEntity target, SkillId skillId, float damage, SkillHitType hitType, HitResultType resultType, int hitCount = 0, TimeSpan damageDelay = default)
 		{
 			this.Attacker = attacker;
 			this.Target = target;
@@ -180,6 +200,12 @@ namespace Melia.Zone.Skills.Combat
 
 			this.Hp = target.Hp;
 			this.HpPriority = target.HpChangeCounter;
+
+			// Disabled for now as it caused issues with some skills.
+			// Multishot for example is type Force, but the hits get
+			// delayed if a ForceId is sent.
+			//if (hitType == SkillHitType.Force)
+			//	this.ForceId = Combat.ForceId.GetNew();
 		}
 	}
 }
