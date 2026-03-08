@@ -409,12 +409,12 @@ namespace Melia.Zone.World.Gacha
 			{
 				if (animationSpeed > 0)
 				{
-					character.ToggleControl("GACHA_ITEM", false);
-					character.PlayAnimation(animation, animationSpeed);
+					Send.ZC_ENABLE_CONTROL(character, "GACHA_ITEM", false);
+					Send.ZC_PLAY_ANI(character, animation, animationSpeed: animationSpeed);
 
 					await Task.Delay(animationTime / animationSpeed);
 
-					character.ToggleControl("GACHA_ITEM", true);
+					Send.ZC_ENABLE_CONTROL(character, "GACHA_ITEM", true);
 				}
 
 				this.GivePrices(character, entries);

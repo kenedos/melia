@@ -331,7 +331,7 @@ namespace Melia.Barracks.Database
 			{
 				if (BarracksServer.Instance.Data.ItemDb.TryFind(this.Equipment[(int)EquipSlot.Hair].Id, out var item))
 				{
-					if (BarracksServer.Instance.Data.HairTypeDb.TryFind(this.Gender, item.Script.StrArg, out var hairData))
+					if (BarracksServer.Instance.Data.HairTypeDb.TryFindByClassName(item.Script.StrArg, out var hairData))
 						return hairData.Index;
 					else if (BarracksServer.Instance.Data.HeadTypeDb.TryFind(this.Gender, item.Script.StrArg, out var headData))
 						return headData.Index;

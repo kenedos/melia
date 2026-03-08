@@ -26,7 +26,7 @@ public class ItemEquipScript : GeneralScript
 
 		if (ZoneServer.Instance.Data.BuffDb.TryFind(strArg, out var buffData))
 			character.StartBuff(buffData.Id, TimeSpan.Zero);
-		else if (ZoneServer.Instance.Data.HairTypeDb.TryFind(character.Gender, strArg, out var hairData))
+		else if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(strArg, out var hairData))
 		{
 			// For wigs (Hair slot), only send the hair style if visibility is on
 			if (equipSlot == EquipSlot.Hair && (character.VisibleEquip & VisibleEquip.Wig) == 0)
@@ -51,7 +51,7 @@ public class ItemEquipScript : GeneralScript
 
 		if (ZoneServer.Instance.Data.BuffDb.TryFind(strArg, out var buffData))
 			character.Buffs.Remove(buffData.Id);
-		else if (ZoneServer.Instance.Data.HairTypeDb.TryFind(character.Gender, strArg, out var hairData))
+		else if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(strArg, out var hairData))
 			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, 0);
 		else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
 			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, 0);

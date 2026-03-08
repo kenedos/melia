@@ -165,7 +165,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 				var hit = new HitInfo(caster, target, skill, skillHitResult);
 				hit.ForceId = ForceId.GetNew();
-				hit.ResultType = HitResultType.NoHitScript;
+				hit.ResultType = HitResultType.SilentHit;
 
 				if (skillHitResult.Damage > 0)
 				{

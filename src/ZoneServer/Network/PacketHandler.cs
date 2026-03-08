@@ -6009,7 +6009,8 @@ namespace Melia.Zone.Network
 			var newHairColor = packet.GetString();
 			var character = conn.SelectedCharacter;
 
-			if (ZoneServer.Instance.Data.HairTypeDb.TryFind(character.Gender, character.Hair, out var currentHair))
+			var currentHair = ZoneServer.Instance.Data.HairTypeDb.Find(a => a.Gender == character.Gender && a.Index == character.Hair);
+			if (currentHair != null)
 			{
 				var newHair = ZoneServer.Instance.Data.HairTypeDb.Find(a => a.ClassName == currentHair.ClassName && a.Color == newHairColor);
 				if (newHair != null)

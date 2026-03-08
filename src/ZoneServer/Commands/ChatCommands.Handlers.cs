@@ -65,7 +65,6 @@ namespace Melia.Zone.Commands
 			this.Add("requpdateequip", "", "", this.HandleReqUpdateEquip);
 			this.Add("readcollection", "", "", this.HandleReadCollection);
 			this.Add("buyabilpoint", "<amount>", "", this.HandleBuyAbilPoint);
-			this.Add("hairgacha", "", "", this.HandleHairGacha);
 			this.Add("guildexpup", "", "", this.HandleGuildExpUp);
 			this.Add("intewarp", "<warp id> 0", "", this.HandleInteWarp);
 			this.Add("intewarpByToken", "<destination>", "", this.HandleTokenWarp);
@@ -3047,52 +3046,6 @@ namespace Melia.Zone.Commands
 			// Removed: Guild type deleted during Laima merge
 			// var guild = sender.Connection.Guild;
 			// guild?.RemoveMember(sender);
-
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
-		/// Official slash command to use gacha
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleHairGacha(Character sender, Character target, string message, string command, Arguments args)
-		{
-			// Since this command is sent via UI interactions, we'll not
-			// use any automated command result messages, but we'll leave
-			// debug messages for now, in case of unexpected values.
-			if (args.Count < 1)
-
-			{
-				Log.Debug("HandleHairGacha: Invalid call by user '{0}': {1}", sender.Username, command);
-				return CommandResult.Okay;
-			}
-
-			//if (IsPlayingPairAnimation(pc) == 0)
-			//	RunScript('SCR_USE_GHACHA_TPCUBE', pc, arg1);
-			if (!ScriptableFunctions.Item.TryGet("SCR_USE_GHACHA_TPCUBE", out var script))
-			{
-				Log.Debug("HandleHairGacha: Invalid call by user '{0}': {1}", sender.Username, command);
-				return CommandResult.Okay;
-			}
-
-			if (sender.HasItem(args.Get(0), 1))
-			{
-				var randomItem = ZoneServer.Instance.Data.ItemDb.Entries.ToArray().Random();
-				sender.Inventory.Add(new Item(randomItem.Value.Id), InventoryAddType.NotNew, InventoryType.Inventory, 99999);
-				Send.ZC_ENABLE_CONTROL(sender.Connection, "ITEM_GACHA_TP", false);
-				Send.ZC_LOCK_KEY(sender, "ITEM_GACHA_TP", true);
-				sender.TimedEvents.Add(TimeSpan.FromSeconds(5), TimeSpan.Zero, 0, "gacha", caller =>
-				{
-					Send.ZC_ENABLE_CONTROL(sender.Connection, "ITEM_GACHA_TP", true);
-					Send.ZC_LOCK_KEY(sender, "ITEM_GACHA_TP", false);
-					Send.ZC_ADDON_MSG(sender, "HAIR_GACHA_POPUP", 1003, randomItem.Value.ClassName);
-				});
-			}
 
 			return CommandResult.Okay;
 		}

@@ -160,7 +160,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 					trigger.DisappearTime = DateTime.Now.AddSeconds(10);
 					caster.Map.AddMonster(trigger);
 
-					trigger.AttachEffect(new AttachableEffect("F_cleric_heal_loop_ground_cleric01_3", scale));
+					trigger.AttachEffect("F_cleric_heal_loop_ground_cleric01_3", scale);
 				}
 			}
 		}

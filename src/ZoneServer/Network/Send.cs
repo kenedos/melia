@@ -5975,7 +5975,7 @@ namespace Melia.Zone.Network
 			packet.PutFloat(time);
 			packet.PutFloat(easing);
 
-			character.Connection.Send(packet);
+			conn.Send(packet);
 		}
 
 		/// <summary>

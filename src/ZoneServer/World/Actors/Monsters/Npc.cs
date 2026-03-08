@@ -312,6 +312,21 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
+		/// Returns true if the given entity can be hit by this NPC.
+		/// </summary>
+		public bool CanHit(ICombatEntity entity) => false;
+
+		/// <summary>
+		/// Returns true if the given entity can be targeted by this NPC.
+		/// </summary>
+		public bool CanTarget(ICombatEntity entity) => false;
+
+		/// <summary>
+		/// Returns true if the given entity can be damaged by this NPC.
+		/// </summary>
+		public bool CanDamage(ICombatEntity entity) => false;
+
+		/// <summary>
 		/// Returns true if this NPC can move.
 		/// </summary>
 		/// <returns>Returns true if AllowMovement is enabled, false otherwise.</returns>
