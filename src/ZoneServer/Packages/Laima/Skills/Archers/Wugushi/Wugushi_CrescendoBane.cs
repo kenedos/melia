@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -79,7 +79,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 					target.TakeDamage(skillHitResult.Damage, caster);
 
 					var hit = new HitInfo(caster, target, skill, skillHitResult);
-					hit.ForceId = ForceId.GetNew();
 					Send.ZC_HIT_INFO(caster, target, hit);
 				}
 			}

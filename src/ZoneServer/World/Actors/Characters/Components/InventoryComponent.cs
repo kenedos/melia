@@ -49,7 +49,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Returns list of ids of equipped items, in the order of EquipSlot.
+		/// Returns list of ids of equipped items, including dummy items,
+		/// in the order of EquipSlot.
 		/// </summary>
 		/// <returns></returns>
 		public int[] GetEquipIds()
@@ -58,6 +59,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			lock (_syncLock)
 				return _equip.Where(a => (int)a.Key <= InventoryDefaults.EquipSlotCount).OrderBy(a => a.Key).Select(a => a.Value.Id).ToArray();
+		}
+
+		/// <summary>
+		/// Returns unordered list of ids of equipped items, excluding
+		/// dummy items.
+		/// </summary>
+		/// <returns></returns>
+		public int[] GetActualEquipIds()
+		{
+			// TODO: Cache.
+
+			lock (_syncLock)
+				return _equip.Where(a => (int)a.Key <= InventoryDefaults.EquipSlotCount && a.Value is not DummyEquipItem).Select(a => a.Value.Id).ToArray();
 		}
 
 		/// <summary>
@@ -411,6 +425,43 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				_equip.TryGetValue(slot, out item);
 
 			return item;
+		}
+
+		/// <summary>
+		/// Returns the first item stack in the inventory that matches the
+		/// given predicate.
+		/// </summary>
+		/// <param name="predicate"></param>
+		/// <returns></returns>
+		public Item FindItem(Predicate<Item> predicate)
+		{
+			lock (_syncLock)
+			{
+				foreach (var category in _items)
+				{
+					for (var i = 0; i < category.Value.Count; ++i)
+					{
+						var item = category.Value[i];
+						if (predicate(item))
+							return item;
+					}
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Returns the first item stack in the inventory that matches the
+		/// given class name via out. Returns false if no match was found.
+		/// </summary>
+		/// <param name="className"></param>
+		/// <param name="item"></param>
+		/// <returns></returns>
+		public bool TryFindItem(string className, out Item item)
+		{
+			item = this.FindItem(a => a.Data.ClassName == className);
+			return item != null;
 		}
 
 		/// <summary>
@@ -945,7 +996,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			// Update character
-			this.Character.UpdateStance();
+			this.HandleAppearanceChanges(slot);
 
 			// Update client
 			Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, 1, InventoryItemRemoveMsg.Equipped, InventoryType.Inventory);
@@ -1007,6 +1058,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			lock (_syncLock)
 				_equip[slot] = new DummyEquipItem(slot);
 
+			// Update character
+			this.HandleAppearanceChanges(slot);
+
+			// Update client
 			Send.ZC_ITEM_EQUIP_LIST(this.Character);
 			Send.ZC_UPDATED_PCAPPEARANCE(this.Character);
 
@@ -1046,6 +1101,35 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			return InventoryResult.Success;
+		}
+
+		/// <summary>
+		/// Updates appearance related properties when (un)equipping
+		/// relevant item.
+		/// </summary>
+		/// <param name="slot"></param>
+		private void HandleAppearanceChanges(EquipSlot slot)
+		{
+			if (slot == EquipSlot.Hair)
+			{
+				var hair = this.Character.Hair;
+
+				var hairEquip = this.GetEquip(EquipSlot.Hair);
+				if (hairEquip is not DummyEquipItem)
+				{
+					var hairClassName = hairEquip.Data.Script.StrArg;
+
+					if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(hairClassName, out var partData))
+						hair = partData.Index;
+				}
+
+				if (hair != this.Character.Hair)
+					this.Character.Variables.Perm.SetInt("Melia.DisplayHair", hair);
+				else
+					this.Character.Variables.Perm.Remove("Melia.DisplayHair");
+			}
+
+			this.Character.UpdateStance();
 		}
 
 		/// <summary>

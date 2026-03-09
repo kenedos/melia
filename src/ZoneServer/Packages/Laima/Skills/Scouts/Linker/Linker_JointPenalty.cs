@@ -56,7 +56,6 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 			}
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult);
-			skillHit.ForceId = ForceId.GetNew();
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);

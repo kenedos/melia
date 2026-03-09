@@ -431,8 +431,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 				if (target.IsKnockdownable())
 				{
 					// Knockback away from the statue
-					skillHit.KnockBackInfo = new KnockBackInfo(statue.Position, skillHit.Target, HitType.Normal, knockbackVelocity, 10);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.KnockBackInfo = new KnockBackInfo(statue.Position, skillHit.Target, KnockBackType.KnockBack, knockbackVelocity, 10);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					target.ApplyKnockback(caster, skill, skillHit);
 				}
 

@@ -54,7 +54,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 
@@ -139,7 +138,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				// would also be interesting and realistic.
 				var explosionPos = target.Position.GetRelative(target.Direction, 2f);
 
-				skillHit.KnockBackInfo = new KnockBackInfo(explosionPos, target, HitType.KnockDown, 150, 60);
+				skillHit.KnockBackInfo = new KnockBackInfo(explosionPos, target, KnockBackType.KnockDown, 150, 60);
 				skillHit.ApplyKnockBack(target);
 			}
 
@@ -184,7 +183,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				var skillHit = new SkillHitInfo(caster, blastTarget, skill, skillHitResult, damageDelay, skillHitDelay);
 				if (!caster.IsAbilityActive(AbilityId.Ranger35))
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(target.Position, blastTarget, HitType.KnockDown, 150, 60);
+					skillHit.KnockBackInfo = new KnockBackInfo(target.Position, blastTarget, KnockBackType.KnockDown, 150, 60);
 					skillHit.ApplyKnockBack(blastTarget);
 				}
 

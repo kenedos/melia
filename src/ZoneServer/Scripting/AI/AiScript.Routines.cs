@@ -378,12 +378,6 @@ namespace Melia.Zone.Scripting.AI
 				if (!(this.Entity is Mob mob && !mob.Data.CanRotate))
 					this.Entity.TurnTowards(target);
 
-				// Debug only
-				// if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss)
-				// {
-				// 	Send.ZC_CHAT(this.Entity, $"Watchout I'm using {skill.Id}.");
-				// }
-
 				var skillId = skill.Id;
 				if (Versions.Client == KnownVersions.ClosedBeta1)
 					skillId += 100000;

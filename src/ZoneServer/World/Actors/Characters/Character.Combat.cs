@@ -295,6 +295,55 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Returns true if the given entity can be hit by this character.
+		/// </summary>
+		public bool CanHit(ICombatEntity entity)
+		{
+			if (entity == this)
+				return false;
+
+			if (entity.IsDead)
+				return false;
+
+			var isHostileMonster = (entity is IMonster monster && monster.MonsterType == RelationType.Enemy);
+			if (!isHostileMonster)
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Returns true if the given entity can be targeted by this character.
+		/// </summary>
+		public bool CanTarget(ICombatEntity entity)
+		{
+			if (!this.CanHit(entity))
+				return false;
+
+			if (entity.IsLocked(LockType.GetTargeted))
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Returns true if the given entity can be damaged by this character.
+		/// </summary>
+		public bool CanDamage(ICombatEntity entity)
+		{
+			if (!this.CanHit(entity))
+				return false;
+
+			if (entity.IsLocked(LockType.GetDamaged))
+				return false;
+
+			if (entity.IsBuffActive(BuffId.Skill_NoDamage_Buff))
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
 		/// Returns true if the character can attack others.
 		/// </summary>
 		public bool CanFight()

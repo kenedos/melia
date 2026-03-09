@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
@@ -106,7 +106,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			var hit = new HitInfo(caster, target, buffSkill, skillHitResult);
 			hit.HitCount = 5;
 			hit.UnkFloat1 = -1;
-			hit.ForceId = ForceId.GetNew();
 			Send.ZC_HIT_INFO(caster, target, hit);
 
 			if (target.TryGetBounceTarget(caster, buffSkill, out var bounceTarget))
@@ -142,7 +141,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var hit = new HitInfo(caster, target, buffSkill, skillHitResult);
-			hit.ForceId = ForceId.GetNew();
 			Send.ZC_HIT_INFO(caster, target, hit);
 
 			if (target.TryGetBounceTarget(caster, buffSkill, out var bounceTarget))

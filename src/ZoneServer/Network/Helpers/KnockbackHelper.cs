@@ -26,7 +26,7 @@ namespace Melia.Zone.Network.Helpers
 			packet.PutInt(0);
 			packet.PutByte(0);
 			packet.PutByte(0);
-			if (knockBackInfo.HitType == Shared.Game.Const.HitType.KnockDown)
+			if (knockBackInfo.HitType == Shared.Game.Const.KnockBackType.KnockDown)
 			{
 				packet.PutByte(40);
 				packet.PutByte(64);

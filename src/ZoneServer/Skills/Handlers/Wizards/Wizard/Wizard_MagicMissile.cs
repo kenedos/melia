@@ -10,7 +10,9 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Components;
 using Yggdrasil.Extensions;
+using Yggdrasil.Logging;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
@@ -65,7 +67,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 					target.TakeDamage(skillHitResult.Damage, caster);
 
 					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-					skillHit.ForceId = ForceId.GetNew();
 					skillHits.Add(skillHit);
 				}
 			}
@@ -90,7 +91,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				{
 					var subTarget = subTargets.Random();
 
-					var skillHitResult = SCR_SkillHit(caster, target, skill);
+					var skillHitResult = SCR_SkillHit(caster, subTarget, skill);
 					subTarget.TakeDamage(skillHitResult.Damage, caster);
 
 					var hit = new HitInfo(caster, subTarget, skill, skillHitResult.Damage, skillHitResult.Result);

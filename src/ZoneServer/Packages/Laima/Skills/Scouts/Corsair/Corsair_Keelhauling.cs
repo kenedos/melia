@@ -127,8 +127,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 				if (target.IsKnockdownable())
 				{
 					var velocity = this.CalculatePullVelocity(caster, target);
-					skillHit.KnockBackInfo = new KnockBackInfo(caster, target, HitType.KnockDown, velocity, 30, KnockDirection.TowardsCaster);
-					skillHit.HitInfo.Type = HitType.KnockDown;
+					skillHit.KnockBackInfo = new KnockBackInfo(caster, target, KnockBackType.KnockDown, velocity, 30, KnockDirection.TowardsCaster);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 					target.ApplyKnockdown(caster, skill, skillHit);
 				}
 

@@ -71,8 +71,8 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 
 				if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, HitType.KnockDown, 200, 20);
-					skillHit.HitInfo.Type = HitType.KnockDown;
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockDown, 200, 20);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 					target.ApplyKnockdown(caster, skill, skillHit);
 				}
 

@@ -96,8 +96,8 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 
 			if (initiator.IsKnockdownable())
 			{
-				skillHit.KnockBackInfo = new KnockBackInfo(initiator, HitType.KnockBack, 100, 10, pad.Direction);
-				skillHit.HitInfo.Type = HitType.KnockBack;
+				skillHit.KnockBackInfo = new KnockBackInfo(initiator, KnockBackType.KnockBack, 100, 10, pad.Direction);
+				skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 				initiator.ApplyKnockback(creator, skill, skillHit);
 			}
 
@@ -122,8 +122,8 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 				{
 					if (target.IsKnockdownable())
 					{
-						targetHit.KnockBackInfo = new KnockBackInfo(target, HitType.KnockBack, 100, 10, pad.Direction);
-						targetHit.HitInfo.Type = HitType.KnockBack;
+						targetHit.KnockBackInfo = new KnockBackInfo(target, KnockBackType.KnockBack, 100, 10, pad.Direction);
+						targetHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 						target.ApplyKnockback(creator, skill, targetHit);
 					}
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Melia.Shared.Data.Database;
@@ -10,9 +10,7 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
-using Melia.Shared.Data.Database;
 using Melia.Zone.World.Items;
-// using Melia.Zone.World.MiniGames; // Removed: MiniGames namespace deleted
 
 namespace Melia.Zone.Scripting
 {
@@ -40,6 +38,7 @@ namespace Melia.Zone.Scripting
 		public static readonly DelegateCollection<SkillCalcFunc> Skill = new();
 		public static readonly DelegateCollection<CardScriptFunc> Card = new();
 		public static readonly DelegateCollection<CombatCalcFunction> Combat = new();
+		public static readonly DelegateCollection<CombatCalcModifierFunction> CombatModifier = new();
 		public static readonly DelegateCollection<StatusCalcFunction> Status = new();
 		public static readonly DelegateCollection<SkillHitFunction> SkillHit = new();
 		public static readonly DelegateCollection<ItemCalcFunc> ItemCalc = new();
@@ -54,10 +53,9 @@ namespace Melia.Zone.Scripting
 		public static readonly DelegateCollection<CustomCommandScriptFunc> CustomCommand = new();
 		public static readonly DelegateCollection<AbilityUnlockFunc> AbilityUnlock = new();
 		public static readonly DelegateCollection<AbilityPriceFunc> AbilityPrice = new();
+		public static readonly DelegateCollection<ClientGachaScpFunc> GachaScp = new();
 		public static readonly DelegateCollection<MapScriptFunc> Map = new();
 		public static readonly DelegateCollection<PadFunc> Pad = new();
-		// Removed: MiniGameStageFunc references deleted Stage type from MiniGames
-		// public static readonly DelegateCollection<MiniGameStageFunc> MiniGameStages = new();
 		public static readonly DelegateCollection<CompanionPriceFunc> CompanionPrice = new();
 		public static readonly DelegateCollection<ItemSetScriptFunc> ItemSet = new();
 		public static readonly DelegateCollection<SkillBuffHookFunc> SkillBuffHook = new();
@@ -197,6 +195,15 @@ namespace Melia.Zone.Scripting
 	public delegate float CombatCalcFunction(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult);
 
 	/// <summary>
+	/// A function that modifies values related to skill usage and combat.
+	/// </summary>
+	/// <param name="attacker"></param>
+	/// <param name="target"></param>
+	/// <param name="skill"></param>
+	/// <param name="skillHitResult"></param>
+	public delegate void CombatCalcModifierFunction(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult);
+
+	/// <summary>
 	/// A function that calculates values related to buff/status application.
 	/// </summary>
 	/// <param name="caster">The entity applying the buff.</param>
@@ -239,15 +246,22 @@ namespace Melia.Zone.Scripting
 	/// <returns></returns>
 	public delegate void AbilityPriceFunc(Character character, AbilityData abilityData, int abilityLevel, int maxLevel, out int price, out int time);
 
+	/// <summary>
+	/// A function the handles a request to use certain gacha items.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <param name="item"></param>
+	/// <param name="className"></param>
+	/// <param name="skipAnimation"></param>
+	/// <param name="pullCount"></param>
+	/// <returns></returns>
+	public delegate void ClientGachaScpFunc(Character character, Item item, string className, bool skipAnimation, int pullCount);
 
 	/// <summary>
 	/// A function that handles map specific behaviors.
 	/// </summary>
 	/// <param name="character"></param>
 	public delegate void MapScriptFunc(Character character);
-
-	// Removed: Stage type was in deleted MiniGames namespace
-	// public delegate void MiniGameStageFunc(Character character, Stage stage);
 
 	/// <summary>
 	/// A function that calculates the price for a companion stat training.

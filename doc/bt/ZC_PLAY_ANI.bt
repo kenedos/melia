@@ -19,7 +19,11 @@ int handle;
 int animationId;
 byte stopOnLastFrame;
 byte b2;
-float readyTime;
-float animationSpeed;
-byte b3;
-byte b4;
+float startDelay; // time in seconds
+float animationSpeed; // multiplier, 1 = 100%
+
+if (LOG_DATE >= 20230509)
+{
+    byte b3;
+    byte b4;
+}

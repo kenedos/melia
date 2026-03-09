@@ -57,7 +57,6 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult);
-			skillHit.ForceId = ForceId.GetNew();
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 
 			// Don't create link if initial hit dealt no damage

@@ -97,7 +97,7 @@ public class CustomCommandFunctionsScript : GeneralScript
 				if (wigVisible)
 				{
 					// Wig visible - show wig hair style
-					if (ZoneServer.Instance.Data.HairTypeDb.TryFind(character.Gender, strArg, out var hairData))
+					if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(strArg, out var hairData))
 						Send.ZC_NORMAL.UpdateCharacterLook(character, hairItem.Id, EquipSlot.Hair, hairData.Index);
 					else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
 						Send.ZC_NORMAL.UpdateCharacterLook(character, hairItem.Id, EquipSlot.Hair, headData.Index);

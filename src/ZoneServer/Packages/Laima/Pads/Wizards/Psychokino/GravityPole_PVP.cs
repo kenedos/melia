@@ -83,10 +83,10 @@ namespace Melia.Zone.Pads.HandlersOverride.Wizards.Psychokino
 					var pullFromPos = enemy.Position.GetRelative(pullDirection.Backwards, 10);
 
 					var velocity = Math.Min(150,(int)enemy.Position.Get2DDistance(closestPoint) * 5 + 50);
-					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, enemy, HitType.KnockDown, velocity, 60);
+					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, enemy, KnockBackType.KnockDown, velocity, 60);
 					skillHit.KnockBackInfo.Speed = 1;
 					skillHit.KnockBackInfo.VPow = 1;
-					skillHit.HitInfo.Type = HitType.KnockDown;
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 
 					enemy.ApplyKnockdown(creator, skill, skillHit);
 				}

@@ -160,10 +160,10 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 
 					var skillHitResult = new SkillHitResult { Damage = 0, Result = HitResultType.Hit };
 					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult);
-					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, HitType.KnockBack, 80, 10);
+					skillHit.KnockBackInfo = new KnockBackInfo(pullFromPos, target, KnockBackType.KnockBack, 80, 10);
 					skillHit.KnockBackInfo.Speed = 1;
 					skillHit.KnockBackInfo.VPow = 1;
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 
 					target.ApplyKnockback(caster, skill, skillHit);
 					hits.Add(skillHit);

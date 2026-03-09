@@ -100,8 +100,8 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 
 				if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, HitType.KnockBack, 120, 10);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockBack, 120, 10);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					target.ApplyKnockback(caster, skill, skillHit);
 				}
 

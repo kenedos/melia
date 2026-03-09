@@ -15,6 +15,7 @@ namespace Melia.Shared.Data.Database
 		public string Name { get; set; }
 		public string ClassName { get; set; }
 		public string Color { get; set; }
+		public bool AvailableOnCreation { get; set; }
 	}
 
 	/// <summary>
@@ -23,35 +24,16 @@ namespace Melia.Shared.Data.Database
 	public class HairTypeDb : DatabaseJson<HairTypeData>
 	{
 		/// <summary>
-		/// Returns the hair with the given class name or null if there was no
-		/// matching hair.
+		/// Returns the first entry with the given class name via out.
+		/// Returns false if no match was found.
 		/// </summary>
-		/// <param name="gender"></param>
-		/// <param name="name"></param>
-		/// <param name="hairData"></param>
-		/// <param name="color"></param>
+		/// <param name="className"></param>
+		/// <param name="result"></param>
 		/// <returns></returns>
-		public bool TryFind(Gender gender, string name, out HairTypeData hairData, string color = "default")
+		public bool TryFindByClassName(string className, out HairTypeData result)
 		{
-			hairData = this.Entries.Find(a => a.Gender == gender && a.ClassName.Equals(name, StringComparison.CurrentCultureIgnoreCase) && a.Color == color);
-
-			return hairData != null;
-		}
-
-		/// <summary>
-		/// Returns the hair with the given index or null if there was no
-		/// matching hair.
-		/// </summary>
-		/// <param name="gender"></param>
-		/// <param name="index"></param>
-		/// <param name="hairData"></param>
-		/// <param name="color"></param>
-		/// <returns></returns>
-		public bool TryFind(Gender gender, int index, out HairTypeData hairData, string color = "default")
-		{
-			hairData = this.Entries.Find(a => a.Gender == gender && a.Index == index && a.Color == color);
-
-			return hairData != null;
+			result = this.Entries.FirstOrDefault(a => string.CompareOrdinal(a.ClassName, className) == 0);
+			return result != null;
 		}
 
 		/// <summary>
@@ -69,6 +51,7 @@ namespace Melia.Shared.Data.Database
 			data.Name = entry.ReadString("name");
 			data.ClassName = entry.ReadString("className");
 			data.Color = entry.ReadString("color");
+			data.AvailableOnCreation = entry.ReadBool("availableOnCreation", false);
 
 			this.Add(data);
 		}

@@ -67,7 +67,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 				if (!TryTrackEnemy(tracked, initiator.Handle))
 					return;
 
-				var kb = new KnockBackInfo(pad.Position, initiator, HitType.KnockBack, 100, 10);
+				var kb = new KnockBackInfo(pad.Position, initiator, KnockBackType.KnockBack, 100, 10);
 				initiator.Position = kb.ToPosition;
 				initiator.AddState(StateType.KnockedBack, kb.Time);
 				Send.ZC_KNOCKBACK_INFO(initiator, kb);
@@ -108,7 +108,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 					if (!TryTrackEnemy(tracked, combatEntity.Handle))
 						continue;
 
-					var kb = new KnockBackInfo(pad.Position, combatEntity, HitType.KnockBack, 100, 10);
+					var kb = new KnockBackInfo(pad.Position, combatEntity, KnockBackType.KnockBack, 100, 10);
 					combatEntity.Position = kb.ToPosition;
 					combatEntity.AddState(StateType.KnockedBack, kb.Time);
 					Send.ZC_KNOCKBACK_INFO(combatEntity, kb);

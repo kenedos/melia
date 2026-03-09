@@ -216,7 +216,8 @@ namespace Melia.Zone.World.Actors
 		}
 
 		/// <summary>
-		/// Attaches an effect to the actor that is displayed alongside it.
+		/// Attaches an effect to the actor that is displayed alongside it
+		/// and updates clients.
 		/// </summary>
 		/// <param name="packetString"></param>
 		/// <param name="scale"></param>

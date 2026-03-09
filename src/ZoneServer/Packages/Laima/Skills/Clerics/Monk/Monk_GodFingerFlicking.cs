@@ -70,8 +70,8 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 
 				if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, HitType.KnockBack, 250, 10);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, KnockBackType.KnockBack, 250, 10);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					target.ApplyKnockback(caster, skill, skillHit);
 				}
 

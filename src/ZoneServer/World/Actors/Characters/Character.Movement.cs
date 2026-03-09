@@ -481,7 +481,7 @@ namespace Melia.Zone.World.Actors.Characters
 					var strArg = hairItem.Data?.Script?.StrArg ?? "";
 					if (!string.IsNullOrEmpty(strArg))
 					{
-						if (ZoneServer.Instance.Data.HairTypeDb.TryFind(character.Gender, strArg, out var hairData))
+						if (ZoneServer.Instance.Data.HairTypeDb.TryFindByClassName(strArg, out var hairData))
 							Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, hairItem.Id, EquipSlot.Hair, hairData.Index);
 						else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
 							Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, hairItem.Id, EquipSlot.Hair, headData.Index);

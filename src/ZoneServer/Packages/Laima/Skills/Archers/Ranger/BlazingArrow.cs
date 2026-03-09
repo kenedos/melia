@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -97,14 +97,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			target.TakeDamage(damage, caster);
 
 			var hit = new HitInfo(caster, target, skill, skillHitResult);
-			hit.ForceId = ForceId.GetNew();
-			hit.ResultType = HitResultType.NoHitScript;
+			hit.ResultType = HitResultType.SilentHit;
 
 			Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, caster, target, animationName, 1.3f, "arrow_cast", "F_hit_good", 1, "arrow_blow", "SLOW", 400);
 
 			var damageDelay = TimeSpan.FromMilliseconds(0);
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
-			skillHit.ForceId = ForceId.GetNew();
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 			//Send.ZC_HIT_INFO(caster, target, hit);

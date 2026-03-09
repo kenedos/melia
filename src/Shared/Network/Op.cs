@@ -1382,6 +1382,7 @@ namespace Melia.Shared.Network
 		CZ_REQ_GUILD_TOWER_REMOVE,
 		CZ_REQ_GUILD_QUEST_REWARD_INFO,
 		ZC_SEND_GUILD_QUEST_REWARD_INFO,
+		CZ_CHECK_GUILD_TICKET_RESET,
 
 	}
 	public static class OpTable

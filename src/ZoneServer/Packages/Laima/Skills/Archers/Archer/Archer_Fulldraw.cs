@@ -101,7 +101,7 @@ namespace Melia.Zone.Skills.Handlers.Archer
 				if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 				{
 					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					target.ApplyKnockback(caster, skill, skillHit);
 				}
 

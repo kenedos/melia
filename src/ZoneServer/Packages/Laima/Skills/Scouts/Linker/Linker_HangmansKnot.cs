@@ -92,7 +92,6 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 				}
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult);
-				skillHit.ForceId = ForceId.GetNew();
 				hits.Add(skillHit);
 			}
 

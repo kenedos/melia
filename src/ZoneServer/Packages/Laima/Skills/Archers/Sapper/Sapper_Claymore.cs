@@ -115,8 +115,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 					if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 					{
 						var velocity = 20 + 20 * detonateTrapsSkill.Level;
-						skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, HitType.KnockDown, velocity, 70);
-						skillHit.HitInfo.Type = HitType.KnockDown;
+						skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockDown, velocity, 70);
+						skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
 						target.ApplyKnockdown(caster, skill, skillHit);
 					}
 				}

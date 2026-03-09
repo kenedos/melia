@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
@@ -134,7 +134,6 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 				target.TakeDamage(skillHitResult.Damage, caster);
 
 				var hit = new HitInfo(caster, target, skill, skillHitResult);
-				hit.ForceId = ForceId.GetNew();
 
 				Send.ZC_NORMAL.PlayForceEffect(caster, sourceMonster, target, hit.ForceId, "I_arrow009", 0.5f, "None", "None", 0, "None", "FAST", 500, 1, 20, 5, 0, 1);
 				Send.ZC_HIT_INFO(caster, target, hit);

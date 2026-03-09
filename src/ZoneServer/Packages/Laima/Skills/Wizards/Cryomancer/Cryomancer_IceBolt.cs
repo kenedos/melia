@@ -86,12 +86,11 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill, SkillModifier.MultiHit(2));
 				currentTarget.TakeDamage(skillHitResult.Damage, caster);
 				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, damageDelay, skillHitDelay);
-				skillHit.ForceId = ForceId.GetNew();
 
 				if (skillHitResult.Damage > 0 && currentTarget != target && currentTarget.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, HitType.KnockBack, 90, 10);
-					skillHit.HitInfo.Type = HitType.KnockBack;
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, KnockBackType.KnockBack, 90, 10);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 					currentTarget.ApplyKnockback(caster, skill, skillHit);
 				}
 

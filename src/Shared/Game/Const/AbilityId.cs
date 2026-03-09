@@ -5169,6 +5169,8 @@ namespace Melia.Shared.Game.Const
 		Kneller11 = 421066,
 		Kneller107 = 421067,
 		Kneller12 = 421068,
+		/// <summary>[Arts] Resonance Pulse: Centripetal</summary>
+		Kneller108 = 421069,
 		/// <summary>Cloaking: Enhance</summary>
 		Scout18 = 501001,
 		/// <summary>Dagger Slash: Enhance</summary>

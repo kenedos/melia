@@ -2089,8 +2089,24 @@ namespace Melia.Zone.Network
 
 			// Check target
 			ICombatEntity target = null;
-			if (targetHandle != 0 && character.Map.TryGetActor(targetHandle, out var actor) && actor is ICombatEntity ce)
-				target = ce;
+			if (targetHandle != 0)
+			{
+				if (!character.Map.TryGetActor(targetHandle, out var actor))
+				{
+					Log.Warning("CZ_SKILL_GROUND: User '{0}' tried to use skill '{1}' on a non-existing target.", conn.Account.Name, skill.Id);
+					return;
+				}
+
+				// The client sends a handle even if you target a friendly
+				// monster, such as an NPC. We'll ignore that case for
+				// now and leave target as null, under the assumption
+				// that you never use skills on non-combatants.
+				if (actor is ICombatEntity ce)
+				{
+					if (character.CanTarget(ce))
+						target = ce;
+				}
+			}
 
 			// Try to use skill
 			try
@@ -4731,7 +4747,9 @@ namespace Melia.Zone.Network
 					var canLearn = unlockFunc(character, abilityTreeData.UnlockScriptArgStr, abilityTreeData.UnlockScriptArgNum, abilityData);
 					if (!canLearn)
 					{
-						Log.Warning("CZ_REQ_LEARN_ABILITY: User '{0}' tried to learn an ability they haven't unlocked yet (Ability: {1}, Unlock: {2}).", character.Username, abilityData.ClassName, abilityTreeData.UnlockScriptName);
+						var callStr = string.Format("{0}('{1}', {2})", abilityTreeData.UnlockScriptName, abilityTreeData.UnlockScriptArgStr, abilityTreeData.UnlockScriptArgNum);
+
+						Log.Warning("CZ_REQ_LEARN_ABILITY: User '{0}' tried to learn an ability they haven't unlocked yet (Ability: {1}, Unlock: {2}).", character.Username, abilityData.ClassName, callStr);
 						return;
 					}
 				}
@@ -5981,7 +5999,8 @@ namespace Melia.Zone.Network
 			var newHairColor = packet.GetString();
 			var character = conn.SelectedCharacter;
 
-			if (ZoneServer.Instance.Data.HairTypeDb.TryFind(character.Gender, character.Hair, out var currentHair))
+			var currentHair = ZoneServer.Instance.Data.HairTypeDb.Find(a => a.Gender == character.Gender && a.Index == character.Hair);
+			if (currentHair != null)
 			{
 				var newHair = ZoneServer.Instance.Data.HairTypeDb.Find(a => a.ClassName == currentHair.ClassName && a.Color == newHairColor);
 				if (newHair != null)

@@ -108,14 +108,14 @@ namespace Melia.Zone.Pads.Handlers.Elementalist
 
 			if (isKnockdown)
 			{
-				var kb = new KnockBackInfo(target, HitType.KnockDown, 150, 60, perpendicularDirection);
+				var kb = new KnockBackInfo(target, KnockBackType.KnockDown, 150, 60, perpendicularDirection);
 				target.Position = kb.ToPosition;
 				target.AddState(StateType.KnockedDown, kb.Time);
 				Send.ZC_KNOCKDOWN_INFO(target, kb);
 			}
 			else
 			{
-				var kb = new KnockBackInfo(target, HitType.KnockBack, 100, 10, perpendicularDirection);
+				var kb = new KnockBackInfo(target, KnockBackType.KnockBack, 100, 10, perpendicularDirection);
 				target.Position = kb.ToPosition;
 				target.AddState(StateType.KnockedBack, kb.Time);
 				Send.ZC_KNOCKBACK_INFO(target, kb);
