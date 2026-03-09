@@ -30,23 +30,34 @@ namespace Melia.Zone.Buffs
 		/// <param name="packages"></param>
 		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly());
+			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly(), packages);
 		}
 
 		/// <summary>
-		/// Loads ability handlers marked with an ability handler
+		/// Loads buff handlers marked with a buff handler
 		/// attribute in the given assembly.
 		/// </summary>
 		/// <remarks>
 		/// Searches the given assembly for classes implementing the <see
-		/// cref="IAbilityHandler"/> interface and marked with the <see
-		/// cref="AbilityHandlerAttribute"/>. The handlers are then
-		/// registered for the ability ids specified in the attribute.
+		/// cref="IBuffHandler"/> interface and marked with the <see
+		/// cref="BuffHandlerAttribute"/>. The handlers are then
+		/// registered for the buff ids specified in the attribute.
 		/// </remarks>
 		/// <param name="assembly">Assembly to search for handlers.</param>
-		public void LoadHandlersFromAssembly(Assembly assembly)
+		/// <param name="packages">Package manager for filtering package handlers.</param>
+		public void LoadHandlersFromAssembly(Assembly assembly, PackageManager packages)
 		{
-			foreach (var type in assembly.GetTypes().Where(a => typeof(IBuffHandler).IsAssignableFrom(a) && !a.IsInterface))
+			var handlerTypes = assembly.GetTypes()
+				.Where(a => typeof(IBuffHandler).IsAssignableFrom(a) && !a.IsInterface)
+				.Where(a => packages.ShouldRegister(a));
+
+			// Process non-package types first, then package types, so
+			// that package handlers naturally override base handlers
+			// at equal priority.
+			var ordered = handlerTypes
+				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
+
+			foreach (var type in ordered)
 			{
 				foreach (var attr in type.GetCustomAttributes<BuffHandlerAttribute>())
 				{
@@ -54,7 +65,13 @@ namespace Melia.Zone.Buffs
 					var buffIds = attr.BuffIds;
 
 					foreach (var buffId in buffIds)
+					{
+						if (_priorities.TryGetValue(buffId, out var priority) && priority > attr.Priority)
+							continue;
+
 						this.Register(buffId, handler);
+						_priorities[buffId] = attr.Priority;
+					}
 				}
 			}
 		}

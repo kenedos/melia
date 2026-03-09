@@ -9,6 +9,7 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters.Components;
+using Yggdrasil.Logging;
 
 namespace Melia.Zone.Skills.Handlers
 {
@@ -27,7 +28,7 @@ namespace Melia.Zone.Skills.Handlers
 		/// <param name="packages"></param>
 		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly());
+			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly(), packages);
 		}
 
 		/// <summary>
@@ -41,9 +42,20 @@ namespace Melia.Zone.Skills.Handlers
 		/// registered for the skill ids specified in the attribute.
 		/// </remarks>
 		/// <param name="assembly">Assembly to search for handlers.</param>
-		public void LoadHandlersFromAssembly(Assembly assembly)
+		/// <param name="packages">Package manager for filtering package handlers.</param>
+		public void LoadHandlersFromAssembly(Assembly assembly, PackageManager packages)
 		{
-			foreach (var type in assembly.GetTypes().Where(a => typeof(ISkillHandler).IsAssignableFrom(a) && !a.IsInterface))
+			var handlerTypes = assembly.GetTypes()
+				.Where(a => typeof(ISkillHandler).IsAssignableFrom(a) && !a.IsInterface)
+				.Where(a => packages.ShouldRegister(a));
+
+			// Process non-package types first, then package types, so
+			// that package handlers naturally override base handlers
+			// at equal priority.
+			var ordered = handlerTypes
+				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
+
+			foreach (var type in ordered)
 			{
 				foreach (var attr in type.GetCustomAttributes<SkillHandlerAttribute>())
 				{
@@ -187,8 +199,18 @@ namespace Melia.Zone.Skills.Handlers
 		/// </exception>
 		public bool TryGetHandler<TSkillHandler>(SkillId skillId, out TSkillHandler handler) where TSkillHandler : ISkillHandler
 		{
-			handler = this.GetHandler<TSkillHandler>(skillId);
-			return handler != null;
+			try
+			{
+				handler = this.GetHandler<TSkillHandler>(skillId);
+				return handler != null;
+			}
+			catch (ArgumentException ex)
+			{
+				// Handler exists but doesn't implement the requested interface
+				Log.Warning("TryGetHandler: {0}", ex.Message);
+				handler = default;
+				return false;
+			}
 		}
 
 		/// <summary>

@@ -30,7 +30,7 @@ namespace Melia.Zone.Abilities
 		/// <param name="packages"></param>
 		public void Init(PackageManager packages)
 		{
-			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly());
+			this.LoadHandlersFromAssembly(Assembly.GetExecutingAssembly(), packages);
 		}
 
 		/// <summary>
@@ -44,9 +44,20 @@ namespace Melia.Zone.Abilities
 		/// registered for the ability ids specified in the attribute.
 		/// </remarks>
 		/// <param name="assembly">Assembly to search for handlers.</param>
-		public void LoadHandlersFromAssembly(Assembly assembly)
+		/// <param name="packages">Package manager for filtering package handlers.</param>
+		public void LoadHandlersFromAssembly(Assembly assembly, PackageManager packages)
 		{
-			foreach (var type in assembly.GetTypes().Where(a => typeof(IAbilityHandler).IsAssignableFrom(a) && !a.IsInterface))
+			var handlerTypes = assembly.GetTypes()
+				.Where(a => typeof(IAbilityHandler).IsAssignableFrom(a) && !a.IsInterface)
+				.Where(a => packages.ShouldRegister(a));
+
+			// Process non-package types first, then package types, so
+			// that package handlers naturally override base handlers
+			// at equal priority.
+			var ordered = handlerTypes
+				.OrderBy(t => Attribute.IsDefined(t, typeof(PackageAttribute)) ? 1 : 0);
+
+			foreach (var type in ordered)
 			{
 				foreach (var attr in type.GetCustomAttributes<AbilityHandlerAttribute>())
 				{
@@ -54,7 +65,13 @@ namespace Melia.Zone.Abilities
 					var abilityIds = attr.Ids;
 
 					foreach (var abilityId in abilityIds)
+					{
+						if (_priorities.TryGetValue(abilityId, out var priority) && priority > attr.Priority)
+							continue;
+
 						this.Register(abilityId, handler);
+						_priorities[abilityId] = attr.Priority;
+					}
 				}
 			}
 		}

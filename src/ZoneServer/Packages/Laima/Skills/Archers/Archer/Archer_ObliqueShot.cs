@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -87,7 +87,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 					bounceTarget.TakeDamage(skillHitResult.Damage, caster);
 
 					var hit = new HitInfo(caster, bounceTarget, skill, skillHitResult);
-					hit.ForceId = ForceId.GetNew();
 
 					Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, lastTarget, bounceTarget, "I_arrow009_red", 0.7f, "arrow_cast", "F_hit_good", 1, "arrow_blow", "SLOW", 800);
 					Send.ZC_HIT_INFO(caster, bounceTarget, hit);

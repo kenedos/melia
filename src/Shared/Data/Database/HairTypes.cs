@@ -42,7 +42,7 @@ namespace Melia.Shared.Data.Database
 		/// <param name="entry"></param>
 		protected override void ReadEntry(JObject entry)
 		{
-			entry.AssertNotMissing("index", "gender", "name", "className", "color", "availableOnCreation");
+			entry.AssertNotMissing("index", "gender", "name", "className", "color");
 
 			var data = new HairTypeData();
 
@@ -51,7 +51,7 @@ namespace Melia.Shared.Data.Database
 			data.Name = entry.ReadString("name");
 			data.ClassName = entry.ReadString("className");
 			data.Color = entry.ReadString("color");
-			data.AvailableOnCreation = entry.ReadBool("availableOnCreation");
+			data.AvailableOnCreation = entry.ReadBool("availableOnCreation", false);
 
 			this.Add(data);
 		}
