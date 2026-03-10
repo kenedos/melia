@@ -272,8 +272,16 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Returns true if the given entity can be hit by this character.
+		/// Returns true if this entity can hit the given one in a general
+		/// sense.
 		/// </summary>
+		/// <remarks>
+		/// Checks general purpose factors, such as whether the entity is
+		/// alive and a potential hostile target. Does not check
+		/// specialized states, such as locks.
+		/// </remarks>
+		/// <param name="entity"></param>
+		/// <returns></returns>
 		public bool CanHit(ICombatEntity entity)
 		{
 			if (entity == this)
@@ -282,8 +290,21 @@ namespace Melia.Zone.World.Actors.Characters
 			if (entity.IsDead)
 				return false;
 
-			var isHostileMonster = (entity is IMonster monster && monster.MonsterType == RelationType.Enemy);
-			if (!isHostileMonster)
+			if (!this.CanSee(entity))
+				return false;
+
+			if (entity.Properties.GetString(PropertyName.HitProof, "NO") == "YES" || entity.IsSafe())
+				return false;
+
+			if (entity is Companion companion && companion.IsRiding)
+				return false;
+
+			if (!this.IsEnemy(entity))
+				return false;
+
+			if (entity is Character character
+				&& character.Connection != null
+				&& !character.Connection.LoadComplete)
 				return false;
 
 			return true;
