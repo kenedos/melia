@@ -533,61 +533,61 @@ namespace Melia.Barracks.Network
 		[PacketHandler(Op.CB_BUY_THEMA)]
 		public void CB_BUY_THEMA(IBarracksConnection conn, Packet packet)
 		{
-			var type = packet.GetInt(); // 0 = Buy, 1 = Use, 2 = New Slot
+			var type = (ThemaType)packet.GetInt();
 			var newMapId = packet.GetInt();
 			var oldMapId = packet.GetInt();
 
-			// Get barrack
-			if (!BarracksServer.Instance.Data.BarrackDb.TryFind(newMapId, out var barrackData))
+			if (type >= ThemaType.BuyLodge && type <= ThemaType.UseLodge)
 			{
-				Log.Warning("CB_BUY_THEMA: User '{0}' tried to buy invalid thema '{1}'.", conn.Account.Name, newMapId);
-				return;
-			}
-
-			// If buying, check if the user has enough TP
-			if (type == 0)
-			{
-				if (!conn.Account.Charge(barrackData.Price))
+				// Get barrack
+				if (!BarracksServer.Instance.Data.BarrackDb.TryFind(newMapId, out var barrackData))
 				{
-					Log.Warning("CB_BUY_THEMA: User '{0}' tried to buy thema without having the necessary TP.", conn.Account.Name);
+					Log.Warning("CB_BUY_THEMA: User '{0}' tried to buy invalid thema '{1}'.", conn.Account.Name, newMapId);
 					return;
 				}
-			}
-			// If using, check if the user owns the thema
-			else if (type == 1)
-			{
-				if (!conn.Account.Themas.Contains(newMapId))
-				{
-					Log.Warning("CB_BUY_THEMA: User '{0}' tried to use thema they don't own.", conn.Account.Name);
-					return;
-				}
-			}
-			else if (type != 2)
-			{
-				Log.Debug("CB_BUY_THEMA: User '{0}' sent unknown type '{1}'.", conn.Account.Name, type);
-				return;
-			}
 
-			switch (type)
-			{
-				case 2:
-					if (!conn.Account.Charge(33))
+				// If buying, check if the user has enough TP
+				if (type == ThemaType.BuyLodge)
+				{
+					if (!conn.Account.Charge(barrackData.Price))
 					{
-						Log.Warning("CB_BUY_THEMA: User '{0}' tried to buy character slot without having the necessary TP.", conn.Account.Name);
+						Log.Warning("CB_BUY_THEMA: User '{0}' tried to buy thema without having the necessary TP.", conn.Account.Name);
 						return;
 					}
-					conn.Account.AdditionalSlotCount++;
-					break;
-				default:
-					conn.Account.SelectedBarrack = newMapId;
-					conn.Account.Themas.Add(newMapId);
-					break;
+				}
+				// If using, check if the user owns the thema
+				else if (type == ThemaType.UseLodge)
+				{
+					if (!conn.Account.Themas.Contains(newMapId))
+					{
+						Log.Warning("CB_BUY_THEMA: User '{0}' tried to use thema they don't own.", conn.Account.Name);
+						return;
+					}
+				}
+				conn.Account.SelectedBarrack = newMapId;
+				conn.Account.Themas.Add(newMapId);
+			}
+			else if (type == ThemaType.BuyCharacterSlot)
+			{
+				var price = BarracksServer.Instance.Conf.Barracks.CharacterSlotPrice;
+
+				if (!conn.Account.Charge(price))
+				{
+					Log.Warning("CB_BUY_THEMA: User '{0}' tried to buy a slot without having the necessary TP.", conn.Account.Name);
+					return;
+				}
+
+				conn.Account.AdditionalSlotCount++;
+			}
+			else if (type != ThemaType.BuyCharacterSlot)
+			{
+				Log.Debug("CB_BUY_THEMA: User '{0}' sent unknown type '{1}'.", conn.Account.Name, type);
 			}
 
 			// XXX: There's currently an issue where you might get stuck
 			//   in the thema buying screen if you preview a thema, don't
 			//   return, and then click buy or use. This seems to be a
-			//   client bug, because it's been observed on other servers.
+			//   client bug, because it's been observed on other servers
 			//   as well.
 
 			Send.BC_ACCOUNT_PROP(conn, conn.Account);
@@ -1070,16 +1070,17 @@ namespace Melia.Barracks.Network
 		}
 
 		/// <summary>
-		/// Request for the price of an additional character slot.
+		/// Request for the price of buying additional character slots.
+		/// Sent by client when the button to buy is clicked.
 		/// </summary>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
 		[PacketHandler(Op.CB_REQ_SLOT_PRICE)]
 		public void CB_REQ_SLOT_PRICE(IBarracksConnection conn, Packet packet)
 		{
-			var characterSlotPrice = 33;
+			var price = BarracksServer.Instance.Conf.Barracks.CharacterSlotPrice;
 
-			Send.BC_REQ_SLOT_PRICE(conn, characterSlotPrice);
+			Send.BC_REQ_SLOT_PRICE(conn, price);
 		}
 
 		/// <summary>

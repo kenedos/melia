@@ -46,6 +46,11 @@ namespace Melia.Shared.Configuration.Files
 		public int StartAdditionalSlotCount { get; private set; }
 
 		/// <summary>
+		/// TP price for buying additional character slots.
+		/// </summary>
+		public int CharacterSlotPrice { get; private set; }
+
+		/// <summary>
 		/// Delay in milliseconds before closing connections.
 		/// Allows clients to receive final packets before disconnect.
 		/// </summary>
@@ -72,8 +77,10 @@ namespace Melia.Shared.Configuration.Files
 			this.StartMap = this.GetString("start_map", "f_siauliai_west");
 			this.StartPosition = this.GetPosition("start_position", new Position(-628, 260, -1025));
 
-			this.EnableAccountCreation = this.GetBool("enable_account_creation", false);
+			this.EnableAccountCreation = this.GetBool("enable_account_creation", true);
 			this.StartAdditionalSlotCount = this.GetInt("additional_slot_count", 0);
+
+			this.CharacterSlotPrice = this.GetInt("character_slot_price", 33);
 
 			this.ConnectionCloseDelay = this.GetInt("connection_close_delay", 100);
 		}

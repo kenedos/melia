@@ -1,11 +1,25 @@
 // Melia
 // Database file
+// 
+// Features are toggles that enable or disable certain functionality in
+// the game, such as which classes are available or whether anyone can
+// dash. They are organized in a tree, so it's easy to enable or disable
+// a series of related features at once.
+// 
+// For more information, please check the doc folder.
 //---------------------------------------------------------------------------
 
 [
+// Base features of the game that are presumed to always have been there.
+{ name: "Base", enabled: true, children: [
+	// Enables bonus stats from jobs
+	{ name: "JobStatBonuses", enabled: true },
+]},
+
 // Second Closed Beta Phase, which ran between Winter 2015 and Spring 2016.
 { name: "iCBT2", enabled: true, children: [
-	// Removes Centurion from the Swordman job tree
+	// Removes Centurion from the Swordman job tree. Disabling this
+	// feature will enable the job on more recent clients.
 	{ name: "CenturionRemoved", enabled: true },
 ]},
 

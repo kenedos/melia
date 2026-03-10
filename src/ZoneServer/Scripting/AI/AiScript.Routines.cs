@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -68,11 +69,36 @@ namespace Melia.Zone.Scripting.AI
 
 			var radius = this.Random(min, max + 1);
 			var destination = this.Entity.Position;
+			var creationPos = this.CreationPosition;
 			var foundValidDest = false;
 
-			for (var i = 0; i < 5; ++i)
+			var wanderRange = Math.Max(max, _wanderRange);
+			var extraRangeRate = _extraWanderRangeRate;
+			var freeRoam = creationPos == null || ZoneServer.Instance.Conf.World.FreeRoamMonsters;
+
+			for (var i = 0; i < 10; ++i)
 			{
 				destination = this.Entity.Position.GetRandomInRange2D(radius, _rnd);
+
+				// Give entities a random chance to move past their wander
+				// limit, that decreases with distance, to add some
+				// unpredictability. The extra range rate respresents how
+				// much further past the wander limit movement is allowed.
+				// For example, 0.25 means movement is allowed up to 25%
+				// past the wander limit.
+				if (!freeRoam)
+				{
+					var distance = destination.Get2DDistance(creationPos.Value);
+
+					if (distance > wanderRange)
+					{
+						var chance = Math.Clamp(1 - (distance - wanderRange) / (wanderRange * extraRangeRate), 0, 1);
+
+						if (_rnd.NextDouble() > chance)
+							continue;
+					}
+				}
+
 				if (!this.Entity.Map.Ground.AnyObstacles(this.Entity.Position, destination))
 				{
 					foundValidDest = true;
@@ -246,6 +272,16 @@ namespace Melia.Zone.Scripting.AI
 		{
 			_movement?.Stop();
 			yield break;
+		}
+
+		/// <summary>
+		/// Moves entity back to its spawn position.
+		/// </summary>
+		/// <returns></returns>
+		protected IEnumerable ReturnHome()
+		{
+			if (this.CreationPosition.HasValue)
+				yield return this.MoveTo(this.CreationPosition.Value);
 		}
 
 		/// <summary>

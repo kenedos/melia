@@ -71,6 +71,9 @@ namespace Melia.Zone.Scripting.AI
 		private readonly HashSet<FactionType> _hatedFactions = new();
 		private readonly HashSet<int> _hatedMonsters = new();
 
+		private float _wanderRange = 300;
+		private readonly float _extraWanderRangeRate = 0.25f;
+
 		private readonly Dictionary<string, List<Action>> _duringActions = new();
 		private readonly Queue<IAiEventAlert> _eventAlerts = new();
 
@@ -100,6 +103,12 @@ namespace Melia.Zone.Scripting.AI
 		public ICombatEntity Owner { get; private set; }
 
 		/// <summary>
+		/// Gets or sets the position the entity was in when the AI script
+		/// was created.
+		/// </summary>
+		public Position? CreationPosition { get; set; }
+
+		/// <summary>
 		/// Returns the name of the currently running routine if it was named.
 		/// </summary>
 		public string CurrentRoutine { get; protected set; }
@@ -112,6 +121,7 @@ namespace Melia.Zone.Scripting.AI
 		{
 			this.Entity = combatEntity;
 			this.SetTendency(combatEntity.Tendency);
+			this.CreationPosition = combatEntity.Position;
 
 			// Cache hot-path components
 			_movement = this.Entity.Components.Get<MovementComponent>();
@@ -945,14 +955,14 @@ namespace Melia.Zone.Scripting.AI
 		/// <summary>
 		/// Makes AI hostile towards the given factions.
 		/// </summary>
-		/// <param name="faction"></param>
+		/// <param name="factions"></param>
 		protected void HatesFaction(params FactionType[] factions)
 			=> this.HatesFaction((IEnumerable<FactionType>)factions);
 
 		/// <summary>
 		/// Makes AI hostile towards the given factions.
 		/// </summary>
-		/// <param name="faction"></param>
+		/// <param name="factions"></param>
 		protected void HatesFaction(IEnumerable<FactionType> factions)
 		{
 			_hatedFactions.UnionWith(factions);
@@ -1099,6 +1109,28 @@ namespace Melia.Zone.Scripting.AI
 				return false;
 
 			return (hate >= _minAggroHateLevel);
+		}
+
+		/// <summary>
+		/// Returns true if the entity is outside of its allowed wander
+		/// range, relative to its spawn location.
+		/// </summary>
+		/// <remarks>
+		/// Also returns false if no spawn position could be found or
+		/// monsters were configured to not return home.
+		/// </remarks>
+		public bool IsFarFromHome()
+		{
+			if (!this.CreationPosition.HasValue)
+				return false;
+
+			if (!ZoneServer.Instance.Conf.World.MonstersReturnHome)
+				return false;
+
+			var distance = this.Entity.Position.Get2DDistance(this.CreationPosition.Value);
+			var allowedDistance = _wanderRange * (1 + _extraWanderRangeRate);
+
+			return (distance >= allowedDistance);
 		}
 
 		/// <summary>
@@ -1386,6 +1418,16 @@ namespace Melia.Zone.Scripting.AI
 		protected void SetViewDistance(float viewRange)
 		{
 			_viewRange = viewRange;
+		}
+
+		/// <summary>
+		/// Sets the range around the creation position in which the
+		/// entity may wander randomly.
+		/// </summary>
+		/// <param name="range"></param>
+		protected void SetWanderRange(float range)
+		{
+			_wanderRange = range;
 		}
 
 		/// <summary>
