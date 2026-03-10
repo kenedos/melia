@@ -22,7 +22,7 @@ internal class PadFunctionsScript : GeneralScript
 			case SkillId.Engineer_FrozenTurret:
 				foreach (var target in targets)
 				{
-					if (caster.CanAttack(target))
+					if (caster.CanDamage(target))
 						target.StartBuff(BuffId.ENGINEER_TURRET_SLOW_DEBUFF, skill.Level, 0, TimeSpan.FromSeconds(4), caster);
 				}
 				break;

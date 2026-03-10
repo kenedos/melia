@@ -66,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			if (caster == null) return;
 			if (target == null) return;
-			if (!caster.CanAttack(target)) return;
+			if (!caster.CanDamage(target)) return;
 			if (skillId == SkillId.None) return;
 			if (caster.TryGetSkill(skillId, out var skill)) return;
 

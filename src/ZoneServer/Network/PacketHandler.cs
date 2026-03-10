@@ -1820,7 +1820,7 @@ namespace Melia.Zone.Network
 					continue;
 				}
 
-				if (!character.CanAttack(target))
+				if (!character.CanDamage(target))
 				{
 					Log.Warning("CZ_CLIENT_HIT_LIST: User '{0}' tried to attack invalid target '{1}'.", conn.Account.Name, handle);
 					continue;

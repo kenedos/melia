@@ -110,7 +110,7 @@ namespace Melia.Zone.Skills.Helpers
 			{
 				if (args.Initiator is not ICombatEntity target)
 					return;
-				if (!caster.CanAttack(target))
+				if (!caster.CanDamage(target))
 					return;
 
 				var modifier = new SkillModifier();

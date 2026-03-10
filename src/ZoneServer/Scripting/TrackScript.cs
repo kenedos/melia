@@ -221,7 +221,7 @@ namespace Melia.Zone.Scripting
 			track.HasBattleBoxInLayer = true;
 			foreach (var actor in track.Actors)
 			{
-				if (actor.Handle != character.Handle && actor is ICombatEntity combatEntity && character.CanAttack(combatEntity))
+				if (actor.Handle != character.Handle && actor is ICombatEntity combatEntity && character.CanTarget(combatEntity))
 				{
 					var distance = (float)character.Position.Get2DDistance(actor.Position);
 					if (distance > 0)

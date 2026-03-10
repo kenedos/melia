@@ -209,7 +209,7 @@ namespace Melia.Zone.Skills.Helpers
 			var skillHitDelay = skill.Properties.HitDelay;
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
-				if (target == null || target.IsDead || !caster.CanAttack(target))
+				if (target == null || target.IsDead || !caster.CanDamage(target))
 					continue;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, skillModifier);

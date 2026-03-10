@@ -302,16 +302,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Returns true if this NPC can attack the given entity. NPCs typically cannot attack.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns>Always returns false for NPCs.</returns>
-		public bool CanAttack(ICombatEntity entity)
-		{
-			return false;
-		}
-
-		/// <summary>
 		/// Returns true if the given entity can be hit by this NPC.
 		/// </summary>
 		public bool CanHit(ICombatEntity entity) => false;

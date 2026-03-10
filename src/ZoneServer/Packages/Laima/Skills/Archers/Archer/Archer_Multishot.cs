@@ -109,7 +109,7 @@ namespace Melia.Zone.Skills.Handlers.Archer
 					if (targets.Count != 0)
 					{
 						var target = targets.Random();
-						if (!caster.CanAttack(target))
+						if (!caster.CanDamage(target))
 							continue;
 
 						var skillHitResult = SCR_SkillHit(caster, target, skill);

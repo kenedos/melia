@@ -728,7 +728,7 @@ namespace Melia.Zone.World.Maps
 					var effectiveRadius = radius + e.AgentRadius;
 					var dx = e.Position.X - position.X;
 					var dz = e.Position.Z - position.Z;
-					return attacker.CanAttack(e) && dx * dx + dz * dz <= effectiveRadius * effectiveRadius;
+					return attacker.CanDamage(e) && dx * dx + dz * dz <= effectiveRadius * effectiveRadius;
 				})
 				.OrderBy(e => position.Get2DDistance(e.Position));
 
@@ -771,7 +771,7 @@ namespace Melia.Zone.World.Maps
 			var excludeSet = exclude?.Length > 0 ? new HashSet<ICombatEntity>(exclude) : null;
 			var query = candidates
 				.Where(e => (excludeSet == null || !excludeSet.Contains(e)) &&
-						   attacker.CanAttack(e) &&
+						   attacker.CanDamage(e) &&
 						   shape.IsInsideOrInRange(e.Position, e.AgentRadius))
 				.OrderBy(e => attacker.GetDistance(e));
 
@@ -1279,7 +1279,7 @@ namespace Melia.Zone.World.Maps
 
 			var query = candidates
 				.Where(entity => (radius == 0 || entity.Position.InRange2D(attacker.Position, radius + entity.AgentRadius)) &&
-							   attacker.CanAttack(entity))
+							   attacker.CanDamage(entity))
 				.OrderBy(a => a.Position.Get2DDistance(attacker.Position));
 
 			return maxResult > 0 ? query.Take(maxResult).ToList() : query.ToList();
@@ -1303,7 +1303,7 @@ namespace Melia.Zone.World.Maps
 			}
 
 			return candidates
-				.Where(entity => entity.Position.InRange2D(position, radius + entity.AgentRadius) && attacker.CanAttack(entity))
+				.Where(entity => entity.Position.InRange2D(position, radius + entity.AgentRadius) && attacker.CanDamage(entity))
 				.OrderBy(a => a.Position.Get2DDistance(position))
 				.FirstOrDefault();
 		}
@@ -1328,7 +1328,7 @@ namespace Melia.Zone.World.Maps
 			var query = candidates
 				.Where(a => entity.Handle != a.Handle &&
 						   a.Position.InRange2D(entity.Position, radius + a.AgentRadius) &&
-						   attacker.CanAttack(a))
+						   attacker.CanDamage(a))
 				.OrderBy(a => a.Position.Get2DDistance(entity.Position));
 
 			return maxResult > 0 ? query.Take(maxResult).ToList() : query.ToList();

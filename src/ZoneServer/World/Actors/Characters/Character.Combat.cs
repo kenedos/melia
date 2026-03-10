@@ -272,29 +272,6 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Returns true if the character can attack the entity.
-		/// </summary>
-		public virtual bool CanAttack(ICombatEntity entity)
-		{
-			if (entity == this || this.Handle == entity.Handle || entity.IsDead)
-				return false;
-
-			if (this.IsLocked(LockType.Attack))
-				return false;
-
-			if (!this.CanSee(entity))
-				return false;
-
-			if (!this.IsEnemy(entity))
-				return false;
-
-			if (entity.IsSafe())
-				return false;
-
-			return true;
-		}
-
-		/// <summary>
 		/// Returns true if the given entity can be hit by this character.
 		/// </summary>
 		public bool CanHit(ICombatEntity entity)

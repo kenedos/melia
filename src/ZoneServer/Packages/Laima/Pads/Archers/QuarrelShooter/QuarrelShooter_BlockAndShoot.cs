@@ -76,7 +76,7 @@ namespace Melia.Zone.Pads.Handlers
 			if (pad.Trigger.AtCapacity)
 				return;
 
-			if (!creator.CanAttack(target))
+			if (!creator.CanDamage(target))
 				return;
 
 			if (target.IsDead)

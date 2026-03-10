@@ -1313,15 +1313,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Returns true if the given entity can be attacked by this one.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <returns></returns>
-		[Obsolete("Use CanTarget and CanDamage instead.")]
-		public bool CanAttack(ICombatEntity entity)
-			=> this.CanDamage(entity);
-
-		/// <summary>
 		/// Returns true if this entity can hit the given one in a general
 		/// sense.
 		/// </summary>
