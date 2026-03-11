@@ -54,6 +54,11 @@ namespace Melia.Zone.World.Maps
 		public NavGraphNode[] GraphNodes => _graphNodes;
 
 		/// <summary>
+		/// Returns the data that was used to create the ground.
+		/// </summary>
+		public GroundData Data => _data;
+
+		/// <summary>
 		/// Returns the raw array of walkable cell polygons.
 		/// </summary>
 		public Polygon2d[] GetCellPolygons() => _cells;

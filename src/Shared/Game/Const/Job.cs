@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 namespace Melia.Shared.Game.Const
 {
@@ -32,6 +32,8 @@ namespace Melia.Shared.Game.Const
 		Vanquisher = 1026,
 		SledgerS = 1027,
 		BonemancerS = 1028,
+		GrimmarkS = 1029,
+		Eskrimer = 1030,
 
 		// Wizard
 		Wizard = 2001,
@@ -136,6 +138,8 @@ namespace Melia.Shared.Game.Const
 		VultureT = 5020,
 		BlitzHunterT = 5021,
 		AetherBladerT = 5022,
+		GrimmarkT = 5023,
+		KnellerT = 5024,
 
 		// GM
 		GM = 9001,

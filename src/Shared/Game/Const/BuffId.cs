@@ -1,4 +1,4 @@
-namespace Melia.Shared.Game.Const
+﻿namespace Melia.Shared.Game.Const
 {
 	/// <summary>
 	/// A buff's id.
@@ -1474,6 +1474,18 @@ namespace Melia.Shared.Game.Const
 		BloodspearPierce_Speed_Buff = 3315,
 		ExploitWeakness_Buff = 3316,
 		Bloodlust_Dummy_Buff = 3317,
+		guild_dignity_Buff = 3318,
+		PassingBell_Buff = 3319,
+		GraveChill_Debuff = 3320,
+		Mourning_Debuff = 3321,
+		RestingGround_Buff = 3322,
+		Mourning_Dummy_Debuff = 3323,
+		Touche_Buff = 3324,
+		Touche_max_Buff = 3325,
+		Invitation_Buff = 3326,
+		Pret_Buff = 3327,
+		AdvantGarde_Buff = 3328,
+		Ouvert_Buff = 3329,
 		ItemSTRUP = 4001,
 		ItemCONUP = 4002,
 		ItemINTUP = 4003,

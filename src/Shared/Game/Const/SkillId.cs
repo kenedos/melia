@@ -1,4 +1,4 @@
-namespace Melia.Shared.Game.Const
+﻿namespace Melia.Shared.Game.Const
 {
 	/// <summary>
 	/// A skill's id.
@@ -172,6 +172,13 @@ namespace Melia.Shared.Game.Const
 		Grimmark_StakeOfTerminus_Swordman = 12350,
 		Grimmark_ExploitWeakness_Swordman = 12351,
 		Grimmark_BloodEruption_Swordman = 12352,
+		Escrimeur_AttaqueEnchainee = 12353,
+		Escrimeur_SeptEclairs = 12354,
+		Escrimeur_GrandFente = 12355,
+		Escrimeur_Invitation = 12356,
+		Escrimeur_AvantGarde = 12357,
+		Escrimeur_Rafale = 12358,
+		Escrimeur_PassataSotto = 12359,
 		IllusionSword_Illusion31 = 22019,
 		Vulture_Attack_Wizard = 22101,
 		Vulture_CombatProtocol_Wizard = 22102,
@@ -497,6 +504,13 @@ namespace Melia.Shared.Game.Const
 		Kupole_Naktis_NightFog = 143018,
 		Kupole_Zesty_BladeWhirlwind = 143019,
 		Kupole_SugarGabia_SweetDrops = 143020,
+		Kneller_GraveHand_Scout = 51743,
+		Kneller_MourningChime_Scout = 51744,
+		Kneller_PassingBell_Scout = 51745,
+		Kneller_DeeperResonance_Scout = 51746,
+		Kneller_RestingGround_Scout = 51747,
+		Kneller_ResonantPulse_Scout = 51748,
+		Kneller_DeathKnell_Scout = 51749,
 
 		// Warrior
 		NakMuay_Attack = 66,

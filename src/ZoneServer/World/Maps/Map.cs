@@ -124,9 +124,7 @@ namespace Melia.Zone.World.Maps
 		{
 			if (ZoneServer.Instance.Conf.World.MonstersUsePathfinding)
 			{
-				this.Pathfinder = this.Ground.GraphNodes?.Length > 0
-					? new NavGraphNodePathfinder(this)
-					: new DynamicGridPathfinder(this);
+				this.Pathfinder = new NavMeshPathfinder(this.Ground);
 			}
 			else
 			{

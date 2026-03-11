@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Monster ids
 //--- Description -----------------------------------------------------------
 // Auto-generated list of monster ids for easy access.
@@ -8058,6 +8058,18 @@ public static class MonsterId
 	public const int Tosz_Colony_Flag_Orsha = 160277;
 	public const int Tosz_Colony_Flag_Pedimian = 160278;
 	public const int DemonLair_Ashark_Explosion_Core = 160279;
+	public const int Npc_Grimmark = 160280;
+	public const int Npc_Kneller = 160281;
+	public const int EP18_1_ZMEI_SEAL = 160282;
+	public const int Npc_Uriel_Cat = 160283;
+	public const int Npc_Justis = 160284;
+	public const int Katyn_Tombstone1 = 160285;
+	public const int Katyn_Tombstone2 = 160286;
+	public const int Katyn_Tombstone3 = 160287;
+	public const int Katyn_Tombstone4 = 160288;
+	public const int Katyn_Tombstone5 = 160289;
+	public const int Gacha_Machine_Sliver = 160290;
+	public const int D_Thron_19_HiddenTrigger = 160291;
 	public const int E_Statue_Zemina = 161000;
 	public const int Npc_Kupole_Velcoffer = 161001;
 	public const int Npc_Teliavelis = 161002;

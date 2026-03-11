@@ -189,7 +189,9 @@ namespace Melia.Zone.Commands
 			this.Add("jobinfo", "", "Display information about character's jobs.", this.HandleJobInfo);
 			this.Add("feature", "<feature name> <enabled>", "Toggles a feature.", this.HandleFeature);
 			this.Add("resetcd", "", "Resets all skill cooldowns.", this.HandleResetSkillCooldown);
-			this.Add("nosave", "<enabled>", "Toggles whether the character will be saved on logout.", this.NoSave);
+			this.Add("nosave", "[enabled]", "Toggles whether the character will be saved on logout.", this.HandleNoSave);
+			this.Add("callmonster", "", "Instructs nearest monster to move to character.", this.HandleCallMonster);
+			this.Add("sendmonster", "<x> [y] <z>", "Instructs nearest monster to walk to given position.", this.HandleSendMonster);
 			this.Add("savelocation", "<location memo>", "Saves a location to locations.txt in temp folder.", this.HandleSaveLocation);
 			this.Add("marktreasure", "", "Saves current position as treasure chest spawn to treasures.txt in temp folder.", this.HandleMarkTreasure);
 			this.Add("markwarpentry", "", "Marks current position as warpable and saves to mark_warp.txt in temp folder", this.HandleMarkWarpEntry);
@@ -944,17 +946,23 @@ namespace Melia.Zone.Commands
 					return CommandResult.InvalidArgument;
 
 				var tempPos = new Position(x, 0, z);
-				if (!sender.Map.Ground.TryGetHeightAt(tempPos, out var height))
+				if (!sender.Map.Ground.TryGetHeightAt(tempPos, out var groundHeight))
 				{
 					sender.ServerMessage(Localization.Get("Failed to find ground at position ({0}, {1})."), x, z);
 					return CommandResult.Fail;
 				}
 
-				newPos = new Position(x, height, z);
+				newPos = new Position(x, groundHeight, z);
 			}
 			else if (args.Count == 3)
 			{
-				if (!float.TryParse(args.Get(0), NumberStyles.Float, CultureInfo.InvariantCulture, out var x) || !float.TryParse(args.Get(1), NumberStyles.Float, CultureInfo.InvariantCulture, out var y) || !float.TryParse(args.Get(2), NumberStyles.Float, CultureInfo.InvariantCulture, out var z))
+				if (!float.TryParse(args.Get(0), NumberStyles.Float, CultureInfo.InvariantCulture, out var x))
+					return CommandResult.InvalidArgument;
+
+				if (!float.TryParse(args.Get(1), NumberStyles.Float, CultureInfo.InvariantCulture, out var y))
+					return CommandResult.InvalidArgument;
+
+				if (!float.TryParse(args.Get(2), NumberStyles.Float, CultureInfo.InvariantCulture, out var z))
 					return CommandResult.InvalidArgument;
 
 				newPos = new Position(x, y, z);
@@ -964,7 +972,15 @@ namespace Melia.Zone.Commands
 				return CommandResult.InvalidArgument;
 			}
 
+			if (!target.Map.Ground.TryGetHeightAt(newPos, out var height))
+			{
+				sender.ServerMessage(Localization.Get("Invalid position."));
+				return CommandResult.Okay;
+			}
+
+			newPos.Y = height;
 			target.Position = newPos;
+
 			Send.ZC_SET_POS(target);
 
 			if (sender == target)
@@ -1064,13 +1080,23 @@ namespace Melia.Zone.Commands
 
 			// Get target position
 			Position targetPos;
-			if (args.Count < 4)
+			if (args.Count < 3)
 			{
 				if (!map.Ground.TryGetRandomPosition(out targetPos))
 				{
 					sender.ServerMessage(Localization.Get("Random position warp failed."));
 					return CommandResult.Okay;
 				}
+			}
+			else if (args.Count < 4)
+			{
+				if (!float.TryParse(args.Get(1), NumberStyles.Float, CultureInfo.InvariantCulture, out var x))
+					return CommandResult.InvalidArgument;
+
+				if (!float.TryParse(args.Get(2), NumberStyles.Float, CultureInfo.InvariantCulture, out var z))
+					return CommandResult.InvalidArgument;
+
+				targetPos = new Position(x, 0, z);
 			}
 			else
 			{
@@ -1085,6 +1111,14 @@ namespace Melia.Zone.Commands
 
 				targetPos = new Position(x, y, z);
 			}
+
+			if (!target.Map.Ground.TryGetHeightAt(targetPos, out var height))
+			{
+				sender.ServerMessage(Localization.Get("Invalid position."));
+				return CommandResult.Okay;
+			}
+
+			targetPos.Y = height;
 
 			// Warp
 			try
@@ -5189,7 +5223,7 @@ namespace Melia.Zone.Commands
 		/// <param name="args"></param>
 		/// <returns></returns>
 		/// <exception cref="NotImplementedException"></exception>
-		private CommandResult NoSave(Character sender, Character target, string message, string commandName, Arguments args)
+		private CommandResult HandleNoSave(Character sender, Character target, string message, string commandName, Arguments args)
 		{
 			if (args.Count < 1)
 			{
@@ -5368,6 +5402,9 @@ namespace Melia.Zone.Commands
 		/// <summary>
 		/// Gets all items listed in a temp file.
 		/// Item Ids should be listed once per line.
+		/// <summary>
+		/// Makes nearest monster move to the target character's position.
+		/// Useful for debugging and testing.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5436,7 +5473,44 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Generates all map images in temp folder
+		/// Makes nearest monster move to the target character's position.
+		/// Useful for debugging and testing.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleCallMonster(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			var dest = sender.Position;
+
+			var monsters = target.Map.GetMonsters().OfType<ICombatEntity>().OrderBy(a => sender.Position.Get2DDistance(a.Position));
+
+			foreach (var monster in monsters)
+			{
+				if (monster.Components.TryGet<MovementComponent>(out var movement))
+				{
+					var ai = monster.Components.Get<AiComponent>();
+
+					ai?.Script.Suspend();
+					movement.Stop();
+					var moveTime = movement.MoveTo(dest);
+					ai?.Script.Suspend(moveTime);
+
+					sender.ServerMessage(Localization.Get("Called monster to your position. Move time: {1}"), monster.Name, moveTime);
+					return CommandResult.Okay;
+				}
+			}
+
+			sender.ServerMessage(Localization.Get("No suitable monsters found."));
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Generates all map images in temp folder.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5834,6 +5908,78 @@ namespace Melia.Zone.Commands
 					break;
 				}
 			}
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Makes nearest monster move to a given position.
+		/// Useful for debugging and testing.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleSendMonster(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			if (args.Count < 2)
+				return CommandResult.InvalidArgument;
+
+			float x, y, z;
+
+			if (args.Count < 3)
+			{
+				if (!float.TryParse(args.Get(0), NumberStyles.Float, CultureInfo.InvariantCulture, out x))
+					return CommandResult.InvalidArgument;
+
+				if (!float.TryParse(args.Get(1), NumberStyles.Float, CultureInfo.InvariantCulture, out z))
+					return CommandResult.InvalidArgument;
+
+				y = 0;
+			}
+			else
+			{
+				if (!float.TryParse(args.Get(0), NumberStyles.Float, CultureInfo.InvariantCulture, out x))
+					return CommandResult.InvalidArgument;
+
+				if (!float.TryParse(args.Get(1), NumberStyles.Float, CultureInfo.InvariantCulture, out y))
+					return CommandResult.InvalidArgument;
+
+				if (!float.TryParse(args.Get(2), NumberStyles.Float, CultureInfo.InvariantCulture, out z))
+					return CommandResult.InvalidArgument;
+			}
+
+			var dest = new Position(x, y, z);
+
+			if (!target.Map.Ground.TryGetHeightAt(dest, out var height))
+			{
+				sender.ServerMessage(Localization.Get("Destination '{0}' is not a valid position."), dest);
+				return CommandResult.Okay;
+			}
+
+			dest.Y = height;
+
+			var monsters = target.Map.GetMonsters().OfType<ICombatEntity>().OrderBy(a => sender.Position.Get2DDistance(a.Position));
+
+			foreach (var monster in monsters)
+			{
+				if (monster.Components.TryGet<MovementComponent>(out var movement))
+				{
+					var ai = monster.Components.Get<AiComponent>();
+
+					ai?.Script.Suspend();
+					movement.Stop();
+					var moveTime = movement.MoveTo(dest);
+					ai?.Script.Suspend(moveTime);
+
+					sender.ServerMessage(Localization.Get("Sent monster to position {1}. Move time: {2}"), monster.Name, dest, moveTime);
+					return CommandResult.Okay;
+				}
+			}
+
+			sender.ServerMessage(Localization.Get("No suitable monsters found."));
 
 			return CommandResult.Okay;
 		}

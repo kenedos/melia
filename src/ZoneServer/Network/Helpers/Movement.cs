@@ -1,4 +1,5 @@
-﻿using Melia.Shared.Network;
+﻿using Melia.Shared.Game.Const;
+using Melia.Shared.Network;
 using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.World.Actors;
@@ -19,8 +20,20 @@ namespace Melia.Zone.Network.Helpers
 		/// <param name="fromCellPos"></param>
 		/// <param name="toCellPos"></param>
 		/// <param name="speed"></param>
-		/// <param name="rotate">If actor should rotate</param>
-		public static void AddCellMovement(this Packet packet, IActor actor, Position fromCellPos, Position toCellPos, float speed, bool autoRotate = true)
+		public static void AddCellMovement(this Packet packet, IActor actor, Position fromCellPos, Position toCellPos, float speed)
+			=> AddCellMovement(packet, actor, fromCellPos, toCellPos, speed, CellMoveType.Normal);
+
+		/// <summary>
+		/// Adds information about the actor moving between the given cell
+		/// positions to the packet.
+		/// </summary>
+		/// <param name="packet"></param>
+		/// <param name="actor"></param>
+		/// <param name="fromCellPos"></param>
+		/// <param name="toCellPos"></param>
+		/// <param name="speed"></param>
+		/// <param name="type"></param>
+		public static void AddCellMovement(this Packet packet, IActor actor, Position fromCellPos, Position toCellPos, float speed, CellMoveType type)
 		{
 			packet.PutInt(actor.Handle);
 			packet.PutInt((int)fromCellPos.X);
@@ -32,15 +45,11 @@ namespace Melia.Zone.Network.Helpers
 			packet.PutFloat(speed);
 
 			// [i354444] Float removed, byte added. Same thing?
+			//packet.PutFloat(0);
 			if (Versions.Client < 354444)
-				packet.PutFloat(0);
+				packet.PutFloat(0); 
 			else
-			{
-				if (autoRotate == false)
-					packet.PutByte(2);
-				else
-					packet.PutByte(0);
-			}
+				packet.PutByte((byte)type);
 		}
 
 		/// <summary>
