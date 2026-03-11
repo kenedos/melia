@@ -1112,7 +1112,7 @@ namespace Melia.Zone.Commands
 				targetPos = new Position(x, y, z);
 			}
 
-			if (!target.Map.Ground.TryGetHeightAt(targetPos, out var height))
+			if (!map.Ground.TryGetHeightAt(targetPos, out var height))
 			{
 				sender.ServerMessage(Localization.Get("Invalid position."));
 				return CommandResult.Okay;
