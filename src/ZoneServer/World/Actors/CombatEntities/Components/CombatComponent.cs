@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
 using Melia.Zone.Skills;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Extensions;
 using Yggdrasil.Scheduling;
@@ -231,9 +233,30 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			this._isCasting = casting;
 
 			if (casting)
+			{
 				this._castingSkill = skill;
+				this.NotifyBuffsOnCastStart(skill);
+			}
 			else
+			{
 				this._castingSkill = null;
+			}
+		}
+
+		/// <summary>
+		/// Notifies active buffs that implement IBuffOnCastStartHandler.
+		/// </summary>
+		/// <param name="skill"></param>
+		private void NotifyBuffsOnCastStart(Skill skill)
+		{
+			if (!this.Entity.Components.TryGet<BuffComponent>(out var buffs))
+				return;
+
+			foreach (var buff in buffs.GetList())
+			{
+				if (buff.Handler is IBuffOnCastStartHandler castHandler)
+					castHandler.OnCastStart(buff, this.Entity, skill);
+			}
 		}
 
 		/// <summary>

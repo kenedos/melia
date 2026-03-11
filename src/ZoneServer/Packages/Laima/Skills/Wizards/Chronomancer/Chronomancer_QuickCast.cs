@@ -7,6 +7,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 {
@@ -14,6 +15,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 	[SkillHandler(SkillId.Chronomancer_QuickCast)]
 	public class Chronomancer_QuickCastOverride : ISelfSkillHandler
 	{
+		private const float BuffRange = 300;
+		private const int BuffDurationSeconds = 300;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Direction dir)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -27,8 +31,20 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
 
-			var durationMs = (30000 + skill.Level * 5000);
-			caster.StartBuff(BuffId.QuickCast_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(durationMs), caster);
+			var duration = TimeSpan.FromSeconds(BuffDurationSeconds);
+
+			caster.StartBuff(BuffId.QuickCast_Buff, skill.Level, 0f, duration, caster);
+
+			if (caster is Character character)
+			{
+				var members = character.GetPartyMembersInRange(BuffRange);
+				foreach (var member in members)
+				{
+					if (member == caster)
+						continue;
+					member.StartBuff(BuffId.QuickCast_Buff, skill.Level, 0f, duration, caster);
+				}
+			}
 		}
 	}
 }

@@ -1686,7 +1686,7 @@ public class CharacterCalculationsScript : GeneralScript
 		if (nowWeight > maxWeight && !character.Map.IsCity)
 			value /= 3;
 
-		return value;
+		return Math.Max(1, value);
 	}
 
 	/// <summary>

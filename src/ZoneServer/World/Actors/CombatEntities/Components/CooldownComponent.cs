@@ -42,6 +42,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="duration"></param>
 		public Cooldown Start(CooldownId cooldownId, TimeSpan duration)
 		{
+			if (this.ExtraCooldown > TimeSpan.Zero)
+				duration += this.ExtraCooldown;
+
 			var cooldown = new Cooldown(cooldownId, duration);
 
 			lock (_syncLock)
@@ -83,9 +86,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			{
 				duration *= (1 - cdrRate);
 			}
-
-			if (this.ExtraCooldown > TimeSpan.Zero)
-				duration += this.ExtraCooldown;
 
 			return this.Start(skill.Data.CooldownGroup, duration);
 		}

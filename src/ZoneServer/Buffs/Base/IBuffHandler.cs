@@ -112,6 +112,11 @@ namespace Melia.Zone.Buffs.Base
 	}
 
 	/// <summary>
+	/// Called when the entity starts casting a skill (dynamic cast start).
+	/// </summary>
+	public interface IBuffOnCastStartHandler { void OnCastStart(Buff buff, ICombatEntity caster, Skill skill); }
+
+	/// <summary>
 	/// Called on the target before a knockback is applied.
 	/// Return KnockResult.Prevent to block the knockback.
 	/// </summary>

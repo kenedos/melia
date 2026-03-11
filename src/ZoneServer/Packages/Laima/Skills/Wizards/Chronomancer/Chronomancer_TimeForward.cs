@@ -45,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, caster.Position, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			var targetList = caster.Map.GetAttackableEnemiesInPosition(caster, farPos, (int)skill.Data.SplashRange * 4);
+			var targetList = caster.Map.GetAttackableEnemiesInPosition(caster, farPos, 100f);
 
 			foreach (var currentTarget in targetList.Take(8))
 			{

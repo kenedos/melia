@@ -255,7 +255,7 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 
 		var byBuff = monster.Properties.GetFloat(PropertyName.MSPD_BM);
 
-		var value = (int)Math.Max(0, baseValue + byBuff);
+		var value = (int)Math.Max(1, baseValue + byBuff);
 
 		return value;
 	}

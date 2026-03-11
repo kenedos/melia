@@ -1,3 +1,4 @@
+using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
@@ -14,7 +15,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 		{
 			var skillLevel = buff.NumArg1;
 
-			var speedReduction = 3f + skillLevel * 1f;
+			var speedReduction = (float)Math.Floor(8 + skillLevel * 1.5);
 
 			AddPropertyModifier(buff, buff.Target, PropertyName.MSPD_BM, -speedReduction);
 		}
