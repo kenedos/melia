@@ -27,18 +27,14 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_wiz_psychicpressure_shot", "voice_wiz_m_psychicpressure_shot");
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(false, skill);
 			Send.ZC_SKILL_DISABLE(caster);
 			Send.ZC_NORMAL.SkillCancel(caster, skill.Id);
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
 			SkillRemovePad(caster, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

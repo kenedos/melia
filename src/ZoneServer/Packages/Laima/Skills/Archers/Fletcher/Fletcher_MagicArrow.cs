@@ -20,13 +20,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopSound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

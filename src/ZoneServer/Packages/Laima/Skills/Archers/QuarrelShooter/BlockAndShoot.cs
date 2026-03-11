@@ -37,14 +37,12 @@ namespace Melia.Zone.Skills.Handlers.QuarrelShooter
 		{
 			var blockBonus = this.CalculateBlockBonus(skill, caster);
 			caster.StartBuff(BuffId.BlockAndShoot_Buff, skill.Level, blockBonus, TimeSpan.Zero, caster);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 			_isCasting = true;
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.RemoveBuff(BuffId.BlockAndShoot_Buff);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 			_isCasting = false;
 		}
 

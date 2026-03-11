@@ -31,14 +31,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 		private static readonly TimeSpan HitDelay = TimeSpan.FromMilliseconds(435);
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(5);
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-		}
-
 		/// <summary>
 		/// Handles skill, damaging targets.
 		/// </summary>

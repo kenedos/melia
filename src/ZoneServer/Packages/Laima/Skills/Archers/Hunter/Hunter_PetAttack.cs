@@ -40,16 +40,6 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 			// Passive effect is handled via OnCompanionAttackAfterCalc hook
 		}
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TryGetActiveCompanion(out var companion))
@@ -122,7 +112,6 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 					else
 						companion.InsertHate(target, 300);
 
-
 					var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHit(2));
 					target.TakeDamage(skillHitResult.Damage, caster);
 
@@ -132,7 +121,6 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 					hits.Add(skillHit);
 				}
 			}
-
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
 		}

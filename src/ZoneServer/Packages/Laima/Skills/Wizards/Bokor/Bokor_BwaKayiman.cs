@@ -32,12 +32,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-
 			if (caster is not Character character)
 				return;
-
 
 			if (!caster.TryGetBuff(BuffId.PowerOfDarkness_Buff, out var darkForceBuff) || darkForceBuff.OverbuffCounter < 10)
 			{
@@ -96,9 +92,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-
 			if (caster is not Character character)
 				return;
 

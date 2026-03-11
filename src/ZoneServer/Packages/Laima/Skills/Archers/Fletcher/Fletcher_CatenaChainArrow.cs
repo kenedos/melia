@@ -22,18 +22,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 	[SkillHandler(SkillId.Fletcher_CatenaChainArrow)]
 	public class Fletcher_CatenaChainArrowOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			if (caster is Character character)
-			{
-			}
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (skill.Vars.TryGet<int>("Melia.CatenaChainArrowPadHandle", out var padHandle))

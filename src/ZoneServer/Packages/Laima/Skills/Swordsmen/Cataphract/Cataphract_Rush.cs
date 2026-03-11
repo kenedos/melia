@@ -32,8 +32,6 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 			caster.StartBuff(BuffId.Warrior_RushMove_Buff, 1f, 0f, TimeSpan.Zero, caster);
 			caster.StartBuff(BuffId.Warrior_EnableMovingShot_Buff, 2, 0, TimeSpan.Zero, caster);
 			caster.PlaySound("voice_atk_long_war_f", "voice_war_atk_long_cast");
-
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		/// <summary>
@@ -44,7 +42,6 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 			caster.RemoveBuff(BuffId.Warrior_RushMove_Buff);
 			caster.StopBuff(BuffId.Warrior_EnableMovingShot_Buff);
 			caster.StopSound("voice_atk_long_war_f", "voice_war_atk_long_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		/// <summary>

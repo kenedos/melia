@@ -34,19 +34,15 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(true, skill);
 			var pad = SkillCreatePad(caster, skill, caster.Position, 0f, PadName.Paladin_Sanctuary_Pad);
 			skill.Vars.Set("Skill.Pad", pad);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(false, skill);
 			// TODO: No Implementation SKL_CANCEL_CANCEL
 			var pad = skill.Vars.Get<Pad>("Skill.Pad");
 			pad.Destroy();
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

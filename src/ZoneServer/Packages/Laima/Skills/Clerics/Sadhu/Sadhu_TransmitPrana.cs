@@ -26,18 +26,6 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 		private const float BaseDamageMultiplierIncrease = 0.10f;
 		private const float DamageMultiplierIncreasePerLevel = 0.02f;
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))

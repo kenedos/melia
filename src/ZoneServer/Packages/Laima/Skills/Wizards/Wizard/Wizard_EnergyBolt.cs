@@ -23,17 +23,12 @@ namespace Melia.Zone.Skills.Handlers.Wizard
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_wiz_energybolt_cast", "voice_wiz_m_energybolt_cast");
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopSound("voice_wiz_energybolt_cast", "voice_wiz_m_energybolt_cast");
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
-
 
 		/// <summary>
 		/// Handles the skill, attacking the targets.

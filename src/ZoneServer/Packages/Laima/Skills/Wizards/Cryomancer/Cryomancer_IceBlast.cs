@@ -30,24 +30,6 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		private const int DebuffDurationSeconds = 20;
 		private const int DebuffUpdateTimeMilliseconds = 1000;
 
-		/// <summary>
-		/// Start casting.
-		/// </summary>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		/// <summary>
-		/// End casting.
-		/// </summary>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))

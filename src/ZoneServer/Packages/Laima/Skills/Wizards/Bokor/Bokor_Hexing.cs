@@ -24,24 +24,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 		private const int DebuffDurationMilliseconds = 20000;
 
 		/// <summary>
-		/// Starts the dynamic casting of the skill.
-		/// </summary>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		/// <summary>
-		/// Ends the dynamic casting of the skill.
-		/// </summary>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
-		/// <summary>
 		/// Handles skill behavior
 		/// </summary>
 		/// <param name="skill"></param>

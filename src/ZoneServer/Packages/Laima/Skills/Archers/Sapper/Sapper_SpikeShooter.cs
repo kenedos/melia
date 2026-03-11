@@ -24,17 +24,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 		private const int CastDelayMs = 300;
 		private const float SpawnDistance = 22.4f;
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(false, skill);
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

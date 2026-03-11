@@ -2229,16 +2229,12 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IDynamicCasted>(skillId, out var handler))
-			{
-				character.ServerMessage(Localization.Get("This skill has not been implemented yet."));
-				Log.Warning("CZ_DYNAMIC_CASTING_START: No handler for skill '{0}' found.", skillId);
-				return;
-			}
-
 			character.SetCastingState(true, skill);
+			Send.ZC_NORMAL.Skill_DynamicCastStart(character, skill.Id);
 			character.Variables.Temp.Set("Melia.Cast.Skill", skill);
-			handler.StartDynamicCast(skill, character, maxCastTime);
+
+			if (ZoneServer.Instance.SkillHandlers.TryGetHandler<IDynamicCasted>(skillId, out var handler))
+				handler.StartDynamicCast(skill, character, maxCastTime);
 		}
 
 		/// <summary>
@@ -2262,16 +2258,12 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IDynamicCasted>(skillId, out var handler))
-			{
-				character.ServerMessage(Localization.Get("This skill has not been implemented yet."));
-				Log.Warning("CZ_DYNAMIC_CASTING_END: No handler for skill '{0}' found.", skillId);
-				return;
-			}
-
 			character.SetCastingState(false, skill);
-			handler.EndDynamicCast(skill, character, castTime);
+			Send.ZC_NORMAL.Skill_DynamicCastEnd(character, skill.Id, castTime);
 			character.Variables.Temp.Remove("Melia.Cast.Skill");
+
+			if (ZoneServer.Instance.SkillHandlers.TryGetHandler<IDynamicCasted>(skillId, out var handler))
+				handler.EndDynamicCast(skill, character, castTime);
 		}
 
 		/// <summary>

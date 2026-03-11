@@ -25,15 +25,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 	[SkillHandler(SkillId.Hoplite_Stabbing)]
 	public class Hoplite_StabbingOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		/// <summary>
 		/// Handles skill, damaging targets.

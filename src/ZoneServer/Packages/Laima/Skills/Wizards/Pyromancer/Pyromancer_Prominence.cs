@@ -29,18 +29,6 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		private const float DamageWidth = 40f;
 		private const int MaxTargetsPerSalamander = 4;
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))

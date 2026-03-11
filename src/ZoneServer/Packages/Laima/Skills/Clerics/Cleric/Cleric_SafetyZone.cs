@@ -22,29 +22,6 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 	[SkillHandler(SkillId.Cleric_SafetyZone)]
 	public class Cleric_SafetyZoneOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		/// <summary>
-		/// Start casting.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="maxCastTime"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		/// <summary>
-		/// End casting.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="maxCastTime"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		/// <summary>
 		/// Handles skill

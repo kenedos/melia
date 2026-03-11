@@ -51,9 +51,6 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-
 			caster.StartBuff(BuffId.Pouncing_Buff, TimeSpan.Zero);
 
 			var padName = PadName.Barbarian_Pouncing;
@@ -82,8 +79,6 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 		/// <param name="caster"></param>
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 			caster.StopBuff(BuffId.Pouncing_Buff);
 		}
 	}

@@ -25,18 +25,14 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 			if (caster.TryGetActiveAbility(AbilityId.Paladin20, out var ability))
 				caster.StartBuff(BuffId.Skill_Durability_Buff, 1f, 0f, TimeSpan.FromMilliseconds(1f), caster);
 			caster.PlaySound("voice_cleric_barrier_shot", "voice_cleric_m_barrier_shot");
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(false, skill);
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
 			SkillRemovePad(caster, skill);
 			caster.RemoveBuff(BuffId.Skill_Durability_Buff);
 			caster.StopSound("voice_cleric_barrier_shot", "voice_cleric_m_barrier_shot");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

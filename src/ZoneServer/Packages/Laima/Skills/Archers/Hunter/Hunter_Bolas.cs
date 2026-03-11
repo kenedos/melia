@@ -32,15 +32,6 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 	[SkillHandler(SkillId.Hunter_Bolas)]
 	public class Hunter_BolasOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{

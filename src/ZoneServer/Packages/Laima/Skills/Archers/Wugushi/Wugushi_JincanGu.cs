@@ -39,13 +39,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_archer_jincangu_shot", "voice_archer_m_jincangu_shot");
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopSound("voice_archer_jincangu_shot", "voice_archer_m_jincangu_shot");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

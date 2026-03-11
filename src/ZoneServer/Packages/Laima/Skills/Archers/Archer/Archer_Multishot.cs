@@ -36,7 +36,6 @@ namespace Melia.Zone.Skills.Handlers.Archer
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_archer_multishot_cast", "voice_archer_m_multishot_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		/// <summary>
@@ -47,7 +46,6 @@ namespace Melia.Zone.Skills.Handlers.Archer
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopSound("voice_archer_multishot_cast", "voice_archer_m_multishot_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		/// <summary>

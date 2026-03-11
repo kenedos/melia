@@ -16,17 +16,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	[SkillHandler(SkillId.Wizard_ReflectShield)]
 	public class Wizard_ReflectShieldOverride : ISelfSkillHandler, IDynamicCasted
 	{
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.

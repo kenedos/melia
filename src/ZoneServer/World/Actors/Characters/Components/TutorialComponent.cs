@@ -60,7 +60,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					}
 
 					if (help.DbSave)
-						ZoneServer.Instance.Database.SaveHelp(this.Character.DbId, help.Id, true);
+						ZoneServer.Instance.Database.SaveHelp(this.Character.AccountDbId, help.Id, true);
 				}
 			}
 		}

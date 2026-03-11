@@ -39,13 +39,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 
 			skill.Vars.Set(VarPads, new List<Pad>());
 			skill.Vars.Set(VarIsCasting, true);
-
-			caster.SetCastingState(true, skill);
 			caster.StartBuff(BuffId.Chainreaction_Runpad_Buff, 1f, 0f, TimeSpan.Zero, caster);
 			caster.PlaySound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
 			caster.PlaySound("skl_eff_lightningsphere_cast", "skl_eff_lightningsphere_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-
 			var castingSpeed = caster.Properties.GetFloat(PropertyName.CastingSpeed);
 			var castTimeMs = skill.Data.BasicCast * castingSpeed / 100f;
 			skill.Vars.Set(VarCastTimeMs, castTimeMs);
@@ -73,12 +69,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.SetCastingState(false, skill);
 			skill.Vars.Set(VarIsCasting, false);
 			caster.RemoveBuff(BuffId.Chainreaction_Runpad_Buff);
 			caster.StopSound("skl_eff_lightningsphere_cast", "skl_eff_lightningsphere_cast");
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

@@ -26,18 +26,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		private const int BulletsPerUse = 3;
 		private const float SubSplashAreaSize = 200;
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		/// <summary>
 		/// Handles the skill, shooting missiles at enemies.
 		/// </summary>

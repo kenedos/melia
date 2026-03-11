@@ -315,6 +315,7 @@ namespace Melia.Zone.World
 		public void RemoveScriptedEntities()
 		{
 			this.Maps.RemoveScriptedEntities();
+			this.NPCs.Clear();
 
 			lock (_spawners)
 			{

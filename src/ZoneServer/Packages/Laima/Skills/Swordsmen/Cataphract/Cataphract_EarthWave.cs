@@ -31,7 +31,6 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_archer_cloaking_shot", "voice_war_atk_long_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		/// <summary>
@@ -40,7 +39,6 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StopSound("voice_archer_cloaking_shot", "voice_war_atk_long_cast");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		/// <summary>

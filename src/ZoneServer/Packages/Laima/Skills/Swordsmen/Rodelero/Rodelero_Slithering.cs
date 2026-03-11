@@ -34,7 +34,6 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 			caster.RemoveBuff(BuffId.Slithering_Buff);
 			caster.StartBuff(BuffId.Slithering_Buff, skill.Level, 0f, TimeSpan.Zero, caster);
 			caster.PlaySound("voice_archer_camouflage_shot", "voice_archer_m_camouflage_shot");
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		/// <summary>
@@ -44,7 +43,6 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 		{
 			caster.RemoveBuff(BuffId.Slithering_Buff);
 			caster.StopSound("voice_archer_camouflage_shot", "voice_archer_m_camouflage_shot");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		/// <summary>

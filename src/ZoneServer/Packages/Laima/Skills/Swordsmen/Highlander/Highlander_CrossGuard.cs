@@ -24,8 +24,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.StartBuff(BuffId.CrossGuard_Buff, skill.Level, 0, TimeSpan.Zero, caster);
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		/// <summary>
@@ -36,8 +34,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.RemoveBuff(BuffId.CrossGuard_Buff);
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 			Send.ZC_SKILL_CAST_CANCEL(caster);
 		}
 

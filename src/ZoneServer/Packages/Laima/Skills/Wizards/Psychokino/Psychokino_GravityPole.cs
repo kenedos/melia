@@ -28,16 +28,12 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.ClearTargets();
-			caster.SetCastingState(true, skill);
-
 			if (caster.TryGetActiveAbilityLevel(AbilityId.Psychokino3, out var abilityLevel))
 			{
 				var evasionBonus = abilityLevel * 10f;
 				caster.Properties.Modify(PropertyName.DR_BM, evasionBonus);
 				skill.Vars.Set("Psychokino3_EvasionBonus", evasionBonus);
 			}
-
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
@@ -47,11 +43,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 				caster.Properties.Modify(PropertyName.DR_BM, -evasionBonus);
 				skill.Vars.Remove("Psychokino3_EvasionBonus");
 			}
-
-			caster.SetCastingState(false, skill);
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
 			caster.RemoveBuff(BuffId.Wizard_SklCasting_Avoid);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)

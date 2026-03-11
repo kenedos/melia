@@ -28,8 +28,6 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		/// </summary>
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-			caster.SetCastingState(true, skill);
 			_isCasting = true;
 		}
 
@@ -39,12 +37,10 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			_isCasting = false;
-			caster.SetCastingState(false, skill);
 			Send.ZC_SKILL_DISABLE(caster);
 			Send.ZC_NORMAL.SkillCancel(caster, skill.Id);
 			caster.StopSound("skl_eff_pyromancer_hellbreath_abil");
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, 0);
 		}
 
 		/// <summary>

@@ -122,9 +122,9 @@ namespace Melia.Zone.Database
 		private void LoadHelp(Character character)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new MySqlCommand("SELECT * FROM `help` WHERE `characterId` = @characterId", conn))
+			using (var cmd = new MySqlCommand("SELECT * FROM `help` WHERE `accountId` = @accountId", conn))
 			{
-				cmd.Parameters.AddWithValue("@characterId", character.DbId);
+				cmd.Parameters.AddWithValue("@accountId", character.AccountDbId);
 				using (var reader = cmd.ExecuteReader())
 				{
 					while (reader.Read())
@@ -546,15 +546,15 @@ namespace Melia.Zone.Database
 		/// <summary>
 		/// Save Help (Tutorials) to database.
 		/// </summary>
-		public void SaveHelp(long characterId, int helpId, bool isShown)
+		public void SaveHelp(long accountId, int helpId, bool isShown)
 		{
-			if (characterId == 0)
+			if (accountId == 0)
 				return;
 
 			using (var conn = this.GetConnection())
 			using (var cmd = new InsertCommand("INSERT INTO `help` {0} ON DUPLICATE KEY UPDATE `shown` = VALUES(`shown`)", conn))
 			{
-				cmd.Set("characterId", characterId);
+				cmd.Set("accountId", accountId);
 				cmd.Set("helpId", helpId);
 				cmd.Set("shown", isShown ? 1 : 0);
 

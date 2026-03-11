@@ -22,25 +22,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	[SkillHandler(SkillId.Ranger_SpiralArrow)]
 	public class Ranger_SpiralArrowOverride : IForceSkillHandler, IDynamicCasted
 	{
-		/// <summary>
-		/// Called when the user starts casting the skill.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		/// <summary>
-		/// Called when the user stops casting the skill.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		/// <summary>
 		/// Handles the skill, attacking targets.

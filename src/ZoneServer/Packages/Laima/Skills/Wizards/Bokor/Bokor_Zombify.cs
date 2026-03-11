@@ -41,30 +41,6 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 		private const int MaxWheelchairZombies = 4;
 		private const int MaxGiantZombies = 2;
 
-		/// <summary>
-		/// Start casting.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="maxCastTime"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		/// <summary>
-		/// End casting.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="maxCastTime"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -272,7 +248,6 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 				propertyOverrides.Add(PropertyName.Blockable, zombieBlockable);
 				propertyOverrides.Add(PropertyName.BLK, zombieBLK);
 			}
-
 
 			zombie.ApplyOverrides(propertyOverrides);
 			zombie.Properties.InvalidateAll();

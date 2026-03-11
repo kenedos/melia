@@ -24,22 +24,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 	[SkillHandler(SkillId.Highlander_SkyLiner)]
 	public class Highlander_SkyLinerOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(true, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		/// <summary>
-		/// Called when the user stops casting the skill.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			caster.SetCastingState(false, skill);
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		/// <summary>
 		/// Applies bonus damage if target is bleeding

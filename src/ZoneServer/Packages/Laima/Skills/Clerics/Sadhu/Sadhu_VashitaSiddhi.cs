@@ -25,15 +25,6 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	public class Sadhu_VashitaSiddhiOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(500);
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{

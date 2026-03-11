@@ -31,7 +31,6 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 			var targetPos = caster.Position.GetRelative(caster.Direction, distance: 20f);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Rodelero_ShieldCharge);
 			caster.PlaySound("voice_archer_camouflage_shot", "voice_archer_m_camouflage_shot");
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
 		}
 
 		/// <summary>
@@ -42,7 +41,6 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 			caster.RemoveBuff(BuffId.ShieldCharge_Buff);
 			SkillRemovePad(caster, skill);
 			caster.StopSound("voice_archer_camouflage_shot", "voice_archer_m_camouflage_shot");
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
 		}
 
 		/// <summary>

@@ -25,16 +25,6 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 		private const int HookDelayMs = 300;
 		private const float HookTargetRadius = 30f;
 
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
