@@ -118,7 +118,7 @@ namespace Melia.Zone.World.Actors.Characters
 			if (this.IsDead)
 				return true;
 
-			if (this.IsSafe())
+			if (this.IsLocked(LockType.GetDamaged))
 				return false;
 
 			if (this.IsAnyBuffActive(BuffId.Skill_NoDamage_Buff,
@@ -293,7 +293,7 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.CanSee(entity))
 				return false;
 
-			if (entity.Properties.GetString(PropertyName.HitProof, "NO") == "YES" || entity.IsSafe())
+			if (entity.Properties.GetString(PropertyName.HitProof, "NO") == "YES")
 				return false;
 
 			if (entity is Companion companion && companion.IsRiding)

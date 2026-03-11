@@ -14,24 +14,21 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 		{
 			buff.Target.AddState(StateType.Held, buff.Duration);
 			buff.Target.Lock(LockType.Attack, buff.Duration);
-			buff.Target.Lock(LockType.GetHit, buff.Duration);
-			buff.Target.SetSafeState(true);
+			buff.Target.Lock(LockType.GetDamaged, buff.Duration);
 		}
 
 		public override void OnExtend(Buff buff)
 		{
 			buff.Target.AddState(StateType.Held, buff.Duration);
 			buff.Target.Lock(LockType.Attack, buff.Duration);
-			buff.Target.Lock(LockType.GetHit, buff.Duration);
-			buff.Target.SetSafeState(true);
+			buff.Target.Lock(LockType.GetDamaged, buff.Duration);
 		}
 
 		public override void OnEnd(Buff buff)
 		{
 			buff.Target.RemoveState(StateType.Held);
 			buff.Target.Unlock(LockType.Attack);
-			buff.Target.Unlock(LockType.GetHit);
-			buff.Target.SetSafeState(false);
+			buff.Target.Unlock(LockType.GetDamaged);
 		}
 	}
 }

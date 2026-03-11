@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
+using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Composition;
@@ -182,6 +184,9 @@ namespace Melia.Zone.World.Actors.Components
 					movement.Stop();
 
 				entity.Properties.Invalidate(PropertyName.MSPD);
+
+				if (entity is Character character)
+					Send.ZC_MSPD(character);
 			}
 		}
 

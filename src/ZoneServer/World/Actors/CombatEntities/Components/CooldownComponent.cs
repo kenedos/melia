@@ -21,6 +21,12 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private readonly List<Cooldown> _over = new List<Cooldown>();
 
 		/// <summary>
+		/// Extra flat time added to all skill cooldowns when they start.
+		/// Used by effects like Chronomancer's Time Forward.
+		/// </summary>
+		public TimeSpan ExtraCooldown { get; set; }
+
+		/// <summary>
 		/// Creates new component.
 		/// </summary>
 		/// <param name="entity"></param>
@@ -77,6 +83,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			{
 				duration *= (1 - cdrRate);
 			}
+
+			if (this.ExtraCooldown > TimeSpan.Zero)
+				duration += this.ExtraCooldown;
 
 			return this.Start(skill.Data.CooldownGroup, duration);
 		}

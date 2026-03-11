@@ -39,11 +39,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public bool IsGuarding { get; set; }
 
 		/// <summary>
-		/// Returns the entity's safe state.
-		/// </summary>
-		public bool IsSafe { get; set; }
-
-		/// <summary>
 		/// Returns the last time the entity was involved in combat in
 		/// any way.
 		/// </summary>

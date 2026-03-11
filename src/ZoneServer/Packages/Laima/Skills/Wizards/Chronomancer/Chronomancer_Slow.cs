@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -44,15 +45,15 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 
 			Send.ZC_NORMAL.RunPad(caster, skill, "Chronomancer_Slow", farPos, caster.Direction, 0.06292176f, 85.76556f, skillHandle, 60);
 
-			var targetList = caster.Map.GetAttackableEnemiesInPosition(caster, farPos, (int)skill.Data.SplashRange * 4);
+			var targetList = caster.Map.GetAttackableEnemiesInPosition(caster, farPos, 100f);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			foreach (var currentTarget in targetList.LimitBySDR(caster, skill))
+			foreach (var currentTarget in targetList.Take(9))
 			{
 				Send.ZC_SYNC_START(caster, skillHandle, 1);
 
-				var debuffDuration = TimeSpan.FromSeconds(5 + skill.Level);
+				var debuffDuration = TimeSpan.FromSeconds(10 + skill.Level);
 				currentTarget.StartBuff(BuffId.Slow_Debuff, skill.Level, 0, debuffDuration, caster);
 
 				Send.ZC_SYNC_END(caster, skillHandle, 0);

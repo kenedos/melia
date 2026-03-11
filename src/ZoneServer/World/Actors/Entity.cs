@@ -1507,24 +1507,6 @@ namespace Melia.Zone.World.Actors
 		}
 
 		/// <summary>
-		/// Gets the entity's safe state.
-		/// </summary>
-		/// <param name="entity"></param>
-		public static bool IsSafe(this ICombatEntity entity)
-			=> entity.Components.Get<CombatComponent>()?.IsSafe ?? false;
-
-		/// <summary>
-		/// Sets the entity's safe state.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="isSafe"></param>
-		public static void SetSafeState(this ICombatEntity entity, bool isSafe)
-		{
-			if (entity.Components.TryGet<CombatComponent>(out var combat))
-				combat.IsSafe = isSafe;
-		}
-
-		/// <summary>
 		/// Gets the entity's stagger state.
 		/// </summary>
 		public static bool IsStaggered(this ICombatEntity entity)

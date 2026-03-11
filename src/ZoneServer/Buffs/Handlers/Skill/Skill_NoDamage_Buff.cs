@@ -3,6 +3,7 @@ using Melia.Zone.Buffs.Base;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Components;
 
 namespace Melia.Zone.Buffs.Handlers
 {
@@ -13,11 +14,9 @@ namespace Melia.Zone.Buffs.Handlers
 	/// </summary>
 	/// <remarks>
 	/// Uses two layers of protection:
-	/// 1. SetSafeState(true) prevents being targeted by new attacks
+	/// 1. LockType.GetDamaged prevents receiving damage from new attacks
 	/// 2. IBuffCombatDefenseAfterCalc sets damage to 0 for any attacks that
 	///    slip through (e.g., already-targeted skills, delayed damage)
-	///
-	/// Note: TakeDamage also has a hardcoded check for this buff as a final safety.
 	/// </remarks>
 	[BuffHandler(BuffId.Skill_NoDamage_Buff)]
 	public class Skill_NoDamage_Buff : BuffHandler, IBuffCombatDefenseAfterCalcHandler
@@ -27,7 +26,7 @@ namespace Melia.Zone.Buffs.Handlers
 		/// </summary>
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			buff.Target.SetSafeState(true);
+			buff.Target.Lock(LockType.GetDamaged);
 		}
 
 		/// <summary>
@@ -35,13 +34,13 @@ namespace Melia.Zone.Buffs.Handlers
 		/// </summary>
 		public override void OnEnd(Buff buff)
 		{
-			buff.Target.SetSafeState(false);
+			buff.Target.Unlock(LockType.GetDamaged);
 		}
 
 		/// <summary>
 		/// Sets damage to 0 for any incoming attacks while buff is active.
 		/// This catches attacks from entities that already had a target reference
-		/// before SetSafeState was applied.
+		/// before the lock was applied.
 		/// </summary>
 		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{

@@ -9,6 +9,7 @@ using Melia.Zone.World.Actors.Characters;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using System;
+using Melia.Zone.World.Actors.Components;
 
 namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 {
@@ -30,7 +31,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 			AddPropertyModifier(buff, target, PropertyName.FIXMSPD_BM, 15);
 			AddPropertyModifier(buff, target, PropertyName.Jumpable, -1);
 
-			target.SetSafeState(true);
+			target.Lock(LockType.GetDamaged);
 			target.SetHideFromMon(true);
 
 			buff.SetUpdateTime(1000);
@@ -67,7 +68,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 			RemovePropertyModifier(buff, target, PropertyName.FIXMSPD_BM);
 			RemovePropertyModifier(buff, target, PropertyName.Jumpable);
 
-			target.SetSafeState(false);
+			target.Unlock(LockType.GetDamaged);
 			target.SetHideFromMon(false);
 
 			if (target is Character character)

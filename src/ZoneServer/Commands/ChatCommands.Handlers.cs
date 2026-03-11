@@ -445,9 +445,9 @@ namespace Melia.Zone.Commands
 				return CommandResult.InvalidArgument;
 
 			if (args.Get(0) == "on")
-				sender.SetSafeState(true);
+				sender.Lock(LockType.GetDamaged);
 			else
-				sender.SetSafeState(false);
+				sender.Unlock(LockType.GetDamaged);
 
 			return CommandResult.Okay;
 		}
