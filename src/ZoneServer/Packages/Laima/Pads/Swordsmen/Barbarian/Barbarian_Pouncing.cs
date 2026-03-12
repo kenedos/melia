@@ -26,8 +26,6 @@ namespace Melia.Zone.Pads.Handlers
 			pad.SetUpdateInterval(200);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3500);
 			var value = 6;
-			if (creator.Map.IsPVP && value > 2)
-				value = (int)Math.Floor(Math.Pow(Math.Max(0, value - 2), 0.5)) + Math.Min(2, value);
 			pad.Trigger.MaxActorCount = value;
 		}
 

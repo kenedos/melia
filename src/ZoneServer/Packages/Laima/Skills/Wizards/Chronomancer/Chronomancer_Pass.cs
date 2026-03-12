@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 
 			var skillLevel = skill.Level;
 			var buffDuration = TimeSpan.FromSeconds(5);
-			var sicknessDuration = TimeSpan.FromSeconds(30 + skillLevel * 2);
+			var sicknessDuration = TimeSpan.FromSeconds(10);
 
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
 			caster.StartBuff(BuffId.Pass_Buff, skillLevel, 0, buffDuration, caster);

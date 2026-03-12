@@ -15,19 +15,13 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 {
 	[Package("laima")]
 	[SkillHandler(SkillId.Chronomancer_BackMasking)]
-	public class Chronomancer_BackmaskingOverride : IMeleeGroundSkillHandler
+	public class Chronomancer_BackmaskingOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
-				return;
-			}
-
-			if (caster.Map.IsPVP)
-			{
-				caster.ServerMessage(Localization.Get("This skill cannot be used in PVP areas."));
 				return;
 			}
 
@@ -41,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 
 		private void RefreshFriendlyPads(ICombatEntity caster, Skill skill, Position position)
 		{
-			var range = skill.Data.SplashRange * 4;
+			var range = 300;
 
 			var pads = caster.Map.GetPads(pad =>
 				pad.Creator is ICombatEntity padCreator

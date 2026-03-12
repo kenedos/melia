@@ -91,8 +91,6 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 					over = 2;
 				time = over * 1250;
 			}
-			if (caster.Map.IsPVP)
-				time /= 2;
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, time, 0, 100, -1, hits);
 		}
 	}

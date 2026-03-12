@@ -13,6 +13,10 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 	[BuffHandler(BuffId.Pass_Buff)]
 	public class Pass_BuffOverride : BuffHandler
 	{
+		private const float BaseReduction = 0.30f;
+		private const float ReductionPerLevel = 0.03f;
+		private const float MaxReduction = 0.80f;
+
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
@@ -25,14 +29,14 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 			if (cooldownComponent == null)
 				return;
 
-			var reductionSeconds = 5 + skillLevel;
-			var reduction = TimeSpan.FromSeconds(reductionSeconds);
+			var reductionRate = Math.Min(BaseReduction + ReductionPerLevel * skillLevel, MaxReduction);
 
 			var activeCooldowns = cooldownComponent.GetAll();
 			foreach (var cooldown in activeCooldowns)
 			{
 				if (cooldown.Remaining > TimeSpan.Zero)
 				{
+					var reduction = TimeSpan.FromTicks((long)(cooldown.Remaining.Ticks * reductionRate));
 					cooldownComponent.ReduceCooldown(cooldown.Id, reduction);
 				}
 			}

@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var damageDelay = 1500;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 3000f, 1, 100, -1, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.CasterForward, 100, 30, 10, 1, 5, hits);
 		}
 	}
 
@@ -81,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var damageDelay = 1000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 3000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 20, -1, hits);
 			await EffectAndHit(skill, caster, farPos, new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
