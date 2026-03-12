@@ -117,6 +117,13 @@ namespace Melia.Zone.Buffs.Base
 	public interface IBuffOnCastStartHandler { void OnCastStart(Buff buff, ICombatEntity caster, Skill skill); }
 
 	/// <summary>
+	/// Called on the target after a SkillHitInfo is created, allowing
+	/// modification of the HitInfo (e.g., changing HitType to Endure
+	/// for stagger immunity).
+	/// </summary>
+	public interface IBuffOnHitInfoCreatedHandler { void OnHitInfoCreated(Buff buff, SkillHitInfo skillHitInfo); }
+
+	/// <summary>
 	/// Called on the target before a knockback is applied.
 	/// Return KnockResult.Prevent to block the knockback.
 	/// </summary>

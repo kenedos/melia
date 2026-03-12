@@ -177,6 +177,7 @@ namespace Melia.Zone.Skills.Combat
 				this.AttackType = skillData.HitAttackType;
 			}
 
+
 			this.Hp = target.Hp;
 			this.HpPriority = target.HpChangeCounter;
 		}

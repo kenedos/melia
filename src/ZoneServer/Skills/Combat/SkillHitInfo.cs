@@ -148,6 +148,8 @@ namespace Melia.Zone.Skills.Combat
 
 			if (skill.Data.HitType == SkillHitType.Force)
 				this.ForceId = Melia.Zone.Skills.Combat.ForceId.GetNew();
+
+			this.RunHitInfoCreatedHooks();
 		}
 
 		/// <summary>
@@ -169,6 +171,25 @@ namespace Melia.Zone.Skills.Combat
 			this.SkillHitDelay = TimeSpan.Zero;
 			this.HitEffect = result.Effect;
 			this.HitCount = result.HitCount;
+
+			this.RunHitInfoCreatedHooks();
+		}
+
+		/// <summary>
+		/// Runs IBuffOnHitInfoCreatedHandler hooks on the target's
+		/// active buffs, allowing them to modify the hit info.
+		/// </summary>
+		private void RunHitInfoCreatedHooks()
+		{
+			var buffs = this.Target.Components.Get<BuffComponent>()?.GetList();
+			if (buffs == null)
+				return;
+
+			foreach (var buff in buffs)
+			{
+				if (buff.Handler is IBuffOnHitInfoCreatedHandler handler)
+					handler.OnHitInfoCreated(buff, this);
+			}
 		}
 
 		/// <summary>

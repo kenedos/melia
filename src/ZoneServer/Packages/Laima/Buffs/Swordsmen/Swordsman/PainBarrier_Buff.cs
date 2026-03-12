@@ -1,18 +1,20 @@
+using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.Handlers.Swordsmen.Swordsman
 {
 	/// <summary>
-	/// Handler for PainBarrier_Buff, which provides knockback and
-	/// knockdown immunity. Also handles the Doppelsoeldner3 ability
-	/// trade-off of movement speed for damage resistance.
+	/// Handler for PainBarrier_Buff, which provides knockback,
+	/// knockdown, and stagger immunity. Also handles the Doppelsoeldner3
+	/// ability trade-off of movement speed for damage resistance.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.PainBarrier_Buff)]
-	public class PainBarrier_BuffOverride : BuffHandler, IBuffBeforeKnockbackHandler, IBuffBeforeKnockdownHandler
+	public class PainBarrier_BuffOverride : BuffHandler, IBuffBeforeKnockbackHandler, IBuffBeforeKnockdownHandler, IBuffOnHitInfoCreatedHandler
 	{
 		private const float MspdBonusPerLevel = 0.05f;
 		private const float DrBonusPerLevel = -0.1f;
@@ -51,6 +53,14 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Swordsman
 		public KnockResult OnBeforeKnockdown(Buff buff, ICombatEntity attacker, ICombatEntity target)
 		{
 			return KnockResult.Prevent;
+		}
+
+		public void OnHitInfoCreated(Buff buff, SkillHitInfo skillHitInfo)
+		{
+			skillHitInfo.HitInfo.Type = HitType.Endure;
+
+			skillHitInfo.SkillHitDelay = TimeSpan.Zero;
+			skillHitInfo.DamageDelay = TimeSpan.Zero;
 		}
 	}
 }
