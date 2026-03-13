@@ -47,6 +47,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Rogue
 			if (pad.Trigger.AtCapacity)
 				return;
 
+			pad.Trigger.ActivateCount++;
 			PadTargetBuff(pad, initiator, RelationType.Enemy, 0, 0, BuffId.Lachrymator_Debuff, 1, 0, (int)((3.5 + skill.Level * 0.5) * 1000), 1, 100, false);
 		}
 

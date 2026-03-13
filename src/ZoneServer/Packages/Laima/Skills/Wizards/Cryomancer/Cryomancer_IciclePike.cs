@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
@@ -30,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		private const float BaseFreezeChance = 40f;
 		private const float FreezeChancePerLevel = 4f;
 		private const int MaxTargets = 16;
-		private const int FreezeDurationMilliSeconds = 7000;
+		private const int FreezeDurationMilliSeconds = 8000;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
@@ -60,7 +61,10 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, targetPos);
 
-			var targetList = caster.Map.GetAttackableEnemiesIn(caster, new CircleF(targetPos, 100), MaxTargets);
+			var targetList = caster.Map.GetAttackableEnemiesIn(caster, new CircleF(targetPos, 100))
+				.OrderBy(t => t.IsBuffActive(BuffId.Cryomancer_Freeze) ? 1 : 0)
+				.Take(MaxTargets)
+				.ToList();
 			var damageDelay = TimeSpan.FromMilliseconds(500);
 
 			var freezeChance = BaseFreezeChance + (skill.Level * FreezeChancePerLevel);

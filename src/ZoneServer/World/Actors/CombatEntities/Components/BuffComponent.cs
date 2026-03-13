@@ -541,6 +541,14 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 					initializer?.Invoke(buff);
 
+					// Update Duration to the longest between current and new
+					if (buff.HasDuration && duration != Buff.InfiniteDuration)
+					{
+						var effectiveDuration = (duration == Buff.DefaultDuration) ? buff.Data.Duration : duration;
+						if (effectiveDuration > buff.Duration)
+							buff.Duration = effectiveDuration;
+					}
+
 					overbuffChanged = (overbuff != buff.OverbuffCounter);
 					if (!overbuffChanged)
 						buff.Extend();

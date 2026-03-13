@@ -1,20 +1,21 @@
 using System;
-using System.Threading.Tasks;
+using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.CombatEntities.Components;
-using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using Melia.Zone.World.Actors.Monsters;
 
 namespace Melia.Zone.Pads.Handlers
 {
 	[Package("laima")]
 	[PadHandler(PadName.Cryomancer_Gust)]
-	public class Cryomancer_GustOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
+	public class Cryomancer_GustOverride : ICreatePadHandler, IDestroyPadHandler, IUpdatePadHandler
 	{
+		private const int FreezeDurationMilliSeconds = 7000;
+
 		public void Created(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
@@ -23,42 +24,36 @@ namespace Melia.Zone.Pads.Handlers
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
 			pad.SetRectangleRange(creator.Direction, 40, 120);
-			pad.SetUpdateInterval(1000);
+			pad.SetUpdateInterval(100);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(1200);
-			var maxActors = 2 + skill.Level;
-			pad.Trigger.MaxActorCount = maxActors;
+			var maxTargets = 2 + skill.Level;
+			pad.Trigger.MaxUseCount = maxTargets;
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
 			var creator = args.Creator;
-			var skill = pad.Skill;
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
-		}
-
-		public void Entered(object sender, PadTriggerActorArgs args)
-		{
-			var pad = args.Trigger;
-			var creator = args.Creator;
-			var initiator = args.Initiator;
-			var skill = pad.Skill;
-
-			if (!creator.IsEnemy(initiator))
-				return;
-
-			if (pad.Trigger.AtCapacity)
-				return;
-
-			initiator.StartBuff(BuffId.Cryomancer_Freeze, TimeSpan.FromMilliseconds(4000), creator);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
 			var creator = args.Creator;
-			var skill = pad.Skill;
+
+			var targets = pad.Trigger.GetAttackableEntities(creator)
+				.Where(t => creator.IsEnemy(t))
+				.OrderBy(t => t.IsBuffActive(BuffId.Cryomancer_Freeze) ? 1 : 0);
+
+			foreach (var target in targets)
+			{
+				if (pad.Trigger.IncreaseUseCount())
+					break;
+
+				target.StartBuff(BuffId.Cryomancer_Freeze, TimeSpan.FromMilliseconds(FreezeDurationMilliSeconds), creator);
+			}
 		}
 	}
 }

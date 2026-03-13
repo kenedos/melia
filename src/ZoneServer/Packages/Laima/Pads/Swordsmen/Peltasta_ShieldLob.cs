@@ -38,7 +38,7 @@ namespace Melia.Zone.Pads.Handlers.Swordsman.Peltasta
 			var creator = args.Creator;
 
 			pad.Movement.Speed = ShieldFlySpeedForward;
-			pad.Trigger.MaxActorCount = 4;
+			pad.Trigger.MaxConcurrentUseCount = 4;
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, "Peltasta_ShieldLob2", -0.7853982f, 0, 30, true);
 

@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 	[SkillHandler(SkillId.Cryomancer_Gust)]
 	public class Cryomancer_GustOverride : IMeleeGroundSkillHandler
 	{
-		private const int FreezeDurationMilliSeconds = 4000;
+		private const int FreezeDurationMilliSeconds = 7000;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{

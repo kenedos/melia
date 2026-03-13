@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		private const int MaxTargets = 4;
 		private const float BaseFreezeChance = 50f;
 		private const float FreezeChancePerLevel = 2f;
-		private const float FreezeDurationMilliSeconds = 4000;
+		private const float FreezeDurationMilliSeconds = 6000;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -52,7 +52,8 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea)
 				.Where(t => t != target)
-				.OrderBy(t => t.Position.Get2DDistance(farPos))
+				.OrderBy(t => t.IsBuffActive(BuffId.Cryomancer_Freeze) ? 1 : 0)
+				.ThenBy(t => t.Position.Get2DDistance(farPos))
 				.Take(MaxTargets - 1)
 				.ToList();
 

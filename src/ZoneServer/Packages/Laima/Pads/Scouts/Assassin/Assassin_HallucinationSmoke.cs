@@ -35,7 +35,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Assassin
 
 			pad.SetUpdateInterval(1000);
 			pad.Position = creator.Position;
-			pad.Trigger.MaxActorCount = 8;
+			pad.Trigger.MaxConcurrentUseCount = 8;
 			pad.Trigger.LifeTime = TimeSpan.FromSeconds(skill.Level + 5);
 			Send.ZC_NORMAL.PadUpdate(args.Creator, args.Trigger, PadName.Assassin_HallucinationSmoke, -0.7853982f, 0, 30, true);
 		}
@@ -53,6 +53,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Assassin
 			if (!creator.IsAlly(target))
 				return;
 
+			pad.Trigger.ActivateCount++;
 			target.StartBuff(BuffId.HallucinationSmoke_Buff, skill.Level, 0, TimeSpan.FromSeconds(4), creator);
 		}
 
@@ -74,6 +75,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Assassin
 				if (target.IsDead)
 					continue;
 
+				pad.Trigger.ActivateCount++;
 				target.StartBuff(BuffId.HallucinationSmoke_Buff, skill.Level, 0, TimeSpan.FromSeconds(4), creator);
 			}
 		}

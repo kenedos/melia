@@ -68,6 +68,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			if (!creator.CanDamage(target))
 				return;
 
+			pad.Trigger.ActivateCount++;
 			this.Attack(pad.Skill, creator, target);
 		}
 

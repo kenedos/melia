@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 	public class Cryomancer_IceWallOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		private const int IceWallDuration = 15;
-		private const int IceWallSize = 25;
+		private const int IceWallSize = 20;
 
 		/// <summary>
 		/// Handles skill.

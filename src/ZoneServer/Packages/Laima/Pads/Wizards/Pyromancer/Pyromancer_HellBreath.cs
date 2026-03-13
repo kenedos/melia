@@ -57,6 +57,7 @@ namespace Melia.Zone.Pads.Handlers
 			if (pad.Trigger.AtCapacity)
 				return;
 
+			pad.Trigger.ActivateCount++;
 			var skill = pad.Skill;
 			var skillHitResult = SCR_SkillHit(creator, target, skill);
 			target.TakeDamage(skillHitResult.Damage, creator);

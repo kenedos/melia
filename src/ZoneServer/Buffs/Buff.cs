@@ -68,7 +68,7 @@ namespace Melia.Zone.Buffs
 		/// <summary>
 		/// Returns the full duration of the buff.
 		/// </summary>
-		public TimeSpan Duration { get; } = TimeSpan.Zero;
+		public TimeSpan Duration { get; internal set; } = TimeSpan.Zero;
 
 		/// <summary>
 		/// Returns the amount of time the buff was active.
