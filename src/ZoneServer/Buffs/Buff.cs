@@ -360,8 +360,12 @@ namespace Melia.Zone.Buffs
 		{
 			if (this.HasDuration)
 			{
-				this.RunTime = TimeSpan.Zero;
-				this.RemovalTime = DateTime.Now.Add(this.Duration);
+				var newRemovalTime = DateTime.Now.Add(this.Duration);
+				if (newRemovalTime > this.RemovalTime)
+				{
+					this.RunTime = TimeSpan.Zero;
+					this.RemovalTime = newRemovalTime;
+				}
 			}
 
 			if (this.HasUpdateTime)

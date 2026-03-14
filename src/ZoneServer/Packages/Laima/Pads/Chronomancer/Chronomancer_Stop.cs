@@ -68,7 +68,11 @@ namespace Melia.Zone.Pads.Handlers
 
 					foreach (var debuff in debuffs)
 					{
+						if (debuff.Vars.GetBool("Laima.Stop.BreakTimeExtended"))
+							continue;
+
 						debuff.IncreaseDuration(debuff.RemainingDuration + extensionTime);
+						debuff.Vars.SetBool("Laima.Stop.BreakTimeExtended", true);
 						debuff.NotifyUpdate();
 					}
 				}
