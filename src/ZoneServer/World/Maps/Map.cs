@@ -124,7 +124,7 @@ namespace Melia.Zone.World.Maps
 		{
 			if (ZoneServer.Instance.Conf.World.MonstersUsePathfinding)
 			{
-				this.Pathfinder = new NavMeshPathfinder(this.Ground);
+				this.Pathfinder = new NavMeshPathfinder(this);
 			}
 			else
 			{

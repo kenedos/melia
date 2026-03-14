@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone.World.Maps;
 
 namespace Melia.Zone.World.Maps.Pathfinding
 {
@@ -14,7 +15,7 @@ namespace Melia.Zone.World.Maps.Pathfinding
 	/// While the game uses nav mesh pathfinding as well, this
 	/// implementation is custom and might not match the game's
 	/// behavior in all cases.
-	/// 
+	///
 	/// The cells are polygons, defined by the game, that represent
 	/// walkable areas of the ground. They're connected similarly to
 	/// the ground's triangles, but are shaped from the maps corners
@@ -23,16 +24,18 @@ namespace Melia.Zone.World.Maps.Pathfinding
 	/// </remarks>
 	public class NavMeshPathfinder : IPathfinder
 	{
+		private readonly Map _map;
 		private readonly Ground _ground;
 		private readonly NavMesh _navMesh;
 
 		/// <summary>
 		/// Creates new instance.
 		/// </summary>
-		/// <param name="ground"></param>
-		public NavMeshPathfinder(Ground ground)
+		/// <param name="map"></param>
+		public NavMeshPathfinder(Map map)
 		{
-			_ground = ground;
+			_map = map;
+			_ground = map.Ground;
 			_navMesh = new NavMesh(_ground);
 		}
 
@@ -61,7 +64,7 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			if (!_ground.IsValidCirclePosition(start, actorRadius) || !_ground.IsValidCirclePosition(destination, actorRadius))
 				return false;
 
-			if (_ground.GetLastValidCirclePosition(start, actorRadius, destination) == destination)
+			if (_map.IsLineOfSightWalkable(start, destination, actorRadius))
 			{
 				path.Add(start);
 				path.Add(destination);
@@ -74,9 +77,10 @@ namespace Melia.Zone.World.Maps.Pathfinding
 
 			if (startCellIndex == destinationCellIndex)
 			{
-				path.Add(start);
-				path.Add(destination);
-				return true;
+				// Both positions are in the same cell but an obstacle
+				// blocks the direct path. Can't route around within
+				// a single cell, so reject.
+				return false;
 			}
 
 			if (!this.TryFindCellPath(startCellIndex, destinationCellIndex, actorRadius, out var cellPath))
@@ -438,6 +442,9 @@ namespace Melia.Zone.World.Maps.Pathfinding
 				if (path.Count > 0 && path[^1] == point)
 					continue;
 
+				if (_map.TryCollideObstacles(point, actorRadius, out _))
+					continue;
+
 				path.Add(point);
 			}
 
@@ -448,7 +455,7 @@ namespace Melia.Zone.World.Maps.Pathfinding
 
 			for (var i = 1; i < path.Count - 1; ++i)
 			{
-				if (_ground.GetLastValidCirclePosition(simplified[^1], actorRadius, path[i + 1]) == path[i + 1])
+				if (_map.IsLineOfSightWalkable(simplified[^1], path[i + 1], actorRadius))
 					continue;
 
 				simplified.Add(path[i]);
