@@ -911,7 +911,7 @@
 { id: 209012, className: "Chronomancer12", name: "Reincarnate: Ally", level: 1, passive: false },
 { id: 209013, className: "Chronomancer13", name: "Pass: Focus Time", level: 1, passive: false },
 { id: 209014, className: "Chronomancer14", name: "Time Forward: Attack Skills", level: 1, passive: false },
-{ id: 209015, className: "Chronomancer15", name: "Quick Cast: Increase Accuracy", level: 1, passive: false },
+{ id: 209015, className: "Chronomancer15", name: "Quick Cast: Empower", level: 1, passive: false },
 { id: 209016, className: "Chronomancer16", name: "Reincarnate: Enhance", level: 1, passive: true },
 { id: 209017, className: "Chronomancer17", name: "[Arts] Backmasking: Mystery", level: 1, passive: false },
 { id: 209018, className: "Chronomancer18", name: "[Arts] Slow: Absorb Time", level: 1, passive: false },

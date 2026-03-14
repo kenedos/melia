@@ -20,19 +20,13 @@ namespace Melia.Zone.Buffs.Handlers
 		{
 			var target = buff.Target;
 
+			target.AddState(StateType.Stunned);
 			Send.ZC_SHOW_EMOTICON(target, "I_emo_confuse", buff.Duration);
-			target.AddState(StateType.Stunned, buff.Duration);
-		}
-
-		public override void OnExtend(Buff buff)
-		{
-			var target = buff.Target;
-
-			target.AddState(StateType.Stunned, buff.Duration);
 		}
 
 		public override void OnEnd(Buff buff)
 		{
+			buff.Target.RemoveState(StateType.Stunned);
 		}
 	}
 }

@@ -31,7 +31,12 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 		public void OnCastStart(Buff buff, ICombatEntity caster, Skill skill)
 		{
 			if (skill.Data.BasicCast > 0)
+			{
+				if (caster.TryGetActiveAbilityLevel(AbilityId.Chronomancer15, out var abilLevel))
+					caster.StartBuff(BuffId.QuickCast_After_Buff, abilLevel, 0f, TimeSpan.FromSeconds(5), caster);
+
 				caster.StopBuff(BuffId.QuickCast_Buff);
+			}
 		}
 	}
 }

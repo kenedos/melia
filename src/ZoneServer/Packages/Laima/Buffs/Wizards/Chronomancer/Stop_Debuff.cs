@@ -12,16 +12,9 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			buff.Target.AddState(StateType.Held, buff.Duration);
-			buff.Target.Lock(LockType.Attack, buff.Duration);
-			buff.Target.Lock(LockType.GetDamaged, buff.Duration);
-		}
-
-		public override void OnExtend(Buff buff)
-		{
-			buff.Target.AddState(StateType.Held, buff.Duration);
-			buff.Target.Lock(LockType.Attack, buff.Duration);
-			buff.Target.Lock(LockType.GetDamaged, buff.Duration);
+			buff.Target.AddState(StateType.Held);
+			buff.Target.Lock(LockType.Attack);
+			buff.Target.Lock(LockType.GetDamaged);
 		}
 
 		public override void OnEnd(Buff buff)

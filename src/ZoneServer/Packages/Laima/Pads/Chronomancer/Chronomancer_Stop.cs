@@ -1,4 +1,6 @@
 using System;
+using Melia.Shared.Data;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
@@ -51,7 +53,30 @@ namespace Melia.Zone.Pads.Handlers
 
 			var buffTime = (int)((4f + 0.4f * skill.Level) * 1000);
 
-			PadBuffEnemyMonster(pad, RelationType.Enemy, 0, 0, BuffId.Stop_Debuff, skill.Level, 0, buffTime, 0, 100);
+			if (creator.TryGetActiveAbilityLevel(AbilityId.Chronomancer10, out var abilLevel))
+			{
+				var extensionTime = TimeSpan.FromMilliseconds(buffTime);
+
+				foreach (var target in pad.Trigger.GetAttackableEntities(creator))
+				{
+					if (!creator.IsEnemy(target))
+						continue;
+
+					var debuffs = target.Components.Get<BuffComponent>()?.GetAll(b => b.Data.Type == BuffType.Debuff && b.HasDuration);
+					if (debuffs == null)
+						continue;
+
+					foreach (var debuff in debuffs)
+					{
+						debuff.IncreaseDuration(debuff.RemainingDuration + extensionTime);
+						debuff.NotifyUpdate();
+					}
+				}
+			}
+			else
+			{
+				PadBuffEnemyMonster(pad, RelationType.Enemy, 0, 0, BuffId.Stop_Debuff, skill.Level, 0, buffTime, 0, 100);
+			}
 		}
 	}
 }

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Melia.Shared.Packages;
+﻿using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -8,11 +6,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.Characters.Components;
-using Yggdrasil.Util;
-using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
-using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 using Melia.Zone.Skills.Handlers;
 
 namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
@@ -50,12 +44,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			skill.Run(this.HandleSkill(skill, caster, originPos, farPos));
-		}
-
-		private async Task HandleSkill(Skill skill, ICombatEntity caster, Position originPos, Position farPos)
-		{
-			await skill.Wait(TimeSpan.FromMilliseconds(350));
 			var targetPos = originPos.GetRelative(farPos, distance: 5);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.PsychicPressure_Pad);
 		}

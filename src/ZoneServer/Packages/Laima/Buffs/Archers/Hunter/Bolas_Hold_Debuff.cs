@@ -13,9 +13,9 @@ namespace Melia.Zone.Buffs.Handlers
 	[BuffHandler(BuffId.Bolas_Hold_Debuff)]
 	public class Bolas_Hold_DebuffOverride : BuffHandler
 	{
-		public override void OnExtend(Buff buff)
+		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			buff.Target.AddState(StateType.Held, buff.Duration);
+			buff.Target.AddState(StateType.Held);
 		}
 
 		public override void OnEnd(Buff buff)

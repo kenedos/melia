@@ -20,7 +20,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Psychokino
 		{
 			var target = buff.Target;
 
-			target.AddState(StateType.Raised, buff.Duration);
+			target.AddState(StateType.Raised);
 			target.Vibrate(100, 1.5f, 10, 0.1f);
 			target.FlyMath(70, 0.5f, 10);
 			target.SetTempVar("RAISE_MOVETYPE", target.MoveType.ToString());

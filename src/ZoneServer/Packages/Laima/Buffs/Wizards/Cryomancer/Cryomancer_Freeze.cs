@@ -18,23 +18,14 @@ namespace Melia.Zone.Buffs.Handlers
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			var caster = buff.Caster;
 			var target = buff.Target;
 
 			if (target.Faction == FactionType.IceWall)
 				return;
 
+			target.AddState(StateType.Frozen);
 			Send.ZC_SHOW_EMOTICON(target, "I_emo_freeze", buff.Duration);
 			Send.ZC_NORMAL.StatusEffect(target, (int)buff.RemainingDuration.TotalMilliseconds, "Freeze", "Cryomancer_Freeze");
-		}
-
-		public override void OnExtend(Buff buff)
-		{
-			var target = buff.Target;
-
-			if (target.Faction == FactionType.IceWall)
-				return;
-			target.AddState(StateType.Frozen, buff.Duration);
 		}
 
 		public override void OnEnd(Buff buff)
@@ -44,6 +35,7 @@ namespace Melia.Zone.Buffs.Handlers
 			if (target.Faction == FactionType.IceWall)
 				return;
 
+			target.RemoveState(StateType.Frozen);
 		}
 	}
 }

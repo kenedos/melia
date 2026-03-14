@@ -13,9 +13,9 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Sapper
 	[BuffHandler(BuffId.PunjiStake_Debuff)]
 	public class PunjiStake_DebuffOverride : BuffHandler
 	{
-		public override void OnExtend(Buff buff)
+		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			buff.Target.AddState(StateType.Held, buff.Duration);
+			buff.Target.AddState(StateType.Held);
 		}
 
 		public override void OnEnd(Buff buff)
