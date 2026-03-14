@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -30,6 +30,11 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		private const int DebuffDurationSeconds = 20;
 		private const int DebuffUpdateTimeMilliseconds = 1000;
 
+		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
+		{
+			caster.PlaySound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
+		}
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -43,9 +48,47 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
+			if (caster.TryGetActiveAbilityLevel(AbilityId.Cryomancer24, out _))
+				skill.Run(this.HandleAbilitySkill(caster, skill, originPos, farPos));
+			else
+				skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
 		}
 
+		/// <summary>
+		/// Handles the ability version of Ice Blast, dealing 4x skill factor
+		/// as direct damage to frozen enemies.
+		/// </summary>
+		private async Task HandleAbilitySkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		{
+			await skill.Wait(TimeSpan.FromMilliseconds(450));
+
+			var targetList = SkillSelectEnemiesInCircle(caster, caster.Position, 250);
+			foreach (var currentTarget in targetList)
+			{
+				if (!currentTarget.TryGetBuff(BuffId.Cryomancer_Freeze, out var freezeBuff))
+					continue;
+
+				var multihitCount = 4;
+				var modifier = SkillModifier.MultiHit(multihitCount);
+
+				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill, modifier);
+				currentTarget.TakeDamage(skillHitResult.Damage, caster);
+				var hit = new HitInfo(caster, currentTarget, skill, skillHitResult);
+				Send.ZC_HIT_INFO(caster, currentTarget, hit);
+
+				// Don't stack same debuff
+				if (currentTarget.TryGetBuff(BuffId.IceBlast_Debuff, out var iceBlastBuff))
+					continue;
+
+				var debuff = currentTarget.StartBuff(BuffId.IceBlast_Debuff, skill.Level, skillHitResult.Damage / multihitCount, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
+				debuff?.SetUpdateTime(DebuffUpdateTimeMilliseconds);
+			}
+		}
+
+		/// <summary>
+		/// Handles the default version of Ice Blast, applying the IceBlast
+		/// debuff to frozen enemies.
+		/// </summary>
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(450));

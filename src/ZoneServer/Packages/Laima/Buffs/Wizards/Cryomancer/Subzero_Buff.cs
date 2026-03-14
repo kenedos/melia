@@ -3,10 +3,12 @@ using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Network;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Buffs.HandlersOverrides.Wizard.Cryomancer
 {
@@ -51,6 +53,20 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizard.Cryomancer
 				var freezeDuration = buff.NumArg2;
 
 				attacker.StartBuff(BuffId.Cryomancer_Freeze, buff.NumArg1, 0, TimeSpan.FromMilliseconds(freezeDuration), buff.Target);
+
+				if (buff.Target.TryGetActiveAbilityLevel(AbilityId.Cryomancer10, out var abilLevel)
+					&& buff.Target.TryGetSkill(SkillId.Cryomancer_SubzeroShield, out var subzeroSkill))
+				{
+					var counterModifier = SkillModifier.Default;
+					counterModifier.DamageMultiplier = 0.5f * abilLevel;
+
+					var counterHitResult = SCR_SkillHit(buff.Target, attacker, subzeroSkill, counterModifier);
+					attacker.TakeDamage(counterHitResult.Damage, buff.Target);
+
+					var hitInfo = new HitInfo(buff.Target, attacker, counterHitResult.Damage, HitResultType.Hit);
+					hitInfo.Type = HitType.Ice;
+					Send.ZC_HIT_INFO(buff.Target, attacker, hitInfo);
+				}
 			}
 		}
 	}

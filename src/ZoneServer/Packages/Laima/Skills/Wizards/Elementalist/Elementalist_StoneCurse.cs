@@ -28,17 +28,21 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 		private const int OrbCount = 14;
 
 		private const string VarPads = "Melia.StoneCurse.Pads";
-		private const string VarIsCasting = "Melia.StoneCurse.IsCasting";
 		private const string VarCastTimeMs = "Melia.StoneCurse.CastTimeMs";
 
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
 			var oldPads = caster.Map.GetPads(p => p.Name == PadName.Elementalist_ChainReaction_Pad && p.Creator == caster);
 			foreach (var pad in oldPads)
 				pad.Destroy();
 
 			skill.Vars.Set(VarPads, new List<Pad>());
-			skill.Vars.Set(VarIsCasting, true);
 			caster.StartBuff(BuffId.Chainreaction_Runpad_Buff, 1f, 0f, TimeSpan.Zero, caster);
 			caster.PlaySound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
 			caster.PlaySound("skl_eff_lightningsphere_cast", "skl_eff_lightningsphere_cast");
@@ -58,9 +62,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 
 			for (var i = 0; i < OrbCount; i++)
 			{
-				if (!skill.Vars.Get<bool>(VarIsCasting))
-					break;
-
 				var position = caster.Position.GetRandomInRange2D(20, 45);
 				pads.Add(SkillCreatePad(caster, skill, position, 0f, PadName.Elementalist_ChainReaction_Pad));
 				await skill.Wait(delayBetweenOrbs);
@@ -69,7 +70,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			skill.Vars.Set(VarIsCasting, false);
 			caster.RemoveBuff(BuffId.Chainreaction_Runpad_Buff);
 			caster.StopSound("skl_eff_lightningsphere_cast", "skl_eff_lightningsphere_cast");
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
@@ -77,11 +77,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
-			if (!caster.TrySpendSp(skill))
-			{
-				caster.ServerMessage(Localization.Get("Not enough SP."));
-				return;
-			}
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
