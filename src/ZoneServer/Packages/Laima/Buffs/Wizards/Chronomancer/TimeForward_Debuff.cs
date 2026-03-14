@@ -22,6 +22,10 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 			var skillLevel = Math.Max(1, (int)buff.NumArg1);
 			var increase = 2 + (skillLevel * 0.2);
 
+			var abilityLevel = (int)buff.NumArg2;
+			if (abilityLevel > 0)
+				increase *= 1 + (abilityLevel * 0.05);
+
 			buff.Vars.SetFloat(ExtraCdVar, (float)increase);
 
 			if (buff.Target.Components.TryGet<CooldownComponent>(out var cooldowns))

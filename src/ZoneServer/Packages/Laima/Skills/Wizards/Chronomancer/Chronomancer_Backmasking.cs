@@ -37,6 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 		private void RefreshFriendlyPads(ICombatEntity caster, Skill skill, Position position)
 		{
 			var range = 300;
+			var maxPads = 6;
 
 			var pads = caster.Map.GetPads(pad =>
 				pad.Creator is ICombatEntity padCreator
@@ -44,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 				&& pad != null
 				&& !pad.IsDead
 				&& pad.Position.Get2DDistance(position) <= range
-			);
+			).OrderBy(pad => pad.Position.Get2DDistance(position)).Take(maxPads);
 
 			foreach (var pad in pads)
 			{

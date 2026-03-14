@@ -467,13 +467,12 @@
 //---------------------------------------------------------------------------
 { category: "Chronomancer", classId: 201, abilityId: 209003, jobId: 2008, className: "Chronomancer3", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Chronomancer_Samsara", argNum: 1 } },
 { category: "Chronomancer", classId: 203, abilityId: 209016, jobId: 2008, className: "Chronomancer16", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Chronomancer_Samsara", argNum: 1 } },
-{ category: "Chronomancer", classId: 301, abilityId: 209004, jobId: 2008, className: "Chronomancer4", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_300LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
-{ category: "Chronomancer", classId: 302, abilityId: 209010, jobId: 2008, className: "Chronomancer10", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_200LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Chronomancer", classId: 301, abilityId: 209010, jobId: 2008, className: "Chronomancer10", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_200LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Chronomancer", classId: 401, abilityId: 209009, jobId: 2008, className: "Chronomancer9", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Chronomancer_Pass", argNum: 1 } },
 { category: "Chronomancer", classId: 402, abilityId: 209013, jobId: 2008, className: "Chronomancer13", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_200LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Chronomancer", classId: 501, abilityId: 209011, jobId: 2008, className: "Chronomancer11", maxLevel: 10, priceTimeScript: 'ABIL_ABOVE_NORMAL_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
-{ category: "Chronomancer", classId: 601, abilityId: 209014, jobId: 2008, className: "Chronomancer14", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_300LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
-{ category: "Chronomancer", classId: 701, abilityId: 209015, jobId: 2008, className: "Chronomancer15", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_200LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+
+{ category: "Chronomancer", classId: 601, abilityId: 209015, jobId: 2008, className: "Chronomancer15", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_200LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 
 // Necromancer
 //---------------------------------------------------------------------------

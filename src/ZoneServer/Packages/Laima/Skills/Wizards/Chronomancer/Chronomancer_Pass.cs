@@ -45,13 +45,15 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 			var buffDuration = TimeSpan.FromSeconds(5);
 			var sicknessDuration = TimeSpan.FromSeconds(10);
 
+			var hasChronomancer13 = caster.TryGetActiveAbilityLevel(AbilityId.Chronomancer13, out _);
+
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
-			caster.StartBuff(BuffId.Pass_Buff, skillLevel, 0, buffDuration, caster);
+			caster.StartBuff(BuffId.Pass_Buff, skillLevel, hasChronomancer13 ? 1 : 0, buffDuration, caster);
 			caster.StartBuff(BuffId.Pass_Debuff, skillLevel, 0, sicknessDuration, caster);
 			Send.ZC_SYNC_END(caster, skillHandle, 0);
 			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, TimeSpan.FromMilliseconds(100));
 
-			if (caster is Character character)
+			if (!hasChronomancer13 && caster is Character character)
 			{
 				var party = character.Connection.Party;
 				if (party != null)

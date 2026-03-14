@@ -6,6 +6,7 @@ using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Yggdrasil.Util;
 
 namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 {
@@ -29,14 +30,30 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 			if (cooldownComponent == null)
 				return;
 
-			var reductionRate = Math.Min(BaseReduction + ReductionPerLevel * skillLevel, MaxReduction);
+			var reductionRate = BaseReduction + ReductionPerLevel * skillLevel;
+
+			if (buff.NumArg2 == 1)
+				reductionRate *= 1.5f;
+
+			reductionRate = Math.Min(reductionRate, MaxReduction);
+
+			var bonusReduction = TimeSpan.Zero;
+			if (buff.Caster is ICombatEntity abilCaster
+				&& abilCaster.TryGetActiveAbilityLevel(AbilityId.Chronomancer9, out var chrono9Level)
+				&& RandomProvider.Get().Next(1, 101) <= chrono9Level * 0.5f)
+			{
+				bonusReduction = TimeSpan.FromSeconds(3);
+			}
 
 			var activeCooldowns = cooldownComponent.GetAll();
 			foreach (var cooldown in activeCooldowns)
 			{
+				if (cooldown.Id == CooldownId.Pass)
+					continue;
+
 				if (cooldown.Remaining > TimeSpan.Zero)
 				{
-					var reduction = TimeSpan.FromTicks((long)(cooldown.Remaining.Ticks * reductionRate));
+					var reduction = TimeSpan.FromTicks((long)(cooldown.Remaining.Ticks * reductionRate)) + bonusReduction;
 					cooldownComponent.ReduceCooldown(cooldown.Id, reduction);
 				}
 			}

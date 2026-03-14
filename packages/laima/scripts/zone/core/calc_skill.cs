@@ -471,6 +471,13 @@ public class SkillCalculationsScript : GeneralScript
 
 		var (coolDownClassify, zoneAddCoolDown) = ("None", 0f);
 
+		if (skill.Id == SkillId.Chronomancer_BackMasking)
+		{
+			var level = skill.Level;
+			var cooldownSec = Math.Max(10, 40 - 2 * level);
+			basicCooldown = cooldownSec * 1000f;
+		}
+
 		if (skill.Id == SkillId.Cleric_Cure)
 		{
 			if (owner is Character character)

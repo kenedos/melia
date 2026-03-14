@@ -49,6 +49,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
+			if (caster.TryGetAbility(AbilityId.Chronomancer11, out var slowAbility))
+				caster.StartBuff(BuffId.Slow_Abil_Buff, skill.Level, slowAbility.Level, TimeSpan.FromMinutes(30), caster);
+
 			foreach (var currentTarget in targetList.Take(9))
 			{
 				Send.ZC_SYNC_START(caster, skillHandle, 1);
