@@ -111,7 +111,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var damageDelay = 1000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.Motion, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
 
