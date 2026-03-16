@@ -27,7 +27,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 	public class Sapper_ClaymoreOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		private const float ClaymoreLifetimeSeconds = 120f;
-		private const float ExplosionRadius = 70f;
 		private const float SpawnDistance = 22.4f;
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
@@ -82,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 
 			Send.ZC_GROUND_EFFECT(claymore, explosionPos, "F_explosion006_orange1", 1f, 0f, 0f);
 
-			var splashArea = new Circle(explosionPos, ExplosionRadius);
+			var splashArea = new Circle(explosionPos, 140f);
 
 			this.Attack(skill, caster, splashArea, explosionPos, detonateTrapsSkill);
 		}
@@ -96,7 +95,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in targets.Take(5))
+			foreach (var target in targets.Take(15))
 			{
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);

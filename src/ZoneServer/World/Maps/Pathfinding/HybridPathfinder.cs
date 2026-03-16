@@ -24,11 +24,16 @@ namespace Melia.Zone.World.Maps.Pathfinding
 		public bool TryFindPath(Position start, Position destination, float actorRadius, out List<Position> path)
 		{
 			path = new List<Position>();
-			if (!this.ValidatePositions(ref start, ref destination, actorRadius))
+
+			var actualStart = start;
+			if (!this.ValidatePositions(ref start, ref destination, out var startWasInvalid, actorRadius))
 				return false;
 
 			if (this.IsDirectPath(start, destination, actorRadius))
 			{
+				if (startWasInvalid)
+					path.Add(actualStart);
+
 				path.Add(start);
 				path.Add(destination);
 				LogPathToFile(path, "direct");
@@ -45,6 +50,10 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			}
 
 			path = this.SmoothPath(cellPath, actorRadius);
+
+			if (startWasInvalid && path.Count > 1)
+				path.Insert(0, actualStart);
+
 			LogPathToFile(path, "smoothed");
 			return path.Count > 1;
 		}
@@ -81,8 +90,10 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			}
 		}
 
-		private bool ValidatePositions(ref Position start, ref Position goal, float actorRadius)
+		private bool ValidatePositions(ref Position start, ref Position goal, out bool startWasInvalid, float actorRadius)
 		{
+			startWasInvalid = false;
+
 			if (_ground == null || !_ground.HasData() || _map == null)
 			{
 				Log.Warning("Pathfinding: Ground data or map not available.");
@@ -91,16 +102,18 @@ namespace Melia.Zone.World.Maps.Pathfinding
 
 			if (!_map.IsWalkablePosition(start, actorRadius))
 			{
-				if (!_ground.TryGetNearestValidPosition(start, actorRadius, out start, 100f))
+				if (!_ground.TryGetNearestValidPosition(start, actorRadius, out start, 200f))
 				{
 					Log.Warning($"Pathfinding: Start position {start} not walkable and no alternative found.");
 					return false;
 				}
+
+				startWasInvalid = true;
 			}
 
 			if (!_map.IsWalkablePosition(goal, actorRadius))
 			{
-				if (!_ground.TryGetNearestValidPosition(goal, actorRadius, out goal, 100f))
+				if (!_ground.TryGetNearestValidPosition(goal, actorRadius, out goal, 200f))
 				{
 					Log.Warning($"Pathfinding: Goal position {goal} not walkable and no alternative found.");
 					return false;

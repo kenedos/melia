@@ -42,19 +42,26 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			if (_ground == null || !_ground.HasData())
 				return false;
 
-			// Validate start position. If it's invalid, find the nearest walkable one.
+			// If the start position is not valid (entity stuck in wall/obstacle/
+			// outside boundaries), find the nearest valid position and use it
+			// as the pathfinding start. The actual position is prepended to
+			// the final path so the entity walks out of the invalid area.
+			var actualStart = start;
+			var startWasInvalid = false;
+
 			if (!_map.IsWalkablePosition(start, actorRadius))
 			{
-				if (!_ground.TryGetNearestValidPosition(start, actorRadius, out start, 50f))
+				if (!_ground.TryGetNearestValidPosition(start, actorRadius, out start, 200f))
 				{
 					Log.Warning($"Pathfinder: Could not find a walkable start position near {start} for actor with radius {actorRadius}.");
-					return false; // Pathfinding is impossible if we can't find a valid place to start.
+					return false;
 				}
+
+				startWasInvalid = true;
 			}
 
 			// Validate goal position. If it's invalid, find the nearest walkable one.
-			// If we can't find a valid spot near the goal, we don't fail; A* will find a path to the closest reachable node.
-			_ground.TryGetNearestValidPosition(goal, actorRadius, out goal, 50f);
+			_ground.TryGetNearestValidPosition(goal, actorRadius, out goal, 200f);
 
 			var distance = start.Get2DDistance(goal);
 			var gridScale = this.GetGridScale(distance, actorRadius);
@@ -67,6 +74,9 @@ namespace Melia.Zone.World.Maps.Pathfinding
 				var distinctPath = roughPath.Distinct().ToList();
 				path.AddRange(this.MergePathNodes(distinctPath, actorRadius));
 			}
+
+			if (startWasInvalid && path.Count > 0)
+				path.Insert(0, actualStart);
 
 #if DEBUG
 			Debug.ShowPositions(_map, path, TimeSpan.FromMilliseconds(200));

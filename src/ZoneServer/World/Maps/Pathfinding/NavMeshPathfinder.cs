@@ -61,11 +61,32 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			start.Y = startHeight;
 			destination.Y = destinationHeight;
 
-			if (!_ground.IsValidCirclePosition(start, actorRadius) || !_ground.IsValidCirclePosition(destination, actorRadius))
-				return false;
+			// If the start position is not valid (entity stuck in wall/obstacle/
+			// outside boundaries), find the nearest valid position and use it
+			// as the pathfinding start. The actual position is prepended to
+			// the final path so the entity walks out of the invalid area.
+			var actualStart = start;
+			var startWasInvalid = false;
+
+			if (!_ground.IsValidCirclePosition(start, actorRadius))
+			{
+				if (!_ground.TryGetNearestValidPosition(start, actorRadius, out start, 200f))
+					return false;
+
+				startWasInvalid = true;
+			}
+
+			if (!_ground.IsValidCirclePosition(destination, actorRadius))
+			{
+				if (!_ground.TryGetNearestValidPosition(destination, actorRadius, out destination, 200f))
+					return false;
+			}
 
 			if (_map.IsLineOfSightWalkable(start, destination, actorRadius))
 			{
+				if (startWasInvalid)
+					path.Add(actualStart);
+
 				path.Add(start);
 				path.Add(destination);
 
@@ -88,6 +109,9 @@ namespace Melia.Zone.World.Maps.Pathfinding
 
 			var rawPath = this.BuildFunnelPath(start, destination, cellPath, actorRadius);
 			path = this.ValidatePath(rawPath, actorRadius);
+
+			if (startWasInvalid && path.Count >= 2)
+				path.Insert(0, actualStart);
 
 			return path.Count >= 2;
 		}
