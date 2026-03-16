@@ -374,21 +374,13 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 				await dialog.Msg("My bees... they're all gone...");
 
 				var response = await dialog.Select("This was once the most productive bee farm in all of Orsha. Now look at it. Empty. Silent.",
-					Option("What happened to your bees?", "bees"),
 					Option("Maybe I can help", "help"),
+					Option("What happened to your bees?", "bees"),
 					Option("That's unfortunate", "leave")
 				);
 
 				switch (response)
 				{
-					case "bees":
-						await dialog.Msg("{#666666}*She gazes toward the forest*{/}");
-						await dialog.Msg("After the war, corruption spread throughout these woods. The air became toxic.");
-						await dialog.Msg("The bees... they couldn't survive here. Some died. Most fled to cleaner lands.");
-						await dialog.Msg("But I've heard reports of wild flowers blooming in certain spots - flowers that bees love.");
-						await dialog.Msg("I tried to stay, hoping they'd return. But hope fades with each empty sunrise.");
-						break;
-
 					case "help":
 						await dialog.Msg("{#666666}*A spark of hope appears in her eyes*{/}");
 						await dialog.Msg("You... you would help an old beekeeper?");
@@ -402,6 +394,14 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 							await dialog.Msg("Gather 5 bunches of those special flowers and bring them back to me.");
 							await dialog.Msg("With those flowers near my hives, maybe... just maybe... the bees will return to these woods.");
 						}
+						break;
+
+					case "bees":
+						await dialog.Msg("{#666666}*She gazes toward the forest*{/}");
+						await dialog.Msg("After the war, corruption spread throughout these woods. The air became toxic.");
+						await dialog.Msg("The bees... they couldn't survive here. Some died. Most fled to cleaner lands.");
+						await dialog.Msg("But I've heard reports of wild flowers blooming in certain spots - flowers that bees love.");
+						await dialog.Msg("I tried to stay, hoping they'd return. But hope fades with each empty sunrise.");
 						break;
 
 					case "leave":

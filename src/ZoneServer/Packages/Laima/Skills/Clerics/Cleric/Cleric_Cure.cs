@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 
 			var target = targets.FirstOrDefault();
 			if (target == null)
-				return;
+				target = caster;
 
 			this.RemoveDebuffs(caster, target, skill);
 
