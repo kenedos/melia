@@ -50,7 +50,6 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 150;
 			var damageDelay = 350;
-			Debug.ShowShape(caster.Map, splashArea, TimeSpan.FromMilliseconds(500));
 
 			await skill.Wait(TimeSpan.FromMilliseconds(hitDelay));
 

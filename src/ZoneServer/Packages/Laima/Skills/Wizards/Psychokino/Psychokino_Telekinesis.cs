@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 	[SkillHandler(SkillId.Psychokino_Telekinesis)]
 	public class Psychokino_TelekinesisOverride : IForceSkillHandler
 	{
-		public async void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

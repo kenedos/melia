@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 				}
 			}
 		}
-		public async void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (caster is Character character)
 			{
@@ -70,6 +70,11 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
+			skill.Run(this.HandleSkillAsync(skill, caster, farPos, targetPos));
+		}
+
+		private async Task HandleSkillAsync(Skill skill, ICombatEntity caster, Position farPos, Position targetPos)
+		{
 			await skill.Wait(TimeSpan.FromMilliseconds(700));
 
 			var targets2 = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, 150f);

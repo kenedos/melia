@@ -144,11 +144,11 @@ namespace Melia.Zone.Database
 					try
 					{
 						var lockStart = saveStopwatch.ElapsedMilliseconds;
-						CharacterLockManager.TryAcquire(character.DbId, TimeSpan.FromSeconds(10), "SaveCharacterData", ref lockTaken, out acquiredLock);
+						CharacterLockManager.TryAcquire(character.DbId, TimeSpan.FromSeconds(3), "SaveCharacterData", ref lockTaken, out acquiredLock);
 						lockMs = saveStopwatch.ElapsedMilliseconds - lockStart;
 						if (!lockTaken)
 						{
-							Log.Error($"SaveCharacterData: Failed to acquire C# lock for character {character.DbId} after 10s. Aborting save.");
+							Log.Error($"SaveCharacterData: Failed to acquire C# lock for character {character.DbId} after 3s. Aborting save.");
 							return;
 						}
 
@@ -249,6 +249,14 @@ namespace Melia.Zone.Database
 								Log.Warning($"SaveCharacterData: {errorType} detected for character {character.DbId} on attempt {i + 1}/{maxRetries}. Retrying...");
 								try { trans.Rollback(); } catch (Exception rbEx) { Log.Error($"Rollback after {errorType} failed: {rbEx}"); }
 								if (i == maxRetries - 1) throw;
+
+								// Release lock before sleeping so other operations
+								// on this character aren't blocked during backoff
+								if (lockTaken)
+								{
+									CharacterLockManager.Release(acquiredLock, character.DbId, "SaveCharacterData");
+									lockTaken = false;
+								}
 								Thread.Sleep(50 + RandomProvider.Get().Next(100));
 							}
 							catch (Exception ex)

@@ -387,10 +387,11 @@ namespace Melia.Zone.Pads.Helpers
 			var timeTaken = pad.Movement.MoveTo(destination);
 			if (destroyOnArrival)
 			{
-				Task.Delay(timeTaken).ContinueWith(_ =>
+				_ = Task.Delay(timeTaken).ContinueWith(_ =>
 				{
-					pad.Destroy();
-				});
+					try { pad.Destroy(); }
+					catch (Exception ex) { Log.Error("PadHelper.SetDestPos: Error destroying pad: {0}", ex); }
+				}, TaskScheduler.Default);
 			}
 		}
 
@@ -400,10 +401,9 @@ namespace Melia.Zone.Pads.Helpers
 			var timeTaken = pad.Movement.MoveTo(destination);
 			if (destroyOnArrival)
 			{
-				await Task.Delay(timeTaken).ContinueWith(_ =>
-				{
-					pad.Destroy();
-				});
+				await Task.Delay(timeTaken);
+				try { pad.Destroy(); }
+				catch (Exception ex) { Log.Error("PadHelper.SetDestPosWithDelay: Error destroying pad: {0}", ex); }
 			}
 			if (accumDelay > 0)
 				await Task.Delay((int)accumDelay);

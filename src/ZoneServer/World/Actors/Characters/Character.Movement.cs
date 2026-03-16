@@ -413,57 +413,54 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.EyesOpen)
 				return;
 
+			var currentlyVisibleMonsters = this.Map.GetVisibleMonsters(this);
+			var currentlyVisibleCharacters = this.Map.GetVisibleCharacters(this);
+			var currentlyVisiblePads = this.Map.GetVisiblePads(this);
+
+			IEnumerable<Character> appearCharacters;
+			IEnumerable<Character> disappearCharacters;
+			IMonster[] appearMonsterList;
+			IEnumerable<IMonster> disappearMonsters;
+			IEnumerable<Pad> appearPads;
+			IEnumerable<Pad> disappearPads;
+			int sentCount;
+
 			lock (_lookAroundLock)
 			{
-				var currentlyVisibleMonsters = this.Map.GetVisibleMonsters(this);
-				var currentlyVisibleCharacters = this.Map.GetVisibleCharacters(this);
-				var currentlyVisiblePads = this.Map.GetVisiblePads(this);
+				appearCharacters = currentlyVisibleCharacters.Except(_visibleCharacters).ToArray();
+				disappearCharacters = _visibleCharacters.Except(currentlyVisibleCharacters).ToArray();
 
-				var appearMonsters = currentlyVisibleMonsters.Except(_visibleMonsters);
-				var appearCharacters = currentlyVisibleCharacters.Except(_visibleCharacters);
-				var appearPads = currentlyVisiblePads.Except(_visiblePads);
+				appearMonsterList = currentlyVisibleMonsters.Except(_visibleMonsters).ToArray();
+				disappearMonsters = _visibleMonsters.Except(currentlyVisibleMonsters).ToArray();
 
-				var disappearMonsters = _visibleMonsters.Except(currentlyVisibleMonsters);
-				var disappearCharacters = _visibleCharacters.Except(currentlyVisibleCharacters);
-				var disappearPads = _visiblePads.Except(currentlyVisiblePads);
-
-				this.HandleAppearingCharacters(appearCharacters);
-				this.HandleDisappearingCharacters(disappearCharacters);
-
-				// Throttle monster appearances to prevent packet storms.
-				// Only send up to MaxMonsterAppearPerTick new monsters per tick.
-				// Unsent monsters will reappear in the next tick's delta since
-				// _visibleMonsters only tracks what was actually sent to the client.
-				var appearMonsterList = appearMonsters.ToArray();
-				var sentCount = 0;
-				foreach (var monster in appearMonsterList)
-				{
-					if (sentCount >= MaxMonsterAppearPerTick)
-						break;
-
-					this.HandleAppearingSingleMonster(monster);
-					sentCount++;
-				}
-
-				// Disappearances remain unlimited (ZC_LEAVE is cheap)
-				this.HandleDisappearingMonsters(disappearMonsters);
-
-				this.HandleAppearingPads(appearPads);
-				this.HandleDisappearingPads(disappearPads);
+				appearPads = currentlyVisiblePads.Except(_visiblePads).ToArray();
+				disappearPads = _visiblePads.Except(currentlyVisiblePads).ToArray();
 
 				// Update _visibleMonsters to reflect only what the client
 				// actually knows about: previously visible (minus disappeared)
 				// plus only the monsters we actually sent this tick.
+				sentCount = Math.Min(appearMonsterList.Length, MaxMonsterAppearPerTick);
 				var newVisibleMonsters = new HashSet<IMonster>(_visibleMonsters);
 				foreach (var monster in disappearMonsters)
 					newVisibleMonsters.Remove(monster);
-				for (var i = 0; i < sentCount && i < appearMonsterList.Length; i++)
+				for (var i = 0; i < sentCount; i++)
 					newVisibleMonsters.Add(appearMonsterList[i]);
 				_visibleMonsters = newVisibleMonsters.ToArray();
 
 				_visibleCharacters = currentlyVisibleCharacters;
 				_visiblePads = currentlyVisiblePads;
 			}
+
+			this.HandleAppearingCharacters(appearCharacters);
+			this.HandleDisappearingCharacters(disappearCharacters);
+
+			for (var i = 0; i < sentCount; i++)
+				this.HandleAppearingSingleMonster(appearMonsterList[i]);
+
+			this.HandleDisappearingMonsters(disappearMonsters);
+
+			this.HandleAppearingPads(appearPads);
+			this.HandleDisappearingPads(disappearPads);
 		}
 
 		private void HandleAppearingCharacters(IEnumerable<Character> appearCharacters)

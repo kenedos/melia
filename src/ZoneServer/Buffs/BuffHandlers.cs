@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Buffs
 	/// </summary>
 	public class BuffHandlers
 	{
-		private readonly Dictionary<BuffId, IBuffHandler> _buffHandlers = new();
+		private readonly ConcurrentDictionary<BuffId, IBuffHandler> _buffHandlers = new();
 		private readonly Dictionary<BuffId, HandlerPriority> _priorities = new();
 
 		/// <summary>
@@ -83,8 +84,7 @@ namespace Melia.Zone.Buffs
 		/// <param name="handler"></param>
 		public void Register(BuffId buffId, IBuffHandler handler)
 		{
-			lock (_buffHandlers)
-				_buffHandlers[buffId] = handler;
+			_buffHandlers[buffId] = handler;
 
 			this.LoadCombatEvents(buffId, handler);
 			ScriptableFunctions.Load(handler);
@@ -190,8 +190,7 @@ namespace Melia.Zone.Buffs
 		/// <returns></returns>
 		public bool Has(BuffId buffId)
 		{
-			lock (_buffHandlers)
-				return _buffHandlers.ContainsKey(buffId);
+			return _buffHandlers.ContainsKey(buffId);
 		}
 
 		/// <summary>
@@ -202,11 +201,8 @@ namespace Melia.Zone.Buffs
 		/// <returns></returns>
 		public IBuffHandler GetHandler(BuffId buffId)
 		{
-			lock (_buffHandlers)
-			{
-				if (_buffHandlers.TryGetValue(buffId, out var handler))
-					return handler;
-			}
+			if (_buffHandlers.TryGetValue(buffId, out var handler))
+				return handler;
 
 			return null;
 		}
@@ -220,8 +216,7 @@ namespace Melia.Zone.Buffs
 		/// <returns></returns>
 		public bool TryGetHandler(BuffId buffId, out IBuffHandler handler)
 		{
-			lock (_buffHandlers)
-				return _buffHandlers.TryGetValue(buffId, out handler);
+			return _buffHandlers.TryGetValue(buffId, out handler);
 		}
 	}
 }

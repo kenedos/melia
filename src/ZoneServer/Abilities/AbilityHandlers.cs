@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -19,9 +20,9 @@ namespace Melia.Zone.Abilities
 	/// </summary>
 	public class AbilityHandlers
 	{
-		private readonly Dictionary<AbilityId, IAbilityHandler> _handlers = new();
+		private readonly ConcurrentDictionary<AbilityId, IAbilityHandler> _handlers = new();
 		private readonly Dictionary<AbilityId, HandlerPriority> _priorities = new();
-		private readonly Dictionary<AbilityId, IAbilityPropertyHandler> _propertyHandlers = new();
+		private readonly ConcurrentDictionary<AbilityId, IAbilityPropertyHandler> _propertyHandlers = new();
 
 		/// <summary>
 		/// Creates a new ability handler manager and loads all handlers
@@ -83,15 +84,10 @@ namespace Melia.Zone.Abilities
 		/// <param name="handler"></param>
 		public void Register(AbilityId abilityId, IAbilityHandler handler)
 		{
-			lock (_handlers)
-				_handlers[abilityId] = handler;
+			_handlers[abilityId] = handler;
 
-			// Also register as property handler if it implements the interface
 			if (handler is IAbilityPropertyHandler propertyHandler)
-			{
-				lock (_propertyHandlers)
-					_propertyHandlers[abilityId] = propertyHandler;
-			}
+				_propertyHandlers[abilityId] = propertyHandler;
 
 			this.LoadCombatEvents(abilityId, handler);
 			ScriptableFunctions.Load(handler);
@@ -104,11 +100,8 @@ namespace Melia.Zone.Abilities
 		/// <param name="character"></param>
 		public void ActivatePropertyHandler(Ability ability, Character character)
 		{
-			lock (_propertyHandlers)
-			{
-				if (_propertyHandlers.TryGetValue(ability.Id, out var handler))
-					handler.OnActivate(ability, character);
-			}
+			if (_propertyHandlers.TryGetValue(ability.Id, out var handler))
+				handler.OnActivate(ability, character);
 		}
 
 		/// <summary>
@@ -118,11 +111,8 @@ namespace Melia.Zone.Abilities
 		/// <param name="character"></param>
 		public void DeactivatePropertyHandler(Ability ability, Character character)
 		{
-			lock (_propertyHandlers)
-			{
-				if (_propertyHandlers.TryGetValue(ability.Id, out var handler))
-					handler.OnDeactivate(ability, character);
-			}
+			if (_propertyHandlers.TryGetValue(ability.Id, out var handler))
+				handler.OnDeactivate(ability, character);
 		}
 
 		/// <summary>
@@ -132,8 +122,7 @@ namespace Melia.Zone.Abilities
 		/// <returns></returns>
 		public bool HasPropertyHandler(AbilityId abilityId)
 		{
-			lock (_propertyHandlers)
-				return _propertyHandlers.ContainsKey(abilityId);
+			return _propertyHandlers.ContainsKey(abilityId);
 		}
 
 		/// <summary>
@@ -236,8 +225,7 @@ namespace Melia.Zone.Abilities
 		/// <returns></returns>
 		public bool Has(AbilityId abilityId)
 		{
-			lock (_handlers)
-				return _handlers.ContainsKey(abilityId);
+			return _handlers.ContainsKey(abilityId);
 		}
 
 		/// <summary>
@@ -248,11 +236,8 @@ namespace Melia.Zone.Abilities
 		/// <returns></returns>
 		public IAbilityHandler GetHandler(AbilityId abilityId)
 		{
-			lock (_handlers)
-			{
-				if (_handlers.TryGetValue(abilityId, out var handler))
-					return handler;
-			}
+			if (_handlers.TryGetValue(abilityId, out var handler))
+				return handler;
 
 			return null;
 		}
@@ -266,8 +251,7 @@ namespace Melia.Zone.Abilities
 		/// <returns></returns>
 		public bool TryGetHandler(AbilityId abilityId, out IAbilityHandler handler)
 		{
-			lock (_handlers)
-				return _handlers.TryGetValue(abilityId, out handler);
+			return _handlers.TryGetValue(abilityId, out handler);
 		}
 	}
 }

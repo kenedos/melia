@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Data.Database;
@@ -15,12 +16,10 @@ namespace Melia.Zone.World
 	/// </summary>
 	public class MapManager
 	{
-		//private readonly Dictionary<int, Map> _mapsId = new();
-		private readonly Dictionary<string, Map> _mapsName = new(StringComparer.OrdinalIgnoreCase);
-		private readonly Dictionary<int, Map> _maps = new();
+		private readonly ConcurrentDictionary<string, Map> _mapsName = new(StringComparer.OrdinalIgnoreCase);
+		private readonly ConcurrentDictionary<int, Map> _maps = new();
 
-		// Key: Source Map ClassName, Value: Set of directly connected Destination Map ClassNames
-		private readonly Dictionary<string, HashSet<string>> _mapConnections = new(StringComparer.OrdinalIgnoreCase);
+		private readonly ConcurrentDictionary<string, HashSet<string>> _mapConnections = new(StringComparer.OrdinalIgnoreCase);
 		private readonly object _connectionLock = new();
 
 		/// <summary>
@@ -31,7 +30,7 @@ namespace Melia.Zone.World
 		/// <summary>
 		/// Returns the number of maps currently loaded.
 		/// </summary>
-		public int Count { get { lock (_maps) return _maps.Count; } }
+		public int Count => _maps.Count;
 
 		/// <summary>
 		/// Adds map to the world.
@@ -43,24 +42,15 @@ namespace Melia.Zone.World
 		/// </exception>
 		public void Add(Map map)
 		{
-			lock (_maps)
+			if (!_maps.TryAdd(map.WorldId, map))
 			{
-				if (_maps.ContainsKey(map.WorldId))
-				{
-					Log.Warning($"Map id {map.Id} ('{map.ClassName}') already exists. It will not be added again.");
-					return;
-				}
+				Log.Warning($"Map id {map.Id} ('{map.ClassName}') already exists. It will not be added again.");
+				return;
+			}
 
-				_maps.Add(map.WorldId, map);
-
-				if (!_mapsName.ContainsKey(map.ClassName))
-				{
-					_mapsName.Add(map.ClassName, map);
-				}
-				else
-				{
-					Log.Warning($"Map with ClassName '{map.ClassName}' already exists in name dictionary. WorldId: {map.WorldId}");
-				}
+			if (!_mapsName.TryAdd(map.ClassName, map))
+			{
+				Log.Warning($"Map with ClassName '{map.ClassName}' already exists in name dictionary. WorldId: {map.WorldId}");
 			}
 		}
 
@@ -73,16 +63,11 @@ namespace Melia.Zone.World
 		/// </exception>
 		public void Remove(int worldMapId)
 		{
-			lock (_maps)
-			{
-				if (!_maps.TryGetValue(worldMapId, out var map))
-					throw new ArgumentException($"Map {worldMapId} doesn't exist.");
+			if (!_maps.TryRemove(worldMapId, out var map))
+				throw new ArgumentException($"Map {worldMapId} doesn't exist.");
 
-				_maps.Remove(worldMapId);
-
-				if (map != null)
-					_mapsName.Remove(map.ClassName);
-			}
+			if (map != null)
+				_mapsName.TryRemove(map.ClassName, out _);
 		}
 
 		/// <summary>
@@ -92,8 +77,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public bool Has(int worldMapId)
 		{
-			lock (_maps)
-				return _maps.ContainsKey(worldMapId);
+			return _maps.ContainsKey(worldMapId);
 		}
 
 		/// <summary>
@@ -103,8 +87,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public bool Has(string mapName)
 		{
-			lock (_mapsName)
-				return _mapsName.ContainsKey(mapName);
+			return _mapsName.ContainsKey(mapName);
 		}
 
 		/// <summary>
@@ -115,11 +98,8 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public Map Get(int worldId)
 		{
-			lock (_maps)
-			{
-				_maps.TryGetValue(worldId, out var map);
-				return map;
-			}
+			_maps.TryGetValue(worldId, out var map);
+			return map;
 		}
 
 		/// <summary>
@@ -128,11 +108,8 @@ namespace Melia.Zone.World
 		/// <param name="mapClassName"></param>
 		public Map Get(string mapClassName)
 		{
-			lock (_mapsName)
-			{
-				_mapsName.TryGetValue(mapClassName, out var result);
-				return result;
-			}
+			_mapsName.TryGetValue(mapClassName, out var result);
+			return result;
 		}
 
 		/// <summary>
@@ -145,8 +122,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public bool TryGet(int worldMapId, out Map map)
 		{
-			lock (_maps)
-				return _maps.TryGetValue(worldMapId, out map);
+			return _maps.TryGetValue(worldMapId, out map);
 		}
 
 		/// <summary>
@@ -159,10 +135,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public bool TryGet(string mapName, out Map map)
 		{
-			lock (_mapsName)
-			{
-				return _mapsName.TryGetValue(mapName, out map);
-			}
+			return _mapsName.TryGetValue(mapName, out map);
 		}
 
 		/// <summary>
@@ -171,8 +144,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public Map[] GetList()
 		{
-			lock (_maps)
-				return _maps.Values.ToArray();
+			return _maps.Values.ToArray();
 		}
 
 		/// <summary>
@@ -182,8 +154,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public Map[] GetList(Func<Map, bool> predicate)
 		{
-			lock (_maps)
-				return _maps.Values.Where(predicate).ToArray();
+			return _maps.Values.Where(predicate).ToArray();
 		}
 
 		/// <summary>
@@ -192,11 +163,8 @@ namespace Melia.Zone.World
 		/// <param name="func"></param>
 		public void Execute(Action<Map> func)
 		{
-			lock (_maps)
-			{
-				foreach (var map in _maps.Values)
-					func(map);
-			}
+			foreach (var map in _maps.Values)
+				func(map);
 		}
 
 		/// <summary>
@@ -207,8 +175,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public TObj[] ExecuteQuery<TObj>(Func<Map, IEnumerable<TObj>> func)
 		{
-			lock (_maps)
-				return _maps.Values.SelectMany(func).ToArray();
+			return _maps.Values.SelectMany(func).ToArray();
 		}
 
 		/// <summary>
@@ -217,13 +184,10 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public int GenerateDynamicMapId()
 		{
-			lock (_maps)
+			for (var i = DynamicMaps; i < ushort.MaxValue; ++i)
 			{
-				for (var i = DynamicMaps; i < ushort.MaxValue; ++i)
-				{
-					if (!_maps.ContainsKey(i))
-						return i;
-				}
+				if (!_maps.ContainsKey(i))
+					return i;
 			}
 
 			throw new Exception("No dynamic map ids available.");
@@ -234,11 +198,8 @@ namespace Melia.Zone.World
 		/// </summary>
 		public void RemoveScriptedEntities()
 		{
-			lock (_maps)
-			{
-				foreach (var map in _maps.Values)
-					map.RemoveScriptedEntities();
-			}
+			foreach (var map in _maps.Values)
+				map.RemoveScriptedEntities();
 		}
 
 		/// <summary>
@@ -247,14 +208,11 @@ namespace Melia.Zone.World
 		/// </summary>
 		public Character GetCharacterByTeamName(string teamName)
 		{
-			lock (_maps)
+			foreach (var map in _maps.Values)
 			{
-				foreach (var map in _maps.Values)
-				{
-					var character = map.GetCharacterByTeamName(teamName);
-					if (character != null)
-						return character;
-				}
+				var character = map.GetCharacterByTeamName(teamName);
+				if (character != null)
+					return character;
 			}
 
 			return null;
@@ -270,15 +228,12 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public bool TryGetMonster(Func<IMonster, bool> predicate, out IMonster monster)
 		{
-			lock (_maps)
+			foreach (var map in _maps.Values)
 			{
-				foreach (var map in _maps.Values)
+				if (map.TryGetMonster(predicate, out var m))
 				{
-					if (map.TryGetMonster(predicate, out var m))
-					{
-						monster = m;
-						return true;
-					}
+					monster = m;
+					return true;
 				}
 			}
 
@@ -292,8 +247,7 @@ namespace Melia.Zone.World
 		/// <returns></returns>
 		public int GetCharacterCount()
 		{
-			lock (_maps)
-				return _maps.Values.Sum(a => a.CharacterCount);
+			return _maps.Values.Sum(a => a.CharacterCount);
 		}
 
 		/// <summary>
@@ -301,8 +255,7 @@ namespace Melia.Zone.World
 		/// </summary>
 		public Character[] GetCharacters()
 		{
-			lock (_maps)
-				return _maps.Values.SelectMany(a => a.GetCharacters()).ToArray();
+			return _maps.Values.SelectMany(a => a.GetCharacters()).ToArray();
 		}
 
 		/// <summary>
@@ -310,8 +263,7 @@ namespace Melia.Zone.World
 		/// </summary>
 		public Character[] GetCharacters(Func<Character, bool> predicate)
 		{
-			lock (_maps)
-				return _maps.Values.SelectMany(a => a.GetCharacters(predicate)).ToArray();
+			return _maps.Values.SelectMany(a => a.GetCharacters(predicate)).ToArray();
 		}
 
 		/// <summary>
@@ -320,11 +272,8 @@ namespace Melia.Zone.World
 		/// <param name="packet"></param>
 		public void Broadcast(Packet packet)
 		{
-			lock (_maps)
-			{
-				foreach (var map in _maps.Values)
-					map.Broadcast(packet);
-			}
+			foreach (var map in _maps.Values)
+				map.Broadcast(packet);
 		}
 
 		/// <summary>
@@ -332,17 +281,14 @@ namespace Melia.Zone.World
 		/// </summary>
 		public Character GetCharacter(Func<Character, bool> predicate)
 		{
-			lock (_maps)
+			foreach (var map in _maps.Values)
 			{
-				foreach (var map in _maps.Values)
-				{
-					var character = map.GetCharacter(predicate);
+				var character = map.GetCharacter(predicate);
 
-					if (character != null)
-						return character;
-				}
-				return null;
+				if (character != null)
+					return character;
 			}
+			return null;
 		}
 
 		/// <summary>

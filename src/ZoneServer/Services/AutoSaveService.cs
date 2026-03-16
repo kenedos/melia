@@ -65,9 +65,10 @@ namespace Melia.Zone.Services
 					SaveQueue.Enqueue(() =>
 					{
 						var lockTaken = false;
+						object acquiredLock = null;
 						try
 						{
-							CharacterLockManager.TryAcquire(capturedChar.DbId, TimeSpan.Zero, "AutoSave", ref lockTaken);
+							CharacterLockManager.TryAcquire(capturedChar.DbId, TimeSpan.Zero, "AutoSave", ref lockTaken, out acquiredLock);
 							if (lockTaken)
 							{
 								var account = capturedChar.Connection?.Account;
@@ -101,7 +102,7 @@ namespace Melia.Zone.Services
 						finally
 						{
 							if (lockTaken)
-								CharacterLockManager.Release(capturedChar.DbId, "AutoSave");
+								CharacterLockManager.Release(acquiredLock, capturedChar.DbId, "AutoSave");
 
 							if (Interlocked.Decrement(ref remaining) == 0)
 								Log.Info($"AutoSaveService: Finished save for slot {capturedSlot}. Saved: {savedCount}, Skipped/Failed: {failedCount}.");

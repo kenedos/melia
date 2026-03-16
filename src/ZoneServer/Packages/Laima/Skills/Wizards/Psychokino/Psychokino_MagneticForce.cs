@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 		{
 			caster.PlaySound("voice_wiz_magneticforce_shot", "voice_wiz_m_magneticforce_shot");
 		}
-		public async void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
@@ -58,6 +58,11 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
+			skill.Run(this.HandleSkillAsync(skill, caster, targetPos));
+		}
+
+		private async Task HandleSkillAsync(Skill skill, ICombatEntity caster, Position targetPos)
+		{
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 
 			var totalRadius = 100f;
@@ -137,7 +142,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 				stunChance = abilityLevel * 0.05f;
 
 			var nearbyTargets = caster.Map.GetAttackableEnemiesInPosition(caster, magneticMob.Position, range);
-			var targetsToHit = nearbyTargets.Take(5);
+			var targetsToHit = nearbyTargets.Take(5).ToList();
 			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targetsToHit)
@@ -160,14 +165,11 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 					hits.Add(skillHit);
 				}
 
-				if (targetsToHit.Count() >= 1)
-				{
-					target.StartBuff(BuffId.MagneticForce_Debuff, skillLevel, (int)HitType.Normal, TimeSpan.FromMilliseconds(300), caster);
+				target.StartBuff(BuffId.MagneticForce_Debuff, skillLevel, (int)HitType.Normal, TimeSpan.FromMilliseconds(300), caster);
 
-					if (stunChance > 0 && RandomProvider.Get().NextDouble() < stunChance)
-					{
-						target.StartBuff(BuffId.Stun, 1, 0, TimeSpan.FromMilliseconds(1500), caster);
-					}
+				if (stunChance > 0 && RandomProvider.Get().NextDouble() < stunChance)
+				{
+					target.StartBuff(BuffId.Stun, 1, 0, TimeSpan.FromMilliseconds(1500), caster);
 				}
 			}
 

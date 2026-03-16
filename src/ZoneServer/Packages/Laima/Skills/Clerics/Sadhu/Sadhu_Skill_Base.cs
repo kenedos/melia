@@ -177,12 +177,17 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 		/// <param name="skill"></param>
 		/// <param name="farPos"></param>
 		/// <param name="buffId"></param>
-		private async void ReturnToBody(ICombatEntity caster, Skill skill, Position farPos, BuffId buffId)
+		private void ReturnToBody(ICombatEntity caster, Skill skill, Position farPos, BuffId buffId)
 		{
 			Send.ZC_SKILL_READY(caster, skill, caster.Position, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 1, caster.Handle, caster.Position, caster.Direction, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, caster.Position, ForceId.GetNew(), null);
 
+			skill.Run(this.ReturnToBodyAsync(caster, skill, buffId));
+		}
+
+		private async Task ReturnToBodyAsync(ICombatEntity caster, Skill skill, BuffId buffId)
+		{
 			await skill.Wait(TimeSpan.FromMilliseconds(750));
 
 			skill.IncreaseOverheat();

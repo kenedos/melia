@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers
 	/// </summary>
 	public class SkillHandlers
 	{
-		private readonly Dictionary<SkillId, ISkillHandler> _handlers = new();
+		private readonly ConcurrentDictionary<SkillId, ISkillHandler> _handlers = new();
 		private readonly Dictionary<SkillId, int> _priorities = new();
 
 		/// <summary>
@@ -85,8 +86,7 @@ namespace Melia.Zone.Skills.Handlers
 		/// <param name="handler"></param>
 		public void Register(SkillId skillId, ISkillHandler handler)
 		{
-			lock (_handlers)
-				_handlers[skillId] = handler;
+			_handlers[skillId] = handler;
 
 			this.LoadCombatEvents(skillId, handler);
 			ScriptableFunctions.Load(handler);
@@ -173,16 +173,13 @@ namespace Melia.Zone.Skills.Handlers
 		/// </exception>
 		public TSkillHandler GetHandler<TSkillHandler>(SkillId skillId) where TSkillHandler : ISkillHandler
 		{
-			lock (_handlers)
-			{
-				if (!_handlers.TryGetValue(skillId, out var handler))
-					return default;
+			if (!_handlers.TryGetValue(skillId, out var handler))
+				return default;
 
-				if (handler is not TSkillHandler tHandler)
-					throw new ArgumentException($"The skill handler for '{skillId}' is not of type '{typeof(TSkillHandler).Name}'.");
+			if (handler is not TSkillHandler tHandler)
+				throw new ArgumentException($"The skill handler for '{skillId}' is not of type '{typeof(TSkillHandler).Name}'.");
 
-				return tHandler;
-			}
+			return tHandler;
 		}
 
 		/// <summary>

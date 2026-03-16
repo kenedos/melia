@@ -82,7 +82,7 @@ namespace Melia.Zone.Skills.Handlers.Archer
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			var splashArea = new Circle(targetPos, SplashRadius);
-			this.Attack(skill, caster, splashArea);
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -91,51 +91,42 @@ namespace Melia.Zone.Skills.Handlers.Archer
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
 		/// <param name="splashArea"></param>
-		private async void Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
+		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			try
+			var hits = new List<SkillHitInfo>();
+
+			for (var i = 0; i < TotalHits; ++i)
 			{
-				var hits = new List<SkillHitInfo>();
+				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+				var targetPos = splashArea.OriginPos;
 
-				for (var i = 0; i < TotalHits; ++i)
+				if (targets.Count != 0)
 				{
-					// TODO: Try to optimize this to not get all targets
-					//   every time, though we might want/need that?
-					var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-					var targetPos = splashArea.OriginPos;
+					var target = targets.Random();
+					if (!caster.CanDamage(target))
+						continue;
 
-					if (targets.Count != 0)
-					{
-						var target = targets.Random();
-						if (!caster.CanDamage(target))
-							continue;
+					var skillHitResult = SCR_SkillHit(caster, target, skill);
 
-						var skillHitResult = SCR_SkillHit(caster, target, skill);
+					target.TakeDamage(skillHitResult.Damage, caster);
+					targetPos = target.Position;
 
-						target.TakeDamage(skillHitResult.Damage, caster);
-						targetPos = target.Position;
-
-						var hit = new HitInfo(caster, target, skill, skillHitResult.Damage, skillHitResult.Result);
-						Send.ZC_HIT_INFO(caster, target, hit);
-					}
-
-					// It seems like the game uses ZC_SYNC_* packets
-					// to control how and when packets such as this
-					// are actually handled by the client instead of
-					// sending them on precise timers, though timers
-					// also seem to get employed... Needs more research.
-					Send.ZC_NORMAL.SkillProjectile(caster, targetPos, "I_arrow013_mash_yellow#Dummy_Force", 0.6f, "F_explosion092_hit", 0.6f, 30, TimeSpan.FromSeconds(0.2f));
-
-					if (i < TotalHits - 1)
-						await skill.Wait(DelayBetweenHits);
+					var hit = new HitInfo(caster, target, skill, skillHitResult.Damage, skillHitResult.Result);
+					Send.ZC_HIT_INFO(caster, target, hit);
 				}
 
-				Send.ZC_SKILL_DISABLE(caster);
+				// It seems like the game uses ZC_SYNC_* packets
+				// to control how and when packets such as this
+				// are actually handled by the client instead of
+				// sending them on precise timers, though timers
+				// also seem to get employed... Needs more research.
+				Send.ZC_NORMAL.SkillProjectile(caster, targetPos, "I_arrow013_mash_yellow#Dummy_Force", 0.6f, "F_explosion092_hit", 0.6f, 30, TimeSpan.FromSeconds(0.2f));
+
+				if (i < TotalHits - 1)
+					await skill.Wait(DelayBetweenHits);
 			}
-			catch (Exception ex)
-			{
-				Log.Error("Multishot: Attack failed. Error: {0}", ex);
-			}
+
+			Send.ZC_SKILL_DISABLE(caster);
 		}
 	}
 }
