@@ -168,7 +168,7 @@ public class RefiningItemScripts : GeneralScript
 		// Note: The original script checked IS_MORU_NOT_DESTROY_TARGET_ITEM, which we've renamed for clarity.
 		var anvilName = IsAnvilForZeroPotential(anvilItem) ? "anvil_gold_mon" : "anvil_mon";
 
-		var anvilMonster = CreateMonster(character, anvilName, position, 0, 1, 1, 0);
+		var anvilMonster = CreateMonster(character, anvilName, position, 0, 1, 1);
 		SetupAnvil(anvilMonster, hitCount, character.Name);
 
 		anvilMonster.Vars.Set("OWNERAID", character.AccountObjectId);
