@@ -166,39 +166,39 @@
 // MAGE TOWER - Monster Cards Theme
 // ============================================================================
 { mapClassName: "d_firetower_41", items: [
-	{ itemId: 670001, chance: 0.064 }, // Monster Card Album: Red
-	{ itemId: 670002, chance: 0.064 }, // Monster Card Album: Blue
-	{ itemId: 670003, chance: 0.064 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.064 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.064 }  // Enhancement Card Lv1
+	{ itemId: 670001, chance: 0.128 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.128 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.128 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.128 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.128 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_42", items: [
-	{ itemId: 670001, chance: 0.067 }, // Monster Card Album: Red
-	{ itemId: 670002, chance: 0.067 }, // Monster Card Album: Blue
-	{ itemId: 670003, chance: 0.067 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.067 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.067 }  // Enhancement Card Lv1
+	{ itemId: 670001, chance: 0.134 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.134 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.134 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.134 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.134 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_43", items: [
-	{ itemId: 670001, chance: 0.071 }, // Monster Card Album: Red
-	{ itemId: 670002, chance: 0.071 }, // Monster Card Album: Blue
-	{ itemId: 670003, chance: 0.071 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.071 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.071 }  // Enhancement Card Lv1
+	{ itemId: 670001, chance: 0.142 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.142 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.142 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.142 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.142 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_44", items: [
-	{ itemId: 670001, chance: 0.085 }, // Monster Card Album: Red
-	{ itemId: 670002, chance: 0.085 }, // Monster Card Album: Blue
-	{ itemId: 670003, chance: 0.085 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.085 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.085 }  // Enhancement Card Lv1
+	{ itemId: 670001, chance: 0.170 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.170 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.170 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.170 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.170 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_45", items: [
-	{ itemId: 670001, chance: 0.090 }, // Monster Card Album: Red
-	{ itemId: 670002, chance: 0.090 }, // Monster Card Album: Blue
-	{ itemId: 670003, chance: 0.090 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.090 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.090 }  // Enhancement Card Lv1
+	{ itemId: 670001, chance: 0.180 }, // Monster Card Album: Red
+	{ itemId: 670002, chance: 0.180 }, // Monster Card Album: Blue
+	{ itemId: 670003, chance: 0.180 }, // Monster Card Album: Green
+	{ itemId: 670004, chance: 0.180 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.180 }  // Enhancement Card Lv1
 ]},
 
 // ============================================================================
