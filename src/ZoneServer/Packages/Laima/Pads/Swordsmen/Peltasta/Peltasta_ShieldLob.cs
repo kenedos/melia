@@ -11,8 +11,10 @@ using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Shared.Util.TaskHelper;
+using Melia.Zone.Pads;
+using Melia.Zone.Pads.Handlers;
 
-namespace Melia.Zone.Pads.Handlers.Swordsman.Peltasta
+namespace Melia.Zone.Packages.Laima.Pads.Swordsmen.Peltasta
 {
 	/// <summary>
 	/// Handler for the Shield Lob pad, spawning a shield modeled after the

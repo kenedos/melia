@@ -55,6 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			skill.IncreaseOverheat();
 			caster.TurnTowards(target);
 			caster.SetAttackState(true);
+			Send.ZC_PLAY_ANI(caster, "SKL_CHARGESHOT_SHOT");
 
 			if (target == null)
 			{

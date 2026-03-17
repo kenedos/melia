@@ -8,12 +8,14 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using Melia.Zone.Pads;
+using Melia.Zone.Pads.Handlers;
 
-namespace Melia.Zone.Pads.Handlers
+namespace Melia.Zone.Packages.Laima.Pads.Scouts.Thaumaturge
 {
 	[Package("laima")]
-	[PadHandler(PadName.Thaumaturge_SwellBrain)]
-	public class Thaumaturge_SwellBrainOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
+	[PadHandler(PadName.Thaumaturge_Reversi)]
+	public class Thaumaturge_ReversiOverride : ICreatePadHandler, IDestroyPadHandler, IUpdatePadHandler
 	{
 		public void Created(object sender, PadTriggerArgs args)
 		{
@@ -21,10 +23,9 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
-			pad.SetRange(150f);
-			pad.SetUpdateInterval(100);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(10000);
-			pad.Trigger.MaxUseCount = 10;
+			pad.SetRange(50f);
+			pad.SetUpdateInterval(400);
+			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(100);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -34,16 +35,6 @@ namespace Melia.Zone.Pads.Handlers
 			var skill = pad.Skill;
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
-		}
-
-		public void Entered(object sender, PadTriggerActorArgs args)
-		{
-			var pad = args.Trigger;
-			var creator = args.Creator;
-			var initiator = args.Initiator;
-			var skill = pad.Skill;
-
-			PadTargetBuff(pad, initiator, RelationType.Party, 0, 0, BuffId.BigHeadMode, skill.Level, 0, 1800000, 1, 100, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

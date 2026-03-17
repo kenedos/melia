@@ -8,12 +8,14 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using Melia.Zone.Pads;
+using Melia.Zone.Pads.Handlers;
 
-namespace Melia.Zone.Pads.Handlers
+namespace Melia.Zone.Packages.Laima.Pads.Scouts.Thaumaturge
 {
 	[Package("laima")]
-	[PadHandler(PadName.Thaumaturge_Quicken)]
-	public class Thaumaturge_QuickenOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
+	[PadHandler(PadName.Thaumaturge_SwellBody)]
+	public class Thaumaturge_SwellBodyOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
 	{
 		public void Created(object sender, PadTriggerArgs args)
 		{
@@ -22,11 +24,11 @@ namespace Melia.Zone.Pads.Handlers
 			var skill = pad.Skill;
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
-			pad.SetRange(10f);
+			pad.SetRange(50f);
 			pad.SetUpdateInterval(100);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(30000);
-			pad.Trigger.MaxUseCount = 88880;
-			pad.NumArg1 = skill.Level;
+			pad.Trigger.MaxActorCount = (int)(3 + skill.Level * 0.5);
+			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(10000);
+			pad.Trigger.MaxUseCount = (int)(3 + skill.Level * 0.5);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -45,7 +47,8 @@ namespace Melia.Zone.Pads.Handlers
 			var initiator = args.Initiator;
 			var skill = pad.Skill;
 
-			PadTargetBuff(pad, initiator, RelationType.Friendly, 0, 0, BuffId.Quicken_Buff, skill.Level, 0, 10000 + skill.Level * 1000, 1, 100, false);
+			if (!PadActivate(pad, initiator, RelationType.Enemy)) return;
+			PadTargetBuff(pad, initiator, RelationType.Enemy, 0, -1, BuffId.SwellBody_Debuff, 1, 0, 5000 + skill.Level * 1000, 1, 100, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

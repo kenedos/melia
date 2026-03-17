@@ -3768,7 +3768,7 @@ namespace Melia.Zone.Network
 				//character.AddSessionObject(quest.SessionObjectStaticData.Id);
 			}
 
-			foreach (var skill in character.Skills.GetList(s => s.IsPassive))
+			foreach (var skill in character.Skills.GetList())
 			{
 				if (ZoneServer.Instance.SkillHandlers.TryGetPassiveSkillHandler<IPassiveSkillHandler>(skill.Id, out var handler))
 					handler.Handle(skill, skill.Owner);

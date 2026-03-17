@@ -9,8 +9,10 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using Melia.Zone.Pads;
+using Melia.Zone.Pads.Handlers;
 
-namespace Melia.Zone.Pads.Handlers
+namespace Melia.Zone.Packages.Laima.Pads.Wizards.Chronomancer
 {
 	[Package("laima")]
 	[PadHandler(PadName.Chronomancer_Stop)]
