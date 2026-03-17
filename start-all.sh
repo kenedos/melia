@@ -44,10 +44,17 @@ echo "Starting all servers..."
 launch_server "Barracks" "BarracksServer.dll" "1001" "1"
 sleep 2
 
-launch_server "Zone-1" "ZoneServer.dll" "1001" "1"
+echo "Starting Zone-1 with logging..."
+TIMESTAMP=$(date +'%Y-%m-%d_%H-%M-%S')
+LOG_FILENAME="zone-1-${TIMESTAMP}.log"
+echo "Zone-1 log file will be: $LOG_FILENAME"
+screen -dmL -Logfile "$LOG_FILENAME" -S Zone-1 dotnet "bin/Release/net8.0/ZoneServer.dll" "1001" "1"
 sleep 2
 
-launch_server "Social" "SocialServer.dll" "1001" "1"
+launch_server "Chat" "SocialServer.dll" "1001" "1"
+sleep 2
+
+launch_server "Relation" "SocialServer.dll" "1001" "2"
 sleep 2
 
 launch_server "Web" "WebServer.dll"
