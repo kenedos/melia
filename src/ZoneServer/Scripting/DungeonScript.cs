@@ -565,7 +565,7 @@ namespace Melia.Zone.Scripting
 
 			// Create instance immediately and register all party members
 			// This ensures non-leaders can find their instance mapping right away
-			var newDungeonInstance = InstanceDungeon.CreateNew(this.Id, dungeonData, dungeonData.Map, leaderCharacter, partyMembers, this.GetDungeonStages(), this.StartPosition);
+			var newDungeonInstance = InstanceDungeon.CreateNew(this.Id, dungeonData, dungeonData.Map, leaderCharacter, partyMembers.ToList(), this.GetDungeonStages(), this.StartPosition);
 
 			_instancesByOwner[leaderCharacter.DbId] = newDungeonInstance;
 			foreach (var member in partyMembers)
