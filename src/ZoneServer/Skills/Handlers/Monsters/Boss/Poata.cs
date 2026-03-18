@@ -122,16 +122,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 			var spawnPos = originPos.GetRelative(farPos, distance: 84.896057f);
-			MonsterSkillCreateMob(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMob(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 74.946373f);
-			MonsterSkillCreateMob(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMob(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			spawnPos = originPos.GetRelative(farPos, distance: 63.12207f);
-			MonsterSkillCreateMob(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMob(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 75.523308f);
-			MonsterSkillCreateMob(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMob(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 70.352638f);
-			MonsterSkillCreateMob(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMob(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 		}
 	}
 
@@ -293,16 +293,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 			var spawnPos = originPos.GetRelative(farPos, distance: 74.949997f);
-			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMobPC(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 84.900002f);
-			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMobPC(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			spawnPos = originPos.GetRelative(farPos, distance: 70.349998f);
-			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMobPC(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 75.519997f);
-			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMobPC(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 80.360001f);
-			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
+			MonsterSkillCreateMobPC(skill, caster, "Jukopus_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 		}
 	}
 
