@@ -24,6 +24,10 @@ namespace Melia.Zone.World.Spawning
 	public class MonsterSpawner : ISpawner
 	{
 		private const int MaxSpawnsPerTick = 5;
+		private const int RootCrystalMinId = 45110;
+		private const int RootCrystalMaxId = 45137;
+		private const float RootCrystalMinSpacing = 250f;
+		private const int RootCrystalMaxSpawnAttempts = 20;
 
 		private const float FlexIncreaseLimit = 100;
 		private const float FlexDecreaseLimit = -100;
@@ -184,10 +188,19 @@ namespace Melia.Zone.World.Spawning
 		/// <param name="amount"></param>
 		public void Spawn(int amount)
 		{
+			var isRootCrystal = _monsterData.Id >= RootCrystalMinId && _monsterData.Id <= RootCrystalMaxId;
+			List<Position> batchPositions = null;
+			if (isRootCrystal)
+				batchPositions = new List<Position>();
+			var spawned = 0;
+
 			for (var i = 0; i < amount; ++i)
 			{
 				if (!_spawnAreas.TryGetRandomLocation(out var map, out var pos))
 					return;
+
+				if (isRootCrystal && !this.TryGetRootCrystalPosition(map, batchPositions, ref pos))
+					continue;
 
 				if (!this.Maps.Contains(map.Id))
 					this.Maps.Add(map.Id);
@@ -222,9 +235,69 @@ namespace Melia.Zone.World.Spawning
 				map.Data.SpawnedMonsterIds.Add(_monsterData.Id);
 
 				this.Spawned?.Invoke(this, new SpawnEventArgs(this, monster));
+				spawned++;
+
+				if (isRootCrystal)
+					batchPositions.Add(pos);
 			}
 
-			this.Amount += amount;
+			this.Amount += spawned;
+		}
+
+		/// <summary>
+		/// Validates and adjusts a spawn position for root crystals to ensure
+		/// they don't spawn too close to other root crystals. Returns true if
+		/// a valid position was found, updating pos by ref.
+		/// </summary>
+		/// <param name="map"></param>
+		/// <param name="pos"></param>
+		/// <returns></returns>
+		private bool TryGetRootCrystalPosition(Map map, List<Position> batchPositions, ref Position pos)
+		{
+			var existingCrystals = map.GetMonsters(m => m.Id >= RootCrystalMinId && m.Id <= RootCrystalMaxId);
+
+			if (!this.IsTooCloseToRootCrystal(pos, existingCrystals, batchPositions))
+				return true;
+
+			for (var attempt = 0; attempt < RootCrystalMaxSpawnAttempts; attempt++)
+			{
+				if (!_spawnAreas.TryGetRandomLocation(out _, out var newPos))
+					continue;
+
+				if (!this.IsTooCloseToRootCrystal(newPos, existingCrystals, batchPositions))
+				{
+					pos = newPos;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Returns true if the given position is within the minimum spacing
+		/// distance of any existing root crystal or any position in the
+		/// current spawn batch.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="existingCrystals"></param>
+		/// <param name="batchPositions"></param>
+		/// <returns></returns>
+		private bool IsTooCloseToRootCrystal(Position pos, IMonster[] existingCrystals, List<Position> batchPositions)
+		{
+			for (var i = 0; i < existingCrystals.Length; i++)
+			{
+				if (pos.InRange2D(existingCrystals[i].Position, RootCrystalMinSpacing))
+					return true;
+			}
+
+			for (var i = 0; i < batchPositions.Count; i++)
+			{
+				if (pos.InRange2D(batchPositions[i], RootCrystalMinSpacing))
+					return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
