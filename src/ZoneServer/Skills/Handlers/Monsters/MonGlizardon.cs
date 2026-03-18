@@ -43,14 +43,14 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 65, width: 40, angle: 90f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var hitDelay = 450;
-			var damageDelay = 650;
+			var hitDelay = 650;
+			var damageDelay = 850;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 65, width: 40, angle: 90f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 350;
-			damageDelay = 1000;
+			hitDelay = 550;
+			damageDelay = 750;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 4000f, 1, 25, -1, hits);
@@ -88,8 +88,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 60, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 1100;
-			var damageDelay = 1300;
+			var hitDelay = 1300;
+			var damageDelay = 1600;
 			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 60, angle: 30f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
@@ -126,7 +126,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var targetHandle = target?.Handle ?? 0;
 			var forceId = ForceId.GetNew();
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));

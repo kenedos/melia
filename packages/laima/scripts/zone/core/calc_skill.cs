@@ -121,7 +121,7 @@ public class SkillCalculationsScript : GeneralScript
 		var sklFactor = skill.Properties.GetFloat(PropertyName.SklFactor);
 		var sklFactorByLevel = skill.Properties.GetFloat(PropertyName.SklFactorByLevel);
 
-		var value = sklFactor + (sklFactorByLevel * (skill.Level - 1));
+		var value = sklFactor + (sklFactorByLevel * skill.Level);
 
 		var byReinforceRate = SCR_Get_AbilityReinforceRate(skill);
 		value += value * byReinforceRate;
