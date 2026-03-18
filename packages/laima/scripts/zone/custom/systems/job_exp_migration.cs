@@ -17,16 +17,18 @@ public class JobExpMigrationScript : GeneralScript
 			return;
 	
 		character.ResetSkills();
-	
-		// Stat point migration: stats_per_level changed from 1 to 3.
-		// Grant the missing (level - 1) * 2 stat points and reset stats.
-		// var level = character.Level;
-		// var missingStatPoints = (level - 1) * 2;
-		// 
-		// if (missingStatPoints > 0)
-		// 	character.Properties.Modify(PropertyName.StatByLevel, missingStatPoints);
-		// 
-		// character.ResetStats();
+
+		if (!vars.GetBool("Laima.Custom.JobExpMigration_2026_02_12", false))
+		{
+			var level = character.Level;
+			var missingStatPoints = (level - 1) * 2;
+
+			if (missingStatPoints > 0)
+				character.Properties.Modify(PropertyName.StatByLevel, missingStatPoints);
+
+			character.ResetStats();
+			vars.SetBool("Laima.Custom.JobExpMigration_2026_02_12", true);
+		}
 	
 		Send.ZC_OBJECT_PROPERTY(character);
 	
