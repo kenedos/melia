@@ -43,9 +43,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 10);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 800;
-			var aniTime = 1000;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			var hitDelay = 800 + (int)(caster.Position.Get2DDistance(target.Position) * 1.6);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}

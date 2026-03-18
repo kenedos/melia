@@ -80,10 +80,10 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var splashArea = new CircleF(farPos, 15f);
-			var hitDelay = 400;
-			var aniTime = 600;
+			var hitDelay = 400 + (int)(caster.Position.Get2DDistance(target.Position) * 1.9);
+			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 8000f, 1, 30, -1, hits);
 		}

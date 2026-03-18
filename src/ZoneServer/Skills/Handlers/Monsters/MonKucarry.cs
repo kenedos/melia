@@ -50,8 +50,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 30, angle: 80f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var hitDelay = 800;
-			var aniTime = 1000;
+			var hitDelay = 800 + (int)(caster.Position.Get2DDistance(target.Position) * 2.4);
+			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);
@@ -128,8 +128,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 20, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 600;
-			var aniTime = 800;
+			var hitDelay = 600 + (int)(caster.Position.Get2DDistance(target.Position) * 1.8);
+			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);
@@ -203,9 +203,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 10);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 600;
-			var aniTime = 800;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			var hitDelay = 600 + (int)(caster.Position.Get2DDistance(target.Position) * 1.8);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);
@@ -291,9 +291,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 10, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 700;
-			var aniTime = 900;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			var hitDelay = 700 + (int)(caster.Position.Get2DDistance(target.Position) * 3.2);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);
@@ -328,8 +328,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 10, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 800;
-			var aniTime = 1000;
+			var hitDelay = 800 + (int)(caster.Position.Get2DDistance(target.Position) * 2.4);
+			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);
@@ -481,8 +481,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 20, angle: 90f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var hitDelay = 600;
-			var aniTime = 800;
+			var hitDelay = 600 + (int)(caster.Position.Get2DDistance(target.Position) * 1.8);
+			var aniTime = hitDelay + 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 20, angle: 90f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
@@ -528,7 +528,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 600;
 			var aniTime = 800;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);
@@ -679,7 +679,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 800;
 			var aniTime = 1000;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);
@@ -719,9 +719,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 10);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 300;
-			var aniTime = 500;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			var hitDelay = 300 + (int)(caster.Position.Get2DDistance(target.Position) * 2.4);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 3000f, 1, 30, -1, hits);

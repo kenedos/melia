@@ -54,7 +54,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 600;
 			var aniTime = 800;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
 		}
@@ -93,12 +93,12 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 350;
 			var aniTime = 550;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 10);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 250;
-			aniTime = 800;
+			hitDelay = 800;
+			aniTime = 250;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}

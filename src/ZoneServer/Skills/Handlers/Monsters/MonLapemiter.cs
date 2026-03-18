@@ -44,9 +44,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var splashArea = new CircleF(farPos, 30f);
-			var hitDelay = 600;
-			var aniTime = 800;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			var hitDelay = 600 + (int)(caster.Position.Get2DDistance(target.Position) * 2.1);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
 		}

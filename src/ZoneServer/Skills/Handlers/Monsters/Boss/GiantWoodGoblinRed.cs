@@ -230,8 +230,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			// Next breaths
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 150, angle: 100f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 1700;
-			aniTime = 800;
+			hitDelay = 800;
+			aniTime = 1700;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 150, angle: 100f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
@@ -240,28 +240,28 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 150, angle: 100f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 200;
-			aniTime = 300;
+			hitDelay = 300;
+			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 150, angle: 100f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 200;
-			aniTime = 300;
+			hitDelay = 300;
+			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 150, angle: 100f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 200;
-			aniTime = 300;
+			hitDelay = 300;
+			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 150, angle: 100f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 200;
-			aniTime = 300;
+			hitDelay = 300;
+			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 150, angle: 100f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 200;
-			aniTime = 300;
+			hitDelay = 300;
+			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}

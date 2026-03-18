@@ -40,8 +40,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 0, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 0;
-			var aniTime = 300;
+			var hitDelay = 0 + (int)(caster.Position.Get2DDistance(target.Position) * 5);
+			var aniTime = hitDelay + 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 60, rand: 70);
 			await MissileThrow(skill, caster, position, new MissileConfig

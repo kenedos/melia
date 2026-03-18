@@ -44,8 +44,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, target.Position, length: 80, width: 10, angle: 50f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 700;
-			var aniTime = 700;
+			var hitDelay = 700 + (int)(caster.Position.Get2DDistance(target.Position) * 2.2);
+			var aniTime = hitDelay + 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
@@ -155,10 +155,10 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var area = new Circle(target.Position, 10f);
-			var hitDelay = 1200;
-			var aniTime = 1200;
+			var hitDelay = 1200 + (int)(caster.Position.Get2DDistance(target.Position) * 0.8);
+			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, area, hitDelay, aniTime, hits);
 
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 10000f, 1, 50, -1, hits);
@@ -197,15 +197,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var area = new Circle(target.Position, 10f);
 			var hitDelay = 1400;
 			var aniTime = 1600;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, area, hitDelay, aniTime);
 			var area2 = new Circle(target.Position, 10f);
-			hitDelay = 100;
-			aniTime = 1700;
+			hitDelay = 1700;
+			aniTime = 100;
 			await SkillAttack(caster, skill, area2, hitDelay, aniTime);
 			var area3 = new Circle(target.Position, 10f);
-			hitDelay = 100;
-			aniTime = 1800;
+			hitDelay = 1800;
+			aniTime = 100;
 			await SkillAttack(caster, skill, area3, hitDelay, aniTime);
 		}
 	}

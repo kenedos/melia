@@ -156,18 +156,18 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 65);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 300;
-			aniTime = 2500;
+			hitDelay = 2500;
+			aniTime = 300;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 65);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 300;
-			aniTime = 2800;
+			hitDelay = 2800;
+			aniTime = 300;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 65);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 300;
-			aniTime = 3100;
+			hitDelay = 3100;
+			aniTime = 300;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(1400));
 			var missileConfig = new MissileConfig
@@ -267,8 +267,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 20);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 1900;
-			aniTime = 2200;
+			hitDelay = 2200;
+			aniTime = 1900;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var startingPosition = originPos.GetRelative(farPos, distance: 30f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 120f);

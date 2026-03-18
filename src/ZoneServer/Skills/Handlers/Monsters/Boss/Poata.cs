@@ -259,8 +259,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 50);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 600;
-			aniTime = 200;
+			hitDelay = 200;
+			aniTime = 600;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);

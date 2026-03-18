@@ -51,8 +51,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 			SkillResultTargetBuff(caster, skill, BuffId.UC_bleed, 1, hits.Sum(h => h.HitInfo.Damage) * 0.3f, 8000f, 1, 40, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 70, angle: 130f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 300;
-			aniTime = 100;
+			hitDelay = 100;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_bleed, 1, hits.Sum(h => h.HitInfo.Damage) * 0.3f, 8000f, 1, 40, -1, hits);

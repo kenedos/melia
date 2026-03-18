@@ -147,6 +147,8 @@ namespace Melia.Zone.Skills.Helpers
 			float hitDelay = 0
 			)
 		{
+			await skill.Wait(TimeSpan.FromMilliseconds(hitDelay));
+
 			if (caster == null || caster.IsDead)
 				return;
 
