@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_WUG_master_Skill_1)]
 	public class Mon_WUG_master_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(480);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(480);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -40,9 +40,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 12);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 280;
-			var damageDelay = 480;
+			var aniTime = 480;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 		}
 	}
 

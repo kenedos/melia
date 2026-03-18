@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Deathweaver_Skill_1)]
 	public class Mon_boss_Deathweaver_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1400);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1400);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -42,9 +42,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 50, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1400;
-			var damageDelay = 1400;
+			var aniTime = 1400;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 100, -1, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 100, -1, hits);
 		}
@@ -53,7 +53,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Deathweaver_Skill_2)]
 	public class Mon_boss_Deathweaver_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -75,14 +75,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var delays = new[] { (hitDelay: 2200, damageDelay: 2300), (300, 300), (300, 300) };
+			var delays = new[] { (hitDelay: 2200, aniTime: 2300), (300, 300), (300, 300) };
 
-			foreach (var (hitDelay, damageDelay) in delays)
+			foreach (var (hitDelay, aniTime) in delays)
 			{
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 220, width: 30, angle: 7f);
 				var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 				var hits = new List<SkillHitInfo>();
-				await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+				await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 				SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 100, -1, hits);
 			}
 		}
@@ -91,7 +91,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Deathweaver_Skill_3)]
 	public class Mon_boss_Deathweaver_Skill_3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -113,7 +113,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var damageDelay = 300;
+			var aniTime = 300;
 			var attacks = new[] { (hitDelay: 2200, angle: 10f), (500, 10f), (1100, 30f) };
 
 			foreach (var (hitDelay, angle) in attacks)
@@ -121,7 +121,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 50, angle: angle);
 				var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 				var hits = new List<SkillHitInfo>();
-				await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+				await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 				SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 50, -1, hits);
 			}
 		}
@@ -130,7 +130,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Deathweaver_Skill_4)]
 	public class Mon_boss_Deathweaver_Skill_4 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(3000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(3000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -155,9 +155,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 110);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 3000;
-			var damageDelay = 3000;
+			var aniTime = 3000;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}

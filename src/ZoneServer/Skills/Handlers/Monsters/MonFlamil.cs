@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Flamil_Skill_1)]
 	public class Mon_Flamil_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,13 +41,13 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 300;
-			var damageDelay = 500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 30f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 150;
-			damageDelay = 650;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 650;
+			aniTime = 150;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 

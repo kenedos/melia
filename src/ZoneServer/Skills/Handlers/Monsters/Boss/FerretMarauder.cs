@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_FerretMarauder_Skill_1)]
 	public class Mon_boss_FerretMarauder_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -47,15 +47,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 25, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 1300;
-			var damageDelay = 1500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_boss_FerretMarauder_Skill_2)]
 	public class Mon_boss_FerretMarauder_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1600);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1600);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -83,21 +83,21 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 50, angle: 50f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 1400;
-			var damageDelay = 1600;
+			var aniTime = 1600;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 110, width: 50, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 100;
-			damageDelay = 1700;
+			hitDelay = 1700;
+			aniTime = 100;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 50, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 800;
-			damageDelay = 2500;
+			hitDelay = 2500;
+			aniTime = 800;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 3000f, 1, 7, -1, hits);
 		}
 	}
@@ -218,7 +218,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_FerretMarauder_Skill_5)]
 	public class Mon_boss_FerretMarauder_Skill_5 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -246,8 +246,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 50, angle: 50f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 2300;
-			var damageDelay = 2500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 2500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 			var spawnPos = originPos.GetRelative(farPos, distance: 92.832687f, angle: -152f, rand: 20, height: 1);
 			MonsterSkillCreateMobPC(skill, caster, "ferret_slinger_summon", spawnPos, 0f, "", "", -2, 0f, "None", "");

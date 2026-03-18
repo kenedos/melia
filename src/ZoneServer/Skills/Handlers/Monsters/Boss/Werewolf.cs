@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_werewolf_Skill_1)]
 	public class Mon_boss_werewolf_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1200);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -46,15 +46,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 30, angle: 45f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1000;
-			var damageDelay = 1200;
+			var aniTime = 1200;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 30, angle: 45f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 300;
-			damageDelay = 1500;
+			hitDelay = 1500;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 10000f, 1, 100, -1, hits);
 		}
 	}
@@ -108,7 +108,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_werewolf_Skill_3)]
 	public class Mon_boss_werewolf_Skill_3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -136,21 +136,21 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 170, width: 30, angle: 20f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2300;
-			var damageDelay = 2500;
+			var aniTime = 2500;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 170, width: 30, angle: 20f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 200;
-			damageDelay = 2700;
+			hitDelay = 2700;
+			aniTime = 200;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 170, width: 30, angle: 20f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 300;
-			damageDelay = 3000;
+			hitDelay = 3000;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 10000f, 1, 100, -1, hits);
 		}
 	}
@@ -206,7 +206,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_werewolf_Skill_5)]
 	public class Mon_boss_werewolf_Skill_5 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -231,8 +231,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 30, angle: 20f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2300;
-			var damageDelay = 2500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 2500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2600));
 			var spawnPos = originPos.GetRelative(farPos, distance: 104.20988f);
 			MonsterSkillCreateMob(skill, caster, "Worg", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");

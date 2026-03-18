@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 	[SkillHandler(SkillId.Monk_God_Finger_Flicking)]
 	public class Monk_God_Finger_FlickingOverride : IMeleeGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(200);
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var damageDelay = 200;
+			var aniTime = 200;
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -65,7 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(damageDelay), skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(aniTime), skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				if (skillHitResult.Damage > 0 && target.IsKnockdownable())

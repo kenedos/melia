@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	{
 		private const int CastTimeMs = 2000;
 
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(700);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))

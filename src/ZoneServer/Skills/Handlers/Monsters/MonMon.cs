@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_mon_intermediate_officer_men2_Skill_1)]
 	public class Mon_mon_intermediate_officer_men2_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(400);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(400);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -40,15 +40,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 200;
-			var damageDelay = 400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 400;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_mon_npc_sapper_Skill_1)]
 	public class Mon_mon_npc_sapper_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -78,9 +78,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 10, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 100;
-			var damageDelay = 300;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 300;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
 		}
 	}
@@ -88,7 +88,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_mon_npc_tila_monk_Skill_1)]
 	public class Mon_mon_npc_tila_monk_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -113,15 +113,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 100;
-			var damageDelay = 300;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 300;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_mon_npc_w_hunter_Skill_1)]
 	public class Mon_mon_npc_w_hunter_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(600);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(600);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -151,16 +151,16 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 10, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 400;
-			var damageDelay = 600;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 600;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_mon_paladin_follower1_1_Skill_1)]
 	public class Mon_mon_paladin_follower1_1_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(400);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(400);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -185,15 +185,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 15, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 200;
-			var damageDelay = 400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 400;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_mon_paladin_follower2_1_Skill_1)]
 	public class Mon_mon_paladin_follower2_1_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -218,8 +218,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 300;
-			var damageDelay = 500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 }

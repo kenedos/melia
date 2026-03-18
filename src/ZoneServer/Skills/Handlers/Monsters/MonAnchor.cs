@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_anchor_golem_Skill_1)]
 	public class Mon_anchor_golem_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(650);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(650);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,20 +41,20 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 85, width: 12, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 450;
-			var damageDelay = 650;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 650;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 85, width: 12, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 550;
-			damageDelay = 1200;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 1200;
+			aniTime = 550;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_anchor_golem_Skill_2)]
 	public class Mon_anchor_golem_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(580);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(580);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -79,15 +79,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 20, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 380;
-			var damageDelay = 580;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 580;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_anchor_mage_Skill_1)]
 	public class Mon_anchor_mage_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(600);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(600);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -112,15 +112,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 400;
-			var damageDelay = 600;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 600;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_anchor_purple_Skill_1)]
 	public class Mon_anchor_purple_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(900);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(900);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -145,8 +145,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 0, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 700;
-			var damageDelay = 900;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 900;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
@@ -199,7 +199,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_anchor_Skill_1)]
 	public class Mon_anchor_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(900);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(900);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -224,8 +224,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 0, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 700;
-			var damageDelay = 900;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 900;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 }

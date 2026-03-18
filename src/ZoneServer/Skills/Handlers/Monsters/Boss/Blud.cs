@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Blud_Skill_1)]
 	public class Mon_boss_Blud_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1200);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -45,9 +45,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 45, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1000;
-			var damageDelay = 1200;
+			var aniTime = 1200;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}
@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Blud_Skill_2)]
 	public class Mon_boss_Blud_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -80,8 +80,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 40, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2300;
-			var damageDelay = 2500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 2500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));
 
 			var arrowConfig = new ArrowConfig

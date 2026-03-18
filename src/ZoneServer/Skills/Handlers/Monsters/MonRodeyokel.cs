@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_rodeyokel_Skill_1)]
 	public class Mon_rodeyokel_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -44,15 +44,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 30, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 300;
-			var damageDelay = 500;
+			var aniTime = 500;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 30, angle: 30f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 300;
-			damageDelay = 800;
+			hitDelay = 800;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_bleed, 1, hits.Sum(h => h.HitInfo.Damage) * 0.3f, 5000f, 1, 4, -1, hits);
 		}
 	}

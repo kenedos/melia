@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_NightPanto_Archer_Skill_1)]
 	public class Mon_NightPanto_Archer_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(700);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -39,16 +39,16 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 10, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 500;
-			var damageDelay = 700;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 500 + (int)(caster.Position.Get2DDistance(target.Position) * 2.5);
+			var aniTime = hitDelay + 200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_NightPanto_Archer_Skill_2)]
 	public class Mon_NightPanto_Archer_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1100);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1100);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -73,8 +73,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 10, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 900;
-			var damageDelay = 1100;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1100;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
 			var startingPosition = originPos.GetRelative(farPos, distance: 10f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 120f);
@@ -100,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_NightPanto_mage_Skill_1)]
 	public class Mon_NightPanto_mage_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(700);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -128,10 +128,10 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 10, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 500;
-			var damageDelay = 700;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 500 + (int)(caster.Position.Get2DDistance(target.Position) * 2.5);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
 		}
 	}
@@ -185,7 +185,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_NightPanto_Stellar_Skill_1)]
 	public class Mon_NightPanto_Stellar_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(800);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(800);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -213,10 +213,10 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 10, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 600;
-			var damageDelay = 800;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 600 + (int)(caster.Position.Get2DDistance(target.Position) * 2.8);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
 		}
 	}

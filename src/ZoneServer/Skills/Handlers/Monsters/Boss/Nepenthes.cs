@@ -43,9 +43,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 60);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2000;
-			var damageDelay = 2000;
+			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_sleep, 1, 0f, 5000f, 1, 100, -1, hits);
 		}
 	}
@@ -262,7 +262,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Nepenthes_Skill_6)]
 	public class Mon_boss_Nepenthes_Skill_6 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -287,23 +287,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 1, width: 150, angle: 50f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1300;
-			var damageDelay = 1500;
+			var aniTime = 1500;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 3000f, 1, 50, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 1, width: 150, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 1500;
-			damageDelay = 1500;
+			aniTime = 1500;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 3000f, 1, 50, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 1, width: 150, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 2000;
-			damageDelay = 2000;
+			aniTime = 2000;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 3000f, 1, 50, -1, hits);
 			await EffectAndHit(skill, caster, originPos, new EffectHitConfig
 			{

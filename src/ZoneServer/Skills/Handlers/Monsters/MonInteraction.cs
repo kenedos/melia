@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Interaction_ballista_Skill_1)]
 	public class Mon_Interaction_ballista_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -51,8 +51,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 750, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 800;
-			var damageDelay = 1000;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1000;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
@@ -77,11 +77,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 		}
 	}

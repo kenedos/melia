@@ -30,7 +30,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 	[SkillHandler(SkillId.Paladin_Conviction)]
 	public class Paladin_ConvictionOverride : IMeleeGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(250);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(250);
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -51,14 +51,14 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 50;
-			var damageDelay = 250;
+			var aniTime = 250;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 30, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 250;
-			damageDelay = 500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			aniTime = 500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.Conviction_Debuff, skill.Level, 0f, 20000f, 1, 100, -1, hits);
 			if (caster.IsAbilityActive(AbilityId.Paladin43))
 			{

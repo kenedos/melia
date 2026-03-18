@@ -76,7 +76,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		{
 			var hitTime = TimeSpan.FromMilliseconds(100);
 			var skillHitDelay = TimeSpan.Zero;
-			var damageDelay = TimeSpan.FromMilliseconds(100);
+			var aniTime = TimeSpan.FromMilliseconds(100);
 
 			await skill.Wait(hitTime);
 
@@ -106,7 +106,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				hits.Add(skillHit);
 
 				if (skillHitResult.Damage > 0)

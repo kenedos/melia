@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_AmissDog_Skill_1)]
 	public class MonBossAmissDogSkill1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1400);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1400);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -47,15 +47,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 50, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1200;
-			var damageDelay = 1400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1400;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_boss_AmissDog_Skill_2)]
 	public class MonBossAmissDogSkill2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -80,8 +80,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 50);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1300;
-			var damageDelay = 1500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2500));
 			var position = originPos.GetRelative(farPos, distance: 50);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig

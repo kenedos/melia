@@ -57,16 +57,16 @@ namespace Melia.Zone.Skills.Handlers.Common
 				return;
 			}
 
-			var damageDelay = TimeSpan.FromMilliseconds(skill.Id != SkillId.Common_DaggerAries ? 330 : 250);
+			var aniTime = TimeSpan.FromMilliseconds(skill.Id != SkillId.Common_DaggerAries ? 330 : 250);
 			var skillHitDelay = skill.Properties.HitDelay;
 
-			damageDelay = TimeSpan.FromMilliseconds(damageDelay.TotalMilliseconds / skill.Properties.GetFloat(PropertyName.SklSpdRate));
+			aniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skill.Properties.GetFloat(PropertyName.SklSpdRate));
 			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / skill.Properties.GetFloat(PropertyName.SklSpdRate));
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 		}
@@ -102,7 +102,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			// the correct value for the skill hit delay. Not a clue
 			// about damage delay though. Though there are potentially
 			// related values in older skill_bytool files.
-			var damageDelay = TimeSpan.FromMilliseconds(skill.Id != SkillId.Common_DaggerAries ? 330 : 250);
+			var aniTime = TimeSpan.FromMilliseconds(skill.Id != SkillId.Common_DaggerAries ? 330 : 250);
 			var skillHitDelay = skill.Properties.HitDelay;
 
 			// This part is somewhat guessed. The damage delay does seem to
@@ -111,7 +111,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			// handle very high attack speeds. Granted, they need to be
 			// higher than the devs might have ever intended for this to
 			// happen, but I still kinda want them to work.
-			damageDelay = TimeSpan.FromMilliseconds(damageDelay.TotalMilliseconds / skill.Properties.GetFloatSafe(PropertyName.SklSpdRate));
+			aniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skill.Properties.GetFloatSafe(PropertyName.SklSpdRate));
 			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / skill.Properties.GetFloatSafe(PropertyName.SklSpdRate));
 
 			var modifier = SkillModifier.Default;
@@ -126,7 +126,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 		}

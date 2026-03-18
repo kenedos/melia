@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Long_Arm_Skill_1)]
 	public class Mon_Long_Arm_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -44,15 +44,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 30, angle: 70f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 1000;
-			var damageDelay = 1000;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1000;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_Long_Arm_Skill_2)]
 	public class Mon_Long_Arm_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1100);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1100);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -77,9 +77,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 25);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 900;
-			var damageDelay = 1100;
+			var aniTime = 1100;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 8000f, 1, 10, -1, hits);
 		}
 	}
@@ -87,7 +87,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Long_Arm_Skill_4)]
 	public class Mon_Long_Arm_Skill_4 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1200);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -112,8 +112,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 25, angle: 40f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1000;
-			var damageDelay = 1200;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			SkillCreatePad(caster, skill, farPos, 0f, PadName.Mon_firewall);
 		}
 	}

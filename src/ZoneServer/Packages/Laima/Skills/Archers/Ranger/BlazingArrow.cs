@@ -101,8 +101,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, caster, target, animationName, 1.3f, "arrow_cast", "F_hit_good", 1, "arrow_blow", "SLOW", 400);
 
-			var damageDelay = TimeSpan.FromMilliseconds(0);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var aniTime = TimeSpan.FromMilliseconds(0);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 			//Send.ZC_HIT_INFO(caster, target, hit);

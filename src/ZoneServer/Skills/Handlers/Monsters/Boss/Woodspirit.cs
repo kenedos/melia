@@ -213,7 +213,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_woodspirit_Skill_5)]
 	public class Mon_boss_woodspirit_Skill_5 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(200);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -238,8 +238,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 0;
-			var damageDelay = 200;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			var spawnPos = originPos.GetRelative(farPos, distance: 65, angle: 94f);
 			MonsterSkillCreateMob(skill, caster, "Onion", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");

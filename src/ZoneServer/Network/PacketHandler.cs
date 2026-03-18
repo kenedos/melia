@@ -4808,7 +4808,13 @@ namespace Melia.Zone.Network
 				return;
 			}
 
+			if (ability.Active)
+				ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, character);
+
 			ability.Active = !ability.Active;
+
+			if (ability.Active)
+				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, character);
 
 			Send.ZC_OBJECT_PROPERTY(conn, ability, PropertyName.ActiveState);
 			Send.ZC_ADDON_MSG(character, "RESET_ABILITY_ACTIVE", ability.Active ? 1 : 0, ability.Data.ClassName);

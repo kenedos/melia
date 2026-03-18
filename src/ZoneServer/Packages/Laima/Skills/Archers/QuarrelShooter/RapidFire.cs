@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 	[SkillHandler(SkillId.QuarrelShooter_RapidFire)]
 	public class QuarrelShooterRapidFire : IForceSkillHandler, IDynamicCasted
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 
 		/// <summary>
 		/// Handles the Rapid Fire skill execution.
@@ -68,12 +68,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 		{
 			var attackArea = new CircleF(targetPos, 60);
 			var attackDelays = new[] { 100f, 180f, 260f, 340f, 420f };
-			var damageDelays = new[] { 300f, 380f, 460f, 540f, 620f };
+			var aniTimes = new[] { 300f, 380f, 460f, 540f, 620f };
 
 			for (var i = 0; i < 5; i++)
 			{
 				var hits = new List<SkillHitInfo>();
-				_ = SkillAttack(caster, skill, attackArea, attackDelays[i], damageDelays[i], hits);
+				_ = SkillAttack(caster, skill, attackArea, attackDelays[i], aniTimes[i], hits);
 			}
 
 			return Task.CompletedTask;

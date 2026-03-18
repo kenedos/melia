@@ -106,7 +106,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_stone_whale_Skill_3)]
 	public class Mon_boss_stone_whale_Skill_3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(3600);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(3600);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -131,30 +131,30 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 3400;
-			var damageDelay = 300;
+			var aniTime = 300;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 300;
-			damageDelay = 300;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 300;
-			damageDelay = 300;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 300;
-			damageDelay = 300;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
 		}
 	}

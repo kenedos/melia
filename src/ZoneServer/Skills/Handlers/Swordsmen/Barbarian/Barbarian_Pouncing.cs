@@ -99,7 +99,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="target"></param>
 		private void Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 
 			var modifier = SkillModifier.MultiHit(3);
@@ -121,7 +121,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			if (caster.IsAbilityActive(AbilityId.Barbarian4))
 			{

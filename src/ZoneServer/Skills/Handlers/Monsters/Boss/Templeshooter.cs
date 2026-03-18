@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Templeshooter_Skill_1)]
 	public class Mon_boss_Templeshooter_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1500);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -46,10 +46,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 35, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 1300;
-			var damageDelay = 1500;
+			var hitDelay = 1300 + (int)(caster.Position.Get2DDistance(target.Position) * 2);
+			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_debrave, 1, 0f, 5000f, 1, 30, -1, hits);
 		}
 	}
@@ -57,7 +57,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Templeshooter_Skill_2)]
 	public class Mon_boss_Templeshooter_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2400);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2400);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -84,9 +84,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 200, width: 60, angle: 20f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var hitDelay = 2300;
-			var damageDelay = 2400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 2300 + (int)(caster.Position.Get2DDistance(target.Position) * 5.2);
+			var aniTime = hitDelay + 200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
@@ -232,7 +232,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Templeshooter_Skill_5)]
 	public class Mon_boss_Templeshooter_Skill_5 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2400);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2400);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -259,9 +259,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 250, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 2200;
-			var damageDelay = 2400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 2200 + (int)(caster.Position.Get2DDistance(target.Position) * 3.4);
+			var aniTime = hitDelay + 200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2400));
 
 			var config = new EffectHitConfig

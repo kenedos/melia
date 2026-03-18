@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_flight_hope_Skill_1)]
 	public class Mon_flight_hope_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -52,9 +52,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 90f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 1000;
-			var damageDelay = 1000;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 1000 + (int)(caster.Position.Get2DDistance(target.Position) * 10.7);
+			var aniTime = hitDelay + 200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var config = new MissileConfig
 			{
 				Effect = new EffectConfig("I_force054_fire#B_mouth", 0.7f),
@@ -77,7 +77,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_flight_hope_Skill_2)]
 	public class Mon_flight_hope_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1700);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -102,9 +102,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 10, angle: 90f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 1500;
-			var damageDelay = 1700;
+			var aniTime = 1700;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 4000f, 1, 60, -1, hits);
 		}
 	}
@@ -112,7 +112,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_flight_hope_Skill_3)]
 	public class Mon_flight_hope_Skill_3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1700);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -137,13 +137,13 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 10, angle: 90f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 1500;
-			var damageDelay = 1700;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1700;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 10, angle: 90f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 300;
-			damageDelay = 300;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			aniTime = 300;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 }

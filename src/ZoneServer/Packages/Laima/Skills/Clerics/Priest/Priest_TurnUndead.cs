@@ -49,17 +49,17 @@ namespace Melia.Zone.Skills.Handlers.Priest
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 50);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 200;
-			var damageDelay = 1000;
+			var aniTime = 1000;
 
 			var hits = new List<SkillHitInfo>();
-			await this.SkillAttackWithInstantKill(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await this.SkillAttackWithInstantKill(caster, skill, splashArea, hitDelay, aniTime, hits);
 		}
 
 		/// <summary>
 		/// Performs the skill attack with a chance to instantly kill targets
 		/// based on damage dealt. Only hits demon-race enemies.
 		/// </summary>
-		private async Task SkillAttackWithInstantKill(ICombatEntity caster, Skill skill, ISplashArea splashArea, int hitDelay, int damageDelay, List<SkillHitInfo> hits)
+		private async Task SkillAttackWithInstantKill(ICombatEntity caster, Skill skill, ISplashArea splashArea, int hitDelay, int aniTime, List<SkillHitInfo> hits)
 		{
 			var rng = new Random();
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea).ToList();
@@ -84,7 +84,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 				else
 					target.TakeDamage(skillHitResult.Damage, caster);
 
-				var hit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(damageDelay), TimeSpan.FromMilliseconds(hitDelay));
+				var hit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(aniTime), TimeSpan.FromMilliseconds(hitDelay));
 				hits.Add(hit);
 
 				targetCount--;

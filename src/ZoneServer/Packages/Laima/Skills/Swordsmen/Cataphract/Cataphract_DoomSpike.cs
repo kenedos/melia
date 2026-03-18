@@ -53,7 +53,7 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 130, width: 35, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var damageDelay = TimeSpan.FromMilliseconds(200);
+			var aniTime = TimeSpan.FromMilliseconds(200);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
@@ -69,7 +69,7 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);

@@ -14,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Large_crossbow_Skill_1)]
 	public class Mon_Large_crossbow_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1800);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1800);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -36,9 +36,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 180, width: 15, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 1600;
-			var damageDelay = 1800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 1600 + (int)(caster.Position.Get2DDistance(target.Position) * 0.9);
+			var aniTime = hitDelay + 200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 

@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="target"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
-			var damageDelay = TimeSpan.FromMilliseconds(270);
+			var aniTime = TimeSpan.FromMilliseconds(270);
 			var skillHitDelay = TimeSpan.Zero;
 			var hitDelay = TimeSpan.FromMilliseconds(100);
 
@@ -77,7 +77,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 			skillHit.ForceId = forceId;
 
 			Send.ZC_SKILL_HIT_INFO(caster, skillHit);
@@ -87,7 +87,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 				var skillHitResultPost = SCR_SkillHit(caster, bounceTarget, skill);
 				bounceTarget.TakeDamage(skillHitResultPost.Damage, caster);
 
-				var skillHitPost = new SkillHitInfo(caster, bounceTarget, skill, skillHitResultPost, damageDelay, skillHitDelay);
+				var skillHitPost = new SkillHitInfo(caster, bounceTarget, skill, skillHitResultPost, aniTime, skillHitDelay);
 				var hit = new HitInfo(caster, bounceTarget, skill, skillHitResult.Damage, skillHitResult.Result);
 
 				Send.ZC_HIT_INFO(caster, bounceTarget, hit);

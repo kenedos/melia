@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_ginklas_Skill_1)]
 	public class Mon_boss_ginklas_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(3700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(3700);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -44,16 +44,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 80);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2800;
-			var damageDelay = 2800;
+			var aniTime = 2800;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 80);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 250;
-			damageDelay = 250;
+			aniTime = 250;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			var targetPos = originPos.GetRelative(farPos);
 			var config = new MissileConfig
@@ -81,37 +81,37 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 80);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 250;
-			damageDelay = 250;
+			aniTime = 250;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 80);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 250;
-			damageDelay = 250;
+			aniTime = 250;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 80);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 250;
-			damageDelay = 250;
+			aniTime = 250;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 80);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 250;
-			damageDelay = 250;
+			aniTime = 250;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 80);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 250;
-			damageDelay = 250;
+			aniTime = 250;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
 		}
 	}

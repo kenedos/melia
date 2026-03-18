@@ -55,8 +55,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 			for (var i = 0; i < HitCount; i++)
 			{
 				var hitDelay = i == 0 ? 0 : 50;
-				var damageDelay = baseDelay + (i * 50);
-				await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, null, this.ModifyDamage);
+				var aniTime = baseDelay + (i * 50);
+				await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, null, this.ModifyDamage);
 			}
 		}
 

@@ -61,10 +61,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			var damageDelay = TimeSpan.FromMilliseconds(270);
+			var aniTime = TimeSpan.FromMilliseconds(270);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await Task.Delay(damageDelay);
+			await Task.Delay(aniTime);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -77,7 +77,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				hits.Add(skillHit);
 			}
 

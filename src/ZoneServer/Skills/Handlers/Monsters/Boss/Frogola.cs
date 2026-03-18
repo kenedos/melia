@@ -110,7 +110,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Frogola_Q1_Skill_2)]
 	public class Mon_boss_Frogola_Q1_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2200);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -138,21 +138,21 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 75, width: 30, angle: 45f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 2000;
-			var damageDelay = 2200;
+			var aniTime = 2200;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 75, width: 30, angle: 45f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 400;
-			damageDelay = 2600;
+			hitDelay = 2600;
+			aniTime = 400;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 75, width: 30, angle: 45f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 200;
-			damageDelay = 2800;
+			hitDelay = 2800;
+			aniTime = 200;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(3000));
 
 			hits = new List<SkillHitInfo>();
@@ -435,7 +435,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Frogola_Skill_2)]
 	public class Mon_boss_Frogola_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2150);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2150);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -458,15 +458,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 25);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1950;
-			var damageDelay = 2150;
+			var aniTime = 2150;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 25);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 350;
-			damageDelay = 2500;
+			hitDelay = 2500;
+			aniTime = 350;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 10000f, 1, 20, -1, hits);
 		}
 	}

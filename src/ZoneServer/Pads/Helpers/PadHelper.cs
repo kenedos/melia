@@ -717,7 +717,7 @@ namespace Melia.Zone.Pads.Helpers
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
-			skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, skill.GetDamageDelay(), skill.GetHitDelay());
+			skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, skill.GetAniTime(), skill.GetHitDelay());
 
 			if (skill.Id == SkillId.Peltasta_ShieldLob || skill.Id == SkillId.Peltasta_ShieldLob_2)
 				skillHit.HitCount = 4;

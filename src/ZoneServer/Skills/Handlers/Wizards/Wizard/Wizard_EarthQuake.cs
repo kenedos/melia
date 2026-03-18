@@ -45,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 
 			// Attack targets
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var damageDelay = TimeSpan.FromMilliseconds(200);
+			var aniTime = TimeSpan.FromMilliseconds(200);
 
 			var skillHits = new List<SkillHitInfo>();
 
@@ -59,7 +59,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				if (caster.IsAbilityActive(AbilityId.Wizard23))
 					skillHitResult.KnockBack.Type = KnockBackType.None;
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
 
 				skillHit.ApplyDamage();
 				skillHit.ApplyKnockBack();

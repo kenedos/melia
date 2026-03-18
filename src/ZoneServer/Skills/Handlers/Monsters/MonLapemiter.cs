@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Lapemiter_Skill_1)]
 	public class Mon_Lapemiter_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(800);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(800);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -44,10 +44,10 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var splashArea = new CircleF(farPos, 30f);
-			var hitDelay = 600;
-			var damageDelay = 800;
-			await ForceAttackEffect(caster, target, skill, hitDelay);
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 600 + (int)(caster.Position.Get2DDistance(target.Position) * 2.1);
+			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
 		}
 	}

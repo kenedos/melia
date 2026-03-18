@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 	[SkillHandler(SkillId.Paladin_Demolition)]
 	public class Paladin_DemolitionOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
@@ -52,46 +52,46 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: length, width: width, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 100;
-			var damageDelay = 300;
+			var aniTime = 300;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ModifySkillHitResult);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ModifySkillHitResult);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, skill.Level, 0f, 4000, 1, 5 + skill.Level, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: length, width: width, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 100;
-			damageDelay = 400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ModifySkillHitResult);
+			aniTime = 400;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ModifySkillHitResult);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, skill.Level, 0f, 4000, 1, 5 + skill.Level, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: length, width: width, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 100;
-			damageDelay = 500;
+			aniTime = 500;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ModifySkillHitResult);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ModifySkillHitResult);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, skill.Level, 0f, 4000, 1, 5 + skill.Level, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: length, width: width, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 300;
-			damageDelay = 800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ModifySkillHitResult);
+			aniTime = 800;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ModifySkillHitResult);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, skill.Level, 0f, 4000, 1, 5 + skill.Level, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: length, width: width, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 100;
-			damageDelay = 900;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ModifySkillHitResult);
+			aniTime = 900;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ModifySkillHitResult);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, skill.Level, 0f, 4000, 1, 5 + skill.Level, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: length, width: width, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 100;
-			damageDelay = 1000;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ModifySkillHitResult);
+			aniTime = 1000;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ModifySkillHitResult);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, skill.Level, 0f, 4000, 1, 5 + skill.Level, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: length, width: width, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 400;
-			damageDelay = 1400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ModifySkillHitResult);
+			aniTime = 1400;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ModifySkillHitResult);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, skill.Level, 0f, 4000, 1, 5 + skill.Level, -1, hits);
 			var targetPos = originPos.GetRelative(farPos, distance: 0);
 			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 50f, 5));

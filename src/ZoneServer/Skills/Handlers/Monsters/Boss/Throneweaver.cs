@@ -154,7 +154,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Throneweaver_Skill_4)]
 	public class Mon_boss_Throneweaver_Skill_4 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2900);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2900);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -178,9 +178,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 40);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2700;
-			var damageDelay = 2900;
+			var aniTime = 2900;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 60000f, 1, 10, -1, hits);
 			var position = originPos.GetRelative(farPos, distance: 30);
 			var pad = SkillCreatePad(caster, skill, position, 0f, PadName.Monster_Slow);
@@ -324,7 +324,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Throneweaver_Q1_Skill_4)]
 	public class Mon_boss_Throneweaver_Q1_Skill_4 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2900);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2900);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -349,9 +349,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 40);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2700;
-			var damageDelay = 2900;
+			var aniTime = 2900;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 60000f, 1, 10, -1, hits);
 			var position = originPos.GetRelative(farPos, distance: 30);
 			var pad = SkillCreatePad(caster, skill, position, 0f, PadName.Monster_Slow);

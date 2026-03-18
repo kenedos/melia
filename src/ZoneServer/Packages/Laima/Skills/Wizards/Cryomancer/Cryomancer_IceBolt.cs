@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 				return;
 			}
 
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 			var splashArea = new Circle(target.Position, skill.Properties.GetFloat(PropertyName.SplRange));
 
@@ -74,7 +74,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 			{
 				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill, SkillModifier.MultiHit(2));
 				currentTarget.TakeDamage(skillHitResult.Damage, caster);
-				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, aniTime, skillHitDelay);
 
 				if (skillHitResult.Damage > 0 && currentTarget != target && currentTarget.IsKnockdownable())
 				{

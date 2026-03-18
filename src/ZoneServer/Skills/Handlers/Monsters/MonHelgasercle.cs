@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_helgasercle_phantom_Skill_1)]
 	public class Mon_helgasercle_phantom_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -40,9 +40,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 0, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 0;
-			var damageDelay = 300;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var hitDelay = 0 + (int)(caster.Position.Get2DDistance(target.Position) * 5);
+			var aniTime = hitDelay + 200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 60, rand: 70);
 			await MissileThrow(skill, caster, position, new MissileConfig
 			{

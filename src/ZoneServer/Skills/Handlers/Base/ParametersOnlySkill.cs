@@ -11,15 +11,15 @@ namespace Melia.Zone.Skills.Handlers.Base
 	/// </summary>
 	public abstract class ParametersOnlySkill : SimpleMonsterAttackSkill
 	{
-		protected abstract TimeSpan DamageDelay { get; }
+		protected abstract TimeSpan AniTime { get; }
 		protected abstract TimeSpan HitDelay { get; }
 		protected abstract SplashType SplashType { get; }
 		protected abstract float Length { get; }
 		protected abstract float Width { get; }
 		protected abstract float Angle { get; }
 
-		protected override TimeSpan GetDamageDelay(Skill skill)
-			=> this.DamageDelay;
+		protected override TimeSpan GetAniTime(Skill skill)
+			=> this.AniTime;
 
 		protected override TimeSpan GetHitDelay(Skill skill)
 			=> this.HitDelay;

@@ -84,7 +84,7 @@ namespace Melia.Zone.Skills.Helpers
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				skillHitResult.Damage *= damageMultiplier;
 				target.TakeDamage(skillHitResult.Damage, caster);
-				hits.Add(new SkillHitInfo(caster, target, skill, skillHitResult, skill.GetDamageDelay(), skill.GetHitDelay()));
+				hits.Add(new SkillHitInfo(caster, target, skill, skillHitResult, skill.GetAniTime(), skill.GetHitDelay()));
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

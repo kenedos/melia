@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 
 			// Attack targets
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var damageDelay = TimeSpan.FromMilliseconds(200);
+			var aniTime = TimeSpan.FromMilliseconds(200);
 
 			var skillHits = new List<SkillHitInfo>();
 
@@ -65,7 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHitIf(2, targetLethargic));
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
 
 				// Ability "Earthquake: Remove Knockdown"
 				if (skillHitResult.Damage > 0 && !caster.IsAbilityActive(AbilityId.Wizard23) && target.IsKnockdownable())

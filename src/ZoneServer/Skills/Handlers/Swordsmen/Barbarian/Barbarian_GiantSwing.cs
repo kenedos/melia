@@ -143,7 +143,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="target"></param>
 		private void Hit(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
-			var damageDelay = TimeSpan.FromMilliseconds(2950);
+			var aniTime = TimeSpan.FromMilliseconds(2950);
 			var skillHitDelay = TimeSpan.Zero;
 
 			var modifier = SkillModifier.Default;
@@ -155,7 +155,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 			skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 			skillHit.ApplyKnockBack(target);
 

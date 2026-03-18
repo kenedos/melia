@@ -132,6 +132,18 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Returns the cooldown with the given id if it exists.
+		/// </summary>
+		/// <param name="cooldownId"></param>
+		/// <param name="cooldown"></param>
+		/// <returns></returns>
+		public bool TryGet(CooldownId cooldownId, out Cooldown cooldown)
+		{
+			lock (_syncLock)
+				return _cooldowns.TryGetValue(cooldownId, out cooldown);
+		}
+
+		/// <summary>
 		/// Returns true if the given cooldown is active. Always returns false if
 		/// a cooldown id of 0 is given.
 		/// </summary>

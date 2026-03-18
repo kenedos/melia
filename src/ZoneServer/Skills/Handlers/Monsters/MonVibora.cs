@@ -36,11 +36,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 		}
 	}
@@ -48,7 +48,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Vibora_Spiritarcher_Skill_2)]
 	public class Mon_Vibora_Spiritarcher_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(420);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(420);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -71,25 +71,25 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 140, width: 13, angle: 25f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 220;
-			var damageDelay = 420;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 420;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 140, width: 13, angle: 25f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 10;
-			damageDelay = 430;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 430;
+			aniTime = 10;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 140, width: 13, angle: 25f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 10;
-			damageDelay = 440;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 440;
+			aniTime = 10;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_Vibora_Spiritelitesoldier_Skill_1)]
 	public class Mon_Vibora_Spiritelitesoldier_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(330);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(330);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -112,20 +112,20 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 31.25f, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 330;
-			var damageDelay = 330;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 330;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 31.25f, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 0;
-			damageDelay = 330;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 330;
+			aniTime = 0;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_Vibora_Spiritelitesoldier_Skill_2)]
 	public class Mon_Vibora_Spiritelitesoldier_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(420);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(420);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -151,9 +151,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 90, angle: 50f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 220;
-			var damageDelay = 420;
+			var aniTime = 420;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			// TODO: No Implementation S_R_ABIL_KNOCK_TARGET
 
 		}
@@ -192,7 +192,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Vibora_Spiritsoldier_Skill_1)]
 	public class Mon_Vibora_Spiritsoldier_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(350);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(350);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -215,8 +215,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 150;
-			var damageDelay = 350;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 350;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(350));
 			var position = originPos.GetRelative(farPos, distance: 0);
 			Send.ZC_GROUND_EFFECT(caster, position, "I_warrior_florysh_shot_dash", 0.2f, 0f, 0f, 270f);
@@ -226,7 +226,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Vibora_Spiritsoldier_Skill_2)]
 	public class Mon_Vibora_Spiritsoldier_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(375);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(375);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -249,8 +249,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 175;
-			var damageDelay = 375;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 375;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(375));
 			var position = originPos.GetRelative(farPos, distance: 0, angle: 90f);
 			Send.ZC_GROUND_EFFECT(caster, position, "E_warrior_pierce", 1f, 0f, 0f, 90f);
@@ -266,7 +266,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Vibora_Spiritsoldier_Skill_3)]
 	public class Mon_Vibora_Spiritsoldier_Skill_3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(250);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(250);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -289,53 +289,53 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 50;
-			var damageDelay = 250;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 250;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 250;
-			damageDelay = 500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 500;
+			aniTime = 250;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 146;
-			damageDelay = 646;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 646;
+			aniTime = 146;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 146;
-			damageDelay = 792;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 792;
+			aniTime = 146;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 146;
-			damageDelay = 938;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 938;
+			aniTime = 146;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 146;
-			damageDelay = 1084;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 1084;
+			aniTime = 146;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 146;
-			damageDelay = 1230;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 1230;
+			aniTime = 146;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 146;
-			damageDelay = 1376;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 1376;
+			aniTime = 146;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 46;
-			damageDelay = 1422;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 1422;
+			aniTime = 46;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 20, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 246;
-			damageDelay = 1668;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			hitDelay = 1668;
+			aniTime = 246;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(250));
 			var position = originPos.GetRelative(farPos, distance: 0, angle: 90f);
 			Send.ZC_GROUND_EFFECT(caster, position, "I_warrior_florysh_shot_dash_re", 0.60000002f, 0f, 0f, 270f);
@@ -390,11 +390,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 		}
 	}
@@ -420,11 +420,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 		}
 	}

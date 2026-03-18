@@ -91,7 +91,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				blastName = "F_explosion104_ice";
 			}
 
-			var damageDelay = TimeSpan.FromMilliseconds(100);
+			var aniTime = TimeSpan.FromMilliseconds(100);
 			var bounceHitDelay = TimeSpan.FromMilliseconds(500);
 			var skillHitDelay = TimeSpan.Zero;
 
@@ -100,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			results.Add(skillHitResult);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			if (!alternateAnimation)
 			{
@@ -110,7 +110,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			{
 				Send.ZC_SKILL_FORCE_TARGET_DUMMY(caster, target, skill, SkillId.Archer_HighAnchoring2, skillHit.ForceId, null);
 
-				await Task.Delay(damageDelay);
+				await Task.Delay(aniTime);
 				bounceHitDelay = TimeSpan.FromMilliseconds(400);
 
 				var hit = new HitInfo(caster, target, skill, skillHitResult, HitResultType.SilentHit);

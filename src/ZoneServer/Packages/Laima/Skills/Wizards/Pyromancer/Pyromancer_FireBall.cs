@@ -51,7 +51,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 
 			var splashArea = new Circle(farPos, 70);
 			var hitDelay = 200;
-			var damageDelay = 400;
+			var aniTime = 400;
 			var hits = new List<SkillHitInfo>();
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea)
@@ -72,7 +72,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			{
 				var splashHitResult = SCR_SkillHit(caster, currentTarget, skill);
 				currentTarget.TakeDamage(splashHitResult.Damage, caster);
-				var splashHit = new SkillHitInfo(caster, currentTarget, skill, splashHitResult, TimeSpan.FromMilliseconds(damageDelay), TimeSpan.FromMilliseconds(hitDelay));
+				var splashHit = new SkillHitInfo(caster, currentTarget, skill, splashHitResult, TimeSpan.FromMilliseconds(aniTime), TimeSpan.FromMilliseconds(hitDelay));
 				hits.Add(splashHit);
 
 				if ((rng.Next(100) < burnChance) && splashHitResult.Damage > 0)

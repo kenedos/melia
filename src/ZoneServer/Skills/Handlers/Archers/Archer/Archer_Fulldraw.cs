@@ -82,7 +82,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(100);
-			var damageDelay = TimeSpan.FromMilliseconds(100);
+			var aniTime = TimeSpan.FromMilliseconds(100);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await Task.Delay(hitDelay);
@@ -97,7 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 				skillHit.ApplyKnockBack(target);

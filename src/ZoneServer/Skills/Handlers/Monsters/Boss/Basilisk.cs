@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Basilisk_Skill_1)]
 	public class Mon_boss_Basilisk_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(600);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(600);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,9 +41,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 30, angle: 25f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 400;
-			var damageDelay = 600;
+			var aniTime = 600;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			var targetPos = originPos.GetRelative(farPos, distance: 45);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_debrave, 1, 0f, 8000f, 1, 15, -1, hits);
 		}
@@ -52,7 +52,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Basilisk_Skill_2)]
 	public class Mon_boss_Basilisk_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(700);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -75,9 +75,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 40);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 500;
-			var damageDelay = 700;
+			var aniTime = 700;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_debrave, 1, 0f, 8000f, 1, 30, -1, hits);
 		}
 	}

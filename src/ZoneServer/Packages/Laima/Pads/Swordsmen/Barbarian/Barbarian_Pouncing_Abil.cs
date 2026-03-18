@@ -48,7 +48,7 @@ namespace Melia.Zone.Pads.Handlers
 			pad.SetRectangleRange(creator.Direction, 35f, 90f);
 
 			// Deal damage using PadDamageEnemy
-			PadDamageEnemy(pad, 1f, 0, 0, "F_hit_slash", 3, 0f, 0f);
+			PadDamageEnemy(pad, 1f, 0, 0, "F_hit008_slash", 3, 0f, 0f);
 		}
 	}
 }

@@ -67,8 +67,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 0;
-			var damageDelay = 175;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			var aniTime = 175;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			foreach (var hit in hits)
 			{
 				var damage = hit.HitInfo.Damage;
@@ -83,8 +83,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 360;
-			damageDelay = 560;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			aniTime = 560;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			foreach (var hit in hits)
 			{
 				var damage = hit.HitInfo.Damage;

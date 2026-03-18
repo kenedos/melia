@@ -3023,12 +3023,12 @@ namespace Melia.Zone.Network
 				packet.PutInt(hitInfo.HitCount);
 				packet.PutByte(1);
 				packet.PutInt(0);
-				packet.PutInt((int)hitInfo.DamageDelay.TotalMilliseconds);
+				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
 			}
 			else
 			{
 				packet.PutByte(1);
-				packet.PutInt((int)hitInfo.DamageDelay.TotalMilliseconds);
+				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
 			}
 
 			target.Map.Broadcast(packet, target);

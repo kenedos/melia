@@ -52,13 +52,13 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 				return;
 			}
 
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 			{

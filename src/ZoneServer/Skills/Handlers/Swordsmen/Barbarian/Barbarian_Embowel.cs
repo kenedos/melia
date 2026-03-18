@@ -66,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(50);
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var jumpDelay = TimeSpan.FromMilliseconds(675);
 			var skillHitDelay = TimeSpan.Zero;
 
@@ -100,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
 				skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 				target.Position = skillHit.KnockBackInfo.ToPosition;

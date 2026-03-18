@@ -36,7 +36,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			var aoeTargets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var damageDelay = TimeSpan.FromMilliseconds(300);
+			var aniTime = TimeSpan.FromMilliseconds(300);
 
 			var hits = new List<SkillHitInfo>();
 			foreach (var target in aoeTargets.LimitBySDR(caster, skill))
@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
 				hits.Add(skillHit);
 			}
 

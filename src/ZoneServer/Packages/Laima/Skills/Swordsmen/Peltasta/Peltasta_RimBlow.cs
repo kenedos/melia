@@ -65,7 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(50);
-			var damageDelay = TimeSpan.FromMilliseconds(330);
+			var aniTime = TimeSpan.FromMilliseconds(330);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await skill.Wait(hitDelay);
@@ -93,7 +93,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				if (skillHitResult.Damage > 0 && !caster.TryGetActiveAbility(AbilityId.Peltasta35, out var abilityLevel) && target.IsKnockdownable())

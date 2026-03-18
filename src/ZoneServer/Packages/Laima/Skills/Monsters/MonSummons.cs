@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_summons_zombie_Skill_1)]
 	public class Mon_summons_zombie_Skill_1Override : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(350);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(350);
 
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
@@ -52,11 +52,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 20, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 150;
-			var damageDelay = 350;
+			var aniTime = 350;
 
 			// Attack enemies
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 
 			// Grant Dark Force stacks to the Bokor owner if zombie is a summon and hit enemies
 			if (hits.Count > 0 && caster is Summon summon && summon.Owner != null)
@@ -75,7 +75,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Graztas_Skill_1)]
 	public class Mon_Graztas_Skill_1Override : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(700);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(700);
 
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
@@ -102,11 +102,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 30, angle: 20f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 500;
-			var damageDelay = 700;
+			var aniTime = 700;
 
 			// Attack enemies
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			foreach (var hit in hits)
 			{
 				var bleedDamage = hit.HitInfo.Damage * 0.5f;
@@ -132,7 +132,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Zombie_hoplite_Skill_1)]
 	public class Mon_Zombie_hoplite_Skill_1Override : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1200);
 
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
@@ -159,11 +159,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 35, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1000;
-			var damageDelay = 1200;
+			var aniTime = 1200;
 
 			// Attack enemies
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			foreach (var hit in hits)
 			{
 				SkillResultKnockTarget(caster, null, skill, hit, KnockType.KnockDown, KnockDirection.TowardsTarget, 90, 10f, 0, 0, 2);
@@ -186,7 +186,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Zombie_hoplite_Skill_2)]
 	public class Mon_Zombie_hoplite_Skill_2Override : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1000);
 
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
@@ -213,11 +213,11 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 35, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 800;
-			var damageDelay = 1000;
+			var aniTime = 1000;
 
 			// Attack enemies
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			foreach (var hit in hits)
 			{
 				SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0, 1000, 1, 40, -1, hit);

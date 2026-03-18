@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.Handlers.Wizard
 				return;
 			}
 
-			var damageDelay = TimeSpan.FromMilliseconds(550);
+			var aniTime = TimeSpan.FromMilliseconds(550);
 			var skillHitDelay = TimeSpan.FromMilliseconds(100);
 
 			var splashArea = new Circle(target.Position, skill.Properties.GetFloat(PropertyName.SplRange));
@@ -71,7 +71,7 @@ namespace Melia.Zone.Skills.Handlers.Wizard
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHit(2));
 			target.TakeDamage(skillHitResult.Damage, caster);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 			{

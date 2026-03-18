@@ -83,7 +83,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 				if (companion.Components.TryGet<AiComponent>(out var ai))
 					ai.Script.QueueEventAlert(new HateResetAlert());
 
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
 			var firstTarget = true;
@@ -115,7 +115,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 					var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHit(2));
 					target.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 					skillHit.HitEffect = HitEffect.Impact;
 
 					hits.Add(skillHit);

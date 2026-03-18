@@ -249,7 +249,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Sparnanman_Skill_4)]
 	public class Mon_boss_Sparnanman_Skill_4 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(9499);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(9499);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))

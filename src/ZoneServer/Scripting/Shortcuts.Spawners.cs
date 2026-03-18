@@ -275,13 +275,6 @@ namespace Melia.Zone.Scripting
 			var minRespawnDelay = respawn;
 			var maxRespawnDelay = respawn;
 
-			// Until we have a proper root crystal spawn handler, only spawn 1 per spawn point.
-			if (monsterClassId >= 45110 && monsterClassId <= 45137)
-			{
-				min = 1;
-				max = 1;
-			}
-
 			return AddSpawner(identifier, monsterClassId, min, max, initialSpawnDelay, minRespawnDelay, maxRespawnDelay, tendency);
 		}
 

@@ -63,7 +63,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(600);
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 			var delayBetweenHits = TimeSpan.FromMilliseconds(150);
 
@@ -81,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 					var skillHitResult = SCR_SkillHit(caster, target, skill);
 					target.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 					skillHit.HitEffect = HitEffect.Impact;
 
 					hits.Add(skillHit);
@@ -100,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 				target.StartBuff(BuffId.Stun, TimeSpan.FromMilliseconds(StunDurationMilliseconds));
 				hits.Add(skillHit);

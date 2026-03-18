@@ -50,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				return;
 			}
 
-			var damageDelay = TimeSpan.FromMilliseconds(200);
+			var aniTime = TimeSpan.FromMilliseconds(200);
 			var skillHitDelay = skill.Properties.HitDelay;
 
 			var modifier = SkillModifier.MultiHit(3);
@@ -66,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 			skillHit.UnkFloat = 8;
 			skillHit.VarInfoCount = 1;
 
