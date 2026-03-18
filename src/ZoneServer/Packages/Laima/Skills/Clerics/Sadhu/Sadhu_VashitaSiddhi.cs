@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	[SkillHandler(SkillId.Sadhu_VashitaSiddhi)]
 	public class Sadhu_VashitaSiddhiOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(500);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(500);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
@@ -54,9 +54,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 300;
-			var damageDelay = 500;
+			var aniTime = 500;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			caster.StartBuff(BuffId.Sadhu_Soul_Pre_Buff, 1f, 0f, TimeSpan.Zero, caster);
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 			//var position = GetRelativePosition(PosType.TargetFront, caster, target);

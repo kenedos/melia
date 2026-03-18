@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_moa_Skill_1)]
 	public class Mon_boss_moa_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1800);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1800);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -48,20 +48,20 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 40);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 1600;
-			var damageDelay = 1800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1800;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 40);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 1500;
-			damageDelay = 1500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			aniTime = 1500;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
 	[SkillHandler(SkillId.Mon_boss_moa_Skill_2)]
 	public class Mon_boss_moa_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -87,9 +87,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 40, angle: 40f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 1800;
-			var damageDelay = 2000;
+			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 20000f, 1, 100, -1, hits);
 		}
 	}
@@ -97,7 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_moa_Skill_3)]
 	public class Mon_boss_moa_Skill_3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -123,9 +123,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 30, angle: 120f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 1800;
-			var damageDelay = 2000;
+			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.CasterForward, 150, 30, 10, 1, 5, hits);
 		}
 	}
@@ -212,7 +212,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 30, angle: 120f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 1800;
-			var damageDelay = 2000;
+			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
 
 			// Start attack and wait for hit delay
@@ -245,7 +245,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 5000f, 1, 100, -1, explosionHits);
 
 			// Continue with the fan attack
-			await SkillAttack(caster, skill, splashArea, 0, damageDelay - hitDelay, hits);
+			await SkillAttack(caster, skill, splashArea, 0, aniTime - hitDelay, hits);
 			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.CasterForward, 150, 30, 10, 1, 5, hits);
 		}
 	}

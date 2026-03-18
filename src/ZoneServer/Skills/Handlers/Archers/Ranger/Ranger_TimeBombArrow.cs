@@ -47,13 +47,13 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				return;
 			}
 
-			var damageDelay = TimeSpan.FromMilliseconds(45);
+			var aniTime = TimeSpan.FromMilliseconds(45);
 			var skillHitDelay = TimeSpan.Zero;
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 
@@ -156,7 +156,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		{
 			var splashArea = new Circle(target.Position, 45);
 
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
@@ -180,7 +180,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				var skillHitResult = SCR_SkillHit(caster, blastTarget, skill);
 				blastTarget.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, blastTarget, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, blastTarget, skill, skillHitResult, aniTime, skillHitDelay);
 				if (!caster.IsAbilityActive(AbilityId.Ranger35))
 				{
 					skillHit.KnockBackInfo = new KnockBackInfo(target.Position, blastTarget, KnockBackType.KnockDown, 150, 60);

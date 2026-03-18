@@ -88,7 +88,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 			var affectedTargets = allTargetsInArea.LimitBySDR(caster, skill);
 
 			var hits = new List<SkillHitInfo>();
-			var damageDelay = TimeSpan.FromMilliseconds(100);
+			var aniTime = TimeSpan.FromMilliseconds(100);
 
 			// Process all targets - damage, knockback, and stun chance for everyone
 			foreach (var target in affectedTargets)
@@ -96,7 +96,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 				var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.Default);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
 
 				if (skillHitResult.Damage > 0 && target.IsKnockdownable())
 				{

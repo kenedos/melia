@@ -65,7 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 				.OrderBy(t => t.IsBuffActive(BuffId.Cryomancer_Freeze) ? 1 : 0)
 				.Take(MaxTargets)
 				.ToList();
-			var damageDelay = TimeSpan.FromMilliseconds(500);
+			var aniTime = TimeSpan.FromMilliseconds(500);
 
 			var freezeChance = BaseFreezeChance + (skill.Level * FreezeChancePerLevel);
 
@@ -79,7 +79,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill, SkillModifier.MultiHit(4));
 				currentTarget.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, aniTime, TimeSpan.Zero);
 				hits.Add(skillHit);
 
 				if (currentTarget.IsDead)

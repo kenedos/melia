@@ -81,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 				snowball.Vars.Set("NextAvailableAttachPoint", 1);
 				var splashArea = new Circle(snowball.Position, DamageRadius);
 				var hitDelay = 0;
-				var damageDelay = 0;
+				var aniTime = 0;
 				var hits = new List<SkillHitInfo>();
 				var targets = caster.Map.GetAttackableEnemiesIn(snowball, splashArea);
 
@@ -90,7 +90,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 					// Apply damage
 					var splashHitResult = SCR_SkillHit(caster, target, skill);
 					target.TakeDamage(splashHitResult.Damage, caster);
-					var splashHit = new SkillHitInfo(caster, target, skill, splashHitResult, TimeSpan.FromMilliseconds(damageDelay), TimeSpan.FromMilliseconds(hitDelay));
+					var splashHit = new SkillHitInfo(caster, target, skill, splashHitResult, TimeSpan.FromMilliseconds(aniTime), TimeSpan.FromMilliseconds(hitDelay));
 					hits.Add(splashHit);
 
 					// Apply freeze

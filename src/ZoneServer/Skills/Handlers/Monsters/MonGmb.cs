@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_GMB_boss_Moyabruka_Skill_1)]
 	public class Mon_GMB_boss_Moyabruka_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1800);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1800);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -53,14 +53,14 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var hitDelays = new[] { 1600, 2500, 1700 };
-			var damageDelays = new[] { 1800, 4300, 6000 };
+			var aniTimes = new[] { 1800, 4300, 6000 };
 
 			for (var i = 0; i < hitDelays.Length; i++)
 			{
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 75, width: 150);
 				var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 				var hits = new List<SkillHitInfo>();
-				await SkillAttack(caster, skill, splashArea, hitDelays[i], damageDelays[i], hits);
+				await SkillAttack(caster, skill, splashArea, hitDelays[i], aniTimes[i], hits);
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2800));

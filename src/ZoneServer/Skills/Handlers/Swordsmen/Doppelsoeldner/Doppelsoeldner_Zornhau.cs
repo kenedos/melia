@@ -63,7 +63,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(400);
-			var damageDelay = TimeSpan.FromMilliseconds(150);
+			var aniTime = TimeSpan.FromMilliseconds(150);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await Task.Delay(hitDelay);
@@ -86,7 +86,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 

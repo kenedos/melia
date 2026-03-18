@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 0, angle: 170f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var damageDelay = TimeSpan.FromMilliseconds(400);
+			var aniTime = TimeSpan.FromMilliseconds(400);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
@@ -71,7 +71,7 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				if (skillHitResult.Damage > 0)

@@ -68,7 +68,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 
 			var hitTime = TimeSpan.FromMilliseconds(300);
 			var skillHitDelay = TimeSpan.Zero;
-			var damageDelay = TimeSpan.FromMilliseconds(270);
+			var aniTime = TimeSpan.FromMilliseconds(270);
 
 			await Task.Delay(hitTime);
 
@@ -80,7 +80,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				hits.Add(skillHit);
 			}
 

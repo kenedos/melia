@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var damageDelay = TimeSpan.FromMilliseconds(175);
+			var aniTime = TimeSpan.FromMilliseconds(175);
 
 			var targetList = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);

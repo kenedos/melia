@@ -83,7 +83,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await Task.Delay(HitDelay);
@@ -98,7 +98,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 				if (caster.Components.TryGet<AbilityComponent>(out var abilities) && abilities.IsActive(AbilityId.Hoplite33))
 				{
@@ -152,7 +152,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			var caster = args.Creator;
 			var skill = args.Skill;
 
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
 			var targets = pad.Trigger.GetAttackableEntities(caster);
@@ -165,7 +165,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);

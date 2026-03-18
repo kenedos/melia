@@ -89,7 +89,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 		private void Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea, Position explosionPos, Skill detonateTrapsSkill = null)
 		{
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var damageDelay = TimeSpan.FromMilliseconds(150);
+			var aniTime = TimeSpan.FromMilliseconds(150);
 
 			var modifier = SkillModifier.MultiHit(3);
 

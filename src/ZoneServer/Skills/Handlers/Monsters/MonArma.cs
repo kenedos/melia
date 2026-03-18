@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_arma_Skill_1)]
 	public class Mon_arma_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(900);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(900);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -45,9 +45,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 15, angle: 25f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 900;
-			var damageDelay = 900;
+			var aniTime = 900;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.Fire, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 5000f, 1, 100, -1, hits);
 		}
 	}
@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(HandlerPriority.Override, SkillId.Mon_arma_Skill_2)]
 	public class Mon_arma_Skill_2Override : ParametersOnlySkill
 	{
-		protected override TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2000);
+		protected override TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2000);
 		protected override TimeSpan HitDelay { get; } = TimeSpan.FromMilliseconds(1800);
 		protected override SplashType SplashType { get; } = SplashType.Square;
 		protected override float Length { get; } = 30f;
@@ -66,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_arma_Skill_2)]
 	public class Mon_arma_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -90,8 +90,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashArea = new CircleF(farPos, 20);
 			var hitDelay = 1800;
-			var damageDelay = 2000;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 2000;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			MonsterSkillSetCollisionDamage(caster, skill, true, 1f);
 			await skill.Wait(TimeSpan.FromMilliseconds(3000));
 			MonsterSkillSetCollisionDamage(caster, skill, false, 1f);

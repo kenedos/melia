@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 			var hitDelay1 = TimeSpan.FromMilliseconds(350);
 			var hitDelay2 = TimeSpan.FromMilliseconds(600);
 			var hitDelay3 = TimeSpan.FromMilliseconds(50);
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
 			// Outlaw6 gives guaranteed evade throughout the whole animation
@@ -81,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 			}
@@ -105,7 +105,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 			}
@@ -124,7 +124,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 			}
@@ -143,7 +143,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 

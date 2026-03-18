@@ -70,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(330);
-			var damageDelay = TimeSpan.FromMilliseconds(20);
+			var aniTime = TimeSpan.FromMilliseconds(20);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await Task.Delay(hitDelay);
@@ -95,7 +95,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 			}

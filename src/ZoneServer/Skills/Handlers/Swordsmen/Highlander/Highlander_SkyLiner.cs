@@ -80,8 +80,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		{
 			var hits = new List<SkillHitInfo>();
 			var hitDelay = TimeSpan.FromMilliseconds(30);
-			var damageDelay1 = TimeSpan.FromMilliseconds(50);
-			var damageDelay2 = TimeSpan.FromMilliseconds(80);
+			var aniTime1 = TimeSpan.FromMilliseconds(50);
+			var aniTime2 = TimeSpan.FromMilliseconds(80);
 			var delayBetweenHits = TimeSpan.FromMilliseconds(250);
 			var delayBetweenRepeats = TimeSpan.FromMilliseconds(470);
 			var skillHitDelay = TimeSpan.Zero;
@@ -97,7 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 					var skillHitResult = SCR_SkillHit(caster, target, skill);
 					target.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay1, skillHitDelay);
+					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime1, skillHitDelay);
 					skillHit.HitEffect = HitEffect.Impact;
 
 					hits.Add(skillHit);
@@ -113,7 +113,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 					var skillHitResult2 = SCR_SkillHit(caster, target, skill);
 					target.TakeDamage(skillHitResult2.Damage, caster);
 
-					var skillHit2 = new SkillHitInfo(caster, target, skill, skillHitResult2, damageDelay2, skillHitDelay);
+					var skillHit2 = new SkillHitInfo(caster, target, skill, skillHitResult2, aniTime2, skillHitDelay);
 					skillHit2.HitEffect = HitEffect.Impact;
 
 					hits.Add(skillHit2);

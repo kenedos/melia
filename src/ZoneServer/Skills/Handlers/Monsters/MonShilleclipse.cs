@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_ShillEclipse_Skill_1)]
 	public class Mon_ShillEclipse_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.Zero;
+		protected TimeSpan AniTime { get; } = TimeSpan.Zero;
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,8 +41,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 0;
-			var damageDelay = 0;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 0;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var targetPos = originPos.GetRelative(farPos);
 			var targets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 100f, 15f, 20);
 			if (targets.Count == 0)
@@ -68,7 +68,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_ShillEclipse_Skill_2)]
 	public class Mon_ShillEclipse_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.Zero;
+		protected TimeSpan AniTime { get; } = TimeSpan.Zero;
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -132,7 +132,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_ShillEclipse_Skill_3)]
 	public class Mon_ShillEclipse_Skill_3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.Zero;
+		protected TimeSpan AniTime { get; } = TimeSpan.Zero;
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -157,8 +157,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 0;
-			var damageDelay = 0;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 0;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var targetPos = originPos.GetRelative(farPos);
 			var targets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 90f, 30f, 5);
 			if (targets.Count == 0)

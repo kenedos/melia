@@ -39,7 +39,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 	[SkillHandler(SkillId.Dievdirbys_Carve)]
 	public class Dievdirbys_CarveOverride : IMeleeGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.Zero;
+		protected TimeSpan AniTime { get; } = TimeSpan.Zero;
 
 		// List of Dievdirbys statue class names
 		private static readonly HashSet<string> DievdirbysStatues = new HashSet<string>
@@ -69,7 +69,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			// Length 55, width 20 based on skill's melee range
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 20);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 			var skillTargets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -82,7 +82,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);
@@ -366,7 +366,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			var limitedEnemies = enemiesInRange.Take(maxTargets);
 
 			var hits = new List<SkillHitInfo>();
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 
 			foreach (var target in limitedEnemies)
@@ -377,7 +377,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);
@@ -411,7 +411,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			var enemiesInRange = caster.Map.GetAttackableEnemiesIn(caster, knockbackArea);
 
 			var hits = new List<SkillHitInfo>();
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 
 			// Calculate knockback velocity based on Carve skill level: 70 + 10 * SkillLv
@@ -424,7 +424,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 				skillHitResult.Result = HitResultType.Hit;
 				skillHitResult.Damage = 0;
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				// Apply knockback if target is knockbackable

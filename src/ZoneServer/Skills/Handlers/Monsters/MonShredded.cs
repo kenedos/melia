@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	[SkillHandler(SkillId.Mon_Shredded_Skill_1)]
 	public class Mon_Shredded_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -43,9 +43,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0.1f, width: 0.1f, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 0;
-			var damageDelay = 300;
+			var aniTime = 300;
 			await skill.Wait(TimeSpan.FromMilliseconds(800));
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var position = GetRelativePosition(PosType.Target, caster, target);
 			await MissileThrow(skill, caster, position, new MissileConfig
 			{

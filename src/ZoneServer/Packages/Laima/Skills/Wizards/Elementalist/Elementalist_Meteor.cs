@@ -72,7 +72,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			var area = new CircleF(targetPos, range);
 
 			var enemies = caster.Map.GetAttackableEnemiesIn(caster, area);
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHits = new List<SkillHitInfo>();
 
 			var maxTargets = 50;
@@ -81,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 				var skillHitResult = SCR_SkillHit(caster, enemy, skill, SkillModifier.MultiHit(2));
 				enemy.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, enemy, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, enemy, skill, skillHitResult, aniTime, TimeSpan.Zero);
 				skillHits.Add(skillHit);
 
 				if (skillHitResult.Damage > 0)

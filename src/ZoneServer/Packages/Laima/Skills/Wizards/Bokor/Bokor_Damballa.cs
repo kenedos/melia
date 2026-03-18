@@ -84,7 +84,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 					target.TakeDamage(skillHitResult.Damage, caster);
 
 					var hitInfo = new HitInfo(caster, target, skill, skillHitResult.Damage, skillHitResult.Result);
-					hitInfo.DamageDelay = TimeSpan.FromMilliseconds(100);
+					hitInfo.AniTime = TimeSpan.FromMilliseconds(100);
 
 					Send.ZC_HIT_INFO(caster, target, hitInfo);
 				}

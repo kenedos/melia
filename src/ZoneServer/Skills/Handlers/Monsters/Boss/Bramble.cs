@@ -207,8 +207,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 50, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1700;
-			var damageDelay = 1900;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1900;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(1600));
 			var spawnPos = originPos.GetRelative(farPos, distance: 120);
 			MonsterSkillCreateMob(skill, caster, "monskill_bramble_obj", spawnPos, 0f, "", "", 0, 0f, "Bram_test", "");

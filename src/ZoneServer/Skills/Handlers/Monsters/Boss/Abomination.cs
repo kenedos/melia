@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 	[SkillHandler(SkillId.Mon_boss_Abomination_Skill1)]
 	public class MonBossAbominationSkill1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -84,7 +84,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 	[SkillHandler(SkillId.Mon_boss_Abomination_Skill2)]
 	public class MonBossAbominationSkill2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -148,7 +148,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 	[SkillHandler(SkillId.Mon_boss_Abomination_Skill3)]
 	public class MonBossAbominationSkill3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))

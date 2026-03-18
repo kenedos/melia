@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	[SkillHandler(SkillId.Wugushi_LatentVenom)]
 	public class Wugushi_LatentVenomOverride : IForceSkillHandler
 	{
-		private const int DamageDelayMs = 300;
+		private const int AniTimeMs = 300;
 		private const int BaseLatentDurationMs = 40000;
 		private const int StacksPerUse = 2;
 		private const float SplashLength = 30f;
@@ -73,10 +73,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 
 			var hits = new List<SkillHitInfo>();
 
-			var primaryHit = new SkillHitInfo(caster, primaryTarget, skill, primaryHitResult, TimeSpan.FromMilliseconds(DamageDelayMs), TimeSpan.Zero);
+			var primaryHit = new SkillHitInfo(caster, primaryTarget, skill, primaryHitResult, TimeSpan.FromMilliseconds(AniTimeMs), TimeSpan.Zero);
 			hits.Add(primaryHit);
 
-			await skill.Wait(TimeSpan.FromMilliseconds(DamageDelayMs));
+			await skill.Wait(TimeSpan.FromMilliseconds(AniTimeMs));
 
 			var stacks = StacksPerUse;
 

@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Centaurus_Skill_1)]
 	public class Mon_boss_Centaurus_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1200);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -49,8 +49,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 30);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1000;
-			var damageDelay = 1200;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1200;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
@@ -212,7 +212,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Centaurus_Skill_5)]
 	public class Mon_boss_Centaurus_Skill_5 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2100);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2100);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -235,15 +235,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 25, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 1900;
-			var damageDelay = 2100;
+			var aniTime = 2100;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 25, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 600;
-			damageDelay = 2700;
+			aniTime = 2700;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 4000f, 1, 35, -1, hits);
 		}
 	}
@@ -251,7 +251,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Centaurus_Q2_Skill_1)]
 	public class Mon_boss_Centaurus_Q2_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1200);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -277,13 +277,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var hitDelays = new[] { 1000, 50, 50, 50, 50 };
-			var damageDelays = new[] { 1200, 1250, 1300, 1350, 1400 };
+			var aniTimes = new[] { 1200, 1250, 1300, 1350, 1400 };
 
 			for (var i = 0; i < hitDelays.Length; i++)
 			{
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 30, angle: 20f);
 				var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-				await SkillAttack(caster, skill, splashArea, hitDelays[i], damageDelays[i]);
+				await SkillAttack(caster, skill, splashArea, hitDelays[i], aniTimes[i]);
 			}
 		}
 	}
@@ -468,7 +468,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Centaurus_Q2_Skill_5)]
 	public class Mon_boss_Centaurus_Q2_Skill_5 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -494,13 +494,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var hitDelays = new[] { 1800, 50, 50, 50, 50, 500, 50, 50, 50, 50 };
-			var damageDelays = new[] { 2000, 2050, 2100, 2150, 2200, 2700, 2750, 2800, 2850, 2900 };
+			var aniTimes = new[] { 2000, 2050, 2100, 2150, 2200, 2700, 2750, 2800, 2850, 2900 };
 
 			for (var i = 0; i < hitDelays.Length; i++)
 			{
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 30, angle: 20f);
 				var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-				await SkillAttack(caster, skill, splashArea, hitDelays[i], damageDelays[i]);
+				await SkillAttack(caster, skill, splashArea, hitDelays[i], aniTimes[i]);
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));

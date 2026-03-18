@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_varleking_Skill_1)]
 	public class Mon_boss_varleking_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(950);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(950);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -48,9 +48,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 115, width: 0, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 750;
-			var damageDelay = 950;
+			var aniTime = 950;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			MonsterSkillSetCollisionDamage(caster, skill, true, 1f);
 			if (caster.Components.TryGet<TriggerComponent>(out var triggers))
 				triggers.Entered += this.Triggers_Entered;

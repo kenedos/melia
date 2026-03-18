@@ -99,7 +99,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				return;
 			}
 
-			var damageDelay = TimeSpan.FromMilliseconds(300);
+			var aniTime = TimeSpan.FromMilliseconds(300);
 			var skillHitDelay = TimeSpan.Zero;
 
 			var modifier = SkillModifier.MultiHit(5);
@@ -117,7 +117,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			if (skillHitResult.Damage > 0)
 			{
@@ -146,7 +146,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		private async Task MultiAttack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(100);
-			var damageDelay = TimeSpan.FromMilliseconds(100);
+			var aniTime = TimeSpan.FromMilliseconds(100);
 			var skillHitDelay = TimeSpan.Zero;
 
 			await Task.Delay(hitDelay);

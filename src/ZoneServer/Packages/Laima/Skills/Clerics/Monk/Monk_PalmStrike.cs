@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 	[SkillHandler(SkillId.Monk_PalmStrike)]
 	public class Monk_PalmStrikeOverride : IMeleeGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(350);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(350);
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -49,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 55, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 150;
-			var damageDelay = 350;
+			var aniTime = 350;
 
 			await skill.Wait(TimeSpan.FromMilliseconds(hitDelay));
 
@@ -67,7 +67,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(damageDelay), skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(aniTime), skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				if (skillHitResult.Damage > 0 && target.IsKnockdownable())

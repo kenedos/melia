@@ -80,7 +80,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_RingCrawler_Skill_2)]
 	public class Mon_boss_RingCrawler_Skill_2 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(4800);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(4800);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -105,18 +105,18 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 4500;
-			var damageDelay = 4800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 4800;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 1000;
-			damageDelay = 5800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			aniTime = 5800;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 1000;
-			damageDelay = 6800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			aniTime = 6800;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 			var targetPos = originPos.GetRelative(farPos);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.RingCrawler_ElectricFields);

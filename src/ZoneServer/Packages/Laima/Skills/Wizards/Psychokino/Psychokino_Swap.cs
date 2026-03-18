@@ -30,7 +30,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 	[SkillHandler(SkillId.Psychokino_Swap)]
 	public class Psychokino_SwapOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(200);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(200);
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			if (caster is Character character)

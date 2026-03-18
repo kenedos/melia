@@ -164,7 +164,7 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
 		/// <param name="hitDelay">Delay before the hit occurs</param>
-		/// <param name="damageDelay">Delay before damage is applied</param>
+		/// <param name="aniTime">Delay before damage is applied</param>
 		/// <param name="hits">List of SkillHitInfo objects</param>
 		/// <param name="modifySkillHitResult">Optional callback to modify 
 		/// skillHitResult before applying damage</param>
@@ -173,7 +173,7 @@ namespace Melia.Zone.Skills.Helpers
 			Skill skill,
 			IShapeF splashArea,
 			float hitDelay = 0,
-			float damageDelay = 0,
+			float aniTime = 0,
 			List<SkillHitInfo> hits = null,
 			Func<Skill, ICombatEntity, ICombatEntity, SkillHitResult, SkillHitResult> modifySkillHitResult = null,
 			SkillModifier skillModifier = null)
@@ -193,7 +193,7 @@ namespace Melia.Zone.Skills.Helpers
 					Debug.ShowShape(caster.Map, splashArea, SkillConstants.DefaultDebugShapeDuration);
 			}
 
-			await skill.Wait(TimeSpan.FromMilliseconds(hitDelay));
+			await skill.Wait(TimeSpan.FromMilliseconds(aniTime));
 
 			if (caster.IsDead) return;
 
@@ -219,7 +219,7 @@ namespace Melia.Zone.Skills.Helpers
 					skillHitResult = modifySkillHitResult(skill, caster, target, skillHitResult);
 
 				target.TakeDamage(skillHitResult.Damage, caster);
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(damageDelay), skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(hitDelay), skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 				if (skillModifier == SkillModifier.Default)
 					skillHit.VarInfoCount = 0;
@@ -773,7 +773,7 @@ namespace Melia.Zone.Skills.Helpers
 
 			range = Math.Max(range, SizeTypeRadius.GetRadius(caster.EffectiveSize));
 
-			var damageDelay = skill.GetDamageDelay();
+			var aniTime = skill.GetAniTime();
 			var hitDelay = skill.GetHitDelay();
 
 			List<ICombatEntity> targets;
@@ -804,7 +804,7 @@ namespace Melia.Zone.Skills.Helpers
 					var skillHitResult = SCR_SkillHit(caster, target, skill);
 					target.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, hitDelay);
+					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, hitDelay);
 					var hasKnock = skillHit.KnockBackInfo != null && skillHitResult.Damage > 0 && target.IsKnockdownable();
 
 					if (hasKnock)

@@ -27,7 +27,7 @@ namespace Melia.Zone.Network.Helpers
 			if (Versions.Protocol > 500)
 			{
 				packet.PutInt(skillHitInfo.IsKnockBack ? 1 : 0);
-				packet.PutShort((short)skillHitInfo.DamageDelay.TotalMilliseconds);
+				packet.PutShort((short)skillHitInfo.AniTime.TotalMilliseconds);
 				packet.PutByte(0);
 				packet.PutByte(0);
 				packet.PutShort((short)skillHitInfo.SkillHitDelay.TotalMilliseconds); // Skill Hit Delay? Adds pause in attack animation?

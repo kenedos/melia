@@ -12,11 +12,12 @@ namespace Melia.Zone.Skills.SplashAreas
 	public class Circle : IShapeF, ISplashArea
 	{
 		private readonly CircleF _base;
+		private readonly float _originY;
 
 		/// <summary>
 		/// Returns the center of the circle.
 		/// </summary>
-		public Position Center => new Position(_base.Center.X, 0, _base.Center.Y);
+		public Position Center => new Position(_base.Center.X, _originY, _base.Center.Y);
 
 		/// <summary>
 		/// Returns the circle's radius.
@@ -61,6 +62,7 @@ namespace Melia.Zone.Skills.SplashAreas
 		public Circle(Position originPos, float radius)
 		{
 			this.Radius = radius;
+			_originY = originPos.Y;
 			_base = new CircleF(originPos, radius);
 		}
 

@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 
 			var targetList = caster.Map.GetAttackableEnemiesInPosition(caster, farPos, (int)skill.Data.SplashRange * 4);
-			var damageDelay = TimeSpan.FromMilliseconds(200);
+			var aniTime = TimeSpan.FromMilliseconds(200);
 
 			var hits = new List<SkillHitInfo>();
 
@@ -56,7 +56,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill);
 				currentTarget.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, damageDelay, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, aniTime, TimeSpan.Zero);
 				hits.Add(skillHit);
 			}
 

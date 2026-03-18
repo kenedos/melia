@@ -90,7 +90,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		{
 			var hits = new List<SkillHitInfo>();
 			var hitDelay = TimeSpan.FromMilliseconds(30);
-			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
 			var totalHits = 17;
@@ -118,7 +118,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 					var skillHitResult = SCR_SkillHit(caster, target, skill);
 					target.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 					skillHit.HitEffect = HitEffect.Impact;
 
 					hits.Add(skillHit);

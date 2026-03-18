@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Thaumaturge
 	[SkillHandler(SkillId.Thaumaturge_Reversi)]
 	public class Thaumaturge_ReversiOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{

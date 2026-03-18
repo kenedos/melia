@@ -57,7 +57,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea, Position farPos)
 		{
-			var damageDelay = TimeSpan.FromMilliseconds(90);
+			var aniTime = TimeSpan.FromMilliseconds(90);
 			var skillHitDelay = TimeSpan.Zero;
 			var hitDelay = TimeSpan.FromMilliseconds(100);
 
@@ -73,7 +73,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 				if (skillHitResult.Damage > 0)
 					dealtDamage = true;
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				hits.Add(skillHit);
 			}
 
@@ -87,7 +87,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			// Based on the packets this delay is more like 270, but that
 			// just doesn't look right for unknown reasons, so we'll use
 			// 370 for now.
-			damageDelay = TimeSpan.FromMilliseconds(370);
+			aniTime = TimeSpan.FromMilliseconds(370);
 			hits.Clear();
 
 			foreach (var target in targets)
@@ -97,7 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 
 				target.TakeDamage(damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				hits.Add(skillHit);
 			}
 

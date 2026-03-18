@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Base
 			skill.IncreaseOverheat();
 
 			var splashArea = this.GetSplashArea(skill, caster, designatedTarget);
-			var damageDelay = this.GetDamageDelay(skill);
+			var aniTime = this.GetAniTime(skill);
 			var hitDelay = this.GetHitDelay(skill);
 			var skillHitDelay = skill.Properties.HitDelay;
 
@@ -49,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Base
 			// actually works is currently somewhat guessed and is mostly based
 			// on research done on dagger attacks by players. For more info,
 			// see MeleeGroundSkillHandler.
-			damageDelay /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
+			aniTime /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
 			hitDelay /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, designatedTarget.Position, null);
@@ -60,19 +60,11 @@ namespace Melia.Zone.Skills.Handlers.Base
 			// target to move out of harms way before the skill hits,
 			// such as with the poison cloud in the Kepa attack skill.
 
-			Debug.ShowShape(caster.Map, splashArea, edgePoints: false, duration: damageDelay);
+			Debug.ShowShape(caster.Map, splashArea, edgePoints: false, duration: aniTime);
 
-			if (hitDelay > TimeSpan.Zero)
-				await skill.Wait(hitDelay);
+			if (aniTime > TimeSpan.Zero)
+				await skill.Wait(aniTime);
 
-			// Check if attacker is still able to fight after the delay.
-			// Update: This check was primarily added to see if the caster
-			// is still alive after the delay, though we're now also checking
-			// for locks, which this doesn't cover, as the caster might've
-			// gotten locked and unlocked during the delay. We presumably
-			// wouldn't want to continue in that case, but we currently
-			// don't have a way for checking that. The proper way to handle
-			// this would probably be to cancel the skill execution.
 			if (!caster.CanFight())
 			{
 				Send.ZC_SKILL_DISABLE(caster);
@@ -87,7 +79,7 @@ namespace Melia.Zone.Skills.Handlers.Base
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, hitDelay, skillHitDelay);
 				hits.Add(skillHit);
 
 				this.OnHit(caster, target, skill, skillHitResult);
@@ -96,14 +88,13 @@ namespace Melia.Zone.Skills.Handlers.Base
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
 		}
 
-		public async Task SkillHitInfo(Skill skill, ICombatEntity caster, ISplashArea splashArea, TimeSpan damageDelay)
+		public async Task SkillHitInfo(Skill skill, ICombatEntity caster, ISplashArea splashArea, TimeSpan aniTime)
 		{
 			var hitDelay = this.GetHitDelay(skill);
 
-			if (hitDelay > TimeSpan.Zero)
-				await skill.Wait(hitDelay);
+			if (aniTime > TimeSpan.Zero)
+				await skill.Wait(aniTime);
 
-			// Check if attacker is still able to fight after the delay
 			if (!caster.CanFight())
 				return;
 
@@ -116,7 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Base
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, hitDelay, skillHitDelay);
 				hits.Add(skillHit);
 
 				this.OnHit(caster, target, skill, skillHitResult);
@@ -142,13 +133,13 @@ namespace Melia.Zone.Skills.Handlers.Base
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <returns></returns>
-		protected virtual TimeSpan GetDamageDelay(Skill skill)
+		protected virtual TimeSpan GetAniTime(Skill skill)
 		{
 			var hitTime = skill.Data.HitTime.First();
 			var skillHitDelay = skill.Properties.HitDelay;
-			var damageDelay = hitTime + skillHitDelay;
+			var aniTime = hitTime + skillHitDelay;
 
-			return damageDelay;
+			return aniTime;
 		}
 
 		/// <summary>

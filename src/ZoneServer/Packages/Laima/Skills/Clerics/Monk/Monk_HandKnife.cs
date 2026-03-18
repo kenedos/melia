@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 		private const float DefPenetrationPerLevel = 0.01f;
 		private const float MaxDefPenetration = 0.40f;
 
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(250);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(250);
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -54,14 +54,14 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 25, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 50;
-			var damageDelay = 250;
+			var aniTime = 250;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, modifySkillHitResult: ModifyResult, skillModifier: modifier);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, modifySkillHitResult: ModifyResult, skillModifier: modifier);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 25, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			hitDelay = 150;
-			damageDelay = 250;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, modifySkillHitResult: ModifyResult, skillModifier: modifier);
+			aniTime = 250;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, modifySkillHitResult: ModifyResult, skillModifier: modifier);
 
 			if (caster.TryGetActiveAbilityLevel(AbilityId.Monk5, out var abilityLevel))
 				SkillResultTargetBuff(caster, skill, BuffId.ArmorBreak, abilityLevel, 0f, 8000, 1, 100, -1, hits);

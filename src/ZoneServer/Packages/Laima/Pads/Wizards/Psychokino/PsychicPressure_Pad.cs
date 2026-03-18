@@ -105,13 +105,13 @@ namespace Melia.Zone.Pads.HandlersOverride
 		/// <param name="target"></param>
 		private void Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
-			var damageDelay = TimeSpan.Zero;
+			var aniTime = TimeSpan.Zero;
 			var skillHitDelay = TimeSpan.Zero;
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 			target.TakeDamage(skillHitResult.Damage, caster);
 
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
+			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			Send.ZC_SKILL_HIT_INFO(caster, skillHit);
 

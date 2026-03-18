@@ -139,7 +139,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 		private async void ThrowProjectile(ICombatEntity caster, ICombatEntity target, Skill skill, int delay, int randDist, int count)
 		{
 			var splashArea = this.GetSplashArea(skill, caster, target);
-			var damageDelay = this.GetDamageDelay(skill) + TimeSpan.FromMilliseconds(delay);
+			var aniTime = this.GetAniTime(skill) + TimeSpan.FromMilliseconds(delay);
 			var hitDelay = this.GetHitDelay(skill);
 			var skillHitDelay = skill.Properties.HitDelay;
 
@@ -162,7 +162,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 						var skillHitResult = SCR_SkillHit(caster, currentTarget, skill);
 						currentTarget.TakeDamage(skillHitResult.Damage, caster);
 
-						var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, damageDelay, skillHitDelay);
+						var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, aniTime, skillHitDelay);
 						hits.Add(skillHit);
 					}
 
@@ -175,7 +175,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 	[SkillHandler(SkillId.Mon_boss_dionia_Skill_3)]
 	public class MonBossDioniaSkill3 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1600);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1600);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -260,7 +260,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 		private async void ThrowProjectile(ICombatEntity caster, ICombatEntity target, Skill skill, int delay, int randDist, int count)
 		{
 			var splashArea = this.GetSplashArea(skill, caster, target);
-			var damageDelay = this.GetDamageDelay(skill);
+			var aniTime = this.GetAniTime(skill);
 			var hitDelay = this.GetHitDelay(skill);
 			var skillHitDelay = skill.Properties.HitDelay;
 
@@ -285,7 +285,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 					var skillHitResult = SCR_SkillHit(caster, currentTarget, skill);
 					currentTarget.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, damageDelay, skillHitDelay);
+					var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, aniTime, skillHitDelay);
 					hits.Add(skillHit);
 				}
 
@@ -374,7 +374,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 	[SkillHandler(SkillId.Mon_boss_dionia_Skill_6)]
 	public class MonBossDioniaSkill6 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(10199);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(10199);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))

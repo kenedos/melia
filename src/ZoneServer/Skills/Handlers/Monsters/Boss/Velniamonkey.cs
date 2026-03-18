@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Velniamonkey_Skill_1)]
 	public class Mon_boss_Velniamonkey_Skill_1 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(1900);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(1900);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -47,8 +47,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 30, angle: 35f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 1700;
-			var damageDelay = 1900;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 1900;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
 
@@ -210,7 +210,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Velniamonkey_Skill_5)]
 	public class Mon_boss_Velniamonkey_Skill_5 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(2600);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(2600);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -236,7 +236,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var hitDelays = new[] { 2400, 100, 100, 100, 400, 100 };
-			var damageDelays = new[] { 2600, 2700, 2800, 2900, 3300, 3400 };
+			var aniTimes = new[] { 2600, 2700, 2800, 2900, 3300, 3400 };
 
 			var hits = new List<SkillHitInfo>();
 			for (var i = 0; i < 6; i++)
@@ -244,7 +244,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 130, width: 30, angle: 20f);
 				var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 				hits = new List<SkillHitInfo>();
-				await SkillAttack(caster, skill, splashArea, hitDelays[i], damageDelays[i], hits);
+				await SkillAttack(caster, skill, splashArea, hitDelays[i], aniTimes[i], hits);
 			}
 
 			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 5000f, 1, 30, -1, hits);
@@ -254,7 +254,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 	[SkillHandler(SkillId.Mon_boss_Velniamonkey_Skill_6)]
 	public class Mon_boss_Velniamonkey_Skill_6 : ITargetSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(3000);
+		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(3000);
 		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -282,8 +282,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 30, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 2800;
-			var damageDelay = 3000;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			var aniTime = 3000;
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2500));
 
 			var spawns = new[]

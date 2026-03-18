@@ -60,8 +60,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(30);
-			var damageDelay1 = TimeSpan.FromMilliseconds(50);
-			var damageDelay2 = TimeSpan.FromMilliseconds(80);
+			var aniTime1 = TimeSpan.FromMilliseconds(50);
+			var aniTime2 = TimeSpan.FromMilliseconds(80);
 			var delayBetweenHits = TimeSpan.FromMilliseconds(330);
 			var skillHitDelay = TimeSpan.Zero;
 
@@ -80,7 +80,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay1, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime1, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);
@@ -98,7 +98,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay2, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime2, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);

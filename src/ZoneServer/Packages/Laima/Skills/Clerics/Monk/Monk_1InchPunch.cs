@@ -51,10 +51,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 25, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 250;
-			var damageDelay = 450;
+			var aniTime = 450;
 			var hits = new List<SkillHitInfo>();
 
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, modifySkillHitResult: (sk, attacker, target, result) =>
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, modifySkillHitResult: (sk, attacker, target, result) =>
 			{
 				if (result.Damage <= 0)
 					return result;

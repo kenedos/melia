@@ -54,8 +54,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			var hitDelay = 80;
-			var damageDelay = 280;
-			skill.Run(SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits, this.ApplyStun));
+			var aniTime = 280;
+			skill.Run(SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ApplyStun));
 		}
 
 		/// <summary>

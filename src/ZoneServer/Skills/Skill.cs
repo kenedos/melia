@@ -365,13 +365,13 @@ namespace Melia.Zone.Skills
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <returns></returns>
-		public virtual TimeSpan GetDamageDelay()
+		public virtual TimeSpan GetAniTime()
 		{
 			var hitTime = this.Data.HitTime.First();
 			var skillHitDelay = this.Properties.HitDelay;
-			var damageDelay = hitTime + skillHitDelay;
+			var aniTime = hitTime + skillHitDelay;
 
-			return damageDelay;
+			return aniTime;
 		}
 
 		/// <summary>
