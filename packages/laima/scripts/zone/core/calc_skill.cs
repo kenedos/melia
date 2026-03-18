@@ -516,6 +516,23 @@ public class SkillCalculationsScript : GeneralScript
 				}
 			}
 
+			// Catena Chain Arrow buff: Reduce Fletcher arrow skill cooldowns
+			if (owner.IsBuffActive(BuffId.Fletcher_CatenaChainArrow_Buff)
+				&& (skill.Id == SkillId.Fletcher_BodkinPoint || skill.Id == SkillId.Fletcher_BodkinPoint_2
+					|| skill.Id == SkillId.Fletcher_BarbedArrow || skill.Id == SkillId.Fletcher_BarbedArrow_2
+					|| skill.Id == SkillId.Fletcher_CrossFire || skill.Id == SkillId.Fletcher_CrossFire_2
+					|| skill.Id == SkillId.Fletcher_Singijeon || skill.Id == SkillId.Fletcher_Singijeon_2))
+			{
+				if (owner.TryGetBuff(BuffId.Fletcher_CatenaChainArrow_Buff, out var catenaBuff))
+				{
+					var catenaReduction = 0.25f + 0.025f * catenaBuff.NumArg1;
+					if (owner.TryGetActiveAbilityLevel(AbilityId.Fletcher37, out var fletcher37Level))
+						catenaReduction *= 1f + 0.005f * fletcher37Level;
+					catenaReduction = Math.Min(catenaReduction, 0.75f);
+					basicCooldown *= (1f - catenaReduction);
+				}
+			}
+
 			// AyinSof CoolTime Buff
 			var ayinSofCoolTime = owner.GetTempVar("AyinSof_BUFF_COOLDOWN");
 			if (ayinSofCoolTime != 0 && skill.Data.CooldownGroup != CooldownId.ItemSetSkill)
@@ -653,6 +670,6 @@ public class SkillCalculationsScript : GeneralScript
 			ret += (float)Math.Floor(ret * tbAddCoolDownRate);
 		}
 
-		return (int)Math.Floor(ret);
+		return (int)Math.Max(0, Math.Floor(ret));
 	}
 }
