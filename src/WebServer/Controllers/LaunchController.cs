@@ -157,6 +157,14 @@ namespace Melia.Web.Controllers
 				xml.WriteStartDocument();
 				xml.WriteStartElement("patchlist");
 
+				var conf = WebServer.Instance.Conf.Web;
+
+				if (conf.PatchCustomPatchStart >= 0)
+					xml.WriteAttributeString("custom_patch_start", conf.PatchCustomPatchStart.ToString());
+
+				if (conf.PatchCumulativeEnabled)
+					xml.WriteAttributeString("cumulative_patch", "true");
+
 				foreach (var patch in existingHashes)
 				{
 					xml.WriteStartElement(patch.IsExecutable ? "client" : "prepatch");

@@ -86,6 +86,17 @@ namespace Melia.Shared.Configuration.Files
 		public float CpUnstuckZ { get; private set; }
 
 		/// <summary>
+		/// Returns the patch index where custom patches start.
+		/// Set to -1 to disable.
+		/// </summary>
+		public int PatchCustomPatchStart { get; private set; }
+
+		/// <summary>
+		/// Returns whether cumulative patching mode is enabled.
+		/// </summary>
+		public bool PatchCumulativeEnabled { get; private set; }
+
+		/// <summary>
 		/// Loads conf file and its options from the given path.
 		/// </summary>
 		/// <param name="filePath"></param>
@@ -129,6 +140,10 @@ namespace Melia.Shared.Configuration.Files
 			this.CpUnstuckX = this.GetFloat("cp_unstuck_x", -430f);
 			this.CpUnstuckY = this.GetFloat("cp_unstuck_y", 261f);
 			this.CpUnstuckZ = this.GetFloat("cp_unstuck_z", -650f);
+
+			// Patch list
+			this.PatchCustomPatchStart = this.GetInt("patch_custom_start", -1);
+			this.PatchCumulativeEnabled = this.GetBool("patch_cumulative", false);
 		}
 
 		/// <summary>
