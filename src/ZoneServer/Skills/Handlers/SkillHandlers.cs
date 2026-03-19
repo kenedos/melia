@@ -138,6 +138,22 @@ namespace Melia.Zone.Skills.Handlers
 			if (handler is ISkillCombatAttackAfterBonusesHandler afterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_Attack_" + skillId, afterBonusesAttackHandler.OnAttackAfterBonuses);
 			if (handler is ISkillCombatDefenseAfterBonusesHandler afterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_Defense_" + skillId, afterBonusesDefenseHandler.OnDefenseAfterBonuses);
 #pragma warning restore CS0618 // Type or member is obsolete
+
+			if (handler is ISkillOnBuffStartHandler buffStartHandler)
+			{
+				ScriptableFunctions.SkillBuffHook.Register("SCR_Buff_OnStart_" + skillId, (skill, target, buff) =>
+				{
+					buffStartHandler.OnBuffStart(skill, target, buff);
+				});
+			}
+
+			if (handler is ISkillOnBuffEndHandler buffEndHandler)
+			{
+				ScriptableFunctions.SkillBuffHook.Register("SCR_Buff_OnEnd_" + skillId, (skill, target, buff) =>
+				{
+					buffEndHandler.OnBuffEnd(skill, target, buff);
+				});
+			}
 		}
 
 		private delegate void CombatCalcHookFunction(Skill skill, ICombatEntity attacker, ICombatEntity target, Skill attackerSkill, SkillModifier modifier, SkillHitResult skillHitResult);
@@ -157,6 +173,9 @@ namespace Melia.Zone.Skills.Handlers
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeBonuses_Defense_" + skillId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Attack_" + skillId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Defense_" + skillId);
+
+			ScriptableFunctions.SkillBuffHook.Remove("SCR_Buff_OnStart_" + skillId);
+			ScriptableFunctions.SkillBuffHook.Remove("SCR_Buff_OnEnd_" + skillId);
 		}
 
 		/// <summary>
