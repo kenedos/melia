@@ -3,6 +3,7 @@ using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
+using Yggdrasil.Util;
 
 namespace Melia.Zone.Skills
 {
@@ -42,6 +43,11 @@ namespace Melia.Zone.Skills
 		/// Whether the ability is active.
 		/// </summary>
 		public bool Active { get; set; } = true;
+
+		/// <summary>
+		/// The ability's temporary variables.
+		/// </summary>
+		public Variables Vars { get; } = new Variables();
 
 		/// <summary>
 		/// Creates new instance.

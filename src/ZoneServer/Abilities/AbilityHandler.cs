@@ -90,10 +90,10 @@ namespace Melia.Zone.Abilities
 			var varName = GetModifierVarName(propertyName);
 			var oldValue = 0f;
 
-			ability.Properties.TryGetFloat(varName, out oldValue);
+			ability.Vars.TryGetFloat(varName, out oldValue);
 
 			var newValue = oldValue + value;
-			ability.Properties.SetFloat(varName, newValue);
+			ability.Vars.SetFloat(varName, newValue);
 			character.Properties.Modify(propertyName, value);
 
 			Send.ZC_OBJECT_PROPERTY(character, propertyName);
@@ -115,10 +115,10 @@ namespace Melia.Zone.Abilities
 
 			var varName = GetModifierVarName(propertyName);
 
-			if (ability.Properties.TryGetFloat(varName, out var value))
+			if (ability.Vars.TryGetFloat(varName, out var value))
 			{
 				character.Properties.Modify(propertyName, -value);
-				ability.Properties.Remove(varName);
+				ability.Vars.Remove(varName);
 
 				Send.ZC_OBJECT_PROPERTY(character, propertyName);
 			}
