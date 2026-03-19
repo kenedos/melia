@@ -31,6 +31,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 
 		private static void ChargeArrow(Skill skill, ICombatEntity caster)
 		{
+			if (!caster.TryGetSkill(SkillId.Fletcher_BarbedArrow, out _))
+				return;
+
 			if (caster.TryGetActiveAbility(AbilityId.Fletcher44, out _))
 				return;
 

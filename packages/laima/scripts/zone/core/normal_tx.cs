@@ -18,6 +18,7 @@ using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
+using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -228,6 +229,12 @@ public class NormalTxFunctionsScript : GeneralScript
 				skill.Properties.InvalidateAll();
 				Send.ZC_OBJECT_PROPERTY(character.Connection, skill);
 			}
+
+			// Trigger passive handler for newly learned/leveled skills
+			// so that skills like Fletcher arrows can auto-charge their
+			// quiver without requiring a map change or relog.
+			if (ZoneServer.Instance.SkillHandlers.TryGetPassiveSkillHandler<IPassiveSkillHandler>(skillId, out var passiveHandler))
+				passiveHandler.Handle(skill, character);
 
 			job.SkillPoints -= addLevels;
 

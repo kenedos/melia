@@ -15,5 +15,9 @@ public class DZachariel36NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddNpc(3008, 40120, "Statue of Goddess Vakarine", "d_zachariel_36", -2509.775, 329.4753, -5506.343, 25, "WARP_D_ZACHARIEL_36", "STOUP_CAMP", "STOUP_CAMP");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(3025, 147392, "Lv1 Treasure Chest", "d_zachariel_36", -2772.17, 324.06, -4747.02, 0, "TREASUREBOX_LV_D_ZACHARIEL_363025", "", "");
 	}
 }

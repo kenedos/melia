@@ -20,5 +20,9 @@ public class FHuevillage581NpcScript : GeneralScript
 		//---------------------------------------------------------------------------
 		AddTrackNPC(153008, "", "f_huevillage_58_1", 638.2, 129.74, 468.58, 0, "f_huevillage58_1_cablecar", 2, 5);
 
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(50, 147392, "Lv1 Treasure Chest", "f_huevillage_58_1", -315.60, 371.41, -1374.85, 90, "TREASUREBOX_LV_F_HUEVILLAGE_58_150", "", "");
 	}
 }

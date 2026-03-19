@@ -12,5 +12,9 @@ public class DVelniasprison541NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(52, 147392, "Lv1 Treasure Chest", "d_velniasprison_54_1", 507, 90, -608, 0, "TREASUREBOX_LV_D_VELNIASPRISON_54_152", "", "");
 	}
 }

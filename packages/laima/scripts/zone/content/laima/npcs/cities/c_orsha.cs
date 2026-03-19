@@ -149,6 +149,10 @@ public class COrshaNpcScript : GeneralScript
 		AddPlatformNpc("c_orsha", -423, 529, 92, 0, "blue");
 		AddPlatformNpc("c_orsha", -423, 569, 92, 0, "white");
 		AddFloatingTreasureChestSpawner("Laima.Treasures.Orsha.Chest1", "c_orsha", -423, 569, 92, 0, ItemId.EmoticonItem_55_58, monsterId: 147393);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(150, 147392, "Lv1 Treasure Chest", "c_orsha", -461.54, 505.13, -277, -135, "TREASUREBOX_LV_C_ORSHA150", "", "");
 	}
 
 	/// <summary>
