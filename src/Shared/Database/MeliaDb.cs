@@ -269,6 +269,12 @@ namespace Melia.Shared.Database
 							}
 						}
 
+						if (!PropertyTable.Exists(properties.Namespace, propertyName))
+						{
+							Log.Warning($"MeliaDb.LoadProperties: Property '{propertyName}' doesn't exist in namespace '{properties.Namespace}', skipping.");
+							continue;
+						}
+
 						if (typeStr == "f")
 						{
 							if (!properties.TryGet<FloatProperty>(propertyName, out var property))
