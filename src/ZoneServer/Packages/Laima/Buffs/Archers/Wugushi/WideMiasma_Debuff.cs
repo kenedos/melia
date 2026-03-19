@@ -2,6 +2,7 @@ using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.SplashAreas;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Buffs.Handlers
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.WideMiasma_Debuff)]
-	public class WideMiasma_DebuffOverride : DamageOverTimeBuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class WideMiasma_DebuffOverride : DamageOverTimeBuffHandler
 	{
 		private const float SpreadRange = 50f;
 		private const float SpreadChance = 20f;
@@ -32,8 +33,12 @@ namespace Melia.Zone.Buffs.Handlers
 		/// When the target is struck, each poison debuff on the target
 		/// has a 20% chance to spread to 1 nearby enemy.
 		/// </summary>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.WideMiasma_Debuff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.WideMiasma_Debuff, out var buff))
+				return;
+
 			if (buff.Caster is not ICombatEntity caster)
 				return;
 

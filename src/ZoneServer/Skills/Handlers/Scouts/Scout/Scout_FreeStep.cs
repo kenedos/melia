@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -21,10 +20,10 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
-		/// <param name="dir"></param>
+		/// <param name="farPos"></param>
+		/// <param name="target"></param>
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -34,10 +33,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			target = caster;
-
 			var duration = TimeSpan.FromMinutes(30);
-			target.StartBuff(BuffId.FreeStep_Buff, skill.Level, 0, duration, caster);
+			caster.StartBuff(BuffId.FreeStep_Buff, skill.Level, 0, duration, caster);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, originPos, null);
 		}

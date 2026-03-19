@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Highlander
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.CrossGuard_Buff)]
-	public class CrossGuard_BuffOverride : BuffHandler, IBuffCombatDefenseBeforeCalcHandler
+	public class CrossGuard_BuffOverride : BuffHandler
 	{
 		private const float PercentageEvasionBlkBonusPerLevel = 0.05f;
 		private const float AbilityBonus = 0.005f;
@@ -58,14 +59,17 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Highlander
 		/// <summary>
 		/// Applies the buff's effect during the combat calculations.
 		/// </summary>
-		/// <param name="buff"></param>
 		/// <param name="attacker"></param>
 		/// <param name="target"></param>
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.CrossGuard_Buff)]
+		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.CrossGuard_Buff, out var buff))
+				return;
+
 			target.StartBuff(BuffId.CrossGuard_Damage_Buff, buff.NumArg1, 0, TimeSpan.FromSeconds(DebuffDuration), target);
 		}
 	}

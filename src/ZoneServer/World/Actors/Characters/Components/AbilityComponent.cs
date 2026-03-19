@@ -192,6 +192,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Returns the ability with the given id via out, or null if it
+		/// didn't exist.
+		/// </summary>
+		/// <param name="abilityClassName"></param>
+		/// <param name="ability"></param>
+		/// <returns></returns>
+		public bool TryGet(string abilityClassName, out Ability ability)
+		{
+			ability = this.Get(abilityClassName);
+			return (ability != null);
+		}
+
+		/// <summary>
 		/// Returns the total modifier of the given type for the category
 		/// based on all active abilities. May return 0 if there are no
 		/// relevant modifiers.
@@ -275,12 +288,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public bool Toggle(string className)
 		{
-			var data = ZoneServer.Instance.Data.AbilityDb.Find(className);
-			if (data == null || data.Passive)
+			if (!this.TryGet(className, out var ability))
 				return false;
 
-			var ability = this.Get(data.Id);
-			if (ability == null)
+			if (ability.Data.Passive)
 				return false;
 
 			// Deactivate before toggling off, activate after toggling on
@@ -293,7 +304,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, this.Character);
 
 			Send.ZC_OBJECT_PROPERTY(this.Character.Connection, ability);
-			Send.ZC_ADDON_MSG(this.Character, AddonMessage.RESET_ABILITY_ACTIVE, 0, "Swordman28");
+			Send.ZC_ADDON_MSG(this.Character, AddonMessage.RESET_ABILITY_ACTIVE, 0, className);
 
 			return true;
 		}

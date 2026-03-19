@@ -1,5 +1,6 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -13,12 +14,16 @@ namespace Melia.Zone.Abilities.Handlers
 	/// </summary>
 	[Package("laima")]
 	[AbilityHandler(AbilityId.Elementalist39)]
-	public class Elementalist39Override : IAbilityHandler, IAbilityCombatAttackAfterCalcHandler
+	public class Elementalist39Override : IAbilityHandler
 	{
 		private const float DamagePerLevelPerCondition = 0.005f;
 
-		public void OnAttackAfterCalc(Ability ability, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, AbilityId.Elementalist39)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetActiveAbility(AbilityId.Elementalist39, out var ability))
+				return;
+
 			var conditionCount = 0;
 
 			if (target.IsBuffActiveByKeyword(BuffTag.Fire))

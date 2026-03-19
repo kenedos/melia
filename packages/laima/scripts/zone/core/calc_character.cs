@@ -535,7 +535,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byAbility = 1.0f;
 		if (character.Abilities.TryGet(AbilityId.Cloth, out var ability))
 		{
-			byAbility += character.IsWearingFullArmorSetOfType(ArmorMaterialType.Cloth) ? 1.0f : 0f;
+			byAbility += character.Inventory.CountEquipMaterial(ArmorMaterialType.Cloth) >= 4 ? 1.0f : 0f;
 		}
 		value *= byAbility;
 
@@ -805,7 +805,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byAbility = 1.0f;
 		if (character.Abilities.TryGet(AbilityId.Cloth, out var ability))
 		{
-			byAbility += character.IsWearingFullArmorSetOfType(ArmorMaterialType.Cloth) ? 1.0f : 0f;
+			byAbility += character.Inventory.CountEquipMaterial(ArmorMaterialType.Cloth) >= 4 ? 1.0f : 0f;
 		}
 		value /= byAbility;
 
@@ -1464,7 +1464,7 @@ public class CharacterCalculationsScript : GeneralScript
 		if (character.Abilities.TryGet(AbilityId.Leather, out var ability))
 		{
 			rate = 0.6f;
-			byAbility += character.IsWearingFullArmorSetOfType(ArmorMaterialType.Leather) ? (float)Math.Floor(value * rate) : 0f;
+			byAbility += character.Inventory.CountEquipMaterial(ArmorMaterialType.Leather) >= 4 ? (float)Math.Floor(value * rate) : 0f;
 		}
 
 		value += byBuffs + byAbility + byRateBuffs;

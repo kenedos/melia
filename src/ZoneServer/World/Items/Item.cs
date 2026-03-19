@@ -508,49 +508,42 @@ namespace Melia.Zone.World.Items
 		/// </summary>
 		public void MigrateProperties()
 		{
-			// Check if the item has the incorrect GemLevel property set
-			if (!this.Properties.TryGetFloat(PropertyName.GemLevel, out var gemLevelValue) || gemLevelValue == 0)
-				return;
-
-			// For cards, GemLevel is invalid - remove it and ensure CardLevel is set correctly
-			if (this.Data.Group == ItemGroup.Card)
+			if (this.Properties.TryGetFloat(PropertyName.GemLevel, out var gemLevelValue) && gemLevelValue != 0)
 			{
-				this.Properties.Remove(PropertyName.GemLevel);
-
-				// Recalculate CardLevel from ItemExp if needed
-				if (this.Properties.TryGetFloat(PropertyName.ItemExp, out var itemExp) && itemExp > 0)
+				if (this.Data.Group == ItemGroup.Card)
 				{
-					this.GetItemLevelExp((int)itemExp, out var level, out var curExp, out var maxExp);
-					this.Properties.SetFloat(PropertyName.CardLevel, level);
-				}
-			}
-			// For gems, GemLevel should be Level - migrate it
-			else if (this.Data.Group == ItemGroup.Gem)
-			{
-				this.Properties.Remove(PropertyName.GemLevel);
+					this.Properties.Remove(PropertyName.GemLevel);
 
-				// Set the correct Level property if not already set
-				if (!this.Properties.TryGetFloat(PropertyName.Level, out var levelValue) || levelValue == 0)
-				{
 					if (this.Properties.TryGetFloat(PropertyName.ItemExp, out var itemExp) && itemExp > 0)
 					{
 						this.GetItemLevelExp((int)itemExp, out var level, out var curExp, out var maxExp);
-						this.Properties.SetFloat(PropertyName.Level, level);
-					}
-					else
-					{
-						this.Properties.SetFloat(PropertyName.Level, gemLevelValue);
+						this.Properties.SetFloat(PropertyName.CardLevel, level);
 					}
 				}
+				else if (this.Data.Group == ItemGroup.Gem)
+				{
+					this.Properties.Remove(PropertyName.GemLevel);
 
-				// Update gem stat options if needed
-				if (this.Data.EquipExpGroup == EquipExpGroup.Gem)
-					this.UpdateGemStatOptions();
-			}
-			// For any other item type, just remove the invalid property
-			else
-			{
-				this.Properties.Remove(PropertyName.GemLevel);
+					if (!this.Properties.TryGetFloat(PropertyName.Level, out var levelValue) || levelValue == 0)
+					{
+						if (this.Properties.TryGetFloat(PropertyName.ItemExp, out var itemExp) && itemExp > 0)
+						{
+							this.GetItemLevelExp((int)itemExp, out var level, out var curExp, out var maxExp);
+							this.Properties.SetFloat(PropertyName.Level, level);
+						}
+						else
+						{
+							this.Properties.SetFloat(PropertyName.Level, gemLevelValue);
+						}
+					}
+
+					if (this.Data.EquipExpGroup == EquipExpGroup.Gem)
+						this.UpdateGemStatOptions();
+				}
+				else
+				{
+					this.Properties.Remove(PropertyName.GemLevel);
+				}
 			}
 		}
 

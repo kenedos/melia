@@ -3,6 +3,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Buffs.Handlers;
 using Melia.Zone.Scripting.AI;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -17,7 +18,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Lachrymator_Debuff)]
-	public class Lachrymator_DebuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Lachrymator_DebuffOverride : BuffHandler
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -32,8 +33,12 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 			buff.Target.RemoveState(StateType.Held);
 		}
 
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Lachrymator_Debuff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Lachrymator_Debuff, out var buff))
+				return;
+
 			target.StopBuff(BuffId.Lachrymator_Debuff);
 		}
 	}

@@ -58,7 +58,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await this.WaitUntilGrounded(caster);
+			await skill.Wait(this.WaitUntilGrounded(caster));
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -101,7 +101,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			// Barbarian 31 triggers a rejump afterwards
 			if (caster.IsAbilityActive(AbilityId.Barbarian31))
 			{
-				await Task.Delay(100);
+				await skill.Wait(100);
 
 				if (caster.Components.TryGet<MovementComponent>(out var movementComponent))
 				{

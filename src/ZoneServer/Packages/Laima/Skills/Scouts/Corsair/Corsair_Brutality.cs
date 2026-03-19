@@ -1,6 +1,7 @@
 using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
@@ -15,11 +16,12 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Corsair_Brutality)]
-	public class Corsair_BrutalityOverride : ISkillHandler, ISkillCombatAttackAfterCalcHandler
+	public class Corsair_BrutalityOverride : ISkillHandler
 	{
 		private const int BuffDurationMs = 10000;
 
-		public void OnAttackAfterCalc(Skill skill, ICombatEntity attacker, ICombatEntity target, Skill attackerSkill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, SkillId.Corsair_Brutality)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
 			if (skillHitResult.Result == HitResultType.Dodge)
 				return;
@@ -33,16 +35,19 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 			if (character.TryGetBuff(BuffId.Brutality_Buff, out var buff) && buff.RemainingDuration >= TimeSpan.FromSeconds(6))
 				return;
 
+			if (!character.TryGetSkill(SkillId.Corsair_Brutality, out var brutalitySkill))
+				return;
+
 			var buffDuration = TimeSpan.FromMilliseconds(BuffDurationMs);
 
 			if (character.HasParty)
 			{
 				foreach (var member in character.Map.GetPartyMembers(character))
-					member.StartBuff(BuffId.Brutality_Buff, skill.Level, 0, buffDuration, character);
+					member.StartBuff(BuffId.Brutality_Buff, brutalitySkill.Level, 0, buffDuration, character);
 			}
 			else
 			{
-				character.StartBuff(BuffId.Brutality_Buff, skill.Level, 0, buffDuration, character);
+				character.StartBuff(BuffId.Brutality_Buff, brutalitySkill.Level, 0, buffDuration, character);
 			}
 		}
 	}

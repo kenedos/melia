@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
@@ -41,9 +40,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
+		/// <param name="target"></param>
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
-			var target = targets.FirstOrDefault();
 			Send.ZC_SKILL_CAST_CANCEL(caster);
 		}
 	}

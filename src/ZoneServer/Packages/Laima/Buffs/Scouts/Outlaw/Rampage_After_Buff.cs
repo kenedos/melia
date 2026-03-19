@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -17,7 +18,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.OutLaw
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.Rampage_After_Buff)]
-	public class Rampage_After_BuffOverride : BuffHandler, IBuffCombatAttackBeforeCalcHandler
+	public class Rampage_After_BuffOverride : BuffHandler
 	{
 		private const float DamageBonus = 0.5f;
 		private const float EvasionReduction = 0.50f;
@@ -50,8 +51,12 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.OutLaw
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnAttackBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Rampage_After_Buff)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.Rampage_After_Buff, out var buff))
+				return;
+
 			modifier.FinalDamageMultiplier += DamageBonus;
 		}
 	}

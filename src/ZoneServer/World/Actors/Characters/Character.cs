@@ -668,6 +668,8 @@ namespace Melia.Zone.World.Actors.Characters
 						}
 					}
 
+					this.Variables.Perm.SetInt("Melia.ResurrectOptions", (int)options);
+
 					Send.ZC_RESURRECT_DIALOG(this, options);
 					_resurrectDialogTimer = ResurrectDialogDelay;
 				}

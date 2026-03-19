@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -11,7 +12,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Archers.Fletcher
 {
 	[Package("laima")]
 	[BuffHandler(BuffId.Fletcher_CatenaChainArrow_Buff)]
-	public class Fletcher_CatenaChainArrow_BuffOverride : BuffHandler, IBuffCombatAttackBeforeBonusesHandler
+	public class Fletcher_CatenaChainArrow_BuffOverride : BuffHandler
 	{
 		private static readonly SkillId[] FletcherSkills = new[]
 		{
@@ -30,8 +31,12 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Archers.Fletcher
 			InvalidateFletcherCooldowns(buff.Target);
 		}
 
-		public void OnAttackBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.Fletcher_CatenaChainArrow_Buff)]
+		public void OnAttackBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.Fletcher_CatenaChainArrow_Buff, out var buff))
+				return;
+
 			if (skill.Data.Attribute == AttributeType.None || skill.Data.Attribute == AttributeType.Melee)
 				modifier.AttackAttribute = AttributeType.Magic;
 		}

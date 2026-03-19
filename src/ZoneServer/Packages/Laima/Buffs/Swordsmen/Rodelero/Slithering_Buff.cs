@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -17,7 +18,7 @@ namespace Melia.Zone.Buffs.Handlers
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Slithering_Buff)]
-	public class Slithering_BuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Slithering_BuffOverride : BuffHandler
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -61,8 +62,12 @@ namespace Melia.Zone.Buffs.Handlers
 			target.Properties.Modify(PropertyName.Jumpable, 1);
 		}
 
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Slithering_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Slithering_Buff, out var buff))
+				return;
+
 			if (skill.Data.ClassType != SkillClassType.Magic)
 				return;
 

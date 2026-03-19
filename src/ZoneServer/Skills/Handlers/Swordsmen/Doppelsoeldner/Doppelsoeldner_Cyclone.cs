@@ -78,7 +78,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster));
+			skill.Run(this.Attack(skill, caster));
 		}
 
 		/// <summary>
@@ -107,7 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 
 			for (var i = 0; i < totalHits; ++i)
 			{
-				await Task.Delay(hitDelay);
+				await skill.Wait(hitDelay);
 
 				var splashParam = skill.GetSplashParameters(caster, caster.Position, caster.Position, length: 0, width: attackWidth, angle: 0);
 				var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
@@ -127,7 +127,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 				Send.ZC_SKILL_HIT_INFO(caster, hits);
 
 				if (i < totalHits - 1)
-					await Task.Delay(delayBetweenRepeats);
+					await skill.Wait(delayBetweenRepeats);
 
 				hits.Clear();
 

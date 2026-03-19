@@ -57,6 +57,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			for (var i = 0; i < maxTargets; i++)
 			{
 				var hitTarget = targets[i];
+
 				if (hitTarget.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
 					continue;
 

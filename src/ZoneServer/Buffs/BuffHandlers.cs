@@ -128,6 +128,7 @@ namespace Melia.Zone.Buffs
 				});
 			}
 
+#pragma warning disable CS0618 // Type or member is obsolete
 			if (handler is IBuffCombatAttackBeforeCalcHandler beforeCalcAttackHandler) registerAttackFunc("SCR_Combat_BeforeCalc_Attack_" + buffId, beforeCalcAttackHandler.OnAttackBeforeCalc);
 			if (handler is IBuffCombatDefenseBeforeCalcHandler beforeCalcDefenseHandler) registerDefenseFunc("SCR_Combat_BeforeCalc_Defense_" + buffId, beforeCalcDefenseHandler.OnDefenseBeforeCalc);
 
@@ -139,6 +140,7 @@ namespace Melia.Zone.Buffs
 
 			if (handler is IBuffCombatAttackAfterBonusesHandler afterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_Attack_" + buffId, afterBonusesAttackHandler.OnAttackAfterBonuses);
 			if (handler is IBuffCombatDefenseAfterBonusesHandler afterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_Defense_" + buffId, afterBonusesDefenseHandler.OnDefenseAfterBonuses);
+
 
 			// Companion-specific combat hooks
 			if (handler is IBuffCombatCompanionAttackBeforeCalcHandler companionBeforeCalcAttackHandler) registerAttackFunc("SCR_Combat_BeforeCalc_CompanionAttack_" + buffId, companionBeforeCalcAttackHandler.OnCompanionAttackBeforeCalc);
@@ -152,6 +154,7 @@ namespace Melia.Zone.Buffs
 
 			if (handler is IBuffCombatCompanionAttackAfterBonusesHandler companionAfterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_CompanionAttack_" + buffId, companionAfterBonusesAttackHandler.OnCompanionAttackAfterBonuses);
 			if (handler is IBuffCombatCompanionDefenseAfterBonusesHandler companionAfterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_CompanionDefense_" + buffId, companionAfterBonusesDefenseHandler.OnCompanionDefenseAfterBonuses);
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 
 		/// <summary>
@@ -160,7 +163,6 @@ namespace Melia.Zone.Buffs
 		/// <param name="buffId"></param>
 		private void RemoveCombatEvents(BuffId buffId)
 		{
-			// Remove all possible combat hook functions that may have been registered
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Attack_" + buffId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Defense_" + buffId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Attack_" + buffId);
@@ -170,7 +172,6 @@ namespace Melia.Zone.Buffs
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Attack_" + buffId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Defense_" + buffId);
 
-			// Companion hooks
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_CompanionAttack_" + buffId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_CompanionDefense_" + buffId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_CompanionAttack_" + buffId);

@@ -4,6 +4,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Link_Enemy)]
-	public class Link_EnemyOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Link_EnemyOverride : BuffHandler
 	{
 		private const float BaseDamageReduction = -0.30f;
 		private const float DamageIncreasePerSkillLevel = 0.03f;
@@ -45,8 +46,12 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Link_Enemy)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Link_Enemy, out var buff))
+				return;
+
 			if (!buff.Vars.TryGet<List<int>>("Melia.Link.Members", out var memberHandles))
 				return;
 

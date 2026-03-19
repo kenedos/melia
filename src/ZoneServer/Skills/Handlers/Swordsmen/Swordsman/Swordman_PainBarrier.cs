@@ -3,6 +3,8 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
+using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 
@@ -32,18 +34,57 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var target = caster;
+			caster.StartBuff(BuffId.PainBarrier_Buff, skill.Level, 0, GetBuffTime(skill), caster);
+			caster.StartBuff(BuffId.PainBarrierImmune_Buff, skill.Level, 0, TimeSpan.FromSeconds(3), caster);
 
+			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster, null);
+		}
+
+		/// <summary>
+		/// Returns the duration of the main buff applied by this skill.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <returns></returns>
+		public static TimeSpan GetBuffTime(Skill skill)
+		{
 			// Guru lists this skill with 5 levels that slowly increased
-			// the duration from 10s to 30s. This now appears to be the
-			// default though and the skill is set to max level 1.
-			var mainDuration = TimeSpan.FromSeconds(30);
-			var immunityDuration = TimeSpan.FromSeconds(3);
+			// the duration from 10s to 30s. But on the current version
+			// its max level is set to 1 and the skill factors work out to
+			// the same 30s duration from the get-go. We'll still
+			// calculate it though, just in case factors or levels
+			// change.
 
-			target.StartBuff(BuffId.PainBarrier_Buff, skill.Level, 0, mainDuration, caster);
-			target.StartBuff(BuffId.PainBarrierImmune_Buff, skill.Level, 0, immunityDuration, caster);
+			var baseValue = skill.Properties.GetFloat(PropertyName.SklFactor, 0);
+			var perLevel = skill.Properties.GetFloat(PropertyName.SklFactorByLevel, 0);
 
-			Send.ZC_SKILL_MELEE_TARGET(caster, skill, target, null);
+			var value = baseValue + skill.Level * perLevel;
+
+			// TODO: Enable once we have PvP.
+			//if (skill.Owner.InPvp)
+			//	value /= 2;
+
+			return TimeSpan.FromMilliseconds(value);
+		}
+
+		/// <summary>
+		/// Disables knockback during combat calculation if the target has
+		/// the Pain Barrier buff active.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="modifier"></param>
+		/// <param name="skillHitResult"></param>
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.PainBarrier_Buff)]
+		public static void OnAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		{
+			// R1 appears to solve this by checking an array of knock back
+			// immunity conditions and setting the KDArmor property to
+			// 9999 to prevent knock backs. TIL: There's a KDArmor
+			// property. Do I care? Not particularly.
+
+			if (target.IsBuffActive(BuffId.PainBarrier_Buff))
+				skillHitResult.KnockBack.Type = KnockBackType.None;
 		}
 	}
 }

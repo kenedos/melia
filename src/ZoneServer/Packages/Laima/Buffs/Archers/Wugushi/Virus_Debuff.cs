@@ -2,6 +2,7 @@ using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.SplashAreas;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Buffs.Handlers
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.Virus_Debuff)]
-	public class Virus_DebuffOverride : DamageOverTimeBuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Virus_DebuffOverride : DamageOverTimeBuffHandler
 	{
 		private const int MaxSpreadOnDeathAmount = 2;
 		private const float SpreadRange = 50f;
@@ -52,8 +53,12 @@ namespace Melia.Zone.Buffs.Handlers
 		/// When the poisoned target is struck, 20% chance to spread
 		/// poison to one nearby enemy with remaining duration.
 		/// </summary>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Virus_Debuff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Virus_Debuff, out var buff))
+				return;
+
 			if (buff.Caster is not ICombatEntity caster)
 				return;
 

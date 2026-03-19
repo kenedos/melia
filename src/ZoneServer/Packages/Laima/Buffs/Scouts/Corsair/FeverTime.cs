@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -13,14 +14,18 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.FeverTime)]
-	public class FeverTimeOverride : BuffHandler, IBuffCombatAttackAfterCalcHandler
+	public class FeverTimeOverride : BuffHandler
 	{
 		private const float BaseDamageBonus = 1.0f; // +100% Damage
 		private const float DamageBonusPerLevel = 0.1f; // +10% Damage per SkillLv
 		private const float AbilityBonusPerLevel = 0.005f; // +0.5% Damage per Corsair20 ability level
 
-		public void OnAttackAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.FeverTime)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.FeverTime, out var buff))
+				return;
+
 			if (buff.Caster is ICombatEntity caster && caster.TryGetSkillLevel(SkillId.Corsair_JollyRoger, out var level))
 			{
 				var damageBonus = BaseDamageBonus + (level * DamageBonusPerLevel);

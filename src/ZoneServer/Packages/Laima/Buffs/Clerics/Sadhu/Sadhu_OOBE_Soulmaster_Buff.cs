@@ -5,6 +5,7 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.OOBE_Soulmaster_Buff)]
-	public class Sadhu_OOBE_Soulmaster_BuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Sadhu_OOBE_Soulmaster_BuffOverride : BuffHandler
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -228,14 +229,12 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Sadhu
 			casterCharacter.RemoveEffect("Melia.OOBE.LinkBg");
 		}
 
-		/// <summary>
-		/// Damage reduction while in spirit form.
-		/// Physical: 80% damage reduction.
-		/// Holy: Double damage.
-		/// Magical: Reduced by Prakriti skill level (40% + 3% per level, max 80%).
-		/// </summary>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.OOBE_Soulmaster_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.OOBE_Soulmaster_Buff, out var buff))
+				return;
+
 			if (target is not Character targetCharacter || !targetCharacter.IsOutOfBody())
 				return;
 

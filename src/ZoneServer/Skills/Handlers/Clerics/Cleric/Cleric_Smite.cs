@@ -50,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 			var aniTime = TimeSpan.FromMilliseconds(270);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await Task.Delay(aniTime);
+			await skill.Wait(aniTime);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();

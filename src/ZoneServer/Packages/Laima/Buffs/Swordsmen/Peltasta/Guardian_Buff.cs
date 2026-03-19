@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -15,7 +16,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Guardian_Buff)]
-	public class Guardian_BuffOverride : BuffHandler, IBuffCombatDefenseBeforeCalcHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Guardian_BuffOverride : BuffHandler
 	{
 		public const float DamageReductionBase = 0.25f;
 		public const float DamageReductionPerLevel = 0.025f;
@@ -45,14 +46,17 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 		/// <summary>
 		/// Damage reduction
 		/// </summary>
-		/// <param name="buff"></param>
 		/// <param name="attacker"></param>
 		/// <param name="target"></param>
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Guardian_Buff)]
+		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Guardian_Buff, out var buff))
+				return;
+
 			var skillLevel = buff.NumArg1;
 			var multiplierReduction = DamageReductionBase + skillLevel * DamageReductionPerLevel;
 
@@ -68,14 +72,17 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 		/// <summary>
 		/// Damage reflect
 		/// </summary>
-		/// <param name="buff"></param>
 		/// <param name="attacker"></param>
 		/// <param name="target"></param>
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Guardian_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Guardian_Buff, out var buff))
+				return;
+
 			var skillLevel = buff.NumArg1;
 			var multiplierReduction = DamageReductionBase + skillLevel * DamageReductionPerLevel;
 

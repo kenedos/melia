@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
@@ -11,10 +12,14 @@ namespace Melia.Zone.Buffs.Handlers
 {
 	[Package("laima")]
 	[BuffHandler(BuffId.SafetyZone_Buff)]
-	public class SafetyZone_BuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class SafetyZone_BuffOverride : BuffHandler
 	{
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.SafetyZone_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.SafetyZone_Buff, out var buff))
+				return;
+
 			// Finds safety zone pad this entity is on
 			// Note: The normal behaviour is to only allow one safety zone
 			// per character, this is not currently implemented but should

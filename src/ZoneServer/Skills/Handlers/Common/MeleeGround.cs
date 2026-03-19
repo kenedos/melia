@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			if (caster is Character character && Feature.IsEnabled("BattleManager"))
 				ZoneServer.Instance.World.BattleManager.StartBattle(character, targets.FirstOrDefault());
 
-			this.Attack(skill, caster, originPos, farPos, targets);
+			skill.Run(this.Attack(skill, caster, originPos, farPos, targets));
 		}
 
 		/// <summary>
@@ -57,7 +57,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 		/// <param name="castPosition"></param>
 		/// <param name="targetPosition"></param>
 		/// <param name="targets"></param>
-		private async void Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IEnumerable<ICombatEntity> targets)
+		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IEnumerable<ICombatEntity> targets)
 		{
 			// Based on Normal_Attack posessing a hit delay of 100ms,
 			// and Common_DaggerAries one of 50ms, and these two values
@@ -77,8 +77,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			aniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skill.Properties.GetFloat(PropertyName.SklSpdRate));
 			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / skill.Properties.GetFloat(PropertyName.SklSpdRate));
 
-			if (skillHitDelay > TimeSpan.Zero)
-				await skill.Wait(skillHitDelay);
+			await skill.Wait(skillHitDelay);
 
 			var hits = new List<SkillHitInfo>();
 			var rnd = RandomProvider.Get();

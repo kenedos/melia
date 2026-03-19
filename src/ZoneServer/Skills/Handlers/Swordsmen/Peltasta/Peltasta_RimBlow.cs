@@ -53,7 +53,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -68,7 +68,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			var aniTime = TimeSpan.FromMilliseconds(330);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(hitDelay);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -100,8 +100,11 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 
 				hits.Add(skillHit);
 
-				if (caster.TryGetActiveAbilityLevel(AbilityId.Impact, out int stunLevel) && RandomProvider.Get().Next(100) < stunLevel * StunChancePerLevel)
-					target.StartBuff(BuffId.Stun, stunLevel, 0, StunDuration, caster);
+				if (caster.TryGetActiveAbilityLevel(AbilityId.Impact, out var stunLevel))
+				{
+					if (RandomProvider.Get().Next(100) < stunLevel * StunChancePerLevel)
+						target.StartBuff(BuffId.Stun, stunLevel, 0, StunDuration, caster);
+				}
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

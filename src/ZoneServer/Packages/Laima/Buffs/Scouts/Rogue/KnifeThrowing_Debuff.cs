@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Buffs.Handlers;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -18,10 +19,14 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.KnifeThrowing_Debuff)]
-	public class KnifeThrowing_DebuffOverride : BuffHandler, IBuffCombatDefenseBeforeCalcHandler
+	public class KnifeThrowing_DebuffOverride : BuffHandler
 	{
-		public void OnDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.KnifeThrowing_Debuff)]
+		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.KnifeThrowing_Debuff, out var buff))
+				return;
+
 			if (skillHitResult.Result != HitResultType.Crit)
 				return;
 

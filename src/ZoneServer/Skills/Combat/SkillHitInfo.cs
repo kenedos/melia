@@ -56,7 +56,7 @@ namespace Melia.Zone.Skills.Combat
 		/// called DefaultHitDelay. More data might potentially go into
 		/// the final value.
 		/// </remarks>
-		public TimeSpan SkillHitDelay { get; set; }
+		public TimeSpan HitDelay { get; set; }
 
 		/// <summary>
 		/// Gets or sets the hit effect displayed on the target.
@@ -133,8 +133,8 @@ namespace Melia.Zone.Skills.Combat
 		/// <param name="skill"></param>
 		/// <param name="result"></param>
 		/// <param name="aniTime"></param>
-		/// <param name="skillHitDelay"></param>
-		public SkillHitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillHitResult result, TimeSpan aniTime, TimeSpan skillHitDelay)
+		/// <param name="hitDelay"></param>
+		public SkillHitInfo(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillHitResult result, TimeSpan aniTime, TimeSpan hitDelay)
 		{
 			this.Attacker = attacker;
 			this.Target = target;
@@ -142,7 +142,7 @@ namespace Melia.Zone.Skills.Combat
 			this.HitResult = result;
 			this.HitInfo = new HitInfo(attacker, target, skill, result.Damage, result.Result);
 			this.AniTime = aniTime;
-			this.SkillHitDelay = skillHitDelay;
+			this.HitDelay = hitDelay;
 			this.HitEffect = result.Effect;
 			this.HitCount = result.HitCount;
 
@@ -168,7 +168,7 @@ namespace Melia.Zone.Skills.Combat
 			this.HitResult = result;
 			this.HitInfo = hitInfo;
 			this.AniTime = TimeSpan.Zero;
-			this.SkillHitDelay = TimeSpan.Zero;
+			this.HitDelay = TimeSpan.Zero;
 			this.HitEffect = result.Effect;
 			this.HitCount = result.HitCount;
 
@@ -223,6 +223,12 @@ namespace Melia.Zone.Skills.Combat
 				var result = this.HitResult;
 
 				if (result.KnockBack.Type == KnockBackType.None)
+					return;
+
+				// Since we currently don't know exactly what the various
+				// knock back types do, we're gonna limit automatic knock
+				// back setup to those we do know.
+				if (result.KnockBack.Type != KnockBackType.KnockBack && result.KnockBack.Type != KnockBackType.KnockDown)
 					return;
 
 				var type = result.KnockBack.Type;

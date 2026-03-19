@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -14,7 +15,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Bear_Buff)]
-	public class Bear_BuffOverride : BuffHandler, IBuffCombatDefenseBeforeCalcHandler
+	public class Bear_BuffOverride : BuffHandler
 	{
 		private const float DamageReductionPerLevel = 0.03f;
 		private const float AbilityBonus = 0.005f;
@@ -22,15 +23,17 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 		/// <summary>
 		/// Applies the buff's effect during the combat calculations.
 		/// </summary>
-		/// <param name="buff"></param>
 		/// <param name="attacker"></param>
 		/// <param name="target"></param>
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		/// <exception cref="NotImplementedException"></exception>
-		public void OnDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Bear_Buff)]
+		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Bear_Buff, out var buff))
+				return;
+
 			var skillLevel = buff.NumArg1;
 			var multiplierReduction = skillLevel * DamageReductionPerLevel;
 

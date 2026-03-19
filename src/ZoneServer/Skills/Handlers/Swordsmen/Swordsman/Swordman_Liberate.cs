@@ -3,6 +3,8 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
+using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 
@@ -32,12 +34,55 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var target = caster;
+			caster.StartBuff(BuffId.Liberate_Buff, skill.Level, 0, GetDuration(caster), caster);
 
+			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster, null);
+		}
+
+		/// <summary>
+		/// Returns the duration of the buff for the caster, affected by
+		/// factors such as active abilities.
+		/// </summary>
+		/// <param name="caster"></param>
+		/// <returns></returns>
+		public static TimeSpan GetDuration(ICombatEntity caster)
+		{
 			var duration = TimeSpan.FromSeconds(30);
-			target.StartBuff(BuffId.Liberate_Buff, skill.Level, 0, duration, caster);
 
-			Send.ZC_SKILL_MELEE_TARGET(caster, skill, target, null);
+			// Ability "Liberate: Awaken"
+			// Reduces the duration to 12 seconds
+			if (caster.TryGetActiveAbility(AbilityId.Swordman31, out var ability))
+				duration = TimeSpan.FromSeconds(12);
+
+			// Ability "Liberate: Fortitude"
+			// Reduces the duration to 6 seconds
+			if (caster.TryGetActiveAbility(AbilityId.Swordman32, out ability))
+				duration = TimeSpan.FromSeconds(6);
+
+			return duration;
+		}
+
+		/// <summary>
+		/// Increases damage of attackers affected by the Liberate buff
+		/// and the Awaken ability.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="modifier"></param>
+		/// <param name="skillHitResult"></param>
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, AbilityId.Swordman31)]
+		public static void OnBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		{
+			// Ability "Liberate: Awaken"
+			// Increases damage to enemies by 50%
+			if (attacker.IsAbilityActive(AbilityId.Swordman31))
+				modifier.DamageMultiplier += 0.50f;
+
+			// Ability "Liberate: Fortitude"
+			// Increases damage reduction by 50%
+			if (target.IsAbilityActive(AbilityId.Swordman32))
+				modifier.DamageMultiplier -= 0.50f;
 		}
 	}
 }

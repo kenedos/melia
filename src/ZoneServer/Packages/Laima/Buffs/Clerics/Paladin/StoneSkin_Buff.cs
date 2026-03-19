@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -16,22 +17,17 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Clerics.Paladin
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.StoneSkin_Buff)]
-	public class StoneSkin_BuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class StoneSkin_BuffOverride : BuffHandler
 	{
 		private const float DamageReductionBase = 0.10f;
 		private const float DamageReductionPerLevel = 0.01f;
 
-		/// <summary>
-		/// Reduces physical damage taken.
-		/// </summary>
-		/// <param name="buff"></param>
-		/// <param name="attacker"></param>
-		/// <param name="target"></param>
-		/// <param name="skill"></param>
-		/// <param name="modifier"></param>
-		/// <param name="skillHitResult"></param>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.StoneSkin_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.StoneSkin_Buff, out var buff))
+				return;
+
 			// Only reduce physical damage (not magic)
 			if (skill.Data.AttackType == SkillAttackType.Magic)
 				return;

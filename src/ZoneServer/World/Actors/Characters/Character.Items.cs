@@ -21,21 +21,6 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Returns true if the character is wearing a full armor set of the given armor material type.
-		/// </summary>
-		public bool IsWearingFullArmorSetOfType(ArmorMaterialType armorType)
-		{
-			var equipIds = this.GetEquipIds();
-			var armorSlots = new[] { EquipSlot.Shoes, EquipSlot.Top, EquipSlot.Pants, EquipSlot.Gloves };
-			var armorCount = armorSlots.Count(slot =>
-			{
-				var itemId = equipIds[(int)slot];
-				return ZoneServer.Instance.Data.ItemDb.TryFind(itemId, out var item) && item.Material == armorType;
-			});
-			return armorCount == 4;
-		}
-
-		/// <summary>
 		/// Returns true if the character is wearing any armor piece of the given armor material type.
 		/// </summary>
 		public bool IsWearingArmorOfType(ArmorMaterialType armorType)

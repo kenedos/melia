@@ -145,7 +145,7 @@ namespace Melia.Zone.Abilities
 			{
 				ScriptableFunctions.Combat.Register(name, (attacker, target, skill, modifier, skillHitResult) =>
 				{
-					if (attacker.TryGetAbility(abilityId, out var ability) && ability.Active)
+					if (attacker.TryGetActiveAbility(abilityId, out var ability))
 						func(ability, attacker, target, skill, modifier, skillHitResult);
 
 					return 0;
@@ -156,13 +156,14 @@ namespace Melia.Zone.Abilities
 			{
 				ScriptableFunctions.Combat.Register(name, (attacker, target, skill, modifier, skillHitResult) =>
 				{
-					if (target.TryGetAbility(abilityId, out var ability))
+					if (target.TryGetActiveAbility(abilityId, out var ability))
 						func(ability, attacker, target, skill, modifier, skillHitResult);
 
 					return 0;
 				});
 			}
 
+#pragma warning disable CS0618 // Type or member is obsolete
 			if (handler is IAbilityCombatAttackBeforeCalcHandler beforeCalcAttackHandler) registerAttackFunc("SCR_Combat_BeforeCalc_Attack_" + abilityId, beforeCalcAttackHandler.OnAttackBeforeCalc);
 			if (handler is IAbilityCombatDefenseBeforeCalcHandler beforeCalcDefenseHandler) registerDefenseFunc("SCR_Combat_BeforeCalc_Defense_" + abilityId, beforeCalcDefenseHandler.OnDefenseBeforeCalc);
 
@@ -174,6 +175,7 @@ namespace Melia.Zone.Abilities
 
 			if (handler is IAbilityCombatAttackAfterBonusesHandler afterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_Attack_" + abilityId, afterBonusesAttackHandler.OnAttackAfterBonuses);
 			if (handler is IAbilityCombatDefenseAfterBonusesHandler afterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_Defense_" + abilityId, afterBonusesDefenseHandler.OnDefenseAfterBonuses);
+
 
 			// Companion-specific combat hooks
 			if (handler is IAbilityCombatCompanionAttackBeforeCalcHandler companionBeforeCalcAttackHandler) registerAttackFunc("SCR_Combat_BeforeCalc_CompanionAttack_" + abilityId, companionBeforeCalcAttackHandler.OnCompanionAttackBeforeCalc);
@@ -187,6 +189,7 @@ namespace Melia.Zone.Abilities
 
 			if (handler is IAbilityCombatCompanionAttackAfterBonusesHandler companionAfterBonusesAttackHandler) registerAttackFunc("SCR_Combat_AfterBonuses_CompanionAttack_" + abilityId, companionAfterBonusesAttackHandler.OnCompanionAttackAfterBonuses);
 			if (handler is IAbilityCombatCompanionDefenseAfterBonusesHandler companionAfterBonusesDefenseHandler) registerDefenseFunc("SCR_Combat_AfterBonuses_CompanionDefense_" + abilityId, companionAfterBonusesDefenseHandler.OnCompanionDefenseAfterBonuses);
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 
 		/// <summary>
@@ -195,7 +198,6 @@ namespace Melia.Zone.Abilities
 		/// <param name="abilityId"></param>
 		private void RemoveCombatEvents(AbilityId abilityId)
 		{
-			// Remove all possible combat hook functions that may have been registered
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Attack_" + abilityId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_Defense_" + abilityId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_Attack_" + abilityId);
@@ -205,7 +207,6 @@ namespace Melia.Zone.Abilities
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Attack_" + abilityId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterBonuses_Defense_" + abilityId);
 
-			// Companion hooks
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_CompanionAttack_" + abilityId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_BeforeCalc_CompanionDefense_" + abilityId);
 			ScriptableFunctions.Combat.Remove("SCR_Combat_AfterCalc_CompanionAttack_" + abilityId);

@@ -49,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			var radius = 120;
 			var splashArea = new Circle(caster.Position, radius);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -60,7 +60,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			await Task.Delay(TimeSpan.FromSeconds(1));
+			await skill.Wait(1000);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 

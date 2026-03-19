@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.Savagery_Buff)]
-	public class Savagery_BuffOverride : BuffHandler, IBuffCombatAttackBeforeCalcHandler
+	public class Savagery_BuffOverride : BuffHandler
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -39,8 +40,12 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnAttackBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Savagery_Buff)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.Savagery_Buff, out var buff))
+				return;
+
 			if (skill.Data.AttackType == SkillAttackType.Aries || (attacker.IsAbilityActive(AbilityId.Barbarian6) && skill.Data.AttackType == SkillAttackType.Slash))
 				modifier.HitCount++;
 		}

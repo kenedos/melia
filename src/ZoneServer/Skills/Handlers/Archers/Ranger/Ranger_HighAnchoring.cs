@@ -48,7 +48,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -63,7 +63,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(hitDelay);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var results = new List<SkillHitResult>();

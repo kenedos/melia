@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
@@ -15,7 +16,7 @@ namespace Melia.Zone.Buffs.Handlers.Scout
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.ObliqueFire_Buff)]
-	public class ObliqueFire_BuffOverride : BuffHandler, IBuffCombatAttackBeforeCalcHandler
+	public class ObliqueFire_BuffOverride : BuffHandler
 	{
 		/// <summary>
 		/// Applies the buff's effect before the damage calculation.
@@ -26,8 +27,12 @@ namespace Melia.Zone.Buffs.Handlers.Scout
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnAttackBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.ObliqueFire_Buff)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.ObliqueFire_Buff, out var buff))
+				return;
+
 			modifier.DamageMultiplier += buff.OverbuffCounter * 0.04f;
 		}
 	}

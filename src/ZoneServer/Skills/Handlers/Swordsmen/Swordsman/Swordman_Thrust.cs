@@ -11,7 +11,6 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
-using static Melia.Shared.Util.TaskHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
@@ -48,7 +47,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			// TODO: Log and implement ability "[Arts] Thrust: Charge"
+
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -65,12 +66,17 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 			// delay. However, the hit comes too early with either value
 			// on Melia. One value that appears to work well is 300ms,
 			// so we'll use that for now.
+			// 
+			// Update: I don't know what changed, but testing this again
+			// a while later, the Time value found in the ByTool data,
+			// 70ms, now seems to work perfectly. It also fits the packet
+			// logs, so we'll switch to that.
 
-			var hitTime = TimeSpan.FromMilliseconds(300);
-			var skillHitDelay = TimeSpan.Zero;
+			var attackTime = TimeSpan.FromMilliseconds(70);
 			var aniTime = TimeSpan.FromMilliseconds(270);
+			var hitDelay = skill.Properties.HitDelay;
 
-			await Task.Delay(hitTime);
+			await skill.Wait(attackTime);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -78,9 +84,11 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
-				target.TakeDamage(skillHitResult.Damage, caster);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, hitDelay);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+				skillHit.ApplyDamage();
+				skillHit.ApplyKnockBack();
+
 				hits.Add(skillHit);
 			}
 

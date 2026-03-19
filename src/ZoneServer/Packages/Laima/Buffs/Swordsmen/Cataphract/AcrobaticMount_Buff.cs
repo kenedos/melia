@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -17,7 +18,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Cataphract
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.AcrobaticMount_Buff)]
-	public class AcrobaticMount_BuffOverride : BuffHandler, IBuffCombatAttackBeforeBonusesHandler
+	public class AcrobaticMount_BuffOverride : BuffHandler
 	{
 		private const float BaseFinalDamageRate = 0.10f;
 		private const float FinalDamageRatePerLevel = 0.01f;
@@ -58,8 +59,12 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Cataphract
 		/// <summary>
 		/// Applies final damage bonus before attribute/race bonuses.
 		/// </summary>
-		public void OnAttackBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.AcrobaticMount_Buff)]
+		public void OnAttackBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.AcrobaticMount_Buff, out var buff))
+				return;
+
 			var skillLevel = buff.NumArg1;
 			var damageIncrease = BaseFinalDamageRate + FinalDamageRatePerLevel * skillLevel;
 

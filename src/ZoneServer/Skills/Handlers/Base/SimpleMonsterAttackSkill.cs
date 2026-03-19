@@ -62,8 +62,7 @@ namespace Melia.Zone.Skills.Handlers.Base
 
 			Debug.ShowShape(caster.Map, splashArea, edgePoints: false, duration: aniTime);
 
-			if (aniTime > TimeSpan.Zero)
-				await skill.Wait(aniTime);
+			await skill.Wait(hitDelay);
 
 			if (!caster.CanFight())
 			{

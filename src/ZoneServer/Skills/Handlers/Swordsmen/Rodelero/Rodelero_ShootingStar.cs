@@ -50,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 
 			if (!caster.IsAbilityActive(AbilityId.Rodelero41))
 			{
-				CallSafe(this.Attack(skill, caster, splashArea));
+				skill.Run(this.Attack(skill, caster, splashArea));
 			}
 			else
 			{
@@ -73,7 +73,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 			var delayBetweenHits = TimeSpan.FromMilliseconds(350);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(hitDelay);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -95,7 +95,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
 
-			await Task.Delay(delayBetweenHits);
+			await skill.Wait(delayBetweenHits);
 			hits.Clear();
 
 			targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);

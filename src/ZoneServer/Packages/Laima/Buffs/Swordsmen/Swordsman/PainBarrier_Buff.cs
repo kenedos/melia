@@ -59,7 +59,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Swordsman
 		{
 			skillHitInfo.HitInfo.Type = HitType.Endure;
 
-			skillHitInfo.SkillHitDelay = TimeSpan.Zero;
+			skillHitInfo.HitDelay = TimeSpan.Zero;
 			skillHitInfo.AniTime = TimeSpan.Zero;
 		}
 	}

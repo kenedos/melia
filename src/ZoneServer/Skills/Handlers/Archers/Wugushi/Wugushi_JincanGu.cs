@@ -52,7 +52,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, farPos, caster.Position.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			CallSafe(this.CreateAttackArea(skill, caster, farPos));
+			skill.Run(this.CreateAttackArea(skill, caster, farPos));
 		}
 
 		/// <summary>
@@ -64,11 +64,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="direction"></param>
 		private async Task CreateAttackArea(Skill skill, ICombatEntity caster, Position farPos)
 		{
-			await Task.Delay(200);
+			await skill.Wait(200);
 
 			Send.ZC_NORMAL.SkillProjectile(caster, farPos, "I_cleric_jincangu_force_mash#Dummy_effect_shoot", 0.4f, "", 1, 10, TimeSpan.FromSeconds(0.6f), TimeSpan.Zero, 200);
 
-			await Task.Delay(600);
+			await skill.Wait(600);
 
 			var pad = new Pad(PadName.Archer_JincanGu_Abil, caster, skill, new Circle(farPos, 100));
 			pad.Position = new Position(pad.Trigger.Area.Center.X, caster.Position.Y, pad.Trigger.Area.Center.Y);

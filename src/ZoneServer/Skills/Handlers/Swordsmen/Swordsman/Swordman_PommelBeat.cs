@@ -11,7 +11,6 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
-using static Melia.Shared.Util.TaskHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
@@ -52,7 +51,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -63,11 +62,11 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			var hitDelay = TimeSpan.FromMilliseconds(300);
+			var attackTime = TimeSpan.FromMilliseconds(300);
 			var aniTime = TimeSpan.FromMilliseconds(150);
-			var skillHitDelay = TimeSpan.Zero;
+			var hitDelay = skill.Properties.HitDelay;
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(attackTime);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -79,18 +78,16 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 				if (target.IsBuffActive(BuffId.Stun))
 					modifier.DamageMultiplier = StunDamageMultiplier;
 
-				var targetSize = target.EffectiveSize;
-				if (targetSize >= SizeType.S && targetSize <= SizeType.M)
+				if (target.EffectiveSize >= SizeType.S && target.EffectiveSize <= SizeType.M)
 					modifier.DefensePenetrationRate = DefPierceRate + skill.Level * DefPierceRatePerLevel;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
-				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, hitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
-				skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-				skillHit.ApplyKnockBack(target);
+				skillHit.ApplyDamage();
+				skillHit.ApplyKnockBack();
 
 				hits.Add(skillHit);
 			}

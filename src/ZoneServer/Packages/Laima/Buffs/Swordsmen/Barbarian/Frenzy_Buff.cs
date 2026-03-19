@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Frenzy_Buff)]
-	public class Frenzy_BuffOverride : BuffHandler, IBuffCombatDefenseBeforeCalcHandler
+	public class Frenzy_BuffOverride : BuffHandler
 	{
 		public const string NextDecayTimeKey = "FrenzyNextDecayTime";
 		public const string LastStackGainTimeKey = "FrenzyLastStackGainTime";
@@ -103,8 +104,12 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 		/// While not explicitly in the rework, a "frenzy" state making the user
 		/// more vulnerable is thematically appropriate.
 		/// </summary>
-		public void OnDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Frenzy_Buff)]
+		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Frenzy_Buff, out var buff))
+				return;
+
 			// The Barbarian takes 0.5% more damage per stack of Frenzy.
 			// This is a small penalty for the high-risk/high-reward playstyle.
 			modifier.DamageMultiplier += 0.005f * buff.OverbuffCounter;

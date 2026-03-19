@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.Praise_Atk_Buff)]
-	public class Praise_Atk_BuffOverride : BuffHandler, IBuffCombatAttackAfterCalcHandler
+	public class Praise_Atk_BuffOverride : BuffHandler
 	{
 		private const float FlatAtkBonus = 200f;
 		private const float BaseAtkRate = 0.20f;
@@ -64,8 +65,12 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
 		/// Applies bleeding to targets when the companion attacks.
 		/// Bleeding deals 100% of attack damage over 8 seconds.
 		/// </summary>
-		public void OnAttackAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Praise_Atk_Buff)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.Praise_Atk_Buff, out var buff))
+				return;
+
 			if (skillHitResult.Damage <= 0)
 				return;
 

@@ -5,6 +5,7 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Bokor
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Mackangdal_Buff)]
-	public class Mackangdal_BuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Mackangdal_BuffOverride : BuffHandler
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -32,8 +33,12 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Bokor
 		{
 		}
 
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Mackangdal_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Mackangdal_Buff, out var buff))
+				return;
+
 			if (!(target is Character character))
 				return;
 

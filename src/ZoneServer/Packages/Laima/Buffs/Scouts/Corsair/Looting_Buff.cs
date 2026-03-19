@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Yggdrasil.Util;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -16,7 +17,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Looting_Buff)]
-	public class Looting_BuffOverride : BuffHandler, IBuffCombatAttackAfterCalcHandler
+	public class Looting_BuffOverride : BuffHandler
 	{
 		private const int BaseSilverAmount = 5;
 		private const int SilverPerLevel = 3;
@@ -25,8 +26,12 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 		private const string LootingCounterKey = "Melia.Buff.Looting.DropCount";
 		private const int MaxDropsPerMob = 10;
 
-		public void OnAttackAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Looting_Buff)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.Looting_Buff, out var buff))
+				return;
+
 			if (skillHitResult.Damage == 0)
 				return;
 

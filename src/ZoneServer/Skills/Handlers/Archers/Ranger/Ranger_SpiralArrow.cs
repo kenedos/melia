@@ -70,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 				Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-				CallSafe(this.MultiAttack(skill, caster, splashArea));
+				skill.Run(this.MultiAttack(skill, caster, splashArea));
 			}
 			else
 			{
@@ -107,7 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			if (caster.TryGetBuff(BuffId.SpiralArrow_Debuff, out var buff))
 				modifier.HitCount += buff.OverbuffCounter;
 
-			if (caster.TryGetAbility(AbilityId.Ranger6, out var ability))
+			if (caster.TryGetActiveAbility(AbilityId.Ranger6, out var ability))
 				modifier.BonusCritChance += 10 * ability.Level;
 
 			// In the past, this skill did 50% more damage if the target was slowed
@@ -149,7 +149,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var aniTime = TimeSpan.FromMilliseconds(100);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(hitDelay);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var results = new List<SkillHitResult>();
@@ -162,7 +162,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				if (caster.TryGetBuff(BuffId.SpiralArrow_Debuff, out var buff))
 					modifier.HitCount += buff.OverbuffCounter;
 
-				if (caster.TryGetAbility(AbilityId.Ranger6, out var ability))
+				if (caster.TryGetActiveAbility(AbilityId.Ranger6, out var ability))
 					modifier.BonusCritChance += 10 * ability.Level;
 
 				// In the past, this skill did 50% more damage if the target was slowed

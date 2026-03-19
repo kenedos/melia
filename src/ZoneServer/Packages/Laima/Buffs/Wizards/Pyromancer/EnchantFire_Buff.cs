@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -15,19 +16,14 @@ namespace Melia.Zone.Buffs.Handlers.Wizard
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.EnchantFire_Buff)]
-	public class EnchantFire_BuffOverride : BuffHandler, IBuffCombatAttackBeforeBonusesHandler
+	public class EnchantFire_BuffOverride : BuffHandler
 	{
-		/// <summary>
-		/// Applies the buff's effects during the combat calculations.
-		/// </summary>
-		/// <param name="buff"></param>
-		/// <param name="attacker"></param>
-		/// <param name="target"></param>
-		/// <param name="skill"></param>
-		/// <param name="modifier"></param>
-		/// <param name="skillHitResult"></param>
-		public void OnAttackBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.EnchantFire_Buff)]
+		public void OnAttackBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.EnchantFire_Buff, out var buff))
+				return;
+
 			var damageMultiplierIncrease = buff.NumArg2;
 
 			if ((skill.Data.Attribute == AttributeType.None) || (skill.Data.Attribute == AttributeType.Melee) || (skill.Data.Attribute == AttributeType.Magic))

@@ -59,7 +59,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 					caster.StartBuff(BuffId.Langort_BlkAbil, BlockDuration);
 			}
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -76,7 +76,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 
 			var delayBetweenHits = TimeSpan.FromMilliseconds(100);
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(hitDelay);
 
 			var hits = new List<SkillHitInfo>();
 
@@ -116,7 +116,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 				hits.Clear();
 
 				if (i < 3)
-					await Task.Delay(delayBetweenHits);
+					await skill.Wait(delayBetweenHits);
 			}
 		}
 	}

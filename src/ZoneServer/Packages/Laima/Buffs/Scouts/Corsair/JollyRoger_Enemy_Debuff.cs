@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -16,13 +17,17 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.JollyRoger_Enemy_Debuff)]
-	public class JollyRoger_Enemy_DebuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class JollyRoger_Enemy_DebuffOverride : BuffHandler
 	{
 		private const int ComboThreshold = 100;
 		private const int FeverDurationMs = 5000;
 
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.JollyRoger_Enemy_Debuff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.JollyRoger_Enemy_Debuff, out var buff))
+				return;
+
 			if (skillHitResult.Result == HitResultType.Dodge)
 				return;
 

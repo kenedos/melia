@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
@@ -11,22 +12,16 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 	/// <summary>
 	/// Handler for the passive Highlander skill Defiance.
 	/// </summary>
-	/// 
 	[Package("laima")]
 	[SkillHandler(SkillId.Highlander_Defiance)]
-	public class Highlander_DefianceOverride : ISkillHandler, ISkillCombatDefenseAfterCalcHandler
+	public class Highlander_DefianceOverride : ISkillHandler
 	{
-		/// <summary>
-		/// Applies the skill's effect after combat calculations.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="attacker"></param>
-		/// <param name="target"></param>
-		/// <param name="attackerSkill"></param>
-		/// <param name="modifier"></param>
-		/// <param name="skillHitResult"></param>
-		public void OnDefenseAfterCalc(Skill skill, ICombatEntity attacker, ICombatEntity target, Skill attackerSkill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, SkillId.Highlander_Defiance)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetSkill(SkillId.Highlander_Defiance, out var defianceSkill))
+				return;
+
 			var hp = ((float)target.Hp / target.MaxHp);
 			var hpLost = 1f - hp;
 
@@ -39,7 +34,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 			var reductionPerSkilllevel = baseValue + (baseValue * byAttribute);
 
 			// 90% Damage reduction hard cap
-			var reduction = Math.Min(0.9f, reductionPerSkilllevel * skill.Level * hpLost);
+			var reduction = Math.Min(0.9f, reductionPerSkilllevel * defianceSkill.Level * hpLost);
 
 			skillHitResult.Damage -= skillHitResult.Damage * reduction;
 		}

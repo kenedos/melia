@@ -1,5 +1,6 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
@@ -13,17 +14,19 @@ namespace Melia.Zone.Abilities.Handlers
 	/// </summary>
 	[Package("laima")]
 	[AbilityHandler(AbilityId.Leather)]
-	public class LeatherOverride : IAbilityHandler, IAbilityCombatAttackBeforeCalcHandler, IAbilityCombatDefenseBeforeBonusesHandler
+	public class LeatherOverride : IAbilityHandler
 	{
 		/// <summary>
 		/// Applies the Leather Mastery effects before damage calculation.
 		/// </summary>
-		public void OnAttackBeforeCalc(Ability ability, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, AbilityId.Leather)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
 			if (attacker is not Character character)
 				return;
 
-			if (character.IsWearingFullArmorSetOfType(ArmorMaterialType.Leather))
+			var count = character.Inventory.CountEquipMaterial(ArmorMaterialType.Leather);
+			if (count >= 4)
 			{
 				switch (character.JobClass)
 				{
@@ -35,12 +38,14 @@ namespace Melia.Zone.Abilities.Handlers
 			}
 		}
 
-		public void OnDefenseBeforeBonuses(Ability ability, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, AbilityId.Leather)]
+		public void OnDefenseBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
 			if (target is not Character character)
 				return;
 
-			if (character.IsWearingFullArmorSetOfType(ArmorMaterialType.Leather))
+			var count = character.Inventory.CountEquipMaterial(ArmorMaterialType.Leather);
+			if (count >= 4)
 			{
 				switch (character.JobClass)
 				{

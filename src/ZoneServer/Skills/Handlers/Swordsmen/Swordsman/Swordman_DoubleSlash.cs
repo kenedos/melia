@@ -11,7 +11,6 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
-using static Melia.Shared.Util.TaskHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
@@ -31,9 +30,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
+		/// <param name="target"></param>
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -50,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -61,13 +60,13 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			var hitDelay = TimeSpan.FromMilliseconds(100);
+			var attackTime1 = TimeSpan.FromMilliseconds(100);
+			var attackTime2 = TimeSpan.FromMilliseconds(250);
 			var aniTime1 = TimeSpan.FromMilliseconds(50);
 			var aniTime2 = TimeSpan.FromMilliseconds(100);
-			var delayBetweenHits = TimeSpan.FromMilliseconds(250);
-			var skillHitDelay = TimeSpan.Zero;
+			var hitDelay = skill.Properties.HitDelay;
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(attackTime1);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -80,17 +79,21 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 					modifier.DamageMultiplier = BleedDamageMultiplier;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
-				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime1, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime1, hitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
+
+				skillHit.ApplyDamage();
+				skillHit.ApplyKnockBack();
 
 				hits.Add(skillHit);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
 
-			await Task.Delay(delayBetweenHits);
+			await skill.Wait(attackTime2);
+
+			targets = caster.Map.GetAttackableEntitiesIn(caster, splashArea);
 			hits.Clear();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
@@ -101,10 +104,12 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 					modifier.DamageMultiplier = BleedDamageMultiplier;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
-				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime2, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime2, hitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
+
+				skillHit.ApplyDamage();
+				skillHit.ApplyKnockBack();
 
 				hits.Add(skillHit);
 			}

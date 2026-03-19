@@ -149,7 +149,7 @@ namespace Melia.Zone.Commands
 			this.Add("recallmap", "[map id/name]", "Warps all characters on given map back.", this.HandleRecallMap);
 			this.Add("recallall", "", "Warps all characters on the server back.", this.HandleRecallAll);
 			this.Add("heal", "[hp] [sp] [stamina]", "Heals the character's HP, SP, and Stamina.", this.HandleHeal);
-			this.Add("alive", "", "Revives the character if dead, or fully heals if alive.", this.HandleAlive);
+			this.Add("alive", "", "Revives the character if dead, or kills it if alive.", this.HandleAlive);
 			this.Add("clearinv", "", "Removes all items from inventory.", this.HandleClearInventory);
 			this.Add("addjob", "<job id|name> [circle]", "Adds a job to character by ID or name.", this.HandleAddJob);
 			this.Add("removejob", "<job id>", "Removes a job from character.", this.HandleRemoveJob);
@@ -2260,6 +2260,7 @@ namespace Melia.Zone.Commands
 			return CommandResult.Okay;
 		}
 
+
 		/// <summary>
 		/// Finds the maps where a monster respawns
 		/// </summary>
@@ -2276,7 +2277,6 @@ namespace Melia.Zone.Commands
 
 			var search = string.Join(" ", args.GetAll()).ToLower();
 
-			// Find the monster data that matches the search term
 			var monsters = ZoneServer.Instance.Data.MonsterDb.FindAllPreferExact(search);
 			if (monsters.Count == 0)
 			{
@@ -2284,90 +2284,95 @@ namespace Melia.Zone.Commands
 				return CommandResult.Okay;
 			}
 
-			// Get all spawners in the world
-			var allSpawners = ZoneServer.Instance.World.GetSpawners();
-			var monsterSpawners = allSpawners.OfType<MonsterSpawner>();
-			var eventSpawners = allSpawners.OfType<EventMonsterSpawner>();
-
-			var results = new List<(MonsterData Monster, Map Map, int MinAmount, int MaxAmount, TimeSpan MinRespawnDelay, TimeSpan MaxRespawnDelay)>();
+			var allSpawners = ZoneServer.Instance.World.GetSpawners().OfType<MonsterSpawner>();
+			var spawnLocations = new List<(MonsterSpawner Spawner, IList<SpawnArea> Areas)>();
 
 			foreach (var monster in monsters)
 			{
-				// Find all MonsterSpawners that spawn this monster
-				foreach (var spawner in monsterSpawners)
-				{
-					// Skip if this spawner doesn't spawn our monster
-					if (!ZoneServer.Instance.Data.MonsterDb.TryFind(spawner.MonsterData.Id, out var spawnerMonster) ||
-						spawnerMonster.Id != monster.Id)
-						continue;
+				var spawners = allSpawners.Where(a => a.MonsterData.Id == monster.Id);
 
-					// Get the map from the spawn areas
+				foreach (var spawner in spawners)
+				{
 					if (!ZoneServer.Instance.World.TryGetSpawnAreas(spawner.SpawnPointsIdent, out var spawnAreas))
 						continue;
 
-					foreach (var area in spawnAreas.GetAll())
-					{
-						if (!ZoneServer.Instance.World.TryGetMap(area.Map.Id, out var map))
-							continue;
-
-						results.Add((monster, map, spawner.MinAmount, spawner.MaxAmount, spawner.MinRespawnDelay, spawner.MaxRespawnDelay));
-					}
-				}
-
-				// Find all EventMonsterSpawners (boss spawners) that spawn this monster
-				foreach (var spawner in eventSpawners)
-				{
-					// Skip if this spawner doesn't spawn our monster
-					if (spawner.MonsterData.Id != monster.Id)
+					var areas = spawnAreas.GetAll();
+					if (!areas.Any())
 						continue;
 
-					// Get the map directly from MapId
-					if (!ZoneServer.Instance.World.TryGetMap(spawner.MapId, out var map))
-						continue;
-
-					results.Add((monster, map, spawner.MinAmount, spawner.MaxAmount, spawner.MinRespawnDelay, spawner.MaxRespawnDelay));
+					spawnLocations.Add((spawner, areas));
 				}
 			}
 
-			if (results.Count == 0)
+			if (spawnLocations.Count == 0)
 			{
 				sender.ServerMessage(Localization.Get("No spawn locations found for '{0}'."), search);
 				return CommandResult.Okay;
 			}
 
-			// Order results by map name
-			results = results.OrderBy(x => x.Map.ClassName).ToList();
+			var monsterGroups = spawnLocations.GroupBy(a => a.Spawner.MonsterData.Id);
+			var groupCount = monsterGroups.Count();
 
-			// Display results
-			foreach (var result in results)
+			var sb = new StringBuilder();
+			var i = 1;
+
+			foreach (var monsterGroup in monsterGroups)
 			{
-				var respawnInfo = "";
+				var first = monsterGroup.First();
 
-				// Add respawn time info if it exists
-				if (result.MinRespawnDelay != TimeSpan.Zero || result.MaxRespawnDelay != TimeSpan.Zero)
+				sb.AppendLine(Localization.Get("Result {0}/{1}:"), i++, groupCount);
+				sb.AppendLine(Localization.Get("--- {0} ({1}) ---"), first.Spawner.MonsterData.Name, first.Spawner.MonsterData.ClassName);
+
+				foreach (var spawnLocation in monsterGroup)
 				{
-					if (result.MinRespawnDelay == result.MaxRespawnDelay)
-						respawnInfo = $" [Delay: {result.MinRespawnDelay.TotalSeconds:0}s]";
+					var spawner = spawnLocation.Spawner;
+					var areaGroups = spawnLocation.Areas.GroupBy(a => a.Map.Id);
+
+					if (spawner.MinAmount == spawner.MaxAmount)
+						sb.AppendFormat(Localization.Get("{0} spawn"), spawner.MinAmount);
 					else
-						respawnInfo = $" [Delay: {result.MinRespawnDelay.TotalSeconds:0}s~{result.MaxRespawnDelay.TotalSeconds:0}s]";
+						sb.AppendFormat(Localization.Get("{0}~{1} spawn"), spawner.MinAmount, spawner.MaxAmount);
+
+					if (spawner.MinRespawnDelay != TimeSpan.Zero || spawner.MaxRespawnDelay != TimeSpan.Zero)
+					{
+						static string timeSpanToString(TimeSpan timeSpan)
+						{
+							if (timeSpan.TotalSeconds < 60)
+								return string.Format(Localization.Get("{0:0}s"), timeSpan.TotalSeconds);
+							else if (timeSpan.TotalMinutes < 60)
+								return string.Format(Localization.Get("{0:0}m"), timeSpan.TotalMinutes);
+							else if (timeSpan.TotalHours < 24)
+								return string.Format(Localization.Get("{0:0}h"), timeSpan.TotalHours);
+							else
+								return string.Format(Localization.Get("{0:0}d"), timeSpan.TotalDays);
+						}
+
+						if (spawner.MinRespawnDelay == spawner.MaxRespawnDelay)
+							sb.AppendFormat(Localization.Get(" every {0}"), timeSpanToString(spawner.MinRespawnDelay));
+						else
+							sb.AppendFormat(Localization.Get(" every {0}~{1}"), timeSpanToString(spawner.MinRespawnDelay), timeSpanToString(spawner.MaxRespawnDelay));
+					}
+
+					sb.AppendLine(Localization.Get(" across:"));
+
+					foreach (var areaGroup in areaGroups)
+					{
+						var area = areaGroup.First();
+						var name = area.Map.Data.Name;
+						var className = area.Map.ClassName;
+
+						sb.AppendLine(Localization.Get("    - {0} ({1})"), name, className);
+					}
 				}
 
-				var response = string.Format(
-					"{0} ({1}) - {2} ({3}) - Quantity: {4}~{5}{6}",
-					result.Monster.Name,
-					result.Monster.ClassName,
-					result.Map?.Data?.Name ?? "Unknown",
-					result.Map.ClassName,
-					result.MinAmount,
-					result.MaxAmount,
-					respawnInfo
-				);
-
-				sender.ServerMessage(response);
+				sender.ServerMessage(sb.ToString());
+				sb.Clear();
 			}
 
 			return CommandResult.Okay;
 		}
+
+
 
 		/// <summary>
 		/// Warps target to a pre-defined location.
@@ -2590,7 +2595,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Heals the target hp and optionally sp.
+		/// Heals the target hp and optionally sp/stamina.
 		/// If no argument is given, heals fully.
 		/// Can also heal negative values.
 		/// </summary>
@@ -2602,18 +2607,9 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleHeal(Character sender, Character target, string message, string command, Arguments args)
 		{
-			if (args.Count > 3)
-				return CommandResult.InvalidArgument;
-
 			if (target.IsDead)
-				return CommandResult.Okay;
+				target.Resurrect(ResurrectOptions.TryAgain);
 
-			// TODO: Maybe refactor to take indexed arguments, named
-			//   ones, or combinations, so you can, for example, heal
-			//   stamina without specifying HP and SP like so:
-			//   >heal sp:10
-
-			// Fully heal HP, SP and Stamina if no arguments are given
 			if (args.Count == 0)
 			{
 				target.ModifyHp(target.MaxHp);
@@ -2623,59 +2619,115 @@ namespace Melia.Zone.Commands
 				sender.ServerMessage(Localization.Get("Healed HP, SP and Stamina."));
 				if (sender != target)
 					target.ServerMessage(Localization.Get("Your HP, SP and Stamina were healed by {0}."), sender.TeamName);
+
+				return CommandResult.Okay;
 			}
-			// Modify only HP if one argument is given
-			else if (args.Count == 1)
+
+			var hpModify = 0f;
+			var spModify = 0f;
+			var stModify = 0f;
+
+			if (args.IndexedCount >= 1)
 			{
-				if (!int.TryParse(args.Get(0), out var hpAmount))
+				if (!float.TryParse(args.Get(0), CultureInfo.InvariantCulture, out hpModify))
 					return CommandResult.InvalidArgument;
-
-				target.ModifyHp(hpAmount);
-
-				sender.ServerMessage(Localization.Get("Healed HP by {0} points."), hpAmount);
-				if (sender != target)
-					target.ServerMessage(Localization.Get("{0} healed your HP by {1} points."), sender.TeamName, hpAmount);
 			}
-			// Modify HP and SP if two arguments are given
-			else if (args.Count == 2)
+
+			if (args.IndexedCount >= 2)
 			{
-				if (!int.TryParse(args.Get(0), out var hpAmount))
+				if (!float.TryParse(args.Get(1), CultureInfo.InvariantCulture, out spModify))
 					return CommandResult.InvalidArgument;
-
-				if (!int.TryParse(args.Get(1), out var spAmount))
-					return CommandResult.InvalidArgument;
-
-				target.ModifyHp(hpAmount);
-				target.ModifySp(spAmount);
-
-				sender.ServerMessage(Localization.Get("Healed HP by {0} and SP by {1} points."), hpAmount, spAmount);
-				if (sender != target)
-					target.ServerMessage(Localization.Get("{0} healed your HP by {1} and your SP by {2} points."), sender.TeamName, hpAmount, spAmount);
 			}
-			// Modify HP, SP, and Stamina if three arguments are given
-			else if (args.Count >= 3)
+
+			if (args.IndexedCount >= 3)
 			{
-				if (!int.TryParse(args.Get(0), out var hpAmount))
+				if (!float.TryParse(args.Get(2), CultureInfo.InvariantCulture, out stModify))
 					return CommandResult.InvalidArgument;
+			}
 
-				if (!int.TryParse(args.Get(1), out var spAmount))
+			if (args.TryGet("hp", out var hpArg))
+			{
+				if (!float.TryParse(hpArg, CultureInfo.InvariantCulture, out hpModify))
 					return CommandResult.InvalidArgument;
+			}
 
-				if (!int.TryParse(args.Get(2), out var staminaAmount))
+			if (args.TryGet("sp", out var spArg))
+			{
+				if (!float.TryParse(spArg, CultureInfo.InvariantCulture, out spModify))
 					return CommandResult.InvalidArgument;
+			}
 
+			if (args.TryGet("stamina", out var stArg))
+			{
+				if (!float.TryParse(stArg, CultureInfo.InvariantCulture, out stModify))
+					return CommandResult.InvalidArgument;
+			}
+
+			if (hpModify != 0)
+				target.ModifyHp(hpModify);
+
+			if (spModify != 0)
+				target.ModifySp(spModify);
+
+			if (stModify != 0)
+			{
 				// Adjust Stamina to match the game's display value, since
 				// most users of this command wouldn't be aware of this
 				// property's value being 1000 times larger than displayed.
-				staminaAmount *= 1000;
+				stModify *= 1000;
 
-				target.ModifyHp(hpAmount);
-				target.ModifySp(spAmount);
-				target.ModifyStamina(staminaAmount);
+				target.ModifyStamina((int)stModify);
+			}
 
-				sender.ServerMessage(Localization.Get("Healed HP by {0}, SP by {1}, and Stamina by {2} points."), hpAmount, spAmount, staminaAmount);
+			var modifiedStats = new List<string>();
+			var modifiedStr = "";
+
+			if (hpModify != 0) modifiedStats.Add(string.Format(Localization.Get("HP by {0}"), hpModify));
+			if (spModify != 0) modifiedStats.Add(string.Format(Localization.Get("SP by {0}"), spModify));
+			if (stModify != 0) modifiedStats.Add(string.Format(Localization.Get("Stamina by {0:0}"), stModify / 1000));
+
+			if (modifiedStats.Count == 1)
+				modifiedStr = modifiedStats[0];
+			else if (modifiedStats.Count == 2)
+				modifiedStr = string.Format(Localization.Get("{0} and {1}"), modifiedStats[0], modifiedStats[1]);
+			else if (modifiedStats.Count == 3)
+				modifiedStr = string.Format(Localization.Get("{0}, {1}, and {2}"), modifiedStats[0], modifiedStats[1], modifiedStats[2]);
+
+			sender.ServerMessage(Localization.Get("Healed {0} points."), modifiedStr);
+
+			if (target.Hp == 0)
+				sender.Kill(target);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Revives the character if dead, or kills it if alive
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleAlive(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (target.IsDead)
+			{
+				target.Resurrect(ResurrectOptions.TryAgain);
+
+				sender.ServerMessage(Localization.Get("Revived."));
 				if (sender != target)
-					target.ServerMessage(Localization.Get("{0} healed your HP by {1}, SP by {2}, and Stamina by {3} points."), sender.TeamName, hpAmount, spAmount, staminaAmount);
+					target.ServerMessage(Localization.Get("You were revived by {0}."), sender.TeamName);
+
+			}
+			else
+			{
+				sender.Kill(target);
+
+				sender.ServerMessage(Localization.Get("Killed."));
+				if (sender != target)
+					target.ServerMessage(Localization.Get("You were killed by {0}."), sender.TeamName);
 			}
 
 			if (target.Hp == 0)
@@ -2687,33 +2739,6 @@ namespace Melia.Zone.Commands
 			return CommandResult.Okay;
 		}
 
-		/// <summary>
-		/// Revives the character if dead, or fully heals if alive.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="target"></param>
-		/// <param name="message"></param>
-		/// <param name="command"></param>
-		/// <param name="args"></param>
-		/// <returns></returns>
-		private CommandResult HandleAlive(Character sender, Character target, string message, string command, Arguments
-		args)
-		{
-			if (target.IsDead)
-			{
-				// Revive in place like soul crystal
-				target.Resurrect(ResurrectOptions.TryAgain);
-			}
-			else
-			{
-				// Fully heal HP, SP and Stamina
-				target.ModifyHp(target.MaxHp);
-				target.ModifySp(target.MaxSp);
-				target.ModifyStamina(target.MaxStamina);
-			}
-
-			return CommandResult.Okay;
-		}
 
 		/// <summary>
 		/// Removes all items from target's inventory.
@@ -4154,8 +4179,6 @@ namespace Melia.Zone.Commands
 				sb.AppendLine("   Rank: {0}, Level: {0}, SkillPoints: {0}", job.Rank, job.Level, job.SkillPoints);
 				sb.AppendLine("   Exp: {0} / {1} ({2:0.0}%)", exp, maxExp, percent);
 			}
-
-			sender.ServerMessage(sb.ToString().Replace(Environment.NewLine, "{nl}"));
 
 			return CommandResult.Okay;
 		}

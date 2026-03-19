@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -21,7 +22,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Clerics.Monk
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.Golden_Bell_Shield_Buff)]
-	public class Golden_Bell_Shield_BuffOverride : BuffHandler, IBuffCombatAttackBeforeBonusesHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Golden_Bell_Shield_BuffOverride : BuffHandler
 	{
 		private const int SpDrainPerTick = 65;
 		private const float BaseDamageReduction = 0.30f;
@@ -49,12 +50,12 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Clerics.Monk
 			}
 		}
 
-		public void OnAttackBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Golden_Bell_Shield_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
-		}
+			if (!target.TryGetBuff(BuffId.Golden_Bell_Shield_Buff, out var buff))
+				return;
 
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
-		{
 			var skillLevel = buff.NumArg1;
 			var reduction = Math.Min(BaseDamageReduction + DamageReductionPerLevel * skillLevel, MaxDamageReduction);
 

@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting.AI;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -23,7 +24,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.OutLaw
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.BullyPainBarrier_Buff)]
-	public class BullyPainBarrier_BuffOverride : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class BullyPainBarrier_BuffOverride : BuffHandler
 	{
 		private const float DrBuffRateBase = 0.24f;
 		private const float DrBuffRatePerLevel = 0.04f;
@@ -61,8 +62,12 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.OutLaw
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.BullyPainBarrier_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.BullyPainBarrier_Buff, out var buff))
+				return;
+
 			if (skillHitResult.Result == HitResultType.Dodge && attacker.Components.TryGet<AiComponent>(out var component))
 			{
 				//component.Script.QueueEventAlert(new HateIncreaseAlert(target, buff.NumArg1 * HatePerLevel));

@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 				TimeSpan.FromMilliseconds(160),
 			};
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(hitDelay);
 
 			var hits = new List<SkillHitInfo>();
 
@@ -93,7 +93,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 				hits.Clear();
 
 				if (i < 4)
-					await Task.Delay(delayBetweenHits[i]);
+					await skill.Wait(delayBetweenHits[i]);
 			}
 		}
 	}

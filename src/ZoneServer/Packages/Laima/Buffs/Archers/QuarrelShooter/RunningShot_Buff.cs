@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -15,7 +16,7 @@ namespace Melia.Zone.Buffs.Handlers
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.RunningShot_Buff)]
-	public class RunningShot_BuffOverride : BuffHandler, IBuffCombatAttackBeforeCalcHandler
+	public class RunningShot_BuffOverride : BuffHandler
 	{
 		private const float MovingShotBonusPerLevel = 0.1f;
 
@@ -39,8 +40,12 @@ namespace Melia.Zone.Buffs.Handlers
 				Send.ZC_MOVE_SPEED(character);
 		}
 
-		public void OnAttackBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.RunningShot_Buff)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.RunningShot_Buff, out var buff))
+				return;
+
 			if (skill.IsNormalAttack || skill.Id == SkillId.Bow_Hanging_Attack || skill.Id == SkillId.Cannon_Attack || skill.Id == SkillId.DoubleGun_Attack)
 			{
 				var factor = buff.NumArg2;

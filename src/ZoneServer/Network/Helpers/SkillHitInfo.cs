@@ -27,14 +27,11 @@ namespace Melia.Zone.Network.Helpers
 			if (Versions.Protocol > 500)
 			{
 				packet.PutInt(skillHitInfo.IsKnockBack ? 1 : 0);
-				packet.PutShort((short)skillHitInfo.AniTime.TotalMilliseconds);
-				packet.PutByte(0);
-				packet.PutByte(0);
-				packet.PutShort((short)skillHitInfo.SkillHitDelay.TotalMilliseconds); // Skill Hit Delay? Adds pause in attack animation?
-
+				packet.PutInt((int)skillHitInfo.AniTime.TotalMilliseconds);
+				packet.PutShort((short)skillHitInfo.HitDelay.TotalMilliseconds);
 				packet.PutByte((byte)skillHitInfo.HitEffect);
-				packet.PutByte(1); // Was 1, but after melia update, was set to 0.
-
+				packet.PutByte(0);
+				packet.PutInt(0);
 			}
 			else
 			{
@@ -42,13 +39,10 @@ namespace Melia.Zone.Network.Helpers
 				var hitDelay = (short)skillHitInfo.Skill.Data.DefaultHitDelay.TotalMilliseconds;
 				packet.PutInt(cooldownTime);
 				packet.PutShort(hitDelay);
-
 				packet.PutByte((byte)skillHitInfo.HitEffect);
 				packet.PutInt(0);
-				packet.PutByte(skillHitInfo.IsKnockBack); // Was 1, but after melia update, was set to 0.
+				packet.PutByte(skillHitInfo.IsKnockBack);
 			}
-			if (Versions.Protocol > 500)
-				packet.PutInt(0);
 			packet.PutInt(skillHitInfo.ForceId); // This being set to anything causes a delay in the dagger damage animation
 			packet.PutShort(0);
 			packet.PutShort(0);

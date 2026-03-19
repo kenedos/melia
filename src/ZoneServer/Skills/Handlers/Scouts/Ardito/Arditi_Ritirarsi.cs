@@ -66,7 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 
 			caster.RemoveRandomDebuff(this.GetRemoveDebuffChance(skill));
 
-			CallSafe(this.Attack(skill, caster, originPos, farPos));
+			skill.Run(this.Attack(skill, caster, originPos, farPos));
 		}
 
 		/// <summary>
@@ -81,11 +81,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 			var direction = (originPos == farPos) ? caster.Direction : originPos.GetDirection(farPos);
 			var effectPosition = caster.Position.GetRelative(direction, 40);
 
-			await Task.Delay(TimeSpan.FromMilliseconds(150));
+			await skill.Wait(150);
 
 			Send.ZC_NORMAL.SkillProjectile(caster, effectPosition, "I_archer_Lachrymator_force_mash002#Dummy_R_HAND", 0.75f, "F_scout_Ritirarsi", 4f, 70f, TimeSpan.FromSeconds(0.3f), TimeSpan.Zero, 600);
 
-			await Task.Delay(TimeSpan.FromMilliseconds(600));
+			await skill.Wait(600);
 
 			var distance = this.GetJumpDistance();
 			var targetPos = caster.Position.GetRelative(caster.Direction.Backwards, distance);

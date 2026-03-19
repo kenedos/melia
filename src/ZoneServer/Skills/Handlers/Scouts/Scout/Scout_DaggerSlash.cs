@@ -51,7 +51,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 
-			CallSafe(this.Attack(skill, caster, splashArea, farPos));
+			skill.Run(this.Attack(skill, caster, splashArea, farPos));
 		}
 
 		/// <summary>
@@ -60,6 +60,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
 		/// <param name="splashArea"></param>
+		/// <param name="farPos"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea, Position farPos)
 		{
 			var aniTime = TimeSpan.FromMilliseconds(90);
@@ -80,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, hits);
 
-			await Task.Delay(hitDelay);
+			await skill.Wait(hitDelay);
 
 			// Based on the packets this delay is more like 270, but that
 			// just doesn't look right for unknown reasons, so we'll use

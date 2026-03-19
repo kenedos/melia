@@ -1,5 +1,6 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
@@ -14,12 +15,13 @@ namespace Melia.Zone.Abilities.Handlers
 	/// </summary>
 	[Package("laima")]
 	[AbilityHandler(AbilityId.Cloth)]
-	public class ClothOverride : IAbilityHandler, IAbilityCombatDefenseAfterCalcHandler
+	public class ClothOverride : IAbilityHandler
 	{
 		/// <summary>
 		/// Reduces cloth damage taken if wearing full plate armor.
 		/// </summary>
-		public void OnDefenseAfterCalc(Ability ability, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, AbilityId.Cloth)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
 			if (target is not Character character)
 				return;
@@ -27,7 +29,8 @@ namespace Melia.Zone.Abilities.Handlers
 			if (skill.Data.AttackType != SkillAttackType.Magic)
 				return;
 
-			if (character.IsWearingFullArmorSetOfType(ArmorMaterialType.Cloth))
+			var count = character.Inventory.CountEquipMaterial(ArmorMaterialType.Cloth);
+			if (count >= 4)
 			{
 				skillHitResult.Damage *= 0.8f;
 			}

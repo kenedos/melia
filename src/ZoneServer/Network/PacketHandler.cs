@@ -35,6 +35,7 @@ using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 using Melia.Zone.World.Storages;
 using Melia.Zone.Util;
+using Microsoft.CodeAnalysis;
 using Yggdrasil.Extensions;
 using Yggdrasil.Logging;
 using Yggdrasil.Network.Communication;
@@ -1844,6 +1845,7 @@ namespace Melia.Zone.Network
 							return;
 						}
 
+						skill.PrepareCancellation();
 						handler.Handle(skill, character, originPos, farPos, targets.ToArray());
 						break;
 					}
@@ -1856,6 +1858,7 @@ namespace Melia.Zone.Network
 							return;
 						}
 
+						skill.PrepareCancellation();
 						handler.Handle(skill, character, originPos, farPos, targets.FirstOrDefault());
 						break;
 					}
@@ -1939,6 +1942,7 @@ namespace Melia.Zone.Network
 							return;
 						}
 
+						skill.PrepareCancellation();
 						handler.Handle(skill, character, target);
 						break;
 					}
@@ -2010,6 +2014,7 @@ namespace Melia.Zone.Network
 							return;
 						}
 
+						skill.PrepareCancellation();
 						handler.Handle(skill, character, null);
 						break;
 					}
@@ -2097,6 +2102,12 @@ namespace Melia.Zone.Network
 					return;
 				}
 
+				// The client sends a handle regardless of who you're
+				// targetting, including friendlies and NPCs. The latter
+				// we're going to exclude for now, under the assumption
+				// that you never use skills on "non-combatants."
+				// We probably want a more sophisticated target check
+				// down the line, based on the skill's target options.
 				if (actor is ICombatEntity ce)
 					target = ce;
 			}
@@ -2190,6 +2201,7 @@ namespace Melia.Zone.Network
 					return;
 				}
 
+				skill.PrepareCancellation();
 				handler.Handle(skill, character, originPos, direction);
 			}
 			catch (ArgumentException ex)
@@ -6370,6 +6382,19 @@ namespace Melia.Zone.Network
 			if (character.Map.IsPVP && !Feature.IsEnabled("AllowPVPResurrection"))
 			{
 				Log.Warning("CZ_RESURRECT: User '{0}' tried to revive their character in a PVP map.", conn.Account.Name);
+				return;
+			}
+
+			if (!character.Variables.Perm.TryGetInt("Melia.ResurrectOptions", out var options))
+			{
+				Log.Warning("CZ_RESURRECT: User '{0}' tried to revive their character while no options were set.", conn.Account.Name);
+				return;
+			}
+
+			var availableOptions = (ResurrectOptions)options;
+			if ((availableOptions & option) == 0)
+			{
+				Log.Warning("CZ_RESURRECT: User '{0}' tried to revive their character with an unavailable option ('{1}' not in '{2}').", conn.Account.Name, option, availableOptions);
 				return;
 			}
 

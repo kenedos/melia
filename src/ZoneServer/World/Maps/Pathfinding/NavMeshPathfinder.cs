@@ -61,32 +61,15 @@ namespace Melia.Zone.World.Maps.Pathfinding
 			start.Y = startHeight;
 			destination.Y = destinationHeight;
 
-			// If the start position is not valid (entity stuck in wall/obstacle/
-			// outside boundaries), find the nearest valid position and use it
-			// as the pathfinding start. The actual position is prepended to
-			// the final path so the entity walks out of the invalid area.
-			var actualStart = start;
-			var startWasInvalid = false;
+			// We'll skip the start position check, since an actor
+			// might've accidentally slipped or spawned partially into
+			// a wall, at which point they would be unable to get out
+			// of that situation.
+			if (/*!_ground.IsValidCirclePosition(start, actorRadius) ||*/ !_ground.IsValidCirclePosition(destination, actorRadius))
+				return false;
 
-			if (!_ground.IsValidCirclePosition(start, actorRadius))
+			if (_ground.GetLastValidCirclePosition(start, actorRadius, destination) == destination)
 			{
-				if (!_ground.TryGetNearestValidPosition(start, actorRadius, out start, 200f))
-					return false;
-
-				startWasInvalid = true;
-			}
-
-			if (!_ground.IsValidCirclePosition(destination, actorRadius))
-			{
-				if (!_ground.TryGetNearestValidPosition(destination, actorRadius, out destination, 200f))
-					return false;
-			}
-
-			if (_map.IsLineOfSightWalkable(start, destination, actorRadius))
-			{
-				if (startWasInvalid)
-					path.Add(actualStart);
-
 				path.Add(start);
 				path.Add(destination);
 
@@ -98,10 +81,9 @@ namespace Melia.Zone.World.Maps.Pathfinding
 
 			if (startCellIndex == destinationCellIndex)
 			{
-				// Both positions are in the same cell but an obstacle
-				// blocks the direct path. Can't route around within
-				// a single cell, so reject.
-				return false;
+				path.Add(start);
+				path.Add(destination);
+				return true;
 			}
 
 			if (!this.TryFindCellPath(startCellIndex, destinationCellIndex, actorRadius, out var cellPath))
@@ -109,9 +91,6 @@ namespace Melia.Zone.World.Maps.Pathfinding
 
 			var rawPath = this.BuildFunnelPath(start, destination, cellPath, actorRadius);
 			path = this.ValidatePath(rawPath, actorRadius);
-
-			if (startWasInvalid && path.Count >= 2)
-				path.Insert(0, actualStart);
 
 			return path.Count >= 2;
 		}

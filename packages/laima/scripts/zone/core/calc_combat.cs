@@ -900,7 +900,7 @@ public class CombatCalculationsScript : GeneralScript
 			{
 				if (target is Character character)
 				{
-					if (character.IsWearingFullArmorSetOfType(ArmorMaterialType.Iron))
+					if (character.Inventory.CountEquipMaterial(ArmorMaterialType.Iron) >= 4)
 						return 0.7f;
 				}
 			}

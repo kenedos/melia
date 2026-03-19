@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -15,13 +16,14 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.ResistElements_Buff)]
-	public class ResistElements_BuffOverride : BuffHandler, IBuffCombatDefenseBeforeCalcHandler
+	public class ResistElements_BuffOverride : BuffHandler
 	{
-		/// <summary>
-		/// Reduces incoming elemental damage.
-		/// </summary>
-		public void OnDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.ResistElements_Buff)]
+		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.ResistElements_Buff, out var buff))
+				return;
+
 			var attackAttribute = modifier.AttackAttribute == AttributeType.None ? skill.Data.Attribute : modifier.AttackAttribute;
 
 			// Check if the incoming attack is elemental (Fire, Ice, Lightning, Earth, Poison)

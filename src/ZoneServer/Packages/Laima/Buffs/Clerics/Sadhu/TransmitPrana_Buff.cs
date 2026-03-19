@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -17,7 +18,7 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.TransmitPrana_Buff)]
-	public class TransmitPrana_BuffOverride : BuffHandler, IBuffCombatAttackBeforeBonusesHandler
+	public class TransmitPrana_BuffOverride : BuffHandler
 	{
 		private const float BaseFlatSoulAtk = 50f;
 		private const float FlatSoulAtkPerLevel = 5f;
@@ -33,8 +34,12 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Sadhu
 			RemovePropertyModifier(buff, buff.Target, PropertyName.Soul_Atk_BM);
 		}
 
-		public void OnAttackBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.TransmitPrana_Buff)]
+		public void OnAttackBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.TransmitPrana_Buff, out var buff))
+				return;
+
 			var damageMultiplierIncrease = buff.NumArg2;
 
 			if (skill.Data.Attribute == AttributeType.None || skill.Data.Attribute == AttributeType.Melee || skill.Data.Attribute == AttributeType.Magic)

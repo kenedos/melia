@@ -328,8 +328,14 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
-		/// Returns a random skill the entity can use
+		/// Returns a random skill the entity can use.
 		/// </summary>
+		/// <remarks>
+		/// The chance for each skill to be returned is determined by its
+		/// probability. These are equal by default, except for the
+		/// default skill, which has a higher chance. The probabilities
+		/// can be modified using <see cref="SetRandomSkill"/>.
+		/// </remarks>
 		/// <param name="skill"></param>
 		/// <returns></returns>
 		protected virtual bool TryGetRandomSkill(out Skill skill)
@@ -347,26 +353,14 @@ namespace Melia.Zone.Scripting.AI
 
 			if (mob.Data.Skills.Count == 0 && skills.Count == 0)
 			{
-				// Spammy doesn't really add much else
-				// Log.Error($"No skill found for {mob.Id}-{mob.Data.Name}");
 				return false;
 			}
 
-			// I thought we wouldn't need probabilities in the
-			// monster skill data, but it actually would be convenient
-			// to have. Though we have no source for them, so we'd have
-			// to define them ourselves. Anyway, for now we'll just
-			// always pick the first skill, assuming it's the default
-			// attack for the given monster.
 			var possibleSkills = mob.Data.Skills.Where(a => !this.Entity.IsOnCooldown(a.SkillId)).Select(a => a.SkillId);
 			if (!possibleSkills.Any())
 				return false;
 			var rndSkillId = possibleSkills.Random();
-			//var rndSkillId = mob.Data.Skills.First().SkillId;
 
-			// Should we give monsters a skill manager? We might not
-			// actually need it, though we should probably at least
-			// cache the skills if we create them on demand.
 			if (!skills.Has(rndSkillId))
 			{
 				var skillId = rndSkillId;
@@ -377,7 +371,6 @@ namespace Melia.Zone.Scripting.AI
 			}
 			else
 				skills.TryGet(rndSkillId, out skill);
-
 			return true;
 		}
 

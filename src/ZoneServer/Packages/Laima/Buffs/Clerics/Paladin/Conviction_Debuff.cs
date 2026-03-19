@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -14,13 +15,14 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Conviction_Debuff)]
-	public class Conviction_DebuffOverride : BuffHandler, IBuffCombatDefenseBeforeCalcHandler
+	public class Conviction_DebuffOverride : BuffHandler
 	{
-		/// <summary>
-		/// Applies the debuff's effect during the combat calculations.
-		/// </summary>
-		public void OnDefenseBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Conviction_Debuff)]
+		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.Conviction_Debuff, out var buff))
+				return;
+
 			// Get the attack attribute (override or skill's default)
 			var attackAttribute = modifier.AttackAttribute == AttributeType.None ? skill.Data.Attribute : modifier.AttackAttribute;
 

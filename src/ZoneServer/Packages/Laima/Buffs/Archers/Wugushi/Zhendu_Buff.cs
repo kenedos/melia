@@ -3,6 +3,7 @@ using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -20,7 +21,7 @@ namespace Melia.Zone.Buffs.Handlers
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.Zhendu_Buff)]
-	public class Zhendu_BuffOverride : BuffHandler, IBuffCombatAttackBeforeBonusesHandler
+	public class Zhendu_BuffOverride : BuffHandler
 	{
 		static Zhendu_BuffOverride()
 		{
@@ -30,8 +31,12 @@ namespace Melia.Zone.Buffs.Handlers
 		/// <summary>
 		/// On attack: change default element to Poison and boost poison damage.
 		/// </summary>
-		public void OnAttackBeforeBonuses(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.Zhendu_Buff)]
+		public void OnAttackBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.Zhendu_Buff, out var buff))
+				return;
+
 			if (skill.Data.Attribute == AttributeType.None || skill.Data.Attribute == AttributeType.Melee || skill.Data.Attribute == AttributeType.Magic)
 				modifier.AttackAttribute = AttributeType.Poison;
 

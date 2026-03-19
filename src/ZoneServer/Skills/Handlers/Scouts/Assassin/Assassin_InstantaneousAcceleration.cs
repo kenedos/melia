@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 			caster.Position = endingPosition;
 			Send.ZC_SET_POS(caster);
 
-			CallSafe(this.Attack(skill, caster, splashArea));
+			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
 		/// <summary>
@@ -70,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 			var skillHitDelay = TimeSpan.Zero;
 			var aniTime = TimeSpan.FromMilliseconds(100);
 
-			await Task.Delay(hitTime);
+			await skill.Wait(hitTime);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();

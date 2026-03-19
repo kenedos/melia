@@ -672,4 +672,19 @@ public class SkillCalculationsScript : GeneralScript
 
 		return (int)Math.Max(0, Math.Floor(ret));
 	}
+
+	/// <summary>
+	/// Returns the hit delay of the skills, which affects animations.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_GET_HIT_DELAY(Skill skill)
+	{
+		var baseValue = skill.Data.DefaultHitDelay.TotalMilliseconds;
+
+		// TODO: Apply skill speed rate and other modifiers here? Probably.
+
+		return (float)Math.Floor(baseValue);
+	}
 }

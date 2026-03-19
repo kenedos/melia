@@ -71,8 +71,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			if (caster is Character character)
 				Send.ZC_NORMAL.SkillItemToss(caster, "warrior_f_", "RH", farPos, "F_smoke177", 3, 0.2f, 0, 600, 1, 240, 295, 0, 3f);
 
-			CallSafe(this.Attack(skill, caster, new Circle(farPos, 50)));
-			CallSafe(this.Explosion(caster, skill, farPos));
+			skill.Run(this.Attack(skill, caster, new Circle(farPos, 50)));
+			skill.Run(this.Explosion(caster, skill, farPos));
 		}
 
 		/// <summary>
@@ -86,7 +86,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
-			await Task.Delay(HitDelay);
+			await skill.Wait(HitDelay);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
@@ -130,7 +130,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			if (!caster.IsAbilityActive(AbilityId.Hoplite33))
 				return;
 
-			await Task.Delay(HitDelay);
+			await skill.Wait(HitDelay);
 
 			var pad = new Pad(PadName.ThrouwingSpear_Hoplite33_Pad, caster, skill, new Circle(farPos, 50));
 			pad.Position = farPos;

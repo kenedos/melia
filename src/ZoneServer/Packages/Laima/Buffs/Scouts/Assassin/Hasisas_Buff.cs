@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
@@ -19,7 +20,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Assassin
 	/// </remarks>
 	[Package("laima")]
 	[BuffHandler(BuffId.Hasisas_Buff)]
-	public class Hasisas_BuffOverride : BuffHandler, IBuffCombatAttackBeforeCalcHandler
+	public class Hasisas_BuffOverride : BuffHandler
 	{
 		private const float CritBonusRateBase = 0.3f;
 		private const float CritBonusRatePerLevel = 0.04f;
@@ -44,8 +45,12 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Assassin
 		{
 			this.ReduceHp(buff);
 		}
-		public void OnAttackBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Hasisas_Buff)]
+		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.Hasisas_Buff, out var buff))
+				return;
+
 			var critBonus = this.GetCritBonus(buff);
 			modifier.CritDamageMultiplier += critBonus;
 		}
