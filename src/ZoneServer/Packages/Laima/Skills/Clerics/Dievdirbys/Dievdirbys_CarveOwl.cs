@@ -114,7 +114,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			}
 
 			// Start background task to make the owl attack nearby enemies
-			skill.Run(this.OwlAttackLoop(skill, caster, owl, position));
+			// Use RunFree so the attack loop survives the skill being recast for additional owls
+			skill.RunFree(this.OwlAttackLoop(skill, caster, owl, position));
 
 			// Note: MonsterSkillCreateMob already handles AddMonster, DelayEnterWorld, EnterDelayedActor
 		}
@@ -136,10 +137,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 
 			while (owl != null && !owl.IsDead)
 			{
-				// Check if owl is still alive
-				if (owl == null || owl.IsDead)
-					break;
-
 				// Find enemy targets in range
 				var targets = owl.Map.GetActorsInRange<ICombatEntity>(owlPosition, detectionRange, target =>
 				{
@@ -185,8 +182,9 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 					useSkill1 = !useSkill1;
 				}
 
-				// Wait for next check interval
-				await skill.Wait(TimeSpan.FromMilliseconds(checkInterval));
+				// Use Task.Delay instead of skill.Wait so the loop is independent
+				// of the skill's cancellation token (survives skill recast)
+				await Task.Delay(checkInterval);
 			}
 		}
 	}
