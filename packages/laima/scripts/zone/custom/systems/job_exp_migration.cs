@@ -13,10 +13,7 @@ public class JobExpMigrationScript : GeneralScript
 		var character = args.Character;
 		var vars = character.Variables.Perm;
 	
-		if (vars.GetBool("Laima.Custom.JobExpMigration_2026_03_17", false))
-			return;
-	
-		character.ResetSkills();
+		var changed = false;
 
 		if (!vars.GetBool("Laima.Custom.JobExpMigration_2026_02_12", false))
 		{
@@ -27,11 +24,19 @@ public class JobExpMigrationScript : GeneralScript
 				character.Properties.Modify(PropertyName.StatByLevel, missingStatPoints);
 
 			character.ResetStats();
+			character.ResetSkills();
 			vars.SetBool("Laima.Custom.JobExpMigration_2026_02_12", true);
+			changed = true;
 		}
-	
-		Send.ZC_OBJECT_PROPERTY(character);
-	
-		vars.SetBool("Laima.Custom.JobExpMigration_2026_03_17", true);
+
+		if (!vars.GetBool("Laima.Custom.JobExpMigration_2026_03_17", false))
+		{
+			character.ResetSkills();
+			vars.SetBool("Laima.Custom.JobExpMigration_2026_03_17", true);
+			changed = true;
+		}
+
+		if (changed)
+			Send.ZC_OBJECT_PROPERTY(character);
 	}
 }
