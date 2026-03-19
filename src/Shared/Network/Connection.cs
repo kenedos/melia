@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading.Tasks;
 using Melia.Shared.Network.Crypto;
 using Yggdrasil.Logging;
@@ -57,12 +56,8 @@ namespace Melia.Shared.Network
 	/// </summary>
 	public abstract class Connection : TcpConnection, IConnection
 	{
-		private const int SendTimeoutMs = 5000;
-		private static readonly FieldInfo _socketField = typeof(TcpConnection).GetField("_socket", BindingFlags.NonPublic | BindingFlags.Instance);
-
 		protected readonly TosFramer _framer = new(1024 * 50);
 		protected readonly Codec _crypto = new();
-		private volatile bool _sendTimeoutConfigured;
 
 		/// <summary>
 		/// Gets or sets whether the player authenticated themselves.
@@ -135,31 +130,6 @@ namespace Melia.Shared.Network
 		/// </summary>
 		/// <param name="packet"></param>
 		protected abstract void OnPacketReceived(Packet packet);
-
-		/// <summary>
-		/// Overrides the base Send to configure a send timeout on the
-		/// underlying socket, preventing indefinite blocking when a
-		/// client connection goes dead without a clean disconnect.
-		/// </summary>
-		/// <param name="data"></param>
-		public override void Send(byte[] data)
-		{
-			if (!_sendTimeoutConfigured)
-			{
-				_sendTimeoutConfigured = true;
-				try
-				{
-					if (_socketField?.GetValue(this) is Socket socket)
-						socket.SendTimeout = SendTimeoutMs;
-				}
-				catch (Exception ex)
-				{
-					Log.Warning("Connection: Failed to set send timeout: {0}", ex.Message);
-				}
-			}
-
-			base.Send(data);
-		}
 
 		/// <summary>
 		/// Sends packet to client.
