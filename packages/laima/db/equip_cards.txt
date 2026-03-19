@@ -80,7 +80,7 @@
 { id: 75, className: "card_helgasercle", useType: "Always", script: { function: "SCR_CARDEFFECT_STATUS_PLUS", strArg: "EQUIP_MATK", strArg2: "MATK", strArg3: "0.5" } },
 { id: 76, className: "card_Spector_F", useType: "Always", script: { function: "SCR_CARDEFFECT_STATUS_RATE", strArg: "MSP_RATE_BM", strArg2: "MSP", strArg3: "0.8" } },
 { id: 77, className: "card_hydra", useType: "BeforeAttack", script: { function: "SCR_CARDEFFECT_DAMAGE_RATE_BY_BUFF", strArg: "Freeze", strArg2: "Keyword", strArg3: "2" } },
-{ id: 78, className: "card_rajapearl", useType: "Attack", condScript: { function: "SCR_CARDCHECK_ATTACK_RATE" }, script: { function: "SCR_CARDEFFECT_ADD_BUFF_MONSTER", strArg: "CARD_Wound", strArg3: "6000" } },
+{ id: 78, className: "card_rajapearl", useType: "Attack", condScript: { function: "SCR_CARDCHECK_ATTACK_RATE" }, script: { function: "SCR_CARDEFFECT_ADD_BUFF_MONSTER", strArg: "CARD_Wound", strArg3: "10000" } },
 { id: 79, className: "card_fallen_statue", useType: "BeforeAttack", condScript: { function: "SCR_CARDCHECK_MONRACE", strArg: "Holding", numArg1: 100 }, script: { function: "SCR_CARDEFFECT_ADD_DAMAGE_RATE_BM", strArg3: "2.5" } },
 { id: 80, className: "card_lepus", useType: "Always", condScript: { function: "SCR_CARDCHECK_ATTACKTYPE_EQUIP", strArg: "SH", numArg1: 100 }, script: { function: "SCR_CARDEFFECT_ATK_SPEED", strArg3: "1" } },
 { id: 81, className: "card_sparnas", useType: "BeforeAttack", condScript: { function: "SCR_CARDCHECK_ATTACKTYPE_MISSILE", strArg: "Arrow/Cannon/Gun", numArg1: 100 }, script: { function: "SCR_CARDEFFECT_ADD_DAMAGE_RATE_BM", strArg3: "1" } },
