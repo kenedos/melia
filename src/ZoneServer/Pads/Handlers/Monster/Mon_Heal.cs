@@ -1,12 +1,12 @@
 using System;
-using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
+using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Pads.Handlers
 {
@@ -47,8 +47,11 @@ namespace Melia.Zone.Pads.Handlers
 			if (initiator.Hp >= initiator.MaxHp)
 				return;
 
-			var matk = creator.Properties.GetFloat(PropertyName.MINMATK) + creator.Properties.GetFloat(PropertyName.MAXMATK) / 2;
-			initiator.StartBuff(BuffId.Mon_Heal_Buff, skill.Level, matk, TimeSpan.FromMilliseconds(1000), creator);
+			var modifier = new SkillModifier();
+			var skillHitResult = SCR_SkillHit(creator, initiator, skill, modifier);
+			var healAmount = skillHitResult.Damage;
+
+			initiator.StartBuff(BuffId.Mon_Heal_Buff, skill.Level, healAmount, TimeSpan.FromMilliseconds(1000), creator);
 
 			pad.Trigger.IncreaseUseCount();
 		}
