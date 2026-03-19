@@ -365,6 +365,9 @@ namespace Melia.Web
 				foreach (var processor in this.Conf.Web.CgiProcessors)
 					_server.WithModule(new CgiProcessorModule("/", processor.Name, processor.Path, processor.FileExtensions));
 
+				var webRoot = Directory.Exists("user/web/") ? "user/web/" : "system/web/";
+				_server.WithModule(new CleanUrlModule("/", webRoot));
+
 				if (Directory.Exists("user/web/"))
 				{
 					_server.WithStaticFolder("/", "user/web/", false, fm =>
