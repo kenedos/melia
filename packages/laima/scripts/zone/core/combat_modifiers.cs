@@ -283,6 +283,7 @@ public class CombatModifierCalculationsScript : GeneralScript
 
 	/// <summary>
 	/// Calls the given scriptable function for all active buffs (new system).
+	/// Also checks companion owners' active buffs.
 	/// </summary>
 	private void CallForBuffs(string baseFuncName, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 	{
@@ -293,6 +294,19 @@ public class CombatModifierCalculationsScript : GeneralScript
 
 		if (target.Components.TryGet<BuffComponent>(out buffs))
 			buffIds.UnionWith(buffs.GetList().Select(b => b.Id));
+
+		// Check companion owners' active buffs
+		if (attacker is Companion companionAtk && companionAtk.Owner != null)
+		{
+			if (companionAtk.Owner.Components.TryGet<BuffComponent>(out var ownerBuffs))
+				buffIds.UnionWith(ownerBuffs.GetList().Select(b => b.Id));
+		}
+
+		if (target is Companion companionTgt && companionTgt.Owner != null)
+		{
+			if (companionTgt.Owner.Components.TryGet<BuffComponent>(out var ownerBuffs))
+				buffIds.UnionWith(ownerBuffs.GetList().Select(b => b.Id));
+		}
 
 		foreach (var buffId in buffIds)
 		{
@@ -305,6 +319,7 @@ public class CombatModifierCalculationsScript : GeneralScript
 
 	/// <summary>
 	/// Calls the given scriptable function for all passive skills (new system).
+	/// Also checks companion owners' passive skills.
 	/// </summary>
 	private void CallForPassiveSkills(string baseFuncName, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 	{
@@ -315,6 +330,19 @@ public class CombatModifierCalculationsScript : GeneralScript
 
 		if (target.Components.TryGet<SkillComponent>(out skills))
 			skillIds.UnionWith(skills.GetList(a => a.IsPassive).Select(s => s.Id));
+
+		// Check companion owners' passive skills
+		if (attacker is Companion companionAtk && companionAtk.Owner != null)
+		{
+			if (companionAtk.Owner.Components.TryGet<SkillComponent>(out var ownerSkills))
+				skillIds.UnionWith(ownerSkills.GetList(a => a.IsPassive).Select(s => s.Id));
+		}
+
+		if (target is Companion companionTgt && companionTgt.Owner != null)
+		{
+			if (companionTgt.Owner.Components.TryGet<SkillComponent>(out var ownerSkills))
+				skillIds.UnionWith(ownerSkills.GetList(a => a.IsPassive).Select(s => s.Id));
+		}
 
 		foreach (var skillId in skillIds)
 		{
@@ -327,6 +355,7 @@ public class CombatModifierCalculationsScript : GeneralScript
 
 	/// <summary>
 	/// Calls the given scriptable function for all active abilities (new system).
+	/// Also checks companion owners' active abilities.
 	/// </summary>
 	private void CallForAbilities(string baseFuncName, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 	{
@@ -337,6 +366,19 @@ public class CombatModifierCalculationsScript : GeneralScript
 
 		if (target.Components.TryGet<AbilityComponent>(out abilities))
 			abilityIds.UnionWith(abilities.GetList(a => a.Active).Select(a => a.Id));
+
+		// Check companion owners' active abilities
+		if (attacker is Companion companionAtk && companionAtk.Owner != null)
+		{
+			if (companionAtk.Owner.Components.TryGet<AbilityComponent>(out var ownerAbilities))
+				abilityIds.UnionWith(ownerAbilities.GetList(a => a.Active).Select(a => a.Id));
+		}
+
+		if (target is Companion companionTgt && companionTgt.Owner != null)
+		{
+			if (companionTgt.Owner.Components.TryGet<AbilityComponent>(out var ownerAbilities))
+				abilityIds.UnionWith(ownerAbilities.GetList(a => a.Active).Select(a => a.Id));
+		}
 
 		foreach (var abilityId in abilityIds)
 		{

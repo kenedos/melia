@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -18,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hunter_Growling)]
-	public class Hunter_GrowlingOverride : IPassiveSkillHandler, ISkillCombatCompanionAttackAfterBonusesHandler
+	public class Hunter_GrowlingOverride : IPassiveSkillHandler
 	{
 		private const string GrowlingEventId = "Hunter.Growling.Fear";
 		private const float GrowlingRange = 100f;
@@ -131,14 +132,21 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 		/// Hunter15/Hunter35 abilities are applied via reinforceAbility in skill data.
 		/// Hunter24 ability increases the damage bonus by 50%.
 		/// </summary>
-		public void OnCompanionAttackAfterBonuses(Skill skill, ICombatEntity attacker, ICombatEntity target, Skill attackerSkill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterBonuses, SkillId.Hunter_Growling)]
+		public void OnCompanionAttackAfterBonuses(ICombatEntity attacker, ICombatEntity target, Skill attackerSkill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetOwner(out var owner))
+				return;
+
+			if (!owner.TryGetSkill(SkillId.Hunter_Growling, out var skill))
+				return;
+
 			// Use the calculated skill factor which includes reinforceAbility bonuses
 			var skillFactor = skill.Properties.GetFloat(PropertyName.SkillFactor);
 			var damageIncrease = skillHitResult.Damage * (skillFactor / 100f);
 
 			// Hunter24: Increases companion damage from Growling by 50%
-			if (attacker.TryGetOwner(out var owner) && owner.IsAbilityActive(AbilityId.Hunter24))
+			if (owner.IsAbilityActive(AbilityId.Hunter24))
 				damageIncrease *= 1.5f;
 
 			skillHitResult.Damage += damageIncrease;
