@@ -4830,6 +4830,12 @@ namespace Melia.Zone.Network
 
 			Send.ZC_OBJECT_PROPERTY(conn, ability, PropertyName.ActiveState);
 			Send.ZC_ADDON_MSG(character, "RESET_ABILITY_ACTIVE", ability.Active ? 1 : 0, ability.Data.ClassName);
+
+			if (ZoneServer.Instance.AbilityHandlers.HasPropertyHandler(abilityId))
+			{
+				character.Properties.InvalidateAll();
+				Send.ZC_OBJECT_PROPERTY(character);
+			}
 		}
 
 		[PacketHandler(Op.CZ_OPEN_HELP)]

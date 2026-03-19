@@ -302,6 +302,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.ShopDb, "db/shops.txt");
 					this.LoadDb(this.Data.SimonyDb, "db/simony.txt");
 					this.LoadDb(this.Data.SkillDb, "db/skills.txt");
+					this.LoadDb(this.Data.SkillOverrideDb, "db/skills_overrides.txt");
 					this.LoadDb(this.Data.SkillTreeDb, "db/skilltree.txt");
 					this.LoadDb(this.Data.SkinToneDb, "db/skin_tones.txt");
 					this.LoadDb(this.Data.SocketPriceDb, "db/socket_prices.txt");
@@ -343,6 +344,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.MonsterDb, "db/monsters.txt");
 					this.LoadDb(this.Data.JobDb, "db/jobs.txt");
 					this.LoadDb(this.Data.SkillDb, "db/skills.txt");
+					this.LoadDb(this.Data.SkillOverrideDb, "db/skills_overrides.txt");
 					this.LoadDb(this.Data.SkillTreeDb, "db/skilltree.txt");
 				}
 				else if (serverType == ServerType.Lada)
@@ -392,6 +394,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.SessionObjectDb, "db/sessionobjects.txt");
 					this.LoadDb(this.Data.ShopDb, "db/shops.txt");
 					this.LoadDb(this.Data.SkillDb, "db/skills.txt");
+					this.LoadDb(this.Data.SkillOverrideDb, "db/skills_overrides.txt");
 					this.LoadDb(this.Data.SkillTreeDb, "db/skilltree.txt");
 					this.LoadDb(this.Data.SkinToneDb, "db/skin_tones.txt");
 					this.LoadDb(this.Data.SocketPriceDb, "db/socket_prices.txt");

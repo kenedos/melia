@@ -97,7 +97,8 @@ namespace Melia.Zone.Abilities
 			ability.Vars.SetFloat(varName, newValue);
 			character.Properties.Modify(propertyName, value);
 
-			Send.ZC_OBJECT_PROPERTY(character, propertyName);
+			if (character.Connection != null)
+				Send.ZC_OBJECT_PROPERTY(character, propertyName);
 		}
 
 		/// <summary>
@@ -121,7 +122,8 @@ namespace Melia.Zone.Abilities
 				character.Properties.Modify(propertyName, -value);
 				ability.Vars.Remove(varName);
 
-				Send.ZC_OBJECT_PROPERTY(character, propertyName);
+				if (character.Connection != null)
+					Send.ZC_OBJECT_PROPERTY(character, propertyName);
 			}
 		}
 

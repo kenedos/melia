@@ -70,7 +70,7 @@ namespace Melia.Shared.Data
 		public ShopDb ShopDb { get; } = new ShopDb();
 		public SimonyDb SimonyDb { get; } = new SimonyDb();
 		public SkillDb SkillDb { get; } = new SkillDb();
-
+		public SkillOverrideDb SkillOverrideDb { get; }
 		public SkillTreeDb SkillTreeDb { get; } = new SkillTreeDb();
 		public SkinToneDb SkinToneDb { get; } = new SkinToneDb();
 		public SocketPriceDb SocketPriceDb { get; } = new SocketPriceDb();
@@ -87,6 +87,7 @@ namespace Melia.Shared.Data
 			// the zone servers serve.
 			this.ServerDb = new ServerDb(this.MapDb);
 			this.TradeShopDb = new TradeShopDb(this.ItemDb);
+			this.SkillOverrideDb = new SkillOverrideDb(this.SkillDb);
 			// Yup, still not entirely happy with this.
 			this.CollectionDb = new CollectionDb(this.PropertiesDb, this.ItemDb);
 			this.ItemSetDb = new ItemSetDb(this.ItemDb);

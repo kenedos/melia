@@ -135,6 +135,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 					return;
 			}
 
+			if (buffSkill == null)
+			{
+				caster.StopBuff(selectedBuff.Id);
+				return;
+			}
+
 			if (!caster.TrySpendSp(buffSkill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
