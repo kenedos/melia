@@ -313,6 +313,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_STR_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("JobStatBonuses"))
+			return 0;
+
 		var properties = character.Properties;
 		var jobs = character.Jobs.GetList();
 
@@ -335,6 +338,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CON_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("JobStatBonuses"))
+			return 0;
+
 		var properties = character.Properties;
 		var jobs = character.Jobs.GetList();
 
@@ -357,6 +363,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_INT_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("JobStatBonuses"))
+			return 0;
+
 		var properties = character.Properties;
 		var jobs = character.Jobs.GetList();
 
@@ -379,6 +388,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MNA_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("JobStatBonuses"))
+			return 0;
+
 		var properties = character.Properties;
 		var jobs = character.Jobs.GetList();
 
@@ -401,6 +413,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DEX_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("JobStatBonuses"))
+			return 0;
+
 		var properties = character.Properties;
 		var jobs = character.Jobs.GetList();
 
