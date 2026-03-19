@@ -22,7 +22,10 @@ namespace Melia.Zone.Buffs.Handlers.Rodelero
 			AddPropertyModifier(buff, buff.Target, PropertyName.BLK_RATE_BM, blockRate);
 
 			buff.Target.Properties.Modify(PropertyName.Jumpable, -1);
-			buff.Target.Properties.Modify(PropertyName.DashRun, 0);
+			// TODO: Review DashRun property handling. Dashing is
+			// currently blocked by the client during channeling, but we
+			// don't know how to enforce it properly on the server yet.
+			buff.Target.Properties.SetFloat(PropertyName.DashRun, 0);
 		}
 
 		public override void OnEnd(Buff buff)
@@ -31,7 +34,10 @@ namespace Melia.Zone.Buffs.Handlers.Rodelero
 			RemovePropertyModifier(buff, buff.Target, PropertyName.BLK_RATE_BM);
 
 			buff.Target.Properties.Modify(PropertyName.Jumpable, 1);
-			buff.Target.Properties.Modify(PropertyName.DashRun, 1);
+			// TODO: Review DashRun property handling. Dashing is
+			// currently blocked by the client during channeling, but we
+			// don't know how to enforce it properly on the server yet.
+			buff.Target.Properties.SetFloat(PropertyName.DashRun, 0);
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 {
 	[Package("laima")]
 	[PadHandler(PadName.Cleric_Restoration)]
-	public class Paladin_RestorationOverride : ICreatePadHandler, IDestroyPadHandler, IUpdatePadHandler
+	public class Paladin_RestorationOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, ILeavePadHandler, IUpdatePadHandler
 	{
 		private const int PadLifeTimeSeconds = 300;
 
@@ -23,9 +23,11 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 			var creator = args.Creator;
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
-			pad.SetRange(70f);
+			pad.SetRange(100f);
 			pad.Trigger.LifeTime = TimeSpan.FromSeconds(PadLifeTimeSeconds);
 			pad.SetUpdateInterval(300);
+
+			Debug.ShowShape(creator.Map, pad.Trigger.Area, TimeSpan.FromSeconds(PadLifeTimeSeconds));
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -52,7 +54,14 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 				return;
 
 			var healAmount = this.GetHealAmount(creator, initiator, skill);
-			initiator.StartBuff(BuffId.Restoration_Buff, skill.Level, healAmount, TimeSpan.FromMilliseconds(3000f), creator);
+			initiator.StartBuff(BuffId.Restoration_Buff, skill.Level, healAmount, pad.Trigger.RemainingLifeTime, creator);
+		}
+
+		public void Left(object sender, PadTriggerActorArgs args)
+		{
+			var initiator = args.Initiator;
+
+			initiator.StopBuff(BuffId.Restoration_Buff);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)
@@ -82,17 +91,10 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 					continue;
 
 				var healAmount = this.GetHealAmount(creator, target, skill);
-				target.StartBuff(BuffId.Restoration_Buff, skill.Level, healAmount, TimeSpan.FromMilliseconds(3000f), creator);
+				target.StartBuff(BuffId.Restoration_Buff, skill.Level, healAmount, pad.Trigger.RemainingLifeTime, creator);
 			}
 		}
 
-		/// <summary>
-		/// Returns the healing power of the skill.
-		/// </summary>
-		/// <param name="caster"></param>
-		/// <param name="target"></param>
-		/// <param name="skill"></param>
-		/// <returns></returns>
 		private float GetHealAmount(ICombatEntity caster, ICombatEntity target, Skill skill)
 		{
 			var SCR_CalculateHeal = ScriptableFunctions.Combat.Get("SCR_CalculateHeal");

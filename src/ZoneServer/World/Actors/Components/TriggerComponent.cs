@@ -63,6 +63,11 @@ namespace Melia.Zone.World.Actors.Components
 		public TimeSpan LifeTime { get; set; } = TimeSpan.MaxValue;
 
 		/// <summary>
+		/// Returns the remaining life time of the trigger.
+		/// </summary>
+		public TimeSpan RemainingLifeTime => this.LifeTime != TimeSpan.MaxValue ? this.LifeTime - _lifetimeTimer : TimeSpan.MaxValue;
+
+		/// <summary>
 		/// Returns the number of actors currently inside the trigger.
 		/// </summary>
 		public int ActorCount
