@@ -113,6 +113,7 @@ public class CombatModifierCalculationsScript : GeneralScript
 		CallForBuffs(baseFuncName, attacker, target, skill, modifier, skillHitResult);
 		CallForPassiveSkills(baseFuncName, attacker, target, skill, modifier, skillHitResult);
 		CallForAbilities(baseFuncName, attacker, target, skill, modifier, skillHitResult);
+		CallForEquip(baseFuncName, attacker, target, skill, modifier, skillHitResult);
 	}
 
 	/// <summary>
@@ -340,6 +341,34 @@ public class CombatModifierCalculationsScript : GeneralScript
 		foreach (var abilityId in abilityIds)
 		{
 			var funcName = baseFuncName + "_" + abilityId;
+
+			if (ScriptableFunctions.CombatModifier.TryGet(funcName, out var func))
+				func(attacker, target, skill, modifier, skillHitResult);
+		}
+	}
+
+	/// <summary>
+	/// Calls the given scriptable function for all active abilities.
+	/// </summary>
+	/// <param name="baseFuncName"></param>
+	/// <param name="attacker"></param>
+	/// <param name="target"></param>
+	/// <param name="skill"></param>
+	/// <param name="modifier"></param>
+	/// <param name="skillHitResult"></param>
+	private void CallForEquip(string baseFuncName, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+	{
+		var equipIds = new HashSet<int>();
+
+		if (attacker.Components.TryGet<InventoryComponent>(out var inventory))
+			equipIds.UnionWith(inventory.GetActualEquipIds());
+
+		if (target.Components.TryGet<InventoryComponent>(out inventory))
+			equipIds.UnionWith(inventory.GetActualEquipIds());
+
+		foreach (var equipId in equipIds)
+		{
+			var funcName = baseFuncName + "_" + equipId;
 
 			if (ScriptableFunctions.CombatModifier.TryGet(funcName, out var func))
 				func(attacker, target, skill, modifier, skillHitResult);
