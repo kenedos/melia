@@ -10,35 +10,41 @@ using Melia.Zone.Skills;
 namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
 {
 	/// <summary>
-	/// Handle for the Restoration, restores HP
+	/// Handle for the Restoration, periodically restores HP
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Restoration_Buff)]
 	public class Restoration_BuffOverride : BuffHandler
 	{
-		private const string RHPModPropName = PropertyName.RHP_BM;
-		private const string RSPModPropName = PropertyName.RSP_BM;
+		private const int HealTickMs = 3000;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			var target = buff.Target;
 			var caster = (ICombatEntity)buff.Caster;
 
-			if (caster != null && caster.TryGetSkill(SkillId.Paladin_Restoration, out var skill))
-			{
-				// Calculate heal amount based on skill factor
-				var healAmount = this.CalculateHealAmount(caster, target, skill);
-				buff.Target.Heal(healAmount, 0);
-			}
-			else
+			if (caster == null || !caster.TryGetSkill(SkillId.Paladin_Restoration, out var skill))
 			{
 				buff.End();
+				return;
 			}
+
+			var healAmount = this.CalculateHealAmount(caster, buff.Target, skill);
+			buff.Target.Heal(healAmount, 0);
+
+			buff.SetUpdateTime(HealTickMs);
 		}
 
-		/// <summary>
-		/// Calculates the heal amount for the target based on skill factor.
-		/// </summary>
+		public override void WhileActive(Buff buff)
+		{
+			var caster = (ICombatEntity)buff.Caster;
+
+			if (caster == null || !caster.TryGetSkill(SkillId.Paladin_Restoration, out var skill))
+				return;
+
+			var healAmount = this.CalculateHealAmount(caster, buff.Target, skill);
+			buff.Target.Heal(healAmount, 0);
+		}
+
 		private float CalculateHealAmount(ICombatEntity caster, ICombatEntity target, Skill skill)
 		{
 			var SCR_CalculateHeal = ScriptableFunctions.Combat.Get("SCR_CalculateHeal");
