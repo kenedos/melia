@@ -15,6 +15,6 @@ public class DZachariel35NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(3026, 147392, "Lv1 Treasure Chest", "d_zachariel_35", -110.82, -53.77, 1350, 180, "TREASUREBOX_LV_D_ZACHARIEL_353026", "", "");
+		AddNpc(3026, 147392, "Lv1 Treasure Chest", "d_zachariel_35", -297, -53.77, 1524, 270, "TREASUREBOX_LV_D_ZACHARIEL_353026", "", "");
 	}
 }

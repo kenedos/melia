@@ -19,6 +19,9 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 			if (buff.Caster is not Character caster)
 				return;
 
+			if (buff.Target != buff.Caster)
+				return;
+
 			caster.Variables.Temp.Remove("Melia.Buff.JollyRoger");
 			caster.Variables.Temp.Remove("Melia.Buff.JollyRoger.FeverStartTime");
 		}

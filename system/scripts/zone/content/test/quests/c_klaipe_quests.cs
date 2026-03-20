@@ -365,7 +365,7 @@ public class KlaipeCaravanEscortQuest : QuestScript
 		// Kill 15 monsters on the western road (using common monsters as placeholder)
 		AddObjective("killHanaming", "Kill Hanamings", new KillObjective(5, new[] { MonsterId.Hanaming }));
 		AddObjective("killOnion", "Kill Kepas", new KillObjective(5, new[] { MonsterId.Onion }));
-		AddObjective("killLeafDiving", "Kill Leaf Diving", new KillObjective(5, new[] { MonsterId.Leaf_Diving }));
+		AddObjective("killLeafDiving", "Kill Leaf Bugs", new KillObjective(5, new[] { MonsterId.Leaf_Diving }));
 		AddObjective("killInfrorocktor", "Kill Infrorocktor", new KillObjective(5, new[] { MonsterId.InfroRocktor }));
 
 		// Rewards
