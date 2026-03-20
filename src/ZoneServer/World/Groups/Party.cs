@@ -454,6 +454,11 @@ namespace Melia.Zone.World
 				{
 					var averageLevel = partyCharacters.Average(a => a.Level);
 
+					if (exp > 0)
+						exp = Math.Max(0, exp / partyCharacters.Length);
+					if (classExp > 0)
+						classExp = Math.Max(0, classExp / partyCharacters.Length);
+
 					foreach (var partyCharacter in partyCharacters)
 					{
 						var levelModifiedExp = exp;

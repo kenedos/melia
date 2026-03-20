@@ -27,9 +27,9 @@ namespace Melia.Zone.World
 			{
 				LeaderDbId = character.DbId,
 			};
-			party.AddMember(character, true);
-
 			ZoneServer.Instance.Database.CreateParty(party);
+
+			party.AddMember(character, true);
 
 			// Notify SocialServer to add player to party chat room
 			// Must be done after CreateParty() so party.DbId is valid
