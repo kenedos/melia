@@ -418,8 +418,9 @@ namespace Melia.Zone.World
 			if (partyCharacters.Length == 0)
 				return;
 
-			// Calculate party bonus exp
-			(exp, classExp) = this.GetPartyBonusExp(exp, classExp);
+			// Calculate party bonus exp based on members on the same map,
+			// not total online members
+			(exp, classExp) = this.GetPartyBonusExp(exp, classExp, partyCharacters.Length);
 
 			// Find highest level in party for penalty calculations
 			var highestLevel = partyCharacters.Max(c => c.Level);
@@ -435,16 +436,9 @@ namespace Melia.Zone.World
 
 					foreach (var partyCharacter in partyCharacters)
 					{
-						var (penalizedExp, penalizedClassExp) = this.ApplyLevelPenalty(
+						partyCharacter?.GiveExp(
 							exp,
 							classExp,
-							partyCharacter.Level,
-							highestLevel
-						);
-
-						partyCharacter?.GiveExp(
-							penalizedExp,
-							penalizedClassExp,
 							(partyCharacter.ObjectId == killer.ObjectId) ? monster : null
 						);
 					}
@@ -527,10 +521,12 @@ namespace Melia.Zone.World
 		/// modified exp based on party configuration.
 		/// </summary>
 		/// <param name="baseExp"></param>
+		/// <param name="baseJobExp"></param>
+		/// <param name="memberCount">Number of party members eligible for exp (same map).</param>
 		/// <returns></returns>
-		private (long, long) GetPartyBonusExp(long baseExp, long baseJobExp)
+		private (long, long) GetPartyBonusExp(long baseExp, long baseJobExp, int memberCount)
 		{
-			var bonusExpRatio = this.GetPartyExpModifier();
+			var bonusExpRatio = GetPartyExpModifier(memberCount);
 			baseExp = (long)Math.Floor(baseExp * bonusExpRatio);
 			baseJobExp = (long)Math.Floor(baseJobExp * bonusExpRatio);
 
@@ -539,20 +535,15 @@ namespace Melia.Zone.World
 
 		/// <summary>
 		/// Returns the exp multiplier based on party member count.
-		/// <remarks>
-		/// Does not take into consideration party configuration.
-		/// </remarks>
 		/// </summary>
+		/// <param name="memberCount">Number of party members eligible for exp.</param>
 		/// <returns></returns>
-		private float GetPartyExpModifier()
+		private static float GetPartyExpModifier(int memberCount)
 		{
-			var onlineMemberCount = this.OnlineMemberCount;
-			if (onlineMemberCount <= 1)
-			{
+			if (memberCount <= 1)
 				return 1f;
-			}
 
-			switch (onlineMemberCount)
+			switch (memberCount)
 			{
 				case 2:
 					return 1.2f;
@@ -571,7 +562,7 @@ namespace Melia.Zone.World
 				case 9:
 					return 3.5f;
 				default:
-					return (onlineMemberCount - 9) * .5f + 3.5f;
+					return (memberCount - 9) * .5f + 3.5f;
 			}
 		}
 
