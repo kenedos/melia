@@ -67,8 +67,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 		private Task ExecuteRapidFire(Skill skill, ICombatEntity caster, Position targetPos)
 		{
 			var attackArea = new CircleF(targetPos, 60);
-			var attackDelays = new[] { 100f, 180f, 260f, 340f, 420f };
-			var aniTimes = new[] { 300f, 380f, 460f, 540f, 620f };
+			var attackDelays = new[] { 300f, 380f, 460f, 540f, 620f };
+			var aniTimes = new[] { 100f, 180f, 260f, 340f, 420f };
 
 			for (var i = 0; i < 5; i++)
 			{

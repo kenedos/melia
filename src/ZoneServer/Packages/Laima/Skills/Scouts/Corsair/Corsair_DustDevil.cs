@@ -80,7 +80,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 			var splashParam = skill.GetSplashParameters(caster, caster.Position, caster.Position, length: 0, width: SplashRadius);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 
-			await SkillAttack(caster, skill, splashArea, hitDelay: 250, aniTime: 0, hits, this.ModifyDamage);
+			await SkillAttack(caster, skill, splashArea, hitDelay: 0, aniTime: 250, hits, this.ModifyDamage);
 			foreach (var hit in hits)
 			{
 				SkillResultTargetBuff(caster, skill, BuffId.Confuse, skill.Level, 0, ConfusionDurationMs, 1, ConfusionChance, -1, hit);
@@ -90,7 +90,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 
 			hits.Clear();
 
-			await SkillAttack(caster, skill, splashArea, hitDelay: 50, aniTime: 0, hits, this.ModifyDamage);
+			await SkillAttack(caster, skill, splashArea, hitDelay: 0, aniTime: 50, hits, this.ModifyDamage);
 			foreach (var hit in hits)
 			{
 				SkillResultTargetBuff(caster, skill, BuffId.Confuse, skill.Level, 0, ConfusionDurationMs, 1, ConfusionChance, -1, hit);
@@ -100,7 +100,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 
 			hits.Clear();
 
-			await SkillAttack(caster, skill, splashArea, hitDelay: 50, aniTime: 0, hits, this.ModifyDamage);
+			await SkillAttack(caster, skill, splashArea, hitDelay: 0, aniTime: 50, hits, this.ModifyDamage);
 			foreach (var hit in hits)
 			{
 				SkillResultTargetBuff(caster, skill, BuffId.Confuse, skill.Level, 0, ConfusionDurationMs, 1, ConfusionChance, -1, hit);
@@ -110,7 +110,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 
 			hits.Clear();
 
-			await SkillAttack(caster, skill, splashArea, hitDelay: 50, aniTime: 0, hits, this.ModifyDamage);
+			await SkillAttack(caster, skill, splashArea, hitDelay: 0, aniTime: 50, hits, this.ModifyDamage);
 			foreach (var hit in hits)
 			{
 				SkillResultTargetBuff(caster, skill, BuffId.Confuse, skill.Level, 0, ConfusionDurationMs, 1, ConfusionChance, -1, hit);
@@ -120,7 +120,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 
 			hits.Clear();
 
-			await SkillAttack(caster, skill, splashArea, hitDelay: 50, aniTime: 0, hits, this.ModifyDamage);
+			await SkillAttack(caster, skill, splashArea, hitDelay: 0, aniTime: 50, hits, this.ModifyDamage);
 			foreach (var hit in hits)
 			{
 				SkillResultTargetBuff(caster, skill, BuffId.Confuse, skill.Level, 0, ConfusionDurationMs, 1, ConfusionChance, -1, hit);

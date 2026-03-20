@@ -69,13 +69,13 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 
 			var splashParam = skill.GetSplashParameters(caster, casterPos, targetArea, length: 25, width: 20, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			await SkillAttack(caster, skill, splashArea, 30, 50);
+			await SkillAttack(caster, skill, splashArea, 50, 30);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
 
 			splashParam = skill.GetSplashParameters(caster, casterPos, targetArea, length: 25, width: 20, angle: 0);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			await SkillAttack(caster, skill, splashArea, 30, 80);
+			await SkillAttack(caster, skill, splashArea, 80, 30);
 
 			caster.StartBuff(BuffId.DoublePunch_Buff, skill.Level, 0, TimeSpan.FromSeconds(10), caster);
 		}

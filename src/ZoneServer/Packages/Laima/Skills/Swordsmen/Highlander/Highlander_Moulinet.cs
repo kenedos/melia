@@ -79,33 +79,33 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 0;
-			var aniTime = 60;
+			var hitDelay = 60;
+			var aniTime = 0;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, modifySkillHitResult: this.ModifySkillHitResult);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 0;
-			aniTime = 200;
+			hitDelay = 200;
+			aniTime = 0;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, modifySkillHitResult: this.ModifySkillHitResult);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 100;
-			aniTime = 300;
+			hitDelay = 300;
+			aniTime = 100;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, modifySkillHitResult: this.ModifySkillHitResult);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 140;
-			aniTime = 440;
+			hitDelay = 440;
+			aniTime = 140;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, modifySkillHitResult: this.ModifySkillHitResult);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 160;
-			aniTime = 700;
+			hitDelay = 700;
+			aniTime = 160;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, modifySkillHitResult: this.ModifySkillHitResult);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 0);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 250;
-			aniTime = 950;
+			hitDelay = 950;
+			aniTime = 250;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, modifySkillHitResult: this.ModifySkillHitResult);
 		}
 	}

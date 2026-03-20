@@ -53,14 +53,14 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 25, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 50;
-			var aniTime = 250;
+			var hitDelay = 250;
+			var aniTime = 50;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, modifySkillHitResult: ModifyResult, skillModifier: modifier);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 25, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 150;
-			aniTime = 250;
+			hitDelay = 250;
+			aniTime = 150;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, modifySkillHitResult: ModifyResult, skillModifier: modifier);
 
 			if (caster.TryGetActiveAbilityLevel(AbilityId.Monk5, out var abilityLevel))

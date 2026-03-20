@@ -60,8 +60,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 75, width: 20, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 70;
-			var aniTime = 270;
+			var hitDelay = 270;
+			var aniTime = 70;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			foreach (var hit in hits)
 			{

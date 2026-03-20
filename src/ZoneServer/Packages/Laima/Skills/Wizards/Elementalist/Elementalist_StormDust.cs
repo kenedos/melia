@@ -51,8 +51,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var hitDelay = 0;
-			var aniTime = 300;
+			var hitDelay = 300;
+			var aniTime = 0;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			var value = PadName.StormDust_Pad;

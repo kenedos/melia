@@ -71,8 +71,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		{
 			var hits = new List<SkillHitInfo>();
 
-			var hitDelay = 0;
-			var aniTime = 175;
+			var hitDelay = 175;
+			var aniTime = 0;
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 40, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 

@@ -50,14 +50,14 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 50;
-			var aniTime = 250;
+			var hitDelay = 250;
+			var aniTime = 50;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 30, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 250;
-			aniTime = 500;
+			hitDelay = 500;
+			aniTime = 250;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.Conviction_Debuff, skill.Level, 0f, 20000f, 1, 100, -1, hits);
 			if (caster.IsAbilityActive(AbilityId.Paladin43))
