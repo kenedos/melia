@@ -436,6 +436,10 @@ namespace Melia.Zone.World
 
 					foreach (var partyCharacter in partyCharacters)
 					{
+						var levelDifference = highestLevel - partyCharacter.Level;
+						if (levelDifference >= ZoneServer.Instance.Conf.World.PartyExpLevelPenaltyFull)
+							continue;
+
 						partyCharacter?.GiveExp(
 							exp,
 							classExp,
