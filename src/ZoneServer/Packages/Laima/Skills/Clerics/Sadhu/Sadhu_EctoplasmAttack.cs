@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Melia.Shared.Packages;
-using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
@@ -15,8 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 {
 	/// <summary>
 	/// Handler for the Sadhu skill Ectoplasm Attack.
-	/// Spirit basic attack using MATK with Soul attribute. 129% factor.
-	/// Only usable in spirit form (OOBE_Soulmaster_Buff active).
+	/// Spirit basic attack with 3 multi-hits and Soul attribute.
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_EctoplasmAttack)]
@@ -27,30 +28,48 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			if (!caster.IsBuffActive(BuffId.OOBE_Soulmaster_Buff))
 				return;
 
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
+			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_SKILL_READY(caster, skill, caster.Position, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, farPos);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 25, angle: 30f);
-			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			skill.Run(this.Attack(skill, caster, originPos, farPos, targets));
+		}
 
-			var aoeTargets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var aniTime = TimeSpan.FromMilliseconds(300);
+		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IEnumerable<ICombatEntity> targets)
+		{
+			var aniTime = TimeSpan.FromMilliseconds(330);
+			var skillHitDelay = skill.Properties.HitDelay;
+
+			var spdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate);
+			var reducedSpdRate = 1f + (spdRate - 1f) / 2f;
+
+			aniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / reducedSpdRate);
+			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / reducedSpdRate);
+
+			await skill.Wait(skillHitDelay);
 
 			var hits = new List<SkillHitInfo>();
-			foreach (var target in aoeTargets.LimitBySDR(caster, skill))
+
+			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.MultiHit(3);
 				modifier.AttackAttribute = AttributeType.Soul;
+
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 				hits.Add(skillHit);
 			}
 
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, hits);
+			Send.ZC_SKILL_HIT_INFO(caster, hits);
 		}
 	}
 }

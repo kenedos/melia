@@ -839,7 +839,7 @@
 { skillId: 40504, className: "Sadhu_AstralBodyExplosion", name: "Astral Body Explosion", basicSp: 75, splashRate: 10, factor: 138, factorByLevel: 23, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
 { skillId: 40505, className: "Sadhu_Possession", name: "Possession", basicSp: 115, basicCast: 1500, castInterruptible: false, splashRate: 0, factor: 210, factorByLevel: 21, hitCount: 1, multiHitCount: 5, cooldownTime: 9000, overheatCount: "0", hiddenReinforceAbility: "" },
 { skillId: 40506, className: "Sadhu_TransmitPrana", name: "Transmit Prana", basicSp: 120, basicCast: 0, splashRate: 1, factor: 0, factorByLevel: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, overheatCount: "0" },
-{ skillId: 40507, className: "Sadhu_EctoplasmAttack", name: "Ectoplasm Attack", splashRate: 1, factor: 129, factorByLevel: 0, hitCount: 1, multiHitCount: 3 },
+{ skillId: 40507, className: "Sadhu_EctoplasmAttack", name: "Ectoplasm Attack", splashRate: 1, factor: 129, factorByLevel: 0, hitCount: 1, multiHitCount: 3, speedRateAffectedByDex: true, speedRateAffectedByBuff: true },
 { skillId: 40508, className: "Sadhu_SpiritualSeal", name: "Spirit Barrier", splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 88000 },
 { skillId: 40509, className: "Sadhu_EctoplasmExplosion", name: "Spirit Explosion", splashRate: 1, factor: 100, factorByLevel: 10, hitCount: 1, multiHitCount: 1 },
 { skillId: 40510, className: "Sadhu_OutofBodyCancel", name: "Back to Body", splashRate: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
