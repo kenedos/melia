@@ -151,7 +151,17 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			skill.IncreaseOverheat();
 			caster.TurnTowards(target);
 			caster.SetAttackState(true);
-			Send.ZC_PLAY_ANI(caster, "SKL_CHARGESHOT_SHOT");
+			var mspd = caster.Properties.GetFloat(PropertyName.MSPD) * caster.Properties.GetFloat(PropertyName.MovingShot);
+			var isMoving = caster.Components.Get<MovementComponent>()?.IsMoving ?? false;
+			if (isMoving)
+			{
+				if (mspd > 50)
+					Send.ZC_PLAY_ANI(caster, "ATKRUN2");
+				else
+					Send.ZC_PLAY_ANI(caster, "ATKMOVE2");
+			}
+			else
+				Send.ZC_PLAY_ANI(caster, "SKL_CHARGESHOT_SHOT");
 
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
 			selectedBuff.DecreaseOverbuff();
@@ -178,7 +188,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 
 		private void HandleBarbedArrow(Skill fletcherSkill, Skill buffSkill, ICombatEntity caster, ICombatEntity target)
 		{
-			Send.ZC_SKILL_FORCE_TARGET(caster, target, fletcherSkill, ForceId.GetNew(), null);
+			var forceId = ForceId.GetNew();
+			Send.ZC_NORMAL.PlayForceEffect(caster, caster, target, forceId, "I_arrow005_mash2#Dummy_buff_L_hand", 0.7f, "arrow_cast", null, 1f, "arrow_blow", "SLOW", 800f, 1, 5, 10, 0);
+			Send.ZC_SKILL_FORCE_TARGET(caster, target, fletcherSkill, forceId, null);
 
 			var modifier = new SkillModifier();
 			modifier.DamageMultiplier += GetFasBonus(fletcherSkill);
@@ -199,7 +211,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 		private void HandleBodkinPoint(Skill fletcherSkill, Skill buffSkill, ICombatEntity caster, ICombatEntity target)
 		{
 			var forceId = ForceId.GetNew();
-			Send.ZC_NORMAL.PlayForceEffect(caster, caster, target, forceId, "I_arrow009_red#Dummy_arrow", 0.7f, "arrow_cast", null, 1f, "arrow_blow", "SLOW", 800f, 1, 5, 10, 0);
+			Send.ZC_NORMAL.PlayForceEffect(caster, caster, target, forceId, "I_arrow009_red#Dummy_q_Force", 0.7f, "arrow_cast", null, 1f, "arrow_blow", "SLOW", 800f, 1, 5, 10, 0);
 			Send.ZC_NORMAL.PlayEffectNode(caster, "F_archer_shot_light_red", 0.6f, "Dummy_arrow_effect", "None");
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, fletcherSkill, forceId, null);
 
@@ -218,7 +230,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 		private void HandleCrossFire(Skill fletcherSkill, Skill buffSkill, ICombatEntity caster, ICombatEntity target)
 		{
 			var forceId = ForceId.GetNew();
-			Send.ZC_NORMAL.PlayForceEffect(caster, caster, target, forceId, "I_arrow009_yellow#Dummy_arrow", 0.7f, null, "F_archer_crossarrow_shot_ground", 1f, null, "FAST", 500f, 0, 0, 0, 0);
+			Send.ZC_NORMAL.PlayForceEffect(caster, caster, target, forceId, "I_arrow005_mash2_red#Dummy_buff_L_hand", 0.7f, null, "F_archer_crossarrow_shot_ground", 1f, null, "FAST", 500f, 0, 0, 0, 0);
 			Send.ZC_GROUND_EFFECT(caster, target.Position, "E_archer_crossarrow_shot_ground", 1.3f, 0, 0.2f);
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, fletcherSkill, forceId, null);
 
@@ -262,7 +274,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 		private void HandleDivineMachineArrow(Skill fletcherSkill, Skill buffSkill, ICombatEntity caster, ICombatEntity target)
 		{
 			var forceId = ForceId.GetNew();
-			Send.ZC_NORMAL.PlayForceEffect(caster, caster, target, forceId, "E_archer_Flareshot_arrow_violet#Dummy_arrow", 0.3f, null, "", 0.5f, null, "FAST", 700f, 0, 0, 0, 0);
+			Send.ZC_NORMAL.PlayForceEffect(caster, caster, target, forceId, "E_archer_Flareshot_arrow_violet#Dummy_q_Force", 0.3f, null, "", 0.5f, null, "FAST", 700f, 0, 0, 0, 0);
 			Send.ZC_GROUND_EFFECT(caster, target.Position, "I_explosion002_orange", 1.5f, 0, 0.2f);
 			Send.ZC_GROUND_EFFECT(caster, target.Position, "F_archer_caltrop_hit_explosion", 1f, 0, 0.1f);
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, fletcherSkill, forceId, null);
