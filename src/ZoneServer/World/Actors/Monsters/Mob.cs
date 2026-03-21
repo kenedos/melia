@@ -283,7 +283,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Returns the monster's effective size type, read from its
 		/// properties or falling back to the data definition.
 		/// </summary>
-		public SizeType EffectiveSize => Enum.Parse<SizeType>(this.Properties.GetString(PropertyName.Size, this.Data.Size));
+		public SizeType EffectiveSize => ParseSizeType(this.Properties.GetString(PropertyName.Size, this.Data.Size));
 
 		/// <summary>
 		/// Gets or sets the monster's rank (e.g. Normal, Elite, Boss).
@@ -292,7 +292,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		{
 			get
 			{
-				return Enum.Parse<MonsterRank>(this.Properties.GetString(PropertyName.MonRank, this.Data.Rank));
+				return ParseMonsterRank(this.Properties.GetString(PropertyName.MonRank, this.Data.Rank));
 			}
 			set
 			{
@@ -1676,6 +1676,59 @@ namespace Melia.Zone.World.Actors.Monsters
 				return true;
 			}
 			return false;
+		}
+
+		/// <summary>
+		/// Fast SizeType parser that avoids reflection-based Enum.Parse.
+		/// </summary>
+		private static SizeType ParseSizeType(string value)
+		{
+			return value switch
+			{
+				"None" => SizeType.None,
+				"Hide" => SizeType.Hide,
+				"Hidden" => SizeType.Hidden,
+				"VS" => SizeType.VS,
+				"SS" => SizeType.SS,
+				"S" => SizeType.S,
+				"M" => SizeType.M,
+				"L" => SizeType.L,
+				"XL" => SizeType.XL,
+				"XXL" => SizeType.XXL,
+				"XXXL" => SizeType.XXXL,
+				"OBS" => SizeType.OBS,
+				"Item" => SizeType.Item,
+				"ItemS" => SizeType.ItemS,
+				"ItemM" => SizeType.ItemM,
+				"Icewall" => SizeType.Icewall,
+				"XL_Hit" => SizeType.XL_Hit,
+				"XL_LHit" => SizeType.XL_LHit,
+				"PC" => SizeType.PC,
+				"EX" => SizeType.EX,
+				_ => SizeType.None,
+			};
+		}
+
+		/// <summary>
+		/// Fast MonsterRank parser that avoids reflection-based Enum.Parse.
+		/// </summary>
+		private static MonsterRank ParseMonsterRank(string value)
+		{
+			return value switch
+			{
+				"Normal" => MonsterRank.Normal,
+				"Elite" => MonsterRank.Elite,
+				"Boss" => MonsterRank.Boss,
+				"Special" => MonsterRank.Special,
+				"Material" => MonsterRank.Material,
+				"NPC" => MonsterRank.NPC,
+				"MISC" => MonsterRank.MISC,
+				"Neutral" => MonsterRank.Neutral,
+				"Pet" => MonsterRank.Pet,
+				"Monster" => MonsterRank.Monster,
+				"Instance" => MonsterRank.Instance,
+				_ => MonsterRank.Normal,
+			};
 		}
 	}
 }
