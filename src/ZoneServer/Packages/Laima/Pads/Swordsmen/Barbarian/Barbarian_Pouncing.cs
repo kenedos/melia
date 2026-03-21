@@ -23,7 +23,7 @@ namespace Melia.Zone.Pads.Handlers
 
 			// Note: The skill handler creates the Square area with proper dimensions
 			// We don't override it here
-			pad.SetUpdateInterval(200);
+			pad.SetUpdateInterval(100);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3500);
 			var value = 6;
 			pad.Trigger.MaxActorCount = value;

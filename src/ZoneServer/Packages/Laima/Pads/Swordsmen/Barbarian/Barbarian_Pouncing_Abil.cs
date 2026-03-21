@@ -22,7 +22,7 @@ namespace Melia.Zone.Pads.Handlers
 
 			// Note: The skill handler creates the Square area with proper dimensions
 			// We don't override it here
-			pad.SetUpdateInterval(200);
+			pad.SetUpdateInterval(100);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3500);
 			pad.Trigger.MaxActorCount = 5;
 			creator.PlaySound("skl_eff_barbarian_pouncing_whoosh_abil");
