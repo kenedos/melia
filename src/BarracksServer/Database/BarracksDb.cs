@@ -147,6 +147,13 @@ namespace Melia.Barracks.Database
 					if (account.Password.Length == 32)
 						account.Password = BCrypt.HashPassword(account.Password, BCrypt.GenerateSalt());
 
+					// Sets additional slots to default if needed
+					var defaultSlotCount = BarracksServer.Instance.Conf.Barracks.StartAdditionalSlotCount;
+					if (account.AdditionalSlotCount < defaultSlotCount)
+					{
+						account.AdditionalSlotCount += defaultSlotCount - account.AdditionalSlotCount;
+					}
+
 					return account;
 				}
 			}
