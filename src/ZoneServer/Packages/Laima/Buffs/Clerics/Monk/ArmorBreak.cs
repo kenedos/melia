@@ -12,19 +12,20 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Monk
 	[BuffHandler(BuffId.ArmorBreak)]
 	public class ArmorBreakOverride : BuffHandler
 	{
-		private const float DefRatePerLevel = -0.02f;
+		private const float DefRatePerLevel = 0.02f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
-			var penalty = DefRatePerLevel * buff.NumArg1;
+			var def = target.Properties.GetFloat(PropertyName.DEF);
+			var penalty = def * DefRatePerLevel * buff.NumArg1;
 
-			AddPropertyModifier(buff, target, PropertyName.DEF_RATE_BM, penalty);
+			AddPropertyModifier(buff, target, PropertyName.DEF_BM, -penalty);
 		}
 
 		public override void OnEnd(Buff buff)
 		{
-			RemovePropertyModifier(buff, buff.Target, PropertyName.DEF_RATE_BM);
+			RemovePropertyModifier(buff, buff.Target, PropertyName.DEF_BM);
 		}
 	}
 }
