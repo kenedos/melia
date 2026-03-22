@@ -61,7 +61,11 @@ public class WorldMapClientScript : ClientScript
 	private void SendIcons(Character character)
 	{
 		var warps = character.Map.GetMonsters(a => a is WarpMonster);
-		var table = new LuaTable();
+		var isFirstBatch = true;
+
+		var funcName = "Melia.World.Icons.Load";
+		var batch = new LuaTable();
+		var currentLength = funcName.Length + 2;
 
 		foreach (WarpMonster warp in warps)
 		{
@@ -70,10 +74,28 @@ public class WorldMapClientScript : ClientScript
 				tooltip = string.Format(Localization.Get("To {0}"), Localization.Get(targetMapData.Name));
 
 			var iconTable = CreateIconTable("minimap_portal", character.Map.ClassName, warp.Position, tooltip);
-			table.Insert(iconTable);
+			var entryLength = iconTable.SerializedSize + 4;
+
+			if (batch.Count > 0 && currentLength + entryLength > ScriptMaxLength)
+			{
+				this.SendRawLuaScript(character, funcName + "(" + batch.Serialize() + ")");
+				batch = new LuaTable();
+
+				if (isFirstBatch)
+				{
+					funcName = "Melia.World.Icons.LoadMore";
+					isFirstBatch = false;
+				}
+
+				currentLength = funcName.Length + 2;
+			}
+
+			batch.Insert(iconTable);
+			currentLength += entryLength;
 		}
 
-		this.SendRawLuaScript(character, "Melia.World.Icons.Load(" + table.Serialize() + ")");
+		if (batch.Count > 0)
+			this.SendRawLuaScript(character, funcName + "(" + batch.Serialize() + ")");
 	}
 
 	private LuaTable CreateIconTable(string imageName, string mapClassName, Position pos, string tooltip)
