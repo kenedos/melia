@@ -418,7 +418,11 @@ namespace Melia.Zone.World.Spawning
 					_respawnDelays[i] = spawnDelay - elapsed;
 				}
 
-				expiredDelayCount = _respawnDelays.Count(d => d <= TimeSpan.Zero);
+				expiredDelayCount = 0;
+				for (var j = 0; j < _respawnDelays.Count; j++)
+					if (_respawnDelays[j] <= TimeSpan.Zero)
+						expiredDelayCount++;
+
 				if (expiredDelayCount == 0)
 					return;
 
@@ -427,17 +431,16 @@ namespace Melia.Zone.World.Spawning
 				// and get picked up on subsequent ticks.
 				var removeCount = Math.Min(expiredDelayCount, MaxSpawnsPerTick);
 				var removed = 0;
-				_respawnDelays.RemoveAll(d =>
+				for (var j = _respawnDelays.Count - 1; j >= 0; j--)
 				{
 					if (removed >= removeCount)
-						return false;
-					if (d <= TimeSpan.Zero)
+						break;
+					if (_respawnDelays[j] <= TimeSpan.Zero)
 					{
+						_respawnDelays.RemoveAt(j);
 						removed++;
-						return true;
 					}
-					return false;
-				});
+				}
 
 				expiredDelayCount = removed;
 			}

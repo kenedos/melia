@@ -75,6 +75,13 @@ namespace Melia.Zone.World.Maps
 		public int MonsterCount => _monsters.Count;
 		public bool HasCharacters => this.CharacterCount > 0;
 
+		// Direct collection access for zero-alloc iteration in hot paths
+		internal ICollection<Character> Characters => _characters.Values;
+		internal ICollection<IMonster> Monsters => _monsters.Values;
+		internal ICollection<Pad> Pads => _pads.Values;
+		internal ICollection<ITriggerableArea> TriggerableAreas => _triggerableAreas.Values;
+		internal ICollection<ICombatEntity> CombatEntities => _combatEntities.Values;
+
 		public bool IsPVP { get; set; }
 		public bool IsRaid { get; set; }
 		public bool IsGTW { get; protected set; }
@@ -163,7 +170,9 @@ namespace Melia.Zone.World.Maps
 				var withinGracePeriod = _lastPlayerLeftTime != DateTime.MinValue && (DateTime.Now - _lastPlayerLeftTime) < EntityUpdateGracePeriod;
 				if (this.HasCharacters || withinGracePeriod)
 				{
-					updateList.AddRange(_monsters.Values.OfType<IUpdateable>());
+					foreach (var monster in _monsters.Values)
+						if (monster is IUpdateable updateable)
+							updateList.Add(updateable);
 				}
 
 				// Update pads before characters so enter/leave detection
@@ -468,10 +477,10 @@ namespace Melia.Zone.World.Maps
 		{
 			var result = new List<ICombatEntity>();
 
-			lock (_combatEntities)
+			foreach (var a in _combatEntities.Values)
 			{
-				var entities = _combatEntities.Values.Where(a => a.Position.InRange2D(position, radius) && attacker.CanDamage(a));
-				result.AddRange(entities);
+				if (a.Position.InRange2D(position, radius) && attacker.CanDamage(a))
+					result.Add(a);
 			}
 
 			return result;
@@ -720,7 +729,9 @@ namespace Melia.Zone.World.Maps
 		public List<ItemMonster> GetItemsInPosition(Position position, float radius)
 		{
 			var shape = new CircleF(position, radius);
-			return this.GetActorsIn<ItemMonster>(shape).OrderBy(e => position.Get2DDistance(e.Position)).ToList();
+			var result = this.GetActorsIn<ItemMonster>(shape);
+			result.Sort((a, b) => position.Get2DDistance(a.Position).CompareTo(position.Get2DDistance(b.Position)));
+			return result;
 		}
 
 
@@ -748,17 +759,18 @@ namespace Melia.Zone.World.Maps
 				candidates = _combatEntities.Values;
 			}
 
-			var query = candidates
-				.Where(e =>
-				{
-					var effectiveRadius = radius + e.AgentRadius;
-					var dx = e.Position.X - position.X;
-					var dz = e.Position.Z - position.Z;
-					return attacker.CanDamage(e) && dx * dx + dz * dz <= effectiveRadius * effectiveRadius;
-				})
-				.OrderBy(e => position.Get2DDistance(e.Position));
+			var result = new List<ICombatEntity>();
+			foreach (var e in candidates)
+			{
+				var effectiveRadius = radius + e.AgentRadius;
+				var dx = e.Position.X - position.X;
+				var dz = e.Position.Z - position.Z;
+				if (attacker.CanDamage(e) && dx * dx + dz * dz <= effectiveRadius * effectiveRadius)
+					result.Add(e);
+			}
 
-			return query.ToList();
+			result.Sort((a, b) => position.Get2DDistance(a.Position).CompareTo(position.Get2DDistance(b.Position)));
+			return result;
 		}
 
 		/// <summary>
@@ -829,13 +841,22 @@ namespace Melia.Zone.World.Maps
 			}
 
 			var excludeSet = exclude?.Length > 0 ? new HashSet<ICombatEntity>(exclude) : null;
-			var query = candidates
-				.Where(e => (excludeSet == null || !excludeSet.Contains(e)) &&
-						   attacker.CanDamage(e) &&
-						   shape.IsInsideOrInRange(e.Position, e.AgentRadius))
-				.OrderBy(e => attacker.GetDistance(e));
+			var result = new List<ICombatEntity>();
+			foreach (var e in candidates)
+			{
+				if (excludeSet != null && excludeSet.Contains(e))
+					continue;
+				if (!attacker.CanDamage(e))
+					continue;
+				if (!shape.IsInsideOrInRange(e.Position, e.AgentRadius))
+					continue;
+				result.Add(e);
+			}
 
-			return maxTargets > 0 ? query.Take(maxTargets).ToList() : query.ToList();
+			result.Sort((a, b) => attacker.GetDistance(a).CompareTo(attacker.GetDistance(b)));
+			if (maxTargets > 0 && result.Count > maxTargets)
+				result.RemoveRange(maxTargets, result.Count - maxTargets);
+			return result;
 		}
 
 		/// <summary>
@@ -861,15 +882,20 @@ namespace Melia.Zone.World.Maps
 				candidates = _combatEntities.Values;
 			}
 
-			var query = candidates
-					.Where(entity => (
-						entity.IsAlly(ally)) &&
-						entity != ally &&
-						!entity.IsDead &&
-						shape.IsInsideOrInRange(entity.Position, entity.AgentRadius))
-					.OrderBy(a => ally.GetDistance(a));
+			var result = new List<ICombatEntity>();
+			foreach (var entity in candidates)
+			{
+				if (!entity.IsAlly(ally) || entity == ally || entity.IsDead)
+					continue;
+				if (!shape.IsInsideOrInRange(entity.Position, entity.AgentRadius))
+					continue;
+				result.Add(entity);
+			}
 
-			return maxTargets > 0 ? query.Take(maxTargets).ToList() : query.ToList();
+			result.Sort((a, b) => ally.GetDistance(a).CompareTo(ally.GetDistance(b)));
+			if (maxTargets > 0 && result.Count > maxTargets)
+				result.RemoveRange(maxTargets, result.Count - maxTargets);
+			return result;
 		}
 
 		/// <summary>
@@ -895,14 +921,20 @@ namespace Melia.Zone.World.Maps
 				candidates = _combatEntities.Values;
 			}
 
-			var query = candidates
-					.Where(entity => (
-						entity.IsDeadAlly(ally)) &&
-						entity != ally &&
-						shape.IsInsideOrInRange(entity.Position, entity.AgentRadius))
-					.OrderBy(a => ally.GetDistance(a));
+			var result = new List<ICombatEntity>();
+			foreach (var entity in candidates)
+			{
+				if (!entity.IsDeadAlly(ally) || entity == ally)
+					continue;
+				if (!shape.IsInsideOrInRange(entity.Position, entity.AgentRadius))
+					continue;
+				result.Add(entity);
+			}
 
-			return maxTargets > 0 ? query.Take(maxTargets).ToList() : query.ToList();
+			result.Sort((a, b) => ally.GetDistance(a).CompareTo(ally.GetDistance(b)));
+			if (maxTargets > 0 && result.Count > maxTargets)
+				result.RemoveRange(maxTargets, result.Count - maxTargets);
+			return result;
 		}
 
 		/// <summary>
@@ -1235,23 +1267,39 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public virtual void Broadcast(Packet packet, IActor source, bool includeSource = true)
 		{
-			IEnumerable<Character> candidates;
+			HashSet<IZoneConnection> sentConnections = null;
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryCircle(source.Position, VisibleRange)
-					.OfType<Character>();
-			}
-			else
-			{
-				candidates = _characters.Values
-					.Where(a => a.Position.InRange2D(source.Position, VisibleRange));
+				foreach (var entity in _spatialIndex.QueryCircle(source.Position, VisibleRange))
+				{
+					if (entity is not Character character)
+						continue;
+
+					if (!includeSource && character == source)
+						continue;
+
+					if (character.Layer != source.Layer)
+						continue;
+
+					var conn = character.Connection;
+					if (conn == null)
+						continue;
+
+					sentConnections ??= new HashSet<IZoneConnection>();
+					if (!sentConnections.Add(conn))
+						continue;
+
+					conn.Send(packet);
+				}
+				return;
 			}
 
-			HashSet<IZoneConnection> sentConnections = null;
-
-			foreach (var character in candidates)
+			foreach (var character in _characters.Values)
 			{
+				if (!character.Position.InRange2D(source.Position, VisibleRange))
+					continue;
+
 				if (!includeSource && character == source)
 					continue;
 
@@ -1299,11 +1347,18 @@ namespace Melia.Zone.World.Maps
 			if (character.Connection.Party == null) return new List<Character>();
 
 			var party = character.Connection.Party;
-			return _characters.Values
-				.Where(a => (radius == 0 || a.Position.InRange2D(position, radius)) &&
-						   a.Connection.Party?.ObjectId == party.ObjectId &&
-						   a.IsDead == !areAlive)
-				.ToList();
+			var result = new List<Character>();
+			foreach (var a in _characters.Values)
+			{
+				if (radius > 0 && !a.Position.InRange2D(position, radius))
+					continue;
+				if (a.Connection.Party?.ObjectId != party.ObjectId)
+					continue;
+				if (a.IsDead != !areAlive)
+					continue;
+				result.Add(a);
+			}
+			return result;
 		}
 
 		/// <summary>
@@ -1315,9 +1370,13 @@ namespace Melia.Zone.World.Maps
 			if (character.Connection.Party == null) return new List<Character>();
 
 			var party = character.Connection.Party;
-			return _characters.Values
-				.Where(a => a.Connection.Party?.ObjectId == party.ObjectId)
-				.ToList();
+			var result = new List<Character>();
+			foreach (var a in _characters.Values)
+			{
+				if (a.Connection.Party?.ObjectId == party.ObjectId)
+					result.Add(a);
+			}
+			return result;
 		}
 
 		/// <summary>
@@ -1337,12 +1396,20 @@ namespace Melia.Zone.World.Maps
 				candidates = _combatEntities.Values;
 			}
 
-			var query = candidates
-				.Where(entity => (radius == 0 || entity.Position.InRange2D(attacker.Position, radius + entity.AgentRadius)) &&
-							   attacker.CanDamage(entity))
-				.OrderBy(a => a.Position.Get2DDistance(attacker.Position));
+			var result = new List<ICombatEntity>();
+			foreach (var entity in candidates)
+			{
+				if (radius > 0 && !entity.Position.InRange2D(attacker.Position, radius + entity.AgentRadius))
+					continue;
+				if (!attacker.CanDamage(entity))
+					continue;
+				result.Add(entity);
+			}
 
-			return maxResult > 0 ? query.Take(maxResult).ToList() : query.ToList();
+			result.Sort((a, b) => a.Position.Get2DDistance(attacker.Position).CompareTo(b.Position.Get2DDistance(attacker.Position)));
+			if (maxResult > 0 && result.Count > maxResult)
+				result.RemoveRange(maxResult, result.Count - maxResult);
+			return result;
 		}
 
 		/// <summary>
@@ -1362,10 +1429,22 @@ namespace Melia.Zone.World.Maps
 				candidates = _combatEntities.Values;
 			}
 
-			return candidates
-				.Where(entity => entity.Position.InRange2D(position, radius + entity.AgentRadius) && attacker.CanDamage(entity))
-				.OrderBy(a => a.Position.Get2DDistance(position))
-				.FirstOrDefault();
+			ICombatEntity nearest = null;
+			var nearestDist = double.MaxValue;
+			foreach (var entity in candidates)
+			{
+				if (!entity.Position.InRange2D(position, radius + entity.AgentRadius))
+					continue;
+				if (!attacker.CanDamage(entity))
+					continue;
+				var dist = entity.Position.Get2DDistance(position);
+				if (dist < nearestDist)
+				{
+					nearestDist = dist;
+					nearest = entity;
+				}
+			}
+			return nearest;
 		}
 
 		/// <summary>
@@ -1385,13 +1464,22 @@ namespace Melia.Zone.World.Maps
 				candidates = _combatEntities.Values;
 			}
 
-			var query = candidates
-				.Where(a => entity.Handle != a.Handle &&
-						   a.Position.InRange2D(entity.Position, radius + a.AgentRadius) &&
-						   attacker.CanDamage(a))
-				.OrderBy(a => a.Position.Get2DDistance(entity.Position));
+			var result = new List<ICombatEntity>();
+			foreach (var a in candidates)
+			{
+				if (entity.Handle == a.Handle)
+					continue;
+				if (!a.Position.InRange2D(entity.Position, radius + a.AgentRadius))
+					continue;
+				if (!attacker.CanDamage(a))
+					continue;
+				result.Add(a);
+			}
 
-			return maxResult > 0 ? query.Take(maxResult).ToList() : query.ToList();
+			result.Sort((a, b) => a.Position.Get2DDistance(entity.Position).CompareTo(b.Position.Get2DDistance(entity.Position)));
+			if (maxResult > 0 && result.Count > maxResult)
+				result.RemoveRange(maxResult, result.Count - maxResult);
+			return result;
 		}
 		#endregion
 

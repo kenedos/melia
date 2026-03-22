@@ -85,6 +85,9 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			await Task.Delay(5000);
 
+			if (this.Connection == null)
+				return;
+
 			var oldKey = this.Variables.Perm.GetString("Melia.Main.Welcome");
 
 			if (string.IsNullOrEmpty(oldKey) || oldKey != this.Connection?.SessionKey)

@@ -437,54 +437,91 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.EyesOpen)
 				return;
 
-			var currentlyVisibleMonsters = this.Map.GetVisibleMonsters(this);
-			var currentlyVisibleCharacters = this.Map.GetVisibleCharacters(this);
-			var currentlyVisiblePads = this.Map.GetVisiblePads(this);
+			// Fill reusable scratch sets with currently visible entities
+			_currentVisMonsters.Clear();
+			foreach (var m in this.Map.Monsters)
+				if (this.CanSee(m))
+					_currentVisMonsters.Add(m);
 
-			IEnumerable<Character> appearCharacters;
-			IEnumerable<Character> disappearCharacters;
-			IMonster[] appearMonsterList;
-			IEnumerable<IMonster> disappearMonsters;
-			IEnumerable<Pad> appearPads;
-			IEnumerable<Pad> disappearPads;
+			_currentVisChars.Clear();
+			foreach (var c in this.Map.Characters)
+				if (this.CanSee(c))
+					_currentVisChars.Add(c);
+
+			_currentVisPads.Clear();
+			foreach (var p in this.Map.Pads)
+				if (this.CanSee(p))
+					_currentVisPads.Add(p);
+
 			int sentCount;
 
 			lock (_lookAroundLock)
 			{
-				appearCharacters = currentlyVisibleCharacters.Except(_visibleCharacters).ToArray();
-				disappearCharacters = _visibleCharacters.Except(currentlyVisibleCharacters).ToArray();
+				// Compute appeared characters
+				_tempAppearChars.Clear();
+				foreach (var c in _currentVisChars)
+					if (!_visibleCharacters.Contains(c))
+						_tempAppearChars.Add(c);
 
-				appearMonsterList = currentlyVisibleMonsters.Except(_visibleMonsters).ToArray();
-				disappearMonsters = _visibleMonsters.Except(currentlyVisibleMonsters).ToArray();
+				// Compute disappeared characters
+				_tempDisappearChars.Clear();
+				foreach (var c in _visibleCharacters)
+					if (!_currentVisChars.Contains(c))
+						_tempDisappearChars.Add(c);
 
-				appearPads = currentlyVisiblePads.Except(_visiblePads).ToArray();
-				disappearPads = _visiblePads.Except(currentlyVisiblePads).ToArray();
+				// Compute appeared monsters
+				_tempAppearMonsters.Clear();
+				foreach (var m in _currentVisMonsters)
+					if (!_visibleMonsters.Contains(m))
+						_tempAppearMonsters.Add(m);
+
+				// Compute disappeared monsters
+				_tempDisappearMonsters.Clear();
+				foreach (var m in _visibleMonsters)
+					if (!_currentVisMonsters.Contains(m))
+						_tempDisappearMonsters.Add(m);
+
+				// Compute appeared pads
+				_tempAppearPads.Clear();
+				foreach (var p in _currentVisPads)
+					if (!_visiblePads.Contains(p))
+						_tempAppearPads.Add(p);
+
+				// Compute disappeared pads
+				_tempDisappearPads.Clear();
+				foreach (var p in _visiblePads)
+					if (!_currentVisPads.Contains(p))
+						_tempDisappearPads.Add(p);
 
 				// Update _visibleMonsters to reflect only what the client
 				// actually knows about: previously visible (minus disappeared)
 				// plus only the monsters we actually sent this tick.
-				sentCount = Math.Min(appearMonsterList.Length, MaxMonsterAppearPerTick);
-				var newVisibleMonsters = new HashSet<IMonster>(_visibleMonsters);
-				foreach (var monster in disappearMonsters)
-					newVisibleMonsters.Remove(monster);
+				sentCount = Math.Min(_tempAppearMonsters.Count, MaxMonsterAppearPerTick);
+				foreach (var m in _tempDisappearMonsters)
+					_visibleMonsters.Remove(m);
 				for (var i = 0; i < sentCount; i++)
-					newVisibleMonsters.Add(appearMonsterList[i]);
-				_visibleMonsters = newVisibleMonsters.ToArray();
+					_visibleMonsters.Add(_tempAppearMonsters[i]);
 
-				_visibleCharacters = currentlyVisibleCharacters;
-				_visiblePads = currentlyVisiblePads;
+				// Characters and pads update fully each tick
+				_visibleCharacters.Clear();
+				foreach (var c in _currentVisChars)
+					_visibleCharacters.Add(c);
+
+				_visiblePads.Clear();
+				foreach (var p in _currentVisPads)
+					_visiblePads.Add(p);
 			}
 
-			this.HandleAppearingCharacters(appearCharacters);
-			this.HandleDisappearingCharacters(disappearCharacters);
+			this.HandleAppearingCharacters(_tempAppearChars);
+			this.HandleDisappearingCharacters(_tempDisappearChars);
 
 			for (var i = 0; i < sentCount; i++)
-				this.HandleAppearingSingleMonster(appearMonsterList[i]);
+				this.HandleAppearingSingleMonster(_tempAppearMonsters[i]);
 
-			this.HandleDisappearingMonsters(disappearMonsters);
+			this.HandleDisappearingMonsters(_tempDisappearMonsters);
 
-			this.HandleAppearingPads(appearPads);
-			this.HandleDisappearingPads(disappearPads);
+			this.HandleAppearingPads(_tempAppearPads);
+			this.HandleDisappearingPads(_tempDisappearPads);
 		}
 
 		private void HandleAppearingCharacters(IEnumerable<Character> appearCharacters)
@@ -677,17 +714,43 @@ namespace Melia.Zone.World.Actors.Characters
 			// the player expects to see everything on map entry.
 			lock (_lookAroundLock)
 			{
-				var currentlyVisibleMonsters = this.Map.GetVisibleMonsters(this);
-				var currentlyVisibleCharacters = this.Map.GetVisibleCharacters(this);
-				var currentlyVisiblePads = this.Map.GetVisiblePads(this);
+				// Compute newly appearing characters
+				_tempAppearChars.Clear();
+				foreach (var c in this.Map.Characters)
+					if (this.CanSee(c) && !_visibleCharacters.Contains(c))
+						_tempAppearChars.Add(c);
 
-				this.HandleAppearingCharacters(currentlyVisibleCharacters.Except(_visibleCharacters));
-				this.HandleAppearingMonsters(currentlyVisibleMonsters.Except(_visibleMonsters));
-				this.HandleAppearingPads(currentlyVisiblePads.Except(_visiblePads));
+				// Compute newly appearing monsters
+				_tempAppearMonsters.Clear();
+				foreach (var m in this.Map.Monsters)
+					if (this.CanSee(m) && !_visibleMonsters.Contains(m))
+						_tempAppearMonsters.Add(m);
 
-				_visibleMonsters = currentlyVisibleMonsters;
-				_visibleCharacters = currentlyVisibleCharacters;
-				_visiblePads = currentlyVisiblePads;
+				// Compute newly appearing pads
+				_tempAppearPads.Clear();
+				foreach (var p in this.Map.Pads)
+					if (this.CanSee(p) && !_visiblePads.Contains(p))
+						_tempAppearPads.Add(p);
+
+				this.HandleAppearingCharacters(_tempAppearChars);
+				this.HandleAppearingMonsters(_tempAppearMonsters);
+				this.HandleAppearingPads(_tempAppearPads);
+
+				// Update visible sets
+				_visibleCharacters.Clear();
+				foreach (var c in this.Map.Characters)
+					if (this.CanSee(c))
+						_visibleCharacters.Add(c);
+
+				_visibleMonsters.Clear();
+				foreach (var m in this.Map.Monsters)
+					if (this.CanSee(m))
+						_visibleMonsters.Add(m);
+
+				_visiblePads.Clear();
+				foreach (var p in this.Map.Pads)
+					if (this.CanSee(p))
+						_visiblePads.Add(p);
 			}
 		}
 
@@ -710,9 +773,9 @@ namespace Melia.Zone.World.Actors.Characters
 				foreach (var pad in _observedPads)
 					pad.Observers.RemoveObserver(this);
 
-				_visibleMonsters = [];
-				_visibleCharacters = [];
-				_visiblePads = [];
+				_visibleMonsters.Clear();
+				_visibleCharacters.Clear();
+				_visiblePads.Clear();
 				_observedPads.Clear();
 			}
 		}

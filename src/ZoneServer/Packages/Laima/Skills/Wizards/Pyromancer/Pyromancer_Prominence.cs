@@ -52,9 +52,8 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, null);
-
 			this.InitiateSkill(skill, caster, targetPos);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, null);
 			this.SpawnSalamanders(skill, caster, targetPos);
 		}
 

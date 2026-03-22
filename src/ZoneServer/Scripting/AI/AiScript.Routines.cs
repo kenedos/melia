@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -356,8 +357,11 @@ namespace Melia.Zone.Scripting.AI
 				return false;
 			}
 
-			var possibleSkills = mob.Data.Skills.Where(a => !this.Entity.IsOnCooldown(a.SkillId)).Select(a => a.SkillId);
-			if (!possibleSkills.Any())
+			var possibleSkills = new List<SkillId>();
+			foreach (var a in mob.Data.Skills)
+				if (!this.Entity.IsOnCooldown(a.SkillId))
+					possibleSkills.Add(a.SkillId);
+			if (possibleSkills.Count == 0)
 				return false;
 			var rndSkillId = possibleSkills.Random();
 

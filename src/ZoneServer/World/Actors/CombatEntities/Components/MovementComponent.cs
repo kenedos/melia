@@ -25,7 +25,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private double _moveX, _moveZ;
 		private TimeSpan _moveTime;
 
-		private ITriggerableArea[] _triggerAreas = [];
+		private readonly HashSet<ITriggerableArea> _triggerAreas = new();
+		private readonly HashSet<ITriggerableArea> _currentTriggerAreas = new();
+		private readonly List<ITriggerableArea> _tempEnteredAreas = new();
+		private readonly List<ITriggerableArea> _tempLeftAreas = new();
 
 		/// <summary>
 		/// Returns the entity's current destination, if it's moving to
@@ -779,31 +782,45 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			//   with any trigger areas. Not overly complicated, but
 			//   support needs to be added to the shape classes first.
 
-			var prevTriggerAreas = _triggerAreas;
-			var triggerAreas = this.Entity.Map.GetTriggerableAreasAt(this.Entity.Position);
+			_currentTriggerAreas.Clear();
+			foreach (var ta in this.Entity.Map.TriggerableAreas)
+				if (ta.Area?.IsInside(this.Entity.Position) ?? false)
+					_currentTriggerAreas.Add(ta);
 
-			if (prevTriggerAreas.Length == 0 && triggerAreas.Length == 0)
+			if (_triggerAreas.Count == 0 && _currentTriggerAreas.Count == 0)
 				return;
 
-			var enteredTriggerAreas = triggerAreas.Except(prevTriggerAreas);
-			var leftTriggerAreas = prevTriggerAreas.Except(triggerAreas);
+			// Find entered areas
+			_tempEnteredAreas.Clear();
+			foreach (var ta in _currentTriggerAreas)
+				if (!_triggerAreas.Contains(ta))
+					_tempEnteredAreas.Add(ta);
 
-			foreach (var triggerArea in enteredTriggerAreas)
+			// Find left areas
+			_tempLeftAreas.Clear();
+			foreach (var ta in _triggerAreas)
+				if (!_currentTriggerAreas.Contains(ta))
+					_tempLeftAreas.Add(ta);
+
+			foreach (var triggerArea in _tempEnteredAreas)
 			{
 				if (triggerArea.EnterFunc != null)
 					TaskHelper.CallSafe(triggerArea.EnterFunc(new TriggerActorArgs(TriggerType.Enter, triggerArea, this.Entity)));
 			}
 
-			foreach (var triggerArea in leftTriggerAreas)
+			foreach (var triggerArea in _tempLeftAreas)
 			{
 				if (triggerArea.LeaveFunc != null)
 					TaskHelper.CallSafe(triggerArea.LeaveFunc(new TriggerActorArgs(TriggerType.Leave, triggerArea, this.Entity)));
 			}
 
-			foreach (var triggerArea in triggerAreas)
+			foreach (var triggerArea in _currentTriggerAreas)
 				triggerArea.WhileInsideFunc?.Invoke(new TriggerActorArgs(TriggerType.Update, triggerArea, this.Entity));
 
-			_triggerAreas = triggerAreas;
+			// Swap: update _triggerAreas to current state
+			_triggerAreas.Clear();
+			foreach (var ta in _currentTriggerAreas)
+				_triggerAreas.Add(ta);
 		}
 
 		/// <summary>

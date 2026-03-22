@@ -52,9 +52,20 @@ namespace Melia.Zone.World.Actors.Characters
 		private readonly object _warpLock = new();
 		private readonly object _lookAroundLock = new();
 		private readonly object _hpLock = new();
-		private IMonster[] _visibleMonsters = [];
-		private Character[] _visibleCharacters = [];
-		private Pad[] _visiblePads = [];
+		private readonly HashSet<IMonster> _visibleMonsters = new();
+		private readonly HashSet<Character> _visibleCharacters = new();
+		private readonly HashSet<Pad> _visiblePads = new();
+
+		// Reusable scratch collections for LookAround diffing (zero-alloc per tick)
+		private readonly HashSet<IMonster> _currentVisMonsters = new();
+		private readonly HashSet<Character> _currentVisChars = new();
+		private readonly HashSet<Pad> _currentVisPads = new();
+		private readonly List<IMonster> _tempAppearMonsters = new();
+		private readonly List<IMonster> _tempDisappearMonsters = new();
+		private readonly List<Character> _tempAppearChars = new();
+		private readonly List<Character> _tempDisappearChars = new();
+		private readonly List<Pad> _tempAppearPads = new();
+		private readonly List<Pad> _tempDisappearPads = new();
 		private readonly HashSet<Pad> _observedPads = [];
 		private readonly static TimeSpan ResurrectDialogDelay = TimeSpan.FromSeconds(2);
 		private TimeSpan _resurrectDialogTimer = ResurrectDialogDelay;
@@ -814,9 +825,9 @@ namespace Melia.Zone.World.Actors.Characters
 			if (Interlocked.Exchange(ref _cleanedUp, 1) == 1)
 				return;
 
-			_visibleMonsters = [];
-			_visibleCharacters = [];
-			_visiblePads = [];
+			_visibleMonsters.Clear();
+			_visibleCharacters.Clear();
+			_visiblePads.Clear();
 			_observedPads.Clear();
 
 			// Clear major component collections
@@ -831,9 +842,6 @@ namespace Melia.Zone.World.Actors.Characters
 			// Null out delegate properties to release any captured closures
 			this.Died = null;
 			this.Damaged = null;
-
-			// Break connection reference
-			this.Connection = null;
 		}
 		#endregion
 

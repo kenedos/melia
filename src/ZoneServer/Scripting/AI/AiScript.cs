@@ -377,17 +377,26 @@ namespace Melia.Zone.Scripting.AI
 			if (timeSinceLastSkill < _lastSkillDuration)
 				return;
 
-			// Find all characters within 200 range
-			var nearbyCharacters = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, 200)
-				.OfType<Character>()
-				.Where(c => !c.IsDead)
-				.OrderBy(c => c.Position.Get2DDistance(this.Entity.Position))
-				.ToList();
+			// Find closest living character within 200 range
+			Character closestCharacter = null;
+			var closestDist = double.MaxValue;
+			var enemies = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, 200);
+			foreach (var e in enemies)
+			{
+				if (e is Character c && !c.IsDead)
+				{
+					var dist = c.Position.Get2DDistance(this.Entity.Position);
+					if (dist < closestDist)
+					{
+						closestDist = dist;
+						closestCharacter = c;
+					}
+				}
+			}
 
 			// If there are nearby characters, run away from the closest one
-			if (nearbyCharacters.Any())
+			if (closestCharacter != null)
 			{
-				var closestCharacter = nearbyCharacters.First();
 
 				// Calculate away direction from the closest character
 				var awayVector = (this.Entity.Position - closestCharacter.Position).Normalize2D();
@@ -413,15 +422,24 @@ namespace Melia.Zone.Scripting.AI
 			while (this.IsFeared())
 			{
 				// Find the closest character to run away from
-				var nearbyCharacters = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, 200)
-					.OfType<Character>()
-					.Where(c => !c.IsDead)
-					.OrderBy(c => c.Position.Get2DDistance(this.Entity.Position))
-					.ToList();
-
-				if (nearbyCharacters.Any())
+				Character closestCharacter = null;
+				var closestDist = double.MaxValue;
+				var fearEnemies = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, 200);
+				foreach (var e in fearEnemies)
 				{
-					var closestCharacter = nearbyCharacters.First();
+					if (e is Character c && !c.IsDead)
+					{
+						var dist = c.Position.Get2DDistance(this.Entity.Position);
+						if (dist < closestDist)
+						{
+							closestDist = dist;
+							closestCharacter = c;
+						}
+					}
+				}
+
+				if (closestCharacter != null)
+				{
 
 					// Calculate away direction from the closest character
 					var awayVector = (this.Entity.Position - closestCharacter.Position).Normalize2D();
@@ -685,16 +703,22 @@ namespace Melia.Zone.Scripting.AI
 				return;
 
 			// Find nearby allies of same type
-			var allies = this.Entity.Map.GetAttackableEnemiesInPosition(attacker, this.Entity.Position, helpCallRange)
-				.OfType<Mob>()
-				.Where(m =>
-					m.Id == ((Mob)this.Entity).Id &&
+			var candidates = this.Entity.Map.GetAttackableEnemiesInPosition(attacker, this.Entity.Position, helpCallRange);
+			var allies = new List<Mob>();
+			var selfMob = (Mob)this.Entity;
+			foreach (var candidate in candidates)
+			{
+				if (candidate is Mob m &&
+					m.Id == selfMob.Id &&
 					m.Handle != this.Entity.Handle &&
 					!m.IsDead &&
-					m.Components.TryGet<AiComponent>(out var ai) && ai.Script.Target == null // Only help allies that aren't already fighting
-				);
+					m.Components.TryGet<AiComponent>(out var ai) && ai.Script.Target == null)
+				{
+					allies.Add(m);
+				}
+			}
 
-			if (!allies.Any())
+			if (allies.Count == 0)
 				return;
 
 			// Visual feedback
@@ -783,7 +807,7 @@ namespace Melia.Zone.Scripting.AI
 		{
 			_hateLevelsToRemove.Clear();
 
-			foreach (var entry in _hateLevels)
+		foreach (var entry in _hateLevels)
 			{
 				var handle = entry.Key;
 
@@ -1836,12 +1860,23 @@ namespace Melia.Zone.Scripting.AI
 		{
 			if (_skillRotation == null || target == null) return null;
 
-			var bestSkill = _skillRotation
-				.Where(p => !p.IsBuff && !p.IsHeal && (p.Condition == null || p.Condition(target)))
-				.OrderByDescending(p => p.Priority)
-				.Select(p => this.GetOrCreateSkill(p.Id))
-				.FirstOrDefault(s => s != null && this.CanUseSkill(s, target));
-
+			Skill bestSkill = null;
+			var bestPriority = int.MinValue;
+			foreach (var p in _skillRotation)
+			{
+				if (p.IsBuff || p.IsHeal)
+					continue;
+				if (p.Priority <= bestPriority)
+					continue;
+				if (p.Condition != null && !p.Condition(target))
+					continue;
+				var s = this.GetOrCreateSkill(p.Id);
+				if (s != null && this.CanUseSkill(s, target))
+				{
+					bestSkill = s;
+					bestPriority = p.Priority;
+				}
+			}
 			return bestSkill;
 		}
 
@@ -1853,22 +1888,25 @@ namespace Melia.Zone.Scripting.AI
 			if (_skillRotation == null) return null;
 
 			var self = this.Entity;
-
-			var bestSkill = _skillRotation
-				.Where(p => p.IsBuff || p.IsHeal)
-				.OrderByDescending(p => p.Priority)
-				.Select(p =>
+			Skill bestSkill = null;
+			var bestPriority = int.MinValue;
+			foreach (var p in _skillRotation)
+			{
+				if (!p.IsBuff && !p.IsHeal)
+					continue;
+				if (p.Priority <= bestPriority)
+					continue;
+				var skill = this.GetOrCreateSkill(p.Id);
+				if (skill == null)
+					continue;
+				var master = this.GetMaster();
+				var target = (p.IsHeal && master != null && !this.EntityGone(master)) ? master : self;
+				if ((p.Condition == null || p.Condition(target)) && this.CanUseSkill(skill, target))
 				{
-					var skill = this.GetOrCreateSkill(p.Id);
-					if (skill == null) return null;
-					var master = this.GetMaster();
-
-					var target = (p.IsHeal && master != null && !this.EntityGone(master)) ? master : self;
-
-					return (p.Condition == null || p.Condition(target)) && this.CanUseSkill(skill, target) ? skill : null;
-				})
-				.FirstOrDefault(s => s != null);
-
+					bestSkill = skill;
+					bestPriority = p.Priority;
+				}
+			}
 			return bestSkill;
 		}
 		/// <summary>

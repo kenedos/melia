@@ -26,6 +26,10 @@ namespace Melia.Zone.World.Actors.Components
 		private readonly object _syncLock = new();
 
 		private List<IActor> _actorsInside = new();
+		private readonly HashSet<IActor> _actorsInsideSet = new();
+		private readonly HashSet<IActor> _nowInsideSet = new();
+		private readonly List<IActor> _tempEntered = new();
+		private readonly List<IActor> _tempLeft = new();
 		private int _actorCount = 0;
 		private int _maxActorCount = short.MaxValue;
 		private int _maxConcurrentUse = short.MaxValue;
@@ -184,7 +188,18 @@ namespace Melia.Zone.World.Actors.Components
 		public List<IActor> GetActors()
 		{
 			lock (_syncLock)
-				return _actorsInside.Take(this.MaxActorCount).ToList();
+			{
+				var result = new List<IActor>();
+				var count = 0;
+				foreach (var a in _actorsInside)
+				{
+					if (count >= this.MaxActorCount)
+						break;
+					result.Add(a);
+					count++;
+				}
+				return result;
+			}
 		}
 
 		/// <summary>
@@ -196,7 +211,13 @@ namespace Melia.Zone.World.Actors.Components
 		public List<TActor> GetActors<TActor>() where TActor : IActor
 		{
 			lock (_syncLock)
-				return _actorsInside.OfType<TActor>().ToList();
+			{
+				var result = new List<TActor>();
+				foreach (var a in _actorsInside)
+					if (a is TActor typed)
+						result.Add(typed);
+				return result;
+			}
 		}
 
 		/// <summary>
@@ -208,7 +229,13 @@ namespace Melia.Zone.World.Actors.Components
 		public List<ICombatEntity> GetAttackableEntities(ICombatEntity attacker)
 		{
 			lock (_syncLock)
-				return _actorsInside.OfType<ICombatEntity>().Where(attacker.CanDamage).ToList();
+			{
+				var result = new List<ICombatEntity>();
+				foreach (var a in _actorsInside)
+					if (a is ICombatEntity ce && attacker.CanDamage(ce))
+						result.Add(ce);
+				return result;
+			}
 		}
 
 		/// <summary>
@@ -220,9 +247,13 @@ namespace Melia.Zone.World.Actors.Components
 		public List<ICombatEntity> GetAlliedEntities(ICombatEntity ally)
 		{
 			lock (_syncLock)
-				return _actorsInside.OfType<ICombatEntity>()
-					.Where(target => target != ally && !target.IsDead && ally.IsAlly(target))
-					.ToList();
+			{
+				var result = new List<ICombatEntity>();
+				foreach (var a in _actorsInside)
+					if (a is ICombatEntity target && target != ally && !target.IsDead && ally.IsAlly(target))
+						result.Add(target);
+				return result;
+			}
 		}
 
 		/// <summary>
@@ -273,18 +304,33 @@ namespace Melia.Zone.World.Actors.Components
 
 			lock (_syncLock)
 			{
-				var wereInside = _actorsInside;
+				// Build set of current actors for O(1) lookup
+				_nowInsideSet.Clear();
+				foreach (var a in nowInside)
+					_nowInsideSet.Add(a);
 
-				var entered = nowInside.Except(wereInside);
-				var left = wereInside.Except(nowInside);
+				// Find entered actors (in now but not in previous)
+				_tempEntered.Clear();
+				foreach (var a in _nowInsideSet)
+					if (!_actorsInsideSet.Contains(a))
+						_tempEntered.Add(a);
 
-				foreach (var actor in entered)
+				// Find left actors (in previous but not in now)
+				_tempLeft.Clear();
+				foreach (var a in _actorsInsideSet)
+					if (!_nowInsideSet.Contains(a))
+						_tempLeft.Add(a);
+
+				foreach (var actor in _tempEntered)
 					this.Entered?.Invoke(this, new TriggerActorArgs(TriggerType.Enter, this.Actor, actor));
 
-				foreach (var actor in left)
+				foreach (var actor in _tempLeft)
 					this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
 
 				_actorsInside = nowInside;
+				_actorsInsideSet.Clear();
+				foreach (var a in nowInside)
+					_actorsInsideSet.Add(a);
 				this.ActorCount = nowInside.Count;
 			}
 

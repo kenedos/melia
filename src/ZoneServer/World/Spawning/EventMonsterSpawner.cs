@@ -316,11 +316,17 @@ namespace Melia.Zone.World.Spawning
 					_respawnDelays[i] = spawnDelay - elapsed;
 				}
 
-				expiredDelayCount = _respawnDelays.Count(d => d <= TimeSpan.Zero);
+				expiredDelayCount = 0;
+				for (var j = 0; j < _respawnDelays.Count; j++)
+					if (_respawnDelays[j] <= TimeSpan.Zero)
+						expiredDelayCount++;
+
 				if (expiredDelayCount == 0)
 					return;
 
-				_respawnDelays.RemoveAll(d => d <= TimeSpan.Zero);
+				for (var j = _respawnDelays.Count - 1; j >= 0; j--)
+					if (_respawnDelays[j] <= TimeSpan.Zero)
+						_respawnDelays.RemoveAt(j);
 			}
 
 			var spawnAmount = Math.Min(expiredDelayCount, this.FlexAmount - this.Amount);

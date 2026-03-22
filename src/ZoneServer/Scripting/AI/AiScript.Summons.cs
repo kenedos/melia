@@ -67,7 +67,17 @@ namespace Melia.Zone.Scripting.AI
 
 			if (cursedTargets.Count > 0)
 			{
-				var closestCursed = cursedTargets.OrderBy(t => t.Position.Get2DDistance(this.Entity.Position)).FirstOrDefault();
+				ICombatEntity closestCursed = null;
+				var closestCursedDist = double.MaxValue;
+				foreach (var t in cursedTargets)
+				{
+					var dist = t.Position.Get2DDistance(this.Entity.Position);
+					if (dist < closestCursedDist)
+					{
+						closestCursedDist = dist;
+						closestCursed = t;
+					}
+				}
 				if (closestCursed != null)
 					return closestCursed;
 			}
@@ -200,7 +210,18 @@ namespace Melia.Zone.Scripting.AI
 				return null;
 
 			// Return closest enemy
-			return enemiesInAttackState.OrderBy(t => t.Position.Get2DDistance(this.Entity.Position)).FirstOrDefault();
+			ICombatEntity closestEnemy = null;
+			var closestEnemyDist = double.MaxValue;
+			foreach (var t in enemiesInAttackState)
+			{
+				var dist = t.Position.Get2DDistance(this.Entity.Position);
+				if (dist < closestEnemyDist)
+				{
+					closestEnemyDist = dist;
+					closestEnemy = t;
+				}
+			}
+			return closestEnemy;
 		}
 
 		/// <summary>
