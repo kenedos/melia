@@ -551,7 +551,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			var beneficiary = this.GetKillBeneficiary(killer);
 
-			if (this.MonsterType == RelationType.Enemy && beneficiary != null)
+			if (this.MonsterType == RelationType.Enemy && beneficiary != null && beneficiary.IsOnline && beneficiary.Connection != null)
 			{
 				this.GetExpToGive(out var exp, out var jobExp);
 
