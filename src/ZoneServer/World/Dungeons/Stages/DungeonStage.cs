@@ -21,6 +21,8 @@ namespace Melia.Zone.World.Dungeons.Stages
 
 	public abstract class DungeonStage : IDisposable
 	{
+		private int _deadMonsterCount;
+
 		public DungeonScript DungeonScript { get; }
 		public string StageId { get; set; }
 		public int TotalMonstersSpawned { get; private set; } = 0;
@@ -148,8 +150,8 @@ namespace Melia.Zone.World.Dungeons.Stages
 			monster.Died += (source, args) =>
 			{
 				// Register kill with instance-wide tracking, including base exp values
-				var baseExp = monster.Data?.Exp ?? 0;
-				var jobExp = monster.Data?.JobExp ?? 0;
+				var baseExp = source.Data?.Exp ?? 0;
+				var jobExp = source.Data?.JobExp ?? 0;
 				instance.RegisterMonsterKill(1, baseExp, jobExp);
 
 				// Only notify dungeon script if this monster belongs to the current stage.
@@ -157,8 +159,12 @@ namespace Melia.Zone.World.Dungeons.Stages
 				if (instance.CurrentStage == owningStage)
 				{
 					if (DungeonScript.TryGet(instance.Id, out var dungeonScript))
-						dungeonScript.MonsterKilled(instance, monster);
+						dungeonScript.MonsterKilled(instance, source);
 				}
+
+				// Remove dead monster from tracking list to allow GC
+				owningStage.Monsters.Remove(source);
+				owningStage._deadMonsterCount++;
 			};
 		}
 
@@ -174,9 +180,7 @@ namespace Melia.Zone.World.Dungeons.Stages
 		public int GetDeadMonstersPercentage()
 		{
 			if (this.TotalMonstersSpawned == 0) return 0;
-			var aliveCount = this.Monsters.Count(m => !m.IsDead);
-			double killedCount = this.TotalMonstersSpawned - aliveCount;
-			return (int)((killedCount / this.TotalMonstersSpawned) * 100.0);
+			return (int)(((double)_deadMonsterCount / this.TotalMonstersSpawned) * 100.0);
 		}
 
 		/// <summary>
@@ -184,7 +188,7 @@ namespace Melia.Zone.World.Dungeons.Stages
 		/// </summary>
 		public int GetAliveMonsterCount()
 		{
-			return this.Monsters.Count(m => !m.IsDead);
+			return this.TotalMonstersSpawned - _deadMonsterCount;
 		}
 
 		/// <summary>
@@ -192,12 +196,13 @@ namespace Melia.Zone.World.Dungeons.Stages
 		/// </summary>
 		public int GetKilledMonsterCount()
 		{
-			return this.TotalMonstersSpawned - GetAliveMonsterCount();
+			return _deadMonsterCount;
 		}
 
 		public void Dispose()
 		{
-			// Resource cleanup if needed
+			this.Monsters.Clear();
+			this.NPCs.Clear();
 		}
 
 		// ===========================

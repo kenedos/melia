@@ -594,6 +594,23 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
+		/// Clears heavy internal state after the monster is removed from
+		/// the map, allowing the GC to collect referenced objects sooner.
+		/// </summary>
+		public void Cleanup()
+		{
+			this.Died = null;
+			this.FixedDrops.Clear();
+			//this.Vars.Clear();
+			while (this.StaticDrops.TryTake(out _)) { }
+
+			this.Components.Get<CombatComponent>()?.ClearTracking();
+
+			if (this.Components.TryGet<AiComponent>(out var ai))
+				ai.Script?.ReleaseEntity();
+		}
+
+		/// <summary>
 		/// Returns the character that benefits from the kill of the mob
 		/// in form of EXP and drops.
 		/// </summary>

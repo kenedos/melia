@@ -20,6 +20,15 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly Dictionary<int, Collection> _collections = new();
 
 		/// <summary>
+		/// Clears all collections to release references for GC.
+		/// </summary>
+		public void Clear()
+		{
+			lock (_syncLock)
+				_collections.Clear();
+		}
+
+		/// <summary>
 		/// Returns the total number of registered collections.
 		/// </summary>
 		public int Count { get { lock (_syncLock) return _collections.Count; } }

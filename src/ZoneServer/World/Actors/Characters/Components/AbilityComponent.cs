@@ -18,6 +18,15 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly Dictionary<AbilityId, Ability> _abilities = new();
 
 		/// <summary>
+		/// Clears all abilities to release references for GC.
+		/// </summary>
+		public void Clear()
+		{
+			lock (_abilities)
+				_abilities.Clear();
+		}
+
+		/// <summary>
 		/// Returns amount of abilities.
 		/// </summary>
 		public int Count { get { lock (_abilities) return _abilities.Count; } }

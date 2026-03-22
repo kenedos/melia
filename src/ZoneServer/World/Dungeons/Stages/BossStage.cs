@@ -86,7 +86,7 @@ namespace Melia.Zone.World.Dungeons.Stages
 				boss.Died += (deadBoss, killer) =>
 				{
 					// Call the script's BossKilled method for custom behavior
-					script.BossKilled(instance, boss);
+					script.BossKilled(instance, deadBoss);
 				};
 			}
 		}

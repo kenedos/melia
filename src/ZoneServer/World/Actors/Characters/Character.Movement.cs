@@ -10,6 +10,7 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Versioning;
 using Melia.Shared.World;
+using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -382,6 +383,16 @@ namespace Melia.Zone.World.Actors.Characters
 			{
 				if (saveSuccess)
 				{
+					// Remove from map immediately so other players don't see
+					// a lingering ghost. The connection is still open, so the
+					// ZC_MOVE_ZONE_OK packet will still reach the client.
+					this.CloseEyes();
+					this.Map?.RemoveCharacter(this);
+
+					ItemHookRegistry.Instance.UnregisterCharacter(this);
+					this.Properties.RemoveEvents();
+					ZoneServer.Instance.World.BattleManager.ForceEndBattle(this);
+
 					Log.Info($"Instructing client for '{this.Name}' (ID: {this.DbId}) to move to Zone Server {serverInfo.Ip}:{serverInfo.Port}, Map {destinationMapId}, Channel {channelId}.");
 					Send.ZC_MOVE_ZONE_OK(this, channelId, serverInfo.Ip, serverInfo.Port, destinationMapId);
 				}

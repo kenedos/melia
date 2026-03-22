@@ -32,6 +32,15 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		];
 
 		/// <summary>
+		/// Clears all buffs to release references for GC.
+		/// </summary>
+		public void Clear()
+		{
+			lock (_buffs)
+				_buffs.Clear();
+		}
+
+		/// <summary>
 		/// Raised when a buff starts.
 		/// </summary>
 		public event Action<ICombatEntity, Buff> BuffStarted;

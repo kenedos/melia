@@ -27,6 +27,25 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly Dictionary<int, Item> _cards = new();
 
 		/// <summary>
+		/// Clears all internal collections to release item references
+		/// for GC after the character has been saved and removed from
+		/// the world.
+		/// </summary>
+		public void ReleaseAll()
+		{
+			lock (_syncLock)
+			{
+				foreach (var list in _items.Values)
+					list.Clear();
+				_items.Clear();
+				_itemsWorldIndex.Clear();
+				_equip.Clear();
+				_warehouse.Clear();
+				_cards.Clear();
+			}
+		}
+
+		/// <summary>
 		/// Raised when the character equipped an item.
 		/// </summary>
 		public event Action<Character, Item> Equipped;

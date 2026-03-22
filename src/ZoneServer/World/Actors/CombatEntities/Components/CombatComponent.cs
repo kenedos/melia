@@ -350,6 +350,23 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				_targets.Clear();
 		}
 
+		/// <summary>
+		/// Clears all combat tracking data (damage taken, hits, targets).
+		/// Used during monster cleanup to release references.
+		/// </summary>
+		public void ClearTracking()
+		{
+			lock (_hitLock)
+			{
+				_damageTaken.Clear();
+				_hitsTaken.Clear();
+			}
+			lock (_targets)
+			{
+				_targets.Clear();
+			}
+		}
+
 		public ICombatEntity[] GetTargets()
 		{
 			int[] handles;

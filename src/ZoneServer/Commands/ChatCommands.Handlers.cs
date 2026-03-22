@@ -118,6 +118,7 @@ namespace Melia.Zone.Commands
 			this.Add("who", "", "Displays players online with names.", this.HandlePlayersOnline);
 			this.Add("w", "", "Displays player count.", this.HandlePlayerCount);
 			this.Add("uptime", "", "Displays the server uptime.", this.HandleUptime);
+			this.Add("mapinfo", "", "Displays entity counts on the current map.", this.HandleMapInfo);
 			this.Add("rates", "", "Displays the current server rates.", this.HandleRates);
 
 			// VIP
@@ -731,6 +732,16 @@ namespace Melia.Zone.Commands
 			else
 				sender.ServerMessage(Localization.Get("{2}'s reputation is {0} ({1})."), tier, ZoneServer.Instance.World.Factions.GetReputation(target, faction), target.TeamName);
 
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Displays entity counts on the current map.
+		/// </summary>
+		private CommandResult HandleMapInfo(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			var map = target.Map;
+			sender.ServerMessage(Localization.Get("Map: {0} ({1}) — {2} monsters, {3} characters"), map.ClassName, map.Id, map.MonsterCount, map.CharacterCount);
 			return CommandResult.Okay;
 		}
 

@@ -56,6 +56,7 @@ namespace Melia.Zone.World.Maps
 		// Pooled lists for temporary operations
 		protected readonly ThreadLocal<List<IUpdateable>> _updateEntitiesPool = new(() => new List<IUpdateable>());
 		protected readonly ThreadLocal<List<Character>> _updateVisibleCharactersPool = new(() => new List<Character>());
+		private readonly List<int> _expiredHandles = new();
 
 		// Spatial index for efficient range queries
 		private EntitySpatialIndex _spatialIndex;
@@ -185,29 +186,53 @@ namespace Melia.Zone.World.Maps
 			var now = DateTime.Now;
 
 			// Process character disappearances
-			var expiredCharacters = _characters.Values.Where(c => c.DisappearTime < now).ToList();
-			foreach (var character in expiredCharacters)
+			foreach (var kvp in _characters)
 			{
-				character.OnDisappear?.Invoke();
-				this.RemoveCharacter(character);
+				if (kvp.Value.DisappearTime < now)
+					_expiredHandles.Add(kvp.Key);
 			}
+			foreach (var handle in _expiredHandles)
+			{
+				if (_characters.TryGetValue(handle, out var character))
+				{
+					character.OnDisappear?.Invoke();
+					this.RemoveCharacter(character);
+				}
+			}
+			_expiredHandles.Clear();
 
 			// Process monster disappearances
-			var expiredMonsters = _monsters.Values.Where(m => m.DisappearTime < now).ToList();
-			foreach (var monster in expiredMonsters)
+			foreach (var kvp in _monsters)
 			{
-				monster.OnDisappear?.Invoke();
-				ZoneServer.Instance.ServerEvents.MonsterDisappears.Raise(new MonsterEventArgs(monster));
-				this.RemoveMonster(monster);
+				if (kvp.Value.DisappearTime < now)
+					_expiredHandles.Add(kvp.Key);
 			}
+			foreach (var handle in _expiredHandles)
+			{
+				if (_monsters.TryGetValue(handle, out var monster))
+				{
+					monster.OnDisappear?.Invoke();
+					ZoneServer.Instance.ServerEvents.MonsterDisappears.Raise(new MonsterEventArgs(monster));
+					this.RemoveMonster(monster);
+				}
+			}
+			_expiredHandles.Clear();
 
 			// Process pad disappearances
-			var expiredPads = _pads.Values.Where(p => p.DisappearTime < now).ToList();
-			foreach (var pad in expiredPads)
+			foreach (var kvp in _pads)
 			{
-				pad.OnDisappear?.Invoke();
-				this.RemovePad(pad);
+				if (kvp.Value.DisappearTime < now)
+					_expiredHandles.Add(kvp.Key);
 			}
+			foreach (var handle in _expiredHandles)
+			{
+				if (_pads.TryGetValue(handle, out var pad))
+				{
+					pad.OnDisappear?.Invoke();
+					this.RemovePad(pad);
+				}
+			}
+			_expiredHandles.Clear();
 		}
 
 		private void UpdateVisibility()
@@ -409,6 +434,9 @@ namespace Melia.Zone.World.Maps
 			}
 
 			monster.Map = null;
+
+			if (monster is Mob mob)
+				mob.Cleanup();
 		}
 
 		/// <summary>
@@ -731,6 +759,40 @@ namespace Melia.Zone.World.Maps
 				.OrderBy(e => position.Get2DDistance(e.Position));
 
 			return query.ToList();
+		}
+
+		/// <summary>
+		/// Fills the provided buffer with all enemies that can be attacked
+		/// in a circular area around the target position. Does not sort.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="position"></param>
+		/// <param name="radius"></param>
+		/// <param name="buffer">Buffer to fill with results. Cleared before use.</param>
+		public void GetAttackableEnemiesInPosition(ICombatEntity attacker, Position position, float radius, List<ICombatEntity> buffer)
+		{
+			buffer.Clear();
+
+			IEnumerable<ICombatEntity> candidates;
+
+			if (_spatialIndex != null)
+			{
+				candidates = _spatialIndex.QueryCircle(position, radius + MaxAgentRadius);
+			}
+			else
+			{
+				candidates = _combatEntities.Values;
+			}
+
+			foreach (var e in candidates)
+			{
+				var effectiveRadius = radius + e.AgentRadius;
+				var dx = e.Position.X - position.X;
+				var dz = e.Position.Z - position.Z;
+
+				if (attacker.CanDamage(e) && dx * dx + dz * dz <= effectiveRadius * effectiveRadius)
+					buffer.Add(e);
+			}
 		}
 
 		/// <summary>

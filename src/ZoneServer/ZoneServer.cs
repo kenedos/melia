@@ -47,6 +47,7 @@ namespace Melia.Zone
 		private TcpConnectionAcceptor<ZoneConnection> _acceptor;
 		private AutoSaveService _autoSaveService;
 		private OrphanCleanupService _orphanCleanupService;
+		private DeadConnectionSweepService _deadConnectionSweepService;
 
 		public override ServerType Type => ServerType.Zone;
 
@@ -172,6 +173,7 @@ namespace Melia.Zone
 			SaveQueue.Start();
 			this.StartAutoSaveService();
 			this.StartOrphanCleanupService();
+			this.StartDeadConnectionSweepService();
 			if (this.Conf.World.EnableProceduralQuests)
 			{
 				NpcSpawnManager.LoadSpawnData();
@@ -648,6 +650,18 @@ namespace Melia.Zone
 		/// </summary>
 		public OrphanCleanupService OrphanCleanupService => _orphanCleanupService;
 
+		private void StartDeadConnectionSweepService()
+		{
+			try
+			{
+				_deadConnectionSweepService = new DeadConnectionSweepService(TimeSpan.FromSeconds(15));
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Failed to initialize DeadConnectionSweep Service: {0}", ex);
+			}
+		}
+
 		private void StopServices()
 		{
 			Log.Info("Stopping server services...");
@@ -671,6 +685,10 @@ namespace Melia.Zone
 			// Dispose OrphanCleanup Service
 			_orphanCleanupService?.Dispose();
 			Log.Info("OrphanCleanup Service stopped.");
+
+			// Dispose DeadConnectionSweep Service
+			_deadConnectionSweepService?.Dispose();
+			Log.Info("DeadConnectionSweep Service stopped.");
 
 			// Disconnect communicator
 			//Communicator?.Disconnect();

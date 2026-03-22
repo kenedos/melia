@@ -51,6 +51,18 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Clears all quests to release references for GC.
+		/// </summary>
+		public void Clear()
+		{
+			lock (_syncLock)
+			{
+				_quests.Clear();
+				_disabledQuests.Clear();
+			}
+		}
+
+		/// <summary>
 		/// Notes the given quest db id as disabled.
 		/// </summary>
 		/// <remarks>

@@ -46,11 +46,32 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns>The nearest ICombatEntity, or null if none are found.</returns>
 		protected ICombatEntity GetNearestEnemy(float range)
 		{
-			return this.Entity.Map
-				.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, range)
-				.Where(e => this.IsHostileTowards(e) && !this.EntityGone(e))
-				.OrderBy(e => this.Entity.Position.Get2DDistance(e.Position))
-				.FirstOrDefault();
+			_nearbyEnemiesBuffer.Clear();
+			this.Entity.Map.GetAttackableEnemiesInPosition(
+				this.Entity, this.Entity.Position, range, _nearbyEnemiesBuffer);
+
+			ICombatEntity nearest = null;
+			var nearestDistSq = float.MaxValue;
+			var pos = this.Entity.Position;
+
+			for (var i = 0; i < _nearbyEnemiesBuffer.Count; i++)
+			{
+				var e = _nearbyEnemiesBuffer[i];
+				if (!this.IsHostileTowards(e) || this.EntityGone(e))
+					continue;
+
+				var dx = e.Position.X - pos.X;
+				var dz = e.Position.Z - pos.Z;
+				var distSq = dx * dx + dz * dz;
+
+				if (distSq < nearestDistSq)
+				{
+					nearestDistSq = distSq;
+					nearest = e;
+				}
+			}
+
+			return nearest;
 		}
 
 		/// <summary>
@@ -60,11 +81,32 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns>The farthest ICombatEntity, or null if none are found.</returns>
 		protected ICombatEntity GetFarthestEnemy(float range)
 		{
-			return this.Entity.Map
-				.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, range)
-				.Where(e => this.IsHostileTowards(e) && !this.EntityGone(e))
-				.OrderByDescending(e => this.Entity.Position.Get2DDistance(e.Position))
-				.FirstOrDefault();
+			_nearbyEnemiesBuffer.Clear();
+			this.Entity.Map.GetAttackableEnemiesInPosition(
+				this.Entity, this.Entity.Position, range, _nearbyEnemiesBuffer);
+
+			ICombatEntity farthest = null;
+			var farthestDistSq = -1f;
+			var pos = this.Entity.Position;
+
+			for (var i = 0; i < _nearbyEnemiesBuffer.Count; i++)
+			{
+				var e = _nearbyEnemiesBuffer[i];
+				if (!this.IsHostileTowards(e) || this.EntityGone(e))
+					continue;
+
+				var dx = e.Position.X - pos.X;
+				var dz = e.Position.Z - pos.Z;
+				var distSq = dx * dx + dz * dz;
+
+				if (distSq > farthestDistSq)
+				{
+					farthestDistSq = distSq;
+					farthest = e;
+				}
+			}
+
+			return farthest;
 		}
 
 		/// <summary>

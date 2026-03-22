@@ -32,6 +32,18 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Clears all jobs to release references for GC.
+		/// </summary>
+		public void Clear()
+		{
+			lock (_jobs)
+			{
+				_jobs.Clear();
+				_jobRanks = null;
+			}
+		}
+
+		/// <summary>
 		/// Returns the amount of jobs in the collection.
 		/// </summary>
 		public int Count { get { lock (_jobs) return _jobs.Count; } }

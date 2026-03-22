@@ -72,14 +72,18 @@ namespace Melia.Zone.Scripting
 		private readonly ConcurrentDictionary<long, InstanceDungeon> _instancesByCharacter = new();
 
 		/// <summary>
-		/// Thread-safe dictionary mapping characters to their warp cancellation tokens.
+		/// Thread-safe dictionary mapping character DbIds to their warp cancellation tokens.
+		/// Uses DbId instead of Character reference to prevent memory leaks when
+		/// characters reconnect and get a new object instance.
 		/// </summary>
-		private readonly ConcurrentDictionary<Character, CancellationTokenSource> _warpCancellationTokens = new();
+		private readonly ConcurrentDictionary<long, CancellationTokenSource> _warpCancellationTokens = new();
 
 		/// <summary>
-		/// Thread-safe dictionary mapping characters to their activity monitoring cancellation tokens.
+		/// Thread-safe dictionary mapping character DbIds to their activity monitoring cancellation tokens.
+		/// Uses DbId instead of Character reference to prevent memory leaks when
+		/// characters reconnect and get a new object instance.
 		/// </summary>
-		private readonly ConcurrentDictionary<Character, CancellationTokenSource> _activityCheckTokens = new();
+		private readonly ConcurrentDictionary<long, CancellationTokenSource> _activityCheckTokens = new();
 
 		/// <summary>
 		/// Thread-safe dictionary mapping instances to their timeout cancellation tokens.
@@ -746,14 +750,14 @@ namespace Melia.Zone.Scripting
 		private void StartActivityMonitoring(Character character, InstanceDungeon instance)
 		{
 			// Cancel and dispose any existing monitoring
-			if (_activityCheckTokens.TryRemove(character, out var existingCts))
+			if (_activityCheckTokens.TryRemove(character.DbId, out var existingCts))
 			{
 				existingCts.Cancel();
 				existingCts.Dispose();
 			}
 
 			var cts = new CancellationTokenSource();
-			_activityCheckTokens[character] = cts;
+			_activityCheckTokens[character.DbId] = cts;
 
 			CallSafe(this.MonitorDungeonActivity(character, instance, cts));
 		}
@@ -824,7 +828,7 @@ namespace Melia.Zone.Scripting
 			finally
 			{
 				// Always clean up and dispose the CTS
-				_activityCheckTokens.TryRemove(character, out _);
+				_activityCheckTokens.TryRemove(character.DbId, out _);
 				cts.Dispose();
 			}
 		}
@@ -1216,14 +1220,14 @@ namespace Melia.Zone.Scripting
 					continue;
 
 				// Cancel any existing warp token before creating a new one
-				if (_warpCancellationTokens.TryRemove(character, out var existingCts))
+				if (_warpCancellationTokens.TryRemove(character.DbId, out var existingCts))
 				{
 					existingCts.Cancel();
 					existingCts.Dispose();
 				}
 
 				var cts = new CancellationTokenSource();
-				_warpCancellationTokens[character] = cts;
+				_warpCancellationTokens[character.DbId] = cts;
 				CallSafe(this.AutoWarpCharacter(character, instance, cts.Token));
 
 				// Clear all instance tracking so player can start a new dungeon immediately
@@ -1304,7 +1308,7 @@ namespace Melia.Zone.Scripting
 			finally
 			{
 				// Clean up and dispose the token
-				if (_warpCancellationTokens.TryRemove(character, out var cts))
+				if (_warpCancellationTokens.TryRemove(character.DbId, out var cts))
 				{
 					cts.Dispose();
 				}
@@ -1323,14 +1327,14 @@ namespace Melia.Zone.Scripting
 			character.Variables.Perm.SetString(ActiveInstanceVarName, null);
 
 			// Stop and dispose activity monitoring token
-			if (_activityCheckTokens.TryRemove(character, out var cts))
+			if (_activityCheckTokens.TryRemove(character.DbId, out var cts))
 			{
 				cts.Cancel();
 				cts.Dispose();
 			}
 
 			// Stop and dispose warp token if active
-			if (_warpCancellationTokens.TryRemove(character, out var warpCts))
+			if (_warpCancellationTokens.TryRemove(character.DbId, out var warpCts))
 			{
 				warpCts.Cancel();
 				warpCts.Dispose();
@@ -1344,14 +1348,14 @@ namespace Melia.Zone.Scripting
 		protected virtual void OnMapLeave(Character character)
 		{
 			// Cancel and dispose auto-warp if active
-			if (_warpCancellationTokens.TryRemove(character, out var cts))
+			if (_warpCancellationTokens.TryRemove(character.DbId, out var cts))
 			{
 				cts.Cancel();
 				cts.Dispose();
 			}
 
 			// Cancel and dispose activity monitoring
-			if (_activityCheckTokens.TryRemove(character, out var activityCts))
+			if (_activityCheckTokens.TryRemove(character.DbId, out var activityCts))
 			{
 				activityCts.Cancel();
 				activityCts.Dispose();

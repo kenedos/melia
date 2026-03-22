@@ -321,15 +321,16 @@ namespace Melia.Zone.Network
 			// is cleaned up while the character is still on the map.
 			character.CancelOutOfBody();
 
-			// 1. Clean up visibility state so pad observer references are released.
-			character.CloseEyes();
+			// 1. Clean up visibility state and remove from map.
+			// During a warp, FinalizeWarp() already handles this, so skip
+			// if the character has already been removed from the map.
+			if (character.Map != null)
+			{
+				character.CloseEyes();
 
-			// 2. Immediately remove the character from the map.
-			// This is the MOST IMPORTANT step to prevent doppelgangers.
-			// By doing this synchronously, any new connection for this player
-			// will not see the old character object in the world.
-			Log.Info($"Character '{character.Name}' (Handle: {character.Handle}) removed from map '{character.Map?.ClassName ?? "null"}' due to connection close.");
-			character.Map?.RemoveCharacter(character);
+				Log.Info($"Character '{character.Name}' (Handle: {character.Handle}) removed from map '{character.Map?.ClassName ?? "null"}' due to connection close.");
+				character.Map.RemoveCharacter(character);
+			}
 
 			// Clean up card registries
 			Items.Effects.ItemHookRegistry.Instance.UnregisterCharacter(character);
@@ -393,6 +394,10 @@ namespace Melia.Zone.Network
 					// lock. It will be cleaned up on eventual normal disconnect.
 					if (character != null && !wasSavedForWarp)
 						CharacterLockManager.TryRemoveLock(character.DbId);
+
+					// Release the character's object graph so GC can collect
+					// it promptly instead of waiting for Gen2 collection.
+					character?.Cleanup();
 				}
 			});
 

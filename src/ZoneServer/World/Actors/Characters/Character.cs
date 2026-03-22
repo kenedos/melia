@@ -47,6 +47,7 @@ namespace Melia.Zone.World.Actors.Characters
 		#region Private Fields
 		private const int MaxMonsterAppearPerTick = 8;
 
+		private int _cleanedUp;
 		private int _destinationChannelId;
 		private readonly object _warpLock = new();
 		private readonly object _lookAroundLock = new();
@@ -798,6 +799,41 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			foreach (var buffId in OobeBuffIds)
 				this.StopBuff(buffId);
+		}
+		#endregion
+
+		#region Cleanup
+		/// <summary>
+		/// Releases internal collections and breaks reference cycles so
+		/// the GC can collect this character's object graph promptly.
+		/// Called from the SaveQueue after the final save completes.
+		/// Safe to call more than once.
+		/// </summary>
+		public void Cleanup()
+		{
+			if (Interlocked.Exchange(ref _cleanedUp, 1) == 1)
+				return;
+
+			_visibleMonsters = [];
+			_visibleCharacters = [];
+			_visiblePads = [];
+			_observedPads.Clear();
+
+			// Clear major component collections
+			this.Inventory?.ReleaseAll();
+			this.Skills?.Clear();
+			this.Buffs?.Clear();
+			this.Jobs?.Clear();
+			this.Quests?.Clear();
+			this.Abilities?.Clear();
+			this.Collections?.Clear();
+
+			// Null out delegate properties to release any captured closures
+			this.Died = null;
+			this.Damaged = null;
+
+			// Break connection reference
+			this.Connection = null;
 		}
 		#endregion
 

@@ -72,6 +72,9 @@ namespace Melia.Zone.Scripting.AI
 		private readonly HashSet<FactionType> _hatedFactions = new();
 		private readonly HashSet<int> _hatedMonsters = new();
 
+		private readonly List<ICombatEntity> _nearbyEnemiesBuffer = new();
+		private TimeSpan _hateUpdateAccumulator = TimeSpan.Zero;
+
 		private float _wanderRange = 300;
 		private readonly float _extraWanderRangeRate = 0.25f;
 
@@ -142,6 +145,9 @@ namespace Melia.Zone.Scripting.AI
 			this.InitSkills();
 			this.InitializeSkillRotation();
 			this.Setup();
+
+			// Stagger hate updates across monsters to avoid thundering herd
+			_hateUpdateAccumulator = TimeSpan.FromMilliseconds(-(combatEntity.Handle % 500));
 
 			_initiated = true;
 		}
@@ -219,8 +225,19 @@ namespace Melia.Zone.Scripting.AI
 					if (this.Suspended)
 						return;
 
-					// The main logic of the AI tick
-					this.UpdateHate(elapsed);
+					// Throttle hate updates: 200ms in combat, 500ms idle.
+					// Stagger start times across monsters to avoid spikes.
+					_hateUpdateAccumulator += elapsed;
+					var hateInterval = _target != null
+						? TimeSpan.FromMilliseconds(200)
+						: TimeSpan.FromMilliseconds(500);
+
+					if (_hateUpdateAccumulator >= hateInterval)
+					{
+						this.UpdateHate(_hateUpdateAccumulator);
+						_hateUpdateAccumulator = TimeSpan.Zero;
+					}
+
 					this.UpdatePhase();
 					this.HandleEventAlerts();
 					this.ExecuteDuringActions();
@@ -749,11 +766,12 @@ namespace Melia.Zone.Scripting.AI
 		/// <param name="elapsed"></param>
 		private void UpdateHate(TimeSpan elapsed)
 		{
-			var potentialEnemiesList = this.Entity.Map
-				.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, _viewRange);
+			_nearbyEnemiesBuffer.Clear();
+			this.Entity.Map.GetAttackableEnemiesInPosition(
+				this.Entity, this.Entity.Position, _viewRange, _nearbyEnemiesBuffer);
 
-			this.RemoveNonNearbyHate(elapsed, potentialEnemiesList);
-			this.IncreaseNearbyHate(elapsed, potentialEnemiesList);
+			this.RemoveNonNearbyHate(elapsed, _nearbyEnemiesBuffer);
+			this.IncreaseNearbyHate(elapsed, _nearbyEnemiesBuffer);
 		}
 
 		/// <summary>
@@ -761,17 +779,26 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		/// <param name="elapsed"></param>
 		/// <param name="potentialEnemies"></param>
-		private void RemoveNonNearbyHate(TimeSpan elapsed, IEnumerable<ICombatEntity> potentialEnemies)
+		private void RemoveNonNearbyHate(TimeSpan elapsed, List<ICombatEntity> potentialEnemies)
 		{
 			_hateLevelsToRemove.Clear();
-
-			var nearbyHandles = new HashSet<int>(potentialEnemies.Select(a => a.Handle));
 
 			foreach (var entry in _hateLevels)
 			{
 				var handle = entry.Key;
 
-				if (!nearbyHandles.Contains(handle))
+				// Linear scan — both collections are small
+				var isNearby = false;
+				for (var i = 0; i < potentialEnemies.Count; i++)
+				{
+					if (potentialEnemies[i].Handle == handle)
+					{
+						isNearby = true;
+						break;
+					}
+				}
+
+				if (!isNearby)
 				{
 					// Check if the entity is dead or gone from the map
 					var entity = this.Entity.Map.GetCombatEntity(handle);
@@ -1423,6 +1450,27 @@ namespace Melia.Zone.Scripting.AI
 		public void ClearTarget()
 		{
 			_target = null;
+		}
+
+		/// <summary>
+		/// Releases all heavy state and breaks reference cycles.
+		/// Called when the entity is removed from the map.
+		/// </summary>
+		public void ReleaseEntity()
+		{
+			this.ClearTarget();
+			this.ClearEventAlerts();
+			_hateLevels.Clear();
+			_hateLevelsToRemove.Clear();
+			_hatedFactions.Clear();
+			_hatedMonsters.Clear();
+			_duringActions.Clear();
+			_randomSkills.Clear();
+			_tempVars.Clear();
+			_usedSkillHistory.Clear();
+			_movement = null;
+			this.Entity = null;
+			this.Owner = null;
 		}
 
 		/// <summary>

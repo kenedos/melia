@@ -87,12 +87,12 @@ namespace Melia.Zone.World.Actors.Characters
 
 			var oldKey = this.Variables.Perm.GetString("Melia.Main.Welcome");
 
-			if (string.IsNullOrEmpty(oldKey) || oldKey != this.Connection.SessionKey)
+			if (string.IsNullOrEmpty(oldKey) || oldKey != this.Connection?.SessionKey)
 			{
 				this.ServerMessage("Click here to join the main chat: {a SLC 0@@@557516819791873}{#0000FF}{img link_whisper 24 24}Main{/}{/}{/}");
 			}
 
-			this.Variables.Perm.SetString("Melia.Main.Welcome", this.Connection.SessionKey);
+			this.Variables.Perm.SetString("Melia.Main.Welcome", this.Connection?.SessionKey);
 		}
 
 		/// <summary>
