@@ -449,6 +449,7 @@ namespace Melia.Zone.Network
 				if (character != null)
 				{
 					Log.Debug($"SaveAccountAndCharacter: Performing final save for character '{character.Name}' (ID: {character.DbId}) on normal disconnect.");
+					character.Variables.Perm.Remove("Melia.WasRidingOnWarp");
 					character.Components.Get<BuffComponent>()?.StopTempBuffs();
 					ZoneServer.Instance.Database.SaveCharacterData(character);
 				}

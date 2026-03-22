@@ -8,6 +8,7 @@ using Melia.Shared.World;
 using Melia.Zone.Buffs;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Yggdrasil.Scheduling;
@@ -202,6 +203,21 @@ namespace Melia.Zone.World.Actors.Monsters
 				Send.ZC_PET_AUTO_ATK(this.Owner, this);
 				Send.ZC_NORMAL.PetInfo(this.Owner);
 				// Note: PvP/duel relation handling is done in HandleAppearingMonsters
+
+				if (this.Owner.Variables.Perm.GetBool("Melia.WasRidingOnWarp"))
+				{
+					this.Owner.Variables.Perm.Remove("Melia.WasRidingOnWarp");
+					if (!this.IsDead && !this.IsBird)
+					{
+						var owner = this.Owner;
+						var companion = this;
+						Task.Delay(1000).ContinueWith(_ =>
+						{
+							if (owner.Map != null && companion.IsActivated && !companion.IsDead)
+								owner.StartBuff(BuffId.RidingCompanion, TimeSpan.Zero, companion);
+						});
+					}
+				}
 			}
 			else
 			{

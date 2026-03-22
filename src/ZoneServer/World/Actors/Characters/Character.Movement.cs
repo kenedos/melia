@@ -237,6 +237,13 @@ namespace Melia.Zone.World.Actors.Characters
 				{
 					this.Position = pos;
 					Send.ZC_SET_POS(this);
+
+					if (this.IsRiding && this.ActiveCompanion is Companion ridingCompanion)
+					{
+						ridingCompanion.Position = pos;
+						Send.ZC_SET_POS(ridingCompanion);
+					}
+
 					lock (_warpLock)
 					{
 						this.IsWarping = false;
@@ -336,7 +343,13 @@ namespace Melia.Zone.World.Actors.Characters
 			var channelId = Math2.Clamp(0, availableZones.Length, _destinationChannelId);
 			var serverInfo = availableZones[channelId];
 
-			this.Components.Get<BuffComponent>()?.StopTempBuffs();
+			var wasRiding = this.IsRiding;
+			var excludeFromTempBuffs = wasRiding
+				? new HashSet<BuffId> { BuffId.RidingCompanion }
+				: null;
+			this.Components.Get<BuffComponent>()?.StopTempBuffs(excludeFromTempBuffs);
+			if (wasRiding)
+				this.Variables.Perm.SetBool("Melia.WasRidingOnWarp", true);
 
 			Log.Info($"Character '{this.Name}' (ID: {this.DbId}) finalizing warp to Map {destinationMapId}. Saving...");
 
