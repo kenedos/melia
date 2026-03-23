@@ -15,9 +15,9 @@ namespace Melia.Zone.Pads.Handlers
 {
 	[Package("laima")]
 	[PadHandler(PadName.Cleric_Zalciai)]
-	public class Krivis_ZalciaiOverride : ICreatePadHandler, IDestroyPadHandler, IUpdatePadHandler
+	public class Krivis_ZalciaiOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
 	{
-		private const int BuffDurationMilliseconds = 4000;
+		private const int BuffDurationMilliseconds = 8000;
 
 		public void Created(object sender, PadTriggerArgs args)
 		{
@@ -51,9 +51,6 @@ namespace Melia.Zone.Pads.Handlers
 			if (!initiator.IsAlly(creator))
 				return;
 
-			if (initiator.IsBuffActive(BuffId.Zalciai_Buff))
-				return;
-
 			var amount = this.CalculateHeal(creator, initiator, skill);
 			initiator.StartBuff(BuffId.Zalciai_Buff, skill.Level, amount, TimeSpan.FromMilliseconds(BuffDurationMilliseconds), creator);
 
@@ -72,7 +69,7 @@ namespace Melia.Zone.Pads.Handlers
 
 			foreach (var target in targets)
 			{
-				if (target.IsBuffActive(BuffId.Zalciai_Buff))
+				if (target.TryGetBuff(BuffId.Zalciai_Buff, out var existingBuff) && existingBuff.RemainingDuration.TotalSeconds > 2)
 					continue;
 
 				if (target.IsDead)

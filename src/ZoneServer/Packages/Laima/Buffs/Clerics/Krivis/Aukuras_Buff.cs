@@ -1,3 +1,4 @@
+using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
@@ -5,51 +6,56 @@ using Melia.Zone.Scripting;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.Monsters;
 
 namespace Melia.Zone.Buffs.Handlers
 {
 	/// <summary>
-	/// Handle for the Aukuras, increases HP and SP Regen speed.
+	/// Handle for the Aukuras buff, periodically restores HP and SP.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Aukuras_Buff)]
 	public class Aukuras_BuffOverride : BuffHandler
 	{
+		private const int HealTickMs = 10000;
+
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			var target = buff.Target;
+			var caster = (ICombatEntity)buff.Caster;
 
-			var hpRegenSpeed = 10000f;
-			var hpRegen = buff.NumArg2;
-
-			AddPropertyModifier(buff, target, PropertyName.RHPTIME_BM, hpRegenSpeed);
-			AddPropertyModifier(buff, target, PropertyName.RHP_BM, hpRegen);
-
-			// Only apply SP regen to player characters (monsters don't have SP properties)
-			if (target is not Mob)
+			if (caster == null || !caster.TryGetSkill(SkillId.Kriwi_Aukuras, out var skill))
 			{
-				var spRegenSpeed = 10000f;
-				var spRegen = buff.NumArg2;
-
-				AddPropertyModifier(buff, target, PropertyName.RSPTIME_BM, spRegenSpeed);
-				AddPropertyModifier(buff, target, PropertyName.RSP_BM, spRegen);
+				buff.End();
+				return;
 			}
+
+			var healAmount = this.CalculateHealAmount(caster, buff.Target, skill);
+			buff.Target.Heal(healAmount, healAmount);
+
+			buff.SetUpdateTime(HealTickMs);
 		}
 
-		public override void OnEnd(Buff buff)
+		public override void WhileActive(Buff buff)
 		{
-			var target = buff.Target;
+			var caster = (ICombatEntity)buff.Caster;
 
-			RemovePropertyModifier(buff, target, PropertyName.RHPTIME_BM);
-			RemovePropertyModifier(buff, target, PropertyName.RHP_BM);
+			if (caster == null || !caster.TryGetSkill(SkillId.Kriwi_Aukuras, out var skill))
+				return;
 
-			// Only remove SP properties if they were added (non-monsters)
-			if (target is not Mob)
-			{
-				RemovePropertyModifier(buff, target, PropertyName.RSPTIME_BM);
-				RemovePropertyModifier(buff, target, PropertyName.RSP_BM);
-			}
+			var healAmount = this.CalculateHealAmount(caster, buff.Target, skill);
+			buff.Target.Heal(healAmount, 0);
+		}
+
+		private float CalculateHealAmount(ICombatEntity caster, ICombatEntity target, Skill skill)
+		{
+			var SCR_CalculateHeal = ScriptableFunctions.Combat.Get("SCR_CalculateHeal");
+			var modifier = new SkillModifier();
+			var skillHitResult = new SkillHitResult();
+			var healAmount = SCR_CalculateHeal(caster, target, skill, modifier, skillHitResult);
+
+			if (caster.TryGetActiveAbilityLevel(AbilityId.Kriwi14, out var abilityLevel))
+				healAmount *= 1f + abilityLevel * 0.005f;
+
+			return healAmount;
 		}
 	}
 }

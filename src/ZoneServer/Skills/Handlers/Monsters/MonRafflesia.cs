@@ -83,7 +83,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				GroundEffect = EffectConfig.None,
 			});
 			var pad = SkillCreatePad(caster, skill, position, 0f, PadName.Mon_PoisonPilla);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3000);
+			if (pad != null)
+				pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3000);
 		}
 	}
 
@@ -190,7 +191,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				GroundEffect = EffectConfig.None,
 			});
 			var pad = SkillCreatePad(caster, skill, position, 0f, PadName.Mon_PoisonPilla);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3000);
+			if (pad != null)
+				pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3000);
 		}
 	}
 

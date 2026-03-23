@@ -24,6 +24,8 @@ namespace Melia.Zone.Buffs.Handlers
 			var target = buff.Target;
 			var skillLevel = buff.NumArg1;
 			var maxHeal = buff.NumArg2;
+
+			buff.SetUpdateTime(300);
 		}
 
 		public override void WhileActive(Buff buff)

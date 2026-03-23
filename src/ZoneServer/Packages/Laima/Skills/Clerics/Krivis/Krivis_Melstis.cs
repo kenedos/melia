@@ -36,8 +36,8 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 
 			SkillCreatePad(caster, skill, caster.Position, 0f, PadName.Cleric_Melstis);
 
-			caster.PlayGroundEffect(caster.Position, "I_cleric_melstis_loop_levitation", 1, 15f);
-			caster.PlayGroundEffect(caster.Position, "F_cleric_melstis_loop_ground", 1, 15f);
+			caster.PlayGroundEffect(caster.Position, "F_cleric_melstis_loop_ground", 1, 25f);
+			
 		}
 	}
 }

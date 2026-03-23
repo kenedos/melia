@@ -668,6 +668,8 @@ public class CombatCalculationsScript : GeneralScript
 			return 0;
 
 		var weapon = character.Inventory.GetEquip(EquipSlot.RightHand);
+		if (weapon == null)
+			return 0;
 
 		var targetSize = SizeType.M;
 		if (target is Mob mob)

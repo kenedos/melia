@@ -804,11 +804,11 @@
 // Krivis
 //---------------------------------------------------------------------------
 { skillId: 40101, className: "Kriwi_Aukuras", name: "Aukuras", basicSp: 96, basicCast: 2000, splashRate: 1, factor: 40, factorByLevel: 4.0, cooldownTime: 10000, overheatCount: "0", castInterruptible: true},
-{ skillId: 40102, className: "Kriwi_Zalciai", name: "Zalciai", basicSp: 50, basicCast: 1500, splashRate: 1, factor: 90.0, factorByLevel: 9.0, cooldownTime: 12000, overheatCount: "0", castInterruptible: true},
+{ skillId: 40102, className: "Kriwi_Zalciai", name: "Zalciai", basicSp: 50, basicCast: 1500, splashRate: 1, factor: 90.0, factorByLevel: 9.0, cooldownTime: 12000, overheatCount: "0", castInterruptible: false},
 { skillId: 40103, className: "Kriwi_Daino", name: "Daino", basicSp: 124, basicCast: 2000, splashRate: 1, factor: 5.0, factorByLevel: 5.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: true},
 { skillId: 40104, className: "Kriwi_Zaibas", name: "Zaibas", basicSp: 38, basicCast: 1000, splashRate: 1, factor: 44, factorByLevel: 4.4, cooldownTime: 4000, overheatCount: "2", castInterruptible: false},
 { skillId: 40105, className: "Kriwi_DivineStigma", name: "Divine Stigma", basicSp: 39, basicCast: 1000, splashRate: 0, factor: 40.0, factorByLevel: 4.0, cooldownTime: 6000, overheatCount: "0", castInterruptible: false},
-{ skillId: 40106, className: "Kriwi_Melstis", name: "Piety", basicSp: 190, basicCast: 3000, splashRate: 1, factor: 150, factorByLevel: 15, cooldownTime: 12000, overheatCount: "0", castInterruptible: true},
+{ skillId: 40106, className: "Kriwi_Melstis", name: "Piety", basicSp: 190, basicCast: 3000, splashRate: 1, factor: 150, factorByLevel: 15, cooldownTime: 12000, overheatCount: "0", castInterruptible: false},
 
 // Priest
 //---------------------------------------------------------------------------

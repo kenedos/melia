@@ -25,7 +25,7 @@ namespace Melia.Zone.Pads.Handlers
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
 			pad.SetRange(45f);
 			pad.SetUpdateInterval(500);
-			pad.Trigger.LifeTime = TimeSpan.FromSeconds(15);
+			pad.Trigger.LifeTime = TimeSpan.FromSeconds(25);
 
 			// Store the total SP to be recharged over the pad's lifetime
 			var totalSpRecharge = this.GetTotalSpRecharge(creator, skill.Level);

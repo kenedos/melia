@@ -44,6 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 		}
 		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
+			SkillRemovePad(caster, skill);
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 
 			if (caster.TryGetActiveAbilityLevel(AbilityId.Kriwi14, out var abilityLevel))

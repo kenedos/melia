@@ -47,8 +47,16 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 
+			var spBonus = 0f;
+			var currentSp = caster.Properties.GetFloat(PropertyName.SP);
+			var spCost = currentSp * 0.10f;
+			if (caster.TrySpendSp(spCost))
+				spBonus = spCost;
+
 			var targetPos = caster.Position.GetRelative(caster.Direction, 50);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Cleric_Zaibas);
+			var pad = SkillCreatePad(caster, skill, targetPos, 0f, PadName.Cleric_Zaibas);
+			if (pad != null)
+				pad.NumArg2 = spBonus;
 		}
 	}
 }

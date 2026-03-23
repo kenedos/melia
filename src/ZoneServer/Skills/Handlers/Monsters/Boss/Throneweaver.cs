@@ -184,7 +184,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 60000f, 1, 10, -1, hits);
 			var position = originPos.GetRelative(farPos, distance: 30);
 			var pad = SkillCreatePad(caster, skill, position, 0f, PadName.Monster_Slow);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000);
+			if (pad != null)
+				pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000);
 		}
 	}
 
@@ -355,7 +356,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 60000f, 1, 10, -1, hits);
 			var position = originPos.GetRelative(farPos, distance: 30);
 			var pad = SkillCreatePad(caster, skill, position, 0f, PadName.Monster_Slow);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000);
+			if (pad != null)
+				pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000);
 		}
 	}
 }

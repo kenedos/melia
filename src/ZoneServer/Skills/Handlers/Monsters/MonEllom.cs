@@ -47,7 +47,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 8000f, 1, 75, -1, hits);
 			var pad = SkillCreatePad(caster, skill, farPos, 0f, PadName.Mon_PoisonPilla);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3000);
+			if (pad != null)
+				pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3000);
 		}
 	}
 
