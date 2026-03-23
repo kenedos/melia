@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -28,20 +29,18 @@ namespace Melia.Zone.Buffs.Handlers
 		private const float SpreadRange = 50f;
 		private const float SpreadOnHitChance = 20f;
 		private const int SpreadOnHitCount = 1;
+		private const string RemainingDurationVar = "Melia.Virus_Debuff.RemainingDuration";
 
 		public override void WhileActive(Buff buff)
 		{
-			var target = buff.Target;
-
-			if (target.IsDead)
-			{
-				if (!buff.Vars.ActivateOnce("Spread"))
-					this.SpreadVirusOnDeath(buff);
-
-				return;
-			}
-
+			buff.Vars.Set(RemainingDurationVar, buff.RemainingDuration);
 			base.WhileActive(buff);
+		}
+
+		public override void OnEnd(Buff buff)
+		{
+			if (buff.Target.IsDead)
+				this.SpreadVirusOnDeath(buff);
 		}
 
 		protected override HitType GetHitType(Buff buff)
@@ -87,18 +86,26 @@ namespace Melia.Zone.Buffs.Handlers
 
 		private void SpreadVirusOnDeath(Buff buff)
 		{
-			var caster = (ICombatEntity)buff.Caster;
+			if (buff.Caster is not ICombatEntity caster)
+				return;
+
 			var target = buff.Target;
 
+			if (target.Map == null)
+				return;
+
 			var targetsInRange = target.Map.GetAttackableEnemiesInPosition(caster, target.Position, SpreadRange);
-			var spreadTargets = targetsInRange.Where(a => !a.IsBuffActive(BuffId.Virus_Debuff));
+			var spreadTargets = targetsInRange
+				.Where(a => a != target && !a.IsBuffActive(BuffId.Virus_Debuff))
+				.Take(MaxSpreadOnDeathAmount);
 
-			var damage = 0f;
-			if (buff.Vars.TryGetFloat("Melia.DoT.SnapshotDamage", out var snapshotDamage))
-				damage = snapshotDamage;
+			var damage = buff.NumArg2;
 
-			foreach (var spreadTarget in spreadTargets.LimitRandom(MaxSpreadOnDeathAmount))
-				spreadTarget.StartBuff(BuffId.Virus_Debuff, buff.NumArg1, damage, buff.Duration, caster, buff.SkillId);
+			if (!buff.Vars.TryGet<TimeSpan>(RemainingDurationVar, out var remainingDuration) || remainingDuration <= TimeSpan.Zero)
+				return;
+
+			foreach (var spreadTarget in spreadTargets)
+				spreadTarget.StartBuff(BuffId.Virus_Debuff, buff.NumArg1, damage, remainingDuration, caster, buff.SkillId);
 		}
 	}
 }

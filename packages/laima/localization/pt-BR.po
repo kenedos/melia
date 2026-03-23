@@ -12,7 +12,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 # ============================================================================
-# Klaipeda NPCs
+# Klaipeda NPCs (c_klaipe.cs)
 # ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
@@ -128,7 +128,7 @@ msgid "Statue of Goddess Ausrine"
 msgstr "Estátua da Deusa Ausrine"
 
 # ============================================================================
-# Fedimian NPCs
+# Fedimian NPCs (c_fedimian.cs)
 # ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
@@ -188,7 +188,7 @@ msgid "Accessories~! Everyone loves good looking jewelry!"
 msgstr "Acessórios~! Todo mundo ama joias bonitas!"
 
 # ============================================================================
-# Orsha NPCs
+# Orsha NPCs (c_orsha.cs)
 # ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
@@ -264,7 +264,7 @@ msgid "Lv1 Treasure Chest"
 msgstr "Baú de Tesouro Nv1"
 
 # ============================================================================
-# Klaipeda Quests
+# Klaipeda Quests (c_klaipe_quests.cs)
 # ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
@@ -832,7 +832,7 @@ msgid "Retrieve the broken amulet"
 msgstr "Recuperar o amuleto quebrado"
 
 # ============================================================================
-# Orsha Quests
+# Orsha Quests (c_orsha_quests.cs)
 # ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
@@ -1460,7 +1460,7 @@ msgid "Collect Fragrant Herbs"
 msgstr "Coletar Ervas Perfumadas"
 
 # ============================================================================
-# Fedimian Quests
+# Fedimian Quests (c_fedimian_quests.cs)
 # ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
@@ -2135,12 +2135,9 @@ msgstr "Recupere os Memorandos de Relíquias de Kepeck do perigoso Mausoléu Rea
 msgid "Collect Relic Memoranda from the Ancient Pedestals"
 msgstr "Coletar Memorandos de Relíquias dos Pedestais Antigos"
 
-# Translation file - pt-BR
-# Files: f_siauliai_15_re_quests.cs, f_siauliai_11_re_quests.cs
-
-# ===========================================================================
-# FILE: f_siauliai_15_re_quests.cs
-# ===========================================================================
+# ============================================================================
+# Woods of the Linked Bridges Quests (f_siauliai_15_re_quests.cs)
+# ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_siauliai_15_re_quests.cs
 msgid "[Scout] Milda"
@@ -3502,16 +3499,9 @@ msgstr "Os javalis têm estado mais calmos ultimamente. A influência da corrup�
 msgid "Keep that armor close. It'll serve you well against dark forces."
 msgstr "Mantenha essa armadura por perto. Ela será útil contra as forças das trevas."
 
-# Portuguese (pt-BR) translations for f_siauliai_11_re_quests.cs
-# Paupys Crossing Quest NPCs — post-demon war storyline
-# Quests: 1001 Crossing Guard Duty, 1002 The Timber Thief Mystery,
-#         1003 Herbal Rain Harvest, 1004 Corruption Watch,
-#         1005 Detection Device Test, 1006 A Moment of Peace
-msgid ""
-msgstr ""
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Language: pt_BR\n"
+# ============================================================================
+# Paupys Crossing Quests (f_siauliai_11_re_quests.cs)
+# ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_siauliai_11_re_quests.cs
 msgid "[Guard] Borin"
@@ -4660,9 +4650,10 @@ msgstr "[Eremita] Lukas"
 #: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_siauliai_11_re_quests.cs
 msgid "Sit peacefully with Lukas"
 msgstr "Sentar tranquilamente com Lukas"
-# ============================================================
-# f_rokas_25_quests.cs
-# ============================================================
+
+# ============================================================================
+# Ramstis Ridge Quests (f_rokas_25_quests.cs)
+# ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_rokas_25_quests.cs
 msgid "[Wanderer] Peregrin Lyon"
@@ -5464,9 +5455,9 @@ msgstr "Pétalas de Fragaras Azul coletadas: {0}/6"
 msgid "Sacred relics found: {0}/5"
 msgstr "Relíquias sagradas encontradas: {0}/5"
 
-# ============================================================
-# f_rokas_28_quests.cs
-# ============================================================
+# ============================================================================
+# Tiltas Valley Quests (f_rokas_28_quests.cs)
+# ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_rokas_28_quests.cs
 msgid "[Supply Officer] Darius"
@@ -6128,9 +6119,9 @@ msgstr "Colete Ervas Hemostáticas pelo vale para a pesquisa de antídoto da her
 msgid "Collect Hemostasis Herbs"
 msgstr "Coletar Ervas Hemostáticas"
 
-# ============================================================
-# f_rokas_30_quests.cs
-# ============================================================
+# ============================================================================
+# King's Plateau Quests (f_rokas_30_quests.cs)
+# ============================================================================
 
 #: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_rokas_30_quests.cs
 msgid "[Expedition Leader] Brennan"
@@ -6988,20 +6979,9 @@ msgstr "Investigue a ponte sabotada para o Cartógrafo Varus examinando todos os
 msgid "Inspect the bridge support posts"
 msgstr "Inspecionar os postes de suporte da ponte"
 
-
-# Portuguese (Brazil) translations for group_c quest files
-# Files: f_bracken_63_1_quests.cs, f_gele_57_1_quests.cs, f_siauliai_50_1_quests.cs
-msgid ""
-msgstr ""
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Language: pt_BR\n"
-
-#
-# ============================================================
-# FILE: f_bracken_63_1_quests.cs (Koru Jungle)
-# ============================================================
-#
+# ============================================================================
+# Koru Jungle Quests (f_bracken_63_1_quests.cs)
+# ============================================================================
 
 #: f_bracken_63_1_quests.cs
 msgid "[Scout] Kaina"
@@ -7775,11 +7755,9 @@ msgstr "Eliminar Parrot do caminho"
 msgid "Clear Polibu from the pathway"
 msgstr "Eliminar Polibu do caminho"
 
-#
-# ============================================================
-# FILE: f_gele_57_1_quests.cs (Srautas Gorge)
-# ============================================================
-#
+# ============================================================================
+# Srautas Gorge Quests (f_gele_57_1_quests.cs)
+# ============================================================================
 
 #: f_gele_57_1_quests.cs
 msgid "Gorge Wildflower"
@@ -8341,11 +8319,9 @@ msgstr "Caçar Grummer"
 msgid "Hunt Cafrisun"
 msgstr "Caçar Cafrisun"
 
-#
-# ============================================================
-# FILE: f_siauliai_50_1_quests.cs (Gytis Settlement Area)
-# ============================================================
-#
+# ============================================================================
+# Gytis Settlement Quests (f_siauliai_50_1_quests.cs)
+# ============================================================================
 
 #: f_siauliai_50_1_quests.cs
 msgid "Crop Bundle"
@@ -8794,13 +8770,10 @@ msgstr "[Fazendeiro] Jonas"
 #: f_siauliai_50_1_quests.cs (Quest Definitions)
 msgid "Collect Crop Bundles from the eastern fields"
 msgstr "Coletar Fardos de Colheita dos campos leste"
-# Translation file - pt-BR
-# Group D: f_gele_57_2, f_gele_57_3, f_rokas_31, d_zachariel_32
-#
 
-# ===========================================================================
-# FILE: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_gele_57_2_quests.cs
-# ===========================================================================
+# ============================================================================
+# Srautas Gorge Plateau Quests (f_gele_57_2_quests.cs)
+# ============================================================================
 
 #: f_gele_57_2_quests.cs
 msgid "[Klaipeda Scout] Lania"
@@ -9182,9 +9155,9 @@ msgstr "[Mensageiro de Klaipeda] Gareth"
 msgid "Deliver letter to Roderic in Nefritas Cliff"
 msgstr "Entregar a carta para Roderic em Nefritas Cliff"
 
-# ===========================================================================
-# FILE: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_gele_57_3_quests.cs
-# ===========================================================================
+# ============================================================================
+# Nefritas Cliff Quests (f_gele_57_3_quests.cs)
+# ============================================================================
 
 #: f_gele_57_3_quests.cs
 msgid "[Hillside Watcher] Roderic"
@@ -9234,9 +9207,9 @@ msgstr "Você não deveria estar aqui. Este lugar está repleto de criaturas agr
 msgid "If you don't have business with me, I suggest you leave. Quickly."
 msgstr "Se não tem nenhum assunto comigo, sugiro que vá embora. Rapidamente."
 
-# ===========================================================================
-# FILE: packages/laima/scripts/zone/content/laima/npcs/fields/quests/f_rokas_31_quests.cs
-# ===========================================================================
+# ============================================================================
+# Zachariel Crossroads Quests (f_rokas_31_quests.cs)
+# ============================================================================
 
 #: f_rokas_31_quests.cs
 msgid "[Royal Guard] Balthor"
@@ -9570,9 +9543,9 @@ msgstr "[Devota] Lyanna"
 msgid "Defeat corrupted Repusbunny Mages"
 msgstr "Derrotar Repusbunny Mages corrompidos"
 
-# ===========================================================================
-# FILE: packages/laima/scripts/zone/content/laima/npcs/dungeons/quests/d_zachariel_32_quests.cs
-# ===========================================================================
+# ============================================================================
+# Royal Mausoleum Quests (d_zachariel_32_quests.cs)
+# ============================================================================
 
 #: d_zachariel_32_quests.cs
 msgid "Ancient Scroll Pedestal"
@@ -9626,17 +9599,9 @@ msgstr "{#666666}Todos os Memorandos de Relíquia coletados! Volte para a Grande
 msgid "Collection cancelled."
 msgstr "Coleta cancelada."
 
-
-# Headgear Quests - pt-BR translations (batch 1)
-# Files: ancient_crown_quest.cs, angel_wings_quest.cs, angelic_halo_quest.cs,
-#        boeing_sunglasses_quest.cs, buried_carrot_quest.cs, butterfly_hat_quest.cs,
-#        cat_ears_quest.cs, christmas_tree_snowglobe_quest.cs, cloud_quest.cs,
-#        cozy_polar_bear_ears_quest.cs
-#
-
-# ============================================================
-# ancient_crown_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Ancient Crown (ancient_crown_quest.cs)
+# ============================================================================
 
 #: headgears/ancient_crown_quest.cs
 msgid "[Scholar] Sssevren"
@@ -9698,9 +9663,9 @@ msgstr "*folheia animadamente as anotações de pesquisa* Excelente! Lembre-se, 
 msgid "*returns to studying scrolls* Very well... The secrets of our ancient crowns will wait. They have waited for centuries, after all..."
 msgstr "*volta a estudar os pergaminhos* Muito bem... Os segredos das nossas coroas ancestrais podem esperar. Eles esperaram séculos, afinal..."
 
-# ============================================================
-# angel_wings_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Angel Wings (angel_wings_quest.cs)
+# ============================================================================
 
 #: headgears/angel_wings_quest.cs
 msgid "[Tomb Keeper] Seraphiel"
@@ -9774,9 +9739,9 @@ msgstr "Que as bênçãos recaiam sobre você, viajante. Preciso de 75 Resinas d
 msgid "{#666666}*turns back toward the tomb*{/} The guardian waits patiently. They have waited for centuries... a little longer matters not."
 msgstr "{#666666}*vira-se de volta para o túmulo*{/} O guardião espera com paciência. Esperou séculos... um pouco mais não faz diferença."
 
-# ============================================================
-# angelic_halo_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Angelic Halo (angelic_halo_quest.cs)
+# ============================================================================
 
 #: headgears/angelic_halo_quest.cs
 msgid "[Priestess] Celestine"
@@ -9870,9 +9835,9 @@ msgstr "Volte até mim quando tiver reunido esses materiais, e juntos criaremos 
 msgid "I understand. The path of service is not for everyone. May the goddesses watch over you nonetheless."
 msgstr "Compreendo. O caminho do serviço não é para todos. Que as deusas vejem sobre você mesmo assim."
 
-# ============================================================
-# boeing_sunglasses_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Boeing Sunglasses (boeing_sunglasses_quest.cs)
+# ============================================================================
 
 #: headgears/boeing_sunglasses_quest.cs
 msgid "[Klaipeda Agent] Markas"
@@ -9938,9 +9903,9 @@ msgstr "*solta um suspiro de alívio* Obrigado! Preciso de 50 peles de Lauzinute
 msgid "*nods understandingly* I understand. If you change your mind, I'll be here... keeping a safe distance from those Hogmas."
 msgstr "*acena com a cabeça compreensivamente* Entendo. Se mudar de ideia, estarei aqui... mantendo uma distância segura desses Hogmas."
 
-# ============================================================
-# buried_carrot_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Buried Carrot (buried_carrot_quest.cs)
+# ============================================================================
 
 #: headgears/buried_carrot_quest.cs
 msgid "[Forager] Terron"
@@ -10014,9 +9979,9 @@ msgstr "Maravilhoso! Preciso de 60 Cristais de Truffle das criaturas fúngicas q
 msgid "{#666666}*returns to digging*{/} Very well. I shall continue my search for those elusive cauliflowers..."
 msgstr "{#666666}*volta a cavar*{/} Muito bem. Continuarei minha busca por aquelas escorregadias couves-flores..."
 
-# ============================================================
-# butterfly_hat_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Butterfly Hat (butterfly_hat_quest.cs)
+# ============================================================================
 
 #: headgears/butterfly_hat_quest.cs
 msgid "[Grandma] Nella"
@@ -10074,9 +10039,9 @@ msgstr "Obrigada, querido(a)! Traga-me 150 Asas de Leafly para o tecido delicado
 msgid "Oh, that's alright dear. Perhaps another time. I'll be here, watching my butterflies."
 msgstr "Oh, tudo bem, querido(a). Talvez em outro momento. Estarei aqui, observando minhas borboletas."
 
-# ============================================================
-# cat_ears_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Cat Ears (cat_ears_quest.cs)
+# ============================================================================
 
 #: headgears/cat_ears_quest.cs
 msgid "[Fearful] Felix"
@@ -10134,9 +10099,9 @@ msgstr "Oh, obrigado! *torce as mãos nervosamente* Preciso de 80 pedaços de su
 msgid "*whimpers* I understand... they are scary after all..."
 msgstr "*geme* Entendo... eles são assustadores afinal..."
 
-# ============================================================
-# christmas_tree_snowglobe_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Christmas Tree Snowglobe (christmas_tree_snowglobe_quest.cs)
+# ============================================================================
 
 #: headgears/christmas_tree_snowglobe_quest.cs
 msgid "[Tinkerer] Holvir"
@@ -10202,9 +10167,9 @@ msgstr "Maravilhoso! Traga-me 60 Chifres de Groll dos White Grolls e 80 Corrente
 msgid "Understandable. The cold can be unforgiving. Should you change your mind, I'll be here, tinkering away..."
 msgstr "Compreensível. O frio pode ser implacável. Se mudar de ideia, estarei aqui, trabalhando no meu artesanato..."
 
-# ============================================================
-# cloud_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Cloud (cloud_quest.cs)
+# ============================================================================
 
 #: headgears/cloud_quest.cs
 msgid "[Dreamer] Tomas"
@@ -10274,9 +10239,9 @@ msgstr "Obrigado, amigo! Os Siaulamb aqui perdem suas folhas de pelo com bastant
 msgid "I understand. Dreams can wait... they always do. But the clouds will still be here when you return."
 msgstr "Entendo. Os sonhos podem esperar... sempre esperam. Mas as nuvens ainda estarão aqui quando você voltar."
 
-# ============================================================
-# cozy_polar_bear_ears_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Cozy Polar Bear Ears (cozy_polar_bear_ears_quest.cs)
+# ============================================================================
 
 #: headgears/cozy_polar_bear_ears_quest.cs
 msgid "[Mountain Ranger] Valdis"
@@ -10345,16 +10310,10 @@ msgstr "Esplêndido! Vou precisar de duas coisas das criaturas locais. Primeiro,
 #: headgears/cozy_polar_bear_ears_quest.cs
 msgid "{#666666}*nods knowingly*{/} The plateau will still be here when you're ready. Stay warm out there, traveler."
 msgstr "{#666666}*acena com a cabeça com entendimento*{/} O planalto ainda estará aqui quando você estiver pronto. Fique aquecido por aí, viajante."
-# Headgear Quest Translations - Batch 2
-# Language: pt-BR
-# Files: crocus_quest.cs, fashion_quest.cs, feather_helmet_quest.cs,
-#        flarestone_horn_quest.cs, flower_branch_quest.cs, flower_crown_quest.cs,
-#        ghost_headband_quest.cs, groucho_glasses_quest.cs,
-#        horned_hat_quest.cs, huckleberry_hair_accessory_quest.cs
 
-# ============================================================
-# crocus_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Crocus (crocus_quest.cs)
+# ============================================================================
 
 #: headgears/crocus_quest.cs
 msgid "[Shrine Keeper] Velana"
@@ -10428,9 +10387,9 @@ msgstr "Obrigada, gentil viajante. Preciso de 50 Peles de Mantiwood dos Mantiwoo
 msgid "{#666666}*returns to tending the shrine*{/} The glen's beauty endures... for now. Return if you change your mind."
 msgstr "{#666666}*volta a cuidar do santuário*{/} A beleza do vale perdura... por enquanto. Volte se mudar de ideia."
 
-# ============================================================
-# fashion_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Fashion (fashion_quest.cs)
+# ============================================================================
 
 #: headgears/fashion_quest.cs
 msgid "Welcome, adventurer! I have some special items available for those who have diligently gathered certain... resources."
@@ -10472,9 +10431,9 @@ msgstr "Pronto! Volte se precisar de mais alguma coisa."
 msgid "You have {0} {1}. That's not enough for anything yet."
 msgstr "Você tem {0} {1}. Ainda não é suficiente para nada."
 
-# ============================================================
-# feather_helmet_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Feather Helmet (feather_helmet_quest.cs)
+# ============================================================================
 
 #: headgears/feather_helmet_quest.cs
 msgid "[Retired Warrior] Helena"
@@ -10536,9 +10495,9 @@ msgstr "*fica em posição ereta com porte militar* Excelente! Lembre-se: 40 sin
 msgid "*nods understandingly* A warrior must choose their own path. Return if you wish to learn more about the old ways."
 msgstr "*acena com a cabeça compreensivamente* Um guerreiro deve escolher seu próprio caminho. Volte se quiser aprender mais sobre os velhos costumes."
 
-# ============================================================
-# flarestone_horn_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Flarestone Horn (flarestone_horn_quest.cs)
+# ============================================================================
 
 #: headgears/flarestone_horn_quest.cs
 msgid "[Frightened Villager] Valdas"
@@ -10608,9 +10567,9 @@ msgstr "Graças à deusa! Cace os Siaulavs nas partes orientais desta floresta. 
 msgid "{#666666}*sighs heavily*{/} I understand. These are dangerous times. Please reconsider if you change your mind."
 msgstr "{#666666}*suspira fundo*{/} Entendo. São tempos perigosos. Por favor, reconsidere se mudar de ideia."
 
-# ============================================================
-# flower_branch_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Flower Branch (flower_branch_quest.cs)
+# ============================================================================
 
 #: headgears/flower_branch_quest.cs
 msgid "[Forest Artist] Florina"
@@ -10672,9 +10631,9 @@ msgstr "Maravilhoso! Os chifres de Leafnut formarão a estrutura base, as folhas
 msgid "*returns to arranging flowers* Nature's beauty will still be here when you return..."
 msgstr "*volta a arranjar flores* A beleza da natureza ainda estará aqui quando você retornar..."
 
-# ============================================================
-# flower_crown_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Flower Crown (flower_crown_quest.cs)
+# ============================================================================
 
 #: headgears/flower_crown_quest.cs
 msgid "[Florist] Flora"
@@ -10736,9 +10695,9 @@ msgstr "*bate palmas animada* Maravilhoso! As folhas de Caro têm uma forma tão
 msgid "*nods understandingly* Of course, of course. The flowers will still be here when you return. They always are."
 msgstr "*acena com a cabeça compreensivamente* Claro, claro. As flores ainda estarão aqui quando você retornar. Sempre estão."
 
-# ============================================================
-# ghost_headband_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Ghost Headband (ghost_headband_quest.cs)
+# ============================================================================
 
 #: headgears/ghost_headband_quest.cs
 msgid "[Spirit] Marcus"
@@ -10796,9 +10755,9 @@ msgstr "*o fantasma se ilumina* Excelente! Traga-me 75 porções de Matéria Esp
 msgid "*ghost fades slightly* Then I shall continue to wait... as I have for so long already..."
 msgstr "*o fantasma desbota levemente* Então continuarei a esperar... como já espero há tanto tempo..."
 
-# ============================================================
-# groucho_glasses_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Groucho Glasses (groucho_glasses_quest.cs)
+# ============================================================================
 
 #: headgears/groucho_glasses_quest.cs
 msgid "[Survivor] Berthold"
@@ -10904,9 +10863,9 @@ msgstr "{#666666}*seu rosto cai*{/}"
 msgid "I... I understand. It is dangerous out there. Maybe I'll find another way... or maybe I'll just stay hidden here forever."
 msgstr "Eu... entendo. É perigoso lá fora. Talvez encontre outra maneira... ou talvez fique escondido aqui para sempre."
 
-# ============================================================
-# horned_hat_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Horned Hat (horned_hat_quest.cs)
+# ============================================================================
 
 #: headgears/horned_hat_quest.cs
 msgid "[Historian] Valdric"
@@ -10980,9 +10939,9 @@ msgstr "Com esses materiais, posso criar uma réplica do Chapéu com Chifres do 
 msgid "{#666666}*returns to examining a petrified merchant stall*{/} The stones here have many secrets to tell. Return if you change your mind."
 msgstr "{#666666}*volta a examinar uma banca de mercador petrificada*{/} As pedras aqui têm muitos segredos a contar. Volte se mudar de ideia."
 
-# ============================================================
-# huckleberry_hair_accessory_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Huckleberry Hair Accessory (huckleberry_hair_accessory_quest.cs)
+# ============================================================================
 
 #: headgears/huckleberry_hair_accessory_quest.cs
 msgid "[Farmer's Daughter] Lina"
@@ -11060,16 +11019,9 @@ msgstr "Estão espalhados por toda a fazenda. Os Pinos adoram especialmente fica
 msgid "That's alright. The pollen will be here for a while yet if you change your mind."
 msgstr "Tudo bem. O pólen ainda vai estar por aqui por um tempo se mudar de ideia."
 
-# Headgear Quest Translations - Batch 3
-# Language: pt-BR
-# Files: imperial_helm_quest.cs, jack_o_lantern_hair_ornament_quest.cs,
-#         jingle_bell_earmuffs_quest.cs, lotus_leaf_quest.cs, outdoors_hat_quest.cs,
-#         owl_hat_quest.cs, pancake_quest.cs, party_cone_quest.cs,
-#         peacock_feather_quest.cs, picnic_hat_quest.cs
-
-# =============================================================================
-# imperial_helm_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Imperial Helm (imperial_helm_quest.cs)
+# ============================================================================
 
 #: headgears/imperial_helm_quest.cs
 msgid "[Archeologist] Aldric"
@@ -11155,9 +11107,9 @@ msgstr "{#666666}*acena com a cabeça em compreensão*{/}"
 msgid "I understand. The ruins will still be here when you return. These stones have waited for ages - they shall wait a while longer."
 msgstr "Compreendo. As ruínas ainda estarão aqui quando você voltar. Estas pedras esperaram por eras — podem esperar um pouco mais."
 
-# =============================================================================
-# jack_o_lantern_hair_ornament_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Jack O Lantern Hair Ornament (jack_o_lantern_hair_ornament_quest.cs)
+# ============================================================================
 
 #: headgears/jack_o_lantern_hair_ornament_quest.cs
 msgid "[Lumberjack] Garvyn"
@@ -11231,9 +11183,9 @@ msgstr "Que Deus o abençoe, viajante. Traga-me 75 Ossos das Mãos de Hallowvent
 msgid "I understand. It's dangerous work, hunting ghosts. I'll be here if you change your mind - not like I have anywhere else to go."
 msgstr "Compreendo. É um trabalho perigoso, caçar fantasmas. Estarei aqui se mudar de ideia — não é que eu tenha outro lugar para ir."
 
-# =============================================================================
-# jingle_bell_earmuffs_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Jingle Bell Earmuffs (jingle_bell_earmuffs_quest.cs)
+# ============================================================================
 
 #: headgears/jingle_bell_earmuffs_quest.cs
 msgid "[Traveling Merchant] Mirena"
@@ -11307,9 +11259,9 @@ msgstr "Maravilhoso! Preciso de 100 Peles de White Spion para o forro aconchegan
 msgid "{#666666}*pulls her cloak tighter against the wind*{/} I understand. This cold isn't for everyone. If you change your mind, I'll be here... trying not to freeze."
 msgstr "{#666666}*aperta a capa contra o vento*{/} Compreendo. Este frio não é para todos. Se mudar de ideia, estarei aqui... tentando não congelar."
 
-# =============================================================================
-# lotus_leaf_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Lotus Leaf (lotus_leaf_quest.cs)
+# ============================================================================
 
 #: headgears/lotus_leaf_quest.cs
 msgid "[Plant Enthusiast] Miri"
@@ -11367,9 +11319,9 @@ msgstr "Obrigada! As cascas darão estrutura ao acessório enquanto as pétalas 
 msgid "Perhaps another time then. The flowers will still be here when you return."
 msgstr "Talvez em outro momento então. As flores ainda estarão aqui quando você voltar."
 
-# =============================================================================
-# outdoors_hat_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Outdoors Hat (outdoors_hat_quest.cs)
+# ============================================================================
 
 #: headgears/outdoors_hat_quest.cs
 msgid "[Tailor] Pascal"
@@ -11431,9 +11383,9 @@ msgstr "*pega os esboços animadamente* Excelente! Traga-me 40 pedaços de Madei
 msgid "*returns to sketching* Fashion waits for no one, but I'll be here when you're ready!"
 msgstr "*volta a esboçar* A moda não espera por ninguém, mas estarei aqui quando estiver pronto!"
 
-# =============================================================================
-# owl_hat_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Owl Hat (owl_hat_quest.cs)
+# ============================================================================
 
 #: headgears/owl_hat_quest.cs
 msgid "[Wooden Owl] Nocturnus"
@@ -11495,9 +11447,9 @@ msgstr "*a voz fica mais forte* Encontre o Ridimed azul onde o luar toca a água
 msgid "*the whispers grow distant* I will remain... as I have for centuries... watching... waiting... in this wooden form..."
 msgstr "*os sussurros se distanciam* Permanecerei... como estive por séculos... observando... esperando... nesta forma de madeira..."
 
-# =============================================================================
-# pancake_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Pancake (pancake_quest.cs)
+# ============================================================================
 
 #: headgears/pancake_quest.cs
 msgid "[Cook] Morella"
@@ -11555,9 +11507,9 @@ msgstr "Maravilhoso! Vou precisar de 100 Ferrões de Honeybean — eles contêm 
 msgid "I understand. The bees can be quite intimidating. Perhaps another adventurer will help me realize my culinary vision. I'll be here, dreaming of pancakes..."
 msgstr "Compreendo. As abelhas podem ser bem intimidadoras. Talvez outro aventureiro me ajude a realizar minha visão culinária. Estarei aqui, sonhando com panquecas..."
 
-# =============================================================================
-# party_cone_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Party Cone (party_cone_quest.cs)
+# ============================================================================
 
 #: headgears/party_cone_quest.cs
 msgid "[Party Enthusiast] Fiesta"
@@ -11619,9 +11571,9 @@ msgstr "*pula de animação* Eba! Traga-me 5 Galhos de Ponpon para a base — el
 msgid "*spins around* That's okay! The party never ends here - come back when you're ready to join the fun!"
 msgstr "*gira* Tudo bem! A festa nunca acaba aqui — volte quando estiver pronto para se juntar à diversão!"
 
-# =============================================================================
-# peacock_feather_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Peacock Feather (peacock_feather_quest.cs)
+# ============================================================================
 
 #: headgears/peacock_feather_quest.cs
 msgid "[Noblewoman] Isabella"
@@ -11683,9 +11635,9 @@ msgstr "*bate palmas delicadamente* Esplêndido! Vamos precisar tanto das crista
 msgid "*returns to her fan* Very well, we shall meet again!"
 msgstr "*volta ao seu leque* Muito bem, nos encontraremos novamente!"
 
-# =============================================================================
-# picnic_hat_quest.cs
-# =============================================================================
+# ============================================================================
+# Headgear: Picnic Hat (picnic_hat_quest.cs)
+# ============================================================================
 
 #: headgears/picnic_hat_quest.cs
 msgid "[Little Girl] Mila"
@@ -11763,15 +11715,9 @@ msgstr "De verdade?! Muito obrigada! Preciso de 50 dessas Máscaras de Siaulamb 
 msgid "Oh... okay. Maybe someone else will help. I really want my picnic hat..."
 msgstr "Oh... tudo bem. Talvez outra pessoa me ajude. Eu realmente quero meu chapéu de piquenique..."
 
-# Headgear Quest Translations - Batch 4
-# pt-BR translations for headgear quest NPCs
-# Files: pineapple_hat, polka_dot_ribbon, pudding_hat, purple_ribbon_witch_hat,
-#        radishu, sailor_cap, sea_themed_headband, shaman_mask,
-#        snowman_nose, snowy_reindeer_antlers
-
-# ============================================================
-# FILE: pineapple_hat_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Pineapple Hat (pineapple_hat_quest.cs)
+# ============================================================================
 
 #: headgears/pineapple_hat_quest.cs
 msgid "[Eccentric Designer] Pierre"
@@ -11833,9 +11779,9 @@ msgstr "*pula animado* MAGNÍFICO! As penas desses Cockatrices - perfeitas para 
 msgid "*sighs dramatically* Alas, another visionary masterpiece must wait... But fashion never sleeps! Neither do I! *returns to furious sketching*"
 msgstr "*suspira dramaticamente* Ai de mim, mais uma obra-prima visionária terá de esperar... Mas a moda nunca dorme! Eu também não! *volta a esboçar furiosamente*"
 
-# ============================================================
-# FILE: polka_dot_ribbon_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Polka Dot Ribbon (polka_dot_ribbon_quest.cs)
+# ============================================================================
 
 #: headgears/polka_dot_ribbon_quest.cs
 msgid "[Enchantress] Dotty"
@@ -11889,9 +11835,9 @@ msgstr "*grita de alegria* Maravilhoso! Traga-me 10 pedaços de Algodão de Bone
 msgid "*pouts briefly before twirling* Well, the dots will be here waiting when you're ready for their sparkly magic!"
 msgstr "*fica de bico por um momento antes de girar* Bom, as bolinhas estarão aqui esperando quando você estiver pronto para sua magia brilhante!"
 
-# ============================================================
-# FILE: pudding_hat_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Pudding Hat (pudding_hat_quest.cs)
+# ============================================================================
 
 #: headgears/pudding_hat_quest.cs
 msgid "[Chef] Purin"
@@ -11953,9 +11899,9 @@ msgstr "Maravilhoso! Traga-me 100 Cogumelos Trufas Vermelhas para a base e 50 Ta
 msgid "*returns to stirring* That's okay! The pot's always simmering if you change your mind~"
 msgstr "*volta a mexer a panela* Tudo bem! A panela está sempre no fogo se mudar de ideia~"
 
-# ============================================================
-# FILE: purple_ribbon_witch_hat_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Purple Ribbon Witch Hat (purple_ribbon_witch_hat_quest.cs)
+# ============================================================================
 
 #: headgears/purple_ribbon_witch_hat_quest.cs
 msgid "[Witch] Morvenna"
@@ -12037,9 +11983,9 @@ msgstr "{#666666}*A expressão de Morvenna escurece por um momento*{/}"
 msgid "So be it. But remember, child... the owls never forget those who turned away from the graves. Walk carefully in these woods."
 msgstr "Que assim seja. Mas lembre-se, criança... as corujas nunca esquecem aqueles que se afastaram dos túmulos. Caminhe com cuidado por estas matas."
 
-# ============================================================
-# FILE: radishu_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Radishu (radishu_quest.cs)
+# ============================================================================
 
 #: headgears/radishu_quest.cs
 msgid "[Farmer] Theodric"
@@ -12109,9 +12055,9 @@ msgstr "Maravilhoso! Preciso de Talos de Ashrong - uns 80 deles - para a matéri
 msgid "{#666666}*sighs and returns to tending the wilted crops*{/} Can't blame you. These old bones aren't what they used to be either... Maybe next time."
 msgstr "{#666666}*suspira e volta a cuidar das plantas murchadas*{/} Não posso te culpar. Estes ossos velhos também já não são o que eram... Talvez na próxima vez."
 
-# ============================================================
-# FILE: sailor_cap_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Sailor Cap (sailor_cap_quest.cs)
+# ============================================================================
 
 #: headgears/sailor_cap_quest.cs
 msgid "[Retired Sailor] Jacques"
@@ -12173,9 +12119,9 @@ msgstr "*irradia entusiasmo* Excelente! Precisaremos de bastante pele de furão 
 msgid "*returns to adjusting his cap* No rush, the sea teaches us patience after all... Come back when you're ready to learn about real sailing gear!"
 msgstr "*volta a ajustar seu boné* Sem pressa, o mar nos ensina paciência afinal... Volte quando estiver pronto para aprender sobre equipamentos de navegação de verdade!"
 
-# ============================================================
-# FILE: sea_themed_headband_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Sea Themed Headband (sea_themed_headband_quest.cs)
+# ============================================================================
 
 #: headgears/sea_themed_headband_quest.cs
 msgid "[Shrine Keeper] Thalassa"
@@ -12245,9 +12191,9 @@ msgstr "As criaturas Merog nas proximidades absorveram o poder do santuário ao 
 msgid "{#666666}*nods slowly*{/} The waters are patient. Return when you are ready."
 msgstr "{#666666}*acena lentamente com a cabeça*{/} As águas são pacientes. Retorne quando estiver pronto."
 
-# ============================================================
-# FILE: shaman_mask_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Shaman Mask (shaman_mask_quest.cs)
+# ============================================================================
 
 #: headgears/shaman_mask_quest.cs
 msgid "[Mystic Doll] Yagra"
@@ -12309,9 +12255,9 @@ msgstr "*acena solenemente* A essência espiritual dos wendigos é forte. Suas p
 msgid "*returns to meditation* The spirits will wait... as will I."
 msgstr "*volta à meditação* Os espíritos vão esperar... assim como eu."
 
-# ============================================================
-# FILE: snowman_nose_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Snowman Nose (snowman_nose_quest.cs)
+# ============================================================================
 
 #: headgears/snowman_nose_quest.cs
 msgid "[Mountaineer] Bjorn"
@@ -12385,9 +12331,9 @@ msgstr "Você é uma boa pessoa! Traga-me 80 pacotes de Pele de White Spion e 30
 msgid "Can't blame you. It is a bit of a foolish request. But if you change your mind, I'll be here... talking to my frozen meat, apparently."
 msgstr "Não posso te culpar. É um pedido meio tolo. Mas se mudar de ideia, estarei aqui... conversando com minha carne congelada, aparentemente."
 
-# ============================================================
-# FILE: snowy_reindeer_antlers_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Snowy Reindeer Antlers (snowy_reindeer_antlers_quest.cs)
+# ============================================================================
 
 #: headgears/snowy_reindeer_antlers_quest.cs
 msgid "[Hunter] Valdis"
@@ -12492,14 +12438,10 @@ msgstr "{#666666}*volta ao seu entalhe*{/}"
 #: headgears/snowy_reindeer_antlers_quest.cs
 msgid "A wise choice if you feel unprepared. The frozen plains are not kind to those who underestimate them. Return when you are ready, and the fire will still be burning."
 msgstr "Uma escolha sábia se sentir que não está preparado. As planícies congeladas não são gentis com aqueles que as subestimam. Retorne quando estiver pronto, e o fogo ainda estará aceso."
-# Headgear Quest Translations (pt-BR) — Batch 5
-# Files: soldier_hat_quest.cs, spiral_glasses_quest.cs, sprout_quest.cs,
-#        square_black_hat_quest.cs, tantalizer_feelers_quest.cs, tribal_ornament_quest.cs,
-#        umbrella_quest.cs, unicorn_horn_quest.cs, white_bunny_hairband_quest.cs
 
-# ============================================================
-# soldier_hat_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Soldier Hat (soldier_hat_quest.cs)
+# ============================================================================
 
 #: headgears/soldier_hat_quest.cs
 msgid "[Adventurer] Marcus"
@@ -12565,9 +12507,9 @@ msgstr "Ótimo! As amostras de tecido vão nos ajudar a estudar a degradação d
 msgid "No problem, I'll keep collecting. Stop by if you change your mind - the guild always needs help!"
 msgstr "Sem problemas, vou continuar coletando. Apareça se mudar de ideia — a guilda sempre precisa de ajuda!"
 
-# ============================================================
-# spiral_glasses_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Spiral Glasses (spiral_glasses_quest.cs)
+# ============================================================================
 
 #: headgears/spiral_glasses_quest.cs
 msgid "[Crystal Miner] Gareth"
@@ -12633,9 +12575,9 @@ msgstr "Excelente! As Fichas de Vubbe têm propriedades refrativas únicas, e os
 msgid "Well, if you change your mind, you know where to find me. These old glasses won't last much longer..."
 msgstr "Bom, se mudar de ideia, sabe onde me encontrar. Estes óculos velhos não vão durar muito mais..."
 
-# ============================================================
-# sprout_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Sprout (sprout_quest.cs)
+# ============================================================================
 
 #: headgears/sprout_quest.cs
 msgid "[Botanist] Flora"
@@ -12697,9 +12639,9 @@ msgstr "*bate palmas de alegria* Maravilhoso! Traga-me 75 Pétalas de Hanaming e
 msgid "*returns to her plants* That's okay! Plants teach us patience. Come back when you're ready!"
 msgstr "*volta para as plantas* Não tem problema! As plantas nos ensinam paciência. Volte quando estiver pronto!"
 
-# ============================================================
-# square_black_hat_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Square Black Hat (square_black_hat_quest.cs)
+# ============================================================================
 
 #: headgears/square_black_hat_quest.cs
 msgid "[Scholar] Tini"
@@ -12761,9 +12703,9 @@ msgstr "*endireita os papéis* Excelente! Preciso de 120 Ossos Brown Tini para a
 msgid "*returns to reading* Very well. The pursuit of knowledge waits for those who are ready."
 msgstr "*volta a ler* Muito bem. A busca pelo conhecimento aguarda aqueles que estão prontos."
 
-# ============================================================
-# tantalizer_feelers_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Tantalizer Feelers (tantalizer_feelers_quest.cs)
+# ============================================================================
 
 #: headgears/tantalizer_feelers_quest.cs
 msgid "[Naturalist] Vaelen"
@@ -12829,9 +12771,9 @@ msgstr "Excelente! Traga-me 80 Penas de Velwriggler e 60 Espinhos de Thornball. 
 msgid "The darkness isn't for everyone. I'll continue my observations here, where the light doesn't reach."
 msgstr "A escuridão não é para todos. Vou continuar minhas observações aqui, onde a luz não alcança."
 
-# ============================================================
-# tribal_ornament_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Tribal Ornament (tribal_ornament_quest.cs)
+# ============================================================================
 
 #: headgears/tribal_ornament_quest.cs
 msgid "[Tribal Craftsman] Kamu"
@@ -12893,9 +12835,9 @@ msgstr "Uma escolha sábia! Traga-me 120 Penas de Ultanun — elas devem ser col
 msgid "*returns to his crafting* The spirits will wait. Return when you feel their call."
 msgstr "*volta ao seu artesanato* Os espíritos vão esperar. Volte quando sentir o chamado deles."
 
-# ============================================================
-# umbrella_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Umbrella (umbrella_quest.cs)
+# ============================================================================
 
 #: headgears/umbrella_quest.cs
 msgid "[Traveler] Pluvis"
@@ -12973,9 +12915,9 @@ msgstr "Você tem minha eterna gratidão! Traga-me 50 Ganchos Grandes dos Puragi
 msgid "I understand. No one wants to wade through this miserable swamp for a stranger. I'll just... stand here. Getting wetter. Thinking about my life choices."
 msgstr "Entendo. Ninguém quer atravessar este pântano miserável por um estranho. Vou ficar aqui... parado. Me molhando cada vez mais. Pensando nas minhas escolhas de vida."
 
-# ============================================================
-# unicorn_horn_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: Unicorn Horn (unicorn_horn_quest.cs)
+# ============================================================================
 
 #: headgears/unicorn_horn_quest.cs
 msgid "[Researcher] Dr. Hornsby"
@@ -13045,9 +12987,9 @@ msgstr "Excelente! *rabiscando intensamente* Lembre-se, preciso de 250 chifres p
 msgid "*sighs disappointedly* Very well... I suppose I'll have to continue my research alone. Do come back if you change your mind!"
 msgstr "*suspira com decepção* Muito bem... Suponho que terei que continuar minha pesquisa sozinho. Volte se mudar de ideia!"
 
-# ============================================================
-# white_bunny_hairband_quest.cs
-# ============================================================
+# ============================================================================
+# Headgear: White Bunny Hairband (white_bunny_hairband_quest.cs)
+# ============================================================================
 
 #: headgears/white_bunny_hairband_quest.cs
 msgid "[Seamstress] Mirela"
