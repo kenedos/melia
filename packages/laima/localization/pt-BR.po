@@ -262,3 +262,1875 @@ msgstr "Toras"
 #: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
 msgid "Lv1 Treasure Chest"
 msgstr "Baú de Tesouro Nv1"
+
+# ============================================================================
+# Klaipeda Quests
+# ============================================================================
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Withered Branch"
+msgstr "Galho Murcho"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "A dying and burnt branch with blackened, withering leaves. The corruption has taken hold of the vegetation."
+msgstr "Um galho moribundo e queimado com folhas enegrecidas e murchas. A corrupção tomou conta da vegetação."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've already collected a branch from this location."
+msgstr "Você já coletou um galho deste local."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Collecting branch..."
+msgstr "Coletando galho..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Branches collected: {0}/5"
+msgstr "Galhos coletados: {0}/5"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "All branches collected! Return to Elara."
+msgstr "Todos os galhos coletados! Volte para Elara."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Collection cancelled."
+msgstr "Coleta cancelada."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "[Caravan Master] Marcus"
+msgstr "[Mestre de Caravana] Marcus"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Marcus"
+msgstr "Marcus"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Ah, traveler! Welcome to Klaipeda. We're working hard to rebuild after the war, but it's been... challenging."
+msgstr "Ah, viajante! Bem-vindo a Klaipeda. Estamos trabalhando duro para reconstruir após a guerra, mas tem sido... desafiador."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The roads are no longer safe. Monsters roam freely, and our supply caravans can't get through without proper protection."
+msgstr "As estradas não são mais seguras. Monstros vagam livremente, e nossas caravanas de suprimentos não conseguem passar sem proteção adequada."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Would you be willing to help escort a supply caravan? The pay is modest, but you'd be helping our city recover."
+msgstr "Você estaria disposto a ajudar a escoltar uma caravana de suprimentos? O pagamento é modesto, mas você estaria ajudando nossa cidade a se recuperar."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Excellent! Head to the western road and clear out the monsters. We need at least 5 of each of them gone before the caravan can safely pass."
+msgstr "Excelente! Vá para a estrada oeste e elimine os monstros. Precisamos que pelo menos 5 de cada sejam eliminados antes que a caravana possa passar em segurança."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Be careful out there. These aren't ordinary beasts - some say they're tainted by lingering demon magic from the war."
+msgstr "Tenha cuidado por lá. Não são bestas comuns - alguns dizem que estão contaminadas pela magia demoníaca remanescente da guerra."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "I understand. It's dangerous work. If you change your mind, I'll be here organizing our supply efforts."
+msgstr "Eu entendo. É um trabalho perigoso. Se mudar de ideia, estarei aqui organizando nossos esforços de suprimento."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Keep up the good work! The western road is particularly dangerous near the forest edge. Watch your back out there."
+msgstr "Continue com o bom trabalho! A estrada oeste é particularmente perigosa perto da borda da floresta. Fique atento por lá."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Fantastic work! The road is clear, and our caravan just reported safe passage!"
+msgstr "Trabalho fantástico! A estrada está limpa, e nossa caravana acabou de reportar passagem segura!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've earned this reward, and more importantly, you've helped dozens of families who depend on these supplies."
+msgstr "Você mereceu esta recompensa, e mais importante, ajudou dezenas de famílias que dependem desses suprimentos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Thanks to you, our supply lines are much safer. You're always welcome in Klaipeda, friend."
+msgstr "Graças a você, nossas linhas de suprimento estão muito mais seguras. Você é sempre bem-vindo em Klaipeda, amigo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "If you're looking for more work, you might check with Elara near the river. She's been dealing with some... unusual problems."
+msgstr "Se está procurando mais trabalho, pode falar com Elara perto do rio. Ela está lidando com alguns... problemas incomuns."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "[River Warden] Elara"
+msgstr "[Guardiã do Rio] Elara"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Elara"
+msgstr "Elara"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "This river is the main water source for the residents of Klaipeda. Without it, the city cannot survive."
+msgstr "Este rio é a principal fonte de água dos moradores de Klaipeda. Sem ele, a cidade não pode sobreviver."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "What brings you to the riverside?"
+msgstr "O que te traz à beira do rio?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Can I help?"
+msgstr "Posso ajudar?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Tell me more about the river"
+msgstr "Me conte mais sobre o rio"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Just passing through"
+msgstr "Só estou de passagem"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You would help? Thank the goddesses! The corruption is spreading and we need to act quickly."
+msgstr "Você ajudaria? Graças às deusas! A corrupção está se espalhando e precisamos agir rápido."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Can you help me by removing corrupted tree branches from the river? They're scattered along the riverbanks and need to be cleared."
+msgstr "Pode me ajudar removendo galhos de árvores corrompidos do rio? Estão espalhados pelas margens e precisam ser limpos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Thank you so much! Please remove 5 Withered Branches from different locations along the river."
+msgstr "Muito obrigada! Por favor, remova 5 Galhos Murchos de diferentes locais ao longo do rio."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The river used to flow crystal clear, providing fresh water for drinking, cooking, and daily life."
+msgstr "O rio costumava fluir cristalino, fornecendo água fresca para beber, cozinhar e o dia a dia."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "But corruption from the forest upstream has been falling into the river. Corrupted tree branches and debris are poisoning our water supply."
+msgstr "Mas a corrupção da floresta rio acima está caindo no rio. Galhos corrompidos e detritos estão envenenando nosso suprimento de água."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Safe travels. Try not to drink the river water until we've cleaned it..."
+msgstr "Boa viagem. Tente não beber a água do rio até a limparmos..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Have you collected the branches? You have {0} out of 5 so far."
+msgstr "Você coletou os galhos? Você tem {0} de 5 até agora."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Check the riverbanks for withered bushes and corrupted vegetation. They're the source of the contamination."
+msgstr "Verifique as margens do rio em busca de arbustos murchos e vegetação corrompida. Eles são a fonte da contaminação."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've collected all the branches! The river is already flowing clearer!"
+msgstr "Você coletou todos os galhos! O rio já está fluindo mais limpo!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "{#666666}*She inspects the water, a relieved smile crossing her face*{/}"
+msgstr "{#666666}*Ela inspeciona a água, um sorriso aliviado cruzando seu rosto*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The water quality is improving already. The residents will be able to use the river safely again."
+msgstr "A qualidade da água já está melhorando. Os moradores poderão usar o rio com segurança novamente."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've saved countless lives today. Here - take this as thanks for your help."
+msgstr "Você salvou incontáveis vidas hoje. Tome - aceite isso como agradecimento pela sua ajuda."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The river is flowing much clearer now. The residents are grateful to have clean water again."
+msgstr "O rio está fluindo muito mais limpo agora. Os moradores estão gratos por ter água limpa novamente."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Your help was invaluable. Without removing those corrupted branches, the water would have become completely unusable."
+msgstr "Sua ajuda foi inestimável. Sem remover aqueles galhos corrompidos, a água teria se tornado completamente inutilizável."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "[Reconstruction Coordinator] Viktor"
+msgstr "[Coordenador de Reconstrução] Viktor"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Viktor"
+msgstr "Viktor"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Every day we rebuild, and every night I count the buildings still in ruins. This city was once magnificent, you know."
+msgstr "Todo dia reconstruímos, e toda noite eu conto os prédios ainda em ruínas. Esta cidade já foi magnífica, sabia?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The demon war left scars on more than just the land. Entire districts were destroyed. But we'll rebuild - we must."
+msgstr "A guerra demoníaca deixou cicatrizes em mais do que apenas a terra. Distritos inteiros foram destruídos. Mas vamos reconstruir - precisamos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Would you like to help us rebuilding our homes?"
+msgstr "Gostaria de nos ajudar a reconstruir nossas casas?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "I'd like to help"
+msgstr "Gostaria de ajudar"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "What do you need most?"
+msgstr "Do que vocês mais precisam?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Good luck with that"
+msgstr "Boa sorte com isso"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "A volunteer! We desperately need building materials - wood planks specifically."
+msgstr "Um voluntário! Precisamos desesperadamente de materiais de construção - tábuas de madeira especificamente."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The forests outside the city have salvageable materials, but they're monster-infested. Can you gather 20 Dry Wood for us?"
+msgstr "As florestas fora da cidade têm materiais aproveitáveis, mas estão infestadas de monstros. Pode coletar 20 Madeiras Secas para nós?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Wonderful! You'll find wood to the west and east of the city. Salvage what you can and bring back to me."
+msgstr "Maravilha! Você encontrará madeira a oeste e leste da cidade. Recupere o que puder e traga de volta para mim."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Watch out for scavenger monsters - they've made homes in the forests and don't take kindly to visitors."
+msgstr "Cuidado com os monstros carniceiros - eles fizeram suas casas nas florestas e não gostam de visitantes."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Wood - the basic material of construction. But they're hard to come by now."
+msgstr "Madeira - o material básico de construção. Mas está difícil de encontrar agora."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The old quarries and lumber camps were overrun during the war. We'd need someone to venture out and reclaim them."
+msgstr "As antigas pedreiras e acampamentos madeireiros foram invadidos durante a guerra. Precisaríamos de alguém para se aventurar e recuperá-los."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "We rebuild with or without help. It's what we do."
+msgstr "Reconstruímos com ou sem ajuda. É o que fazemos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've brought everything we need! Excellent work!"
+msgstr "Você trouxe tudo que precisávamos! Excelente trabalho!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "With these materials, we can repair at least three houses. That's three more families with roofs over their heads."
+msgstr "Com esses materiais, podemos reparar pelo menos três casas. São mais três famílias com um teto sobre suas cabeças."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You have my gratitude, and the gratitude of everyone in those homes."
+msgstr "Você tem minha gratidão, e a gratidão de todos naquelas casas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Thank you for gathering materials! We need 20 wood planks from Dry Woods (you have {0})."
+msgstr "Obrigado por coletar materiais! Precisamos de 20 tábuas de Madeira Seca (você tem {0})."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The forests are dangerous, but the materials there are essential for our recovery."
+msgstr "As florestas são perigosas, mas os materiais de lá são essenciais para nossa recuperação."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The houses you helped rebuild are occupied now. I see children playing in those yards every day."
+msgstr "As casas que você ajudou a reconstruir estão ocupadas agora. Vejo crianças brincando naqueles quintais todo dia."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "That's what reconstruction is really about - giving people their lives back."
+msgstr "É disso que a reconstrução realmente se trata - devolver a vida das pessoas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "[Merchant Guild] Anastasia"
+msgstr "[Guilda Mercante] Anastasia"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Anastasia"
+msgstr "Anastasia"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The Merchant Guild is working to reestablish trade routes between the three great cities."
+msgstr "A Guilda Mercante está trabalhando para reestabelecer rotas comerciais entre as três grandes cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Klaipeda, Orsha, and Fedimian were once connected by thriving commerce. Now... we barely communicate."
+msgstr "Klaipeda, Orsha e Fedimian já foram conectadas por um comércio próspero. Agora... mal nos comunicamos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "I need a reliable courier to deliver trade proposals to my counterparts in Orsha and Fedimian. Would you be willing to travel between the cities?"
+msgstr "Preciso de um mensageiro confiável para entregar propostas comerciais aos meus colegas em Orsha e Fedimian. Você estaria disposto a viajar entre as cidades?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Splendid! Here are sealed letters for the guild representatives in both cities."
+msgstr "Esplêndido! Aqui estão cartas lacradas para os representantes da guilda em ambas as cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Deliver them personally - don't trust these to random messengers. The future of our economy depends on reopening these trade routes."
+msgstr "Entregue-as pessoalmente - não confie essas cartas a mensageiros aleatórios. O futuro da nossa economia depende da reabertura dessas rotas comerciais."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "I understand. It's quite a journey. If you change your mind, the guild would compensate you well."
+msgstr "Eu entendo. É uma longa jornada. Se mudar de ideia, a guilda o compensará bem."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've delivered both letters! The responses are... cautiously optimistic."
+msgstr "Você entregou ambas as cartas! As respostas são... cautelosamente otimistas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Orsha is willing to resume grain shipments, and Fedimian will provide academic resources. It's a start!"
+msgstr "Orsha está disposta a retomar envios de grãos, e Fedimian fornecerá recursos acadêmicos. É um começo!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Here's your payment, plus a bonus. You've helped lay the foundation for economic recovery across all three cities."
+msgstr "Aqui está seu pagamento, mais um bônus. Você ajudou a estabelecer a base para a recuperação econômica das três cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You still need to deliver letters to both Orsha and Fedimian."
+msgstr "Você ainda precisa entregar cartas para Orsha e Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've delivered to Fedimian. Now deliver to the Orsha guild representative - Rose."
+msgstr "Você entregou em Fedimian. Agora entregue à representante da guilda em Orsha - Rose."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You've delivered to Orsha. Now deliver to the Fedimian guild representative - Anne."
+msgstr "Você entregou em Orsha. Agora entregue à representante da guilda em Fedimian - Anne."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Remember - deliver them personally to the guild representatives in each city."
+msgstr "Lembre-se - entregue-as pessoalmente aos representantes da guilda em cada cidade."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Thanks to your deliveries, trade is slowly resuming between our cities."
+msgstr "Graças às suas entregas, o comércio está lentamente sendo retomado entre nossas cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "It'll take time to return to pre-war prosperity, but at least we're moving in the right direction."
+msgstr "Vai levar tempo para voltar à prosperidade pré-guerra, mas pelo menos estamos indo na direção certa."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "[Mayor] Oswald"
+msgstr "[Prefeito] Oswald"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Mayor Oswald"
+msgstr "Prefeito Oswald"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "I've already signed the cooperation contract. Deliver it to Agatha in Fedimian."
+msgstr "Já assinei o contrato de cooperação. Entregue-o a Agatha em Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Klaipeda is ready to work with the other cities for our mutual prosperity."
+msgstr "Klaipeda está pronta para trabalhar com as outras cidades para nossa prosperidade mútua."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "A cooperation contract from Fedimian? Let me see..."
+msgstr "Um contrato de cooperação de Fedimian? Deixe-me ver..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "{#666666}*He reads the contract carefully*{/}"
+msgstr "{#666666}*Ele lê o contrato cuidadosamente*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "A Unity Summit to establish cooperation between our three cities? Interesting..."
+msgstr "Uma Cúpula de Unidade para estabelecer cooperação entre nossas três cidades? Interessante..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Klaipeda has much to gain from renewed trade and cooperation. We need resources, knowledge, and allies."
+msgstr "Klaipeda tem muito a ganhar com o comércio e cooperação renovados. Precisamos de recursos, conhecimento e aliados."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Tell Agatha that Klaipeda accepts. We'll send our best delegates to represent our interests."
+msgstr "Diga a Agatha que Klaipeda aceita. Enviaremos nossos melhores delegados para representar nossos interesses."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Perhaps working together, we can all recover from this war faster."
+msgstr "Talvez trabalhando juntos, todos possamos nos recuperar desta guerra mais rápido."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Unity contracts delivered: {0}/2"
+msgstr "Contratos de unidade entregues: {0}/2"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "{#FFD700}All contracts delivered! Return to Agatha in Fedimian.{/}"
+msgstr "{#FFD700}Todos os contratos entregues! Volte para Agatha em Fedimian.{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Do you need me to sign a cooperation contract? You'll need to bring it to me first."
+msgstr "Precisa que eu assine um contrato de cooperação? Você precisará trazê-lo primeiro."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The Unity Summit was a great success. Our delegates reported productive discussions."
+msgstr "A Cúpula de Unidade foi um grande sucesso. Nossos delegados reportaram discussões produtivas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Klaipeda looks forward to working with Orsha and Fedimian for our mutual benefit."
+msgstr "Klaipeda espera trabalhar com Orsha e Fedimian para nosso benefício mútuo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "As Mayor of Klaipeda, I oversee the city's recovery and reconstruction efforts."
+msgstr "Como Prefeito de Klaipeda, supervisiono os esforços de recuperação e reconstrução da cidade."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "We're working hard to rebuild what the demon war destroyed."
+msgstr "Estamos trabalhando duro para reconstruir o que a guerra demoníaca destruiu."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "If you have business with the city, speak with our various coordinators around town."
+msgstr "Se tem assuntos com a cidade, fale com nossos diversos coordenadores pela cidade."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "[Cursed Refugee] Aldric"
+msgstr "[Refugiado Amaldiçoado] Aldric"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Aldric"
+msgstr "Aldric"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "{#666666}*The man is wrapped in heavy chains, his eyes haunted*{/}"
+msgstr "{#666666}*O homem está envolvido em correntes pesadas, seus olhos assombrados*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Stay back... I'm dangerous. The curse... it makes me lose control when the sun sets."
+msgstr "Fique longe... Eu sou perigoso. A maldição... me faz perder o controle quando o sol se põe."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "How can I help?"
+msgstr "Como posso ajudar?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Tell me about your curse"
+msgstr "Me conte sobre sua maldição"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Leave him be"
+msgstr "Deixe-o em paz"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "A demon lord marked my village during the war. Those who survived... we carry his curse."
+msgstr "Um senhor demônio marcou minha vila durante a guerra. Aqueles que sobreviveram... carregamos sua maldição."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "At night, we become violent, mindless. These chains are the only thing keeping the citizens safe from me."
+msgstr "À noite, nos tornamos violentos, irracionais. Essas correntes são a única coisa mantendo os cidadãos seguros de mim."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You would help someone like me? I... thank you."
+msgstr "Você ajudaria alguém como eu? Eu... obrigado."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "There might be a way to break the curse. In my village ruins, there's an ancient chest with a broken amulet. If you could retrieve it..."
+msgstr "Pode haver um jeito de quebrar a maldição. Nas ruínas da minha vila, há um baú antigo com um amuleto quebrado. Se você pudesse recuperá-lo..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The broken amulet absorbs dark energies - it might be able to draw out the curse from my body."
+msgstr "O amuleto quebrado absorve energias sombrias - pode ser capaz de extrair a maldição do meu corpo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The cursed villagers still wander the ruins. They were my neighbors once. My friends. Now they're just... shells."
+msgstr "Os aldeões amaldiçoados ainda vagam pelas ruínas. Eram meus vizinhos uma vez. Meus amigos. Agora são apenas... cascas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Head east from the Miner's Village. You'll find the ruins there, and the chest with the amulet. Please... hurry."
+msgstr "Vá para o leste da Vila dos Mineradores. Você encontrará as ruínas lá, e o baú com o amuleto. Por favor... se apresse."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "{#666666}*He nods silently, chains rattling*{/}"
+msgstr "{#666666}*Ele acena silenciosamente, correntes tilintando*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "{#FFFF00}*His eyes widen as he sees the broken amulet*{/}"
+msgstr "{#FFFF00}*Seus olhos se arregalam ao ver o amuleto quebrado*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "You found it! You actually found it! Please, place it against my chest - carefully, the curse fights back..."
+msgstr "Você encontrou! Você realmente encontrou! Por favor, coloque contra meu peito - com cuidado, a maldição resiste..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "{#FF0000}*As the amulet touches him, it begins to glow. Dark smoke pours from his body into the amulet. He screams in pain, then... silence*{/}"
+msgstr "{#FF0000}*Quando o amuleto o toca, começa a brilhar. Fumaça escura sai de seu corpo para o amuleto. Ele grita de dor, então... silêncio*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "It's... it's gone. The curse is broken! The amulet absorbed all the dark energy!"
+msgstr "Se... se foi. A maldição foi quebrada! O amuleto absorveu toda a energia sombria!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Thank you, stranger. You've given me my life back. Here - this was my father's. He'd want you to have it."
+msgstr "Obrigado, estranho. Você me devolveu minha vida. Tome - isto era do meu pai. Ele gostaria que você ficasse com isto."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "The broken amulet should be in an ancient chest somewhere in the village ruins. Please, hurry. Every night the curse grows stronger."
+msgstr "O amuleto quebrado deve estar em um baú antigo em algum lugar nas ruínas da vila. Por favor, se apresse. Toda noite a maldição fica mais forte."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Eastwood Village is east from the Miner's Village. Look for the ruins."
+msgstr "A Vila Eastwood fica a leste da Vila dos Mineradores. Procure pelas ruínas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "I'm free of the curse, but my village is still lost. Perhaps one day I'll return and help cleanse it."
+msgstr "Estou livre da maldição, mas minha vila ainda está perdida. Talvez um dia eu volte e ajude a purificá-la."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Until then, I owe you a debt I can never repay. You've given me hope when I had none."
+msgstr "Até lá, tenho uma dívida que nunca poderei pagar. Você me deu esperança quando eu não tinha nenhuma."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Caravan Escort"
+msgstr "Escolta de Caravana"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Clear the western road of monsters so supply caravans can safely reach Klaipeda."
+msgstr "Limpe a estrada oeste de monstros para que caravanas de suprimentos possam chegar a Klaipeda com segurança."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Kill Hanamings"
+msgstr "Matar Hanamings"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Kill Kepas"
+msgstr "Matar Kepas"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Kill Leaf Bugs"
+msgstr "Matar Insetos Folha"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Kill Infrorocktor"
+msgstr "Matar Infrorocktor"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Cleansing the River"
+msgstr "Limpando o Rio"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Help River Warden Elara by removing corrupted tree branches that are polluting Klaipeda's main water source."
+msgstr "Ajude a Guardiã do Rio Elara removendo galhos de árvores corrompidos que estão poluindo a principal fonte de água de Klaipeda."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Collect Withered Burnt Branches"
+msgstr "Coletar Galhos Murchos Queimados"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Rebuilding Klaipeda"
+msgstr "Reconstruindo Klaipeda"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Gather wood planks from the forest monsters to help rebuild Klaipeda."
+msgstr "Colete tábuas de madeira dos monstros da floresta para ajudar a reconstruir Klaipeda."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Collect Dry Wood"
+msgstr "Coletar Madeira Seca"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Reopening Trade Routes"
+msgstr "Reabrindo Rotas Comerciais"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Deliver trade proposals to the Merchant Guild representatives in Orsha and Fedimian."
+msgstr "Entregue propostas comerciais aos representantes da Guilda Mercante em Orsha e Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Deliver letter to Orsha Merchant Guild"
+msgstr "Entregar carta à Guilda Mercante de Orsha"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Deliver letter to Fedimian Merchant Guild"
+msgstr "Entregar carta à Guilda Mercante de Fedimian"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Breaking the Curse"
+msgstr "Quebrando a Maldição"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Retrieve the broken amulet from Eastwood Village at east of Miner's Village to break Aldric's curse. The amulet absorbs dark energies and may be able to draw out the curse."
+msgstr "Recupere o amuleto quebrado da Vila Eastwood a leste da Vila dos Mineradores para quebrar a maldição de Aldric. O amuleto absorve energias sombrias e pode ser capaz de extrair a maldição."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_klaipe_quests.cs
+msgid "Retrieve the broken amulet"
+msgstr "Recuperar o amuleto quebrado"
+
+# ============================================================================
+# Orsha Quests
+# ============================================================================
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "[Commander] Theron"
+msgstr "[Comandante] Theron"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Theron"
+msgstr "Theron"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Orsha stands ready to coordinate with the other cities."
+msgstr "Orsha está pronta para coordenar com as outras cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "A cooperation contract from Fedimian? Let me review this..."
+msgstr "Um contrato de cooperação de Fedimian? Deixe-me analisar..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*He reads the contract with a stern expression*{/}"
+msgstr "{#666666}*Ele lê o contrato com uma expressão séria*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "A Unity Summit between the three cities... Hmph. Politicians and diplomats talking instead of acting."
+msgstr "Uma Cúpula de Unidade entre as três cidades... Humph. Políticos e diplomatas falando em vez de agir."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "But I suppose talking is better than fighting. Orsha needs allies, not more enemies."
+msgstr "Mas suponho que falar é melhor do que lutar. Orsha precisa de aliados, não de mais inimigos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Tell Agatha that Commander Theron accepts on behalf of Orsha. We'll send our military advisors."
+msgstr "Diga a Agatha que o Comandante Theron aceita em nome de Orsha. Enviaremos nossos conselheiros militares."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "If nothing else, it's an opportunity to coordinate our defenses against the remaining monster threats."
+msgstr "Se nada mais, é uma oportunidade de coordenar nossas defesas contra as ameaças de monstros restantes."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*The grizzled commander regards you with interest*{/}"
+msgstr "{#666666}*O experiente comandante o observa com interesse*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Recording testimonies from the war? The Grand Archive is doing important work."
+msgstr "Gravando testemunhos da guerra? O Grande Arquivo está fazendo um trabalho importante."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Would you like to hear my account as a military commander who fought on the front lines?"
+msgstr "Gostaria de ouvir meu relato como comandante militar que lutou na linha de frente?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*Commander Theron speaks with military precision into the recording crystal*{/}"
+msgstr "{#666666}*O Comandante Theron fala com precisão militar no cristal de gravação*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "'I am Commander Theron of Orsha. I led the defense of our northern borders during the demon war.'"
+msgstr "'Eu sou o Comandante Theron de Orsha. Liderei a defesa de nossas fronteiras norte durante a guerra demoníaca.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "'We lost many good soldiers - friends, comrades, people I trained myself. But we held the line.'"
+msgstr "'Perdemos muitos bons soldados - amigos, camaradas, pessoas que eu mesmo treinei. Mas seguramos a linha.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "'Orsha stands strong because we never gave up. That's what makes a true soldier.'"
+msgstr "'Orsha se mantém forte porque nunca desistimos. É isso que faz um verdadeiro soldado.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "'The war cost us dearly, but it taught us that unity and determination can overcome even the darkest threats.'"
+msgstr "'A guerra nos custou caro, mas nos ensinou que unidade e determinação podem superar até as ameaças mais sombrias.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "War testimonies recorded: {0}/3"
+msgstr "Testemunhos de guerra gravados: {0}/3"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#FFD700}All testimonies collected! Return to Grand Archivist Elwen in Fedimian.{/}"
+msgstr "{#FFD700}Todos os testemunhos coletados! Volte para a Grande Arquivista Elwen em Fedimian.{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Make sure the Grand Archive preserves these accounts. Future generations must learn from our experiences."
+msgstr "Garanta que o Grande Arquivo preserve esses relatos. Futuras gerações devem aprender com nossas experiências."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I've already given my testimony. Share it with the Grand Archive."
+msgstr "Já dei meu testemunho. Compartilhe com o Grande Arquivo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Are you headed to Izoliacjia Plateau? These used to be the Orsha Military's old training grounds..."
+msgstr "Está indo para o Platô Izoliacjia? Estes costumavam ser os antigos campos de treinamento do Exército de Orsha..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*The grizzled commander gazes toward the plateau with a distant look*{/}"
+msgstr "{#666666}*O experiente comandante olha para o platô com um olhar distante*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "We held those lands for generations. Every soldier in Orsha trained there - myself included."
+msgstr "Mantivemos essas terras por gerações. Todo soldado em Orsha treinou lá - eu inclusive."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "But after the demon war, we lost control. The area became overrun with monsters. Now they roam freely where our soldiers once marched."
+msgstr "Mas após a guerra demoníaca, perdemos o controle. A área foi invadida por monstros. Agora eles vagam livremente onde nossos soldados marchavam."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I could help reclaim those lands"
+msgstr "Posso ajudar a recuperar essas terras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Tell me about the war"
+msgstr "Me conte sobre a guerra"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I'll be going now"
+msgstr "Vou indo agora"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*He shakes his head*{/}"
+msgstr "{#666666}*Ele balança a cabeça*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Sorry, but I would need you to be stronger to handle this. You know, these monsters are dangerous."
+msgstr "Desculpe, mas precisaria que você fosse mais forte para lidar com isso. Sabe, esses monstros são perigosos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Come back when you're at least level 30, and we'll talk about reclaiming our lands."
+msgstr "Volte quando estiver pelo menos no nível 30, e conversaremos sobre recuperar nossas terras."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*He clears his throat*{/}"
+msgstr "{#666666}*Ele limpa a garganta*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Would you help me reclaim these lands? They have been overrun by monsters."
+msgstr "Você me ajudaria a recuperar essas terras? Elas foram invadidas por monstros."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "If we could clear out the beasts, we could restore the training grounds and rebuild our military strength."
+msgstr "Se pudéssemos expulsar as feras, poderíamos restaurar os campos de treinamento e reconstruir nossa força militar."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Drive back the monsters and I'll personally ensure you're rewarded for your service. Will you help?"
+msgstr "Expulse os monstros e eu pessoalmente garantirei que você seja recompensado pelo seu serviço. Vai ajudar?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Excellent! Head to Izoliacjia Plateau and drive back the Yakmap and Yakmambo infesting our old training grounds."
+msgstr "Excelente! Vá para o Platô Izoliacjia e expulse os Yakmap e Yakmambo infestando nossos antigos campos de treinamento."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "When you return victorious, Orsha will be one step closer to reclaiming our heritage. Move out!"
+msgstr "Quando você retornar vitorioso, Orsha estará um passo mais perto de recuperar nossa herança. Mova-se!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*His expression darkens*{/}"
+msgstr "{#666666}*Sua expressão escurece*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The demon war... we lost too many good soldiers. Friends, comrades, people I trained myself."
+msgstr "A guerra demoníaca... perdemos muitos bons soldados. Amigos, camaradas, pessoas que eu mesmo treinei."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "But we survived. Orsha stands strong because we never gave up. That's what makes a true soldier."
+msgstr "Mas sobrevivemos. Orsha se mantém forte porque nunca desistimos. É isso que faz um verdadeiro soldado."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Dismissed! Come back when you're ready to serve."
+msgstr "Dispensado! Volte quando estiver pronto para servir."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The training grounds aren't clear yet!"
+msgstr "Os campos de treinamento ainda não estão limpos!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Yakmap eliminated: {0}/40"
+msgstr "Yakmap eliminados: {0}/40"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Yakmambo eliminated: {0}/5"
+msgstr "Yakmambo eliminados: {0}/5"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Our recruits depend on having safe training facilities. Get back out there!"
+msgstr "Nossos recrutas dependem de instalações de treinamento seguras. Volte lá!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Outstanding work! The training grounds are clear and recruits are already using them again."
+msgstr "Trabalho excepcional! Os campos de treinamento estão limpos e os recrutas já estão usando-os novamente."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You've proven yourself a capable warrior. Here - these combat techniques served me well in the war."
+msgstr "Você provou ser um guerreiro capaz. Tome - essas técnicas de combate me serviram bem na guerra."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Use them wisely, and maybe you'll live as long as I have!"
+msgstr "Use-as com sabedoria, e talvez viva tanto quanto eu!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The Unity Summit proved useful. Our cities are coordinating defenses and sharing resources."
+msgstr "A Cúpula de Unidade provou ser útil. Nossas cidades estão coordenando defesas e compartilhando recursos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Orsha remains strong, and now we have reliable allies. That's good tactics."
+msgstr "Orsha permanece forte, e agora temos aliados confiáveis. Isso é boa tática."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The recruits are training hard thanks to you. Orsha's military grows stronger every day."
+msgstr "Os recrutas estão treinando duro graças a você. O exército de Orsha fica mais forte a cada dia."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You're welcome in our ranks anytime, soldier!"
+msgstr "Você é bem-vindo em nossas fileiras a qualquer momento, soldado!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "[Forest Warden] Miriam"
+msgstr "[Guardiã da Floresta] Miriam"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Miriam"
+msgstr "Miriam"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The roads through the forest have become dangerous. Travelers and adventurers are being attacked by monsters."
+msgstr "As estradas pela floresta se tornaram perigosas. Viajantes e aventureiros estão sendo atacados por monstros."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*She gestures toward the forest path outside the city*{/}"
+msgstr "{#666666}*Ela aponta para o caminho da floresta fora da cidade*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The Woods of the Linked Bridges used to be a safe passage. Now? Dark creatures roam freely, and the ancient purifying statues have lost their power."
+msgstr "O Bosque das Pontes Conectadas costumava ser uma passagem segura. Agora? Criaturas sombrias vagam livremente, e as antigas estátuas purificadoras perderam seu poder."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Can we make the roads safe again?"
+msgstr "Podemos tornar as estradas seguras novamente?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "What are these purifying statues?"
+msgstr "O que são essas estátuas purificadoras?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "That sounds difficult"
+msgstr "Parece difícil"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "There is a way! The ancient purifying statues blessed by the Guardian Owl still stand in the forest."
+msgstr "Há um jeito! As antigas estátuas purificadoras abençoadas pela Coruja Guardiã ainda estão de pé na floresta."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "If you could pray at each of the five purifying statues, their holy power will awaken and drive back the monsters. Will you help us?"
+msgstr "Se você pudesse rezar em cada uma das cinco estátuas purificadoras, seu poder sagrado despertará e expulsará os monstros. Vai nos ajudar?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Thank the goddesses! The five purifying statues are scattered throughout the Woods of the Linked Bridges."
+msgstr "Graças às deusas! As cinco estátuas purificadoras estão espalhadas pelo Bosque das Pontes Conectadas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You'll recognize them - they're wooden statues carved in the shape of an owl. Pray at each one to energize them."
+msgstr "Você as reconhecerá - são estátuas de madeira esculpidas em forma de coruja. Reze em cada uma para energizá-las."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Be careful out there. The monsters have made the forest their territory."
+msgstr "Tenha cuidado por lá. Os monstros fizeram da floresta seu território."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Long ago, our ancestors erected purifying statues throughout the forest. They were blessed by priests of the goddess Laima."
+msgstr "Há muito tempo, nossos ancestrais ergueram estátuas purificadoras por toda a floresta. Elas foram abençoadas por sacerdotes da deusa Laima."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "These statues protected travelers and kept the forest safe. But during the demon war, their holy power was drained."
+msgstr "Essas estátuas protegiam viajantes e mantinham a floresta segura. Mas durante a guerra demoníaca, seu poder sagrado foi drenado."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Now they stand dormant, and without their protection, monsters have overrun the roads."
+msgstr "Agora estão dormentes, e sem sua proteção, monstros invadiram as estradas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "It is difficult. But someone must protect our travelers. Every day, more people are hurt on those roads."
+msgstr "É difícil. Mas alguém deve proteger nossos viajantes. Todo dia, mais pessoas são feridas nessas estradas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Have you prayed at the purifying statues? You've energized {0} out of 5 so far."
+msgstr "Você rezou nas estátuas purificadoras? Você energizou {0} de 5 até agora."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Look for the wooden statues carved in the shape of an owl. Offer your prayers to awaken their holy power."
+msgstr "Procure as estátuas de madeira esculpidas em forma de coruja. Ofereça suas preces para despertar seu poder sagrado."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*Her eyes light up with hope*{/}"
+msgstr "{#666666}*Seus olhos se iluminam de esperança*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I can already feel the difference! The forest feels safer, and travelers are reporting fewer monster attacks!"
+msgstr "Já posso sentir a diferença! A floresta parece mais segura, e viajantes estão reportando menos ataques de monstros!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The purifying statues are glowing with holy light again. The roads will be safe once more!"
+msgstr "As estátuas purificadoras estão brilhando com luz sagrada novamente. As estradas serão seguras mais uma vez!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Here - take this as thanks. This magical talisman will protect you from darkness. You've protected countless lives today, traveller."
+msgstr "Tome - aceite isso como agradecimento. Este talismã mágico te protegerá da escuridão. Você protegeu incontáveis vidas hoje, viajante."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The roads through the forest are safe again! Travelers can pass without fear."
+msgstr "As estradas pela floresta estão seguras novamente! Viajantes podem passar sem medo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The purifying statues protect us once more, thanks to you."
+msgstr "As estátuas purificadoras nos protegem mais uma vez, graças a você."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "[Relic Hunter] Raymond"
+msgstr "[Caçador de Relíquias] Raymond"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Raymond"
+msgstr "Raymond"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I'm a historian working with the Orsha military. We're searching for fragments of an ancient tombstone."
+msgstr "Sou um historiador trabalhando com o exército de Orsha. Estamos buscando fragmentos de uma lápide antiga."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "This tombstone holds inscriptions about the old war with the demons - tactical knowledge that could be invaluable."
+msgstr "Esta lápide contém inscrições sobre a antiga guerra com os demônios - conhecimento tático que pode ser inestimável."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "What do you seek?"
+msgstr "O que você procura?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Can I assist your search?"
+msgstr "Posso ajudar na sua busca?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Why is this tombstone important?"
+msgstr "Por que esta lápide é importante?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I'll be on my way"
+msgstr "Vou seguir meu caminho"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*He shakes his head apologetically*{/}"
+msgstr "{#666666}*Ele balança a cabeça em tom de desculpa*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I appreciate your willingness to help, but the battlefield is extremely dangerous. The corrupted monsters there would overwhelm someone of your current experience."
+msgstr "Agradeço sua disposição em ajudar, mas o campo de batalha é extremamente perigoso. Os monstros corrompidos de lá sobrecarregariam alguém com sua experiência atual."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Come back when you're at least level 15, and we can discuss this further. The Orsha military needs capable fighters for this mission."
+msgstr "Volte quando estiver pelo menos no nível 15, e poderemos discutir mais. O exército de Orsha precisa de guerreiros capazes para esta missão."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Someone willing to help preserve our military history! The Orsha command will be grateful."
+msgstr "Alguém disposto a ajudar a preservar nossa história militar! O comando de Orsha ficará grato."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The tombstone was destroyed during the demon war, shattered into five pieces. They're scattered across the old battlefield in Nobreer Forest. Can you help me recover them?"
+msgstr "A lápide foi destruída durante a guerra demoníaca, estilhaçada em cinco pedaços. Estão espalhados pelo antigo campo de batalha na Floresta Nobreer. Pode me ajudar a recuperá-los?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Excellent! The fragments are scattered across the old battlefield south of Orsha."
+msgstr "Excelente! Os fragmentos estão espalhados pelo antigo campo de batalha ao sul de Orsha."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The area is still dangerous - corrupted monsters guard the ruins. But the stone fragments should be recognizable among the rubble."
+msgstr "A área ainda é perigosa - monstros corrompidos guardam as ruínas. Mas os fragmentos de pedra devem ser reconhecíveis entre os escombros."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The tombstone belonged to a legendary commander who fought in the first demon war, centuries ago."
+msgstr "A lápide pertencia a um comandante lendário que lutou na primeira guerra demoníaca, séculos atrás."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The inscriptions contain battle formations, demon weaknesses, and tactical knowledge that was lost over time."
+msgstr "As inscrições contêm formações de batalha, fraquezas demoníacas e conhecimento tático que foi perdido ao longo do tempo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "With demons potentially returning, the Orsha military desperately needs this knowledge. It could save countless lives in future conflicts."
+msgstr "Com os demônios potencialmente retornando, o exército de Orsha precisa desesperadamente desse conhecimento. Pode salvar incontáveis vidas em conflitos futuros."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Safe travels. If you change your mind, the military needs all the help it can get."
+msgstr "Boa viagem. Se mudar de ideia, o exército precisa de toda ajuda possível."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You found them! All five fragments of the ancient tombstone!"
+msgstr "Você os encontrou! Todos os cinco fragmentos da lápide antiga!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*He carefully examines each piece, his hands trembling with excitement*{/}"
+msgstr "{#666666}*Ele examina cuidadosamente cada peça, suas mãos tremendo de empolgação*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Remarkable! Even damaged, I can make out parts of the inscriptions. Battle formations... demon weak points... this is exactly what the military needed!"
+msgstr "Notável! Mesmo danificado, consigo identificar partes das inscrições. Formações de batalha... pontos fracos demoníacos... isto é exatamente o que o exército precisava!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The tombstone belonged to Commander Valen, who led Orsha's forces in the first demon war. His tactical genius saved the kingdom."
+msgstr "A lápide pertencia ao Comandante Valen, que liderou as forças de Orsha na primeira guerra demoníaca. Seu gênio tático salvou o reino."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I'll work with military scholars to translate and preserve these inscriptions. This knowledge could be crucial if the demons ever return."
+msgstr "Trabalharei com estudiosos militares para traduzir e preservar essas inscrições. Este conhecimento pode ser crucial se os demônios retornarem."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You've done Orsha a great service. The military council asked me to give you this reward. Thank you."
+msgstr "Você prestou um grande serviço a Orsha. O conselho militar me pediu para lhe dar esta recompensa. Obrigado."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You've found {0} fragments so far. We need all 5 pieces to restore the tombstone's inscriptions."
+msgstr "Você encontrou {0} fragmentos até agora. Precisamos de todas as 5 peças para restaurar as inscrições da lápide."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Keep searching the old battlefield. The stone fragments should stand out among the debris."
+msgstr "Continue procurando no antigo campo de batalha. Os fragmentos de pedra devem se destacar entre os escombros."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The military scholars have finished translating the tombstone inscriptions. The tactical knowledge is already being incorporated into training."
+msgstr "Os estudiosos militares terminaram de traduzir as inscrições da lápide. O conhecimento tático já está sendo incorporado ao treinamento."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Commander Valen's wisdom will help protect Orsha for generations to come, thanks to your help."
+msgstr "A sabedoria do Comandante Valen ajudará a proteger Orsha por gerações, graças à sua ajuda."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "[Healer] Tamara"
+msgstr "[Curandeira] Tamara"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Tamara"
+msgstr "Tamara"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Welcome to the Orsha Infirmary. This building has been converted to treat our soldiers."
+msgstr "Bem-vindo à Enfermaria de Orsha. Este prédio foi convertido para tratar nossos soldados."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*You hear coughing and groans of pain from inside the building*{/}"
+msgstr "{#666666}*Você ouve tosse e gemidos de dor de dentro do prédio*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "So many wounded from the war... We're doing our best, but we're running low on medicinal herbs."
+msgstr "Tantos feridos da guerra... Estamos fazendo o nosso melhor, mas estamos ficando sem ervas medicinais."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "What happened to these soldiers?"
+msgstr "O que aconteceu com esses soldados?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I should go"
+msgstr "Preciso ir"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*Her exhausted face lights up with relief*{/}"
+msgstr "{#666666}*Seu rosto exausto se ilumina de alívio*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Bless you! Our soldiers are suffering from battle wounds, infections, and fevers."
+msgstr "Que as deusas te abençoem! Nossos soldados estão sofrendo com ferimentos de batalha, infecções e febres."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "I need medicinal herbs to create poultices and remedies. Without them, many won't survive. Will you help gather herbs for the infirmary?"
+msgstr "Preciso de ervas medicinais para criar cataplasmas e remédios. Sem elas, muitos não sobreviverão. Vai ajudar a coletar ervas para a enfermaria?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Thank you! I need 5 Languid Herbs for pain relief, 5 Sweet Herbs for fever, and 5 Fragrant Herbs for infection."
+msgstr "Obrigada! Preciso de 5 Ervas Lânguidas para dor, 5 Ervas Doces para febre e 5 Ervas Perfumadas para infecção."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "These herbs grow in the forests surrounding Orsha. Some monsters carry them as well."
+msgstr "Essas ervas crescem nas florestas ao redor de Orsha. Alguns monstros também as carregam."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Please hurry - every hour without medicine, we lose more soldiers."
+msgstr "Por favor, se apresse - a cada hora sem remédio, perdemos mais soldados."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "These are our brave warriors who fought in the demon war. Battle wounds, demon corruption, festering injuries..."
+msgstr "Estes são nossos bravos guerreiros que lutaram na guerra demoníaca. Ferimentos de batalha, corrupção demoníaca, feridas infectadas..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The military healers are overwhelmed. This building was hastily converted into an infirmary to handle the overflow."
+msgstr "Os curandeiros militares estão sobrecarregados. Este prédio foi rapidamente convertido em enfermaria para lidar com o excesso."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "We're doing everything we can, but without proper herbs and medicines, I fear many won't make it."
+msgstr "Estamos fazendo tudo que podemos, mas sem ervas e remédios adequados, temo que muitos não sobreviverão."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "May the goddess watch over you. If you change your mind, these soldiers need all the help they can get."
+msgstr "Que a deusa cuide de você. Se mudar de ideia, esses soldados precisam de toda ajuda possível."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You've brought all the herbs! Thank the goddess!"
+msgstr "Você trouxe todas as ervas! Graças à deusa!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*She immediately begins preparing remedies*{/}"
+msgstr "{#666666}*Ela imediatamente começa a preparar remédios*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The Languid Herbs will ease their pain. The Sweet Herbs will break their fevers. The Fragrant Herbs will fight infection."
+msgstr "As Ervas Lânguidas aliviarão a dor. As Ervas Doces quebrarão as febres. As Ervas Perfumadas combaterão a infecção."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "You've saved lives today. These soldiers will survive because of you."
+msgstr "Você salvou vidas hoje. Esses soldados sobreviverão por sua causa."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Here - take these supplies from the military stores. The Commander approved this reward for helping our wounded."
+msgstr "Tome - pegue esses suprimentos dos estoques militares. O Comandante aprovou esta recompensa por ajudar nossos feridos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Did you find the herbs? We desperately need them - soldiers are dying in there. Please hurry!"
+msgstr "Você encontrou as ervas? Precisamos desesperadamente delas - soldados estão morrendo lá dentro. Por favor, se apresse!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Thanks to those herbs, many soldiers have recovered. Some are even back on duty already."
+msgstr "Graças a essas ervas, muitos soldados se recuperaram. Alguns já voltaram ao serviço."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The infirmary is still crowded, but at least now I have the medicine to treat them properly."
+msgstr "A enfermaria ainda está lotada, mas pelo menos agora tenho os remédios para tratá-los adequadamente."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "[Merchant Guild] Rose"
+msgstr "[Guilda Mercante] Rose"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Rose"
+msgstr "Rose"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Ah, a letter from the Klaipeda Guild! Let me see..."
+msgstr "Ah, uma carta da Guilda de Klaipeda! Deixe-me ver..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "{#666666}*She reads the letter carefully*{/}"
+msgstr "{#666666}*Ela lê a carta cuidadosamente*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Trade proposals, resource sharing, joint caravans... this is exactly what we need!"
+msgstr "Propostas comerciais, compartilhamento de recursos, caravanas conjuntas... é exatamente disso que precisamos!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Tell your guild master we accept. Orsha will resume grain shipments to Klaipeda starting next month."
+msgstr "Diga ao mestre da guilda que aceitamos. Orsha retomará os envios de grãos para Klaipeda no próximo mês."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Here's our formal response. Thank you for making this journey."
+msgstr "Aqui está nossa resposta formal. Obrigada por fazer esta jornada."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Trade with Klaipeda is resuming nicely. It's good to see cooperation between our cities again."
+msgstr "O comércio com Klaipeda está sendo retomado bem. É bom ver cooperação entre nossas cidades novamente."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "The Merchant Guild is working to restore trade networks across all three cities."
+msgstr "A Guilda Mercante está trabalhando para restaurar redes comerciais entre as três cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "War may have divided us, but commerce will bring us back together."
+msgstr "A guerra pode ter nos dividido, mas o comércio nos unirá novamente."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Reclaim the Training Grounds"
+msgstr "Recuperar os Campos de Treinamento"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Clear monsters from Orsha's military training grounds so recruits can train safely."
+msgstr "Elimine monstros dos campos de treinamento militar de Orsha para que recrutas possam treinar com segurança."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Kill Yakmap"
+msgstr "Matar Yakmap"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Kill Yakmambo"
+msgstr "Matar Yakmambo"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Guardians of the Forest Roads"
+msgstr "Guardiões das Estradas da Floresta"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Pray at the five ancient purifying statues in the Woods of the Linked Bridges to awaken their holy power and protect travelers from monster attacks."
+msgstr "Reze nas cinco antigas estátuas purificadoras no Bosque das Pontes Conectadas para despertar seu poder sagrado e proteger viajantes de ataques de monstros."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Pray at Purifying Statues"
+msgstr "Rezar nas Estátuas Purificadoras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Echoes of the Ancient War"
+msgstr "Ecos da Guerra Antiga"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Recover the five fragments of an ancient tombstone containing tactical knowledge from the first demon war."
+msgstr "Recupere os cinco fragmentos de uma lápide antiga contendo conhecimento tático da primeira guerra demoníaca."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Collect Tombstone fragments"
+msgstr "Coletar fragmentos da Lápide"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Healing the Wounded"
+msgstr "Curando os Feridos"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Gather medicinal herbs for the Orsha Infirmary to treat wounded soldiers - Languid Herbs, Sweet Herbs, and Fragrant Herbs."
+msgstr "Colete ervas medicinais para a Enfermaria de Orsha para tratar soldados feridos - Ervas Lânguidas, Ervas Doces e Ervas Perfumadas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Collect Languid Herbs"
+msgstr "Coletar Ervas Lânguidas"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Collect Sweet Herbs"
+msgstr "Coletar Ervas Doces"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_orsha_quests.cs
+msgid "Collect Fragrant Herbs"
+msgstr "Coletar Ervas Perfumadas"
+
+# ============================================================================
+# Fedimian Quests
+# ============================================================================
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "[Grand Archivist] Elwen"
+msgstr "[Grande Arquivista] Elwen"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Elwen"
+msgstr "Elwen"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Welcome to Fedimian's Grand Archive. Here we preserve the knowledge and history of our world."
+msgstr "Bem-vindo ao Grande Arquivo de Fedimian. Aqui preservamos o conhecimento e a história do nosso mundo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*She gestures to countless scrolls and books lining the walls*{/}"
+msgstr "{#666666}*Ela aponta para inúmeros pergaminhos e livros cobrindo as paredes*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I'm compiling a comprehensive history of the demon war. Future generations must understand what happened - both the horrors and the heroism."
+msgstr "Estou compilando uma história abrangente da guerra demoníaca. Futuras gerações devem entender o que aconteceu - tanto os horrores quanto o heroísmo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "How can I assist?"
+msgstr "Como posso ajudar?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I'd like to contribute"
+msgstr "Gostaria de contribuir"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "What kind of history are you compiling?"
+msgstr "Que tipo de história você está compilando?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Just browsing"
+msgstr "Só dando uma olhada"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Truly? I need someone to seek out war survivors and collect their testimonies."
+msgstr "Verdade? Preciso de alguém para procurar sobreviventes da guerra e coletar seus testemunhos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "There are three key witnesses I've identified. Would you be willing to interview them and record their stories?"
+msgstr "Identifiquei três testemunhas-chave. Você estaria disposto a entrevistá-las e gravar suas histórias?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Wonderful! Here's a recording crystal. It will preserve their words exactly as spoken."
+msgstr "Maravilha! Aqui está um cristal de gravação. Ele preservará suas palavras exatamente como foram ditas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The witnesses are: Commander Theron in Orsha, Peregrin Lyon at Ramstis Ridge, and Wizard Silas here in Fedimian."
+msgstr "As testemunhas são: Comandante Theron em Orsha, Peregrin Lyon na Cordilheira de Ramstis e o Mago Silas aqui em Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Ask them about their experiences during the war. The crystal will do the rest."
+msgstr "Pergunte sobre suas experiências durante a guerra. O cristal fará o resto."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I'm gathering firsthand accounts from those who lived through the war - soldiers, civilians, survivors."
+msgstr "Estou reunindo relatos de primeira mão daqueles que viveram a guerra - soldados, civis, sobreviventes."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Each person's story is unique. Together, they form a complete picture of what our world endured."
+msgstr "A história de cada pessoa é única. Juntas, formam um quadro completo do que nosso mundo suportou."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "But many survivors won't come forward. They're scattered across the land, and their memories are painful."
+msgstr "Mas muitos sobreviventes não se apresentam. Estão espalhados pela terra, e suas memórias são dolorosas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Feel free to browse our collection. Knowledge should be shared."
+msgstr "Fique à vontade para explorar nossa coleção. Conhecimento deve ser compartilhado."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've collected all three testimonies! Let me review them..."
+msgstr "Você coletou todos os três testemunhos! Deixe-me analisá-los..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*She holds the crystal, tears streaming down her face as she listens*{/}"
+msgstr "{#666666}*Ela segura o cristal, lágrimas escorrendo pelo rosto enquanto ouve*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "These stories... such pain, such courage. This is exactly what we need to preserve."
+msgstr "Essas histórias... tanta dor, tanta coragem. É exatamente isso que precisamos preservar."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Future generations will learn from these accounts. They'll understand the true cost of war, and hopefully prevent another one."
+msgstr "Futuras gerações aprenderão com esses relatos. Entenderão o verdadeiro custo da guerra, e esperamos que previnam outra."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've made an invaluable contribution to our history. Thank you."
+msgstr "Você fez uma contribuição inestimável para nossa história. Obrigada."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've collected {0} out of 3 testimonies so far."
+msgstr "Você coletou {0} de 3 testemunhos até agora."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Remember: Commander Theron in Orsha, Peregrin Lyon at Ramstis Ridge, and Wizard Silas here in Fedimian."
+msgstr "Lembre-se: Comandante Theron em Orsha, Peregrin Lyon na Cordilheira de Ramstis e o Mago Silas aqui em Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Your work on the War Chronicles has been invaluable. The testimonies you gathered will educate generations."
+msgstr "Seu trabalho nas Crônicas de Guerra foi inestimável. Os testemunhos que você reuniu educarão gerações."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*She pauses, studying you with keen eyes*{/}"
+msgstr "{#666666}*Ela pausa, estudando você com olhos atentos*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Your dedication and trustworthiness have not gone unnoticed. I have another matter - one of great importance and sensitivity."
+msgstr "Sua dedicação e confiabilidade não passaram despercebidas. Tenho outro assunto - de grande importância e sensibilidade."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I'm willing to help"
+msgstr "Estou disposto a ajudar"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Tell me more"
+msgstr "Me conte mais"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I'm not interested"
+msgstr "Não estou interessado"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The Royal Mausoleum in the Ramstis region contains ancient relics from Fedimian's past."
+msgstr "O Mausoléu Real na região de Ramstis contém relíquias antigas do passado de Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Our sages have been investigating reports of a powerful relic documented by the great scholar Kepeck."
+msgstr "Nossos sábios estão investigando relatos de uma relíquia poderosa documentada pelo grande estudioso Kepeck."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "However, the mausoleum is sealed and filled with dangerous creatures. Only those with official permission may enter."
+msgstr "No entanto, o mausoléu está selado e cheio de criaturas perigosas. Apenas aqueles com permissão oficial podem entrar."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I would entrust you with the Great King's Key - proof of your authority to enter the Royal Mausoleum. Will you venture there and recover Kepeck's Relic Memorandum?"
+msgstr "Eu lhe confiaria a Chave do Grande Rei - prova da sua autoridade para entrar no Mausoléu Real. Você se aventurará lá e recuperará o Memorando de Relíquias de Kepeck?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Excellent! This key proves you act with the Archive's full authority."
+msgstr "Excelente! Esta chave prova que você age com total autoridade do Arquivo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Travel to the Royal Mausoleum entrance in Ramstis Ridge. Show the key to the guard, and they will grant you passage."
+msgstr "Viaje até a entrada do Mausoléu Real na Cordilheira de Ramstis. Mostre a chave ao guarda, e ele lhe concederá passagem."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Inside, search for Kepeck's Relic Memorandum - scrolls documenting a powerful relic. Be careful - the mausoleum is dangerous."
+msgstr "Dentro, procure pelo Memorando de Relíquias de Kepeck - pergaminhos documentando uma relíquia poderosa. Tenha cuidado - o mausoléu é perigoso."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I understand. The mausoleum is perilous. Come back if you change your mind."
+msgstr "Eu entendo. O mausoléu é perigoso. Volte se mudar de ideia."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I understand. Should you change your mind, I'll be here."
+msgstr "Eu entendo. Se mudar de ideia, estarei aqui."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've recovered Kepeck's Relic Memoranda! Let me examine them..."
+msgstr "Você recuperou os Memorandos de Relíquias de Kepeck! Deixe-me examiná-los..."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*She carefully unrolls the ancient scrolls*{/}"
+msgstr "{#666666}*Ela cuidadosamente desenrola os pergaminhos antigos*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Remarkable! These contain detailed descriptions of a powerful relic that could benefit all of Fedimian."
+msgstr "Notável! Estes contêm descrições detalhadas de uma relíquia poderosa que pode beneficiar toda Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Your courage in entering the Royal Mausoleum has uncovered knowledge we thought lost forever."
+msgstr "Sua coragem em entrar no Mausoléu Real revelou conhecimento que pensávamos estar perdido para sempre."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You have my deepest gratitude. Here - you've more than earned this reward."
+msgstr "Você tem minha mais profunda gratidão. Tome - você mais do que mereceu esta recompensa."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've recovered {0} out of 3 Relic Memoranda."
+msgstr "Você recuperou {0} de 3 Memorandos de Relíquias."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Search the Royal Mausoleum thoroughly. Kepeck's scrolls should be hidden within."
+msgstr "Procure no Mausoléu Real minuciosamente. Os pergaminhos de Kepeck devem estar escondidos lá dentro."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Thanks to your efforts, we've recovered Kepeck's research on the ancient relic."
+msgstr "Graças aos seus esforços, recuperamos a pesquisa de Kepeck sobre a relíquia antiga."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The Royal Mausoleum remains open to you should you wish to explore it further."
+msgstr "O Mausoléu Real permanece aberto para você, caso queira explorá-lo mais."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The War Chronicles are nearly complete, thanks to your help. Scholars from across the world come to study them."
+msgstr "As Crônicas de Guerra estão quase completas, graças à sua ajuda. Estudiosos de todo o mundo vêm estudá-las."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "History lives through those who remember and record it."
+msgstr "A história vive através daqueles que a lembram e a registram."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "[Divine Scholar] Lysander"
+msgstr "[Estudioso Divino] Lysander"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Lysander"
+msgstr "Lysander"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Welcome. I'm Lysander, devoted to restoring divine protection to our three great cities."
+msgstr "Bem-vindo. Sou Lysander, dedicado a restaurar a proteção divina de nossas três grandes cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*His eyes burn with intense dedication*{/}"
+msgstr "{#666666}*Seus olhos ardem com dedicação intensa*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The demon war left lingering corruption in Klaipeda, Orsha, and even here in Fedimian. We need purification rituals to cleanse these traces."
+msgstr "A guerra demoníaca deixou corrupção persistente em Klaipeda, Orsha e até aqui em Fedimian. Precisamos de rituais de purificação para limpar esses vestígios."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Tell me about the purification"
+msgstr "Me conte sobre a purificação"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I see. Good luck with that."
+msgstr "Entendo. Boa sorte com isso."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Excellent! I need your help recovering ancient knowledge."
+msgstr "Excelente! Preciso da sua ajuda para recuperar conhecimento antigo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Long ago, an old druid master lived here in Fedimian. He created powerful purification scrolls to cleanse demonic corruption."
+msgstr "Há muito tempo, um velho mestre druida vivia aqui em Fedimian. Ele criou poderosos pergaminhos de purificação para limpar a corrupção demoníaca."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "These scrolls were scattered and lost during the war. I believe monsters in Ramstis Ridge have found them. Will you venture there and recover 5 purification scrolls?"
+msgstr "Esses pergaminhos foram espalhados e perdidos durante a guerra. Acredito que monstros na Cordilheira de Ramstis os encontraram. Você se aventurará lá e recuperará 5 pergaminhos de purificação?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Thank you! The monsters in Ramstis Ridge - particularly near the old druid's hermitage - should have the scrolls."
+msgstr "Obrigado! Os monstros na Cordilheira de Ramstis - particularmente perto da ermida do velho druida - devem ter os pergaminhos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The druid master studied corruption extensively. His scrolls are our best hope for purifying the lingering demonic traces."
+msgstr "O mestre druida estudou a corrupção extensivamente. Seus pergaminhos são nossa melhor esperança para purificar os vestígios demoníacos persistentes."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Once you collect 5 Purification Scrolls, return to me. We'll use them to help all three cities!"
+msgstr "Assim que coletar 5 Pergaminhos de Purificação, volte para mim. Vamos usá-los para ajudar as três cidades!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The old druid master was a brilliant scholar who lived in Fedimian centuries ago."
+msgstr "O velho mestre druida era um estudioso brilhante que viveu em Fedimian séculos atrás."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "He studied demonic corruption and created purification rituals recorded on sacred scrolls."
+msgstr "Ele estudou a corrupção demoníaca e criou rituais de purificação registrados em pergaminhos sagrados."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "When the demon war erupted, his research became invaluable - but the scrolls were scattered and lost."
+msgstr "Quando a guerra demoníaca estourou, sua pesquisa se tornou inestimável - mas os pergaminhos foram espalhados e perdidos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Now we need them more than ever to cleanse what the war left behind."
+msgstr "Agora precisamos deles mais do que nunca para limpar o que a guerra deixou para trás."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The corruption won't cleanse itself. But I understand if you have other priorities."
+msgstr "A corrupção não vai se limpar sozinha. Mas entendo se você tem outras prioridades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've recovered the purification scrolls! This is remarkable!"
+msgstr "Você recuperou os pergaminhos de purificação! Isso é notável!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*He carefully examines the ancient parchments*{/}"
+msgstr "{#666666}*Ele examina cuidadosamente os pergaminhos antigos*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "These are genuine! The druid master's own handwriting... his knowledge of purification magic was unmatched."
+msgstr "São genuínos! A própria caligrafia do mestre druida... seu conhecimento de magia de purificação era incomparável."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "With these scrolls, we can perform cleansing rituals in Klaipeda, Orsha, and Fedimian."
+msgstr "Com esses pergaminhos, podemos realizar rituais de limpeza em Klaipeda, Orsha e Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The demon war's corruption will finally be purged from our cities!"
+msgstr "A corrupção da guerra demoníaca será finalmente purgada de nossas cidades!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've helped all three cities today. Accept this reward - you've more than earned it."
+msgstr "Você ajudou as três cidades hoje. Aceite esta recompensa - você mais do que a mereceu."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've collected {0} out of 5 Purification Scrolls so far."
+msgstr "Você coletou {0} de 5 Pergaminhos de Purificação até agora."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Search Ramstis Ridge thoroughly. The monsters there have found the old druid's lost scrolls."
+msgstr "Procure na Cordilheira de Ramstis minuciosamente. Os monstros de lá encontraram os pergaminhos perdidos do velho druida."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Thanks to the purification scrolls you recovered, we've cleansed the corruption in all three cities!"
+msgstr "Graças aos pergaminhos de purificação que você recuperou, limpamos a corrupção nas três cidades!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Klaipeda, Orsha, and Fedimian are safer now. The old druid master's legacy lives on."
+msgstr "Klaipeda, Orsha e Fedimian estão mais seguras agora. O legado do velho mestre druida continua vivo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "[Peace Envoy] Agatha"
+msgstr "[Emissária da Paz] Agatha"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Agatha"
+msgstr "Agatha"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Klaipeda, Orsha, and Fedimian - three great cities that once worked together. Now we barely communicate."
+msgstr "Klaipeda, Orsha e Fedimian - três grandes cidades que um dia trabalharam juntas. Agora mal nos comunicamos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The war left wounds beyond the physical. Old rivalries resurfaced, trust was broken."
+msgstr "A guerra deixou feridas além das físicas. Velhas rivalidades ressurgiram, a confiança foi quebrada."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "But we're stronger together. If we can't unite now, during reconstruction, how will we face the next crisis?"
+msgstr "Mas somos mais fortes juntos. Se não podemos nos unir agora, durante a reconstrução, como enfrentaremos a próxima crise?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Can the cities be unified?"
+msgstr "As cidades podem ser unificadas?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I want to help unite them"
+msgstr "Quero ajudar a uni-las"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "What divides them?"
+msgstr "O que as divide?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Some things can't be fixed"
+msgstr "Algumas coisas não podem ser consertadas"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "A champion of unity! This is exactly what we need!"
+msgstr "Um campeão da unidade! É exatamente disso que precisamos!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I need someone to organize a Unity Summit - bring representatives from all three cities together. Will you help arrange it?"
+msgstr "Preciso de alguém para organizar uma Cúpula de Unidade - reunir representantes das três cidades. Vai ajudar a organizar?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Excellent! First, deliver these cooperation contracts to the other city leaders."
+msgstr "Excelente! Primeiro, entregue esses contratos de cooperação aos outros líderes das cidades."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Visit Mayor Oswald in Klaipeda and Commander Theron in Orsha. Convince them to send delegations here to Fedimian."
+msgstr "Visite o Prefeito Oswald em Klaipeda e o Comandante Theron em Orsha. Convença-os a enviar delegações aqui para Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "It won't be easy - old grudges run deep. But if anyone can bring them together, it's someone like you - an outsider they all respect."
+msgstr "Não será fácil - velhos rancores são profundos. Mas se alguém pode uni-los, é alguém como você - um forasteiro que todos respeitam."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Klaipeda focuses on commerce and rebuilding. Orsha maintains military strength and agricultural production. Fedimian pursues knowledge and diplomacy."
+msgstr "Klaipeda foca em comércio e reconstrução. Orsha mantém força militar e produção agrícola. Fedimian busca conhecimento e diplomacia."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "These different priorities create friction. Each city thinks their approach is best."
+msgstr "Essas prioridades diferentes criam atrito. Cada cidade acha que sua abordagem é a melhor."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "But we need all three - trade, defense, and knowledge. United, we could thrive. Divided, we merely survive."
+msgstr "Mas precisamos dos três - comércio, defesa e conhecimento. Unidos, poderíamos prosperar. Divididos, apenas sobrevivemos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Perhaps you're right. But I have to try. The future of our world depends on cooperation."
+msgstr "Talvez você esteja certo. Mas preciso tentar. O futuro do nosso mundo depende de cooperação."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Both Klaipeda and Orsha have signed the contracts! This is historic!"
+msgstr "Klaipeda e Orsha assinaram os contratos! Isso é histórico!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*The summit hall fills with representatives from all three cities*{/}"
+msgstr "{#666666}*O salão da cúpula se enche com representantes das três cidades*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "It's tense at first, but as they discuss shared challenges - monsters, refugees, trade - common ground emerges."
+msgstr "É tenso no início, mas conforme discutem desafios compartilhados - monstros, refugiados, comércio - um terreno comum emerge."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "By the end, they've formalized the Mutual Aid Pact. Each city will support the others in times of need."
+msgstr "No final, formalizaram o Pacto de Ajuda Mútua. Cada cidade apoiará as outras em tempos de necessidade."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "This is just the beginning, but you've helped take the first step toward true unity."
+msgstr "Isso é apenas o começo, mas você ajudou a dar o primeiro passo rumo à verdadeira unidade."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The world is safer because of what you've done today."
+msgstr "O mundo está mais seguro por causa do que você fez hoje."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You've delivered {0} out of 2 contracts."
+msgstr "Você entregou {0} de 2 contratos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Find Mayor Oswald in Klaipeda and Commander Theron in Orsha. They need to sign the cooperation contracts."
+msgstr "Encontre o Prefeito Oswald em Klaipeda e o Comandante Theron em Orsha. Eles precisam assinar os contratos de cooperação."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The Mutual Aid Pact is working beautifully. We've already coordinated three joint operations against monster threats."
+msgstr "O Pacto de Ajuda Mútua está funcionando lindamente. Já coordenamos três operações conjuntas contra ameaças de monstros."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You proved that unity is possible. Thank you."
+msgstr "Você provou que a unidade é possível. Obrigada."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "[Merchant Guild] Anne"
+msgstr "[Guilda Mercante] Anne"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Anne"
+msgstr "Anne"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You have urgent news? Please, tell me."
+msgstr "Tem notícias urgentes? Por favor, me conte."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*She listens intently*{/}"
+msgstr "{#666666}*Ela ouve atentamente*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The Zachariel Crossroads route is being overrun by Warleader Hogmas? This is serious!"
+msgstr "A rota da Encruzilhada Zachariel está sendo invadida por Hogmas Líder de Guerra? Isso é sério!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "That's one of our key trade routes to Ramstis Ridge and the Royal Mausoleum. If it's compromised, we'll need to reroute all caravans."
+msgstr "Essa é uma das nossas rotas comerciais principais para a Cordilheira de Ramstis e o Mausoléu Real. Se estiver comprometida, precisaremos redirecionar todas as caravanas."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Thank you for this warning. I'll inform the Guildmaster immediately and arrange for additional guards on future expeditions."
+msgstr "Obrigada por este aviso. Informarei o Mestre da Guilda imediatamente e providenciarei guardas adicionais em futuras expedições."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#FFD700}Warning delivered! Return to Darius at Zachariel Crossroads.{/}"
+msgstr "{#FFD700}Aviso entregue! Volte para Darius na Encruzilhada Zachariel.{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You look like you have something to say, but it seems you're still handling a situation. Come back when you're ready."
+msgstr "Parece que você tem algo a dizer, mas parece que ainda está lidando com uma situação. Volte quando estiver pronto."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "A letter from Klaipeda's Merchant Guild? How delightful!"
+msgstr "Uma carta da Guilda Mercante de Klaipeda? Que delícia!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*She reads eagerly*{/}"
+msgstr "{#666666}*Ela lê avidamente*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Resource sharing agreements, academic exchange programs, joint ventures... this is precisely what Fedimian needs!"
+msgstr "Acordos de compartilhamento de recursos, programas de intercâmbio acadêmico, empreendimentos conjuntos... é precisamente o que Fedimian precisa!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "We accept their proposal wholeheartedly. Fedimian will provide academic resources and magical research in exchange for goods."
+msgstr "Aceitamos a proposta de todo coração. Fedimian fornecerá recursos acadêmicos e pesquisa mágica em troca de bens."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Here's our formal acceptance. Thank you for facilitating this connection!"
+msgstr "Aqui está nossa aceitação formal. Obrigada por facilitar esta conexão!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Trade with Klaipeda has opened wonderful opportunities. We've exchanged dozens of scholars and merchants already!"
+msgstr "O comércio com Klaipeda abriu oportunidades maravilhosas. Já trocamos dezenas de estudiosos e comerciantes!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Fedimian's Merchant Guild specializes in knowledge trade - books, research, magical training."
+msgstr "A Guilda Mercante de Fedimian se especializa em comércio de conhecimento - livros, pesquisa, treinamento mágico."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "We may not have Orsha's food or Klaipeda's goods, but our intellectual resources are unmatched."
+msgstr "Podemos não ter a comida de Orsha ou os bens de Klaipeda, mas nossos recursos intelectuais são incomparáveis."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "[Wizard] Silas"
+msgstr "[Mago] Silas"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Silas"
+msgstr "Silas"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*The air is thick with incense smoke rising from a large cauldron*{/}"
+msgstr "{#666666}*O ar está carregado com fumaça de incenso subindo de um grande caldeirão*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I am Silas, a wizard who survived the great war. These protective wards and incense help keep the dark spirits at bay."
+msgstr "Sou Silas, um mago que sobreviveu à grande guerra. Essas proteções mágicas e incenso ajudam a manter os espíritos sombrios afastados."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The demons may be gone, but their corruption lingers. I've learned to ward against it."
+msgstr "Os demônios podem ter ido embora, mas sua corrupção persiste. Aprendi a me proteger contra ela."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "What knowledge do you possess?"
+msgstr "Que conhecimento você possui?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "What is the incense for?"
+msgstr "Para que serve o incenso?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I'll leave you to your work"
+msgstr "Vou deixá-lo com seu trabalho"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I fought in the great war as a battle wizard. I witnessed things that still haunt my dreams."
+msgstr "Lutei na grande guerra como mago de batalha. Presenciei coisas que ainda assombram meus sonhos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Demons, corruption, cities burning... but I survived through knowledge and preparation."
+msgstr "Demônios, corrupção, cidades em chamas... mas sobrevivi através de conhecimento e preparação."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Now I use what I learned to protect this place. The incense, the wards - they keep the darkness away."
+msgstr "Agora uso o que aprendi para proteger este lugar. O incenso, as proteções - mantêm a escuridão afastada."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I may have survived, but I'll never forget what was lost."
+msgstr "Posso ter sobrevivido, mas nunca esquecerei o que foi perdido."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "This incense is made from sacred herbs blessed with protective magic."
+msgstr "Este incenso é feito de ervas sagradas abençoadas com magia protetora."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "It purifies the air and repels malevolent spirits. After the war, such precautions became necessary."
+msgstr "Purifica o ar e repele espíritos malevolentes. Após a guerra, tais precauções se tornaram necessárias."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The cauldron never stops burning. As long as it does, this place remains safe from corruption."
+msgstr "O caldeirão nunca para de queimar. Enquanto queimar, este lugar permanece seguro da corrupção."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Stay vigilant. The darkness never truly rests."
+msgstr "Fique vigilante. A escuridão nunca descansa de verdade."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "My testimony is recorded. Share it with the Grand Archive."
+msgstr "Meu testemunho está gravado. Compartilhe com o Grande Arquivo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "The world must know what we endured, and how we survived."
+msgstr "O mundo deve saber o que suportamos, e como sobrevivemos."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You need a recording crystal to preserve my testimony."
+msgstr "Você precisa de um cristal de gravação para preservar meu testemunho."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "You're documenting the war for posterity? Important work."
+msgstr "Está documentando a guerra para a posteridade? Trabalho importante."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Would you like to hear my account as a battle wizard who survived the great war?"
+msgstr "Gostaria de ouvir meu relato como mago de batalha que sobreviveu à grande guerra?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "{#666666}*Silas speaks solemnly into the recording crystal*{/}"
+msgstr "{#666666}*Silas fala solenemente no cristal de gravação*{/}"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "'I am Silas, battle wizard. I fought in the great war and witnessed horrors beyond imagination.'"
+msgstr "'Sou Silas, mago de batalha. Lutei na grande guerra e presenciei horrores além da imaginação.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "'Cities burned, people died, and demons seemed unstoppable. But we fought on with magic and steel.'"
+msgstr "'Cidades queimaram, pessoas morreram, e os demônios pareciam imparáveis. Mas continuamos lutando com magia e aço.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "'I survived through preparation, knowledge, and protective wards. Now I use what I learned to keep the darkness at bay.'"
+msgstr "'Sobrevivi através de preparação, conhecimento e proteções mágicas. Agora uso o que aprendi para manter a escuridão afastada.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "'The war may be over, but its corruption lingers. We must remain vigilant, always.'"
+msgstr "'A guerra pode ter acabado, mas sua corrupção persiste. Devemos permanecer vigilantes, sempre.'"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "I understand. Return when you're ready to hear my account."
+msgstr "Eu entendo. Volte quando estiver pronto para ouvir meu relato."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Thank you for preserving the truth in Fedimian's Grand Archive."
+msgstr "Obrigado por preservar a verdade no Grande Arquivo de Fedimian."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Future generations will know the goddesses stood with us."
+msgstr "Futuras gerações saberão que as deusas estiveram conosco."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Chronicles of the Demon War"
+msgstr "Crônicas da Guerra Demoníaca"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Collect testimonies from war survivors to complete the Grand Archive's historical record."
+msgstr "Colete testemunhos de sobreviventes da guerra para completar o registro histórico do Grande Arquivo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Record testimony from Commander Theron in Orsha"
+msgstr "Gravar testemunho do Comandante Theron em Orsha"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Record testimony from Peregrin Lyon in Ramstis Ridge"
+msgstr "Gravar testemunho de Peregrin Lyon na Cordilheira de Ramstis"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Record testimony from Wizard Silas in Fedimian"
+msgstr "Gravar testemunho do Mago Silas em Fedimian"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Ancient Purification"
+msgstr "Purificação Ancestral"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Recover lost purification scrolls from monsters in Ramstis Ridge to help cleanse demonic corruption."
+msgstr "Recupere pergaminhos de purificação perdidos de monstros na Cordilheira de Ramstis para ajudar a limpar a corrupção demoníaca."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Collect Purification Scrolls from monsters in Ramstis Ridge"
+msgstr "Coletar Pergaminhos de Purificação de monstros na Cordilheira de Ramstis"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Path to Unity"
+msgstr "Caminho para a Unidade"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Organize a summit between the three great cities to establish cooperation and mutual aid."
+msgstr "Organize uma cúpula entre as três grandes cidades para estabelecer cooperação e ajuda mútua."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Deliver invitation to Mayor Oswald in Klaipeda"
+msgstr "Entregar convite ao Prefeito Oswald em Klaipeda"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Deliver invitation to Commander Theron in Orsha"
+msgstr "Entregar convite ao Comandante Theron em Orsha"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Royal Mausoleum Expedition"
+msgstr "Expedição ao Mausoléu Real"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Recover Kepeck's Relic Memoranda from the dangerous Royal Mausoleum to aid the Grand Archive's research."
+msgstr "Recupere os Memorandos de Relíquias de Kepeck do perigoso Mausoléu Real para ajudar a pesquisa do Grande Arquivo."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/quests/c_fedimian_quests.cs
+msgid "Collect Relic Memoranda from the Ancient Pedestals"
+msgstr "Coletar Memorandos de Relíquias dos Pedestais Antigos"

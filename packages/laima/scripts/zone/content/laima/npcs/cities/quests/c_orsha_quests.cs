@@ -21,14 +21,14 @@ public class OrshaQuestNpcsScript : GeneralScript
 	{
 		// War Veteran Commander Theron
 		//-------------------------------------------------------------------------
-		AddNpc(20113, "[Commander] Theron", "c_orsha", -1050, -538, 0, async dialog =>
+		AddNpc(20113, L("[Commander] Theron"), "c_orsha", -1050, -538, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("Orsha", 2001);
 			var testimonyQuestId = new QuestId("Fedimian", 3001);
 			var unitySummitQuestId = new QuestId("Fedimian", 3003);
 
-			dialog.SetTitle("Theron");
+			dialog.SetTitle(L("Theron"));
 
 			// Handle Unity Summit quest
 			if (character.Quests.IsActive(unitySummitQuestId))
@@ -37,18 +37,18 @@ public class OrshaQuestNpcsScript : GeneralScript
 
 				if (deliveredOrsha)
 				{
-					await dialog.Msg("I've already signed the cooperation contract. Deliver it to Agatha in Fedimian.");
-					await dialog.Msg("Orsha stands ready to coordinate with the other cities.");
+					await dialog.Msg(L("I've already signed the cooperation contract. Deliver it to Agatha in Fedimian."));
+					await dialog.Msg(L("Orsha stands ready to coordinate with the other cities."));
 					return;
 				}
 				else if (character.Inventory.HasItem(650633))
 				{
-					await dialog.Msg("A cooperation contract from Fedimian? Let me review this...");
-					await dialog.Msg("{#666666}*He reads the contract with a stern expression*{/}");
-					await dialog.Msg("A Unity Summit between the three cities... Hmph. Politicians and diplomats talking instead of acting.");
-					await dialog.Msg("But I suppose talking is better than fighting. Orsha needs allies, not more enemies.");
-					await dialog.Msg("Tell Agatha that Commander Theron accepts on behalf of Orsha. We'll send our military advisors.");
-					await dialog.Msg("If nothing else, it's an opportunity to coordinate our defenses against the remaining monster threats.");
+					await dialog.Msg(L("A cooperation contract from Fedimian? Let me review this..."));
+					await dialog.Msg(L("{#666666}*He reads the contract with a stern expression*{/}"));
+					await dialog.Msg(L("A Unity Summit between the three cities... Hmph. Politicians and diplomats talking instead of acting."));
+					await dialog.Msg(L("But I suppose talking is better than fighting. Orsha needs allies, not more enemies."));
+					await dialog.Msg(L("Tell Agatha that Commander Theron accepts on behalf of Orsha. We'll send our military advisors."));
+					await dialog.Msg(L("If nothing else, it's an opportunity to coordinate our defenses against the remaining monster threats."));
 
 					character.Inventory.Remove(650633, 1, InventoryItemRemoveMsg.Given);
 					character.Variables.Perm.Set("Laima.Quests.Fedimian.Quest3003.DeliveredOrshaContract", true);
@@ -57,11 +57,11 @@ public class OrshaQuestNpcsScript : GeneralScript
 					var contractsDelivered = character.Variables.Perm.GetInt("Laima.Quests.Fedimian.Quest3003.UnityContractsDelivered", 0);
 					character.Variables.Perm.Set("Laima.Quests.Fedimian.Quest3003.UnityContractsDelivered", contractsDelivered + 1);
 
-					character.ServerMessage($"Unity contracts delivered: {contractsDelivered + 1}/2");
+					character.ServerMessage(LF("Unity contracts delivered: {0}/2", contractsDelivered + 1));
 
 					if (contractsDelivered + 1 >= 2)
 					{
-						character.ServerMessage("{#FFD700}All contracts delivered! Return to Agatha in Fedimian.{/}");
+						character.ServerMessage(L("{#FFD700}All contracts delivered! Return to Agatha in Fedimian.{/}"));
 					}
 
 					return;
@@ -75,16 +75,16 @@ public class OrshaQuestNpcsScript : GeneralScript
 
 				if (!recorded && character.Inventory.HasItem(650282))
 				{
-					await dialog.Msg("{#666666}*The grizzled commander regards you with interest*{/}");
-					await dialog.Msg("Recording testimonies from the war? The Grand Archive is doing important work.");
+					await dialog.Msg(L("{#666666}*The grizzled commander regards you with interest*{/}"));
+					await dialog.Msg(L("Recording testimonies from the war? The Grand Archive is doing important work."));
 
-					if (await dialog.YesNo("Would you like to hear my account as a military commander who fought on the front lines?"))
+					if (await dialog.YesNo(L("Would you like to hear my account as a military commander who fought on the front lines?")))
 					{
-						await dialog.Msg("{#666666}*Commander Theron speaks with military precision into the recording crystal*{/}");
-						await dialog.Msg("'I am Commander Theron of Orsha. I led the defense of our northern borders during the demon war.'");
-						await dialog.Msg("'We lost many good soldiers - friends, comrades, people I trained myself. But we held the line.'");
-						await dialog.Msg("'Orsha stands strong because we never gave up. That's what makes a true soldier.'");
-						await dialog.Msg("'The war cost us dearly, but it taught us that unity and determination can overcome even the darkest threats.'");
+						await dialog.Msg(L("{#666666}*Commander Theron speaks with military precision into the recording crystal*{/}"));
+						await dialog.Msg(L("'I am Commander Theron of Orsha. I led the defense of our northern borders during the demon war.'"));
+						await dialog.Msg(L("'We lost many good soldiers - friends, comrades, people I trained myself. But we held the line.'"));
+						await dialog.Msg(L("'Orsha stands strong because we never gave up. That's what makes a true soldier.'"));
+						await dialog.Msg(L("'The war cost us dearly, but it taught us that unity and determination can overcome even the darkest threats.'"));
 
 						character.Variables.Perm.Set("Laima.Quests.Fedimian.Quest3001.TestimonyCommanderTheron", true);
 						character.Quests.CompleteObjective(testimonyQuestId, "testimony1");
@@ -92,34 +92,34 @@ public class OrshaQuestNpcsScript : GeneralScript
 						var testimonies = character.Variables.Perm.GetInt("Laima.Quests.Fedimian.Quest3001.WarTestimoniesCollected", 0);
 						character.Variables.Perm.Set("Laima.Quests.Fedimian.Quest3001.WarTestimoniesCollected", testimonies + 1);
 
-						character.ServerMessage($"War testimonies recorded: {testimonies + 1}/3");
+						character.ServerMessage(LF("War testimonies recorded: {0}/3", testimonies + 1));
 
 						if (testimonies + 1 >= 3)
 						{
-							character.ServerMessage("{#FFD700}All testimonies collected! Return to Grand Archivist Elwen in Fedimian.{/}");
+							character.ServerMessage(L("{#FFD700}All testimonies collected! Return to Grand Archivist Elwen in Fedimian.{/}"));
 						}
 
-						await dialog.Msg("Make sure the Grand Archive preserves these accounts. Future generations must learn from our experiences.");
+						await dialog.Msg(L("Make sure the Grand Archive preserves these accounts. Future generations must learn from our experiences."));
 						return;
 					}
 				}
 				else if (recorded)
 				{
-					await dialog.Msg("I've already given my testimony. Share it with the Grand Archive.");
+					await dialog.Msg(L("I've already given my testimony. Share it with the Grand Archive."));
 					return;
 				}
 			}
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("Are you headed to Izoliacjia Plateau? These used to be the Orsha Military's old training grounds...");
-				await dialog.Msg("{#666666}*The grizzled commander gazes toward the plateau with a distant look*{/}");
-				await dialog.Msg("We held those lands for generations. Every soldier in Orsha trained there - myself included.");
+				await dialog.Msg(L("Are you headed to Izoliacjia Plateau? These used to be the Orsha Military's old training grounds..."));
+				await dialog.Msg(L("{#666666}*The grizzled commander gazes toward the plateau with a distant look*{/}"));
+				await dialog.Msg(L("We held those lands for generations. Every soldier in Orsha trained there - myself included."));
 
-				var response = await dialog.Select("But after the demon war, we lost control. The area became overrun with monsters. Now they roam freely where our soldiers once marched.",
-					Option("I could help reclaim those lands", "help"),
-					Option("Tell me about the war", "war"),
-					Option("I'll be going now", "leave")
+				var response = await dialog.Select(L("But after the demon war, we lost control. The area became overrun with monsters. Now they roam freely where our soldiers once marched."),
+					Option(L("I could help reclaim those lands"), "help"),
+					Option(L("Tell me about the war"), "war"),
+					Option(L("I'll be going now"), "leave")
 				);
 
 				switch (response)
@@ -127,33 +127,33 @@ public class OrshaQuestNpcsScript : GeneralScript
 					case "help":
 						if (character.Level < 30)
 						{
-							await dialog.Msg("{#666666}*He shakes his head*{/}");
-							await dialog.Msg("Sorry, but I would need you to be stronger to handle this. You know, these monsters are dangerous.");
-							await dialog.Msg("Come back when you're at least level 30, and we'll talk about reclaiming our lands.");
+							await dialog.Msg(L("{#666666}*He shakes his head*{/}"));
+							await dialog.Msg(L("Sorry, but I would need you to be stronger to handle this. You know, these monsters are dangerous."));
+							await dialog.Msg(L("Come back when you're at least level 30, and we'll talk about reclaiming our lands."));
 						}
 						else
 						{
-							await dialog.Msg("{#666666}*He clears his throat*{/}");
-							await dialog.Msg("Would you help me reclaim these lands? They have been overrun by monsters.");
-							await dialog.Msg("If we could clear out the beasts, we could restore the training grounds and rebuild our military strength.");
+							await dialog.Msg(L("{#666666}*He clears his throat*{/}"));
+							await dialog.Msg(L("Would you help me reclaim these lands? They have been overrun by monsters."));
+							await dialog.Msg(L("If we could clear out the beasts, we could restore the training grounds and rebuild our military strength."));
 
-							if (await dialog.YesNo("Drive back the monsters and I'll personally ensure you're rewarded for your service. Will you help?"))
+							if (await dialog.YesNo(L("Drive back the monsters and I'll personally ensure you're rewarded for your service. Will you help?")))
 							{
 								character.Quests.Start(questId);
-								await dialog.Msg("Excellent! Head to Izoliacjia Plateau and drive back the Yakmap and Yakmambo infesting our old training grounds.");
-								await dialog.Msg("When you return victorious, Orsha will be one step closer to reclaiming our heritage. Move out!");
+								await dialog.Msg(L("Excellent! Head to Izoliacjia Plateau and drive back the Yakmap and Yakmambo infesting our old training grounds."));
+								await dialog.Msg(L("When you return victorious, Orsha will be one step closer to reclaiming our heritage. Move out!"));
 							}
 						}
 						break;
 
 					case "war":
-						await dialog.Msg("{#666666}*His expression darkens*{/}");
-						await dialog.Msg("The demon war... we lost too many good soldiers. Friends, comrades, people I trained myself.");
-						await dialog.Msg("But we survived. Orsha stands strong because we never gave up. That's what makes a true soldier.");
+						await dialog.Msg(L("{#666666}*His expression darkens*{/}"));
+						await dialog.Msg(L("The demon war... we lost too many good soldiers. Friends, comrades, people I trained myself."));
+						await dialog.Msg(L("But we survived. Orsha stands strong because we never gave up. That's what makes a true soldier."));
 						break;
 
 					case "leave":
-						await dialog.Msg("Dismissed! Come back when you're ready to serve.");
+						await dialog.Msg(L("Dismissed! Come back when you're ready to serve."));
 						break;
 				}
 			}
@@ -170,16 +170,16 @@ public class OrshaQuestNpcsScript : GeneralScript
 
 				if (!yakmapDone || !yakmamboDone)
 				{
-					await dialog.Msg($"The training grounds aren't clear yet!");
-					await dialog.Msg($"Yakmap eliminated: {yakmapProgress}/40");
-					await dialog.Msg($"Yakmambo eliminated: {yakmamboProgress}/5");
-					await dialog.Msg("Our recruits depend on having safe training facilities. Get back out there!");
+					await dialog.Msg(L("The training grounds aren't clear yet!"));
+					await dialog.Msg(LF("Yakmap eliminated: {0}/40", yakmapProgress));
+					await dialog.Msg(LF("Yakmambo eliminated: {0}/5", yakmamboProgress));
+					await dialog.Msg(L("Our recruits depend on having safe training facilities. Get back out there!"));
 				}
 				else
 				{
-					await dialog.Msg("Outstanding work! The training grounds are clear and recruits are already using them again.");
-					await dialog.Msg("You've proven yourself a capable warrior. Here - these combat techniques served me well in the war.");
-					await dialog.Msg("Use them wisely, and maybe you'll live as long as I have!");
+					await dialog.Msg(L("Outstanding work! The training grounds are clear and recruits are already using them again."));
+					await dialog.Msg(L("You've proven yourself a capable warrior. Here - these combat techniques served me well in the war."));
+					await dialog.Msg(L("Use them wisely, and maybe you'll live as long as I have!"));
 
 					character.Quests.Complete(questId);
 				}
@@ -189,60 +189,60 @@ public class OrshaQuestNpcsScript : GeneralScript
 				// Check if Unity Summit was completed
 				if (character.Quests.HasCompleted(unitySummitQuestId))
 				{
-					await dialog.Msg("The Unity Summit proved useful. Our cities are coordinating defenses and sharing resources.");
-					await dialog.Msg("Orsha remains strong, and now we have reliable allies. That's good tactics.");
+					await dialog.Msg(L("The Unity Summit proved useful. Our cities are coordinating defenses and sharing resources."));
+					await dialog.Msg(L("Orsha remains strong, and now we have reliable allies. That's good tactics."));
 				}
 				else
 				{
-					await dialog.Msg("The recruits are training hard thanks to you. Orsha's military grows stronger every day.");
-					await dialog.Msg("You're welcome in our ranks anytime, soldier!");
+					await dialog.Msg(L("The recruits are training hard thanks to you. Orsha's military grows stronger every day."));
+					await dialog.Msg(L("You're welcome in our ranks anytime, soldier!"));
 				}
 			}
 		});
 
 		// Forest Warden Miriam
 		//-------------------------------------------------------------------------
-		AddNpc(147473, "[Forest Warden] Miriam", "c_orsha", -994, 409, 0, async dialog =>
+		AddNpc(147473, L("[Forest Warden] Miriam"), "c_orsha", -994, 409, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("Orsha", 2002);
 
-			dialog.SetTitle("Miriam");
+			dialog.SetTitle(L("Miriam"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("The roads through the forest have become dangerous. Travelers and adventurers are being attacked by monsters.");
-				await dialog.Msg("{#666666}*She gestures toward the forest path outside the city*{/}");
-				await dialog.Msg("The Woods of the Linked Bridges used to be a safe passage. Now? Dark creatures roam freely, and the ancient purifying statues have lost their power.");
+				await dialog.Msg(L("The roads through the forest have become dangerous. Travelers and adventurers are being attacked by monsters."));
+				await dialog.Msg(L("{#666666}*She gestures toward the forest path outside the city*{/}"));
+				await dialog.Msg(L("The Woods of the Linked Bridges used to be a safe passage. Now? Dark creatures roam freely, and the ancient purifying statues have lost their power."));
 
-				var response = await dialog.Select("Can we make the roads safe again?",
-					Option("How can I help?", "help"),
-					Option("What are these purifying statues?", "cause"),
-					Option("That sounds difficult", "leave")
+				var response = await dialog.Select(L("Can we make the roads safe again?"),
+					Option(L("How can I help?"), "help"),
+					Option(L("What are these purifying statues?"), "cause"),
+					Option(L("That sounds difficult"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("There is a way! The ancient purifying statues blessed by the Guardian Owl still stand in the forest.");
+						await dialog.Msg(L("There is a way! The ancient purifying statues blessed by the Guardian Owl still stand in the forest."));
 
-						if (await dialog.YesNo("If you could pray at each of the five purifying statues, their holy power will awaken and drive back the monsters. Will you help us?"))
+						if (await dialog.YesNo(L("If you could pray at each of the five purifying statues, their holy power will awaken and drive back the monsters. Will you help us?")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Thank the goddesses! The five purifying statues are scattered throughout the Woods of the Linked Bridges.");
-							await dialog.Msg("You'll recognize them - they're wooden statues carved in the shape of an owl. Pray at each one to energize them.");
-							await dialog.Msg("Be careful out there. The monsters have made the forest their territory.");
+							await dialog.Msg(L("Thank the goddesses! The five purifying statues are scattered throughout the Woods of the Linked Bridges."));
+							await dialog.Msg(L("You'll recognize them - they're wooden statues carved in the shape of an owl. Pray at each one to energize them."));
+							await dialog.Msg(L("Be careful out there. The monsters have made the forest their territory."));
 						}
 						break;
 
 					case "cause":
-						await dialog.Msg("Long ago, our ancestors erected purifying statues throughout the forest. They were blessed by priests of the goddess Laima.");
-						await dialog.Msg("These statues protected travelers and kept the forest safe. But during the demon war, their holy power was drained.");
-						await dialog.Msg("Now they stand dormant, and without their protection, monsters have overrun the roads.");
+						await dialog.Msg(L("Long ago, our ancestors erected purifying statues throughout the forest. They were blessed by priests of the goddess Laima."));
+						await dialog.Msg(L("These statues protected travelers and kept the forest safe. But during the demon war, their holy power was drained."));
+						await dialog.Msg(L("Now they stand dormant, and without their protection, monsters have overrun the roads."));
 						break;
 
 					case "leave":
-						await dialog.Msg("It is difficult. But someone must protect our travelers. Every day, more people are hurt on those roads.");
+						await dialog.Msg(L("It is difficult. But someone must protect our travelers. Every day, more people are hurt on those roads."));
 						break;
 				}
 			}
@@ -256,44 +256,44 @@ public class OrshaQuestNpcsScript : GeneralScript
 
 				if (!statuesDone)
 				{
-					await dialog.Msg($"Have you prayed at the purifying statues? You've energized {statuesPrayed} out of 5 so far.");
-					await dialog.Msg("Look for the wooden statues carved in the shape of an owl. Offer your prayers to awaken their holy power.");
+					await dialog.Msg(LF("Have you prayed at the purifying statues? You've energized {0} out of 5 so far.", statuesPrayed));
+					await dialog.Msg(L("Look for the wooden statues carved in the shape of an owl. Offer your prayers to awaken their holy power."));
 				}
 				else
 				{
-					await dialog.Msg("{#666666}*Her eyes light up with hope*{/}");
-					await dialog.Msg("I can already feel the difference! The forest feels safer, and travelers are reporting fewer monster attacks!");
-					await dialog.Msg("The purifying statues are glowing with holy light again. The roads will be safe once more!");
-					await dialog.Msg("Here - take this as thanks. This magical talisman will protect you from darkness. You've protected countless lives today, traveller.");
+					await dialog.Msg(L("{#666666}*Her eyes light up with hope*{/}"));
+					await dialog.Msg(L("I can already feel the difference! The forest feels safer, and travelers are reporting fewer monster attacks!"));
+					await dialog.Msg(L("The purifying statues are glowing with holy light again. The roads will be safe once more!"));
+					await dialog.Msg(L("Here - take this as thanks. This magical talisman will protect you from darkness. You've protected countless lives today, traveller."));
 
 					character.Quests.Complete(questId);
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("The roads through the forest are safe again! Travelers can pass without fear.");
-				await dialog.Msg("The purifying statues protect us once more, thanks to you.");
+				await dialog.Msg(L("The roads through the forest are safe again! Travelers can pass without fear."));
+				await dialog.Msg(L("The purifying statues protect us once more, thanks to you."));
 			}
 		});
 
 		// Raymond (Historian)
 		//-------------------------------------------------------------------------
-		AddNpc(155142, "[Relic Hunter] Raymond", "c_orsha", 956, 136, 90, async dialog =>
+		AddNpc(155142, L("[Relic Hunter] Raymond"), "c_orsha", 956, 136, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("Orsha", 2003);
 
-			dialog.SetTitle("Raymond");
+			dialog.SetTitle(L("Raymond"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("I'm a historian working with the Orsha military. We're searching for fragments of an ancient tombstone.");
-				await dialog.Msg("This tombstone holds inscriptions about the old war with the demons - tactical knowledge that could be invaluable.");
+				await dialog.Msg(L("I'm a historian working with the Orsha military. We're searching for fragments of an ancient tombstone."));
+				await dialog.Msg(L("This tombstone holds inscriptions about the old war with the demons - tactical knowledge that could be invaluable."));
 
-				var response = await dialog.Select("What do you seek?",
-					Option("Can I assist your search?", "help"),
-					Option("Why is this tombstone important?", "importance"),
-					Option("I'll be on my way", "leave")
+				var response = await dialog.Select(L("What do you seek?"),
+					Option(L("Can I assist your search?"), "help"),
+					Option(L("Why is this tombstone important?"), "importance"),
+					Option(L("I'll be on my way"), "leave")
 				);
 
 				switch (response)
@@ -301,31 +301,31 @@ public class OrshaQuestNpcsScript : GeneralScript
 					case "help":
 						if (character.Level < 15)
 						{
-							await dialog.Msg("{#666666}*He shakes his head apologetically*{/}");
-							await dialog.Msg("I appreciate your willingness to help, but the battlefield is extremely dangerous. The corrupted monsters there would overwhelm someone of your current experience.");
-							await dialog.Msg("Come back when you're at least level 15, and we can discuss this further. The Orsha military needs capable fighters for this mission.");
+							await dialog.Msg(L("{#666666}*He shakes his head apologetically*{/}"));
+							await dialog.Msg(L("I appreciate your willingness to help, but the battlefield is extremely dangerous. The corrupted monsters there would overwhelm someone of your current experience."));
+							await dialog.Msg(L("Come back when you're at least level 15, and we can discuss this further. The Orsha military needs capable fighters for this mission."));
 						}
 						else
 						{
-							await dialog.Msg("Someone willing to help preserve our military history! The Orsha command will be grateful.");
+							await dialog.Msg(L("Someone willing to help preserve our military history! The Orsha command will be grateful."));
 
-							if (await dialog.YesNo("The tombstone was destroyed during the demon war, shattered into five pieces. They're scattered across the old battlefield in Nobreer Forest. Can you help me recover them?"))
+							if (await dialog.YesNo(L("The tombstone was destroyed during the demon war, shattered into five pieces. They're scattered across the old battlefield in Nobreer Forest. Can you help me recover them?")))
 							{
 								character.Quests.Start(questId);
-								await dialog.Msg("Excellent! The fragments are scattered across the old battlefield south of Orsha.");
-								await dialog.Msg("The area is still dangerous - corrupted monsters guard the ruins. But the stone fragments should be recognizable among the rubble.");
+								await dialog.Msg(L("Excellent! The fragments are scattered across the old battlefield south of Orsha."));
+								await dialog.Msg(L("The area is still dangerous - corrupted monsters guard the ruins. But the stone fragments should be recognizable among the rubble."));
 							}
 						}
 						break;
 
 					case "importance":
-						await dialog.Msg("The tombstone belonged to a legendary commander who fought in the first demon war, centuries ago.");
-						await dialog.Msg("The inscriptions contain battle formations, demon weaknesses, and tactical knowledge that was lost over time.");
-						await dialog.Msg("With demons potentially returning, the Orsha military desperately needs this knowledge. It could save countless lives in future conflicts.");
+						await dialog.Msg(L("The tombstone belonged to a legendary commander who fought in the first demon war, centuries ago."));
+						await dialog.Msg(L("The inscriptions contain battle formations, demon weaknesses, and tactical knowledge that was lost over time."));
+						await dialog.Msg(L("With demons potentially returning, the Orsha military desperately needs this knowledge. It could save countless lives in future conflicts."));
 						break;
 
 					case "leave":
-						await dialog.Msg("Safe travels. If you change your mind, the military needs all the help it can get.");
+						await dialog.Msg(L("Safe travels. If you change your mind, the military needs all the help it can get."));
 						break;
 				}
 			}
@@ -335,72 +335,72 @@ public class OrshaQuestNpcsScript : GeneralScript
 
 				if (fragments >= 5)
 				{
-					await dialog.Msg("You found them! All five fragments of the ancient tombstone!");
-					await dialog.Msg("{#666666}*He carefully examines each piece, his hands trembling with excitement*{/}");
-					await dialog.Msg("Remarkable! Even damaged, I can make out parts of the inscriptions. Battle formations... demon weak points... this is exactly what the military needed!");
-					await dialog.Msg("The tombstone belonged to Commander Valen, who led Orsha's forces in the first demon war. His tactical genius saved the kingdom.");
-					await dialog.Msg("I'll work with military scholars to translate and preserve these inscriptions. This knowledge could be crucial if the demons ever return.");
-					await dialog.Msg("You've done Orsha a great service. The military council asked me to give you this reward. Thank you.");
+					await dialog.Msg(L("You found them! All five fragments of the ancient tombstone!"));
+					await dialog.Msg(L("{#666666}*He carefully examines each piece, his hands trembling with excitement*{/}"));
+					await dialog.Msg(L("Remarkable! Even damaged, I can make out parts of the inscriptions. Battle formations... demon weak points... this is exactly what the military needed!"));
+					await dialog.Msg(L("The tombstone belonged to Commander Valen, who led Orsha's forces in the first demon war. His tactical genius saved the kingdom."));
+					await dialog.Msg(L("I'll work with military scholars to translate and preserve these inscriptions. This knowledge could be crucial if the demons ever return."));
+					await dialog.Msg(L("You've done Orsha a great service. The military council asked me to give you this reward. Thank you."));
 
 					character.Inventory.Remove(650732, 5, InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg($"You've found {fragments} fragments so far. We need all 5 pieces to restore the tombstone's inscriptions.");
-					await dialog.Msg("Keep searching the old battlefield. The stone fragments should stand out among the debris.");
+					await dialog.Msg(LF("You've found {0} fragments so far. We need all 5 pieces to restore the tombstone's inscriptions.", fragments));
+					await dialog.Msg(L("Keep searching the old battlefield. The stone fragments should stand out among the debris."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("The military scholars have finished translating the tombstone inscriptions. The tactical knowledge is already being incorporated into training.");
-				await dialog.Msg("Commander Valen's wisdom will help protect Orsha for generations to come, thanks to your help.");
+				await dialog.Msg(L("The military scholars have finished translating the tombstone inscriptions. The tactical knowledge is already being incorporated into training."));
+				await dialog.Msg(L("Commander Valen's wisdom will help protect Orsha for generations to come, thanks to your help."));
 			}
 		});
 
 		// Infirmary Healer Tamara
 		//-------------------------------------------------------------------------
-		AddNpc(147493, "[Healer] Tamara", "c_orsha", -877, -20, 90, async dialog =>
+		AddNpc(147493, L("[Healer] Tamara"), "c_orsha", -877, -20, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("Orsha", 2004);
 
-			dialog.SetTitle("Tamara");
+			dialog.SetTitle(L("Tamara"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("Welcome to the Orsha Infirmary. This building has been converted to treat our soldiers.");
-				await dialog.Msg("{#666666}*You hear coughing and groans of pain from inside the building*{/}");
+				await dialog.Msg(L("Welcome to the Orsha Infirmary. This building has been converted to treat our soldiers."));
+				await dialog.Msg(L("{#666666}*You hear coughing and groans of pain from inside the building*{/}"));
 
-				var response = await dialog.Select("So many wounded from the war... We're doing our best, but we're running low on medicinal herbs.",
-					Option("How can I help?", "help"),
-					Option("What happened to these soldiers?", "soldiers"),
-					Option("I should go", "leave")
+				var response = await dialog.Select(L("So many wounded from the war... We're doing our best, but we're running low on medicinal herbs."),
+					Option(L("How can I help?"), "help"),
+					Option(L("What happened to these soldiers?"), "soldiers"),
+					Option(L("I should go"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("{#666666}*Her exhausted face lights up with relief*{/}");
-						await dialog.Msg("Bless you! Our soldiers are suffering from battle wounds, infections, and fevers.");
+						await dialog.Msg(L("{#666666}*Her exhausted face lights up with relief*{/}"));
+						await dialog.Msg(L("Bless you! Our soldiers are suffering from battle wounds, infections, and fevers."));
 
-						if (await dialog.YesNo("I need medicinal herbs to create poultices and remedies. Without them, many won't survive. Will you help gather herbs for the infirmary?"))
+						if (await dialog.YesNo(L("I need medicinal herbs to create poultices and remedies. Without them, many won't survive. Will you help gather herbs for the infirmary?")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Thank you! I need 5 Languid Herbs for pain relief, 5 Sweet Herbs for fever, and 5 Fragrant Herbs for infection.");
-							await dialog.Msg("These herbs grow in the forests surrounding Orsha. Some monsters carry them as well.");
-							await dialog.Msg("Please hurry - every hour without medicine, we lose more soldiers.");
+							await dialog.Msg(L("Thank you! I need 5 Languid Herbs for pain relief, 5 Sweet Herbs for fever, and 5 Fragrant Herbs for infection."));
+							await dialog.Msg(L("These herbs grow in the forests surrounding Orsha. Some monsters carry them as well."));
+							await dialog.Msg(L("Please hurry - every hour without medicine, we lose more soldiers."));
 						}
 						break;
 
 					case "soldiers":
-						await dialog.Msg("These are our brave warriors who fought in the demon war. Battle wounds, demon corruption, festering injuries...");
-						await dialog.Msg("The military healers are overwhelmed. This building was hastily converted into an infirmary to handle the overflow.");
-						await dialog.Msg("We're doing everything we can, but without proper herbs and medicines, I fear many won't make it.");
+						await dialog.Msg(L("These are our brave warriors who fought in the demon war. Battle wounds, demon corruption, festering injuries..."));
+						await dialog.Msg(L("The military healers are overwhelmed. This building was hastily converted into an infirmary to handle the overflow."));
+						await dialog.Msg(L("We're doing everything we can, but without proper herbs and medicines, I fear many won't make it."));
 						break;
 
 					case "leave":
-						await dialog.Msg("May the goddess watch over you. If you change your mind, these soldiers need all the help they can get.");
+						await dialog.Msg(L("May the goddess watch over you. If you change your mind, these soldiers need all the help they can get."));
 						break;
 				}
 			}
@@ -412,42 +412,42 @@ public class OrshaQuestNpcsScript : GeneralScript
 
 				if (languidHerbs >= 30 && sweetHerbs >= 15 && fragrantHerbs >= 30)
 				{
-					await dialog.Msg("You've brought all the herbs! Thank the goddess!");
-					await dialog.Msg("{#666666}*She immediately begins preparing remedies*{/}");
-					await dialog.Msg("The Languid Herbs will ease their pain. The Sweet Herbs will break their fevers. The Fragrant Herbs will fight infection.");
-					await dialog.Msg("You've saved lives today. These soldiers will survive because of you.");
-					await dialog.Msg("Here - take these supplies from the military stores. The Commander approved this reward for helping our wounded.");
+					await dialog.Msg(L("You've brought all the herbs! Thank the goddess!"));
+					await dialog.Msg(L("{#666666}*She immediately begins preparing remedies*{/}"));
+					await dialog.Msg(L("The Languid Herbs will ease their pain. The Sweet Herbs will break their fevers. The Fragrant Herbs will fight infection."));
+					await dialog.Msg(L("You've saved lives today. These soldiers will survive because of you."));
+					await dialog.Msg(L("Here - take these supplies from the military stores. The Commander approved this reward for helping our wounded."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg($"Did you find the herbs? We desperately need them - soldiers are dying in there. Please hurry!");
+					await dialog.Msg(L("Did you find the herbs? We desperately need them - soldiers are dying in there. Please hurry!"));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("Thanks to those herbs, many soldiers have recovered. Some are even back on duty already.");
-				await dialog.Msg("The infirmary is still crowded, but at least now I have the medicine to treat them properly.");
+				await dialog.Msg(L("Thanks to those herbs, many soldiers have recovered. Some are even back on duty already."));
+				await dialog.Msg(L("The infirmary is still crowded, but at least now I have the medicine to treat them properly."));
 			}
 		});
 
 		// Merchant Guild Representative (receiving letter from Klaipeda quest)
 		//-------------------------------------------------------------------------
-		AddNpc(20061, "[Merchant Guild] Rose", "c_orsha", 251, 633, 0, async dialog =>
+		AddNpc(20061, L("[Merchant Guild] Rose"), "c_orsha", 251, 633, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var klaipeQuestId = new QuestId("Klaipeda", 1004);
 
-			dialog.SetTitle("Rose");
+			dialog.SetTitle(L("Rose"));
 
 			if (character.Quests.IsActive(klaipeQuestId) && character.Inventory.HasItem(663220))
 			{
-				await dialog.Msg("Ah, a letter from the Klaipeda Guild! Let me see...");
-				await dialog.Msg("{#666666}*She reads the letter carefully*{/}");
-				await dialog.Msg("Trade proposals, resource sharing, joint caravans... this is exactly what we need!");
-				await dialog.Msg("Tell your guild master we accept. Orsha will resume grain shipments to Klaipeda starting next month.");
-				await dialog.Msg("Here's our formal response. Thank you for making this journey.");
+				await dialog.Msg(L("Ah, a letter from the Klaipeda Guild! Let me see..."));
+				await dialog.Msg(L("{#666666}*She reads the letter carefully*{/}"));
+				await dialog.Msg(L("Trade proposals, resource sharing, joint caravans... this is exactly what we need!"));
+				await dialog.Msg(L("Tell your guild master we accept. Orsha will resume grain shipments to Klaipeda starting next month."));
+				await dialog.Msg(L("Here's our formal response. Thank you for making this journey."));
 
 				character.Inventory.Remove(663220, 1, InventoryItemRemoveMsg.Given);
 				character.Variables.Perm.Set("Laima.Quests.Klaipeda.Quest1004.DeliveredOrshaLetter", true);
@@ -455,12 +455,12 @@ public class OrshaQuestNpcsScript : GeneralScript
 			}
 			else if (character.Variables.Perm.GetBool("Laima.Quests.Klaipeda.Quest1004.DeliveredOrshaLetter", false))
 			{
-				await dialog.Msg("Trade with Klaipeda is resuming nicely. It's good to see cooperation between our cities again.");
+				await dialog.Msg(L("Trade with Klaipeda is resuming nicely. It's good to see cooperation between our cities again."));
 			}
 			else
 			{
-				await dialog.Msg("The Merchant Guild is working to restore trade networks across all three cities.");
-				await dialog.Msg("War may have divided us, but commerce will bring us back together.");
+				await dialog.Msg(L("The Merchant Guild is working to restore trade networks across all three cities."));
+				await dialog.Msg(L("War may have divided us, but commerce will bring us back together."));
 			}
 		});
 	}
@@ -473,18 +473,18 @@ public class OrshaTrainingGroundsQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("Orsha", 2001);
-		SetName("Reclaim the Training Grounds");
-		SetDescription("Clear monsters from Orsha's military training grounds so recruits can train safely.");
+		SetName(L("Reclaim the Training Grounds"));
+		SetDescription(L("Clear monsters from Orsha's military training grounds so recruits can train safely."));
 		SetLocation("f_whitetrees_22_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Commander] Theron", "c_orsha");
+		AddQuestGiver(L("[Commander] Theron"), "c_orsha");
 
-		AddObjective("killYakmap", "Kill Yakmap", new KillObjective(40, new[] { MonsterId.Yakmab }));
-		AddObjective("killYakmambo", "Kill Yakmambo", new KillObjective(5, new[] { MonsterId.Yakmambo }));
+		AddObjective("killYakmap", L("Kill Yakmap"), new KillObjective(40, new[] { MonsterId.Yakmab }));
+		AddObjective("killYakmambo", L("Kill Yakmambo"), new KillObjective(5, new[] { MonsterId.Yakmambo }));
 
 		// Rewards
 		AddReward(new ExpReward(4200, 3200));
@@ -503,18 +503,18 @@ public class GuardiansOfTheForestRoadsQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("Orsha", 2002);
-		SetName("Guardians of the Forest Roads");
-		SetDescription("Pray at the five ancient purifying statues in the Woods of the Linked Bridges to awaken their holy power and protect travelers from monster attacks.");
+		SetName(L("Guardians of the Forest Roads"));
+		SetDescription(L("Pray at the five ancient purifying statues in the Woods of the Linked Bridges to awaken their holy power and protect travelers from monster attacks."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Forest Warden] Miriam", "c_orsha");
+		AddQuestGiver(L("[Forest Warden] Miriam"), "c_orsha");
 
 		// Pray at 5 purifying statues (tracked by VariableCheckObjective)
-		AddObjective("prayStatues", "Pray at Purifying Statues",
+		AddObjective("prayStatues", L("Pray at Purifying Statues"),
 			new VariableCheckObjective("Laima.Quests.Orsha.Quest2002.PurifyingStatuesAwakened", 5, true));
 
 		// Rewards
@@ -556,15 +556,15 @@ public class EchoesOfAncientWarQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("Orsha", 2003);
-		SetName("Echoes of the Ancient War");
-		SetDescription("Recover the five fragments of an ancient tombstone containing tactical knowledge from the first demon war.");
+		SetName(L("Echoes of the Ancient War"));
+		SetDescription(L("Recover the five fragments of an ancient tombstone containing tactical knowledge from the first demon war."));
 		SetLocation("f_whitetrees_21_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("Raymond", "c_orsha");
+		AddQuestGiver(L("Raymond"), "c_orsha");
 
 		// Add quest item drops from specific monsters when quest is active
 		AddDrop(650732, 0.1f, MonsterId.Kucarry_Symbani);
@@ -572,7 +572,7 @@ public class EchoesOfAncientWarQuest : QuestScript
 		AddDrop(650732, 0.1f, MonsterId.Kucarry_Balzer);
 
 		// Collect 5 fragments
-		AddObjective("collectFragments", "Collect Tombstone fragments",
+		AddObjective("collectFragments", L("Collect Tombstone fragments"),
 			new CollectItemObjective(650732, 5));
 
 		// Rewards
@@ -611,15 +611,15 @@ public class OrshaInfirmaryQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("Orsha", 2004);
-		SetName("Healing the Wounded");
-		SetDescription("Gather medicinal herbs for the Orsha Infirmary to treat wounded soldiers - Languid Herbs, Sweet Herbs, and Fragrant Herbs.");
+		SetName(L("Healing the Wounded"));
+		SetDescription(L("Gather medicinal herbs for the Orsha Infirmary to treat wounded soldiers - Languid Herbs, Sweet Herbs, and Fragrant Herbs."));
 		SetLocation("c_orsha");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Healer] Tamara", "c_orsha");
+		AddQuestGiver(L("[Healer] Tamara"), "c_orsha");
 
 		// Add quest item drops from monsters when quest is active
 		AddDrop(650662, 0.3f, MonsterId.Sec_Jukopus);
@@ -630,11 +630,11 @@ public class OrshaInfirmaryQuest : QuestScript
 		AddDrop(663261, 0.3f, MonsterId.Sec_Jukopus);
 
 		// Collect herbs
-		AddObjective("collectLanguidHerbs", "Collect Languid Herbs",
+		AddObjective("collectLanguidHerbs", L("Collect Languid Herbs"),
 			new CollectItemObjective(650662, 30));
-		AddObjective("collectSweetHerbs", "Collect Sweet Herbs",
+		AddObjective("collectSweetHerbs", L("Collect Sweet Herbs"),
 			new CollectItemObjective(662020, 15));
-		AddObjective("collectFragrantHerbs", "Collect Fragrant Herbs",
+		AddObjective("collectFragrantHerbs", L("Collect Fragrant Herbs"),
 			new CollectItemObjective(663261, 30));
 
 		// Rewards

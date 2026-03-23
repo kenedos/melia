@@ -26,49 +26,49 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Scout Adventurer - Near Orsha Entrance
 		//-------------------------------------------------------------------------
-		AddNpc(57264, "[Scout] Milda", "f_siauliai_15_re", 2621, 99, 0, async dialog =>
+		AddNpc(57264, L("[Scout] Milda"), "f_siauliai_15_re", 2621, 99, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1001);
 
-			dialog.SetTitle("Milda");
+			dialog.SetTitle(L("Milda"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*A scout crouches near a patch of withered vegetation, examining toxic residue*{/}");
-				await dialog.Msg("The contamination is spreading faster than I anticipated. I've been tracking the poison's source throughout this region.");
+				await dialog.Msg(L("{#666666}*A scout crouches near a patch of withered vegetation, examining toxic residue*{/}"));
+				await dialog.Msg(L("The contamination is spreading faster than I anticipated. I've been tracking the poison's source throughout this region."));
 
-				var response = await dialog.Select("These woods are becoming increasingly hazardous. The corrupted creatures are carriers - spreading toxins with every movement.",
-					Option("I can help deal with the corrupted creatures", "help"),
-					Option("What's causing the contamination?", "cause"),
-					Option("I should go", "leave")
+				var response = await dialog.Select(L("These woods are becoming increasingly hazardous. The corrupted creatures are carriers - spreading toxins with every movement."),
+					Option(L("I can help deal with the corrupted creatures"), "help"),
+					Option(L("What's causing the contamination?"), "cause"),
+					Option(L("I should go"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("{#666666}*She stands, her hand moving to her weapon*{/}");
-						await dialog.Msg("Another capable fighter? Good. We need more people taking action.");
-						await dialog.Msg("The Jukopus, Kepas, and Pokubu - they've all become vectors for the corruption. Every one of them spreads poison through this region.");
+						await dialog.Msg(L("{#666666}*She stands, her hand moving to her weapon*{/}"));
+						await dialog.Msg(L("Another capable fighter? Good. We need more people taking action."));
+						await dialog.Msg(L("The Jukopus, Kepas, and Pokubu - they've all become vectors for the corruption. Every one of them spreads poison through this region."));
 
-						if (await dialog.YesNo("We need to cull the infected population before the contamination overwhelms the entire forest. I can offer you a proper weapon - a soldier's iron club - if you help thin their numbers. Are you in?"))
+						if (await dialog.YesNo(L("We need to cull the infected population before the contamination overwhelms the entire forest. I can offer you a proper weapon - a soldier's iron club - if you help thin their numbers. Are you in?")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Excellent. Hunt down the corrupted Jukopus, poisoned Kepas, and infected Pokubu throughout these woods.");
-							await dialog.Msg("Come back when you've made a significant impact on their numbers. The club will be waiting for you.");
+							await dialog.Msg(L("Excellent. Hunt down the corrupted Jukopus, poisoned Kepas, and infected Pokubu throughout these woods."));
+							await dialog.Msg(L("Come back when you've made a significant impact on their numbers. The club will be waiting for you."));
 						}
 						break;
 
 					case "cause":
-						await dialog.Msg("{#666666}*She gestures toward the forest*{/}");
-						await dialog.Msg("After the demon war, residual dark energy saturated these lands. When the guardian owl's protection weakened, that corruption took root.");
-						await dialog.Msg("Now it's infecting the wildlife, turning ordinary creatures into toxic threats. If we don't contain it, this entire region could become uninhabitable.");
-						await dialog.Msg("I've been scouting the affected zones, mapping contamination levels. But studying it isn't enough - we need to actively cull the infected creatures.");
+						await dialog.Msg(L("{#666666}*She gestures toward the forest*{/}"));
+						await dialog.Msg(L("After the demon war, residual dark energy saturated these lands. When the guardian owl's protection weakened, that corruption took root."));
+						await dialog.Msg(L("Now it's infecting the wildlife, turning ordinary creatures into toxic threats. If we don't contain it, this entire region could become uninhabitable."));
+						await dialog.Msg(L("I've been scouting the affected zones, mapping contamination levels. But studying it isn't enough - we need to actively cull the infected creatures."));
 						break;
 
 					case "leave":
-						await dialog.Msg("{#666666}*She returns to examining the ground*{/}");
-						await dialog.Msg("Watch yourself in these woods. The poison doesn't discriminate - it affects everyone.");
+						await dialog.Msg(L("{#666666}*She returns to examining the ground*{/}"));
+						await dialog.Msg(L("Watch yourself in these woods. The poison doesn't discriminate - it affects everyone."));
 						break;
 				}
 			}
@@ -85,24 +85,24 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (!jukopusDone || !kepasDone || !pokubuDone)
 				{
-					await dialog.Msg("Still culling the infected creatures?");
-					await dialog.Msg("Keep at it. Every infected creature eliminated slows the contamination's spread.");
+					await dialog.Msg(L("Still culling the infected creatures?"));
+					await dialog.Msg(L("Keep at it. Every infected creature eliminated slows the contamination's spread."));
 				}
 				else
 				{
-					await dialog.Msg("{#666666}*She looks up from her field notes, impressed*{/}");
-					await dialog.Msg("Excellent work. I've been monitoring the contamination levels, and they're already starting to stabilize in some areas.");
-					await dialog.Msg("You've proven yourself capable. Here - take this soldier's short bow. It's a solid weapon, and you've earned it.");
-					await dialog.Msg("{#666666}*She hands you a well-crafted short bow*{/}");
-					await dialog.Msg("With fighters like you helping to contain this threat, we might actually reclaim these woods.");
+					await dialog.Msg(L("{#666666}*She looks up from her field notes, impressed*{/}"));
+					await dialog.Msg(L("Excellent work. I've been monitoring the contamination levels, and they're already starting to stabilize in some areas."));
+					await dialog.Msg(L("You've proven yourself capable. Here - take this soldier's short bow. It's a solid weapon, and you've earned it."));
+					await dialog.Msg(L("{#666666}*She hands you a well-crafted short bow*{/}"));
+					await dialog.Msg(L("With fighters like you helping to contain this threat, we might actually reclaim these woods."));
 
 					character.Quests.Complete(questId);
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("The culling operation you conducted made a real difference. Contamination readings have improved in several zones.");
-				await dialog.Msg("With continued effort, we might be able to reclaim these woods from the poison's grip.");
+				await dialog.Msg(L("The culling operation you conducted made a real difference. Contamination readings have improved in several zones."));
+				await dialog.Msg(L("With continued effort, we might be able to reclaim these woods from the poison's grip."));
 			}
 		});
 
@@ -111,22 +111,22 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Distressed Merchant
 		//-------------------------------------------------------------------------
-		AddNpc(20153, "[Merchant] Alfred", "f_siauliai_15_re", 2404, -1088, 44, async dialog =>
+		AddNpc(20153, L("[Merchant] Alfred"), "f_siauliai_15_re", 2404, -1088, 44, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1002);
 
-			dialog.SetTitle("Alfred");
+			dialog.SetTitle(L("Alfred"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*A disheveled merchant sits on a crate, head in his hands*{/}");
-				await dialog.Msg("Ruined... I'm completely ruined...");
+				await dialog.Msg(L("{#666666}*A disheveled merchant sits on a crate, head in his hands*{/}"));
+				await dialog.Msg(L("Ruined... I'm completely ruined..."));
 
-				var response = await dialog.Select("My caravan was attacked by those blasted poisoned Kepas! They scattered my goods everywhere!",
-					Option("I can help recover your goods", "help"),
-					Option("What were you transporting?", "goods"),
-					Option("Maybe you should hire guards", "leave")
+				var response = await dialog.Select(L("My caravan was attacked by those blasted poisoned Kepas! They scattered my goods everywhere!"),
+					Option(L("I can help recover your goods"), "help"),
+					Option(L("What were you transporting?"), "goods"),
+					Option(L("Maybe you should hire guards"), "leave")
 				);
 
 				switch (response)
@@ -134,34 +134,34 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 					case "help":
 						if (character.Level < 3)
 						{
-							await dialog.Msg("{#666666}*He looks you over skeptically*{/}");
-							await dialog.Msg("No offense, friend, but those Kepas are tougher than they look. You'd need to be at least level 3 to handle them safely.");
-							await dialog.Msg("Come back when you're stronger, and I'll still need the help.");
+							await dialog.Msg(L("{#666666}*He looks you over skeptically*{/}"));
+							await dialog.Msg(L("No offense, friend, but those Kepas are tougher than they look. You'd need to be at least level 3 to handle them safely."));
+							await dialog.Msg(L("Come back when you're stronger, and I'll still need the help."));
 						}
 						else
 						{
-							await dialog.Msg("{#666666}*He jumps to his feet*{/}");
-							await dialog.Msg("You'd do that? Oh, thank the goddess!");
+							await dialog.Msg(L("{#666666}*He jumps to his feet*{/}"));
+							await dialog.Msg(L("You'd do that? Oh, thank the goddess!"));
 
-							if (await dialog.YesNo("My goods are scattered all over this area. Those poisoned Kepas probably dragged some of it around. Can you recover what you can find?"))
+							if (await dialog.YesNo(L("My goods are scattered all over this area. Those poisoned Kepas probably dragged some of it around. Can you recover what you can find?")))
 							{
 								character.Quests.Start(questId);
-								await dialog.Msg("Thank you! Look for scattered crates and packages. The Kepas might have taken some of it too.");
-								await dialog.Msg("Bring me back 8 packages and I can salvage at least part of my business!");
+								await dialog.Msg(L("Thank you! Look for scattered crates and packages. The Kepas might have taken some of it too."));
+								await dialog.Msg(L("Bring me back 8 packages and I can salvage at least part of my business!"));
 							}
 						}
 						break;
 
 					case "goods":
-						await dialog.Msg("Medicinal herbs, cloth, tools... supplies for the villages around Orsha.");
-						await dialog.Msg("Nothing fancy, but it's my livelihood. Without those goods, I can't pay my debts.");
-						await dialog.Msg("My family will starve if I don't recover something from this disaster.");
+						await dialog.Msg(L("Medicinal herbs, cloth, tools... supplies for the villages around Orsha."));
+						await dialog.Msg(L("Nothing fancy, but it's my livelihood. Without those goods, I can't pay my debts."));
+						await dialog.Msg(L("My family will starve if I don't recover something from this disaster."));
 						break;
 
 					case "leave":
-						await dialog.Msg("{#666666}*He laughs bitterly*{/}");
-						await dialog.Msg("Hire guards? With what money? I spent everything I had on this shipment!");
-						await dialog.Msg("I gambled it all on one big delivery and lost. That's the merchant's life for you.");
+						await dialog.Msg(L("{#666666}*He laughs bitterly*{/}"));
+						await dialog.Msg(L("Hire guards? With what money? I spent everything I had on this shipment!"));
+						await dialog.Msg(L("I gambled it all on one big delivery and lost. That's the merchant's life for you."));
 						break;
 				}
 			}
@@ -171,24 +171,24 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (goods >= 8)
 				{
-					await dialog.Msg("{#666666}*He eagerly examines the packages*{/}");
-					await dialog.Msg("You found them! Let me see... yes, yes! These are still in good condition!");
-					await dialog.Msg("{#666666}*He starts counting quickly*{/}");
-					await dialog.Msg("This is enough to save my business! I can still make my deliveries, pay my debts... oh, thank you!");
-					await dialog.Msg("Here, please accept this reward. You've saved my family from ruin.");
+					await dialog.Msg(L("{#666666}*He eagerly examines the packages*{/}"));
+					await dialog.Msg(L("You found them! Let me see... yes, yes! These are still in good condition!"));
+					await dialog.Msg(L("{#666666}*He starts counting quickly*{/}"));
+					await dialog.Msg(L("This is enough to save my business! I can still make my deliveries, pay my debts... oh, thank you!"));
+					await dialog.Msg(L("Here, please accept this reward. You've saved my family from ruin."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg("Still looking for my goods? Please keep searching.");
-					await dialog.Msg("Please hurry - the longer they're out there, the more damaged they'll become.");
+					await dialog.Msg(L("Still looking for my goods? Please keep searching."));
+					await dialog.Msg(L("Please hurry - the longer they're out there, the more damaged they'll become."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("Thanks to you, my business survived. I've been making deliveries again!");
-				await dialog.Msg("Next time I'll definitely hire guards before traveling through these woods.");
+				await dialog.Msg(L("Thanks to you, my business survived. I've been making deliveries again!"));
+				await dialog.Msg(L("Next time I'll definitely hire guards before traveling through these woods."));
 			}
 		});
 
@@ -197,48 +197,48 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Old Hermit - Secluded Cabin
 		//-------------------------------------------------------------------------
-		AddNpc(20152, "[Hermit] Torsten", "f_siauliai_15_re", 462, 2100, 90, async dialog =>
+		AddNpc(20152, L("[Hermit] Torsten"), "f_siauliai_15_re", 462, 2100, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1003);
 
-			dialog.SetTitle("Torsten");
+			dialog.SetTitle(L("Torsten"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*An old hermit sits outside his cabin, watching the forest*{/}");
-				await dialog.Msg("Hm. Another traveler. Don't see many people out here in this remote spot.");
+				await dialog.Msg(L("{#666666}*An old hermit sits outside his cabin, watching the forest*{/}"));
+				await dialog.Msg(L("Hm. Another traveler. Don't see many people out here in this remote spot."));
 
-				var response = await dialog.Select("Though I suppose the boars have been acting strange lately. More aggressive. Almost... corrupted.",
-					Option("I could investigate for you", "help"),
-					Option("What do you mean by corrupted?", "corrupted"),
-					Option("Why do you live so far from town?", "hermit")
+				var response = await dialog.Select(L("Though I suppose the boars have been acting strange lately. More aggressive. Almost... corrupted."),
+					Option(L("I could investigate for you"), "help"),
+					Option(L("What do you mean by corrupted?"), "corrupted"),
+					Option(L("Why do you live so far from town?"), "hermit")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("{#666666}*He nods slowly*{/}");
-						await dialog.Msg("So you're a fighter, eh? Good. The forest needs people willing to face the darkness.");
+						await dialog.Msg(L("{#666666}*He nods slowly*{/}"));
+						await dialog.Msg(L("So you're a fighter, eh? Good. The forest needs people willing to face the darkness."));
 
-						if (await dialog.YesNo("Hunt the corrupted Pokubu and the Pokuborn. If enough of them are culled, maybe the corruption will slow its spread. Will you do this?"))
+						if (await dialog.YesNo(L("Hunt the corrupted Pokubu and the Pokuborn. If enough of them are culled, maybe the corruption will slow its spread. Will you do this?")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Good. Hunt the Pokubu throughout these woods. The Pokuborn especially - they're the most dangerous.");
-							await dialog.Msg("When you're done, return here. I have something that might help protect you in the future.");
+							await dialog.Msg(L("Good. Hunt the Pokubu throughout these woods. The Pokuborn especially - they're the most dangerous."));
+							await dialog.Msg(L("When you're done, return here. I have something that might help protect you in the future."));
 						}
 						break;
 
 					case "corrupted":
-						await dialog.Msg("The Pokubu - the boars that roam these woods. They've always been territorial, but lately they've become violent.");
-						await dialog.Msg("Their eyes glow with dark energy. Some - the Pokuborn - have darker hides and are far more aggressive.");
-						await dialog.Msg("I've lived in these woods for thirty years. I know when something's unnatural.");
+						await dialog.Msg(L("The Pokubu - the boars that roam these woods. They've always been territorial, but lately they've become violent."));
+						await dialog.Msg(L("Their eyes glow with dark energy. Some - the Pokuborn - have darker hides and are far more aggressive."));
+						await dialog.Msg(L("I've lived in these woods for thirty years. I know when something's unnatural."));
 						break;
 
 					case "hermit":
-						await dialog.Msg("I came out here to escape people and their politics. Cities, armies, wars... all that noise.");
-						await dialog.Msg("Out here, it's just me, the trees, and the beasts. Or at least it used to be peaceful.");
-						await dialog.Msg("But even in isolation, the world's problems find you eventually.");
+						await dialog.Msg(L("I came out here to escape people and their politics. Cities, armies, wars... all that noise."));
+						await dialog.Msg(L("Out here, it's just me, the trees, and the beasts. Or at least it used to be peaceful."));
+						await dialog.Msg(L("But even in isolation, the world's problems find you eventually."));
 						break;
 				}
 			}
@@ -253,24 +253,24 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (!pokubuDone || !arburnDone)
 				{
-					await dialog.Msg("Still hunting the corrupted boars?");
-					await dialog.Msg("Be careful out there. The Pokuborn are particularly vicious.");
+					await dialog.Msg(L("Still hunting the corrupted boars?"));
+					await dialog.Msg(L("Be careful out there. The Pokuborn are particularly vicious."));
 				}
 				else
 				{
-					await dialog.Msg("{#666666}*He stands and inspects you carefully*{/}");
-					await dialog.Msg("You did it. I can already sense the forest feels... calmer. Less corrupted energy in the air.");
-					await dialog.Msg("{#666666}*He retrieves a piece of leather armor from his cabin*{/}");
-					await dialog.Msg("This is an armor I crafted with the leather from these monsters.");
-					await dialog.Msg("You've earned it. Thank you for helping maintain the balance in these woods.");
+					await dialog.Msg(L("{#666666}*He stands and inspects you carefully*{/}"));
+					await dialog.Msg(L("You did it. I can already sense the forest feels... calmer. Less corrupted energy in the air."));
+					await dialog.Msg(L("{#666666}*He retrieves a piece of leather armor from his cabin*{/}"));
+					await dialog.Msg(L("This is an armor I crafted with the leather from these monsters."));
+					await dialog.Msg(L("You've earned it. Thank you for helping maintain the balance in these woods."));
 
 					character.Quests.Complete(questId);
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("The boars have been calmer lately. The corruption's influence is weakening, thanks to you.");
-				await dialog.Msg("Keep that armor close. It'll serve you well against dark forces.");
+				await dialog.Msg(L("The boars have been calmer lately. The corruption's influence is weakening, thanks to you."));
+				await dialog.Msg(L("Keep that armor close. It'll serve you well against dark forces."));
 			}
 		});
 
@@ -279,50 +279,50 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Orsha Soldier - Near Linked Bridges
 		//-------------------------------------------------------------------------
-		AddNpc(20060, "[Soldier] Henrik", "f_siauliai_15_re", -759, -176, 90, async dialog =>
+		AddNpc(20060, L("[Soldier] Henrik"), "f_siauliai_15_re", -759, -176, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1004);
 
-			dialog.SetTitle("Henrik");
+			dialog.SetTitle(L("Henrik"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*A sturdy soldier stands near the bridge, examining rubble and debris*{/}");
-				await dialog.Msg("Hmm... these bridges are shedding rubble. The war took its toll on the infrastructure.");
+				await dialog.Msg(L("{#666666}*A sturdy soldier stands near the bridge, examining rubble and debris*{/}"));
+				await dialog.Msg(L("Hmm... these bridges are shedding rubble. The war took its toll on the infrastructure."));
 
-				var response = await dialog.Select("I'm Henrik, sent from Orsha to assess the damage and plan reconstruction efforts. These linked bridges are vital for supply routes and trade.",
-					Option("How can I help?", "help"),
-					Option("What's your assessment?", "assessment"),
-					Option("Good luck with that", "leave")
+				var response = await dialog.Select(L("I'm Henrik, sent from Orsha to assess the damage and plan reconstruction efforts. These linked bridges are vital for supply routes and trade."),
+					Option(L("How can I help?"), "help"),
+					Option(L("What's your assessment?"), "assessment"),
+					Option(L("Good luck with that"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("{#666666}*He looks up from his plans*{/}");
-						await dialog.Msg("You'd help with the survey? That would speed things up considerably.");
+						await dialog.Msg(L("{#666666}*He looks up from his plans*{/}"));
+						await dialog.Msg(L("You'd help with the survey? That would speed things up considerably."));
 
-						if (await dialog.YesNo("I need someone to inspect the rubble piles coming off the bridges - this will help us assess which areas need the most urgent repairs. Can you handle that?"))
+						if (await dialog.YesNo(L("I need someone to inspect the rubble piles coming off the bridges - this will help us assess which areas need the most urgent repairs. Can you handle that?")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Excellent. Follow the main road through the Woods of the Linked Bridges and inspect each rubble pile you find.");
-							await dialog.Msg("There's another bridge further south - follow the road and you'll find more rubble piles along the way.");
-							await dialog.Msg("Once you've inspected all the rubble piles, report back to me. We'll use your findings to prioritize reconstruction efforts.");
+							await dialog.Msg(L("Excellent. Follow the main road through the Woods of the Linked Bridges and inspect each rubble pile you find."));
+							await dialog.Msg(L("There's another bridge further south - follow the road and you'll find more rubble piles along the way."));
+							await dialog.Msg(L("Once you've inspected all the rubble piles, report back to me. We'll use your findings to prioritize reconstruction efforts."));
 						}
 						break;
 
 					case "assessment":
-						await dialog.Msg("{#666666}*He rolls out a worn map of the forest*{/}");
-						await dialog.Msg("Multiple bridges connect this entire region - built generations ago by Master Siauliai.");
-						await dialog.Msg("After the demon war, we lost contact with this area. The bridges are deteriorating - rubble and debris falling from the supports.");
-						await dialog.Msg("Without proper bridges, Orsha's supply routes are cut off. Villages remain isolated. Commerce has ground to a halt.");
-						await dialog.Msg("We need to survey the damage before we can begin reconstruction work.");
+						await dialog.Msg(L("{#666666}*He rolls out a worn map of the forest*{/}"));
+						await dialog.Msg(L("Multiple bridges connect this entire region - built generations ago by Master Siauliai."));
+						await dialog.Msg(L("After the demon war, we lost contact with this area. The bridges are deteriorating - rubble and debris falling from the supports."));
+						await dialog.Msg(L("Without proper bridges, Orsha's supply routes are cut off. Villages remain isolated. Commerce has ground to a halt."));
+						await dialog.Msg(L("We need to survey the damage before we can begin reconstruction work."));
 						break;
 
 					case "leave":
-						await dialog.Msg("{#666666}*He returns to his construction plans*{/}");
-						await dialog.Msg("Right. This is Orsha military business anyway. Safe travels.");
+						await dialog.Msg(L("{#666666}*He returns to his construction plans*{/}"));
+						await dialog.Msg(L("Right. This is Orsha military business anyway. Safe travels."));
 						break;
 				}
 			}
@@ -332,27 +332,27 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (bridgesChecked >= 6)
 				{
-					await dialog.Msg("{#666666}*He straightens up, eager for your report*{/}");
-					await dialog.Msg("You've inspected all the rubble piles? Give me your assessment!");
-					await dialog.Msg("{#666666}*You provide detailed reports on the damage at each location*{/}");
-					await dialog.Msg("{#666666}*He makes notes on his plans*{/}");
-					await dialog.Msg("This is excellent intelligence. Now I know exactly which bridges need the most urgent repairs.");
-					await dialog.Msg("I can take this back to Orsha and get reconstruction approved immediately. We'll have work crews out here within the week.");
-					await dialog.Msg("Here - take this soldier's iron club as payment for your survey work. Orsha thanks you for helping reconnect the region!");
+					await dialog.Msg(L("{#666666}*He straightens up, eager for your report*{/}"));
+					await dialog.Msg(L("You've inspected all the rubble piles? Give me your assessment!"));
+					await dialog.Msg(L("{#666666}*You provide detailed reports on the damage at each location*{/}"));
+					await dialog.Msg(L("{#666666}*He makes notes on his plans*{/}"));
+					await dialog.Msg(L("This is excellent intelligence. Now I know exactly which bridges need the most urgent repairs."));
+					await dialog.Msg(L("I can take this back to Orsha and get reconstruction approved immediately. We'll have work crews out here within the week."));
+					await dialog.Msg(L("Here - take this soldier's iron club as payment for your survey work. Orsha thanks you for helping reconnect the region!"));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg("How's the survey going? Keep looking for more rubble piles to inspect.");
-					await dialog.Msg("Follow the main road through the forest. Remember, there's another bridge further south - keep following the road.");
+					await dialog.Msg(L("How's the survey going? Keep looking for more rubble piles to inspect."));
+					await dialog.Msg(L("Follow the main road through the forest. Remember, there's another bridge further south - keep following the road."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("{#666666}*He's reviewing construction schedules*{/}");
-				await dialog.Msg("Thanks to your survey, reconstruction has been approved. Work crews are already repairing the most damaged bridges.");
-				await dialog.Msg("Within a few months, all the linked bridges will be fully restored. Commerce and travel will return to normal.");
+				await dialog.Msg(L("{#666666}*He's reviewing construction schedules*{/}"));
+				await dialog.Msg(L("Thanks to your survey, reconstruction has been approved. Work crews are already repairing the most damaged bridges."));
+				await dialog.Msg(L("Within a few months, all the linked bridges will be fully restored. Commerce and travel will return to normal."));
 			}
 		});
 
@@ -361,52 +361,52 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Former Beekeeper - Abandoned Bee Farm
 		//-------------------------------------------------------------------------
-		AddNpc(20116, "[Beekeeper] Greta", "f_siauliai_15_re", 52, -1382, 0, async dialog =>
+		AddNpc(20116, L("[Beekeeper] Greta"), "f_siauliai_15_re", 52, -1382, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1005);
 
-			dialog.SetTitle("Greta");
+			dialog.SetTitle(L("Greta"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*An elderly woman stands among empty beehives*{/}");
-				await dialog.Msg("My bees... they're all gone...");
+				await dialog.Msg(L("{#666666}*An elderly woman stands among empty beehives*{/}"));
+				await dialog.Msg(L("My bees... they're all gone..."));
 
-				var response = await dialog.Select("This was once the most productive bee farm in all of Orsha. Now look at it. Empty. Silent.",
-					Option("Maybe I can help", "help"),
-					Option("What happened to your bees?", "bees"),
-					Option("That's unfortunate", "leave")
+				var response = await dialog.Select(L("This was once the most productive bee farm in all of Orsha. Now look at it. Empty. Silent."),
+					Option(L("Maybe I can help"), "help"),
+					Option(L("What happened to your bees?"), "bees"),
+					Option(L("That's unfortunate"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("{#666666}*A spark of hope appears in her eyes*{/}");
-						await dialog.Msg("You... you would help an old beekeeper?");
-						await dialog.Msg("I've heard there are special flowers growing wild in the forest - Moonbells, Sunpetals, Honeydew blooms...");
-						await dialog.Msg("The kind of flowers that bees absolutely love. If I could get some of those flowers, I could use them to lure wild bees back to my farm!");
+						await dialog.Msg(L("{#666666}*A spark of hope appears in her eyes*{/}"));
+						await dialog.Msg(L("You... you would help an old beekeeper?"));
+						await dialog.Msg(L("I've heard there are special flowers growing wild in the forest - Moonbells, Sunpetals, Honeydew blooms..."));
+						await dialog.Msg(L("The kind of flowers that bees absolutely love. If I could get some of those flowers, I could use them to lure wild bees back to my farm!"));
 
-						if (await dialog.YesNo("Would you gather those bee-attracting flowers for me? I need at least 5 bunches to have a chance of luring the bees back."))
+						if (await dialog.YesNo(L("Would you gather those bee-attracting flowers for me? I need at least 5 bunches to have a chance of luring the bees back.")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Oh, thank you! Look for colorful flower patches throughout the forest.");
-							await dialog.Msg("Gather 5 bunches of those special flowers and bring them back to me.");
-							await dialog.Msg("With those flowers near my hives, maybe... just maybe... the bees will return to these woods.");
+							await dialog.Msg(L("Oh, thank you! Look for colorful flower patches throughout the forest."));
+							await dialog.Msg(L("Gather 5 bunches of those special flowers and bring them back to me."));
+							await dialog.Msg(L("With those flowers near my hives, maybe... just maybe... the bees will return to these woods."));
 						}
 						break;
 
 					case "bees":
-						await dialog.Msg("{#666666}*She gazes toward the forest*{/}");
-						await dialog.Msg("After the war, corruption spread throughout these woods. The air became toxic.");
-						await dialog.Msg("The bees... they couldn't survive here. Some died. Most fled to cleaner lands.");
-						await dialog.Msg("But I've heard reports of wild flowers blooming in certain spots - flowers that bees love.");
-						await dialog.Msg("I tried to stay, hoping they'd return. But hope fades with each empty sunrise.");
+						await dialog.Msg(L("{#666666}*She gazes toward the forest*{/}"));
+						await dialog.Msg(L("After the war, corruption spread throughout these woods. The air became toxic."));
+						await dialog.Msg(L("The bees... they couldn't survive here. Some died. Most fled to cleaner lands."));
+						await dialog.Msg(L("But I've heard reports of wild flowers blooming in certain spots - flowers that bees love."));
+						await dialog.Msg(L("I tried to stay, hoping they'd return. But hope fades with each empty sunrise."));
 						break;
 
 					case "leave":
-						await dialog.Msg("{#666666}*She nods sadly*{/}");
-						await dialog.Msg("Yes... unfortunate. But such is life after war. We lose the things we love.");
+						await dialog.Msg(L("{#666666}*She nods sadly*{/}"));
+						await dialog.Msg(L("Yes... unfortunate. But such is life after war. We lose the things we love."));
 						break;
 				}
 			}
@@ -416,26 +416,26 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (flowersCollected >= 5)
 				{
-					await dialog.Msg("{#666666}*She clasps your hands gratefully*{/}");
-					await dialog.Msg("You gathered them! All five bunches of bee-attracting flowers!");
-					await dialog.Msg("{#666666}*She carefully arranges the flowers around her beehives*{/}");
-					await dialog.Msg("{#666666}*Almost immediately, you hear a faint buzzing in the distance*{/}");
-					await dialog.Msg("Listen! Do you hear that? Bees! Wild bees are already coming to investigate!");
-					await dialog.Msg("You've given me something I'd lost - hope. Hope that someday, these hives will be full of life again.");
-					await dialog.Msg("Thank you, dear traveler. Please, take this. It's not much, but it's offered with a grateful heart.");
+					await dialog.Msg(L("{#666666}*She clasps your hands gratefully*{/}"));
+					await dialog.Msg(L("You gathered them! All five bunches of bee-attracting flowers!"));
+					await dialog.Msg(L("{#666666}*She carefully arranges the flowers around her beehives*{/}"));
+					await dialog.Msg(L("{#666666}*Almost immediately, you hear a faint buzzing in the distance*{/}"));
+					await dialog.Msg(L("Listen! Do you hear that? Bees! Wild bees are already coming to investigate!"));
+					await dialog.Msg(L("You've given me something I'd lost - hope. Hope that someday, these hives will be full of life again."));
+					await dialog.Msg(L("Thank you, dear traveler. Please, take this. It's not much, but it's offered with a grateful heart."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg($"Have you found the bee-attracting flowers? You have {flowersCollected} out of 5 bunches.");
-					await dialog.Msg("Look for colorful flower patches throughout the forest - places where the corruption hasn't taken hold.");
+					await dialog.Msg(LF("Have you found the bee-attracting flowers? You have {0} out of 5 bunches.", flowersCollected));
+					await dialog.Msg(L("Look for colorful flower patches throughout the forest - places where the corruption hasn't taken hold."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("I can hear bees buzzing around the hives again! A few have even started building new colonies!");
-				await dialog.Msg("It'll take time to rebuild what was lost, but you've given me that chance. Thank you.");
+				await dialog.Msg(L("I can hear bees buzzing around the hives again! A few have even started building new colonies!"));
+				await dialog.Msg(L("It'll take time to rebuild what was lost, but you've given me that chance. Thank you."));
 			}
 		});
 
@@ -444,50 +444,50 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Desperate Farmer - Morku Farm
 		//-------------------------------------------------------------------------
-		AddNpc(20117, "[Farmer] Morku", "f_siauliai_15_re", -2330, -172, 44, async dialog =>
+		AddNpc(20117, L("[Farmer] Morku"), "f_siauliai_15_re", -2330, -172, 44, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1006);
 
-			dialog.SetTitle("Morku");
+			dialog.SetTitle(L("Morku"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*A weathered farmer stares at an empty plot of land*{/}");
-				await dialog.Msg("Nothing grows anymore. Nothing at all.");
+				await dialog.Msg(L("{#666666}*A weathered farmer stares at an empty plot of land*{/}"));
+				await dialog.Msg(L("Nothing grows anymore. Nothing at all."));
 
-				var response = await dialog.Select("I've tried everything - new seeds, fertilizer, prayers. But the soil is dead. Corrupted.",
-					Option("Perhaps I can help", "help"),
-					Option("What corrupted your farm?", "corruption"),
-					Option("Maybe you should move", "leave")
+				var response = await dialog.Select(L("I've tried everything - new seeds, fertilizer, prayers. But the soil is dead. Corrupted."),
+					Option(L("Perhaps I can help"), "help"),
+					Option(L("What corrupted your farm?"), "corruption"),
+					Option(L("Maybe you should move"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("{#666666}*He looks at you with tired eyes*{/}");
-						await dialog.Msg("Help? I don't know if anyone can help. But...");
-						await dialog.Msg("There's a legend about an ancient stone golem. A guardian that watches over a sacred monument north of here.");
+						await dialog.Msg(L("{#666666}*He looks at you with tired eyes*{/}"));
+						await dialog.Msg(L("Help? I don't know if anyone can help. But..."));
+						await dialog.Msg(L("There's a legend about an ancient stone golem. A guardian that watches over a sacred monument north of here."));
 
-						if (await dialog.YesNo("They say the golem can grant blessings to purify corrupted land. It's probably just a story, but... I'm desperate. Would you seek out the Stone Guardian and ask for its blessing?"))
+						if (await dialog.YesNo(L("They say the golem can grant blessings to purify corrupted land. It's probably just a story, but... I'm desperate. Would you seek out the Stone Guardian and ask for its blessing?")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("The Stone Guardian is north of here, deep in the forest. Look for a giant carved stone head - the golem stands watch over it.");
-							await dialog.Msg("If the legends are true... maybe it will help us. Please, try.");
+							await dialog.Msg(L("The Stone Guardian is north of here, deep in the forest. Look for a giant carved stone head - the golem stands watch over it."));
+							await dialog.Msg(L("If the legends are true... maybe it will help us. Please, try."));
 						}
 						break;
 
 					case "corruption":
-						await dialog.Msg("After the war, dark energy seeped into the ground. Poisoned everything.");
-						await dialog.Msg("My crops withered. My animals died. Even the weeds won't grow here anymore.");
-						await dialog.Msg("This farm has been in my family for four generations. Now it's just... dead earth.");
+						await dialog.Msg(L("After the war, dark energy seeped into the ground. Poisoned everything."));
+						await dialog.Msg(L("My crops withered. My animals died. Even the weeds won't grow here anymore."));
+						await dialog.Msg(L("This farm has been in my family for four generations. Now it's just... dead earth."));
 						break;
 
 
 					case "leave":
-						await dialog.Msg("{#666666}*He clenches his fists*{/}");
-						await dialog.Msg("Move? And abandon four generations of family history? Never.");
-						await dialog.Msg("I'll die on this land before I give up on it.");
+						await dialog.Msg(L("{#666666}*He clenches his fists*{/}"));
+						await dialog.Msg(L("Move? And abandon four generations of family history? Never."));
+						await dialog.Msg(L("I'll die on this land before I give up on it."));
 						break;
 				}
 			}
@@ -495,32 +495,32 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 			{
 				if (character.Inventory.HasItem(650713))
 				{
-					await dialog.Msg("{#666666}*His eyes widen*{/}");
-					await dialog.Msg("That glow... is that... the Stone Guardian's purified essence?!");
-					await dialog.Msg("{#666666}*He kneels reverently*{/}");
-					await dialog.Msg("You actually received it! The ancient guardian acknowledged you!");
-					await dialog.Msg("Please, may I... may I apply this to my farm?");
-					await dialog.Msg("{#666666}*He carefully spreads the purified essence across his empty field*{/}");
-					await dialog.Msg("{#666666}*The soil begins to glow faintly, the corruption visibly receding*{/}");
-					await dialog.Msg("It's working! The land... it's healing! After all this time, there's finally hope!");
-					await dialog.Msg("{#666666}*He looks at you with tears in his eyes*{/}");
-					await dialog.Msg("Thank you. Thank you for giving me back my future.");
+					await dialog.Msg(L("{#666666}*His eyes widen*{/}"));
+					await dialog.Msg(L("That glow... is that... the Stone Guardian's purified essence?!"));
+					await dialog.Msg(L("{#666666}*He kneels reverently*{/}"));
+					await dialog.Msg(L("You actually received it! The ancient guardian acknowledged you!"));
+					await dialog.Msg(L("Please, may I... may I apply this to my farm?"));
+					await dialog.Msg(L("{#666666}*He carefully spreads the purified essence across his empty field*{/}"));
+					await dialog.Msg(L("{#666666}*The soil begins to glow faintly, the corruption visibly receding*{/}"));
+					await dialog.Msg(L("It's working! The land... it's healing! After all this time, there's finally hope!"));
+					await dialog.Msg(L("{#666666}*He looks at you with tears in his eyes*{/}"));
+					await dialog.Msg(L("Thank you. Thank you for giving me back my future."));
 
 					character.Inventory.Remove(650713, 1, InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg("Have you found the Stone Guardian? It should be west of here, deeper in the forest.");
-					await dialog.Msg("Look for a giant carved stone head monument - the golem stands watch over it.");
+					await dialog.Msg(L("Have you found the Stone Guardian? It should be west of here, deeper in the forest."));
+					await dialog.Msg(L("Look for a giant carved stone head monument - the golem stands watch over it."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("{#666666}*He's working in his field, where small green shoots are beginning to emerge*{/}");
-				await dialog.Msg("Look! Real crops! Growing in my soil again!");
-				await dialog.Msg("The Stone Guardian's blessing worked. The corruption is gone, the land is healing!");
-				await dialog.Msg("I'll never forget what you've done for me and my family.");
+				await dialog.Msg(L("{#666666}*He's working in his field, where small green shoots are beginning to emerge*{/}"));
+				await dialog.Msg(L("Look! Real crops! Growing in my soil again!"));
+				await dialog.Msg(L("The Stone Guardian's blessing worked. The corruption is gone, the land is healing!"));
+				await dialog.Msg(L("I'll never forget what you've done for me and my family."));
 			}
 		});
 
@@ -529,22 +529,22 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Ancient Stone Golem Guardian
 		//-------------------------------------------------------------------------
-		AddNpc(47125, "[Ancient Guardian] Stone Golem", "f_siauliai_15_re", -2889, 900, 135, async dialog =>
+		AddNpc(47125, L("[Ancient Guardian] Stone Golem"), "f_siauliai_15_re", -2889, 900, 135, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1006);
 
 			if (!character.Quests.IsActive(questId))
 			{
-				await dialog.Msg("{#666666}*A towering stone golem stands motionless, facing an enormous carved stone head*{/}");
-				await dialog.Msg("{#666666}*The ancient monument is covered in glowing runes. The golem seems to be guarding it reverently*{/}");
+				await dialog.Msg(L("{#666666}*A towering stone golem stands motionless, facing an enormous carved stone head*{/}"));
+				await dialog.Msg(L("{#666666}*The ancient monument is covered in glowing runes. The golem seems to be guarding it reverently*{/}"));
 				return;
 			}
 
 			if (character.Inventory.HasItem(650713))
 			{
-				await dialog.Msg("{#666666}*The golem's eyes glow faintly as it gazes at the stone head*{/}");
-				await dialog.Msg("The blessing... has been granted. Take it... to the farmer.");
+				await dialog.Msg(L("{#666666}*The golem's eyes glow faintly as it gazes at the stone head*{/}"));
+				await dialog.Msg(L("The blessing... has been granted. Take it... to the farmer."));
 				return;
 			}
 
@@ -552,107 +552,107 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 			if (riddleSolved)
 			{
-				await dialog.Msg("{#666666}*The golem gestures toward the monument*{/}");
-				await dialog.Msg("You have proven yourself... worthy. Approach the monument... and pray.");
+				await dialog.Msg(L("{#666666}*The golem gestures toward the monument*{/}"));
+				await dialog.Msg(L("You have proven yourself... worthy. Approach the monument... and pray."));
 				return;
 			}
 
-			await dialog.Msg("{#666666}*The golem's eyes ignite with blue light as you approach*{/}");
-			await dialog.Msg("Mortal... you disturb... the sacred monument.");
-			await dialog.Msg("{#666666}*It turns its massive stone head toward you*{/}");
-			await dialog.Msg("I have stood... for centuries. Guarding this place... since before the demon war ended.");
+			await dialog.Msg(L("{#666666}*The golem's eyes ignite with blue light as you approach*{/}"));
+			await dialog.Msg(L("Mortal... you disturb... the sacred monument."));
+			await dialog.Msg(L("{#666666}*It turns its massive stone head toward you*{/}"));
+			await dialog.Msg(L("I have stood... for centuries. Guarding this place... since before the demon war ended."));
 
-			var response1 = await dialog.Select("Tell me... did you witness... the great war between goddesses and demons?",
-				Option("Yes, I fought in the demon war", "fought"),
-				Option("No, I came after the war ended", "after"),
-				Option("I don't remember much about it", "forget")
+			var response1 = await dialog.Select(L("Tell me... did you witness... the great war between goddesses and demons?"),
+				Option(L("Yes, I fought in the demon war"), "fought"),
+				Option(L("No, I came after the war ended"), "after"),
+				Option(L("I don't remember much about it"), "forget")
 			);
 
 			switch (response1)
 			{
 				case "fought":
-					await dialog.Msg("{#666666}*The golem's eyes dim slightly*{/}");
-					await dialog.Msg("Deception... I sense no war-weariness in your soul. You lie to impress me.");
-					await dialog.Msg("The monument's blessing... is not for deceivers. Leave.");
+					await dialog.Msg(L("{#666666}*The golem's eyes dim slightly*{/}"));
+					await dialog.Msg(L("Deception... I sense no war-weariness in your soul. You lie to impress me."));
+					await dialog.Msg(L("The monument's blessing... is not for deceivers. Leave."));
 					return;
 
 				case "after":
-					await dialog.Msg("{#666666}*The golem nods slowly*{/}");
-					await dialog.Msg("Truthful... good. The young should not carry... the burdens of old wars.");
-					await dialog.Msg("{#666666}*It gestures toward the massive stone head monument behind it*{/}");
-					await dialog.Msg("This monument... honors the Earth Goddess. Many seek its power... but few deserve it.");
+					await dialog.Msg(L("{#666666}*The golem nods slowly*{/}"));
+					await dialog.Msg(L("Truthful... good. The young should not carry... the burdens of old wars."));
+					await dialog.Msg(L("{#666666}*It gestures toward the massive stone head monument behind it*{/}"));
+					await dialog.Msg(L("This monument... honors the Earth Goddess. Many seek its power... but few deserve it."));
 					break;
 
 				case "forget":
-					await dialog.Msg("{#666666}*The golem studies you carefully*{/}");
-					await dialog.Msg("Uncertain... evasive. You seek to hide something... or simply speak carelessly.");
-					await dialog.Msg("I cannot grant blessings... to those who do not speak clearly. Return when you know your truth.");
+					await dialog.Msg(L("{#666666}*The golem studies you carefully*{/}"));
+					await dialog.Msg(L("Uncertain... evasive. You seek to hide something... or simply speak carelessly."));
+					await dialog.Msg(L("I cannot grant blessings... to those who do not speak clearly. Return when you know your truth."));
 					return;
 			}
 
-			var response2 = await dialog.Select("Why do you seek... the monument's blessing?",
-				Option("To prove I am worthy of such power", "worthy"),
-				Option("Because I need its power for myself", "power"),
-				Option("To help a farmer whose land is corrupted", "help")
+			var response2 = await dialog.Select(L("Why do you seek... the monument's blessing?"),
+				Option(L("To prove I am worthy of such power"), "worthy"),
+				Option(L("Because I need its power for myself"), "power"),
+				Option(L("To help a farmer whose land is corrupted"), "help")
 			);
 
 			switch (response2)
 			{
 				case "worthy":
-					await dialog.Msg("{#666666}*The golem's eyes flicker with disappointment*{/}");
-					await dialog.Msg("Pride... ambition. You seek validation... not healing.");
-					await dialog.Msg("The blessing is not... a trophy for your collection. Leave.");
+					await dialog.Msg(L("{#666666}*The golem's eyes flicker with disappointment*{/}"));
+					await dialog.Msg(L("Pride... ambition. You seek validation... not healing."));
+					await dialog.Msg(L("The blessing is not... a trophy for your collection. Leave."));
 					return;
 
 				case "power":
-					await dialog.Msg("{#666666}*The golem's entire form seems to harden*{/}");
-					await dialog.Msg("Selfishness... greed. Your soul harbors darkness.");
-					await dialog.Msg("The monument's blessing... would be wasted on you. Begone.");
+					await dialog.Msg(L("{#666666}*The golem's entire form seems to harden*{/}"));
+					await dialog.Msg(L("Selfishness... greed. Your soul harbors darkness."));
+					await dialog.Msg(L("The monument's blessing... would be wasted on you. Begone."));
 					return;
 
 				case "help":
-					await dialog.Msg("{#666666}*The golem's eyes glow brighter*{/}");
-					await dialog.Msg("Compassion... selflessness. You seek to heal... not to take.");
-					await dialog.Msg("Morku's suffering... yes... I sense it from here. His land cries out... poisoned by war's remnants.");
+					await dialog.Msg(L("{#666666}*The golem's eyes glow brighter*{/}"));
+					await dialog.Msg(L("Compassion... selflessness. You seek to heal... not to take."));
+					await dialog.Msg(L("Morku's suffering... yes... I sense it from here. His land cries out... poisoned by war's remnants."));
 					break;
 			}
 
-			var response3 = await dialog.Select("One final question... Where do you come from, stranger?",
-				Option("I am just a wandering traveler", "wanderer"),
-				Option("From Orsha, the military stronghold", "orsha"),
-				Option("From Goddess Laima's Maple Leaf Sanctuary", "laima")
+			var response3 = await dialog.Select(L("One final question... Where do you come from, stranger?"),
+				Option(L("I am just a wandering traveler"), "wanderer"),
+				Option(L("From Orsha, the military stronghold"), "orsha"),
+				Option(L("From Goddess Laima's Maple Leaf Sanctuary"), "laima")
 			);
 
 			switch (response3)
 			{
 				case "wanderer":
-					await dialog.Msg("{#666666}*The golem pauses, as if sensing something*{/}");
-					await dialog.Msg("Wanderer... perhaps. But I sense... something more. A divine touch upon your soul.");
-					await dialog.Msg("No matter. Your intentions are pure... that is what matters.");
+					await dialog.Msg(L("{#666666}*The golem pauses, as if sensing something*{/}"));
+					await dialog.Msg(L("Wanderer... perhaps. But I sense... something more. A divine touch upon your soul."));
+					await dialog.Msg(L("No matter. Your intentions are pure... that is what matters."));
 					break;
 
 				case "orsha":
-					await dialog.Msg("{#666666}*The golem considers your words*{/}");
-					await dialog.Msg("Orsha... strong warriors. Good hearts. The land remembers... their sacrifices.");
-					await dialog.Msg("You carry their spirit... that is enough.");
+					await dialog.Msg(L("{#666666}*The golem considers your words*{/}"));
+					await dialog.Msg(L("Orsha... strong warriors. Good hearts. The land remembers... their sacrifices."));
+					await dialog.Msg(L("You carry their spirit... that is enough."));
 					break;
 
 				case "laima":
-					await dialog.Msg("{#666666}*The golem's entire form seems to brighten*{/}");
-					await dialog.Msg("Laima... the merciful goddess. She who creates sanctuary... for the lost and weary.");
-					await dialog.Msg("You are one of her Otherworlders... summoned to help heal this broken world.");
-					await dialog.Msg("Then you are... exactly who should receive... this blessing.");
+					await dialog.Msg(L("{#666666}*The golem's entire form seems to brighten*{/}"));
+					await dialog.Msg(L("Laima... the merciful goddess. She who creates sanctuary... for the lost and weary."));
+					await dialog.Msg(L("You are one of her Otherworlders... summoned to help heal this broken world."));
+					await dialog.Msg(L("Then you are... exactly who should receive... this blessing."));
 					break;
 			}
 
-			await dialog.Msg("{#666666}*The golem places a massive hand on the stone head monument*{/}");
-			await dialog.Msg("You have proven yourself... worthy. Your heart is pure... your intentions noble.");
-			await dialog.Msg("The Earth Goddess... hears the pleas of those who suffer. And she answers... through those like you.");
-			await dialog.Msg("{#666666}*The golem steps aside, revealing the glowing monument*{/}");
-			await dialog.Msg("Approach the monument... and offer your prayer. The goddess... will answer.");
+			await dialog.Msg(L("{#666666}*The golem places a massive hand on the stone head monument*{/}"));
+			await dialog.Msg(L("You have proven yourself... worthy. Your heart is pure... your intentions noble."));
+			await dialog.Msg(L("The Earth Goddess... hears the pleas of those who suffer. And she answers... through those like you."));
+			await dialog.Msg(L("{#666666}*The golem steps aside, revealing the glowing monument*{/}"));
+			await dialog.Msg(L("Approach the monument... and offer your prayer. The goddess... will answer."));
 
 			character.Variables.Perm.Set("Laima.Quests.f_siauliai_15_re.Quest1006.RiddleSolved", true);
-			character.ServerMessage("{#FFD700}The golem has granted you permission. Approach the monument and pray.{/}");
+			character.ServerMessage(L("{#FFD700}The golem has granted you permission. Approach the monument and pray.{/}"));
 		});
 
 		// =====================================================================
@@ -660,20 +660,20 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Sacred Monument - Only accessible after solving the golem's riddle
 		//-------------------------------------------------------------------------
-		AddNpc(12080, "Sacred Monument", "f_siauliai_15_re", -2828, 917, 135, async dialog =>
+		AddNpc(12080, L("Sacred Monument"), "f_siauliai_15_re", -2828, 917, 135, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_siauliai_15_re", 1006);
 
 			if (!character.Quests.IsActive(questId))
 			{
-				await dialog.Msg("{#666666}*An enormous stone head carved with ancient runes. Its eyes seem to watch you*{/}");
+				await dialog.Msg(L("{#666666}*An enormous stone head carved with ancient runes. Its eyes seem to watch you*{/}"));
 				return;
 			}
 
 			if (character.Inventory.HasItem(650713))
 			{
-				await dialog.Msg("{#666666}*The monument's blessing has already been granted*{/}");
+				await dialog.Msg(L("{#666666}*The monument's blessing has already been granted*{/}"));
 				return;
 			}
 
@@ -681,26 +681,26 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 			if (!riddleSolved)
 			{
-				await dialog.Msg("{#666666}*The monument is protected by the stone golem. You must prove yourself worthy first*{/}");
+				await dialog.Msg(L("{#666666}*The monument is protected by the stone golem. You must prove yourself worthy first*{/}"));
 				return;
 			}
 
-			var result = await character.TimeActions.StartAsync("Praying before the monument...", "Cancel", "PRAY", TimeSpan.FromSeconds(5));
+			var result = await character.TimeActions.StartAsync(L("Praying before the monument..."), "Cancel", "PRAY", TimeSpan.FromSeconds(5));
 
 			if (result == TimeActionResult.Completed)
 			{
-				await dialog.Msg("{#666666}*The runes on the monument begin to glow brilliantly*{/}");
-				await dialog.Msg("{#666666}*Divine energy flows from the monument, forming a crystalline essence*{/}");
-				await dialog.Msg("{#666666}*The purified essence floats gently into your hands*{/}");
-				await dialog.Msg("{#666666}*You feel the Earth Goddess's blessing upon you*{/}");
+				await dialog.Msg(L("{#666666}*The runes on the monument begin to glow brilliantly*{/}"));
+				await dialog.Msg(L("{#666666}*Divine energy flows from the monument, forming a crystalline essence*{/}"));
+				await dialog.Msg(L("{#666666}*The purified essence floats gently into your hands*{/}"));
+				await dialog.Msg(L("{#666666}*You feel the Earth Goddess's blessing upon you*{/}"));
 
 				character.Inventory.Add(650713, 1, InventoryAddType.PickUp);
 				character.Quests.CompleteObjective(questId, "seekBlessing");
-				character.ServerMessage("{#FFD700}Received Purified Essence! Return to Morku.{/}");
+				character.ServerMessage(L("{#FFD700}Received Purified Essence! Return to Morku.{/}"));
 			}
 			else
 			{
-				await dialog.Msg("{#666666}*Your prayer was interrupted. The monument waits patiently*{/}");
+				await dialog.Msg(L("{#666666}*Your prayer was interrupted. The monument waits patiently*{/}"));
 			}
 		});
 
@@ -716,7 +716,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		void AddPurifyingStatue(int statueNumber, int x, int y, int direction, string inactiveMsg1, string inactiveMsg2, string activationMsg1, string activationMsg2)
 		{
-			AddNpc(150226, "Purifying Statue", "f_siauliai_15_re", x, y, direction, async dialog =>
+			AddNpc(150226, L("Purifying Statue"), "f_siauliai_15_re", x, y, direction, async dialog =>
 			{
 				var character = dialog.Player;
 
@@ -726,8 +726,8 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (prayed)
 				{
-					await dialog.Msg("{#666666}*The statue glows with holy light, warding off evil creatures*{/}");
-					await dialog.Msg("Your prayer has already awakened this guardian. The road here is safe.");
+					await dialog.Msg(L("{#666666}*The statue glows with holy light, warding off evil creatures*{/}"));
+					await dialog.Msg(L("Your prayer has already awakened this guardian. The road here is safe."));
 					return;
 				}
 
@@ -739,7 +739,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync("Praying...", "Cancel", "PRAY", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Praying..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
 
 				if (result == TimeActionResult.Completed)
 				{
@@ -754,16 +754,16 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 					Send.ZC_NORMAL.PlayEffect(character.Connection, dialog.Npc, animationName: "F_light076_spread_in_blue_loop");
 
 					var newTotal = statuesPrayed + 1;
-					character.ServerMessage($"Purifying statues awakened: {newTotal}/5");
+					character.ServerMessage(LF("Purifying statues awakened: {0}/5", newTotal));
 
 					if (newTotal >= 5)
 					{
-						character.ServerMessage("{#FFD700}All statues awakened! The forest roads are protected. Return to Miriam in Orsha.{/}");
+						character.ServerMessage(L("{#FFD700}All statues awakened! The forest roads are protected. Return to Miriam in Orsha.{/}"));
 					}
 				}
 				else
 				{
-					character.ServerMessage("Your prayer was interrupted. The statue remains dormant.");
+					character.ServerMessage(L("Your prayer was interrupted. The statue remains dormant."));
 				}
 			});
 		}
@@ -771,42 +771,42 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 		// Purifying Statue 1 - Northern Path
 		//-------------------------------------------------------------------------
 		AddPurifyingStatue(1, -1374, 174, 45,
-			"{#666666}*An ancient wooden statue carved in the shape of an Owl. Its holy power lies dormant*{/}",
-			"The statue once protected travelers on this road, but its blessing has faded.",
-			"{#666666}*Holy light bursts from the statue! The Guardian's blessing awakens!*{/}",
-			"The statue comes alive with divine energy. Monsters nearby flee from its radiance.");
+			L("{#666666}*An ancient wooden statue carved in the shape of an Owl. Its holy power lies dormant*{/}"),
+			L("The statue once protected travelers on this road, but its blessing has faded."),
+			L("{#666666}*Holy light bursts from the statue! The Guardian's blessing awakens!*{/}"),
+			L("The statue comes alive with divine energy. Monsters nearby flee from its radiance."));
 
 		// Purifying Statue 2 - Eastern Path
 		//-------------------------------------------------------------------------
 		AddPurifyingStatue(2, 1347, 900, 45,
-			"{#666666}*A weathered wooden guardian stands watch over the eastern road*{/}",
-			"The statue's divine protection has long since faded. Monsters roam freely here.",
-			"{#666666}*The Guardian's power flows through the statue! Light banishes the shadows!*{/}",
-			"The guardian awakens. This path is under divine protection once more.");
+			L("{#666666}*A weathered wooden guardian stands watch over the eastern road*{/}"),
+			L("The statue's divine protection has long since faded. Monsters roam freely here."),
+			L("{#666666}*The Guardian's power flows through the statue! Light banishes the shadows!*{/}"),
+			L("The guardian awakens. This path is under divine protection once more."));
 
 		// Purifying Statue 3 - Southern Path
 		//-------------------------------------------------------------------------
 		AddPurifyingStatue(3, 2743, 24, 45,
-			"{#666666}*The southern guardian stands silent and dark, its blessing dormant*{/}",
-			"Without the statue's protection, this road has become treacherous.",
-			"{#666666}*Sacred light erupts from the statue! The guardian's blessing returns!*{/}",
-			"The southern road is safe once more. The goddess hears your prayers.");
+			L("{#666666}*The southern guardian stands silent and dark, its blessing dormant*{/}"),
+			L("Without the statue's protection, this road has become treacherous."),
+			L("{#666666}*Sacred light erupts from the statue! The guardian's blessing returns!*{/}"),
+			L("The southern road is safe once more. The goddess hears your prayers."));
 
 		// Purifying Statue 4 - Western Path
 		//-------------------------------------------------------------------------
 		AddPurifyingStatue(4, -187, -1427, 45,
-			"{#666666}*An ancient guardian carved from blessed wood stands watch over the western approach*{/}",
-			"Its holy power has faded. Travelers on this road are no longer safe.",
-			"{#666666}*Divine power surges through the statue! The guardian awakens with radiant light!*{/}",
-			"The western road is blessed once more. Your prayers have been answered.");
+			L("{#666666}*An ancient guardian carved from blessed wood stands watch over the western approach*{/}"),
+			L("Its holy power has faded. Travelers on this road are no longer safe."),
+			L("{#666666}*Divine power surges through the statue! The guardian awakens with radiant light!*{/}"),
+			L("The western road is blessed once more. Your prayers have been answered."));
 
 		// Purifying Statue 5 - Central Crossroads
 		//-------------------------------------------------------------------------
 		AddPurifyingStatue(5, 360, -37, 45,
-			"{#666666}*The greatest of the five guardians stands at the forest crossroads. Once, this statue's blessing protected the entire forest network of roads*{/}",
-			"But now it stands dark and silent. Without its power, no road is truly safe.",
-			"{#666666}*Brilliant holy light explodes from the statue! The Guardian's full blessing returns!*{/}",
-			"The forest roads are completely safe now. Your devotion has restored what was lost.");
+			L("{#666666}*The greatest of the five guardians stands at the forest crossroads. Once, this statue's blessing protected the entire forest network of roads*{/}"),
+			L("But now it stands dark and silent. Without its power, no road is truly safe."),
+			L("{#666666}*Brilliant holy light explodes from the statue! The Guardian's full blessing returns!*{/}"),
+			L("The forest roads are completely safe now. Your devotion has restored what was lost."));
 
 		// =====================================================================
 		// RUBBLE INSPECTION POINTS
@@ -829,11 +829,11 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (isChecked)
 				{
-					await dialog.Msg("{#666666}*You've already inspected this rubble pile*{/}");
+					await dialog.Msg(L("{#666666}*You've already inspected this rubble pile*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync("Inspecting rubble...", "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Inspecting rubble..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
 
 				if (result == TimeActionResult.Completed)
 				{
@@ -841,16 +841,16 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 					var bridgesChecked = character.Variables.Perm.GetInt("Laima.Quests.f_siauliai_15_re.Quest1004.BridgesChecked", 0);
 					character.Variables.Perm.Set("Laima.Quests.f_siauliai_15_re.Quest1004.BridgesChecked", bridgesChecked + 1);
 
-					character.ServerMessage($"Rubble piles inspected: {bridgesChecked + 1}/6");
+					character.ServerMessage(LF("Rubble piles inspected: {0}/6", bridgesChecked + 1));
 
 					if (bridgesChecked + 1 >= 6)
 					{
-						character.ServerMessage("{#FFD700}All rubble piles inspected! Return to Soldier Henrik.{/}");
+						character.ServerMessage(L("{#FFD700}All rubble piles inspected! Return to Soldier Henrik.{/}"));
 					}
 				}
 				else
 				{
-					character.ServerMessage("Inspection cancelled.");
+					character.ServerMessage(L("Inspection cancelled."));
 				}
 			});
 		}
@@ -881,14 +881,14 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 		void AddFlowerCollectionSpot(int spotNumber, int x, int y)
 		{
-			AddNpc(153067, "Bee-Attracting Flowers", "f_siauliai_15_re", x, y, 0, async dialog =>
+			AddNpc(153067, L("Bee-Attracting Flowers"), "f_siauliai_15_re", x, y, 0, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_siauliai_15_re", 1005);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg("A beautiful patch of colorful wildflowers. Bees would love these.");
+					await dialog.Msg(L("A beautiful patch of colorful wildflowers. Bees would love these."));
 					return;
 				}
 
@@ -897,11 +897,11 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (collected)
 				{
-					await dialog.Msg("You've already gathered flowers from this patch.");
+					await dialog.Msg(L("You've already gathered flowers from this patch."));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync("Gathering flowers...", "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Gathering flowers..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
 
 				if (result == TimeActionResult.Completed)
 				{
@@ -909,16 +909,16 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 					character.Variables.Perm.Set(variableKey, true);
 
 					var currentCount = character.Inventory.CountItem(650428);
-					character.ServerMessage($"Bee-attracting flowers collected: {currentCount}/5");
+					character.ServerMessage(LF("Bee-attracting flowers collected: {0}/5", currentCount));
 
 					if (currentCount >= 5)
 					{
-						character.ServerMessage("All flowers collected! Return to Beekeeper Greta.");
+						character.ServerMessage(L("All flowers collected! Return to Beekeeper Greta."));
 					}
 				}
 				else
 				{
-					character.ServerMessage("Collection cancelled.");
+					character.ServerMessage(L("Collection cancelled."));
 				}
 			});
 		}
@@ -969,21 +969,21 @@ public class CleansingCorruptedAirQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_siauliai_15_re", 1001);
-		SetName("Cleansing the Corrupted Air");
-		SetDescription("Cull the infected creatures spreading poison throughout the woods to help Scout Milda contain the contamination.");
+		SetName(L("Cleansing the Corrupted Air"));
+		SetDescription(L("Cull the infected creatures spreading poison throughout the woods to help Scout Milda contain the contamination."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Scout] Milda", "f_siauliai_15_re");
+		AddQuestGiver(L("[Scout] Milda"), "f_siauliai_15_re");
 
-		AddObjective("killJukopus", "Hunt corrupted Jukopus",
+		AddObjective("killJukopus", L("Hunt corrupted Jukopus"),
 			new KillObjective(15, new[] { MonsterId.Sec_Jukopus }));
-		AddObjective("killKepas", "Hunt poisoned Kepas",
+		AddObjective("killKepas", L("Hunt poisoned Kepas"),
 			new KillObjective(5, new[] { MonsterId.Onion_Green }));
-		AddObjective("killPokubu", "Hunt infected Pokubu",
+		AddObjective("killPokubu", L("Hunt infected Pokubu"),
 			new KillObjective(5, new[] { MonsterId.Sec_Pokubu }));
 
 		AddReward(new ExpReward(500, 350));
@@ -1002,20 +1002,20 @@ public class LostCaravanQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_siauliai_15_re", 1002);
-		SetName("The Lost Caravan");
-		SetDescription("Recover loose packages from the poisoned Kepas.");
+		SetName(L("The Lost Caravan"));
+		SetDescription(L("Recover loose packages from the poisoned Kepas."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Merchant] Alfred", "f_siauliai_15_re");
+		AddQuestGiver(L("[Merchant] Alfred"), "f_siauliai_15_re");
 
 		// Drop loose packages from Onion_Green (poisoned kepas)
 		AddDrop(650399, 0.30f, MonsterId.Onion_Green);
 
-		AddObjective("collectGoods", "Recover Loose Packages",
+		AddObjective("collectGoods", L("Recover Loose Packages"),
 			new CollectItemObjective(650399, 8));
 
 		AddReward(new ExpReward(400, 300));
@@ -1045,19 +1045,19 @@ public class HermitDiscoveryQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_siauliai_15_re", 1003);
-		SetName("The Hermit's Discovery");
-		SetDescription("Hunt corrupted boars to slow the spread of corruption in the forest.");
+		SetName(L("The Hermit's Discovery"));
+		SetDescription(L("Hunt corrupted boars to slow the spread of corruption in the forest."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Hermit] Torsten", "f_siauliai_15_re");
+		AddQuestGiver(L("[Hermit] Torsten"), "f_siauliai_15_re");
 
-		AddObjective("killPokubu", "Hunt corrupted Pokubu",
+		AddObjective("killPokubu", L("Hunt corrupted Pokubu"),
 			new KillObjective(15, new[] { MonsterId.Sec_Pokubu }));
-		AddObjective("killArburn", "Hunt Pokuborn",
+		AddObjective("killArburn", L("Hunt Pokuborn"),
 			new KillObjective(8, new[] { MonsterId.Sec_Arburn_Pokubu }));
 
 		AddReward(new ExpReward(600, 400));
@@ -1076,17 +1076,17 @@ public class TalesOfBridgesQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_siauliai_15_re", 1004);
-		SetName("Reconstructing the Bridges");
-		SetDescription("Inspect rubble piles coming off the deteriorating bridges to help assess the damage for reconstruction efforts.");
+		SetName(L("Reconstructing the Bridges"));
+		SetDescription(L("Inspect rubble piles coming off the deteriorating bridges to help assess the damage for reconstruction efforts."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Soldier] Henrik", "f_siauliai_15_re");
+		AddQuestGiver(L("[Soldier] Henrik"), "f_siauliai_15_re");
 
-		AddObjective("checkBridges", "Inspect the rubble piles",
+		AddObjective("checkBridges", L("Inspect the rubble piles"),
 			new VariableCheckObjective("Laima.Quests.f_siauliai_15_re.Quest1004.BridgesChecked", 6, true));
 
 		AddReward(new ExpReward(600, 400));
@@ -1125,17 +1125,17 @@ public class BeekeeperHopeQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_siauliai_15_re", 1005);
-		SetName("The Beekeeper's Hope");
-		SetDescription("Gather bee-attracting flowers from around the forest to help Beekeeper Greta lure wild bees back to her farm.");
+		SetName(L("The Beekeeper's Hope"));
+		SetDescription(L("Gather bee-attracting flowers from around the forest to help Beekeeper Greta lure wild bees back to her farm."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Beekeeper] Greta", "f_siauliai_15_re");
+		AddQuestGiver(L("[Beekeeper] Greta"), "f_siauliai_15_re");
 
-		AddObjective("collectFlowers", "Collect bee-attracting flowers",
+		AddObjective("collectFlowers", L("Collect bee-attracting flowers"),
 			new CollectItemObjective(650428, 5));
 
 		// Rewards - Peaceful quest with good rewards
@@ -1182,17 +1182,17 @@ public class SeedsOfHopeQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_siauliai_15_re", 1006);
-		SetName("Seeds of Hope");
-		SetDescription("Seek out the ancient stone golem guardian and request its blessing to purify Morku's corrupted farmland.");
+		SetName(L("Seeds of Hope"));
+		SetDescription(L("Seek out the ancient stone golem guardian and request its blessing to purify Morku's corrupted farmland."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Farmer] Morku", "f_siauliai_15_re");
+		AddQuestGiver(L("[Farmer] Morku"), "f_siauliai_15_re");
 
-		AddObjective("seekBlessing", "Seek the Stone Golem's blessing",
+		AddObjective("seekBlessing", L("Seek the Stone Golem's blessing"),
 			new ManualObjective());
 
 		AddReward(new ExpReward(800, 600));

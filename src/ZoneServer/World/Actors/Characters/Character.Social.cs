@@ -79,7 +79,7 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Shows the "Click here to join main char" on character login.
+		/// Tracks main chat login session.
 		/// </summary>
 		public async Task ShowMainChatOnLogin()
 		{
@@ -87,13 +87,6 @@ namespace Melia.Zone.World.Actors.Characters
 
 			if (this.Connection == null)
 				return;
-
-			var oldKey = this.Variables.Perm.GetString("Melia.Main.Welcome");
-
-			if (string.IsNullOrEmpty(oldKey) || oldKey != this.Connection?.SessionKey)
-			{
-				this.ServerMessage("Click here to join the main chat: {a SLC 0@@@557516819791873}{#0000FF}{img link_whisper 24 24}Main{/}{/}{/}");
-			}
 
 			this.Variables.Perm.SetString("Melia.Main.Welcome", this.Connection?.SessionKey);
 		}
