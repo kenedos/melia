@@ -70,7 +70,7 @@ public class LotusLeafQuestScript : QuestScript
 				}
 				else
 				{
-					await dialog.Msg("Umm sorry you seem to be missing a few items. I need 50 Leaf Bug Shells and 30 Hanaming Petals.");
+					await dialog.Msg(L("Umm sorry you seem to be missing a few items. I need 50 Leaf Bug Shells and 30 Hanaming Petals."));
 				}
 			}
 			else

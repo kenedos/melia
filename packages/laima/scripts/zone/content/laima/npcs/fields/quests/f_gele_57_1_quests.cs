@@ -24,7 +24,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		void AddWildflowerSpot(int flowerNumber, int x, int z, int direction)
 		{
-			AddNpc(160049, "Gorge Wildflower", "f_gele_57_1", x, z, direction, async dialog =>
+			AddNpc(160049, L("Gorge Wildflower"), "f_gele_57_1", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_gele_57_1", 1002);
@@ -32,13 +32,13 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg("{#666666}*A beautiful wildflower with vibrant petals swaying in the breeze*{/}");
+					await dialog.Msg(L("{#666666}*A beautiful wildflower with vibrant petals swaying in the breeze*{/}"));
 					return;
 				}
 
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg("{#666666}*You've already collected stamens from this flower*{/}");
+					await dialog.Msg(L("{#666666}*You've already collected stamens from this flower*{/}"));
 					return;
 				}
 
@@ -51,7 +51,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 					if (SpawnTempMonsters(character, MonsterId.Grummer, 2, 70, TimeSpan.FromMinutes(1)))
 					{
-						character.ServerMessage("{#FF6666}Territorial Grummer emerge from the flowers!{/}");
+						character.ServerMessage(L("{#FF6666}Territorial Grummer emerge from the flowers!{/}"));
 					}
 				}
 
@@ -59,74 +59,74 @@ public class FGele571QuestNpcsScript : GeneralScript
 				var luredCount = LureNearbyEnemies(character, new[] { MonsterId.Grummer }, 150, 150);
 				if (luredCount > 0)
 				{
-					character.ServerMessage("{#FF6666}Nearby Grummer notice you disturbing the flowers!{/}");
+					character.ServerMessage(L("{#FF6666}Nearby Grummer notice you disturbing the flowers!{/}"));
 				}
 
 				var result = await character.TimeActions.StartAsync(
-					"Collecting flower stamens...", "Cancel", "SITGROPE", TimeSpan.FromSeconds(3)
+					L("Collecting flower stamens..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
 				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Inventory.Add(650696, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage("Found: Wildflower Stamen");
+					character.ServerMessage(L("Found: Wildflower Stamen"));
 
 					var currentCount = character.Inventory.CountItem(650696);
-					character.ServerMessage($"Wildflower Stamens collected: {currentCount}/6");
+					character.ServerMessage(LF("Wildflower Stamens collected: {0}/6", currentCount));
 
 					if (currentCount >= 6)
 					{
-						character.ServerMessage("{#FFD700}All stamens collected! Return to the botanist.{/}");
+						character.ServerMessage(L("{#FFD700}All stamens collected! Return to the botanist.{/}"));
 					}
 				}
 				else
 				{
-					character.ServerMessage("Collection cancelled.");
+					character.ServerMessage(L("Collection cancelled."));
 				}
 			});
 		}
 
 		// Quest NPC 1: Local Settler (Panto Population Control)
 		//-------------------------------------------------------------------------
-		AddNpc(20117, "[Local Settler] Torin", "f_gele_57_1", -1394, 603, 180, async dialog =>
+		AddNpc(20117, L("[Local Settler] Torin"), "f_gele_57_1", -1394, 603, 180, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_1", 1001);
 
-			dialog.SetTitle("Torin");
+			dialog.SetTitle(L("Torin"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("Welcome to Mieguista slope, traveler. Beautiful view, isn't it?");
-				await dialog.Msg("{#666666}*He gestures toward the valley below, then his expression darkens*{/}");
-				await dialog.Msg("It would be perfect... if not for the Panto problem. They're breeding out of control!");
+				await dialog.Msg(L("Welcome to Mieguista slope, traveler. Beautiful view, isn't it?"));
+				await dialog.Msg(L("{#666666}*He gestures toward the valley below, then his expression darkens*{/}"));
+				await dialog.Msg(L("It would be perfect... if not for the Panto problem. They're breeding out of control!"));
 
-				var response = await dialog.Select("The slope used to be peaceful, but now they're everywhere!",
-					Option("I'll thin their numbers", "help"),
-					Option("What's the problem with Panto?", "info"),
-					Option("Good luck with that", "leave")
+				var response = await dialog.Select(L("The slope used to be peaceful, but now they're everywhere!"),
+					Option(L("I'll thin their numbers"), "help"),
+					Option(L("What's the problem with Panto?"), "info"),
+					Option(L("Good luck with that"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo("Would you really help? We need someone to clear out the Panto before they overrun the entire gorge!"))
+						if (await dialog.YesNo(L("Would you really help? We need someone to clear out the Panto before they overrun the entire gorge!")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Thank you! Hunt down 25 of them here on the slope. That should give us breathing room.");
-							await dialog.Msg("Be careful - there are a LOT of them around here. They're everywhere you look.");
+							await dialog.Msg(L("Thank you! Hunt down 25 of them here on the slope. That should give us breathing room."));
+							await dialog.Msg(L("Be careful - there are a LOT of them around here. They're everywhere you look."));
 						}
 						break;
 
 					case "info":
-						await dialog.Msg("Panto are normally harmless in small numbers, but they breed incredibly fast.");
-						await dialog.Msg("A few months ago there were maybe a dozen on this slope. Now there are hundreds!");
-						await dialog.Msg("If we don't control their population now, they'll spread to the entire valley.");
+						await dialog.Msg(L("Panto are normally harmless in small numbers, but they breed incredibly fast."));
+						await dialog.Msg(L("A few months ago there were maybe a dozen on this slope. Now there are hundreds!"));
+						await dialog.Msg(L("If we don't control their population now, they'll spread to the entire valley."));
 						break;
 
 					case "leave":
-						await dialog.Msg("Can't blame you. It's not your problem... yet.");
+						await dialog.Msg(L("Can't blame you. It's not your problem... yet."));
 						break;
 				}
 			}
@@ -137,64 +137,64 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 				if (pantoObj.Done)
 				{
-					await dialog.Msg("You've cleared out a good number of them! I can already see the difference!");
-					await dialog.Msg("The slope feels safer now. Here - take this as thanks for your help.");
+					await dialog.Msg(L("You've cleared out a good number of them! I can already see the difference!"));
+					await dialog.Msg(L("The slope feels safer now. Here - take this as thanks for your help."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg($"Keep hunting! The Panto are all around the slope - you won't have to look far.");
+					await dialog.Msg(L("Keep hunting! The Panto are all around the slope - you won't have to look far."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("Thanks to you, we can actually enjoy the view again without Panto underfoot.");
-				await dialog.Msg("They'll breed back up eventually, but at least we have some peace for now.");
+				await dialog.Msg(L("Thanks to you, we can actually enjoy the view again without Panto underfoot."));
+				await dialog.Msg(L("They'll breed back up eventually, but at least we have some peace for now."));
 			}
 		});
 
 		// Quest NPC 2: Traveling Botanist (Honey for the Hives)
 		//-------------------------------------------------------------------------
-		AddNpc(20168, "[Traveling Botanist] Elara", "f_gele_57_1", -449, -1265, 89, async dialog =>
+		AddNpc(20168, L("[Traveling Botanist] Elara"), "f_gele_57_1", -449, -1265, 89, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_1", 1002);
 
-			dialog.SetTitle("Elara");
+			dialog.SetTitle(L("Elara"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*A woman in travel-worn robes examines the wildflowers with keen interest*{/}");
-				await dialog.Msg("These flowers... they're exactly what I need for my medicinal research!");
+				await dialog.Msg(L("{#666666}*A woman in travel-worn robes examines the wildflowers with keen interest*{/}"));
+				await dialog.Msg(L("These flowers... they're exactly what I need for my medicinal research!"));
 
-				var response = await dialog.Select("The stamens contain compounds that can treat fever and inflammation.",
-					Option("Can I help with your research?", "help"),
-					Option("What kind of medicine?", "info"),
-					Option("Good luck with that", "leave")
+				var response = await dialog.Select(L("The stamens contain compounds that can treat fever and inflammation."),
+					Option(L("Can I help with your research?"), "help"),
+					Option(L("What kind of medicine?"), "info"),
+					Option(L("Good luck with that"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("You would help? That's wonderful!");
+						await dialog.Msg(L("You would help? That's wonderful!"));
 
-						if (await dialog.YesNo("I need wildflower stamens from 6 different flowers in this area. But be careful - Grummer and Zignuts patrol these fields!"))
+						if (await dialog.YesNo(L("I need wildflower stamens from 6 different flowers in this area. But be careful - Grummer and Zignuts patrol these fields!")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("The flowers are scattered throughout the southern meadow. Look for bright petals!");
-							await dialog.Msg("The creatures here are territorial. They might attack if you disturb the flowers. Stay alert!");
+							await dialog.Msg(L("The flowers are scattered throughout the southern meadow. Look for bright petals!"));
+							await dialog.Msg(L("The creatures here are territorial. They might attack if you disturb the flowers. Stay alert!"));
 						}
 						break;
 
 					case "info":
-						await dialog.Msg("I'm researching natural remedies for post-war ailments. Many survivors suffer from lingering fevers.");
-						await dialog.Msg("These Srautas wildflowers contain compounds that reduce inflammation and fight infection.");
-						await dialog.Msg("If I can perfect the formula, we could help countless people recover faster.");
+						await dialog.Msg(L("I'm researching natural remedies for post-war ailments. Many survivors suffer from lingering fevers."));
+						await dialog.Msg(L("These Srautas wildflowers contain compounds that reduce inflammation and fight infection."));
+						await dialog.Msg(L("If I can perfect the formula, we could help countless people recover faster."));
 						break;
 
 					case "leave":
-						await dialog.Msg("I understand. It is dangerous work gathering ingredients here.");
+						await dialog.Msg(L("I understand. It is dangerous work gathering ingredients here."));
 						break;
 				}
 			}
@@ -204,24 +204,24 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 				if (stamenCount >= 6)
 				{
-					await dialog.Msg("{#666666}*Her eyes light up as she sees the stamens*{/}");
-					await dialog.Msg("Perfect! These are exactly what I need! The pollen is still fresh!");
-					await dialog.Msg("With these, I can create enough medicine to treat an entire village.");
-					await dialog.Msg("Here - take this glove. Drake leather is perfect for handling delicate flowers while staying protected.");
+					await dialog.Msg(L("{#666666}*Her eyes light up as she sees the stamens*{/}"));
+					await dialog.Msg(L("Perfect! These are exactly what I need! The pollen is still fresh!"));
+					await dialog.Msg(L("With these, I can create enough medicine to treat an entire village."));
+					await dialog.Msg(L("Here - take this glove. Drake leather is perfect for handling delicate flowers while staying protected."));
 
 					character.Inventory.Remove(650696, 6, InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg($"You have {stamenCount} stamens so far. I need 6 total from different flowers in the meadow.");
-					await dialog.Msg("Watch for the Grummer and Zignuts - they don't like visitors disturbing their territory.");
+					await dialog.Msg(LF("You have {0} stamens so far. I need 6 total from different flowers in the meadow.", stamenCount));
+					await dialog.Msg(L("Watch for the Grummer and Zignuts - they don't like visitors disturbing their territory."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("The medicine is working beautifully! Fever cases are dropping in the villages I visit.");
-				await dialog.Msg("Thank you again for braving the flower fields. Your help saved lives.");
+				await dialog.Msg(L("The medicine is working beautifully! Fever cases are dropping in the villages I visit."));
+				await dialog.Msg(L("Thank you again for braving the flower fields. Your help saved lives."));
 			}
 		});
 
@@ -237,45 +237,45 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 		// Quest NPC 3: Traveling Merchant (Merchant's Panto Problem)
 		//-------------------------------------------------------------------------
-		AddNpc(20165, "[Traveling Merchant] Gareth", "f_gele_57_1", 578, 465, 270, async dialog =>
+		AddNpc(20165, L("[Traveling Merchant] Gareth"), "f_gele_57_1", 578, 465, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_1", 1003);
 
-			dialog.SetTitle("Gareth");
+			dialog.SetTitle(L("Gareth"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("Ah, a fellow traveler! Tell me - have you noticed the Panto in this meadow?");
-				await dialog.Msg("Their claws are prized by craftsmen! Sharp, durable, and perfect for making tools and weapons.");
+				await dialog.Msg(L("Ah, a fellow traveler! Tell me - have you noticed the Panto in this meadow?"));
+				await dialog.Msg(L("Their claws are prized by craftsmen! Sharp, durable, and perfect for making tools and weapons."));
 
-				var response = await dialog.Select("I'm buying Panto Horns at good prices. Interested?",
-					Option("I'll hunt Panto for you", "help"),
-					Option("What makes their claws valuable?", "info"),
-					Option("Not interested", "leave")
+				var response = await dialog.Select(L("I'm buying Panto Horns at good prices. Interested?"),
+					Option(L("I'll hunt Panto for you"), "help"),
+					Option(L("What makes their claws valuable?"), "info"),
+					Option(L("Not interested"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("Excellent! A hunter with initiative!");
+						await dialog.Msg(L("Excellent! A hunter with initiative!"));
 
-						if (await dialog.YesNo("Bring me 15 Panto Horns and I'll pay you handsomely. I'll even throw in a special crafting recipe!"))
+						if (await dialog.YesNo(L("Bring me 15 Panto Horns and I'll pay you handsomely. I'll even throw in a special crafting recipe!")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Hunt the Panto right here in the meadow. They're everywhere!");
-							await dialog.Msg("Fair warning - the claws don't come off easily. You'll need to hunt quite a few to get 15 good ones.");
+							await dialog.Msg(L("Hunt the Panto right here in the meadow. They're everywhere!"));
+							await dialog.Msg(L("Fair warning - the claws don't come off easily. You'll need to hunt quite a few to get 15 good ones."));
 						}
 						break;
 
 					case "info":
-						await dialog.Msg("Panto Horns are naturally sharp and retain their edge far longer than steel blades.");
-						await dialog.Msg("Craftsmen use them for precision tools - surgical instruments, engraving tools, even weapon edges.");
-						await dialog.Msg("A single quality claw can be worth its weight in silver to the right buyer.");
+						await dialog.Msg(L("Panto Horns are naturally sharp and retain their edge far longer than steel blades."));
+						await dialog.Msg(L("Craftsmen use them for precision tools - surgical instruments, engraving tools, even weapon edges."));
+						await dialog.Msg(L("A single quality claw can be worth its weight in silver to the right buyer."));
 						break;
 
 					case "leave":
-						await dialog.Msg("Your loss! These claws practically sell themselves in the cities.");
+						await dialog.Msg(L("Your loss! These claws practically sell themselves in the cities."));
 						break;
 				}
 			}
@@ -285,110 +285,110 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 				if (clawCount >= 15)
 				{
-					await dialog.Msg("{#666666}*He examines the claws carefully, nodding with approval*{/}");
-					await dialog.Msg("Perfect quality! These will fetch a fine price in Klaipeda!");
-					await dialog.Msg("You're a skilled hunter. Here's your payment - plus this recipe for a Panto Sword.");
-					await dialog.Msg("It's an old design using Panto parts. Fitting reward for a Panto hunter, wouldn't you say?");
+					await dialog.Msg(L("{#666666}*He examines the claws carefully, nodding with approval*{/}"));
+					await dialog.Msg(L("Perfect quality! These will fetch a fine price in Klaipeda!"));
+					await dialog.Msg(L("You're a skilled hunter. Here's your payment - plus this recipe for a Panto Sword."));
+					await dialog.Msg(L("It's an old design using Panto parts. Fitting reward for a Panto hunter, wouldn't you say?"));
 
 					character.Inventory.Remove(645134, 15, InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg($"You have {clawCount} claws so far. Keep hunting - I need 15 quality claws.");
-					await dialog.Msg("The meadow is full of Panto. You won't have to search far.");
+					await dialog.Msg(LF("You have {0} claws so far. Keep hunting - I need 15 quality claws.", clawCount));
+					await dialog.Msg(L("The meadow is full of Panto. You won't have to search far."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("Those claws you brought sold out in two days! Craftsmen were fighting over them!");
-				await dialog.Msg("If you find more quality claws, I'll buy them. A hunter like you is always welcome.");
+				await dialog.Msg(L("Those claws you brought sold out in two days! Craftsmen were fighting over them!"));
+				await dialog.Msg(L("If you find more quality claws, I'll buy them. A hunter like you is always welcome."));
 			}
 		});
 
 		// Quest NPC 4: Supply Caravan Organizer (Gorge Delivery Service)
 		//-------------------------------------------------------------------------
-		AddNpc(20103, "[Caravan Organizer] Roland", "f_gele_57_1", 504, 1099, 0, async dialog =>
+		AddNpc(20103, L("[Caravan Organizer] Roland"), "f_gele_57_1", 504, 1099, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_1", 1004);
 
-			dialog.SetTitle("Roland");
+			dialog.SetTitle(L("Roland"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("Our supply caravans can't reach Gele Plateau anymore. The path is too dangerous for wagons.");
-				await dialog.Msg("{#666666}*He gestures toward the plateau rising above the gorge*{/}");
-				await dialog.Msg("The outpost up there is running low on provisions. They need help urgently.");
+				await dialog.Msg(L("Our supply caravans can't reach Gele Plateau anymore. The path is too dangerous for wagons."));
+				await dialog.Msg(L("{#666666}*He gestures toward the plateau rising above the gorge*{/}"));
+				await dialog.Msg(L("The outpost up there is running low on provisions. They need help urgently."));
 
-				if (await dialog.YesNo("Would you carry emergency food supplies to the outpost? They're desperate up there."))
+				if (await dialog.YesNo(L("Would you carry emergency food supplies to the outpost? They're desperate up there.")))
 				{
 					character.Quests.Start(questId);
-					await dialog.Msg("Thank you! Head through the northern passage to Gele Plateau.");
-					await dialog.Msg("Look for Scout Miriam at the outpost entrance. She's coordinating the supply distribution.");
+					await dialog.Msg(L("Thank you! Head through the northern passage to Gele Plateau."));
+					await dialog.Msg(L("Look for Scout Miriam at the outpost entrance. She's coordinating the supply distribution."));
 
 					character.Inventory.Add(667122, 1, InventoryAddType.PickUp);
 				}
 				else
 				{
-					await dialog.Msg("I understand. It's a difficult trek. But those people up there are counting on us...");
+					await dialog.Msg(L("I understand. It's a difficult trek. But those people up there are counting on us..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				await dialog.Msg("The supplies need to reach Scout Miriam at the Gele Plateau outpost entrance.");
-				await dialog.Msg("Head north through the passage. The path is steep but well-marked.");
+				await dialog.Msg(L("The supplies need to reach Scout Miriam at the Gele Plateau outpost entrance."));
+				await dialog.Msg(L("Head north through the passage. The path is steep but well-marked."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("Word came back - the supplies arrived safely! The outpost is grateful.");
-				await dialog.Msg("You've helped keep them going until proper caravans can get through again.");
+				await dialog.Msg(L("Word came back - the supplies arrived safely! The outpost is grateful."));
+				await dialog.Msg(L("You've helped keep them going until proper caravans can get through again."));
 			}
 		});
 
 		// Quest NPC 5: Ranger (The Gorge Patrol)
 		//-------------------------------------------------------------------------
-		AddNpc(147415, "[Ranger] Lynn", "f_gele_57_1", -404, -644, 90, async dialog =>
+		AddNpc(147415, L("[Ranger] Lynn"), "f_gele_57_1", -404, -644, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_1", 1005);
 
-			dialog.SetTitle("Lynn");
+			dialog.SetTitle(L("Lynn"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg("{#666666}*A weathered ranger scans the gorge with a practiced eye*{/}");
-				await dialog.Msg("The eastern gorge needs patrolling. Grummer have been multiplying, and there's something worse...");
-				await dialog.Msg("{#FF6666}Cafrisun.{/} An elite Panto warrior. Extremely dangerous. It's been terrorizing travelers on the road.");
+				await dialog.Msg(L("{#666666}*A weathered ranger scans the gorge with a practiced eye*{/}"));
+				await dialog.Msg(L("The eastern gorge needs patrolling. Grummer have been multiplying, and there's something worse..."));
+				await dialog.Msg(L("{#FF6666}Cafrisun.{/} An elite Panto warrior. Extremely dangerous. It's been terrorizing travelers on the road."));
 
-				var response = await dialog.Select("I need someone skilled to clear the area and hunt that beast.",
-					Option("I'll patrol the gorge", "help"),
-					Option("Tell me about Cafrisun", "info"),
-					Option("That sounds too dangerous", "leave")
+				var response = await dialog.Select(L("I need someone skilled to clear the area and hunt that beast."),
+					Option(L("I'll patrol the gorge"), "help"),
+					Option(L("Tell me about Cafrisun"), "info"),
+					Option(L("That sounds too dangerous"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg("You've got courage, I'll give you that.");
+						await dialog.Msg(L("You've got courage, I'll give you that."));
 
-						if (await dialog.YesNo("Clear out 15 Grummer, then track down Cafrisun. Can you handle it?"))
+						if (await dialog.YesNo(L("Clear out 15 Grummer, then track down Cafrisun. Can you handle it?")))
 						{
 							character.Quests.Start(questId);
-							await dialog.Msg("Head east into the gorge. The Grummer patrol the southern areas.");
-							await dialog.Msg("{#FF6666}Cafrisun spawns in the eastern section. Be ready - it's fast, strong, and doesn't go down easy.{/}");
-							await dialog.Msg("That beast has elite training and weapons. Don't underestimate it.");
+							await dialog.Msg(L("Head east into the gorge. The Grummer patrol the southern areas."));
+							await dialog.Msg(L("{#FF6666}Cafrisun spawns in the eastern section. Be ready - it's fast, strong, and doesn't go down easy.{/}"));
+							await dialog.Msg(L("That beast has elite training and weapons. Don't underestimate it."));
 						}
 						break;
 
 					case "info":
-						await dialog.Msg("Cafrisun is a Panto Javelin warrior - elite rank. Far more dangerous than common Panto.");
-						await dialog.Msg("It's smart, aggressive, and carries a wickedly sharp javelin. I've seen it take down three soldiers alone.");
-						await dialog.Msg("Only hunters with real skill should attempt to face it. Most travelers just avoid that section entirely.");
+						await dialog.Msg(L("Cafrisun is a Panto Javelin warrior - elite rank. Far more dangerous than common Panto."));
+						await dialog.Msg(L("It's smart, aggressive, and carries a wickedly sharp javelin. I've seen it take down three soldiers alone."));
+						await dialog.Msg(L("Only hunters with real skill should attempt to face it. Most travelers just avoid that section entirely."));
 						break;
 
 					case "leave":
-						await dialog.Msg("I don't blame you. Cafrisun isn't something to face unprepared.");
+						await dialog.Msg(L("I don't blame you. Cafrisun isn't something to face unprepared."));
 						break;
 				}
 			}
@@ -401,28 +401,28 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 				if (grummerDone && cafrisunDone)
 				{
-					await dialog.Msg("{#666666}*She looks at you with newfound respect*{/}");
-					await dialog.Msg("You actually took down Cafrisun? That beast has been plaguing us for weeks!");
-					await dialog.Msg("The gorge is safe again. Travelers can use the eastern road without fear.");
-					await dialog.Msg("Here - this boot is a ranger's secret. Drake leather boots will serve you well on patrol.");
+					await dialog.Msg(L("{#666666}*She looks at you with newfound respect*{/}"));
+					await dialog.Msg(L("You actually took down Cafrisun? That beast has been plaguing us for weeks!"));
+					await dialog.Msg(L("The gorge is safe again. Travelers can use the eastern road without fear."));
+					await dialog.Msg(L("Here - this boot is a ranger's secret. Drake leather boots will serve you well on patrol."));
 
 					character.Quests.Complete(questId);
 				}
 				else if (!grummerDone)
 				{
-					await dialog.Msg("Start with the Grummer in the southern sections. They're dangerous but manageable.");
-					await dialog.Msg("Save your strength for Cafrisun - you'll need it.");
+					await dialog.Msg(L("Start with the Grummer in the southern sections. They're dangerous but manageable."));
+					await dialog.Msg(L("Save your strength for Cafrisun - you'll need it."));
 				}
 				else
 				{
-					await dialog.Msg("{#FF6666}Now for the real challenge - Cafrisun patrols the eastern gorge.{/}");
-					await dialog.Msg("It's fast and hits hard. Keep moving, watch for its javelin throws, and don't let it corner you.");
+					await dialog.Msg(L("{#FF6666}Now for the real challenge - Cafrisun patrols the eastern gorge.{/}"));
+					await dialog.Msg(L("It's fast and hits hard. Keep moving, watch for its javelin throws, and don't let it corner you."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg("The gorge has been quiet since you dealt with Cafrisun. No more attacks on travelers.");
-				await dialog.Msg("You've got the skills of a true ranger. If you ever need work, look me up.");
+				await dialog.Msg(L("The gorge has been quiet since you dealt with Cafrisun. No more attacks on travelers."));
+				await dialog.Msg(L("You've got the skills of a true ranger. If you ever need work, look me up."));
 			}
 		});
 	}
@@ -439,17 +439,17 @@ public class PantoPopulationControlQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_gele_57_1", 1001);
-		SetName("Panto Population Control");
-		SetDescription("Help Torin thin the Panto population on Mieguista slope before they overrun the entire gorge.");
+		SetName(L("Panto Population Control"));
+		SetDescription(L("Help Torin thin the Panto population on Mieguista slope before they overrun the entire gorge."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Local Settler] Torin", "f_gele_57_1");
+		AddQuestGiver(L("[Local Settler] Torin"), "f_gele_57_1");
 		// Objectives
-		AddObjective("killPanto", "Hunt Panto",
+		AddObjective("killPanto", L("Hunt Panto"),
 			new KillObjective(25, new[] { MonsterId.Npanto_Baby }));
 
 		// Rewards
@@ -469,17 +469,17 @@ public class HoneyForTheHivesQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_gele_57_1", 1002);
-		SetName("Honey for the Hives");
-		SetDescription("Help the traveling botanist collect wildflower stamens from the dangerous flower fields patrolled by territorial Grummer and Zignuts.");
+		SetName(L("Honey for the Hives"));
+		SetDescription(L("Help the traveling botanist collect wildflower stamens from the dangerous flower fields patrolled by territorial Grummer and Zignuts."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Traveling Botanist] Elara", "f_gele_57_1");
+		AddQuestGiver(L("[Traveling Botanist] Elara"), "f_gele_57_1");
 		// Objectives
-		AddObjective("collectStamens", "Collect Wildflower Stamens",
+		AddObjective("collectStamens", L("Collect Wildflower Stamens"),
 			new CollectItemObjective(650696, 6));
 
 		// Rewards
@@ -524,18 +524,18 @@ public class MerchantsPantoProblemQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_gele_57_1", 1003);
-		SetName("Merchant's Panto Problem");
-		SetDescription("Hunt Panto in the meadow and collect 15 valuable Panto Horns for the traveling merchant Gareth.");
+		SetName(L("Merchant's Panto Problem"));
+		SetDescription(L("Hunt Panto in the meadow and collect 15 valuable Panto Horns for the traveling merchant Gareth."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Traveling Merchant] Gareth", "f_gele_57_1");
-		
+		AddQuestGiver(L("[Traveling Merchant] Gareth"), "f_gele_57_1");
+
 		// Objectives
-		AddObjective("collectClaws", "Collect Panto Horns",
+		AddObjective("collectClaws", L("Collect Panto Horns"),
 			new CollectItemObjective(645134, 15));
 
 		// Rewards
@@ -568,17 +568,17 @@ public class GorgeDeliveryServiceQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_gele_57_1", 1004);
-		SetName("Gorge Delivery Service");
-		SetDescription("Deliver emergency food supplies from Srautas Gorge to the isolated outpost on Gele Plateau.");
+		SetName(L("Gorge Delivery Service"));
+		SetDescription(L("Deliver emergency food supplies from Srautas Gorge to the isolated outpost on Gele Plateau."));
 		SetLocation("f_gele_57_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Caravan Organizer] Roland", "f_gele_57_1");
+		AddQuestGiver(L("[Caravan Organizer] Roland"), "f_gele_57_1");
 		// Objectives
-		AddObjective("deliverSupplies", "Deliver supplies to Scout Miriam on Gele Plateau",
+		AddObjective("deliverSupplies", L("Deliver supplies to Scout Miriam on Gele Plateau"),
 			new ManualObjective());
 
 		// Rewards
@@ -610,20 +610,20 @@ public class GorgePatrolQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_gele_57_1", 1005);
-		SetName("The Gorge Patrol");
-		SetDescription("Patrol the eastern gorge, clear Grummer threats, and hunt down the dangerous elite warrior Cafrisun.");
+		SetName(L("The Gorge Patrol"));
+		SetDescription(L("Patrol the eastern gorge, clear Grummer threats, and hunt down the dangerous elite warrior Cafrisun."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Ranger] Lynn", "f_gele_57_1");
+		AddQuestGiver(L("[Ranger] Lynn"), "f_gele_57_1");
 		// Objectives
-		AddObjective("killGrummer", "Hunt Grummer",
+		AddObjective("killGrummer", L("Hunt Grummer"),
 			new KillObjective(15, new[] { MonsterId.Grummer }));
 
-		AddObjective("killCafrisun", "Hunt Cafrisun",
+		AddObjective("killCafrisun", L("Hunt Cafrisun"),
 			new KillObjective(1, new[] { MonsterId.Panto_Javelin_Gele }));
 
 		// Rewards
