@@ -657,14 +657,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 						_itemsWorldIndex[item.ObjectId] = item;
 						break;
 					default:
-						_items[cat].Add(item);
+						if (!_items.TryGetValue(cat, out var categoryList))
+							return;
+						categoryList.Add(item);
 						_itemsWorldIndex[item.ObjectId] = item;
 						break;
 				}
 
 				if (!silent)
 				{
-					var categoryIndex = item.GetInventoryIndex(_items[cat].Count - 1);
+					var itemCount = inventoryType == InventoryType.PersonalStorage
+						? _warehouse.Count
+						: _items.TryGetValue(cat, out var catItems) ? catItems.Count : 0;
+					var categoryIndex = item.GetInventoryIndex(itemCount - 1);
 					Send.ZC_ITEM_ADD(this.Character, item, categoryIndex, item.Amount, addType, inventoryType, notificationDelay);
 
 					if (ZoneServer.Instance.Conf.Log.LogItems)
@@ -696,7 +701,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 						result.Add(index);
 						break;
 					default:
-						var categoryItems = _items[cat];
+						if (!_items.TryGetValue(cat, out var categoryItems))
+							break;
 						for (var i = 0; i < categoryItems.Count; ++i)
 						{
 							var item = categoryItems[i];
