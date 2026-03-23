@@ -1235,6 +1235,22 @@ namespace Melia.Zone.Scripting
 				character.Variables.Perm.SetString(ActiveInstanceVarName, null);
 				character.Variables.Perm.SetInt(AutoMatchZoneManager.DungeonIdVarName, 0);
 				character.Variables.Perm.SetLong(AutoMatchZoneManager.SessionIdVarName, 0);
+
+				// If the character disconnected during the dungeon, their stale
+				// vars were already saved to DB by OnClosed. The clears above
+				// only update the orphaned in-memory object, so we need to
+				// explicitly persist them or they'll reload on reconnect.
+				if (!character.IsOnline)
+				{
+					try
+					{
+						ZoneServer.Instance.Database.SaveCharacterData(character);
+					}
+					catch (Exception ex)
+					{
+						Log.Error("DungeonScript: Failed to save cleared dungeon vars for offline character '{0}': {1}", character.Name, ex);
+					}
+				}
 			}
 
 			// Remove owner association only if this instance is still the one mapped

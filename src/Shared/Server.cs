@@ -150,12 +150,14 @@ namespace Melia.Shared
 			var serverLanguage = conf.Localization.Language;
 			var relativeFolderPath = "localization";
 			var systemFolderPath = Path.Combine("system", relativeFolderPath);
-			var userFolderPath = Path.Combine("system", relativeFolderPath);
+			var userFolderPath = Path.Combine("user", relativeFolderPath);
 
 			Log.Info("Loading localization...");
 
-			// Load everything from user first, then check system, without
-			// overriding the ones loaded from user
+			// Load in 3-tier order: user → packages → system.
+			// User overrides take highest priority, then packages,
+			// then system defaults. Files for the same language are
+			// merged together, with earlier entries taking precedence.
 			if (Directory.Exists(userFolderPath))
 			{
 				foreach (var filePath in Directory.EnumerateFiles(userFolderPath, "*.po", SearchOption.AllDirectories))
@@ -163,7 +165,22 @@ namespace Melia.Shared
 					var languageName = Path.GetFileNameWithoutExtension(filePath);
 					this.MultiLocalization.Load(languageName, filePath);
 
-					Log.Info("  loaded {0}.", languageName);
+					Log.Info("  loaded {0} (user).", languageName);
+				}
+			}
+
+			foreach (var package in this.Packages.Packages)
+			{
+				var packageLocalizationPath = Path.Combine(package.Directory, relativeFolderPath);
+				if (!Directory.Exists(packageLocalizationPath))
+					continue;
+
+				foreach (var filePath in Directory.EnumerateFiles(packageLocalizationPath, "*.po", SearchOption.AllDirectories))
+				{
+					var languageName = Path.GetFileNameWithoutExtension(filePath);
+					this.MultiLocalization.Load(languageName, filePath);
+
+					Log.Info("  loaded {0} ({1}).", languageName, package.Name);
 				}
 			}
 
@@ -172,12 +189,9 @@ namespace Melia.Shared
 				foreach (var filePath in Directory.EnumerateFiles(systemFolderPath, "*.po", SearchOption.AllDirectories))
 				{
 					var languageName = Path.GetFileNameWithoutExtension(filePath);
-					if (this.MultiLocalization.Contains(languageName))
-						continue;
-
 					this.MultiLocalization.Load(languageName, filePath);
 
-					Log.Info("  loaded {0}.", languageName);
+					Log.Info("  loaded {0} (system).", languageName);
 				}
 			}
 

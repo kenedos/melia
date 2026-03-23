@@ -25,16 +25,16 @@ public class CKlaipeNpcScript : GeneralScript
 		// Storage Keeper
 		//-------------------------------------------------------------------------
 
-		AddNpc(154018, "[Storage Keeper] Rita", "Rita", "c_Klaipe", 317, 279, 90.0, async dialog =>
+		AddNpc(154018, L("[Storage Keeper] Rita"), "Rita", "c_Klaipe", 317, 279, 90.0, async dialog =>
 		{
-			dialog.SetTitle("Rita");
+			dialog.SetTitle(L("Rita"));
 			dialog.SetPortrait("WAREHOUSE_DLG");
 
-			var response = await dialog.Select("Hello! Can I help you store your items?",
-				Option("Personal Storage", "personal"),
-				Option("Team Storage", "team"),
-				Option("Save Spawn Location", "savelocation"),
-				Option("Cancel", "cancel")
+			var response = await dialog.Select(L("Hello! Can I help you store your items?"),
+				Option(L("Personal Storage"), "personal"),
+				Option(L("Team Storage"), "team"),
+				Option(L("Save Spawn Location"), "savelocation"),
+				Option(L("Cancel"), "cancel")
 			);
 
 			if (response == "personal")
@@ -44,22 +44,22 @@ public class CKlaipeNpcScript : GeneralScript
 			else if (response == "savelocation")
 			{
 				await dialog.SaveLocation();
-				await dialog.Msg("Your location has been saved!");
+				await dialog.Msg(L("Your location has been saved!"));
 			}
 
 		});
 
 		// [Item Merchant] Mirina
 		//-------------------------------------------------------------------------
-		var itemMerchant = AddNpc(20115, "[Item Merchant] Mirina", "Mirina", "c_Klaipe", 510.7029, -349.3194, 90.0, async dialog =>
+		var itemMerchant = AddNpc(20115, L("[Item Merchant] Mirina"), "Mirina", "c_Klaipe", 510.7029, -349.3194, 90.0, async dialog =>
 		{
-			dialog.SetTitle("Mirina");
+			dialog.SetTitle(L("Mirina"));
 			dialog.SetPortrait("Dlg_port_TOOL_DEALER");
 
 			if (RandomProvider.Get().NextDouble() >= 0.5)
-				await dialog.Msg("Care for some potions or helpful consumables?{nl}Buy at Mirina's shop today!");
+				await dialog.Msg(L("Care for some potions or helpful consumables?{nl}Buy at Mirina's shop today!"));
 			else
-				await dialog.Msg("Mirina's shop at your service~");
+				await dialog.Msg(L("Mirina's shop at your service~"));
 
 			await dialog.OpenShop("KlaipedaMiscItems");
 		});
@@ -70,15 +70,15 @@ public class CKlaipeNpcScript : GeneralScript
 		// Equipment Merchant
 		//-------------------------------------------------------------------------
 
-		var equipmentMerchant = AddNpc(20111, "[Equipment Merchant] Dunkel", "Dunkel", "c_Klaipe", 394, -475, 90.0, async dialog =>
+		var equipmentMerchant = AddNpc(20111, L("[Equipment Merchant] Dunkel"), "Dunkel", "c_Klaipe", 394, -475, 90.0, async dialog =>
 		{
-			dialog.SetTitle("Dunkel");
+			dialog.SetTitle(L("Dunkel"));
 			dialog.SetPortrait("Dlg_port_vickers");
 
-			var response = await dialog.Select("Take a look around at your own pace without feeling anxious.",
-				Option("Weapons", "weapon"),
-				Option("Armor", "armor"),
-				Option("Cancel", "cancel")
+			var response = await dialog.Select(L("Take a look around at your own pace without feeling anxious."),
+				Option(L("Weapons"), "weapon"),
+				Option(L("Armor"), "armor"),
+				Option(L("Cancel"), "cancel")
 			);
 
 			if (response == "weapon")
@@ -93,15 +93,15 @@ public class CKlaipeNpcScript : GeneralScript
 		// Accessory Merchant
 		//-------------------------------------------------------------------------
 
-		var ronesa = AddNpc(20104, "[Accessory Merchant] Ronesa", "Ronesa", "c_Klaipe", 269, -611, 90.0, async dialog =>
+		var ronesa = AddNpc(20104, L("[Accessory Merchant] Ronesa"), "Ronesa", "c_Klaipe", 269, -611, 90.0, async dialog =>
 		{
-			dialog.SetTitle("Ronesa");
+			dialog.SetTitle(L("Ronesa"));
 			dialog.SetPortrait("Dlg_port_KLAPEDA_ACCESSORY");
 
 			if (await dialog.Hooks("BeforeDialog"))
-				await dialog.Msg("While you're here, do you need anything?{nl}I've got some hard-to-find stuff.");
+				await dialog.Msg(L("While you're here, do you need anything?{nl}I've got some hard-to-find stuff."));
 			else
-				await dialog.Msg("Welcome.{nl}Only hard-to-find stuff here.");
+				await dialog.Msg(L("Welcome.{nl}Only hard-to-find stuff here."));
 
 			await dialog.OpenShop("KlaipedaAccessories");
 		});
@@ -111,23 +111,23 @@ public class CKlaipeNpcScript : GeneralScript
 
 		// [Blacksmith] Zaras
 		//-------------------------------------------------------------------------
-		AddNpc(13, 20105, "[Blacksmith]{nl}Zaras", "c_Klaipe", 600, -1, -83, 90, "KLAPEDA_BLACKSMITH", "TUTO_REPAIR_NPC", "");
+		AddNpc(13, 20105, L("[Blacksmith]{nl}Zaras"), "c_Klaipe", 600, -1, -83, 90, "KLAPEDA_BLACKSMITH", "TUTO_REPAIR_NPC", "");
 
 		// [Companion Trader] Christina
 		//-------------------------------------------------------------------------
-		var christina = AddNpc(153005, "[Companion Trader] Christina", "Christina", "c_Klaipe", -1, -760, 90, async dialog =>
+		var christina = AddNpc(153005, L("[Companion Trader] Christina"), "Christina", "c_Klaipe", -1, -760, 90, async dialog =>
 		{
 			var character = dialog.Player;
 
-			dialog.SetTitle("Christina");
+			dialog.SetTitle(L("Christina"));
 			dialog.SetPortrait("Dlg_port_kristina");
 
 			var options = dialog.CreateOptions(
-				Option("Adopt Companion", "adopt"),
-				Option("Buy Pet Food", "food"),
+				Option(L("Adopt Companion"), "adopt"),
+				Option(L("Buy Pet Food"), "food"),
 				Option(ScpArgMsg("shop_companion_learnabil"), "learnabil", () => character.HasCompanions),
 				Option(ScpArgMsg("shop_companion_info"), "info"),
-				Option("Leave", "leave")
+				Option(L("Leave"), "leave")
 			);
 
 			var selectedOption = await dialog.Select("PETSHOP_KLAIPE_basic1", options);
@@ -154,7 +154,7 @@ public class CKlaipeNpcScript : GeneralScript
 
 		// Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
-		AddNpc(10017, 154039, "Statue of Goddess Ausrine", "c_Klaipe", -206.574, 148.8251, 98.63973, 45, "WARP_C_KLAIPE", "STOUP_CAMP", "STOUP_CAMP");
+		AddNpc(10017, 154039, L("Statue of Goddess Ausrine"), "c_Klaipe", -206.574, 148.8251, 98.63973, 45, "WARP_C_KLAIPE", "STOUP_CAMP", "STOUP_CAMP");
 	}
 
 	/// <summary>

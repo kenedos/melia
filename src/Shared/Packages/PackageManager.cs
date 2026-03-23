@@ -107,6 +107,11 @@ namespace Melia.Shared.Packages
 		public string ScriptsDirectory => Path.Combine(this.Directory, "scripts");
 
 		/// <summary>
+		/// Returns the path to the package's localization directory.
+		/// </summary>
+		public string LocalizationDirectory => Path.Combine(this.Directory, "localization");
+
+		/// <summary>
 		/// Returns the path to the package's SQL updates directory.
 		/// </summary>
 		public string SqlDirectory => Path.Combine(this.Directory, "sql");

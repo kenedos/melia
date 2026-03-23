@@ -13,8 +13,9 @@ namespace Melia.Shared.L10N
 		private readonly Dictionary<string, Localizer> _localizers = new Dictionary<string, Localizer>();
 
 		/// <summary>
-		/// Loads messages from given PO file and creates a localizer
-		/// for it under the language name.
+		/// Loads messages from given PO file into the localizer for the
+		/// given language. If no localizer exists yet, one is created.
+		/// If one already exists, the new messages are merged into it.
 		/// </summary>
 		/// <param name="languageName"></param>
 		/// <param name="path"></param>
@@ -23,7 +24,12 @@ namespace Melia.Shared.L10N
 			languageName = languageName.ToLower();
 
 			lock (_localizers)
-				_localizers[languageName] = new Localizer(path);
+			{
+				if (_localizers.TryGetValue(languageName, out var localizer))
+					localizer.Load(path);
+				else
+					_localizers[languageName] = new Localizer(path);
+			}
 		}
 
 		/// <summary>

@@ -86,6 +86,11 @@ namespace Melia.Zone.Network
 		DateTime LastHeartBeat { get; set; }
 
 		/// <summary>
+		/// Gets or sets the client's selected language name (e.g. "pt-BR").
+		/// </summary>
+		string SelectedLanguage { get; set; }
+
+		/// <summary>
 		/// Generate a session key.
 		/// </summary>
 		/// <returns></returns>
@@ -116,6 +121,7 @@ namespace Melia.Zone.Network
 		public string SessionKey { get; set; }
 		public Trade ActiveTrade { get; set; }
 		public Duel ActiveDuel { get; set; }
+		public string SelectedLanguage { get; set; }
 
 		public int IntegritySeed { get; set; }
 
@@ -210,6 +216,11 @@ namespace Melia.Zone.Network
 		/// Gets or sets the last heartbeat.
 		/// </summary>
 		public DateTime LastHeartBeat { get; set; }
+
+		/// <summary>
+		/// Gets or sets the client's selected language name (e.g. "pt-BR").
+		/// </summary>
+		public string SelectedLanguage { get; set; }
 
 		/// <summary>
 		/// Generates a session key

@@ -20,35 +20,35 @@ public class CFedimianNpcScript : GeneralScript
 
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(10, 40120, "Statue of Goddess Vakarine", "c_fedimian", -280, 162, -239, 7, "WARP_C_FEDIMIAN", "STOUP_CAMP", "STOUP_CAMP");
+		AddNpc(10, 40120, L("Statue of Goddess Vakarine"), "c_fedimian", -280, 162, -239, 7, "WARP_C_FEDIMIAN", "STOUP_CAMP", "STOUP_CAMP");
 
 		// [Item Merchant] Muras
 		//-------------------------------------------------------------------------
-		AddNpc(20055, "[Item Merchant] Muras", "Muras", "c_fedimian", -631.32, -174.9, 0, async dialog =>
+		AddNpc(20055, L("[Item Merchant] Muras"), "Muras", "c_fedimian", -631.32, -174.9, 0, async dialog =>
 		{
-			dialog.SetTitle("Muras");
+			dialog.SetTitle(L("Muras"));
 			dialog.SetPortrait("Dlg_port_Muras");
 
 			if (RandomProvider.Get().NextDouble() >= 0.5)
-				await dialog.Msg("H-Hello there! C-Can I help you with some good consumables?");
+				await dialog.Msg(L("H-Hello there! C-Can I help you with some good consumables?"));
 			else
-				await dialog.Msg("O-Oh, hi. W-Welcome to my humble shop.");
+				await dialog.Msg(L("O-Oh, hi. W-Welcome to my humble shop."));
 
 			await dialog.OpenShop("FedimianMiscItems");
 		});
 
 		// [Storage Keeper] Zadan
 		//-------------------------------------------------------------------------
-		AddNpc(156027, "[Storage Keeper] Zadan", "Zadan", "c_fedimian", -170, -218, 0, async dialog =>
+		AddNpc(156027, L("[Storage Keeper] Zadan"), "Zadan", "c_fedimian", -170, -218, 0, async dialog =>
 		{
-			dialog.SetTitle("Zadan");
+			dialog.SetTitle(L("Zadan"));
 			dialog.SetPortrait("Dlg_port_Zadan");
 
-			var response = await dialog.Select("Looking for a place to store your items safely? I'm just the guy.",
-				Option("Personal Storage", "personal"),
-				Option("Team Storage", "team"),
-				Option("Save Spawn Location", "savelocation"),
-				Option("Cancel", "cancel")
+			var response = await dialog.Select(L("Looking for a place to store your items safely? I'm just the guy."),
+				Option(L("Personal Storage"), "personal"),
+				Option(L("Team Storage"), "team"),
+				Option(L("Save Spawn Location"), "savelocation"),
+				Option(L("Cancel"), "cancel")
 			);
 
 			if (response == "personal")
@@ -58,21 +58,21 @@ public class CFedimianNpcScript : GeneralScript
 			else if (response == "savelocation")
 			{
 				await dialog.SaveLocation();
-				await dialog.Msg("Your location has been saved!");
+				await dialog.Msg(L("Your location has been saved!"));
 			}
 		});
 
 		// [Equipment Merchant] Yorgis
 		//-------------------------------------------------------------------------
-		AddNpc(151035, "[Equipment Merchant] Yorgis", "Yorgis", "c_fedimian", -219.15, -558.35, 90, async dialog =>
+		AddNpc(151035, L("[Equipment Merchant] Yorgis"), "Yorgis", "c_fedimian", -219.15, -558.35, 90, async dialog =>
 		{
-			dialog.SetTitle("Dunkel");
+			dialog.SetTitle(L("Dunkel"));
 			dialog.SetPortrait("Dlg_port_Yorgis");
 
-			var response = await dialog.Select("Welcome! Only the best quality equipments around here!",
-				Option("Weapons", "weapon"),
-				Option("Armor", "armor"),
-				Option("Cancel", "cancel")
+			var response = await dialog.Select(L("Welcome! Only the best quality equipments around here!"),
+				Option(L("Weapons"), "weapon"),
+				Option(L("Armor"), "armor"),
+				Option(L("Cancel"), "cancel")
 			);
 
 			if (response == "weapon")
@@ -83,19 +83,19 @@ public class CFedimianNpcScript : GeneralScript
 
 		// [Blacksmith] Anna
 		//-------------------------------------------------------------------------
-		AddNpc(126, 151036, "[Blacksmith]{nl}Anna", "c_fedimian", 120, 160, -504, 75, "FEDIMIAN_BLACKSMITH", "TUTO_REPAIR_NPC", "");
+		AddNpc(126, 151036, L("[Blacksmith]{nl}Anna"), "c_fedimian", 120, 160, -504, 75, "FEDIMIAN_BLACKSMITH", "TUTO_REPAIR_NPC", "");
 
 		// [Accessory Merchant] Joana
 		//-------------------------------------------------------------------------
-		AddNpc(151038, "[Accessory Merchant] Joana", "Joana", "c_fedimian", -130.2, -496.14, 0, async dialog =>
+		AddNpc(151038, L("[Accessory Merchant] Joana"), "Joana", "c_fedimian", -130.2, -496.14, 0, async dialog =>
 		{
-			dialog.SetTitle("Joana");
+			dialog.SetTitle(L("Joana"));
 			dialog.SetPortrait("Dlg_port_Yoana");
 
 			if (await dialog.Hooks("BeforeDialog"))
-				await dialog.Msg("Accessories~! Everyone loves good looking jewelry!");
+				await dialog.Msg(L("Accessories~! Everyone loves good looking jewelry!"));
 			else
-				await dialog.Msg("Accessories~! Everyone loves good looking jewelry!");
+				await dialog.Msg(L("Accessories~! Everyone loves good looking jewelry!"));
 
 			await dialog.OpenShop("FedimianAccessories");
 		});

@@ -368,6 +368,12 @@ namespace Melia.Zone.World.Maps
 			monster.FromGround = false;
 		}
 
+		/// <summary>
+		/// Attempts to merge a newly dropped item with nearby items of the
+		/// same type on the ground. If 5+ of the same stackable item exist
+		/// within 30 units on the same layer/owner, they are consolidated
+		/// into a single stack at the average position, capped at MaxStack.
+		/// </summary>
 		private void TryMergeNearbyItems(ItemMonster newItem)
 		{
 			if (!newItem.Item.IsStackable)

@@ -68,6 +68,7 @@ namespace Melia.Zone.Scripting.AI
 		protected bool EnableReturnHome = true;
 
 		private readonly HashSet<int> _hateLevelsToRemove = new();
+		private readonly HashSet<int> _nearbyHandleSet = new();
 		private readonly Dictionary<int, float> _hateLevels = new();
 		private readonly HashSet<FactionType> _hatedFactions = new();
 		private readonly HashSet<int> _hatedMonsters = new();
@@ -807,7 +808,9 @@ namespace Melia.Zone.Scripting.AI
 		{
 			_hateLevelsToRemove.Clear();
 
-		foreach (var entry in _hateLevels)
+			var nearbyHandles = new HashSet<int>(potentialEnemies.Select(a => a.Handle));
+
+			foreach (var entry in _hateLevels)
 			{
 				var handle = entry.Key;
 

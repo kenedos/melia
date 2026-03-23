@@ -1,0 +1,264 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Melia\n"
+"POT-Creation-Date: 2026-03-22 00:00+0000\n"
+"PO-Revision-Date: 2026-03-22 00:00+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+# ============================================================================
+# Klaipeda NPCs
+# ============================================================================
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "[Storage Keeper] Rita"
+msgstr "[Guardiã do Armazém] Rita"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Rita"
+msgstr "Rita"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Hello! Can I help you store your items?"
+msgstr "Olá! Posso ajudar a guardar seus itens?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Personal Storage"
+msgstr "Armazém Pessoal"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Team Storage"
+msgstr "Armazém de Equipe"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Save Spawn Location"
+msgstr "Salvar Local de Reaparecimento"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Your location has been saved!"
+msgstr "Sua localização foi salva!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "[Item Merchant] Mirina"
+msgstr "[Comerciante de Itens] Mirina"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Mirina"
+msgstr "Mirina"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Care for some potions or helpful consumables?{nl}Buy at Mirina's shop today!"
+msgstr "Precisa de poções ou consumíveis úteis?{nl}Compre na loja da Mirina hoje!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Mirina's shop at your service~"
+msgstr "A loja da Mirina ao seu dispor~"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "[Equipment Merchant] Dunkel"
+msgstr "[Comerciante de Equipamentos] Dunkel"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Dunkel"
+msgstr "Dunkel"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Take a look around at your own pace without feeling anxious."
+msgstr "Dê uma olhada com calma, sem pressa."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Weapons"
+msgstr "Armas"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Armor"
+msgstr "Armaduras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "[Accessory Merchant] Ronesa"
+msgstr "[Comerciante de Acessórios] Ronesa"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Ronesa"
+msgstr "Ronesa"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "While you're here, do you need anything?{nl}I've got some hard-to-find stuff."
+msgstr "Já que está aqui, precisa de algo?{nl}Tenho algumas coisas difíceis de encontrar."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Welcome.{nl}Only hard-to-find stuff here."
+msgstr "Bem-vindo.{nl}Só coisas raras por aqui."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "[Blacksmith]{nl}Zaras"
+msgstr "[Ferreiro]{nl}Zaras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "[Companion Trader] Christina"
+msgstr "[Comerciante de Companheiros] Christina"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Christina"
+msgstr "Christina"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Adopt Companion"
+msgstr "Adotar Companheiro"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Buy Pet Food"
+msgstr "Comprar Ração"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Leave"
+msgstr "Sair"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_klaipe.cs
+msgid "Statue of Goddess Ausrine"
+msgstr "Estátua da Deusa Ausrine"
+
+# ============================================================================
+# Fedimian NPCs
+# ============================================================================
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "Statue of Goddess Vakarine"
+msgstr "Estátua da Deusa Vakarine"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "[Item Merchant] Muras"
+msgstr "[Comerciante de Itens] Muras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "Muras"
+msgstr "Muras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "H-Hello there! C-Can I help you with some good consumables?"
+msgstr "O-Olá! P-Posso te ajudar com alguns bons consumíveis?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "O-Oh, hi. W-Welcome to my humble shop."
+msgstr "A-Ah, oi. B-Bem-vindo à minha humilde loja."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "[Storage Keeper] Zadan"
+msgstr "[Guardião do Armazém] Zadan"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "Zadan"
+msgstr "Zadan"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "Looking for a place to store your items safely? I'm just the guy."
+msgstr "Procurando um lugar seguro para guardar seus itens? Eu sou a pessoa certa."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "[Equipment Merchant] Yorgis"
+msgstr "[Comerciante de Equipamentos] Yorgis"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "Welcome! Only the best quality equipments around here!"
+msgstr "Bem-vindo! Só equipamentos da melhor qualidade por aqui!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "[Blacksmith]{nl}Anna"
+msgstr "[Ferreira]{nl}Anna"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "[Accessory Merchant] Joana"
+msgstr "[Comerciante de Acessórios] Joana"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "Joana"
+msgstr "Joana"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_fedimian.cs
+msgid "Accessories~! Everyone loves good looking jewelry!"
+msgstr "Acessórios~! Todo mundo ama joias bonitas!"
+
+# ============================================================================
+# Orsha NPCs
+# ============================================================================
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "[Equipment Merchant] Jura"
+msgstr "[Comerciante de Equipamentos] Jura"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Jura"
+msgstr "Jura"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Welcome! What kind of equipment are you looking for?"
+msgstr "Bem-vindo! Que tipo de equipamento você procura?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "[Item Merchant] Alf"
+msgstr "[Comerciante de Itens] Alf"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Alf"
+msgstr "Alf"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Looking for potions or other useful items? You've come to the right place!"
+msgstr "Procurando poções ou outros itens úteis? Você veio ao lugar certo!"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Welcome to Alf's shop. What can I get for you today?"
+msgstr "Bem-vindo à loja do Alf. O que posso pegar para você hoje?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "[Accessory Merchant] Jurus"
+msgstr "[Comerciante de Acessórios] Jurus"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Jurus"
+msgstr "Jurus"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Welcome to my accessory shop. I have some rare and unique items you might be interested in."
+msgstr "Bem-vindo à minha loja de acessórios. Tenho alguns itens raros e únicos que podem te interessar."
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Greetings! Looking for something to enhance your style and power?"
+msgstr "Saudações! Procurando algo para melhorar seu estilo e poder?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "[Storage Keeper] Aisah"
+msgstr "[Guardiã do Armazém] Aisah"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Aisah"
+msgstr "Aisah"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Welcome to Orsha's storage. How may I assist you?"
+msgstr "Bem-vindo ao armazém de Orsha. Como posso ajudá-lo?"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "[Blacksmith]{nl}Ilanai"
+msgstr "[Ferreiro]{nl}Ilanai"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "[Companion Trader] Toras"
+msgstr "[Comerciante de Companheiros] Toras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Toras"
+msgstr "Toras"
+
+#: packages/laima/scripts/zone/content/laima/npcs/cities/c_orsha.cs
+msgid "Lv1 Treasure Chest"
+msgstr "Baú de Tesouro Nv1"

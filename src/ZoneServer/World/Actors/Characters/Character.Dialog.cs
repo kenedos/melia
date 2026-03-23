@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
@@ -113,6 +114,7 @@ namespace Melia.Zone.World.Actors.Characters
 				{
 					try
 					{
+						SetPlayerLocalizationContext();
 						dlg.State = DialogState.Active;
 						await dialogFunc(dlg);
 					}
@@ -123,6 +125,7 @@ namespace Melia.Zone.World.Actors.Characters
 					}
 					finally
 					{
+						Localization.SetContextLocalizer(null);
 						dlg.State = DialogState.Ended;
 						dlg.Close();
 						dlg.Leave();
@@ -160,6 +163,7 @@ namespace Melia.Zone.World.Actors.Characters
 				{
 					try
 					{
+						SetPlayerLocalizationContext();
 						dlg.State = DialogState.Active;
 						await dialogFunc(dlg);
 					}
@@ -170,6 +174,7 @@ namespace Melia.Zone.World.Actors.Characters
 					}
 					finally
 					{
+						Localization.SetContextLocalizer(null);
 						dlg.State = DialogState.Ended;
 						dlg.Close();
 						dlg.Leave();
@@ -202,6 +207,7 @@ namespace Melia.Zone.World.Actors.Characters
 				{
 					try
 					{
+						SetPlayerLocalizationContext();
 						dlg.State = DialogState.Active;
 						await dialogFunc(dlg);
 					}
@@ -212,6 +218,7 @@ namespace Melia.Zone.World.Actors.Characters
 					}
 					finally
 					{
+						Localization.SetContextLocalizer(null);
 						dlg.State = DialogState.Ended;
 						dlg.Close();
 						dlg.Leave();
@@ -219,6 +226,19 @@ namespace Melia.Zone.World.Actors.Characters
 				}
 			}
 			CallSafe(RunItemDialogAsync(dialog));
+		}
+		/// <summary>
+		/// Sets the async-local localization context based on the
+		/// player's selected client language.
+		/// </summary>
+		private void SetPlayerLocalizationContext()
+		{
+			var language = this.Connection?.SelectedLanguage;
+			if (language != null)
+			{
+				var localizer = ZoneServer.Instance.MultiLocalization.Get(language);
+				Localization.SetContextLocalizer(localizer);
+			}
 		}
 		#endregion
 	}

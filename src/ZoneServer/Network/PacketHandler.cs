@@ -146,6 +146,9 @@ namespace Melia.Zone.Network
 					return;
 				}
 
+				if (conn.Account.Variables.Perm.Has("Melia.SelectedLanguage"))
+					conn.SelectedLanguage = conn.Account.Variables.Perm.GetString("Melia.SelectedLanguage");
+
 				if (!ZoneServer.Instance.Database.CheckSessionKey(conn.Account.Id, sessionKey))
 				{
 					Log.Warning("Stopped attempt to login on account '{0}' with invalid session key '{1}'. Closing connection.", accountName, sessionKey);
@@ -4905,8 +4908,21 @@ namespace Melia.Zone.Network
 		{
 			var language = packet.GetShort();
 
-			// 0 = English, 1 = German, 2 = Portugese,
-			// 4 = Indonesian, 5 = Russian, 6 = Thai
+			// Map client language index to locale name
+			var languageName = language switch
+			{
+				1 => "de-DE",
+				2 => "pt-BR",
+				4 => "id-ID",
+				5 => "ru-RU",
+				6 => "th-TH",
+				_ => "en-US",
+			};
+
+			conn.SelectedLanguage = languageName;
+
+			if (conn.Account != null)
+				conn.Account.Variables.Perm.SetString("Melia.SelectedLanguage", languageName);
 		}
 
 		/// <summary>

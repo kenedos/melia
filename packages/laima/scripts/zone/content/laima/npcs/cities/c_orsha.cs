@@ -24,15 +24,15 @@ public class COrshaNpcScript : GeneralScript
 
 		// [Equipment Merchant] Jura
 		//-------------------------------------------------------------------------
-		AddNpc(20056, "[Equipment Merchant] Jura", "Jura", "c_orsha", 21, 154, 123.0, async dialog =>
+		AddNpc(20056, L("[Equipment Merchant] Jura"), "Jura", "c_orsha", 21, 154, 123.0, async dialog =>
 		{
-			dialog.SetTitle("Jura");
+			dialog.SetTitle(L("Jura"));
 			dialog.SetPortrait("Dlg_port_Julla");
 
-			var response = await dialog.Select("Welcome! What kind of equipment are you looking for?",
-				Option("Weapons", "weapon"),
-				Option("Armor", "armor"),
-				Option("Cancel", "cancel")
+			var response = await dialog.Select(L("Welcome! What kind of equipment are you looking for?"),
+				Option(L("Weapons"), "weapon"),
+				Option(L("Armor"), "armor"),
+				Option(L("Cancel"), "cancel")
 			);
 
 			if (response == "weapon")
@@ -43,46 +43,46 @@ public class COrshaNpcScript : GeneralScript
 
 		// [Item Merchant] Alf
 		//-------------------------------------------------------------------------
-		AddNpc(20055, "[Item Merchant] Alf", "Alf", "c_orsha", 231, 166, 120.0, async dialog =>
+		AddNpc(20055, L("[Item Merchant] Alf"), "Alf", "c_orsha", 231, 166, 120.0, async dialog =>
 		{
-			dialog.SetTitle("Alf");
+			dialog.SetTitle(L("Alf"));
 			dialog.SetPortrait("Dlg_port_Alf");
 
 			if (RandomProvider.Get().NextDouble() >= 0.5)
-				await dialog.Msg("Looking for potions or other useful items? You've come to the right place!");
+				await dialog.Msg(L("Looking for potions or other useful items? You've come to the right place!"));
 			else
-				await dialog.Msg("Welcome to Alf's shop. What can I get for you today?");
+				await dialog.Msg(L("Welcome to Alf's shop. What can I get for you today?"));
 
 			await dialog.OpenShop("OrshaMiscItems");
 		});
 
 		// [Accessory Merchant] Jurus
 		//-------------------------------------------------------------------------
-		AddNpc(20057, "[Accessory Merchant] Jurus", "Jurus", "c_orsha", 462.1917, -29.93526, -11.0, async dialog =>
+		AddNpc(20057, L("[Accessory Merchant] Jurus"), "Jurus", "c_orsha", 462.1917, -29.93526, -11.0, async dialog =>
 		{
-			dialog.SetTitle("Jurus");
+			dialog.SetTitle(L("Jurus"));
 			dialog.SetPortrait("Dlg_port_Yurrs");
 
 			if (await dialog.Hooks("BeforeDialog"))
-				await dialog.Msg("Welcome to my accessory shop. I have some rare and unique items you might be interested in.");
+				await dialog.Msg(L("Welcome to my accessory shop. I have some rare and unique items you might be interested in."));
 			else
-				await dialog.Msg("Greetings! Looking for something to enhance your style and power?");
+				await dialog.Msg(L("Greetings! Looking for something to enhance your style and power?"));
 
 			await dialog.OpenShop("OrshaAccessories");
 		});
 
 		// [Storage Keeper] Aisa
 		//-------------------------------------------------------------------------
-		AddNpc(20067, "[Storage Keeper] Aisah", "Aisah", "c_orsha", 308, 64, 90.0, async dialog =>
+		AddNpc(20067, L("[Storage Keeper] Aisah"), "Aisah", "c_orsha", 308, 64, 90.0, async dialog =>
 		{
-			dialog.SetTitle("Aisah");
+			dialog.SetTitle(L("Aisah"));
 			dialog.SetPortrait("Dlg_port_aisah");
 
-			var response = await dialog.Select("Welcome to Orsha's storage. How may I assist you?",
-				Option("Personal Storage", "personal"),
-				Option("Team Storage", "team"),
-				Option("Save Spawn Location", "savelocation"),
-				Option("Cancel", "cancel")
+			var response = await dialog.Select(L("Welcome to Orsha's storage. How may I assist you?"),
+				Option(L("Personal Storage"), "personal"),
+				Option(L("Team Storage"), "team"),
+				Option(L("Save Spawn Location"), "savelocation"),
+				Option(L("Cancel"), "cancel")
 			);
 
 			if (response == "personal")
@@ -92,29 +92,29 @@ public class COrshaNpcScript : GeneralScript
 			else if (response == "savelocation")
 			{
 				await dialog.SaveLocation();
-				await dialog.Msg("Your location has been saved!");
+				await dialog.Msg(L("Your location has been saved!"));
 			}
 		});
 
 		// [Blacksmith] Ilanai
 		//-------------------------------------------------------------------------
-		AddNpc(2, 20066, "[Blacksmith]{nl}Ilanai", "c_orsha", -133.44, 175.98, -285.69, 73, "ORSHA_BLACKSMITH", "TUTO_REPAIR_NPC", "");
+		AddNpc(2, 20066, L("[Blacksmith]{nl}Ilanai"), "c_orsha", -133.44, 175.98, -285.69, 73, "ORSHA_BLACKSMITH", "TUTO_REPAIR_NPC", "");
 
 		// [Companion Trader] Toras
 		//-------------------------------------------------------------------------
-		var toras = AddNpc(20058, "[Companion Trader] Toras", "Toras", "c_orsha", -109.365, 362.765, 104.0, async dialog =>
+		var toras = AddNpc(20058, L("[Companion Trader] Toras"), "Toras", "c_orsha", -109.365, 362.765, 104.0, async dialog =>
 		{
 			var character = dialog.Player;
 
-			dialog.SetTitle("Toras");
+			dialog.SetTitle(L("Toras"));
 			dialog.SetPortrait("Dlg_port_npc_tonus");
 
 			var options = dialog.CreateOptions(
-				Option("Adopt Companion", "adopt"),
-				Option("Buy Pet Food", "food"),
+				Option(L("Adopt Companion"), "adopt"),
+				Option(L("Buy Pet Food"), "food"),
 				Option(ScpArgMsg("shop_companion_learnabil"), "learnabil", () => character.HasCompanions),
 				Option(ScpArgMsg("shop_companion_info"), "info"),
-				Option("Leave", "leave")
+				Option(L("Leave"), "leave")
 			);
 
 			var selectedOption = await dialog.Select("PETSHOP_ORSHA_basic1", options);
@@ -141,7 +141,7 @@ public class COrshaNpcScript : GeneralScript
 
 		// Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
-		AddNpc(115, 154063, "Statue of Goddess Ausrine", "c_orsha", 103.14, 176.14, 322.95, -46, "WARP_C_ORSHA", "STOUP_CAMP", "STOUP_CAMP");
+		AddNpc(115, 154063, L("Statue of Goddess Ausrine"), "c_orsha", 103.14, 176.14, 322.95, -46, "WARP_C_ORSHA", "STOUP_CAMP", "STOUP_CAMP");
 
 		// Emoticon Chest
 		//-------------------------------------------------------------------------
@@ -152,7 +152,7 @@ public class COrshaNpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(150, 147392, "Lv1 Treasure Chest", "c_orsha", -461.54, 505.13, -277, -135, "TREASUREBOX_LV_C_ORSHA150", "", "");
+		AddNpc(150, 147392, L("Lv1 Treasure Chest"), "c_orsha", -461.54, 505.13, -277, -135, "TREASUREBOX_LV_C_ORSHA150", "", "");
 	}
 
 	/// <summary>
