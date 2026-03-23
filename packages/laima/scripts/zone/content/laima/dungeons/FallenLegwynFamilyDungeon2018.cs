@@ -15,7 +15,6 @@ using Melia.Zone.World.Quests.Rewards;
 
 /// <summary>
 /// Dungeon script for 'Fallen Legwyn Family Dungeon'
-/// Generated from XML: ID_STARTOWER_MINI
 /// </summary>
 [DungeonScript("ID_STARTOWER_MINI")]
 public class FallenLegwynFamilyDungeon2018 : DungeonScript
@@ -33,10 +32,10 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 
 	protected override void Load()
 	{
-		SetId("ID_STARTOWER_MINI");
-		SetName("Fallen Legwyn Family Dungeon");
-		SetMapName("ID_startower");
-		SetStartPosition(new Position(x: 155f, y: -106f, z: -2387f));
+		this.SetId("ID_STARTOWER_MINI");
+		this.SetName("Fallen Legwyn Family Dungeon");
+		this.SetMapName("ID_startower");
+		this.SetStartPosition(new Position(x: 155f, y: -106f, z: -2387f));
 	}
 
 	/// <summary>Creates the 'ready' stage.</summary>
@@ -52,9 +51,9 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 			await Task.Delay(TimeSpan.FromSeconds(10));
 			// Event: start at 20s
 			script.MGameMessage(instance, "NOTICE_Dm_scroll", "Start!", 5);
-			// Unhandled action: GAME_ST_EVT_EXEC_STAGE_DISABLE
+
 		}, null, this, "id_startower_mini_ready", "ready");
-		//stage.TransitionTo(STAGE_TIME); // Inferred transition
+
 		stage.TransitionTo(STAGE_DEFGROUP);
 		return stage;
 	}
@@ -67,14 +66,10 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 			instance.Vars.Set("StageStartTime", DateTime.UtcNow);
 			var stageObjects = new Dictionary<string, IMonster>();
 			await Task.Delay(TimeSpan.FromSeconds(3300));
-			// Event: 경고 메시지 at 3300s
+
 			script.MGameMessage(instance, "NOTICE_Dm_scroll", "ETC_20151224_020093", 5);
-			await Task.Delay(TimeSpan.FromSeconds(300));
-			// Event: 시간 제한 at 3600s
-			// Unhandled action: MGAME_RETURN
-			await Task.Delay(TimeSpan.FromSeconds(60));
-			// Event: 인던 삭제 at 3660s
-			// Unhandled action: MGAME_END
+			await Task.Delay(TimeSpan.FromSeconds(360));
+
 		}, null, this, "id_startower_mini_time", "Time");
 		stage.TransitionTo(STAGE_PERCENTUI); // Inferred transition
 		return stage;
@@ -429,11 +424,10 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 			instance.Vars.Set("StageEndTime", DateTime.UtcNow);
 			var stageObjects = new Dictionary<string, IMonster>();
 			await Task.Delay(TimeSpan.FromSeconds(60));
-			// Event: 존으로돌아가기 at 60s
-			// Unhandled action: MGAME_RETURN
-			// Unhandled action: MGAME_END
+
+
 		}, null, this, "id_startower_mini_end", "You will return to the entrance in 60 seconds");
-		//stage.TransitionTo(STAGE_BOSS1); // Inferred transition
+
 		return stage;
 	}
 
@@ -441,13 +435,13 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 	{
 		var stages = new List<DungeonStage>
 		{
-			CreateReady(),
-			CreateDefGroup(),
-			CreateStage2(),
-			CreateStage3(),
-			CreateBoss1(),
-			CreateLastboss(),
-			CreateEnd(),
+			this.CreateReady(),
+			this.CreateDefGroup(),
+			this.CreateStage2(),
+			this.CreateStage3(),
+			this.CreateBoss1(),
+			this.CreateLastboss(),
+			this.CreateEnd(),
 			//CreateTime(),
 			//CreatePercentUI(),
 		};
