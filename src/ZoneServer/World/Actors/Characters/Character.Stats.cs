@@ -52,7 +52,7 @@ namespace Melia.Zone.World.Actors.Characters
 			get
 			{
 				var job = this.Jobs.Get(this.JobId);
-				return job.Level;
+				return job?.Level ?? 1;
 			}
 		}
 
@@ -270,17 +270,20 @@ namespace Melia.Zone.World.Actors.Characters
 			var rank = this.Jobs.GetCurrentRank();
 			var job = this.Job;
 
-			// Limit EXP to the total max, otherwise the client will
-			// display level 1 with 0%.
-			job.TotalExp = Math.Min(job.TotalMaxExp, (job.TotalExp + jobExp));
+			if (job != null)
+			{
+				// Limit EXP to the total max, otherwise the client will
+				// display level 1 with 0%.
+				job.TotalExp = Math.Min(job.TotalMaxExp, (job.TotalExp + jobExp));
 
-			var newJobLevel = this.JobLevel;
-			var jobLevelsGained = (newJobLevel - jobLevel);
+				var newJobLevel = this.JobLevel;
+				var jobLevelsGained = (newJobLevel - jobLevel);
 
-			Send.ZC_JOB_EXP_UP(this, jobExp);
+				Send.ZC_JOB_EXP_UP(this, jobExp);
 
-			if (jobLevelsGained > 0)
-				this.FinishJobLevelChange(jobLevelsGained);
+				if (jobLevelsGained > 0)
+					this.FinishJobLevelChange(jobLevelsGained);
+			}
 
 			if (this.HasCompanions)
 			{
