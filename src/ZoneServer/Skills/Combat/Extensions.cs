@@ -38,7 +38,7 @@ namespace Melia.Zone.Skills.Combat
 			// the highest SDR are hit first and are able to potentially
 			// tank the hit before it can hit other targets.
 
-			targets = targets.OrderByDescending(a => a.Properties.GetFloat(PropertyName.SDR));
+			targets = targets.Where(a => a != null).OrderByDescending(a => a.Properties.GetFloat(PropertyName.SDR));
 
 			foreach (var target in targets)
 			{
