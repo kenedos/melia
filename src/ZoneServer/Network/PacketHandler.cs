@@ -369,7 +369,7 @@ namespace Melia.Zone.Network
 				Send.ZC_LOGIN_TIME(conn, DateTime.Now);
 				Send.ZC_MYPC_ENTER(character);
 
-	
+
 				if (conn.Party != null) // Guild check removed: Guild type deleted
 					Send.ZC_NORMAL.ShowParty(character);
 
@@ -3870,6 +3870,18 @@ namespace Melia.Zone.Network
 			var sysMsg = lockItem ? "{Item}LockSuccess" : "{Item}UnlockSuccess";
 			character.SystemMessage(sysMsg, new MsgParameter("Item", item.Data.Name));
 			Send.ZC_ITEM_LOCK_STATE(character, item);
+		}
+
+		/// <summary>
+		/// Dummy Handler
+		/// </summary>
+		/// <remarks>Someone was sending this, maybe it's via an an addon?</remarks>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_OBJ_RECORD_POS)]
+		public void CZ_OBJ_RECORD_POS(IZoneConnection conn, Packet packet)
+		{
+			// Unknown purpose
 		}
 
 		/// <summary> 
