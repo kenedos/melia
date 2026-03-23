@@ -1636,6 +1636,9 @@ namespace Melia.Zone.Scripting.AI
 			if (_masterHandle == 0)
 				return null;
 
+			if (this.Entity?.Map == null)
+				return null;
+
 			return this.Entity.Map.GetCombatEntity(_masterHandle);
 		}
 

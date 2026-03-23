@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cataphract_Rush)]
-	public class Cataphract_RushOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cataphract_RushOverride : IMeleeGroundSkillHandler, IDynamicCasted, ICancelSkillHandler
 	{
 		/// <summary>
 		/// Called when the skill begins channeling.
@@ -38,6 +38,16 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 		/// Called when the skill channeling ends.
 		/// </summary>
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
+		{
+			caster.RemoveBuff(BuffId.Warrior_RushMove_Buff);
+			caster.StopBuff(BuffId.Warrior_EnableMovingShot_Buff);
+			caster.StopSound("voice_atk_long_war_f", "voice_war_atk_long_cast");
+		}
+
+		/// <summary>
+		/// Called when the skill is cancelled.
+		/// </summary>
+		public void Handle(Skill skill, ICombatEntity caster)
 		{
 			caster.RemoveBuff(BuffId.Warrior_RushMove_Buff);
 			caster.StopBuff(BuffId.Warrior_EnableMovingShot_Buff);
