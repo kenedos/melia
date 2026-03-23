@@ -232,9 +232,22 @@ namespace Melia.Zone.World.Groups
 				member.JobLevel = character.JobLevel;
 				member.IsOnline = isOnline;
 
-				// Spams pretty hard, probably should move this to the Update(TimeSpan elapsed)
-				// TODO: Optimize this, maybe only send if more than 1 member is online too.
 				Send.ZC_PARTY_INST_INFO(this);
+			}
+		}
+
+		/// <summary>
+		/// Updates only the member's position and map data without
+		/// broadcasting. Used for frequent movement updates where
+		/// a full info broadcast is unnecessary.
+		/// </summary>
+		/// <param name="character"></param>
+		public void UpdateMemberPosition(Character character)
+		{
+			if (this.TryGetMember(character.ObjectId, out var member))
+			{
+				member.Position = character.Position;
+				member.MapId = character.MapId;
 			}
 		}
 

@@ -42,6 +42,11 @@ namespace Melia.Shared.Data.Database
 		private readonly List<BaseExpData> _friendExp = new List<BaseExpData>();
 		private readonly List<BaseExpData> _ancientExp = new List<BaseExpData>();
 
+		// Precomputed lookup caches for job exp (built in AfterLoad)
+		private int _highestJobRank;
+		private Dictionary<int, int> _maxJobLevelByRank = new Dictionary<int, int>();
+		private Dictionary<(int rank, int level), long> _totalJobExpByRankLevel = new Dictionary<(int, int), long>();
+
 		public override void Clear()
 		{
 			_exp.Clear();
@@ -49,6 +54,9 @@ namespace Melia.Shared.Data.Database
 			_guildExp.Clear();
 			_petExp.Clear();
 			_ancientExp.Clear();
+			_maxJobLevelByRank.Clear();
+			_totalJobExpByRankLevel.Clear();
+			_highestJobRank = 0;
 			base.Clear();
 		}
 
@@ -105,17 +113,13 @@ namespace Melia.Shared.Data.Database
 			if (level < 1 || level > maxLevel)
 				throw new ArgumentException($"Invalid level {level} (expected: 1~{maxLevel}).");
 
-			var highestRank = _jobExp.Max(a => a.Rank);
-			if (rank > highestRank)
-				rank = highestRank;
+			if (rank > _highestJobRank)
+				rank = _highestJobRank;
 
-			var data = _jobExp.Where(a => a.Rank == rank);
-			if (!data.Any())
-				throw new KeyNotFoundException("No job exp data found for rank '" + rank + "' and level '" + level + "'.");
+			if (_totalJobExpByRankLevel.TryGetValue((rank, level), out var totalExp))
+				return totalExp;
 
-			var result = data.Where(a => a.Level <= level).Sum(a => a.Exp);
-
-			return result;
+			throw new KeyNotFoundException("No job exp data found for rank '" + rank + "' and level '" + level + "'.");
 		}
 
 		/// <summary>
@@ -125,15 +129,13 @@ namespace Melia.Shared.Data.Database
 		/// <returns></returns>
 		public int GetMaxJobLevel(int rank)
 		{
-			var highestRank = _jobExp.Max(a => a.Rank);
-			if (rank > highestRank)
-				rank = highestRank;
+			if (rank > _highestJobRank)
+				rank = _highestJobRank;
 
-			var data = _jobExp.Where(a => a.Rank == rank);
-			if (!data.Any())
-				throw new KeyNotFoundException("No job exp data found for rank '" + rank + "'.");
+			if (_maxJobLevelByRank.TryGetValue(rank, out var maxLevel))
+				return maxLevel;
 
-			return data.Max(a => a.Level);
+			throw new KeyNotFoundException("No job exp data found for rank '" + rank + "'.");
 		}
 
 		/// <summary>
@@ -299,6 +301,61 @@ namespace Melia.Shared.Data.Database
 			this.Entries.AddRange(_petExp);
 			this.Entries.AddRange(_friendExp);
 			this.Entries.AddRange(_ancientExp);
+
+			this.BuildJobExpCaches();
+		}
+
+		/// <summary>
+		/// Builds precomputed lookup caches for job exp data so that
+		/// GetMaxJobLevel and GetNextTotalJobExp are O(1) lookups.
+		/// </summary>
+		private void BuildJobExpCaches()
+		{
+			if (_jobExp.Count == 0)
+				return;
+
+			_highestJobRank = 0;
+			foreach (var entry in _jobExp)
+			{
+				if (entry.Rank > _highestJobRank)
+					_highestJobRank = entry.Rank;
+			}
+
+			// Group by rank and compute max level + cumulative exp
+			var byRank = new Dictionary<int, List<JobExpData>>();
+			foreach (var entry in _jobExp)
+			{
+				if (!byRank.TryGetValue(entry.Rank, out var list))
+				{
+					list = new List<JobExpData>();
+					byRank[entry.Rank] = list;
+				}
+				list.Add(entry);
+			}
+
+			foreach (var kvp in byRank)
+			{
+				var rank = kvp.Key;
+				var entries = kvp.Value;
+
+				// Find max level for this rank
+				var maxLevel = 0;
+				foreach (var entry in entries)
+				{
+					if (entry.Level > maxLevel)
+						maxLevel = entry.Level;
+				}
+				_maxJobLevelByRank[rank] = maxLevel;
+
+				// Sort by level and compute cumulative exp
+				entries.Sort((a, b) => a.Level.CompareTo(b.Level));
+				var cumulativeExp = 0L;
+				foreach (var entry in entries)
+				{
+					cumulativeExp += entry.Exp;
+					_totalJobExpByRankLevel[(rank, entry.Level)] = cumulativeExp;
+				}
+			}
 		}
 
 		/// <summary>

@@ -402,7 +402,22 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// There doesn't seem to be a way to change the max job EXP from
 		/// the server, as it is with the base EXP.
 		/// </remarks>
-		public long TotalExp { get; set; }
+		private long _totalExp;
+		private int _cachedLevel = -1;
+		private long _cachedLevelExp = -1;
+
+		public long TotalExp
+		{
+			get => _totalExp;
+			set
+			{
+				if (_totalExp != value)
+				{
+					_totalExp = value;
+					_cachedLevel = -1;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Returns the total maximum EXP that can be collected on this job.
@@ -450,8 +465,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			get
 			{
-				var rank = this.Character.Jobs.GetJobRank(this.Id);
 				var totalExp = this.TotalExp;
+
+				if (_cachedLevel > 0 && _cachedLevelExp == totalExp)
+					return _cachedLevel;
+
+				var rank = this.Character.Jobs.GetJobRank(this.Id);
 				var max = this.MaxLevel;
 
 				// Search for the first level which's requirement we can't
@@ -460,10 +479,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				{
 					var needed = ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(rank, i);
 					if (totalExp < needed)
+					{
+						_cachedLevel = i;
+						_cachedLevelExp = totalExp;
 						return i;
+					}
 				}
 
 				// Found none? It's the max then.
+				_cachedLevel = max;
+				_cachedLevelExp = totalExp;
 				return max;
 			}
 		}

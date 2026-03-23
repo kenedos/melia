@@ -28,6 +28,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private readonly HashSet<ITriggerableArea> _triggerAreas = new();
 		private readonly HashSet<ITriggerableArea> _currentTriggerAreas = new();
 		private readonly List<ITriggerableArea> _tempEnteredAreas = new();
+
+		private DateTime _lastPartyUpdate = DateTime.MinValue;
+		private static readonly TimeSpan PartyUpdateInterval = TimeSpan.FromMilliseconds(500);
 		private readonly List<ITriggerableArea> _tempLeftAreas = new();
 
 		/// <summary>
@@ -534,8 +537,19 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					attachment.OnAttachedEntityMoved(pos);
 				}
 
-				character.Connection.Party?.UpdateMemberInfo(character);
-				// character.Connection.Guild?.UpdateMemberInfo(character); // Removed: Guild type deleted
+				if (character.Connection.Party != null)
+				{
+					var now = DateTime.UtcNow;
+					if ((now - _lastPartyUpdate) >= PartyUpdateInterval)
+					{
+						_lastPartyUpdate = now;
+						character.Connection.Party.UpdateMemberInfo(character);
+					}
+					else
+					{
+						character.Connection.Party.UpdateMemberPosition(character);
+					}
+				}
 
 				if (character.IsRiding && character.ActiveCompanion != null)
 					character.ActiveCompanion.Position = pos;
