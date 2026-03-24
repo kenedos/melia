@@ -3,6 +3,12 @@
 //---------------------------------------------------------------------------
 
 [
+// Base features of the game that are presumed to always have been there.
+{ name: "Base", enabled: true, children: [
+	// Enables bonus stats from jobs
+	{ name: "JobStatBonuses", enabled: true },
+]},
+
 // Second Closed Beta Phase, which ran between Winter 2015 and Spring 2016.
 { name: "iCBT2", enabled: true, children: [
 	// Removes Centurion from the Swordman job tree
