@@ -201,6 +201,9 @@ namespace Melia.Zone.Scripting.AI
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
+			if (this.Entity == null)
+				return;
+
 			using (Debug.Profile($"AiScript.Update: {this.Entity.Name} ({this.Entity.Handle}), Routine: {this.CurrentRoutine ?? "Idle"}", 50))
 			{
 				try
