@@ -68,19 +68,6 @@ namespace Melia.Zone.Packages.Laima.Pads.Swordsmen.Peltasta
 
 			pad.Variables.Set("shieldMonster", shieldMonster);
 
-			//if (creator is Character character)
-			{
-				// Check item type for shield? Though it will be funny when
-				// someone manages to throw something else, and it's only
-				// a visual effect anyway.
-				//var lhItem = character.Inventory.GetItem(EquipSlot.LeftHand).Data;
-				//Send.ZC_NORMAL.PadSetModel(shieldMonster, "warrior_f_", lhItem.Id);
-			}
-
-			//Send.ZC_NORMAL.ActorRotate(shieldMonster, 90, 0, 0);
-			//Send.ZC_NORMAL.SpinObject(shieldMonster, 0, -1, 0.2f, 0);
-			//Send.ZC_NORMAL.PadSetMonsterAltitude(pad, shieldMonster, 22);
-
 			CallSafe(this.FlyShieldFly(pad, creator));
 		}
 
@@ -97,7 +84,7 @@ namespace Melia.Zone.Packages.Laima.Pads.Swordsmen.Peltasta
 			var shieldMonster = pad.Variables.Get<Mob>("shieldMonster");
 
 			Send.ZC_NORMAL.PadUpdate(creator, pad, "Peltasta_ShieldLob2", 0, 145.8735f, 30, false);
-			creator.Map.RemoveMonster(shieldMonster);
+			pad.Map.RemoveMonster(shieldMonster);
 		}
 
 		/// <summary>
