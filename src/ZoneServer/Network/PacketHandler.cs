@@ -2099,20 +2099,11 @@ namespace Melia.Zone.Network
 			ICombatEntity target = null;
 			if (targetHandle != 0)
 			{
-				if (!character.Map.TryGetActor(targetHandle, out var actor))
+				if (character.Map.TryGetActor(targetHandle, out var actor))
 				{
-					Log.Warning("CZ_SKILL_GROUND: User '{0}' tried to use skill '{1}' on a non-existing target.", conn.Account.Name, skill.Id);
-					return;
+					if (actor is ICombatEntity ce)
+						target = ce;
 				}
-
-				// The client sends a handle regardless of who you're
-				// targetting, including friendlies and NPCs. The latter
-				// we're going to exclude for now, under the assumption
-				// that you never use skills on "non-combatants."
-				// We probably want a more sophisticated target check
-				// down the line, based on the skill's target options.
-				if (actor is ICombatEntity ce)
-					target = ce;
 			}
 
 			// Try to use skill
