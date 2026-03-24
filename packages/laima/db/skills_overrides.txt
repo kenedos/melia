@@ -47,12 +47,12 @@
 // Hoplite
 //---------------------------------------------------------------------------
 { skillId: 10301, className: "Hoplite_Stabbing", name: "Stabbing", basicSp: 50, splashRate: 0, factor: 66, factorByLevel: 6.6, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "2" },
-{ skillId: 10302, className: "Hoplite_Pierce", name: "Pierce", basicSp: 24, splashRate: 3, factor: 185, factorByLevel: 18.5, hitCount: 1, multiHitCount: 4, cooldownTime: 9000, overheatCount: "3" },
+{ skillId: 10302, className: "Hoplite_Pierce", name: "Pierce", basicSp: 24, splashRate: 3, factor: 185, factorByLevel: 18.5, hitCount: 1, multiHitCount: 4, cooldownTime: 7000, overheatCount: "3" },
 { skillId: 10303, className: "Hoplite_Finestra", name: "Finestra", basicSp: 67, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 10304, className: "Hoplite_SynchroThrusting", name: "Synchro Thrusting", basicSp: 33, splashRate: 0, factor: 415, factorByLevel: 41.5, hitCount: 1, multiHitCount: 3, cooldownTime: 4000, overheatCount: "3" },
 { skillId: 10305, className: "Hoplite_LongStride", name: "Long Stride", basicSp: 18, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "3" },
 { skillId: 10306, className: "Hoplite_ThrouwingSpear", name: "Spear Throw", basicSp: 30, splashRate: 16, factor: 103, factorByLevel: 10.3, hitCount: 1, multiHitCount: 3, cooldownTime: 9000, overheatCount: "3" },
-{ skillId: 10307, className: "Hoplite_SpearLunge", name: "Spear Lunge", basicSp: 26, splashRate: 3, factor: 242, factorByLevel: 24.2, hitCount: 1, multiHitCount: 2, cooldownTime: 8000, overheatCount: "3" },
+{ skillId: 10307, className: "Hoplite_SpearLunge", name: "Spear Lunge", basicSp: 26, splashRate: 3, factor: 242, factorByLevel: 24.2, hitCount: 1, multiHitCount: 2, cooldownTime: 8000, overheatCount: "3", shootTime: 400 },
 { skillId: 10308, className: "Hoplite_SharpSpear", name: "Sharp Spear", basicSp: 0, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
 
 // Barbarian
@@ -630,12 +630,12 @@
 
 // Fletcher
 //---------------------------------------------------------------------------
-{ skillId: 30801, className: "Fletcher_BroadHead", name: "Broadhead", basicSp: 50, splashRate: -1, factor: 38, factorByLevel: 63, hitCount: 1, multiHitCount: 13, cooldownTime: 15000 },
-{ skillId: 30802, className: "Fletcher_BodkinPoint", name: "Bodkin Point", basicSp: 29, splashRate: 0, factor: 85, factorByLevel: 8.5, hitCount: 1, multiHitCount: 1, cooldownTime: 4000 },
-{ skillId: 30803, className: "Fletcher_BarbedArrow", name: "Barbed Arrow", basicSp: 31, splashRate: 0, factor: 125, factorByLevel: 12.5, hitCount: 1, multiHitCount: 5, cooldownTime: 6000 },
-{ skillId: 30804, className: "Fletcher_CrossFire", name: "Crossfire", basicSp: 65, splashRate: 10, factor: 245, factorByLevel: 24.5, hitCount: 1, multiHitCount: 2, cooldownTime: 12000 },
-{ skillId: 30805, className: "Fletcher_MagicArrow", name: "Magic Arrow", basicSp: 46, splashRate: -1, factor: 28, factorByLevel: 28, hitCount: 1, multiHitCount: 20, cooldownTime: 10000 },
-{ skillId: 30806, className: "Fletcher_Singijeon", name: "Divine Machine Arrow", basicSp: 51, splashRate: 8, factor: 342, factorByLevel: 34.2, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
+{ skillId: 30801, className: "Fletcher_BroadHead", name: "Broadhead", basicSp: 20, splashRate: -1, factor: 38, factorByLevel: 63, hitCount: 1, multiHitCount: 13, cooldownTime: 15000 },
+{ skillId: 30802, className: "Fletcher_BodkinPoint", name: "Bodkin Point", basicSp: 12, splashRate: 0, factor: 85, factorByLevel: 8.5, hitCount: 1, multiHitCount: 1, cooldownTime: 4000 },
+{ skillId: 30803, className: "Fletcher_BarbedArrow", name: "Barbed Arrow", basicSp: 19, splashRate: 0, factor: 125, factorByLevel: 12.5, hitCount: 1, multiHitCount: 5, cooldownTime: 6000 },
+{ skillId: 30804, className: "Fletcher_CrossFire", name: "Crossfire", basicSp: 45, splashRate: 10, factor: 245, factorByLevel: 24.5, hitCount: 1, multiHitCount: 2, cooldownTime: 12000 },
+{ skillId: 30805, className: "Fletcher_MagicArrow", name: "Magic Arrow", basicSp: 35, splashRate: -1, factor: 28, factorByLevel: 28, hitCount: 1, multiHitCount: 20, cooldownTime: 10000 },
+{ skillId: 30806, className: "Fletcher_Singijeon", name: "Divine Machine Arrow", basicSp: 36, splashRate: 8, factor: 342, factorByLevel: 34.2, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
 { skillId: 30807, className: "Fletcher_BroadHead_DOT", name: "Broadhead", basicSp: 50, splashRate: -1, factor: 38, factorByLevel: 63, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "0" },
 { skillId: 30808, className: "Fletcher_FletcherArrowShot", name: "Fletcher Arrow Shot", basicSp: 0, splashRate: -1, factor: 10, factorByLevel: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 0, overheatCount: "0", enableCastMove: true },
 { skillId: 30809, className: "Fletcher_CatenaChainArrow", name: "Catena Chain Arrow", basicSp: 55, splashRate: -1, factor: 178, factorByLevel: 33, hitCount: 1, multiHitCount: 1, cooldownTime: 20000 },
