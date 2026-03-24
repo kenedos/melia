@@ -2101,7 +2101,7 @@ namespace Melia.Zone.Network
 			{
 				if (character.Map.TryGetActor(targetHandle, out var actor))
 				{
-					if (actor is ICombatEntity ce)
+					if (actor is ICombatEntity ce && character.CanDamage(ce))
 						target = ce;
 				}
 			}
