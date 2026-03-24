@@ -856,7 +856,8 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var byBuffs = properties.GetFloat(PropertyName.MaxWeight_BM);
 		var byBonus = properties.GetFloat(PropertyName.MaxWeight_Bonus);
-		value += byBuffs + byBonus;
+		var byBuffRate = (float)Math.Floor(value * properties.GetFloat(PropertyName.MaxWeight_RATE_BM));
+		value += byBuffs + byBonus + byBuffRate;
 
 		return value;
 	}
