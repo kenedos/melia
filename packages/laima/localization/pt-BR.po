@@ -13055,3 +13055,715 @@ msgstr "Maravilhoso! Traga-me 40 tufos de Pelo de Lepusbunny e 8 Correntes Branc
 msgid "That's alright, dear. I'll be here if you change your mind."
 msgstr "Tudo bem, querida. Estarei aqui se mudar de ideia."
 
+# ============================================================================
+# Blacksmiths (NPCFunctions.cs)
+# ============================================================================
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Zaras"
+msgstr "Zaras"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Zaras, best Blacksmith in town! How may I help you?"
+msgstr "Zaras, o melhor ferreiro da cidade! Como posso ajudá-lo?"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Ilanai"
+msgstr "Ilanai"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Welcome to my humble shop~! How can I help you?"
+msgstr "Bem-vindo à minha humilde loja~! Como posso ajudá-lo?"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Anna"
+msgstr "Anna"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Welcome, welcome! My services will surprise you!"
+msgstr "Bem-vindo, bem-vindo! Meus serviços vão surpreendê-lo!"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Repair"
+msgstr "Reparar"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Socket Management"
+msgstr "Gerenciar Engastes"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Identify"
+msgstr "Identificar"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Item Dismantle"
+msgstr "Desmontar Item"
+
+#: src/ZoneServer/Scripting/Shared/NPCFunctions.cs
+msgid "Cancel"
+msgstr "Cancelar"
+
+# ============================================================================
+# Silver Exchanger - Sandra (exchanger.cs)
+# ============================================================================
+
+#: custom/npcs/exchanger.cs
+msgid "[Silver Exchanger] Sandra"
+msgstr "[Cambista] Sandra"
+
+#: custom/npcs/exchanger.cs
+msgid "Hi there! I can help you exchange your silver for Goddess Bills. With those, you'll be able to better commercialize your goods with other people! Paper money is the best!"
+msgstr "Olá! Posso ajudá-lo a trocar sua prata por Notas da Deusa. Com elas, você poderá comercializar melhor seus produtos com outras pessoas! Dinheiro em papel é o melhor!"
+
+#: custom/npcs/exchanger.cs
+msgid "Exchange Silver"
+msgstr "Trocar Prata"
+
+#: custom/npcs/exchanger.cs
+msgid "Exchange Bills"
+msgstr "Trocar Notas"
+
+#: custom/npcs/exchanger.cs
+msgid "Nothing"
+msgstr "Nada"
+
+#: custom/npcs/exchanger.cs
+msgid "Please come back any time."
+msgstr "Por favor, volte quando quiser."
+
+#: custom/npcs/exchanger.cs
+msgid "Want some shiny paper money? That's the best decision you will ever make!"
+msgstr "Quer umas notas brilhantes? Essa é a melhor decisão que você vai tomar!"
+
+#: custom/npcs/exchanger.cs
+msgid "Looks like you have {0} silver. How much do you want to exchange?"
+msgstr "Parece que você tem {0} de prata. Quanto deseja trocar?"
+
+#: custom/npcs/exchanger.cs
+msgid "Sorry, I can only exchange 1000 silver or more!"
+msgstr "Desculpe, só posso trocar 1000 de prata ou mais!"
+
+#: custom/npcs/exchanger.cs
+msgid "You don't have that much silver! Check your pockets again."
+msgstr "Você não tem tanta prata! Verifique seus bolsos novamente."
+
+#: custom/npcs/exchanger.cs
+msgid "Thanks for your business!"
+msgstr "Obrigada pelo negócio!"
+
+#: custom/npcs/exchanger.cs
+msgid "Eh? You want silver? But paper is the future! No, really! Would I lie to you? ... Well, suit yourself."
+msgstr "Hã? Você quer prata? Mas papel é o futuro! Sério! Eu mentiria para você? ... Bom, como quiser."
+
+#: custom/npcs/exchanger.cs
+msgid "You have bills worth {0} silver. How much silver do you want?"
+msgstr "Você tem notas no valor de {0} de prata. Quanta prata você quer?"
+
+#: custom/npcs/exchanger.cs
+msgid "Sorry, I have a 1000 silver minimum."
+msgstr "Desculpe, o mínimo é 1000 de prata."
+
+#: custom/npcs/exchanger.cs
+msgid "I could only give you {0} silver for your bills. That's all you had!"
+msgstr "Só consegui te dar {0} de prata pelas suas notas. Era tudo que você tinha!"
+
+#: custom/npcs/exchanger.cs
+msgid "Here's your {0} silver. Thanks for the business!"
+msgstr "Aqui está sua prata: {0}. Obrigada pelo negócio!"
+
+# ============================================================================
+# Stat/Skill Reset - Seraphina (stat_skill_reset.cs)
+# ============================================================================
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "[Angel] Seraphina"
+msgstr "[Anjo] Seraphina"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "Seraphina"
+msgstr "Seraphina"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "Greetings, adventurer. I am Seraphina, an angel of the goddess Laima. I can help you redistribute your stat points or reset your skill points, for a fee that increases with each use."
+msgstr "Saudações, aventureiro. Eu sou Seraphina, uma anjo da deusa Laima. Posso ajudá-lo a redistribuir seus pontos de atributo ou resetar seus pontos de habilidade, por uma taxa que aumenta a cada uso."
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "Stat Reset ({0} Silver)"
+msgstr "Reset de Atributos ({0} Prata)"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "Skill Reset ({0} Silver)"
+msgstr "Reset de Habilidades ({0} Prata)"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "No thanks."
+msgstr "Não, obrigado."
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "May the blessings of the goddess Laima be with you."
+msgstr "Que as bênçãos da deusa Laima estejam com você."
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "stat"
+msgstr "atributo"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "skill"
+msgstr "habilidade"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "A {0} reset will cost {1} Silver.\nYou have used this service {2} time(s) before."
+msgstr "Um reset de {0} custará {1} Prata.\nVocê já usou este serviço {2} vez(es) antes."
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "You have reached the maximum price. Further resets will not increase in cost."
+msgstr "Você atingiu o preço máximo. Resets futuros não terão aumento de custo."
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "{0}\n\nYou don't have enough Silver. You need {1} Silver."
+msgstr "{0}\n\nVocê não tem Prata suficiente. Você precisa de {1} Prata."
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "Yes, reset my {0}s"
+msgstr "Sim, resetar meus {0}s"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "No, nevermind"
+msgstr "Não, deixa pra lá"
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "Your {0}s have been reset successfully.\n\nYour next {0} reset will cost {1} Silver."
+msgstr "Seus {0}s foram resetados com sucesso.\n\nSeu próximo reset de {0} custará {1} Prata."
+
+#: custom/npcs/stat_skill_reset.cs
+msgid "Perhaps another time, then."
+msgstr "Talvez em outra hora, então."
+
+# ============================================================================
+# Stylist - Jeremy (stylist.cs)
+# ============================================================================
+
+#: custom/npcs/stylist.cs
+msgid "[Stylist] Jeremy"
+msgstr "[Estilista] Jeremy"
+
+#: custom/npcs/stylist.cs
+msgid "Jeremy"
+msgstr "Jeremy"
+
+#: custom/npcs/stylist.cs
+msgid "What can I do for you today?"
+msgstr "O que posso fazer por você hoje?"
+
+#: custom/npcs/stylist.cs
+msgid "Change Hair Style"
+msgstr "Mudar Estilo de Cabelo"
+
+#: custom/npcs/stylist.cs
+msgid "Change Hair Color"
+msgstr "Mudar Cor de Cabelo"
+
+#: custom/npcs/stylist.cs
+msgid "Nothing"
+msgstr "Nada"
+
+#: custom/npcs/stylist.cs
+msgid "Please come back any time."
+msgstr "Por favor, volte quando quiser."
+
+#: custom/npcs/stylist.cs
+msgid "This style is called {0} in {1} (#{2}), what do you think?"
+msgstr "Este estilo se chama {0} em {1} (#{2}), o que acha?"
+
+#: custom/npcs/stylist.cs
+msgid "Next"
+msgstr "Próximo"
+
+#: custom/npcs/stylist.cs
+msgid "Previous"
+msgstr "Anterior"
+
+#: custom/npcs/stylist.cs
+msgid "Jump"
+msgstr "Pular para"
+
+#: custom/npcs/stylist.cs
+msgid "I like it"
+msgstr "Gostei"
+
+#: custom/npcs/stylist.cs
+msgid "Which style would you like to see, do you have a number for me?"
+msgstr "Qual estilo gostaria de ver? Tem um número para mim?"
+
+#: custom/npcs/stylist.cs
+msgid "Hm... Not a number, is it?"
+msgstr "Hm... Não é um número, né?"
+
+#: custom/npcs/stylist.cs
+msgid "I'm sorry, I don't know that style."
+msgstr "Desculpe, não conheço esse estilo."
+
+# ============================================================================
+# Costume Converter - Fabrizio (costume_converter.cs)
+# ============================================================================
+
+#: custom/npcs/costume_converter.cs
+msgid "[Fashion Virtuoso] Fabrizio"
+msgstr "[Virtuoso da Moda] Fabrizio"
+
+#: custom/npcs/costume_converter.cs
+msgid "Fabrizio"
+msgstr "Fabrizio"
+
+#: custom/npcs/costume_converter.cs
+msgid "Darling! DARLING! What a MAGNIFICENT creature you are! I am Fabrizio, the one and only Fashion Virtuoso of the realm!"
+msgstr "Querido! QUERIDO! Que criatura MAGNÍFICA você é! Eu sou Fabrizio, o único e inigualável Virtuoso da Moda do reino!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Tell me, what brings you to my fabulous presence today?"
+msgstr "Diga-me, o que te traz à minha fabulosa presença hoje?"
+
+#: custom/npcs/costume_converter.cs
+msgid "I need a costume converted"
+msgstr "Preciso converter um traje"
+
+#: custom/npcs/costume_converter.cs
+msgid "Who are you exactly?"
+msgstr "Quem é você exatamente?"
+
+#: custom/npcs/costume_converter.cs
+msgid "Nothing, just passing by"
+msgstr "Nada, só passando"
+
+#: custom/npcs/costume_converter.cs
+msgid "Oh, you DON'T know?! I am simply DEVASTATED! But also thrilled to enlighten you!"
+msgstr "Oh, você NÃO sabe?! Estou simplesmente DEVASTADO! Mas também empolgado em iluminá-lo!"
+
+#: custom/npcs/costume_converter.cs
+msgid "I am Fabrizio! Master of fabric, sultan of stitches, the EMPEROR of elegant ensembles!"
+msgstr "Eu sou Fabrizio! Mestre dos tecidos, sultão das costuras, o IMPERADOR dos conjuntos elegantes!"
+
+#: custom/npcs/costume_converter.cs
+msgid "I possess the extraordinary gift of transforming costumes between their masculine and feminine forms. A little nip here, a tuck there, some ABSOLUTELY divine magic..."
+msgstr "Possuo o dom extraordinário de transformar trajes entre suas formas masculina e feminina. Um ajuste aqui, uma prega ali, um pouco de magia ABSOLUTAMENTE divina..."
+
+#: custom/npcs/costume_converter.cs
+msgid "And voila! Your dashing knight's armor becomes a stunning warrior princess gown! Or vice versa, naturally. I don't discriminate - fashion is UNIVERSAL!"
+msgstr "E voilà! Sua armadura de cavaleiro se torna um deslumbrante vestido de princesa guerreira! Ou vice-versa, naturalmente. Eu não discrimino - moda é UNIVERSAL!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Leaving so soon?! But we've barely scratched the surface of your fashion POTENTIAL! Do come back when you're ready to be TRANSFORMED, darling!"
+msgstr "Indo tão cedo?! Mas mal arranhamos a superfície do seu POTENCIAL fashion! Volte quando estiver pronto para ser TRANSFORMADO, querido!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Oh no, no, NO! I've searched through your belongings and found NOTHING I can work with!"
+msgstr "Oh não, não, NÃO! Procurei em seus pertences e não encontrei NADA com que eu possa trabalhar!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Bring me costumes with proper gendered designs, darling. The ones marked as Male or Female variants. THEN we can create magic together!"
+msgstr "Traga-me trajes com designs próprios de gênero, querido. Aqueles marcados como variantes Masculina ou Feminina. AÍ poderemos criar magia juntos!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Ooh, let me take a PEEK at what treasures you've brought me today..."
+msgstr "Ooh, deixe-me dar uma ESPIADA nos tesouros que você trouxe hoje..."
+
+#: custom/npcs/costume_converter.cs
+msgid "Yes, YES! I see some pieces with POTENTIAL! Which one shall we transform?"
+msgstr "Sim, SIM! Vejo algumas peças com POTENCIAL! Qual vamos transformar?"
+
+#: custom/npcs/costume_converter.cs
+msgid "Changed your mind? Perfectly understandable, darling. Fashion decisions should NEVER be rushed! Come back when inspiration strikes!"
+msgstr "Mudou de ideia? Perfeitamente compreensível, querido. Decisões de moda NUNCA devem ser apressadas! Volte quando a inspiração surgir!"
+
+#: custom/npcs/costume_converter.cs
+msgid "masculine"
+msgstr "masculina"
+
+#: custom/npcs/costume_converter.cs
+msgid "feminine"
+msgstr "feminina"
+
+#: custom/npcs/costume_converter.cs
+msgid "I examined your {0} from EVERY angle..."
+msgstr "Examinei seu {0} de TODOS os ângulos..."
+
+#: custom/npcs/costume_converter.cs
+msgid "But alas! This particular piece has no counterpart in the opposite style. Some designs are simply TOO unique to be reimagined!"
+msgstr "Mas infelizmente! Esta peça não tem equivalente no estilo oposto. Alguns designs são simplesmente ÚNICOS demais para serem reimaginados!"
+
+#: custom/npcs/costume_converter.cs
+msgid "It's not a failure, darling - it's EXCLUSIVITY! Wear it with PRIDE!"
+msgstr "Não é uma falha, querido - é EXCLUSIVIDADE! Use com ORGULHO!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Aha! Your gorgeous '{0}'!"
+msgstr "Aha! Seu lindo '{0}'!"
+
+#: custom/npcs/costume_converter.cs
+msgid "I can transform this {0} masterpiece into its {1} counterpart: '{2}'!"
+msgstr "Posso transformar esta obra-prima {0} em sua versão {1}: '{2}'!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Shall I work my magic? This transformation is IRREVERSIBLE... well, unless you come back to me again!"
+msgstr "Devo fazer minha mágica? Esta transformação é IRREVERSÍVEL... bom, a menos que você volte aqui novamente!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Yes, transform it!"
+msgstr "Sim, transforme!"
+
+#: custom/npcs/costume_converter.cs
+msgid "No, I changed my mind"
+msgstr "Não, mudei de ideia"
+
+#: custom/npcs/costume_converter.cs
+msgid "No?! But... but it would have been SPECTACULAR! *sigh* Very well. The artist in me weeps, but I respect your decision. Come back when you're ready for GREATNESS!"
+msgstr "Não?! Mas... mas teria sido ESPETACULAR! *suspiro* Muito bem. O artista em mim chora, mas respeito sua decisão. Volte quando estiver pronto para a GRANDEZA!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Stand back, darling! Watch the MASTER at work!"
+msgstr "Afaste-se, querido! Veja o MESTRE em ação!"
+
+#: custom/npcs/costume_converter.cs
+msgid "*snip snip* *dramatic flourish* *a sprinkle of fairy dust*"
+msgstr "*clip clip* *floreio dramático* *uma pitada de pó de fada*"
+
+#: custom/npcs/costume_converter.cs
+msgid "...AND WE'RE DONE!"
+msgstr "...E PRONTO!"
+
+#: custom/npcs/costume_converter.cs
+msgid "BEHOLD! Your '{0}' has been REBORN as '{1}'!"
+msgstr "CONTEMPLE! Seu '{0}' RENASCEU como '{1}'!"
+
+#: custom/npcs/costume_converter.cs
+msgid "Is it not MAGNIFICENT?! Is it not DIVINE?! Go forth and DAZZLE the world, you beautiful creature!"
+msgstr "Não é MAGNÍFICO?! Não é DIVINO?! Vá em frente e DESLUMBRE o mundo, sua bela criatura!"
+
+#: custom/npcs/costume_converter.cs
+msgid "< Previous page"
+msgstr "< Página anterior"
+
+#: custom/npcs/costume_converter.cs
+msgid "Next page >"
+msgstr "Próxima página >"
+
+#: custom/npcs/costume_converter.cs
+msgid "Actually, never mind"
+msgstr "Na verdade, deixa pra lá"
+
+#: custom/npcs/costume_converter.cs
+msgid "Select a costume to convert:"
+msgstr "Selecione um traje para converter:"
+
+#: custom/npcs/costume_converter.cs
+msgid " (Page {0}/{1})"
+msgstr " (Página {0}/{1})"
+
+# ============================================================================
+# Megaphone - Vivienne (megaphone_npc.cs)
+# ============================================================================
+
+#: custom/npcs/megaphone_npc.cs
+msgid "[Party Planner] Vivienne"
+msgstr "[Organizadora de Festas] Vivienne"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Vivienne"
+msgstr "Vivienne"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Hey there, cutie! I'm Vivienne, party planner extraordinaire!"
+msgstr "Oi, fofura! Eu sou a Vivienne, organizadora de festas extraordinária!"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "You know what makes a party really pop? When everyone can hear about it! That's where my little magic helpers come in."
+msgstr "Sabe o que faz uma festa bombar de verdade? Quando todo mundo fica sabendo! É aí que meus ajudantes mágicos entram."
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Ooh, you've already got a Megaphone! Perfect! Now you can let everyone know when and where the fun's happening!"
+msgstr "Ooh, você já tem um Megafone! Perfeito! Agora você pode avisar todo mundo quando e onde a diversão está rolando!"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Just use /y and your message to shout it out to everyone! Go spread the good vibes!"
+msgstr "Basta usar /y e sua mensagem para gritar para todos! Vá espalhar boas vibrações!"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "You look like someone who knows how to have a good time! Want a Megaphone so you can rally the troops for some fun?"
+msgstr "Você parece alguém que sabe se divertir! Quer um Megafone para reunir a galera?"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Yes please!"
+msgstr "Sim, por favor!"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "No thanks, I'm more of a wallflower."
+msgstr "Não, obrigado, sou mais na minha."
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Aww, that's a shame! But hey, if you ever change your mind and want to join the party, you know where to find me!"
+msgstr "Ahh, que pena! Mas ei, se mudar de ideia e quiser entrar na festa, sabe onde me encontrar!"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Here you go, hun! One magical Megaphone, fresh and ready to use!"
+msgstr "Aqui está, querido! Um Megafone mágico, novinho e pronto para usar!"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Just type /y followed by whatever you wanna say. Like: /y Party at the fountain, everyone's invited!"
+msgstr "Basta digitar /y seguido do que quiser dizer. Tipo: /y Festa na fonte, todos estão convidados!"
+
+#: custom/npcs/megaphone_npc.cs
+msgid "Now go out there and spread those good vibes! And remember, be nice to each other. Life's too short for drama!"
+msgstr "Agora vá lá fora e espalhe boas vibrações! E lembre-se, sejam legais uns com os outros. A vida é curta demais para drama!"
+
+# ============================================================================
+# PVP Arena - Zack (pvp_arena.cs)
+# ============================================================================
+
+#: custom/npcs/pvp_arena.cs
+msgid "Zack"
+msgstr "Zack"
+
+#: custom/npcs/pvp_arena.cs
+msgid "Would you like to exit the PVP Arena?"
+msgstr "Gostaria de sair da Arena PVP?"
+
+#: custom/npcs/pvp_arena.cs
+msgid "Exit"
+msgstr "Sair"
+
+#: custom/npcs/pvp_arena.cs
+msgid "Are you ready to battle for glory in the PVP Arena?"
+msgstr "Está pronto para lutar por glória na Arena PVP?"
+
+#: custom/npcs/pvp_arena.cs
+msgid "Battle!"
+msgstr "Batalhar!"
+
+#: custom/npcs/pvp_arena.cs
+msgid "Spectate"
+msgstr "Assistir"
+
+#: custom/npcs/pvp_arena.cs
+msgid "There is a battle currently going on, please wait a moment!"
+msgstr "Há uma batalha acontecendo, por favor aguarde um momento!"
+
+#: custom/npcs/pvp_arena.cs
+msgid "You've been added to the queue. Please wait for the battle to start."
+msgstr "Você foi adicionado à fila. Aguarde o início da batalha."
+
+# ============================================================================
+# Free-For-All PVP Arena (free_for_all_pvp_arena.cs)
+# ============================================================================
+
+#: custom/npcs/free_for_all_pvp_arena.cs
+msgid "Welcome to the Free-For-All Arena! Here, it's every warrior for themselves. Would you like to enter?"
+msgstr "Bem-vindo à Arena Todos Contra Todos! Aqui, cada guerreiro por si. Gostaria de entrar?"
+
+#: custom/npcs/free_for_all_pvp_arena.cs
+msgid "Enter Arena"
+msgstr "Entrar na Arena"
+
+#: custom/npcs/free_for_all_pvp_arena.cs
+msgid "Exit Portal"
+msgstr "Portal de Saída"
+
+#: custom/npcs/free_for_all_pvp_arena.cs
+msgid "Stand here for 10 seconds to exit the arena. Moving will cancel the exit process."
+msgstr "Fique aqui por 10 segundos para sair da arena. Mover-se cancelará o processo de saída."
+
+#: custom/npcs/free_for_all_pvp_arena.cs
+msgid "Start Exit Timer"
+msgstr "Iniciar Contagem de Saída"
+
+#: custom/npcs/free_for_all_pvp_arena.cs
+msgid "Don't move for 10 seconds..."
+msgstr "Não se mova por 10 segundos..."
+
+# ============================================================================
+# Adventurer's Guild (adventurer_guild.cs)
+# ============================================================================
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Receptionist"
+msgstr "Recepcionista"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Would you like to register?"
+msgstr "Gostaria de se registrar?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Yes"
+msgstr "Sim"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "No"
+msgstr "Não"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Excellent! You are now a Wood Rank adventurer. I will have quests for you soon!"
+msgstr "Excelente! Você agora é um aventureiro de Rank Madeira. Terei missões para você em breve!"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "No problem. Let me know if you change your mind."
+msgstr "Sem problema. Me avise se mudar de ideia."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Welcome back to the Adventurer's Guild, {0}! Your current rank is {1}."
+msgstr "Bem-vindo de volta à Guilda dos Aventureiros, {0}! Seu rank atual é {1}."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Daily Quest."
+msgstr "Missão Diária."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "I'd like to hear about other available tasks."
+msgstr "Gostaria de saber sobre outras tarefas disponíveis."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "I'm ready for a promotion!"
+msgstr "Estou pronto para uma promoção!"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Nevermind"
+msgstr "Deixa pra lá"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "What can I help you with today?"
+msgstr "Como posso ajudá-lo hoje?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Alright, feel free to come back when you're ready."
+msgstr "Tudo bem, fique à vontade para voltar quando estiver pronto."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Hmm, something seems to be wrong with my records for today's quest."
+msgstr "Hmm, parece haver algo errado com meus registros da missão de hoje."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Turn in items."
+msgstr "Entregar itens."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Decline"
+msgstr "Recusar"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Alright, let me know if you change your mind."
+msgstr "Tudo bem, me avise se mudar de ideia."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "You don't have a pending rank-up quest."
+msgstr "Você não tem uma missão de promoção pendente."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "You are now eligible for a promotion! Are you ready for a challenging task?"
+msgstr "Você está elegível para uma promoção! Está pronto para uma tarefa desafiadora?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Accept"
+msgstr "Aceitar"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Come back tomorrow for another quest!"
+msgstr "Volte amanhã para outra missão!"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "I don't have any other quests for you right now."
+msgstr "Não tenho outras missões para você agora."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "I have some other tasks available. Would you like to hear about them?"
+msgstr "Tenho outras tarefas disponíveis. Gostaria de saber sobre elas?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Which task are you interested in?"
+msgstr "Em qual tarefa você está interessado?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Hmm, something seems to be wrong with my records. Please try again later."
+msgstr "Hmm, parece haver algo errado com meus registros. Tente novamente mais tarde."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Will you accept this task?"
+msgstr "Você aceita esta tarefa?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Excellent! Good luck."
+msgstr "Excelente! Boa sorte."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Alright, no problem."
+msgstr "Tudo bem, sem problema."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Quartermaster"
+msgstr "Intendente"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Welcome! I offer powerful buffs to aid you on your adventures."
+msgstr "Bem-vindo! Ofereço buffs poderosos para ajudá-lo em suas aventuras."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Which buff would you like to purchase?"
+msgstr "Qual buff gostaria de comprar?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Increased Attack (1000 Silver)"
+msgstr "Aumento de Ataque (1000 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Increased Defense (1500 Silver)"
+msgstr "Aumento de Defesa (1500 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Increased Movement Speed (800 Silver)"
+msgstr "Aumento de Velocidade (800 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Bartender"
+msgstr "Barman"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Welcome! I have a selection of potent potions to enhance your abilities."
+msgstr "Bem-vindo! Tenho uma seleção de poções potentes para melhorar suas habilidades."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Which potion would you like to purchase?"
+msgstr "Qual poção gostaria de comprar?"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Might Potion (500 Silver)"
+msgstr "Poção de Poder (500 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Condensed Might Potion (750 Silver)"
+msgstr "Poção de Poder Condensada (750 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Strength Potion (500 Silver)"
+msgstr "Poção de Força (500 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Condensed Strength Potion (750 Silver)"
+msgstr "Poção de Força Condensada (750 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Fire Resistance Potion (600 Silver)"
+msgstr "Poção de Resistência ao Fogo (600 Prata)"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Alright, come back if you need something."
+msgstr "Tudo bem, volte se precisar de algo."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "You don't have enough silver."
+msgstr "Você não tem prata suficiente."
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Buff applied!"
+msgstr "Buff aplicado!"
+
+#: custom/npcs/adventurer_guild.cs
+msgid "Here's your {0}!"
+msgstr "Aqui está seu {0}!"
+

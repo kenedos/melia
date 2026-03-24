@@ -25,7 +25,7 @@ public class CustomNpcStatSkillReset : GeneralScript
 	{
 		var player = dialog.Player;
 
-		dialog.SetTitle("Seraphina");
+		dialog.SetTitle(L("Seraphina"));
 
 		var statResetCount = player.Variables.Perm.GetInt("StatResetCount");
 		var skillResetCount = player.Variables.Perm.GetInt("SkillResetCount");
@@ -35,9 +35,7 @@ public class CustomNpcStatSkillReset : GeneralScript
 		var statPriceStr = FormatSilver(statPrice);
 		var skillPriceStr = FormatSilver(skillPrice);
 
-		var greeting = "Greetings, adventurer. I am Seraphina, an angel of the goddess Laima. "
-			+ "I can help you redistribute your stat points or reset your skill points, "
-			+ "for a fee that increases with each use.";
+		var greeting = L("Greetings, adventurer. I am Seraphina, an angel of the goddess Laima. I can help you redistribute your stat points or reset your skill points, for a fee that increases with each use.");
 
 		var selection = await dialog.Select(greeting,
 			Option(LF("Stat Reset ({0} Silver)", statPriceStr), "stat_reset"),
@@ -54,19 +52,19 @@ public class CustomNpcStatSkillReset : GeneralScript
 				await this.HandleReset(dialog, player, false, skillPrice, skillResetCount);
 				break;
 			case "cancel":
-				await dialog.Msg("May the blessings of the goddess Laima be with you.");
+				await dialog.Msg(L("May the blessings of the goddess Laima be with you."));
 				break;
 		}
 	}
 	private async Task HandleReset(Dialog dialog, Character player, bool isStatReset, int price, int resetCount)
 	{
-		var resetTypeName = isStatReset ? "stat" : "skill";
+		var resetTypeName = isStatReset ? L("stat") : L("skill");
 		var resetCountVariable = isStatReset ? "StatResetCount" : "SkillResetCount";
 
 		var confirmMsg = LF("A {0} reset will cost {1} Silver.\nYou have used this service {2} time(s) before.", resetTypeName, FormatSilver(price), resetCount);
 
 		if (price >= MaxPrice)
-			confirmMsg += "\nYou have reached the maximum price. Further resets will not increase in cost.";
+			confirmMsg += "\n" + L("You have reached the maximum price. Further resets will not increase in cost.");
 
 		if (!player.HasSilver(price))
 		{
@@ -100,7 +98,7 @@ public class CustomNpcStatSkillReset : GeneralScript
 		}
 		else
 		{
-			await dialog.Msg("Perhaps another time, then.");
+			await dialog.Msg(L("Perhaps another time, then."));
 		}
 	}
 
