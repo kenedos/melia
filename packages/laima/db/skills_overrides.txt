@@ -561,7 +561,7 @@
 { skillId: 30005, className: "Archer_ObliqueShot", name: "Oblique Shot", basicSp: 3, factor: 50, factorByLevel: 10, cooldownTime: 0, overheatCount: "0", maxRange: 250 },
 { skillId: 30007, className: "Archer_TwinArrows", name: "Twin Arrow", basicSp: 4, factor: 70, factorByLevel: 14, cooldownTime: 0, overheatCount: "0", maxRange: 250 },
 { skillId: 30008, className: "Archer_Concentration", name: "Concentration", basicSp: 45, cooldownTime: 15000, overheatCount: "0" },
-{ skillId: 30009, className: "Archer_Jump", name: "Leap", basicSp: 40, factor: 20, factorByLevel: 4, cooldownTime: 5000, overheatCount: "0" },
+{ skillId: 30009, className: "Archer_Jump", name: "Leap", basicSp: 40, factor: 20, factorByLevel: 4, cooldownTime: 5000, overheatCount: "0", shootTime: 200 },
 
 // Ranger
 //---------------------------------------------------------------------------
@@ -570,7 +570,7 @@
 { skillId: 30104, className: "Ranger_SteadyAim", name: "Steady Aim", basicSp: 60, factor: 0, factorByLevel: 0, cooldownTime: 10000, overheatCount: "0" },
 { skillId: 30107, className: "Ranger_SpiralArrow", name: "Spiral Arrow", basicSp: 33, factor: 48, factorByLevel: 4.8, cooldownTime: 8000, overheatCount: "5", maxRange: 250 },
 { skillId: 30110, className: "Ranger_Scan", name: "Scan", basicSp: 13, factor: 100, factorByLevel: 0, cooldownTime: 0, overheatCount: "0", maxRange: 250 },
-{ skillId: 30111, className: "Ranger_Strafe", name: "Strafe", basicSp: 13, factor: 100, factorByLevel: 10, cooldownTime: 3000, maxRange: 250, overheatCount: "0" },
+{ skillId: 30111, className: "Ranger_Strafe", name: "Strafe", basicSp: 13, factor: 100, factorByLevel: 10, cooldownTime: 3000, maxRange: 250, overheatCount: "0", shootTime: 150 },
 { skillId: 30112, className: "Ranger_BlazingArrow", name: "Blazing Arrow", basicSp: 40, factor: 400, factorByLevel: 40, cooldownTime: 9000, maxRange: 250, overheatCount: "0" },
 
 // Quarrel Shooter
