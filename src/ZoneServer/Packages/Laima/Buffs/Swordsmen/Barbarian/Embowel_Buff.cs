@@ -1,3 +1,4 @@
+using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
@@ -28,13 +29,16 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 		/// <param name="skill"></param>
 		/// <param name="modifier"></param>
 		/// <param name="skillHitResult"></param>
-		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Embowel_Buff)]
-		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Embowel_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
 			if (!target.TryGetBuff(BuffId.Embowel_Buff, out var buff))
 				return;
 
-			modifier.DamageMultiplier -= 0.5f;
+			var skillLevel = (int)buff.NumArg1;
+			var reduction = Math.Min(0.30f + 0.03f * skillLevel, 0.80f);
+
+			skillHitResult.Damage *= (1f - reduction);
 		}
 	}
 }

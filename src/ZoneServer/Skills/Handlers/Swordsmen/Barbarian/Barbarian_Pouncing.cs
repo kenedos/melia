@@ -1,6 +1,7 @@
 ﻿using System;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
+using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
@@ -60,6 +61,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3500);
 			pad.Trigger.UpdateInterval = updateInverval;
 			pad.Trigger.Subscribe(TriggerType.Update, this.OnTriggerUpdate);
+
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
 
 			caster.Map.AddPad(pad);
 		}

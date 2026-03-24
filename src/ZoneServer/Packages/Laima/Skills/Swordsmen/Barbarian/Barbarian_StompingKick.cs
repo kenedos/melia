@@ -11,7 +11,6 @@ using Melia.Zone.Buffs;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
-using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
@@ -54,13 +53,13 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			// Adjust the target position to ground level
-			if (caster.Map.Ground.TryGetHeightAt(farPos, out var groundHeight))
-				farPos.Y = groundHeight;
+			// Define the circular area of effect centered on caster
+			var centerPos = caster.Position;
+			if (caster.Map.Ground.TryGetHeightAt(centerPos, out var groundHeight))
+				centerPos.Y = groundHeight;
 
-			// Define the circular area of effect based on skill data.
-			var splashParam = skill.GetSplashParameters(caster, farPos, farPos, length: 0, width: 60, angle: 0);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			var moveSpeed = caster.Properties.GetFloat(PropertyName.MSPD);
+			var splashArea = new CircleF(centerPos.GetRelative(caster.Direction, moveSpeed), 70f);
 
 			// Send client-side visuals.
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
@@ -74,12 +73,14 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 		/// <summary>
 		/// Executes the actual attack after the caster has landed.
 		/// </summary>
-		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
+		private async Task Attack(Skill skill, ICombatEntity caster, CircleF splashArea)
 		{
 			// --- Core Mechanic: Wait until the Barbarian lands from their jump ---
 			await this.WaitUntilGrounded(skill, caster);
 
-			var allTargetsInArea = caster.Map.GetAttackableEnemiesIn(caster, splashArea).ToList();
+			var allTargetsInArea = caster.Map.GetAttackableEnemiesIn(caster, splashArea)
+				.OrderByDescending(t => t.IsKnockedDown())
+				.ToList();
 
 			if (!allTargetsInArea.Any())
 				return;
@@ -93,7 +94,12 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 			// Process all targets - damage, knockback, and stun chance for everyone
 			foreach (var target in affectedTargets)
 			{
-				var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.Default);
+				var modifier = SkillModifier.Default;
+
+				if (target.IsKnockedDown())
+					modifier.DamageMultiplier += 2f;
+
+				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
@@ -152,7 +158,8 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 			// Roll for stun (0-99, check if less than stunChance)
 			if (RandomProvider.Get().Next(100) < stunChance)
 			{
-				target.StartBuff(BuffId.Stun, skill.Level, 0, TimeSpan.FromSeconds(2), caster);
+				var stunDuration = target.IsKnockedDown() ? 4 : 2;
+				target.StartBuff(BuffId.Stun, skill.Level, 0, TimeSpan.FromSeconds(stunDuration), caster);
 			}
 		}
 	}

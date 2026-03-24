@@ -64,7 +64,7 @@
 { skillId: 10405, className: "Barbarian_Warcry", name: "Warcry", basicSp: 39, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, overheatCount: "0" },
 { skillId: 10406, className: "Barbarian_Frenzy", name: "Frenzy", basicSp: 43, splashRate: 0, factorByLevel: 2, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 10407, className: "Barbarian_GiantSwing", name: "Giant Swing", splashRate: 2, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
-{ skillId: 10408, className: "Barbarian_Pouncing", name: "Pouncing", basicSp: 23, splashRate: 10, factor: 180, factorByLevel: 18, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, overheatCount: "0", enableCastMove: true },
+{ skillId: 10408, className: "Barbarian_Pouncing", name: "Pouncing", basicSp: 23, splashRate: 10, factor: 60, factorByLevel: 6, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, overheatCount: "0", enableCastMove: true },
 { skillId: 10410, className: "Barbarian_Seism", name: "Seism", basicSp: 30, splashRate: 10, factor: 195, factorByLevel: 19.5, hitCount: 1, multiHitCount: 1, cooldownTime: 7000, overheatCount: "2" },
 { skillId: 10411, className: "Barbarian_Cleave", name: "Cleave", basicSp: 22, splashRate: 4, factor: 115, factorByLevel: 11.5, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, overheatCount: "2" },
 
