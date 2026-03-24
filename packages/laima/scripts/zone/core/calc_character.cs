@@ -1728,12 +1728,12 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var baseStat = 100;
 		var byStat = Math.Min(250, properties.GetFloat(PropertyName.DEX));
-		var byBuff = properties.GetFloat(PropertyName.CastingSpeed_BM);
+		var byBuff = Math2.Clamp(0, 100, properties.GetFloat(PropertyName.CastingSpeed_BM));
 
-		// 50% Fixed, 50% Variable cast time
-		var fixedPortion = baseStat * 0.5f;
-		var variablePortion = baseStat * 0.5f * (1 - byStat / 250);
-		var result = fixedPortion + variablePortion - byBuff;
+		// 30% Fixed, 70% Variable cast time
+		var fixedPortion = baseStat * 0.3f;
+		var variablePortion = baseStat * 0.7f * (1 - byStat / 250);
+		var result = (fixedPortion + variablePortion) * (1 - byBuff / 100f);
 
 		// 100% Variable cast time
 		// var result = baseStat * (1 - byStat / 250) - byBuff;
