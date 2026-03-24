@@ -197,10 +197,9 @@ public class CombatCalculationsScript : GeneralScript
 		{
 			defense -= Math2.Clamp(0, defense, defense * modifier.DefensePenetrationRate);
 
-			var percentIncreaseFactor = 1f + (modifier.DamageMultiplier - 1f);
 			var logFactor = (float)Math.Min(1, Math.Log10(Math.Pow(attack / (defense + 1), 0.8) + 1));
 
-			skillHitResult.Damage = percentIncreaseFactor * attack * logFactor;
+			skillHitResult.Damage = attack * logFactor;
 		}
 		else
 		{
@@ -208,8 +207,6 @@ public class CombatCalculationsScript : GeneralScript
 
 			var skillAtkAdd = skill.Properties.GetFloat(PropertyName.SkillAtkAdd);
 			skillHitResult.Damage += skillAtkAdd;
-
-			skillHitResult.Damage *= modifier.DamageMultiplier;
 
 			defense -= Math2.Clamp(0, defense, defense * modifier.DefensePenetrationRate);
 			skillHitResult.Damage = Math.Max(1, skillHitResult.Damage - defense);
@@ -242,6 +239,8 @@ public class CombatCalculationsScript : GeneralScript
 		// Item hooks - BeforeBonuses
 		ItemHookRegistry.Instance.InvokeAttackHooks(ItemHookType.AttackBeforeBonuses, attacker, target, skill, modifier, skillHitResult);
 		ItemHookRegistry.Instance.InvokeDefenseHooks(ItemHookType.DefenseBeforeBonuses, attacker, target, skill, modifier, skillHitResult);
+
+		skillHitResult.Damage *= modifier.DamageMultiplier;
 
 		var sizeBonusDamage = SCR_SizeTypeBonus(attacker, target, skill, modifier, skillHitResult);
 		if (sizeBonusDamage != 0)
