@@ -100,23 +100,21 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 		}
 
 		/// <summary>
-		/// Handles the defensive portion of Frenzy.
-		/// While not explicitly in the rework, a "frenzy" state making the user
-		/// more vulnerable is thematically appropriate.
+		/// Handles the offensive portion of Frenzy.
+		/// Increases damage dealt by 5% per stack.
 		/// </summary>
-		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Frenzy_Buff)]
-		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.Frenzy_Buff)]
+		public void OnAttackBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
-			if (!target.TryGetBuff(BuffId.Frenzy_Buff, out var buff))
+			if (!attacker.TryGetBuff(BuffId.Frenzy_Buff, out var buff))
 				return;
 
-			// The Barbarian takes 0.5% more damage per stack of Frenzy.
-			// This is a small penalty for the high-risk/high-reward playstyle.
-			modifier.DamageMultiplier += 0.005f * buff.OverbuffCounter;
+			var bonusPerStack = 0.025f;
+			var byAbility = 1f;
+			if (attacker.TryGetActiveAbilityLevel(AbilityId.Barbarian14, out var abilityLevel))
+				byAbility += abilityLevel * 0.005f;
 
-			// DEVELOPER NOTE: The primary offensive bonus (+5% damage dealt per stack) is NOT
-			// handled here. It must be implemented in an ISkillCombatAttackBeforeCalcHandler
-			// that checks if the ATTACKER has the Frenzy buff.
+			skillHitResult.Damage *= 1f + (bonusPerStack * buff.OverbuffCounter * byAbility);
 		}
 
 		/// <summary>
