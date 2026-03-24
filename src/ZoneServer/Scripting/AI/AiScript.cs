@@ -251,7 +251,9 @@ namespace Melia.Zone.Scripting.AI
 				}
 				catch (Exception ex)
 				{
-					Console.WriteLine($"Exception during AiScript.Update for entity '{this.Entity.Name}' (Handle: {this.Entity.Handle}): {ex}");
+					var entityName = this.Entity?.Name ?? "Released";
+					var entityHandle = this.Entity?.Handle ?? 0;
+					Console.WriteLine($"Exception during AiScript.Update for entity '{entityName}' (Handle: {entityHandle}): {ex}");
 				}
 			}
 		}
