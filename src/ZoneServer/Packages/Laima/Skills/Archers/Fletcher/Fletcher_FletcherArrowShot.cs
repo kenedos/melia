@@ -151,17 +151,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			skill.IncreaseOverheat();
 			caster.TurnTowards(target);
 			caster.SetAttackState(true);
-			var mspd = caster.Properties.GetFloat(PropertyName.MSPD) * caster.Properties.GetFloat(PropertyName.MovingShot);
-			var isMoving = caster.Components.Get<MovementComponent>()?.IsMoving ?? false;
-			if (isMoving)
-			{
-				if (mspd > 50)
-					Send.ZC_PLAY_ANI(caster, "ATKRUN2");
-				else
-					Send.ZC_PLAY_ANI(caster, "ATKMOVE2");
-			}
-			else
-				Send.ZC_PLAY_ANI(caster, "SKL_CHARGESHOT_SHOT");
 
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
 			selectedBuff.DecreaseOverbuff();
