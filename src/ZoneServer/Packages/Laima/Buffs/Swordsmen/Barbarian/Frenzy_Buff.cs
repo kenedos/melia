@@ -109,7 +109,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 			if (!attacker.TryGetBuff(BuffId.Frenzy_Buff, out var buff))
 				return;
 
-			var bonusPerStack = 0.025f;
+			var bonusPerStack = 0.04f;
 			var byAbility = 1f;
 			if (attacker.TryGetActiveAbilityLevel(AbilityId.Barbarian14, out var abilityLevel))
 				byAbility += abilityLevel * 0.005f;
