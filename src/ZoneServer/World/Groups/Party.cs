@@ -16,6 +16,7 @@ using Melia.Zone.World.Maps;
 using Yggdrasil.Extensions;
 using Yggdrasil.Network.Communication;
 using Yggdrasil.Scheduling;
+using Yggdrasil.Util;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Yggdrasil.Geometry.Shapes;
 using Melia.Zone.Events.Arguments;
@@ -408,31 +409,32 @@ namespace Melia.Zone.World
 			}
 
 			// Get all valid party members in the map
-			var partyCharacters = killer.Map.GetCharacters(a =>
-				a.Connection.Party != null &&
-				a.Connection.Party.ObjectId == this.ObjectId &&
-				!a.IsDead
-			);
+			var partyCharacters = this.GetEligiblePartyMembers(killer);
 
 			// If no valid party members found
-			if (partyCharacters.Length == 0)
+			if (partyCharacters.Count == 0)
 				return;
 
 			// Calculate party bonus exp based on members on the same map,
 			// not total online members
-			(exp, classExp) = this.GetPartyBonusExp(exp, classExp, partyCharacters.Length);
+			(exp, classExp) = this.GetPartyBonusExp(exp, classExp, partyCharacters.Count);
 
 			// Find highest level in party for penalty calculations
-			var highestLevel = partyCharacters.Max(c => c.Level);
+			var highestLevel = 0;
+			foreach (var pc in partyCharacters)
+			{
+				if (pc.Level > highestLevel)
+					highestLevel = pc.Level;
+			}
 
 			switch (this.ExpDistribution)
 			{
 				case PartyExpDistribution.EqualExp:
 				{
 					if (exp > 0)
-						exp = Math.Max(0, exp / partyCharacters.Length);
+						exp = Math.Max(0, exp / partyCharacters.Count);
 					if (classExp > 0)
-						classExp = Math.Max(0, classExp / partyCharacters.Length);
+						classExp = Math.Max(0, classExp / partyCharacters.Count);
 
 					foreach (var partyCharacter in partyCharacters)
 					{
@@ -450,12 +452,15 @@ namespace Melia.Zone.World
 				}
 				case PartyExpDistribution.ByLevel:
 				{
-					var averageLevel = partyCharacters.Average(a => a.Level);
+					var totalLevel = 0;
+					foreach (var pc in partyCharacters)
+						totalLevel += pc.Level;
+					var averageLevel = (double)totalLevel / partyCharacters.Count;
 
 					if (exp > 0)
-						exp = Math.Max(0, exp / partyCharacters.Length);
+						exp = Math.Max(0, exp / partyCharacters.Count);
 					if (classExp > 0)
-						classExp = Math.Max(0, classExp / partyCharacters.Length);
+						classExp = Math.Max(0, classExp / partyCharacters.Count);
 
 					foreach (var partyCharacter in partyCharacters)
 					{
@@ -649,14 +654,11 @@ namespace Melia.Zone.World
 				}
 				case PartyItemDistribution.RoundRobin:
 				{
-					var partyCharacters = killer.Map.GetCharacters(a =>
-						a.Connection.Party != null &&
-						a.Connection.Party.ObjectId == this.ObjectId &&
-						!a.IsDead);
+					var partyCharacters = this.GetEligiblePartyMembers(killer);
 
-					if (partyCharacters != null && partyCharacters.Length > 0)
+					if (partyCharacters.Count > 0)
 					{
-						this.LastItemRecipientIndex %= partyCharacters.Length;
+						this.LastItemRecipientIndex %= partyCharacters.Count;
 						recipient = partyCharacters[this.LastItemRecipientIndex];
 						this.LastItemRecipientIndex++;
 						return true;
@@ -668,15 +670,12 @@ namespace Melia.Zone.World
 				}
 				case PartyItemDistribution.Random:
 				{
-					// Get party members eligible to receive items.
-					var partyCharacters = killer.Map.GetCharacters(a =>
-						a.Connection.Party != null &&
-						a.Connection.Party.ObjectId == this.ObjectId &&
-						!a.IsDead);
+					var partyCharacters = this.GetEligiblePartyMembers(killer);
 
-					if (partyCharacters != null && partyCharacters.Length > 0)
+					if (partyCharacters.Count > 0)
 					{
-						recipient = partyCharacters.Random();
+						var rnd = RandomProvider.Get();
+						recipient = partyCharacters[rnd.Next(partyCharacters.Count)];
 						return true;
 					}
 					else
@@ -687,6 +686,42 @@ namespace Melia.Zone.World
 				default:
 					return false;
 			}
+		}
+
+		/// <summary>
+		/// Returns a list of eligible party members on the same map as
+		/// the reference character. Excludes dummy characters (e.g. Sadhu
+		/// OOB bodies), dead characters, and characters without a valid
+		/// connection.
+		/// </summary>
+		private List<Character> GetEligiblePartyMembers(Character reference)
+		{
+			var allCharacters = reference.Map.GetCharacters(a => true);
+			var result = new List<Character>();
+
+			for (var i = 0; i < allCharacters.Length; i++)
+			{
+				var a = allCharacters[i];
+
+				if (a is DummyCharacter)
+					continue;
+
+				if (a.Connection == null)
+					continue;
+
+				if (a.Connection.Party == null)
+					continue;
+
+				if (a.Connection.Party.ObjectId != this.ObjectId)
+					continue;
+
+				if (a.IsDead)
+					continue;
+
+				result.Add(a);
+			}
+
+			return result;
 		}
 
 		public int StartLayer()
