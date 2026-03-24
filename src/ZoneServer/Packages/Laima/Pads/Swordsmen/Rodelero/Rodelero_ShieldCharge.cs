@@ -35,6 +35,7 @@ namespace Melia.Zone.Pads.Handlers
 			pad.SetUpdateInterval(200);
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
 			pad.SetRange(30f);
+			pad.FollowsTarget(creator, 20f, creator.Direction);
 			pad.Variables.Set(VarHitHandles, new HashSet<int>());
 		}
 
@@ -110,9 +111,6 @@ namespace Melia.Zone.Pads.Handlers
 		{
 			var pad = args.Trigger;
 			var creator = args.Creator;
-
-			var position = creator.Position.GetRelative(creator.Direction, 20);
-			pad.Position = position;
 
 			if (creator.IsDead)
 			{

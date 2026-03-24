@@ -1,12 +1,8 @@
 using System;
-using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
-using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
 
 namespace Melia.Zone.Pads.Handlers
@@ -25,6 +21,7 @@ namespace Melia.Zone.Pads.Handlers
 			pad.SetUpdateInterval(100);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3500);
 			pad.Trigger.MaxActorCount = 5;
+			pad.FollowsTarget(creator);
 			creator.PlaySound("skl_eff_barbarian_pouncing_whoosh_abil");
 		}
 
@@ -40,11 +37,7 @@ namespace Melia.Zone.Pads.Handlers
 				return;
 			}
 
-			// Update the pad's area shape to match new position/direction
-			pad.Movement.MoveTo(creator.Position);
 			pad.Direction = creator.Direction;
-
-			// Recreate Square area with updated direction (Square.Direction is readonly)
 			pad.SetRectangleRange(creator.Direction, 35f, 90f);
 
 			// Deal damage using PadDamageEnemy

@@ -1,12 +1,10 @@
 using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
-using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
-using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
 
 namespace Melia.Zone.Pads.Handlers
@@ -66,17 +64,24 @@ namespace Melia.Zone.Pads.Handlers
 				return;
 			}
 
-			var summonHandle = pad.Variables.Get<int>("BwaKayiman_SummonHandle");
-			var monster = character.Map.GetMonster(summonHandle);
+			if (pad.FollowTarget == null)
+			{
+				var summonHandle = pad.Variables.Get<int>("BwaKayiman_SummonHandle");
+				var monster = character.Map.GetMonster(summonHandle);
 
-			if (monster is not Summon summon || summon.IsDead)
+				if (monster is not Summon summon || summon.IsDead)
+				{
+					pad.Destroy();
+					return;
+				}
+
+				pad.FollowsTarget(summon);
+			}
+			else if (pad.FollowTarget.IsDead)
 			{
 				pad.Destroy();
 				return;
 			}
-
-			pad.Movement.MoveTo(summon.Position);
-			pad.Position = summon.Position;
 
 			PadDamageEnemy(pad, 1f, 0, 0, "None", 1, 0f, 0f);
 		}

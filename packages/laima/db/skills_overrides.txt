@@ -577,7 +577,7 @@
 //---------------------------------------------------------------------------
 { skillId: 30201, className: "QuarrelShooter_DeployPavise", name: "Deploy Pavise", basicSp: 60, factor: 197, factorByLevel: 10.8, cooldownTime: 12000, overheatCount: "2" },
 { skillId: 30202, className: "QuarrelShooter_ScatterCaltrop", name: "Scatter Caltrops", basicSp: 70, factor: 40, factorByLevel: 4, cooldownTime: 8000, maxRange: 90 },
-{ skillId: 30204, className: "QuarrelShooter_StoneShot", name: "Stone Shot", basicSp: 7, factor: 160, factorByLevel: 16, cooldownTime: 0, overheatCount: "0", maxRange: 90 },
+{ skillId: 30204, className: "QuarrelShooter_StoneShot", name: "Stone Shot", basicSp: 7, factor: 160, factorByLevel: 16, cooldownTime: 0, overheatCount: "0", maxRange: 90, enableCastMove: true },
 { skillId: 30205, className: "QuarrelShooter_RapidFire", name: "Rapid Fire", basicSp: 36, basicCast: 1500, splashRate: 8, factor: 145, factorByLevel: 14.5, cooldownTime: 6000, overheatCount: "0", maxRange: 220, castInterruptible: false },
 { skillId: 30206, className: "QuarrelShooter_Teardown", name: "Teardown", basicSp: 0, factor: 332, factorByLevel: 23.3, cooldownTime: 0, overheatCount: "0" },
 { skillId: 30207, className: "QuarrelShooter_RunningShot", name: "Running Shot", basicSp: 65, factor: 2, factorByLevel: 2, cooldownTime: 30000, overheatCount: "0" },

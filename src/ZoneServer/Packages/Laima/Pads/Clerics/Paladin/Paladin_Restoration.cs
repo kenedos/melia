@@ -26,6 +26,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 			pad.SetRange(100f);
 			pad.Trigger.LifeTime = TimeSpan.FromSeconds(PadLifeTimeSeconds);
 			pad.SetUpdateInterval(300);
+			pad.FollowsTarget(creator);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -60,8 +61,6 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 			var pad = args.Trigger;
 			var creator = args.Creator;
 			var skill = pad.Skill;
-
-			pad.Position = creator.Position;
 
 			if (creator.IsDead)
 			{

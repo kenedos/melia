@@ -9,7 +9,9 @@ using Melia.Zone.Pads;
 using Melia.Zone.Pads.Handlers;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.SplashAreas;
+using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Components;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads.Components;
 using Yggdrasil.Composition;
@@ -90,6 +92,49 @@ namespace Melia.Zone.World.Actors.Pads
 		/// Returns if the pad has died.
 		/// </summary>
 		public bool IsDead => this.Trigger.MaxUseCount <= 0;
+
+		/// <summary>
+		/// Gets or sets an entity for the pad to follow. When set, the
+		/// pad's position is updated to the target's position each tick,
+		/// with a forward translation based on movement speed to
+		/// compensate for fast-moving characters.
+		/// </summary>
+		public ICombatEntity FollowTarget { get; private set; }
+
+		/// <summary>
+		/// Returns the offset distance applied when following a target.
+		/// </summary>
+		public float FollowTargetOffset { get; private set; }
+
+		/// <summary>
+		/// Returns the offset angle in degrees, relative to the target's
+		/// facing direction.
+		/// </summary>
+		public float FollowTargetOffsetAngle { get; private set; }
+
+		/// <summary>
+		/// Sets the pad to follow the given entity.
+		/// </summary>
+		/// <param name="target"></param>
+		public void FollowsTarget(ICombatEntity target)
+		{
+			this.FollowTarget = target;
+		}
+
+		/// <summary>
+		/// Sets the pad to follow the given entity with an offset.
+		/// The direction is stored as a relative angle from the target's
+		/// current facing, so it rotates with them as they turn.
+		/// </summary>
+		/// <param name="target"></param>
+		/// <param name="offset"></param>
+		/// <param name="direction"></param>
+		public void FollowsTarget(ICombatEntity target, float offset, Direction direction)
+		{
+			this.FollowTarget = target;
+			this.FollowTargetOffset = offset;
+			this.FollowTargetOffsetAngle = direction.DegreeAngle - target.Direction.DegreeAngle;
+		}
 
 		public Mob? Monster
 		{
@@ -219,6 +264,29 @@ namespace Melia.Zone.World.Actors.Pads
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
+			var followTarget = this.FollowTarget;
+			if (followTarget != null && !followTarget.IsDead)
+			{
+				var targetPos = followTarget.Position;
+
+				if (followTarget is Character player && player.Movement.IsMoving)
+				{
+					var speed = (int)player.Properties.GetFloat(PropertyName.MSPD);
+					var translationPerSpeed = speed / 4;
+					targetPos = targetPos.GetRelative(followTarget.Direction, translationPerSpeed);
+				}
+
+				if (this.FollowTargetOffset != 0)
+				{
+					var offsetDir = this.FollowTargetOffsetAngle != 0
+						? followTarget.Direction.AddDegreeAngle(this.FollowTargetOffsetAngle)
+						: followTarget.Direction;
+					targetPos = targetPos.GetRelative(offsetDir, this.FollowTargetOffset);
+				}
+
+				this.Position = targetPos;
+			}
+
 			this.Components.Update(elapsed);
 		}
 
