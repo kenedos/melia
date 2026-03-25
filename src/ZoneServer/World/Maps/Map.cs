@@ -852,7 +852,10 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryCircle(position, radius + MaxAgentRadius);
+				var queryBuffer = _spatialQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(position, radius + MaxAgentRadius, queryBuffer);
+				candidates = queryBuffer;
 			}
 			else
 			{
@@ -865,7 +868,7 @@ namespace Melia.Zone.World.Maps
 				var effectiveRadius = radius + e.AgentRadius;
 				var dx = e.Position.X - position.X;
 				var dz = e.Position.Z - position.Z;
-				if (attacker.CanDamage(e) && dx * dx + dz * dz <= effectiveRadius * effectiveRadius)
+				if (dx * dx + dz * dz <= effectiveRadius * effectiveRadius && attacker.CanDamage(e))
 					result.Add(e);
 			}
 
@@ -908,7 +911,7 @@ namespace Melia.Zone.World.Maps
 				var dx = e.Position.X - position.X;
 				var dz = e.Position.Z - position.Z;
 
-				if (attacker.CanDamage(e) && dx * dx + dz * dz <= effectiveRadius * effectiveRadius)
+				if (dx * dx + dz * dz <= effectiveRadius * effectiveRadius && attacker.CanDamage(e))
 					buffer.Add(e);
 			}
 		}
@@ -1185,7 +1188,10 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryCircle(position, searchRadius);
+				var queryBuffer = _spatialQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(position, searchRadius, queryBuffer);
+				candidates = queryBuffer;
 			}
 			else
 			{
@@ -1395,7 +1401,10 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryCircle(source.Position, VisibleRange);
+				var queryBuffer = _spatialQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(source.Position, VisibleRange, queryBuffer);
+				candidates = queryBuffer;
 			}
 			else
 			{
@@ -1435,6 +1444,9 @@ namespace Melia.Zone.World.Maps
 				character.Connection.Send(packet);
 		}
 
+		[ThreadStatic]
+		private static List<ICombatEntity> _broadcastQueryBuffer;
+
 		/// <summary>
 		/// Broadcasts a packet to all characters within visible range of
 		/// the source actor, optionally excluding the source itself.
@@ -1445,7 +1457,11 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null)
 			{
-				foreach (var entity in _spatialIndex.QueryCircle(source.Position, VisibleRange))
+				var queryBuffer = _broadcastQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(source.Position, VisibleRange, queryBuffer);
+
+				foreach (var entity in queryBuffer)
 				{
 					if (entity is not Character character)
 						continue;
@@ -1581,7 +1597,10 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null && radius > 0)
 			{
-				candidates = _spatialIndex.QueryCircle(attacker.Position, radius + MaxAgentRadius);
+				var queryBuffer = _spatialQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(attacker.Position, radius + MaxAgentRadius, queryBuffer);
+				candidates = queryBuffer;
 			}
 			else
 			{
@@ -1614,7 +1633,10 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryCircle(position, radius + MaxAgentRadius);
+				var queryBuffer = _spatialQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(position, radius + MaxAgentRadius, queryBuffer);
+				candidates = queryBuffer;
 			}
 			else
 			{
@@ -1649,7 +1671,10 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryCircle(entity.Position, radius + MaxAgentRadius);
+				var queryBuffer = _spatialQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(entity.Position, radius + MaxAgentRadius, queryBuffer);
+				candidates = queryBuffer;
 			}
 			else
 			{
