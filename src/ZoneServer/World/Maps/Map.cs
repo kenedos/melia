@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -314,7 +313,15 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns the first character matching the predicate, or null.
 		/// </summary>
-		public Character GetCharacter(Func<Character, bool> predicate) => _characters.Values.FirstOrDefault(predicate);
+		public Character GetCharacter(Func<Character, bool> predicate)
+		{
+			foreach (var character in _characters.Values)
+			{
+				if (predicate(character))
+					return character;
+			}
+			return null;
+		}
 
 		/// <summary>
 		/// Returns the character with the given handle via out.
@@ -330,7 +337,16 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns all characters matching the predicate.
 		/// </summary>
-		public Character[] GetCharacters(Func<Character, bool> predicate) => _characters.Values.Where(predicate).ToArray();
+		public Character[] GetCharacters(Func<Character, bool> predicate)
+		{
+			var result = new List<Character>();
+			foreach (var character in _characters.Values)
+			{
+				if (predicate(character))
+					result.Add(character);
+			}
+			return result.ToArray();
+		}
 
 		/// <summary>
 		/// Returns all characters visible to the given character.
@@ -459,10 +475,21 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void RemoveEntitiesOnLayer(int layer)
 		{
-			var toRemove = _monsters.Values.Where(m => m.Layer == layer).ToList();
+			var toRemove = new List<IMonster>();
+			foreach (var monster in _monsters.Values)
+			{
+				if (monster.Layer == layer)
+					toRemove.Add(monster);
+			}
 			foreach (var monster in toRemove)
 				this.RemoveMonster(monster);
-			var toRemovePads = _pads.Values.Where(p => p.Layer == layer).ToList();
+
+			var toRemovePads = new List<Pad>();
+			foreach (var pad in _pads.Values)
+			{
+				if (pad.Layer == layer)
+					toRemovePads.Add(pad);
+			}
 			foreach (var pad in toRemovePads)
 				this.RemovePad(pad);
 		}
@@ -495,7 +522,15 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns the first monster matching the predicate, or null.
 		/// </summary>
-		public IMonster GetMonster(Func<IMonster, bool> predicate) => _monsters.Values.FirstOrDefault(predicate);
+		public IMonster GetMonster(Func<IMonster, bool> predicate)
+		{
+			foreach (var monster in _monsters.Values)
+			{
+				if (predicate(monster))
+					return monster;
+			}
+			return null;
+		}
 
 		/// <summary>
 		/// Returns all attackable combat entities within the given shape.
@@ -551,12 +586,28 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns all monsters currently on the map.
 		/// </summary>
-		public IMonster[] GetMonsters() => _monsters.Values.ToArray();
+		public IMonster[] GetMonsters()
+		{
+			var result = new IMonster[_monsters.Count];
+			var i = 0;
+			foreach (var monster in _monsters.Values)
+				result[i++] = monster;
+			return result;
+		}
 
 		/// <summary>
 		/// Returns all monsters matching the predicate.
 		/// </summary>
-		public IMonster[] GetMonsters(Func<IMonster, bool> predicate) => _monsters.Values.Where(predicate).ToArray();
+		public IMonster[] GetMonsters(Func<IMonster, bool> predicate)
+		{
+			var result = new List<IMonster>();
+			foreach (var monster in _monsters.Values)
+			{
+				if (predicate(monster))
+					result.Add(monster);
+			}
+			return result.ToArray();
+		}
 
 		/// <summary>
 		/// Returns all monsters visible to the given character.
@@ -573,7 +624,9 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void RemoveScriptedEntities()
 		{
-			var toRemove = _monsters.Values.ToList();
+			var toRemove = new List<IMonster>();
+			foreach (var monster in _monsters.Values)
+				toRemove.Add(monster);
 			foreach (var monster in toRemove)
 				this.RemoveMonster(monster);
 		}
@@ -661,20 +714,48 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns all pads within range of or overlapping the given position.
 		/// </summary>
-		public Pad[] GetPadsAt(Position pos, float range) =>
-			_pads.Values.Where(a => a.Position.InRange2D(pos, range) || (a.Area?.IsInside(pos) ?? false)).ToArray();
+		public Pad[] GetPadsAt(Position pos, float range)
+		{
+			var result = new List<Pad>();
+			foreach (var pad in _pads.Values)
+			{
+				if (pad.Position.InRange2D(pos, range) || (pad.Area?.IsInside(pos) ?? false))
+					result.Add(pad);
+			}
+			return result.ToArray();
+		}
 
 		/// <summary>
 		/// Returns all pads matching the given predicate.
 		/// </summary>
-		public Pad[] GetPads(Func<Pad, bool> func) => _pads.Values.Where(func).ToArray();
+		public Pad[] GetPads(Func<Pad, bool> func)
+		{
+			var result = new List<Pad>();
+			foreach (var pad in _pads.Values)
+			{
+				if (func(pad))
+					result.Add(pad);
+			}
+			return result.ToArray();
+		}
 
 		/// <summary>
 		/// Returns all pads that can hit the given entity based on faction
 		/// rules and area overlap.
 		/// </summary>
-		public Pad[] GetHittablePadsAt(ICombatEntity entity) =>
-			_pads.Values.Where(a => entity.IsHitByPad() && (a.Area?.IsInside(entity.Position) ?? false)).ToArray();
+		public Pad[] GetHittablePadsAt(ICombatEntity entity)
+		{
+			if (!entity.IsHitByPad())
+				return Array.Empty<Pad>();
+
+			var result = new List<Pad>();
+			foreach (var pad in _pads.Values)
+			{
+				if (pad.Area?.IsInside(entity.Position) ?? false)
+					result.Add(pad);
+			}
+			return result.ToArray();
+		}
 		#endregion
 
 		#region Combat Entity Management
@@ -722,8 +803,16 @@ namespace Melia.Zone.World.Maps
 		/// Returns all triggerable areas whose trigger zone contains
 		/// the given position.
 		/// </summary>
-		public ITriggerableArea[] GetTriggerableAreasAt(Position pos) =>
-			_triggerableAreas.Values.Where(a => a.Area?.IsInside(pos) ?? false).ToArray();
+		public ITriggerableArea[] GetTriggerableAreasAt(Position pos)
+		{
+			var result = new List<ITriggerableArea>();
+			foreach (var area in _triggerableAreas.Values)
+			{
+				if (area.Area?.IsInside(pos) ?? false)
+					result.Add(area);
+			}
+			return result.ToArray();
+		}
 
 		/// <summary>
 		/// Returns all items in a circular area around the target position
@@ -1030,10 +1119,17 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var obstacle in _obstacles)
 				{
-					if (checkPositions.Any(point => obstacle.Shape.IsInside(point)))
+					var hit = false;
+					for (var i = 0; i < checkPositions.Length; i++)
 					{
-						collidedObstacles.Add(obstacle);
+						if (obstacle.Shape.IsInside(checkPositions[i]))
+						{
+							hit = true;
+							break;
+						}
 					}
+					if (hit)
+						collidedObstacles.Add(obstacle);
 				}
 			}
 
@@ -1173,31 +1269,71 @@ namespace Melia.Zone.World.Maps
 		/// Returns the nearest warp within range of the position that
 		/// warps when approached, or null if none found.
 		/// </summary>
-		public WarpMonster GetNearbyWarp(Position pos) =>
-			_monsters.Values.OfType<WarpMonster>()
-				.FirstOrDefault(a => a.WarpWhenNearby && a.Position.InRange2D(pos, 35));
+		public WarpMonster GetNearbyWarp(Position pos)
+		{
+			foreach (var monster in _monsters.Values)
+			{
+				if (monster is WarpMonster warp && warp.WarpWhenNearby && warp.Position.InRange2D(pos, 35))
+					return warp;
+			}
+			return null;
+		}
 
 		/// <summary>
 		/// Returns all warp monsters on the map.
 		/// </summary>
-		public IEnumerable<WarpMonster> GetWarps() => _monsters.Values.OfType<WarpMonster>();
+		public List<WarpMonster> GetWarps()
+		{
+			var result = new List<WarpMonster>();
+			foreach (var monster in _monsters.Values)
+			{
+				if (monster is WarpMonster warp)
+					result.Add(warp);
+			}
+			return result;
+		}
 
 		/// <summary>
 		/// Returns all warp monsters matching the predicate.
 		/// </summary>
-		public IEnumerable<WarpMonster> GetWarps(Func<WarpMonster, bool> predicate) =>
-			_monsters.Values.OfType<WarpMonster>().Where(predicate ?? (_ => true));
+		public List<WarpMonster> GetWarps(Func<WarpMonster, bool> predicate)
+		{
+			var result = new List<WarpMonster>();
+			foreach (var monster in _monsters.Values)
+			{
+				if (monster is WarpMonster warp && (predicate == null || predicate(warp)))
+					result.Add(warp);
+			}
+			return result;
+		}
 
 		/// <summary>
 		/// Returns all NPC monsters on the map.
 		/// </summary>
-		public IEnumerable<MonsterInName> GetNpcs() => _monsters.Values.OfType<MonsterInName>();
+		public List<MonsterInName> GetNpcs()
+		{
+			var result = new List<MonsterInName>();
+			foreach (var monster in _monsters.Values)
+			{
+				if (monster is MonsterInName npc)
+					result.Add(npc);
+			}
+			return result;
+		}
 
 		/// <summary>
 		/// Returns all NPC monsters matching the predicate.
 		/// </summary>
-		public IEnumerable<MonsterInName> GetNpcs(Func<MonsterInName, bool> predicate) =>
-			_monsters.Values.OfType<MonsterInName>().Where(predicate ?? (_ => true));
+		public List<MonsterInName> GetNpcs(Func<MonsterInName, bool> predicate)
+		{
+			var result = new List<MonsterInName>();
+			foreach (var monster in _monsters.Values)
+			{
+				if (monster is MonsterInName npc && (predicate == null || predicate(npc)))
+					result.Add(npc);
+			}
+			return result;
+		}
 
 		/// <summary>
 		/// Returns the nearest resurrection/safe position to the given
@@ -1214,7 +1350,18 @@ namespace Melia.Zone.World.Maps
 			if (!favorResurrectionPoints)
 				positions.Add(this.Data.DefaultPosition);
 
-			return positions.OrderBy(a => a.Get2DDistance(pos)).First();
+			var nearest = positions[0];
+			var nearestDist = nearest.Get2DDistance(pos);
+			for (var i = 1; i < positions.Count; i++)
+			{
+				var dist = positions[i].Get2DDistance(pos);
+				if (dist < nearestDist)
+				{
+					nearestDist = dist;
+					nearest = positions[i];
+				}
+			}
+			return nearest;
 		}
 		#endregion
 
@@ -1233,12 +1380,14 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values
-					.Where(e => e.Position.InRange2D(source.Position, VisibleRange));
+				candidates = _combatEntities.Values;
 			}
 
 			foreach (var combatEntity in candidates)
 			{
+				if (!combatEntity.Position.InRange2D(source.Position, VisibleRange))
+					continue;
+
 				if (!combatEntity.Components.TryGet<AiComponent>(out var aiComponent))
 					continue;
 
@@ -1330,12 +1479,30 @@ namespace Melia.Zone.World.Maps
 		/// Returns all characters whose position is inside or within agent
 		/// radius of the given shape.
 		/// </summary>
-		public Character[] GetCharactersInside(IShapeF shape) => this.GetCharacters(a => shape.IsInsideOrInRange(a.Position, ((ICombatEntity)a).AgentRadius));
+		public Character[] GetCharactersInside(IShapeF shape)
+		{
+			var result = new List<Character>();
+			foreach (var character in _characters.Values)
+			{
+				if (shape.IsInsideOrInRange(character.Position, ((ICombatEntity)character).AgentRadius))
+					result.Add(character);
+			}
+			return result.ToArray();
+		}
 
 		/// <summary>
 		/// Returns all characters whose position is outside the given shape.
 		/// </summary>
-		public Character[] GetCharactersOutside(IShapeF shape) => this.GetCharacters(a => !shape.IsInsideOrInRange(a.Position, ((ICombatEntity)a).AgentRadius));
+		public Character[] GetCharactersOutside(IShapeF shape)
+		{
+			var result = new List<Character>();
+			foreach (var character in _characters.Values)
+			{
+				if (!shape.IsInsideOrInRange(character.Position, ((ICombatEntity)character).AgentRadius))
+					result.Add(character);
+			}
+			return result.ToArray();
+		}
 
 		/// <summary>
 		/// Returns all alive (or dead) party members of the character

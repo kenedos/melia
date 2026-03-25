@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using g4;
 using Melia.Shared.Data.Database;
@@ -115,8 +114,32 @@ namespace Melia.Zone.World.Maps
 		{
 			if (_cells?.Length > 0)
 			{
-				// Build QuadTree for cells
-				var bounds = this.CalculateBounds(_cells.Where(c => c != null).Select(c => c.Bounds));
+				// Calculate bounds from non-null cells
+				var hasBounds = false;
+				double minX = 0, minY = 0, maxX = 0, maxY = 0;
+
+				for (var i = 0; i < _cells.Length; i++)
+				{
+					if (_cells[i] == null)
+						continue;
+
+					var b = _cells[i].Bounds;
+					if (!hasBounds)
+					{
+						minX = b.Min.x; minY = b.Min.y;
+						maxX = b.Max.x; maxY = b.Max.y;
+						hasBounds = true;
+					}
+					else
+					{
+						if (b.Min.x < minX) minX = b.Min.x;
+						if (b.Min.y < minY) minY = b.Min.y;
+						if (b.Max.x > maxX) maxX = b.Max.x;
+						if (b.Max.y > maxY) maxY = b.Max.y;
+					}
+				}
+
+				var bounds = hasBounds ? new AxisAlignedBox2d(minX, minY, maxX, maxY) : new AxisAlignedBox2d(0, 0, 1000, 1000);
 				_cellQuadTree = new QuadTree<int>(bounds, maxDepth: 6, maxObjectsPerNode: 10);
 
 				for (var i = 0; i < _cells.Length; i++)
@@ -128,11 +151,28 @@ namespace Melia.Zone.World.Maps
 
 			if (_outlines?.Length > 0)
 			{
-				// Build QuadTree for outlines
-				var outlineBounds = _outlines.Select(o => new AxisAlignedBox2d(
-					Math.Min(o.Point1.X, o.Point2.X), Math.Min(o.Point1.Y, o.Point2.Y),
-					Math.Max(o.Point1.X, o.Point2.X), Math.Max(o.Point1.Y, o.Point2.Y)));
-				var bounds = this.CalculateBounds(outlineBounds);
+				// Calculate bounds from outlines
+				var first = _outlines[0];
+				double oMinX = Math.Min(first.Point1.X, first.Point2.X);
+				double oMinY = Math.Min(first.Point1.Y, first.Point2.Y);
+				double oMaxX = Math.Max(first.Point1.X, first.Point2.X);
+				double oMaxY = Math.Max(first.Point1.Y, first.Point2.Y);
+
+				for (var i = 1; i < _outlines.Length; i++)
+				{
+					var o = _outlines[i];
+					var lMinX = Math.Min(o.Point1.X, o.Point2.X);
+					var lMinY = Math.Min(o.Point1.Y, o.Point2.Y);
+					var lMaxX = Math.Max(o.Point1.X, o.Point2.X);
+					var lMaxY = Math.Max(o.Point1.Y, o.Point2.Y);
+
+					if (lMinX < oMinX) oMinX = lMinX;
+					if (lMinY < oMinY) oMinY = lMinY;
+					if (lMaxX > oMaxX) oMaxX = lMaxX;
+					if (lMaxY > oMaxY) oMaxY = lMaxY;
+				}
+
+				var bounds = new AxisAlignedBox2d(oMinX, oMinY, oMaxX, oMaxY);
 				_outlineQuadTree = new QuadTree<int>(bounds, maxDepth: 6, maxObjectsPerNode: 10);
 
 				for (var i = 0; i < _outlines.Length; i++)
@@ -145,28 +185,6 @@ namespace Melia.Zone.World.Maps
 					_outlineQuadTree.Insert(i, lineBounds);
 				}
 			}
-		}
-
-		/// <summary>
-		/// Calculate overall bounds from a collection of individual bounds
-		/// </summary>
-		private AxisAlignedBox2d CalculateBounds(IEnumerable<AxisAlignedBox2d> bounds)
-		{
-			var first = bounds.FirstOrDefault();
-			if (!bounds.Any()) return new AxisAlignedBox2d(0, 0, 1000, 1000); // Default bounds
-
-			double minX = first.Min.x, minY = first.Min.y;
-			double maxX = first.Max.x, maxY = first.Max.y;
-
-			foreach (var bound in bounds.Skip(1))
-			{
-				minX = Math.Min(minX, bound.Min.x);
-				minY = Math.Min(minY, bound.Min.y);
-				maxX = Math.Max(maxX, bound.Max.x);
-				maxY = Math.Max(maxY, bound.Max.y);
-			}
-
-			return new AxisAlignedBox2d(minX, minY, maxX, maxY);
 		}
 
 		/// <summary>
@@ -286,8 +304,16 @@ namespace Melia.Zone.World.Maps
 
 		private bool PolygonsAreNeighbors(Polygon2d a, Polygon2d b)
 		{
-			var vertsA = new HashSet<Vector2d>(a.Vertices);
-			return b.Vertices.Any(vertsA.Contains);
+			foreach (var vb in b.Vertices)
+			{
+				foreach (var va in a.Vertices)
+				{
+					if (va == vb)
+						return true;
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>
@@ -332,7 +358,22 @@ namespace Melia.Zone.World.Maps
 		{
 			await Task.Run(() =>
 			{
-				_navGraphPolygons = _cells.Where(c => c != null).ToArray();
+				var count = 0;
+				for (var i = 0; i < _cells.Length; i++)
+				{
+					if (_cells[i] != null)
+						count++;
+				}
+
+				var result = new Polygon2d[count];
+				var idx = 0;
+				for (var i = 0; i < _cells.Length; i++)
+				{
+					if (_cells[i] != null)
+						result[idx++] = _cells[i];
+				}
+
+				_navGraphPolygons = result;
 			});
 		}
 
@@ -384,8 +425,16 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		private void LoadGroundMesh()
 		{
-			var vertices = _data.Vertices.Select(a => new Vector3f(a.X, a.Z, a.Y));
-			var triangles = _data.Triangles.Select(a => new Index3i(a.Indices[0], a.Indices[1], a.Indices[2]));
+			var srcVerts = _data.Vertices;
+			var srcTris = _data.Triangles;
+
+			var vertices = new Vector3f[srcVerts.Length];
+			for (var i = 0; i < srcVerts.Length; i++)
+				vertices[i] = new Vector3f(srcVerts[i].X, srcVerts[i].Z, srcVerts[i].Y);
+
+			var triangles = new Index3i[srcTris.Length];
+			for (var i = 0; i < srcTris.Length; i++)
+				triangles[i] = new Index3i(srcTris[i].Indices[0], srcTris[i].Indices[1], srcTris[i].Indices[2]);
 
 			_mesh = DMesh3Builder.Build<Vector3f, Index3i, Vector3f>(vertices, triangles, null, null);
 			_spatial = new DMeshAABBTree3(_mesh, autoBuild: true);
@@ -403,7 +452,11 @@ namespace Melia.Zone.World.Maps
 				var cellData = _data.Cells[i];
 				if (cellData == null) continue;
 
-				var vertices = cellData.Vertices.Select(a => new Vector2d(a.X, a.Y)).ToArray();
+				var srcVerts = cellData.Vertices;
+				var vertices = new Vector2d[srcVerts.Length];
+				for (var j = 0; j < srcVerts.Length; j++)
+					vertices[j] = new Vector2d(srcVerts[j].X, srcVerts[j].Y);
+
 				_cells[i] = new Polygon2d(vertices);
 			}
 		}
@@ -520,11 +573,31 @@ namespace Melia.Zone.World.Maps
 			pos = Position.Zero;
 			if (_cells == null) return false;
 
-			var validCells = _cells.Where(c => c != null).ToArray();
-			if (validCells.Length == 0) return false;
+			var validCount = 0;
+			for (var i = 0; i < _cells.Length; i++)
+			{
+				if (_cells[i] != null)
+					validCount++;
+			}
+
+			if (validCount == 0) return false;
 
 			var rnd = RandomProvider.Get();
-			var rndCell = validCells[rnd.Next(validCells.Length)];
+			var targetIdx = rnd.Next(validCount);
+			Polygon2d rndCell = null;
+			var seen = 0;
+			for (var i = 0; i < _cells.Length; i++)
+			{
+				if (_cells[i] != null)
+				{
+					if (seen == targetIdx)
+					{
+						rndCell = _cells[i];
+						break;
+					}
+					seen++;
+				}
+			}
 
 			var bounds = rndCell.Bounds;
 			for (var i = 0; i < 50; ++i)
