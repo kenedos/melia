@@ -545,7 +545,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			this.Properties.SetFloat(PropertyName.HP, 0);
 			this.Components.Get<MovementComponent>()?.Stop();
-			this.DisappearTime = DateTime.Now.AddSeconds(2);
+			this.DisappearTime = DateTime.Now.AddSeconds(3);
 			if (this.Effects?.Count != 0)
 				Send.ZC_NORMAL.ClearEffects(this);
 
