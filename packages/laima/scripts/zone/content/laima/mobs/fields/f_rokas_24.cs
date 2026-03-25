@@ -28,8 +28,9 @@ public class FRokas24MobScript : GeneralScript
 		AddSpawner("f_rokas_24.Id10", MonsterId.Hogma_Warrior, min: 30, max: 50);
 		AddSpawner("f_rokas_24.Id11", MonsterId.Hogma_Combat, min: 30, max: 50);
 
-		AddSpawner("f_rokas_24.Id12", MonsterId.Cockatries, min: 40, max: 70);
-		AddSpawner("f_rokas_24.Id13", MonsterId.Big_Cockatries_Red, min: 18, max: 30);
+		AddSpawner("f_rokas_24.Id12", MonsterId.Cockatries, min: 30, max: 50);
+		AddSpawner("f_rokas_24.Id13", MonsterId.Big_Cockatries_Red, min: 12, max: 20);
+		AddSpawner("f_rokas_24.Id14", MonsterId.Big_Cockatries, min: 12, max: 20);
 
 		// Monster Spawn Points -----------------------------
 
@@ -121,6 +122,24 @@ public class FRokas24MobScript : GeneralScript
 		AddSpawnPoint("f_rokas_24.Id13", "f_rokas_24", Rectangle(1684, -299, 300));
 		AddSpawnPoint("f_rokas_24.Id13", "f_rokas_24", Rectangle(1091, 622, 300));
 		AddSpawnPoint("f_rokas_24.Id13", "f_rokas_24", Rectangle(734, 712, 300));
+
+		// 'Big_Cockatries' Spawn Points
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(1052, -606, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(1001, -969, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(652, -717, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(947, 240, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(1145, 718, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(901, 1046, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(496, 569, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(222, 975, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(392, 1339, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(-115, 1368, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(-458, 1338, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(-821, 1626, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(-1193, 1518, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(-63, 2117, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(-92, 2331, 200));
+		AddSpawnPoint("f_rokas_24.Id14", "f_rokas_24", Rectangle(-1282, 1913, 200));
 
 	}
 }
