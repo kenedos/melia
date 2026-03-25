@@ -396,8 +396,7 @@ public class RefiningItemScripts : GeneralScript
 		var classNames = new HashSet<string>
 		{
 			"Moru_Silver", "Moru_Silver_test", "Moru_Silver_NoDay", "Moru_Silver_TA", "Moru_Silver_TA2",
-			"Moru_Silver_Event_1704", "Moru_Silver_TA_Recycle", "Moru_Silver_TA_V2", "Moru_Gold_TA",
-			"Moru_Gold_TA_NR", "Moru_Gold_TA_NR_Team_Trade", "Moru_Gold_EVENT_1710_NEWCHARACTER",
+			"Moru_Silver_Event_1704", "Moru_Silver_TA_Recycle", "Moru_Silver_TA_V2",
 			"Moru_Event160609", "Moru_Event160929_14d", "Moru_Potential", "Moru_Potential14d",
 			"Moru_Silver_Team", "Moru_Silver_Team_event1909", "Moru_Ruby_noCharge"
 		};
@@ -575,13 +574,26 @@ public class RefiningItemScripts : GeneralScript
 		}
 		else
 		{
-			// Anvils that prevent potential loss are handled by IsAnvilForZeroPotential.
-			// The base logic is that failure on an item with potential loses potential.
-			// If potential is 0, the item breaks unless a special anvil is used.
-			if (invItem.Potential > 0)
+			var moruStrArg = moruItem.Data?.Script?.StrArg ?? "";
+
+			if (moruStrArg == "gold_Moru" || moruStrArg == "blessed_gold_Moru")
+			{
+				if (itemReinCount >= 12)
+					invItem.Properties.SetFloat(PropertyName.Reinforce_2, 10);
+			}
+			else if (moruStrArg == "unique_gold_Moru" || moruStrArg == "blessed_ruby_Moru")
+			{
+				if (itemReinCount >= 16)
+					invItem.Properties.SetFloat(PropertyName.Reinforce_2, 15);
+			}
+			else if (invItem.Potential > 0)
+			{
 				invItem.Properties.Modify(PropertyName.PR, -1);
+			}
 			else if (!IsAnvilForZeroPotential(moruItem))
+			{
 				isBreakItem = true;
+			}
 		}
 
 		var delaySec = 1.0f;
