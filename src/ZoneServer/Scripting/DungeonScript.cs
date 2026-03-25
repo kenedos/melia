@@ -440,6 +440,9 @@ namespace Melia.Zone.Scripting
 		/// <param name="character">The character entering the dungeon.</param>
 		protected async Task SetupPlayer(Character character)
 		{
+			if (character?.Map == null)
+				return;
+
 			if (!ZoneServer.Instance.Data.InstanceDungeonDb.TryGetByMapClassName(character.Map.ClassName, out var dungeonData))
 			{
 				return;
@@ -485,7 +488,7 @@ namespace Melia.Zone.Scripting
 			if (party == null)
 			{
 				Log.Info("DungeonScript: Character '{0}' entered dungeon map without a party. Warping out.", character.Name);
-				while (character.IsWarping) await Task.Delay(50);
+				while (character.IsWarping && character.Map != null) await Task.Delay(50);
 				character.Warp(character.GetCityReturnLocation());
 				return;
 			}
@@ -494,7 +497,7 @@ namespace Melia.Zone.Scripting
 			if (leaderCharacter == null)
 			{
 				Log.Info("DungeonScript: Party has no leader for character '{0}'. Warping out.", character.Name);
-				while (character.IsWarping) await Task.Delay(50);
+				while (character.IsWarping && character.Map != null) await Task.Delay(50);
 				character.Warp(character.GetCityReturnLocation());
 				return;
 			}
@@ -531,14 +534,14 @@ namespace Melia.Zone.Scripting
 					else
 					{
 						Log.Warning("DungeonScript: Non-leader '{0}' instance was created but character not mapped. Warping out.", character.Name);
-						while (character.IsWarping) await Task.Delay(50);
+						while (character.IsWarping && character.Map != null) await Task.Delay(50);
 						character.Warp(character.GetCityReturnLocation());
 					}
 				}
 				catch (TaskCanceledException)
 				{
 					Log.Warning("DungeonScript: Non-leader '{0}' timed out waiting for instance creation ({1}ms). Warping out.", character.Name, InstanceCreationWaitTimeoutMs);
-					while (character.IsWarping) await Task.Delay(50);
+					while (character.IsWarping && character.Map != null) await Task.Delay(50);
 					character.Warp(character.GetCityReturnLocation());
 				}
 				finally
@@ -591,7 +594,7 @@ namespace Melia.Zone.Scripting
 			foreach (var memberCharacter in partyMembers)
 			{
 				if (memberCharacter == null) continue;
-				while (memberCharacter.IsWarping && (DateTime.UtcNow - warpWaitStart) < MaxWarpWaitTime)
+				while (memberCharacter.IsWarping && memberCharacter.Map != null && (DateTime.UtcNow - warpWaitStart) < MaxWarpWaitTime)
 					await Task.Delay(50);
 			}
 
@@ -623,7 +626,7 @@ namespace Melia.Zone.Scripting
 		/// </summary>
 		private async Task JoinInstance(Character character, InstanceDungeon instance)
 		{
-			while (character.IsWarping) await Task.Delay(50);
+			while (character.IsWarping && character.Map != null) await Task.Delay(50);
 
 			// If dungeon hasn't started yet (pre-created instance), start it
 			if (!instance.IsStarted)
@@ -774,6 +777,10 @@ namespace Melia.Zone.Scripting
 				while (!token.IsCancellationRequested)
 				{
 					await Task.Delay(TimeSpan.FromSeconds(5), token);
+
+					// Check if character has been cleaned up
+					if (character.Map == null)
+						break;
 
 					// Check if character is still in the dungeon map
 					if (character.MapId != instance.MapId)

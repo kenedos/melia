@@ -126,7 +126,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					if (property is CFloatProperty calcProperty)
 						calcProperty.Invalidate();
 				}
-				Send.ZC_OBJECT_PROPERTY(this.Character.Connection, skill);
+				var conn = this.Character?.Connection;
+			if (conn != null)
+				Send.ZC_OBJECT_PROPERTY(conn, skill);
 			}
 		}
 	}

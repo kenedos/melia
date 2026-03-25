@@ -157,6 +157,9 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="buff"></param>
 		private void OnBuffsChanged(ICombatEntity entity, Buff buff)
 		{
+			if (this.Monster?.Map == null)
+				return;
+
 			// Mobs don't have a stat UI, but movement speed changes need to be broadcast
 			if (buff.AffectsMovementSpeed())
 			{

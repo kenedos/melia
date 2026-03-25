@@ -72,6 +72,9 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			{
 				skill.Wait(TimeSpan.FromMilliseconds(1000 * (i + 1))).ContinueWith(_ =>
 				{
+					if (caster?.Map == null)
+						return;
+
 					for (var j = 0; j < SimultaneousSalamanders; j++)
 					{
 						var start = this.GetRandomPerimeterPosition(caster.Map, position, EffectRadius);

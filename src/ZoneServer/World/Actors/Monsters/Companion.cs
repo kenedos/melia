@@ -306,6 +306,9 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="attackState"></param>
 		private void OnCombatStateChanged(ICombatEntity combatEntity, bool attackState)
 		{
+			if (this.Map == null)
+				return;
+
 			this.Properties.Invalidate(PropertyName.RHPTIME);
 		}
 

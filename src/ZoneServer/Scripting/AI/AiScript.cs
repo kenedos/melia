@@ -74,6 +74,8 @@ namespace Melia.Zone.Scripting.AI
 		private readonly HashSet<int> _hatedMonsters = new();
 
 		private readonly List<ICombatEntity> _nearbyEnemiesBuffer = new();
+		private ICombatEntity _cachedMostHated;
+		private bool _mostHatedDirty = true;
 		private TimeSpan _hateUpdateAccumulator = TimeSpan.Zero;
 
 		private float _wanderRange = 300;
@@ -813,22 +815,14 @@ namespace Melia.Zone.Scripting.AI
 		{
 			_hateLevelsToRemove.Clear();
 
-			var nearbyHandles = new HashSet<int>(potentialEnemies.Select(a => a.Handle));
+			_nearbyHandleSet.Clear();
+			for (var i = 0; i < potentialEnemies.Count; i++)
+				_nearbyHandleSet.Add(potentialEnemies[i].Handle);
 
 			foreach (var entry in _hateLevels)
 			{
 				var handle = entry.Key;
-
-				// Linear scan — both collections are small
-				var isNearby = false;
-				for (var i = 0; i < potentialEnemies.Count; i++)
-				{
-					if (potentialEnemies[i].Handle == handle)
-					{
-						isNearby = true;
-						break;
-					}
-				}
+				var isNearby = _nearbyHandleSet.Contains(handle);
 
 				if (!isNearby)
 				{
@@ -858,6 +852,8 @@ namespace Melia.Zone.Scripting.AI
 
 			foreach (var handle in _hateLevelsToRemove)
 				_hateLevels.Remove(handle);
+
+			_mostHatedDirty = true;
 		}
 
 		/// <summary>
@@ -866,6 +862,7 @@ namespace Melia.Zone.Scripting.AI
 		protected void RemoveAllHate()
 		{
 			_hateLevels.Clear();
+			_mostHatedDirty = true;
 		}
 
 		/// <summary>
@@ -900,7 +897,12 @@ namespace Melia.Zone.Scripting.AI
 				var amount = (float)(_hateGainPerSecond * elapsed.TotalSeconds);
 
 				// --- Custom in Laima ---
-				var enemyInAttackState = potentialEnemy.Components.Get<CombatComponent>()?.AttackState ?? false;
+				var enemyInAttackState = potentialEnemy switch
+				{
+					Character ch => ch.Combat?.AttackState ?? false,
+					Mob mob => mob.CombatState?.AttackState ?? false,
+					_ => potentialEnemy.Components.Get<CombatComponent>()?.AttackState ?? false,
+				};
 				if (this.Entity.Tendency == TendencyType.Peaceful)
 				{
 					if (enemyInAttackState)
@@ -1017,6 +1019,7 @@ namespace Melia.Zone.Scripting.AI
 			//newHate += addAdjusted * _overHateRate;
 
 			_hateLevels[handle] = newHate;
+			_mostHatedDirty = true;
 
 			// Debug
 			// Console.WriteLine("Monster {0} hate level for {1} is now {2}.", this.Entity, entity.Name, _hateLevels[handle]);
@@ -1142,6 +1145,15 @@ namespace Melia.Zone.Scripting.AI
 					return caster;
 			}
 
+			// Return cached result if hate levels haven't changed and
+			// the cached target is still valid.
+			if (!_mostHatedDirty && _cachedMostHated != null
+				&& !this.EntityGone(_cachedMostHated)
+				&& this.CanBeHated(_cachedMostHated))
+			{
+				return _cachedMostHated;
+			}
+
 			var highestHate = 0f;
 			ICombatEntity mostHated = null;
 
@@ -1175,8 +1187,14 @@ namespace Melia.Zone.Scripting.AI
 				_hateLevels.Remove(handle);
 
 			if (highestHate < _minAggroHateLevel)
+			{
+				_cachedMostHated = null;
+				_mostHatedDirty = false;
 				return null;
+			}
 
+			_cachedMostHated = mostHated;
+			_mostHatedDirty = false;
 			return mostHated;
 		}
 
@@ -1366,6 +1384,7 @@ namespace Melia.Zone.Scripting.AI
 					{
 						var targetHandle = hateResetAlert.Target.Handle;
 						_hateLevels.Remove(targetHandle);
+						_mostHatedDirty = true;
 					}
 					else
 						this.RemoveAllHate();
@@ -1493,6 +1512,8 @@ namespace Melia.Zone.Scripting.AI
 			this.ClearTarget();
 			this.ClearEventAlerts();
 			_hateLevels.Clear();
+			_mostHatedDirty = true;
+			_cachedMostHated = null;
 			_hateLevelsToRemove.Clear();
 			_hatedFactions.Clear();
 			_hatedMonsters.Clear();

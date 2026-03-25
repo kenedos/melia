@@ -90,7 +90,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		/// </summary>
 		private Pad CreateHellBreathPad(ICombatEntity caster, Skill skill)
 		{
-			if (caster == null)
+			if (caster?.Map == null)
 				return null;
 
 			var pad = new Pad(PadName.Pyromancer_HellBreath, caster, skill, new Circle(caster.Position, 45));
@@ -107,10 +107,12 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		/// </summary>
 		private async Task CreateAndMovePad(ICombatEntity caster, Skill skill)
 		{
-			if (caster == null)
+			if (caster?.Map == null)
 				return;
 
 			var pad = this.CreateHellBreathPad(caster, skill);
+			if (pad == null)
+				return;
 			var destination = pad.Position.GetRelative(caster.Direction, MaxDistance);
 			var moveTime = pad.Movement.MoveTo(destination);
 			await skill.Wait(moveTime);

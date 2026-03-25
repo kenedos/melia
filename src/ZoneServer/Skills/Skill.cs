@@ -698,7 +698,7 @@ namespace Melia.Zone.Skills
 				Interlocked.Decrement(ref _runnerCount);
 
 				if (t.Exception != null)
-					Log.Error("An exception occured while running '{0}' for '{1}': {2}", this.Id, this.Owner.Name, t.Exception);
+					Log.Error("An exception occured while running '{0}' for '{1}': {2}", this.Id, this.Owner?.Name ?? "(disposed)", t.Exception);
 			});
 		}
 
@@ -724,7 +724,7 @@ namespace Melia.Zone.Skills
 			task.ContinueWith(t =>
 			{
 				if (t.Exception != null)
-					Log.Error("An exception occured while running '{0}' for '{1}': {2}", this.Id, this.Owner.Name, t.Exception);
+					Log.Error("An exception occured while running '{0}' for '{1}': {2}", this.Id, this.Owner?.Name ?? "(disposed)", t.Exception);
 			});
 		}
 

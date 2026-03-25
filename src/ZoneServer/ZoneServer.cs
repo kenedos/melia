@@ -662,7 +662,7 @@ namespace Melia.Zone
 			}
 		}
 
-		private void StopServices()
+		public void StopServices()
 		{
 			Log.Info("Stopping server services...");
 
@@ -675,7 +675,8 @@ namespace Melia.Zone
 			Log.Info("World stopped.");
 
 			// Stop SaveQueue (drain remaining saves)
-			SaveQueue.Stop();
+			if (!SaveQueue.IsAddingCompleted)
+				SaveQueue.Stop();
 			Log.Info("SaveQueue stopped.");
 
 			// Dispose AutoSave Service

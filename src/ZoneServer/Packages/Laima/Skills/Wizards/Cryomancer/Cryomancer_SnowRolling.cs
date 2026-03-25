@@ -76,6 +76,8 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 			{
 				if (snowball.IsDead)
 					break;
+				if (caster?.Map == null)
+					break;
 				snowball.Position = new Position(caster.Position.X, caster.Position.Y - SnowballHeight, caster.Position.Z);
 				snowball.Direction = caster.Direction;
 				snowball.Vars.Set("NextAvailableAttachPoint", 1);

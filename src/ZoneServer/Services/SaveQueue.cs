@@ -15,6 +15,12 @@ namespace Melia.Zone.Services
 		private static Thread[] _workers;
 
 		/// <summary>
+		/// Returns true if the queue has been marked as complete
+		/// and will no longer accept new items.
+		/// </summary>
+		public static bool IsAddingCompleted => _queue.IsAddingCompleted;
+
+		/// <summary>
 		/// Starts the save queue with the specified number of
 		/// dedicated worker threads.
 		/// </summary>
@@ -56,7 +62,22 @@ namespace Melia.Zone.Services
 		/// <param name="action"></param>
 		public static void Enqueue(Action action)
 		{
-			_queue.Add(action);
+			try
+			{
+				_queue.Add(action);
+			}
+			catch (InvalidOperationException)
+			{
+				Log.Warning("SaveQueue: Queue is completing; executing save inline.");
+				try
+				{
+					action();
+				}
+				catch (Exception ex)
+				{
+					Log.Error($"SaveQueue inline fallback: {ex}");
+				}
+			}
 		}
 
 		/// <summary>
@@ -65,7 +86,40 @@ namespace Melia.Zone.Services
 		/// </summary>
 		public static void Stop()
 		{
-			_queue.CompleteAdding();
+			if (!_queue.IsAddingCompleted)
+				_queue.CompleteAdding();
+		}
+
+		/// <summary>
+		/// Signals the queue to stop accepting new work, then blocks
+		/// until all workers finish processing remaining items.
+		/// </summary>
+		/// <param name="timeoutMs">Maximum time in ms to wait for
+		/// each worker thread. Default 30 seconds.</param>
+		/// <returns>True if all workers drained in time.</returns>
+		public static bool StopAndDrain(int timeoutMs = 30000)
+		{
+			if (!_queue.IsAddingCompleted)
+				_queue.CompleteAdding();
+
+			if (_workers == null)
+				return true;
+
+			var allDrained = true;
+			foreach (var worker in _workers)
+			{
+				if (worker != null && worker.IsAlive)
+				{
+					if (!worker.Join(timeoutMs))
+					{
+						Log.Warning("SaveQueue: Worker '{0}' did not finish within {1}ms.", worker.Name, timeoutMs);
+						allDrained = false;
+					}
+				}
+			}
+
+			Log.Info("SaveQueue: All workers {0}.", allDrained ? "drained successfully" : "timed out");
+			return allDrained;
 		}
 	}
 }

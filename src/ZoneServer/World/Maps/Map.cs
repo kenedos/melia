@@ -876,6 +876,9 @@ namespace Melia.Zone.World.Maps
 		/// <param name="position"></param>
 		/// <param name="radius"></param>
 		/// <param name="buffer">Buffer to fill with results. Cleared before use.</param>
+		[ThreadStatic]
+		private static List<ICombatEntity> _spatialQueryBuffer;
+
 		public void GetAttackableEnemiesInPosition(ICombatEntity attacker, Position position, float radius, List<ICombatEntity> buffer)
 		{
 			buffer.Clear();
@@ -884,7 +887,10 @@ namespace Melia.Zone.World.Maps
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryCircle(position, radius + MaxAgentRadius);
+				var queryBuffer = _spatialQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(position, radius + MaxAgentRadius, queryBuffer);
+				candidates = queryBuffer;
 			}
 			else
 			{

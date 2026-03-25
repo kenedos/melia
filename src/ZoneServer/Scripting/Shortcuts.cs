@@ -355,7 +355,7 @@ namespace Melia.Zone.Scripting
 			// Make chest reappear after a certain amount of time
 			// TODO: Add timer component, to set up and associate timers
 			//   and intervals with entities.
-			_ = Task.Delay(TimeSpan.FromMinutes(1)).ContinueWith(_ => npc.SetState(NpcState.Normal));
+			_ = Task.Delay(TimeSpan.FromMinutes(1)).ContinueWith(_ => { if (npc?.Map != null) npc.SetState(NpcState.Normal); });
 		}
 
 		/// <summary>

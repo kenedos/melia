@@ -9,6 +9,7 @@ using Melia.Shared.L10N;
 using Melia.Shared.Network;
 using Melia.Shared.Network.Inter.Messages;
 using Melia.Zone.Network;
+using Melia.Zone.Services;
 using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Logging;
 
@@ -393,7 +394,7 @@ namespace Melia.Zone.Util
 					var characters = ZoneServer.Instance.World.GetCharacters().ToList();
 					Log.Info("Players to save and disconnect: {0}", characters.Count);
 
-					// Final broadcast (system message, followed by MsgBox popup per player)
+					// Final broadcast
 					var finalMessage = "[Server] Server is shutting down NOW. Thank you for playing!";
 					BroadcastToAllPlayers(finalMessage);
 
@@ -422,20 +423,34 @@ namespace Melia.Zone.Util
 								Localization.Get("The server is shutting down: {0}"),
 								ShutdownReason ?? "maintenance"
 							);
-							character.Connection?.Close(1000);
+
+							// Clear autotrade so OnClosed takes the normal
+							// save/cleanup path instead of keeping them in world.
+							character.IsAutoTrading = false;
+							character.Connection?.Close();
 
 							savedCount++;
-							Log.Info("    ✓ Saved and disconnected");
+							Log.Info("    Saved and disconnected");
 						}
 						catch (Exception ex)
 						{
 							failedCount++;
-							Log.Error("    ✗ Error: {0}", ex.Message);
+							Log.Error("    Error saving {0}: {1}", character.Name, ex.Message);
 							character.Connection?.Close();
 						}
 					}
 
 					Log.Info("Player save complete - Saved: {0}, Failed: {1}", savedCount, failedCount);
+
+					// Wait for all characters to finish leaving the world
+					WaitForPlayersToLeave(timeout: TimeSpan.FromSeconds(10));
+
+					// Drain the SaveQueue so all disconnect-triggered saves complete
+					Log.Info("Draining SaveQueue...");
+					SaveQueue.StopAndDrain(30000);
+
+					// Stop all server services (acceptor, heartbeat, autosave, etc.)
+					ZoneServer.Instance.StopServices();
 
 					// Update server status
 					ZoneServer.Instance.ServerInfo.Status = ServerStatus.Offline;
@@ -452,16 +467,40 @@ namespace Melia.Zone.Util
 					Log.Info("========================================");
 					Log.Info("       SERVER SHUTDOWN COMPLETE         ");
 					Log.Info("========================================");
-					Log.Info("The server process can now be safely terminated.");
 
-					// Optionally exit the process
-					// Environment.Exit(0);
+					Environment.Exit(0);
 				}
 				catch (Exception ex)
 				{
 					Log.Error("Critical error during shutdown: {0}", ex);
 				}
 			});
+		}
+
+		/// <summary>
+		/// Polls until all characters have left the world, or the
+		/// timeout expires.
+		/// </summary>
+		private static void WaitForPlayersToLeave(TimeSpan timeout)
+		{
+			var deadline = DateTime.Now + timeout;
+
+			while (DateTime.Now < deadline)
+			{
+				var remaining = ZoneServer.Instance.World.GetCharacterCount();
+				if (remaining == 0)
+				{
+					Log.Info("All players have left the world.");
+					return;
+				}
+
+				Log.Info("Waiting for {0} player(s) to finish cleanup...", remaining);
+				Thread.Sleep(500);
+			}
+
+			var leftover = ZoneServer.Instance.World.GetCharacterCount();
+			if (leftover > 0)
+				Log.Warning("Timed out waiting for players to leave. {0} still in world.", leftover);
 		}
 
 		/// <summary>

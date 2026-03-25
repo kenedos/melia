@@ -154,6 +154,15 @@ namespace Melia.Zone.World.Maps.Spatial
 		public List<ICombatEntity> QueryCircle(Position center, float radius)
 		{
 			var results = new List<ICombatEntity>();
+			this.QueryCircle(center, radius, results);
+			return results;
+		}
+
+		/// <summary>
+		/// Queries all entities within a circular area into the given buffer.
+		/// </summary>
+		public void QueryCircle(Position center, float radius, List<ICombatEntity> results)
+		{
 			var radiusSq = radius * radius;
 
 			var minCellX = (int)((center.X - radius - _minX) / CellSize);
@@ -186,8 +195,6 @@ namespace Melia.Zone.World.Maps.Spatial
 					}
 				}
 			}
-
-			return results;
 		}
 
 		/// <summary>

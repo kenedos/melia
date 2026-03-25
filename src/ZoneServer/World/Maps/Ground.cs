@@ -26,6 +26,9 @@ namespace Melia.Zone.World.Maps
 		private Polygon2d[] _navGraphPolygons;
 		private NavGraphNode[] _graphNodes;
 
+		// Height cache to avoid repeated AABB tree raycasts
+		private readonly Dictionary<long, float> _heightCache = new();
+
 		// Spatial indexing for performance
 		private QuadTree<int> _cellQuadTree;
 		private QuadTree<int> _outlineQuadTree;
@@ -494,6 +497,13 @@ namespace Melia.Zone.World.Maps
 			height = float.NaN;
 			if (_spatial == null) return false;
 
+			var qx = (int)MathF.Round(pos.X);
+			var qz = (int)MathF.Round(pos.Z);
+			var key = ((long)qx << 32) | (uint)qz;
+
+			if (_heightCache.TryGetValue(key, out height))
+				return true;
+
 			var origin = new Vector3d(pos.X, RayOriginHeight, pos.Z);
 			var ray = new Ray3d(origin, Vector3d.AxisY * -1);
 
@@ -502,6 +512,7 @@ namespace Melia.Zone.World.Maps
 
 			var intersection = MeshQueries.TriangleIntersection(_mesh, hitId, ray);
 			height = (float)(origin.y - intersection.RayParameter);
+			_heightCache[key] = height;
 			return true;
 		}
 
@@ -693,6 +704,13 @@ namespace Melia.Zone.World.Maps
 		/// <param name="center"></param>
 		/// <param name="radius"></param>
 		/// <returns></returns>
+		private static readonly (float dx, float dz)[] PerimeterUnitOffsets =
+		[
+			(1, 0), (-1, 0), (0, 1), (0, -1),
+			(0.707f, 0.707f), (-0.707f, 0.707f),
+			(0.707f, -0.707f), (-0.707f, -0.707f)
+		];
+
 		public bool IsValidCirclePosition(Position center, float radius)
 		{
 			const float maxTerrainVarianceMultiplier = 1.5f;
@@ -703,16 +721,9 @@ namespace Melia.Zone.World.Maps
 			var minHeight = centerHeight;
 			var maxHeight = centerHeight;
 
-			var perimeterOffsets = new Vector2f[]
+			foreach (var offset in PerimeterUnitOffsets)
 			{
-				new(radius, 0), new(-radius, 0), new(0, radius), new(0, -radius),
-				new(radius * 0.707f, radius * 0.707f), new(-radius * 0.707f, radius * 0.707f),
-				new(radius * 0.707f, -radius * 0.707f), new(-radius * 0.707f, -radius * 0.707f)
-			};
-
-			foreach (var offset in perimeterOffsets)
-			{
-				var perimeterPos = new Position(center.X + offset.x, 0, center.Z + offset.y);
+				var perimeterPos = new Position(center.X + offset.dx * radius, 0, center.Z + offset.dz * radius);
 				if (!this.TryGetHeightAt(perimeterPos, out var height)) return false;
 
 				minHeight = Math.Min(minHeight, height);
