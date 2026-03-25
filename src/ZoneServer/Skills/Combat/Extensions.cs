@@ -98,23 +98,32 @@ namespace Melia.Zone.Skills.Combat
 			var splashParam = skill.GetSplashParameters(caster, splashPos, mainTarget.Position, length: 130, width: 60, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 
+			// GetAttackableEnemiesIn returns sorted by distance already
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var eligibleTargets = targets.Where(a => a != mainTarget).ToList();
 
-			if (!eligibleTargets.Any())
+			// Filter out main target and find eligible candidates
+			var eligibleCount = 0;
+			for (var i = targets.Count - 1; i >= 0; i--)
+			{
+				if (targets[i] == mainTarget)
+					targets.RemoveAt(i);
+				else
+					eligibleCount++;
+			}
+
+			if (eligibleCount == 0)
 			{
 				bounceTarget = null;
 				return false;
 			}
 
-			// Sort targets by distance, but only consider the closest 50% of targets
-			var sortedTargets = eligibleTargets.OrderBy(a => a.Position.Get2DDistance(mainTarget.Position)).ToList();
-			var consideredTargetsCount = Math.Max(1, (int)(sortedTargets.Count * 0.5));
-			var consideredTargets = sortedTargets.Take(consideredTargetsCount).ToList();
+			// Sort by distance to main target for bounce proximity
+			var mainPos = mainTarget.Position;
+			targets.Sort((a, b) => a.Position.Get2DDistance(mainPos).CompareTo(b.Position.Get2DDistance(mainPos)));
 
-			// Randomly select one of the considered targets
-			var rnd = new Random();
-			bounceTarget = consideredTargets[rnd.Next(consideredTargets.Count)];
+			// Consider closest 50% of targets
+			var consideredCount = Math.Max(1, (int)(targets.Count * 0.5));
+			bounceTarget = targets[RandomProvider.Get().Next(consideredCount)];
 			return true;
 		}
 	}

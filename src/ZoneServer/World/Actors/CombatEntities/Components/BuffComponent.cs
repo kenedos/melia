@@ -21,6 +21,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 	public class BuffComponent : CombatEntityComponent, IUpdateable
 	{
 		private readonly Dictionary<BuffId, Buff> _buffs = new();
+		private readonly List<Buff> _updateBuffer = new();
+		private readonly List<Buff> _removeBuffer = new();
 
 		private readonly HashSet<BuffId> _noTextEffect =
 		[
@@ -667,8 +669,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		public void Update(TimeSpan elapsed)
 		{
-			List<Buff> toUpdate = null;
-			List<Buff> toRemove = null;
+			_updateBuffer.Clear();
+			_removeBuffer.Clear();
 			var now = DateTime.Now;
 
 			lock (_buffs)
@@ -676,37 +678,23 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				foreach (var buff in _buffs.Values)
 				{
 					if (buff.HasUpdateTime)
-					{
-						toUpdate ??= new List<Buff>();
-						toUpdate.Add(buff);
-					}
+						_updateBuffer.Add(buff);
+
 					if (buff.HasDuration && now >= buff.RemovalTime)
-					{
-						toRemove ??= new List<Buff>();
-						toRemove.Add(buff);
-					}
-					if (buff.Target.IsDead && buff.Data.RemoveOnDeath)
-					{
-						toRemove ??= new List<Buff>();
-						toRemove.Add(buff);
-					}
+						_removeBuffer.Add(buff);
+					else if (buff.Target.IsDead && buff.Data.RemoveOnDeath)
+						_removeBuffer.Add(buff);
 				}
 			}
 
-			if (toUpdate != null)
+			foreach (var buff in _updateBuffer)
 			{
-				foreach (var buff in toUpdate)
-				{
-					if (this.Has(buff.Id))
-						buff.Update(elapsed);
-				}
+				if (this.Has(buff.Id))
+					buff.Update(elapsed);
 			}
 
-			if (toRemove != null)
-			{
-				foreach (var buff in toRemove)
-					this.Remove(buff);
-			}
+			foreach (var buff in _removeBuffer)
+				this.Remove(buff);
 		}
 
 		/// <summary>

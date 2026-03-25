@@ -26,6 +26,7 @@ namespace Melia.Zone.World.Actors.Components
 		private readonly object _syncLock = new();
 
 		private List<IActor> _actorsInside = new();
+		private List<IActor> _actorsInsideBuffer = new();
 		private readonly HashSet<IActor> _actorsInsideSet = new();
 		private readonly HashSet<IActor> _nowInsideSet = new();
 		private readonly List<IActor> _tempEntered = new();
@@ -300,13 +301,14 @@ namespace Melia.Zone.World.Actors.Components
 
 			this.Area.UpdatePosition(this.Actor.Position);
 
-			var nowInside = this.Actor.Map.GetActorsIn<IActor>(this.Area, this.IsValidTriggerer);
+			// Fill the back-buffer with current actors, reusing the list
+			this.Actor.Map.GetActorsIn<IActor>(this.Area, this.IsValidTriggerer, _actorsInsideBuffer);
 
 			lock (_syncLock)
 			{
 				// Build set of current actors for O(1) lookup
 				_nowInsideSet.Clear();
-				foreach (var a in nowInside)
+				foreach (var a in _actorsInsideBuffer)
 					_nowInsideSet.Add(a);
 
 				// Find entered actors (in now but not in previous)
@@ -327,11 +329,16 @@ namespace Melia.Zone.World.Actors.Components
 				foreach (var actor in _tempLeft)
 					this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
 
-				_actorsInside = nowInside;
+				// Swap buffers: _actorsInsideBuffer becomes the current
+				// list, old _actorsInside becomes the next write target
+				var temp = _actorsInside;
+				_actorsInside = _actorsInsideBuffer;
+				_actorsInsideBuffer = temp;
+
 				_actorsInsideSet.Clear();
-				foreach (var a in nowInside)
+				foreach (var a in _actorsInside)
 					_actorsInsideSet.Add(a);
-				this.ActorCount = nowInside.Count;
+				this.ActorCount = _actorsInside.Count;
 			}
 
 			_updateTimer += elapsed;

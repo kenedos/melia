@@ -202,11 +202,23 @@ namespace Melia.Zone.World.Maps.Spatial
 		/// </summary>
 		public List<ICombatEntity> QueryShape(IShapeF shape)
 		{
+			var results = new List<ICombatEntity>();
+			this.QueryShape(shape, results);
+			return results;
+		}
+
+		/// <summary>
+		/// Queries all entities within an arbitrary shape into the given buffer.
+		/// </summary>
+		public void QueryShape(IShapeF shape, List<ICombatEntity> results)
+		{
 			// Fast path for circles - avoid expensive GetEdgePoints
 			if (shape is CircleF circle)
-				return this.QueryCircle(new Position(circle.Center.X, 0, circle.Center.Y), circle.Radius + MaxAgentRadius);
+			{
+				this.QueryCircle(new Position(circle.Center.X, 0, circle.Center.Y), circle.Radius + MaxAgentRadius, results);
+				return;
+			}
 
-			var results = new List<ICombatEntity>();
 			var center = shape.Center;
 
 			// Estimate radius from shape bounds, expanded by max agent
@@ -251,8 +263,6 @@ namespace Melia.Zone.World.Maps.Spatial
 					}
 				}
 			}
-
-			return results;
 		}
 
 		/// <summary>

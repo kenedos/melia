@@ -59,6 +59,11 @@ namespace Melia.Zone.World.Maps
 
 		// Spatial index for efficient range queries
 		private EntitySpatialIndex _spatialIndex;
+
+		// Buffer to avoid allocating new lists every spatial query
+		[ThreadStatic]
+		private static List<ICombatEntity> _spatialShapeQueryBuffer;
+
 		#endregion
 
 		#region Properties
@@ -1048,44 +1053,52 @@ namespace Melia.Zone.World.Maps
 		public List<TActor> GetActorsIn<TActor>(IShapeF area, Func<TActor, bool> predicate = null) where TActor : IActor
 		{
 			var result = new List<TActor>();
+			this.GetActorsIn(area, predicate, result);
+			return result;
+		}
 
-			// Use spatial index for ICombatEntity queries (covers monsters and characters)
+		/// <summary>
+		/// Fills the provided buffer with all actors in a given area,
+		/// avoiding list allocation.
+		/// </summary>
+		public void GetActorsIn<TActor>(IShapeF area, Func<TActor, bool> predicate, List<TActor> buffer) where TActor : IActor
+		{
+			buffer.Clear();
+
 			if (_spatialIndex != null && typeof(ICombatEntity).IsAssignableFrom(typeof(TActor)))
 			{
-				var candidates = _spatialIndex.QueryShape(area);
-				foreach (var entity in candidates)
+				var queryBuffer = _spatialShapeQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryShape(area, queryBuffer);
+				foreach (var entity in queryBuffer)
 				{
 					if (entity is TActor actor && area.IsInsideOrInRange(actor.Position, entity.AgentRadius) && (predicate?.Invoke(actor) ?? true))
-						result.Add(actor);
+						buffer.Add(actor);
 				}
 			}
 			else
 			{
-				// Fallback: Check monsters
 				foreach (var monster in _monsters.Values)
 				{
 					var radius = (monster as ICombatEntity)?.AgentRadius ?? 0;
 					if (monster is TActor actor && area.IsInsideOrInRange(actor.Position, radius) && (predicate?.Invoke(actor) ?? true))
-						result.Add(actor);
+						buffer.Add(actor);
 				}
 
-				// Check characters
 				foreach (var character in _characters.Values)
 				{
 					if (character is TActor actor && area.IsInsideOrInRange(actor.Position, ((ICombatEntity)character).AgentRadius) && (predicate?.Invoke(actor) ?? true))
-						result.Add(actor);
+						buffer.Add(actor);
 				}
 			}
 
-			// Check pads (not in spatial index)
 			foreach (var pad in _pads.Values)
 			{
 				if (pad is TActor actor && area.IsInside(actor.Position) && (predicate?.Invoke(actor) ?? true))
-					result.Add(actor);
+					buffer.Add(actor);
 			}
-
-			return result;
 		}
+
 
 		/// <summary>
 		/// Returns all actors of type TActor within the given range of a
