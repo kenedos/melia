@@ -1,5 +1,5 @@
-﻿//--- Melia Script ----------------------------------------------------------
-// Crafting Table Scripts
+//--- Melia Script ----------------------------------------------------------
+// Mixing Table Scripts
 //--- Description -----------------------------------------------------------
 // Handles "Dialog TX" requests from the client.
 //---------------------------------------------------------------------------
@@ -16,27 +16,27 @@ using Yggdrasil.Util;
 using Yggdrasil.Util.Commands;
 using static Melia.Zone.Scripting.Shortcuts;
 
-public class CraftingTableFunctionsScript : GeneralScript
+public class MixingTableFunctionsScript : GeneralScript
 {
 	protected override void Load()
 	{
 		base.Load();
 
-		if (!Feature.IsEnabled(FeatureId.CraftingTable))
+		if (!Feature.IsEnabled(FeatureId.MixingTable))
 			return;
-		AddChatCommand("craftingtable", "", "Opens the crafting table.", 0, 99, HandleCraftingTable);
+		AddChatCommand("mixing", "", "Opens the mixing table.", 0, 99, HandleMixingTable);
 	}
 
-	private CommandResult HandleCraftingTable(Character sender, Character target, string message, string commandName, Arguments args)
+	private CommandResult HandleMixingTable(Character sender, Character target, string message, string commandName, Arguments args)
 	{
-		if (!Feature.IsEnabled(FeatureId.CraftingTable))
+		if (!Feature.IsEnabled(FeatureId.MixingTable))
 			return CommandResult.Okay;
 
-		sender.AddonMessage("OPEN_DLG_CRAFTINGTABLE");
+		sender.AddonMessage("OPEN_DLG_MIXINGTABLE");
 		return CommandResult.Okay;
 	}
 
-	public enum CraftingTableRecipe
+	public enum MixingTableRecipe
 	{
 		RerollGem = 1,
 		ImproveQuality = 2,
@@ -44,30 +44,30 @@ public class CraftingTableFunctionsScript : GeneralScript
 	}
 
 	[ScriptableFunction]
-	public DialogTxResult SCR_CRAFTINGTABLE_CRAFT(Character character, DialogTxArgs args)
+	public DialogTxResult SCR_MIXINGTABLE_CRAFT(Character character, DialogTxArgs args)
 	{
-		if (!Feature.IsEnabled(FeatureId.CraftingTable))
+		if (!Feature.IsEnabled(FeatureId.MixingTable))
 			return DialogTxResult.Okay;
 
 		if (args.TxItems.Length < 1 || args.NumArgs.Length < 1)
 		{
-			Log.Debug("SCR_CRAFTINGTABLE_CRAFT: Invalid args. TxItems={0}, NumArgs={1}", args.TxItems.Length, args.NumArgs.Length);
+			Log.Debug("SCR_MIXINGTABLE_CRAFT: Invalid args. TxItems={0}, NumArgs={1}", args.TxItems.Length, args.NumArgs.Length);
 			return DialogTxResult.Fail;
 		}
 
 		// NumArgs[0] = recipeId
-		var recipeType = (CraftingTableRecipe)args.NumArgs[0];
+		var recipeType = (MixingTableRecipe)args.NumArgs[0];
 
 		switch (recipeType)
 		{
-			case CraftingTableRecipe.RerollGem:
+			case MixingTableRecipe.RerollGem:
 				return HandleRerollGem(character, args);
-			case CraftingTableRecipe.ImproveQuality:
+			case MixingTableRecipe.ImproveQuality:
 				return HandleImproveQuality(character, args);
-			case CraftingTableRecipe.RerollMods:
+			case MixingTableRecipe.RerollMods:
 				return HandleRerollMods(character, args);
 			default:
-				Log.Debug("SCR_CRAFTINGTABLE_CRAFT: Unknown recipeType {0}", recipeType);
+				Log.Debug("SCR_MIXINGTABLE_CRAFT: Unknown recipeType {0}", recipeType);
 				character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_FAIL, "");
 				return DialogTxResult.Fail;
 		}

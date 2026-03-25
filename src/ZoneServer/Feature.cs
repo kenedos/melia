@@ -58,7 +58,7 @@ namespace Melia.Zone
 		public static readonly string BountyHunterSystem = "BountyHunterSystem";
 		public static readonly string CenturionRemoved = "CenturionRemoved";
 		public static readonly string ClericHealPartySelect = "ClericHealPartySelect";
-		public static readonly string CraftingTable = "CraftingTable";
+		public static readonly string MixingTable = "MixingTable";
 		public static readonly string DashingForAll = "DashingForAll";
 		public static readonly string DayNightCycle = "DayNightCycle";
 		public static readonly string GrowthEquipOnStart = "GrowthEquipOnStart";

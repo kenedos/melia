@@ -1,5 +1,8 @@
--- Create system button to toggle buy-in shop creation window.
-Melia.Ui.SysMenu.AddButton("BtnBuyInShop", "sysmenu_wugushi", "Create Buy-in Shop", "M_TOGGLE_PERSONAL_SHOP()")
+-- Create system button for mixing table.
+Melia.Ui.SysMenu.AddButton("BtnMixingTable", "sysmenu_alchemist", "Mixing Table", "ui.ToggleFrame('mixingtable')")
+
+-- Create system buttons to toggle shop creation windows.
+Melia.Ui.SysMenu.AddButton("BtnBuyInShop", "sysmenu_wugushi", "Create Buy Shop", "M_TOGGLE_PERSONAL_SHOP()")
 Melia.Ui.SysMenu.AddButton("BtnSellShop", "sysmenu_wugushi", "Create Sell Shop", "M_TOGGLE_PERSONAL_SELL_SHOP()")
 
 function M_TOGGLE_PERSONAL_SHOP()
