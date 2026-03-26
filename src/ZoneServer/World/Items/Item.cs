@@ -1169,7 +1169,7 @@ namespace Melia.Zone.World.Items
 		/// <param name="itemLevel"></param>
 		/// <param name="itemGradeModifier"></param>
 		/// <returns></returns>
-		private float GenerateRandomStatValue(string propertyName, float itemLevel, ItemGrade itemGrade, out float rngModifier)
+		public float GenerateRandomStatValue(string propertyName, float itemLevel, ItemGrade itemGrade, out float rngModifier)
 		{
 			var random = RandomProvider.Get();
 

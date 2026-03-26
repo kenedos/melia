@@ -24,45 +24,6 @@ using static Melia.Zone.Scripting.Shortcuts;
 
 public class ItemTxFunctionsScript : GeneralScript
 {
-	// Class names must match exactly as in items.txt (e.g., Gem_Swordman_Bash, GEM_OutLaw_Bully)
-	private static readonly HashSet<string> AllowedSkillGemClasses = new(StringComparer.OrdinalIgnoreCase)
-	{
-		"Swordman",
-		"Highlander",
-		"Peltasta",
-		"Barbarian",
-		"Hoplite",
-		"Cataphract",
-		"Rodelero",
-		"Archer",
-		"Ranger",
-		"Sapper",
-		"QuarrelShooter",
-		"Wugushi",
-		"Fletcher",
-		"Hunter",
-		"Wizard",
-		"Pyromancer",
-		"Cryomancer",
-		"Psychokino",
-		"Bokor",
-		"Chronomancer",
-		"Elementalist",
-		"Cleric",
-		"Priest",
-		"Kriwi",
-		"Paladin",
-		"Dievdirbys",
-		"Sadhu",
-		"Monk",
-		"Scout",
-		"Linker",
-		"Assassin",
-		"OutLaw",
-		"Corsair",
-		"Thaumaturge",
-		"Rogue",
-	};
 
 	[ScriptableFunction]
 	public ItemTxResult SCR_TRADE_SELECT_SKILL_GEM(Character character, Item item, int[] numArgs)
@@ -99,7 +60,7 @@ public class ItemTxFunctionsScript : GeneralScript
 		}
 
 		var jobClass = parts[1];
-		if (!AllowedSkillGemClasses.Contains(jobClass))
+		if (!SkillGemConst.AllowedClasses.Contains(jobClass))
 		{
 			character.ServerMessage($"Skill gems for {jobClass} are not available yet.");
 			return ItemTxResult.Fail;

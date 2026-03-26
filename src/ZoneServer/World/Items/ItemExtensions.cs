@@ -34,6 +34,29 @@ namespace Melia.Zone.World.Items
 			maxExp = ZoneServer.Instance.Data.ItemExpDb.GetTotalExp(item.Data.EquipExpGroup, lv);
 		}
 
+		/// <summary>
+		/// Sets the item's level by calculating the required experience
+		/// and updating the appropriate level property (CardLevel for cards,
+		/// Level for gems). For colored gems, also recalculates stat options.
+		/// </summary>
+		/// <param name="item">The item to set the level on.</param>
+		/// <param name="level">The target level.</param>
+		public static void SetLevel(this Item item, int level)
+		{
+			var totalExp = ZoneServer.Instance.Data.ItemExpDb.GetTotalExp(item.Data.EquipExpGroup, level);
+			item.Properties.SetFloat(PropertyName.ItemExp, totalExp);
+			item.GetItemLevelExp(totalExp, out var resultLevel, out _, out _);
+
+			if (item.Data.Group == ItemGroup.Card)
+				item.Properties.SetFloat(PropertyName.CardLevel, resultLevel);
+			else if (item.Data.Group == ItemGroup.Gem)
+			{
+				item.Properties.SetFloat(PropertyName.Level, resultLevel);
+				if (item.Data.EquipExpGroup == EquipExpGroup.Gem)
+					item.UpdateGemStatOptions();
+			}
+		}
+
 		public static int GetMaterialPrice(this Item item)
 		{
 			var itemExp = (int)item.Properties[PropertyName.ItemExp];

@@ -35,7 +35,7 @@ public class CardAlbumBossRewardsScript : GeneralScript
 	private const float SUPPORT_RANGE = 400f;
 
 	// Card data mapping: monster class name -> card item ID
-	private static readonly Dictionary<string, int> CardAlbumDrops = new()
+	public static readonly Dictionary<string, int> CardAlbumDrops = new()
 	{
 		// Item Summon Boss Drops (Card Album)
 		{ "item_summon_boss_Gaigalas", 644001 },
