@@ -160,6 +160,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			Debug.MobSkillAnnounce(caster, skill);
+			await skill.Wait(TimeSpan.FromMilliseconds(800));
 			var hits = new List<SkillHitInfo>();
 			var config = new ArrowConfig
 			{
@@ -181,13 +183,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var startingPosition = originPos;
 			var endingPosition = originPos.GetRelative(farPos, distance: 93.131165f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
-			startingPosition = originPos.GetRelative(farPos, distance: 10.921849f);
-			endingPosition = originPos.GetRelative(farPos, distance: 79.536636f);
-			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
-			startingPosition = originPos.GetRelative(farPos, distance: 10.921849f);
-			endingPosition = originPos.GetRelative(farPos, distance: 88.372749f);
-			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 5000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 5000f, 1, 20, -1, hits);
 		}
 	}
 
@@ -216,8 +212,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 15, angle: 30f);
-			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 30, angle: 30f);
+			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 700;
 			var aniTime = 900;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -248,6 +244,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			Debug.MobSkillAnnounce(caster, skill);
+			await skill.Wait(TimeSpan.FromMilliseconds(800));
 			var startingPosition = originPos;
 			var endingPosition = originPos.GetRelative(farPos, distance: 100f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
@@ -260,7 +258,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				HitEffect = new EffectConfig("F_explosion059_ground", 0.2f),
 				Range = 10f,
 				KnockdownPower = 50f,
-				Delay = 1f,
+				Delay = 0f,
 				HitEffectSpacing = 15f,
 				HitTimeSpacing = 0.1f,
 				HitCount = 1,

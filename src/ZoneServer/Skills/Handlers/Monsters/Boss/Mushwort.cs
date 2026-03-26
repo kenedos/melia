@@ -66,6 +66,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var startingPosition = originPos.GetRelative(farPos);
 			var endingPosition = originPos.GetRelative(farPos, distance: 250f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 20000f, 1, 10, -1, hits);
+			hits.Clear();
 			startingPosition = originPos.GetRelative(farPos);
 			endingPosition = originPos.GetRelative(farPos, distance: 250f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
