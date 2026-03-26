@@ -160,7 +160,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			Debug.MobSkillAnnounce(caster, skill);
 			await skill.Wait(TimeSpan.FromMilliseconds(800));
 			var hits = new List<SkillHitInfo>();
 			var config = new ArrowConfig
@@ -244,7 +243,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			Debug.MobSkillAnnounce(caster, skill);
 			await skill.Wait(TimeSpan.FromMilliseconds(800));
 			var startingPosition = originPos;
 			var endingPosition = originPos.GetRelative(farPos, distance: 100f);
