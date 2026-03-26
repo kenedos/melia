@@ -525,17 +525,14 @@ public class CombatCalculationsScript : GeneralScript
 			}
 
 			// Apply attribute multiplier
-			// Note: Workaround by creating new skill and forcing the
-			// attribute type
-			var sk = new Skill(attacker, SkillId.Normal_Attack);
 			var skMod = new SkillModifier();
 			var parsed = Enum.TryParse(attributeTypeStr, out AttributeType attributeType);
 			skMod.AttackAttribute = parsed ? attributeType : AttributeType.None;
-			var attributeMultiplier = SCR_AttributeMultiplier(attacker, target, sk, skMod, null);
+			var attributeMultiplier = SCR_AttributeMultiplier(attacker, target, skill, skMod, null);
 			attributeAtkBonus *= attributeMultiplier;
 
 			// Apply additional attack multiplier for buffs/debuffs (ResistElements, Conviction, ..)
-			var addAtkMultiplier = SCR_GetAddAttackMultiplier(attacker, target, sk, skMod, skillHitResult);
+			var addAtkMultiplier = SCR_GetAddAttackMultiplier(attacker, target, skill, skMod, skillHitResult);
 			attributeAtkBonus *= addAtkMultiplier;
 
 			// Add the bonus if attacker's bonus exists or if the skill is of
@@ -565,13 +562,10 @@ public class CombatCalculationsScript : GeneralScript
 			var attackTypeBonus = atk - atkResist;
 
 			// Apply attack type multiplier
-			// Note: Workaround by creating new skill and forcing the
-			// attack type
-			var sk = new Skill(attacker, SkillId.Normal_Attack);
 			var skMod = new SkillModifier();
 			var parsed = Enum.TryParse(attackTypeStr, out SkillAttackType attackType);
 			skMod.AttackType = parsed ? attackType : SkillAttackType.None;
-			var atkTypeMultiplier = SCR_AttackTypeMultiplier(attacker, target, sk, skMod, null);
+			var atkTypeMultiplier = SCR_AttackTypeMultiplier(attacker, target, skill, skMod, null);
 			attackTypeBonus *= atkTypeMultiplier;
 
 			// Add the bonus if attacker's bonus exists or if the skill is of
