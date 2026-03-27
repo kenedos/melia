@@ -57,9 +57,6 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 		/// </summary>
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
-			
-
-
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
