@@ -26,6 +26,15 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 		/// </summary>
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
+			skill.IncreaseOverheat();
+			caster.SetAttackState(true);
+
 			caster.RemoveBuff(BuffId.ShieldCharge_Buff);
 			caster.StartBuff(BuffId.ShieldCharge_Buff, skill.Level, 0f, TimeSpan.Zero, caster);
 			var targetPos = caster.Position.GetRelative(caster.Direction, distance: 20f);
@@ -48,14 +57,8 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 		/// </summary>
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
-			if (!caster.TrySpendSp(skill))
-			{
-				caster.ServerMessage(Localization.Get("Not enough SP."));
-				return;
-			}
+			
 
-			skill.IncreaseOverheat();
-			caster.SetAttackState(true);
 
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, originPos, farPos);

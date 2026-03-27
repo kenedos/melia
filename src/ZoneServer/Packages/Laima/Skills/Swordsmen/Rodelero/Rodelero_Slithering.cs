@@ -34,6 +34,12 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 			caster.RemoveBuff(BuffId.Slithering_Buff);
 			caster.StartBuff(BuffId.Slithering_Buff, skill.Level, 0f, TimeSpan.Zero, caster);
 			caster.PlaySound("voice_archer_camouflage_shot", "voice_archer_m_camouflage_shot");
+
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
 		}
 
 		/// <summary>
@@ -50,11 +56,6 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 		/// </summary>
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
-			if (!caster.TrySpendSp(skill))
-			{
-				caster.ServerMessage(Localization.Get("Not enough SP."));
-				return;
-			}
 
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
