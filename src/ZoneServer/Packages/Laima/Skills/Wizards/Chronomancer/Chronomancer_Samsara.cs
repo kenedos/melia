@@ -43,18 +43,15 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 
 			var reincarnateChance = Math.Min(100f, 30f + 3f * skill.Level);
-
-			if (caster is Character chrono16Character
-				&& chrono16Character.TryGetActiveAbilityLevel(AbilityId.Chronomancer16, out var enhanceLevel))
-			{
-				reincarnateChance = Math.Min(100f, reincarnateChance * (1f + enhanceLevel * 0.005f));
-			}
-
 			var doubleCloneChance = 0f;
-			if (caster is Character character
-				&& character.TryGetActiveAbilityLevel(AbilityId.Chronomancer3, out var abilityLevel))
+
+			if (caster is Character character)
 			{
-				doubleCloneChance = abilityLevel * 0.5f;
+				if (character.TryGetActiveAbilityLevel(AbilityId.Chronomancer16, out var enhanceLevel))
+					reincarnateChance = Math.Min(100f, reincarnateChance * (1f + enhanceLevel * 0.005f));
+
+				if (character.TryGetActiveAbilityLevel(AbilityId.Chronomancer3, out var doubleLevel))
+					doubleCloneChance = doubleLevel * 0.5f;
 			}
 
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
