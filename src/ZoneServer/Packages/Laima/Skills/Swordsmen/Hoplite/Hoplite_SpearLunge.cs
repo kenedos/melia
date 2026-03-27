@@ -117,7 +117,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 				hits.Add(skillHit);
 
 				// Apply debuff that increases pierce damage
-				target.StartBuff(BuffId.SpearLunge_Debuff, skill.Level, 0, TimeSpan.FromSeconds(5), caster);
+				target.StartBuff(BuffId.SpearLunge_Debuff, skill.Level, 0, TimeSpan.FromSeconds(10), caster);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

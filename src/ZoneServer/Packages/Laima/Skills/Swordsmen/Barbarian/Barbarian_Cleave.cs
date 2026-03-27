@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Barbarian
 
 				if (skillHitResult.Damage > 0)
 				{
-					var debuffDuration = TimeSpan.FromSeconds(5);
+					var debuffDuration = TimeSpan.FromSeconds(10);
 					target.StartBuff(BuffId.Cleave_Debuff, skill.Level, 0, debuffDuration, caster);
 				}
 
