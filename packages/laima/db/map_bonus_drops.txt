@@ -351,6 +351,7 @@
 	{ itemId: 649002, chance: 0.100 }, // Steel Ore
 	{ itemId: 649003, chance: 0.074 }, // Titanium Ore
 	{ itemId: 649004, chance: 0.050 }, // Mithril Ore
+	{ itemId: 649016, chance: 0.037 }, // Absidium Ore
 	{ itemId: 649005, chance: 0.024 }  // Orichalcum Ore
 ]},
 { mapClassName: "d_prison_62_2", items: [
@@ -359,6 +360,7 @@
 	{ itemId: 649002, chance: 0.110 }, // Steel Ore
 	{ itemId: 649003, chance: 0.082 }, // Titanium Ore
 	{ itemId: 649004, chance: 0.054 }, // Mithril Ore
+	{ itemId: 649016, chance: 0.041 }, // Absidium Ore
 	{ itemId: 649005, chance: 0.028 }  // Orichalcum Ore
 ]},
 { mapClassName: "d_prison_62_3", items: [
@@ -367,6 +369,7 @@
 	{ itemId: 649002, chance: 0.120 }, // Steel Ore
 	{ itemId: 649003, chance: 0.090 }, // Titanium Ore
 	{ itemId: 649004, chance: 0.060 }, // Mithril Ore
+	{ itemId: 649016, chance: 0.045 }, // Absidium Ore
 	{ itemId: 649005, chance: 0.030 }  // Orichalcum Ore
 ]},
 
