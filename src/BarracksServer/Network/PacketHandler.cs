@@ -716,6 +716,39 @@ namespace Melia.Barracks.Network
 				return;
 			}
 
+			// When assigning a companion to a character, check if another
+			// companion of the same type is already assigned and unset it.
+			// Companion type is determined by JobId from companion data
+			// (e.g. job 3014 = flying companions, job 0 = ground mounts).
+			if (character != null)
+			{
+				var companionDb = BarracksServer.Instance.Data.CompanionDb;
+				var newJobId = 0;
+
+				if (companionDb.TryFind(companion.MonsterId, out var newCompanionData))
+					newJobId = newCompanionData.JobId;
+
+				foreach (var other in conn.Account.GetCompanions())
+				{
+					if (other.ObjectId == companion.ObjectId)
+						continue;
+
+					if (other.CharacterDbId != character.DbId)
+						continue;
+
+					var otherJobId = 0;
+					if (companionDb.TryFind(other.MonsterId, out var otherCompanionData))
+						otherJobId = otherCompanionData.JobId;
+
+					if (otherJobId == newJobId)
+					{
+						other.CharacterDbId = 0;
+						BarracksServer.Instance.Database.SetCompanionCharacter(other.DbId, 0);
+						Send.BC_NORMAL.SetCompanion(conn, other.ObjectId, 0);
+					}
+				}
+			}
+
 			companion.CharacterDbId = character?.DbId ?? 0;
 			BarracksServer.Instance.Database.SetCompanionCharacter(companion.DbId, companion.CharacterDbId);
 			Send.BC_NORMAL.SetCompanion(conn, companion.ObjectId, character?.ObjectId ?? 0);
