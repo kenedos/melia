@@ -22,7 +22,7 @@ namespace Melia.Zone.Packages.Laima.Pads.Scouts.Thaumaturge
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(150f);
 			pad.SetUpdateInterval(100);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(10000);
@@ -35,7 +35,7 @@ namespace Melia.Zone.Packages.Laima.Pads.Scouts.Thaumaturge
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)

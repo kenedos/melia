@@ -23,7 +23,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Wizards.Psychokino
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(50f);
 			pad.SetUpdateInterval(1000);
 			var life = 3000f + (200f * skill.Level);
@@ -41,7 +41,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Wizards.Psychokino
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 			foreach (var actor in pad.Trigger.GetActors<ICombatEntity>())
 			{
 				if (actor.TryGetBuff(BuffId.Raise_Debuff, out var buff)

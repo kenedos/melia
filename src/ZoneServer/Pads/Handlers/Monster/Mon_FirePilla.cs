@@ -19,7 +19,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			if (pad.Name == PadName.Mon_FirePilla_5)
 				pad.SetRange(15f);
 			else
@@ -36,7 +36,7 @@ namespace Melia.Zone.Pads.Handlers
 
 			PadRemoveBuff(pad, RelationType.Enemy, 0, 0, BuffId.Mon_FirePilla);
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)

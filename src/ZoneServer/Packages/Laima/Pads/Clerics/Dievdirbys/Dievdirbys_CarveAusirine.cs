@@ -21,7 +21,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(45f);
 			pad.SetUpdateInterval(3000);
 			var lifetimeSeconds = 15 + skill.Level * 2;
@@ -39,7 +39,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 			PadRemoveBuff(pad, RelationType.Friendly, 0, 0, BuffId.Ausirine_Buff);
 		}
 

@@ -437,15 +437,55 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.EyesOpen)
 				return;
 
-			this.GetVisibleEntities();
+			// Fill reusable scratch sets with currently visible entities
+			_currentVisMonsters.Clear();
+			this.Map.GetVisibleMonsters(this, _currentVisMonsters);
+
+			_currentVisChars.Clear();
+			this.Map.GetVisibleCharacters(this, _currentVisChars);
+
+			_currentVisPads.Clear();
+			this.Map.GetVisiblePads(this, _currentVisPads);
 
 			int sentCount;
 
 			lock (_lookAroundLock)
 			{
-				this.DiffVisibility(_currentVisChars, _visibleCharacters, _tempAppearChars, _tempDisappearChars);
-				this.DiffVisibility(_currentVisMonsters, _visibleMonsters, _tempAppearMonsters, _tempDisappearMonsters);
-				this.DiffVisibility(_currentVisPads, _visiblePads, _tempAppearPads, _tempDisappearPads);
+				// Compute appeared characters
+				_tempAppearChars.Clear();
+				foreach (var c in _currentVisChars)
+					if (!_visibleCharacters.Contains(c))
+						_tempAppearChars.Add(c);
+
+				// Compute disappeared characters
+				_tempDisappearChars.Clear();
+				foreach (var c in _visibleCharacters)
+					if (!_currentVisChars.Contains(c))
+						_tempDisappearChars.Add(c);
+
+				// Compute appeared monsters
+				_tempAppearMonsters.Clear();
+				foreach (var m in _currentVisMonsters)
+					if (!_visibleMonsters.Contains(m))
+						_tempAppearMonsters.Add(m);
+
+				// Compute disappeared monsters
+				_tempDisappearMonsters.Clear();
+				foreach (var m in _visibleMonsters)
+					if (!_currentVisMonsters.Contains(m))
+						_tempDisappearMonsters.Add(m);
+
+				// Compute appeared pads
+				_tempAppearPads.Clear();
+				foreach (var p in _currentVisPads)
+					if (!_visiblePads.Contains(p))
+						_tempAppearPads.Add(p);
+
+				// Compute disappeared pads
+				_tempDisappearPads.Clear();
+				foreach (var p in _visiblePads)
+					if (!_currentVisPads.Contains(p))
+						_tempDisappearPads.Add(p);
 
 				// Update _visibleMonsters to reflect only what the client
 				// actually knows about: previously visible (minus disappeared)
@@ -469,7 +509,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.HandleAppearingCharacters(_tempAppearChars);
 			this.HandleDisappearingCharacters(_tempDisappearChars);
 
-			for (var i = 0; i < sentCount; i++)
+			for (var i = 0; i < sentCount && i < _tempAppearMonsters.Count; i++)
 				this.HandleAppearingSingleMonster(_tempAppearMonsters[i]);
 
 			this.HandleDisappearingMonsters(_tempDisappearMonsters);
@@ -478,48 +518,11 @@ namespace Melia.Zone.World.Actors.Characters
 			this.HandleDisappearingPads(_tempDisappearPads);
 		}
 
-		/// <summary>
-		/// Fills the scratch sets with currently visible entities.
-		/// </summary>
-		private void GetVisibleEntities()
+		private void HandleAppearingCharacters(List<Character> appearCharacters)
 		{
-			_currentVisMonsters.Clear();
-			foreach (var m in this.Map.Monsters)
-				if (this.CanSee(m))
-					_currentVisMonsters.Add(m);
-
-			_currentVisChars.Clear();
-			foreach (var c in this.Map.Characters)
-				if (this.CanSee(c))
-					_currentVisChars.Add(c);
-
-			_currentVisPads.Clear();
-			foreach (var p in this.Map.Pads)
-				if (this.CanSee(p))
-					_currentVisPads.Add(p);
-		}
-
-		/// <summary>
-		/// Computes the appeared and disappeared entities between the
-		/// current and previously visible sets.
-		/// </summary>
-		private void DiffVisibility<T>(HashSet<T> current, HashSet<T> previous, List<T> appeared, List<T> disappeared)
-		{
-			appeared.Clear();
-			foreach (var item in current)
-				if (!previous.Contains(item))
-					appeared.Add(item);
-
-			disappeared.Clear();
-			foreach (var item in previous)
-				if (!current.Contains(item))
-					disappeared.Add(item);
-		}
-
-		private void HandleAppearingCharacters(IEnumerable<Character> appearCharacters)
-		{
-			foreach (var character in appearCharacters)
+			for (var i = 0; i < appearCharacters.Count; i++)
 			{
+				var character = appearCharacters[i];
 				Send.ZC_ENTER_PC(this.Connection, character);
 				Send.ZC_NORMAL.HeadgearVisibilityUpdate(this.Connection, character);
 
@@ -560,16 +563,16 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 		}
 
-		private void HandleDisappearingCharacters(IEnumerable<Character> disappearCharacters)
+		private void HandleDisappearingCharacters(List<Character> disappearCharacters)
 		{
-			foreach (var character in disappearCharacters)
-				Send.ZC_LEAVE(this.Connection, character);
+			for (var i = 0; i < disappearCharacters.Count; i++)
+				Send.ZC_LEAVE(this.Connection, disappearCharacters[i]);
 		}
 
-		private void HandleAppearingMonsters(IEnumerable<IMonster> appearMonsters)
+		private void HandleAppearingMonsters(List<IMonster> appearMonsters)
 		{
-			foreach (var monster in appearMonsters)
-				this.HandleAppearingSingleMonster(monster);
+			for (var i = 0; i < appearMonsters.Count; i++)
+				this.HandleAppearingSingleMonster(appearMonsters[i]);
 		}
 
 		/// <summary>
@@ -659,32 +662,32 @@ namespace Melia.Zone.World.Actors.Characters
 				Send.ZC_SET_NPC_STATE(minMon);
 		}
 
-		private void HandleDisappearingMonsters(IEnumerable<IMonster> disappearMonsters)
+		private void HandleDisappearingMonsters(List<IMonster> disappearMonsters)
 		{
-			foreach (var monster in disappearMonsters)
+			for (var i = 0; i < disappearMonsters.Count; i++)
 			{
+				var monster = disappearMonsters[i];
 				Send.ZC_LEAVE(this.Connection, monster);
 				if (monster is ICombatEntity entity)
 					Send.ZC_BUFF_CLEAR(this.Connection, entity);
 			}
 		}
 
-		private void HandleAppearingPads(IEnumerable<Pad> appearPads)
+		private void HandleAppearingPads(List<Pad> appearPads)
 		{
-			foreach (var pad in appearPads)
+			for (var i = 0; i < appearPads.Count; i++)
 			{
+				var pad = appearPads[i];
 				if (pad.Creator is ICombatEntity creator)
 				{
-					// Send pad create packet to this character
-					Send.ZC_NORMAL.PadUpdateToCharacter(this, creator, pad, true);
-					// Track this character as an observer
+					Send.ZC_NORMAL.PadUpdate(this, pad, true);
 					pad.Observers.AddObserver(this);
 					_observedPads.Add(pad);
 				}
 			}
 		}
 
-		private void HandleDisappearingPads(IEnumerable<Pad> disappearPads)
+		private void HandleDisappearingPads(List<Pad> disappearPads)
 		{
 			// Don't remove from observers or send destroy - the player stays tracked
 			// so they receive the destroy packet when the pad actually expires.

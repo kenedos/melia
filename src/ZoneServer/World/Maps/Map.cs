@@ -377,6 +377,23 @@ namespace Melia.Zone.World.Maps
 				}
 			}
 		}
+
+		/// <summary>
+		/// Adds all characters in visible range of character to the result set.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		public void GetVisibleCharacters(Character character, HashSet<Character> result)
+		{
+			lock (_characters)
+			{
+				foreach (var otherCharacter in _characters.Values)
+				{
+					if (otherCharacter != character && character.Position.InRange2D(otherCharacter.Position, VisibleRange))
+						result.Add(otherCharacter);
+				}
+			}
+		}
 		#endregion
 
 		#region Monster Management
@@ -714,6 +731,28 @@ namespace Melia.Zone.World.Maps
 		}
 
 		/// <summary>
+		/// Adds all monsters in visible range of character to the result set.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		public void GetVisibleMonsters(Character character, HashSet<IMonster> result)
+		{
+			lock (_monsters)
+			{
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is Npc npc && npc.State == NpcState.Invisible)
+						continue;
+
+					if (!character.Position.InRange2D(monster.Position, VisibleRange))
+						continue;
+
+					result.Add(monster);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Returns all pads visible to the given character.
 		/// </summary>
 		public Pad[] GetVisiblePads(Character character) => this.GetPads(character.CanSee);
@@ -724,6 +763,25 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisiblePads(Character character, List<Pad> result)
+		{
+			lock (_pads)
+			{
+				foreach (var pad in _pads.Values)
+				{
+					if (!character.Position.InRange2D(pad.Position, VisibleRange))
+						continue;
+
+					result.Add(pad);
+				}
+			}
+		}
+
+		/// <summary>
+		/// Adds all pads in visible range of character to the result set.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		public void GetVisiblePads(Character character, HashSet<Pad> result)
 		{
 			lock (_pads)
 			{

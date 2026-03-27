@@ -20,7 +20,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Fletcher
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -38,7 +38,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Fletcher
 			if (skill != null)
 				skill.Vars.SetInt("Melia.Skill.CatenaPadHandle", 0);
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)
@@ -49,7 +49,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Fletcher
 			var distance = creator.Position.Get2DDistance(pad.Position);
 			if (distance >= MaxLeashDistance)
 			{
-				Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+				Send.ZC_NORMAL.PadUpdate(pad, false);
 				creator.Map.RemovePad(pad);
 			}
 		}

@@ -16,7 +16,7 @@ namespace Melia.Zone.Pads.Base
 			if (args.Trigger is not Pad pad) return;
 			if (pad.Creator is not ICombatEntity creator) return;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -24,7 +24,7 @@ namespace Melia.Zone.Pads.Base
 			if (args.Trigger is not Pad pad) return;
 			if (pad.Creator is not ICombatEntity creator) return;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)

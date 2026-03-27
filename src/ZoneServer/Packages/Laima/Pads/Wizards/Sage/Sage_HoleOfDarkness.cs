@@ -27,7 +27,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Wizards.Sage
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(PullRange);
 			pad.SetUpdateInterval(500);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(5000);
@@ -39,7 +39,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Wizards.Sage
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

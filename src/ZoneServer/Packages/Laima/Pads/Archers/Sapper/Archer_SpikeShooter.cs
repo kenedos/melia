@@ -44,7 +44,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 
 			pad.Direction = creator.Direction.Left;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetUpdateInterval(UpdateIntervalMs);
 			pad.NumArg1 = skill.Level;
 
@@ -95,7 +95,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			if (pad.Variables.TryGet<IMonster>(EndMonsterKey, out var endMonster))
 				endMonster.Map?.RemoveMonster(endMonster);
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

@@ -20,7 +20,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(50f);
 			pad.SetUpdateInterval(1000);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(10000);
@@ -32,7 +32,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 			PadRemoveBuff(pad, RelationType.Party, 0, 0, BuffId.Prakriti_Buff);
 		}
 

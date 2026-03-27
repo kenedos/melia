@@ -22,7 +22,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(100f);
 			pad.Trigger.LifeTime = TimeSpan.FromSeconds(PadLifeTimeSeconds);
 			pad.SetUpdateInterval(300);
@@ -35,7 +35,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.Restoration_Buff);
 		}
 

@@ -22,7 +22,7 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetUpdateInterval(200);
 		}
 		public void Entered(object sender, PadTriggerActorArgs args)
@@ -43,7 +43,7 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

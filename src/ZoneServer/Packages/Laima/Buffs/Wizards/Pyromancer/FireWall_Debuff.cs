@@ -17,11 +17,6 @@ namespace Melia.Zone.Buffs.Handlers
 		/// <summary>
 		/// The amount by which the target's fire resistance is reduced.
 		/// </summary>
-		/// <remarks>
-		/// This value is used as part of a percentage based multiplier.
-		/// A reduction of 20 effectively means the target takes 20% more
-		/// fire damage.
-		/// </remarks>
 		private const float FireResistance = -20f;
 
 		/// <summary>
@@ -46,8 +41,10 @@ namespace Melia.Zone.Buffs.Handlers
 		/// <param name="buff"></param>
 		public override void OnEnd(Buff buff)
 		{
-			RemovePropertyModifier(buff, buff.Target, PropertyName.ResFire_BM);
-			RemovePropertyModifier(buff, buff.Target, PropertyName.Fire_Def_BM);
+			if (buff.Target.Properties.Has(PropertyName.ResFire))
+				RemovePropertyModifier(buff, buff.Target, PropertyName.ResFire_BM);
+			else if (buff.Target.Properties.Has(PropertyName.Fire_Def))
+				RemovePropertyModifier(buff, buff.Target, PropertyName.Fire_Def_BM);
 		}
 
 		/// <summary>

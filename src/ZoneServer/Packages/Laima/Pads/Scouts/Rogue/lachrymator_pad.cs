@@ -21,7 +21,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Rogue
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(50f);
 			pad.SetUpdateInterval(750);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds((3.5 + skill.Level * 0.5) * 1000);
@@ -34,7 +34,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Rogue
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)

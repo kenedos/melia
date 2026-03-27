@@ -28,7 +28,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(PadRange);
 			pad.SetUpdateInterval(UpdateIntervalMs);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(PadLifetimeMs);
@@ -41,7 +41,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			var creator = args.Creator;
 
 			PadRemoveBuff(pad, RelationType.Enemy, 0, 0, BuffId.Common_Slow);
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)

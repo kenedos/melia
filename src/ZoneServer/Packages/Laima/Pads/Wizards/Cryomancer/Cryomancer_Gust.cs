@@ -22,7 +22,7 @@ namespace Melia.Zone.Pads.Handlers
 			var skill = pad.Skill;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRectangleRange(creator.Direction, 40, 120);
 			pad.SetUpdateInterval(100);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(1200);
@@ -35,7 +35,7 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

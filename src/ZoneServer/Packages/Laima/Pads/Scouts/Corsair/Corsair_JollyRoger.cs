@@ -29,7 +29,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Scouts.Corsair
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(PadRange);
 			pad.SetUpdateInterval(UpdateIntervalMs);
 			this.CreateFlagMonster(pad);
@@ -50,7 +50,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Scouts.Corsair
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.JollyRoger_Buff);
 			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.JollyRoger_Enemy_Debuff);
 			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.Looting_Buff);

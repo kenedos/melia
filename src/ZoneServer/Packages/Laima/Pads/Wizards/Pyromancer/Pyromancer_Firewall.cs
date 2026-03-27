@@ -29,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetUpdateInterval(1000);
 		}
 
@@ -38,7 +38,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 
 		}
 

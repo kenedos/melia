@@ -31,7 +31,7 @@ namespace Melia.Zone.Pads.HandlersOverride
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			var offset = creator.Position.GetRelative(creator.Direction, 15f);
 			pad.Position = offset;
 			pad.SetRange(35f);
@@ -47,7 +47,7 @@ namespace Melia.Zone.Pads.HandlersOverride
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)

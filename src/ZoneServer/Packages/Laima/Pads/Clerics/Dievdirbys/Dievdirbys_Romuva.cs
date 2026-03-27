@@ -21,7 +21,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(100f);
 			pad.SetUpdateInterval(1000); // Update every 1 second
 
@@ -47,7 +47,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 
 			// Only remove silence buff if not in damage mode
 			var isDamageMode = pad.Variables.GetBool("Melia.RomuvaDamageMode");

@@ -20,7 +20,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(10f);
 			pad.SetUpdateInterval(300);
 			pad.Trigger.MaxActorCount = 1;
@@ -34,7 +34,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)

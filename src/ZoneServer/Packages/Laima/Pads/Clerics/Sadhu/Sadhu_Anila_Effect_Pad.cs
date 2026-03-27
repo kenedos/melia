@@ -26,7 +26,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(50f);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3000);
 			pad.Trigger.MaxConcurrentUseCount = 3;
@@ -40,7 +40,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		/// <summary>

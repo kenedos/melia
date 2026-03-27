@@ -29,7 +29,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 			var skill = pad.Skill;
 
 			pad.NumArg1 = skill.Level;
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(80f);
 			pad.SetUpdateInterval(200);
 			pad.Trigger.Area = new Circle(pad.Position, 80f);
@@ -45,7 +45,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Paladin
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.Barrier_Buff);
 			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.Barrier_MeleeAttack_Buff);
 			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.Barrier_MagicAttack_Buff);

@@ -34,7 +34,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetBladedFanRange(3, 90, 15);
 			pad.SetUpdateInterval(UpdateIntervalMs);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(PadLifetimeMs);
@@ -64,7 +64,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)

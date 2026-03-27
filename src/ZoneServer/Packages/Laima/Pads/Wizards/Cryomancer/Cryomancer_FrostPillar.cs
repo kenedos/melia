@@ -29,7 +29,7 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(PadRange);
 			pad.SetUpdateInterval(UpdateInterval);
 			var lifeTime = BasePadLifeTimeMilliseconds + (PadLifeTimePerLevelMilliseconds * pad.Skill.Level);
@@ -47,7 +47,7 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		/// <summary>

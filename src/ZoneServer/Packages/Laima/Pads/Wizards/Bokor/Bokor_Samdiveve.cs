@@ -25,7 +25,7 @@ namespace Melia.Zone.Pads.Handlers.Wizards.Bokor
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(PadRange);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(PadLifeTimeMilliseconds);
 
@@ -40,7 +40,7 @@ namespace Melia.Zone.Pads.Handlers.Wizards.Bokor
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		/// <summary>

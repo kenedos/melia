@@ -30,7 +30,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Cleric
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.Trigger.MaxUseCount = 1;
 			pad.Trigger.LifeTime = TimeSpan.FromSeconds(30);
 		}
@@ -45,7 +45,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Cleric
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		/// <summary>

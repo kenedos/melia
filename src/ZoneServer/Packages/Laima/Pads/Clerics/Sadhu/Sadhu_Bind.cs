@@ -21,7 +21,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(40f);
 			pad.SetUpdateInterval(750);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(99999);
@@ -36,7 +36,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Sadhu
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			Send.ZC_NORMAL.PadUpdate(creator, pad, false);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 			PadRemoveBuff(pad, RelationType.Enemy, 0, 0, BuffId.SadhuBind_Debuff);
 		}
 
