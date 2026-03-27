@@ -65,7 +65,16 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Bokor
 		private float GetMspdBonus(Buff buff)
 		{
 			var skillLevel = buff.NumArg1;
-			return BaseBonus + skillLevel * BonusPerLevel;
+			var bonus = BaseBonus + skillLevel * BonusPerLevel;
+
+			var byAbility = 1f;
+			if (buff.Caster is ICombatEntity caster
+				&& caster.TryGetActiveAbilityLevel(AbilityId.Bokor33, out var abilityLevel))
+			{
+				byAbility += abilityLevel * 0.005f;
+			}
+
+			return bonus * byAbility;
 		}
 	}
 }
