@@ -195,6 +195,11 @@ namespace Melia.Zone.Network
 						{
 							Log.Error($"CZ_CONNECT: Background save failed for '{charToSave.Name}' ({charToSave.DbId}): {ex}");
 						}
+						finally
+						{
+							charToSave.Cleanup();
+							CharacterLockManager.TryRemoveLock(charToSave.DbId);
+						}
 					});
 
 					const int SaveTimeoutMs = 5000;

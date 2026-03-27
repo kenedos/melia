@@ -404,11 +404,18 @@ namespace Melia.Zone.Network
 					// background save (ProcessConnect) may still be holding the
 					// lock. It will be cleaned up on eventual normal disconnect.
 					if (character != null && !wasSavedForWarp)
+					{
 						CharacterLockManager.TryRemoveLock(character.DbId);
 
-					// Release the character's object graph so GC can collect
-					// it promptly instead of waiting for Gen2 collection.
-					character?.Cleanup();
+						// Release the character's object graph so GC can collect
+						// it promptly instead of waiting for Gen2 collection.
+						// Only do this on normal disconnect — during reconnect,
+						// ProcessConnect owns the old character's lifecycle and
+						// will clean up after its own save completes. Cleaning
+						// up here would race with that save and wipe collections
+						// mid-write, causing data loss.
+						character.Cleanup();
+					}
 				}
 			});
 
