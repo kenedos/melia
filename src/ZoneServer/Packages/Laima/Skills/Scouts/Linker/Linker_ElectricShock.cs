@@ -82,8 +82,10 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 			var duration = TimeSpan.FromSeconds(LinkDurationSeconds);
 			var alreadyHasDebuff = target.IsBuffActive(BuffId.ElectricShock_Debuff);
 
+			var skillHitResult = SCR_SkillHit(caster, target, skill);
+
 			// StartBuff handles stacking automatically via OnActivate/OnExtend
-			var buff = target.StartBuff(BuffId.ElectricShock_Debuff, skill.Level, 0, duration, caster, skill.Id);
+			var buff = target.StartBuff(BuffId.ElectricShock_Debuff, skill.Level, skillHitResult.Damage, duration, caster);
 			if (buff == null)
 				return;
 

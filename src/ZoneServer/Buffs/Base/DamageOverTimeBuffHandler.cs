@@ -4,7 +4,7 @@ using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
-using static Melia.Zone.Skills.SkillUseFunctions;
+using Yggdrasil.Logging;
 
 namespace Melia.Zone.Buffs.Base
 {
@@ -34,8 +34,7 @@ namespace Melia.Zone.Buffs.Base
 	///
 	/// Usage:
 	/// - Inherit from this class for poison, bleed, burn, and similar DoT effects
-	/// - The damage will be read from buff.NumArg2 if provided, otherwise calculated
-	/// - Override GetSnapshotDamage() if you need custom damage calculation
+	/// - The caller MUST pass pre-calculated damage via buff.NumArg2
 	/// - Override GetHitType() if you need a specific hit type (Poison, Bleed, etc.)
 	/// - Override GetSkillId() if the buff uses a different skill ID than buff.SkillId
 	/// </remarks>
@@ -92,18 +91,13 @@ namespace Melia.Zone.Buffs.Base
 		/// <param name="buff"></param>
 		private void AddDamageInstance(Buff buff)
 		{
-			float newDamage;
-			if (buff.NumArg2 > 0)
-			{
-				newDamage = buff.NumArg2;
-			}
-			else
-			{
-				newDamage = this.GetSnapshotDamage(buff);
-			}
+			var newDamage = buff.NumArg2;
 
 			if (newDamage <= 0)
+			{
+				Log.Warning("DamageOverTimeBuffHandler.AddDamageInstance: Buff '{0}' has no damage (NumArg2={1}). The caller must pass pre-calculated damage.", buff.Id, buff.NumArg2);
 				return;
+			}
 
 			var instances = this.GetDamageInstances(buff);
 
@@ -354,27 +348,6 @@ namespace Melia.Zone.Buffs.Base
 					linkTarget.TakeSimpleHit(damage, attacker, this.GetSkillId(buff), this.GetHitType(buff));
 				}
 			}
-		}
-
-		/// <summary>
-		/// Calculates the damage to snapshot when the buff is applied.
-		/// Override this to provide custom damage calculation logic.
-		/// </summary>
-		/// <param name="buff"></param>
-		/// <returns>The damage value to snapshot</returns>
-		protected virtual float GetSnapshotDamage(Buff buff)
-		{
-			// Default behavior: Use SCR_SkillHit to calculate initial damage
-			if (buff.Caster is not ICombatEntity caster)
-				return 0;
-
-			if (!caster.TryGetSkill(buff.SkillId, out var skill))
-				return 0;
-
-			var target = buff.Target;
-			var skillHitResult = SCR_SkillHit(caster, target, skill);
-
-			return skillHitResult.Damage;
 		}
 
 		/// <summary>

@@ -211,7 +211,21 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 				EffectMoveDelay = 0f,
 			}, 0f, "ScatterCaltrop_Pad");
 			if (caster.IsBuffActive(BuffId.DeployPavise_ReinforceSkill_Buff))
-				SkillResultTargetBuff(caster, skill, BuffId.CriticalWound, 1, 0f, 10000f, 1, 20, -1, hits);
+			{
+				foreach (var hit in hits)
+				{
+					if (hit.Target.IsDead)
+						continue;
+
+					var chance = 20;
+					if (RandomProvider.Next(1, 101) > chance)
+						continue;
+
+					var buff = hit.Target.StartBuff(BuffId.CriticalWound, 1, hit.HitInfo.Damage, TimeSpan.FromMilliseconds(10000), caster);
+					if (buff != null)
+						buff.OverbuffCounter = 1;
+				}
+			}
 		}
 	}
 }

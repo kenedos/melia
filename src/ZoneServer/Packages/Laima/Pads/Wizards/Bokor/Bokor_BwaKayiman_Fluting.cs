@@ -6,6 +6,7 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Pads.Handlers
 {
@@ -35,7 +36,8 @@ namespace Melia.Zone.Pads.Handlers
 			if (!creator.IsEnemy(initiator))
 				return;
 
-			initiator.StartBuff(BuffId.Pollution_Debuff, skill.Level, 0, TimeSpan.FromSeconds(3), creator);
+			var skillHitResult = SCR_SkillHit(creator, initiator, skill);
+			initiator.StartBuff(BuffId.Pollution_Debuff, skill.Level, skillHitResult.Damage, TimeSpan.FromSeconds(3), creator);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)

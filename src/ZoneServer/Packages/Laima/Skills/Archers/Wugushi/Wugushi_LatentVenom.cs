@@ -80,7 +80,16 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 
 			var stacks = StacksPerUse;
 
-			SkillResultTargetBuff(caster, skill, BuffId.LatentVenom_Debuff, stacks, 0f, BaseLatentDurationMs, 1, 100, -1, hits);
+			foreach (var hit in hits)
+			{
+				var target = hit.Target;
+				if (target.IsDead)
+					continue;
+
+				var buff = target.StartBuff(BuffId.LatentVenom_Debuff, stacks, hit.HitInfo.Damage, TimeSpan.FromMilliseconds(BaseLatentDurationMs), caster);
+				if (buff != null)
+					buff.OverbuffCounter = 1;
+			}
 		}
 	}
 }

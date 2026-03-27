@@ -7,6 +7,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Pads.Handlers
 {
@@ -46,7 +47,8 @@ namespace Melia.Zone.Pads.Handlers
 			var initiator = args.Initiator;
 			var skill = pad.Skill;
 
-			PadTargetBuff(pad, initiator, RelationType.Enemy, 0, 0, BuffId.Mon_FirePilla, skill.Level, 0, 3000, 1, 100);
+			var skillHitResult = SCR_SkillHit(creator, initiator, skill);
+			PadTargetBuff(pad, initiator, RelationType.Enemy, 0, 0, BuffId.Mon_FirePilla, skill.Level, (int)skillHitResult.Damage, 3000, 1, 100);
 		}
 		public void Updated(object sender, PadTriggerArgs args)
 		{
@@ -54,7 +56,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			PadBuff(pad, RelationType.Enemy, 0, 0, BuffId.Mon_FirePilla, skill.Level, 0, 3000, 1, 100);
+			PadDamageEnemy(pad, 1f, 0, 0, "None", 1, 0f, 0f);
 		}
 
 		public void Left(object sender, PadTriggerActorArgs args)

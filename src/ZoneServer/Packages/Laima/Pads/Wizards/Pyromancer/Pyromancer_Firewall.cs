@@ -11,6 +11,7 @@ using Melia.Zone.World.Actors.Monsters;
 using Melia.Shared.World;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Pyromancer
 {
@@ -51,7 +52,8 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 
 			if (creator.IsEnemy(initiator))
 			{
-				initiator.StartBuff(BuffId.FireWall_Debuff, skill.Level, 0, TimeSpan.FromSeconds(DebuffDuration), creator);
+				var skillHitResult = SCR_SkillHit(creator, initiator, skill);
+				initiator.StartBuff(BuffId.FireWall_Debuff, skill.Level, skillHitResult.Damage, TimeSpan.FromSeconds(DebuffDuration), creator);
 				pad.Trigger.LifeTime -= TimeSpan.FromSeconds(2);
 
 				if (pad.Trigger.LifeTime < TimeSpan.Zero)
