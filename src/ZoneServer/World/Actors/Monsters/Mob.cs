@@ -35,7 +35,6 @@ namespace Melia.Zone.World.Actors.Monsters
 	public partial class Mob : Actor, IMonster, ICombatEntity, IUpdateable
 	{
 		private readonly object _hpLock = new();
-		private bool _isDead;
 		private Position _position;
 
 		/// <summary>
@@ -198,7 +197,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <summary>
 		/// Returns whether the monster is dead.
 		/// </summary>
-		public virtual bool IsDead => _isDead;
+		public virtual bool IsDead => this.Hp == 0;
 
 		/// <summary>
 		/// Gets or sets whether the monster appears from inside the ground.
@@ -367,7 +366,6 @@ namespace Melia.Zone.World.Actors.Monsters
 			// the original's current (possibly zero) HP.
 			clone.Properties.SetFloat(PropertyName.HP, clone.Properties.GetFloat(PropertyName.MHP));
 			clone.Properties.SetFloat(PropertyName.SP, clone.Properties.GetFloat(PropertyName.MSP));
-			clone._isDead = false;
 
 			return clone;
 		}
@@ -438,7 +436,6 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			this.Properties.SetFloat(PropertyName.HP, this.Properties.GetFloat(PropertyName.MHP));
 			this.Properties.SetFloat(PropertyName.SP, this.Properties.GetFloat(PropertyName.MSP));
-			_isDead = false;
 		}
 
 		/// <summary>
@@ -547,7 +544,6 @@ namespace Melia.Zone.World.Actors.Monsters
 			this.Components.Get<BaseSkillComponent>()?.CancelCurrentSkill();
 
 			this.Properties.SetFloat(PropertyName.HP, 0);
-			_isDead = true;
 			this.Components.Get<MovementComponent>()?.Stop();
 			this.DisappearTime = DateTime.Now.AddSeconds(3);
 			if (this.Effects?.Count != 0)
@@ -1546,7 +1542,6 @@ namespace Melia.Zone.World.Actors.Monsters
 			{
 				newHp = (int)this.Properties.Modify(PropertyName.HP, amount);
 				priority = (this.HpChangeCounter += 1);
-				_isDead = newHp == 0;
 			}
 		}
 
@@ -1589,7 +1584,6 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			this.Properties.SetFloat(PropertyName.HP, this.Properties.GetFloat(PropertyName.MHP));
 			this.Properties.SetFloat(PropertyName.SP, this.Properties.GetFloat(PropertyName.MSP));
-			_isDead = false;
 		}
 
 		/// <summary>
