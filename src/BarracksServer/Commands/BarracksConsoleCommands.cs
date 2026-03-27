@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Network;
@@ -16,6 +17,9 @@ namespace Melia.Barracks.Util
 			this.Add("shutdown", "[minutes|now] [reason]", "Schedules a shutdown on all servers (default: 15 minutes).", this.HandleShutdown);
 			this.Add("cancelshutdown", "", "Cancels a pending shutdown on all servers.", this.HandleCancelShutdown);
 			this.Add("status", "", "Shows the status of all connected servers.", this.HandleStatus);
+			this.Add("banip", "<ip>", "Bans an IP Address", this.HandleBanIP);
+			this.Add("teamname", "<account> <new team name>", "Changes team name of account", this.HandleTeamName);
+			this.Add("charname", "<account> <old name> <new name>", "Changes character name on account", this.HandleCharName);
 		}
 
 		private CommandResult HandleAuth(string command, Arguments args)
@@ -180,6 +184,92 @@ namespace Melia.Barracks.Util
 
 			Log.Info("Total players online: {0}", totalPlayers);
 			Log.Info("=====================");
+
+			return CommandResult.Okay;
+		}
+
+		private CommandResult HandleBanIP(string command, Arguments args)
+		{
+			if (args.Count < 1)
+				return CommandResult.InvalidArgument;
+
+			var ip = args.Get(1);
+
+			BarracksServer.Instance.Database.BanIp(ip, DateTime.Now, DateTime.MaxValue, "Manual Ban");
+			Log.Info($"Banned IP mask {ip} successfully.");
+
+			return CommandResult.Okay;
+		}
+
+		private CommandResult HandleTeamName(string command, Arguments args)
+		{
+			if (args.Count < 3)
+				return CommandResult.InvalidArgument;
+
+			var accountName = args.Get(1);
+			var newTeamName = args.Get(2);
+
+			var account = BarracksServer.Instance.Database.GetAccount(accountName);
+			if (account == null)
+			{
+				Log.Error("Please specify an existing account.");
+				return CommandResult.Okay;
+			}
+
+			if (BarracksServer.Instance.Database.TeamNameExists(newTeamName))
+			{
+				Log.Error("Team name '{0}' is already taken.", newTeamName);
+				return CommandResult.Okay;
+			}
+
+			if (!BarracksServer.Instance.Database.UpdateTeamName(account.Id, newTeamName))
+			{
+				Log.Error("Failed to change team name.");
+				return CommandResult.Okay;
+			}
+
+			BarracksServer.Instance.Database.UpdateCharactersTeamName(account.Id, newTeamName);
+
+			Log.Info("Team name for '{0}' changed to '{1}'.", accountName, newTeamName);
+
+			return CommandResult.Okay;
+		}
+
+		private CommandResult HandleCharName(string command, Arguments args)
+		{
+			if (args.Count < 4)
+				return CommandResult.InvalidArgument;
+
+			var accountName = args.Get(1);
+			var oldName = args.Get(2);
+			var newName = args.Get(3);
+
+			var account = BarracksServer.Instance.Database.GetAccount(accountName);
+			if (account == null)
+			{
+				Log.Error("Please specify an existing account.");
+				return CommandResult.Okay;
+			}
+
+			if (!BarracksServer.Instance.Database.CharacterExists(account.Id, oldName))
+			{
+				Log.Error("Character '{0}' not found on account '{1}'.", oldName, accountName);
+				return CommandResult.Okay;
+			}
+
+			if (BarracksServer.Instance.Database.CharacterExists(account.Id, newName))
+			{
+				Log.Error("Character name '{0}' already exists on account '{1}'.", newName, accountName);
+				return CommandResult.Okay;
+			}
+
+			if (!BarracksServer.Instance.Database.UpdateCharacterName(account.Id, oldName, newName))
+			{
+				Log.Error("Failed to change character name.");
+				return CommandResult.Okay;
+			}
+
+			Log.Info("Character '{0}' on account '{1}' renamed to '{2}'.", oldName, accountName, newName);
 
 			return CommandResult.Okay;
 		}

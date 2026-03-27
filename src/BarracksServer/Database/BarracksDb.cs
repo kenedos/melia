@@ -563,6 +563,44 @@ namespace Melia.Barracks.Database
 
 
 		/// <summary>
+		/// Changes the name of a character on an account.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="oldName"></param>
+		/// <param name="newName"></param>
+		/// <returns></returns>
+		public bool UpdateCharacterName(long accountId, string oldName, string newName)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `accountId` = @accountId AND `name` = @oldName", conn))
+			{
+				cmd.AddParameter("@accountId", accountId);
+				cmd.AddParameter("@oldName", oldName);
+				cmd.Set("name", newName);
+
+				return cmd.Execute() > 0;
+			}
+		}
+
+		/// <summary>
+		/// Updates the team name on all characters belonging to an account.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="teamName"></param>
+		/// <returns></returns>
+		public bool UpdateCharactersTeamName(long accountId, string teamName)
+		{
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("UPDATE `characters` SET `teamName` = @teamName WHERE `accountId` = @accountId", conn))
+			{
+				mc.Parameters.AddWithValue("@accountId", accountId);
+				mc.Parameters.AddWithValue("@teamName", teamName);
+
+				return mc.ExecuteNonQuery() > 0;
+			}
+		}
+
+		/// <summary>
 		/// Checks if a character has any active market items (Listed status).
 		/// </summary>
 		/// <param name="characterId">The character's database ID.</param>
