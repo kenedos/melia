@@ -60,7 +60,7 @@ public class WorldMapClientScript : ClientScript
 
 	private void SendIcons(Character character)
 	{
-		var warps = character.Map.GetMonsters(a => a is WarpMonster);
+		var warps = character.Map.GetMonsters(static a => a is WarpMonster);
 		var isFirstBatch = true;
 
 		var funcName = "Melia.World.Icons.Load";

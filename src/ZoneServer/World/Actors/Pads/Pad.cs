@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using Melia.Shared.Data.Database;
@@ -6,7 +7,6 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Pads;
-using Melia.Zone.Pads.Handlers;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors.Characters;
@@ -33,6 +33,8 @@ namespace Melia.Zone.World.Actors.Pads
 	/// </remarks>
 	public class Pad : Actor, IUpdateable
 	{
+		private readonly List<Mob> _associatedMonsters = new();
+
 		/// <summary>
 		/// Gets or sets the pad's name.
 		/// </summary>
@@ -54,6 +56,48 @@ namespace Melia.Zone.World.Actors.Pads
 		public IShapeF Area { get; set; }
 
 		/// <summary>
+		/// Gets or sets the pad's first numeric argument, which is
+		/// typically used for the pad's "angle".
+		/// </summary>
+		/// <remarks>
+		/// It's currently unknown what exactly this property does. It can
+		/// be found in pad-related packets and in the skill bytool data
+		/// (element "Pos", argument "Angle"), but it doesn't appear to
+		/// have any effect on the pad or its visuals.
+		///
+		/// Initially we called this property "Angle" due to the bytool
+		/// data, but it's been reportedly found to contain different
+		/// values in some cases, like Centurion skills.
+		/// </remarks>
+		public float NumArg1 { get; set; }
+
+		/// <summary>
+		/// Gets or sets the pad's second numeric argument, which is
+		/// typically used as "distance".
+		/// </summary>
+		/// <remarks>
+		/// It's currently unknown what exactly this property does. It can
+		/// be found in pad-related packets and in the skill bytool data
+		/// (element "Pos", argument "Dist"), but it doesn't appear to
+		/// have any effect on the pad or its visuals.
+		///
+		/// Initially we called this property "Distance" due to the bytool
+		/// data, but it's been reportedly found to contain different
+		/// values in some cases, like Centurion skills.
+		/// </remarks>
+		public float NumArg2 { get; set; }
+
+		/// <summary>
+		/// Gets or sets the pad's third numeric argument.
+		/// </summary>
+		/// <remarks>
+		/// It's currently unknown what exactly this property does. It can
+		/// be found in pad-related packets, but it doesn't appear to have
+		/// any effect on the pad or its visuals.
+		/// </remarks>
+		public float NumArg3 { get; set; }
+
+		/// <summary>
 		/// Returns the pad's movement component.
 		/// </summary>
 		public PadMovementComponent Movement { get; }
@@ -72,21 +116,6 @@ namespace Melia.Zone.World.Actors.Pads
 		/// the pad was destroyed.
 		/// </remarks>
 		public Variables Variables { get; } = new();
-
-		/// <summary>
-		/// Returns the first argument the pad was started with.
-		/// </summary>
-		public float NumArg1 { get; set; }
-
-		/// <summary>
-		/// Returns the second argument the pad was started with.
-		/// </summary>
-		public float NumArg2 { get; set; }
-
-		/// <summary>
-		/// Returns the third argument the pad was started with.
-		/// </summary>
-		public float NumArg3 { get; set; }
 
 		/// <summary>
 		/// Returns if the pad has died.
@@ -154,25 +183,16 @@ namespace Melia.Zone.World.Actors.Pads
 		/// <summary>
 		/// Creates a new pad.
 		/// </summary>
-		/// <param name="creator"></param>
-		/// <param name="skill"></param>
-		/// <param name="triggerArea"></param>
-		public Pad(IActor creator, Skill skill, IShapeF triggerArea)
-			: this(null, creator, skill, triggerArea)
-		{
-		}
-
-		/// <summary>
-		/// Creates a new pad.
-		/// </summary>
-		/// <param name="name">
-		/// If not null, a pad handler with the given name will be looked up.
-		/// And its methods will be registered as trigger events. The given
-		/// handler must exist. Use null if no handler is needed.
-		/// </param>
-		/// <param name="creator"></param>
-		/// <param name="skill"></param>
-		/// <param name="triggerArea"></param>
+		/// <remarks>
+		/// We currently allow null names for pads, in which case no
+		/// handler will be registered, but this might change in the
+		/// future. If at all possible, the official name of the pad
+		/// should be used.
+		/// </remarks>
+		/// <param name="name">The name of the pad, as defined in the client and the PadName enum.</param>
+		/// <param name="creator">The actor that created the pad.</param>
+		/// <param name="skill">The skill that created the pad.</param>
+		/// <param name="triggerArea">The area that defines the pad's trigger zone.</param>
 		/// <exception cref="ArgumentException">
 		/// Thrown if a handler with the given name does not exist.
 		/// </exception>
@@ -216,23 +236,36 @@ namespace Melia.Zone.World.Actors.Pads
 				this.RegisterHandler(name);
 		}
 
-		public Pad(ICombatEntity creator, Skill skill, string name, Position position, Direction direction, int bladeCount, int bladeLength, int bladeWidth)
+		/// <summary>
+		/// Creates a new pad.
+		/// </summary>
+		/// <param name="name">The name of the pad, as defined in the client and the PadName enum.</param>
+		/// <param name="creator">The actor that created the pad.</param>
+		/// <param name="skill">The skill that created the pad.</param>
+		/// <param name="triggerArea">The area that defines the pad's trigger zone.</param>
+		/// <param name="options">Options that define additional properties for the pad.</param>
+		/// <exception cref="ArgumentException">
+		/// Thrown if a handler with the given name does not exist.
+		/// </exception>
+		public static Pad Create(string name, IActor creator, Skill skill, Position position, IShapeF triggerArea, PadOptions options)
 		{
-			this.Name = name;
-			this.Creator = creator;
-			this.Skill = skill;
+			var pad = new Pad(name, creator, skill, triggerArea);
+			pad.Position = position;
 
-			this.Position = position;
-			this.Direction = direction;
-			this.Layer = creator.Layer;
-
-			this.Area = new BladedFan(this.Position, bladeCount, bladeLength, bladeWidth);
-			this.Components.Add(this.Trigger = new TriggerComponent(this, this.Area));
-			this.Components.Add(this.Movement = new PadMovementComponent(this));
-			this.Components.Add(this.Observers = new PadObserverComponent(this));
+			pad.NumArg1 = options.NumArg1;
+			pad.NumArg2 = options.NumArg2;
+			pad.NumArg3 = options.NumArg3;
+			pad.Trigger.LifeTime = options.LifeTime;
+			pad.Trigger.UpdateInterval = options.UpdateInterval;
+			pad.Trigger.MaxActorCount = options.MaxActorCount;
+			pad.Trigger.MaxUseCount = options.MaxUseCount;
 
 			if (name != null)
-				this.RegisterHandler(name);
+				pad.RegisterHandler(name);
+
+			pad.Trigger.Subscribe(TriggerType.Destroy, pad.OnDestroyed);
+
+			return pad;
 		}
 
 		/// <summary>
@@ -361,6 +394,63 @@ namespace Melia.Zone.World.Actors.Pads
 		public void ChangeGroundEffect(string effectName, float size)
 		{
 			Send.ZC_NORMAL.ChangeGroundEffect(this, effectName, size);
+		}
+
+		/// <summary>
+		/// Called when the pad is destroyed.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void OnDestroyed(object sender, TriggerArgs e)
+		{
+			foreach (var monster in _associatedMonsters)
+				monster.Map?.RemoveMonster(monster);
+		}
+
+		/// <summary>
+		/// Spawns a monster at the pad's position and associates it with
+		/// the pad, meaning it will be automatically removed when the pad
+		/// is destroyed.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public Mob SpawnMonster(int monsterId, RelationType type)
+		{
+			var monster = this.CreateMonster(monsterId, type);
+			this.Map.AddMonster(monster);
+
+			return monster;
+		}
+
+		/// <summary>
+		/// Creates a monster at the pad's position without adding it to
+		/// the map and associates it with the pad, meaning it will be
+		/// automatically removed when the pad is destroyed.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		public Mob CreateMonster(int monsterId, RelationType type)
+		{
+			var monster = new Mob(monsterId, type);
+			monster.Components.Add(new MovementComponent(monster));
+			monster.Position = this.Position;
+			monster.Direction = this.Direction;
+
+			this.AssociateMonster(monster);
+
+			return monster;
+		}
+
+		/// <summary>
+		/// Associates the given monster with the pad, meaning it will be
+		/// automatically removed when the pad is destroyed.
+		/// </summary>
+		/// <param name="monster"></param>
+		public void AssociateMonster(Mob monster)
+		{
+			_associatedMonsters.Add(monster);
 		}
 	}
 }

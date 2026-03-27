@@ -601,10 +601,11 @@ namespace Melia.Barracks.Network
 		}
 
 		/// <summary>
-		/// Sent upon login. Asserts that the client IPF files are correct.
+		/// Sent upon login. Asserts that IPF files checksum is correct,
+		/// indicating that the data has not been tempered with.
 		/// </summary>
 		/// <remarks>
-		/// This must be configured in the login configuration file to be enabled.
+		/// This must be enabled in the barracks configuration file.
 		/// </remarks>
 		[PacketHandler(Op.CB_CHECK_CLIENT_INTEGRITY)]
 		public void CB_CHECK_CLIENT_INTEGRITY(IBarracksConnection conn, Packet packet)
@@ -615,8 +616,9 @@ namespace Melia.Barracks.Network
 				return;
 
 			var serverChecksum = BarracksServer.Instance.Conf.Barracks.IpfChecksum;
+			var autoUpdateEnabled = BarracksServer.Instance.Conf.Barracks.IpfChecksumAutoUpdate;
 
-			if (BarracksServer.Instance.Conf.Barracks.IpfChecksumAutoUpdate && conn.Account.Authority >= 99 && !clientChecksum.Equals(serverChecksum, StringComparison.InvariantCultureIgnoreCase))
+			if (autoUpdateEnabled && conn.Account.Authority >= 99 && !clientChecksum.Equals(serverChecksum, StringComparison.InvariantCultureIgnoreCase))
 			{
 				Log.Info("Updating IPF checksum to '{0}' based on user '{1}'s request.", clientChecksum, conn.Account.Name);
 
@@ -1068,6 +1070,20 @@ namespace Melia.Barracks.Network
 		}
 
 		/// <summary>
+		/// Request for the price of buying additional character slots.
+		/// Sent by client when the button to buy is clicked.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CB_REQ_SLOT_PRICE)]
+		public void CB_REQ_SLOT_PRICE(IBarracksConnection conn, Packet packet)
+		{
+			var price = BarracksServer.Instance.Conf.Barracks.CharacterSlotPrice;
+
+			Send.BC_REQ_SLOT_PRICE(conn, price);
+		}
+
+		/// <summary>
 		/// Sent when a companion moves in the barracks.
 		/// </summary>
 		/// <param name="conn"></param>
@@ -1100,20 +1116,6 @@ namespace Melia.Barracks.Network
 
 			if (conn.Account.Id == accountId)
 				Send.BC_JUMP(conn);
-		}
-
-		/// <summary>
-		/// Request for the price of buying additional character slots.
-		/// Sent by client when the button to buy is clicked.
-		/// </summary>
-		/// <param name="conn"></param>
-		/// <param name="packet"></param>
-		[PacketHandler(Op.CB_REQ_SLOT_PRICE)]
-		public void CB_REQ_SLOT_PRICE(IBarracksConnection conn, Packet packet)
-		{
-			var price = BarracksServer.Instance.Conf.Barracks.CharacterSlotPrice;
-
-			Send.BC_REQ_SLOT_PRICE(conn, price);
 		}
 
 		/// <summary>

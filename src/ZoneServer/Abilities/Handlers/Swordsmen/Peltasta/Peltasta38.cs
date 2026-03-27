@@ -1,6 +1,5 @@
 ﻿using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.Characters.Components;
 
 namespace Melia.Zone.Abilities.Handlers.Swordsmen.Peltasta
 {
@@ -23,14 +22,13 @@ namespace Melia.Zone.Abilities.Handlers.Swordsmen.Peltasta
 			if (!caster.TryGetActiveAbilityLevel(AbilityId.Peltasta38, out var abilityLevel))
 				return 0;
 
-			if (!caster.Components.TryGet<InventoryComponent>(out var inv))
+			if (!caster.TryGetItem(EquipSlot.LeftHand, out var lhItem))
 				return 0;
 
-			var lhItem = inv.GetItem(EquipSlot.LeftHand);
 			if (lhItem.Data.EquipType1 != EquipType.Shield)
 				return 0;
 
-			var shieldDef = lhItem.Data.Def;
+			var shieldDef = lhItem.Properties.GetFloat(PropertyName.DEF);
 			var bonusPatk = abilityLevel * BonusPerLevel * shieldDef;
 
 			return bonusPatk;

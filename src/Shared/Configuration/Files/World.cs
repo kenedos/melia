@@ -79,6 +79,10 @@ namespace Melia.Shared.Configuration.Files
 		public bool ResurrectRevivalPointOption { get; protected set; }
 		public bool ResurrectSoulCrystalOption { get; protected set; }
 
+		// monsters.conf
+		public TimeSpan DefaultMinRespawn { get; protected set; }
+		public TimeSpan DefaultMaxRespawn { get; protected set; }
+
 		// quests.conf
 		public bool DisplayQuestObjectives { get; protected set; }
 		public bool EnableProceduralQuests { get; protected set; }
@@ -258,7 +262,7 @@ namespace Melia.Shared.Configuration.Files
 
 			this.StorageFee = this.GetInt("storage_fee", 20);
 			this.StorageExtCost = this.GetInt("storage_ext_cost", 20);
-			this.StorageDefaultSize = this.GetInt("storage_default_size", 60);
+			this.StorageDefaultSize = this.GetInt("storage_default_size", 110);
 			this.StorageMaxSize = this.GetInt("storage_max_size", 110);
 			this.StorageMultiStack = this.GetBool("storage_multi_stack", true);
 			this.TeamStorageDefaultSize = this.GetInt("team_storage_default_size", 5);
@@ -305,6 +309,9 @@ namespace Melia.Shared.Configuration.Files
 			this.ResurrectRevivalPointOption = this.GetBool("resurrect_revival_point_option", true);
 			this.ResurrectCityOption = this.GetBool("resurrect_city_option", true);
 			this.ResurrectSoulCrystalOption = this.GetBool("resurrect_soul_crystal_option", true);
+
+			this.DefaultMinRespawn = TimeSpan.FromSeconds(this.GetInt("default_min_respawn", 30));
+			this.DefaultMaxRespawn = TimeSpan.FromSeconds(this.GetInt("default_max_respawn", 60));
 
 			this.DisplayQuestObjectives = this.GetBool("display_quest_objectives", true);
 			this.EnableProceduralQuests = this.GetBool("enable_procedural_quests", false);

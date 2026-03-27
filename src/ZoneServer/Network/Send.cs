@@ -2681,6 +2681,12 @@ namespace Melia.Zone.Network
 			packet.PutFloat(entity.Direction.Cos);
 			packet.PutFloat(entity.Direction.Sin);
 
+			if (Versions.Client >= 403202)
+			{
+				// Rotation doesn't change if != 0?
+				packet.PutByte(0);
+			}
+
 			entity.Map.Broadcast(packet, entity);
 		}
 
@@ -3033,6 +3039,14 @@ namespace Melia.Zone.Network
 
 			target.Map.Broadcast(packet, target);
 		}
+
+		/// <summary>
+		/// Informs players about a hit that occured, and about the target's
+		/// new hp, after damage was applied.
+		/// </summary>
+		/// <param name="hitInfo"></param>
+		public static void ZC_HIT_INFO(HitInfo hitInfo)
+			=> ZC_HIT_INFO(hitInfo.Attacker, hitInfo.Target, hitInfo);
 
 		/// <summary>
 		/// Informs players about a hit that occured, and about the target's

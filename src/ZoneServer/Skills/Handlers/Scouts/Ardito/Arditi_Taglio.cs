@@ -2,6 +2,8 @@
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Zone.Network;
+using Melia.Zone.Pads;
+using Melia.Zone.Pads.Handlers;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
@@ -25,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
+		public void StartDynamicCast(Skill skill, ICombatEntity caster)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -54,12 +56,12 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 
 			Send.ZC_PLAY_SOUND_Gendered(caster, "voice_war_atk_long_cast", "voice_atk_long_cast_f");
 
-			var pad = new Pad(PadName.Arditi_Taglio, caster, skill, new Square(caster.Position, caster.Direction, 45, 30));
-			pad.Position = caster.Position;
-			pad.Trigger.LifeTime = TimeSpan.FromSeconds(maxCastingTime);
-			pad.Trigger.MaxActorCount = 10;
-			pad.Trigger.UpdateInterval = TimeSpan.FromMilliseconds(250);
-			pad.Trigger.Subscribe(TriggerType.Update, this.OnTriggerUpdate);
+			var pad = Pad.Create(PadName.Arditi_Taglio, caster, skill, caster.Position, new Square(caster.Position, caster.Direction, 45, 30), new PadOptions
+			{
+				LifeTime = TimeSpan.FromSeconds(maxCastingTime),
+				UpdateInterval = TimeSpan.FromMilliseconds(250),
+				MaxActorCount = 10,
+			});
 
 			caster.Map.AddPad(pad);
 		}
@@ -69,13 +71,12 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
+		public void EndDynamicCast(Skill skill, ICombatEntity caster)
 		{
 			caster.StopBuff(BuffId.Taglio_Buff);
 
-			// TODO: UnkDynamicCastEnd not implemented
-			//if (caster is Character casterCharacter)
-			//	Send.ZC_NORMAL.UnkDynamicCastEnd(casterCharacter, skill.Id, 2.1f);
+			if (caster is Character casterCharacter)
+				Send.ZC_NORMAL.UnkDynamicCastEnd(casterCharacter, skill.Id, 2.1f);
 
 			Send.ZC_STOP_SOUND_Gendered(caster, "voice_war_atk_long_cast", "voice_atk_long_cast_f");
 
@@ -85,51 +86,6 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 				var moveSpeed = this.GetBonusMoveSpeed();
 				caster.Properties.Modify(PropertyName.MSPD_BM, -moveSpeed);
 				Send.ZC_MSPD(caster);
-			}
-		}
-
-		/// <summary>
-		/// Called when an actor enters the area of the attack.
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="args"></param>
-		private void OnTriggerUpdate(object sender, PadTriggerArgs args)
-		{
-			var pad = args.Trigger;
-			var caster = args.Creator;
-			var skill = args.Skill;
-
-			var targets = pad.Trigger.GetAttackableEntities(caster);
-
-			foreach (var target in targets.LimitBySDR(caster, skill))
-			{
-				this.Attack(skill, caster, target);
-			}
-		}
-
-		/// <summary>
-		/// Attacks the target one time.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		/// <param name="target"></param>
-		private void Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
-		{
-			var skillHitResult = SCR_SkillHit(caster, target, skill);
-
-			target.TakeDamage(skillHitResult.Damage, caster);
-
-			var hit = new HitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(100));
-			Send.ZC_HIT_INFO(caster, target, hit);
-
-			// Ability - Taglio: Remove Knockback
-			if (!caster.IsAbilityActive(AbilityId.Arditi8))
-			{
-				var kb = new KnockBackInfo(caster.Position, target, skill);
-				target.Position = kb.ToPosition;
-				target.AddState(StateType.KnockedBack, kb.Time);
-
-				Send.ZC_KNOCKDOWN_INFO(caster, kb);
 			}
 		}
 
@@ -149,6 +105,49 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		private float GetMaxCastTime(ICombatEntity caster)
 		{
 			return caster.IsAbilityActive(AbilityId.Arditi19) ? 5f : 2f;
+		}
+	}
+
+	/// <summary>
+	/// Handler for the Arditi_Taglio pad.
+	/// </summary>
+	[PadHandler(PadName.Arditi_Taglio)]
+	public class Arditi_Taglio_Pad : IUpdatePadHandler
+	{
+		/// <summary>
+		/// Apply damage to targets in the pad area every update.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
+		public void Updated(object sender, PadTriggerArgs args)
+		{
+			var pad = args.Trigger;
+			var caster = args.Creator;
+			var skill = args.Skill;
+
+			args.Trigger.Position = args.Creator.Position;
+
+			var targets = pad.Trigger.GetAttackableEntities(caster);
+
+			foreach (var target in targets.LimitBySDR(caster, skill))
+			{
+				var skillHitResult = SCR_SkillHit(caster, target, skill);
+
+				target.TakeDamage(skillHitResult.Damage, caster);
+
+				var hit = new HitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(100));
+				Send.ZC_HIT_INFO(caster, target, hit);
+
+				// Ability - Taglio: Remove Knockback
+				if (!caster.IsAbilityActive(AbilityId.Arditi8))
+				{
+					var kb = new KnockBackInfo(caster.Position, target, skill);
+					target.Position = kb.ToPosition;
+					target.AddState(StateType.KnockedBack, kb.Time);
+
+					Send.ZC_KNOCKDOWN_INFO(caster, target, kb);
+				}
+			}
 		}
 	}
 }

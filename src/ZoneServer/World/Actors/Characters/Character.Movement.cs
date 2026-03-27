@@ -437,61 +437,15 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.EyesOpen)
 				return;
 
-			// Fill reusable scratch sets with currently visible entities
-			_currentVisMonsters.Clear();
-			foreach (var m in this.Map.Monsters)
-				if (this.CanSee(m))
-					_currentVisMonsters.Add(m);
-
-			_currentVisChars.Clear();
-			foreach (var c in this.Map.Characters)
-				if (this.CanSee(c))
-					_currentVisChars.Add(c);
-
-			_currentVisPads.Clear();
-			foreach (var p in this.Map.Pads)
-				if (this.CanSee(p))
-					_currentVisPads.Add(p);
+			this.GetVisibleEntities();
 
 			int sentCount;
 
 			lock (_lookAroundLock)
 			{
-				// Compute appeared characters
-				_tempAppearChars.Clear();
-				foreach (var c in _currentVisChars)
-					if (!_visibleCharacters.Contains(c))
-						_tempAppearChars.Add(c);
-
-				// Compute disappeared characters
-				_tempDisappearChars.Clear();
-				foreach (var c in _visibleCharacters)
-					if (!_currentVisChars.Contains(c))
-						_tempDisappearChars.Add(c);
-
-				// Compute appeared monsters
-				_tempAppearMonsters.Clear();
-				foreach (var m in _currentVisMonsters)
-					if (!_visibleMonsters.Contains(m))
-						_tempAppearMonsters.Add(m);
-
-				// Compute disappeared monsters
-				_tempDisappearMonsters.Clear();
-				foreach (var m in _visibleMonsters)
-					if (!_currentVisMonsters.Contains(m))
-						_tempDisappearMonsters.Add(m);
-
-				// Compute appeared pads
-				_tempAppearPads.Clear();
-				foreach (var p in _currentVisPads)
-					if (!_visiblePads.Contains(p))
-						_tempAppearPads.Add(p);
-
-				// Compute disappeared pads
-				_tempDisappearPads.Clear();
-				foreach (var p in _visiblePads)
-					if (!_currentVisPads.Contains(p))
-						_tempDisappearPads.Add(p);
+				this.DiffVisibility(_currentVisChars, _visibleCharacters, _tempAppearChars, _tempDisappearChars);
+				this.DiffVisibility(_currentVisMonsters, _visibleMonsters, _tempAppearMonsters, _tempDisappearMonsters);
+				this.DiffVisibility(_currentVisPads, _visiblePads, _tempAppearPads, _tempDisappearPads);
 
 				// Update _visibleMonsters to reflect only what the client
 				// actually knows about: previously visible (minus disappeared)
@@ -522,6 +476,44 @@ namespace Melia.Zone.World.Actors.Characters
 
 			this.HandleAppearingPads(_tempAppearPads);
 			this.HandleDisappearingPads(_tempDisappearPads);
+		}
+
+		/// <summary>
+		/// Fills the scratch sets with currently visible entities.
+		/// </summary>
+		private void GetVisibleEntities()
+		{
+			_currentVisMonsters.Clear();
+			foreach (var m in this.Map.Monsters)
+				if (this.CanSee(m))
+					_currentVisMonsters.Add(m);
+
+			_currentVisChars.Clear();
+			foreach (var c in this.Map.Characters)
+				if (this.CanSee(c))
+					_currentVisChars.Add(c);
+
+			_currentVisPads.Clear();
+			foreach (var p in this.Map.Pads)
+				if (this.CanSee(p))
+					_currentVisPads.Add(p);
+		}
+
+		/// <summary>
+		/// Computes the appeared and disappeared entities between the
+		/// current and previously visible sets.
+		/// </summary>
+		private void DiffVisibility<T>(HashSet<T> current, HashSet<T> previous, List<T> appeared, List<T> disappeared)
+		{
+			appeared.Clear();
+			foreach (var item in current)
+				if (!previous.Contains(item))
+					appeared.Add(item);
+
+			disappeared.Clear();
+			foreach (var item in previous)
+				if (!current.Contains(item))
+					disappeared.Add(item);
 		}
 
 		private void HandleAppearingCharacters(IEnumerable<Character> appearCharacters)

@@ -320,10 +320,13 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public Character GetCharacter(Func<Character, bool> predicate)
 		{
-			foreach (var character in _characters.Values)
+			lock (_characters)
 			{
-				if (predicate(character))
-					return character;
+				foreach (var character in _characters.Values)
+				{
+					if (predicate(character))
+						return character;
+				}
 			}
 			return null;
 		}
@@ -357,6 +360,23 @@ namespace Melia.Zone.World.Maps
 		/// Returns all characters visible to the given character.
 		/// </summary>
 		public Character[] GetVisibleCharacters(Character character) => this.GetCharacters(character.CanSee);
+
+		/// <summary>
+		/// Adds all characters in visible range of character to the result list.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		public void GetVisibleCharacters(Character character, List<Character> result)
+		{
+			lock (_characters)
+			{
+				foreach (var otherCharacter in _characters.Values)
+				{
+					if (otherCharacter != character && character.Position.InRange2D(otherCharacter.Position, VisibleRange))
+						result.Add(otherCharacter);
+				}
+			}
+		}
 		#endregion
 
 		#region Monster Management
@@ -500,6 +520,24 @@ namespace Melia.Zone.World.Maps
 		}
 
 		/// <summary>
+		/// Adds all triggerable areas that overlap with the given
+		/// position to the result list.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="result"></param>
+		public void GetTriggerableAreasAt(Position pos, List<ITriggerableArea> result)
+		{
+			lock (_triggerableAreas)
+			{
+				foreach (var area in _triggerableAreas.Values)
+				{
+					if (area.Area?.IsInside(pos) ?? false)
+						result.Add(area);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Returns the monster with the given handle, or null if not found.
 		/// </summary>
 		public IMonster GetMonster(int handle) => _monsters.TryGetValue(handle, out var monster) ? monster : null;
@@ -601,6 +639,40 @@ namespace Melia.Zone.World.Maps
 		}
 
 		/// <summary>
+		/// Returns all actors with the given type in the area.
+		/// </summary>
+		public List<TActor> GetActorsIn<TActor>(IShapeF area) where TActor : IActor
+		{
+			var result = new List<TActor>();
+			this.GetActorsIn<TActor>(area, result);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the result list with all actors of the given type in the area.
+		/// </summary>
+		public void GetActorsIn<TActor>(IShapeF area, List<TActor> result) where TActor : IActor
+		{
+			lock (_monsters)
+			{
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is TActor actor && area.IsInside(actor.Position))
+						result.Add(actor);
+				}
+			}
+
+			lock (_characters)
+			{
+				foreach (var character in _characters.Values)
+				{
+					if (character is TActor actor && area.IsInside(actor.Position))
+						result.Add(actor);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Returns all monsters matching the predicate.
 		/// </summary>
 		public IMonster[] GetMonsters(Func<IMonster, bool> predicate)
@@ -620,9 +692,50 @@ namespace Melia.Zone.World.Maps
 		public IMonster[] GetVisibleMonsters(Character character) => this.GetMonsters(character.CanSee);
 
 		/// <summary>
+		/// Adds all monsters in visible range of character to the result list.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		public void GetVisibleMonsters(Character character, List<IMonster> result)
+		{
+			lock (_monsters)
+			{
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is Npc npc && npc.State == NpcState.Invisible)
+						continue;
+
+					if (!character.Position.InRange2D(monster.Position, VisibleRange))
+						continue;
+
+					result.Add(monster);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Returns all pads visible to the given character.
 		/// </summary>
 		public Pad[] GetVisiblePads(Character character) => this.GetPads(character.CanSee);
+
+		/// <summary>
+		/// Adds all pads in visible range of character to the result list.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		public void GetVisiblePads(Character character, List<Pad> result)
+		{
+			lock (_pads)
+			{
+				foreach (var pad in _pads.Values)
+				{
+					if (!character.Position.InRange2D(pad.Position, VisibleRange))
+						continue;
+
+					result.Add(pad);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Removes all scripted entities (monsters) from the map.
@@ -697,6 +810,7 @@ namespace Melia.Zone.World.Maps
 		{
 			pad.Map = this;
 			_pads[pad.Handle] = pad;
+			this.UpdateVisibility();
 			pad.Components.Get<TriggerComponent>()?.OnAddedToMap();
 		}
 
@@ -708,6 +822,7 @@ namespace Melia.Zone.World.Maps
 			pad.Components.Get<TriggerComponent>()?.OnRemovingFromMap();
 			_pads.TryRemove(pad.Handle, out _);
 			pad.Map = null;
+			this.UpdateVisibility();
 		}
 
 		/// <summary>
@@ -1044,6 +1159,28 @@ namespace Melia.Zone.World.Maps
 			if (maxTargets > 0 && result.Count > maxTargets)
 				result.RemoveRange(maxTargets, result.Count - maxTargets);
 			return result;
+		}
+
+		/// <summary>
+		/// Returns warp NPC that should be used when at given position.
+		/// </summary>
+		/// <param name="pos"></param>
+		public bool TryGetNearbyWarp(Position pos, out WarpMonster result)
+		{
+			lock (_monsters)
+			{
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is WarpMonster warp && warp.Position.InRange2D(pos, 35))
+					{
+						result = warp;
+						return true;
+					}
+				}
+			}
+
+			result = null;
+			return false;
 		}
 
 		/// <summary>

@@ -263,11 +263,12 @@ namespace Melia.Zone.World.Actors.Components
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
-			// Make sure the elapsed time is not the full update time if we run
-			// for the first time, since the component might not have been around
-			// for the full update interval, which would mess with the update time
-			// calculations. We probably want to standardize this in some say,
-			// since this is generally what we would want to know. TODO.
+			// Make sure the elapsed time is not the full update time if
+			// we run for the first time, since the component might not
+			// have been around for the full update interval, which would
+			// mess with the update time calculations. We probably want to
+			// standardize this in some say, since this is generally what
+			// we would want to know. TODO.
 			if (!_elapsedInitalized)
 			{
 				elapsed = Math2.Max(TimeSpan.Zero, DateTime.Now - _creationTime);
@@ -341,6 +342,16 @@ namespace Melia.Zone.World.Actors.Components
 				this.ActorCount = _actorsInside.Count;
 			}
 
+			this.UpdateTimers(elapsed);
+		}
+
+		/// <summary>
+		/// Updates the update and lifetime timers and triggers relevant
+		/// events.
+		/// </summary>
+		/// <param name="elapsed"></param>
+		private void UpdateTimers(TimeSpan elapsed)
+		{
 			_updateTimer += elapsed;
 
 			if (_updateTimer >= this.UpdateInterval)

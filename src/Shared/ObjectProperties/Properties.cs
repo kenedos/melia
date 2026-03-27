@@ -475,7 +475,7 @@ namespace Melia.Shared.ObjectProperties
 
 			foreach (var propertyName in propertyNames)
 			{
-				if (!this.TryGet(propertyName, out var property) || !(property is FloatProperty floatProperty))
+				if (!this.TryGet(propertyName, out var property) || property is not FloatProperty floatProperty)
 					continue;
 
 				floatProperty.MaxValue = maxProperty.Value;

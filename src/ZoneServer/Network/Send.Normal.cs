@@ -1079,6 +1079,13 @@ namespace Melia.Zone.Network
 			/// in the right place.
 			/// </remarks>
 			/// <param name="entity"></param>
+			/// <param name="target"></param>
+			/// <param name="originPos"></param>
+			/// <param name="farPos"></param>
+			public static void UpdateSkillEffect(ICombatEntity entity, ICombatEntity target, Position originPos, Position farPos)
+				=> UpdateSkillEffect(entity, target?.Handle ?? 0, originPos, entity.Direction, farPos);
+
+			/// <param name="entity"></param>
 			/// <param name="targetHandle"></param>
 			/// <param name="originPos"></param>
 			/// <param name="direction"></param>
@@ -1825,6 +1832,16 @@ namespace Melia.Zone.Network
 			/// <param name="f2"></param>
 			/// <param name="f3"></param>
 			/// <param name="isVisible"></param>
+			/// <summary>
+			/// Sends pad update with custom animation name and float args.
+			/// </summary>
+			/// <param name="caster"></param>
+			/// <param name="pad"></param>
+			/// <param name="animationName"></param>
+			/// <param name="f1"></param>
+			/// <param name="f2"></param>
+			/// <param name="f3"></param>
+			/// <param name="isVisible"></param>
 			public static void PadUpdate(ICombatEntity caster, Pad pad, string animationName, float f1, float f2, float f3, bool isVisible)
 			{
 				var packet = new Packet(Op.ZC_NORMAL);
@@ -1839,14 +1856,13 @@ namespace Melia.Zone.Network
 				packet.PutFloat(f1);
 				packet.PutFloat(f2);
 				packet.PutInt(pad.Handle);
-				packet.PutInt(isVisible ? 1 : 0); // Possibly a bool with a 3 byte gap
+				packet.PutInt(isVisible ? 1 : 0);
 				packet.PutEmptyBin(13);
 				packet.PutFloat(f3);
 				packet.PutEmptyBin(16);
 
 				if (isVisible)
 				{
-					// Creating: broadcast to players near PAD position and track them
 					foreach (var character in pad.Map.GetCharacters(c =>
 						c.Position.InRange2D(pad.Position, Map.VisibleRange) &&
 						c.Layer == pad.Layer))
@@ -1857,7 +1873,6 @@ namespace Melia.Zone.Network
 				}
 				else
 				{
-					// Destroying: send to ALL tracked observers
 					foreach (var character in pad.Observers.GetObservers())
 					{
 						character.Connection?.Send(packet);
@@ -1866,82 +1881,13 @@ namespace Melia.Zone.Network
 				}
 			}
 
-			/// <Summary>
-			/// Used to show complex visual effects related to skills, called Pads.
-			/// </summary>
-			/// <param name="caster"></param>
-			/// <param name="pad"></param>
-			/// <param name="isVisible"></param>
+			[Obsolete("Use PadUpdate(Pad, bool) instead.")]
 			public static void PadUpdate(ICombatEntity caster, Pad pad, bool isVisible)
-			{
-				var packet = new Packet(Op.ZC_NORMAL);
-				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.PadUpdate);
+				=> PadUpdate(pad, isVisible);
 
-				packet.PutInt(caster.Handle);
-				packet.AddStringId(pad.Name);
-				packet.PutInt((int)pad.Skill.Id);
-				packet.PutInt(pad.Skill.Level);
-				packet.PutPosition(pad.Position);
-				packet.PutDirection(pad.Direction);
-				packet.PutFloat(pad.NumArg1);
-				packet.PutFloat(pad.NumArg2);
-				packet.PutInt(pad.Handle);
-				packet.PutInt(isVisible ? 1 : 0); // Possibly a bool with a 3 byte gap
-				packet.PutEmptyBin(13);
-				packet.PutFloat(pad.NumArg3);
-				packet.PutEmptyBin(16);
-
-				if (isVisible)
-				{
-					// Creating: broadcast to players near PAD position and track them
-					foreach (var character in pad.Map.GetCharacters(c =>
-						c.Position.InRange2D(pad.Position, Map.VisibleRange) &&
-						c.Layer == pad.Layer))
-					{
-						pad.Observers.AddObserver(character);
-						character.Connection?.Send(packet);
-					}
-				}
-				else
-				{
-					// Destroying: send to ALL tracked observers
-					foreach (var character in pad.Observers.GetObservers())
-					{
-						character.Connection?.Send(packet);
-					}
-					pad.Observers.Clear();
-				}
-			}
-
-			/// <summary>
-			/// Sends pad update to a specific character.
-			/// Used when a character walks into visibility range of an existing pad.
-			/// </summary>
-			/// <param name="character"></param>
-			/// <param name="caster"></param>
-			/// <param name="pad"></param>
-			/// <param name="isVisible"></param>
+			[Obsolete("Use PadUpdate(Character, Pad, bool) instead.")]
 			public static void PadUpdateToCharacter(Character character, ICombatEntity caster, Pad pad, bool isVisible)
-			{
-				var packet = new Packet(Op.ZC_NORMAL);
-				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.PadUpdate);
-
-				packet.PutInt(caster.Handle);
-				packet.AddStringId(pad.Name);
-				packet.PutInt((int)pad.Skill.Id);
-				packet.PutInt(pad.Skill.Level);
-				packet.PutPosition(pad.Position);
-				packet.PutDirection(pad.Direction);
-				packet.PutFloat(pad.NumArg1);
-				packet.PutFloat(pad.NumArg2);
-				packet.PutInt(pad.Handle);
-				packet.PutInt(isVisible ? 1 : 0);
-				packet.PutEmptyBin(13);
-				packet.PutFloat(pad.NumArg3);
-				packet.PutEmptyBin(16);
-
-				character.Connection?.Send(packet);
-			}
+				=> PadUpdate(character, pad, isVisible);
 
 			/// <summary>
 			/// Creates a skill in client (MONSKL_CRE_PAD)
@@ -3308,8 +3254,148 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
+			/// Plays an animation of an effect getting thrown from the
+			/// entity to the position, where a second effect is played
+			/// for the impact.
+			/// </summary>
+			/// <param name="entity"></param>
+			/// <param name="packetString1"></param>
+			/// <param name="duration1"></param>
+			/// <param name="packetString2"></param>
+			/// <param name="duration2"></param>
+			/// <param name="position"></param>
+			/// <param name="f1"></param>
+			/// <param name="f2"></param>
+			/// <param name="f3"></param>
+			/// <param name="f4"></param>
+			/// <summary>
+			/// Attack broadcast?
+			/// </summary>
+			/// <param name="character"></param>
+			public static void AttackCancel(Character character)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.SkillResetAnimation);
+				packet.PutInt(character.Handle);
+
+				character.Map.Broadcast(packet);
+			}
+
+			/// <summary>
+			/// Packet with unknown purpose that's sent during dynamic
+			/// casting.
+			/// </summary>
+			/// <param name="character"></param>
+			/// <param name="skillId"></param>
+			public static void UnkDynamicCastStart(Character character, SkillId skillId)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Skill_DynamicCastStart);
+
+				packet.PutInt(character.Handle);
+				packet.PutInt((int)skillId);
+
+				character.Connection.Send(packet);
+			}
+
+			/// <summary>
+			/// Packet with unknown purpose that's sent during dynamic
+			/// casting.
+			/// </summary>
+			/// <param name="character"></param>
+			/// <param name="skillId"></param>
+			/// <param name="value"></param>
+			public static void UnkDynamicCastEnd(Character character, SkillId skillId, float value)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Skill_DynamicCastEnd);
+
+				packet.PutInt(character.Handle);
+				packet.PutInt((int)skillId);
+				packet.PutFloat(value);
+				packet.PutByte(0);
+
+				character.Connection.Send(packet);
+			}
+
+			/// <summary>
+			/// Makes pad appear or disappear on clients around it.
+			/// Uses observer tracking to ensure destroy packets reach
+			/// all clients that received the create packet.
+			/// </summary>
+			/// <param name="pad">The pad to update.</param>
+			/// <param name="isVisible">Whether to display or hide the pad.</param>
+			public static void PadUpdate(Pad pad, bool isVisible)
+			{
+				var packet = CreatePadUpdatePacket(pad, isVisible);
+
+				if (isVisible)
+				{
+					foreach (var character in pad.Map.GetCharacters(c =>
+						c.Position.InRange2D(pad.Position, Map.VisibleRange) &&
+						c.Layer == pad.Layer))
+					{
+						pad.Observers.AddObserver(character);
+						character.Connection?.Send(packet);
+					}
+				}
+				else
+				{
+					foreach (var character in pad.Observers.GetObservers())
+					{
+						character.Connection?.Send(packet);
+					}
+					pad.Observers.Clear();
+				}
+			}
+
+			/// <summary>
+			/// Makes pad appear or disappear on the character's client.
+			/// Used when a character walks into visibility range of an
+			/// existing pad.
+			/// </summary>
+			/// <param name="receiver">The character to send the packet to.</param>
+			/// <param name="pad">The pad to update.</param>
+			/// <param name="isVisible">Whether to display or hide the pad.</param>
+			public static void PadUpdate(Character receiver, Pad pad, bool isVisible)
+			{
+				var packet = CreatePadUpdatePacket(pad, isVisible);
+				receiver.Connection?.Send(packet);
+			}
+
+			/// <summary>
+			/// Creates the pad update packet with the correct format for
+			/// the current client version.
+			/// </summary>
+			/// <param name="pad"></param>
+			/// <param name="isVisible"></param>
+			/// <returns></returns>
+			private static Packet CreatePadUpdatePacket(Pad pad, bool isVisible)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.PadUpdate);
+
+				packet.PutInt(pad.Creator.Handle);
+				packet.AddStringId(pad.Name);
+				packet.PutInt((int)pad.Skill.Id);
+				packet.PutInt(pad.Skill.Level);
+				packet.PutPosition(pad.Position);
+				packet.PutDirection(pad.Direction);
+				packet.PutFloat(pad.NumArg1);
+				packet.PutFloat(pad.NumArg2);
+				packet.PutInt(pad.Handle);
+				packet.PutInt(isVisible ? 1 : 0);
+				packet.PutEmptyBin(13);
+				packet.PutFloat(pad.NumArg3);
+				packet.PutEmptyBin(16);
+
+				return packet;
+			}
+
+			/// <summary>
 			/// Plays text effect on actor but local (to a single connection).
 			/// </summary>
+			/// <param name="conn"></param>
 			/// <param name="actor"></param>
 			/// <param name="caster"></param>
 			/// <param name="packetString"></param>
@@ -3345,6 +3431,40 @@ namespace Melia.Zone.Network
 				packet.PutInt(classId);
 
 				conn.Send(packet);
+			}
+
+			/// <summary>
+			/// Makes actor spin on clients near it.
+			/// </summary>
+			/// <param name="actor"></param>
+			/// <summary>
+			/// Unknown purpose yet.
+			/// </summary>
+			/// <param name="character"></param>
+			public static void Unknown_A1(Character character)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Unknown_A1);
+				packet.PutLong(4);
+
+				character.Connection.Send(packet);
+			}
+
+			/// <summary>
+			/// Sent during login for unknown purpose
+			/// </summary>
+			/// <param name="character"></param>
+			public static void Unknown_DA(Character character)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.RemoveCorpseParts);
+				packet.Zlib(true, zpacket =>
+				{
+					zpacket.PutLong(character.ObjectId);
+					zpacket.PutInt(0);
+				});
+
+				character.Connection.Send(packet);
 			}
 
 			/// <summary>

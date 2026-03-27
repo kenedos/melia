@@ -465,6 +465,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			get
 			{
+				if (this.Rank == 0)
+					throw new InvalidOperationException("The job needs to be added to a character before the level can be determined.");
+
 				var totalExp = this.TotalExp;
 
 				if (_cachedLevel > 0 && _cachedLevelExp == totalExp)

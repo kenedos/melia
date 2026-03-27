@@ -16,14 +16,15 @@ namespace Melia.Shared.Configuration.Files
 		public bool VerifyIpf { get; private set; }
 
 		/// <summary>
-		/// When enabled, auto-update the ipf checksum.
-		/// </summary>
-		public bool IpfChecksumAutoUpdate { get; private set; }
-
-		/// <summary>
 		/// Checksum to prevent clients using modified or out-dated IPF files.
 		/// </summary>
 		public string IpfChecksum { get; set; }
+
+		/// <summary>
+		/// If true, the server updates the user barracks conf file with
+		/// the checksum sent by the first high ranking GM that logs in.
+		/// </summary>
+		public bool IpfChecksumAutoUpdate { get; set; }
 
 		/// <summary>
 		/// Map new players start on.

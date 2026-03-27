@@ -1,7 +1,6 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Buffs.Handlers
 {
@@ -15,34 +14,57 @@ namespace Melia.Zone.Buffs.Handlers
 	[BuffHandler(BuffId.FireWall_Debuff)]
 	public class FireWall_DebuffOverride : DamageOverTimeBuffHandler
 	{
+		/// <summary>
+		/// The amount by which the target's fire resistance is reduced.
+		/// </summary>
+		/// <remarks>
+		/// This value is used as part of a percentage based multiplier.
+		/// A reduction of 20 effectively means the target takes 20% more
+		/// fire damage.
+		/// </remarks>
 		private const float FireResistance = -20f;
 
+		/// <summary>
+		/// Reduces the target's fire resistance when the buff starts
+		/// and snapshots damage for the DoT.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <param name="activationType"></param>
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			// Call base to snapshot damage
 			base.OnActivate(buff, activationType);
 
-			// Apply fire resistance debuff
-			if (buff.Target is Character)
-				buff.Target.Properties.Modify(PropertyName.ResFire_BM, FireResistance);
-			else
-				buff.Target.Properties.Modify(PropertyName.Fire_Def, FireResistance);
+			if (buff.Target.Properties.Has(PropertyName.ResFire))
+				AddPropertyModifier(buff, buff.Target, PropertyName.ResFire_BM, FireResistance);
+			else if (buff.Target.Properties.Has(PropertyName.Fire_Def))
+				AddPropertyModifier(buff, buff.Target, PropertyName.Fire_Def_BM, FireResistance);
 		}
 
+		/// <summary>
+		/// Removes the fire resistance reduction when the buff ends.
+		/// </summary>
+		/// <param name="buff"></param>
 		public override void OnEnd(Buff buff)
 		{
-			// Remove fire resistance debuff
-			if (buff.Target is Character)
-				buff.Target.Properties.Modify(PropertyName.ResFire_BM, -FireResistance);
-			else
-				buff.Target.Properties.Modify(PropertyName.Fire_Def, -FireResistance);
+			RemovePropertyModifier(buff, buff.Target, PropertyName.ResFire_BM);
+			RemovePropertyModifier(buff, buff.Target, PropertyName.Fire_Def_BM);
 		}
 
+		/// <summary>
+		/// Returns the skill ID used for damage calculation.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <returns></returns>
 		protected override SkillId GetSkillId(Buff buff)
 		{
 			return SkillId.Pyromancer_FireWall;
 		}
 
+		/// <summary>
+		/// Returns the hit type for the DoT damage.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <returns></returns>
 		protected override HitType GetHitType(Buff buff)
 		{
 			return HitType.Fire;

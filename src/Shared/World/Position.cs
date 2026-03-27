@@ -307,6 +307,62 @@ namespace Melia.Shared.World
 		}
 
 		/// <summary>
+		/// Returns position on the line between this and the other in 3D space.
+		/// </summary>
+		public readonly Position GetRelative3D(Position other, float distance)
+		{
+			if (this == other)
+				return this;
+
+			var deltaX = (double)other.X - this.X;
+			var deltaY = (double)other.Y - this.Y;
+			var deltaZ = (double)other.Z - this.Z;
+
+			var deltaXYZ = Math.Sqrt(Math.Pow(deltaX, 2) + Math.Pow(deltaY, 2) + Math.Pow(deltaZ, 2));
+
+			var newX = other.X + (distance / deltaXYZ) * (deltaX);
+			var newY = other.Y + (distance / deltaXYZ) * (deltaY);
+			var newZ = other.Z + (distance / deltaXYZ) * (deltaZ);
+
+			return new Position((float)newX, (float)newY, (float)newZ);
+		}
+
+		/// <summary>
+		/// Returns position in direction and distance in 2D space.
+		/// </summary>
+		public readonly Position GetRelative2D(Direction direction, float distance)
+		{
+			var deltaX = direction.Cos;
+			var deltaZ = direction.Sin;
+
+			var deltaXZ = Math.Sqrt(Math.Pow(deltaX, 2) + Math.Pow(deltaZ, 2));
+
+			var newX = this.X + (distance / deltaXZ) * (deltaX);
+			var newZ = this.Z + (distance / deltaXZ) * (deltaZ);
+
+			return new Position((float)newX, this.Y, (float)newZ);
+		}
+
+		/// <summary>
+		/// Returns position on the line between this and the other in 2D space.
+		/// </summary>
+		public readonly Position GetRelative2D(Position other, float distance)
+		{
+			if (this == other)
+				return this;
+
+			var deltaX = (double)other.X - this.X;
+			var deltaZ = (double)other.Z - this.Z;
+
+			var deltaXZ = Math.Sqrt(Math.Pow(deltaX, 2) + Math.Pow(deltaZ, 2));
+
+			var newX = this.X + (distance / deltaXZ) * (deltaX);
+			var newZ = this.Z + (distance / deltaXZ) * (deltaZ);
+
+			return new Position((float)newX, this.Y, (float)newZ);
+		}
+
+		/// <summary>
 		/// Returns direction the other position is in as radian.
 		/// </summary>
 		/// <param name="otherPos"></param>

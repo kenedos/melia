@@ -31,9 +31,9 @@ namespace Melia.Zone.Scripting.AI
 		private int _masterHandle;
 		private int _followTargetHandle;
 
-		private DateTime _lastPlayerSeenTime;
 		private readonly TimeSpan _inactivityDelay = TimeSpan.FromSeconds(2);
-		private DateTime _suspensionEnd = DateTime.MinValue;
+		private TimeSpan _inactivityTime = TimeSpan.Zero;
+		private TimeSpan _suspensionTime = TimeSpan.Zero;
 
 		protected DateTime _lastAttackedTime;
 		protected int _lastAttackerHandle;
@@ -127,7 +127,7 @@ namespace Melia.Zone.Scripting.AI
 		/// won't execute its routine or react to events until the
 		/// suspension ends.
 		/// </summary>
-		public bool IsSuspended => DateTime.Now < _suspensionEnd;
+		public bool IsSuspended => _suspensionTime > TimeSpan.Zero;
 
 		/// <summary>
 		/// Initializes AI for the given entity, setting the initial hostility and tendency.
@@ -213,6 +213,12 @@ namespace Melia.Zone.Scripting.AI
 					if (!_initiated)
 						throw new InvalidOperationException("AI has not been initiated.");
 
+					if (this.CheckSuspension(elapsed))
+						return;
+
+					if (!this.CheckAnyPlayersOnMap(elapsed))
+						return;
+
 					if (this.Entity.IsDead)
 					{
 						if (!_isDeadNotified)
@@ -220,7 +226,6 @@ namespace Melia.Zone.Scripting.AI
 							_isDeadNotified = true;
 							this.OnDeath();
 						}
-						// Reset target on death to stop any lingering routines.
 						if (_target != null)
 						{
 							_target = null;
@@ -228,11 +233,7 @@ namespace Melia.Zone.Scripting.AI
 						return;
 					}
 
-					if (this.Suspended)
-						return;
-
 					// Throttle hate updates: 200ms in combat, 500ms idle.
-					// Stagger start times across monsters to avoid spikes.
 					_hateUpdateAccumulator += elapsed;
 					var hateInterval = _target != null
 						? TimeSpan.FromMilliseconds(200)
@@ -248,7 +249,6 @@ namespace Melia.Zone.Scripting.AI
 					this.HandleEventAlerts();
 					this.ExecuteDuringActions();
 
-					// This is the call that executes the current coroutine (e.g., Follow, Attack)
 					this.Heartbeat();
 				}
 				catch (Exception ex)
@@ -266,7 +266,7 @@ namespace Melia.Zone.Scripting.AI
 			{
 				if (_target != mostHated)
 				{
-					_targetAcquiredTime = DateTime.UtcNow; // Set time when target changes
+					_targetAcquiredTime = DateTime.UtcNow;
 				}
 				_target = mostHated;
 				this.StartRoutine("StopAndAttack", this.StopAndAttack());
@@ -280,11 +280,9 @@ namespace Melia.Zone.Scripting.AI
 			if (!this.TryGetMaster(out var master))
 				return;
 
-			// Reset aggro if the master left
 			if (this.EntityGone(master) || !this.InRangeOf(master, MaxMasterDistance))
 			{
 				_target = null;
-				// Clear all hate immediately when master is gone - summon should fully reset
 				if (EnableReturnHome)
 					this.StartRoutine("ReturnHome", this.ReturnHome(clearAllHateImmediately: true));
 				else
@@ -297,7 +295,6 @@ namespace Melia.Zone.Scripting.AI
 
 		protected virtual void CheckTarget()
 		{
-			// We cannot get a target if we cannot attack
 			if (this.Entity.IsLocked(LockType.Attack))
 			{
 				return;
@@ -329,7 +326,7 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		public void Suspend()
 		{
-			_suspensionEnd = DateTime.MaxValue;
+			_suspensionTime = TimeSpan.MaxValue;
 		}
 
 		/// <summary>
@@ -340,7 +337,56 @@ namespace Melia.Zone.Scripting.AI
 		/// <param name="duration"></param>
 		public void Suspend(TimeSpan duration)
 		{
-			_suspensionEnd = DateTime.Now + duration;
+			_suspensionTime = duration;
+		}
+
+		/// <summary>
+		/// Returns true if the AI is currently suspended. If it is,
+		/// it reduces the suspension time based on the elapsed time.
+		/// </summary>
+		/// <param name="elapsed"></param>
+		/// <returns></returns>
+		public bool CheckSuspension(TimeSpan elapsed)
+		{
+			if (_suspensionTime <= TimeSpan.Zero)
+				return false;
+
+			if (_suspensionTime == TimeSpan.MaxValue)
+				return true;
+
+			_suspensionTime = Math2.Max(TimeSpan.Zero, _suspensionTime - elapsed);
+			return true;
+		}
+
+		/// <summary>
+		/// Returns true if there was any recent player presence on the
+		/// map.
+		/// </summary>
+		/// <remarks>
+		/// This method keeps returning true for a short time after the
+		/// last player left the map so the AI can react to players
+		/// leaving.
+		/// </remarks>
+		/// <param name="elapsed"></param>
+		/// <returns></returns>
+		private bool CheckAnyPlayersOnMap(TimeSpan elapsed)
+		{
+			var playerCount = this.Entity.Map.CharacterCount;
+
+			if (playerCount > 0)
+			{
+				_inactivityTime = TimeSpan.Zero;
+				return true;
+			}
+
+			if (_inactivityTime >= _inactivityDelay)
+				return false;
+
+			_inactivityTime += elapsed;
+			if (_inactivityTime >= _inactivityDelay)
+				return false;
+
+			return true;
 		}
 
 		/// <summary>
@@ -348,7 +394,6 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		protected virtual bool IsFeared()
 		{
-			// Check for all fear-causing debuffs
 			if (this.Entity.IsBuffActive(BuffId.Pollution_Debuff))
 				return true;
 
@@ -357,10 +402,6 @@ namespace Melia.Zone.Scripting.AI
 
 			if (this.Entity.IsBuffActive(BuffId.Growling_fear_Debuff))
 				return true;
-
-			// Add other fear debuffs here as needed
-			// if (this.Entity.IsBuffActive(BuffId.OtherFearDebuff))
-			//     return true;
 
 			return false;
 		}

@@ -1,6 +1,6 @@
 ﻿using System;
-using Melia.Shared.ObjectProperties;
 using Melia.Shared.Game.Const;
+using Melia.Shared.ObjectProperties;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.Buffs;
@@ -73,6 +73,14 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (this is not CompanionProperties)
 				this.Create(PropertyName.MShield, "SCR_Get_MON_MSHIELD");
 
+			this.Create(PropertyName.Fire_Def, "SCR_GET_MON_FIRE_DEF");
+			this.Create(PropertyName.Ice_Def, "SCR_GET_MON_ICE_DEF");
+			this.Create(PropertyName.Lightning_Def, "SCR_GET_MON_LIGHTNING_DEF");
+			this.Create(PropertyName.Earth_Def, "SCR_GET_MON_EARTH_DEF");
+			this.Create(PropertyName.Poison_Def, "SCR_GET_MON_POISON_DEF");
+			this.Create(PropertyName.Holy_Def, "SCR_GET_MON_HOLY_DEF");
+			this.Create(PropertyName.Dark_Def, "SCR_GET_MON_DARK_DEF");
+
 			this.Create(new FloatProperty(PropertyName.WlkMSPD, this.Monster.Data.WalkSpeed));
 			this.Create(new FloatProperty(PropertyName.RunMSPD, this.Monster.Data.RunSpeed));
 			this.Create(PropertyName.MSPD, "SCR_Get_MON_MSPD");
@@ -104,6 +112,13 @@ namespace Melia.Zone.World.Actors.Monsters
 			this.AutoUpdate(PropertyName.CRTATK, [PropertyName.CRTATK_BM]);
 			this.AutoUpdate(PropertyName.BLK, [PropertyName.BLK_BM]);
 			this.AutoUpdate(PropertyName.BLK_BREAK, [PropertyName.BLK_BREAK_BM]);
+			this.AutoUpdate(PropertyName.Fire_Def, [PropertyName.Fire_Def_BM]);
+			this.AutoUpdate(PropertyName.Ice_Def, [PropertyName.Ice_Def_BM]);
+			this.AutoUpdate(PropertyName.Lightning_Def, [PropertyName.Lightning_Def_BM]);
+			this.AutoUpdate(PropertyName.Earth_Def, [PropertyName.Earth_Def_BM]);
+			this.AutoUpdate(PropertyName.Poison_Def, [PropertyName.Poison_Def_BM]);
+			this.AutoUpdate(PropertyName.Holy_Def, [PropertyName.Holy_Def_BM]);
+			this.AutoUpdate(PropertyName.Dark_Def, [PropertyName.Dark_Def_BM]);
 
 			this.AutoUpdateMax(PropertyName.HP, PropertyName.MHP);
 			this.AutoUpdateMax(PropertyName.SP, PropertyName.MSP);

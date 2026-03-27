@@ -82,6 +82,7 @@ public class CombatCalculationsScript : GeneralScript
 		var SCR_HitCountMultiplier = ScriptableFunctions.Combat.Get("SCR_HitCountMultiplier");
 		var SCR_SizeTypeBonus = ScriptableFunctions.Combat.Get("SCR_SizeTypeBonus");
 		var SCR_AttributeMultiplier = ScriptableFunctions.Combat.Get("SCR_AttributeMultiplier");
+		var SCR_AttributeResistanceMultiplier = ScriptableFunctions.Combat.Get("SCR_AttributeResistanceMultiplier");
 		var SCR_AttackTypeMultiplier = ScriptableFunctions.Combat.Get("SCR_AttackTypeMultiplier");
 		var SCR_RaceMultiplier = ScriptableFunctions.Combat.Get("SCR_RaceMultiplier");
 		var SCR_Combat_BeforeCalc = ScriptableFunctions.Combat.Get("SCR_Combat_BeforeCalc");
@@ -158,6 +159,12 @@ public class CombatCalculationsScript : GeneralScript
 		if (attrMultiplier != 1)
 		{
 			skillHitResult.Damage *= attrMultiplier;
+		}
+
+		var attrResistanceMultiplier = SCR_AttributeResistanceMultiplier(attacker, target, skill, modifier, skillHitResult);
+		if (attrResistanceMultiplier != 1)
+		{
+			skillHitResult.Damage *= attrResistanceMultiplier;
 		}
 
 		var atkTypeMultiplier = SCR_AttackTypeMultiplier(attacker, target, skill, modifier, skillHitResult);
@@ -247,18 +254,15 @@ public class CombatCalculationsScript : GeneralScript
 		if (skill.Data.ClassType == SkillClassType.Magic)
 			return 0;
 
-		if (attacker is not Character character)
-			return 0;
-
-		var weapon = character.Inventory.GetEquip(EquipSlot.RightHand);
-
-		var targetSize = SizeType.M;
-		if (target is Mob mob)
-			targetSize = mob.Data.Size;
-
-		if (targetSize == SizeType.S) return weapon.Data.SmallSizeBonus;
-		if (targetSize == SizeType.M) return weapon.Data.MediumSizeBonus;
-		if (targetSize == SizeType.L) return weapon.Data.LargeSizeBonus;
+		if (attacker.TryGetItem(EquipSlot.RightHand, out var weapon))
+		{
+			switch (target.EffectiveSize)
+			{
+				case SizeType.S: return weapon.Data.SmallSizeBonus;
+				case SizeType.M: return weapon.Data.MediumSizeBonus;
+				case SizeType.L: return weapon.Data.LargeSizeBonus;
+			}
+		}
 
 		return 0;
 	}
@@ -372,6 +376,95 @@ public class CombatCalculationsScript : GeneralScript
 		}
 
 		return 1;
+	}
+
+	/// <summary>
+	/// Returns a damage multiplier for the skill used on the target,
+	/// based on its attribute resistance.
+	/// </summary>
+	/// <param name="attacker"></param>
+	/// <param name="target"></param>
+	/// <param name="skill"></param>
+	/// <param name="skillHitResult"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_AttributeResistanceMultiplier(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+	{
+		if (skill.Data.ClassType != SkillClassType.Magic)
+			return 1;
+
+		var attackerAttr = skill.Data.Attribute;
+
+		if (modifier.AttackAttribute != AttributeType.None)
+			attackerAttr = modifier.AttackAttribute;
+
+		// Characters and monsters appear to have different properties for
+		// attribute resistance, so we'll get both and add them together.
+		// Either entity type can only have one of them.
+		var characterPropertyName = (string)null;
+		var monsterPropertyName = (string)null;
+
+		switch (attackerAttr)
+		{
+			case AttributeType.Fire:
+			{
+				characterPropertyName = PropertyName.ResFire;
+				monsterPropertyName = PropertyName.Fire_Def;
+				break;
+			}
+			case AttributeType.Ice:
+			{
+				characterPropertyName = PropertyName.ResIce;
+				monsterPropertyName = PropertyName.Ice_Def;
+				break;
+			}
+			case AttributeType.Lightning:
+			{
+				characterPropertyName = PropertyName.ResLightning;
+				monsterPropertyName = PropertyName.Lightning_Def;
+				break;
+			}
+			case AttributeType.Earth:
+			{
+				characterPropertyName = PropertyName.ResEarth;
+				monsterPropertyName = PropertyName.Earth_Def;
+				break;
+			}
+			case AttributeType.Poison:
+			{
+				characterPropertyName = PropertyName.ResPoison;
+				monsterPropertyName = PropertyName.Poison_Def;
+				break;
+			}
+			case AttributeType.Holy:
+			{
+				characterPropertyName = PropertyName.ResHoly;
+				monsterPropertyName = PropertyName.Holy_Def;
+				break;
+			}
+			case AttributeType.Dark:
+			{
+				characterPropertyName = PropertyName.ResDark;
+				monsterPropertyName = PropertyName.Dark_Def;
+				break;
+			}
+			case AttributeType.Soul:
+			{
+				characterPropertyName = PropertyName.ResSoul;
+				monsterPropertyName = null; // Soul_Def doesn't exist?
+				break;
+			}
+		}
+
+		var resistance = 0f;
+
+		if (characterPropertyName != null)
+			resistance += target.Properties.GetFloat(characterPropertyName);
+
+		if (monsterPropertyName != null)
+			resistance += target.Properties.GetFloat(monsterPropertyName);
+
+		return 1 - (resistance / 100f);
 	}
 
 	/// <summary>
