@@ -36,21 +36,19 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 
-			var skillHitResult = SCR_SkillHit(caster, target, skill);
-			target.TakeDamage(skillHitResult.Damage, caster);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero);
-			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
+			var originPos = caster.Position;
+			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 
-
-			skill.Run(this.HandleSkill(caster, target, skill));
+			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill)
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, caster.Position, target.Position, length: 80, width: 10, angle: 10f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 10);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 300 + (int)(caster.Position.Get2DDistance(target.Position) * 4);
 			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
@@ -77,20 +75,19 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 
-			var skillHitResult = SCR_SkillHit(caster, target, skill);
-			target.TakeDamage(skillHitResult.Damage, caster);
-			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero);
-			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
+			var originPos = caster.Position;
+			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 
-			skill.Run(this.HandleSkill(caster, target, skill));
+			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill)
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, caster.Position, target.Position, length: 80, width: 10, angle: 10f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 10);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 			var hitDelay = 400 + (int)(caster.Position.Get2DDistance(target.Position) * 4.6);
 			var aniTime = hitDelay + 200;
+			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
