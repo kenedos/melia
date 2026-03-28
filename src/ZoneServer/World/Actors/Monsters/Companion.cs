@@ -182,6 +182,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			Send.ZC_OBJECT_PROPERTY(this.Owner.Connection, this, PropertyName.IsActivated);
 			if (isActive)
 			{
+				this.Map?.RemoveMonster(this);
 				this.Map = this.Owner.Map;
 				this.Layer = this.Owner.Layer;
 				this.OwnerHandle = this.Owner.Handle;
