@@ -437,20 +437,19 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.EyesOpen)
 				return;
 
-			// Fill reusable scratch sets with currently visible entities
-			_currentVisMonsters.Clear();
-			this.Map.GetVisibleMonsters(this, _currentVisMonsters);
-
-			_currentVisChars.Clear();
-			this.Map.GetVisibleCharacters(this, _currentVisChars);
-
-			_currentVisPads.Clear();
-			this.Map.GetVisiblePads(this, _currentVisPads);
-
 			int sentCount;
 
 			lock (_lookAroundLock)
 			{
+				// Fill reusable scratch sets with currently visible entities
+				_currentVisMonsters.Clear();
+				this.Map.GetVisibleMonsters(this, _currentVisMonsters);
+
+				_currentVisChars.Clear();
+				this.Map.GetVisibleCharacters(this, _currentVisChars);
+
+				_currentVisPads.Clear();
+				this.Map.GetVisiblePads(this, _currentVisPads);
 				// Compute appeared characters
 				_tempAppearChars.Clear();
 				foreach (var c in _currentVisChars)
@@ -758,20 +757,23 @@ namespace Melia.Zone.World.Actors.Characters
 
 			lock (_lookAroundLock)
 			{
-				foreach (var monster in _visibleMonsters)
-					Send.ZC_LEAVE(this.Connection, monster);
-
-				foreach (var character in _visibleCharacters)
-					Send.ZC_LEAVE(this.Connection, character);
-
-				// Clean up all observed pads (includes those we walked out of range from)
-				foreach (var pad in _observedPads)
-					pad.Observers.RemoveObserver(this);
+				var monsters = _visibleMonsters.ToArray();
+				var characters = _visibleCharacters.ToArray();
+				var pads = _observedPads.ToArray();
 
 				_visibleMonsters.Clear();
 				_visibleCharacters.Clear();
 				_visiblePads.Clear();
 				_observedPads.Clear();
+
+				foreach (var monster in monsters)
+					Send.ZC_LEAVE(this.Connection, monster);
+
+				foreach (var character in characters)
+					Send.ZC_LEAVE(this.Connection, character);
+
+				foreach (var pad in pads)
+					pad.Observers.RemoveObserver(this);
 			}
 		}
 		#endregion

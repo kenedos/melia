@@ -231,27 +231,37 @@
 { mapClassName: "d_limestonecave_52_1", items: [
 	{ itemId: 649009, chance: 0.068 }, // Phydecium
 	{ itemId: 649010, chance: 0.068 }, // Ferinium
-	{ itemId: 649011, chance: 0.068 }  // Portium
+	{ itemId: 649011, chance: 0.068 }, // Portium
+	{ itemId: 649008, chance: 0.068 }, // Chromite
+	{ itemId: 649016, chance: 0.068 }  // Absidium Ore
 ]},
 { mapClassName: "d_limestonecave_52_2", items: [
 	{ itemId: 649009, chance: 0.075 }, // Phydecium
 	{ itemId: 649010, chance: 0.075 }, // Ferinium
-	{ itemId: 649011, chance: 0.075 }  // Portium
+	{ itemId: 649011, chance: 0.075 }, // Portium
+	{ itemId: 649008, chance: 0.075 }, // Chromite
+	{ itemId: 649016, chance: 0.075 }  // Absidium Ore
 ]},
 { mapClassName: "d_limestonecave_52_3", items: [
 	{ itemId: 649009, chance: 0.083 }, // Phydecium
 	{ itemId: 649010, chance: 0.083 }, // Ferinium
-	{ itemId: 649011, chance: 0.083 }  // Portium
+	{ itemId: 649011, chance: 0.083 }, // Portium
+	{ itemId: 649008, chance: 0.083 }, // Chromite
+	{ itemId: 649016, chance: 0.083 }  // Absidium Ore
 ]},
 { mapClassName: "d_limestonecave_52_4", items: [
 	{ itemId: 649009, chance: 0.091 }, // Phydecium
 	{ itemId: 649010, chance: 0.091 }, // Ferinium
-	{ itemId: 649011, chance: 0.091 }  // Portium
+	{ itemId: 649011, chance: 0.091 }, // Portium
+	{ itemId: 649008, chance: 0.091 }, // Chromite
+	{ itemId: 649016, chance: 0.091 }  // Absidium Ore
 ]},
 { mapClassName: "d_limestonecave_52_5", items: [
 	{ itemId: 649009, chance: 0.100 }, // Phydecium
 	{ itemId: 649010, chance: 0.100 }, // Ferinium
-	{ itemId: 649011, chance: 0.100 }  // Portium
+	{ itemId: 649011, chance: 0.100 }, // Portium
+	{ itemId: 649008, chance: 0.100 }, // Chromite
+	{ itemId: 649016, chance: 0.100 }  // Absidium Ore
 ]},
 
 // ============================================================================
@@ -351,7 +361,6 @@
 	{ itemId: 649002, chance: 0.100 }, // Steel Ore
 	{ itemId: 649003, chance: 0.074 }, // Titanium Ore
 	{ itemId: 649004, chance: 0.050 }, // Mithril Ore
-	{ itemId: 649016, chance: 0.037 }, // Absidium Ore
 	{ itemId: 649005, chance: 0.024 }  // Orichalcum Ore
 ]},
 { mapClassName: "d_prison_62_2", items: [
@@ -360,7 +369,6 @@
 	{ itemId: 649002, chance: 0.110 }, // Steel Ore
 	{ itemId: 649003, chance: 0.082 }, // Titanium Ore
 	{ itemId: 649004, chance: 0.054 }, // Mithril Ore
-	{ itemId: 649016, chance: 0.041 }, // Absidium Ore
 	{ itemId: 649005, chance: 0.028 }  // Orichalcum Ore
 ]},
 { mapClassName: "d_prison_62_3", items: [
@@ -369,7 +377,6 @@
 	{ itemId: 649002, chance: 0.120 }, // Steel Ore
 	{ itemId: 649003, chance: 0.090 }, // Titanium Ore
 	{ itemId: 649004, chance: 0.060 }, // Mithril Ore
-	{ itemId: 649016, chance: 0.045 }, // Absidium Ore
 	{ itemId: 649005, chance: 0.030 }  // Orichalcum Ore
 ]},
 

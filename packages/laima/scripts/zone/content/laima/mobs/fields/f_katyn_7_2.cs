@@ -180,8 +180,7 @@ public class FKatyn72MobScript : GeneralScript
 		AddSpawnPoint("f_katyn_7_2.Id11", "f_katyn_7_2", Rectangle(1838, 932, 30));
 
 		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Throneweaver, "f_katyn_7_2", 1, TimeSpan.FromHours(6), TimeSpan.FromHours(12));
-		AddBossSpawner(MonsterId.Boss_Fallen_Statue, "f_katyn_7_2", 1, TimeSpan.FromHours(6), TimeSpan.FromHours(12));
-		AddBossSpawner(MonsterId.Boss_Golem_Gray, "f_katyn_7_2", 1, TimeSpan.FromHours(6), TimeSpan.FromHours(12));
+		AddBossSpawner(MonsterId.Boss_Throneweaver, "f_katyn_7_2", 1, Hours(2), Hours(4));
+		AddBossSpawner(MonsterId.Boss_Werewolf, "f_katyn_7_2", 1, Hours(2), Hours(4));
 	}
 }

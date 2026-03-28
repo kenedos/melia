@@ -317,5 +317,8 @@ public class DAbbey225MobScript : GeneralScript
 		AddSpawnPoint("d_abbey_22_5.Id10", "d_abbey_22_5", Rectangle(-1344, -912, 20));
 		AddSpawnPoint("d_abbey_22_5.Id10", "d_abbey_22_5", Rectangle(-1442, -709, 20));
 		AddSpawnPoint("d_abbey_22_5.Id10", "d_abbey_22_5", Rectangle(-1368, -751, 20));
+
+		// Boss Spawners ---------------------------------
+		AddBossSpawner(MonsterId.Boss_Durahan, "d_abbey_22_5", 1, Hours(2), Hours(4));
 	}
 }

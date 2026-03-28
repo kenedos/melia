@@ -315,5 +315,8 @@ public class DAbbey224MobScript : GeneralScript
 		AddSpawnPoint("d_abbey_22_4.Id9", "d_abbey_22_4", Rectangle(-585, -1060, 40));
 		AddSpawnPoint("d_abbey_22_4.Id9", "d_abbey_22_4", Rectangle(-65, -1126, 40));
 		AddSpawnPoint("d_abbey_22_4.Id9", "d_abbey_22_4", Rectangle(1245, 1286, 40));
+
+		// Boss Spawners ---------------------------------
+		AddBossSpawner(MonsterId.Boss_Unicorn, "d_abbey_22_4", 1, Hours(2), Hours(4));
 	}
 }

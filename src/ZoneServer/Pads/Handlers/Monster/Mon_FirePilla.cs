@@ -56,7 +56,11 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			PadDamageEnemy(pad, 1f, 0, 0, "None", 1, 0f, 0f);
+			foreach (var target in pad.Trigger.GetAttackableEntities(creator))
+			{
+				var skillHitResult = SCR_SkillHit(creator, target, skill);
+				PadTargetBuff(pad, target, RelationType.Enemy, 0, 0, BuffId.Mon_FirePilla, skill.Level, (int)skillHitResult.Damage, 3000, 1, 100);
+			}
 		}
 
 		public void Left(object sender, PadTriggerActorArgs args)
