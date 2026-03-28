@@ -35,8 +35,5 @@ public class DVelniasprison515WarpsScript : GeneralScript
 		AddWarpPortal(From("d_velniasprison_51_5", 118, -638), To("d_velniasprison_51_5", -2095, 43));
 
 		AddWarpPortal(From("d_velniasprison_51_5", 1075, -679), To("d_velniasprison_51_5", 2247, 169));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Marnoks, "d_velniasprison_51_5", 1, Hours(2), Hours(4));
 	}
 }

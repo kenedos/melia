@@ -229,5 +229,8 @@ public class DVelniasprison515MobScript : GeneralScript
 		// 'Hohen_Gulak' Spawn Points
 		AddSpawnPoint("d_velniasprison_51_5.Id11", "d_velniasprison_51_5", Rectangle(2102, 63, 300));
 		AddSpawnPoint("d_velniasprison_51_5.Id11", "d_velniasprison_51_5", Rectangle(2450, 45, 300));
+
+		// Boss Spawners ---------------------------------
+		AddBossSpawner(MonsterId.Boss_Marnoks, "d_velniasprison_51_5", 1, Hours(2), Hours(4));
 	}
 }
