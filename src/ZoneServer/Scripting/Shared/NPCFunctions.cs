@@ -129,6 +129,8 @@ namespace Melia.Zone.Scripting.Shared
 		/// <returns></returns>
 		public static async Task TREASUREBOX_LV(Dialog dialog, string className, int amount, string itemRequiredToUnlock = "")
 		{
+			if (dialog.Npc != null && dialog.Player.GetMapNPCState(dialog.Npc) == NpcState.Invisible)
+				return;
 			if (!string.IsNullOrEmpty(itemRequiredToUnlock) && dialog.Player.RemoveItem(itemRequiredToUnlock) > 0)
 				return;
 			await OpenChest(dialog.Player, dialog.Npc);

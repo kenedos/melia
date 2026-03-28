@@ -719,7 +719,7 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var monster in _monsters.Values)
 				{
-					if (monster is Npc npc && npc.State == NpcState.Invisible)
+					if (monster is Npc npc && (npc.State == NpcState.Invisible || character.GetMapNPCState(npc) == NpcState.Invisible))
 						continue;
 
 					if (!character.Position.InRange2D(monster.Position, VisibleRange))
@@ -741,7 +741,7 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var monster in _monsters.Values)
 				{
-					if (monster is Npc npc && npc.State == NpcState.Invisible)
+					if (monster is Npc npc && (npc.State == NpcState.Invisible || character.GetMapNPCState(npc) == NpcState.Invisible))
 						continue;
 
 					if (!character.Position.InRange2D(monster.Position, VisibleRange))

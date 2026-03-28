@@ -350,11 +350,11 @@ namespace Melia.Zone.Scripting
 			if (disappearOnOpen)
 				npc.DisappearTime = DateTime.Now.AddSeconds(3);
 
+			npc.SetState(NpcState.Invisible);
 			character.SetMapNPCState(npc, NpcState.Invisible);
 
-			// Make chest reappear after a certain amount of time
-			// TODO: Add timer component, to set up and associate timers
-			//   and intervals with entities.
+			// Make chest reappear after a certain amount of time for
+			// characters that haven't opened it yet.
 			_ = Task.Delay(TimeSpan.FromMinutes(1)).ContinueWith(_ => { if (npc?.Map != null) npc.SetState(NpcState.Normal); });
 		}
 
