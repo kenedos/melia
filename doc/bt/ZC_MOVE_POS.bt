@@ -19,6 +19,6 @@ int handle;
 position fromPos;
 position toPos;
 float speed;
-float f2;
+float time;
 byte b1;
 byte gap1[3];
