@@ -4,6 +4,7 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Network.Inter.Messages;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Logging;
 using Yggdrasil.Network.Communication;
@@ -297,6 +298,65 @@ namespace Melia.Zone.World
 				// Send all members in a single packet
 				Send.ZC_NORMAL.DungeonAutoMatchPartyCount(character.Connection, memberStrings);
 			}
+		}
+
+		/// <summary>
+		/// Handles the auto match content initialization message from SocialServer.
+		/// Creates a party for matched players and warps them to the dungeon.
+		/// </summary>
+		public void HandleInitAutoMatchContent(InitAutoMatchContentMessage message)
+		{
+			var world = ZoneServer.Instance.World;
+
+			// Find all characters on this zone server that are part of the match
+			var matchedCharacters = new List<Character>();
+			foreach (var characterDbId in message.CharacterDbIds)
+			{
+				var character = world.GetCharacter(c => c.DbId == characterDbId);
+				if (character != null)
+					matchedCharacters.Add(character);
+			}
+
+			if (matchedCharacters.Count == 0)
+			{
+				Log.Debug("InitAutoMatchContentMessage: No matched characters found on this zone server.");
+				return;
+			}
+
+			// Remove all matched characters from their existing parties
+			foreach (var character in matchedCharacters)
+			{
+				if (character.HasParty)
+				{
+					var existingParty = character.Connection.Party;
+					existingParty.RemoveMember(character);
+				}
+			}
+
+			// Use the first matched character as the leader
+			var leader = matchedCharacters[0];
+
+			// Create a dungeon session with the AutoMatchZoneManager
+			var session = this.CreateDungeonSession(leader, message.AutoMatchId, message.DungeonId);
+
+			// Add remaining characters to the session/party
+			for (var i = 1; i < matchedCharacters.Count; i++)
+			{
+				session.AddMember(matchedCharacters[i]);
+			}
+
+			// Store player count and clear any stale instance references on all characters
+			foreach (var character in matchedCharacters)
+			{
+				character.Variables.Temp.SetInt(PlayersCountVarName, message.CharacterDbIds.Count);
+				character.Variables.Perm.SetString(DungeonScript.ActiveInstanceVarName, null);
+			}
+
+			Log.Info("InitAutoMatchContentMessage: Created party for {0} players for dungeon id '{1}' (AutoMatchId: {2}).",
+				matchedCharacters.Count, message.DungeonId, message.AutoMatchId);
+
+			// Warp all players to the dungeon using the centralized dungeon warp method
+			DungeonScript.WarpPartyToDungeon(matchedCharacters, message.DungeonId);
 		}
 
 		/// <summary>
