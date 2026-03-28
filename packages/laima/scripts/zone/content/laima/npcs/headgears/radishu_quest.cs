@@ -62,9 +62,6 @@ public class RadishuQuestScript : QuestScript
 				if (player.Inventory.HasItem(AshrongStemId, AshrongStemAmount) &&
 					player.Inventory.HasItem(CronewtBonesId, CronewtBonesAmount))
 				{
-					player.Inventory.RemoveItem(AshrongStemId, AshrongStemAmount);
-					player.Inventory.RemoveItem(CronewtBonesId, CronewtBonesAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*excitedly examines the materials*{/} Perfect! These stems will break down beautifully, and the bones... they'll add just the right minerals to the soil!"));
 					await dialog.Msg(L("{#666666}*mixes the compost and tends to a special plot*{/} Would you look at that! The radish is already sprouting! Here, take this one - it grew so fast it popped right out of the ground wearing its own little hat!"));
@@ -99,5 +96,11 @@ public class RadishuQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*sighs and returns to tending the wilted crops*{/} Can't blame you. These old bones aren't what they used to be either... Maybe next time."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(AshrongStemId, AshrongStemAmount);
+		character.Inventory.RemoveItem(CronewtBonesId, CronewtBonesAmount);
 	}
 }

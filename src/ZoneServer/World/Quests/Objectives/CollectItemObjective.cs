@@ -86,7 +86,7 @@ namespace Melia.Zone.World.Quests.Objectives
 
 			character.Quests.UpdateObjectives<CollectItemObjective>((quest, objective, progress) =>
 			{
-				if (objective.ItemId == itemId && !progress.Done)
+				if (objective.ItemId == itemId)
 				{
 					progress.Count = Math.Min(objective.TargetCount, character.Inventory.CountItem(objective.ItemId));
 					progress.Done = progress.Count >= objective.TargetCount;

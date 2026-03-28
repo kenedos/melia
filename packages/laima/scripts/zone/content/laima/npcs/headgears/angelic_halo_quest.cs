@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class AngelicHaloQuestScript : QuestScript
 {
@@ -64,8 +65,6 @@ public class AngelicHaloQuestScript : QuestScript
 				if (player.Inventory.HasItem(ResinId, ResinAmount) &&
 					player.Inventory.HasItem(InfroburgShellId, InfroburgShellAmount))
 				{
-					player.Inventory.RemoveItem(ResinId, ResinAmount);
-					player.Inventory.RemoveItem(InfroburgShellId, InfroburgShellAmount);
 					player.Quests.Complete(QuestId);
 
 					await dialog.Msg(L("{#666666}*accepts the materials with reverence*{/}"));
@@ -101,5 +100,11 @@ public class AngelicHaloQuestScript : QuestScript
 				await dialog.Msg(L("I understand. The path of service is not for everyone. May the goddesses watch over you nonetheless."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(ResinId, ResinAmount);
+		character.Inventory.RemoveItem(InfroburgShellId, InfroburgShellAmount);
 	}
 }

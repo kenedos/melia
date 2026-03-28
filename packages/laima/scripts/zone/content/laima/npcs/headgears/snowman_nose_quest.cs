@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class SnowmanNoseQuestScript : QuestScript
 {
@@ -62,9 +63,6 @@ public class SnowmanNoseQuestScript : QuestScript
 				if (player.Inventory.HasItem(WhiteSpionFurId, WhiteSpionFurAmount) &&
 					player.Inventory.HasItem(BlueHarugalManeId, BlueHarugalManeAmount))
 				{
-					player.Inventory.RemoveItem(WhiteSpionFurId, WhiteSpionFurAmount);
-					player.Inventory.RemoveItem(BlueHarugalManeId, BlueHarugalManeAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*eagerly takes the materials and begins weaving them together with practiced hands*{/}"));
 					await dialog.Msg(L("Ha! Look at this beauty! The fur makes it soft to the touch, and the mane gives it that distinctive blue-white shimmer of the frozen peaks."));
@@ -95,5 +93,11 @@ public class SnowmanNoseQuestScript : QuestScript
 			default:
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(WhiteSpionFurId, WhiteSpionFurAmount);
+		character.Inventory.RemoveItem(BlueHarugalManeId, BlueHarugalManeAmount);
 	}
 }

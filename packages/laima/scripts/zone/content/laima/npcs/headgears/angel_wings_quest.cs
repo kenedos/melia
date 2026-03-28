@@ -62,9 +62,6 @@ public class AngelWingsQuestScript : QuestScript
 				if (player.Inventory.HasItem(ResinId, ResinAmount) &&
 					player.Inventory.HasItem(InfroburkShellId, InfroburkShellAmount))
 				{
-					player.Inventory.RemoveItem(ResinId, ResinAmount);
-					player.Inventory.RemoveItem(InfroburkShellId, InfroburkShellAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*takes the materials with reverent care, crafting beneath the shadow of the tomb*{/}"));
 					await dialog.Msg(L("The resin of the ancient trees holds memories of this garden's sacred past. The shells provide the structure, resilient yet light. Together... they become something divine."));
@@ -100,5 +97,11 @@ public class AngelWingsQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*turns back toward the tomb*{/} The guardian waits patiently. They have waited for centuries... a little longer matters not."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(ResinId, ResinAmount);
+		character.Inventory.RemoveItem(InfroburkShellId, InfroburkShellAmount);
 	}
 }

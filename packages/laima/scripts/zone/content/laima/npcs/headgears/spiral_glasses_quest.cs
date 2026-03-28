@@ -59,9 +59,6 @@ public class SpiralGlassesQuestScript : QuestScript
 				if (player.Inventory.HasItem(VubbeTokenId, 50) &&
 					player.Inventory.HasItem(StoneOrcaCoreId, 200))
 				{
-					player.Inventory.RemoveItem(VubbeTokenId, 50);
-					player.Inventory.RemoveItem(StoneOrcaCoreId, 200);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("Perfect! These will work wonderfully. Here are your Spiral Glasses - they'll help you spot treasures others might miss!"));
 
@@ -99,5 +96,11 @@ public class SpiralGlassesQuestScript : QuestScript
 		{
 			await dialog.Msg(L("Well, if you change your mind, you know where to find me. These old glasses won't last much longer..."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(VubbeTokenId, 50);
+		character.Inventory.RemoveItem(StoneOrcaCoreId, 200);
 	}
 }

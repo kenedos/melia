@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class CloudQuestScript : QuestScript
 {
@@ -57,7 +58,6 @@ public class CloudQuestScript : QuestScript
 			{
 				if (player.Inventory.HasItem(SiaulambFurLeafId, SiaulambFurLeafAmount))
 				{
-					player.Inventory.RemoveItem(SiaulambFurLeafId, SiaulambFurLeafAmount);
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*carefully arranges the soft leaves into a fluffy shape*{/}"));
 					await dialog.Msg(L("Magnificent! Look at how they catch the light from the waterfall's mist. Here, take this Cloud headpiece. Whenever you wear it, may you feel as free as the clouds drifting over these waters."));
@@ -89,5 +89,10 @@ public class CloudQuestScript : QuestScript
 				await dialog.Msg(L("I understand. Dreams can wait... they always do. But the clouds will still be here when you return."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(SiaulambFurLeafId, SiaulambFurLeafAmount);
 	}
 }

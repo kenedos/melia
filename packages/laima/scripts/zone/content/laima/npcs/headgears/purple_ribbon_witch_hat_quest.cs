@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class PurpleRibbonWitchHatQuestScript : QuestScript
 {
@@ -63,8 +64,6 @@ public class PurpleRibbonWitchHatQuestScript : QuestScript
 				if (player.Inventory.HasItem(HighVubbeTokenId, HighVubbeTokenAmount) &&
 					player.Inventory.HasItem(BushspiderLeafId, BushspiderLeafAmount))
 				{
-					player.Inventory.RemoveItem(HighVubbeTokenId, HighVubbeTokenAmount);
-					player.Inventory.RemoveItem(BushspiderLeafId, BushspiderLeafAmount);
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*Morvenna's eyes gleam as she examines the materials, her gnarled fingers weaving through the air*{/}"));
 					await dialog.Msg(L("Excellent... The Vubbe tokens carry traces of their tribal magic, and the spider leaves still pulse with forest essence. These will serve well."));
@@ -96,5 +95,11 @@ public class PurpleRibbonWitchHatQuestScript : QuestScript
 				await dialog.Msg(L("So be it. But remember, child... the owls never forget those who turned away from the graves. Walk carefully in these woods."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(HighVubbeTokenId, HighVubbeTokenAmount);
+		character.Inventory.RemoveItem(BushspiderLeafId, BushspiderLeafAmount);
 	}
 }

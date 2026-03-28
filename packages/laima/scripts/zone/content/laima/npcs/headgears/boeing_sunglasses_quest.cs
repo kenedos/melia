@@ -59,9 +59,6 @@ public class BoeingSunglassesQuestScript : QuestScript
 				if (player.Inventory.HasItem(LauzininteSkinId, 50) &&
 					player.Inventory.HasItem(HogmaTuskId, 30))
 				{
-					player.Inventory.RemoveItem(LauzininteSkinId, 50);
-					player.Inventory.RemoveItem(HogmaTuskId, 30);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*examines the materials carefully* Excellent! The Lauzinute skins and Hogma tusks provide clear evidence of the creatures' presence and behavior."));
 					await dialog.Msg(L("Here, take these sunglasses. They were part of my field equipment, but I think you've earned them more than I have. Stay safe out there."));
@@ -97,5 +94,11 @@ public class BoeingSunglassesQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*nods understandingly* I understand. If you change your mind, I'll be here... keeping a safe distance from those Hogmas."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(LauzininteSkinId, 50);
+		character.Inventory.RemoveItem(HogmaTuskId, 30);
 	}
 }

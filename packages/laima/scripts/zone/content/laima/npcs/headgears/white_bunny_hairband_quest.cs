@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class WhiteBunnyHairbandQuestScript : QuestScript
 {
@@ -66,8 +67,6 @@ public class WhiteBunnyHairbandQuestScript : QuestScript
 				if (player.Inventory.HasItem(LepusbunnyHairId, LepusbunnyHairAmount) &&
 					player.Inventory.HasItem(WhiteChainId, WhiteChainAmount))
 				{
-					player.Inventory.RemoveItem(LepusbunnyHairId, LepusbunnyHairAmount);
-					player.Inventory.RemoveItem(WhiteChainId, WhiteChainAmount);
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*deftly weaves the fur into a delicate hairband*{/}"));
 					await dialog.Msg(L("Just wonderful! Feel how soft it is. Here, take it, you've more than earned it."));
@@ -95,5 +94,11 @@ public class WhiteBunnyHairbandQuestScript : QuestScript
 				await dialog.Msg(L("That's alright, dear. I'll be here if you change your mind."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(LepusbunnyHairId, LepusbunnyHairAmount);
+		character.Inventory.RemoveItem(WhiteChainId, WhiteChainAmount);
 	}
 }

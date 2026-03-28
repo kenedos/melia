@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class PancakeQuestScript : QuestScript
 {
@@ -61,9 +62,6 @@ public class PancakeQuestScript : QuestScript
 				if (player.Inventory.HasItem(HoneybeanStingerId, HoneybeanStingerAmount) &&
 					player.Inventory.HasItem(RabbeeFurId, RabbeeFurAmount))
 				{
-					player.Inventory.RemoveItem(HoneybeanStingerId, HoneybeanStingerAmount);
-					player.Inventory.RemoveItem(RabbeeFurId, RabbeeFurAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*excitedly takes the materials and begins crafting*{/}"));
 					await dialog.Msg(L("Magnificent! The stingers will give it that authentic honey sheen, and the fur will make it wonderfully soft - just like a real pancake fresh off the griddle! Here, take this. May it bring sweetness to your adventures!"));
@@ -93,5 +91,11 @@ public class PancakeQuestScript : QuestScript
 			default:
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(HoneybeanStingerId, HoneybeanStingerAmount);
+		character.Inventory.RemoveItem(RabbeeFurId, RabbeeFurAmount);
 	}
 }

@@ -12,6 +12,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class HuckleberryHairAccessoryQuestScript : QuestScript
 {
@@ -74,8 +75,6 @@ public class HuckleberryHairAccessoryQuestScript : QuestScript
 				if (player.Inventory.HasItem(PinoStemId, PinoStemAmount) &&
 					player.Inventory.HasItem(GeppettoLeafId, GeppettoLeafAmount))
 				{
-					player.Inventory.RemoveItem(PinoStemId, PinoStemAmount);
-					player.Inventory.RemoveItem(GeppettoLeafId, GeppettoLeafAmount);
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*carefully weaves the materials together*{/}"));
 					await dialog.Msg(L("Perfect! The stems are just the right texture, and look how the leaves catch the light."));
@@ -105,5 +104,11 @@ public class HuckleberryHairAccessoryQuestScript : QuestScript
 				await dialog.Msg(L("That's alright. The pollen will be here for a while yet if you change your mind."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(PinoStemId, PinoStemAmount);
+		character.Inventory.RemoveItem(GeppettoLeafId, GeppettoLeafAmount);
 	}
 }

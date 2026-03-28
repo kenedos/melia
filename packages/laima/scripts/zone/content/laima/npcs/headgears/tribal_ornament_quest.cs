@@ -59,9 +59,6 @@ public class TribalOrnamentQuestScript : QuestScript
 				if (player.Inventory.HasItem(UltanunFeather, 120) &&
 					player.Inventory.HasItem(LoxodonIvory, 1))
 				{
-					player.Inventory.RemoveItem(UltanunFeather, 120);
-					player.Inventory.RemoveItem(LoxodonIvory, 1);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*works with practiced hands* Yes... the spirits of the Ultanun and Loxodon flow through these materials. Wear this ornament with pride - it carries the essence of our traditions."));
 
@@ -95,5 +92,11 @@ public class TribalOrnamentQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*returns to his crafting* The spirits will wait. Return when you feel their call."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(UltanunFeather, 120);
+		character.Inventory.RemoveItem(LoxodonIvory, 1);
 	}
 }

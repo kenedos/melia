@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class GrouchoGlassesQuestScript : QuestScript
 {
@@ -65,8 +66,6 @@ public class GrouchoGlassesQuestScript : QuestScript
 				if (player.Inventory.HasItem(HallowventerHandBonesId, HallowventerHandBonesAmount) &&
 					player.Inventory.HasItem(GravegolemCoreId, GravegolemCoreAmount))
 				{
-					player.Inventory.RemoveItem(HallowventerHandBonesId, HallowventerHandBonesAmount);
-					player.Inventory.RemoveItem(GravegolemCoreId, GravegolemCoreAmount);
 					player.Quests.Complete(QuestId);
 
 					await dialog.Msg(L("{#666666}*grabs the materials with trembling hands*{/}"));
@@ -104,5 +103,11 @@ public class GrouchoGlassesQuestScript : QuestScript
 				await dialog.Msg(L("I... I understand. It is dangerous out there. Maybe I'll find another way... or maybe I'll just stay hidden here forever."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(HallowventerHandBonesId, HallowventerHandBonesAmount);
+		character.Inventory.RemoveItem(GravegolemCoreId, GravegolemCoreAmount);
 	}
 }

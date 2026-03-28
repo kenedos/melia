@@ -59,9 +59,6 @@ public class SoldierHatQuestScript : QuestScript
 				if (player.Inventory.HasItem(ShreddedClothId, 1) &&
 					player.Inventory.HasItem(YekubiteAntennaeId, 150))
 				{
-					player.Inventory.RemoveItem(ShreddedClothId, 1);
-					player.Inventory.RemoveItem(YekubiteAntennaeId, 150);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("Excellent specimens! The research department will be pleased. Here's your Soldier Hat - straight from the guild's special collection."));
 
@@ -99,5 +96,11 @@ public class SoldierHatQuestScript : QuestScript
 		{
 			await dialog.Msg(L("No problem, I'll keep collecting. Stop by if you change your mind - the guild always needs help!"));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(ShreddedClothId, 1);
+		character.Inventory.RemoveItem(YekubiteAntennaeId, 150);
 	}
 }

@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class HornedHatQuestScript : QuestScript
 {
@@ -61,9 +62,6 @@ public class HornedHatQuestScript : QuestScript
 				if (player.Inventory.HasItem(MoyaFragmentId, MoyaFragmentAmount) &&
 					player.Inventory.HasItem(BavonFeatherId, BavonFeatherAmount))
 				{
-					player.Inventory.RemoveItem(MoyaFragmentId, MoyaFragmentAmount);
-					player.Inventory.RemoveItem(BavonFeatherId, BavonFeatherAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*carefully arranges the materials on a worn workbench*{/}"));
 					await dialog.Msg(L("Remarkable... these fragments still pulse with residual energy. And the feathers from those flying creatures carry traces of the storm that accompanied the curse."));
@@ -93,5 +91,11 @@ public class HornedHatQuestScript : QuestScript
 				await dialog.Msg(L("{#666666}*returns to examining a petrified merchant stall*{/} The stones here have many secrets to tell. Return if you change your mind."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(MoyaFragmentId, MoyaFragmentAmount);
+		character.Inventory.RemoveItem(BavonFeatherId, BavonFeatherAmount);
 	}
 }

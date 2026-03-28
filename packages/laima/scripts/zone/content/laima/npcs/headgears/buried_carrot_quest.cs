@@ -59,9 +59,6 @@ public class BuriedCarrotQuestScript : QuestScript
 			{
 				if (player.Inventory.HasItem(TruffleCrystalId, 60) && player.Inventory.HasItem(GrollHornId, 30))
 				{
-					player.Inventory.RemoveItem(TruffleCrystalId, 60);
-					player.Inventory.RemoveItem(GrollHornId, 30);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*carefully arranges the materials, grinding and mixing them together*{/}"));
 					await dialog.Msg(L("Remarkable! The crystal essence combined with the ground horn creates this earth-toned pigment... and look! It has formed into the shape of a carrot! A buried carrot, if you will."));
@@ -97,5 +94,11 @@ public class BuriedCarrotQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*returns to digging*{/} Very well. I shall continue my search for those elusive cauliflowers..."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(TruffleCrystalId, 60);
+		character.Inventory.RemoveItem(GrollHornId, 30);
 	}
 }

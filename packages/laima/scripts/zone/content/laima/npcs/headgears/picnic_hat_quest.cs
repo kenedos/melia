@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class PicnicHatQuestScript : QuestScript
 {
@@ -60,9 +61,6 @@ public class PicnicHatQuestScript : QuestScript
 				if (player.Inventory.HasItem(SiaulambMaskId, 50) &&
 					player.Inventory.HasItem(DilgeleId, 30))
 				{
-					player.Inventory.RemoveItem(SiaulambMaskId, 50);
-					player.Inventory.RemoveItem(DilgeleId, 30);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*Mila's eyes light up with joy*{/}"));
 					await dialog.Msg(L("Wow! These are so pretty! Look at all the colors!"));
@@ -94,5 +92,11 @@ public class PicnicHatQuestScript : QuestScript
 			default:
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(SiaulambMaskId, 50);
+		character.Inventory.RemoveItem(DilgeleId, 30);
 	}
 }

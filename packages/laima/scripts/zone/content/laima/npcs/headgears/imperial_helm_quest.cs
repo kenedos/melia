@@ -60,9 +60,6 @@ public class ImperialHelmQuestScript : QuestScript
 				if (player.Inventory.HasItem(AshWoodId, 80) &&
 					player.Inventory.HasItem(TamaSkinId, 60))
 				{
-					player.Inventory.RemoveItem(AshWoodId, 80);
-					player.Inventory.RemoveItem(TamaSkinId, 60);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*examines the materials with scholarly precision*{/}"));
 					await dialog.Msg(L("Magnificent! The ash wood's grain is perfect, and this Tama skin... exceptional quality. Watch closely..."));
@@ -101,5 +98,11 @@ public class ImperialHelmQuestScript : QuestScript
 			await dialog.Msg(L("{#666666}*nods understandingly*{/}"));
 			await dialog.Msg(L("I understand. The ruins will still be here when you return. These stones have waited for ages - they shall wait a while longer."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(AshWoodId, 80);
+		character.Inventory.RemoveItem(TamaSkinId, 60);
 	}
 }

@@ -59,9 +59,6 @@ public class PolkaDotRibbonQuestScript : QuestScript
 				if (player.Inventory.HasItem(MageCoreId, 10) &&
 					player.Inventory.HasItem(MageStaffId, 3))
 				{
-					player.Inventory.RemoveItem(MageCoreId, 10);
-					player.Inventory.RemoveItem(MageStaffId, 3);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*dances while crafting* Yes, yes, YES! Watch the magic swirl... see the dots appear... *giggles* Here you are! Isn't it just the most delightful thing you've ever seen?"));
 
@@ -95,5 +92,11 @@ public class PolkaDotRibbonQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*pouts briefly before twirling* Well, the dots will be here waiting when you're ready for their sparkly magic!"));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(MageCoreId, 10);
+		character.Inventory.RemoveItem(MageStaffId, 3);
 	}
 }

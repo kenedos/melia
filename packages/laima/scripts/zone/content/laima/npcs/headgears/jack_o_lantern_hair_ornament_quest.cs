@@ -12,6 +12,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class JackOLanternHairOrnamentQuestScript : QuestScript
 {
@@ -68,7 +69,6 @@ public class JackOLanternHairOrnamentQuestScript : QuestScript
 			{
 				if (player.Inventory.HasItem(HallowventerHandBonesId, HallowventerHandBonesAmount))
 				{
-					player.Inventory.RemoveItem(HallowventerHandBonesId, HallowventerHandBonesAmount);
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*Garvyn's weathered hands work with surprising delicacy, shaping the bones*{/}"));
 					await dialog.Msg(L("There we are... a little Jack-O-Lantern, just like I used to make for the children. The bones give it an eerie glow - fitting for this haunted place."));
@@ -97,5 +97,10 @@ public class JackOLanternHairOrnamentQuestScript : QuestScript
 				await dialog.Msg(L("I understand. It's dangerous work, hunting ghosts. I'll be here if you change your mind - not like I have anywhere else to go."));
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(HallowventerHandBonesId, HallowventerHandBonesAmount);
 	}
 }

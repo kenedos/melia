@@ -62,9 +62,6 @@ public class CozyPolarBearEarsQuestScript : QuestScript
 				if (player.Inventory.HasItem(BlueCronewtLeatherId, BlueCronewtLeatherAmount) &&
 					player.Inventory.HasItem(BlueHohenManeId, BlueHohenManeAmount))
 				{
-					player.Inventory.RemoveItem(BlueCronewtLeatherId, BlueCronewtLeatherAmount);
-					player.Inventory.RemoveItem(BlueHohenManeId, BlueHohenManeAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*examines the materials with practiced hands*{/} Excellent quality! The leather from those blue Cronewts is naturally resistant to frost - it never quite thaws, which makes it perfect for insulation."));
 					await dialog.Msg(L("{#666666}*carefully stitches and shapes the materials*{/} And these Hohen manes... thick and soft, they'll keep the bitter wind from reaching your ears. There we go - a proper pair of polar bear ears!"));
@@ -99,5 +96,11 @@ public class CozyPolarBearEarsQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*nods knowingly*{/} The plateau will still be here when you're ready. Stay warm out there, traveler."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(BlueCronewtLeatherId, BlueCronewtLeatherAmount);
+		character.Inventory.RemoveItem(BlueHohenManeId, BlueHohenManeAmount);
 	}
 }

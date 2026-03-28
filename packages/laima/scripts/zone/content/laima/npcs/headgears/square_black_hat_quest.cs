@@ -59,9 +59,6 @@ public class SquareBlackHatQuestScript : QuestScript
 				if (player.Inventory.HasItem(TinyBrownBoneId, 120) &&
 					player.Inventory.HasItem(TinyBrownHornId, 2))
 				{
-					player.Inventory.RemoveItem(TinyBrownBoneId, 120);
-					player.Inventory.RemoveItem(TinyBrownHornId, 2);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*examines materials thoroughly* Yes, yes! These specimens are perfect! Here's your Square Black Hat - quite distinguished, if I do say so myself."));
 
@@ -95,5 +92,11 @@ public class SquareBlackHatQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*returns to reading* Very well. The pursuit of knowledge waits for those who are ready."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(TinyBrownBoneId, 120);
+		character.Inventory.RemoveItem(TinyBrownHornId, 2);
 	}
 }

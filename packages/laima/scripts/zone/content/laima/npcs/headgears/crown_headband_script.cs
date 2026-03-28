@@ -56,8 +56,6 @@ public class CrownHeadbandQuestScript : QuestScript
 			{
 				if (player.Inventory.HasItem(FerretFur, 300))
 				{
-					player.Inventory.RemoveItem(FerretFur, 300);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*examines materials with approval* Yes... yes, these will do nicely. *crafts with precise movements* Behold, a crown headband that speaks of refinement and taste. Do wear it with the dignity it deserves."));
 
@@ -91,5 +89,10 @@ public class CrownHeadbandQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*returns to arranging materials* Very well. Quality craftsmanship cannot be rushed, after all."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(FerretFur, 300);
 	}
 }

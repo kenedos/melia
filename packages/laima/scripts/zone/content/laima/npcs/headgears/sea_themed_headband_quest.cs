@@ -62,9 +62,6 @@ public class SeaThemedHeadbandQuestScript : QuestScript
 				if (player.Inventory.HasItem(MerogHeartId, MerogHeartAmount) &&
 					player.Inventory.HasItem(CinnabarId, CinnabarAmount))
 				{
-					player.Inventory.RemoveItem(MerogHeartId, MerogHeartAmount);
-					player.Inventory.RemoveItem(CinnabarId, CinnabarAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*carefully weaves the materials together, whispering ancient words*{/}"));
 					await dialog.Msg(L("The spirits of the deep have blessed this work. Take this headband - may the waters always guide you safely home."));
@@ -99,5 +96,11 @@ public class SeaThemedHeadbandQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*nods slowly*{/} The waters are patient. Return when you are ready."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(MerogHeartId, MerogHeartAmount);
+		character.Inventory.RemoveItem(CinnabarId, CinnabarAmount);
 	}
 }

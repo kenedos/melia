@@ -7,6 +7,7 @@ using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class LotusLeafQuestScript : QuestScript
 {
@@ -62,9 +63,6 @@ public class LotusLeafQuestScript : QuestScript
 					player.Inventory.HasItem(HanamingPetalId, 30))
 				{
 					// Remove materials
-					player.Inventory.RemoveItem(LeafBugShellId, 50);
-					player.Inventory.RemoveItem(HanamingPetalId, 30);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("Perfect! These materials are exactly what I needed. Here's your Lotus Leaf headpiece - may it bring you closer to nature's beauty!"));
 				}
@@ -97,5 +95,11 @@ public class LotusLeafQuestScript : QuestScript
 			default:
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(LeafBugShellId, 50);
+		character.Inventory.RemoveItem(HanamingPetalId, 30);
 	}
 }

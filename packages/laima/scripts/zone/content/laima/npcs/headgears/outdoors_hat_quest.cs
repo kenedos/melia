@@ -60,9 +60,6 @@ public class OutdoorsHatQuestScript : QuestScript
 				if (player.Inventory.HasItem(TimberPieceId, 40) &&
 					player.Inventory.HasItem(CystNeedleId, 25))
 				{
-					player.Inventory.RemoveItem(TimberPieceId, 40);
-					player.Inventory.RemoveItem(CystNeedleId, 25);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*skillfully crafts the hat* Marvelous! The frame is light but strong, and those needles work perfectly for the detailed stitching. Here you are - perfect for any outdoor adventure!"));
 
@@ -96,5 +93,11 @@ public class OutdoorsHatQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*returns to sketching* Fashion waits for no one, but I'll be here when you're ready!"));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(TimberPieceId, 40);
+		character.Inventory.RemoveItem(CystNeedleId, 25);
 	}
 }

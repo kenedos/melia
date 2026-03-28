@@ -58,7 +58,6 @@ public class FlarestoneHornQuestScript : QuestScript
 			{
 				if (player.Inventory.HasItem(SiaulambMaskId, SiaulambMaskAmount))
 				{
-					player.Inventory.RemoveItem(SiaulambMaskId, SiaulambMaskAmount);
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*takes the masks with trembling hands*{/}"));
 					await dialog.Msg(L("These masks... I can feel the dark energy within them. But look what I found hidden among the Siaulavs' possessions - a horn carved from flarestone! It pulses with fiery power."));
@@ -92,5 +91,10 @@ public class FlarestoneHornQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*sighs heavily*{/} I understand. These are dangerous times. Please reconsider if you change your mind."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(SiaulambMaskId, SiaulambMaskAmount);
 	}
 }

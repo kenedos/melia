@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class UmbrellaQuestScript : QuestScript
 {
@@ -62,9 +63,6 @@ public class UmbrellaQuestScript : QuestScript
 				if (player.Inventory.HasItem(LargeHookId, LargeHookAmount) &&
 					player.Inventory.HasItem(KitchenKnifeId, KitchenKnifeAmount))
 				{
-					player.Inventory.RemoveItem(LargeHookId, LargeHookAmount);
-					player.Inventory.RemoveItem(KitchenKnifeId, KitchenKnifeAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*takes the materials with trembling, waterlogged hands and begins working feverishly*{/}"));
 					await dialog.Msg(L("Yes, yes! The hooks curve perfectly for the ribs... and the metal from these knives... just need to shape it properly..."));
@@ -96,5 +94,11 @@ public class UmbrellaQuestScript : QuestScript
 			default:
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(LargeHookId, LargeHookAmount);
+		character.Inventory.RemoveItem(KitchenKnifeId, KitchenKnifeAmount);
 	}
 }

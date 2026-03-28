@@ -65,10 +65,6 @@ public class WoodOwlQuestScript : QuestScript
 					player.Inventory.HasItem(RedStrawId, 30) &&
 					player.Inventory.HasItem(KepaSkinId, 8))
 				{
-					player.Inventory.RemoveItem(RidimedStemId, 45);
-					player.Inventory.RemoveItem(RedStrawId, 30);
-					player.Inventory.RemoveItem(KepaSkinId, 8);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*the wooden owl's eyes seem to absorb the darkness around it* Yesss... The stems hold moonlight... the straw carries twilight... the skin contains shadow itself..."));
 					await dialog.Msg(L("*whispers grow fainter* Take this gift... forged from night's essence... I will wait here... as I always have... as I always will..."));
@@ -101,5 +97,12 @@ public class WoodOwlQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*the whispers grow distant* I will remain... as I have for centuries... watching... waiting... in this wooden form..."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(RidimedStemId, 45);
+		character.Inventory.RemoveItem(RedStrawId, 30);
+		character.Inventory.RemoveItem(KepaSkinId, 8);
 	}
 }

@@ -62,10 +62,6 @@ public class FlowerBranchQuestScript : QuestScript
 					player.Inventory.HasItem(PolibuLeafId, 40) &&
 					player.Inventory.HasItem(ParrotStems, 15))
 				{
-					player.Inventory.RemoveItem(LeafnutHornId, 25);
-					player.Inventory.RemoveItem(PolibuLeafId, 40);
-					player.Inventory.RemoveItem(ParrotStems, 15);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*carefully weaves the materials together* Beautiful! The curve of the Leafnut horns provides the perfect foundation, while the Polibu leaves add texture, and the Parrot stems give it that delicate finishing touch."));
 
@@ -100,5 +96,12 @@ public class FlowerBranchQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*returns to arranging flowers* Nature's beauty will still be here when you return..."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(LeafnutHornId, 25);
+		character.Inventory.RemoveItem(PolibuLeafId, 40);
+		character.Inventory.RemoveItem(ParrotStems, 15);
 	}
 }

@@ -59,9 +59,6 @@ public class AncientCrownQuestScript : QuestScript
 				if (player.Inventory.HasItem(LizardmanBonesId, 100) &&
 					player.Inventory.HasItem(TamaLeafId, 50))
 				{
-					player.Inventory.RemoveItem(LizardmanBonesId, 100);
-					player.Inventory.RemoveItem(TamaLeafId, 50);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*eyes gleaming with scholarly excitement* Yesss! These are perfect specimens! Watch as I craft... *carefully assembles the crown* Here, take this recreation of our ancient crown. May it serve you as well as it served my ancestors."));
 
@@ -95,5 +92,11 @@ public class AncientCrownQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*returns to studying scrolls* Very well... The secrets of our ancient crowns will wait. They have waited for centuries, after all..."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(LizardmanBonesId, 100);
+		character.Inventory.RemoveItem(TamaLeafId, 50);
 	}
 }

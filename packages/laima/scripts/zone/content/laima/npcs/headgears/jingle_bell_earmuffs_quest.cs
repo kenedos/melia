@@ -60,9 +60,6 @@ public class JingleBellEarmuffsQuestScript : QuestScript
 				if (player.Inventory.HasItem(WhiteSpionFurId, 100) &&
 					player.Inventory.HasItem(BrownLapasapeLeavesId, 75))
 				{
-					player.Inventory.RemoveItem(WhiteSpionFurId, 100);
-					player.Inventory.RemoveItem(BrownLapasapeLeavesId, 75);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*her eyes light up as she examines the materials*{/}"));
 					await dialog.Msg(L("Perfect! The White Spion fur is wonderfully soft and insulating - just what you need to keep your ears warm in this bitter cold. And these Lapasape leaves have just the right flexibility to bind the jingle bells securely."));
@@ -99,5 +96,11 @@ public class JingleBellEarmuffsQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*pulls her cloak tighter against the wind*{/} I understand. This cold isn't for everyone. If you change your mind, I'll be here... trying not to freeze."));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(WhiteSpionFurId, 100);
+		character.Inventory.RemoveItem(BrownLapasapeLeavesId, 75);
 	}
 }

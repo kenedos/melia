@@ -222,7 +222,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			{
 				foreach (var quest in _quests)
 				{
-					if (quest.Status != QuestStatus.InProgress)
+					if (quest.Status != QuestStatus.InProgress && quest.Status != QuestStatus.Success)
 						continue;
 
 					quest.UpdateObjectives(updater);
@@ -230,6 +230,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (quest.ChangesOnLastUpdate)
 					{
 						quest.UpdateUnlock();
+
+						if (quest.Status == QuestStatus.Success && !quest.IsCompletable)
+							quest.Status = QuestStatus.InProgress;
+
 						this.UpdateClient_UpdateQuest(quest);
 					}
 				}

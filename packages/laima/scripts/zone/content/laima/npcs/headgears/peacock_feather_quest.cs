@@ -59,9 +59,6 @@ public class PeacockFeatherQuestScript : QuestScript
 				if (player.Inventory.HasItem(CockatriesCrestId, 1) &&
 					player.Inventory.HasItem(CockatriesFeatherId, 75))
 				{
-					player.Inventory.RemoveItem(CockatriesCrestId, 1);
-					player.Inventory.RemoveItem(CockatriesFeatherId, 75);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("*arranges the feathers with practiced grace* Simply divine! The crests provide that perfect crown-like shape, while the feathers add such elegant flourish. It's absolutely perfect for any formal occasion."));
 
@@ -96,5 +93,11 @@ public class PeacockFeatherQuestScript : QuestScript
 		{
 			await dialog.Msg(L("*returns to her fan* Very well, we shall meet again!"));
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(CockatriesCrestId, 1);
+		character.Inventory.RemoveItem(CockatriesFeatherId, 75);
 	}
 }

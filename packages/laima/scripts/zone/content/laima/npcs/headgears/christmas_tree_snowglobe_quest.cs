@@ -5,6 +5,7 @@ using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Rewards;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors.Characters;
 
 public class ChristmasTreeSnowglobeQuestScript : QuestScript
 {
@@ -61,9 +62,6 @@ public class ChristmasTreeSnowglobeQuestScript : QuestScript
 				if (player.Inventory.HasItem(GrollHornId, GrollHornAmount) &&
 					player.Inventory.HasItem(WhiteChainId, WhiteChainAmount))
 				{
-					player.Inventory.RemoveItem(GrollHornId, GrollHornAmount);
-					player.Inventory.RemoveItem(WhiteChainId, WhiteChainAmount);
-
 					player.Quests.Complete(QuestId);
 					await dialog.Msg(L("{#666666}*carefully grinds the horns into a fine powder and weaves the chains into an intricate frame*{/}"));
 					await dialog.Msg(L("Magnificent! Watch closely... {#666666}*shakes the completed snowglobe*{/} See how the snow swirls around the tiny tree? A piece of eternal winter, just for you. May it remind you of the magic found in these cold lands."));
@@ -93,5 +91,11 @@ public class ChristmasTreeSnowglobeQuestScript : QuestScript
 			default:
 				break;
 		}
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.RemoveItem(GrollHornId, GrollHornAmount);
+		character.Inventory.RemoveItem(WhiteChainId, WhiteChainAmount);
 	}
 }
