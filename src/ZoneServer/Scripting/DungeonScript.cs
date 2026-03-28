@@ -1048,6 +1048,7 @@ namespace Melia.Zone.Scripting
 				};
 				portal.AddEffect(new AttachEffect(AnimationName.Portal, 1, EffectLocation.Top));
 				map.AddMonster(portal);
+				instance.RegisterPersistentMonster(portal);
 
 				portal.SetClickTrigger("ExitPortalDialog", async (dialog) =>
 				{
