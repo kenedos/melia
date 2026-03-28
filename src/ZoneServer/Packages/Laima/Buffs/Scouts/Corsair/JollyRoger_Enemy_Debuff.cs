@@ -13,7 +13,8 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 {
 	/// <summary>
 	/// Handler for the Jolly Roger Enemy Debuff.
-	/// Enemies with this debuff increase combo count when hit by party members.
+	/// Enemies with this debuff increase combo count when hit by party members
+	/// and trigger Brutality buff application.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.JollyRoger_Enemy_Debuff)]
@@ -21,6 +22,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 	{
 		private const int ComboThreshold = 100;
 		private const int FeverDurationMs = 5000;
+		private const int BrutalityBuffDurationMs = 10000;
 
 		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.JollyRoger_Enemy_Debuff)]
 		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
@@ -40,6 +42,40 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 			if (buff.Caster is not Character caster)
 				return;
 
+			this.TryApplyBrutality(caster, character);
+			this.IncrementCombo(caster);
+		}
+
+		/// <summary>
+		/// Checks if the JollyRoger caster has Brutality and applies the
+		/// buff to the attacker and their party members.
+		/// </summary>
+		private void TryApplyBrutality(Character caster, Character attacker)
+		{
+			if (!caster.TryGetSkill(SkillId.Corsair_Brutality, out var brutalitySkill))
+				return;
+
+			if (attacker.TryGetBuff(BuffId.Brutality_Buff, out var existingBuff) && existingBuff.RemainingDuration >= TimeSpan.FromSeconds(6))
+				return;
+
+			var buffDuration = TimeSpan.FromMilliseconds(BrutalityBuffDurationMs);
+
+			if (attacker.HasParty)
+			{
+				foreach (var member in attacker.Map.GetPartyMembers(attacker))
+					member.StartBuff(BuffId.Brutality_Buff, brutalitySkill.Level, 0, buffDuration, caster);
+			}
+			else
+			{
+				attacker.StartBuff(BuffId.Brutality_Buff, brutalitySkill.Level, 0, buffDuration, caster);
+			}
+		}
+
+		/// <summary>
+		/// Increments the combo counter and handles Fever Time activation.
+		/// </summary>
+		private void IncrementCombo(Character caster)
+		{
 			var now = DateTime.Now;
 			var feverStartTime = caster.Variables.Temp.Get<DateTime>("Melia.Buff.JollyRoger.FeverStartTime", DateTime.MinValue);
 			var timeSinceFever = (now - feverStartTime).TotalMilliseconds;
