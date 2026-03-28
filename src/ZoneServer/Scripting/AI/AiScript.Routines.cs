@@ -383,73 +383,66 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		protected virtual IEnumerable UseSkill(Skill skill, ICombatEntity target, TimeSpan delay = default)
 		{
-			using (Debug.Profile($"AiRoutine.UseSkill('{skill.Id}') on '{this.Entity.Name}'", 5000))
+			// Track when we start using a skill for fear behavior timing
+			_lastSkillUseTime = DateTime.UtcNow;
+			// Track the skill's duration to prevent interruption during animation
+			_lastSkillDuration = (delay == default) ? skill.Properties.ShootTime : delay;
+
+			yield return this.StopMove();
+
+			if (!this.CanUseSkill(skill, target))
 			{
-				// Track when we start using a skill for fear behavior timing
-				_lastSkillUseTime = DateTime.UtcNow;
-				// Track the skill's duration to prevent interruption during animation
-				_lastSkillDuration = (delay == default) ? skill.Properties.ShootTime : delay;
+				Send.ZC_SKILL_DISABLE(this.Entity);
+				yield break;
+			}
 
-				yield return this.StopMove();
+			if (!(this.Entity is Mob mob && !mob.Data.CanRotate))
+				this.Entity.TurnTowards(target);
 
-				if (!this.CanUseSkill(skill, target))
+			var skillId = skill.Id;
+			if (Versions.Client == KnownVersions.ClosedBeta1)
+				skillId += 100000;
+
+			var skillUsedSuccessfully = false;
+
+			// Standard monster skill handling
+			if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<ITargetSkillHandler>(skillId, out var handler))
+			{
+				Log.Warning($"AiScript: No handler found for skill '{skillId}'.");
+			}
+			else
+			{
+				if (this.Entity.Components.TryGet<BaseSkillComponent>(out var skillComponent))
+					skillComponent.UseSkill(skill.Id);
+
+				handler.Handle(skill, this.Entity, target);
+			}
+			skillUsedSuccessfully = true;
+
+			if (skillUsedSuccessfully)
+			{
+				// Record skill history for condition checks
+				_lastUsedSkill = skill.Id;
+				_usedSkillHistory.Insert(0, skill.Id);
+				if (_usedSkillHistory.Count > 10) // Limit history size
 				{
-					Send.ZC_SKILL_DISABLE(this.Entity);
-					yield break;
+					_usedSkillHistory.RemoveAt(_usedSkillHistory.Count - 1);
 				}
+			}
 
-				if (!(this.Entity is Mob mob && !mob.Data.CanRotate))
-					this.Entity.TurnTowards(target);
-
-				var skillId = skill.Id;
-				if (Versions.Client == KnownVersions.ClosedBeta1)
-					skillId += 100000;
-
-				var skillUsedSuccessfully = false;
-
-				// The 'active work' part of the skill execution.
-				using (Debug.Profile($"AiRoutine.UseSkill.ActiveWork: {skill.Id}", 100))
+			// --- Perform the intentional wait ---
+			// Wait while casting, but break early if interrupted
+			var useTime = (delay == default) ? skill.Properties.ShootTime : delay;
+			if (useTime > TimeSpan.Zero)
+			{
+				var waitEnd = DateTime.Now + useTime;
+				while (DateTime.Now < waitEnd)
 				{
-					// Standard monster skill handling
-					if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<ITargetSkillHandler>(skillId, out var handler))
-					{
-						Log.Warning($"AiScript: No handler found for skill '{skillId}'.");
-					}
-					else
-					{
-						if (this.Entity.Components.TryGet<BaseSkillComponent>(out var skillComponent))
-							skillComponent.UseSkill(skill.Id);
+					// If the cast was interrupted, stop waiting immediately
+					if (skill.Vars.GetBool("Melia.MonsterCastInterrupted"))
+						break;
 
-						handler.Handle(skill, this.Entity, target);
-					}
-					skillUsedSuccessfully = true;
-				}
-
-				if (skillUsedSuccessfully)
-				{
-					// Record skill history for condition checks
-					_lastUsedSkill = skill.Id;
-					_usedSkillHistory.Insert(0, skill.Id);
-					if (_usedSkillHistory.Count > 10) // Limit history size
-					{
-						_usedSkillHistory.RemoveAt(_usedSkillHistory.Count - 1);
-					}
-				}
-
-				// --- Perform the intentional wait ---
-				// Wait while casting, but break early if interrupted
-				var useTime = (delay == default) ? skill.Properties.ShootTime : delay;
-				if (useTime > TimeSpan.Zero)
-				{
-					var waitEnd = DateTime.Now + useTime;
-					while (DateTime.Now < waitEnd)
-					{
-						// If the cast was interrupted, stop waiting immediately
-						if (skill.Vars.GetBool("Melia.MonsterCastInterrupted"))
-							break;
-
-						yield return this.Wait(TimeSpan.FromMilliseconds(100));
-					}
+					yield return this.Wait(TimeSpan.FromMilliseconds(100));
 				}
 			}
 		}

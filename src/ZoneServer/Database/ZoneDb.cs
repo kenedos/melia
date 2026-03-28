@@ -30,72 +30,60 @@ namespace Melia.Zone.Database
 			var adjustedCharId = characterId > ObjectIdRanges.Characters ? characterId - ObjectIdRanges.Characters : characterId;
 			var charNameForLog = $"ID:{adjustedCharId}"; // Initial name for logging
 
-			using (Debug.Profile($"TotalLoad: {charNameForLog}", 1000))
+			var character = new Character();
+
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("SELECT * FROM `characters` WHERE `accountId` = @accountId AND `characterId` = @characterId", conn))
 			{
-				var character = new Character();
+				mc.Parameters.AddWithValue("@accountId", accountId);
+				mc.Parameters.AddWithValue("@characterId", adjustedCharId);
 
-				using (Debug.Profile($"Load.CharacterTable: {charNameForLog}"))
+				using (var reader = mc.ExecuteReader())
 				{
-					using (var conn = this.GetConnection())
-					using (var mc = new MySqlCommand("SELECT * FROM `characters` WHERE `accountId` = @accountId AND `characterId` = @characterId", conn))
-					{
-						mc.Parameters.AddWithValue("@accountId", accountId);
-						mc.Parameters.AddWithValue("@characterId", adjustedCharId);
+					if (!reader.Read())
+						return null;
 
-						using (var reader = mc.ExecuteReader())
-						{
-							if (!reader.Read())
-								return null;
-
-							// Populate character base data
-							character.DbId = reader.GetInt64("characterId");
-							character.AccountDbId = accountId;
-							character.Name = reader.GetString("name");
-							character.TeamName = reader.GetString("teamName");
-							character.JobId = (JobId)reader.GetInt16("job");
-							character.Gender = (Gender)reader.GetByte("gender");
-							character.Hair = reader.GetInt32("hair");
-							character.SkinColor = reader.GetUInt32("skinColor");
-							character.MapId = reader.GetInt32("zone");
-							character.Exp = reader.GetInt64("exp");
-							character.MaxExp = reader.GetInt64("maxExp");
-							character.TotalExp = reader.GetInt64("totalExp");
-							character.VisibleEquip = (VisibleEquip)reader.GetInt32("equipVisibility");
-							character.EquippedTitleId = reader.GetInt32("equippedTitleId");
-							var x = reader.GetFloat("x");
-							var y = reader.GetFloat("y");
-							var z = reader.GetFloat("z");
-							var dir = reader.GetFloat("dir");
-							character.Position = new Position(x, y, z);
-							character.Direction = new Direction(dir);
-							character.PartyId = reader.GetInt64("partyId");
-							character.GuildId = reader.GetInt64("guildId");
-						}
-					}
+					// Populate character base data
+					character.DbId = reader.GetInt64("characterId");
+					character.AccountDbId = accountId;
+					character.Name = reader.GetString("name");
+					character.TeamName = reader.GetString("teamName");
+					character.JobId = (JobId)reader.GetInt16("job");
+					character.Gender = (Gender)reader.GetByte("gender");
+					character.Hair = reader.GetInt32("hair");
+					character.SkinColor = reader.GetUInt32("skinColor");
+					character.MapId = reader.GetInt32("zone");
+					character.Exp = reader.GetInt64("exp");
+					character.MaxExp = reader.GetInt64("maxExp");
+					character.TotalExp = reader.GetInt64("totalExp");
+					character.VisibleEquip = (VisibleEquip)reader.GetInt32("equipVisibility");
+					character.EquippedTitleId = reader.GetInt32("equippedTitleId");
+					var x = reader.GetFloat("x");
+					var y = reader.GetFloat("y");
+					var z = reader.GetFloat("z");
+					var dir = reader.GetFloat("dir");
+					character.Position = new Position(x, y, z);
+					character.Direction = new Direction(dir);
+					character.PartyId = reader.GetInt64("partyId");
+					character.GuildId = reader.GetInt64("guildId");
 				}
-
-				// Calls to partial class methods for loading components
-				using (Debug.Profile($"Load.AllCharacterData: {charNameForLog}", 500))
-				{
-					this.LoadCharacterComponentData(character, charNameForLog);
-				}
-
-				using (Debug.Profile($"Load.FinalizeObject: {charNameForLog}", 50))
-				{
-					character.InitProperties();
-					character.Properties.Stamina = (int)character.Properties.GetFloat(PropertyName.MaxSta);
-					character.UpdateStance();
-
-					// Initialize visibility PCEtc properties based on VisibleEquip bitmask
-					// These properties control the client UI checkbox state (1 = visible, 0 = hidden)
-					character.Etc.Properties.SetFloat(PropertyName.HAT_Visible, (character.VisibleEquip & VisibleEquip.Headgear1) != 0 ? 1 : 0);
-					character.Etc.Properties.SetFloat(PropertyName.HAT_T_Visible, (character.VisibleEquip & VisibleEquip.Headgear2) != 0 ? 1 : 0);
-					character.Etc.Properties.SetFloat(PropertyName.HAT_L_Visible, (character.VisibleEquip & VisibleEquip.Headgear3) != 0 ? 1 : 0);
-					character.Etc.Properties.SetFloat(PropertyName.HAIR_WIG_Visible, (character.VisibleEquip & VisibleEquip.Wig) != 0 ? 1 : 0);
-				}
-
-				return character;
 			}
+
+			// Calls to partial class methods for loading components
+			this.LoadCharacterComponentData(character, charNameForLog);
+
+			character.InitProperties();
+			character.Properties.Stamina = (int)character.Properties.GetFloat(PropertyName.MaxSta);
+			character.UpdateStance();
+
+			// Initialize visibility PCEtc properties based on VisibleEquip bitmask
+			// These properties control the client UI checkbox state (1 = visible, 0 = hidden)
+			character.Etc.Properties.SetFloat(PropertyName.HAT_Visible, (character.VisibleEquip & VisibleEquip.Headgear1) != 0 ? 1 : 0);
+			character.Etc.Properties.SetFloat(PropertyName.HAT_T_Visible, (character.VisibleEquip & VisibleEquip.Headgear2) != 0 ? 1 : 0);
+			character.Etc.Properties.SetFloat(PropertyName.HAT_L_Visible, (character.VisibleEquip & VisibleEquip.Headgear3) != 0 ? 1 : 0);
+			character.Etc.Properties.SetFloat(PropertyName.HAIR_WIG_Visible, (character.VisibleEquip & VisibleEquip.Wig) != 0 ? 1 : 0);
+
+			return character;
 		}
 
 		/// <summary>
@@ -137,9 +125,7 @@ namespace Melia.Zone.Database
 			saveStopwatch.Start();
 			long lockMs = 0, transMs = 0;
 
-			using (Debug.Profile($"TotalSave: {character.Name} ({character.DbId})", 1000))
-			{
-				for (var i = 0; i < maxRetries; i++)
+			for (var i = 0; i < maxRetries; i++)
 				{
 					try
 					{
@@ -159,79 +145,59 @@ namespace Melia.Zone.Database
 							try
 							{
 								// --- Main Character Table ---
-								using (Debug.Profile($"SaveChar.CharacterTable"))
+								using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
 								{
-									using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
-									{
-										cmd.AddParameter("@characterId", character.DbId);
-										cmd.Set("name", character.Name);
-										cmd.Set("job", (short)character.JobId);
-										cmd.Set("gender", (byte)character.Gender);
-										cmd.Set("hair", character.Hair);
-										cmd.Set("skinColor", character.SkinColor);
-										cmd.Set("zone", character.MapId);
-										cmd.Set("x", character.Position.X);
-										cmd.Set("y", character.Position.Y);
-										cmd.Set("z", character.Position.Z);
-										cmd.Set("dir", character.Direction.DegreeAngle);
-										cmd.Set("exp", character.Exp);
-										cmd.Set("maxExp", character.MaxExp);
-										cmd.Set("totalExp", character.TotalExp);
-										cmd.Set("level", character.Level);
-										cmd.Set("equipVisibility", (int)character.VisibleEquip);
-										cmd.Set("equippedTitleId", character.EquippedTitleId);
-										cmd.Set("stamina", character.Properties.Stamina);
-										cmd.Set("partyId", character.PartyId);
-										cmd.Set("guildId", character.GuildId);
-										cmd.Execute();
-									}
+									cmd.AddParameter("@characterId", character.DbId);
+									cmd.Set("name", character.Name);
+									cmd.Set("job", (short)character.JobId);
+									cmd.Set("gender", (byte)character.Gender);
+									cmd.Set("hair", character.Hair);
+									cmd.Set("skinColor", character.SkinColor);
+									cmd.Set("zone", character.MapId);
+									cmd.Set("x", character.Position.X);
+									cmd.Set("y", character.Position.Y);
+									cmd.Set("z", character.Position.Z);
+									cmd.Set("dir", character.Direction.DegreeAngle);
+									cmd.Set("exp", character.Exp);
+									cmd.Set("maxExp", character.MaxExp);
+									cmd.Set("totalExp", character.TotalExp);
+									cmd.Set("level", character.Level);
+									cmd.Set("equipVisibility", (int)character.VisibleEquip);
+									cmd.Set("equippedTitleId", character.EquippedTitleId);
+									cmd.Set("stamina", character.Properties.Stamina);
+									cmd.Set("partyId", character.PartyId);
+									cmd.Set("guildId", character.GuildId);
+									cmd.Execute();
 								}
 
 								// --- Call Internal Save Methods for all components ---
-								using (Debug.Profile($"SaveChar.ItemsAndStorage"))
-								{
-									this.InternalSaveCharacterItems(character, conn, trans);
-									this.InternalSaveStorage(character.PersonalStorage, "storage_personal", "characterId", character.DbId, conn, trans);
-								}
-								using (Debug.Profile($"SaveChar.PropertiesAndVars"))
-								{
-									this.InternalSaveVariables(character.Variables.Perm, "vars_characters", "characterId", character.DbId, conn, trans);
-									this.InternalSaveProperties("character_properties", "characterId", character.DbId, character.Properties, conn, trans);
-									this.InternalSaveProperties("character_etc_properties", "characterId", character.DbId, character.Etc.Properties, conn, trans);
-								}
-								using (Debug.Profile($"SaveChar.JobsSkillsAbilities"))
-								{
-									this.InternalSaveJobs(character, conn, trans);
-									this.InternalSaveSkills(character, conn, trans);
-									this.InternalSaveAbilities(character, conn, trans);
-								}
-								using (Debug.Profile($"SaveChar.BuffsCooldowns"))
-								{
-									this.InternalSaveBuffs(character, conn, trans);
-									this.InternalSaveCooldowns(character, conn, trans);
-								}
-								using (Debug.Profile($"SaveChar.SessionObjects"))
-									this.InternalSaveSessionObjects(character, conn, trans);
-								using (Debug.Profile($"SaveChar.Quests"))
-									this.InternalSaveQuests(character, conn, trans);
+								this.InternalSaveCharacterItems(character, conn, trans);
+								this.InternalSaveStorage(character.PersonalStorage, "storage_personal", "characterId", character.DbId, conn, trans);
+
+								this.InternalSaveVariables(character.Variables.Perm, "vars_characters", "characterId", character.DbId, conn, trans);
+								this.InternalSaveProperties("character_properties", "characterId", character.DbId, character.Properties, conn, trans);
+								this.InternalSaveProperties("character_etc_properties", "characterId", character.DbId, character.Etc.Properties, conn, trans);
+
+								this.InternalSaveJobs(character, conn, trans);
+								this.InternalSaveSkills(character, conn, trans);
+								this.InternalSaveAbilities(character, conn, trans);
+
+								this.InternalSaveBuffs(character, conn, trans);
+								this.InternalSaveCooldowns(character, conn, trans);
+
+								this.InternalSaveSessionObjects(character, conn, trans);
+								this.InternalSaveQuests(character, conn, trans);
 
 								if (character.HasCompanions)
-								{
-									using (Debug.Profile($"SaveChar.Companions"))
-										this.InternalSaveCompanions(character, conn, trans);
-								}
-								using (Debug.Profile($"SaveChar.AchievementsAndCollections"))
-								{
-									this.InternalSaveAchievements(character, conn, trans);
-									this.InternalSaveAchievementPoints(character, conn, trans);
-									this.InternalSaveCollections(character, conn, trans);
-								}
-								using (Debug.Profile($"SaveChar.AdventureBook"))
-								{
-									this.InternalSaveAdventureBook(character, conn, trans);
-									this.InternalSaveAdventureBookMonsterDrop(character, conn, trans);
-									this.InternalSaveAdventureBookItems(character, conn, trans);
-								}
+									this.InternalSaveCompanions(character, conn, trans);
+
+								this.InternalSaveAchievements(character, conn, trans);
+								this.InternalSaveAchievementPoints(character, conn, trans);
+								this.InternalSaveCollections(character, conn, trans);
+
+								this.InternalSaveAdventureBook(character, conn, trans);
+								this.InternalSaveAdventureBookMonsterDrop(character, conn, trans);
+								this.InternalSaveAdventureBookItems(character, conn, trans);
 
 								trans.Commit();
 								character.LastSaved = DateTime.UtcNow;
@@ -275,7 +241,6 @@ namespace Melia.Zone.Database
 							lockTaken = false; // Reset for retry loop
 						}
 					}
-				}
 			}
 		}
 	}

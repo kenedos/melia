@@ -400,26 +400,17 @@ namespace Melia.Zone
 		/// </summary>
 		private void InitWorld()
 		{
-			using (Debug.Profile($"Initializing World", 5000))
-			{
-				Log.Info("Initializing world...");
-				this.World.Initialize();
-			}
-			using (Debug.Profile($"Initializing Game Events", 500))
-			{
-				Log.Info("Initializing game events...");
-				this.GameEvents.Initialize();
-			}
-			using (Debug.Profile($"Initializing Dungeon Reset Service", 100))
-			{
-				Log.Info("Initializing dungeon reset service...");
-				this.DungeonReset.Initialize();
-			}
-			using (Debug.Profile($"Initializing Achievement Service", 100))
-			{
-				Log.Info("Initializing achievement service...");
-				this.Achievements.Initialize();
-			}
+			Log.Info("Initializing world...");
+			this.World.Initialize();
+
+			Log.Info("Initializing game events...");
+			this.GameEvents.Initialize();
+
+			Log.Info("Initializing dungeon reset service...");
+			this.DungeonReset.Initialize();
+
+			Log.Info("Initializing achievement service...");
+			this.Achievements.Initialize();
 			Log.Info("  done loading {0} maps.", this.World.Count);
 		}
 

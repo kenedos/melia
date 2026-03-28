@@ -34,53 +34,35 @@ namespace Melia.Zone.Database
 		/// </summary>
 		private void LoadCharacterComponentData(Character character, string charNameForLog)
 		{
-			using (Debug.Profile($"Load.InventoryItems: {charNameForLog}", 200))
-				this.LoadCharacterItems(character);
+			this.LoadCharacterItems(character);
 
-			using (Debug.Profile($"Load.MiscData: {charNameForLog}", 100))
-			{
-				this.LoadVars(character.Variables.Perm, "vars_characters", "characterId", character.DbId);
-				this.LoadSessionObjects(character);
-				this.LoadJobs(character);
-				this.LoadSkills(character);
-				this.LoadAbilities(character);
-				this.LoadBuffs(character);
-				this.LoadCooldowns(character);
-			}
+			this.LoadVars(character.Variables.Perm, "vars_characters", "characterId", character.DbId);
+			this.LoadSessionObjects(character);
+			this.LoadJobs(character);
+			this.LoadSkills(character);
+			this.LoadAbilities(character);
+			this.LoadBuffs(character);
+			this.LoadCooldowns(character);
 
-			using (Debug.Profile($"Load.Quests: {charNameForLog}", 100))
-				this.LoadQuests(character);
+			this.LoadQuests(character);
 
-			using (Debug.Profile($"Load.Properties: {charNameForLog}", 100))
-			{
-				this.LoadProperties("character_properties", "characterId", character.DbId, character.Properties);
-				this.LoadProperties("character_etc_properties", "characterId", character.DbId, character.Etc.Properties);
-				CardPropertyModifier.Instance.RestoreAllModifiers(character);
-			}
+			this.LoadProperties("character_properties", "characterId", character.DbId, character.Properties);
+			this.LoadProperties("character_etc_properties", "characterId", character.DbId, character.Etc.Properties);
+			CardPropertyModifier.Instance.RestoreAllModifiers(character);
 
-			using (Debug.Profile($"Load.GroupsAndSocial: {charNameForLog}", 100))
-			{
-				this.LoadCompanions(character);
-				this.LoadParty(character);
-				// this.LoadGuild(character); // Removed: Guild type deleted
-				this.LoadHelp(character);
-			}
+			this.LoadCompanions(character);
+			this.LoadParty(character);
+			this.LoadHelp(character);
 
-			using (Debug.Profile($"Load.AchievementsAndBooks: {charNameForLog}", 100))
-			{
-				this.LoadAchievements(character);
-				this.LoadAchievementPoints(character);
-				this.LoadAdventureBook(character);
-				this.LoadAdventureBookMonsterDrop(character);
-				this.LoadAdventureBookItems(character);
-				this.LoadCollections(character);
-			}
+			this.LoadAchievements(character);
+			this.LoadAchievementPoints(character);
+			this.LoadAdventureBook(character);
+			this.LoadAdventureBookMonsterDrop(character);
+			this.LoadAdventureBookItems(character);
+			this.LoadCollections(character);
 
-			using (Debug.Profile($"Load.PersonalStorage: {charNameForLog}", 100))
-			{
-				character.PersonalStorage.InitSize();
-				this.LoadStorage(character.PersonalStorage, "storage_personal", "characterId", character.DbId);
-			}
+			character.PersonalStorage.InitSize();
+			this.LoadStorage(character.PersonalStorage, "storage_personal", "characterId", character.DbId);
 		}
 
 		private void LoadAchievements(Character character)

@@ -206,57 +206,54 @@ namespace Melia.Zone.Scripting.AI
 			if (this.Entity == null)
 				return;
 
-			using (Debug.Profile($"AiScript.Update: {this.Entity.Name} ({this.Entity.Handle}), Routine: {this.CurrentRoutine ?? "Idle"}", 50))
+			try
 			{
-				try
+				if (!_initiated)
+					throw new InvalidOperationException("AI has not been initiated.");
+
+				if (this.CheckSuspension(elapsed))
+					return;
+
+				if (!this.CheckAnyPlayersOnMap(elapsed))
+					return;
+
+				if (this.Entity.IsDead)
 				{
-					if (!_initiated)
-						throw new InvalidOperationException("AI has not been initiated.");
-
-					if (this.CheckSuspension(elapsed))
-						return;
-
-					if (!this.CheckAnyPlayersOnMap(elapsed))
-						return;
-
-					if (this.Entity.IsDead)
+					if (!_isDeadNotified)
 					{
-						if (!_isDeadNotified)
-						{
-							_isDeadNotified = true;
-							this.OnDeath();
-						}
-						if (_target != null)
-						{
-							_target = null;
-						}
-						return;
+						_isDeadNotified = true;
+						this.OnDeath();
 					}
-
-					// Throttle hate updates: 200ms in combat, 500ms idle.
-					_hateUpdateAccumulator += elapsed;
-					var hateInterval = _target != null
-						? TimeSpan.FromMilliseconds(200)
-						: TimeSpan.FromMilliseconds(500);
-
-					if (_hateUpdateAccumulator >= hateInterval)
+					if (_target != null)
 					{
-						this.UpdateHate(_hateUpdateAccumulator);
-						_hateUpdateAccumulator = TimeSpan.Zero;
+						_target = null;
 					}
-
-					this.UpdatePhase();
-					this.HandleEventAlerts();
-					this.ExecuteDuringActions();
-
-					this.Heartbeat();
+					return;
 				}
-				catch (Exception ex)
+
+				// Throttle hate updates: 200ms in combat, 500ms idle.
+				_hateUpdateAccumulator += elapsed;
+				var hateInterval = _target != null
+					? TimeSpan.FromMilliseconds(200)
+					: TimeSpan.FromMilliseconds(500);
+
+				if (_hateUpdateAccumulator >= hateInterval)
 				{
-					var entityName = this.Entity?.Name ?? "Released";
-					var entityHandle = this.Entity?.Handle ?? 0;
-					Console.WriteLine($"Exception during AiScript.Update for entity '{entityName}' (Handle: {entityHandle}): {ex}");
+					this.UpdateHate(_hateUpdateAccumulator);
+					_hateUpdateAccumulator = TimeSpan.Zero;
 				}
+
+				this.UpdatePhase();
+				this.HandleEventAlerts();
+				this.ExecuteDuringActions();
+
+				this.Heartbeat();
+			}
+			catch (Exception ex)
+			{
+				var entityName = this.Entity?.Name ?? "Released";
+				var entityHandle = this.Entity?.Handle ?? 0;
+				Console.WriteLine($"Exception during AiScript.Update for entity '{entityName}' (Handle: {entityHandle}): {ex}");
 			}
 		}
 		protected virtual void CheckEnemies()

@@ -23,7 +23,6 @@ namespace Melia.Zone.Util
 			this.Add("shutdown", "[minutes] [reason]", "Schedules a graceful server shutdown (default: 15 minutes). Use 'now' for immediate shutdown.", this.HandleShutdown);
 			this.Add("cancelshutdown", "", "Cancels a pending server shutdown.", this.HandleCancelShutdown);
 			this.Add("shutdownstatus", "", "Shows the status of any pending shutdown.", this.HandleShutdownStatus);
-			this.Add("profiling", "[on|off]", "Enables, disables, or toggles performance profiling logs.", this.HandleToggleProfiling);
 			this.Add("who", "", "Shows the current number of online players.", this.HandlePlayersOnline);
 			this.Add("playersonline", "", "Shows the current number of online players (alias for 'who').", this.HandlePlayersOnline);
 			this.Add("uptime", "", "Shows how long the server has been running.", this.HandleUptime);
@@ -153,39 +152,6 @@ namespace Melia.Zone.Util
 			ZoneServer.Instance.Database.BanIp(ip, DateTime.Now, DateTime.MaxValue, "Manual Ban");
 			Log.Info($"Banned IP mask {ip} successfully.");
 
-			return CommandResult.Okay;
-		}
-
-		/// <summary>
-		/// Handles the 'toggleprofiling' console command to enable or disable
-		/// performance logging at runtime.
-		/// </summary>
-		private CommandResult HandleToggleProfiling(string command, Arguments args)
-		{
-			if (args.Count < 1)
-			{
-				// If no argument is provided, just toggle the current state.
-				Debug.IsProfilingEnabled = !Debug.IsProfilingEnabled;
-			}
-			else
-			{
-				var state = args.Get(0).ToLowerInvariant();
-				if (state == "on" || state == "true" || state == "1")
-				{
-					Debug.IsProfilingEnabled = true;
-				}
-				else if (state == "off" || state == "false" || state == "0")
-				{
-					Debug.IsProfilingEnabled = false;
-				}
-				else
-				{
-					Log.Info("Invalid argument. Usage: profiling [on|off]");
-					return CommandResult.InvalidArgument;
-				}
-			}
-
-			Log.Info($"Performance profiling is now {(Debug.IsProfilingEnabled ? "ENABLED" : "DISABLED")}.");
 			return CommandResult.Okay;
 		}
 

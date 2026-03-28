@@ -148,12 +148,9 @@ namespace Melia.Zone.World.Maps
 		#region Update Methods
 		public virtual void Update(TimeSpan elapsed)
 		{
-			using (Debug.Profile($"Map.Update: {this.ClassName}", 150))
-			{
-				this.ProcessDisappearances();
-				this.UpdateVisibility();
-				this.UpdateEntities(elapsed);
-			}
+			this.ProcessDisappearances();
+			this.UpdateVisibility();
+			this.UpdateEntities(elapsed);
 		}
 
 		private void UpdateEntities(TimeSpan elapsed)
@@ -174,15 +171,17 @@ namespace Melia.Zone.World.Maps
 				var withinGracePeriod = _lastPlayerLeftTime != DateTime.MinValue && (DateTime.Now - _lastPlayerLeftTime) < EntityUpdateGracePeriod;
 				if (this.HasCharacters || withinGracePeriod)
 				{
-					foreach (var monster in _monsters.Values)
-						if (monster is IUpdateable updateable)
+					foreach (var kvp in _monsters)
+						if (kvp.Value is IUpdateable updateable)
 							updateList.Add(updateable);
 				}
 
 				// Update pads before characters so enter/leave detection
 				// happens first
-				updateList.AddRange(_pads.Values);
-				updateList.AddRange(_characters.Values);
+				foreach (var kvp in _pads)
+					updateList.Add(kvp.Value);
+				foreach (var kvp in _characters)
+					updateList.Add(kvp.Value);
 
 				// Update all entities
 				foreach (var entity in updateList)
@@ -255,7 +254,8 @@ namespace Melia.Zone.World.Maps
 
 			try
 			{
-				visibilityList.AddRange(_characters.Values);
+				foreach (var kvp in _characters)
+					visibilityList.Add(kvp.Value);
 
 				foreach (var character in visibilityList)
 					character.LookAround();
