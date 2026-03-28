@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Melia.Shared.World;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
@@ -18,7 +19,7 @@ namespace Melia.Zone.World.Maps.Spatial
 
 		private readonly Dictionary<long, List<ICombatEntity>> _cells = new();
 		private readonly Dictionary<int, long> _entityCells = new();
-		private readonly object _lock = new();
+		private readonly ReaderWriterLockSlim _rwLock = new(LockRecursionPolicy.NoRecursion);
 
 		private readonly float _minX, _minZ;
 		private readonly int _gridWidth, _gridHeight;
@@ -55,7 +56,8 @@ namespace Melia.Zone.World.Maps.Spatial
 
 			var key = this.GetCellKey(entity.Position.X, entity.Position.Z);
 
-			lock (_lock)
+			_rwLock.EnterWriteLock();
+			try
 			{
 				if (!_cells.TryGetValue(key, out var cell))
 				{
@@ -64,6 +66,10 @@ namespace Melia.Zone.World.Maps.Spatial
 				}
 				cell.Add(entity);
 				_entityCells[entity.Handle] = key;
+			}
+			finally
+			{
+				_rwLock.ExitWriteLock();
 			}
 		}
 
@@ -75,7 +81,8 @@ namespace Melia.Zone.World.Maps.Spatial
 			if (entity == null)
 				return;
 
-			lock (_lock)
+			_rwLock.EnterWriteLock();
+			try
 			{
 				if (_entityCells.TryGetValue(entity.Handle, out var key))
 				{
@@ -89,6 +96,10 @@ namespace Melia.Zone.World.Maps.Spatial
 					_entityCells.Remove(entity.Handle);
 				}
 			}
+			finally
+			{
+				_rwLock.ExitWriteLock();
+			}
 		}
 
 		/// <summary>
@@ -96,7 +107,8 @@ namespace Melia.Zone.World.Maps.Spatial
 		/// </summary>
 		public void Remove(int handle, Position position)
 		{
-			lock (_lock)
+			_rwLock.EnterWriteLock();
+			try
 			{
 				if (_entityCells.TryGetValue(handle, out var key))
 				{
@@ -110,6 +122,10 @@ namespace Melia.Zone.World.Maps.Spatial
 					_entityCells.Remove(handle);
 				}
 			}
+			finally
+			{
+				_rwLock.ExitWriteLock();
+			}
 		}
 
 		/// <summary>
@@ -122,7 +138,8 @@ namespace Melia.Zone.World.Maps.Spatial
 
 			var newKey = this.GetCellKey(newPos.X, newPos.Z);
 
-			lock (_lock)
+			_rwLock.EnterWriteLock();
+			try
 			{
 				if (!_entityCells.TryGetValue(entity.Handle, out var currentKey))
 					return;
@@ -145,6 +162,10 @@ namespace Melia.Zone.World.Maps.Spatial
 				}
 				newCell.Add(entity);
 				_entityCells[entity.Handle] = newKey;
+			}
+			finally
+			{
+				_rwLock.ExitWriteLock();
 			}
 		}
 
@@ -175,7 +196,8 @@ namespace Melia.Zone.World.Maps.Spatial
 			minCellY = Math.Max(0, minCellY);
 			maxCellY = Math.Min(_gridHeight - 1, maxCellY);
 
-			lock (_lock)
+			_rwLock.EnterReadLock();
+			try
 			{
 				for (var cx = minCellX; cx <= maxCellX; cx++)
 				{
@@ -194,6 +216,10 @@ namespace Melia.Zone.World.Maps.Spatial
 						}
 					}
 				}
+			}
+			finally
+			{
+				_rwLock.ExitReadLock();
 			}
 		}
 
@@ -245,7 +271,8 @@ namespace Melia.Zone.World.Maps.Spatial
 			minCellY = Math.Max(0, minCellY);
 			maxCellY = Math.Min(_gridHeight - 1, maxCellY);
 
-			lock (_lock)
+			_rwLock.EnterReadLock();
+			try
 			{
 				for (var cx = minCellX; cx <= maxCellX; cx++)
 				{
@@ -263,6 +290,10 @@ namespace Melia.Zone.World.Maps.Spatial
 					}
 				}
 			}
+			finally
+			{
+				_rwLock.ExitReadLock();
+			}
 		}
 
 		/// <summary>
@@ -279,10 +310,15 @@ namespace Melia.Zone.World.Maps.Spatial
 		{
 			var results = new List<ICombatEntity>();
 
-			lock (_lock)
+			_rwLock.EnterReadLock();
+			try
 			{
 				foreach (var cell in _cells.Values)
 					results.AddRange(cell);
+			}
+			finally
+			{
+				_rwLock.ExitReadLock();
 			}
 
 			return results;
@@ -293,6 +329,7 @@ namespace Melia.Zone.World.Maps.Spatial
 		/// </summary>
 		public void Dispose()
 		{
+			_rwLock.Dispose();
 		}
 	}
 }
