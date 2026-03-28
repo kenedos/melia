@@ -1690,7 +1690,8 @@ namespace Melia.Zone.Network
 
 						zpacket.PutInt(item.Value.Id);
 						zpacket.PutShort(propertiesSize);
-						zpacket.PutEmptyBin(2);
+						zpacket.PutByte(item.Value.IsLocked);
+						zpacket.PutEmptyBin(1);
 						zpacket.PutLong(item.Value.ObjectId);
 						zpacket.PutInt(item.Value.Amount);
 						zpacket.PutInt(item.Value.Price);
@@ -1758,7 +1759,8 @@ namespace Melia.Zone.Network
 
 						packet.PutInt(equipItem.Id);
 						packet.PutShort(propertiesSize);
-						packet.PutEmptyBin(2);
+						packet.PutByte(equipItem.IsLocked);
+						packet.PutEmptyBin(1);
 						packet.PutLong(equipItem.ObjectId);
 						packet.PutByte((byte)equipSlot);
 						packet.PutEmptyBin(3);
@@ -1803,7 +1805,8 @@ namespace Melia.Zone.Network
 						packet.PutShort(propertiesSize);
 					else
 						packet.PutShort(0);
-					packet.PutEmptyBin(2);
+					packet.PutByte(equipItem.Value.IsLocked);
+					packet.PutEmptyBin(1);
 					packet.PutLong(equipItem.Value.ObjectId);
 					packet.PutByte((byte)equipItem.Key);
 					packet.PutEmptyBin(3);
