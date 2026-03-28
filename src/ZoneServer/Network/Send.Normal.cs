@@ -2972,6 +2972,26 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
+			/// Sends ride pet state to a specific connection.
+			/// </summary>
+			/// <param name="conn"></param>
+			/// <param name="character"></param>
+			/// <param name="companion"></param>
+			public static void RidePet(IZoneConnection conn, Character character, Companion companion)
+			{
+				var packet = new Packet(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.RidePet);
+
+				packet.PutInt(character.Handle);
+				packet.PutInt(companion.Handle);
+				packet.PutByte(character.IsRiding);
+				packet.PutByte(companion.IsRiding);
+				packet.PutLpString(companion.Data.ClassName);
+
+				conn.Send(packet);
+			}
+
+			/// <summary>
 			/// Pet handle association?
 			/// </summary>
 			/// <param name="conn"></param>

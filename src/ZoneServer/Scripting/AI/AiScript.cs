@@ -348,6 +348,9 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		public bool CheckSuspension(TimeSpan elapsed)
 		{
+			if (this.Suspended)
+				return true;
+
 			if (_suspensionTime <= TimeSpan.Zero)
 				return false;
 

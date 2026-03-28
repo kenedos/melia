@@ -515,6 +515,13 @@ namespace Melia.Zone.World.Actors.Characters
 
 			this.HandleAppearingPads(_tempAppearPads);
 			this.HandleDisappearingPads(_tempDisappearPads);
+
+			for (var i = 0; i < _tempAppearChars.Count; i++)
+			{
+				var character = _tempAppearChars[i];
+				if (character.IsRiding && character.ActiveCompanion is Companion ridingCompanion)
+					Send.ZC_NORMAL.RidePet(this.Connection, character, ridingCompanion);
+			}
 		}
 
 		private void HandleAppearingCharacters(List<Character> appearCharacters)
