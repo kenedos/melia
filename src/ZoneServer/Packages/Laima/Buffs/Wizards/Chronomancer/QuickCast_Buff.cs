@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Skills;
+using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
@@ -30,7 +31,10 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Wizards.Chronomancer
 
 		public void OnCastStart(Buff buff, ICombatEntity caster, Skill skill)
 		{
-			if (skill.Data.BasicCast > 0)
+			var hasCastTime = skill.Data.BasicCast > 0;
+			var isDynamicCasted = ZoneServer.Instance.SkillHandlers.TryGetHandler<IDynamicCasted>(skill.Id, out _);
+
+			if (hasCastTime || isDynamicCasted)
 			{
 				if (caster.TryGetActiveAbilityLevel(AbilityId.Chronomancer15, out var abilLevel))
 					caster.StartBuff(BuffId.QuickCast_After_Buff, abilLevel, 0f, TimeSpan.FromSeconds(5), caster);
