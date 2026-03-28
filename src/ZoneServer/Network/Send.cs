@@ -7221,7 +7221,7 @@ namespace Melia.Zone.Network
 		/// <param name="fromPos"></param>
 		/// <param name="toPos"></param>
 		/// <param name="speed"></param>
-		public static void ZC_MOVE_POS(IActor actor, Position fromPos, Position toPos, float speed)
+		public static void ZC_MOVE_POS(IActor actor, Position fromPos, Position toPos, float speed, float time = 0)
 		{
 			var packet = new Packet(Op.ZC_MOVE_POS);
 
@@ -7229,7 +7229,7 @@ namespace Melia.Zone.Network
 			packet.PutPosition(fromPos);
 			packet.PutPosition(toPos);
 			packet.PutFloat(speed);
-			packet.PutFloat(0);
+			packet.PutFloat(time);
 			packet.PutByte(false); // if true, actor teleports after a moment?
 			packet.PutGap(3);
 

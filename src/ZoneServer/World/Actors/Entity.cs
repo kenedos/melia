@@ -768,17 +768,6 @@ namespace Melia.Zone.World.Actors
 		}
 
 		/// <summary>
-		/// Cancels the monster's current skill via AI alert and disables
-		/// further skill use temporarily.
-		/// </summary>
-		public static void CancelMonsterSkill(this ICombatEntity entity)
-		{
-			if (entity.Components.TryGet<AiComponent>(out var ai))
-				ai.Script.QueueEventAlert(new CancelSkillAlert());
-			Send.ZC_SKILL_DISABLE(entity);
-		}
-
-		/// <summary>
 		/// Returns the skill ID of the entity's currently active skill.
 		/// </summary>
 		public static SkillId GetCurrentSkill(this ICombatEntity caster)
@@ -880,51 +869,6 @@ namespace Melia.Zone.World.Actors
 		public static void MoveTo(this ICombatEntity entity, Position position, float speed, int moveTime = 0, bool ignoreHoldMove = false, bool suspendAI = false)
 		{
 			entity.Components.Get<AiComponent>()?.Script.QueueEventAlert(new MoveToAlert(position, speed, moveTime, ignoreHoldMove, suspendAI));
-		}
-
-		/// <summary>
-		/// Immediately teleports the entity to a position and sends
-		/// movement packets to the client.
-		/// </summary>
-		public static void ForceMoveTo(this ICombatEntity entity, Position position, float speed, float moveTime = 0, bool ignoreHoldMove = false, bool suspendAI = false)
-		{
-			var currentPos = entity.Position;
-			entity.Position = position;
-			Send.ZC_MOVE_POS(entity, currentPos, position, speed, moveTime);
-		}
-
-		/// <summary>
-		/// Sets the client-side death script for the actor.
-		/// </summary>
-		public static void SetClientDeadScript(this IActor actor, string scriptName, string finEft, float finEftScl)
-		{
-			Send.ZC_NORMAL.Skill_CallLuaFunc(actor, scriptName, 2, 4, 0, 3, 1);
-		}
-
-		/// <summary>
-		/// Sets up collision-based damage on the entity using the given
-		/// skill. Pass SkillId.None to disable collision damage.
-		/// </summary>
-		public static void SetCollisionDamage(this ICombatEntity entity, SkillId skillId, float damageRate)
-		{
-			if (entity is Character character)
-			{
-				if (character.Trigger == null)
-					character.Components.Add(character.Trigger = new TriggerComponent(character, new CircleF(character.Position, 25)));
-				else if (skillId == SkillId.None)
-					character.Components.Remove<TriggerComponent>();
-				character.Variables.Temp.SetInt("Melia.CollisionSkillId", (int)skillId);
-				character.Variables.Temp.SetFloat("Melia.CollisionDamageRate", damageRate);
-			}
-			else if (entity is Mob mob)
-			{
-				if (mob.Trigger == null && skillId != SkillId.None)
-					mob.Components.Add(mob.Trigger = new TriggerComponent(mob, new CircleF(mob.Position, mob.Data.BoundingBox.Width)));
-				else if (skillId == SkillId.None)
-					mob.Components.Remove<TriggerComponent>();
-				mob.Vars.SetInt("Melia.CollisionSkillId", (int)skillId);
-				mob.Vars.SetFloat("Melia.CollisionDamageRate", damageRate);
-			}
 		}
 
 		/// <summary>

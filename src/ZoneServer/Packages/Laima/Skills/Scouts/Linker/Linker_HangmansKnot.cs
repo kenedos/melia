@@ -63,28 +63,31 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 			if (linkedTargets.Count == 0)
 				return;
 
-			// Calculate destination 50 units in front of caster
-			var destination = caster.Position.GetRelative(caster.Direction, 50);
+			var destination = caster.Position.GetRelative(caster.Direction, 25);
 			destination.Y = caster.Map.Ground.GetHeightAt(destination) + 5;
 
-			// Gather linked enemies to destination
 			var hits = new List<SkillHitInfo>();
 			var debuffDuration = TimeSpan.FromMilliseconds(1000 + skill.Level * 200);
+			var syncKey = caster.GenerateSyncKey();
+
+			Send.ZC_SYNC_START(caster, syncKey, 1);
 
 			foreach (var target in linkedTargets)
 			{
 				if (target.Rank == MonsterRank.Boss)
 					continue;
 
-				target.CancelMonsterSkill();
 				if (target.MoveType != MoveType.Holding)
 				{
-					target.ForceMoveTo(destination, -1, 0.2f);
+					var fromPos = target.Position;
+					target.Position = destination;
+
+					Send.ZC_MOVE_STOP(target, fromPos);
+					Send.ZC_MOVE_POS(target, fromPos, destination, -1, 0.2f);
 				}
 
 				target.StartBuff(BuffId.HangmansKnot_Debuff, 1, 0, debuffDuration, caster);
 
-				// Deal damage
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 				if (skillHitResult.Result > HitResultType.Dodge)
 				{
@@ -94,6 +97,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult);
 				hits.Add(skillHit);
 			}
+
+			Send.ZC_SYNC_END(caster, syncKey, 0);
+			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, syncKey, TimeSpan.FromMilliseconds(CastDelayMs));
 
 			if (hits.Count > 0)
 			{

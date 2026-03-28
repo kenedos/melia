@@ -119,6 +119,8 @@ namespace Melia.Zone.World.Actors.Components
 
 			if (lockType == LockType.Movement)
 				this.ApplyMovementLockEffects();
+			if (lockType == LockType.Attack)
+				this.ApplyAttackLockEffects();
 		}
 
 		/// <summary>
@@ -169,6 +171,19 @@ namespace Melia.Zone.World.Actors.Components
 
 			if (_lockCounts[lockType] <= 0)
 				_lockCounts.Remove(lockType);
+		}
+
+		/// <summary>
+		/// Applies attack lock side effects (interrupt current skill).
+		/// Must be called outside of lock(_syncLock).
+		/// </summary>
+		private void ApplyAttackLockEffects()
+		{
+			if (this.Owner is ICombatEntity entity)
+			{
+				if (entity.Components.TryGet<CombatComponent>(out var combat))
+					combat.InterruptCasting();
+			}
 		}
 
 		/// <summary>
@@ -234,6 +249,7 @@ namespace Melia.Zone.World.Actors.Components
 		public void AddState(string stateType, TimeSpan duration)
 		{
 			var movementLockChanged = false;
+			var attackLockChanged = false;
 
 			lock (_syncLock)
 			{
@@ -245,6 +261,8 @@ namespace Melia.Zone.World.Actors.Components
 					this.LockCore(lockType, TimeSpan.MaxValue);
 					if (lockType == LockType.Movement)
 						movementLockChanged = true;
+					if (lockType == LockType.Attack)
+						attackLockChanged = true;
 				}
 
 				if (_stateCounts.TryGetValue(stateType, out var value))
@@ -261,6 +279,8 @@ namespace Melia.Zone.World.Actors.Components
 
 			if (movementLockChanged)
 				this.ApplyMovementLockEffects();
+			if (attackLockChanged)
+				this.ApplyAttackLockEffects();
 		}
 
 		/// <summary>

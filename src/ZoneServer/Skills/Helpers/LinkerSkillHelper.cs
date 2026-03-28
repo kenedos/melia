@@ -263,10 +263,11 @@ namespace Melia.Zone.Skills.Helpers
 				{
 					if (enemy.Rank == MonsterRank.Boss) continue;
 
-					enemy.CancelMonsterSkill();
 					if (enemy.MoveType != MoveType.Holding)
 					{
-						enemy.ForceMoveTo(destination, -1, time);
+						var fromPos = enemy.Position;
+						enemy.Position = destination;
+						Send.ZC_MOVE_POS(enemy, fromPos, destination, -1);
 					}
 
 					enemy.StartBuff(BuffId.HangmansKnot_Debuff, 1, 0, TimeSpan.FromMilliseconds(1000 + skill.Level * 200), caster);
