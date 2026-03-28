@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 	public class Corsair_IronHookOverride : IMeleeGroundSkillHandler, IDynamicCasted
 	{
 		private const int HookDelayMs = 300;
-		private const float HookTargetRadius = 30f;
+		private const float HookTargetRadius = 50f;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
 		{
