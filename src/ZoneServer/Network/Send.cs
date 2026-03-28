@@ -1412,21 +1412,17 @@ namespace Melia.Zone.Network
 		/// <param name="character"></param>
 		public static void ZC_ABILITY_LIST(Character character)
 		{
-			var abilities = character.Abilities.GetList();
-			if (true)
+			if (Feature.IsEnabled("UnlockAllWeaponTypes"))
 			{
-				var abilityData = ZoneServer.Instance.Data.AbilityDb.FindAll(a => a.Id >= AbilityId.SwapWeapon && a.Id <= AbilityId.CompanionRide);
-				var abilityTreeData = ZoneServer.Instance.Data.AbilityTreeDb.FindAll(a => a.JobId == character.JobId && !a.HasUnlockScript);
-				foreach (var ability in abilityData)
+				var equipAbilities = ZoneServer.Instance.Data.AbilityDb.FindAll(a => a.Id >= AbilityId.SwapWeapon && a.Id <= AbilityId.CompanionRide);
+				foreach (var abilityData in equipAbilities)
 				{
-					character.Abilities.AddSilent(new Ability(ability.Id, 1));
+					if (!character.Abilities.Has(abilityData.Id))
+						character.Abilities.AddSilent(new Ability(abilityData.Id, 1));
 				}
-				foreach (var ability in abilityTreeData)
-				{
-					character.Abilities.AddSilent(new Ability(ability.AbilityId, 1));
-				}
-				abilities = character.Abilities.GetList();
 			}
+
+			var abilities = character.Abilities.GetList();
 
 			var packet = new Packet(Op.ZC_ABILITY_LIST);
 

@@ -156,6 +156,10 @@
 	
 	// Enables new icons and names for skill gem items
 	{ name: "SkillGemRevamp", enabled: true },
+
+	// Grants all weapon/armor equip abilities to every character,
+	// allowing them to equip any weapon type their class supports
+	{ name: "UnlockAllWeaponTypes", enabled: false },
 ]},
 
 // Let's disable certain features for now, to disable undesired changes or
