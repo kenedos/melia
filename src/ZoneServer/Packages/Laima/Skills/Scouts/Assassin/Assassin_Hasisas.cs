@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Assassin_Hasisas)]
-	public class Assassin_HasisasOverride : IMeleeGroundSkillHandler
+	public class Assassin_HasisasOverride : IGroundSkillHandler
 	{
 		private const int HasisasPotionId = 647010;
 		private static readonly TimeSpan BuffDuration = TimeSpan.FromMinutes(5);
@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

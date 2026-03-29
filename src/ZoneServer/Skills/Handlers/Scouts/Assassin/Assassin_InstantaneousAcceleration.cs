@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 	/// Handler for the Assassin skill Instant Acceleration
 	/// </summary>
 	[SkillHandler(SkillId.Assassin_InstantaneousAcceleration)]
-	public class Assassin_InstantaneousAcceleration : IMeleeGroundSkillHandler
+	public class Assassin_InstantaneousAcceleration : IGroundSkillHandler
 	{
 		private const float DashDistance = 100f;
 		/// <summary>
@@ -30,9 +30,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

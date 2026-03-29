@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Kriwi_Zaibas)]
-	public class Krivis_ZaibasOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Krivis_ZaibasOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
 		/// <summary>
@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

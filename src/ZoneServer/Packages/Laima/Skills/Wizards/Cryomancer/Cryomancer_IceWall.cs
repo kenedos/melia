@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cryomancer_IceWall)]
-	public class Cryomancer_IceWallOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cryomancer_IceWallOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int IceWallDuration = 15;
 		private const int IceWallSize = 20;
@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		/// <summary>
 		/// Handles skill.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

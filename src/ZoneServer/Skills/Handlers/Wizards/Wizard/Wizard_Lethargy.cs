@@ -14,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// Handler for the Wizard skill Lethargy.
 	/// </summary>
 	[SkillHandler(SkillId.Wizard_Lethargy)]
-	public class Wizard_Lethargy : IMeleeGroundSkillHandler
+	public class Wizard_Lethargy : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, debuffing enemies in target area.
@@ -24,9 +24,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var initialTarget = designatedTargets.FirstOrDefault();
 
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
@@ -54,10 +53,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			var splashArea = new Circle(targetPos, skill.Properties.GetFloat(PropertyName.SklSplRange));
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
-			foreach (var target in targets)
+			foreach (var t in targets)
 			{
-				target.StartBuff(BuffId.Lethargy_Debuff, skill.Level, 0, TimeSpan.FromSeconds(20), caster);
-				target.StartBuff(BuffId.Lethargy_Atk_Debuff, skill.Level, 0, TimeSpan.FromSeconds(20), caster);
+				t.StartBuff(BuffId.Lethargy_Debuff, skill.Level, 0, TimeSpan.FromSeconds(20), caster);
+				t.StartBuff(BuffId.Lethargy_Atk_Debuff, skill.Level, 0, TimeSpan.FromSeconds(20), caster);
 			}
 		}
 	}

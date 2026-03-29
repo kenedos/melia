@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 	/// Handler for the Hoplite Skill Synchro Thrusting.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_Langort)]
-	public class Peltasta_Langort : IMeleeGroundSkillHandler
+	public class Peltasta_Langort : IGroundSkillHandler
 	{
 		private readonly static TimeSpan BlockDuration = TimeSpan.FromMilliseconds(750);
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(10);
@@ -34,9 +34,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

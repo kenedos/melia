@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Swordman_Thrust)]
-	public class Swordman_ThrustOverride : IMeleeGroundSkillHandler
+	public class Swordman_ThrustOverride : IGroundSkillHandler
 	{
 		private const float BaseBleedDamage = 1.0f;
 		private const float BleedDamagePerLevel = 0.2f;
@@ -36,7 +36,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

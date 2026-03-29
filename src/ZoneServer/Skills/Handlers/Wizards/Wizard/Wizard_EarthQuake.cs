@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// Handler for the Wizard skill Earthquake.
 	/// </summary>
 	[SkillHandler(SkillId.Wizard_EarthQuake)]
-	public class Wizard_EarthQuake : IMeleeGroundSkillHandler
+	public class Wizard_EarthQuake : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -26,9 +26,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var initialTarget = designatedTargets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{
@@ -49,22 +48,22 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 
 			var skillHits = new List<SkillHitInfo>();
 
-			foreach (var target in targets.LimitBySDR(caster, skill))
+			foreach (var t in targets.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.Default;
 
 				// Buff "Lethargy"
 				// Hits twice against enemies under the effect of [Lethargy]
-				if (target.IsBuffActive(BuffId.Lethargy_Debuff))
+				if (t.IsBuffActive(BuffId.Lethargy_Debuff))
 					modifier.HitCount = 2;
 
-				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
+				var skillHitResult = SCR_SkillHit(caster, t, skill, modifier);
 
 				// Ability "Earthquake: Remove Knockdown"
 				if (caster.IsAbilityActive(AbilityId.Wizard23))
 					skillHitResult.KnockBack.Type = KnockBackType.None;
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, hitDelay);
+				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, aniTime, hitDelay);
 
 				skillHit.ApplyDamage();
 				skillHit.ApplyKnockBack();
@@ -72,7 +71,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				skillHits.Add(skillHit);
 			}
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Peltasta_SwashBuckling)]
-	public class Peltasta_SwashBucklingOverride : IMeleeGroundSkillHandler
+	public class Peltasta_SwashBucklingOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, giving the caster a buff and debuffing enemies
@@ -29,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -58,19 +58,18 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 				.Take(maxTargets)
 				.ToList();
 
-			foreach (var target in targetList)
+			foreach (var t in targetList)
 			{
-				if (target.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
+				if (t.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
 					continue;
 
-				target.StartBuff(BuffId.SwashBuckling_Debuff, skill.Level, 0, duration, caster);
-				target.StartBuff(BuffId.ProvocationImmunity_Debuff, skill.Level, 0, duration, caster);
+				t.StartBuff(BuffId.SwashBuckling_Debuff, skill.Level, 0, duration, caster);
+				t.StartBuff(BuffId.ProvocationImmunity_Debuff, skill.Level, 0, duration, caster);
 
-				if (target.Components.TryGet<AiComponent>(out var ai))
+				if (t.Components.TryGet<AiComponent>(out var ai))
 				{
-					// Reset hate and simulate a hit to build a small amount of threat
 					ai.Script.QueueEventAlert(new HateResetAlert(caster));
-					ai.Script.QueueEventAlert(new HitEventAlert(target, caster, 0));
+					ai.Script.QueueEventAlert(new HitEventAlert(t, caster, 0));
 				}
 			}
 		}

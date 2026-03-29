@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	/// Handler for the Highlander skill Cartar Stroke.
 	/// </summary>
 	[SkillHandler(SkillId.Highlander_CartarStroke)]
-	public class Highlander_CartarStroke : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Highlander_CartarStroke : IGroundSkillHandler, IDynamicCasted
 	{
 		/// <summary>
 		/// Called when the user starts casting the skill.
@@ -49,9 +49,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

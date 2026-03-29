@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity designatedTarget)
+		public void Handle(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -32,16 +32,16 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			}
 
 			skill.IncreaseOverheat();
-			caster.TurnTowards(designatedTarget);
+			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
-			if (designatedTarget == null)
+			if (target == null)
 			{
 				Send.ZC_SKILL_FORCE_TARGET(caster, null, skill, null);
 				return;
 			}
 
-			if (!caster.InSkillUseRange(skill, designatedTarget))
+			if (!caster.InSkillUseRange(skill, target))
 			{
 				caster.ServerMessage(Localization.Get("Too far away."));
 				return;
@@ -50,17 +50,17 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			var aniTime = TimeSpan.FromMilliseconds(50);
 			var hitDelay = skill.Properties.HitDelay;
 
-			var splashArea = new Circle(designatedTarget.Position, skill.Properties.GetFloat(PropertyName.SplRange));
+			var splashArea = new Circle(target.Position, skill.Properties.GetFloat(PropertyName.SplRange));
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			var skillHits = new List<SkillHitInfo>();
 			var sharedForceId = ForceId.GetNew();
 
-			foreach (var target in targets.LimitBySDR(caster, skill))
+			foreach (var t in targets.LimitBySDR(caster, skill))
 			{
-				var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHit(2));
+				var skillHitResult = SCR_SkillHit(caster, t, skill, SkillModifier.MultiHit(2));
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, hitDelay);
+				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, aniTime, hitDelay);
 				skillHit.HitEffect = HitEffect.ImpactHard;
 				skillHit.ForceId = sharedForceId;
 
@@ -70,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				skillHits.Add(skillHit);
 			}
 
-			Send.ZC_SKILL_FORCE_TARGET(caster, designatedTarget, skill, skillHits);
+			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHits);
 		}
 	}
 }

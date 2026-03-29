@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hoplite_Stabbing)]
-	public class Hoplite_StabbingOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Hoplite_StabbingOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
 		/// <summary>
@@ -34,7 +34,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			// Check if caster is wielding a spear or two-handed spear
 			if (caster is Character character)
@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, targets.FirstOrDefault()?.Handle ?? 0, originPos, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, target?.Handle ?? 0, originPos, caster.Direction, Position.Zero);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);

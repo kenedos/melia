@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -15,11 +15,11 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 {
 	[Package("laima")]
 	[SkillHandler(SkillId.Chronomancer_Pass)]
-	public class Chronomancer_PassOverride : IMeleeGroundSkillHandler
+	public class Chronomancer_PassOverride : IGroundSkillHandler
 	{
 		private const float BuffRange = 300;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (caster.IsBuffActive(BuffId.Pass_Debuff))
 			{

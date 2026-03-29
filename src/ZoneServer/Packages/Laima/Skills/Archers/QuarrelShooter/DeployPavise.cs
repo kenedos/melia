@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.QuarrelShooter_DeployPavise)]
-	public class QuarrelShooterDeployPavise : IMeleeGroundSkillHandler
+	public class QuarrelShooterDeployPavise : IGroundSkillHandler
 	{
 		private const float PaviseDurationSeconds = 30f;
 		private const float PaviseBaseHealth = 500f;
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 		private const float PaviseBaseBlock = 100f;
 		private const float PaviseBlockBonusPerLevel = 0.5f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!this.CanUseSkill(caster, skill))
 				return;
@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			farPos = caster.Position.GetRelative(caster.Direction, 10);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, caster.Direction, Position.Zero);

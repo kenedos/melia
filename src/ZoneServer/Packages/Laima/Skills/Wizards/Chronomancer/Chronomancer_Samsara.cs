@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
@@ -18,12 +18,12 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 {
 	[Package("laima")]
 	[SkillHandler(SkillId.Chronomancer_Samsara)]
-	public class Chronomancer_SamsaraOverride : IMeleeGroundSkillHandler
+	public class Chronomancer_SamsaraOverride : IGroundSkillHandler
 	{
 		private const string VarReincarnated = "Melia.Skill.Samsara.Reincarnated";
 		private const string VarCreatedBySamsara = "Melia.Skill.Samsara.Created";
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

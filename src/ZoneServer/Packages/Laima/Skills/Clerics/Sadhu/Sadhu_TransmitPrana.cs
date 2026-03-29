@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -19,14 +19,14 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_TransmitPrana)]
-	public class Sadhu_TransmitPranaOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Sadhu_TransmitPranaOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float BuffRange = 300;
 		private const int BuffDurationSeconds = 300;
 		private const float BaseDamageMultiplierIncrease = 0.10f;
 		private const float DamageMultiplierIncreasePerLevel = 0.02f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

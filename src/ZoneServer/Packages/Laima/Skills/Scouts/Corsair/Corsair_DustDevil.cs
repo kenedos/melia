@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -23,14 +23,14 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Corsair_DustDevil)]
-	public class Corsair_DustDevilOverride : IMeleeGroundSkillHandler
+	public class Corsair_DustDevilOverride : IGroundSkillHandler
 	{
 		private const float SplashRadius = 60f;
 		private const int ConfusionChance = 12;
 		private const int ConfusionDurationMs = 2000;
 		private const float JollyRogerDamageBonus = 0.2f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

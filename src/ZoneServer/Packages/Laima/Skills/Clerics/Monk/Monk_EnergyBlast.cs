@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Monk_EnergyBlast)]
-	public class Monk_EnergyBlastOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Monk_EnergyBlastOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -34,7 +34,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 			caster.StopSound("voice_cleric_sunrayshand_shot", "voice_cleric_m_sunrayshand_shot");
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets?.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);

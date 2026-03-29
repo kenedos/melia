@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -16,9 +16,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_Soulmaster)]
-	public class Sadhu_SoulmasterOverride : IMeleeGroundSkillHandler
+	public class Sadhu_SoulmasterOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 		}
 	}

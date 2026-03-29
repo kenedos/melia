@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 	/// Handler for the Rodelero skill Shield Push.
 	/// </summary>
 	[SkillHandler(SkillId.Rodelero_ShieldPush)]
-	public class Rodelero_ShieldPush : IMeleeGroundSkillHandler
+	public class Rodelero_ShieldPush : IGroundSkillHandler
 	{
 		private readonly static TimeSpan DefDownDuration = TimeSpan.FromSeconds(10);
 		private readonly static TimeSpan UnbalanceDuration = TimeSpan.FromSeconds(3);
@@ -34,9 +34,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

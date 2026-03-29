@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Pyromancer_FirePillar)]
-	public class Pyromancer_FirePillarOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Pyromancer_FirePillarOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
 		/// <summary>
@@ -42,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

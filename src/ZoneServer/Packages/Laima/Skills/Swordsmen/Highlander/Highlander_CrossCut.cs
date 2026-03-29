@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Highlander_CrossCut)]
-	public class Highlander_CrossCutOverride : IMeleeGroundSkillHandler
+	public class Highlander_CrossCutOverride : IGroundSkillHandler
 	{
 		private const float BaseBleedDamage = 0.2f;
 		private const float BleedDamagePerLevel = 0.01f;
@@ -38,7 +38,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

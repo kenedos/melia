@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -25,14 +25,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		protected override async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity designatedTarget)
+		protected override async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 				return;
 
 			skill.IncreaseOverheat();
 
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, designatedTarget.Position);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, target.Position);
 
 			caster.PlayAnimation("SKL2", false, 0);
 			caster.PlayAnimation("SKL2", false, 4000);
@@ -51,87 +51,87 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 				GroundEffect = EffectConfig.None,
 			};
 
-			var targets = SkillSelectEnemiesInCircle(caster, designatedTarget.Position, 200, 50);
-			foreach (var target in targets)
+			var targets = SkillSelectEnemiesInCircle(caster, target.Position, 200, 50);
+			foreach (var t in targets)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(1800));
 
 				// Volley 1: 3 missiles (Height, Distance, Distance)
-				var position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 150, height: 2);
+				var position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
 
 				await skill.Wait(TimeSpan.FromMilliseconds(200));
 
 				// Volley 2: 3 missiles (Height, Distance, Height)
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
 
 				await skill.Wait(TimeSpan.FromMilliseconds(200));
 
 				// Volley 3: 3 missiles (Distance, Distance, Height)
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
 
 				await skill.Wait(TimeSpan.FromMilliseconds(200));
 
 				// Volley 4: 3 missiles (Distance, Distance, Distance)
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150, height: 2);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 150, height: 2);
 				await MissileThrow(skill, caster, position, config);
 
 				await skill.Wait(TimeSpan.FromMilliseconds(3400));
 
 				// Volley 5: 3 missiles (Distance x3), rand=170, height=1
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
 
 				await skill.Wait(TimeSpan.FromMilliseconds(200));
 
 				// Volley 6: 3 missiles (Height x3), rand=170, height=1
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
 
 				await skill.Wait(TimeSpan.FromMilliseconds(200));
 
 				// Volley 7: 3 missiles (Distance, Height, Height), rand=170, height=1
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
 
 				await skill.Wait(TimeSpan.FromMilliseconds(200));
 
 				// Volley 8: 3 missiles (Height, Distance, Distance), rand=170, height=1
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetHeight, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 170, height: 1);
+				position = GetRelativePosition(PosType.TargetDistance, caster, t, rand: 170, height: 1);
 				await MissileThrow(skill, caster, position, config);
 			}
 		}
@@ -208,14 +208,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 	[SkillHandler(SkillId.Mon_boss_dionia_Skill_4)]
 	public class MonBossDionaSkill4 : SimpleMonsterAttackSkill
 	{
-		protected override async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity designatedTarget)
+		protected override async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 				return;
 
 			skill.IncreaseOverheat();
 
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, designatedTarget.Position);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, target.Position);
 
 			// Play animation
 			caster.PlayAnimation("SKL", false);
@@ -234,17 +234,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 				GroundEffect = EffectConfig.None,
 			};
 
-			var targets = SkillSelectEnemiesInCircle(caster, designatedTarget.Position, 200, 30);
-			var target = targets.Random();
-			if (target != null)
+			var targets = SkillSelectEnemiesInCircle(caster, target.Position, 200, 30);
+			var randomTarget = targets.Random();
+			if (randomTarget != null)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(1500));
-				var position = GetRelativePosition(PosType.TargetHeight, caster, target);
+				var position = GetRelativePosition(PosType.TargetHeight, caster, randomTarget);
 				await MissileThrow(skill, caster, position, config);
 
 				for (var i = 0; i < 5; i++)
 				{
-					position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 140, height: 1);
+					position = GetRelativePosition(PosType.TargetRandomDistance, caster, randomTarget, rand: 140, height: 1);
 					await MissileThrow(skill, caster, position, config);
 				}
 			}
@@ -253,8 +253,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 			//var targets = caster.Map.GetAttackableEntitiesIn(caster, new CircleF(caster.Position, 200));
 
 			// Throw projectiles
-			//this.ThrowProjectile(caster, designatedTarget, skill, 1500, 0, 1); // Center
-			//this.ThrowProjectile(caster, designatedTarget, skill, 1500, 140, 6); // Around
+			//this.ThrowProjectile(caster, target, skill, 1500, 0, 1); // Center
+			//this.ThrowProjectile(caster, target, skill, 1500, 140, 6); // Around
 		}
 
 		private async void ThrowProjectile(ICombatEntity caster, ICombatEntity target, Skill skill, int delay, int randDist, int count)
@@ -316,9 +316,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 
 			if (targets == null || targets.Count == 0)
 				return;
-			target = targets.Random();
+			var chosenTarget = targets.Random();
 
-			skill.Run(this.HandleSkill(caster, target, skill));
+			skill.Run(this.HandleSkill(caster, chosenTarget, skill));
 		}
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill)

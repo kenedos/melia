@@ -19,10 +19,10 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Rogue_Lachrymator)]
-	public class Rogue_LachrymatorOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Rogue_LachrymatorOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			var isEscape = caster.IsAbilityActive(AbilityId.Rogue27);
 			var targetPos = caster.Position;

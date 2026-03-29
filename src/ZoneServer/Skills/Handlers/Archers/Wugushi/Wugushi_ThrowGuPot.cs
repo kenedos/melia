@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	/// Handler for the Wugushi skill Poison Pot (Throw Gu Pot).
 	/// </summary>
 	[SkillHandler(SkillId.Wugushi_ThrowGuPot)]
-	public class Wugushi_ThrowGuPot : IMeleeGroundSkillHandler
+	public class Wugushi_ThrowGuPot : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, creates an area of effect that damages the enemies inside
@@ -32,9 +32,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

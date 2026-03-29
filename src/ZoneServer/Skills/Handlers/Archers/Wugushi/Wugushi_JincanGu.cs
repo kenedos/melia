@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	/// Handler for the skill Golden Frog (JincanGu)
 	/// </summary>
 	[SkillHandler(SkillId.Wugushi_JincanGu)]
-	public class Wugushi_JincanGu : IMeleeGroundSkillHandler
+	public class Wugushi_JincanGu : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, creates an area of effect that damages the enemies inside
@@ -31,9 +31,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

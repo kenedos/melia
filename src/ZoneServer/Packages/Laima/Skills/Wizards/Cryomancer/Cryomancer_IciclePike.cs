@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,14 +26,14 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cryomancer_IciclePike)]
-	public class Cryomancer_IciclePikeOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cryomancer_IciclePikeOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float BaseFreezeChance = 40f;
 		private const float FreezeChancePerLevel = 4f;
 		private const int MaxTargets = 16;
 		private const int FreezeDurationMilliSeconds = 8000;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

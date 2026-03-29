@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
@@ -18,11 +18,11 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Elementalist_StormDust)]
-	public class Elementalist_StormDustOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Elementalist_StormDustOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(300);
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

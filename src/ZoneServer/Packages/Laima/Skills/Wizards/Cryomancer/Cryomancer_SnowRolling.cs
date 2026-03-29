@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cryomancer_SnowRolling)]
-	public class Cryomancer_SnowRollingOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cryomancer_SnowRollingOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float SnowballScale = 0.65f;
 		private const float SnowballHeight = 10.4f;
@@ -34,7 +34,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		private const float DamageRadius = 20f;
 		private const int DamageInterval = 200;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 	/// Handler for the Rodelero skill Shooting Star.
 	/// </summary>
 	[SkillHandler(SkillId.Rodelero_ShootingStar)]
-	public class Rodelero_ShootingStar : IMeleeGroundSkillHandler
+	public class Rodelero_ShootingStar : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -30,9 +30,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

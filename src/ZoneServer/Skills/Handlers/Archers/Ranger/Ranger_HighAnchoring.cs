@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// Handler for the Ranger skill High Anchoring.
 	/// </summary>
 	[SkillHandler(SkillId.Ranger_HighAnchoring)]
-	public class Ranger_HighAnchoring : IMeleeGroundSkillHandler
+	public class Ranger_HighAnchoring : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -30,9 +30,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

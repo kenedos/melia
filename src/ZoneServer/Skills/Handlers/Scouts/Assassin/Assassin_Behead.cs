@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 	/// Handler for the Assassin skill Behead.
 	/// </summary>
 	[SkillHandler(SkillId.Assassin_Behead)]
-	public class Assassin_Behead : IMeleeGroundSkillHandler
+	public class Assassin_Behead : IGroundSkillHandler
 	{
 		private const float JumpBehindDistance = 10;
 		private const float MaxJumpDistance = 150;
@@ -33,9 +33,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
@@ -26,11 +26,11 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_Moksha)]
-	public class Sadhu_MokshaOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Sadhu_MokshaOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int MaxTargets = 9;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.IsBuffActive(BuffId.OOBE_Soulmaster_Buff))
 				return;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// </remarks>
 	[Package("laima")]
 	[SkillHandler(SkillId.Peltasta_HardShield)]
-	public class Peltasta_HardShieldOverride : IMeleeGroundSkillHandler
+	public class Peltasta_HardShieldOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="dir"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

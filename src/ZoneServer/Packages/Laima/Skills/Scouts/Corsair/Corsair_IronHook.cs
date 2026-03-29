@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,12 +20,12 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Corsair_IronHook)]
-	public class Corsair_IronHookOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Corsair_IronHookOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int HookDelayMs = 300;
 		private const float HookTargetRadius = 50f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
@@ -42,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);

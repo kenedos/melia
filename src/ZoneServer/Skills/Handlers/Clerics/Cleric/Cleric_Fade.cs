@@ -13,7 +13,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 	/// Handler for the Cleric skill Fade.
 	/// </summary>
 	[SkillHandler(SkillId.Cleric_Fade)]
-	public class Cleric_Fade : IMeleeGroundSkillHandler
+	public class Cleric_Fade : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying buff to the caster.
@@ -23,9 +23,8 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

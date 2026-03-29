@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.OutLaw_SprinkleSands)]
-	public class OutLaw_SprinkleSandsOverride : IMeleeGroundSkillHandler
+	public class OutLaw_SprinkleSandsOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill
@@ -30,8 +30,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] designatedTargets)
+		/// <param name="target"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

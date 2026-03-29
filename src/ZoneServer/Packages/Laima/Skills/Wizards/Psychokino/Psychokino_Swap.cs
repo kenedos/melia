@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -28,7 +28,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Psychokino_Swap)]
-	public class Psychokino_SwapOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Psychokino_SwapOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(200);
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 				}
 			}
 		}
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (caster is Character character)
 			{

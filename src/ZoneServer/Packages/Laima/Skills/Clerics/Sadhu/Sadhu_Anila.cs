@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -20,12 +20,12 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_Anila)]
-	public class Sadhu_AnilaOverride : IMeleeGroundSkillHandler
+	public class Sadhu_AnilaOverride : IGroundSkillHandler
 	{
 		private const float MaxDistance = 200f;
 		private const float PadSpeed = 185f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.IsBuffActive(BuffId.OOBE_Soulmaster_Buff))
 				return;

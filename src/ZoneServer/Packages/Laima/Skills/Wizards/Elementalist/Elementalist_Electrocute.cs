@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,13 +28,13 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Elementalist_Electrocute)]
-	public class Elementalist_ElectrocuteOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Elementalist_ElectrocuteOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_wiz_electrocute_cast", "voice_wiz_m_electrocute_cast");
 		}
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -42,8 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 				return;
 			}
 			skill.IncreaseOverheat();
-			var designatedTarget = targets.FirstOrDefault();
-			caster.TurnTowards(designatedTarget);
+			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
@@ -53,11 +52,11 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			var targetList = new List<ICombatEntity>();
-			if (designatedTarget != null)
+			if (target != null)
 			{
-				targetList.Add(designatedTarget);
-				var nearbyTargets = designatedTarget.Map.GetAttackableEntitiesInRangeAroundEntity(caster, designatedTarget, 150, skill.Level + 1)
-					.Where(t => t != designatedTarget);
+				targetList.Add(target);
+				var nearbyTargets = target.Map.GetAttackableEntitiesInRangeAroundEntity(caster, target, 150, skill.Level + 1)
+					.Where(t => t != target);
 				targetList.AddRange(nearbyTargets);
 			}
 			skill.Run(this.TargetChainDamage(caster, skill, targetList, "I_laser005_blue#Dummy_effect_electrocute", 4, 0.1));

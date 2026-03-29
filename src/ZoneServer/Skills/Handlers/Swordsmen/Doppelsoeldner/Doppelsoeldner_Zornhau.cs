@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 	/// Handler for the Doppelsoeldner skill Zornhau.
 	/// </summary>
 	[SkillHandler(SkillId.Doppelsoeldner_Zornhau)]
-	public class Doppelsoeldner_Zornhau : IMeleeGroundSkillHandler
+	public class Doppelsoeldner_Zornhau : IGroundSkillHandler
 	{
 		private const int BuffRemoveChancePerLevel = 5;
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(5);
@@ -32,9 +32,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

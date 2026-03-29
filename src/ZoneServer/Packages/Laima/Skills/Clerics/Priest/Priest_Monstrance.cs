@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Priest_Monstrance)]
-	public class Priest_MonstranceOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Priest_MonstranceOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int DebuffRadius = 150;
 		private const int DebuffDurationMilliseconds = 20000;
@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 		private const float DamageRatePerLevel = 0.01f;
 		private const float AbilityBonus = 0.005f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

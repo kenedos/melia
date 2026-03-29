@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Priest_Sacrament)]
-	public class Priest_SacramentOverride : IMeleeGroundSkillHandler
+	public class Priest_SacramentOverride : IGroundSkillHandler
 	{
 		private const int HolyWeaponBuffDurationSeconds = 300;
 		private const float HolyWeaponBuffRadius = 100f;
@@ -29,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 		private const float DebuffHolyDamageBonusPerLevel = 0.01f;
 		private const float AbilityBonus = 0.005f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

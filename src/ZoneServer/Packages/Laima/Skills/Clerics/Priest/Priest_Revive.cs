@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Priest_Revive)]
-	public class Priest_ReviveOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Priest_ReviveOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float BuffRange = 250f;
 		private const int BuffDurationSeconds = 300;
@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 		/// <summary>
 		/// Handles the execution of the Revive skill.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

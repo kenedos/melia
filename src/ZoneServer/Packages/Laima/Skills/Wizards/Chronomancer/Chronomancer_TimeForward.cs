@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 {
 	[Package("laima")]
 	[SkillHandler(SkillId.Chronomancer_TimeForward)]
-	public class Chronomancer_TimeForwardOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Chronomancer_TimeForwardOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -29,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 				Send.ZC_NORMAL.Skill_DynamicCastEnd(character, skill.Id, 2);
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

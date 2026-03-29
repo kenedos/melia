@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 	/// Handler for the Assassin skill Throw Sand
 	/// </summary>
 	[SkillHandler(SkillId.OutLaw_SprinkleSands)]
-	public class OutLaw_SprinkleSands : IMeleeGroundSkillHandler
+	public class OutLaw_SprinkleSands : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill
@@ -30,9 +30,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

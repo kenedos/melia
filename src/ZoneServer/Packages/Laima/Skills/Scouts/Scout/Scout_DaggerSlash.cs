@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Scout_DaggerSlash)]
-	public class Scout_DaggerSlashOverride : IMeleeGroundSkillHandler
+	public class Scout_DaggerSlashOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, do a slash attack to the nearby enemies.
@@ -29,8 +29,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		/// <param name="target"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

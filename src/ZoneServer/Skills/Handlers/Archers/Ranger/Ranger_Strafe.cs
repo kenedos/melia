@@ -17,16 +17,15 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// Handles the Ranger skill Strafe.
 	/// </summary>
 	[SkillHandler(SkillId.Ranger_Strafe)]
-	public class Ranger_Strafe : IMeleeGroundSkillHandler
+	public class Ranger_Strafe : IGroundSkillHandler
 	{
 		public const float JumpDistance = 40f;
 
 		/// <summary>
 		/// Handles the skill
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

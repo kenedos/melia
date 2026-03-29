@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cleric_Heal)]
-	public class Cleric_HealOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cleric_HealOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		// Tile layout: Each value represents the minimum skill level required
 		// for that tile to be spawned
@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -54,7 +54,6 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var target = targets.FirstOrDefault();
 			this.ExecuteHeal(caster, target, skill);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);

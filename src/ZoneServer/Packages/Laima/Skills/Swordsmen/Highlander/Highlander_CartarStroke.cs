@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Highlander_CartarStroke)]
-	public class Highlander_CartarStrokeOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Highlander_CartarStrokeOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int StunDurationMilliseconds = 3000;
 
@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

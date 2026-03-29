@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 	/// Handler for the Hoplite skill Stabbing.
 	/// </summary>
 	[SkillHandler(SkillId.Hoplite_Stabbing)]
-	public class Hoplite_Stabbing : IMeleeGroundSkillHandler
+	public class Hoplite_Stabbing : IGroundSkillHandler
 	{
 		// This represents 0.23% to remove 2 buffs per level per hit
 		private const float BuffRemoveChancePerLevel = 23f;
@@ -32,9 +32,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

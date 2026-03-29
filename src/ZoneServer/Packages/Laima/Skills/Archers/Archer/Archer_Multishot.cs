@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Archer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Archer_Multishot)]
-	public class Archer_MultishotOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Archer_MultishotOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float SplashRadius = 30;
 		private const int TotalHits = 10;
@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Archer
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

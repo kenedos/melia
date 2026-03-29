@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 	/// Handler for the Highlander skill Crosscut.
 	/// </summary>
 	[SkillHandler(SkillId.Swordman_DoubleSlash)]
-	public class Swordman_DoubleSlash : IMeleeGroundSkillHandler
+	public class Swordman_DoubleSlash : IGroundSkillHandler
 	{
 		private const float BleedDamageMultiplier = 3f;
 
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

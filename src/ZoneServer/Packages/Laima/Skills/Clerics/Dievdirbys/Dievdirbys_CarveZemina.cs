@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,9 +31,9 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Dievdirbys_CarveZemina)]
-	public class Dievdirbys_CarveZeminaOverride : IMeleeGroundSkillHandler
+	public class Dievdirbys_CarveZeminaOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

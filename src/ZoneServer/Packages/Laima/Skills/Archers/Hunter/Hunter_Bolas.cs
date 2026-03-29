@@ -30,10 +30,10 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hunter_Bolas)]
-	public class Hunter_BolasOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Hunter_BolasOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

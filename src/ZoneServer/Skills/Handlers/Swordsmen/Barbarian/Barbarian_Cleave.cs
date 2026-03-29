@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 	/// Handler for the Barbarian skill Cleave.
 	/// </summary>
 	[SkillHandler(SkillId.Barbarian_Cleave)]
-	public class Barbarian_Cleave : IMeleeGroundSkillHandler
+	public class Barbarian_Cleave : IGroundSkillHandler
 	{
 		public const float StunDamageBonus = 1.5f;
 
@@ -31,9 +31,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

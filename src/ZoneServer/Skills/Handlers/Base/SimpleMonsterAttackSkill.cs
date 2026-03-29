@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,14 +33,14 @@ namespace Melia.Zone.Skills.Handlers.Base
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		protected virtual async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity designatedTarget)
+		protected virtual async Task Attack(Skill skill, ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 				return;
 
 			skill.IncreaseOverheat();
 
-			var splashArea = this.GetSplashArea(skill, caster, designatedTarget);
+			var splashArea = this.GetSplashArea(skill, caster, target);
 			var aniTime = this.GetAniTime(skill);
 			var hitDelay = this.GetHitDelay(skill);
 			var skillHitDelay = skill.Properties.HitDelay;
@@ -52,7 +52,7 @@ namespace Melia.Zone.Skills.Handlers.Base
 			aniTime /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
 			hitDelay /= skill.Properties.GetFloat(PropertyName.SklSpdRate);
 
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, designatedTarget.Position, null);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, target.Position, null);
 
 			// Some skills are running on a timer, such as Onion_Attack1.
 			// These skills get initiated, but the hit info is only sent
@@ -73,15 +73,15 @@ namespace Melia.Zone.Skills.Handlers.Base
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in targets.LimitBySDR(caster, skill))
+			foreach (var t in targets.LimitBySDR(caster, skill))
 			{
-				var skillHitResult = SCR_SkillHit(caster, target, skill);
-				target.TakeDamage(skillHitResult.Damage, caster);
+				var skillHitResult = SCR_SkillHit(caster, t, skill);
+				t.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, hitDelay, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, hitDelay, skillHitDelay);
 				hits.Add(skillHit);
 
-				this.OnHit(caster, target, skill, skillHitResult);
+				this.OnHit(caster, t, skill, skillHitResult);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

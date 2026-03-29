@@ -1,4 +1,4 @@
-using Melia.Shared.Packages;
+﻿using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -14,10 +14,10 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Kriwi_Melstis)]
-	public class Krivis_MelstisOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Krivis_MelstisOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

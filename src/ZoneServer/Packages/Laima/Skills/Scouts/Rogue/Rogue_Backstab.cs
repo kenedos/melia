@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -20,12 +20,12 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Rogue_Backstab)]
-	public class Rogue_BackstabOverride : IMeleeGroundSkillHandler
+	public class Rogue_BackstabOverride : IGroundSkillHandler
 	{
 		private const float BackAttackAngle = 90f;
 		private const float BackAttackDamageMultiplier = 2.0f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

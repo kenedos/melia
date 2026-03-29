@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Corsair_HexenDropper)]
-	public class Corsair_HexenDropperOverride : IMeleeGroundSkillHandler
+	public class Corsair_HexenDropperOverride : IGroundSkillHandler
 	{
 		private const float SplashLength = 70f;
 		private const float SplashWidth = 20f;
@@ -28,7 +28,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 		private const int HitCount = 9;
 		private const float JollyRogerDamageBonus = 0.2f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 	/// Handler for the Outlaw skill Aggress.
 	/// </summary>
 	[SkillHandler(SkillId.OutLaw_Aggress)]
-	public class OutLaw_Aggress : IMeleeGroundSkillHandler
+	public class OutLaw_Aggress : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, debuffing enemies in the target area.
@@ -27,9 +27,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = designatedTargets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

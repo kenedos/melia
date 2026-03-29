@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cryomancer_IceBlast)]
-	public class Cryomancer_IceBlastOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cryomancer_IceBlastOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int DebuffDurationSeconds = 20;
 		private const int DebuffUpdateTimeMilliseconds = 1000;
@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 			caster.PlaySound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

@@ -22,11 +22,11 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_VashitaSiddhi)]
-	public class Sadhu_VashitaSiddhiOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Sadhu_VashitaSiddhiOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(500);
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);

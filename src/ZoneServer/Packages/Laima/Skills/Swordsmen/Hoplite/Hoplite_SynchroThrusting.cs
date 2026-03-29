@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hoplite_SynchroThrusting)]
-	public class Hoplite_SynchroThrustingOverride : IMeleeGroundSkillHandler
+	public class Hoplite_SynchroThrustingOverride : IGroundSkillHandler
 	{
 		private readonly static TimeSpan BlockDuration = TimeSpan.FromMilliseconds(800);
 
@@ -34,7 +34,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			// Check if caster is wielding a one-handed spear
 			if (caster is Character casterCharacter)

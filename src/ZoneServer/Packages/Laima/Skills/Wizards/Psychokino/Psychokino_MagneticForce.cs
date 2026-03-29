@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Psychokino_MagneticForce)]
-	public class Psychokino_MagneticForceOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Psychokino_MagneticForceOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int LifeTimeSeconds = 3;
 
@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 		{
 			caster.PlaySound("voice_wiz_magneticforce_shot", "voice_wiz_m_magneticforce_shot");
 		}
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

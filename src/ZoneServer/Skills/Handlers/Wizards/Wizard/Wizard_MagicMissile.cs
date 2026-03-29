@@ -31,8 +31,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		/// <param name="target"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -57,10 +57,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			{
 				for (var i = 0; i < BulletsPerUse; ++i)
 				{
-					var target = mainTargets.Random();
+					var missileTarget = mainTargets.Random();
 
-					var skillHitResult = SCR_SkillHit(caster, target, skill);
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, hitDelay);
+					var skillHitResult = SCR_SkillHit(caster, missileTarget, skill);
+					var skillHit = new SkillHitInfo(caster, missileTarget, skill, skillHitResult, aniTime, hitDelay);
 
 					skillHit.ApplyDamage();
 					skillHit.ApplyKnockBack();

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Melia.Shared.World;
 using Melia.Zone.Buffs;
@@ -18,9 +18,9 @@ namespace Melia.Zone.Skills.Handlers.Base
 		void Handle(Skill skill, ICombatEntity caster, ICombatEntity target);
 	}
 
-	public interface IMeleeGroundSkillHandler : ISkillHandler
+	public interface IGroundSkillHandler : ISkillHandler
 	{
-		void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets);
+		void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target);
 	}
 
 	public interface ITargetGroundSkillHandler : ISkillHandler
@@ -29,11 +29,6 @@ namespace Melia.Zone.Skills.Handlers.Base
 	}
 
 	public interface IForceGroundSkillHandler : ISkillHandler
-	{
-		void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target);
-	}
-
-	public interface IGroundSkillHandler : ISkillHandler
 	{
 		void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target);
 	}

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Dievdirbys_Carve)]
-	public class Dievdirbys_CarveOverride : IMeleeGroundSkillHandler
+	public class Dievdirbys_CarveOverride : IGroundSkillHandler
 	{
 		protected TimeSpan AniTime { get; } = TimeSpan.Zero;
 
@@ -52,7 +52,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			"pcskill_wood_laima2",
 		};
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -74,15 +74,14 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			var skillTargets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in skillTargets.LimitBySDR(caster, skill))
+			foreach (var t in skillTargets.LimitBySDR(caster, skill))
 			{
-				// Carve has 5 multi-hits as defined in skills_overrides.txt
 				var modifier = SkillModifier.MultiHit(5);
 
-				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
-				target.TakeDamage(skillHitResult.Damage, caster);
+				var skillHitResult = SCR_SkillHit(caster, t, skill, modifier);
+				t.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, aniTime, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);

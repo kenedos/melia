@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
@@ -15,9 +15,9 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 {
 	[Package("laima")]
 	[SkillHandler(SkillId.Chronomancer_BackMasking)]
-	public class Chronomancer_BackmaskingOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Chronomancer_BackmaskingOverride : IGroundSkillHandler, IDynamicCasted
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

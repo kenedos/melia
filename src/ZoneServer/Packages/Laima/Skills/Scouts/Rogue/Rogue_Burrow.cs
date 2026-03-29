@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,9 +21,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Rogue_Burrow)]
-	public class Rogue_BurrowOverride : IMeleeGroundSkillHandler
+	public class Rogue_BurrowOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			var buffActive = caster.IsBuffActive(BuffId.Burrow_Rogue);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, buffActive ? 1 : 0, targetHandle, caster.Position, caster.Direction, Position.Zero);
 

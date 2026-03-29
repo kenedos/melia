@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Elementalist_Meteor)]
-	public class Elementalist_MeteorOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Elementalist_MeteorOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			caster.StopSound("voice_wiz_meteor_cast");
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
@@ -50,7 +50,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var target = targets.FirstOrDefault();
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);

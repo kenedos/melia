@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Fletcher_MagicArrow)]
-	public class Fletcher_MagicArrowOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Fletcher_MagicArrowOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			caster.StopSound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

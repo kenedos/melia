@@ -1,4 +1,4 @@
-using Melia.Shared.Packages;
+﻿using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.World;
@@ -18,9 +18,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_Prakriti)]
-	public class Sadhu_PrakritiOverride : IMeleeGroundSkillHandler
+	public class Sadhu_PrakritiOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.IsBuffActive(BuffId.OOBE_Soulmaster_Buff))
 				return;

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -21,14 +21,14 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Fletcher_CatenaChainArrow)]
-	public class Fletcher_CatenaChainArrowOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Fletcher_CatenaChainArrowOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const string ChainLinkEffectKey = "Melia.Skill.CatenaChainLink";
 		private const float PadDuration = 20f;
 		private const float PadSize = 20f;
 		private const float MaxLeashDistance = 150f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (skill.Vars.TryGet<int>("Melia.Skill.CatenaPadHandle", out var existingPadHandle) && existingPadHandle > 0)
 			{

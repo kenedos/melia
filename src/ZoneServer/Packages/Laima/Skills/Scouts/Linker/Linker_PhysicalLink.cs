@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
@@ -30,7 +30,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 		private const float LinkEffectScale = 0.5f;
 		private const string LinkSound = "swd_blow_cloth2";
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity designatedTarget)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

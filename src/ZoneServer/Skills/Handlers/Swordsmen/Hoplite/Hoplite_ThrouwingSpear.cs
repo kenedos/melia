@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 	/// Handler for the Hoplite skill Throwing Spear
 	/// </summary>
 	[SkillHandler(SkillId.Hoplite_ThrouwingSpear)]
-	public class Hoplite_ThrouwingSpear : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Hoplite_ThrouwingSpear : IGroundSkillHandler, IDynamicCasted
 	{
 		private static readonly TimeSpan HitDelay = TimeSpan.FromMilliseconds(435);
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(5);
@@ -55,9 +55,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

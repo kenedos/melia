@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,10 +31,10 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hunter_Brawl)]
-	public class Hunter_BrawlOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Hunter_BrawlOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TryGetActiveCompanion(out var companion))
 			{

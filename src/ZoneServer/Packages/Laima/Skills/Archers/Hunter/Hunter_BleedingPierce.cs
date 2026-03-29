@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hunter_BleedingPierce)]
-	public class Hunter_BleedingPierceOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Hunter_BleedingPierceOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 			caster.StopSound("voice_atk_long_cast_f", "voice_war_atk_long_cast");
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -56,7 +56,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 
 			skill.Run(this.HandleSkill(skill, caster, originPos, farPos));
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 

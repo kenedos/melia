@@ -12,7 +12,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 	/// Handler for the Scout skill Free Step.
 	/// </summary>
 	[SkillHandler(SkillId.Scout_FreeStep)]
-	public class Scout_FreeStep : IMeleeGroundSkillHandler
+	public class Scout_FreeStep : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.
@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

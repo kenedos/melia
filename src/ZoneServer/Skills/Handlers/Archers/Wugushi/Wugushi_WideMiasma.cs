@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	/// Handler for the Wugushi skill Wide Miasma.
 	/// </summary>
 	[SkillHandler(SkillId.Wugushi_WideMiasma)]
-	public class Wugushi_WideMiasma : IMeleeGroundSkillHandler
+	public class Wugushi_WideMiasma : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, insert debuffs to enemies inside of the effect area
@@ -27,9 +27,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

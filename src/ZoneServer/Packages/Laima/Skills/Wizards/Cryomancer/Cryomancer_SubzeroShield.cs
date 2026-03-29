@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
@@ -18,13 +18,13 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cryomancer_SubzeroShield)]
-	public class Cryomancer_SubzeroShieldOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cryomancer_SubzeroShieldOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int BuffRange = 300;
 		private const int BuffDurationSeconds = 300;
 		private const int FreezeDurationMilliseconds = 500;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

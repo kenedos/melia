@@ -14,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 	/// Handler for the Assassin skill Hasisas.
 	/// </summary>
 	[SkillHandler(SkillId.Assassin_Hasisas)]
-	public class Assassin_Hasisas : IMeleeGroundSkillHandler
+	public class Assassin_Hasisas : IGroundSkillHandler
 	{
 		private const int HasisasPotionId = 647010;
 		private static readonly TimeSpan BuffDuration = TimeSpan.FromMinutes(30);
@@ -26,9 +26,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

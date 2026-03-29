@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Elementalist_ElementalEssence)]
-	public class Elementalist_ElementalEssenceOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Elementalist_ElementalEssenceOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			caster.StopSound("voice_elementalist_f_elementalessence_cast", "voice_elementalist_m_elementalessence_cast");
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -51,7 +51,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var target = targets.FirstOrDefault();
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cataphract_EarthWave)]
-	public class Cataphract_EarthWaveOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Cataphract_EarthWaveOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		/// <summary>
 		/// Called when the skill begins casting.
@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 		/// <summary>
 		/// Handles the Earth Wave skill execution.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

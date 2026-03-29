@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 	/// Handler for the Ardito skill Invasione.
 	/// </summary>
 	[SkillHandler(SkillId.Arditi_Invasione)]
-	public class Arditi_Invasione : IMeleeGroundSkillHandler
+	public class Arditi_Invasione : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -29,9 +29,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

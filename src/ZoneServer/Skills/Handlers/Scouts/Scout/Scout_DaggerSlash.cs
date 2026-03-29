@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 	/// Handler for the Scout skill Dagger Slash.
 	/// </summary>
 	[SkillHandler(SkillId.Scout_DaggerSlash)]
-	public class Scout_DaggerSlash : IMeleeGroundSkillHandler
+	public class Scout_DaggerSlash : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, do a slash attack to the nearby enemies.
@@ -30,9 +30,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

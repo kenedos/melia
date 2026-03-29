@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Psychokino_GravityPole)]
-	public class Psychokino_GravityPoleOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Psychokino_GravityPoleOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 			caster.RemoveBuff(BuffId.Wizard_SklCasting_Avoid);
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -57,7 +57,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var target = targets.FirstOrDefault();
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);

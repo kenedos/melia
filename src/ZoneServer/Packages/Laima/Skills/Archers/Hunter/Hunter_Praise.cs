@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -17,11 +17,11 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hunter_Praise)]
-	public class Hunter_PraiseOverride : IMeleeGroundSkillHandler
+	public class Hunter_PraiseOverride : IGroundSkillHandler
 	{
 		private const int PraiseAtkBuffDurationSeconds = 10;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TryGetActiveCompanion(out var companion))
 			{

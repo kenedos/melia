@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Wizard_MagicMissile)]
-	public class Wizard_MagicMissileOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Wizard_MagicMissileOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int BulletsPerUse = 3;
 		private const float SubSplashAreaSize = 200;
@@ -33,8 +33,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="designatedTarget"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] designatedTargets)
+		/// <param name="target"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -59,26 +59,22 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			{
 				for (var i = 0; i < BulletsPerUse; ++i)
 				{
-					var target = targets.Random();
+					var missileTarget = targets.Random();
 
-					var skillHitResult = SCR_SkillHit(caster, target, skill);
-					target.TakeDamage(skillHitResult.Damage, caster);
+					var skillHitResult = SCR_SkillHit(caster, missileTarget, skill);
+					missileTarget.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+					var skillHit = new SkillHitInfo(caster, missileTarget, skill, skillHitResult, aniTime, skillHitDelay);
 					skillHits.Add(skillHit);
 				}
 			}
 
 			foreach (var skillHit in skillHits)
 			{
-				var target = skillHit.Target;
+				var sourceTarget = skillHit.Target;
 
-				// Not sure about this sub splash area, but it feels alright.
-				// And while it seems rather large, you can actually observe
-				// ricochet bullets going pretty far, so it can't be off by
-				// too much.
-				var subSplashArea = Square.Centered(target.Position, caster.Direction, SubSplashAreaSize, SubSplashAreaSize / 2);
-				var subTargets = caster.Map.GetAttackableEnemiesIn(caster, subSplashArea).Where(a => a != target);
+				var subSplashArea = Square.Centered(sourceTarget.Position, caster.Direction, SubSplashAreaSize, SubSplashAreaSize / 2);
+				var subTargets = caster.Map.GetAttackableEnemiesIn(caster, subSplashArea).Where(a => a != sourceTarget);
 
 				if (!subTargets.Any())
 					continue;
@@ -89,13 +85,13 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 				{
 					var subTarget = subTargets.Random();
 
-					var skillHitResult = SCR_SkillHit(caster, target, skill);
+					var skillHitResult = SCR_SkillHit(caster, sourceTarget, skill);
 					subTarget.TakeDamage(skillHitResult.Damage, caster);
 
 					var hit = new HitInfo(caster, subTarget, skill, skillHitResult.Damage, skillHitResult.Result);
 					hits.Add(hit);
 
-					Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, target, subTarget, "I_force001_yellow", 1, "arrow_cast", "I_explosion004_yellow", 1, "arrow_blow", "SLOW", 150);
+					Send.ZC_NORMAL.PlayForceEffect(hit.ForceId, caster, sourceTarget, subTarget, "I_force001_yellow", 1, "arrow_cast", "I_explosion004_yellow", 1, "arrow_blow", "SLOW", 150);
 				}
 			}
 

@@ -13,7 +13,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// Handler for the Ranger skill Scan.
 	/// </summary>
 	[SkillHandler(SkillId.Ranger_Scan)]
-	public class Ranger_Scan : IMeleeGroundSkillHandler
+	public class Ranger_Scan : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a debuff to the target
@@ -23,9 +23,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (target == null)
 			{
 				caster.ServerMessage(Localization.Get("No target specified."));

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Pyromancer_EnchantFire)]
-	public class Pyromancer_EnchantFireOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Pyromancer_EnchantFireOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float BuffRange = 300;
 		private const int BuffDurationSeconds = 300;
@@ -45,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

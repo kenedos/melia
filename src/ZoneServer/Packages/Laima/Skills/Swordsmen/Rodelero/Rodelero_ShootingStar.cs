@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -23,12 +23,12 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Rodelero_ShootingStar)]
-	public class Rodelero_ShootingStarOverride : IMeleeGroundSkillHandler
+	public class Rodelero_ShootingStarOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the Shooting Star skill execution.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

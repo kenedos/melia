@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -14,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 {
 	[Package("laima")]
 	[SkillHandler(SkillId.Pyromancer_HellBreath)]
-	public class Pyromancer_HellBreathOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Pyromancer_HellBreathOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float MaxDistance = 200f;
 		private const float PadSpeed = 150f;
@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		/// <summary>
 		/// Handles the execution of the skill.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

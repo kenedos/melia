@@ -26,9 +26,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_AstralBodySmite)]
-	public class Sadhu_AstralBodySmiteOverride : IMeleeGroundSkillHandler
+	public class Sadhu_AstralBodySmiteOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -38,19 +38,20 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos, targets));
+			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos, ICombatEntity[] targets)
+		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			var targetPos = originPos.GetRelative(farPos, distance: 50f);
 			var value = skill.GetPVPValue(5);
 			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 60f, value));
+			var targets = caster.GetTargets();
 			caster.StartBuff(BuffId.Sadhu_Soul_Pre_Buff, 1f, 0f, TimeSpan.Zero, caster);
 			caster.StartBuff(BuffId.Sadhu_Soul_Buff, 1f, 0f, TimeSpan.FromMilliseconds(60000f), caster);
 			await skill.Wait(TimeSpan.FromMilliseconds(500));

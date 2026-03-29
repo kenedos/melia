@@ -13,7 +13,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	/// Handler for the skill Crescendo Bane.
 	/// </summary>
 	[SkillHandler(SkillId.Wugushi_CrescendoBane)]
-	public class Wugushi_CrescendoBane : IMeleeGroundSkillHandler
+	public class Wugushi_CrescendoBane : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.
@@ -22,9 +22,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

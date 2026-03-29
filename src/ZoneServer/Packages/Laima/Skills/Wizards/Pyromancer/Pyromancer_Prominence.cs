@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -17,9 +17,9 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Pyromancer_Prominence)]
-	public class Pyromancer_ProminenceOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Pyromancer_ProminenceOverride : IGroundSkillHandler, IDynamicCasted
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

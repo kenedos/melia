@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Swordman_Bear)]
-	public class Swordman_BearOverride : IMeleeGroundSkillHandler
+	public class Swordman_BearOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="dir"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

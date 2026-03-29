@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -22,11 +22,11 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_Patati)]
-	public class Sadhu_PatatiOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Sadhu_PatatiOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int MaxTargets = 7;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.IsBuffActive(BuffId.OOBE_Soulmaster_Buff))
 				return;
@@ -52,19 +52,19 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			var circle = new Circle(originPos, 70);
 			var aoeTargets = caster.Map.GetAttackableEnemiesIn(caster, circle);
 
-			foreach (var target in aoeTargets.Take(MaxTargets))
+			foreach (var t in aoeTargets.Take(MaxTargets))
 			{
 				var chance = this.GetKnockdownChance(skill);
 
-				if (chance >= RandomProvider.Get().Next(100) && target.IsKnockdownable())
-					this.KnockdownEntity(caster, target, skill);
+				if (chance >= RandomProvider.Get().Next(100) && t.IsKnockdownable())
+					this.KnockdownEntity(caster, t, skill);
 
 				var modifier = SkillModifier.MultiHit(6);
-				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
-				target.TakeDamage(skillHitResult.Damage, caster);
+				var skillHitResult = SCR_SkillHit(caster, t, skill, modifier);
+				t.TakeDamage(skillHitResult.Damage, caster);
 
-				var hit = new HitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(200));
-				Send.ZC_HIT_INFO(caster, target, hit);
+				var hit = new HitInfo(caster, t, skill, skillHitResult, TimeSpan.FromMilliseconds(200));
+				Send.ZC_HIT_INFO(caster, t, hit);
 			}
 		}
 

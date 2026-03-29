@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Linker_SpiritualChain)]
-	public class Linker_SpiritualChainOverride : IMeleeGroundSkillHandler
+	public class Linker_SpiritualChainOverride : IGroundSkillHandler
 	{
 		private const float LinkRange = 250f;
 		private const string LinkTexture = "Linker_blue2";
@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 		private const float LinkEffectScale = 0.3f;
 		private const string LinkSound = "swd_blow_cloth2";
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

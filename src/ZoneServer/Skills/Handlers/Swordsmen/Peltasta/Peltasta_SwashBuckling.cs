@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// Handler for the Peltasta skill Swash Buckling.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_SwashBuckling)]
-	public class Peltasta_SwashBuckling : IMeleeGroundSkillHandler
+	public class Peltasta_SwashBuckling : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, giving the caster a buff and debuffing enemies
@@ -27,9 +27,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] designatedTargets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = designatedTargets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

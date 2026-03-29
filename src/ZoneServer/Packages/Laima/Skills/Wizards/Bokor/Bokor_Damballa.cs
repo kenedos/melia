@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Bokor_Damballa)]
-	public class Bokor_DamballaOverride : IMeleeGroundSkillHandler
+	public class Bokor_DamballaOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill behavior
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			var maxRange = skill.Properties.GetFloat(PropertyName.MaxR);
 
@@ -77,16 +77,16 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 
 				summon.Kill(caster);
 
-				foreach (var target in targetsToHit)
+				foreach (var t in targetsToHit)
 				{
-					var skillHitResult = SCR_SkillHit(caster, target, skill);
-					target.PlayEffect("F_rize004_dark_damballa", 5f, 0);
-					target.TakeDamage(skillHitResult.Damage, caster);
+					var skillHitResult = SCR_SkillHit(caster, t, skill);
+					t.PlayEffect("F_rize004_dark_damballa", 5f, 0);
+					t.TakeDamage(skillHitResult.Damage, caster);
 
-					var hitInfo = new HitInfo(caster, target, skill, skillHitResult.Damage, skillHitResult.Result);
+					var hitInfo = new HitInfo(caster, t, skill, skillHitResult.Damage, skillHitResult.Result);
 					hitInfo.AniTime = TimeSpan.FromMilliseconds(100);
 
-					Send.ZC_HIT_INFO(caster, target, hitInfo);
+					Send.ZC_HIT_INFO(caster, t, hitInfo);
 				}
 			}
 		}

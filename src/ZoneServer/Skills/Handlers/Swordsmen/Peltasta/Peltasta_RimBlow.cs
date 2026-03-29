@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// Handler for the Peltasta skill Rim Blow.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_RimBlow)]
-	public class Peltasta_RimBlow : IMeleeGroundSkillHandler
+	public class Peltasta_RimBlow : IGroundSkillHandler
 	{
 		private readonly static TimeSpan StunDuration = TimeSpan.FromSeconds(3);
 		private const float StunChancePerLevel = 5f;
@@ -34,9 +34,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

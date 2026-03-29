@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 	/// Handler for the Ardito skill Granata.
 	/// </summary>
 	[SkillHandler(SkillId.Arditi_Granata)]
-	public class Arditi_Granata : IMeleeGroundSkillHandler
+	public class Arditi_Granata : IGroundSkillHandler
 	{
 		private const int CastLength = 70;
 
@@ -34,9 +34,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

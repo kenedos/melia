@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Kriwi_DivineStigma)]
-	public class Krivis_DivineStigmaOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Krivis_DivineStigmaOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int DebuffDurationMilliseconds = 8000;
 
@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -47,9 +47,9 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos, targets));
+			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
 		}
-		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos, ICombatEntity[] targets)
+		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			var targetPos = originPos.GetRelative(caster.Direction, distance: 100);
 			var area = new Yggdrasil.Geometry.Shapes.CircleF(targetPos, 150f);

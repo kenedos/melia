@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
@@ -17,7 +17,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 {
 	[Package("laima")]
 	[SkillHandler(SkillId.Chronomancer_TimeClutch)]
-	public class Chronomancer_TimeClutchOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Chronomancer_TimeClutchOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 				Send.ZC_NORMAL.Skill_DynamicCastEnd(character, skill.Id, maxCastTime);
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -60,7 +60,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 				hits.Add(skillHit);
 			}
 
-			var targetHandle = targets?.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), hits);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Priest_Resurrection)]
-	public class ResurrectionOverride : IMeleeGroundSkillHandler
+	public class ResurrectionOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill
@@ -29,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -50,9 +50,9 @@ namespace Melia.Zone.Skills.Handlers.Priest
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			var allies = caster.Map.GetDeadAlliedEntitiesIn(caster, splashArea);
-			foreach (var target in allies)
+			foreach (var ally in allies)
 			{
-				if (target is Character player)
+				if (ally is Character player)
 				{
 					player.Resurrect(ResurrectOptions.TryAgain);
 				}

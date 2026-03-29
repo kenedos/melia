@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 	/// Handler for the Ardito skill Ritirarsi.
 	/// </summary>
 	[SkillHandler(SkillId.Arditi_Ritirarsi)]
-	public class Arditi_Ritirarsi : IMeleeGroundSkillHandler
+	public class Arditi_Ritirarsi : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -28,9 +28,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

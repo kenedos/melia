@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Barbarian_Seism)]
-	public class Barbarian_SeismOverride : IMeleeGroundSkillHandler
+	public class Barbarian_SeismOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill behavior
@@ -39,7 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

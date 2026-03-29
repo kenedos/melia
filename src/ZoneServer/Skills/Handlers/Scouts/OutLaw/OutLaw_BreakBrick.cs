@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 	/// Handler for the Assassin skill Brick Smash
 	/// </summary>
 	[SkillHandler(SkillId.OutLaw_BreakBrick)]
-	public class OutLaw_BreakBrick : IMeleeGroundSkillHandler
+	public class OutLaw_BreakBrick : IGroundSkillHandler
 	{
 		public const float JumpDistance = 60f;
 
@@ -33,9 +33,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 
 			if (!caster.TrySpendSp(skill))
 			{

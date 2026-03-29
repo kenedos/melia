@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -16,9 +16,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_OutofBodyCancel)]
-	public class Sadhu_OutofBodyCancelOverride : IMeleeGroundSkillHandler
+	public class Sadhu_OutofBodyCancelOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.IsBuffActive(BuffId.OOBE_Soulmaster_Buff))
 				return;

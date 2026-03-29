@@ -25,13 +25,13 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Wugushi_CrescendoBane)]
-	public class Wugushi_CrescendoBaneOverride : IMeleeGroundSkillHandler
+	public class Wugushi_CrescendoBaneOverride : IGroundSkillHandler
 	{
 		private const float BuffDurationMs = 8000f;
 		private const float SplashRadius = 300f;
 		private const int MaxTargets = 15;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -42,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);

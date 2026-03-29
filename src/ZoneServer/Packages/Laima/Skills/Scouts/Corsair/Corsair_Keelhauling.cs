@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Corsair_Keelhauling)]
-	public class Corsair_KeelhaulingOverride : IMeleeGroundSkillHandler
+	public class Corsair_KeelhaulingOverride : IGroundSkillHandler
 	{
 		private const float SplashLength = 80f;
 		private const float SplashWidth = 20f;
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 		private const int MinKnockdownVelocity = 50;
 		private const float MaxPullDistance = 300f;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -42,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
@@ -60,19 +60,19 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 			var processedTargets = new HashSet<ICombatEntity>();
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in aoeTargets.LimitBySDR(caster, skill))
+			foreach (var t in aoeTargets.LimitBySDR(caster, skill))
 			{
-				processedTargets.Add(target);
-				this.ProcessTarget(caster, skill, target, knockedDownTargets, hits);
+				processedTargets.Add(t);
+				this.ProcessTarget(caster, skill, t, knockedDownTargets, hits);
 			}
 
-			foreach (var target in hookedTargets)
+			foreach (var t in hookedTargets)
 			{
-				if (processedTargets.Contains(target))
+				if (processedTargets.Contains(t))
 					continue;
 
-				processedTargets.Add(target);
-				this.ProcessTarget(caster, skill, target, knockedDownTargets, hits);
+				processedTargets.Add(t);
+				this.ProcessTarget(caster, skill, t, knockedDownTargets, hits);
 			}
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), hits);
@@ -91,19 +91,19 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 			var processedTargets = new HashSet<ICombatEntity>();
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in aoeTargets.LimitBySDR(caster, skill))
+			foreach (var t in aoeTargets.LimitBySDR(caster, skill))
 			{
-				processedTargets.Add(target);
-				this.ProcessTarget(caster, skill, target, knockedDownTargets, hits);
+				processedTargets.Add(t);
+				this.ProcessTarget(caster, skill, t, knockedDownTargets, hits);
 			}
 
-			foreach (var target in hookedTargets)
+			foreach (var t in hookedTargets)
 			{
-				if (processedTargets.Contains(target))
+				if (processedTargets.Contains(t))
 					continue;
 
-				processedTargets.Add(target);
-				this.ProcessTarget(caster, skill, target, knockedDownTargets, hits);
+				processedTargets.Add(t);
+				this.ProcessTarget(caster, skill, t, knockedDownTargets, hits);
 			}
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), hits);

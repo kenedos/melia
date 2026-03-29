@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -22,12 +22,12 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cataphract_SteedCharge)]
-	public class Cataphract_SteedChargeOverride : IMeleeGroundSkillHandler
+	public class Cataphract_SteedChargeOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the Steed Charge skill execution.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -24,9 +24,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.QuarrelShooter_StonePicking)]
-	public class QuarrelShooterStonePicking : IMeleeGroundSkillHandler
+	public class QuarrelShooterStonePicking : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

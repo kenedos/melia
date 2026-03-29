@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 	/// Handler for the Barbarian skill Giant Swing.
 	/// </summary>
 	[SkillHandler(SkillId.Barbarian_GiantSwing)]
-	public class Barbarian_GiantSwing : IMeleeGroundSkillHandler
+	public class Barbarian_GiantSwing : IGroundSkillHandler
 	{
 		public const float TossDistance = 150;
 		public const float ChainLength = 80;
@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

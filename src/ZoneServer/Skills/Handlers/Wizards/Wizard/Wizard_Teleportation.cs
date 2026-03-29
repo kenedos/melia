@@ -14,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// Handler for the Wizard skill Teleportation.
 	/// </summary>
 	[SkillHandler(SkillId.Wizard_Teleportation)]
-	public class Wizard_Teleportation : IMeleeGroundSkillHandler
+	public class Wizard_Teleportation : IGroundSkillHandler
 	{
 		private const float TeleportationDistance = 100;
 		private static readonly TimeSpan ReUseTime = TimeSpan.FromSeconds(2);
@@ -27,9 +27,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

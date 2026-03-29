@@ -13,7 +13,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 	/// Handler for the Archer skill Leap.
 	/// </summary>
 	[SkillHandler(SkillId.Archer_Jump)]
-	public class Archer_Jump : IMeleeGroundSkillHandler
+	public class Archer_Jump : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, moving the character back.
@@ -23,9 +23,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

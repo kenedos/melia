@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection.Emit;
 using Melia.Shared.Packages;
@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Ranger_Scan)]
-	public class Ranger_ScanOverride : IMeleeGroundSkillHandler
+	public class Ranger_ScanOverride : IGroundSkillHandler
 	{
 		private const float BaseCritResistReduce = 20f;
 
@@ -33,9 +33,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (target == null)
 			{
 				caster.ServerMessage(Localization.Get("No target specified."));

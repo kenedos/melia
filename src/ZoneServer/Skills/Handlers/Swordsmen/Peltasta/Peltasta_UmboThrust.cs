@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// Handler for the Peltasta Skill Umbo Thrust.
 	/// </summary>
 	[SkillHandler(SkillId.Peltasta_UmboThrust)]
-	public class Peltasta_UmboThrust : IMeleeGroundSkillHandler
+	public class Peltasta_UmboThrust : IGroundSkillHandler
 	{
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(3);
 
@@ -32,9 +32,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,7 +30,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Paladin_Sanctuary)]
-	public class Paladin_SanctuaryOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Paladin_SanctuaryOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -45,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 			pad.Destroy();
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			// Check if caster is wielding a shield
 			if (caster is Character character)

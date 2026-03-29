@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -14,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cleric_PatronSaint)]
-	public class Cleric_PatronSaintOverride : IMeleeGroundSkillHandler
+	public class Cleric_PatronSaintOverride : IGroundSkillHandler
 	{
 		private const int BuffDurationSeconds = 300;
 		private const float AbilityBonus = 0.005f;
@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

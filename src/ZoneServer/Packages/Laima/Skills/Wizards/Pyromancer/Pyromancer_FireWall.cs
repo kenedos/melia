@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Pyromancer_FireWall)]
-	public class Pyromancer_FireWallOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Pyromancer_FireWallOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int FireWallDuration = 15;
 		private const int FireWallSize = 25;
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 		/// <summary>
 		/// Handles skill.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

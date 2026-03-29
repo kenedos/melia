@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Hoplite_ThrouwingSpear)]
-	public class Hoplite_ThrouwingSpearOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Hoplite_ThrouwingSpearOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private static readonly TimeSpan HitDelay = TimeSpan.FromMilliseconds(435);
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(5);
@@ -38,7 +38,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			// Check if caster is wielding a spear or two-handed spear
 			if (caster is Character casterCharacter)

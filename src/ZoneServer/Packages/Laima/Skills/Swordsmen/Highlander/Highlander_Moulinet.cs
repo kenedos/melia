@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Highlander_Moulinet)]
-	public class Highlander_MoulinetOverride : IMeleeGroundSkillHandler
+	public class Highlander_MoulinetOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Applies bonus damage if target is bleeding
@@ -45,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -61,12 +61,12 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 			var targetList = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in targetList.LimitBySDR(caster, skill))
+			foreach (var t in targetList.LimitBySDR(caster, skill))
 			{
-				var skillHitResult = SCR_SkillHit(caster, target, skill);
+				var skillHitResult = SCR_SkillHit(caster, t, skill);
 
-				target.TakeDamage(skillHitResult.Damage, caster);
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero);
+				t.TakeDamage(skillHitResult.Damage, caster);
+				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero);
 				hits.Add(skillHit);
 			}
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);

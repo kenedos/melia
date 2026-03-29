@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
@@ -21,10 +21,10 @@ namespace Melia.Zone.Skills.Handlers.Priest
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Priest_TurnUndead)]
-	public class Priest_TurnUndeadOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Priest_TurnUndeadOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

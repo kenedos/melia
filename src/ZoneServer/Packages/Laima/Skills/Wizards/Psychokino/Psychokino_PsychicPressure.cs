@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Psychokino_PsychicPressure)]
-	public class Psychokino_PsychicPressureOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Psychokino_PsychicPressureOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 			SkillRemovePad(caster, skill);
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	/// Handler for the Highlander skill SkyLiner.
 	/// </summary>
 	[SkillHandler(SkillId.Highlander_SkyLiner)]
-	public class Highlander_SkyLiner : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Highlander_SkyLiner : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int TotalHits = 4;
 
@@ -48,9 +48,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

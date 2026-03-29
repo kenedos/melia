@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 	/// Handler for the Barbarian skill Seism.
 	/// </summary>
 	[SkillHandler(SkillId.Barbarian_Seism)]
-	public class Barbarian_Seism : IMeleeGroundSkillHandler
+	public class Barbarian_Seism : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -30,9 +30,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Barbarian
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

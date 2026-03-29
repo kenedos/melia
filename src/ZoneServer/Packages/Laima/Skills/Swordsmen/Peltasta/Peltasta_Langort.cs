@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Peltasta_Langort)]
-	public class Peltasta_LangortOverride : IMeleeGroundSkillHandler
+	public class Peltasta_LangortOverride : IGroundSkillHandler
 	{
 		private readonly static TimeSpan BlockDuration = TimeSpan.FromMilliseconds(750);
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(1);
@@ -34,7 +34,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

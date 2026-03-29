@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -10,7 +11,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using Yggdrasil.Util;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
@@ -21,9 +21,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sadhu_EctoplasmAttack)]
-	public class Sadhu_EctoplasmAttackOverride : IMeleeGroundSkillHandler
+	public class Sadhu_EctoplasmAttackOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.IsBuffActive(BuffId.OOBE_Soulmaster_Buff))
 				return;
@@ -39,10 +39,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			skill.Run(this.Attack(skill, caster, originPos, farPos, targets));
+			skill.Run(this.Attack(skill, caster, originPos, farPos));
 		}
 
-		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IEnumerable<ICombatEntity> targets)
+		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition)
 		{
 			var aniTime = TimeSpan.FromMilliseconds(330);
 			var skillHitDelay = skill.Properties.HitDelay;
@@ -54,6 +54,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / reducedSpdRate);
 
 			await skill.Wait(skillHitDelay);
+
+			var splashParam = skill.GetSplashParameters(caster, castPosition, targetPosition, length: 30, width: 30, angle: 0);
+			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			var hits = new List<SkillHitInfo>();
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.QuarrelShooter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.QuarrelShooter_BlockAndShoot)]
-	public class QuarrelShooterBlockAndShootOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class QuarrelShooterBlockAndShootOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float BaseBlockBonus = 100f;
 		private const float BlockBonusPerLevel = 10f;
@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.QuarrelShooter
 			_isCasting = false;
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

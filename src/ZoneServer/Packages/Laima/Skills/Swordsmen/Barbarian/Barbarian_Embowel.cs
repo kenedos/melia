@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -22,12 +22,12 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Barbarian_Embowel)]
-	public class Barbarian_EmbowelOverride : IMeleeGroundSkillHandler
+	public class Barbarian_EmbowelOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the Embowel skill execution.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -49,14 +49,14 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 			var targetList = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in targetList.LimitBySDR(caster, skill))
+			foreach (var t in targetList.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.Default;
-				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
+				var skillHitResult = SCR_SkillHit(caster, t, skill, modifier);
 
-				target.TakeDamage(skillHitResult.Damage, caster);
+				t.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, aniTime, TimeSpan.Zero);
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);

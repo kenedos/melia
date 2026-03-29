@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Sapper_Claymore)]
-	public class Sapper_ClaymoreOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Sapper_ClaymoreOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float ClaymoreLifetimeSeconds = 120f;
 		private const float SpawnDistance = 22.4f;
@@ -34,7 +34,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			skill.IncreaseOverheat();
 
@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 				return;
 			}
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			var spawnPos = originPos.GetRelative(caster.Direction, distance: SpawnDistance);
 
 			var claymore = MonsterSkillCreateMob(skill, caster, "skill_sapper_trap4", spawnPos, 0, "", "", 0, ClaymoreLifetimeSeconds, "MON_DUMMY", "");

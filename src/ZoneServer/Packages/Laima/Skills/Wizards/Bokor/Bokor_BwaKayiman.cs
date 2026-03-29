@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Bokor_BwaKayiman)]
-	public class Bokor_BwaKayimanOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Bokor_BwaKayimanOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float CircleRadius = 50f;
 		private const int PadRadius = 30;
@@ -107,7 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 			}
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (caster is not Character character)
 				return;

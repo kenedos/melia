@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 	/// Handler for the Ardito skill Recupero.
 	/// </summary>
 	[SkillHandler(SkillId.Arditi_Recupero)]
-	public class Arditi_Recupero : IMeleeGroundSkillHandler
+	public class Arditi_Recupero : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, heals the player and increases the max stamina
@@ -28,9 +28,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -1846,7 +1846,7 @@ namespace Melia.Zone.Network
 				{
 					case SkillUseType.MeleeGround:
 					{
-						if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IMeleeGroundSkillHandler>(skillId, out var handler))
+						if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IGroundSkillHandler>(skillId, out var handler))
 						{
 							character.ServerMessage(Localization.Get("This skill has not been implemented yet."));
 							Log.Warning("CZ_CLIENT_HIT_LIST: No handler for skill '{0}' found.", skillId);
@@ -1854,7 +1854,7 @@ namespace Melia.Zone.Network
 						}
 
 						skill.PrepareCancellation();
-						handler.Handle(skill, character, originPos, farPos, targets.ToArray());
+						handler.Handle(skill, character, originPos, farPos, targets.FirstOrDefault());
 						break;
 					}
 					case SkillUseType.Force:
@@ -2133,7 +2133,7 @@ namespace Melia.Zone.Network
 					}
 					case SkillUseType.MeleeGround:
 					{
-						if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IMeleeGroundSkillHandler>(skillId, out var handler))
+						if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IGroundSkillHandler>(skillId, out var handler))
 						{
 							character.ServerMessage(Localization.Get("This skill has not been implemented yet."));
 							Log.Warning("CZ_SKILL_GROUND: No melee ground handler for skill '{0}' found.", skillId);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Archer_Concentration)]
-	public class Archer_ConcentrationOverride : IMeleeGroundSkillHandler
+	public class Archer_ConcentrationOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying buff to the caster.
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

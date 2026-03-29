@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 	/// Handler for the Swordsman skill Pommel Beat.
 	/// </summary>
 	[SkillHandler(SkillId.Swordman_PommelBeat)]
-	public class Swordman_PommelBeat : IMeleeGroundSkillHandler
+	public class Swordman_PommelBeat : IGroundSkillHandler
 	{
 		private const float StunDamageMultiplier = 3f;
 		private const float DefPierceRate = 0.01f;
@@ -32,9 +32,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

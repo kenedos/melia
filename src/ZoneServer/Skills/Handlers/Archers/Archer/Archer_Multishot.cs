@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 	/// Handler for the Archer skill Multishot.
 	/// </summary>
 	[SkillHandler(SkillId.Archer_Multishot)]
-	public class Archer_Multishot : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Archer_Multishot : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float SplashRadius = 30;
 		private const int TotalHits = 10;
@@ -54,7 +54,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

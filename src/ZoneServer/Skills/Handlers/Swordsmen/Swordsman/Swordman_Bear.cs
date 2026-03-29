@@ -12,7 +12,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 	/// Handler for the Swordman skill Bear.
 	/// </summary>
 	[SkillHandler(SkillId.Swordman_Bear)]
-	public class Swordman_Bear : IMeleeGroundSkillHandler
+	public class Swordman_Bear : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.
@@ -22,7 +22,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Swordsman
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

@@ -26,9 +26,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.QuarrelShooter_ScatterCaltrop)]
-	public class QuarrelShooterScatterCaltrop : IMeleeGroundSkillHandler
+	public class QuarrelShooterScatterCaltrop : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{

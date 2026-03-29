@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.OutLaw_Aggress)]
-	public class OutLaw_AggressOverride : IMeleeGroundSkillHandler
+	public class OutLaw_AggressOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the skill, debuffing enemies in the target area.
@@ -29,7 +29,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] designatedTargets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -56,19 +56,17 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 
 			for (var i = 0; i < maxTargets; i++)
 			{
-				var target = targets[i];
-				if (target.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
+				var t = targets[i];
+				if (t.IsBuffActive(BuffId.ProvocationImmunity_Debuff))
 					continue;
 
-				target.StartBuff(BuffId.Aggress_Debuff, skill.Level, unhingeLevel, duration, caster);
-				target.StartBuff(BuffId.ProvocationImmunity_Debuff, skill.Level, 0, duration, caster);
+				t.StartBuff(BuffId.Aggress_Debuff, skill.Level, unhingeLevel, duration, caster);
+				t.StartBuff(BuffId.ProvocationImmunity_Debuff, skill.Level, 0, duration, caster);
 
-				if (target.Components.TryGet<AiComponent>(out var component))
+				if (t.Components.TryGet<AiComponent>(out var component))
 				{
-					// Reset hate and simulate a hit to build a small amount
-					// of threat
 					component.Script.QueueEventAlert(new HateResetAlert(caster));
-					component.Script.QueueEventAlert(new HitEventAlert(target, caster, 0));
+					component.Script.QueueEventAlert(new HitEventAlert(t, caster, 0));
 				}
 			}
 

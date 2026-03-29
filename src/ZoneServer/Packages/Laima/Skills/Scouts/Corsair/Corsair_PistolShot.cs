@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,9 +23,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Corsair_PistolShot)]
-	public class Corsair_PistolShotOverride : IMeleeGroundSkillHandler
+	public class Corsair_PistolShotOverride : IGroundSkillHandler
 	{
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

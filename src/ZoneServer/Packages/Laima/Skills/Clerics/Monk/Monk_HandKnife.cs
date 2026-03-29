@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,14 +21,14 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Monk_HandKnife)]
-	public class Monk_HandKnifeOverride : IMeleeGroundSkillHandler
+	public class Monk_HandKnifeOverride : IGroundSkillHandler
 	{
 		private const float BaseDefPenetration = 0.10f;
 		private const float DefPenetrationPerLevel = 0.01f;
 		private const float MaxDefPenetration = 0.40f;
 
 		protected TimeSpan AniTime { get; } = TimeSpan.FromMilliseconds(250);
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -38,7 +38,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets?.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);

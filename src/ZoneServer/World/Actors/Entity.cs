@@ -793,14 +793,11 @@ namespace Melia.Zone.World.Actors
 		/// <summary>
 		/// Adds one or more entities to the caster's target list.
 		/// </summary>
-		public static void AddTarget(this ICombatEntity caster, params ICombatEntity[] targets)
+		public static void AddTarget(this ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.Components.TryGet<CombatComponent>(out var combat))
 				return;
-			foreach (var target in targets)
-			{
-				combat.AddTarget(target);
-			}
+			combat.AddTarget(target);
 		}
 
 		/// <summary>
@@ -840,10 +837,10 @@ namespace Melia.Zone.World.Actors
 		/// <summary>
 		/// Replaces the caster's target list with the given targets.
 		/// </summary>
-		public static void SetTarget(this ICombatEntity caster, params ICombatEntity[] targets)
+		public static void SetTarget(this ICombatEntity caster, ICombatEntity target)
 		{
 			caster.ClearTargets();
-			caster.AddTarget(targets);
+			caster.AddTarget(target);
 		}
 
 		/// <summary>

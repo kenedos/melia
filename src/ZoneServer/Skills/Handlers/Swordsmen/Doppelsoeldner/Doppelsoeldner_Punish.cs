@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 	/// Handler for the Doppelsoeldner skill Punish.
 	/// </summary>
 	[SkillHandler(SkillId.Doppelsoeldner_Punish)]
-	public class Doppelsoeldner_Punish : IMeleeGroundSkillHandler
+	public class Doppelsoeldner_Punish : IGroundSkillHandler
 	{
 		private const float MaxTargetDistance = 30f;
 		private const float MaxMoveDistance = 140f;
@@ -34,9 +34,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			// Punish will attempt to move you towards the target before
 			// it activates. The position is just in front of the target.
 			var attackPosDist = caster.Position.Get2DDistance(target.Position) - MaxTargetDistance;

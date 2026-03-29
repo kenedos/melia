@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Paladin_Barrier)]
-	public class Paladin_BarrierOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Paladin_BarrierOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 			caster.StopSound("voice_cleric_barrier_shot", "voice_cleric_m_barrier_shot");
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -45,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Paladin
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);

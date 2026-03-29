@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
@@ -22,10 +22,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Monk_DoublePunch)]
-	public class Monk_DoublePunchOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Monk_DoublePunchOverride : IGroundSkillHandler, IDynamicCasted
 	{
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);

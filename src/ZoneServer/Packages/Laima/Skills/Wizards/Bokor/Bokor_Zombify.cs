@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -28,7 +28,7 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Bokor_Zombify)]
-	public class Bokor_ZombifyOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Bokor_ZombifyOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const string DefaultZombieClass = "summons_zombie";
 		private const string WheelchairZombieClass = "Zombie_Overwatcher";
@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 		private const int MaxWheelchairZombies = 4;
 		private const int MaxGiantZombies = 2;
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

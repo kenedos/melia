@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -16,7 +16,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Wizard_Teleportation)]
-	public class Wizard_TeleportationOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Wizard_TeleportationOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -38,7 +38,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (caster is Character character)
 			{

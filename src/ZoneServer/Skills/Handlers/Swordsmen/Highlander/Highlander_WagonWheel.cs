@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	/// Handler for the Highlander skill Wagon Wheel
 	/// </summary>
 	[SkillHandler(SkillId.Highlander_WagonWheel)]
-	public class Highlander_WagonWheel : IMeleeGroundSkillHandler
+	public class Highlander_WagonWheel : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, damaging targets.
@@ -29,9 +29,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Rodelero_ShieldCharge)]
-	public class Rodelero_ShieldChargeOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Rodelero_ShieldChargeOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		/// <summary>
 		/// Called when the skill begins channeling.
@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Rodelero
 		/// <summary>
 		/// Handles the Shield Charge skill execution.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, originPos, farPos);

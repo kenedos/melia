@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Cleric_Cure)]
-	public class Cleric_CureOverride : IMeleeGroundSkillHandler
+	public class Cleric_CureOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, removing debuffs from target.
@@ -28,7 +28,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -39,9 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var target = targets.FirstOrDefault();
-			if (target == null)
-				target = caster;
+			target ??= caster;
 
 			this.RemoveDebuffs(caster, target, skill);
 

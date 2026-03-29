@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,12 +29,12 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Barbarian_StompingKick)]
-	public class Barbarian_StompingKickOverride : IMeleeGroundSkillHandler
+	public class Barbarian_StompingKickOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles the initial casting of the skill.
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			// Check for plate armor restriction
 			if (caster is Character character && character.IsWearingArmorOfType(ArmorMaterialType.Iron))

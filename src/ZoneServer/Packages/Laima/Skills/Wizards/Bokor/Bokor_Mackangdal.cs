@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Bokor_Mackangdal)]
-	public class Bokor_MackangdalOverride : IMeleeGroundSkillHandler
+	public class Bokor_MackangdalOverride : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handle Skill Behavior
@@ -25,7 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.Components.Get<BuffComponent>().TryGet(BuffId.PowerOfDarkness_Buff, out var darkForceBuff))
 			{

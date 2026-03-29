@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -14,7 +14,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Highlander_CrossGuard)]
-	public class Highlander_CrossGuardOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Highlander_CrossGuardOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		/// <summary>
 		/// Called when the user starts casting the skill.
@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 			Send.ZC_SKILL_CAST_CANCEL(caster);
 		}
 
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

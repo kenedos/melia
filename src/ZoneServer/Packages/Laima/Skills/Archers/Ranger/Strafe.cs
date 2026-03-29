@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Ranger_Strafe)]
-	public class Ranger_StrafeOverride : IMeleeGroundSkillHandler
+	public class Ranger_StrafeOverride : IGroundSkillHandler
 	{
 		private const float BaseStrafeDistance = 40f;
 		private const float StrafeDistancePerLevel = 4f;
@@ -28,9 +28,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		/// <summary>
 		/// Handles the skill
 		/// </summary>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

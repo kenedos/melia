@@ -11,7 +11,6 @@ using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using Melia.Zone.World.Actors.Characters;
-using System.Linq;
 
 namespace Melia.Zone.Skills.Handlers.Common
 {
@@ -20,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 	/// </summary>
 	[SkillHandler(SkillId.Normal_Attack, SkillId.Normal_Attack_TH, SkillId.Hammer_Attack, SkillId.Hammer_Attack_TH, SkillId.Common_DaggerAries,
 		SkillId.Sword_Attack, SkillId.SpearMaster_Attack, SkillId.SpearMaster_Attack_TH)]
-	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler
+	public class MeleeGroundSkillHandler : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles usage of the skill.
@@ -29,8 +28,8 @@ namespace Melia.Zone.Skills.Handlers.Common
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		/// <param name="target"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -44,9 +43,9 @@ namespace Melia.Zone.Skills.Handlers.Common
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			if (caster is Character character && Feature.IsEnabled("BattleManager"))
-				ZoneServer.Instance.World.BattleManager.StartBattle(character, targets.FirstOrDefault());
+				ZoneServer.Instance.World.BattleManager.StartBattle(character, target);
 
-			skill.Run(this.Attack(skill, caster, originPos, farPos, targets));
+			skill.Run(this.Attack(skill, caster, originPos, farPos, target));
 		}
 
 		/// <summary>
@@ -56,8 +55,8 @@ namespace Melia.Zone.Skills.Handlers.Common
 		/// <param name="caster"></param>
 		/// <param name="castPosition"></param>
 		/// <param name="targetPosition"></param>
-		/// <param name="targets"></param>
-		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IEnumerable<ICombatEntity> targets)
+		/// <param name="target"></param>
+		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, ICombatEntity target)
 		{
 			// Based on Normal_Attack posessing a hit delay of 100ms,
 			// and Common_DaggerAries one of 50ms, and these two values
@@ -80,10 +79,11 @@ namespace Melia.Zone.Skills.Handlers.Common
 			await skill.Wait(skillHitDelay);
 
 			var hits = new List<SkillHitInfo>();
-			var rnd = RandomProvider.Get();
 
-			foreach (var target in targets)
+			if (target != null)
 			{
+				var rnd = RandomProvider.Get();
+
 				var modifier = SkillModifier.Default;
 
 				// Random chance to trigger double hit with dagger while buff is active

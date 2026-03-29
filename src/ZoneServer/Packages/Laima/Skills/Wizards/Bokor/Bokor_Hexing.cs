@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Bokor_Hexing)]
-	public class Bokor_HexingOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Bokor_HexingOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int DebuffDurationMilliseconds = 20000;
 
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
 		/// <param name="targets"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{

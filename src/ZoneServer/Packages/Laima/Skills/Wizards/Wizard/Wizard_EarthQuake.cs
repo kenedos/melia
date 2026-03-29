@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Wizard_EarthQuake)]
-	public class Wizard_EarthQuakeOverride : IMeleeGroundSkillHandler, IDynamicCasted, ICancelSkillHandler
+	public class Wizard_EarthQuakeOverride : IGroundSkillHandler, IDynamicCasted, ICancelSkillHandler
 	{
 
 		/// <summary>
@@ -31,7 +31,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity[] designatedTargets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -52,34 +52,32 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			var skillHits = new List<SkillHitInfo>();
 
 			var targetCount = 12;
-			foreach (var target in targets)
+			foreach (var t in targets)
 			{
 				if (targetCount == 0)
 					break;
 
-				// Get target's state BEFORE dealing damage
-				var targetIsMoving = target.Components.TryGet<MovementComponent>(out var targetMovement) && targetMovement.IsMoving;
+				var targetIsMoving = t.Components.TryGet<MovementComponent>(out var targetMovement) && targetMovement.IsMoving;
 
-				var targetLethargic = target.IsBuffActive(BuffId.Lethargy_Debuff);
+				var targetLethargic = t.IsBuffActive(BuffId.Lethargy_Debuff);
 
-				var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHitIf(2, targetLethargic));
-				target.TakeDamage(skillHitResult.Damage, caster);
+				var skillHitResult = SCR_SkillHit(caster, t, skill, SkillModifier.MultiHitIf(2, targetLethargic));
+				t.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, TimeSpan.Zero);
+				var skillHit = new SkillHitInfo(caster, t, skill, skillHitResult, aniTime, TimeSpan.Zero);
 
-				// Ability "Earthquake: Remove Knockdown"
-				if (skillHitResult.Damage > 0 && !caster.IsAbilityActive(AbilityId.Wizard23) && target.IsKnockdownable())
+				if (skillHitResult.Damage > 0 && !caster.IsAbilityActive(AbilityId.Wizard23) && t.IsKnockdownable())
 				{
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, KnockBackType.KnockDown, 400, 86);
+					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, t, KnockBackType.KnockDown, 400, 86);
 					skillHit.HitInfo.KnockBackType = skill.Data.KnockDownHitType;
-					target.ApplyKnockdown(caster, skill, skillHit);
+					t.ApplyKnockdown(caster, skill, skillHit);
 				}
 
 				skillHits.Add(skillHit);
 				targetCount--;
 			}
 
-			var targetHandle = targets.FirstOrDefault()?.Handle ?? 0;
+			var targetHandle = target?.Handle ?? 0;
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);

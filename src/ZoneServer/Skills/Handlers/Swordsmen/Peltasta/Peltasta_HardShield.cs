@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 	/// <remarks>
 	/// </remarks>
 	[SkillHandler(SkillId.Peltasta_HardShield)]
-	public class Peltasta_HardShield : IMeleeGroundSkillHandler
+	public class Peltasta_HardShield : IGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles skill, applying a buff to the caster.
@@ -24,9 +24,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="dir"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

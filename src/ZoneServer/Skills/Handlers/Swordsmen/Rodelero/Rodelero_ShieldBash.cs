@@ -21,7 +21,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 	/// Handler for the Rodelero skill Shield Shoving.
 	/// </summary>
 	[SkillHandler(SkillId.Rodelero_ShieldBash)]
-	public class Rodelero_ShieldBash : IMeleeGroundSkillHandler
+	public class Rodelero_ShieldBash : IGroundSkillHandler
 	{
 		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(10);
 		private const int BuffRemoveChancePerLevel = 10;
@@ -33,9 +33,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Rodelero
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			var target = targets.FirstOrDefault();
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
@@ -20,13 +20,13 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Elementalist_Hail)]
-	public class Elementalist_HailOverride : IMeleeGroundSkillHandler, IDynamicCasted
+	public class Elementalist_HailOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
 			caster.PlaySound("voice_wiz_hail_cast", "voice_wiz_m_hail_cast");
 		}
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, params ICombatEntity[] targets)
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
