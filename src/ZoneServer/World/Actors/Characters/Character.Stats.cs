@@ -181,6 +181,11 @@ namespace Melia.Zone.World.Actors.Characters
 		public SizeType EffectiveSize => SizeType.PC;
 
 		/// <summary>
+		/// Returns the character's agent radius (always 5 for players).
+		/// </summary>
+		public float AgentRadius => 5;
+
+		/// <summary>
 		/// Returns the character's monster rank (always Normal for players).
 		/// </summary>
 		public MonsterRank Rank => MonsterRank.Normal;

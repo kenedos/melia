@@ -1633,7 +1633,8 @@ namespace Melia.Zone.Network
 
 					zpacket.PutInt(item.Value.Id);
 					zpacket.PutShort(propertiesSize);
-					zpacket.PutEmptyBin(2);
+					zpacket.PutByte(item.Value.IsLocked);
+					zpacket.PutEmptyBin(1);
 					zpacket.PutLong(item.Value.ObjectId);
 					zpacket.PutInt(item.Value.Amount);
 					zpacket.PutInt(item.Value.Price);

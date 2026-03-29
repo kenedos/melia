@@ -155,9 +155,14 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// </summary>
 		public int Level
 		{
-			get { return (int)this.Properties.GetFloat(PropertyName.Lv); }
-			set { this.Properties.SetFloat(PropertyName.Lv, value); }
+			get => _cachedLevel;
+			set
+			{
+				this.Properties.SetFloat(PropertyName.Lv, value);
+				_cachedLevel = value;
+			}
 		}
+		private int _cachedLevel;
 
 		/// <summary>
 		/// Gets or sets the mob's AoE Defense Ratio.
@@ -283,22 +288,47 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Returns the monster's effective size type, read from its
 		/// properties or falling back to the data definition.
 		/// </summary>
-		public SizeType EffectiveSize => ParseSizeType(this.Properties.GetString(PropertyName.Size, this.Data.Size));
+		public SizeType EffectiveSize => _cachedEffectiveSize;
+		private SizeType _cachedEffectiveSize;
+
+		/// <summary>
+		/// Returns the cached agent radius for this monster.
+		/// </summary>
+		public float AgentRadius => _cachedAgentRadius;
+		private float _cachedAgentRadius;
+
+		/// <summary>
+		/// Recomputes the cached EffectiveSize and AgentRadius from the
+		/// current Size property. Call after changing the Size property.
+		/// </summary>
+		public void InvalidateSizeCache()
+		{
+			_cachedEffectiveSize = ParseSizeType(this.Properties.GetString(PropertyName.Size, this.Data.Size));
+			_cachedAgentRadius = _cachedEffectiveSize switch
+			{
+				SizeType.S => 12,
+				SizeType.PC => 5,
+				SizeType.M => 15,
+				SizeType.L => 20,
+				SizeType.XL => 40,
+				SizeType.XXL => 40,
+				_ => 0,
+			};
+		}
 
 		/// <summary>
 		/// Gets or sets the monster's rank (e.g. Normal, Elite, Boss).
 		/// </summary>
 		public MonsterRank Rank
 		{
-			get
-			{
-				return ParseMonsterRank(this.Properties.GetString(PropertyName.MonRank, this.Data.Rank));
-			}
+			get => _cachedRank;
 			set
 			{
 				this.Properties.SetString(PropertyName.MonRank, value);
+				_cachedRank = value;
 			}
 		}
+		private MonsterRank _cachedRank;
 
 		/// <summary>
 		/// Gets or sets the monster's current shield value.
@@ -362,6 +392,11 @@ namespace Melia.Zone.World.Actors.Monsters
 			// based on the newly copied base values and the updated level.
 			clone.Properties.InvalidateAll();
 
+			// Refresh cached size/rank/level since properties were copied.
+			clone.InvalidateSizeCache();
+			clone._cachedRank = ParseMonsterRank(clone.Properties.GetString(PropertyName.MonRank, clone.Data.Rank));
+			clone._cachedLevel = (int)clone.Properties.GetFloat(PropertyName.Lv);
+
 			// The clone should start with full HP and SP, as CopyFrom would have copied
 			// the original's current (possibly zero) HP.
 			clone.Properties.SetFloat(PropertyName.HP, clone.Properties.GetFloat(PropertyName.MHP));
@@ -387,6 +422,10 @@ namespace Melia.Zone.World.Actors.Monsters
 			this.Components.Add(new BaseSkillComponent(this));
 
 			this.LoadData();
+
+			this.InvalidateSizeCache();
+			_cachedRank = ParseMonsterRank(this.Properties.GetString(PropertyName.MonRank, this.Data.Rank));
+			_cachedLevel = (int)this.Properties.GetFloat(PropertyName.Lv);
 
 			this.Name = this.Data.Name;
 			this.MoveType = this.Data.MoveType;
@@ -1348,19 +1387,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (entity.IsDead)
 				return false;
 
-			if (this.IsLocked(LockType.Attack))
-				return false;
-
-			if (!this.CanSee(entity))
-				return false;
-
-			if (entity.Properties.GetString(PropertyName.HitProof, "NO") == "YES")
-				return false;
-
 			if (entity is Companion companion && companion.IsRiding)
-				return false;
-
-			if (!this.IsEnemy(entity))
 				return false;
 
 			if (entity is Character character
@@ -1368,19 +1395,22 @@ namespace Melia.Zone.World.Actors.Monsters
 				&& !character.Connection.LoadComplete)
 				return false;
 
-			// For now, let's specify that mobs can attack any combat
-			// entities, since we want them them to be able to attack
-			// both characters and other mobs.
-			//return (entity is ICombatEntity);
+			if (this.IsLocked(LockType.Attack))
+				return false;
 
-			// New plan. Let's say that mobs can attack those entities
-			// they're hostile towards. That allows AoEs to ignore
-			// friendly entities. If the mob doesn't have an AI,
-			// it shouldn't need to be able to attack anything,
-			// so we return false in that case.
+			if (entity.Properties.GetString(PropertyName.HitProof, "NO") == "YES")
+				return false;
+
+			if (!this.CanSee(entity))
+				return false;
+
+			// Mobs with an AI can attack those entities they're hostile
+			// towards. This allows AoEs to ignore friendly entities.
+			// IsHostileTowards includes IsEnemy, so we don't need a
+			// separate IsEnemy check. Mobs without an AI fall back to
+			// the basic IsEnemy check.
 			if (!this.Components.TryGet<AiComponent>(out var ai))
-				return true;
-
+				return this.IsEnemy(entity);
 
 			return ai.Script.IsHostileTowards(entity);
 		}

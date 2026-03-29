@@ -25,17 +25,19 @@ namespace Melia.Zone.Buffs.Handlers
 			if (size == SizeType.S)
 			{
 				monster.Properties.SetString(PropertyName.Size, SizeType.L);
+				monster.InvalidateSizeCache();
 				monster.ChangeScale(2f, 1f);
 			}
 
 			if (size == SizeType.M)
 			{
 				monster.Properties.SetString(PropertyName.Size, SizeType.L);
+				monster.InvalidateSizeCache();
 				monster.ChangeScale(1.5f, 1f);
 			}
 
 			if (monster.Rank == MonsterRank.Normal)
-				monster.Properties.SetString(PropertyName.MonRank, MonsterRank.Elite);
+				monster.Rank = MonsterRank.Elite;
 
 			var worldConf = ZoneServer.Instance.Conf.World;
 			var prevMaxHP = monster.Properties.GetFloat(PropertyName.MHP);

@@ -439,6 +439,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			this.Entity.Properties.Modify(PropertyName.Shield, maxStagger);
 			var stagger = (int)this.Entity.Properties.GetFloat(PropertyName.Shield);
 			Send.ZC_UPDATE_SHIELD(this.Entity, stagger, 1);
+
+			// Re-engage the early exit in UpdateStaggerState so we
+			// stop doing property lookups every tick until the next
+			// stagger event.
+			this.LastStaggerTime = default;
 		}
 
 		/// <summary>
@@ -448,6 +453,12 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		{
 			if (!this.Entity.CanStagger())
 				return;
+
+			// Skip the property lookups if stagger was never triggered
+			// and the entity is not currently staggered.
+			if (!this.IsStaggered && this.LastStaggerTime == default)
+				return;
+
 			var maxStagger = (int)this.Entity.Properties.GetFloat(PropertyName.MShield);
 			var stagger = (int)this.Entity.Properties.GetFloat(PropertyName.Shield);
 			if (maxStagger <= 0 || stagger > 0)

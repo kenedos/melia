@@ -91,6 +91,25 @@ namespace Melia.Shared.Data.Database
 	/// </summary>
 	public class MonsterDb : DatabaseJsonIndexed<int, MonsterData>
 	{
+		private Dictionary<string, MonsterData> _classNameIndex;
+		private Dictionary<string, MonsterData> _nameIndex;
+
+		/// <summary>
+		/// Builds the secondary lookup indexes after data is loaded.
+		/// Called automatically after all entries are read.
+		/// </summary>
+		public void BuildIndexes()
+		{
+			_classNameIndex = new Dictionary<string, MonsterData>(StringComparer.OrdinalIgnoreCase);
+			_nameIndex = new Dictionary<string, MonsterData>(StringComparer.OrdinalIgnoreCase);
+
+			foreach (var entry in this.Entries.Values)
+			{
+				_classNameIndex.TryAdd(entry.ClassName, entry);
+				_nameIndex.TryAdd(entry.Name, entry);
+			}
+		}
+
 		/// <summary>
 		/// Returns the monster with the given name. Returns null if
 		/// no matching entry was found.
@@ -99,6 +118,9 @@ namespace Melia.Shared.Data.Database
 		/// <returns></returns>
 		public MonsterData Find(string name)
 		{
+			if (_nameIndex != null && _nameIndex.TryGetValue(name, out var data))
+				return data;
+
 			name = name.ToLower();
 			return this.Entries.Values.FirstOrDefault(a => a.Name.ToLower() == name);
 		}
@@ -112,6 +134,9 @@ namespace Melia.Shared.Data.Database
 		/// <returns></returns>
 		public bool TryFind(string className, out MonsterData data)
 		{
+			if (_classNameIndex != null && _classNameIndex.TryGetValue(className, out data))
+				return true;
+
 			data = this.Entries.Values.FirstOrDefault(a => a.ClassName.ToLower() == className.ToLower());
 			return data != null;
 		}

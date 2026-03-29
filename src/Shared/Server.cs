@@ -431,6 +431,8 @@ namespace Melia.Shared
 
 					this.LoadCustomDb(this.Data.ItemIconDb, "user/tools/lada/db/item_icons.txt");
 					this.LoadCustomDb(this.Data.MonsterIconDb, "user/tools/lada/db/monster_icons.txt");
+
+					this.Data.MonsterDb.BuildIndexes();
 				}
 
 			}

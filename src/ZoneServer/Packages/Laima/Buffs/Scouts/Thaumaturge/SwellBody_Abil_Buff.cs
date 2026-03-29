@@ -4,6 +4,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Monsters;
 
 namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 {
@@ -29,11 +30,13 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 			{
 				case SizeType.M:
 					target.Properties.SetString(PropertyName.Size, SizeType.L);
+					(target as Mob)?.InvalidateSizeCache();
 					target.Properties.SetFloat(PropertyName.Scale, SwellScale);
 					Send.ZC_NORMAL.SetScale(target, 33, SwellScale, 0, 1, 1, 0);
 					break;
 				case SizeType.S:
 					target.Properties.SetString(PropertyName.Size, SizeType.M);
+					(target as Mob)?.InvalidateSizeCache();
 					target.Properties.SetFloat(PropertyName.Scale, SwellScale);
 					Send.ZC_NORMAL.SetScale(target, 33, SwellScale, 0, 1, 1, 0);
 					break;
@@ -59,6 +62,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 			var originalSize = buff.Vars.Get("Melia.SwellBody.Size", target.EffectiveSize);
 
 			target.Properties.SetString(PropertyName.Size, originalSize);
+			(target as Mob)?.InvalidateSizeCache();
 			target.Properties.SetFloat(PropertyName.Scale, 1f);
 			Send.ZC_NORMAL.SetScale(target, 33, 1f, 0, 1, 1, 0);
 

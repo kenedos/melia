@@ -928,9 +928,6 @@ namespace Melia.Zone.Scripting.AI
 				if (!potentialEnemy.Position.InRange2D(this.Entity.Position, _hateRange))
 					continue;
 
-				if (!this.IsHostileTowards(potentialEnemy))
-					continue;
-
 				if (!this.CanAccumulateHate(potentialEnemy))
 					continue;
 
@@ -1359,6 +1356,9 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		private void HandleEventAlerts()
 		{
+			if (_eventAlerts.Count == 0)
+				return;
+
 			lock (_eventAlerts)
 			{
 				while (_eventAlerts.Count > 0)
