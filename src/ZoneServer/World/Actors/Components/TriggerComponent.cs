@@ -31,6 +31,8 @@ namespace Melia.Zone.World.Actors.Components
 		private readonly HashSet<IActor> _nowInsideSet = new();
 		private readonly List<IActor> _tempEntered = new();
 		private readonly List<IActor> _tempLeft = new();
+		private readonly List<ICombatEntity> _attackableBuffer = new();
+		private readonly List<ICombatEntity> _alliedBuffer = new();
 		private int _actorCount = 0;
 		private int _maxActorCount = short.MaxValue;
 		private int _maxConcurrentUse = short.MaxValue;
@@ -225,17 +227,21 @@ namespace Melia.Zone.World.Actors.Components
 		/// Returns a list of actors currently inside the trigger area
 		/// that can be attacked by the given actor.
 		/// </summary>
+		/// <remarks>
+		/// The returned list is reused between calls. Do not store
+		/// a reference to it — copy if you need to keep the data.
+		/// </remarks>
 		/// <param name="attacker"></param>
 		/// <returns></returns>
 		public List<ICombatEntity> GetAttackableEntities(ICombatEntity attacker)
 		{
 			lock (_syncLock)
 			{
-				var result = new List<ICombatEntity>();
+				_attackableBuffer.Clear();
 				foreach (var a in _actorsInside)
 					if (a is ICombatEntity ce && attacker.CanDamage(ce))
-						result.Add(ce);
-				return result;
+						_attackableBuffer.Add(ce);
+				return _attackableBuffer;
 			}
 		}
 
@@ -243,17 +249,21 @@ namespace Melia.Zone.World.Actors.Components
 		/// Returns a list of actors currently inside the trigger area
 		/// that are allied to the given actor.
 		/// </summary>
+		/// <remarks>
+		/// The returned list is reused between calls. Do not store
+		/// a reference to it — copy if you need to keep the data.
+		/// </remarks>
 		/// <param name="ally"></param>
 		/// <returns></returns>
 		public List<ICombatEntity> GetAlliedEntities(ICombatEntity ally)
 		{
 			lock (_syncLock)
 			{
-				var result = new List<ICombatEntity>();
+				_alliedBuffer.Clear();
 				foreach (var a in _actorsInside)
 					if (a is ICombatEntity target && target != ally && !target.IsDead && ally.IsAlly(target))
-						result.Add(target);
-				return result;
+						_alliedBuffer.Add(target);
+				return _alliedBuffer;
 			}
 		}
 

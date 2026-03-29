@@ -86,6 +86,16 @@ namespace Melia.Zone.World.Maps
 		internal ICollection<ITriggerableArea> TriggerableAreas => _triggerableAreas.Values;
 		internal ICollection<ICombatEntity> CombatEntities => _combatEntities.Values;
 
+		// Collision
+		private const int CollisionCheckPointCount = 9;
+
+		[ThreadStatic]
+		private static Vector2F[] CollisionCheckBuffer;
+
+		[ThreadStatic]
+		private static List<ICombatEntity> CollideActorsQueryBuffer;
+
+
 		public bool IsPVP { get; set; }
 		public bool IsRaid { get; set; }
 		public bool IsGTW { get; protected set; }
@@ -1092,27 +1102,66 @@ namespace Melia.Zone.World.Maps
 		/// <param name="maxTargets"></param>
 		/// <param name="exclude"></param>
 		/// <returns></returns>
-		public List<ICombatEntity> GetAttackableEnemiesIn(ICombatEntity attacker, IShapeF shape, int maxTargets = 0, params ICombatEntity[] exclude)
+		public List<ICombatEntity> GetAttackableEnemiesIn(ICombatEntity attacker, IShapeF shape, int maxTargets = 0)
 		{
 			if (attacker is Character rangePreviewCharacter && rangePreviewCharacter.Variables.Temp.GetBool("Melia.RangePreview"))
 				Debug.ShowShape(this, shape, TimeSpan.FromSeconds(1));
 
-			IEnumerable<ICombatEntity> candidates;
+			var queryBuffer = _spatialShapeQueryBuffer ??= new List<ICombatEntity>();
+			queryBuffer.Clear();
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryShape(shape);
+				_spatialIndex.QueryShape(shape, queryBuffer);
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				foreach (var e in _combatEntities.Values)
+					queryBuffer.Add(e);
 			}
 
-			var excludeSet = exclude?.Length > 0 ? new HashSet<ICombatEntity>(exclude) : null;
 			var result = new List<ICombatEntity>();
-			foreach (var e in candidates)
+			foreach (var e in queryBuffer)
 			{
-				if (excludeSet != null && excludeSet.Contains(e))
+				if (!attacker.CanDamage(e))
+					continue;
+				if (!shape.IsInsideOrInRange(e.Position, e.AgentRadius))
+					continue;
+				result.Add(e);
+			}
+
+			result.Sort((a, b) => attacker.GetDistance(a).CompareTo(attacker.GetDistance(b)));
+			if (maxTargets > 0 && result.Count > maxTargets)
+				result.RemoveRange(maxTargets, result.Count - maxTargets);
+			return result;
+		}
+
+		/// <summary>
+		/// Returns all enemies that can be attacked inside the given shape,
+		/// excluding the specified entities.
+		/// </summary>
+		public List<ICombatEntity> GetAttackableEnemiesIn(ICombatEntity attacker, IShapeF shape, int maxTargets, ICombatEntity exclude1)
+		{
+			if (attacker is Character rangePreviewCharacter && rangePreviewCharacter.Variables.Temp.GetBool("Melia.RangePreview"))
+				Debug.ShowShape(this, shape, TimeSpan.FromSeconds(1));
+
+			var queryBuffer = _spatialShapeQueryBuffer ??= new List<ICombatEntity>();
+			queryBuffer.Clear();
+
+			if (_spatialIndex != null)
+			{
+				_spatialIndex.QueryShape(shape, queryBuffer);
+			}
+			else
+			{
+				foreach (var e in _combatEntities.Values)
+					queryBuffer.Add(e);
+			}
+
+			var result = new List<ICombatEntity>();
+			foreach (var e in queryBuffer)
+			{
+				if (e == exclude1)
 					continue;
 				if (!attacker.CanDamage(e))
 					continue;
@@ -1139,19 +1188,21 @@ namespace Melia.Zone.World.Maps
 		/// <returns></returns>
 		public List<ICombatEntity> GetAliveAlliedEntitiesIn(ICombatEntity ally, IShapeF shape, int maxTargets = 0)
 		{
-			IEnumerable<ICombatEntity> candidates;
+			var queryBuffer = _spatialShapeQueryBuffer ??= new List<ICombatEntity>();
+			queryBuffer.Clear();
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryShape(shape);
+				_spatialIndex.QueryShape(shape, queryBuffer);
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				foreach (var e in _combatEntities.Values)
+					queryBuffer.Add(e);
 			}
 
 			var result = new List<ICombatEntity>();
-			foreach (var entity in candidates)
+			foreach (var entity in queryBuffer)
 			{
 				if (!entity.IsAlly(ally) || entity == ally || entity.IsDead)
 					continue;
@@ -1178,19 +1229,21 @@ namespace Melia.Zone.World.Maps
 		/// <returns></returns>
 		public List<ICombatEntity> GetDeadAlliedEntitiesIn(ICombatEntity ally, IShapeF shape, int maxTargets = 0)
 		{
-			IEnumerable<ICombatEntity> candidates;
+			var queryBuffer = _spatialShapeQueryBuffer ??= new List<ICombatEntity>();
+			queryBuffer.Clear();
 
 			if (_spatialIndex != null)
 			{
-				candidates = _spatialIndex.QueryShape(shape);
+				_spatialIndex.QueryShape(shape, queryBuffer);
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				foreach (var e in _combatEntities.Values)
+					queryBuffer.Add(e);
 			}
 
 			var result = new List<ICombatEntity>();
-			foreach (var entity in candidates)
+			foreach (var entity in queryBuffer)
 			{
 				if (!entity.IsDeadAlly(ally) || entity == ally)
 					continue;
@@ -1296,63 +1349,97 @@ namespace Melia.Zone.World.Maps
 		#endregion
 
 		#region Collision and Pathfinding
-		[Obsolete("Use IsWalkablePosition(ICombatEntity, Position) instead for accurate collision checks.")]
+
+		/// <summary>
+		/// Returns true if the given position is walkable for an entity
+		/// with the given radius, accounting for ground validity and
+		/// dynamic obstacles.
+		/// </summary>
 		public bool IsWalkablePosition(Position position, float radius) =>
-			this.Ground.IsValidCirclePosition(position, radius) && !this.TryCollideObstacles(position, radius, out _);
+			this.Ground.IsValidCirclePosition(position, radius) && !this.CollidesWithObstacles(position, radius);
 
 		/// <summary>
-		/// Returns true if the given entity can stand at the given position,
-		/// accounting for ground validity, obstacles, and actor collisions.
+		/// Returns true if a circle at the given position collides with
+		/// any dynamic obstacles. Bool-only check, no list allocation.
 		/// </summary>
-		public bool IsWalkablePosition(ICombatEntity entity, Position position) =>
-			this.Ground.IsValidCirclePosition(position, entity.AgentRadius) &&
-			!this.TryCollideObstacles(position, entity.AgentRadius, out _) &&
-			!this.TryCollideActors(entity, position, out _);
-
-		/// <summary>
-		/// Checks whether a circle at the given position collides with any
-		/// dynamic obstacles. Returns the collided obstacles via out.
-		/// </summary>
-		public bool TryCollideObstacles(Position position, float radius, out List<DynamicObstacle> collidedObstacles)
+		public bool CollidesWithObstacles(Position position, float radius)
 		{
-			var checkPositions = this.GetCollisionCheckPositions(position, radius);
-			collidedObstacles = new List<DynamicObstacle>();
+			var checkPositions = CollisionCheckBuffer ??= new Vector2F[CollisionCheckPointCount];
+			this.FillCollisionCheckPositions(position, radius, checkPositions);
 
 			lock (_obstaclesLock)
 			{
 				foreach (var obstacle in _obstacles)
 				{
-					var hit = false;
-					for (var i = 0; i < checkPositions.Length; i++)
+					for (var i = 0; i < CollisionCheckPointCount; i++)
 					{
 						if (obstacle.Shape.IsInside(checkPositions[i]))
-						{
-							hit = true;
-							break;
-						}
+							return true;
 					}
-					if (hit)
-						collidedObstacles.Add(obstacle);
 				}
 			}
 
-			return collidedObstacles.Count > 0;
+			return false;
 		}
 
-		private Vector2F[] GetCollisionCheckPositions(Position position, float radius)
+		/// <summary>
+		/// Returns true if the given entity's collision circle at a
+		/// position overlaps with other entities. Bool-only check, no
+		/// list allocation.
+		/// </summary>
+		public bool CollidesWithActors(ICombatEntity requester, Position position)
 		{
-			return new Vector2F[]
+			var searchRadius = requester.AgentRadius + 100f;
+
+			if (_spatialIndex != null)
 			{
-				new(position.X, position.Z),                    // Center
-				new(position.X + radius, position.Z),           // Right
-				new(position.X - radius, position.Z),           // Left
-				new(position.X, position.Z + radius),           // Top
-				new(position.X, position.Z - radius),           // Bottom
-				new(position.X + radius, position.Z + radius),  // Top-Right
-				new(position.X - radius, position.Z + radius),  // Top-Left
-				new(position.X + radius, position.Z - radius),  // Bottom-Right
-				new(position.X - radius, position.Z - radius)   // Bottom-Left
-			};
+				var queryBuffer = CollideActorsQueryBuffer ??= new List<ICombatEntity>();
+				queryBuffer.Clear();
+				_spatialIndex.QueryCircle(position, searchRadius, queryBuffer);
+
+				foreach (var otherEntity in queryBuffer)
+				{
+					if (otherEntity.Handle == requester.Handle)
+						continue;
+
+					var dx = position.X - otherEntity.Position.X;
+					var dz = position.Z - otherEntity.Position.Z;
+					var minSep = requester.AgentRadius + otherEntity.AgentRadius;
+
+					if (dx * dx + dz * dz < minSep * minSep)
+						return true;
+				}
+			}
+			else
+			{
+				foreach (var otherEntity in _combatEntities.Values)
+				{
+					if (otherEntity.Handle == requester.Handle)
+						continue;
+
+					var dx = position.X - otherEntity.Position.X;
+					var dz = position.Z - otherEntity.Position.Z;
+					var minSep = requester.AgentRadius + otherEntity.AgentRadius;
+
+					if (dx * dx + dz * dz < minSep * minSep)
+						return true;
+				}
+			}
+
+			return false;
+		}
+
+		private void FillCollisionCheckPositions(Position position, float radius, Vector2F[] buffer)
+		{
+			buffer[0] = new(position.X, position.Z);                    // Center
+			buffer[1] = new(position.X + radius, position.Z);           // Right
+			buffer[2] = new(position.X - radius, position.Z);           // Left
+			buffer[3] = new(position.X, position.Z + radius);           // Top
+			buffer[4] = new(position.X, position.Z - radius);           // Bottom
+			buffer[5] = new(position.X + radius, position.Z + radius);  // Top-Right
+			buffer[6] = new(position.X - radius, position.Z + radius);  // Top-Left
+			buffer[7] = new(position.X + radius, position.Z - radius);  // Bottom-Right
+			buffer[8] = new(position.X - radius, position.Z - radius);  // Bottom-Left
 		}
 
 		/// <summary>
@@ -1623,10 +1710,15 @@ namespace Melia.Zone.World.Maps
 		{
 			foreach (var character in _characters.Values)
 				character.Connection.Send(packet);
+
+			Packet.Return(packet);
 		}
 
 		[ThreadStatic]
 		private static List<ICombatEntity> _broadcastQueryBuffer;
+
+		[ThreadStatic]
+		private static HashSet<IZoneConnection> _broadcastSentConnections;
 
 		/// <summary>
 		/// Broadcasts a packet to all characters within visible range of
@@ -1634,7 +1726,8 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public virtual void Broadcast(Packet packet, IActor source, bool includeSource = true)
 		{
-			HashSet<IZoneConnection> sentConnections = null;
+			var sentConnections = _broadcastSentConnections ??= new HashSet<IZoneConnection>();
+			sentConnections.Clear();
 
 			if (_spatialIndex != null)
 			{
@@ -1657,7 +1750,6 @@ namespace Melia.Zone.World.Maps
 					if (conn == null)
 						continue;
 
-					sentConnections ??= new HashSet<IZoneConnection>();
 					if (!sentConnections.Add(conn))
 						continue;
 
@@ -1681,12 +1773,13 @@ namespace Melia.Zone.World.Maps
 				if (conn == null)
 					continue;
 
-				sentConnections ??= new HashSet<IZoneConnection>();
 				if (!sentConnections.Add(conn))
 					continue;
 
 				conn.Send(packet);
 			}
+
+			Packet.Return(packet);
 		}
 		#endregion
 

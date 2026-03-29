@@ -67,7 +67,7 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Fletcher
 				caster,
 				new CircleF(target.Position, SplashRadius),
 				MaxSplashTargets,
-				[target]
+				target
 			);
 
 			foreach (var splashTarget in splashTargets)

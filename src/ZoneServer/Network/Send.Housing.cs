@@ -17,7 +17,7 @@ namespace Melia.Zone.Network
 		/// <param name="character"></param>
 		public static void ZC_HOUSING_READY_GRID(Character character)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_READY_GRID);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_READY_GRID);
 
 			packet.PutInt(0);
 			packet.PutInt(0);
@@ -33,7 +33,7 @@ namespace Melia.Zone.Network
 		/// <param name="furnitureId"></param>
 		public static void ZC_HOUSING_START_ARRANGEMENT_FURNITURE(Character character, int furnitureId)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_START_ARRANGEMENT_FURNITURE);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_START_ARRANGEMENT_FURNITURE);
 
 			packet.PutInt(furnitureId);
 
@@ -49,7 +49,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_ANSWER_REMOVE_FURNITURE(IMonster furniture, int furnitureId)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_ANSWER_REMOVE_FURNITURE);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_REMOVE_FURNITURE);
 
 			packet.PutInt(furnitureId);
 			packet.PutInt(furniture.Handle);
@@ -63,7 +63,7 @@ namespace Melia.Zone.Network
 		/// <param name="conn"></param>
 		public static void ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST(Character character)
 		{
-			var packet = new Packet(Op.ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST);
+			var packet = Packet.Borrow(Op.ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST);
 
 			var count = 3;
 			packet.PutInt(count); // Count
@@ -97,7 +97,7 @@ namespace Melia.Zone.Network
 		/// <param name="furnitureHandle"></param>
 		public static void ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE(Character character, int furnitureId, int furnitureHandle)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE);
 
 			packet.PutInt(furnitureId);
 			packet.PutInt(furnitureHandle);
@@ -112,7 +112,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_CREATE_BG_FURNITURE(Character character, IMonster furniture)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 			packet.PutInt(furniture.Id);
@@ -128,7 +128,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_CREATE_BG_FURNITURE(IMonster furniture)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 			packet.PutInt(furniture.Id);
@@ -144,7 +144,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_MOVE_BG_FURNITURE(IMonster furniture)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_MOVE_BG_FURNITURE);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_MOVE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 			packet.PutPosition(furniture.Position);
@@ -159,7 +159,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_REMOVE_BG_FURNITURE(IMonster furniture)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_REMOVE_BG_FURNITURE);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_REMOVE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 
@@ -175,7 +175,7 @@ namespace Melia.Zone.Network
 		/// <param name="guildLevel"></param>
 		public static void ZC_HOUSING_ANSWER_GUILD_AGIT_INFO(IZoneConnection conn, long guildId, int guildMapId, int guildLevel)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
 
 			packet.PutLong(guildId);
 			packet.PutInt(guildMapId);
@@ -194,7 +194,7 @@ namespace Melia.Zone.Network
 		/// <param name="guildMapId"></param>
 		public static void ZC_HOUSING_ANSWER_PREVIEW(IZoneConnection conn, long guildId, int guildMapId)
 		{
-			var packet = new Packet(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
+			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
 			var count = 0;
 
 			packet.PutLong(guildId);

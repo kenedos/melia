@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Versioning;
@@ -120,6 +119,19 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Adds and activates a buff. If it already exists,
+		/// it gets overbuffed.
+		/// </summary>
+		/// <param name="addBuff"></param>
+		public void AddOrUpdate(Buff addBuff)
+		{
+			if (!this.TryGet(addBuff.Id, out var buff))
+				this.Add(addBuff);
+			else
+				this.Overbuff(buff);
+		}
+
+		/// <summary>
 		/// Adds and activates given buffs. If a buff already exists,
 		/// it gets overbuffed.
 		/// </summary>
@@ -127,12 +139,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public void AddOrUpdate(params Buff[] buffs)
 		{
 			foreach (var addBuff in buffs)
-			{
-				if (!this.TryGet(addBuff.Id, out var buff))
-					this.Add(addBuff);
-				else
-					this.Overbuff(buff);
-			}
+				this.AddOrUpdate(addBuff);
 		}
 
 		/// <summary>
@@ -303,9 +310,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public void RemoveAll(Func<Buff, bool> predicate)
 		{
 			var buffs = this.GetList();
-			foreach (var buff in buffs.Where(buff => predicate(buff)))
+			foreach (var buff in buffs)
 			{
-				this.Remove(buff);
+				if (predicate(buff))
+					this.Remove(buff);
 			}
 		}
 
@@ -346,7 +354,12 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public Buff Get(string buffClassName)
 		{
 			lock (_buffs)
-				return _buffs.Values.FirstOrDefault(a => a.Data.ClassName == buffClassName);
+			{
+				foreach (var buff in _buffs.Values)
+					if (buff.Data.ClassName == buffClassName)
+						return buff;
+				return null;
+			}
 		}
 
 		/// <summary>
@@ -356,18 +369,23 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public List<Buff> GetList()
 		{
 			lock (_buffs)
-				return _buffs.Values.ToList();
+				return new List<Buff>(_buffs.Values);
 		}
 
 		/// <summary>
-		/// Returns a list of all active buffs that match the given predicate.
+		/// Returns true if any active buff matches the given predicate.
 		/// </summary>
 		/// <param name="predicate"></param>
 		/// <returns></returns>
 		public bool Exists(Func<Buff, bool> predicate)
 		{
 			lock (_buffs)
-				return _buffs.Values.Any(predicate);
+			{
+				foreach (var buff in _buffs.Values)
+					if (predicate(buff))
+						return true;
+				return false;
+			}
 		}
 
 		/// <summary>
@@ -378,7 +396,13 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public List<Buff> GetAll(Func<Buff, bool> predicate)
 		{
 			lock (_buffs)
-				return _buffs.Values.Where(predicate).ToList();
+			{
+				var result = new List<Buff>();
+				foreach (var buff in _buffs.Values)
+					if (predicate(buff))
+						result.Add(buff);
+				return result;
+			}
 		}
 
 		/// <summary>
@@ -389,7 +413,38 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public int CountActive(Func<Buff, bool> predicate)
 		{
 			lock (_buffs)
-				return _buffs.Values.Count(predicate);
+			{
+				var count = 0;
+				foreach (var buff in _buffs.Values)
+					if (predicate(buff))
+						count++;
+				return count;
+			}
+		}
+
+		/// <summary>
+		/// Returns true if the buff with the given id exists.
+		/// </summary>
+		/// <param name="buffId1"></param>
+		/// <param name="buffId2"></param>
+		/// <returns></returns>
+		public bool HasAny(BuffId buffId1, BuffId buffId2)
+		{
+			lock (_buffs)
+				return _buffs.ContainsKey(buffId1) || _buffs.ContainsKey(buffId2);
+		}
+
+		/// <summary>
+		/// Returns true if any of the given buff ids exists.
+		/// </summary>
+		/// <param name="buffId1"></param>
+		/// <param name="buffId2"></param>
+		/// <param name="buffId3"></param>
+		/// <returns></returns>
+		public bool HasAny(BuffId buffId1, BuffId buffId2, BuffId buffId3)
+		{
+			lock (_buffs)
+				return _buffs.ContainsKey(buffId1) || _buffs.ContainsKey(buffId2) || _buffs.ContainsKey(buffId3);
 		}
 
 		/// <summary>
@@ -401,7 +456,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		{
 			lock (_buffs)
 			{
-				return Array.Exists(buffIds, _buffs.ContainsKey);
+				for (var i = 0; i < buffIds.Length; i++)
+					if (_buffs.ContainsKey(buffIds[i]))
+						return true;
+				return false;
 			}
 		}
 
@@ -656,12 +714,32 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <summary>
 		/// Stops the buff with the given id.
 		/// </summary>
+		/// <param name="buffId"></param>
+		public void Stop(BuffId buffId)
+		{
+			if (this.TryGet(buffId, out var buff))
+				this.Remove(buff);
+		}
+
+		/// <summary>
+		/// Stops the buffs with the given ids.
+		/// </summary>
+		/// <param name="buffId1"></param>
+		/// <param name="buffId2"></param>
+		public void Stop(BuffId buffId1, BuffId buffId2)
+		{
+			this.Stop(buffId1);
+			this.Stop(buffId2);
+		}
+
+		/// <summary>
+		/// Stops the buffs with the given ids.
+		/// </summary>
 		/// <param name="buffIds"></param>
 		public void Stop(params BuffId[] buffIds)
 		{
-			foreach (var buffId in buffIds)
-				if (this.TryGet(buffId, out var buff))
-					this.Remove(buff);
+			for (var i = 0; i < buffIds.Length; i++)
+				this.Stop(buffIds[i]);
 		}
 
 		/// <summary>

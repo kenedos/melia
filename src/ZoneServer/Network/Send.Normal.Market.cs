@@ -21,7 +21,7 @@ namespace Melia.Zone.Network
 			/// <param name="character"></param>
 			public static void MarketRetrievalItems(Character character, List<MarketItem> items)
 			{
-				var packet = new Packet(Op.ZC_NORMAL);
+				var packet = Packet.Borrow(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketRetrievalItems);
 				packet.Zlib(true, zpacket =>
@@ -56,7 +56,7 @@ namespace Melia.Zone.Network
 			/// <param name="itemWorldId"></param>
 			public static void MarketRetrieveItem(Character character, long itemWorldId)
 			{
-				var packet = new Packet(Op.ZC_NORMAL);
+				var packet = Packet.Borrow(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketRegisterItem);
 				packet.PutLong(itemWorldId);
@@ -71,7 +71,7 @@ namespace Melia.Zone.Network
 			/// <param name="marketWorldId"></param>
 			public static void MarketBuyItem(Character character, long marketWorldId, int itemRemainingAmount, short s1 = 1)
 			{
-				var packet = new Packet(Op.ZC_NORMAL);
+				var packet = Packet.Borrow(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketBuyItem);
 				packet.PutLong(marketWorldId);
@@ -88,7 +88,7 @@ namespace Melia.Zone.Network
 			/// <param name="marketWorldId"></param>
 			public static void MarketCancelItem(Character character, long marketWorldId)
 			{
-				var packet = new Packet(Op.ZC_NORMAL);
+				var packet = Packet.Borrow(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketCancelItem);
 				packet.PutLpString(marketWorldId.ToString());
@@ -109,7 +109,7 @@ namespace Melia.Zone.Network
 			/// <param name="unitPrice">The default or current unit price</param>
 			public static void MarketMinMaxInfo(Character character, bool isTradable, long avgPrice, long minPrice, long softCapPrice, long maxPrice, long unitPrice)
 			{
-				var packet = new Packet(Op.ZC_NORMAL);
+				var packet = Packet.Borrow(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketMinMaxInfo);
 
 				packet.PutByte(isTradable);

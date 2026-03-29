@@ -14,6 +14,12 @@ namespace Melia.Shared.Network
 	public class Packet
 	{
 		private static readonly Encoding DefaultEncoding = Encoding.UTF8;
+		private static readonly byte[] SharedZeroBuffer = new byte[256];
+
+		private const int PoolMaxSize = 64;
+
+		[ThreadStatic]
+		private static Stack<Packet> _pool;
 
 		/// <summary>
 		/// The max length packets may have.
@@ -26,6 +32,7 @@ namespace Melia.Shared.Network
 
 		private readonly BufferReaderWriter _buffer;
 		private readonly int _bodyStart;
+		private bool _pooled;
 
 		/// <summary>
 		/// Returns the length of the packet's buffer.
@@ -101,6 +108,46 @@ namespace Melia.Shared.Network
 			_buffer.Endianness = Endianness.LittleEndian;
 
 			_bodyStart = 0;
+		}
+
+		/// <summary>
+		/// Borrows a packet from the thread-local pool, or creates a
+		/// new one if the pool is empty. The packet's buffer is reset
+		/// and ready for writing.
+		/// </summary>
+		/// <param name="op">The packet op code.</param>
+		/// <returns>A packet ready for writing.</returns>
+		public static Packet Borrow(Op op)
+		{
+			var pool = _pool ??= new Stack<Packet>(PoolMaxSize);
+
+			if (pool.TryPop(out var packet))
+			{
+				packet.Op = OpTable.GetOp(op);
+				packet.SubOp = -1;
+				packet._buffer.ResetLength();
+				packet._pooled = true;
+				return packet;
+			}
+
+			var newPacket = new Packet(op);
+			newPacket._pooled = true;
+			return newPacket;
+		}
+
+		/// <summary>
+		/// Returns a borrowed packet to the thread-local pool for
+		/// reuse. Non-pooled packets are silently ignored.
+		/// </summary>
+		/// <param name="packet">The packet to return.</param>
+		public static void Return(Packet packet)
+		{
+			if (packet == null || !packet._pooled)
+				return;
+
+			var pool = _pool ??= new Stack<Packet>(PoolMaxSize);
+			if (pool.Count < PoolMaxSize)
+				pool.Push(packet);
 		}
 
 		/// <summary>
@@ -492,7 +539,14 @@ namespace Melia.Shared.Network
 			if (amount <= 0)
 				return;
 
-			this.PutBin(new byte[amount]);
+			if (amount <= SharedZeroBuffer.Length)
+			{
+				_buffer.Write(SharedZeroBuffer, 0, amount);
+			}
+			else
+			{
+				this.PutBin(new byte[amount]);
+			}
 		}
 
 		/// <summary>

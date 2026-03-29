@@ -445,7 +445,7 @@ namespace Melia.Zone.World.Maps.Pathfinding
 				if (path.Count > 0 && path[^1] == point)
 					continue;
 
-				if (_map.TryCollideObstacles(point, actorRadius, out _))
+				if (_map.CollidesWithObstacles(point, actorRadius))
 					continue;
 
 				path.Add(point);

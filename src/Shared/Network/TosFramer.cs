@@ -109,15 +109,25 @@ namespace Melia.Shared.Network
 
 			// Create packet
 			var buffer = new byte[packetSize];
-			Buffer.BlockCopy(BitConverter.GetBytes((short)op), 0, buffer, 0, sizeof(short));
-			Buffer.BlockCopy(BitConverter.GetBytes(-1), 0, buffer, sizeof(short), sizeof(int)); // checksum?
+
+			// Write op (short, little-endian) without BitConverter allocation
+			buffer[0] = (byte)(op & 0xFF);
+			buffer[1] = (byte)((op >> 8) & 0xFF);
+
+			// Write checksum (-1 as int, little-endian)
+			buffer[2] = 0xFF;
+			buffer[3] = 0xFF;
+			buffer[4] = 0xFF;
+			buffer[5] = 0xFF;
 
 			var offset = (Versions.Client >= 174236) ?
 				sizeof(short) + sizeof(int) + sizeof(int) :
 				sizeof(short) + sizeof(int);
 			if (tableSize == 0)
 			{
-				Buffer.BlockCopy(BitConverter.GetBytes((short)packetSize), 0, buffer, offset, sizeof(short));
+				// Write packetSize (short, little-endian)
+				buffer[offset] = (byte)(packetSize & 0xFF);
+				buffer[offset + 1] = (byte)((packetSize >> 8) & 0xFF);
 				offset += sizeof(short);
 			}
 
