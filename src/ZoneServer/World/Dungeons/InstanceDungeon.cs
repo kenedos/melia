@@ -728,11 +728,15 @@ namespace Melia.Zone.World.Dungeons
 			// Clear task references
 			_backgroundStageTasks.Clear();
 
-			// Clear stage monster lists to release mob references
+			// Remove stage monsters from the map and clear references
 			if (this.Stages != null)
 			{
 				foreach (var stage in this.Stages)
+				{
+					foreach (var monster in stage.Monsters)
+						monster.Map?.RemoveMonster(monster);
 					stage.Monsters.Clear();
+				}
 				this.Stages.Clear();
 			}
 			_stageMap.Clear();
