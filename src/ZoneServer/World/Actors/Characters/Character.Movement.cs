@@ -12,6 +12,7 @@ using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
@@ -644,6 +645,12 @@ namespace Melia.Zone.World.Actors.Characters
 					Send.ZC_FLY_HEIGHT(this.Connection, companion, 80);
 				}
 				Send.ZC_NORMAL.Pet_AssociateHandleWorldId(this.Connection, companion);
+
+				if (companion.PendingMount && companion.Owner == this)
+				{
+					companion.PendingMount = false;
+					this.StartBuff(BuffId.RidingCompanion, TimeSpan.Zero, companion);
+				}
 			}
 
 			if (monster is ICombatEntity entity)

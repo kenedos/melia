@@ -83,6 +83,14 @@ namespace Melia.Zone.World.Actors.Monsters
 		public bool IsRiding { get; set; } = false;
 
 		/// <summary>
+		/// Whether the companion should mount its owner when it becomes
+		/// visible on the client. Set during map change when the owner
+		/// was riding before warping. The mount buff is applied once
+		/// the companion appears to the owner via HandleAppearingSingleMonster.
+		/// </summary>
+		public bool PendingMount { get; set; } = false;
+
+		/// <summary>
 		/// Whether the companion is in aggressive mode (auto-attack).
 		/// </summary>
 		public bool IsAggressiveMode { get; set; } = false;
@@ -209,15 +217,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				{
 					this.Owner.Variables.Perm.Remove("Melia.WasRidingOnWarp");
 					if (!this.IsDead && !this.IsBird)
-					{
-						var owner = this.Owner;
-						var companion = this;
-						Task.Delay(1000).ContinueWith(_ =>
-						{
-							if (owner.Map != null && companion.IsActivated && !companion.IsDead)
-								owner.StartBuff(BuffId.RidingCompanion, TimeSpan.Zero, companion);
-						});
-					}
+						this.PendingMount = true;
 				}
 			}
 			else

@@ -141,6 +141,17 @@ namespace Melia.Zone.Events
 		public readonly Event<PlayerEventArgs> PlayerEnteredMap = new();
 
 		/// <summary>
+		/// Raised when a player's client has finished loading the map.
+		/// </summary>
+		/// <remarks>
+		/// This event fires from the CZ_LOAD_COMPLETE packet handler,
+		/// after the client has fully loaded the map and is ready to
+		/// receive gameplay actions such as dungeon stage starts,
+		/// companion spawns, and other post-load operations.
+		/// </remarks>
+		public readonly Event<PlayerEventArgs> PlayerLoadComplete = new();
+
+		/// <summary>
 		/// Raised when a player leaves a map.
 		/// </summary>
 		public readonly Event<PlayerEventArgs> PlayerLeftMap = new();

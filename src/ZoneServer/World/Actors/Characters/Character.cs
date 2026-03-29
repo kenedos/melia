@@ -71,8 +71,6 @@ namespace Melia.Zone.World.Actors.Characters
 		private TimeSpan _resurrectDialogTimer = ResurrectDialogDelay;
 		private Localizer _localizer;
 		private Companion _companionToReactivate;
-		private DateTime _pendingCompanionActivation = DateTime.MinValue;
-		private readonly static TimeSpan CompanionActivationDelay = TimeSpan.FromSeconds(2);
 		#endregion
 
 		#region Core Properties
@@ -617,22 +615,14 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			this.Components.Update(elapsed);
 			this.UpdateResurrection(elapsed);
-			this.UpdatePendingCompanion();
 		}
 
 		/// <summary>
-		/// Activates pending companion after scripts have had time to set layer.
+		/// Activates companions that should be on the current map.
+		/// Called from CZ_LOAD_COMPLETE when the client has finished loading.
 		/// </summary>
-		private void UpdatePendingCompanion()
+		public void ActivateCompanions()
 		{
-			if (_pendingCompanionActivation == DateTime.MinValue)
-				return;
-
-			if (DateTime.Now < _pendingCompanionActivation)
-				return;
-
-			_pendingCompanionActivation = DateTime.MinValue;
-
 			if (!this.HasCompanions)
 				return;
 
@@ -641,14 +631,6 @@ namespace Melia.Zone.World.Actors.Characters
 				if (companion.IsActivated && companion.Map != this.Map)
 					companion.SetCompanionState(true);
 			}
-		}
-
-		/// <summary>
-		/// Schedules companion activation after a delay.
-		/// </summary>
-		public void ScheduleCompanionActivation()
-		{
-			_pendingCompanionActivation = DateTime.Now + CompanionActivationDelay;
 		}
 
 		/// <summary>

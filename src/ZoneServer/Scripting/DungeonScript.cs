@@ -376,7 +376,7 @@ namespace Melia.Zone.Scripting
 				existingScript.Dispose();
 			}
 
-			ZoneServer.Instance.ServerEvents.PlayerEnteredMap.Subscribe(this.OnMapEntryInternal);
+			ZoneServer.Instance.ServerEvents.PlayerLoadComplete.Subscribe(this.OnMapEntryInternal);
 			ZoneServer.Instance.ServerEvents.PlayerLeftMap.Subscribe(this.OnMapLeaveInternal);
 			ZoneServer.Instance.ServerEvents.PlayerLeftParty.Subscribe(this.OnPlayerLeftParty);
 
@@ -1649,7 +1649,7 @@ namespace Melia.Zone.Scripting
 			_instanceCreationTasks.Clear();
 
 			// Unsubscribe from events
-			ZoneServer.Instance.ServerEvents.PlayerEnteredMap.Unsubscribe(this.OnMapEntryInternal);
+			ZoneServer.Instance.ServerEvents.PlayerLoadComplete.Unsubscribe(this.OnMapEntryInternal);
 			ZoneServer.Instance.ServerEvents.PlayerLeftMap.Unsubscribe(this.OnMapLeaveInternal);
 			ZoneServer.Instance.ServerEvents.PlayerLeftParty.Unsubscribe(this.OnPlayerLeftParty);
 

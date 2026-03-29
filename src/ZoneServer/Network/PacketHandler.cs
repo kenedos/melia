@@ -374,6 +374,7 @@ namespace Melia.Zone.Network
 				Send.ZC_LOGIN_TIME(conn, DateTime.Now);
 				Send.ZC_MYPC_ENTER(character);
 
+				character.ActivateCompanions();
 
 				if (conn.Party != null) // Guild check removed: Guild type deleted
 					Send.ZC_NORMAL.ShowParty(character);
@@ -426,8 +427,7 @@ namespace Melia.Zone.Network
 				Send.ZC_UPDATE_SKL_SPDRATE_LIST(character, skillUpdateList);
 				Send.ZC_NORMAL.AccountProperties(character);
 
-				// Send companion info and schedule activation
-				// after scripts have run on the player (i.e. set layer)
+				// Send companion info
 				if (character.HasCompanions)
 				{
 					foreach (var companion in character.Companions.GetList())
@@ -436,7 +436,6 @@ namespace Melia.Zone.Network
 						Send.ZC_OBJECT_PROPERTY(character.Connection, companion);
 					}
 					Send.ZC_NORMAL.PetInfo(character);
-					character.ScheduleCompanionActivation();
 				}
 
 				Send.ZC_ANCIENT_CARD_RESET(conn);
@@ -534,7 +533,7 @@ namespace Melia.Zone.Network
 				character.Inventory.ProcessEquipScripts();
 				character.Inventory.ProcessCardScripts();
 
-				// Send companion info and schedule activation after scripts have set layer
+				// Send companion info
 				if (character.HasCompanions)
 				{
 					foreach (var companion in character.Companions.GetList())
@@ -543,7 +542,6 @@ namespace Melia.Zone.Network
 						Send.ZC_OBJECT_PROPERTY(character.Connection, companion);
 					}
 					Send.ZC_NORMAL.PetInfo(character);
-					character.ScheduleCompanionActivation();
 				}
 			}
 
@@ -3784,6 +3782,8 @@ namespace Melia.Zone.Network
 				if (ZoneServer.Instance.SkillHandlers.TryGetPassiveSkillHandler<IPassiveSkillHandler>(skill.Id, out var handler))
 					handler.Handle(skill, skill.Owner);
 			}
+
+			ZoneServer.Instance.ServerEvents.PlayerLoadComplete.Raise(new PlayerEventArgs(character));
 
 			//character.ShowHelp("TUTO_MOVE_KB");
 			//character.ShowHelp("TUTO_MOVE_JUMP");
