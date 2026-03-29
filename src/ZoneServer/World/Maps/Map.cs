@@ -362,7 +362,7 @@ namespace Melia.Zone.World.Maps
 		public Character[] GetVisibleCharacters(Character character) => this.GetCharacters(character.CanSee);
 
 		/// <summary>
-		/// Adds all characters in visible range of character to the result list.
+		/// Adds all characters visible to the given character to the result list.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="result"></param>
@@ -372,14 +372,14 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var otherCharacter in _characters.Values)
 				{
-					if (otherCharacter != character && character.Position.InRange2D(otherCharacter.Position, VisibleRange))
+					if (otherCharacter != character && character.CanSee(otherCharacter))
 						result.Add(otherCharacter);
 				}
 			}
 		}
 
 		/// <summary>
-		/// Adds all characters in visible range of character to the result set.
+		/// Adds all characters visible to the given character to the result set.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="result"></param>
@@ -389,7 +389,7 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var otherCharacter in _characters.Values)
 				{
-					if (otherCharacter != character && character.Position.InRange2D(otherCharacter.Position, VisibleRange))
+					if (otherCharacter != character && character.CanSee(otherCharacter))
 						result.Add(otherCharacter);
 				}
 			}
@@ -709,7 +709,7 @@ namespace Melia.Zone.World.Maps
 		public IMonster[] GetVisibleMonsters(Character character) => this.GetMonsters(character.CanSee);
 
 		/// <summary>
-		/// Adds all monsters in visible range of character to the result list.
+		/// Adds all monsters visible to the given character to the result list.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="result"></param>
@@ -719,19 +719,14 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var monster in _monsters.Values)
 				{
-					if (monster is Npc npc && (npc.State == NpcState.Invisible || character.GetMapNPCState(npc) == NpcState.Invisible))
-						continue;
-
-					if (!character.Position.InRange2D(monster.Position, VisibleRange))
-						continue;
-
-					result.Add(monster);
+					if (character.CanSee(monster))
+						result.Add(monster);
 				}
 			}
 		}
 
 		/// <summary>
-		/// Adds all monsters in visible range of character to the result set.
+		/// Adds all monsters visible to the given character to the result set.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="result"></param>
@@ -741,13 +736,8 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var monster in _monsters.Values)
 				{
-					if (monster is Npc npc && (npc.State == NpcState.Invisible || character.GetMapNPCState(npc) == NpcState.Invisible))
-						continue;
-
-					if (!character.Position.InRange2D(monster.Position, VisibleRange))
-						continue;
-
-					result.Add(monster);
+					if (character.CanSee(monster))
+						result.Add(monster);
 				}
 			}
 		}
@@ -758,7 +748,7 @@ namespace Melia.Zone.World.Maps
 		public Pad[] GetVisiblePads(Character character) => this.GetPads(character.CanSee);
 
 		/// <summary>
-		/// Adds all pads in visible range of character to the result list.
+		/// Adds all pads visible to the given character to the result list.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="result"></param>
@@ -768,16 +758,14 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var pad in _pads.Values)
 				{
-					if (!character.Position.InRange2D(pad.Position, VisibleRange))
-						continue;
-
-					result.Add(pad);
+					if (character.CanSee(pad))
+						result.Add(pad);
 				}
 			}
 		}
 
 		/// <summary>
-		/// Adds all pads in visible range of character to the result set.
+		/// Adds all pads visible to the given character to the result set.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="result"></param>
@@ -787,10 +775,8 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var pad in _pads.Values)
 				{
-					if (!character.Position.InRange2D(pad.Position, VisibleRange))
-						continue;
-
-					result.Add(pad);
+					if (character.CanSee(pad))
+						result.Add(pad);
 				}
 			}
 		}
