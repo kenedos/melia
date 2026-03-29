@@ -57,7 +57,7 @@ namespace Melia.Zone.Scripting.AI
 			for (var i = 0; i < _nearbyEnemiesBuffer.Count; i++)
 			{
 				var e = _nearbyEnemiesBuffer[i];
-				if (!this.IsHostileTowards(e) || this.EntityGone(e))
+				if (this.EntityGone(e))
 					continue;
 
 				var dx = e.Position.X - pos.X;
@@ -92,7 +92,7 @@ namespace Melia.Zone.Scripting.AI
 			for (var i = 0; i < _nearbyEnemiesBuffer.Count; i++)
 			{
 				var e = _nearbyEnemiesBuffer[i];
-				if (!this.IsHostileTowards(e) || this.EntityGone(e))
+				if (this.EntityGone(e))
 					continue;
 
 				var dx = e.Position.X - pos.X;

@@ -141,7 +141,10 @@ namespace Melia.Shared.World
 		/// <returns></returns>
 		public readonly double Get3DDistance(Position otherPos)
 		{
-			return Math.Sqrt(Math.Pow(X - otherPos.X, 2) + Math.Pow(Y - otherPos.Y, 2) + Math.Pow(Z - otherPos.Z, 2));
+			var dx = (double)(X - otherPos.X);
+			var dy = (double)(Y - otherPos.Y);
+			var dz = (double)(Z - otherPos.Z);
+			return Math.Sqrt(dx * dx + dy * dy + dz * dz);
 		}
 
 		/// <summary>
@@ -151,7 +154,9 @@ namespace Melia.Shared.World
 		/// <returns></returns>
 		public readonly bool InRange2D(Position otherPos, float range)
 		{
-			return Math.Pow(X - otherPos.X, 2) + Math.Pow(Z - otherPos.Z, 2) <= Math.Pow(range, 2);
+			var dx = X - otherPos.X;
+			var dz = Z - otherPos.Z;
+			return dx * dx + dz * dz <= range * range;
 		}
 
 		/// <summary>
@@ -161,7 +166,10 @@ namespace Melia.Shared.World
 		/// <returns></returns>
 		public readonly bool InRange3D(Position otherPos, float range)
 		{
-			return Math.Pow(X - otherPos.X, 2) + Math.Pow(Y - otherPos.Y, 2) + Math.Pow(Z - otherPos.Z, 2) <= Math.Pow(range, 2);
+			var dx = X - otherPos.X;
+			var dy = Y - otherPos.Y;
+			var dz = Z - otherPos.Z;
+			return dx * dx + dy * dy + dz * dz <= range * range;
 		}
 
 		/// <summary>
