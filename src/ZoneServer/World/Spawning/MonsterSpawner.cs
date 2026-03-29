@@ -412,39 +412,33 @@ namespace Melia.Zone.World.Spawning
 
 			lock (_respawnDelays)
 			{
-				// Single pass: decrement timers, count expired, and
-				// compact expired entries to the end via swap-remove.
-				var expiredCount = 0;
 				for (var i = 0; i < _respawnDelays.Count; ++i)
 				{
-					_respawnDelays[i] -= elapsed;
-					if (_respawnDelays[i] <= TimeSpan.Zero)
-						expiredCount++;
+					var spawnDelay = _respawnDelays[i];
+					_respawnDelays[i] = spawnDelay - elapsed;
 				}
 
-				if (expiredCount == 0)
+				expiredDelayCount = 0;
+				for (var j = 0; j < _respawnDelays.Count; j++)
+					if (_respawnDelays[j] <= TimeSpan.Zero)
+						expiredDelayCount++;
+
+				if (expiredDelayCount == 0)
 					return;
 
 				// Only remove up to MaxSpawnsPerTick expired entries per tick.
 				// Excess expired entries remain with negative TimeSpan values
 				// and get picked up on subsequent ticks.
-				var removeCount = Math.Min(expiredCount, MaxSpawnsPerTick);
+				var removeCount = Math.Min(expiredDelayCount, MaxSpawnsPerTick);
 				var removed = 0;
-				var i2 = _respawnDelays.Count - 1;
-				while (removed < removeCount && i2 >= 0)
+				for (var j = _respawnDelays.Count - 1; j >= 0; j--)
 				{
-					if (_respawnDelays[i2] <= TimeSpan.Zero)
+					if (removed >= removeCount)
+						break;
+					if (_respawnDelays[j] <= TimeSpan.Zero)
 					{
-						// Swap with last non-removed element and shrink
-						var lastIdx = _respawnDelays.Count - 1;
-						if (i2 != lastIdx)
-							_respawnDelays[i2] = _respawnDelays[lastIdx];
-						_respawnDelays.RemoveAt(lastIdx);
+						_respawnDelays.RemoveAt(j);
 						removed++;
-					}
-					else
-					{
-						i2--;
 					}
 				}
 
