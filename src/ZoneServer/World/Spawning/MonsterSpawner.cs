@@ -430,21 +430,16 @@ namespace Melia.Zone.World.Spawning
 				// and get picked up on subsequent ticks.
 				var removeCount = Math.Min(expiredCount, MaxSpawnsPerTick);
 				var removed = 0;
-				var i2 = _respawnDelays.Count - 1;
-				while (removed < removeCount && i2 >= 0)
+				for (var j = _respawnDelays.Count - 1; j >= 0 && removed < removeCount; j--)
 				{
-					if (_respawnDelays[i2] <= TimeSpan.Zero)
+					if (_respawnDelays[j] <= TimeSpan.Zero)
 					{
-						// Swap with last non-removed element and shrink
+						// Swap with last valid element and shrink from end
 						var lastIdx = _respawnDelays.Count - 1;
-						if (i2 != lastIdx)
-							_respawnDelays[i2] = _respawnDelays[lastIdx];
+						if (j != lastIdx)
+							_respawnDelays[j] = _respawnDelays[lastIdx];
 						_respawnDelays.RemoveAt(lastIdx);
 						removed++;
-					}
-					else
-					{
-						i2--;
 					}
 				}
 
