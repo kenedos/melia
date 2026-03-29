@@ -894,6 +894,9 @@ namespace Melia.Zone.World.Items
 			if (!this.NeedRandomOptions)
 				return;
 
+			for (var i = 1; i <= 4; i++)
+				this.RemoveRandomOption(i);
+
 			this.Properties.SetFloat(PropertyName.NeedRandomOption, 0);
 			var random = RandomProvider.Get();
 			var itemGrade = (ItemGrade)this.Properties.GetFloat(PropertyName.ItemGrade);
@@ -1430,8 +1433,6 @@ namespace Melia.Zone.World.Items
 			var optionPropValue = string.Format("RandomOptionValue_{0}", optionIndex);
 
 			if (!this.Properties.TryGetString(optionPropId, out var optionType))
-				return;
-			if (!this.Properties.TryGetFloat(optionPropGroup, out var optionGroup))
 				return;
 			if (!this.Properties.TryGetFloat(optionPropValue, out var optionValue))
 				return;
