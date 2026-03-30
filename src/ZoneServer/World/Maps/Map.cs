@@ -166,9 +166,42 @@ namespace Melia.Zone.World.Maps
 		private void UpdateEntities(TimeSpan elapsed)
 		{
 			// Process pending monster additions (throttled to prevent
-			// packet storms when many monsters spawn simultaneously)
-			for (var i = 0; i < MaxMonsterAddsPerTick && _addMonsters.TryDequeue(out var monster); i++)
+			// packet storms when many monsters spawn simultaneously).
+			// Item drops bypass the throttle so they appear instantly
+			// when a mob dies, rather than trickling in over multiple
+			// ticks.
+			List<ItemMonster> newItemMonsters = null;
+			var monstersAdded = 0;
+			while (_addMonsters.TryPeek(out var next))
+			{
+				// Throttle non-item monster additions to prevent packet
+				// storms, but always process item drops immediately so
+				// they all appear at once when a mob dies.
+				if (next is not ItemMonster && monstersAdded >= MaxMonsterAddsPerTick)
+					break;
+
+				if (!_addMonsters.TryDequeue(out var monster))
+					break;
+
 				this.AddMonsterInternal(monster);
+
+				if (monster is ItemMonster itemMonster)
+					(newItemMonsters ??= new()).Add(itemMonster);
+				else
+					monstersAdded++;
+			}
+
+			// Batch-merge items after all additions for this tick,
+			// so drops that exceed the threshold are merged all at
+			// once rather than progressively across multiple ticks.
+			if (newItemMonsters != null)
+			{
+				foreach (var itemMonster in newItemMonsters)
+				{
+					if (_monsters.ContainsKey(itemMonster.Handle))
+						this.TryMergeNearbyItems(itemMonster);
+				}
+			}
 
 			var updateList = _updateEntitiesPool.Value;
 			updateList.Clear();
@@ -429,9 +462,6 @@ namespace Melia.Zone.World.Maps
 			if (monster is ITriggerableArea trigger)
 				_triggerableAreas[monster.Handle] = trigger;
 
-			if (monster is ItemMonster itemMonster)
-				this.TryMergeNearbyItems(itemMonster);
-
 			monster.Components.Get<TriggerComponent>()?.OnAddedToMap();
 			monster.FromGround = false;
 		}
@@ -453,7 +483,7 @@ namespace Melia.Zone.World.Maps
 			var ownerId = newItem.Item.OwnerCharacterId;
 
 			var itemMergeRange = 30f;
-			var itemMergeThreshold = 5;
+			var itemMergeThreshold = itemId == ItemId.Silver ? 30 : 5;
 
 			var nearbyItems = new List<ItemMonster>();
 
