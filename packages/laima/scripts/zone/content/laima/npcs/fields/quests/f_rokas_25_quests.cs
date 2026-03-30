@@ -84,13 +84,7 @@ public class RokasRidgeScript : GeneralScript
 			}
 			else if (character.Quests.IsActive(testimonyQuestId))
 			{
-				var recorded = character.Variables.Perm.GetBool("Laima.Quests.Quest3001.TestimonyPeregrinLyon", false);
-
-				if (character.Variables.Perm.Has("Laima.Quests.Quest3001.WarTestimoniesCollected"))
-				{
-					recorded = false;
-					character.Variables.Perm.Remove("Laima.Quests.Quest3001.WarTestimoniesCollected");
-				}
+				var recorded = character.Variables.Perm.GetBool("Laima.Quests.Fedimian.Quest3001.TestimonyPeregrinLyon", false);
 
 				if (recorded)
 				{
@@ -115,7 +109,7 @@ public class RokasRidgeScript : GeneralScript
 						await dialog.Msg(L("'So I sought places like this. Mountaintops where the world is quiet, where I can appreciate what we still have.'"));
 						await dialog.Msg(L("'Peace. Silence. The view from high above. These are what I fought for, even if I didn't know it then.'"));
 
-						character.Variables.Perm.Set("Laima.Quests.Quest3001.TestimonyPeregrinLyon", true);
+						character.Variables.Perm.Set("Laima.Quests.Fedimian.Quest3001.TestimonyPeregrinLyon", true);
 						character.Quests.CompleteObjective(testimonyQuestId, "testimony2");
 
 						var testimonies = character.Variables.Perm.GetInt("Laima.Quests.Fedimian.Quest3001.WarTestimoniesCollected", 0);
