@@ -1,8 +1,8 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
-using Newtonsoft.Json.Linq;
 
 namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 {
@@ -14,17 +14,16 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 	public class GungHoOverride : BuffHandler
 	{
 		private const float AtkRateBonusPerLevel = 0.03f;
-		private const float AbilityBonus = 0.005f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var bonus = this.GetAtkRateBonus(buff);
 
-			var byAbility = 0f;
-			if (buff.Target.TryGetActiveAbilityLevel(AbilityId.Swordman13, out var abilityLevel))
-				byAbility = abilityLevel * AbilityBonus;
-
-			bonus *= 1f + byAbility;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				bonus *= 1f + SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			AddPropertyModifier(buff, buff.Target, PropertyName.PATK_RATE_BM, bonus);
 		}

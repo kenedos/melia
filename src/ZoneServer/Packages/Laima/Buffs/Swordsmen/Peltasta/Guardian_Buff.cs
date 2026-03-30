@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -60,8 +61,11 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 			var skillLevel = buff.NumArg1;
 			var multiplierReduction = DamageReductionBase + skillLevel * DamageReductionPerLevel;
 
-			if (target.TryGetActiveAbilityLevel(AbilityId.Peltasta13, out var abilityLevel))
-				multiplierReduction *= 1 + (abilityLevel * 0.005f);
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var buffSkill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				multiplierReduction *= 1f + SCR_Get_AbilityReinforceRate(buffSkill);
+			}
 
 			multiplierReduction = Math.Min(0.80f, multiplierReduction);
 
@@ -88,8 +92,11 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 
 			var reflectedDamage = skillHitResult.Damage * multiplierReduction;
 
-			if (target.TryGetActiveAbilityLevel(AbilityId.Peltasta13, out var abilityLevel))
-				reflectedDamage *= 1 + (abilityLevel * 0.005f);
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var buffSkill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				reflectedDamage *= 1f + SCR_Get_AbilityReinforceRate(buffSkill);
+			}
 
 			reflectedDamage = Math.Min(1.9f, reflectedDamage);
 

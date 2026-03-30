@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Buffs.Handlers;
+using Melia.Zone.Scripting;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -48,8 +49,11 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 			var skillLevel = (int)buff.NumArg1;
 			var healRate = 0.05f + 0.005f * skillLevel;
 
-			if (target.TryGetActiveAbilityLevel(AbilityId.Rogue20, out var abilityLevel))
-				healRate *= 1f + abilityLevel * 0.005f;
+			if (target.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				healRate *= 1f + SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			var healAmount = target.MaxHp * healRate;
 

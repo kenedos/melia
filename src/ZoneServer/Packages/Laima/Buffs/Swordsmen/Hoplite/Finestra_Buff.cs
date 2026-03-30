@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
@@ -39,10 +40,10 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Hoplite
 			var flatCrtBonus = FlatCrtBonusBase + (FlatCrtBonusPerLevel * skillLevel);
 			var crtRateBonus = CrtRateBonusBase + (CrtRateBonusPerLevel * skillLevel);
 
-			// Hoplite32: Finestra Enhance - increases crit bonuses by 0.5% per level
-			if (target.TryGetActiveAbilityLevel(AbilityId.Hoplite32, out var abilityLevel))
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
 			{
-				var abilityMultiplier = 1f + (abilityLevel * 0.005f);
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				var abilityMultiplier = 1f + SCR_Get_AbilityReinforceRate(skill);
 				flatCrtBonus *= abilityMultiplier;
 				crtRateBonus *= abilityMultiplier;
 			}

@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.Handlers.Scout
@@ -19,8 +20,11 @@ namespace Melia.Zone.Buffs.Handlers.Scout
 			var bonus = 0.1f + 0.02f * level;
 
 			var byAbility = 1f;
-			if (buff.Target.TryGetActiveAbilityLevel(AbilityId.Scout21, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			bonus *= byAbility;
 

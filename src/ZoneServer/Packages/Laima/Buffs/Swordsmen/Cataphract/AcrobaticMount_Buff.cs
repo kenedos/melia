@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -68,9 +69,11 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Cataphract
 			var skillLevel = buff.NumArg1;
 			var damageIncrease = BaseFinalDamageRate + FinalDamageRatePerLevel * skillLevel;
 
-			// Cataphract33: Acrobatic Mount: Enhance - increases damage bonus by 0.5% per level
-			if (buff.Target.TryGetActiveAbilityLevel(AbilityId.Cataphract33, out var abilityLevel))
-				damageIncrease *= 1f + (abilityLevel * 0.005f);
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var buffSkill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				damageIncrease *= 1f + SCR_Get_AbilityReinforceRate(buffSkill);
+			}
 
 			skillHitResult.Damage *= 1f + damageIncrease;
 		}

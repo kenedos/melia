@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -34,8 +35,11 @@ namespace Melia.Zone.Buffs.Handlers.Scout
 
 			var damageReduction = 0.30f + 0.06f * skill.Level;
 			var byAbility = 1f;
-			if (buff.Target.TryGetActiveAbility(AbilityId.Scout18, out var ability))
-				byAbility += ability.Level * 0.005f;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var buffSkill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(buffSkill);
+			}
 			damageReduction *= byAbility;
 
 			damageReduction = (float)Math.Min(0.95, damageReduction);

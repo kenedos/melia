@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters.Components;
 
@@ -38,8 +39,11 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 					shieldDef = lhItem.Data.Def;
 			}
 
-			if (buff.Target.TryGetActiveAbilityLevel(AbilityId.Peltasta37, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			return shieldDef * DefMultiplierPerLevel * buff.NumArg1 * byAbility;
 		}

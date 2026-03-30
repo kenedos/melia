@@ -7,6 +7,7 @@ using Melia.Shared.L10N;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Skills.Handlers.Archers.Ranger
@@ -54,10 +55,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var accuracy = caster.Properties.GetFloat(PropertyName.HR);
 			var critResistReduce = BaseCritResistReduce + (accuracy * skill.Level * CritResistMultiplierPerLevel);
 
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbility(AbilityId.Ranger51, out var ability))
-				byAbility += ability.Level * 0.005f;
-			critResistReduce *= byAbility;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			critResistReduce *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			target.StartBuff(BuffId.Ranger_Scan_Debuff, skill.Level, critResistReduce, duration, caster);
 

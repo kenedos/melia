@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
@@ -25,8 +26,11 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
 			var skillLevel = buff.NumArg1;
 
 			var byAbility = 1f;
-			if (buff.Caster is ICombatEntity caster && caster.TryGetActiveAbilityLevel(AbilityId.Hunter14, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
+			if (buff.Caster is ICombatEntity caster && caster.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			var rate = (BaseRate + RatePerLevel * skillLevel) * byAbility;
 

@@ -10,6 +10,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -119,8 +120,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 					{
 						var burnDamagePercent = 0.1f * (detonateTrapsSkill.Level - 4);
 
-						if (caster.TryGetActiveAbilityLevel(AbilityId.Sapper14, out var abilityLevel))
-							burnDamagePercent *= 1 + abilityLevel * 0.005f;
+						var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+						burnDamagePercent *= 1f + SCR_Get_AbilityReinforceRate(detonateTrapsSkill);
 
 						var burnDamage = skillHitResult.Damage * burnDamagePercent;
 						target.StartBuff(BuffId.Fire, detonateTrapsSkill.Level, burnDamage, TimeSpan.FromSeconds(4), caster);

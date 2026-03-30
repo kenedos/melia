@@ -7,6 +7,7 @@ using Melia.Shared.L10N;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Yggdrasil.Util;
@@ -45,10 +46,8 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 
 			var buffDuration = 5000 + skill.Level * 2000;
 
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Cleric11, out var level))
-				byAbility += level * 0.005f;
-			buffDuration = (int)(buffDuration * byAbility);
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			buffDuration = (int)(buffDuration * (1f + SCR_Get_AbilityReinforceRate(skill)));
 
 			target.StartBuff(BuffId.Cure_Buff, TimeSpan.FromMilliseconds(buffDuration));
 

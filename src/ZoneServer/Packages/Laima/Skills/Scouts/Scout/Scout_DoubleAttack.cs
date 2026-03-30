@@ -6,6 +6,7 @@ using Melia.Shared.World;
 using Melia.Zone.Buffs;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Skills.Handlers.Scouts.Scout
@@ -38,11 +39,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			var duration = TimeSpan.FromSeconds(300);
 			var doubleHitChance = 25f + skill.Level * 5f;
 
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Scout21, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
-
-			doubleHitChance *= byAbility;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			doubleHitChance *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			caster.StartBuff(BuffId.DoubleAttack_Buff, skill.Level, doubleHitChance, duration, caster);
 

@@ -6,6 +6,7 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
@@ -20,7 +21,6 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 	{
 		private const int BuffDurationSeconds = 300;
 		private const int BuffRange = 300;
-		private const float AbilityBonus = 0.005f;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -43,10 +43,8 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 
 			var healBonus = 0.30f + 0.03f * skill.Level;
 
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Kriwi32, out var level))
-				byAbility += level * AbilityBonus;
-			healBonus *= byAbility;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			healBonus *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			caster.StartBuff(BuffId.Daino_Buff, skill.Level, healBonus, TimeSpan.FromSeconds(BuffDurationSeconds), caster);
 

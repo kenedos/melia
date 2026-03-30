@@ -5,6 +5,7 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
@@ -133,8 +134,11 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Sadhu
 
 			var recoveryRate = 0.30f + 0.03f * prakritiLevel;
 
-			if (character.TryGetActiveAbilityLevel(AbilityId.Sadhu40, out var abilityLevel))
-				recoveryRate *= 1f + abilityLevel * 0.005f;
+			if (character.TryGetSkill(SkillId.Sadhu_Prakriti, out var prakritiSkill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				recoveryRate *= 1f + SCR_Get_AbilityReinforceRate(prakritiSkill);
+			}
 
 			recoveryRate = Math.Min(1.0f, recoveryRate);
 			var spRecovery = (int)(spLost * recoveryRate);

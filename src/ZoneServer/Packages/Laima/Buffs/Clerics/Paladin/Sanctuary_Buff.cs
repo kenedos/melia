@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
@@ -29,9 +30,11 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
 			// Base: 150% + 15% per skill level
 			var modValue = 1.5f + 0.15f * buff.NumArg1;
 
-			// Paladin27 ability: +0.5% per level as final multiplier
-			if (caster != null && caster.TryGetActiveAbilityLevel(AbilityId.Paladin27, out var abilityLevel))
-				modValue *= (1 + abilityLevel * 0.005f);
+			if (caster != null && caster.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				modValue *= 1f + SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			var pdef = target.Properties.GetFloat(PropertyName.DEF) * modValue;
 			var mdef = target.Properties.GetFloat(PropertyName.MDEF) * modValue;

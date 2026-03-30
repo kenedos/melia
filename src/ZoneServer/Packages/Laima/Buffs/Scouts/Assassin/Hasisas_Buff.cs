@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills;
@@ -109,8 +110,11 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Assassin
 			var bonus = CritBonusRateBase + CritBonusRatePerLevel * buff.NumArg1;
 
 			var byAbility = 1f;
-			if (buff.Target.TryGetActiveAbility(AbilityId.Assassin1, out var ability))
-				byAbility += ability.Level * 0.005f;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
+			}
 			bonus *= byAbility;
 
 			return bonus;

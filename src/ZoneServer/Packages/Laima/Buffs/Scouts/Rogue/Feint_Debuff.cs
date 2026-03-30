@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Buffs.Handlers;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -31,8 +32,11 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Scouts.Rogue
 			var skillLevel = (int)buff.NumArg1;
 
 			var byAbility = 1f;
-			if (buff.Caster is ICombatEntity caster && caster.TryGetActiveAbilityLevel(AbilityId.Rogue28, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
+			if (buff.Caster is ICombatEntity caster && caster.TryGetSkill(buff.SkillId, out var buffSkill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(buffSkill);
+			}
 
 			modifier.BonusCritChance += (150 + (skillLevel * 15)) * byAbility;
 			modifier.MinCritChance += (0.30f + (skillLevel * 0.03f)) * byAbility;

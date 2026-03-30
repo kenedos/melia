@@ -93,7 +93,8 @@ namespace Melia.Zone.Pads.Handlers
 			var skillHitResult = new SkillHitResult();
 			var hpRegenAmount = SCR_CalculateHeal(caster, target, skill, modifier, skillHitResult);
 
-			hpRegenAmount *= 1f + abilityLevel * 0.005f;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			hpRegenAmount *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			return hpRegenAmount;
 		}

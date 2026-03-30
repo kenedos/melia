@@ -5,6 +5,7 @@ using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
@@ -30,9 +31,8 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 				// Base 20% + 2% per skill level
 				var critRateBonus = 0.20f + (sharpSpearSkill.Level * 0.02f);
 
-				// Hoplite31: Sharp Spear: Enhance - +0.5% per ability level
-				if (attacker.TryGetActiveAbilityLevel(AbilityId.Hoplite31, out var abilityLevel))
-					critRateBonus *= 1f + abilityLevel * 0.005f;
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				critRateBonus *= 1f + SCR_Get_AbilityReinforceRate(sharpSpearSkill);
 
 				modifier.CritRateMultiplier += critRateBonus;
 			}

@@ -24,7 +24,6 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Highlander
 	public class CrossGuard_BuffOverride : BuffHandler
 	{
 		private const float PercentageEvasionBlkBonusPerLevel = 0.05f;
-		private const float AbilityBonus = 0.005f;
 		private const float BlkBonus = 200f;
 		private const float BlkBonusPerLevel = 50f;
 		private const float DebuffDuration = 5f;
@@ -39,11 +38,11 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Highlander
 
 			var value = baseValue + byLevel + byEvasion;
 
-			var byAbility = 1f;
-			if (buff.Target.TryGetActiveAbilityLevel(AbilityId.Highlander15, out var abilityLevel))
-				byAbility += abilityLevel * AbilityBonus;
-
-			value *= byAbility;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				value *= 1f + SCR_Get_AbilityReinforceRate(skill);
+			}
 			value += 1f;
 
 			AddPropertyModifier(buff, buff.Target, PropertyName.BLK_BM, value);

@@ -4,6 +4,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -23,7 +24,6 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 	{
 		private const float BaseDamageReduction = -0.30f;
 		private const float DamageIncreasePerSkillLevel = 0.03f;
-		private const float AbilityBonusPerLevel = 0.005f;
 		private const float MaxHorizontalDistance = 200f;
 		private const int DistanceCheckIntervalMs = 500;
 
@@ -70,15 +70,13 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 			if (!linkTargets.Any())
 				return;
 
-			// Calculate damage multiplier based on skill level and ability
-			// Formula: DamageMult = 1 + (-0.30 + 0.03 * SkillLv * (1 + 0.005 * AbilityLevel))
-			// SkillLv 1: 73%, SkillLv 10: 100%, SkillLv 10 + Lv100 ability: 115%
 			var skillLevel = buff.NumArg1;
 			var abilityMultiplier = 1f;
 
-			if (buff.Caster is ICombatEntity caster && caster.TryGetActiveAbilityLevel(AbilityId.Linker22, out var abilityLevel))
+			if (buff.Caster is ICombatEntity caster && caster.TryGetSkill(buff.SkillId, out var buffSkill))
 			{
-				abilityMultiplier = 1f + (abilityLevel * AbilityBonusPerLevel);
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				abilityMultiplier += SCR_Get_AbilityReinforceRate(buffSkill);
 			}
 
 			var damageMultiplier = 1f + BaseDamageReduction + (DamageIncreasePerSkillLevel * skillLevel * abilityMultiplier);

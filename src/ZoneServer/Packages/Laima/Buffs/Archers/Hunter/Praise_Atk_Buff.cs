@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -34,10 +35,12 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
 			var target = buff.Target;
 			var skillLevel = buff.NumArg1;
 
-			// Hunter31: Increases Praise buff effectiveness by 0.5% per ability level
 			var byAbility = 1f;
-			if (buff.Caster is ICombatEntity caster && caster.TryGetActiveAbilityLevel(AbilityId.Hunter31, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
+			if (buff.Caster is ICombatEntity caster && caster.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			// +200 ATK flat bonus
 			AddPropertyModifier(buff, target, PropertyName.ATK_BM, FlatAtkBonus * byAbility);

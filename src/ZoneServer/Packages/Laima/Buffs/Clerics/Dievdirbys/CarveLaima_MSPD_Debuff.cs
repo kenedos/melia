@@ -2,6 +2,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Buffs.Handlers;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -34,10 +35,8 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Clerics.Dievdirbys
 			// Base MSPD reduction: 10 + skillLevel
 			var mspdReduction = 10f + skill.Level;
 
-			// Check for Dievdirbys26 ability: +0.5% effectiveness per ability level
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Dievdirbys26, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			var byAbility = 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			mspdReduction *= byAbility;
 

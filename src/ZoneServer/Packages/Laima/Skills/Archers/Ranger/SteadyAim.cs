@@ -6,6 +6,7 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters.Components;
 
@@ -37,10 +38,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			var criticalRateMultiplier = 0.1f + 0.02f * skill.Level;
 
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbility(AbilityId.Ranger14, out var ability))
-				byAbility += ability.Level * 0.005f;
-			criticalRateMultiplier *= byAbility;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			criticalRateMultiplier *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			caster.StartBuff(BuffId.SteadyAim_Buff, skill.Level, criticalRateMultiplier, TimeSpan.FromMilliseconds(1800000f), caster);
 		}

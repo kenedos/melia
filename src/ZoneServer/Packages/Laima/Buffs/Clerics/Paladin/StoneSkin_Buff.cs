@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -35,11 +36,11 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Clerics.Paladin
 			var skillLevel = buff.NumArg1;
 			var damageReduction = DamageReductionBase + (skillLevel * DamageReductionPerLevel);
 
-			var byAbility = 1f;
-			if (buff.Caster is Character character)
-				if (character.TryGetActiveAbilityLevel(AbilityId.Paladin24, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
-			damageReduction *= byAbility;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var buffSkill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				damageReduction *= 1f + SCR_Get_AbilityReinforceRate(buffSkill);
+			}
 
 			// Apply damage reduction (Cap at 90%)
 			skillHitResult.Damage *= Math.Max(0.1f, (1f - damageReduction));

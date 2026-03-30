@@ -4,6 +4,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Monsters;
 
@@ -68,10 +69,10 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Bokor
 			var bonus = BaseBonus + skillLevel * BonusPerLevel;
 
 			var byAbility = 1f;
-			if (buff.Caster is ICombatEntity caster
-				&& caster.TryGetActiveAbilityLevel(AbilityId.Bokor33, out var abilityLevel))
+			if (buff.Caster is ICombatEntity caster && caster.TryGetSkill(buff.SkillId, out var skill))
 			{
-				byAbility += abilityLevel * 0.005f;
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
 			}
 
 			return bonus * byAbility;

@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
@@ -29,11 +30,13 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 			var blkBonus = BlkRateBonusBase + (BlkRateBonusPerLevel * skillLevel);
 			var crtResistBonus = CrtDrRateBonusBase + (CrtDrRateBonusPerLevel * skillLevel);
 
-			if (target.TryGetActiveAbilityLevel(AbilityId.Peltasta36, out var abilityLevel))
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
 			{
-				flatBlkBonus *= 1f + (abilityLevel * 0.005f);
-				blkBonus *= 1f + (abilityLevel * 0.005f);
-				crtResistBonus *= 1f + (abilityLevel * 0.005f);
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				var reinforceRate = 1f + SCR_Get_AbilityReinforceRate(skill);
+				flatBlkBonus *= reinforceRate;
+				blkBonus *= reinforceRate;
+				crtResistBonus *= reinforceRate;
 			}
 
 			AddPropertyModifier(buff, target, PropertyName.BLK_BM, flatBlkBonus);

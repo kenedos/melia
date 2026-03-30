@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.Handlers
@@ -15,7 +16,6 @@ namespace Melia.Zone.Buffs.Handlers
 	{
 		private const float BaseDEFMultiplier = 0.25f;
 		private const float DEFMultiplierPerLevel = 0.05f;
-		private const float AbilityBonus = 0.005f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -24,10 +24,11 @@ namespace Melia.Zone.Buffs.Handlers
 			var level = buff.NumArg1;
 			var defMultiplier = BaseDEFMultiplier + (DEFMultiplierPerLevel * level);
 
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Priest11, out var abilityLevel))
-				byAbility += abilityLevel * AbilityBonus;
-			defMultiplier *= byAbility;
+			if (caster.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				defMultiplier *= 1f + SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			// Apply the defense modifier
 			AddPropertyModifier(buff, target, PropertyName.DEF_RATE_BM, defMultiplier);

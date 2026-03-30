@@ -63,10 +63,11 @@ namespace Melia.Zone.Buffs.Handlers
 					return;
 				}
 
-				var byAbility = 1f;
-				if (caster.TryGetActiveAbilityLevel(AbilityId.Kriwi17, out var level))
-					byAbility += level * 0.005f;
-				amount *= byAbility;
+				if (caster.TryGetSkill(buff.SkillId, out var skill))
+				{
+					var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+					amount *= 1f + SCR_Get_AbilityReinforceRate(skill);
+				}
 			}
 
 			buff.Target.Heal(amount, 0);

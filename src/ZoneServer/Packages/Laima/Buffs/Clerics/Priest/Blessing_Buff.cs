@@ -2,6 +2,7 @@ using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.Handlers
@@ -23,10 +24,11 @@ namespace Melia.Zone.Buffs.Handlers
 			var level = buff.NumArg1;
 			var defMultiplier = BaseATKMultiplier + (ATKMultiplierPerLevel * level);
 
-			var byAbility = 1f;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Priest13, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
-			defMultiplier *= byAbility;
+			if (caster.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				defMultiplier *= 1f + SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			// Apply the defense modifier
 			AddPropertyModifier(buff, target, PropertyName.PATK_RATE_BM, defMultiplier);

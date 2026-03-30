@@ -3,6 +3,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
@@ -25,8 +26,11 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 			var skillLevel = buff.NumArg1;
 
 			var byAbility = 1f;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Thaumaturge15, out var thaum15Level))
-				byAbility += thaum15Level * 0.005f;
+			if (caster.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
+			}
 
 			var intRatePercent = (20f + 2f * skillLevel) * byAbility;
 			var intFlat = (25f + 2.5f * skillLevel) * byAbility;

@@ -52,8 +52,8 @@ namespace Melia.Zone.Buffs.Handlers
 			var skillHitResult = new SkillHitResult();
 			var healAmount = SCR_CalculateHeal(caster, target, skill, modifier, skillHitResult);
 
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Kriwi14, out var abilityLevel))
-				healAmount *= 1f + abilityLevel * 0.005f;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			healAmount *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			return healAmount;
 		}

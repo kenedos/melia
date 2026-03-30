@@ -5,6 +5,7 @@ using Melia.Zone.Buffs;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 
 namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
@@ -27,9 +28,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsman.Highlander
 
 			var baseValue = 0.06f;
 
-			var byAttribute = 0f;
-			if (target.TryGetActiveAbilityLevel(AbilityId.Highlander44, out var abilityLevel))
-				byAttribute = abilityLevel * 0.005f;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			var byAttribute = SCR_Get_AbilityReinforceRate(defianceSkill);
 
 			var reductionPerSkilllevel = baseValue + (baseValue * byAttribute);
 

@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
@@ -33,8 +28,11 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Assassin
 			var evasionRate = 0.20f + level * 0.03f;
 
 			var byAbility = 1f;
-			if (buff.Target.TryGetActiveAbility(AbilityId.Assassin10, out var ability))
-				byAbility += ability.Level * 0.005f;
+			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var skill))
+			{
+				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+				byAbility += SCR_Get_AbilityReinforceRate(skill);
+			}
 			evasionRate *= byAbility;
 
 			// Property only exists in PC Namespace

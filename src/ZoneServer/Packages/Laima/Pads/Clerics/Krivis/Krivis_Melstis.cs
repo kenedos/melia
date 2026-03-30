@@ -5,6 +5,8 @@ using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.Scripting;
+using Melia.Zone.Skills;
 using static Melia.Zone.Pads.Helpers.PadHelper;
 
 namespace Melia.Zone.Pads.Handlers
@@ -28,7 +30,7 @@ namespace Melia.Zone.Pads.Handlers
 			pad.Trigger.LifeTime = TimeSpan.FromSeconds(25);
 
 			// Store the total SP to be recharged over the pad's lifetime
-			var totalSpRecharge = this.GetTotalSpRecharge(creator, skill.Level);
+			var totalSpRecharge = this.GetTotalSpRecharge(creator, skill);
 			pad.Variables.Set("TotalSpRecharge", totalSpRecharge);
 		}
 
@@ -72,16 +74,15 @@ namespace Melia.Zone.Pads.Handlers
 		/// <summary>
 		/// Calculates the total SP to be recharged over the pad's lifetime.
 		/// </summary>
-		private float GetTotalSpRecharge(ICombatEntity creator, int skillLevel)
+		private float GetTotalSpRecharge(ICombatEntity creator, Skill skill)
 		{
+			var skillLevel = skill.Level;
 			var basePercentage = 0.20f; // 20% at level 1
 			var percentagePerLevel = 0.04f; // 4% increase per level
 			var totalPercentage = basePercentage + (skillLevel - 1) * percentagePerLevel;
 
-			var byAbility = 1f;
-			if (creator.TryGetActiveAbilityLevel(AbilityId.Kriwi30, out var abilityLevel))
-				byAbility += abilityLevel * 0.005f;
-			totalPercentage *= byAbility;
+			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
+			totalPercentage *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			if (creator is Character character)
 				return character.MaxSp * totalPercentage;
