@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Packages;
@@ -48,10 +47,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			var skillHitDelay = skill.Properties.HitDelay;
 
 			var spdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate);
-			var reducedSpdRate = 1f + (spdRate - 1f) / 2f;
 
-			aniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / reducedSpdRate);
-			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / reducedSpdRate);
+			aniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / spdRate);
+			skillHitDelay = TimeSpan.FromMilliseconds(skillHitDelay.TotalMilliseconds / spdRate);
 
 			await skill.Wait(skillHitDelay);
 
@@ -69,7 +67,11 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+				var hitAniTime = skillHitResult.HitCount > 1
+					? TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skillHitResult.HitCount)
+					: aniTime;
+
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, hitAniTime, skillHitDelay);
 				hits.Add(skillHit);
 			}
 

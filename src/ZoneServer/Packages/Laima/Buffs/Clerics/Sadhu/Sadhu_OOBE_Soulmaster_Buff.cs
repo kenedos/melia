@@ -105,7 +105,6 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Sadhu
 			this.RecoverSp(casterCharacter, buff);
 
 			Send.ZC_NORMAL.SetMainAttackSkill(casterCharacter, SkillId.None);
-			Send.ZC_NORMAL.SetActorColor(casterCharacter, 255, 255, 255, 255, 0.01f);
 			Send.ZC_PLAY_SOUND(casterCharacter, "skl_eff_yuchae_end_2");
 
 			if (ZoneServer.Instance.Data.BuffDb.TryFind(BuffId.OOBE_Soulmaster_Buff, out var buffData))
@@ -113,6 +112,8 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Sadhu
 
 			this.RemoveLinkEffect(casterCharacter);
 			this.ReturnToBody(casterCharacter, (int)buff.NumArg2);
+
+			Send.ZC_NORMAL.SetActorColor(casterCharacter, 255, 255, 255, 255, 0.01f);
 		}
 
 		/// <summary>
