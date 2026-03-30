@@ -201,7 +201,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!silently)
 			{
 				Send.ZC_BUFF_REMOVE(this.Entity, buff);
-				Send.ZC_MSPD(this.Entity);
+
+				if (affectsSpeed)
+					Send.ZC_MSPD(this.Entity);
 			}
 
 			return true;

@@ -674,6 +674,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="mspd"></param>
 		public void SetFixedMoveSpeed(float mspd)
 		{
+			var current = this.Entity.Properties.GetFloat(PropertyName.FIXMSPD_BM);
+			if (current == mspd)
+				return;
+
 			this.Entity.Properties.SetFloat(PropertyName.FIXMSPD_BM, mspd);
 			Send.ZC_MSPD(this.Entity);
 		}
@@ -683,8 +687,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		public void ResetFixedMoveSpeed()
 		{
-			this.Entity.Properties.SetFloat(PropertyName.FIXMSPD_BM, 0);
-			Send.ZC_MSPD(this.Entity);
+			this.SetFixedMoveSpeed(0);
 		}
 
 		/// <summary>
