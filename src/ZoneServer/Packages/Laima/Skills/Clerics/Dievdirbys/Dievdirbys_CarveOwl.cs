@@ -263,7 +263,13 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			if (caster.Components.TryGet<BaseSkillComponent>(out var skillComponent) &&
 				skillComponent.TryGet(SkillId.Wugushi_WideMiasma, out var miasmaSkill))
 			{
-				SkillResultTargetBuff(caster, miasmaSkill, BuffId.WideMiasma_Debuff, 1, 0f, 8000f, 1, 100, -1, hits);
+				foreach (var hit in hits)
+				{
+					if (hit.HitInfo == null || hit.HitInfo.Damage <= 0)
+						continue;
+
+					hit.Target.StartBuff(BuffId.WideMiasma_Debuff, 1, hit.HitInfo.Damage, TimeSpan.FromMilliseconds(8000), caster, miasmaSkill.Id);
+				}
 			}
 		}
 	}

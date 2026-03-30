@@ -15,7 +15,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Cataphract
 	[BuffHandler(BuffId.Impaler_Debuff)]
 	public class Impaler_DebuffOverride : BuffHandler
 	{
-		private const float DefenseReduction = -0.30f;
+		private const float DefenseReductionRate = 0.30f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -26,7 +26,9 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Cataphract
 			target.Lock(LockType.Attack);
 			target.Lock(LockType.Movement);
 
-			AddPropertyModifier(buff, target, PropertyName.DEF_RATE_BM, DefenseReduction);
+			var currentDef = target.Properties.GetFloat(PropertyName.DEF);
+			var reduction = -(currentDef * DefenseReductionRate);
+			AddPropertyModifier(buff, target, PropertyName.DEF_BM, reduction);
 		}
 
 		public override void OnEnd(Buff buff)
@@ -34,7 +36,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Cataphract
 			var caster = buff.Caster;
 			var target = buff.Target;
 
-			RemovePropertyModifier(buff, target, PropertyName.DEF_RATE_BM);
+			RemovePropertyModifier(buff, target, PropertyName.DEF_BM);
 
 			target.Unlock(LockType.Attack);
 			target.Unlock(LockType.Movement);
