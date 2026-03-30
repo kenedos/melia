@@ -127,6 +127,51 @@ namespace Melia.Zone.Services
 			}
 		}
 
+		/// <summary>
+		/// Stops the periodic timer, waits for any in-flight auto-save
+		/// tasks on the SaveQueue to finish, then saves every online
+		/// character synchronously on the calling thread.
+		/// </summary>
+		/// <returns>Number of characters saved successfully.</returns>
+		public int SaveAllNow()
+		{
+			// 1. Stop the timer so no new callbacks fire.
+			_timer?.Change(Timeout.Infinite, Timeout.Infinite);
+
+			// 2. Drain any auto-save tasks already on the SaveQueue
+			//    so they finish before we start our own saves.
+			SaveQueue.StopAndDrain(30000);
+
+			// 3. Save everyone synchronously — nothing else is running.
+			var allChars = _zoneServer.World.GetCharacters().ToList();
+			if (allChars.Count == 0)
+				return 0;
+
+			var savedCount = 0;
+			var failedCount = 0;
+
+			foreach (var character in allChars)
+			{
+				try
+				{
+					if (character == null || character.Connection?.Account == null)
+						continue;
+
+					_database.SaveCharacterData(character);
+					_database.SaveAccountData(character.Connection.Account);
+					savedCount++;
+				}
+				catch (Exception ex)
+				{
+					failedCount++;
+					Log.Error("SaveAllNow: Error saving {0} (ID: {1}): {2}", character?.Name ?? "?", character?.DbId ?? 0, ex.Message);
+				}
+			}
+
+			Log.Info("SaveAllNow: Saved {0}, Failed {1}.", savedCount, failedCount);
+			return savedCount;
+		}
+
 		public void Dispose()
 		{
 			_timer?.Dispose();

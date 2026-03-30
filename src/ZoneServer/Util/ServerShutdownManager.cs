@@ -391,66 +391,44 @@ namespace Melia.Zone.Util
 					if (IsIscInitiated)
 						Log.Info("(Shutdown was initiated by ISC coordinator)");
 
-					var characters = ZoneServer.Instance.World.GetCharacters().ToList();
-					Log.Info("Players to save and disconnect: {0}", characters.Count);
+					// Stop all services (blocks new connections, stops
+					// autosave timer, heartbeat, etc.)
+					ZoneServer.Instance.StopServices();
 
-					// Final broadcast
-					var finalMessage = "[Server] Server is shutting down NOW. Thank you for playing!";
-					BroadcastToAllPlayers(finalMessage);
-
-					// Give players a moment to see the message
+					BroadcastToAllPlayers("[Server] Server is shutting down NOW. Thank you for playing!");
 					Thread.Sleep(2000);
 
-					// Save and disconnect all players
-					var savedCount = 0;
-					var failedCount = 0;
+					// Save every character. Services are stopped so
+					// nothing can race with us.
+					Log.Info("Saving all players...");
+					var savedCount = ZoneServer.Instance.AutoSave?.SaveAllNow() ?? 0;
+					Log.Info("Saved {0} player(s).", savedCount);
 
+					// Disconnect everyone
+					var characters = ZoneServer.Instance.World.GetCharacters().ToList();
 					foreach (var character in characters)
 					{
 						try
 						{
-							Log.Info("  Saving: {0} (ID: {1})", character.Name, character.DbId);
-
-							if (character.Connection?.Account != null)
-							{
-								ZoneServer.Instance.Database.SaveCharacterData(character);
-								ZoneServer.Instance.Database.SaveAccountData(character.Connection.Account);
-								ZoneServer.Instance.Database.UpdateLoginState(character.AccountDbId, 0, LoginState.LoggedOut);
-							}
-
 							character.MsgBox(
 								Localization.Get("Server Shutdown"),
 								Localization.Get("The server is shutting down: {0}"),
 								ShutdownReason ?? "maintenance"
 							);
 
-							// Clear autotrade so OnClosed takes the normal
-							// save/cleanup path instead of keeping them in world.
+							character.Variables.Temp.SetBool("Melia.NoSave", true);
 							character.IsAutoTrading = false;
 							character.Connection?.Close();
-
-							savedCount++;
-							Log.Info("    Saved and disconnected");
 						}
 						catch (Exception ex)
 						{
-							failedCount++;
-							Log.Error("    Error saving {0}: {1}", character.Name, ex.Message);
+							Log.Error("Error disconnecting {0}: {1}", character.Name, ex.Message);
 							character.Connection?.Close();
 						}
 					}
 
-					Log.Info("Player save complete - Saved: {0}, Failed: {1}", savedCount, failedCount);
-
-					// Wait for all characters to finish leaving the world
+					// Wait for disconnects to finish
 					WaitForPlayersToLeave(timeout: TimeSpan.FromSeconds(10));
-
-					// Drain the SaveQueue so all disconnect-triggered saves complete
-					Log.Info("Draining SaveQueue...");
-					SaveQueue.StopAndDrain(30000);
-
-					// Stop all server services (acceptor, heartbeat, autosave, etc.)
-					ZoneServer.Instance.StopServices();
 
 					// Update server status
 					ZoneServer.Instance.ServerInfo.Status = ServerStatus.Offline;

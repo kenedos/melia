@@ -45,6 +45,8 @@ namespace Melia.Zone
 		public readonly static ZoneServer Instance = new();
 
 		private TcpConnectionAcceptor<ZoneConnection> _acceptor;
+		public bool BlockNewConnections { get; set; }
+		internal AutoSaveService AutoSave => _autoSaveService;
 		private AutoSaveService _autoSaveService;
 		private OrphanCleanupService _orphanCleanupService;
 		private DeadConnectionSweepService _deadConnectionSweepService;
@@ -194,7 +196,12 @@ namespace Melia.Zone
 		private void StartAcceptor()
 		{
 			_acceptor = new TcpConnectionAcceptor<ZoneConnection>(this.ServerInfo.Port);
-			_acceptor.ConnectionChecker = (conn) => this.CheckConnection(conn, this.Database);
+			_acceptor.ConnectionChecker = (conn) =>
+			{
+				if (this.BlockNewConnections)
+					return new ConnectionCheck(ConnectionCheckResult.Reject, "Server is shutting down");
+				return this.CheckConnection(conn, this.Database);
+			};
 			_acceptor.ConnectionAccepted += this.OnConnectionAccepted;
 			_acceptor.ConnectionRejected += this.OnConnectionRejected;
 			_acceptor.Listen();
@@ -600,18 +607,14 @@ namespace Melia.Zone
 		{
 			Log.Info("Stopping server services...");
 
-			// Stop accepting new connections
-			this._acceptor?.Stop();
-			Log.Info("Acceptor stopped.");
+			// Block new connections (don't call _acceptor.Stop()
+			// as Yggdrasil's ResetSocket causes an exception loop).
+			this.BlockNewConnections = true;
+			Log.Info("New connections blocked.");
 
 			// Stop world update loop (gracefully if possible)
 			this.World?.Heartbeat.Stop();
 			Log.Info("World stopped.");
-
-			// Stop SaveQueue (drain remaining saves)
-			if (!SaveQueue.IsAddingCompleted)
-				SaveQueue.Stop();
-			Log.Info("SaveQueue stopped.");
 
 			// Dispose AutoSave Service
 			_autoSaveService?.Dispose();
