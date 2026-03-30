@@ -178,14 +178,13 @@ namespace Melia.Zone.Network
 					existingCharacter.Connection?.Close();
 					cleanupCloseMs = sw.ElapsedMilliseconds - closeStart;
 
-					// Run the save in the background with a bounded wait so the
-					// reconnect isn't blocked by a slow DB transaction. If the
-					// save doesn't finish within 5 seconds, proceed anyway — the
-					// DB already has autosave data, and the background save will
-					// still complete eventually.
+					// Enqueue the save on the SaveQueue so it serializes with
+					// the OnClosed save task for the same character, avoiding
+					// concurrent writes from two different thread pools.
 					var charToSave = existingCharacter;
 					var saveStart = sw.ElapsedMilliseconds;
-					var saveTask = Task.Run(() =>
+					var saveDone = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+					SaveQueue.Enqueue(() =>
 					{
 						try
 						{
@@ -197,13 +196,13 @@ namespace Melia.Zone.Network
 						}
 						finally
 						{
-							charToSave.Cleanup();
 							CharacterLockManager.TryRemoveLock(charToSave.DbId);
+							saveDone.TrySetResult(true);
 						}
 					});
 
 					const int SaveTimeoutMs = 5000;
-					if (!saveTask.Wait(SaveTimeoutMs))
+					if (!saveDone.Task.Wait(SaveTimeoutMs))
 					{
 						Log.Warning($"CZ_CONNECT: Save for '{charToSave.Name}' ({charToSave.DbId}) didn't finish within {SaveTimeoutMs}ms. Proceeding with reconnect; save continues in background.");
 					}

@@ -276,221 +276,147 @@ namespace Melia.Zone.Network
 		{
 			base.OnClosed(type);
 
-			// --- IMMEDIATE STATE INVALIDATION ---
-			// Capture references before they are nulled.
 			this.LoadComplete = false;
 			var account = this.Account;
 			var character = this.SelectedCharacter;
 
-			// If no character was selected, there's nothing to clean up in the world.
 			if (character == null)
-			{
 				return;
-			}
 
-			// If character is autotrading, keep them in the world with their shop.
-			// Only nullify the connection references to allow the socket to close cleanly.
+			// Autotrading characters stay in the world.
 			if (character.IsAutoTrading)
 			{
-				Log.Info($"Character '{character.Name}' entered autotrade mode. Connection closed but character remains in world.");
-
-				// Update login state to allow other characters on same account to log in
 				ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
 
-				// Clear connection reference on character since we're disconnecting
 				character.Connection = new DummyConnection
 				{
 					Account = account,
 					SelectedCharacter = character,
 					ShopCreated = this.ShopCreated,
 					Party = this.Party,
-					// Guild = this.Guild, // Removed: Guild type deleted
 				};
 
-				// Nullify connection references
-				this.Account = null;
-				this.SelectedCharacter = null;
-				this.ActiveDuel = null;
-				// this.ActiveHouse = null; // Removed: PersonalHouse type deleted
-				this.ActiveShop = null;
-				this.ActiveTrade = null;
-				this.CurrentDialog?.Cancel();
-				this.CurrentDialog = null;
-				// this.Guild = null; // Removed: Guild type deleted
-				this.Party = null;
-				this.ShopCreated = null;
-				this.GameReady = false;
-
+				this.NullifyConnectionReferences();
 				return;
 			}
 
-			// Cancel all running async skill tasks (e.g. Dievdirbys statue
-			// buff loops) to prevent them from keeping the character alive.
 			character.Components.Get<BaseSkillComponent>()?.CancelAllRunningSkills();
-
-			// Cancel OOBE before removing from map so the dummy body
-			// is cleaned up while the character is still on the map.
 			character.CancelOutOfBody();
 
-			// 1. Clean up visibility state and remove from map.
-			// During a warp, FinalizeWarp() already handles this, so skip
-			// if the character has already been removed from the map.
+			// Strip temp buffs while the character is still on the map
+			// so that OnEnd handlers have full map context available.
+			character.Components.Get<BuffComponent>()?.StopTempBuffs(silently: true);
+
 			if (character.Map != null)
 			{
 				character.CloseEyes();
-
-				Log.Info($"Character '{character.Name}' (Handle: {character.Handle}) removed from map '{character.Map?.ClassName ?? "null"}' due to connection close.");
 				character.Map.RemoveCharacter(character);
 			}
 
-			// Clean up card registries
 			Items.Effects.ItemHookRegistry.Instance.UnregisterCharacter(character);
 
-			// 2. Update group/system statuses to reflect the offline state.
 			character.IsOnline = false;
 			this.Party?.UpdateMember(character, false);
-			// this.Guild?.UpdateMember(character, false); // Removed: Guild type deleted
 
-			// 3. Clean up active interactions.
 			if (this.ActiveTrade != null || character.IsTrading)
-			{
 				ZoneServer.Instance.World.Trades.CancelTrade(character);
-			}
 			if (this.ActiveDuel != null || character.IsDueling)
-			{
 				ZoneServer.Instance.World.Duels.EndDuel(this.ActiveDuel);
-			}
+
 			character.ActiveCompanion?.Map?.RemoveMonster(character.ActiveCompanion);
 			character.Summons.RemoveAllSummons();
 
-			// 3b. Release any pending TimeAction semaphore so dialog
-			// tasks waiting on StartAsync don't hang forever.
 			character.Components.Get<TimeActionComponent>()?.End(TimeActionResult.Cancelled);
 			character.Components.Get<TimeActionComponent>()?.Resume();
 
-			// 4. Remove from auto-match queue if they were queued.
-			// This ensures disconnected players don't block re-queuing when they log back in.
 			ZoneServer.Instance.World.AutoMatch.RemoveCharacterFromQueue(character);
 
-			// 5. Clean up card metadata registry entries for equipped cards.
 			foreach (var card in character.Inventory.GetCards())
 				Items.Effects.CardMetadataRegistry.Instance.Remove(card.Value.ObjectId);
 
-			// 6. Character lock removal is deferred to after save completes (see below).
-
-			// 7. Force end any active battle to prevent _battles dictionary from leaking.
 			ZoneServer.Instance.World.BattleManager.ForceEndBattle(character);
-
-			// 8. Remove character property event subscriptions to allow clean GC.
 			character.Properties.RemoveEvents();
 
-			// --- DEFERRED SAVE LOGIC ---
-			// Enqueue the final save on the SaveQueue worker thread.
-			var wasSavedForWarp = character?.SavedForWarp ?? false;
+			// Capture everything the SaveQueue lambda needs by value
+			// so the task is self-contained and doesn't depend on
+			// connection state that gets nulled below.
+			var sessionKey = this.SessionKey;
+			var wasSavedForWarp = character.SavedForWarp;
+
 			SaveQueue.Enqueue(() =>
 			{
 				try
 				{
-					this.SaveAccountAndCharacter(account, character);
+					// Double-check the warp flag — ProcessConnect may have
+					// set it between our capture and this task running.
+					if (character.SavedForWarp)
+						return;
+
+					this.SaveAccountAndCharacter(account, character, sessionKey);
 				}
 				catch (Exception ex)
 				{
-					Log.Error($"Exception in SaveQueue save task for Account ID {account?.Id ?? 0}: {ex}");
+					Log.Error($"OnClosed save failed for account {account?.Id}: {ex}");
 				}
 				finally
 				{
-					// Only remove the lock on a normal disconnect. During a
-					// warp/reconnect the save is skipped here but the reconnect's
-					// background save (ProcessConnect) may still be holding the
-					// lock. It will be cleaned up on eventual normal disconnect.
-					if (character != null && !wasSavedForWarp)
-					{
+					if (!wasSavedForWarp)
 						CharacterLockManager.TryRemoveLock(character.DbId);
-
-						// Release the character's object graph so GC can collect
-						// it promptly instead of waiting for Gen2 collection.
-						// Only do this on normal disconnect — during reconnect,
-						// ProcessConnect owns the old character's lifecycle and
-						// will clean up after its own save completes. Cleaning
-						// up here would race with that save and wipe collections
-						// mid-write, causing data loss.
-						character.Cleanup();
-					}
 				}
 			});
 
-			// --- NULLIFY CONNECTION REFERENCES ---
-			// This happens after the save task is kicked off, since the task needs the references.
-			// The references are passed by value to the task lambda, so it's safe.
+			this.NullifyConnectionReferences();
+		}
+
+		/// <summary>
+		/// Nullifies all connection-level references after disconnect.
+		/// </summary>
+		private void NullifyConnectionReferences()
+		{
 			this.Account = null;
 			this.SelectedCharacter = null;
 			this.ActiveDuel = null;
-			// this.ActiveHouse = null; // Removed: PersonalHouse type deleted
 			this.ActiveShop = null;
 			this.ActiveTrade = null;
 			this.CurrentDialog?.Cancel();
 			this.CurrentDialog = null;
-			// this.Guild = null; // Removed: Guild type deleted
 			this.Party = null;
 			this.ShopCreated = null;
 			this.GameReady = false;
 		}
 
-		public void SaveAccountAndCharacter()
-			=> this.SaveAccountAndCharacter(this.Account, this.SelectedCharacter);
-
 		/// <summary>
-		/// Saves the account and character synchronously. Used in background tasks.
+		/// Saves the account and character associated with this connection.
 		/// </summary>
-		private void SaveAccountAndCharacter(Account account, Character character)
+		public void SaveAccountAndCharacter()
 		{
-			var sessionKey = this.SessionKey;
+			this.SaveAccountAndCharacter(this.Account, this.SelectedCharacter, this.SessionKey);
+		}
 
+		private void SaveAccountAndCharacter(Account account, Character character, string sessionKey)
+		{
 			if (account == null)
-			{
 				return;
-			}
 
-			// If character was warping, data was already saved. Do nothing.
-			if (character != null && character.SavedForWarp)
-			{
-				Log.Debug($"SaveAccountAndCharacter: Skipping save for '{character.Name}', was saved for warp.");
-				character.ResetWarpSaveFlag();
-				return;
-			}
-
-			// Check session key against DB to prevent saving stale data after a quick reconnect.
 			if (!ZoneServer.Instance.Database.CheckSessionKey(account.Id, sessionKey))
 			{
-				Log.Warning($"SaveAccountAndCharacter: Session key mismatch for account '{account.Name}'. The player has likely reconnected. Skipping save of stale data.");
+				Log.Warning("ZoneConnection.Save: Skipping save for account '{0}' and character '{1}' because the connection's session key does not match.", account.Name, character?.Name ?? "NULL");
 				return;
 			}
 
-			try
+			// Save character FIRST — if this fails, we don't want
+			// the account already marked as logged out with stale
+			// character data in the DB.
+			if (character != null)
 			{
-				// Perform final save for character if they exist.
-				if (character != null)
-				{
-					Log.Debug($"SaveAccountAndCharacter: Performing final save for character '{character.Name}' (ID: {character.DbId}) on normal disconnect.");
-					character.Variables.Perm.Remove("Melia.WasRidingOnWarp");
-					character.Components.Get<BuffComponent>()?.StopTempBuffs(silently: true);
-					ZoneServer.Instance.Database.SaveCharacterData(character);
-				}
+				character.Variables.Perm.Remove("Melia.WasRidingOnWarp");
+				ZoneServer.Instance.Database.SaveCharacterData(character);
+			}
 
-				// Always save account data.
-				ZoneServer.Instance.Database.SaveAccountData(account);
+			ZoneServer.Instance.Database.SaveAccountData(account);
+			ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
 
-				// Update login state to LoggedOut.
-				ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
-			}
-			catch (Exception ex)
-			{
-				Log.Error($"SaveAccountAndCharacter: Failed during final save/logout for Account ID {account.Id}, Character ID {character?.DbId ?? 0}: {ex}");
-			}
-			finally
-			{
-				character?.ResetWarpSaveFlag();
-			}
+			character?.ResetWarpSaveFlag();
 		}
 	}
 }
