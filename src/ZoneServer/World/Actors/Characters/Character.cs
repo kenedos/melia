@@ -721,6 +721,7 @@ namespace Melia.Zone.World.Actors.Characters
 
 			dummyCharacter.Position = position;
 			dummyCharacter.Direction = this.Direction;
+			dummyCharacter.VisibleEquip = this.VisibleEquip;
 
 			foreach (var item in this.Inventory.GetEquip())
 			{
