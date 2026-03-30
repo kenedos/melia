@@ -513,13 +513,13 @@ namespace Melia.Zone.Network
 			{
 				var compressedData = packet.CompressData(p =>
 				{
-					var quickSlotsStr = serialized.Split(['#'], StringSplitOptions.RemoveEmptyEntries);
+					var quickSlotsStr = serialized.Split('#', StringSplitOptions.RemoveEmptyEntries);
 
 					p.PutByte(quickSlotRows);
 
 					for (var i = 0; i < 50; ++i)
 					{
-						var split = quickSlotsStr[i].Split([','], StringSplitOptions.RemoveEmptyEntries);
+						var split = quickSlotsStr[i].Split(',', StringSplitOptions.RemoveEmptyEntries);
 
 						var type = Enum.Parse<QuickSlotType>(split[0]);
 						var id = int.Parse(split[1]);
@@ -563,7 +563,7 @@ namespace Melia.Zone.Network
 
 					for (var i = 0; i < 4; ++i)
 					{
-						var split = quickSlotsStr[i].Split([','], StringSplitOptions.RemoveEmptyEntries);
+						var split = quickSlotsStr[i].Split(',', StringSplitOptions.RemoveEmptyEntries);
 
 						var type = Enum.Parse(typeof(QuickSlotType), split[0]);
 						var id = int.Parse(split[1]);
@@ -6374,7 +6374,7 @@ namespace Melia.Zone.Network
 
 			if (caster is Character character)
 				character.Connection.Send(packet);
-				Packet.Return(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -6397,7 +6397,7 @@ namespace Melia.Zone.Network
 
 			if (caster is Character character)
 				character.Connection.Send(packet);
-				Packet.Return(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -6432,7 +6432,7 @@ namespace Melia.Zone.Network
 
 			if (actor is Character character)
 				character.Connection.Send(packet);
-				Packet.Return(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -6452,7 +6452,7 @@ namespace Melia.Zone.Network
 
 			if (actor is Character character)
 				character.Connection.Send(packet);
-				Packet.Return(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
