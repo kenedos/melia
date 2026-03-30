@@ -71,21 +71,32 @@ namespace Melia.Zone.Services
 							CharacterLockManager.TryAcquire(capturedChar.DbId, TimeSpan.Zero, "AutoSave", ref lockTaken, out acquiredLock);
 							if (lockTaken)
 							{
-								var account = capturedChar.Connection?.Account;
+								var conn = capturedChar.Connection;
+								var account = conn?.Account;
+								var sessionKey = conn?.SessionKey;
 								var isAutoTrading = capturedChar.IsAutoTrading;
-								var sessionValid = isAutoTrading || _database.CheckSessionKey(account.Id, capturedChar.Connection.SessionKey);
 
-								if (account != null && (capturedChar.IsOnline || isAutoTrading) && sessionValid)
+								if (account == null)
 								{
-									_database.SaveCharacterData(capturedChar);
-									if (!isAutoTrading)
-										_database.SaveAccountData(account);
-									Interlocked.Increment(ref savedCount);
+									Log.Warning($"AutoSaveService: Skipping save for {capturedChar.Name} ({capturedChar.DbId}), account is null.");
+									Interlocked.Increment(ref failedCount);
 								}
 								else
 								{
-									Log.Warning($"AutoSaveService: Skipping save for {capturedChar.Name} (logged out, session mismatch, or lock issue during check).");
-									Interlocked.Increment(ref failedCount);
+									var sessionValid = isAutoTrading || _database.CheckSessionKey(account.Id, sessionKey);
+
+									if ((capturedChar.IsOnline || isAutoTrading) && sessionValid)
+									{
+										_database.SaveCharacterData(capturedChar);
+										if (!isAutoTrading)
+											_database.SaveAccountData(account);
+										Interlocked.Increment(ref savedCount);
+									}
+									else
+									{
+										Log.Warning($"AutoSaveService: Skipping save for {capturedChar.Name} (logged out or session mismatch).");
+										Interlocked.Increment(ref failedCount);
+									}
 								}
 							}
 							else
@@ -131,6 +142,9 @@ namespace Melia.Zone.Services
 		/// Stops the periodic timer, waits for any in-flight auto-save
 		/// tasks on the SaveQueue to finish, then saves every online
 		/// character synchronously on the calling thread.
+		/// WARNING: This permanently stops the SaveQueue via CompleteAdding.
+		/// Only call during server shutdown — the queue cannot accept new
+		/// items afterwards.
 		/// </summary>
 		/// <returns>Number of characters saved successfully.</returns>
 		public int SaveAllNow()

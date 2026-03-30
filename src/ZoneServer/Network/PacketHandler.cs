@@ -178,33 +178,21 @@ namespace Melia.Zone.Network
 					existingCharacter.Connection?.Close();
 					cleanupCloseMs = sw.ElapsedMilliseconds - closeStart;
 
-					// Enqueue the save on the SaveQueue so it serializes with
-					// the OnClosed save task for the same character, avoiding
-					// concurrent writes from two different thread pools.
+					// Save inline — ProcessConnect already runs on the
+					// SaveQueue worker, so enqueuing + waiting would deadlock.
 					var charToSave = existingCharacter;
 					var saveStart = sw.ElapsedMilliseconds;
-					var saveDone = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-					SaveQueue.Enqueue(() =>
+					try
 					{
-						try
-						{
-							ZoneServer.Instance.Database.SaveCharacterData(charToSave);
-						}
-						catch (Exception ex)
-						{
-							Log.Error($"CZ_CONNECT: Background save failed for '{charToSave.Name}' ({charToSave.DbId}): {ex}");
-						}
-						finally
-						{
-							CharacterLockManager.TryRemoveLock(charToSave.DbId);
-							saveDone.TrySetResult(true);
-						}
-					});
-
-					const int SaveTimeoutMs = 5000;
-					if (!saveDone.Task.Wait(SaveTimeoutMs))
+						ZoneServer.Instance.Database.SaveCharacterData(charToSave);
+					}
+					catch (Exception ex)
 					{
-						Log.Warning($"CZ_CONNECT: Save for '{charToSave.Name}' ({charToSave.DbId}) didn't finish within {SaveTimeoutMs}ms. Proceeding with reconnect; save continues in background.");
+						Log.Error($"CZ_CONNECT: Save failed for '{charToSave.Name}' ({charToSave.DbId}): {ex}");
+					}
+					finally
+					{
+						CharacterLockManager.TryRemoveLock(charToSave.DbId);
 					}
 					cleanupSaveMs = sw.ElapsedMilliseconds - saveStart;
 				}
@@ -212,7 +200,14 @@ namespace Melia.Zone.Network
 				if (existingCharacter != null && existingCharacter.IsAutoTrading)
 				{
 					var saveStart = sw.ElapsedMilliseconds;
-					ZoneServer.Instance.Database.SaveCharacterData(existingCharacter);
+					try
+					{
+						ZoneServer.Instance.Database.SaveCharacterData(existingCharacter);
+					}
+					catch (Exception ex)
+					{
+						Log.Error($"CZ_CONNECT: Auto-trade save failed for '{existingCharacter.Name}' ({existingCharacter.DbId}): {ex}");
+					}
 					cleanupSaveMs = sw.ElapsedMilliseconds - saveStart;
 				}
 
@@ -692,8 +687,8 @@ namespace Melia.Zone.Network
 			// new session key on login, which invalidates the old key and
 			// would cause the deferred save in CleanUpAndSave to skip
 			// saving entirely.
-			conn.SaveAccountAndCharacter();
 			character.SavedForWarp = true;
+			SaveQueue.SaveAccountAndCharacter(conn.Account, character, conn.SessionKey, skipSessionCheck: true);
 
 			Log.Info("User '{0}' is leaving for character selection.", conn.Account.Name);
 

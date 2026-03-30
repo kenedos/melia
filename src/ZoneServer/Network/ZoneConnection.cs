@@ -95,11 +95,6 @@ namespace Melia.Zone.Network
 		/// </summary>
 		/// <returns></returns>
 		string GenerateSessionKey();
-
-		/// <summary>
-		/// Saves the account and character associated with this connection.
-		/// </summary>
-		void SaveAccountAndCharacter();
 	}
 
 	public class DummyConnection : IZoneConnection
@@ -138,11 +133,6 @@ namespace Melia.Zone.Network
 		public string GenerateSessionKey()
 		{
 			return "";
-		}
-
-		public void SaveAccountAndCharacter()
-		{
-			// Method intentionally left empty.
 		}
 
 		public void Send(Packet packet)
@@ -337,33 +327,27 @@ namespace Melia.Zone.Network
 			ZoneServer.Instance.World.BattleManager.ForceEndBattle(character);
 			character.Properties.RemoveEvents();
 
-			// Capture everything the SaveQueue lambda needs by value
-			// so the task is self-contained and doesn't depend on
-			// connection state that gets nulled below.
-			var sessionKey = this.SessionKey;
 			var wasSavedForWarp = character.SavedForWarp;
 
-			SaveQueue.Enqueue(() =>
+			if (wasSavedForWarp)
 			{
-				try
+				// FinalizeWarp already enqueued a full SaveAccountAndCharacter
+				// that will set LoginState to LoggedOut. Only save character
+				// data here (in case OnClosed cleanup changed state) without
+				// touching login state — the destination zone will set it to
+				// Zone when the player reconnects. Using SaveAccountAndCharacter
+				// here would race with the destination zone's UpdateLoginState
+				// on cross-server warps.
+				SaveQueue.SaveCharacter(character);
+			}
+			else
+			{
+				SaveQueue.SaveAccountAndCharacter(account, character, this.SessionKey);
+				SaveQueue.Enqueue(() =>
 				{
-					// Double-check the warp flag — ProcessConnect may have
-					// set it between our capture and this task running.
-					if (character.SavedForWarp)
-						return;
-
-					this.SaveAccountAndCharacter(account, character, sessionKey);
-				}
-				catch (Exception ex)
-				{
-					Log.Error($"OnClosed save failed for account {account?.Id}: {ex}");
-				}
-				finally
-				{
-					if (!wasSavedForWarp)
-						CharacterLockManager.TryRemoveLock(character.DbId);
-				}
-			});
+					CharacterLockManager.TryRemoveLock(character.DbId);
+				});
+			}
 
 			this.NullifyConnectionReferences();
 		}
@@ -385,38 +369,5 @@ namespace Melia.Zone.Network
 			this.GameReady = false;
 		}
 
-		/// <summary>
-		/// Saves the account and character associated with this connection.
-		/// </summary>
-		public void SaveAccountAndCharacter()
-		{
-			this.SaveAccountAndCharacter(this.Account, this.SelectedCharacter, this.SessionKey);
-		}
-
-		private void SaveAccountAndCharacter(Account account, Character character, string sessionKey)
-		{
-			if (account == null)
-				return;
-
-			if (!ZoneServer.Instance.Database.CheckSessionKey(account.Id, sessionKey))
-			{
-				Log.Warning("ZoneConnection.Save: Skipping save for account '{0}' and character '{1}' because the connection's session key does not match.", account.Name, character?.Name ?? "NULL");
-				return;
-			}
-
-			// Save character FIRST — if this fails, we don't want
-			// the account already marked as logged out with stale
-			// character data in the DB.
-			if (character != null)
-			{
-				character.Variables.Perm.Remove("Melia.WasRidingOnWarp");
-				ZoneServer.Instance.Database.SaveCharacterData(character);
-			}
-
-			ZoneServer.Instance.Database.SaveAccountData(account);
-			ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
-
-			character?.ResetWarpSaveFlag();
-		}
 	}
 }

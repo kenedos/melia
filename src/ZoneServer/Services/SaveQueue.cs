@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
+using Melia.Shared.Database;
+using Melia.Zone.Database;
+using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Logging;
 
 namespace Melia.Zone.Services
@@ -25,7 +28,17 @@ namespace Melia.Zone.Services
 		/// dedicated worker threads.
 		/// </summary>
 		/// <param name="workerCount"></param>
-		public static void Start(int workerCount = 4)
+		/// <remarks>
+		/// Uses a single worker to guarantee save operations for the
+		/// same character/account are never processed concurrently.
+		/// Multiple workers would require per-entity partitioning to
+		/// avoid interleaved writes (e.g. DELETE-all + INSERT-all in
+		/// SaveRevealedMaps racing with itself). If throughput becomes
+		/// an issue, increase workerCount but add keyed partitioning
+		/// so that saves for the same character always land on the
+		/// same worker.
+		/// </remarks>
+		public static void Start(int workerCount = 1)
 		{
 			_workers = new Thread[workerCount];
 			for (var i = 0; i < workerCount; i++)
@@ -78,6 +91,69 @@ namespace Melia.Zone.Services
 					Log.Error($"SaveQueue inline fallback: {ex}");
 				}
 			}
+		}
+
+		/// <summary>
+		/// Enqueues a character save operation.
+		/// </summary>
+		public static void SaveCharacter(Character character)
+		{
+			Enqueue(() =>
+			{
+				try
+				{
+					ZoneServer.Instance.Database.SaveCharacterData(character);
+				}
+				catch (Exception ex)
+				{
+					Log.Error($"SaveQueue: Failed to save character '{character?.Name}' ({character?.DbId}): {ex}");
+				}
+			});
+		}
+
+		/// <summary>
+		/// Enqueues a character + account save operation.
+		/// </summary>
+		/// <param name="account"></param>
+		/// <param name="character"></param>
+		/// <param name="sessionKey"></param>
+		/// <param name="skipSessionCheck">Skip the DB session key check.
+		/// Use when the caller has already validated the session and the
+		/// key may be invalidated before the queue drains (e.g. moving
+		/// to barracks where the barracks server issues a new key).</param>
+		public static void SaveAccountAndCharacter(Account account, Character character, string sessionKey, bool skipSessionCheck = false)
+		{
+			Enqueue(() =>
+			{
+				try
+				{
+					if (account == null)
+						return;
+
+					if (!skipSessionCheck && !ZoneServer.Instance.Database.CheckSessionKey(account.Id, sessionKey))
+					{
+						Log.Warning("SaveQueue: Skipping save for account '{0}' and character '{1}' because session key does not match.", account.Name, character?.Name ?? "NULL");
+						return;
+					}
+
+					// Save character FIRST — if this fails, we don't want
+					// the account already marked as logged out with stale
+					// character data in the DB.
+					if (character != null)
+					{
+						ZoneServer.Instance.Database.SaveCharacterData(character);
+					}
+
+					ZoneServer.Instance.Database.SaveAccountData(account);
+					ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
+
+					character?.ResetWarpSaveFlag();
+				}
+				catch (Exception ex)
+				{
+					Log.Error($"SaveQueue: Failed to save account/character '{character?.Name}': {ex}");
+				}
+			});
 		}
 
 		/// <summary>

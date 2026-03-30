@@ -19,6 +19,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Scripting.Extensions.Keywords;
+using Melia.Zone.Services;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World;
@@ -4635,7 +4636,7 @@ namespace Melia.Zone.Commands
 			Log.Info($"Character '{sender.Name}' enabled autotrade mode at {sender.Position} on map '{sender.Map.ClassName}'.");
 
 			// Save character data to ensure database has correct MapId for reconnection
-			ZoneServer.Instance.Database.SaveCharacterData(sender);
+			SaveQueue.SaveCharacter(sender);
 
 			// Send player to barracks - OnClosed will keep character in world due to IsAutoTrading
 			sender.MsgBox(Localization.Get("Autotrade mode enabled. Your shop will remain open while you are offline."));
