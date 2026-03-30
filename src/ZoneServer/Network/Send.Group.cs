@@ -64,6 +64,7 @@ namespace Melia.Zone.Network
 			}
 
 			character.Connection.Send(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -83,6 +84,7 @@ namespace Melia.Zone.Network
 				packet.AddMember(member);
 
 			group.Broadcast(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -100,6 +102,7 @@ namespace Melia.Zone.Network
 			packet.PutShort(0);
 
 			group.Broadcast(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -116,6 +119,7 @@ namespace Melia.Zone.Network
 			packet.PutByte(0);
 
 			character.Connection.Send(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -133,6 +137,7 @@ namespace Melia.Zone.Network
 			packet.PutByte(0);
 
 			group.Broadcast(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -156,6 +161,7 @@ namespace Melia.Zone.Network
 			packet.PutByte(0);
 
 			group.Broadcast(packet);
+			Packet.Return(packet);
 		}
 	}
 }

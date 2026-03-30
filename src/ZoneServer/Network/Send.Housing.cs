@@ -23,6 +23,7 @@ namespace Melia.Zone.Network
 			packet.PutInt(0);
 
 			character.Connection.Send(packet);
+			Packet.Return(packet);
 		}
 
 
@@ -38,6 +39,7 @@ namespace Melia.Zone.Network
 			packet.PutInt(furnitureId);
 
 			character.Connection.Send(packet);
+			Packet.Return(packet);
 		}
 
 		// Removed: ZC_HOUSING_READY_ARRANGED_FURNITURE referenced PersonalHouse and Prop
@@ -87,6 +89,7 @@ namespace Melia.Zone.Network
 			}
 
 			character.Connection.Send(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -103,6 +106,7 @@ namespace Melia.Zone.Network
 			packet.PutInt(furnitureHandle);
 
 			character.Connection.Send(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -120,6 +124,7 @@ namespace Melia.Zone.Network
 			packet.PutByte((byte)furniture.Direction.ToCardinalDirection());
 
 			character.Connection.Send(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -183,6 +188,7 @@ namespace Melia.Zone.Network
 			packet.PutEmptyBin(128);
 
 			conn.Send(packet);
+			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -211,6 +217,7 @@ namespace Melia.Zone.Network
 			}
 
 			conn.Send(packet);
+			Packet.Return(packet);
 		}
 	}
 }

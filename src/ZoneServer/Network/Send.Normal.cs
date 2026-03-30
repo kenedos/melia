@@ -57,6 +57,7 @@ namespace Melia.Zone.Network
 					packet.PutLpString(timeAction.ButtonText);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -73,6 +74,7 @@ namespace Melia.Zone.Network
 				packet.PutByte((byte)result);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -98,6 +100,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat((float)duration.TotalSeconds);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -374,6 +377,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(endEffectScale);
 
 				caster.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -393,6 +397,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(enabled);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -422,6 +427,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(midOffset);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -460,6 +466,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(i1);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void UpdateCharacterLook(IActor actor, int itemId, EquipSlot slot, int pcInfoPartsNode2 = 0, int i1 = 0)
@@ -486,6 +493,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(i1);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -522,6 +530,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(i1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -542,6 +551,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(isVisible);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -565,6 +575,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(duration);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -590,6 +601,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(duration);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -630,6 +642,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(nodeName);
 
 				actorToAttach.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -661,6 +674,7 @@ namespace Melia.Zone.Network
 				packet.PutEmptyBin(12);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -691,6 +705,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b4);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -729,6 +744,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(4);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -757,6 +773,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(associatedHandle);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -962,6 +979,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(damage);
 
 				reflector.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1045,6 +1063,7 @@ namespace Melia.Zone.Network
 				packet.AddStringId(effectName);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1064,6 +1083,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(hitCountToFever);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1173,6 +1193,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b6);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1203,6 +1224,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b6);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1219,6 +1241,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(enabled ? 1 : 0);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1266,6 +1289,7 @@ namespace Melia.Zone.Network
 				packet.AddProperties(properties);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -1333,6 +1357,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1368,6 +1393,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b1);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1421,6 +1447,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(parameter);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1455,6 +1482,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(count);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1473,6 +1501,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(stanceName);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1517,6 +1546,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1531,6 +1561,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1564,6 +1595,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((int)skillId);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void MinimapMarker(IZoneConnection conn, IActor actor, byte b1, byte b2, byte b3)
@@ -1583,6 +1615,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b3);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void MinimapMarker(IMonster monster, byte b1, byte b2, byte b3)
@@ -1624,6 +1657,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1645,6 +1679,7 @@ namespace Melia.Zone.Network
 				packet.AddProperties(properties);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1698,6 +1733,7 @@ namespace Melia.Zone.Network
 					packet.PutFloat(f1);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1721,6 +1757,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(f1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1737,6 +1774,7 @@ namespace Melia.Zone.Network
 				packet.PutPosition(actor.Position);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1762,6 +1800,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(parameter);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1781,6 +1820,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b2);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1801,6 +1841,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(i2);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1820,6 +1861,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(trackOrCharacter);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <Summary>
@@ -1879,6 +1921,7 @@ namespace Melia.Zone.Network
 					}
 					pad.Observers.Clear();
 				}
+				Packet.Return(packet);
 			}
 
 			[Obsolete("Use PadUpdate(Pad, bool) instead.")]
@@ -1938,6 +1981,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(monsterId);
 
 				pad.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1960,6 +2004,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				pad.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -1982,6 +2027,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2000,6 +2046,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(sizeY);
 
 				pad.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2019,6 +2066,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(effectScale);
 
 				pad.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -2037,6 +2085,7 @@ namespace Melia.Zone.Network
 				packet.AddStringId(effectName);
 
 				pad.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2054,6 +2103,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(enable);
 
 				character.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2109,6 +2159,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(hideUi);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2125,6 +2176,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2141,6 +2193,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2165,6 +2218,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(character.Handle);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2188,6 +2242,7 @@ namespace Melia.Zone.Network
 					packet.PutInt(actors[i]);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2203,6 +2258,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(frame);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2227,6 +2283,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(f1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2259,6 +2316,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(value);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2276,6 +2334,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(value);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2292,6 +2351,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(value);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2364,6 +2424,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((int)skillId);
 
 				entity.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2380,6 +2441,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((int)skillId);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2406,6 +2468,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(sR);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2428,6 +2491,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(velocityChangeTerm);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2450,6 +2514,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(velocityChangeTerm);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void CollToGround(IActor actor, Position position, float speed, float easing, int skillKey, string anim, float animSec)
@@ -2463,6 +2528,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(easing);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2506,6 +2572,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(returnToOriginalPosition);
 
 				caster.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void PenetratePosition(IActor actor, Position position, float pentrateHeight, int syncKey, string animation, float goTime, float goEasing, float backTime, float backEasing, float collisionOffset)
@@ -2525,6 +2592,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(collisionOffset);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void ThrowAttachedMonster(IActor actor, ICombatEntity caster, string monName, Position throwPos, float throwSpd, float hideTime)
@@ -2539,6 +2607,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(hideTime);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2553,6 +2622,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2571,6 +2641,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void PlayConnectEffect(IActor actor, Position position, string effectName, float effectScale)
@@ -2585,6 +2656,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(1f);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2620,6 +2692,7 @@ namespace Melia.Zone.Network
 				}
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2649,6 +2722,7 @@ namespace Melia.Zone.Network
 				packet.AddStringId(nodeName);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -2673,6 +2747,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(text);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2688,6 +2763,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(text);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2707,6 +2783,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(jumpPower);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2726,6 +2803,7 @@ namespace Melia.Zone.Network
 					packet.AddCompanion(companion);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2742,6 +2820,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2758,6 +2837,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2773,6 +2853,7 @@ namespace Melia.Zone.Network
 				packet.PutLong(companion.TotalExp);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2807,6 +2888,7 @@ namespace Melia.Zone.Network
 				packet.AddStringId(linkSound);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2857,6 +2939,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(linkerId);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2893,6 +2976,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(0);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2950,6 +3034,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(isSkillUsable);
 
 				owner.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2969,6 +3054,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(companion.Data.ClassName);
 
 				character.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -2989,6 +3075,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(companion.Data.ClassName);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3005,6 +3092,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(companion.OwnerHandle);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3021,6 +3109,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(yOffset);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3040,6 +3129,7 @@ namespace Melia.Zone.Network
 				packet.AddStringId(detachAnimationId);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -3143,6 +3233,7 @@ namespace Melia.Zone.Network
 				});
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -3160,6 +3251,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(collectionId);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -3179,6 +3271,7 @@ namespace Melia.Zone.Network
 				packet.PutLong(itemId);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void Unknown_E0(Character entity)
@@ -3190,6 +3283,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(0);
 
 				entity.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3299,6 +3393,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(character.Handle);
 
 				character.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3316,6 +3411,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((int)skillId);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3336,6 +3432,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(0);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3367,6 +3464,7 @@ namespace Melia.Zone.Network
 					}
 					pad.Observers.Clear();
 				}
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3381,6 +3479,7 @@ namespace Melia.Zone.Network
 			{
 				var packet = CreatePadUpdatePacket(pad, isVisible);
 				receiver.Connection?.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3451,6 +3550,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(classId);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3468,6 +3568,7 @@ namespace Melia.Zone.Network
 				packet.PutLong(4);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3485,6 +3586,7 @@ namespace Melia.Zone.Network
 				});
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3499,6 +3601,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(0);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3517,6 +3620,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat((float)duration.TotalSeconds);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3534,6 +3638,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(duration);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3573,6 +3678,7 @@ namespace Melia.Zone.Network
 				}
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3592,6 +3698,7 @@ namespace Melia.Zone.Network
 				packet.AddMember(member);
 
 				group.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -3609,6 +3716,7 @@ namespace Melia.Zone.Network
 				packet.PutLong(leaderId);
 
 				group.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3628,6 +3736,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				group.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3645,6 +3754,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(sender.TeamName);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3662,6 +3772,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(propertyValue);
 
 				group.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3678,6 +3789,7 @@ namespace Melia.Zone.Network
 				packet.AddProperties(properties);
 
 				group.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3696,6 +3808,7 @@ namespace Melia.Zone.Network
 				packet.AddProperties(properties);
 
 				group.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3804,6 +3917,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(buffName);
 
 				entity.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3823,6 +3937,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(buffName);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3839,6 +3954,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((int)skillId);
 
 				entity.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3855,6 +3971,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((int)skillId);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3870,6 +3987,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3885,6 +4003,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(character.Handle);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3900,6 +4019,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3914,6 +4034,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(0); // ?
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -3933,6 +4054,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(i1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -3965,11 +4087,13 @@ namespace Melia.Zone.Network
 				{
 					// Send only to the specific player intended to see it
 					character.Connection.Send(packet);
+					Packet.Return(packet);
 				}
 				else
 				{
 					// Broadcast to all players who can see the target actor
 					targetActor.Map.Broadcast(packet);
+					Packet.Return(packet);
 				}
 			}
 
@@ -3986,6 +4110,7 @@ namespace Melia.Zone.Network
 					packet.PutByte(b1);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void Transmutation(IZoneConnection conn, IActor actor, int monsterId, byte b1 = 1)
@@ -4000,6 +4125,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void Skill_122(IActor actor, string effectId, bool isEnabled = true)
@@ -4011,6 +4137,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(isEnabled ? actor.Handle : 0);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void Skill_122(Character character, IActor actor, string effectId)
@@ -4022,6 +4149,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor?.Handle ?? 0);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void RunJumpRope(IActor actor, int effectHandle, string effect, float effectScale, Position position,
@@ -4046,6 +4174,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(height);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void RunJumpRope(IActor actor, int effectHandle)
@@ -4057,6 +4186,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(0);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4135,6 +4265,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(i4);
 
 				entity.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4151,6 +4282,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 
@@ -4176,6 +4308,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(position2.Z);
 
 				entity.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4199,6 +4332,7 @@ namespace Melia.Zone.Network
 				}
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4235,6 +4369,7 @@ namespace Melia.Zone.Network
 				});
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4280,6 +4415,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(label);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4300,6 +4436,7 @@ namespace Melia.Zone.Network
 				});
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4323,6 +4460,7 @@ namespace Melia.Zone.Network
 				}
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4346,6 +4484,7 @@ namespace Melia.Zone.Network
 				}
 
 				character.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4361,6 +4500,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(0);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4376,6 +4516,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(0);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4398,6 +4539,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b2);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4413,6 +4555,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void FlyWithObject(IActor actor, IActor? target, string nodeName = "", float addHeight = 0)
@@ -4428,6 +4571,7 @@ namespace Melia.Zone.Network
 					packet.PutFloat(addHeight);
 				}
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4448,6 +4592,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(effectType);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4465,6 +4610,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(0);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4519,6 +4665,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(isHostile);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4546,6 +4693,7 @@ namespace Melia.Zone.Network
 				});
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void MemberMapStatusUpdate(IGroup group, IMember member)
@@ -4559,6 +4707,7 @@ namespace Melia.Zone.Network
 				packet.PutShort(member.IsOnline ? member.Channel : 0);
 
 				group.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4597,6 +4746,7 @@ namespace Melia.Zone.Network
 				packet.PutByte((character.VisibleEquip & VisibleEquip.Wig) != 0);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4614,6 +4764,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(0);
 
 				ZoneServer.Instance.World.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			public static void WorldMessage(byte b1, string message, string parameter = "")
@@ -4626,6 +4777,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(parameter);
 
 				ZoneServer.Instance.World.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4650,6 +4802,7 @@ namespace Melia.Zone.Network
 				}
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4665,6 +4818,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(instanceType);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4705,6 +4859,7 @@ namespace Melia.Zone.Network
 				}
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4733,6 +4888,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b1);
 
 				entity.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4759,6 +4915,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(options.IsGrowthSupportGuildParty ? (byte)1 : (byte)0);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4785,6 +4942,7 @@ namespace Melia.Zone.Network
 				}
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4804,6 +4962,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(1);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4839,6 +4998,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(100000); // Current Points
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4854,6 +5014,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(0);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4868,6 +5029,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(0);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4888,6 +5050,7 @@ namespace Melia.Zone.Network
 				packet.PutDate(DateTime.Now.AddHours(2));
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4904,6 +5067,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(companion.IsActivated ? 0 : 1); // Inverse of active
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4919,6 +5083,7 @@ namespace Melia.Zone.Network
 				packet.PutInt((int)skillId);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4940,6 +5105,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(5000);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4961,6 +5127,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(itemId);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -4982,6 +5149,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(itemId);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5013,6 +5181,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(medals);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5030,6 +5199,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(0);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5044,6 +5214,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(achievement);
 
 				entity.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5068,6 +5239,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(angleZ);
 
 				actor.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5092,6 +5264,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(angleZ);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5121,6 +5294,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(b1);
 
 				character.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5151,6 +5325,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(caster.Handle);
 
 				caster.Map.Broadcast(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5285,6 +5460,7 @@ namespace Melia.Zone.Network
 				}
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5304,6 +5480,7 @@ namespace Melia.Zone.Network
 				packet.PutByte(isEnabled);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5320,6 +5497,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(sender.TeamName);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5340,6 +5518,7 @@ namespace Melia.Zone.Network
 				}
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5363,6 +5542,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(dungeonName);
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void DungeonAutoMatchPartyCount(IZoneConnection conn, int partyQueueMemberCount, string memberStr, int i1 = 0)
@@ -5379,6 +5559,7 @@ namespace Melia.Zone.Network
 				}
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 
 			public static void DungeonAutoMatchPartyCount(IZoneConnection conn, IList<string> memberStrings)
@@ -5395,6 +5576,7 @@ namespace Melia.Zone.Network
 				}
 
 				conn.Send(packet);
+				Packet.Return(packet);
 			}
 		}
 
@@ -5419,6 +5601,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(duration);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -5440,6 +5623,7 @@ namespace Melia.Zone.Network
 				packet.PutLpString(message);
 
 				party.Broadcast(packet);
+				Packet.Return(packet);
 				packet.PutLong(character.ObjectId);
 			}
 		}

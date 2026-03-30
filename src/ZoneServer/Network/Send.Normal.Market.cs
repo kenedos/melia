@@ -47,6 +47,7 @@ namespace Melia.Zone.Network
 				});
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -62,6 +63,7 @@ namespace Melia.Zone.Network
 				packet.PutLong(itemWorldId);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -79,6 +81,7 @@ namespace Melia.Zone.Network
 				packet.PutShort(s1);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -95,6 +98,7 @@ namespace Melia.Zone.Network
 				packet.PutInt(0);
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -120,6 +124,7 @@ namespace Melia.Zone.Network
 				packet.PutLong(unitPrice);          // unitPrice / totalPrice
 
 				character.Connection.Send(packet);
+				Packet.Return(packet);
 			}
 		}
 	}

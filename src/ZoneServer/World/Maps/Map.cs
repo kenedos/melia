@@ -1710,8 +1710,6 @@ namespace Melia.Zone.World.Maps
 		{
 			foreach (var character in _characters.Values)
 				character.Connection.Send(packet);
-
-			Packet.Return(packet);
 		}
 
 		[ThreadStatic]
@@ -1778,8 +1776,6 @@ namespace Melia.Zone.World.Maps
 
 				conn.Send(packet);
 			}
-
-			Packet.Return(packet);
 		}
 		#endregion
 
