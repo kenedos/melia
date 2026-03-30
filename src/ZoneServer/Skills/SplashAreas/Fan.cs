@@ -73,6 +73,13 @@ namespace Melia.Zone.Skills.SplashAreas
 		}
 
 		/// <summary>
+		/// Returns the axis-aligned bounding box that contains the shape.
+		/// </summary>
+		/// <returns></returns>
+		public BoundingBoxF GetBounds()
+			=> BoundingBoxF.FromPoints(this.GetEdgePoints());
+
+		/// <summary>
 		/// Returns edge points that approximate the fan's shape.
 		/// </summary>
 		/// <returns></returns>

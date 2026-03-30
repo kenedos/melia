@@ -75,6 +75,13 @@ namespace Melia.Zone.Skills.SplashAreas
 		}
 
 		/// <summary>
+		/// Returns the axis-aligned bounding box that contains the shape.
+		/// </summary>
+		/// <returns></returns>
+		public BoundingBoxF GetBounds()
+			=> _baseOuter.GetBounds();
+
+		/// <summary>
 		/// Returns edge points that approximate the donut's outer shape.
 		/// </summary>
 		/// <returns></returns>

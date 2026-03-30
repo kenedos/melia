@@ -123,6 +123,13 @@ namespace Melia.Zone.Skills.SplashAreas
 		}
 
 		/// <summary>
+		/// Returns the axis-aligned bounding box that contains the shape.
+		/// </summary>
+		/// <returns></returns>
+		public BoundingBoxF GetBounds()
+			=> BoundingBoxF.FromPoints(this.GetEdgePoints());
+
+		/// <summary>
 		/// Returns the square's four corner points.
 		/// </summary>
 		/// <returns></returns>
