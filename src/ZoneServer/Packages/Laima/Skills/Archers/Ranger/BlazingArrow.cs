@@ -105,15 +105,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
-			//Send.ZC_HIT_INFO(caster, target, hit);
-
-			// If the target has Scan, it is removed, but the cooldown is cut
-			// by 15 seconds
-			if (target.IsBuffActive(BuffId.Ranger_Scan_Debuff))
-			{
-				target.StopBuff(BuffId.Ranger_Scan_Debuff);
-				skill.ReduceCooldown(TimeSpan.FromSeconds(15));
-			}
 
 			if (isIceVariant)
 			{
