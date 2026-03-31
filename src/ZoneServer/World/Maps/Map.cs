@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -37,25 +38,22 @@ namespace Melia.Zone.World.Maps
 		private static readonly TimeSpan EntityUpdateGracePeriod = TimeSpan.FromMinutes(5);
 		#endregion
 
-		#region Collections - Thread-safe collections for better performance
-		protected readonly ConcurrentDictionary<int, ICombatEntity> _combatEntities = new();
-		protected readonly ConcurrentDictionary<int, Character> _characters = new();
-		protected readonly ConcurrentDictionary<int, IMonster> _monsters = new();
-		protected readonly ConcurrentDictionary<int, ITriggerableArea> _triggerableAreas = new();
-		protected readonly ConcurrentDictionary<int, Pad> _pads = new();
+		#region Collections
+		protected readonly Dictionary<int, ICombatEntity> _combatEntities = new();
+		protected readonly Dictionary<int, Character> _characters = new();
+		protected readonly Dictionary<int, IMonster> _monsters = new();
+		protected readonly Dictionary<int, ITriggerableArea> _triggerableAreas = new();
+		protected readonly Dictionary<int, Pad> _pads = new();
 
-		// Keep these as regular collections with locks for specific operations
 		protected readonly List<DynamicObstacle> _obstacles = new();
-		private readonly object _obstaclesLock = new();
+		protected readonly object _obstaclesLock = new();
 
 		private readonly ConcurrentQueue<IMonster> _addMonsters = new();
 		private DateTime _lastPlayerLeftTime = DateTime.MinValue;
-		protected readonly ConcurrentDictionary<int, PropertyOverrides> _monsterPropertyOverrides = new();
+		protected readonly Dictionary<int, PropertyOverrides> _monsterPropertyOverrides = new();
 
-		// Pooled lists for temporary operations
-		protected readonly ThreadLocal<List<IUpdateable>> _updateEntitiesPool = new(() => new List<IUpdateable>());
-		protected readonly ThreadLocal<List<Character>> _updateVisibleCharactersPool = new(() => new List<Character>());
-		private readonly List<int> _expiredHandles = new();
+		private readonly List<IUpdateable> _updateEntities = new();
+		private readonly List<Character> _updateVisibleCharacters = new();
 
 		// Spatial index for efficient range queries
 		private EntitySpatialIndex _spatialIndex;
@@ -74,17 +72,9 @@ namespace Melia.Zone.World.Maps
 		public Ground Ground { get; } = new Ground();
 		public IPathfinder Pathfinder { get; private set; }
 
-		// Thread-safe property accessors
-		public int CharacterCount => _characters.Count;
-		public int MonsterCount => _monsters.Count;
-		public bool HasCharacters => this.CharacterCount > 0;
-
-		// Direct collection access for zero-alloc iteration in hot paths
-		internal ICollection<Character> Characters => _characters.Values;
-		internal ICollection<IMonster> Monsters => _monsters.Values;
-		internal ICollection<Pad> Pads => _pads.Values;
-		internal ICollection<ITriggerableArea> TriggerableAreas => _triggerableAreas.Values;
-		internal ICollection<ICombatEntity> CombatEntities => _combatEntities.Values;
+		public int CharacterCount { get { lock (_characters) return _characters.Count; } }
+		public int MonsterCount { get { lock (_monsters) return _monsters.Count; } }
+		public bool HasCharacters { get { lock (_characters) return _characters.Count > 0; } }
 
 		// Collision
 		private const int CollisionCheckPointCount = 9;
@@ -158,7 +148,7 @@ namespace Melia.Zone.World.Maps
 		#region Update Methods
 		public virtual void Update(TimeSpan elapsed)
 		{
-			this.ProcessDisappearances();
+			this.Disappearances();
 			this.UpdateVisibility();
 			this.UpdateEntities(elapsed);
 		}
@@ -198,15 +188,15 @@ namespace Melia.Zone.World.Maps
 			{
 				foreach (var itemMonster in newItemMonsters)
 				{
-					if (_monsters.ContainsKey(itemMonster.Handle))
+					bool exists;
+					lock (_monsters)
+						exists = _monsters.ContainsKey(itemMonster.Handle);
+					if (exists)
 						this.TryMergeNearbyItems(itemMonster);
 				}
 			}
 
-			var updateList = _updateEntitiesPool.Value;
-			updateList.Clear();
-
-			try
+			lock (_updateEntities)
 			{
 				// Collect updateables - update monsters if players are on
 				// the map or if players left recently (grace period for
@@ -214,98 +204,108 @@ namespace Melia.Zone.World.Maps
 				var withinGracePeriod = _lastPlayerLeftTime != DateTime.MinValue && (DateTime.Now - _lastPlayerLeftTime) < EntityUpdateGracePeriod;
 				if (this.HasCharacters || withinGracePeriod)
 				{
-					foreach (var kvp in _monsters)
-						if (kvp.Value is IUpdateable updateable)
-							updateList.Add(updateable);
+					lock (_monsters)
+					{
+						foreach (var monster in _monsters.Values)
+						{
+							if (monster is IUpdateable updatable)
+								_updateEntities.Add(updatable);
+						}
+					}
 				}
 
 				// Update pads before characters so enter/leave detection
 				// happens first
-				foreach (var kvp in _pads)
-					updateList.Add(kvp.Value);
-				foreach (var kvp in _characters)
-					updateList.Add(kvp.Value);
+				lock (_pads)
+				{
+					foreach (var updatable in _pads.Values)
+						_updateEntities.Add(updatable);
+				}
 
-				// Update all entities
-				foreach (var entity in updateList)
+				lock (_characters)
+				{
+					foreach (var updatable in _characters.Values)
+						_updateEntities.Add(updatable);
+				}
+
+				foreach (var entity in _updateEntities)
 					entity.Update(elapsed);
-			}
-			finally
-			{
-				updateList.Clear();
+
+				_updateEntities.Clear();
 			}
 		}
 
-		private void ProcessDisappearances()
+		private void Disappearances()
 		{
 			var now = DateTime.Now;
 
-			// Process character disappearances
-			foreach (var kvp in _characters)
+			// Process monster disappearances (like base Melia)
+			var toDisappear = new List<IMonster>();
+			lock (_monsters)
 			{
-				if (kvp.Value.DisappearTime < now)
-					_expiredHandles.Add(kvp.Key);
-			}
-			foreach (var handle in _expiredHandles)
-			{
-				if (_characters.TryGetValue(handle, out var character))
+				foreach (var monster in _monsters.Values)
 				{
-					character.OnDisappear?.Invoke();
-					this.RemoveCharacter(character);
+					if (monster.DisappearTime < now)
+						toDisappear.Add(monster);
 				}
 			}
-			_expiredHandles.Clear();
 
-			// Process monster disappearances
-			foreach (var kvp in _monsters)
+			foreach (var monster in toDisappear)
 			{
-				if (kvp.Value.DisappearTime < now)
-					_expiredHandles.Add(kvp.Key);
+				monster.OnDisappear?.Invoke();
+				ZoneServer.Instance.ServerEvents.MonsterDisappears.Raise(new MonsterEventArgs(monster));
+				this.RemoveMonster(monster);
 			}
-			foreach (var handle in _expiredHandles)
+
+			// Process character disappearances
+			var toDisappearChars = new List<Character>();
+			lock (_characters)
 			{
-				if (_monsters.TryGetValue(handle, out var monster))
+				foreach (var character in _characters.Values)
 				{
-					monster.OnDisappear?.Invoke();
-					ZoneServer.Instance.ServerEvents.MonsterDisappears.Raise(new MonsterEventArgs(monster));
-					this.RemoveMonster(monster);
+					if (character.DisappearTime < now)
+						toDisappearChars.Add(character);
 				}
 			}
-			_expiredHandles.Clear();
+
+			foreach (var character in toDisappearChars)
+			{
+				character.OnDisappear?.Invoke();
+				this.RemoveCharacter(character);
+			}
 
 			// Process pad disappearances
-			foreach (var kvp in _pads)
+			var toDisappearPads = new List<Pad>();
+			lock (_pads)
 			{
-				if (kvp.Value.DisappearTime < now)
-					_expiredHandles.Add(kvp.Key);
-			}
-			foreach (var handle in _expiredHandles)
-			{
-				if (_pads.TryGetValue(handle, out var pad))
+				foreach (var pad in _pads.Values)
 				{
-					pad.OnDisappear?.Invoke();
-					this.RemovePad(pad);
+					if (pad.DisappearTime < now)
+						toDisappearPads.Add(pad);
 				}
 			}
-			_expiredHandles.Clear();
+
+			foreach (var pad in toDisappearPads)
+			{
+				pad.OnDisappear?.Invoke();
+				this.RemovePad(pad);
+			}
 		}
 
 		private void UpdateVisibility()
 		{
-			var visibilityList = _updateVisibleCharactersPool.Value;
-			visibilityList.Clear();
-
-			try
+			lock (_updateVisibleCharacters)
 			{
-				foreach (var kvp in _characters)
-					visibilityList.Add(kvp.Value);
+				lock (_characters)
+				{
+					foreach (var character in _characters.Values)
+						_updateVisibleCharacters.Add(character);
+				}
 
-				foreach (var character in visibilityList)
+				foreach (var character in _updateVisibleCharacters)
 					character.LookAround();
-			}
-			finally
-			{
-				visibilityList.Clear();
+
+				_updateVisibleCharacters.Clear();
 			}
 		}
 
@@ -318,11 +318,15 @@ namespace Melia.Zone.World.Maps
 		public void AddCharacter(Character character)
 		{
 			character.Map = this;
-			_characters[character.Handle] = character;
+
+			lock (_characters)
+				_characters[character.Handle] = character;
 
 			if (character is ICombatEntity combatEntity)
 			{
-				_combatEntities[character.Handle] = combatEntity;
+				lock (_combatEntities)
+					_combatEntities[character.Handle] = combatEntity;
+
 				_spatialIndex?.Insert(combatEntity);
 			}
 
@@ -338,8 +342,12 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void RemoveCharacter(Character character)
 		{
-			_characters.TryRemove(character.Handle, out _);
-			_combatEntities.TryRemove(character.Handle, out _);
+			lock (_characters)
+				_characters.Remove(character.Handle);
+
+			lock (_combatEntities)
+				_combatEntities.Remove(character.Handle);
+
 			_spatialIndex?.Remove(character);
 
 			ZoneServer.Instance.ServerEvents.PlayerLeftMap.Raise(new PlayerEventArgs(character));
@@ -378,7 +386,11 @@ namespace Melia.Zone.World.Maps
 		/// Returns the character with the given handle via out.
 		/// Returns false if not found.
 		/// </summary>
-		public bool TryGetCharacter(int handle, out Character character) => _characters.TryGetValue(handle, out character);
+		public bool TryGetCharacter(int handle, out Character character)
+		{
+			lock (_characters)
+				return _characters.TryGetValue(handle, out character);
+		}
 
 		/// <summary>
 		/// Returns all non-dummy characters on the map.
@@ -390,13 +402,8 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public Character[] GetCharacters(Func<Character, bool> predicate)
 		{
-			var result = new List<Character>();
-			foreach (var character in _characters.Values)
-			{
-				if (predicate(character))
-					result.Add(character);
-			}
-			return result.ToArray();
+			lock (_characters)
+				return _characters.Values.Where(predicate).ToArray();
 		}
 
 		/// <summary>
@@ -451,16 +458,23 @@ namespace Melia.Zone.World.Maps
 		private void AddMonsterInternal(IMonster monster)
 		{
 			monster.Map = this;
-			_monsters[monster.Handle] = monster;
+
+			lock (_monsters)
+				_monsters[monster.Handle] = monster;
 
 			if (monster is ICombatEntity entity)
 			{
-				_combatEntities[monster.Handle] = entity;
+				lock (_combatEntities)
+					_combatEntities[monster.Handle] = entity;
+
 				_spatialIndex?.Insert(entity);
 			}
 
 			if (monster is ITriggerableArea trigger)
-				_triggerableAreas[monster.Handle] = trigger;
+			{
+				lock (_triggerableAreas)
+					_triggerableAreas[monster.Handle] = trigger;
+			}
 
 			monster.Components.Get<TriggerComponent>()?.OnAddedToMap();
 			monster.FromGround = false;
@@ -487,15 +501,18 @@ namespace Melia.Zone.World.Maps
 
 			var nearbyItems = new List<ItemMonster>();
 
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (monster == newItem || monster is not ItemMonster im)
-					continue;
-				if (im.PickedUp || im.Item.Id != itemId || im.Layer != layer || im.Item.OwnerCharacterId != ownerId)
-					continue;
-				if (!im.Position.InRange2D(pos, itemMergeRange))
-					continue;
-				nearbyItems.Add(im);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster == newItem || monster is not ItemMonster im)
+						continue;
+					if (im.PickedUp || im.Item.Id != itemId || im.Layer != layer || im.Item.OwnerCharacterId != ownerId)
+						continue;
+					if (!im.Position.InRange2D(pos, itemMergeRange))
+						continue;
+					nearbyItems.Add(im);
+				}
 			}
 
 			if (nearbyItems.Count + 1 < itemMergeThreshold)
@@ -533,9 +550,14 @@ namespace Melia.Zone.World.Maps
 			monster.Components.Get<TriggerComponent>()?.OnRemovingFromMap();
 			monster.Components.Get<MovementComponent>()?.RemoveMarker();
 
-			_monsters.TryRemove(monster.Handle, out _);
-			_combatEntities.TryRemove(monster.Handle, out _);
-			_triggerableAreas.TryRemove(monster.Handle, out _);
+			lock (_monsters)
+				_monsters.Remove(monster.Handle);
+
+			lock (_combatEntities)
+				_combatEntities.Remove(monster.Handle);
+
+			lock (_triggerableAreas)
+				_triggerableAreas.Remove(monster.Handle);
 
 			if (monster is ICombatEntity entity)
 				_spatialIndex?.Remove(entity);
@@ -547,6 +569,7 @@ namespace Melia.Zone.World.Maps
 			}
 
 			monster.Map = null;
+			this.UpdateVisibility();
 
 			if (monster is Mob mob)
 				mob.Cleanup();
@@ -558,19 +581,25 @@ namespace Melia.Zone.World.Maps
 		public void RemoveEntitiesOnLayer(int layer)
 		{
 			var toRemove = new List<IMonster>();
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (monster.Layer == layer)
-					toRemove.Add(monster);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster.Layer == layer)
+						toRemove.Add(monster);
+				}
 			}
 			foreach (var monster in toRemove)
 				this.RemoveMonster(monster);
 
 			var toRemovePads = new List<Pad>();
-			foreach (var pad in _pads.Values)
+			lock (_pads)
 			{
-				if (pad.Layer == layer)
-					toRemovePads.Add(pad);
+				foreach (var pad in _pads.Values)
+				{
+					if (pad.Layer == layer)
+						toRemovePads.Add(pad);
+				}
 			}
 			foreach (var pad in toRemovePads)
 				this.RemovePad(pad);
@@ -595,9 +624,29 @@ namespace Melia.Zone.World.Maps
 		}
 
 		/// <summary>
+		/// Adds all triggerable areas that overlap with the given
+		/// position to the result set.
+		/// </summary>
+		public void GetTriggerableAreasAt(Position pos, HashSet<ITriggerableArea> result)
+		{
+			lock (_triggerableAreas)
+			{
+				foreach (var area in _triggerableAreas.Values)
+				{
+					if (area.Area?.IsInside(pos) ?? false)
+						result.Add(area);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Returns the monster with the given handle, or null if not found.
 		/// </summary>
-		public IMonster GetMonster(int handle) => _monsters.TryGetValue(handle, out var monster) ? monster : null;
+		public IMonster GetMonster(int handle)
+		{
+			lock (_monsters)
+				return _monsters.TryGetValue(handle, out var monster) ? monster : null;
+		}
 
 		/// <summary>
 		/// Returns all attackable combat entities within the given range.
@@ -610,10 +659,18 @@ namespace Melia.Zone.World.Maps
 		{
 			var result = new List<ICombatEntity>();
 
-			foreach (var a in _combatEntities.Values)
+			lock (_combatEntities)
 			{
-				if (a.Position.InRange2D(position, radius) && attacker.CanDamage(a))
-					result.Add(a);
+				foreach (var entity in _combatEntities.Values)
+				{
+					if (!entity.Position.InRange2D(position, radius))
+						continue;
+
+					if (!attacker.CanDamage(entity))
+						continue;
+
+					result.Add(entity);
+				}
 			}
 
 			return result;
@@ -624,11 +681,15 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public IMonster GetMonster(Func<IMonster, bool> predicate)
 		{
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (predicate(monster))
-					return monster;
+				foreach (var monster in _monsters.Values)
+				{
+					if (predicate(monster))
+						return monster;
+				}
 			}
+
 			return null;
 		}
 
@@ -663,7 +724,11 @@ namespace Melia.Zone.World.Maps
 		/// Returns the monster with the given handle via out.
 		/// Returns false if not found.
 		/// </summary>
-		public bool TryGetMonster(int handle, out IMonster monster) => _monsters.TryGetValue(handle, out monster);
+		public bool TryGetMonster(int handle, out IMonster monster)
+		{
+			lock (_monsters)
+				return _monsters.TryGetValue(handle, out monster);
+		}
 
 		/// <summary>
 		/// Returns the first monster matching the predicate via out.
@@ -671,14 +736,18 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public bool TryGetMonster(Func<IMonster, bool> predicate, out IMonster monster)
 		{
-			foreach (var m in _monsters.Values)
+			lock (_monsters)
 			{
-				if (predicate(m))
+				foreach (var m in _monsters.Values)
 				{
-					monster = m;
-					return true;
+					if (predicate(m))
+					{
+						monster = m;
+						return true;
+					}
 				}
 			}
+
 			monster = null;
 			return false;
 		}
@@ -688,11 +757,8 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public IMonster[] GetMonsters()
 		{
-			var result = new IMonster[_monsters.Count];
-			var i = 0;
-			foreach (var monster in _monsters.Values)
-				result[i++] = monster;
-			return result;
+			lock (_monsters)
+				return _monsters.Values.ToArray();
 		}
 
 		/// <summary>
@@ -732,21 +798,26 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns all monsters matching the predicate.
 		/// </summary>
-		public IMonster[] GetMonsters(Func<IMonster, bool> predicate)
+		public List<IMonster> GetMonsters(Func<IMonster, bool> predicate)
 		{
 			var result = new List<IMonster>();
-			foreach (var monster in _monsters.Values)
+
+			lock (_monsters)
 			{
-				if (predicate(monster))
-					result.Add(monster);
+				foreach (var monster in _monsters.Values)
+				{
+					if (predicate(monster))
+						result.Add(monster);
+				}
 			}
-			return result.ToArray();
+
+			return result;
 		}
 
 		/// <summary>
 		/// Returns all monsters visible to the given character.
 		/// </summary>
-		public IMonster[] GetVisibleMonsters(Character character) => this.GetMonsters(character.CanSee);
+		public List<IMonster> GetVisibleMonsters(Character character) => this.GetMonsters(character.CanSee);
 
 		/// <summary>
 		/// Adds all monsters visible to the given character to the result list.
@@ -827,8 +898,9 @@ namespace Melia.Zone.World.Maps
 		public void RemoveScriptedEntities()
 		{
 			var toRemove = new List<IMonster>();
-			foreach (var monster in _monsters.Values)
-				toRemove.Add(monster);
+			lock (_monsters)
+				toRemove.AddRange(_monsters.Values);
+
 			foreach (var monster in toRemove)
 				this.RemoveMonster(monster);
 		}
@@ -893,7 +965,10 @@ namespace Melia.Zone.World.Maps
 		public void AddPad(Pad pad)
 		{
 			pad.Map = this;
-			_pads[pad.Handle] = pad;
+
+			lock (_pads)
+				_pads[pad.Handle] = pad;
+
 			this.UpdateVisibility();
 			pad.Components.Get<TriggerComponent>()?.OnAddedToMap();
 		}
@@ -904,7 +979,10 @@ namespace Melia.Zone.World.Maps
 		public void RemovePad(Pad pad)
 		{
 			pad.Components.Get<TriggerComponent>()?.OnRemovingFromMap();
-			_pads.TryRemove(pad.Handle, out _);
+
+			lock (_pads)
+				_pads.Remove(pad.Handle);
+
 			pad.Map = null;
 			this.UpdateVisibility();
 		}
@@ -913,7 +991,11 @@ namespace Melia.Zone.World.Maps
 		/// Returns the pad with the given handle via out.
 		/// Returns false if not found.
 		/// </summary>
-		public bool TryGetPad(int handle, out Pad pad) => _pads.TryGetValue(handle, out pad);
+		public bool TryGetPad(int handle, out Pad pad)
+		{
+			lock (_pads)
+				return _pads.TryGetValue(handle, out pad);
+		}
 
 		/// <summary>
 		/// Returns all pads within range of or overlapping the given position.
@@ -921,10 +1003,13 @@ namespace Melia.Zone.World.Maps
 		public Pad[] GetPadsAt(Position pos, float range)
 		{
 			var result = new List<Pad>();
-			foreach (var pad in _pads.Values)
+			lock (_pads)
 			{
-				if (pad.Position.InRange2D(pos, range) || (pad.Area?.IsInside(pos) ?? false))
-					result.Add(pad);
+				foreach (var pad in _pads.Values)
+				{
+					if (pad.Position.InRange2D(pos, range) || (pad.Area?.IsInside(pos) ?? false))
+						result.Add(pad);
+				}
 			}
 			return result.ToArray();
 		}
@@ -935,10 +1020,13 @@ namespace Melia.Zone.World.Maps
 		public Pad[] GetPads(Func<Pad, bool> func)
 		{
 			var result = new List<Pad>();
-			foreach (var pad in _pads.Values)
+			lock (_pads)
 			{
-				if (func(pad))
-					result.Add(pad);
+				foreach (var pad in _pads.Values)
+				{
+					if (func(pad))
+						result.Add(pad);
+				}
 			}
 			return result.ToArray();
 		}
@@ -953,10 +1041,13 @@ namespace Melia.Zone.World.Maps
 				return Array.Empty<Pad>();
 
 			var result = new List<Pad>();
-			foreach (var pad in _pads.Values)
+			lock (_pads)
 			{
-				if (pad.Area?.IsInside(entity.Position) ?? false)
-					result.Add(pad);
+				foreach (var pad in _pads.Values)
+				{
+					if (pad.Area?.IsInside(entity.Position) ?? false)
+						result.Add(pad);
+				}
 			}
 			return result.ToArray();
 		}
@@ -969,15 +1060,30 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public ICombatEntity GetCombatEntity(int handle)
 		{
-			return _combatEntities.TryGetValue(handle, out var entity) ? entity : null;
+			lock (_monsters)
+			{
+				if (_monsters.TryGetValue(handle, out var monster) && monster is ICombatEntity entity)
+					return entity;
+			}
+
+			lock (_characters)
+			{
+				if (_characters.TryGetValue(handle, out var entity))
+					return entity;
+			}
+
+			return null;
 		}
 
 		/// <summary>
 		/// Returns the combat entity with the given handle via out.
 		/// Returns false if not found.
 		/// </summary>
-		public bool TryGetCombatEntity(int handle, out ICombatEntity entity) =>
-			_combatEntities.TryGetValue(handle, out entity);
+		public bool TryGetCombatEntity(int handle, out ICombatEntity entity)
+		{
+			entity = this.GetCombatEntity(handle);
+			return entity != null;
+		}
 
 		/// <summary>
 		/// Returns any actor (monster or character) with the given handle
@@ -985,16 +1091,22 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public bool TryGetActor(int handle, out IActor actor)
 		{
-			if (_monsters.TryGetValue(handle, out var monster))
+			lock (_monsters)
 			{
-				actor = monster;
-				return true;
+				if (_monsters.TryGetValue(handle, out var monster))
+				{
+					actor = monster;
+					return true;
+				}
 			}
 
-			if (_characters.TryGetValue(handle, out var character))
+			lock (_characters)
 			{
-				actor = character;
-				return true;
+				if (_characters.TryGetValue(handle, out var character))
+				{
+					actor = character;
+					return true;
+				}
 			}
 
 			actor = null;
@@ -1010,10 +1122,13 @@ namespace Melia.Zone.World.Maps
 		public ITriggerableArea[] GetTriggerableAreasAt(Position pos)
 		{
 			var result = new List<ITriggerableArea>();
-			foreach (var area in _triggerableAreas.Values)
+			lock (_triggerableAreas)
 			{
-				if (area.Area?.IsInside(pos) ?? false)
-					result.Add(area);
+				foreach (var area in _triggerableAreas.Values)
+				{
+					if (area.Area?.IsInside(pos) ?? false)
+						result.Add(area);
+				}
 			}
 			return result.ToArray();
 		}
@@ -1058,7 +1173,8 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				lock (_combatEntities)
+					candidates = _combatEntities.Values.ToList();
 			}
 
 			var result = new List<ICombatEntity>();
@@ -1101,7 +1217,8 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				lock (_combatEntities)
+					candidates = _combatEntities.Values.ToList();
 			}
 
 			foreach (var e in candidates)
@@ -1146,8 +1263,11 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				foreach (var e in _combatEntities.Values)
-					queryBuffer.Add(e);
+				lock (_combatEntities)
+				{
+					foreach (var e in _combatEntities.Values)
+						queryBuffer.Add(e);
+				}
 			}
 
 			var result = new List<ICombatEntity>();
@@ -1184,8 +1304,11 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				foreach (var e in _combatEntities.Values)
-					queryBuffer.Add(e);
+				lock (_combatEntities)
+				{
+					foreach (var e in _combatEntities.Values)
+						queryBuffer.Add(e);
+				}
 			}
 
 			var result = new List<ICombatEntity>();
@@ -1227,8 +1350,11 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				foreach (var e in _combatEntities.Values)
-					queryBuffer.Add(e);
+				lock (_combatEntities)
+				{
+					foreach (var e in _combatEntities.Values)
+						queryBuffer.Add(e);
+				}
 			}
 
 			var result = new List<ICombatEntity>();
@@ -1268,8 +1394,11 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				foreach (var e in _combatEntities.Values)
-					queryBuffer.Add(e);
+				lock (_combatEntities)
+				{
+					foreach (var e in _combatEntities.Values)
+						queryBuffer.Add(e);
+				}
 			}
 
 			var result = new List<ICombatEntity>();
@@ -1345,24 +1474,33 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				foreach (var monster in _monsters.Values)
+				lock (_monsters)
 				{
-					var radius = (monster as ICombatEntity)?.AgentRadius ?? 0;
-					if (monster is TActor actor && area.IsInsideOrInRange(actor.Position, radius) && (predicate?.Invoke(actor) ?? true))
-						buffer.Add(actor);
+					foreach (var monster in _monsters.Values)
+					{
+						var radius = (monster as ICombatEntity)?.AgentRadius ?? 0;
+						if (monster is TActor actor && area.IsInsideOrInRange(actor.Position, radius) && (predicate?.Invoke(actor) ?? true))
+							buffer.Add(actor);
+					}
 				}
 
-				foreach (var character in _characters.Values)
+				lock (_characters)
 				{
-					if (character is TActor actor && area.IsInsideOrInRange(actor.Position, ((ICombatEntity)character).AgentRadius) && (predicate?.Invoke(actor) ?? true))
-						buffer.Add(actor);
+					foreach (var character in _characters.Values)
+					{
+						if (character is TActor actor && area.IsInsideOrInRange(actor.Position, ((ICombatEntity)character).AgentRadius) && (predicate?.Invoke(actor) ?? true))
+							buffer.Add(actor);
+					}
 				}
 			}
 
-			foreach (var pad in _pads.Values)
+			lock (_pads)
 			{
-				if (pad is TActor actor && area.IsInside(actor.Position) && (predicate?.Invoke(actor) ?? true))
-					buffer.Add(actor);
+				foreach (var pad in _pads.Values)
+				{
+					if (pad is TActor actor && area.IsInside(actor.Position) && (predicate?.Invoke(actor) ?? true))
+						buffer.Add(actor);
+				}
 			}
 		}
 
@@ -1442,17 +1580,20 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				foreach (var otherEntity in _combatEntities.Values)
+				lock (_combatEntities)
 				{
-					if (otherEntity.Handle == requester.Handle)
-						continue;
+					foreach (var otherEntity in _combatEntities.Values)
+					{
+						if (otherEntity.Handle == requester.Handle)
+							continue;
 
-					var dx = position.X - otherEntity.Position.X;
-					var dz = position.Z - otherEntity.Position.Z;
-					var minSep = requester.AgentRadius + otherEntity.AgentRadius;
+						var dx = position.X - otherEntity.Position.X;
+						var dz = position.Z - otherEntity.Position.Z;
+						var minSep = requester.AgentRadius + otherEntity.AgentRadius;
 
-					if (dx * dx + dz * dz < minSep * minSep)
-						return true;
+						if (dx * dx + dz * dz < minSep * minSep)
+							return true;
+					}
 				}
 			}
 
@@ -1493,7 +1634,8 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				lock (_combatEntities)
+					candidates = _combatEntities.Values.ToList();
 			}
 
 			foreach (var otherEntity in candidates)
@@ -1576,15 +1718,21 @@ namespace Melia.Zone.World.Maps
 		/// Stores property overrides to apply to monsters of the given
 		/// class when they are spawned on this map.
 		/// </summary>
-		public void AddPropertyOverrides(int monsterClassId, PropertyOverrides propertyOverrides) =>
-			_monsterPropertyOverrides[monsterClassId] = propertyOverrides;
+		public void AddPropertyOverrides(int monsterClassId, PropertyOverrides propertyOverrides)
+		{
+			lock (_monsterPropertyOverrides)
+				_monsterPropertyOverrides[monsterClassId] = propertyOverrides;
+		}
 
 		/// <summary>
 		/// Returns property overrides for the given monster class via out.
 		/// Returns false if no overrides are defined.
 		/// </summary>
-		public bool TryGetPropertyOverrides(int monsterClassId, out PropertyOverrides propertyOverrides) =>
-			_monsterPropertyOverrides.TryGetValue(monsterClassId, out propertyOverrides);
+		public bool TryGetPropertyOverrides(int monsterClassId, out PropertyOverrides propertyOverrides)
+		{
+			lock (_monsterPropertyOverrides)
+				return _monsterPropertyOverrides.TryGetValue(monsterClassId, out propertyOverrides);
+		}
 		#endregion
 
 		#region Specialized Queries
@@ -1594,10 +1742,13 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public WarpMonster GetNearbyWarp(Position pos)
 		{
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (monster is WarpMonster warp && warp.WarpWhenNearby && warp.Position.InRange2D(pos, 35))
-					return warp;
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is WarpMonster warp && warp.WarpWhenNearby && warp.Position.InRange2D(pos, 35))
+						return warp;
+				}
 			}
 			return null;
 		}
@@ -1608,10 +1759,13 @@ namespace Melia.Zone.World.Maps
 		public List<WarpMonster> GetWarps()
 		{
 			var result = new List<WarpMonster>();
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (monster is WarpMonster warp)
-					result.Add(warp);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is WarpMonster warp)
+						result.Add(warp);
+				}
 			}
 			return result;
 		}
@@ -1622,10 +1776,13 @@ namespace Melia.Zone.World.Maps
 		public List<WarpMonster> GetWarps(Func<WarpMonster, bool> predicate)
 		{
 			var result = new List<WarpMonster>();
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (monster is WarpMonster warp && (predicate == null || predicate(warp)))
-					result.Add(warp);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is WarpMonster warp && (predicate == null || predicate(warp)))
+						result.Add(warp);
+				}
 			}
 			return result;
 		}
@@ -1636,10 +1793,13 @@ namespace Melia.Zone.World.Maps
 		public List<MonsterInName> GetNpcs()
 		{
 			var result = new List<MonsterInName>();
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (monster is MonsterInName npc)
-					result.Add(npc);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is MonsterInName npc)
+						result.Add(npc);
+				}
 			}
 			return result;
 		}
@@ -1650,10 +1810,13 @@ namespace Melia.Zone.World.Maps
 		public List<MonsterInName> GetNpcs(Func<MonsterInName, bool> predicate)
 		{
 			var result = new List<MonsterInName>();
-			foreach (var monster in _monsters.Values)
+			lock (_monsters)
 			{
-				if (monster is MonsterInName npc && (predicate == null || predicate(npc)))
-					result.Add(npc);
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is MonsterInName npc && (predicate == null || predicate(npc)))
+						result.Add(npc);
+				}
 			}
 			return result;
 		}
@@ -1706,7 +1869,8 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				lock (_combatEntities)
+					candidates = _combatEntities.Values.ToList();
 			}
 
 			foreach (var combatEntity in candidates)
@@ -1726,10 +1890,15 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void AlertAis(IAiEventAlert alert)
 		{
-			foreach (var combatEntity in _combatEntities.Values)
+			lock (_combatEntities)
 			{
-				if (combatEntity.Components.TryGet<AiComponent>(out var aiComponent))
+				foreach (var combatEntity in _combatEntities.Values)
+				{
+					if (!combatEntity.Components.TryGet<AiComponent>(out var aiComponent))
+						continue;
+
 					aiComponent.Script.QueueEventAlert(alert);
+				}
 			}
 		}
 
@@ -1738,8 +1907,11 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public virtual void Broadcast(Packet packet)
 		{
-			foreach (var character in _characters.Values)
-				character.Connection.Send(packet);
+			lock (_characters)
+			{
+				foreach (var character in _characters.Values)
+					character.Connection.Send(packet);
+			}
 		}
 
 		[ThreadStatic]
@@ -1786,25 +1958,28 @@ namespace Melia.Zone.World.Maps
 				return;
 			}
 
-			foreach (var character in _characters.Values)
+			lock (_characters)
 			{
-				if (!character.Position.InRange2D(source.Position, VisibleRange))
-					continue;
+				foreach (var character in _characters.Values)
+				{
+					if (!character.Position.InRange2D(source.Position, VisibleRange))
+						continue;
 
-				if (!includeSource && character == source)
-					continue;
+					if (!includeSource && character == source)
+						continue;
 
-				if (character.Layer != source.Layer)
-					continue;
+					if (character.Layer != source.Layer)
+						continue;
 
-				var conn = character.Connection;
-				if (conn == null)
-					continue;
+					var conn = character.Connection;
+					if (conn == null)
+						continue;
 
-				if (!sentConnections.Add(conn))
-					continue;
+					if (!sentConnections.Add(conn))
+						continue;
 
-				conn.Send(packet);
+					conn.Send(packet);
+				}
 			}
 		}
 		#endregion
@@ -1817,10 +1992,13 @@ namespace Melia.Zone.World.Maps
 		public Character[] GetCharactersInside(IShapeF shape)
 		{
 			var result = new List<Character>();
-			foreach (var character in _characters.Values)
+			lock (_characters)
 			{
-				if (shape.IsInsideOrInRange(character.Position, ((ICombatEntity)character).AgentRadius))
-					result.Add(character);
+				foreach (var character in _characters.Values)
+				{
+					if (shape.IsInsideOrInRange(character.Position, ((ICombatEntity)character).AgentRadius))
+						result.Add(character);
+				}
 			}
 			return result.ToArray();
 		}
@@ -1831,10 +2009,13 @@ namespace Melia.Zone.World.Maps
 		public Character[] GetCharactersOutside(IShapeF shape)
 		{
 			var result = new List<Character>();
-			foreach (var character in _characters.Values)
+			lock (_characters)
 			{
-				if (!shape.IsInsideOrInRange(character.Position, ((ICombatEntity)character).AgentRadius))
-					result.Add(character);
+				foreach (var character in _characters.Values)
+				{
+					if (!shape.IsInsideOrInRange(character.Position, ((ICombatEntity)character).AgentRadius))
+						result.Add(character);
+				}
 			}
 			return result.ToArray();
 		}
@@ -1856,15 +2037,18 @@ namespace Melia.Zone.World.Maps
 
 			var party = character.Connection.Party;
 			var result = new List<Character>();
-			foreach (var a in _characters.Values)
+			lock (_characters)
 			{
-				if (radius > 0 && !a.Position.InRange2D(position, radius))
-					continue;
-				if (a.Connection.Party?.ObjectId != party.ObjectId)
-					continue;
-				if (a.IsDead != !areAlive)
-					continue;
-				result.Add(a);
+				foreach (var a in _characters.Values)
+				{
+					if (radius > 0 && !a.Position.InRange2D(position, radius))
+						continue;
+					if (a.Connection.Party?.ObjectId != party.ObjectId)
+						continue;
+					if (a.IsDead != !areAlive)
+						continue;
+					result.Add(a);
+				}
 			}
 			return result;
 		}
@@ -1879,10 +2063,13 @@ namespace Melia.Zone.World.Maps
 
 			var party = character.Connection.Party;
 			var result = new List<Character>();
-			foreach (var a in _characters.Values)
+			lock (_characters)
 			{
-				if (a.Connection.Party?.ObjectId == party.ObjectId)
-					result.Add(a);
+				foreach (var a in _characters.Values)
+				{
+					if (a.Connection.Party?.ObjectId == party.ObjectId)
+						result.Add(a);
+				}
 			}
 			return result;
 		}
@@ -1904,7 +2091,8 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				lock (_combatEntities)
+					candidates = _combatEntities.Values.ToList();
 			}
 
 			var result = new List<ICombatEntity>();
@@ -1940,7 +2128,8 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				lock (_combatEntities)
+					candidates = _combatEntities.Values.ToList();
 			}
 
 			ICombatEntity nearest = null;
@@ -1978,7 +2167,8 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				candidates = _combatEntities.Values;
+				lock (_combatEntities)
+					candidates = _combatEntities.Values.ToList();
 			}
 
 			var result = new List<ICombatEntity>();
@@ -2049,8 +2239,6 @@ namespace Melia.Zone.World.Maps
 		{
 			if (disposing)
 			{
-				_updateEntitiesPool?.Dispose();
-				_updateVisibleCharactersPool?.Dispose();
 				_spatialIndex?.Dispose();
 			}
 		}

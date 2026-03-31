@@ -17,13 +17,20 @@ namespace Melia.Zone.World.Maps
 
 		internal void Clear()
 		{
-			this._characters.Clear();
-			this._monsters.Clear();
-			this._monsterPropertyOverrides.Clear();
-			this._pads.Clear();
-			this._obstacles.Clear();
-			this._updateEntitiesPool.Value.Clear();
-			this._updateVisibleCharactersPool.Value.Clear();
+			lock (_characters)
+				_characters.Clear();
+			lock (_monsters)
+				_monsters.Clear();
+			lock (_combatEntities)
+				_combatEntities.Clear();
+			lock (_triggerableAreas)
+				_triggerableAreas.Clear();
+			lock (_monsterPropertyOverrides)
+				_monsterPropertyOverrides.Clear();
+			lock (_pads)
+				_pads.Clear();
+			lock (_obstaclesLock)
+				_obstacles.Clear();
 		}
 	}
 }

@@ -723,22 +723,32 @@ namespace Melia.Zone.World.Actors.Characters
 			// the player expects to see everything on map entry.
 			lock (_lookAroundLock)
 			{
+				// Get currently visible entities
+				_currentVisChars.Clear();
+				this.Map.GetVisibleCharacters(this, _currentVisChars);
+
+				_currentVisMonsters.Clear();
+				this.Map.GetVisibleMonsters(this, _currentVisMonsters);
+
+				_currentVisPads.Clear();
+				this.Map.GetVisiblePads(this, _currentVisPads);
+
 				// Compute newly appearing characters
 				_tempAppearChars.Clear();
-				foreach (var c in this.Map.Characters)
-					if (this.CanSee(c) && !_visibleCharacters.Contains(c))
+				foreach (var c in _currentVisChars)
+					if (!_visibleCharacters.Contains(c))
 						_tempAppearChars.Add(c);
 
 				// Compute newly appearing monsters
 				_tempAppearMonsters.Clear();
-				foreach (var m in this.Map.Monsters)
-					if (this.CanSee(m) && !_visibleMonsters.Contains(m))
+				foreach (var m in _currentVisMonsters)
+					if (!_visibleMonsters.Contains(m))
 						_tempAppearMonsters.Add(m);
 
 				// Compute newly appearing pads
 				_tempAppearPads.Clear();
-				foreach (var p in this.Map.Pads)
-					if (this.CanSee(p) && !_visiblePads.Contains(p))
+				foreach (var p in _currentVisPads)
+					if (!_visiblePads.Contains(p))
 						_tempAppearPads.Add(p);
 
 				this.HandleAppearingCharacters(_tempAppearChars);
@@ -747,19 +757,16 @@ namespace Melia.Zone.World.Actors.Characters
 
 				// Update visible sets
 				_visibleCharacters.Clear();
-				foreach (var c in this.Map.Characters)
-					if (this.CanSee(c))
-						_visibleCharacters.Add(c);
+				foreach (var c in _currentVisChars)
+					_visibleCharacters.Add(c);
 
 				_visibleMonsters.Clear();
-				foreach (var m in this.Map.Monsters)
-					if (this.CanSee(m))
-						_visibleMonsters.Add(m);
+				foreach (var m in _currentVisMonsters)
+					_visibleMonsters.Add(m);
 
 				_visiblePads.Clear();
-				foreach (var p in this.Map.Pads)
-					if (this.CanSee(p))
-						_visiblePads.Add(p);
+				foreach (var p in _currentVisPads)
+					_visiblePads.Add(p);
 			}
 		}
 

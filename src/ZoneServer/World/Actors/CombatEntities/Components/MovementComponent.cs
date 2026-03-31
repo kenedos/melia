@@ -800,9 +800,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			//   support needs to be added to the shape classes first.
 
 			_currentTriggerAreas.Clear();
-			foreach (var ta in this.Entity.Map.TriggerableAreas)
-				if (ta.Area?.IsInside(this.Entity.Position) ?? false)
-					_currentTriggerAreas.Add(ta);
+			this.Entity.Map.GetTriggerableAreasAt(this.Entity.Position, _currentTriggerAreas);
 
 			if (_triggerAreas.Count == 0 && _currentTriggerAreas.Count == 0)
 				return;

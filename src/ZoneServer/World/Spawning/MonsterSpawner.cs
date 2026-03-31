@@ -283,9 +283,9 @@ namespace Melia.Zone.World.Spawning
 		/// <param name="existingCrystals"></param>
 		/// <param name="batchPositions"></param>
 		/// <returns></returns>
-		private bool IsTooCloseToRootCrystal(Position pos, IMonster[] existingCrystals, List<Position> batchPositions)
+		private bool IsTooCloseToRootCrystal(Position pos, List<IMonster> existingCrystals, List<Position> batchPositions)
 		{
-			for (var i = 0; i < existingCrystals.Length; i++)
+			for (var i = 0; i < existingCrystals.Count; i++)
 			{
 				if (pos.InRange2D(existingCrystals[i].Position, RootCrystalMinSpacing))
 					return true;
