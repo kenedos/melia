@@ -16,5 +16,11 @@ public class f_siauliai_westWarpsScript : GeneralScript
 
 		// West Siauliai Woods to West Siauliai Woods
 		AddWarp(2031, "TO_SIAULIAI_WEST", -24, From("f_siauliai_west", 2755.275, 443.1412), To("f_siauliai_west", 1412, -362));
+
+		// West Siauliai Woods to West Siauliai Woods
+		AddNpc(147501, "Teleporter", "f_siauliai_west", 1451, -341, 45, async dialog =>
+		{
+			dialog.Player.Warp("f_siauliai_west", 2769, 423, 521);
+		});
 	}
 }

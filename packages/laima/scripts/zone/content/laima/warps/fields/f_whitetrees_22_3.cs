@@ -19,5 +19,17 @@ public class f_whitetrees_22_3WarpsScript : GeneralScript
 
 		// Izoliacjia Plateau to Orsha
 		AddWarp(38, "WHITETREES22_3_ORSHA", 90, From("f_whitetrees_22_3", 1765, 1063), To("c_orsha", -1367, -679));
+
+		// Izoliacjia Plateau to Izoliacjia Plateau
+		AddNpc(147501, "Teleporter", "f_whitetrees_22_3", 433, -1174, 45, async dialog =>
+		{
+			dialog.Player.Warp("f_whitetrees_22_3", 1086, 790, -1089);
+		});
+
+		// Izoliacjia Plateau to Izoliacjia Plateau
+		AddNpc(147501, "Teleporter", "f_whitetrees_22_3", 1012, -1083, 45, async dialog =>
+		{
+			dialog.Player.Warp("f_whitetrees_22_3", 360, 194, -1148);
+		});
 	}
 }
