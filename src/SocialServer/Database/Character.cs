@@ -1,5 +1,6 @@
 ﻿using System;
 using Melia.Shared.Game.Const;
+using Melia.Shared.ObjectProperties;
 
 namespace Melia.Social.Database
 {
@@ -74,7 +75,7 @@ namespace Melia.Social.Database
 		/// <summary>
 		/// Gets or sets the character's party id.
 		/// </summary>
-		public long PartyId { get; set; }
+		public long PartyId { get; set; } = ObjectIdRanges.Party;
 
 		/// <summary>
 		/// Resets select properties that will make the character appear offline
