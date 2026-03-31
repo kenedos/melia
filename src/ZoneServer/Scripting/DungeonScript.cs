@@ -1410,6 +1410,9 @@ namespace Melia.Zone.Scripting
 			// Cancel any pending instance timeout
 			this.CancelInstanceTimeout(instance);
 
+			// Snapshot the character list before Cleanup clears it
+			var characters = instance.Characters.ToList();
+
 			// Stop all background stages
 			instance.Cleanup();
 
@@ -1421,8 +1424,7 @@ namespace Melia.Zone.Scripting
 			}
 			else
 			{
-				// If owner is null, try to find the session ID from any character
-				foreach (var character in instance.Characters)
+				foreach (var character in characters)
 				{
 					if (character == null) continue;
 					autoMatchId = character.Variables.Perm.GetLong(AutoMatchZoneManager.SessionIdVarName);
@@ -1439,7 +1441,7 @@ namespace Melia.Zone.Scripting
 			instance.CurrentStage?.Complete();
 
 			// Clean up all characters
-			foreach (var character in instance.Characters)
+			foreach (var character in characters)
 			{
 				if (character == null) continue;
 
