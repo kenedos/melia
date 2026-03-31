@@ -1135,7 +1135,7 @@ namespace Melia.Zone.World.Items
 			}
 			else if (isArmor)
 			{
-				return new List<string> {
+				var armorStats = new List<string> {
 					"STR", "DEX", "CON", "INT", "MNA",
 					"RHP", "RSP",
 					"CRTDR",
@@ -1145,6 +1145,11 @@ namespace Melia.Zone.World.Items
 					"SlashDEF", "AriesDEF", "StrikeDEF",
 					"RES_FIRE", "RES_ICE", "RES_LIGHTNING", "RES_POISON", "RES_EARTH", "RES_HOLY", "RES_DARK", "RES_SOUL",
 				};
+
+				if (this.Data.EquipType1 == EquipType.Boots)
+					armorStats.Add("MSPD");
+
+				return armorStats;
 			}
 
 			// Defaults to all stats
@@ -1340,6 +1345,10 @@ namespace Melia.Zone.World.Items
 					rndValue = 1;
 					break;
 
+				case "MSPD":
+					rndValue = 1;
+					break;
+
 				default:
 					break;
 			}
@@ -1471,7 +1480,7 @@ namespace Melia.Zone.World.Items
 		{
 			var random = RandomProvider.Get();
 			var options = random.Next(minOptions, maxOptions);
-			var utilOptions = new string[] { "CRTHR", "CRTDR", "BLK_BREAK", "BLK", "ADD_HR", "ADD_DR", "RHP", "SR" };
+			var utilOptions = new string[] { "CRTHR", "CRTDR", "BLK_BREAK", "BLK", "ADD_HR", "ADD_DR", "RHP", "SR", "MSPD" };
 			var atkOptions = new string[] { "ADD_CLOTH", "ADD_LEATHER", "ADD_IRON", "ADD_SMALLSIZE", "ADD_MIDDLESIZE",
 				"ADD_LARGESIZE", "ADD_GHOST", "ADD_FORESTER", "ADD_WIDLING", "ADD_VELIAS",
 				"ADD_PARAMUNE", "ADD_KLAIDA" };

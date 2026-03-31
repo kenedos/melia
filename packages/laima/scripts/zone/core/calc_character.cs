@@ -612,6 +612,10 @@ public class CharacterCalculationsScript : GeneralScript
 		if (Feature.IsEnabled("FreeRunning"))
 			baseValue = 0;
 
+		// Root crystal buff allows dashing without consuming stamina
+		if (character.Buffs.Has(BuffId.RootCrystalMoveSpeed))
+			return 0;
+
 		// If DashRun is active, the stamina usage is increased. This does
 		// not apply if character is in a city and FreeDashingInCities is
 		// enabled.

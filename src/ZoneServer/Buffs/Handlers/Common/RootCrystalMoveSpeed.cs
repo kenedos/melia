@@ -5,6 +5,7 @@ namespace Melia.Zone.Buffs.Handlers.Common
 {
 	/// <summary>
 	/// Handler for the RootCrystalMoveSpeed buff, which increases movement speed.
+	/// Stamina-free dashing is handled in calc_character.cs (SCR_Get_Character_Sta_Run).
 	/// </summary>
 	/// <remarks>
 	/// NumArg1: Flat speed bonus

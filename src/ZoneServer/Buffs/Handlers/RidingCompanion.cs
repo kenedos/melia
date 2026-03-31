@@ -26,7 +26,7 @@ namespace Melia.Zone.Buffs.Handlers
 			caster.StartBuff(BuffId.TakingOwner, TimeSpan.Zero, target);
 
 			// Generic values from Velheider, should be companion specific?
-			target.Properties.Modify(PropertyName.MSPD_BM, 8f);
+			target.Properties.Modify(PropertyName.MSPD_BM, 3f);
 			target.Properties.Modify(PropertyName.DR_BM, 3f);
 			target.Properties.Modify(PropertyName.DEF_BM, 12f);
 
@@ -51,7 +51,7 @@ namespace Melia.Zone.Buffs.Handlers
 			target.RemoveBuff(BuffId.AcrobaticMount_Buff);
 
 			// Generic values from Velheider, should be companion specific?
-			target.Properties.Modify(PropertyName.MSPD_BM, -8f);
+			target.Properties.Modify(PropertyName.MSPD_BM, -3f);
 			target.Properties.Modify(PropertyName.DR_BM, -3f);
 			target.Properties.Modify(PropertyName.DEF_BM, -12f);
 
