@@ -236,10 +236,8 @@ public class CastleDungeon : DungeonScript
 		var stage = new ActionStage(async (instance, script) =>
 		{
 			instance.Vars.Set("StageStartTime", DateTime.UtcNow);
-			await Task.Delay(TimeSpan.FromSeconds(60));
-			this.MGameReturn();
-			this.DungeonEnded(instance, false);
-		}, null, this, STAGE_END, "End");
+			await Task.Delay(TimeSpan.FromSeconds(60), instance.StageCancellationToken);
+		}, null, this, STAGE_END, "Returning to entrance in 60 seconds");
 
 		stage.TransitionTo(StageId.Complete);
 		return stage;

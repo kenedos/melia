@@ -364,11 +364,7 @@ public class LankoLakeDungeon : DungeonScript
 			instance.Vars.Set("StageStartTime", DateTime.UtcNow);
 			instance.Vars.Set("DungeonEnded", true);
 
-			await Task.Delay(TimeSpan.FromSeconds(10));
-
-			// Return players to entrance
-			this.MGameReturn();
-			this.DungeonEnded(instance, false);
+			await Task.Delay(TimeSpan.FromSeconds(10), instance.StageCancellationToken);
 		}, null, this, STAGE_END, "End");
 
 		stage.TransitionTo(StageId.Complete);

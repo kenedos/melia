@@ -27,7 +27,7 @@ public class KillEventsScript : GeneralScript
 
 	private void OnRootCrystalKilled(Mob mob, ICombatEntity attacker)
 	{
-		attacker.StartBuff(BuffId.RootCrystalMoveSpeed, 10, 0, TimeSpan.FromSeconds(10), attacker);
+		attacker.StartBuff(BuffId.RootCrystalMoveSpeed, 10, 0, TimeSpan.FromSeconds(15), attacker);
 
 		if (attacker is Character character)
 			CallSafe(this.MonsterHealStamina(mob, character, 100000));
