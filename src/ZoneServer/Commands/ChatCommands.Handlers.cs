@@ -137,6 +137,7 @@ namespace Melia.Zone.Commands
 			this.Add("silver", "<modifier>", "Spawns silver.", this.HandleSilver);
 			this.Add("droptest", "<item id|name> [count=1] [radius=50]", "Drops items on the ground for pickup testing.", this.HandleDropTest);
 			this.Add("spawn", "<monster id|class name> [amount=1] ['ai'=BasicMonster] ['tendency'=peaceful] ['hp'=amount]", "Spawns monster.", this.HandleSpawn);
+			this.Add("spawnbuff", "<monster id|class name> <buff class name> [duration=0] ['ai'=BasicMonster] ['tendency'=aggressive]", "Spawns monster with a buff.", this.HandleSpawnBuff);
 			this.Add("madhatter", "", "Spawns all headgears.", this.HandleGetAllHats);
 			this.Add("heartofcards", "", "Spawns all boss cards at level 10.", this.HandleGetAllBossCards);
 			this.Add("heartofgems", "", "Spawns all gems at level 10.", this.HandleGetAllGems);
@@ -1519,6 +1520,86 @@ namespace Melia.Zone.Commands
 			sender.ServerMessage(Localization.Get("Monsters were spawned."));
 			if (sender != target)
 				target.ServerMessage(Localization.Get("Monsters were spawned at your location by {0}."), sender.TeamName);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Spawns a monster with a buff at target's location.
+		/// </summary>
+		private CommandResult HandleSpawnBuff(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.IndexedCount < 2)
+				return CommandResult.InvalidArgument;
+
+			MonsterData monsterData;
+			if (int.TryParse(args.Get(0), out var id))
+			{
+				monsterData = ZoneServer.Instance.Data.MonsterDb.Find(id);
+				if (monsterData == null)
+				{
+					sender.ServerMessage(Localization.Get("Monster not found by id."));
+					return CommandResult.Okay;
+				}
+			}
+			else
+			{
+				var searchName = args.Get(0).ToLower();
+				var monstersData = ZoneServer.Instance.Data.MonsterDb.Entries.Values.Where(a => a.ClassName.Contains(searchName, StringComparison.InvariantCultureIgnoreCase)).ToList();
+				if (monstersData.Count == 0)
+				{
+					sender.ServerMessage(Localization.Get("Monster not found by name."));
+					return CommandResult.Okay;
+				}
+
+				var sorted = monstersData.OrderBy(a => a.ClassName.ToLower().GetLevenshteinDistance(searchName));
+				monsterData = sorted.First();
+			}
+
+			var buffName = args.Get(1);
+			if (!Enum.TryParse<BuffId>(buffName, out var buffId))
+			{
+				sender.ServerMessage(Localization.Get("Buff '{0}' not found."), buffName);
+				return CommandResult.Okay;
+			}
+
+			var duration = TimeSpan.Zero;
+			if (args.IndexedCount >= 3 && int.TryParse(args.Get(2), out var durationSec))
+				duration = TimeSpan.FromSeconds(durationSec);
+
+			var aiName = "BasicMonster";
+			if (args.TryGet("ai", out var aiNameArg))
+			{
+				if (aiNameArg.ToLower() == "none")
+					aiName = null;
+				else
+					aiName = aiNameArg;
+			}
+
+			var tendency = TendencyType.Aggressive;
+			if (args.TryGet("tendency", out var tendencyArg) && tendencyArg.ToLower() == "peaceful")
+				tendency = TendencyType.Peaceful;
+
+			var monster = new Mob(monsterData.Id, RelationType.Enemy);
+
+			var pos = target.Position.GetRandomInRange2D(30, 50);
+			if (!target.Map.Ground.TryGetNearestValidPosition(pos, out var validPos))
+				validPos = target.Position;
+
+			monster.Position = validPos;
+			monster.Direction = target.Direction;
+			monster.SpawnPosition = monster.Position;
+			monster.Tendency = tendency;
+			monster.Components.Add(new MovementComponent(monster));
+
+			if (!string.IsNullOrWhiteSpace(aiName))
+				monster.Components.Add(new AiComponent(monster, aiName));
+
+			target.Map.AddMonster(monster);
+
+			monster.StartBuff(buffId, 0, 0, duration, monster);
+
+			sender.ServerMessage(Localization.Get("Spawned '{0}' with buff '{1}'."), monsterData.ClassName, buffId);
 
 			return CommandResult.Okay;
 		}
