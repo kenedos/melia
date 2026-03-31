@@ -682,11 +682,12 @@ namespace Melia.Zone.Scripting
 			// left their previous map (before entering the dungeon map).
 			this.CancelInstanceTimeout(instance);
 
-			// Add character to instance's character list if not already present
-			if (!instance.Characters.Contains(character))
-			{
+			// Replace stale character reference or add if not present
+			var staleIdx = instance.Characters.FindIndex(c => c?.DbId == character.DbId);
+			if (staleIdx >= 0)
+				instance.Characters[staleIdx] = character;
+			else
 				instance.Characters.Add(character);
-			}
 
 			// Wait for all registered party members to finish warping
 			var partyMembers = _instancesByCharacter
@@ -758,13 +759,15 @@ namespace Melia.Zone.Scripting
 			this.CancelInstanceTimeout(instance);
 
 			// Restore character mapping if it was cleared
-			_instancesByCharacter.TryAdd(character.DbId, instance);
+			_instancesByCharacter[character.DbId] = instance;
 
-			// Add character back to instance's character list if not already present
-			if (!instance.Characters.Contains(character))
-			{
+			// Replace stale character reference (from before reconnect) with
+			// the current object, or add if not present at all
+			var staleIdx = instance.Characters.FindIndex(c => c?.DbId == character.DbId);
+			if (staleIdx >= 0)
+				instance.Characters[staleIdx] = character;
+			else
 				instance.Characters.Add(character);
-			}
 
 			// Restore permanent variable reference
 			character.Variables.Perm.SetString(ActiveInstanceVarName, this.Id);
@@ -1084,10 +1087,12 @@ namespace Melia.Zone.Scripting
 		{
 			if (ZoneServer.Instance.World.TryGetMap(this.MapName, out var map))
 			{
-				var leader = instance.Owner?.Connection?.Party?.GetLeader()
-					?? instance.Characters.FirstOrDefault(c => c != null && c.MapId == instance.MapId);
-				var portalPos = leader?.Position.GetRandomInRange2D(20, 30) ?? instance.StartPosition;
-				var portalDir = leader?.Direction.Backwards ?? Direction.South;
+				var party = instance.Owner?.Connection?.Party;
+				var portalChar = party?.GetLeader();
+				if (portalChar == null || portalChar.Connection == null || portalChar.MapId != instance.MapId)
+					portalChar = instance.Characters.FirstOrDefault(c => c != null && c.Connection != null && c.MapId == instance.MapId);
+				var portalPos = portalChar?.Position.GetRandomInRange2D(20, 30) ?? instance.StartPosition;
+				var portalDir = portalChar?.Direction.Backwards ?? Direction.South;
 
 				var portal = new Npc(MonsterId.MissionGate, "Exit Portal", portalPos, portalDir)
 				{
@@ -1202,13 +1207,17 @@ namespace Melia.Zone.Scripting
 			instance.IsComplete = true;
 			instance.Vars.Set(CompletionTimeVarName, DateTime.UtcNow);
 
+			// Snapshot character list — reconnects can replace character objects
+			// mid-dungeon, so instance.Characters may contain stale references
+			var characters = instance.Characters.ToList();
+
 			this.OnDungeonComplete(instance);
 
 			// Check if entry count should be incremented on complete and hasn't been already
 			var incrementOnComplete = ZoneServer.Instance.Conf.World.InstancedDungeonIncrementEntryOnComplete;
 			var alreadyIncremented = instance.Vars.GetBool(InstanceDungeon.EntryCountIncrementedVarName);
 
-			foreach (var character in instance.Characters)
+			foreach (var character in characters)
 			{
 				if (character == null) continue;
 
@@ -1253,7 +1262,7 @@ namespace Melia.Zone.Scripting
 
 			if (autoMatchId == 0)
 			{
-				foreach (var character in instance.Characters)
+				foreach (var character in characters)
 				{
 					if (character == null) continue;
 					autoMatchId = character.Variables.Perm.GetLong(AutoMatchZoneManager.SessionIdVarName);
@@ -1265,7 +1274,7 @@ namespace Melia.Zone.Scripting
 				ZoneServer.Instance.World.AutoMatch.DestroyDungeonSession(autoMatchId);
 
 			// Start auto-warp timer for all characters
-			foreach (var character in instance.Characters)
+			foreach (var character in characters)
 			{
 				if (character == null) continue;
 
