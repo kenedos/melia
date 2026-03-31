@@ -110,14 +110,16 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Corsair
 				{
 					caster.Variables.Temp.Set("Melia.Buff.JollyRoger.FeverStartTime", now);
 
+					var skillLevel = caster.TryGetSkill(SkillId.Corsair_JollyRoger, out var jollySkill) ? jollySkill.Level : 1;
+
 					if (caster.HasParty)
 					{
 						foreach (var member in caster.Map.GetPartyMembers(caster))
-							member.StartBuff(BuffId.FeverTime, TimeSpan.FromMilliseconds(FeverDurationMs), caster);
+							member.StartBuff(BuffId.FeverTime, skillLevel, 0, TimeSpan.FromMilliseconds(FeverDurationMs), caster, SkillId.Corsair_JollyRoger);
 					}
 					else
 					{
-						caster.StartBuff(BuffId.FeverTime, TimeSpan.FromMilliseconds(FeverDurationMs), caster);
+						caster.StartBuff(BuffId.FeverTime, skillLevel, 0, TimeSpan.FromMilliseconds(FeverDurationMs), caster, SkillId.Corsair_JollyRoger);
 					}
 				}
 			}

@@ -43,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 				if (caster.TryGetActiveAbilityLevel(AbilityId.Peltasta43, out var level))
 					caster.StartBuff(BuffId.HighGuard_Abil_Buff, level, 0, TimeSpan.Zero, caster);
 				else
-					caster.StartBuff(BuffId.HighGuard_Buff, skill.Level, 0, TimeSpan.Zero, caster);
+					caster.StartBuff(BuffId.HighGuard_Buff, skill.Level, 0, TimeSpan.Zero, caster, skill.Id);
 			}
 
 			skill.IncreaseOverheat();

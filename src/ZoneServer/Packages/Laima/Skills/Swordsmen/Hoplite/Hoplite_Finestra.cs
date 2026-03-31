@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 			}
 
 			// Buff lasts 5 minutes (300 seconds)
-			caster.StartBuff(BuffId.Finestra_Buff, skill.Level, 0, TimeSpan.FromMinutes(5), caster);
+			caster.StartBuff(BuffId.Finestra_Buff, skill.Level, 0, TimeSpan.FromMinutes(5), caster, skill.Id);
 
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);

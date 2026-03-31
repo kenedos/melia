@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Cataphract
 			if (!target.IsRiding())
 				return;
 
-			target.StartBuff(BuffId.AcrobaticMount_Buff, skill.Level, 0, TimeSpan.FromSeconds(5), target);
+			target.StartBuff(BuffId.AcrobaticMount_Buff, skill.Level, 0, TimeSpan.FromSeconds(5), target, skill.Id);
 		}
 	}
 }

@@ -42,7 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
 			doubleHitChance *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
-			caster.StartBuff(BuffId.DoubleAttack_Buff, skill.Level, doubleHitChance, duration, caster);
+			caster.StartBuff(BuffId.DoubleAttack_Buff, skill.Level, doubleHitChance, duration, caster, skill.Id);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, originPos);
 		}

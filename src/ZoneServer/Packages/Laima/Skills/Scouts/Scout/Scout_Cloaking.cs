@@ -36,7 +36,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Scout
 
 			var seconds = 10 + skill.Level * 3;
 			var duration = TimeSpan.FromSeconds(seconds);
-			caster.StartBuff(BuffId.Cloaking_Buff, skill.Level, 0, duration, caster);
+			caster.StartBuff(BuffId.Cloaking_Buff, skill.Level, 0, duration, caster, skill.Id);
 
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
 		}

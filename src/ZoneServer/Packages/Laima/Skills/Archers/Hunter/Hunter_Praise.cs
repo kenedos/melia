@@ -50,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 
 			// Apply Praise_Atk_Buff to companion (attack buff + bleeding on attack, 10 seconds)
-			companion.StartBuff(BuffId.Praise_Atk_Buff, skill.Level, 0f, TimeSpan.FromSeconds(PraiseAtkBuffDurationSeconds), caster);
+			companion.StartBuff(BuffId.Praise_Atk_Buff, skill.Level, 0f, TimeSpan.FromSeconds(PraiseAtkBuffDurationSeconds), caster, skill.Id);
 
 			// Hunter26 ability: grant temporary debuff immunity to companion
 			if (caster.IsAbilityActive(AbilityId.Hunter26))

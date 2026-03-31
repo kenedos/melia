@@ -54,7 +54,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Assassin
 				return;
 
 			pad.Trigger.ActivateCount++;
-			target.StartBuff(BuffId.HallucinationSmoke_Buff, skill.Level, 0, TimeSpan.FromSeconds(4), creator);
+			target.StartBuff(BuffId.HallucinationSmoke_Buff, skill.Level, 0, TimeSpan.FromSeconds(4), creator, skill.Id);
 		}
 
 		public void Updated(object sender, PadTriggerArgs args)
@@ -76,7 +76,7 @@ namespace Melia.Zone.Pads.Handlers.Scouts.Assassin
 					continue;
 
 				pad.Trigger.ActivateCount++;
-				target.StartBuff(BuffId.HallucinationSmoke_Buff, skill.Level, 0, TimeSpan.FromSeconds(4), creator);
+				target.StartBuff(BuffId.HallucinationSmoke_Buff, skill.Level, 0, TimeSpan.FromSeconds(4), creator, skill.Id);
 			}
 		}
 

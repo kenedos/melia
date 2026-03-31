@@ -45,7 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 
-			caster.StartBuff(BuffId.Blessing_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster);
+			caster.StartBuff(BuffId.Blessing_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster, skill.Id);
 
 			if (caster is Character character)
 			{
@@ -58,7 +58,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 					{
 						if (member == caster)
 							continue;
-						member.StartBuff(BuffId.Blessing_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster);
+						member.StartBuff(BuffId.Blessing_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster, skill.Id);
 					}
 				}
 			}

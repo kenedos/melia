@@ -91,7 +91,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 
 			SkillResultTargetBuff(caster, skill, BuffId.KnifeThrowing_Debuff, skill.Level, 0f, DebuffDuration, 1, 100, -1, hits);
 
-			caster.StartBuff(BuffId.Cloaking_Buff, TimeSpan.FromSeconds(3));
+			caster.StartBuff(BuffId.Cloaking_Buff, 0, 0, TimeSpan.FromSeconds(3), caster, SkillId.Scout_Cloaking);
 		}
 	}
 }

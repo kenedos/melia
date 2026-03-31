@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 			caster.SetAttackState(true);
 
 			var duration = TimeSpan.FromSeconds(300);
-			caster.StartBuff(BuffId.Bear_Buff, skill.Level, 0, duration, caster);
+			caster.StartBuff(BuffId.Bear_Buff, skill.Level, 0, duration, caster, skill.Id);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, originPos);
 		}

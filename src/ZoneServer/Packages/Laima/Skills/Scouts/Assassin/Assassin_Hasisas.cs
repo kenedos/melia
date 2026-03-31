@@ -54,7 +54,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 			if (caster.IsAbilityActive(AbilityId.Assassin3))
 				evasionVariant++;
 
-			var buff = caster.StartBuff(BuffId.Hasisas_Buff, skill.Level, evasionVariant, BuffDuration, caster);
+			var buff = caster.StartBuff(BuffId.Hasisas_Buff, skill.Level, evasionVariant, BuffDuration, caster, skill.Id);
 			buff?.Vars.SetInt("Hasisas.TickLimit", tickLimit);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, caster.Position);

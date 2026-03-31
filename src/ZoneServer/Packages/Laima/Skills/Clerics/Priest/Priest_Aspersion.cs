@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
-			caster.StartBuff(BuffId.Aspersion_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster);
+			caster.StartBuff(BuffId.Aspersion_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster, skill.Id);
 			Send.ZC_SYNC_END(caster, skillHandle, 0);
 			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle);
 
@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 					{
 						if (member == caster)
 							continue;
-						member.StartBuff(BuffId.Aspersion_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster);
+						member.StartBuff(BuffId.Aspersion_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster, skill.Id);
 					}
 				}
 			}

@@ -49,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
-				target.StartBuff(BuffId.Feint_Debuff, skill.Level, 0, duration, caster);
+				target.StartBuff(BuffId.Feint_Debuff, skill.Level, 0, duration, caster, skill.Id);
 			}
 		}
 	}

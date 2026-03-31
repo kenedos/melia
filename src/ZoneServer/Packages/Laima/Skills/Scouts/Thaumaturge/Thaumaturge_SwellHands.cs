@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Thaumaturge
 
 			var casterInt = caster.Properties.GetFloat(PropertyName.INT);
 
-			caster.StartBuff(BuffId.SwellHands_Buff, skill.Level, casterInt, TimeSpan.FromSeconds(BuffDurationSeconds), caster);
+			caster.StartBuff(BuffId.SwellHands_Buff, skill.Level, casterInt, TimeSpan.FromSeconds(BuffDurationSeconds), caster, skill.Id);
 
 			if (caster is Character character)
 			{
@@ -59,7 +59,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Thaumaturge
 					{
 						if (member == caster)
 							continue;
-						member.StartBuff(BuffId.SwellHands_Buff, skill.Level, casterInt, TimeSpan.FromSeconds(BuffDurationSeconds), caster);
+						member.StartBuff(BuffId.SwellHands_Buff, skill.Level, casterInt, TimeSpan.FromSeconds(BuffDurationSeconds), caster, skill.Id);
 					}
 				}
 			}

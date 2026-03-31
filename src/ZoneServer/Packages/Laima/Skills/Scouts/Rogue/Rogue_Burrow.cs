@@ -53,7 +53,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 			{
 				SkillResetCooldown(skill, caster);
 				await skill.Wait(TimeSpan.FromMilliseconds(600));
-				caster.StartBuff(BuffId.Burrow_Rogue, skill.Level, 0, TimeSpan.FromSeconds(60), caster);
+				caster.StartBuff(BuffId.Burrow_Rogue, skill.Level, 0, TimeSpan.FromSeconds(60), caster, skill.Id);
 			}
 		}
 	}

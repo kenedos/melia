@@ -39,7 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			var target = caster;
 
 			var duration = TimeSpan.FromSeconds(15);
-			target.StartBuff(BuffId.Guardian_Buff, skill.Level, 0, duration, caster);
+			target.StartBuff(BuffId.Guardian_Buff, skill.Level, 0, duration, caster, skill.Id);
 
 			var debuffRemoveChance = DebuffRemoveChancePerLevel * skill.Level;
 			target.RemoveRandomDebuff(debuffRemoveChance);

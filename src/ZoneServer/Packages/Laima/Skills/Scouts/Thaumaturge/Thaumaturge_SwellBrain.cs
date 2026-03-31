@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Thaumaturge
 
 			var duration = TimeSpan.FromSeconds(BuffDurationSeconds);
 
-			caster.StartBuff(BuffId.BigHeadMode, skill.Level, 0, duration, caster);
+			caster.StartBuff(BuffId.BigHeadMode, skill.Level, 0, duration, caster, skill.Id);
 
 			if (caster is Character character)
 			{
@@ -49,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Thaumaturge
 					{
 						if (member == caster)
 							continue;
-						member.StartBuff(BuffId.BigHeadMode, skill.Level, 0, duration, caster);
+						member.StartBuff(BuffId.BigHeadMode, skill.Level, 0, duration, caster, skill.Id);
 					}
 				}
 			}

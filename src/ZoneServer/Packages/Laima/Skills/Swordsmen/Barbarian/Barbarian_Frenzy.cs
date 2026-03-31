@@ -50,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 			var buffInstanceDuration = TimeSpan.FromSeconds(10);
 
 			// Gain a stack on every hit
-			target.StartBuff(BuffId.Frenzy_Buff, maxStacks, 1, buffInstanceDuration, target);
+			target.StartBuff(BuffId.Frenzy_Buff, maxStacks, 1, buffInstanceDuration, target, SkillId.Barbarian_Frenzy);
 		}
 	}
 }

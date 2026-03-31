@@ -55,7 +55,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			{
 				var lhItem = inv.GetItem(EquipSlot.LeftHand);
 				if (lhItem.Data.EquipType1 == EquipType.Shield)
-					caster.StartBuff(BuffId.Langort_BlkAbil, skill.Level, 0, BlockDuration, caster);
+					caster.StartBuff(BuffId.Langort_BlkAbil, skill.Level, 0, BlockDuration, caster, skill.Id);
 			}
 
 			skill.Run(this.Attack(skill, caster, splashArea));

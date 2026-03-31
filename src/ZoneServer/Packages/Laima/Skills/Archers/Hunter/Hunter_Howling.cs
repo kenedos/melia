@@ -56,7 +56,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 				.Take(10);
 			foreach (var target in targets)
 			{
-				target.StartBuff(BuffId.Howling_Debuff, skill.Level, 0, TimeSpan.FromSeconds(15), companion);
+				target.StartBuff(BuffId.Howling_Debuff, skill.Level, 0, TimeSpan.FromSeconds(15), companion, skill.Id);
 			}
 		}
 	}

@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			///   is removed, probably need an equipment change hook.
 
 			var duration = TimeSpan.FromSeconds(300);
-			caster.StartBuff(BuffId.HardShield_Buff, skill.Level, 0, duration, caster);
+			caster.StartBuff(BuffId.HardShield_Buff, skill.Level, 0, duration, caster, skill.Id);
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, originPos);
 		}

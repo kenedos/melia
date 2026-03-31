@@ -127,7 +127,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 			// Assassin16 gives cloak after the slow version
 			if (!isFastVariant && caster.TryGetActiveAbilityLevel(AbilityId.Assassin16, out var level))
 			{
-				caster.StartBuff(BuffId.Cloaking_Buff, skill.Level, 0, TimeSpan.FromSeconds(level), caster);
+				caster.StartBuff(BuffId.Cloaking_Buff, skill.Level, 0, TimeSpan.FromSeconds(level), caster, SkillId.Scout_Cloaking);
 			}
 		}
 	}
