@@ -42,6 +42,17 @@ namespace Melia.Zone.World.Actors.Monsters
 		public Character Owner { get; private set; }
 
 		/// <summary>
+		/// Returns the layer on which this companion exists.
+		/// When activated, always matches the owner's layer so the
+		/// companion stays visible after layer changes (e.g. dungeons).
+		/// </summary>
+		public override int Layer
+		{
+			get => this.IsActivated && this.Owner != null ? this.Owner.Layer : base.Layer;
+			set => base.Layer = value;
+		}
+
+		/// <summary>
 		/// Companion's slot in the companion list.
 		/// </summary>
 		public int Slot { get; set; }

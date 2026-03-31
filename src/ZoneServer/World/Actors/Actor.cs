@@ -172,7 +172,7 @@ namespace Melia.Zone.World.Actors
 		/// <summary>
 		/// Returns the layer on which this actor exists.
 		/// </summary>
-		public int Layer { get; set; }
+		public virtual int Layer { get; set; }
 
 		/// <summary>
 		/// Returns the time when the actor is removed from the map.
