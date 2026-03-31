@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 		SkillId.Bow_Hanging_Attack, SkillId.Pistol_Attack, SkillId.Cannon_Normal_Attack,
 		SkillId.CrossBow_Attack, SkillId.CrossBow_Attack2,
 		SkillId.Bow_Attack2, SkillId.Pistol_Attack2, SkillId.Cannon_Attack,
-		SkillId.DoubleGun_Attack, SkillId.DoubleBullet_Attack)]
+		SkillId.DoubleGun_Attack, SkillId.DoubleBullet_Attack, SkillId.Musket_Attack)]
 	public class TargetSkill : ITargetSkillHandler, IForceSkillHandler
 	{
 		/// <summary>
