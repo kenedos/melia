@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
@@ -23,10 +25,13 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 	public class rope_padOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
 	{
 		private const int UpdateIntervalMs = 100;
+		private const int CircleDamageIntervalMs = 1000;
 		private const int PadLifetimeMs = 120000;
 		private const int TrapMaxHP = 10;
 		private const float RotationAnglePerUpdate = 13f;
 		private const float InitialRotation = 40f;
+		private const float CenterCircleRadius = 20f;
+		private const string CircleTimerKey = "Melia.BroomTrap.CircleTimer";
 
 		public void Created(object sender, PadTriggerArgs args)
 		{
@@ -97,6 +102,34 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			{
 				fan.Rotate(RotationAnglePerUpdate);
 			}
+
+			if (pad.IsDead || skill == null)
+				return;
+
+			var timer = pad.Variables.GetFloat(CircleTimerKey) + UpdateIntervalMs;
+			if (timer < CircleDamageIntervalMs)
+			{
+				pad.Variables.SetFloat(CircleTimerKey, timer);
+				return;
+			}
+			pad.Variables.SetFloat(CircleTimerKey, 0f);
+
+			var splashArea = new Circle(pad.Position, CenterCircleRadius);
+			var targets = creator.Map.GetAttackableEntitiesIn(creator, splashArea).Take(8);
+
+			var hits = new List<SkillHitInfo>();
+
+			foreach (var target in targets)
+			{
+				var skillHitResult = SCR_SkillHit(creator, target, skill);
+				target.TakeDamage(skillHitResult.Damage, creator);
+
+				var skillHit = new SkillHitInfo(creator, target, skill, skillHitResult);
+				hits.Add(skillHit);
+			}
+
+			if (hits.Count > 0)
+				Send.ZC_SKILL_HIT_INFO(creator, hits);
 		}
 	}
 }
