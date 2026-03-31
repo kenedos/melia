@@ -516,8 +516,6 @@ namespace Melia.Zone.World.Dungeons
 			}
 		}
 
-		private bool _isTransitioning;
-
 		/// <summary>
 		/// Moves to the next stage based on the current stage's transitions.
 		/// Thread-safe to prevent concurrent stage transitions.
@@ -528,15 +526,8 @@ namespace Melia.Zone.World.Dungeons
 
 			lock (_stateLock)
 			{
-				if (_isTransitioning)
-					return;
-
-				_isTransitioning = true;
 				previousStage = this.CurrentStage;
 			}
-
-			try
-			{
 
 			previousStage?.Complete();
 
@@ -605,15 +596,6 @@ namespace Melia.Zone.World.Dungeons
 			{
 				// No more stages, the dungeon is complete.
 				dungeonScript.DungeonComplete(this);
-			}
-
-			}
-			finally
-			{
-				lock (_stateLock)
-				{
-					_isTransitioning = false;
-				}
 			}
 		}
 

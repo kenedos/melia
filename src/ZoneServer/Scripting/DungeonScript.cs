@@ -484,6 +484,17 @@ namespace Melia.Zone.Scripting
 				return;
 			}
 
+			// If the character is on the dungeon map but has no instance mapping
+			// and no dungeon ID, they're reconnecting after completion — warp out
+			var dungeonIdVar = character.Variables.Perm.GetInt(AutoMatchZoneManager.DungeonIdVarName);
+			if (dungeonIdVar == 0 && character.Map.ClassName == this.MapName)
+			{
+				Log.Info("DungeonScript: Character '{0}' reconnected on dungeon map with no active instance. Warping out.", character.Name);
+				while (character.IsWarping && character.Map != null) await Task.Delay(50);
+				character.Warp(character.GetCityReturnLocation());
+				return;
+			}
+
 			// Get party - players must be in a party to enter dungeons
 			var party = character.Connection?.Party;
 			if (party == null)
@@ -609,11 +620,20 @@ namespace Melia.Zone.Scripting
 		{
 			// First check direct mapping
 			if (_instancesByCharacter.TryGetValue(characterDbId, out var instance))
-				return instance;
+			{
+				if (instance.State != InstanceState.Destroyed)
+					return instance;
+
+				// Stale mapping to destroyed instance — clean it up
+				_instancesByCharacter.TryRemove(characterDbId, out _);
+			}
 
 			// Check all instances to see if character was an original member
 			foreach (var inst in _instancesByOwner.Values)
 			{
+				if (inst.State == InstanceState.Destroyed)
+					continue;
+
 				if (inst.Characters.Any(c => c?.DbId == characterDbId))
 					return inst;
 			}
@@ -628,6 +648,17 @@ namespace Melia.Zone.Scripting
 		private async Task JoinInstance(Character character, InstanceDungeon instance)
 		{
 			while (character.IsWarping && character.Map != null) await Task.Delay(50);
+
+			// Don't join destroyed instances
+			if (instance.State == InstanceState.Destroyed)
+			{
+				_instancesByCharacter.TryRemove(character.DbId, out _);
+				character.Variables.Perm.SetString(ActiveInstanceVarName, null);
+				character.Variables.Perm.SetInt(AutoMatchZoneManager.DungeonIdVarName, 0);
+				character.Variables.Perm.SetLong(AutoMatchZoneManager.SessionIdVarName, 0);
+				character.Warp(character.GetCityReturnLocation());
+				return;
+			}
 
 			// If dungeon hasn't started yet (pre-created instance), start it
 			if (!instance.IsStarted)
@@ -698,6 +729,18 @@ namespace Melia.Zone.Scripting
 		/// </summary>
 		private async Task RejoinInstance(Character character, InstanceDungeon instance)
 		{
+			// Don't rejoin a destroyed instance
+			if (instance.State == InstanceState.Destroyed)
+			{
+				_instancesByCharacter.TryRemove(character.DbId, out _);
+				character.Variables.Perm.SetString(ActiveInstanceVarName, null);
+				character.Variables.Perm.SetInt(AutoMatchZoneManager.DungeonIdVarName, 0);
+				character.Variables.Perm.SetLong(AutoMatchZoneManager.SessionIdVarName, 0);
+				Log.Info("DungeonScript: Character '{0}' tried to rejoin destroyed instance '{1}'. Warping out.", character.Name, instance.Id);
+				character.Warp(character.GetCityReturnLocation());
+				return;
+			}
+
 			// Check if rejoining is allowed by config
 			if (!ZoneServer.Instance.Conf.World.InstancedDungeonAllowRejoin)
 			{
@@ -977,12 +1020,10 @@ namespace Melia.Zone.Scripting
 			instance.Cleanup();
 
 			// Clear character mappings for all characters that were associated
-			foreach (var kvp in _instancesByCharacter)
+			var keysToRemove = _instancesByCharacter.Where(kvp => kvp.Value == instance).Select(kvp => kvp.Key).ToList();
+			foreach (var key in keysToRemove)
 			{
-				if (kvp.Value == instance)
-				{
-					_instancesByCharacter.TryRemove(kvp.Key, out _);
-				}
+				_instancesByCharacter.TryRemove(key, out _);
 			}
 
 			// Remove owner association only if this instance is still the one mapped
@@ -1043,7 +1084,12 @@ namespace Melia.Zone.Scripting
 		{
 			if (ZoneServer.Instance.World.TryGetMap(this.MapName, out var map))
 			{
-				var portal = new Npc(MonsterId.MissionGate, "Exit Portal", instance.Characters.FirstOrDefault().Position.GetRandomInRange2D(20, 30), instance.Characters.FirstOrDefault().Direction.Backwards)
+				var leader = instance.Owner?.Connection?.Party?.GetLeader()
+					?? instance.Characters.FirstOrDefault(c => c != null && c.MapId == instance.MapId);
+				var portalPos = leader?.Position.GetRandomInRange2D(20, 30) ?? instance.StartPosition;
+				var portalDir = leader?.Direction.Backwards ?? Direction.South;
+
+				var portal = new Npc(MonsterId.MissionGate, "Exit Portal", portalPos, portalDir)
 				{
 					Layer = instance.Layer
 				};
@@ -1054,7 +1100,7 @@ namespace Melia.Zone.Scripting
 				portal.SetClickTrigger("ExitPortalDialog", async (dialog) =>
 				{
 					dialog.Player.Warp(dialog.Player.GetCityReturnLocation());
-					this.DungeonEnded(instance, false);
+					instance.Cleanup();
 				});
 			}
 		}
@@ -1223,10 +1269,14 @@ namespace Melia.Zone.Scripting
 			{
 				if (character == null) continue;
 
-				// Only process if the character is still associated with THIS instance
-				// This prevents stale dungeon completions from interfering with new instances
-				if (!_instancesByCharacter.TryGetValue(character.DbId, out var mappedInstance) || mappedInstance != instance)
-					continue;
+				// Cancel activity monitoring before clearing instance tracking,
+				// otherwise the monitor sees no mapping and warps the player
+				// out before the auto-warp delay expires.
+				if (_activityCheckTokens.TryRemove(character.DbId, out var activityCts))
+				{
+					activityCts.Cancel();
+					activityCts.Dispose();
+				}
 
 				// Cancel any existing warp token before creating a new one
 				if (_warpCancellationTokens.TryRemove(character.DbId, out var existingCts))
@@ -1306,18 +1356,18 @@ namespace Melia.Zone.Scripting
 
 				character.Warp(character.GetCityReturnLocation());
 
-				// After warping, check if dungeon is complete and all characters have left
-				// If so, end the dungeon properly instead of waiting for timeout
-				if (instance.IsComplete)
+				// Clean up instance resources (monsters, portals, stages) once
+				// all players have left. Cleanup is idempotent — the Destroyed
+				// state guard prevents double cleanup.
+				try
 				{
-					await Task.Delay(500, token); // Small delay to ensure warp is processed
+					await Task.Delay(500);
+				}
+				catch (TaskCanceledException) { }
 
-					var anyMemberInside = instance.Characters.Any(c => c != null && c.MapId == instance.MapId);
-					if (!anyMemberInside)
-					{
-						// Use DungeonEnded to properly clean up character variables and auto-match session
-						this.DungeonEnded(instance, false);
-					}
+				if (!instance.Characters.Any(c => c != null && c.MapId == instance.MapId))
+				{
+					instance.Cleanup();
 				}
 			}
 			catch (TaskCanceledException) { }
