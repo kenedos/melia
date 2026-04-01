@@ -53,6 +53,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 			{
 				claymore.MonsterType = RelationType.Friendly;
 				claymore.Faction = FactionType.Law;
+				claymore.SetHittable(false);
 				claymore.StartBuff(BuffId.Invincible);
 				claymore.Vars.Set("Skill", skill);
 				claymore.Vars.Set("Caster", caster);

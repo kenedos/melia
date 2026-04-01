@@ -50,6 +50,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			{
 				trap.MonsterType = RelationType.Friendly;
 				trap.Faction = FactionType.Law;
+				trap.SetHittable(false);
 				trap.StartBuff(BuffId.Invincible);
 			}
 			PadSetJumpRope(pad, "I_laser013", 1, 80, 0, 3, 1, 40, 3, 10);

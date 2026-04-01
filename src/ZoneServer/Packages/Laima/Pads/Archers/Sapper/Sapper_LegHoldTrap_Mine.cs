@@ -47,6 +47,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			{
 				trap.MonsterType = RelationType.Friendly;
 				trap.Faction = FactionType.Law;
+				trap.SetHittable(false);
 				trap.StartBuff(BuffId.Invincible);
 			}
 		}

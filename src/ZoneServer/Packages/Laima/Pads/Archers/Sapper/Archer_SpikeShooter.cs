@@ -61,6 +61,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 				var startMob = (Mob)startMonster;
 				startMob.MonsterType = RelationType.Friendly;
 				startMob.Faction = FactionType.Law;
+				startMob.SetHittable(false);
 				startMob.StartBuff(BuffId.Invincible);
 				pad.Variables.Set(StartMonsterKey, startMonster);
 			}
@@ -70,6 +71,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 				var endMob = (Mob)endMonster;
 				endMob.MonsterType = RelationType.Friendly;
 				endMob.Faction = FactionType.Law;
+				endMob.SetHittable(false);
 				endMob.StartBuff(BuffId.Invincible);
 				pad.Variables.Set(EndMonsterKey, endMonster);
 			}

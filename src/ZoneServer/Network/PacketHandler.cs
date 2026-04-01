@@ -4317,13 +4317,10 @@ namespace Melia.Zone.Network
 			var accountId = packet.GetLong();
 
 			var account = ZoneServer.Instance.World.GetCharacter(c => c.AccountDbId == accountId);
-			if (account != null)
-			{
-				var character = account.Connection.SelectedCharacter;
-				// Removed: Guild type deleted during Laima merge
+			var character = account?.Connection?.SelectedCharacter;
+			if (character != null)
 				Send.ZC_RESPONSE_GUILD_INDEX(conn, character, null);
 			}
-		}
 
 		/// <summary>
 		/// Sent during login after an unexpected disconnect.
