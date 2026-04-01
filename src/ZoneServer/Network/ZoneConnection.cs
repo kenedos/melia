@@ -266,6 +266,7 @@ namespace Melia.Zone.Network
 		{
 			base.OnClosed(type);
 
+			this.LoggedIn = false;
 			this.LoadComplete = false;
 			var account = this.Account;
 			var character = this.SelectedCharacter;
@@ -286,6 +287,18 @@ namespace Melia.Zone.Network
 					Party = this.Party,
 				};
 
+				this.NullifyConnectionReferences();
+				return;
+			}
+
+			// FinalizeWarp already handled all cleanup (buff removal,
+			// map removal, hook unregistration, etc.) and enqueued a
+			// full save. Only do a light character save here in case
+			// OnClosed cleanup changed any state, then nullify.
+			if (character.SavedForWarp)
+			{
+				character.IsWarping = false;
+				SaveQueue.SaveCharacter(character);
 				this.NullifyConnectionReferences();
 				return;
 			}
@@ -327,27 +340,11 @@ namespace Melia.Zone.Network
 			ZoneServer.Instance.World.BattleManager.ForceEndBattle(character);
 			character.Properties.RemoveEvents();
 
-			var wasSavedForWarp = character.SavedForWarp;
-
-			if (wasSavedForWarp)
+			SaveQueue.SaveAccountAndCharacter(account, character, this.SessionKey);
+			SaveQueue.Enqueue(() =>
 			{
-				// FinalizeWarp already enqueued a full SaveAccountAndCharacter
-				// that will set LoginState to LoggedOut. Only save character
-				// data here (in case OnClosed cleanup changed state) without
-				// touching login state — the destination zone will set it to
-				// Zone when the player reconnects. Using SaveAccountAndCharacter
-				// here would race with the destination zone's UpdateLoginState
-				// on cross-server warps.
-				SaveQueue.SaveCharacter(character);
-			}
-			else
-			{
-				SaveQueue.SaveAccountAndCharacter(account, character, this.SessionKey);
-				SaveQueue.Enqueue(() =>
-				{
-					CharacterLockManager.TryRemoveLock(character.DbId);
-				});
-			}
+				CharacterLockManager.TryRemoveLock(character.DbId);
+			});
 
 			this.NullifyConnectionReferences();
 		}

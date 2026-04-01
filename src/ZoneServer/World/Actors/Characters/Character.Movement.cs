@@ -397,6 +397,8 @@ namespace Melia.Zone.World.Actors.Characters
 
 					Log.Info($"Instructing client for '{this.Name}' (ID: {this.DbId}) to move to Zone Server {serverInfo.Ip}:{serverInfo.Port}, Map {destinationMapId}, Channel {channelId}.");
 					Send.ZC_MOVE_ZONE_OK(this, channelId, serverInfo.Ip, serverInfo.Port, destinationMapId);
+
+					this.Connection.LoggedIn = false;
 				}
 				else
 				{
