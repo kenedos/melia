@@ -240,11 +240,39 @@ namespace Melia.Zone.World.Spawning
 				map.AddMonster(monster);
 				monster.SpawnPosition = monster.Position;
 				monster.PossiblyBecomeRare();
+				this.ApplySpawnBuffs(monster, map);
 
 				this.Spawned?.Invoke(this, new SpawnEventArgs(this, monster));
 			}
 
 			this.Amount += amount;
+		}
+
+		/// <summary>
+		/// Applies spawn buffs registered on the map to the monster.
+		/// Skips buffs the monster already has (e.g. from PossiblyBecomeRare).
+		/// </summary>
+		/// <param name="monster"></param>
+		/// <param name="map"></param>
+		private void ApplySpawnBuffs(Mob monster, Map map)
+		{
+			var spawnBuffs = map.GetSpawnBuffs();
+			if (spawnBuffs.Length == 0)
+				return;
+
+			foreach (var entry in spawnBuffs)
+			{
+				if (entry.MonsterClassId != 0 && entry.MonsterClassId != monster.Id)
+					continue;
+
+				if (monster.IsBuffActive(entry.BuffId))
+					continue;
+
+				if (_rnd.NextDouble() * 100 >= entry.Chance)
+					continue;
+
+				monster.StartBuff(entry.BuffId, entry.NumArg1, entry.NumArg2, TimeSpan.Zero, monster);
+			}
 		}
 
 		/// <summary>

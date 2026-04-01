@@ -15,15 +15,19 @@ public class DZachariel36MobScript : GeneralScript
 	{
 		// Property Overrides -------------------------------
 
+		// Spawn Buffs -------------------------------------
+		AddSpawnBuff("d_zachariel_36", MonsterId.Schlesien_Darkmage, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_36", MonsterId.Schlesien_Heavycavarly, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_36", MonsterId.Schlesien_Claw, BuffId.EliteMonsterBuff, chance: 100);
 
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_zachariel_36.Id1", MonsterId.Rootcrystal_05, min: 8, max: 10, respawn: Seconds(15), tendency: TendencyType.Peaceful);
-		AddSpawner("d_zachariel_36.Id2", MonsterId.Schlesien_Darkmage, min: 8, max: 12, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_36.Id3", MonsterId.Schlesien_Heavycavarly, amount: 7, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_36.Id4", MonsterId.Schlesien_Claw, min: 19, max: 30, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_36.Id5", MonsterId.Schlesien_Darkmage, min: 18, max: 24, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_36.Id6", MonsterId.Schlesien_Darkmage, min: 6, max: 8, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id2", MonsterId.Schlesien_Darkmage, min: 3, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id3", MonsterId.Schlesien_Heavycavarly, amount: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id4", MonsterId.Schlesien_Claw, min: 7, max: 12, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id5", MonsterId.Schlesien_Darkmage, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id6", MonsterId.Schlesien_Claw, min: 4, max: 6, tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 

@@ -13,13 +13,20 @@ public class DAbbey225MobScript : GeneralScript
 {
 	protected override void Load()
 	{
+		// Property Overrides -------------------------------
+
+		// Spawn Buffs -------------------------------------
+		AddSpawnBuff("d_abbey_22_5", MonsterId.Hohen_Orben_Black, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_abbey_22_5", MonsterId.Harugal_Black, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_abbey_22_5", MonsterId.Hohen_Mage_Black, BuffId.EliteMonsterBuff, chance: 100);
+
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_abbey_22_5.Id1", MonsterId.Rootcrystal_01, min: 16, max: 21, respawn: Minutes(1));
-		AddSpawner("d_abbey_22_5.Id2", MonsterId.Hohen_Orben_Black, min: 15, max: 20, tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_5.Id3", MonsterId.Harugal_Black, min: 15, max: 20, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id2", MonsterId.Hohen_Orben_Black, min: 7, max: 9, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id3", MonsterId.Harugal_Black, min: 8, max: 12, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_5.Id4", MonsterId.Drooper, min: 15, max: 20, tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_5.Id5", MonsterId.Hohen_Mage_Black, min: 128, max: 170, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id5", MonsterId.Hohen_Mage_Black, min: 24, max: 32, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_5.Id6", MonsterId.Hohen_Orben_Black, min: 5, max: 6, respawn: Seconds(40), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_5.Id7", MonsterId.Drooper, amount: 2, respawn: Seconds(40), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_5.Id8", MonsterId.Harugal_Black, min: 3, max: 4, respawn: Seconds(40), tendency: TendencyType.Aggressive);

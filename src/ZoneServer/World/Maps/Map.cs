@@ -20,6 +20,7 @@ using Melia.Zone.World.Actors.Pads;
 using Melia.Zone.World.Maps.Pathfinding;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Maps.Spatial;
+using Melia.Zone.World.Spawning;
 using Yggdrasil.Geometry;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
@@ -51,6 +52,7 @@ namespace Melia.Zone.World.Maps
 		private readonly ConcurrentQueue<IMonster> _addMonsters = new();
 		private DateTime _lastPlayerLeftTime = DateTime.MinValue;
 		protected readonly Dictionary<int, PropertyOverrides> _monsterPropertyOverrides = new();
+		protected readonly List<SpawnBuffEntry> _spawnBuffs = new();
 
 		private readonly List<IUpdateable> _updateEntities = new();
 		private readonly List<Character> _updateVisibleCharacters = new();
@@ -903,6 +905,9 @@ namespace Melia.Zone.World.Maps
 
 			foreach (var monster in toRemove)
 				this.RemoveMonster(monster);
+
+			lock (_spawnBuffs)
+				_spawnBuffs.Clear();
 		}
 		#endregion
 
@@ -1732,6 +1737,29 @@ namespace Melia.Zone.World.Maps
 		{
 			lock (_monsterPropertyOverrides)
 				return _monsterPropertyOverrides.TryGetValue(monsterClassId, out propertyOverrides);
+		}
+		#endregion
+
+		#region Spawn Buffs
+		/// <summary>
+		/// Registers a buff to be applied to monsters when they spawn
+		/// on this map.
+		/// </summary>
+		/// <param name="entry"></param>
+		public void AddSpawnBuff(SpawnBuffEntry entry)
+		{
+			lock (_spawnBuffs)
+				_spawnBuffs.Add(entry);
+		}
+
+		/// <summary>
+		/// Returns a snapshot of the spawn buff entries for this map.
+		/// </summary>
+		/// <returns></returns>
+		public SpawnBuffEntry[] GetSpawnBuffs()
+		{
+			lock (_spawnBuffs)
+				return _spawnBuffs.ToArray();
 		}
 		#endregion
 

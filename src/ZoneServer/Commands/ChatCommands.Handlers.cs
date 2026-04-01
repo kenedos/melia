@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Melia.Zone.Buffs.Handlers.Monster;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Game.Properties;
@@ -1594,6 +1595,8 @@ namespace Melia.Zone.Commands
 
 			if (!string.IsNullOrWhiteSpace(aiName))
 				monster.Components.Add(new AiComponent(monster, aiName));
+
+			MythicBuffHelper.ApplyMythicStats(monster);
 
 			target.Map.AddMonster(monster);
 

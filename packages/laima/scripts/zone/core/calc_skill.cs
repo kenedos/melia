@@ -455,7 +455,12 @@ public class SkillCalculationsScript : GeneralScript
 		var sklSpdRate = skill.Properties.GetFloat(PropertyName.SklSpdRate, 1);
 		var baseValue = skill.Data.ShootTime.TotalMilliseconds;
 
-		return (float)(baseValue / sklSpdRate);
+		var result = (float)(baseValue / sklSpdRate);
+
+		if (skill.Owner is Mob mob && mob.Vars.TryGet<float>("Melia.ShootTimeMultiplier", out var mult))
+			result *= mult;
+
+		return result;
 	}
 
 	/// <summary>

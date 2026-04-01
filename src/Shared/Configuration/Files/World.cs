@@ -141,6 +141,16 @@ namespace Melia.Shared.Configuration.Files
 		public float RedOrbJackpotRate { get; protected set; }
 		public float RedOrbEliteRate { get; protected set; }
 
+		// mythic monsters
+		public float MythicSpawnChance { get; protected set; }
+		public int MythicMinLevel { get; protected set; }
+		public bool MythicAlwaysAggressive { get; protected set; }
+		public float MythicHPSPRate { get; protected set; }
+		public float MythicStatRate { get; protected set; }
+		public float MythicExpRate { get; protected set; }
+		public int MythicRolls { get; protected set; }
+		public float MythicGuaranteedItemThreshold { get; protected set; }
+
 		// boss_monsters.conf
 		public float BossHPSPRate { get; protected set; }
 		public float BossStatRate { get; protected set; }
@@ -352,6 +362,15 @@ namespace Melia.Shared.Configuration.Files
 			this.EliteAlwaysAggressive = this.GetBool("elite_always_aggressive", true);
 			this.RedOrbJackpotRate = this.GetFloat("red_orb_jackpot_rate", 10000);
 			this.RedOrbEliteRate = this.GetFloat("red_orb_elite_rate", 1000);
+
+			this.MythicSpawnChance = this.GetFloat("mythic_spawn_chance", 0.1f);
+			this.MythicMinLevel = this.GetInt("mythic_min_level", 20);
+			this.MythicAlwaysAggressive = this.GetBool("mythic_always_aggressive", true);
+			this.MythicHPSPRate = this.GetFloat("mythic_hpsp_rate", 600);
+			this.MythicStatRate = this.GetFloat("mythic_stat_rate", 400);
+			this.MythicExpRate = this.GetFloat("mythic_exp_rate", 3000);
+			this.MythicRolls = this.GetInt("mythic_rolls", 15);
+			this.MythicGuaranteedItemThreshold = this.GetFloat("mythic_guaranteed_item_threshold", 5);
 
 			this.BossHPSPRate = this.GetFloat("boss_hpsp_rate", 100);
 			this.BossStatRate = this.GetFloat("boss_stat_rate", 100);

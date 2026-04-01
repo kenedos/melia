@@ -150,7 +150,7 @@ namespace Melia.Zone.Skills.Combat
 				KnockDirection.TowardsTarget => caster.Position,
 				KnockDirection.TowardsCaster => target.Position.GetRelative(caster.Position.GetDirection(target.Position), 200f),
 				KnockDirection.CasterForward => target.Position.GetRelative(caster.Direction.Backwards, 100f),
-				KnockDirection.Random => target.Position.GetRelative(new Direction(RandomProvider.Get().NextDouble() * Math.PI * 2), 100f),
+				KnockDirection.Random => target.Position.GetRelative(new Direction(RandomProvider.Get().NextDouble() * 360), 100f),
 				_ => caster.Position,
 			};
 		}

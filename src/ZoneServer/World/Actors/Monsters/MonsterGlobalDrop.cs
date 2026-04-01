@@ -69,29 +69,35 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (killer.Map.Data?.Type == MapType.Dungeon || killer.Map.IsInstance)
 				return drops;
 
-			var isSuperMob = this.TryGetSuperMob(out var superMobType);
+			var superMobTypes = this.GetSuperMobTypes();
+			var isSuperMob = superMobTypes.Count > 0;
 			var superMobRerolls = 0;
 			var superMobItemThreshold = 0f;
 			var worldConf = ZoneServer.Instance.Conf.World;
 
-			// Set reroll counts and guaranteed thresholds based on mob type
-			if (isSuperMob)
+			// Accumulate reroll counts and guaranteed thresholds from all types
+			foreach (var superMobType in superMobTypes)
 			{
 				switch (superMobType)
 				{
 					case SuperMobType.Silver:
-						superMobRerolls = worldConf.SilverJackpotRolls;
-						superMobItemThreshold = worldConf.SilverJackpotGuaranteedItemThreshold / 100f;
+						superMobRerolls += worldConf.SilverJackpotRolls;
+						superMobItemThreshold = Math.Max(superMobItemThreshold, worldConf.SilverJackpotGuaranteedItemThreshold / 100f);
 						break;
 
 					case SuperMobType.Gold:
-						superMobRerolls = worldConf.GoldJackpotRolls;
-						superMobItemThreshold = worldConf.GoldJackpotGuaranteedItemThreshold / 100f;
+						superMobRerolls += worldConf.GoldJackpotRolls;
+						superMobItemThreshold = Math.Max(superMobItemThreshold, worldConf.GoldJackpotGuaranteedItemThreshold / 100f);
 						break;
 
 					case SuperMobType.Elite:
-						superMobRerolls = worldConf.EliteRolls;
-						superMobItemThreshold = worldConf.EliteGuaranteedItemThreshold / 100f;
+						superMobRerolls += worldConf.EliteRolls;
+						superMobItemThreshold = Math.Max(superMobItemThreshold, worldConf.EliteGuaranteedItemThreshold / 100f);
+						break;
+
+					case SuperMobType.Mythic:
+						superMobRerolls += worldConf.MythicRolls;
+						superMobItemThreshold = Math.Max(superMobItemThreshold, worldConf.MythicGuaranteedItemThreshold / 100f);
 						break;
 				}
 			}

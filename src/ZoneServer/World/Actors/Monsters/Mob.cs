@@ -701,6 +701,11 @@ namespace Melia.Zone.World.Actors.Monsters
 				expRate *= worldConf.EliteExpRate / 100.0;
 				jobExpRate *= worldConf.EliteExpRate / 100.0;
 			}
+			if (this.IsMythicMonster())
+			{
+				expRate *= worldConf.MythicExpRate / 100.0;
+				jobExpRate *= worldConf.MythicExpRate / 100.0;
+			}
 			if (this.Rank == MonsterRank.Boss)
 			{
 				expRate *= worldConf.BossExpRate / 100.0;
@@ -814,16 +819,21 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			// Map bonus drops
 			var mapBonusRerolls = 1;
-			if (this.TryGetSuperMob(out var superMobType))
+			var superMobTypes = this.GetSuperMobTypes();
+			if (superMobTypes.Count > 0)
 			{
 				var worldConf = ZoneServer.Instance.Conf.World;
-				mapBonusRerolls = superMobType switch
+				foreach (var type in superMobTypes)
 				{
-					SuperMobType.Silver => worldConf.SilverJackpotRolls,
-					SuperMobType.Gold => worldConf.GoldJackpotRolls,
-					SuperMobType.Elite => worldConf.EliteRolls,
-					_ => 1
-				};
+					mapBonusRerolls += type switch
+					{
+						SuperMobType.Silver => worldConf.SilverJackpotRolls,
+						SuperMobType.Gold => worldConf.GoldJackpotRolls,
+						SuperMobType.Elite => worldConf.EliteRolls,
+						SuperMobType.Mythic => worldConf.MythicRolls,
+						_ => 0
+					};
+				}
 			}
 			this.DropMapBonusItems(killer, mapBonusRerolls);
 		}
@@ -868,7 +878,8 @@ namespace Melia.Zone.World.Actors.Monsters
 				adjustedDropChance *= lootingRate;
 
 				// Calculate Enhanced drops for super mobs
-				var isSuperMob = this.TryGetSuperMob(out var superMobType);
+				var superMobTypes = this.GetSuperMobTypes();
+				var isSuperMob = superMobTypes.Count > 0;
 				var superMobRerolls = 0;
 				var superMobGuaranteedItemDrop = false;
 				var superMobMoneyMultiplier = 0f;
@@ -876,29 +887,36 @@ namespace Melia.Zone.World.Actors.Monsters
 				if (isSuperMob)
 				{
 					var worldConf = ZoneServer.Instance.Conf.World;
-					switch (superMobType)
+					foreach (var superMobType in superMobTypes)
 					{
-						case SuperMobType.Silver:
-							superMobRerolls = worldConf.SilverJackpotRolls;
-							superMobGuaranteedItemDrop = originalDropChance > worldConf.SilverJackpotGuaranteedItemThreshold;
-							superMobMoneyMultiplier = worldConf.SilverJackpotRolls / 20f;
-							superMobMoneyStacks = rnd.Next(40, 50);
-							break;
+						switch (superMobType)
+						{
+							case SuperMobType.Silver:
+								superMobRerolls += worldConf.SilverJackpotRolls;
+								superMobGuaranteedItemDrop |= originalDropChance > worldConf.SilverJackpotGuaranteedItemThreshold;
+								superMobMoneyMultiplier += worldConf.SilverJackpotRolls / 20f;
+								break;
 
-						case SuperMobType.Gold:
-							superMobRerolls = worldConf.GoldJackpotRolls;
-							superMobGuaranteedItemDrop = originalDropChance > worldConf.GoldJackpotGuaranteedItemThreshold;
-							superMobMoneyMultiplier = worldConf.GoldJackpotRolls / 20f;
-							superMobMoneyStacks = rnd.Next(40, 50);
-							break;
+							case SuperMobType.Gold:
+								superMobRerolls += worldConf.GoldJackpotRolls;
+								superMobGuaranteedItemDrop |= originalDropChance > worldConf.GoldJackpotGuaranteedItemThreshold;
+								superMobMoneyMultiplier += worldConf.GoldJackpotRolls / 20f;
+								break;
 
-						case SuperMobType.Elite:
-							superMobRerolls = worldConf.EliteRolls;
-							superMobGuaranteedItemDrop = originalDropChance > worldConf.EliteGuaranteedItemThreshold;
-							superMobMoneyMultiplier = worldConf.EliteRolls / 20f;
-							superMobMoneyStacks = rnd.Next(40, 50);
-							break;
+							case SuperMobType.Elite:
+								superMobRerolls += worldConf.EliteRolls;
+								superMobGuaranteedItemDrop |= originalDropChance > worldConf.EliteGuaranteedItemThreshold;
+								superMobMoneyMultiplier += worldConf.EliteRolls / 20f;
+								break;
+
+							case SuperMobType.Mythic:
+								superMobRerolls += worldConf.MythicRolls;
+								superMobGuaranteedItemDrop |= originalDropChance > worldConf.MythicGuaranteedItemThreshold;
+								superMobMoneyMultiplier += worldConf.MythicRolls / 20f;
+								break;
+						}
 					}
+					superMobMoneyStacks = rnd.Next(40, 50);
 				}
 
 				if (this.Rank == MonsterRank.Boss)
@@ -974,30 +992,49 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <returns></returns>
 		private bool TryGetSuperMob(out SuperMobType superMobType)
 		{
-			superMobType = (SuperMobType)(-1);
-
-			// Note: The client cannot handle SuperDrop and EliteMonsterBuff
-			// together.
-			if (this.Buffs.Has(BuffId.EliteMonsterBuff))
+			var types = this.GetSuperMobTypes();
+			if (types.Count > 0)
 			{
-				superMobType = SuperMobType.Elite;
+				superMobType = types[0];
 				return true;
 			}
+
+			superMobType = (SuperMobType)(-1);
+			return false;
+		}
+
+		private List<SuperMobType> GetSuperMobTypes()
+		{
+			var types = new List<SuperMobType>();
+
+			if (this.IsMythicMonster())
+				types.Add(SuperMobType.Mythic);
+
+			if (this.Buffs.Has(BuffId.EliteMonsterBuff))
+				types.Add(SuperMobType.Elite);
+
 			if (this.Buffs.TryGet(BuffId.SuperDrop, out var buff))
 			{
 				if (buff.NumArg2 == 0)
-				{
-					superMobType = SuperMobType.Silver;
-					return true;
-				}
+					types.Add(SuperMobType.Silver);
 				else if (buff.NumArg2 == 1)
-				{
-					superMobType = SuperMobType.Gold;
-					return true;
-				}
+					types.Add(SuperMobType.Gold);
 			}
 
-			return false;
+			return types;
+		}
+
+		/// <summary>
+		/// Returns true if this monster has any mythic buff active.
+		/// </summary>
+		public bool IsMythicMonster()
+		{
+			return this.IsBuffActive(BuffId.Mythic_Chain_Lightning_Buff)
+				|| this.IsBuffActive(BuffId.Mythic_Boosting_Morale_Buff)
+				|| this.IsBuffActive(BuffId.Mythic_Puddle_Buff)
+				|| this.IsBuffActive(BuffId.Mythic_Bomb_Buff)
+				|| this.IsBuffActive(BuffId.Mythic_InfectiousDisease_Buff)
+				|| this.IsBuffActive(BuffId.Mythic_Link_Buff);
 		}
 
 		/// <summary>
@@ -1296,6 +1333,30 @@ namespace Melia.Zone.World.Actors.Monsters
 					this.Tendency = TendencyType.Aggressive;
 
 				// TODO: Add summoning and special attacks.
+				return;
+			}
+
+			if (this.Level < worldConf.MythicMinLevel)
+				return;
+
+			var mythicChance = worldConf.MythicSpawnChance * eliteRate / 100f;
+			if (rnd.NextDouble() * 100 < mythicChance)
+			{
+				var mythicBuffs = new[]
+				{
+					BuffId.Mythic_Chain_Lightning_Buff,
+					BuffId.Mythic_Boosting_Morale_Buff,
+					BuffId.Mythic_Puddle_Buff,
+					BuffId.Mythic_Bomb_Buff,
+					BuffId.Mythic_InfectiousDisease_Buff,
+					BuffId.Mythic_Link_Buff,
+				};
+
+				var chosenBuff = mythicBuffs[rnd.Next(mythicBuffs.Length)];
+				this.StartBuff(chosenBuff, 1, 0, TimeSpan.Zero, this);
+
+				if (worldConf.MythicAlwaysAggressive)
+					this.Tendency = TendencyType.Aggressive;
 			}
 		}
 

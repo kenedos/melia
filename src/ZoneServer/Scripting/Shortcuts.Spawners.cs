@@ -305,6 +305,41 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Registers a buff to be applied with a percentage chance to
+		/// monsters when they spawn on the given map. If a monster
+		/// already has the buff (e.g. from the rare monster system),
+		/// it will not be applied again.
+		/// </summary>
+		/// <param name="mapClassName"></param>
+		/// <param name="buffId"></param>
+		/// <param name="chance">Chance in percent (0-100) for the buff to be applied.</param>
+		/// <param name="numArg1">First numeric argument for the buff.</param>
+		/// <param name="numArg2">Second numeric argument for the buff.</param>
+		public static void AddSpawnBuff(string mapClassName, BuffId buffId, float chance, float numArg1 = 0, float numArg2 = 0)
+		{
+			var map = GetMapOrThrow(mapClassName);
+			map.AddSpawnBuff(new SpawnBuffEntry(buffId, chance, numArg1, numArg2));
+		}
+
+		/// <summary>
+		/// Registers a buff to be applied with a percentage chance to a
+		/// specific monster type when it spawns on the given map. If the
+		/// monster already has the buff (e.g. from the rare monster system),
+		/// it will not be applied again.
+		/// </summary>
+		/// <param name="mapClassName"></param>
+		/// <param name="monsterClassId">The monster class id to apply the buff to.</param>
+		/// <param name="buffId"></param>
+		/// <param name="chance">Chance in percent (0-100) for the buff to be applied.</param>
+		/// <param name="numArg1">First numeric argument for the buff.</param>
+		/// <param name="numArg2">Second numeric argument for the buff.</param>
+		public static void AddSpawnBuff(string mapClassName, int monsterClassId, BuffId buffId, float chance, float numArg1 = 0, float numArg2 = 0)
+		{
+			var map = GetMapOrThrow(mapClassName);
+			map.AddSpawnBuff(new SpawnBuffEntry(buffId, chance, numArg1, numArg2, monsterClassId));
+		}
+
+		/// <summary>
 		/// Adds an override for the properties of a monster on a specific
 		/// map. These override the stats of monsters spawned via spawners
 		/// if no property overrides are specified for the spawner itself.

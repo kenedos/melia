@@ -5,5 +5,6 @@
 		Silver = 0,
 		Gold = 1,
 		Elite = 2,
+		Mythic = 3,
 	}
 }

@@ -63,9 +63,10 @@ namespace Melia.Shared.Network.Helpers
 			{
 				packet.PutInt(0);
 
-				// Visual Equip Ids?
-				for (var i = 0; i < InventoryDefaults.EquipItems.Length; ++i)
-					packet.PutInt(InventoryDefaults.EquipItems[i]);
+				// Visual Equip Ids (with briquetting overrides)
+				var visualEquipIds = appearancePc.GetVisualEquipIds();
+				for (var i = 0; i < visualEquipIds.Length; ++i)
+					packet.PutInt(visualEquipIds[i]);
 			}
 
 			// [i336041, 2021-07-25]
@@ -199,5 +200,12 @@ namespace Melia.Shared.Network.Helpers
 		/// </summary>
 		/// <returns></returns>
 		int[] GetEquipIds();
+
+		/// <summary>
+		/// Returns the ids of the character's equipment with
+		/// briquetting appearance overrides applied.
+		/// </summary>
+		/// <returns></returns>
+		int[] GetVisualEquipIds();
 	}
 }

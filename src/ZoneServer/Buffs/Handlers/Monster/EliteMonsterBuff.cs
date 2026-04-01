@@ -56,9 +56,12 @@ namespace Melia.Zone.Buffs.Handlers
 			var runSpeed = monster.Properties.GetFloat(PropertyName.RunMSPD);
 			var baseRunSpeed = 60;
 			var additionalRunSpeed = Math.Max(3, runSpeed - baseRunSpeed);
-			propertyOverrides.Add(PropertyName.RunMSPD, runSpeed + (additionalRunSpeed * worldConf.EliteStatRate / 100f));
+			propertyOverrides.Add(PropertyName.RunMSPD, runSpeed + (additionalRunSpeed * worldConf.EliteStatRate / 100f * 0.5f));
 
 			monster.ApplyOverrides(propertyOverrides);
+
+			// 20% faster skill usage
+			monster.Vars.Set("Melia.ShootTimeMultiplier", 0.8f);
 			monster.Heal(newMaxHP - prevMaxHP, 0);
 			monster.InvalidateProperties();
 		}

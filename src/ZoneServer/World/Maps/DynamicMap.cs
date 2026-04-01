@@ -27,6 +27,8 @@ namespace Melia.Zone.World.Maps
 				_triggerableAreas.Clear();
 			lock (_monsterPropertyOverrides)
 				_monsterPropertyOverrides.Clear();
+			lock (_spawnBuffs)
+				_spawnBuffs.Clear();
 			lock (_pads)
 				_pads.Clear();
 			lock (_obstaclesLock)

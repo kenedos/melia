@@ -237,7 +237,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 10);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 500 + (int)(caster.Position.Get2DDistance(target.Position) * 4.4);
+			var hitDelay = 800 + (int)(caster.Position.Get2DDistance(target.Position) * 4.4);
 			var aniTime = hitDelay + 200;
 			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -282,7 +282,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				KnockdownPower = 100f,
 				Delay = 0f,
 				HitCount = 1,
-				HitDuration = 500f,
+				HitDuration = 250f,
 				CasterEffect = EffectConfig.None,
 				CasterNodeName = "None",
 				KnockType = 1,

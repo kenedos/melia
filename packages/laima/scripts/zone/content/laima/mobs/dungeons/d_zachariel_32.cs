@@ -16,19 +16,26 @@ public class DZachariel32MobScript : GeneralScript
 	{
 		// Property Overrides -------------------------------
 
+		// Spawn Buffs -------------------------------------
+		AddSpawnBuff("d_zachariel_32", MonsterId.Zinutekas, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_32", MonsterId.Stoulet, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_32", MonsterId.Moving_Trap, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_32", MonsterId.Karas, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_32", MonsterId.Zinutekas_Elite, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_32", MonsterId.Varv, BuffId.EliteMonsterBuff, chance: 100);
 
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_zachariel_32.Id1", MonsterId.Rootcrystal_05, min: 12, max: 16, respawn: Seconds(5), tendency: TendencyType.Peaceful);
-		AddSpawner("d_zachariel_32.Id2", MonsterId.Zinutekas, min: 6, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id3", MonsterId.Zinutekas, min: 8, max: 10, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id4", MonsterId.Stoulet, min: 8, max: 10, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id5", MonsterId.Moving_Trap, min: 8, max: 10, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id2", MonsterId.Zinutekas, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id3", MonsterId.Zinutekas, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id4", MonsterId.Stoulet, min: 6, max: 8, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id5", MonsterId.Moving_Trap, min: 6, max: 8, tendency: TendencyType.Aggressive);
 		AddSpawner("d_zachariel_32.Id6", MonsterId.Moving_Trap, min: 5, max: 6, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id7", MonsterId.Stoulet, min: 12, max: 15, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id8", MonsterId.Karas, min: 8, max: 10, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id7", MonsterId.Stoulet, min: 6, max: 8, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id8", MonsterId.Karas, min: 4, max: 6, tendency: TendencyType.Aggressive);
 		AddSpawner("d_zachariel_32.Id9", MonsterId.Zinutekas_Elite, min: 3, max: 4, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id10", MonsterId.Varv, min: 12, max: 26, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id10", MonsterId.Varv, min: 6, max: 10, tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 

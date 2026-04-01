@@ -15,18 +15,23 @@ public class DZachariel35MobScript : GeneralScript
 	{
 		// Property Overrides -------------------------------
 
+		// Spawn Buffs -------------------------------------
+		AddSpawnBuff("d_zachariel_35", MonsterId.Dog_Of_King, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_35", MonsterId.Schlesien_Guard, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_35", MonsterId.Wolf_Statue_Bow, BuffId.EliteMonsterBuff, chance: 100);
+		AddSpawnBuff("d_zachariel_35", MonsterId.Karas_Mage, BuffId.EliteMonsterBuff, chance: 100);
 
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_zachariel_35.Id1", MonsterId.Rootcrystal_05, min: 6, max: 8, respawn: Seconds(5), tendency: TendencyType.Peaceful);
-		AddSpawner("d_zachariel_35.Id2", MonsterId.Dog_Of_King, min: 12, max: 15, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id3", MonsterId.Schlesien_Guard, min: 12, max: 15, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id4", MonsterId.Schlesien_Guard, min: 8, max: 10, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id5", MonsterId.Dog_Of_King, min: 8, max: 10, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id6", MonsterId.Schlesien_Guard, min: 6, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id7", MonsterId.Dog_Of_King, min: 8, max: 10, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id8", MonsterId.Wolf_Statue_Bow, min: 8, max: 10, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id9", MonsterId.Karas_Mage, min: 4, max: 5, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id2", MonsterId.Dog_Of_King, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id3", MonsterId.Schlesien_Guard, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id4", MonsterId.Schlesien_Guard, min: 3, max: 5, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id5", MonsterId.Dog_Of_King, min: 4, max: 5, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id6", MonsterId.Schlesien_Guard, min: 3, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id7", MonsterId.Dog_Of_King, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id8", MonsterId.Wolf_Statue_Bow, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id9", MonsterId.Karas_Mage, min: 3, max: 4, tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 
