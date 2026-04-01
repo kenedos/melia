@@ -266,17 +266,20 @@ namespace Melia.Zone.Network
 		{
 			base.OnClosed(type);
 
-			this.LoggedIn = false;
-			this.LoadComplete = false;
-			var account = this.Account;
 			var character = this.SelectedCharacter;
 
 			if (character == null)
+			{
+				this.LoggedIn = false;
+				this.LoadComplete = false;
 				return;
+			}
 
 			// Autotrading characters stay in the world.
 			if (character.IsAutoTrading)
 			{
+				var account = this.Account;
+
 				ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
 
 				character.Connection = new DummyConnection
@@ -287,6 +290,8 @@ namespace Melia.Zone.Network
 					Party = this.Party,
 				};
 
+				this.LoggedIn = false;
+				this.LoadComplete = false;
 				this.NullifyConnectionReferences();
 				return;
 			}
@@ -297,6 +302,26 @@ namespace Melia.Zone.Network
 			// any cleanup itself, and these operations are safe to
 			// call even if FinalizeWarp already handled some of them.
 			var skipSave = character.SavedForWarp;
+
+			this.CleanupCharacter(save: !skipSave);
+		}
+
+		/// <summary>
+		/// Performs full character cleanup. Used by both normal disconnect
+		/// and the dead connection sweep service to ensure consistent
+		/// teardown of character state.
+		/// </summary>
+		/// <param name="save">Whether to save account and character data.</param>
+		internal void CleanupCharacter(bool save)
+		{
+			var account = this.Account;
+			var character = this.SelectedCharacter;
+
+			if (character == null)
+				return;
+
+			this.LoggedIn = false;
+			this.LoadComplete = false;
 			character.IsWarping = false;
 
 			character.Components.Get<BaseSkillComponent>()?.CancelAllRunningSkills();
@@ -337,7 +362,7 @@ namespace Melia.Zone.Network
 			ZoneServer.Instance.World.BattleManager.ForceEndBattle(character);
 			character.Properties.RemoveEvents();
 
-			if (!skipSave)
+			if (save)
 				SaveQueue.SaveAccountAndCharacter(account, character, this.SessionKey);
 
 			SaveQueue.Enqueue(() =>
