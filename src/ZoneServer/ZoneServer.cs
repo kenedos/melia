@@ -49,6 +49,7 @@ namespace Melia.Zone
 		internal AutoSaveService AutoSave => _autoSaveService;
 		private AutoSaveService _autoSaveService;
 		private OrphanCleanupService _orphanCleanupService;
+		private LogCleanupService _logCleanupService;
 		private DeadConnectionSweepService _deadConnectionSweepService;
 
 		public override ServerType Type => ServerType.Zone;
@@ -175,6 +176,7 @@ namespace Melia.Zone
 			SaveQueue.Start();
 			this.StartAutoSaveService();
 			this.StartOrphanCleanupService();
+			this.StartLogCleanupService();
 			this.StartDeadConnectionSweepService();
 			if (this.Conf.World.EnableProceduralQuests)
 			{
@@ -591,6 +593,21 @@ namespace Melia.Zone
 		/// </summary>
 		public OrphanCleanupService OrphanCleanupService => _orphanCleanupService;
 
+		private void StartLogCleanupService()
+		{
+			try
+			{
+				var retentionDays = this.Conf.World.LogCleanupRetentionDays;
+				var intervalHours = this.Conf.World.LogCleanupIntervalHours;
+
+				_logCleanupService = new LogCleanupService(this.Database, retentionDays, TimeSpan.FromHours(intervalHours));
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Failed to initialize LogCleanup Service: {0}", ex);
+			}
+		}
+
 		private void StartDeadConnectionSweepService()
 		{
 			try
@@ -623,6 +640,10 @@ namespace Melia.Zone
 			// Dispose OrphanCleanup Service
 			_orphanCleanupService?.Dispose();
 			Log.Info("OrphanCleanup Service stopped.");
+
+			// Dispose LogCleanup Service
+			_logCleanupService?.Dispose();
+			Log.Info("LogCleanup Service stopped.");
 
 			// Dispose DeadConnectionSweep Service
 			_deadConnectionSweepService?.Dispose();

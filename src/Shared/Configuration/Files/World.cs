@@ -218,6 +218,10 @@ namespace Melia.Shared.Configuration.Files
 		public int OrphanCleanupCycles { get; protected set; }
 		public int OrphanCleanupBatchSize { get; protected set; }
 
+		// Log cleanup settings
+		public int LogCleanupRetentionDays { get; protected set; }
+		public int LogCleanupIntervalHours { get; protected set; }
+
 		// party.conf - Quest Sharing
 		public bool PartyQuestSharingEnabled { get; protected set; }
 		public float PartyQuestSharingRange { get; protected set; }
@@ -388,6 +392,9 @@ namespace Melia.Shared.Configuration.Files
 			this.OrphanCleanupEnabled = this.GetBool("orphan_cleanup_enabled", true);
 			this.OrphanCleanupCycles = this.GetInt("orphan_cleanup_cycles", 144);
 			this.OrphanCleanupBatchSize = this.GetInt("orphan_cleanup_batch_size", 10000);
+
+			this.LogCleanupRetentionDays = this.GetInt("log_cleanup_retention_days", 7);
+			this.LogCleanupIntervalHours = this.GetInt("log_cleanup_interval_hours", 6);
 
 			this.GlobalDropSuperMobItemThreshold = this.GetBool("global_drop_super_mob_item_threshold", false);
 			this.GlobalDropSuperMobItemReroll = this.GetBool("global_drop_super_mob_item_reroll", false);
