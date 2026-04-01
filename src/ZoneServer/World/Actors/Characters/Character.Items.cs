@@ -21,6 +21,15 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Returns ids of equipped items with briquetting appearance
+		/// overrides applied.
+		/// </summary>
+		public int[] GetVisualEquipIds()
+		{
+			return this.Inventory.GetVisualEquipIds();
+		}
+
+		/// <summary>
 		/// Returns true if the character is wearing any armor piece of the given armor material type.
 		/// </summary>
 		public bool IsWearingArmorOfType(ArmorMaterialType armorType)

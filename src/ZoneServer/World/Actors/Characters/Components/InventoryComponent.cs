@@ -81,6 +81,29 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Returns list of ids of equipped items with briquetting
+		/// appearance overrides applied, in the order of EquipSlot.
+		/// If an equipped item has a BriquettingIndex property set,
+		/// that value is used instead of the actual item id.
+		/// </summary>
+		/// <returns></returns>
+		public int[] GetVisualEquipIds()
+		{
+			lock (_syncLock)
+			{
+				return _equip
+					.Where(a => (int)a.Key <= InventoryDefaults.EquipSlotCount)
+					.OrderBy(a => a.Key)
+					.Select(a =>
+					{
+						var briquettingIndex = (int)a.Value.Properties.GetFloat(PropertyName.BriquettingIndex);
+						return briquettingIndex > 0 ? briquettingIndex : a.Value.Id;
+					})
+					.ToArray();
+			}
+		}
+
+		/// <summary>
 		/// Returns unordered list of ids of equipped items, excluding
 		/// dummy items.
 		/// </summary>

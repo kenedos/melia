@@ -292,6 +292,20 @@ namespace Melia.Barracks.Database
 		}
 
 		/// <summary>
+		/// Returns ids of equipped items with briquetting appearance
+		/// overrides applied.
+		/// </summary>
+		/// <returns></returns>
+		public int[] GetVisualEquipIds()
+		{
+			return this.Equipment.Select(a =>
+			{
+				var briquettingIndex = (int)a.Properties.GetFloat(PropertyName.BriquettingIndex);
+				return briquettingIndex > 0 ? briquettingIndex : a.Id;
+			}).ToArray();
+		}
+
+		/// <summary>
 		/// Returns the equipment properties as an array.
 		/// </summary>
 		/// <returns></returns>
