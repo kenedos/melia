@@ -1447,6 +1447,10 @@ namespace Melia.Zone.Scripting
 				if (currentMapId != instance.MapId)
 					return;
 
+				// Close the reward HUD so it doesn't persist in the destination map
+				if (character.Connection != null)
+					Send.ZC_NORMAL.IndunAddonMsgParam(character.Connection, 2, "FAIL", 1);
+
 				// Check if any member is still inside the dungeon
 				var anyMemberInside = instance.Characters.Any(member => member != null && member.Map?.Id == instance.MapId && member.DbId != character.DbId);
 
@@ -1515,9 +1519,11 @@ namespace Melia.Zone.Scripting
 
 				this.OnDungeonExit(character);
 
-				// Null-safe connection access
-				if (sendFailMessage && character.Connection != null)
+				if (character.Connection != null)
+				{
+					// Always close the reward HUD to prevent it persisting in towns
 					Send.ZC_NORMAL.IndunAddonMsgParam(character.Connection, 2, "FAIL", 1);
+				}
 
 				character.StopLayer();
 				_instancesByCharacter.TryRemove(character.DbId, out _);
