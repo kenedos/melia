@@ -24,7 +24,6 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 	[PadHandler(PadName.punji_stake)]
 	public class punji_stakeOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, IUpdatePadHandler
 	{
-		private const int TrapMaxHP = 10;
 		private const string ActivatedKey = "Melia.PunjiStake.Activated";
 
 		public void Created(object sender, PadTriggerArgs args)
@@ -42,13 +41,10 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			var trap = (Mob)PadAttachMonster(pad, "skill_sapper_trap1", pad.Position, 0, 0, 0, 0, "HitProof#YES", "None", 1, true, "None", "None", true, "SCR_INIT_SAPPER_TRAP");
 			if (trap != null)
 			{
-				var propertyOverrides = new PropertyOverrides();
-				propertyOverrides.Add(PropertyName.HPCount, TrapMaxHP);
-				trap.ApplyOverrides(propertyOverrides);
-				trap.Properties.InvalidateAll();
-				trap.HealToFull();
+				trap.MonsterType = RelationType.Friendly;
+				trap.Faction = FactionType.Law;
+				trap.StartBuff(BuffId.Invincible);
 				trap.StartBuff(BuffId.Cover_Buff, TimeSpan.FromMinutes(2));
-				trap.Died += (mob, killer) => pad.Destroy();
 			}
 		}
 

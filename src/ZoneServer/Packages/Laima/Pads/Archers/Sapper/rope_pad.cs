@@ -27,7 +27,6 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 		private const int UpdateIntervalMs = 100;
 		private const int CircleDamageIntervalMs = 1000;
 		private const int PadLifetimeMs = 120000;
-		private const int TrapMaxHP = 10;
 		private const float RotationAnglePerUpdate = 13f;
 		private const float InitialRotation = 40f;
 		private const float CenterCircleRadius = 20f;
@@ -49,12 +48,9 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			var trap = (Mob)PadCreateMonster(pad, "skill_sapper_trap2", pad.Position, 0f, 0, 0f, "HitProof#YES", "None", 1, true, "None", "None", true, "SCR_INIT_SAPPER_TRAP");
 			if (trap != null)
 			{
-				var propertyOverrides = new PropertyOverrides();
-				propertyOverrides.Add(PropertyName.HPCount, TrapMaxHP);
-				trap.ApplyOverrides(propertyOverrides);
-				trap.Properties.InvalidateAll();
-				trap.HealToFull();
-				trap.Died += (mob, killer) => pad.Destroy();
+				trap.MonsterType = RelationType.Friendly;
+				trap.Faction = FactionType.Law;
+				trap.StartBuff(BuffId.Invincible);
 			}
 			PadSetJumpRope(pad, "I_laser013", 1, 80, 0, 3, 1, 40, 3, 10);
 

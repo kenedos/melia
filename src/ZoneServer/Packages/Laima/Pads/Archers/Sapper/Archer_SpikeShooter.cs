@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Packages;
-using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
@@ -32,7 +31,6 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 		private const int UpdateIntervalMs = 1000;
 		private const string EffectMonsterClassName = "pcskill_stake_stockades2";
 		private const float SplashLength = 150f;
-		private const int TrapMaxHP = 10;
 		private const string StartMonsterKey = "Melia.SpikeShooter.StartMonster";
 		private const string EndMonsterKey = "Melia.SpikeShooter.EndMonster";
 
@@ -60,23 +58,19 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 
 			if (startMonster != null)
 			{
-				var propertyOverrides = new PropertyOverrides();
-				propertyOverrides.Add(PropertyName.HPCount, TrapMaxHP);
-				((Mob)startMonster).ApplyOverrides(propertyOverrides);
-				startMonster.Properties.InvalidateAll();
-				((Mob)startMonster).HealToFull();
-				((Mob)startMonster).Died += (mob, killer) => pad.Destroy();
+				var startMob = (Mob)startMonster;
+				startMob.MonsterType = RelationType.Friendly;
+				startMob.Faction = FactionType.Law;
+				startMob.StartBuff(BuffId.Invincible);
 				pad.Variables.Set(StartMonsterKey, startMonster);
 			}
 
 			if (endMonster != null)
 			{
-				var propertyOverrides = new PropertyOverrides();
-				propertyOverrides.Add(PropertyName.HPCount, TrapMaxHP);
-				((Mob)endMonster).ApplyOverrides(propertyOverrides);
-				endMonster.Properties.InvalidateAll();
-				((Mob)endMonster).HealToFull();
-				((Mob)endMonster).Died += (mob, killer) => pad.Destroy();
+				var endMob = (Mob)endMonster;
+				endMob.MonsterType = RelationType.Friendly;
+				endMob.Faction = FactionType.Law;
+				endMob.StartBuff(BuffId.Invincible);
 				pad.Variables.Set(EndMonsterKey, endMonster);
 			}
 

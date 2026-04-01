@@ -27,7 +27,6 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 		private const float PadRange = 25f;
 		private const int UpdateIntervalMs = 750;
 		private const int PadLifetimeMs = 120000;
-		private const int TrapMaxHP = 10;
 		private const float ReactivationDelayMs = 3000f;
 		private const string CooldownKey = "Melia.LegHold.Cooldown";
 
@@ -46,12 +45,9 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			var trap = (Mob)PadCreateMonster(pad, "pcskill_leghold_trap", pad.Position, 0f, 0, 0f, "HitProof#YES", "None", 1, true, "None", "None", true, "SCR_INIT_SAPPER_TRAP");
 			if (trap != null)
 			{
-				var propertyOverrides = new PropertyOverrides();
-				propertyOverrides.Add(PropertyName.HPCount, TrapMaxHP);
-				trap.ApplyOverrides(propertyOverrides);
-				trap.Properties.InvalidateAll();
-				trap.HealToFull();
-				trap.Died += (mob, killer) => pad.Destroy();
+				trap.MonsterType = RelationType.Friendly;
+				trap.Faction = FactionType.Law;
+				trap.StartBuff(BuffId.Invincible);
 			}
 		}
 

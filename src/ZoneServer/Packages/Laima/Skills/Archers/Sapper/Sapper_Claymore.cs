@@ -51,6 +51,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 			var claymore = MonsterSkillCreateMob(skill, caster, "skill_sapper_trap4", spawnPos, 0, "", "", 0, ClaymoreLifetimeSeconds, "MON_DUMMY", "");
 			if (claymore != null)
 			{
+				claymore.MonsterType = RelationType.Friendly;
+				claymore.Faction = FactionType.Law;
+				claymore.StartBuff(BuffId.Invincible);
 				claymore.Vars.Set("Skill", skill);
 				claymore.Vars.Set("Caster", caster);
 				claymore.StartBuff(BuffId.Cover_Buff, TimeSpan.FromSeconds(ClaymoreLifetimeSeconds), caster);
