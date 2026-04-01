@@ -291,17 +291,13 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			// FinalizeWarp already handled all cleanup (buff removal,
-			// map removal, hook unregistration, etc.) and enqueued a
-			// full save. Only do a light character save here in case
-			// OnClosed cleanup changed any state, then nullify.
-			if (character.SavedForWarp)
-			{
-				character.IsWarping = false;
-				SaveQueue.SaveCharacter(character);
-				this.NullifyConnectionReferences();
-				return;
-			}
+			// If SavedForWarp is set, FinalizeWarp or CZ_MOVE_BARRACK
+			// already enqueued a save. Skip the redundant save but
+			// still run full cleanup — CZ_MOVE_BARRACK doesn't do
+			// any cleanup itself, and these operations are safe to
+			// call even if FinalizeWarp already handled some of them.
+			var skipSave = character.SavedForWarp;
+			character.IsWarping = false;
 
 			character.Components.Get<BaseSkillComponent>()?.CancelAllRunningSkills();
 			character.CancelOutOfBody();
@@ -341,7 +337,9 @@ namespace Melia.Zone.Network
 			ZoneServer.Instance.World.BattleManager.ForceEndBattle(character);
 			character.Properties.RemoveEvents();
 
-			SaveQueue.SaveAccountAndCharacter(account, character, this.SessionKey);
+			if (!skipSave)
+				SaveQueue.SaveAccountAndCharacter(account, character, this.SessionKey);
+
 			SaveQueue.Enqueue(() =>
 			{
 				CharacterLockManager.TryRemoveLock(character.DbId);
