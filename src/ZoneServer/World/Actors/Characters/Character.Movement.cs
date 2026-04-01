@@ -388,7 +388,8 @@ namespace Melia.Zone.World.Actors.Characters
 					// a lingering ghost. The connection is still open, so the
 					// ZC_MOVE_ZONE_OK packet will still reach the client.
 					this.CloseEyes();
-					this.ActiveCompanion?.Map?.RemoveMonster(this.ActiveCompanion);
+					foreach (var companion in this.Companions.GetList())
+						companion.Map?.RemoveMonster(companion);
 					this.Map?.RemoveCharacter(this);
 
 					ItemHookRegistry.Instance.UnregisterCharacter(this);

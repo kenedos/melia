@@ -326,7 +326,8 @@ namespace Melia.Zone.Network
 			if (this.ActiveDuel != null || character.IsDueling)
 				ZoneServer.Instance.World.Duels.EndDuel(this.ActiveDuel);
 
-			character.ActiveCompanion?.Map?.RemoveMonster(character.ActiveCompanion);
+			foreach (var companion in character.Companions.GetList())
+				companion.Map?.RemoveMonster(companion);
 			character.Summons.RemoveAllSummons();
 
 			character.Components.Get<TimeActionComponent>()?.End(TimeActionResult.Cancelled);

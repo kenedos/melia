@@ -4705,7 +4705,8 @@ namespace Melia.Zone.Commands
 			}
 
 			// Clean up companion and summons before entering autotrade
-			sender.ActiveCompanion?.Map?.RemoveMonster(sender.ActiveCompanion);
+			foreach (var companion in sender.Companions.GetList())
+				companion.Map?.RemoveMonster(companion);
 			sender.Summons.RemoveAllSummons();
 
 			// Remove from party before entering autotrade - autotrading characters cannot be in parties

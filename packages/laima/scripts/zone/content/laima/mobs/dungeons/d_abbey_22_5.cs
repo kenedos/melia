@@ -23,14 +23,14 @@ public class DAbbey225MobScript : GeneralScript
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_abbey_22_5.Id1", MonsterId.Rootcrystal_01, min: 16, max: 21, respawn: Minutes(1));
-		AddSpawner("d_abbey_22_5.Id2", MonsterId.Hohen_Orben_Black, min: 7, max: 9, tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_5.Id3", MonsterId.Harugal_Black, min: 8, max: 12, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id2", MonsterId.Hohen_Orben_Black, min: 3, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id3", MonsterId.Harugal_Black, min: 3, max: 4, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_5.Id4", MonsterId.Drooper, min: 15, max: 20, tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_5.Id5", MonsterId.Hohen_Mage_Black, min: 24, max: 32, tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_5.Id6", MonsterId.Hohen_Orben_Black, min: 5, max: 6, respawn: Seconds(40), tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id5", MonsterId.Hohen_Mage_Black, min: 9, max: 12, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id6", MonsterId.Hohen_Orben_Black, min: 2, max: 2, respawn: Seconds(40), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_5.Id7", MonsterId.Drooper, amount: 2, respawn: Seconds(40), tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_5.Id8", MonsterId.Harugal_Black, min: 3, max: 4, respawn: Seconds(40), tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_5.Id9", MonsterId.Harugal_Black, amount: 3, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id8", MonsterId.Harugal_Black, min: 1, max: 2, respawn: Seconds(40), tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_5.Id9", MonsterId.Harugal_Black, amount: 1, respawn: Seconds(20), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_5.Id10", MonsterId.Drooper, amount: 1, respawn: Minutes(1), tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------

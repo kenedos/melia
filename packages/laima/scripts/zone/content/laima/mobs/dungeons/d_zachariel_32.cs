@@ -27,15 +27,15 @@ public class DZachariel32MobScript : GeneralScript
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_zachariel_32.Id1", MonsterId.Rootcrystal_05, min: 12, max: 16, respawn: Seconds(5), tendency: TendencyType.Peaceful);
-		AddSpawner("d_zachariel_32.Id2", MonsterId.Zinutekas, min: 4, max: 6, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id3", MonsterId.Zinutekas, min: 4, max: 6, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id4", MonsterId.Stoulet, min: 6, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id5", MonsterId.Moving_Trap, min: 6, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id6", MonsterId.Moving_Trap, min: 5, max: 6, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id7", MonsterId.Stoulet, min: 6, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id8", MonsterId.Karas, min: 4, max: 6, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id9", MonsterId.Zinutekas_Elite, min: 3, max: 4, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_32.Id10", MonsterId.Varv, min: 6, max: 10, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id2", MonsterId.Zinutekas, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id3", MonsterId.Zinutekas, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id4", MonsterId.Stoulet, min: 3, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id5", MonsterId.Moving_Trap, min: 3, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id6", MonsterId.Moving_Trap, min: 3, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id7", MonsterId.Stoulet, min: 3, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id8", MonsterId.Karas, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id9", MonsterId.Zinutekas_Elite, min: 2, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_32.Id10", MonsterId.Varv, min: 3, max: 5, tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 

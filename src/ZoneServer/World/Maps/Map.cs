@@ -513,7 +513,7 @@ namespace Melia.Zone.World.Maps
 			var ownerId = newItem.Item.OwnerCharacterId;
 
 			var itemMergeRange = 30f;
-			var itemMergeThreshold = itemId == ItemId.Silver ? 30 : 5;
+			var itemMergeThreshold = 5;
 
 			var nearbyItems = new List<ItemMonster>();
 

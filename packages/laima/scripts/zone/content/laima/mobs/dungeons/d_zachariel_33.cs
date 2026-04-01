@@ -24,16 +24,16 @@ public class DZachariel33MobScript : GeneralScript
 
 		// Monster Spawners ---------------------------------
 
-		AddSpawner("d_zachariel_33.Id1", MonsterId.Beetle, min: 3, max: 4, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_33.Id2", MonsterId.Vesper, min: 4, max: 5, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id1", MonsterId.Beetle, min: 2, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id2", MonsterId.Vesper, min: 2, max: 3, tendency: TendencyType.Aggressive);
 		AddSpawner("d_zachariel_33.Id3", MonsterId.Rootcrystal_05, min: 18, max: 24, respawn: Seconds(15), tendency: TendencyType.Peaceful);
-		AddSpawner("d_zachariel_33.Id4", MonsterId.Wolf_Statue, min: 4, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_33.Id5", MonsterId.Beetle, min: 6, max: 10, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_33.Id6", MonsterId.Vesper, min: 4, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_33.Id7", MonsterId.Wolf_Statue, min: 3, max: 4, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_33.Id8", MonsterId.Tombsinker, min: 4, max: 8, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_33.Id9", MonsterId.Wolf_Statue, min: 3, max: 4, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_33.Id10", MonsterId.Beetle_Elite, amount: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id4", MonsterId.Wolf_Statue, min: 2, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id5", MonsterId.Beetle, min: 3, max: 5, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id6", MonsterId.Vesper, min: 2, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id7", MonsterId.Wolf_Statue, min: 2, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id8", MonsterId.Tombsinker, min: 2, max: 4, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id9", MonsterId.Wolf_Statue, min: 2, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_33.Id10", MonsterId.Beetle_Elite, amount: 2, tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 

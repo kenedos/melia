@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Logging;
 
 namespace Melia.Zone.Services
@@ -40,7 +41,32 @@ namespace Melia.Zone.Services
 				{
 					Log.Info($"DeadConnectionSweep: Closing stale connection for '{character.Name}' (last heartbeat: {conn.LastHeartBeat}).");
 					conn.Close();
+
+					// If Close() was a no-op (connection already closed
+					// previously) the character may still be on the map.
+					// Remove it directly to prevent infinite sweep loops.
+					if (character.Map != null)
+					{
+						Log.Info($"DeadConnectionSweep: Force-removing orphaned character '{character.Name}' from map {character.Map.Id}.");
+						this.ForceRemoveCharacter(character);
+					}
 				}
+			}
+		}
+
+		/// <summary>
+		/// Forcibly removes a character that was orphaned on a map
+		/// after its connection was already closed.
+		/// </summary>
+		private void ForceRemoveCharacter(Character character)
+		{
+			try
+			{
+				character.Map.RemoveCharacter(character);
+			}
+			catch (Exception ex)
+			{
+				Log.Error($"DeadConnectionSweep: Error removing '{character.Name}' from map: {ex.Message}");
 			}
 		}
 

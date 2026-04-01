@@ -171,6 +171,8 @@ namespace Melia.Zone.Network
 					existingCharacter.SavedForWarp = true;
 
 					var removeStart = sw.ElapsedMilliseconds;
+					foreach (var companion in existingCharacter.Companions.GetList())
+						companion.Map?.RemoveMonster(companion);
 					existingCharacter.Map?.RemoveCharacter(existingCharacter);
 					cleanupRemoveMs = sw.ElapsedMilliseconds - removeStart;
 
@@ -239,6 +241,8 @@ namespace Melia.Zone.Network
 				var ghost = map.GetCharacter(c => c.DbId == character.DbId && c.Handle != character.Handle);
 				if (ghost != null)
 				{
+					foreach (var companion in ghost.Companions.GetList())
+						companion.Map?.RemoveMonster(companion);
 					Send.ZC_LEAVE(ghost);
 					ghost.IsAutoTrading = false;
 					ghost.IsOnline = false;

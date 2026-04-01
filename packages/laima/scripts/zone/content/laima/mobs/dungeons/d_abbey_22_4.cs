@@ -21,13 +21,13 @@ public class DAbbey224MobScript : GeneralScript
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_abbey_22_4.Id1", MonsterId.Rootcrystal_05, min: 14, max: 18, respawn: Minutes(1));
-		AddSpawner("d_abbey_22_4.Id2", MonsterId.Hohen_Mage_Black, min: 24, max: 32, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id2", MonsterId.Hohen_Mage_Black, min: 9, max: 12, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id3", MonsterId.Nook, min: 18, max: 24, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id4", MonsterId.Boor, min: 20, max: 26, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id5", MonsterId.Mangosting, min: 40, max: 60, respawn: Minutes(1), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id6", MonsterId.Half_Mangosting, min: 60, max: 86, respawn: Minutes(1), tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_4.Id7", MonsterId.Hohen_Mage_Black, min: 6, max: 10, respawn: Seconds(40), tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_4.Id8", MonsterId.Hohen_Mage_Black, min: 6, max: 10, respawn: Minutes(1), tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id7", MonsterId.Hohen_Mage_Black, min: 2, max: 4, respawn: Seconds(40), tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id8", MonsterId.Hohen_Mage_Black, min: 2, max: 4, respawn: Minutes(1), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id9", MonsterId.Rootcrystal_01, min: 13, max: 17, respawn: Minutes(1), tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
