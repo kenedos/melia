@@ -50,6 +50,7 @@ namespace Melia.Zone.World.Maps
 		protected readonly object _obstaclesLock = new();
 
 		private readonly ConcurrentQueue<IMonster> _addMonsters = new();
+		private int _characterCount;
 		private DateTime _lastPlayerLeftTime = DateTime.MinValue;
 		protected readonly Dictionary<int, PropertyOverrides> _monsterPropertyOverrides = new();
 		protected readonly List<SpawnBuffEntry> _spawnBuffs = new();
@@ -74,9 +75,9 @@ namespace Melia.Zone.World.Maps
 		public Ground Ground { get; } = new Ground();
 		public IPathfinder Pathfinder { get; private set; }
 
-		public int CharacterCount { get { lock (_characters) return _characters.Count; } }
+		public int CharacterCount => _characterCount;
 		public int MonsterCount { get { lock (_monsters) return _monsters.Count; } }
-		public bool HasCharacters { get { lock (_characters) return _characters.Count > 0; } }
+		public bool HasCharacters => _characterCount > 0;
 
 		// Collision
 		private const int CollisionCheckPointCount = 9;
@@ -324,6 +325,8 @@ namespace Melia.Zone.World.Maps
 			lock (_characters)
 				_characters[character.Handle] = character;
 
+			Interlocked.Increment(ref _characterCount);
+
 			if (character is ICombatEntity combatEntity)
 			{
 				lock (_combatEntities)
@@ -346,6 +349,8 @@ namespace Melia.Zone.World.Maps
 		{
 			lock (_characters)
 				_characters.Remove(character.Handle);
+
+			Interlocked.Decrement(ref _characterCount);
 
 			lock (_combatEntities)
 				_combatEntities.Remove(character.Handle);
