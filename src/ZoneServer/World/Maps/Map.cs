@@ -61,9 +61,18 @@ namespace Melia.Zone.World.Maps
 		// Spatial index for efficient range queries
 		private EntitySpatialIndex _spatialIndex;
 
-		// Buffer to avoid allocating new lists every spatial query
+		// Buffer to avoid allocating new lists
 		[ThreadStatic]
 		private static List<ICombatEntity> _spatialShapeQueryBuffer;
+
+		[ThreadStatic]
+		private static List<ICombatEntity> _broadcastAllBuffer;
+
+		[ThreadStatic]
+		private static List<ICombatEntity> _broadcastQueryBuffer;
+
+		[ThreadStatic]
+		private static HashSet<IZoneConnection> _broadcastSentConnections;
 
 		#endregion
 
@@ -1940,18 +1949,18 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public virtual void Broadcast(Packet packet)
 		{
+			var buffer = _broadcastAllBuffer ??= new List<ICombatEntity>();
+			buffer.Clear();
+
 			lock (_characters)
 			{
 				foreach (var character in _characters.Values)
-					character.Connection.Send(packet);
+					buffer.Add(character);
 			}
+
+			foreach (var entity in buffer)
+				((Character)entity).Connection.Send(packet);
 		}
-
-		[ThreadStatic]
-		private static List<ICombatEntity> _broadcastQueryBuffer;
-
-		[ThreadStatic]
-		private static HashSet<IZoneConnection> _broadcastSentConnections;
 
 		/// <summary>
 		/// Broadcasts a packet to all characters within visible range of
@@ -1991,28 +2000,36 @@ namespace Melia.Zone.World.Maps
 				return;
 			}
 
+			var charBuffer = _broadcastQueryBuffer ??= new List<ICombatEntity>();
+			charBuffer.Clear();
+
 			lock (_characters)
 			{
 				foreach (var character in _characters.Values)
-				{
-					if (!character.Position.InRange2D(source.Position, VisibleRange))
-						continue;
+					charBuffer.Add(character);
+			}
 
-					if (!includeSource && character == source)
-						continue;
+			foreach (var entity in charBuffer)
+			{
+				var character = (Character)entity;
 
-					if (character.Layer != source.Layer)
-						continue;
+				if (!character.Position.InRange2D(source.Position, VisibleRange))
+					continue;
 
-					var conn = character.Connection;
-					if (conn == null)
-						continue;
+				if (!includeSource && character == source)
+					continue;
 
-					if (!sentConnections.Add(conn))
-						continue;
+				if (character.Layer != source.Layer)
+					continue;
 
-					conn.Send(packet);
-				}
+				var conn = character.Connection;
+				if (conn == null)
+					continue;
+
+				if (!sentConnections.Add(conn))
+					continue;
+
+				conn.Send(packet);
 			}
 		}
 		#endregion
