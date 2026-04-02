@@ -28,7 +28,7 @@
 - **Moa** (ID: 27): Increases [★ * 2.5]% damage against Devil-type monsters
 - **Vubbe Fighter** (ID: 36): Increases [★ * 2.5]% damage against Beast-type monsters
 - **Grinender** (ID: 5): Increases [★ * 2.5]% damage against Flying-type monsters
-- **Iltiswort** (ID: 59): Increases [★ * 2.5]% damage against Forester-type monsters
+- **Iltiswort** (ID: 59): Increases [★ * 2.5]% damage against Plant-type monsters
 - **Giant Red Wood Goblin** (ID: 60): Increases [★ * 2.5]% damage against Cloth-armor type monsters
 - **Corrupted** (ID: 79): Increases [★ * 2.5]% damage against Holding-type monsters
 
@@ -49,7 +49,7 @@
 - **Necrovanter** (ID: 9): Increases [★ * 2]% damage against targets with Blind debuff
 
 ### Weapon-Type Damage Bonuses
-- **Rajatoad** (ID: 14): Increases [★ * 1]% damage with Aries-type weapons
+- **Rajatoad** (ID: 14): Increases [★ * 1]% damage with Pierce-type weapons
 - **Mothstem** (ID: 26): Increases [★ * 1]% magic damage with Strike-type weapons
 - **Red Vubbe Fighter** (ID: 37): Increases [★ * 1]% damage with Strike-type weapons
 - **Gremlin** (ID: 98): Increases [★ * 1]% damage with Slash-type weapons
@@ -100,7 +100,7 @@
 - **Sequoia** (ID: 72): Physical Defense +[★ * 0.5]%, Magical Defense +[★ * 0.5]%
 
 ### Damage Type Resistance
-- **Scorpio** (ID: 46): Aries damage type taken -[★ * 1.5]%
+- **Scorpio** (ID: 46): Pierce damage type taken -[★ * 1.5]%
 - **Glackuman** (ID: 95): Slash damage type taken -[★ * 1.5]%
 - **Golem** (ID: 4): Strike damage type taken -[★ * 1.5]%
 
@@ -183,7 +183,7 @@
 #### SP Recovery
 - **Mallet Wyvern** (ID: 20): When attacked by Large monster: [★ * 1]% chance to recover 5% SP (5s cooldown)
 - **Cerberus** (ID: 83): When attacked by Medium monster: [★ * 1]% chance to recover 5% SP (5s cooldown)
-- **Magburk** (ID: 21): On kill Paramune-type: [★ * 1]% chance to recover 5% SP
+- **Magburk** (ID: 21): On kill Mutant-type: [★ * 1]% chance to recover 5% SP
 - **Specter Monarch** (ID: 47): On kill Dark property: [★ * 1]% chance to recover 5% SP
 - **Throneweaver** (ID: 48): On kill Poison property: [★ * 1]% chance to recover 5% SP
 - **Harpeia** (ID: 73): On kill Lightning property: [★ * 1]% chance to recover 5% SP
