@@ -60,6 +60,9 @@ namespace Melia.Zone.Buffs.Handlers
 
 			monster.ApplyOverrides(propertyOverrides);
 
+			// +1 SDR for elite monsters
+			monster.Properties.Modify(PropertyName.SDR_BM, 1);
+
 			// 20% faster skill usage
 			monster.Vars.Set("Melia.ShootTimeMultiplier", 0.8f);
 			monster.Heal(newMaxHP - prevMaxHP, 0);

@@ -67,6 +67,9 @@ namespace Melia.Zone.Buffs.Handlers.Monster
 
 			monster.ApplyOverrides(propertyOverrides);
 
+			// +2 SDR for mythic monsters
+			monster.Properties.Modify(PropertyName.SDR_BM, 2);
+
 			// 30% faster skill usage
 			monster.Vars.Set("Melia.ShootTimeMultiplier", 0.7f);
 			monster.Heal(newMaxHP - prevMaxHP, 0);
