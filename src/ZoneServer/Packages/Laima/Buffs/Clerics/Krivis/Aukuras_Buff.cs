@@ -29,7 +29,7 @@ namespace Melia.Zone.Buffs.Handlers
 			}
 
 			var healAmount = this.CalculateHealAmount(caster, buff.Target, skill);
-			buff.Target.Heal(healAmount, healAmount);
+			buff.Target.Heal(healAmount, 0);
 
 			buff.SetUpdateTime(HealTickMs);
 		}
