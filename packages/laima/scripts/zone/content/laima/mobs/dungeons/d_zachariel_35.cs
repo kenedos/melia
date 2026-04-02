@@ -24,18 +24,59 @@ public class DZachariel35MobScript : GeneralScript
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_zachariel_35.Id1", MonsterId.Rootcrystal_05, min: 6, max: 8, respawn: Seconds(5), tendency: TendencyType.Peaceful);
-		AddSpawner("d_zachariel_35.Id2", MonsterId.Dog_Of_King, min: 2, max: 3, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id3", MonsterId.Schlesien_Guard, min: 2, max: 3, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id4", MonsterId.Schlesien_Guard, min: 2, max: 3, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id5", MonsterId.Dog_Of_King, min: 2, max: 3, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id6", MonsterId.Schlesien_Guard, min: 2, max: 2, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id7", MonsterId.Dog_Of_King, min: 2, max: 3, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id8", MonsterId.Wolf_Statue_Bow, min: 2, max: 3, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_35.Id9", MonsterId.Karas_Mage, min: 2, max: 2, tendency: TendencyType.Aggressive);
+
+		// Room 1 (876, -1152)
+		AddSpawner("d_zachariel_35.Id2", MonsterId.Dog_Of_King, min: 1, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id3", MonsterId.Schlesien_Guard, min: 1, max: 1, tendency: TendencyType.Aggressive);
+
+		// Room 2 (1159, -47)
+		AddSpawner("d_zachariel_35.Id4", MonsterId.Wolf_Statue_Bow, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id5", MonsterId.Karas_Mage, min: 1, max: 1, tendency: TendencyType.Aggressive);
+
+		// Room 3 (67, -30)
+		AddSpawner("d_zachariel_35.Id6", MonsterId.Dog_Of_King, min: 1, max: 1, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id7", MonsterId.Wolf_Statue_Bow, min: 1, max: 2, tendency: TendencyType.Aggressive);
+
+		// Room 4 (-1073, -11)
+		AddSpawner("d_zachariel_35.Id8", MonsterId.Schlesien_Guard, min: 1, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id9", MonsterId.Karas_Mage, min: 1, max: 2, tendency: TendencyType.Aggressive);
+
+		// Room 5 (-701, -1335)
+		AddSpawner("d_zachariel_35.Id10", MonsterId.Wolf_Statue_Bow, min: 1, max: 1, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id11", MonsterId.Dog_Of_King, min: 2, max: 3, tendency: TendencyType.Aggressive);
+
+		// Room 6 (-478, 1107)
+		AddSpawner("d_zachariel_35.Id12", MonsterId.Karas_Mage, min: 1, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id13", MonsterId.Schlesien_Guard, min: 1, max: 1, tendency: TendencyType.Aggressive);
+
+		// Room 7 (585, 1074)
+		AddSpawner("d_zachariel_35.Id14", MonsterId.Dog_Of_King, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_35.Id15", MonsterId.Wolf_Statue_Bow, min: 1, max: 1, tendency: TendencyType.Aggressive);
+
+		// Corridor 1 (855, 1484)
+		AddSpawner("d_zachariel_35.Id16", MonsterId.Schlesien_Guard, min: 1, max: 1, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+
+		// Corridor 2 (1166, 777)
+		AddSpawner("d_zachariel_35.Id17", MonsterId.Dog_Of_King, min: 1, max: 2, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+
+		// Corridor 3 (684, -48)
+		AddSpawner("d_zachariel_35.Id18", MonsterId.Karas_Mage, min: 1, max: 1, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+
+		// Corridor 4 (-577, -8)
+		AddSpawner("d_zachariel_35.Id19", MonsterId.Wolf_Statue_Bow, min: 1, max: 2, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+
+		// Corridor 5 (-1048, -779)
+		AddSpawner("d_zachariel_35.Id20", MonsterId.Schlesien_Guard, min: 1, max: 1, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+
+		// Corridor 6 (-1045, 923)
+		AddSpawner("d_zachariel_35.Id21", MonsterId.Dog_Of_King, min: 1, max: 2, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+
+		// Corridor 7 (-483, 1528)
+		AddSpawner("d_zachariel_35.Id22", MonsterId.Karas_Mage, min: 1, max: 1, respawn: Seconds(20), tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 
-		// 'Rootcrystal_05' GenType 600 Spawn Points
+		// 'Rootcrystal_05' Spawn Points
 		AddSpawnPoint("d_zachariel_35.Id1", "d_zachariel_35", Rectangle(1059, -1508, 30));
 		AddSpawnPoint("d_zachariel_35.Id1", "d_zachariel_35", Rectangle(1212, -118, 30));
 		AddSpawnPoint("d_zachariel_35.Id1", "d_zachariel_35", Rectangle(1084, 1432, 30));
@@ -45,123 +86,53 @@ public class DZachariel35MobScript : GeneralScript
 		AddSpawnPoint("d_zachariel_35.Id1", "d_zachariel_35", Rectangle(-1049, -50, 30));
 		AddSpawnPoint("d_zachariel_35.Id1", "d_zachariel_35", Rectangle(496, 1507, 30));
 
-		// 'Dog_Of_King' GenType 608 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id2", "d_zachariel_35", Rectangle(1115, -54, 9999));
+		// Room 1 (876, -1152)
+		AddSpawnPoint("d_zachariel_35.Id2", "d_zachariel_35", Rectangle(876, -1152, 400));
+		AddSpawnPoint("d_zachariel_35.Id3", "d_zachariel_35", Rectangle(876, -1152, 400));
 
-		// 'Schlesien_Guard' GenType 3006 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id3", "d_zachariel_35", Rectangle(1142, 378, 9999));
+		// Room 2 (1159, -47)
+		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(1159, -47, 400));
+		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(1159, -47, 400));
 
-		// 'Schlesien_Guard' GenType 3009 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-1127, -5, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-382, 1073, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-456, -1514, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-706, -1387, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-710, -1164, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-39, 10, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-1043, 220, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-717, -37, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-632, 1109, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-409, 1220, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-826, 1535, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-1035, 639, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-21, -1609, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(37, -1459, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-196, -1636, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-933, -1484, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-974, -1159, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-1059, -792, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-1127, -149, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-1030, 1111, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-1007, 1435, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-461, 1518, 40));
-		AddSpawnPoint("d_zachariel_35.Id4", "d_zachariel_35", Rectangle(-348, 842, 40));
+		// Room 3 (67, -30)
+		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(67, -30, 400));
+		AddSpawnPoint("d_zachariel_35.Id7", "d_zachariel_35", Rectangle(67, -30, 400));
 
-		// 'Dog_Of_King' GenType 3010 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(1202, -130, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(47, -23, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-1078, -38, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-88, -18, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-714, 21, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-1093, 142, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-1232, -25, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-1165, 79, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-1099, -184, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-766, -27, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-512, 2, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(-4, -151, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(68, 61, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(204, -125, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(295, 13, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(703, -46, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(895, -46, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(1175, 8, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(1316, -29, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(1009, -127, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(1083, 49, 250));
-		AddSpawnPoint("d_zachariel_35.Id5", "d_zachariel_35", Rectangle(1101, -35, 250));
+		// Room 4 (-1073, -11)
+		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-1073, -11, 400));
+		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-1073, -11, 400));
 
-		// 'Schlesien_Guard' GenType 3012 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(949, -1220, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(815, -1013, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(799, -1209, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(915, -1500, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(1102, -1539, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(1175, -1372, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(727, -1579, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(1159, -856, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(900, -1104, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(1142, -567, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(1158, -234, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(449, -1569, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(1104, -1434, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(919, -1386, 30));
-		AddSpawnPoint("d_zachariel_35.Id6", "d_zachariel_35", Rectangle(1028, -1027, 30));
+		// Room 5 (-701, -1335)
+		AddSpawnPoint("d_zachariel_35.Id10", "d_zachariel_35", Rectangle(-701, -1335, 400));
+		AddSpawnPoint("d_zachariel_35.Id11", "d_zachariel_35", Rectangle(-701, -1335, 400));
 
-		// 'Dog_Of_King' GenType 3016 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id7", "d_zachariel_35", Rectangle(589, 1077, 300));
-		AddSpawnPoint("d_zachariel_35.Id7", "d_zachariel_35", Rectangle(-504, 1076, 300));
+		// Room 6 (-478, 1107)
+		AddSpawnPoint("d_zachariel_35.Id12", "d_zachariel_35", Rectangle(-478, 1107, 400));
+		AddSpawnPoint("d_zachariel_35.Id13", "d_zachariel_35", Rectangle(-478, 1107, 400));
 
-		// 'Wolf_Statue_Bow' GenType 3021 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-501, 1107, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-737, -1401, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-748, -1176, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-1084, 236, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(174, -93, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(1017, -51, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(1239, -43, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(95, 51, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(1073, 1386, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(550, 929, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(723, 1167, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-1082, -347, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-1067, 589, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-994, 1121, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-862, 1496, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(1184, 531, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-1040, -934, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(1201, -446, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(711, -54, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-690, -38, 30));
-		AddSpawnPoint("d_zachariel_35.Id8", "d_zachariel_35", Rectangle(-1165, -30, 30));
+		// Room 7 (585, 1074)
+		AddSpawnPoint("d_zachariel_35.Id14", "d_zachariel_35", Rectangle(585, 1074, 400));
+		AddSpawnPoint("d_zachariel_35.Id15", "d_zachariel_35", Rectangle(585, 1074, 400));
 
-		// 'Karas_Mage' GenType 3022 Spawn Points
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-558, 1113, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-378, 1045, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(19, -1562, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-174, -1570, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(696, 965, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(788, 1210, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-1089, -29, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-801, -1456, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-719, -1171, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-1051, -734, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-1035, 467, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(427, 1414, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(1001, 1483, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(1179, 950, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(1136, 382, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(651, -51, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(903, -60, 30));
-		AddSpawnPoint("d_zachariel_35.Id9", "d_zachariel_35", Rectangle(-14, -70, 30));
+		// Corridor 1 (855, 1484)
+		AddSpawnPoint("d_zachariel_35.Id16", "d_zachariel_35", Rectangle(855, 1484, 400));
+
+		// Corridor 2 (1166, 777)
+		AddSpawnPoint("d_zachariel_35.Id17", "d_zachariel_35", Rectangle(1166, 777, 400));
+
+		// Corridor 3 (684, -48)
+		AddSpawnPoint("d_zachariel_35.Id18", "d_zachariel_35", Rectangle(684, -48, 400));
+
+		// Corridor 4 (-577, -8)
+		AddSpawnPoint("d_zachariel_35.Id19", "d_zachariel_35", Rectangle(-577, -8, 400));
+
+		// Corridor 5 (-1048, -779)
+		AddSpawnPoint("d_zachariel_35.Id20", "d_zachariel_35", Rectangle(-1048, -779, 400));
+
+		// Corridor 6 (-1045, 923)
+		AddSpawnPoint("d_zachariel_35.Id21", "d_zachariel_35", Rectangle(-1045, 923, 400));
+
+		// Corridor 7 (-483, 1528)
+		AddSpawnPoint("d_zachariel_35.Id22", "d_zachariel_35", Rectangle(-483, 1528, 400));
 	}
 }

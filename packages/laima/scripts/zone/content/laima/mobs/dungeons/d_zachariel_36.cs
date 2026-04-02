@@ -19,19 +19,48 @@ public class DZachariel36MobScript : GeneralScript
 		AddSpawnBuff("d_zachariel_36", MonsterId.Schlesien_Darkmage, BuffId.EliteMonsterBuff, chance: 100);
 		AddSpawnBuff("d_zachariel_36", MonsterId.Schlesien_Heavycavarly, BuffId.EliteMonsterBuff, chance: 100);
 		AddSpawnBuff("d_zachariel_36", MonsterId.Schlesien_Claw, BuffId.EliteMonsterBuff, chance: 100);
-
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_zachariel_36.Id1", MonsterId.Rootcrystal_05, min: 8, max: 10, respawn: Seconds(15), tendency: TendencyType.Peaceful);
-		AddSpawner("d_zachariel_36.Id2", MonsterId.Schlesien_Darkmage, min: 2, max: 2, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_36.Id3", MonsterId.Schlesien_Heavycavarly, amount: 2, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_36.Id4", MonsterId.Schlesien_Claw, min: 4, max: 6, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id2", MonsterId.Schlesien_Heavycavarly, min: 4, max: 4, tendency: TendencyType.Aggressive);
+
+		// Room 1 (-2491, -4561)
+		AddSpawner("d_zachariel_36.Id3", MonsterId.Schlesien_Claw, min: 1, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id4", MonsterId.Schlesien_Darkmage, min: 1, max: 1, tendency: TendencyType.Aggressive);
+
+		// Room 2 (-2499, -3595)
 		AddSpawner("d_zachariel_36.Id5", MonsterId.Schlesien_Darkmage, min: 2, max: 3, tendency: TendencyType.Aggressive);
-		AddSpawner("d_zachariel_36.Id6", MonsterId.Schlesien_Claw, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id6", MonsterId.Schlesien_Claw, min: 1, max: 1, tendency: TendencyType.Aggressive);
+
+		// Room 3 (-2493, -2595)
+		AddSpawner("d_zachariel_36.Id7", MonsterId.Schlesien_Darkmage, min: 1, max: 1, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id8", MonsterId.Schlesien_Claw, min: 1, max: 2, tendency: TendencyType.Aggressive);
+
+		// Room 4 (-3429, -2590)
+		AddSpawner("d_zachariel_36.Id9", MonsterId.Schlesien_Claw, min: 1, max: 2, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id10", MonsterId.Schlesien_Darkmage, min: 1, max: 2, tendency: TendencyType.Aggressive);
+
+		// Room 5 (-1710, -2596)
+		AddSpawner("d_zachariel_36.Id11", MonsterId.Schlesien_Darkmage, min: 1, max: 1, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id12", MonsterId.Schlesien_Claw, min: 2, max: 3, tendency: TendencyType.Aggressive);
+
+		// Room 6 (-2490, -1088) - Big room, pop 5
+		AddSpawner("d_zachariel_36.Id13", MonsterId.Schlesien_Darkmage, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id14", MonsterId.Schlesien_Claw, min: 2, max: 2, tendency: TendencyType.Aggressive);
+
+		// Room 7 (-2664, 482) - Big room, pop 5
+		AddSpawner("d_zachariel_36.Id15", MonsterId.Schlesien_Claw, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_zachariel_36.Id16", MonsterId.Schlesien_Darkmage, min: 2, max: 2, tendency: TendencyType.Aggressive);
+
+		// Corridor 1 (-2516, -1851)
+		AddSpawner("d_zachariel_36.Id17", MonsterId.Schlesien_Darkmage, min: 1, max: 1, respawn: Seconds(20), tendency: TendencyType.Aggressive);
+
+		// Corridor 2 (-2492, -365)
+		AddSpawner("d_zachariel_36.Id18", MonsterId.Schlesien_Claw, min: 1, max: 2, respawn: Seconds(20), tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 
-		// 'Rootcrystal_05' GenType 600 Spawn Points
+		// 'Rootcrystal_05' Spawn Points
 		AddSpawnPoint("d_zachariel_36.Id1", "d_zachariel_36", Rectangle(-2596, -4677, 30));
 		AddSpawnPoint("d_zachariel_36.Id1", "d_zachariel_36", Rectangle(-2412, -2689, 30));
 		AddSpawnPoint("d_zachariel_36.Id1", "d_zachariel_36", Rectangle(-2468, -1043, 30));
@@ -43,93 +72,41 @@ public class DZachariel36MobScript : GeneralScript
 		AddSpawnPoint("d_zachariel_36.Id1", "d_zachariel_36", Rectangle(-2609, -1073, 30));
 		AddSpawnPoint("d_zachariel_36.Id1", "d_zachariel_36", Rectangle(-2755, -2496, 30));
 
-		// 'Schlesien_Darkmage' GenType 720 Spawn Points
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2498, -2577, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2504, -5413, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2593, -5535, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2535, -5683, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2493, -5573, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2413, -5478, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2521, -5296, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2588, -2733, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2614, -2511, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2390, -2462, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2408, -2752, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2714, -2611, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2218, -2606, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2645, -2857, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2490, -2347, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2514, -2999, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2064, -2578, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2947, -2578, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2491, -2191, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-1702, -2597, 250));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2658, 497, 300));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2658, 497, 300));
-		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2658, 497, 300));
+		// 'Schlesien_Heavycavarly' Roaming Spawn
+		AddSpawnPoint("d_zachariel_36.Id2", "d_zachariel_36", Rectangle(-2493, -2595, 9999));
 
-		// 'Schlesien_Heavycavarly' GenType 721 Spawn Points
-		AddSpawnPoint("d_zachariel_36.Id3", "d_zachariel_36", Rectangle(-2669, -2596, 9999));
+		// Room 1 (-2491, -4561)
+		AddSpawnPoint("d_zachariel_36.Id3", "d_zachariel_36", Rectangle(-2491, -4561, 400));
+		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2491, -4561, 400));
 
-		// 'Schlesien_Claw' GenType 723 Spawn Points
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2405, -2705, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2693, -4590, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2510, -4346, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2354, -4544, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2493, -4544, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2535, -4726, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2551, -3721, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2571, -3518, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2419, -3530, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2616, -3597, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2496, -3387, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2605, -2686, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2578, -2523, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2897, -2589, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2514, -3053, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2526, -3138, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2473, -2154, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2513, -1799, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2136, -2587, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-1809, -2542, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-1640, -2572, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-1697, -2678, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-3354, -2707, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-3515, -2663, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-3464, -2482, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-3503, -2554, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2402, -2505, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2532, -1293, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2625, -1086, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2485, -886, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2240, -1118, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2373, -1240, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2803, -1239, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2730, -1000, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2146, -1324, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2146, -980, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2499, -208, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2500, -484, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-3068, -2585, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-1702, -2597, 40));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2658, 497, 300));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2658, 497, 300));
-		AddSpawnPoint("d_zachariel_36.Id4", "d_zachariel_36", Rectangle(-2658, 497, 300));
+		// Room 2 (-2499, -3595)
+		AddSpawnPoint("d_zachariel_36.Id5", "d_zachariel_36", Rectangle(-2499, -3595, 400));
+		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2499, -3595, 400));
 
-		// 'Schlesien_Darkmage' GenType 3002 Spawn Points
-		AddSpawnPoint("d_zachariel_36.Id5", "d_zachariel_36", Rectangle(-2476, -2588, 9999));
+		// Room 3 (-2493, -2595)
+		AddSpawnPoint("d_zachariel_36.Id7", "d_zachariel_36", Rectangle(-2493, -2595, 400));
+		AddSpawnPoint("d_zachariel_36.Id8", "d_zachariel_36", Rectangle(-2493, -2595, 400));
 
-		// 'Schlesien_Darkmage' GenType 3018 Spawn Points
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2497, -4520, 30));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2643, -4760, 30));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2700, -4529, 30));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2447, -4361, 30));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2281, -4544, 30));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2362, -4726, 30));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2488, -4659, 30));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-1702, -2597, 40));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2658, 497, 300));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2658, 497, 300));
-		AddSpawnPoint("d_zachariel_36.Id6", "d_zachariel_36", Rectangle(-2658, 497, 300));
+		// Room 4 (-3429, -2590)
+		AddSpawnPoint("d_zachariel_36.Id9", "d_zachariel_36", Rectangle(-3429, -2590, 400));
+		AddSpawnPoint("d_zachariel_36.Id10", "d_zachariel_36", Rectangle(-3429, -2590, 400));
+
+		// Room 5 (-1710, -2596)
+		AddSpawnPoint("d_zachariel_36.Id11", "d_zachariel_36", Rectangle(-1710, -2596, 400));
+		AddSpawnPoint("d_zachariel_36.Id12", "d_zachariel_36", Rectangle(-1710, -2596, 400));
+
+		// Room 6 (-2490, -1088) - Big room
+		AddSpawnPoint("d_zachariel_36.Id13", "d_zachariel_36", Rectangle(-2490, -1088, 500));
+		AddSpawnPoint("d_zachariel_36.Id14", "d_zachariel_36", Rectangle(-2490, -1088, 500));
+
+		// Room 7 (-2664, 482) - Big room
+		AddSpawnPoint("d_zachariel_36.Id15", "d_zachariel_36", Rectangle(-2664, 482, 500));
+		AddSpawnPoint("d_zachariel_36.Id16", "d_zachariel_36", Rectangle(-2664, 482, 500));
+
+		// Corridor 1 (-2516, -1851)
+		AddSpawnPoint("d_zachariel_36.Id17", "d_zachariel_36", Rectangle(-2516, -1851, 400));
+
+		// Corridor 2 (-2492, -365)
+		AddSpawnPoint("d_zachariel_36.Id18", "d_zachariel_36", Rectangle(-2492, -365, 400));
 	}
 }
