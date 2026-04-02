@@ -34,7 +34,7 @@ namespace Melia.Zone.Buffs.Handlers.Wizard
 
 			multiplierReduction = Math.Min(0.8f, multiplierReduction);
 
-			modifier.DamageMultiplier -= multiplierReduction;
+			modifier.DamageMultiplier *= (1f - multiplierReduction);
 
 			var maxSp = target.Properties.GetFloat(PropertyName.MSP);
 			var currentSp = target.Properties.GetFloat(PropertyName.SP);

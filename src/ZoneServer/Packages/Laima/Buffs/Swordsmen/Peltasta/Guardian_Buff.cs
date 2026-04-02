@@ -70,7 +70,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsman.Peltasta
 			multiplierReduction = Math.Min(0.80f, multiplierReduction);
 
 			if (!target.IsAbilityActive(AbilityId.Peltasta39))
-				modifier.DamageMultiplier -= multiplierReduction;
+				modifier.DamageMultiplier *= (1f - multiplierReduction);
 		}
 
 		/// <summary>

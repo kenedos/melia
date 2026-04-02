@@ -48,7 +48,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 			// calculations, on AfterBonuses, but setting the multiplier seems
 			// much easier. Is this correct? Who knows.
 
-			modifier.DamageMultiplier -= multiplierReduction;
+			modifier.DamageMultiplier *= (1f - multiplierReduction);
 		}
 	}
 }

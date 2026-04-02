@@ -73,7 +73,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				animationName = "I_arrow003_blue";
 
 				modifier.AttackAttribute = AttributeType.Ice;
-				modifier.DamageMultiplier -= 0.3f;
+				modifier.DamageMultiplier *= 0.7f;
 			}
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, target.Position);

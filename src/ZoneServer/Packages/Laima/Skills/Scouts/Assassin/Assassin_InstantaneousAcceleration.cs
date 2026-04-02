@@ -92,7 +92,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 				if (caster.IsAbilityActive(AbilityId.Assassin8))
 				{
 					modifier.HitCount *= 2;
-					modifier.FinalDamageMultiplier -= 0.25f;
+					modifier.FinalDamageMultiplier *= 0.75f;
 				}
 
 				// Increase damage by 10% if target is under the effect of

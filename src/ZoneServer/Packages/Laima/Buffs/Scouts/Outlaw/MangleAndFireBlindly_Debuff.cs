@@ -37,7 +37,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.OutLaw
 
 			if (target == buff.Caster)
 			{
-				modifier.FinalDamageMultiplier -= 0.07f * buff.OverbuffCounter;
+				modifier.FinalDamageMultiplier *= (1f - 0.07f * buff.OverbuffCounter);
 			}
 		}
 	}

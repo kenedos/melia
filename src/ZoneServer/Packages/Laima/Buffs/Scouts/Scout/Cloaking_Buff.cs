@@ -44,7 +44,7 @@ namespace Melia.Zone.Buffs.Handlers.Scout
 
 			damageReduction = (float)Math.Min(0.95, damageReduction);
 
-			modifier.DamageMultiplier -= damageReduction;
+			modifier.DamageMultiplier *= (1f - damageReduction);
 		}
 
 		/// <summary>

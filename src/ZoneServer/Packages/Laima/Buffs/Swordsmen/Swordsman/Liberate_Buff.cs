@@ -35,7 +35,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 				return;
 
 			var multiplier = 0.5f;
-			modifier.DamageMultiplier -= multiplier;
+			modifier.DamageMultiplier *= (1f - multiplier);
 		}
 
 		/// <summary>

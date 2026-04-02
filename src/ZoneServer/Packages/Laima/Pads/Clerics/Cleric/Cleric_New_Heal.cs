@@ -142,7 +142,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Cleric
 
 			modifier.AttackAttribute = AttributeType.Holy;
 			modifier.BonusDamage += damageBonus;
-			modifier.DamageMultiplier -= 0.5f;
+			modifier.DamageMultiplier *= 0.5f;
 
 			// Calculate final damage
 			skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
