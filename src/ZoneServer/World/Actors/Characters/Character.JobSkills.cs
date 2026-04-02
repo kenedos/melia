@@ -229,13 +229,6 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void ChangeJob(JobId jobId, JobCircle circle, int skillPoints, bool playEffect = true)
 		{
-			// Store current levels of all existing jobs before adding the new one,
-			// because adding a job changes the rank which affects how TotalExp
-			// translates to Level (Level is calculated from TotalExp + rank)
-			var existingJobLevels = new Dictionary<JobId, int>();
-			foreach (var existingJob in this.Jobs.GetList())
-				existingJobLevels[existingJob.Id] = existingJob.Level;
-
 			var newJob = new Job(this, jobId, circle, skillPoints);
 			newJob.AdvancementDate = DateTime.Now;
 
@@ -244,18 +237,6 @@ namespace Melia.Zone.World.Actors.Characters
 
 			this.JobId = jobId;
 			this.Jobs.Add(newJob);
-
-			// After adding the job, the rank has increased. Recalculate TotalExp
-			// for all existing jobs to maintain their levels at the new rank.
-			var newRank = this.Jobs.GetCurrentRank();
-			foreach (var existingJob in this.Jobs.GetList())
-			{
-				if (existingJob.Id == jobId)
-					continue;
-
-				var targetLevel = existingJobLevels[existingJob.Id];
-				existingJob.TotalExp = ZoneServer.Instance.Data.ExpDb.GetNextTotalJobExp(newRank, targetLevel);
-			}
 
 			ZoneServer.Instance.ServerEvents.PlayerAdvancedJob.Raise(new PlayerEventArgs(this));
 
