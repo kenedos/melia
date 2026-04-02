@@ -47,21 +47,7 @@ namespace Melia.Zone.Buffs.Handlers.Laima.Monster
 				buff.Vars.Set(MinionHandlesVar, minionHandles);
 			}
 
-			// Remove dead/gone minions from tracking
-			for (var i = minionHandles.Count - 1; i >= 0; i--)
-			{
-				if (!monster.Map.TryGetCombatEntity(minionHandles[i], out var minion) || minion.IsDead)
-					minionHandles.RemoveAt(i);
-			}
-
-			// Spawn more if below target count
-			var needed = TargetMinionCount - minionHandles.Count;
-			if (needed > 0)
-			{
-				var newMinions = MythicBuffHelper.SpawnMythicMinions(monster, needed);
-				foreach (var m in newMinions)
-					minionHandles.Add(m.Handle);
-			}
+			MythicBuffHelper.MaintainMinions(buff, monster, minionHandles, TargetMinionCount);
 
 			// Apply morale buff to nearby monsters
 			var range = MoraleRange;

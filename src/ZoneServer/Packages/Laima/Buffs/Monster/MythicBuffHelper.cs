@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
@@ -18,6 +19,8 @@ namespace Melia.Zone.Buffs.Handlers.Monster
 	{
 		private const float ShieldHpRate = 20f;
 		private const int MinionCount = 5;
+		private const int RespawnDelayMs = 30000;
+		private const string RespawnTimeVar = "Melia.Mythic.RespawnTime";
 		/// <summary>
 		/// Applies mythic stat boosts to a monster (size, rank, HP/SP/ATK/DEF/speed).
 		/// </summary>
@@ -121,6 +124,44 @@ namespace Melia.Zone.Buffs.Handlers.Monster
 			}
 
 			return minions;
+		}
+
+		/// <summary>
+		/// Maintains minion count for a mythic monster, cleaning up dead
+		/// minions and respawning after a 30-second delay.
+		/// </summary>
+		public static void MaintainMinions(Buff buff, Mob leader, List<int> minionHandles, int targetCount = MinionCount)
+		{
+			if (leader.Map == null || leader.IsDead)
+				return;
+
+			// Remove dead/gone minions from tracking
+			var hadDeaths = false;
+			for (var i = minionHandles.Count - 1; i >= 0; i--)
+			{
+				if (!leader.Map.TryGetCombatEntity(minionHandles[i], out var minion) || minion.IsDead)
+				{
+					minionHandles.RemoveAt(i);
+					hadDeaths = true;
+				}
+			}
+
+			// Start respawn timer when minions die
+			if (hadDeaths && (!buff.Vars.TryGet<long>(RespawnTimeVar, out var existingTime) || existingTime == 0))
+				buff.Vars.Set(RespawnTimeVar, Environment.TickCount64 + RespawnDelayMs);
+
+			// Spawn more if below target count and delay has elapsed
+			var needed = targetCount - minionHandles.Count;
+			if (needed > 0)
+			{
+				if (buff.Vars.TryGet<long>(RespawnTimeVar, out var respawnTime) && respawnTime > 0 && Environment.TickCount64 < respawnTime)
+					return;
+
+				buff.Vars.Set(RespawnTimeVar, 0L);
+				var newMinions = SpawnMythicMinions(leader, needed);
+				foreach (var m in newMinions)
+					minionHandles.Add(m.Handle);
+			}
 		}
 
 	}

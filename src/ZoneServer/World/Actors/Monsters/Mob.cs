@@ -1033,7 +1033,8 @@ namespace Melia.Zone.World.Actors.Monsters
 				|| this.IsBuffActive(BuffId.Mythic_Boosting_Morale_Buff)
 				|| this.IsBuffActive(BuffId.Mythic_Puddle_Buff)
 				|| this.IsBuffActive(BuffId.Mythic_Bomb_Buff)
-				|| this.IsBuffActive(BuffId.Mythic_InfectiousDisease_Buff);
+				|| this.IsBuffActive(BuffId.Mythic_InfectiousDisease_Buff)
+				|| this.IsBuffActive(BuffId.Mythic_Link_Buff);
 		}
 
 		/// <summary>
@@ -1348,6 +1349,7 @@ namespace Melia.Zone.World.Actors.Monsters
 					BuffId.Mythic_Puddle_Buff,
 					BuffId.Mythic_Bomb_Buff,
 					BuffId.Mythic_InfectiousDisease_Buff,
+					BuffId.Mythic_Link_Buff,
 				};
 
 				var chosenBuff = mythicBuffs[rnd.Next(mythicBuffs.Length)];
