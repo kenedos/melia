@@ -114,14 +114,6 @@ namespace Melia.Zone.Network
 				sessionKey = packet.GetString(64);
 			}
 
-			var enqueuedAt = Stopwatch.GetTimestamp();
-
-			SaveQueue.Enqueue(() => this.ProcessConnect(conn, accountId, characterId, accountName, sessionKey, fromBarracks1, enqueuedAt));
-		}
-
-		private void ProcessConnect(IZoneConnection conn, long accountId, long characterId, string accountName, string sessionKey, bool fromBarracks1, long enqueuedAt)
-		{
-			var queuedMs = (Stopwatch.GetTimestamp() - enqueuedAt) * 1000 / Stopwatch.Frequency;
 			var sw = Stopwatch.StartNew();
 			long authMs = 0, cleanupMs = 0, loadMs = 0;
 			long cleanupSaveMs = 0, cleanupRemoveMs = 0, cleanupCloseMs = 0;
@@ -180,8 +172,6 @@ namespace Melia.Zone.Network
 					existingCharacter.Connection?.Close();
 					cleanupCloseMs = sw.ElapsedMilliseconds - closeStart;
 
-					// Save inline — ProcessConnect already runs on the
-					// SaveQueue worker, so enqueuing + waiting would deadlock.
 					var charToSave = existingCharacter;
 					var saveStart = sw.ElapsedMilliseconds;
 					try
@@ -299,7 +289,7 @@ namespace Melia.Zone.Network
 				if (charName != null)
 				{
 					var cleanupStr = cleanupMs > 0 ? $", cleanup={cleanupMs} [save={cleanupSaveMs}, remove={cleanupRemoveMs}, close={cleanupCloseMs}]" : "";
-					Log.Info($"CZ_CONNECT: '{charName}' (ID: {charDbId}) ready in {sw.ElapsedMilliseconds}ms [queued={queuedMs}, auth={authMs}{cleanupStr}, load={loadMs}, setup={setupMs}]");
+					Log.Info($"CZ_CONNECT: '{charName}' (ID: {charDbId}) ready in {sw.ElapsedMilliseconds}ms [auth={authMs}{cleanupStr}, load={loadMs}, setup={setupMs}]");
 				}
 			}
 		}
