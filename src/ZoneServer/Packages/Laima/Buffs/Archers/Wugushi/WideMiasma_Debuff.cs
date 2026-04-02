@@ -71,11 +71,7 @@ namespace Melia.Zone.Buffs.Handlers
 				if (nearbyEnemy == null)
 					continue;
 
-				var damage = 0f;
-				if (poisonBuff.Vars.TryGetFloat("Melia.DoT.SnapshotDamage", out var snapshotDamage))
-					damage = snapshotDamage;
-
-				nearbyEnemy.StartBuff(poisonBuff.Id, poisonBuff.NumArg1, damage, poisonBuff.RemainingDuration, poisonCaster, poisonBuff.SkillId);
+				nearbyEnemy.StartBuff(poisonBuff.Id, poisonBuff.NumArg1, poisonBuff.NumArg2, poisonBuff.RemainingDuration, poisonCaster, poisonBuff.SkillId);
 			}
 		}
 	}

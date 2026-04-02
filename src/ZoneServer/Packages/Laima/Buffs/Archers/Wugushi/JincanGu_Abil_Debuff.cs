@@ -42,10 +42,7 @@ namespace Melia.Zone.Buffs.Handlers
 				var target = buff.Target;
 
 				// Get the snapshotted damage
-				if (buff.Vars.TryGetFloat("Melia.DoT.SnapshotDamage", out var damage))
-				{
-					target.TakeSimpleHit(damage, attacker, this.GetSkillId(buff), this.GetHitType(buff));
-				}
+				target.TakeSimpleHit(buff.NumArg2, attacker, this.GetSkillId(buff), this.GetHitType(buff));
 
 				buff.Vars.SetInt(AdditionalHitsDoneVar, additionalHitsDone + 1);
 			}
