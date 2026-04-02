@@ -306,13 +306,39 @@ namespace Melia.Zone.Skills.Helpers
 		public static List<List<ICombatEntity>> FindAllLinks(ICombatEntity caster, BuffId buffId)
 		{
 			var allLinks = new List<List<ICombatEntity>>();
-			var processedBuffs = new HashSet<int>();
+			var processedLinkIds = new HashSet<int>();
 
+			// Check the caster's own buff first — for party links (Link_Physical,
+			// Link_Party, Link) the caster carries the buff with the member list,
+			// and allies won't appear in GetAttackableEntities.
+			if (caster.TryGetBuff(buffId, out var casterBuff) && casterBuff.Vars != null)
+			{
+				if (casterBuff.Vars.TryGet<int>("Melia.Link.Id", out var linkId))
+					processedLinkIds.Add(linkId);
+
+				if (casterBuff.Vars.TryGet<List<int>>("Melia.Link.Members", out var casterMembers))
+				{
+					var members = new List<ICombatEntity>();
+					foreach (var handle in casterMembers)
+					{
+						if (caster.Map.TryGetCombatEntity(handle, out var member))
+							members.Add(member);
+					}
+					if (members.Any())
+						allLinks.Add(members);
+				}
+			}
+
+			// Also check attackable entities for enemy links (Link_Enemy, etc.)
 			foreach (var actor in caster.Map.GetAttackableEntities(caster, 500))
 			{
 				if (actor.TryGetBuff(buffId, out var buff) && buff.Caster?.Handle == caster.Handle && buff.Vars != null)
 				{
-					if (processedBuffs.Contains(buff.Handle)) continue;
+					if (buff.Vars.TryGet<int>("Melia.Link.Id", out var linkId) && processedLinkIds.Contains(linkId))
+						continue;
+
+					if (buff.Vars.TryGet<int>("Melia.Link.Id", out var lid))
+						processedLinkIds.Add(lid);
 
 					if (buff.Vars.TryGet<List<int>>("Melia.Link.Members", out var memberHandles))
 					{
@@ -323,10 +349,6 @@ namespace Melia.Zone.Skills.Helpers
 							if (caster.Map.TryGetCombatEntity(handle, out var member))
 							{
 								members.Add(member);
-								if (member.TryGetBuff(buffId, out var memberBuff))
-								{
-									processedBuffs.Add(memberBuff.Handle);
-								}
 							}
 							else
 							{

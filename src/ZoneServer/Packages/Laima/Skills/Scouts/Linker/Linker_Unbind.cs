@@ -48,8 +48,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 
 			// Only cancel party member related links
 			LinkerSkillHelper.LinkDestruct(caster, BuffId.Link_Physical);  // Physical Link
-			LinkerSkillHelper.LinkDestruct(caster, BuffId.Link_Party);     // Lifeline
-			LinkerSkillHelper.LinkDestruct(caster, BuffId.Link);           // Spiritual Chain
+			LinkerSkillHelper.LinkDestruct(caster, BuffId.Link_Party);     // Spiritual Chain
+			LinkerSkillHelper.LinkDestruct(caster, BuffId.Link_Sacrifice); // Lifeline
+			LinkerSkillHelper.LinkDestruct(caster, BuffId.Link);           // Link
 		}
 	}
 }
