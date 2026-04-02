@@ -1,6 +1,7 @@
 using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -14,7 +15,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 	/// 1% chance on normal attack to activate item_set_011_buff.
 	/// </summary>
 	[BuffHandler(BuffId.item_set_011pre_buff)]
-	public class item_set_011pre_buff : BuffHandler, IBuffCombatAttackAfterCalcHandler
+	public class item_set_011pre_buff : BuffHandler
 	{
 		/// <summary>
 		/// Chance to proc the buff (1% = 1 out of 100).
@@ -30,8 +31,12 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 		/// Called after attack damage is calculated.
 		/// Has 1% chance to trigger item_set_011_buff on normal attacks.
 		/// </summary>
-		public void OnAttackAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.item_set_011pre_buff)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.item_set_011pre_buff, out var buff))
+				return;
+
 			// Only apply on normal attacks
 			if (!skill.IsNormalAttack)
 				return;

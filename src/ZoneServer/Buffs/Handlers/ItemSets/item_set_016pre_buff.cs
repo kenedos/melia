@@ -1,6 +1,7 @@
 using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -14,7 +15,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 	/// 1% chance when hit by Dark damage to activate item_set_016_buff.
 	/// </summary>
 	[BuffHandler(BuffId.item_set_016pre_buff)]
-	public class item_set_016pre_buff : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class item_set_016pre_buff : BuffHandler
 	{
 		/// <summary>
 		/// Chance to proc the buff (1% = 1 out of 100).
@@ -30,8 +31,12 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 		/// Called after defense damage is calculated (when taking damage).
 		/// Has 1% chance to trigger item_set_016_buff when hit by Dark damage.
 		/// </summary>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.item_set_016pre_buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.item_set_016pre_buff, out var buff))
+				return;
+
 			// Only characters can benefit
 			if (target is not Character)
 				return;

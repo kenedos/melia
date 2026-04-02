@@ -1,5 +1,6 @@
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -12,7 +13,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 	/// After every 5 attacks, deals an explosion with random bonus damage.
 	/// </summary>
 	[BuffHandler(BuffId.item_set_039pre_buff)]
-	public class item_set_039pre_buff : BuffHandler, IBuffCombatAttackAfterCalcHandler
+	public class item_set_039pre_buff : BuffHandler
 	{
 		private const string AttackCountVar = "Melia.Set039.AttackCount";
 		private const int RequiredAttacks = 5;
@@ -24,8 +25,12 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 		/// Called after attack damage is calculated.
 		/// Counts attacks and deals explosion damage after 5 hits.
 		/// </summary>
-		public void OnAttackAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.item_set_039pre_buff)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.item_set_039pre_buff, out var buff))
+				return;
+
 			// Don't apply if no damage was dealt
 			if (skillHitResult.Damage <= 0)
 				return;
@@ -49,7 +54,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 			skillHitResult.Damage += explosionDamage;
 
 			// Display as 2 hits for the explosion effect
-			skillHitResult.HitCount = 2;
+			skillHitResult.HitCount += 1;
 
 			// TODO: Play explosion effect
 			// PlayEffect(target, "F_explosion065_violet", 1, 1, 'BOT')

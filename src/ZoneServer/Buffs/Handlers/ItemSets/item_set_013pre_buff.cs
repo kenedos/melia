@@ -1,6 +1,7 @@
 using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -13,7 +14,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 	/// When hit by Earth damage, triggers item_set_013_buff.
 	/// </summary>
 	[BuffHandler(BuffId.item_set_013pre_buff)]
-	public class item_set_013pre_buff : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class item_set_013pre_buff : BuffHandler
 	{
 		/// <summary>
 		/// Duration of the triggered buff in milliseconds.
@@ -24,8 +25,12 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 		/// Called after defense damage is calculated (when taking damage).
 		/// Triggers item_set_013_buff when hit by Earth damage.
 		/// </summary>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.item_set_013pre_buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.TryGetBuff(BuffId.item_set_013pre_buff, out var buff))
+				return;
+
 			// Only characters can benefit
 			if (target is not Character)
 				return;

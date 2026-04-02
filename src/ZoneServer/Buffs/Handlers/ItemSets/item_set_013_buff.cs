@@ -1,5 +1,6 @@
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -12,7 +13,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 	/// Adds Earth damage on normal attacks based on overbuff counter.
 	/// </summary>
 	[BuffHandler(BuffId.item_set_013_buff)]
-	public class item_set_013_buff : BuffHandler, IBuffCombatAttackAfterCalcHandler
+	public class item_set_013_buff : BuffHandler
 	{
 		/// <summary>
 		/// Bonus damage ratio for the extra hit.
@@ -23,8 +24,12 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 		/// Called after attack damage is calculated.
 		/// Adds bonus Earth damage on normal attacks based on overbuff count.
 		/// </summary>
-		public void OnAttackAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.item_set_013_buff)]
+		public void OnAttackAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!attacker.TryGetBuff(BuffId.item_set_013_buff, out var buff))
+				return;
+
 			// Only apply on normal attacks
 			if (!skill.IsNormalAttack)
 				return;
@@ -46,8 +51,8 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 			var bonusDamage = skillHitResult.Damage * BonusDamageRatio * damageMultiplier;
 			skillHitResult.Damage += bonusDamage;
 
-			// Display as 2 hits
-			skillHitResult.HitCount = 2;
+			// Add extra hit line to display
+			skillHitResult.HitCount += 1;
 		}
 	}
 }

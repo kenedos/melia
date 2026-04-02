@@ -7,7 +7,7 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 
-namespace Melia.Zone.Buffs.Handlers
+namespace Melia.Zone.Buffs.Handlers.Monster
 {
 	/// <summary>
 	/// Handle for the Elite Buff, An enormous monster, like the leader of the group..
