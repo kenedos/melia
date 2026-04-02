@@ -21,14 +21,22 @@ public class DAbbey224MobScript : GeneralScript
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("d_abbey_22_4.Id1", MonsterId.Rootcrystal_05, min: 14, max: 18, respawn: Minutes(1));
-		AddSpawner("d_abbey_22_4.Id2", MonsterId.Hohen_Mage_Black, min: 9, max: 12, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id3", MonsterId.Nook, min: 18, max: 24, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id4", MonsterId.Boor, min: 20, max: 26, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id5", MonsterId.Mangosting, min: 40, max: 60, respawn: Minutes(1), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id6", MonsterId.Half_Mangosting, min: 60, max: 86, respawn: Minutes(1), tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_4.Id7", MonsterId.Hohen_Mage_Black, min: 2, max: 4, respawn: Seconds(40), tendency: TendencyType.Aggressive);
-		AddSpawner("d_abbey_22_4.Id8", MonsterId.Hohen_Mage_Black, min: 2, max: 4, respawn: Minutes(1), tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_22_4.Id9", MonsterId.Rootcrystal_01, min: 13, max: 17, respawn: Minutes(1), tendency: TendencyType.Aggressive);
+
+		// Hohen_Mage_Black Room Spawners
+		AddSpawner("d_abbey_22_4.Id10", MonsterId.Hohen_Mage_Black, min: 1, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id11", MonsterId.Hohen_Mage_Black, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id12", MonsterId.Hohen_Mage_Black, min: 1, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id13", MonsterId.Hohen_Mage_Black, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id14", MonsterId.Hohen_Mage_Black, min: 1, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id15", MonsterId.Hohen_Mage_Black, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id16", MonsterId.Hohen_Mage_Black, min: 1, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id17", MonsterId.Hohen_Mage_Black, min: 2, max: 3, tendency: TendencyType.Aggressive);
+		AddSpawner("d_abbey_22_4.Id18", MonsterId.Hohen_Mage_Black, min: 1, max: 3, tendency: TendencyType.Aggressive);
 
 		// Monster Spawn Points -----------------------------
 
@@ -52,103 +60,16 @@ public class DAbbey224MobScript : GeneralScript
 		AddSpawnPoint("d_abbey_22_4.Id1", "d_abbey_22_4", Rectangle(-700, -1085, 20));
 		AddSpawnPoint("d_abbey_22_4.Id1", "d_abbey_22_4", Rectangle(-176, -1085, 20));
 
-		// 'Hohen_Mage_Black' GenType 50 Spawn Points
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(1471, 1199, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(1444, 1330, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(1271, 1328, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(1276, 1162, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(1592, 1175, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(797, 1325, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(786, 1226, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(365, 1346, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(366, 1209, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(551, 1327, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(36, 1348, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(30, 1229, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-138, 1222, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-150, 1350, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-528, 1179, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-543, 1399, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-683, 1402, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-688, 1178, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-807, 1409, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-834, 1177, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1119, 1338, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1125, 1263, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1324, 1357, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1328, 1220, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1343, 1083, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1546, 1376, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1655, 1269, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1540, 1152, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1443, 1273, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1530, 1035, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1742, 1052, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1739, 1225, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1748, 1377, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-47, 1117, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-53, 906, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(13, 906, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-721, 560, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-721, 709, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-554, 534, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-500, 707, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1287, 616, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1272, 710, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1405, 455, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1382, 586, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1558, 716, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1564, 594, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(349, 596, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(356, 708, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(448, 515, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(474, 794, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-68, 457, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-64, 294, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-384, 148, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-566, -39, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-546, 126, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-775, 147, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-776, -45, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-796, -358, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-810, -508, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-570, -573, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-579, -392, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(193, 177, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(482, 175, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(465, -64, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(682, -63, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(686, 126, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(854, -114, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(910, 111, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-763, -1182, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-592, -1123, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-469, -890, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-320, -912, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-517, -1119, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-462, -1236, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-303, -1000, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-436, -1136, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-214, -913, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-22, -1009, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-463, -1021, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-359, -1072, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-738, -587, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-613, -512, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-24, 793, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-33, 1016, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-254, 1318, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-842, 1278, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(36, 171, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-40, 346, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-108, 365, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-705, -189, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-933, 119, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-1031, 139, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-131, 142, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-670, -718, 40));
-		AddSpawnPoint("d_abbey_22_4.Id2", "d_abbey_22_4", Rectangle(-772, -334, 40));
-
+		// 'Hohen_Mage_Black' Room Spawn Points
+		AddSpawnPoint("d_abbey_22_4.Id10", "d_abbey_22_4", Rectangle(-1438, 460, 400));
+		AddSpawnPoint("d_abbey_22_4.Id11", "d_abbey_22_4", Rectangle(523, 1299, 400));
+		AddSpawnPoint("d_abbey_22_4.Id12", "d_abbey_22_4", Rectangle(-695, 1305, 400));
+		AddSpawnPoint("d_abbey_22_4.Id13", "d_abbey_22_4", Rectangle(-1567, 1260, 400));
+		AddSpawnPoint("d_abbey_22_4.Id14", "d_abbey_22_4", Rectangle(555, 669, 400));
+		AddSpawnPoint("d_abbey_22_4.Id15", "d_abbey_22_4", Rectangle(-636, 635, 400));
+		AddSpawnPoint("d_abbey_22_4.Id16", "d_abbey_22_4", Rectangle(-661, 53, 400));
+		AddSpawnPoint("d_abbey_22_4.Id17", "d_abbey_22_4", Rectangle(-1487, -13, 400));
+		AddSpawnPoint("d_abbey_22_4.Id18", "d_abbey_22_4", Rectangle(668, 71, 400));
 		// 'Nook' GenType 51 Spawn Points
 		AddSpawnPoint("d_abbey_22_4.Id3", "d_abbey_22_4", Rectangle(1642, 1093, 40));
 		AddSpawnPoint("d_abbey_22_4.Id3", "d_abbey_22_4", Rectangle(1562, 1392, 40));
@@ -287,20 +208,6 @@ public class DAbbey224MobScript : GeneralScript
 		AddSpawnPoint("d_abbey_22_4.Id6", "d_abbey_22_4", Rectangle(14, -1122, 40));
 		AddSpawnPoint("d_abbey_22_4.Id6", "d_abbey_22_4", Rectangle(-19, -922, 40));
 		AddSpawnPoint("d_abbey_22_4.Id6", "d_abbey_22_4", Rectangle(-138, -958, 40));
-
-		// 'Hohen_Mage_Black' GenType 57 Spawn Points
-		AddSpawnPoint("d_abbey_22_4.Id7", "d_abbey_22_4", Rectangle(1588, 1250, 20));
-		AddSpawnPoint("d_abbey_22_4.Id7", "d_abbey_22_4", Rectangle(1348, 1444, 20));
-		AddSpawnPoint("d_abbey_22_4.Id7", "d_abbey_22_4", Rectangle(1407, 1112, 20));
-		AddSpawnPoint("d_abbey_22_4.Id7", "d_abbey_22_4", Rectangle(404, 1342, 20));
-		AddSpawnPoint("d_abbey_22_4.Id7", "d_abbey_22_4", Rectangle(777, 1230, 20));
-
-		// 'Hohen_Mage_Black' GenType 58 Spawn Points
-		AddSpawnPoint("d_abbey_22_4.Id8", "d_abbey_22_4", Rectangle(-729, 29, 20));
-		AddSpawnPoint("d_abbey_22_4.Id8", "d_abbey_22_4", Rectangle(-708, 130, 20));
-		AddSpawnPoint("d_abbey_22_4.Id8", "d_abbey_22_4", Rectangle(-594, 45, 20));
-		AddSpawnPoint("d_abbey_22_4.Id8", "d_abbey_22_4", Rectangle(-500, -107, 20));
-		AddSpawnPoint("d_abbey_22_4.Id8", "d_abbey_22_4", Rectangle(-829, 215, 20));
 
 		// 'Rootcrystal_01' GenType 59 Spawn Points
 		AddSpawnPoint("d_abbey_22_4.Id9", "d_abbey_22_4", Rectangle(1609, 1235, 40));
