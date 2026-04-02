@@ -47,7 +47,7 @@
 // Hoplite
 //---------------------------------------------------------------------------
 { skillId: 10301, className: "Hoplite_Stabbing", name: "Stabbing", basicSp: 50, splashRate: -99, factor: 66, factorByLevel: 6.6, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "2" },
-{ skillId: 10302, className: "Hoplite_Pierce", name: "Pierce", basicSp: 24, splashRate: 3, factor: 222, factorByLevel: 22.2, hitCount: 1, multiHitCount: 4, cooldownTime: 7000, overheatCount: "3" },
+{ skillId: 10302, className: "Hoplite_Pierce", name: "Pierce", basicSp: 24, splashRate: 4, factor: 222, factorByLevel: 22.2, hitCount: 1, multiHitCount: 4, cooldownTime: 7000, overheatCount: "3" },
 { skillId: 10303, className: "Hoplite_Finestra", name: "Finestra", basicSp: 67, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 10304, className: "Hoplite_SynchroThrusting", name: "Synchro Thrusting", basicSp: 33, splashRate: 0, factor: 415, factorByLevel: 41.5, hitCount: 1, multiHitCount: 3, cooldownTime: 4000, overheatCount: "3" },
 { skillId: 10305, className: "Hoplite_LongStride", name: "Long Stride", basicSp: 18, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "3" },
