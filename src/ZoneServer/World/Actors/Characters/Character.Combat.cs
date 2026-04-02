@@ -218,7 +218,7 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <summary>
 		/// Resurrects the character if its dead.
 		/// </summary>
-		public void Resurrect(ResurrectOptions option)
+		public void Resurrect(ResurrectOptions option, float hpPercent = 1f)
 		{
 			if (option == ResurrectOptions.SoulCrystal)
 			{
@@ -255,7 +255,7 @@ namespace Melia.Zone.World.Actors.Characters
 				case ResurrectOptions.SoulCrystal:
 				default:
 				{
-					this.Heal(this.MaxHp, 0);
+					this.Heal(this.MaxHp * hpPercent, 0);
 					break;
 				}
 			}

@@ -8,19 +8,25 @@ using Melia.Zone.World.Actors.Characters;
 namespace Melia.Zone.Buffs.Handlers
 {
 	/// <summary>
-	/// Handler for CARD_* stat buffs (CARD_MNA, CARD_CON).
-	/// This is a generic buff that increases any stat property based on the property name passed.
-	/// Used by cards like Lavenzard (SPR +[★ * 6] for 10s) and Stone Froster (CON +[★ * 6] for 10s).
+	/// Generic handler for all potion-use stat buff cards. Only CARD_CON and
+	/// CARD_MNA exist as client buff IDs; the other stat cards (CARD_DEX,
+	/// CARD_INT, CARD_STR) fall back to CARD_MNA in SCR_CARDEFFECT_ADD_BUFF_PC_STAT.
+	/// The actual stat modified is determined by the "Melia.Card.PropertyName"
+	/// var, not the buff ID, so this single handler covers all five stat cards:
+	///   - Ellaganos  (DEX) — HP potion
+	///   - Pyroego    (STR) — HP potion
+	///   - Stonefroster (CON) — HP potion
+	///   - Linkroller (INT) — SP potion
+	///   - Lavenzard  (SPR) — SP potion
 	/// </summary>
 	/// <remarks>
 	/// NumArg1: Star level
 	/// Vars["Melia.Card.PropertyName"]: Property name to modify (e.g., "MNA_ITEM_BM", "CON_ITEM_BM", "DEX_ITEM_BM")
-	/// Note: Only CARD_CON and CARD_MNA exist in the client. Other stat cards (DEX, INT, STR) use CARD_MNA as fallback.
 	/// </remarks>
 	[BuffHandler(BuffId.CARD_MNA, BuffId.CARD_CON)]
 	public class CARD_MNA : BuffHandler
 	{
-		private const float BonusPerStar = 6f;
+		private const float BonusPerStar = 10f;
 		private const string PropertyNameKey = "Melia.Card.PropertyName";
 
 		public override void OnActivate(Buff buff, ActivationType activationType)

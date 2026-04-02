@@ -1017,6 +1017,14 @@ namespace Melia.Zone.Scripting.AI
 			if (entity.TryGetActiveAbility(AbilityId.Swordman28, out var provoke))
 				amount *= (1 + provoke.Level * 15);
 
+			// Card effect: Ferret Marauder increases aggro generation
+			if (entity.Properties.Has(PropertyName.HateRate_BM))
+			{
+				var hateRate = entity.Properties.GetFloat(PropertyName.HateRate_BM);
+				if (hateRate != 0)
+					amount *= (1 + hateRate);
+			}
+
 			// Increase the hate level at the normal rate up to the
 			// min aggro level. Once we reach that point we lower
 			// the hate increase so it will still accumulate for

@@ -404,7 +404,8 @@ public class CardFunctionsScript : GeneralScript
 				{
 					if (condition(attacker, tgt, skill))
 					{
-						character.Heal(0, spAmount);
+						var actualSp = character.MaxSp * spAmount / 100f;
+						character.Heal(0, actualSp);
 					}
 				});
 		}
@@ -430,7 +431,8 @@ public class CardFunctionsScript : GeneralScript
 
 					if (condition(attacker, tgt, skill))
 					{
-						character.Heal(0, spAmount);
+						var actualSp = character.MaxSp * spAmount / 100f;
+						character.Heal(0, actualSp);
 					}
 				});
 		}
@@ -498,7 +500,8 @@ public class CardFunctionsScript : GeneralScript
 
 					if (condition(attacker, tgt, skill))
 					{
-						character.Heal(hpAmount, 0);
+						var actualHp = character.MaxHp * hpAmount / 100f;
+						character.Heal(actualHp, 0);
 					}
 				});
 		}
@@ -518,9 +521,8 @@ public class CardFunctionsScript : GeneralScript
 
 		var coefficient = string.IsNullOrEmpty(arg3) || arg3 == "None" ? 1 : float.Parse(arg3);
 		var value = (float)Math.Floor(TypeValue * coefficient);
-		var finalValue = PropertyName.ASPD_BM.Contains("RATE", StringComparison.OrdinalIgnoreCase) ? value / 100f : value;
 
-		CardPropertyModifier.Instance.AddPropertyModifier(character, item.ObjectId, PropertyName.ASPD_BM, finalValue);
+		CardPropertyModifier.Instance.AddPropertyModifier(character, item.ObjectId, PropertyName.NormalASPD_BM, value);
 	}
 
 	/// <summary>
@@ -756,6 +758,10 @@ public class CardFunctionsScript : GeneralScript
 						return;
 				}
 
+				// Don't re-activate while shield is still active
+				if (character.IsBuffActive(BuffId.CARD_Shield))
+					return;
+
 				// Apply the shield buff with the combined value from all cards
 				character.StartBuff(BuffId.CARD_Shield, totalShieldValue, 0, TimeSpan.FromSeconds(10), character);
 			});
@@ -878,8 +884,8 @@ public class CardFunctionsScript : GeneralScript
 				// Increment revival count
 				character.SetTempVar("DURAHAN_CARD_COUNT", revivalCount + 1);
 
-				// Auto-resurrect with full HP
-				character.Resurrect(ResurrectOptions.TryAgain);
+				// Auto-resurrect with 10% HP
+				character.Resurrect(ResurrectOptions.TryAgain, 0.1f);
 			});
 	}
 
