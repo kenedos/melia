@@ -469,6 +469,9 @@ namespace Melia.Zone.Scripting
 				var character = dialog.Player;
 				var npc = dialog.Npc;
 
+				if (!character.Position.InRange3D(npc.Position, 30))
+					return;
+
 				if (npc.Vars.ActivateOnce($"Npc.{uniqueName}"))
 				{
 					await OpenChest(character, npc, true);
@@ -519,6 +522,9 @@ namespace Melia.Zone.Scripting
 			{
 				var character = dialog.Player;
 				var npc = dialog.Npc;
+
+				if (!character.Position.InRange3D(npc.Position, 30))
+					return;
 
 				if (npc.Vars.ActivateOnce($"Npc.{uniqueName}"))
 				{
