@@ -72,7 +72,7 @@ namespace Melia.Zone.World.Actors.Components
 		/// <summary>
 		/// Returns the remaining life time of the trigger.
 		/// </summary>
-		public TimeSpan RemainingLifeTime => this.LifeTime != TimeSpan.MaxValue ? this.LifeTime - _lifetimeTimer : TimeSpan.MaxValue;
+		public TimeSpan RemainingLifeTime => this.LifeTime != TimeSpan.MaxValue ? Math2.Max(TimeSpan.Zero, this.LifeTime - _lifetimeTimer) : TimeSpan.MaxValue;
 
 		/// <summary>
 		/// Returns the number of actors currently inside the trigger.
@@ -310,6 +310,11 @@ namespace Melia.Zone.World.Actors.Components
 				}
 			}
 
+			// Advance the lifetime timer before firing events so that
+			// RemainingLifeTime is accurate when handlers read it.
+			if (this.LifeTime != TimeSpan.MaxValue)
+				_lifetimeTimer += elapsed;
+
 			this.Area.UpdatePosition(this.Actor.Position);
 
 			// Fill the back-buffer with current actors, reusing the list
@@ -372,8 +377,6 @@ namespace Melia.Zone.World.Actors.Components
 
 			if (this.LifeTime != TimeSpan.MaxValue)
 			{
-				_lifetimeTimer += elapsed;
-
 				if (_lifetimeTimer >= this.LifeTime)
 				{
 					this.DestroyOwner();
