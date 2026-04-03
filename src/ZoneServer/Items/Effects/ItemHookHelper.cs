@@ -180,7 +180,15 @@ namespace Melia.Zone.Items.Effects
 				if (buffs == null)
 					return false;
 
-				var matchingBuffs = buffs.GetAll(b => b.Id.ToString().Contains(buffKeyword, StringComparison.OrdinalIgnoreCase));
+				var matchingBuffs = buffs.GetAll(b =>
+				{
+					foreach (var tag in b.Data.Tags)
+					{
+						if (string.Equals(tag, buffKeyword, StringComparison.OrdinalIgnoreCase))
+							return true;
+					}
+					return false;
+				});
 				return matchingBuffs.Count > 0;
 			};
 		}
