@@ -12,7 +12,6 @@ using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
-using Melia.Zone.Services;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -363,9 +362,9 @@ namespace Melia.Zone.World.Actors.Characters
 				if (currentConnection != null && currentConnection.Account != null &&
 					ZoneServer.Instance.Database.CheckSessionKey(currentConnection.Account.Id, currentConnection.SessionKey))
 				{
-					SaveQueue.SaveAccountAndCharacter(currentConnection.Account, this, currentConnection.SessionKey);
+					ZoneServer.Instance.Database.SaveCharacterData(this);
+					ZoneServer.Instance.Database.SaveAccountData(currentConnection.Account);
 					this.SavedForWarp = true;
-					Log.Debug($"Character '{this.Name}' (ID: {this.DbId}) save enqueued for warp.");
 					saveSuccess = true;
 				}
 				else

@@ -362,13 +362,21 @@ namespace Melia.Zone.Network
 			ZoneServer.Instance.World.BattleManager.ForceEndBattle(character);
 			character.Properties.RemoveEvents();
 
-			if (save)
-				SaveQueue.SaveAccountAndCharacter(account, character, this.SessionKey);
-
-			SaveQueue.Enqueue(() =>
+			if (save && account != null)
 			{
-				CharacterLockManager.TryRemoveLock(character.DbId);
-			});
+				if (ZoneServer.Instance.Database.CheckSessionKey(account.Id, this.SessionKey))
+				{
+					ZoneServer.Instance.Database.SaveCharacterData(character);
+					ZoneServer.Instance.Database.SaveAccountData(account);
+					ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
+				}
+				else
+				{
+					Log.Warning("ZoneConnection.CleanupCharacter: Skipping save for account '{0}' and character '{1}' because session key does not match.", account.Name, character?.Name ?? "NULL");
+				}
+			}
+
+			CharacterLockManager.TryRemoveLock(character.DbId);
 
 			this.NullifyConnectionReferences();
 		}

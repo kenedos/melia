@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Melia.Zone.Database;
-using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Logging;
 
@@ -55,71 +54,48 @@ namespace Melia.Zone.Services
 
 				var savedCount = 0;
 				var failedCount = 0;
-				var remaining = charactersInSlot.Count;
 				var capturedSlot = slotToSave;
 
 				foreach (var character in charactersInSlot)
 				{
-					var capturedChar = character;
-
-					SaveQueue.Enqueue(() =>
+					try
 					{
-						var lockTaken = false;
-						object acquiredLock = null;
-						try
+						var conn = character.Connection;
+						var account = conn?.Account;
+						var sessionKey = conn?.SessionKey;
+						var isAutoTrading = character.IsAutoTrading;
+
+						if (account == null)
 						{
-							CharacterLockManager.TryAcquire(capturedChar.DbId, TimeSpan.Zero, "AutoSave", ref lockTaken, out acquiredLock);
-							if (lockTaken)
+							Log.Warning($"AutoSaveService: Skipping save for {character.Name} ({character.DbId}), account is null.");
+							failedCount++;
+						}
+						else
+						{
+							var sessionValid = isAutoTrading || _database.CheckSessionKey(account.Id, sessionKey);
+
+							if ((character.IsOnline || isAutoTrading) && sessionValid)
 							{
-								var conn = capturedChar.Connection;
-								var account = conn?.Account;
-								var sessionKey = conn?.SessionKey;
-								var isAutoTrading = capturedChar.IsAutoTrading;
-
-								if (account == null)
-								{
-									Log.Warning($"AutoSaveService: Skipping save for {capturedChar.Name} ({capturedChar.DbId}), account is null.");
-									Interlocked.Increment(ref failedCount);
-								}
-								else
-								{
-									var sessionValid = isAutoTrading || _database.CheckSessionKey(account.Id, sessionKey);
-
-									if ((capturedChar.IsOnline || isAutoTrading) && sessionValid)
-									{
-										_database.SaveCharacterData(capturedChar);
-										if (!isAutoTrading)
-											_database.SaveAccountData(account);
-										Interlocked.Increment(ref savedCount);
-									}
-									else
-									{
-										Log.Warning($"AutoSaveService: Skipping save for {capturedChar.Name} (logged out or session mismatch).");
-										Interlocked.Increment(ref failedCount);
-									}
-								}
+								_database.SaveCharacterData(character);
+								if (!isAutoTrading)
+									_database.SaveAccountData(account);
+								savedCount++;
 							}
 							else
 							{
-								Log.Debug($"AutoSaveService: Skipping '{capturedChar.Name}' ({capturedChar.DbId}), character lock is busy.");
-								Interlocked.Increment(ref failedCount);
+								Log.Warning($"AutoSaveService: Skipping save for {character.Name} (logged out or session mismatch).");
+								failedCount++;
 							}
 						}
-						catch (Exception ex)
-						{
-							Log.Error($"AutoSaveService: Error saving character {capturedChar?.Name ?? "Unknown"} (ID: {capturedChar?.DbId ?? 0}): {ex}");
-							Interlocked.Increment(ref failedCount);
-						}
-						finally
-						{
-							if (lockTaken)
-								CharacterLockManager.Release(acquiredLock, capturedChar.DbId, "AutoSave");
-
-							if (Interlocked.Decrement(ref remaining) == 0)
-								Log.Info($"AutoSaveService: Finished save for slot {capturedSlot}. Saved: {savedCount}, Skipped/Failed: {failedCount}.");
-						}
-					});
+					}
+					catch (Exception ex)
+					{
+						Log.Error($"AutoSaveService: Error saving character {character?.Name ?? "Unknown"} (ID: {character?.DbId ?? 0}): {ex}");
+						failedCount++;
+					}
 				}
+
+				Log.Info($"AutoSaveService: Finished save for slot {capturedSlot}. Saved: {savedCount}, Skipped/Failed: {failedCount}.");
 
 				if (_currentSlot == 0)
 				{
@@ -139,24 +115,15 @@ namespace Melia.Zone.Services
 		}
 
 		/// <summary>
-		/// Stops the periodic timer, waits for any in-flight auto-save
-		/// tasks on the SaveQueue to finish, then saves every online
-		/// character synchronously on the calling thread.
-		/// WARNING: This permanently stops the SaveQueue via CompleteAdding.
-		/// Only call during server shutdown — the queue cannot accept new
-		/// items afterwards.
+		/// Stops the periodic timer and saves every online character
+		/// synchronously on the calling thread.
 		/// </summary>
 		/// <returns>Number of characters saved successfully.</returns>
 		public int SaveAllNow()
 		{
-			// 1. Stop the timer so no new callbacks fire.
+			// Stop the timer so no new callbacks fire.
 			_timer?.Change(Timeout.Infinite, Timeout.Infinite);
 
-			// 2. Drain any auto-save tasks already on the SaveQueue
-			//    so they finish before we start our own saves.
-			SaveQueue.StopAndDrain(30000);
-
-			// 3. Save everyone synchronously — nothing else is running.
 			var allChars = _zoneServer.World.GetCharacters().ToList();
 			if (allChars.Count == 0)
 				return 0;

@@ -9,7 +9,6 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
-using Melia.Zone.Services;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
@@ -1309,7 +1308,7 @@ namespace Melia.Zone.Scripting
 				// only update the orphaned in-memory object, so we need to
 				// explicitly persist them or they'll reload on reconnect.
 				if (!character.IsOnline)
-					SaveQueue.SaveCharacter(character);
+					ZoneServer.Instance.Database.SaveCharacterData(character);
 			}
 
 			// Remove owner association only if this instance is still the one mapped
@@ -1533,7 +1532,7 @@ namespace Melia.Zone.Scripting
 				// only exist on the orphaned in-memory object and are lost
 				// because OnClosed already saved stale values on disconnect.
 				if (!character.IsOnline)
-					SaveQueue.SaveCharacter(character);
+					ZoneServer.Instance.Database.SaveCharacterData(character);
 			}
 
 			// Remove owner association if owner exists

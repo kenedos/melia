@@ -173,7 +173,6 @@ namespace Melia.Zone
 			this.LoadIesMods();
 			this.StartWorld();
 
-			SaveQueue.Start();
 			this.StartAutoSaveService();
 			this.StartOrphanCleanupService();
 			this.StartLogCleanupService();
