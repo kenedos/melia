@@ -17,6 +17,12 @@ public class SummoningItemScripts : GeneralScript
 	[ScriptableFunction]
 	public ItemUseResult SCR_USE_SUMMONORB_FRIEND(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
+		if (character.Map.Data.Type == MapType.City)
+		{
+			character.ServerMessage(Localization.Get("You cannot use summoning orbs in towns."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
 		var monsterClassName = strArg;
 		if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterClassName, out var monsterData))
 		{
@@ -62,6 +68,12 @@ public class SummoningItemScripts : GeneralScript
 	[ScriptableFunction]
 	public ItemUseResult SCR_USE_SUMMONORB_ENEMY(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
+		if (character.Map.Data.Type == MapType.City)
+		{
+			character.ServerMessage(Localization.Get("You cannot use summoning orbs in towns."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
 		var monsterClassName = strArg;
 		if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterClassName, out var monsterData))
 		{

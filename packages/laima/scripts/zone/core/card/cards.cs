@@ -28,8 +28,15 @@ public class CardFunctionsScript : GeneralScript
 	[ScriptableFunction]
 	public static void SCR_CARDEFFECT_STATUS_RATE_HP_SP(Character character, ICombatEntity target, Item item, float TypeValue, string arg1, string arg2, string arg3)
 	{
-		SCR_CARDEFFECT_STATUS_RATE(character, target, item, TypeValue, PropertyName.RHP_BM, PropertyName.RHP, "None");
-		SCR_CARDEFFECT_STATUS_RATE(character, target, item, TypeValue, PropertyName.RSP_BM, PropertyName.RSP, "None");
+		var properties = arg1.Split('/');
+		var baseProperties = arg2.Split('/');
+		var coefficients = arg3.Split('/');
+
+		for (var i = 0; i < properties.Length; i++)
+		{
+			var coefficient = (i < coefficients.Length && coefficients[i] != "None") ? coefficients[i] : "None";
+			SCR_CARDEFFECT_STATUS_RATE(character, target, item, TypeValue, properties[i], baseProperties[i], coefficient);
+		}
 	}
 
 	[ScriptableFunction]
