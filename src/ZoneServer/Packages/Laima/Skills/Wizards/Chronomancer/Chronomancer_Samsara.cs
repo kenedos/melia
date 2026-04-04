@@ -110,6 +110,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 				&& caster.CheckRelation(mob, RelationType.Enemy)
 				&& !mob.Vars.GetBool(VarReincarnated)
 				&& !mob.Vars.GetBool(VarCreatedBySamsara)
+				&& mob.Rank != MonsterRank.Boss
+				&& mob.Rank != MonsterRank.MISC
+				&& mob.Rank != MonsterRank.Material
+				&& mob.Rank != MonsterRank.NPC
 			);
 
 			return deadMobs.Take(maxTargets).ToList();
