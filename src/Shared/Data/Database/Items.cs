@@ -488,7 +488,7 @@ namespace Melia.Shared.Data.Database
 			data.ItemLifeTimeOver = entry.ReadFloat("itemLifeTimeOver", 0);
 			data.NeedAppraisal = entry.ReadFloat("needAppraisal", 0);
 			data.NeedRandomOption = entry.ReadFloat("needRandomOption", 0);
-			data.LootingChance = entry.ReadFloat("lootingchance", 0);
+			data.LootingChance = entry.ReadFloat("lootingChance", 0);
 			data.IsAlwaysHatVisible = entry.ReadFloat("isAlwaysHatVisible", 0);
 			data.SkillWidthRange = entry.ReadFloat("skillWidthRange", 0);
 			data.DynamicLifeTime = entry.ReadFloat("dynamicLifeTime", 0);
