@@ -672,7 +672,7 @@ namespace Melia.Zone.Network
 			// saving entirely.
 			character.SavedForWarp = true;
 			ZoneServer.Instance.Database.SaveCharacterData(character);
-			ZoneServer.Instance.Database.SaveAccountData(conn.Account);
+			ZoneServer.Instance.Database.SaveAccountData(conn.Account, character);
 			ZoneServer.Instance.Database.UpdateLoginState(conn.Account.Id, 0, LoginState.LoggedOut);
 
 			Log.Info("User '{0}' is leaving for character selection.", conn.Account.Name);

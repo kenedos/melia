@@ -4,6 +4,7 @@ using System.Linq;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.World;
+using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Maps;
 using MySqlConnector;
@@ -15,7 +16,7 @@ namespace Melia.Zone.Database
 	/// </summary>
 	public partial class ZoneDb
 	{
-		public bool SaveAccountData(Account account)
+		public bool SaveAccountData(Account account, Character character = null)
 		{
 			if (account == null)
 				throw new ArgumentNullException(nameof(account));
@@ -39,6 +40,31 @@ namespace Melia.Zone.Database
 			this.SaveChatMacros(account);
 			this.SaveRevealedMaps(account);
 			this.SaveStorage(account.TeamStorage, "storage_team", "accountId", account.Id);
+
+			// Save account-scoped data that lives on the Character object
+			// (collections, adventure book). These are keyed by accountId
+			// and must only be saved here, not in SaveCharacterData, to
+			// prevent stale overwrites from autotrading characters.
+			if (character != null)
+			{
+				using (var conn = this.GetConnection())
+				using (var trans = conn.BeginTransaction())
+				{
+					try
+					{
+						this.InternalSaveCollections(character, conn, trans);
+						this.InternalSaveAdventureBook(character, conn, trans);
+						this.InternalSaveAdventureBookMonsterDrop(character, conn, trans);
+						this.InternalSaveAdventureBookItems(character, conn, trans);
+						trans.Commit();
+					}
+					catch (Exception)
+					{
+						trans.Rollback();
+						throw;
+					}
+				}
+			}
 
 			return true;
 		}

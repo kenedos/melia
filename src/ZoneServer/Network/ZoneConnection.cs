@@ -367,7 +367,7 @@ namespace Melia.Zone.Network
 				if (ZoneServer.Instance.Database.CheckSessionKey(account.Id, this.SessionKey))
 				{
 					ZoneServer.Instance.Database.SaveCharacterData(character);
-					ZoneServer.Instance.Database.SaveAccountData(account);
+					ZoneServer.Instance.Database.SaveAccountData(account, character);
 					ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
 				}
 				else

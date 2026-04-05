@@ -405,6 +405,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private long _totalExp;
 		private int _cachedLevel = -1;
 		private long _cachedLevelExp = -1;
+		private int _cachedLevelRank = -1;
 
 		public long TotalExp
 		{
@@ -469,11 +470,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					throw new InvalidOperationException("The job needs to be added to a character before the level can be determined.");
 
 				var totalExp = this.TotalExp;
+				var rank = this.Character.Jobs.GetJobRank(this.Id);
 
-				if (_cachedLevel > 0 && _cachedLevelExp == totalExp)
+				if (_cachedLevel > 0 && _cachedLevelExp == totalExp && _cachedLevelRank == rank)
 					return _cachedLevel;
 
-				var rank = this.Character.Jobs.GetJobRank(this.Id);
 				var max = this.MaxLevel;
 
 				// Search for the first level which's requirement we can't
@@ -485,6 +486,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					{
 						_cachedLevel = i;
 						_cachedLevelExp = totalExp;
+						_cachedLevelRank = rank;
 						return i;
 					}
 				}
@@ -492,6 +494,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				// Found none? It's the max then.
 				_cachedLevel = max;
 				_cachedLevelExp = totalExp;
+				_cachedLevelRank = rank;
 				return max;
 			}
 		}

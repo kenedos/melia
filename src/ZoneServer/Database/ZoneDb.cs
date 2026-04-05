@@ -174,8 +174,6 @@ namespace Melia.Zone.Database
 								this.InternalSaveCharacterItems(character, conn, trans);
 								this.InternalSaveStorage(character.PersonalStorage, "storage_personal", "characterId", character.DbId, conn, trans);
 
-								this.InternalSaveStorage(character.TeamStorage, "storage_team", "accountId", character.AccountDbId, conn, trans);
-
 								this.InternalSaveVariables(character.Variables.Perm, "vars_characters", "characterId", character.DbId, conn, trans);
 								this.InternalSaveProperties("character_properties", "characterId", character.DbId, character.Properties, conn, trans);
 								this.InternalSaveProperties("character_etc_properties", "characterId", character.DbId, character.Etc.Properties, conn, trans);
@@ -195,11 +193,6 @@ namespace Melia.Zone.Database
 
 								this.InternalSaveAchievements(character, conn, trans);
 								this.InternalSaveAchievementPoints(character, conn, trans);
-								this.InternalSaveCollections(character, conn, trans);
-
-								this.InternalSaveAdventureBook(character, conn, trans);
-								this.InternalSaveAdventureBookMonsterDrop(character, conn, trans);
-								this.InternalSaveAdventureBookItems(character, conn, trans);
 
 								trans.Commit();
 								character.LastSaved = DateTime.UtcNow;

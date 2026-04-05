@@ -363,7 +363,7 @@ namespace Melia.Zone.World.Actors.Characters
 					ZoneServer.Instance.Database.CheckSessionKey(currentConnection.Account.Id, currentConnection.SessionKey))
 				{
 					ZoneServer.Instance.Database.SaveCharacterData(this);
-					ZoneServer.Instance.Database.SaveAccountData(currentConnection.Account);
+					ZoneServer.Instance.Database.SaveAccountData(currentConnection.Account, this);
 					this.SavedForWarp = true;
 					saveSuccess = true;
 				}

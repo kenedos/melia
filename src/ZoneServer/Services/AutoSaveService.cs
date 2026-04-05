@@ -78,7 +78,7 @@ namespace Melia.Zone.Services
 							{
 								_database.SaveCharacterData(character);
 								if (!isAutoTrading)
-									_database.SaveAccountData(account);
+									_database.SaveAccountData(account, character);
 								savedCount++;
 							}
 							else
@@ -139,7 +139,8 @@ namespace Melia.Zone.Services
 						continue;
 
 					_database.SaveCharacterData(character);
-					_database.SaveAccountData(character.Connection.Account);
+					if (!character.IsAutoTrading)
+						_database.SaveAccountData(character.Connection.Account, character);
 					savedCount++;
 				}
 				catch (Exception ex)
