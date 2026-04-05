@@ -262,12 +262,15 @@ public class CardFunctionsScript : GeneralScript
 
 		var duration = int.Parse(arg3);
 		var coefficient = 0.3f;
-		var value = TypeValue * coefficient;
 
 		ItemHookRegistry.Instance.RegisterHook(character, item, ItemHookType.ItemUse,
 			(itm, attacker, tgt, skill, modifier, skillHitResult) =>
 			{
-				character.StartBuff(buffType, value, 0, TimeSpan.FromMilliseconds(duration), character);
+				var (totalStarLevel, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
+				if (!isTrigger)
+					return;
+
+				character.StartBuff(buffType, totalStarLevel * coefficient, 0, TimeSpan.FromMilliseconds(duration), character);
 			});
 	}
 
@@ -288,7 +291,11 @@ public class CardFunctionsScript : GeneralScript
 		ItemHookRegistry.Instance.RegisterHook(character, item, ItemHookType.ItemUse,
 			(itm, attacker, tgt, skill, modifier, skillHitResult) =>
 			{
-				var buff = character.StartBuff(buffType, TypeValue, 0, TimeSpan.FromMilliseconds(duration), character);
+				var (totalStarLevel, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
+				if (!isTrigger)
+					return;
+
+				var buff = character.StartBuff(buffType, totalStarLevel, 0, TimeSpan.FromMilliseconds(duration), character);
 				buff.Vars.SetString("Melia.Card.PropertyName", status);
 			});
 	}
@@ -575,7 +582,11 @@ public class CardFunctionsScript : GeneralScript
 		ItemHookRegistry.Instance.RegisterHook(character, item, ItemHookType.ItemUse,
 			(itm, attacker, tgt, skill, modifier, skillHitResult) =>
 			{
-				character.StartBuff(buffType, TypeValue, 0, TimeSpan.FromMilliseconds(duration), character, SkillId.Normal_Attack,
+				var (totalStarLevel, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
+				if (!isTrigger)
+					return;
+
+				character.StartBuff(buffType, totalStarLevel, 0, TimeSpan.FromMilliseconds(duration), character, SkillId.Normal_Attack,
 					buff => buff.Vars.SetString("Melia.Card.PropertyName", propertyName));
 			});
 	}
