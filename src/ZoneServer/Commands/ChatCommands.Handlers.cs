@@ -4719,8 +4719,12 @@ namespace Melia.Zone.Commands
 
 			Log.Info($"Character '{sender.Name}' enabled autotrade mode at {sender.Position} on map '{sender.Map.ClassName}'.");
 
-			// Save character data to ensure database has correct MapId for reconnection
+			// Save character and account data before entering autotrade.
+			// OnClosed skips CleanupCharacter for autotraders, so this
+			// is the last chance to persist account-scoped data (team
+			// storage, collections, etc.).
 			ZoneServer.Instance.Database.SaveCharacterData(sender);
+			ZoneServer.Instance.Database.SaveAccountData(sender.Connection.Account, sender);
 
 			// Send player to barracks - OnClosed will keep character in world due to IsAutoTrading
 			sender.MsgBox(Localization.Get("Autotrade mode enabled. Your shop will remain open while you are offline."));
