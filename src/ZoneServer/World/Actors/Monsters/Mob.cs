@@ -647,6 +647,9 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (this.Components.TryGet<AiComponent>(out var ai))
 				ai.Script?.ReleaseEntity();
+
+			if (this.Properties is MonsterProperties monsterProperties)
+				monsterProperties.RemoveEvents();
 		}
 
 		/// <summary>

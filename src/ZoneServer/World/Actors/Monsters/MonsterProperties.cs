@@ -146,6 +146,8 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// </summary>
 		public void RemoveEvents()
 		{
+			this.Monster.CombatState.CombatStateChanged -= this.CombatStateChanged;
+
 			// Unsubscribe to buff events
 			if (this.Monster.Components.TryGet<BuffComponent>(out var buffComponent))
 			{
