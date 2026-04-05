@@ -23,11 +23,78 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 
 		private static readonly HashSet<BuffId> ExcludedBuffs = new HashSet<BuffId>
 		{
+			// Linker link buffs
 			BuffId.Link_Party,
 			BuffId.Link_Physical,
 			BuffId.Link_Sacrifice,
 			BuffId.Link_Enemy,
 			BuffId.Link,
+
+			// Sadhu out of body / soul buffs
+			BuffId.OutofBody_Soul_Buff,
+			BuffId.Sadhu_Soul_Buff,
+			BuffId.Sadhu_Soul_Pre_Buff,
+			BuffId.OOBE_Possession_Buff,
+			BuffId.SadhuPossessionTemporaryImmune,
+			BuffId.Achieve_Possession_Buff,
+
+			// Invincibility
+			BuffId.Invincible,
+			BuffId.After_Invincible,
+			BuffId.SuperInvincible,
+			BuffId.GM_Invincible_Buff,
+			BuffId.Merkabah_Invincible_Buff,
+			BuffId.Merkabah_Invincible_After_Buff,
+			BuffId.Mon_invincible,
+			BuffId.Illusion_Invincible,
+
+			// Cloaking / stealth
+			BuffId.Cloaking_Buff,
+			BuffId.ShinobiCloaking_Buff,
+			BuffId.Illusionist_Cloaking,
+			BuffId.Companion_Cloaking_Buff,
+
+			// Transformation
+			BuffId.transform,
+			BuffId.Lycanthropy_Buff,
+			BuffId.Lycanthropy_Half_Buff,
+			BuffId.Lycanthropy_Soul_Buff,
+
+			// Riding
+			BuffId.HorseRiding_Buff,
+			BuffId.RidingCompanion,
+
+			// Bunshin (Shinobi clone)
+			BuffId.Bunshin_Buff,
+			BuffId.Bunshin_Stack_Buff,
+			BuffId.Bunshin_Damage_Buff,
+
+			// Channeling
+			BuffId.IS_Channeling_Buff,
+
+			// Resurrection
+			BuffId.Resurrection_Buff,
+
+			// No damage
+			BuffId.Skill_NoDamage_Buff,
+		};
+
+		private static readonly string[] ExcludedPrefixes = new[]
+		{
+			"CARD_",
+			"item_",
+			"Item",
+			"Drug_",
+			"BRC",
+			"SHD",
+			"NKC",
+			"Premium_",
+			"Event_",
+			"GIMMICK_",
+			"squire_food",
+			"subweapon_",
+			"drop_",
+			"GOOD_STAMP_",
 		};
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
@@ -158,6 +225,11 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 
 					// Skip excluded buffs (link buffs, etc.)
 					if (ExcludedBuffs.Contains(memberBuff.Id))
+						continue;
+
+					// Skip item, equipment, and card buffs
+					var buffName = memberBuff.Id.ToString();
+					if (Array.Exists(ExcludedPrefixes, prefix => buffName.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)))
 						continue;
 
 					// Skip if this buff was propagated from another member
