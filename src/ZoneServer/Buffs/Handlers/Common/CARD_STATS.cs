@@ -1,90 +1,121 @@
 using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Buffs.Handlers
 {
 	/// <summary>
-	/// Generic handler for all potion-use stat buff cards. Only CARD_CON and
-	/// CARD_MNA exist as client buff IDs; the other stat cards (CARD_DEX,
-	/// CARD_INT, CARD_STR) fall back to CARD_MNA in SCR_CARDEFFECT_ADD_BUFF_PC_STAT.
-	/// The actual stat modified is determined by the "Melia.Card.PropertyName"
-	/// var, not the buff ID, so this single handler covers all five stat cards:
-	///   - Ellaganos  (DEX) — HP potion
-	///   - Pyroego    (STR) — HP potion
-	///   - Stonefroster (CON) — HP potion
-	///   - Linkroller (INT) — SP potion
-	///   - Lavenzard  (SPR) — SP potion
+	/// Generic handler for potion-use stat buff cards (CARD_CON, CARD_MNA).
+	/// On activation, scans all equipped cards that use the same buff ID,
+	/// sums their star levels per property, and applies the bonuses.
+	/// Supports multiple different stat cards sharing the same buff ID
+	/// (e.g., Stonefroster/CON + Pyroego/STR both use CARD_CON) and
+	/// multiple copies of the same card at different star levels.
 	/// </summary>
-	/// <remarks>
-	/// NumArg1: Star level
-	/// Vars["Melia.Card.PropertyName"]: Property name to modify (e.g., "MNA_ITEM_BM", "CON_ITEM_BM", "DEX_ITEM_BM")
-	/// </remarks>
 	[BuffHandler(BuffId.CARD_MNA, BuffId.CARD_CON)]
 	public class CARD_MNA : BuffHandler
 	{
 		private const float BonusPerStar = 10f;
-		private const string PropertyNameKey = "Melia.Card.PropertyName";
+		private const string PropertiesKey = "Melia.Card.Properties";
+		private const string ScriptFunction = "SCR_CARDEFFECT_ADD_BUFF_PC_STAT";
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			var target = buff.Target;
-			var starLevel = buff.NumArg1;
-			var propertyName = buff.Vars.GetString(PropertyNameKey);
-
-			if (string.IsNullOrEmpty(propertyName))
+			if (buff.Target is not Character character)
 				return;
 
-			if (!target.Properties.Has(propertyName))
-				return;
+			// Remove previous modifiers on reapplication
+			RemoveAllModifiers(buff, character);
 
-			var bonus = starLevel * BonusPerStar;
+			var allCards = character.Inventory.GetCards();
+			var buffClassName = buff.Id.ToString();
 
-			AddPropertyModifier(buff, target, propertyName, bonus);
-
-			// Invalidate the main stat property (e.g., DEX_ITEM_BM -> DEX)
-			if (target is Character character)
+			foreach (var cardKvp in allCards)
 			{
-				var mainStatName = GetMainStatName(propertyName);
-				if (mainStatName != null)
-					character.InvalidateProperties(mainStatName);
+				var card = cardKvp.Value;
+				if (card == null)
+					continue;
+
+				if (!ZoneServer.Instance.Data.EquipCardDb.TryFind(card.Data.ClassName, out var cardData))
+					continue;
+
+				if (cardData.Script?.Function != ScriptFunction)
+					continue;
+
+				// Check if this card uses the same buff ID.
+				// Non-existent buff names (CARD_INT, CARD_STR, CARD_DEX)
+				// fall back based on potion type: HP -> CARD_CON, SP -> CARD_MNA.
+				var cardBuffName = cardData.Script.StrArg;
+				if (!Enum.TryParse<BuffId>(cardBuffName, out var cardBuffId))
+				{
+					var potionType = cardData.ConditionScript?.StrArg ?? "";
+					cardBuffId = potionType == "HPPOTION" ? BuffId.CARD_CON : BuffId.CARD_MNA;
+				}
+
+				if (cardBuffId != buff.Id)
+					continue;
+
+				var propertyName = cardData.Script.StrArg2;
+				var starLevel = Math.Max(card.CardLevel, 1);
+				var bonus = starLevel * BonusPerStar;
+
+				// Track property in comma-separated list
+				var existing = buff.Vars.GetString(PropertiesKey);
+				if (string.IsNullOrEmpty(existing))
+					buff.Vars.SetString(PropertiesKey, propertyName);
+				else if (!existing.Contains(propertyName))
+					buff.Vars.SetString(PropertiesKey, existing + "," + propertyName);
+
+				AddPropertyModifier(buff, character, propertyName, bonus);
 			}
+
+			// Invalidate all affected stats
+			InvalidateStats(buff, character);
 		}
 
 		public override void OnEnd(Buff buff)
 		{
-			var target = buff.Target;
-			var propertyName = buff.Vars.GetString(PropertyNameKey);
-
-			if (string.IsNullOrEmpty(propertyName))
+			if (buff.Target is not Character character)
 				return;
 
-			RemovePropertyModifier(buff, target, propertyName);
-
-			// Invalidate the main stat property (e.g., DEX_ITEM_BM -> DEX)
-			if (target is Character character)
-			{
-				var mainStatName = GetMainStatName(propertyName);
-				if (mainStatName != null)
-					character.InvalidateProperties(mainStatName);
-			}
+			RemoveAllModifiers(buff, character);
 		}
 
 		/// <summary>
-		/// Extracts the main stat name from a bonus property name.
-		/// E.g., "DEX_ITEM_BM" -> "DEX", "CON_ITEM_BM" -> "CON"
+		/// Removes all tracked property modifiers and invalidates stats.
 		/// </summary>
-		private static string GetMainStatName(string bonusPropertyName)
+		private static void RemoveAllModifiers(Buff buff, Character character)
 		{
-			// Pattern: STAT_ITEM_BM or STAT_BM
-			var underscoreIndex = bonusPropertyName.IndexOf('_');
-			if (underscoreIndex > 0)
-				return bonusPropertyName.Substring(0, underscoreIndex);
+			var properties = buff.Vars.GetString(PropertiesKey);
+			if (string.IsNullOrEmpty(properties))
+				return;
 
-			return null;
+			foreach (var propertyName in properties.Split(','))
+			{
+				RemovePropertyModifier(buff, character, propertyName);
+			}
+
+			InvalidateStats(buff, character);
+			buff.Vars.SetString(PropertiesKey, "");
+		}
+
+		/// <summary>
+		/// Invalidates all main stats that have tracked modifiers.
+		/// </summary>
+		private static void InvalidateStats(Buff buff, Character character)
+		{
+			var properties = buff.Vars.GetString(PropertiesKey);
+			if (string.IsNullOrEmpty(properties))
+				return;
+
+			foreach (var propertyName in properties.Split(','))
+			{
+				var underscoreIdx = propertyName.IndexOf('_');
+				if (underscoreIdx > 0)
+					character.InvalidateProperties(propertyName.Substring(0, underscoreIdx));
+			}
 		}
 	}
 }

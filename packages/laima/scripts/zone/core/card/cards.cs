@@ -261,16 +261,18 @@ public class CardFunctionsScript : GeneralScript
 			return;
 
 		var duration = int.Parse(arg3);
-		var coefficient = 0.3f;
 
 		ItemHookRegistry.Instance.RegisterHook(character, item, ItemHookType.ItemUse,
 			(itm, attacker, tgt, skill, modifier, skillHitResult) =>
 			{
-				var (totalStarLevel, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
+				var (_, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
 				if (!isTrigger)
 					return;
 
-				character.StartBuff(buffType, totalStarLevel * coefficient, 0, TimeSpan.FromMilliseconds(duration), character);
+				if (character.IsBuffActive(buffType))
+					return;
+
+				character.StartBuff(buffType, 0, 0, TimeSpan.FromMilliseconds(duration), character);
 			});
 	}
 
@@ -291,12 +293,14 @@ public class CardFunctionsScript : GeneralScript
 		ItemHookRegistry.Instance.RegisterHook(character, item, ItemHookType.ItemUse,
 			(itm, attacker, tgt, skill, modifier, skillHitResult) =>
 			{
-				var (totalStarLevel, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
+				var (_, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
 				if (!isTrigger)
 					return;
 
-				var buff = character.StartBuff(buffType, totalStarLevel, 0, TimeSpan.FromMilliseconds(duration), character);
-				buff.Vars.SetString("Melia.Card.PropertyName", status);
+				if (character.IsBuffActive(buffType))
+					return;
+
+				character.StartBuff(buffType, 0, 0, TimeSpan.FromMilliseconds(duration), character);
 			});
 	}
 
@@ -559,8 +563,8 @@ public class CardFunctionsScript : GeneralScript
 
 	/// <summary>
 	/// Buff PC based on stat (on potion use)
-	/// Uses the appropriate CARD_* buff based on buffName parameter (e.g., CARD_DEX, CARD_CON, CARD_MNA)
-	/// Note: CARD_DEX, CARD_INT, CARD_STR don't exist in the client, so they fall back to CARD_MNA (CARD_SPR)
+	/// The buff handler itself scans all equipped stat cards and applies
+	/// the correct bonuses, so the script just needs to start the buff.
 	/// </summary>
 	[ScriptableFunction]
 	public static void SCR_CARDEFFECT_ADD_BUFF_PC_STAT(Character character, ICombatEntity target, Item item, float TypeValue, string buffName, string propertyName, string arg3)
@@ -571,23 +575,26 @@ public class CardFunctionsScript : GeneralScript
 			return;
 		}
 
-		// Parse the buff name to get the correct BuffId
-		// Non-existent stat buffs fall back to CARD_MNA (only CARD_CON and CARD_MNA exist in the client)
 		if (!Enum.TryParse<BuffId>(buffName, out var buffType))
 		{
-			buffType = BuffId.CARD_MNA;
+			if (!CardMetadataRegistry.Instance.TryGet(item.ObjectId, out var metadata))
+				return;
+			var potionType = metadata.ConditionArg ?? "";
+			buffType = potionType == "HPPOTION" ? BuffId.CARD_CON : BuffId.CARD_MNA;
 		}
 
 		var duration = int.Parse(arg3);
 		ItemHookRegistry.Instance.RegisterHook(character, item, ItemHookType.ItemUse,
 			(itm, attacker, tgt, skill, modifier, skillHitResult) =>
 			{
-				var (totalStarLevel, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
+				var (_, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, itm);
 				if (!isTrigger)
 					return;
 
-				character.StartBuff(buffType, totalStarLevel, 0, TimeSpan.FromMilliseconds(duration), character, SkillId.Normal_Attack,
-					buff => buff.Vars.SetString("Melia.Card.PropertyName", propertyName));
+				if (character.IsBuffActive(buffType))
+					return;
+
+				character.StartBuff(buffType, 0, 0, TimeSpan.FromMilliseconds(duration), character);
 			});
 	}
 
