@@ -67,7 +67,7 @@ public class CardFunctionsScript : GeneralScript
 		}
 
 		var coefficient = arg3 == "None" ? 1 : float.Parse(arg3);
-		var value = (float)Math.Floor(TypeValue * coefficient);
+		var value = TypeValue * coefficient;
 		var finalValue = arg1.Contains("RATE", StringComparison.OrdinalIgnoreCase) ? value / 100f : value;
 		CardPropertyModifier.Instance.AddPropertyModifier(character, item.ObjectId, arg1, finalValue);
 	}
@@ -331,7 +331,7 @@ public class CardFunctionsScript : GeneralScript
 			{
 				var propertyName = arg1List[i];
 				var coefficient = (arg3List.Count > i) ? arg3List[i] : 1;
-				var value = (float)Math.Floor(TypeValue * coefficient);
+				var value = TypeValue * coefficient;
 				var finalValue = propertyName.Contains("RATE", StringComparison.OrdinalIgnoreCase) ? value / 100f : value;
 
 				CardPropertyModifier.Instance.AddPropertyModifier(character, item.ObjectId, propertyName, finalValue);
@@ -366,7 +366,7 @@ public class CardFunctionsScript : GeneralScript
 			{
 				var propertyName = arg1List[i];
 				var coefficient = (arg3List.Count > i) ? arg3List[i] : 1;
-				var value = (float)Math.Floor(TypeValue * coefficient);
+				var value = TypeValue * coefficient;
 				var finalValue = propertyName.Contains("RATE", StringComparison.OrdinalIgnoreCase) ? value / 100f : value;
 
 				CardPropertyModifier.Instance.AddPropertyModifier(character, item.ObjectId, propertyName, finalValue);
@@ -538,7 +538,7 @@ public class CardFunctionsScript : GeneralScript
 		}
 
 		var coefficient = string.IsNullOrEmpty(arg3) || arg3 == "None" ? 1 : float.Parse(arg3);
-		var value = (float)Math.Floor(TypeValue * coefficient);
+		var value = TypeValue * coefficient;
 
 		CardPropertyModifier.Instance.AddPropertyModifier(character, item.ObjectId, PropertyName.NormalASPD_BM, value);
 	}
