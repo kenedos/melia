@@ -6003,8 +6003,14 @@ namespace Melia.Zone.Network
 		{
 			var packet = Packet.Borrow(Op.ZC_SET_WEBSERVICE_URL);
 
-			packet.PutString("http://127.0.0.1:9004", 128);
-			packet.PutString("http://127.0.0.1:9005", 128);
+			var webServerIp = "127.0.0.1";
+			if (ZoneServer.Instance.ServerList.GetAll(ServerType.Web).FirstOrDefault() is { } webServer)
+				webServerIp = webServer.Ip;
+
+			var guildPort = ZoneServer.Instance.Conf.Web.GuildPort;
+
+			packet.PutString($"http://{webServerIp}:{guildPort}", 128);
+			packet.PutString($"http://{webServerIp}:{guildPort}", 128);
 
 			conn.Send(packet);
 			Packet.Return(packet);
