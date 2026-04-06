@@ -676,6 +676,8 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (beneficiary.Components.Get<AiComponent>()?.Script.GetMaster() is Character master)
 				beneficiary = master;
+			else if (beneficiary is Summon summon && summon.Owner is Character summonOwner)
+				beneficiary = summonOwner;
 
 			return beneficiary as Character;
 		}
