@@ -470,4 +470,32 @@ public class CompanionCalculationsScript : GeneralScript
 	{
 		return 60f;
 	}
+
+
+	/// <summary>
+	/// Returns the value in silver needed to train that stat of that companion
+	/// by another level
+	/// </summary>
+	/// <param name="companion"></param>
+	/// <param name="statName"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public int SCR_Get_Companion_STAT_PRICE(Companion companion, string statName)
+	{
+		var defPrice = 300;
+
+		if (statName == "ATK")
+			defPrice = 600;
+		else if (statName == "DR")
+			defPrice = 1200;
+		else if (statName == "HR")
+			defPrice = 1200;
+		else if (statName == "CRTHR")
+			defPrice = 2400;
+
+		var statValue = companion.Properties.GetFloat("Stat_" + statName);
+		var price = (int)Math.Floor(defPrice * Math.Pow(1.08, statValue - 1));
+
+		return price;
+	}
 }

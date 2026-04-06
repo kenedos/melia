@@ -73,13 +73,16 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (this is not CompanionProperties)
 				this.Create(PropertyName.MShield, "SCR_Get_MON_MSHIELD");
 
-			this.Create(PropertyName.Fire_Def, "SCR_GET_MON_FIRE_DEF");
-			this.Create(PropertyName.Ice_Def, "SCR_GET_MON_ICE_DEF");
-			this.Create(PropertyName.Lightning_Def, "SCR_GET_MON_LIGHTNING_DEF");
-			this.Create(PropertyName.Earth_Def, "SCR_GET_MON_EARTH_DEF");
-			this.Create(PropertyName.Poison_Def, "SCR_GET_MON_POISON_DEF");
-			this.Create(PropertyName.Holy_Def, "SCR_GET_MON_HOLY_DEF");
-			this.Create(PropertyName.Dark_Def, "SCR_GET_MON_DARK_DEF");
+			if (this is not CompanionProperties)
+			{
+				this.Create(PropertyName.Fire_Def, "SCR_GET_MON_FIRE_DEF");
+				this.Create(PropertyName.Ice_Def, "SCR_GET_MON_ICE_DEF");
+				this.Create(PropertyName.Lightning_Def, "SCR_GET_MON_LIGHTNING_DEF");
+				this.Create(PropertyName.Earth_Def, "SCR_GET_MON_EARTH_DEF");
+				this.Create(PropertyName.Poison_Def, "SCR_GET_MON_POISON_DEF");
+				this.Create(PropertyName.Holy_Def, "SCR_GET_MON_HOLY_DEF");
+				this.Create(PropertyName.Dark_Def, "SCR_GET_MON_DARK_DEF");
+			}
 
 			this.Create(new FloatProperty(PropertyName.WlkMSPD, this.Monster.Data.WalkSpeed));
 			this.Create(new FloatProperty(PropertyName.RunMSPD, this.Monster.Data.RunSpeed));
