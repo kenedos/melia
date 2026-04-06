@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Melia.Shared.Game.Properties;
 using Melia.Zone.World.Actors.Characters;
@@ -238,13 +237,11 @@ namespace Melia.Zone.Items.Effects
 		public float GetCardBonus(Character character, string propertyName)
 		{
 			var suffix = "." + propertyName;
-			var total = character.Variables.Perm.GetList()
+			return character.Variables.Perm.GetList()
 				.Where(kvp => kvp.Key.StartsWith(ModifierVarPrefix) &&
 							  kvp.Key.EndsWith(suffix) &&
 							  kvp.Value is float)
 				.Sum(kvp => (float)kvp.Value);
-
-			return (float)Math.Floor(total);
 		}
 	}
 }
