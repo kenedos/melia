@@ -19,6 +19,13 @@ namespace Melia.Zone.World.Spawning
 		void Spawn(int amount);
 
 		/// <summary>
+		/// Notifies the spawner that monsters were removed due to map
+		/// dormancy.
+		/// </summary>
+		/// <param name="removedCount"></param>
+		void NotifyDormancy(int removedCount);
+
+		/// <summary>
 		/// Raised for every monster the spawner creates, just before it's
 		/// added to the world.
 		/// </summary>

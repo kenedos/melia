@@ -91,6 +91,10 @@ namespace Melia.Zone.World.Spawning
 			_timeSinceLastSpawn = this.RespawnDelay;
 		}
 
+		public void NotifyDormancy(int removedCount)
+		{
+		}
+
 		/// <summary>
 		/// Loads all minigame scripts from the registered minigames.
 		/// </summary>

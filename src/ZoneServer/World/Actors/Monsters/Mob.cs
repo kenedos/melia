@@ -23,6 +23,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
+using Melia.Zone.World.Spawning;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
 using Yggdrasil.Util;
@@ -101,6 +102,11 @@ namespace Melia.Zone.World.Actors.Monsters
 			// see for what purpose we would need them to be the same for
 			// multiple monsters.
 			= ZoneServer.Instance.World.CreateGenType();
+
+		/// <summary>
+		/// Gets or sets the spawner that created this mob, if any.
+		/// </summary>
+		public ISpawner Spawner { get; set; }
 
 		/// <summary>
 		/// Gets or sets what kind of "monster" the mob is.

@@ -32,6 +32,10 @@ namespace Melia.Zone.World.Maps
 	{
 		private volatile int _layer = DefaultLayer;
 
+		private static volatile int _dormancyBatchCount;
+		private static int _dormancyBatchMobs;
+		private static readonly object _dormancyLogLock = new();
+
 		#region Constants
 		public const int DefaultLayer = 0;
 		public const int VisibleRange = 500;
@@ -52,6 +56,7 @@ namespace Melia.Zone.World.Maps
 		private readonly ConcurrentQueue<IMonster> _addMonsters = new();
 		private int _characterCount;
 		private DateTime _lastPlayerLeftTime = DateTime.MinValue;
+		private readonly DateTime _createdTime = DateTime.Now;
 		protected readonly Dictionary<int, PropertyOverrides> _monsterPropertyOverrides = new();
 		protected readonly List<SpawnBuffEntry> _spawnBuffs = new();
 
@@ -105,6 +110,7 @@ namespace Melia.Zone.World.Maps
 		public bool IsTOSHeroZone => this.Data?.Tags.Has(SkillTag.ExpertSkill) ?? false;
 		public bool IsInstance => this.Data?.Type == MapType.Instance;
 		public bool TeleportDisabled { get; internal set; }
+		public bool IsDormant { get; private set; }
 
 		public float AverageMonsterLevel { get; private set; }
 		public static Map Limbo { get; } = new Limbo();
@@ -160,6 +166,29 @@ namespace Melia.Zone.World.Maps
 		#region Update Methods
 		public virtual void Update(TimeSpan elapsed)
 		{
+			if (this.IsDormant)
+			{
+				FlushDormancyLog();
+				return;
+			}
+
+			if (!this.HasCharacters && !this.IsCity && !this.IsInstance)
+			{
+				// Player left recently — enter dormancy after grace period
+				if (_lastPlayerLeftTime != DateTime.MinValue && (DateTime.Now - _lastPlayerLeftTime) >= EntityUpdateGracePeriod)
+				{
+					this.EnterDormancy();
+					return;
+				}
+
+				// Map never had a player — enter dormancy after startup grace period
+				if (_lastPlayerLeftTime == DateTime.MinValue && (DateTime.Now - _createdTime) >= EntityUpdateGracePeriod)
+				{
+					this.EnterDormancy();
+					return;
+				}
+			}
+
 			this.Disappearances();
 			this.UpdateVisibility();
 			this.UpdateEntities(elapsed);
@@ -323,12 +352,111 @@ namespace Melia.Zone.World.Maps
 
 		#endregion
 
+		#region Dormancy
+
+		/// <summary>
+		/// Removes all spawner-managed mobs and pads from the map,
+		/// notifies their spawners, and marks the map as dormant.
+		/// NPCs, cities, and instance maps are not affected.
+		/// </summary>
+		private void EnterDormancy()
+		{
+			if (this.IsDormant)
+				return;
+
+			// Collect spawner-managed mobs (not NPCs or warps)
+			var mobsToRemove = new List<Mob>();
+			lock (_monsters)
+			{
+				foreach (var monster in _monsters.Values)
+				{
+					if (monster is Mob mob && monster is not Npc)
+						mobsToRemove.Add(mob);
+				}
+			}
+
+			// Group by spawner so we can notify each one
+			var spawnerCounts = new Dictionary<ISpawner, int>();
+			foreach (var mob in mobsToRemove)
+			{
+				if (mob.Spawner is ISpawner spawner)
+				{
+					spawnerCounts.TryGetValue(spawner, out var count);
+					spawnerCounts[spawner] = count + 1;
+				}
+			}
+
+			// Remove the mobs
+			foreach (var mob in mobsToRemove)
+				this.RemoveMonster(mob);
+
+			// Notify spawners of the removal counts
+			foreach (var kvp in spawnerCounts)
+				kvp.Key.NotifyDormancy(kvp.Value);
+
+			// Remove all pads
+			var padsToRemove = new List<Pad>();
+			lock (_pads)
+				padsToRemove.AddRange(_pads.Values);
+
+			foreach (var pad in padsToRemove)
+				this.RemovePad(pad);
+
+			// Drain pending monster queue
+			while (_addMonsters.TryDequeue(out _)) { }
+
+			this.IsDormant = true;
+
+			lock (_dormancyLogLock)
+			{
+				_dormancyBatchCount++;
+				_dormancyBatchMobs += mobsToRemove.Count;
+			}
+		}
+
+		/// <summary>
+		/// Wakes the map from dormancy, allowing spawners to repopulate.
+		/// </summary>
+		private void WakeUp()
+		{
+			this.IsDormant = false;
+			_lastPlayerLeftTime = DateTime.MinValue;
+
+			Log.Info("Map '{0}' waking up.", this.ClassName);
+		}
+
+		/// <summary>
+		/// Logs a summary of maps that entered dormancy since the last
+		/// flush. Called from dormant map updates so the log appears
+		/// shortly after the batch completes.
+		/// </summary>
+		private static void FlushDormancyLog()
+		{
+			if (_dormancyBatchCount == 0)
+				return;
+
+			lock (_dormancyLogLock)
+			{
+				if (_dormancyBatchCount == 0)
+					return;
+
+				Log.Info("{0} map(s) entered dormancy ({1} mobs removed).", _dormancyBatchCount, _dormancyBatchMobs);
+				_dormancyBatchCount = 0;
+				_dormancyBatchMobs = 0;
+			}
+		}
+
+		#endregion
+
 		#region Character Management
 		/// <summary>
 		/// Adds the character to the map and raises the player entered event.
 		/// </summary>
 		public void AddCharacter(Character character)
 		{
+			if (this.IsDormant)
+				this.WakeUp();
+
 			character.Map = this;
 
 			lock (_characters)
@@ -468,6 +596,13 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public void AddMonster(IMonster monster)
 		{
+			// Only block spawner-managed mobs on dormant maps. NPCs,
+			// treasure chests, minigame entities, and other non-spawner
+			// mobs are allowed through so they can be queued for when
+			// the map wakes up.
+			if (this.IsDormant && monster is Mob mob && mob.Spawner != null)
+				return;
+
 			_addMonsters.Enqueue(monster);
 		}
 

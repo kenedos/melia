@@ -75,6 +75,10 @@ namespace Melia.Zone.World.Spawning
 			_timeSinceLastSpawn = this.RespawnDelay;
 		}
 
+		public void NotifyDormancy(int removedCount)
+		{
+		}
+
 		private bool IsPositionAvailable(string mapName, Position position)
 		{
 			lock (LockObj)

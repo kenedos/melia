@@ -174,10 +174,15 @@ namespace Melia.Zone.World.Spawning
 		/// <param name="amount"></param>
 		public void Spawn(int amount)
 		{
+			var spawned = 0;
+
 			for (var i = 0; i < amount; ++i)
 			{
 				if (!ZoneServer.Instance.World.Maps.TryGet(this.MapId, out var map))
 					throw new InvalidOperationException($"Map '{0}' not found.");
+
+				if (map.IsDormant)
+					continue;
 
 				var monster = new Mob(_monsterData.Id, RelationType.Enemy);
 				if (monster.Rank == MonsterRank.Boss)
@@ -201,6 +206,7 @@ namespace Melia.Zone.World.Spawning
 				}
 				monster.FromGround = true;
 				monster.Tendency = this.Tendency;
+				monster.Spawner = this;
 				monster.Died += this.OnMonsterDied;
 
 				// Apply map overrides first
@@ -243,9 +249,10 @@ namespace Melia.Zone.World.Spawning
 				this.ApplySpawnBuffs(monster, map);
 
 				this.Spawned?.Invoke(this, new SpawnEventArgs(this, monster));
+				spawned++;
 			}
 
-			this.Amount += amount;
+			this.Amount += spawned;
 		}
 
 		/// <summary>
@@ -314,6 +321,16 @@ namespace Melia.Zone.World.Spawning
 
 			lock (_respawnDelays)
 				_respawnDelays.Add(this.GetRandomRespawnDelay());
+		}
+
+		/// <summary>
+		/// Notifies the spawner that monsters were removed due to map
+		/// dormancy.
+		/// </summary>
+		/// <param name="removedCount"></param>
+		public void NotifyDormancy(int removedCount)
+		{
+			this.Amount = Math.Max(0, this.Amount - removedCount);
 		}
 
 		/// <summary>

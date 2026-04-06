@@ -79,6 +79,10 @@ namespace Melia.Zone.World.Spawning
 			_timeSinceDisappeared = _nextRespawnDelay; // Start ready to spawn immediately
 		}
 
+		public void NotifyDormancy(int removedCount)
+		{
+		}
+
 		private TimeSpan GetRandomRespawnDelay()
 		{
 			var minMs = _minRespawnDelay.TotalMilliseconds;

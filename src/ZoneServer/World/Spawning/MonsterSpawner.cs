@@ -199,6 +199,9 @@ namespace Melia.Zone.World.Spawning
 				if (!_spawnAreas.TryGetRandomLocation(out var map, out var pos))
 					return;
 
+				if (map.IsDormant)
+					continue;
+
 				if (isRootCrystal && !this.TryGetRootCrystalPosition(map, batchPositions, ref pos))
 					continue;
 
@@ -209,6 +212,7 @@ namespace Melia.Zone.World.Spawning
 				monster.Position = pos;
 				monster.FromGround = true;
 				monster.Tendency = this.Tendency;
+				monster.Spawner = this;
 				monster.Died += this.OnMonsterDied;
 
 				// Set spawn position early for any initialization that needs it
@@ -396,6 +400,19 @@ namespace Melia.Zone.World.Spawning
 
 			lock (_respawnDelays)
 				_respawnDelays.Add(this.GetRandomRespawnDelay());
+		}
+
+		/// <summary>
+		/// Notifies the spawner that monsters were removed due to map
+		/// dormancy. Decrements the amount so the spawner knows it
+		/// needs to respawn them. Existing respawn delays and flex
+		/// state are preserved to respect boss timers and other
+		/// long-delay spawners.
+		/// </summary>
+		/// <param name="removedCount"></param>
+		public void NotifyDormancy(int removedCount)
+		{
+			this.Amount = Math.Max(0, this.Amount - removedCount);
 		}
 
 		/// <summary>
