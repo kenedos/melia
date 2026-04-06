@@ -386,6 +386,13 @@ namespace Melia.Zone.World.Actors.Characters
 					// Remove from map immediately so other players don't see
 					// a lingering ghost. The connection is still open, so the
 					// ZC_MOVE_ZONE_OK packet will still reach the client.
+					var campfires = this.Map?.GetMonsters(m => m.Id == 46011 && m.OwnerHandle == this.Handle);
+					if (campfires != null)
+					{
+						foreach (var campfire in campfires)
+							this.Map.RemoveMonster(campfire);
+					}
+
 					this.CloseEyes();
 					foreach (var companion in this.Companions.GetList())
 						companion.Map?.RemoveMonster(companion);

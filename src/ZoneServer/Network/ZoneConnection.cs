@@ -333,6 +333,10 @@ namespace Melia.Zone.Network
 
 			if (character.Map != null)
 			{
+				var campfires = character.Map.GetMonsters(m => m.Id == 46011 && m.OwnerHandle == character.Handle);
+				foreach (var campfire in campfires)
+					character.Map.RemoveMonster(campfire);
+
 				character.CloseEyes();
 				character.Map.RemoveCharacter(character);
 			}

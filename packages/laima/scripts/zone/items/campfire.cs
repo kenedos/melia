@@ -84,6 +84,7 @@ public class CampfireActionScript : GeneralScript
 		campfire.Position = pos;
 		campfire.Direction = creator.Direction;
 		campfire.Layer = creator.Layer;
+		campfire.OwnerHandle = creator.Handle;
 		campfire.AddEffect(new AttachEffect("F_bg_fire003", 1, EffectLocation.Bottom));
 		campfire.DisappearTime = DateTime.Now + CampfireDuration;
 
