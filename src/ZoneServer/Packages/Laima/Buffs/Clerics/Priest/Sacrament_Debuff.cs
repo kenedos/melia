@@ -18,13 +18,13 @@ namespace Melia.Zone.Buffs.Handlers.Wizard
 	[BuffHandler(BuffId.Sacrament_Debuff)]
 	public class Sacrament_DebuffOverride : BuffHandler
 	{
-		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.Sacrament_Debuff)]
-		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.Sacrament_Debuff)]
+		public void OnDefenseBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
 			if (!target.TryGetBuff(BuffId.Sacrament_Debuff, out var buff))
 				return;
 
-			if (skill.Data.Attribute != AttributeType.Holy && modifier.AttackAttribute != AttributeType.Holy)
+			if (modifier.AttackAttribute != AttributeType.Holy)
 				return;
 
 			modifier.DamageMultiplier += buff.NumArg2;
