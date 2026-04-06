@@ -175,11 +175,16 @@ namespace Melia.Zone.World.Spawning
 		}
 
 		/// <summary>
-		/// Initializes the population by setting current monster amount to zero
+		/// Resets the spawner to its initial state, as if the server
+		/// just started. Amount is zeroed, the initial spawn flag is
+		/// cleared, and the spawn delay is reset to the configured
+		/// initial delay so the spawner repopulates from scratch.
 		/// </summary>
 		public void InitializePopulation()
 		{
 			this.Amount = 0;
+			_initialSpawnDone = false;
+			_flexSpawnDelay = this.InitialDelay;
 		}
 
 		/// <summary>
@@ -412,7 +417,7 @@ namespace Melia.Zone.World.Spawning
 		/// <param name="removedCount"></param>
 		public void NotifyDormancy(int removedCount)
 		{
-			this.Amount = Math.Max(0, this.Amount - removedCount);
+			this.InitializePopulation();
 		}
 
 		/// <summary>
@@ -529,12 +534,13 @@ namespace Melia.Zone.World.Spawning
 				// Spawn the full amount on the first flex spawn to get up
 				// to the flex amount without delay.
 				if (!_initialSpawnDone)
-				{
 					spawnAmount = potentialSpawnAmount;
-					_initialSpawnDone = true;
-				}
 
+				var amountBefore = this.Amount;
 				this.Spawn(spawnAmount);
+
+				if (!_initialSpawnDone && this.Amount > amountBefore)
+					_initialSpawnDone = true;
 			}
 		}
 

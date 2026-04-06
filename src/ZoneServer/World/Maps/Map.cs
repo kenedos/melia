@@ -56,7 +56,7 @@ namespace Melia.Zone.World.Maps
 		private readonly ConcurrentQueue<IMonster> _addMonsters = new();
 		private int _characterCount;
 		private DateTime _lastPlayerLeftTime = DateTime.MinValue;
-		private readonly DateTime _createdTime = DateTime.Now;
+		private DateTime _createdTime = DateTime.Now;
 		protected readonly Dictionary<int, PropertyOverrides> _monsterPropertyOverrides = new();
 		protected readonly List<SpawnBuffEntry> _spawnBuffs = new();
 
@@ -421,6 +421,7 @@ namespace Melia.Zone.World.Maps
 		{
 			this.IsDormant = false;
 			_lastPlayerLeftTime = DateTime.MinValue;
+			_createdTime = DateTime.Now;
 
 			Log.Info("Map '{0}' waking up.", this.ClassName);
 		}
