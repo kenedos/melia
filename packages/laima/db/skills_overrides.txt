@@ -818,7 +818,7 @@
 { skillId: 40204, className: "Priest_Resurrection", name: "Resurrection", basicSp: 160, basicCast: 0, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 30000, overheatCount: "0"},
 { skillId: 40205, className: "Priest_Sacrament", name: "Sacrament", basicSp: 48, basicCast: 0, splashRate: 0, factor: 18.0, factorByLevel: 2.2, cooldownTime: 7000, overheatCount: "0"},
 { skillId: 40206, className: "Priest_Revive", name: "Revive", basicSp: 168, basicCast: 2000, splashRate: 0, factor: 215.0, factorByLevel: 40.0, cooldownTime: 40000, overheatCount: "0", castInterruptible: true},
-{ skillId: 40209, className: "Priest_MassHeal", name: "Mass Heal", basicSp: 88, basicCast: 0, splashRate: 0, factor: 350.0, factorByLevel: 35.0, cooldownTime: 3000, overheatCount: "0", castInterruptible: true},
+{ skillId: 40209, className: "Priest_MassHeal", name: "Mass Heal", basicSp: 88, basicCast: 1500, splashRate: 0, factor: 350.0, factorByLevel: 35.0, cooldownTime: 3000, overheatCount: "0", castInterruptible: true},
 { skillId: 40211, className: "Priest_TurnUndead", name: "Turn Undead", basicSp: 104, basicCast: 1000, splashRate: 0, factor: 266, factorByLevel: 26.6, cooldownTime: 3000, overheatCount: "0", castInterruptible: false},
 
 // Dievdirbys
