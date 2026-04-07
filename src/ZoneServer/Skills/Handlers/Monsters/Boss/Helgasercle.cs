@@ -40,13 +40,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 40, angle: 45f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 60, angle: 45f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 1800;
 			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 20000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_bleed, 1, 0f, 7000f, 1, 20, -1, hits);
 		}
 	}
 
@@ -79,7 +80,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2000;
 			var aniTime = 2200;
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
+			var hits = new List<SkillHitInfo>();
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 20000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_bleed, 1, 0f, 7000f, 1, 20, -1, hits);
 		}
 	}
 
@@ -107,9 +111,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
-			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 150f, 20));
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await skill.Wait(TimeSpan.FromMilliseconds(2400));
 			var missileConfig = new MissileConfig
 			{
 				Effect = new EffectConfig("I_spread_in008_red#Bip001 R Hand", 1f),
@@ -124,37 +126,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("None", 0.8f),
 			};
 
-			Position position;
-
 			for (var i = 0; i < 5; i++)
 			{
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 150);
-				await MissileThrow(skill, caster, position, missileConfig);
+				var targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 250f);
+				await skill.Wait(TimeSpan.FromMilliseconds(250));
+				_ = MissileThrow(skill, caster, targetPos, missileConfig);
 			}
-			await skill.Wait(TimeSpan.FromMilliseconds(800));
-			var missileConfig2 = new MissileConfig
-			{
-				Effect = new EffectConfig("I_spread_in008_red#Bip001 L Hand", 1f),
-				EndEffect = new EffectConfig("F_explosion046_red", 1f),
-				Range = 20f,
-				FlyTime = 0.3f,
-				DelayTime = 0f,
-				Gravity = 0f,
-				Speed = 1f,
-				HitTime = 1000f,
-				HitCount = 1,
-				GroundEffect = new EffectConfig("None", 0.8f),
-			};
-
-			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 130, height: 1);
-			await MissileThrow(skill, caster, position, missileConfig2);
-			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 130, height: 1);
-			await MissileThrow(skill, caster, position, missileConfig2);
-			for (var i = 0; i < 3; i++)
-			{
-				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 130, height: 1);
-				await MissileThrow(skill, caster, position, missileConfig2);
-			}
+			
 		}
 	}
 
@@ -183,7 +161,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 100, angle: 10f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2300;
 			var aniTime = 2500;
@@ -225,19 +203,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			MonsterSkillCreateMob(skill, caster, "helgasercle_phantom", spawnPos, 299f, "헬가세르클의 분신체", "BasicMonster_ATK", -5, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 90, angle: 240f);
 			MonsterSkillCreateMob(skill, caster, "helgasercle_phantom", spawnPos, 60f, "헬가세르클의 분신체", "BasicMonster_ATK", -5, 0f, "helga_real", "");
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			var targetPos = originPos.GetRelative(farPos, distance: 150, rand: 60);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.helgasercle_atk2);
-			targetPos = originPos.GetRelative(farPos, distance: 150, angle: 180f, rand: 60);
-			SkillCreatePad(caster, skill, targetPos, 3.1415927f, PadName.helgasercle_atk2);
-			targetPos = originPos.GetRelative(farPos, distance: 47, angle: -60f);
-			SkillCreatePad(caster, skill, targetPos, -1.0471976f, PadName.helgasercle_atk);
-			targetPos = originPos.GetRelative(farPos, distance: 47, angle: 60f);
-			SkillCreatePad(caster, skill, targetPos, 1.0471976f, PadName.helgasercle_atk);
-			targetPos = originPos.GetRelative(farPos);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.helgasercle_atk);
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			caster.StartBuff(BuffId.Invincible, 1f, 0f, TimeSpan.Zero, caster);
+			await skill.Wait(TimeSpan.FromMilliseconds(2500));
+			
+			caster.StartBuff(BuffId.Invincible, 1f, 0f, TimeSpan.FromSeconds(10), caster);
 		}
 	}
 }

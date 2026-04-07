@@ -9,6 +9,7 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Mon
@@ -43,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var hitDelay = 0 + (int)(caster.Position.Get2DDistance(target.Position) * 5);
 			var aniTime = hitDelay + 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			var position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 60, rand: 70);
+			var position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 60);
 			await MissileThrow(skill, caster, position, new MissileConfig
 			{
 				Effect = new EffectConfig("I_spread_in008_red#Bip001 R Hand", 0.5f),
