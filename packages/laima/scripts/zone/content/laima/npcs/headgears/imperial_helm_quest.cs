@@ -23,6 +23,7 @@ public class ImperialHelmQuestScript : QuestScript
 	{
 		SetId(QuestNamespace, QuestNumber);
 		SetName(QuestName);
+		SetType(QuestType.Repeat);
 		SetDescription(QuestDescription);
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);

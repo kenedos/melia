@@ -685,6 +685,7 @@ public class DesertMysteriesQuest : QuestScript
 	{
 		SetId("f_rokas_25", 1001);
 		SetName(L("Desert Mysteries"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Marcus gather data on chupacabra behavior to prove they are no longer dangerous."));
 		SetLocation("f_rokas_25");
 		SetAutoTracked(true);
@@ -717,6 +718,7 @@ public class HeightsOfDzidaQuest : QuestScript
 	{
 		SetId("f_rokas_25", 1002);
 		SetName(L("Heights of Dzida"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Elena collect rare cliff blossoms from dangerous heights around the Dzida cliffs."));
 		SetLocation("f_rokas_25");
 		SetAutoTracked(true);
@@ -774,6 +776,7 @@ public class EchoesInStoneQuest : QuestScript
 	{
 		SetId("f_rokas_25", 1003);
 		SetName(L("Echoes in Stone"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Archivist Tobias collect monument fragments to preserve the history destroyed during the war."));
 		SetLocation("f_rokas_25");
 		SetAutoTracked(true);
@@ -833,6 +836,7 @@ public class SanctumsMemoryQuest : QuestScript
 	{
 		SetId("f_rokas_25", 1004);
 		SetName(L("Sanctum's Memory"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Paladin Cyril restore access to the ruined sanctum by clearing Zinutes and recovering sacred relics."));
 		SetLocation("f_rokas_25");
 		SetAutoTracked(true);

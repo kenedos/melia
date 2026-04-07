@@ -851,6 +851,7 @@ public class CrossingGuardDutyQuest : QuestScript
 	{
 		SetId("f_siauliai_11_re", 1001);
 		SetName(L("Crossing Guard Duty"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Guard Borin clear aggressive Popolions from the Uninhabited Crossing so he can properly watch for threats."));
 		SetLocation("f_siauliai_11_re");
 		SetAutoTracked(true);
@@ -880,6 +881,7 @@ public class TimberThiefMysteryQuest : QuestScript
 	{
 		SetId("f_siauliai_11_re", 1002);
 		SetName(L("The Timber Thief Mystery"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Investigate who or what is stealing timber from Lumberjack Kaspar's work area by examining log piles, then deal with the culprits."));
 		SetLocation("f_siauliai_11_re");
 		SetAutoTracked(true);
@@ -932,6 +934,7 @@ public class HerbalRainHarvestQuest : QuestScript
 	{
 		SetId("f_siauliai_11_re", 1003);
 		SetName(L("Herbal Rain Harvest"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Herbalist Ruta gather rare Moonlight Flowers that bloom during Paupys Crossing's endless rain."));
 		SetLocation("f_siauliai_11_re");
 		SetAutoTracked(true);
@@ -986,6 +989,7 @@ public class CorruptionWatchQuest : QuestScript
 	{
 		SetId("f_siauliai_11_re", 1004);
 		SetName(L("Corruption Watch"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Scout Daina inspect the three purification crystals at Deer Hooves Lot to check for traces of corruption from Koru Jungle."));
 		SetLocation("f_siauliai_11_re");
 		SetAutoTracked(true);
@@ -1037,6 +1041,7 @@ public class DetectionDeviceTestQuest : QuestScript
 	{
 		SetId("f_siauliai_11_re", 1005);
 		SetName(L("Detection Device Test"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Commander Uska test the magical detection device that monitors threats from Ashaq Underground Prison by deploying monster bait to attract prison creatures."));
 		SetLocation("f_siauliai_11_re");
 		SetAutoTracked(true);
@@ -1093,6 +1098,7 @@ public class AMomentOfPeaceQuest : QuestScript
 	{
 		SetId("f_siauliai_11_re", 1006);
 		SetName(L("A Moment of Peace"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Join Hermit Lukas for a peaceful moment of meditation and relaxation in his secluded grove."));
 		SetLocation("f_siauliai_11_re");
 		SetAutoTracked(true);

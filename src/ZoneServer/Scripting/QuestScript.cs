@@ -259,6 +259,13 @@ namespace Melia.Zone.Scripting
 			=> this.Data.Description = description;
 
 		/// <summary>
+		/// Sets the quest's type.
+		/// </summary>
+		/// <param name="type"></param>
+		protected void SetType(QuestType type)
+			=> this.Data.Type = type;
+
+		/// <summary>
 		/// Sets the quest's location (map class name).
 		/// </summary>
 		/// <param name="mapClassName"></param>

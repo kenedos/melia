@@ -653,6 +653,7 @@ public class JungleEntryPatrolQuest : QuestScript
 	{
 		SetId("f_bracken_63_1", 1001);
 		SetName(L("Jungle Entry Patrol"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Clear poison-tainted Polibu from the jungle entrance to make it safe for travelers."));
 		SetLocation("f_bracken_63_1");
 		SetAutoTracked(true);
@@ -682,6 +683,7 @@ public class HerbGatherersPleaQuest : QuestScript
 	{
 		SetId("f_bracken_63_1", 1002);
 		SetName(L("Herb Gatherer's Plea"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Protect the herbalist's garden by driving away poison-corrupted Parrot creatures."));
 		SetLocation("f_bracken_63_1");
 		SetAutoTracked(true);
@@ -711,6 +713,7 @@ public class ElevatorMaintenanceQuest : QuestScript
 	{
 		SetId("f_bracken_63_1", 1003);
 		SetName(L("Elevator Maintenance"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Clear Polibu from the elevator and inspect critical components for the engineer."));
 		SetLocation("f_bracken_63_1");
 		SetAutoTracked(true);
@@ -767,6 +770,7 @@ public class WaterfallSanctuaryQuest : QuestScript
 	{
 		SetId("f_bracken_63_1", 1004);
 		SetName(L("Waterfall Sanctuary"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Collect purifying water samples from sacred crystal formations near the waterfall."));
 		SetLocation("f_bracken_63_1");
 		SetAutoTracked(true);
@@ -822,6 +826,7 @@ public class LostInTheMistQuest : QuestScript
 	{
 		SetId("f_bracken_63_1", 1005);
 		SetName(L("Lost in the Mist"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help a lost merchant by clearing Leafnut and recovering her scattered supply crates."));
 		SetLocation("f_bracken_63_1");
 		SetAutoTracked(true);
@@ -876,6 +881,7 @@ public class PathwayPurgeQuest : QuestScript
 	{
 		SetId("f_bracken_63_1", 1006);
 		SetName(L("Pathway Purge"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Clear the jungle pathway of both Parrot and Polibu to restore the safe travel route."));
 		SetLocation("f_bracken_63_1");
 		SetAutoTracked(true);

@@ -1106,6 +1106,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			questTable.Insert("Description", quest.Data.Description);
 			questTable.Insert("Location", locationName);
 			questTable.Insert("Level", quest.Data.Level);
+			questTable.Insert("Type", quest.Data.Type.ToString());
 			questTable.Insert("Status", quest.Status.ToString());
 			questTable.Insert("Done", quest.ObjectivesCompleted);
 			questTable.Insert("Cancelable", quest.Data.Cancelable);

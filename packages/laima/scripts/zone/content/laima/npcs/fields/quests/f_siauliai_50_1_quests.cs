@@ -450,6 +450,7 @@ public class WarningTheFarmersQuest : QuestScript
 	{
 		SetId("f_siauliai_50_1", 1001);
 		SetName(L("Warning the Farmers"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Deliver warning letters to farmers across the Gytis Settlement Area about aggressive Orange Sakmoli monsters."));
 		SetLocation("f_siauliai_50_1");
 		SetAutoTracked(true);
@@ -507,6 +508,7 @@ public class ClearingTheFieldsQuest : QuestScript
 	{
 		SetId("f_siauliai_50_1", 1002);
 		SetName(L("Clearing the Fields"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Clear Orange Sakmoli and Black Ridimed from the farmland to protect the crops."));
 		SetLocation("f_siauliai_50_1");
 		SetAutoTracked(true);
@@ -551,6 +553,7 @@ public class TheSeedOfCorruptionQuest : QuestScript
 	{
 		SetId("f_siauliai_50_1", 1003);
 		SetName(L("The Seed of Corruption"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Collect Tough Orange Sakmoli Stems to help Henrik study the corruption affecting the pumpkin monsters."));
 		SetLocation("f_siauliai_50_1");
 		SetAutoTracked(true);
@@ -596,6 +599,7 @@ public class RabbitProblemQuest : QuestScript
 	{
 		SetId("f_siauliai_50_1", 1004);
 		SetName(L("Rabbit Problem"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Aldric by reducing the population of Lepusbunny Assassins raiding his vegetable garden."));
 		SetLocation("f_siauliai_50_1");
 		SetAutoTracked(true);
@@ -637,6 +641,7 @@ public class HopeAmongTheFieldsQuest : QuestScript
 	{
 		SetId("f_siauliai_50_1", 1005);
 		SetName(L("Hope Among the Fields"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Jonas gather crop bundles from the eastern fields before monsters destroy the harvest."));
 		SetLocation("f_siauliai_50_1");
 		SetAutoTracked(true);

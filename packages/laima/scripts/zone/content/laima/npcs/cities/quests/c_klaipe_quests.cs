@@ -477,6 +477,7 @@ public class KlaipeCaravanEscortQuest : QuestScript
 	{
 		SetId("Klaipeda", 1001);
 		SetName(L("Caravan Escort"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Clear the western road of monsters so supply caravans can safely reach Klaipeda."));
 		SetLocation("f_siauliai_west");
 		SetAutoTracked(true);
@@ -509,6 +510,7 @@ public class KlaipeRiverCorruptionQuest : QuestScript
 	{
 		SetId("Klaipeda", 1002);
 		SetName(L("Cleansing the River"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help River Warden Elara by removing corrupted tree branches that are polluting Klaipeda's main water source."));
 		SetLocation("c_Klaipe");
 		SetAutoTracked(true);
@@ -574,6 +576,7 @@ public class KlaipeReconstructionQuest : QuestScript
 	{
 		SetId("Klaipeda", 1003);
 		SetName(L("Rebuilding Klaipeda"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Gather wood planks from the forest monsters to help rebuild Klaipeda."));
 		SetLocation("f_siauliai_west", "f_siauliai_out");
 		SetAutoTracked(true);
@@ -627,6 +630,7 @@ public class KlaipeMerchantGuildQuest : QuestScript
 	{
 		SetId("Klaipeda", 1004);
 		SetName(L("Reopening Trade Routes"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Deliver trade proposals to the Merchant Guild representatives in Orsha and Fedimian."));
 		SetLocation("c_fedimian", "c_orsha");
 		SetAutoTracked(true);
@@ -688,6 +692,7 @@ public class KlaipeCursedRefugeeQuest : QuestScript
 	{
 		SetId("Klaipeda", 1005);
 		SetName(L("Breaking the Curse"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Retrieve the broken amulet from Eastwood Village at east of Miner's Village to break Aldric's curse. The amulet absorbs dark energies and may be able to draw out the curse."));
 		SetLocation("c_siauliai_out");
 		SetAutoTracked(true);

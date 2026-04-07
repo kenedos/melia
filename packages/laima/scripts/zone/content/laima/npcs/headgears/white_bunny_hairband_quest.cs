@@ -25,6 +25,7 @@ public class WhiteBunnyHairbandQuestScript : QuestScript
 	{
 		this.SetId(QuestNamespace, QuestNumber);
 		this.SetName(QuestName);
+		SetType(QuestType.Repeat);
 		this.SetDescription(QuestDescription);
 		this.SetUnlock(QuestUnlockType.AllAtOnce);
 		this.SetCancelable(true);

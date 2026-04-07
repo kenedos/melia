@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
@@ -25,6 +25,7 @@ public class GhostHeadbandQuestScript : QuestScript
 	{
 		SetId(QuestNamespace, QuestNumber);
 		SetName(QuestName);
+		SetType(QuestType.Repeat);
 		SetDescription(QuestDescription);
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);

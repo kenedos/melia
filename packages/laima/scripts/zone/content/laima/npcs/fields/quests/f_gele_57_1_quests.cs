@@ -440,6 +440,7 @@ public class PantoPopulationControlQuest : QuestScript
 	{
 		SetId("f_gele_57_1", 1001);
 		SetName(L("Panto Population Control"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Torin thin the Panto population on Mieguista slope before they overrun the entire gorge."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);
@@ -470,6 +471,7 @@ public class HoneyForTheHivesQuest : QuestScript
 	{
 		SetId("f_gele_57_1", 1002);
 		SetName(L("Honey for the Hives"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help the traveling botanist collect wildflower stamens from the dangerous flower fields patrolled by territorial Grummer and Zignuts."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);
@@ -525,6 +527,7 @@ public class MerchantsPantoProblemQuest : QuestScript
 	{
 		SetId("f_gele_57_1", 1003);
 		SetName(L("Merchant's Panto Problem"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Hunt Panto in the meadow and collect 15 valuable Panto Horns for the traveling merchant Gareth."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);
@@ -569,6 +572,7 @@ public class GorgeDeliveryServiceQuest : QuestScript
 	{
 		SetId("f_gele_57_1", 1004);
 		SetName(L("Gorge Delivery Service"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Deliver emergency food supplies from Srautas Gorge to the isolated outpost on Gele Plateau."));
 		SetLocation("f_gele_57_2");
 		SetAutoTracked(true);
@@ -611,6 +615,7 @@ public class GorgePatrolQuest : QuestScript
 	{
 		SetId("f_gele_57_1", 1005);
 		SetName(L("The Gorge Patrol"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Patrol the eastern gorge, clear Grummer threats, and hunt down the dangerous elite warrior Cafrisun."));
 		SetLocation("f_gele_57_1");
 		SetAutoTracked(true);

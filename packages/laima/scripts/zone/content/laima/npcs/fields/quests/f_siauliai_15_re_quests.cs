@@ -970,6 +970,7 @@ public class CleansingCorruptedAirQuest : QuestScript
 	{
 		SetId("f_siauliai_15_re", 1001);
 		SetName(L("Cleansing the Corrupted Air"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Cull the infected creatures spreading poison throughout the woods to help Scout Milda contain the contamination."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
@@ -1003,6 +1004,7 @@ public class LostCaravanQuest : QuestScript
 	{
 		SetId("f_siauliai_15_re", 1002);
 		SetName(L("The Lost Caravan"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Recover loose packages from the poisoned Kepas."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
@@ -1046,6 +1048,7 @@ public class HermitDiscoveryQuest : QuestScript
 	{
 		SetId("f_siauliai_15_re", 1003);
 		SetName(L("The Hermit's Discovery"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Hunt corrupted boars to slow the spread of corruption in the forest."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
@@ -1077,6 +1080,7 @@ public class TalesOfBridgesQuest : QuestScript
 	{
 		SetId("f_siauliai_15_re", 1004);
 		SetName(L("Reconstructing the Bridges"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Inspect rubble piles coming off the deteriorating bridges to help assess the damage for reconstruction efforts."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
@@ -1126,6 +1130,7 @@ public class BeekeeperHopeQuest : QuestScript
 	{
 		SetId("f_siauliai_15_re", 1005);
 		SetName(L("The Beekeeper's Hope"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Gather bee-attracting flowers from around the forest to help Beekeeper Greta lure wild bees back to her farm."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
@@ -1183,6 +1188,7 @@ public class SeedsOfHopeQuest : QuestScript
 	{
 		SetId("f_siauliai_15_re", 1006);
 		SetName(L("Seeds of Hope"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Seek out the ancient stone golem guardian and request its blessing to purify Morku's corrupted farmland."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);

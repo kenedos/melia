@@ -26,6 +26,14 @@ namespace Melia.Zone.World.Quests
 		public string Description { get; set; }
 
 		/// <summary>
+		/// Gets or sets the quest's type.
+		/// </summary>
+		/// <remarks>
+		/// Currently used primarily for UI filtering purposes.
+		/// </remarks>
+		public QuestType Type { get; set; } = QuestType.Sub;
+
+		/// <summary>
 		/// Gets or sets the quest's location (map class name).
 		/// </summary>
 		public string Location { get; set; }
@@ -141,6 +149,41 @@ namespace Melia.Zone.World.Quests
 		/// have been met.
 		/// </summary>
 		Auto,
+	}
+
+	/// <summary>
+	/// Specifies a quest's type.
+	/// </summary>
+	/// <remarks>
+	/// The names of these types mirror the names used in the client and should
+	/// not be changed unless the client is updated.
+	/// </remarks>
+	public enum QuestType
+	{
+		/// <summary>
+		/// A main story quest.
+		/// </summary>
+		Main,
+
+		/// <summary>
+		/// A side quest that is not part of the main story.
+		/// </summary>
+		Sub,
+
+		/// <summary>
+		/// A quest that can be repeated multiple times,
+		/// </summary>
+		Repeat,
+
+		/// <summary>
+		/// A quest that is to be completed with a party.
+		/// </summary>
+		Party,
+
+		/// <summary>
+		/// ?
+		/// </summary>
+		KeyItem,
 	}
 
 	public enum QuestRepeatability

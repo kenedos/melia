@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -23,6 +23,7 @@ public class SoldierHatQuestScript : QuestScript
 	{
 		SetId(QuestNamespace, QuestNumber);
 		SetName(QuestName);
+		SetType(QuestType.Repeat);
 		SetDescription(QuestDescription);
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);

@@ -509,6 +509,7 @@ public class FedimianWarChroniclesQuest : QuestScript
 	{
 		SetId("Fedimian", 3001);
 		SetName(L("Chronicles of the Demon War"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Collect testimonies from war survivors to complete the Grand Archive's historical record."));
 		SetLocation("c_fedimian");
 		SetAutoTracked(true);
@@ -570,6 +571,7 @@ public class FedimianPurificationScrollsQuest : QuestScript
 	{
 		SetId("Fedimian", 3002);
 		SetName(L("Ancient Purification"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Recover lost purification scrolls from monsters in Ramstis Ridge to help cleanse demonic corruption."));
 		SetLocation("c_fedimian");
 		SetAutoTracked(true);
@@ -620,6 +622,7 @@ public class FedimianUnitySummitQuest : QuestScript
 	{
 		SetId("Fedimian", 3003);
 		SetName(L("Path to Unity"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Organize a summit between the three great cities to establish cooperation and mutual aid."));
 		SetLocation("c_fedimian");
 		SetAutoTracked(true);
@@ -679,6 +682,7 @@ public class FedimianRoyalMausoleumQuest : QuestScript
 	{
 		SetId("Fedimian", 3004);
 		SetName(L("Royal Mausoleum Expedition"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Recover Kepeck's Relic Memoranda from the dangerous Royal Mausoleum to aid the Grand Archive's research."));
 		SetLocation("d_zachariel_32");
 		SetAutoTracked(true);

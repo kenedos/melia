@@ -499,6 +499,7 @@ public class ScorpionSuppressionQuest : QuestScript
 	{
 		SetId("f_rokas_28", 1001);
 		SetName(L("Scorpion Suppression"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help the supply officer thin out the Lauzinute population around the camp to prevent accidents."));
 		SetLocation("f_rokas_28");
 		SetAutoTracked(true);
@@ -530,6 +531,7 @@ public class ValleyPatrolQuest : QuestScript
 	{
 		SetId("f_rokas_28", 1002);
 		SetName(L("Valley Patrol"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help the Fedimian scout eliminate threats in Tiltas Valley by clearing Hogma Archers and Lauzinute."));
 		SetLocation("f_rokas_28");
 		SetAutoTracked(true);
@@ -564,6 +566,7 @@ public class MonumentsOfTheValleyQuest : QuestScript
 	{
 		SetId("f_rokas_28", 1003);
 		SetName(L("Monuments of the Valley"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Document ancient monuments at Zibintu Hill and Stone Pillar Hill for the Fedimian archaeologist's research."));
 		SetLocation("f_rokas_28");
 		SetAutoTracked(true);
@@ -612,6 +615,7 @@ public class DesertHerbalistQuest : QuestScript
 	{
 		SetId("f_rokas_28", 1004);
 		SetName(L("Desert Herbalist"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Collect Hemostasis Herbs across the valley for the Fedimian herbalist's antidote research."));
 		SetLocation("f_rokas_28");
 		SetAutoTracked(true);

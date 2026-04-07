@@ -758,6 +758,7 @@ public class ShadowsOfThePlateauQuest : QuestScript
 	{
 		SetId("f_rokas_30", 1001);
 		SetName(L("Shadows of the Plateau"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Deliver Expedition Leader Brennan's research document to Magister Corvinus at Sviesa Altar."));
 		SetLocation("f_rokas_30");
 		SetAutoTracked(true);
@@ -800,6 +801,7 @@ public class PlateauPatrolQuest : QuestScript
 	{
 		SetId("f_rokas_30", 1002);
 		SetName(L("Plateau Patrol"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Eliminate Hogma Scouts and Shamans threatening the expedition camps on King's Plateau."));
 		SetLocation("f_rokas_30");
 		SetAutoTracked(true);
@@ -834,6 +836,7 @@ public class EchoesInTheJarsQuest : QuestScript
 	{
 		SetId("f_rokas_30", 1003);
 		SetName(L("Echoes in the Jars"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Activate ancient ceremonial jars in the correct sequence to reveal hidden inscriptions about the Mage's Tower."));
 		SetLocation("f_rokas_30");
 		SetAutoTracked(true);
@@ -878,6 +881,7 @@ public class UnlockingTheTowerQuest : QuestScript
 	{
 		SetId("f_rokas_30", 1004);
 		SetName(L("Unlocking the Tower"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Gather Hogma Tusks and Destroyed Barrier Pieces from ancient monuments to create a Key of Passage for the Mage's Tower."));
 		SetLocation("f_rokas_30");
 		SetAutoTracked(true);
@@ -936,6 +940,7 @@ public class ThePrecariousCrossingQuest : QuestScript
 	{
 		SetId("f_rokas_30", 1005);
 		SetName(L("The Precarious Crossing"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Investigate the sabotaged bridge for Cartographer Varus by examining all four support posts."));
 		SetLocation("f_rokas_30");
 		SetAutoTracked(true);

@@ -449,6 +449,7 @@ public class FSiauliaiWestFarmingToolsQuest : QuestScript
 	{
 		SetId("f_siauliai_west", 1001);
 		SetName(L("The Farmer's Legacy"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Bronius recover his family's heirloom farming tools by searching through bags scattered across the farmlands when monsters drove him away."));
 		SetLocation("f_siauliai_west");
 		SetAutoTracked(true);
@@ -500,6 +501,7 @@ public class FSiauliaiWestHerbalistQuest : QuestScript
 	{
 		SetId("f_siauliai_west", 1002);
 		SetName(L("Magical Contamination Study"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Collect samples from Bokchoy and Chinency monsters to help Vesta's research on post-war magical contamination in the local ecosystem."));
 		SetLocation("f_siauliai_west");
 		SetAutoTracked(true);
@@ -532,6 +534,7 @@ public class FSiauliaiWestVillageRemedyQuest : QuestScript
 	{
 		SetId("f_siauliai_west", 1003);
 		SetName(L("Roots of the World Tree"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Henrik with his research by destroying 2 Rootcrystals."));
 		SetLocation("f_siauliai_west");
 		SetAutoTracked(true);
@@ -563,6 +566,7 @@ public class FSiauliaiWestRunestoneQuest : QuestScript
 	{
 		SetId("f_siauliai_west", 1004);
 		SetName(L("Bridge Maintenance"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help bridge guard Tomas reinforce the bridge by collecting Infrorocktor Fragments from Infrorocktor monsters."));
 		SetLocation("f_siauliai_west");
 		SetAutoTracked(true);
@@ -609,6 +613,7 @@ public class FSiauliaiWestMerchantQuest : QuestScript
 	{
 		SetId("f_siauliai_west", 1005);
 		SetName(L("The Broken Wagon"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help traveling merchant Sigrid repair her broken wagon by collecting Hanaming Petals and Leaf Bug Feelers."));
 		SetLocation("f_siauliai_west");
 		SetAutoTracked(true);

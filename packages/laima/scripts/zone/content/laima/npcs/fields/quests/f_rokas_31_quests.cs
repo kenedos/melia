@@ -247,6 +247,7 @@ public class CrossroadsWarningQuest : QuestScript
 	{
 		SetId("f_rokas_31", 1001);
 		SetName(L("Crossroads Warning"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Defeat the Warleader Hogmas threatening the crossroads, then deliver Darius's warning to the Fedimian Merchant Guild."));
 		SetLocation("f_rokas_31", "c_fedimian");
 		SetAutoTracked(true);
@@ -282,6 +283,7 @@ public class GuardianOfZemynaQuest : QuestScript
 	{
 		SetId("f_rokas_31", 1002);
 		SetName(L("Guardian of Zemyna"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Protect the Statue of Goddess Zemyna by culling the corrupted Repusbunny Mages."));
 		SetLocation("f_rokas_31");
 		SetAutoTracked(true);

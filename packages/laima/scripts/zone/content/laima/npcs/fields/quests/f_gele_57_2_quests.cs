@@ -282,6 +282,7 @@ public class PlateausMenaceQuest : QuestScript
 	{
 		SetId("f_gele_57_2", 1001);
 		SetName(L("Plateau's Menace"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Klaipeda Scout Lania thin the monster population across Srautas Gorge by hunting Leafly, Panto warriors with swords, and Panto warriors with their hands."));
 		SetLocation("f_gele_57_2");
 		SetAutoTracked(true);
@@ -320,6 +321,7 @@ public class TotemDesecrationQuest : QuestScript
 	{
 		SetId("f_gele_57_2", 1002);
 		SetName(L("Totem Desecration"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Klaipeda Researcher Veric restore the gorge's natural balance by destroying Panto territorial totems in the southern plateau."));
 		SetLocation("f_gele_57_2");
 		SetAutoTracked(true);
@@ -351,6 +353,7 @@ public class MessageToTheHillsideQuest : QuestScript
 	{
 		SetId("f_gele_57_2", 1003);
 		SetName(L("Message to the Hillside"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Deliver an urgent sealed letter from Klaipeda Messenger Gareth to Hillside Watcher Roderic in Nefritas Cliff's Uzbaigi Hillside."));
 		SetLocation("f_gele_57_2");
 		SetAutoTracked(true);

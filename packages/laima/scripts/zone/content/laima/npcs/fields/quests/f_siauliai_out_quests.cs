@@ -513,6 +513,7 @@ public class FSiauliaiOutGoblinProblemQuest : QuestScript
 	{
 		SetId("f_siauliai_out", 1001);
 		SetName(L("The Goblin Menace"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Mine Foreman Karolis by clearing out the Goblin Spears that have been raiding the village's supply routes."));
 		SetLocation("f_siauliai_out");
 		SetAutoTracked(true);
@@ -544,6 +545,7 @@ public class FSiauliaiOutAlchemistRemedyQuest : QuestScript
 	{
 		SetId("f_siauliai_out", 1002);
 		SetName(L("The Cure for Crystal Sickness"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Gather Red Kepa Skins and Jukopus Cores for Village Alchemist Elara so she can create a remedy for the miners suffering from crystal contamination."));
 		SetLocation("f_siauliai_out");
 		SetAutoTracked(true);
@@ -595,6 +597,7 @@ public class FSiauliaiOutAncientRelicsQuest : QuestScript
 	{
 		SetId("f_siauliai_out", 1003);
 		SetName(L("Fragments of the Ancient Blade"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Help Mysterious Trader Rokas retrieve three pieces of an ancient broken sword hidden around Miner's Village. Search the village to find the legendary sword fragments."));
 		SetLocation("f_siauliai_out");
 		SetAutoTracked(true);
@@ -646,6 +649,7 @@ public class FSiauliaiOutLostPendantQuest : QuestScript
 	{
 		SetId("f_siauliai_out", 1004);
 		SetName(L("A Father's Memory"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Search Miner's Village for Magnus's lost copper pendant - a precious family heirloom that means everything to the retired adventurer."));
 		SetLocation("f_siauliai_out");
 		SetAutoTracked(true);

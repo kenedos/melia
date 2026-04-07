@@ -474,6 +474,7 @@ public class OrshaTrainingGroundsQuest : QuestScript
 	{
 		SetId("Orsha", 2001);
 		SetName(L("Reclaim the Training Grounds"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Clear monsters from Orsha's military training grounds so recruits can train safely."));
 		SetLocation("f_whitetrees_22_3");
 		SetAutoTracked(true);
@@ -504,6 +505,7 @@ public class GuardiansOfTheForestRoadsQuest : QuestScript
 	{
 		SetId("Orsha", 2002);
 		SetName(L("Guardians of the Forest Roads"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Pray at the five ancient purifying statues in the Woods of the Linked Bridges to awaken their holy power and protect travelers from monster attacks."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
@@ -557,6 +559,7 @@ public class EchoesOfAncientWarQuest : QuestScript
 	{
 		SetId("Orsha", 2003);
 		SetName(L("Echoes of the Ancient War"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Recover the five fragments of an ancient tombstone containing tactical knowledge from the first demon war."));
 		SetLocation("f_whitetrees_21_2");
 		SetAutoTracked(true);
@@ -612,6 +615,7 @@ public class OrshaInfirmaryQuest : QuestScript
 	{
 		SetId("Orsha", 2004);
 		SetName(L("Healing the Wounded"));
+		SetType(QuestType.Sub);
 		SetDescription(L("Gather medicinal herbs for the Orsha Infirmary to treat wounded soldiers - Languid Herbs, Sweet Herbs, and Fragrant Herbs."));
 		SetLocation("c_orsha");
 		SetAutoTracked(true);
