@@ -182,6 +182,8 @@ public class NormalTxFunctionsScript : GeneralScript
 		}
 
 		// Iterate over the amounts and try to apply them to the skills
+		var commonSkillChanged = false;
+
 		for (var i = 0; i < amounts.Length; ++i)
 		{
 			var addLevels = amounts[i];
@@ -200,7 +202,8 @@ public class NormalTxFunctionsScript : GeneralScript
 
 			// Check max level
 			var maxLevel = character.Skills.GetMaxLevel(skillId);
-			var currentLevel = character.Skills.GetLevel(skillId);
+			var existingSkill = character.Skills.Get(skillId);
+			var currentLevel = existingSkill?.LevelByDB ?? 0;
 			var newLevel = (currentLevel + addLevels);
 
 			// Safety check.
@@ -225,7 +228,11 @@ public class NormalTxFunctionsScript : GeneralScript
 			}
 			else
 			{
+				if (skill.IsCommon)
+					commonSkillChanged = true;
+
 				skill.LevelByDB = newLevel;
+				skill.IsCommon = false;
 				skill.Properties.InvalidateAll();
 				Send.ZC_OBJECT_PROPERTY(character.Connection, skill);
 			}
@@ -243,7 +250,13 @@ public class NormalTxFunctionsScript : GeneralScript
 
 		Send.ZC_ADDON_MSG(character, AddonMessage.RESET_SKL_UP);
 		Send.ZC_JOB_PTS(character, job);
-		//Send.ZC_ADDITIONAL_SKILL_POINT(character, job);
+
+		if (commonSkillChanged)
+		{
+			Send.ZC_SKILL_LIST(character);
+			Send.ZC_COMMON_SKILL_LIST(character);
+			Send.ZC_NORMAL.UpdateSkillUI(character);
+		}
 
 		return NormalTxResult.Okay;
 	}

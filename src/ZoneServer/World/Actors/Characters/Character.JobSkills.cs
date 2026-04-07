@@ -117,6 +117,8 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void ResetSkills()
 		{
+			var commonSkillChanged = false;
+
 			foreach (var skill in this.Skills.GetList())
 			{
 				var skillTree = ZoneServer.Instance.Data.SkillTreeDb.Find(skillTree => skillTree.SkillId == skill.Id);
@@ -124,12 +126,33 @@ namespace Melia.Zone.World.Actors.Characters
 					continue;
 
 				if (skill.LevelByDB > 0)
-					this.Skills.Remove(skill.Id);
+				{
+					var gemLevel = skill.Properties.GetFloat(PropertyName.GemLevel_BM, 0);
+					if (gemLevel > 0)
+					{
+						skill.LevelByDB = 0;
+						skill.IsCommon = true;
+						skill.Properties.InvalidateAll();
+						Send.ZC_OBJECT_PROPERTY(this.Connection, skill);
+						commonSkillChanged = true;
+					}
+					else
+					{
+						this.Skills.Remove(skill.Id);
+					}
+				}
 			}
 
 			foreach (var job in this.Jobs.GetList())
 			{
 				job.SetSkillPoints(job.Level);
+			}
+
+			if (commonSkillChanged)
+			{
+				Send.ZC_SKILL_LIST(this);
+				Send.ZC_COMMON_SKILL_LIST(this);
+				Send.ZC_NORMAL.UpdateSkillUI(this);
 			}
 		}
 
@@ -141,6 +164,8 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.Jobs.TryGet(jobId, out var job))
 				return;
 
+			var commonSkillChanged = false;
+
 			foreach (var skill in this.Skills.GetList())
 			{
 				var skillTree = ZoneServer.Instance.Data.SkillTreeDb.Find(skillTree => skillTree.JobId == jobId && skillTree.SkillId == skill.Id);
@@ -148,10 +173,31 @@ namespace Melia.Zone.World.Actors.Characters
 					continue;
 
 				if (skill.LevelByDB > 0)
-					this.Skills.Remove(skill.Id);
+				{
+					var gemLevel = skill.Properties.GetFloat(PropertyName.GemLevel_BM, 0);
+					if (gemLevel > 0)
+					{
+						skill.LevelByDB = 0;
+						skill.IsCommon = true;
+						skill.Properties.InvalidateAll();
+						Send.ZC_OBJECT_PROPERTY(this.Connection, skill);
+						commonSkillChanged = true;
+					}
+					else
+					{
+						this.Skills.Remove(skill.Id);
+					}
+				}
 			}
 
 			job.SetSkillPoints(job.Level);
+
+			if (commonSkillChanged)
+			{
+				Send.ZC_SKILL_LIST(this);
+				Send.ZC_COMMON_SKILL_LIST(this);
+				Send.ZC_NORMAL.UpdateSkillUI(this);
+			}
 		}
 
 		/// <summary>
