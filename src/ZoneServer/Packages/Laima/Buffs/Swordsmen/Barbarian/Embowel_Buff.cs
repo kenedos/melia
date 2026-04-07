@@ -36,7 +36,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 				return;
 
 			var skillLevel = (int)buff.NumArg1;
-			var reduction = Math.Min(0.30f + 0.03f * skillLevel, 0.80f);
+			var reduction = Math.Min(0.40f + 0.02f * skillLevel, 0.80f);
 
 			skillHitResult.Damage *= (1f - reduction);
 		}

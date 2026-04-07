@@ -14,8 +14,8 @@ namespace Melia.Zone.Buffs.Handlers
 	[BuffHandler(BuffId.Blessing_Buff)]
 	public class Blessing_BuffOverride : BuffHandler
 	{
-		private const float BaseATKMultiplier = 0.17f;
-		private const float ATKMultiplierPerLevel = 0.03f;
+		private const float BaseATKMultiplier = 0.20f;
+		private const float ATKMultiplierPerLevel = 0.02f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{

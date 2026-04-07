@@ -18,7 +18,7 @@ namespace Melia.Zone.Pads.Handlers
 	[PadHandler(PadName.Cleric_New_SafetyZone_abil)]
 	public class Cleric_New_SafetyZone_abilOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, ILeavePadHandler, IUpdatePadHandler
 	{
-		private const string ShieldVariableName = "Melia.SafetyZone.Shield.HP";
+		private const string HitCountVariableName = "Melia.SafetyZone.HitCount";
 
 		public void Created(object sender, PadTriggerArgs args)
 		{
@@ -31,8 +31,8 @@ namespace Melia.Zone.Pads.Handlers
 			pad.SetUpdateInterval(1000);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(30000);
 
-			var shieldHp = this.CalculateShieldHP(creator, creator, skill);
-			pad.Variables.SetFloat(ShieldVariableName, shieldHp);
+			var hitCount = 6 + skill.Level;
+			pad.Variables.SetInt(HitCountVariableName, hitCount);
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)
@@ -62,7 +62,6 @@ namespace Melia.Zone.Pads.Handlers
 			if (initiator.IsBuffActive(BuffId.SafetyZone_Buff))
 				return;
 
-			var remainingShieldHp = pad.Variables.GetFloat(ShieldVariableName);
 			initiator.StartBuff(BuffId.SafetyZone_Buff, skill.Level, 0f, TimeSpan.Zero, creator);
 		}
 
@@ -77,20 +76,12 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			var remainingShieldHp = pad.Variables.GetFloat(ShieldVariableName);
-			if (remainingShieldHp <= 0)
+			var remainingHits = pad.Variables.GetInt(HitCountVariableName);
+			if (remainingHits <= 0)
 			{
 				pad.Destroy();
 				return;
 			}
-		}
-
-		private float CalculateShieldHP(ICombatEntity caster, ICombatEntity target, Skill skill)
-		{
-			var SCR_CalculateHeal = ScriptableFunctions.Combat.Get("SCR_CalculateHeal");
-			var modifier = new SkillModifier();
-			var skillHitResult = new SkillHitResult();
-			return SCR_CalculateHeal(caster, target, skill, modifier, skillHitResult);
 		}
 	}
 }

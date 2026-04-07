@@ -796,7 +796,7 @@
 //---------------------------------------------------------------------------
 { skillId: 40001, className: "Cleric_Heal", name: "Heal", basicSp: 45, basicCast: 1000, splashRate: 0, factor: 100.0, factorByLevel: 20.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: true},
 { skillId: 40002, className: "Cleric_Cure", name: "Cure", basicSp: 50, basicCast: 0, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 12000, overheatCount: "0"},
-{ skillId: 40003, className: "Cleric_SafetyZone", name: "Safety Zone", basicCast: 1500, splashRate: 0, factor: 300.0, factorByLevel: 60.0, cooldownTime: 12000, overheatCount: "0", castInterruptible: true},
+{ skillId: 40003, className: "Cleric_SafetyZone", name: "Safety Zone", basicCast: 1500, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 12000, overheatCount: "0", castInterruptible: true},
 { skillId: 40006, className: "Cleric_Fade", name: "Fade", basicSp: 55, basicCast: 0, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 30000, overheatCount: "0"},
 { skillId: 40007, className: "Cleric_PatronSaint", name: "Guardian Saint", basicSp: 110, basicCast: 0, splashRate: 1, factor: 0, factorByLevel: 0.0, cooldownTime: 30000, overheatCount: "0"},
 { skillId: 40008, className: "Cleric_Smite", name: "Smite", basicSp: 20, basicCast: 0, splashRate: 3, factor: 180.0, factorByLevel: 36.0, cooldownTime: 3000, overheatCount: "3"},

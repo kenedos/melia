@@ -17,7 +17,8 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 	[BuffHandler(BuffId.Bear_Buff)]
 	public class Bear_BuffOverride : BuffHandler
 	{
-		private const float DamageReductionPerLevel = 0.03f;
+		private const float BaseDamageReduction = 0.075f;
+		private const float DamageReductionPerLevel = 0.015f;
 
 		/// <summary>
 		/// Applies the buff's effect during the combat calculations.
@@ -34,7 +35,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Swordsmen.Swordsman
 				return;
 
 			var skillLevel = buff.NumArg1;
-			var multiplierReduction = skillLevel * DamageReductionPerLevel;
+			var multiplierReduction = BaseDamageReduction + skillLevel * DamageReductionPerLevel;
 
 			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var buffSkill))
 			{

@@ -13,7 +13,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Clerics.Monk
 	/// <summary>
 	/// Handler for Golden_Bell_Shield_Buff. Drains 65 SP per second
 	/// and tracks total SP consumed. Provides damage reduction equal
-	/// to (30% + 3% * SkillLv), hard capped at 80%. When the caster
+	/// to (40% + 2% * SkillLv), hard capped at 80%. When the caster
 	/// uses Energy Blast, adds bonus flat damage equal to
 	/// totalSpConsumed * (3 + 0.3 * SkillLv), then removes the buff.
 	/// </summary>
@@ -25,8 +25,8 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Clerics.Monk
 	public class Golden_Bell_Shield_BuffOverride : BuffHandler
 	{
 		private const int SpDrainPerTick = 65;
-		private const float BaseDamageReduction = 0.30f;
-		private const float DamageReductionPerLevel = 0.03f;
+		private const float BaseDamageReduction = 0.40f;
+		private const float DamageReductionPerLevel = 0.02f;
 		private const float MaxDamageReduction = 0.80f;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)

@@ -41,23 +41,18 @@ namespace Melia.Zone.Buffs.Handlers
 				return;
 			}
 
-			var remainingShieldHp = pad.Variables.GetFloat("Melia.SafetyZone.Shield.HP");
-			if (remainingShieldHp <= 0)
+			var remainingHits = pad.Variables.GetInt("Melia.SafetyZone.HitCount");
+			if (remainingHits <= 0)
 			{
 				pad.Destroy();
 				return;
 			}
 
-			var reduceDamage = Math.Min(remainingShieldHp, skillHitResult.Damage);
-			skillHitResult.Damage -= reduceDamage;
+			pad.Variables.SetInt("Melia.SafetyZone.HitCount", remainingHits - 1);
 
-			pad.Variables.SetFloat("Melia.SafetyZone.Shield.HP", remainingShieldHp - reduceDamage);
-
-			if (skillHitResult.Damage <= 0)
-			{
-				skillHitResult.Effect = HitEffect.SAFETY;
-				skillHitResult.Result = HitResultType.Miss;
-			}
+			skillHitResult.Damage = 0;
+			skillHitResult.Effect = HitEffect.SAFETY;
+			skillHitResult.Result = HitResultType.Miss;
 		}
 	}
 }
