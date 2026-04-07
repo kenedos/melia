@@ -1,11 +1,9 @@
 using System;
-using System.Threading.Tasks;
-using Melia.Shared.Data.Database;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
 using static Melia.Zone.Pads.Helpers.PadHelper;
@@ -24,8 +22,7 @@ namespace Melia.Zone.Pads.Handlers
 			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(30f);
 			pad.SetUpdateInterval(750);
-			var value = 1;
-			pad.Trigger.MaxActorCount = value;
+			pad.Trigger.MaxActorCount = 1;
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000);
 			pad.Trigger.MaxUseCount = 10;
 		}
@@ -45,49 +42,30 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			if (pad.IsDead)
-				return;
-			if (creator == null)
+			var targets = pad.Trigger.GetAttackableEntities(creator);
+
+			if (targets == null || !targets.Any())
 				return;
 
-			var caster = (ICombatEntity)creator;
-			if (caster.IsDead)
-				return;
-			if (skill == null)
-				return;
+			var modifier = new SkillModifier();
 
 			var targetCount = pad.Trigger.MaxActorCount;
-			var targets = pad.Map.GetAttackableEnemiesIn(caster, pad.Area);
-			foreach (var actor in targets)
+			foreach (var target in targets)
 			{
-				if (actor is not ICombatEntity target || target.IsDead)
-					continue;
-
 				if (targetCount <= 0)
 					break;
 
-				if (!caster.IsEnemy(target))
-					return;
-
-				var modifier = new SkillModifier();
-				modifier.AttackType = SkillAttackType.Magic;
-
-				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
+				var skillHitResult = SCR_SkillHit(creator, target, skill, modifier);
 				var damage = skillHitResult.Damage;
+				target.TakeSimpleHit(damage, creator, skill.Id);
 
-				target.TakeDamage(damage, caster);
-
-				var hitInfo = new HitInfo(caster, target, skill, skillHitResult.Damage, skillHitResult.Result);
-				Send.ZC_HIT_INFO(caster, target, hitInfo);
-
-				caster.PlayEffectToGround("F_cleric_zaibas_shot_rize", target.Position, 1, 0f, 0f, 0);
+				pad.PlayEffectToGround("F_cleric_zaibas_shot_rize", target.Position, 1f, 3000f, 0, 0);
+				pad.PlayEffectToGround("F_cleric_zaibas_shot_ground", target.Position, 0.5f, 500f, 0f, 0);
 
 				targetCount--;
-
-				pad.Trigger.IncreaseUseCount();
-				if (pad.IsDead)
-					break;
 			}
+
+			pad.Trigger.IncreaseUseCount();
 		}
 	}
 }

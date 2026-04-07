@@ -640,7 +640,7 @@ namespace Melia.Zone.World.Actors.Characters
 
 			monster.ShowEffects(this.Connection);
 
-			if (monster.OwnerHandle != 0)
+			if (monster.OwnerHandle != 0 && this.Map.TryGetCharacter(monster.OwnerHandle, out _))
 				Send.ZC_OWNER(this, monster);
 
 			if (monster is Summon summon)
