@@ -54,7 +54,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var skillHitDelay = skill.Properties.HitDelay;
 
 			var modifier = SkillModifier.MultiHit(3);
-			modifier.DamageMultiplier = 3;
 
 			// Wild throw reduces base hit rate by 70% but cuts cooldown by 5s
 			if (caster.IsAbilityActive(AbilityId.Ranger39))
