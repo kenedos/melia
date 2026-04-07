@@ -9,6 +9,7 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using System.Threading.Tasks;
@@ -134,38 +135,18 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 		private bool TryGetBounceTarget(ICombatEntity caster, ICombatEntity mainTarget, Skill skill, HashSet<ICombatEntity> hitTargets, out ICombatEntity bounceTarget)
 		{
-			var splashPos = caster.Position;
-			var splashParam = skill.GetSplashParameters(caster, splashPos, mainTarget.Position, length: 130, width: 60, angle: 0);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			var direction = caster.Position.GetDirection(mainTarget.Position);
+			var splashArea = new Fan(caster.Position, direction, 250, 110);
+
+			Debug.ShowShape(caster.Map, splashArea);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var eligibleTargets = targets.Where(a => a != mainTarget && !hitTargets.Contains(a) && this.IsBehindTarget(caster, mainTarget, a)).ToList();
 
-			if (!eligibleTargets.Any())
-			{
-				bounceTarget = null;
-				return false;
-			}
+			bounceTarget = targets.Where(a => !hitTargets.Contains(a))
+				.OrderBy(a => a.Position.Get2DDistance(caster.Position))
+				.FirstOrDefault();
 
-			// Sort targets by distance
-			var sortedTargets = eligibleTargets.OrderBy(a => a.Position.Get2DDistance(mainTarget.Position)).ToList();
-			var consideredTargetsCount = Math.Max(1, (int)(sortedTargets.Count));
-			var consideredTargets = sortedTargets.Take(consideredTargetsCount).ToList();
-
-			// Randomly select one of the considered targets
-			var rnd = new Random();
-			bounceTarget = consideredTargets[rnd.Next(consideredTargets.Count)];
-			return true;
-		}
-
-		private bool IsBehindTarget(ICombatEntity caster, ICombatEntity mainTarget, ICombatEntity potentialTarget)
-		{
-			var casterToMainVector = mainTarget.Position - caster.Position;
-			var casterToPotentialVector = potentialTarget.Position - caster.Position;
-
-			var dotProduct = casterToMainVector.X * casterToPotentialVector.X + casterToMainVector.Z * casterToPotentialVector.Z;
-
-			return dotProduct > 0;
+			return bounceTarget != null;
 		}
 	}
 }

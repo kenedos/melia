@@ -565,7 +565,7 @@
 
 // Ranger
 //---------------------------------------------------------------------------
-{ skillId: 30101, className: "Ranger_Barrage", name: "Barrage", basicSp: 10, factor: 18, factorByLevel: 1.8, cooldownTime: 0, overheatCount: "0", maxRange: 250, enableCastMove: true },
+{ skillId: 30101, className: "Ranger_Barrage", name: "Barrage", basicSp: 5, factor: 18, factorByLevel: 1.8, cooldownTime: 0, overheatCount: "0", maxRange: 250, enableCastMove: true },
 { skillId: 30103, className: "Ranger_CriticalShot", name: "Double Take", basicSp: 0, factor: 63, factorByLevel: 6.3, cooldownTime: 3000, overheatCount: "0" },
 { skillId: 30104, className: "Ranger_SteadyAim", name: "Steady Aim", basicSp: 60, factor: 0, factorByLevel: 0, cooldownTime: 10000, overheatCount: "0" },
 { skillId: 30107, className: "Ranger_SpiralArrow", name: "Spiral Arrow", basicSp: 33, factor: 34, factorByLevel: 3.4, cooldownTime: 8000, overheatCount: "5", maxRange: 250 },
