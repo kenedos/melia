@@ -138,8 +138,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var direction = caster.Position.GetDirection(mainTarget.Position);
 			var splashArea = new Fan(caster.Position, direction, 250, 110);
 
-			Debug.ShowShape(caster.Map, splashArea);
-
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 			bounceTarget = targets.Where(a => !hitTargets.Contains(a))
