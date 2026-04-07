@@ -1053,7 +1053,7 @@ namespace Melia.Zone.Network
 			}
 
 			// Check potential
-			if (item.Potential <= 0)
+			if (Feature.IsEnabled("HeadgearEnchantsConsumePotential") && item.Potential <= 0)
 			{
 				character.SystemMessage("NoMorePotential");
 				return;
@@ -1070,7 +1070,8 @@ namespace Melia.Zone.Network
 			item.GenerateRandomHatOptions(minOptions, maxOptions + 1);
 
 			// Reduce potential by 1
-			item.Properties.Modify(PropertyName.PR, -1);
+			if (Feature.IsEnabled("HeadgearEnchantsConsumePotential"))
+				item.Properties.Modify(PropertyName.PR, -1);
 
 			// Update item properties
 			Send.ZC_OBJECT_PROPERTY(character.Connection, item);
@@ -1531,7 +1532,7 @@ namespace Melia.Zone.Network
 				}
 
 				// Check potential
-				if (itemUsedOn.Potential <= 0)
+				if (Feature.IsEnabled("HeadgearEnchantsConsumePotential") && itemUsedOn.Potential <= 0)
 				{
 					character.SystemMessage("NoMorePotential");
 					return;
@@ -1544,7 +1545,11 @@ namespace Melia.Zone.Network
 				if (maxOptions <= 0) maxOptions = 2;
 
 				itemUsedOn.GenerateRandomHatOptions(minOptions, maxOptions + 1);
-				itemUsedOn.Properties.Modify(PropertyName.PR, -1);
+
+				// Reduce potential by 1
+				if (Feature.IsEnabled("HeadgearEnchantsConsumePotential"))
+					itemUsedOn.Properties.Modify(PropertyName.PR, -1);
+
 				character.Inventory.Remove(item1WorldId);
 				Send.ZC_OBJECT_PROPERTY(conn, itemUsedOn);
 			}

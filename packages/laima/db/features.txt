@@ -178,6 +178,9 @@
 	
 	// Allows character resurrection in PvP Maps
 	{ name: "AllowPVPResurrection", enabled: true},
+
+	// Headgear enchants consume potential when used
+	{ name: "HeadgearEnchantsConsumePotential", enabled: false },
 	
 	// Enables Mixing Table system
 	{ name: "MixingTable", enabled: true },
