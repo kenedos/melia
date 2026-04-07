@@ -27,6 +27,34 @@ using Yggdrasil.Util;
 
 public class CombatCalculationsScript : GeneralScript
 {
+	private static readonly (string AtkProperty, string ResistProperty, AttributeType AttributeType)[] AttributeEntries =
+	{
+		(PropertyName.Fire_Atk, PropertyName.ResFire, AttributeType.Fire),
+		(PropertyName.Ice_Atk, PropertyName.ResIce, AttributeType.Ice),
+		(PropertyName.Earth_Atk, PropertyName.ResEarth, AttributeType.Earth),
+		(PropertyName.Lightning_Atk, PropertyName.ResLightning, AttributeType.Lightning),
+		(PropertyName.Poison_Atk, PropertyName.ResPoison, AttributeType.Poison),
+		(PropertyName.Holy_Atk, PropertyName.ResHoly, AttributeType.Holy),
+		(PropertyName.Dark_Atk, PropertyName.ResDark, AttributeType.Dark),
+		(PropertyName.Soul_Atk, PropertyName.ResSoul, AttributeType.Soul),
+	};
+
+	private static readonly (string AtkProperty, string DefProperty, SkillAttackType AttackType)[] AttackTypeEntries =
+	{
+		(PropertyName.Slash_Atk, PropertyName.DefSlash, SkillAttackType.Slash),
+		(PropertyName.Aries_Atk, PropertyName.DefAries, SkillAttackType.Aries),
+		(PropertyName.Strike_Atk, PropertyName.DefStrike, SkillAttackType.Strike),
+	};
+
+	private static readonly Dictionary<RaceType, string> RaceAtkProperties = new()
+	{
+		[RaceType.Klaida] = PropertyName.Klaida_Atk,
+		[RaceType.Paramune] = PropertyName.Paramune_Atk,
+		[RaceType.Forester] = PropertyName.Forester_Atk,
+		[RaceType.Velnias] = PropertyName.Velnias_Atk,
+		[RaceType.Widling] = PropertyName.Widling_Atk,
+	};
+
 	/// <summary>
 	/// Returns a random attack value between the min and max values
 	/// for the type that matches the given skill (PATK or MATK).
@@ -501,13 +529,9 @@ public class CombatCalculationsScript : GeneralScript
 		var totalAdditionalAttack = 0f;
 
 		// Calculate attribute attack bonuses
-		var attributeTypeStrList = new[] { "Fire", "Ice", "Earth", "Lightning", "Poison", "Holy", "Dark", "Soul" };
 		var SCR_GetAddAttackMultiplier = ScriptableFunctions.Combat.Get("SCR_GetAddAttackMultiplier");
-		foreach (var attributeTypeStr in attributeTypeStrList)
+		foreach (var (atkPropertyName, resistPropertyName, attributeType) in AttributeEntries)
 		{
-			var atkPropertyName = $"{attributeTypeStr}_Atk";
-			var resistPropertyName = $"Res{attributeTypeStr}";
-
 			// Check for simulated monster attribute
 			// then fall back to player property
 			var atk = skill.Vars.TryGet(atkPropertyName, out float simulatedAtk)
@@ -534,8 +558,7 @@ public class CombatCalculationsScript : GeneralScript
 
 			// Apply attribute multiplier
 			var skMod = new SkillModifier();
-			var parsed = Enum.TryParse(attributeTypeStr, out AttributeType attributeType);
-			skMod.AttackAttribute = parsed ? attributeType : AttributeType.None;
+			skMod.AttackAttribute = attributeType;
 			var attributeMultiplier = SCR_AttributeMultiplier(attacker, target, skill, skMod, null);
 			attributeAtkBonus *= attributeMultiplier;
 
@@ -546,7 +569,7 @@ public class CombatCalculationsScript : GeneralScript
 			// Add the bonus if attacker's bonus exists or if the skill is of
 			// given attribute, reducing incoming damage from a negative bonus
 			var attackerAttr = modifier.AttackAttribute == AttributeType.None ? skill.Data.Attribute : modifier.AttackAttribute;
-			if ((atk > 0) || (parsed && (attackerAttr == attributeType)))
+			if ((atk > 0) || (attackerAttr == attributeType))
 				totalAdditionalAttack += attributeAtkBonus;
 		}
 
@@ -555,38 +578,33 @@ public class CombatCalculationsScript : GeneralScript
 			return totalAdditionalAttack;
 
 		// Calculate attack type bonuses (Players only)
-		var attackTypeStrList = new[] { "Slash", "Aries", "Strike" };
-		foreach (var attackTypeStr in attackTypeStrList)
+		if (skill.Data.AttackType != SkillAttackType.Magic)
 		{
-			if (skill.Data.AttackType == SkillAttackType.Magic)
-				continue;
+			foreach (var (atkPropertyName, defPropertyName, attackType) in AttackTypeEntries)
+			{
+				var atk = attacker.Properties.GetFloat(atkPropertyName, 0);
+				var atkResist = target.Properties.GetFloat(defPropertyName, 0);
 
-			var atkPropertyName = $"{attackTypeStr}_Atk";
-			var resistPropertyName = $"Def{attackTypeStr}";
+				var attackTypeBonus = atk - atkResist;
 
-			var atk = attacker.Properties.GetFloat(atkPropertyName, 0);
-			var atkResist = target.Properties.GetFloat(resistPropertyName, 0);
+				// Apply attack type multiplier
+				var skMod = new SkillModifier();
+				skMod.AttackType = attackType;
+				var atkTypeMultiplier = SCR_AttackTypeMultiplier(attacker, target, skill, skMod, null);
+				attackTypeBonus *= atkTypeMultiplier;
 
-			var attackTypeBonus = atk - atkResist;
-
-			// Apply attack type multiplier
-			var skMod = new SkillModifier();
-			var parsed = Enum.TryParse(attackTypeStr, out SkillAttackType attackType);
-			skMod.AttackType = parsed ? attackType : SkillAttackType.None;
-			var atkTypeMultiplier = SCR_AttackTypeMultiplier(attacker, target, skill, skMod, null);
-			attackTypeBonus *= atkTypeMultiplier;
-
-			// Add the bonus if attacker's bonus exists or if the skill is of
-			// given attack type, reducing incoming damage from a negative bonus
-			var attackerAtkType = modifier.AttackType == SkillAttackType.None ? skill.AttackType : modifier.AttackType;
-			if ((atk > 0) || (parsed && (attackerAtkType == attackType)))
-				totalAdditionalAttack += attackTypeBonus;
+				// Add the bonus if attacker's bonus exists or if the skill is of
+				// given attack type, reducing incoming damage from a negative bonus
+				var attackerAtkType = modifier.AttackType == SkillAttackType.None ? skill.AttackType : modifier.AttackType;
+				if ((atk > 0) || (attackerAtkType == attackType))
+					totalAdditionalAttack += attackTypeBonus;
+			}
 		}
 
 		// Calculate other attack property bonuses
 		// RaceType
-		if (target.Race != RaceType.None)
-			totalAdditionalAttack += attacker.Properties.GetFloat(target.Race.ToString() + "_Atk", 0);
+		if (target.Race != RaceType.None && RaceAtkProperties.TryGetValue(target.Race, out var raceAtkProperty))
+			totalAdditionalAttack += attacker.Properties.GetFloat(raceAtkProperty, 0);
 
 		// Size
 		switch (target.EffectiveSize)
