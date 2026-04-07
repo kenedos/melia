@@ -55,11 +55,15 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 					doubleCloneChance = doubleLevel * 0.5f;
 			}
 
+			// Mark all targets as reincarnated immediately to prevent
+			// multiple Chronomancers from reincarnating the same mobs
+			// due to a TOCTOU race between GetDeadEnemies and the loop.
+			foreach (var deadMob in deadTargets)
+				deadMob.Vars.SetBool(VarReincarnated, true);
+
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
 			foreach (var deadMob in deadTargets)
 			{
-				deadMob.Vars.SetBool(VarReincarnated, true);
-
 				if (RandomProvider.Next(1, 101) > reincarnateChance)
 					continue;
 
