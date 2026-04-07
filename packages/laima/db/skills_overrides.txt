@@ -638,7 +638,7 @@
 { skillId: 30806, className: "Fletcher_Singijeon", name: "Divine Machine Arrow", basicSp: 36, splashRate: 8, maxRange: 200, factor: 239, factorByLevel: 23.9, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
 { skillId: 30807, className: "Fletcher_BroadHead_DOT", name: "Broadhead", basicSp: 50, splashRate: -1, factor: 27, factorByLevel: 44.1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "0" },
 { skillId: 30808, className: "Fletcher_FletcherArrowShot", name: "Fletcher Arrow Shot", basicSp: 0, splashRate: -1, maxRange: 200, factor: 7, factorByLevel: 0.7, hitCount: 1, multiHitCount: 1, cooldownTime: 0, overheatCount: "0", enableCastMove: true },
-{ skillId: 30809, className: "Fletcher_CatenaChainArrow", name: "Catena Chain Arrow", basicSp: 55, splashRate: -1, maxRange: 200, factor: 125, factorByLevel: 23.1, hitCount: 1, multiHitCount: 1, cooldownTime: 20000 },
+{ skillId: 30809, className: "Fletcher_CatenaChainArrow", name: "Catena Chain Arrow", basicSp: 55, splashRate: -1, maxRange: 200, factor: 125, factorByLevel: 23.1, hitCount: 1, multiHitCount: 1, cooldownTime: 12000 },
 
 { skillId: 31001, className: "Falconer_Calling", name: "Call", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 1000 },
 { skillId: 31002, className: "Falconer_BuildRoost", name: "Roost", basicSp: 33, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 45000 },

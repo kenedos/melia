@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 	public class Fletcher_CatenaChainArrowOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const string ChainLinkEffectKey = "Melia.Skill.CatenaChainLink";
-		private const float PadDuration = 20f;
+		private const float PadDuration = 5f;
 		private const float PadSize = 20f;
 		private const float MaxLeashDistance = 150f;
 

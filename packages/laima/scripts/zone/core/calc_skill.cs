@@ -530,10 +530,10 @@ public class SkillCalculationsScript : GeneralScript
 			{
 				if (owner.TryGetBuff(BuffId.Fletcher_CatenaChainArrow_Buff, out var catenaBuff))
 				{
-					var catenaReduction = 0.25f + 0.025f * catenaBuff.NumArg1;
+					var catenaReduction = 0.40f + 0.04f * catenaBuff.NumArg1;
 					if (owner.TryGetActiveAbilityLevel(AbilityId.Fletcher37, out var fletcher37Level))
 						catenaReduction *= 1f + 0.005f * fletcher37Level;
-					catenaReduction = Math.Min(catenaReduction, 0.75f);
+					catenaReduction = Math.Min(catenaReduction, 0.90f);
 					basicCooldown *= (1f - catenaReduction);
 				}
 			}
