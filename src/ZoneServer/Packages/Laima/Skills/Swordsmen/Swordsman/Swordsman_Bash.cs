@@ -55,7 +55,9 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Swordsman
 
 			var hitDelay = 280;
 			var aniTime = 80;
-			skill.Run(SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ApplyStun));
+			var modifier = new SkillModifier();
+			modifier.HitRateMultiplier += 0.25f + 0.05f * skill.Level;
+			skill.Run(SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits, this.ApplyStun, modifier));
 		}
 
 		/// <summary>
