@@ -931,9 +931,10 @@ public class CharacterCalculationsScript : GeneralScript
 		value += byStat;
 
 		// Card percentage bonuses (EQUIP_PATK stores percentage points, e.g., 5 = 5%)
+		var byCards = 0f;
 		var cardPatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK) / 100f;
 		cardPatkRate += character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK_MAIN) / 100f;
-		value *= (1 + cardPatkRate);
+		byCards = value * cardPatkRate;
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.PATK_BM);
@@ -948,7 +949,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MINPATK_MAIN_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byBuffs + byRateBuffs;
+		value += byCards + byBuffs + byRateBuffs;
 
 		var max = SCR_Get_Character_MAXPATK(character);
 		return (int)Math2.Clamp(1, max, value);
@@ -986,9 +987,10 @@ public class CharacterCalculationsScript : GeneralScript
 		value += byStat;
 
 		// Card percentage bonuses (EQUIP_PATK stores percentage points, e.g., 5 = 5%)
+		var byCards = 0f;
 		var cardPatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK) / 100f;
 		cardPatkRate += character.Inventory.GetCardBonuses(PropertyName.EQUIP_PATK_MAIN) / 100f;
-		value *= (1 + cardPatkRate);
+		byCards = value * cardPatkRate;
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.PATK_BM);
@@ -1003,7 +1005,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MAXPATK_MAIN_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byBuffs + byRateBuffs;
+		value += byCards + byBuffs + byRateBuffs;
 
 		return (int)Math.Max(1, value);
 	}
@@ -1140,8 +1142,9 @@ public class CharacterCalculationsScript : GeneralScript
 		value += byStat;
 
 		// Card percentage bonuses (EQUIP_MATK stores percentage points, e.g., 5 = 5%)
+		var byCards = 0f;
 		var cardMatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_MATK) / 100f;
-		value *= (1 + cardMatkRate);
+		byCards = value * cardMatkRate;
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.MATK_BM);
@@ -1152,7 +1155,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MINMATK_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byBuffs + byRateBuffs;
+		value += byCards + byBuffs + byRateBuffs;
 
 		var max = SCR_Get_Character_MAXMATK(character);
 		return (int)Math2.Clamp(1, max, value);
@@ -1190,8 +1193,9 @@ public class CharacterCalculationsScript : GeneralScript
 		value += byStat;
 
 		// Card percentage bonuses (EQUIP_MATK stores percentage points, e.g., 5 = 5%)
+		var byCards = 0f;
 		var cardMatkRate = character.Inventory.GetCardBonuses(PropertyName.EQUIP_MATK) / 100f;
-		value *= (1 + cardMatkRate);
+		byCards = value * cardMatkRate;
 
 		var byBuffs = 0f;
 		byBuffs += properties.GetFloat(PropertyName.MATK_BM);
@@ -1202,7 +1206,7 @@ public class CharacterCalculationsScript : GeneralScript
 		byRateBuffs += properties.GetFloat(PropertyName.MAXMATK_RATE_BM);
 		byRateBuffs = (value * byRateBuffs);
 
-		value += byBuffs + byRateBuffs;
+		value += byCards + byBuffs + byRateBuffs;
 
 		return (int)Math.Max(1, value);
 	}
