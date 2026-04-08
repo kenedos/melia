@@ -721,7 +721,7 @@ namespace Melia.Zone.Network
 
 				var character = conn.SelectedCharacter;
 
-				if (character.IsDead)
+				if (character.IsDead || character.IsWarping)
 					return;
 
 				character.Movement.NotifyJump(position, direction, unkFloat, unkByte2);
@@ -730,7 +730,7 @@ namespace Melia.Zone.Network
 			{
 				var character = conn.SelectedCharacter;
 
-				if (character.IsDead)
+				if (character.IsDead || character.IsWarping)
 					return;
 
 				character.Movement.NotifyJump(character.Position, character.Direction, (float)ZoneServer.Instance.World.WorldTime.Elapsed.TotalSeconds, unkByte1);
@@ -845,6 +845,8 @@ namespace Melia.Zone.Network
 			// TODO: Is there a broadcast for this?
 
 			//conn.SelectedCharacter.SetPosition(position);
+			if (character.IsWarping)
+				return;
 			if (character.Components.TryGet<AttachmentComponent>(out var attachment) && attachment.IsAttached)
 				return;
 			character?.Movement?.NotifyStopMove(position, character.Direction);
@@ -5608,6 +5610,9 @@ namespace Melia.Zone.Network
 			var position = packet.GetPosition();
 
 			var character = conn.SelectedCharacter;
+
+			if (character.IsWarping)
+				return;
 
 			if (character.Map.TryGetActor(handle, out var actor) && actor is ISubActor subActor)
 			{
