@@ -31,7 +31,6 @@
 	{ map: "f_maple_24_2", x: -635.5754, y: 7.2021003, z: 89.33417, direction: 45 },
 	{ map: "f_maple_24_2", x: 1099.4749, y: 1.1246811, z: -657.5632, direction: 45 },
 	{ map: "f_whitetrees_21_2", x: -117.41104, y: 79.91425, z: -771.2225, direction: 45 },
-	{ map: "f_whitetrees_21_2", x: 552.8909, y: 79.91267, z: -1100.6317, direction: 45 },
 	{ map: "f_whitetrees_21_2", x: -106.95172, y: 0.42354736, z: 53.62566, direction: 45 },
 	{ map: "f_whitetrees_21_2", x: -810.09796, y: 120.49737, z: -563.6976, direction: 45 },
 	{ map: "f_whitetrees_21_2", x: 931.5662, y: 127.68093, z: 1765.9391, direction: 45 },

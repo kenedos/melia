@@ -9,10 +9,12 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
+using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class FWhitetrees212QuestNpcsScript : GeneralScript
@@ -33,9 +35,6 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A woman sits cross-legged on the forest path, her eyes closed in quiet meditation*{/}"));
-				await dialog.Msg(L("..."));
-				await dialog.Msg(L("{#666666}*She opens one eye*{/}"));
 				await dialog.Msg(L("Ah. A traveler. Forgive my silence - I was listening to the forest breathe."));
 
 				var response = await dialog.Select(L("I've walked from Orsha to find stillness in these white-leaf woods. The trees here hold an ancient calm... if you know where to look."),
@@ -65,7 +64,6 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 						break;
 
 					case "leave":
-						await dialog.Msg(L("{#666666}*She closes her eyes again*{/}"));
 						await dialog.Msg(L("Safe travels. The forest watches over those who walk gently."));
 						break;
 				}
@@ -92,7 +90,6 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("{#666666}*She sits peacefully, eyes half-closed*{/}"));
 				await dialog.Msg(L("The forest remembers you. Welcome back."));
 			}
 		});
@@ -147,10 +144,13 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddMeditationStone(1, -907, 335, 0);
-		AddMeditationStone(2, -1276, 476, 45);
-		AddMeditationStone(3, -1113, 142, 90);
-		AddMeditationStone(4, -1364, 314, 0);
+		AddMeditationStone(1, -827, 328, 0);
+		AddMeditationStone(2, -1107, 131, 90);
+		AddMeditationStone(3, -448, 63, 0);
+		AddMeditationStone(4, -892, -423, 0);
+		AddMeditationStone(5, -558, -466, 270);
+		AddMeditationStone(6, -885, -831, 180);
+		AddMeditationStone(7, 73, -157, 90);
 
 		// =====================================================================
 		// QUEST 1002: Bells of the Wild
@@ -166,12 +166,12 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A woman kneels beside a hollow log, sketching something in a leather journal*{/}"));
+				await dialog.Msg(L("{#666666}*A woman studies a hollow log, sketching something in a leather journal*{/}"));
 				await dialog.Msg(L("Fascinating... absolutely fascinating. The resonance patterns are unlike anything I've documented before."));
 
 				var response = await dialog.Select(L("Oh! I didn't hear you approach. I'm studying the Kugheri - have you noticed the bells they wear? They're not decorative. I believe they serve a deeper purpose."),
-					Option(L("What kind of purpose?"), "info"),
 					Option(L("Need help with your research?"), "help"),
+					Option(L("What kind of purpose?"), "info"),
 					Option(L("Sounds like your problem"), "leave")
 				);
 
@@ -197,7 +197,6 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 						break;
 
 					case "leave":
-						await dialog.Msg(L("{#666666}*She waves absently, already back to her sketching*{/}"));
 						await dialog.Msg(L("Mm. Mind the Balzer if you pass through. Their magic stings."));
 						break;
 				}
@@ -226,7 +225,6 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("{#666666}*She's surrounded by bells and scattered notes*{/}"));
 				await dialog.Msg(L("I've confirmed it - each bell corresponds to a different harmonic frequency. The Kugheri are far more sophisticated than anyone suspected."));
 			}
 		});
@@ -245,7 +243,7 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*An old monk sits near the waterfall, his robes damp with mist. A small shrine of white stones stands beside him*{/}"));
+				await dialog.Msg(L("{#666666}*A small shrine of white stones has been arranged near the waterfall*{/}"));
 				await dialog.Msg(L("The water speaks today. It says someone new has come."));
 
 				var response = await dialog.Select(L("I tend the shrines in this part of the forest. Every day, I place fresh white flowers at each one. The offering keeps the forest's spirit at ease."),
@@ -276,7 +274,6 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 						break;
 
 					case "leave":
-						await dialog.Msg(L("{#666666}*He nods slowly*{/}"));
 						await dialog.Msg(L("Walk softly. The forest listens."));
 						break;
 				}
@@ -304,7 +301,6 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("{#666666}*He sits by the shrine, eyes closed, listening to the waterfall*{/}"));
 				await dialog.Msg(L("The forest remembers your kindness. It always will."));
 			}
 		});
@@ -315,9 +311,9 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 		// For Quest 1003 - Waterfall Offering
 		// =====================================================================
 
-		void AddWhiteFlowerSpot(int spotNumber, int x, int z)
+		void AddWhiteFlowerSpot(int spotNumber, int x, int z, int direction)
 		{
-			AddNpc(47246, L("White Flowers"), "f_whitetrees_21_2", x, z, 0, async dialog =>
+			AddNpc(47246, L("White Flowers"), "f_whitetrees_21_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_whitetrees_21_2", 1003);
@@ -335,6 +331,19 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("{#666666}*You've already gathered flowers from this patch*{/}"));
 					return;
+				}
+
+				// 15% chance to spawn a Kugheri Zeffi (only once per flower per player)
+				var spawnedKey = $"Laima.Quests.f_whitetrees_21_2.Quest1003.Flower{spotNumber}.Spawned";
+				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
+				if (!hasSpawned && RandomProvider.Get().Next(100) < 15)
+				{
+					character.Variables.Perm.Set(spawnedKey, true);
+
+					if (SpawnTempMonsters(character, MonsterId.Kucarry_Zeffi, 1, 70, TimeSpan.FromMinutes(1)))
+					{
+						character.ServerMessage(L("{#FF6666}A Kugheri emerges from the underbrush!{/}"));
+					}
 				}
 
 				var result = await character.TimeActions.StartAsync(L("Gathering flowers..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
@@ -359,11 +368,13 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddWhiteFlowerSpot(1, 86, 1710);
-		AddWhiteFlowerSpot(2, 253, 1633);
-		AddWhiteFlowerSpot(3, 322, 1616);
-		AddWhiteFlowerSpot(4, 438, 1681);
-		AddWhiteFlowerSpot(5, 216, 1528);
+		AddWhiteFlowerSpot(1, 102, 1503, 90);
+		AddWhiteFlowerSpot(2, 427, 1534, 179);
+		AddWhiteFlowerSpot(3, 503, 1669, 0);
+		AddWhiteFlowerSpot(4, 303, 1702, 90);
+		AddWhiteFlowerSpot(5, 287, 1811, 0);
+		AddWhiteFlowerSpot(6, 4, 1785, 0);
+		AddWhiteFlowerSpot(7, 202, 1611, 0);
 
 		// =====================================================================
 		// QUEST 1004: The Unsettled Grove
@@ -379,7 +390,7 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A hunter crouches near a tree, examining deep claw marks in the bark*{/}"));
+				await dialog.Msg(L("{#666666}*Deep claw marks scar the bark of a nearby tree*{/}"));
 				await dialog.Msg(L("These marks are fresh. The Kugheri Zeffi have been ranging further than usual."));
 
 				var response = await dialog.Select(L("I patrol this forest for the Orsha garrison. Something's agitated the Zeffi - they're pushing into areas they normally avoid and threatening the path between here and Emmet Forest."),
@@ -391,10 +402,9 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He stands and checks his weapon*{/}"));
 						await dialog.Msg(L("Good. I could use another pair of hands."));
 
-						if (await dialog.YesNo(L("The Zeffi have grown bold. If we don't push them back, they'll start threatening travelers on the main road. Help me cull fifteen of them to restore the balance?")))
+						if (await dialog.YesNo(L("The Zeffi have grown bold. If we don't push them back, they'll start threatening travelers on the main road. Help me drive them back?")))
 						{
 							character.Quests.Start(questId);
 							await dialog.Msg(L("The Zeffi roam the groves further south of here. You'll know them by their icy temperament - literally."));
@@ -403,14 +413,12 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 						break;
 
 					case "info":
-						await dialog.Msg(L("{#666666}*He shakes his head*{/}"));
 						await dialog.Msg(L("Hard to say. Could be territorial pressure from the other Kugheri types. Could be something deeper - the forest's balance shifting."));
 						await dialog.Msg(L("The hermit by the waterfall says the forest's spirit is unsettled. I'm not one for mysticism, but I've seen enough strange things in these woods to keep an open mind."));
 						await dialog.Msg(L("Whatever the cause, the result is the same - aggressive Zeffi where they shouldn't be."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("{#666666}*He shrugs*{/}"));
 						await dialog.Msg(L("Keep your eyes open if you're heading south. The Zeffi don't discriminate."));
 						break;
 				}
@@ -422,9 +430,7 @@ public class FWhitetrees212QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He inspects the surrounding trees, nodding slowly*{/}"));
 					await dialog.Msg(L("I can already feel the difference. The forest is calmer. The Zeffi are retreating to their normal territory."));
-					await dialog.Msg(L("{#666666}*He reaches into his pack*{/}"));
 					await dialog.Msg(L("You've earned this. It's a solid weapon - served me well before I switched to the bow. Take it."));
 					await dialog.Msg(L("The forest thanks you. And so does every traveler who won't get ambushed on the road."));
 
@@ -480,7 +486,7 @@ public class ThePilgrimsRestQuest : QuestScript
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_21_2.Quest1001.StonesVisited");
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 7; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_21_2.Quest1001.Stone{i}");
 		}
@@ -489,7 +495,7 @@ public class ThePilgrimsRestQuest : QuestScript
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_21_2.Quest1001.StonesVisited");
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 7; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_21_2.Quest1001.Stone{i}");
 		}
@@ -580,9 +586,10 @@ public class WaterfallOfferingQuest : QuestScript
 			character.Inventory.CountItem(667232),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 7; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_21_2.Quest1003.Flower{i}");
+			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_21_2.Quest1003.Flower{i}.Spawned");
 		}
 	}
 
@@ -592,9 +599,10 @@ public class WaterfallOfferingQuest : QuestScript
 			character.Inventory.CountItem(667232),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 7; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_21_2.Quest1003.Flower{i}");
+			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_21_2.Quest1003.Flower{i}.Spawned");
 		}
 	}
 }
@@ -619,7 +627,7 @@ public class TheUnsettledGroveQuest : QuestScript
 		AddQuestGiver("[Hunter] Kazys", "f_whitetrees_21_2");
 
 		AddObjective("killZeffi", "Defeat Kugheri Zeffi",
-			new KillObjective(15, new[] { MonsterId.Kucarry_Zeffi }));
+			new KillObjective(35, new[] { MonsterId.Kucarry_Zeffi }));
 
 		AddReward(new ExpReward(1400, 1000));
 		AddReward(new SilverReward(10500));
