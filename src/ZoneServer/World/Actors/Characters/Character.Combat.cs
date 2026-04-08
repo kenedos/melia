@@ -173,6 +173,9 @@ namespace Melia.Zone.World.Actors.Characters
 
 			if (this.ActiveCompanion != null)
 			{
+				if (this.IsRiding)
+					this.RemoveBuff(BuffId.RidingCompanion);
+
 				_companionToReactivate = this.ActiveCompanion;
 				this.Companions.ActiveCompanion.SetCompanionState(false);
 			}

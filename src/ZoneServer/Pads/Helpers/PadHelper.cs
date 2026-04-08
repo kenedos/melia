@@ -736,6 +736,8 @@ namespace Melia.Zone.Pads.Helpers
 		{
 			if (pad.IsDead || caster == null)
 				return null;
+			if (target.Properties.GetString(PropertyName.HitProof, "NO") == "YES")
+				return null;
 			if (target.IsBuffActive(BuffId.Skill_NoDamage_Buff)
 				&& ZoneServer.Instance.Data.BuffDb.TryFind(buffId, out var buffData)
 				&& buffData.Type == BuffType.Debuff && buffData.Level < 99)

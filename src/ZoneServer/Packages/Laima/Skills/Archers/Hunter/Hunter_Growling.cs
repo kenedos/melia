@@ -95,7 +95,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 			if (!owner.TryGetSkill(SkillId.Hunter_Growling, out var growlingSkill))
 				return;
 
-			if (!companion.CombatState.AttackState)
+			if (!companion.IsRiding && !companion.CombatState.AttackState)
 				return;
 
 			var allEnemies = companion.Map.GetAttackableEnemiesInPosition(companion, companion.Position, GrowlingRange);

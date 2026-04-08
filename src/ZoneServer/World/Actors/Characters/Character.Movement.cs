@@ -659,6 +659,7 @@ namespace Melia.Zone.World.Actors.Characters
 				{
 					companion.PendingMount = false;
 					this.StartBuff(BuffId.RidingCompanion, TimeSpan.Zero, companion);
+					Send.ZC_NORMAL.RidePet(this.Connection, this, companion);
 				}
 			}
 

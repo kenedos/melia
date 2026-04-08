@@ -21,9 +21,14 @@ namespace Melia.Zone.Buffs.Handlers
 
 			target.StopMove();
 			target.Position = caster.Position;
+
+			if (target.Components.TryGet<CombatComponent>(out var combat))
+				combat.InterruptCasting();
+
 			if (target.Components.TryGet<AiComponent>(out var aiComponent))
 				aiComponent.Script.Suspended = true;
 			target.IsRiding = true;
+			target.SetHittable(false);
 			Send.ZC_NORMAL.RidePet(caster, target);
 		}
 
@@ -35,6 +40,7 @@ namespace Melia.Zone.Buffs.Handlers
 			if (target.Components.TryGet<AiComponent>(out var aiComponent))
 				aiComponent.Script.Suspended = false;
 			target.IsRiding = false;
+			target.SetHittable(true);
 			target.Position = caster.Position;
 			Send.ZC_NORMAL.RidePet(caster, target);
 		}
