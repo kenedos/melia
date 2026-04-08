@@ -278,6 +278,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.AchievementPointDb, "db/achievement_points.txt");
 					this.LoadDb(this.Data.BarrackDb, "db/barracks.txt");
 					this.LoadDb(this.Data.BuffDb, "db/buffs.txt");
+					this.LoadDb(this.Data.BuffOverrideDb, "db/buffs_overrides.txt");
 					this.LoadDb(this.Data.CabinetDb, "db/cabinet_items.txt");
 					this.LoadDb(this.Data.ChatEmoticonDb, "db/chat_emoticons.txt");
 					this.LoadDb(this.Data.ChatMacroDb, "db/chatmacros.txt");
@@ -371,6 +372,7 @@ namespace Melia.Shared
 					this.LoadDb(this.Data.AchievementPointDb, "db/achievement_points.txt");
 					this.LoadDb(this.Data.BarrackDb, "db/barracks.txt");
 					this.LoadDb(this.Data.BuffDb, "db/buffs.txt");
+					this.LoadDb(this.Data.BuffOverrideDb, "db/buffs_overrides.txt");
 					this.LoadDb(this.Data.CabinetDb, "db/cabinet_items.txt");
 					this.LoadDb(this.Data.ChatEmoticonDb, "db/chat_emoticons.txt");
 					this.LoadDb(this.Data.ChatMacroDb, "db/chatmacros.txt");

@@ -14,6 +14,7 @@ namespace Melia.Shared.Data
 		public AchievementPointDb AchievementPointDb { get; } = new AchievementPointDb();
 		public BarrackDb BarrackDb { get; } = new BarrackDb();
 		public BuffDb BuffDb { get; } = new BuffDb();
+		public BuffOverrideDb BuffOverrideDb { get; }
 
 		public CabinetDb CabinetDb { get; } = new CabinetDb();
 		public ChatEmoticonDb ChatEmoticonDb { get; } = new ChatEmoticonDb();
@@ -88,6 +89,7 @@ namespace Melia.Shared.Data
 			this.ServerDb = new ServerDb(this.MapDb);
 			this.TradeShopDb = new TradeShopDb(this.ItemDb);
 			this.SkillOverrideDb = new SkillOverrideDb(this.SkillDb);
+			this.BuffOverrideDb = new BuffOverrideDb(this.BuffDb);
 			// Yup, still not entirely happy with this.
 			this.CollectionDb = new CollectionDb(this.PropertiesDb, this.ItemDb);
 			this.ItemSetDb = new ItemSetDb(this.ItemDb);

@@ -1,0 +1,9 @@
+// Melia
+// Buff Override Database
+//
+// Values: id, className, [name], [type], [tags], [level], [duration], [updateTime], [overBuff], [buffExpUp], [removable], [removeOnDeath], [removeBySkill], [save], [updateProperties]
+//---------------------------------------------------------------------------
+
+[
+
+]
