@@ -5,7 +5,9 @@
 //---------------------------------------------------------------------------
 
 using System.Globalization;
+using Melia.Shared.Network;
 using Melia.Zone.Scripting;
+using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
 using Yggdrasil.Logging;
 using Yggdrasil.Util.Commands;
@@ -18,12 +20,21 @@ public class CustomQuestSystemClientScript : ClientScript
 		this.LoadAllScripts();
 
 		AddChatCommand("quest", "<complete|cancel>", "", 0, 99, HandleQuest);
+		AddChatCommand("questsearch", "<text>", "", 0, 99, HandleQuestSearch);
 	}
 
 	protected override void Ready(Character character)
 	{
 		this.SendAllScripts(character);
 		character.Quests.UpdateClient();
+	}
+
+	private CommandResult HandleQuestSearch(Character sender, Character target, string message, string commandName, Arguments args)
+	{
+		var searchText = args.Count > 0 ? args.Get(0) : "";
+		var lua = "M_QUESTS_SET_SEARCH(\"" + searchText.Replace("\"", "\\\"") + "\")";
+		Send.ZC_EXEC_CLIENT_SCP(sender.Connection, lua);
+		return CommandResult.Okay;
 	}
 
 	private CommandResult HandleQuest(Character sender, Character target, string message, string commandName, Arguments args)
