@@ -631,11 +631,11 @@
 // Fletcher
 //---------------------------------------------------------------------------
 { skillId: 30801, className: "Fletcher_BroadHead", name: "Broadhead", basicSp: 20, splashRate: -1, factor: 27, factorByLevel: 44.1, hitCount: 1, multiHitCount: 13, cooldownTime: 15000 },
-{ skillId: 30802, className: "Fletcher_BodkinPoint", name: "Bodkin Point", basicSp: 12, splashRate: 0, factor: 60, maxRange: 200, factorByLevel: 6, hitCount: 1, multiHitCount: 1, cooldownTime: 4000 },
-{ skillId: 30803, className: "Fletcher_BarbedArrow", name: "Barbed Arrow", basicSp: 19, splashRate: 0, factor: 88, maxRange: 200, factorByLevel: 8.8, hitCount: 1, multiHitCount: 5, cooldownTime: 6000 },
+{ skillId: 30802, className: "Fletcher_BodkinPoint", name: "Bodkin Point", basicSp: 6, splashRate: 0, factor: 60, maxRange: 200, factorByLevel: 6, hitCount: 1, multiHitCount: 1, cooldownTime: 4000 },
+{ skillId: 30803, className: "Fletcher_BarbedArrow", name: "Barbed Arrow", basicSp: 9, splashRate: 0, factor: 88, maxRange: 200, factorByLevel: 8.8, hitCount: 1, multiHitCount: 5, cooldownTime: 6000 },
 { skillId: 30804, className: "Fletcher_CrossFire", name: "Crossfire", basicSp: 45, splashRate: 10, factor: 172, maxRange: 200, factorByLevel: 17.2, hitCount: 1, multiHitCount: 2, cooldownTime: 12000 },
 { skillId: 30805, className: "Fletcher_MagicArrow", name: "Magic Arrow", basicSp: 35, splashRate: -1, factor: 20, factorByLevel: 19.6, hitCount: 1, multiHitCount: 20, cooldownTime: 10000 },
-{ skillId: 30806, className: "Fletcher_Singijeon", name: "Divine Machine Arrow", basicSp: 36, splashRate: 8, maxRange: 200, factor: 239, factorByLevel: 23.9, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
+{ skillId: 30806, className: "Fletcher_Singijeon", name: "Divine Machine Arrow", basicSp: 36, splashRate: 8, maxRange: 200, factor: 286, factorByLevel: 28.6, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
 { skillId: 30807, className: "Fletcher_BroadHead_DOT", name: "Broadhead", basicSp: 50, splashRate: -1, factor: 27, factorByLevel: 44.1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "0" },
 { skillId: 30808, className: "Fletcher_FletcherArrowShot", name: "Fletcher Arrow Shot", basicSp: 0, splashRate: -1, maxRange: 200, factor: 7, factorByLevel: 0.7, hitCount: 1, multiHitCount: 1, cooldownTime: 0, overheatCount: "0", enableCastMove: true },
 { skillId: 30809, className: "Fletcher_CatenaChainArrow", name: "Catena Chain Arrow", basicSp: 55, splashRate: -1, maxRange: 200, factor: 125, factorByLevel: 23.1, hitCount: 1, multiHitCount: 1, cooldownTime: 12000 },

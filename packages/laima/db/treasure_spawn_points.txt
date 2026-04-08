@@ -285,7 +285,7 @@
 { map: "f_rokas_30", x: 1317, y: 284, z: 602, direction: 45 },
 { map: "f_rokas_30", x: 768, y: 402, z: 1307, direction: 315 },
 { map: "f_rokas_30", x: -713, y: 215, z: -474, direction: 135 },
-{ map: "f_rokas_30", x: -1356, y: 194, z: -867, direction: 180 },
+{ map: "f_rokas_30", x: -1303, y: 175, z: -1045, direction: 180 },
 { map: "f_rokas_30", x: 817, y: 148, z: -1101, direction: 180 },
 { map: "f_rokas_30", x: 597, y: 148, z: -853, direction: 90 },
 { map: "f_rokas_31", x: 122, y: 107, z: -851, direction: 315 },
