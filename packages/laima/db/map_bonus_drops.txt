@@ -124,29 +124,26 @@
 // ROYAL MAUSOLEUM - Attribute Points Theme
 // ============================================================================
 { mapClassName: "d_zachariel_32", items: [
-	{ itemId: 490174, chance: 1.360 }, // Attribute Point Scroll
-	{ itemId: 900415, chance: 1.020 }, // Attribute Point Scroll
-	{ itemId: 490311, chance: 0.136 }  // Attribute Point Scroll
+	{ itemId: 490174, chance: 0.317 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.238 }  // 1000 Attribute Points
 ]},
 { mapClassName: "d_zachariel_33", items: [
-	{ itemId: 490174, chance: 1.500 }, // Attribute Point Scroll
-	{ itemId: 900415, chance: 1.120 }, // Attribute Point Scroll
-	{ itemId: 490311, chance: 0.148 }  // Attribute Point Scroll
+	{ itemId: 490174, chance: 0.350 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.261 }  // 1000 Attribute Points
 ]},
 { mapClassName: "d_zachariel_34", items: [
-	{ itemId: 490174, chance: 1.660 }, // Attribute Point Scroll
-	{ itemId: 900415, chance: 1.240 }, // Attribute Point Scroll
-	{ itemId: 490311, chance: 0.164 }  // Attribute Point Scroll
+	{ itemId: 490174, chance: 0.387 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.289 }  // 1000 Attribute Points
 ]},
 { mapClassName: "d_zachariel_35", items: [
-	{ itemId: 490174, chance: 1.820 }, // Attribute Point Scroll
-	{ itemId: 900415, chance: 1.360 }, // Attribute Point Scroll
-	{ itemId: 490311, chance: 0.180 }  // Attribute Point Scroll
+	{ itemId: 490174, chance: 0.425 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.317 }, // 1000 Attribute Points
+	{ itemId: 490311, chance: 0.060 }  // 10000 Attribute Points
 ]},
 { mapClassName: "d_zachariel_36", items: [
-	{ itemId: 490174, chance: 2.000 }, // Attribute Point Scroll
-	{ itemId: 900415, chance: 1.500 }, // Attribute Point Scroll
-	{ itemId: 490311, chance: 0.200 }  // Attribute Point Scroll
+	{ itemId: 490174, chance: 0.467 }, // 500 Attribute Points
+	{ itemId: 900415, chance: 0.350 }, // 1000 Attribute Points
+	{ itemId: 490311, chance: 0.067 }  // 10000 Attribute Points
 ]},
 
 // ============================================================================
@@ -163,66 +160,63 @@
 ]},
 
 // ============================================================================
-// MAGE TOWER - Monster Cards Theme
+// MAGE TOWER - Monster Albums Theme
 // ============================================================================
 { mapClassName: "d_firetower_41", items: [
 	{ itemId: 670001, chance: 0.128 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.128 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.128 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.128 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.128 }  // Enhancement Card Lv1
+	{ itemId: 670004, chance: 0.128 }  // Monster Card Album: Purple
 ]},
 { mapClassName: "d_firetower_42", items: [
 	{ itemId: 670001, chance: 0.134 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.134 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.134 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.134 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.134 }  // Enhancement Card Lv1
+	{ itemId: 670004, chance: 0.134 }  // Monster Card Album: Purple
 ]},
 { mapClassName: "d_firetower_43", items: [
 	{ itemId: 670001, chance: 0.142 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.142 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.142 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.142 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.142 }  // Enhancement Card Lv1
+	{ itemId: 670004, chance: 0.142 }  // Monster Card Album: Purple
 ]},
 { mapClassName: "d_firetower_44", items: [
 	{ itemId: 670001, chance: 0.170 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.170 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.170 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.170 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.170 }  // Enhancement Card Lv1
+	{ itemId: 670004, chance: 0.170 }  // Monster Card Album: Purple
 ]},
 { mapClassName: "d_firetower_45", items: [
 	{ itemId: 670001, chance: 0.180 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.180 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.180 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.180 }, // Monster Card Album: Purple
-	{ itemId: 645631, chance: 0.180 }  // Enhancement Card Lv1
+	{ itemId: 670004, chance: 0.180 }  // Monster Card Album: Purple
 ]},
 
 // ============================================================================
-// DEMON PRISON - Nucle/Sierra Powder Theme
+// DEMON PRISON - Card Enhancement Theme
 // ============================================================================
 { mapClassName: "d_velniasprison_51_1", items: [
-	{ itemId: 649025, chance: 0.904 }, // Nucle Powder
-	{ itemId: 649026, chance: 0.113 }  // Sierra Powder
+	{ itemId: 646071, chance: 0.150 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.075 }  // Enhancement Card: 500
 ]},
 { mapClassName: "d_velniasprison_51_2", items: [
-	{ itemId: 649025, chance: 0.992 }, // Nucle Powder
-	{ itemId: 649026, chance: 0.124 }  // Sierra Powder
+	{ itemId: 646071, chance: 0.188 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.095 }  // Enhancement Card: 500
 ]},
 { mapClassName: "d_velniasprison_51_3", items: [
-	{ itemId: 649025, chance: 1.092 }, // Nucle Powder
-	{ itemId: 649026, chance: 0.137 }  // Sierra Powder
+	{ itemId: 646071, chance: 0.225 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.113 }  // Enhancement Card: 500
 ]},
 { mapClassName: "d_velniasprison_51_4", items: [
-	{ itemId: 649025, chance: 1.200 }, // Nucle Powder
-	{ itemId: 649026, chance: 0.150 }  // Sierra Powder
+	{ itemId: 646071, chance: 0.263 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.132 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.027 }  // Enhancement Card Lv1 (2000)
 ]},
 { mapClassName: "d_velniasprison_51_5", items: [
-	{ itemId: 649025, chance: 1.320 }, // Nucle Powder
-	{ itemId: 649026, chance: 0.165 }  // Sierra Powder
+	{ itemId: 646071, chance: 0.300 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.150 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.030 }  // Enhancement Card Lv1 (2000)
 ]},
 
 // ============================================================================
