@@ -682,9 +682,14 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (this.Has(BuffId.Cure_Buff))
 				return true;
 
-			// Cannot apply debuffs to bosses when they have shield
+			// Cannot apply debuffs to bosses when they have shield,
+			// but allow damage-over-time buffs through
 			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss && mob.Shield > 0)
-				return true;
+			{
+				var handler = ZoneServer.Instance.BuffHandlers.GetHandler(buffId);
+				if (handler is not DamageOverTimeBuffHandler)
+					return true;
+			}
 
 			if (this.TryGet(BuffId.Cyclone_Buff_ImmuneAbil, out var cycloneImmuneBuff)
 				&& RandomProvider.Get().Next(100) < cycloneImmuneBuff.NumArg1 * 15)
