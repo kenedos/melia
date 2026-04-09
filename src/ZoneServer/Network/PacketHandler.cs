@@ -122,14 +122,6 @@ namespace Melia.Zone.Network
 
 			try
 			{
-				if (ServerShutdownManager.Instance.IsShutdownPending)
-				{
-					var remaining = ServerShutdownManager.Instance.GetRemainingTimeFormatted();
-					Log.Info("Rejected login attempt from '{0}' - server is shutting down ({1} remaining).", accountName, remaining);
-					Send.ZC_CONNECT_FAILED(conn, 1, "Server is shutting down. Please try again later.");
-					return;
-				}
-
 				conn.Account = ZoneServer.Instance.Database.GetAccount(accountName);
 				if (conn.Account == null)
 				{
