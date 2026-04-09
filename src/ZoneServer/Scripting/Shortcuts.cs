@@ -417,6 +417,35 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Lures all nearby enemies within the specified radius of a character.
+		/// Adds threat/hate to each enemy within the specified radius.
+		/// </summary>
+		/// <param name="character">The character to lure enemies towards</param>
+		/// <param name="radius">The radius to search for enemies</param>
+		/// <param name="threatAmount">Amount of threat/hate to add (default: 150)</param>
+		/// <returns>Number of enemies lured</returns>
+		public static int LureNearbyEnemies(Character character, float radius, int threatAmount = 150)
+		{
+			if (character?.Map == null)
+				return 0;
+
+			var luredCount = 0;
+
+			var nearbyEnemies = character.Map.GetAttackableEnemiesInPosition(character, character.Position, radius);
+
+			foreach (var enemy in nearbyEnemies)
+			{
+				if (enemy is Mob mob && !mob.IsDead)
+				{
+					mob.InsertHate(character, threatAmount);
+					luredCount++;
+				}
+			}
+
+			return luredCount;
+		}
+
+		/// <summary>
 		/// Attempts to get a map by class name. If the map doesn't exist
 		/// in the current version's map database, throws MapNotLoadedException
 		/// to signal a version mismatch. If it exists in the database but
