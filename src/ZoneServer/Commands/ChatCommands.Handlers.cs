@@ -6149,7 +6149,11 @@ namespace Melia.Zone.Commands
 
 			if (args.IndexedCount == 0)
 			{
-				setNames = new[] { "Savinose Dysnai" };
+				setNames = new[] { "Raffye", "Blint" };
+
+				target.Inventory.Add(new Item(640003, 100), InventoryAddType.PickUp);
+				target.Inventory.Add(new Item(640006, 100), InventoryAddType.PickUp);
+				target.Inventory.Add(new Item(640009, 100), InventoryAddType.PickUp);
 			}
 			else
 			{
