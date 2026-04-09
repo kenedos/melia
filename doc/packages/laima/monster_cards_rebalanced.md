@@ -61,9 +61,9 @@
 - **Honeypin** (ID: 74): On SP potion use: Magical Attack +[★ * 1.5]% for 20 seconds
 - **LithoRex** (ID: 105): On HP potion use: Magical Attack +[★ * 1.5]% for 20 seconds
 
-### Critical Attack Bonuses
-- **Deadborn** (ID: 10): Critical Attack (Physical) +[★ * 1.5]%
-- **Rexipher** (ID: 16): Critical Attack (Magical) +[★ * 1.5]%
+### Critical Damage Bonuses
+- **Deadborn** (ID: 10): Critical Damage +[★ * 1.5]%
+- **Rexipher** (ID: 16): Critical Damage +[★ * 1.5]%
 
 ### General Damage Bonuses
 - **Yekub** (ID: 55): Physical and Magical Attack +[★ * 0.5]%
