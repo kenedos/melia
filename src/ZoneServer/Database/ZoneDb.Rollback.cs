@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.Json;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Shared.ObjectProperties;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
@@ -36,7 +37,7 @@ namespace Melia.Zone.Database
 				{
 					// Create main snapshot record
 					long snapshotId;
-					using (var cmd = new InsertCommand("INSERT INTO `character_snapshots` {0}", conn, trans))
+					using (var cmd = new InsertCommand("INSERT INTO `character_snapshots` {parameters}", conn, trans))
 					{
 						cmd.Set("characterId", character.DbId);
 						cmd.Set("accountId", character.AccountDbId);
@@ -109,7 +110,7 @@ namespace Melia.Zone.Database
 					}
 
 					// Create a pre-rollback snapshot for safety
-					using (var preRollbackCmd = new InsertCommand("INSERT INTO `character_snapshots` {0}", conn, trans))
+					using (var preRollbackCmd = new InsertCommand("INSERT INTO `character_snapshots` {parameters}", conn, trans))
 					{
 						preRollbackCmd.Set("characterId", characterId);
 						preRollbackCmd.Set("snapshotReason", "PRE_ROLLBACK_SAFETY");
@@ -133,7 +134,7 @@ namespace Melia.Zone.Database
 					this.RestoreStorageData(characterId, snapshotId, conn, trans);
 
 					// Log the rollback
-					using (var logCmd = new InsertCommand("INSERT INTO `rollback_log` {0}", conn, trans))
+					using (var logCmd = new InsertCommand("INSERT INTO `rollback_log` {parameters}", conn, trans))
 					{
 						logCmd.Set("characterId", characterId);
 						logCmd.Set("snapshotId", snapshotId);
@@ -248,7 +249,7 @@ namespace Melia.Zone.Database
 				}
 
 				// Log the mass rollback operation
-				using (var logCmd = new InsertCommand("INSERT INTO `mass_rollback_log` {0}", conn))
+				using (var logCmd = new InsertCommand("INSERT INTO `mass_rollback_log` {parameters}", conn))
 				{
 					logCmd.Set("bugDescription", bugDescription);
 					logCmd.Set("fromTime", fromTime);
@@ -271,7 +272,7 @@ namespace Melia.Zone.Database
 
 		private void SnapshotCharacterData(Character character, long snapshotId, MySqlConnection conn, MySqlTransaction trans)
 		{
-			using (var cmd = new InsertCommand("INSERT INTO `snapshot_character_data` {0}", conn, trans))
+			using (var cmd = new InsertCommand("INSERT INTO `snapshot_character_data` {parameters}", conn, trans))
 			{
 				cmd.Set("snapshotId", snapshotId);
 				cmd.Set("characterId", character.DbId);
@@ -307,7 +308,7 @@ namespace Melia.Zone.Database
 
 			foreach (var item in allItems)
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_items` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_items` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("originalItemId", item.DbId);
@@ -348,7 +349,7 @@ namespace Melia.Zone.Database
 					{
 						if (property is IUnsettableProperty) continue;
 
-						using (var propCmd = new InsertCommand("INSERT INTO `snapshot_item_properties` {0}", conn, trans))
+						using (var propCmd = new InsertCommand("INSERT INTO `snapshot_item_properties` {parameters}", conn, trans))
 						{
 							propCmd.Set("snapshotItemId", snapshotItemId);
 							propCmd.Set("name", property.Ident);
@@ -368,7 +369,7 @@ namespace Melia.Zone.Database
 			{
 				if (property is IUnsettableProperty) continue;
 
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_character_properties` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_character_properties` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("name", property.Ident);
@@ -383,7 +384,7 @@ namespace Melia.Zone.Database
 			{
 				if (property is IUnsettableProperty) continue;
 
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_character_etc_properties` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_character_etc_properties` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("name", property.Ident);
@@ -396,7 +397,7 @@ namespace Melia.Zone.Database
 			// Variables
 			foreach (var varKvp in character.Variables.Perm.GetList())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_variables` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_variables` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("variableName", varKvp.Key);
@@ -412,7 +413,7 @@ namespace Melia.Zone.Database
 			// Jobs
 			foreach (var job in character.Jobs.GetList())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_jobs` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_jobs` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("jobId", (int)job.Id);
@@ -428,7 +429,7 @@ namespace Melia.Zone.Database
 			// Skills
 			foreach (var skill in character.Skills.GetList())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_skills` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_skills` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("skillId", (int)skill.Id);
@@ -440,7 +441,7 @@ namespace Melia.Zone.Database
 			// Abilities
 			foreach (var ability in character.Abilities.GetList())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_abilities` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_abilities` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("abilityId", (int)ability.Id);
@@ -455,7 +456,7 @@ namespace Melia.Zone.Database
 		{
 			foreach (var quest in character.Quests.GetList())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_quests` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_quests` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("questClassId", quest.Data.Id.Value);
@@ -471,7 +472,7 @@ namespace Melia.Zone.Database
 					{
 						if (progress.Objective == null) continue;
 
-						using (var progCmd = new InsertCommand("INSERT INTO `snapshot_quest_progress` {0}", conn, trans))
+						using (var progCmd = new InsertCommand("INSERT INTO `snapshot_quest_progress` {parameters}", conn, trans))
 						{
 							progCmd.Set("snapshotQuestId", snapshotQuestId);
 							progCmd.Set("ident", progress.Objective.Ident);
@@ -487,7 +488,7 @@ namespace Melia.Zone.Database
 
 		private void SnapshotSocialData(Character character, long snapshotId, MySqlConnection conn, MySqlTransaction trans)
 		{
-			using (var cmd = new InsertCommand("INSERT INTO `snapshot_social_data` {0}", conn, trans))
+			using (var cmd = new InsertCommand("INSERT INTO `snapshot_social_data` {parameters}", conn, trans))
 			{
 				cmd.Set("snapshotId", snapshotId);
 				cmd.Set("partyId", character.PartyId);
@@ -501,7 +502,7 @@ namespace Melia.Zone.Database
 			// Personal storage
 			foreach (var itemKvp in character.PersonalStorage.GetItems())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `snapshot_storage_personal` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `snapshot_storage_personal` {parameters}", conn, trans))
 				{
 					cmd.Set("snapshotId", snapshotId);
 					cmd.Set("position", itemKvp.Key);
@@ -517,7 +518,7 @@ namespace Melia.Zone.Database
 			{
 				foreach (var itemKvp in character.TeamStorage.GetItems())
 				{
-					using (var cmd = new InsertCommand("INSERT INTO `snapshot_storage_team` {0}", conn, trans))
+					using (var cmd = new InsertCommand("INSERT INTO `snapshot_storage_team` {parameters}", conn, trans))
 					{
 						cmd.Set("snapshotId", snapshotId);
 						cmd.Set("position", itemKvp.Key);
@@ -543,7 +544,7 @@ namespace Melia.Zone.Database
 				{
 					if (reader.Read())
 					{
-						using (var updateCmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
+						using (var updateCmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn, trans))
 						{
 							updateCmd.AddParameter("@characterId", characterId);
 							updateCmd.Set("name", reader.GetString("name"));
@@ -604,7 +605,7 @@ namespace Melia.Zone.Database
 					{
 						// Create new item in items table
 						long newItemId;
-						using (var itemCmd = new InsertCommand("INSERT INTO `items` {0}", conn, trans))
+						using (var itemCmd = new InsertCommand("INSERT INTO `items` {parameters}", conn, trans))
 						{
 							itemCmd.Set("itemId", itemData.ItemId);
 							itemCmd.Set("amount", itemData.Amount);
@@ -620,7 +621,7 @@ namespace Melia.Zone.Database
 							{
 								while (propReader.Read())
 								{
-									using (var insertPropCmd = new InsertCommand("INSERT INTO `item_properties` {0}", conn, trans))
+									using (var insertPropCmd = new InsertCommand("INSERT INTO `item_properties` {parameters}", conn, trans))
 									{
 										insertPropCmd.Set("itemId", newItemId);
 										insertPropCmd.Set("name", propReader.GetString("name"));
@@ -633,7 +634,7 @@ namespace Melia.Zone.Database
 						}
 
 						// Link to inventory
-						using (var invCmd = new InsertCommand("INSERT INTO `inventory` {0}", conn, trans))
+						using (var invCmd = new InsertCommand("INSERT INTO `inventory` {parameters}", conn, trans))
 						{
 							invCmd.Set("characterId", characterId);
 							invCmd.Set("itemId", newItemId);
@@ -858,7 +859,7 @@ namespace Melia.Zone.Database
 					{
 						var snapshotQuestId = reader.GetInt64("snapshotQuestId");
 
-						using (var insertCmd = new InsertCommand("INSERT INTO `quests` {0}", conn, trans))
+						using (var insertCmd = new InsertCommand("INSERT INTO `quests` {parameters}", conn, trans))
 						{
 							insertCmd.Set("characterId", characterId);
 							insertCmd.Set("classId", reader.GetInt64("questClassId"));
@@ -912,7 +913,7 @@ namespace Melia.Zone.Database
 				{
 					if (reader.Read())
 					{
-						using (var updateCmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
+						using (var updateCmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn, trans))
 						{
 							updateCmd.AddParameter("@characterId", characterId);
 							updateCmd.Set("partyId", reader.GetInt64("partyId"));
@@ -943,7 +944,7 @@ namespace Melia.Zone.Database
 					{
 						// Create new item
 						long newItemId;
-						using (var itemCmd = new InsertCommand("INSERT INTO `items` {0}", conn, trans))
+						using (var itemCmd = new InsertCommand("INSERT INTO `items` {parameters}", conn, trans))
 						{
 							itemCmd.Set("itemId", reader.GetInt32("itemId"));
 							itemCmd.Set("amount", reader.GetInt32("amount"));
@@ -952,7 +953,7 @@ namespace Melia.Zone.Database
 						}
 
 						// Link to storage
-						using (var linkCmd = new InsertCommand("INSERT INTO `storage_personal` {0}", conn, trans))
+						using (var linkCmd = new InsertCommand("INSERT INTO `storage_personal` {parameters}", conn, trans))
 						{
 							linkCmd.Set("characterId", characterId);
 							linkCmd.Set("itemId", newItemId);

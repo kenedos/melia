@@ -8,6 +8,7 @@ using Melia.Shared.Game.Properties;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Util;
 using MySqlConnector;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Yggdrasil.Logging;
 using Yggdrasil.Security.Hashing;
 using Yggdrasil.Util;
@@ -25,13 +26,14 @@ namespace Melia.Shared.Database
 		/// Sets connection string and calls TestConnection.
 		/// </summary>
 		/// <param name="host"></param>
+		/// <param name="port"></param>
 		/// <param name="user"></param>
 		/// <param name="pass"></param>
 		/// <param name="db"></param>
 		/// <exception cref="Exception">Thrown if connection couldn't be established.</exception>
-		public void Init(string host, string user, string pass, string db)
+		public void Init(string host, int port, string user, string pass, string db)
 		{
-			_connectionString = string.Format("server={0}; database={1}; uid={2}; password={3}; charset=utf8; pooling=true; min pool size=0; max pool size=200; connection timeout=30; default command timeout=30;", host, db, user, pass);
+			_connectionString = $"server={host}; port={port}; database={db}; uid={user}; password={pass}; charset=utf8; pooling=true; min pool size=0; max pool size=200; connection timeout=30; default command timeout=30;";
 			this.TestConnection();
 		}
 
@@ -134,7 +136,7 @@ namespace Melia.Shared.Database
 			password = BCrypt.HashPassword(password, BCrypt.GenerateSalt());
 
 			using (var conn = this.GetConnection())
-			using (var cmd = new InsertCommand("INSERT INTO `accounts` {0}", conn))
+			using (var cmd = new InsertCommand("INSERT INTO `accounts` {parameters}", conn))
 			{
 				cmd.Set("name", name);
 				cmd.Set("password", password);
@@ -215,7 +217,7 @@ namespace Melia.Shared.Database
 		public bool UpdateTeamName(long accountId, string teamName)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `accountId` = @accountId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `accountId` = @accountId", conn))
 			{
 				cmd.AddParameter("@accountId", accountId);
 				cmd.Set("teamName", teamName);
@@ -381,7 +383,7 @@ namespace Melia.Shared.Database
 		public void UpdateLastLoginIP(long accountId, string ip)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `accountId` = @accountId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `accountId` = @accountId", conn))
 			{
 				cmd.AddParameter("@accountId", accountId);
 				cmd.Set("lastIP", ip.ToInt32());
@@ -399,7 +401,7 @@ namespace Melia.Shared.Database
 		public void UpdateLoginState(long accountId, long characterDbId, LoginState state)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `accountId` = @accountId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `accountId` = @accountId", conn))
 			{
 				cmd.AddParameter("@accountId", accountId);
 				cmd.Set("loginState", (int)state);
@@ -420,7 +422,7 @@ namespace Melia.Shared.Database
 		public void UpdateSessionKey(long accountId, string sessionKey)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `accountId` = @accountId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `accountId` = @accountId", conn))
 			{
 				cmd.AddParameter("@accountId", accountId);
 				cmd.Set("sessionKey", sessionKey);
@@ -545,7 +547,7 @@ namespace Melia.Shared.Database
 				throw new ArgumentException("Invalid IP address mask.", nameof(ipMask));
 
 			using (var conn = this.GetConnection())
-			using (var cmd = new InsertCommand("INSERT INTO `ip_bans` {0}", conn))
+			using (var cmd = new InsertCommand("INSERT INTO `ip_bans` {parameters}", conn))
 			{
 				cmd.Set("ip", ipMask);
 				cmd.Set("fromDate", from);
@@ -562,7 +564,7 @@ namespace Melia.Shared.Database
 		public void ClearLoginStates()
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0}", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters}", conn))
 			{
 				cmd.Set("loginState", (int)LoginState.LoggedOut);
 				cmd.Set("loginCharacter", 0);
@@ -653,7 +655,7 @@ namespace Melia.Shared.Database
 				}
 
 				// Save
-				using (var cmd = new InsertCommand($"INSERT INTO `{tableName}` {{0}}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `" + tableName + "` {parameters}", conn, trans))
 				{
 					if (checkOwner)
 						cmd.Set(ownerField, ownerId);

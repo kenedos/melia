@@ -21,7 +21,7 @@ namespace Melia.Zone.Network
 			/// <param name="character"></param>
 			public static void MarketRetrievalItems(Character character, List<MarketItem> items)
 			{
-				var packet = Packet.Borrow(Op.ZC_NORMAL);
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketRetrievalItems);
 				packet.Zlib(true, zpacket =>
@@ -47,7 +47,6 @@ namespace Melia.Zone.Network
 				});
 
 				character.Connection.Send(packet);
-				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -57,13 +56,12 @@ namespace Melia.Zone.Network
 			/// <param name="itemWorldId"></param>
 			public static void MarketRetrieveItem(Character character, long itemWorldId)
 			{
-				var packet = Packet.Borrow(Op.ZC_NORMAL);
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketRegisterItem);
 				packet.PutLong(itemWorldId);
 
 				character.Connection.Send(packet);
-				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -73,7 +71,7 @@ namespace Melia.Zone.Network
 			/// <param name="marketWorldId"></param>
 			public static void MarketBuyItem(Character character, long marketWorldId, int itemRemainingAmount, short s1 = 1)
 			{
-				var packet = Packet.Borrow(Op.ZC_NORMAL);
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketBuyItem);
 				packet.PutLong(marketWorldId);
@@ -81,7 +79,6 @@ namespace Melia.Zone.Network
 				packet.PutShort(s1);
 
 				character.Connection.Send(packet);
-				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -91,14 +88,13 @@ namespace Melia.Zone.Network
 			/// <param name="marketWorldId"></param>
 			public static void MarketCancelItem(Character character, long marketWorldId)
 			{
-				var packet = Packet.Borrow(Op.ZC_NORMAL);
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
 
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketCancelItem);
 				packet.PutLpString(marketWorldId.ToString());
 				packet.PutInt(0);
 
 				character.Connection.Send(packet);
-				Packet.Return(packet);
 			}
 
 			/// <summary>
@@ -113,7 +109,7 @@ namespace Melia.Zone.Network
 			/// <param name="unitPrice">The default or current unit price</param>
 			public static void MarketMinMaxInfo(Character character, bool isTradable, long avgPrice, long minPrice, long softCapPrice, long maxPrice, long unitPrice)
 			{
-				var packet = Packet.Borrow(Op.ZC_NORMAL);
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.MarketMinMaxInfo);
 
 				packet.PutByte(isTradable);
@@ -124,7 +120,6 @@ namespace Melia.Zone.Network
 				packet.PutLong(unitPrice);          // unitPrice / totalPrice
 
 				character.Connection.Send(packet);
-				Packet.Return(packet);
 			}
 		}
 	}

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Melia.Shared.Network.Crypto;
@@ -109,7 +110,7 @@ namespace Melia.Shared.Network
 		{
 			_crypto.Decrypt(buffer, 0, buffer.Length);
 
-			var packet = new Packet(buffer);
+			using var packet = Packet.Rent(buffer);
 
 			// Check login state
 			if (packet.Op != OpTable.GetOp(Op.CB_LOGIN) && packet.Op != OpTable.GetOp(Op.CB_LOGIN_BY_PASSPORT) && packet.Op != OpTable.GetOp(Op.CS_LOGIN) && packet.Op != OpTable.GetOp(Op.CZ_CONNECT))
@@ -145,20 +146,23 @@ namespace Melia.Shared.Network
 			if (!OpTable.Exists(packet.Op))
 				return;
 
-			var buffer = _framer.Frame(packet);
-			var op = packet.Op;
-			var name = OpTable.GetName(packet.Op);
-			var tableSize = OpTable.GetSize(op);
-
 			if (OpTable.GetOp(packet.Op) == Op.ZC_NORMAL && packet.SubOp == -1)
 			{
-				Log.Warning("Connection.Send: Invalid packet sub op for ZC_NORMAL '{0:X4}' ({1}) ({2}).", op, name, buffer.Length, packet.SubOp);
+				var name = OpTable.GetName(packet.Op);
+				Log.Warning("Connection.Send: Invalid packet sub op for ZC_NORMAL '{0:X4}' ({1}), SubOp: {2}.", packet.Op, name, packet.SubOp);
 				return;
 			}
 
-			if (tableSize != TosFramer.DynamicPacketSize && buffer.Length != tableSize)
+			_framer.GetPacketSize(packet, out var tableSize, out var packetSize);
+
+			var buffer = ArrayPool<byte>.Shared.Rent(packetSize);
+			_framer.Frame(packet, tableSize, packetSize, buffer);
+
+			if (tableSize != TosFramer.DynamicPacketSize && packetSize != tableSize)
 			{
-				Log.Warning("Connection.Send: Invalid packet size for '{0:X4}' ({1}) ({2} != {3}).", op, name, buffer.Length, tableSize);
+				var name = OpTable.GetName(packet.Op);
+
+				Log.Warning("Connection.Send: Invalid packet size for '{0:X4}' ({1}) ({2} != {3}).", packet.Op, name, packetSize, tableSize);
 
 				// We can't send a packet that's not the correct size, as
 				// that will mess up the data stream, at which point we might
@@ -167,21 +171,35 @@ namespace Melia.Shared.Network
 				// fixed of course, but at least you're not kicked every
 				// time you haven't updated some packet for a new version
 				// yet.
-				var newBuffer = new byte[tableSize];
-				var copySize = Math.Min(buffer.Length, tableSize);
+				var newBuffer = ArrayPool<byte>.Shared.Rent(tableSize);
+				var copySize = Math.Min(packetSize, tableSize);
 				Buffer.BlockCopy(buffer, 0, newBuffer, 0, copySize);
 
+				ArrayPool<byte>.Shared.Return(buffer);
+
 				buffer = newBuffer;
+				packetSize = tableSize;
 			}
 
 			try
 			{
-				this.Send(buffer);
+				this.Send(buffer, packetSize);
 			}
 			catch (SocketException)
 			{
 				this.Close();
 			}
+		}
+
+		/// <summary>
+		/// Called after data sent is no longer needed by the connection.
+		/// </summary>
+		/// <param name="data"></param>
+		/// <param name="length"></param>
+		/// <param name="type"></param>
+		protected override void PostSend(byte[] data, int length, PostSendType type)
+		{
+			ArrayPool<byte>.Shared.Return(data);
 		}
 
 		/// <summary>

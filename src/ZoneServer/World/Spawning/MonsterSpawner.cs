@@ -213,7 +213,7 @@ namespace Melia.Zone.World.Spawning
 				if (!this.Maps.Contains(map.Id))
 					this.Maps.Add(map.Id);
 
-				var monster = new Mob(_monsterData.Id, RelationType.Enemy);
+				var monster = new Mob(_monsterData.Id);
 				monster.Position = pos;
 				monster.FromGround = true;
 				monster.Tendency = this.Tendency;

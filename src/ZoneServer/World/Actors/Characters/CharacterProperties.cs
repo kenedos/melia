@@ -246,7 +246,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.AutoUpdate(PropertyName.DR, [PropertyName.Lv, PropertyName.DEX, PropertyName.DR_BM, PropertyName.DR_RATE_BM]);
 			this.AutoUpdate(PropertyName.BLK, [PropertyName.Lv, PropertyName.CON, PropertyName.BLK_BM, PropertyName.BLK_RATE_BM]);
 			this.AutoUpdate(PropertyName.BLK_BREAK, [PropertyName.Lv, PropertyName.STR, PropertyName.BLK_BREAK_BM, PropertyName.BLK_BREAK_RATE_BM]);
-			this.AutoUpdate(PropertyName.HEAL_PWR, [PropertyName.Lv, PropertyName.INT, PropertyName.MNA, PropertyName.HEAL_PWR_BM, PropertyName.HEAL_PWR_RATE_BM]);
+			this.AutoUpdate(PropertyName.HEAL_PWR, [PropertyName.Lv, PropertyName.INT, PropertyName.MNA, PropertyName.HEAL_PWR_BM, PropertyName.HEAL_PWR_RATE_BM, PropertyName.MINPATK, PropertyName.MAXPATK, PropertyName.MINMATK, PropertyName.MAXMATK]);
 			this.AutoUpdate(PropertyName.SR, [PropertyName.SR_BM]);
 			this.AutoUpdate(PropertyName.SDR, [PropertyName.FixedMinSDR_BM, PropertyName.SDR_BM]);
 			this.AutoUpdate(PropertyName.MaxSta, [PropertyName.CON, PropertyName.MAXSTA_Bonus, PropertyName.MaxSta_BM]);

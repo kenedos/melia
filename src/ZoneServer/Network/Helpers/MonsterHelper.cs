@@ -15,15 +15,24 @@ namespace Melia.Zone.Network.Helpers
 		/// <param name="packet"></param>
 		/// <param name="monster"></param>
 		public static void AddMonster(this Packet packet, IMonster monster)
+			=> AddMonster(packet, monster, monster.MonsterType);
+
+		/// <summary>
+		/// Adds information about the monster to the packet.
+		/// </summary>
+		/// <param name="packet"></param>
+		/// <param name="monster"></param>
+		/// <param name="relation"></param>
+		public static void AddMonster(this Packet packet, IMonster monster, RelationType relation)
 		{
-			var propertyList = monster.Properties.GetSelect(PropertyName.Range, PropertyName.Scale);
+			var propertyList = monster.Properties.GetAll();
 			var propertiesSize = propertyList.GetByteCount();
 			var appearanceSize = monster.GetByteCount();
 
 			packet.PutInt(monster.Handle);
 			packet.PutPosition(monster.Position);
 			packet.PutDirection(monster.Direction);
-			packet.PutByte((byte)monster.MonsterType); // 0~2,  0: friendly?, 1: monster, 2: NPC
+			packet.PutByte((byte)relation);
 			packet.PutByte(monster.FromGround);
 			packet.PutInt(monster.Hp);
 			packet.PutInt(monster.MaxHp);

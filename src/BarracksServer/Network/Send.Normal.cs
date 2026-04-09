@@ -19,7 +19,7 @@ namespace Melia.Barracks.Network
 			/// <param name="id"></param>
 			public static void SetBarrackCharacter(IBarracksConnection conn, Character character)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.SetBarrackCharacter);
 
 				packet.PutLong(conn.Account.Id);
@@ -37,7 +37,7 @@ namespace Melia.Barracks.Network
 			/// <param name="mapId"></param>
 			public static void SetBarrack(IBarracksConnection conn, int mapId)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.SetBarrack);
 				packet.PutLong(conn.Account.Id);
 				packet.PutInt(mapId);
@@ -54,7 +54,7 @@ namespace Melia.Barracks.Network
 			/// <param name="conn"></param>
 			public static void ThemaSuccess(IBarracksConnection conn)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.ThemaSuccess);
 
 				conn.Send(packet);
@@ -68,7 +68,7 @@ namespace Melia.Barracks.Network
 			/// <param name="position"></param>
 			public static void SetPosition(IBarracksConnection conn, byte index, Position position)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.SetPosition);
 				packet.PutLong(conn.Account.Id);
 				packet.PutByte(index);
@@ -87,7 +87,7 @@ namespace Melia.Barracks.Network
 			/// <param name="position"></param>
 			public static void SetCompanionPosition(IBarracksConnection conn, long companionId, Position position)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.SetCompanionPosition);
 
 				packet.PutLong(conn.Account.ObjectId);
@@ -111,7 +111,7 @@ namespace Melia.Barracks.Network
 				if (companionCount == 0)
 					return;
 
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.CompanionInfo);
 
 				packet.PutLong(conn.Account.ObjectId);
@@ -133,7 +133,7 @@ namespace Melia.Barracks.Network
 			/// <param name="characterId"></param>
 			public static void SetCompanion(IBarracksConnection conn, long companionId, long characterId)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.SetCompanion);
 
 				packet.PutLong(conn.Account.ObjectId);
@@ -150,7 +150,7 @@ namespace Melia.Barracks.Network
 			/// <param name="companionId"></param>
 			public static void DeleteCompanion(IBarracksConnection conn, long companionId)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.DeleteCompanion);
 
 				packet.PutLong(conn.Account.ObjectId);
@@ -167,7 +167,7 @@ namespace Melia.Barracks.Network
 			{
 				var characters = conn.Account.GetCharacters();
 
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.TeamUI);
 				packet.PutLong(conn.Account.Id);
 				packet.PutShort(conn.Account.AdditionalSlotCount);
@@ -188,7 +188,7 @@ namespace Melia.Barracks.Network
 				var mapCount = mapIds.Count();
 				var maxPlayersPerMap = 100;
 
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.ZoneTraffic);
 
 				// The response is a list of maps and the zone servers they
@@ -266,7 +266,7 @@ namespace Melia.Barracks.Network
 			/// <param name="str"></param>
 			public static void Run(IBarracksConnection conn, string str)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.Run);
 				packet.PutLpString(str);
 
@@ -284,7 +284,7 @@ namespace Melia.Barracks.Network
 			{
 				var messageCount = messages.Count();
 
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.Mailbox);
 
 				packet.Zlib(true, zpacket =>
@@ -337,7 +337,7 @@ namespace Melia.Barracks.Network
 			/// <param name="state"></param>
 			public static void UpdateMailboxState(IBarracksConnection conn, long messageId, MailboxMessageState state)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.MailboxState);
 				packet.PutLong(messageId);
 				packet.PutByte((byte)state);
@@ -354,7 +354,7 @@ namespace Melia.Barracks.Network
 				var items = message.GetItems();
 				var receivedItemCount = items.Count(item => item.WasReceived);
 
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.MailUpdate);
 
 				packet.PutLong(message.Id);
@@ -379,7 +379,7 @@ namespace Melia.Barracks.Network
 			/// <param name="conn"></param>
 			public static void SetSessionKey(IBarracksConnection conn)
 			{
-				var packet = new Packet(Op.ZC_NORMAL);
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.SetSessionKey);
 				packet.PutLpString(conn.SessionKey);
 
@@ -392,7 +392,7 @@ namespace Melia.Barracks.Network
 			/// <param name="conn"></param>
 			public static void ClientIntegrityFailure(IBarracksConnection conn)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.ClientIntegrityFailure);
 
 				conn.Send(packet);
@@ -405,7 +405,7 @@ namespace Melia.Barracks.Network
 			/// <param name="count"></param>
 			public static void BarrackSlotCount(IBarracksConnection conn, int count)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.BarrackSlotCount);
 				packet.PutInt(count);
 
@@ -420,7 +420,7 @@ namespace Melia.Barracks.Network
 			{
 				var characters = conn.Account.GetCharacters();
 
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.CharacterInfo);
 
 				packet.PutLong(conn.Account.Id);
@@ -447,7 +447,7 @@ namespace Melia.Barracks.Network
 			/// <param name="conn"></param>
 			public static void StartGameFailed(IBarracksConnection conn)
 			{
-				var packet = new Packet(Op.BC_NORMAL);
+				using var packet = Packet.Rent(Op.BC_NORMAL);
 				packet.PutInt(NormalOp.Barrack.StartGameFailed);
 
 				conn.Send(packet);

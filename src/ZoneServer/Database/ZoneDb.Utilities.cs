@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Melia.Shared.Database;
 using Melia.Shared.ObjectProperties;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Zone.Scripting;
 using MySqlConnector;
 using Yggdrasil.Logging;
@@ -129,7 +130,7 @@ namespace Melia.Zone.Database
 		public bool SaveSessionKey(long characterId, string key)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn))
 			{
 				cmd.AddParameter("@characterId", characterId);
 				cmd.Set("sessionKey", key);
@@ -141,19 +142,19 @@ namespace Melia.Zone.Database
 		{
 			if (amount == 0) return;
 			using (var conn = this.GetConnection())
-			using (var cmd = new InsertCommand("INSERT INTO `log_item_transactions` (`characterId`, `characterName`, `itemObjectId`, `itemDbId`, `itemId`, `itemName`, `amount`, `transactionType`, `reason`, `timestamp`) VALUES (@characterId, @characterName, @itemObjectId, @itemDbId, @itemId, @itemName, @amount, @transactionType, @reason, @timestamp)", conn))
+			using (var cmd = new MySqlCommand("INSERT INTO `log_item_transactions` (`characterId`, `characterName`, `itemObjectId`, `itemDbId`, `itemId`, `itemName`, `amount`, `transactionType`, `reason`, `timestamp`) VALUES (@characterId, @characterName, @itemObjectId, @itemDbId, @itemId, @itemName, @amount, @transactionType, @reason, @timestamp)", conn))
 			{
-				cmd.AddParameter("@characterId", characterId);
-				cmd.AddParameter("@characterName", characterName);
-				cmd.AddParameter("@itemObjectId", itemObjectId);
-				cmd.AddParameter("@itemDbId", itemDbId);
-				cmd.AddParameter("@itemId", itemId);
-				cmd.AddParameter("@itemName", itemName);
-				cmd.AddParameter("@amount", amount);
-				cmd.AddParameter("@transactionType", transactionType);
-				cmd.AddParameter("@reason", reason);
-				cmd.AddParameter("@timestamp", DateTime.UtcNow);
-				cmd.Execute();
+				cmd.Parameters.AddWithValue("@characterId", characterId);
+				cmd.Parameters.AddWithValue("@characterName", characterName);
+				cmd.Parameters.AddWithValue("@itemObjectId", itemObjectId);
+				cmd.Parameters.AddWithValue("@itemDbId", itemDbId);
+				cmd.Parameters.AddWithValue("@itemId", itemId);
+				cmd.Parameters.AddWithValue("@itemName", itemName);
+				cmd.Parameters.AddWithValue("@amount", amount);
+				cmd.Parameters.AddWithValue("@transactionType", transactionType);
+				cmd.Parameters.AddWithValue("@reason", reason);
+				cmd.Parameters.AddWithValue("@timestamp", DateTime.UtcNow);
+				cmd.ExecuteNonQuery();
 			}
 		}
 
@@ -163,15 +164,15 @@ namespace Melia.Zone.Database
 		{
 			if (string.IsNullOrEmpty(message)) return;
 			using (var conn = this.GetConnection())
-			using (var cmd = new InsertCommand("INSERT INTO `log_chat` (`characterId`, `characterName`, `chatType`, `message`, `targetName`, `timestamp`) VALUES (@characterId, @characterName, @chatType, @message, @targetName, @timestamp)", conn))
+			using (var cmd = new MySqlCommand("INSERT INTO `log_chat` (`characterId`, `characterName`, `chatType`, `message`, `targetName`, `timestamp`) VALUES (@characterId, @characterName, @chatType, @message, @targetName, @timestamp)", conn))
 			{
-				cmd.AddParameter("@characterId", characterId);
-				cmd.AddParameter("@characterName", characterName);
-				cmd.AddParameter("@chatType", chatType);
-				cmd.AddParameter("@message", message);
-				cmd.AddParameter("@targetName", targetName ?? (object)DBNull.Value);
-				cmd.AddParameter("@timestamp", DateTime.UtcNow);
-				cmd.Execute();
+				cmd.Parameters.AddWithValue("@characterId", characterId);
+				cmd.Parameters.AddWithValue("@characterName", characterName);
+				cmd.Parameters.AddWithValue("@chatType", chatType);
+				cmd.Parameters.AddWithValue("@message", message);
+				cmd.Parameters.AddWithValue("@targetName", targetName ?? (object)DBNull.Value);
+				cmd.Parameters.AddWithValue("@timestamp", DateTime.UtcNow);
+				cmd.ExecuteNonQuery();
 			}
 		}
 

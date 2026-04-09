@@ -2399,5 +2399,7 @@ namespace Melia.Shared.Game.Const
 		DeadlyFire_OH = 50731,
 		RussianRoulette_OH = 50732,
 		LastManStanding_OH = 50733,
+
+		RAID_POTION_TP = 30000,
 	}
 }

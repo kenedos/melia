@@ -74,7 +74,7 @@ public class CampfireActionScript : GeneralScript
 		var area = new Circle(pos, MinDistanceToFires);
 		var monsters = map.GetActorsIn<Mob>(area);
 
-		var anyCampfires = monsters.Exists(a => a.Id == CampfireMonsterId);
+		var anyCampfires = monsters.Any(a => a.Id == CampfireMonsterId);
 		return anyCampfires;
 	}
 
@@ -86,13 +86,13 @@ public class CampfireActionScript : GeneralScript
 			creator.Map.RemoveMonster(previousCampfire);
 		}
 
-		var campfire = new Mob(CampfireMonsterId, RelationType.Party);
+		var campfire = new Mob(CampfireMonsterId);
 		campfire.Faction = FactionType.Neutral;
 		campfire.Position = pos;
 		campfire.Direction = creator.Direction;
 		campfire.Layer = creator.Layer;
-		campfire.AttachEffect("F_bg_fire003");
 		campfire.DisappearTime = DateTime.Now.Add(CampfireDuration);
+		campfire.AttachEffect("F_bg_fire003", 1);
 		campfire.OnDisappear += () =>
 		{
 			creator.Variables.Temp.SetInt("Melia.CampFire.Handle", 0);

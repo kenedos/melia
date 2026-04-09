@@ -46,18 +46,19 @@ namespace Melia.Shared.Network
 		}
 
 		/// <summary>
-		/// Wraps packet body in frame.
+		/// Calculates the size of the packet when framed.
 		/// </summary>
-		/// <param name="message"></param>
+		/// <param name="packet"></param>
 		/// <returns></returns>
-		public byte[] Frame(Packet packet)
+		/// <exception cref="ArgumentException"></exception>
+		public void GetPacketSize(Packet packet, out int tableSize, out int packetSize)
 		{
 			var op = packet.Op;
 
 			// Get size from table
-			var tableSize = OpTable.GetSize(op);
+			tableSize = OpTable.GetSize(op);
 			if (tableSize == -1)
-				throw new ArgumentException("Size for op '" + packet.Op.ToString("X4") + "' unknown.");
+				throw new ArgumentException("Size for op '" + op.ToString("X4") + "' unknown.");
 
 			// Prior to i174236 packet headers sent from the server to the
 			// client were 4 bytes shorter, as they didn't have the part
@@ -69,8 +70,6 @@ namespace Melia.Shared.Network
 			//var fixHeaderSize = (sizeof(short) + sizeof(int) + sizeof(int) + packet.Length);
 			//var dynHeaderSize = (sizeof(short) + sizeof(int) + sizeof(int) + sizeof(short) + packet.Length);
 			//var size = (tableSize == DynamicPacketSize ? dynHeaderSize : tableSize);
-
-			int packetSize;
 
 			// Check table length
 			if (tableSize == DynamicPacketSize)
@@ -93,7 +92,7 @@ namespace Melia.Shared.Network
 				if (packetSize > tableSize)
 				{
 					Log.Warning("Packet is bigger than specified in the packet size table. (op: {3} ({0:X4}), size: {1}, expected: {2})", op, packetSize, tableSize, OpTable.GetName(op));
-					throw new ArgumentException("Packet is bigger than specified in the packet size table.");
+					throw new ArgumentException("Packet is bigger than specified in the packet size table. (op: {3} ({0:X4}), size: {1}, expected: {2})");
 				}
 
 				// If the packet is smaller than the table size we might
@@ -106,9 +105,18 @@ namespace Melia.Shared.Network
 					packetSize = tableSize;
 				}
 			}
+		}
 
-			// Create packet
-			var buffer = new byte[packetSize];
+		/// <summary>
+		/// Wraps packet body in frame and writes it to buffer.
+		/// </summary>
+		/// <param name="packet"></param>
+		/// <param name="tableSize"></param>
+		/// <param name="packetSize"></param>
+		/// <param name="buffer"></param>
+		public void Frame(Packet packet, int tableSize, int packetSize, byte[] buffer)
+		{
+			var op = packet.Op;
 
 			// Write op (short, little-endian) without BitConverter allocation
 			buffer[0] = (byte)(op & 0xFF);
@@ -132,8 +140,6 @@ namespace Melia.Shared.Network
 			}
 
 			packet.Build(ref buffer, offset);
-
-			return buffer;
 		}
 
 		/// <summary>

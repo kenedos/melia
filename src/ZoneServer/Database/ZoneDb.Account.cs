@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -22,7 +23,7 @@ namespace Melia.Zone.Database
 				throw new ArgumentNullException(nameof(account));
 
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `accountId` = @accountId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `accountId` = @accountId", conn))
 			{
 				cmd.AddParameter("@accountId", account.Id);
 				cmd.Set("settings", account.Settings.ToString());
@@ -30,6 +31,7 @@ namespace Melia.Zone.Database
 				cmd.Set("medals", account.Medals);
 				cmd.Set("giftMedals", account.GiftMedals);
 				cmd.Set("premiumMedals", account.PremiumMedals);
+				cmd.Set("language", account.Language);
 
 				if (cmd.Execute() == 0)
 					return false;
@@ -93,6 +95,7 @@ namespace Melia.Zone.Database
 					account.GiftMedals = reader.GetInt32("giftMedals");
 					account.PremiumMedals = reader.GetInt32("premiumMedals");
 					account.Premium.Token.Expiration = reader.GetDateTimeSafe("premiumTokenExpiration");
+					account.Language = reader.GetStringSafe("language");
 					var creationDate = reader.GetDateTimeSafe("creationDate");
 
 					if (creationDate == DateTime.MinValue)
@@ -227,7 +230,7 @@ namespace Melia.Zone.Database
 
 				foreach (var revealedMap in account.GetRevealedMaps())
 				{
-					using (var cmd = new InsertCommand("INSERT INTO `revealedmaps` {0}", conn, trans))
+					using (var cmd = new InsertCommand("INSERT INTO `revealedmaps` {parameters}", conn, trans))
 					{
 						cmd.Set("accountId", account.Id);
 						cmd.Set("map", revealedMap.MapId);

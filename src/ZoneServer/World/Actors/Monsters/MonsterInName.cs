@@ -17,9 +17,9 @@ namespace Melia.Zone.World.Actors.Monsters
 		public int Id { get; }
 
 		/// <summary>
-		/// Returns the monster's type.
+		/// Gets or sets what kind of "monster" the mob is.
 		/// </summary>
-		public RelationType MonsterType => RelationType.Neutral;
+		public RelationType MonsterType { get; set; } = RelationType.Neutral;
 
 		/// <summary>
 		/// Returns the monster's race.
@@ -40,6 +40,16 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Returns the monster's maximum HP.
 		/// </summary>
 		public int MaxHp => 100;
+
+		/// <summary>
+		/// Returns the monster's current shield.
+		/// </summary>
+		public int Shield => 0;
+
+		/// <summary>
+		/// Returns the monster's maximum shield.
+		/// </summary>
+		public int MaxShield => 0;
 
 		/// <summary>
 		/// Returns the monster's level.
@@ -111,10 +121,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		public Position SpawnPosition { get; set; } = Position.Zero;
 
 		public NpcState State { get; set; } = NpcState.Normal;
-
-		public int Shield => 0;
-
-		public int MaxShield => 0;
 
 		/// <summary>
 		/// Initializes the monster's properties.

@@ -101,6 +101,11 @@ namespace Melia.Zone.Database
 		public int SelectedBarrackLayer { get; set; }
 
 		/// <summary>
+		/// Gets or sets the selected language for the account.
+		/// </summary>
+		public string Language { get; set; } = "English";
+
+		/// <summary>
 		/// The account's settings.
 		/// </summary>
 		public AccountSettings Settings { get; } = new AccountSettings();

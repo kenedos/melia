@@ -24,7 +24,7 @@ namespace Melia.Zone.Network
 			var propertyList = group.Properties.GetAll();
 			var propertiesSize = propertyList.GetByteCount();
 
-			var packet = Packet.Borrow(Op.ZC_PARTY_INFO);
+			using var packet = Packet.Rent(Op.ZC_PARTY_INFO);
 			packet.PutByte((byte)group.Type);
 			packet.PutByte(0);
 			packet.PutDate(group.DateCreated);
@@ -64,7 +64,6 @@ namespace Melia.Zone.Network
 			}
 
 			character.Connection.Send(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -75,7 +74,7 @@ namespace Melia.Zone.Network
 		{
 			var members = group.GetMembers();
 
-			var packet = Packet.Borrow(Op.ZC_PARTY_LIST);
+			using var packet = Packet.Rent(Op.ZC_PARTY_LIST);
 			packet.PutLong(0);
 			packet.PutByte((byte)group.Type);
 			packet.PutLong(group.ObjectId);
@@ -84,7 +83,6 @@ namespace Melia.Zone.Network
 				packet.AddMember(member);
 
 			group.Broadcast(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -94,7 +92,7 @@ namespace Melia.Zone.Network
 		/// <param name="group"></param>
 		public static void ZC_PARTY_ENTER(Character character, IGroup group)
 		{
-			var packet = Packet.Borrow(Op.ZC_PARTY_ENTER);
+			using var packet = Packet.Rent(Op.ZC_PARTY_ENTER);
 
 			packet.PutByte((byte)group.Type);
 			packet.PutLong(group.ObjectId);
@@ -102,7 +100,6 @@ namespace Melia.Zone.Network
 			packet.PutShort(0);
 
 			group.Broadcast(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -111,7 +108,7 @@ namespace Melia.Zone.Network
 		/// <param name="group"></param>
 		public static void ZC_PARTY_OUT(Character character, IGroup group)
 		{
-			var packet = Packet.Borrow(Op.ZC_PARTY_OUT);
+			using var packet = Packet.Rent(Op.ZC_PARTY_OUT);
 
 			packet.PutByte((byte)group.Type);
 			packet.PutLong(group.ObjectId);
@@ -119,7 +116,6 @@ namespace Melia.Zone.Network
 			packet.PutByte(0);
 
 			character.Connection.Send(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -129,7 +125,7 @@ namespace Melia.Zone.Network
 		/// <param name="group"></param>
 		public static void ZC_PARTY_OUT(IGroup group, IMember member)
 		{
-			var packet = Packet.Borrow(Op.ZC_PARTY_OUT);
+			using var packet = Packet.Rent(Op.ZC_PARTY_OUT);
 
 			packet.PutByte((byte)group.Type);
 			packet.PutLong(group.ObjectId);
@@ -137,7 +133,6 @@ namespace Melia.Zone.Network
 			packet.PutByte(0);
 
 			group.Broadcast(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -148,7 +143,7 @@ namespace Melia.Zone.Network
 		{
 			var members = group.GetMembers();
 
-			var packet = Packet.Borrow(Op.ZC_PARTY_INST_INFO);
+			using var packet = Packet.Rent(Op.ZC_PARTY_INST_INFO);
 
 			packet.PutByte((byte)group.Type);
 			packet.PutInt(members.Count);
@@ -161,7 +156,6 @@ namespace Melia.Zone.Network
 			packet.PutByte(0);
 
 			group.Broadcast(packet);
-			Packet.Return(packet);
 		}
 	}
 }

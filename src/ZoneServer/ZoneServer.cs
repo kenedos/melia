@@ -27,6 +27,7 @@ using Melia.Zone.Services;
 using Melia.Zone.Skills.Handlers;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Spawning;
+using Melia.Zone.World.Spawning;
 using Melia.Zone.Util;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
@@ -171,6 +172,7 @@ namespace Melia.Zone
 			this.LoadTriggerFunctions();
 			this.LoadScripts("zone");
 			this.LoadIesMods();
+			this.PrepareWorld();
 			this.StartWorld();
 
 			this.StartAutoSaveService();
@@ -237,7 +239,7 @@ namespace Melia.Zone
 
 			try
 			{
-				this.Communicator.Connect("Coordinator", authentication, barracksServerInfo.InterIp, barracksServerInfo.InterPort);
+				this.Communicator.Connect("Coordinator", authentication, barracksServerInfo.InterHost, barracksServerInfo.InterPort);
 
 				this.Communicator.Subscribe("Coordinator", "ServerUpdates");
 				this.Communicator.Subscribe("Coordinator", "AllServers");
@@ -420,6 +422,24 @@ namespace Melia.Zone
 			Log.Info("Initializing achievement service...");
 			this.Achievements.Initialize();
 			Log.Info("  done loading {0} maps.", this.World.Count);
+		}
+
+		/// <summary>
+		/// Prepares world before it's started.
+		/// </summary>
+		private void PrepareWorld()
+		{
+			Log.Info("Prepairing world...");
+
+			// Removes spawners that have no spawn areas, as they would
+			// unnecessarily consume resources. This may happen naturally
+			// if the server loads spawners for maps it doesn't serve.
+			var spawners = this.World.GetSpawners();
+			foreach (var spawner in spawners)
+			{
+				if (spawner is MonsterSpawner ms && (!this.World.TryGetSpawnAreas(ms.SpawnPointsIdent, out var areas) || areas.Count == 0))
+					this.World.RemoveSpawner(spawner);
+			}
 		}
 
 		/// <summary>

@@ -412,12 +412,19 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Creates new NPC.
+		/// Creates new mob.
 		/// </summary>
-		public Mob(int id, RelationType type) : base()
+		public Mob(int id, RelationType type) : this(id)
+		{
+			this.MonsterType = type;
+		}
+
+		/// <summary>
+		/// Creates new mob.
+		/// </summary>
+		public Mob(int id) : base()
 		{
 			this.Id = id;
-			this.MonsterType = type;
 
 			this.Components.Add(this.Buffs = new BuffComponent(this));
 			this.Components.Add(this.CombatState = new CombatComponent(this));
@@ -596,7 +603,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			var beneficiary = this.GetKillBeneficiary(killer);
 
-			if (this.MonsterType == RelationType.Enemy && beneficiary != null && beneficiary.IsOnline && beneficiary.Connection != null)
+			if (beneficiary != null && beneficiary.IsOnline && beneficiary.Connection != null)
 			{
 				this.GetExpToGive(out var exp, out var jobExp);
 

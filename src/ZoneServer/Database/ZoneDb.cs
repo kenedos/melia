@@ -11,6 +11,7 @@ using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Storages;
 using MySqlConnector;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
@@ -145,7 +146,7 @@ namespace Melia.Zone.Database
 							try
 							{
 								// --- Main Character Table ---
-								using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
+								using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn, trans))
 								{
 									cmd.AddParameter("@characterId", character.DbId);
 									cmd.Set("name", character.Name);

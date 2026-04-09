@@ -23,9 +23,10 @@
     <PackageReference Include="DotRecast.Detour" Version="2025.2.1" />
     <PackageReference Include="DotRecast.Recast" Version="2025.2.1" />
     <PackageReference Include="DotRecast.Recast.Toolset" Version="2025.2.1" />
-    <PackageReference Include="ExecTails.Yggdrasil" Version="1.7.0" />
+    <PackageReference Include="ExecTails.Yggdrasil" Version="1.7.4" />
     <PackageReference Include="ExecTails.Yggdrasil.Ai" Version="1.0.1" />
     <PackageReference Include="ExecTails.Yggdrasil.Data.JSON" Version="1.0.1" />
+    <PackageReference Include="ExecTails.Yggdrasil.Db.MySql" Version="1.1.2" />
     <PackageReference Include="ExecTails.Yggdrasil.Scripting" Version="1.0.1" />
     <PackageReference Include="ExecTails.Yggdrasil.Structures" Version="1.0.1" />
     <PackageReference Include="geometry4Sharp" Version="1.0.0" />

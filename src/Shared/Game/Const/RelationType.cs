@@ -1,22 +1,22 @@
-﻿namespace Melia.Shared.Game.Const
+namespace Melia.Shared.Game.Const
 {
 	/// <summary>
-	/// Used to specify the type of a monster.
+	/// Defines the relation type between actors.
 	/// </summary>
 	public enum RelationType : byte
 	{
 		/// <summary>
-		/// Party/Guild
+		/// Friendly actors, such as party members.
 		/// </summary>
 		Friendly = 0,
 
 		/// <summary>
-		/// An aggressive monster.
+		/// Enemy actors, such as mobs.
 		/// </summary>
 		Enemy = 1,
 
 		/// <summary>
-		/// An NPC or item.
+		/// Neutral actors, such as NPCs.
 		/// </summary>
 		Neutral = 2,
 
@@ -29,18 +29,6 @@
 		/// A guild member
 		/// </summary>
 		Guild = 4,
-
-		/// <summary>
-		/// Is a player.
-		/// Exists in client but we should NOT use it.
-		/// </summary>
-		// Character = 5,
-
-		/// <summary>
-		/// Is a monster.
-		/// Exists in client but we should NOT use it.
-		/// </summary>
-		// Monster = 6,
 
 		/// <summary>
 		/// All relations

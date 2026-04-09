@@ -2,7 +2,7 @@
 //--- 010 Editor v11.0.1 Binary Template
 //
 //      File: CZ_PVP_COMMAND.bt
-//   Authors: Salman T. Khan
+//   Authors: Salman T. Khan, exec
 //   Version: i337645
 //   Purpose: 
 //  Category: 
@@ -15,8 +15,7 @@
 
 ClientHeaderFixed header;
 
-int i1; // 2, 6
-int i2; // 0, 1
-int i3; // 0 
-byte b1; // 0
-byte b[3]; // 0x3B, 0x4B, 0xAC
+int commandType;
+int i1;
+int i2;
+byte b1;

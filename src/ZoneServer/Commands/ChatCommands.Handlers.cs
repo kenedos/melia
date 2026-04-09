@@ -121,6 +121,7 @@ namespace Melia.Zone.Commands
 			this.Add("uptime", "", "Displays the server uptime.", this.HandleUptime);
 			this.Add("mapinfo", "", "Displays entity counts on the current map.", this.HandleMapInfo);
 			this.Add("rates", "", "Displays the current server rates.", this.HandleRates);
+			this.Add("language", "<language>", "Sets the server-side language.", this.HandleLanguage);
 
 			// VIP
 			this.Add("autoloot", "", "Toggles autolooting.", this.HandleAutoloot);
@@ -622,7 +623,7 @@ namespace Melia.Zone.Commands
 			if (args.Count >= 3 && !float.TryParse(args.Get(2), out time))
 				return CommandResult.Okay;
 
-			var packet = new Packet(Op.ZC_NORMAL);
+			using var packet = Packet.Rent(Op.ZC_NORMAL);
 
 			packet.PutSubOp(NormalOpType.Zone, subOpCode);
 			packet.PutInt(sender.Handle);
@@ -1474,7 +1475,7 @@ namespace Melia.Zone.Commands
 			var rnd = new Random(Environment.TickCount);
 			for (var i = 0; i < amount; ++i)
 			{
-				var monster = new Mob(monsterData.Id, RelationType.Enemy);
+				var monster = new Mob(monsterData.Id);
 
 				Position pos;
 				Direction dir;
@@ -4559,8 +4560,7 @@ namespace Melia.Zone.Commands
 
 			// Create auto seller packet from arguments and have the
 			// channel handle it as if the client had sent it.
-			var packet = new Packet(Op.CZ_REGISTER_AUTOSELLER);
-			packet.PutShort(0);
+			using var packet = Packet.Rent(Op.CZ_REGISTER_AUTOSELLER);
 			packet.PutString(title, 64);
 			packet.PutInt(items.Count);
 			packet.PutInt(personalShopPacketStringId); // PersonalShop
@@ -6101,6 +6101,33 @@ namespace Melia.Zone.Commands
 			}
 
 			sender.ServerMessage(Localization.Get("No suitable monsters found."));
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Changes the target's account's language.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleLanguage(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			if (args.Count < 1)
+			{
+				sender.ServerMessage(Localization.Get("Current language: {0}"), target.Connection.Account.Language);
+				return CommandResult.Okay;
+			}
+
+			var language = args.Get(0);
+
+			target.Connection.Account.Language = args.Get(0);
+			target.Connection.SelectedLanguage = language;
+
+			sender.ServerMessage(Localization.Get("Changed language to '{0}'."), language);
 
 			return CommandResult.Okay;
 		}

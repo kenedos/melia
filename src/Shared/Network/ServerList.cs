@@ -92,6 +92,20 @@ namespace Melia.Shared.Network
 		}
 
 		/// <summary>
+		/// Returns true if there's any zone servers online that serve the
+		/// given map.
+		/// </summary>
+		/// <param name="mapId"></param>
+		/// <returns></returns>
+		public bool IsBeingServed(int mapId)
+		{
+			var zoneServers = _servers.Where(a => a.Type == ServerType.Zone);
+			var mapServers = zoneServers.Where(a => a.Status == ServerStatus.Online && a.MapIds.Contains(mapId));
+
+			return mapServers.Any();
+		}
+
+		/// <summary>
 		/// Returns the zone server with the given index that serves the
 		/// given map via out. Returns false if no matching server was found.
 		/// </summary>
@@ -101,10 +115,15 @@ namespace Melia.Shared.Network
 		{
 			serverInfo = null;
 
-			var zoneServers = _servers.Where(a => a.Type == ServerType.Zone);
-			var mapServers = zoneServers.Where(a => a.MapIds.Contains(mapId));
+			// We need to filter for ServerStatus.Online both here and in
+			// GetZoneServers, so the channel list, our list, and the
+			// selected channels match up. Alternatively, we could show
+			// channels even if they're offline.
 
-			if (index < 0 || index > _servers.Count - 1)
+			var zoneServers = _servers.Where(a => a.Type == ServerType.Zone);
+			var mapServers = zoneServers.Where(a => a.Status == ServerStatus.Online && a.MapIds.Contains(mapId));
+
+			if (index < 0 || index > mapServers.Count() - 1)
 				return false;
 
 			serverInfo = mapServers.ElementAt(index);
@@ -151,9 +170,9 @@ namespace Melia.Shared.Network
 		public int Port { get; set; }
 
 		/// <summary>
-		/// Returns the server's internal IP address.
+		/// Returns the server's internal host address.
 		/// </summary>
-		public string InterIp { get; }
+		public string InterHost { get; set; }
 
 		/// <summary>
 		/// Returns the port the server is listening on internally.
@@ -203,7 +222,7 @@ namespace Melia.Shared.Network
 			this.Id = data.Id;
 			this.Ip = data.Ip;
 			this.Port = data.Port;
-			this.InterIp = data.InterIp;
+			this.InterHost = data.InterHost;
 			this.InterPort = data.InterPort;
 			this.MapIds = data.MapIds;
 		}
