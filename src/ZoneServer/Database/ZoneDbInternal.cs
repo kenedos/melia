@@ -394,6 +394,7 @@ namespace Melia.Zone.Database
 							{
 								cmd.Set("itemId", item.Id);
 								cmd.Set("amount", item.Amount);
+								cmd.Set("locked", item.IsLocked);
 								cmd.Execute();
 								item.DbId = cmd.LastId; // Assign the correct ID immediately.
 
@@ -421,7 +422,7 @@ namespace Melia.Zone.Database
 					try
 					{
 						using (var batch = new BatchInsertCommand("items",
-							"ON DUPLICATE KEY UPDATE `itemId` = VALUES(`itemId`), `amount` = VALUES(`amount`)",
+							"ON DUPLICATE KEY UPDATE `itemId` = VALUES(`itemId`), `amount` = VALUES(`amount`), `locked` = VALUES(`locked`)",
 							conn, trans))
 						{
 							foreach (var item in existingItems)
@@ -430,7 +431,8 @@ namespace Melia.Zone.Database
 								{
 									{ "itemUniqueId", item.DbId },
 									{ "itemId", item.Id },
-									{ "amount", item.Amount }
+									{ "amount", item.Amount },
+									{ "locked", item.IsLocked }
 								});
 							}
 
