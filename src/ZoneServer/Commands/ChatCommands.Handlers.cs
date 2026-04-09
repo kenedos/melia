@@ -181,6 +181,9 @@ namespace Melia.Zone.Commands
 			this.Add("killmonsters", "<handle>", "Official GM Command for killing all monster on the map.", this.HandleKillMonsters);
 			this.Add("items", "", "Spawns all the items.", this.HandleGetAllItems);
 			this.Add("dungeon", "<id>", "", this.HandleDungeonMatchMaking);
+			this.Add("equipset", "[set name] [grade=Legend] [refine=15]", "Gives equipment matching set name. No args = Savinose Dysnai.", this.HandleEquipSet);
+			this.Add("allabilities", "", "Learns all abilities for character's jobs at max level.", this.HandleMaxAbilities);
+			this.Add("allskills", "", "Learns all skills for character's jobs at max level.", this.HandleAllSkills);
 
 			// Dev
 			this.Add("test", "", "", this.HandleTest);
@@ -6128,6 +6131,179 @@ namespace Melia.Zone.Commands
 			target.Connection.SelectedLanguage = language;
 
 			sender.ServerMessage(Localization.Get("Changed language to '{0}'."), language);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Gives a full equipment set to the target character.
+		/// Searches item DB by name (StartsWith match). No args = Savinose Dysnai.
+		/// </summary>
+		private CommandResult HandleEquipSet(Character sender, Character target, string message, string command, Arguments args)
+		{
+			var itemDb = ZoneServer.Instance.Data.ItemDb;
+			var grade = ItemGrade.Legend;
+			var refine = 15;
+
+			string[] setNames;
+
+			if (args.IndexedCount == 0)
+			{
+				setNames = new[] { "Savinose Dysnai" };
+			}
+			else
+			{
+				setNames = new[] { args.Get(0) };
+
+				if (args.IndexedCount >= 2)
+				{
+					if (!Enum.TryParse(args.Get(1), true, out grade))
+					{
+						sender.ServerMessage(Localization.Get("Invalid grade. Use: Normal/Magic/Rare/Unique/Legend/Goddess"));
+						return CommandResult.Okay;
+					}
+				}
+
+				if (args.IndexedCount >= 3)
+				{
+					if (!int.TryParse(args.Get(2), out refine) || refine < 0 || refine > 40)
+					{
+						sender.ServerMessage(Localization.Get("Invalid refine level. Use 0-40."));
+						return CommandResult.Okay;
+					}
+				}
+			}
+
+			var itemCount = 0;
+
+			foreach (var setName in setNames)
+			{
+				var matches = itemDb.FindAll(a =>
+					a.Name.StartsWith(setName + " ", StringComparison.OrdinalIgnoreCase)
+					&& !a.Name.Contains("Realization", StringComparison.OrdinalIgnoreCase)
+					&& a.Type == ItemType.Equip
+					&& a.Journal
+					&& (a.Group == ItemGroup.Weapon || a.Group == ItemGroup.SubWeapon || a.Group == ItemGroup.Armor)
+				);
+
+				foreach (var itemData in matches)
+				{
+					var item = new Item(itemData.Id, 1);
+
+					item.Properties.SetFloat(PropertyName.ItemGrade, (int)grade);
+
+					item.Properties.SetFloat(PropertyName.NeedRandomOption, 1);
+					item.GenerateGradeBasedRandomOptions();
+					item.Appraisal();
+
+					if (item.IsRefinable && refine > 0)
+						item.Properties.SetFloat(PropertyName.Reinforce_2, refine);
+
+					target.Inventory.Add(item, InventoryAddType.PickUp);
+					itemCount++;
+				}
+			}
+
+			if (itemCount == 0)
+			{
+				sender.ServerMessage(Localization.Get("No equipment found matching '{0}'."), string.Join(", ", setNames));
+				return CommandResult.Okay;
+			}
+
+			sender.ServerMessage(Localization.Get("Added {0} items ({1}, +{2}, identified)."), itemCount, grade, refine);
+			if (sender != target)
+				target.ServerMessage(Localization.Get("Received {0} items ({1}, +{2}, identified)."), itemCount, grade, refine);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Sets all abilities of all character jobs to their max level.
+		/// </summary>
+		private CommandResult HandleMaxAbilities(Character sender, Character target, string message, string command, Arguments args)
+		{
+			var abilityTreeDb = ZoneServer.Instance.Data.AbilityTreeDb;
+			var jobs = target.Jobs.GetList();
+			var learnedCount = 0;
+
+			foreach (var job in jobs)
+			{
+				var abilities = abilityTreeDb.Find(job.Id);
+
+				foreach (var abilityData in abilities)
+				{
+					if (abilityData.MaxLevel <= 0)
+						continue;
+
+					target.Abilities.Learn(abilityData.AbilityId, abilityData.MaxLevel);
+					learnedCount++;
+				}
+			}
+
+			if (learnedCount > 0)
+			{
+				sender.ServerMessage(Localization.Get("Set {0} abilities to max level."), learnedCount);
+				if (sender != target)
+					target.ServerMessage(Localization.Get("All {0} abilities set to max level."), learnedCount);
+			}
+			else
+			{
+				sender.ServerMessage(Localization.Get("No abilities found for character's jobs."));
+			}
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Learns all skills for character's jobs at max level.
+		/// </summary>
+		private CommandResult HandleAllSkills(Character sender, Character target, string message, string command, Arguments args)
+		{
+			var skillTreeDb = ZoneServer.Instance.Data.SkillTreeDb;
+			var jobs = target.Jobs.GetList();
+			var learnedCount = 0;
+
+			foreach (var job in jobs)
+			{
+				var skills = skillTreeDb.FindSkills(job.Id, job.Level);
+
+				foreach (var skillData in skills)
+				{
+					if (skillData.MaxLevel <= 0)
+						continue;
+
+					if (target.Skills.Has(skillData.SkillId))
+					{
+						var existing = target.Skills.Get(skillData.SkillId);
+						if (existing.LevelByDB < skillData.MaxLevel)
+						{
+							existing.LevelByDB = skillData.MaxLevel;
+							existing.Properties.InvalidateAll();
+							Send.ZC_OBJECT_PROPERTY(target.Connection, existing);
+						}
+					}
+					else
+					{
+						var skill = new Skill(target, skillData.SkillId, skillData.MaxLevel);
+						target.Skills.Add(skill);
+					}
+
+					learnedCount++;
+				}
+			}
+
+			if (learnedCount > 0)
+			{
+				Send.ZC_SKILL_LIST(target);
+
+				sender.ServerMessage(Localization.Get("Set {0} skills to max level."), learnedCount);
+				if (sender != target)
+					target.ServerMessage(Localization.Get("All {0} skills set to max level."), learnedCount);
+			}
+			else
+			{
+				sender.ServerMessage(Localization.Get("No skills found for character's jobs."));
+			}
 
 			return CommandResult.Okay;
 		}
