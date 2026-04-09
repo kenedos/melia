@@ -34,6 +34,7 @@ namespace Melia.Zone.Database
 						var itemUniqueId = reader.GetInt64("itemUniqueId");
 						var itemId = reader.GetInt32("itemId");
 						var amount = reader.GetInt32("amount");
+						var locked = reader.GetBoolean("locked");
 						var equipSlotValue = reader.GetByte("equipSlot");
 
 						if (!ZoneServer.Instance.Data.ItemDb.Contains(itemId))
@@ -43,6 +44,7 @@ namespace Melia.Zone.Database
 						}
 
 						var item = new Item(itemUniqueId, itemId, amount);
+						item.IsLocked = locked;
 
 						// Check if it's a card slot (100-115 maps to card slots 1-15)
 						if (equipSlotValue >= 100 && equipSlotValue <= 115)
@@ -120,6 +122,7 @@ namespace Melia.Zone.Database
 						var itemUniqueId = reader.GetInt64("itemUniqueId");
 						var itemId = reader.GetInt32("itemId");
 						var amount = reader.GetInt32("amount");
+						var locked = reader.GetBoolean("locked");
 						var position = reader.GetInt32("position");
 						if (!ZoneServer.Instance.Data.ItemDb.Contains(itemId))
 						{
@@ -127,6 +130,7 @@ namespace Melia.Zone.Database
 							continue;
 						}
 						var item = new Item(itemUniqueId, itemId, amount);
+						item.IsLocked = locked;
 						if (!this.LoadProperties("item_properties", "itemId", item.DbId, item.Properties))
 						{
 							if (item.Properties.GetFloat(PropertyName.MaxDur) > 0)
