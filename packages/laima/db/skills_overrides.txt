@@ -464,7 +464,7 @@
 { skillId: 21703, className: "Bokor_Tetmamakla", name: "Tet Mamak La", basicSp: 19, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, overheatCount: "0" },
 { skillId: 21704, className: "Bokor_Zombify", name: "Zombify", useType: "MeleeGround", basicSp: 144, basicCast: 4000, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 12000, castInterruptible: true},
 { skillId: 21705, className: "Bokor_Mackangdal", name: "Mackangdal", basicSp: 130, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 12000 },
-{ skillId: 21706, className: "Bokor_BwaKayiman", name: "Bwa Kayiman", basicSp: 100, basicCast: 10000, splashRate: 2, factor: 28, factorByLevel: 2.8, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, enableCastMove: true, castInterruptible: false },
+{ skillId: 21706, className: "Bokor_BwaKayiman", name: "Bwa Kayiman", useType: "MeleeGround", basicSp: 100, basicCast: 10000, splashRate: 2, factor: 28, factorByLevel: 2.8, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, enableCastMove: true, castInterruptible: false },
 { skillId: 21707, className: "Bokor_Samdiveve", name: "Samediveve", basicSp: 132, splashRate: 0, factor: 70, factorByLevel: 14, hitCount: 1, multiHitCount: 10, cooldownTime: 5000 },
 { skillId: 21708, className: "Bokor_Damballa", name: "Damballa", basicSp: 156, basicCast: 0, splashRate: 0, factor: 203, factorByLevel: 20.3, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 21709, className: "Bokor_ZombieCapsule", name: "Zombie Capsule", splashRate: 2, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000 },
@@ -624,7 +624,7 @@
 { skillId: 30505, className: "Wugushi_ThrowGuPot", name: "Poison Pot", basicSp: 46, splashRate: 0, factor: 25, factorByLevel: 2.5, hitCount: 1, multiHitCount: 1, cooldownTime: 11000 },
 { skillId: 30506, className: "Wugushi_JincanGu", name: "Golden Frog", basicSp: 85, splashRate: 0, factor: 92, factorByLevel: 9.2, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
 { skillId: 30507, className: "Wugushi_Zhendu", name: "Zhendu", basicSp: 47, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
-{ skillId: 30508, className: "Wugushi_LatentVenom", name: "Latent Venom", basicSp: 34, splashRate: 0, factor: 39, factorByLevel: 3.9, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "2" },
+{ skillId: 30508, className: "Wugushi_LatentVenom", name: "Latent Venom", basicSp: 34, splashRate: 0, factor: 39, factorByLevel: 3.9, hitCount: 1, multiHitCount: 1, cooldownTime: 4000, overheatCount: "2" },
 { skillId: 30509, className: "Wugushi_WideMiasma", name: "Wide Miasma", basicSp: 39, splashRate: 0, factor: 15, factorByLevel: 1.5, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
 { skillId: 30510, className: "Wugushi_CrescendoBane", name: "Crescendo Bane", basicSp: 38, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 

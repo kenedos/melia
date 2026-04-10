@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Shared.Game.Properties;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.World;
@@ -27,7 +28,7 @@ namespace Melia.Zone.Database
 			{
 				try
 				{
-					using (var cmd = new InsertCommand("INSERT INTO `party` {0}", conn, trans))
+					using (var cmd = new InsertCommand("INSERT INTO `party` {parameters}", conn, trans))
 					{
 						party.DateCreated = DateTime.Now;
 						cmd.Set("name", party.Name);
@@ -41,7 +42,7 @@ namespace Melia.Zone.Database
 						party.DbId = cmd.LastId;
 					}
 
-					using (var cmdUpdateLeader = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
+					using (var cmdUpdateLeader = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn, trans))
 					{
 						cmdUpdateLeader.AddParameter("@characterId", party.LeaderDbId);
 						cmdUpdateLeader.Set("partyId", party.DbId);
@@ -196,7 +197,7 @@ namespace Melia.Zone.Database
 			using (var conn = this.GetConnection())
 			using (var trans = conn.BeginTransaction())
 			{
-				using (var cmd = new UpdateCommand("UPDATE `party` SET {0} WHERE `partyId` = @partyId", conn, trans))
+				using (var cmd = new UpdateCommand("UPDATE `party` SET {parameters} WHERE `partyId` = @partyId", conn, trans))
 				{
 					cmd.AddParameter("@partyId", party.DbId);
 					cmd.Set("name", party.Name);
@@ -223,7 +224,7 @@ namespace Melia.Zone.Database
 				}
 				foreach (var member in party.GetMembers())
 				{
-					using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
+					using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn, trans))
 					{
 						cmd.AddParameter("@characterId", member.DbId);
 						cmd.Set("partyId", 0);
@@ -237,7 +238,7 @@ namespace Melia.Zone.Database
 		public void UpdatePartyId(long dbId, long partyId = 0)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn))
 			{
 				cmd.AddParameter("@characterId", dbId);
 				cmd.Set("partyId", partyId);
@@ -258,7 +259,7 @@ namespace Melia.Zone.Database
 				try
 				{
 					// Insert Guild with Leader Account ID
-					using (var cmd = new InsertCommand("INSERT INTO `guilds` {0}", conn, trans))
+					using (var cmd = new InsertCommand("INSERT INTO `guilds` {parameters}", conn, trans))
 					{
 						guild.DateCreated = DateTime.Now;
 						cmd.Set("name", guild.Name);
@@ -281,7 +282,7 @@ namespace Melia.Zone.Database
 						// Visual link: Update character table so Zone knows to load guild on login
 						// Note: We update ALL characters on this account if you want shared membership, 
 						// but usually creation involves the specific character present.
-						using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn, trans))
+						using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn, trans))
 						{
 							cmd.AddParameter("@characterId", member.DbId);
 							cmd.Set("guildId", guild.DbId);
@@ -296,7 +297,7 @@ namespace Melia.Zone.Database
 								var typeStr = property is FloatProperty ? "f" : "s";
 								var valueStr = property.Serialize();
 
-								using (var cmd = new InsertCommand("INSERT INTO `guild_member_properties` {0}", conn, trans))
+								using (var cmd = new InsertCommand("INSERT INTO `guild_member_properties` {parameters}", conn, trans))
 								{
 									cmd.Set("guildId", guild.DbId);
 									cmd.Set("accountId", member.AccountId);
@@ -330,7 +331,7 @@ namespace Melia.Zone.Database
 			{
 				try
 				{
-					using (var cmd = new UpdateCommand("UPDATE `guilds` SET {0} WHERE `guildId` = @guildId", conn, trans))
+					using (var cmd = new UpdateCommand("UPDATE `guilds` SET {parameters} WHERE `guildId` = @guildId", conn, trans))
 					{
 						cmd.AddParameter("@guildId", guild.DbId);
 						cmd.Set("name", guild.Name);
@@ -510,7 +511,7 @@ namespace Melia.Zone.Database
 						var typeStr = property is FloatProperty ? "f" : "s";
 						var valueStr = property.Serialize();
 
-						using (var cmd = new InsertCommand("INSERT INTO `guild_member_properties` {0}", conn, trans))
+						using (var cmd = new InsertCommand("INSERT INTO `guild_member_properties` {parameters}", conn, trans))
 						{
 							cmd.Set("guildId", guildId);
 							cmd.Set("accountId", member.AccountId);
@@ -544,7 +545,7 @@ namespace Melia.Zone.Database
 		public void UpdateGuildId(long dbId, long guildId = 0)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn))
 			{
 				cmd.AddParameter("@characterId", dbId);
 				cmd.Set("guildId", guildId);
@@ -573,16 +574,16 @@ namespace Melia.Zone.Database
 						cmd.ExecuteNonQuery();
 					}
 
-					using (var cmd = new UpdateCommand("UPDATE characters SET duelWins = duelWins + 1 WHERE characterId = @winnerId", conn, trans))
+					using (var cmd = new MySqlCommand("UPDATE characters SET duelWins = duelWins + 1 WHERE characterId = @winnerId", conn, trans))
 					{
-						cmd.AddParameter("@winnerId", winnerId);
-						cmd.Execute();
+						cmd.Parameters.AddWithValue("@winnerId", winnerId);
+						cmd.ExecuteNonQuery();
 					}
 
-					using (var cmd = new UpdateCommand("UPDATE characters SET duelLosses = duelLosses + 1 WHERE characterId = @loserId", conn, trans))
+					using (var cmd = new MySqlCommand("UPDATE characters SET duelLosses = duelLosses + 1 WHERE characterId = @loserId", conn, trans))
 					{
-						cmd.AddParameter("@loserId", loserId);
-						cmd.Execute();
+						cmd.Parameters.AddWithValue("@loserId", loserId);
+						cmd.ExecuteNonQuery();
 					}
 
 					trans.Commit();

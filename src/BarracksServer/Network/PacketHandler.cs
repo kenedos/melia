@@ -511,7 +511,13 @@ namespace Melia.Barracks.Network
 			// Get zone server info
 			if (!BarracksServer.Instance.ServerList.TryGetZoneServer(character.MapId, channelId, out var zoneServerInfo))
 			{
-				Log.Error("CB_START_GAME: Zone server serving map '{0}' with index '{1}' not found.", character.MapId, channelId);
+				// The client will send this packet with index 0 even if
+				// no channels are available, so we're not going to log an
+				// error.
+
+				//Log.Error("CB_START_GAME: Zone server serving map '{0}' with index '{1}' not found.", character.MapId, channelId);
+				Send.BC_MESSAGE(conn, MsgType.Text, Localization.Get("This channel appears to be offline. Please choose another or try again later."));
+				Send.BC_NORMAL.StartGameFailed(conn);
 				return;
 			}
 
@@ -949,14 +955,36 @@ namespace Melia.Barracks.Network
 		}
 
 		/// <summary>
-		/// Sent upon login, to inform the server about the selected language.
+		/// Sent upon login, to inform the server about the selected
+		/// language.
 		/// </summary>
+		/// <remarks>
+		/// This packet is only sent if the selected language is part of
+		/// the internally supported languages, which are the ones defined
+		/// in the <see cref="Language"/> enum. Other languages can be
+		/// selected, since every language found in "languageData" is
+		/// displayed as an option, but they will not trigger this packet
+		/// or CZ_SELECTED_LANGUAGE. This includes Chinese, which doesn't
+		/// appear to send it either, and Korean, which is filtered out
+		/// as an option on the client-side.
+		/// 
+		/// To support languages that the client doesn't handle normally,
+		/// use the command >language.
+		/// </remarks>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
 		[PacketHandler(Op.CB_SELECTED_LANGUAGE)]
 		public void CB_SELECTED_LANGUAGE(IBarracksConnection conn, Packet packet)
 		{
-			var language = packet.GetShort();
+			var language = (Language)packet.GetShort();
+
+			if (!Enum.IsDefined(typeof(Language), language))
+			{
+				Log.Warning("CB_SELECTED_LANGUAGE: Invalid language '{0}' received from '{1}'.", language, conn.Account.Name);
+				return;
+			}
+
+			conn.Account.Language = language.ToString();
 		}
 
 		/// <summary>
@@ -1140,6 +1168,21 @@ namespace Melia.Barracks.Network
 		{
 			var len = packet.GetShort();
 			var msg = packet.GetString();
+		}
+
+		/// <summary>
+		/// Request for latest barracks and character data. Sent when
+		/// selecting a different language.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CB_RELOAD_BARRACK_CAHR_INFO)]
+		public void CB_RELOAD_BARRACK_CAHR_INFO(IBarracksConnection conn, Packet packet)
+		{
+			Send.BC_NORMAL.SetBarrack(conn, conn.Account.SelectedBarrack);
+			Send.BC_COMMANDER_LIST(conn);
+			Send.BC_NORMAL.CharacterInfo(conn);
+			Send.BC_NORMAL.TeamUI(conn);
 		}
 	}
 }

@@ -56,6 +56,27 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// Creates new square that starts at origin and extends in
 		/// direction by the given height.
 		/// </summary>
+		/// <remarks>
+		/// This constructor and <see cref="Square.Centered"/> create a
+		/// square that extends from a certain position, with the width
+		/// acting like a radius, extending side by side, while the height
+		/// is the actual height of the square.
+		///
+		/// For example, using the character as the origin, with their
+		/// view direction, a width of 50, and a height of 100, the
+		/// resulting rectangle would extend 50 units to either side of
+		/// the character, for a total of 100, and the other end of the
+		/// rectangle would be found 100 units in the direction they're
+		/// facing, creating a 100x100 square directly in front of the
+		/// character.
+		///
+		/// This is the way the square splash area typically works in this
+		/// game and allows to directly use known parameters for this
+		/// class.
+		///
+		/// For a more traditional interpretation of a square around an
+		/// origin, use <see cref="Square.Simple"/>.
+		/// </remarks>
 		/// <param name="originPos"></param>
 		/// <param name="direction"></param>
 		/// <param name="height"></param>
@@ -123,11 +144,25 @@ namespace Melia.Zone.Skills.SplashAreas
 		}
 
 		/// <summary>
-		/// Returns the axis-aligned bounding box that contains the shape.
+		/// Returns a square centered around the given position and
+		/// extending by the actual amounts of height and width, unlike
+		/// <see cref="Square.Centered"/>.
 		/// </summary>
+		/// <param name="centerPos"></param>
+		/// <param name="direction"></param>
+		/// <param name="height"></param>
+		/// <param name="width"></param>
 		/// <returns></returns>
-		public BoundingBoxF GetBounds()
-			=> BoundingBoxF.FromPoints(this.GetEdgePoints());
+		public static Square Simple(Position centerPos, Direction direction, float height, float width)
+		{
+			var halfHeight = height / 2f;
+			var halfWidth = width / 2f;
+
+			var originPos = centerPos.GetRelative2D(direction, -halfHeight);
+			var farSidePos = centerPos.GetRelative2D(direction, halfHeight);
+
+			return new Square(originPos, direction, height, halfWidth);
+		}
 
 		/// <summary>
 		/// Returns the square's four corner points.
@@ -142,6 +177,13 @@ namespace Melia.Zone.Skills.SplashAreas
 		/// <returns></returns>
 		public OutlineF[] GetOutlines()
 			=> _base.GetOutlines();
+
+		/// <summary>
+		/// Returns the axis-aligned bounding box that contains the shape.
+		/// </summary>
+		/// <returns></returns>
+		public BoundingBoxF GetBounds()
+			=> _base.GetBounds();
 
 		/// <summary>
 		/// Returns a random point inside the square.

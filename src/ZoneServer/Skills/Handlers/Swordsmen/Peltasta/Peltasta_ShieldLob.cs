@@ -82,7 +82,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			//if (creator.Map.IsPvp)
 			//	pad.Trigger.ActorMaxCount = 4;
 
-			var shieldMonster = pad.CreateMonster(57001, RelationType.Friendly);
+			var shieldMonster = pad.CreateMonster(57001, FactionType.Peaceful);
 			shieldMonster.AttachEffect("I_light004_violet", 1.5f);
 			pad.Map.AddMonster(shieldMonster);
 

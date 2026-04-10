@@ -315,7 +315,8 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
-		/// Adds new NPC to the world.
+		/// Adds new NPC to the world. May return null if the map isn't
+		/// served by the server.
 		/// </summary>
 		/// <param name="monsterId"></param>
 		/// <param name="name"></param>

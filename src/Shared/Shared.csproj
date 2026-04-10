@@ -20,10 +20,12 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ExecTails.NetText" Version="1.0.1" />
-    <PackageReference Include="ExecTails.Yggdrasil" Version="1.7.0" />
+    <PackageReference Include="ExecTails.Yggdrasil" Version="1.7.4" />
     <PackageReference Include="ExecTails.Yggdrasil.Data.JSON" Version="1.0.1" />
+    <PackageReference Include="ExecTails.Yggdrasil.Db.MySql" Version="1.1.2" />
     <PackageReference Include="ExecTails.Yggdrasil.Scripting" Version="1.0.1" />
-    <PackageReference Include="MySqlConnector" Version="2.4.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="10.0.5" />
+    <PackageReference Include="MySqlConnector" Version="2.5.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 </Project>

@@ -11,9 +11,9 @@ namespace Melia.Zone.World.Actors.Monsters
 	public interface IMonster : ISubActor, IMonsterAppearance, IMonsterAppearanceBase, ISpawn
 	{
 		/// <summary>
-		/// Returns the monster's type.
+		/// Gets or sets what kind of "monster" the mob is.
 		/// </summary>
-		RelationType MonsterType { get; }
+		RelationType MonsterType { get; set; }
 
 		/// <summary>
 		/// Returns the monster's race.
@@ -39,7 +39,15 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// </summary>
 		int Hp { get; }
 
+		/// <summary>
+		/// Returns the monster's current shield.
+		/// </summary>
 		int Shield { get; }
+
+		/// <summary>
+		/// Returns the monster's max shield.
+		/// </summary>
+		int MaxShield { get; }
 
 		/// <summary>
 		/// Returns a reference to the monster's properties.

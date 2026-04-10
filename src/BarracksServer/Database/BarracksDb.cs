@@ -5,6 +5,7 @@ using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using MySqlConnector;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Yggdrasil.Logging;
 using Yggdrasil.Security.Hashing;
 using Yggdrasil.Util;
@@ -62,7 +63,7 @@ namespace Melia.Barracks.Database
 						cmd.ExecuteNonQuery();
 
 					// Log update
-					using (var cmd = new InsertCommand("INSERT INTO `updates` {0}", conn))
+					using (var cmd = new InsertCommand("INSERT INTO `updates` {parameters}", conn))
 					{
 						cmd.Set("path", updateName);
 						cmd.Execute();
@@ -89,7 +90,7 @@ namespace Melia.Barracks.Database
 				throw new ArgumentNullException(nameof(account));
 
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `accountId` = @accountId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `accountId` = @accountId", conn))
 			{
 				cmd.AddParameter("@accountId", account.Id);
 				cmd.Set("teamName", account.TeamName);
@@ -102,6 +103,7 @@ namespace Melia.Barracks.Database
 				cmd.Set("barracksThema", account.SelectedBarrack);
 				cmd.Set("themas", string.Join(" ", account.Themas));
 				cmd.Set("selectedSlot", account.SelectedCharacterSlot);
+				cmd.Set("language", account.Language);
 
 				return cmd.Execute() > 0;
 			}
@@ -138,6 +140,7 @@ namespace Melia.Barracks.Database
 					account.TeamExp = reader.GetInt32("teamExp");
 					account.SelectedBarrack = reader.GetInt32("barracksThema");
 					account.SelectedCharacterSlot = reader.GetInt32("selectedSlot");
+					account.Language = reader.GetStringSafe("language");
 
 					var themas = reader.GetStringSafe("themas");
 					account.Themas.Clear();
@@ -170,7 +173,7 @@ namespace Melia.Barracks.Database
 			using (var conn = this.GetConnection())
 			using (var trans = conn.BeginTransaction())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `characters` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `characters` {parameters}", conn, trans))
 				{
 					cmd.Set("accountId", accountId);
 					cmd.Set("name", character.Name);
@@ -215,7 +218,7 @@ namespace Melia.Barracks.Database
 				{
 					var newId = 0L;
 
-					using (var cmd = new InsertCommand("INSERT INTO `items` {0}", conn))
+					using (var cmd = new InsertCommand("INSERT INTO `items` {parameters}", conn))
 					{
 						cmd.Set("itemId", item.Id);
 						cmd.Set("amount", 1);
@@ -225,7 +228,7 @@ namespace Melia.Barracks.Database
 						newId = cmd.LastId;
 					}
 
-					using (var cmd = new InsertCommand("INSERT INTO `inventory` {0}", conn))
+					using (var cmd = new InsertCommand("INSERT INTO `inventory` {parameters}", conn))
 					{
 						cmd.Set("characterId", character.DbId);
 						cmd.Set("itemId", newId);
@@ -237,7 +240,7 @@ namespace Melia.Barracks.Database
 				}
 
 				// Job
-				using (var cmd = new InsertCommand("INSERT INTO `jobs` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `jobs` {parameters}", conn, trans))
 				{
 					cmd.Set("characterId", character.DbId);
 					cmd.Set("jobId", character.JobId);
@@ -274,7 +277,7 @@ namespace Melia.Barracks.Database
 		public void SaveCharacter(Character character)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `characterId` = @characterId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `characterId` = @characterId", conn))
 			{
 				cmd.AddParameter("@characterId", character.DbId);
 				cmd.Set("teamName", character.TeamName);
@@ -402,7 +405,7 @@ namespace Melia.Barracks.Database
 		public bool ChangeAuth(string accountName, int level)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {0} WHERE `name` = @accountName", conn))
+			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `name` = @accountName", conn))
 			{
 				cmd.AddParameter("@accountName", accountName);
 				cmd.Set("authority", level);
@@ -527,7 +530,7 @@ namespace Melia.Barracks.Database
 			{
 				foreach (var mail in account.Mailbox.GetMessages())
 				{
-					using (var cmd = new UpdateCommand("UPDATE `mail` SET {0} WHERE `mailId` = @mailId", conn, trans))
+					using (var cmd = new UpdateCommand("UPDATE `mail` SET {parameters} WHERE `mailId` = @mailId", conn, trans))
 					{
 						cmd.AddParameter("@mailId", mail.Id);
 						cmd.Set("accountId", account.Id);
@@ -544,7 +547,7 @@ namespace Melia.Barracks.Database
 
 					foreach (var item in mail.GetItems())
 					{
-						using (var cmd = new UpdateCommand("UPDATE `mail_items` SET {0} WHERE `mailItemId` = @mailItemId", conn, trans))
+						using (var cmd = new UpdateCommand("UPDATE `mail_items` SET {parameters} WHERE `mailItemId` = @mailItemId", conn, trans))
 						{
 							cmd.AddParameter("@mailItemId", item.DbId);
 							cmd.Set("mailId", mail.Id);
@@ -572,7 +575,7 @@ namespace Melia.Barracks.Database
 		public bool UpdateCharacterName(long accountId, string oldName, string newName)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `characters` SET {0} WHERE `accountId` = @accountId AND `name` = @oldName", conn))
+			using (var cmd = new UpdateCommand("UPDATE `characters` SET {parameters} WHERE `accountId` = @accountId AND `name` = @oldName", conn))
 			{
 				cmd.AddParameter("@accountId", accountId);
 				cmd.AddParameter("@oldName", oldName);
@@ -672,7 +675,7 @@ namespace Melia.Barracks.Database
 			using (var conn = this.GetConnection())
 			using (var trans = conn.BeginTransaction())
 			{
-				using (var cmd = new UpdateCommand("UPDATE `companions` SET {0} WHERE `companionId` = @companionId", conn, trans))
+				using (var cmd = new UpdateCommand("UPDATE `companions` SET {parameters} WHERE `companionId` = @companionId", conn, trans))
 				{
 					cmd.AddParameter("@companionId", companionId);
 					if (characterId > 0)
@@ -709,7 +712,7 @@ namespace Melia.Barracks.Database
 		public void SaveCompanion(Companion companion)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `companions` SET {0} WHERE `companionId` = @companionId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `companions` SET {parameters} WHERE `companionId` = @companionId", conn))
 			{
 				cmd.AddParameter("@companionId", companion.DbId);
 				if (companion.CharacterDbId > 0)
@@ -739,7 +742,7 @@ namespace Melia.Barracks.Database
 			using (var conn = this.GetConnection())
 			using (var trans = conn.BeginTransaction())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `inventory` {0}", conn))
+				using (var cmd = new InsertCommand("INSERT INTO `inventory` {parameters}", conn))
 				{
 					cmd.Set("characterId", character.DbId);
 					cmd.Set("itemId", itemId);

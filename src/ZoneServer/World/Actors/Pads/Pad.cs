@@ -413,11 +413,11 @@ namespace Melia.Zone.World.Actors.Pads
 		/// is destroyed.
 		/// </summary>
 		/// <param name="monsterId"></param>
-		/// <param name="type"></param>
+		/// <param name="faction"></param>
 		/// <returns></returns>
-		public Mob SpawnMonster(int monsterId, RelationType type)
+		public Mob SpawnMonster(int monsterId, FactionType faction)
 		{
-			var monster = this.CreateMonster(monsterId, type);
+			var monster = this.CreateMonster(monsterId, faction);
 			this.Map.AddMonster(monster);
 
 			return monster;
@@ -429,14 +429,15 @@ namespace Melia.Zone.World.Actors.Pads
 		/// automatically removed when the pad is destroyed.
 		/// </summary>
 		/// <param name="monsterId"></param>
-		/// <param name="type"></param>
+		/// <param name="faction"></param>
 		/// <returns></returns>
-		public Mob CreateMonster(int monsterId, RelationType type)
+		public Mob CreateMonster(int monsterId, FactionType faction)
 		{
-			var monster = new Mob(monsterId, type);
-			monster.Components.Add(new MovementComponent(monster));
+			var monster = new Mob(monsterId);
+			monster.Faction = faction;
 			monster.Position = this.Position;
 			monster.Direction = this.Direction;
+			monster.Components.Add(new MovementComponent(monster));
 
 			this.AssociateMonster(monster);
 

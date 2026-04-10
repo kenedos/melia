@@ -35,6 +35,12 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 			if (caster is not Character character)
 				return;
 
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
 			if (!caster.TryGetBuff(BuffId.PowerOfDarkness_Buff, out var darkForceBuff) || darkForceBuff.OverbuffCounter < 10)
 			{
 				caster.ServerMessage(Localization.Get("Requires at least 10 stacks of Dark Force."));
@@ -43,6 +49,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 
 			darkForceBuff.OverbuffCounter -= 10;
 			darkForceBuff.NotifyUpdate();
+
+			skill.IncreaseOverheat();
 
 			var summons = character.Summons.GetSummons();
 			if (summons.Count == 0)
@@ -106,19 +114,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 				summon.Vars.Remove("BwaKayiman_CurrentAngle");
 			}
 		}
-
+		
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			if (caster is not Character character)
-				return;
-
-			if (!caster.TrySpendSp(skill))
-			{
-				caster.ServerMessage(Localization.Get("Not enough SP."));
-				return;
-			}
-
-			skill.IncreaseOverheat();
+			
 		}
 
 		private async Task UpdateSummonPositions(Skill skill, ICombatEntity caster)

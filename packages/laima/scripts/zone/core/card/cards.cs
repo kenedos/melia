@@ -223,6 +223,29 @@ public class CardFunctionsScript : GeneralScript
 	}
 
 	[ScriptableFunction]
+	public static void SCR_CARDEFFECT_CRIT_DAMAGE_RATE(Character character, ICombatEntity target, Item item, float TypeValue, string arg1, string arg2, string arg3)
+	{
+		if (TypeValue <= 0)
+		{
+			ItemHookRegistry.Instance.UnregisterItem(character, item.ObjectId);
+			return;
+		}
+
+		var coefficient = arg3 == "None" ? 1 : float.Parse(arg3);
+
+		ItemHookRegistry.Instance.RegisterHook(character, item, ItemHookType.AttackBeforeCalc,
+			(itm, attacker, tgt, skill, modifier, skillHitResult) =>
+			{
+				var (totalStarLevel, isTrigger) = ItemHookHelper.GetCombinedCardStarLevel(character, item);
+				if (!isTrigger)
+					return;
+
+				var bonus = (coefficient * totalStarLevel) / 100f;
+				modifier.CritDamageMultiplier += bonus;
+			});
+	}
+
+	[ScriptableFunction]
 	public static void SCR_CARDEFFECT_ADD_BUFF_PC_PLUS(Character character, ICombatEntity target, Item item, float TypeValue, string buffName, string buffArg2, string arg3)
 	{
 		if (TypeValue <= 0)

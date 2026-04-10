@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Storages;
@@ -191,7 +192,7 @@ namespace Melia.Zone.Database
 		public bool ModifyItemAmount(long itemUniqueId, int amount)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `items` SET {0} WHERE `itemUniqueId` = @itemUniqueId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `items` SET {parameters} WHERE `itemUniqueId` = @itemUniqueId", conn))
 			{
 				cmd.AddParameter("@itemUniqueId", itemUniqueId);
 				cmd.Set("amount", amount);

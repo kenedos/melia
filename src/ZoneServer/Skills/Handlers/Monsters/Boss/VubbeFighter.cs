@@ -41,8 +41,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 0, angle: 120f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var hitDelay = 2000;
-			var aniTime = 2000;
+			var hitDelay = 2200;
+			var aniTime = 2500;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 100, -1, hits);
@@ -76,8 +76,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 50);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 2600;
-			var aniTime = 2600;
+			var hitDelay = 2900;
+			var aniTime = 3200;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 100, -1, hits);
@@ -111,8 +111,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await skill.Wait(TimeSpan.FromMilliseconds(4100));
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 50);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 200;
-			var aniTime = 200;
+			var hitDelay = 1000;
+			var aniTime = 1000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 100, -1, hits);
@@ -156,8 +156,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 50);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 0;
-			aniTime = 0;
+			hitDelay = 1000;
+			aniTime = 1000;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 100, -1, hits);
@@ -186,8 +186,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 50);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 0;
-			aniTime = 0;
+			hitDelay = 1000;
+			aniTime = 1000;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			position = originPos.GetNearestPositionWithinDistance(target.Position, 150f);

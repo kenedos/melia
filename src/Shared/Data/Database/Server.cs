@@ -23,7 +23,7 @@ namespace Melia.Shared.Data.Database
 		public int Id { get; set; }
 		public string Ip { get; set; }
 		public int Port { get; set; }
-		public string InterIp { get; set; }
+		public string InterHost { get; set; }
 		public int InterPort { get; set; }
 		public int[] MapIds { get; set; }
 
@@ -73,8 +73,8 @@ namespace Melia.Shared.Data.Database
 				serverData.Id = serverEntry.ReadInt("id");
 				serverData.Ip = serverEntry.ReadString("ip", "127.0.0.1");
 				serverData.Port = serverEntry.ReadInt("port");
-				serverData.InterIp = serverEntry.ReadString("interIp", "127.0.0.1");
-				serverData.InterPort = serverEntry.ReadInt("interPort", 6001);
+				serverData.InterHost = serverEntry.ReadString("interHost", null);
+				serverData.InterPort = serverEntry.ReadInt("interPort", 0);
 
 				if (serverData.Type == ServerType.Zone)
 				{
@@ -82,7 +82,34 @@ namespace Melia.Shared.Data.Database
 
 					if (serverEntry["maps"].Type == JTokenType.Array)
 					{
-						serverData.MapIds = serverEntry.ReadArray<int>("maps");
+						var mapList = new List<int>();
+
+						foreach (var map in serverEntry["maps"])
+						{
+							var mapId = -1;
+
+							if (map.Type == JTokenType.Integer)
+							{
+								mapId = (int)map;
+							}
+							else if (map.Type == JTokenType.String)
+							{
+								var mapClassName = (string)map;
+
+								if (!_mapDb.TryFind(mapClassName, out var mapData))
+									throw new DatabaseErrorException($"Map with classname {mapClassName} not found for {serverData.Type}:{serverData.Id}.");
+
+								mapId = mapData.Id;
+							}
+							else
+							{
+								throw new DatabaseErrorException($"Invalid map id found on {serverData.Type}:{serverData.Id}. Expected string or integer.");
+							}
+
+							mapList.Add(mapId);
+						}
+
+						serverData.MapIds = mapList.ToArray();
 					}
 					else if ((string)serverEntry["maps"] == "all")
 					{

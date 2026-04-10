@@ -174,7 +174,7 @@ public class CombatCalculationsScript : GeneralScript
 		var SCR_HitCountMultiplier = ScriptableFunctions.Combat.Get("SCR_HitCountMultiplier");
 		var SCR_SizeTypeBonus = ScriptableFunctions.Combat.Get("SCR_SizeTypeBonus");
 		var SCR_AttributeMultiplier = ScriptableFunctions.Combat.Get("SCR_AttributeMultiplier");
-		var SCR_AttributeResistanceMultiplier = ScriptableFunctions.Combat.Get("SCR_AttributeResistanceMultiplier");
+		var SCR_AttributeResistance = ScriptableFunctions.Combat.Get("SCR_AttributeResistance");
 		var SCR_AttackTypeMultiplier = ScriptableFunctions.Combat.Get("SCR_AttackTypeMultiplier");
 		var SCR_RaceMultiplier = ScriptableFunctions.Combat.Get("SCR_RaceMultiplier");
 		var SCR_Combat_BeforeCalc = ScriptableFunctions.Combat.Get("SCR_Combat_BeforeCalc");
@@ -287,11 +287,8 @@ public class CombatCalculationsScript : GeneralScript
 		}
 
 		// Removed in Laima
-		// var attrResistanceMultiplier = SCR_AttributeResistanceMultiplier(attacker, target, skill, modifier, skillHitResult);
-		// if (attrResistanceMultiplier != 1)
-		// {
-		// 	skillHitResult.Damage *= attrResistanceMultiplier;
-		// }
+		// var attributeDefense = SCR_AttributeResistance(attacker, target, skill, modifier, skillHitResult);
+		// def += attributeDefense;
 
 		var atkTypeMultiplier = SCR_AttackTypeMultiplier(attacker, target, skill, modifier, skillHitResult);
 		if (atkTypeMultiplier != 1)
@@ -368,6 +365,11 @@ public class CombatCalculationsScript : GeneralScript
 			else if (targetMob.Properties.TryGetFloat(PropertyName.HPCount, out _) && skillHitResult.Damage > 0)
 				skillHitResult.Damage = 1;
 		}
+
+		var minCap = 0;
+		var maxCap = ZoneServer.Instance.Conf.World.MaxDamageCap;
+
+		skillHitResult.Damage = Math2.Clamp(minCap, maxCap, skillHitResult.Damage);
 
 		return (int)skillHitResult.Damage;
 	}
@@ -764,39 +766,41 @@ public class CombatCalculationsScript : GeneralScript
 		{
 			if (attackerAttr == AttributeType.Fire)
 			{
-				if (targetAttr == AttributeType.Earth) return 1.75f;
-				if (targetAttr == AttributeType.Fire) return 0.25f;
+				if (targetAttr == AttributeType.Earth) return 1.50f;
+				if (targetAttr == AttributeType.Fire) return 0.50f;
 			}
 			else if (attackerAttr == AttributeType.Ice)
 			{
-				if (targetAttr == AttributeType.Fire) return 1.75f;
-				if (targetAttr == AttributeType.Ice) return 0.25f;
+				if (targetAttr == AttributeType.Fire) return 1.50f;
+				if (targetAttr == AttributeType.Ice) return 0.50f;
 			}
 			else if (attackerAttr == AttributeType.Lightning)
 			{
-				if (targetAttr == AttributeType.Ice) return 2f;
-				if (targetAttr == AttributeType.Lightning) return 0.25f;
-				if (targetAttr == AttributeType.Earth) return 0.5f;
+				if (targetAttr == AttributeType.Ice) return 1.75f;
+				if (targetAttr == AttributeType.Lightning) return 0.50f;
+				if (targetAttr == AttributeType.Earth) return 0.75f;
 			}
 			else if (attackerAttr == AttributeType.Earth)
 			{
-				if (targetAttr == AttributeType.Lightning) return 1.75f;
-				if (targetAttr == AttributeType.Earth) return 0.25f;
+				if (targetAttr == AttributeType.Lightning) return 1.50f;
+				if (targetAttr == AttributeType.Earth) return 0.50f;
 			}
 			else if (attackerAttr == AttributeType.Poison)
 			{
-				if (targetAttr == AttributeType.Earth) return 1.75f;
-				if (targetAttr == AttributeType.Poison) return 0.25f;
+				if (targetAttr == AttributeType.Earth) return 1.50f;
+				if (targetAttr == AttributeType.Poison) return 0.50f;
 			}
 			else if (attackerAttr == AttributeType.Holy)
 			{
-				if (targetAttr == AttributeType.Dark) return 2f;
-				if (targetAttr == AttributeType.Holy) return 0.25f;
+				if (targetAttr == AttributeType.Dark) return 1.50f;
 			}
 			else if (attackerAttr == AttributeType.Dark)
 			{
-				if (targetAttr == AttributeType.Holy) return 2f;
-				if (targetAttr == AttributeType.Dark) return 0.25f;
+				if (targetAttr == AttributeType.Holy) return 1.50f;
+			}
+			else if (attackerAttr == AttributeType.Soul)
+			{
+				if (targetAttr == AttributeType.Soul) return 1.50f;
 			}
 		}
 
@@ -804,8 +808,8 @@ public class CombatCalculationsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Returns a damage multiplier for the skill used on the target,
-	/// based on its attribute resistance.
+	/// Returns a flat defense bonus the target may have against the
+	/// attack's attribute.
 	/// </summary>
 	/// <param name="attacker"></param>
 	/// <param name="target"></param>
@@ -813,10 +817,10 @@ public class CombatCalculationsScript : GeneralScript
 	/// <param name="skillHitResult"></param>
 	/// <returns></returns>
 	[ScriptableFunction]
-	public float SCR_AttributeResistanceMultiplier(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+	public float SCR_AttributeResistance(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 	{
 		if (skill.Data.ClassType != SkillClassType.Magic)
-			return 1;
+			return 0;
 
 		var attackerAttr = skill.Data.Attribute;
 
@@ -889,7 +893,7 @@ public class CombatCalculationsScript : GeneralScript
 		if (monsterPropertyName != null)
 			resistance += target.Properties.GetFloat(monsterPropertyName);
 
-		return 1 - (resistance / 100f);
+		return resistance;
 	}
 
 	/// <summary>

@@ -17,13 +17,12 @@ namespace Melia.Zone.Network
 		/// <param name="character"></param>
 		public static void ZC_HOUSING_READY_GRID(Character character)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_READY_GRID);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_READY_GRID);
 
 			packet.PutInt(0);
 			packet.PutInt(0);
 
 			character.Connection.Send(packet);
-			Packet.Return(packet);
 		}
 
 
@@ -34,12 +33,11 @@ namespace Melia.Zone.Network
 		/// <param name="furnitureId"></param>
 		public static void ZC_HOUSING_START_ARRANGEMENT_FURNITURE(Character character, int furnitureId)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_START_ARRANGEMENT_FURNITURE);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_START_ARRANGEMENT_FURNITURE);
 
 			packet.PutInt(furnitureId);
 
 			character.Connection.Send(packet);
-			Packet.Return(packet);
 		}
 
 		// Removed: ZC_HOUSING_READY_ARRANGED_FURNITURE referenced PersonalHouse and Prop
@@ -51,7 +49,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_ANSWER_REMOVE_FURNITURE(IMonster furniture, int furnitureId)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_REMOVE_FURNITURE);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_ANSWER_REMOVE_FURNITURE);
 
 			packet.PutInt(furnitureId);
 			packet.PutInt(furniture.Handle);
@@ -65,7 +63,7 @@ namespace Melia.Zone.Network
 		/// <param name="conn"></param>
 		public static void ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST(Character character)
 		{
-			var packet = Packet.Borrow(Op.ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST);
+			using var packet = Packet.Rent(Op.ZC_PERSONAL_HOUSING_ANSWER_GROUP_LIST);
 
 			var count = 3;
 			packet.PutInt(count); // Count
@@ -89,7 +87,6 @@ namespace Melia.Zone.Network
 			}
 
 			character.Connection.Send(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -100,13 +97,12 @@ namespace Melia.Zone.Network
 		/// <param name="furnitureHandle"></param>
 		public static void ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE(Character character, int furnitureId, int furnitureHandle)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_ANSWER_ENABLE_MOVE_FURNITURE);
 
 			packet.PutInt(furnitureId);
 			packet.PutInt(furnitureHandle);
 
 			character.Connection.Send(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -116,7 +112,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_CREATE_BG_FURNITURE(Character character, IMonster furniture)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 			packet.PutInt(furniture.Id);
@@ -124,7 +120,6 @@ namespace Melia.Zone.Network
 			packet.PutByte((byte)furniture.Direction.ToCardinalDirection());
 
 			character.Connection.Send(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -133,7 +128,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_CREATE_BG_FURNITURE(IMonster furniture)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_CREATE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 			packet.PutInt(furniture.Id);
@@ -149,7 +144,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_MOVE_BG_FURNITURE(IMonster furniture)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_MOVE_BG_FURNITURE);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_MOVE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 			packet.PutPosition(furniture.Position);
@@ -164,7 +159,7 @@ namespace Melia.Zone.Network
 		/// <param name="furniture"></param>
 		public static void ZC_HOUSING_REMOVE_BG_FURNITURE(IMonster furniture)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_REMOVE_BG_FURNITURE);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_REMOVE_BG_FURNITURE);
 
 			packet.PutInt(furniture.Handle);
 
@@ -180,7 +175,7 @@ namespace Melia.Zone.Network
 		/// <param name="guildLevel"></param>
 		public static void ZC_HOUSING_ANSWER_GUILD_AGIT_INFO(IZoneConnection conn, long guildId, int guildMapId, int guildLevel)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
 
 			packet.PutLong(guildId);
 			packet.PutInt(guildMapId);
@@ -188,7 +183,6 @@ namespace Melia.Zone.Network
 			packet.PutEmptyBin(128);
 
 			conn.Send(packet);
-			Packet.Return(packet);
 		}
 
 		/// <summary>
@@ -200,7 +194,7 @@ namespace Melia.Zone.Network
 		/// <param name="guildMapId"></param>
 		public static void ZC_HOUSING_ANSWER_PREVIEW(IZoneConnection conn, long guildId, int guildMapId)
 		{
-			var packet = Packet.Borrow(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
+			using var packet = Packet.Rent(Op.ZC_HOUSING_ANSWER_GUILD_AGIT_INFO);
 			var count = 0;
 
 			packet.PutLong(guildId);
@@ -217,7 +211,6 @@ namespace Melia.Zone.Network
 			}
 
 			conn.Send(packet);
-			Packet.Return(packet);
 		}
 	}
 }

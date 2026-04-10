@@ -4,11 +4,15 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
+using CodingSeb.ExpressionEvaluator;
 using Melia.Shared.Configuration;
 using Melia.Shared.Data;
 using Melia.Shared.Data.Database;
@@ -202,7 +206,7 @@ namespace Melia.Shared
 			// US english.
 			if (!this.MultiLocalization.Contains(serverLanguage))
 			{
-				if (serverLanguage != "en-US")
+				if (serverLanguage != "English")
 					Log.Warning("Localization file '{0}.po' not found.", serverLanguage);
 			}
 			else
@@ -221,7 +225,7 @@ namespace Melia.Shared
 			try
 			{
 				Log.Info("Initializing database...");
-				db.Init(conf.Database.Host, conf.Database.User, conf.Database.Pass, conf.Database.Db);
+				db.Init(conf.Database.Host, conf.Database.Port, conf.Database.User, conf.Database.Pass, conf.Database.Db);
 			}
 			catch (Exception ex)
 			{
@@ -347,11 +351,13 @@ namespace Melia.Shared
 				else if (serverType == ServerType.Social)
 				{
 					this.LoadDb(this.Data.PropertiesDb, "db/properties.txt");
+					this.LoadDb(this.Data.MapDb, "db/maps.txt");
 					this.LoadDb(this.Data.ServerDb, "db/servers.txt");
 					this.LoadDb(this.Data.SystemMessageDb, "db/system_messages.txt");
 				}
 				else if (serverType == ServerType.Web)
 				{
+					this.LoadDb(this.Data.MapDb, "db/maps.txt");
 					this.LoadDb(this.Data.ServerDb, "db/servers.txt");
 					this.LoadDb(this.Data.InvBaseIdDb, "db/invbaseids.txt");
 					this.LoadDb(this.Data.ItemDb, "db/items.txt");
@@ -436,7 +442,6 @@ namespace Melia.Shared
 
 					this.Data.MonsterDb.BuildIndexes();
 				}
-
 			}
 			catch (DatabaseErrorException ex)
 			{
@@ -833,6 +838,45 @@ namespace Melia.Shared
 		protected void LoadServerList(ServerDb serverDb, ServerType serverType, int groupId, int serverId)
 		{
 			Log.Info("Loading server list...");
+
+			// Resolve host names
+			foreach (var serverData in this.Data.ServerDb.Entries.Values.SelectMany(a => a.Servers))
+			{
+				var host = serverData.Ip;
+				var ipResult = IpAddressUtil.TryResolve(host, out var ip);
+				switch (ipResult)
+				{
+					case ResolveResult.Resolved:
+						serverData.Ip = ip;
+						Log.Info("  resolved hostname '{0}' for '{1}:{2}' to '{3}'.", host, serverData.Type, serverData.Id, ip);
+						break;
+					case ResolveResult.Fail:
+						Log.Warning("  failed to resolve hostname '{0}' for '{1}:{2}'.", host, serverData.Type, serverData.Id);
+						break;
+					case ResolveResult.Error:
+						Log.Warning("  failed to resolve hostname '{0}' for '{1}:{2}'.", host, serverData.Type, serverData.Id);
+						break;
+				}
+
+				if (string.IsNullOrWhiteSpace(serverData.InterHost))
+					continue;
+
+				var interHost = serverData.InterHost;
+				var interResult = IpAddressUtil.TryResolve(interHost, out var interIp);
+				switch (interResult)
+				{
+					case ResolveResult.Resolved:
+						serverData.InterHost = interIp;
+						Log.Info("  resolved hostname '{0}' for '{1}:{2}' to '{3}'.", interHost, serverData.Type, serverData.Id, interIp);
+						break;
+					case ResolveResult.Fail:
+						Log.Warning("  failed to resolve hostname '{0}' for '{1}:{2}'.", interHost, serverData.Type, serverData.Id);
+						break;
+					case ResolveResult.Error:
+						Log.Warning("  failed to resolve hostname '{0}' for '{1}:{2}'.", interHost, serverData.Type, serverData.Id);
+						break;
+				}
+			}
 
 			this.ServerList.Load(serverDb, groupId);
 			this.ServerInfo = this.GetServerInfo(serverType, serverId);

@@ -1578,8 +1578,7 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			// Enemies usually can't be talked to unless specific scripts enable it.
-			if (monster.MonsterType == RelationType.Enemy)
+			if (monster is Mob)
 			{
 				// Optional: Check if the enemy specifically has a DialogComponent enabled
 				// For now, adhere to standard logic:
@@ -1620,6 +1619,12 @@ namespace Melia.Zone.Network
 			if (conn.CurrentDialog == null)
 			{
 				Log.Debug("CZ_DIALOG_SELECT: User '{0}' is not in a dialog.", conn.Account.Name);
+				return;
+			}
+
+			if (conn.CurrentDialog.State != DialogState.Waiting)
+			{
+				Log.Debug("CZ_DIALOG_SELECT: User '{0}' is not currently selecting an option.", conn.Account.Name);
 				return;
 			}
 
@@ -2274,8 +2279,8 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Sent when character is using the ground position selection tool
-		/// starts.
+		/// Sent when character is using the ground position selection
+		/// tool, like for certain skills.
 		/// </summary>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
@@ -2284,11 +2289,12 @@ namespace Melia.Zone.Network
 		{
 			var character = conn.SelectedCharacter;
 
-			// TODO: keep track of state?
+			// TODO: Keep track of state?
 		}
 
 		/// <summary>
-		/// Sent when character is using the ground position selection tool ends
+		/// Sent when character stops using the ground position selection
+		/// tool, like at the end of selecting a destination for a skill.
 		/// </summary>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
@@ -2297,7 +2303,7 @@ namespace Melia.Zone.Network
 		{
 			var character = conn.SelectedCharacter;
 
-			// TODO: keep track of state?
+			// TODO: Keep track of state?
 		}
 
 		/// <summary>
@@ -2864,7 +2870,7 @@ namespace Melia.Zone.Network
 					shopData.IsClosed = true;
 					Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
 					Send.ZC_AUTOSELLER_TITLE(shopOwner);
-					Send.ZC_NORMAL.ShopAnimation(shopOwner.Connection, shopOwner, "Squire_Repair", 1, 0);
+					Send.ZC_NORMAL.ShopAnimation(shopOwner, "Squire_Repair", 1, 0);
 					shopOwner.Connection.ShopCreated = null;
 
 					// Close seller's shop management UI (personal_sell_shop_my frame for sell shops)
@@ -4879,28 +4885,25 @@ namespace Melia.Zone.Network
 		/// <summary>
 		/// Sent when selecting a new language.
 		/// </summary>
+		/// <remarks>
+		/// See handler for CB_SELECTED_LANGUAGE for more information on
+		/// how language selection works.
+		/// </remarks>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
 		[PacketHandler(Op.CZ_SELECTED_LANGUAGE)]
 		public void CZ_SELECTED_LANGUAGE(IZoneConnection conn, Packet packet)
 		{
-			var language = packet.GetShort();
+			var language = (Language)packet.GetShort();
 
-			// Map client language index to locale name
-			var languageName = language switch
+			if (!Enum.IsDefined(typeof(Language), language))
 			{
-				1 => "de-DE",
-				2 => "pt-BR",
-				4 => "id-ID",
-				5 => "ru-RU",
-				6 => "th-TH",
-				_ => "en-US",
-			};
+				Log.Warning("CZ_SELECTED_LANGUAGE: Invalid language '{0}' received from '{1}'.", language, conn.Account.Name);
+				return;
+			}
 
-			conn.SelectedLanguage = languageName;
-
-			if (conn.Account != null)
-				conn.Account.Variables.Perm.SetString("Melia.SelectedLanguage", languageName);
+			conn.Account.Language = language.ToString();
+			conn.SelectedLanguage = conn.Account.Language;
 		}
 
 		/// <summary>
@@ -4945,7 +4948,7 @@ namespace Melia.Zone.Network
 				shop.IsClosed = true;
 				Send.ZC_AUTOSELLER_LIST(conn, character);
 				Send.ZC_AUTOSELLER_TITLE(character);
-				Send.ZC_NORMAL.ShopAnimation(conn, character, "Squire_Repair", 1, 0);
+				Send.ZC_NORMAL.ShopAnimation(character, "Squire_Repair", 1, 0);
 				character.Connection.ShopCreated = null;
 			}
 			else
@@ -5133,7 +5136,7 @@ namespace Melia.Zone.Network
 				character.Connection.ShopCreated = shop;
 				Send.ZC_AUTOSELLER_LIST(conn, character);
 				Send.ZC_NORMAL.Shop_Unknown11C(conn, "Squire", shop.Type);
-				Send.ZC_NORMAL.ShopAnimation(conn, character, "Squire_Repair", 1, 1);
+				Send.ZC_NORMAL.ShopAnimation(character, "Squire_Repair", 1, 1);
 				Send.ZC_AUTOSELLER_TITLE(character);
 
 				Log.Debug("CZ_REGISTER_AUTOSELLER: {0}, {1} item(s), Type: {2}", shopName, itemCount, shop.Type);

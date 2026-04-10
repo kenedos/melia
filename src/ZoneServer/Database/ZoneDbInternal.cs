@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Shared.ObjectProperties;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.World.Actors.Characters;
@@ -260,7 +261,7 @@ namespace Melia.Zone.Database
 						continue;
 					}
 
-					using (var cmd = new InsertCommand($"INSERT INTO `{tableName}` {{0}}", conn, trans))
+					using (var cmd = new InsertCommand($"INSERT INTO `{tableName}` {{parameters}}", conn, trans))
 					{
 						cmd.Set("name", varKey);
 						cmd.Set("type", type);
@@ -390,7 +391,7 @@ namespace Melia.Zone.Database
 					{
 						try
 						{
-							using (var cmd = new InsertCommand("INSERT INTO `items` {0}", conn, trans))
+							using (var cmd = new InsertCommand("INSERT INTO `items` {parameters}", conn, trans))
 							{
 								cmd.Set("itemId", item.Id);
 								cmd.Set("amount", item.Amount);
@@ -928,7 +929,7 @@ namespace Melia.Zone.Database
 			foreach (var buff in savableBuffs)
 			{
 				long buffDbId = 0;
-				using (var cmd = new InsertCommand("INSERT INTO `buffs` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `buffs` {parameters}", conn, trans))
 				{
 					cmd.Set("characterId", character.DbId);
 					cmd.Set("classId", buff.Id);

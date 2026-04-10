@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Shared.Game.Properties;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.World;
@@ -534,7 +535,7 @@ namespace Melia.Zone.Database
 				return;
 
 			using (var conn = this.GetConnection())
-			using (var cmd = new InsertCommand("INSERT INTO `help` {0} ON DUPLICATE KEY UPDATE `shown` = VALUES(`shown`)", conn))
+			using (var cmd = new InsertCommand("INSERT INTO `help` {parameters} ON DUPLICATE KEY UPDATE `shown` = VALUES(`shown`)", conn))
 			{
 				cmd.Set("accountId", accountId);
 				cmd.Set("helpId", helpId);
@@ -552,7 +553,7 @@ namespace Melia.Zone.Database
 			using (var conn = this.GetConnection())
 			using (var trans = conn.BeginTransaction())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `companions` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `companions` {parameters}", conn, trans))
 				{
 					companion.AdoptTime = DateTime.Now;
 
@@ -752,7 +753,7 @@ namespace Melia.Zone.Database
 					}
 
 					// Re-insert parent
-					using (var cmd = new InsertCommand("INSERT INTO `houses` {0}", conn, trans))
+					using (var cmd = new InsertCommand("INSERT INTO `houses` {parameters}", conn, trans))
 					{
 						cmd.Set("houseId", house.Id);
 						cmd.Set("name", house.Name);
@@ -766,7 +767,7 @@ namespace Melia.Zone.Database
 					// Re-insert children
 					foreach (var prop in house.Props)
 					{
-						using (var cmd = new InsertCommand("INSERT INTO `house_props` {0}", conn, trans))
+						using (var cmd = new InsertCommand("INSERT INTO `house_props` {parameters}", conn, trans))
 						{
 							cmd.Set("houseId", house.Id);
 							cmd.Set("monsterId", prop.MonsterId);

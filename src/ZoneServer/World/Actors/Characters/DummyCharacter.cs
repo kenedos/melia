@@ -132,7 +132,7 @@ namespace Melia.Zone.World.Actors.Characters
 
 			var hitInfo = new HitInfo(attacker, target, damage, HitResultType.Hit);
 
-			var packet = new Packet(Op.ZC_HIT_INFO);
+			using var packet = Packet.Rent(Op.ZC_HIT_INFO);
 			packet.PutInt(target.Handle);
 			packet.PutInt(attacker.Handle);
 			packet.PutInt((int)hitInfo.SkillId);

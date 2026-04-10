@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
+using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Shared.Game.Const.Web;
 using Melia.Shared.ObjectProperties;
 using Melia.Zone.World.Actors.Characters;
@@ -24,7 +25,7 @@ namespace Melia.Zone.Database
 		private long SaveItem(Item item)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new InsertCommand("INSERT INTO `items` {0}", conn))
+			using (var cmd = new InsertCommand("INSERT INTO `items` {parameters}", conn))
 			{
 				cmd.Set("itemId", item.Id);
 				cmd.Set("amount", item.Amount);
@@ -48,7 +49,7 @@ namespace Melia.Zone.Database
 			using (var conn = this.GetConnection())
 			using (var trans = conn.BeginTransaction())
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `market_items` {0}", conn, trans))
+				using (var cmd = new InsertCommand("INSERT INTO `market_items` {parameters}", conn, trans))
 				{
 					var registerDate = DateTime.Now;
 					var expireDate = registerDate.AddDays(saleLength);
@@ -70,7 +71,7 @@ namespace Melia.Zone.Database
 		public bool CancelMarketItem(Character character, long marketWorldId)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `market_items` SET {0} WHERE `sellerId` = @characterId AND `marketItemUniqueId` = @marketId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `market_items` SET {parameters} WHERE `sellerId` = @characterId AND `marketItemUniqueId` = @marketId", conn))
 			{
 				var date = DateTime.Now;
 				cmd.AddParameter("@characterId", character.DbId);
@@ -388,7 +389,7 @@ namespace Melia.Zone.Database
 		public bool UpdateMarketItemBuyer(long marketWorldId, long characterId)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `market_items` SET {0} WHERE `marketItemUniqueId` = @marketItemUniqueId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `market_items` SET {parameters} WHERE `marketItemUniqueId` = @marketItemUniqueId", conn))
 			{
 				cmd.AddParameter("@marketItemUniqueId", marketWorldId);
 				cmd.Set("buyerId", characterId);
@@ -403,7 +404,7 @@ namespace Melia.Zone.Database
 		public bool UpdateMarketItemStatus(long marketWorldId, MarketItemStatus status)
 		{
 			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `market_items` SET {0} WHERE `marketItemUniqueId` = @marketItemUniqueId", conn))
+			using (var cmd = new UpdateCommand("UPDATE `market_items` SET {parameters} WHERE `marketItemUniqueId` = @marketItemUniqueId", conn))
 			{
 				cmd.AddParameter("@marketItemUniqueId", marketWorldId);
 				cmd.Set("status", (byte)status);

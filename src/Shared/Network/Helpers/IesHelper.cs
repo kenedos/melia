@@ -75,7 +75,7 @@ namespace Melia.Shared.Network.Helpers
 			var splitLength = 1024 * 44;
 			var curLength = 0;
 
-			var packet = new Packet(Op.ZC_IES_MODIFY_LIST);
+			var packet = Packet.Rent(Op.ZC_IES_MODIFY_LIST);
 
 			foreach (var group in allMods.Mods.Values)
 			{
@@ -109,7 +109,8 @@ namespace Melia.Shared.Network.Helpers
 
 							if (curLength > splitLength)
 							{
-								packet = new Packet(OpTable.GetOp(Op.ZC_IES_MODIFY_LIST));
+								packet.Dispose();
+								packet = Packet.Rent(OpTable.GetOp(Op.ZC_IES_MODIFY_LIST));
 								curList = new IesModList();
 								modLists.Add(curList);
 								curLength = 0;
@@ -120,6 +121,8 @@ namespace Melia.Shared.Network.Helpers
 					}
 				}
 			}
+
+			packet.Dispose();
 
 			return modLists;
 		}

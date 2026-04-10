@@ -54,7 +54,8 @@ namespace Melia.Zone
 					var height = map.Ground.GetHeightAt(pos);
 					pos.Y = height;
 
-					var monster = new Mob(monsterId, RelationType.Neutral);
+					var monster = new Mob(monsterId);
+					monster.Faction = FactionType.Neutral;
 					monster.Position = pos;
 					monster.DisappearTime = DateTime.Now.Add((TimeSpan)duration);
 					map.AddMonster(monster);
@@ -105,7 +106,8 @@ namespace Melia.Zone
 			if (duration == null)
 				duration = TimeSpan.FromSeconds(5);
 
-			var monster = new Mob(10005, RelationType.Friendly);
+			var monster = new Mob(10005);
+			monster.Faction = FactionType.Neutral;
 			monster.Position = pos;
 			monster.DisappearTime = DateTime.Now.Add((TimeSpan)duration);
 			map.AddMonster(monster);

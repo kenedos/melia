@@ -39,6 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			if (target == null)
 			{
 				caster.ServerMessage(Localization.Get("No target specified."));
+				Send.ZC_SKILL_MELEE_GROUND(caster, skill, originPos, null);
 				return;
 			}
 
