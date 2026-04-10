@@ -296,31 +296,45 @@ namespace Melia.Zone.Scripting
 		/// </summary>
 		public static void HandleSellToBuyShop(IZoneConnection conn, Character character, Character shopOwner, ShopData shop, int index, long itemId, int itemAmount)
 		{
-			var product = shop.GetProduct(index);
+			if (!character.Inventory.TryGetItem(itemId, out var item))
+				return;
 
-			if (character.Inventory.TryGetItem(itemId, out var item) && product.RequiredAmount >= itemAmount)
+			// Find the matching product by item class ID, since the
+			// client may not send a reliable product index for buyshops.
+			var matchedKey = -1;
+			ProductData product = null;
+			foreach (var kvp in shop.Products)
 			{
-				var sellerSilver = shopOwner.Inventory.CountItem(ItemId.Silver);
-				var totalCost = product.Price * itemAmount;
-
-				if (sellerSilver >= totalCost && character.Inventory.Remove(itemId, itemAmount) == InventoryResult.Success
-						&& shopOwner.RemoveItem(ItemId.Silver, totalCost) == totalCost)
+				if (kvp.Value.ItemId == item.Id)
 				{
-					product.RequiredAmount -= itemAmount;
-
-					if (product.RequiredAmount <= 0)
-					{
-						shop.Products.Remove(index);
-					}
-
-					character.AddItem(ItemId.Silver, totalCost);
-					shopOwner.AddItem(item.Id, itemAmount);
-					Send.ZC_AUTOSELLER_LIST(shopOwner);
+					matchedKey = kvp.Key;
+					product = kvp.Value;
+					break;
 				}
-				else
+			}
+
+			if (product == null || product.RequiredAmount < itemAmount)
+				return;
+
+			var sellerSilver = shopOwner.Inventory.CountItem(ItemId.Silver);
+			var totalCost = product.Price * itemAmount;
+
+			if (sellerSilver >= totalCost && character.Inventory.Remove(itemId, itemAmount) == InventoryResult.Success
+					&& shopOwner.RemoveItem(ItemId.Silver, totalCost) == totalCost)
+			{
+				product.RequiredAmount -= itemAmount;
+
+				if (product.RequiredAmount <= 0)
 				{
-					character.SystemMessage("FarFromFoodTable");
+					shop.Products.Remove(matchedKey);
 				}
+
+				character.AddItem(ItemId.Silver, totalCost);
+				shopOwner.AddItem(item.Id, itemAmount);
+			}
+			else
+			{
+				character.SystemMessage("FarFromFoodTable");
 			}
 		}
 
@@ -332,19 +346,22 @@ namespace Melia.Zone.Scripting
 			if (shop.Products.Count == 0)
 			{
 				shop.IsClosed = true;
+
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+				Send.ZC_AUTOSELLER_TITLE(shopOwner);
+				Send.ZC_NORMAL.ShopAnimation(shopOwner, "Squire_Repair", 1, 0);
+
 				shopOwner.Connection.ShopCreated = null;
 
-				Send.ZC_AUTOSELLER_TITLE(shopOwner);
-				Send.ZC_NORMAL.ShopAnimation(shopOwner.Connection, shopOwner, "Squire_Repair", 1, 0);
-
-				shopOwner.SystemMessage("ShopClosedAllItemsSold");
+				shopOwner.ServerMessage("All items purchased. Shop closed.");
 				Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('personal_shop_target')");
 
 				Log.Debug("CloseShopIfEmpty: Shop empty, closing shop for {0}", shopOwner.Name);
 			}
 			else
 			{
-				Send.ZC_AUTOSELLER_LIST(shopOwner);
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
 				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
 			}
 		}

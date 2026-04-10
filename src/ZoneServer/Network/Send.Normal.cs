@@ -4401,6 +4401,26 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
+			/// Broadcasts shop animation to all players on the map.
+			/// </summary>
+			/// <param name="entity"></param>
+			/// <param name="scriptFunc"></param>
+			/// <param name="b1"></param>
+			/// <param name="b2">If set to 0, animation plays in reverse? Used to close shop.</param>
+			public static void ShopAnimation(Character entity, string scriptFunc, byte b1 = 1, byte b2 = 2)
+			{
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.ShopAnimation);
+
+				packet.PutInt(entity.Handle);
+				packet.PutLpString(scriptFunc);
+				packet.PutByte(b1);
+				packet.PutByte(b2);
+
+				entity.Map.Broadcast(packet);
+			}
+
+			/// <summary>
 			/// Sends the session key to the client.
 			/// </summary>
 			/// <param name="conn"></param>

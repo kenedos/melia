@@ -2870,7 +2870,7 @@ namespace Melia.Zone.Network
 					shopData.IsClosed = true;
 					Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
 					Send.ZC_AUTOSELLER_TITLE(shopOwner);
-					Send.ZC_NORMAL.ShopAnimation(shopOwner.Connection, shopOwner, "Squire_Repair", 1, 0);
+					Send.ZC_NORMAL.ShopAnimation(shopOwner, "Squire_Repair", 1, 0);
 					shopOwner.Connection.ShopCreated = null;
 
 					// Close seller's shop management UI (personal_sell_shop_my frame for sell shops)
@@ -4948,7 +4948,7 @@ namespace Melia.Zone.Network
 				shop.IsClosed = true;
 				Send.ZC_AUTOSELLER_LIST(conn, character);
 				Send.ZC_AUTOSELLER_TITLE(character);
-				Send.ZC_NORMAL.ShopAnimation(conn, character, "Squire_Repair", 1, 0);
+				Send.ZC_NORMAL.ShopAnimation(character, "Squire_Repair", 1, 0);
 				character.Connection.ShopCreated = null;
 			}
 			else
@@ -5136,7 +5136,7 @@ namespace Melia.Zone.Network
 				character.Connection.ShopCreated = shop;
 				Send.ZC_AUTOSELLER_LIST(conn, character);
 				Send.ZC_NORMAL.Shop_Unknown11C(conn, "Squire", shop.Type);
-				Send.ZC_NORMAL.ShopAnimation(conn, character, "Squire_Repair", 1, 1);
+				Send.ZC_NORMAL.ShopAnimation(character, "Squire_Repair", 1, 1);
 				Send.ZC_AUTOSELLER_TITLE(character);
 
 				Log.Debug("CZ_REGISTER_AUTOSELLER: {0}, {1} item(s), Type: {2}", shopName, itemCount, shop.Type);

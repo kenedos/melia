@@ -4564,6 +4564,7 @@ namespace Melia.Zone.Commands
 			// Create auto seller packet from arguments and have the
 			// channel handle it as if the client had sent it.
 			using var packet = Packet.Rent(Op.CZ_REGISTER_AUTOSELLER);
+			packet.PutShort(0);
 			packet.PutString(title, 64);
 			packet.PutInt(items.Count);
 			packet.PutInt(personalShopPacketStringId); // PersonalShop
@@ -4672,7 +4673,7 @@ namespace Melia.Zone.Commands
 			sender.Connection.ShopCreated = shop;
 			Send.ZC_AUTOSELLER_LIST(sender.Connection, sender);
 			Send.ZC_NORMAL.Shop_Unknown11C(sender.Connection, "Squire", shop.Type);
-			Send.ZC_NORMAL.ShopAnimation(sender.Connection, sender, "Squire_Repair", 1, 1);
+			Send.ZC_NORMAL.ShopAnimation(sender, "Squire_Repair", 1, 1);
 			Send.ZC_AUTOSELLER_TITLE(sender);
 
 			Log.Debug("HandleSellShop: {0} opened sell shop '{1}' with {2} item(s)", sender.Name, title, shop.Products.Count);
