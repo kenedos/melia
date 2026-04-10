@@ -798,6 +798,10 @@ public class CombatCalculationsScript : GeneralScript
 			{
 				if (targetAttr == AttributeType.Holy) return 1.50f;
 			}
+			else if (attackerAttr == AttributeType.Soul)
+			{
+				if (targetAttr == AttributeType.Soul) return 1.50f;
+			}
 		}
 
 		return 1;
