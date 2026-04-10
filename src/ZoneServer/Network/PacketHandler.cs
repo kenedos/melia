@@ -2881,7 +2881,7 @@ namespace Melia.Zone.Network
 
 					// Update seller's shop UI
 					if (shopOwner.Connection.ShopCreated != null)
-						Send.ZC_AUTOSELLER_LIST(shopOwner);
+						Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
 
 					// Update buyer's shop UI
 					if (shopData.IsCustom)
