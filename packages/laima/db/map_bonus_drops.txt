@@ -99,26 +99,6 @@
 	{ itemId: 649216, chance: 0.090 }, // Sapphire
 	{ itemId: 649217, chance: 0.090 }  // Ruby
 ]},
-{ mapClassName: "d_cmine_9", items: [
-	{ itemId: 649200, chance: 0.400 }, // Amber
-	{ itemId: 649201, chance: 0.300 }, // Fossilized Lizard Amber
-	{ itemId: 649202, chance: 0.400 }, // Topaz
-	{ itemId: 649203, chance: 0.400 }, // Opal
-	{ itemId: 649204, chance: 0.400 }, // Garnet
-	{ itemId: 649205, chance: 0.400 }, // Obsidian
-	{ itemId: 649206, chance: 0.400 }, // Peridot
-	{ itemId: 649207, chance: 0.400 }, // Zircon
-	{ itemId: 649208, chance: 0.400 }, // Pyrite
-	{ itemId: 649209, chance: 0.300 }, // Bloodstone
-	{ itemId: 649210, chance: 0.300 }, // Cryorite
-	{ itemId: 649211, chance: 0.300 }, // Pyrostone
-	{ itemId: 649212, chance: 0.300 }, // Cryostone
-	{ itemId: 649213, chance: 0.200 }, // Pyranium
-	{ itemId: 649214, chance: 0.200 }, // Cryonium
-	{ itemId: 649215, chance: 0.100 }, // Diamond
-	{ itemId: 649216, chance: 0.100 }, // Sapphire
-	{ itemId: 649217, chance: 0.100 }  // Ruby
-]},
 
 // ============================================================================
 // ROYAL MAUSOLEUM - Attribute Points Theme
