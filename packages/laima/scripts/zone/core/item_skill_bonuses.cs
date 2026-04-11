@@ -81,7 +81,7 @@ public static class ItemEquipEffects
 		{ 142102, new[] { ItemEffect.JobSkillUp(JobId.Cryomancer, 1) } },  // STF02_102
 		{ 142105, new[] { ItemEffect.SkillUp(SkillId.Wizard_EarthQuake, 3) } },  // STF02_105
 		{ 144123, new[] { ItemEffect.ExProp("ITEM_RAISESKELETON_SUMMONCOUNT", 1) } },  // STF04_123
-		{ 144124, new[] { ItemEffect.ExProp("ITEM_METEOR_MULTIHIT", 5) } },  // TSF04_124
+		{ 274124, new[] { ItemEffect.ExProp("ITEM_METEOR_MULTIHIT", 5) } },  // TSF04_124
 
 		// Two-Handed Bows
 		{ 162107, new[] { ItemEffect.JobSkillUp(JobId.Hunter, 2) } },  // TBW02_107
@@ -132,12 +132,12 @@ public static class ItemEquipEffects
 
 		// Pistols
 		{ 302103, new[] { ItemEffect.JobSkillUp(JobId.SchwarzerReiter, 1) } },  // PST02_103
-		{ 324102, new[] { ItemEffect.JobSkillUp(JobId.SchwarzerReiter, 1) } },  // PST04_102
-		{ 324103, new[] { ItemEffect.JobSkillUp(JobId.SchwarzerReiter, 1) } },  // PST04_103
-		{ 324110, new[] { ItemEffect.SkillUp(SkillId.Corsair_PistolShot, 1), ItemEffect.SkillUp(SkillId.Schwarzereiter_Limacon, 1), ItemEffect.SkillUp(SkillId.Bulletmarker_RestInPeace, 1) } },  // PST04_110
-		{ 324112, new[] { ItemEffect.SkillUp(SkillId.Bulletmarker_RestInPeace, 2), ItemEffect.SkillUp(SkillId.Schwarzereiter_Caracole, 2) } },  // PST04_112
-		{ 324118, new[] { ItemEffect.ExProp("ITEM_OUTLAW_AGGRESS_DEBUFF_ADDDMG", 30) } },  // PST04_118
-		{ 324119, new[] { ItemEffect.JobSkillUp(JobId.Corsair, 2) } },  // PST04_119
+		{ 304102, new[] { ItemEffect.JobSkillUp(JobId.SchwarzerReiter, 1) } },  // PST04_102
+		{ 304103, new[] { ItemEffect.JobSkillUp(JobId.SchwarzerReiter, 1) } },  // PST04_103
+		{ 304110, new[] { ItemEffect.SkillUp(SkillId.Corsair_PistolShot, 1), ItemEffect.SkillUp(SkillId.Schwarzereiter_Limacon, 1), ItemEffect.SkillUp(SkillId.Bulletmarker_RestInPeace, 1) } },  // PST04_110
+		{ 304112, new[] { ItemEffect.SkillUp(SkillId.Bulletmarker_RestInPeace, 2), ItemEffect.SkillUp(SkillId.Schwarzereiter_Caracole, 2) } },  // PST04_112
+		{ 304118, new[] { ItemEffect.ExProp("ITEM_OUTLAW_AGGRESS_DEBUFF_ADDDMG", 30) } },  // PST04_118
+		{ 304119, new[] { ItemEffect.JobSkillUp(JobId.Corsair, 2) } },  // PST04_119
 
 		// Rapiers
 		{ 313101, new[] { ItemEffect.JobSkillUp(JobId.Fencer, 1) } },  // RAP03_101
@@ -157,42 +157,43 @@ public static class ItemEquipEffects
 		{ 334114, new[] { ItemEffect.ExProp("ITEM_EYEOFBEAST_TIMEUP", 3000) } },  // MUS04_114
 
 		// Armor — Hate rate sets
-		{ 503151, new[] { ItemEffect.ExProp("ItemHateDownRate_BM", -50) } },  // HAND04_151
-		{ 503152, new[] { ItemEffect.ExProp("ItemHateUpRate_BM", 50) } },  // HAND04_152
-		{ 511149, new[] { ItemEffect.ExProp("ItemHateDownRate_BM", -50) } },  // FOOT04_149
-		{ 511150, new[] { ItemEffect.ExProp("ItemHateUpRate_BM", 50) } },  // FOOT04_150
-		{ 521149, new[] { ItemEffect.ExProp("ItemHateDownRate_BM", -50) } },  // LEG04_149
-		{ 521150, new[] { ItemEffect.ExProp("ItemHateUpRate_BM", 50) } },  // LEG04_150
-		{ 531149, new[] { ItemEffect.ExProp("ItemHateDownRate_BM", -50) } },  // TOP04_149
-		{ 531150, new[] { ItemEffect.ExProp("ItemHateUpRate_BM", 50) } },  // TOP04_150
+		{ 504151, new[] { ItemEffect.ExProp("HateRate_BM", -50) } },  // HAND04_151
+		{ 504152, new[] { ItemEffect.ExProp("HateRate_BM", 50) } },  // HAND04_152
+		{ 514149, new[] { ItemEffect.ExProp("HateRate_BM", -50) } },  // FOOT04_149
+		{ 514150, new[] { ItemEffect.ExProp("HateRate_BM", 50) } },  // FOOT04_150
+		{ 524149, new[] { ItemEffect.ExProp("HateRate_BM", -50) } },  // LEG04_149
+		{ 524150, new[] { ItemEffect.ExProp("HateRate_BM", 50) } },  // LEG04_150
+		{ 534149, new[] { ItemEffect.ExProp("HateRate_BM", -50) } },  // TOP04_149
+		{ 534150, new[] { ItemEffect.ExProp("HateRate_BM", 50) } },  // TOP04_150
 
 		// Necklaces
 		{ 582123, new[] { ItemEffect.Buff(BuffId.NECK02_123_buff) } },  // NECK02_123
 		{ 582124, new[] { ItemEffect.Buff(BuffId.NECK02_124_buff) } },  // NECK02_124
 
 		// Cannons
-		{ 634001, new[] { ItemEffect.JobSkillUp(JobId.Cannoneer, 1) } },  // CAN04_101
-		{ 634002, new[] { ItemEffect.JobSkillUp(JobId.Cannoneer, 1) } },  // CAN04_102
-		{ 634008, new[] { ItemEffect.SkillUp(SkillId.Cannoneer_SweepingCannon, 1), ItemEffect.SkillUp(SkillId.Cannoneer_CannonBarrage, 1) } },  // CAN04_108
-		{ 634011, new[] { ItemEffect.SkillUp(SkillId.Cannoneer_SweepingCannon, 2), ItemEffect.SkillUp(SkillId.Cannoneer_SiegeBurst, 2) } },  // CAN04_111
-		{ 634014, new[] { ItemEffect.ExProp("ITEM_SIEGEBURST_FLASHBOMB", 1) } },  // CAN04_114
-		{ 634015, new[] { ItemEffect.ExProp("ITEM_CANISTERSHOT_HITCOUNT", 5) } },  // CAN04_115
+		{ 324101, new[] { ItemEffect.JobSkillUp(JobId.Cannoneer, 1) } },  // CAN04_101
+		{ 324102, new[] { ItemEffect.JobSkillUp(JobId.Cannoneer, 1) } },  // CAN04_102
+		{ 324108, new[] { ItemEffect.SkillUp(SkillId.Cannoneer_SweepingCannon, 1), ItemEffect.SkillUp(SkillId.Cannoneer_CannonBarrage, 1) } },  // CAN04_108
+		{ 324111, new[] { ItemEffect.SkillUp(SkillId.Cannoneer_SweepingCannon, 2), ItemEffect.SkillUp(SkillId.Cannoneer_SiegeBurst, 2) } },  // CAN04_111
+		{ 324114, new[] { ItemEffect.ExProp("ITEM_SIEGEBURST_FLASHBOMB", 1) } },  // CAN04_114
+		{ 324115, new[] { ItemEffect.ExProp("ITEM_CANISTERSHOT_HITCOUNT", 5) } },  // CAN04_115
 
-		// Glacier equipment
-		{ 636801, new[] { ItemEffect.ExProp("ITEM_GLACIER_CROSSBOW", 1) } },  // EP12_BOW04_001
-		{ 636802, new[] { ItemEffect.ExProp("ITEM_GLACIER_DAGGER", 1) } },  // EP12_DAG04_001
-		{ 636803, new[] { ItemEffect.ExProp("ITEM_GLACIER_MACE", 1) } },  // EP12_MAC04_001
-		{ 636804, new[] { ItemEffect.ExProp("ITEM_GLACIER_ROD", 1) } },  // EP12_STF04_001
-		{ 636805, new[] { ItemEffect.ExProp("ITEM_GLACIER_SPEAR", 1) } },  // EP12_SPR04_001
-		{ 636806, new[] { ItemEffect.ExProp("ITEM_GLACIER_STAFF", 1) } },  // EP12_TSF04_001
-		{ 636807, new[] { ItemEffect.ExProp("ITEM_GLACIER_SWORD", 1) } },  // EP12_SWD04_001
-		{ 636808, new[] { ItemEffect.ExProp("ITEM_GLACIER_THMACE", 1) } },  // EP12_TMAC04_001
-		{ 636809, new[] { ItemEffect.ExProp("ITEM_GLACIER_THSWORD", 1) } },  // EP12_TSW04_001
-		{ 636810, new[] { ItemEffect.ExProp("ITEM_GLACIER_TRINKET", 1) } },  // EP12_TRK04_001
-		{ 636901, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_TOP04_006
-		{ 636902, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_LEG04_006
-		{ 636903, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_FOOT04_006
-		{ 636904, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_HAND04_006
+		// Glacier equipment — commented out: IDs are wrong (point to New Year/Grimoire items),
+		// and EP12_xxx classnames don't exist in XML. Need correct IDs.
+		// { 636801, new[] { ItemEffect.ExProp("ITEM_GLACIER_CROSSBOW", 1) } },  // EP12_BOW04_001
+		// { 636802, new[] { ItemEffect.ExProp("ITEM_GLACIER_DAGGER", 1) } },  // EP12_DAG04_001
+		// { 636803, new[] { ItemEffect.ExProp("ITEM_GLACIER_MACE", 1) } },  // EP12_MAC04_001
+		// { 636804, new[] { ItemEffect.ExProp("ITEM_GLACIER_ROD", 1) } },  // EP12_STF04_001
+		// { 636805, new[] { ItemEffect.ExProp("ITEM_GLACIER_SPEAR", 1) } },  // EP12_SPR04_001
+		// { 636806, new[] { ItemEffect.ExProp("ITEM_GLACIER_STAFF", 1) } },  // EP12_TSF04_001
+		// { 636807, new[] { ItemEffect.ExProp("ITEM_GLACIER_SWORD", 1) } },  // EP12_SWD04_001
+		// { 636808, new[] { ItemEffect.ExProp("ITEM_GLACIER_THMACE", 1) } },  // EP12_TMAC04_001
+		// { 636809, new[] { ItemEffect.ExProp("ITEM_GLACIER_THSWORD", 1) } },  // EP12_TSW04_001
+		// { 636810, new[] { ItemEffect.ExProp("ITEM_GLACIER_TRINKET", 1) } },  // EP12_TRK04_001
+		// { 636901, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_TOP04_006
+		// { 636902, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_LEG04_006
+		// { 636903, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_FOOT04_006
+		// { 636904, new[] { ItemEffect.ExProp("ITEM_GLACIER_PLATE", 1) } },  // EP12_HAND04_006
 
 		// PVP Weapons
 		{ 636647, new[] { ItemEffect.SkillUp(SkillId.BlossomBlader_BlossomSlash, 2), ItemEffect.ExProp("ITEM_VIBORA_THSWORD", 1) } },  // PVP_TSW04_126
