@@ -63,6 +63,13 @@ namespace Melia.Zone.Network
 		ShopData ActiveShop { get; set; }
 
 		/// <summary>
+		/// Gets or sets the handle of the shop owner when ActiveShop was set.
+		/// Used to prevent cross-shop contamination when a buyer opens
+		/// multiple sell shops.
+		/// </summary>
+		int ActiveShopOwnerHandle { get; set; }
+
+		/// <summary>
 		/// Gets or sets the currently shop opened.
 		/// </summary>
 		ShopData ShopCreated { get; set; }
@@ -108,6 +115,7 @@ namespace Melia.Zone.Network
 		// Removed: Guild type deleted during Laima merge
 		// public Guild Guild { get; set; }
 		public ShopData ActiveShop { get; set; }
+		public int ActiveShopOwnerHandle { get; set; }
 		public ShopData ShopCreated { get; set; }
 		// Removed: PersonalHouse type deleted during Laima merge
 		// public PersonalHouse ActiveHouse { get; set; }
@@ -183,6 +191,13 @@ namespace Melia.Zone.Network
 		/// Gets or sets the currently shop browsed.
 		/// </summary>
 		public ShopData ActiveShop { get; set; }
+
+		/// <summary>
+		/// Gets or sets the handle of the shop owner when ActiveShop was set.
+		/// Used to prevent cross-shop contamination when a buyer opens
+		/// multiple sell shops.
+		/// </summary>
+		public int ActiveShopOwnerHandle { get; set; }
 
 		/// <summary>
 		/// Gets or sets the currently shop opened.
@@ -394,6 +409,7 @@ namespace Melia.Zone.Network
 			this.SelectedCharacter = null;
 			this.ActiveDuel = null;
 			this.ActiveShop = null;
+			this.ActiveShopOwnerHandle = 0;
 			this.ActiveTrade = null;
 			this.CurrentDialog?.Cancel();
 			this.CurrentDialog = null;

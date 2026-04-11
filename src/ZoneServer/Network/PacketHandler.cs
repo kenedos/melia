@@ -1673,6 +1673,7 @@ namespace Melia.Zone.Network
 				if (conn.ActiveShop != null)
 				{
 					conn.ActiveShop = null;
+					conn.ActiveShopOwnerHandle = 0;
 					Send.ZC_DIALOG_CLOSE(conn);
 					Send.ZC_LEAVE_TRIGGER(conn);
 					Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
@@ -2649,6 +2650,15 @@ namespace Melia.Zone.Network
 					return;
 				}
 
+				// Verify the shop owner matches who the buyer originally opened
+				// the shop with, to prevent cross-shop contamination when a
+				// buyer clicks on a different sell shop before completing purchase.
+				if (conn.ActiveShopOwnerHandle != 0 && conn.ActiveShopOwnerHandle != shopOwner.Handle)
+				{
+					Log.Warning("CZ_ITEM_BUY: User '{0}' ActiveShop owner mismatch (expected {1}, got {2}). Possible cross-shop contamination.", conn.Account.Name, conn.ActiveShopOwnerHandle, shopOwner.Handle);
+					return;
+				}
+
 				// Check and reduce money
 				if (character.Inventory.CountItem(ItemId.Silver) < totalCost)
 				{
@@ -2739,7 +2749,13 @@ namespace Melia.Zone.Network
 						return;
 					}
 
-					// Execute all transactions
+					// Execute all transactions, tracking the actual cost of
+					// items that were successfully transferred. This prevents
+					// silver from being deducted/credited when a concurrent
+					// buyer purchased the same product between validation and
+					// execution phases.
+					var executedCost = 0;
+
 					foreach (var successfulPurchase in successfulPurchases)
 					{
 						var productData = successfulPurchase.Item1;
@@ -2791,6 +2807,13 @@ namespace Melia.Zone.Network
 							foreach (var transferItem in itemsToTransfer)
 								character.Inventory.Add(transferItem, InventoryAddType.Buy);
 
+							// Track actual cost for items that were transferred
+							if (totalRemoved > 0)
+							{
+								var productPrice = (int)(productData.Price * productData.PriceMultiplier * discountMultiplier);
+								executedCost += productPrice * totalRemoved;
+							}
+
 							// Update product state
 							productData.RequiredAmount -= totalRemoved;
 							productData.Amount -= totalRemoved;  // Also update Amount for UI
@@ -2803,9 +2826,12 @@ namespace Melia.Zone.Network
 						}
 					}
 
-					// Transfer silver
-					character.Inventory.Remove(ItemId.Silver, actualTotalCost, InventoryItemRemoveMsg.Given);
-					shopOwner.Inventory.Add(ItemId.Silver, actualBaseCost, InventoryAddType.Sell);
+					// Only transfer silver for items that were actually transferred
+					if (executedCost > 0)
+					{
+						character.Inventory.Remove(ItemId.Silver, executedCost, InventoryItemRemoveMsg.Given);
+						shopOwner.Inventory.Add(ItemId.Silver, executedCost, InventoryAddType.Sell);
+					}
 				}
 				else
 				{
@@ -2862,6 +2888,7 @@ namespace Melia.Zone.Network
 					// Close buyer's shop dialog FIRST (before broadcast so they don't react to it)
 					Send.ZC_DIALOG_CLOSE(conn);
 					conn.ActiveShop = null;
+					conn.ActiveShopOwnerHandle = 0;
 					Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
 					Send.ZC_LOCK_KEY(character, "AUTOSELLER", false);
 
@@ -5172,6 +5199,7 @@ namespace Melia.Zone.Network
 			}
 
 			var shop = conn.ActiveShop = shopOwner.Connection.ShopCreated;
+			conn.ActiveShopOwnerHandle = shopOwner.Handle;
 
 			for (var i = 0; i < itemCount; i++)
 			{
@@ -5217,6 +5245,7 @@ namespace Melia.Zone.Network
 			}
 
 			var shop = conn.ActiveShop = shopOwner.Connection.ShopCreated;
+			conn.ActiveShopOwnerHandle = shopOwner.Handle;
 
 			// ============================================================
 			// BUYSHOP (IsCustom=false) - Visitor wants to SELL items TO shop owner
@@ -5321,6 +5350,7 @@ namespace Melia.Zone.Network
 			}
 
 			conn.ActiveShop = null;
+			conn.ActiveShopOwnerHandle = 0;
 			Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
 			Send.ZC_LOCK_KEY(character, "AUTOSELLER", false);
 			switch (shopType)
