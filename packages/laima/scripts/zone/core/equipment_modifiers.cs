@@ -397,8 +397,21 @@ public class EquipmentCombatModifiersScript : GeneralScript
 		if (!AttackerHasItem(attacker, 582127))
 			return;
 
-		if (skill.Data.Attribute == AttributeType.Fire)
-			modifier.SkillFactorBonus += 0.5f;
+		switch (skill.Id)
+		{
+			case SkillId.Pyromancer_FireBall:
+			case SkillId.Pyromancer_FireWall:
+			case SkillId.Pyromancer_FirePillar:
+			case SkillId.Pyromancer_HellBreath:
+			case SkillId.Pyromancer_FlameGround:
+			case SkillId.Elementalist_Meteor:
+			case SkillId.PlagueDoctor_Incineration:
+			case SkillId.Elementalist_Prominence:
+			case SkillId.Alchemist_Combustion:
+			case SkillId.Zealot_Immolation:
+				modifier.SkillFactorBonus += 50;
+				break;
+		}
 	}
 
 	/// <summary>
@@ -410,8 +423,15 @@ public class EquipmentCombatModifiersScript : GeneralScript
 		if (!AttackerHasItem(attacker, 582128))
 			return;
 
-		if (skill.Data.Attribute == AttributeType.Lightning)
-			modifier.SkillFactorBonus += 0.5f;
+		switch (skill.Id)
+		{
+			case SkillId.Elementalist_Electrocute:
+			case SkillId.Kriwi_Zaibas:
+			case SkillId.Daoshi_DivinePunishment:
+			case SkillId.Zealot_FanaticIllusion:
+				modifier.SkillFactorBonus += 50;
+				break;
+		}
 	}
 
 	/// <summary>
@@ -423,8 +443,19 @@ public class EquipmentCombatModifiersScript : GeneralScript
 		if (!AttackerHasItem(attacker, 582129))
 			return;
 
-		if (skill.Data.Attribute == AttributeType.Ice)
-			modifier.SkillFactorBonus += 0.5f;
+		switch (skill.Id)
+		{
+			case SkillId.Cryomancer_IceBolt:
+			case SkillId.Cryomancer_IciclePike:
+			case SkillId.Cryomancer_IceBlast:
+			case SkillId.Cryomancer_SnowRolling:
+			case SkillId.Cryomancer_FrostPillar:
+			case SkillId.Elementalist_Hail:
+			case SkillId.RuneCaster_Isa:
+			case SkillId.Onmyoji_WaterShikigami:
+				modifier.SkillFactorBonus += 50;
+				break;
+		}
 	}
 
 	/// <summary>
@@ -436,8 +467,15 @@ public class EquipmentCombatModifiersScript : GeneralScript
 		if (!AttackerHasItem(attacker, 582132))
 			return;
 
-		if (skill.Data.Attribute == AttributeType.Earth)
-			modifier.SkillFactorBonus += 0.5f;
+		switch (skill.Id)
+		{
+			case SkillId.Elementalist_StormDust:
+			case SkillId.Wizard_EarthQuake:
+			case SkillId.Onmyoji_GreenwoodShikigami:
+			case SkillId.Onmyoji_Toyou:
+				modifier.SkillFactorBonus += 50;
+				break;
+		}
 	}
 
 	//=======================================================================
