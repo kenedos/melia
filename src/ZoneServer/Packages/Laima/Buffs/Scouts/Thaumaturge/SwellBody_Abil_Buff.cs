@@ -13,8 +13,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 	public class SwellBody_Abil_BuffOverride : BuffHandler
 	{
 		private const float SwellScale = 1.15f;
-		private const string VarMhpRateBonus = "Melia.SwellBody.MhpRate";
-		private const string VarMhpFlatBonus = "Melia.SwellBody.MhpFlat";
+		private const string VarOriginalSize = "Melia.SwellBody.OriginalSize";
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
@@ -23,8 +22,8 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 			if (buff.Target.IsBuffActive(BuffId.ShrinkBody_Debuff))
 				buff.Target.RemoveBuff(BuffId.ShrinkBody_Debuff);
 
-			if (!buff.Vars.Has("Melia.SwellBody.Size"))
-				buff.Vars.Set("Melia.SwellBody.Size", target.EffectiveSize);
+			if (!buff.Vars.Has(VarOriginalSize))
+				buff.Vars.SetString(VarOriginalSize, target.EffectiveSize.ToString());
 
 			switch (target.EffectiveSize)
 			{
@@ -47,11 +46,8 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 
 			var mhpRateBonus = Math.Min(0.30f, (10f + skillLevel) / 100f);
 
-			buff.Vars.SetFloat(VarMhpRateBonus, mhpRateBonus);
-			buff.Vars.SetFloat(VarMhpFlatBonus, flatMhpFromInt);
-
-			target.Properties.Modify(PropertyName.MHP_RATE_BM, mhpRateBonus);
-			target.Properties.Modify(PropertyName.MHP_BM, flatMhpFromInt);
+			AddPropertyModifier(buff, target, PropertyName.MHP_RATE_BM, mhpRateBonus);
+			AddPropertyModifier(buff, target, PropertyName.MHP_BM, flatMhpFromInt);
 			target.Properties.InvalidateAll();
 		}
 
@@ -59,19 +55,17 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 		{
 			var target = buff.Target;
 
-			var originalSize = buff.Vars.Get("Melia.SwellBody.Size", target.EffectiveSize);
+			if (buff.Vars.TryGetString(VarOriginalSize, out var originalSizeStr) && Enum.TryParse<SizeType>(originalSizeStr, out var originalSize))
+				target.Properties.SetString(PropertyName.Size, originalSize);
+			else
+				target.Properties.SetString(PropertyName.Size, target.EffectiveSize);
 
-			target.Properties.SetString(PropertyName.Size, originalSize);
 			(target as Mob)?.InvalidateSizeCache();
 			target.Properties.SetFloat(PropertyName.Scale, 1f);
 			Send.ZC_NORMAL.SetScale(target, 33, 1f, 0, 1, 1, 0);
 
-			if (buff.Vars.TryGetFloat(VarMhpRateBonus, out var mhpRateBonus))
-				target.Properties.Modify(PropertyName.MHP_RATE_BM, -mhpRateBonus);
-
-			if (buff.Vars.TryGetFloat(VarMhpFlatBonus, out var flatMhpFromInt))
-				target.Properties.Modify(PropertyName.MHP_BM, -flatMhpFromInt);
-
+			RemovePropertyModifier(buff, target, PropertyName.MHP_RATE_BM);
+			RemovePropertyModifier(buff, target, PropertyName.MHP_BM);
 			target.Properties.InvalidateAll();
 		}
 	}

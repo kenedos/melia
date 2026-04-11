@@ -86,6 +86,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 				if (target.IsDead)
 					continue;
 
+				if (hit.HitInfo.Damage <= 0)
+					continue;
+
 				var buff = target.StartBuff(BuffId.LatentVenom_Debuff, stacks, hit.HitInfo.Damage, TimeSpan.FromMilliseconds(BaseLatentDurationMs), caster);
 				if (buff != null)
 					buff.OverbuffCounter = 1;
