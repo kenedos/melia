@@ -146,57 +146,63 @@
 	{ itemId: 670001, chance: 0.128 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.128 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.128 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.128 }  // Monster Card Album: Purple
+	{ itemId: 670004, chance: 0.128 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.047 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_42", items: [
 	{ itemId: 670001, chance: 0.134 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.134 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.134 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.134 }  // Monster Card Album: Purple
+	{ itemId: 670004, chance: 0.134 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.060 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_43", items: [
 	{ itemId: 670001, chance: 0.142 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.142 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.142 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.142 }  // Monster Card Album: Purple
+	{ itemId: 670004, chance: 0.142 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.100 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_44", items: [
 	{ itemId: 670001, chance: 0.170 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.170 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.170 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.170 }  // Monster Card Album: Purple
+	{ itemId: 670004, chance: 0.170 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.131 }  // Enhancement Card Lv1
 ]},
 { mapClassName: "d_firetower_45", items: [
 	{ itemId: 670001, chance: 0.180 }, // Monster Card Album: Red
 	{ itemId: 670002, chance: 0.180 }, // Monster Card Album: Blue
 	{ itemId: 670003, chance: 0.180 }, // Monster Card Album: Green
-	{ itemId: 670004, chance: 0.180 }  // Monster Card Album: Purple
+	{ itemId: 670004, chance: 0.180 }, // Monster Card Album: Purple
+	{ itemId: 645631, chance: 0.149 }  // Enhancement Card Lv1
 ]},
 
 // ============================================================================
 // DEMON PRISON - Card Enhancement Theme
 // ============================================================================
 { mapClassName: "d_velniasprison_51_1", items: [
-	{ itemId: 646071, chance: 0.150 }, // Enhancement Card: 100
-	{ itemId: 646043, chance: 0.075 }  // Enhancement Card: 500
+	{ itemId: 646071, chance: 0.300 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.150 }  // Enhancement Card: 500
 ]},
 { mapClassName: "d_velniasprison_51_2", items: [
-	{ itemId: 646071, chance: 0.188 }, // Enhancement Card: 100
-	{ itemId: 646043, chance: 0.095 }  // Enhancement Card: 500
+	{ itemId: 646071, chance: 0.376 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.189 }  // Enhancement Card: 500
 ]},
 { mapClassName: "d_velniasprison_51_3", items: [
-	{ itemId: 646071, chance: 0.225 }, // Enhancement Card: 100
-	{ itemId: 646043, chance: 0.113 }  // Enhancement Card: 500
+	{ itemId: 646071, chance: 0.550 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.276 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.015 }  // Enhancement Card Lv1 (2000)
 ]},
 { mapClassName: "d_velniasprison_51_4", items: [
-	{ itemId: 646071, chance: 0.263 }, // Enhancement Card: 100
-	{ itemId: 646043, chance: 0.132 }, // Enhancement Card: 500
-	{ itemId: 645631, chance: 0.027 }  // Enhancement Card Lv1 (2000)
+	{ itemId: 646071, chance: 0.526 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.264 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.054 }  // Enhancement Card Lv1 (2000)
 ]},
 { mapClassName: "d_velniasprison_51_5", items: [
-	{ itemId: 646071, chance: 0.300 }, // Enhancement Card: 100
-	{ itemId: 646043, chance: 0.150 }, // Enhancement Card: 500
-	{ itemId: 645631, chance: 0.030 }  // Enhancement Card Lv1 (2000)
+	{ itemId: 646071, chance: 0.600 }, // Enhancement Card: 100
+	{ itemId: 646043, chance: 0.300 }, // Enhancement Card: 500
+	{ itemId: 645631, chance: 0.060 }  // Enhancement Card Lv1 (2000)
 ]},
 
 // ============================================================================
