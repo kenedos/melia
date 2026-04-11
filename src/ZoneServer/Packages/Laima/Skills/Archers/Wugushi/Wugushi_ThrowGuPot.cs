@@ -92,13 +92,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 
 		private string GetPadName(ICombatEntity caster)
 		{
-			var bossCardId = caster.GetTempVar("Wugushi_bosscard");
-			if (bossCardId > 0)
-				return "Archer_VerminPot_Boss";
-
-			if (caster.IsAbilityActive(AbilityId.Wugushi5))
-				return "Archer_VerminPot_Enhanced";
-
 			return DefaultPadName;
 		}
 	}

@@ -4,6 +4,8 @@ using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.Pads.Handlers;
+using Melia.Zone.Skills;
+using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
@@ -65,6 +67,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Wugushi
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
+
 			var targets = pad.Trigger.GetAttackableEntities(creator)
 				.OrderBy(t => t.IsBuffActive(BuffId.Archer_VerminPot_Debuff) ? 1 : 0)
 				.Take(MaxTargets);
@@ -80,6 +83,47 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Wugushi
 
 				AddPadBuff(creator, target, pad, BuffId.Archer_VerminPot_Debuff, skill.Level, damage, 15000, 1, 100);
 			}
+
+			if (!pad.Variables.GetBool("Melia.BossCardUsed"))
+			{
+				var firstTarget = pad.Trigger.GetAttackableEntities(creator).FirstOrDefault();
+				if (firstTarget != null)
+					this.TryUseBossCardSkill(pad, creator, firstTarget);
+			}
+		}
+
+		private void TryUseBossCardSkill(Pad pad, ICombatEntity creator, ICombatEntity target)
+		{
+			var bossCardId = (int)creator.GetTempVar(PropertyName.Wugushi_bosscard);
+			if (bossCardId <= 0)
+				return;
+
+			if (!ZoneServer.Instance.Data.ItemDb.TryFind(bossCardId, out var cardData))
+				return;
+
+			var monsterClassId = (int)cardData.Script.NumArg1;
+			if (monsterClassId <= 0)
+				return;
+
+			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterClassId, out var monsterData))
+				return;
+
+			if (monsterData.Skills.Count == 0)
+				return;
+
+			var skillId = monsterData.Skills[0].SkillId;
+
+			if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<ITargetSkillHandler>(skillId, out var handler))
+				return;
+
+			var padMonster = pad.Monster;
+			if (padMonster == null)
+				return;
+
+			pad.Variables.SetBool("Melia.BossCardUsed", true);
+
+			var bossSkill = new Skill(padMonster, skillId);
+			handler.Handle(bossSkill, padMonster, target);
 		}
 	}
 }

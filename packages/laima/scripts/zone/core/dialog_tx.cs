@@ -888,4 +888,92 @@ public class DialogTxFunctionsScript : GeneralScript
 		character.AddonMessage(AddonMessage.POPOBOOST_REWARD_RSET);
 		return DialogTxResult.Okay;
 	}
+
+	[ScriptableFunction]
+	public DialogTxResult SCR_POISON_SET_CARD(Character character, DialogTxArgs args)
+	{
+		if (!character.Jobs.Has(JobId.Wugushi))
+			return DialogTxResult.Fail;
+
+		if (args.NumArgs.Length < 2)
+			return DialogTxResult.Fail;
+
+		var slot = args.NumArgs[0];
+		var action = args.NumArgs[1];
+
+		if (action == 1)
+		{
+			if (args.TxItems.Length < 1)
+				return DialogTxResult.Fail;
+
+			var cardItem = args.TxItems[0].Item;
+
+			if (cardItem == null || cardItem.Data.Group != ItemGroup.Card)
+				return DialogTxResult.Fail;
+
+			character.SetEtcProperty(PropertyName.Wugushi_bosscard, cardItem.Id);
+			character.SetEtcProperty(PropertyName.Wugushi_bosscardGUID, cardItem.ObjectId.ToString());
+
+			character.SetTempVar(PropertyName.Wugushi_bosscard, cardItem.Id);
+		}
+		else
+		{
+			character.SetEtcProperty(PropertyName.Wugushi_bosscard, 0);
+			character.SetEtcProperty(PropertyName.Wugushi_bosscardGUID, "0");
+
+			character.SetTempVar(PropertyName.Wugushi_bosscard, 0);
+		}
+
+		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		character.AddonMessage(AddonMessage.MSG_UPDATE_POISONPOT_UI);
+
+		return DialogTxResult.Okay;
+	}
+
+	[ScriptableFunction]
+	public DialogTxResult SCR_TX_POISONPOT(Character character, DialogTxArgs args)
+	{
+		if (!character.Jobs.Has(JobId.Wugushi))
+			return DialogTxResult.Fail;
+
+		if (args.TxItems.Length < 1)
+			return DialogTxResult.Fail;
+
+		var totalPoison = 0;
+
+		foreach (var txItem in args.TxItems)
+		{
+			var item = txItem.Item;
+			var amount = txItem.Amount;
+
+			if (item == null || amount <= 0)
+				continue;
+
+			var poisonValue = (int)item.Data.Script.NumArg1;
+			if (poisonValue <= 0)
+				poisonValue = 200;
+
+			totalPoison += poisonValue * amount;
+
+			character.Inventory.Remove(item, amount, InventoryItemRemoveMsg.Given);
+		}
+
+		if (totalPoison > 0)
+		{
+			var currentAmount = (int)character.Etc.Properties.GetFloat(PropertyName.Wugushi_PoisonAmount);
+			var maxAmount = (int)character.Etc.Properties.GetFloat(PropertyName.Wugushi_PoisonMaxAmount);
+
+			if (maxAmount <= 0)
+				maxAmount = 100000;
+
+			var newAmount = Math.Min(currentAmount + totalPoison, maxAmount);
+
+			character.SetEtcProperty(PropertyName.Wugushi_PoisonAmount, newAmount);
+		}
+
+		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		character.AddonMessage(AddonMessage.MSG_UPDATE_POISONPOT_UI);
+
+		return DialogTxResult.Okay;
+	}
 }

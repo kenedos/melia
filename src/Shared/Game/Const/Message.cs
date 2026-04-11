@@ -487,6 +487,11 @@
 		public const string UPDATE_NECRONOMICON_UI = "UPDATE_NECRONOMICON_UI";
 
 		/// <summary>
+		/// Wugushi Poison Pot UI Update
+		/// </summary>
+		public const string MSG_UPDATE_POISONPOT_UI = "MSG_UPDATE_POISONPOT_UI";
+
+		/// <summary>
 		/// An effect played when you unlock Legendary Card Slot?
 		/// </summary>
 		public const string MSG_PLAY_LEGENDCARD_OPEN_EFFECT = "MSG_PLAY_LEGENDCARD_OPEN_EFFECT";
