@@ -721,7 +721,6 @@ namespace Melia.Zone.World.Maps
 			}
 
 			monster.Map = null;
-			this.UpdateVisibility();
 
 			if (monster is Mob mob)
 				mob.Cleanup();
@@ -1139,7 +1138,6 @@ namespace Melia.Zone.World.Maps
 				_pads.Remove(pad.Handle);
 
 			pad.Map = null;
-			this.UpdateVisibility();
 		}
 
 		/// <summary>
