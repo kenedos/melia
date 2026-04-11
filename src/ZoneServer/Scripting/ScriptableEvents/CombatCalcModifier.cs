@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Melia.Shared.Game.Const;
 
 namespace Melia.Zone.Scripting.ScriptableEvents
@@ -20,22 +20,15 @@ namespace Melia.Zone.Scripting.ScriptableEvents
 	/// values, see <see cref="CombatCalcPhase"/>.
 	/// </remarks>
 	/// <example>
-	/// [CombatCalcModifier(CombatCalcPhase.BeforeCalc, SkillId.Ranger_SteadyAim)]
-	/// public void OnCombatBeforeCalc(...)
+	/// [CombatCalcModifier(CombatCalcPhase.BeforeCalc_Attack, SkillId.Ranger_SteadyAim)]
+	/// public static float OnCombatBeforeCalc(...)
 	///
 	/// The above method will be registered as a scriptable function with
-	/// the name "SCR_Combat_BeforeCalc_Ranger_SteadyAim" and called
-	/// during the BeforeCalc phase of combat calculations if the attacker
-	/// or the target has the relevant skills. Effectively, it's the same
-	/// as creating a scriptable function with these attributes:
-	/// 
-	/// [ScriptableFunction("SCR_Combat_BeforeCalc_Ranger_SteadyAim")]
-	/// public void OnCombatBeforeCalc(...)
-	/// 
-	/// [ScriptableFunction]
-	/// public void SCR_Combat_BeforeCalc_Ranger_SteadyAim(...)
+	/// the name "SCR_Combat_BeforeCalc_Attack_Ranger_SteadyAim" and called
+	/// during the BeforeCalc_Attack phase of combat calculations if the
+	/// attacker or the target has the relevant skills.
 	/// </example>
-	[AttributeUsage(AttributeTargets.Method)]
+	[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 	public class CombatCalcModifierAttribute : ScriptableFunctionAttribute
 	{
 		/// <summary>
@@ -62,9 +55,9 @@ namespace Melia.Zone.Scripting.ScriptableEvents
 		/// Creates new instance.
 		/// </summary>
 		/// <param name="phase"></param>
-		/// <param name="identifier"></param>
-		public CombatCalcModifierAttribute(string phase, SkillId identifier)
-			: this(phase, identifier.ToString())
+		/// <param name="skillId"></param>
+		public CombatCalcModifierAttribute(string phase, SkillId skillId)
+			: this(phase, skillId.ToString())
 		{
 		}
 
@@ -72,9 +65,9 @@ namespace Melia.Zone.Scripting.ScriptableEvents
 		/// Creates new instance.
 		/// </summary>
 		/// <param name="phase"></param>
-		/// <param name="identifier"></param>
-		public CombatCalcModifierAttribute(string phase, BuffId identifier)
-			: this(phase, identifier.ToString())
+		/// <param name="buffId"></param>
+		public CombatCalcModifierAttribute(string phase, BuffId buffId)
+			: this(phase, buffId.ToString())
 		{
 		}
 
@@ -82,9 +75,9 @@ namespace Melia.Zone.Scripting.ScriptableEvents
 		/// Creates new instance.
 		/// </summary>
 		/// <param name="phase"></param>
-		/// <param name="identifier"></param>
-		public CombatCalcModifierAttribute(string phase, AbilityId identifier)
-			: this(phase, identifier.ToString())
+		/// <param name="abilityId"></param>
+		public CombatCalcModifierAttribute(string phase, AbilityId abilityId)
+			: this(phase, abilityId.ToString())
 		{
 		}
 	}
@@ -115,5 +108,103 @@ namespace Melia.Zone.Scripting.ScriptableEvents
 		/// including bonuses.
 		/// </summary>
 		public const string AfterCalc = "AfterCalc";
+
+		/// <summary>
+		/// Occurs when a physical attack is dodged by the target.
+		/// </summary>
+		public const string OnDodge = "OnDodge";
+
+		/// <summary>
+		/// Occurs when a physical attack is blocked by the target.
+		/// </summary>
+		public const string OnBlock = "OnBlock";
+
+		// Attack-specific phases
+
+		/// <summary>
+		/// Occurs before combat calculations, checked on the attacker.
+		/// </summary>
+		public const string BeforeCalc_Attack = "BeforeCalc_Attack";
+
+		/// <summary>
+		/// Occurs after combat calculations, checked on the attacker.
+		/// </summary>
+		public const string AfterCalc_Attack = "AfterCalc_Attack";
+
+		/// <summary>
+		/// Occurs before bonuses, checked on the attacker.
+		/// </summary>
+		public const string BeforeBonuses_Attack = "BeforeBonuses_Attack";
+
+		/// <summary>
+		/// Occurs after bonuses, checked on the attacker.
+		/// </summary>
+		public const string AfterBonuses_Attack = "AfterBonuses_Attack";
+
+		// Defense-specific phases
+
+		/// <summary>
+		/// Occurs before combat calculations, checked on the target.
+		/// </summary>
+		public const string BeforeCalc_Defense = "BeforeCalc_Defense";
+
+		/// <summary>
+		/// Occurs after combat calculations, checked on the target.
+		/// </summary>
+		public const string AfterCalc_Defense = "AfterCalc_Defense";
+
+		/// <summary>
+		/// Occurs before bonuses, checked on the target.
+		/// </summary>
+		public const string BeforeBonuses_Defense = "BeforeBonuses_Defense";
+
+		/// <summary>
+		/// Occurs after bonuses, checked on the target.
+		/// </summary>
+		public const string AfterBonuses_Defense = "AfterBonuses_Defense";
+
+		// Companion attack phases
+
+		/// <summary>
+		/// Occurs before combat calculations when a companion attacks.
+		/// </summary>
+		public const string BeforeCalc_CompanionAttack = "BeforeCalc_CompanionAttack";
+
+		/// <summary>
+		/// Occurs after combat calculations when a companion attacks.
+		/// </summary>
+		public const string AfterCalc_CompanionAttack = "AfterCalc_CompanionAttack";
+
+		/// <summary>
+		/// Occurs before bonuses when a companion attacks.
+		/// </summary>
+		public const string BeforeBonuses_CompanionAttack = "BeforeBonuses_CompanionAttack";
+
+		/// <summary>
+		/// Occurs after bonuses when a companion attacks.
+		/// </summary>
+		public const string AfterBonuses_CompanionAttack = "AfterBonuses_CompanionAttack";
+
+		// Companion defense phases
+
+		/// <summary>
+		/// Occurs before combat calculations when a companion defends.
+		/// </summary>
+		public const string BeforeCalc_CompanionDefense = "BeforeCalc_CompanionDefense";
+
+		/// <summary>
+		/// Occurs after combat calculations when a companion defends.
+		/// </summary>
+		public const string AfterCalc_CompanionDefense = "AfterCalc_CompanionDefense";
+
+		/// <summary>
+		/// Occurs before bonuses when a companion defends.
+		/// </summary>
+		public const string BeforeBonuses_CompanionDefense = "BeforeBonuses_CompanionDefense";
+
+		/// <summary>
+		/// Occurs after bonuses when a companion defends.
+		/// </summary>
+		public const string AfterBonuses_CompanionDefense = "AfterBonuses_CompanionDefense";
 	}
 }

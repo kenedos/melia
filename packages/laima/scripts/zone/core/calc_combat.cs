@@ -192,10 +192,14 @@ public class CombatCalculationsScript : GeneralScript
 
 		// Check dodge
 		var isMagicSkill = skill.Data.ClassType == SkillClassType.Magic;
+		var SCR_Combat_OnDodge = ScriptableFunctions.Combat.Get("SCR_Combat_OnDodge");
+		var SCR_Combat_OnBlock = ScriptableFunctions.Combat.Get("SCR_Combat_OnBlock");
+
 		var dodgeChance = SCR_GetDodgeChance(attacker, target, skill, modifier, skillHitResult);
 		if (!isMagicSkill && rnd.Next(100) < dodgeChance)
 		{
 			skillHitResult.Result = HitResultType.Dodge;
+			SCR_Combat_OnDodge(attacker, target, skill, modifier, skillHitResult);
 			return 0;
 		}
 
@@ -206,10 +210,13 @@ public class CombatCalculationsScript : GeneralScript
 		if (!isMagicSkill && rnd.Next(100) < blockChance)
 		{
 			skillHitResult.Result = HitResultType.Block;
+			SCR_Combat_OnBlock(attacker, target, skill, modifier, skillHitResult);
 
 			// Nullify damage on successful classic block
 			if (!Feature.IsEnabled("NonNullifyBlocks"))
+			{
 				return 0;
+			}
 		}
 
 		// Get attack, including bonuses
@@ -248,6 +255,12 @@ public class CombatCalculationsScript : GeneralScript
 		{
 			Log.Warning($"SCR_CalculateDamage: {skill.Id} skill factor is {skillFactor}");
 		}
+
+		// Apply equipment/buff SFR bonuses
+		// Additive: +50 means skill factor goes from 500% to 550%
+		if (modifier.SkillFactorBonus != 0)
+			skillFactor += modifier.SkillFactorBonus;
+
 		skillHitResult.Damage *= skillFactor / 100f;
 
 		// After skill factor flat bonuses

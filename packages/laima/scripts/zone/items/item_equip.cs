@@ -1,11 +1,13 @@
 ﻿//--- Melia Script ----------------------------------------------------------
 // Equip Items
 //--- Description -----------------------------------------------------------
-// Item scripts that add and remove buffs on equipping items.
+// Item scripts that handle on-equip and on-unequip effects including
+// buff application, skill level bonuses, and property modifications.
 //---------------------------------------------------------------------------
 
 using System;
 using System.Linq;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone;
 using Melia.Zone.Network;
@@ -41,6 +43,9 @@ public class ItemEquipScript : GeneralScript
 			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, headData.Index);
 		}
 
+		// Apply item-specific equip effects
+		this.ApplyEquipEffects(character, item);
+
 		return ItemEquipResult.Okay;
 	}
 
@@ -55,6 +60,9 @@ public class ItemEquipScript : GeneralScript
 			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, 0);
 		else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
 			Send.ZC_NORMAL.UpdateCharacterLook(character, item.Id, equipSlot, 0);
+
+		// Remove item-specific equip effects
+		this.RemoveEquipEffects(character, item);
 
 		return ItemUnequipResult.Okay;
 	}
@@ -193,11 +201,86 @@ public class ItemEquipScript : GeneralScript
 		Send.ZC_COMMON_SKILL_LIST(character);
 		Send.ZC_NORMAL.SetSkillsProperties(character.Connection);
 
-		// if (character.HasSkill(skillData.Id))
-		// 	Log.Debug($"Unequipped Gem '{item.Data.ClassName}' with skill: '{item.Data.EquipSkill}' skill level is now: '{skill.Level}'");
-		// else
-		// 	Log.Debug($"Unequipped Gem '{item.Data.ClassName}' with skill: '{item.Data.EquipSkill}' and skill has been removed");
-
 		return ItemUnequipResult.Okay;
 	}
+
+	//===================================================================
+	// Item-specific equip/unequip effects
+	//===================================================================
+
+	/// <summary>
+	/// Applies item-specific effects when an item is equipped.
+	/// Handles SPCI_SKILLUP, SPCI_JOB_ALL_SKILLUP, and
+	/// SPCI_EQUIP_ADD_EXPROP_NUM from client SpcItem triggers.
+	/// </summary>
+	private void ApplyEquipEffects(Character character, Item item)
+	{
+		// Apply registry-based effects (ExProp, PropMod, Buff)
+		ItemEquipEffects.ApplyEffects(character, item.Id);
+
+		// NECK04_103: +40% HP recovery as magic crit attack, base HP recovery to 0
+		if (item.Data.ClassName == "NECK04_103")
+		{
+			var rhp = character.Properties.GetFloat(PropertyName.RHP);
+			var bonus = (float)Math.Floor(rhp * 0.4f);
+			character.Properties.SetFloat("NECK04_103_CRTMATK", bonus);
+			character.Properties.SetFloat("NECK04_103_RHP", rhp);
+			character.Properties.Modify(PropertyName.CRTMATK_BM, bonus);
+			character.Properties.Modify(PropertyName.RHP_BM, -rhp);
+		}
+
+		// Refresh skill UI if this item provides skill level bonuses
+		if (ItemEquipEffects.HasSkillEffects(item.Id))
+			RefreshSkillLevels(character);
+	}
+
+	/// <summary>
+	/// Removes item-specific effects when an item is unequipped.
+	/// Reverses all effects applied by ApplyEquipEffects.
+	/// </summary>
+	private void RemoveEquipEffects(Character character, Item item)
+	{
+		// Remove registry-based effects (ExProp, PropMod, Buff)
+		ItemEquipEffects.RemoveEffects(character, item.Id);
+
+		// NECK04_103: reverse the HP recovery conversion
+		if (item.Data.ClassName == "NECK04_103")
+		{
+			var bonus = character.Properties.GetFloat("NECK04_103_CRTMATK");
+			var rhp = character.Properties.GetFloat("NECK04_103_RHP");
+			character.Properties.Modify(PropertyName.CRTMATK_BM, -bonus);
+			character.Properties.Modify(PropertyName.RHP_BM, rhp);
+			character.Properties.SetFloat("NECK04_103_CRTMATK", 0);
+			character.Properties.SetFloat("NECK04_103_RHP", 0);
+		}
+
+		// Refresh skill UI if this item provides skill level bonuses
+		if (ItemEquipEffects.HasSkillEffects(item.Id))
+			RefreshSkillLevels(character);
+	}
+
+	//===================================================================
+	// Helper: Refresh skill UI after equip changes
+	//===================================================================
+
+	/// <summary>
+	/// Invalidates all skill properties and sends UI updates to the client.
+	/// Called after equipping/unequipping items that affect skill levels.
+	/// The actual level bonuses are auto-calculated by ItemEquipEffects
+	/// in SCR_Get_SkillLv.
+	/// </summary>
+	private static void RefreshSkillLevels(Character character)
+	{
+		foreach (var skill in character.Skills.GetList())
+		{
+			skill.Properties.InvalidateAll();
+		}
+
+		if (character.Connection != null)
+		{
+			Send.ZC_NORMAL.SetSkillsProperties(character.Connection);
+			Send.ZC_NORMAL.UpdateSkillUI(character);
+		}
+	}
+
 }

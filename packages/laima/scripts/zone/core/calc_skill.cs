@@ -51,6 +51,9 @@ public class SkillCalculationsScript : GeneralScript
 
 		value += skill.Properties.GetFloat(PropertyName.GemLevel_BM, 0);
 
+		if (skill.Owner is Character character)
+			value += ItemEquipEffects.GetSkillBonus(character, skill.Id);
+
 		if (value == 0)
 			return 0;
 

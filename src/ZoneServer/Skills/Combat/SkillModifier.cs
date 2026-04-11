@@ -165,6 +165,16 @@ namespace Melia.Zone.Skills.Combat
 		public float BonusCritChance { get; set; }
 
 		/// <summary>
+		/// Gets or sets a flat bonus added to the skill factor before it's applied.
+		/// </summary>
+		/// <remarks>
+		/// Value is in percentage points, e.g. 50 adds 50% to the skill factor.
+		/// A skill with 500% factor + 50 bonus = 550% factor.
+		/// Multiple sources stack additively.
+		/// </remarks>
+		public float SkillFactorBonus { get; set; }
+
+		/// <summary>
 		/// Gets or sets damage multiplier applied to skill damage after
 		/// defense, crit, and other modifiers were applied.
 		/// </summary>

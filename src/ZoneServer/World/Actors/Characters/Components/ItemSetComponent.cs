@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Data.Database;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Items;
 using Yggdrasil.Logging;
@@ -16,14 +17,52 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly object _syncLock = new();
 
 		/// <summary>
-		/// Tracks the equipped item class names per set.
+		/// Tracks the equipped item class names and their counts per set.
+		/// Uses a dictionary of counts instead of a HashSet to support
+		/// duplicate items (e.g., two identical bracelets in a set).
 		/// </summary>
-		private readonly Dictionary<string, HashSet<string>> _equippedSetItems = new();
+		private readonly Dictionary<string, Dictionary<string, int>> _equippedSetItems = new();
 
 		/// <summary>
 		/// Tracks the current piece count per set (for script notification).
 		/// </summary>
 		private readonly Dictionary<string, int> _currentPieceCounts = new();
+
+		/// <summary>
+		/// Returns the total piece count from item count tracking.
+		/// </summary>
+		private static int GetPieceCount(Dictionary<string, int> itemCounts)
+			=> itemCounts.Values.Sum();
+
+		/// <summary>
+		/// Returns the maximum allowed count for an item in a set,
+		/// based on how many times it appears in the set definition.
+		/// </summary>
+		private static int GetMaxItemCount(ItemSetData setData, string itemClassName)
+			=> setData.Items.Count(i => i == itemClassName);
+
+		/// <summary>
+		/// Returns true if the slot is a gear slot that can contribute
+		/// to set bonuses (armor, weapons, accessories), excluding
+		/// cosmetic and outer add-on slots.
+		/// </summary>
+		private static bool IsGearSlot(EquipSlot slot)
+		{
+			return slot switch
+			{
+				EquipSlot.Top => true,
+				EquipSlot.Pants => true,
+				EquipSlot.Gloves => true,
+				EquipSlot.Shoes => true,
+				EquipSlot.RightHand => true,
+				EquipSlot.LeftHand => true,
+				EquipSlot.Bracelet1 => true,
+				EquipSlot.Bracelet2 => true,
+				EquipSlot.Necklace => true,
+				EquipSlot.Earring => true,
+				_ => false,
+			};
+		}
 
 		/// <summary>
 		/// Creates new instance for character.
@@ -46,6 +85,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			var itemClassName = item.Data.ClassName;
 
+			// Log.Debug("ItemSetComponent.OnItemEquipped: '{0}' (Id={1}, IsDummy={2}) on '{3}'", itemClassName, item.Id, item is DummyEquipItem, character.Name);
+
 			if (!ZoneServer.Instance.Data.ItemSetDb.TryGetSetForItem(itemClassName, out var setData))
 				return;
 
@@ -54,17 +95,23 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				// Initialize tracking for this set if needed
 				if (!_equippedSetItems.TryGetValue(setData.ClassName, out var equippedItems))
 				{
-					equippedItems = new HashSet<string>();
+					equippedItems = new Dictionary<string, int>();
 					_equippedSetItems[setData.ClassName] = equippedItems;
 					_currentPieceCounts[setData.ClassName] = 0;
 				}
 
-				var oldPieceCount = equippedItems.Count;
+				var oldPieceCount = GetPieceCount(equippedItems);
 
-				// Add this item to the set tracking
-				equippedItems.Add(itemClassName);
+				// Increment count for this item class name, capped at the
+				// number of times it appears in the set definition
+				equippedItems.TryGetValue(itemClassName, out var count);
+				var maxCount = GetMaxItemCount(setData, itemClassName);
+				if (count >= maxCount)
+					return;
 
-				var newPieceCount = equippedItems.Count;
+				equippedItems[itemClassName] = count + 1;
+
+				var newPieceCount = GetPieceCount(equippedItems);
 				_currentPieceCounts[setData.ClassName] = newPieceCount;
 
 				// Notify script of the change
@@ -90,12 +137,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				if (!_equippedSetItems.TryGetValue(setData.ClassName, out var equippedItems))
 					return;
 
-				var oldPieceCount = equippedItems.Count;
+				// Check if this item is actually tracked
+				if (!equippedItems.TryGetValue(itemClassName, out var count))
+					return;
 
-				// Remove this item from set tracking
-				equippedItems.Remove(itemClassName);
+				var oldPieceCount = GetPieceCount(equippedItems);
 
-				var newPieceCount = equippedItems.Count;
+				// Decrement count, remove entry if it reaches 0
+				if (count <= 1)
+					equippedItems.Remove(itemClassName);
+				else
+					equippedItems[itemClassName] = count - 1;
+
+				var newPieceCount = GetPieceCount(equippedItems);
 				_currentPieceCounts[setData.ClassName] = newPieceCount;
 
 				// Notify script of the change
@@ -167,8 +221,15 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				// Build set tracking from equipped items
 				foreach (var kvp in equippedItems)
 				{
+					var slot = kvp.Key;
 					var item = kvp.Value;
-					if (item == null || item.Id == 0) // Skip dummy items
+					if (item == null || item is DummyEquipItem)
+						continue;
+
+					// Only count items in gear slots, skip cosmetic/outer
+					// add-on slots (Ring1-Ring4 are OUTERADD slots that can
+					// contain stale data)
+					if (!IsGearSlot(slot))
 						continue;
 
 					var itemClassName = item.Data?.ClassName;
@@ -178,14 +239,20 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (!ZoneServer.Instance.Data.ItemSetDb.TryGetSetForItem(itemClassName, out var setData))
 						continue;
 
+					Log.Debug("ItemSetComponent.Recalculate: Slot={0}, Item='{1}' (Id={2}) matches set '{3}'",
+						slot, itemClassName, item.Id, setData.ClassName);
+
 					// Initialize tracking for this set if needed
 					if (!_equippedSetItems.TryGetValue(setData.ClassName, out var setItems))
 					{
-						setItems = new HashSet<string>();
+						setItems = new Dictionary<string, int>();
 						_equippedSetItems[setData.ClassName] = setItems;
 					}
 
-					setItems.Add(itemClassName);
+					setItems.TryGetValue(itemClassName, out var count);
+					var maxCount = GetMaxItemCount(setData, itemClassName);
+					if (count < maxCount)
+						setItems[itemClassName] = count + 1;
 				}
 
 				// Notify scripts for each tracked set (from 0 to current count)
@@ -194,7 +261,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (!ZoneServer.Instance.Data.ItemSetDb.TryGetByClassName(setClassName, out var setData))
 						continue;
 
-					var pieceCount = _equippedSetItems[setClassName].Count;
+					var pieceCount = GetPieceCount(_equippedSetItems[setClassName]);
 					_currentPieceCounts[setClassName] = pieceCount;
 
 					// Notify script of the change (0 -> current count)
@@ -224,7 +291,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					result.Add(new ActiveSetBonusInfo
 					{
 						SetData = setData,
-						EquippedPieceCount = equippedItems.Count
+						EquippedPieceCount = GetPieceCount(equippedItems)
 					});
 				}
 			}

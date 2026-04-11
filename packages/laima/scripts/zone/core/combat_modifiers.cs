@@ -88,6 +88,40 @@ public class CombatModifierCalculationsScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Calls scriptable functions for active buffs, skills, abilities, etc,
+	/// when a physical attack is dodged by the target.
+	/// </summary>
+	/// <param name="attacker"></param>
+	/// <param name="target"></param>
+	/// <param name="skill"></param>
+	/// <param name="modifier"></param>
+	/// <param name="skillHitResult"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Combat_OnDodge(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+	{
+		CallAll(nameof(SCR_Combat_OnDodge), attacker, target, skill, modifier, skillHitResult);
+		return 0;
+	}
+
+	/// <summary>
+	/// Calls scriptable functions for active buffs, skills, abilities, etc,
+	/// when a physical attack is blocked by the target.
+	/// </summary>
+	/// <param name="attacker"></param>
+	/// <param name="target"></param>
+	/// <param name="skill"></param>
+	/// <param name="modifier"></param>
+	/// <param name="skillHitResult"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Combat_OnBlock(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+	{
+		CallAll(nameof(SCR_Combat_OnBlock), attacker, target, skill, modifier, skillHitResult);
+		return 0;
+	}
+
+	/// <summary>
 	/// Calls scriptable functions for buffs, skills, abilities, etc. for both
 	/// the attacker and target.
 	/// </summary>

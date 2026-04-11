@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.Combat
 		/// <summary>
 		/// Returns the result of the combat calculations.
 		/// </summary>
-		private SkillHitResult HitResult { get; }
+		public SkillHitResult HitResult { get; }
 
 		/// <summary>
 		/// Returns the hit's damage information.
