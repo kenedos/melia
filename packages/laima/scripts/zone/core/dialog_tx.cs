@@ -398,7 +398,9 @@ public class DialogTxFunctionsScript : GeneralScript
 			if (!character.HasSilver(price))
 				return DialogTxResult.Fail;
 
+			var prBefore = targetItem.Properties.GetFloat(PropertyName.PR);
 			targetItem.Properties.Modify(PropertyName.PR, -1);
+			Log.Debug("SCR_MAKE_ITEM_SOCKET: {0}'s '{1}' (ObjId:{2}) PR: {3} -> {4}", character.Name, targetItem.Name, targetItem.ObjectId, prBefore, targetItem.Properties.GetFloat(PropertyName.PR));
 
 			if (price > 0)
 				character.RemoveItem(ItemId.Vis, price);
