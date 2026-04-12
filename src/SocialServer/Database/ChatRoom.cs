@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
+using MySqlConnector;
 using Melia.Shared.Network;
 using Melia.Social.Network;
 using Melia.Social.World;
 using Yggdrasil.Logging;
+using Yggdrasil.Db.MySql.SimpleCommands;
 
 namespace Melia.Social.Database
 {
@@ -20,6 +22,11 @@ namespace Melia.Social.Database
 		/// Returns the chat room's globally unique id.
 		/// </summary>
 		public long Id { get; }
+
+		/// <summary>  
+		/// Database room ID for persistence  
+		/// </summary>  
+		public long DbId { get; set; }  
 
 		/// <summary>
 		/// Get or set the chat room's name.
@@ -129,6 +136,16 @@ namespace Melia.Social.Database
 				_members.Add(newMember);
 			}
 
+			if (this.Type == ChatRoomType.Group) {
+				using (var conn = SocialServer.Instance.Database.GetConnection())
+				using (var cmd = new InsertCommand("INSERT INTO `chat_members` {parameters}", conn)) {
+					cmd.Set("roomId", this.DbId);
+					cmd.Set("userId", user.AccountId);//using AccountId since it might be futureproof
+					cmd.Set("teamName", user.TeamName);
+					cmd.Execute();
+				}
+			}
+
 			if (user.TryGetConnection(out var userConn))
 			{
 				Send.SC_NORMAL.CreateRoom(userConn, this);
@@ -146,6 +163,37 @@ namespace Melia.Social.Database
 		}
 
 		/// <summary>
+		/// Add a member to the chat room.
+		/// </summary>
+		/// <param name="chatMember"></param>
+		public void AddMember(ChatMember chatMember)
+		{
+			// Check if the user is already a member
+			lock (_members) {
+				if (_members.Any(m => m.AccountId == chatMember.AccountId))
+					return;
+
+				_members.Add(chatMember);
+			}
+
+			if (SocialServer.Instance.UserManager.TryGet(chatMember.AccountId, out var user)) {  
+				if (user.TryGetConnection(out var userConn)) {  
+					Send.SC_NORMAL.CreateRoom(userConn, this);  
+					Send.SC_NORMAL.MessageList(userConn, this, this.GetMessages());  
+				}  
+			}  
+
+			foreach (var member in this.GetMembers())
+			{
+				if (member.AccountId == chatMember.AccountId)
+					continue;
+
+				if (SocialServer.Instance.UserManager.TryGet(member.AccountId, out var memberUser) && memberUser.TryGetConnection(out var memberConn))
+					Send.SC_NORMAL.CreateRoom(memberConn, this);
+			}
+		}
+
+		/// <summary>
 		/// Removes a member from a chat room.
 		/// </summary>
 		/// <param name="accountId"></param>
@@ -153,6 +201,21 @@ namespace Melia.Social.Database
 		{
 			lock (_members)
 				_members.RemoveAll(m => m.AccountId == accountId);
+
+
+			if (this.Type == ChatRoomType.Group) {
+				using (var conn = SocialServer.Instance.Database.GetConnection())
+				using (var cmd = new MySqlCommand("DELETE FROM `chat_members` WHERE `roomId` = @roomId AND `userId` = @userId", conn)) {
+					cmd.Parameters.AddWithValue("@roomId", this.DbId);
+					cmd.Parameters.AddWithValue("@userId", accountId);
+					cmd.ExecuteNonQuery();
+				}
+
+				if (this.MemberCount == 0) {  
+					SocialServer.Instance.ChatManager.RemoveChatRoom(this.Id);  
+					return;
+				}  
+			}
 
 			foreach (var member in this.GetMembers())
 			{

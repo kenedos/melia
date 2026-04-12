@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using MySqlConnector;
+using Melia.Shared.Database;
 using Melia.Social.Database;
 using Melia.Social.Network;
+using Yggdrasil.Db.MySql.SimpleCommands;
 
 namespace Melia.Social.World
 {
@@ -35,6 +38,14 @@ namespace Melia.Social.World
 		/// <param name="id"></param>
 		public void RemoveChatRoom(long id)
 		{
+			if (_rooms[id].Type == ChatRoomType.Group) {
+				using (var conn = SocialServer.Instance.Database.GetConnection())
+				using (var cmd = new MySqlCommand("DELETE FROM `chat_rooms` WHERE `roomId` = @roomId", conn)) {
+					cmd.Parameters.AddWithValue("@roomId", _rooms[id].DbId);
+					cmd.ExecuteNonQuery();
+				}
+			}
+
 			lock (_rooms)
 				_rooms.Remove(id);
 		}
@@ -96,6 +107,19 @@ namespace Melia.Social.World
 		{
 			var room = new ChatRoom(chatId, "", type);
 			this.AddChatRoom(room);
+			if (type == ChatRoomType.Group) {
+				using (var conn = SocialServer.Instance.Database.GetConnection())
+				using (var trans = conn.BeginTransaction()) {
+					using (var cmd = new InsertCommand("INSERT INTO `chat_rooms` {parameters}", conn, trans)) {
+						cmd.Set("type", type);
+						cmd.Set("creatorId", creator.Id);
+						cmd.Set("name", "New Chat");
+						cmd.Execute();
+						room.DbId = cmd.LastId;
+					}
+					trans.Commit();
+				}
+			}
 
 			room.AddMember(creator);
 
@@ -127,7 +151,50 @@ namespace Melia.Social.World
 
 			this.AddChatRoom(room);
 
-			// TODO: Restore chat rooms from database?
+			using (var conn = SocialServer.Instance.Database.GetConnection()) {
+				var roomsToLoad = new List<(ChatRoom room, long dbId)>();
+				using (var cmd = new MySqlCommand("SELECT * FROM `chat_rooms` WHERE `type` = @type", conn)) {
+					cmd.Parameters.AddWithValue("@type", 3);
+					using (var reader = cmd.ExecuteReader()) {
+						while (reader.Read()) {
+							var dbRoom = new ChatRoom(reader.GetStringSafe("name"), ChatRoomType.Group);
+							dbRoom.DbId = reader.GetInt64("roomId");
+							dbRoom.OwnerId = reader.GetInt64("creatorId");
+							this.AddChatRoom(dbRoom);
+							roomsToLoad.Add((dbRoom, dbRoom.DbId));
+						}
+					}
+				}
+				if (roomsToLoad.Any() == false)
+					return;
+				var roomIds = roomsToLoad.Select(room => room.dbId).ToList();
+				var idParams = roomIds.Select((id, i) => $"@roomId{i}").ToArray();
+				using (var cmd = new MySqlCommand($"SELECT * FROM `chat_members` WHERE `roomId` IN ({string.Join(",", idParams)})", conn)) {
+					for (int i = 0 ; i < roomIds.Count(); i++)
+						cmd.Parameters.AddWithValue(idParams[i], roomIds[i]);
+					
+					using (var reader = cmd.ExecuteReader()) {
+						var membersByRoom = new Dictionary<long, List<ChatMember>>();
+						while (reader.Read()) {
+							var roomId = reader.GetInt64("roomId");
+							var chatMember = new ChatMember(
+								roomId,
+								reader.GetInt64("userId"),
+								reader.GetStringSafe("teamName")
+							);
+							if (membersByRoom.ContainsKey(roomId) == false)
+								membersByRoom[roomId] = new List<ChatMember>();
+							membersByRoom[roomId].Add(chatMember);
+						}
+						foreach (var (roomToLoad, dbId) in roomsToLoad) {
+							if (membersByRoom.TryGetValue(dbId, out var members)) {
+								foreach (var member in members)
+									roomToLoad.AddMember(member);
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 }
