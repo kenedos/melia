@@ -197,10 +197,13 @@ public class RefiningItemScripts : GeneralScript
 		if (owner.AccountObjectId != savedOwnerAid)
 			return;
 
-		if (anvil.GetTempVar("ITEM_GET") == 1)
-			return;
+		lock (anvil)
+		{
+			if (anvil.GetTempVar("ITEM_GET") == 1)
+				return;
 
-		anvil.SetTempVar("ITEM_GET", 1);
+			anvil.SetTempVar("ITEM_GET", 1);
+		}
 
 		var guid = anvil.Vars.GetLong("ITEM_GUID");
 		var fromItem = owner.Inventory.GetItem(guid);
@@ -588,7 +591,9 @@ public class RefiningItemScripts : GeneralScript
 			}
 			else if (invItem.Potential > 0)
 			{
+				var prBefore = invItem.Properties.GetFloat(PropertyName.PR);
 				invItem.Properties.Modify(PropertyName.PR, -1);
+				Log.Debug("ReinforceResult: {0}'s '{1}' (ObjId:{2}) PR: {3} -> {4}", character.Name, invItem.Name, invItem.ObjectId, prBefore, invItem.Properties.GetFloat(PropertyName.PR));
 			}
 			else if (!IsAnvilForZeroPotential(moruItem))
 			{
