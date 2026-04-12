@@ -13056,6 +13056,202 @@ msgid "That's alright, dear. I'll be here if you change your mind."
 msgstr "Tudo bem, querida. Estarei aqui se mudar de ideia."
 
 # ============================================================================
+# Headgear: White Flower Headgear (white_flower_headgear_quest.cs)
+# ============================================================================
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "[Ex-Refugee] Ohla"
+msgstr "[Ex-Refugiada] Ohla"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Ohla"
+msgstr "Ohla"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "An Ex-Refugee's Homesickness"
+msgstr "A Saudade de uma Ex-Refugiada"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Help Ohla defeat monsters around Mishekan Forest."
+msgstr "Ajude Ohla a derrotar monstros na Floresta Mishekan."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Collect 30 Flowlevi Downs"
+msgstr "Colete 30 Penugens de Flowlevi"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Collect 30 Flowlon Leaves"
+msgstr "Colete 30 Folhas de Flowlon"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Collect 30 Bloom Leaves"
+msgstr "Colete 30 Folhas de Bloom"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Collect 30 Virdney Leaves"
+msgstr "Colete 30 Folhas de Virdney"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "{#666666}*looking around*{/}"
+msgstr "{#666666}*olhando ao redor*{/}"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Me and my daughter used to be refugees living in this area. Although our situation has improved since then, I do come here occasionally. It's nostalgic, in a way."
+msgstr "Eu e minha filha costumávamos ser refugiadas vivendo nesta área. Embora nossa situação tenha melhorado desde então, eu venho aqui de vez em quando. É nostálgico, de certa forma."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "I see this place is still plagued with monsters. Would you help me in culling their numbers? Just bring me materials from the monsters around here."
+msgstr "Vejo que este lugar ainda está infestado de monstros. Você me ajudaria a reduzir seus números? Apenas me traga materiais dos monstros daqui."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Have you defeated monsters from around here?"
+msgstr "Você derrotou monstros daqui?"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Yes, I have."
+msgstr "Sim, eu derrotei."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "There are still more monsters to defeat."
+msgstr "Ainda há mais monstros para derrotar."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "{#666666}*inspects the materials*{/}"
+msgstr "{#666666}*inspeciona os materiais*{/}"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Thank you. Although we have long moved away from here, I am happy to see this area becoming a nicer place."
+msgstr "Obrigada. Embora tenhamos nos mudado há muito tempo, fico feliz em ver esta área se tornando um lugar melhor."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "I know it isn't much, but I'd like to give you this. I appreciate you defeating these monsters."
+msgstr "Sei que não é muito, mas gostaria de lhe dar isto. Agradeço por derrotar esses monstros."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "You will find all types of monsters at different parts of Mishekan Forest."
+msgstr "Você encontrará todos os tipos de monstros em diferentes partes da Floresta Mishekan."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Would you do that for me?"
+msgstr "Faria isso por mim?"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "I'll help"
+msgstr "Vou ajudar"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Not now"
+msgstr "Agora não"
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "Thank you. Bring me 30 Flowlevi Downs, Flowlon Leaves, Bloom Leaves and Virdney Leaves. That should be enough proof you have cleaned up the area."
+msgstr "Obrigada. Traga-me 30 Penugens de Flowlevi, Folhas de Flowlon, Folhas de Bloom e Folhas de Virdney. Isso deve ser prova suficiente de que você limpou a área."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "With this, hopefully this area becomes safer."
+msgstr "Com isso, espero que esta área se torne mais segura."
+
+#: headgears/white_flower_headgear_quest.cs
+msgid "{#666666}*looks at the monsters from a distance*"
+msgstr "{#666666}*olha para os monstros de longe*"
+
+# ============================================================================
+# Headgear: Hair Accessory of Goddess Dahlia (hair_accessory_of_goddess_dahlia_quest.cs)
+# ============================================================================
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "[Believer] Sancti"
+msgstr "[Crente] Sancti"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Sancti"
+msgstr "Sancti"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Silent Prayers"
+msgstr "Orações Silenciosas"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Assist Sancti in order to drive out the evil energy in the Tower."
+msgstr "Ajude Sancti a expulsar a energia maligna da Torre."
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Collect 30 Minivern Skins"
+msgstr "Colete 30 Peles de Minivern"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Collect 10 Dimmer Marbles"
+msgstr "Colete 10 Esferas Opacas"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Collect 20 Black Drake Hearts"
+msgstr "Colete 20 Corações de Drake Negro"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Collect 30 Black Shaman Doll Cores"
+msgstr "Colete 30 Núcleos de Boneco Xamã Negro"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "{#666666}*praying with her eyes shut*{/}"
+msgstr "{#666666}*rezando com os olhos fechados*{/}"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Greetings Adventurer, what brings you here? Did you know that this area is rumored to have traces of a Goddess? With this place overrun by monsters it proves difficult to establish a spiritual connection through prayer."
+msgstr "Saudações Aventureiro, o que o traz aqui? Você sabia que há rumores de que esta área possui vestígios de uma Deusa? Com este lugar infestado de monstros, é difícil estabelecer uma conexão espiritual através da oração."
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Are you done?"
+msgstr "Você terminou?"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Yes, I have cleared the vicinity"
+msgstr "Sim, limpei as redondezas"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "There are still creatures lurking around"
+msgstr "Ainda há criaturas rondando por aqui"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "{#666666}*the monster remains were magically purified into thin air*{/}"
+msgstr "{#666666}*os restos dos monstros foram magicamente purificados no ar*{/}"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "This must be prove that our efforts paid off."
+msgstr "Isso deve ser prova de que nossos esforços valeram a pena."
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Take this as a token of my gratitude. Perhaps you can assist me once more to drive out the remaining monsters?"
+msgstr "Aceite isto como um sinal da minha gratidão. Talvez você possa me ajudar mais uma vez a expulsar os monstros restantes?"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Please restore this place to it's former glory."
+msgstr "Por favor, restaure este lugar à sua antiga glória."
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Will you help me drive out the monsters?"
+msgstr "Você me ajudará a expulsar os monstros?"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "I'll help"
+msgstr "Vou ajudar"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Not now"
+msgstr "Agora não"
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Thank you. Clearing out the evil energy around here should improve my prayers."
+msgstr "Obrigada. Limpar a energia maligna daqui deve melhorar minhas orações."
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "Please collect 30 Minivern Skins 10 Dimmer Marbles 20 Black Drake Hearts and 30 Black Shaman Doll Cores as proof of your efforts."
+msgstr "Por favor, colete 30 Peles de Minivern, 10 Esferas Opacas, 20 Corações de Drake Negro e 30 Núcleos de Boneco Xamã Negro como prova dos seus esforços."
+
+#: headgears/hair_accessory_of_goddess_dahlia_quest.cs
+msgid "{#666666}*continues praying*"
+msgstr "{#666666}*continua rezando*"
+
+# ============================================================================
 # Blacksmiths (NPCFunctions.cs)
 # ============================================================================
 
