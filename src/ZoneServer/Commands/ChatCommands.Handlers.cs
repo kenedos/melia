@@ -135,6 +135,7 @@ namespace Melia.Zone.Commands
 			this.Add("identify", "", "Identifies all unidentified items in inventory.", this.HandleIdentify);
 			this.Add("appraise", "", "Identifies all unidentified items in inventory.", this.HandleIdentify);
 			this.Add("refine", "<slot> <amount>", "Refines equipment. Slot 0 = all equipped items.", this.HandleRefine);
+			this.Add("itemprop", "<objectid> <property> <value>", "Sets an item property by ObjectId. Example: /itemprop 12345 PR 4", this.HandleItemProp);
 			this.Add("silver", "<modifier>", "Spawns silver.", this.HandleSilver);
 			this.Add("droptest", "<item id|name> [count=1] [radius=50]", "Drops items on the ground for pickup testing.", this.HandleDropTest);
 			this.Add("spawn", "<monster id|class name> [amount=1] ['ai'=BasicMonster] ['tendency'=peaceful] ['hp'=amount]", "Spawns monster.", this.HandleSpawn);
@@ -5881,6 +5882,44 @@ namespace Melia.Zone.Commands
 
 				sender.ServerMessage(Localization.Get("Refined {0} to +{1}."), item.Name, newRefine);
 			}
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Sets a property on an item by its ObjectId.
+		/// </summary>
+		private CommandResult HandleItemProp(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.Count < 3)
+				return CommandResult.InvalidArgument;
+
+			if (!long.TryParse(args.Get(0), out var objectId))
+				return CommandResult.InvalidArgument;
+
+			var propertyName = args.Get(1);
+
+			if (!float.TryParse(args.Get(2), NumberStyles.Float, CultureInfo.InvariantCulture, out var value))
+				return CommandResult.InvalidArgument;
+
+			if (!target.Inventory.TryGetItemOrEquip(objectId, out var item))
+			{
+				sender.ServerMessage(Localization.Get("Item with ObjectId {0} not found."), objectId);
+				return CommandResult.Okay;
+			}
+
+			var oldValue = item.Properties.GetFloat(propertyName);
+			item.Properties.SetFloat(propertyName, value);
+
+			item.Properties.InvalidateAll();
+			Send.ZC_OBJECT_PROPERTY(target, item);
+
+			if (target.Inventory.GetEquip().Values.Any(a => a.ObjectId == objectId))
+			{
+				target.InvalidateProperties();
+			}
+
+			sender.ServerMessage(Localization.Get("Set {0} on '{1}' (ObjId:{2}): {3} -> {4}"), propertyName, item.Name, objectId, oldValue, value);
 
 			return CommandResult.Okay;
 		}
