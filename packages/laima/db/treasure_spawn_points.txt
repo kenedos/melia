@@ -216,7 +216,7 @@
 { map: "f_orchard_34_2", x: 510, y: 0, z: 1798, direction: 315 },
 { map: "f_orchard_34_1", x: -1349, y: 22, z: 765, direction: 135 },
 { map: "f_orchard_34_1", x: -1016, y: 50, z: 280, direction: 45 },
-{ map: "f_orchard_34_1", x: -1527, y: -44, z: -505, direction: 44 },
+{ map: "f_orchard_34_1", x: -1580, y: -96, z: -522, direction: 0 },
 { map: "f_orchard_34_1", x: 312, y: 25, z: 329, direction: 315 },
 { map: "f_orchard_34_1", x: 579, y: -1, z: 402, direction: 45 },
 { map: "f_bracken_63_3", x: -1274, y: 191, z: 40, direction: 180 },

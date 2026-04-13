@@ -84,18 +84,25 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Wugushi
 				AddPadBuff(creator, target, pad, BuffId.Archer_VerminPot_Debuff, skill.Level, damage, 15000, 1, 100);
 			}
 
-			if (!pad.Variables.GetBool("Melia.BossCardUsed"))
-			{
-				var firstTarget = pad.Trigger.GetAttackableEntities(creator).FirstOrDefault();
-				if (firstTarget != null)
-					this.TryUseBossCardSkill(pad, creator, firstTarget);
-			}
+			this.TryUseBossCardSkill(pad, creator);
 		}
 
-		private void TryUseBossCardSkill(Pad pad, ICombatEntity creator, ICombatEntity target)
+		private void TryUseBossCardSkill(Pad pad, ICombatEntity creator)
 		{
 			var bossCardId = (int)creator.GetTempVar(PropertyName.Wugushi_bosscard);
 			if (bossCardId <= 0)
+				return;
+
+			var now = DateTime.Now;
+			if (pad.Variables.Has("Melia.BossCard.NextFire"))
+			{
+				var nextFire = pad.Variables.Get<DateTime>("Melia.BossCard.NextFire");
+				if (now < nextFire)
+					return;
+			}
+
+			var firstTarget = pad.Trigger.GetAttackableEntities(creator).FirstOrDefault();
+			if (firstTarget == null)
 				return;
 
 			if (!ZoneServer.Instance.Data.ItemDb.TryFind(bossCardId, out var cardData))
@@ -120,10 +127,14 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Wugushi
 			if (padMonster == null)
 				return;
 
-			pad.Variables.SetBool("Melia.BossCardUsed", true);
+			var shootTime = ZoneServer.Instance.Data.SkillDb.TryFind(skillId, out var skillData)
+				? skillData.ShootTime
+				: TimeSpan.FromMilliseconds(1000);
+
+			pad.Variables.Set("Melia.BossCard.NextFire", now + shootTime);
 
 			var bossSkill = new Skill(padMonster, skillId);
-			handler.Handle(bossSkill, padMonster, target);
+			handler.Handle(bossSkill, padMonster, firstTarget);
 		}
 	}
 }
