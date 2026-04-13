@@ -24,8 +24,6 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			this.Properties.SetFloat(propertyName, value);
 			Send.ZC_OBJECT_PROPERTY(this, propertyName);
-			if (propertyName == PropertyName.CastingSpeed)
-				this.StatChanged?.Invoke(this);
 		}
 
 		/// <summary>
@@ -44,8 +42,6 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			this.Properties.Modify(propertyName, value);
 			Send.ZC_OBJECT_PROPERTY(this, propertyName);
-			if (propertyName == PropertyName.CastingSpeed)
-				this.StatChanged?.Invoke(this);
 		}
 
 		/// <summary>

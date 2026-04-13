@@ -313,9 +313,6 @@ namespace Melia.Zone.World.Actors.Characters
 			// as those properties are affected by the sitting status.
 			this.Character.SitStatusChanged += this.SitStatusChanged;
 
-			// Update some special properties when character's stats change
-			this.Character.StatChanged += this.OnStatChanged;
-
 			// Subscribe to equipment changes, as any number of properties
 			// might make use of equipment stats
 			if (this.Character.Inventory != null)
@@ -340,6 +337,15 @@ namespace Melia.Zone.World.Actors.Characters
 			if (this.TryGet<CFloatProperty>(PropertyName.DEX, out var dexProperty))
 				dexProperty.ValueChanged += this.OnSkillSpeedPropertyChanged;
 
+			// Subscribe to CastingSpeed and MSPD property changes to
+			// automatically send client update packets whenever any
+			// effect changes these values (buffs, equipment, trinkets, etc.)
+			if (this.TryGet<CFloatProperty>(PropertyName.CastingSpeed, out var castingSpeedProperty))
+				castingSpeedProperty.ValueChanged += this.OnCastingSpeedChanged;
+
+			if (this.TryGet<CFloatProperty>(PropertyName.MSPD, out var mspdProperty))
+				mspdProperty.ValueChanged += this.OnMovementSpeedChanged;
+
 			// Subscribe to property changes that affect companion stats
 			this.SubscribeCompanionPropertyUpdates();
 		}
@@ -351,9 +357,6 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			// Unsubscribe from sit status changes
 			this.Character.SitStatusChanged -= this.SitStatusChanged;
-
-			// Unsubscribe from stat changes
-			this.Character.StatChanged -= this.OnStatChanged;
 
 			// Unsubscribe from equipment changes
 			this.Character.Inventory.Equipped -= this.OnEquipmentChanged;
@@ -370,6 +373,13 @@ namespace Melia.Zone.World.Actors.Characters
 
 			if (this.TryGet<CFloatProperty>(PropertyName.DEX, out var dexProperty))
 				dexProperty.ValueChanged -= this.OnSkillSpeedPropertyChanged;
+
+			// Unsubscribe from CastingSpeed and MSPD property changes
+			if (this.TryGet<CFloatProperty>(PropertyName.CastingSpeed, out var castingSpeedProperty))
+				castingSpeedProperty.ValueChanged -= this.OnCastingSpeedChanged;
+
+			if (this.TryGet<CFloatProperty>(PropertyName.MSPD, out var mspdProperty))
+				mspdProperty.ValueChanged -= this.OnMovementSpeedChanged;
 
 			// Unsubscribe from companion property updates
 			this.UnsubscribeCompanionPropertyUpdates();
@@ -449,10 +459,7 @@ namespace Melia.Zone.World.Actors.Characters
 
 			this.InvalidateAll();
 			Send.ZC_OBJECT_PROPERTY(this.Character);
-			Send.ZC_CASTING_SPEED(this.Character);
 			Send.ZC_UPDATE_SKL_SPDRATE_LIST(this.Character, this.Character.Skills.GetList());
-			if (buff.AffectsMovementSpeed())
-				Send.ZC_MSPD(this.Character);
 		}
 
 		/// <summary>
@@ -492,12 +499,21 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Sends necessary updates to a character when their stats change.
+		/// Called when the CastingSpeed property changes to update the client.
 		/// </summary>
-		/// <param name="character"></param>
-		private void OnStatChanged(Character character)
+		/// <param name="propertyName"></param>
+		private void OnCastingSpeedChanged(string propertyName)
 		{
-			Send.ZC_CASTING_SPEED(character);
+			Send.ZC_CASTING_SPEED(this.Character);
+		}
+
+		/// <summary>
+		/// Called when the MSPD property changes to update the client.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		private void OnMovementSpeedChanged(string propertyName)
+		{
+			Send.ZC_MSPD(this.Character);
 		}
 
 		/// <summary>

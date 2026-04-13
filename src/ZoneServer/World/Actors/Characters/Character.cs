@@ -494,11 +494,6 @@ namespace Melia.Zone.World.Actors.Characters
 		public event Action<Character> SitStatusChanged;
 
 		/// <summary>
-		/// Raised when the characters stats change.
-		/// </summary>
-		public event Action<Character> StatChanged;
-
-		/// <summary>
 		/// Raised when the character dies.
 		/// </summary>
 		public Action<Character, ICombatEntity> Died { get; set; }
