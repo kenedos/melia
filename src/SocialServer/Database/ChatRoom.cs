@@ -1,11 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
-using MySqlConnector;
 using Melia.Shared.Network;
 using Melia.Social.Network;
 using Melia.Social.World;
 using Yggdrasil.Logging;
-using Yggdrasil.Db.MySql.SimpleCommands;
 
 namespace Melia.Social.Database
 {
@@ -136,15 +134,8 @@ namespace Melia.Social.Database
 				_members.Add(newMember);
 			}
 
-			if (this.Type == ChatRoomType.Group) {
-				using (var conn = SocialServer.Instance.Database.GetConnection())
-				using (var cmd = new InsertCommand("INSERT INTO `chat_members` {parameters}", conn)) {
-					cmd.Set("roomId", this.DbId);
-					cmd.Set("userId", user.AccountId);//using AccountId since it might be futureproof
-					cmd.Set("teamName", user.TeamName);
-					cmd.Execute();
-				}
-			}
+			if (this.Type == ChatRoomType.Group && this.DbId > 0)
+				SocialServer.Instance.Database.InsertChatMember(this.DbId, user.Id, user.TeamName);
 
 			if (user.TryGetConnection(out var userConn))
 			{
@@ -169,19 +160,22 @@ namespace Melia.Social.Database
 		public void AddMember(ChatMember chatMember)
 		{
 			// Check if the user is already a member
-			lock (_members) {
+			lock (_members)
+			{
 				if (_members.Any(m => m.AccountId == chatMember.AccountId))
 					return;
 
 				_members.Add(chatMember);
 			}
 
-			if (SocialServer.Instance.UserManager.TryGet(chatMember.AccountId, out var user)) {  
-				if (user.TryGetConnection(out var userConn)) {  
-					Send.SC_NORMAL.CreateRoom(userConn, this);  
-					Send.SC_NORMAL.MessageList(userConn, this, this.GetMessages());  
-				}  
-			}  
+			if (SocialServer.Instance.UserManager.TryGet(chatMember.AccountId, out var user))
+			{
+				if (user.TryGetConnection(out var userConn))
+				{
+					Send.SC_NORMAL.CreateRoom(userConn, this);
+					Send.SC_NORMAL.MessageList(userConn, this, this.GetMessages());
+				}
+			}
 
 			foreach (var member in this.GetMembers())
 			{
@@ -199,22 +193,23 @@ namespace Melia.Social.Database
 		/// <param name="accountId"></param>
 		public void RemoveMember(long accountId)
 		{
+			var isEmpty = false;
+
 			lock (_members)
+			{
 				_members.RemoveAll(m => m.AccountId == accountId);
+				isEmpty = _members.Count == 0;
+			}
 
+			if (this.Type == ChatRoomType.Group && this.DbId > 0)
+			{
+				SocialServer.Instance.Database.DeleteChatMember(this.DbId, accountId);
 
-			if (this.Type == ChatRoomType.Group) {
-				using (var conn = SocialServer.Instance.Database.GetConnection())
-				using (var cmd = new MySqlCommand("DELETE FROM `chat_members` WHERE `roomId` = @roomId AND `userId` = @userId", conn)) {
-					cmd.Parameters.AddWithValue("@roomId", this.DbId);
-					cmd.Parameters.AddWithValue("@userId", accountId);
-					cmd.ExecuteNonQuery();
-				}
-
-				if (this.MemberCount == 0) {  
-					SocialServer.Instance.ChatManager.RemoveChatRoom(this.Id);  
+				if (isEmpty)
+				{
+					SocialServer.Instance.ChatManager.RemoveChatRoom(this.Id);
 					return;
-				}  
+				}
 			}
 
 			foreach (var member in this.GetMembers())
