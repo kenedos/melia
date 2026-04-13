@@ -30,7 +30,14 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Wugushi
 			pad.SetUpdateInterval(750);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000);
 
-			PadCreateMonster(pad, "hidden_monster4", pad.Position, 0f, 0, 15f, "HitProof#YES", "None", 1, true, "None", "None", false, "SCR_ARRIVE_THROWGUPOT");
+			var monster = PadCreateMonster(pad, "hidden_monster4", pad.Position, 0f, 0, 15f, "HitProof#YES", "None", 1, true, "None", "None", false, "SCR_ARRIVE_THROWGUPOT");
+			if (monster is Mob mob)
+			{
+				mob.SetHittable(false);
+				mob.MonsterType = RelationType.Friendly;
+				mob.Faction = FactionType.Law;
+				mob.StartBuff(BuffId.Invincible);
+			}
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)

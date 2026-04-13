@@ -94,6 +94,7 @@ namespace Melia.Zone.Pads.Handlers
 			var lifeTime = BasePadLifeTimeMilliseconds + (PadLifeTimePerLevelMilliseconds * pad.Skill.Level);
 			var monster = PadCreateMonster(pad, "attract_pillar", pad.Position, 0f, 0, lifeTime, "", "None", 1, true, "None", "None", false, "SET_PVE_NODAMAGE");
 			var mob = monster as Mob;
+			mob.SetHittable(false);
 			mob.MonsterType = RelationType.Friendly;
 			mob.Faction = FactionType.Law;
 			mob.StartBuff(BuffId.Invincible);

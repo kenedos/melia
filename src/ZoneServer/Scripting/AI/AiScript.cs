@@ -1171,6 +1171,9 @@ namespace Melia.Zone.Scripting.AI
 			if (entity.IsBuffActive(BuffId.Pet_Dead))
 				return false;
 
+			if (entity.Properties.GetString(PropertyName.HitProof, "NO") == "YES")
+				return false;
+
 			return true;
 		}
 
