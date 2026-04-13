@@ -134,9 +134,6 @@ namespace Melia.Social.Database
 				_members.Add(newMember);
 			}
 
-			if (this.Type == ChatRoomType.Group && this.DbId > 0)
-				SocialServer.Instance.Database.InsertChatMember(this.DbId, user.Id, user.TeamName);
-
 			if (user.TryGetConnection(out var userConn))
 			{
 				Send.SC_NORMAL.CreateRoom(userConn, this);
@@ -199,17 +196,6 @@ namespace Melia.Social.Database
 			{
 				_members.RemoveAll(m => m.AccountId == accountId);
 				isEmpty = _members.Count == 0;
-			}
-
-			if (this.Type == ChatRoomType.Group && this.DbId > 0)
-			{
-				SocialServer.Instance.Database.DeleteChatMember(this.DbId, accountId);
-
-				if (isEmpty)
-				{
-					SocialServer.Instance.ChatManager.RemoveChatRoom(this.Id);
-					return;
-				}
 			}
 
 			foreach (var member in this.GetMembers())

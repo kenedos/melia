@@ -338,7 +338,7 @@ namespace Melia.Social.Network
 			// chats, but perhaps that should be an option? For example, we
 			// could send a tag invite via whisper.
 
-			room.AddMember(invitedUser);
+			SocialServer.Instance.ChatManager.AddMemberToRoom(room, invitedUser);
 			room.AddMessage(new ChatMessage(invitedUser, string.Format(Localization.Get("{0} has joined."), invitedUser.TeamName)));
 		}
 
@@ -419,7 +419,7 @@ namespace Melia.Social.Network
 				return;
 			}
 
-			room.AddMember(user);
+			SocialServer.Instance.ChatManager.AddMemberToRoom(room, user);
 			room.AddMessage(new ChatMessage(user, string.Format(Localization.Get("{0} has joined."), user.TeamName)));
 		}
 
@@ -485,7 +485,7 @@ namespace Melia.Social.Network
 				return;
 			}
 
-			room.RemoveMember(user.AccountId);
+			SocialServer.Instance.ChatManager.RemoveMemberFromRoom(room, user.AccountId);
 			room.AddMessage(new ChatMessage(user, string.Format(Localization.Get("{0} has left."), user.TeamName)));
 		}
 
