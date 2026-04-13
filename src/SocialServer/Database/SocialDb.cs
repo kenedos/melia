@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
@@ -424,6 +425,154 @@ namespace Melia.Social.Database
 
 				cmd.Execute();
 			}
+		}
+
+		/// <summary>
+		/// Inserts a new chat room into the database and returns its
+		/// auto-generated id.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <param name="creatorId"></param>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		public long InsertChatRoom(ChatRoomType type, long creatorId, string name)
+		{
+			using (var conn = this.GetConnection())
+			using (var trans = conn.BeginTransaction())
+			{
+				using (var cmd = new InsertCommand("INSERT INTO `chat_rooms` {parameters}", conn, trans))
+				{
+					cmd.Set("type", (int)type);
+					cmd.Set("creatorId", creatorId);
+					cmd.Set("name", name);
+
+					cmd.Execute();
+
+					trans.Commit();
+
+					return cmd.LastId;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Deletes a chat room from the database by its database id.
+		/// </summary>
+		/// <param name="dbId"></param>
+		public void DeleteChatRoom(long dbId)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new MySqlCommand("DELETE FROM `chat_rooms` WHERE `roomId` = @roomId", conn))
+			{
+				cmd.Parameters.AddWithValue("@roomId", dbId);
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		/// <summary>
+		/// Inserts a chat member into the database.
+		/// </summary>
+		/// <param name="roomDbId"></param>
+		/// <param name="userId"></param>
+		/// <param name="teamName"></param>
+		public void InsertChatMember(long roomDbId, long userId, string teamName)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new InsertCommand("INSERT INTO `chat_members` {parameters}", conn))
+			{
+				cmd.Set("roomId", roomDbId);
+				cmd.Set("userId", userId);
+				cmd.Set("teamName", teamName);
+
+				cmd.Execute();
+			}
+		}
+
+		/// <summary>
+		/// Deletes a chat member from the database.
+		/// </summary>
+		/// <param name="roomDbId"></param>
+		/// <param name="userId"></param>
+		public void DeleteChatMember(long roomDbId, long userId)
+		{
+			using (var conn = this.GetConnection())
+			using (var cmd = new MySqlCommand("DELETE FROM `chat_members` WHERE `roomId` = @roomId AND `userId` = @userId", conn))
+			{
+				cmd.Parameters.AddWithValue("@roomId", roomDbId);
+				cmd.Parameters.AddWithValue("@userId", userId);
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		/// <summary>
+		/// Loads all persisted group chat rooms and their members from the
+		/// database.
+		/// </summary>
+		/// <returns></returns>
+		public List<(ChatRoom Room, List<ChatMember> Members)> LoadChatRooms()
+		{
+			var result = new List<(ChatRoom Room, List<ChatMember> Members)>();
+
+			using (var conn = this.GetConnection())
+			{
+				var roomsById = new Dictionary<long, (ChatRoom Room, List<ChatMember> Members)>();
+
+				using (var cmd = new MySqlCommand("SELECT * FROM `chat_rooms` WHERE `type` = @type", conn))
+				{
+					cmd.Parameters.AddWithValue("@type", (int)ChatRoomType.Group);
+
+					using (var reader = cmd.ExecuteReader())
+					{
+						while (reader.Read())
+						{
+							var dbId = reader.GetInt64("roomId");
+							var name = reader.GetStringSafe("name");
+							var creatorId = reader.GetInt64("creatorId");
+
+							var room = new ChatRoom(name, ChatRoomType.Group);
+							room.DbId = dbId;
+							room.OwnerId = creatorId;
+
+							var entry = (room, new List<ChatMember>());
+							roomsById[dbId] = entry;
+							result.Add(entry);
+						}
+					}
+				}
+
+				if (roomsById.Count == 0)
+					return result;
+
+				var dbIds = roomsById.Keys.ToList();
+				var idParams = dbIds.Select((id, i) => $"@roomId{i}").ToArray();
+
+				using (var cmd = new MySqlCommand($"SELECT * FROM `chat_members` WHERE `roomId` IN ({string.Join(",", idParams)})", conn))
+				{
+					for (var i = 0; i < dbIds.Count; i++)
+						cmd.Parameters.AddWithValue(idParams[i], dbIds[i]);
+
+					using (var reader = cmd.ExecuteReader())
+					{
+						while (reader.Read())
+						{
+							var dbRoomId = reader.GetInt64("roomId");
+
+							if (!roomsById.TryGetValue(dbRoomId, out var entry))
+								continue;
+
+							var chatMember = new ChatMember(
+								entry.Room.Id,
+								reader.GetInt64("userId"),
+								reader.GetStringSafe("teamName")
+							);
+
+							entry.Members.Add(chatMember);
+						}
+					}
+				}
+			}
+
+			return result;
 		}
 
 		/// <summary>

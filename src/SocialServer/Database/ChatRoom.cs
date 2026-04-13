@@ -21,6 +21,11 @@ namespace Melia.Social.Database
 		/// </summary>
 		public long Id { get; }
 
+		/// <summary>  
+		/// Database room ID for persistence  
+		/// </summary>  
+		public long DbId { get; set; }  
+
 		/// <summary>
 		/// Get or set the chat room's name.
 		/// </summary>
@@ -129,6 +134,9 @@ namespace Melia.Social.Database
 				_members.Add(newMember);
 			}
 
+			if (this.Type == ChatRoomType.Group && this.DbId > 0)
+				SocialServer.Instance.Database.InsertChatMember(this.DbId, user.Id, user.TeamName);
+
 			if (user.TryGetConnection(out var userConn))
 			{
 				Send.SC_NORMAL.CreateRoom(userConn, this);
@@ -146,13 +154,63 @@ namespace Melia.Social.Database
 		}
 
 		/// <summary>
+		/// Add a member to the chat room.
+		/// </summary>
+		/// <param name="chatMember"></param>
+		public void AddMember(ChatMember chatMember)
+		{
+			// Check if the user is already a member
+			lock (_members)
+			{
+				if (_members.Any(m => m.AccountId == chatMember.AccountId))
+					return;
+
+				_members.Add(chatMember);
+			}
+
+			if (SocialServer.Instance.UserManager.TryGet(chatMember.AccountId, out var user))
+			{
+				if (user.TryGetConnection(out var userConn))
+				{
+					Send.SC_NORMAL.CreateRoom(userConn, this);
+					Send.SC_NORMAL.MessageList(userConn, this, this.GetMessages());
+				}
+			}
+
+			foreach (var member in this.GetMembers())
+			{
+				if (member.AccountId == chatMember.AccountId)
+					continue;
+
+				if (SocialServer.Instance.UserManager.TryGet(member.AccountId, out var memberUser) && memberUser.TryGetConnection(out var memberConn))
+					Send.SC_NORMAL.CreateRoom(memberConn, this);
+			}
+		}
+
+		/// <summary>
 		/// Removes a member from a chat room.
 		/// </summary>
 		/// <param name="accountId"></param>
 		public void RemoveMember(long accountId)
 		{
+			var isEmpty = false;
+
 			lock (_members)
+			{
 				_members.RemoveAll(m => m.AccountId == accountId);
+				isEmpty = _members.Count == 0;
+			}
+
+			if (this.Type == ChatRoomType.Group && this.DbId > 0)
+			{
+				SocialServer.Instance.Database.DeleteChatMember(this.DbId, accountId);
+
+				if (isEmpty)
+				{
+					SocialServer.Instance.ChatManager.RemoveChatRoom(this.Id);
+					return;
+				}
+			}
 
 			foreach (var member in this.GetMembers())
 			{

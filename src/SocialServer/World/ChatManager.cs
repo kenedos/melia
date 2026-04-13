@@ -35,8 +35,21 @@ namespace Melia.Social.World
 		/// <param name="id"></param>
 		public void RemoveChatRoom(long id)
 		{
+			long dbId = 0;
+
 			lock (_rooms)
-				_rooms.Remove(id);
+			{
+				if (_rooms.TryGetValue(id, out var room))
+				{
+					if (room.Type == ChatRoomType.Group)
+						dbId = room.DbId;
+
+					_rooms.Remove(id);
+				}
+			}
+
+			if (dbId > 0)
+				SocialServer.Instance.Database.DeleteChatRoom(dbId);
 		}
 
 		/// <summary>
@@ -97,6 +110,9 @@ namespace Melia.Social.World
 			var room = new ChatRoom(chatId, "", type);
 			this.AddChatRoom(room);
 
+			if (type == ChatRoomType.Group)
+				room.DbId = SocialServer.Instance.Database.InsertChatRoom(type, creator.Id, "New Chat");
+
 			room.AddMember(creator);
 
 			if (chatId == 0)
@@ -127,7 +143,15 @@ namespace Melia.Social.World
 
 			this.AddChatRoom(room);
 
-			// TODO: Restore chat rooms from database?
+			var chatRooms = SocialServer.Instance.Database.LoadChatRooms();
+
+			foreach (var (dbRoom, members) in chatRooms)
+			{
+				this.AddChatRoom(dbRoom);
+
+				foreach (var member in members)
+					dbRoom.AddMember(member);
+			}
 		}
 	}
 }
