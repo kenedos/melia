@@ -460,6 +460,15 @@ namespace Melia.Zone.World.Actors.Characters
 			this.InvalidateAll();
 			Send.ZC_OBJECT_PROPERTY(this.Character);
 			Send.ZC_UPDATE_SKL_SPDRATE_LIST(this.Character, this.Character.Skills.GetList());
+
+			if (this.Character.Companions?.HasCompanions == true)
+			{
+				foreach (var companion in this.Character.Companions.GetList())
+				{
+					companion.Properties.InvalidateAll();
+					Send.ZC_OBJECT_PROPERTY(this.Character.Connection, companion);
+				}
+			}
 		}
 
 		/// <summary>

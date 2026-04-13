@@ -151,6 +151,15 @@ namespace Melia.Zone.World.Actors.Characters
 			Send.ZC_CASTING_SPEED(this);
 			Send.ZC_UPDATE_ALL_STATUS(this, this.HpChangeCounter);
 			Send.ZC_UPDATE_SKL_SPDRATE_LIST(this, this.Skills.GetList());
+
+			if (this.Companions?.HasCompanions == true)
+			{
+				foreach (var companion in this.Companions.GetList())
+				{
+					companion.Properties.InvalidateAll();
+					Send.ZC_OBJECT_PROPERTY(this.Connection, companion);
+				}
+			}
 		}
 
 		/// <summary>
