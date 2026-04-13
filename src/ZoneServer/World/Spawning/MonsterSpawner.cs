@@ -403,8 +403,13 @@ namespace Melia.Zone.World.Spawning
 			this.Amount--;
 			_flexMeter += FlexMeterIncreasePerDeath;
 
+			// Use RandomProvider instead of _rnd to avoid corrupting _rnd's
+			// internal state via concurrent access from the death callback
+			// and the update thread.
+			var delay = RandomProvider.Get().Between(this.MinRespawnDelay, this.MaxRespawnDelay);
+
 			lock (_respawnDelays)
-				_respawnDelays.Add(this.GetRandomRespawnDelay());
+				_respawnDelays.Add(delay);
 		}
 
 		/// <summary>
@@ -570,11 +575,5 @@ namespace Melia.Zone.World.Spawning
 			}
 		}
 
-		/// <summary>
-		/// Returns a random delay between min and max respawn delay.
-		/// </summary>
-		/// <returns></returns>
-		private TimeSpan GetRandomRespawnDelay()
-			=> _rnd.Between(this.MinRespawnDelay, this.MaxRespawnDelay);
 	}
 }
