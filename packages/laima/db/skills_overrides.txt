@@ -324,12 +324,12 @@
 // Cryomancer
 //---------------------------------------------------------------------------
 { skillId: 20201, className: "Cryomancer_IceBolt", name: "Ice Bolt", basicSp: 55, basicCast: 800, splashRate: 10, maxRange: 150, factor: 98, factorByLevel: 9.8, cooldownTime: 8000, overheatCount: "3", castInterruptible: true, enableCastMove: true },
-{ skillId: 20202, className: "Cryomancer_IciclePike", name: "Ice Pike", basicSp: 95, basicCast: 3000, maxRange: 150, factor: 84, factorByLevel: 8.4, cooldownTime: 9000, overheatCount: "3", castInterruptible: true },
+{ skillId: 20202, className: "Cryomancer_IciclePike", name: "Ice Pike", basicSp: 95, basicCast: 1500, maxRange: 150, factor: 84, factorByLevel: 8.4, cooldownTime: 9000, overheatCount: "3", castInterruptible: true },
 { skillId: 20203, className: "Cryomancer_IceWall", name: "Ice Wall", basicSp: 75, basicCast: 2500, splashRate: 1, maxRange: 150, factor: 11, factorByLevel: 1.1, cooldownTime: 12000, castInterruptible: true },
 { skillId: 20206, className: "Cryomancer_Gust", name: "Gust", basicSp: 60, basicCast: 0, splashRate: 1, maxRange: 150, factor: 0, factorByLevel: 0, shootTime: 1000, cooldownTime: 6000, overheatCount: "0" },
 { skillId: 20204, className: "Cryomancer_IceBlast", name: "Ice Blast", basicSp: 23, basicCast: 0, splashRate: 1, factor: 112, factorByLevel: 11.2, cooldownTime: 100, overheatCount: "0", castInterruptible: true },
 { skillId: 20205, className: "Cryomancer_SubzeroShield", name: "Subzero Shield", basicSp: 160, basicCast: 3000, splashRate: 0, factor: 100, factorByLevel: 0, cooldownTime: 30000, overheatCount: "0", castInterruptible: true },
-{ skillId: 20208, className: "Cryomancer_FrostPillar", name: "Frost Pillar", basicSp: 150, basicCast: 6000, maxRange: 150, splashRate: 3, factor: 98, factorByLevel: 9.8, cooldownTime: 15000, overheatCount: "0", castInterruptible: true },
+{ skillId: 20208, className: "Cryomancer_FrostPillar", name: "Frost Pillar", basicSp: 150, basicCast: 6000, maxRange: 150, splashRate: 3, factor: 127, factorByLevel: 12.7, cooldownTime: 15000, overheatCount: "0", castInterruptible: true },
 
 // Psychokino
 //---------------------------------------------------------------------------

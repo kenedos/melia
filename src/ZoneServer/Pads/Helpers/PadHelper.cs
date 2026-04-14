@@ -289,7 +289,7 @@ namespace Melia.Zone.Pads.Helpers
 
 			foreach (var actor in pad.Trigger.GetActors())
 			{
-				if (!caster.CheckRelation(actor, targetRelation) || actor is not ICombatEntity target)
+				if (!caster.CheckRelation(actor, targetRelation) || actor is not ICombatEntity target || target.IsDead)
 					continue;
 				if (target.IsBuffActive(checkBuff))
 					continue;
