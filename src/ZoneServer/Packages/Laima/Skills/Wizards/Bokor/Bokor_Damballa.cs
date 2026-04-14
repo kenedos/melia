@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
 using Melia.Shared.Game.Const;
@@ -7,6 +7,7 @@ using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Handlers.Bokor;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Maps;
 using static Melia.Zone.Skills.SkillUseFunctions;
@@ -69,6 +70,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			var summons = character.Summons.GetSummons();
+			var zombiesKilled = summons.Count;
+			var killedEnemyPositions = new List<Position>();
 
 			foreach (var summon in summons)
 			{
@@ -87,6 +90,19 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 					hitInfo.AniTime = TimeSpan.FromMilliseconds(100);
 
 					Send.ZC_HIT_INFO(caster, t, hitInfo);
+
+					if (t.IsDead && killedEnemyPositions.Count < zombiesKilled)
+						killedEnemyPositions.Add(t.Position);
+				}
+			}
+
+			// Respawn zombies on killed enemy corpses (1 per kill, up to original count)
+			if (killedEnemyPositions.Count > 0 && caster.TryGetSkill(SkillId.Bokor_Zombify, out var zombifySkill))
+			{
+				var zombieInfo = ZombifyHelper.GetZombieInfo(caster);
+				foreach (var pos in killedEnemyPositions)
+				{
+					ZombifyHelper.SummonZombieAt(zombifySkill, caster, zombieInfo, pos);
 				}
 			}
 		}

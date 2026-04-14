@@ -16,6 +16,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
+using Yggdrasil.Util;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 {
@@ -62,7 +63,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 			await skill.Wait(TimeSpan.FromMilliseconds(250));
 			SkillTargetEffects(skill, caster, "F_blood002_dark", 1.6f, false);
 
-			var maxTargets = 3;
+			var maxTargets = 14;
 			var totalDamage = 0f;
 			var hitTargets = new List<ICombatEntity>();
 
@@ -92,7 +93,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 					var skillHitInfo = new SkillHitInfo(caster, target, skill, skillHit);
 					Send.ZC_SKILL_HIT_INFO(caster, skillHitInfo);
 
-					target.StartBuff(BuffId.Pollution_Debuff, skill.Level, skillHit.Damage, TimeSpan.FromMilliseconds(6000), caster, skill.Id);
+					if (skillHit.Damage > 0 && RandomProvider.Get().Next(100) < 5)
+						target.StartBuff(BuffId.Pollution_Debuff, skill.Level, skillHit.Damage, TimeSpan.FromMilliseconds(6000), caster, skill.Id);
 				}
 			}
 

@@ -5,6 +5,9 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.ScriptableEvents;
+using Melia.Zone.Skills;
+using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Monsters;
 
@@ -61,6 +64,19 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Bokor
 				enemy.StartBuff(BuffId.Decomposition_Debuff, buff.NumArg1, 0f, TimeSpan.FromSeconds(10), summon);
 			}
 			}
+		}
+
+		[CombatCalcModifier(CombatCalcPhase.AfterBonuses, BuffId.Samdiveve_Buff)]
+		public void OnAttackAfterBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		{
+			if (!attacker.TryGetBuff(BuffId.Samdiveve_Buff, out var buff))
+				return;
+
+			if (attacker is not Summon summon)
+				return;
+
+			var damageBonus = buff.NumArg1 * 0.10f;
+			skillHitResult.Damage *= 1f + damageBonus;
 		}
 
 		private float GetMspdBonus(Buff buff)

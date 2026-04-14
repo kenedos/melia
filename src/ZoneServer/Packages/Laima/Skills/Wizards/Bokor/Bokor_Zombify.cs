@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -30,16 +30,7 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 	[SkillHandler(SkillId.Bokor_Zombify)]
 	public class Bokor_ZombifyOverride : IGroundSkillHandler, IDynamicCasted
 	{
-		private const string DefaultZombieClass = "summons_zombie";
-		private const string WheelchairZombieClass = "Zombie_Overwatcher";
-		private const string GiantZombieClass = "Zombie_hoplite";
-
 		private const int LifetimeSeconds = 300;
-
-		// Max summon counts per zombie type
-		private const int MaxDefaultZombies = 6;
-		private const int MaxWheelchairZombies = 4;
-		private const int MaxGiantZombies = 2;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -64,45 +55,19 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 			// Wait for client effect timing (matches Time="250" in bytool)
 			await skill.Wait(TimeSpan.FromMilliseconds(250));
 
-			// Determine zombie type based on abilities
-			string zombieClass;
-			string zombieName;
-			int maxCount;
-
-			if (caster.TryGetActiveAbility(AbilityId.Bokor22, out var wheelchairAbility))
-			{
-				// Wheelchair Zombie
-				zombieClass = WheelchairZombieClass;
-				zombieName = "Wheelchair Zombie";
-				maxCount = MaxWheelchairZombies;
-			}
-			else if (caster.TryGetActiveAbility(AbilityId.Bokor21, out var giantAbility))
-			{
-				// Giant Zombie
-				zombieClass = GiantZombieClass;
-				zombieName = "Giant Zombie";
-				maxCount = MaxGiantZombies;
-			}
-			else
-			{
-				// Default Zombie
-				zombieClass = DefaultZombieClass;
-				zombieName = "Zombie";
-				maxCount = MaxDefaultZombies;
-			}
-
-			// Get character and validate
-			if (!(caster is Character character))
+			if (caster is not Character character)
 				return;
 
-			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(zombieClass, out var monsterData))
+			var zombieInfo = ZombifyHelper.GetZombieInfo(caster);
+
+			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(zombieInfo.ClassName, out var monsterData))
 			{
 				caster.ServerMessage(Localization.Get("Failed to find zombie monster data."));
 				return;
 			}
 
 			// Kill all zombies of other types when switching zombie type
-			this.KillOtherZombieTypes(character, zombieClass, caster);
+			ZombifyHelper.KillOtherZombieTypes(character, zombieInfo.ClassName, caster);
 
 			// Kill all existing zombies of the current type to refresh them
 			var existingZombies = character.Summons.GetSummons(monsterData.Id);
@@ -112,50 +77,93 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 			}
 
 			// Summon full maxCount of zombies
-			var zombiesToSummon = maxCount;
-
-			// Summon all zombies at once
-			var summonedCount = 0;
-			var random = new Random();
-			for (var i = 0; i < zombiesToSummon; i++)
-			{
-				// Calculate spawn position with random angle around caster (35 unit radius, matching IdleRadius in AiScript)
-				var randomAngle = random.Next(0, 360);
-				var spawnRadius = 35f;
-				var spawnPosition = caster.Position.GetRelative(new Direction(randomAngle), spawnRadius);
-
-				// Create zombie summon using MonsterSkillCreateMob with PC_Summon AI
-				var zombie = MonsterSkillCreateMob(skill, caster, zombieClass, spawnPosition, 0, zombieName, "None", 0, LifetimeSeconds, "PC_Summon", "Faction#Summon#!SCR_USE_ZOMBIFY#1");
-
-				if (zombie == null)
-					continue;
-
-				// Apply zombie stats based on type
-				this.ApplyZombieStats(zombie, zombieClass, skill, caster);
-
-				summonedCount++;
-			}
+			var summonedCount = ZombifyHelper.SummonZombies(skill, caster, zombieInfo, zombieInfo.MaxCount);
 
 			if (summonedCount > 0)
 			{
-				// Grant initial Dark Force stacks to caster for summoning (1 per zombie)
-				// PowerOfDarkness_BuffOverride.AddDarkForceStacks(caster, summonedCount, caster);
-
-				caster.ServerMessage(Localization.Get($"Summoned {summonedCount} {zombieName}(s)."));
+				caster.ServerMessage(Localization.Get($"Summoned {summonedCount} {zombieInfo.Name}(s)."));
 			}
 			else
 			{
 				caster.ServerMessage(Localization.Get("Failed to summon zombies."));
 			}
 		}
+	}
+
+	/// <summary>
+	/// Shared helper for zombie summoning logic used by Zombify and Damballa.
+	/// </summary>
+	public static class ZombifyHelper
+	{
+		private const string DefaultZombieClass = "summons_zombie";
+		private const string WheelchairZombieClass = "Zombie_Overwatcher";
+		private const string GiantZombieClass = "Zombie_hoplite";
+
+		private const int MaxDefaultZombies = 6;
+		private const int MaxWheelchairZombies = 4;
+		private const int MaxGiantZombies = 2;
+
+		private const int LifetimeSeconds = 300;
 
 		/// <summary>
-		/// Kills all zombies of other types when switching zombie type.
+		/// Determines the zombie type based on the caster's active abilities.
 		/// </summary>
-		/// <param name="character">The character who owns the zombies</param>
-		/// <param name="currentZombieClass">The current zombie type being summoned</param>
-		/// <param name="caster">The caster entity</param>
-		private void KillOtherZombieTypes(Character character, string currentZombieClass, ICombatEntity caster)
+		public static ZombieInfo GetZombieInfo(ICombatEntity caster)
+		{
+			if (caster.TryGetActiveAbility(AbilityId.Bokor22, out _))
+				return new ZombieInfo(WheelchairZombieClass, "Wheelchair Zombie", MaxWheelchairZombies);
+			else if (caster.TryGetActiveAbility(AbilityId.Bokor21, out _))
+				return new ZombieInfo(GiantZombieClass, "Giant Zombie", MaxGiantZombies);
+			else
+				return new ZombieInfo(DefaultZombieClass, "Zombie", MaxDefaultZombies);
+		}
+
+		/// <summary>
+		/// Summons the specified number of zombies at the caster's position.
+		/// Returns the number successfully summoned.
+		/// </summary>
+		public static int SummonZombies(Skill skill, ICombatEntity caster, ZombieInfo info, int count)
+		{
+			var summonedCount = 0;
+			var random = new Random();
+
+			for (var i = 0; i < count; i++)
+			{
+				var randomAngle = random.Next(0, 360);
+				var spawnRadius = 35f;
+				var spawnPosition = caster.Position.GetRelative(new Direction(randomAngle), spawnRadius);
+
+				var zombie = MonsterSkillCreateMob(skill, caster, info.ClassName, spawnPosition, 0, info.Name, "None", 0, LifetimeSeconds, "PC_Summon", "Faction#Summon#!SCR_USE_ZOMBIFY#1");
+
+				if (zombie == null)
+					continue;
+
+				ApplyZombieStats(zombie, info.ClassName, skill, caster);
+				summonedCount++;
+			}
+
+			return summonedCount;
+		}
+
+		/// <summary>
+		/// Summons a single zombie at the specified position.
+		/// Returns true if successful.
+		/// </summary>
+		public static bool SummonZombieAt(Skill skill, ICombatEntity caster, ZombieInfo info, Position position)
+		{
+			var zombie = MonsterSkillCreateMob(skill, caster, info.ClassName, position, 0, info.Name, "None", 0, LifetimeSeconds, "PC_Summon", "Faction#Summon#!SCR_USE_ZOMBIFY#1");
+
+			if (zombie == null)
+				return false;
+
+			ApplyZombieStats(zombie, info.ClassName, skill, caster);
+			return true;
+		}
+
+		/// <summary>
+		/// Kills all zombies of types other than the specified class.
+		/// </summary>
+		public static void KillOtherZombieTypes(Character character, string currentZombieClass, ICombatEntity caster)
 		{
 			var otherZombieTypes = new List<string>();
 			if (currentZombieClass != DefaultZombieClass)
@@ -179,20 +187,14 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 		}
 
 		/// <summary>
-		/// Applies stat overrides to the zombie based on its type and caster's stats.
+		/// Applies stat overrides to a zombie based on its type and caster's stats.
 		/// </summary>
-		/// <param name="zombie">The zombie to apply stats to</param>
-		/// <param name="zombieClass">The zombie type class name</param>
-		/// <param name="skill">The Zombify skill</param>
-		/// <param name="caster">The caster entity</param>
-		private void ApplyZombieStats(Mob zombie, string zombieClass, Skill skill, ICombatEntity caster)
+		public static void ApplyZombieStats(Mob zombie, string zombieClass, Skill skill, ICombatEntity caster)
 		{
-			// Get caster's stats
 			var casterMATK = (caster.Properties.GetFloat(PropertyName.MINMATK) + caster.Properties.GetFloat(PropertyName.MAXMATK)) / 2f;
 			var casterMNA = caster.Properties.GetFloat(PropertyName.MNA);
 			var casterLevel = caster.Level;
 
-			// Calculate zombie stats based on type
 			float zombiePATK;
 			float zombieHP;
 			float zombieDEF;
@@ -210,7 +212,6 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 				zombieBLK_BREAK = 30f + (8f * casterMNA) + casterLevel / 2;
 				zombieHR = 20f + (5f * casterMNA) + casterLevel / 2;
 
-				// Giant zombie can block
 				zombieBlockable = 1;
 				zombieBLK = 20f + (5f * casterMNA) + casterLevel / 2;
 			}
@@ -233,7 +234,6 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 				zombieHR = 20f + (5f * casterMNA) + casterLevel / 2;
 			}
 
-			// Apply property overrides
 			var propertyOverrides = new PropertyOverrides();
 			propertyOverrides.Add(PropertyName.MHP, zombieHP);
 			propertyOverrides.Add(PropertyName.MINPATK, zombiePATK);
@@ -242,7 +242,7 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 			propertyOverrides.Add(PropertyName.MDEF, zombieDEF);
 			propertyOverrides.Add(PropertyName.BLK_BREAK, zombieBLK_BREAK);
 			propertyOverrides.Add(PropertyName.HR, zombieHR);
-			propertyOverrides.Add(PropertyName.SDR, 1); // AoE Defense Rate
+			propertyOverrides.Add(PropertyName.SDR, 1);
 			if (zombieBlockable != 0)
 			{
 				propertyOverrides.Add(PropertyName.Blockable, zombieBlockable);
@@ -252,6 +252,23 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 			zombie.ApplyOverrides(propertyOverrides);
 			zombie.Properties.InvalidateAll();
 			zombie.HealToFull();
+		}
+	}
+
+	/// <summary>
+	/// Contains zombie type information.
+	/// </summary>
+	public class ZombieInfo
+	{
+		public string ClassName { get; }
+		public string Name { get; }
+		public int MaxCount { get; }
+
+		public ZombieInfo(string className, string name, int maxCount)
+		{
+			this.ClassName = className;
+			this.Name = name;
+			this.MaxCount = maxCount;
 		}
 	}
 }

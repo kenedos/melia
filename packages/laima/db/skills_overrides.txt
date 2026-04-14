@@ -460,7 +460,7 @@
 // Bokor
 //---------------------------------------------------------------------------
 { skillId: 21701, className: "Bokor_Hexing", name: "Curse of Debility", basicSp: 35, basicCast: 500, splashRate: 1, factor: 23, factorByLevel: 37.8, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, overheatCount: "0", castInterruptible: false },
-{ skillId: 21702, className: "Bokor_Effigy", name: "Effigy", basicSp: 48, splashRate: 2, factor: 336, factorByLevel: 33.6, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, overheatCount: "2" },
+{ skillId: 21702, className: "Bokor_Effigy", name: "Effigy", basicSp: 25, splashRate: 2, factor: 80, factorByLevel: 8, hitCount: 1, multiHitCount: 1, cooldownTime: 0, overheatCount: "0" },
 { skillId: 21703, className: "Bokor_Tetmamakla", name: "Tet Mamak La", basicSp: 19, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, overheatCount: "0" },
 { skillId: 21704, className: "Bokor_Zombify", name: "Zombify", useType: "MeleeGround", basicSp: 144, basicCast: 4000, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 12000, castInterruptible: true},
 { skillId: 21705, className: "Bokor_Mackangdal", name: "Mackangdal", basicSp: 130, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 12000 },
@@ -806,8 +806,8 @@
 { skillId: 40101, className: "Kriwi_Aukuras", name: "Aukuras", basicSp: 96, basicCast: 2000, splashRate: 1, factor: 40, factorByLevel: 4.0, cooldownTime: 10000, overheatCount: "0", castInterruptible: true},
 { skillId: 40102, className: "Kriwi_Zalciai", name: "Zalciai", basicSp: 50, basicCast: 1500, splashRate: 1, factor: 90.0, factorByLevel: 9.0, cooldownTime: 12000, overheatCount: "0", castInterruptible: false},
 { skillId: 40103, className: "Kriwi_Daino", name: "Daino", basicSp: 124, basicCast: 2000, splashRate: 1, factor: 5.0, factorByLevel: 5.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: true},
-{ skillId: 40104, className: "Kriwi_Zaibas", name: "Zaibas", basicSp: 38, basicCast: 1000, splashRate: 1, factor: 31, factorByLevel: 3.1, cooldownTime: 4000, overheatCount: "2", castInterruptible: false},
-{ skillId: 40105, className: "Kriwi_DivineStigma", name: "Divine Stigma", basicSp: 39, basicCast: 1000, splashRate: 0, factor: 28, factorByLevel: 2.8, cooldownTime: 6000, overheatCount: "0", castInterruptible: false},
+{ skillId: 40104, className: "Kriwi_Zaibas", name: "Zaibas", basicSp: 38, basicCast: 1000, splashRate: 1, factor: 41, factorByLevel: 4.1, cooldownTime: 4000, overheatCount: "2", castInterruptible: false},
+{ skillId: 40105, className: "Kriwi_DivineStigma", name: "Divine Stigma", basicSp: 39, basicCast: 1000, splashRate: 0, factor: 39, factorByLevel: 3.9, cooldownTime: 6000, overheatCount: "0", castInterruptible: false},
 { skillId: 40106, className: "Kriwi_Melstis", name: "Piety", basicSp: 190, basicCast: 3000, splashRate: 1, factor: 150, factorByLevel: 15, cooldownTime: 12000, overheatCount: "0", castInterruptible: false},
 
 // Priest

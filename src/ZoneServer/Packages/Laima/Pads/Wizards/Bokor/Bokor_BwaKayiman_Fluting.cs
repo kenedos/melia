@@ -6,13 +6,14 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using static Melia.Zone.Pads.Helpers.PadHelper;
+using Melia.Zone.Skills.Combat;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Pads.Handlers
 {
 	/// <summary>
-	/// Pad handler for Bwa Kayiman follower pads that circle around the caster.
-	/// Each pad follows a summon, dealing trampling damage to enemies.
+	/// Pad handler for Bwa Kayiman follower pads that form a conga line
+	/// behind the caster, dealing trampling damage to enemies.
 	/// </summary>
 	[Package("laima")]
 	[PadHandler(PadName.Bokor_BwaKayiman_Fluting)]
@@ -68,7 +69,7 @@ namespace Melia.Zone.Pads.Handlers
 
 			if (pad.FollowTarget == null)
 			{
-				var summonHandle = pad.Variables.Get<int>("BwaKayiman_SummonHandle");
+				var summonHandle = pad.Variables.Get<int>("Melia.Skills.BwaKayiman.SummonHandle");
 				var monster = character.Map.GetMonster(summonHandle);
 
 				if (monster is not Summon summon || summon.IsDead)
@@ -85,7 +86,27 @@ namespace Melia.Zone.Pads.Handlers
 				return;
 			}
 
-			PadDamageEnemy(pad, 1f, 0, 0, "None", 1, 0f, 0f);
+			var samdiveveMultiplier = 1f;
+			if (creator.TryGetSkill(SkillId.Bokor_Samdiveve, out var samdiveveSkill))
+				samdiveveMultiplier += samdiveveSkill.Level * 0.10f;
+
+			var targets = pad.Map.GetAttackableEnemiesIn(creator, pad.Area);
+			foreach (var actor in targets)
+			{
+				if (actor is not ICombatEntity target || target.IsDead)
+					continue;
+
+				if (!creator.IsEnemy(target))
+					continue;
+
+				var skillHitResult = SCR_SkillHit(creator, target, skill);
+				var damage = skillHitResult.Damage * samdiveveMultiplier;
+
+				target.TakeDamage(damage, creator);
+
+				var hitInfo = new HitInfo(creator, target, skill, damage, skillHitResult.Result);
+				Send.ZC_HIT_INFO(creator, target, hitInfo);
+			}
 		}
 	}
 }

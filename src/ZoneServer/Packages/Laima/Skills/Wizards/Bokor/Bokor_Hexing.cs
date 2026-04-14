@@ -51,15 +51,14 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = caster.Position.GetRelative(caster.Direction, distance: 75);
-			var circle = new CircleF(targetPos, 100f);
+			var targetPos = caster.Position.GetRelative(caster.Direction, distance: 100);
+			var circle = new CircleF(targetPos, 150f);
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, circle);
 			await skill.Wait(TimeSpan.FromMilliseconds(350));
 
 			var character = caster as Character;
 			var summons = character?.Summons.GetSummons();
 
-			// Target count: 2 + SkillLevel
 			var targetCount = 2 + skill.Level;
 			foreach (var currentTarget in targets)
 			{
