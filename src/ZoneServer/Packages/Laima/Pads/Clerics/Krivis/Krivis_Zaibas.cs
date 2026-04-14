@@ -53,14 +53,14 @@ namespace Melia.Zone.Pads.Handlers
 			if (targets == null || !targets.Any())
 				return;
 
-			var modifier = new SkillModifier();
-			modifier.BonusMAtk = pad.NumArg2;
-
 			var targetCount = pad.Trigger.MaxActorCount;
 			foreach (var target in targets)
 			{
 				if (targetCount <= 0)
 					break;
+
+				var modifier = new SkillModifier();
+				modifier.BonusMAtk = pad.NumArg2;
 
 				var skillHitResult = SCR_SkillHit(creator, target, skill, modifier);
 				var damage = skillHitResult.Damage;
