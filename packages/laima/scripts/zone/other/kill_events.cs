@@ -36,7 +36,7 @@ public class KillEventsScript : GeneralScript
 			var party = character.Connection?.Party;
 			if (party != null)
 			{
-				var members = character.Map.GetPartyMembersInRange(character, 150, false);
+				var members = character.Map.GetPartyMembersInRange(character, 150);
 				foreach (var member in members)
 				{
 					member.StartBuff(BuffId.RootCrystalMoveSpeed, 10, 0, TimeSpan.FromSeconds(15), attacker);

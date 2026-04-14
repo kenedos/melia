@@ -2223,15 +2223,15 @@ namespace Melia.Zone.World.Maps
 			var result = new List<Character>();
 			lock (_characters)
 			{
-				foreach (var a in _characters.Values)
+				foreach (var mapChar in _characters.Values)
 				{
-					if (radius > 0 && !a.Position.InRange2D(position, radius))
+					if (radius > 0 && !mapChar.Position.InRange2D(position, radius))
 						continue;
-					if (a.Connection.Party?.ObjectId != party.ObjectId)
+					if (mapChar.Connection.Party?.ObjectId != party.ObjectId)
 						continue;
-					if (a.IsDead != !areAlive)
+					if (mapChar.IsDead != !areAlive)
 						continue;
-					result.Add(a);
+					result.Add(mapChar);
 				}
 			}
 			return result;
