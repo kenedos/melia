@@ -7,6 +7,7 @@ using Melia.Zone.Scripting.AI;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
@@ -37,6 +38,8 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Bokor
 			var target = buff.Target;
 			Send.ZC_SHOW_EMOTICON(target, "I_emo_fear", buff.Duration);
 
+			target.AddState(StateType.Fear);
+
 			var currentMspd = target.Properties.GetFloat(PropertyName.MSPD);
 			var reduction = currentMspd * MoveSpeedReductionRate;
 
@@ -49,6 +52,7 @@ namespace Melia.Zone.Buffs.Handlers.Wizards.Bokor
 		/// </summary>
 		public override void OnEnd(Buff buff)
 		{
+			buff.Target.RemoveState(StateType.Fear);
 			RemovePropertyModifier(buff, buff.Target, PropertyName.MSPD_BM);
 		}
 

@@ -1025,6 +1025,9 @@ namespace Melia.Zone.Scripting.AI
 					amount *= (1 + hateRate);
 			}
 
+			if (entity is Companion)
+				amount /= 3f;
+
 			// Increase the hate level at the normal rate up to the
 			// min aggro level. Once we reach that point we lower
 			// the hate increase so it will still accumulate for

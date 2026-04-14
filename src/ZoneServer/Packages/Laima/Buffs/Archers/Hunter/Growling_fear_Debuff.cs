@@ -4,6 +4,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Components;
 
 namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
 {
@@ -26,6 +27,8 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
 			var target = buff.Target;
 			Send.ZC_SHOW_EMOTICON(target, "I_emo_fear", buff.Duration);
 
+			target.AddState(StateType.Fear);
+
 			var currentMspd = target.Properties.GetFloat(PropertyName.MSPD);
 			var reduction = currentMspd * MoveSpeedReductionRate;
 
@@ -38,6 +41,7 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Hunter
 		/// </summary>
 		public override void OnEnd(Buff buff)
 		{
+			buff.Target.RemoveState(StateType.Fear);
 			RemovePropertyModifier(buff, buff.Target, PropertyName.MSPD_BM);
 		}
 	}

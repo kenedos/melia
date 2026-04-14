@@ -369,9 +369,9 @@ public class CharacterAdvancementScript : GeneralScript
 			{
 				LearnSkill(character, SkillId.Magic_Attack);
 				LearnSkill(character, SkillId.Magic_Attack_TH);
-				LearnSkill(character, SkillId.Common_ForcedAttack);
-				LearnSkill(character, SkillId.Common_ForcedAttackCancel);
-				LearnSkill(character, SkillId.Common_SummonRemove);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttack);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttackCancel);
+				// LearnCommonSkill(character, SkillId.Common_SummonRemove);
 
 				GiveItem(character, ItemId.Costume_Char2_6, 1);
 				break;
@@ -388,9 +388,9 @@ public class CharacterAdvancementScript : GeneralScript
 			{
 				LearnSkill(character, SkillId.Magic_Attack);
 				LearnSkill(character, SkillId.Magic_Attack_TH);
-				LearnSkill(character, SkillId.Common_ForcedAttack);
-				LearnSkill(character, SkillId.Common_ForcedAttackCancel);
-				LearnSkill(character, SkillId.Common_SummonRemove);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttack);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttackCancel);
+				// LearnCommonSkill(character, SkillId.Common_SummonRemove);
 
 				GiveItem(character, ItemId.Costume_Char2_9, 1);
 				break;
@@ -473,9 +473,9 @@ public class CharacterAdvancementScript : GeneralScript
 			{
 				LearnSkill(character, SkillId.Magic_Attack);
 				LearnSkill(character, SkillId.Magic_Attack_TH);
-				LearnSkill(character, SkillId.Common_ForcedAttack);
-				LearnSkill(character, SkillId.Common_ForcedAttackCancel);
-				LearnSkill(character, SkillId.Common_SummonRemove);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttack);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttackCancel);
+				// LearnCommonSkill(character, SkillId.Common_SummonRemove);
 
 				GiveItem(character, ItemId.Costume_Char4_4, 1);
 				break;
@@ -1283,6 +1283,15 @@ public class CharacterAdvancementScript : GeneralScript
 			return;
 
 		var skill = new Skill(character, skillId, 1);
+		character.Skills.Add(skill);
+	}
+
+	private static void LearnCommonSkill(Character character, SkillId skillId)
+	{
+		if (character.Skills.Has(skillId))
+			return;
+
+		var skill = new Skill(character, skillId, 1, isCommon: true);
 		character.Skills.Add(skill);
 	}
 

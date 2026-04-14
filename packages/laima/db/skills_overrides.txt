@@ -323,7 +323,7 @@
 
 // Cryomancer
 //---------------------------------------------------------------------------
-{ skillId: 20201, className: "Cryomancer_IceBolt", name: "Ice Bolt", basicSp: 55, basicCast: 800, splashRate: 10, maxRange: 150, factor: 98, factorByLevel: 9.8, cooldownTime: 8000, overheatCount: "3", castInterruptible: true, enableCastMove: true },
+{ skillId: 20201, className: "Cryomancer_IceBolt", name: "Ice Bolt", basicSp: 55, basicCast: 800, splashRate: 10, maxRange: 150, factor: 180, factorByLevel: 18.0, cooldownTime: 8000, overheatCount: "3", castInterruptible: true, enableCastMove: true },
 { skillId: 20202, className: "Cryomancer_IciclePike", name: "Ice Pike", basicSp: 95, basicCast: 1500, maxRange: 150, factor: 84, factorByLevel: 8.4, cooldownTime: 9000, overheatCount: "3", castInterruptible: true },
 { skillId: 20203, className: "Cryomancer_IceWall", name: "Ice Wall", basicSp: 75, basicCast: 2500, splashRate: 1, maxRange: 150, factor: 11, factorByLevel: 1.1, cooldownTime: 12000, castInterruptible: true },
 { skillId: 20206, className: "Cryomancer_Gust", name: "Gust", basicSp: 60, basicCast: 0, splashRate: 1, maxRange: 150, factor: 0, factorByLevel: 0, shootTime: 1000, cooldownTime: 6000, overheatCount: "0" },
@@ -608,7 +608,7 @@
 { skillId: 30406, className: "Hunter_Retrieve", name: "Retrieve", basicSp: 29, splashRate: 0, factor: 22, factorByLevel: 37.1, hitCount: 1, multiHitCount: 3, cooldownTime: 15000, overheatCount: "2" },
 { skillId: 30407, className: "Hunter_Hounding", name: "Hounding", basicSp: 36, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
 { skillId: 30408, className: "Hunter_Growling", name: "Growling", activationType: "PassiveSkill", useType: "Self", basicSp: 50, splashRate: 0, factor: 100, factorByLevel: 10, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
-{ skillId: 30409, className: "Hunter_Howling", name: "Howling", basicSp: 33, splashRate: 0, factor: 100, factorByLevel: 10, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
+{ skillId: 30409, className: "Hunter_Howling", name: "Howling", basicSp: 15, splashRate: 0, factor: 100, factorByLevel: 10, hitCount: 1, multiHitCount: 1, cooldownTime: 4000, shootTime: 0, cancelTime: 0, holdTime: [0] },
 { skillId: 30410, className: "Hunter_Bolas", name: "Bolas", basicSp: 35, splashRate: -1, factor: 100, factorByLevel: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, maxRange: 200 },
 { skillId: 30411, className: "Hunter_BleedingPierce", name: "Bleeding Pierce", basicSp: 34, splashRate: -1, factor: 63, factorByLevel: 6.3, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "2" },
 { skillId: 30412, className: "Hunter_Brawl", name: "Udang-tang-tang!", basicSp: 80, splashRate: -1, factor: 119, factorByLevel: 11.9, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },

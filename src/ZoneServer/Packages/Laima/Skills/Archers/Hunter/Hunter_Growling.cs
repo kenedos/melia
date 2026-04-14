@@ -74,8 +74,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 		}
 
 		/// <summary>
-		/// Applies the fear debuff to 1-3 nearby enemies randomly.
-		/// 20% chance for 3 targets, 30% for 2 targets, 50% for 1 target.
+		/// Applies the fear debuff to nearby enemies
 		/// Hunter24 ability disables this effect.
 		/// </summary>
 		private void ApplyGrowlingFear(ICombatEntity entity)
@@ -107,13 +106,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 			var roll = rnd.NextDouble();
 			int targetCount;
 
-			if (roll < 0.20)
-				targetCount = 3;
-			else if (roll < 0.50)
-				targetCount = 2;
-			else
-				targetCount = 1;
-
+			targetCount = 3;
 			targetCount = Math.Min(targetCount, allEnemies.Count);
 
 			var selectedTargets = allEnemies

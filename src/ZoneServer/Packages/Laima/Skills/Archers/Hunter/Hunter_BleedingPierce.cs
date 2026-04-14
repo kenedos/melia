@@ -66,8 +66,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 
 		private async Task HandleSkill(Skill skill, ICombatEntity caster, Position originPos, Position farPos)
 		{
-			// Create pad with direction matching caster's facing
-			var position = originPos.GetRelative(farPos);
+			var position = caster.Position;
 			var padAngle = caster.Direction.DegreeAngle;
 
 			var pad = SkillCreatePad(caster, skill, position, padAngle, PadName.shootpad_BleedingPierce);

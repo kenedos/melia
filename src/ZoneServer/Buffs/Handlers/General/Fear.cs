@@ -3,6 +3,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Components;
 
 namespace Melia.Zone.Buffs.Handlers
 {
@@ -22,6 +23,8 @@ namespace Melia.Zone.Buffs.Handlers
 			var target = buff.Target;
 			var caster = buff.Caster;
 
+			target.AddState(StateType.Fear);
+
 			// If the target is not a player character, apply a short Stun.
 			if (target is not Character)
 			{
@@ -38,6 +41,8 @@ namespace Melia.Zone.Buffs.Handlers
 		public override void OnEnd(Buff buff)
 		{
 			var target = buff.Target;
+
+			target.RemoveState(StateType.Fear);
 
 			// Revert the stat penalties using the helper methods.
 			RemovePropertyModifier(buff, target, PropertyName.PATK_RATE_BM);
