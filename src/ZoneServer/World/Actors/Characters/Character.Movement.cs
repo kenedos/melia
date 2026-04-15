@@ -362,8 +362,7 @@ namespace Melia.Zone.World.Actors.Characters
 				if (currentConnection != null && currentConnection.Account != null &&
 					ZoneServer.Instance.Database.CheckSessionKey(currentConnection.Account.Id, currentConnection.SessionKey))
 				{
-					ZoneServer.Instance.Database.SaveCharacterData(this);
-					ZoneServer.Instance.Database.SaveAccountData(currentConnection.Account, this);
+					ZoneServer.Instance.Database.SavePlayerData(this, currentConnection.Account);
 					this.SavedForWarp = true;
 					saveSuccess = true;
 				}

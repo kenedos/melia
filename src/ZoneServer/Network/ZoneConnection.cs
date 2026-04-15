@@ -290,7 +290,10 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			// Autotrading characters stay in the world.
+			// Autotrading characters stay in the world as server-managed
+			// entities. They don't own account-scoped data (team storage,
+			// etc.) — all account data was persisted before entering
+			// autotrade mode, so we null out the Account reference.
 			if (character.IsAutoTrading)
 			{
 				var account = this.Account;
@@ -299,7 +302,6 @@ namespace Melia.Zone.Network
 
 				character.Connection = new DummyConnection
 				{
-					Account = account,
 					SelectedCharacter = character,
 					ShopCreated = this.ShopCreated,
 					Party = this.Party,
@@ -385,8 +387,7 @@ namespace Melia.Zone.Network
 			{
 				if (ZoneServer.Instance.Database.CheckSessionKey(account.Id, this.SessionKey))
 				{
-					ZoneServer.Instance.Database.SaveCharacterData(character);
-					ZoneServer.Instance.Database.SaveAccountData(account, character);
+					ZoneServer.Instance.Database.SavePlayerData(character, account);
 					ZoneServer.Instance.Database.UpdateLoginState(account.Id, 0, LoginState.LoggedOut);
 				}
 				else

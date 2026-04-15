@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
-using Yggdrasil.Db.MySql.SimpleCommands;
 using Melia.Zone.World;
-using Melia.Zone.World.Actors.Characters;
-using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Maps;
 using MySqlConnector;
 
@@ -17,60 +12,6 @@ namespace Melia.Zone.Database
 	/// </summary>
 	public partial class ZoneDb
 	{
-		public bool SaveAccountData(Account account, Character character = null)
-		{
-			if (account == null)
-				throw new ArgumentNullException(nameof(account));
-
-			using (var conn = this.GetConnection())
-			using (var cmd = new UpdateCommand("UPDATE `accounts` SET {parameters} WHERE `accountId` = @accountId", conn))
-			{
-				cmd.AddParameter("@accountId", account.Id);
-				cmd.Set("settings", account.Settings.ToString());
-				cmd.Set("premiumTokenExpiration", account.Premium.Token.Expiration);
-				cmd.Set("medals", account.Medals);
-				cmd.Set("giftMedals", account.GiftMedals);
-				cmd.Set("premiumMedals", account.PremiumMedals);
-				cmd.Set("language", account.Language);
-
-				if (cmd.Execute() == 0)
-					return false;
-			}
-
-			this.SaveVariables(account.Variables.Perm, "vars_accounts", "accountId", account.Id);
-			this.SaveProperties("account_properties", "accountId", account.Id, account.Properties);
-			this.SaveChatMacros(account);
-			this.SaveRevealedMaps(account);
-			this.SaveStorage(account.TeamStorage, "storage_team", "accountId", account.Id);
-
-			// Save account-scoped data that lives on the Character object
-			// (collections, adventure book). These are keyed by accountId
-			// and must only be saved here, not in SaveCharacterData, to
-			// prevent stale overwrites from autotrading characters.
-			if (character != null)
-			{
-				using (var conn = this.GetConnection())
-				using (var trans = conn.BeginTransaction())
-				{
-					try
-					{
-						this.InternalSaveCollections(character, conn, trans);
-						this.InternalSaveAdventureBook(character, conn, trans);
-						this.InternalSaveAdventureBookMonsterDrop(character, conn, trans);
-						this.InternalSaveAdventureBookItems(character, conn, trans);
-						trans.Commit();
-					}
-					catch (Exception)
-					{
-						trans.Rollback();
-						throw;
-					}
-				}
-			}
-
-			return true;
-		}
-
 		public Account GetAccount(string name)
 		{
 			var account = new Account();
@@ -134,68 +75,6 @@ namespace Melia.Zone.Database
 			}
 		}
 
-		private void SaveChatMacros(Account account)
-		{
-			using (var conn = this.GetConnection())
-			using (var trans = conn.BeginTransaction())
-			{
-				var macros = account.GetChatMacros().ToList();
-
-				if (!macros.Any())
-				{
-					using (var mc = new MySqlCommand("DELETE FROM `chatmacros` WHERE `accountId` = @accountId", conn, trans))
-					{
-						mc.Parameters.AddWithValue("@accountId", account.Id);
-						mc.ExecuteNonQuery();
-					}
-					trans.Commit();
-					return;
-				}
-
-				var macroIndicesInMemory = new HashSet<int>(macros.Select(m => m.Index));
-
-				foreach (var macro in macros)
-				{
-					using (var cmd = new MySqlCommand(
-						"INSERT INTO `chatmacros` (`accountId`, `index`, `message`, `pose`) VALUES (@accountId, @index, @message, @pose) " +
-						"ON DUPLICATE KEY UPDATE `message` = VALUES(`message`), `pose` = VALUES(`pose`)", conn, trans))
-					{
-						cmd.Parameters.AddWithValue("@accountId", account.Id);
-						cmd.Parameters.AddWithValue("@index", macro.Index);
-						cmd.Parameters.AddWithValue("@message", macro.Message);
-						cmd.Parameters.AddWithValue("@pose", macro.Pose);
-						cmd.ExecuteNonQuery();
-					}
-				}
-
-				var macroIndicesInDb = new HashSet<int>();
-				using (var cmd = new MySqlCommand("SELECT `index` FROM `chatmacros` WHERE `accountId` = @accountId", conn, trans))
-				{
-					cmd.Parameters.AddWithValue("@accountId", account.Id);
-					using (var reader = cmd.ExecuteReader())
-					{
-						while (reader.Read())
-							macroIndicesInDb.Add(reader.GetInt32(0));
-					}
-				}
-
-				var indicesToDelete = macroIndicesInDb.Except(macroIndicesInMemory).ToList();
-				if (indicesToDelete.Any())
-				{
-					var deleteParams = indicesToDelete.Select((idx, i) => $"@idx{i}").ToArray();
-					using (var cmd = new MySqlCommand($"DELETE FROM `chatmacros` WHERE `accountId` = @accountId AND `index` IN ({string.Join(",", deleteParams)})", conn, trans))
-					{
-						cmd.Parameters.AddWithValue("@accountId", account.Id);
-						for (var i = 0; i < indicesToDelete.Count; i++)
-							cmd.Parameters.AddWithValue(deleteParams[i], indicesToDelete[i]);
-						cmd.ExecuteNonQuery();
-					}
-				}
-
-				trans.Commit();
-			}
-		}
-
 		private void LoadRevealedMaps(Account account)
 		{
 			using (var conn = this.GetConnection())
@@ -217,30 +96,5 @@ namespace Melia.Zone.Database
 			}
 		}
 
-		private void SaveRevealedMaps(Account account)
-		{
-			using (var conn = this.GetConnection())
-			using (var trans = conn.BeginTransaction())
-			{
-				using (var mc = new MySqlCommand("DELETE FROM `revealedmaps` WHERE `accountId` = @accountId", conn, trans))
-				{
-					mc.Parameters.AddWithValue("@accountId", account.Id);
-					mc.ExecuteNonQuery();
-				}
-
-				foreach (var revealedMap in account.GetRevealedMaps())
-				{
-					using (var cmd = new InsertCommand("INSERT INTO `revealedmaps` {parameters}", conn, trans))
-					{
-						cmd.Set("accountId", account.Id);
-						cmd.Set("map", revealedMap.MapId);
-						cmd.Set("explored", revealedMap.Explored);
-						cmd.Set("percentage", revealedMap.Percentage);
-						cmd.Execute();
-					}
-				}
-				trans.Commit();
-			}
-		}
 	}
 }

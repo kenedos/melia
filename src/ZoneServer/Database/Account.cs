@@ -285,13 +285,5 @@ namespace Melia.Zone.Database
 		{
 			return ZoneServer.Instance.Database.GetAccount(accountName);
 		}
-
-		/// <summary>
-		/// Saves account database.
-		/// </summary>
-		public void Save()
-		{
-			ZoneServer.Instance.Database.SaveAccountData(this);
-		}
 	}
 }

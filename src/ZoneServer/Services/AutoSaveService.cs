@@ -65,7 +65,7 @@ namespace Melia.Zone.Services
 						var sessionKey = conn?.SessionKey;
 						var isAutoTrading = character.IsAutoTrading;
 
-						if (account == null)
+						if (account == null && !isAutoTrading)
 						{
 							Log.Warning($"AutoSaveService: Skipping save for {character.Name} ({character.DbId}), account is null.");
 							failedCount++;
@@ -76,9 +76,7 @@ namespace Melia.Zone.Services
 
 							if ((character.IsOnline || isAutoTrading) && sessionValid)
 							{
-								_database.SaveCharacterData(character);
-								if (!isAutoTrading)
-									_database.SaveAccountData(account, character);
+								_database.SavePlayerData(character, isAutoTrading ? null : account);
 								savedCount++;
 							}
 							else
@@ -135,12 +133,14 @@ namespace Melia.Zone.Services
 			{
 				try
 				{
-					if (character == null || character.Connection?.Account == null)
+					if (character == null)
 						continue;
 
-					_database.SaveCharacterData(character);
-					if (!character.IsAutoTrading)
-						_database.SaveAccountData(character.Connection.Account, character);
+					var account = character.IsAutoTrading ? null : character.Connection?.Account;
+					if (account == null && !character.IsAutoTrading)
+						continue;
+
+					_database.SavePlayerData(character, account);
 					savedCount++;
 				}
 				catch (Exception ex)

@@ -168,7 +168,7 @@ namespace Melia.Zone.Network
 					var saveStart = sw.ElapsedMilliseconds;
 					try
 					{
-						ZoneServer.Instance.Database.SaveCharacterData(charToSave);
+						ZoneServer.Instance.Database.SavePlayerData(charToSave, charToSave.Connection?.Account);
 					}
 					catch (Exception ex)
 					{
@@ -186,7 +186,7 @@ namespace Melia.Zone.Network
 					var saveStart = sw.ElapsedMilliseconds;
 					try
 					{
-						ZoneServer.Instance.Database.SaveCharacterData(existingCharacter);
+						ZoneServer.Instance.Database.SavePlayerData(existingCharacter);
 					}
 					catch (Exception ex)
 					{
@@ -663,8 +663,7 @@ namespace Melia.Zone.Network
 			// would cause the deferred save in CleanUpAndSave to skip
 			// saving entirely.
 			character.SavedForWarp = true;
-			ZoneServer.Instance.Database.SaveCharacterData(character);
-			ZoneServer.Instance.Database.SaveAccountData(conn.Account, character);
+			ZoneServer.Instance.Database.SavePlayerData(character, conn.Account);
 			ZoneServer.Instance.Database.UpdateLoginState(conn.Account.Id, 0, LoginState.LoggedOut);
 
 			Log.Info("User '{0}' is leaving for character selection.", conn.Account.Name);
