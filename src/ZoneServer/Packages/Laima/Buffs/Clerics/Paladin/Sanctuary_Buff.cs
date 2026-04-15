@@ -13,8 +13,6 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
 	[BuffHandler(BuffId.Sanctuary_Buff)]
 	public class Sanctuary_BuffOverride : BuffHandler
 	{
-		private const string AtkModPropertyName = PropertyName.PATK_BM;
-		private const string MAtkModPropertyName = PropertyName.MATK_BM;
 		private const string DefModPropertyName = PropertyName.DEF_BM;
 		private const string MDefModPropertyName = PropertyName.MDEF_BM;
 
@@ -42,8 +40,6 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
 			// Flat defense bonus: 200 + 40 * skill level
 			var flatDefBonus = 200 + 40 * buff.NumArg1;
 
-			AddPropertyModifier(buff, target, AtkModPropertyName, pdef);
-			AddPropertyModifier(buff, target, MAtkModPropertyName, mdef);
 			AddPropertyModifier(buff, target, DefModPropertyName, pdef + flatDefBonus);
 			AddPropertyModifier(buff, target, MDefModPropertyName, mdef + flatDefBonus);
 		}
@@ -54,8 +50,6 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Paladin
 		/// <param name="buff"></param>
 		public override void OnEnd(Buff buff)
 		{
-			RemovePropertyModifier(buff, buff.Target, AtkModPropertyName);
-			RemovePropertyModifier(buff, buff.Target, MAtkModPropertyName);
 			RemovePropertyModifier(buff, buff.Target, DefModPropertyName);
 			RemovePropertyModifier(buff, buff.Target, MDefModPropertyName);
 		}
