@@ -186,6 +186,12 @@ namespace Melia.Zone.World.Actors.Characters
 		public float AgentRadius => 5;
 
 		/// <summary>
+		/// Gets or sets the bonus added to this entity's radius for AoE
+		/// hit detection purposes only. Does not affect pathfinding.
+		/// </summary>
+		public float HitRadiusBonus { get; set; }
+
+		/// <summary>
 		/// Returns the character's monster rank (always Normal for players).
 		/// </summary>
 		public MonsterRank Rank => MonsterRank.Normal;

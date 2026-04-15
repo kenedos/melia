@@ -111,8 +111,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task HandleSkillAsync(ICombatEntity caster, Skill skill, Companion hawk, Character character, TimeSpan buffTimeSpan)
 		{
-			// Small delay before attachment sequence
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
+			// Wait for skill animation to finish before attachment
+			// (official shows ~1s gap between MELEE_GROUND and attachment)
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
 			// Lock hawk
 			hawk.Vars.Set("Hawk.UsingSkill", true);
@@ -187,13 +188,16 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task CleanupHangingShot(Skill skill, Character character, Companion hawk, AttachmentComponent attachment, MovementComponent movement)
 		{
-			// Detach without sending packets - buff handler OnEnd
-			// handles all detachment packets (ControlObject,
-			// FlyWithObject, MOVE_ANIM, SetMainAttackSkill, 0x1A9)
+			hawk.Vars.Set("Hawk.UsingSkill", false);
+
 			if (attachment != null && attachment.IsAttached)
 				attachment.Detach(sendPackets: false);
 
 			movement?.SetAttachmentMovementMode(false);
+
+			Send.ZC_NORMAL.ControlObject(character, null, ControlLookType.SameDirection, true, true, "None", true);
+			Send.ZC_NORMAL.FlyWithObject(character, null);
+			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.EMPTY, 0);
 
 			await FalconerHawkHelper.HawkFlyAway(skill, character, hawk);
 		}

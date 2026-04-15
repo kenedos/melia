@@ -488,7 +488,6 @@ namespace Melia.Shared.Network
 			public const int PetIsInactive = 0x1A6;              // LATEST
 			public const int SetSubAttackSkill = 0x1A7;          // LATEST
 			public const int Unknown_1A6 = 0x1A8;                // LATEST
-			public const int Unknown_1A9 = 0x1A9;                // LATEST. Sent when HangingShot ends (handle + int)
 			public const int PadSetModel = 0x1AB;                // LATEST
 			public const int WigVisibilityUpdate = 0x1AC;        // LATEST
 			public const int UsedMedalTotal = 0x1B7;             // LATEST

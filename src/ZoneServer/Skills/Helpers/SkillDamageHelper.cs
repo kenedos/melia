@@ -204,7 +204,7 @@ namespace Melia.Zone.Skills.Helpers
 				skillModifier = SkillModifier.Default;
 			}
 
-			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea, hitType: skill.Data.HitType);
 			hits ??= new List<SkillHitInfo>();
 
 

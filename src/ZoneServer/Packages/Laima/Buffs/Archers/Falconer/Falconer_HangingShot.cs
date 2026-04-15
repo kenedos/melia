@@ -52,9 +52,8 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 			// (dispel, death, etc.) without going through skill handler cleanup
 			this.CleanupAttachment(character);
 
-			// Restore normal attack and reset state
+			// Restore normal attack
 			Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.None);
-			Send.ZC_NORMAL.Unknown_1A9(character);
 		}
 
 		/// <summary>
@@ -67,8 +66,6 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 			{
 				var hawk = attachment.AttachedTo as Companion;
 
-				// Detach server-side without sending packets, we send
-				// them manually below with the correct parameters
 				attachment.Detach(sendPackets: false);
 
 				// Reset movement mode
@@ -84,12 +81,10 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 				{
 					Send.ZC_MOVE_ANIM(hawk, FixedAnimation.EMPTY, 0);
 
-					// Clear hawk skill state
 					hawk.Vars.Set("Hawk.UsingSkill", false);
 					hawk.Vars.Set("Hawk.SkillFunction", "None");
 				}
 			}
-
 		}
 	}
 }

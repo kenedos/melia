@@ -4942,24 +4942,6 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
-			/// Sent when a special attack mode ends (e.g. HangingShot).
-			/// Observed with handle + 0 when the character drops from
-			/// the falcon and returns to normal state.
-			/// </summary>
-			/// <param name="character"></param>
-			/// <param name="value"></param>
-			public static void Unknown_1A9(Character character, int value = 0)
-			{
-				using var packet = Packet.Rent(Op.ZC_NORMAL);
-				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Unknown_1A9);
-
-				packet.PutInt(character.Handle);
-				packet.PutInt(value);
-
-				character.Connection.Send(packet);
-			}
-
-			/// <summary>
 			/// Unknown purpose yet.
 			/// </summary>
 			/// <param name="character"></param>

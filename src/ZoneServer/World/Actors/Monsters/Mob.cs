@@ -304,6 +304,12 @@ namespace Melia.Zone.World.Actors.Monsters
 		private float _cachedAgentRadius;
 
 		/// <summary>
+		/// Gets or sets the bonus added to this entity's radius for AoE
+		/// hit detection purposes only. Does not affect pathfinding.
+		/// </summary>
+		public float HitRadiusBonus { get; set; }
+
+		/// <summary>
 		/// Recomputes the cached EffectiveSize and AgentRadius from the
 		/// current Size property. Call after changing the Size property.
 		/// </summary>

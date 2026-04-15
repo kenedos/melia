@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -19,19 +17,19 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	/// <summary>
 	/// Handler for the Falconer skill Aiming.
 	/// Commands the hawk to mark enemies in an area, making them easier to hit
-	/// and increasing damage taken. Marked enemies are revealed even if hidden.
+	/// by increasing their effective hit radius for AoE attacks.
 	/// </summary>
 	/// <remarks>
-	/// - Pad is created at the HAWK's position, not target position
-	/// - Pad follows hawk as it moves
-	/// - Duration: (skill.Level * 5000) + 10000 ms
-	/// - Falconer21 (Hawk Eye) changes buff from Aiming_Buff to Aiming_Hawk_Buff
+	/// - Creates a pad at the hawk's position that follows the hawk
+	/// - Pad applies Aiming_Buff to enemies every 1 second
+	/// - Aiming_Buff increases target HitRadiusBonus (client: ZC_ALTER_HIT_RADIUS)
+	/// - Hawk receives Aiming_Hawk_Buff for the skill's duration
+	/// - Duration: 10000 + (skill.Level * 5000) ms
 	/// </remarks>
 	[Package("laima")]
 	[SkillHandler(SkillId.Falconer_Aiming)]
 	public class Falconer_AimingOverride : IGroundSkillHandler
 	{
-		private const float AimingRadius = 100f;
 		private const int BaseDurationMs = 10000;
 		private const int DurationPerLevelMs = 5000;
 		private const string AimingPadVariable = "Hawk.Aiming.PadId";
@@ -66,6 +64,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 
+			// Clean up any existing Aiming pad
+			var oldPadId = hawk.Vars.Get<int>(AimingPadVariable, 0);
+			if (oldPadId != 0 && caster.Map.TryGetPad(oldPadId, out var oldPad))
+				oldPad?.Destroy();
+
 			// Take off from shoulder if landed
 			if (hawk.IsLandedOnShoulder)
 			{
@@ -73,50 +76,25 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			}
 
-			// Create Aiming pad at HAWK's position (matches Lua: local x, y, z = Get3DPos(hawk))
-			var hawkPos = hawk.Position;
-			var pad = SkillCreatePad(caster, skill, hawkPos, 0f, PadName.Falconer_Aiming, range: AimingRadius);
+			// Calculate duration
+			var durationMs = BaseDurationMs + (skill.Level * DurationPerLevelMs);
+			var duration = TimeSpan.FromMilliseconds(durationMs);
+
+			// Apply hawk buff
+			hawk.StartBuff(BuffId.Aiming_Hawk_Buff, skill.Level, 0f, duration, caster, skill.Id);
+
+			// Create pad at hawk's position, following the hawk
+			var pad = SkillCreatePad(caster, skill, hawk.Position, 0f, PadName.Falconer_Aiming);
 			if (pad == null)
 				return;
 
-			// Store pad ID on hawk for tracking (matches Lua: SetExProp(hawk, 'AIMING_PAD_ID', padID))
-			var padId = pad.Handle;
-			hawk.Vars.Set(AimingPadVariable, padId);
+			pad.FollowsTarget(hawk);
+			pad.Trigger.LifeTime = duration;
+
+			hawk.Vars.Set(AimingPadVariable, pad.Handle);
 
 			// Set hawk aiming state
-			hawk.Vars.Set("Hawk.Aiming.Active", true);
-			hawk.Vars.Set("Hawk.Aiming.Position", hawkPos);
-
-			// Calculate duration: (skill.Level * 5000) + 10000
-			var durationMs = BaseDurationMs + (skill.Level * DurationPerLevelMs);
-			var endTime = DateTime.Now.AddMilliseconds(durationMs);
-
-			// Monitor aiming state
-			while (DateTime.Now < endTime)
-			{
-				// Check if caster or hawk died
-				if (caster.IsDead || hawk.IsDead)
-					break;
-
-				// Check if pad was replaced (another Aiming cast)
-				var currentPadId = hawk.Vars.Get<int>(AimingPadVariable, 0);
-				if (currentPadId != padId)
-				{
-					// Pad was replaced, destroy this one
-					if (caster.Map.TryGetPad(pad.Handle, out var existingPad))
-						existingPad?.Destroy();
-					return;
-				}
-
-				// Check if pad is still alive
-				if (pad.IsDead)
-					break;
-
-				await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			}
-
-			// Cleanup
-			hawk.Vars.Set("Hawk.Aiming.Active", false);
+			FalconerHawkHelper.ExecuteAiming(caster, hawk, skill, hawk.Position);
 		}
 	}
 }

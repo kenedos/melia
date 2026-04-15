@@ -99,6 +99,12 @@ namespace Melia.Zone.World.Actors
 		};
 
 		/// <summary>
+		/// Gets or sets the bonus added to this entity's radius for AoE
+		/// hit detection purposes only. Does not affect pathfinding.
+		/// </summary>
+		float HitRadiusBonus { get; set; }
+
+		/// <summary>
 		/// Returns the entity's level.
 		/// </summary>
 		int Level { get; }
@@ -1097,6 +1103,19 @@ namespace Melia.Zone.World.Actors
 		/// </summary>
 		public static bool IsJumping(this ICombatEntity entity)
 			=> !entity.Components.Get<MovementComponent>()?.IsGrounded ?? false;
+
+		/// <summary>
+		/// Returns true if the entity is flying at high altitude, such as
+		/// a hawk companion or a player under Levitation. Low-flying mobs
+		/// (e.g. bats with MovementType.Flying) are not considered high-flying.
+		/// </summary>
+		public static bool IsHighFlying(this ICombatEntity entity)
+		{
+			if (!entity.Components.TryGet<MovementComponent>(out var movement))
+				return false;
+
+			return movement.IsFlying && movement.FlyHeight >= 50f;
+		}
 
 		// NOTE: This is the main method in Melia for checking enemies, but
 		// since it's lacking in checks compared to our relation system in laima,
