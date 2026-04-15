@@ -26,7 +26,7 @@ public class CompanionScripts : GeneralScript
 		if (character.Connection.CurrentDialog != null)
 			return ItemUseResult.Fail;
 
-		if (character.ActiveCompanion != null)
+		if (character.Companions.ActiveGroundCompanion != null)
 			return ItemUseResult.Fail;
 
 		// if (character.Connection.Account.CharacterSlots + 1 < Max Slots Allow) {
@@ -55,7 +55,7 @@ public class CompanionScripts : GeneralScript
 	[ScriptableFunction]
 	public ItemUseResult PET_FOOD_USE(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
-		var companion = character.Companions.ActiveCompanion;
+		var companion = character.Companions.ActiveGroundCompanion;
 		if (companion == null)
 		{
 			character.ServerMessage("You must have an active companion to use this item.");

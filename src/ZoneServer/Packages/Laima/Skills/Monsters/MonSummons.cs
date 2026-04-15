@@ -179,6 +179,21 @@ namespace Melia.Zone.Skills.Handlers.Mon
 	}
 
 	/// <summary>
+	/// Handler for Sorcerer Familiar bat's attack skill.
+	/// </summary>
+	[Package("laima")]
+	[SkillHandler(SkillId.Mon_pcskill_summon_Familiar_Skill_1)]
+	public class Mon_pcskill_summon_Familiar_Skill_1 : ParametersOnlySkill
+	{
+		protected override TimeSpan AniTime { get; } = TimeSpan.Zero;
+		protected override TimeSpan HitDelay { get; } = TimeSpan.Zero;
+		protected override SplashType SplashType { get; } = SplashType.Circle;
+		protected override float Length { get; } = 40f;
+		protected override float Width { get; } = 15f;
+		protected override float Angle { get; } = 0f;
+	}
+
+	/// <summary>
 	/// Handler override for Giant Zombie's Skill_2.
 	/// Grants Dark Force stacks to the Bokor owner when the zombie attacks.
 	/// </summary>

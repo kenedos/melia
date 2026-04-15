@@ -26,10 +26,10 @@ namespace Melia.Zone.World
 			if (viewer.Connection == null)
 				return;
 
-			// Send relation for active companion
-			if (owner.ActiveCompanion != null && owner.ActiveCompanion.IsActivated)
+			// Send relation for active companions
+			foreach (var companion in owner.Companions.GetActiveCompanions())
 			{
-				RefreshMonsterRelationForViewer(owner.ActiveCompanion, viewer, relation);
+				RefreshMonsterRelationForViewer(companion, viewer, relation);
 			}
 
 			// Send relation for all summons

@@ -534,7 +534,7 @@ namespace Melia.Zone.Scripting.AI
 		/// <param name="maxFollowDistance">The maximum distance before the AI gives up or teleports.</param>
 		/// <param name="matchSpeed">If true, the entity's speed will be changed to match the target's.</param>
 		/// <returns></returns>
-		protected IEnumerable Follow(ICombatEntity followTarget, float minDistance = 50, float maxFollowDistance = 1000, bool matchSpeed = false)
+		protected IEnumerable Follow(ICombatEntity followTarget, float minDistance = 80, float maxFollowDistance = 1000, bool matchSpeed = false)
 		{
 			if (followTarget == null)
 			{

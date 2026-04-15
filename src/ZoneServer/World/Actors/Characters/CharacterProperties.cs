@@ -603,78 +603,87 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <param name="propertyName"></param>
 		private void OnCompanionDependentPropertyChanged(string propertyName)
 		{
-			// Check if character has an active companion
+			// Check if character has active companions
 			if (!this.Character.Components.TryGet<CompanionComponent>(out var companionComponent))
 				return;
 
-			var companion = companionComponent.ActiveCompanion;
-			if (companion == null || !companion.IsActivated || companion.IsBird)
+			var activeCompanions = companionComponent.GetActiveCompanions();
+			if (activeCompanions.Count == 0)
 				return;
 
-			// Invalidate companion properties based on which owner property changed
-			switch (propertyName)
+			foreach (var companion in activeCompanions)
 			{
-				case PropertyName.DEF:
-					companion.Properties.Invalidate(PropertyName.DEF, PropertyName.MountDEF);
-					break;
+				// Invalidate companion properties based on which owner property changed
+				switch (propertyName)
+				{
+					case PropertyName.DEF:
+						companion.Properties.Invalidate(PropertyName.DEF);
+						if (!companion.IsBird)
+							companion.Properties.Invalidate(PropertyName.MountDEF);
+						break;
 
-				case PropertyName.MDEF:
-					companion.Properties.Invalidate(PropertyName.MDEF);
-					break;
+					case PropertyName.MDEF:
+						companion.Properties.Invalidate(PropertyName.MDEF);
+						break;
 
-				case PropertyName.MHP:
-					companion.Properties.Invalidate(PropertyName.MHP, PropertyName.MountMHP);
-					break;
+					case PropertyName.MHP:
+						companion.Properties.Invalidate(PropertyName.MHP);
+						if (!companion.IsBird)
+							companion.Properties.Invalidate(PropertyName.MountMHP);
+						break;
 
-				case PropertyName.DR:
-					companion.Properties.Invalidate(PropertyName.DR, PropertyName.MountDR);
-					break;
+					case PropertyName.DR:
+						companion.Properties.Invalidate(PropertyName.DR);
+						if (!companion.IsBird)
+							companion.Properties.Invalidate(PropertyName.MountDR);
+						break;
 
-				case PropertyName.HR:
-					companion.Properties.Invalidate(PropertyName.HR);
-					break;
+					case PropertyName.HR:
+						companion.Properties.Invalidate(PropertyName.HR);
+						break;
 
-				case PropertyName.CRTHR:
-					companion.Properties.Invalidate(PropertyName.CRTHR);
-					break;
+					case PropertyName.CRTHR:
+						companion.Properties.Invalidate(PropertyName.CRTHR);
+						break;
 
-				case PropertyName.MINPATK:
-				case PropertyName.MAXPATK:
-					companion.Properties.Invalidate(PropertyName.ATK);
-					break;
+					case PropertyName.MINPATK:
+					case PropertyName.MAXPATK:
+						companion.Properties.Invalidate(PropertyName.ATK);
+						break;
 
-				case PropertyName.MINMATK:
-					companion.Properties.Invalidate(PropertyName.MINMATK);
-					break;
+					case PropertyName.MINMATK:
+						companion.Properties.Invalidate(PropertyName.MINMATK);
+						break;
 
-				case PropertyName.MAXMATK:
-					companion.Properties.Invalidate(PropertyName.MAXMATK);
-					break;
+					case PropertyName.MAXMATK:
+						companion.Properties.Invalidate(PropertyName.MAXMATK);
+						break;
 
-				case PropertyName.STR:
-					companion.Properties.Invalidate(PropertyName.STR);
-					break;
+					case PropertyName.STR:
+						companion.Properties.Invalidate(PropertyName.STR);
+						break;
 
-				case PropertyName.DEX:
-					companion.Properties.Invalidate(PropertyName.DEX, PropertyName.DR, PropertyName.HR, PropertyName.CRTHR);
-					break;
+					case PropertyName.DEX:
+						companion.Properties.Invalidate(PropertyName.DEX, PropertyName.DR, PropertyName.HR, PropertyName.CRTHR);
+						break;
 
-				case PropertyName.CON:
-					companion.Properties.Invalidate(PropertyName.CON);
-					break;
+					case PropertyName.CON:
+						companion.Properties.Invalidate(PropertyName.CON);
+						break;
 
-				case PropertyName.INT:
-					companion.Properties.Invalidate(PropertyName.INT);
-					break;
+					case PropertyName.INT:
+						companion.Properties.Invalidate(PropertyName.INT);
+						break;
 
-				case PropertyName.MNA:
-					companion.Properties.Invalidate(PropertyName.MNA);
-					break;
+					case PropertyName.MNA:
+						companion.Properties.Invalidate(PropertyName.MNA);
+						break;
+				}
+
+				// Send updated companion properties to the client
+				if (this.Character.Connection != null)
+					Send.ZC_OBJECT_PROPERTY(this.Character.Connection, companion);
 			}
-
-			// Send updated companion properties to the client
-			if (this.Character.Connection != null)
-				Send.ZC_OBJECT_PROPERTY(this.Character.Connection, companion);
 		}
 	}
 }

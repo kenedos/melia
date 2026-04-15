@@ -253,7 +253,7 @@ namespace Melia.Zone.Skills.Helpers
 				else
 					Debug.ShowShape(caster.Map, pad.Area, SkillConstants.ShortDebugShapeDuration);
 			}
-			if (caster is Mob)
+			if (caster is Mob and not Companion)
 			{
 				if (skill.Data.ShootTime < SkillConstants.MaxPadShootTimeForPreview)
 					Debug.ShowShape(caster.Map, pad.Area, skill.Data.ShootTime);

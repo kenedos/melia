@@ -70,7 +70,7 @@ namespace Melia.Zone.World.Actors.Characters
 		private readonly static TimeSpan ResurrectDialogDelay = TimeSpan.FromSeconds(2);
 		private TimeSpan _resurrectDialogTimer = ResurrectDialogDelay;
 		private Localizer _localizer;
-		private Companion _companionToReactivate;
+		private List<Companion> _companionsToReactivate;
 		#endregion
 
 		#region Core Properties

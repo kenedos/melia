@@ -73,7 +73,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 				EffectMoveDelay = 0f,
 			}, 0f, PadName.Shootpad_Bolas);
 			
-			if (caster.TryGetActiveCompanion(out var companion))
+			if (caster.TryGetActiveGroundCompanion(out var companion))
 			{
 				var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, 40f);
 

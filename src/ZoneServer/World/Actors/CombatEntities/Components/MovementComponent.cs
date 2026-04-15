@@ -551,8 +551,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					}
 				}
 
-				if (character.IsRiding && character.ActiveCompanion != null)
-					character.ActiveCompanion.Position = pos;
+				if (character.IsRiding && character.Companions.ActiveGroundCompanion != null)
+					character.Companions.ActiveGroundCompanion.Position = pos;
 
 				if (this.ShowMinimapMarker)
 					Send.ZC_NORMAL.MinimapMarker(character, 2, 0);

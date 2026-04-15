@@ -2190,10 +2190,30 @@ namespace Melia.Zone.World.Actors
 		}
 
 		/// <summary>
+		/// Returns the entity's active ground companion (non-bird) via out.
+		/// Returns false if no ground companion is active.
+		/// </summary>
+		public static bool TryGetActiveGroundCompanion(this ICombatEntity entity, out Companion companion)
+		{
+			companion = entity.Components.Get<CompanionComponent>()?.ActiveGroundCompanion ?? null;
+			return companion != null;
+		}
+
+		/// <summary>
+		/// Returns the entity's active bird companion (hawk) via out.
+		/// Returns false if no bird companion is active.
+		/// </summary>
+		public static bool TryGetActiveBirdCompanion(this ICombatEntity entity, out Companion companion)
+		{
+			companion = entity.Components.Get<CompanionComponent>()?.ActiveBirdCompanion ?? null;
+			return companion != null;
+		}
+
+		/// <summary>
 		/// Returns true if the entity is currently riding its companion.
 		/// </summary>
 		public static bool IsRiding(this ICombatEntity entity)
-			=> entity.Components.Get<CompanionComponent>()?.ActiveCompanion?.IsRiding ?? false;
+			=> entity.Components.Get<CompanionComponent>()?.ActiveGroundCompanion?.IsRiding ?? false;
 
 		/// <summary>
 		/// Sends a localized system message to the entity if it is a character.

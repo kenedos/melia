@@ -240,7 +240,7 @@ namespace Melia.Zone.World.Actors.Characters
 					this.Position = pos;
 					Send.ZC_SET_POS(this);
 
-					if (this.IsRiding && this.ActiveCompanion is Companion ridingCompanion)
+					if (this.IsRiding && this.Companions.ActiveGroundCompanion is Companion ridingCompanion)
 					{
 						ridingCompanion.Position = pos;
 						Send.ZC_SET_POS(ridingCompanion);
@@ -530,7 +530,7 @@ namespace Melia.Zone.World.Actors.Characters
 			for (var i = 0; i < _tempAppearChars.Count; i++)
 			{
 				var character = _tempAppearChars[i];
-				if (character.IsRiding && character.ActiveCompanion is Companion ridingCompanion)
+				if (character.IsRiding && character.Companions.ActiveGroundCompanion is Companion ridingCompanion)
 					Send.ZC_NORMAL.RidePet(this.Connection, character, ridingCompanion);
 			}
 		}

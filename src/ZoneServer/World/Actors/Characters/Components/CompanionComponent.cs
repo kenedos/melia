@@ -34,6 +34,47 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 		}
 
+		/// <summary>
+		/// Returns the active ground companion (non-bird), or null.
+		/// </summary>
+		public Companion ActiveGroundCompanion
+		{
+			get
+			{
+				lock (_companions)
+					return _companions?.Find(companion => companion.IsActivated && !companion.IsBird);
+			}
+		}
+
+		/// <summary>
+		/// Returns the active bird companion (hawk), or null.
+		/// </summary>
+		public Companion ActiveBirdCompanion
+		{
+			get
+			{
+				lock (_companions)
+					return _companions?.Find(companion => companion.IsActivated && companion.IsBird);
+			}
+		}
+
+		/// <summary>
+		/// Returns all currently activated companions.
+		/// </summary>
+		public IList<Companion> GetActiveCompanions()
+		{
+			lock (_companions)
+			{
+				var result = new List<Companion>();
+				foreach (var companion in _companions)
+				{
+					if (companion.IsActivated)
+						result.Add(companion);
+				}
+				return result;
+			}
+		}
+
 		/// Add companion
 		/// </summary>
 		/// <param name="companion"></param>

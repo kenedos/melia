@@ -31,6 +31,7 @@ public class PcPetAiScript : AiScript
 		During("Attack", CheckTarget);
 		During("Attack", CheckMaster);
 		During("Attack", CheckFear);
+		During("Attack", CheckAggressiveDisabled);
 	}
 
 	protected override void Root()
@@ -66,7 +67,7 @@ public class PcPetAiScript : AiScript
 
 		// Find nearby enemies within view range, sorted by distance to master
 		var nearbyEnemies = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, _viewRange)
-				.Where(e => !e.IsDead && this.IsHostileTowards(e) && e.Position.InRange2D(master.Position, MaxMasterDistance))
+				.Where(e => !e.IsDead && this.IsHostileTowards(e))
 				.OrderBy(e => e.Position.Get2DDistance(master.Position))
 				.ToList();
 
@@ -78,6 +79,22 @@ public class PcPetAiScript : AiScript
 
 			// Check enemies will pick up the most hated target
 			this.CheckEnemies();
+		}
+	}
+
+	/// <summary>
+	/// Checks if aggressive mode was disabled mid-combat and stops attacking.
+	/// </summary>
+	protected virtual void CheckAggressiveDisabled()
+	{
+		if (this.Entity is not Companion companion)
+			return;
+
+		if (!companion.IsAggressiveMode && _target != null)
+		{
+			_target = null;
+			this.RemoveAllHate();
+			this.StartRoutine("Idle", this.Idle());
 		}
 	}
 
@@ -294,7 +311,15 @@ public class PcPetAiScript : AiScript
 		if (!this.TryGetMaster(out var master))
 			return;
 
-		Hunter_PetAttackOverride.TryActivate(master, companion, target);
-		Hunter_HowlingOverride.TryActivate(master, companion, target);
+		var distanceToTarget = this.Entity.Position.Get2DDistance(target.Position);
+
+		// Hunter_PetAttack when target is >50 range away
+		if (distanceToTarget > 50f)
+		{
+			Hunter_PetAttackOverride.TryActivate(master, companion, target);
+		}
+
+		// Future skills can be added here with different conditions
+		// Example: if (distanceToTarget < 50f) { SomeOtherSkill.TryActivate(...); }
 	}
 }
