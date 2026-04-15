@@ -553,7 +553,11 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			var isOwnerMoving = this.Owner.Components.TryGet<MovementComponent>(out var movement) && movement.IsMoving;
 
-			if (isOwnerMoving)
+			// Reset shoulder timer when owner is moving or hawk is
+			// busy with a skill (e.g. FirstStrike auto-attacks)
+			var hawkBusy = this.Vars.Get<bool>("Hawk.UsingSkill", false);
+
+			if (isOwnerMoving || hawkBusy)
 			{
 				_ownerStillTimer = TimeSpan.Zero;
 				this.WantsToLand = false;

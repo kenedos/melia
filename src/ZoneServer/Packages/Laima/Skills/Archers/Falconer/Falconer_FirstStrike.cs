@@ -60,8 +60,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				caster.StartBuff(BuffId.FirstStrike_Buff, skill.Level, 0f, TimeSpan.Zero, caster);
 
 				// Visual activation effect
-				caster.PlayEffect("F_archer_firststrike_activate", scale: 1f, heightOffset: EffectLocation.Top);
-				caster.PlaySound("skill_archer_firststrike_on", "skill_archer_firststrike_on");
+				caster.PlayEffect("skl_eff_whistle_4", scale: 1f, heightOffset: EffectLocation.Top);
 
 				// Start hawk auto-attack script
 				hawk.Vars.Set("Hawk.FirstStrike.Active", true);
@@ -72,7 +71,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				caster.StopBuff(BuffId.FirstStrike_Buff);
 
 				// Deactivation effect
-				caster.PlayEffect("F_archer_firststrike_deactivate", scale: 0.8f, heightOffset: EffectLocation.Top);
+				caster.PlayEffect("skl_eff_whistle_4", scale: 0.8f, heightOffset: EffectLocation.Top);
 
 				// Stop hawk auto-attack script
 				hawk.Vars.Set("Hawk.FirstStrike.Active", false);

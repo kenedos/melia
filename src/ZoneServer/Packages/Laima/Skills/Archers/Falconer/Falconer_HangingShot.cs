@@ -37,7 +37,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	[SkillHandler(SkillId.Falconer_HangingShot)]
 	public class Falconer_HangingShotOverride : IGroundSkillHandler
 	{
-		private const int BaseBuffDurationSeconds = 14;
+		private const int BuffDurationSeconds = 30;
 		private const string HangingShotAttachNode = "Dummy_hawk";
 		private const int HangingShotAttachOffset = -56;
 
@@ -68,9 +68,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (caster is not Character chr)
 				return;
 
-			// Calculate buff duration based on skill level
-			var buffDuration = BaseBuffDurationSeconds + skill.Level;
-			var buffTimeSpan = TimeSpan.FromSeconds(buffDuration);
+			var buffTimeSpan = TimeSpan.FromSeconds(BuffDurationSeconds);
 
 			// ===== Packet sequence matching official =====
 
@@ -93,7 +91,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			// 4. Buff + SetMainAttackSkill in sync block with SYNC_EXEC_BY_SKILL_TIME
 			var syncKey1 = hawk.GenerateSyncKey();
 			Send.ZC_SYNC_START(caster, syncKey1, 1);
-			caster.StartBuff(BuffId.HangingShot, skill.Level, 0, buffTimeSpan, caster);
+			caster.StartBuff(BuffId.HangingShot, skill.Level, 0, buffTimeSpan, hawk, skill.Id);
 			// Note: SetMainAttackSkill is sent by buff handler OnActivate
 			Send.ZC_SYNC_END(caster, syncKey1, 1);
 			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, syncKey1);
@@ -165,7 +163,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			// Falconer23: [Arts] Hanging Shot: Dodge
 			if (caster.IsAbilityActive(AbilityId.Falconer23))
-				caster.StartBuff(BuffId.HangingShot_Falconer23_Buff, skill.Level, 0, buffTimeSpan, caster);
+				caster.StartBuff(BuffId.HangingShot_Falconer23_Buff, skill.Level, 0, buffTimeSpan, caster, skill.Id);
 
 			// Monitor buff state
 			var endTime = DateTime.Now.Add(buffTimeSpan);
@@ -189,16 +187,13 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task CleanupHangingShot(Skill skill, Character character, Companion hawk, AttachmentComponent attachment, MovementComponent movement)
 		{
-			hawk.Vars.Set("Hawk.UsingSkill", false);
+			// Detach without sending packets - buff handler OnEnd
+			// handles all detachment packets (ControlObject,
+			// FlyWithObject, MOVE_ANIM, SetMainAttackSkill, 0x1A9)
+			if (attachment != null && attachment.IsAttached)
+				attachment.Detach(sendPackets: false);
 
-			attachment?.Detach(sendPackets: false);
 			movement?.SetAttachmentMovementMode(false);
-
-			character.ToggleControl("None", false);
-
-			Send.ZC_NORMAL.ControlObject(character, null, ControlLookType.SameDirection, true, true, "None", true);
-			Send.ZC_NORMAL.FlyWithObject(character, null);
-			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.EMPTY, 0);
 
 			await FalconerHawkHelper.HawkFlyAway(skill, character, hawk);
 		}

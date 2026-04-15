@@ -77,20 +77,23 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task HandleSkill(Skill skill, ICombatEntity caster, Companion hawk, Position targetPos)
 		{
-			// Interrupt hawk if busy
-			if (FalconerHawkHelper.IsHawkBusy(hawk))
-			{
-				hawk.Vars.Set("Hawk.UsingSkill", false);
-				await skill.Wait(TimeSpan.FromMilliseconds(100));
-			}
+			// Queue if hawk is busy with another skill
+			if (FalconerHawkHelper.TryQueueSkill(hawk, () => skill.Run(HandleSkill(skill, caster, hawk, targetPos))))
+				return;
+
+			// Read GCD remaining before LockHawk resets the timer
+			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
+
+			// Lock hawk immediately so subsequent casts get queued
+			FalconerHawkHelper.LockHawk(hawk);
+
+			// Wait for hawk global cooldown if needed
+			if (gcdRemaining > 0)
+				await skill.Wait(TimeSpan.FromMilliseconds(gcdRemaining));
 
 			// Unhide hawk if it flew away from a previous skill
 			if (FalconerHawkHelper.IsHawkFlyingAway(hawk))
 				await FalconerHawkHelper.HawkUnhide(skill, caster, hawk);
-
-			// Lock hawk action
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "BlisteringThrash");
 
 			// Take off from shoulder or leave roost
 			if (hawk.IsLandedOnShoulder)
@@ -145,14 +148,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			// Shockwave effect
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
 
+			hawk.SetPosition(targetPos);
+
 			// Wait for hawk return animation
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 
-			// Cleanup
-			hawk.Vars.Set("Hawk.UsingSkill", false);
-			hawk.Vars.Set("Hawk.SkillFunction", "None");
-
-			// Hawk flies away after attack
+			// Hawk flies away or processes next queued skill
 			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
 		}
 
@@ -176,6 +177,15 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 
 			skill.IncreaseOverheat();
+
+			if (FalconerHawkHelper.TryQueueSkill(hawk, () =>
+			{
+				FalconerHawkHelper.LockHawk(hawk);
+				skill.Run(ActivateSonicStrike(skill, caster, hawk, target));
+			}))
+				return;
+
+			FalconerHawkHelper.LockHawk(hawk);
 			skill.Run(ActivateSonicStrike(skill, caster, hawk, target));
 		}
 
@@ -208,6 +218,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			var hit = new HitInfo(caster, target, skill, skillHitResult, HitResultType.Hit);
 			Send.ZC_HIT_INFO(caster, target, hit);
+
+			hawk.SetPosition(targetPos);
+
+			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
 		}
 	}
 }

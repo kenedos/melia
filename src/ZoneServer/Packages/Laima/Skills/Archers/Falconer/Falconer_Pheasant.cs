@@ -86,12 +86,19 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (previousPheasant != null && !previousPheasant.IsDead)
 				previousPheasant.Kill(null);
 
-			// Interrupt hawk if busy
-			if (FalconerHawkHelper.IsHawkBusy(hawk))
-			{
-				hawk.Vars.Set("Hawk.UsingSkill", false);
-				await skill.Wait(TimeSpan.FromMilliseconds(100));
-			}
+			// Queue if hawk is busy with another skill
+			if (FalconerHawkHelper.TryQueueSkill(hawk, () => skill.Run(HandleSkill(caster, skill, hawk, originPos, targetPos))))
+				return;
+
+			// Read GCD remaining before LockHawk resets the timer
+			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
+
+			// Lock hawk immediately so subsequent casts get queued
+			FalconerHawkHelper.LockHawk(hawk);
+
+			// Wait for hawk global cooldown if needed
+			if (gcdRemaining > 0)
+				await skill.Wait(TimeSpan.FromMilliseconds(gcdRemaining));
 
 			// Unhide hawk if it flew away from a previous skill
 			if (FalconerHawkHelper.IsHawkFlyingAway(hawk))
@@ -112,10 +119,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			// Throw pheasant to target location
 			Send.ZC_NORMAL.ThrowActor(pheasant, "F_smoke109_2", 1.5f, targetPos, 0.5f, 0f, 900f, 1f, 0);
 			pheasant.SetPosition(targetPos);
-
-			// Lock hawk action
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "Pheasant");
 
 			// Take off from shoulder or leave roost
 			if (hawk.IsLandedOnShoulder)
@@ -143,11 +146,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (!pheasant.IsDead)
 				pheasant.Kill(null);
 
-			// Cleanup hawk state
-			hawk.Vars.Set("Hawk.UsingSkill", false);
-			hawk.Vars.Set("Hawk.SkillFunction", "None");
-
-			// Hawk flies away after attack
+			// Hawk flies away or processes next queued skill
 			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
 		}
 
@@ -221,6 +220,103 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
 
 			await Task.CompletedTask;
+		}
+
+		/// <summary>
+		/// Attempts to auto-trigger Pheasant on a target.
+		/// Called by the hawk AI during FirstStrike auto-attack.
+		/// Performs a simplified version: hawk dives to target and
+		/// triggers the explosion without spawning the pheasant decoy.
+		/// </summary>
+		public static void TryAutoActivate(ICombatEntity caster, ICombatEntity target)
+		{
+			if (!caster.TryGetSkill(SkillId.Falconer_Pheasant, out var skill))
+				return;
+
+			if (skill.IsOnCooldown || target.IsDead)
+				return;
+
+			if (!FalconerHawkHelper.TryGetHawk(caster, out var hawk))
+				return;
+
+			skill.IncreaseOverheat();
+
+			if (FalconerHawkHelper.TryQueueSkill(hawk, () =>
+			{
+				FalconerHawkHelper.LockHawk(hawk);
+				skill.Run(AutoActivate(skill, caster, hawk, target));
+			}))
+				return;
+
+			FalconerHawkHelper.LockHawk(hawk);
+			skill.Run(AutoActivate(skill, caster, hawk, target));
+		}
+
+		private static async Task AutoActivate(Skill skill, ICombatEntity caster, Companion hawk, ICombatEntity target)
+		{
+			var targetPos = target.Position;
+			var syncKey = hawk.GenerateSyncKey();
+
+			Send.ZC_NORMAL.CollisionAndBack(hawk, target, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f, true);
+
+			await skill.Wait(TimeSpan.FromMilliseconds(700));
+
+			if (target.IsDead)
+				return;
+
+			hawk.PlayGroundEffect(targetPos, "F_archer_caltrop_hit_explosion", 1f);
+			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
+			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
+
+			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, DamageRadius)
+				.Take(MaxTargets)
+				.ToList();
+
+			if (enemies.Count == 0)
+				return;
+
+			var hits = new List<SkillHitInfo>();
+			var damageDelay = TimeSpan.FromMilliseconds(50);
+			var skillHitDelay = TimeSpan.Zero;
+
+			var hasFalconer12 = caster.TryGetActiveAbilityLevel(AbilityId.Falconer12, out var falconer12Level);
+			var hasFalconer18 = caster.IsAbilityActive(AbilityId.Falconer18);
+
+			foreach (var enemy in enemies)
+			{
+				if (enemy.IsDead)
+					continue;
+
+				var skillHitResult = SCR_SkillHit(caster, enemy, skill);
+				enemy.TakeDamage(skillHitResult.Damage, caster);
+
+				var skillHit = new SkillHitInfo(caster, enemy, skill, skillHitResult, damageDelay, skillHitDelay);
+				skillHit.HitEffect = HitEffect.Impact;
+
+				if (enemy.IsKnockdownable())
+				{
+					if (hasFalconer18)
+						skillHit.KnockBackInfo = new KnockBackInfo(targetPos, enemy, KnockBackType.KnockDown, 150, 80);
+					else if (!hasFalconer12)
+						skillHit.KnockBackInfo = new KnockBackInfo(hawk.Position, enemy, KnockBackType.KnockDown, 150, 80);
+
+					if (skillHit.KnockBackInfo != null)
+						enemy.ApplyKnockdown(caster, skill, skillHit);
+				}
+
+				if (hasFalconer12)
+				{
+					var stunChance = falconer12Level * 10;
+					if (RandomProvider.Get().Next(100) < stunChance)
+						enemy.StartBuff(BuffId.Stun, skill.Level, 0, TimeSpan.FromSeconds(3), caster);
+				}
+
+				hits.Add(skillHit);
+			}
+
+			Send.ZC_SKILL_HIT_INFO(caster, hits);
+
+			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
 		}
 	}
 }

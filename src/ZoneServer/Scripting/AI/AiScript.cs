@@ -1075,6 +1075,17 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
+		/// Adds hate toward an entity from an external source (e.g.
+		/// owner's combat transferring aggro to a companion).
+		/// </summary>
+		/// <param name="entity">The entity to hate.</param>
+		/// <param name="amount">Amount of hate to add.</param>
+		public void AddHate(ICombatEntity entity, float amount)
+		{
+			this.IncreaseHate(entity, amount);
+		}
+
+		/// <summary>
 		/// Returns true if the AI's entity is hostile towards the given
 		/// entity based on the factions they belong to, or based on
 		/// PvP/duel status.

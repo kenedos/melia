@@ -13,6 +13,8 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.Skills.Handlers.Archers.Falconer;
+using Melia.Zone.Skills.Helpers;
 using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
@@ -54,14 +56,9 @@ public class PcPetHawkAiScript : AiScript
 
 		this.SetViewRange(300);
 
-		During("Idle", CheckEnemies);
-		During("Idle", CheckAggressiveMode);
 		During("Idle", CheckFirstStrike);
 		During("Idle", CheckFear);
-		During("Attack", CheckTarget);
-		During("Attack", CheckMaster);
-		During("Attack", CheckAggressiveDisabled);
-		During("Attack", CheckFear);
+		During("Idle", CheckAggressiveMode);
 	}
 
 	protected override void Root()
@@ -88,8 +85,8 @@ public class PcPetHawkAiScript : AiScript
 
 	private bool IsFlyingAway
 	{
-		get => this.Companion?.Vars.TryGet<bool>("Hawk.IsFlyingAway", out var val) == true && val;
-		set => this.Companion?.Vars.Set("Hawk.IsFlyingAway", value);
+		get => this.Companion?.Vars.TryGet<bool>("Hawk.FlyingAway", out var val) == true && val;
+		set => this.Companion?.Vars.Set("Hawk.FlyingAway", value);
 	}
 
 	private bool IsUsingSkillFlag
@@ -364,7 +361,10 @@ public class PcPetHawkAiScript : AiScript
 	{
 		var distance = this.Entity.Position.Get2DDistance(owner.Position);
 
-		if (distance >= TeleportDistance)
+		// Don't hard-teleport while FirstStrike is active — the hawk
+		// may be far from the owner after an auto-cast and should fly
+		// back smoothly instead of visibly jumping.
+		if (distance >= TeleportDistance && !owner.IsBuffActive(BuffId.FirstStrike_Buff))
 		{
 			var teleportPos = GetRandomFlyPosition(owner, 250);
 			this.Entity.Position = teleportPos;
@@ -413,6 +413,13 @@ public class PcPetHawkAiScript : AiScript
 			{
 				LockHawkAction(false);
 				this.Companion?.Vars.Set("Hawk.LastSkillEndTime", DateTime.UtcNow);
+				yield break;
+			}
+
+			// First Strike active - hawk stays visible for auto-casting
+			if (owner.IsBuffActive(BuffId.FirstStrike_Buff))
+			{
+				LockHawkAction(false);
 				yield break;
 			}
 
@@ -495,9 +502,6 @@ public class PcPetHawkAiScript : AiScript
 		if (this.Companion == null || !this.Companion.IsAggressiveMode)
 			return;
 
-		if (_target != null)
-			return;
-
 		if (this.Entity.IsLocked(LockType.Attack))
 			return;
 
@@ -516,7 +520,6 @@ public class PcPetHawkAiScript : AiScript
 		{
 			var closestToMaster = nearbyEnemies.First();
 			this.IncreaseHate(closestToMaster, 150);
-			this.CheckEnemies();
 		}
 	}
 
@@ -551,22 +554,56 @@ public class PcPetHawkAiScript : AiScript
 		if (IsUsingSkillFlag)
 			return;
 
-		if (owner.Components.TryGet<CombatComponent>(out var combat) && !combat.AttackState)
+		if (FalconerHawkHelper.IsOnGlobalCooldown(this.Companion))
 			return;
 
-		var target = GetOwnerTarget(owner);
+		// Pick the most hated target first (hate is added by the
+		// FirstStrike buff when the owner attacks). Fall back to
+		// the owner's current combat target if no hate exists.
+		var target = this.GetMostHated();
+
+		if (target == null || this.EntityGone(target))
+			target = GetOwnerTarget(owner);
+
 		if (target == null || this.EntityGone(target))
 			return;
 
-		// Falconer14: Remove Sonic Strike
-		if (!owner.IsAbilityActive(AbilityId.Falconer14)
-			&& owner.TryGetSkill(SkillId.Falconer_BlisteringThrash, out var skill) && !skill.IsOnCooldown)
+		// Unhide hawk if hidden so it can auto-cast
+		if (IsHidden || IsFlyingAway)
 		{
-			TriggerHawkSkill("BlisteringThrash", owner, target, skill, true);
+			this.ExecuteOnce(Unhide(owner));
 			return;
 		}
 
-		// Falconer13: Remove Hovering
+		// Try skills in priority order — each handler manages its own
+		// cooldowns, damage, and visual animation
+
+		// Blistering Thrash / Sonic Strike (if not disabled by Falconer14)
+		if (!owner.IsAbilityActive(AbilityId.Falconer14)
+			&& owner.TryGetSkill(SkillId.Falconer_BlisteringThrash, out var bt) && !bt.IsOnCooldown)
+		{
+			TakeOffIfLanded();
+			Falconer_BlisteringThrashOverride.TryActivateSonicStrike(owner, target);
+			return;
+		}
+
+		// Pheasant
+		if (owner.TryGetSkill(SkillId.Falconer_Pheasant, out var ph) && !ph.IsOnCooldown)
+		{
+			TakeOffIfLanded();
+			Falconer_PheasantOverride.TryAutoActivate(owner, target);
+			return;
+		}
+
+		// Tomahawk
+		if (owner.TryGetSkill(SkillId.Falconer_Tomahawk, out var tm) && !tm.IsOnCooldown)
+		{
+			TakeOffIfLanded();
+			Falconer_TomahawkOverride.TryAutoActivate(owner, target);
+			return;
+		}
+
+		// Hovering (if not disabled by Falconer13)
 		if (!owner.IsAbilityActive(AbilityId.Falconer13))
 		{
 			var approachingEnemy = FindEnemyApproachingOwner(owner);

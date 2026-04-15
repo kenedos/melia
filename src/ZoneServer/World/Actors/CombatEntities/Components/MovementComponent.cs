@@ -68,6 +68,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public bool IsFlying { get; private set; } = false;
 
 		/// <summary>
+		/// The current fly height offset above ground.
+		/// </summary>
+		public float FlyHeight { get; private set; } = 0f;
+
+		/// <summary>
 		/// Enable or disable a minimap marker being shown when the entity moves.
 		/// </summary>
 		public bool ShowMinimapMarker { get; set; } = false;
@@ -331,13 +336,23 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				this.Destination = nextDestination;
 				this.Entity.Direction = position.GetDirection(nextDestination);
 
-				var fromCellPos = this.Entity.Map.Ground.GetCellPosition(position);
-				var toCellPos = this.Entity.Map.Ground.GetCellPosition(nextDestination);
+				if (this.IsFlying)
+				{
+					// Use world-position movement for flying entities so
+					// the client receives explicit Y coordinates that
+					// follow the terrain at the correct fly height.
+					var fromPos = new Position(position.X, position.Y + this.FlyHeight, position.Z);
+					var toPos = new Position(nextDestination.X, nextDestination.Y + this.FlyHeight, nextDestination.Z);
 
-				Send.ZC_MOVE_PATH(this.Entity, fromCellPos, toCellPos, speed);
+					Send.ZC_MOVE_POS(this.Entity, fromPos, toPos, speed);
+				}
+				else
+				{
+					var fromCellPos = this.Entity.Map.Ground.GetCellPosition(position);
+					var toCellPos = this.Entity.Map.Ground.GetCellPosition(nextDestination);
 
-				//this.Entity.TurnTowards(nextDestination);
-				//Send.ZC_MOVE_POS(this.Entity, position, nextDestination, speed);
+					Send.ZC_MOVE_PATH(this.Entity, fromCellPos, toCellPos, speed);
+				}
 			}
 		}
 
@@ -431,7 +446,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				this.IsMoving = false;
 				this.Destination = pos;
 
-				Send.ZC_MOVE_STOP(this.Entity, pos);
+				if (this.IsFlying)
+					Send.ZC_MOVE_STOP(this.Entity, new Position(pos.X, pos.Y + this.FlyHeight, pos.Z));
+				else
+					Send.ZC_MOVE_STOP(this.Entity, pos);
 			}
 
 			// Clear any remaining path waypoints to prevent resuming movement
@@ -494,6 +512,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public void NotifyFlying(bool flying, float height = 0, float raiseTime = 1, float easing = 0)
 		{
 			this.IsFlying = flying;
+			this.FlyHeight = height;
 			if (this.Entity is Character character)
 			{
 				Send.ZC_FLY(character, height, 5);

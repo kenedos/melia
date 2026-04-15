@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -7,6 +8,7 @@ using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Logging;
 using Yggdrasil.Util;
@@ -50,6 +52,47 @@ namespace Melia.Zone.Skills.Helpers
 		public const float FlyAwayDistance = 300f;
 
 		/// <summary>
+		/// Per-hawk skill queues, keyed by hawk handle.
+		/// </summary>
+		private static readonly Dictionary<int, Queue<Action>> _skillQueues = new();
+
+		/// <summary>
+		/// Queues a skill action for the hawk if it is currently busy.
+		/// Returns true if the action was queued, false if the hawk is
+		/// free and the caller should execute immediately.
+		/// </summary>
+		public static bool TryQueueSkill(Companion hawk, Action executeSkill)
+		{
+			if (!IsHawkBusy(hawk))
+				return false;
+
+			if (!_skillQueues.TryGetValue(hawk.Handle, out var queue))
+			{
+				queue = new Queue<Action>();
+				_skillQueues[hawk.Handle] = queue;
+			}
+			queue.Enqueue(executeSkill);
+			return true;
+		}
+
+		/// <summary>
+		/// Returns true if the hawk has queued skills waiting.
+		/// </summary>
+		public static bool HasQueuedSkills(Companion hawk)
+		{
+			return _skillQueues.TryGetValue(hawk.Handle, out var queue) && queue.Count > 0;
+		}
+
+		/// <summary>
+		/// Clears all queued skills for the hawk.
+		/// </summary>
+		public static void ClearQueue(Companion hawk)
+		{
+			if (_skillQueues.ContainsKey(hawk.Handle))
+				_skillQueues[hawk.Handle].Clear();
+		}
+
+		/// <summary>
 		/// Attempts to get the Falconer's active hawk companion.
 		/// </summary>
 		/// <param name="caster">The caster (Falconer)</param>
@@ -78,6 +121,52 @@ namespace Melia.Zone.Skills.Helpers
 		public static bool IsHawkBusy(Companion hawk)
 		{
 			return hawk.Vars.Get<bool>("Hawk.UsingSkill", false);
+		}
+
+		/// <summary>
+		/// Locks the hawk for a skill: sets the busy flag and locks
+		/// movement so the AI cannot move the hawk mid-attack.
+		/// </summary>
+		public static void LockHawk(Companion hawk)
+		{
+			hawk.Vars.Set("Hawk.UsingSkill", true);
+			hawk.Vars.Set("Hawk.LastSkillStartTime", DateTime.UtcNow);
+			hawk.Lock(LockType.Movement);
+		}
+
+		/// <summary>
+		/// Returns true if the hawk has used a skill too recently
+		/// (within 2.5 seconds).
+		/// </summary>
+		public static bool IsOnGlobalCooldown(Companion hawk)
+		{
+			if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
+				return (DateTime.UtcNow - lastStart).TotalMilliseconds < 2500;
+			return false;
+		}
+
+		/// <summary>
+		/// Returns the number of milliseconds remaining on the hawk's
+		/// 2.5s global cooldown, or 0 if it has expired.
+		/// </summary>
+		public static double GetGlobalCooldownRemaining(Companion hawk)
+		{
+			if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
+			{
+				var remaining = 2500.0 - (DateTime.UtcNow - lastStart).TotalMilliseconds;
+				return remaining > 0 ? remaining : 0;
+			}
+			return 0;
+		}
+
+		/// <summary>
+		/// Unlocks the hawk after a skill: clears the busy flag and
+		/// restores AI movement.
+		/// </summary>
+		public static void UnlockHawk(Companion hawk)
+		{
+			hawk.Vars.Set("Hawk.UsingSkill", false);
+			hawk.Unlock(LockType.Movement);
 		}
 
 		/// <summary>
@@ -125,7 +214,7 @@ namespace Melia.Zone.Skills.Helpers
 			}
 
 			// Clear skill lock
-			hawk.Vars.Set("Hawk.UsingSkill", false);
+			UnlockHawk(hawk);
 
 			// Move towards owner
 			hawk.PlayEffect("F_buff_basic008_blue", scale: 1f);
@@ -186,8 +275,7 @@ namespace Melia.Zone.Skills.Helpers
 				await InterruptHawkAction(skill, hawk);
 			}
 
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "BlisteringThrash");
+			LockHawk(hawk);
 
 			UnrestHawkIfNeeded(hawk);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
@@ -206,8 +294,6 @@ namespace Melia.Zone.Skills.Helpers
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1200));
-
-			hawk.Vars.Set("Hawk.UsingSkill", false);
 
 			// Fly away after attack
 			await HawkFlyAway(skill, caster, hawk);
@@ -228,8 +314,7 @@ namespace Melia.Zone.Skills.Helpers
 				await InterruptHawkAction(skill, hawk);
 			}
 
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "Hovering");
+			LockHawk(hawk);
 
 			UnrestHawkIfNeeded(hawk);
 		}
@@ -243,8 +328,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (hawk == null || target == null)
 				return;
 
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "Combination");
+			LockHawk(hawk);
 
 			UnrestHawkIfNeeded(hawk);
 
@@ -260,8 +344,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (hawk == null)
 				return;
 
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "HangingShot");
+			LockHawk(hawk);
 
 			UnrestHawkIfNeeded(hawk);
 
@@ -276,8 +359,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (hawk == null || pheasant == null)
 				return;
 
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "Pheasant");
+			LockHawk(hawk);
 
 			UnrestHawkIfNeeded(hawk);
 
@@ -288,7 +370,6 @@ namespace Melia.Zone.Skills.Helpers
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 
-			hawk.Vars.Set("Hawk.UsingSkill", false);
 			await HawkFlyAway(skill, caster, hawk);
 		}
 
@@ -303,13 +384,34 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster is not Character character)
 				return;
 
+			// If there's a queued skill, wait until the 2.5s global
+			// cooldown has passed, then fire the next skill
+			if (HasQueuedSkills(hawk))
+			{
+				var remaining = 2500.0;
+				if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
+					remaining = 2500.0 - (DateTime.UtcNow - lastStart).TotalMilliseconds;
+				if (remaining > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(remaining));
+
+				UnlockHawk(hawk);
+
+				if (_skillQueues.TryGetValue(hawk.Handle, out var queue) && queue.Count > 0)
+				{
+					var next = queue.Dequeue();
+					next();
+				}
+				return;
+			}
+
+			UnlockHawk(hawk);
+
 			// Check for roost - don't fly away if owner near roost
 			var roostHandle = (int)caster.GetTempVar("Falconer.Roost.Handle");
 			if (roostHandle != 0 && caster.Map.TryGetCombatEntity(roostHandle, out var roost))
 			{
 				if (roost != null && !roost.IsDead)
 				{
-					hawk.Vars.Set("Hawk.UsingSkill", false);
 					hawk.Vars.Set("Hawk.LastSkillEndTime", DateTime.UtcNow);
 					return;
 				}
@@ -317,17 +419,11 @@ namespace Melia.Zone.Skills.Helpers
 
 			// Check if First Strike is active - hawk doesn't fly away
 			if (caster.IsBuffActive(BuffId.FirstStrike_Buff))
-			{
-				hawk.Vars.Set("Hawk.UsingSkill", false);
 				return;
-			}
 
 			// Falconer20: Hawk Hunt - hawk doesn't fly away
 			if (caster.IsAbilityActive(AbilityId.Falconer20))
-			{
-				hawk.Vars.Set("Hawk.UsingSkill", false);
 				return;
-			}
 
 			// Check if already flying away
 			if (hawk.Vars.Get<bool>("Hawk.FlyingAway", false))
@@ -358,7 +454,6 @@ namespace Melia.Zone.Skills.Helpers
 				hawk.SetHide(true);
 				hawk.Vars.Set("Hawk.IsHidden", true);
 				hawk.Vars.Set("Hawk.FlyingAway", false);
-				hawk.Vars.Set("Hawk.UsingSkill", false);
 			}
 		}
 
@@ -369,7 +464,7 @@ namespace Melia.Zone.Skills.Helpers
 		{
 			var currentFunction = hawk.Vars.Get<string>("Hawk.SkillFunction", "None");
 
-			hawk.Vars.Set("Hawk.UsingSkill", false);
+			UnlockHawk(hawk);
 
 			if (currentFunction == "Hovering" || currentFunction == "Circling")
 			{

@@ -52,8 +52,9 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 			// (dispel, death, etc.) without going through skill handler cleanup
 			this.CleanupAttachment(character);
 
-			// Restore normal attack
+			// Restore normal attack and reset state
 			Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.None);
+			Send.ZC_NORMAL.Unknown_1A9(character);
 		}
 
 		/// <summary>
@@ -66,8 +67,9 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 			{
 				var hawk = attachment.AttachedTo as Companion;
 
-				// Detach server-side
-				attachment.Detach();
+				// Detach server-side without sending packets, we send
+				// them manually below with the correct parameters
+				attachment.Detach(sendPackets: false);
 
 				// Reset movement mode
 				if (character.Components.TryGet<MovementComponent>(out var movement))
@@ -88,8 +90,6 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 				}
 			}
 
-			// Re-enable control just in case it was still locked
-			character.ToggleControl("None", true);
 		}
 	}
 }
