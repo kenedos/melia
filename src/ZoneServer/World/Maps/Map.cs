@@ -36,6 +36,15 @@ namespace Melia.Zone.World.Maps
 		private static int _dormancyBatchMobs;
 		private static readonly object _dormancyLogLock = new();
 
+		// Global throttle to prevent all maps from entering dormancy on the
+		// same tick after the startup grace period elapses. Without this,
+		// 400+ maps would unload simultaneously and stall the server.
+		private const int DormancyMaxPerWindow = 20;
+		private static readonly TimeSpan DormancyWindow = TimeSpan.FromSeconds(10);
+		private static readonly object _dormancyThrottleLock = new();
+		private static DateTime _dormancyWindowStart = DateTime.MinValue;
+		private static int _dormancyWindowCount;
+
 		#region Constants
 		public const int DefaultLayer = 0;
 		public const int VisibleRange = 500;
@@ -128,6 +137,12 @@ namespace Melia.Zone.World.Maps
 			this.WorldId = id;
 			this.ClassName = name;
 			this.Load();
+
+			// Maps start dormant so spawners don't populate them until a
+			// player actually enters. Cities and instances are excluded,
+			// matching the same rules used by the runtime dormancy check.
+			if (!this.IsCity && !this.IsInstance)
+				this.IsDormant = true;
 		}
 
 		private void Load()
@@ -174,15 +189,18 @@ namespace Melia.Zone.World.Maps
 
 			if (!this.HasCharacters && !this.IsCity && !this.IsInstance)
 			{
+				var eligible = false;
+
 				// Player left recently — enter dormancy after grace period
 				if (_lastPlayerLeftTime != DateTime.MinValue && (DateTime.Now - _lastPlayerLeftTime) >= EntityUpdateGracePeriod)
-				{
-					this.EnterDormancy();
-					return;
-				}
+					eligible = true;
 
-				// Map never had a player — enter dormancy after startup grace period
-				if (_lastPlayerLeftTime == DateTime.MinValue && (DateTime.Now - _createdTime) >= EntityUpdateGracePeriod)
+				// Map never had a player — eligible immediately on startup
+				// (throttle still spreads the actual unload work over time)
+				else if (_lastPlayerLeftTime == DateTime.MinValue)
+					eligible = true;
+
+				if (eligible && TryAcquireDormancySlot())
 				{
 					this.EnterDormancy();
 					return;
@@ -424,6 +442,31 @@ namespace Melia.Zone.World.Maps
 			_createdTime = DateTime.Now;
 
 			Log.Info("Map '{0}' waking up.", this.ClassName);
+		}
+
+		/// <summary>
+		/// Attempts to reserve a slot in the current dormancy throttle
+		/// window. Returns false if the per-window cap has been hit,
+		/// deferring the dormancy transition to a later tick so the
+		/// server isn't stalled unloading hundreds of maps at once.
+		/// </summary>
+		private static bool TryAcquireDormancySlot()
+		{
+			lock (_dormancyThrottleLock)
+			{
+				var now = DateTime.Now;
+				if (now - _dormancyWindowStart >= DormancyWindow)
+				{
+					_dormancyWindowStart = now;
+					_dormancyWindowCount = 0;
+				}
+
+				if (_dormancyWindowCount >= DormancyMaxPerWindow)
+					return false;
+
+				_dormancyWindowCount++;
+				return true;
+			}
 		}
 
 		/// <summary>

@@ -38,6 +38,12 @@ namespace Melia.Zone.Pads.HandlersOverride.Wizards.Psychokino
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
+			foreach (var actor in pad.Trigger.GetActors())
+			{
+				if (actor is ICombatEntity target && creator is ICombatEntity casterEntity && casterEntity.IsEnemy(target))
+					target.RemoveBuff(BuffId.HeavyGravity_Debuff);
+			}
+
 			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
