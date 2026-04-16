@@ -264,10 +264,10 @@ namespace Melia.Zone.World.Actors.Monsters
 			var level = this.Level;
 			var levelUps = 0;
 			var maxExp = this.MaxExp;
-			var maxLevel = ZoneServer.Instance.Data.ExpDb.GetMaxLevel();
+			var maxLevel = ZoneServer.Instance.Conf.World.MaxCompanionLevel;
 
 			// Consume EXP as many times as possible to reach new levels
-			while (this.Exp >= maxExp && level < maxLevel)
+			while (maxExp > 0 && this.Exp >= maxExp && level < maxLevel)
 			{
 				this.Exp -= maxExp;
 
@@ -292,10 +292,18 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (amount < 1)
 				throw new ArgumentException("Amount can't be lower than 1.");
 
-			var newLevel = this.Properties.Modify(PropertyName.Lv, amount);
+			// Use the Level setter so both PropertyName.Lv and the Mob's
+			// cached level field stay in sync. Calling Properties.Modify
+			// directly bypasses the setter and leaves _cachedLevel stale,
+			// which corrupts subsequent GiveExp calls and DB saves.
+			var newLevel = this.Level + amount;
+			this.Level = newLevel;
 
-			this.MaxExp = ZoneServer.Instance.Data.ExpDb.GetNextExp(ExpType.Pet, (int)newLevel);
+			this.MaxExp = ZoneServer.Instance.Data.ExpDb.GetNextExp(ExpType.Pet, newLevel);
 			this.Heal(this.MaxHp, 0);
+
+			Send.ZC_OBJECT_PROPERTY(this.Owner.Connection, this);
+			Send.ZC_NORMAL.PetInfo(this.Owner);
 
 			this.PlayEffect("F_companion_level_up", 3);
 		}

@@ -253,7 +253,7 @@ namespace Melia.Zone.World.Actors.Characters
 			//var maxLevel = ZoneServer.Instance.Data.ExpDb.GetMaxLevel();
 
 			// Consume EXP as many times as possible to reach new levels
-			while (this.Exp >= maxExp && level < maxLevel)
+			while (maxExp > 0 && this.Exp >= maxExp && level < maxLevel)
 			{
 				this.Exp -= maxExp;
 
@@ -293,9 +293,10 @@ namespace Melia.Zone.World.Actors.Characters
 			if (this.HasCompanions)
 			{
 				// Pretty sure companions get reduced exp, but don't remember the exact value.
-				exp = (long)(exp * .25f);
-				foreach (var companion in this.Companions.GetList())
-					companion.GiveExp(exp, monster);
+				var companionExp = (long)(exp * .25f);
+				var activeCompanion = this.Companions.ActiveCompanion;
+				if (activeCompanion != null)
+					activeCompanion.GiveExp(companionExp, monster);
 			}
 		}
 

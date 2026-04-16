@@ -77,6 +77,12 @@ namespace Melia.Zone.Database
 			character.Properties.Stamina = (int)character.Properties.GetFloat(PropertyName.MaxSta);
 			character.UpdateStance();
 
+			// Recalculate companion properties now that the owner's
+			// properties are fully initialized, since companion stats
+			// depend on owner stats via PET_STAT_BY_OWNER.
+			foreach (var companion in character.Companions.GetList())
+				companion.Properties.InvalidateAll();
+
 			// Initialize visibility PCEtc properties based on VisibleEquip bitmask
 			// These properties control the client UI checkbox state (1 = visible, 0 = hidden)
 			character.Etc.Properties.SetFloat(PropertyName.HAT_Visible, (character.VisibleEquip & VisibleEquip.Headgear1) != 0 ? 1 : 0);

@@ -645,7 +645,11 @@ namespace Melia.Barracks.Database
 							companion.Name = reader.GetStringSafe("name");
 							companion.Index = (byte)reader.GetInt32("slot");
 							companion.BarracksLayer = reader.GetInt32("barrackLayer");
-							companion.Exp = reader.GetInt64("exp");
+							// Use cumulative totalExp so the barracks client derives
+							// the companion's level correctly. The `exp` column only
+							// stores partial progress toward the next level and is
+							// reset on each level up in the zone server.
+							companion.Exp = reader.GetInt64("totalExp");
 
 							var bx = reader.GetFloat("bx");
 							var by = reader.GetFloat("by");
