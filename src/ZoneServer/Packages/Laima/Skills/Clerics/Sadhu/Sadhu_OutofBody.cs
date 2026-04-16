@@ -54,6 +54,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 
 			farPos = casterCharacter.Position.GetRelative(casterCharacter.Direction, 30);
 
+			if (!casterCharacter.Map.Ground.IsValidPosition(farPos))
+				farPos = casterCharacter.Position;
+
 			Send.ZC_SKILL_READY(casterCharacter, skill, casterCharacter.Position, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(casterCharacter, casterCharacter.Handle, casterCharacter.Position, casterCharacter.Direction, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(casterCharacter, skill, casterCharacter.Position, ForceId.GetNew(), null);
