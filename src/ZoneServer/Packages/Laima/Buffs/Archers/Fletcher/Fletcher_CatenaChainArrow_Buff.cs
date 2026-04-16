@@ -55,7 +55,7 @@ namespace Melia.Zone.Buffs.HandlersOverrides.Archers.Fletcher
 				return;
 
 			var skillLevel = buff.NumArg1;
-			var catenaReduction = 0.40f + 0.04f * skillLevel;
+			var catenaReduction = 0.30f + 0.03f * skillLevel;
 
 			if (character.TryGetActiveAbilityLevel(AbilityId.Fletcher37, out var fletcher37Level))
 				catenaReduction *= 1f + 0.005f * fletcher37Level;
