@@ -36,7 +36,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				if (canMove)
 					this.Components.Add(new MovementComponent(this));
 				if (hasAi)
-					this.Components.Add(new AiComponent(this, "BasicMonster", this.Owner));
+					this.Components.Add(new AiComponent(this, "PC_Summon", this.Owner));
 				Send.ZC_SET_POS(this);
 				this.Map.AddMonster(this);
 				Send.ZC_HARDCODED_SKILL(this, 1);

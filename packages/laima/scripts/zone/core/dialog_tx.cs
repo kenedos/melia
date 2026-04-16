@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Properties;
 using Melia.Zone;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
@@ -928,6 +929,68 @@ public class DialogTxFunctionsScript : GeneralScript
 
 		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
 		character.AddonMessage(AddonMessage.MSG_UPDATE_POISONPOT_UI);
+
+		return DialogTxResult.Okay;
+	}
+
+	[ScriptableFunction]
+	public DialogTxResult SCR_SORCERER_SET_CARD(Character character, DialogTxArgs args)
+	{
+		if (!character.Jobs.Has(JobId.Sorcerer))
+			return DialogTxResult.Fail;
+
+		int slot, action;
+
+		if (args.NumArgs.Length >= 2)
+		{
+			slot = args.NumArgs[0];
+			action = args.NumArgs[1];
+		}
+		else if (args.StrArgs.Length >= 1)
+		{
+			var parts = args.StrArgs[0].Split(' ');
+			if (parts.Length < 2 || !int.TryParse(parts[0], out slot) || !int.TryParse(parts[1], out action))
+				return DialogTxResult.Fail;
+		}
+		else
+		{
+			return DialogTxResult.Fail;
+		}
+
+		if (slot < 1 || slot > 2)
+			return DialogTxResult.Fail;
+
+		var nameProperty = slot == 1 ? PropertyName.Sorcerer_bosscardName1 : PropertyName.Sorcerer_bosscardName2;
+		var guidProperty = slot == 1 ? PropertyName.Sorcerer_bosscardGUID1 : PropertyName.Sorcerer_bosscardGUID2;
+		var cardProperty = slot == 1 ? PropertyName.Sorcerer_bosscard1 : PropertyName.Sorcerer_bosscard2;
+
+		if (action == 1)
+		{
+			if (args.TxItems.Length < 1)
+				return DialogTxResult.Fail;
+
+			var cardItem = args.TxItems[0].Item;
+
+			if (cardItem == null || cardItem.Data.Group != ItemGroup.Card)
+				return DialogTxResult.Fail;
+
+			var monsterId = (int)cardItem.Data.Script.NumArg1;
+			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterId, out var monsterData))
+				return DialogTxResult.Fail;
+
+			character.SetEtcProperty(nameProperty, monsterData.ClassName);
+			character.SetEtcProperty(guidProperty, cardItem.ObjectId.ToString());
+			character.SetEtcProperty(cardProperty, cardItem.Id);
+		}
+		else
+		{
+			character.SetEtcProperty(nameProperty, "None");
+			character.SetEtcProperty(guidProperty, "None");
+			character.SetEtcProperty(cardProperty, 0);
+		}
+
+		Send.ZC_PC_PROP_UPDATE(character, PropertyTable.GetId("PCEtc", cardProperty), 1);
+		character.AddonMessage(AddonMessage.UPDATE_GRIMOIRE_UI);
 
 		return DialogTxResult.Okay;
 	}

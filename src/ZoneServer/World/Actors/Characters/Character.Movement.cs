@@ -644,7 +644,19 @@ namespace Melia.Zone.World.Actors.Characters
 				Send.ZC_OWNER(this, monster);
 
 			if (monster is Summon summon)
+			{
 				Send.ZC_IS_SUMMON_SORCERER_MONSTER(this, summon);
+
+				if (summon.Vars.TryGetInt("SORCERER_MON", out var isSorcMon) && isSorcMon == 1)
+				{
+					Send.ZC_NORMAL.SetScale(summon, 176, 0.7f, 0, 0, 1, 0);
+					Send.ZC_NORMAL.DelayEnterWorld(this, summon);
+					Send.ZC_NORMAL.EnterDelayedActor(summon);
+					Send.ZC_NORMAL.SummonPlayAnimation(summon, "SORCERER_SUMMONING", 1);
+					Send.ZC_NORMAL.SetActorColor(this.Connection, summon, 64, 32, 64, 250, 0, 0);
+					Send.ZC_IS_SUMMONING_MONSTER(this, summon);
+				}
+			}
 
 			if (monster is Companion companion)
 			{

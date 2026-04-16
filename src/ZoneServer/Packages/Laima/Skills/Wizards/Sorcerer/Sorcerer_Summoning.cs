@@ -136,11 +136,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			if (isLegendCard)
 				summon.Vars.SetInt("LEGEND_CARD", 1);
 
-			// Calculate scale based on skill level
-			var scale = 0.7f + (skill.Level / 15f) * 0.3f;
-			if (isLegendCard)
-				scale *= 1.15f;
-			summon.Properties.SetFloat(PropertyName.Scale, scale);
 
 			// Set level to caster's level
 			summon.Level = character.Level;
@@ -172,15 +167,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			// Apply PC_Summon buff
 			summon.StartBuff(BuffId.Ability_buff_PC_Summon, TimeSpan.Zero, summon);
 
-			// Send property updates
-			//Send.ZC_OBJECT_PROPERTY(summon, PropertyName.Scale);
-
-			// Play summon animation
-			Send.ZC_NORMAL.SummonPlayAnimation(character, "SORCERER_SUMMONING", 1);
-
-			// Attach appropriate effects based on card type
-			AttachSummonEffects(summon, isLegendCard);
-
 			// Reset quickslot cooldown for this monster
 			Send.ZC_ADDON_MSG(character, "QUICKSLOT_MONSTER_RESET_COOLDOWN", argStr: monsterClassName);
 		}
@@ -209,23 +195,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			// Set movement speed
 			summon.Properties.SetFloat(PropertyName.WlkMSPD, 160f);
 			summon.Properties.SetFloat(PropertyName.RunMSPD, 160f);
-		}
-
-		/// <summary>
-		/// Attaches visual effects to the summon based on card type.
-		/// </summary>
-		private void AttachSummonEffects(Summon summon, bool isLegendCard)
-		{
-			if (isLegendCard)
-			{
-				// Legend card summons get special effects
-				Send.ZC_NORMAL.AttachEffect(summon, "F_pc_summon_legend", 1f);
-			}
-			else
-			{
-				// Normal summons
-				Send.ZC_NORMAL.AttachEffect(summon, "F_pc_summon_normal", 1f);
-			}
 		}
 
 		/// <summary>
