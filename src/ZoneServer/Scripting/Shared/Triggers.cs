@@ -9297,7 +9297,7 @@ namespace Melia.Zone.Scripting.Shared
 			//if (!ZoneServer.Instance.Conf.World.FastTravelEnabled) return;
 
 			var npc = args.Npc;
-			if (args.Initiator is not Character character)
+			if (args.Initiator is not Character character || args.Initiator is DummyCharacter)
 				return;
 			var propertyName = npc.DialogName;
 

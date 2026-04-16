@@ -310,7 +310,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					for (var i = 0; i < category.Value.Count; ++i)
 					{
 						var index = category.Value[i].GetInventoryIndex(i);
-						var itemObjectId = category.Value[i].Id;
+						var itemObjectId = category.Value[i].ObjectId;
 
 						result.Add(index, itemObjectId);
 					}
@@ -337,7 +337,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				for (var i = 0; i < items.Count; ++i)
 				{
 					var index = items[i].GetInventoryIndex(i);
-					var itemObjectId = items[i].Id;
+					var itemObjectId = items[i].ObjectId;
 
 					result.Add(index, itemObjectId);
 				}
@@ -556,15 +556,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (inventoryType == InventoryType.Inventory)
 				this.UpdateWeight();
 
-			// Temp fix. The amounts on item stacks that items were added
-			// to are sometimes wrong, a full updates fixes that. Maybe
-			// ZC_ITEM_ADD needs an update.
+			// The server's item list uses position-based indices that shift
+			// when items are removed. The client doesn't re-index on its
+			// own after ZC_ITEM_REMOVE, so we send a lightweight index
+			// list for the affected category to keep client indices in
+			// sync. This replaces a previous workaround that re-sent the
+			// entire inventory (ZC_ITEM_INVENTORY_DIVISION_LIST) which
+			// caused massive client lag with large inventories.
 			if (Versions.Client > KnownVersions.ClosedBeta1)
 			{
-				// Note: Not sending ZC_ITEM_INVENTORY_DIVISION_LIST is causing
-				// client to mix up the boss cards when unequipping them.
-				// There's some kind of caching going on for these items.
-				Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
+				Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
 				Send.ZC_EQUIP_GEM_INFO(this.Character);
 			}
 
@@ -844,7 +845,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Update client (consistent with regular equipment)
 			Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, 1, InventoryItemRemoveMsg.Equipped, InventoryType.Inventory);
+			Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
 			Send.ZC_EQUIP_CARD_INFO(this.Character);
+			Send.ZC_UPDATED_PCAPPEARANCE(this.Character);
 
 			this.ProcessCardScript(item);
 
@@ -880,6 +883,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Zone.Items.Effects.CardMetadataRegistry.Instance.Remove(item.ObjectId);
 
 			Send.ZC_EQUIP_CARD_INFO(this.Character);
+			Send.ZC_UPDATED_PCAPPEARANCE(this.Character);
 
 			this.Add(item, InventoryAddType.NotNew);
 
@@ -1089,9 +1093,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Update client
 			Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, 1, InventoryItemRemoveMsg.Equipped, InventoryType.Inventory);
+			Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
 			Send.ZC_ITEM_EQUIP_LIST(this.Character);
 			Send.ZC_UPDATED_PCAPPEARANCE(this.Character);
-			//Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
 			Send.ZC_EQUIP_GEM_INFO(this.Character);
 
 			if (this.Character.IsOutOfBody())
@@ -1313,12 +1317,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// We need to update the indices after removing an item,
 			// because we'll run into issues with the client potentially
 			// misidentifying items otherwise, caused by duplicate indices.
-			// Alternatively, we could revamp our index handling, so there's
-			// no more risk for duplicates.
-			//Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
 			if (!silently)
 			{
-				//Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
+				Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
 				Send.ZC_EQUIP_GEM_INFO(this.Character);
 
 				this.UpdateWeight();
@@ -1420,8 +1421,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				}
 
 				Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, reduce, msg, InventoryType.Inventory);
-				//Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
-				//Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
+				if (reduce == itemAmount)
+					Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
 				Send.ZC_EQUIP_GEM_INFO(this.Character);
 			}
 
