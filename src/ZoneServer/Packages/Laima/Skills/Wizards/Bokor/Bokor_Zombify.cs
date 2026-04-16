@@ -242,7 +242,6 @@ namespace Melia.Zone.Skills.Handlers.Bokor
 			propertyOverrides.Add(PropertyName.MDEF, zombieDEF);
 			propertyOverrides.Add(PropertyName.BLK_BREAK, zombieBLK_BREAK);
 			propertyOverrides.Add(PropertyName.HR, zombieHR);
-			propertyOverrides.Add(PropertyName.SDR, 1);
 			if (zombieBlockable != 0)
 			{
 				propertyOverrides.Add(PropertyName.Blockable, zombieBlockable);

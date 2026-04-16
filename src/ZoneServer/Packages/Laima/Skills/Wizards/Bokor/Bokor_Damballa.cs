@@ -71,6 +71,12 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 
 			var summons = character.Summons.GetSummons();
 			var zombiesKilled = summons.Count;
+
+			// Cap respawn count by the CURRENT zombie type's max count so that
+			// switching abilities (e.g., kill 6 default zombies then respawn as
+			// giants which cap at 2) can never exceed the active cap.
+			var zombieInfo = ZombifyHelper.GetZombieInfo(caster);
+			var respawnCap = Math.Min(zombiesKilled, zombieInfo.MaxCount);
 			var killedEnemyPositions = new List<Position>();
 
 			foreach (var summon in summons)
@@ -91,18 +97,27 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 
 					Send.ZC_HIT_INFO(caster, t, hitInfo);
 
-					if (t.IsDead && killedEnemyPositions.Count < zombiesKilled)
+					if (t.IsDead && killedEnemyPositions.Count < respawnCap)
 						killedEnemyPositions.Add(t.Position);
 				}
 			}
 
-			// Respawn zombies on killed enemy corpses (1 per kill, up to original count)
+			// Respawn zombies on killed enemy corpses. Re-check the live summon
+			// count after the kills above (all bokor summons are now dead, but
+			// mixed-type remnants may still exist if the player recently switched
+			// abilities) and only fill up to the current zombie type's cap.
 			if (killedEnemyPositions.Count > 0 && caster.TryGetSkill(SkillId.Bokor_Zombify, out var zombifySkill))
 			{
-				var zombieInfo = ZombifyHelper.GetZombieInfo(caster);
-				foreach (var pos in killedEnemyPositions)
+				if (ZoneServer.Instance.Data.MonsterDb.TryFind(zombieInfo.ClassName, out var monsterData))
 				{
-					ZombifyHelper.SummonZombieAt(zombifySkill, caster, zombieInfo, pos);
+					var existingOfType = character.Summons.GetSummons(monsterData.Id).Count;
+					var remaining = zombieInfo.MaxCount - existingOfType;
+					var toSpawn = Math.Min(killedEnemyPositions.Count, remaining);
+
+					for (var i = 0; i < toSpawn; i++)
+					{
+						ZombifyHelper.SummonZombieAt(zombifySkill, caster, zombieInfo, killedEnemyPositions[i]);
+					}
 				}
 			}
 		}

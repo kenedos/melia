@@ -28,9 +28,19 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 	public class Bokor_BwaKayimanOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int PadRadius = 30;
-		private const float FollowSpacing = 40f;
-		private const int UpdateIntervalMs = 200;
-		private const int MaxPositionHistory = 50;
+		private const float FollowSpacing = 30f;
+		private const int UpdateIntervalMs = 150;
+		private const int MaxPositionHistory = 64;
+		// How far the caster must move before a new trail point is recorded.
+		// Smaller values make the trail follow curves more tightly but also
+		// cause more frequent MoveTo reissues; this value is tuned to feel
+		// smooth while still tracing the caster's path.
+		private const float TrailPointSpacing = 5f;
+		// How far the newly-computed target for a summon must be from the
+		// destination previously commanded to it before we reissue a MoveTo.
+		// Without this gate, every tick would cancel the ongoing movement
+		// and restart it, which manifests as constant wiggling.
+		private const float RetargetThreshold = 20f;
 
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -78,12 +88,16 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 				summonHandles.Add(summons[i].Handle);
 			skill.Vars.Set("Melia.Skills.BwaKayiman.SummonOrder", summonHandles);
 
-			// Place each summon at its initial line position
+			// Place each summon at its initial line position and suspend
+			// their AI so it doesn't fight our MoveTo commands.
 			for (var i = 0; i < summons.Count; i++)
 			{
 				var summon = summons[i];
 
 				summon.StartBuff(BuffId.BwaKayiman_Fluting, TimeSpan.FromSeconds(10));
+
+				if (summon.Components.TryGet<AiComponent>(out var ai))
+					ai.Script.Suspended = true;
 
 				summon.Components.Get<MovementComponent>()?.MoveTo(positionHistory[i]);
 
@@ -114,6 +128,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 					continue;
 
 				summon.StopBuff(BuffId.BwaKayiman_Fluting);
+
+				// Re-enable the summon's AI now that the conga line is over.
+				if (summon.Components.TryGet<AiComponent>(out var ai))
+					ai.Script.Suspended = false;
 			}
 
 			skill.Vars.Remove("Melia.Skills.BwaKayiman.PositionHistory");
@@ -137,19 +155,42 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 				if (!skill.Vars.TryGet("Melia.Skills.BwaKayiman.SummonOrder", out List<int> summonHandles))
 					break;
 
-				positionHistory.Insert(0, caster.Position);
-				if (positionHistory.Count > MaxPositionHistory)
-					positionHistory.RemoveAt(positionHistory.Count - 1);
+				// Extend the trail only when the caster has moved enough to
+				// justify a new waypoint. This keeps the trail a faithful
+				// representation of the caster's path without flooding it
+				// with near-duplicate points every tick.
+				var lastFront = positionHistory.Count > 0 ? positionHistory[0] : caster.Position;
+				if (caster.Position.Get2DDistance(lastFront) >= TrailPointSpacing)
+				{
+					positionHistory.Insert(0, caster.Position);
+					if (positionHistory.Count > MaxPositionHistory)
+						positionHistory.RemoveAt(positionHistory.Count - 1);
+				}
 
-				// Move each summon using the fixed order assigned at start
+				// Always evaluate the summons' desired positions each tick, but
+				// only reissue a MoveTo when the new target is meaningfully
+				// different from what the summon is currently walking toward.
+				// Comparing against the summon's commanded FinalDestination
+				// (rather than its live Position) prevents us from cancelling
+				// and restarting in-progress movement every tick — that cycle
+				// was what caused the visible wiggle.
 				for (var i = 0; i < summonHandles.Count; i++)
 				{
 					var monster = character.Map.GetMonster(summonHandles[i]);
 					if (monster is not ICombatEntity summon || summon.IsDead)
 						continue;
 
+					var movement = summon.Components.Get<MovementComponent>();
+					if (movement == null)
+						continue;
+
 					var targetPos = this.GetTrailPosition(positionHistory, (i + 1) * FollowSpacing);
-					summon.Components.Get<MovementComponent>()?.MoveTo(targetPos);
+
+					var lastCommanded = movement.IsMoving ? movement.FinalDestination : summon.Position;
+					if (lastCommanded.Get2DDistance(targetPos) < RetargetThreshold)
+						continue;
+
+					movement.MoveTo(targetPos);
 				}
 
 				await skill.Wait(TimeSpan.FromMilliseconds(UpdateIntervalMs));
