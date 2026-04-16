@@ -177,8 +177,9 @@ namespace Melia.Shared.Data.Database
 		public int MaterialPrice { get; set; }
 		public CardGroup CardGroup { get; set; }
 		public string EquipSlot { get; set; }
+		public string EquipGroup { get; set; }
 		public bool IsOneHanded => OneHandedWeapons.Contains(this.EquipType1);
-		public bool IsTwoHanded => TwoHandedWeapons.Contains(this.EquipType1);
+		public bool IsTwoHanded => this.EquipGroup == "THWeapon" || TwoHandedWeapons.Contains(this.EquipType1);
 
 		public string MainProperties { get; internal set; }
 
@@ -188,7 +189,8 @@ namespace Melia.Shared.Data.Database
 			EquipType.Staff,
 			EquipType.Bow,
 			EquipType.Mace,
-			EquipType.Spear
+			EquipType.Spear,
+			EquipType.Rapier,
 		};
 
 		private static readonly EquipType[] TwoHandedWeapons =
@@ -197,7 +199,9 @@ namespace Melia.Shared.Data.Database
 			EquipType.THStaff,
 			EquipType.THBow,
 			EquipType.THMace,
-			EquipType.THSpear
+			EquipType.THSpear,
+			EquipType.Musket,
+			EquipType.Cannon,
 		};
 
 
@@ -245,10 +249,62 @@ namespace Melia.Shared.Data.Database
 			return this.EquipType1 != EquipType.None;
 		}
 
+		/// <summary>
+		/// Returns true if the given job class can equip this item
+		/// based on weapon type restrictions.
+		/// </summary>
 		public bool CanJobEquip(JobClass job)
 		{
-			return true;
+			if (!this.IsWeapon() && this.EquipType1 != EquipType.Shield && this.EquipType1 != EquipType.Dagger && this.EquipType1 != EquipType.Trinket)
+				return true;
+
+			if (job == JobClass.GM)
+				return true;
+
+			if (!JobWeaponRestrictions.TryGetValue(job, out var allowedTypes))
+				return true;
+
+			return allowedTypes.Contains(this.EquipType1);
 		}
+
+		private static readonly Dictionary<JobClass, HashSet<EquipType>> JobWeaponRestrictions = new()
+		{
+			[JobClass.Swordsman] = new HashSet<EquipType>
+			{
+				EquipType.Sword, EquipType.THSword,
+				EquipType.Spear, EquipType.THSpear,
+				EquipType.Mace, EquipType.THMace,
+				EquipType.Rapier,
+				EquipType.Shield, EquipType.Dagger, EquipType.Trinket,
+			},
+			[JobClass.Wizard] = new HashSet<EquipType>
+			{
+				EquipType.Sword,
+				EquipType.Staff, EquipType.THStaff,
+				EquipType.Mace,
+				EquipType.Shield, EquipType.Dagger, EquipType.Trinket,
+			},
+			[JobClass.Archer] = new HashSet<EquipType>
+			{
+				EquipType.Bow, EquipType.THBow,
+				EquipType.Musket, EquipType.Cannon,
+				EquipType.Shield, EquipType.Dagger, EquipType.Trinket,
+			},
+			[JobClass.Cleric] = new HashSet<EquipType>
+			{
+				EquipType.Sword,
+				EquipType.Mace, EquipType.THMace,
+				EquipType.Staff,
+				EquipType.Shield, EquipType.Dagger, EquipType.Trinket,
+			},
+			[JobClass.Scout] = new HashSet<EquipType>
+			{
+				EquipType.Sword,
+				EquipType.Rapier,
+				EquipType.Pistol,
+				EquipType.Shield, EquipType.Dagger,
+			},
+		};
 	}
 
 	[Serializable]
@@ -362,6 +418,7 @@ namespace Melia.Shared.Data.Database
 				data.SellPrice = data.Price / 2;
 			}
 			data.EquipSlot = entry.ReadString("equipSlot");
+			data.EquipGroup = entry.ReadString("equipGroup", "");
 			data.EquipType1 = entry.ReadEnum("equipType1", EquipType.None);
 			data.EquipType2 = entry.ReadEnum("equipType2", EquipType.None);
 			data.Category = GetCategory(data);

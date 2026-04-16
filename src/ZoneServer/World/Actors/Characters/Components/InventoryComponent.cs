@@ -1009,43 +1009,72 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (item == null)
 				return InventoryResult.ItemNotFound;
 
-			// Unequip existing item first.
-			var collision = false;
-			var secondCollision = false;
-			var thirdCollision = false;
+			// Check job-based weapon restrictions
+			if (!item.Data.CanJobEquip(this.Character.JobClass))
+				return InventoryResult.InvalidSlot;
+
+			// Handle weapon slot conflicts between RH and LH.
+			// Read current equip state under lock, then unequip outside it
+			// since Unequip also acquires the lock.
+			var unequipLH = false;
+			var unequipRH = false;
+			var redirectToRH = false;
+
 			lock (_syncLock)
 			{
-				collision = _equip[slot] is not DummyEquipItem;
+				var rhItem = _equip[EquipSlot.RightHand];
+				var lhItem = _equip[EquipSlot.LeftHand];
+				var rhOccupied = rhItem is not DummyEquipItem;
+				var lhOccupied = lhItem is not DummyEquipItem;
+
 				if (slot == EquipSlot.RightHand)
-					secondCollision = _equip[EquipSlot.LeftHand] is not DummyEquipItem;
-				if (slot == EquipSlot.LeftHand)
-					thirdCollision = _equip[EquipSlot.RightHand] is not DummyEquipItem;
-			}
-
-			if (secondCollision)
-			{
-				var newItemOneHanded = item.Data.IsOneHanded;
-				var equippedItemTwoHanded = _equip[slot].Data.IsTwoHanded;
-				if ((newItemOneHanded && equippedItemTwoHanded)
-					|| (!newItemOneHanded && !equippedItemTwoHanded))
-					this.Unequip(EquipSlot.LeftHand);
-			}
-
-			if (thirdCollision)
-			{
-				var itemIsWeapon = item.Data.Group == ItemGroup.Weapon;
-				var equippedItemOneHanded = _equip[EquipSlot.RightHand].Data.Group == ItemGroup.Weapon;
-				if (itemIsWeapon && equippedItemOneHanded)
 				{
-					this.Unequip(EquipSlot.RightHand);
-					slot = EquipSlot.RightHand;
+					if (lhOccupied)
+					{
+						var newIsTwoHanded = item.Data.IsTwoHanded;
+						var lhIsTrinket = lhItem.Data.EquipType1 == EquipType.Trinket;
+
+						// Equipping a 2H weapon: unequip LH if it's not a trinket
+						// Equipping a 1H weapon: unequip LH if it's a trinket (trinkets pair with 2H only)
+						if ((newIsTwoHanded && !lhIsTrinket) || (!newIsTwoHanded && lhIsTrinket))
+							unequipLH = true;
+					}
+				}
+				else if (slot == EquipSlot.LeftHand)
+				{
+					if (rhOccupied)
+					{
+						var rhIsTwoHanded = rhItem.Data.IsTwoHanded;
+						var newIsTrinket = item.Data.EquipType1 == EquipType.Trinket;
+
+						// Equipping a trinket to LH: unequip RH if it's a 1H weapon (trinkets pair with 2H only)
+						// Equipping a non-trinket to LH: unequip RH if it's a 2H weapon (daggers/shields pair with 1H only)
+						if ((newIsTrinket && !rhIsTwoHanded) || (!newIsTrinket && rhIsTwoHanded))
+							unequipRH = true;
+					}
+
+					// If equipping a main weapon (Weapon group) to LH and RH has a 1H weapon,
+					// move the new weapon to RH instead
+					if (rhOccupied && !unequipRH && item.Data.Group == ItemGroup.Weapon && rhItem.Data.Group == ItemGroup.Weapon)
+						redirectToRH = true;
 				}
 			}
 
-			if (collision)
+			if (unequipLH)
+				this.Unequip(EquipSlot.LeftHand);
+
+			if (unequipRH)
+				this.Unequip(EquipSlot.RightHand);
+
+			if (redirectToRH)
 			{
-				this.Unequip(slot);
+				this.Unequip(EquipSlot.RightHand);
+				slot = EquipSlot.RightHand;
 			}
+
+			// Unequip existing item in the target slot
+			if (this.GetItem(slot) is not DummyEquipItem)
+				this.Unequip(slot);
 
 			// Equip new item
 			lock (_syncLock)
