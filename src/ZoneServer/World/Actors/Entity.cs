@@ -152,7 +152,9 @@ namespace Melia.Zone.World.Actors
 		bool CanGuard();
 
 		/// <summary>
-		/// Returns true if the entity can be staggered.
+		/// Returns true if the entity can be staggered (brief motion
+		/// knockback + cast interrupt on heavy hits). Bosses and NPCs
+		/// always return false; players are not affected by this system.
 		/// </summary>
 		/// <returns></returns>
 		bool CanStagger();
@@ -1448,22 +1450,31 @@ namespace Melia.Zone.World.Actors
 		}
 
 		/// <summary>
-		/// Gets the entity's stagger state.
+		/// Staggers the target by applying a brief motion knockback away from
+		/// the attacker and interrupting any active skill cast. Intended as
+		/// a reactive interrupt when a mob takes a heavy hit. Returns true
+		/// if the stagger was applied.
 		/// </summary>
-		public static bool IsStaggered(this ICombatEntity entity)
-			=> entity.Components.Get<CombatComponent>()?.IsStaggered ?? false;
+		public static bool ApplyStagger(this ICombatEntity target, ICombatEntity attacker)
+		{
+			if (target is not Mob mob || attacker == null)
+				return false;
 
-		/// <summary>
-		/// Applies stagger to the entity.
-		/// </summary>
-		public static void ApplyStagger(this ICombatEntity entity)
-			=> entity.Components.Get<CombatComponent>()?.ApplyStagger();
+			if (!mob.CanStagger())
+				return false;
 
-		/// <summary>
-		/// Ends stagger on the entity.
-		/// </summary>
-		public static void EndStagger(this ICombatEntity entity)
-			=> entity.Components.Get<CombatComponent>()?.EndStagger();
+			if (!mob.IsKnockdownable())
+				return false;
+
+			mob.TryInterruptCasting();
+
+			// Apply the motion knockback directly but
+			// don't send it to client
+			var kb = new KnockBackInfo(attacker.Position, target, KnockBackType.Motion, 0, 10);
+			target.AddState(StateType.KnockedBack, kb.Time);
+
+			return true;
+		}
 
 		/// <summary>
 		/// Checks if an entity is a specific race type

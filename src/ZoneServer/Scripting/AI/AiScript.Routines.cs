@@ -217,6 +217,79 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
+		/// Commits a short pre-cast lunge toward the target's predicted
+		/// future position, so the attack lands where the target is moving
+		/// rather than where they currently stand. No-op when the AI is
+		/// ranged, the target is stationary, movement is locked, or the
+		/// skill has no meaningful wind-up.
+		/// </summary>
+		protected IEnumerable PreCastLunge(Skill skill, float attackRange)
+		{
+			if (_target == null || skill == null) yield break;
+			if (this.RangeType != AttackerRangeType.Melee) yield break;
+			if (!this.Entity.CanMove() || this.Entity.IsLocked(LockType.Movement)) yield break;
+
+			// Need a valid motion sample to tell real travel from jukes.
+			if (_targetMotionSampleTime == default) yield break;
+
+			var sampleAge = (float)(DateTime.UtcNow - _targetMotionSampleTime).TotalSeconds;
+			if (sampleAge < 0.15f) yield break;
+
+			// Observed motion over the sample window — this is what we
+			// lead against, NOT the target's instantaneous facing. A
+			// player jiggling left/right in place produces tiny net
+			// displacement, so the lunge correctly becomes a no-op.
+			var motionDist = (float)_target.Position.Get2DDistance(_targetMotionSamplePos);
+			var actualSpeed = motionDist / sampleAge;
+
+			var targetMaxSpeed = _target.Properties.GetFloat(PropertyName.MSPD);
+			if (targetMaxSpeed <= 0f) yield break;
+
+			// Coherence: fraction of max speed actually achieved. Low
+			// coherence = juking or stopping, don't commit to a lunge.
+			var coherence = actualSpeed / targetMaxSpeed;
+			if (coherence < 0.4f) yield break;
+
+			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+			if (mobSpeed <= 0f) yield break;
+
+			// Total time until attack lands: wind-up + approach travel.
+			var windupSec = (float)skill.Properties.ShootTime.TotalSeconds;
+			var distToTarget = (float)this.Entity.Position.Get2DDistance(_target.Position);
+			var approxLungeSec = distToTarget / mobSpeed;
+			var totalLeadSec = windupSec + approxLungeSec;
+
+			// Scale lead by the speed ratio. A mob significantly faster
+			// than its target doesn't need much lead — the player can't
+			// escape its range in the short windup anyway. Without this,
+			// fast mobs overshoot wildly on any direction change.
+			var speedRatio = Math.Min(actualSpeed / mobSpeed, 1f);
+
+			// Lead distance uses observed speed (so a barely-moving target
+			// is barely led) and the speed ratio (so fast mobs don't
+			// overcommit against slow targets).
+			var leadDist = Math.Min(actualSpeed * totalLeadSec * this.LeadFactor * speedRatio, this.MaxLungeDistance);
+			if (leadDist < 5f) yield break;
+
+			// Heading: the actual observed travel direction.
+			var motionVec = _target.Position - _targetMotionSamplePos;
+			var dirVector = motionVec.Normalize2D();
+			if (dirVector.X == 0 && dirVector.Z == 0) yield break;
+
+			var aimPos = _target.Position + dirVector * leadDist;
+			var distToAim = (float)this.Entity.Position.Get2DDistance(aimPos);
+			if (distToAim < 1f) yield break;
+
+			var approachDir = (aimPos - this.Entity.Position).Normalize2D();
+			var lungeDest = this.Entity.Position + approachDir * distToAim;
+
+			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(lungeDest, this.Entity.AgentRadius, out var validDest, 50f))
+				yield break;
+
+			yield return this.MoveTo(validDest, wait: true);
+		}
+
+		/// <summary>
 		/// Uses MoveToAttack while trying to keep further away range
 		/// </summary>
 		/// <param name="target"></param>

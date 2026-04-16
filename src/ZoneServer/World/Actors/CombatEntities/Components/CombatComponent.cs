@@ -20,7 +20,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 	public class CombatComponent : CombatEntityComponent, IUpdateable
 	{
 		private static readonly TimeSpan AttackStateDuration = TimeSpan.FromSeconds(10);
-		private static readonly TimeSpan StaggerCooldownDuration = TimeSpan.FromSeconds(30);
 
 		private readonly object _hitLock = new();
 		private readonly Dictionary<int, float> _damageTaken = new();
@@ -50,21 +49,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// Raised when combat state changes.
 		/// </summary>
 		public event Action<ICombatEntity, bool> CombatStateChanged;
-
-		/// <summary>
-		/// Is the entity currently staggered?
-		/// </summary>
-		public bool IsStaggered { get; private set; }
-
-		/// <summary>
-		/// Returns the last time the entity was staggered.
-		/// </summary>
-		public DateTime LastStaggerTime { get; private set; }
-
-		/// <summary>
-		/// Raised when the entity is staggered.
-		/// </summary>
-		public event Action<ICombatEntity> Staggered;
 
 		/// <summary>
 		/// Creates new component for entity.
@@ -98,7 +82,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		public void Update(TimeSpan elapsed)
 		{
 			this.UpdateAttackState();
-			this.UpdateStaggerState();
 		}
 
 		/// <summary>
@@ -397,76 +380,5 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			return null;
 		}
 
-		/// <summary>
-		/// Applies stagger to the entity.
-		/// </summary>
-		public void ApplyStagger()
-		{
-			if (!this.Entity.CanStagger() || this.IsStaggered)
-				return;
-			this.IsStaggered = true;
-			this.LastStaggerTime = DateTime.UtcNow;
-			this.Entity.StartBuff(BuffId.Stun, TimeSpan.FromSeconds(5));
-
-			this.InterruptCasting();
-
-			// Cancel any running skill for monsters/entities using BaseSkillComponent
-			this.Entity.Components.Get<BaseSkillComponent>()?.CancelCurrentSkill();
-
-			this.Staggered?.Invoke(this.Entity);
-			Task.Delay(TimeSpan.FromSeconds(5))
-				.ContinueWith(t =>
-				{
-					this.EndStagger();
-				});
-		}
-
-		/// <summary>
-		/// Ends stagger on the entity.
-		/// </summary>
-		public void EndStagger()
-		{
-			this.IsStaggered = false;
-			this.Entity.RemoveBuff(BuffId.Stun);
-		}
-
-		/// <summary>
-		/// Reset stagger to max amount and update the client.
-		/// </summary>
-		private void ResetStagger()
-		{
-			var maxStagger = (int)this.Entity.Properties.GetFloat(PropertyName.MShield);
-			this.Entity.Properties.Modify(PropertyName.Shield, maxStagger);
-			var stagger = (int)this.Entity.Properties.GetFloat(PropertyName.Shield);
-			Send.ZC_UPDATE_SHIELD(this.Entity, stagger, 1);
-
-			// Re-engage the early exit in UpdateStaggerState so we
-			// stop doing property lookups every tick until the next
-			// stagger event.
-			this.LastStaggerTime = default;
-		}
-
-		/// <summary>
-		/// Updates the entity's attack state.
-		/// </summary>
-		private void UpdateStaggerState()
-		{
-			if (!this.Entity.CanStagger())
-				return;
-
-			// Skip the property lookups if stagger was never triggered
-			// and the entity is not currently staggered.
-			if (!this.IsStaggered && this.LastStaggerTime == default)
-				return;
-
-			var maxStagger = (int)this.Entity.Properties.GetFloat(PropertyName.MShield);
-			var stagger = (int)this.Entity.Properties.GetFloat(PropertyName.Shield);
-			if (maxStagger <= 0 || stagger > 0)
-				return;
-
-			var timePassed = DateTime.UtcNow - this.LastStaggerTime;
-			if (timePassed > StaggerCooldownDuration)
-				this.ResetStagger();
-		}
 	}
 }

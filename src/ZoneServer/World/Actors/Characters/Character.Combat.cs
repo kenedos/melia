@@ -365,7 +365,8 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Returns if the character can be staggered.
+		/// Returns if the character can be staggered. Players are not
+		/// affected by the stagger system.
 		/// </summary>
 		public bool CanStagger() => false;
 

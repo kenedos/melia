@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 	/// </summary>
 	[SkillHandler(SkillId.Normal_Attack, SkillId.Normal_Attack_TH, SkillId.Hammer_Attack, SkillId.Hammer_Attack_TH, SkillId.Common_DaggerAries,
 		SkillId.Sword_Attack, SkillId.SpearMaster_Attack, SkillId.SpearMaster_Attack_TH)]
-	public class MeleeGroundSkillHandler : IGroundSkillHandler
+	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler
 	{
 		/// <summary>
 		/// Handles usage of the skill.
@@ -28,8 +28,8 @@ namespace Melia.Zone.Skills.Handlers.Common
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		/// <param name="targets"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, IList<ICombatEntity> targets)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -42,10 +42,10 @@ namespace Melia.Zone.Skills.Handlers.Common
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			if (caster is Character character && Feature.IsEnabled("BattleManager"))
-				ZoneServer.Instance.World.BattleManager.StartBattle(character, target);
+			if (caster is Character character && Feature.IsEnabled("BattleManager") && targets.Count > 0)
+				ZoneServer.Instance.World.BattleManager.StartBattle(character, targets[0]);
 
-			skill.Run(this.Attack(skill, caster, originPos, farPos, target));
+			skill.Run(this.Attack(skill, caster, originPos, farPos, targets));
 		}
 
 		/// <summary>
@@ -55,8 +55,8 @@ namespace Melia.Zone.Skills.Handlers.Common
 		/// <param name="caster"></param>
 		/// <param name="castPosition"></param>
 		/// <param name="targetPosition"></param>
-		/// <param name="target"></param>
-		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, ICombatEntity target)
+		/// <param name="targets"></param>
+		private async Task Attack(Skill skill, ICombatEntity caster, Position castPosition, Position targetPosition, IList<ICombatEntity> targets)
 		{
 			// Based on Normal_Attack posessing a hit delay of 100ms,
 			// and Common_DaggerAries one of 50ms, and these two values
@@ -79,10 +79,12 @@ namespace Melia.Zone.Skills.Handlers.Common
 			await skill.Wait(skillHitDelay);
 
 			var hits = new List<SkillHitInfo>();
+			var rnd = RandomProvider.Get();
 
-			if (target != null)
+			foreach (var target in targets)
 			{
-				var rnd = RandomProvider.Get();
+				if (target == null)
+					continue;
 
 				var modifier = SkillModifier.Default;
 
@@ -101,10 +103,11 @@ namespace Melia.Zone.Skills.Handlers.Common
 				// the official behavior is, because it kind of looks
 				// correct there for me, but that might very well be
 				// the lag at play...
+				var hitAniTime = aniTime;
 				if (skillHitResult.HitCount > 1)
-					aniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skillHitResult.HitCount);
+					hitAniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skillHitResult.HitCount);
 
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, hitAniTime, skillHitDelay);
 				hits.Add(skillHit);
 			}
 

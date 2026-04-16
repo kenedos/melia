@@ -59,7 +59,6 @@ namespace Melia.Zone.World.Actors.Components
 			this.RegisterState(new(StateType.KnockedBack, [LockType.Movement, LockType.Attack]));
 			this.RegisterState(new(StateType.KnockedDown, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
 			this.RegisterState(new(StateType.Silenced, [LockType.Attack]));
-			this.RegisterState(new(StateType.Staggered, [LockType.Movement, LockType.Attack]));
 			this.RegisterState(new(StateType.Stunned, [LockType.Movement, LockType.Attack]));
 			this.RegisterState(new(StateType.Sleep, [LockType.Movement, LockType.Attack]));
 			this.RegisterState(new(StateType.Petrified, [LockType.Movement, LockType.Attack, LockType.GetKnockedBack]));
@@ -468,7 +467,6 @@ namespace Melia.Zone.World.Actors.Components
 		public const string Petrified = nameof(Petrified);
 		public const string Raised = nameof(Raised);
 		public const string Silenced = nameof(Silenced);
-		public const string Staggered = nameof(Staggered);
 		public const string Stunned = nameof(Stunned);
 		public const string Sleep = nameof(Sleep);
 		public const string Captured = nameof(Captured);

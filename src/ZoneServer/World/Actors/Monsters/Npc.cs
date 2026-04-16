@@ -343,10 +343,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Returns true if this NPC can be staggered.
 		/// </summary>
 		/// <returns>Always returns false for NPCs.</returns>
-		public bool CanStagger()
-		{
-			return false;
-		}
+		public bool CanStagger() => false;
 
 		/// <summary>
 		/// Returns true if this NPC can be knocked down.

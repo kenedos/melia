@@ -1822,6 +1822,13 @@ namespace Melia.Zone.Network
 				{
 					case SkillUseType.MeleeGround:
 					{
+						if (ZoneServer.Instance.SkillHandlers.TryGetHandler<IMeleeGroundSkillHandler>(skillId, out var meleeHandler))
+						{
+							skill.PrepareCancellation();
+							meleeHandler.Handle(skill, character, originPos, farPos, targets);
+							break;
+						}
+
 						if (!ZoneServer.Instance.SkillHandlers.TryGetHandler<IGroundSkillHandler>(skillId, out var handler))
 						{
 							character.ServerMessage(Localization.Get("This skill has not been implemented yet."));

@@ -89,6 +89,13 @@ namespace Melia.Zone.Scripting.AI
 		protected ICombatEntity? _target;
 		private DateTime _targetAcquiredTime;
 
+		// Rolling snapshot of target position for motion-coherence checks.
+		// Used by the predictive lunge to tell real motion from jukes in
+		// place: if the target's net displacement over the sample window
+		// is much smaller than their MSPD would imply, we skip leading.
+		private Position _targetMotionSamplePos;
+		private DateTime _targetMotionSampleTime;
+
 		// State tracking for advanced conditions
 		private readonly Dictionary<string, object> _tempVars = new();
 		protected SkillId _lastUsedSkill = SkillId.None;
@@ -246,6 +253,7 @@ namespace Melia.Zone.Scripting.AI
 				this.UpdatePhase();
 				this.HandleEventAlerts();
 				this.ExecuteDuringActions();
+				this.UpdateTargetMotionSample();
 
 				this.Heartbeat();
 			}
@@ -256,6 +264,26 @@ namespace Melia.Zone.Scripting.AI
 				Console.WriteLine($"Exception during AiScript.Update for entity '{entityName}' (Handle: {entityHandle}): {ex}");
 			}
 		}
+		/// <summary>
+		/// Refreshes the rolling snapshot of the current target's position
+		/// so the lunge heuristic can tell real displacement apart from
+		/// jukes in place. Only rotates the snapshot on a fixed interval
+		/// to keep the window wide enough for a meaningful reading.
+		/// </summary>
+		private void UpdateTargetMotionSample()
+		{
+			if (_target == null)
+				return;
+
+			var now = DateTime.UtcNow;
+			var age = now - _targetMotionSampleTime;
+			if (age < TimeSpan.FromMilliseconds(350))
+				return;
+
+			_targetMotionSamplePos = _target.Position;
+			_targetMotionSampleTime = now;
+		}
+
 		protected virtual void CheckEnemies()
 		{
 			var mostHated = this.GetMostHated();
@@ -651,6 +679,17 @@ namespace Melia.Zone.Scripting.AI
 				// Attack if in range and able
 				if (this.InRangeOf(_target, attackRange) && this.CanUseSkill(skill, _target))
 				{
+					// Commit to the target's predicted future position so the
+					// attack lands where the player is going, not where they
+					// were at cast time. No-op for ranged, stationary targets,
+					// or skills without a meaningful wind-up.
+					yield return this.PreCastLunge(skill, attackRange);
+
+					// Re-verify skill is still usable after the lunge (may have
+					// been staggered, silenced, or target may have died).
+					if (!this.CanUseSkill(skill, _target))
+						continue;
+
 					yield return this.UseSkill(skill, _target);
 
 					// After skill completes, check if we're feared
@@ -1341,6 +1380,49 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
+		/// Fraction of MaxHp a single hit must deal to stagger the entity.
+		/// Scales with the mob's effective size so bigger targets resist
+		/// interruption more than small ones. Subclasses may override.
+		/// </summary>
+		protected virtual float StaggerThreshold
+		{
+			get
+			{
+				if (this.Entity is not Mob mob)
+					return 0.10f;
+
+				return mob.EffectiveSize switch
+				{
+					SizeType.L => 0.15f,
+					SizeType.XL or SizeType.XXL or SizeType.XXXL or SizeType.EX => 0.20f,
+					SizeType.M or SizeType.PC => 0.10f,
+					_ => 0.05f,
+				};
+			}
+		}
+
+		/// <summary>
+		/// How aggressively the AI leads its target when committing to a
+		/// pre-cast lunge. 0 disables prediction; 1 commits to the full
+		/// predicted position. Tune per AI rank.
+		/// </summary>
+		protected virtual float LeadFactor => 1.0f;
+
+		/// <summary>
+		/// Caps the distance of a single pre-cast lunge so fast-moving
+		/// targets can't yank the AI across the map.
+		/// </summary>
+		protected virtual float MaxLungeDistance => 150f;
+
+		/// <summary>
+		/// Minimum time between consecutive staggers, preventing chain-lock
+		/// from multi-hit AoE and DoT ticks.
+		/// </summary>
+		protected virtual TimeSpan StaggerCooldown => TimeSpan.FromMilliseconds(800);
+
+		private DateTime _lastStaggerTime = DateTime.MinValue;
+
+		/// <summary>
 		/// Called when the entity takes damage. Can be overridden for reactive behaviors.
 		/// Equivalent to a TakeDamage hook.
 		/// </summary>
@@ -1348,6 +1430,25 @@ namespace Melia.Zone.Scripting.AI
 		/// <param name="damage">The amount of damage taken.</param>
 		protected virtual void OnTakeDamage(ICombatEntity attacker, float damage)
 		{
+			// Stagger: a single hit above the damage-% threshold interrupts
+			// the current attack animation with a small motion knockback,
+			// giving burst/defensive play a counter to mob wind-ups.
+			if (damage <= 0 || attacker == null)
+				return;
+
+			var maxHp = this.Entity.MaxHp;
+			if (maxHp <= 0)
+				return;
+
+			if ((damage / maxHp) < this.StaggerThreshold)
+				return;
+
+			var now = DateTime.UtcNow;
+			if ((now - _lastStaggerTime) < this.StaggerCooldown)
+				return;
+
+			if (this.Entity.ApplyStagger(attacker))
+				_lastStaggerTime = now;
 		}
 
 		/// <summary>
