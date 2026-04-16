@@ -62,6 +62,7 @@ namespace Melia.Zone.World.Actors.Characters
 				this.FullHeal();
 
 			Send.ZC_OBJECT_PROPERTY(this);
+			Send.ZC_NORMAL.UpdateSkillUI(this);
 			this.AddonMessage("NOTICE_Dm_levelup_skill", "!@#$Auto_KeulLeSeu_LeBeli_SangSeungHayeossSeupNiDa#@!", 3);
 			this.PlayEffect("F_pc_joblevel_up", 3);
 			Send.ZC_SKILL_LIST(this);

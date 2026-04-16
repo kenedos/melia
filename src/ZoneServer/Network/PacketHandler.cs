@@ -6363,6 +6363,7 @@ namespace Melia.Zone.Network
 				return;
 			}
 			character.JobId = jobId;
+			Send.ZC_NORMAL.UpdateSkillUI(character);
 			character.AddonMessage(AddonMessage.UPDATE_REPRESENTATION_CLASS_ICON, "None", (int)jobId);
 		}
 

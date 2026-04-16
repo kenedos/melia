@@ -4704,13 +4704,13 @@ namespace Melia.Zone.Network
 				// will appear as well. So it seems like you can create a
 				// Wizard/Archer hybrid for example.
 
-				var jobs = character.Jobs.GetList().OrderBy(a => a.Id);
+				var jobs = character.Jobs.GetList();
 
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.UpdateSkillUI);
 
 				packet.PutLong(character.ObjectId);
-				packet.PutInt(jobs.Count());
+				packet.PutInt(jobs.Length);
 				foreach (var job in jobs)
 				{
 					packet.PutShort((short)job.Id);
@@ -4720,8 +4720,8 @@ namespace Melia.Zone.Network
 					packet.PutByte((byte)job.SkillPoints);
 					packet.PutShort(0);
 					packet.PutEmptyBin(5);
-					packet.PutLong(job.AdvancementDate.ToFileTime());
 					packet.PutLong(job.SelectionDate.ToFileTime());
+					packet.PutLong(job.AdvancementDate.ToFileTime());
 				}
 
 				character.Connection.Send(packet);
