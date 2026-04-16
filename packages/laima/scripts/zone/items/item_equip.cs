@@ -131,7 +131,7 @@ public class ItemEquipScript : GeneralScript
 		Send.ZC_NORMAL.SetSkillsProperties(character.Connection);
 		Send.ZC_NORMAL.UpdateSkillUI(character);
 
-		// Log.Debug($"Equipped Gem '{item.Data.ClassName}' with skill: '{item.Data.EquipSkill}' skill level is now: '{skill.Level}'");
+		skill.RecalculateDependentBuffs();
 
 		return ItemEquipResult.Okay;
 	}
@@ -193,6 +193,8 @@ public class ItemEquipScript : GeneralScript
 		if (amountToRemove > 0)
 			skill.Properties.Modify(PropertyName.GemLevel_BM, -amountToRemove);
 		skill.Properties.InvalidateAll();
+
+		skill.RecalculateDependentBuffs();
 
 		if (skill.Level == 0 && skill.LevelByDB == 0)
 			character.Skills.Remove(skill.Id);
@@ -274,6 +276,7 @@ public class ItemEquipScript : GeneralScript
 		foreach (var skill in character.Skills.GetList())
 		{
 			skill.Properties.InvalidateAll();
+			skill.RecalculateDependentBuffs();
 		}
 
 		if (character.Connection != null)

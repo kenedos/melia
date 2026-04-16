@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,6 +7,8 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.World;
+using Melia.Zone.Buffs;
+using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills.SplashAreas;
@@ -204,6 +207,64 @@ namespace Melia.Zone.Skills
 		/// Returns the skill's temporary variables.
 		/// </summary>
 		public Variables Vars { get; } = new Variables();
+
+		private readonly List<WeakReference<Buff>> _dependentBuffs = new();
+
+		/// <summary>
+		/// Registers a buff as dependent on this skill's level.
+		/// When the skill level changes, dependent buffs will be
+		/// recalculated.
+		/// </summary>
+		/// <param name="buff"></param>
+		public void RegisterDependentBuff(Buff buff)
+		{
+			lock (_dependentBuffs)
+				_dependentBuffs.Add(new WeakReference<Buff>(buff));
+		}
+
+		/// <summary>
+		/// Unregisters a buff from this skill's dependent buff list.
+		/// </summary>
+		/// <param name="buff"></param>
+		public void UnregisterDependentBuff(Buff buff)
+		{
+			lock (_dependentBuffs)
+				_dependentBuffs.RemoveAll(wr => !wr.TryGetTarget(out var b) || b == buff);
+		}
+
+		/// <summary>
+		/// Recalculates all dependent buffs after a skill level change.
+		/// Calls OnEnd and then OnActivate with the updated skill level
+		/// on each dependent buff.
+		/// </summary>
+		public void RecalculateDependentBuffs()
+		{
+			List<Buff> buffs;
+
+			lock (_dependentBuffs)
+			{
+				_dependentBuffs.RemoveAll(wr => !wr.TryGetTarget(out _));
+
+				buffs = new List<Buff>(_dependentBuffs.Count);
+				foreach (var wr in _dependentBuffs)
+				{
+					if (wr.TryGetTarget(out var buff))
+						buffs.Add(buff);
+				}
+			}
+
+			var currentLevel = this.Level;
+
+			foreach (var buff in buffs)
+			{
+				if (buff.NumArg1 == currentLevel)
+					continue;
+
+				buff.Handler?.OnEnd(buff);
+				buff.NumArg1 = currentLevel;
+				buff.Handler?.OnActivate(buff, ActivationType.Recalculate);
+			}
+		}
 
 		/// <summary>
 		/// Returns whether this skill can overheat.

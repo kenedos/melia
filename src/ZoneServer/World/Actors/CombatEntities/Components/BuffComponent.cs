@@ -6,6 +6,7 @@ using Melia.Shared.Versioning;
 using Melia.Zone.Buffs;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.Skills;
 using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Extensions;
 using Yggdrasil.Scheduling;
@@ -187,6 +188,15 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			{
 				if (!_buffs.Remove(buff.Id))
 					return false;
+			}
+
+			// Unregister from the caster's skill so it no longer
+			// receives recalculations on skill level changes.
+			if (buff.SkillId != SkillId.None && buff.SkillId != SkillId.Normal_Attack
+				&& buff.Caster is ICombatEntity casterEntity
+				&& casterEntity.TryGetSkill(buff.SkillId, out var skill))
+			{
+				skill.UnregisterDependentBuff(buff);
 			}
 
 			// Need to do this before buff.End because this method checks
@@ -635,6 +645,16 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				buff.Activate(ActivationType.Start);
 			else if (overbuffChanged)
 				buff.Activate(ActivationType.Overbuff);
+
+			// Register the buff with the caster's skill so it gets
+			// recalculated when the skill level changes (e.g., gem
+			// equip/unequip).
+			if (isNew && skillId != SkillId.None && skillId != SkillId.Normal_Attack
+				&& caster is ICombatEntity casterEntity
+				&& casterEntity.TryGetSkill(skillId, out var skill))
+			{
+				skill.RegisterDependentBuff(buff);
+			}
 
 			if (isNew)
 			{

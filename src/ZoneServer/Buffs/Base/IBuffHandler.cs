@@ -68,6 +68,7 @@ namespace Melia.Zone.Buffs.Base
 	{
 		Start,
 		Overbuff,
+		Recalculate,
 	}
 
 	[Obsolete("Use CombatCalcModifierAttribute instead.")] public interface IBuffCombatAttackBeforeCalcHandler { void OnAttackBeforeCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult); }
