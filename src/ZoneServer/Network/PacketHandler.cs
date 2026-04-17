@@ -6576,14 +6576,9 @@ namespace Melia.Zone.Network
 		[PacketHandler(Op.CZ_BRIQUET)]
 		public void CZ_BRIQUET(IZoneConnection conn, Packet packet)
 		{
+			var size = packet.GetShort();
 			var targetWorldId = packet.GetLong();
 			var sourceWorldId = packet.GetLong();
-			var materialCount = packet.GetInt();
-			var unknownFlag = packet.GetByte();
-
-			var materialWorldIds = new long[materialCount];
-			for (var i = 0; i < materialCount; i++)
-				materialWorldIds[i] = packet.GetLong();
 
 			var character = conn.SelectedCharacter;
 
@@ -6595,7 +6590,7 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			// Get source item (the weapon whose appearance to copy)
+			// Get source item (the appearance source, will be consumed)
 			var sourceItem = character.Inventory.GetItem(sourceWorldId);
 			if (sourceItem == null)
 			{
@@ -6603,37 +6598,19 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			// Get all material items
-			var materialItems = new List<Item>();
-			foreach (var materialWorldId in materialWorldIds)
+			// Calculate silver cost (scales by item level and grade)
+			var lv = (double)targetItem.UseLevel;
+			var grade = Math.Min(5, (int)targetItem.Properties.GetFloat(PropertyName.ItemGrade));
+			var silverCost = (int)(lv * 100 + Math.Floor(Math.Pow(lv, 1.6) * grade * (lv / (6 - grade))));
+
+			if (!character.HasSilver(silverCost))
 			{
-				var materialItem = character.Inventory.GetItem(materialWorldId);
-				if (materialItem == null)
-				{
-					Log.Warning("CZ_BRIQUET: User '{0}' tried to briquet with a non-existent material item.", conn.Account.Name);
-					return;
-				}
-				materialItems.Add(materialItem);
+				character.ServerMessage(Localization.Get("Not enough silver for appearance change."));
+				return;
 			}
 
-			// Calculate silver cost matching client formula:
-			// price = (lv * 100) + floor((lv^1.6 * grade) * (lv / (7 - grade)))
-			var lv = (double)targetItem.UseLevel;
-			var grade = Math.Min(6, (int)targetItem.Properties.GetFloat(PropertyName.ItemGrade));
-			var silverCost = (int)(lv * 100 + Math.Floor(Math.Pow(lv, 1.6) * grade * (lv / (7 - grade))));
-
-			// Check silver
-			if (!character.HasSilver(silverCost))
-				return;
-
-			// Remove source item
+			// Consume the appearance source item and silver
 			character.Inventory.Remove(sourceItem, 1, InventoryItemRemoveMsg.Given);
-
-			// Remove material items
-			foreach (var materialItem in materialItems)
-				character.Inventory.Remove(materialItem, 1, InventoryItemRemoveMsg.Given);
-
-			// Remove silver cost
 			character.Inventory.Remove(ItemId.Silver, silverCost, InventoryItemRemoveMsg.Given);
 
 			// Set the briquetting appearance on the target item
@@ -6642,8 +6619,8 @@ namespace Melia.Zone.Network
 			// Update item properties to client
 			Send.ZC_OBJECT_PROPERTY(character.Connection, targetItem);
 
-			// Send success addon message
-			Send.ZC_ADDON_MSG(character, "SUCCESS_BRIQUETTING", 0, targetWorldId.ToString());
+			// Send success addon message (argNum = appearance source class id for result popup)
+			Send.ZC_ADDON_MSG(character, "SUCCESS_BRIQUETTING", sourceItem.Id, targetWorldId.ToString());
 
 			// Broadcast appearance update so other players see the change
 			Send.ZC_UPDATED_PCAPPEARANCE(character);

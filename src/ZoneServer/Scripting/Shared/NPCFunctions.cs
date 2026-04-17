@@ -1179,18 +1179,12 @@ namespace Melia.Zone.Scripting.Shared
 				L("Socket Management"),
 				L("Identify"),
 				L("Item Dismantle"),
-				// "Transcend Item",
-				// "Item Dismantle",
-				// "Item Re-Identification",
-				// "Change Weapon Appearance",
+				L("Change Weapon Appearance"),
 				L("Cancel")))
 			{
 				case 1:
 					dialog.OpenAddon(AddonMessage.OPEN_DLG_REPAIR);
 					break;
-				// case 2:
-				//  await dialog.OpenShop("Klapeda_Recipe");
-				//  break;
 				case 2:
 					dialog.OpenAddon(AddonMessage.DO_OPEN_MANAGE_GEM_UI);
 					break;
@@ -1200,18 +1194,9 @@ namespace Melia.Zone.Scripting.Shared
 				case 4:
 					dialog.OpenUI("itemdecompose");
 					break;
-					// case 5:
-					// 	await dialog.CustomDialog(CustomDialog.ITEM_TRANSCEND);
-					// 	break;
-					// case 6:
-					// 	await dialog.OpenUI("itemdecompose");
-					// 	break;
-					// case 7:
-					// 	await dialog.OpenUI("itemrandomreset");
-					// 	break;
-					// case 8:
-					// 	await dialog.OpenUI("briquetting");
-					// 	break;
+				case 5:
+					dialog.OpenUI("briquetting");
+					break;
 			}
 		}
 
