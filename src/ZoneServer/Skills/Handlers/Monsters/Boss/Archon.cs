@@ -318,8 +318,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var rnd = RandomProvider.Get();
-
 			// Wave 1
 			var position = originPos.GetRelative(farPos, distance: 70);
 			_ = EffectAndHit(skill, caster, position, new EffectHitConfig
@@ -340,7 +338,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			});
 			for (var i = 0; i < 3; i++)
 			{
-				var firePos = GetRandomPositionAround(originPos, rnd, 150);
+				var firePos = GetRandomPositionAround(originPos, RandomProvider.Get(), 150);
 				_ = EffectAndHit(skill, caster, firePos, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_buff_fire_spread##1", 0.3f),
@@ -381,7 +379,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			});
 			for (var i = 0; i < 3; i++)
 			{
-				var firePos = GetRandomPositionAround(originPos, rnd, 180);
+				var firePos = GetRandomPositionAround(originPos, RandomProvider.Get(), 180);
 				_ = EffectAndHit(skill, caster, firePos, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_buff_fire_spread##1", 0.4f),
@@ -422,7 +420,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			});
 			for (var i = 0; i < 5; i++)
 			{
-				var firePos = GetRandomPositionAround(originPos, rnd, 200);
+				var firePos = GetRandomPositionAround(originPos, RandomProvider.Get(), 200);
 				_ = EffectAndHit(skill, caster, firePos, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_buff_fire_spread##1", 0.5f),

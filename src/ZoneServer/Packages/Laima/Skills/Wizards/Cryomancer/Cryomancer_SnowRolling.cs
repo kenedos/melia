@@ -71,7 +71,6 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		private async Task ApplyDamageAndPullEffect(ICombatEntity caster, Skill skill, Mob snowball)
 		{
 			var startTime = DateTime.Now;
-			var random = RandomProvider.Get();
 			while ((DateTime.Now - startTime).TotalMilliseconds < SnowRollingDuration)
 			{
 				if (snowball.IsDead)
@@ -98,7 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 					// Apply freeze
 					var freezeChance = 100f;
 					var freezeDurationMilli = 3000f;
-					if ((random.Next(100) < freezeChance) && splashHitResult.Damage > 0)
+					if ((RandomProvider.Get().Next(100) < freezeChance) && splashHitResult.Damage > 0)
 					{
 						target.StartBuff(BuffId.Cryomancer_Freeze, TimeSpan.FromMilliseconds(freezeDurationMilli), caster);
 					}

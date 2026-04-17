@@ -73,8 +73,6 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			var rnd = RandomProvider.Get();
-
 			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
@@ -109,6 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 
 			for (var i = 0; i < 9; i++)
 			{
+				var rnd = RandomProvider.Get();
 				var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
 				foreach (var target in targets.LimitBySDR(caster, skill))

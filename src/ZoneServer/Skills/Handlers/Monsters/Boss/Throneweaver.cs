@@ -88,11 +88,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var rnd = RandomProvider.Get();
 			var targetPos = originPos.GetRelative(farPos);
 			await skill.Wait(TimeSpan.FromMilliseconds(1400));
 			for (var i = 0; i < 9; i++)
 			{
+				var rnd = RandomProvider.Get();
 				var distance = 30 + rnd.Next(30);
 				var position = target.Position.GetRandomInRange2D(distance, rnd);
 				await MissileThrow(skill, caster, position, new MissileConfig
@@ -257,11 +257,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var rnd = RandomProvider.Get();
 			var targetPos = originPos.GetRelative(farPos);
 			await skill.Wait(TimeSpan.FromMilliseconds(1400));
 			for (var i = 0; i < 9; i++)
 			{
+				var rnd = RandomProvider.Get();
 				var distance = 30 + rnd.Next(30);
 				var position = target.Position.GetRandomInRange2D(distance, rnd);
 				await MissileThrow(skill, caster, position, new MissileConfig

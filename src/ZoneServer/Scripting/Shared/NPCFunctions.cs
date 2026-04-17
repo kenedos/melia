@@ -1179,7 +1179,7 @@ namespace Melia.Zone.Scripting.Shared
 				L("Socket Management"),
 				L("Identify"),
 				L("Item Dismantle"),
-				// L("Change Weapon Appearance"),
+				L("Change Weapon Appearance"),
 				L("Cancel")))
 			{
 				case 1:
@@ -1194,9 +1194,9 @@ namespace Melia.Zone.Scripting.Shared
 				case 4:
 					dialog.OpenUI("itemdecompose");
 					break;
-				// case 5:
-				// 	dialog.OpenUI("briquetting");
-				// 	break;
+				case 5:
+					dialog.OpenUI("briquetting");
+					break;
 			}
 		}
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -36,6 +37,7 @@ namespace Melia.Zone.World.Actors.Monsters
 	public partial class Mob : Actor, IMonster, ICombatEntity, IUpdateable
 	{
 		private readonly object _hpLock = new();
+		private int _killed;
 		private Position _position;
 
 		/// <summary>
@@ -575,6 +577,10 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="killer"></param>
 		public virtual void Kill(ICombatEntity killer)
 		{
+			// Guarantee single call
+			if (Interlocked.Exchange(ref _killed, 1) != 0)
+				return;
+
 			Send.ZC_SKILL_CAST_CANCEL(this);
 			Send.ZC_SKILL_DISABLE(this);
 			Send.ZC_DEAD(this);

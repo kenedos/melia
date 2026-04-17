@@ -50,27 +50,25 @@ namespace Melia.Zone.Pads.Handlers
 			if (creator.TryGetActiveAbilityLevel(AbilityId.Elementalist4, out var abilLevel))
 				freezeChance += 8 * abilLevel;
 
-			var rnd = RandomProvider.Get();
-
-			await this.FireProjectile(pad, creator, skill, 40f, 0f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 70f, 0.15f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 95f, 0.3f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 55f, 0.45f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 85f, 0.6f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 70f, 0.75f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 95f, 0.9f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 55f, 1.0f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 85f, 0.5f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 70f, 0.2f, freezeChance, rnd);
-			await this.FireProjectile(pad, creator, skill, 85f, 1.1f, freezeChance, rnd);
+			await this.FireProjectile(pad, creator, skill, 40f, 0f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 70f, 0.15f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 95f, 0.3f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 55f, 0.45f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 85f, 0.6f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 70f, 0.75f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 95f, 0.9f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 55f, 1.0f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 85f, 0.5f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 70f, 0.2f, freezeChance);
+			await this.FireProjectile(pad, creator, skill, 85f, 1.1f, freezeChance);
 		}
 
-		private async Task FireProjectile(Pad pad, ICombatEntity creator, Skill skill, float fallRange, float delayTime, int freezeChance, Random rnd)
+		private async Task FireProjectile(Pad pad, ICombatEntity creator, Skill skill, float fallRange, float delayTime, int freezeChance)
 		{
 			if (creator.IsDead || pad.IsDead)
 				return;
 
-			var fallPos = pad.Position.GetRandomInRange2D((int)fallRange, rnd);
+			var fallPos = pad.Position.GetRandomInRange2D((int)fallRange, RandomProvider.Get());
 
 			creator.MissileFall(skill.Data.ClassName, "I_wizard_hail_force", 0.5f, fallPos, HitRange, delayTime, 0.6f, 200f, 2f, "F_wizard_hail_hit_ice", 0.5f, 0f, "F_wizard_hail_hit_ice", 0.5f);
 
@@ -95,7 +93,7 @@ namespace Melia.Zone.Pads.Handlers
 				var skillHit = new SkillHitInfo(creator, target, skill, skillHitResult);
 				Send.ZC_SKILL_HIT_INFO(creator, skillHit);
 
-				if (rnd.Next(100) < freezeChance && !target.IsBuffActive(BuffId.Freeze))
+				if (RandomProvider.Get().Next(100) < freezeChance && !target.IsBuffActive(BuffId.Freeze))
 					target.StartBuff(BuffId.Freeze, skill.Level, 0, TimeSpan.FromMilliseconds(FreezeDurationMs), creator);
 			}
 		}

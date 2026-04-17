@@ -118,7 +118,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.OutLaw
 
 				hits.Add(skillHit);
 
-				if (rnd.Next(10) <= stunChance)
+				if (RandomProvider.Get().Next(10) <= stunChance)
 					target.StartBuff(BuffId.Stun, skill.Level, 0, TimeSpan.FromSeconds(3), caster);
 
 				target.StartBuff(BuffId.BreakBrick_Debuff, skill.Level, 0, TimeSpan.FromSeconds(20), caster);

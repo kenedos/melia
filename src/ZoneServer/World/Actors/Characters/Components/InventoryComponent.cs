@@ -1098,6 +1098,15 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_UPDATED_PCAPPEARANCE(this.Character);
 			Send.ZC_EQUIP_GEM_INFO(this.Character);
 
+			// If the equipped item has a briquetting (appearance) override,
+			// broadcast a look update so the swapped 3D model is rendered for
+			// the player's own avatar and for nearby players. APPEARANCE_PC's
+			// visualEquipIds covers other players' initial render but does not
+			// retrigger a model swap on the wearer, so this packet is needed.
+			var briquettingIndex = (int)item.Properties.GetFloat(PropertyName.BriquettingIndex);
+			if (briquettingIndex > 0)
+				Send.ZC_NORMAL.UpdateCharacterLook(this.Character, briquettingIndex, slot);
+
 			if (this.Character.IsOutOfBody())
 				Send.ZC_NORMAL.SetActorColor(this.Character, 255, 200, 100, 150, 0.01f);
 
@@ -1157,6 +1166,13 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// Update client
 			Send.ZC_ITEM_EQUIP_LIST(this.Character);
 			Send.ZC_UPDATED_PCAPPEARANCE(this.Character);
+
+			// If the unequipped item had a briquetting (appearance) override,
+			// clear the previously broadcast look so the swapped 3D model is
+			// detached on the wearer and on nearby players.
+			var briquettingIndex = (int)item.Properties.GetFloat(PropertyName.BriquettingIndex);
+			if (briquettingIndex > 0)
+				Send.ZC_NORMAL.UpdateCharacterLook(this.Character, 0, slot);
 
 			if (this.Character.IsOutOfBody())
 				Send.ZC_NORMAL.SetActorColor(this.Character, 255, 200, 100, 150, 0.01f);

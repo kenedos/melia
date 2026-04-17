@@ -89,8 +89,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1200));
 
-			var rnd = RandomProvider.Get();
-
 			// 6 waves of 4 hits each
 			for (var wave = 0; wave < 6; wave++)
 			{
@@ -99,6 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 				for (var i = 0; i < 4; i++)
 				{
+					var rnd = RandomProvider.Get();
 					var angle = rnd.NextDouble() * Math.PI * 2;
 					var distance = rnd.NextDouble() * 200;
 					var position = new Position(
@@ -293,8 +292,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1200));
 
-			var rnd = RandomProvider.Get();
-
 			// 6 waves of 4 hits each
 			for (var wave = 0; wave < 6; wave++)
 			{
@@ -303,6 +300,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 				for (var i = 0; i < 4; i++)
 				{
+					var rnd = RandomProvider.Get();
 					var angle = rnd.NextDouble() * Math.PI * 2;
 					var distance = rnd.NextDouble() * 200;
 					var position = new Position(

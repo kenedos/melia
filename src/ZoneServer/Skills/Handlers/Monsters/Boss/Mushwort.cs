@@ -102,9 +102,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 150);
 			await skill.Wait(TimeSpan.FromMilliseconds(2500));
 
-			var rnd = RandomProvider.Get();
 			for (var i = 0; i < 10; i++)
 			{
+				var rnd = RandomProvider.Get();
 				var angle = rnd.NextDouble() * Math.PI * 2;
 				var distance = rnd.NextDouble() * 20;
 				var missilePos = new Position(
@@ -208,11 +208,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 
-			var rnd = RandomProvider.Get();
 			for (var i = 0; i < 14; i++)
 			{
 				for (var j = 0; j < 3; j++)
 				{
+					var rnd = RandomProvider.Get();
 					var angle = rnd.NextDouble() * Math.PI * 2;
 					var distance = rnd.NextDouble() * 300;
 					var missilePos = new Position(
@@ -270,13 +270,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 200);
 			await skill.Wait(TimeSpan.FromMilliseconds(2900));
 
-			var rnd = RandomProvider.Get();
 			for (var waves = 0; waves < 2; waves++)
 			{
 				for (var i = 0; i < 6; i++)
 				{
 					for (var j = 0; j < 2; j++)
 					{
+						var rnd = RandomProvider.Get();
 						var angle = rnd.NextDouble() * Math.PI * 2;
 						var distance = 20 + rnd.NextDouble() * 40;
 						var missilePos = new Position(
@@ -335,13 +335,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 180);
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
-			var rnd = RandomProvider.Get();
 			for (var waves = 0; waves < 2; waves++)
 			{
 				for (var i = 0; i < 6; i++)
 				{
 					for (var j = 0; j < 2; j++)
 					{
+						var rnd = RandomProvider.Get();
 						var angle = rnd.NextDouble() * Math.PI * 2;
 						var distance = 20 + rnd.NextDouble() * 40;
 						var missilePos = new Position(
@@ -399,11 +399,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(3200));
 
-			var rnd = RandomProvider.Get();
 			for (var i = 0; i < 9; i++)
 			{
 				for (var j = 0; j < 3; j++)
 				{
+					var rnd = RandomProvider.Get();
 					var angle = rnd.NextDouble() * Math.PI * 2;
 					var distance = 20 + rnd.NextDouble() * 40;
 					var missilePos = new Position(

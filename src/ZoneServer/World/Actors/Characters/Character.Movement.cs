@@ -12,6 +12,7 @@ using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -555,6 +556,20 @@ namespace Melia.Zone.World.Actors.Characters
 						else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
 							Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, hairItem.Id, EquipSlot.Hair, headData.Index);
 					}
+				}
+
+				// Send briquetting (weapon/armor appearance override) look updates
+				// for any equipped item carrying a BriquettingIndex, so the
+				// swapped 3D model is rendered when this character comes into view.
+				foreach (var equipPair in character.Inventory.GetEquip())
+				{
+					var equipItem = equipPair.Value;
+					if (equipItem == null || equipItem is DummyEquipItem)
+						continue;
+
+					var briquettingIndex = (int)equipItem.Properties.GetFloat(PropertyName.BriquettingIndex);
+					if (briquettingIndex > 0)
+						Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, briquettingIndex, equipPair.Key);
 				}
 
 				if (character.HasParty || character.HasGuild)
