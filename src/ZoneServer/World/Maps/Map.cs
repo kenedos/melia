@@ -647,6 +647,16 @@ namespace Melia.Zone.World.Maps
 			if (this.IsDormant && monster is Mob mob && mob.Spawner != null)
 				return;
 
+			// Dormant maps skip UpdateEntities, so the queue never drains.
+			// Add non-spawner monsters (NPCs, warps, etc.) directly so
+			// their Map reference is set and lookups like HandleInteWarp
+			// see a valid map id before a player ever wakes the map.
+			if (this.IsDormant)
+			{
+				this.AddMonsterInternal(monster);
+				return;
+			}
+
 			_addMonsters.Enqueue(monster);
 		}
 
