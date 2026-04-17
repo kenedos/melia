@@ -16,7 +16,6 @@ namespace Melia.Zone.World.Spawning
 	{
 		private static int Ids;
 
-		private readonly Random _rnd = new(RandomProvider.GetSeed());
 		private readonly List<SpawnArea> _spawnAreas = new();
 
 		/// <summary>
@@ -98,7 +97,7 @@ namespace Melia.Zone.World.Spawning
 				if (_spawnAreas.Count == 0)
 					return false;
 
-				var index = _rnd.Next(_spawnAreas.Count);
+				var index = RandomProvider.Get().Next(_spawnAreas.Count);
 				spawnArea = _spawnAreas[index];
 
 				return true;

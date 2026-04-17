@@ -30,7 +30,6 @@ using static Melia.Zone.Scripting.Shortcuts;
 
 public class AdventurersGuildScript : GeneralScript
 {
-	private readonly Random _random = RandomProvider.Get();
 
 	internal static class ItemId
 	{
@@ -235,7 +234,7 @@ public class AdventurersGuildScript : GeneralScript
 			return;
 
 		var mobList = _mobLists[rank];
-		var monster = mobList[_random.Next(mobList.Count)];
+		var monster = mobList[RandomProvider.Get().Next(mobList.Count)];
 		var materialItemId = GetMonsterDropItemId(monster);
 
 		_dailyQuests[rank] = new DailyQuestInfo
@@ -507,7 +506,7 @@ public class AdventurersGuildScript : GeneralScript
 		var boss = new Mob(bossData.Item1, RelationType.Enemy);
 		boss.VisibilityId = character.ObjectId;
 		boss.Visibility = ActorVisibility.Individual;
-		boss.Level = character.Level + _random.Next(5, 10);
+		boss.Level = character.Level + RandomProvider.Get().Next(5, 10);
 		boss.Vars.SetString("SpawnMap", map.ClassName);
 
 		boss.Components.Add(new MovementComponent(boss));
@@ -966,7 +965,7 @@ public class AdventurersGuildScript : GeneralScript
 			// Create 3 procedural quests for each rank
 			for (int i = 0; i < 5; i++)
 			{
-				var monsterData = _mobLists[rank][_random.Next(_mobLists[rank].Count)]; // Random monster from the rank's list
+				var monsterData = _mobLists[rank][RandomProvider.Get().Next(_mobLists[rank].Count)]; // Random monster from the rank's list
 
 				_proceduralQuests[rank].Add(new ProceduralQuest
 				{

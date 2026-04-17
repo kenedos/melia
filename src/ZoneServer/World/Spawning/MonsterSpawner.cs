@@ -45,7 +45,6 @@ namespace Melia.Zone.World.Spawning
 		private TimeSpan _flexSpawnDelay = TimeSpan.MaxValue;
 		private readonly List<TimeSpan> _respawnDelays = new();
 
-		private readonly Random _rnd = new(RandomProvider.GetSeed());
 
 		private SpawnAreaCollection _spawnAreas;
 		private bool _spawnPointsLoadFailed;
@@ -351,7 +350,7 @@ namespace Melia.Zone.World.Spawning
 				if (monster.IsBuffActive(entry.BuffId))
 					continue;
 
-				if (_rnd.NextDouble() * 100 >= entry.Chance)
+				if (RandomProvider.Get().NextDouble() * 100 >= entry.Chance)
 					continue;
 
 				monster.Map = map;
@@ -403,9 +402,6 @@ namespace Melia.Zone.World.Spawning
 			this.Amount--;
 			_flexMeter += FlexMeterIncreasePerDeath;
 
-			// Use RandomProvider instead of _rnd to avoid corrupting _rnd's
-			// internal state via concurrent access from the death callback
-			// and the update thread.
 			var delay = RandomProvider.Get().Between(this.MinRespawnDelay, this.MaxRespawnDelay);
 
 			lock (_respawnDelays)

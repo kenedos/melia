@@ -43,8 +43,6 @@ namespace Melia.Zone.World.Spawning
 		private readonly List<TimeSpan> _respawnDelays = new();
 		private readonly Position[] _positions;
 
-		private readonly Random _rnd = new(RandomProvider.GetSeed());
-
 		/// <summary>
 		/// Returns the unique id of this spawner.
 		/// </summary>
@@ -191,7 +189,7 @@ namespace Melia.Zone.World.Spawning
 				}
 				else if (_positions != null && _positions.Length > 0)
 				{
-					monster.Position = _positions[_rnd.Next(_positions.Length)];
+					monster.Position = _positions[RandomProvider.Get().Next(_positions.Length)];
 				}
 				else
 				{
@@ -275,7 +273,7 @@ namespace Melia.Zone.World.Spawning
 				if (monster.IsBuffActive(entry.BuffId))
 					continue;
 
-				if (_rnd.NextDouble() * 100 >= entry.Chance)
+				if (RandomProvider.Get().NextDouble() * 100 >= entry.Chance)
 					continue;
 
 				monster.StartBuff(entry.BuffId, entry.NumArg1, entry.NumArg2, TimeSpan.Zero, monster);
@@ -319,9 +317,6 @@ namespace Melia.Zone.World.Spawning
 			this.Amount--;
 			_flexMeter += FlexMeterIncreasePerDeath;
 
-			// Use RandomProvider instead of _rnd to avoid corrupting _rnd's
-			// internal state via concurrent access from the death callback
-			// and the update thread.
 			var delay = RandomProvider.Get().Between(this.MinRespawnDelay, this.MaxRespawnDelay);
 
 			lock (_respawnDelays)

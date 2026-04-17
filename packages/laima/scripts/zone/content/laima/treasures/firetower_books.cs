@@ -47,7 +47,6 @@ public class FiretowerBookSpawner : ISpawner
 
 	private static readonly int[] ItemIds = { 670001, 670002, 670003, 670004 };
 
-	private readonly Random _rnd;
 	private readonly int _maxPopulation;
 	private TimeSpan _timeSinceLastSpawn;
 
@@ -254,7 +253,6 @@ public class FiretowerBookSpawner : ISpawner
 		this.Id = Interlocked.Increment(ref Ids);
 		_maxPopulation = maxPopulation;
 		this.RespawnDelay = respawnDelay;
-		_rnd = new Random(RandomProvider.GetSeed());
 
 		this.InitializePopulation();
 	}
@@ -323,11 +321,11 @@ public class FiretowerBookSpawner : ISpawner
 
 			var uniqueId = Interlocked.Increment(ref BookIds);
 			var uniqueName = $"firetower_book_{uniqueId}";
-			var itemId = ItemIds[_rnd.Next(ItemIds.Length)];
+			var itemId = ItemIds[RandomProvider.Get().Next(ItemIds.Length)];
 
 			var location = new Location(map.Id, position);
 			var dir = new Direction(sp.Dir);
-			var monsterId = BookMonsterIds[_rnd.Next(BookMonsterIds.Length)];
+			var monsterId = BookMonsterIds[RandomProvider.Get().Next(BookMonsterIds.Length)];
 
 			var book = new Npc(monsterId, "Magic Books", location, dir);
 			book.UniqueName = uniqueName;
@@ -377,7 +375,7 @@ public class FiretowerBookSpawner : ISpawner
 	{
 		for (var attempt = 0; attempt < MAX_SPAWN_ATTEMPTS; attempt++)
 		{
-			var sp = SpawnPoints[_rnd.Next(SpawnPoints.Length)];
+			var sp = SpawnPoints[RandomProvider.Get().Next(SpawnPoints.Length)];
 			var position = new Position(sp.X, sp.Y, sp.Z);
 
 			if (this.IsPositionAvailable(sp.Map, position))

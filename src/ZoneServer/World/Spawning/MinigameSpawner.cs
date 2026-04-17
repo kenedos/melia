@@ -29,7 +29,6 @@ namespace Melia.Zone.World.Spawning
 		private const int MAX_SPAWN_ATTEMPTS = 10;
 
 		private readonly MinigameSpawnPointData[] _spawnPoints;
-		private readonly Random _rnd;
 		private readonly int _maxPopulation;
 		private TimeSpan _timeSinceLastSpawn;
 		private readonly List<IMinigameScript> _availableMinigames;
@@ -61,7 +60,6 @@ namespace Melia.Zone.World.Spawning
 			_maxPopulation = maxPopulation;
 			this.RespawnDelay = respawnDelay;
 			_rotationTimeout = rotationTimeout;
-			_rnd = new Random(RandomProvider.GetSeed());
 			_availableMinigames = new List<IMinigameScript>();
 			_activeMinigames = new Dictionary<int, IMinigameInstance>();
 			_idleTime = new Dictionary<int, TimeSpan>();
@@ -177,7 +175,7 @@ namespace Melia.Zone.World.Spawning
 				}
 
 				// Select random minigame
-				var minigameScript = _availableMinigames[_rnd.Next(_availableMinigames.Count)];
+				var minigameScript = _availableMinigames[RandomProvider.Get().Next(_availableMinigames.Count)];
 
 				// Create minigame instance
 				var instance = minigameScript.CreateInstance(map, position, direction);
@@ -216,7 +214,7 @@ namespace Melia.Zone.World.Spawning
 
 		private (bool Success, MinigameSpawnPointData? SpawnPoint) TryGetAvailableSpawnPoint()
 		{
-			var shuffledPoints = _spawnPoints.OrderBy(x => _rnd.Next()).ToArray();
+			var shuffledPoints = _spawnPoints.OrderBy(x => RandomProvider.Get().Next()).ToArray();
 
 			if (shuffledPoints.Length == 0)
 			{
@@ -225,7 +223,7 @@ namespace Melia.Zone.World.Spawning
 
 			for (var attempt = 0; attempt < MAX_SPAWN_ATTEMPTS; attempt++)
 			{
-				var spawnPoint = shuffledPoints[_rnd.Next(shuffledPoints.Length)];
+				var spawnPoint = shuffledPoints[RandomProvider.Get().Next(shuffledPoints.Length)];
 				if (this.IsPositionAvailable(spawnPoint.MapClassName, spawnPoint.Position))
 				{
 					return (true, spawnPoint);

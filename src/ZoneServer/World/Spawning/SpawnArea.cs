@@ -17,8 +17,6 @@ namespace Melia.Zone.World.Spawning
 		private const int MaxValidPositionTries = 100;
 		private static int Ids;
 
-		private readonly Random _rnd = new Random(RandomProvider.GetSeed());
-
 		/// <summary>
 		/// Returns the unique id of this spawn area.
 		/// </summary>
@@ -69,7 +67,7 @@ namespace Melia.Zone.World.Spawning
 
 			for (var i = 0; i < MaxValidPositionTries; ++i)
 			{
-				var rndVector = this.Area.GetRandomPoint(_rnd);
+				var rndVector = this.Area.GetRandomPoint(RandomProvider.Get());
 				if (this.TryGetPositionFromPoint(rndVector, out pos))
 					return true;
 			}
@@ -79,7 +77,7 @@ namespace Melia.Zone.World.Spawning
 				return true;
 
 			// No dice? Okay... What about the edge points?
-			foreach (var edgePoint in this.Area.GetEdgePoints().OrderBy(_ => _rnd.Next()))
+			foreach (var edgePoint in this.Area.GetEdgePoints().OrderBy(_ => RandomProvider.Get().Next()))
 			{
 				if (this.TryGetPositionFromPoint(edgePoint, out pos))
 					return true;

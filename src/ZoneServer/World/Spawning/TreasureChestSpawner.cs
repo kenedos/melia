@@ -30,7 +30,6 @@ namespace Melia.Zone.World.Spawning
 		private readonly TreasureDropDb _dropDb;
 		private readonly string _baseUniqueName;
 		private readonly TreasureSpawnPointData[] _spawnPoints;
-		private readonly Random _rnd;
 		private readonly int _maxPopulation;
 		private TimeSpan _timeSinceLastSpawn;
 
@@ -64,7 +63,6 @@ namespace Melia.Zone.World.Spawning
 			_spawnPoints = spawnPoints;
 			_maxPopulation = maxPopulation;
 			this.RespawnDelay = respawnDelay;
-			_rnd = new Random(RandomProvider.GetSeed());
 
 			this.InitializePopulation();
 		}
@@ -178,7 +176,7 @@ namespace Melia.Zone.World.Spawning
 
 		private (bool Success, TreasureSpawnPointData? SpawnPoint) TryGetAvailableSpawnPoint()
 		{
-			var shuffledPoints = _spawnPoints.OrderBy(x => _rnd.Next()).ToArray();
+			var shuffledPoints = _spawnPoints.OrderBy(x => RandomProvider.Get().Next()).ToArray();
 
 			if (shuffledPoints.Length == 0)
 			{
@@ -187,7 +185,7 @@ namespace Melia.Zone.World.Spawning
 
 			for (var attempt = 0; attempt < MAX_SPAWN_ATTEMPTS; attempt++)
 			{
-				var spawnPoint = shuffledPoints[_rnd.Next(shuffledPoints.Length)];
+				var spawnPoint = shuffledPoints[RandomProvider.Get().Next(shuffledPoints.Length)];
 				if (this.IsPositionAvailable(spawnPoint.MapClassName, spawnPoint.Position))
 				{
 					return (true, spawnPoint);
@@ -199,7 +197,7 @@ namespace Melia.Zone.World.Spawning
 		private int GetWeightedRandomDrop(TreasureDropDb dropDb)
 		{
 			var totalWeight = dropDb.Entries.Values.Sum(d => d.ProbabilityFactor);
-			var random = (float)(_rnd.NextDouble() * totalWeight);
+			var random = (float)(RandomProvider.Get().NextDouble() * totalWeight);
 
 			float currentWeight = 0;
 			foreach (var drop in dropDb.Entries.Values)

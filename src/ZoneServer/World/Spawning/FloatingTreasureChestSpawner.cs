@@ -26,7 +26,6 @@ namespace Melia.Zone.World.Spawning
 		private readonly string _chestName;
 		private readonly TimeSpan _minRespawnDelay;
 		private readonly TimeSpan _maxRespawnDelay;
-		private readonly Random _rnd;
 
 		private Npc _currentChest;
 		private TimeSpan _timeSinceDisappeared;
@@ -67,7 +66,6 @@ namespace Melia.Zone.World.Spawning
 			_chestName = chestName;
 			_minRespawnDelay = minRespawnDelay;
 			_maxRespawnDelay = maxRespawnDelay;
-			_rnd = new Random(RandomProvider.GetSeed());
 
 			this.InitializePopulation();
 		}
@@ -87,7 +85,7 @@ namespace Melia.Zone.World.Spawning
 		{
 			var minMs = _minRespawnDelay.TotalMilliseconds;
 			var maxMs = _maxRespawnDelay.TotalMilliseconds;
-			var randomMs = minMs + (_rnd.NextDouble() * (maxMs - minMs));
+			var randomMs = minMs + (RandomProvider.Get().NextDouble() * (maxMs - minMs));
 			return TimeSpan.FromMilliseconds(randomMs);
 		}
 

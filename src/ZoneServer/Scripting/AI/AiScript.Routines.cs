@@ -28,8 +28,6 @@ namespace Melia.Zone.Scripting.AI
 {
 	public abstract partial class AiScript
 	{
-		private readonly Random _rnd = new(RandomProvider.GetSeed());
-
 		protected Position GetRetreatPosition(ICombatEntity target, float idealRange)
 		{
 			// Get direction vector from target to self
@@ -79,7 +77,7 @@ namespace Melia.Zone.Scripting.AI
 
 			for (var i = 0; i < 10; ++i)
 			{
-				destination = this.Entity.Position.GetRandomInRange2D(radius, _rnd);
+				destination = this.Entity.Position.GetRandomInRange2D(radius, RandomProvider.Get());
 
 				// Give entities a random chance to move past their wander
 				// limit, that decreases with distance, to add some
@@ -95,7 +93,7 @@ namespace Melia.Zone.Scripting.AI
 					{
 						var chance = Math.Clamp(1 - (distance - wanderRange) / (wanderRange * extraRangeRate), 0, 1);
 
-						if (_rnd.NextDouble() > chance)
+						if (RandomProvider.Get().NextDouble() > chance)
 							continue;
 					}
 				}
@@ -705,7 +703,7 @@ namespace Melia.Zone.Scripting.AI
 				{
 					// Option A: Teleport to target
 					movement?.Stop();
-					this.Entity.Position = followTarget.Position.GetRandomInRange2D((int)minDistance / 2, _rnd); // Teleport nearby, not directly on top
+					this.Entity.Position = followTarget.Position.GetRandomInRange2D((int)minDistance / 2, RandomProvider.Get()); // Teleport nearby, not directly on top
 					Send.ZC_SET_POS(this.Entity);
 					yield return this.Wait(250); // Small delay after teleport to re-orient.
 					continue; // Continue the loop from the new position
