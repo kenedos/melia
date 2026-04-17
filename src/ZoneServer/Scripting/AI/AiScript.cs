@@ -89,15 +89,12 @@ namespace Melia.Zone.Scripting.AI
 		protected ICombatEntity? _target;
 		private DateTime _targetAcquiredTime;
 
-		// Rolling two-stage snapshot of target position. Mid is the
-		// previous sample; Old is the one before that. Comparing the
-		// Old→Mid and Mid→Now headings tells the lunge predictor how
-		// straight the target is moving, so it can extrapolate fully
-		// on straight runs and collapse to 0 on sharp turns / jukes.
-		private Position _targetSampleOldPos;
-		private DateTime _targetSampleOldTime;
-		private Position _targetSampleMidPos;
-		private DateTime _targetSampleMidTime;
+		// Rolling sample of the target's distance to the mob, used to
+		// decide whether the target is closing in. Prediction/early-cast
+		// behavior only kicks in when the target is approaching — if
+		// they're moving away we fall back to regular in-range gating.
+		private double _lastTargetDistance;
+		private DateTime _lastTargetDistanceTime;
 
 		// State tracking for advanced conditions
 		private readonly Dictionary<string, object> _tempVars = new();
@@ -256,7 +253,7 @@ namespace Melia.Zone.Scripting.AI
 				this.UpdatePhase();
 				this.HandleEventAlerts();
 				this.ExecuteDuringActions();
-				this.UpdateTargetMotionSample();
+				this.SampleTargetDistance();
 
 				this.Heartbeat();
 			}
@@ -268,25 +265,42 @@ namespace Melia.Zone.Scripting.AI
 			}
 		}
 		/// <summary>
-		/// Rotates the two-stage motion sample: the previous Mid sample
-		/// becomes Old, and the current target position becomes the new
-		/// Mid. Only rotates on a fixed interval so each window is wide
-		/// enough to produce a meaningful heading reading.
+		/// Rolls the target's distance sample on a 100ms window. The
+		/// previous sample is retained so <see cref="IsTargetApproaching"/>
+		/// can compare now-vs-then to infer closing/fleeing intent
+		/// without needing access to the target's velocity.
 		/// </summary>
-		private void UpdateTargetMotionSample()
+		private void SampleTargetDistance()
 		{
 			if (_target == null)
+			{
+				_lastTargetDistanceTime = default;
 				return;
+			}
 
 			var now = DateTime.UtcNow;
-			var age = now - _targetSampleMidTime;
-			if (age < TimeSpan.FromMilliseconds(350))
+			if (_lastTargetDistanceTime != default && (now - _lastTargetDistanceTime) < TimeSpan.FromMilliseconds(100))
 				return;
 
-			_targetSampleOldPos = _targetSampleMidPos;
-			_targetSampleOldTime = _targetSampleMidTime;
-			_targetSampleMidPos = _target.Position;
-			_targetSampleMidTime = now;
+			_lastTargetDistance = this.Entity.Position.Get2DDistance(_target.Position);
+			_lastTargetDistanceTime = now;
+		}
+
+		/// <summary>
+		/// Returns true if the target's distance to the mob is stable or
+		/// decreasing relative to the last ~100ms sample. No sample yet
+		/// (fresh target) defaults to true so the first cast isn't
+		/// suppressed. A small epsilon absorbs jitter around standing
+		/// still, so idle targets still count as "approaching".
+		/// </summary>
+		private bool IsTargetApproaching()
+		{
+			if (_target == null) return false;
+			if (_lastTargetDistanceTime == default) return true;
+
+			var currentDist = this.Entity.Position.Get2DDistance(_target.Position);
+			const double epsilon = 2.0;
+			return currentDist <= _lastTargetDistance + epsilon;
 		}
 
 		protected virtual void CheckEnemies()
@@ -656,11 +670,28 @@ namespace Melia.Zone.Scripting.AI
 				// committing to the aim step.
 				var maxAttackRange = this.GetAttackRange(skill);
 
-				// Move into range if needed
-				if (!this.InRangeOf(_target, maxAttackRange))
+				// The cast can commit when the predicted target position
+				// (at skill resolve time) is within MaxR/2 of the mob —
+				// even if the target isn't currently in range. Only fires
+				// on a closing target: if they're moving away we fall
+				// back to normal in-range gating so the mob doesn't chain
+				// predictive casts at a fleeing target's back.
+				bool CanCommitCast()
+				{
+					if (!this.IsTargetApproaching())
+						return false;
+
+					var shootSec = (float)skill.Properties.ShootTime.TotalSeconds;
+					var leadPos = this.GetLeadPosition(_target, shootSec);
+					return this.Entity.Position.InRange2D(leadPos, maxAttackRange * 0.5f);
+				}
+
+				// Move into range if needed (and the lead-based commit
+				// isn't already satisfied).
+				if (!this.InRangeOf(_target, maxAttackRange) && !CanCommitCast())
 				{
 					if (RangeType == AttackerRangeType.Melee)
-						yield return this.MoveToAttack(_target, maxAttackRange);
+						yield return this.MoveToAttack(_target, maxAttackRange, skill);
 					else if (RangeType == AttackerRangeType.Ranged)
 						yield return this.MoveToRangedAttack(_target, maxAttackRange);
 					else
@@ -683,8 +714,8 @@ namespace Melia.Zone.Scripting.AI
 					}
 				}
 
-				// Attack if in range and able
-				if (this.InRangeOf(_target, maxAttackRange) && this.CanUseSkill(skill, _target))
+				// Attack if in range (current or predicted) and able
+				if ((this.InRangeOf(_target, maxAttackRange) || CanCommitCast()) && this.CanUseSkill(skill, _target))
 				{
 					// Commit to the aim: solve for the lunge destination
 					// that places the mob at MaxR/2 from where the target
@@ -1407,12 +1438,6 @@ namespace Melia.Zone.Scripting.AI
 				};
 			}
 		}
-
-		/// <summary>
-		/// Caps the distance of a single pre-cast lunge so fast-moving
-		/// targets can't yank the AI across the map.
-		/// </summary>
-		protected virtual float MaxLungeDistance => 150f;
 
 		/// <summary>
 		/// Minimum time between consecutive staggers, preventing chain-lock

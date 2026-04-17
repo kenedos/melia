@@ -161,113 +161,98 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
-		/// Moves to be in attack range of an enemy
+		/// Moves to be in attack range of an enemy. Aims one move-speed
+		/// step in front of the target so the mob commits to where the
+		/// player is heading instead of chasing their current position.
 		/// </summary>
 		/// <param name="target"></param>
 		/// <param name="attackRange"></param>
 		/// <returns></returns>
-		protected IEnumerable MoveToAttack(ICombatEntity target, float attackRange)
+		protected IEnumerable MoveToAttack(ICombatEntity target, float attackRange, Skill skill = null)
 		{
 			if (target == null) yield break;
-			if (!this.Entity.CanMove()) yield break; // If entity can't move, exit immediately.
+			if (!this.Entity.CanMove()) yield break;
+			if (this.Entity.IsLocked(LockType.Movement)) yield break;
 
-			// For Boss monsters, move closer to the target,
-			// as bosses attacks typically cover a bigger area.
-			var rangeWithBuffer = attackRange;
-			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss)
+			var rangeWithBuffer = this.Entity is Mob mob && mob.Rank == MonsterRank.Boss
+				? attackRange * 0.7f
+				: attackRange - 10;
+
+			if (this.Entity.Position.InRange2D(target.Position, rangeWithBuffer))
 			{
-				rangeWithBuffer = attackRange * 0.7f;
-			}
-			else
-			{
-				rangeWithBuffer = attackRange - 10; // Aim to get slightly closer than max range
+				yield return this.StopMove();
+				yield break;
 			}
 
-			// Loop with safe exit conditions
-			while (!this.Entity.IsDead && !target.IsDead && this.Entity.Map == target.Map)
+			// Lead by the time it'll take the mob itself to travel to the
+			// target — keeps the approach aimed at where the target will
+			// be when the mob arrives, not where they were when it left.
+			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+			var distToTarget = (float)this.Entity.Position.Get2DDistance(target.Position);
+			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
+
+			var destination = this.GetLeadPosition(target, travelSec);
+
+			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(destination, this.Entity.AgentRadius, out var validDest, 50f))
+				yield break;
+
+			var estimatedTime = _movement?.MoveStraight(validDest) ?? TimeSpan.Zero;
+			if (estimatedTime <= TimeSpan.Zero) yield break;
+
+			var shootSec = skill != null ? (float)skill.Properties.ShootTime.TotalSeconds : 0f;
+			var commitRange = attackRange * 0.5f;
+
+			var deadline = DateTime.UtcNow + estimatedTime + TimeSpan.FromMilliseconds(200);
+			while (_movement != null && _movement.IsMoving && DateTime.UtcNow < deadline)
 			{
-				// If we are already in range, we are done. Stop moving and exit.
+				if (this.Entity.IsDead || target.IsDead || this.Entity.Map != target.Map)
+					break;
+
 				if (this.Entity.Position.InRange2D(target.Position, rangeWithBuffer))
+					break;
+
+				// If a skill was supplied, break the chase as soon as the
+				// shoot-time lead position falls within MaxR/2 so the
+				// caller can fire immediately instead of committing to
+				// the full walk. Suppressed when the target is running
+				// away — we don't want the mob to cast at their back.
+				if (skill != null && this.IsTargetApproaching())
 				{
-					yield return this.StopMove();
-					yield break;
+					var leadPos = this.GetLeadPosition(target, shootSec);
+					if (this.Entity.Position.InRange2D(leadPos, commitRange))
+						break;
 				}
 
-				// If we are movement-locked (e.g., stunned), wait and try again.
-				if (this.Entity.IsLocked(LockType.Movement))
-				{
-					yield return this.Wait(100);
-					continue;
-				}
-
-				// The target is out of range, so we need to move.
-				// Get a position adjacent to the target.
-				var destination = this.GetAdjacentPosition(target, rangeWithBuffer);
-				yield return this.MoveTo(destination, wait: false);
-
-				// Yield control for one frame before re-evaluating the distance.
 				yield return true;
 			}
 
-			// The loop terminated because the entity or target died, or target warped.
-			// Ensure we stop moving.
 			yield return this.StopMove();
 		}
 
 		/// <summary>
-		/// Estimates where the target will be <paramref name="leadSec"/>
-		/// seconds from now using the rolling two-stage motion samples.
-		/// Returns the target's current position when the samples are
-		/// missing, stale, or incoherent. Prediction is confidence-weighted
-		/// by straightness (dirA · dirB): straight lines extrapolate fully,
-		/// sharp turns collapse lead toward 0 so the mob doesn't commit
-		/// on a juke.
+		/// World units covered per second, per point of MSPD. Empirically
+		/// a 30 MSPD entity travels ~75 units/s, so 1 MSPD ≈ 2.5 units/s.
 		/// </summary>
-		protected Position PredictTargetPosition(float leadSec)
+		private const float UnitsPerMspdSecond = 2.5f;
+
+		/// <summary>
+		/// Returns the position the target will reach in
+		/// <paramref name="leadSec"/> seconds if it keeps moving in its
+		/// current facing direction at its current move speed.
+		/// </summary>
+		private Position GetLeadPosition(ICombatEntity target, float leadSec)
 		{
-			if (_target == null) return Position.Zero;
-			if (_targetSampleMidTime == default) return _target.Position;
+			if (leadSec <= 0f) return target.Position;
 
-			var now = DateTime.UtcNow;
-			var newHalfSec = (float)(now - _targetSampleMidTime).TotalSeconds;
-			if (newHalfSec < 0.05f) return _target.Position;
-
-			var newHalfDist = (float)_targetSampleMidPos.Get2DDistance(_target.Position);
-			if (newHalfDist < 0.5f) return _target.Position;
-
-			var dirB = (_target.Position - _targetSampleMidPos).Normalize2D();
-			if (dirB.X == 0 && dirB.Z == 0) return _target.Position;
-
-			var speed = newHalfDist / newHalfSec;
-			var targetMaxSpeed = _target.Properties.GetFloat(PropertyName.MSPD);
-			if (targetMaxSpeed > 0f && speed > targetMaxSpeed) speed = targetMaxSpeed;
-
-			var straightness = 0.5f;
-			if (_targetSampleOldTime != default)
-			{
-				var oldHalfDist = (float)_targetSampleOldPos.Get2DDistance(_targetSampleMidPos);
-				if (oldHalfDist >= 0.5f)
-				{
-					var dirA = (_targetSampleMidPos - _targetSampleOldPos).Normalize2D();
-					if (!(dirA.X == 0 && dirA.Z == 0))
-					{
-						var dot = dirA.X * dirB.X + dirA.Z * dirB.Z;
-						straightness = Math.Max(0f, dot);
-					}
-				}
-			}
-
-			return _target.Position + dirB * (speed * leadSec * straightness);
+			var targetSpeed = target.Properties.GetFloat(PropertyName.MSPD);
+			var distance = targetSpeed * UnitsPerMspdSecond * leadSec;
+			return target.Position.GetRelative(target.Direction, distance);
 		}
 
 		/// <summary>
-		/// Solves for a lunge destination that places the mob at MaxR/2
-		/// from the target's *predicted* position at arrival time, then
-		/// walks there. Travel time and shoot time compound (mob can't
-		/// move while casting), so we iterate a couple of times on
-		/// leadSec = travelSec + shootSec until the ideal spot converges.
-		/// Arrival lines up with the start of the cast so the hit lands
-		/// centered on the target when the skill resolves.
+		/// Walks to a position one move-speed step in front of the target
+		/// so the cast resolves on where the target is heading rather than
+		/// where they currently stand.
 		/// </summary>
 		protected IEnumerable PreCastLunge(Skill skill, float maxAttackRange)
 		{
@@ -275,73 +260,46 @@ namespace Melia.Zone.Scripting.AI
 			if (this.RangeType != AttackerRangeType.Melee) yield break;
 			if (!this.Entity.CanMove() || this.Entity.IsLocked(LockType.Movement)) yield break;
 
-			var mobPos = this.Entity.Position;
-			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
-			if (mobSpeed <= 0f) yield break;
-
-			var shootSec = (float)skill.Properties.ShootTime.TotalSeconds;
-			var idealDistance = maxAttackRange * 0.5f;
-
-			var leadSec = shootSec;
-			Position idealMobPos = mobPos;
-
-			for (var iter = 0; iter < 3; iter++)
-			{
-				var predictedPos = this.PredictTargetPosition(leadSec);
-
-				// Offset from predicted target toward the mob's current
-				// position, placed at MaxR/2 — that's where we want to
-				// stand when the cast resolves.
-				var away = (mobPos - predictedPos).Normalize2D();
-				if (away.X == 0 && away.Z == 0)
-				{
-					// Mob is exactly on top of the prediction; fall back
-					// to the mob's current facing so we don't freeze.
-					var fallback = (_target.Position - mobPos).Normalize2D();
-					if (fallback.X == 0 && fallback.Z == 0) yield break;
-					away = new Position(-fallback.X, 0, -fallback.Z);
-				}
-
-				idealMobPos = predictedPos + away * idealDistance;
-
-				// Cap how far the mob will commit per lunge so a sprinting
-				// target can't drag the AI across the map.
-				var toIdeal = idealMobPos - mobPos;
-				var commitDist = (float)mobPos.Get2DDistance(idealMobPos);
-				if (commitDist > this.MaxLungeDistance)
-				{
-					var dir = toIdeal.Normalize2D();
-					idealMobPos = mobPos + dir * this.MaxLungeDistance;
-					commitDist = this.MaxLungeDistance;
-				}
-
-				var newLead = (commitDist / mobSpeed) + shootSec;
-
-				// Converged? Bail out early to save a sample.
-				if (Math.Abs(newLead - leadSec) < 0.02f)
-				{
-					leadSec = newLead;
-					break;
-				}
-				leadSec = newLead;
-			}
-
-			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(idealMobPos, this.Entity.AgentRadius, out var validDest, 50f))
+			// Already in range — don't walk, just let the caller cast.
+			if (this.Entity.Position.InRange2D(_target.Position, maxAttackRange))
 				yield break;
 
-			// Start the move and poll actual arrival instead of sleeping
-			// for the pathfinder's estimated duration — the estimate often
-			// overshoots real arrival time (ground snap, coroutine tick
-			// granularity), which shows up in-game as the mob freezing at
-			// the lunge spot before finally casting. The estimate is kept
-			// as a safety cap (+200ms) so a stuck movement can't stall the
-			// routine forever.
-			var estimatedTime = _movement?.MoveTo(validDest) ?? TimeSpan.Zero;
+			// Predicted hit position (shoot-time lead) is already within
+			// MaxR/2 of where we stand, so the cast will land. Skip the
+			// walk entirely and let the caller fire.
+			var shootSec = (float)skill.Properties.ShootTime.TotalSeconds;
+			var shootLeadPos = this.GetLeadPosition(_target, shootSec);
+			if (this.Entity.Position.InRange2D(shootLeadPos, maxAttackRange * 0.5f))
+				yield break;
+
+			// Otherwise lead by mob travel time + skill shoot time so the
+			// hit lands where the target will be when the cast resolves.
+			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+			var distToTarget = (float)this.Entity.Position.Get2DDistance(_target.Position);
+			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
+			var leadSec = travelSec + shootSec;
+
+			var destination = this.GetLeadPosition(_target, leadSec);
+
+			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(destination, this.Entity.AgentRadius, out var validDest, 50f))
+				yield break;
+
+			var estimatedTime = _movement?.MoveStraight(validDest) ?? TimeSpan.Zero;
 			if (estimatedTime <= TimeSpan.Zero) yield break;
 
 			var deadline = DateTime.UtcNow + estimatedTime + TimeSpan.FromMilliseconds(200);
 			while (_movement != null && _movement.IsMoving && DateTime.UtcNow < deadline)
+			{
+				// Target came into range during the walk — stop and cast now
+				// so we don't waste time arriving at a spot we no longer need.
+				if (this.Entity.Position.InRange2D(_target.Position, maxAttackRange))
+				{
+					yield return this.StopMove();
+					yield break;
+				}
+
 				yield return true;
+			}
 		}
 
 		/// <summary>
