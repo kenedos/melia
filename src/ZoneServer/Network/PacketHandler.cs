@@ -376,6 +376,18 @@ namespace Melia.Zone.Network
 				Send.ZC_EQUIP_CARD_INFO(character);
 				Send.ZC_EQUIP_GEM_INFO(character);
 				Send.ZC_NORMAL.HeadgearVisibilityUpdate(character);
+
+				// Broadcast briquetting (weapon appearance)
+				foreach (var equipPair in character.Inventory.GetEquip())
+				{
+					var equipItem = equipPair.Value;
+					if (equipItem == null || equipItem is DummyEquipItem)
+						continue;
+
+					var equipBriquettingIndex = (int)equipItem.Properties.GetFloat(PropertyName.BriquettingIndex);
+					if (equipBriquettingIndex > 0)
+						Send.ZC_NORMAL.UpdateCharacterLook(character, equipBriquettingIndex, equipPair.Key);
+				}
 				Send.ZC_ADDITIONAL_SKILL_POINT(character);
 				Send.ZC_SET_DAYLIGHT_INFO(character);
 				//Send.ZC_DAYLIGHT_FIXED(character);
