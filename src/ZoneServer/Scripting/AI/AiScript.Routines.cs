@@ -217,76 +217,133 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
-		/// Commits a short pre-cast lunge toward the target's predicted
-		/// future position, so the attack lands where the target is moving
-		/// rather than where they currently stand. No-op when the AI is
-		/// ranged, the target is stationary, movement is locked, or the
-		/// skill has no meaningful wind-up.
+		/// Estimates where the target will be <paramref name="leadSec"/>
+		/// seconds from now using the rolling two-stage motion samples.
+		/// Returns the target's current position when the samples are
+		/// missing, stale, or incoherent. Prediction is confidence-weighted
+		/// by straightness (dirA · dirB): straight lines extrapolate fully,
+		/// sharp turns collapse lead toward 0 so the mob doesn't commit
+		/// on a juke.
 		/// </summary>
-		protected IEnumerable PreCastLunge(Skill skill, float attackRange)
+		protected Position PredictTargetPosition(float leadSec)
+		{
+			if (_target == null) return Position.Zero;
+			if (_targetSampleMidTime == default) return _target.Position;
+
+			var now = DateTime.UtcNow;
+			var newHalfSec = (float)(now - _targetSampleMidTime).TotalSeconds;
+			if (newHalfSec < 0.05f) return _target.Position;
+
+			var newHalfDist = (float)_targetSampleMidPos.Get2DDistance(_target.Position);
+			if (newHalfDist < 0.5f) return _target.Position;
+
+			var dirB = (_target.Position - _targetSampleMidPos).Normalize2D();
+			if (dirB.X == 0 && dirB.Z == 0) return _target.Position;
+
+			var speed = newHalfDist / newHalfSec;
+			var targetMaxSpeed = _target.Properties.GetFloat(PropertyName.MSPD);
+			if (targetMaxSpeed > 0f && speed > targetMaxSpeed) speed = targetMaxSpeed;
+
+			var straightness = 0.5f;
+			if (_targetSampleOldTime != default)
+			{
+				var oldHalfDist = (float)_targetSampleOldPos.Get2DDistance(_targetSampleMidPos);
+				if (oldHalfDist >= 0.5f)
+				{
+					var dirA = (_targetSampleMidPos - _targetSampleOldPos).Normalize2D();
+					if (!(dirA.X == 0 && dirA.Z == 0))
+					{
+						var dot = dirA.X * dirB.X + dirA.Z * dirB.Z;
+						straightness = Math.Max(0f, dot);
+					}
+				}
+			}
+
+			return _target.Position + dirB * (speed * leadSec * straightness);
+		}
+
+		/// <summary>
+		/// Solves for a lunge destination that places the mob at MaxR/2
+		/// from the target's *predicted* position at arrival time, then
+		/// walks there. Travel time and shoot time compound (mob can't
+		/// move while casting), so we iterate a couple of times on
+		/// leadSec = travelSec + shootSec until the ideal spot converges.
+		/// Arrival lines up with the start of the cast so the hit lands
+		/// centered on the target when the skill resolves.
+		/// </summary>
+		protected IEnumerable PreCastLunge(Skill skill, float maxAttackRange)
 		{
 			if (_target == null || skill == null) yield break;
 			if (this.RangeType != AttackerRangeType.Melee) yield break;
 			if (!this.Entity.CanMove() || this.Entity.IsLocked(LockType.Movement)) yield break;
 
-			// Need a valid motion sample to tell real travel from jukes.
-			if (_targetMotionSampleTime == default) yield break;
-
-			var sampleAge = (float)(DateTime.UtcNow - _targetMotionSampleTime).TotalSeconds;
-			if (sampleAge < 0.15f) yield break;
-
-			// Observed motion over the sample window — this is what we
-			// lead against, NOT the target's instantaneous facing. A
-			// player jiggling left/right in place produces tiny net
-			// displacement, so the lunge correctly becomes a no-op.
-			var motionDist = (float)_target.Position.Get2DDistance(_targetMotionSamplePos);
-			var actualSpeed = motionDist / sampleAge;
-
-			var targetMaxSpeed = _target.Properties.GetFloat(PropertyName.MSPD);
-			if (targetMaxSpeed <= 0f) yield break;
-
-			// Coherence: fraction of max speed actually achieved. Low
-			// coherence = juking or stopping, don't commit to a lunge.
-			var coherence = actualSpeed / targetMaxSpeed;
-			if (coherence < 0.4f) yield break;
-
+			var mobPos = this.Entity.Position;
 			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
 			if (mobSpeed <= 0f) yield break;
 
-			// Total time until attack lands: wind-up + approach travel.
-			var windupSec = (float)skill.Properties.ShootTime.TotalSeconds;
-			var distToTarget = (float)this.Entity.Position.Get2DDistance(_target.Position);
-			var approxLungeSec = distToTarget / mobSpeed;
-			var totalLeadSec = windupSec + approxLungeSec;
+			var shootSec = (float)skill.Properties.ShootTime.TotalSeconds;
+			var idealDistance = maxAttackRange * 0.5f;
 
-			// Scale lead by the speed ratio. A mob significantly faster
-			// than its target doesn't need much lead — the player can't
-			// escape its range in the short windup anyway. Without this,
-			// fast mobs overshoot wildly on any direction change.
-			var speedRatio = Math.Min(actualSpeed / mobSpeed, 1f);
+			var leadSec = shootSec;
+			Position idealMobPos = mobPos;
 
-			// Lead distance uses observed speed (so a barely-moving target
-			// is barely led) and the speed ratio (so fast mobs don't
-			// overcommit against slow targets).
-			var leadDist = Math.Min(actualSpeed * totalLeadSec * this.LeadFactor * speedRatio, this.MaxLungeDistance);
-			if (leadDist < 5f) yield break;
+			for (var iter = 0; iter < 3; iter++)
+			{
+				var predictedPos = this.PredictTargetPosition(leadSec);
 
-			// Heading: the actual observed travel direction.
-			var motionVec = _target.Position - _targetMotionSamplePos;
-			var dirVector = motionVec.Normalize2D();
-			if (dirVector.X == 0 && dirVector.Z == 0) yield break;
+				// Offset from predicted target toward the mob's current
+				// position, placed at MaxR/2 — that's where we want to
+				// stand when the cast resolves.
+				var away = (mobPos - predictedPos).Normalize2D();
+				if (away.X == 0 && away.Z == 0)
+				{
+					// Mob is exactly on top of the prediction; fall back
+					// to the mob's current facing so we don't freeze.
+					var fallback = (_target.Position - mobPos).Normalize2D();
+					if (fallback.X == 0 && fallback.Z == 0) yield break;
+					away = new Position(-fallback.X, 0, -fallback.Z);
+				}
 
-			var aimPos = _target.Position + dirVector * leadDist;
-			var distToAim = (float)this.Entity.Position.Get2DDistance(aimPos);
-			if (distToAim < 1f) yield break;
+				idealMobPos = predictedPos + away * idealDistance;
 
-			var approachDir = (aimPos - this.Entity.Position).Normalize2D();
-			var lungeDest = this.Entity.Position + approachDir * distToAim;
+				// Cap how far the mob will commit per lunge so a sprinting
+				// target can't drag the AI across the map.
+				var toIdeal = idealMobPos - mobPos;
+				var commitDist = (float)mobPos.Get2DDistance(idealMobPos);
+				if (commitDist > this.MaxLungeDistance)
+				{
+					var dir = toIdeal.Normalize2D();
+					idealMobPos = mobPos + dir * this.MaxLungeDistance;
+					commitDist = this.MaxLungeDistance;
+				}
 
-			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(lungeDest, this.Entity.AgentRadius, out var validDest, 50f))
+				var newLead = (commitDist / mobSpeed) + shootSec;
+
+				// Converged? Bail out early to save a sample.
+				if (Math.Abs(newLead - leadSec) < 0.02f)
+				{
+					leadSec = newLead;
+					break;
+				}
+				leadSec = newLead;
+			}
+
+			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(idealMobPos, this.Entity.AgentRadius, out var validDest, 50f))
 				yield break;
 
-			yield return this.MoveTo(validDest, wait: true);
+			// Start the move and poll actual arrival instead of sleeping
+			// for the pathfinder's estimated duration — the estimate often
+			// overshoots real arrival time (ground snap, coroutine tick
+			// granularity), which shows up in-game as the mob freezing at
+			// the lunge spot before finally casting. The estimate is kept
+			// as a safety cap (+200ms) so a stuck movement can't stall the
+			// routine forever.
+			var estimatedTime = _movement?.MoveTo(validDest) ?? TimeSpan.Zero;
+			if (estimatedTime <= TimeSpan.Zero) yield break;
+
+			var deadline = DateTime.UtcNow + estimatedTime + TimeSpan.FromMilliseconds(200);
+			while (_movement != null && _movement.IsMoving && DateTime.UtcNow < deadline)
+				yield return true;
 		}
 
 		/// <summary>

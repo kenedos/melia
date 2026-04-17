@@ -89,12 +89,15 @@ namespace Melia.Zone.Scripting.AI
 		protected ICombatEntity? _target;
 		private DateTime _targetAcquiredTime;
 
-		// Rolling snapshot of target position for motion-coherence checks.
-		// Used by the predictive lunge to tell real motion from jukes in
-		// place: if the target's net displacement over the sample window
-		// is much smaller than their MSPD would imply, we skip leading.
-		private Position _targetMotionSamplePos;
-		private DateTime _targetMotionSampleTime;
+		// Rolling two-stage snapshot of target position. Mid is the
+		// previous sample; Old is the one before that. Comparing the
+		// Old→Mid and Mid→Now headings tells the lunge predictor how
+		// straight the target is moving, so it can extrapolate fully
+		// on straight runs and collapse to 0 on sharp turns / jukes.
+		private Position _targetSampleOldPos;
+		private DateTime _targetSampleOldTime;
+		private Position _targetSampleMidPos;
+		private DateTime _targetSampleMidTime;
 
 		// State tracking for advanced conditions
 		private readonly Dictionary<string, object> _tempVars = new();
@@ -265,10 +268,10 @@ namespace Melia.Zone.Scripting.AI
 			}
 		}
 		/// <summary>
-		/// Refreshes the rolling snapshot of the current target's position
-		/// so the lunge heuristic can tell real displacement apart from
-		/// jukes in place. Only rotates the snapshot on a fixed interval
-		/// to keep the window wide enough for a meaningful reading.
+		/// Rotates the two-stage motion sample: the previous Mid sample
+		/// becomes Old, and the current target position becomes the new
+		/// Mid. Only rotates on a fixed interval so each window is wide
+		/// enough to produce a meaningful heading reading.
 		/// </summary>
 		private void UpdateTargetMotionSample()
 		{
@@ -276,12 +279,14 @@ namespace Melia.Zone.Scripting.AI
 				return;
 
 			var now = DateTime.UtcNow;
-			var age = now - _targetMotionSampleTime;
+			var age = now - _targetSampleMidTime;
 			if (age < TimeSpan.FromMilliseconds(350))
 				return;
 
-			_targetMotionSamplePos = _target.Position;
-			_targetMotionSampleTime = now;
+			_targetSampleOldPos = _targetSampleMidPos;
+			_targetSampleOldTime = _targetSampleMidTime;
+			_targetSampleMidPos = _target.Position;
+			_targetSampleMidTime = now;
 		}
 
 		protected virtual void CheckEnemies()
@@ -646,16 +651,18 @@ namespace Melia.Zone.Scripting.AI
 					continue;
 				}
 
-				// Get attack range for the skill
-				var attackRange = this.GetAttackRange(skill);
+				// Use the skill's full attack range for the in-range gate;
+				// the mob needs to actually close to max range before
+				// committing to the aim step.
+				var maxAttackRange = this.GetAttackRange(skill);
 
 				// Move into range if needed
-				if (!this.InRangeOf(_target, attackRange))
+				if (!this.InRangeOf(_target, maxAttackRange))
 				{
 					if (RangeType == AttackerRangeType.Melee)
-						yield return this.MoveToAttack(_target, attackRange);
+						yield return this.MoveToAttack(_target, maxAttackRange);
 					else if (RangeType == AttackerRangeType.Ranged)
-						yield return this.MoveToRangedAttack(_target, attackRange);
+						yield return this.MoveToRangedAttack(_target, maxAttackRange);
 					else
 					{
 						if (this.Entity is Mob mob)
@@ -677,13 +684,13 @@ namespace Melia.Zone.Scripting.AI
 				}
 
 				// Attack if in range and able
-				if (this.InRangeOf(_target, attackRange) && this.CanUseSkill(skill, _target))
+				if (this.InRangeOf(_target, maxAttackRange) && this.CanUseSkill(skill, _target))
 				{
-					// Commit to the target's predicted future position so the
-					// attack lands where the player is going, not where they
-					// were at cast time. No-op for ranged, stationary targets,
-					// or skills without a meaningful wind-up.
-					yield return this.PreCastLunge(skill, attackRange);
+					// Commit to the aim: solve for the lunge destination
+					// that places the mob at MaxR/2 from where the target
+					// will be when the cast resolves (accounting for
+					// travel + shoot time), walk there, then attack.
+					yield return this.PreCastLunge(skill, maxAttackRange);
 
 					// Re-verify skill is still usable after the lunge (may have
 					// been staggered, silenced, or target may have died).
@@ -1400,13 +1407,6 @@ namespace Melia.Zone.Scripting.AI
 				};
 			}
 		}
-
-		/// <summary>
-		/// How aggressively the AI leads its target when committing to a
-		/// pre-cast lunge. 0 disables prediction; 1 commits to the full
-		/// predicted position. Tune per AI rank.
-		/// </summary>
-		protected virtual float LeadFactor => 1.0f;
 
 		/// <summary>
 		/// Caps the distance of a single pre-cast lunge so fast-moving
