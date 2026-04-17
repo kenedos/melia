@@ -1564,16 +1564,24 @@ namespace Melia.Zone.Database
 				mc.ExecuteNonQuery();
 			}
 
-			foreach (var revealedMap in account.GetRevealedMaps())
+			var revealedMaps = account.GetRevealedMaps();
+			if (revealedMaps == null) return;
+
+			using (var batch = new BatchInsertCommand("revealedmaps", null, conn, trans))
 			{
-				using (var cmd = new InsertCommand("INSERT INTO `revealedmaps` {parameters}", conn, trans))
+				foreach (var revealedMap in revealedMaps)
 				{
-					cmd.Set("accountId", account.Id);
-					cmd.Set("map", revealedMap.MapId);
-					cmd.Set("explored", revealedMap.Explored);
-					cmd.Set("percentage", revealedMap.Percentage);
-					cmd.Execute();
+					batch.AddRow(new Dictionary<string, object>
+					{
+						{ "accountId", account.Id },
+						{ "map", revealedMap.MapId },
+						{ "explored", revealedMap.Explored },
+						{ "percentage", revealedMap.Percentage }
+					});
 				}
+
+				if (batch.HasRows)
+					batch.Execute();
 			}
 		}
 
