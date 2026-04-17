@@ -192,6 +192,7 @@ namespace Melia.Zone.Scripting.AI
 			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
 
 			var destination = this.GetLeadPosition(target, travelSec);
+			destination = this.ApplyAllySeparation(destination);
 
 			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(destination, this.Entity.AgentRadius, out var validDest, 50f))
 				yield break;
@@ -240,13 +241,62 @@ namespace Melia.Zone.Scripting.AI
 		/// <paramref name="leadSec"/> seconds if it keeps moving in its
 		/// current facing direction at its current move speed.
 		/// </summary>
+		/// <summary>
+		/// Hard cap on how far ahead of the target the lead can project.
+		/// Stops very long travel times (e.g. slow mob chasing a distant
+		/// target) from extrapolating the aim point into the next zip code.
+		/// </summary>
+		private const float MaxLeadDistance = 250f;
+
 		private Position GetLeadPosition(ICombatEntity target, float leadSec)
 		{
 			if (leadSec <= 0f) return target.Position;
 
 			var targetSpeed = target.Properties.GetFloat(PropertyName.MSPD);
 			var distance = targetSpeed * UnitsPerMspdSecond * leadSec;
+			if (distance > MaxLeadDistance) distance = MaxLeadDistance;
 			return target.Position.GetRelative(target.Direction, distance);
+		}
+
+		/// <summary>
+		/// Minimum spacing mobs try to keep from their allies while
+		/// approaching a target. Purely cosmetic — stops packs from
+		/// clumping onto the exact same destination.
+		/// </summary>
+		private const float MinAllySeparation = 7f;
+
+		/// <summary>
+		/// Nudges <paramref name="destination"/> away from any allied mob
+		/// within <see cref="MinAllySeparation"/> so mobs don't stack on
+		/// top of each other. Contribution from each neighbor falls off
+		/// linearly with distance.
+		/// </summary>
+		private Position ApplyAllySeparation(Position destination)
+		{
+			if (this.Entity is not Mob selfMob) return destination;
+
+			var selfPos = this.Entity.Position;
+			var selfHandle = selfMob.Handle;
+			var self = this.Entity;
+
+			var allies = this.Entity.Map.GetActorsInRange<Mob>(selfPos, MinAllySeparation,
+				m => m.Handle != selfHandle && !m.IsDead && self.IsAlly(m));
+
+			if (allies.Count == 0) return destination;
+
+			float px = 0, pz = 0;
+			foreach (var a in allies)
+			{
+				var dist = (float)selfPos.Get2DDistance(a.Position);
+				if (dist <= 0.01f) continue;
+
+				var away = (selfPos - a.Position).Normalize2D();
+				var weight = 1f - (dist / MinAllySeparation);
+				px += away.X * weight;
+				pz += away.Z * weight;
+			}
+
+			return destination + new Position(px * MinAllySeparation, 0, pz * MinAllySeparation);
 		}
 
 		/// <summary>
