@@ -47,6 +47,9 @@ public class CertificateCoinItemScript : GeneralScript
 		character.SystemMessage("GET_MISC_PVP_MINE2{count}", new MsgParameter("count", item.Amount.ToString()));
 		character.AddonMessage(AddonMessage.EARTHTOWERSHOP_BUY_ITEM_RESULT, $"{previousValue}/{newValue}");
 
+		// Keep the propertyshop UI (Mercenary Badge Shop) balance cache in sync.
+		Send.ZC_SHOP_POINT_UPDATE(character.Connection, "uphill_defense_shoppoint", (int)newValue);
+
 		return ItemUseResult.Okay;
 	}
 }

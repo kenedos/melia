@@ -6625,5 +6625,81 @@ namespace Melia.Zone.Network
 			// Broadcast appearance update so other players see the change
 			Send.ZC_UPDATED_PCAPPEARANCE(character);
 		}
+
+		/// <summary>
+		/// Client requests the current balance for a property-shop point
+		/// (e.g. Mercenary Badge count).
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_SHOP_POINT_GET)]
+		public void CZ_SHOP_POINT_GET(IZoneConnection conn, Packet packet)
+		{
+			// Packet body (fixed size 54): padding + 32-byte point name + tail
+			packet.GetBin(12);
+			var pointName = packet.GetString(32);
+
+			var character = conn.SelectedCharacter;
+
+			// Find the shop that uses this point name, read its currency property
+			var shop = Scripting.PropertyShops.FindByPointName(pointName);
+			if (shop == null)
+				return;
+
+			var balance = (int)character.Connection.Account.Properties.GetFloat(shop.CurrencyProperty);
+			Send.ZC_SHOP_POINT_UPDATE(conn, pointName, balance);
+		}
+
+		/// <summary>
+		/// Client is buying an item from a property/point shop (e.g. Mercenary
+		/// Badge Shop). The server looks up the shop+product and deducts the
+		/// currency item.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_BUY_PROPERTYSHOP_ITEM)]
+		public void CZ_BUY_PROPERTYSHOP_ITEM(IZoneConnection conn, Packet packet)
+		{
+			var size = packet.GetShort();
+			var shopName = packet.GetString(32);
+			var count = packet.GetInt();
+			var productIndex = packet.GetInt();
+			var amount = packet.GetInt();
+
+			var character = conn.SelectedCharacter;
+
+			if (!Scripting.PropertyShops.TryGet(shopName, out var shop))
+			{
+				Log.Warning("CZ_BUY_PROPERTYSHOP_ITEM: User '{0}' tried to buy from unknown shop '{1}'.", conn.Account.Name, shopName);
+				return;
+			}
+
+			if (amount <= 0)
+				amount = 1;
+
+			if (productIndex < 0 || productIndex >= shop.Items.Count)
+			{
+				Log.Warning("CZ_BUY_PROPERTYSHOP_ITEM: User '{0}' tried to buy invalid product index {1} from '{2}'.", conn.Account.Name, productIndex, shopName);
+				return;
+			}
+
+			var product = shop.Items[productIndex];
+			var totalCost = product.Price * amount;
+
+			var properties = character.Connection.Account.Properties;
+			var currentBalance = (int)properties.GetFloat(shop.CurrencyProperty);
+			if (currentBalance < totalCost)
+			{
+				character.ServerMessage(Localization.Get("Not enough Mercenary Badges."));
+				return;
+			}
+
+			character.ModifyAccountProperty(shop.CurrencyProperty, -totalCost);
+			character.Inventory.Add(product.ItemId, product.Amount * amount, InventoryAddType.Buy);
+
+			// Refresh the balance in the UI
+			var balance = (int)properties.GetFloat(shop.CurrencyProperty);
+			Send.ZC_SHOP_POINT_UPDATE(conn, shop.PointName, balance);
+		}
 	}
 }
