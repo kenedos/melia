@@ -281,6 +281,12 @@ namespace Melia.Zone.Scripting.AI
 		{
 			if (leadSec <= 0f) return target.Position;
 
+			// Derive prediction on/off deterministically from the mob's
+			// handle — roughly 1 in 3 mobs skip prediction, stable for the
+			// lifetime of the entity, without caching any random state.
+			if (this.Entity.Handle % 3 == 0)
+				return target.Position;
+
 			if (target.Components.TryGet<MovementComponent>(out var movement) && !movement.IsMoving)
 				return target.Position;
 
@@ -308,13 +314,12 @@ namespace Melia.Zone.Scripting.AI
 		/// approaching a target. Purely cosmetic — stops packs from
 		/// clumping onto the exact same destination.
 		/// </summary>
-		private const float MinAllySeparation = 15f;
+		private const float MinAllySeparation = 25f;
 
 		/// <summary>
-		/// Nudges <paramref name="destination"/> away from any allied mob
-		/// within <see cref="MinAllySeparation"/> so mobs don't stack on
-		/// top of each other. Contribution from each neighbor falls off
-		/// linearly with distance.
+		/// If any ally is within <see cref="MinAllySeparation"/> of the
+		/// mob, jitters the destination by up to that same radius so packs
+		/// naturally spread out instead of committing to the same spot.
 		/// </summary>
 		private Position ApplyAllySeparation(Position destination)
 		{
@@ -323,33 +328,19 @@ namespace Melia.Zone.Scripting.AI
 			var selfHandle = selfMob.Handle;
 			var self = this.Entity;
 
-			// Repel from allies near the destination itself (not just near
-			// self) so predicted attack spots don't stack on top of each
-			// other — match against each ally's final destination if they
-			// have one, otherwise their current position.
-			var allies = this.Entity.Map.GetActorsInRange<Mob>(destination, MinAllySeparation,
-				m => m.Handle != selfHandle && !m.IsDead && self.IsAlly(m));
+			var hasNearbyAlly = this.Entity.Map.GetActorsInRange<Mob>(this.Entity.Position, MinAllySeparation,
+				m => m.Handle != selfHandle && !m.IsDead && self.IsAlly(m)).Count > 0;
 
-			if (allies.Count == 0) return destination;
+			if (!hasNearbyAlly) return destination;
 
-			float px = 0, pz = 0;
-			foreach (var a in allies)
-			{
-				var allyPos = a.Components.TryGet<MovementComponent>(out var am) && am.IsMoving
-					? am.FinalDestination
-					: a.Position;
+			// Derive a stable angle and radius from the mob's handle so
+			// every mob has its own persistent offset around the target.
+			var angle = (selfHandle * 137 % 360) * Math.PI / 180.0;
+			var radius = MinAllySeparation * (0.5f + (selfHandle % 11) / 20f);
+			var offsetX = (float)Math.Cos(angle) * radius;
+			var offsetZ = (float)Math.Sin(angle) * radius;
 
-				var dist = (float)destination.Get2DDistance(allyPos);
-				if (dist <= 0.01f) continue;
-				if (dist >= MinAllySeparation) continue;
-
-				var away = (destination - allyPos).Normalize2D();
-				var weight = 1f - (dist / MinAllySeparation);
-				px += away.X * weight;
-				pz += away.Z * weight;
-			}
-
-			return destination + new Position(px * MinAllySeparation, 0, pz * MinAllySeparation);
+			return new Position(destination.X + offsetX, destination.Y, destination.Z + offsetZ);
 		}
 
 		/// <summary>
