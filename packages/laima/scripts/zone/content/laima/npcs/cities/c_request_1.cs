@@ -35,7 +35,7 @@ public class CRequest1NpcScript : GeneralScript
 	public const string MythicKillsVariable = "Laima.Quests.c_request_1.Quest1001.MythicKills";
 
 	public const int MercenaryBadgeItemId = 646076;
-	public const int MythicKillsPerReward = 3;
+	public const int MythicKillsPerReward = 1;
 	public const int BadgesPerReward = 50;
 
 	protected override void Load()
@@ -160,12 +160,7 @@ public class CRequest1NpcScript : GeneralScript
 			character.Inventory.Add(MercenaryBadgeItemId, badges, InventoryAddType.PickUp);
 		}
 
-		var pending = character.Variables.Perm.GetInt(MythicKillsVariable, 0);
-		var untilNext = MythicKillsPerReward - (pending % MythicKillsPerReward);
-		if (pending == 0)
-			untilNext = MythicKillsPerReward;
-
-		var choice = await dialog.Select(LF("Ledger's open. You're sitting on {0} unclaimed mythic kills — one more payout every {1} more. What'll it be?", pending, untilNext),
+		var choice = await dialog.Select(L("Ledger's open. Fifty badges per mythic, paid the moment you report in. What'll it be?"),
 			Option(L("Tell me a mythic story"), "story"),
 			Option(L("I'll get back to the hunt"), "leave")
 		);
@@ -176,7 +171,7 @@ public class CRequest1NpcScript : GeneralScript
 
 	private async Task OfferHuntContract(Dialog dialog, Character character, QuestId questId)
 	{
-		var choice = await dialog.Select(L("So. Want contract work? The standing bounty is simple: three mythics, fifty badges. Bring me three more, fifty more. As long as you keep hunting, I keep paying — the ledger never closes."),
+		var choice = await dialog.Select(L("So. Want contract work? The standing bounty is simple: one mythic, fifty badges. Bring me one more, fifty more. As long as you keep hunting, I keep paying — the ledger never closes."),
 			Option(L("Sign me up"), "accept"),
 			Option(L("Tell me a mythic story"), "story"),
 			Option(L("Another time"), "leave")
@@ -1053,7 +1048,7 @@ public class MythicHuntersLedgerQuest : QuestScript
 		this.SetId("c_request_1", 1001);
 		this.SetName(L("Mythic Hunters' Ledger"));
 		this.SetType(QuestType.Repeat);
-		this.SetDescription(L("Captain Davros Renn of the Fedimian Mercenary Guild pays fifty badges for every three mythic beasts you bring down. Mythics prowl only the most dangerous maps, and the ledger never closes — unredeemed kills stay on the books until you return to collect."));
+		this.SetDescription(L("Captain Davros Renn of the Fedimian Mercenary Guild pays fifty badges for every mythic beast you bring down. Mythics prowl only the most dangerous maps, and the ledger never closes — unredeemed kills stay on the books until you return to collect."));
 		this.SetLocation("c_request_1");
 		this.SetAutoTracked(true);
 
