@@ -184,50 +184,73 @@ namespace Melia.Zone.Scripting.AI
 				yield break;
 			}
 
-			// Lead by the time it'll take the mob itself to travel to the
-			// target — keeps the approach aimed at where the target will
-			// be when the mob arrives, not where they were when it left.
-			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
-			var distToTarget = (float)this.Entity.Position.Get2DDistance(target.Position);
-			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
-
-			var destination = this.GetLeadPosition(target, travelSec);
-			destination = this.ApplyAllySeparation(destination);
-
-			if (!this.Entity.Map.Ground.TryGetNearestValidPosition(destination, this.Entity.AgentRadius, out var validDest, 50f))
-				yield break;
-
-			var estimatedTime = _movement?.MoveStraight(validDest) ?? TimeSpan.Zero;
-			if (estimatedTime <= TimeSpan.Zero) yield break;
-
 			var shootSec = skill != null ? (float)skill.Properties.ShootTime.TotalSeconds : 0f;
 			var commitRange = attackRange * 0.5f;
 
-			var deadline = DateTime.UtcNow + estimatedTime + TimeSpan.FromMilliseconds(200);
-			while (_movement != null && _movement.IsMoving && DateTime.UtcNow < deadline)
+			// Keeps re-aiming the mob at the target as it moves, re-issuing
+			// MoveStraight before the current path naturally completes so
+			// the client never sees an idle gap between packets.
+			Position lastDestination = default;
+			var nextRepath = DateTime.MinValue;
+			var arrivedInRange = false;
+
+			while (true)
 			{
-				if (this.Entity.IsDead || target.IsDead || this.Entity.Map != target.Map)
-					break;
+				if (_movement == null) break;
+				if (this.Entity.IsDead || target.IsDead || this.Entity.Map != target.Map) break;
 
 				if (this.Entity.Position.InRange2D(target.Position, rangeWithBuffer))
+				{
+					arrivedInRange = true;
 					break;
+				}
 
-				// If a skill was supplied, break the chase as soon as the
-				// shoot-time lead position falls within MaxR/2 so the
-				// caller can fire immediately instead of committing to
-				// the full walk. Suppressed when the target is running
-				// away — we don't want the mob to cast at their back.
+				// Skill commit shortcut: stop the walk early once the
+				// shoot-time lead is within MaxR/2, so the caller can fire.
 				if (skill != null && this.IsTargetApproaching())
 				{
 					var leadPos = this.GetLeadPosition(target, shootSec);
 					if (this.Entity.Position.InRange2D(leadPos, commitRange))
+					{
+						arrivedInRange = true;
 						break;
+					}
+				}
+
+				var now = DateTime.UtcNow;
+
+				// Recompute the lead every ~250ms or whenever the target
+				// has drifted far enough from the last destination that
+				// the current path is no longer useful.
+				var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+				var distToTarget = (float)this.Entity.Position.Get2DDistance(target.Position);
+				var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
+
+				var destination = this.GetLeadPosition(target, travelSec);
+				destination = this.ApplyAllySeparation(destination);
+
+				var needsRepath = now >= nextRepath
+					|| !_movement.IsMoving
+					|| (float)destination.Get2DDistance(lastDestination) > 25f;
+
+				if (needsRepath)
+				{
+					if (this.Entity.Map.Ground.TryGetNearestValidPosition(destination, this.Entity.AgentRadius, out var validDest, 50f))
+					{
+						if (_movement.MoveTo(validDest) > TimeSpan.Zero)
+						{
+							lastDestination = validDest;
+							nextRepath = now + TimeSpan.FromMilliseconds(100);
+						}
+					}
 				}
 
 				yield return true;
 			}
 
-			yield return this.StopMove();
+			// Only stop if we actually arrived in attack range.
+			if (arrivedInRange)
+				yield return this.StopMove();
 		}
 
 		/// <summary>
@@ -246,16 +269,38 @@ namespace Melia.Zone.Scripting.AI
 		/// Stops very long travel times (e.g. slow mob chasing a distant
 		/// target) from extrapolating the aim point into the next zip code.
 		/// </summary>
-		private const float MaxLeadDistance = 250f;
+		private const float MaxLeadDistance = 100f;
+
+		/// <summary>
+		/// Hard cap on lead horizon. If the mob can't reach the predicted
+		/// spot within this many seconds, the prediction is abandoned.
+		/// </summary>
+		private const float MaxLeadSeconds = 0.75f;
 
 		private Position GetLeadPosition(ICombatEntity target, float leadSec)
 		{
 			if (leadSec <= 0f) return target.Position;
 
+			if (target.Components.TryGet<MovementComponent>(out var movement) && !movement.IsMoving)
+				return target.Position;
+
 			var targetSpeed = target.Properties.GetFloat(PropertyName.MSPD);
 			var distance = targetSpeed * UnitsPerMspdSecond * leadSec;
 			if (distance > MaxLeadDistance) distance = MaxLeadDistance;
-			return target.Position.GetRelative(target.Direction, distance);
+
+			var leadPos = target.Position.GetRelative(target.Direction, distance);
+
+			// Give up on the prediction if the mob itself can't reach the
+			// lead point within MaxLeadSeconds
+			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
+			if (mobSpeed > 0f)
+			{
+				var mobDistToLead = (float)this.Entity.Position.Get2DDistance(leadPos);
+				var mobTravelSec = mobDistToLead / (mobSpeed * UnitsPerMspdSecond);
+				if (mobTravelSec > MaxLeadSeconds) return target.Position;
+			}
+
+			return leadPos;
 		}
 
 		/// <summary>
@@ -263,7 +308,7 @@ namespace Melia.Zone.Scripting.AI
 		/// approaching a target. Purely cosmetic — stops packs from
 		/// clumping onto the exact same destination.
 		/// </summary>
-		private const float MinAllySeparation = 7f;
+		private const float MinAllySeparation = 15f;
 
 		/// <summary>
 		/// Nudges <paramref name="destination"/> away from any allied mob
@@ -275,11 +320,14 @@ namespace Melia.Zone.Scripting.AI
 		{
 			if (this.Entity is not Mob selfMob) return destination;
 
-			var selfPos = this.Entity.Position;
 			var selfHandle = selfMob.Handle;
 			var self = this.Entity;
 
-			var allies = this.Entity.Map.GetActorsInRange<Mob>(selfPos, MinAllySeparation,
+			// Repel from allies near the destination itself (not just near
+			// self) so predicted attack spots don't stack on top of each
+			// other — match against each ally's final destination if they
+			// have one, otherwise their current position.
+			var allies = this.Entity.Map.GetActorsInRange<Mob>(destination, MinAllySeparation,
 				m => m.Handle != selfHandle && !m.IsDead && self.IsAlly(m));
 
 			if (allies.Count == 0) return destination;
@@ -287,10 +335,15 @@ namespace Melia.Zone.Scripting.AI
 			float px = 0, pz = 0;
 			foreach (var a in allies)
 			{
-				var dist = (float)selfPos.Get2DDistance(a.Position);
-				if (dist <= 0.01f) continue;
+				var allyPos = a.Components.TryGet<MovementComponent>(out var am) && am.IsMoving
+					? am.FinalDestination
+					: a.Position;
 
-				var away = (selfPos - a.Position).Normalize2D();
+				var dist = (float)destination.Get2DDistance(allyPos);
+				if (dist <= 0.01f) continue;
+				if (dist >= MinAllySeparation) continue;
+
+				var away = (destination - allyPos).Normalize2D();
 				var weight = 1f - (dist / MinAllySeparation);
 				px += away.X * weight;
 				pz += away.Z * weight;
