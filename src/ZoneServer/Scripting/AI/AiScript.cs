@@ -1472,6 +1472,9 @@ namespace Melia.Zone.Scripting.AI
 			if ((now - _lastStaggerTime) < this.StaggerCooldown)
 				return;
 
+			if (!ZoneServer.Instance.Conf.World.MonsterStagger)
+				return;
+
 			if (this.Entity.ApplyStagger(attacker))
 				_lastStaggerTime = now;
 		}
