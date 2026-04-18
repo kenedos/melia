@@ -226,12 +226,12 @@ public class CardAlbumBossRewardsScript : GeneralScript
 			return;
 		}
 
-		// Get top damage dealers
+		// Get all damage dealers, then credit pets/summons/OOB to their
+		// master so the ranking is by total damage per player.
 		var combatComponent = mob.Components.Get<CombatComponent>();
-		var topAttackers = combatComponent?.GetTopAttackersByDamage(MAX_DPS_REWARDS);
+		var allAttackers = combatComponent?.GetTopAttackersByDamage(int.MaxValue);
 
-		// Resolve attackers to characters (summons -> master) and deduplicate
-		var rankedPlayers = ResolveToCharacters(topAttackers, mob);
+		var rankedPlayers = ResolveToCharacters(allAttackers, mob, MAX_DPS_REWARDS);
 
 		// Fill remaining slots with nearby support players (within SUPPORT_RANGE)
 		if (rankedPlayers.Count < MAX_DPS_REWARDS)
@@ -250,52 +250,39 @@ public class CardAlbumBossRewardsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Resolves combat entities to their owning characters.
-	/// Summons/pets credit their masters. Deduplicates by character ID.
+	/// Aggregates damage per beneficiary player, crediting pets/summons/OOB
+	/// to their master, then returns the top N characters by total damage.
 	/// </summary>
-	private List<Character> ResolveToCharacters(List<(ICombatEntity Attacker, float Damage)> attackers, Mob boss)
+	private List<Character> ResolveToCharacters(List<(ICombatEntity Attacker, float Damage)> attackers, Mob boss, int max)
 	{
 		var result = new List<Character>();
-		var seenIds = new HashSet<long>();
 
 		if (attackers == null)
 			return result;
 
+		var damageByCharacter = new Dictionary<long, (Character Character, float Damage)>();
+
 		foreach (var (attacker, damage) in attackers)
 		{
-			var character = GetOwningCharacter(attacker);
-			if (character == null)
+			var beneficiary = boss.GetKillBeneficiary(attacker);
+			if (beneficiary == null)
 				continue;
 
-			if (seenIds.Contains(character.DbId))
+			if (beneficiary.Map != boss.Map)
 				continue;
 
-			// Verify character is still on the same map
-			if (character.Map != boss.Map)
-				continue;
-
-			result.Add(character);
-			seenIds.Add(character.DbId);
+			if (damageByCharacter.TryGetValue(beneficiary.DbId, out var entry))
+				damageByCharacter[beneficiary.DbId] = (entry.Character, entry.Damage + damage);
+			else
+				damageByCharacter[beneficiary.DbId] = (beneficiary, damage);
 		}
 
+		result.AddRange(damageByCharacter.Values
+			.OrderByDescending(v => v.Damage)
+			.Take(max)
+			.Select(v => v.Character));
+
 		return result;
-	}
-
-	/// <summary>
-	/// Gets the character that owns this combat entity.
-	/// Returns the master for summons/pets, or the entity itself if it's a character.
-	/// </summary>
-	private Character GetOwningCharacter(ICombatEntity entity)
-	{
-		if (entity is Character character)
-			return character;
-
-		// Check if this is a summon with a master
-		var aiComponent = entity.Components.Get<AiComponent>();
-		if (aiComponent?.Script.GetMaster() is Character master)
-			return master;
-
-		return null;
 	}
 
 	/// <summary>
