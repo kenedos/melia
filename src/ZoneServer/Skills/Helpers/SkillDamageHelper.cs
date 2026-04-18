@@ -147,7 +147,6 @@ namespace Melia.Zone.Skills.Helpers
 			float hitDelay = 0
 			)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(hitDelay));
 
 			if (caster == null || caster.IsDead)
 				return;
@@ -209,6 +208,7 @@ namespace Melia.Zone.Skills.Helpers
 
 
 			var skillHitDelay = skill.Properties.HitDelay;
+			var isForce = skill.Data.HitType == SkillHitType.Force;
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				if (target == null || target.IsDead || !caster.CanDamage(target))
@@ -221,13 +221,23 @@ namespace Melia.Zone.Skills.Helpers
 					skillHitResult = modifySkillHitResult(skill, caster, target, skillHitResult);
 
 				target.TakeDamage(skillHitResult.Damage, caster);
-				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(hitDelay), skillHitDelay);
-				skillHit.HitEffect = HitEffect.Impact;
-				if (skillModifier == SkillModifier.Default)
-					skillHit.VarInfoCount = 0;
-				hits.Add(skillHit);
+
+				if (isForce)
+				{
+					var hitInfo = new HitInfo(caster, target, skill, skillHitResult, TimeSpan.Zero);
+					Send.ZC_HIT_INFO(caster, target, hitInfo);
+				}
+				else
+				{
+					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(hitDelay), skillHitDelay);
+					skillHit.HitEffect = HitEffect.Impact;
+					if (skillModifier == SkillModifier.Default)
+						skillHit.VarInfoCount = 0;
+					hits.Add(skillHit);
+				}
 			}
-			Send.ZC_SKILL_HIT_INFO(caster, hits);
+			if (!isForce)
+				Send.ZC_SKILL_HIT_INFO(caster, hits);
 		}
 
 		/// <summary>
@@ -883,6 +893,31 @@ namespace Melia.Zone.Skills.Helpers
 
 			mob.EndCasting(skill);
 			return true;
+		}
+
+		private const float UnitsPerMspdSecond = 2.5f;
+
+		public static Position GetLeadPosition(ICombatEntity target, int leadMs, float maxLeadDistance = 150f)
+		{
+			if (target == null || leadMs <= 0)
+				return target?.Position ?? Position.Zero;
+
+			if (!target.Components.TryGet<MovementComponent>(out var movement) || !movement.IsMoving)
+				return target.Position;
+
+			var speed = target.Properties.GetFloat(PropertyName.MSPD);
+			if (speed <= 0f)
+				return target.Position;
+
+			var distance = speed * UnitsPerMspdSecond * (leadMs / 1000f);
+			if (distance > maxLeadDistance)
+				distance = maxLeadDistance;
+
+			var jitter = RandomProvider.Get().Next(15, 31);
+			if (RandomProvider.Get().Next(2) == 0) jitter = -jitter;
+			var leadDir = target.Direction.AddDegreeAngle(jitter);
+
+			return target.Position.GetRelative(leadDir, distance);
 		}
 
 	}

@@ -174,9 +174,11 @@ namespace Melia.Zone.Scripting.AI
 			if (!this.Entity.CanMove()) yield break;
 			if (this.Entity.IsLocked(LockType.Movement)) yield break;
 
-			var rangeWithBuffer = this.Entity is Mob mob && mob.Rank == MonsterRank.Boss
-				? attackRange * 0.7f
-				: attackRange - 10;
+			var rangeWithBuffer = this.RangeType == AttackerRangeType.Ranged
+				? attackRange
+				: this.Entity is Mob mob && mob.Rank == MonsterRank.Boss
+					? attackRange * 0.7f
+					: attackRange - 10;
 
 			if (this.Entity.Position.InRange2D(target.Position, rangeWithBuffer))
 			{
@@ -185,7 +187,7 @@ namespace Melia.Zone.Scripting.AI
 			}
 
 			var shootSec = skill != null ? (float)skill.Properties.ShootTime.TotalSeconds : 0f;
-			var commitRange = attackRange * 0.5f;
+			var commitRange = this.RangeType == AttackerRangeType.Ranged ? attackRange : attackRange * 0.5f;
 
 			// Keeps re-aiming the mob at the target as it moves, re-issuing
 			// MoveStraight before the current path naturally completes so
@@ -406,25 +408,25 @@ namespace Melia.Zone.Scripting.AI
 		{
 			var currentDist = this.Entity.Position.Get2DDistance(target.Position);
 
-			if (currentDist > idealRange * 1.2f)
+			if (currentDist > idealRange * 1.1f)
 			{
 				// Approach if too far
 				yield return this.MoveToAttack(target, idealRange);
 			}
-			else if (currentDist < idealRange * 0.8f)
+			else if (currentDist < idealRange * 0.7f)
 			{
 				// Retreat if too close
-				var retreatPos = this.GetRetreatPosition(target, idealRange);
+				var dirFromTarget = target.Position.GetDirection(this.Entity.Position);
+				var retreatPos = target.Position.GetRelative(dirFromTarget, idealRange * 0.7f);
 				yield return this.MoveTo(retreatPos);
 			}
 			else
 			{
 				// Strafe sideways while maintaining range
-				var currentDir = this.Entity.Position.GetDirection(target.Position);
-				var strafeDir = RandomProvider.Get().Next(2) == 0
-					? currentDir.Left
-					: currentDir.Right;
-				var strafePos = this.Entity.Position.GetRelative(strafeDir, idealRange / 2);
+				var dirFromTarget = target.Position.GetDirection(this.Entity.Position);
+				var arcDegrees = RandomProvider.Get().Next(2) == 0 ? -20f : 20f;
+				var orbitDir = dirFromTarget.AddDegreeAngle(arcDegrees);
+				var strafePos = target.Position.GetRelative(orbitDir, idealRange);
 				yield return this.MoveTo(strafePos);
 			}
 		}

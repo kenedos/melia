@@ -683,17 +683,26 @@ namespace Melia.Zone.Scripting.AI
 
 					var shootSec = (float)skill.Properties.ShootTime.TotalSeconds;
 					var leadPos = this.GetLeadPosition(_target, shootSec);
-					return this.Entity.Position.InRange2D(leadPos, maxAttackRange * 0.5f);
+					var commitRange = this.RangeType == AttackerRangeType.Ranged ? maxAttackRange : maxAttackRange * 0.5f;
+					return this.Entity.Position.InRange2D(leadPos, commitRange);
 				}
 
 				// Move into range if needed (and the lead-based commit
-				// isn't already satisfied).
-				if (!this.InRangeOf(_target, maxAttackRange) && !CanCommitCast())
+				// isn't already satisfied). Ranged mobs also reposition
+				// when the target is too close, kiting back toward MaxR.
+				var needsReposition = RangeType == AttackerRangeType.Ranged
+					|| (!this.InRangeOf(_target, maxAttackRange) && !CanCommitCast());
+				if (needsReposition)
 				{
 					if (RangeType == AttackerRangeType.Melee)
-						yield return this.MoveToAttack(_target, maxAttackRange, skill);
+					{
+						if (!this.InRangeOf(_target, maxAttackRange) && !CanCommitCast())
+							yield return this.MoveToAttack(_target, maxAttackRange, skill);
+					}
 					else if (RangeType == AttackerRangeType.Ranged)
+					{
 						yield return this.MoveToRangedAttack(_target, maxAttackRange);
+					}
 					else
 					{
 						if (this.Entity is Mob mob)

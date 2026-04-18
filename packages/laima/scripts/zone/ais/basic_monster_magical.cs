@@ -20,8 +20,10 @@ public class BasicMonsterMagicalAiScript : AiScript
 		this.MaxRoamDistance = 1000;
 
 		During("Idle", CheckEnemies);
+		During("Idle", CheckFear);
 		During("Attack", CheckTarget);
 		During("Attack", CheckMaster);
+		During("Attack", CheckFear);
 	}
 
 	protected override void Root()

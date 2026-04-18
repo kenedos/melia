@@ -1463,7 +1463,9 @@ namespace Melia.Zone.Commands
 
 			amount = Math2.Clamp(1, 100, amount);
 
-			var aiName = "BasicMonster";
+			var aiName = !string.IsNullOrWhiteSpace(monsterData.AiName) && monsterData.AiName != "None"
+				? monsterData.AiName
+				: "BasicMonster";
 			if (args.TryGet("ai", out var aiNameArg))
 			{
 				if (aiNameArg.ToLower() == "none")
