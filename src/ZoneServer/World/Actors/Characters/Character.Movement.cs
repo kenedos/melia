@@ -224,6 +224,28 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void Warp(int mapId, Position pos)
 		{
+			if (!ZoneServer.Instance.World.Maps.TryGet(mapId, out var map))
+				throw new ArgumentException("Map '" + mapId + "' not found in data.");
+
+			if (this.MapId == mapId)
+			{
+				this.Position = pos;
+				Send.ZC_SET_POS(this);
+
+				if (this.IsRiding && this.ActiveCompanion is Companion ridingCompanion)
+				{
+					ridingCompanion.Position = pos;
+					Send.ZC_SET_POS(ridingCompanion);
+				}
+				return;
+			}
+
+			if (ZoneServer.Instance.ServerList.GetZoneServers(mapId).Length == 0)
+			{
+				this.MsgBox("The map is currently unavailable. Please try again later.");
+				return;
+			}
+
 			lock (_warpLock)
 			{
 				if (this.IsWarping)
@@ -233,39 +255,17 @@ namespace Melia.Zone.World.Actors.Characters
 
 			try
 			{
-				if (!ZoneServer.Instance.World.Maps.TryGet(mapId, out var map))
-					throw new ArgumentException("Map '" + mapId + "' not found in data.");
+				this.CancelOutOfBody();
 
-				if (this.MapId == mapId)
+				if (map is DynamicMap)
 				{
-					this.Position = pos;
-					Send.ZC_SET_POS(this);
-
-					if (this.IsRiding && this.ActiveCompanion is Companion ridingCompanion)
-					{
-						ridingCompanion.Position = pos;
-						Send.ZC_SET_POS(ridingCompanion);
-					}
-
-					lock (_warpLock)
-					{
-						this.IsWarping = false;
-					}
+					this.Etc.Properties.SetFloat(PropertyName.LastWarpMapID, this.Map.Id);
+					mapId = map.Id;
 				}
-				else
-				{
-					this.CancelOutOfBody();
+				this.MapId = mapId;
+				this.Position = pos;
 
-					if (map is DynamicMap)
-					{
-						this.Etc.Properties.SetFloat(PropertyName.LastWarpMapID, this.Map.Id);
-						mapId = map.Id;
-					}
-					this.MapId = mapId;
-					this.Position = pos;
-
-					Send.ZC_MOVE_ZONE(this.Connection);
-				}
+				Send.ZC_MOVE_ZONE(this.Connection);
 			}
 			catch
 			{
