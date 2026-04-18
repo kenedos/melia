@@ -993,6 +993,18 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
+		/// Clears hate for a single target.
+		/// </summary>
+		protected void RemoveHate(ICombatEntity entity)
+		{
+			if (entity == null)
+				return;
+
+			if (_hateLevels.Remove(entity.Handle))
+				_mostHatedDirty = true;
+		}
+
+		/// <summary>
 		/// Increase hate levels of enemies that are nearby.
 		/// </summary>
 		/// <param name="elapsed"></param>

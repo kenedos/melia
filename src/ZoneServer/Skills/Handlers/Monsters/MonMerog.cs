@@ -136,7 +136,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			if (target == null)
@@ -147,15 +146,17 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			}
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 1200 + (int)(caster.Position.Get2DDistance(target.Position) * 0.8);
+			var leadPos = GetLeadPosition(target, hitDelay);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 
-			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
+			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos, hitDelay));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay)
 		{
 			var area = new Circle(target.Position, 10f);
-			var hitDelay = 1200 + (int)(caster.Position.Get2DDistance(target.Position) * 0.8);
 			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
 			_ = ForceAttackEffect(caster, target, skill, hitDelay);
@@ -187,15 +188,17 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			}
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 1400;
+			var leadPos = GetLeadPosition(target, hitDelay);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 
-			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
+			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos, hitDelay));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay)
 		{
 			var area = new Circle(target.Position, 10f);
-			var hitDelay = 1400;
 			var aniTime = 1600;
 			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, area, hitDelay, aniTime);

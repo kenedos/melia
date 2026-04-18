@@ -112,6 +112,11 @@ namespace Melia.Zone.Scripting.AI
 			// Transition to idle if the target has vanished or is out of range
 			if (this.EntityGone(_target) || !this.InRangeOf(_target, MaxChaseDistance) || !this.IsHating(_target))
 			{
+				// Drop hate on out-of-reach targets so Idle won't immediately
+				// re-pick them and bounce the summon between Idle/Attack.
+				if (_target != null && !this.EntityGone(_target) && !this.InRangeOf(_target, MaxChaseDistance))
+					this.RemoveHate(_target);
+
 				this._target = null;
 				this.StartRoutine("StopAndIdle", this.StopAndIdle());
 			}
@@ -320,11 +325,14 @@ namespace Melia.Zone.Scripting.AI
 			if (mostHated == null)
 				return;
 
-			// If the most hated target is too far from master, reset hate
 			var distanceToMaster = mostHated.Position.Get2DDistance(master.Position);
-			if (distanceToMaster > DefaultMaxMasterDistance)
+			var distanceToSelf = mostHated.Position.Get2DDistance(this.Entity.Position);
+
+			// Drop hate if the target is unreachable — either beyond the
+			// summon's chase range or beyond the master's follow range.
+			if (distanceToMaster > DefaultMaxMasterDistance || distanceToSelf > MaxChaseDistance)
 			{
-				this.RemoveAllHate();
+				this.RemoveHate(mostHated);
 				this._target = null;
 			}
 		}

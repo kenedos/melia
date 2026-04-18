@@ -61,7 +61,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			if (target == null)
@@ -72,15 +71,17 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			}
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 400 + (int)(caster.Position.Get2DDistance(target.Position) * 1.9);
+			var leadPos = GetLeadPosition(target, hitDelay);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 
-			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
+			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos, hitDelay));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay)
 		{
 			var splashArea = new CircleF(farPos, 15f);
-			var hitDelay = 400 + (int)(caster.Position.Get2DDistance(target.Position) * 1.9);
 			var aniTime = hitDelay + 200;
 			var hits = new List<SkillHitInfo>();
 			_ = ForceAttackEffect(caster, target, skill, hitDelay);
