@@ -39,12 +39,17 @@ public class CertificateCoinItemScript : GeneralScript
 	{
 		var properties = character.Connection.Account.Properties;
 		var previousValue = properties.GetFloat(PropertyName.MISC_PVP_MINE2);
+		var amount = item.Amount;
 
-		if (!character.ModifyAccountProperty(PropertyName.MISC_PVP_MINE2, item.Amount))
+		if (!character.ModifyAccountProperty(PropertyName.MISC_PVP_MINE2, amount))
 			return ItemUseResult.Fail;
 
+		// Consume the remaining badges in the stack
+		if (amount > 1)
+			character.Inventory.Remove(item, amount - 1, InventoryItemRemoveMsg.Used);
+
 		var newValue = properties.GetFloat(PropertyName.MISC_PVP_MINE2);
-		character.SystemMessage("GET_MISC_PVP_MINE2{count}", new MsgParameter("count", item.Amount.ToString()));
+		character.SystemMessage("GET_MISC_PVP_MINE2{count}", new MsgParameter("count", amount.ToString()));
 		character.AddonMessage(AddonMessage.EARTHTOWERSHOP_BUY_ITEM_RESULT, $"{previousValue}/{newValue}");
 
 		// Keep the propertyshop UI (Mercenary Badge Shop) balance cache in sync.

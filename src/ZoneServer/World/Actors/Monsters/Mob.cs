@@ -663,7 +663,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// </summary>
 		/// <param name="killer"></param>
 		/// <returns></returns>
-		private Character GetKillBeneficiary(ICombatEntity killer)
+		public Character GetKillBeneficiary(ICombatEntity killer)
 		{
 			if (killer == null)
 				return null;

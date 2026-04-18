@@ -5554,26 +5554,33 @@ namespace Melia.Zone.Commands
 			{
 				var itemIds = File.ReadAllLines(filePath);
 
-				foreach (var line in itemIds)
+				foreach (var rawLine in itemIds)
 				{
-					if (int.TryParse(line.Trim(), out var itemId))
+					var line = rawLine.Trim();
+					if (string.IsNullOrEmpty(line))
+						continue;
+
+					ItemData itemData = null;
+
+					if (int.TryParse(line, out var itemId))
 					{
-						if (ZoneServer.Instance.Data.ItemDb.Contains(itemId))
-						{
-							var item = new Item(itemId);
-							target.Inventory.Add(item, InventoryAddType.PickUp);
-							addedCount++;
-						}
-						else
-						{
-							failedCount++;
-							Log.Warning($"Item with ID {itemId} not found in the database.");
-						}
+						ZoneServer.Instance.Data.ItemDb.TryFind(itemId, out itemData);
+					}
+					else
+					{
+						itemData = ZoneServer.Instance.Data.ItemDb.Find(a => a.ClassName.Equals(line, StringComparison.InvariantCultureIgnoreCase));
+					}
+
+					if (itemData != null)
+					{
+						var item = new Item(itemData.Id);
+						target.Inventory.Add(item, InventoryAddType.PickUp);
+						addedCount++;
 					}
 					else
 					{
 						failedCount++;
-						Log.Warning($"Invalid item ID format: {line}");
+						Log.Warning($"Item '{line}' not found in the database.");
 					}
 				}
 

@@ -59,8 +59,21 @@ namespace Melia.Zone.World.Quests.Objectives
 			if (args.Target is not IMonster monster)
 				return;
 
-			if (args.Attacker is not Character character)
+			Character character;
+			if (args.Target is Mob mob)
+			{
+				character = mob.GetKillBeneficiary(args.Attacker);
+				if (character == null)
+					return;
+			}
+			else if (args.Attacker is Character attackerCharacter)
+			{
+				character = attackerCharacter;
+			}
+			else
+			{
 				return;
+			}
 
 			// Get all characters that should receive quest progress
 			var eligibleCharacters = this.GetEligibleCharacters(character);

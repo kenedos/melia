@@ -37,11 +37,11 @@ function M_QUESTS_DETAILS_ADD_OBJECTIVES(frame, x, y, quest)
 				lblDesc:SetText(string.format("{@st68}?{/}"))
 				lblDesc:SetTextTooltip("{@st59}Continue the quest to reveal this objective.{/}")
 			else
-				local t=objective.Text
-                if objective.TargetCount>1 then t=t.." ("..objective.Count.."/"..objective.TargetCount..")" end
-                if objective.Monsters and #objective.Monsters>0 then t=t.."{nl}• "..table.concat(objective.Monsters,"{nl}• ") end
-                lblDesc:SetText(string.format("{@st68}%s{/}",t))
-            end
+				local t,c=objective.Text,objective.Count
+				if objective.Unlimited then t=t.." ("..c..")" elseif objective.TargetCount>1 then t=t.." ("..c.."/"..objective.TargetCount..")" end
+				if objective.Monsters and #objective.Monsters>0 then t=t.."{nl}ï¿½ "..table.concat(objective.Monsters,"{nl}ï¿½ ") end
+				lblDesc:SetText(string.format("{@st68}%s{/}",t))
+			end
 
 			height = height + lblDesc:GetHeight() + 10
 		end

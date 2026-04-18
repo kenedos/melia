@@ -1145,6 +1145,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				objectiveTable.Insert("Done", progress.Done);
 				objectiveTable.Insert("Count", progress.Count);
 				objectiveTable.Insert("TargetCount", objective.TargetCount);
+				objectiveTable.Insert("Unlimited", objective is UnlimitedKillObjective);
 
 				// Add monster names for collection objectives with drop modifiers
 				if (objective is CollectItemObjective collectObjective)

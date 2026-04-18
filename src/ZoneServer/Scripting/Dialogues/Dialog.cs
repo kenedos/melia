@@ -854,6 +854,128 @@ namespace Melia.Zone.Scripting.Dialogues
 		}
 
 		/// <summary>
+		/// Opens a property (point/badge-based) shop for the player. The
+		/// shop's item list must already have been streamed to the client
+		/// via <see cref="SendPropertyShop"/> — typically on map entry.
+		///
+		/// When <paramref name="uiShopName"/> is provided, the UI opens
+		/// against that shop entry (for its title/frame definition) while
+		/// serving the item list from <paramref name="shopName"/>.
+		/// </summary>
+		public void OpenPropertyShop(string shopName, string currencyProperty, string shopPointName, string uiShopName = null)
+		{
+			if (!PropertyShops.TryGet(shopName, out _))
+				return;
+
+			var conn = this.Player.Connection;
+
+			// Push the current point balance so the UI header shows it
+			var balance = (int)conn.Account.Properties.GetFloat(currencyProperty);
+			Send.ZC_SHOP_POINT_UPDATE(conn, shopPointName, balance);
+
+			// If an alias is supplied, alias the current shop's data into
+			// the UI-shop slot so the propertyshop frame renders the
+			// correct title while serving our per-weapon item list.
+			var openName = uiShopName ?? shopName;
+			if (uiShopName != null && uiShopName != shopName)
+				Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_ALIAS('{uiShopName}','{shopName}')");
+
+			// Open the property-shop UI. The shopInfo is already cached
+			// client-side from the earlier SendPropertyShop stream.
+			Send.ZC_EXEC_CLIENT_SCP(conn, $"TOGGLE_PROPERTY_SHOP('{openName}', 1)");
+		}
+
+		// Map class name -> property shops that should be streamed to the
+		// client when a player enters that map. Any script can register
+		// into this via RegisterPropertyShopForMap; the PropertyShop
+		// client script reads it on PlayerEnteredMap.
+		private static readonly Dictionary<string, List<(string ShopName, string PointScript)>> _propertyShopsByMap
+			= new(StringComparer.OrdinalIgnoreCase);
+
+		/// <summary>
+		/// Registers a property shop to be streamed to players entering
+		/// the given map. Call this from a script's Load() when placing
+		/// shopkeepers, so the lua injection is scoped to the maps where
+		/// those shops can actually be opened.
+		/// </summary>
+		public static void RegisterPropertyShopForMap(string mapName, string shopName, string pointScript)
+		{
+			if (!_propertyShopsByMap.TryGetValue(mapName, out var list))
+			{
+				list = new List<(string, string)>();
+				_propertyShopsByMap[mapName] = list;
+			}
+
+			foreach (var entry in list)
+			{
+				if (string.Equals(entry.ShopName, shopName, StringComparison.OrdinalIgnoreCase))
+					return;
+			}
+
+			list.Add((shopName, pointScript));
+		}
+
+		/// <summary>
+		/// Streams every property shop registered for the player's current
+		/// map via <see cref="RegisterPropertyShopForMap"/>. Tracks a
+		/// per-session flag on the character so re-entering the same map
+		/// doesn't re-send the lua. No-op if the map has no shops.
+		/// </summary>
+		public static void SendMapPropertyShops(Character character)
+		{
+			var mapName = character.Map.ClassName;
+			if (!_propertyShopsByMap.TryGetValue(mapName, out var list))
+				return;
+
+			var flag = "Melia.PropertyShop." + mapName + ".Streamed";
+			if (character.Variables.Temp.GetBool(flag, false))
+				return;
+
+			foreach (var (shopName, pointScript) in list)
+				SendPropertyShop(character.Connection, shopName, pointScript);
+
+			character.Variables.Temp.Set(flag, true);
+		}
+
+		/// <summary>
+		/// Streams a property shop's item list to the client using
+		/// M_CPS_BEGIN / M_CPS_ADD* / M_CPS_END lua calls, splitting the
+		/// payload so each ZC_EXEC_CLIENT_SCP packet stays under
+		/// <see cref="ClientScript.ScriptMaxLength"/>.
+		/// </summary>
+		public static void SendPropertyShop(IZoneConnection conn, string shopName, string pointScript)
+		{
+			if (!PropertyShops.TryGet(shopName, out var shop))
+				return;
+
+			Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_BEGIN('{shopName}')");
+
+			var addPrefix = $"M_CPS_ADD('{shopName}',{{";
+			const string addSuffix = "})";
+			var budget = ClientScript.ScriptMaxLength - addPrefix.Length - addSuffix.Length;
+
+			var sb = new StringBuilder();
+			foreach (var item in shop.Items)
+			{
+				var entry = $"{{name=\"{item.ClassName}\",count={item.Amount},price={item.Price}}}";
+				var needed = entry.Length + (sb.Length > 0 ? 1 : 0);
+				if (sb.Length > 0 && sb.Length + needed > budget)
+				{
+					Send.ZC_EXEC_CLIENT_SCP(conn, addPrefix + sb + addSuffix);
+					sb.Clear();
+				}
+
+				if (sb.Length > 0) sb.Append(',');
+				sb.Append(entry);
+			}
+
+			if (sb.Length > 0)
+				Send.ZC_EXEC_CLIENT_SCP(conn, addPrefix + sb + addSuffix);
+
+			Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_END('{shopName}','{pointScript}')");
+		}
+
+		/// <summary>
 		/// Opens a custom companion shop with the given name.
 		/// </summary>
 		/// <param name="shopName"></param>

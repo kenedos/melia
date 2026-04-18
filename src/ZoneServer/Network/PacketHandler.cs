@@ -4087,16 +4087,15 @@ namespace Melia.Zone.Network
 				Log.Warning("CZ_REQ_UNDERSTAFF_ENTER_ALLOW_WITH_PARTY: Character '{0}' sent party ready request but has no party.", character.Name);
 			}
 		}
-
 		/// <summary>
-		/// 
+		/// Sent by the propertyshop UI on open (via worldPVP.RequestPVPInfo).
 		/// </summary>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
-		//[PacketHandler(Op.CZ_PVP_COMMAND)]
+		[PacketHandler(Op.CZ_PVP_COMMAND)]
 		public void CZ_PVP_COMMAND(IZoneConnection conn, Packet packet)
 		{
-			// No parameters
+			// No parameters, no response needed.
 		}
 
 		/// <summary>
@@ -6675,8 +6674,6 @@ namespace Melia.Zone.Network
 			var size = packet.GetShort();
 			var shopName = packet.GetString(32);
 			var count = packet.GetInt();
-			var productIndex = packet.GetInt();
-			var amount = packet.GetInt();
 
 			var character = conn.SelectedCharacter;
 
@@ -6686,17 +6683,28 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			if (amount <= 0)
-				amount = 1;
-
-			if (productIndex < 0 || productIndex >= shop.Items.Count)
-			{
-				Log.Warning("CZ_BUY_PROPERTYSHOP_ITEM: User '{0}' tried to buy invalid product index {1} from '{2}'.", conn.Account.Name, productIndex, shopName);
+			if (count <= 0)
 				return;
-			}
 
-			var product = shop.Items[productIndex];
-			var totalCost = product.Price * amount;
+			var purchases = new List<(int ProductIndex, int Amount)>(count);
+			var totalCost = 0;
+			for (var i = 0; i < count; ++i)
+			{
+				var productIndex = packet.GetInt();
+				var amount = packet.GetInt();
+
+				if (amount <= 0)
+					amount = 1;
+
+				if (productIndex < 0 || productIndex >= shop.Items.Count)
+				{
+					Log.Warning("CZ_BUY_PROPERTYSHOP_ITEM: User '{0}' tried to buy invalid product index {1} from '{2}'.", conn.Account.Name, productIndex, shopName);
+					return;
+				}
+
+				purchases.Add((productIndex, amount));
+				totalCost += shop.Items[productIndex].Price * amount;
+			}
 
 			var properties = character.Connection.Account.Properties;
 			var currentBalance = (int)properties.GetFloat(shop.CurrencyProperty);
@@ -6707,7 +6715,12 @@ namespace Melia.Zone.Network
 			}
 
 			character.ModifyAccountProperty(shop.CurrencyProperty, -totalCost);
-			character.Inventory.Add(product.ItemId, product.Amount * amount, InventoryAddType.Buy);
+
+			foreach (var (productIndex, amount) in purchases)
+			{
+				var product = shop.Items[productIndex];
+				character.Inventory.Add(product.ItemId, product.Amount * amount, InventoryAddType.Buy);
+			}
 
 			// Refresh the balance in the UI
 			var balance = (int)properties.GetFloat(shop.CurrencyProperty);

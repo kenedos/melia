@@ -29,6 +29,8 @@ function M_CHASE_CREATE_OBJECTIVES(parent, quest, x, y)
 		if not objective.Unlocked then
 			lblDesc:SetText(string.format(textStyle .. "?{/}"))
 			lblDesc:SetTextTooltip("{@st59}Continue the quest to reveal this objective.{/}")
+		elseif objective.Unlimited then
+			lblDesc:SetText(string.format(textStyle .. "%s (%d){/}", objective.Text, objective.Count))
 		elseif objective.TargetCount <= 1 then
 			lblDesc:SetText(string.format(textStyle .. "%s{/}", objective.Text))
 		else

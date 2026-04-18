@@ -17,6 +17,8 @@ ClientHeaderFixed header;
 
 short s1;
 char shop[32];
-int itemIndex;
-int cost;
-int amount;
+int count;
+struct {
+    int itemIndex;
+    int amount;
+} items[count];

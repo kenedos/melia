@@ -56,9 +56,21 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 
 			if (collectObj.Done)
 			{
-				await dialog.Msg(L("That's a fine haul. Dense with demonic energy... exactly what I need for the next batch of powder."));
+				var crystals = character.Inventory.CountItem(HardenedBlackCrystalId);
+				var groups = crystals / 100;
+
+				// OnComplete removes 100 crystals and ItemReward gives 1 Nucle
+				// Powder, so the extras need to be settled manually here.
+				var extraToRemove = (groups - 1) * 100;
+				if (extraToRemove > 0)
+					character.Inventory.Remove(HardenedBlackCrystalId, extraToRemove, InventoryItemRemoveMsg.Given);
+
+				var extraPowders = groups - 1;
+				if (extraPowders > 0)
+					character.Inventory.Add(649025, extraPowders, InventoryAddType.PickUp);
+
+				await dialog.Msg(LF("That's {0} crystals off the pile. Dense with demonic energy... refines into {1} jar(s) of Nucle Powder. The remainder stays on the books.", groups * 100, groups));
 				character.Quests.Complete(questId);
-				await dialog.Msg(L("There's always more to harvest down here. Let me know when you're ready for another run."));
 				await this.OfferNewQuest(dialog, character, questId);
 				return;
 			}
