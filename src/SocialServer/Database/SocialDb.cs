@@ -364,10 +364,7 @@ namespace Melia.Social.Database
 						character.VisibleHats = (VisibleEquip)reader.GetInt32("equipVisibility");
 						character.MapId = reader.GetInt32("zone");
 
-						// Only set PartyId from database if not already set
-						// This prevents overwriting values set from PartyUpdateMessage
-						if (character.PartyId == ObjectIdRanges.Party)
-							character.PartyId = reader.GetInt64("partyId") | ObjectIdRanges.Party;
+						character.PartyId = reader.GetInt64("partyId") | ObjectIdRanges.Party;
 					}
 				}
 			}
