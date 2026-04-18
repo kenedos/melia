@@ -1917,6 +1917,15 @@ namespace Melia.Zone.Network
 			if (!character.Map.TryGetCombatEntity(targetHandle, out var target))
 			{
 				Log.Warning("CZ_SKILL_TARGET: User '{0}' tried to use a skill on a non-existing target.", conn.Account.Name);
+				if (skill.Data.UseType == SkillUseType.Force)
+					Send.ZC_SKILL_FORCE_TARGET(character, null, skill);
+				return;
+			}
+
+			if (target.IsDead)
+			{
+				if (skill.Data.UseType == SkillUseType.Force)
+					Send.ZC_SKILL_FORCE_TARGET(character, null, skill);
 				return;
 			}
 

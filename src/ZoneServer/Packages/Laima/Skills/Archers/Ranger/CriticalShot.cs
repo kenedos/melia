@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				return;
 			}
 
-			if (target == null)
+			if (target == null || target.IsDead)
 				return;
 
 			if (!caster.InSkillUseRange(skill, target))
@@ -60,6 +60,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			modifier.BonusCritChance = 50;
 
 			await skill.Wait(hitDelay);
+
+			if (target.IsDead)
+				return;
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
