@@ -283,6 +283,11 @@ namespace Melia.Zone.Scripting.AI
 		{
 			if (leadSec <= 0f) return target.Position;
 
+			// Prediction only makes sense against players — mob targets
+			// always use their current position.
+			if (target is Mob)
+				return target.Position;
+
 			// Derive prediction on/off deterministically from the mob's
 			// handle — roughly 1 in 3 mobs skip prediction, stable for the
 			// lifetime of the entity, without caching any random state.
