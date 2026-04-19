@@ -320,6 +320,9 @@ namespace Melia.Zone.World.Actors.Components
 			// Fill the back-buffer with current actors, reusing the list
 			this.Actor.Map.GetActorsIn<IActor>(this.Area, this.IsValidTriggerer, _actorsInsideBuffer);
 
+			List<IActor> enteredToDispatch = null;
+			List<IActor> leftToDispatch = null;
+
 			lock (_syncLock)
 			{
 				// Build set of current actors for O(1) lookup
@@ -339,11 +342,10 @@ namespace Melia.Zone.World.Actors.Components
 					if (!_nowInsideSet.Contains(a))
 						_tempLeft.Add(a);
 
-				foreach (var actor in _tempEntered)
-					this.Entered?.Invoke(this, new TriggerActorArgs(TriggerType.Enter, this.Actor, actor));
-
-				foreach (var actor in _tempLeft)
-					this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
+				if (_tempEntered.Count > 0)
+					enteredToDispatch = new List<IActor>(_tempEntered);
+				if (_tempLeft.Count > 0)
+					leftToDispatch = new List<IActor>(_tempLeft);
 
 				// Swap buffers: _actorsInsideBuffer becomes the current
 				// list, old _actorsInside becomes the next write target
@@ -355,6 +357,18 @@ namespace Melia.Zone.World.Actors.Components
 				foreach (var a in _actorsInside)
 					_actorsInsideSet.Add(a);
 				this.ActorCount = _actorsInside.Count;
+			}
+
+			if (enteredToDispatch != null)
+			{
+				foreach (var actor in enteredToDispatch)
+					this.Entered?.Invoke(this, new TriggerActorArgs(TriggerType.Enter, this.Actor, actor));
+			}
+
+			if (leftToDispatch != null)
+			{
+				foreach (var actor in leftToDispatch)
+					this.Left?.Invoke(this, new TriggerActorArgs(TriggerType.Leave, this.Actor, actor));
 			}
 
 			this.UpdateTimers(elapsed);

@@ -129,6 +129,9 @@ namespace Melia.Zone.World.Actors.Components
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
+			List<Action<ICombatEntity>> toInvoke = null;
+			List<Action<ICombatEntity>> cancelsToInvoke = null;
+
 			lock (_events)
 			{
 				if (_events.Count == 0)
@@ -142,14 +145,22 @@ namespace Melia.Zone.World.Actors.Components
 
 					if (timedEvent.State == TimedEvent.TimedEventState.Canceled)
 					{
-						if (timedEvent is CancelableTimedEvent cancelableTimedEvent)
-							cancelableTimedEvent.CancelFunction?.Invoke(this.Entity);
+						if (timedEvent is CancelableTimedEvent cancelableTimedEvent && cancelableTimedEvent.CancelFunction != null)
+						{
+							cancelsToInvoke ??= new List<Action<ICombatEntity>>();
+							cancelsToInvoke.Add(cancelableTimedEvent.CancelFunction);
+						}
 
 						eventsToRemoved.Add(timedEventKey);
 					}
 					else if (DateTime.Now > timedEvent.NextRunTime && (timedEvent.IsInfinite || timedEvent.Count <= timedEvent.RepeatCount))
 					{
-						timedEvent.Function?.Invoke(this.Entity);
+						if (timedEvent.Function != null)
+						{
+							toInvoke ??= new List<Action<ICombatEntity>>();
+							toInvoke.Add(timedEvent.Function);
+						}
+
 						timedEvent.NextRunTime = DateTime.Now.Add(timedEvent.RepeatDelay);
 						timedEvent.Count++;
 
@@ -164,6 +175,18 @@ namespace Melia.Zone.World.Actors.Components
 				{
 					_events.Remove(timedEventKey);
 				}
+			}
+
+			if (cancelsToInvoke != null)
+			{
+				foreach (var fn in cancelsToInvoke)
+					fn.Invoke(this.Entity);
+			}
+
+			if (toInvoke != null)
+			{
+				foreach (var fn in toInvoke)
+					fn.Invoke(this.Entity);
 			}
 		}
 
