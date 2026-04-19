@@ -1523,14 +1523,18 @@ namespace Melia.Zone.Scripting.AI
 			if (_eventAlerts.Count == 0)
 				return;
 
+			List<IAiEventAlert> alerts;
 			lock (_eventAlerts)
 			{
-				while (_eventAlerts.Count > 0)
-				{
-					var eventAlert = _eventAlerts.Dequeue();
-					this.ReactToAlert(eventAlert);
-				}
+				if (_eventAlerts.Count == 0)
+					return;
+
+				alerts = new List<IAiEventAlert>(_eventAlerts);
+				_eventAlerts.Clear();
 			}
+
+			foreach (var alert in alerts)
+				this.ReactToAlert(alert);
 		}
 
 		/// <summary>
