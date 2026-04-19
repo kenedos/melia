@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 0;
-			var aniTime = 0;
+			var aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var targetPos = originPos.GetRelative(farPos);
 			var targets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 100f, 15f, 20);
@@ -157,7 +157,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 0;
-			var aniTime = 0;
+			var aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var targetPos = originPos.GetRelative(farPos);
 			var targets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 90f, 30f, 5);

@@ -119,8 +119,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 10, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 100;
-			var aniTime = 100;
+			var hitDelay = 1100;
+			var aniTime = 1300;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 
 			if (!await MonsterCastTime(skill, caster, "Fire Wall", CastTimeMs, target))

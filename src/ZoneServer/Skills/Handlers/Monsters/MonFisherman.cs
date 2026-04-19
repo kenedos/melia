@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 10, angle: 120f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 900;
-			var aniTime = 900;
+			var aniTime = 1100;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}

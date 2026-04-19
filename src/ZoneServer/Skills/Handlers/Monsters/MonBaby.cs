@@ -528,8 +528,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 733;
-			var aniTime = 1033;
+			var hitDelay = 1733;
+			var aniTime = 2033;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			var targetPos = originPos.GetRelative(farPos);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.mon_Marnoks_pad);
