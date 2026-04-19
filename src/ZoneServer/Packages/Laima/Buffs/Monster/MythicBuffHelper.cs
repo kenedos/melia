@@ -75,6 +75,7 @@ namespace Melia.Zone.Buffs.Handlers.Monster
 
 			// 30% faster skill usage
 			monster.Vars.Set("Melia.ShootTimeMultiplier", 0.7f);
+			monster.Vars.Set("Melia.Mythic.IsMythic", true);
 			monster.Heal(newMaxHP - prevMaxHP, 0);
 			monster.InvalidateProperties();
 

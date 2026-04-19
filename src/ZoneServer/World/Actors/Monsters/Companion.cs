@@ -205,7 +205,9 @@ namespace Melia.Zone.World.Actors.Monsters
 				this.Map = this.Owner.Map;
 				this.Layer = this.Owner.Layer;
 				this.OwnerHandle = this.Owner.Handle;
-				this.Position = this.Owner.Position.GetRandomInRange2D(15);
+				if (!this.Map.Ground.TryGetNearestValidPosition(this.Owner.Position.GetRandomInRange2D(15), out var validPos))
+					validPos = this.Owner.Position;
+				this.Position = validPos;
 				this.SpawnPosition = this.Position;
 				this.Components.Add(new RecoveryComponent(this));
 				this.Components.Add(new MovementComponent(this));

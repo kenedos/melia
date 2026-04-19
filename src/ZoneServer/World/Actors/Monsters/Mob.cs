@@ -1039,6 +1039,9 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// </summary>
 		public bool IsMythicMonster()
 		{
+			if (this.Vars.GetBool("Melia.Mythic.IsMythic", false))
+				return true;
+
 			return this.IsBuffActive(BuffId.Mythic_Chain_Lightning_Buff)
 				|| this.IsBuffActive(BuffId.Mythic_Boosting_Morale_Buff)
 				|| this.IsBuffActive(BuffId.Mythic_Puddle_Buff)
