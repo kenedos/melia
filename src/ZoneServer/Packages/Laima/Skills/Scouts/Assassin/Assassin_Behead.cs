@@ -104,6 +104,16 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 				skillHit.HitEffect = HitEffect.Impact;
 
 				hits.Add(skillHit);
+
+				var bleedingDamage = skillHitResult.Damage * 0.125f;
+
+				if (target.Rank != MonsterRank.Boss && caster.IsAbilityActive(AbilityId.Assassin6))
+				{
+					bleedingDamage = MathF.Min(caster.Properties.GetFloat(PropertyName.MHP) * 0.025f, target.Properties.GetFloat(PropertyName.MHP) * 0.025f);
+				}
+
+				if (skillHitResult.Damage > 0)
+					target.StartBuff(BuffId.Behead_Debuff, skill.Level, bleedingDamage, TimeSpan.FromSeconds(7), caster);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
@@ -138,13 +148,13 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Assassin
 
 				hits.Add(skillHit2);
 
-				var bleedingDamage = skillHitResult2.Damage * 0.25f;
+				var bleedingDamage = skillHitResult2.Damage * 0.125f;
 
 				// Assassin6 instead does 5% of their maximum HP, or 5% of the caster's
 				// maximum HP, whichever is less.  It also doesn't work on bosses
 				if (target.Rank != MonsterRank.Boss && caster.IsAbilityActive(AbilityId.Assassin6))
 				{
-					bleedingDamage = MathF.Min(caster.Properties.GetFloat(PropertyName.MHP) * 0.05f, target.Properties.GetFloat(PropertyName.MHP) * 0.05f);
+					bleedingDamage = MathF.Min(caster.Properties.GetFloat(PropertyName.MHP) * 0.025f, target.Properties.GetFloat(PropertyName.MHP) * 0.025f);
 				}
 
 				if (skillHitResult2.Damage > 0)

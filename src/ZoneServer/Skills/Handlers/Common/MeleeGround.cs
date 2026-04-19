@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 	/// Handles melee skills targeting the ground in front of the caster.
 	/// </summary>
 	[SkillHandler(SkillId.Normal_Attack, SkillId.Normal_Attack_TH, SkillId.Hammer_Attack, SkillId.Hammer_Attack_TH, SkillId.Common_DaggerAries,
-		SkillId.Sword_Attack, SkillId.SpearMaster_Attack, SkillId.SpearMaster_Attack_TH)]
+		SkillId.Sword_Attack, SkillId.SpearMaster_Attack, SkillId.SpearMaster_Attack_TH, SkillId.Common_StaffAttack)]
 	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler
 	{
 		/// <summary>
