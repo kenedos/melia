@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -61,13 +62,16 @@ namespace Melia.Zone.Pads.Handlers
 			}
 		}
 
-		private void CreateSalamanderEffect(ICombatEntity caster, Skill skill, Position start, Position end)
+		private async void CreateSalamanderEffect(ICombatEntity caster, Skill skill, Position start, Position end)
 		{
 			var handleId = ZoneServer.Instance.World.CreateSkillHandle();
 			Send.ZC_NORMAL.Skill_124(caster, handleId, "I_wizard_Prominence_force_fire3", 1.2f, "F_wizard_prominence_fire", 1, 90, 5, DamageWidth, 0.35f, 5, 0.35f, start, 2);
 			Send.ZC_NORMAL.Skill_124(caster, handleId, start, end);
 
 			this.ApplyLineDamage(caster, skill, start, end);
+
+			await Task.Delay(2000);
+			Send.ZC_NORMAL.Skill_124(caster, handleId);
 		}
 
 		private void ApplyLineDamage(ICombatEntity caster, Skill skill, Position start, Position end)

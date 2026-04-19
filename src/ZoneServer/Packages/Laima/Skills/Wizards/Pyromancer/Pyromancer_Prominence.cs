@@ -44,7 +44,6 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 
-			Send.ZC_NORMAL.RunPad(caster, skill, "prominence", targetPos, caster.Direction, -1, 25, skillHandle, 0);
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, caster.Position, targetPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, null);
