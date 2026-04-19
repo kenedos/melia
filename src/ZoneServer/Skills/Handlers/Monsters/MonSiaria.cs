@@ -38,18 +38,18 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			var originPos = caster.Position;
 			var hitDelay = 600 + (int)(caster.Position.Get2DDistance(target.Position) * 2.4);
-			var leadPos = GetLeadPosition(target, hitDelay);
+			var aniTime = hitDelay + 200;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
 			caster.TurnTowards(leadPos);
 			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 
-			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos, hitDelay));
+			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos, hitDelay, aniTime));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay)
+		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 10);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var aniTime = hitDelay + 200;
 			_ = ForceAttackEffect(caster, target, skill, hitDelay);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 

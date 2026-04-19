@@ -897,27 +897,40 @@ namespace Melia.Zone.Skills.Helpers
 
 		private const float UnitsPerMspdSecond = 2.5f;
 
-		public static Position GetLeadPosition(ICombatEntity target, int leadMs, float maxLeadDistance = 150f)
+		public static Position GetLeadPosition(ICombatEntity target, int leadMs, ICombatEntity caster = null, float maxLeadDistance = 150f)
 		{
 			if (target == null || leadMs <= 0)
 				return target?.Position ?? Position.Zero;
 
-			if (!target.Components.TryGet<MovementComponent>(out var movement) || !movement.IsMoving)
-				return target.Position;
+			var lateralOffset = (float)RandomProvider.Get().Next(8, 20);
+			if (RandomProvider.Get().Next(2) == 0) lateralOffset = -lateralOffset;
+			var perpDir = target.Direction.AddDegreeAngle(90);
+
+			var hasMovement = target.Components.TryGet<MovementComponent>(out var movement) && movement.IsMoving;
+			if (!hasMovement || RandomProvider.Get().Next(2) == 0)
+				return target.Position.GetRelative(perpDir, lateralOffset * 0.5f);
 
 			var speed = target.Properties.GetFloat(PropertyName.MSPD);
 			if (speed <= 0f)
-				return target.Position;
+				return target.Position.GetRelative(perpDir, lateralOffset * 0.5f);
 
 			var distance = speed * UnitsPerMspdSecond * (leadMs / 1000f);
 			if (distance > maxLeadDistance)
 				distance = maxLeadDistance;
 
-			var jitter = RandomProvider.Get().Next(15, 31);
-			if (RandomProvider.Get().Next(2) == 0) jitter = -jitter;
-			var leadDir = target.Direction.AddDegreeAngle(jitter);
+			if (caster != null)
+			{
+				var casterDist = (float)caster.Position.Get2DDistance(target.Position);
+				var leadScale = Math.Clamp(casterDist / 80f, 0f, 1f);
+				distance *= leadScale;
+			}
 
-			return target.Position.GetRelative(leadDir, distance);
+			var angleJitter = RandomProvider.Get().Next(5, 15);
+			if (RandomProvider.Get().Next(2) == 0) angleJitter = -angleJitter;
+			var leadDir = target.Direction.AddDegreeAngle(angleJitter);
+			var leadPos = target.Position.GetRelative(leadDir, distance);
+
+			return leadPos.GetRelative(perpDir, lateralOffset);
 		}
 
 	}
