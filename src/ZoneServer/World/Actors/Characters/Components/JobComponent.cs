@@ -340,7 +340,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				if (_jobRanks == null)
 				{
 					_jobRanks = new Dictionary<JobId, int>();
-					var orderedJobs = _jobs.Values.OrderBy(j => j.SelectionDate).ToList();
+					var orderedJobs = _jobs.Values.OrderBy(j => j.SelectionDate).ThenBy(j => j.Rank).ToList();
 					for (var i = 0; i < orderedJobs.Count; i++)
 					{
 						_jobRanks[orderedJobs[i].Id] = i + 1;
