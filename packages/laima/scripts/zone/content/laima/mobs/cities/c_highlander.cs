@@ -15,10 +15,10 @@ public class CHighlanderMobScript : GeneralScript
 	{
 		// Property Overrides -------------------------------
 
-		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Fire, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
-		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Poison, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
-		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Lightning, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
-		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Earth, Properties("MHP", 999999, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Fire, Properties("MHP", int.MaxValue, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Poison, Properties("MHP", int.MaxValue, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Lightning, Properties("MHP", int.MaxValue, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
+		AddPropertyOverrides("c_highlander", MonsterId.Wood_Carving_Earth, Properties("MHP", int.MaxValue, "MINPATK", 0, "MAXPATK", 0, "MINMATK", 0, "MAXMATK", 0, "DEF", 0, "MDEF", 0));
 
 		// Monster Spawners ---------------------------------
 
