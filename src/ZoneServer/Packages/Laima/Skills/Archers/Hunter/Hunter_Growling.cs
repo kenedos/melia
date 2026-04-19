@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 		/// </summary>
 		public void Handle(Skill skill, ICombatEntity caster)
 		{
-			if (!caster.TryGetActiveCompanion(out var companion))
+			if (!caster.TryGetActiveGroundCompanion(out var companion))
 				return;
 
 			this.SetupGrowlingEvent(companion, skill.Level);

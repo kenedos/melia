@@ -258,18 +258,22 @@ namespace Melia.Shared
 				else if (serverType == ServerType.Barracks)
 				{
 					this.LoadDb(this.Data.BarrackDb, "db/barracks.txt");
+					this.LoadDb(this.Data.CompanionDb, "db/companions.txt");
 					this.LoadDb(this.Data.ExpDb, "db/exp.txt");
 					this.LoadDb(this.Data.FeatureDb, "db/features.txt");
 					this.LoadDb(this.Data.InvBaseIdDb, "db/invbaseids.txt");
 					this.LoadDb(this.Data.ItemDb, "db/items.txt");
 					this.LoadDb(this.Data.JobDb, "db/jobs.txt");
 					this.LoadDb(this.Data.MapDb, "db/maps.txt");
+					this.LoadDb(this.Data.MonsterDb, "db/monsters.txt");
 					this.LoadDb(this.Data.PropertiesDb, "db/properties.txt");
 					this.LoadDb(this.Data.ServerDb, "db/servers.txt");
 					this.LoadDb(this.Data.HairTypeDb, "db/hair_types.txt");
 					this.LoadDb(this.Data.HeadTypeDb, "db/head_types.txt");
 					this.LoadDb(this.Data.SkinToneDb, "db/skin_tones.txt");
 					this.LoadDb(this.Data.StanceConditionDb, "db/stanceconditions.txt");
+
+					this.Data.MonsterDb.BuildIndexes();
 
 					PropertyTable.Load(this.Data.PropertiesDb);
 				}

@@ -12,7 +12,6 @@ using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
-using Melia.Zone.World.Items;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -224,28 +223,6 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void Warp(int mapId, Position pos)
 		{
-			if (!ZoneServer.Instance.World.Maps.TryGet(mapId, out var map))
-				throw new ArgumentException("Map '" + mapId + "' not found in data.");
-
-			if (this.MapId == mapId)
-			{
-				this.Position = pos;
-				Send.ZC_SET_POS(this);
-
-				if (this.IsRiding && this.ActiveCompanion is Companion ridingCompanion)
-				{
-					ridingCompanion.Position = pos;
-					Send.ZC_SET_POS(ridingCompanion);
-				}
-				return;
-			}
-
-			if (ZoneServer.Instance.ServerList.GetZoneServers(mapId).Length == 0)
-			{
-				this.MsgBox("The map is currently unavailable. Please try again later.");
-				return;
-			}
-
 			lock (_warpLock)
 			{
 				if (this.IsWarping)
@@ -255,17 +232,39 @@ namespace Melia.Zone.World.Actors.Characters
 
 			try
 			{
-				this.CancelOutOfBody();
+				if (!ZoneServer.Instance.World.Maps.TryGet(mapId, out var map))
+					throw new ArgumentException("Map '" + mapId + "' not found in data.");
 
-				if (map is DynamicMap)
+				if (this.MapId == mapId)
 				{
-					this.Etc.Properties.SetFloat(PropertyName.LastWarpMapID, this.Map.Id);
-					mapId = map.Id;
-				}
-				this.MapId = mapId;
-				this.Position = pos;
+					this.Position = pos;
+					Send.ZC_SET_POS(this);
 
-				Send.ZC_MOVE_ZONE(this.Connection);
+					if (this.IsRiding && this.Companions.ActiveGroundCompanion is Companion ridingCompanion)
+					{
+						ridingCompanion.Position = pos;
+						Send.ZC_SET_POS(ridingCompanion);
+					}
+
+					lock (_warpLock)
+					{
+						this.IsWarping = false;
+					}
+				}
+				else
+				{
+					this.CancelOutOfBody();
+
+					if (map is DynamicMap)
+					{
+						this.Etc.Properties.SetFloat(PropertyName.LastWarpMapID, this.Map.Id);
+						mapId = map.Id;
+					}
+					this.MapId = mapId;
+					this.Position = pos;
+
+					Send.ZC_MOVE_ZONE(this.Connection);
+				}
 			}
 			catch
 			{
@@ -363,7 +362,8 @@ namespace Melia.Zone.World.Actors.Characters
 				if (currentConnection != null && currentConnection.Account != null &&
 					ZoneServer.Instance.Database.CheckSessionKey(currentConnection.Account.Id, currentConnection.SessionKey))
 				{
-					ZoneServer.Instance.Database.SavePlayerData(this, currentConnection.Account);
+					ZoneServer.Instance.Database.SaveCharacterData(this);
+					ZoneServer.Instance.Database.SaveAccountData(currentConnection.Account, this);
 					this.SavedForWarp = true;
 					saveSuccess = true;
 				}
@@ -530,7 +530,7 @@ namespace Melia.Zone.World.Actors.Characters
 			for (var i = 0; i < _tempAppearChars.Count; i++)
 			{
 				var character = _tempAppearChars[i];
-				if (character.IsRiding && character.ActiveCompanion is Companion ridingCompanion)
+				if (character.IsRiding && character.Companions.ActiveGroundCompanion is Companion ridingCompanion)
 					Send.ZC_NORMAL.RidePet(this.Connection, character, ridingCompanion);
 			}
 		}
@@ -556,20 +556,6 @@ namespace Melia.Zone.World.Actors.Characters
 						else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
 							Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, hairItem.Id, EquipSlot.Hair, headData.Index);
 					}
-				}
-
-				// Send briquetting (weapon/armor appearance override) look updates
-				// for any equipped item carrying a BriquettingIndex, so the
-				// swapped 3D model is rendered when this character comes into view.
-				foreach (var equipPair in character.Inventory.GetEquip())
-				{
-					var equipItem = equipPair.Value;
-					if (equipItem == null || equipItem is DummyEquipItem)
-						continue;
-
-					var briquettingIndex = (int)equipItem.Properties.GetFloat(PropertyName.BriquettingIndex);
-					if (briquettingIndex > 0)
-						Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, briquettingIndex, equipPair.Key);
 				}
 
 				if (character.HasParty || character.HasGuild)
@@ -658,7 +644,19 @@ namespace Melia.Zone.World.Actors.Characters
 				Send.ZC_OWNER(this, monster);
 
 			if (monster is Summon summon)
+			{
 				Send.ZC_IS_SUMMON_SORCERER_MONSTER(this, summon);
+
+				if (summon.Vars.TryGetInt("SORCERER_MON", out var isSorcMon) && isSorcMon == 1)
+				{
+					Send.ZC_NORMAL.SetScale(summon, 176, 0.7f, 0, 0, 1, 0);
+					Send.ZC_NORMAL.DelayEnterWorld(this, summon);
+					Send.ZC_NORMAL.EnterDelayedActor(summon);
+					Send.ZC_NORMAL.SummonPlayAnimation(summon, "SORCERER_SUMMONING", 1);
+					Send.ZC_NORMAL.SetActorColor(this.Connection, summon, 64, 32, 64, 250, 0, 0);
+					Send.ZC_IS_SUMMONING_MONSTER(this, summon);
+				}
+			}
 
 			if (monster is Companion companion)
 			{

@@ -5659,16 +5659,17 @@ namespace Melia.Zone.Network
 			if (character == null)
 				return;
 
-			// Find the first active companion
-			var companion = character.Companions.GetList().FirstOrDefault(c => c.IsActivated);
-			if (companion == null)
+			// Packet has no companion identifier. Toggle all active
+			// companions' auto-attack mode together.
+			var activeCompanions = character.Companions.GetActiveCompanions();
+			if (activeCompanions.Count == 0)
 				return;
 
-			// Toggle aggressive mode
-			companion.IsAggressiveMode = !companion.IsAggressiveMode;
-
-			// Send response to client
-			Send.ZC_PET_AUTO_ATK(character, companion);
+			foreach (var companion in activeCompanions)
+			{
+				companion.IsAggressiveMode = !companion.IsAggressiveMode;
+				Send.ZC_PET_AUTO_ATK(character, companion);
+			}
 		}
 
 		[PacketHandler(Op.CZ_OBJECT_MOVE)]

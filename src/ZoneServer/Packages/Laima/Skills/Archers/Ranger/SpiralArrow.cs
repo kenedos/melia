@@ -107,8 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 
 			Ranger_CriticalShotOverride.TryActivateDoubleTake(skill, caster, target);
-
-			caster.StartBuff(BuffId.Ranger_StrapingShot, skill.Level, 0, TimeSpan.FromSeconds(3), caster);
+			Ranger_Strafe.TryApplyStrafeBuff(caster);
 		}
 
 		/// <summary>
@@ -160,7 +159,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				caster.StartBuff(BuffId.SpiralArrow_Debuff, skill.Level, 0, TimeSpan.FromSeconds(30), caster);
 
 			Ranger_CriticalShot.TryActivateDoubleTake(skill, caster, hitTargets);
-			Ranger_CriticalShot.TryReduceCooldown(skill, caster, results);
 			Ranger_Strafe.TryApplyStrafeBuff(caster);
 		}
 	}

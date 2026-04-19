@@ -203,7 +203,7 @@ namespace Melia.Zone.Skills.Helpers
 				skillModifier = SkillModifier.Default;
 			}
 
-			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea, hitType: skill.Data.HitType);
 			hits ??= new List<SkillHitInfo>();
 
 
@@ -263,7 +263,7 @@ namespace Melia.Zone.Skills.Helpers
 				else
 					Debug.ShowShape(caster.Map, pad.Area, SkillConstants.ShortDebugShapeDuration);
 			}
-			if (caster is Mob)
+			if (caster is Mob and not Companion)
 			{
 				if (skill.Data.ShootTime < SkillConstants.MaxPadShootTimeForPreview)
 					Debug.ShowShape(caster.Map, pad.Area, skill.Data.ShootTime);

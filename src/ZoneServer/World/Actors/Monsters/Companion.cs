@@ -11,6 +11,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Components;
 using Yggdrasil.Scheduling;
 using Melia.Zone.Events.Arguments;
 using Yggdrasil.Logging;
@@ -212,7 +213,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				this.Components.Add(new RecoveryComponent(this));
 				this.Components.Add(new MovementComponent(this));
 				if (this.IsBird)
-					this.Components.Add(new AiComponent(this, "PC_Pet_Hawk_Debug", this.Owner));
+					this.Components.Add(new AiComponent(this, "PC_Pet_Hawk", this.Owner));
 				else
 					this.Components.Add(new AiComponent(this, "PC_Pet", this.Owner));
 				Send.ZC_NORMAL.PetIsInactive(this.Owner.Connection, this);
@@ -366,6 +367,9 @@ namespace Melia.Zone.World.Actors.Monsters
 				this.DecayStamina();
 				_staminaDecayTime = TimeSpan.FromMilliseconds(60000);
 			}
+
+			if (this.IsBird)
+				this.UpdateBirdBehavior(elapsed);
 		}
 
 		/// <summary>
@@ -467,5 +471,222 @@ namespace Melia.Zone.World.Actors.Monsters
 		{
 			this.Position = pos;
 		}
+
+		#region Bird Companion Methods
+
+		private const float ShoulderLandDelay = 30f;
+		private const float DefaultBirdFlyHeight = 80f;
+
+		/// <summary>
+		/// Whether the bird companion is currently landed on its owner's shoulder.
+		/// </summary>
+		public bool IsLandedOnShoulder { get; private set; }
+
+		/// <summary>
+		/// Whether the bird companion is currently perched on a roost.
+		/// </summary>
+		public bool IsOnRoost { get; private set; }
+
+		/// <summary>
+		/// Whether the bird is currently landed (shoulder or roost).
+		/// </summary>
+		public bool IsPerched => this.IsLandedOnShoulder || this.IsOnRoost;
+
+		/// <summary>
+		/// The roost mob the bird should fly to. Set by the skill handler,
+		/// consumed by the AI script which moves the bird and calls LandOnRoost().
+		/// </summary>
+		public Mob ActiveRoost { get; private set; }
+
+		/// <summary>
+		/// Set to true when the still timer fires. The AI script should
+		/// move the bird to the owner and call LandOnOwnerShoulder() once close.
+		/// </summary>
+		public bool WantsToLand { get; private set; }
+
+		/// <summary>
+		/// Time the owner has been standing still. Reset on movement.
+		/// </summary>
+		private TimeSpan _ownerStillTimer;
+
+		/// <summary>
+		/// Cached owner moving state to detect transitions.
+		/// </summary>
+		private bool _wasOwnerMoving;
+
+		/// <summary>
+		/// Sets the bird companion's flight height via the movement component.
+		/// </summary>
+		/// <param name="height">Height above ground. Use 0 to land.</param>
+		/// <param name="raiseTime">Time to reach the target height.</param>
+		/// <param name="easing">Easing factor for the height transition.</param>
+		public void SetFlyHeight(float height, float raiseTime = 1f, float easing = 1.5f)
+		{
+			if (this.Components.TryGet<MovementComponent>(out var movement))
+				movement.NotifyFlying(true, height, raiseTime, easing);
+		}
+
+		/// <summary>
+		/// Configures the fly option flags for this bird companion.
+		/// Should be called after takeoff or spawn to ensure proper
+		/// client-side flight rendering.
+		/// </summary>
+		public void SetFlyOption()
+		{
+			Send.ZC_FLY_OPTION(this, true, true, true, false);
+		}
+
+		/// <summary>
+		/// Updates the bird companion's shoulder landing timer.
+		/// Called from Update() every tick.
+		/// </summary>
+		private void UpdateBirdBehavior(TimeSpan elapsed)
+		{
+			if (this.Owner == null)
+				return;
+
+			// If roost was destroyed, leave it and clear reference
+			if (this.IsOnRoost && (this.ActiveRoost == null || this.ActiveRoost.IsDead))
+			{
+				this.LeaveRoost();
+				this.ActiveRoost = null;
+			}
+			else if (this.ActiveRoost != null && this.ActiveRoost.IsDead)
+			{
+				this.ActiveRoost = null;
+			}
+
+			// Don't run shoulder landing logic while roost is active
+			if (this.ActiveRoost != null && !this.ActiveRoost.IsDead)
+				return;
+
+			var isOwnerMoving = this.Owner.Components.TryGet<MovementComponent>(out var movement) && movement.IsMoving;
+
+			// Reset shoulder timer when owner is moving or hawk is
+			// busy with a skill (e.g. FirstStrike auto-attacks)
+			var hawkBusy = this.Vars.Get<bool>("Hawk.UsingSkill", false);
+
+			if (isOwnerMoving || hawkBusy)
+			{
+				_ownerStillTimer = TimeSpan.Zero;
+				this.WantsToLand = false;
+
+				if (this.IsLandedOnShoulder)
+					this.TakeOff();
+			}
+			else
+			{
+				_ownerStillTimer += elapsed;
+
+				if (!this.IsPerched && !this.WantsToLand && _ownerStillTimer.TotalSeconds >= ShoulderLandDelay)
+					this.WantsToLand = true;
+			}
+
+			_wasOwnerMoving = isOwnerMoving;
+		}
+
+		/// <summary>
+		/// Lands the bird companion on its owner's shoulder.
+		/// Attaches to the owner's hawk node and enables auto-detach
+		/// so the bird lifts off when the owner moves.
+		/// </summary>
+		public void LandOnOwnerShoulder()
+		{
+			if (this.Owner == null || this.IsLandedOnShoulder)
+				return;
+
+			this.Direction = this.Owner.Direction;
+			Send.ZC_ROTATE(this);
+
+			this.PlayAnimation("ASTD_TO_SIT", stopOnLastFrame: true);
+			this.AttachToObject(this.Owner, "Dummy_pet_hawk_R", "None", attachSec: 1, attachAnim: "SIT");
+			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, true, "SIT");
+			this.Owner.PlayEffectNode("F_smoke109_2", 1, "Dummy_pet_hawk_R");
+			this.Owner.PlayEffectNode("F_archer_hawk_fether_sit", 1, "Dummy_pet_hawk_R");
+
+			this.IsLandedOnShoulder = true;
+			this.WantsToLand = false;
+		}
+
+		/// <summary>
+		/// Lifts the bird companion off the owner's shoulder and resumes flying.
+		/// </summary>
+		/// <param name="flyHeight">Height to fly at after takeoff.</param>
+		public void TakeOff(float flyHeight = DefaultBirdFlyHeight)
+		{
+			if (!this.IsLandedOnShoulder)
+				return;
+
+			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, false, "SIT");
+			this.AttachToObject(null, "None", "None", attachSec: 1);
+			this.SetFlyHeight(flyHeight);
+			this.PlayAnimation("SIT_TO_ASTD");
+			this.AttachToObject(null, "None", "None", attachSec: 1);
+			this.SetFlyOption();
+
+			this.IsLandedOnShoulder = false;
+			_ownerStillTimer = TimeSpan.Zero;
+		}
+
+		/// <summary>
+		/// Sets the active roost for this bird companion. The AI script
+		/// will fly the bird to the roost and call LandOnRoost().
+		/// </summary>
+		/// <param name="roost">The roost mob, or null to clear.</param>
+		public void SetRoost(Mob roost)
+		{
+			if (this.IsLandedOnShoulder)
+				this.TakeOff();
+			else if (this.IsOnRoost)
+				this.LeaveRoost();
+
+			this.ActiveRoost = roost;
+		}
+
+		/// <summary>
+		/// Clears the active roost reference.
+		/// </summary>
+		public void ClearRoost()
+		{
+			this.ActiveRoost = null;
+		}
+
+		/// <summary>
+		/// Lands the bird companion on its roost.
+		/// Attaches to the roost's hawk node.
+		/// </summary>
+		public void LandOnRoost(Mob roost)
+		{
+			if (roost == null || roost.IsDead || this.IsOnRoost)
+				return;
+
+			this.PlayAnimation("ASTD_TO_SIT", stopOnLastFrame: true);
+			this.AttachToObject(roost, "Dummy_hawk", "None", attachSec: 1, attachAnim: "SIT");
+			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, true, "SIT");
+			roost.PlayEffectNode("F_smoke109_2", 1, "Dummy_hawk");
+			roost.PlayEffectNode("F_archer_hawk_fether_sit", 1, "Dummy_hawk");
+
+			this.IsOnRoost = true;
+		}
+
+		/// <summary>
+		/// Lifts the bird companion off the roost and resumes flying.
+		/// </summary>
+		public void LeaveRoost(float flyHeight = DefaultBirdFlyHeight)
+		{
+			if (!this.IsOnRoost)
+				return;
+
+			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, false, "SIT");
+			this.AttachToObject(null, "None", "None", attachSec: 1);
+			this.SetFlyHeight(flyHeight);
+			this.PlayAnimation("SIT_TO_ASTD");
+			this.AttachToObject(null, "None", "None", attachSec: 1);
+			this.SetFlyOption();
+
+			this.IsOnRoost = false;
+		}
+
+		#endregion
 	}
 }

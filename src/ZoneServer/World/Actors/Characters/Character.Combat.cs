@@ -2,6 +2,7 @@
 // CharacterCombat.cs - Combat and health management
 // ===================================================================
 using System;
+using System.Collections.Generic;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Handlers;
 using Melia.Zone.Buffs.Handlers.Common;
@@ -171,13 +172,15 @@ namespace Melia.Zone.World.Actors.Characters
 			if (killer.Components.TryGet<AiComponent>(out var aiComponent))
 				aiComponent.Script.QueueEventAlert(new CancelSkillAlert());
 
-			if (this.ActiveCompanion != null)
+			var activeCompanions = this.Companions.GetActiveCompanions();
+			if (activeCompanions.Count > 0)
 			{
 				if (this.IsRiding)
 					this.RemoveBuff(BuffId.RidingCompanion);
 
-				_companionToReactivate = this.ActiveCompanion;
-				this.Companions.ActiveCompanion.SetCompanionState(false);
+				_companionsToReactivate = new List<Companion>(activeCompanions);
+				foreach (var comp in activeCompanions)
+					comp.SetCompanionState(false);
 			}
 
 			if (this.Summons.Count != 0)
@@ -267,10 +270,11 @@ namespace Melia.Zone.World.Actors.Characters
 			Send.ZC_RESURRECT(this);
 			this.IsResurrecting = false;
 
-			if (_companionToReactivate != null)
+			if (_companionsToReactivate != null)
 			{
-				_companionToReactivate.SetCompanionState(true);
-				_companionToReactivate = null;
+				foreach (var comp in _companionsToReactivate)
+					comp.SetCompanionState(true);
+				_companionsToReactivate = null;
 			}
 		}
 

@@ -492,6 +492,11 @@
 		public const string MSG_UPDATE_POISONPOT_UI = "MSG_UPDATE_POISONPOT_UI";
 
 		/// <summary>
+		/// Sorcerer Grimoire UI Update
+		/// </summary>
+		public const string UPDATE_GRIMOIRE_UI = "UPDATE_GRIMOIRE_UI";
+
+		/// <summary>
 		/// An effect played when you unlock Legendary Card Slot?
 		/// </summary>
 		public const string MSG_PLAY_LEGENDCARD_OPEN_EFFECT = "MSG_PLAY_LEGENDCARD_OPEN_EFFECT";

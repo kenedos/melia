@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 	{
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			if (!caster.TryGetActiveCompanion(out var companion))
+			if (!caster.TryGetActiveGroundCompanion(out var companion))
 			{
 				if (caster is Character character)
 					character.SystemMessage("CompanionIsNotActive");

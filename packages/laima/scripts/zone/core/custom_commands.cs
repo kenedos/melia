@@ -20,6 +20,7 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Yggdrasil.Logging;
 
@@ -130,8 +131,11 @@ public class CustomCommandFunctionsScript : GeneralScript
 		var companions = character.Companions.GetList();
 		if (companions.Count == 0)
 			return CustomCommandResult.Fail;
-		var companion = companions.FirstOrDefault();
-		if (companion == null && !character.Companions.TryGetCompanion(a => a.CompanionData.JobId == (int)JobId.Falconer, out companion))
+
+		// numArg2 contains the companion's job ID (e.g. 3014 for hawk, 0 for ground pet)
+		var jobId = numArg2;
+		Companion companion;
+		if (!character.Companions.TryGetCompanion(a => a.CompanionData.JobId == jobId, out companion))
 			return CustomCommandResult.Fail;
 
 		var nextActivateSec = companion.Vars.Get<DateTime>("NextActivateTime", DateTime.MinValue);
@@ -203,7 +207,7 @@ public class CustomCommandFunctionsScript : GeneralScript
 		var cooldowns = character.Components.Get<CooldownComponent>();
 		if (cooldowns.IsOnCooldown(item.Data.CooldownId))
 		{
-			return CustomCommandResult.Fail;
+			return CustomCommandResult.Okay;
 		}
 
 		var staminaAmount = (int)item.Data.Script.NumArg1;
@@ -229,10 +233,14 @@ public class CustomCommandFunctionsScript : GeneralScript
 	[ScriptableFunction]
 	public CustomCommandResult SCR_COMPANION_STROKE(Character character, int numArg1, int numArg2, int numArg3)
 	{
-		if (!character.TryGetActiveCompanion(out var companion))
-		{
+		// Prefer bird companion if it's on the player's shoulder,
+		// otherwise fall back to ground companion
+		var bird = character.Companions.ActiveBirdCompanion;
+		if (!character.TryGetActiveGroundCompanion(out var companion) && bird == null)
 			return CustomCommandResult.Fail;
-		}
+
+		if (bird != null && bird.IsLandedOnShoulder)
+			companion = bird;
 
 		Send.ZC_ENABLE_CONTROL(character.Connection, "PlaySumAni", false);
 

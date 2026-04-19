@@ -1824,13 +1824,14 @@ namespace Melia.Zone.Commands
 		{
 			sender.ServerMessage(Localization.Get("Reloading scripts..."));
 
-			var companionsToRestore = new System.Collections.Generic.Dictionary<Character, Companion>();
+			var companionsToRestore = new System.Collections.Generic.Dictionary<Character, System.Collections.Generic.List<Companion>>();
 			var characters = ZoneServer.Instance.World.GetCharacters();
 
 			foreach (var character in characters)
 			{
-				if (character.ActiveCompanion != null)
-					companionsToRestore[character] = character.ActiveCompanion;
+				var activeCompanions = character.Companions.GetActiveCompanions();
+				if (activeCompanions.Count > 0)
+					companionsToRestore[character] = new System.Collections.Generic.List<Companion>(activeCompanions);
 			}
 
 			KeywordDb.Clear();
@@ -1839,9 +1840,7 @@ namespace Melia.Zone.Commands
 
 			foreach (var kvp in companionsToRestore)
 			{
-				var character = kvp.Key;
-				var companion = kvp.Value;
-				if (companion != null)
+				foreach (var companion in kvp.Value)
 					companion.SetCompanionState(true);
 			}
 
@@ -3230,14 +3229,6 @@ namespace Melia.Zone.Commands
 				return CommandResult.Okay;
 			}
 
-			if (sender.HasCompanions)
-			{
-				var durationSeconds = 3;
-				var msg = "You already have a companion. Please store your companion at the Barracks first.";
-				sender?.AddonMessage("NOTICE_Dm_!", msg, durationSeconds);
-				return CommandResult.Okay;
-			}
-
 			if (!int.TryParse(args.Get(0), out var petShopId))
 			{
 				return CommandResult.InvalidArgument;
@@ -3251,6 +3242,23 @@ namespace Melia.Zone.Commands
 			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(data.ClassName, out var monData))
 			{
 				return CommandResult.InvalidArgument;
+			}
+
+			// Check if the character already has a companion of the same type.
+			// Type is determined by JobId (e.g. 3014 = bird/hawk, 0 = ground pet).
+			// A character can have one companion of each type active simultaneously.
+			var newIsBird = (JobId)data.JobId == JobId.Falconer;
+			var existingSameType = sender.Companions.GetList()
+				.FirstOrDefault(c => c.IsBird == newIsBird);
+
+			if (existingSameType != null)
+			{
+				var durationSeconds = 3;
+				var msg = newIsBird
+					? "You already have a hawk companion. Please store it at the Barracks first."
+					: "You already have a ground companion. Please store it at the Barracks first.";
+				sender?.AddonMessage("NOTICE_Dm_!", msg, durationSeconds);
+				return CommandResult.Okay;
 			}
 
 			var targetNpcName = "Companion Trader";

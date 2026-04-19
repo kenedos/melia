@@ -15,7 +15,7 @@ namespace Melia.Zone.Skills.Helpers
 
 		public static bool PetSkillPreCheck(ICombatEntity caster, Skill skill)
 		{
-			if (!caster.TryGetActiveCompanion(out var companion))
+			if (!caster.TryGetActiveGroundCompanion(out var companion))
 			{
 				caster.SendSysMsg("SummonedPetDoesNotExist");
 				return false;
@@ -49,14 +49,14 @@ namespace Melia.Zone.Skills.Helpers
 
 		private static bool PetCheckPausePetSkill(ICombatEntity caster, Skill skill)
 		{
-			if (!caster.TryGetActiveCompanion(out var companion))
+			if (!caster.TryGetActiveGroundCompanion(out var companion))
 				return false;
 			return true;
 		}
 
 		private static bool PetCheckActiveState(ICombatEntity caster, Skill skill)
 		{
-			return caster.TryGetActiveCompanion(out _);
+			return caster.TryGetActiveGroundCompanion(out _);
 		}
 
 		public static bool SkillCheckNearPad(ICombatEntity caster, Skill skill, string padName, bool isExist, float range)

@@ -731,10 +731,14 @@ namespace Melia.Barracks.Network
 			if (character != null)
 			{
 				var companionDb = BarracksServer.Instance.Data.CompanionDb;
+				var monsterDb = BarracksServer.Instance.Data.MonsterDb;
 				var newJobId = 0;
 
-				if (companionDb.TryFind(companion.MonsterId, out var newCompanionData))
+				if (monsterDb.TryFind(companion.MonsterId, out var newMonData)
+					&& companionDb.TryFindByClassName(newMonData.ClassName, out var newCompanionData))
+				{
 					newJobId = newCompanionData.JobId;
+				}
 
 				foreach (var other in conn.Account.GetCompanions())
 				{
@@ -745,8 +749,11 @@ namespace Melia.Barracks.Network
 						continue;
 
 					var otherJobId = 0;
-					if (companionDb.TryFind(other.MonsterId, out var otherCompanionData))
+					if (monsterDb.TryFind(other.MonsterId, out var otherMonData)
+						&& companionDb.TryFindByClassName(otherMonData.ClassName, out var otherCompanionData))
+					{
 						otherJobId = otherCompanionData.JobId;
+					}
 
 					if (otherJobId == newJobId)
 					{

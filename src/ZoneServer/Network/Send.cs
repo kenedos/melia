@@ -5113,6 +5113,22 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
+		/// Marks an entity as a summoning monster on the client.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="summon"></param>
+		/// <param name="isSummoning"></param>
+		public static void ZC_IS_SUMMONING_MONSTER(Character character, IMonster summon, bool isSummoning = true)
+		{
+			using var packet = Packet.Rent(Op.ZC_IS_SUMMONING_MONSTER);
+
+			packet.PutInt(summon.Handle);
+			packet.PutByte(isSummoning);
+
+			character.Connection.Send(packet);
+		}
+
+		/// <summary>
 		/// Updates the character's damage font skin (?) on the client.
 		/// </summary>
 		/// <param name="conn"></param>

@@ -2517,7 +2517,7 @@ namespace Melia.Zone.Network
 				packet.PutPosition(position);
 				packet.PutFloat(pentrateHeight);
 				packet.PutInt(syncKey);
-				packet.AddStringId(animation);
+				packet.PutLpString(animation);
 				packet.PutFloat(goTime);
 				packet.PutFloat(goEasing);
 				packet.PutFloat(backTime);
