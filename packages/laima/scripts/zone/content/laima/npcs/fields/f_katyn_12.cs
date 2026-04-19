@@ -16,7 +16,7 @@ public class FKatyn12NpcScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddNpc(24, 40120, "Statue of Goddess Vakarine", "f_katyn_12", 29.33316, 249.4619, -758.8959, 45, "WARP_F_KATYN_12", "STOUP_CAMP", "STOUP_CAMP");
 
-		// Lv1 Treasure Chest
+		// Lv1 Treasure Chest - Liquefied Solvent
 		//-------------------------------------------------------------------------
 		AddNpc(32, 147392, "Lv1 Treasure Chest", "f_katyn_12", 1642, 248.86, 1686, -90, "TREASUREBOX_LV_F_KATYN_1232", "", "");
 
