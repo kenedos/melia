@@ -1,4 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
+//--- Melia Script ----------------------------------------------------------
 // Companion Calculation Script
 //--- Description -----------------------------------------------------------
 // Functions that calculate companion-related values, such as properties.
@@ -134,8 +134,6 @@ public class CompanionCalculationsScript : GeneralScript
 		{
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
 				value *= 1.25f;
-			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -161,8 +159,6 @@ public class CompanionCalculationsScript : GeneralScript
 		{
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
 				value *= 1.25f;
-			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -255,10 +251,12 @@ public class CompanionCalculationsScript : GeneralScript
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 1.25f;
+				delta += 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
+				delta -= 0.25f;
+			value *= 1f + delta;
 		}
 		if (companion.IsBuffActive(BuffId.BeastMaster_Buff))
 			value *= 1.25f;
@@ -303,10 +301,12 @@ public class CompanionCalculationsScript : GeneralScript
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 0.75f;
+				delta -= 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 1.25f;
+				delta += 0.25f;
+			value *= 1f + delta;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -332,10 +332,12 @@ public class CompanionCalculationsScript : GeneralScript
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 0.75f;
+				delta -= 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 1.25f;
+				delta += 0.25f;
+			value *= 1f + delta;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -358,10 +360,12 @@ public class CompanionCalculationsScript : GeneralScript
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 1.25f;
+				delta -= 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
+				delta += 0.25f;
+			value *= 1f + delta;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -384,10 +388,12 @@ public class CompanionCalculationsScript : GeneralScript
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 1.25f;
+				delta -= 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
+				delta += 0.25f;
+			value *= 1f + delta;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));

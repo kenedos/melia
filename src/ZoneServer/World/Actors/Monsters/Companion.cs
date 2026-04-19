@@ -218,8 +218,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				var hpValue = this.Properties.GetFloat(PropertyName.HP);
 				Send.ZC_OBJECT_PROPERTY(this.Owner.Connection, this);
 				Send.ZC_NORMAL.PetPlayAnimation(this.Owner.Connection, this);
-				// Probably speed is not a fixed 90f value
-				Send.ZC_MSPD(this.Owner, this, this.ObjectId, 90f);
+				Send.ZC_MOVE_SPEED(this);
 				Send.ZC_PET_AUTO_ATK(this.Owner, this);
 				Send.ZC_NORMAL.PetInfo(this.Owner);
 				// Note: PvP/duel relation handling is done in HandleAppearingMonsters

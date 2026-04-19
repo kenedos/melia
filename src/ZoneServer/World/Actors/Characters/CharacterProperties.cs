@@ -4,6 +4,7 @@ using Melia.Shared.ObjectProperties;
 using Melia.Zone.Buffs;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
+using Melia.Zone.Skills;
 using Melia.Zone.World.Items;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Properties;
@@ -348,6 +349,14 @@ namespace Melia.Zone.World.Actors.Characters
 
 			// Subscribe to property changes that affect companion stats
 			this.SubscribeCompanionPropertyUpdates();
+
+			// Subscribe to ability toggles so companion stats that depend on
+			// the owner's active abilities (e.g. CompMastery) refresh live
+			if (this.Character.Abilities != null)
+			{
+				this.Character.Abilities.AbilityActivated += this.OnAbilityToggled;
+				this.Character.Abilities.AbilityDeactivated += this.OnAbilityToggled;
+			}
 		}
 
 		/// <summary>
@@ -383,6 +392,12 @@ namespace Melia.Zone.World.Actors.Characters
 
 			// Unsubscribe from companion property updates
 			this.UnsubscribeCompanionPropertyUpdates();
+
+			if (this.Character.Abilities != null)
+			{
+				this.Character.Abilities.AbilityActivated -= this.OnAbilityToggled;
+				this.Character.Abilities.AbilityDeactivated -= this.OnAbilityToggled;
+			}
 		}
 
 		/// <summary>
@@ -675,6 +690,26 @@ namespace Melia.Zone.World.Actors.Characters
 			// Send updated companion properties to the client
 			if (this.Character.Connection != null)
 				Send.ZC_OBJECT_PROPERTY(this.Character.Connection, companion);
+		}
+
+		/// <summary>
+		/// Called when the owner toggles or learns/removes an ability. Refreshes
+		/// companion properties so stats that read the owner's active abilities
+		/// (e.g. CompMastery) update live on the client.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="ability"></param>
+		private void OnAbilityToggled(Character character, Ability ability)
+		{
+			if (this.Character.Companions?.HasCompanions != true)
+				return;
+
+			foreach (var companion in this.Character.Companions.GetList())
+			{
+				companion.Properties.InvalidateAll();
+				if (this.Character.Connection != null)
+					Send.ZC_OBJECT_PROPERTY(this.Character.Connection, companion);
+			}
 		}
 	}
 }

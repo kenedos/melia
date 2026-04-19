@@ -18,6 +18,30 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly Dictionary<AbilityId, Ability> _abilities = new();
 
 		/// <summary>
+		/// Raised when an ability becomes active (passive learned or active toggled on).
+		/// </summary>
+		public event Action<Character, Ability> AbilityActivated;
+
+		/// <summary>
+		/// Raised when an ability becomes inactive (passive removed or active toggled off).
+		/// </summary>
+		public event Action<Character, Ability> AbilityDeactivated;
+
+		/// <summary>
+		/// Fires the activate/deactivate event that matches the given toggle
+		/// transition. Intended for callers that flip <see cref="Ability.Active"/>
+		/// themselves (e.g. the client toggle packet handler) and need to drive
+		/// the same event path as <see cref="Toggle(string)"/>.
+		/// </summary>
+		public void RaiseToggled(Ability ability, bool activated, bool wasActive)
+		{
+			if (activated)
+				this.AbilityActivated?.Invoke(this.Character, ability);
+			else if (wasActive)
+				this.AbilityDeactivated?.Invoke(this.Character, ability);
+		}
+
+		/// <summary>
 		/// Clears all abilities to release references for GC.
 		/// </summary>
 		public void Clear()
@@ -51,7 +75,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Activate property handler for passive abilities or active toggleable ones
 			if (ability.Data.Passive || ability.Active)
+			{
 				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, this.Character);
+				this.AbilityActivated?.Invoke(this.Character, ability);
+			}
 		}
 
 		/// <summary>
@@ -83,7 +110,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Deactivate property handler
 			if (ability.Data.Passive || ability.Active)
+			{
 				ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, this.Character);
+				this.AbilityDeactivated?.Invoke(this.Character, ability);
+			}
 
 			return true;
 		}
@@ -266,12 +296,18 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				{
 					// Deactivate with old level, then reactivate with new level
 					if (ability.Data.Passive || ability.Active)
+					{
 						ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, this.Character);
+						this.AbilityDeactivated?.Invoke(this.Character, ability);
+					}
 
 					ability.Level = level;
 
 					if (ability.Data.Passive || ability.Active)
+					{
 						ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, this.Character);
+						this.AbilityActivated?.Invoke(this.Character, ability);
+					}
 
 					Send.ZC_OBJECT_PROPERTY(this.Character.Connection, ability, PropertyName.Level);
 				}
@@ -282,7 +318,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 					// Activate property handler for new passive abilities
 					if (newAbility.Data.Passive || newAbility.Active)
+					{
 						ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(newAbility, this.Character);
+						this.AbilityActivated?.Invoke(this.Character, newAbility);
+					}
 
 					Send.ZC_ABILITY_LIST(this.Character);
 				}
@@ -304,13 +343,21 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return false;
 
 			// Deactivate before toggling off, activate after toggling on
-			if (ability.Active)
+			var wasActive = ability.Active;
+			if (wasActive)
 				ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, this.Character);
 
 			ability.Active = !ability.Active;
 
 			if (ability.Active)
+			{
 				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, this.Character);
+				this.AbilityActivated?.Invoke(this.Character, ability);
+			}
+			else if (wasActive)
+			{
+				this.AbilityDeactivated?.Invoke(this.Character, ability);
+			}
 
 			Send.ZC_OBJECT_PROPERTY(this.Character.Connection, ability);
 			Send.ZC_ADDON_MSG(this.Character, AddonMessage.RESET_ABILITY_ACTIVE, 0, className);

@@ -184,7 +184,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (buff.AffectsMovementSpeed())
 			{
 				this.Invalidate(PropertyName.MSPD);
-				Send.ZC_MSPD(this.Monster);
+				Send.ZC_MOVE_SPEED(this.Monster);
 			}
 		}
 
