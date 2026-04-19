@@ -140,6 +140,7 @@ namespace Melia.Zone.Commands
 			this.Add("droptest", "<item id|name> [count=1] [radius=50]", "Drops items on the ground for pickup testing.", this.HandleDropTest);
 			this.Add("spawn", "<monster id|class name> [amount=1] ['ai'=BasicMonster] ['tendency'=peaceful] ['hp'=amount]", "Spawns monster.", this.HandleSpawn);
 			this.Add("spawnbuff", "<monster id|class name> <buff class name> [duration=0] ['ai'=BasicMonster] ['tendency'=aggressive]", "Spawns monster with a buff.", this.HandleSpawnBuff);
+			this.Add("buff", "<buff class name> [duration=30]", "Applies a buff to yourself.", this.HandleBuff);
 			this.Add("madhatter", "", "Spawns all headgears.", this.HandleGetAllHats);
 			this.Add("heartofcards", "", "Spawns all boss cards at level 10.", this.HandleGetAllBossCards);
 			this.Add("heartofgems", "", "Spawns all gems at level 10.", this.HandleGetAllGems);
@@ -1609,6 +1610,29 @@ namespace Melia.Zone.Commands
 			monster.StartBuff(buffId, 0, 0, duration, monster);
 
 			sender.ServerMessage(Localization.Get("Spawned '{0}' with buff '{1}'."), monsterData.ClassName, buffId);
+
+			return CommandResult.Okay;
+		}
+
+		private CommandResult HandleBuff(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.IndexedCount < 1)
+				return CommandResult.InvalidArgument;
+
+			var buffName = args.Get(0);
+			if (!Enum.TryParse<BuffId>(buffName, out var buffId))
+			{
+				sender.ServerMessage(Localization.Get("Buff '{0}' not found."), buffName);
+				return CommandResult.Okay;
+			}
+
+			var duration = TimeSpan.FromSeconds(30);
+			if (args.IndexedCount >= 2 && int.TryParse(args.Get(1), out var durationSec))
+				duration = TimeSpan.FromSeconds(durationSec);
+
+			target.StartBuff(buffId, 0, 0, duration, target);
+
+			sender.ServerMessage(Localization.Get("Applied buff '{0}' to '{1}' for {2}s."), buffId, target.TeamName, (int)duration.TotalSeconds);
 
 			return CommandResult.Okay;
 		}
