@@ -25,12 +25,41 @@ public class PcPetAiScript : AiScript
 		this.MaxRoamDistance = 1000;
 		this.EnableReturnHome = false;
 
+		During("Idle", ResetDistantHateDuringIdle);
 		During("Idle", CheckEnemies);
 		During("Idle", CheckAggressiveMode);
 		During("Idle", CheckFear);
 		During("Attack", CheckTarget);
 		During("Attack", CheckMaster);
 		During("Attack", CheckFear);
+	}
+
+	protected override void CheckTarget()
+	{
+		if (this.Entity.IsLocked(LockType.Attack))
+			return;
+
+		if (this.EntityGone(_target) || !this.InRangeOf(_target, MaxChaseDistance))
+		{
+			if (_target != null && !this.EntityGone(_target) && !this.InRangeOf(_target, MaxChaseDistance))
+				this.RemoveHate(_target);
+
+			_target = null;
+			if (EnableReturnHome)
+				this.StartRoutine("ReturnHome", this.ReturnHome());
+			else
+				this.StartRoutine("Idle", this.Idle());
+			return;
+		}
+
+		if (!this.IsHating(_target))
+		{
+			_target = null;
+			if (EnableReturnHome)
+				this.StartRoutine("ReturnHome", this.ReturnHome());
+			else
+				this.StartRoutine("Idle", this.Idle());
+		}
 	}
 
 	protected override void Root()

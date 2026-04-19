@@ -191,7 +191,10 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns>The closest enemy in attack state within view range, or null</returns>
 		protected ICombatEntity GetEnemyInAttackState()
 		{
-			var enemiesInAttackState = this.Entity.Map.GetActorsInRange<ICombatEntity>(this.Entity.Position, _viewRange, target =>
+			this.TryGetMaster(out var masterForRange);
+			var searchRange = Math.Min(_viewRange, MaxChaseDistance);
+
+			var enemiesInAttackState = this.Entity.Map.GetActorsInRange<ICombatEntity>(this.Entity.Position, searchRange, target =>
 			{
 				if (target == null || target.IsDead)
 					return false;
@@ -202,6 +205,13 @@ namespace Melia.Zone.Scripting.AI
 
 				// Check if target can be attacked (not cloaked, etc.)
 				if (!this.CanBeHated(target))
+					return false;
+
+				// Must be reachable from both summon and master
+				if (!this.InRangeOf(target, MaxChaseDistance))
+					return false;
+
+				if (masterForRange != null && !target.Position.InRange2D(masterForRange.Position, DefaultMaxMasterDistance))
 					return false;
 
 				// Check if target is in attack state
@@ -305,6 +315,13 @@ namespace Melia.Zone.Scripting.AI
 			if (!this.Entity.CheckRelation(attacker, RelationType.Enemy))
 				return;
 
+			// Must be reachable
+			if (!this.InRangeOf(attacker, MaxChaseDistance))
+				return;
+
+			if (!attacker.Position.InRange2D(master.Position, DefaultMaxMasterDistance))
+				return;
+
 			// Prioritize this attacker
 			this._target = attacker;
 			this.IncreaseHate(attacker, 300f);
@@ -354,7 +371,12 @@ namespace Melia.Zone.Scripting.AI
 				if (master.Components.TryGet<CombatComponent>(out var masterCombat) && masterCombat.AttackState)
 				{
 					var attacker = masterCombat.GetTopAttackerByDamage();
-					if (attacker != null && !this.EntityGone(attacker) && this.CanBeHated(attacker) && this.Entity.CheckRelation(attacker, RelationType.Enemy))
+					if (attacker != null
+						&& !this.EntityGone(attacker)
+						&& this.CanBeHated(attacker)
+						&& this.Entity.CheckRelation(attacker, RelationType.Enemy)
+						&& this.InRangeOf(attacker, MaxChaseDistance)
+						&& attacker.Position.InRange2D(master.Position, DefaultMaxMasterDistance))
 					{
 						this._target = attacker;
 						this.IncreaseHate(attacker, 100f);
