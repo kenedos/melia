@@ -636,6 +636,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 					categoryItem.Amount += add;
 					amount -= add;
+					var previousAmount = categoryItem.Amount - add;
 
 					if (!silent)
 					{
@@ -643,12 +644,13 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 						// Use given add type if this was the last of it,
 						// or NotNew if only some was just added to a stack.
-						var adjustedAddType = (amount == 0 ? addType : InventoryAddType.NotNew);
+						if (previousAmount > 0)
+							Send.ZC_ITEM_REMOVE(this.Character, categoryItem.ObjectId, previousAmount, InventoryItemRemoveMsg.Given, inventoryType);
 
-						Send.ZC_ITEM_ADD(this.Character, categoryItem, categoryIndex, add, adjustedAddType, inventoryType, notificationDelay);
+						Send.ZC_ITEM_ADD(this.Character, categoryItem, categoryIndex, categoryItem.Amount, InventoryAddType.NotNew, inventoryType, notificationDelay);
 						if (ZoneServer.Instance.Conf.Log.LogItems)
 						{
-							var logReason = reason ?? adjustedAddType.ToString();
+							var logReason = reason ?? InventoryAddType.NotNew.ToString();
 							ZoneServer.Instance.Database.LogItemTransaction(this.Character.DbId, this.Character.Name, categoryItem.ObjectId, categoryItem.DbId, categoryItem.Id, categoryItem.Name, add, "Add", logReason);
 						}
 					}
@@ -1385,12 +1387,17 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				amountRemoved = amount;
 
 				if (!silently)
+				{
 					Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, amount, msg, inventoryType);
+
+					if (inventoryType == InventoryType.Inventory && Versions.Client > KnownVersions.ClosedBeta1)
+						Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
+				}
 
 				if (ZoneServer.Instance.Conf.Log.LogItems)
 					ZoneServer.Instance.Database.LogItemTransaction(this.Character.DbId, this.Character.Name, item.ObjectId, item.DbId, item.Id, item.Name, amount, "Remove", msg.ToString());
 
-				if (inventoryType == InventoryType.Inventory)
+				if (!silently && inventoryType == InventoryType.Inventory)
 					this.UpdateWeight();
 			}
 

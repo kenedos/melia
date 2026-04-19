@@ -1178,7 +1178,7 @@ namespace Melia.Zone.Scripting.Shared
 				L("Repair"),
 				L("Socket Management"),
 				L("Identify"),
-				L("Item Dismantle"),
+				// L("Item Dismantle"),
 				L("Change Weapon Appearance"),
 				L("Cancel")))
 			{
@@ -1191,10 +1191,10 @@ namespace Melia.Zone.Scripting.Shared
 				case 3:
 					await dialog.OpenCustomDialog(CustomDialog.APPRAISAL);
 					break;
+				//case 4:
+				//	dialog.OpenUI("itemdecompose");
+				//	break;
 				case 4:
-					dialog.OpenUI("itemdecompose");
-					break;
-				case 5:
 					dialog.OpenUI("briquetting");
 					break;
 			}

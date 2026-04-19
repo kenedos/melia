@@ -3019,9 +3019,10 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			// Remove items and count revenue
+			// Remove items and count revenue.
 			var totalMoney = 0;
 			var itemsSold = new Dictionary<int, Item>();
+			var affectedCategories = new HashSet<InventoryCategory>();
 
 			foreach (var itemToSell in itemsToSell)
 			{
@@ -3046,20 +3047,30 @@ namespace Melia.Zone.Network
 					return;
 				}
 
-				// Try to remove item
-				if (character.Inventory.Remove(item, amount, InventoryItemRemoveMsg.Sold) != InventoryResult.Success)
+				var objectId = item.ObjectId;
+				var category = item.Data.Category;
+
+				if (character.Inventory.Remove(item, amount, InventoryItemRemoveMsg.Sold, InventoryType.Inventory, silently: true) != InventoryResult.Success)
 				{
 					Log.Warning("CZ_ITEM_SELL: Failed to sell an item from user '{0}' .", conn.Account.Name);
 					continue;
 				}
 
+				Send.ZC_ITEM_REMOVE(character, objectId, amount, InventoryItemRemoveMsg.Sold, InventoryType.Inventory);
+
 				totalMoney += item.Data.SellPrice * amount;
 				itemsSold.Add(itemsSold.Count, item);
+				affectedCategories.Add(category);
 			}
 
 			// Give money
 			if (totalMoney > 0)
 				character.Inventory.Add(ItemId.Silver, totalMoney, InventoryAddType.Sell);
+
+			// Batch the client refresh work for all categories we touched.
+			foreach (var category in affectedCategories)
+				Send.ZC_ITEM_INVENTORY_INDEX_LIST(character, category);
+			Send.ZC_EQUIP_GEM_INFO(character);
 
 			// Need to keep track of items sold, server sends this list to the client
 			Send.ZC_SOLD_ITEM_DIVISION_LIST(character, InventoryType.Sold, itemsSold);
@@ -4860,13 +4871,16 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			if (ability.Active)
+			var wasActive = ability.Active;
+			if (wasActive)
 				ZoneServer.Instance.AbilityHandlers.DeactivatePropertyHandler(ability, character);
 
 			ability.Active = !ability.Active;
 
 			if (ability.Active)
 				ZoneServer.Instance.AbilityHandlers.ActivatePropertyHandler(ability, character);
+
+			character.Abilities.RaiseToggled(ability, activated: ability.Active, wasActive: wasActive);
 
 			Send.ZC_OBJECT_PROPERTY(conn, ability, PropertyName.ActiveState);
 			Send.ZC_ADDON_MSG(character, "RESET_ABILITY_ACTIVE", ability.Active ? 1 : 0, ability.Data.ClassName);
