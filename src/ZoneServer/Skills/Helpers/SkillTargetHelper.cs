@@ -119,9 +119,6 @@ namespace Melia.Zone.Skills.Helpers
 
 		public static void SkillTargetKnockdown(ICombatEntity caster, Skill skill, IList<ICombatEntity> targets, KnockType knockType, KnockDirection knockDirection, float power, float verticalAngle, float horizontalAngle, int bound, int knockdownRank)
 		{
-			if (caster.IsAbilityActive(AbilityId.Monk8))
-				return;
-
 			foreach (var target in targets)
 			{
 				if (target.CheckBoolTempVar("NO_HIT"))

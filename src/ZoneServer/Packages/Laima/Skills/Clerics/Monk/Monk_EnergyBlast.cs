@@ -90,10 +90,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 
 					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, delayBetweenHits, TimeSpan.Zero);
 
-					if (isLastHit && skillHitResult.Damage > 0 && target.IsKnockdownable() && !caster.IsAbilityActive(AbilityId.Monk8))
+					if (skillHitResult.Damage > 0 && target.IsKnockdownable() && !caster.IsAbilityActive(AbilityId.Monk8))
 					{
-						skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, KnockBackType.KnockDown, 80, 30);
-						skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
+						skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, skillHit.Target, KnockBackType.KnockBack, 80, 30);
+						skillHit.HitInfo.KnockBackType = KnockBackType.KnockBack;
 						target.ApplyKnockdown(caster, skill, skillHit);
 					}
 
