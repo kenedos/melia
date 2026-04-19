@@ -1292,7 +1292,13 @@ namespace Melia.Zone.Network
 			var direction = packet.GetDirection();
 			var character = conn.SelectedCharacter;
 
-			character?.Rotate(direction);
+			if (character == null)
+				return;
+
+			if (!character.IsRotatableCasting())
+				return;
+
+			character.Rotate(direction);
 		}
 
 		/// <summary>

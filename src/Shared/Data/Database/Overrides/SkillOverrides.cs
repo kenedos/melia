@@ -79,6 +79,8 @@ namespace Melia.Shared.Data.Database
 			}
 			if (entry.ContainsKey("enableCastMove"))
 				data.EnableCastMove = entry.ReadBool("enableCastMove");
+			if (entry.ContainsKey("enableCastRotate"))
+				data.EnableCastRotate = entry.ReadBool("enableCastRotate");
 			if (entry.ContainsKey("castInterruptible"))
 				data.CastInterruptible = entry.ReadBool("castInterruptible");
 			if (entry.ContainsKey("useType"))

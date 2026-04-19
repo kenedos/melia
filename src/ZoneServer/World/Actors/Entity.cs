@@ -1311,6 +1311,32 @@ namespace Melia.Zone.World.Actors
 			=> entity.Components.Get<CombatComponent>()?.IsMoveableCasting() ?? false;
 
 		/// <summary>
+		/// Returns true if the entity is not casting or running a skill
+		/// that disallows rotation, false otherwise.
+		/// </summary>
+		/// <param name="entity"></param>
+		public static bool IsRotatableCasting(this ICombatEntity entity)
+		{
+			if (entity.Components.Get<CombatComponent>()?.IsRotatableCasting() == false)
+				return false;
+
+			// Certain skills continue casting after dynamic cast ends,
+			// an example would be Monk_EnergyBlast. Because of that, we
+			// check IsRunning on the skill handler as well
+			var skills = (BaseSkillComponent)entity.Components.Get<SkillComponent>() ?? entity.Components.Get<BaseSkillComponent>();
+			if (skills != null)
+			{
+				foreach (var skill in skills.GetList())
+				{
+					if (skill.IsRunning && !skill.Data.EnableCastRotate)
+						return false;
+				}
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Applies a knockback to target in skill hit context.
 		/// Sets knockback info on the SkillHitInfo and applies position/state changes.
 		/// The knockback animation is sent embedded in the skill hit packet.

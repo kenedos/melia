@@ -60,6 +60,7 @@ namespace Melia.Shared.Data.Database
 		public bool SpeedRateAffectedByBuff { get; set; }
 
 		public bool EnableCastMove { get; set; }
+		public bool EnableCastRotate { get; set; }
 		public bool CastInterruptible { get; set; }
 
 		public SkillHitType HitType { get; set; }
@@ -340,6 +341,7 @@ namespace Melia.Shared.Data.Database
 			data.SpeedRateAffectedByBuff = entry.ReadBool("speedRateAffectedByBuff");
 
 			data.EnableCastMove = entry.ReadBool("enableCastMove");
+			data.EnableCastRotate = entry.ReadBool("enableCastRotate", true);
 			data.CastInterruptible = entry.ReadBool("castInterruptible");
 
 			data.HitType = entry.ReadEnum("hitType", SkillHitType.Melee);

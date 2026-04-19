@@ -280,6 +280,19 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Returns true if entity is casting and can rotate while
+		/// casting.
+		/// </summary>
+		/// <returns></returns>
+		public bool IsRotatableCasting()
+		{
+			if (this._isCasting && !this._castingSkill.Data.EnableCastRotate)
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
 		/// Attempts to interrupt the currently casting skill taking into
 		/// consideration if it has interruptible cast time or not.
 		/// Returns true if the casting was interrupted.
