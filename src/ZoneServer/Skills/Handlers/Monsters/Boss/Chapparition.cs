@@ -192,6 +192,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 100, height: 1);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 
 			foreach (var delay in delays)
 			{
@@ -199,9 +201,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 100, height: 1);
 				position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 				await EffectAndHit(skill, caster, position, hitConfig, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+				hits.Clear();
 			}
 
-			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
 		}
 	}
 
@@ -305,63 +308,97 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 2.5294259, angle: 134f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
 			position = GetRelativePosition(PosType.TargetDistance, caster, target);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetDistance, caster, target);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigNoKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigNoKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.6464868, angle: 117f, rand: 190, height: 1);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigNoKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigNoKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigNoKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigNoKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigNoKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, distance: 2.0491724, angle: 157f, rand: 200);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, distance: 2.0491724, angle: 157f, rand: 180);
 			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
 			await EffectAndHit(skill, caster, position, hitConfigKnock, hits);

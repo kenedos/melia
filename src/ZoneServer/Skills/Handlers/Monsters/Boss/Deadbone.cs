@@ -343,6 +343,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 4000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
 			position = originPos.GetRelative(farPos, distance: 36.069061f, angle: 25f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
@@ -361,6 +363,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 4000f, 1, 10, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 			position = originPos.GetRelative(farPos, distance: 40f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig

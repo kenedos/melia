@@ -248,11 +248,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var targetPos = originPos.GetRelative(farPos, distance: 12.135043f, angle: -50f);
 			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 150f, 20));
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			var position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 160);
 			var hits = new List<SkillHitInfo>();
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
 			var config = new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_smoke129_spreadout##0.8", 0.5f),
@@ -270,49 +266,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
-			position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_debrave, 1, 0f, 6000f, 1, 10, -1, hits);
+			for (var i = 0; i < 9; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 10, height: 2);
+				position = position.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+				await EffectAndHit(skill, caster, position, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_debrave, 1, 0f, 6000f, 1, 10, -1, hits);
+				SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+				hits.Clear();
+			}
 		}
 	}
 }

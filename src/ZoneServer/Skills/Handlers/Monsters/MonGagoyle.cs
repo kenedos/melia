@@ -121,6 +121,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			startingPosition = originPos.GetRelative(farPos);
 			endingPosition = originPos.GetRelative(farPos, distance: 320f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
@@ -139,10 +141,10 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(450));
 			var targetPos = originPos.GetRelative(farPos, distance: 150);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.pollution_zone);
-			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
 		}
 	}
 
@@ -189,6 +191,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				VerticalAngle = 30f,
 				InnerRange = 0f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			position = originPos.GetRelative(farPos);
 			await PadDestruction(skill, caster, position, 20, 150f, PadName.All, "I_pattern008_explosion_mash_square", 1f, 20f, 160f, 2);
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
@@ -211,6 +215,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			var effectHitConfig2 = new EffectHitConfig
 			{
@@ -231,6 +237,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			var effectHitConfig3 = new EffectHitConfig
 			{
@@ -251,6 +259,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(850));
 			var effectHitConfig4 = new EffectHitConfig
 			{
@@ -271,42 +281,64 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig4, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(650));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig4, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(50));
 			position = originPos.GetRelative(farPos);
 			await PadDestruction(skill, caster, position, 20, 150f, PadName.All, "I_pattern008_explosion_mash_square", 1f, 20f, 160f, 2);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(250));
 			position = originPos.GetRelative(farPos);
 			await PadDestruction(skill, caster, position, 20, 150f, PadName.All, "I_pattern008_explosion_mash_square", 1f, 20f, 160f, 2);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig4, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
@@ -422,6 +454,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				VerticalAngle = 60f,
 				InnerRange = 0f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
 			var startingPosition = originPos.GetRelative(farPos, distance: 80f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 240f);
@@ -441,9 +475,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect_Mon, 1, 0f, 30000f, 1, 100, -1, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.Catacom_MDEF_Debuff, 1, 0f, 30000f, 1, 100, -1, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.Raid_Velcofer_Cnt_Debuff, 1, 0f, 0f, 3, 100, -1, hits);
 		}
 	}
 

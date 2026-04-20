@@ -49,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 
 			var position = originPos.GetRelative(farPos);
-			await EffectAndHitRangePreview(skill, caster, position, new EffectHitConfig
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				PositionDelay = 3500,
 				GroundEffect = new EffectConfig("F_archer_explosion2", 2.5f),

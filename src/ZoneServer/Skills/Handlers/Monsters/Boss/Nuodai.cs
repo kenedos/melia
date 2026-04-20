@@ -109,60 +109,33 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2400));
 			var hits = new List<SkillHitInfo>();
-			var position = originPos.GetRelative(farPos);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
+			var effects = new[] { "F_spread_out037_violet_ice_leaf", "None", "F_spread_out037_violet_ice_leaf" };
+			var scales = new[] { 1.3f, 2f, 3f };
+			var ranges = new[] { 100f, 150f, 200f };
+			for (var i = 0; i < 3; i++)
 			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 0,
-				Effect = new EffectConfig("F_spread_out037_violet_ice_leaf", 1.3f),
-				Range = 100f,
-				KnockdownPower = 0f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 1,
-				VerticalAngle = 0f,
-				InnerRange = 0f,
-			}, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(400));
-			position = originPos.GetRelative(farPos);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
-			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 0,
-				Effect = new EffectConfig("None", 2f),
-				Range = 150f,
-				KnockdownPower = 0f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 1,
-				VerticalAngle = 0f,
-				InnerRange = 0f,
-			}, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(400));
-			position = originPos.GetRelative(farPos);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
-			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 0,
-				Effect = new EffectConfig("F_spread_out037_violet_ice_leaf", 3f),
-				Range = 200f,
-				KnockdownPower = 0f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 1,
-				VerticalAngle = 0f,
-				InnerRange = 0f,
-			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 50, -1, hits);
+				if (i > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(400));
+				var position = originPos.GetRelative(farPos);
+				await EffectAndHit(skill, caster, position, new EffectHitConfig
+				{
+					GroundEffect = EffectConfig.None,
+					PositionDelay = 0,
+					Effect = new EffectConfig(effects[i], scales[i]),
+					Range = ranges[i],
+					KnockdownPower = 0f,
+					Delay = 0f,
+					HitCount = 1,
+					HitDuration = 1000f,
+					CasterEffect = EffectConfig.None,
+					CasterNodeName = "None",
+					KnockType = 1,
+					VerticalAngle = 0f,
+					InnerRange = 0f,
+				}, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 50, -1, hits);
+				hits.Clear();
+			}
 		}
 	}
 
@@ -249,6 +222,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 10000f, 1, 30, -1, hits);
+			hits.Clear();
 			var config = new ArrowConfig
 			{
 				ArrowEffect = EffectConfig.None,
@@ -271,9 +246,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				startingPosition = originPos.GetRelative(farPos);
 				endingPosition = originPos.GetRelative(farPos, distance: 250f);
 				await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 10000f, 1, 30, -1, hits);
 			}
 			SkillResultTargetBuff(caster, skill, BuffId.UC_mspblood, 1, 0f, 4000f, 1, 25, -1, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 10000f, 1, 30, -1, hits);
 		}
 	}
 }

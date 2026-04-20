@@ -210,14 +210,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var position = originPos.GetRelative(farPos, angle: -100f, rand: 100, height: 1);
-			await EffectAndHit(skill, caster, position, config, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(3000));
-			position = originPos.GetRelative(farPos, angle: -100f, rand: 100, height: 1);
-			await EffectAndHit(skill, caster, position, config, hits);
+			for (var i = 0; i < 2; i++)
+			{
+				if (i > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(3000));
+				var position = originPos.GetRelative(farPos, angle: -100f, rand: 100, height: 1);
+				await EffectAndHit(skill, caster, position, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
+				hits.Clear();
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(7500));
 			SkillRemovePad(caster, skill);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
 		}
 	}
 

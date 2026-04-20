@@ -294,6 +294,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 4000f, 1, 10, -1, hits);
+			hits.Clear();
 			startingPosition = originPos.GetRelative(farPos, distance: 20f);
 			endingPosition = originPos.GetRelative(farPos, distance: 200f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig

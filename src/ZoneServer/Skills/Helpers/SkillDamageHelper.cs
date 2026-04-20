@@ -24,6 +24,7 @@ using static Melia.Zone.Scripting.Shortcuts;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 using static Melia.Zone.Skills.Helpers.SkillUtilHelper;
+using static Melia.Zone.Skills.Helpers.SkillRangePreviewHelper;
 namespace Melia.Zone.Skills.Helpers
 {
 	public static class SkillDamageHelper
@@ -179,20 +180,7 @@ namespace Melia.Zone.Skills.Helpers
 			Func<Skill, ICombatEntity, ICombatEntity, SkillHitResult, SkillHitResult> modifySkillHitResult = null,
 			SkillModifier skillModifier = null)
 		{
-			if (caster is Character character && (character.Variables.Temp.GetBool("Melia.RangePreview")))
-			{
-				if (skill.Data.ShootTime < SkillConstants.MaxShootTimeForPreview)
-					Debug.ShowShape(caster.Map, splashArea, skill.Data.ShootTime);
-				else
-					Debug.ShowShape(caster.Map, splashArea, SkillConstants.DefaultDebugShapeDuration);
-			}
-			if (caster is Mob)
-			{
-				if (skill.Data.ShootTime < SkillConstants.MaxShootTimeForPreview)
-					Debug.ShowShape(caster.Map, splashArea, skill.Data.ShootTime);
-				else
-					Debug.ShowShape(caster.Map, splashArea, SkillConstants.DefaultDebugShapeDuration);
-			}
+			ShowRangePreview(caster, skill, splashArea);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(aniTime));
 
@@ -536,11 +524,12 @@ namespace Melia.Zone.Skills.Helpers
 			return mob;
 		}
 
-
 		public static async Task MissileFall(ICombatEntity caster, Skill skill, Position position, MissileConfig config, List<SkillHitInfo> hits = null)
 		{
 			if (caster.IsDead)
 				return;
+
+			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range));
 
 			skill.Vars.Set("Melia.Skill.vAngle", config.VerticalAngle);
 
@@ -557,6 +546,8 @@ namespace Melia.Zone.Skills.Helpers
 		{
 			if (caster.IsDead)
 				return;
+
+			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range));
 
 			if (!string.IsNullOrEmpty(config.GroundEffect.Name) && config.GroundEffect.Name != "None")
 				await caster.PlayEffectToGround(config.GroundEffect.Name, position, config.GroundEffect.Scale, 0, config.GroundDelay);
@@ -594,6 +585,8 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster.IsDead)
 				return;
 
+			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range, config.InnerRange));
+
 			if (!string.IsNullOrEmpty(config.TargetEffect.Name) && config.TargetEffect.Name != "None")
 				caster.PlayEffectToGround(config.TargetEffect.Name, position, config.TargetEffect.Scale, 0, config.TargetEffectDuration);
 
@@ -620,6 +613,9 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster.IsDead)
 				return;
 
+			var previewMs = config.PositionDelay + config.Delay + config.HitDuration;
+			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range, config.InnerRange), TimeSpan.FromMilliseconds(previewMs));
+
 			skill.Vars.Set("Melia.Skill.vAngle", config.VerticalAngle);
 
 			if (config.GroundEffect.Name != "None")
@@ -641,26 +637,12 @@ namespace Melia.Zone.Skills.Helpers
 			await DoDamageOverTime(skill, caster, position, config.Delay * 0.001f, config.Range, config.HitDuration, config.HitCount, "None", 1.0f, config.KnockdownPower, config.KnockType, config.InnerRange, hits: hitResults);
 		}
 
-		public static async Task EffectAndHitRangePreview(Skill skill, ICombatEntity caster, Position position, EffectHitConfig config, List<SkillHitInfo> hitResults = null)
-		{
-			if (caster.IsDead)
-				return;
-
-			if (config.GroundEffect.Name != "None")
-				await caster.PlayEffectToGround(config.GroundEffect.Name, position, config.GroundEffect.Scale);
-
-			Send.ZC_START_RANGE_PREVIEW(caster, skill.Data.ClassName, TimeSpan.FromMilliseconds(config.PositionDelay), Shared.Data.Database.SplashType.Circle, caster.Position, caster.Direction, 0, config.Range);
-
-			if (config.PositionDelay > 0)
-				await skill.Wait(TimeSpan.FromMilliseconds(config.PositionDelay));
-
-			await DoDamageOverTime(skill, caster, position, config.Delay * 0.001f, config.Range, config.HitDuration, config.HitCount, "None", 1.0f, config.KnockdownPower, hits: hitResults);
-		}
-
 		public static async Task PadDestruction(Skill skill, ICombatEntity caster, Position position, int padCount, float range, string padStyle, string effect, float effectScale, float hitRange, float knockdownPower, int relationBit)
 		{
 			if (caster == null || caster.IsDead)
 				return;
+
+			ShowRangePreview(caster, skill, new CircleF(position, range));
 
 			var pads = caster.Map.GetPadsAt(position, range);
 			if (padStyle == "MINE")
@@ -685,6 +667,8 @@ namespace Melia.Zone.Skills.Helpers
 		{
 			if (caster.IsDead)
 				return;
+
+			ShowRangePreview(caster, skill, new CircleF(endingPosition, config.Range));
 
 			Send.ZC_NORMAL.PlayArrowEffect(caster, startingPosition, endingPosition,
 				config.ArrowEffect.Name, config.ArrowEffect.Scale, config.ArrowSpacing, config.ArrowSpacingTime, config.ArrowLifeTime);

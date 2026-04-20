@@ -297,6 +297,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 10000f, 1, 100, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			var config = new MissileConfig
 			{

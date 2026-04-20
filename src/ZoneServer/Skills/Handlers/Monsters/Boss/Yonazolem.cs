@@ -300,6 +300,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			var position = originPos.GetRelative(farPos, distance: 50);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+			hits.Clear();
 			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 			var effectHitConfig2 = new EffectHitConfig
@@ -319,19 +321,22 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+			for (var i = 0; i < 4; i++)
+			{
+				if (i > 0)
+				{
+					position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+					await skill.Wait(TimeSpan.FromMilliseconds(150));
+				}
+				await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+				hits.Clear();
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(150));
 			position = originPos.GetRelative(farPos, distance: 50);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+			hits.Clear();
 			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 
@@ -352,23 +357,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
-			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-
-
-			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
-			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-
-			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
-			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-
-			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
-			position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-			await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
+			for (var i = 0; i < 5; i++)
+			{
+				if (i > 0)
+				{
+					position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+					await skill.Wait(TimeSpan.FromMilliseconds(150));
+				}
+				await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 10000f, 1, 5, -1, hits);
+				hits.Clear();
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(1550));
 			position = originPos.GetRelative(farPos, distance: 50);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig

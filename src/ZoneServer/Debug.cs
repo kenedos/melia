@@ -24,6 +24,8 @@ namespace Melia.Zone
 {
 	public static class Debug
 	{
+		private static int _rangePreviewCounter = 0;
+
 		/// <summary>
 		/// Temporarily visualizes the shape on the map using friendly
 		/// monsters and range previews.
@@ -64,9 +66,11 @@ namespace Melia.Zone
 
 			if (rangePreview)
 			{
+				var uniqueName = "DebugPreview_" + System.Threading.Interlocked.Increment(ref _rangePreviewCounter);
+
 				if (shape is ISplashArea splashArea)
 				{
-					Send.ZC_START_RANGE_PREVIEW(map, 0, null, (TimeSpan)duration, splashArea);
+					Send.ZC_START_RANGE_PREVIEW(map, 0, uniqueName, (TimeSpan)duration, splashArea);
 				}
 				else
 				{
@@ -89,7 +93,7 @@ namespace Melia.Zone
 						var height = maxDistance;
 						var width = 0f;
 
-						Send.ZC_START_RANGE_PREVIEW(map, 0, null, (TimeSpan)duration, splashType, centerPos, Direction.Zero, height, width);
+						Send.ZC_START_RANGE_PREVIEW(map, 0, uniqueName, (TimeSpan)duration, splashType, centerPos, Direction.Zero, height, width);
 					}
 				}
 			}

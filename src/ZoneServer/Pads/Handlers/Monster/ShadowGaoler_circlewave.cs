@@ -18,7 +18,7 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var creator = args.Creator;
 
-			pad.SetRange(120f);
+			pad.SetRange(300f);
 			pad.SetUpdateInterval(300);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(2000);
 			pad.Trigger.MaxUseCount = 1;

@@ -109,12 +109,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 60, angle: 74f);
-			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
-			position = originPos.GetRelative(farPos, distance: 60);
-			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
-			position = originPos.GetRelative(farPos, distance: 60, angle: -74f);
-			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			var angles = new[] { 74f, 0f, -74f };
+			Position position;
+			for (var i = 0; i < 3; i++)
+			{
+				position = originPos.GetRelative(farPos, distance: 60, angle: angles[i]);
+				await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 6000f, 1, 20, -1, hits);
+				hits.Clear();
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(1100));
 			var effectHitConfig2 = new EffectHitConfig
 			{
@@ -133,13 +136,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			position = originPos.GetRelative(farPos, distance: 60, angle: 74f);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			position = originPos.GetRelative(farPos, distance: 60, angle: -74f);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			position = originPos.GetRelative(farPos, distance: 60);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 6000f, 1, 20, -1, hits);
+			var angles2 = new[] { 74f, -74f, 0f };
+			for (var i = 0; i < 3; i++)
+			{
+				position = originPos.GetRelative(farPos, distance: 60, angle: angles2[i]);
+				await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 6000f, 1, 20, -1, hits);
+				if (i < 2)
+					hits.Clear();
+			}
 		}
 	}
 

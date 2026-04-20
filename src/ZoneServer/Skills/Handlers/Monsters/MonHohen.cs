@@ -292,13 +292,13 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				InnerRange = 0f,
 			};
 
-			var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target);
-			await EffectAndHit(skill, caster, position, config, hits);
-			position = GetRelativePosition(PosType.TargetDistance, caster, target);
-			await EffectAndHit(skill, caster, position, config, hits);
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target);
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_shock, 1, 0f, 10000f, 1, 100, hits: hits);
+			for (var i = 0; i < 3; i++)
+			{
+				var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target);
+				await EffectAndHit(skill, caster, position, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_shock, 1, 0f, 10000f, 1, 100, -1, hits);
+				hits.Clear();
+			}
 		}
 	}
 

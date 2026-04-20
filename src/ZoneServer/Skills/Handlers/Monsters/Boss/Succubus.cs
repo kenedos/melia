@@ -81,78 +81,34 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 			var hits = new List<SkillHitInfo>();
-			var position = originPos.GetRelative(farPos);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
+			var ranges = new[] { 60f, 80f, 110f, 140f };
+			var innerRanges = new[] { 30f, 50f, 80f, 100f };
+			var knockTypes = new[] { 3, 3, 3, 4 };
+			var vAngles = new[] { 10f, 10f, 10f, 60f };
+			for (var i = 0; i < 4; i++)
 			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 1000,
-				Effect = EffectConfig.None,
-				Range = 60f,
-				KnockdownPower = 150f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 3,
-				VerticalAngle = 10f,
-				InnerRange = 30f,
-			}, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-			position = originPos.GetRelative(farPos);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
-			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 1000,
-				Effect = EffectConfig.None,
-				Range = 80f,
-				KnockdownPower = 150f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 3,
-				VerticalAngle = 10f,
-				InnerRange = 50f,
-			}, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-			position = originPos.GetRelative(farPos);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
-			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 1000,
-				Effect = EffectConfig.None,
-				Range = 110f,
-				KnockdownPower = 150f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 3,
-				VerticalAngle = 10f,
-				InnerRange = 80f,
-			}, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-			position = originPos.GetRelative(farPos);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
-			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 1000,
-				Effect = EffectConfig.None,
-				Range = 140f,
-				KnockdownPower = 150f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 4,
-				VerticalAngle = 60f,
-				InnerRange = 100f,
-			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 6000f, 1, 10, -1, hits);
+				if (i > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(150));
+				var position = originPos.GetRelative(farPos);
+				await EffectAndHit(skill, caster, position, new EffectHitConfig
+				{
+					GroundEffect = EffectConfig.None,
+					PositionDelay = 1000,
+					Effect = EffectConfig.None,
+					Range = ranges[i],
+					KnockdownPower = 150f,
+					Delay = 0f,
+					HitCount = 1,
+					HitDuration = 1000f,
+					CasterEffect = EffectConfig.None,
+					CasterNodeName = "None",
+					KnockType = knockTypes[i],
+					VerticalAngle = vAngles[i],
+					InnerRange = innerRanges[i],
+				}, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 6000f, 1, 10, -1, hits);
+				hits.Clear();
+			}
 		}
 	}
 

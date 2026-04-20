@@ -56,6 +56,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 0f,
 				InnerRange = 0f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Mythic_freeze, 99, 0f, 3000f, 1, 100, -1, hits);
+			hits.Clear();
 			var targetPos = originPos.GetRelative(farPos);
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 			var config = new EffectHitConfig
@@ -79,11 +81,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			{
 				position = originPos.GetRelative(farPos, distance: 180);
 				await EffectAndHit(skill, caster, position, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.Mythic_freeze, 99, 0f, 3000f, 1, 100, -1, hits);
+				hits.Clear();
 
 				if (i < 3)
 					await skill.Wait(TimeSpan.FromMilliseconds(300));
 			}
-			SkillResultTargetBuff(caster, skill, BuffId.Mythic_freeze, 99, 0f, 3000f, 1, 100, -1, hits);
 		}
 	}
 

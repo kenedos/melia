@@ -206,11 +206,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 10);
-			await EffectAndHit(skill, caster, position, config, hits);
-			position = originPos.GetRelative(farPos, distance: 10);
-			await EffectAndHit(skill, caster, position, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, 2f, 12000f, 1, 100, -1, hits);
+			for (var i = 0; i < 2; i++)
+			{
+				var position = originPos.GetRelative(farPos, distance: 10);
+				await EffectAndHit(skill, caster, position, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, 2f, 12000f, 1, 100, -1, hits);
+				hits.Clear();
+			}
 		}
 	}
 

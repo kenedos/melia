@@ -118,6 +118,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 0,
 				HitDuration = 1000f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_fear, 1, 0f, 10000f, 1, 20, -1, hits);
+			hits.Clear();
 			startingPosition = originPos.GetRelative(farPos, distance: 10f);
 			endingPosition = originPos.GetRelative(farPos, distance: 200f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig

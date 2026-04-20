@@ -198,6 +198,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				VerticalAngle = 0f,
 				InnerRange = 10f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_silence, 1, 0f, 6000f, 1, 10, hits: hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
 			position = farPos;
 			await EffectAndHit(skill, caster, position, new EffectHitConfig

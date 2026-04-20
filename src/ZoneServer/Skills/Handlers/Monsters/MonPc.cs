@@ -1730,6 +1730,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 4, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(60));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 70, height: 1);
 			await MissileThrow(skill, caster, position, missileConfig);
@@ -1759,6 +1761,8 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			await skill.Wait(TimeSpan.FromMilliseconds(40));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 4, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(20));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 70, height: 1);
 			await MissileThrow(skill, caster, position, missileConfig);
@@ -1792,6 +1796,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				VerticalAngle = 0f,
 				InnerRange = 0f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 4, -1, hits);
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 70, height: 1);
 			await MissileThrow(skill, caster, position, missileConfig2);
 			await skill.Wait(TimeSpan.FromMilliseconds(60));
@@ -1812,7 +1817,6 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			await skill.Wait(TimeSpan.FromMilliseconds(80));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 70, height: 1);
 			await MissileThrow(skill, caster, position, missileConfig);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 4, -1, hits);
 		}
 	}
 
@@ -3633,7 +3637,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 		{
 			var hits = new List<SkillHitInfo>();
 			var position = originPos.GetRelative(farPos, distance: 32.894077f);
-			await EffectAndHitRangePreview(skill, caster, position, new EffectHitConfig
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				PositionDelay = 1000,
 				GroundEffect = new EffectConfig("GroundImpact_ElectricCrush_Purple_01", 0.6f),
@@ -3645,7 +3649,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			}, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(2500));
 			position = originPos.GetRelative(farPos, distance: 32.894077f);
-			await EffectAndHitRangePreview(skill, caster, position, new EffectHitConfig
+			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				PositionDelay = 1000,
 				GroundEffect = new EffectConfig("GroundImpact_WaterPillar_Purple_02", 0.8f),
@@ -5006,9 +5010,9 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			};
 
 			var position = originPos.GetRelative(farPos, distance: 96.552032f);
-			await EffectAndHitRangePreview(skill, caster, position, config, hits);
+			await EffectAndHit(skill, caster, position, config, hits);
 			position = originPos.GetRelative(farPos, distance: 96.219543f);
-			await EffectAndHitRangePreview(skill, caster, position, config, hits);
+			await EffectAndHit(skill, caster, position, config, hits);
 
 			foreach (var hit in hits)
 				SkillResultKnockTarget(caster, null, skill, hit, KnockType.KnockDown, KnockDirection.TowardsTarget, 200, 40, 0, 1, 2);

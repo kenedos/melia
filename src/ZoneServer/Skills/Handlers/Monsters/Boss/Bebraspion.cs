@@ -209,6 +209,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			{
 				position = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
 				await EffectAndHit(skill, caster, position, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_shock, 1, 0f, 6000f, 1, 10, -1, hits);
+				hits.Clear();
 
 				if (i < delays.Length)
 					await skill.Wait(TimeSpan.FromMilliseconds(delays[i]));

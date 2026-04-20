@@ -302,14 +302,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			var startingPosition = originPos.GetRelative(farPos);
-			var endingPosition = originPos.GetRelative(farPos, distance: 300f);
-			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.ElectricShock, 1, 0f, 6000f, 1, 100, -1, hits);
-			startingPosition = originPos.GetRelative(farPos);
-			endingPosition = originPos.GetRelative(farPos, distance: 300f);
-			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.ElectricShock, 1, 0f, 6000f, 1, 100, -1, hits);
+			for (var i = 0; i < 2; i++)
+			{
+				var startingPosition = originPos.GetRelative(farPos);
+				var endingPosition = originPos.GetRelative(farPos, distance: 300f);
+				await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.ElectricShock, 1, 0f, 6000f, 1, 100, -1, hits);
+				hits.Clear();
+			}
 		}
 	}
 }

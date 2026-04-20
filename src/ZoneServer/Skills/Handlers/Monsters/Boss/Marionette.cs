@@ -57,9 +57,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 0f,
 				InnerRange = 0f,
 			}, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(300));
-			position = originPos.GetRelative(farPos, distance: 60);
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
+			await skill.Wait(TimeSpan.FromMilliseconds(1300));
 
 			var darkBurstConfig = new EffectHitConfig
 			{
@@ -78,17 +78,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0f,
 			};
 
-			position = originPos.GetRelative(farPos, distance: 210, angle: 22f);
-			await EffectAndHit(skill, caster, position, darkBurstConfig, hits);
-			position = originPos.GetRelative(farPos, distance: 210);
-			await EffectAndHit(skill, caster, position, darkBurstConfig, hits);
-			position = originPos.GetRelative(farPos, distance: 210, angle: -22f);
-			await EffectAndHit(skill, caster, position, darkBurstConfig, hits);
+			var angles = new[] { 22f, 0f, -22f };
+			for (var i = 0; i < 3; i++)
+			{
+				position = originPos.GetRelative(farPos, distance: 210, angle: angles[i]);
+				await EffectAndHit(skill, caster, position, darkBurstConfig, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 5000f, 1, 3, -1, hits);
+				hits.Clear();
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 210, angle: 22f);
-			position = originPos.GetRelative(farPos, distance: 210);
-			position = originPos.GetRelative(farPos, distance: 210, angle: -22f);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 5000f, 1, 3, -1, hits);
 		}
 	}
 
@@ -133,6 +131,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 0f,
 				InnerRange = 20f,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 5000f, 1, 20, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			position = originPos.GetRelative(farPos);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig

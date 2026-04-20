@@ -228,34 +228,58 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			var position = originPos.GetRelative(farPos, distance: 90, angle: -159f);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 130, height: 1);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			position = originPos.GetRelative(farPos, distance: 100, angle: 39f);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 110);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 110);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 130);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 140);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = originPos.GetRelative(farPos, distance: 105, angle: -169f);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = originPos.GetRelative(farPos, distance: 80, angle: 60f);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 120);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = originPos.GetRelative(farPos, distance: 80, angle: 180f);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 130);
 			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_confuse, 1, 0f, 5000f, 1, 3, -1, hits);
+			hits.Clear();
 
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
 			position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 140);

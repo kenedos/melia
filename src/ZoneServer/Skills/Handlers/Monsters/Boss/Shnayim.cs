@@ -237,6 +237,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 20, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var effectHitConfig = new EffectHitConfig
 			{
@@ -259,6 +261,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			{
 				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
 				await EffectAndHit(skill, caster, position, effectHitConfig, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 20, -1, hits);
+				hits.Clear();
 
 				if (i < 4)
 					await skill.Wait(TimeSpan.FromMilliseconds(200));
@@ -281,6 +285,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 20, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(1200));
 			var effectHitConfig2 = new EffectHitConfig
 			{
@@ -299,19 +305,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(200));
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(200));
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
-			await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+			var middleWaits = new[] { 0, 0, 200, 100, 200 };
+			for (var i = 0; i < 5; i++)
+			{
+				if (middleWaits[i] > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(middleWaits[i]));
+				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
+				await EffectAndHit(skill, caster, position, effectHitConfig2, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 20, -1, hits);
+				hits.Clear();
+			}
 			await skill.Wait(TimeSpan.FromMilliseconds(1700));
 			position = originPos.GetRelative(farPos, distance: 59, angle: 1f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
@@ -330,6 +333,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 20, -1, hits);
+			hits.Clear();
 			await skill.Wait(TimeSpan.FromMilliseconds(1300));
 			var effectHitConfig3 = new EffectHitConfig
 			{
@@ -352,11 +357,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			{
 				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 140);
 				await EffectAndHit(skill, caster, position, effectHitConfig3, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 20, -1, hits);
+				hits.Clear();
 
 				if (i < 4)
 					await skill.Wait(TimeSpan.FromMilliseconds(200));
 			}
-			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 20, -1, hits);
 		}
 	}
 }
