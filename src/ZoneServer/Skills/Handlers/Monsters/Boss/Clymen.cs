@@ -26,11 +26,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 2100;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -74,11 +76,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 2450;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -104,26 +108,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("None", 1.5f),
 			};
 
-			var hits = new List<SkillHitInfo>();
-			var position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 90, rand: 80, height: 1);
-			await MissileThrow(skill, caster, position, missileConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 15000f, 1, 15, -1, hits);
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, distance: 90, rand: 70, height: 2);
-			hits = new List<SkillHitInfo>();
-			await MissileThrow(skill, caster, position, missileConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 15000f, 1, 15, -1, hits);
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 90, rand: 70, height: 2);
-			hits = new List<SkillHitInfo>();
-			await MissileThrow(skill, caster, position, missileConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 15000f, 1, 15, -1, hits);
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 90, rand: 70, height: 2);
-			hits = new List<SkillHitInfo>();
-			await MissileThrow(skill, caster, position, missileConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 15000f, 1, 15, -1, hits);
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 90, rand: 70, height: 2);
-			hits = new List<SkillHitInfo>();
-			await MissileThrow(skill, caster, position, missileConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 15000f, 1, 15, -1, hits);
+			var waits = new[] { 0, 0, 0, 0, 0, 650, 0, 0, 0, 0 };
+			for (var i = 0; i < waits.Length; i++)
+			{
+				if (waits[i] > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(waits[i]));
+				var position = GetLeadPositionScatter(target, (int)missileConfig.HitTime, 80, caster);
+				var hits = new List<SkillHitInfo>();
+				_ = MissileThrow(skill, caster, position, missileConfig, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 15000f, 1, 15, -1, hits);
+			}
 		}
 	}
 
@@ -138,11 +132,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 3250;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -153,12 +149,37 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2250));
 
-			var hands = new[] { "L Hand", "R Hand", "R Hand", "L Hand", "L Hand", "L Hand", "R Hand", "R Hand" };
+			var hands = new[]
+			{
+				"L Hand", "R Hand", "R Hand", "L Hand",
+				"L Hand", "L Hand", "R Hand", "R Hand",
+				"L Hand", "L Hand", "R Hand", "R Hand",
+				"L Hand", "L Hand", "R Hand", "R Hand",
+				"L Hand", "L Hand", "R Hand", "R Hand",
+				"L Hand", "L Hand", "R Hand", "R Hand",
+				"L Hand", "L Hand", "R Hand", "R Hand",
+				"R Hand",
+				"L Hand", "L Hand", "R Hand",
+			};
+			var waits = new[]
+			{
+				0, 0, 0, 0,
+				300, 0, 0, 0,
+				200, 0, 0, 0,
+				200, 0, 0, 0,
+				200, 0, 0, 0,
+				200, 0, 0, 0,
+				200, 0, 0, 0,
+				100,
+				100, 0, 0,
+			};
 			for (var i = 0; i < hands.Length; i++)
 			{
-				var position = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
+				if (waits[i] > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(waits[i]));
+				var position = GetLeadPositionScatter(target, 100, 0, caster);
 				var hits = new List<SkillHitInfo>();
-				await MissileThrow(skill, caster, position, new MissileConfig
+				_ = MissileThrow(skill, caster, position, new MissileConfig
 				{
 					Effect = new EffectConfig($"I_force011_green#Bip001 {hands[i]}", 1f),
 					EndEffect = new EffectConfig("F_explosion009_green", 1f),
@@ -187,11 +208,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 4000;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), Position.Zero);
 
@@ -213,7 +236,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				var posOrigin = i == 0 ? originPos : farPos;
 				var position = originPos.GetRelative(posOrigin, distance: 20, angle: angles[i], height: i == 0 ? 2 : 0);
 				var hits = new List<SkillHitInfo>();
-				await MissileThrow(skill, caster, position, new MissileConfig
+				_ = MissileThrow(skill, caster, position, new MissileConfig
 				{
 					Effect = new EffectConfig($"I_force011_green#{dummyNames[i]}", 1f),
 					EndEffect = new EffectConfig("F_explosion009_green", 1f),

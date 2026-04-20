@@ -31,7 +31,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 2100;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -63,7 +66,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 700;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -142,7 +148,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 3500;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -186,7 +195,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 2300;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);

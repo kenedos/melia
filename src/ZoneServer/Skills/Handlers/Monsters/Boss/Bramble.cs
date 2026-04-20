@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -32,11 +32,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 1200;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -86,11 +88,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 3250;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -99,10 +103,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(1500));
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
-			// Wave 1
-			for (var i = 0; i < 6; i++)
+			for (var i = 0; i < 17; i++)
 			{
 				var position = GetRelativePosition(PosType.Target, caster, target, rand: 120, height: 2);
 				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
@@ -121,57 +124,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 					VerticalAngle = 60f,
 					InnerRange = 0,
 				});
-				await skill.Wait(TimeSpan.FromMilliseconds(200));
-			}
-
-			await skill.Wait(TimeSpan.FromMilliseconds(1300));
-
-			// Wave 2
-			for (var i = 0; i < 6; i++)
-			{
-				var position = GetRelativePosition(PosType.Target, caster, target, rand: 120, height: 2);
-				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
-				{
-					GroundEffect = new EffectConfig("F_sys_target_monster", 0.5f),
-					PositionDelay = 2250,
-					Effect = new EffectConfig("I_bramble_obj_atk001_mash", 0.8f),
-					Range = 20f,
-					KnockdownPower = 150f,
-					Delay = 0f,
-					HitCount = 1,
-					HitDuration = 1000f,
-					CasterEffect = EffectConfig.None,
-					CasterNodeName = "None",
-					KnockType = 4,
-					VerticalAngle = 60f,
-					InnerRange = 0,
-				});
-				await skill.Wait(TimeSpan.FromMilliseconds(200));
-			}
-
-			await skill.Wait(TimeSpan.FromMilliseconds(1300));
-
-			// Wave 3
-			for (var i = 0; i < 5; i++)
-			{
-				var position = GetRelativePosition(PosType.Target, caster, target, rand: 120, height: 2);
-				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
-				{
-					GroundEffect = new EffectConfig("F_sys_target_monster", 0.5f),
-					PositionDelay = 2250,
-					Effect = new EffectConfig("I_bramble_obj_atk001_mash", 0.8f),
-					Range = 20f,
-					KnockdownPower = 150f,
-					Delay = 0f,
-					HitCount = 1,
-					HitDuration = 1000f,
-					CasterEffect = EffectConfig.None,
-					CasterNodeName = "None",
-					KnockType = 4,
-					VerticalAngle = 60f,
-					InnerRange = 0,
-				});
-				await skill.Wait(TimeSpan.FromMilliseconds(200));
 			}
 		}
 	}
@@ -191,11 +143,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 1700;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -230,11 +184,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 2850;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -310,11 +266,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 2700;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -325,29 +283,28 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
-			// Fire all 6 arrows simultaneously
+			var arrowAngles = new[] { 0.52359879f, 1.4530618f, 2.9710062f, -2.2737467f, -1.0686452f, -0.52129948f };
+			var arrowDists = new[] { 250f, 150f, 150f, 150f, 250f, 250f };
 			var startingPosition = originPos.GetRelative(farPos, distance: 129.33676f);
-			_ = EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: 250f), new ArrowConfig
+			for (var i = 0; i < 6; i++)
 			{
-				ArrowEffect = new EffectConfig("I_force042_violet##0.5", 0.5f),
-				ArrowSpacing = 25f,
-				ArrowSpacingTime = 0.05f,
-				ArrowLifeTime = 0.5f,
-				PositionDelay = 1700f,
-				HitEffect = new EffectConfig("E_bramble_obj_atk001_mash2##0.5", 1f),
-				Range = 20f,
-				KnockdownPower = 0f,
-				Delay = 0f,
-				HitEffectSpacing = 30f,
-				HitTimeSpacing = 0.05f,
-				HitCount = 1,
-				HitDuration = 1000f,
-			});
-			//_ = EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: 150f), "I_force042_violet##0.5", 0.5f, 25f, 0.05f, 0.5f, 1700f, "E_bramble_obj_atk001_mash2##0.5", 1f, 20f, 0f, 0f, 30f, 0.05f, 1, 1000f);
-			//_ = EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: 150f), "I_force042_violet##0.5", 0.5f, 25f, 0.05f, 0.5f, 1700f, "E_bramble_obj_atk001_mash2##0.5", 1f, 20f, 0f, 0f, 30f, 0.05f, 1, 1000f);
-			//_ = EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: 150f), "I_force042_violet##0.5", 0.5f, 25f, 0.05f, 0.5f, 1700f, "E_bramble_obj_atk001_mash2##0.5", 1f, 20f, 0f, 0f, 30f, 0.05f, 1, 1000f);
-			//_ = EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: 250f), "I_force042_violet##0.5", 0.5f, 25f, 0.05f, 0.5f, 1700f, "E_bramble_obj_atk001_mash2##0.5", 1f, 20f, 0f, 0f, 30f, 0.05f, 1, 1000f);
-			//_ = EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: 250f), "I_force042_violet##0.5", 0.5f, 25f, 0.05f, 0.5f, 1700f, "E_bramble_obj_atk001_mash2##0.5", 1f, 20f, 0f, 0f, 30f, 0.05f, 1, 1000f);
+				_ = EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(farPos, distance: arrowDists[i], angle: arrowAngles[i] * (180f / (float)Math.PI)), new ArrowConfig
+				{
+					ArrowEffect = new EffectConfig("I_force042_violet##0.5", 0.5f),
+					ArrowSpacing = 25f,
+					ArrowSpacingTime = 0.05f,
+					ArrowLifeTime = 0.5f,
+					PositionDelay = 1700f,
+					HitEffect = new EffectConfig("E_bramble_obj_atk001_mash2##0.5", 1f),
+					Range = 20f,
+					KnockdownPower = 0f,
+					Delay = 0f,
+					HitEffectSpacing = 30f,
+					HitTimeSpacing = 0.05f,
+					HitCount = 1,
+					HitDuration = 1000f,
+				});
+			}
 		}
 	}
 
@@ -366,11 +323,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 1300;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
@@ -420,11 +379,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
-			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
-			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			var hitDelay = 2000;
+			var leadPos = GetLeadPosition(target, hitDelay, caster);
+			caster.TurnTowards(leadPos);
+			var farPos = originPos.GetNearestPositionWithinDistance(leadPos, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
