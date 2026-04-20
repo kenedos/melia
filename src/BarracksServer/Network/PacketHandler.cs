@@ -247,8 +247,14 @@ namespace Melia.Barracks.Network
 			}
 
 			// Set team name
+			var oldTeamName = conn.Account.TeamName;
 			conn.Account.TeamName = name;
 			BarracksServer.Instance.Database.UpdateTeamName(conn.Account.Id, name);
+			BarracksServer.Instance.Database.UpdateCharactersTeamName(conn.Account.Id, name);
+			BarracksServer.Instance.Database.UpdateSocialUserTeamName(conn.Account.Id, name);
+			BarracksServer.Instance.Database.UpdateChatMembersTeamName(conn.Account.Id, name);
+
+			BarracksServer.Instance.Communicator.Broadcast("AllServers", new TeamNameChangedMessage(conn.Account.Id, oldTeamName, name));
 
 			Send.BC_BARRACKNAME_CHANGE(conn, TeamNameChangeResult.Okay, name);
 

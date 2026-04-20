@@ -222,6 +222,8 @@ namespace Melia.Barracks.Util
 				return CommandResult.Okay;
 			}
 
+			var oldTeamName = account.TeamName;
+
 			if (!BarracksServer.Instance.Database.UpdateTeamName(account.Id, newTeamName))
 			{
 				Log.Error("Failed to change team name.");
@@ -229,6 +231,10 @@ namespace Melia.Barracks.Util
 			}
 
 			BarracksServer.Instance.Database.UpdateCharactersTeamName(account.Id, newTeamName);
+			BarracksServer.Instance.Database.UpdateSocialUserTeamName(account.Id, newTeamName);
+			BarracksServer.Instance.Database.UpdateChatMembersTeamName(account.Id, newTeamName);
+
+			BarracksServer.Instance.Communicator.Broadcast("AllServers", new TeamNameChangedMessage(account.Id, oldTeamName, newTeamName));
 
 			Log.Info("Team name for '{0}' changed to '{1}'.", accountName, newTeamName);
 

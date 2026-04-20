@@ -182,6 +182,18 @@ namespace Melia.Social
 					Send.SC_NORMAL.Shout(shoutingUser, shoutMessage.Text);
 					break;
 				}
+				case TeamNameChangedMessage teamNameChangedMessage:
+				{
+					if (this.UserManager.TryGet(teamNameChangedMessage.AccountId, out var renamedUser))
+						renamedUser.TeamName = teamNameChangedMessage.NewTeamName;
+
+					foreach (var room in this.ChatManager.GetChatRooms())
+						room.UpdateMemberTeamName(teamNameChangedMessage.AccountId, teamNameChangedMessage.NewTeamName);
+
+					Log.Info("TeamNameChangedMessage: Account {0} renamed '{1}' -> '{2}'.",
+						teamNameChangedMessage.AccountId, teamNameChangedMessage.OldTeamName, teamNameChangedMessage.NewTeamName);
+					break;
+				}
 				case PartyUpdateMessage partyUpdateMessage:
 				{
 					if (!this.UserManager.TryGet(partyUpdateMessage.AccountId, out var user))

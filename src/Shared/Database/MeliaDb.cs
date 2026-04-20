@@ -227,6 +227,41 @@ namespace Melia.Shared.Database
 		}
 
 		/// <summary>
+		/// Updates the cached team name on the social server's user row.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="teamName"></param>
+		public void UpdateSocialUserTeamName(long accountId, string teamName)
+		{
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("UPDATE `social_users` SET `teamName` = @teamName WHERE `accountId` = @accountId", conn))
+			{
+				mc.Parameters.AddWithValue("@accountId", accountId);
+				mc.Parameters.AddWithValue("@teamName", teamName);
+
+				mc.ExecuteNonQuery();
+			}
+		}
+
+		/// <summary>
+		/// Updates the denormalized team name stored on every chat room
+		/// membership row for the given account.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="teamName"></param>
+		public void UpdateChatMembersTeamName(long accountId, string teamName)
+		{
+			using (var conn = this.GetConnection())
+			using (var mc = new MySqlCommand("UPDATE `chat_members` SET `teamName` = @teamName WHERE `userId` = @accountId", conn))
+			{
+				mc.Parameters.AddWithValue("@accountId", accountId);
+				mc.Parameters.AddWithValue("@teamName", teamName);
+
+				mc.ExecuteNonQuery();
+			}
+		}
+
+		/// <summary>
 		/// Loads properties from database and adds them to the given
 		/// properties collection.
 		/// </summary>

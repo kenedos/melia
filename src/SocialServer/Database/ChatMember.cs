@@ -18,7 +18,7 @@
 		/// <summary>
 		/// Returns the member's team name.
 		/// </summary>
-		public string TeamName { get; }
+		public string TeamName { get; set; }
 
 		/// <summary>
 		/// Returns true if the member is currently online.

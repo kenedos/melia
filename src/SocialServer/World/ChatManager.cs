@@ -30,6 +30,15 @@ namespace Melia.Social.World
 		}
 
 		/// <summary>
+		/// Returns a snapshot of all current chat rooms.
+		/// </summary>
+		public ChatRoom[] GetChatRooms()
+		{
+			lock (_rooms)
+				return _rooms.Values.ToArray();
+		}
+
+		/// <summary>
 		/// Remove a chat room with a given chat room id.
 		/// </summary>
 		/// <param name="id"></param>

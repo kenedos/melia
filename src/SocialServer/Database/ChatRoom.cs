@@ -217,6 +217,25 @@ namespace Melia.Social.Database
 		}
 
 		/// <summary>
+		/// Updates the cached team name on the membership row for the given
+		/// account, if present. Returns true if a member was updated.
+		/// </summary>
+		/// <param name="accountId"></param>
+		/// <param name="newTeamName"></param>
+		public bool UpdateMemberTeamName(long accountId, string newTeamName)
+		{
+			lock (_members)
+			{
+				var member = _members.FirstOrDefault(m => m.AccountId == accountId);
+				if (member == null)
+					return false;
+
+				member.TeamName = newTeamName;
+				return true;
+			}
+		}
+
+		/// <summary>
 		/// Add a message to the chat room.
 		/// </summary>
 		/// <param name="message"></param>

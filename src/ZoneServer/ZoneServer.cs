@@ -337,6 +337,18 @@ namespace Melia.Zone
 					character?.Connection?.Close();
 					break;
 				}
+				case TeamNameChangedMessage teamNameChangedMessage:
+				{
+					var characters = this.World.GetCharacters(c => c.Connection?.Account?.Id == teamNameChangedMessage.AccountId);
+					foreach (var character in characters)
+					{
+						if (character.Connection?.Account != null)
+							character.Connection.Account.TeamName = teamNameChangedMessage.NewTeamName;
+
+						character.TeamName = teamNameChangedMessage.NewTeamName;
+					}
+					break;
+				}
 				case GuildUpdateMessage guildUpdateMessage:
 				{
 					Log.Debug("Received guild update from '{0}': Type={1}, GuildId={2}, CharacterId={3}",
