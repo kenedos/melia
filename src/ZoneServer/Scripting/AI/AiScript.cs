@@ -683,7 +683,7 @@ namespace Melia.Zone.Scripting.AI
 
 					var shootSec = (float)skill.Properties.ShootTime.TotalSeconds;
 					var leadPos = this.GetLeadPosition(_target, shootSec);
-					var commitRange = this.RangeType == AttackerRangeType.Ranged ? maxAttackRange : maxAttackRange * 0.5f;
+					var commitRange = this.RangeType == AttackerRangeType.Ranged ? maxAttackRange * 0.75f : maxAttackRange * 0.5f;
 					return this.Entity.Position.InRange2D(leadPos, commitRange);
 				}
 
@@ -701,7 +701,7 @@ namespace Melia.Zone.Scripting.AI
 					}
 					else if (RangeType == AttackerRangeType.Ranged)
 					{
-						yield return this.MoveToRangedAttack(_target, maxAttackRange);
+						yield return this.MoveToRangedAttack(_target, maxAttackRange * 0.75f);
 					}
 					else
 					{
