@@ -48,7 +48,7 @@ public class PCSummonAiScript : AiScript
 		}
 	}
 
-	protected IEnumerable Attack()
+	protected override IEnumerable Attack()
 	{
 		SetRunning(true);
 
@@ -61,7 +61,12 @@ public class PCSummonAiScript : AiScript
 			}
 
 			yield return MoveToAttack(_target, skill.GetAttackRange());
-			yield return UseSkill(skill, _target);
+
+			if (EntityGone(_target) || !IsHating(_target))
+				break;
+
+			if (CanUseSkill(skill, _target))
+				yield return UseSkill(skill, _target);
 
 			yield return Wait(skill.Properties.Delay);
 		}

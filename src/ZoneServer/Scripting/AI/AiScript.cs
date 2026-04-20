@@ -751,7 +751,10 @@ namespace Melia.Zone.Scripting.AI
 						yield break;
 					}
 				}
-
+				else
+				{
+					yield return this.Wait(100);
+				}
 			}
 
 			_target = null;

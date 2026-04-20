@@ -529,7 +529,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster.IsDead)
 				return;
 
-			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range));
+			ShowRangePreview(caster, skill, GetPreviewArea(caster, position, config.Range));
 
 			skill.Vars.Set("Melia.Skill.vAngle", config.VerticalAngle);
 
@@ -547,7 +547,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster.IsDead)
 				return;
 
-			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range));
+			ShowRangePreview(caster, skill, GetPreviewArea(caster, position, config.Range));
 
 			if (!string.IsNullOrEmpty(config.GroundEffect.Name) && config.GroundEffect.Name != "None")
 				await caster.PlayEffectToGround(config.GroundEffect.Name, position, config.GroundEffect.Scale, 0, config.GroundDelay);
@@ -585,7 +585,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster.IsDead)
 				return;
 
-			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range, config.InnerRange));
+			ShowRangePreview(caster, skill, GetPreviewArea(caster, position, config.Range, config.InnerRange));
 
 			if (!string.IsNullOrEmpty(config.TargetEffect.Name) && config.TargetEffect.Name != "None")
 				caster.PlayEffectToGround(config.TargetEffect.Name, position, config.TargetEffect.Scale, 0, config.TargetEffectDuration);
@@ -605,7 +605,7 @@ namespace Melia.Zone.Skills.Helpers
 				await skill.Wait(TimeSpan.FromMilliseconds(delayMs));
 			}
 
-			await DoDamageOverTime(skill, caster, position, config.FlyTime + config.DelayTime, config.Range, config.HitTime, config.HitCount, config.DotEffect.Name, config.DotEffect.Scale, 0, 0, config.InnerRange, hits);
+			await DoDamageOverTime(skill, caster, position, (config.HitTime / 1000f) + config.DelayTime + config.HitStartFix, config.Range, config.HitTime, config.HitCount, config.DotEffect.Name, config.DotEffect.Scale, 0, 0, config.InnerRange, hits);
 		}
 
 		public static async Task EffectAndHit(Skill skill, ICombatEntity caster, Position position, EffectHitConfig config, List<SkillHitInfo> hitResults = null)
@@ -614,7 +614,7 @@ namespace Melia.Zone.Skills.Helpers
 				return;
 
 			var previewMs = config.PositionDelay + config.Delay + config.HitDuration;
-			ShowRangePreview(caster, skill, GetPreviewArea(position, config.Range, config.InnerRange), TimeSpan.FromMilliseconds(previewMs));
+			ShowRangePreview(caster, skill, GetPreviewArea(caster, position, config.Range, config.InnerRange), TimeSpan.FromMilliseconds(previewMs));
 
 			skill.Vars.Set("Melia.Skill.vAngle", config.VerticalAngle);
 
@@ -642,7 +642,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster == null || caster.IsDead)
 				return;
 
-			ShowRangePreview(caster, skill, new CircleF(position, range));
+			ShowRangePreview(caster, skill, GetPreviewArea(caster, position, range));
 
 			var pads = caster.Map.GetPadsAt(position, range);
 			if (padStyle == "MINE")
@@ -668,19 +668,26 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster.IsDead)
 				return;
 
-			ShowRangePreview(caster, skill, new CircleF(endingPosition, config.Range));
+			var dist = startingPosition.Get2DDistance(endingPosition);
+			var hitPointCount = 1;
+
+			if (config.HitEffectSpacing != 0)
+				hitPointCount = (int)Math.Floor(dist / config.HitEffectSpacing);
+
+			for (var i = 0; i < hitPointCount; i++)
+			{
+				var di = (float)i / hitPointCount;
+				var px = startingPosition.X + (endingPosition.X - startingPosition.X) * di;
+				var py = startingPosition.Y + (endingPosition.Y - startingPosition.Y) * di;
+				var pz = startingPosition.Z + (endingPosition.Z - startingPosition.Z) * di;
+				ShowRangePreview(caster, skill, GetPreviewArea(caster, new Position(px, py, pz), config.Range));
+			}
 
 			Send.ZC_NORMAL.PlayArrowEffect(caster, startingPosition, endingPosition,
 				config.ArrowEffect.Name, config.ArrowEffect.Scale, config.ArrowSpacing, config.ArrowSpacingTime, config.ArrowLifeTime);
 
 			if (config.PositionDelay > 0)
 				await skill.Wait(TimeSpan.FromMilliseconds((int)config.PositionDelay));
-
-			var dist = startingPosition.Get2DDistance(endingPosition);
-			var hitPointCount = 1;
-
-			if (config.HitEffectSpacing != 0)
-				hitPointCount = (int)Math.Floor(dist / config.HitEffectSpacing);
 
 			skill.Vars.Set("Melia.Skill.vAngle", config.VerticalAngle);
 			for (var i = 0; i < hitPointCount; i++)
@@ -776,18 +783,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (innerRange > 0)
 				targets = caster.Map.GetAttackableEnemiesIn(caster, new Donut(position, range, innerRange));
 			else
-			{
-				if (caster is Character)
-				{
-					targets = caster.Map.GetAttackableEnemiesIn(caster, new CircleF(position, range));
-				}
-				else
-				{
-					targets = caster.Map.GetAttackableEnemiesIn(caster, new CircleF(position, range));
-					if (targets.Count == 0)
-						targets = caster.Map.GetAttackableEnemiesInPosition(caster, position, range);
-				}
-			}
+				targets = caster.Map.GetAttackableEnemiesIn(caster, new CircleF(position, range));
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
@@ -915,6 +911,14 @@ namespace Melia.Zone.Skills.Helpers
 			var leadPos = target.Position.GetRelative(leadDir, distance);
 
 			return leadPos.GetRelative(perpDir, lateralOffset);
+		}
+
+		public static Position GetLeadPositionScatter(ICombatEntity target, int leadMs, int scatter, ICombatEntity caster = null, float maxLeadDistance = 150f)
+		{
+			var leadPos = GetLeadPosition(target, leadMs, caster, maxLeadDistance);
+			if (scatter <= 0)
+				return leadPos;
+			return leadPos.GetRandomInRange2D(scatter);
 		}
 
 	}

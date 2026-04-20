@@ -29,17 +29,23 @@ public class TrackWaitMonsterAiScript : AiScript
 	{
 		SetRunning(true);
 
-		while (!_target.IsDead)
+		while (!EntityGone(_target) && IsHating(_target))
 		{
 			if (!TryGetRandomSkill(out var skill))
 			{
+				yield return Wait(250);
 				continue;
 			}
 
 			yield return MoveToAttack(_target, GetAttackRange(skill));
 
-			if (InRangeOf(_target, GetAttackRange(skill)))
+			if (EntityGone(_target) || !IsHating(_target))
+				break;
+
+			if (InRangeOf(_target, GetAttackRange(skill)) && CanUseSkill(skill, _target))
 				yield return UseSkill(skill, _target);
+			else
+				yield return Wait(100);
 		}
 
 		yield break;

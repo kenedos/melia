@@ -1,4 +1,5 @@
 using System;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -45,6 +46,16 @@ namespace Melia.Zone.Skills.Helpers
 			if (innerRange > 0)
 				return new Donut(position, range, innerRange);
 			return new CircleF(position, range);
+		}
+
+		/// <summary>
+		/// Same as GetPreviewArea but floors the range to the caster's body
+		/// radius, matching SplashDamage's effective hit area.
+		/// </summary>
+		public static IShapeF GetPreviewArea(ICombatEntity caster, Position position, float range, float innerRange = 0)
+		{
+			range = Math.Max(range, SizeTypeRadius.GetRadius(caster.EffectiveSize));
+			return GetPreviewArea(position, range, innerRange);
 		}
 	}
 }
