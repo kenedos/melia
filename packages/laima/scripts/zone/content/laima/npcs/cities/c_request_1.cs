@@ -152,12 +152,11 @@ public class CRequest1NpcScript : GeneralScript
 			return;
 		}
 
-		var redeemed = this.TryRedeemMythicKills(character);
+		var redeemed = this.RedeemMythicKills(character);
 		if (redeemed > 0)
 		{
 			var badges = redeemed * BadgesPerReward;
 			await dialog.Msg(LF("That's {0} mythics brought down. Fedimian's scholars will be circling me for reports. Here, {1} badges — spend them at the specialist booths along the walls.", redeemed * MythicKillsPerReward, badges));
-			character.Inventory.Add(MercenaryBadgeItemId, badges, InventoryAddType.PickUp);
 		}
 
 		var choice = await dialog.Select(L("Ledger's open. Fifty badges per mythic, paid the moment you report in. What'll it be?"),
@@ -224,7 +223,7 @@ public class CRequest1NpcScript : GeneralScript
 	// Consumes whole groups of mythic kills from the player's ledger and
 	// returns how many full reward packets were redeemed. Any remainder is
 	// kept so the player can finish it out on the next hunt.
-	private int TryRedeemMythicKills(Character character)
+	private int RedeemMythicKills(Character character)
 	{
 		var count = character.Variables.Perm.GetInt(MythicKillsVariable, 0);
 		if (count < MythicKillsPerReward)
@@ -233,6 +232,9 @@ public class CRequest1NpcScript : GeneralScript
 		var rewards = count / MythicKillsPerReward;
 		var remainder = count % MythicKillsPerReward;
 		var consumed = rewards * MythicKillsPerReward;
+		var badges = rewards * BadgesPerReward;
+
+		character.Inventory.Add(MercenaryBadgeItemId, badges, InventoryAddType.PickUp);
 		character.Variables.Perm.Set(MythicKillsVariable, remainder);
 
 		var questId = new QuestId("c_request_1", 1001);
