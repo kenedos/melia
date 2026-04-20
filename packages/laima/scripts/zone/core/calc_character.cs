@@ -1646,11 +1646,6 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var baseValue = 3;
 
-		if (character.Jobs.Has(JobId.Swordsman, JobCircle.First))
-			baseValue = 4;
-		else if (character.Jobs.Has(JobId.Archer, JobCircle.First))
-			baseValue = 0;
-
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.SR);
 		var byBuffs = character.Properties.GetFloat(PropertyName.SR_BM);
 
