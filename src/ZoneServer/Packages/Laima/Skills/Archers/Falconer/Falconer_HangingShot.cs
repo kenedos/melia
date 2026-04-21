@@ -6,6 +6,7 @@ using Melia.Shared.L10N;
 using Melia.Shared.Packages;
 using Melia.Shared.World;
 using Melia.Zone.Network;
+using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.Helpers;
@@ -64,7 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			}
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
-
+			
 			if (caster is not Character chr)
 				return;
 
@@ -75,8 +76,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			// 1. Disable control during pickup (ZC_ENABLE_CONTROL + ZC_LOCK_KEY)
 			chr.ToggleControl("HANGINGSHOT", false);
 
-			// 2. Standard skill packets (handled by framework)
-			// ZC_SKILL_ADD, ZC_PC_ATKSTATE already sent by framework
+			// If the hawk is perched, lift off
+			if (hawk.IsLandedOnShoulder)
+				hawk.TakeOff();
 
 			var targetHandle = target?.Handle ?? 0;
 
@@ -92,6 +94,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var syncKey1 = hawk.GenerateSyncKey();
 			Send.ZC_SYNC_START(caster, syncKey1, 1);
 			caster.StartBuff(BuffId.HangingShot, skill.Level, 0, buffTimeSpan, hawk, skill.Id);
+
+			// Change normal attack to hanging shot variant
+			Send.ZC_NORMAL.SetMainAttackSkill(caster as Character, SkillId.Bow_Hanging_Attack);
+
 			// Note: SetMainAttackSkill is sent by buff handler OnActivate
 			Send.ZC_SYNC_END(caster, syncKey1, 1);
 			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, syncKey1);
@@ -118,10 +124,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			// Lock hawk
 			hawk.Vars.Set("Hawk.UsingSkill", true);
 			hawk.Vars.Set("Hawk.SkillFunction", "HangingShot");
-
-			// Take off from shoulder if landed
-			if (hawk.IsLandedOnShoulder)
-				hawk.TakeOff();
 
 			// 7. ZC_NORMAL CollisionAndBack (outside sync block)
 			Send.ZC_NORMAL.CollisionAndBack(hawk, caster, 0, "HANGINGSHOT", 1f, 7f, 1f, 0.7f, 20f, false);
@@ -197,7 +199,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			Send.ZC_NORMAL.ControlObject(character, null, ControlLookType.SameDirection, true, true, "None", true);
 			Send.ZC_NORMAL.FlyWithObject(character, null);
-			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.EMPTY, 0);
+			character.AttachToObject(null, "None", "None", attachSec: 0.5f);
+			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.ASTD, 0);
 
 			await FalconerHawkHelper.HawkFlyAway(skill, character, hawk);
 		}

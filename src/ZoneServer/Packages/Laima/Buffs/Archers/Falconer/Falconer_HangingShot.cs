@@ -54,6 +54,13 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 
 			// Restore normal attack
 			Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.None);
+
+			// Remove the temporary Bow_Hanging_Attack skill registered on skill start
+			if (character.Skills.Has(SkillId.Bow_Hanging_Attack))
+			{
+				character.Skills.RemoveSilent(SkillId.Bow_Hanging_Attack);
+				Send.ZC_SKILL_REMOVE(character, SkillId.Bow_Hanging_Attack);
+			}
 		}
 
 		/// <summary>
