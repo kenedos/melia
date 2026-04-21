@@ -853,7 +853,7 @@
 
 // Paladin
 //---------------------------------------------------------------------------
-{ skillId: 40602, className: "Paladin_Restoration", name: "Restoration", basicSp: 148, basicCast: 2000, splashRate: 1, factor: 150.0, factorByLevel: 15.0, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, castInterruptible: true },
+{ skillId: 40602, className: "Paladin_Restoration", name: "Restoration", basicSp: 148, basicCast: 2000, splashRate: 1, factor: 75.0, factorByLevel: 7.5, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, castInterruptible: true },
 { skillId: 40603, className: "Paladin_ResistElements", name: "Resist Elements", basicSp: 178, basicCast: 3000, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, castInterruptible: true },
 { skillId: 40605, className: "Paladin_Conversion", name: "Conversion", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 40606, className: "Paladin_Barrier", name: "Barrier", basicSp: 175, basicCast: 2500, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, castInterruptible: false },
