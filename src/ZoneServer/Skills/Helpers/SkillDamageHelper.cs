@@ -605,7 +605,7 @@ namespace Melia.Zone.Skills.Helpers
 				await skill.Wait(TimeSpan.FromMilliseconds(delayMs));
 			}
 
-			await DoDamageOverTime(skill, caster, position, (config.HitTime / 1000f) + config.DelayTime + config.HitStartFix, config.Range, config.HitTime, config.HitCount, config.DotEffect.Name, config.DotEffect.Scale, 0, 0, config.InnerRange, hits);
+			await DoDamageOverTime(skill, caster, position, config.FlyTime + config.DelayTime, config.Range, config.HitTime, config.HitCount, config.DotEffect.Name, config.DotEffect.Scale, 0, 0, config.InnerRange, hits);
 		}
 
 		public static async Task EffectAndHit(Skill skill, ICombatEntity caster, Position position, EffectHitConfig config, List<SkillHitInfo> hitResults = null)
