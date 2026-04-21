@@ -225,8 +225,8 @@ public class ItemEquipScript : GeneralScript
 		{
 			var rhp = character.Properties.GetFloat(PropertyName.RHP);
 			var bonus = (float)Math.Floor(rhp * 0.4f);
-			character.Properties.SetFloat("NECK04_103_CRTMATK", bonus);
-			character.Properties.SetFloat("NECK04_103_RHP", rhp);
+			character.Variables.Temp.SetFloat("Melia.NECK04_103.CrtMAtk", bonus);
+			character.Variables.Temp.SetFloat("Melia.NECK04_103.Rhp", rhp);
 			character.Properties.Modify(PropertyName.CRTMATK_BM, bonus);
 			character.Properties.Modify(PropertyName.RHP_BM, -rhp);
 		}
@@ -248,12 +248,12 @@ public class ItemEquipScript : GeneralScript
 		// NECK04_103: reverse the HP recovery conversion
 		if (item.Data.ClassName == "NECK04_103")
 		{
-			var bonus = character.Properties.GetFloat("NECK04_103_CRTMATK");
-			var rhp = character.Properties.GetFloat("NECK04_103_RHP");
+			var bonus = character.Variables.Temp.GetFloat("Melia.NECK04_103.CrtMAtk");
+			var rhp = character.Variables.Temp.GetFloat("Melia.NECK04_103.Rhp");
 			character.Properties.Modify(PropertyName.CRTMATK_BM, -bonus);
 			character.Properties.Modify(PropertyName.RHP_BM, rhp);
-			character.Properties.SetFloat("NECK04_103_CRTMATK", 0);
-			character.Properties.SetFloat("NECK04_103_RHP", 0);
+			character.Variables.Temp.Remove("Melia.NECK04_103.CrtMAtk");
+			character.Variables.Temp.Remove("Melia.NECK04_103.Rhp");
 		}
 
 		// Refresh skill UI if this item provides skill level bonuses
