@@ -95,7 +95,6 @@ namespace Melia.Zone.Pads.Handlers
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.Zero, TimeSpan.Zero);
 				hits.Add(skillHit);
 
-				target.StartBuff(BuffId.Fire, skill.Level, skillHitResult.Damage, TimeSpan.FromSeconds(3), caster);
 				hitCount++;
 			}
 

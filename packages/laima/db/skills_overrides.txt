@@ -319,7 +319,7 @@
 { skillId: 20105, className: "Pyromancer_FirePillar", name: "Fire Pillar", basicSp: 130, basicCast: 4000, splashRate: 1, maxRange: 150, factor: 294, factorByLevel: 29.4, cooldownTime: 8000, overheatCount: "0", castInterruptible: true },
 { skillId: 20106, className: "Pyromancer_HellBreath", name: "Hell Breath", basicSp: 23, basicCast: 0, splashRate: 3, factor: 133, factorByLevel: 13.3, cooldownTime: 5000, overheatCount: "0", castInterruptible: true },
 { skillId: 20107, className: "Pyromancer_FlameGround", name: "Flame Ground", basicSp: 115, basicCast: 4500, splashRate: 5, maxRange: 150, factor: 119, factorByLevel: 11.9, cooldownTime: 9000, overheatCount: "0", castInterruptible: true },
-{ skillId: 20109, className: "Pyromancer_Prominence", name: "Prominence", basicSp: 170, basicCast: 6000, splashRate: 0, maxRange: 150, factor: 245, factorByLevel: 24.5, cooldownTime: 10000, castInterruptible: true },
+{ skillId: 20109, className: "Pyromancer_Prominence", name: "Prominence", basicSp: 170, basicCast: 6000, splashRate: 0, maxRange: 150, factor: 180, factorByLevel: 18, cooldownTime: 10000, castInterruptible: true },
 
 // Cryomancer
 //---------------------------------------------------------------------------
@@ -347,13 +347,13 @@
 { skillId: 20601, className: "Elementalist_Electrocute", name: "Electrocute", basicSp: 74, basicCast: 1500, splashRate: 0, factor: 196, factorByLevel: 19.6, hitCount: 1, multiHitCount: 7, cooldownTime: 3000, castInterruptible: true },
 { skillId: 20602, className: "Elementalist_StoneCurse", name: "Lightning Orb", basicSp: 105, basicCast: 2500, splashRate: 0, factor: 273, factorByLevel: 27.3, hitCount: 1, multiHitCount: 14, cooldownTime: 4000, castInterruptible: true },
 { skillId: 20603, className: "Elementalist_Hail", name: "Hail", basicSp: 90, basicCast: 4000, splashRate: 10, factor: 18, factorByLevel: 1.8, hitCount: 1, multiHitCount: 50, cooldownTime: 12000, castInterruptible: true },
-{ skillId: 20605, className: "Elementalist_Meteor", name: "Meteor", basicSp: 180, basicCast: 7000, splashRate: 0, factor: 1680, factorByLevel: 168, hitCount: 1, multiHitCount: 2, cooldownTime: 18000, castInterruptible: true },
+{ skillId: 20605, className: "Elementalist_Meteor", name: "Meteor", basicSp: 180, basicCast: 8000, splashRate: 0, factor: 1120, factorByLevel: 112, hitCount: 1, multiHitCount: 2, cooldownTime: 18000, castInterruptible: true },
 { skillId: 20606, className: "Elementalist_Rain", name: "Rain", basicSp: 90, basicCast: 1800, splashRate: 5, factor: 0, factorByLevel: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 60000, castInterruptible: true },
 { skillId: 20607, className: "Elementalist_FreezingSphere", name: "Freezing Sphere", basicSp: 95, basicCast: 500, splashRate: 1, factor: 147, factorByLevel: 14.7, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "3", castInterruptible: true },
 { skillId: 20608, className: "Elementalist_FrostCloud", name: "Frost Cloud", basicSp: 105, basicCast: 2200, splashRate: 5, factor: 133, factorByLevel: 13.3, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, castInterruptible: true },
 { skillId: 20609, className: "Elementalist_StormDust", name: "Blizzard Storm", basicSp: 140, basicCast: 5500, splashRate: 5, factor: 63, factorByLevel: 6.3, hitCount: 1, multiHitCount: 32, cooldownTime: 14000, castInterruptible: true },
 { skillId: 20610, className: "Elementalist_FireClaw", name: "Fire Claw", basicSp: 62, basicCast: 2000, splashRate: 5, factor: 126, factorByLevel: 12.6, hitCount: 1, multiHitCount: 8, cooldownTime: 4000, overheatCount: "2", castInterruptible: true },
-{ skillId: 20611, className: "Elementalist_ElementalEssence", name: "Elemental Burst", basicSp: 165, basicCast: 2500, splashRate: 3, factor: 427, factorByLevel: 42.7, hitCount: 1, multiHitCount: 1, cooldownTime: 12000, castInterruptible: true },
+{ skillId: 20611, className: "Elementalist_ElementalEssence", name: "Elemental Burst", basicSp: 165, basicCast: 2500, splashRate: 3, factor: 342, factorByLevel: 34.2, hitCount: 1, multiHitCount: 1, cooldownTime: 12000, castInterruptible: true },
 
 { skillId: 20701, className: "Sorcerer_Summoning", name: "Summoning", basicSp: 108, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 20702, className: "Sorcerer_AttackGround", name: "Attack Ground", splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 3000 },
@@ -1237,6 +1237,18 @@
 { skillId: 142012, className: "Jaguar_WildRush_2", name: "Wild Rush", basicSp: 50, splashRate: 8, factor: 100, factorByLevel: 20, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, overheatCount: "2" },
 { skillId: 142013, className: "Jaguar_WildThorn_2", name: "Wild Thorn", basicSp: 46, splashRate: 10, factor: 40, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "2" },
 { skillId: 142014, className: "Jaguar_WildClaw_2", name: "Wild Claw", basicSp: 31, splashRate: 3, factor: 60, hitCount: 1, multiHitCount: 1, cooldownTime: 12500, overheatCount: "2" },
+
+// Falconer
+//---------------------------------------------------------------------------
+{ skillId: 31002, className: "Falconer_BuildRoost", name: "Roost", basicSp: 40, cooldownTime: 25000, basicCast: 0 },
+{ skillId: 31003, className: "Falconer_Circling", name: "Circling", basicSp: 30, cooldownTime: 0 },
+{ skillId: 31005, className: "Falconer_Pheasant", name: "Pheasant", basicSp: 32, splashRate: 4, factor: 230, factorByLevel: 23, cooldownTime: 6000, overheatCount: "2", overheatDelay: "400", basicCast: 0 },
+{ skillId: 31006, className: "Falconer_HangingShot", name: "Hanging Shot", basicSp: 48, cooldownTime: 30000 },
+{ skillId: 31008, className: "Falconer_BlisteringThrash", name: "Sonic Strike", basicSp: 42, splashRate: 3, factor: 115, factorByLevel: 11.5, cooldownTime: 10000, overheatCount: "0" },
+{ skillId: 31011, className: "Falconer_Aiming", name: "Aiming", basicSp: 55, cooldownTime: 25000, basicCast: 0 },
+{ skillId: 31012, className: "Falconer_FirstStrike", name: "Pre-Emptive Strike", basicSp: 0, cooldownTime: 0 },
+{ skillId: 31013, className: "Falconer_Tomahawk", name: "Tomahawk", basicSp: 62, splashRate: 10, factor: 230, factorByLevel: 23, cooldownTime: 14000, overheatCount: "2", overheatDelay: "500", basicCast: 0 },
+{ skillId: 100117, className: "Falconer_Pheasant_Vibora", name: "Hawk Hunt", basicSp: 45, splashRate: 4, factor: 460, factorByLevel: 46, cooldownTime: 12000 },
 
 // Companions
 //---------------------------------------------------------------------------

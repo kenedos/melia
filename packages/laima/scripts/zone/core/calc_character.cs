@@ -1743,13 +1743,7 @@ public class CharacterCalculationsScript : GeneralScript
 		// 100% Variable cast time
 		// var result = baseStat * (1 - byStat / 250) - byBuff;
 
-		// Armor Penalty
-		var byArmor = 1.0f;
-		byArmor = character.IsWearingArmorOfType(ArmorMaterialType.Leather) ? 1.2f : byArmor;
-		byArmor = character.IsWearingArmorOfType(ArmorMaterialType.Iron) ? 1.5f : byArmor;
-		result *= byArmor;
-
-		result = (float)Math.Floor(Math2.Clamp(0, 200, result));
+		result = (float)Math.Floor(Math2.Clamp(30, 200, result));
 
 		return result;
 	}

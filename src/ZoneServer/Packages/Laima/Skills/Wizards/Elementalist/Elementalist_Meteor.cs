@@ -74,7 +74,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			var aniTime = TimeSpan.FromMilliseconds(50);
 			var skillHits = new List<SkillHitInfo>();
 
-			var maxTargets = 50;
+			var maxTargets = 25;
 			foreach (var enemy in enemies.Take(maxTargets))
 			{
 				var skillHitResult = SCR_SkillHit(caster, enemy, skill, SkillModifier.MultiHit(2));

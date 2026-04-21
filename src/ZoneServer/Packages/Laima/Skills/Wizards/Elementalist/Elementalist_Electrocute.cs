@@ -82,7 +82,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
 			var maxBounces = 20;
-			var bounceRange = 150f;
+			var bounceRange = 80f;
 			var chainTargets = new List<ICombatEntity>();
 			var hitKeyActorList = new List<(int, int)>();
 			var alreadyHit = new HashSet<ICombatEntity>();
