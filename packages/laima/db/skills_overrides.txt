@@ -319,7 +319,7 @@
 { skillId: 20105, className: "Pyromancer_FirePillar", name: "Fire Pillar", basicSp: 130, basicCast: 4000, splashRate: 1, maxRange: 150, factor: 294, factorByLevel: 29.4, cooldownTime: 8000, overheatCount: "0", castInterruptible: true },
 { skillId: 20106, className: "Pyromancer_HellBreath", name: "Hell Breath", basicSp: 23, basicCast: 0, splashRate: 3, factor: 133, factorByLevel: 13.3, cooldownTime: 5000, overheatCount: "0", castInterruptible: true },
 { skillId: 20107, className: "Pyromancer_FlameGround", name: "Flame Ground", basicSp: 115, basicCast: 4500, splashRate: 5, maxRange: 150, factor: 119, factorByLevel: 11.9, cooldownTime: 9000, overheatCount: "0", castInterruptible: true },
-{ skillId: 20109, className: "Pyromancer_Prominence", name: "Prominence", basicSp: 170, basicCast: 6000, splashRate: 0, maxRange: 150, factor: 180, factorByLevel: 18, cooldownTime: 10000, castInterruptible: true },
+{ skillId: 20109, className: "Pyromancer_Prominence", name: "Prominence", basicSp: 170, basicCast: 6000, splashRate: 0, maxRange: 150, factor: 240, factorByLevel: 24, cooldownTime: 10000, castInterruptible: true },
 
 // Cryomancer
 //---------------------------------------------------------------------------

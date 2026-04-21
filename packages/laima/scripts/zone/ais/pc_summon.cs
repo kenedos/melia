@@ -56,19 +56,19 @@ public class PCSummonAiScript : AiScript
 		{
 			if (!TryGetRandomSkill(out var skill))
 			{
-				yield return Wait(2000);
+				yield return Wait(250);
 				continue;
 			}
 
-			yield return MoveToAttack(_target, skill.GetAttackRange());
+			yield return MoveToAttack(_target, GetAttackRange(skill));
 
 			if (EntityGone(_target) || !IsHating(_target))
 				break;
 
-			if (CanUseSkill(skill, _target))
+			if (InRangeOf(_target, GetAttackRange(skill)) && CanUseSkill(skill, _target))
 				yield return UseSkill(skill, _target);
-
-			yield return Wait(skill.Properties.Delay);
+			else
+				yield return Wait(100);
 		}
 
 		_target = null;

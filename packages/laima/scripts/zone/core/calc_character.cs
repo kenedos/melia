@@ -1743,7 +1743,7 @@ public class CharacterCalculationsScript : GeneralScript
 		// 100% Variable cast time
 		// var result = baseStat * (1 - byStat / 250) - byBuff;
 
-		result = (float)Math.Floor(Math2.Clamp(30, 200, result));
+		result = (float)Math.Floor(Math2.Clamp(0, 200, result));
 
 		return result;
 	}

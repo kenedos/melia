@@ -2150,8 +2150,9 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public virtual void Broadcast(Packet packet)
 		{
-			var buffer = _broadcastAllBuffer ??= new List<ICombatEntity>();
-			buffer.Clear();
+			var buffer = _broadcastAllBuffer;
+			_broadcastAllBuffer = null;
+			buffer ??= new List<ICombatEntity>();
 
 			lock (_characters)
 			{
@@ -2161,6 +2162,9 @@ namespace Melia.Zone.World.Maps
 
 			foreach (var entity in buffer)
 				((Character)entity).Connection.Send(packet);
+
+			buffer.Clear();
+			_broadcastAllBuffer ??= buffer;
 		}
 
 		/// <summary>

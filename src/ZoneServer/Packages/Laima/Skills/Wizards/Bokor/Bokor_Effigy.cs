@@ -113,29 +113,16 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 				}
 			}
 
-			// Consume up to 5 Dark Force stacks for bonus healing
-			// Each stack = +30% heal (1 stack = 30%, 5 stacks = 150%)
+			// Heals zombies for 100% damage
 			if (totalDamage > 0 && summons != null && summons.Count > 0)
 			{
-				var stacksToConsume = 0;
+				var healMultiplier = 1f;
+				var healPerSummon = (totalDamage * healMultiplier) / summons.Count;
 
-				if (caster.TryGetBuff(BuffId.PowerOfDarkness_Buff, out var darkForceBuff))
+				foreach (var summon in summons)
 				{
-					stacksToConsume = Math.Min(5, darkForceBuff.OverbuffCounter);
-					darkForceBuff.OverbuffCounter -= stacksToConsume;
-					darkForceBuff.NotifyUpdate();
-				}
-
-				if (stacksToConsume > 0)
-				{
-					var healMultiplier = stacksToConsume * 0.3f;
-					var healPerSummon = (totalDamage * healMultiplier) / summons.Count;
-
-					foreach (var summon in summons)
-					{
-						summon.Heal(healPerSummon, 0);
-						Send.ZC_HEAL_INFO(summon, healPerSummon, summon.Hp, HealType.Hp);
-					}
+					summon.Heal(healPerSummon, 0);
+					Send.ZC_HEAL_INFO(summon, healPerSummon, summon.Hp, HealType.Hp);
 				}
 			}
 		}
