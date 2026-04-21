@@ -7190,25 +7190,6 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Broadcasts a movement action for the specified actor from one position to another.
-		/// </summary>
-		/// <remarks>This method creates a movement packet and broadcasts it to all entities on the actor's
-		/// map.</remarks>
-		/// <param name="actor">The actor performing the movement. Cannot be <see langword="null"/>.</param>
-		/// <param name="fromPos">The starting position of the movement.</param>
-		/// <param name="toPos">The destination position of the movement.</param>
-		/// <param name="speed">The speed at which the actor moves.</param>
-		/// <param name="time">The time taken to complete the movement, in seconds.</param>
-		/// <param name="i1">An optional parameter for additional movement data. Defaults to 0.</param>
-		public static void ZC_MOVE_POS(IActor actor, Position fromPos, Position toPos, float speed, float time, int i1 = 0)
-		{
-			using var packet = Packet.Rent(Op.ZC_MOVE_POS);
-			packet.AddMovement(actor, fromPos, toPos, speed, time, i1);
-
-			actor.Map.Broadcast(packet, actor);
-		}
-
-		/// <summary>
 		/// ZC_MOVE_BEZIER
 		/// </summary>
 		/// <param name="actor"></param>
@@ -7262,7 +7243,7 @@ namespace Melia.Zone.Network
 		/// <param name="fromPos"></param>
 		/// <param name="toPos"></param>
 		/// <param name="speed"></param>
-		public static void ZC_MOVE_POS(IActor actor, Position fromPos, Position toPos, float speed, float time = 0)
+		public static void ZC_MOVE_POS(IActor actor, Position fromPos, Position toPos, float speed, float time = 0, bool teleport = false)
 		{
 			using var packet = Packet.Rent(Op.ZC_MOVE_POS);
 
@@ -7271,7 +7252,7 @@ namespace Melia.Zone.Network
 			packet.PutPosition(toPos);
 			packet.PutFloat(speed);
 			packet.PutFloat(time);
-			packet.PutByte(false); // if true, actor teleports after a moment?
+			packet.PutByte(teleport); // if true, actor teleports after a moment?
 			packet.PutGap(3);
 
 			actor.Map.Broadcast(packet, actor);

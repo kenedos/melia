@@ -395,7 +395,7 @@ namespace Melia.Shared.Network
 																 // OLD: FLY_WITH_OBJECT = 0x144 (Now 0x147 in LATEST)
 																 // OLD: OBJECT_BLINK = 0x145
 			public const int SetSessionKey = 0x146;              // LATEST. Old: PATTERN_MISSILE = 0x146
-			public const int FlyWithObject = 0x147;              // OLD: I_NEED_PARTY = 0x147
+			public const int FlyWithObject = 0x145;              // OLD: I_NEED_PARTY = 0x147
 																 // OLD: UPDATE_AUTHCODE = 0x148
 																 // OLD: MISSION_CLIENT_SCRIPT = 0x149
 			public const int Unknown_14A = 0x14A;                // LATEST. Old: DEAD_OBSERVER_MODE = 0x14A

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
@@ -23,6 +24,7 @@ using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Services;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Util;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -34,7 +36,6 @@ using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 using Melia.Zone.World.Storages;
-using Melia.Zone.Util;
 using Microsoft.CodeAnalysis;
 using Yggdrasil.Extensions;
 using Yggdrasil.Logging;
@@ -5685,14 +5686,31 @@ namespace Melia.Zone.Network
 
 			if (character.IsWarping)
 				return;
-
-			if (character.Map.TryGetActor(handle, out var actor) && actor is ISubActor subActor)
+			if (handle != 0 && attachToHandle != 0)
 			{
-				if (subActor.OwnerHandle != character.Handle)
-					return;
-				character.Position = position;
-				subActor.Position = position;
-				character.Movement.NotifyMove(position, character.Direction, 0);
+				if (character.Map.TryGetActor(handle, out var actor) && actor is ISubActor subActor)
+				{
+					if (subActor.OwnerHandle != character.Handle)
+						return;
+					character.Position = position;
+					subActor.Position = position;
+					character.Movement.NotifyMove(position, character.Direction, 0);
+				}
+			}
+			else if (handle == 0 && attachToHandle == 0 && handleAttachedTo != 0)
+			{
+				if (character.Map.TryGetActor(handleAttachedTo, out var actor) && actor is ISubActor subActor)
+				{
+					if (subActor.OwnerHandle != character.Handle)
+						return;
+					if (character.Position == position)
+						return;
+					var prevPosition = character.Position;
+					character.Position = position;
+					subActor.Position = position;
+					Send.ZC_MOVE_POS(subActor, prevPosition, position, 60, 0, true);
+					//character.Movement.NotifyMove(position, character.Direction, 0);
+				}
 			}
 		}
 
