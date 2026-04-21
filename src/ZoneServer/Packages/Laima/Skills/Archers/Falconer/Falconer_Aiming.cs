@@ -71,10 +71,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			// Take off from shoulder if landed
 			if (hawk.IsLandedOnShoulder)
-			{
 				hawk.TakeOff();
-				await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			}
+			else if (hawk.IsOnRoost)
+				hawk.LeaveRoost();
 
 			// Calculate duration
 			var durationMs = BaseDurationMs + (skill.Level * DurationPerLevelMs);

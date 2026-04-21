@@ -2560,6 +2560,25 @@ namespace Melia.Zone.Network
 			/// </summary>
 			/// <param name="conn"></param>
 			/// <param name="companion"></param>
+			/// <summary>
+			/// Associates a pet with a world id on the client. Sent during
+			/// pet activation before the landing/attach sequence.
+			/// </summary>
+			public static void PetAssociateWorldId(IZoneConnection conn, Companion companion, int worldId)
+			{
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Pet_AssociateWorldId);
+
+				packet.PutInt(companion.Handle);
+				packet.PutByte(1);
+				packet.PutByte(0);
+				packet.PutInt(worldId);
+				packet.PutInt(1);
+				packet.PutByte(0);
+
+				conn.Send(packet);
+			}
+
 			public static void PetPlayAnimation(IZoneConnection conn, Companion companion, int animationId = 8576, int i1 = 1, byte b1 = 0)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
@@ -3038,6 +3057,24 @@ namespace Melia.Zone.Network
 				packet.PutInt(actor.Handle);
 				packet.PutByte(isEnabled);
 				packet.AddStringId(detachAnimationId);
+
+				actor.Map.Broadcast(packet);
+			}
+
+			/// <summary>
+			/// Registers a list of idle animations the client cycles through
+			/// while the actor is attached to another object. Each animation
+			/// plays once, so the caller must re-send periodically to loop.
+			/// </summary>
+			public static void AddAttachAnimList(IActor actor, params string[] animationIds)
+			{
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.AttachIdleAnimList);
+
+				packet.PutInt(actor.Handle);
+				packet.PutInt(animationIds.Length);
+				foreach (var animId in animationIds)
+					packet.AddStringId(animId);
 
 				actor.Map.Broadcast(packet);
 			}

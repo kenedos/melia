@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
 using Melia.Zone.Buffs;
@@ -611,14 +612,92 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 		}
 
+		private readonly HashSet<string> _pendingCompanionProps = new();
+		private readonly object _pendingCompanionPropsLock = new();
+
 		/// <summary>
 		/// Called when a property that affects companion stats changes.
-		/// Updates companion properties accordingly.
+		/// Marks the dependent companion properties dirty so they can be
+		/// flushed as a single packet per companion on the next tick.
 		/// </summary>
 		/// <param name="propertyName"></param>
 		private void OnCompanionDependentPropertyChanged(string propertyName)
 		{
-			// Check if character has active companions
+			lock (_pendingCompanionPropsLock)
+			{
+				switch (propertyName)
+				{
+					case PropertyName.DEF:
+						_pendingCompanionProps.Add(PropertyName.DEF);
+						_pendingCompanionProps.Add(PropertyName.MountDEF);
+						break;
+					case PropertyName.MDEF:
+						_pendingCompanionProps.Add(PropertyName.MDEF);
+						break;
+					case PropertyName.MHP:
+						_pendingCompanionProps.Add(PropertyName.MHP);
+						_pendingCompanionProps.Add(PropertyName.MountMHP);
+						break;
+					case PropertyName.DR:
+						_pendingCompanionProps.Add(PropertyName.DR);
+						_pendingCompanionProps.Add(PropertyName.MountDR);
+						break;
+					case PropertyName.HR:
+						_pendingCompanionProps.Add(PropertyName.HR);
+						break;
+					case PropertyName.CRTHR:
+						_pendingCompanionProps.Add(PropertyName.CRTHR);
+						break;
+					case PropertyName.MINPATK:
+					case PropertyName.MAXPATK:
+						_pendingCompanionProps.Add(PropertyName.ATK);
+						break;
+					case PropertyName.MINMATK:
+						_pendingCompanionProps.Add(PropertyName.MINMATK);
+						break;
+					case PropertyName.MAXMATK:
+						_pendingCompanionProps.Add(PropertyName.MAXMATK);
+						break;
+					case PropertyName.STR:
+						_pendingCompanionProps.Add(PropertyName.STR);
+						break;
+					case PropertyName.DEX:
+						_pendingCompanionProps.Add(PropertyName.DEX);
+						_pendingCompanionProps.Add(PropertyName.DR);
+						_pendingCompanionProps.Add(PropertyName.HR);
+						_pendingCompanionProps.Add(PropertyName.CRTHR);
+						break;
+					case PropertyName.CON:
+						_pendingCompanionProps.Add(PropertyName.CON);
+						break;
+					case PropertyName.INT:
+						_pendingCompanionProps.Add(PropertyName.INT);
+						break;
+					case PropertyName.MNA:
+						_pendingCompanionProps.Add(PropertyName.MNA);
+						break;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Flushes any pending companion property updates as a single
+		/// ZC_OBJECT_PROPERTY per active companion. Called once per
+		/// character tick.
+		/// </summary>
+		public void FlushCompanionPropertyUpdates()
+		{
+			string[] dependents;
+			lock (_pendingCompanionPropsLock)
+			{
+				if (_pendingCompanionProps.Count == 0)
+					return;
+
+				dependents = new string[_pendingCompanionProps.Count];
+				_pendingCompanionProps.CopyTo(dependents);
+				_pendingCompanionProps.Clear();
+			}
+
 			if (!this.Character.Components.TryGet<CompanionComponent>(out var companionComponent))
 				return;
 
@@ -626,78 +705,13 @@ namespace Melia.Zone.World.Actors.Characters
 			if (activeCompanions.Count == 0)
 				return;
 
+			var conn = this.Character.Connection;
 			foreach (var companion in activeCompanions)
 			{
-				// Invalidate companion properties based on which owner property changed
-				switch (propertyName)
-				{
-					case PropertyName.DEF:
-						companion.Properties.Invalidate(PropertyName.DEF);
-						if (!companion.IsBird)
-							companion.Properties.Invalidate(PropertyName.MountDEF);
-						break;
+				companion.Properties.Invalidate(dependents);
 
-					case PropertyName.MDEF:
-						companion.Properties.Invalidate(PropertyName.MDEF);
-						break;
-
-					case PropertyName.MHP:
-						companion.Properties.Invalidate(PropertyName.MHP);
-						if (!companion.IsBird)
-							companion.Properties.Invalidate(PropertyName.MountMHP);
-						break;
-
-					case PropertyName.DR:
-						companion.Properties.Invalidate(PropertyName.DR);
-						if (!companion.IsBird)
-							companion.Properties.Invalidate(PropertyName.MountDR);
-						break;
-
-					case PropertyName.HR:
-						companion.Properties.Invalidate(PropertyName.HR);
-						break;
-
-					case PropertyName.CRTHR:
-						companion.Properties.Invalidate(PropertyName.CRTHR);
-						break;
-
-					case PropertyName.MINPATK:
-					case PropertyName.MAXPATK:
-						companion.Properties.Invalidate(PropertyName.ATK);
-						break;
-
-					case PropertyName.MINMATK:
-						companion.Properties.Invalidate(PropertyName.MINMATK);
-						break;
-
-					case PropertyName.MAXMATK:
-						companion.Properties.Invalidate(PropertyName.MAXMATK);
-						break;
-
-					case PropertyName.STR:
-						companion.Properties.Invalidate(PropertyName.STR);
-						break;
-
-					case PropertyName.DEX:
-						companion.Properties.Invalidate(PropertyName.DEX, PropertyName.DR, PropertyName.HR, PropertyName.CRTHR);
-						break;
-
-					case PropertyName.CON:
-						companion.Properties.Invalidate(PropertyName.CON);
-						break;
-
-					case PropertyName.INT:
-						companion.Properties.Invalidate(PropertyName.INT);
-						break;
-
-					case PropertyName.MNA:
-						companion.Properties.Invalidate(PropertyName.MNA);
-						break;
-				}
-
-				// Send updated companion properties to the client
-				if (this.Character.Connection != null)
-					Send.ZC_OBJECT_PROPERTY(this.Character.Connection, companion);
+				if (conn != null)
+					Send.ZC_OBJECT_PROPERTY(conn, companion, dependents);
 			}
 		}
 

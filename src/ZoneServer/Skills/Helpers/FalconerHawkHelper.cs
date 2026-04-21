@@ -170,6 +170,34 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
+		/// Fully resets hawk skill state. Called when the hawk dies so
+		/// that stale skill/fly-away/hidden flags don't persist through
+		/// revival and block all future skill use.
+		/// </summary>
+		public static void ResetHawkState(Companion hawk)
+		{
+			if (hawk == null)
+				return;
+
+			var wasHidden = hawk.Vars.Get<bool>("Hawk.IsHidden", false);
+
+			hawk.Vars.Set("Hawk.UsingSkill", false);
+			hawk.Vars.Set("Hawk.FlyingAway", false);
+			hawk.Vars.Set("Hawk.IsHidden", false);
+			hawk.Vars.Set("Hawk.StopFlyAway", false);
+			hawk.Vars.Set("Hawk.Circling.Active", false);
+			hawk.Vars.Set("Hawk.Aiming.Active", false);
+			hawk.Vars.Set("Hawk.Hovering.Active", false);
+
+			hawk.Unlock(LockType.Movement);
+
+			ClearQueue(hawk);
+
+			if (wasHidden)
+				hawk.SetHide(false);
+		}
+
+		/// <summary>
 		/// Checks if the hawk is currently flying away or hidden.
 		/// </summary>
 		/// <param name="hawk">The hawk companion</param>

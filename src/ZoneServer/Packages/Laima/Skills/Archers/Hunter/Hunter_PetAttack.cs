@@ -151,10 +151,6 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 			skill.IncreaseOverheat();
 
 			var targetPos = target.Position;
-			Send.ZC_SKILL_READY(master, skill, 1, companion.Position, targetPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(master, target.Handle, companion.Position, companion.Position.GetDirection(targetPos), Position.Zero);
-			Send.ZC_SKILL_MELEE_GROUND(master, skill, targetPos, ForceId.GetNew(), null);
-
 			skill.Run(Activate(master, skill, targetPos, companion));
 		}
 	}

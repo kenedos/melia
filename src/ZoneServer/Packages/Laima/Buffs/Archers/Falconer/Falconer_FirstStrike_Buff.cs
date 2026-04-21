@@ -40,7 +40,7 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 				return 0;
 
 			if (hawk.Components.TryGet<AiComponent>(out var ai))
-				ai.Script.AddHate(target, 100);
+				ai.Script.AddHate(target, 150);
 
 			return 0;
 		}

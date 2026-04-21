@@ -546,7 +546,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!UsePositionOnlyMovement)
 				Send.ZC_MOVE_DIR(this.Entity, pos, dir, unkFloat);
 			else
-				Send.ZC_MOVE_POS(this.Entity, fromPos, pos, 60, 0, 1);
+				Send.ZC_MOVE_POS(this.Entity, fromPos, pos, 60, 0, true);
 			if (this.Entity is Character character)
 			{
 				// Check if character is attached to something

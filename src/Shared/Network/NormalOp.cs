@@ -249,7 +249,7 @@ namespace Melia.Shared.Network
 			public const int PetOwner = 0xB6;                    // LATEST. Old: ITEM_ATTACH_TO_MONSTER_NODE = 0xB6
 			public const int OffsetY = 0xB7;                     // LATEST. Old: AUTO_DETACH_ON_OWNER_MOVE = 0xB7
 																 // OLD: MOVE_NODE_MONSTER = 0xB8
-			public const int PetFlying = 0xB9;                   // LATEST. Old: NODE_MONSTER_ANIM = 0xB9
+			public const int AttachIdleAnimList = 0xB9;          // LATEST. Old: NODE_MONSTER_ANIM = 0xB9
 																 // OLD: ADD_SKILL_SYNCKEY = 0xBA
 																 // OLD: EXEC_SKILL_SYNCKEY = 0xBB
 																 // OLD: JUMP_BY_ARC = 0xBC
@@ -670,7 +670,7 @@ namespace Melia.Shared.Network
 			// LATEST PetOwner = 0xB6. Old ITEM_ATTACH_TO_MONSTER_NODE = 0xB6
 			// LATEST OffsetY = 0xB7. Old AUTO_DETACH_ON_OWNER_MOVE = 0xB7
 			public const int OLD_MOVE_NODE_MONSTER = 0xB8;
-			// LATEST PetFlying = 0xB9. Old NODE_MONSTER_ANIM = 0xB9
+			// LATEST AttachIdleAnimList = 0xB9. Old NODE_MONSTER_ANIM = 0xB9
 			public const int OLD_ADD_SKILL_SYNCKEY = 0xBA;
 			public const int OLD_EXEC_SKILL_SYNCKEY = 0xBB;
 			public const int OLD_JUMP_BY_ARC = 0xBC;

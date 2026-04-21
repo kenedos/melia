@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -52,12 +53,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 			}
 
-			if (FalconerHawkHelper.IsHawkBusy(hawk))
-			{
-				caster.ServerMessage(Localization.Get("Hawk is busy."));
-				return;
-			}
-
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
@@ -79,6 +74,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			// If the hawk is perched, lift off
 			if (hawk.IsLandedOnShoulder)
 				hawk.TakeOff();
+			else if (hawk.IsOnRoost)
+				hawk.LeaveRoost();
 
 			var targetHandle = target?.Handle ?? 0;
 
@@ -117,21 +114,40 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task HandleSkillAsync(ICombatEntity caster, Skill skill, Companion hawk, Character character, TimeSpan buffTimeSpan)
 		{
+			// Queue if hawk is busy with another skill
+			if (FalconerHawkHelper.TryQueueSkill(hawk, () => skill.Run(this.HandleSkillAsync(caster, skill, hawk, character, buffTimeSpan))))
+				return;
+
+			// Read GCD remaining before LockHawk resets the timer
+			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
+
+			// Lock hawk immediately so subsequent casts get queued
+			FalconerHawkHelper.LockHawk(hawk);
+
+			// Wait for hawk global cooldown if needed
+			if (gcdRemaining > 0)
+				await skill.Wait(TimeSpan.FromMilliseconds(gcdRemaining));
+
+			// Unhide hawk if it flew away from a previous skill
+			if (FalconerHawkHelper.IsHawkFlyingAway(hawk))
+				await FalconerHawkHelper.HawkUnhide(skill, caster, hawk);
+
 			// Wait for skill animation to finish before attachment
 			// (official shows ~1s gap between MELEE_GROUND and attachment)
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
-			// Lock hawk
-			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.SkillFunction", "HangingShot");
-
-			// 7. ZC_NORMAL CollisionAndBack (outside sync block)
-			Send.ZC_NORMAL.CollisionAndBack(hawk, caster, 0, "HANGINGSHOT", 1f, 7f, 1f, 0.7f, 20f, false);
-
 			// 8. Attachment sequence in sync block with SYNC_EXEC
 			var syncKey3 = hawk.GenerateSyncKey();
 			Send.ZC_SYNC_START(caster, syncKey3, 1);
+			Send.ZC_NORMAL.CollisionAndBack(hawk, caster, syncKey3, "HANGINGSHOT", 1f, 7f, 1f, 0.7f, 20f, false);
+
+			await skill.Wait(1000);
+			hawk.Position = caster.Position;
 			Send.ZC_NORMAL.ControlObject(caster, hawk, ControlLookType.None, false, false, null, true);
+			Send.ZC_ATTACH_TO_OBJ(caster, hawk, "Dummy_hawk", null, 0.9f);
+			caster.TurnTowards(Direction.North);
+			await skill.Wait(500);
+			Send.ZC_DETACH_TO_OBJ(caster, hawk);
 			Send.ZC_NORMAL.FlyWithObject(caster, hawk, HangingShotAttachNode, HangingShotAttachOffset);
 			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.ASTD, 0);
 			Send.ZC_SYNC_END(caster, syncKey3, 1);
@@ -190,8 +206,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task CleanupHangingShot(Skill skill, Character character, Companion hawk, AttachmentComponent attachment, MovementComponent movement)
 		{
-			hawk.Vars.Set("Hawk.UsingSkill", false);
-
 			if (attachment != null && attachment.IsAttached)
 				attachment.Detach(sendPackets: false);
 
@@ -201,6 +215,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.FlyWithObject(character, null);
 			character.AttachToObject(null, "None", "None", attachSec: 0.5f);
 			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.ASTD, 0);
+
+			// Sync hawk position to character so it doesn't appear stuck at
+			// a stale server-side position after being detached.
+			var resumePos = new Position(character.Position.X, character.Position.Y + FalconerHawkHelper.DefaultHawkHeight, character.Position.Z);
+			hawk.SetPosition(resumePos);
 
 			await FalconerHawkHelper.HawkFlyAway(skill, character, hawk);
 		}

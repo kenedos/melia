@@ -1162,10 +1162,12 @@ switch (NormalOpToStr(type))
 //        float f1; // 10.4
 //        break;
 //
-//    // Flying Pet Related?
+//    // AttachIdleAnimList — idle animations played while attached.
+//    // Plays each once; re-send to loop.
 //    case 0xB9:
 //        int entityHandle;
-//        int i2; // 0
+//        int count;
+//        StringId animationIds[count];
 //        break;
 //
 //    // Pet or Companion animation state?

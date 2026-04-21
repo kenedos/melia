@@ -124,13 +124,20 @@ namespace Melia.Zone.Network
 		/// <param name="nodeName"></param>
 		/// <param name="targetNodeName"></param>
 		/// <param name="attachSeconds"></param>
-		/// <param name="l1"></param>
-		/// <param name="l2"></param>
+		/// <param name="f1"></param>
+		/// <param name="f2"></param>
+		/// <param name="f3"></param>
+		/// <param name="distance"></param>
 		/// <param name="attachAnimation"></param>
-		/// <param name="b1"></param>
+		/// <param name="preserveCurrentAnim">
+		/// 1 = let the current animation finish before switching to
+		/// <paramref name="attachAnimation"/>. 0 = switch immediately.
+		/// </param>
+		/// <param name="b2"></param>
+		/// <param name="b3"></param>
 		public static void ZC_ATTACH_TO_OBJ(IActor actor, IActor attachToEntity, string nodeName,
 			string targetNodeName, float attachSeconds = 0, float f1 = 0, float f2 = 0, float f3 = 0,
-			float distance = 0, string attachAnimation = "None", byte b1 = 0, byte b2 = 0, byte b3 = 0)
+			float distance = 0, string attachAnimation = "None", byte preserveCurrentAnim = 0, byte b2 = 0, byte b3 = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_ATTACH_TO_OBJ);
 
@@ -139,12 +146,12 @@ namespace Melia.Zone.Network
 			packet.AddStringId(nodeName);
 			packet.AddStringId(targetNodeName);
 			packet.PutFloat(attachSeconds);
-			packet.PutFloat(0);
-			packet.PutFloat(0);
-			packet.PutFloat(0);
+			packet.PutFloat(f1);
+			packet.PutFloat(f2);
+			packet.PutFloat(f3);
 			packet.PutFloat(distance);
 			packet.AddStringId(attachAnimation);
-			packet.PutByte(b1);
+			packet.PutByte(preserveCurrentAnim);
 			packet.PutByte(b2);
 			packet.PutByte(b3);
 

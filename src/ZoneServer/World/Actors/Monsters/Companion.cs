@@ -220,6 +220,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				this.Map.AddMonster(this);
 				var hpValue = this.Properties.GetFloat(PropertyName.HP);
 				Send.ZC_OBJECT_PROPERTY(this.Owner.Connection, this);
+				Send.ZC_NORMAL.PetAssociateWorldId(this.Owner.Connection, this, (int)this.DbId);
 				Send.ZC_NORMAL.PetPlayAnimation(this.Owner.Connection, this);
 				Send.ZC_MOVE_SPEED(this);
 				Send.ZC_PET_AUTO_ATK(this.Owner, this);
@@ -319,6 +320,9 @@ namespace Melia.Zone.World.Actors.Monsters
 			this.Properties.SetFloat(PropertyName.HP, 1);
 			ZoneServer.Instance.ServerEvents.EntityKilled.Raise(new CombatEventArgs(this, killer));
 			this.StartBuff(BuffId.Pet_Dead, TimeSpan.FromSeconds(8));
+
+			if (this.IsBird)
+				Melia.Zone.Skills.Helpers.FalconerHawkHelper.ResetHawkState(this);
 		}
 
 		/// <summary>
@@ -476,6 +480,10 @@ namespace Melia.Zone.World.Actors.Monsters
 
 		private const float ShoulderLandDelay = 30f;
 		private const float DefaultBirdFlyHeight = 80f;
+		private const int LandingAnimDurationMs = 1000;
+		private const float ShoulderLandAttachSec = 0.4f;
+		private const float RoostLandAttachSec = 0.4f;
+		private const int PerchIdleLoopIntervalMs = 2500;
 
 		/// <summary>
 		/// Whether the bird companion is currently landed on its owner's shoulder.
@@ -590,7 +598,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Attaches to the owner's hawk node and enables auto-detach
 		/// so the bird lifts off when the owner moves.
 		/// </summary>
-		public void LandOnOwnerShoulder()
+		public async void LandOnOwnerShoulder()
 		{
 			if (this.Owner == null || this.IsLandedOnShoulder)
 				return;
@@ -598,14 +606,24 @@ namespace Melia.Zone.World.Actors.Monsters
 			this.Direction = this.Owner.Direction;
 			Send.ZC_ROTATE(this);
 
-			this.PlayAnimation("ASTD_TO_SIT", stopOnLastFrame: true);
-			this.AttachToObject(this.Owner, "Dummy_pet_hawk_R", "None", attachSec: 1, attachAnim: "SIT");
+			this.IsLandedOnShoulder = true;
+			this.WantsToLand = false;
+
+			Send.ZC_PLAY_ANI(this, "ASTD_TO_SIT", stopOnLastFrame: true, b1: 1);
+			Send.ZC_ATTACH_TO_OBJ(this, this.Owner, "Dummy_pet_hawk_R", "None",
+				attachSeconds: 1f, attachAnimation: "SIT", preserveCurrentAnim: 1);
+			Send.ZC_NORMAL.AddAttachAnimList(this, "SIT_IDLE", "SIT_IDLE2");
+
+			await Task.Delay(1000);
+
+			if (this.Owner == null || !this.IsLandedOnShoulder)
+				return;
+
 			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, true, "SIT");
 			this.Owner.PlayEffectNode("F_smoke109_2", 1, "Dummy_pet_hawk_R");
 			this.Owner.PlayEffectNode("F_archer_hawk_fether_sit", 1, "Dummy_pet_hawk_R");
 
-			this.IsLandedOnShoulder = true;
-			this.WantsToLand = false;
+			this.StartPerchIdleLoop();
 		}
 
 		/// <summary>
@@ -655,18 +673,45 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// Lands the bird companion on its roost.
 		/// Attaches to the roost's hawk node.
 		/// </summary>
-		public void LandOnRoost(Mob roost)
+		public async void LandOnRoost(Mob roost)
 		{
 			if (roost == null || roost.IsDead || this.IsOnRoost)
 				return;
 
-			this.PlayAnimation("ASTD_TO_SIT", stopOnLastFrame: true);
-			this.AttachToObject(roost, "Dummy_hawk", "None", attachSec: 1, attachAnim: "SIT");
+			this.IsOnRoost = true;
+
+			Send.ZC_PLAY_ANI(this, "ASTD_TO_SIT", stopOnLastFrame: true, b1: 1);
+			Send.ZC_ATTACH_TO_OBJ(this, roost, "Dummy_hawk", "None",
+				attachSeconds: 1f, attachAnimation: "SIT", preserveCurrentAnim: 1);
+			Send.ZC_NORMAL.AddAttachAnimList(this, "SIT_IDLE", "SIT_IDLE2");
+
+			await Task.Delay(1000);
+
+			if (roost == null || roost.IsDead || !this.IsOnRoost)
+				return;
+
 			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, true, "SIT");
 			roost.PlayEffectNode("F_smoke109_2", 1, "Dummy_hawk");
 			roost.PlayEffectNode("F_archer_hawk_fether_sit", 1, "Dummy_hawk");
 
-			this.IsOnRoost = true;
+			this.StartPerchIdleLoop();
+		}
+
+		/// <summary>
+		/// Periodically re-sends the attach idle animation list so the bird
+		/// keeps cycling SIT_IDLE animations while perched instead of freezing.
+		/// </summary>
+		private async void StartPerchIdleLoop()
+		{
+			while (this.IsPerched)
+			{
+				await Task.Delay(PerchIdleLoopIntervalMs);
+
+				if (!this.IsPerched)
+					break;
+
+				Send.ZC_NORMAL.AddAttachAnimList(this, "SIT_IDLE");
+			}
 		}
 
 		/// <summary>

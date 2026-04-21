@@ -17,7 +17,7 @@ ServerHeaderFixed header;
 
 int handle;
 int attachToHandle;
-StringId nodeName; // 270089 - Dummy_pet_hawk_R (Packet Id String for Animation?) / 0 / 9072 / 14025 ("Dummy_top") 
+StringId nodeName; // 270089 - Dummy_pet_hawk_R (Packet Id String for Animation?) / 0 / 9072 / 14025 ("Dummy_top")
 StringId targetNodeName; // 0 / 0 / 0 / 0
 float attachSec; // 1 / 0 (Duration?) / 0 / 0.001
 float f2;
@@ -25,6 +25,6 @@ float f3;
 float f4;
 float distance;
 StringId attachAnim; // 2562221 - SIT (Packet Id String for Animation?) / 0 / 0
-byte b1; // 1 / 0 / 0 / 0
+byte preserveCurrentAnim; // 1 = let current anim finish, then switch to attachAnim. 0 = switch immediately.
 byte b2; // 0 / 0 / 1 / 0
 byte b3; // 0 / 0 / 1 / 0
