@@ -7,6 +7,7 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.Skills;
 
 namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 {
@@ -24,6 +25,8 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 		{
 			if (buff.Target is not Character character)
 				return;
+
+			character.Skills.Add(new Skill(character, SkillId.Bow_Hanging_Attack));
 
 			// Change normal attack to hanging shot variant
 			Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.Bow_Hanging_Attack);
@@ -51,6 +54,8 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 			// This handles cases where buff is removed by external means
 			// (dispel, death, etc.) without going through skill handler cleanup
 			this.CleanupAttachment(character);
+
+			character.Skills.Remove(SkillId.Bow_Hanging_Attack);
 
 			// Restore normal attack
 			Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.None);
