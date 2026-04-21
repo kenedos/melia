@@ -400,13 +400,13 @@ public class CombatCalculationsScript : GeneralScript
 		var SCR_GetRandomAtk = ScriptableFunctions.Combat.Get("SCR_GetRandomAtk");
 
 		var byAtk = SCR_GetRandomAtk(caster, target, skill, modifier, skillHitResult);
-		byAtk /= 4;
+		byAtk /= 16;
 
 		var byHealPower = caster.Properties.GetFloat(PropertyName.HEAL_PWR);
 		var bySkillFactor = skill.Properties.GetFloat(PropertyName.SkillFactor);
 
-		// We assume all heals have 5% of target's max HP as base value
-		var byMaxHp = (target.MaxHp * 0.05f);
+		var healPowerRatio = Math.Min(1f, byHealPower / 1000f);
+		var byMaxHp = (target.MaxHp * 0.05f * healPowerRatio);
 
 		var healAmount = (float)Math.Floor(byMaxHp + ((byHealPower * bySkillFactor) / 100f) + byAtk);
 
