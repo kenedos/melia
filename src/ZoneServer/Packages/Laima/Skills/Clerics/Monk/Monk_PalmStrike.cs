@@ -44,8 +44,6 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Monk
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(400));
-
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 55, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 150;

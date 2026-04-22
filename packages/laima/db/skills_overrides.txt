@@ -866,7 +866,7 @@
 //---------------------------------------------------------------------------
 { skillId: 40701, className: "Monk_IronSkin", name: "Iron Skin", basicSp: 14, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000 },
 { skillId: 40702, className: "Monk_DoublePunch", name: "Double Punch", basicSp: 8, splashRate: 0, factor: 28, factorByLevel: 2.8, hitCount: 2, multiHitCount: 1, cooldownTime: 0 },
-{ skillId: 40703, className: "Monk_PalmStrike", name: "Palm Strike", basicSp: 28, splashRate: 6, factor: 308, factorByLevel: 30.8, hitCount: 1, multiHitCount: 1, cooldownTime: 7000, overheatCount: "2" },
+{ skillId: 40703, className: "Monk_PalmStrike", name: "Palm Strike", basicSp: 28, splashRate: 6, factor: 308, factorByLevel: 30.8, shootTime: 300, hitCount: 1, multiHitCount: 1, cooldownTime: 7000, overheatCount: "2", enableCastMove: false },
 { skillId: 40704, className: "Monk_HandKnife", name: "Hand Knife", basicSp: 32, splashRate: 6, factor: 259, factorByLevel: 25.9, hitCount: 1, multiHitCount: 6, cooldownTime: 6000, overheatCount: "2" },
 { skillId: 40705, className: "Monk_1InchPunch", name: "One Inch Punch", basicSp: 42, splashRate: 2, factor: 392, factorByLevel: 39.2, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "2" },
 { skillId: 40706, className: "Monk_EnergyBlast", name: "Energy Blast", basicSp: 120, basicCast: 3000, splashRate: 1, factor: 70, factorByLevel: 7, hitCount: 1, multiHitCount: 20, cooldownTime: 15000 },
