@@ -348,7 +348,7 @@ public class MixingTableFunctionsScript : GeneralScript
 			newGem.SetLevel(requiredGemLevel);
 		character.Inventory.Add(newGem, InventoryAddType.PickUp);
 
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, resultGem.ClassName);
 
 		return DialogTxResult.Okay;
@@ -393,7 +393,7 @@ public class MixingTableFunctionsScript : GeneralScript
 		equipItem.GenerateGradeBasedRandomOptions();
 
 		Send.ZC_OBJECT_PROPERTY(character, equipItem);
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, equipItem.Data.ClassName);
 
 		return DialogTxResult.Okay;
@@ -429,7 +429,7 @@ public class MixingTableFunctionsScript : GeneralScript
 		equipItem.GenerateGradeBasedRandomOptions();
 
 		Send.ZC_OBJECT_PROPERTY(character, equipItem);
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, equipItem.Data.ClassName);
 
 		return DialogTxResult.Okay;
@@ -510,7 +510,7 @@ public class MixingTableFunctionsScript : GeneralScript
 		}
 
 		Send.ZC_OBJECT_PROPERTY(character, equipItem);
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, equipItem.Data.ClassName);
 
 		return DialogTxResult.Okay;
@@ -581,7 +581,7 @@ public class MixingTableFunctionsScript : GeneralScript
 			newCard.SetLevel(cardLevel);
 		character.Inventory.Add(newCard, InventoryAddType.PickUp);
 
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, resultCard.ClassName);
 
 		return DialogTxResult.Okay;
@@ -648,7 +648,7 @@ public class MixingTableFunctionsScript : GeneralScript
 			newCard.SetLevel(requiredCardLevel);
 		character.Inventory.Add(newCard, InventoryAddType.PickUp);
 
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, resultCard.ClassName);
 
 		return DialogTxResult.Okay;
@@ -710,7 +710,7 @@ public class MixingTableFunctionsScript : GeneralScript
 			newGem.SetLevel(sourceGemLevel);
 		character.Inventory.Add(newGem, InventoryAddType.PickUp);
 
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, resultGem.ClassName);
 
 		return DialogTxResult.Okay;
@@ -740,7 +740,7 @@ public class MixingTableFunctionsScript : GeneralScript
 
 		character.AddItem(resultClassName, 1);
 
-		Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
+		Send.ZC_ITEM_INVENTORY_INDEX_LIST(character);
 		character.AddonMessage(AddonMessage.JOURNAL_DETAIL_CRAFT_EXEC_SUCCESS, resultClassName);
 
 		return DialogTxResult.Okay;

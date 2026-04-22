@@ -76,7 +76,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			skill.Run(this.HandleSkill(caster, skill, hawk, originPos, targetPos));
+			FalconerHawkHelper.EnqueueSkill(hawk, () => skill.Run(this.HandleSkill(caster, skill, hawk, originPos, targetPos)));
 		}
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Companion hawk, Position originPos, Position targetPos)
@@ -85,10 +85,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var previousPheasant = hawk.Vars.Get<Mob>("HAWK_PHEASANT");
 			if (previousPheasant != null && !previousPheasant.IsDead)
 				previousPheasant.Kill(null);
-
-			// Queue if hawk is busy with another skill
-			if (FalconerHawkHelper.TryQueueSkill(hawk, () => skill.Run(HandleSkill(caster, skill, hawk, originPos, targetPos))))
-				return;
 
 			// Read GCD remaining before LockHawk resets the timer
 			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
@@ -154,7 +150,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 		{
 			// Explosion effect and screen shake
 			hawk.PlayGroundEffect(explosionPos, "F_archer_caltrop_hit_explosion", 1f);
-			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
+			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 300f, 7f, 0.5f, 50f, 0f, 0f);
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
 
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, explosionPos, DamageRadius)
@@ -241,15 +237,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			skill.IncreaseOverheat();
 
-			if (FalconerHawkHelper.TryQueueSkill(hawk, () =>
+			FalconerHawkHelper.EnqueueSkill(hawk, () =>
 			{
 				FalconerHawkHelper.LockHawk(hawk);
 				skill.Run(AutoActivate(skill, caster, hawk, target));
-			}))
-				return;
-
-			FalconerHawkHelper.LockHawk(hawk);
-			skill.Run(AutoActivate(skill, caster, hawk, target));
+			});
 		}
 
 		private static async Task AutoActivate(Skill skill, ICombatEntity caster, Companion hawk, ICombatEntity target)
@@ -265,7 +257,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 
 			hawk.PlayGroundEffect(targetPos, "F_archer_caltrop_hit_explosion", 1f);
-			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
+			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 300f, 7f, 0.5f, 50f, 0f, 0f);
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
 
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, DamageRadius)

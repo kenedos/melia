@@ -1391,7 +1391,7 @@ namespace Melia.Zone.World.Maps
 				var dz = e.Position.Z - position.Z;
 				if (dx * dx + dz * dz <= effectiveRadius * effectiveRadius && attacker.CanDamage(e))
 				{
-					if (hitType == SkillHitType.Melee && e.IsHighFlying())
+					if (e.IsHighFlying())
 						continue;
 
 					result.Add(e);
@@ -1440,7 +1440,7 @@ namespace Melia.Zone.World.Maps
 
 				if (dx * dx + dz * dz <= effectiveRadius * effectiveRadius && attacker.CanDamage(e))
 				{
-					if (hitType == SkillHitType.Melee && e.IsHighFlying())
+					if (e.IsHighFlying())
 						continue;
 
 					buffer.Add(e);
@@ -1493,7 +1493,7 @@ namespace Melia.Zone.World.Maps
 					continue;
 				if (!shape.IsInsideOrInRange(e.Position, e.AgentRadius + e.HitRadiusBonus))
 					continue;
-				if (hitType == SkillHitType.Melee && e.IsHighFlying())
+				if (e.IsHighFlying())
 					continue;
 				result.Add(e);
 			}
@@ -1538,7 +1538,7 @@ namespace Melia.Zone.World.Maps
 					continue;
 				if (!shape.IsInsideOrInRange(e.Position, e.AgentRadius + e.HitRadiusBonus))
 					continue;
-				if (hitType == SkillHitType.Melee && e.IsHighFlying())
+				if (e.IsHighFlying())
 					continue;
 				result.Add(e);
 			}

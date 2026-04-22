@@ -1391,7 +1391,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, amount, msg, inventoryType);
 
 					if (inventoryType == InventoryType.Inventory && Versions.Client > KnownVersions.ClosedBeta1)
-						Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
+						Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character);
 				}
 
 				if (ZoneServer.Instance.Conf.Log.LogItems)
@@ -1552,7 +1552,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// is way better than the previous options!
 			//Send.ZC_ITEM_INVENTORY_LIST(this.Character);
 
-			Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
+			Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character);
 			Send.ZC_EQUIP_GEM_INFO(this.Character);
 		}
 

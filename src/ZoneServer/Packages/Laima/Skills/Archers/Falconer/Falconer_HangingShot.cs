@@ -13,6 +13,7 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Maps;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
@@ -42,7 +43,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	{
 		private const int BuffDurationSeconds = 30;
 		private const string HangingShotAttachNode = "Dummy_hawk";
-		private const int DefaultHangingShotAttachOffset = -56;
 
 		private static readonly Dictionary<string, int> HangingShotAttachOffsets = new()
 		{
@@ -53,9 +53,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private static int GetAttachOffset(Companion hawk)
 		{
-			if (hawk?.CompanionData != null && HangingShotAttachOffsets.TryGetValue(hawk.CompanionData.ClassName, out var offset))
-				return offset;
-			return DefaultHangingShotAttachOffset;
+			if (hawk?.CompanionData != null && HangingShotAttachOffsets.TryGetValue(hawk.CompanionData.ClassName, out var baseOffset))
+				return baseOffset;
+
+			return 0;
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
@@ -124,15 +125,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 			// 7-8. Run the async portion for attachment
-			skill.Run(this.HandleSkillAsync(caster, skill, hawk, chr, buffTimeSpan));
+			FalconerHawkHelper.EnqueueSkill(hawk, () => skill.Run(this.HandleSkillAsync(caster, skill, hawk, chr, buffTimeSpan)));
 		}
 
 		private async Task HandleSkillAsync(ICombatEntity caster, Skill skill, Companion hawk, Character character, TimeSpan buffTimeSpan)
 		{
-			// Queue if hawk is busy with another skill
-			if (FalconerHawkHelper.TryQueueSkill(hawk, () => skill.Run(this.HandleSkillAsync(caster, skill, hawk, character, buffTimeSpan))))
-				return;
-
 			// Read GCD remaining before LockHawk resets the timer
 			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
 
@@ -187,7 +184,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			);
 
 			if (character.Components.TryGet<MovementComponent>(out var movement))
+			{
 				movement.SetAttachmentMovementMode(true);
+				movement.NotifyFlying(true, 80f);
+			}
 
 			// Re-enable control after pickup
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
@@ -225,16 +225,24 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (attachment != null && attachment.IsAttached)
 				attachment.Detach(sendPackets: false);
 
-			movement?.SetAttachmentMovementMode(false);
+			var flyHeight = movement?.FlyHeight ?? 0f;
+
+			if (movement != null)
+			{
+				movement.SetAttachmentMovementMode(false);
+				movement.NotifyFlying(false, 0f);
+			}
 
 			Send.ZC_NORMAL.ControlObject(character, null, ControlLookType.SameDirection, true, true, "None", true);
 			Send.ZC_NORMAL.FlyWithObject(character, null);
+			Send.ZC_FLY(character, 0, 5);
 			character.AttachToObject(null, "None", "None", attachSec: 0.5f);
 			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.ASTD, 0);
 
 			// Sync hawk position to character so it doesn't appear stuck at
 			// a stale server-side position after being detached.
-			var resumePos = new Position(character.Position.X, character.Position.Y + FalconerHawkHelper.DefaultHawkHeight, character.Position.Z);
+			var groundY = character.Position.Y - flyHeight;
+			var resumePos = new Position(character.Position.X, groundY + FalconerHawkHelper.DefaultHawkHeight, character.Position.Z);
 			hawk.SetPosition(resumePos);
 
 			await FalconerHawkHelper.HawkFlyAway(skill, character, hawk);

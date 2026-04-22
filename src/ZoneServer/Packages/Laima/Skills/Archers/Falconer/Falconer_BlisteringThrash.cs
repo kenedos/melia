@@ -72,15 +72,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			skill.Run(this.HandleSkill(skill, caster, hawk, targetPos));
+			FalconerHawkHelper.EnqueueSkill(hawk, () => skill.Run(this.HandleSkill(skill, caster, hawk, targetPos)));
 		}
 
 		private async Task HandleSkill(Skill skill, ICombatEntity caster, Companion hawk, Position targetPos)
 		{
-			// Queue if hawk is busy with another skill
-			if (FalconerHawkHelper.TryQueueSkill(hawk, () => skill.Run(HandleSkill(skill, caster, hawk, targetPos))))
-				return;
-
 			// Read GCD remaining before LockHawk resets the timer
 			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
 
@@ -178,15 +174,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			skill.IncreaseOverheat();
 
-			if (FalconerHawkHelper.TryQueueSkill(hawk, () =>
+			FalconerHawkHelper.EnqueueSkill(hawk, () =>
 			{
 				FalconerHawkHelper.LockHawk(hawk);
 				skill.Run(ActivateSonicStrike(skill, caster, hawk, target));
-			}))
-				return;
-
-			FalconerHawkHelper.LockHawk(hawk);
-			skill.Run(ActivateSonicStrike(skill, caster, hawk, target));
+			});
 		}
 
 		/// <summary>

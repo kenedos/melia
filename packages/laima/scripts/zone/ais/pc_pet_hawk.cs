@@ -497,10 +497,19 @@ public class PcPetHawkAiScript : AiScript
 		if (reference == null)
 			return this.Entity.Position;
 
-		if (this.Entity.Map.Ground.TryGetRandomPosition(out var groundPos))
-			return new Position(groundPos.X, groundPos.Y + DefaultFlyHeight, groundPos.Z);
+		var angle = RandomProvider.Get().NextDouble() * Math.PI * 2;
+		var dist = RandomProvider.Get().Next(0, (int)Math.Max(1, range));
 
-		return new Position(reference.Position.X, reference.Position.Y + DefaultFlyHeight, reference.Position.Z);
+		var candidate = new Position(
+			reference.Position.X + (float)(Math.Cos(angle) * dist),
+			reference.Position.Y,
+			reference.Position.Z + (float)(Math.Sin(angle) * dist)
+		);
+
+		if (this.Entity.Map.Ground.TryGetNearestValidPosition(candidate, out var validPos))
+			return new Position(validPos.X, validPos.Y + DefaultFlyHeight, validPos.Z);
+
+		return new Position(candidate.X, candidate.Y + DefaultFlyHeight, candidate.Z);
 	}
 
 	#endregion

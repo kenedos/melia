@@ -80,13 +80,16 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 
 				attachment.Detach(sendPackets: false);
 
-				// Reset movement mode
 				if (character.Components.TryGet<MovementComponent>(out var movement))
+				{
 					movement.SetAttachmentMovementMode(false);
+					movement.NotifyFlying(false, 0f);
+				}
 
 				// Send detachment packets
 				Send.ZC_NORMAL.ControlObject(character, null, ControlLookType.SameDirection, true, true, "None", false);
 				Send.ZC_NORMAL.FlyWithObject(character, null);
+				Send.ZC_FLY(character, 0, 5);
 
 				// Reset hawk state if available
 				if (hawk != null)

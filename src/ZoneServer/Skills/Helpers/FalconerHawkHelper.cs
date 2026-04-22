@@ -57,22 +57,33 @@ namespace Melia.Zone.Skills.Helpers
 		private static readonly Dictionary<int, Queue<Action>> _skillQueues = new();
 
 		/// <summary>
-		/// Queues a skill action for the hawk if it is currently busy.
-		/// Returns true if the action was queued, false if the hawk is
-		/// free and the caller should execute immediately.
+		/// Enqueues a skill action. If the hawk is currently free, fires it
+		/// immediately; otherwise it will be fired by HawkFlyAway when the
+		/// current skill finishes.
 		/// </summary>
-		public static bool TryQueueSkill(Companion hawk, Action executeSkill)
+		public static void EnqueueSkill(Companion hawk, Action action)
 		{
-			if (!IsHawkBusy(hawk))
-				return false;
-
 			if (!_skillQueues.TryGetValue(hawk.Handle, out var queue))
 			{
 				queue = new Queue<Action>();
 				_skillQueues[hawk.Handle] = queue;
 			}
-			queue.Enqueue(executeSkill);
-			return true;
+			queue.Enqueue(action);
+
+			if (!IsHawkBusy(hawk))
+				RunNextQueued(hawk);
+		}
+
+		/// <summary>
+		/// Dequeues and fires the next skill action, if any.
+		/// </summary>
+		public static void RunNextQueued(Companion hawk)
+		{
+			if (!_skillQueues.TryGetValue(hawk.Handle, out var queue) || queue.Count == 0)
+				return;
+
+			var next = queue.Dequeue();
+			next();
 		}
 
 		/// <summary>
@@ -423,12 +434,7 @@ namespace Melia.Zone.Skills.Helpers
 					await skill.Wait(TimeSpan.FromMilliseconds(remaining));
 
 				UnlockHawk(hawk);
-
-				if (_skillQueues.TryGetValue(hawk.Handle, out var queue) && queue.Count > 0)
-				{
-					var next = queue.Dequeue();
-					next();
-				}
+				RunNextQueued(hawk);
 				return;
 			}
 

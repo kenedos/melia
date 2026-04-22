@@ -480,9 +480,6 @@ namespace Melia.Zone.World.Actors.Monsters
 
 		private const float ShoulderLandDelay = 30f;
 		private const float DefaultBirdFlyHeight = 80f;
-		private const int LandingAnimDurationMs = 1000;
-		private const float ShoulderLandAttachSec = 0.4f;
-		private const float RoostLandAttachSec = 0.4f;
 		private const int PerchIdleLoopIntervalMs = 2500;
 
 		/// <summary>
