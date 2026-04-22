@@ -34,7 +34,7 @@ public class PcPetHawkAiScript : AiScript
 	// Follow distances
 	protected const float FollowDistanceOwnerMoving = 80f;
 	protected const float FollowDistanceOwnerStationary = 150f;
-	protected const float TeleportDistance = 300f;
+	protected new const float TeleportDistance = 400f;
 
 	// Idle wandering timing
 	protected const float WanderInterval = 5f;
@@ -51,7 +51,7 @@ public class PcPetHawkAiScript : AiScript
 	{
 		this.MaxChaseDistance = 350;
 		this.MaxMasterDistance = 300;
-		this.MaxRoamDistance = 1000;
+		this.MaxRoamDistance = 400;
 		this.EnableReturnHome = false;
 
 		this.SetViewRange(300);
@@ -59,6 +59,24 @@ public class PcPetHawkAiScript : AiScript
 		During("Idle", CheckFirstStrike);
 		During("Idle", CheckFear);
 		During("Idle", CheckAggressiveMode);
+		During("Idle", TeleportToOwnerIfTooFar);
+		During("Attack", TeleportToOwnerIfTooFar);
+	}
+
+	protected virtual void TeleportToOwnerIfTooFar()
+	{
+		if (!this.TryGetMaster(out var owner))
+			return;
+
+		var distance = this.Entity.Position.Get2DDistance(owner.Position);
+		if (distance <= TeleportDistance)
+			return;
+
+		var teleportPos = GetRandomFlyPosition(owner, 40);
+		this.Entity.Position = teleportPos;
+		Send.ZC_SET_POS(this.Entity);
+		this.RemoveAllHate();
+		_target = null;
 	}
 
 	protected override void Root()
@@ -479,14 +497,10 @@ public class PcPetHawkAiScript : AiScript
 		if (reference == null)
 			return this.Entity.Position;
 
-		var rnd = RandomProvider.Get();
-		var angle = rnd.Next(360) * Math.PI / 180.0;
+		if (this.Entity.Map.Ground.TryGetRandomPosition(out var groundPos))
+			return new Position(groundPos.X, groundPos.Y + DefaultFlyHeight, groundPos.Z);
 
-		var x = reference.Position.X + (float)(Math.Cos(angle) * range);
-		var z = reference.Position.Z + (float)(Math.Sin(angle) * range);
-		var y = reference.Position.Y + DefaultFlyHeight;
-
-		return new Position(x, y, z);
+		return new Position(reference.Position.X, reference.Position.Y + DefaultFlyHeight, reference.Position.Z);
 	}
 
 	#endregion

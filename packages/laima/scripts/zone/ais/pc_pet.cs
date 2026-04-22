@@ -32,7 +32,6 @@ public class PcPetAiScript : AiScript
 		During("Attack", CheckTarget);
 		During("Attack", CheckMaster);
 		During("Attack", CheckFear);
-		During("Attack", CheckAggressiveDisabled);
 	}
 
 	protected override void CheckTarget()
@@ -108,22 +107,6 @@ public class PcPetAiScript : AiScript
 
 			// Check enemies will pick up the most hated target
 			this.CheckEnemies();
-		}
-	}
-
-	/// <summary>
-	/// Checks if aggressive mode was disabled mid-combat and stops attacking.
-	/// </summary>
-	protected virtual void CheckAggressiveDisabled()
-	{
-		if (this.Entity is not Companion companion)
-			return;
-
-		if (!companion.IsAggressiveMode && _target != null)
-		{
-			_target = null;
-			this.RemoveAllHate();
-			this.StartRoutine("Idle", this.Idle());
 		}
 	}
 

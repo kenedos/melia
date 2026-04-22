@@ -5661,16 +5661,24 @@ namespace Melia.Zone.Network
 				return;
 
 			// Packet has no companion identifier. Toggle all active
-			// companions' auto-attack mode together.
+			// companions' auto-attack mode together, driven by the shared
+			// CompanionAutoAtk PCEtc property so both companions and the
+			// client button stay in sync.
 			var activeCompanions = character.Companions.GetActiveCompanions();
 			if (activeCompanions.Count == 0)
 				return;
 
+			var etc = character.Etc.Properties;
+			var newAggressiveMode = etc.GetFloat(PropertyName.CompanionAutoAtk) == 0;
+			etc.SetFloat(PropertyName.CompanionAutoAtk, newAggressiveMode ? 1 : 0);
+
 			foreach (var companion in activeCompanions)
 			{
-				companion.IsAggressiveMode = !companion.IsAggressiveMode;
+				companion.IsAggressiveMode = newAggressiveMode;
 				Send.ZC_PET_AUTO_ATK(character, companion);
 			}
+
+			Send.ZC_OBJECT_PROPERTY(conn, character.Etc, PropertyName.CompanionAutoAtk);
 		}
 
 		[PacketHandler(Op.CZ_OBJECT_MOVE)]

@@ -39,6 +39,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Properties.Create(new FloatProperty(PropertyName.LastPlayDate, 20210728));
 			this.Properties.Create(new FloatProperty(PropertyName.CTRLTYPE_RESET_EXCEPT, 1));
 			this.Properties.Create(new FloatProperty(PropertyName.MaxWarehouseCount, PersonalStorage.DefaultSize));
+			this.Properties.Create(new FloatProperty(PropertyName.CompanionAutoAtk, 0));
 		}
 	}
 }

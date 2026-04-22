@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -41,7 +42,21 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	{
 		private const int BuffDurationSeconds = 30;
 		private const string HangingShotAttachNode = "Dummy_hawk";
-		private const int HangingShotAttachOffset = -56;
+		private const int DefaultHangingShotAttachOffset = -56;
+
+		private static readonly Dictionary<string, int> HangingShotAttachOffsets = new()
+		{
+			{ "pet_hawk", -56 },
+			{ "Toucan", -40 },
+			{ "barn_owl", -40 },
+		};
+
+		private static int GetAttachOffset(Companion hawk)
+		{
+			if (hawk?.CompanionData != null && HangingShotAttachOffsets.TryGetValue(hawk.CompanionData.ClassName, out var offset))
+				return offset;
+			return DefaultHangingShotAttachOffset;
+		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -148,7 +163,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			caster.TurnTowards(Direction.North);
 			await skill.Wait(500);
 			Send.ZC_DETACH_TO_OBJ(caster, hawk);
-			Send.ZC_NORMAL.FlyWithObject(caster, hawk, HangingShotAttachNode, HangingShotAttachOffset);
+			var attachOffset = GetAttachOffset(hawk);
+			Send.ZC_NORMAL.FlyWithObject(caster, hawk, HangingShotAttachNode, attachOffset);
 			Send.ZC_MOVE_ANIM(hawk, FixedAnimation.ASTD, 0);
 			Send.ZC_SYNC_END(caster, syncKey3, 1);
 			Send.ZC_SYNC_EXEC(caster, syncKey3);
@@ -163,7 +179,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			attachment.AttachTo(
 				hawk,
 				HangingShotAttachNode,
-				Math.Abs(HangingShotAttachOffset),
+				Math.Abs(attachOffset),
 				AttachmentType.FlyWith,
 				isController: true,
 				syncDirection: false,

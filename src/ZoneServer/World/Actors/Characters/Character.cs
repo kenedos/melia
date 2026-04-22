@@ -622,8 +622,13 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.HasCompanions)
 				return;
 
+			var etc = this.Etc.Properties;
+			var aggressiveMode = etc.GetFloat(PropertyName.CompanionAutoAtk) == 1;
+
 			foreach (var companion in this.Companions.GetList())
 			{
+				companion.IsAggressiveMode = aggressiveMode;
+
 				if (companion.IsActivated && companion.Map != this.Map)
 					companion.SetCompanionState(true);
 			}
