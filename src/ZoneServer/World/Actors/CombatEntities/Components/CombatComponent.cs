@@ -112,7 +112,11 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				if (!_hitsTaken.TryGetValue(attacker.Handle, out var totalHits))
 					totalHits = 0;
 
-				_damageTaken[attacker.Handle] = totalDamage + damage;
+				var totalRecorded = _damageTaken.Values.Sum();
+				var remaining = Math.Max(0, this.Entity.MaxHp - totalRecorded);
+				var cappedDamage = Math.Min(damage, remaining);
+
+				_damageTaken[attacker.Handle] = totalDamage + cappedDamage;
 				_hitsTaken[attacker.Handle] = totalHits + 1;
 			}
 		}
