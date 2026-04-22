@@ -8,6 +8,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Monsters;
 using Yggdrasil.Extensions;
 using Yggdrasil.Scheduling;
 
@@ -104,21 +105,45 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="damage"></param>
 		public void RegisterHit(ICombatEntity attacker, float damage)
 		{
+			var effectiveAttacker = ResolveEffectiveAttacker(attacker);
+
 			lock (_hitLock)
 			{
-				if (!_damageTaken.TryGetValue(attacker.Handle, out var totalDamage))
+				if (!_damageTaken.TryGetValue(effectiveAttacker.Handle, out var totalDamage))
 					totalDamage = 0;
 
-				if (!_hitsTaken.TryGetValue(attacker.Handle, out var totalHits))
+				if (!_hitsTaken.TryGetValue(effectiveAttacker.Handle, out var totalHits))
 					totalHits = 0;
 
 				var totalRecorded = _damageTaken.Values.Sum();
 				var remaining = Math.Max(0, this.Entity.MaxHp - totalRecorded);
 				var cappedDamage = Math.Min(damage, remaining);
 
-				_damageTaken[attacker.Handle] = totalDamage + cappedDamage;
-				_hitsTaken[attacker.Handle] = totalHits + 1;
+				_damageTaken[effectiveAttacker.Handle] = totalDamage + cappedDamage;
+				_hitsTaken[effectiveAttacker.Handle] = totalHits + 1;
 			}
+		}
+
+		/// <summary>
+		/// Resolves the owner of an attacker
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <returns></returns>
+		private static ICombatEntity ResolveEffectiveAttacker(ICombatEntity attacker)
+		{
+			if (attacker == null)
+				return null;
+
+			if (attacker.Components.Get<AiComponent>()?.Script.GetMaster() is Character aiMaster)
+				return aiMaster;
+
+			if (attacker is Summon summon && summon.Owner is Character summonOwner)
+				return summonOwner;
+
+			if (attacker is Companion companion && companion.Owner is Character companionOwner)
+				return companionOwner;
+
+			return attacker;
 		}
 
 		/// <summary>
