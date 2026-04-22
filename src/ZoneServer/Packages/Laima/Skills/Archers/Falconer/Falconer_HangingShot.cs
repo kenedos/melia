@@ -233,7 +233,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var resumePos = new Position(character.Position.X, groundY + FalconerHawkHelper.DefaultHawkHeight, character.Position.Z);
 			hawk.SetPosition(resumePos);
 
-			await FalconerHawkHelper.HawkFlyAway(skill, character, hawk);
+			await FalconerHawkHelper.DequeueSkill(skill, character, hawk);
 		}
 
 		private void RemoveGroundDebuffs(ICombatEntity caster)

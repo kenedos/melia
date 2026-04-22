@@ -129,7 +129,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				pheasant.Kill(null);
 
 			// Hawk flies away or processes next queued skill
-			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
+			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 
 		private async Task TriggerExplosion(ICombatEntity caster, Skill skill, Companion hawk, Position explosionPos)
@@ -294,7 +294,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);
 
-			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
+			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 	}
 }

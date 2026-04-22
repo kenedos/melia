@@ -47,26 +47,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
 
-			// Call hawk back if it's flying away
-			if (FalconerHawkHelper.TryGetHawk(caster, out var hawk))
-			{
-				if (FalconerHawkHelper.IsHawkFlyingAway(hawk))
-				{
-					await FalconerHawkHelper.HawkUnhide(skill, caster, hawk);
-
-					// Falconer2: Call: Obtain - chance to get items
-					if (caster.IsAbilityActive(AbilityId.Falconer2))
-					{
-						// 50% chance to trigger item drop
-						if (RandomProvider.Get().Next(100) < 50)
-						{
-							caster.PlayEffect("F_item_drop_light_violet", scale: 1f, heightOffset: EffectLocation.Top);
-							// Item reward would be handled by reward system
-						}
-					}
-				}
-			}
-
 			// Hawk return visual effect
 			caster.PlayEffect("F_archer_calling_bird", scale: 1.2f, heightOffset: EffectLocation.Top);
 			caster.PlaySound("skill_archer_calling", "skill_archer_calling");

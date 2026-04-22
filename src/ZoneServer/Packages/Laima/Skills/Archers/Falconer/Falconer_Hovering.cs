@@ -113,7 +113,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			pad.Destroy();
 
 			// Hawk flies away
-			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
+			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 
 		private async Task PerformHoveringAttack(Skill skill, ICombatEntity caster, World.Actors.Monsters.Companion hawk, List<ICombatEntity> enemies, Position targetPos)

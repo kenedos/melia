@@ -23,10 +23,7 @@ namespace Melia.Zone.Skills.Helpers
 	/// This helper manages hawk state through Companion.Vars:
 	/// - Hawk.UsingSkill: bool - Whether hawk is currently executing a skill
 	/// - Hawk.SkillFunction: string - Name of current skill being executed
-	/// - Hawk.FlyingAway: bool - Whether hawk has flown away and is hidden
-	/// - Hawk.StopFlyAway: bool - Flag to interrupt fly-away sequence
 	/// - Companion.IsLandedOnShoulder: bool - Whether hawk is landed on owner's shoulder
-	/// - Hawk.IsHidden: bool - Whether hawk is hidden (not visible)
 	/// - Hawk.Circling.Active: bool - Whether Circling is active
 	/// - Hawk.Circling.PadId: int - Handle of current Circling pad
 	/// - Hawk.Aiming.Active: bool - Whether Aiming is active
@@ -47,18 +44,13 @@ namespace Melia.Zone.Skills.Helpers
 		public const float TeleportDistance = 250f;
 
 		/// <summary>
-		/// Distance hawk flies away from owner after skills.
-		/// </summary>
-		public const float FlyAwayDistance = 300f;
-
-		/// <summary>
 		/// Per-hawk skill queues, keyed by hawk handle.
 		/// </summary>
 		private static readonly Dictionary<int, Queue<Action>> _skillQueues = new();
 
 		/// <summary>
 		/// Enqueues a skill action. If the hawk is currently free, fires it
-		/// immediately; otherwise it will be fired by HawkFlyAway when the
+		/// immediately; otherwise it will be fired by Dequeue when the
 		/// current skill finishes.
 		/// </summary>
 		public static void EnqueueSkill(Companion hawk, Action action)
@@ -72,6 +64,36 @@ namespace Melia.Zone.Skills.Helpers
 
 			if (!IsHawkBusy(hawk))
 				RunNextQueued(hawk);
+		}
+
+		/// <summary>
+		/// Makes the hawk fly away after using a skill.
+		/// </summary>
+		public static async Task DequeueSkill(Skill skill, ICombatEntity caster, Companion hawk)
+		{
+			if (hawk == null)
+				return;
+
+			if (caster is not Character character)
+				return;
+
+
+			// If there's a queued skill, wait until the 2.5s global
+			// cooldown has passed, then fire the next skill
+			if (HasQueuedSkills(hawk))
+			{
+				var remaining = 2500.0;
+				if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
+					remaining = 2500.0 - (DateTime.UtcNow - lastStart).TotalMilliseconds;
+				if (remaining > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(remaining));
+
+				UnlockHawk(hawk);
+				RunNextQueued(hawk);
+				return;
+			}
+
+			UnlockHawk(hawk);
 		}
 
 		/// <summary>
@@ -173,9 +195,8 @@ namespace Melia.Zone.Skills.Helpers
 		/// <summary>
 		/// Unified entry point for queued hawk skills. Reads the remaining GCD,
 		/// locks the hawk, waits out the GCD using an uncancellable delay (so a
-		/// second cast of the same skill cannot abort this execution), un-hides
-		/// the hawk if it is flying away, and optionally lifts it off from
-		/// shoulder or roost.
+		/// second cast of the same skill cannot abort this execution) and
+		/// optionally lifts it off from shoulder or roost.
 		/// </summary>
 		public static async Task PrepareForSkill(Skill skill, ICombatEntity caster, Companion hawk, bool unrestHawk = true)
 		{
@@ -183,8 +204,6 @@ namespace Melia.Zone.Skills.Helpers
 			LockHawk(hawk);
 			if (gcdRemaining > 0)
 				await Task.Delay(TimeSpan.FromMilliseconds(gcdRemaining));
-			if (IsHawkFlyingAway(hawk))
-				await HawkUnhide(skill, caster, hawk);
 			if (unrestHawk)
 				UnrestHawkIfNeeded(hawk);
 		}
@@ -201,7 +220,7 @@ namespace Melia.Zone.Skills.Helpers
 
 		/// <summary>
 		/// Fully resets hawk skill state. Called when the hawk dies so
-		/// that stale skill/fly-away/hidden flags don't persist through
+		/// that stale skill/hidden flags don't persist through
 		/// revival and block all future skill use.
 		/// </summary>
 		public static void ResetHawkState(Companion hawk)
@@ -209,12 +228,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (hawk == null)
 				return;
 
-			var wasHidden = hawk.Vars.Get<bool>("Hawk.IsHidden", false);
-
 			hawk.Vars.Set("Hawk.UsingSkill", false);
-			hawk.Vars.Set("Hawk.FlyingAway", false);
-			hawk.Vars.Set("Hawk.IsHidden", false);
-			hawk.Vars.Set("Hawk.StopFlyAway", false);
 			hawk.Vars.Set("Hawk.Circling.Active", false);
 			hawk.Vars.Set("Hawk.Aiming.Active", false);
 			hawk.Vars.Set("Hawk.Hovering.Active", false);
@@ -223,61 +237,6 @@ namespace Melia.Zone.Skills.Helpers
 
 			ClearQueue(hawk);
 
-			if (wasHidden)
-				hawk.SetHide(false);
-		}
-
-		/// <summary>
-		/// Checks if the hawk is currently flying away or hidden.
-		/// </summary>
-		/// <param name="hawk">The hawk companion</param>
-		/// <returns>True if hawk is flying away</returns>
-		public static bool IsHawkFlyingAway(Companion hawk)
-		{
-			var flyingAway = hawk.Vars.Get<bool>("Hawk.FlyingAway", false);
-			if (flyingAway)
-				return true;
-
-			return hawk.Vars.Get<bool>("Hawk.IsHidden", false);
-		}
-
-		/// <summary>
-		/// Makes the hawk unhide and return to the target.
-		/// Called by Calling skill.
-		/// </summary>
-		/// <param name="skill">The skill</param>
-		/// <param name="caster">The Falconer</param>
-		/// <param name="hawk">The hawk</param>
-		public static async Task HawkUnhide(Skill skill, ICombatEntity caster, Companion hawk)
-		{
-			if (hawk == null)
-				return;
-
-			// Check if currently flying away
-			var isFlyingAway = hawk.Vars.Get<bool>("Hawk.FlyingAway", false);
-			if (isFlyingAway)
-			{
-				// Set stop flag and clear flying away state
-				hawk.Vars.Set("Hawk.StopFlyAway", true);
-				hawk.Vars.Set("Hawk.FlyingAway", false);
-			}
-			else
-			{
-				// Completely hidden - teleport near owner
-				var returnPos = caster.Position.GetRandomInRange2D(30, 50);
-				returnPos = new Position(returnPos.X, returnPos.Y + DefaultHawkHeight, returnPos.Z);
-				hawk.SetPosition(returnPos);
-				hawk.SetHide(false);
-				hawk.Vars.Set("Hawk.IsHidden", false);
-			}
-
-			// Clear skill lock
-			UnlockHawk(hawk);
-
-			// Move towards owner
-			hawk.PlayEffect("F_buff_basic008_blue", scale: 1f);
-
-			await Task.Delay(TimeSpan.FromMilliseconds(500));
 		}
 
 		/// <summary>
@@ -354,7 +313,7 @@ namespace Melia.Zone.Skills.Helpers
 			await skill.Wait(TimeSpan.FromMilliseconds(1200));
 
 			// Fly away after attack
-			await HawkFlyAway(skill, caster, hawk);
+			await DequeueSkill(skill, caster, hawk);
 		}
 
 		/// <summary>
@@ -390,7 +349,7 @@ namespace Melia.Zone.Skills.Helpers
 
 			UnrestHawkIfNeeded(hawk);
 
-			// Combination doesn't cause fly-away, handled in skill
+			// Combination doesn't cause handled in skill
 			await Task.CompletedTask;
 		}
 
@@ -428,86 +387,7 @@ namespace Melia.Zone.Skills.Helpers
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 
-			await HawkFlyAway(skill, caster, hawk);
-		}
-
-		/// <summary>
-		/// Makes the hawk fly away after using a skill.
-		/// </summary>
-		public static async Task HawkFlyAway(Skill skill, ICombatEntity caster, Companion hawk)
-		{
-			if (hawk == null)
-				return;
-
-			if (caster is not Character character)
-				return;
-
-			// If there's a queued skill, wait until the 2.5s global
-			// cooldown has passed, then fire the next skill
-			if (HasQueuedSkills(hawk))
-			{
-				var remaining = 2500.0;
-				if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
-					remaining = 2500.0 - (DateTime.UtcNow - lastStart).TotalMilliseconds;
-				if (remaining > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(remaining));
-
-				UnlockHawk(hawk);
-				RunNextQueued(hawk);
-				return;
-			}
-
-			UnlockHawk(hawk);
-
-			// Check for roost - don't fly away if owner near roost
-			var roostHandle = (int)caster.GetTempVar("Falconer.Roost.Handle");
-			if (roostHandle != 0 && caster.Map.TryGetCombatEntity(roostHandle, out var roost))
-			{
-				if (roost != null && !roost.IsDead)
-				{
-					hawk.Vars.Set("Hawk.LastSkillEndTime", DateTime.UtcNow);
-					return;
-				}
-			}
-
-			// Check if First Strike is active - hawk doesn't fly away
-			if (caster.IsBuffActive(BuffId.FirstStrike_Buff))
-				return;
-
-			// Falconer20: Hawk Hunt - hawk doesn't fly away
-			if (caster.IsAbilityActive(AbilityId.Falconer20))
-				return;
-
-			// Check if already flying away
-			if (hawk.Vars.Get<bool>("Hawk.FlyingAway", false))
-				return;
-
-			hawk.Vars.Set("Hawk.FlyingAway", true);
-
-			// Get random fly away position
-			var randomAngle = RandomProvider.Get().Next(360);
-			var flyPos = caster.Position.GetRelative(new Direction(randomAngle), FlyAwayDistance);
-			flyPos = new Position(flyPos.X, flyPos.Y + DefaultHawkHeight + 200f, flyPos.Z);
-
-			// Start flying away
-			await skill.Wait(TimeSpan.FromMilliseconds(5000));
-
-			// Check if fly-away was interrupted
-			var stopFlyAway = hawk.Vars.Get<bool>("Hawk.StopFlyAway", false);
-			if (stopFlyAway)
-			{
-				hawk.Vars.Set("Hawk.StopFlyAway", false);
-				hawk.Vars.Set("Hawk.FlyingAway", false);
-				return;
-			}
-
-			// Still flying away - hide hawk
-			if (hawk.Vars.Get<bool>("Hawk.FlyingAway", false))
-			{
-				hawk.SetHide(true);
-				hawk.Vars.Set("Hawk.IsHidden", true);
-				hawk.Vars.Set("Hawk.FlyingAway", false);
-			}
+			await DequeueSkill(skill, caster, hawk);
 		}
 
 		/// <summary>

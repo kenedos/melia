@@ -115,7 +115,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			await Task.Delay(TimeSpan.FromMilliseconds(500));
 
 			// Hawk flies away or processes next queued skill
-			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
+			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 
 		/// <summary>
@@ -180,7 +180,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			hawk.SetPosition(targetPos);
 
-			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);
+			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 	}
 }

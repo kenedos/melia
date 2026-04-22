@@ -28,8 +28,6 @@ public class PcPetHawkAiScript : AiScript
 {
 	// Flying constants
 	protected const float DefaultFlyHeight = 80f;
-	protected const float FlyAwayHeight = 280f;
-	protected const float FlyAwayDistance = 300f;
 
 	// Follow distances
 	protected const float FollowDistanceOwnerMoving = 80f;
@@ -95,18 +93,6 @@ public class PcPetHawkAiScript : AiScript
 
 	#region State Properties (via Vars for external access)
 
-	private bool IsHidden
-	{
-		get => this.Companion?.Vars.TryGet<bool>("Hawk.IsHidden", out var val) == true && val;
-		set => this.Companion?.Vars.Set("Hawk.IsHidden", value);
-	}
-
-	private bool IsFlyingAway
-	{
-		get => this.Companion?.Vars.TryGet<bool>("Hawk.FlyingAway", out var val) == true && val;
-		set => this.Companion?.Vars.Set("Hawk.FlyingAway", value);
-	}
-
 	private bool IsUsingSkillFlag
 	{
 		get => this.Companion?.Vars.TryGet<bool>("Hawk.UsingSkill", out var val) == true && val;
@@ -134,12 +120,6 @@ public class PcPetHawkAiScript : AiScript
 		{
 			if (this.Entity.IsDead)
 				yield break;
-
-			if (IsHidden)
-			{
-				yield return this.Wait(500);
-				continue;
-			}
 
 			if (IsUsingSkillFlag)
 			{
@@ -417,81 +397,6 @@ public class PcPetHawkAiScript : AiScript
 
 	#region Flying Behavior
 
-	/// <summary>
-	/// Makes the hawk fly away and become hidden.
-	/// </summary>
-	public IEnumerable FlyAway()
-	{
-		if (IsFlyingAway || IsHidden)
-			yield break;
-
-		if (this.TryGetMaster(out var owner))
-		{
-			if (this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead)
-			{
-				LockHawkAction(false);
-				this.Companion?.Vars.Set("Hawk.LastSkillEndTime", DateTime.UtcNow);
-				yield break;
-			}
-
-			// First Strike active - hawk stays visible for auto-casting
-			if (owner.IsBuffActive(BuffId.FirstStrike_Buff))
-			{
-				LockHawkAction(false);
-				yield break;
-			}
-
-			// Falconer20: Hawk Hunt
-			if (owner.IsAbilityActive(AbilityId.Falconer20))
-			{
-				LockHawkAction(false);
-				yield break;
-			}
-		}
-
-		IsFlyingAway = true;
-
-		var flyPos = GetRandomFlyPosition(owner, FlyAwayDistance);
-		this.Companion?.SetFlyHeight(FlyAwayHeight);
-
-		yield return this.MoveTo(flyPos, wait: false);
-		yield return this.Wait(5000);
-
-		if (!IsFlyingAway)
-			yield break;
-
-		IsHidden = true;
-		IsFlyingAway = false;
-		LockHawkAction(false);
-	}
-
-	/// <summary>
-	/// Makes the hawk unhide and return to its owner.
-	/// </summary>
-	public IEnumerable Unhide(ICombatEntity target)
-	{
-		if (!IsHidden && !IsFlyingAway)
-			yield break;
-
-		this.Companion?.SetFlyHeight(DefaultFlyHeight);
-
-		if (IsFlyingAway)
-		{
-			IsFlyingAway = false;
-		}
-		else
-		{
-			var pos = GetRandomFlyPosition(target, 250);
-			this.Entity.Position = pos;
-			Send.ZC_SET_POS(this.Entity);
-		}
-
-		IsHidden = false;
-		LockHawkAction(false);
-
-		yield return this.MoveTo(target.Position, wait: false);
-	}
-
 	private Position GetRandomFlyPosition(ICombatEntity reference, float range)
 	{
 		if (reference == null)
@@ -590,13 +495,6 @@ public class PcPetHawkAiScript : AiScript
 
 		if (target == null || this.EntityGone(target))
 			return;
-
-		// Unhide hawk if hidden so it can auto-cast
-		if (IsHidden || IsFlyingAway)
-		{
-			this.ExecuteOnce(Unhide(owner));
-			return;
-		}
 
 		// Try skills in priority order — each handler manages its own
 		// cooldowns, damage, and visual animation
@@ -735,7 +633,6 @@ public class PcPetHawkAiScript : AiScript
 		yield return this.Wait((int)((goTime + backTime) * 1000));
 
 		SetLastActionTime();
-		yield return FlyAway();
 	}
 
 	private IEnumerable HawkHovering(ICombatEntity owner, ICombatEntity target, Skill skill, bool isFirstStrike)
