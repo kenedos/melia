@@ -65,27 +65,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task HandleSkill(Skill skill, ICombatEntity caster, Companion hawk, Position targetPos)
 		{
-			// Read GCD remaining before LockHawk resets the timer
-			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
+			await FalconerHawkHelper.PrepareForSkill(skill, caster, hawk);
 
-			// Lock hawk immediately so subsequent casts get queued
-			FalconerHawkHelper.LockHawk(hawk);
-
-			// Wait for hawk global cooldown if needed
-			if (gcdRemaining > 0)
-				await skill.Wait(TimeSpan.FromMilliseconds(gcdRemaining));
-
-			// Unhide hawk if it flew away from a previous skill
-			if (FalconerHawkHelper.IsHawkFlyingAway(hawk))
-				await FalconerHawkHelper.HawkUnhide(skill, caster, hawk);
-
-			// Take off from shoulder or leave roost
-			if (hawk.IsLandedOnShoulder)
-				hawk.TakeOff();
-			else if (hawk.IsOnRoost)
-				hawk.LeaveRoost();
-
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
+			await Task.Delay(TimeSpan.FromMilliseconds(100));
 
 			// Screen shake
 			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
@@ -96,7 +78,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "TOMAHAWK_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
 
 			// Wait for hawk to reach target
-			await skill.Wait(TimeSpan.FromMilliseconds(700));
+			await Task.Delay(TimeSpan.FromMilliseconds(700));
 
 			hawk.PlayGroundEffect(targetPos, "F_explosion131_fire", 3f);
 
@@ -130,7 +112,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			hawk.SetPosition(targetPos);
 
 			// Wait for hawk return animation
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
+			await Task.Delay(TimeSpan.FromMilliseconds(500));
 
 			// Hawk flies away or processes next queued skill
 			await FalconerHawkHelper.HawkFlyAway(skill, caster, hawk);

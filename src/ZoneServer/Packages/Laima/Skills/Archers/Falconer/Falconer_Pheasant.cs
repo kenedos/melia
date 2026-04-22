@@ -86,23 +86,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (previousPheasant != null && !previousPheasant.IsDead)
 				previousPheasant.Kill(null);
 
-			// Read GCD remaining before LockHawk resets the timer
-			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
+			await FalconerHawkHelper.PrepareForSkill(skill, caster, hawk, unrestHawk: false);
 
-			// Lock hawk immediately so subsequent casts get queued
-			FalconerHawkHelper.LockHawk(hawk);
-
-			// Wait for hawk global cooldown if needed
-			if (gcdRemaining > 0)
-				await skill.Wait(TimeSpan.FromMilliseconds(gcdRemaining));
-
-			// Unhide hawk if it flew away from a previous skill
-			if (FalconerHawkHelper.IsHawkFlyingAway(hawk))
-			{
-				await FalconerHawkHelper.HawkUnhide(skill, caster, hawk);
-			}
-
-			await skill.Wait(TimeSpan.FromMilliseconds(700));
+			await Task.Delay(TimeSpan.FromMilliseconds(700));
 
 			// Spawn the pheasant decoy
 			var pheasant = MonsterSkillCreateMob(skill, caster, "falconer_pheasantdol", originPos, 0f, "", "", 0, PheasantDurationSeconds, "None", "");
@@ -123,20 +109,20 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				hawk.LeaveRoost();
 
 			// Wait for pheasant to land before hawk dives
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
 			// Hawk dives to attack the pheasant
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.CollisionAndBack(hawk, pheasant, syncKey, "HOVERING_SHOT", 1f, 7f, 1f, 0.7f, 20f, true);
 
 			// Wait for hawk to reach pheasant
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
 			// EXPLOSION DAMAGE - occurs during hawk attack, not after pheasant death
 			await this.TriggerExplosion(caster, skill, hawk, targetPos);
 
 			// Wait for hawk return animation
-			await skill.Wait(TimeSpan.FromMilliseconds(1500));
+			await Task.Delay(TimeSpan.FromMilliseconds(1500));
 
 			// Kill pheasant after hawk attack
 			if (!pheasant.IsDead)

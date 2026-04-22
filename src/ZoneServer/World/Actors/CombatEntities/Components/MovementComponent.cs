@@ -298,6 +298,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				if (this.Entity.IsCasting())
 					return false;
 
+				if (this.Entity.IsLocked(LockType.Movement))
+					return false;
+
 				return true;
 			}
 		}

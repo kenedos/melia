@@ -130,35 +130,23 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private async Task HandleSkillAsync(ICombatEntity caster, Skill skill, Companion hawk, Character character, TimeSpan buffTimeSpan)
 		{
-			// Read GCD remaining before LockHawk resets the timer
-			var gcdRemaining = FalconerHawkHelper.GetGlobalCooldownRemaining(hawk);
-
-			// Lock hawk immediately so subsequent casts get queued
-			FalconerHawkHelper.LockHawk(hawk);
-
-			// Wait for hawk global cooldown if needed
-			if (gcdRemaining > 0)
-				await skill.Wait(TimeSpan.FromMilliseconds(gcdRemaining));
-
-			// Unhide hawk if it flew away from a previous skill
-			if (FalconerHawkHelper.IsHawkFlyingAway(hawk))
-				await FalconerHawkHelper.HawkUnhide(skill, caster, hawk);
+			await FalconerHawkHelper.PrepareForSkill(skill, caster, hawk, unrestHawk: false);
 
 			// Wait for skill animation to finish before attachment
 			// (official shows ~1s gap between MELEE_GROUND and attachment)
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
 			// 8. Attachment sequence in sync block with SYNC_EXEC
 			var syncKey3 = hawk.GenerateSyncKey();
 			Send.ZC_SYNC_START(caster, syncKey3, 1);
 			Send.ZC_NORMAL.CollisionAndBack(hawk, caster, syncKey3, "HANGINGSHOT", 1f, 7f, 1f, 0.7f, 20f, false);
 
-			await skill.Wait(1000);
+			await Task.Delay(1000);
 			hawk.Position = caster.Position;
 			Send.ZC_NORMAL.ControlObject(caster, hawk, ControlLookType.None, false, false, null, true);
 			Send.ZC_ATTACH_TO_OBJ(caster, hawk, "Dummy_hawk", null, 0.9f);
 			caster.TurnTowards(Direction.North);
-			await skill.Wait(500);
+			await Task.Delay(500);
 			Send.ZC_DETACH_TO_OBJ(caster, hawk);
 			var attachOffset = GetAttachOffset(hawk);
 			Send.ZC_NORMAL.FlyWithObject(caster, hawk, HangingShotAttachNode, attachOffset);
@@ -190,7 +178,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			}
 
 			// Re-enable control after pickup
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await Task.Delay(TimeSpan.FromMilliseconds(1000));
 			character.ToggleControl("HANGINGSHOT", true);
 
 			// Remove ground-based debuffs
@@ -213,7 +201,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 					break;
 				}
 
-				await skill.Wait(TimeSpan.FromMilliseconds(1000));
+				await Task.Delay(TimeSpan.FromMilliseconds(1000));
 			}
 
 			// Cleanup

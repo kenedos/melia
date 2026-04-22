@@ -171,6 +171,25 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
+		/// Unified entry point for queued hawk skills. Reads the remaining GCD,
+		/// locks the hawk, waits out the GCD using an uncancellable delay (so a
+		/// second cast of the same skill cannot abort this execution), un-hides
+		/// the hawk if it is flying away, and optionally lifts it off from
+		/// shoulder or roost.
+		/// </summary>
+		public static async Task PrepareForSkill(Skill skill, ICombatEntity caster, Companion hawk, bool unrestHawk = true)
+		{
+			var gcdRemaining = GetGlobalCooldownRemaining(hawk);
+			LockHawk(hawk);
+			if (gcdRemaining > 0)
+				await Task.Delay(TimeSpan.FromMilliseconds(gcdRemaining));
+			if (IsHawkFlyingAway(hawk))
+				await HawkUnhide(skill, caster, hawk);
+			if (unrestHawk)
+				UnrestHawkIfNeeded(hawk);
+		}
+
+		/// <summary>
 		/// Unlocks the hawk after a skill: clears the busy flag and
 		/// restores AI movement.
 		/// </summary>
@@ -258,7 +277,7 @@ namespace Melia.Zone.Skills.Helpers
 			// Move towards owner
 			hawk.PlayEffect("F_buff_basic008_blue", scale: 1f);
 
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
+			await Task.Delay(TimeSpan.FromMilliseconds(500));
 		}
 
 		/// <summary>
