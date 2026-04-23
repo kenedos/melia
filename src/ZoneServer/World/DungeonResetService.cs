@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Properties;
 using Melia.Shared.Util;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
@@ -270,6 +271,9 @@ namespace Melia.Zone.World
 		private void ResetAccountProperty(Character character, string propertyName)
 		{
 			var accountProps = character.Connection.Account.Properties;
+			if (!PropertyTable.Exists(accountProps.Namespace, propertyName))
+				return;
+
 			accountProps.SetFloat(propertyName, 0);
 			Send.ZC_OBJECT_PROPERTY(character.Connection, character.Connection.Account, propertyName);
 		}
@@ -280,6 +284,9 @@ namespace Melia.Zone.World
 		private void ResetEtcProperty(Character character, string propertyName)
 		{
 			var etcProps = character.Etc.Properties;
+			if (!PropertyTable.Exists(etcProps.Namespace, propertyName))
+				return;
+
 			etcProps.SetFloat(propertyName, 0);
 			Send.ZC_OBJECT_PROPERTY(character, propertyName);
 		}

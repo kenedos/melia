@@ -17,6 +17,33 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 		}
 
+		public void SendEntryCountsToClient()
+		{
+			var etcProps = this.Character.Etc.Properties;
+			var names = new System.Collections.Generic.List<string>();
+
+			foreach (var dungeon in ZoneServer.Instance.Data.InstanceDungeonDb.Entries.Values)
+			{
+				if (dungeon.WeeklyEnterableCount != 0)
+				{
+					var weekly = "IndunWeeklyEnteredCount_" + dungeon.PlayPerResetType;
+					if (PropertyTable.Exists("PCEtc", weekly) && etcProps.Has(weekly) && !names.Contains(weekly))
+						names.Add(weekly);
+				}
+				else
+				{
+					var daily = "InDunCountType_" + dungeon.PlayPerResetType;
+					if (PropertyTable.Exists("PCEtc", daily) && etcProps.Has(daily) && !names.Contains(daily))
+						names.Add(daily);
+				}
+			}
+
+			if (names.Count == 0)
+				return;
+
+			Send.ZC_OBJECT_PROPERTY(this.Character, this.Character.Etc.ObjectId, etcProps.GetSelect(names.ToArray()));
+		}
+
 		/// <summary>
 		/// Get max entry count for instance dungeon by a given dungeon id.
 		/// </summary>

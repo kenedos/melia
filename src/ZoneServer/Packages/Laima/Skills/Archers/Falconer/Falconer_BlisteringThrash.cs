@@ -75,13 +75,14 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			caster.SetAttackState(true);
 
 			var targetHandle = target?.Handle ?? 0;
+			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			FalconerHawkQueue.Enqueue(hawk, new HawkSkillRequest(
 				skill, caster,
-				ctx => ExecuteManual(ctx, targetPos)));
+				ctx => ExecuteManual(ctx, targetPos, forceId)));
 		}
 
 		/// <summary>
@@ -112,7 +113,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				ctx => ExecuteAuto(ctx, target)));
 		}
 
-		private static async Task ExecuteManual(HawkSkillContext ctx, Position targetPos)
+		private static async Task ExecuteManual(HawkSkillContext ctx, Position targetPos, int forceId)
 		{
 			if (ctx.Hawk.IsPerched)
 			{
@@ -120,7 +121,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				await ctx.Delay(1200);
 			}
 
-			await Dive(ctx, targetPos);
+			await Dive(ctx, targetPos, forceId);
 
 			await ctx.Delay(500);
 		}
@@ -134,6 +135,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var caster = ctx.Caster;
 			var hawk = ctx.Hawk;
 
+			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_READY(caster, skill, 1, caster.Position, target.Position);
 
 			if (ctx.Hawk.IsPerched)
@@ -142,19 +144,19 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				await ctx.Delay(1200);
 			}
 
-			await Dive(ctx, target.Position);
+			await Dive(ctx, target.Position, forceId);
 
 			await ctx.Delay(500);
 		}
 
-		private static async Task Dive(HawkSkillContext ctx, Position targetPos)
+		private static async Task Dive(HawkSkillContext ctx, Position targetPos, int forceId)
 		{
 			var skill = ctx.Skill;
 			var caster = ctx.Caster;
 			var hawk = ctx.Hawk;
 
 			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
-
+			
 			var divePos = new Position(targetPos.X, targetPos.Y + FalconerHawkHelper.DefaultHawkHeight, targetPos.Z);
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
@@ -176,7 +178,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				var skillHitResult = SCR_SkillHit(caster, enemy, skill, modifier);
 				enemy.TakeDamage(skillHitResult.Damage, caster);
 
-				var hit = new HitInfo(caster, enemy, skill, skillHitResult, TimeSpan.FromMilliseconds(200));
+				var hit = new HitInfo(caster, enemy, skill, skillHitResult);
+				hit.ForceId = forceId;
 				Send.ZC_HIT_INFO(caster, enemy, hit);
 			}
 

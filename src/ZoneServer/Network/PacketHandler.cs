@@ -420,6 +420,9 @@ namespace Melia.Zone.Network
 				Send.ZC_UPDATE_SKL_SPDRATE_LIST(character, skillUpdateList);
 				Send.ZC_NORMAL.AccountProperties(character);
 
+				// Send dungeon counts
+				character.Dungeon.SendEntryCountsToClient();
+
 				// Send companion info
 				if (character.HasCompanions)
 				{
