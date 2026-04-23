@@ -74,6 +74,16 @@ namespace Melia.Zone.Skills.Helpers
 			return TryGetQueue(hawk, out var queue) && queue.IsOnGlobalCooldown();
 		}
 
+		/// <summary>
+		/// Returns true if the hawk is currently executing a landing
+		/// transition (flying to roost or shoulder). Skills must not be
+		/// enqueued while landing.
+		/// </summary>
+		public static bool IsLanding(Companion hawk)
+		{
+			return TryGetQueue(hawk, out var queue) && queue.IsLanding;
+		}
+
 		private static bool TryGetQueue(Companion hawk, out IHawkSkillQueue queue)
 		{
 			queue = null;
@@ -99,6 +109,7 @@ namespace Melia.Zone.Skills.Helpers
 		void CancelInFlightSkill();
 		void ClearSkillQueue();
 		bool IsOnGlobalCooldown();
+		bool IsLanding { get; }
 	}
 
 	/// <summary>

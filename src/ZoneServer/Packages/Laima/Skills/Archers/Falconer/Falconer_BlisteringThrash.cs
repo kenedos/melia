@@ -54,6 +54,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 			}
 
+			if (FalconerHawkQueue.IsLanding(hawk))
+			{
+				Send.ZC_SKILL_DISABLE(caster);
+				return;
+			}
+
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
 				caster.ServerMessage(Localization.Get("No target location specified."));
@@ -90,6 +96,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 
 			if (!FalconerHawkHelper.TryGetHawk(caster, out var hawk))
+				return;
+
+			if (FalconerHawkQueue.IsLanding(hawk))
 				return;
 
 			if (caster.IsAbilityActive(AbilityId.Falconer14))
@@ -141,8 +150,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
 
-			await ctx.Delay(700);
-
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, AttackRadius)
 				.Take(MaxTargets)
 				.ToList();
@@ -150,7 +157,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (enemies.Count > 0)
 			{
 				var hits = new List<SkillHitInfo>();
-				var damageDelay = TimeSpan.FromMilliseconds(50);
+				var damageDelay = TimeSpan.FromMilliseconds(700);
 				var skillHitDelay = TimeSpan.Zero;
 
 				foreach (var enemy in enemies)
@@ -170,6 +177,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 				Send.ZC_SKILL_HIT_INFO(caster, hits);
 			}
+
+			await ctx.Delay(700);
 
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
 			hawk.SetPosition(targetPos);

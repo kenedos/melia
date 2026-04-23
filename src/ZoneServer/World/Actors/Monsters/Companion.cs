@@ -571,7 +571,11 @@ namespace Melia.Zone.World.Actors.Monsters
 			// busy with a skill (e.g. FirstStrike auto-attacks)
 			var hawkBusy = this.Vars.Get<bool>("Hawk.UsingSkill", false);
 
-			if (isOwnerMoving || hawkBusy)
+			var ownerInCombat = false;
+			if (this.Owner.Components.TryGet<CombatComponent>(out var combat))
+				ownerInCombat = combat.AttackState || combat.IsCasting();
+
+			if (isOwnerMoving || hawkBusy || ownerInCombat)
 			{
 				_ownerStillTimer = TimeSpan.Zero;
 				this.WantsToLand = false;

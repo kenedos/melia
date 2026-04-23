@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -41,19 +40,18 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 			caster.SetAttackState(true);
 
 			var targetHandle = target?.Handle ?? 0;
-			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
-			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
-
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
-		}
-
-		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
-		{
-			await skill.Wait(TimeSpan.FromMilliseconds(CastDelayMs));
-
+			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 			var targetPos = originPos.GetRelative(caster.Direction, distance: SpawnDistance);
+
+			Send.ZC_SKILL_READY(caster, skill, skillHandle, originPos, farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+
+			Send.ZC_SYNC_START(caster, skillHandle, 1);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Archer_SpikeShooter);
+			Send.ZC_SYNC_END(caster, skillHandle, 0);
+			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, TimeSpan.FromMilliseconds(CastDelayMs));
+
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 		}
 	}
 }

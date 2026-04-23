@@ -41,6 +41,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 			}
 
+			if (FalconerHawkQueue.IsLanding(hawk))
+			{
+				Send.ZC_SKILL_DISABLE(caster);
+				return;
+			}
+
 			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
 			{
 				caster.ServerMessage(Localization.Get("No target location specified."));
@@ -77,6 +83,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 
 			if (!FalconerHawkHelper.TryGetHawk(caster, out var hawk))
+				return;
+
+			if (FalconerHawkQueue.IsLanding(hawk))
 				return;
 
 			skill.IncreaseOverheat();

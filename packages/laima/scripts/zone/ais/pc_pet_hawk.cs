@@ -35,6 +35,7 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 	private bool _skillProcessorRunning;
 	private CancellationTokenSource _currentSkillCts;
 	private DateTime _lastSkillStartTime;
+	private bool _isLanding;
 	// Flying constants
 	protected const float DefaultFlyHeight = 80f;
 
@@ -51,6 +52,7 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 	// State tracking
 	private DateTime _lastActionTime;
 	private DateTime _lastWanderTime;
+	public bool IsLanding => _isLanding;
 
 	private Companion Companion => this.Entity as Companion;
 
@@ -225,7 +227,9 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 				// Bail out of combat to roost when nothing can auto-cast; keep hate.
 				if (this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead
 					&& !this.Companion.IsOnRoost
-					&& (!master.IsBuffActive(BuffId.FirstStrike_Buff) || AllHawkSkillsOnLongCooldown(master)))
+					&& (!OwnerHasNearbyEnemies(master)
+						|| !master.IsBuffActive(BuffId.FirstStrike_Buff)
+						|| AllHawkSkillsOnLongCooldown(master)))
 				{
 					_target = null;
 					this.StartRoutine("Idle", HawkIdle());
@@ -336,30 +340,38 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 		if (this.Companion == null || target == null)
 			yield break;
 
-		this.SetRunning(true);
-
-		var initialDist = this.Entity.Position.Get2DDistance(target.Position);
-		if (initialDist >= landDistance)
-			yield return this.MoveTo(target.Position, wait: false);
-
-		for (var i = 0; i < 60; i++)
+		_isLanding = true;
+		try
 		{
+			this.SetRunning(true);
+
+			var initialDist = this.Entity.Position.Get2DDistance(target.Position);
+			if (initialDist >= landDistance)
+				yield return this.MoveTo(target.Position, wait: false);
+
+			for (var i = 0; i < 60; i++)
+			{
+				if (shouldAbort())
+					yield break;
+
+				var dist = this.Entity.Position.Get2DDistance(target.Position);
+				if (dist < landDistance)
+					break;
+
+				yield return this.Wait(100);
+			}
+
 			if (shouldAbort())
 				yield break;
 
-			var dist = this.Entity.Position.Get2DDistance(target.Position);
-			if (dist < landDistance)
-				break;
+			yield return this.TurnTowards(target);
 
-			yield return this.Wait(100);
+			onArrival();
 		}
-
-		if (shouldAbort())
-			yield break;
-
-		yield return this.TurnTowards(target);
-
-		onArrival();
+		finally
+		{
+			_isLanding = false;
+		}
 	}
 
 	/// <summary>
@@ -788,6 +800,9 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 	/// </summary>
 	public void EnqueueHawkSkill(HawkSkillRequest request)
 	{
+		if (_isLanding)
+			return;
+
 		bool needStart;
 		lock (_skillQueueLock)
 		{
