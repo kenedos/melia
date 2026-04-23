@@ -3035,7 +3035,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(hitInfo.UnkFloat2);
 				packet.PutInt(hitInfo.HitCount);
 				packet.PutByte(1);
-				packet.PutInt(0);
+				packet.PutInt(0); // Another delay?
 				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
 			}
 			else

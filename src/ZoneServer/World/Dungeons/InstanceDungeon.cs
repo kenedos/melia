@@ -472,6 +472,12 @@ namespace Melia.Zone.World.Dungeons
 			{
 				if (character == null) continue;
 
+				if (character.Map == null || character.Map.Id != this.MapId || !character.IsOnline)
+				{
+					Log.Info("InstanceDungeon.StartDungeon: Skipping '{0}' — no longer on dungeon map {1}.", character.Name, this.MapId);
+					continue;
+				}
+
 				// Increment entry count on enter if not configured to increment on complete
 				if (!incrementOnComplete && character.Connection?.Account != null)
 				{

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.Packages;
@@ -13,8 +14,8 @@ using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
-using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 {
@@ -113,8 +114,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 		private static async Task ExecuteManual(HawkSkillContext ctx, Position targetPos)
 		{
-			FalconerHawkHelper.UnrestHawkIfNeeded(ctx.Hawk);
-			await ctx.Delay(100);
+			if (ctx.Hawk.IsPerched)
+			{
+				FalconerHawkHelper.UnrestHawkIfNeeded(ctx.Hawk);
+				await ctx.Delay(1200);
+			}
 
 			await Dive(ctx, targetPos);
 
@@ -126,10 +130,16 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (target.IsDead)
 				return;
 
+			var skill = ctx.Skill;
+			var caster = ctx.Caster;
+			var hawk = ctx.Hawk;
+
+			Send.ZC_SKILL_READY(caster, skill, 1, caster.Position, target.Position);
+
 			if (ctx.Hawk.IsPerched)
 			{
 				FalconerHawkHelper.UnrestHawkIfNeeded(ctx.Hawk);
-				await ctx.Delay(800);
+				await ctx.Delay(1200);
 			}
 
 			await Dive(ctx, target.Position);
@@ -143,39 +153,31 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var caster = ctx.Caster;
 			var hawk = ctx.Hawk;
 
-
 			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
 
 			var divePos = new Position(targetPos.X, targetPos.Y + FalconerHawkHelper.DefaultHawkHeight, targetPos.Z);
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
 
+			await ctx.Delay(700);
+
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, AttackRadius)
 				.Take(MaxTargets)
 				.ToList();
 
-			if (enemies.Count > 0)
+			foreach (var enemy in enemies)
 			{
-				var hits = new List<SkillHitInfo>();
-				var damageDelay = TimeSpan.FromMilliseconds(700);
-				var skillHitDelay = TimeSpan.Zero;
+				if (enemy.IsDead)
+					continue;
 
-				foreach (var enemy in enemies)
-				{
-					if (enemy.IsDead)
-						continue;
+				enemy.StartBuff(BuffId.Blistering_Debuff, skill.Level, 0, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
 
-					enemy.StartBuff(BuffId.Blistering_Debuff, skill.Level, 0, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
+				var modifier = SkillModifier.MultiHit(BaseHitCount);
+				var skillHitResult = SCR_SkillHit(caster, enemy, skill, modifier);
+				enemy.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHitResult = SCR_SkillHit(caster, enemy, skill, SkillModifier.MultiHit(BaseHitCount));
-					enemy.TakeDamage(skillHitResult.Damage, caster);
-
-					var skillHit = new SkillHitInfo(caster, enemy, skill, skillHitResult, damageDelay, skillHitDelay);
-					skillHit.HitEffect = HitEffect.Impact;
-					hits.Add(skillHit);
-				}
-
-				Send.ZC_SKILL_HIT_INFO(caster, hits);
+				var hit = new HitInfo(caster, enemy, skill, skillHitResult, TimeSpan.FromMilliseconds(200));
+				Send.ZC_HIT_INFO(caster, enemy, hit);
 			}
 
 			await ctx.Delay(700);

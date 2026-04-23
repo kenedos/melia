@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	/// attack while moving. Also removes certain debuffs.
 	/// </summary>
 	/// <remarks>
-	/// Packet sequence from official:
+	/// Sequence:
 	/// 1. ZC_ENABLE_CONTROL / ZC_LOCK_KEY
 	/// 2. ZC_SKILL_ADD / ZC_PC_ATKSTATE / ZC_SKILL_READY / ZC_UPDATE_SP
 	/// 3. ZC_NORMAL UpdateSkillEffect

@@ -124,14 +124,16 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.ThrowActor(pheasant, "F_smoke109_2", 1.5f, targetPos, 0.5f, 0f, 900f, 1f, 0);
 			pheasant.SetPosition(targetPos);
 
-			FalconerHawkHelper.UnrestHawkIfNeeded(hawk);
-
-			await ctx.Delay(1000);
+			if (hawk.IsPerched)
+			{
+				FalconerHawkHelper.UnrestHawkIfNeeded(hawk);
+				await ctx.Delay(800);
+			}
 
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.CollisionAndBack(hawk, pheasant, syncKey, "HOVERING_SHOT", 1f, 7f, 1f, 0.7f, 20f, true);
 
-			await ctx.Delay(1000);
+			await ctx.Delay(700);
 
 			TriggerExplosion(caster, skill, hawk, targetPos);
 
@@ -149,6 +151,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var skill = ctx.Skill;
 			var caster = ctx.Caster;
 			var hawk = ctx.Hawk;
+
+			Send.ZC_SKILL_READY(caster, skill, 1, caster.Position, target.Position);
 
 			if (hawk.IsPerched)
 			{
@@ -182,10 +186,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (enemies.Count == 0)
 				return;
 
-			var hits = new List<SkillHitInfo>();
-			var damageDelay = TimeSpan.FromMilliseconds(50);
-			var skillHitDelay = TimeSpan.Zero;
-
 			foreach (var enemy in enemies)
 			{
 				if (enemy.IsDead)
@@ -194,16 +194,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				var skillHitResult = SCR_SkillHit(caster, enemy, skill);
 				enemy.TakeDamage(skillHitResult.Damage, caster);
 
-				var skillHit = new SkillHitInfo(caster, enemy, skill, skillHitResult, damageDelay, skillHitDelay);
-				skillHit.HitEffect = HitEffect.Impact;
+				var hit = new HitInfo(caster, enemy, skill, skillHitResult, HitResultType.Hit);
+				Send.ZC_HIT_INFO(caster, enemy, hit);
 
 				if (RandomProvider.Get().Next(100) < 50)
 					enemy.StartBuff(BuffId.Stun, skill.Level, 0, TimeSpan.FromSeconds(3), caster);
-
-				hits.Add(skillHit);
 			}
-
-			Send.ZC_SKILL_HIT_INFO(caster, hits);
 		}
 	}
 }

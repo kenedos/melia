@@ -84,10 +84,8 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 					ai.Script.QueueEventAlert(new HateResetAlert());
 
 			var aniTime = TimeSpan.FromMilliseconds(50);
-			var skillHitDelay = TimeSpan.Zero;
 
 			var firstTarget = true;
-			var hits = new List<SkillHitInfo>();
 			foreach (var target in targetList)
 			{
 				if (!companion.IsDead && companion.CanSee(target))
@@ -115,14 +113,10 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 					var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHit(2));
 					target.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
-					skillHit.HitEffect = HitEffect.Impact;
-
-					hits.Add(skillHit);
+					var hit = new HitInfo(caster, target, skill, skillHitResult, HitResultType.Hit, aniTime);
+					Send.ZC_HIT_INFO(caster, target, hit);
 				}
 			}
-
-			Send.ZC_SKILL_HIT_INFO(caster, hits);
 		}
 
 		/// <summary>
@@ -151,6 +145,7 @@ namespace Melia.Zone.Skills.Handlers.Hunter
 			skill.IncreaseOverheat();
 
 			var targetPos = target.Position;
+			Send.ZC_SKILL_READY(master, skill, 1, companion.Position, targetPos);
 			skill.Run(Activate(master, skill, targetPos, companion));
 		}
 	}
