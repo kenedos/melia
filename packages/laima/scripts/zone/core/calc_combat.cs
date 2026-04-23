@@ -1079,7 +1079,8 @@ public class CombatCalculationsScript : GeneralScript
 			attacker.StopBuffByTag(BuffTag.Cloaking);
 
 		var result = new SkillHitResult();
-		result.Damage = SCR_CalculateDamage(attacker, target, skill, modifier, result);
+		var perHitModifier = modifier.Clone();
+		result.Damage = SCR_CalculateDamage(attacker, target, skill, perHitModifier, result);
 
 		return result;
 	}
