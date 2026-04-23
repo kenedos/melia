@@ -301,6 +301,11 @@ namespace Melia.Zone.Skills.Combat
 		public static SkillModifier Default => new();
 
 		/// <summary>
+		/// Returns a shallow copy of this modifier.
+		/// </summary>
+		public SkillModifier Clone() => (SkillModifier)this.MemberwiseClone();
+
+		/// <summary>
 		/// Returns a new skill modifier with the half damage.
 		/// </summary>
 		/// <returns></returns>
