@@ -37,6 +37,12 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 			// Force stand up if currently sitting
 			if (character.IsSitting)
 				character.SetSitting(false);
+
+			if (buff.Caster is Companion hawk
+				&& hawk.Components.TryGet<AiComponent>(out var aiComponent))
+			{
+				aiComponent.Script.Suspended = true;
+			}
 		}
 
 		/// <summary>
@@ -46,6 +52,12 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 		{
 			if (buff.Target is not Character character)
 				return;
+
+			if (buff.Caster is Companion hawk
+				&& hawk.Components.TryGet<AiComponent>(out var aiComponent))
+			{
+				aiComponent.Script.Suspended = false;
+			}
 
 			// Re-enable sitting
 			character.SetSittingDisabled(false);

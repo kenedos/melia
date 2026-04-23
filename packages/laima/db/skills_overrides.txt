@@ -1242,12 +1242,12 @@
 //---------------------------------------------------------------------------
 { skillId: 31002, className: "Falconer_BuildRoost", name: "Roost", basicSp: 40, cooldownTime: 25000 },
 { skillId: 31003, className: "Falconer_Circling", name: "Circling", basicSp: 30, cooldownTime: 0 },
-{ skillId: 31005, className: "Falconer_Pheasant", name: "Pheasant", basicSp: 32, splashRate: 4, factor: 230, factorByLevel: 23, cooldownTime: 6000 },
+{ skillId: 31005, className: "Falconer_Pheasant", name: "Pheasant", basicSp: 32, splashRate: 4, factor: 230, factorByLevel: 23, cooldownTime: 10000 },
 { skillId: 31006, className: "Falconer_HangingShot", name: "Hanging Shot", basicSp: 48, cooldownTime: 30000 },
-{ skillId: 31008, className: "Falconer_BlisteringThrash", name: "Sonic Strike", basicSp: 42, splashRate: 3, factor: 115, factorByLevel: 11.5, cooldownTime: 10000, overheatCount: "0" },
+{ skillId: 31008, className: "Falconer_BlisteringThrash", name: "Sonic Strike", basicSp: 42, splashRate: 3, factor: 115, factorByLevel: 11.5, cooldownTime: 12000, overheatCount: "0" },
 { skillId: 31011, className: "Falconer_Aiming", name: "Aiming", basicSp: 55, cooldownTime: 25000 },
 { skillId: 31012, className: "Falconer_FirstStrike", name: "Pre-Emptive Strike", basicSp: 0, cooldownTime: 0 },
-{ skillId: 31013, className: "Falconer_Tomahawk", name: "Tomahawk", basicSp: 62, splashRate: 10, factor: 230, factorByLevel: 23, cooldownTime: 14000, overheatCount: "2", overheatDelay: "500" },
+{ skillId: 31013, className: "Falconer_Tomahawk", name: "Tomahawk", basicSp: 62, splashRate: 10, factor: 230, factorByLevel: 23, cooldownTime: 12000 },
 { skillId: 100117, className: "Falconer_Pheasant_Vibora", name: "Hawk Hunt", basicSp: 45, splashRate: 4, factor: 460, factorByLevel: 46, cooldownTime: 12000 },
 
 // Companions

@@ -69,17 +69,24 @@ namespace Melia.Zone.Skills.Helpers
 		/// <returns>True if hawk is busy with a skill</returns>
 		public static bool IsHawkBusy(Companion hawk)
 		{
+			if (hawk == null)
+				return false;
+
 			return hawk.Vars.Get<bool>("Hawk.UsingSkill", false);
 		}
 
 		/// <summary>
-		/// Locks the hawk for a skill: sets the busy flag and locks
-		/// movement so the AI cannot move the hawk mid-attack.
+		/// Locks the hawk for a skill: sets busy flag and optionally movement.
 		/// </summary>
-		public static void LockHawk(Companion hawk)
+		public static void LockHawk(Companion hawk, bool lockMovement = true)
 		{
+			if (hawk == null)
+				return;
+
 			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Lock(LockType.Movement);
+
+			if (lockMovement)
+				hawk.Lock(LockType.Movement);
 		}
 
 		/// <summary>
@@ -88,6 +95,9 @@ namespace Melia.Zone.Skills.Helpers
 		/// </summary>
 		public static void UnlockHawk(Companion hawk)
 		{
+			if (hawk == null)
+				return;
+
 			hawk.Vars.Set("Hawk.UsingSkill", false);
 			hawk.Unlock(LockType.Movement);
 		}

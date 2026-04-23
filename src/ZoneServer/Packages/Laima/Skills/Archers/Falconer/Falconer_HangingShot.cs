@@ -124,7 +124,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			// interrupts the ride.
 			FalconerHawkQueue.Enqueue(hawk, new HawkSkillRequest(
 				skill, caster,
-				ctx => Execute(ctx, chr, buffTimeSpan)));
+				ctx => Execute(ctx, chr, buffTimeSpan),
+				SkipMovementLock: true));
 		}
 
 		private static async Task Execute(HawkSkillContext ctx, Character character, TimeSpan buffTimeSpan)

@@ -109,7 +109,8 @@ namespace Melia.Zone.Skills.Helpers
 	public readonly record struct HawkSkillRequest(
 		Skill Skill,
 		ICombatEntity Caster,
-		Func<HawkSkillContext, Task> Execute);
+		Func<HawkSkillContext, Task> Execute,
+		bool SkipMovementLock = false);
 
 	/// <summary>
 	/// Execution context passed to a hawk request's Execute callback.

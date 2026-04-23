@@ -28,7 +28,7 @@ using Yggdrasil.Util;
 [Ai("PC_Pet_Hawk")]
 public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 {
-	private const double HawkSkillGlobalCooldownMs = 2500.0;
+	private const double HawkSkillGlobalCooldownMs = 2000.0;
 
 	private readonly Queue<HawkSkillRequest> _skillQueue = new();
 	private readonly object _skillQueueLock = new();
@@ -158,25 +158,21 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 				continue;
 			}
 
-			// Fly to roost and land when one is active
+			// Rest on roost unless FirstStrike can actually auto-cast right now.
 			if (!ownerTooFarForRoost
-				&& this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead && !this.Companion.IsOnRoost)
+				&& this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead && !this.Companion.IsOnRoost
+				&& (!OwnerHasNearbyEnemies(owner)
+					|| !owner.IsBuffActive(BuffId.FirstStrike_Buff)
+					|| AllHawkSkillsOnLongCooldown(owner)))
 			{
-				// After a skill, fly toward the owner first before
-				// heading back to the roost
-				var lastSkillEnd = this.Companion?.Vars.TryGet<DateTime>("Hawk.LastSkillEndTime", out var t) == true ? t : DateTime.MinValue;
-					var timeSinceSkill = (DateTime.UtcNow - lastSkillEnd).TotalSeconds;
-				if (timeSinceSkill < 3)
-				{
-					this.SetRunning(true);
-					yield return this.MoveTo(owner.Position, wait: false);
-					yield return this.Wait(500);
-					continue;
-				}
-
 				var roost = this.Companion.ActiveRoost;
+				var roostOwner = owner;
 				yield return FlyToAndLand(roost,
-					() => this.Companion.LandOnRoost(roost),
+					() =>
+					{
+						this.Companion.LandOnRoost(roost);
+						_ = ResetHawkSkillCooldownsAfterDelay(roostOwner);
+					},
 					() => roost.IsDead || this.Companion.ActiveRoost != roost,
 					80f);
 				continue;
@@ -222,6 +218,16 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 				{
 					_target = null;
 					this.RemoveAllHate();
+					this.StartRoutine("Idle", HawkIdle());
+					yield break;
+				}
+
+				// Bail out of combat to roost when nothing can auto-cast; keep hate.
+				if (this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead
+					&& !this.Companion.IsOnRoost
+					&& (!master.IsBuffActive(BuffId.FirstStrike_Buff) || AllHawkSkillsOnLongCooldown(master)))
+				{
+					_target = null;
 					this.StartRoutine("Idle", HawkIdle());
 					yield break;
 				}
@@ -348,8 +354,12 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 			yield return this.Wait(100);
 		}
 
-		if (!shouldAbort())
-			onArrival();
+		if (shouldAbort())
+			yield break;
+
+		yield return this.TurnTowards(target);
+
+		onArrival();
 	}
 
 	/// <summary>
@@ -402,6 +412,16 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 			var dist = this.Entity.Position.Get2DDistance(owner.Position);
 			if (dist < 20f)
 				yield break;
+
+			// Break off to roost if resting conditions are met.
+			if (this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead
+				&& this.Companion.ActiveRoost.Position.Get2DDistance(owner.Position) <= 150f
+				&& (!OwnerHasNearbyEnemies(owner)
+					|| !owner.IsBuffActive(BuffId.FirstStrike_Buff)
+					|| AllHawkSkillsOnLongCooldown(owner)))
+			{
+				yield break;
+			}
 
 			yield return this.MoveTo(owner.Position, wait: false);
 			SetLastActionTime();
@@ -529,7 +549,6 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 		if (!owner.IsAbilityActive(AbilityId.Falconer14)
 			&& owner.TryGetSkill(SkillId.Falconer_BlisteringThrash, out var bt) && !bt.IsOnCooldown)
 		{
-			TakeOffIfLanded();
 			Falconer_BlisteringThrashOverride.TryActivate(owner, target);
 			return;
 		}
@@ -537,7 +556,6 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 		// Pheasant
 		if (owner.TryGetSkill(SkillId.Falconer_Pheasant, out var ph) && !ph.IsOnCooldown)
 		{
-			TakeOffIfLanded();
 			Falconer_PheasantOverride.TryActivate(owner, target);
 			return;
 		}
@@ -545,7 +563,6 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 		// Tomahawk
 		if (owner.TryGetSkill(SkillId.Falconer_Tomahawk, out var tm) && !tm.IsOnCooldown)
 		{
-			TakeOffIfLanded();
 			Falconer_TomahawkOverride.TryActivate(owner, target);
 			return;
 		}
@@ -592,6 +609,71 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 	#endregion
 
 	#region Skill Helpers
+
+	private static readonly SkillId[] HawkAutoSkillIds = new[]
+	{
+		SkillId.Falconer_Tomahawk,
+		SkillId.Falconer_BlisteringThrash,
+		SkillId.Falconer_Pheasant,
+	};
+
+	/// <summary>
+	/// Returns true when any attackable enemy exists within the hawk's
+	/// view range of the owner. Used to decide whether resting on the
+	/// roost makes sense.
+	/// </summary>
+	private bool OwnerHasNearbyEnemies(ICombatEntity owner)
+	{
+		return this.Entity.Map.GetAttackableEnemiesInPosition(owner, owner.Position, _viewRange).Any();
+	}
+
+	/// <summary>
+	/// Returns true when every hawk auto-cast skill the owner has learned
+	/// still has at least 3 seconds of cooldown remaining. Unlearned skills
+	/// are ignored so the hawk doesn't block on skills the player doesn't have.
+	/// </summary>
+	private bool AllHawkSkillsOnLongCooldown(ICombatEntity owner)
+	{
+		if (!owner.Components.TryGet<CooldownComponent>(out var cd))
+			return false;
+
+		foreach (var skillId in HawkAutoSkillIds)
+		{
+			if (!owner.TryGetSkill(skillId, out var skill))
+				continue;
+
+			var remaining = cd.GetRemain(skill.Data.CooldownGroup);
+			if (remaining.TotalMilliseconds < 3000)
+				return false;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Waits 2 seconds after perching, then clears the cooldown for all
+	/// hawk auto-cast skills the owner has learned. Aborts if the hawk
+	/// has left the roost or the owner is gone in the meantime.
+	/// </summary>
+	private async Task ResetHawkSkillCooldownsAfterDelay(ICombatEntity owner)
+	{
+		await Task.Delay(2000);
+
+		if (owner == null || owner.IsDead)
+			return;
+		if (this.Companion == null || !this.Companion.IsOnRoost)
+			return;
+		if (!owner.Components.TryGet<CooldownComponent>(out var cd))
+			return;
+
+		foreach (var skillId in HawkAutoSkillIds)
+		{
+			if (!owner.TryGetSkill(skillId, out var skill))
+				continue;
+
+			cd.Remove(skill.Data.CooldownGroup);
+		}
+	}
 
 	public void LockHawkAction(bool locked, string scriptName = "None")
 	{
@@ -717,7 +799,7 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 
 		if (needStart)
 		{
-			FalconerHawkHelper.LockHawk(this.Companion);
+			FalconerHawkHelper.LockHawk(this.Companion, lockMovement: !request.SkipMovementLock);
 			_ = Task.Run(ProcessSkillQueueAsync);
 		}
 	}
@@ -810,7 +892,6 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 		}
 		finally
 		{
-			Console.WriteLine("Unlocked");
 			FalconerHawkHelper.UnlockHawk(this.Companion);
 		}
 	}

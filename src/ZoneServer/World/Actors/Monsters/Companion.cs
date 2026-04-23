@@ -616,6 +616,9 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (this.Owner == null || !this.IsLandedOnShoulder)
 				return;
 
+			if (this.Components.TryGet<MovementComponent>(out var shoulderMovement))
+				shoulderMovement.NotifyFlying(false, 0);
+
 			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, true, "SIT");
 			this.Owner.PlayEffectNode("F_smoke109_2", 1, "Dummy_pet_hawk_R");
 			this.Owner.PlayEffectNode("F_archer_hawk_fether_sit", 1, "Dummy_pet_hawk_R");
@@ -686,6 +689,9 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (roost == null || roost.IsDead || !this.IsOnRoost)
 				return;
+
+			if (this.Components.TryGet<MovementComponent>(out var roostMovement))
+				roostMovement.NotifyFlying(false, 0);
 
 			Send.ZC_NORMAL.AutoDetachWhenTargetMove(this, true, "SIT");
 			roost.PlayEffectNode("F_smoke109_2", 1, "Dummy_hawk");

@@ -26,9 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	[SkillHandler(SkillId.Falconer_BuildRoost)]
 	public class Falconer_BuildRoostOverride : IGroundSkillHandler, IDynamicCasted
 	{
-		private const float BaseRoostRadius = 100f;
-		private const int RoostDurationSeconds = 20;
-		private const int BuffTickIntervalMs = 3000;
+		private const int RoostDurationSeconds = 120;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{

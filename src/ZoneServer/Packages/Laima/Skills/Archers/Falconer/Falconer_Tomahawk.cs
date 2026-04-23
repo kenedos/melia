@@ -101,6 +101,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (target.IsDead)
 				return;
 
+			if (ctx.Hawk.IsPerched)
+			{
+				FalconerHawkHelper.UnrestHawkIfNeeded(ctx.Hawk);
+				await ctx.Delay(800);
+			}
+
 			await Dive(ctx, target.Position);
 
 			await ctx.Delay(500);

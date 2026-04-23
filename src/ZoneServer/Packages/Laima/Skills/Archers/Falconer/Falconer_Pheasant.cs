@@ -150,6 +150,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var caster = ctx.Caster;
 			var hawk = ctx.Hawk;
 
+			if (hawk.IsPerched)
+			{
+				FalconerHawkHelper.UnrestHawkIfNeeded(hawk);
+				await ctx.Delay(800);
+			}
+
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.CollisionAndBack(hawk, target, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f, true);
 
