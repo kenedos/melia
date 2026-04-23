@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
@@ -24,8 +26,15 @@ using Yggdrasil.Util;
 /// skill interactions, and combat.
 /// </summary>
 [Ai("PC_Pet_Hawk")]
-public class PcPetHawkAiScript : AiScript
+public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 {
+	private const double HawkSkillGlobalCooldownMs = 2500.0;
+
+	private readonly Queue<HawkSkillRequest> _skillQueue = new();
+	private readonly object _skillQueueLock = new();
+	private bool _skillProcessorRunning;
+	private CancellationTokenSource _currentSkillCts;
+	private DateTime _lastSkillStartTime;
 	// Flying constants
 	protected const float DefaultFlyHeight = 80f;
 
@@ -482,7 +491,7 @@ public class PcPetHawkAiScript : AiScript
 		if (IsUsingSkillFlag)
 			return;
 
-		if (FalconerHawkHelper.IsOnGlobalCooldown(this.Companion))
+		if (this.IsOnGlobalCooldown())
 			return;
 
 		// Pick the most hated target first (hate is added by the
@@ -504,7 +513,7 @@ public class PcPetHawkAiScript : AiScript
 			&& owner.TryGetSkill(SkillId.Falconer_BlisteringThrash, out var bt) && !bt.IsOnCooldown)
 		{
 			TakeOffIfLanded();
-			Falconer_BlisteringThrashOverride.TryActivateSonicStrike(owner, target);
+			Falconer_BlisteringThrashOverride.TryActivate(owner, target);
 			return;
 		}
 
@@ -512,7 +521,7 @@ public class PcPetHawkAiScript : AiScript
 		if (owner.TryGetSkill(SkillId.Falconer_Pheasant, out var ph) && !ph.IsOnCooldown)
 		{
 			TakeOffIfLanded();
-			Falconer_PheasantOverride.TryAutoActivate(owner, target);
+			Falconer_PheasantOverride.TryActivate(owner, target);
 			return;
 		}
 
@@ -520,7 +529,7 @@ public class PcPetHawkAiScript : AiScript
 		if (owner.TryGetSkill(SkillId.Falconer_Tomahawk, out var tm) && !tm.IsOnCooldown)
 		{
 			TakeOffIfLanded();
-			Falconer_TomahawkOverride.TryAutoActivate(owner, target);
+			Falconer_TomahawkOverride.TryActivate(owner, target);
 			return;
 		}
 
@@ -667,6 +676,118 @@ public class PcPetHawkAiScript : AiScript
 
 		LockHawkAction(false);
 		SetLastActionTime();
+	}
+
+	#endregion
+
+	#region Hawk Skill Queue (IHawkSkillQueue)
+
+	/// <summary>
+	/// Enqueues a hawk-skill request. Safe to call from any thread.
+	/// Requests execute strictly one at a time per hawk, with a 2.5s
+	/// global cooldown between them.
+	/// </summary>
+	public void EnqueueHawkSkill(HawkSkillRequest request)
+	{
+		bool needStart;
+		lock (_skillQueueLock)
+		{
+			_skillQueue.Enqueue(request);
+			needStart = !_skillProcessorRunning;
+			if (needStart)
+				_skillProcessorRunning = true;
+		}
+
+		if (needStart)
+			_ = Task.Run(ProcessSkillQueueAsync);
+	}
+
+	/// <summary>
+	/// Cancels the currently in-flight hawk skill (if any). Pending
+	/// queued requests stay — they run once the current one unwinds.
+	/// </summary>
+	public void CancelInFlightSkill()
+	{
+		var cts = _currentSkillCts;
+		if (cts == null)
+			return;
+
+		try { cts.Cancel(); }
+		catch (ObjectDisposedException) { }
+	}
+
+	/// <summary>
+	/// Clears pending hawk-skill requests and cancels the in-flight one.
+	/// </summary>
+	public void ClearSkillQueue()
+	{
+		lock (_skillQueueLock)
+			_skillQueue.Clear();
+
+		CancelInFlightSkill();
+	}
+
+	/// <summary>
+	/// Returns true if the hawk recently started a skill and the 2.5s
+	/// inter-skill global cooldown has not yet elapsed.
+	/// </summary>
+	public bool IsOnGlobalCooldown()
+	{
+		return (DateTime.UtcNow - _lastSkillStartTime).TotalMilliseconds < HawkSkillGlobalCooldownMs;
+	}
+
+	private async Task ProcessSkillQueueAsync()
+	{
+		while (true)
+		{
+			HawkSkillRequest request;
+			lock (_skillQueueLock)
+			{
+				if (_skillQueue.Count == 0)
+				{
+					_skillProcessorRunning = false;
+					return;
+				}
+
+				request = _skillQueue.Dequeue();
+			}
+
+			var remaining = HawkSkillGlobalCooldownMs - (DateTime.UtcNow - _lastSkillStartTime).TotalMilliseconds;
+			if (remaining > 0)
+				await Task.Delay((int)remaining);
+
+			if (this.Entity == null || this.Entity.IsDead)
+				continue;
+
+			var cts = new CancellationTokenSource();
+			_currentSkillCts = cts;
+			_lastSkillStartTime = DateTime.UtcNow;
+
+			FalconerHawkHelper.LockHawk(this.Companion);
+
+			try
+			{
+				var ctx = new HawkSkillContext(request.Skill, request.Caster, this.Companion, cts.Token);
+				await request.Execute(ctx);
+			}
+			catch (OperationCanceledException)
+			{
+				// External interrupt (stun/freeze/death) — expected.
+			}
+			catch (Exception ex)
+			{
+				Log.Error("PcPetHawkAiScript: hawk skill '{0}' failed: {1}", request.Skill?.Id, ex);
+			}
+			finally
+			{
+				FalconerHawkHelper.UnlockHawk(this.Companion);
+				this.Companion?.Vars.Set("Hawk.LastSkillEndTime", DateTime.UtcNow);
+
+				_currentSkillCts = null;
+				try { cts.Dispose(); }
+				catch (ObjectDisposedException) { }
+			}
+		}
 	}
 
 	#endregion

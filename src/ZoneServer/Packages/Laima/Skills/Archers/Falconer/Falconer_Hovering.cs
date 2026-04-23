@@ -111,9 +111,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			hawk.Vars.Set("Hawk.Hovering.Active", false);
 			caster.PlayGroundEffect(targetPos, "F_archer_hovering_end", 1f);
 			pad.Destroy();
-
-			// Hawk flies away
-			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 
 		private async Task PerformHoveringAttack(Skill skill, ICombatEntity caster, World.Actors.Monsters.Companion hawk, List<ICombatEntity> enemies, Position targetPos)

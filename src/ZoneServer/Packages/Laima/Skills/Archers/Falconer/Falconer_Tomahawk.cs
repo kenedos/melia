@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -60,69 +59,16 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			FalconerHawkHelper.EnqueueSkill(hawk, () => skill.Run(this.HandleSkill(skill, caster, hawk, targetPos)));
-		}
-
-		private async Task HandleSkill(Skill skill, ICombatEntity caster, Companion hawk, Position targetPos)
-		{
-			await FalconerHawkHelper.PrepareForSkill(skill, caster, hawk);
-
-			await Task.Delay(TimeSpan.FromMilliseconds(100));
-
-			// Screen shake
-			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
-
-			// Hawk dive to target position with high penetration
-			var divePos = new Position(targetPos.X, targetPos.Y + FalconerHawkHelper.DefaultHawkHeight, targetPos.Z);
-			var syncKey = hawk.GenerateSyncKey();
-			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "TOMAHAWK_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
-
-			// Wait for hawk to reach target
-			await Task.Delay(TimeSpan.FromMilliseconds(700));
-
-			hawk.PlayGroundEffect(targetPos, "F_explosion131_fire", 3f);
-
-			// Apply damage to enemies in area
-			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, AttackRadius)
-				.Take(MaxTargets)
-				.ToList();
-
-			if (enemies.Count > 0)
-			{
-				foreach (var enemy in enemies)
-				{
-					if (enemy.IsDead)
-						continue;
-
-					// Multi-hit damage (3 hits)
-					var skillHitResult = SCR_SkillHit(caster, enemy, skill, SkillModifier.MultiHit(BaseHitCount));
-					enemy.TakeDamage(skillHitResult.Damage, caster);
-
-					var hit = new HitInfo(caster, enemy, skill, skillHitResult, HitResultType.Hit);
-					Send.ZC_HIT_INFO(caster, enemy, hit);
-
-					// Falconer27: [Arts] Tomahawk: Scorched - applies burn
-					if (caster.IsAbilityActive(AbilityId.Falconer27))
-					{
-						enemy.StartBuff(BuffId.Burn, skill.Level, 0, TimeSpan.FromSeconds(5), caster);
-					}
-				}
-			}
-
-			hawk.SetPosition(targetPos);
-
-			// Wait for hawk return animation
-			await Task.Delay(TimeSpan.FromMilliseconds(500));
-
-			// Hawk flies away or processes next queued skill
-			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
+			FalconerHawkQueue.Enqueue(hawk, new HawkSkillRequest(
+				skill, caster,
+				ctx => ExecuteManual(ctx, targetPos)));
 		}
 
 		/// <summary>
 		/// Attempts to auto-trigger Tomahawk on a target.
 		/// Called by the hawk AI during FirstStrike auto-attack.
 		/// </summary>
-		public static void TryAutoActivate(ICombatEntity caster, ICombatEntity target)
+		public static void TryActivate(ICombatEntity caster, ICombatEntity target)
 		{
 			if (!caster.TryGetSkill(SkillId.Falconer_Tomahawk, out var skill))
 				return;
@@ -135,26 +81,43 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			skill.IncreaseOverheat();
 
-			FalconerHawkHelper.EnqueueSkill(hawk, () =>
-			{
-				FalconerHawkHelper.LockHawk(hawk);
-				skill.Run(AutoActivate(skill, caster, hawk, target));
-			});
+			FalconerHawkQueue.Enqueue(hawk, new HawkSkillRequest(
+				skill, caster,
+				ctx => ExecuteAuto(ctx, target)));
 		}
 
-		private static async Task AutoActivate(Skill skill, ICombatEntity caster, Companion hawk, ICombatEntity target)
+		private static async Task ExecuteManual(HawkSkillContext ctx, Position targetPos)
 		{
+			FalconerHawkHelper.UnrestHawkIfNeeded(ctx.Hawk);
+			await ctx.Delay(100);
+
+			await Dive(ctx, targetPos);
+
+			await ctx.Delay(500);
+		}
+
+		private static async Task ExecuteAuto(HawkSkillContext ctx, ICombatEntity target)
+		{
+			if (target.IsDead)
+				return;
+
+			await Dive(ctx, target.Position);
+		}
+
+		private static async Task Dive(HawkSkillContext ctx, Position targetPos)
+		{
+			var skill = ctx.Skill;
+			var caster = ctx.Caster;
+			var hawk = ctx.Hawk;
+
+
 			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
 
-			var targetPos = target.Position;
 			var divePos = new Position(targetPos.X, targetPos.Y + FalconerHawkHelper.DefaultHawkHeight, targetPos.Z);
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "TOMAHAWK_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
 
-			await skill.Wait(TimeSpan.FromMilliseconds(700));
-
-			if (target.IsDead)
-				return;
+			await ctx.Delay(700);
 
 			hawk.PlayGroundEffect(targetPos, "F_explosion131_fire", 3f);
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
@@ -179,8 +142,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			}
 
 			hawk.SetPosition(targetPos);
-
-			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 	}
 }

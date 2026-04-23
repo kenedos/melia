@@ -72,27 +72,69 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			FalconerHawkHelper.EnqueueSkill(hawk, () => skill.Run(this.HandleSkill(skill, caster, hawk, targetPos)));
+			FalconerHawkQueue.Enqueue(hawk, new HawkSkillRequest(
+				skill, caster,
+				ctx => ExecuteManual(ctx, targetPos)));
 		}
 
-		private async Task HandleSkill(Skill skill, ICombatEntity caster, Companion hawk, Position targetPos)
+		/// <summary>
+		/// Attempts to auto-trigger Sonic Strike on a target.
+		/// Called by FirstStrike buff when the caster attacks.
+		/// </summary>
+		public static void TryActivate(ICombatEntity caster, ICombatEntity target)
 		{
-			await FalconerHawkHelper.PrepareForSkill(skill, caster, hawk);
+			if (!caster.TryGetSkill(SkillId.Falconer_BlisteringThrash, out var skill))
+				return;
 
-			await Task.Delay(TimeSpan.FromMilliseconds(100));
+			if (skill.IsOnCooldown || target.IsDead)
+				return;
 
-			// Screen shake
+			if (!FalconerHawkHelper.TryGetHawk(caster, out var hawk))
+				return;
+
+			if (caster.IsAbilityActive(AbilityId.Falconer14))
+				return;
+
+			skill.IncreaseOverheat();
+
+			FalconerHawkQueue.Enqueue(hawk, new HawkSkillRequest(
+				skill, caster,
+				ctx => ExecuteAuto(ctx, target)));
+		}
+
+		private static async Task ExecuteManual(HawkSkillContext ctx, Position targetPos)
+		{
+			FalconerHawkHelper.UnrestHawkIfNeeded(ctx.Hawk);
+			await ctx.Delay(100);
+
+			await Dive(ctx, targetPos);
+
+			await ctx.Delay(500);
+		}
+
+		private static async Task ExecuteAuto(HawkSkillContext ctx, ICombatEntity target)
+		{
+			if (target.IsDead)
+				return;
+
+			await Dive(ctx, target.Position);
+		}
+
+		private static async Task Dive(HawkSkillContext ctx, Position targetPos)
+		{
+			var skill = ctx.Skill;
+			var caster = ctx.Caster;
+			var hawk = ctx.Hawk;
+
+
 			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
 
-			// Hawk dive to target position
 			var divePos = new Position(targetPos.X, targetPos.Y + FalconerHawkHelper.DefaultHawkHeight, targetPos.Z);
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
 
-			// Wait for hawk to reach target
-			await Task.Delay(TimeSpan.FromMilliseconds(700));
+			await ctx.Delay(700);
 
-			// Apply damage to enemies in area
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, AttackRadius)
 				.Take(MaxTargets)
 				.ToList();
@@ -108,10 +150,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 					if (enemy.IsDead)
 						continue;
 
-					// Apply Blistering_Debuff
 					enemy.StartBuff(BuffId.Blistering_Debuff, skill.Level, 0, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
 
-					// Multi-hit damage (6 hits)
 					var skillHitResult = SCR_SkillHit(caster, enemy, skill, SkillModifier.MultiHit(BaseHitCount));
 					enemy.TakeDamage(skillHitResult.Damage, caster);
 
@@ -123,79 +163,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				Send.ZC_SKILL_HIT_INFO(caster, hits);
 			}
 
-			// Shockwave effect
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
-
 			hawk.SetPosition(targetPos);
-
-			// Wait for hawk return animation
-			await Task.Delay(TimeSpan.FromMilliseconds(500));
-
-			// Hawk flies away or processes next queued skill
-			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
-		}
-
-		/// <summary>
-		/// Attempts to auto-trigger Sonic Strike on a target.
-		/// Called by FirstStrike buff when the caster attacks.
-		/// </summary>
-		public static void TryActivateSonicStrike(ICombatEntity caster, ICombatEntity target)
-		{
-			if (!caster.TryGetSkill(SkillId.Falconer_BlisteringThrash, out var skill))
-				return;
-
-			if (skill.IsOnCooldown || target.IsDead)
-				return;
-
-			if (!FalconerHawkHelper.TryGetHawk(caster, out var hawk))
-				return;
-
-			// Falconer14: Pre-Emptive Strike: Remove Sonic Strike
-			if (caster.IsAbilityActive(AbilityId.Falconer14))
-				return;
-
-			skill.IncreaseOverheat();
-
-			FalconerHawkHelper.EnqueueSkill(hawk, () =>
-			{
-				FalconerHawkHelper.LockHawk(hawk);
-				skill.Run(ActivateSonicStrike(skill, caster, hawk, target));
-			});
-		}
-
-		/// <summary>
-		/// Performs the Sonic Strike auto-attack on a single target.
-		/// </summary>
-		private static async Task ActivateSonicStrike(Skill skill, ICombatEntity caster, Companion hawk, ICombatEntity target)
-		{
-			// Screen shake
-			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
-
-			// Apply Blistering_Debuff
-			target.StartBuff(BuffId.Blistering_Debuff, skill.Level, 0, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
-
-			// Hawk dive to target position
-			var targetPos = target.Position;
-			var divePos = new Position(targetPos.X, targetPos.Y + FalconerHawkHelper.DefaultHawkHeight, targetPos.Z);
-			var syncKey = hawk.GenerateSyncKey();
-			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, PenetrateHeight, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
-
-			// Wait for hawk to reach target
-			await skill.Wait(TimeSpan.FromMilliseconds(700));
-
-			if (target.IsDead)
-				return;
-
-			// Deal damage
-			var skillHitResult = SCR_SkillHit(caster, target, skill, SkillModifier.MultiHit(BaseHitCount));
-			target.TakeDamage(skillHitResult.Damage, caster);
-
-			var hit = new HitInfo(caster, target, skill, skillHitResult, HitResultType.Hit);
-			Send.ZC_HIT_INFO(caster, target, hit);
-
-			hawk.SetPosition(targetPos);
-
-			await FalconerHawkHelper.DequeueSkill(skill, caster, hawk);
 		}
 	}
 }

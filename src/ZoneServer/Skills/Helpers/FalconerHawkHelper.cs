@@ -1,17 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Network;
-using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
-using Yggdrasil.Logging;
-using Yggdrasil.Util;
 
 namespace Melia.Zone.Skills.Helpers
 {
@@ -22,7 +18,6 @@ namespace Melia.Zone.Skills.Helpers
 	/// <remarks>
 	/// This helper manages hawk state through Companion.Vars:
 	/// - Hawk.UsingSkill: bool - Whether hawk is currently executing a skill
-	/// - Hawk.SkillFunction: string - Name of current skill being executed
 	/// - Companion.IsLandedOnShoulder: bool - Whether hawk is landed on owner's shoulder
 	/// - Hawk.Circling.Active: bool - Whether Circling is active
 	/// - Hawk.Circling.PadId: int - Handle of current Circling pad
@@ -30,6 +25,10 @@ namespace Melia.Zone.Skills.Helpers
 	/// - Hawk.Aiming.PadId: int - Handle of current Aiming pad
 	/// - Hawk.Hovering.Active: bool - Whether Hovering is active
 	/// - Hawk.FirstStrike.Active: bool - Whether First Strike auto-attack is active
+	///
+	/// Skill serialisation (one hawk skill at a time) is handled by
+	/// FalconerHawkQueue; this helper only exposes the lock primitives
+	/// and stateless hawk utilities.
 	/// </remarks>
 	public static class FalconerHawkHelper
 	{
@@ -44,88 +43,6 @@ namespace Melia.Zone.Skills.Helpers
 		public const float TeleportDistance = 250f;
 
 		/// <summary>
-		/// Per-hawk skill queues, keyed by hawk handle.
-		/// </summary>
-		private static readonly Dictionary<int, Queue<Action>> _skillQueues = new();
-
-		/// <summary>
-		/// Enqueues a skill action. If the hawk is currently free, fires it
-		/// immediately; otherwise it will be fired by Dequeue when the
-		/// current skill finishes.
-		/// </summary>
-		public static void EnqueueSkill(Companion hawk, Action action)
-		{
-			if (!_skillQueues.TryGetValue(hawk.Handle, out var queue))
-			{
-				queue = new Queue<Action>();
-				_skillQueues[hawk.Handle] = queue;
-			}
-			queue.Enqueue(action);
-
-			if (!IsHawkBusy(hawk))
-				RunNextQueued(hawk);
-		}
-
-		/// <summary>
-		/// Makes the hawk fly away after using a skill.
-		/// </summary>
-		public static async Task DequeueSkill(Skill skill, ICombatEntity caster, Companion hawk)
-		{
-			if (hawk == null)
-				return;
-
-			if (caster is not Character character)
-				return;
-
-
-			// If there's a queued skill, wait until the 2.5s global
-			// cooldown has passed, then fire the next skill
-			if (HasQueuedSkills(hawk))
-			{
-				var remaining = 2500.0;
-				if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
-					remaining = 2500.0 - (DateTime.UtcNow - lastStart).TotalMilliseconds;
-				if (remaining > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(remaining));
-
-				UnlockHawk(hawk);
-				RunNextQueued(hawk);
-				return;
-			}
-
-			UnlockHawk(hawk);
-		}
-
-		/// <summary>
-		/// Dequeues and fires the next skill action, if any.
-		/// </summary>
-		public static void RunNextQueued(Companion hawk)
-		{
-			if (!_skillQueues.TryGetValue(hawk.Handle, out var queue) || queue.Count == 0)
-				return;
-
-			var next = queue.Dequeue();
-			next();
-		}
-
-		/// <summary>
-		/// Returns true if the hawk has queued skills waiting.
-		/// </summary>
-		public static bool HasQueuedSkills(Companion hawk)
-		{
-			return _skillQueues.TryGetValue(hawk.Handle, out var queue) && queue.Count > 0;
-		}
-
-		/// <summary>
-		/// Clears all queued skills for the hawk.
-		/// </summary>
-		public static void ClearQueue(Companion hawk)
-		{
-			if (_skillQueues.ContainsKey(hawk.Handle))
-				_skillQueues[hawk.Handle].Clear();
-		}
-
-		/// <summary>
 		/// Attempts to get the Falconer's active hawk companion.
 		/// </summary>
 		/// <param name="caster">The caster (Falconer)</param>
@@ -138,7 +55,6 @@ namespace Melia.Zone.Skills.Helpers
 			if (caster is not Character character)
 				return false;
 
-			// Try to get hawk companion specifically
 			if (!character.TryGetActiveBirdCompanion(out var companion))
 				return false;
 
@@ -163,49 +79,7 @@ namespace Melia.Zone.Skills.Helpers
 		public static void LockHawk(Companion hawk)
 		{
 			hawk.Vars.Set("Hawk.UsingSkill", true);
-			hawk.Vars.Set("Hawk.LastSkillStartTime", DateTime.UtcNow);
 			hawk.Lock(LockType.Movement);
-		}
-
-		/// <summary>
-		/// Returns true if the hawk has used a skill too recently
-		/// (within 2.5 seconds).
-		/// </summary>
-		public static bool IsOnGlobalCooldown(Companion hawk)
-		{
-			if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
-				return (DateTime.UtcNow - lastStart).TotalMilliseconds < 2500;
-			return false;
-		}
-
-		/// <summary>
-		/// Returns the number of milliseconds remaining on the hawk's
-		/// 2.5s global cooldown, or 0 if it has expired.
-		/// </summary>
-		public static double GetGlobalCooldownRemaining(Companion hawk)
-		{
-			if (hawk.Vars.TryGet<DateTime>("Hawk.LastSkillStartTime", out var lastStart))
-			{
-				var remaining = 2500.0 - (DateTime.UtcNow - lastStart).TotalMilliseconds;
-				return remaining > 0 ? remaining : 0;
-			}
-			return 0;
-		}
-
-		/// <summary>
-		/// Unified entry point for queued hawk skills. Reads the remaining GCD,
-		/// locks the hawk, waits out the GCD using an uncancellable delay (so a
-		/// second cast of the same skill cannot abort this execution) and
-		/// optionally lifts it off from shoulder or roost.
-		/// </summary>
-		public static async Task PrepareForSkill(Skill skill, ICombatEntity caster, Companion hawk, bool unrestHawk = true)
-		{
-			var gcdRemaining = GetGlobalCooldownRemaining(hawk);
-			LockHawk(hawk);
-			if (gcdRemaining > 0)
-				await Task.Delay(TimeSpan.FromMilliseconds(gcdRemaining));
-			if (unrestHawk)
-				UnrestHawkIfNeeded(hawk);
 		}
 
 		/// <summary>
@@ -235,8 +109,7 @@ namespace Melia.Zone.Skills.Helpers
 
 			hawk.Unlock(LockType.Movement);
 
-			ClearQueue(hawk);
-
+			FalconerHawkQueue.Clear(hawk);
 		}
 
 		/// <summary>
@@ -279,139 +152,9 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
-		/// Commands the hawk to execute Blistering Thrash / Sonic Strike attack.
-		/// </summary>
-		public static async Task ExecuteBlisteringThrash(ICombatEntity caster, Companion hawk, Skill skill, Position targetPos, ICombatEntity target = null)
-		{
-			if (hawk == null)
-				return;
-
-			// Interrupt current action if busy
-			if (IsHawkBusy(hawk))
-			{
-				await InterruptHawkAction(skill, hawk);
-			}
-
-			LockHawk(hawk);
-
-			UnrestHawkIfNeeded(hawk);
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
-
-			var attackPos = target?.Position ?? targetPos;
-
-			// Screen shake
-			Send.ZC_CHANGE_CAMERA_ZOOM(hawk, 2, 99999f, 7f, 0.5f, 50f, 0f, 0f);
-
-			// Hawk dive to target position using PenetratePosition
-			var divePos = new Position(attackPos.X, attackPos.Y + DefaultHawkHeight, attackPos.Z);
-			var syncKey = hawk.GenerateSyncKey();
-			Send.ZC_NORMAL.PenetratePosition(hawk, divePos, 10f, syncKey, "HOVERING_SHOT", 0.7f, 7f, 0.5f, 0.7f, 30f);
-
-			// Shockwave effect
-			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
-
-			await skill.Wait(TimeSpan.FromMilliseconds(1200));
-
-			// Fly away after attack
-			await DequeueSkill(skill, caster, hawk);
-		}
-
-		/// <summary>
-		/// Commands the hawk to execute Hovering at the specified position.
-		/// Note: Most hovering logic is in the skill handler; this just sets state.
-		/// </summary>
-		public static async Task ExecuteHovering(ICombatEntity caster, Companion hawk, Skill skill, Position targetPos)
-		{
-			if (hawk == null)
-				return;
-
-			// Interrupt if busy
-			if (IsHawkBusy(hawk))
-			{
-				await InterruptHawkAction(skill, hawk);
-			}
-
-			LockHawk(hawk);
-
-			UnrestHawkIfNeeded(hawk);
-		}
-
-		/// <summary>
-		/// Commands the hawk to execute Combination attack.
-		/// Note: Most logic is in skill handler.
-		/// </summary>
-		public static async Task ExecuteCombination(ICombatEntity caster, Companion hawk, Skill skill, ICombatEntity target)
-		{
-			if (hawk == null || target == null)
-				return;
-
-			LockHawk(hawk);
-
-			UnrestHawkIfNeeded(hawk);
-
-			// Combination doesn't cause handled in skill
-			await Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Commands the hawk to execute Hanging Shot (player hangs from hawk).
-		/// </summary>
-		public static async Task ExecuteHangingShot(ICombatEntity caster, Companion hawk, Skill skill)
-		{
-			if (hawk == null)
-				return;
-
-			LockHawk(hawk);
-
-			UnrestHawkIfNeeded(hawk);
-
-			await Task.CompletedTask;
-		}
-
-		/// <summary>
-		/// Commands the hawk to interact with Pheasant decoy.
-		/// </summary>
-		public static async Task ExecutePheasantAttack(ICombatEntity caster, Companion hawk, Skill skill, ICombatEntity pheasant, Position targetPos)
-		{
-			if (hawk == null || pheasant == null)
-				return;
-
-			LockHawk(hawk);
-
-			UnrestHawkIfNeeded(hawk);
-
-			var syncKey = hawk.GenerateSyncKey();
-
-			// Dive to pheasant
-			Send.ZC_NORMAL.CollisionAndBack(hawk, pheasant, syncKey, "HOVERING_SHOT", 1f, 7f, 1f, 0.7f, 20f, true);
-
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-
-			await DequeueSkill(skill, caster, hawk);
-		}
-
-		/// <summary>
-		/// Interrupts the current hawk action.
-		/// </summary>
-		private static async Task InterruptHawkAction(Skill skill, Companion hawk)
-		{
-			var currentFunction = hawk.Vars.Get<string>("Hawk.SkillFunction", "None");
-
-			UnlockHawk(hawk);
-
-			if (currentFunction == "Hovering" || currentFunction == "Circling")
-			{
-				hawk.Vars.Set("Hawk.Hovering.Active", false);
-				hawk.Vars.Set("Hawk.Circling.Active", false);
-			}
-
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
-		}
-
-		/// <summary>
 		/// Unrests the hawk if it's currently resting on shoulder or roost.
 		/// </summary>
-		private static void UnrestHawkIfNeeded(Companion hawk)
+		public static void UnrestHawkIfNeeded(Companion hawk)
 		{
 			if (hawk.IsLandedOnShoulder)
 				hawk.TakeOff();
