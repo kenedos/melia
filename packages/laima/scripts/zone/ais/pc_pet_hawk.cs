@@ -142,6 +142,15 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 				continue;
 			}
 
+			var ownerTooFarForRoost = this.Companion?.ActiveRoost != null
+				&& this.Companion.ActiveRoost.Position.Get2DDistance(owner.Position) > 150f;
+
+			// Leave roost if the owner has wandered too far away
+			if (this.Companion?.IsOnRoost == true && ownerTooFarForRoost)
+			{
+				this.Companion.LeaveRoost(DefaultFlyHeight);
+			}
+
 			// Skip AI movement while perched (shoulder or roost)
 			if (this.Companion?.IsPerched == true)
 			{
@@ -150,7 +159,8 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 			}
 
 			// Fly to roost and land when one is active
-			if (this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead && !this.Companion.IsOnRoost)
+			if (!ownerTooFarForRoost
+				&& this.Companion?.ActiveRoost != null && !this.Companion.ActiveRoost.IsDead && !this.Companion.IsOnRoost)
 			{
 				// After a skill, fly toward the owner first before
 				// heading back to the roost
@@ -167,7 +177,8 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 				var roost = this.Companion.ActiveRoost;
 				yield return FlyToAndLand(roost,
 					() => this.Companion.LandOnRoost(roost),
-					() => roost.IsDead || this.Companion.ActiveRoost != roost);
+					() => roost.IsDead || this.Companion.ActiveRoost != roost,
+					80f);
 				continue;
 			}
 
@@ -314,24 +325,27 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 	/// <param name="target">Entity to fly to (owner or roost mob).</param>
 	/// <param name="onArrival">Called when the hawk reaches the target. Should call the appropriate land method.</param>
 	/// <param name="shouldAbort">Called each tick to check if landing should be aborted.</param>
-	private IEnumerable FlyToAndLand(ICombatEntity target, Action onArrival, Func<bool> shouldAbort)
+	private IEnumerable FlyToAndLand(ICombatEntity target, Action onArrival, Func<bool> shouldAbort, float landDistance = 15f)
 	{
 		if (this.Companion == null || target == null)
 			yield break;
 
 		this.SetRunning(true);
 
-		for (var i = 0; i < 30; i++)
+		var initialDist = this.Entity.Position.Get2DDistance(target.Position);
+		if (initialDist >= landDistance)
+			yield return this.MoveTo(target.Position, wait: false);
+
+		for (var i = 0; i < 60; i++)
 		{
 			if (shouldAbort())
 				yield break;
 
 			var dist = this.Entity.Position.Get2DDistance(target.Position);
-			if (dist < 15f)
+			if (dist < landDistance)
 				break;
 
-			yield return this.MoveTo(target.Position, wait: false);
-			yield return this.Wait(200);
+			yield return this.Wait(100);
 		}
 
 		if (!shouldAbort())
@@ -503,6 +517,9 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 			target = GetOwnerTarget(owner);
 
 		if (target == null || this.EntityGone(target))
+			return;
+
+		if (owner.Position.Get2DDistance(target.Position) > 150f)
 			return;
 
 		// Try skills in priority order — each handler manages its own
@@ -699,7 +716,10 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 		}
 
 		if (needStart)
+		{
+			FalconerHawkHelper.LockHawk(this.Companion);
 			_ = Task.Run(ProcessSkillQueueAsync);
+		}
 	}
 
 	/// <summary>
@@ -738,55 +758,60 @@ public class PcPetHawkAiScript : AiScript, IHawkSkillQueue
 
 	private async Task ProcessSkillQueueAsync()
 	{
-		while (true)
+		try
 		{
-			HawkSkillRequest request;
-			lock (_skillQueueLock)
+			while (true)
 			{
-				if (_skillQueue.Count == 0)
+				HawkSkillRequest request;
+				lock (_skillQueueLock)
 				{
-					_skillProcessorRunning = false;
-					return;
+					if (_skillQueue.Count == 0)
+					{
+						_skillProcessorRunning = false;
+						return;
+					}
+
+					request = _skillQueue.Dequeue();
 				}
 
-				request = _skillQueue.Dequeue();
+				var remaining = HawkSkillGlobalCooldownMs - (DateTime.UtcNow - _lastSkillStartTime).TotalMilliseconds;
+				if (remaining > 0)
+					await Task.Delay((int)remaining);
+
+				if (this.Entity == null || this.Entity.IsDead)
+					continue;
+
+				var cts = new CancellationTokenSource();
+				_currentSkillCts = cts;
+				_lastSkillStartTime = DateTime.UtcNow;
+
+				try
+				{
+					var ctx = new HawkSkillContext(request.Skill, request.Caster, this.Companion, cts.Token);
+					await request.Execute(ctx);
+				}
+				catch (OperationCanceledException)
+				{
+					// External interrupt (stun/freeze/death) — expected.
+				}
+				catch (Exception ex)
+				{
+					Log.Error("PcPetHawkAiScript: hawk skill '{0}' failed: {1}", request.Skill?.Id, ex);
+				}
+				finally
+				{
+					this.Companion?.Vars.Set("Hawk.LastSkillEndTime", DateTime.UtcNow);
+
+					_currentSkillCts = null;
+					try { cts.Dispose(); }
+					catch (ObjectDisposedException) { }
+				}
 			}
-
-			var remaining = HawkSkillGlobalCooldownMs - (DateTime.UtcNow - _lastSkillStartTime).TotalMilliseconds;
-			if (remaining > 0)
-				await Task.Delay((int)remaining);
-
-			if (this.Entity == null || this.Entity.IsDead)
-				continue;
-
-			var cts = new CancellationTokenSource();
-			_currentSkillCts = cts;
-			_lastSkillStartTime = DateTime.UtcNow;
-
-			FalconerHawkHelper.LockHawk(this.Companion);
-
-			try
-			{
-				var ctx = new HawkSkillContext(request.Skill, request.Caster, this.Companion, cts.Token);
-				await request.Execute(ctx);
-			}
-			catch (OperationCanceledException)
-			{
-				// External interrupt (stun/freeze/death) — expected.
-			}
-			catch (Exception ex)
-			{
-				Log.Error("PcPetHawkAiScript: hawk skill '{0}' failed: {1}", request.Skill?.Id, ex);
-			}
-			finally
-			{
-				FalconerHawkHelper.UnlockHawk(this.Companion);
-				this.Companion?.Vars.Set("Hawk.LastSkillEndTime", DateTime.UtcNow);
-
-				_currentSkillCts = null;
-				try { cts.Dispose(); }
-				catch (ObjectDisposedException) { }
-			}
+		}
+		finally
+		{
+			Console.WriteLine("Unlocked");
+			FalconerHawkHelper.UnlockHawk(this.Companion);
 		}
 	}
 

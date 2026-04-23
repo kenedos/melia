@@ -102,6 +102,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 
 			await Dive(ctx, target.Position);
+
+			await ctx.Delay(500);
 		}
 
 		private static async Task Dive(HawkSkillContext ctx, Position targetPos)

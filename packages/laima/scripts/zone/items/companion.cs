@@ -55,15 +55,10 @@ public class CompanionScripts : GeneralScript
 	[ScriptableFunction]
 	public ItemUseResult PET_FOOD_USE(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
-		var companion = character.Companions.ActiveGroundCompanion;
-		if (companion == null)
+		var companions = character.Companions.GetActiveCompanions();
+		if (companions.Count == 0)
 		{
 			character.ServerMessage("You must have an active companion to use this item.");
-			return ItemUseResult.Fail;
-		}
-
-		if (companion.IsDead)
-		{
 			return ItemUseResult.Fail;
 		}
 
@@ -75,7 +70,19 @@ public class CompanionScripts : GeneralScript
 
 		var staminaAmount = (int)numArg1;
 		var foodType = (CompanionFoodType)(int)numArg2;
-		companion.Feed(staminaAmount, foodType, strArg);
+
+		var fed = false;
+		foreach (var companion in companions)
+		{
+			if (companion.IsDead)
+				continue;
+
+			companion.Feed(staminaAmount, foodType, strArg);
+			fed = true;
+		}
+
+		if (!fed)
+			return ItemUseResult.Fail;
 
 		if (item.Data.HasCooldown)
 		{

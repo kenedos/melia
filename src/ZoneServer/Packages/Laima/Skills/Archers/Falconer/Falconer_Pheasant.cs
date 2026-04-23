@@ -159,6 +159,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				return;
 
 			TriggerExplosion(caster, skill, hawk, target.Position);
+
+			await ctx.Delay(1000);
 		}
 
 		private static void TriggerExplosion(ICombatEntity caster, Skill skill, Companion hawk, Position explosionPos)
@@ -178,9 +180,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			var damageDelay = TimeSpan.FromMilliseconds(50);
 			var skillHitDelay = TimeSpan.Zero;
 
-			var hasFalconer12 = caster.TryGetActiveAbilityLevel(AbilityId.Falconer12, out var falconer12Level);
-			var hasFalconer18 = caster.IsAbilityActive(AbilityId.Falconer18);
-
 			foreach (var enemy in enemies)
 			{
 				if (enemy.IsDead)
@@ -192,27 +191,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				var skillHit = new SkillHitInfo(caster, enemy, skill, skillHitResult, damageDelay, skillHitDelay);
 				skillHit.HitEffect = HitEffect.Impact;
 
-				if (enemy.IsKnockdownable())
-				{
-					if (hasFalconer18)
-					{
-						skillHit.KnockBackInfo = new KnockBackInfo(explosionPos, enemy, KnockBackType.KnockDown, 150, 80);
-					}
-					else if (!hasFalconer12)
-					{
-						skillHit.KnockBackInfo = new KnockBackInfo(hawk.Position, enemy, KnockBackType.KnockDown, 150, 80);
-					}
-
-					if (skillHit.KnockBackInfo != null)
-						enemy.ApplyKnockdown(caster, skill, skillHit);
-				}
-
-				if (hasFalconer12)
-				{
-					var stunChance = falconer12Level * 10;
-					if (RandomProvider.Get().Next(100) < stunChance)
-						enemy.StartBuff(BuffId.Stun, skill.Level, 0, TimeSpan.FromSeconds(3), caster);
-				}
+				if (RandomProvider.Get().Next(100) < 50)
+					enemy.StartBuff(BuffId.Stun, skill.Level, 0, TimeSpan.FromSeconds(3), caster);
 
 				hits.Add(skillHit);
 			}

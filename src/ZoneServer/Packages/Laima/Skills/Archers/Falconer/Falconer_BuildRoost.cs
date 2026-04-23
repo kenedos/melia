@@ -71,6 +71,11 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (roost == null)
 				return;
 
+			roost.SetHittable(false);
+			roost.MonsterType = RelationType.Friendly;
+			roost.Faction = FactionType.Law;
+			roost.StartBuff(BuffId.Invincible);
+
 			// Register roost with hawk helper (removes old roost if exists)
 			FalconerHawkHelper.RegisterRoost(caster, roost);
 
