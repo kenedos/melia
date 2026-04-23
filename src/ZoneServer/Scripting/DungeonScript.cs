@@ -707,8 +707,7 @@ namespace Melia.Zone.Scripting
 
 			// Set up this character for the dungeon
 			character.SetPosition(instance.StartPosition);
-			character.Layer = instance.Layer;
-			character.LookAround();
+			character.SetLayer(instance.Layer, silent: true);
 			character.Dungeon.InstanceDungeon = instance;
 
 			// Null-safe connection access for sending packets
@@ -772,8 +771,7 @@ namespace Melia.Zone.Scripting
 			character.Variables.Perm.SetString(ActiveInstanceVarName, this.Id);
 
 			character.SetPosition(instance.StartPosition);
-			character.Layer = instance.Layer;
-			character.LookAround();
+			character.SetLayer(instance.Layer, silent: true);
 			character.Dungeon.InstanceDungeon = instance;
 
 			// Null-safe connection access for sending packets
@@ -1212,19 +1210,9 @@ namespace Melia.Zone.Scripting
 
 			this.OnDungeonComplete(instance);
 
-			// Check if entry count should be incremented on complete and hasn't been already
-			var incrementOnComplete = ZoneServer.Instance.Conf.World.InstancedDungeonIncrementEntryOnComplete;
-			var alreadyIncremented = instance.Vars.GetBool(InstanceDungeon.EntryCountIncrementedVarName);
-
 			foreach (var character in characters)
 			{
 				if (character == null) continue;
-
-				// Increment entry count on complete if configured and not already incremented on enter
-				if (incrementOnComplete && !alreadyIncremented && character.Connection != null)
-				{
-					character.Dungeon.IncreaseEntryCount(instance.DungeonId, 1);
-				}
 
 				// Null-safe connection access
 				if (character.Connection != null)
@@ -1238,12 +1226,6 @@ namespace Melia.Zone.Scripting
 
 				// Give rewards immediately
 				this.GiveDungeonRewards(instance, character);
-			}
-
-			// Mark entry count as incremented to prevent double-increment
-			if (incrementOnComplete && !alreadyIncremented)
-			{
-				instance.Vars.Set(InstanceDungeon.EntryCountIncrementedVarName, true);
 			}
 
 			// Display the results screen

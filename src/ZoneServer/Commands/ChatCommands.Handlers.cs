@@ -1848,14 +1848,21 @@ namespace Melia.Zone.Commands
 		{
 			sender.ServerMessage(Localization.Get("Reloading scripts..."));
 
-			var companionsToRestore = new System.Collections.Generic.Dictionary<Character, System.Collections.Generic.List<Companion>>();
+			var companionsToRestore = new Dictionary<Character, List<Companion>>();
+			var mountsToRestore = new Dictionary<Character, Companion>();
 			var characters = ZoneServer.Instance.World.GetCharacters();
 
 			foreach (var character in characters)
 			{
 				var activeCompanions = character.Companions.GetActiveCompanions();
 				if (activeCompanions.Count > 0)
-					companionsToRestore[character] = new System.Collections.Generic.List<Companion>(activeCompanions);
+					companionsToRestore[character] = new List<Companion>(activeCompanions);
+
+				if (character.IsRiding && character.Companions.ActiveGroundCompanion is Companion mount)
+				{
+					mountsToRestore[character] = mount;
+					character.RemoveBuff(BuffId.RidingCompanion);
+				}
 			}
 
 			KeywordDb.Clear();
@@ -1866,6 +1873,14 @@ namespace Melia.Zone.Commands
 			{
 				foreach (var companion in kvp.Value)
 					companion.SetCompanionState(true);
+			}
+
+			foreach (var kvp in mountsToRestore)
+			{
+				var character = kvp.Key;
+				var mount = kvp.Value;
+				character.StartBuff(BuffId.RidingCompanion, TimeSpan.Zero, mount);
+				Send.ZC_NORMAL.RidePet(character.Connection, character, mount);
 			}
 
 			sender.ServerMessage(Localization.Get("Done."));

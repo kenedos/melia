@@ -27,8 +27,6 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 	private const string STAGE_BOSS1 = "id_startower_mini_boss1";
 	private const string STAGE_LASTBOSS = "id_startower_mini_lastboss";
 	private const string STAGE_READY = "id_startower_mini_ready";
-	private const string STAGE_TIME = "id_startower_mini_time";
-	private const string STAGE_PERCENTUI = "id_startower_mini_percentui";
 
 	protected override void Load()
 	{
@@ -55,31 +53,6 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 		}, null, this, "id_startower_mini_ready", "ready");
 
 		stage.TransitionTo(STAGE_DEFGROUP);
-		return stage;
-	}
-
-	/// <summary>Creates the 'Time' stage.</summary>
-	private DungeonStage CreateTime()
-	{
-		var stage = new ActionStage(async (instance, script) =>
-		{
-			instance.Vars.Set("StageStartTime", DateTime.UtcNow);
-			var stageObjects = new Dictionary<string, IMonster>();
-			await Task.Delay(TimeSpan.FromSeconds(3300));
-
-			script.MGameMessage(instance, "NOTICE_Dm_scroll", "ETC_20151224_020093", 5);
-			await Task.Delay(TimeSpan.FromSeconds(360));
-
-		}, null, this, "id_startower_mini_time", "Time");
-		stage.TransitionTo(STAGE_PERCENTUI); // Inferred transition
-		return stage;
-	}
-
-	/// <summary>Creates the 'PercentUI' stage.</summary>
-	private DungeonStage CreatePercentUI()
-	{
-		var stage = new InitialSetupStage(instance => { }, this, "id_startower_mini_percentui");
-		stage.TransitionTo(StageId.Complete);
 		return stage;
 	}
 
@@ -205,7 +178,7 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 		};
 		var stage = KillMonstersStage.Create(this, "id_startower_mini_defgroup", monsters, successStageId: "TBD", failStageId: StageId.Fail,
 			message: "DefGroup");
-		stage.OnSuccess(STAGE_STAGE2); // Inferred transition
+		stage.OnSuccess(STAGE_BOSS1);
 		return stage;
 	}
 
@@ -391,7 +364,7 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 		};
 		var stage = KillMonstersStage.Create(this, "id_startower_mini_stage3", monsters, successStageId: "TBD", failStageId: StageId.Fail,
 			message: "Stage3");
-		stage.OnSuccess(STAGE_BOSS1); // Inferred transition
+		stage.OnSuccess(STAGE_LASTBOSS);
 		return stage;
 	}
 
@@ -399,8 +372,8 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 	private DungeonStage CreateBoss1()
 	{
 		var stage = BossStage.Create(this, "id_startower_mini_boss1", MonsterId.ID_Boss_Mineloader, new Position(1743.01f, -95.36f, 1203.65f), successStageId: "TBD", failStageId: StageId.Fail,
-			allowEscape: false, supports: null, message: "A boss monster has appeared!");
-		stage.OnSuccess(STAGE_LASTBOSS); // Inferred transition
+			allowEscape: false, supports: null, message: "Mineloader has appeared!");
+		stage.OnSuccess(STAGE_STAGE2);
 		return stage;
 	}
 
@@ -408,7 +381,7 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 	private DungeonStage CreateLastboss()
 	{
 		var stage = BossStage.Create(this, "id_startower_mini_lastboss", MonsterId.ID_Boss_Harpeia_Orange, new Position(-1862.33f, -13.60f, 637.97f), successStageId: "TBD", failStageId: StageId.Fail,
-			allowEscape: false, supports: null, message: "Elaganos has appeared!");
+			allowEscape: false, supports: null, message: "Harpeia has appeared!");
 		stage.OnSuccess(STAGE_END, instance =>
 		{
 			this.MGameMessage(instance, "NOTICE_Dm_scroll", "Stage complete!", 3);
@@ -442,8 +415,6 @@ public class FallenLegwynFamilyDungeon2018 : DungeonScript
 			this.CreateBoss1(),
 			this.CreateLastboss(),
 			this.CreateEnd(),
-			//CreateTime(),
-			//CreatePercentUI(),
 		};
 
 		return stages;

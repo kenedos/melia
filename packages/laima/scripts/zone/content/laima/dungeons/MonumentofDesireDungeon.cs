@@ -28,8 +28,6 @@ public class MonumentofDesireDungeon : DungeonScript
 	private const string STAGE_LASTBOSS = "indun_remains3_lastboss";
 	private const string STAGE_END = "indun_remains3_end";
 	private const string STAGE_DOOR = "indun_remains3_door";
-	private const string STAGE_TIME = "indun_remains3_time";
-	private const string STAGE_PERCENTUI = "indun_remains3_percentui";
 
 	protected override void Load()
 	{
@@ -302,48 +300,6 @@ public class MonumentofDesireDungeon : DungeonScript
 		return stage;
 	}
 
-	/// <summary>Creates the 'DOOR' stage.</summary>
-	private DungeonStage CreateDOOR()
-	{
-		var stage = new ActionStage(
-			async (instance, script) =>
-			{
-				instance.Vars.Set("StageStartTime", DateTime.UtcNow);
-				// Spawn stage-specific NPCs and objects
-				var npc1 = script.SpawnMonsterWithProperties(instance, MonsterId.Thorn_Gateway_6_2, new Position(378.00f, -0.99f, -116.00f), "OBB#YES#OBBSize#100;100;200#Name#관문");
-				var npc2 = script.SpawnNpc(instance, MonsterId.HiddenWall_100_200_500, "", new Position(359.00f, -0.99f, -214.00f), Direction.South);
-				await Task.CompletedTask;
-			}, new List<QuestObjective>
-			{
-			}, this, "indun_remains3_door", "DOOR");
-		stage.OnSuccess(STAGE_TIME);
-		return stage;
-	}
-
-	/// <summary>Creates the 'Time' stage.</summary>
-	private DungeonStage CreateTime()
-	{
-		var stage = new ActionStage(async (instance, script) =>
-		{
-			instance.Vars.Set("StageStartTime", DateTime.UtcNow);
-			var stageObjects = new Dictionary<string, IMonster>();
-			await Task.Delay(TimeSpan.FromSeconds(3300));
-			script.MGameMessage(instance, "NOTICE_Dm_scroll", "5 minutes are left until the dungeon ends!!", 5);
-			await Task.Delay(TimeSpan.FromSeconds(300));
-			await Task.Delay(TimeSpan.FromSeconds(10));
-		}, null, this, "indun_remains3_time", "Time");
-		stage.TransitionTo(STAGE_PERCENTUI);
-		return stage;
-	}
-
-	/// <summary>Creates the 'PercentUI' stage.</summary>
-	private DungeonStage CreatePercentUI()
-	{
-		var stage = new InitialSetupStage(instance => { }, this, "indun_remains3_percentui");
-		stage.TransitionTo(StageId.Complete);
-		return stage;
-	}
-
 	protected override List<DungeonStage> GetDungeonStages()
 	{
 		var stages = new List<DungeonStage>
@@ -355,9 +311,6 @@ public class MonumentofDesireDungeon : DungeonScript
 			this.CreateLASTBOSS(),
 			//CreateBOSS(),
 			//CreateEND(),
-			//CreateDOOR(),
-			//CreateTime(),
-			//CreatePercentUI(),
 		};
 
 		return stages;

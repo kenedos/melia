@@ -26,8 +26,6 @@ public class UndergroundChapelDungeon : DungeonScript
 	private const string STAGE_STAGE3 = "id_chaple_mini_stage3";
 	private const string STAGE_BOSS = "id_chaple_mini_boss";
 	private const string STAGE_END = "id_chaple_mini_end";
-	private const string STAGE_TIME = "id_chaple_mini_time";
-	private const string STAGE_PERCENTUI = "id_chaple_mini_percentui";
 	private const string STAGE_CHECKALLDEAD = "id_chaple_mini_checkalldead";
 
 	protected override void Load()
@@ -366,31 +364,6 @@ public class UndergroundChapelDungeon : DungeonScript
 			var stageObjects = new Dictionary<string, IMonster>();
 			await Task.Delay(TimeSpan.FromSeconds(60));
 		}, null, this, "id_chaple_mini_end", "You will return to the entrance in 60 seconds");
-		stage.TransitionTo(STAGE_TIME);
-		return stage;
-	}
-
-	/// <summary>Creates the 'Time' stage.</summary>
-	private DungeonStage CreateTime()
-	{
-		var stage = new ActionStage(async (instance, script) =>
-		{
-			instance.Vars.Set("StageStartTime", DateTime.UtcNow);
-			var stageObjects = new Dictionary<string, IMonster>();
-			await Task.Delay(TimeSpan.FromSeconds(3300));
-			script.MGameMessage(instance, "NOTICE_Dm_scroll", "5 minutes are left until the time limit!!", 5);
-			await Task.Delay(TimeSpan.FromSeconds(300));
-			await Task.Delay(TimeSpan.FromSeconds(60));
-		}, null, this, "id_chaple_mini_time", "Time");
-		stage.TransitionTo(STAGE_PERCENTUI);
-		return stage;
-	}
-
-	/// <summary>Creates the 'PercentUI' stage.</summary>
-	private DungeonStage CreatePercentUI()
-	{
-		var stage = new InitialSetupStage(instance => { }, this, "id_chaple_mini_percentui");
-		stage.TransitionTo(StageId.Complete);
 		return stage;
 	}
 
@@ -404,8 +377,6 @@ public class UndergroundChapelDungeon : DungeonScript
 			this.CreateStage3(),
 			this.CreateBoss(),
 			this.CreateEnd(),
-			//CreateTime(),
-			//CreatePercentUI(),
 		};
 
 		return stages;

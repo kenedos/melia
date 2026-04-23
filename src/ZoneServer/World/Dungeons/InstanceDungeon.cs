@@ -480,8 +480,7 @@ namespace Melia.Zone.World.Dungeons
 
 				character.SetPosition(this.StartPosition);
 				Send.ZC_SET_POS(character);
-				character.Layer = this.Layer;
-				character.LookAround();
+				character.SetLayer(this.Layer, silent: true);
 				character.Dungeon.InstanceDungeon = this;
 
 				if (character.Connection != null)

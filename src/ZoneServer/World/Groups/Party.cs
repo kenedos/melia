@@ -727,17 +727,8 @@ namespace Melia.Zone.World
 		public int StartLayer()
 		{
 			var layer = this.GetLeader()?.Map.GetNewLayer() ?? 0;
-			var members = this.GetPartyMembers();
-			foreach (var member in members)
-			{
-				member.Layer = layer;
-			}
-
-			foreach (var member in members)
-			{
-				Send.ZC_SET_LAYER(member, layer, true);
-				member.LookAround();
-			}
+			foreach (var member in this.GetPartyMembers())
+				member.SetLayer(layer);
 
 			return layer;
 		}

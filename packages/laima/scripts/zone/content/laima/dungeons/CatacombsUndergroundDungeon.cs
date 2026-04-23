@@ -27,8 +27,6 @@ public class CatacombsUndergroundDungeon : DungeonScript
 	private const string STAGE_STAGE2 = "id_catacom_mini_stage2";
 	private const string STAGE_TRAP = "id_catacom_mini_trap";
 	private const string STAGE_트랩조건 = "id_catacom_mini_";
-	private const string STAGE_TIME = "id_catacom_mini_time";
-	private const string STAGE_PERCENTUI = "id_catacom_mini_percentui";
 	private const string STAGE_CHECKALLDEAD = "id_catacom_mini_checkalldead";
 
 	protected override void Load()
@@ -328,29 +326,6 @@ public class CatacombsUndergroundDungeon : DungeonScript
 		return stage;
 	}
 
-	/// <summary>Creates the 'Time' stage.</summary>
-	private DungeonStage CreateTime()
-	{
-		var stage = new ActionStage(async (instance, script) =>
-		{
-			instance.Vars.Set("StageStartTime", DateTime.UtcNow);
-			var stageObjects = new Dictionary<string, IMonster>();
-			await Task.Delay(TimeSpan.FromSeconds(3300));
-			await Task.Delay(TimeSpan.FromSeconds(300));
-			await Task.Delay(TimeSpan.FromSeconds(60));
-		}, null, this, "id_catacom_mini_time", "Time");
-		stage.TransitionTo(STAGE_PERCENTUI);
-		return stage;
-	}
-
-	/// <summary>Creates the 'PercentUI' stage.</summary>
-	private DungeonStage CreatePercentUI()
-	{
-		var stage = new InitialSetupStage(instance => { }, this, "id_catacom_mini_percentui");
-		stage.TransitionTo(StageId.Complete);
-		return stage;
-	}
-
 	protected override List<DungeonStage> GetDungeonStages()
 	{
 		var stages = new List<DungeonStage>
@@ -362,8 +337,6 @@ public class CatacombsUndergroundDungeon : DungeonScript
 			this.Create트랩조건(),
 			this.CreateBoss(),
 			this.CreateEnd(),
-			//CreateTime(),
-			//CreatePercentUI(),
 		};
 
 		return stages;

@@ -269,11 +269,45 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <param name="silent">If true, does not send the layer change packet to the client.</param>
 		public int StartLayer(bool silent = false)
 		{
-			this.Layer = this.Map.GetNewLayer();
-			if (!silent)
-				Send.ZC_SET_LAYER(this, this.Layer, true);
-			this.LookAround();
+			this.SetLayer(this.Map.GetNewLayer(), silent);
 			return this.Layer;
+		}
+
+		/// <summary>
+		/// Moves the character onto the given layer and drags any
+		/// active companions and summons along so they don't fall out
+		/// of visibility range of the new position.
+		/// </summary>
+		/// <param name="layer">Target layer.</param>
+		/// <param name="silent">If true, does not send the layer change packet to the client.</param>
+		/// <param name="enabled">Value for the enabled flag on the layer change packet (ignored when silent).</param>
+		public void SetLayer(int layer, bool silent = false, bool enabled = true)
+		{
+			this.Layer = layer;
+
+			if (!silent)
+				Send.ZC_SET_LAYER(this, this.Layer, enabled);
+
+			foreach (var companion in this.Companions.GetActiveCompanions())
+			{
+				companion.Layer = this.Layer;
+
+				if (!this.Map.Ground.TryGetNearestValidPosition(this.Position.GetRandomInRange2D(15), out var pos))
+					pos = this.Position;
+
+				companion.Position = pos;
+				companion.SpawnPosition = pos;
+				Send.ZC_SET_POS(companion);
+			}
+
+			foreach (var summon in this.Summons.GetSummons())
+			{
+				summon.Layer = this.Layer;
+				summon.Position = this.Position;
+				Send.ZC_SET_POS(summon);
+			}
+
+			this.LookAround();
 		}
 
 		/// <summary>
@@ -281,8 +315,7 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void StopLayer()
 		{
-			this.Layer = 0;
-			Send.ZC_SET_LAYER(this, this.Layer, false);
+			this.SetLayer(0, enabled: false);
 		}
 
 		/// <summary>
