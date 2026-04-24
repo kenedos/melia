@@ -21,6 +21,7 @@ using Melia.Zone.World.Maps.Pathfinding;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Maps.Spatial;
 using Melia.Zone.World.Spawning;
+using Yggdrasil.Collections;
 using Yggdrasil.Geometry;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
@@ -704,7 +705,7 @@ namespace Melia.Zone.World.Maps
 			var itemMergeRange = 30f;
 			var itemMergeThreshold = 5;
 
-			var nearbyItems = new List<ItemMonster>();
+			using var nearbyItems = new PooledListSnapshot<ItemMonster>();
 
 			lock (_monsters)
 			{
@@ -1208,7 +1209,7 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public Pad[] GetPadsAt(Position pos, float range)
 		{
-			var result = new List<Pad>();
+			using var result = new PooledListSnapshot<Pad>();
 			lock (_pads)
 			{
 				foreach (var pad in _pads.Values)
@@ -1246,7 +1247,7 @@ namespace Melia.Zone.World.Maps
 			if (!entity.IsHitByPad())
 				return Array.Empty<Pad>();
 
-			var result = new List<Pad>();
+			using var result = new PooledListSnapshot<Pad>();
 			lock (_pads)
 			{
 				foreach (var pad in _pads.Values)
@@ -1327,7 +1328,7 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public ITriggerableArea[] GetTriggerableAreasAt(Position pos)
 		{
-			var result = new List<ITriggerableArea>();
+			using var result = new PooledListSnapshot<ITriggerableArea>();
 			lock (_triggerableAreas)
 			{
 				foreach (var area in _triggerableAreas.Values)
@@ -1467,6 +1468,19 @@ namespace Melia.Zone.World.Maps
 		/// <returns></returns>
 		public List<ICombatEntity> GetAttackableEnemiesIn(ICombatEntity attacker, IShapeF shape, int maxTargets = 0, SkillHitType? hitType = null)
 		{
+			var result = new List<ICombatEntity>();
+			this.GetAttackableEnemiesIn(attacker, shape, maxTargets, result, hitType);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the provided buffer with all enemies that can be attacked
+		/// inside the given shape, avoiding a return-list allocation.
+		/// </summary>
+		public void GetAttackableEnemiesIn(ICombatEntity attacker, IShapeF shape, int maxTargets, List<ICombatEntity> result, SkillHitType? hitType = null)
+		{
+			result.Clear();
+
 			if (attacker is Character rangePreviewCharacter && rangePreviewCharacter.Variables.Temp.GetBool("Melia.RangePreview"))
 				Debug.ShowShape(this, shape, TimeSpan.FromSeconds(1));
 
@@ -1486,7 +1500,6 @@ namespace Melia.Zone.World.Maps
 				}
 			}
 
-			var result = new List<ICombatEntity>();
 			foreach (var e in queryBuffer)
 			{
 				if (!attacker.CanDamage(e))
@@ -1501,7 +1514,6 @@ namespace Melia.Zone.World.Maps
 			result.Sort((a, b) => attacker.GetDistance(a).CompareTo(attacker.GetDistance(b)));
 			if (maxTargets > 0 && result.Count > maxTargets)
 				result.RemoveRange(maxTargets, result.Count - maxTargets);
-			return result;
 		}
 
 		/// <summary>
@@ -1510,6 +1522,19 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public List<ICombatEntity> GetAttackableEnemiesIn(ICombatEntity attacker, IShapeF shape, int maxTargets, ICombatEntity exclude1, SkillHitType? hitType = null)
 		{
+			var result = new List<ICombatEntity>();
+			this.GetAttackableEnemiesIn(attacker, shape, maxTargets, exclude1, result, hitType);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the provided buffer with all enemies that can be attacked
+		/// inside the given shape, excluding the specified entity.
+		/// </summary>
+		public void GetAttackableEnemiesIn(ICombatEntity attacker, IShapeF shape, int maxTargets, ICombatEntity exclude1, List<ICombatEntity> result, SkillHitType? hitType = null)
+		{
+			result.Clear();
+
 			if (attacker is Character rangePreviewCharacter && rangePreviewCharacter.Variables.Temp.GetBool("Melia.RangePreview"))
 				Debug.ShowShape(this, shape, TimeSpan.FromSeconds(1));
 
@@ -1529,7 +1554,6 @@ namespace Melia.Zone.World.Maps
 				}
 			}
 
-			var result = new List<ICombatEntity>();
 			foreach (var e in queryBuffer)
 			{
 				if (e == exclude1)
@@ -1546,7 +1570,6 @@ namespace Melia.Zone.World.Maps
 			result.Sort((a, b) => attacker.GetDistance(a).CompareTo(attacker.GetDistance(b)));
 			if (maxTargets > 0 && result.Count > maxTargets)
 				result.RemoveRange(maxTargets, result.Count - maxTargets);
-			return result;
 		}
 
 		/// <summary>
@@ -1561,6 +1584,20 @@ namespace Melia.Zone.World.Maps
 		/// <returns></returns>
 		public List<ICombatEntity> GetAliveAlliedEntitiesIn(ICombatEntity ally, IShapeF shape, int maxTargets = 0)
 		{
+			var result = new List<ICombatEntity>();
+			this.GetAliveAlliedEntitiesIn(ally, shape, maxTargets, result);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the provided buffer with all alive allies (friendly, party
+		/// or guild relations) in the given shape, avoiding a return-list
+		/// allocation. Ordered by distance.
+		/// </summary>
+		public void GetAliveAlliedEntitiesIn(ICombatEntity ally, IShapeF shape, int maxTargets, List<ICombatEntity> result)
+		{
+			result.Clear();
+
 			var queryBuffer = _spatialShapeQueryBuffer ??= new List<ICombatEntity>();
 			queryBuffer.Clear();
 
@@ -1577,7 +1614,6 @@ namespace Melia.Zone.World.Maps
 				}
 			}
 
-			var result = new List<ICombatEntity>();
 			foreach (var entity in queryBuffer)
 			{
 				if (!entity.IsAlly(ally) || entity == ally || entity.IsDead)
@@ -1590,7 +1626,6 @@ namespace Melia.Zone.World.Maps
 			result.Sort((a, b) => ally.GetDistance(a).CompareTo(ally.GetDistance(b)));
 			if (maxTargets > 0 && result.Count > maxTargets)
 				result.RemoveRange(maxTargets, result.Count - maxTargets);
-			return result;
 		}
 
 		/// <summary>
@@ -1605,6 +1640,20 @@ namespace Melia.Zone.World.Maps
 		/// <returns></returns>
 		public List<ICombatEntity> GetDeadAlliedEntitiesIn(ICombatEntity ally, IShapeF shape, int maxTargets = 0)
 		{
+			var result = new List<ICombatEntity>();
+			this.GetDeadAlliedEntitiesIn(ally, shape, maxTargets, result);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the provided buffer with all dead allies (friendly, party
+		/// or guild relations) in the given shape, avoiding a return-list
+		/// allocation. Ordered by distance.
+		/// </summary>
+		public void GetDeadAlliedEntitiesIn(ICombatEntity ally, IShapeF shape, int maxTargets, List<ICombatEntity> result)
+		{
+			result.Clear();
+
 			var queryBuffer = _spatialShapeQueryBuffer ??= new List<ICombatEntity>();
 			queryBuffer.Clear();
 
@@ -1621,7 +1670,6 @@ namespace Melia.Zone.World.Maps
 				}
 			}
 
-			var result = new List<ICombatEntity>();
 			foreach (var entity in queryBuffer)
 			{
 				if (!entity.IsDeadAlly(ally) || entity == ally)
@@ -1634,7 +1682,6 @@ namespace Melia.Zone.World.Maps
 			result.Sort((a, b) => ally.GetDistance(a).CompareTo(ally.GetDistance(b)));
 			if (maxTargets > 0 && result.Count > maxTargets)
 				result.RemoveRange(maxTargets, result.Count - maxTargets);
-			return result;
 		}
 
 		/// <summary>
@@ -2288,10 +2335,21 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public List<Character> GetPartyMembersInRange(Character character, Position position, float radius, bool areAlive = true)
 		{
-			if (character.Connection.Party == null) return new List<Character>();
+			var result = new List<Character>();
+			this.GetPartyMembersInRange(character, position, radius, areAlive, result);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the buffer with all alive (or dead) party members of the
+		/// character within the given radius of a specific position.
+		/// </summary>
+		public void GetPartyMembersInRange(Character character, Position position, float radius, bool areAlive, List<Character> result)
+		{
+			result.Clear();
+			if (character.Connection.Party == null) return;
 
 			var party = character.Connection.Party;
-			var result = new List<Character>();
 			lock (_characters)
 			{
 				foreach (var mapChar in _characters.Values)
@@ -2305,7 +2363,6 @@ namespace Melia.Zone.World.Maps
 					result.Add(mapChar);
 				}
 			}
-			return result;
 		}
 
 		/// <summary>
@@ -2314,10 +2371,21 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public List<Character> GetPartyMembers(Character character)
 		{
-			if (character.Connection.Party == null) return new List<Character>();
+			var result = new List<Character>();
+			this.GetPartyMembers(character, result);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the buffer with all party members of the character that
+		/// are on this map, regardless of distance or alive status.
+		/// </summary>
+		public void GetPartyMembers(Character character, List<Character> result)
+		{
+			result.Clear();
+			if (character.Connection.Party == null) return;
 
 			var party = character.Connection.Party;
-			var result = new List<Character>();
 			lock (_characters)
 			{
 				foreach (var a in _characters.Values)
@@ -2326,7 +2394,6 @@ namespace Melia.Zone.World.Maps
 						result.Add(a);
 				}
 			}
-			return result;
 		}
 
 		/// <summary>
@@ -2335,6 +2402,19 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public List<ICombatEntity> GetAttackableEntities(ICombatEntity attacker, float radius = 0, int maxResult = 0)
 		{
+			var result = new List<ICombatEntity>();
+			this.GetAttackableEntities(attacker, radius, maxResult, result);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the buffer with all entities that the attacker can attack,
+		/// optionally within the given radius and limited to a maximum count.
+		/// </summary>
+		public void GetAttackableEntities(ICombatEntity attacker, float radius, int maxResult, List<ICombatEntity> result)
+		{
+			result.Clear();
+
 			IEnumerable<ICombatEntity> candidates;
 
 			if (_spatialIndex != null && radius > 0)
@@ -2350,7 +2430,6 @@ namespace Melia.Zone.World.Maps
 					candidates = _combatEntities.Values.ToList();
 			}
 
-			var result = new List<ICombatEntity>();
 			foreach (var entity in candidates)
 			{
 				if (radius > 0 && !entity.Position.InRange2D(attacker.Position, radius + entity.AgentRadius))
@@ -2363,7 +2442,6 @@ namespace Melia.Zone.World.Maps
 			result.Sort((a, b) => a.Position.Get2DDistance(attacker.Position).CompareTo(b.Position.Get2DDistance(attacker.Position)));
 			if (maxResult > 0 && result.Count > maxResult)
 				result.RemoveRange(maxResult, result.Count - maxResult);
-			return result;
 		}
 
 		/// <summary>
@@ -2411,6 +2489,19 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public List<ICombatEntity> GetAttackableEntitiesInRangeAroundEntity(ICombatEntity attacker, ICombatEntity entity, float radius, int maxResult = 0)
 		{
+			var result = new List<ICombatEntity>();
+			this.GetAttackableEntitiesInRangeAroundEntity(attacker, entity, radius, maxResult, result);
+			return result;
+		}
+
+		/// <summary>
+		/// Fills the buffer with all attackable entities within range of a
+		/// specific entity, excluding that entity itself.
+		/// </summary>
+		public void GetAttackableEntitiesInRangeAroundEntity(ICombatEntity attacker, ICombatEntity entity, float radius, int maxResult, List<ICombatEntity> result)
+		{
+			result.Clear();
+
 			IEnumerable<ICombatEntity> candidates;
 
 			if (_spatialIndex != null)
@@ -2426,7 +2517,6 @@ namespace Melia.Zone.World.Maps
 					candidates = _combatEntities.Values.ToList();
 			}
 
-			var result = new List<ICombatEntity>();
 			foreach (var a in candidates)
 			{
 				if (entity.Handle == a.Handle)
@@ -2441,7 +2531,6 @@ namespace Melia.Zone.World.Maps
 			result.Sort((a, b) => a.Position.Get2DDistance(entity.Position).CompareTo(b.Position.Get2DDistance(entity.Position)));
 			if (maxResult > 0 && result.Count > maxResult)
 				result.RemoveRange(maxResult, result.Count - maxResult);
-			return result;
 		}
 		#endregion
 

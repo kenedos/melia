@@ -489,6 +489,67 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
+			/// Broadcasts a character look update looked up by item class name
+			/// (e.g. "EP14_costume_Com_004_af"). Pass null or empty to revert
+			/// the slot to no appearance.
+			/// </summary>
+			/// <param name="actor"></param>
+			/// <param name="itemClassName"></param>
+			/// <param name="slot"></param>
+			/// <param name="pcInfoPartsNode2"></param>
+			/// <param name="i1"></param>
+			public static void UpdateCharacterLook(IActor actor, string itemClassName, EquipSlot slot, int pcInfoPartsNode2 = 0, int i1 = 0)
+			{
+				if (!TryResolveLookItemId(itemClassName, out var itemId))
+					return;
+
+				UpdateCharacterLook(actor, itemId, slot, pcInfoPartsNode2, i1);
+			}
+
+			/// <summary>
+			/// Sends a character look update to a single connection, looked up
+			/// by item class name. See the broadcast overload for semantics.
+			/// </summary>
+			/// <param name="conn"></param>
+			/// <param name="actor"></param>
+			/// <param name="itemClassName"></param>
+			/// <param name="slot"></param>
+			/// <param name="pcInfoPartsNode2"></param>
+			/// <param name="i1"></param>
+			public static void UpdateCharacterLook(IZoneConnection conn, IActor actor, string itemClassName, EquipSlot slot, int pcInfoPartsNode2 = 0, int i1 = 0)
+			{
+				if (!TryResolveLookItemId(itemClassName, out var itemId))
+					return;
+
+				UpdateCharacterLook(conn, actor, itemId, slot, pcInfoPartsNode2, i1);
+			}
+
+			/// <summary>
+			/// Resolves an item class name to its item id for the UpdateCharacterLook
+			/// overloads. Empty/null resolves to 0 (revert appearance); unknown
+			/// names are logged and return false to skip the send.
+			/// </summary>
+			private static bool TryResolveLookItemId(string itemClassName, out int itemId)
+			{
+				if (string.IsNullOrEmpty(itemClassName))
+				{
+					itemId = 0;
+					return true;
+				}
+
+				var data = ZoneServer.Instance.Data.ItemDb.FindByClass(itemClassName);
+				if (data == null)
+				{
+					Log.Warning("UpdateCharacterLook: item class '{0}' not found.", itemClassName);
+					itemId = 0;
+					return false;
+				}
+
+				itemId = data.Id;
+				return true;
+			}
+
+			/// <summary>
 			/// Sends character look update to a specific connection.
 			/// Used for pocket wigs, hair costumes, etc.
 			/// </summary>

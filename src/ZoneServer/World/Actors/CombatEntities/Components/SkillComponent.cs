@@ -53,9 +53,47 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				return false;
 
 			if (this.Entity is Character character)
+			{
 				Send.ZC_SKILL_REMOVE(character, skillId);
+				RemoveFromQuickSlots(character, skillId);
+			}
 
 			return true;
+		}
+
+		/// <summary>
+		/// Scrubs any saved quickslot entries that reference the given skill
+		/// id, so a skill removed server-side (e.g. an item-granted costume
+		/// transform skill on unequip) doesn't linger as a ghost entry the
+		/// next time the client requests the saved hotkeys.
+		/// </summary>
+		private static void RemoveFromQuickSlots(Character character, SkillId skillId)
+		{
+			var serialized = character.Variables.Perm.Get<string>("Melia.QuickSlotList", null);
+			if (string.IsNullOrEmpty(serialized))
+				return;
+
+			var skillToken = "," + (int)skillId + ",";
+			var skillPrefix = QuickSlotType.Skill.ToString();
+			var entries = serialized.Split(new[] { '#' }, StringSplitOptions.RemoveEmptyEntries);
+			var changed = false;
+
+			for (var i = 0; i < entries.Length; i++)
+			{
+				var entry = entries[i];
+				if (entry.StartsWith(skillPrefix + ",", StringComparison.Ordinal)
+					&& entry.Contains(skillToken, StringComparison.Ordinal))
+				{
+					entries[i] = "None,0,0";
+					changed = true;
+				}
+			}
+
+			if (!changed)
+				return;
+
+			character.Variables.Perm.SetString("Melia.QuickSlotList", "#" + string.Join("#", entries) + "#");
+			Send.ZC_QUICK_SLOT_LIST(character);
 		}
 
 		/// <summary>
