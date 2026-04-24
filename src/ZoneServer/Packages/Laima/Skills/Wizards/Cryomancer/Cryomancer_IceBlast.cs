@@ -65,7 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 			var targetList = SkillSelectEnemiesInCircle(caster, caster.Position, 250);
 			foreach (var currentTarget in targetList)
 			{
-				if (!currentTarget.TryGetBuff(BuffId.Cryomancer_Freeze, out var freezeBuff))
+				if (!currentTarget.IsBuffActiveByKeyword(BuffTag.Freeze))
 					continue;
 
 				var multihitCount = 4;
@@ -96,7 +96,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 			var targetList = SkillSelectEnemiesInCircle(caster, caster.Position, 250);
 			foreach (var currentTarget in targetList)
 			{
-				if (!currentTarget.TryGetBuff(BuffId.Cryomancer_Freeze, out var freezeBuff))
+				if (!currentTarget.IsBuffActiveByKeyword(BuffTag.Freeze))
 					continue;
 
 				// Don't stack same debuff
