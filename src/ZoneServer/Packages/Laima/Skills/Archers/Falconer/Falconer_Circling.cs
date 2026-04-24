@@ -19,22 +19,17 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 {
 	/// <summary>
 	/// Handler for the Falconer skill Circling.
-	/// Toggle skill that commands the hawk to circle an area, revealing hidden
-	/// enemies and reducing their size rating for increased multi-hit damage.
+	/// Toggle skill: hawk circles an area, revealing hidden enemies and
+	/// boosting allies' AoE Attack Ratio while draining SP per second.
 	/// </summary>
-	/// <remarks>
-	/// - Applies Circling_Buff to the hawk (visual effect)
-	/// - Creates a pad that follows the hawk
-	/// - Pad applies CirclingIncreaseSR_Buff to allies who enter
-	/// - Falconer11 ability increases the duration
-	/// - Casting again cancels the skill
-	/// </remarks>
 	[Package("laima")]
 	[SkillHandler(SkillId.Falconer_Circling)]
 	public class Falconer_CirclingOverride : IGroundSkillHandler
 	{
-		private const int BaseBuffDurationMs = 10000;
 		private const string CirclingPadVariable = "Falconer.Circling.PadHandle";
+		private const float BaseSpPerSecond = 18f;
+		private const float SpPerSecondPerLevel = 1.5f;
+		private const float MinSpPerSecond = 1f;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -48,7 +43,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			var targetHandle = target?.Handle ?? 0;
 
-			// Toggle off: cancel circling
+			// Toggle off: cancel circling (no SP check — caster must always be able to disable)
 			if (skill.Vars.GetBool("Melia.Skill.Toggled"))
 			{
 				skill.Vars.SetBool("Melia.Skill.Toggled", false);
@@ -59,19 +54,29 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 				Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-				caster.StopBuff(BuffId.CirclingIncreaseSR_Buff);
-				hawk.StopBuff(BuffId.UC_Detected_Debuff);
+				this.StripAllyBuffs(caster);
 				this.CleanupCirclingPad(caster);
 				FalconerHawkHelper.StopCircling(caster, hawk);
 				return;
 			}
 
-			// Toggle on: activate circling
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
 				return;
 			}
+
+			if (caster.IsAbilityActive(AbilityId.Falconer11))
+			{
+				var extraSp = skill.Properties.GetFloat(PropertyName.SpendSP);
+				if (!caster.TrySpendSp(extraSp))
+				{
+					caster.ServerMessage(Localization.Get("Not enough SP."));
+					return;
+				}
+			}
+
+			// Toggle on: activate circling
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
@@ -83,27 +88,13 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			// Calculate buff duration - Falconer11 increases duration
-			var buffDurationMs = BaseBuffDurationMs;
-			if (caster.TryGetActiveAbilityLevel(AbilityId.Falconer11, out var abilLevel))
-				buffDurationMs += abilLevel * 1000;
-
-			var buffDuration = TimeSpan.FromMilliseconds(buffDurationMs);
-
-			// Self-buff on player
-			caster.StartBuff(BuffId.CirclingIncreaseSR_Buff, skill.Level, 0f, buffDuration, caster);
-
-			// UC_Detected_Debuff on hawk (visual state)
-			hawk.StartBuff(BuffId.UC_Detected_Debuff, skill.Level, 0f, buffDuration, caster);
-
-			skill.Run(this.HandleCirclingActive(skill, caster, hawk, buffDuration));
+			skill.Run(this.HandleCirclingActive(skill, caster, hawk));
 		}
 
-		private async Task HandleCirclingActive(Skill skill, ICombatEntity caster, World.Actors.Monsters.Companion hawk, TimeSpan duration)
+		private async Task HandleCirclingActive(Skill skill, ICombatEntity caster, World.Actors.Monsters.Companion hawk)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(200));
+			await skill.Wait(TimeSpan.FromMilliseconds(1200));
 
-			// Take off if perched
 			if (hawk.IsLandedOnShoulder)
 				hawk.TakeOff();
 			else if (hawk.IsOnRoost)
@@ -111,14 +102,18 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 
-			// Create circling pad at hawk's position with hawk as creator
-			// so the client renders the pad at the hawk, not the player
 			var pad = SkillCreatePad(hawk, skill, hawk.Position, 0f, PadName.Falconer_Circling);
 			if (pad == null)
+			{
+				skill.Vars.SetBool("Melia.Skill.Toggled", false);
+				if (caster is Character toggleFailChar)
+					Send.ZC_NORMAL.SkillToggle(toggleFailChar, SkillId.None);
+				FalconerHawkHelper.StopCircling(caster, hawk);
 				return;
+			}
 
 			pad.FollowsTarget(hawk);
-			pad.Trigger.LifeTime = duration;
+			pad.Trigger.LifeTime = TimeSpan.FromMinutes(5);
 
 			caster.SetTempVar(CirclingPadVariable, pad.Handle);
 			hawk.Vars.Set("Hawk.Circling.PadId", pad.Handle);
@@ -127,11 +122,15 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 
 			FalconerHawkHelper.ExecuteCircling(caster, hawk, skill, hawk.Position);
 
-			// Monitor circling state
-			var endTime = DateTime.Now.Add(duration);
+			var spPerSecond = Math.Max(MinSpPerSecond, BaseSpPerSecond - SpPerSecondPerLevel * skill.Level);
+			if (caster.IsAbilityActive(AbilityId.Falconer11))
+				spPerSecond *= 2f;
 
-			while (DateTime.Now < endTime)
+			const int MaxTicks = 300;
+			for (var tick = 0; tick < MaxTicks; tick++)
 			{
+				await skill.Wait(TimeSpan.FromMilliseconds(1000));
+
 				if (!skill.Vars.GetBool("Melia.Skill.Toggled"))
 					break;
 
@@ -141,18 +140,34 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				if (pad.IsDead)
 					break;
 
-				await skill.Wait(TimeSpan.FromMilliseconds(1000));
+				if (!caster.TrySpendSp(spPerSecond))
+					break;
 			}
 
-			// Auto-cleanup when duration expires
 			skill.Vars.SetBool("Melia.Skill.Toggled", false);
 			if (caster is Character character)
 				Send.ZC_NORMAL.SkillToggle(character, SkillId.None);
 
-			caster.StopBuff(BuffId.CirclingIncreaseSR_Buff);
-			hawk.StopBuff(BuffId.UC_Detected_Debuff);
+			this.StripAllyBuffs(caster);
 			this.CleanupCirclingPad(caster);
 			FalconerHawkHelper.StopCircling(caster, hawk);
+		}
+
+		private void StripAllyBuffs(ICombatEntity caster)
+		{
+			caster.StopBuff(BuffId.CirclingIncreaseSR_Buff);
+
+			if (caster is not Character character || character.Connection.Party == null)
+				return;
+
+			var members = caster.Map.GetPartyMembersInRange(character, 0f, true);
+			foreach (var member in members)
+			{
+				if (member == caster)
+					continue;
+
+				member.StopBuff(BuffId.CirclingIncreaseSR_Buff);
+			}
 		}
 
 		private void CleanupCirclingPad(ICombatEntity caster)

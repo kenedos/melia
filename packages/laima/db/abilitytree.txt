@@ -860,11 +860,6 @@
 { category: "Falconer", classId: 4, abilityId: 310015, jobId: 3014, className: "Falconer15", maxLevel: 30, priceTimeScript: 'ABIL_ABOVE_NORMAL_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Falconer", classId: 3, abilityId: 310021, jobId: 3014, className: "Falconer21", maxLevel: 10, priceTimeScript: 'ABIL_ABOVE_NORMAL_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Falconer", classId: 401, abilityId: 310022, jobId: 3014, className: "Falconer22", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Falconer_Tomahawk", argNum: 1 } },
-{ category: "Falconer", classId: 501, abilityId: 310023, jobId: 3014, className: "Falconer23", maxLevel: 1, priceTimeScript: 'HIDDENABIL_PRICE_COND_JOBLEVEL', unlockScript: { name: "UNLOCK_ABIL_JOB_LEVEL", argStr: "Char3_14", argNum: 1 } },
-{ category: "Falconer", classId: 601, abilityId: 310024, jobId: 3014, className: "Falconer24", maxLevel: 30, priceTimeScript: 'HIDDENABIL_PRICE_COND_REINFORCE', unlockScript: { name: "UNLOCK_ABIL_OTHERABILITY", argStr: "Falconer6", argNum: 1 } },
-{ category: "Falconer", classId: 602, abilityId: 310025, jobId: 3014, className: "Falconer25", maxLevel: 30, priceTimeScript: 'HIDDENABIL_PRICE_COND_REINFORCE', unlockScript: { name: "UNLOCK_ABIL_OTHERABILITY", argStr: "Falconer8", argNum: 1 } },
-{ category: "Falconer", classId: 603, abilityId: 310026, jobId: 3014, className: "Falconer26", maxLevel: 30, priceTimeScript: 'HIDDENABIL_PRICE_COND_REINFORCE', unlockScript: { name: "UNLOCK_ABIL_OTHERABILITY", argStr: "Falconer22", argNum: 1 } },
-{ category: "Falconer", classId: 502, abilityId: 310027, jobId: 3014, className: "Falconer27", maxLevel: 1, priceTimeScript: 'HIDDENABIL_PRICE_COND_JOBLEVEL', unlockScript: { name: "UNLOCK_ABIL_JOB_LEVEL", argStr: "Char3_14", argNum: 1 } },
 
 // Cannoneer
 //---------------------------------------------------------------------------

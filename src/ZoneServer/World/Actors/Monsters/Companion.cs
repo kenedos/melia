@@ -352,6 +352,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		private TimeSpan _staminaDecayTime;
+		private DateTime _emergencyCareReadyAt = DateTime.MinValue;
 
 		/// <summary>
 		/// Updates companion's components and handles stamina decay.
@@ -370,10 +371,41 @@ namespace Melia.Zone.World.Actors.Monsters
 			{
 				this.DecayStamina();
 				_staminaDecayTime = TimeSpan.FromMilliseconds(60000);
+
+				if (this.Owner != null && this.Owner.TryGetActiveAbilityLevel(AbilityId.CompMastery1, out var compMastery1Level))
+					_staminaDecayTime += TimeSpan.FromSeconds(10 * compMastery1Level);
 			}
+
+			this.TryTriggerEmergencyCare();
 
 			if (this.IsBird)
 				this.UpdateBirdBehavior(elapsed);
+		}
+
+		private void TryTriggerEmergencyCare()
+		{
+			if (this.IsDead)
+				return;
+
+			if (DateTime.Now < _emergencyCareReadyAt)
+				return;
+
+			if (!this.Owner.TryGetActiveAbilityLevel(AbilityId.CompMastery2, out var level))
+				return;
+
+			var maxHp = this.Properties.GetFloat(PropertyName.MHP, 1);
+			var hp = this.Properties.GetFloat(PropertyName.HP, 0);
+			if (maxHp <= 0 || hp / maxHp > 0.5f)
+				return;
+
+			if (this.IsBuffActive(BuffId.Pet_Heal))
+				return;
+
+			var duration = TimeSpan.FromSeconds(level == 1 ? 2 : 1 + level);
+			this.StartBuff(BuffId.Pet_Heal, 1, 0, duration, this.Owner);
+			this.PlayGroundEffect("F_buff_basic008_blue", 1);
+
+			_emergencyCareReadyAt = DateTime.Now + TimeSpan.FromMinutes(10);
 		}
 
 		/// <summary>

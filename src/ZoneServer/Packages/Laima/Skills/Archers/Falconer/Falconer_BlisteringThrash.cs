@@ -14,6 +14,7 @@ using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
+using Yggdrasil.Util;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
@@ -30,10 +31,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	public class Falconer_BlisteringThrashOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float AttackRadius = 80f;
-		private const int MaxTargets = 8;
 		private const int BaseHitCount = 6;
 		private const float PenetrateHeight = 10f;
 		private const float DebuffDurationSeconds = 7f;
+		private const int DebuffChancePercent = 50;
 
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -70,6 +71,16 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
 				return;
+			}
+
+			if (caster.IsAbilityActive(AbilityId.Falconer10))
+			{
+				var extraSp = skill.Properties.GetFloat(PropertyName.SpendSP) * 0.5f;
+				if (!caster.TrySpendSp(extraSp))
+				{
+					caster.ServerMessage(Localization.Get("Not enough SP."));
+					return;
+				}
 			}
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
@@ -164,23 +175,40 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			await ctx.Delay(700);
 
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, AttackRadius)
-				.Take(MaxTargets)
+				.LimitBySDR(caster, skill)
 				.ToList();
+
+			var falconer15BonusDamage = 0f;
+			if (caster.TryGetActiveAbilityLevel(AbilityId.Falconer15, out var falconer15Level))
+				falconer15BonusDamage = hawk.Properties.GetFloat(PropertyName.PATK) * 0.0025f * falconer15Level;
+
+			var applyConfuse = caster.IsAbilityActive(AbilityId.Falconer10);
 
 			foreach (var enemy in enemies)
 			{
 				if (enemy.IsDead)
 					continue;
 
-				enemy.StartBuff(BuffId.Blistering_Debuff, skill.Level, 0, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
+				var hasBlind = enemy.IsBuffActive(BuffId.Blistering_Debuff);
+
+				if (RandomProvider.Get().Next(100) < DebuffChancePercent)
+					enemy.StartBuff(BuffId.Blistering_Debuff, skill.Level, 0, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
 
 				var modifier = SkillModifier.MultiHit(BaseHitCount);
+				if (enemy.Race == RaceType.Widling)
+					modifier.DamageMultiplier += 0.5f;
+				if (falconer15BonusDamage > 0f)
+					modifier.BonusDamage += falconer15BonusDamage;
+
 				var skillHitResult = SCR_SkillHit(caster, enemy, skill, modifier);
 				enemy.TakeDamage(skillHitResult.Damage, caster);
 
 				var hit = new HitInfo(caster, enemy, skill, skillHitResult);
 				hit.ForceId = forceId;
 				Send.ZC_HIT_INFO(caster, enemy, hit);
+
+				if (applyConfuse && hasBlind)
+					enemy.StartBuff(BuffId.Confuse, skill.Level, 0, TimeSpan.FromSeconds(5), caster, skill.Id);
 			}
 
 			await ctx.Delay(700);

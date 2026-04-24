@@ -339,6 +339,9 @@ namespace Melia.Zone.World.Actors.Characters
 			if (this.TryGet<CFloatProperty>(PropertyName.DEX, out var dexProperty))
 				dexProperty.ValueChanged += this.OnSkillSpeedPropertyChanged;
 
+			if (this.TryGet<CFloatProperty>(PropertyName.SR, out var srProperty))
+				srProperty.ValueChanged += this.OnSkillSRPropertyChanged;
+
 			// Subscribe to CastingSpeed and MSPD property changes to
 			// automatically send client update packets whenever any
 			// effect changes these values (buffs, equipment, trinkets, etc.)
@@ -383,6 +386,9 @@ namespace Melia.Zone.World.Actors.Characters
 
 			if (this.TryGet<CFloatProperty>(PropertyName.DEX, out var dexProperty))
 				dexProperty.ValueChanged -= this.OnSkillSpeedPropertyChanged;
+
+			if (this.TryGet<CFloatProperty>(PropertyName.SR, out var srProperty))
+				srProperty.ValueChanged -= this.OnSkillSRPropertyChanged;
 
 			// Unsubscribe from CastingSpeed and MSPD property changes
 			if (this.TryGet<CFloatProperty>(PropertyName.CastingSpeed, out var castingSpeedProperty))
@@ -554,6 +560,19 @@ namespace Melia.Zone.World.Actors.Characters
 			{
 				if (skill.Properties.TryGet<CFloatProperty>(PropertyName.SklSpdRate, out var spdRateProperty))
 					spdRateProperty.Invalidate();
+			}
+		}
+
+		/// <summary>
+		/// Invalidates SkillSR on every skill when the character's SR changes.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		private void OnSkillSRPropertyChanged(string propertyName)
+		{
+			foreach (var skill in this.Character.Skills.GetList())
+			{
+				if (skill.Properties.TryGet<CFloatProperty>(PropertyName.SkillSR, out var skillSrProperty))
+					skillSrProperty.Invalidate();
 			}
 		}
 

@@ -3,19 +3,19 @@
 //
 //      File: ZC_ALTER_HIT_RADIUS.bt
 //   Authors: Salman T. Khan
-//   Version: 
-//   Purpose: 
-//  Category: 
-// File Mask: 
-//  ID Bytes: 
-//   History: 
+//   Version:
+//   Purpose:
+//  Category:
+// File Mask:
+//  ID Bytes:
+//   History:
 //------------------------------------------------
 
 #include "inc/common.bt"
 
 ServerHeaderFixed header;
 
-int i1;
-float f1;
+int targetHandle;
+float areaIncrease;
 float f2;
-int i2;
+int casterHandle;

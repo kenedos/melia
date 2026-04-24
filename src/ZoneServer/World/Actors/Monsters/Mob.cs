@@ -1089,7 +1089,11 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			var dropItem = new Item(itemId, amount);
 
-			if (dropItem.Data.Type == ItemType.Equip && dropItem.Data.Group != ItemGroup.Premium && dropItem.Data.Group != ItemGroup.Helmet && dropItem.Data.Group != ItemGroup.Armband)
+			if (dropItem.Data.Type == ItemType.Equip
+				&& dropItem.Data.Group != ItemGroup.Premium
+				&& dropItem.Data.EquipType1 != EquipType.Hat
+				&& dropItem.Data.EquipType1 != EquipType.Helmet
+				&& dropItem.Data.EquipType1 != EquipType.Armband)
 			{
 				var lootingChance = killer?.Properties.GetFloat(PropertyName.LootingChance, 1) ?? 1;
 				if (lootingChance <= 0)

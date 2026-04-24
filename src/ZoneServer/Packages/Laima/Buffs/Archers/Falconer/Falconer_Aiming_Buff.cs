@@ -2,6 +2,8 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 {
@@ -20,18 +22,36 @@ namespace Melia.Zone.Buffs.Handlers.Archers.Falconer
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var level = buff.NumArg1;
-			buff.Target.HitRadiusBonus = AimingHitRadiusBonus + level * AimingHitRadiusBonusPerLevel;
+			var bonus = AimingHitRadiusBonus + level * AimingHitRadiusBonusPerLevel;
+			buff.Target.HitRadiusBonus = bonus;
 
-			Send.ZC_NORMAL.EnableHitRadiusPreview(buff.Target, true, buff.Caster);
-			Send.ZC_ALTER_HIT_RADIUS(buff.Caster, buff.Target, AimingHitRadiusBonus, 0f);
+			SendPreview(buff, true);
+			Send.ZC_ALTER_HIT_RADIUS(buff.Caster, buff.Target, bonus, 0f);
 		}
 
 		public override void OnEnd(Buff buff)
 		{
 			buff.Target.HitRadiusBonus = 0f;
 
-			Send.ZC_NORMAL.EnableHitRadiusPreview(buff.Target, false, buff.Caster);
+			SendPreview(buff, false);
 			Send.ZC_ALTER_HIT_RADIUS(buff.Caster, buff.Target, 0f, 0f);
+		}
+
+		private static void SendPreview(Buff buff, bool isEnabled)
+		{
+			Send.ZC_NORMAL.EnableHitRadiusPreview(buff.Target, isEnabled, buff.Caster);
+
+			if (buff.Caster is not Character casterChar || casterChar.Connection.Party == null)
+				return;
+
+			var members = buff.Target.Map.GetPartyMembersInRange(casterChar, 0f, true);
+			foreach (var member in members)
+			{
+				if (member == buff.Caster)
+					continue;
+
+				Send.ZC_NORMAL.EnableHitRadiusPreview(buff.Target, isEnabled, member);
+			}
 		}
 	}
 }

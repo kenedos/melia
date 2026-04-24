@@ -162,6 +162,17 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
+		/// Stops the Aiming skill.
+		/// </summary>
+		public static void StopAiming(ICombatEntity caster, Companion hawk)
+		{
+			if (hawk == null)
+				return;
+
+			hawk.Vars.Set("Hawk.Aiming.Active", false);
+		}
+
+		/// <summary>
 		/// Unrests the hawk if it's currently resting on shoulder or roost.
 		/// </summary>
 		public static void UnrestHawkIfNeeded(Companion hawk)

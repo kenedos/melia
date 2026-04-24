@@ -28,7 +28,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	public class Falconer_TomahawkOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float AttackRadius = 80f;
-		private const int MaxTargets = 10;
 		private const int BaseHitCount = 3;
 		private const float PenetrateHeight = 50f;
 
@@ -149,15 +148,25 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
 
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, targetPos, AttackRadius)
-				.Take(MaxTargets)
+				.LimitBySDR(caster, skill)
 				.ToList();
+
+			var falconer15BonusDamage = 0f;
+			if (caster.TryGetActiveAbilityLevel(AbilityId.Falconer15, out var falconer15Level))
+				falconer15BonusDamage = hawk.Properties.GetFloat(PropertyName.PATK) * 0.0025f * falconer15Level;
 
 			foreach (var enemy in enemies)
 			{
 				if (enemy.IsDead)
 					continue;
 
-				var skillHitResult = SCR_SkillHit(caster, enemy, skill, SkillModifier.MultiHit(BaseHitCount));
+				var modifier = SkillModifier.MultiHit(BaseHitCount);
+				if (enemy.Race == RaceType.Widling)
+					modifier.DamageMultiplier += 0.5f;
+				if (falconer15BonusDamage > 0f)
+					modifier.BonusDamage += falconer15BonusDamage;
+
+				var skillHitResult = SCR_SkillHit(caster, enemy, skill, modifier);
 				enemy.TakeDamage(skillHitResult.Damage, caster);
 
 				var hit = new HitInfo(caster, enemy, skill, skillHitResult, HitResultType.Hit);

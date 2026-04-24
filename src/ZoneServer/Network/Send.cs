@@ -3035,7 +3035,7 @@ namespace Melia.Zone.Network
 				packet.PutFloat(hitInfo.UnkFloat2);
 				packet.PutInt(hitInfo.HitCount);
 				packet.PutByte(1);
-				packet.PutInt(0); // Another delay?
+				packet.PutInt(0);
 				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
 			}
 			else
@@ -7961,12 +7961,12 @@ namespace Melia.Zone.Network
 			character.Connection.Send(packet);
 		}
 
-		public static void ZC_ALTER_HIT_RADIUS(IActor caster, IActor target, float f1, float f2 = 0)
+		public static void ZC_ALTER_HIT_RADIUS(IActor caster, IActor target, float areaIncrease, float f2 = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_ALTER_HIT_RADIUS);
 
 			packet.PutInt(target.Handle);
-			packet.PutFloat(f1);
+			packet.PutFloat(areaIncrease);
 			packet.PutFloat(f2);
 			packet.PutInt(caster.Handle);
 

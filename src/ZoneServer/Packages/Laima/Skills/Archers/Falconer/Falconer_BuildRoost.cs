@@ -90,6 +90,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 		/// </summary>
 		private async Task CheckRoostAutoDestroy(Skill skill, ICombatEntity caster, Mob roost)
 		{
+			var resetThresholdSeconds = Math.Max(2f, 5f - 0.3f * skill.Level);
+			var timeOnRoost = 0f;
+			var cooldownsReset = false;
+
 			for (int i = 0; i < RoostDurationSeconds; i++)
 			{
 				if (caster == null || caster.IsDead)
@@ -105,12 +109,44 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 						this.DestroyRoost(caster, roost);
 						return;
 					}
+
+					if (!cooldownsReset)
+					{
+						if (hawk.IsOnRoost)
+						{
+							timeOnRoost += 1f;
+							if (timeOnRoost >= resetThresholdSeconds)
+							{
+								this.ResetFalconerCooldowns(caster);
+								cooldownsReset = true;
+							}
+						}
+						else
+						{
+							timeOnRoost = 0f;
+						}
+					}
 				}
 
 				await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			}
 
 			this.DestroyRoost(caster, roost);
+		}
+
+		private void ResetFalconerCooldowns(ICombatEntity caster)
+		{
+			if (caster is not Character character)
+				return;
+
+			foreach (var s in character.Skills.GetList())
+			{
+				if (s.Id == SkillId.Falconer_BuildRoost)
+					continue;
+				if ((int)s.Id < 31000 || (int)s.Id >= 32000)
+					continue;
+				caster.RemoveCooldown(s.CooldownData.Id);
+			}
 		}
 
 		/// <summary>

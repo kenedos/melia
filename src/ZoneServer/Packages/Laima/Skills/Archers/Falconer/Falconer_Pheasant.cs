@@ -39,7 +39,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 	public class Falconer_PheasantOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float DamageRadius = 100f;
-		private const int MaxTargets = 15;
 		private const int PheasantDurationSeconds = 20;
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
@@ -130,10 +129,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				await ctx.Delay(800);
 			}
 
+			await ctx.Delay(1000);
+
 			var syncKey = hawk.GenerateSyncKey();
 			Send.ZC_NORMAL.CollisionAndBack(hawk, pheasant, syncKey, "HOVERING_SHOT", 1f, 7f, 1f, 0.7f, 20f, true);
 
-			await ctx.Delay(700);
+			await ctx.Delay(900);
 
 			TriggerExplosion(caster, skill, hawk, targetPos);
 
@@ -180,18 +181,28 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			hawk.BroadcastShockWave(2, 7, 0.5f, 50f, 0);
 
 			var enemies = caster.Map.GetAttackableEnemiesInPosition(caster, explosionPos, DamageRadius)
-				.Take(MaxTargets)
+				.LimitBySDR(caster, skill)
 				.ToList();
 
 			if (enemies.Count == 0)
 				return;
+
+			var falconer15BonusDamage = 0f;
+			if (caster.TryGetActiveAbilityLevel(AbilityId.Falconer15, out var falconer15Level))
+				falconer15BonusDamage = hawk.Properties.GetFloat(PropertyName.PATK) * 0.0025f * falconer15Level;
 
 			foreach (var enemy in enemies)
 			{
 				if (enemy.IsDead)
 					continue;
 
-				var skillHitResult = SCR_SkillHit(caster, enemy, skill);
+				var modifier = new SkillModifier();
+				if (enemy.Race == RaceType.Widling)
+					modifier.DamageMultiplier += 0.5f;
+				if (falconer15BonusDamage > 0f)
+					modifier.BonusDamage += falconer15BonusDamage;
+
+				var skillHitResult = SCR_SkillHit(caster, enemy, skill, modifier);
 				enemy.TakeDamage(skillHitResult.Damage, caster);
 
 				var hit = new HitInfo(caster, enemy, skill, skillHitResult, HitResultType.Hit);
