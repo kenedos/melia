@@ -30,6 +30,7 @@ public class SeaThemedHeadbandQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Shrine Keeper] Thalassa"), "f_3cmlake_83");
 
 		AddObjective("collect_hearts", "Collect 60 Merog Hearts", new CollectItemObjective(MerogHeartId, MerogHeartAmount));
 		AddObjective("collect_cinnabar", "Collect 40 Cinnabar", new CollectItemObjective(CinnabarId, CinnabarAmount));

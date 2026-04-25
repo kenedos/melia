@@ -178,6 +178,21 @@ namespace Melia.Zone.Events
 		public readonly Event<PlayerCompletedQuestEventArgs> PlayerCompletedQuest = new();
 
 		/// <summary>
+		/// Raised when a player starts a quest.
+		/// </summary>
+		public readonly Event<PlayerStartedQuestEventArgs> PlayerStartedQuest = new();
+
+		/// <summary>
+		/// Raised when a player abandons a quest.
+		/// </summary>
+		public readonly Event<PlayerAbandonedQuestEventArgs> PlayerAbandonedQuest = new();
+
+		/// <summary>
+		/// Raised when a quest's objectives have all been completed.
+		/// </summary>
+		public readonly Event<PlayerQuestObjectivesCompletedEventArgs> PlayerQuestObjectivesCompleted = new();
+
+		/// <summary>
 		/// Raised when a player's reputation with a faction changes.
 		/// </summary>
 		public readonly Event<ReputationEventArgs> PlayerReputationChanged = new();

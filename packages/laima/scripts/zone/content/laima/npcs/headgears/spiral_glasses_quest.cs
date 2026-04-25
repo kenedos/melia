@@ -28,6 +28,7 @@ public class SpiralGlassesQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Crystal Miner] Gareth"), "f_siauliai_out");
 
 		AddObjective("collect_tokens", "Collect 50 Vubbe Tokens", new CollectItemObjective(VubbeTokenId, 50));
 		AddObjective("collect_cores", "Collect 200 Stone Orca Cores", new CollectItemObjective(StoneOrcaCoreId, 200));

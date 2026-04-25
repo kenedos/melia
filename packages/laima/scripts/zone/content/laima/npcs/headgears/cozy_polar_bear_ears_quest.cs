@@ -30,6 +30,7 @@ public class CozyPolarBearEarsQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Mountain Ranger] Valdis"), "f_tableland_70");
 
 		AddObjective("collect_leather", "Collect 100 Blue Cronewt Leather", new CollectItemObjective(BlueCronewtLeatherId, BlueCronewtLeatherAmount));
 		AddObjective("collect_mane", "Collect 30 Blue Hohen Mane", new CollectItemObjective(BlueHohenManeId, BlueHohenManeAmount));

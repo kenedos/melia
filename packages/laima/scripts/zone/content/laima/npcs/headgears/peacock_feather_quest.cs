@@ -28,6 +28,7 @@ public class PeacockFeatherQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Noblewoman] Isabella"), "f_rokas_24");
 
 		AddObjective("collect_crests", "Collect 1 Red Cockat Crests", new CollectItemObjective(CockatriesCrestId, 1));
 		AddObjective("collect_feathers", "Collect 75 Cockatries Feathers", new CollectItemObjective(CockatriesFeatherId, 75));

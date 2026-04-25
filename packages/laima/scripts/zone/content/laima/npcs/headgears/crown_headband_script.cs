@@ -27,6 +27,7 @@ public class CrownHeadbandQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Noble Artisan] Coronet"), "f_orchard_34_2");
 
 		AddObjective("collect_fur", "Collect 300 Ferret Fur", new CollectItemObjective(FerretFur, 300));
 		AddReward(new ItemReward(CrownHeadbandId, 1));

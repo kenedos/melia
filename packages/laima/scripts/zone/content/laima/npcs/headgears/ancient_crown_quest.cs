@@ -28,6 +28,7 @@ public class AncientCrownQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Scholar] Sssevren"), "f_farm_49_1");
 
 		AddObjective("collect_bones", "Collect 100 Lizardman Bones", new CollectItemObjective(LizardmanBonesId, 100));
 		AddObjective("collect_leaves", "Collect 50 Tama Leaves", new CollectItemObjective(TamaLeafId, 50));

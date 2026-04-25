@@ -28,6 +28,7 @@ public class PineappleHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Eccentric Designer] Pierre"), "f_rokas_24");
 
 		AddObjective("collect_feathers", "Collect 75 Cockatrice Feathers", new CollectItemObjective(CockatriceFeatherId, 75));
 		AddObjective("collect_bones", "Collect 2 Gigantic Shinbones", new CollectItemObjective(HogmaWarriorBoneId, 2));

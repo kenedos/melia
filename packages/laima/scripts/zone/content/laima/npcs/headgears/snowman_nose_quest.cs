@@ -30,6 +30,7 @@ public class SnowmanNoseQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Mountaineer] Bjorn"), "f_tableland_74");
 
 		AddObjective("collect_fur", "Collect 80 White Spion Fur", new CollectItemObjective(WhiteSpionFurId, WhiteSpionFurAmount));
 		AddObjective("collect_mane", "Collect 30 Blue Harugal Mane", new CollectItemObjective(BlueHarugalManeId, BlueHarugalManeAmount));

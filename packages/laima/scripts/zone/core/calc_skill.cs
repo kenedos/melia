@@ -695,4 +695,100 @@ public class SkillCalculationsScript : GeneralScript
 
 		return (float)Math.Floor(baseValue);
 	}
+
+	/// <summary>
+	/// Returns the DEF transfer ratio for Sorcerer's Summoning skill,
+	/// used by the client to compute summoned boss card defense stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Summoning_Ratio(Skill skill)
+	{
+		return 16f + (skill.Level * 5.6f);
+	}
+
+	/// <summary>
+	/// Returns the MHP transfer ratio for Sorcerer's Summoning skill,
+	/// used by the client to compute summoned boss card HP stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Summoning_Ratio2(Skill skill)
+	{
+		return 24f + (skill.Level * 8.4f);
+	}
+
+	/// <summary>
+	/// Returns the ATK transfer ratio for Sorcerer's Summoning skill,
+	/// used by the client to compute summoned boss card attack stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_Summoning_Ratio3(Skill skill)
+	{
+		return 18.4f + (skill.Level * 6.44f);
+	}
+
+	/// <summary>
+	/// Returns the ATK transfer ratio for Sorcerer's Summon Salamion skill,
+	/// used by the client to compute the salamion's attack stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_SummonSalamion_Ratio(Skill skill)
+	{
+		return 14.72f + (skill.Level * 5.152f);
+	}
+
+	/// <summary>
+	/// Returns the DEF transfer ratio for Sorcerer's Summon Salamion skill,
+	/// used by the client to compute the salamion's defense stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_SummonSalamion_Ratio2(Skill skill)
+	{
+		return 16f + (skill.Level * 5.6f);
+	}
+
+	/// <summary>
+	/// Returns the MHP transfer ratio for Sorcerer's Summon Salamion skill,
+	/// used by the client to compute the salamion's HP stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_SummonSalamion_Ratio3(Skill skill)
+	{
+		return 24f + (skill.Level * 8.4f);
+	}
+
+	/// <summary>
+	/// Returns the ATK transfer ratio for Necromancer's Create Shoggoth skill,
+	/// used by the client to compute the shoggoth's attack stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_CreateShoggoth_Ratio(Skill skill)
+	{
+		return (float)Math.Floor(69f + skill.Level * 11.5f);
+	}
+
+	/// <summary>
+	/// Returns the DEF transfer ratio for Necromancer's Create Shoggoth skill,
+	/// used by the client to compute the shoggoth's defense stats.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float SCR_Get_CreateShoggoth_Ratio2(Skill skill)
+	{
+		return (float)Math.Floor(60f + skill.Level * 10f);
+	}
 }

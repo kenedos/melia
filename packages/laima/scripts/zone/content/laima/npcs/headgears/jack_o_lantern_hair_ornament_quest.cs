@@ -35,6 +35,7 @@ public class JackOLanternHairOrnamentQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Lumberjack] Garvyn"), "f_remains_39");
 
 		AddObjective("collect_bones", "Collect 75 Hallowventer Hand Bones",
 			new CollectItemObjective(HallowventerHandBonesId, HallowventerHandBonesAmount));

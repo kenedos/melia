@@ -30,6 +30,7 @@ public class RadishuQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Farmer] Theodric"), "f_farm_47_2");
 
 		AddObjective("collect_stems", "Collect 80 Ashrong Stems", new CollectItemObjective(AshrongStemId, AshrongStemAmount));
 		AddObjective("collect_bones", "Collect 50 Cronewt Bones", new CollectItemObjective(CronewtBonesId, CronewtBonesAmount));

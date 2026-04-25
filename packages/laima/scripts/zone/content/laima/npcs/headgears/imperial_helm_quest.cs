@@ -28,6 +28,7 @@ public class ImperialHelmQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Archeologist] Aldric"), "f_remains_37");
 
 		AddObjective("collect_wood", "Collect 80 Ash Wood", new CollectItemObjective(AshWoodId, 80));
 		AddObjective("collect_skin", "Collect 60 Tama Skin", new CollectItemObjective(TamaSkinId, 60));

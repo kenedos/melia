@@ -28,6 +28,7 @@ public class OutdoorsHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Tailor] Pascal"), "f_farm_49_2");
 
 		AddObjective("collect_timber", "Collect 40 Short Timber", new CollectItemObjective(TimberPieceId, 40));
 		AddObjective("collect_needles", "Collect 25 Cyst Needles", new CollectItemObjective(CystNeedleId, 25));

@@ -241,6 +241,30 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
+		/// Plays a UI sound effect locally for the sender.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandlePlaySound(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			if (args.Count < 1)
+			{
+				sender.ServerMessage("Usage: /playsound <sound_name>");
+				return CommandResult.InvalidArgument;
+			}
+
+			var soundName = args.Get(0);
+			var lua = $"imcSound.PlaySoundEvent(\"{soundName}\")";
+			Send.ZC_EXEC_CLIENT_SCP(sender.Connection, lua);
+			sender.ServerMessage($"Played sound '{soundName}'.");
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
 		/// Ends a previously created effect.
 		/// </summary>
 		private CommandResult HandleEndEffect(Character sender, Character target, string message, string commandName, Arguments args)

@@ -30,6 +30,7 @@ public class LotusLeafQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Plant Enthusiast] Miri"), "f_siauliai_west");
 
 		AddObjective("collect_shells", "Collect 50 Leaf Bug Shells", new CollectItemObjective(LeafBugShellId, 50));
 		AddObjective("collect_petals", "Collect 30 Hanaming Petals", new CollectItemObjective(HanamingPetalId, 30));

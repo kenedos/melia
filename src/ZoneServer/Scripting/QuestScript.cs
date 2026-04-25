@@ -139,6 +139,20 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Returns all registered quest scripts.
+		/// </summary>
+		/// <returns></returns>
+		public static QuestScript[] GetAll()
+		{
+			lock (ScriptsSyncLock)
+			{
+				var result = new QuestScript[Scripts.Count];
+				Scripts.Values.CopyTo(result, 0);
+				return result;
+			}
+		}
+
+		/// <summary>
 		/// Starts auto receive quests for the character that they meet
 		/// all prerequisites for.
 		/// </summary>

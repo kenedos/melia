@@ -30,6 +30,7 @@ public class PancakeQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Cook] Morella"), "f_siauliai_46_4");
 
 		AddObjective("collect_stingers", "Collect 100 Honeybean Stingers", new CollectItemObjective(HoneybeanStingerId, HoneybeanStingerAmount));
 		AddObjective("collect_fur", "Collect 75 Rabbee Fur", new CollectItemObjective(RabbeeFurId, RabbeeFurAmount));

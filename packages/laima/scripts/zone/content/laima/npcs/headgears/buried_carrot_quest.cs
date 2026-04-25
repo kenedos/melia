@@ -28,6 +28,7 @@ public class BuriedCarrotQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Forager] Terron"), "d_thorn_19");
 
 		AddObjective("collect_crystals", "Collect 60 Truffle Crystals", new CollectItemObjective(TruffleCrystalId, 60));
 		AddObjective("collect_horns", "Collect 30 Groll Horns", new CollectItemObjective(GrollHornId, 30));

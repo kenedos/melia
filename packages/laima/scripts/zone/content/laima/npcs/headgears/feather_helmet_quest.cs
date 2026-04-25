@@ -29,6 +29,7 @@ public class FeatherHelmetQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Retired Warrior] Helena"), "f_farm_47_3");
 
 		AddObjective("collect_bells", "Collect 40 Ellom Bells", new CollectItemObjective(EllomBellId, 40));
 		AddObjective("collect_leather", "Collect 25 Cronewt Leather", new CollectItemObjective(CronewtLeatherId, 25));

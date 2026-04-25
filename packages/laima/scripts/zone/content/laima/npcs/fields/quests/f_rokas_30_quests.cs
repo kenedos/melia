@@ -126,7 +126,7 @@ public class KingsPlateauQuestNpcsScript : GeneralScript
 							character.Quests.Start(questId);
 							await dialog.Msg(L("Thank you. The Hogma are spread across the central plateau. You'll find plenty of both Scouts and Shamans."));
 							await dialog.Msg(L("The Shamans are more dangerous - they wield fire magic and seem to draw power from the ancient sites here."));
-							await dialog.Msg(L("Return when you've culled their numbers. The expedition will be in your debt."));
+							await dialog.Msg(L("Return when you've killed their numbers. The expedition will be in your debt."));
 						}
 						break;
 

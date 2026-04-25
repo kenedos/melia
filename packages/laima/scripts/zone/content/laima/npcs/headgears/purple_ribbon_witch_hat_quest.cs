@@ -30,6 +30,7 @@ public class PurpleRibbonWitchHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Witch] Morvenna"), "f_katyn_13");
 
 		AddObjective("collect_tokens", "Collect 50 High Vubbe Tokens", new CollectItemObjective(HighVubbeTokenId, HighVubbeTokenAmount));
 		AddObjective("collect_leaves", "Collect 75 Bushspider Leaves", new CollectItemObjective(BushspiderLeafId, BushspiderLeafAmount));

@@ -28,6 +28,7 @@ public class JingleBellEarmuffsQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Traveling Merchant] Mirena"), "f_tableland_72");
 
 		AddObjective("collect_fur", "Collect 100 White Spion Fur", new CollectItemObjective(WhiteSpionFurId, 100));
 		AddObjective("collect_leaves", "Collect 75 Brown Lapasape Leaves", new CollectItemObjective(BrownLapasapeLeavesId, 75));

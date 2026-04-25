@@ -150,6 +150,39 @@ namespace Melia.Zone.Events.Arguments
 	}
 
 	/// <summary>
+	/// Arguments for when a player starts a quest.
+	/// </summary>
+	public class PlayerStartedQuestEventArgs(Character character, int questId) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the id of the started quest.
+		/// </summary>
+		public int QuestId { get; } = questId;
+	}
+
+	/// <summary>
+	/// Arguments for when a player abandons a quest.
+	/// </summary>
+	public class PlayerAbandonedQuestEventArgs(Character character, int questId) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the id of the abandoned quest.
+		/// </summary>
+		public int QuestId { get; } = questId;
+	}
+
+	/// <summary>
+	/// Arguments for when a quest's objectives all become complete.
+	/// </summary>
+	public class PlayerQuestObjectivesCompletedEventArgs(Character character, int questId) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the id of the quest whose objectives were completed.
+		/// </summary>
+		public int QuestId { get; } = questId;
+	}
+
+	/// <summary>
 	/// Arguments for when a player's reputation changes.
 	/// </summary>
 	public class ReputationEventArgs(Character character, string factionId, int oldValue, int newValue) : PlayerEventArgs(character)

@@ -1,0 +1,619 @@
+//--- Melia Script ----------------------------------------------------------
+// Dingofasil District Quest NPCs
+//--- Description -----------------------------------------------------------
+// Quests for Dingofasil District (cursed petrification).
+//---------------------------------------------------------------------------
+
+using System;
+using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting;
+using Melia.Zone.World.Quests;
+using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Quests.Objectives;
+using Melia.Zone.World.Quests.Prerequisites;
+using Melia.Zone.World.Quests.Rewards;
+using Yggdrasil.Util;
+using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors;
+
+public class FFlash58QuestNpcsScript : GeneralScript
+{
+	protected override void Load()
+	{
+		// Quest 1: Red Infroholder Raid
+		//-------------------------------------------------------------------------
+		AddNpc(20060, L("[District-Ward] Vytautas"), "f_flash_58", 0, 0, 0, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_flash_58", 1001);
+
+			dialog.SetTitle(L("Vytautas"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("Red Infroholders overrun Dingofasil since the curse fell. Forty-five kills and the petrified citizens get reach."));
+
+				var response = await dialog.Select(L("Kill?"),
+					Option(L("I'll kill"), "help"),
+					Option(L("Citizens?"), "info"),
+					Option(L("Skip"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						if (await dialog.YesNo(L("Kill forty-five Red Infroholders?")))
+						{
+							character.Quests.Start(questId);
+							await dialog.Msg(L("Forty-five. Watch the ground-haze."));
+						}
+						break;
+
+					case "info":
+						await dialog.Msg(L("Hundreds petrified. We need room to work the counter-ritual."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("Citizens stay stone."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killInfros", out var killObj)) return;
+
+				if (killObj.Done)
+				{
+					await dialog.Msg(L("Counter-ritual team in."));
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Keep killing."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("First citizen unpetrified yesterday."));
+			}
+		});
+
+		// Quest 2: Socket Cores
+		//-------------------------------------------------------------------------
+		AddNpc(20117, L("[Cursebreaker] Algimantas"), "f_flash_58", 800, 500, 0, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_flash_58", 1002);
+
+			dialog.SetTitle(L("Algimantas"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("Purple Sockets anchor the petrification. Kill thirty, bring eight cores for the counter-ward."));
+
+				var response = await dialog.Select(L("Cores?"),
+					Option(L("I'll bring"), "help"),
+					Option(L("Anchor?"), "info"),
+					Option(L("Skip"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						if (await dialog.YesNo(L("Kill thirty Purple Sockets and bring eight cores?")))
+						{
+							character.Quests.Start(questId);
+							await dialog.Msg(L("Cores only. The shells shatter."));
+						}
+						break;
+
+					case "info":
+						await dialog.Msg(L("Each Socket pulls petrification in its radius. Break eight cores, the radius splits."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("Curse deepens."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killSockets", out var killObj)) return;
+				if (!quest.TryGetProgress("gatherCores", out var cObj)) return;
+
+				if (killObj.Done && cObj.Done)
+				{
+					await dialog.Msg(L("Eight cores. Counter-ward woven."));
+					character.Inventory.Remove(650380, character.Inventory.CountItem(650380), InventoryItemRemoveMsg.Given);
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Keep hunting."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Counter-ward holds four blocks."));
+			}
+		});
+
+		// Quest 3: Mage Pages
+		//-------------------------------------------------------------------------
+		AddNpc(20114, L("[Scribe] Egle-III"), "f_flash_58", -500, 500, 0, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_flash_58", 1003);
+
+			dialog.SetTitle(L("Egle"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("Green Infroholder Mages memorize the petrification cant. Kill fifteen, bring five cant-pages."));
+
+				var response = await dialog.Select(L("Pages?"),
+					Option(L("I'll bring"), "help"),
+					Option(L("Reverse?"), "info"),
+					Option(L("Skip"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						if (await dialog.YesNo(L("Kill fifteen Green Infroholder Mages and bring five cant-pages?")))
+						{
+							character.Quests.Start(questId);
+							await dialog.Msg(L("Don't read them aloud."));
+						}
+						break;
+
+					case "info":
+						await dialog.Msg(L("Read backward, the cant lifts instead of lays. Maybe. Theory."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("Theory stays theory."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killMages", out var killObj)) return;
+				if (!quest.TryGetProgress("gatherPages", out var pObj)) return;
+
+				if (killObj.Done && pObj.Done)
+				{
+					await dialog.Msg(L("Five pages. Reverse-cant tested tonight."));
+					character.Inventory.Remove(650234, character.Inventory.CountItem(650234), InventoryItemRemoveMsg.Given);
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Keep hunting."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Reverse-cant works on fresh petrification. Old stone harder."));
+			}
+		});
+
+		// Quest 4: Rootcrystal Shards
+		//-------------------------------------------------------------------------
+		AddNpc(20114, L("[Crystal-Warder] Dalia"), "f_flash_58", -1100, 100, 0, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_flash_58", 1004);
+
+			dialog.SetTitle(L("Dalia"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("Dingofasil Rootcrystals hum the curse's tone. Break twelve for eight corrupted shards."));
+
+				var response = await dialog.Select(L("Shards?"),
+					Option(L("I'll break"), "help"),
+					Option(L("Corrupted?"), "info"),
+					Option(L("Skip"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						if (await dialog.YesNo(L("Break twelve Rootcrystals and bring eight corrupted shards?")))
+						{
+							character.Quests.Start(questId);
+							await dialog.Msg(L("Cloth-gloves only. Don't palm them."));
+						}
+						break;
+
+					case "info":
+						await dialog.Msg(L("They feed the curse. Eight less feed is eight less weight."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("Curse endures."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("breakCrystals", out var killObj)) return;
+				if (!quest.TryGetProgress("gatherShards", out var sObj)) return;
+
+				if (killObj.Done && sObj.Done)
+				{
+					await dialog.Msg(L("Eight shards. Curse weight shifts."));
+					character.Inventory.Remove(650236, character.Inventory.CountItem(650236), InventoryItemRemoveMsg.Given);
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Keep breaking."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Tone's thinner. District breathes."));
+			}
+		});
+
+		// Quest 5: The Stoneheart Alpha
+		//-------------------------------------------------------------------------
+		AddNpc(47245, L("[Bounty Hunter] Ignas-II"), "f_flash_58", 1800, -300, 0, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_flash_58", 1005);
+			var alphaSpawnedKey = "Laima.Quests.f_flash_58.Quest1005.AlphaSpawned";
+
+			dialog.SetTitle(L("Ignas"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("An Infroholder Stoneheart anchors the district curse. Kill ten to draw him from his plaza."));
+
+				var response = await dialog.Select(L("Alpha?"),
+					Option(L("I'll face him"), "help"),
+					Option(L("Stoneheart?"), "info"),
+					Option(L("Skip"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						if (await dialog.YesNo(L("Kill ten Red Infroholders and defeat the Stoneheart when he emerges?")))
+						{
+							character.Quests.Start(questId);
+							await dialog.Msg(L("Ten."));
+						}
+						break;
+
+					case "info":
+						await dialog.Msg(L("His heartbeat drives the petrification pulse. End him, drop the pulse."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("Curse beats on."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killPack", out var pObj)) return;
+				if (!quest.TryGetProgress("killAlpha", out var aObj)) return;
+
+				if (pObj.Done && aObj.Done)
+				{
+					await dialog.Msg(L("Pulse stopped."));
+					character.Variables.Perm.Remove(alphaSpawnedKey);
+					character.Quests.Complete(questId);
+				}
+				else if (pObj.Done && !aObj.Done)
+				{
+					var hasSpawned = character.Variables.Perm.GetBool(alphaSpawnedKey, false);
+					if (!hasSpawned)
+					{
+						character.Variables.Perm.Set(alphaSpawnedKey, true);
+						if (SpawnTempMonsters(character, MonsterId.Infroholder_Red, 1, 150, TimeSpan.FromMinutes(5)))
+						{
+							await dialog.Msg(L("He comes!"));
+							character.ServerMessage(L("{#FF9966}The Stoneheart Alpha emerges from the plaza!{/}"));
+						}
+					}
+					else
+					{
+						await dialog.Msg(L("Find him."));
+					}
+				}
+				else
+				{
+					await dialog.Msg(L("Ten first."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Plaza's unlocked. Cursebreakers pouring in."));
+			}
+		});
+
+		// Quest 6: Dingofasil Sweep
+		//-------------------------------------------------------------------------
+		AddNpc(155146, L("[Militia-Captain] Petras"), "f_flash_58", 1700, 1000, 0, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_flash_58", 1006);
+
+			dialog.SetTitle(L("Petras"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("District sweep. Twelve Infroholders, twelve Sockets, twelve Infroholder Mages."));
+
+				var response = await dialog.Select(L("Sweep?"),
+					Option(L("I'll do it"), "help"),
+					Option(L("Pay?"), "info"),
+					Option(L("Skip"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						if (await dialog.YesNo(L("Kill twelve each - Red Infroholders, Purple Sockets, Green Infroholder Mages?")))
+						{
+							character.Quests.Start(questId);
+							await dialog.Msg(L("Thirty-six."));
+						}
+						break;
+
+					case "info":
+						await dialog.Msg(L("Fair."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("District stays locked."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killInfros", out var iObj)) return;
+				if (!quest.TryGetProgress("killSockets", out var sObj)) return;
+				if (!quest.TryGetProgress("killMages", out var mObj)) return;
+
+				if (iObj.Done && sObj.Done && mObj.Done)
+				{
+					await dialog.Msg(L("Done."));
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Keep going."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Militia patrols the block now."));
+			}
+		});
+	}
+}
+
+//-----------------------------------------------------------------------------
+// QUEST DEFINITIONS
+//-----------------------------------------------------------------------------
+
+public class FFlash58Quest1001 : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_flash_58", 1001);
+		SetName(L("Red Infroholder Raid"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Kill Red Infroholders overrunning petrified Dingofasil."));
+		SetLocation("f_flash_58");
+		SetAutoTracked(true);
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[District-Ward] Vytautas"), "f_flash_58");
+
+		AddObjective("killInfros", L("Kill Red Infroholders"),
+			new KillObjective(45, new[] { MonsterId.Infroholder_Red }));
+
+		AddReward(new ExpReward(11900, 8100));
+		AddReward(new SilverReward(60000));
+		AddReward(new ItemReward(640086, 1));
+		AddReward(new ItemReward(640004, 14));
+		AddReward(new ItemReward(640007, 14));
+	}
+}
+
+public class FFlash58Quest1002 : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_flash_58", 1002);
+		SetName(L("Socket Curse-Cores"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Kill Purple Sockets and bring curse-cores for the counter-ward."));
+		SetLocation("f_flash_58");
+		SetAutoTracked(true);
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[Cursebreaker] Algimantas"), "f_flash_58");
+
+		AddObjective("killSockets", L("Kill Purple Sockets"),
+			new KillObjective(30, new[] { MonsterId.Socket_Purple }));
+
+		AddObjective("gatherCores", L("Gather curse-cores"),
+			new CollectItemObjective(650380, 8));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(68000));
+		AddReward(new ItemReward(640086, 2));
+		AddReward(new ItemReward(640004, 14));
+		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640013, 6));
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650380, character.Inventory.CountItem(650380), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650380, character.Inventory.CountItem(650380), InventoryItemRemoveMsg.Destroyed);
+	}
+}
+
+public class FFlash58Quest1003 : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_flash_58", 1003);
+		SetName(L("Cant-Pages"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Kill Green Infroholder Mages and bring cant-pages for reverse-study."));
+		SetLocation("f_flash_58");
+		SetAutoTracked(true);
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[Scribe] Egle"), "f_flash_58");
+
+		AddObjective("killMages", L("Kill Green Infroholder Mages"),
+			new KillObjective(15, new[] { MonsterId.Infroholder_Mage_Green }));
+
+		AddObjective("gatherPages", L("Gather cant-pages"),
+			new CollectItemObjective(650234, 5));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(68000));
+		AddReward(new ItemReward(640086, 2));
+		AddReward(new ItemReward(640004, 14));
+		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640013, 6));
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650234, character.Inventory.CountItem(650234), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650234, character.Inventory.CountItem(650234), InventoryItemRemoveMsg.Destroyed);
+	}
+}
+
+public class FFlash58Quest1004 : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_flash_58", 1004);
+		SetName(L("Corrupted Shards"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Break Dingofasil Rootcrystals to gather corrupted shards."));
+		SetLocation("f_flash_58");
+		SetAutoTracked(true);
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[Crystal-Warder] Dalia"), "f_flash_58");
+
+		AddObjective("breakCrystals", L("Break Rootcrystals"),
+			new KillObjective(12, new[] { MonsterId.Rootcrystal_03 }));
+
+		AddObjective("gatherShards", L("Gather corrupted shards"),
+			new CollectItemObjective(650236, 8));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(68000));
+		AddReward(new ItemReward(640086, 2));
+		AddReward(new ItemReward(640004, 14));
+		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640013, 6));
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650236, character.Inventory.CountItem(650236), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650236, character.Inventory.CountItem(650236), InventoryItemRemoveMsg.Destroyed);
+	}
+}
+
+public class FFlash58Quest1005 : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_flash_58", 1005);
+		SetName(L("The Stoneheart Alpha"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Kill Red Infroholders to draw out the Stoneheart Alpha anchoring the curse."));
+		SetLocation("f_flash_58");
+		SetAutoTracked(true);
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[Bounty Hunter] Ignas"), "f_flash_58");
+
+		AddObjective("killPack", L("Kill Red Infroholders"),
+			new KillObjective(10, new[] { MonsterId.Infroholder_Red }));
+
+		AddObjective("killAlpha", L("Defeat the Stoneheart Alpha"),
+			new KillObjective(1, new[] { MonsterId.Infroholder_Red }));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(68000));
+		AddReward(new ItemReward(640086, 2));
+		AddReward(new ItemReward(640004, 14));
+		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640013, 6));
+	}
+}
+
+public class FFlash58Quest1006 : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_flash_58", 1006);
+		SetName(L("Dingofasil Sweep"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Standard sweep of Red Infroholders, Purple Sockets, and Green Infroholder Mages."));
+		SetLocation("f_flash_58");
+		SetAutoTracked(true);
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[Militia-Captain] Petras"), "f_flash_58");
+
+		AddObjective("killInfros", L("Kill Red Infroholders"),
+			new KillObjective(12, new[] { MonsterId.Infroholder_Red }));
+
+		AddObjective("killSockets", L("Kill Purple Sockets"),
+			new KillObjective(12, new[] { MonsterId.Socket_Purple }));
+
+		AddObjective("killMages", L("Kill Green Infroholder Mages"),
+			new KillObjective(12, new[] { MonsterId.Infroholder_Mage_Green }));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(68000));
+		AddReward(new ItemReward(640086, 2));
+		AddReward(new ItemReward(640004, 14));
+		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640013, 6));
+	}
+}

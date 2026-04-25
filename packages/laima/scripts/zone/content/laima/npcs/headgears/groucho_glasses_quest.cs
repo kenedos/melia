@@ -30,6 +30,7 @@ public class GrouchoGlassesQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Survivor] Berthold"), "f_remains_39");
 
 		AddObjective("collect_bones", $"Collect {HallowventerHandBonesAmount} Hallowventer Hand Bones", new CollectItemObjective(HallowventerHandBonesId, HallowventerHandBonesAmount));
 		AddObjective("collect_cores", $"Collect {GravegolemCoreAmount} Gravegolem Core", new CollectItemObjective(GravegolemCoreId, GravegolemCoreAmount));

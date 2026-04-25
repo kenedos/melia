@@ -27,6 +27,7 @@ public class UnicornHornQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Researcher] Dr. Hornsby"), "f_gele_57_1");
 
 		AddObjective("collect_horns", "Collect 250 Panto Horns", new CollectItemObjective(PantoHornId, 250));
 		AddReward(new ItemReward(UnicornHornId, 1));

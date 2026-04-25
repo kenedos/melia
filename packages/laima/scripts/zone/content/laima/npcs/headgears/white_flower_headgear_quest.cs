@@ -34,6 +34,7 @@ public class WhiteFlowerQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Ex-Refugee] Ohla"), "f_whitetrees_56_1");
 
 		AddObjective("collect_flowlevidowns", "Collect 30 Flowlevi Downs", new CollectItemObjective(FlowleviDownId, FlowleviDownAmount));
 		AddObjective("collect_flowlonleaves", "Collect 30 Flowlon Leaves", new CollectItemObjective(FlowlonLeafId, FlowlonLeafAmount));
@@ -55,7 +56,7 @@ public class WhiteFlowerQuestScript : QuestScript
 		{
 			await dialog.Msg(L("{#666666}*looking around*{/}"));
 			await dialog.Msg(L("Me and my daughter used to be refugees living in this area. Although our situation has improved since then, I do come here occasionally. It's nostalgic, in a way."));
-			await dialog.Msg(L("I see this place is still plagued with monsters. Would you help me in culling their numbers? Just bring me materials from the monsters around here."));
+			await dialog.Msg(L("I see this place is still plagued with monsters. Would you help me in killing their numbers? Just bring me materials from the monsters around here."));
 		}
 		else
 		{

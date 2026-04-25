@@ -28,6 +28,7 @@ public class CrocusQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Shrine Keeper] Velana"), "f_huevillage_58_4");
 
 		AddObjective("collect_skins", "Collect 50 Mantiwood Skins", new CollectItemObjective(MantiwoodSkinId, 50));
 		AddObjective("collect_mushrooms", "Collect 75 Pine Mushrooms", new CollectItemObjective(PineMushroomId, 75));

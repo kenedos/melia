@@ -28,6 +28,7 @@ public class PuddingHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Chef] Purin"), "f_orchard_34_1");
 
 		AddObjective("collect_mushrooms", "Collect 100 Red Truffle Mushrooms", new CollectItemObjective(TruffleMushroom, 100));
 		AddObjective("collect_flowers", "Collect 50 Pungent Stems", new CollectItemObjective(CorpseFlower, 50));

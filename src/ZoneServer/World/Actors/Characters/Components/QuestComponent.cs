@@ -37,6 +37,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly object _syncLock = new();
 		private readonly List<Quest> _quests = new();
 		private readonly List<long> _disabledQuests = new();
+		private readonly HashSet<long> _markerNotifiedSuccess = new();
 
 		private TimeSpan _autoReceiveDelay = AutoReceiveDelay;
 		private TimeSpan _timeSinceLastLocationCheck = TimeSpan.Zero;
@@ -59,7 +60,55 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			{
 				_quests.Clear();
 				_disabledQuests.Clear();
+				_markerNotifiedSuccess.Clear();
 			}
+		}
+
+		/// <summary>
+		/// Removes every quest (in-progress, completed, abandoned) from the
+		/// character and resets their client-side state so the character
+		/// behaves as if no quest had ever been touched.
+		/// </summary>
+		/// <returns>
+		/// The total number of quests that were reset.
+		/// </returns>
+		public int ResetAll()
+		{
+			Quest[] all;
+			lock (_syncLock)
+				all = _quests.ToArray();
+
+			foreach (var quest in all)
+			{
+				if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData) && !string.IsNullOrEmpty(questData.QuestProperty))
+				{
+					var main = this.Character.SessionObjects.Main;
+					if (main.Properties.Has(questData.QuestProperty))
+					{
+						main.Properties.SetFloat(questData.QuestProperty, (float)QuestStatus.Possible);
+						Send.ZC_OBJECT_PROPERTY(this.Character, main, questData.QuestProperty);
+					}
+				}
+
+				if (quest.SessionObjectStaticData != null)
+				{
+					this.Character.SessionObjects.Remove(quest.SessionObjectStaticData.Id);
+					Send.ZC_SESSION_OBJ_REMOVE(this.Character, quest.SessionObjectStaticData.Id);
+				}
+				else
+				{
+					var lua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
+					Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+				}
+			}
+
+			lock (_syncLock)
+			{
+				_quests.Clear();
+				_disabledQuests.Clear();
+			}
+
+			return all.Length;
 		}
 
 		/// <summary>
@@ -312,6 +361,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			{
 				// Call the internal Start method which handles objectives, status, callbacks, and client updates
 				this.Start(quest);
+				ZoneServer.Instance.ServerEvents.PlayerStartedQuest.Raise(new PlayerStartedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 			}
 			else
 			{
@@ -374,6 +424,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				quest.StartTime = DateTime.Now.Add(delay);
 				this.AddSilent(quest);
 			}
+
+			ZoneServer.Instance.ServerEvents.PlayerStartedQuest.Raise(new PlayerStartedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
+
 			return Task.Yield();
 		}
 
@@ -398,7 +451,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				Log.Debug($"No static QuestScript found for QuestId {quest.Data.Id} during Start.");
 			}
 			questScript?.OnStart(this.Character, quest);
-
 
 			this.UpdateClient_AddQuest(quest);
 		}
@@ -744,6 +796,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			quest.CompleteTime = DateTime.Now;
 			quest.CompleteObjectives();
 
+			_markerNotifiedSuccess.Remove(quest.Data.Id.Value);
+
 			if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 				questScript.OnComplete(this.Character, quest);
 
@@ -764,6 +818,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			quest.Status = QuestStatus.Abandoned;
 
+			_markerNotifiedSuccess.Remove(quest.Data.Id.Value);
+
 			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)quest.Data.Id.Value, out var questData) && !string.IsNullOrEmpty(quest.QuestStaticData.QuestProperty))
 			{
 				var main = this.Character.SessionObjects.Main;
@@ -777,6 +833,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 				questScript.OnCancel(this.Character, quest);
+
+			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Raise(new PlayerAbandonedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 
 			this.UpdateClient_RemoveQuest(quest);
 		}
@@ -864,6 +922,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					{
 						Log.Debug($"QuestComponent: Starting delayed quest {quest.Data.Id.Value} for {Character.Name}.");
 						this.Start(quest); // This updates status, client, etc.
+						ZoneServer.Instance.ServerEvents.PlayerStartedQuest.Raise(new PlayerStartedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 					}
 				}
 
@@ -981,6 +1040,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
 			//Log.Debug(lua);
+
+			if (quest.ObjectivesCompleted && quest.Status < QuestStatus.Completed && _markerNotifiedSuccess.Add(quest.Data.Id.Value))
+			{
+				ZoneServer.Instance.ServerEvents.PlayerQuestObjectivesCompleted.Raise(new PlayerQuestObjectivesCompletedEventArgs(this.Character, (int)quest.Data.Id.Value));
+			}
 		}
 
 		/// <summary>

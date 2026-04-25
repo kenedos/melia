@@ -28,6 +28,7 @@ public class CloudQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Dreamer] Tomas"), "f_siauliai_46_4");
 
 		AddObjective("collect_fur_leaves", "Collect 120 Siaulamb Fur Leaves", new CollectItemObjective(SiaulambFurLeafId, SiaulambFurLeafAmount));
 		AddReward(new ItemReward(CloudHeadgearId, 1));

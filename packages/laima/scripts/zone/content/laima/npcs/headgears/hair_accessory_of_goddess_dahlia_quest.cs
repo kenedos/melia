@@ -34,6 +34,7 @@ public class GoddessDahliaQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Believer] Sancti"), "d_firetower_45");
 
 		AddObjective("collect_minvernskin", "Collect 30 Minivern Skins", new CollectItemObjective(MinivernSkinId, MinivernSkinAmount));
 		AddObjective("collect_dimmermarbles", "Collect 10 Dimmer Marbles", new CollectItemObjective(DimmerMarbleId, DimmerMarbleAmount));

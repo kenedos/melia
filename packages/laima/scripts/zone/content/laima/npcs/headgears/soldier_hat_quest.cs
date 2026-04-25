@@ -28,6 +28,7 @@ public class SoldierHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Adventurer] Marcus"), "d_cmine_02");
 
 		AddObjective("collect_cloth", "Collect 1 Shredded Pieces of Cloth", new CollectItemObjective(ShreddedClothId, 1));
 		AddObjective("collect_antennae", "Collect 150 Yekubite Antennae", new CollectItemObjective(YekubiteAntennaeId, 150));

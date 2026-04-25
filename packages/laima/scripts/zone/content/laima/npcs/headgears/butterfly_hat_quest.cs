@@ -28,6 +28,7 @@ public class ButterflyHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Grandma] Nella"), "f_gele_57_2");
 
 		AddObjective("collect_wings", "Collect 150 Leafly Wings", new CollectItemObjective(LeaflyWingId, 150));
 		AddObjective("collect_flowers", "Collect 25 Dilgele", new CollectItemObjective(DilgeleId, 25));

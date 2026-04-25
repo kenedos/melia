@@ -28,6 +28,7 @@ public class SproutQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Botanist] Flora"), "f_siauliai_11_re");
 
 		AddObjective("collect_petals", "Collect 75 Hanaming Petals", new CollectItemObjective(HanamingPetalId, 75));
 		AddObjective("collect_crystals", "Collect 1 Red Kepa Crystals", new CollectItemObjective(OnionRedCrystalId, 1));

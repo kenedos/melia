@@ -29,6 +29,7 @@ public class FlowerBranchQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Forest Artist] Florina"), "f_bracken_63_1");
 
 		AddObjective("collect_horns", "Collect 25 Leafnut Horns", new CollectItemObjective(LeafnutHornId, 25));
 		AddObjective("collect_leaves", "Collect 40 Polibu Leaves", new CollectItemObjective(PolibuLeafId, 40));

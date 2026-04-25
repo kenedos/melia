@@ -30,6 +30,7 @@ public class AngelWingsQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Tomb Keeper] Seraphiel"), "f_remains_38");
 
 		AddObjective("collect_resin", "Collect 75 Resin", new CollectItemObjective(ResinId, ResinAmount));
 		AddObjective("collect_shells", "Collect 50 Infroburk Shells", new CollectItemObjective(InfroburkShellId, InfroburkShellAmount));

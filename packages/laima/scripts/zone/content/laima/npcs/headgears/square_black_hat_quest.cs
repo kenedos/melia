@@ -28,6 +28,7 @@ public class SquareBlackHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Scholar] Tini"), "f_pilgrimroad_49");
 
 		AddObjective("collect_bones", "Collect 120 Brown Tini Bones", new CollectItemObjective(TinyBrownBoneId, 120));
 		AddObjective("collect_horns", "Collect 2 Brown Tini Horns", new CollectItemObjective(TinyBrownHornId, 2));

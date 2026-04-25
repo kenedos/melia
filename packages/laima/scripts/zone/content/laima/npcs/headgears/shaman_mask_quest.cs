@@ -28,6 +28,7 @@ public class ShamanMaskQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Mystic Doll] Yagra"), "f_rokas_26");
 
 		AddObjective("collect_teeth", "Collect 45 Wendigo Teeth", new CollectItemObjective(WendigoToothId, 45));
 		AddObjective("collect_fangs", "Collect 8 Wendigo Fangs", new CollectItemObjective(WendigoFangId, 8));

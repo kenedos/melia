@@ -28,6 +28,7 @@ public class PicnicHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Little Girl] Mila"), "f_siauliai_46_1");
 
 		AddObjective("collect_masks", "Collect 50 Siaulamb Masks", new CollectItemObjective(SiaulambMaskId, 50));
 		AddObjective("collect_flowers", "Collect 30 Dilgele", new CollectItemObjective(DilgeleId, 30));

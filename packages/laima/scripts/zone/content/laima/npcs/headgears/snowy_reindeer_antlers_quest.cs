@@ -30,6 +30,7 @@ public class SnowyReindeerAntlersQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Hunter] Valdis"), "f_tableland_71");
 
 		AddObjective("collect_horns", $"Collect {BlueTiniHornAmount} Blue Tini Horns", new CollectItemObjective(BlueTiniHornId, BlueTiniHornAmount));
 		AddObjective("collect_manes", $"Collect {BlueHohenManeAmount} Blue Hohen Manes", new CollectItemObjective(BlueHohenManeId, BlueHohenManeAmount));

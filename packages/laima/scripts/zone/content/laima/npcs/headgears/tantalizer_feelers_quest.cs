@@ -30,6 +30,7 @@ public class TantalizerFeelersQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Naturalist] Vaelen"), "d_thorn_19");
 
 		AddObjective("collect_feathers", "Collect 80 Velwriggler Feathers", new CollectItemObjective(VelwrigglerFeatherId, VelwrigglerFeatherAmount));
 		AddObjective("collect_thorns", "Collect 60 Thornball Thorns", new CollectItemObjective(ThornballThornId, ThornballThornAmount));

@@ -30,6 +30,7 @@ public class ChupacabraFearQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Fearful] Felix"), "f_rokas_25");
 
 		AddObjective("collect_meat", "Collect 80 Desert Chupacabra Meat", new CollectItemObjective(ChupacabraMeatId, 80));
 		AddObjective("collect_skin", "Collect 5 Desert Chupacabra Skin", new CollectItemObjective(ChupacabraSkinId, 5));

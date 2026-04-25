@@ -30,6 +30,7 @@ public class WhiteBunnyHairbandQuestScript : QuestScript
 		this.SetUnlock(QuestUnlockType.AllAtOnce);
 		this.SetCancelable(true);
 		this.SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Seamstress] Mirela"), "f_tableland_28_1");
 
 		this.AddObjective("collect_hair", "Collect Lepusbunny Hair",
 			new CollectItemObjective(LepusbunnyHairId, LepusbunnyHairAmount));

@@ -37,6 +37,7 @@ public class HuckleberryHairAccessoryQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Farmer's Daughter] Lina"), "f_farm_47_1");
 
 		AddObjective("collect_pino_stems", "Collect 50 Pino Stems",
 			new CollectItemObjective(PinoStemId, PinoStemAmount));

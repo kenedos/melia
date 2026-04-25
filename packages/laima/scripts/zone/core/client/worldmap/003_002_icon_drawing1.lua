@@ -18,10 +18,11 @@ function M_CREATE_MAP_ICON(parent, ctrlName, icon, mapProp, mapWidth, mapHeight,
 	imgIcon:SetEnableStretch(1)
 	imgIcon:SetEnable(1)
 	imgIcon:EnableChangeMouseCursor(1)
-	
+	imgIcon:MakeTopBetweenChild()
+
 	if icon.Tooltip then
 		imgIcon:SetTextTooltip("{@st59}" .. icon.Tooltip .. "{/}");
 	end
-	
+
 	return imgIcon
 end

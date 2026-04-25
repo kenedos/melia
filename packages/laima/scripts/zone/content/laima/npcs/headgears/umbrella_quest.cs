@@ -30,6 +30,7 @@ public class UmbrellaQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Traveler] Pluvis"), "f_katyn_12");
 
 		AddObjective("collect_hooks", "Collect 50 Large Hooks", new CollectItemObjective(LargeHookId, LargeHookAmount));
 		AddObjective("collect_knives", "Collect 75 Kitchen Knives", new CollectItemObjective(KitchenKnifeId, KitchenKnifeAmount));

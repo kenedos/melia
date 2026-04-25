@@ -28,6 +28,7 @@ public class BoeingSunglassesQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Klaipeda Agent] Markas"), "f_rokas_28");
 
 		AddObjective("collect_skin", "Collect 50 Lauzinute Skins", new CollectItemObjective(LauzininteSkinId, 50));
 		AddObjective("collect_tusk", "Collect 30 Hogma Tusks", new CollectItemObjective(HogmaTuskId, 30));

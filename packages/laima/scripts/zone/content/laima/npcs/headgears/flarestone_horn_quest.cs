@@ -28,6 +28,7 @@ public class FlarestoneHornQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Frightened Villager] Valdas"), "f_siauliai_46_1");
 
 		AddObjective("collect_masks", "Collect 80 Siaulamb Masks", new CollectItemObjective(SiaulambMaskId, SiaulambMaskAmount));
 		AddReward(new ItemReward(FlarestoneHornId, 1));

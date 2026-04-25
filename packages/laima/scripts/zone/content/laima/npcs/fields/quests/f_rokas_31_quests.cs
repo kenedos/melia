@@ -181,7 +181,7 @@ public class ZacharielCrossroadsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*Her eyes light up with hope*{/}"));
 						await dialog.Msg(L("Truly? Oh, thank you! I've been trying to contain the corruption myself, but I lack the strength."));
 
-						if (await dialog.YesNo(L("Will you cull the corrupted Repusbunny Mages? If we reduce their numbers, perhaps the corruption will spread more slowly.")))
+						if (await dialog.YesNo(L("Will you kill the corrupted Repusbunny Mages? If we reduce their numbers, perhaps the corruption will spread more slowly.")))
 						{
 							character.Quests.Start(questId);
 							await dialog.Msg(L("Bless you! Please, defeat 15 of the Repusbunny Mages. It pains me to ask this of such creatures, but they are beyond saving now."));
@@ -284,7 +284,7 @@ public class GuardianOfZemynaQuest : QuestScript
 		SetId("f_rokas_31", 1002);
 		SetName(L("Guardian of Zemyna"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Protect the Statue of Goddess Zemyna by culling the corrupted Repusbunny Mages."));
+		SetDescription(L("Protect the Statue of Goddess Zemyna by killing the corrupted Repusbunny Mages."));
 		SetLocation("f_rokas_31");
 		SetAutoTracked(true);
 

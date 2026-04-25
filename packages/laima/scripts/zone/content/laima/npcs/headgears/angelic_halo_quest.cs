@@ -30,6 +30,7 @@ public class AngelicHaloQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Priestess] Celestine"), "f_remains_38");
 
 		AddObjective("collect_resin", $"Collect {ResinAmount} Resin", new CollectItemObjective(ResinId, ResinAmount));
 		AddObjective("collect_shells", $"Collect {InfroburgShellAmount} Infroburk Shell", new CollectItemObjective(InfroburgShellId, InfroburgShellAmount));

@@ -29,6 +29,7 @@ public class WoodOwlQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Wooden Owl] Nocturnus"), "f_katyn_45_2");
 
 		AddObjective("collect_stems", "Collect 45 Blue Ridimed Stems", new CollectItemObjective(RidimedStemId, 45));
 		AddObjective("collect_straw", "Collect 30 Red Straw Sheaves", new CollectItemObjective(RedStrawId, 30));

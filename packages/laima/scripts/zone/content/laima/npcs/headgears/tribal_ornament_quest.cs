@@ -28,6 +28,7 @@ public class TribalOrnamentQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Tribal Craftsman] Kamu"), "f_huevillage_58_2");
 
 		AddObjective("collect_feathers", "Collect 120 Ultanun Feathers", new CollectItemObjective(UltanunFeather, 120));
 		AddObjective("collect_ivory", "Collect 1 Loxodon Ivory", new CollectItemObjective(LoxodonIvory, 1));

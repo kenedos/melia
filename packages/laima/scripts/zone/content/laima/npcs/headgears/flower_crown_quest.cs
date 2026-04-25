@@ -28,6 +28,7 @@ public class FlowerCrownQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Florist] Flora"), "f_huevillage_58_3");
 
 		AddObjective("collect_petals", "Collect 50 Caro Leaves", new CollectItemObjective(CaroLeafId, 50));
 		AddObjective("collect_bark", "Collect 25 Upent Bark", new CollectItemObjective(UpentBarkId, 25));

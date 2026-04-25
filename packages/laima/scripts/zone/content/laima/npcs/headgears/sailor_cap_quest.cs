@@ -27,6 +27,7 @@ public class SailorCapQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Retired Sailor] Jacques"), "f_orchard_32_4");
 
 		AddObjective("collect_fur", "Collect 250 Ferret Fur", new CollectItemObjective(FerretFurId, 250));
 		AddReward(new ItemReward(SailorCapId, 1));

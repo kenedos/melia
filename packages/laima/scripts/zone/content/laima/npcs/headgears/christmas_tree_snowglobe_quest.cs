@@ -30,6 +30,7 @@ public class ChristmasTreeSnowglobeQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Tinkerer] Holvir"), "f_tableland_11_1");
 
 		AddObjective("collect_horns", "Collect 60 Groll Horns", new CollectItemObjective(GrollHornId, GrollHornAmount));
 		AddObjective("collect_chains", "Collect 80 White Chains", new CollectItemObjective(WhiteChainId, WhiteChainAmount));

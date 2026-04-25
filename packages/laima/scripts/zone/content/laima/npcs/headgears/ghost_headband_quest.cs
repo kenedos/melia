@@ -30,6 +30,7 @@ public class GhostHeadbandQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Spirit] Marcus"), "f_gele_57_3");
 
 		AddObjective("collect_matter", "Collect 75 Banshee Spirit Matter", new CollectItemObjective(BansheeSpriteMatterId, 75));
 		AddObjective("collect_hoods", "Collect 3 Banshee Hoods", new CollectItemObjective(BansheeHoodId, 3));

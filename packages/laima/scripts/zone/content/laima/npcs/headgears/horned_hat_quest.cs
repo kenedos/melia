@@ -30,6 +30,7 @@ public class HornedHatQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Historian] Valdric"), "f_flash_60");
 
 		AddObjective("collect_fragments", "Collect 80 Moya Fragments", new CollectItemObjective(MoyaFragmentId, MoyaFragmentAmount));
 		AddObjective("collect_feathers", "Collect 40 Bavon Feathers", new CollectItemObjective(BavonFeatherId, BavonFeatherAmount));

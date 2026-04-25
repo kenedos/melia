@@ -28,6 +28,7 @@ public class PartyConeQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Party Enthusiast] Fiesta"), "f_bracken_63_2");
 
 		AddObjective("collect_branches", "Collect 5 Ponpon Branches", new CollectItemObjective(PonponBranch, 5));
 		AddObjective("collect_feathers", "Collect 45 Loktanun Feathers", new CollectItemObjective(LoktanunFeather, 45));

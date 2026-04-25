@@ -209,6 +209,7 @@ namespace Melia.Zone.Commands
 			this.Add("generatemapimages", "", "Creates a folder 'map_images' in temp folder with all map images.", this.HandleGenerateMapImages);
 			this.Add("skill", "", "Add or remove a skill.", this.HandleSkillManagement);
 			this.Add("resetdungeon", "[daily|weekly|all]", "Resets dungeon entry counters.", this.HandleResetDungeon);
+			this.Add("resetquest", "", "Cancels active quests and clears all Laima quest variables.", this.HandleResetQuests);
 			this.Add("resetteamstorage", "", "Resets team storage properties (expansions) to default.", this.HandleResetTeamStorage);
 			this.Add("cubeinfo", "<group|item_class>", "Shows contents of a cube/gacha by group name or item class.", this.HandleCubeInfo);
 			this.Add("cubelist", "[filter]", "Lists all available cube/gacha groups.", this.HandleCubeList);
@@ -221,6 +222,7 @@ namespace Melia.Zone.Commands
 			this.Add("fixbillboard", "<angle> [0/1]", "Fixes the target's billboard rotation.", this.HandleFixBillboard);
 			this.Add("attachitem", "<item_id> <slot> [0/1]", "Attaches an item model to the target.", this.HandleAttachItem);
 			this.Add("testeffect", "<effect_name> [duration]", "Plays an effect at your position and saves its handle.", this.HandleTestEffect);
+			this.Add("playsound", "<sound_name>", "Plays a UI sound effect locally for testing.", this.HandlePlaySound);
 			this.Add("endeffect", "[handle]", "Ends the last saved effect or a specified one.", this.HandleEndEffect);
 			this.Add("attachtonode", "<attach_handle> <target_handle> <node>", "Attaches one actor to another.", this.HandleAttachToNode);
 			this.Add("playeffect15", "<effect_name>", "Plays an effect using the old 0x15 opcode.", this.HandlePlayEffect15);
@@ -243,6 +245,10 @@ namespace Melia.Zone.Commands
 			this.AddAlias("resetabilities", "resetattributes");
 			this.AddAlias("savelocation", "sl");
 			this.AddAlias("killmonsters", "killmons");
+			this.AddAlias("resetquest", "resetquests");
+			this.AddAlias("mapinfo", "whomap");
+			this.AddAlias("goto", "jumpto");
+			this.AddAlias("resetdungeon", "resetdungeons");
 		}
 
 		private CommandResult HandleDungeonMatchMaking(Character sender, Character target, string message, string commandName, Arguments args)
@@ -300,6 +306,26 @@ namespace Melia.Zone.Commands
 
 			// Use our new, clearer method to send the packet
 			Send.ZC_NORMAL.InstanceDungeonMatchMaking(sender, dungeonInfo.Id, uiOptions);
+
+			return CommandResult.Okay;
+		}
+
+		private CommandResult HandleResetQuests(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			var resetCount = target.Quests.ResetAll();
+
+			var questVars = target.Variables.Perm.GetList()
+				.Where(kvp => kvp.Key.StartsWith("Laima.Quests."))
+				.ToList();
+
+			foreach (var kvp in questVars)
+				target.Variables.Perm.Remove(kvp.Key);
+
+			ZoneServer.Instance.Database.SavePlayerData(target);
+
+			sender.ServerMessage($"Reset {resetCount} quest(s) and cleared {questVars.Count} quest variable(s) for {target.Name}.");
+			if (sender != target)
+				target.ServerMessage($"All your quests have been reset and quest progress variables cleared.");
 
 			return CommandResult.Okay;
 		}

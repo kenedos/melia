@@ -636,7 +636,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 					categoryItem.Amount += add;
 					amount -= add;
-					var previousAmount = categoryItem.Amount - add;
 
 					if (!silent)
 					{
@@ -644,10 +643,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 						// Use given add type if this was the last of it,
 						// or NotNew if only some was just added to a stack.
-						if (previousAmount > 0)
-							Send.ZC_ITEM_REMOVE(this.Character, categoryItem.ObjectId, previousAmount, InventoryItemRemoveMsg.Given, inventoryType);
+						var adjustedAddType = (amount == 0 ? addType : InventoryAddType.NotNew);
 
-						Send.ZC_ITEM_ADD(this.Character, categoryItem, categoryIndex, categoryItem.Amount, InventoryAddType.NotNew, inventoryType, notificationDelay);
+						Send.ZC_ITEM_ADD(this.Character, categoryItem, categoryIndex, add, adjustedAddType, InventoryType.Inventory);
+
+						// We're still not sure how to handle stackable items without causing massive lag
+						// spike on the client
+						if (item.IsStackable && item.Id != ItemId.Silver)
+							Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
+						else
+							Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character, item.Data.Category);
 						if (ZoneServer.Instance.Conf.Log.LogItems)
 						{
 							var logReason = reason ?? InventoryAddType.NotNew.ToString();

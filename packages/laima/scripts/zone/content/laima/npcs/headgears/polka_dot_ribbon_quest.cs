@@ -28,6 +28,7 @@ public class PolkaDotRibbonQuestScript : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetCancelable(true);
 		SetReceive(QuestReceiveType.Manual);
+		AddQuestGiver(L("[Enchantress] Dotty"), "d_thorn_39_1");
 
 		AddObjective("collect_cotton", "Collect 10 Shaman Doll Cotton", new CollectItemObjective(MageCoreId, 10));
 		AddObjective("collect_staff", "Collect 3 Tala Mage Staffs", new CollectItemObjective(MageStaffId, 3));

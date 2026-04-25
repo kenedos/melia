@@ -51,7 +51,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 						await dialog.Msg(L("Another capable fighter? Good. We need more people taking action."));
 						await dialog.Msg(L("The Jukopus, Kepas, and Pokubu - they've all become vectors for the corruption. Every one of them spreads poison through this region."));
 
-						if (await dialog.YesNo(L("We need to cull the infected population before the contamination overwhelms the entire forest. I can offer you a proper weapon - a soldier's iron club - if you help thin their numbers. Are you in?")))
+						if (await dialog.YesNo(L("We need to kill the infected population before the contamination overwhelms the entire forest. I can offer you a proper weapon - a soldier's iron club - if you help thin their numbers. Are you in?")))
 						{
 							character.Quests.Start(questId);
 							await dialog.Msg(L("Excellent. Hunt down the corrupted Jukopus, poisoned Kepas, and infected Pokubu throughout these woods."));
@@ -63,7 +63,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*She gestures toward the forest*{/}"));
 						await dialog.Msg(L("After the demon war, residual dark energy saturated these lands. When the guardian owl's protection weakened, that corruption took root."));
 						await dialog.Msg(L("Now it's infecting the wildlife, turning ordinary creatures into toxic threats. If we don't contain it, this entire region could become uninhabitable."));
-						await dialog.Msg(L("I've been scouting the affected zones, mapping contamination levels. But studying it isn't enough - we need to actively cull the infected creatures."));
+						await dialog.Msg(L("I've been scouting the affected zones, mapping contamination levels. But studying it isn't enough - we need to actively kill the infected creatures."));
 						break;
 
 					case "leave":
@@ -85,7 +85,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 				if (!jukopusDone || !kepasDone || !pokubuDone)
 				{
-					await dialog.Msg(L("Still culling the infected creatures?"));
+					await dialog.Msg(L("Still killing the infected creatures?"));
 					await dialog.Msg(L("Keep at it. Every infected creature eliminated slows the contamination's spread."));
 				}
 				else
@@ -101,7 +101,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The culling operation you conducted made a real difference. Contamination readings have improved in several zones."));
+				await dialog.Msg(L("The killing operation you conducted made a real difference. Contamination readings have improved in several zones."));
 				await dialog.Msg(L("With continued effort, we might be able to reclaim these woods from the poison's grip."));
 			}
 		});
@@ -221,7 +221,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*He nods slowly*{/}"));
 						await dialog.Msg(L("So you're a fighter, eh? Good. The forest needs people willing to face the darkness."));
 
-						if (await dialog.YesNo(L("Hunt the corrupted Pokubu and the Pokuborn. If enough of them are culled, maybe the corruption will slow its spread. Will you do this?")))
+						if (await dialog.YesNo(L("Hunt the corrupted Pokubu and the Pokuborn. If enough of them are killed, maybe the corruption will slow its spread. Will you do this?")))
 						{
 							character.Quests.Start(questId);
 							await dialog.Msg(L("Good. Hunt the Pokubu throughout these woods. The Pokuborn especially - they're the most dangerous."));
@@ -971,7 +971,7 @@ public class CleansingCorruptedAirQuest : QuestScript
 		SetId("f_siauliai_15_re", 1001);
 		SetName(L("Cleansing the Corrupted Air"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Cull the infected creatures spreading poison throughout the woods to help Scout Milda contain the contamination."));
+		SetDescription(L("Kill the infected creatures spreading poison throughout the woods to help Scout Milda contain the contamination."));
 		SetLocation("f_siauliai_15_re");
 		SetAutoTracked(true);
 

@@ -1,4 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
+//--- Melia Script ----------------------------------------------------------
 // World Map
 //--- Description -----------------------------------------------------------
 // Makes changes to the world and mini maps, such as removing the level
