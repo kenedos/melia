@@ -44,12 +44,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Lemurias inside the Inner Enceinte?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. They swarm - keep swinging and don't stop."));
-							await dialog.Msg(L("Ward-charm at the neck. Their bite grey-streaks."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. They swarm - keep swinging and don't stop."));
+						await dialog.Msg(L("Ward-charm at the neck. Their bite grey-streaks."));
 						break;
 
 					case "info":
@@ -109,12 +106,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Crack five Rootcrystals and bring back their wardcores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wardcores are dense - heavy for their size. Dull ones are duds."));
-							await dialog.Msg(L("Five heavy ones. Thank you."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wardcores are dense - heavy for their size. Dull ones are duds."));
+						await dialog.Msg(L("Five heavy ones. Thank you."));
 						break;
 
 					case "info":
@@ -175,12 +169,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Rubabos and recover four citizen tokens from the burrow nests?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fifteen Rubabos. Tokens are wrapped in nesting fur - look for the padded spots."));
-							await dialog.Msg(L("Handle gentle. Sentimental value, not just archival."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fifteen Rubabos. Tokens are wrapped in nesting fur - look for the padded spots."));
+						await dialog.Msg(L("Handle gentle. Sentimental value, not just archival."));
 						break;
 
 					case "info":
@@ -313,12 +304,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Saltisdaughter Archers and recover five brand-arrows?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Arrows in the quivers - their unfired ones. Don't touch the arrowheads. Wrap them."));
-							await dialog.Msg(L("The inspectors need them sealed. Chain-of-custody matters."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Arrows in the quivers - their unfired ones. Don't touch the arrowheads. Wrap them."));
+						await dialog.Msg(L("The inspectors need them sealed. Chain-of-custody matters."));
 						break;
 
 					case "info":
@@ -387,12 +375,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin ten Lemurias and bring down the Stone-Mother when she emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. She lunges from the stone-shoulder. Stay off her right."));
-							await dialog.Msg(L("Good hunting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. She lunges from the stone-shoulder. Stay off her right."));
+						await dialog.Msg(L("Good hunting."));
 						break;
 
 					case "info":
@@ -473,12 +458,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Lemurias and twelve Repusbunnies along the wall walk?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve and twelve. Lemurias scale from inside, Repusbunnies tunnel from outside. Mind both."));
-							await dialog.Msg(L("Clear them, and the walk is patrol-ready by dawn."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve and twelve. Lemurias scale from inside, Repusbunnies tunnel from outside. Mind both."));
+						await dialog.Msg(L("Clear them, and the walk is patrol-ready by dawn."));
 						break;
 
 					case "info":
@@ -547,10 +529,10 @@ public class LemuriaSwarmQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Lemuria }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -574,11 +556,11 @@ public class EnceinteWardstoneCoresQuest : QuestScript
 			new CollectItemObjective(650253, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -615,11 +597,11 @@ public class TheBunnyNestsQuest : QuestScript
 			new CollectItemObjective(650455, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -668,11 +650,11 @@ public class TheSaltisdaughterArchersQuest : QuestScript
 			new CollectItemObjective(650760, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -709,11 +691,11 @@ public class TheStoneMotherQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Lemuria }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -740,10 +722,10 @@ public class TheEnceinteWallWalkQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Repusbunny }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

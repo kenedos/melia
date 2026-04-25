@@ -43,11 +43,8 @@ public class FTableland70QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Purple Mane Hohens?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't inhale the mane-dust."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't inhale the mane-dust."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FTableland70QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Blue Hohen Mages and bring six horns?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Break at the base - don't crack the spiral."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Break at the base - don't crack the spiral."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FTableland70QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Blue Cronewts and bring ten prime scales?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Only the ridgeline scales. Belly scales are useless."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Only the ridgeline scales. Belly scales are useless."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FTableland70QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Blue Lapasape Bows and bring five quivers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Leave the straps. Cut only the bodies."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Leave the straps. Cut only the bodies."));
 						break;
 
 					case "info":
@@ -286,11 +274,8 @@ public class FTableland70QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Purple Mane Hohens and meet the Stampede-Lord's charge?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. Brace."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. Brace."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FTableland70QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Blue Cronewts and twelve Purple Mane Hohens?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Standard bounty."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Standard bounty."));
 						break;
 
 					case "info":
@@ -427,10 +409,10 @@ public class FTableland70Quest1001 : QuestScript
 			new KillObjective(30, new[] { MonsterId.Hohen_Mane_Purple }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -456,11 +438,11 @@ public class FTableland70Quest1002 : QuestScript
 			new CollectItemObjective(650071, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -496,11 +478,11 @@ public class FTableland70Quest1003 : QuestScript
 			new CollectItemObjective(650072, 10));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -536,11 +518,11 @@ public class FTableland70Quest1004 : QuestScript
 			new CollectItemObjective(650073, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -576,11 +558,11 @@ public class FTableland70Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Hohen_Mane_Purple }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -606,10 +588,10 @@ public class FTableland70Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Hohen_Mane_Purple }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }

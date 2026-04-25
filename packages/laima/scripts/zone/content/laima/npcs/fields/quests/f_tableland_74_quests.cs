@@ -43,11 +43,8 @@ public class FTableland74QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Tiny Brown Mages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. Mind their staves."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. Mind their staves."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FTableland74QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Purple Keparis and bring seven flesh-cuts?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cold-wrap the cuts. They sour fast."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cold-wrap the cuts. They sour fast."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FTableland74QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill eighteen White Spion Mages and bring six essence-vials?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't uncork them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't uncork them."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FTableland74QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill eighteen Tiny Brown Mages on the upper terrace?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eighteen. Quick."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eighteen. Quick."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FTableland74QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Blue Harugals and defeat the Elite when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FTableland74QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Tiny Brown Mages, Purple Keparis, Blue Hohen Gulaks?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FTableland74Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Tiny_Mage_Brown }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FTableland74Quest1002 : QuestScript
 			new CollectItemObjective(650776, 7));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 4));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FTableland74Quest1003 : QuestScript
 			new CollectItemObjective(663131, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FTableland74Quest1004 : QuestScript
 			new KillObjective(18, new[] { MonsterId.Tiny_Mage_Brown }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FTableland74Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Harugal_Blue }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -594,10 +576,10 @@ public class FTableland74Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Hohen_Gulak_Blue }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

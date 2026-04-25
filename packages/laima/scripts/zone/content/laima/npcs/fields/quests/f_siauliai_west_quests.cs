@@ -469,9 +469,9 @@ public class FSiauliaiWestFarmingToolsQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(350, 230));
-		AddReward(new SilverReward(2000));
-		AddReward(new ItemReward(640002, 5)); // Small HP potions
-		AddReward(new ItemReward(640005, 5)); // Small SP potions
+		AddReward(new SilverReward(500));
+		AddReward(new ItemReward(640002, 1)); // Small HP potions
+		AddReward(new ItemReward(640005, 1)); // Small SP potions
 		AddReward(new ItemReward(221103, 1)); // Wooden Kite Shield
 		AddReward(new ItemReward(640080, 2)); // Lv1 EXP Cards
 	}
@@ -517,9 +517,9 @@ public class FSiauliaiWestHerbalistQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(420, 280));
-		AddReward(new SilverReward(3200));
-		AddReward(new ItemReward(640002, 5)); // Small HP potions
-		AddReward(new ItemReward(640005, 5)); // Small SP potions
+		AddReward(new SilverReward(800));
+		AddReward(new ItemReward(640002, 1)); // Small HP potions
+		AddReward(new ItemReward(640005, 1)); // Small SP potions
 		AddReward(new ItemReward(640097, 5)); // Stamina potions
 		AddReward(new ItemReward(531103, 1)); // Leather Armor
 		AddReward(new ItemReward(640080, 3)); // Lv1 EXP Cards
@@ -550,9 +550,9 @@ public class FSiauliaiWestVillageRemedyQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(480, 320));
-		AddReward(new SilverReward(3500));
-		AddReward(new ItemReward(640002, 12)); // Small HP potions
-		AddReward(new ItemReward(640005, 12)); // Small SP potions
+		AddReward(new SilverReward(900));
+		AddReward(new ItemReward(640002, 3)); // Small HP potions
+		AddReward(new ItemReward(640005, 3)); // Small SP potions
 		AddReward(new ItemReward(501103, 1)); // Leather Gloves
 		AddReward(new ItemReward(640080, 3)); // Lv1 EXP Cards
 	}
@@ -585,9 +585,9 @@ public class FSiauliaiWestRunestoneQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(400, 300));
-		AddReward(new SilverReward(3000));
-		AddReward(new ItemReward(640002, 10)); // Small HP potions
-		AddReward(new ItemReward(640005, 10)); // Small SP potions
+		AddReward(new SilverReward(800));
+		AddReward(new ItemReward(640002, 2)); // Small HP potions
+		AddReward(new ItemReward(640005, 2)); // Small SP potions
 		AddReward(new ItemReward(511103, 1)); // Leather Boots
 		AddReward(new ItemReward(640080, 2)); // Lv1 EXP Cards
 	}
@@ -631,9 +631,9 @@ public class FSiauliaiWestMerchantQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(420, 280));
-		AddReward(new SilverReward(4500));
-		AddReward(new ItemReward(640002, 10)); // Small HP potions
-		AddReward(new ItemReward(640005, 10)); // Small SP potions
+		AddReward(new SilverReward(1100));
+		AddReward(new ItemReward(640002, 2)); // Small HP potions
+		AddReward(new ItemReward(640005, 2)); // Small SP potions
 		AddReward(new ItemReward(521103, 1)); // Leather Pants
 		AddReward(new ItemReward(640080, 3)); // Lv1 EXP Cards
 	}

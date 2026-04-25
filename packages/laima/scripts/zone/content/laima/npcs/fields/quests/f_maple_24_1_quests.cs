@@ -44,11 +44,8 @@ public class FMaple241QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Rudas Elavines for their petals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-five. They shed only under stress."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-five. They shed only under stress."));
 						break;
 
 					case "info":
@@ -104,11 +101,8 @@ public class FMaple241QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Attis and bring five pollen-clusters?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Scrape the leg-joints. That's where the pollen packs."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Scrape the leg-joints. That's where the pollen packs."));
 						break;
 
 					case "info":
@@ -165,11 +159,8 @@ public class FMaple241QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty-five Deliones along the inner paths?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("They nest in clusters. Easy counting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They nest in clusters. Easy counting."));
 						break;
 
 					case "info":
@@ -225,11 +216,8 @@ public class FMaple241QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Cloverins and bring eight lucky clovers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eight. Don't hold out for nine - that's superstition."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eight. Don't hold out for nine - that's superstition."));
 						break;
 
 					case "info":
@@ -287,11 +275,8 @@ public class FMaple241QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Rudas Elavines and defeat the Matriarch when she emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. She'll feel each one."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. She'll feel each one."));
 						break;
 
 					case "info":
@@ -365,11 +350,8 @@ public class FMaple241QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Rudas, twelve Deliones, and twelve Cloverins?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six. Standard count."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six. Standard count."));
 						break;
 
 					case "info":
@@ -429,10 +411,10 @@ public class FMaple241Quest1001 : QuestScript
 			new KillObjective(25, new[] { MonsterId.Rudas_Elavine }));
 
 		AddReward(new ExpReward(1000, 700));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
 	}
 }
 
@@ -458,11 +440,11 @@ public class FMaple241Quest1002 : QuestScript
 			new CollectItemObjective(650041, 5));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,10 +477,10 @@ public class FMaple241Quest1003 : QuestScript
 			new KillObjective(35, new[] { MonsterId.Delione }));
 
 		AddReward(new ExpReward(1000, 700));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
 	}
 }
 
@@ -524,11 +506,11 @@ public class FMaple241Quest1004 : QuestScript
 			new CollectItemObjective(650051, 8));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -564,11 +546,11 @@ public class FMaple241Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Rudas_Elavine }));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 }
 
@@ -597,10 +579,10 @@ public class FMaple241Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Cloverin }));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 }

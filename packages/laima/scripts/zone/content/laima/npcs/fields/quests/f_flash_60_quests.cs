@@ -45,12 +45,9 @@ public class FFlash60QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Moya from the market grounds?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. Move fast - their carcasses leave grey circles where they fall."));
-							await dialog.Msg(L("Keep moving. The ground here holds a grudge."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. Move fast - their carcasses leave grey circles where they fall."));
+						await dialog.Msg(L("Keep moving. The ground here holds a grudge."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FFlash60QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Crack five Rootcrystals and bring back their silvered cores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Silvered cores feel heavier than plain. If one feels light, it's a dud - leave it."));
-							await dialog.Msg(L("Five proper ones. Thank you."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Silvered cores feel heavier than plain. If one feels light, it's a dud - leave it."));
+						await dialog.Msg(L("Five proper ones. Thank you."));
 						break;
 
 					case "info":
@@ -176,12 +170,9 @@ public class FFlash60QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Bavon and recover four vendor ledgers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fifteen should quiet the main nests. Ledgers are in the stall frames - look for the ones with carved initials."));
-							await dialog.Msg(L("Handle gently. The paper's curse-dry - it crumbles if you grip wrong."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fifteen should quiet the main nests. Ledgers are in the stall frames - look for the ones with carved initials."));
+						await dialog.Msg(L("Handle gently. The paper's curse-dry - it crumbles if you grip wrong."));
 						break;
 
 					case "info":
@@ -314,12 +305,9 @@ public class FFlash60QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Saltisdaughter Mages and recover five curse-brands?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Brands are worn on the breastbone. Check every mage you fell - they hide them under robes."));
-							await dialog.Msg(L("Don't touch a brand with bare skin. Wrap them. I have a furnace ready."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Brands are worn on the breastbone. Check every mage you fell - they hide them under robes."));
+						await dialog.Msg(L("Don't touch a brand with bare skin. Wrap them. I have a furnace ready."));
 						break;
 
 					case "info":
@@ -389,12 +377,9 @@ public class FFlash60QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Moya and bring down the Stallmaster Alpha when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. Pace yourself. Don't face him half-ready."));
-							await dialog.Msg(L("He charges with the stone shoulder. Stay off his right."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. Pace yourself. Don't face him half-ready."));
+						await dialog.Msg(L("He charges with the stone shoulder. Stay off his right."));
 						break;
 
 					case "info":
@@ -475,12 +460,9 @@ public class FFlash60QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Moya and twelve Bavon along the Roxona perimeter?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve of each. Moya spread low dust, Bavon launch from the alleys. Mind both."));
-							await dialog.Msg(L("Clear them, and three caravans roll through by week's end."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve of each. Moya spread low dust, Bavon launch from the alleys. Mind both."));
+						await dialog.Msg(L("Clear them, and three caravans roll through by week's end."));
 						break;
 
 					case "info":
@@ -549,10 +531,10 @@ public class MoyaScavengersQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Moya }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -576,11 +558,11 @@ public class SilveredCoresQuest : QuestScript
 			new CollectItemObjective(650317, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -617,11 +599,11 @@ public class TheVendorLedgersQuest : QuestScript
 			new CollectItemObjective(650475, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -670,11 +652,11 @@ public class TheSaltisdaughterCabalQuest : QuestScript
 			new CollectItemObjective(650615, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -711,11 +693,11 @@ public class TheStallmasterAlphaQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Bavon }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -742,10 +724,10 @@ public class MarketPerimeterQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Bavon }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

@@ -303,11 +303,11 @@ public class PlateausMenaceQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Cards
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Normal Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Normal Recovery Potion
 		AddReward(new ItemReward(112006, 1)); // Sketis Dagger
 	}
 }
@@ -336,11 +336,11 @@ public class TotemDesecrationQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 	}
 }
 
@@ -368,11 +368,11 @@ public class MessageToTheHillsideQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 		AddReward(new ItemReward(924014, 1)); // Recipe - Hunting Bow
 	}
 

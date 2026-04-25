@@ -701,9 +701,9 @@ public class DesertMysteriesQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(600, 400));
-		AddReward(new SilverReward(3000));
-		AddReward(new ItemReward(640002, 8)); // HP potions
-		AddReward(new ItemReward(640005, 10)); // SP potions
+		AddReward(new SilverReward(800));
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 2)); // SP potions
 		AddReward(new ItemReward(640080, 2));  // Lv1 EXP Cards
 		AddReward(new ItemReward(141118, 1));  // Long Rod
 	}
@@ -734,9 +734,9 @@ public class HeightsOfDzidaQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(800, 550));
-		AddReward(new SilverReward(4000));
-		AddReward(new ItemReward(640002, 10)); // HP potions
-		AddReward(new ItemReward(640005, 12)); // SP potions
+		AddReward(new SilverReward(1000));
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 3)); // SP potions
 		AddReward(new ItemReward(640080, 3));  // Lv1 EXP Cards
 		AddReward(new ItemReward(511103, 1));  // Leather Boots
 	}
@@ -792,9 +792,9 @@ public class EchoesInStoneQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(700, 480));
-		AddReward(new SilverReward(3500));
-		AddReward(new ItemReward(640002, 8)); // HP potions
-		AddReward(new ItemReward(640005, 12)); // SP potions
+		AddReward(new SilverReward(900));
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 3)); // SP potions
 		AddReward(new ItemReward(640080, 3));  // Lv1 EXP Cards
 		AddReward(new ItemReward(581102, 1));  // SP Necklace
 		AddReward(new ItemReward(ItemId.Scroll_Warp_Fedimian, 1)); // Fedimian scroll
@@ -856,9 +856,9 @@ public class SanctumsMemoryQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(800, 600));
-		AddReward(new SilverReward(5000));
-		AddReward(new ItemReward(640002, 10)); // HP potions
-		AddReward(new ItemReward(640005, 14)); // SP potions
+		AddReward(new SilverReward(1200));
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 3)); // SP potions
 		AddReward(new ItemReward(640080, 3));  // Lv1 EXP Cards
 		AddReward(new ItemReward(601125, 1));  // Ring Bracelet
 		AddReward(new ItemReward(ItemId.Scroll_Warp_Fedimian, 2)); // Fedimian scroll

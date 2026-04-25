@@ -43,11 +43,8 @@ public class FTableland281QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Green Repusbunnies?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. The warren's east of the crag."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. The warren's east of the crag."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FTableland281QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Green Bow-Repusbunnies and bring eight fletchings?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't crease them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't crease them."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FTableland281QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill sixteen Red Saltisdaughter Mages and bring six ember-dust pinches?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wax-paper packets. Don't breathe it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wax-paper packets. Don't breathe it."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FTableland281QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break fourteen Rootcrystals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fourteen. Mind the spray."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fourteen. Mind the spray."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FTableland281QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Green Bow-Repusbunnies and defeat the Matriarch when she emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. Then she comes up shooting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. Then she comes up shooting."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FTableland281QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Green Repusbunnies, Green Bow-Repusbunnies, Red Saltisdaughter Mages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FTableland281Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Repusbunny_Green }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FTableland281Quest1002 : QuestScript
 			new CollectItemObjective(650266, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FTableland281Quest1003 : QuestScript
 			new CollectItemObjective(650267, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FTableland281Quest1004 : QuestScript
 			new KillObjective(14, new[] { MonsterId.Rootcrystal_03 }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FTableland281Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Repusbunny_Bow_Green }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -594,10 +576,10 @@ public class FTableland281Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Saltisdaughter_Mage_Red }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }

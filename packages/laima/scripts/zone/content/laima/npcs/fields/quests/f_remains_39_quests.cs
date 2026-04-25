@@ -43,11 +43,8 @@ public class FRemains39QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Gravegolems in the east plots?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Shatter the cores. They won't rebuild."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Shatter the cores. They won't rebuild."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FRemains39QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Zolems and bring six earth-cores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Heart of the beast. Sift the rubble."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Heart of the beast. Sift the rubble."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FRemains39QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Hooks and bring five thorns?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Longest thorn from the hump."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Longest thorn from the hump."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FRemains39QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Flying Flogs?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Bless your blade."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Bless your blade."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FRemains39QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Hallowventors and defeat the champion when he manifests?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. Recite as you cut."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. Recite as you cut."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FRemains39QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve of each - Gravegolems, Zolems, Hooks?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FRemains39Quest1001 : QuestScript
 			new KillObjective(25, new[] { MonsterId.Gravegolem }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 8));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FRemains39Quest1002 : QuestScript
 			new CollectItemObjective(650240, 6));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FRemains39Quest1003 : QuestScript
 			new CollectItemObjective(650245, 5));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FRemains39Quest1004 : QuestScript
 			new KillObjective(25, new[] { MonsterId.Flying_Flog }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 8));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FRemains39Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Hallowventor }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -594,9 +576,9 @@ public class FRemains39Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Hook }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }

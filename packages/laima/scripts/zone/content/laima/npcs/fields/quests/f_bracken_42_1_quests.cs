@@ -24,7 +24,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Gosaru Ape Troupe
 		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Forest-Ward] Bronius"), "f_bracken_42_1", 0, 0, 0, async dialog =>
+		AddNpc(20060, L("[Forest-Ward] Bronius"), "f_bracken_42_1", 3, 46, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1001);
@@ -46,12 +46,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty-five Blue Gosarus from the canopy?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-five should break their pack for a full season. Stay clear of the trees with the heaviest growth - that's where they nest and where they ambush from."));
-							await dialog.Msg(L("And keep your eyes upward as you walk. They're patient hunters."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-five should break their pack for a full season. Stay clear of the trees with the heaviest growth - that's where they nest and where they ambush from."));
+						await dialog.Msg(L("And keep your eyes upward as you walk. They're patient hunters."));
 						break;
 
 					case "info":
@@ -86,9 +83,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Quest 2: Tanu Tails
+		// Quest 2: Gosaru Stone Shards
 		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Furrier] Alfreds"), "f_bracken_42_1", -1000, -400, 0, async dialog =>
+		AddNpc(20117, L("[Lapidary] Alfreds"), "f_bracken_42_1", -1000, -400, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1002);
@@ -97,29 +94,26 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Orsha's fur market is hungry for Blue Tanu tails this season. Long, glossy, well-kept ones fetch real silver in the right stalls."));
-				await dialog.Msg(L("Trouble is, I can't leave the shop to hunt them myself, and the regular trappers won't go as deep into Khonot as the prime Tanus run. So I'm hiring out."));
+				await dialog.Msg(L("Blue Gosarus carry a stone in their gut - a slow-grown crystal the canopy brutes use to channel whatever passes for thought between them."));
+				await dialog.Msg(L("Cracked open, those stones break into shards that hum to the touch. The Orsha mage-houses pay real silver for clean fragments, and the regular trappers won't go deep enough to reach the troupe."));
 
 				var response = await dialog.Select(L("Interested in the work?"),
-					Option(L("I'll do the skinning"), "help"),
-					Option(L("What makes a tail prime?"), "info"),
+					Option(L("I'll harvest the shards"), "help"),
+					Option(L("What makes a shard worth buying?"), "info"),
 					Option(L("Not for me"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Blue Tanus and bring back seven prime tails?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cut at the base of the tail, keep the fur clean of blood. A torn or stained tail is worthless on the stall - I won't pay for what I can't sell."));
-							await dialog.Msg(L("Seven prime ones is the count. You'll have to skin more than that to find them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cut the stone clean from the gut, then split it across the grain. The shards come apart on their own if you've found the right line."));
+						await dialog.Msg(L("Seven clean shards is the count. You'll crack more than that before you've found seven the mage-houses will look at twice."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Long, thick-furred, no bald patches and no scars. The mangy ones go straight in the bin."));
-						await dialog.Msg(L("You'll know one when you see it - the prime tails almost shine in the light."));
+						await dialog.Msg(L("Translucent, no clouding, no fracture-lines through the body. A clean shard hums under your thumb. A bad one sits dead."));
+						await dialog.Msg(L("You'll know one when you feel it - the prime shards almost sing in the light."));
 						break;
 
 					case "leave":
@@ -130,30 +124,30 @@ public class FBracken421QuestNpcsScript : GeneralScript
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killTanus", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherTails", out var tObj)) return;
+				if (!quest.TryGetProgress("killGosarus", out var killObj)) return;
+				if (!quest.TryGetProgress("gatherShards", out var sObj)) return;
 
-				if (killObj.Done && tObj.Done)
+				if (killObj.Done && sObj.Done)
 				{
-					await dialog.Msg(L("Seven prime tails, every one of them market-ready. The stall will be stocked through next week, easy."));
+					await dialog.Msg(L("Seven clean shards, every one of them humming. The mage-houses will be stocked through next month, easy."));
 					await dialog.Msg(L("Here's your pay, and a little extra for the quality. We might do business again."));
-					character.Inventory.Remove(650255, character.Inventory.CountItem(650255), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(666120, character.Inventory.CountItem(666120), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep at the skinning. Seven prime tails is the count - the rest you can sell elsewhere."));
+					await dialog.Msg(L("Keep cracking the stones. Seven clean shards is the count - the dud ones you can sell to apprentices."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Sold out of Tanu fur by week's end. The Orsha buyers are already asking when the next batch comes in."));
+				await dialog.Msg(L("Sold out of Gosaru shards by week's end. The Orsha mage-houses are already asking when the next batch comes in."));
 			}
 		});
 
 		// Quest 3: Doyor Fangs
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Dentist] Alda"), "f_bracken_42_1", -300, -500, 0, async dialog =>
+		AddNpc(20112, L("[Dentist] Alda"), "f_bracken_42_1", -471, -476, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1003);
@@ -174,11 +168,8 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Blue Doyors and bring back six clean fangs?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Six fangs - the long canines, mind you, not the molars. And make sure they're not splintered. Cracked fangs ruin the powder."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Six fangs - the long canines, mind you, not the molars. And make sure they're not splintered. Cracked fangs ruin the powder."));
 						break;
 
 					case "info":
@@ -201,7 +192,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("Six clean fangs, every one of them sound. The powder will brew through the night and be ready by morning."));
 					await dialog.Msg(L("Take this for your trouble - and tell anyone in pain to come see me tomorrow."));
-					character.Inventory.Remove(650265, character.Inventory.CountItem(650265), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650692, character.Inventory.CountItem(650692), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
@@ -217,7 +208,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 		// Quest 4: Folibu Wings
 		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Tinkerer] Kaspars"), "f_bracken_42_1", 1000, 700, 0, async dialog =>
+		AddNpc(20110, L("[Tinkerer] Kaspars"), "f_bracken_42_1", 776, 18, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1004);
@@ -239,12 +230,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Yellow Folibus and bring back five intact wings?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Tear them at the joint, never through the membrane. A puncture and the wing's useless to me - the air leaks straight through."));
-							await dialog.Msg(L("You'll kill more than five Folibus to get five clean wings. That's just the way of it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Tear them at the joint, never through the membrane. A puncture and the wing's useless to me - the air leaks straight through."));
+						await dialog.Msg(L("You'll kill more than five Folibus to get five clean wings. That's just the way of it."));
 						break;
 
 					case "info":
@@ -267,7 +255,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("Five wings, all of them whole! Look at this membrane - perfect, every one. Testing this weekend, on the ridge at dawn."));
 					await dialog.Msg(L("Take this with my thanks. If the glider works, your name goes in my notebook beside mine."));
-					character.Inventory.Remove(650270, character.Inventory.CountItem(650270), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(666172, character.Inventory.CountItem(666172), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
@@ -283,11 +271,10 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Gosaru King
 		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Jekabs"), "f_bracken_42_1", 200, 400, 0, async dialog =>
+		AddNpc(57231, L("[Bounty Hunter] Jekabs"), "f_bracken_42_1", -2, 833, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1005);
-			var kingSpawnedKey = "Laima.Quests.f_bracken_42_1.Quest1005.KingSpawned";
 
 			dialog.SetTitle(L("Jekabs"));
 
@@ -295,9 +282,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Forest-Ward Bronius will tell you to kill thirty-five Gosarus. That's a fine job for a forester. But the troupe won't stay broken."));
 				await dialog.Msg(L("There's a king to that pack. Three times the size of his troupe, and twice as cunning. He won't show himself while his apes are full strength."));
-				await dialog.Msg(L("Thin a few of his troupe, though, and he'll come down from the canopy himself to defend them. That's when we have him."));
+				await dialog.Msg(L("Thin ten of his troupe and he'll come down from the canopy himself to defend them. That's when we have him."));
 
-				var response = await dialog.Select(L("Want the bounty?"),
+				var response = await dialog.Select(L("Will you take the bounty?"),
 					Option(L("I'll face the King"), "help"),
 					Option(L("How big is this thing, really?"), "info"),
 					Option(L("Find another hunter"), "leave")
@@ -306,12 +293,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin ten of his troupe and slay the King when he descends?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten Gosarus first. Then come back here and I'll know he's listening - he always does. The drop will follow."));
-							await dialog.Msg(L("Stay clear of the heavy branches. He doesn't climb down. He drops, and he brings half a tree with him."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Kill exactly ten Blue Gosarus. The King will drop from the canopy as soon as the tenth falls."));
+						await dialog.Msg(L("Stay clear of the heavy branches. He doesn't climb down. He drops, and he brings half a tree with him."));
 						break;
 
 					case "info":
@@ -330,29 +314,15 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				if (!quest.TryGetProgress("killTroupe", out var gObj)) return;
 				if (!quest.TryGetProgress("killKing", out var kObj)) return;
 
-				if (gObj.Done && kObj.Done)
+				if (kObj.Done)
 				{
 					await dialog.Msg(L("The King is dead? Show me the hide. Aye - that's him. That's the bastard."));
 					await dialog.Msg(L("Khonot's breathing again. Caravans will pass without escort soon. Pay's yours, with a hunter's bonus on top."));
-					character.Variables.Perm.Remove(kingSpawnedKey);
 					character.Quests.Complete(questId);
 				}
-				else if (gObj.Done && !kObj.Done)
+				else if (gObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(kingSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(kingSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Gosaru_Blue, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("There - the canopy's shaking! He drops! Go now, before he chooses his ground!"));
-							character.ServerMessage(L("{#FF9966}The Gosaru King drops from the canopy!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("He's loose somewhere out there. Find him before he climbs back into the canopy and we lose our chance."));
-					}
+					await dialog.Msg(L("The canopy's shaking - he's down! Find him and finish it before he climbs back."));
 				}
 				else
 				{
@@ -367,7 +337,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 		// Quest 6: Khonot Sweep
 		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Ranger] Peteris"), "f_bracken_42_1", -600, 700, 0, async dialog =>
+		AddNpc(20064, L("[Ranger] Peteris"), "f_bracken_42_1", -744, 945, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1006);
@@ -388,11 +358,8 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each of Blue Gosarus, Blue Doyors, and Blue Tanus?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six in total. Keep moving and you'll find them in any direction you walk - they're the whole forest's pulse."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six in total. Keep moving and you'll find them in any direction you walk - they're the whole forest's pulse."));
 						break;
 
 					case "info":
@@ -453,10 +420,10 @@ public class FBracken421Quest1001 : QuestScript
 			new KillObjective(35, new[] { MonsterId.Gosaru_Blue }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -465,38 +432,40 @@ public class FBracken421Quest1002 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_bracken_42_1", 1002);
-		SetName(L("Prime Tanu Tails"));
+		SetName(L("Gosaru Stone Shards"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Blue Tanus for prime tails for the Orsha fur market."));
+		SetDescription(L("Kill Blue Gosarus and gather magic stone shards for the Orsha mage-houses."));
 		SetLocation("f_bracken_42_1");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Furrier] Alfreds"), "f_bracken_42_1");
+		AddQuestGiver(L("[Lapidary] Alfreds"), "f_bracken_42_1");
 
-		AddObjective("killTanus", L("Kill Blue Tanus"),
-			new KillObjective(30, new[] { MonsterId.Tanu_Blue }));
+		AddDrop(666120, 0.40f, MonsterId.Gosaru_Blue);
 
-		AddObjective("gatherTails", L("Gather prime tails"),
-			new CollectItemObjective(650255, 7));
+		AddObjective("killGosarus", L("Kill Blue Gosarus"),
+			new KillObjective(30, new[] { MonsterId.Gosaru_Blue }));
+
+		AddObjective("gatherShards", L("Gather magic stone shards from Blue Gosarus"),
+			new CollectItemObjective(666120, 7));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 8));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650255, character.Inventory.CountItem(650255), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666120, character.Inventory.CountItem(666120), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650255, character.Inventory.CountItem(650255), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666120, character.Inventory.CountItem(666120), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -515,27 +484,29 @@ public class FBracken421Quest1003 : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver(L("[Dentist] Alda"), "f_bracken_42_1");
 
+		AddDrop(650692, 0.45f, MonsterId.Doyor_Blue);
+
 		AddObjective("killDoyors", L("Kill Blue Doyors"),
 			new KillObjective(15, new[] { MonsterId.Doyor_Blue }));
 
-		AddObjective("gatherFangs", L("Gather fangs"),
-			new CollectItemObjective(650265, 6));
+		AddObjective("gatherFangs", L("Gather fangs from Blue Doyors"),
+			new CollectItemObjective(650692, 6));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650265, character.Inventory.CountItem(650265), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650692, character.Inventory.CountItem(650692), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650265, character.Inventory.CountItem(650265), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650692, character.Inventory.CountItem(650692), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -554,28 +525,30 @@ public class FBracken421Quest1004 : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver(L("[Tinkerer] Kaspars"), "f_bracken_42_1");
 
+		AddDrop(666172, 0.50f, MonsterId.Folibu_Yellow);
+
 		AddObjective("killFolibus", L("Kill Yellow Folibus"),
 			new KillObjective(12, new[] { MonsterId.Folibu_Yellow }));
 
-		AddObjective("gatherWings", L("Gather translucent wings"),
-			new CollectItemObjective(650270, 5));
+		AddObjective("gatherWings", L("Gather translucent wings from Yellow Folibus"),
+			new CollectItemObjective(666172, 5));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 8));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650270, character.Inventory.CountItem(650270), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666172, character.Inventory.CountItem(666172), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650270, character.Inventory.CountItem(650270), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666172, character.Inventory.CountItem(666172), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -591,21 +564,25 @@ public class FBracken421Quest1005 : QuestScript
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
+		SetUnlock(QuestUnlockType.Sequential);
 		AddQuestGiver(L("[Bounty Hunter] Jekabs"), "f_bracken_42_1");
 
 		AddObjective("killTroupe", L("Thin Blue Gosarus"),
 			new KillObjective(10, new[] { MonsterId.Gosaru_Blue }));
 
 		AddObjective("killKing", L("Defeat the Gosaru King"),
-			new KillObjective(1, new[] { MonsterId.Gosaru_Blue }));
+			new LayeredKillObjective(
+				spawnList: new[] { new KillSpec(MonsterId.Boss_Velniamonkey, 1) },
+				resetIdent: "killTroupe",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -634,9 +611,9 @@ public class FBracken421Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Tanu_Blue }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
 	}
 }

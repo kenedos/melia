@@ -43,11 +43,8 @@ public class FKatyn133QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty-five Desmodus?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-five. Pack-hunting fast."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-five. Pack-hunting fast."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FKatyn133QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Red Infrorocktors and bring eight cores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Hammer them at the chest, not the limbs."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Hammer them at the chest, not the limbs."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FKatyn133QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Green Elloms and bring six bells?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cut the chain-rope. Don't shatter the bell."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cut the chain-rope. Don't shatter the bell."));
 						break;
 
 					case "info":
@@ -228,10 +219,10 @@ public class FKatyn133Quest1001 : QuestScript
 			new KillObjective(35, new[] { MonsterId.New_Desmodus }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -257,11 +248,11 @@ public class FKatyn133Quest1002 : QuestScript
 			new CollectItemObjective(650305, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -297,11 +288,11 @@ public class FKatyn133Quest1003 : QuestScript
 			new CollectItemObjective(650122, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)

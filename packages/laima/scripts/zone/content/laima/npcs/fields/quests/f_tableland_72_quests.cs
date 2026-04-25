@@ -43,11 +43,8 @@ public class FTableland72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty White Spions?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. Mind the wind on the ledges."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. Mind the wind on the ledges."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FTableland72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Brown Lapasapes and bring six blue moss tufts?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Tufts only. The roots wilt off-stone."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Tufts only. The roots wilt off-stone."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FTableland72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill eighteen Blue Cronewt Mages and bring five needler crystals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Pinch the base. They snap clean."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Pinch the base. They snap clean."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FTableland72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Burst fifteen Red Hohen Orben?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Strike the underside. Tops are tough."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Strike the underside. Tops are tough."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FTableland72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten White Spions and defeat the alpha when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FTableland72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - White Spions, Blue Cronewt Mages, Brown Lapasapes?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FTableland72Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Spion_White }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FTableland72Quest1002 : QuestScript
 			new CollectItemObjective(668020, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FTableland72Quest1003 : QuestScript
 			new CollectItemObjective(663123, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 4));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,11 +514,11 @@ public class FTableland72Quest1004 : QuestScript
 			new KillObjective(15, new[] { MonsterId.Hohen_Orben_Red }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -562,11 +544,11 @@ public class FTableland72Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Spion_White }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -595,10 +577,10 @@ public class FTableland72Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Lapasape_Brown }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

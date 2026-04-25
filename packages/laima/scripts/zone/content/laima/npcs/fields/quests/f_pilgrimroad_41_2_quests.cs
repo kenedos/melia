@@ -43,11 +43,8 @@ public class FPilgrimroad412QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Purple Banshees?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. Pray before each cut."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. Pray before each cut."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FPilgrimroad412QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Green Tiny Mages and bring eight reagent-pouches?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eight. Seal them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eight. Seal them."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FPilgrimroad412QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Purple Banshees and bring six shrouds?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("They dissolve in sunlight. Cover them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They dissolve in sunlight. Cover them."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FPilgrimroad412QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break fifteen Salvia Rootcrystals and bring ten shards?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't hold them too long."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't hold them too long."));
 						break;
 
 					case "info":
@@ -286,11 +274,8 @@ public class FPilgrimroad412QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Purple Banshees and defeat the Matron when she manifests?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FPilgrimroad412QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Purple Banshees and twelve Green Tiny Mages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Standard."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Standard."));
 						break;
 
 					case "info":
@@ -427,10 +409,10 @@ public class FPilgrimroad412Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Sec_Banshee_Purple }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -456,11 +438,11 @@ public class FPilgrimroad412Quest1002 : QuestScript
 			new CollectItemObjective(650124, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -496,11 +478,11 @@ public class FPilgrimroad412Quest1003 : QuestScript
 			new CollectItemObjective(650144, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -536,11 +518,11 @@ public class FPilgrimroad412Quest1004 : QuestScript
 			new CollectItemObjective(650146, 10));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -576,11 +558,11 @@ public class FPilgrimroad412Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Sec_Banshee_Purple }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -606,10 +588,10 @@ public class FPilgrimroad412Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Tiny_Mage_Green }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }

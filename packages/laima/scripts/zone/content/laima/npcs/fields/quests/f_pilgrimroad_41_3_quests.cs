@@ -43,11 +43,8 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Green Minos?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. The road opens step by step."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. The road opens step by step."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Bow-Minos and bring eight quivers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eight quivers. Intact if you can."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eight quivers. Intact if you can."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Brown Lapasape Mages and bring six grimoires?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't read the margins."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't read the margins."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break twenty Rootcrystals on the pilgrim road?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Mind your feet. They shatter sharp."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Mind your feet. They shatter sharp."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Green Minos and defeat the warchief when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve. He won't stay hidden long."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve. He won't stay hidden long."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Green Minos, Bow-Minos, Brown Lapasape Mages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FPilgrimroad413Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Minos_Green }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FPilgrimroad413Quest1002 : QuestScript
 			new CollectItemObjective(650251, 8));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 11));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FPilgrimroad413Quest1003 : QuestScript
 			new CollectItemObjective(650252, 6));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 11));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FPilgrimroad413Quest1004 : QuestScript
 			new KillObjective(20, new[] { MonsterId.Rootcrystal_01 }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FPilgrimroad413Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Minos_Green }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 12));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -594,9 +576,9 @@ public class FPilgrimroad413Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Lapasape_Mage_Brown }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 12));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }

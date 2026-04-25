@@ -45,12 +45,9 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Ferret Archers from the canopy?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. Look up often - they love to drop shots right past your ear."));
-							await dialog.Msg(L("Good hunting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. Look up often - they love to drop shots right past your ear."));
+						await dialog.Msg(L("Good hunting."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break five Rootcrystals and bring back their blooms?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Look for the ones with the violet swellings - those are the bloomed ones. Dull grey clusters are dormant."));
-							await dialog.Msg(L("Bring me five. I'll cite you in the footnotes."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Look for the ones with the violet swellings - those are the bloomed ones. Dull grey clusters are dormant."));
+						await dialog.Msg(L("Bring me five. I'll cite you in the footnotes."));
 						break;
 
 					case "info":
@@ -176,12 +170,9 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Ferret Searchers and recover four contraband seed pouches?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The pouches are small, wrapped in oiled leaves. Look for disturbed soil under the Searcher routes."));
-							await dialog.Msg(L("Don't open them. Don't even smell them. Just bring them to me sealed."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The pouches are small, wrapped in oiled leaves. Look for disturbed soil under the Searcher routes."));
+						await dialog.Msg(L("Don't open them. Don't even smell them. Just bring them to me sealed."));
 						break;
 
 					case "info":
@@ -314,12 +305,9 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Ferret Vendors and recover five cartel ledgers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Vendors always drop their ledgers when struck - they're light sleepers and lighter pocketed."));
-							await dialog.Msg(L("Twelve Vendors, five ledgers. Simple math, complicated fieldwork."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Vendors always drop their ledgers when struck - they're light sleepers and lighter pocketed."));
+						await dialog.Msg(L("Twelve Vendors, five ledgers. Simple math, complicated fieldwork."));
 						break;
 
 					case "info":
@@ -389,12 +377,9 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Ferret Bearers and bring down the Kingpin when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten Bearers. Don't rush the count - he won't come out till they're thinned for real."));
-							await dialog.Msg(L("When he shows, he shows hard. Good luck."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten Bearers. Don't rush the count - he won't come out till they're thinned for real."));
+						await dialog.Msg(L("When he shows, he shows hard. Good luck."));
 						break;
 
 					case "info":
@@ -475,12 +460,9 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Ferret Archers and twelve Ferret Searchers along the Seir Trail?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve of each. Archers up, Searchers down. Mind both eye-lines."));
-							await dialog.Msg(L("Festival carts are staged already. Clear the trail and they roll by morning."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve of each. Archers up, Searchers down. Mind both eye-lines."));
+						await dialog.Msg(L("Festival carts are staged already. Clear the trail and they roll by morning."));
 						break;
 
 					case "info":
@@ -552,10 +534,10 @@ public class CanopyVolleyQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Ferret_Archer }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Large HP Potion
-		AddReward(new ItemReward(640007, 15)); // Large SP Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
@@ -582,11 +564,11 @@ public class RainforestCrystalBloomQuest : QuestScript
 			new CollectItemObjective(650310, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Large HP Potion
-		AddReward(new ItemReward(640007, 14)); // Large SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -626,11 +608,11 @@ public class TheContrabandStashQuest : QuestScript
 			new CollectItemObjective(650700, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Large HP Potion
-		AddReward(new ItemReward(640007, 15)); // Large SP Potion
-		AddReward(new ItemReward(640013, 14)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -682,11 +664,11 @@ public class TheCartelLedgersQuest : QuestScript
 			new CollectItemObjective(650420, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Large HP Potion
-		AddReward(new ItemReward(640007, 14)); // Large SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -726,11 +708,11 @@ public class TheCartelKingpinQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Ferret_Vendor }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Large HP Potion
-		AddReward(new ItemReward(640007, 15)); // Large SP Potion
-		AddReward(new ItemReward(640013, 14)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 }
 
@@ -760,10 +742,10 @@ public class SeirTrailCleanupQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Ferret_Searcher }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Large HP Potion
-		AddReward(new ItemReward(640007, 14)); // Large SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 }

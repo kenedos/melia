@@ -866,10 +866,10 @@ public class CrossingGuardDutyQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 1));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8));  // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
 	}
 }
 
@@ -898,11 +898,11 @@ public class TimberThiefMysteryQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8));  // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -949,10 +949,10 @@ public class HerbalRainHarvestQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 1));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8));  // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -1008,11 +1008,11 @@ public class CorruptionWatchQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8));  // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(181114, 1));  // Crossbow
 	}
 
@@ -1056,11 +1056,11 @@ public class DetectionDeviceTestQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8));  // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(101120, 1));  // Kaskara
 	}
 
@@ -1113,11 +1113,11 @@ public class AMomentOfPeaceQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 1));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8));  // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(648513, 1));  // Emoticon: Little Burk(Peaceful)
 	}
 }

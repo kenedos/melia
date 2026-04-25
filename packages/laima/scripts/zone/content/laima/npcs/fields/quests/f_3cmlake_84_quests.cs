@@ -475,10 +475,10 @@ public class F3Cmlake84Quest1001 : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_3cmlake_84.Quest1001.MarkersAwakened", 4, true));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 
 	public override void OnCancel(Character character, Quest quest)
@@ -517,11 +517,11 @@ public class F3Cmlake84Quest1002 : QuestScript
 			new CollectItemObjective(650095, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -561,11 +561,11 @@ public class F3Cmlake84Quest1003 : QuestScript
 			new CollectItemObjective(666028, 7));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -600,11 +600,11 @@ public class F3Cmlake84Quest1004 : QuestScript
 			new KillObjective(8, new[] { MonsterId.Rootcrystal_01 }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -636,12 +636,12 @@ public class F3Cmlake84Quest1005 : QuestScript
 				lifetime: TimeSpan.FromMinutes(5)));
 
 		AddReward(new ExpReward(60000, 40000));
-		AddReward(new SilverReward(200000));
+		AddReward(new SilverReward(50000));
 		AddReward(new ItemReward(694009, 1));
 		AddReward(new ItemReward(640086, 5));
-		AddReward(new ItemReward(640004, 25));
-		AddReward(new ItemReward(640007, 25));
-		AddReward(new ItemReward(640013, 12));
+		AddReward(new ItemReward(640004, 6));
+		AddReward(new ItemReward(640007, 6));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -672,10 +672,10 @@ public class F3Cmlake84Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Sowpent }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

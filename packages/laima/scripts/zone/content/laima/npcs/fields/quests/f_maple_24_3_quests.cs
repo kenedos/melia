@@ -43,11 +43,8 @@ public class FMaple243QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty-five Fragolins?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty-five. Watch the berry-patches."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty-five. Watch the berry-patches."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FMaple243QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Cloverins and bring eight pollen sacs?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Sacs whole. They spoil if torn."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Sacs whole. They spoil if torn."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FMaple243QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Blueberrins and bring five essence-vials?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't shake them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't shake them."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FMaple243QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break forty-five Parias Rootcrystals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty-five. Gloves on."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty-five. Gloves on."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FMaple243QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Fragolins and defeat the Mother when she emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FMaple243QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Fragolins, Cloverins, Blueberrins?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FMaple243Quest1001 : QuestScript
 			new KillObjective(45, new[] { MonsterId.Fragolin }));
 
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(5000));
+		AddReward(new SilverReward(1200));
 		AddReward(new ItemReward(640081, 1));
-		AddReward(new ItemReward(640002, 10));
-		AddReward(new ItemReward(640005, 10));
+		AddReward(new ItemReward(640002, 2));
+		AddReward(new ItemReward(640005, 2));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FMaple243Quest1002 : QuestScript
 			new CollectItemObjective(650248, 8));
 
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(6500));
+		AddReward(new SilverReward(1600));
 		AddReward(new ItemReward(640081, 2));
-		AddReward(new ItemReward(640002, 10));
-		AddReward(new ItemReward(640005, 10));
-		AddReward(new ItemReward(640008, 3));
+		AddReward(new ItemReward(640002, 2));
+		AddReward(new ItemReward(640005, 2));
+		AddReward(new ItemReward(640008, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FMaple243Quest1003 : QuestScript
 			new CollectItemObjective(650249, 5));
 
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(6500));
+		AddReward(new SilverReward(1600));
 		AddReward(new ItemReward(640081, 2));
-		AddReward(new ItemReward(640002, 10));
-		AddReward(new ItemReward(640005, 10));
-		AddReward(new ItemReward(640008, 3));
+		AddReward(new ItemReward(640002, 2));
+		AddReward(new ItemReward(640005, 2));
+		AddReward(new ItemReward(640008, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FMaple243Quest1004 : QuestScript
 			new KillObjective(45, new[] { MonsterId.Rootcrystal_01 }));
 
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(5000));
+		AddReward(new SilverReward(1200));
 		AddReward(new ItemReward(640081, 1));
-		AddReward(new ItemReward(640002, 10));
-		AddReward(new ItemReward(640005, 10));
+		AddReward(new ItemReward(640002, 2));
+		AddReward(new ItemReward(640005, 2));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FMaple243Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Fragolin }));
 
 		AddReward(new ExpReward(1600, 1100));
-		AddReward(new SilverReward(8000));
+		AddReward(new SilverReward(2000));
 		AddReward(new ItemReward(640081, 3));
-		AddReward(new ItemReward(640002, 12));
-		AddReward(new ItemReward(640005, 12));
-		AddReward(new ItemReward(640008, 4));
+		AddReward(new ItemReward(640002, 3));
+		AddReward(new ItemReward(640005, 3));
+		AddReward(new ItemReward(640008, 1));
 	}
 }
 
@@ -594,10 +576,10 @@ public class FMaple243Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Blueberrin }));
 
 		AddReward(new ExpReward(1600, 1100));
-		AddReward(new SilverReward(8000));
+		AddReward(new SilverReward(2000));
 		AddReward(new ItemReward(640081, 3));
-		AddReward(new ItemReward(640002, 12));
-		AddReward(new ItemReward(640005, 12));
-		AddReward(new ItemReward(640008, 4));
+		AddReward(new ItemReward(640002, 3));
+		AddReward(new ItemReward(640005, 3));
+		AddReward(new ItemReward(640008, 1));
 	}
 }

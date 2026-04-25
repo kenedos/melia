@@ -43,11 +43,8 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty-five Red Infroholders?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty-five. Watch the ground-haze."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty-five. Watch the ground-haze."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Purple Sockets and bring eight cores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cores only. The shells shatter."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cores only. The shells shatter."));
 						break;
 
 					case "info":
@@ -127,7 +121,7 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				if (killObj.Done && cObj.Done)
 				{
 					await dialog.Msg(L("Eight cores. Counter-ward woven."));
-					character.Inventory.Remove(650380, character.Inventory.CountItem(650380), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650611, character.Inventory.CountItem(650611), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
@@ -163,11 +157,8 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Green Infroholder Mages and bring five cant-pages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't read them aloud."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't read them aloud."));
 						break;
 
 					case "info":
@@ -188,7 +179,7 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				if (killObj.Done && pObj.Done)
 				{
 					await dialog.Msg(L("Five pages. Reverse-cant tested tonight."));
-					character.Inventory.Remove(650234, character.Inventory.CountItem(650234), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650677, character.Inventory.CountItem(650677), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
@@ -224,11 +215,8 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break twelve Rootcrystals and bring eight corrupted shards?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cloth-gloves only. Don't palm them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cloth-gloves only. Don't palm them."));
 						break;
 
 					case "info":
@@ -249,7 +237,7 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				if (killObj.Done && sObj.Done)
 				{
 					await dialog.Msg(L("Eight shards. Curse weight shifts."));
-					character.Inventory.Remove(650236, character.Inventory.CountItem(650236), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650281, character.Inventory.CountItem(650281), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
@@ -286,11 +274,8 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Red Infroholders and defeat the Stoneheart when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FFlash58QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Red Infroholders, Purple Sockets, Green Infroholder Mages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -428,10 +410,10 @@ public class FFlash58Quest1001 : QuestScript
 			new KillObjective(45, new[] { MonsterId.Infroholder_Red }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -453,25 +435,25 @@ public class FFlash58Quest1002 : QuestScript
 		AddObjective("killSockets", L("Kill Purple Sockets"),
 			new KillObjective(30, new[] { MonsterId.Socket_Purple }));
 
-		AddObjective("gatherCores", L("Gather curse-cores"),
-			new CollectItemObjective(650380, 8));
+		AddObjective("gatherCores", L("Gather curse-cores from Purple Sockets"),
+			new CollectItemObjective(650611, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650380, character.Inventory.CountItem(650380), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650611, character.Inventory.CountItem(650611), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650380, character.Inventory.CountItem(650380), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650611, character.Inventory.CountItem(650611), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -493,25 +475,25 @@ public class FFlash58Quest1003 : QuestScript
 		AddObjective("killMages", L("Kill Green Infroholder Mages"),
 			new KillObjective(15, new[] { MonsterId.Infroholder_Mage_Green }));
 
-		AddObjective("gatherPages", L("Gather cant-pages"),
-			new CollectItemObjective(650234, 5));
+		AddObjective("gatherPages", L("Gather cant-pages from Green Infroholder Mages"),
+			new CollectItemObjective(650677, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650234, character.Inventory.CountItem(650234), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650677, character.Inventory.CountItem(650677), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650234, character.Inventory.CountItem(650234), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650677, character.Inventory.CountItem(650677), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -534,24 +516,24 @@ public class FFlash58Quest1004 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Rootcrystal_03 }));
 
 		AddObjective("gatherShards", L("Gather corrupted shards"),
-			new CollectItemObjective(650236, 8));
+			new CollectItemObjective(650281, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650236, character.Inventory.CountItem(650236), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650281, character.Inventory.CountItem(650281), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650236, character.Inventory.CountItem(650236), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650281, character.Inventory.CountItem(650281), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -577,11 +559,11 @@ public class FFlash58Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Infroholder_Red }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -610,10 +592,10 @@ public class FFlash58Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Infroholder_Mage_Green }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

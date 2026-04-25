@@ -988,10 +988,10 @@ public class CleansingCorruptedAirQuest : QuestScript
 			new KillObjective(5, new[] { MonsterId.Sec_Pokubu }));
 
 		AddReward(new ExpReward(500, 350));
-		AddReward(new SilverReward(4000));
+		AddReward(new SilverReward(1000));
 		AddReward(new ItemReward(162112, 1)); // Soldier's Short Bow
-		AddReward(new ItemReward(640002, 10)); // HP potions
-		AddReward(new ItemReward(640005, 6)); // SP potions
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 1)); // SP potions
 		AddReward(new ItemReward(640080, 3)); // Lv1 EXP Cards
 	}
 }
@@ -1021,9 +1021,9 @@ public class LostCaravanQuest : QuestScript
 			new CollectItemObjective(650399, 8));
 
 		AddReward(new ExpReward(400, 300));
-		AddReward(new SilverReward(2500));
-		AddReward(new ItemReward(640002, 12)); // HP potions
-		AddReward(new ItemReward(640005, 10)); // SP potions
+		AddReward(new SilverReward(600));
+		AddReward(new ItemReward(640002, 3)); // HP potions
+		AddReward(new ItemReward(640005, 2)); // SP potions
 		AddReward(new ItemReward(640080, 2)); // Lv1 EXP Cards
 	}
 
@@ -1064,9 +1064,9 @@ public class HermitDiscoveryQuest : QuestScript
 			new KillObjective(8, new[] { MonsterId.Sec_Arburn_Pokubu }));
 
 		AddReward(new ExpReward(600, 400));
-		AddReward(new SilverReward(5000));
-		AddReward(new ItemReward(640002, 15)); // HP potions
-		AddReward(new ItemReward(640005, 12)); // SP potions
+		AddReward(new SilverReward(1200));
+		AddReward(new ItemReward(640002, 3)); // HP potions
+		AddReward(new ItemReward(640005, 3)); // SP potions
 		AddReward(new ItemReward(532112, 1)); // Pokubu Leather Armor
 		AddReward(new ItemReward(640081, 3)); // Lv2 EXP Cards
 	}
@@ -1094,10 +1094,10 @@ public class TalesOfBridgesQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_siauliai_15_re.Quest1004.BridgesChecked", 6, true));
 
 		AddReward(new ExpReward(600, 400));
-		AddReward(new SilverReward(5000));
+		AddReward(new SilverReward(1200));
 		AddReward(new ItemReward(202111, 1)); // Soldier's Iron Club
-		AddReward(new ItemReward(640002, 10)); // HP potions
-		AddReward(new ItemReward(640005, 8)); // SP potions
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 2)); // SP potions
 		AddReward(new ItemReward(640080, 3)); // Lv1 EXP Cards
 	}
 
@@ -1145,10 +1145,10 @@ public class BeekeeperHopeQuest : QuestScript
 
 		// Rewards - Peaceful quest with good rewards
 		AddReward(new ExpReward(500, 300));
-		AddReward(new SilverReward(3500));
+		AddReward(new SilverReward(900));
 		AddReward(new ItemReward(581101, 1)); // HP Necklace
-		AddReward(new ItemReward(640002, 12)); // HP potions
-		AddReward(new ItemReward(640005, 10)); // SP potions
+		AddReward(new ItemReward(640002, 3)); // HP potions
+		AddReward(new ItemReward(640005, 2)); // SP potions
 		AddReward(new ItemReward(640097, 5)); // Stamina potions
 		AddReward(new ItemReward(640080, 3)); // Lv1 EXP Cards
 	}
@@ -1202,9 +1202,9 @@ public class SeedsOfHopeQuest : QuestScript
 			new ManualObjective());
 
 		AddReward(new ExpReward(800, 600));
-		AddReward(new SilverReward(6000));
-		AddReward(new ItemReward(640002, 15)); // HP potions
-		AddReward(new ItemReward(640005, 12)); // SP potions
+		AddReward(new SilverReward(1500));
+		AddReward(new ItemReward(640002, 3)); // HP potions
+		AddReward(new ItemReward(640005, 3)); // SP potions
 		AddReward(new ItemReward(222101, 1)); // Black Wooden Shield
 		AddReward(new ItemReward(640080, 4)); // Lv2 EXP Cards
 	}

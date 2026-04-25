@@ -45,12 +45,9 @@ public class FFlash61QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Sword-Goblins along Ruklys Street?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. Swing hard and don't linger - a goblin that grey-streaks you will chase as long as you bleed."));
-							await dialog.Msg(L("Ward-charm in your pocket. It helps."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. Swing hard and don't linger - a goblin that grey-streaks you will chase as long as you bleed."));
+						await dialog.Msg(L("Ward-charm in your pocket. It helps."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FFlash61QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Crack five Rootcrystals and bring their alley cursecores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Listen for the deep ring. Ruklys cores ring lower than most - almost a drum."));
-							await dialog.Msg(L("Five drum-cores. That's what I need."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Listen for the deep ring. Ruklys cores ring lower than most - almost a drum."));
+						await dialog.Msg(L("Five drum-cores. That's what I need."));
 						break;
 
 					case "info":
@@ -176,12 +170,9 @@ public class FFlash61QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Denden and recover four statued-shopkeeper name-tokens?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Name-tokens are small, coin-sized, metal or polished wood. Under the apron line, tucked against the chest."));
-							await dialog.Msg(L("Treat them with respect. That's someone's whole identity."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Name-tokens are small, coin-sized, metal or polished wood. Under the apron line, tucked against the chest."));
+						await dialog.Msg(L("Treat them with respect. That's someone's whole identity."));
 						break;
 
 					case "info":
@@ -314,12 +305,9 @@ public class FFlash61QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Moyabu and recover five curse-brands?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Brands are burned into the left flank. Cut them out clean - we need the sigils intact."));
-							await dialog.Msg(L("Don't touch the brands with bare skin. Glove up."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Brands are burned into the left flank. Cut them out clean - we need the sigils intact."));
+						await dialog.Msg(L("Don't touch the brands with bare skin. Glove up."));
 						break;
 
 					case "info":
@@ -389,12 +377,9 @@ public class FFlash61QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin ten Moyabu and bring down the Branded Warlord when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten Moyabu. Once he shows, he shows hard. Stay off his stone-left."));
-							await dialog.Msg(L("Good hunting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten Moyabu. Once he shows, he shows hard. Stay off his stone-left."));
+						await dialog.Msg(L("Good hunting."));
 						break;
 
 					case "info":
@@ -475,12 +460,9 @@ public class FFlash61QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Sword-Goblins and twelve Denden along the Ruklys corridor?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve and twelve. Goblins in the open, Denden in the alleys. Mind both flanks."));
-							await dialog.Msg(L("Clear the corridor and three columns roll by week's end."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve and twelve. Goblins in the open, Denden in the alleys. Mind both flanks."));
+						await dialog.Msg(L("Clear the corridor and three columns roll by week's end."));
 						break;
 
 					case "info":
@@ -549,10 +531,10 @@ public class SwordGoblinInfestationQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Goblin2_Sword }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -576,11 +558,11 @@ public class AlleyCursecoresQuest : QuestScript
 			new CollectItemObjective(650355, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -617,11 +599,11 @@ public class TheStatuedShopkeepersQuest : QuestScript
 			new CollectItemObjective(650545, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -670,11 +652,11 @@ public class MoyabuCurseBrandsQuest : QuestScript
 			new CollectItemObjective(650665, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -711,11 +693,11 @@ public class TheBrandedWarlordQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Goblin2_Sword }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -742,10 +724,10 @@ public class TheRuklysCorridorQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Denden }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

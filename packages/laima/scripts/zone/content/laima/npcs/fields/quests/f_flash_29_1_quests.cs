@@ -45,12 +45,9 @@ public class FFlash291QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Orange Minos from the fortress grounds?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. Stand ground when they charge - dodging invites a swarm."));
-							await dialog.Msg(L("Keep your ward-charm close. They leave stone-dust when they fall."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. Stand ground when they charge - dodging invites a swarm."));
+						await dialog.Msg(L("Keep your ward-charm close. They leave stone-dust when they fall."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FFlash291QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Crack five deep Rootcrystals and bring back their seacores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Seacores are rime-white with salt. Dull ones are duds - listen for the ring."));
-							await dialog.Msg(L("Five ringing ones. Thank you."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Seacores are rime-white with salt. Dull ones are duds - listen for the ring."));
+						await dialog.Msg(L("Five ringing ones. Thank you."));
 						break;
 
 					case "info":
@@ -130,14 +124,14 @@ public class FFlash291QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var coreCount = character.Inventory.CountItem(650250);
+				var coreCount = character.Inventory.CountItem(663052);
 
 				if (coreCount >= 5)
 				{
 					await dialog.Msg(L("Five rime-white ones. Good ear. The tide-ward will charge tonight."));
 					await dialog.Msg(L("Take your pay. Coastal towns owe you a meal, even if they don't know your name yet."));
 
-					character.Inventory.Remove(650250, 5, InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(663052, 5, InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -175,12 +169,9 @@ public class FFlash291QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Infroholder Bowmen and recover four fortress armament caches?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fifteen. The bowmen shoot first - close fast. Caches are in the high niches, sealed with iron clasp."));
-							await dialog.Msg(L("Pry the clasps with a knife. Don't force - the wood is curse-dried."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fifteen. The bowmen shoot first - close fast. Caches are in the high niches, sealed with iron clasp."));
+						await dialog.Msg(L("Pry the clasps with a knife. Don't force - the wood is curse-dried."));
 						break;
 
 					case "info":
@@ -312,12 +303,9 @@ public class FFlash291QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Green Minos Mages and recover five salt-brands?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Salt-brands are socketed into the staves. Pry them out clean - we need the sigils intact."));
-							await dialog.Msg(L("Glove up. Raw salt-brand cold-burns on contact."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Salt-brands are socketed into the staves. Pry them out clean - we need the sigils intact."));
+						await dialog.Msg(L("Glove up. Raw salt-brand cold-burns on contact."));
 						break;
 
 					case "info":
@@ -386,12 +374,9 @@ public class FFlash291QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin ten Orange Minos and bring down the Herd-Master when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. Stay mobile when he charges - his brow-plate is a battering ram."));
-							await dialog.Msg(L("Good hunting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. Stay mobile when he charges - his brow-plate is a battering ram."));
+						await dialog.Msg(L("Good hunting."));
 						break;
 
 					case "info":
@@ -472,12 +457,9 @@ public class FFlash291QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Orange Minos and twelve Infroholder Bowmen along the seawall?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve and twelve. Minos charge straight, Infroholders harry from range. Mind both."));
-							await dialog.Msg(L("Clear them, and the patrol walks the full perimeter Monday."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve and twelve. Minos charge straight, Infroholders harry from range. Mind both."));
+						await dialog.Msg(L("Clear them, and the patrol walks the full perimeter Monday."));
 						break;
 
 					case "info":
@@ -546,10 +528,10 @@ public class MinosChargeQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Minos_Orange }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -570,24 +552,24 @@ public class SeacoreCrackingQuest : QuestScript
 		AddQuestGiver(L("[Tide-Warden] Iness"), "f_flash_29_1");
 
 		AddObjective("gatherSeacores", L("Gather rime-white seacores"),
-			new CollectItemObjective(650250, 5));
+			new CollectItemObjective(663052, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650250, character.Inventory.CountItem(650250), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663052, character.Inventory.CountItem(663052), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650250, character.Inventory.CountItem(650250), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663052, character.Inventory.CountItem(663052), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -614,11 +596,11 @@ public class TheFortressArmamentQuest : QuestScript
 			new CollectItemObjective(650388, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -663,15 +645,15 @@ public class TheGreenMageCabalQuest : QuestScript
 		AddObjective("killMages", L("Kill Green Minos Mages"),
 			new KillObjective(12, new[] { MonsterId.Minos_Mage_Green }));
 
-		AddObjective("gatherBrands", L("Recover salt-brands"),
+		AddObjective("gatherBrands", L("Recover salt-brands from Green Minos Mages"),
 			new CollectItemObjective(650575, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -708,11 +690,11 @@ public class TheHerdMasterQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Minos_Orange }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -739,10 +721,10 @@ public class SeawallPerimeterQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Infroholder_Bow_Red }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

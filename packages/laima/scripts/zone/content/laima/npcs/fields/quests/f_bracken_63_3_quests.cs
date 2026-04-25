@@ -44,12 +44,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Drive back twenty Gosaru from the eastern gate?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty should clear the gate approach. They'll be all around you, just inside the treeline."));
-							await dialog.Msg(L("Watch their claws - the corruption here burns as well as poisons."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty should clear the gate approach. They'll be all around you, just inside the treeline."));
+						await dialog.Msg(L("Watch their claws - the corruption here burns as well as poisons."));
 						break;
 
 					case "info":
@@ -109,12 +106,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Harvest five pristine crystal shards from the oldest Root Crystals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Use a hammer and chisel - a blade shatters the matrix. Strike firmly, once."));
-							await dialog.Msg(L("The pristine crystals glow faintly blue under the moss. They're scattered deep in the jungle."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Use a hammer and chisel - a blade shatters the matrix. Strike firmly, once."));
+						await dialog.Msg(L("The pristine crystals glow faintly blue under the moss. They're scattered deep in the jungle."));
 						break;
 
 					case "info":
@@ -129,14 +123,14 @@ public class FBracken633QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var shardCount = character.Inventory.CountItem(650302);
+				var shardCount = character.Inventory.CountItem(650726);
 
 				if (shardCount >= 5)
 				{
 					await dialog.Msg(L("All five. And look at that inner glow - these are pristine, untouched."));
 					await dialog.Msg(L("With these, I can finish the formula. We might actually have a working antidote within the month."));
 
-					character.Inventory.Remove(650302, 5, InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650726, 5, InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -191,11 +185,11 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650302, 1, InventoryAddType.PickUp);
+					character.Inventory.Add(650726, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
 					character.ServerMessage(L("Harvested: Pristine Crystal Shard"));
 
-					var currentCount = character.Inventory.CountItem(650302);
+					var currentCount = character.Inventory.CountItem(650726);
 					character.ServerMessage(LF("Shards harvested: {0}/5", currentCount));
 
 					if (currentCount >= 5)
@@ -240,12 +234,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Bush Beetles and scorch four infested hives?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Take this torch oil - just pour it on the hive and it'll ignite on contact with the wax."));
-							await dialog.Msg(L("The hives sit in clusters along the southern basin. You can smell them before you see them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Take this torch oil - just pour it on the hive and it'll ignite on contact with the wax."));
+						await dialog.Msg(L("The hives sit in clusters along the southern basin. You can smell them before you see them."));
 						break;
 
 					case "info":
@@ -269,7 +260,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("All four hives, and the swarm cleared. The basin will be quiet for a long while."));
 					await dialog.Msg(L("Good work. Here's your pay, with interest for the dirty part."));
 
-					character.Inventory.Remove(650506, character.Inventory.CountItem(650506), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650809, character.Inventory.CountItem(650809), InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -330,11 +321,11 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650506, 1, InventoryAddType.PickUp);
+					character.Inventory.Add(650809, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
 					character.ServerMessage(L("Scorched: Infested Hive"));
 
-					var currentCount = character.Inventory.CountItem(650506);
+					var currentCount = character.Inventory.CountItem(650809);
 					character.ServerMessage(LF("Hives scorched: {0}/4", currentCount));
 
 					if (currentCount >= 4)
@@ -378,12 +369,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Recover five trail markers and kill twelve Raffly in the northwest?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thank you. The markers would be in a loop from here to the ridge and back."));
-							await dialog.Msg(L("Bring me even one and I'll know. And the Raffly... if they got him, at least thin them down."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thank you. The markers would be in a loop from here to the ridge and back."));
+						await dialog.Msg(L("Bring me even one and I'll know. And the Raffly... if they got him, at least thin them down."));
 						break;
 
 					case "info":
@@ -400,7 +388,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killRaffly", out var killObj)) return;
-				var markerCount = character.Inventory.CountItem(650479);
+				var markerCount = character.Inventory.CountItem(650683);
 
 				if (killObj.Done && markerCount >= 5)
 				{
@@ -408,7 +396,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("So he's gone. I knew it. But thanks to you, I know. That's worth something."));
 					await dialog.Msg(L("Take this - it was half his anyway."));
 
-					character.Inventory.Remove(650479, 5, InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650683, 5, InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -457,11 +445,11 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650479, 1, InventoryAddType.PickUp);
+					character.Inventory.Add(650683, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
 					character.ServerMessage(L("Recovered: Trail Marker"));
 
-					var currentCount = character.Inventory.CountItem(650479);
+					var currentCount = character.Inventory.CountItem(650683);
 					character.ServerMessage(LF("Markers recovered: {0}/5", currentCount));
 
 					if (currentCount >= 5)
@@ -506,12 +494,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Hunt down and kill three Ellogua for the bounty?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Good. Don't engage unless you have room to move - they circle, they never charge straight."));
-							await dialog.Msg(L("Bring their fangs and I'll pay per kill."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Good. Don't engage unless you have room to move - they circle, they never charge straight."));
+						await dialog.Msg(L("Bring their fangs and I'll pay per kill."));
 						break;
 
 					case "info":
@@ -570,12 +555,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Gosaru and fifteen Raffly along the shrine approach?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Both territories overlap along the approach path. You'll run into both on every stretch."));
-							await dialog.Msg(L("Thirty clears a reliable corridor. Anything less and they close it again within a day."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Both territories overlap along the approach path. You'll run into both on every stretch."));
+						await dialog.Msg(L("Thirty clears a reliable corridor. Anything less and they close it again within a day."));
 						break;
 
 					case "info":
@@ -647,10 +629,10 @@ public class DadanGateWatchQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Gosaru }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1)); // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 12)); // Large HP Potion
-		AddReward(new ItemReward(640007, 8)); // Large SP Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 }
 
@@ -674,19 +656,19 @@ public class HeartCrystalsQuest : QuestScript
 		AddQuestGiver(L("[Researcher] Miela"), "f_bracken_63_3");
 
 		AddObjective("harvestShards", L("Harvest pristine crystal shards"),
-			new CollectItemObjective(650302, 5));
+			new CollectItemObjective(650726, 5));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 13)); // Large HP Potion
-		AddReward(new ItemReward(640007, 9)); // Large SP Potion
-		AddReward(new ItemReward(640012, 5)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650302, character.Inventory.CountItem(650302), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650726, character.Inventory.CountItem(650726), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 5; i++)
 		{
@@ -697,7 +679,7 @@ public class HeartCrystalsQuest : QuestScript
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650302, character.Inventory.CountItem(650302), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650726, character.Inventory.CountItem(650726), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 5; i++)
 		{
@@ -730,20 +712,20 @@ public class TheBeetleBlightQuest : QuestScript
 			new KillObjective(15, new[] { MonsterId.Bush_Beetle }));
 
 		AddObjective("burnHives", L("Scorch infested hives"),
-			new CollectItemObjective(650506, 4));
+			new CollectItemObjective(650809, 4));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 13)); // Large HP Potion
-		AddReward(new ItemReward(640007, 9)); // Large SP Potion
-		AddReward(new ItemReward(640012, 6)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650506, character.Inventory.CountItem(650506), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650809, character.Inventory.CountItem(650809), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 4; i++)
 		{
@@ -754,7 +736,7 @@ public class TheBeetleBlightQuest : QuestScript
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650506, character.Inventory.CountItem(650506), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650809, character.Inventory.CountItem(650809), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 4; i++)
 		{
@@ -787,20 +769,20 @@ public class TheMissingWardenQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Raffly }));
 
 		AddObjective("findMarkers", L("Recover lost trail markers"),
-			new CollectItemObjective(650479, 5));
+			new CollectItemObjective(650683, 5));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 13)); // Large HP Potion
-		AddReward(new ItemReward(640007, 9)); // Large SP Potion
-		AddReward(new ItemReward(640012, 6)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650479, character.Inventory.CountItem(650479), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650683, character.Inventory.CountItem(650683), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 5; i++)
 		{
@@ -810,7 +792,7 @@ public class TheMissingWardenQuest : QuestScript
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650479, character.Inventory.CountItem(650479), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650683, character.Inventory.CountItem(650683), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 5; i++)
 		{
@@ -842,10 +824,10 @@ public class TheElloguaTrialQuest : QuestScript
 			new KillObjective(3, new[] { MonsterId.Ellogua }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1)); // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 12)); // Large HP Potion
-		AddReward(new ItemReward(640007, 8)); // Large SP Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 		AddReward(new ItemReward(531122, 1)); // Plate Armor
 	}
 }
@@ -876,10 +858,10 @@ public class TheShrineApproachQuest : QuestScript
 			new KillObjective(15, new[] { MonsterId.Raffly }));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 13)); // Large HP Potion
-		AddReward(new ItemReward(640007, 9)); // Large SP Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 		AddReward(new ItemReward(502186, 1)); // Tyla Plate Gauntlets
 	}
 }

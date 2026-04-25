@@ -50,12 +50,9 @@ public class FPilgrimroad49QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He nods once, relief cracking his weathered face*{/}"));
 
-						if (await dialog.YesNo(L("Twenty Brown Tinis. The south beetle-cluster is thickest. Can you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Watch your flanks. Brown Tinis strike in pairs - one draws, the other comes from behind."));
-							await dialog.Msg(L("And if you see their Archers - Green Tinis with bows - those are harder. Don't engage unless you're close already."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Watch your flanks. Brown Tinis strike in pairs - one draws, the other comes from behind."));
+						await dialog.Msg(L("And if you see their Archers - Green Tinis with bows - those are harder. Don't engage unless you're close already."));
 						break;
 
 					case "info":
@@ -120,12 +117,9 @@ public class FPilgrimroad49QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He presses the scroll-bundle into your hands with both of his, slow and careful*{/}"));
 
-						if (await dialog.YesNo(L("The Grynas Trails warp is northwest of here. Urte keeps a stone shrine beside the gate. Bring back whatever reply she offers. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The scroll-wax bears the Fedimian seal. Do not break it. Urte will know the mark."));
-							await dialog.Msg(L("And if you see the apprentices' bodies on the path - do not touch them. The Tinis lay traps over the fallen."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The scroll-wax bears the Fedimian seal. Do not break it. Urte will know the mark."));
+						await dialog.Msg(L("And if you see the apprentices' bodies on the path - do not touch them. The Tinis lay traps over the fallen."));
 						break;
 
 					case "info":
@@ -231,12 +225,9 @@ public class FPilgrimroad49QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She smiles, crystal-dust cracking at the corners of her eyes*{/}"));
 
-						if (await dialog.YesNo(L("Strike the rootcrystals at their base, not the crown. The shards come away cleaner that way. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The big clusters are northwest, along the old trail. Smaller ones scatter toward the southern bend."));
-							await dialog.Msg(L("If a Tini appears while you're gathering - run first, fight second. The shards aren't worth a wound."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The big clusters are northwest, along the old trail. Smaller ones scatter toward the southern bend."));
+						await dialog.Msg(L("If a Tini appears while you're gathering - run first, fight second. The shards aren't worth a wound."));
 						break;
 
 					case "info":
@@ -372,12 +363,9 @@ public class FPilgrimroad49QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She weights the map with a fifth pebble and circles four points*{/}"));
 
-						if (await dialog.YesNo(L("West shrine, north shrine, east shrine, south shrine. Don't touch the seals - just read them. Describe each to me. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The shrines are stone pillars marked with a wardmage's sigil. The seal is a wax disc set into the pillar's face."));
-							await dialog.Msg(L("Clean wax means the seal holds. Cracked wax means it weakened. Black wax means - something drank it through the working."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The shrines are stone pillars marked with a wardmage's sigil. The seal is a wax disc set into the pillar's face."));
+						await dialog.Msg(L("Clean wax means the seal holds. Cracked wax means it weakened. Black wax means - something drank it through the working."));
 						break;
 
 					case "info":
@@ -500,11 +488,11 @@ public class TrailPestCullQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Tiny_Brown }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10)); // Large HP Potion
-		AddReward(new ItemReward(640007, 10)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 }
 
@@ -531,10 +519,10 @@ public class TheUnfinishedPilgrimageQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_49.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10));  // Large HP Potion
-		AddReward(new ItemReward(640007, 10));  // Large SP Potion
+		AddReward(new ItemReward(640004, 2));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -571,11 +559,11 @@ public class RootcrystalShardsQuest : QuestScript
 			new CollectItemObjective(650555, 8));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -628,10 +616,10 @@ public class TheSilentSealsQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_49.Quest1004.ShrinesChecked", 4, true));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

@@ -23,7 +23,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Knidos Frontier Watch
 		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Scout] Kaelin"), "f_bracken_63_2", 560, 2090, 180, async dialog =>
+		AddNpc(20059, L("[Scout] Kaelin"), "f_bracken_63_2", 671, 1878, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_2", 1001);
@@ -35,7 +35,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("You came through the Koru pass? Brave traveler. The deeper jungle is worse."));
 				await dialog.Msg(L("Loktanun swarm the frontier here. Their bite carries the same corruption rotting these trees."));
 
-				var response = await dialog.Select(L("What can I do to help?"),
+				var response = await dialog.Select(L("Will you stand the watch with me?"),
 					Option(L("I'll thin their numbers"), "help"),
 					Option(L("Why are they so aggressive?"), "info"),
 					Option(L("Maybe later"), "leave")
@@ -44,12 +44,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Loktanun along the frontier?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Head south from here, they're everywhere along the tree line."));
-							await dialog.Msg(L("Twenty-two should cripple their pack for a while."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Head south from here, they're everywhere along the tree line."));
+						await dialog.Msg(L("Twenty-two should cripple their pack for a while."));
 						break;
 
 					case "info":
@@ -88,7 +85,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 		// Quest 2: Corrupted Sap
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Alchemist] Vila"), "f_bracken_63_2", 240, 320, 270, async dialog =>
+		AddNpc(20114, L("[Alchemist] Vila"), "f_bracken_63_2", 273, 680, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_2", 1002);
@@ -97,28 +94,25 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("A living sample, please! I need fresh corrupted sap from the Root Crystals deeper in the jungle."));
-				await dialog.Msg(L("Their sap is a concentrated form of the poison. If I can isolate what corrupts it, I can start brewing an antidote."));
+				await dialog.Msg(L("A living sample, please! I need fresh sap from the Tainted Bracken clusters that have sprouted right around the village."));
+				await dialog.Msg(L("The bracken pulls poison straight from the soil and weeps it back out as red sap. If I can isolate what corrupts it, I can start brewing an antidote."));
 
-				var response = await dialog.Select(L("Can you gather the samples?"),
-					Option(L("I'll collect five samples"), "help"),
-					Option(L("Why Root Crystals?"), "info"),
+				var response = await dialog.Select(L("Will you gather the samples?"),
+					Option(L("I'll collect six samples"), "help"),
+					Option(L("Why the bracken?"), "info"),
 					Option(L("Too risky"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Bring back five vials of corrupted sap from Root Crystal formations?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Five should be enough to begin. Tap the crystal formations carefully with the sample vial."));
-							await dialog.Msg(L("They're scattered around the center of the jungle. Be cautious - some react poorly when disturbed."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Six clusters should be enough to begin. Tap the bleeding stems carefully with the sample vial."));
+						await dialog.Msg(L("They're growing right at the edges of the village - you can't miss the red ones. Be cautious - some react poorly when disturbed."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Root Crystals draw poison straight from the earth, concentrating it."));
+						await dialog.Msg(L("Tainted Bracken roots run shallow but deep enough to drink whatever's poisoning the ground."));
 						await dialog.Msg(L("Their sap is potent enough that I can study the corruption itself, not just its effects."));
 						break;
 
@@ -131,18 +125,18 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			{
 				var sapCount = character.Inventory.CountItem(650527);
 
-				if (sapCount >= 5)
+				if (sapCount >= 6)
 				{
-					await dialog.Msg(L("All five vials! And the hue is exactly what I feared - sickly green, not the healthy amber."));
+					await dialog.Msg(L("All six vials! And the hue is exactly what I feared - sickly red, not the healthy amber of true bracken."));
 					await dialog.Msg(L("This will keep my lab busy for weeks. Thank you."));
 
-					character.Inventory.Remove(650527, 5, InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650527, 6, InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(LF("I still need more samples. You have {0} of five.", sapCount));
+					await dialog.Msg(LF("I still need more samples. You have {0} of six.", sapCount));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
@@ -155,7 +149,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		void AddSapNode(int nodeNum, int x, int z, int direction)
 		{
-			AddNpc(47224, L("Bleeding Root Crystal"), "f_bracken_63_2", x, z, direction, async dialog =>
+			AddNpc(160150, L("Tainted Bracken Cluster"), "f_bracken_63_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_bracken_63_2", 1002);
@@ -164,13 +158,13 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A root crystal oozes thick green sap*{/}"));
+					await dialog.Msg(L("{#666666}*A bracken cluster weeps thick red sap*{/}"));
 					return;
 				}
 
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*This crystal has already been tapped*{/}"));
+					await dialog.Msg(L("{#666666}*This cluster has already been tapped*{/}"));
 					return;
 				}
 
@@ -196,9 +190,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 					character.ServerMessage(L("Collected: Corrupted Sap Vial"));
 
 					var currentCount = character.Inventory.CountItem(650527);
-					character.ServerMessage(LF("Sap vials collected: {0}/5", currentCount));
+					character.ServerMessage(LF("Sap vials collected: {0}/6", currentCount));
 
-					if (currentCount >= 5)
+					if (currentCount >= 6)
 					{
 						character.ServerMessage(L("{#FFD700}All samples gathered! Return to Vila.{/}"));
 					}
@@ -210,11 +204,12 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddSapNode(1, 666, 2012, 0);
-		AddSapNode(2, 543, 1732, 0);
-		AddSapNode(3, 308, 1067, 0);
-		AddSapNode(4, 639, 726, 0);
-		AddSapNode(5, 393, 411, 0);
+		AddSapNode(1, 678, 811, 315);
+		AddSapNode(2, 549, 1173, 315);
+		AddSapNode(3, 175, 1166, 45);
+		AddSapNode(4, 295, 234, 90);
+		AddSapNode(5, 548, 639, 180);
+		AddSapNode(6, 622, 1198, 315);
 
 		// Quest 3: Silencing the Shamans
 		//-------------------------------------------------------------------------
@@ -230,7 +225,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The Lapasape Mages on the western ridge aren't merely corrupted - they're channeling it."));
 				await dialog.Msg(L("They've planted blood totems across the ridge that drink in the poison and amplify it back into their spells."));
 
-				var response = await dialog.Select(L("What needs to be done?"),
+				var response = await dialog.Select(L("Will you take this on?"),
 					Option(L("I'll cut them down and smash the totems"), "help"),
 					Option(L("Why do the totems matter?"), "info"),
 					Option(L("Handle it yourself"), "leave")
@@ -239,12 +234,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Slay twelve Lapasape Mages and shatter four blood totems?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The totems are planted across the western ridge. Break them with your weapon - they resist magic."));
-							await dialog.Msg(L("Without the totems the shamans are just tainted beasts. Thin them first so you can work in peace."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The totems are planted across the western ridge. Break them with your weapon - they resist magic."));
+						await dialog.Msg(L("Without the totems the shamans are just tainted beasts. Thin them first so you can work in peace."));
 						break;
 
 					case "info":
@@ -268,7 +260,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Totems broken, shamans slain. The ridge is just a ridge again."));
 					await dialog.Msg(L("Corruption still lingers in the earth, but the amplification is gone. That's a day's good work."));
 
-					character.Inventory.Remove(650378, character.Inventory.CountItem(650378), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650601, character.Inventory.CountItem(650601), InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -317,11 +309,11 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650378, 1, InventoryAddType.PickUp);
+					character.Inventory.Add(650601, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Shattered: Blood Totem"));
+					character.ServerMessage(L("Recovered: Destroyed Altar Fragment"));
 
-					var currentCount = character.Inventory.CountItem(650378);
+					var currentCount = character.Inventory.CountItem(650601);
 					character.ServerMessage(LF("Totems shattered: {0}/4", currentCount));
 
 					if (currentCount >= 4)
@@ -343,7 +335,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 		// Quest 4: The Missing Survey
 		//-------------------------------------------------------------------------
-		AddNpc(155018, L("[Scribe] Petras"), "f_bracken_63_2", 310, -340, 0, async dialog =>
+		AddNpc(155018, L("[Scribe] Petras"), "f_bracken_63_2", 57, -436, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_2", 1004);
@@ -364,12 +356,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Recover five scattered pages and thin the Ponpon flock by ten?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("They blew north and west of my camp. Five pages - each is sealed, you can't miss them."));
-							await dialog.Msg(L("And please, put down at least ten Ponpon so I can work without being dive-bombed."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They blew north and west of my camp. Eight pages - each is sealed, you can't miss them."));
+						await dialog.Msg(L("And please, put down at least ten Ponpon so I can work without being dive-bombed."));
 						break;
 
 					case "info":
@@ -388,12 +377,12 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				if (!quest.TryGetProgress("killPonpon", out var killObj)) return;
 				var pageCount = character.Inventory.CountItem(650445);
 
-				if (killObj.Done && pageCount >= 5)
+				if (killObj.Done && pageCount >= 8)
 				{
-					await dialog.Msg(L("All five pages. And the Ponpon sound quieter already."));
+					await dialog.Msg(L("All eight pages. And the Ponpon sound quieter already."));
 					await dialog.Msg(L("I can resume the survey. This might actually save lives, you understand? Real lives."));
 
-					character.Inventory.Remove(650445, 5, InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650445, 8, InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -402,7 +391,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 					var status = "";
 					if (!killObj.Done)
 						status += L("Thin the Ponpon flock. ");
-					if (pageCount < 5)
+					if (pageCount < 8)
 						status += L("Find more scattered survey pages. ");
 
 					await dialog.Msg(LF("Keep searching. {0}", status));
@@ -418,7 +407,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		void AddSurveyPage(int pageNum, int x, int z, int direction)
 		{
-			AddNpc(46218, L("Scattered Survey Page"), "f_bracken_63_2", x, z, direction, async dialog =>
+			AddNpc(154038, L("Scattered Survey Page"), "f_bracken_63_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_bracken_63_2", 1004);
@@ -447,9 +436,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 					character.ServerMessage(L("Recovered: Survey Page"));
 
 					var currentCount = character.Inventory.CountItem(650445);
-					character.ServerMessage(LF("Pages recovered: {0}/5", currentCount));
+					character.ServerMessage(LF("Pages recovered: {0}/8", currentCount));
 
-					if (currentCount >= 5)
+					if (currentCount >= 8)
 					{
 						character.ServerMessage(L("{#FFD700}All pages recovered! Return to Petras.{/}"));
 					}
@@ -461,15 +450,18 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddSurveyPage(1, 700, -1500, 0);
-		AddSurveyPage(2, 400, -1200, 0);
-		AddSurveyPage(3, 900, -1000, 0);
-		AddSurveyPage(4, 150, -1300, 0);
-		AddSurveyPage(5, 520, -780, 0);
+		AddSurveyPage(1, 1206, -1025, 270);
+		AddSurveyPage(2, 1162, -1256, 270);
+		AddSurveyPage(3, 906, -791, 0);
+		AddSurveyPage(4, 460, -958, 0);
+		AddSurveyPage(5, 218, -958, 0);
+		AddSurveyPage(6, 181, -1243, 90);
+		AddSurveyPage(7, 461, -1374, 315);
+		AddSurveyPage(8, 610, -1186, 90);
 
 		// Quest 5: The Tainted Alpha
 		//-------------------------------------------------------------------------
-		AddNpc(20109, L("[Tracker] Niko"), "f_bracken_63_2", 1050, -1080, 315, async dialog =>
+		AddNpc(20109, L("[Tracker] Niko"), "f_bracken_63_2", 889, -1065, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_2", 1005);
@@ -483,7 +475,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The Kanchobirds down there have been dragged into something else. Something's been feeding them, pushing them."));
 				await dialog.Msg(L("There's an alpha. I've seen its tracks. Twice the size of the flock, and the corruption's thicker in it."));
 
-				var response = await dialog.Select(L("Want me to hunt it?"),
+				var response = await dialog.Select(L("Will you take the hunt?"),
 					Option(L("I'll hunt the alpha"), "help"),
 					Option(L("What kind of alpha?"), "info"),
 					Option(L("Not my fight"), "leave")
@@ -492,12 +484,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin the Kanchobird flock first, then slay the alpha when it shows itself?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Kill ten birds to bait it out. The alpha won't emerge while the flock is full."));
-							await dialog.Msg(L("When the flock thins, it'll come hunting. Come back here then and I'll flush it into the open for you."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Kill ten birds to bait it out. The alpha won't emerge while the flock is full."));
+						await dialog.Msg(L("When the flock thins, it'll come hunting. Come back here then and I'll flush it into the open for you."));
 						break;
 
 					case "info":
@@ -557,7 +546,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 		// Quest 6: The Stoup Camp Route
 		//-------------------------------------------------------------------------
-		AddNpc(155145, L("[Pathfinder] Elvira"), "f_bracken_63_2", 705, 495, 135, async dialog =>
+		AddNpc(155145, L("[Pathfinder] Elvira"), "f_bracken_63_2", 1374, 452, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_2", 1006);
@@ -578,12 +567,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Clear twelve Loktanun and twelve Ponpon along the Stoup route?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Their territories overlap along the trail, so you'll run into both."));
-							await dialog.Msg(L("Even numbers should give the caravans a clean passage for a week or two."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Their territories overlap along the trail, so you'll run into both."));
+						await dialog.Msg(L("Even numbers should give the caravans a clean passage for a week or two."));
 						break;
 
 					case "info":
@@ -655,10 +641,10 @@ public class KnidosFrontierWatchQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Loktanun }));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 }
 
@@ -682,20 +668,20 @@ public class CorruptedSapQuest : QuestScript
 		AddQuestGiver(L("[Alchemist] Vila"), "f_bracken_63_2");
 
 		AddObjective("collectSap", L("Collect corrupted sap vials"),
-			new CollectItemObjective(650527, 5));
+			new CollectItemObjective(650527, 6));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650527, character.Inventory.CountItem(650527), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 6; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_2.Quest1002.Sap{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_2.Quest1002.Sap{i}.Spawned");
@@ -706,7 +692,7 @@ public class CorruptedSapQuest : QuestScript
 	{
 		character.Inventory.Remove(650527, character.Inventory.CountItem(650527), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 6; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_2.Quest1002.Sap{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_2.Quest1002.Sap{i}.Spawned");
@@ -737,19 +723,19 @@ public class SilencingTheShamansQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Lapasape_Mage }));
 
 		AddObjective("shatterTotems", L("Shatter blood totems"),
-			new CollectItemObjective(650378, 4));
+			new CollectItemObjective(650601, 4));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650378, character.Inventory.CountItem(650378), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650601, character.Inventory.CountItem(650601), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 4; i++)
 		{
@@ -759,7 +745,7 @@ public class SilencingTheShamansQuest : QuestScript
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650378, character.Inventory.CountItem(650378), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650601, character.Inventory.CountItem(650601), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 4; i++)
 		{
@@ -791,13 +777,13 @@ public class TheMissingSurveyQuest : QuestScript
 			new KillObjective(10, new[] { MonsterId.Ponpon }));
 
 		AddObjective("recoverPages", L("Recover scattered survey pages"),
-			new CollectItemObjective(650445, 5));
+			new CollectItemObjective(650445, 8));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
 	}
 
@@ -805,7 +791,7 @@ public class TheMissingSurveyQuest : QuestScript
 	{
 		character.Inventory.Remove(650445, character.Inventory.CountItem(650445), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_2.Quest1004.Page{i}");
 		}
@@ -815,7 +801,7 @@ public class TheMissingSurveyQuest : QuestScript
 	{
 		character.Inventory.Remove(650445, character.Inventory.CountItem(650445), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_2.Quest1004.Page{i}");
 		}
@@ -848,10 +834,10 @@ public class TheTaintedAlphaQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Tanu }));
 
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 3)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 		AddReward(new ItemReward(531122, 1)); // Plate Armor
 	}
 
@@ -892,10 +878,10 @@ public class TheStoupCampRouteQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Ponpon }));
 
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 3)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 		AddReward(new ItemReward(501122, 1)); // Plate Gauntlets
 	}
 }

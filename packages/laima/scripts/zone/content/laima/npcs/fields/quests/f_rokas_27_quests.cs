@@ -51,12 +51,9 @@ public class FRokas27QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He pulls a short whistle from his collar*{/}"));
 
-						if (await dialog.YesNo(L("Twenty Tucen. The center pass - look for the rockfall markers. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If you hear two sharp whistles - that's me, rider incoming. Clear the pass-center so they don't ride into your fight."));
-							await dialog.Msg(L("Tucen pincers don't break armor, but they pop grease-seals. Oil your gear before you engage."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If you hear two sharp whistles - that's me, rider incoming. Clear the pass-center so they don't ride into your fight."));
+						await dialog.Msg(L("Tucen pincers don't break armor, but they pop grease-seals. Oil your gear before you engage."));
 						break;
 
 					case "info":
@@ -121,12 +118,9 @@ public class FRokas27QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She presses the dispatch into your hand with both of hers, then tightens the tether on her own mount*{/}"));
 
-						if (await dialog.YesNo(L("The Overlong Bridge warp is northeast of the pass. Kaspar keeps a stone bridgehead shelter. Will you go?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The rider-seal is horse-and-hawk. Don't press it - the wax is soft. Kaspar will countersign with bridge-pitch."));
-							await dialog.Msg(L("If you hear a whistle-pattern from the pass-scout - three long, one short - that's 'rider-down nearby.' Ride around it, don't toward it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The rider-seal is horse-and-hawk. Don't press it - the wax is soft. Kaspar will countersign with bridge-pitch."));
+						await dialog.Msg(L("If you hear a whistle-pattern from the pass-scout - three long, one short - that's 'rider-down nearby.' Ride around it, don't toward it."));
 						break;
 
 					case "info":
@@ -233,12 +227,9 @@ public class FRokas27QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She pulls a second sieve from her gather-pack and passes it up*{/}"));
 
-						if (await dialog.YesNo(L("Sieve the dust at each stone-base. Fragments look like chapel silver, palm-sized or smaller. Eight is enough to make a recovery report worth sending. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wind blows pilgrim-dust east in this ridge. Stones on the east face catch more. Start there."));
-							await dialog.Msg(L("And if a Sauga scorpion wakes while you're sweeping - step back, don't strike. They only lunge at movement toward them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wind blows pilgrim-dust east in this ridge. Stones on the east face catch more. Start there."));
+						await dialog.Msg(L("And if a Sauga scorpion wakes while you're sweeping - step back, don't strike. They only lunge at movement toward them."));
 						break;
 
 					case "info":
@@ -374,12 +365,9 @@ public class FRokas27QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He tears a page from his survey-book and marks four points in ridge-chalk*{/}"));
 
-						if (await dialog.YesNo(L("The tombs are scattered across the upper ridge. Read each seal - describe the stone-state. Do not disturb the seal-lines. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The seal-lines are chalk-and-pitch, renewed every half-century. Fresh chalk is pale; old chalk yellows. Pitch-break means the line was pulled apart, not worn down."));
-							await dialog.Msg(L("Pulled-apart pitch is the one that means something climbed out. Not something got in - something got out."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The seal-lines are chalk-and-pitch, renewed every half-century. Fresh chalk is pale; old chalk yellows. Pitch-break means the line was pulled apart, not worn down."));
+						await dialog.Msg(L("Pulled-apart pitch is the one that means something climbed out. Not something got in - something got out."));
 						break;
 
 					case "info":
@@ -502,11 +490,11 @@ public class AmbushersInThePassQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Tucen }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));  // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Large HP Potion
-		AddReward(new ItemReward(640007, 15)); // Large SP Potion
-		AddReward(new ItemReward(640013, 13));  // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 3));  // Recovery Potion
 	}
 }
 
@@ -533,10 +521,10 @@ public class RiderCaptainsRelayQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_rokas_27.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Large HP Potion
-		AddReward(new ItemReward(640007, 15)); // Large SP Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -573,11 +561,11 @@ public class TheScatteredReliquariesQuest : QuestScript
 			new CollectItemObjective(650735, 8));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Large HP Potion
-		AddReward(new ItemReward(640007, 14)); // Large SP Potion
-		AddReward(new ItemReward(640013, 13));  // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 3));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -630,10 +618,10 @@ public class TheRidgeTombsAreStirringQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_rokas_27.Quest1004.TombsChecked", 4, true));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Large HP Potion
-		AddReward(new ItemReward(640007, 15)); // Large SP Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

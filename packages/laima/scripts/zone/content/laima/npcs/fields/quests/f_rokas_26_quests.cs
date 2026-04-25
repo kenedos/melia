@@ -44,11 +44,8 @@ public class FRokas26QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Wendigos prowling the Overlong Bridge?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. They hunt in fours, mind your back."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. They hunt in fours, mind your back."));
 						break;
 
 					case "info":
@@ -106,11 +103,8 @@ public class FRokas26QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Dumaros and bring five skulls?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty and five. The skulls count for the ledger."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty and five. The skulls count for the ledger."));
 						break;
 
 					case "info":
@@ -169,11 +163,8 @@ public class FRokas26QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Wendigo Bows and collect six quivers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Handle the quivers by the strap, not the leather - venom seeps."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Handle the quivers by the strap, not the leather - venom seeps."));
 						break;
 
 					case "info":
@@ -232,11 +223,8 @@ public class FRokas26QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Wendigo Mages and gather five fog-knots?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fog-knots glow faint green. Look for them near chanting circles."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fog-knots glow faint green. Look for them near chanting circles."));
 						break;
 
 					case "info":
@@ -295,11 +283,8 @@ public class FRokas26QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Wendigos and bring down the Alpha when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten from his pack. Then he comes."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten from his pack. Then he comes."));
 						break;
 
 					case "info":
@@ -373,11 +358,8 @@ public class FRokas26QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Dumaros and twelve Wendigos in the south valley?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Caravans roll at dawn if the count holds."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Caravans roll at dawn if the count holds."));
 						break;
 
 					case "info":
@@ -436,10 +418,10 @@ public class FRokas26Quest1001 : QuestScript
 			new KillObjective(22, new[] { MonsterId.Wendigo }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -465,11 +447,11 @@ public class FRokas26Quest1002 : QuestScript
 			new CollectItemObjective(650012, 5));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 11));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -505,10 +487,10 @@ public class FRokas26Quest1003 : QuestScript
 			new CollectItemObjective(650014, 6));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 11));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -544,11 +526,11 @@ public class FRokas26Quest1004 : QuestScript
 			new CollectItemObjective(650125, 5));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 11));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -584,11 +566,11 @@ public class FRokas26Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Wendigo }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 12));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -614,10 +596,10 @@ public class FRokas26Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Wendigo }));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 11));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }

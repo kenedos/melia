@@ -43,11 +43,8 @@ public class FTableland71QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Purple Hohen Ritter?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. The flats are wide."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. The flats are wide."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FTableland71QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Blue Cronewt Bows and bring eight fletches?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Keep the vanes flat."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Keep the vanes flat."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FTableland71QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Blue Hohen Barkle and bring six resin-pulls?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Pull slow. The bark tears."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Pull slow. The bark tears."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FTableland71QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill sixty Blue Tinys across the ridges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Sixty. Watch the footing."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Sixty. Watch the footing."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FTableland71QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Purple Hohen Ritter and defeat the Alpha when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FTableland71QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Purple Ritter, Blue Barkle, Blue Cronewt Bows?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FTableland71Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Hohen_Ritter_Purple }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FTableland71Quest1002 : QuestScript
 			new CollectItemObjective(650271, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FTableland71Quest1003 : QuestScript
 			new CollectItemObjective(650272, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FTableland71Quest1004 : QuestScript
 			new KillObjective(60, new[] { MonsterId.Tiny_Blue }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FTableland71Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Hohen_Ritter_Purple }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -594,10 +576,10 @@ public class FTableland71Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Cronewt_Bow_Blue }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }

@@ -43,11 +43,8 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty High Bube Spears?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. Watch the hedge-flanks."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. Watch the hedge-flanks."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty High Bube Archers and bring eight fletchings?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Pitch side up. Don't smudge."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Pitch side up. Don't smudge."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Arburn Pokubu Greens and bring six tongues?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wrap in oiled cloth. Tongues dry to dust fast."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wrap in oiled cloth. Tongues dry to dust fast."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break fifteen Poslinkis Rootcrystals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fifteen. Work quiet."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fifteen. Work quiet."));
 						break;
 
 					case "info":
@@ -267,7 +255,6 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_13", 1005);
-			var bossSpawnedKey = "Laima.Quests.f_katyn_13.Quest1005.BossSpawned";
 
 			dialog.SetTitle(L("Tadas"));
 
@@ -284,11 +271,8 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Bushspiders and defeat the Fallen Statue when it rises?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -306,29 +290,15 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				if (!quest.TryGetProgress("killSpiders", out var pObj)) return;
 				if (!quest.TryGetProgress("killStatue", out var sObj)) return;
 
-				if (pObj.Done && sObj.Done)
+				if (sObj.Done)
 				{
 					await dialog.Msg(L("Shrine's still."));
 					character.Inventory.Remove(650243, character.Inventory.CountItem(650243), InventoryItemRemoveMsg.Given);
-					character.Variables.Perm.Remove(bossSpawnedKey);
 					character.Quests.Complete(questId);
 				}
-				else if (pObj.Done && !sObj.Done)
+				else if (pObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(bossSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(bossSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Boss_Fallen_Statue, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("It rises!"));
-							character.ServerMessage(L("{#FF9966}The Fallen Statue rises from the shrine!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("Find it."));
-					}
+					await dialog.Msg(L("It rises! Find it and end it."));
 				}
 				else
 				{
@@ -363,11 +333,8 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - High Bube Spears, High Bube Archers, Arburn Pokubu Greens?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -427,10 +394,10 @@ public class FKatyn13Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.HighBube_Spear }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -456,11 +423,11 @@ public class FKatyn13Quest1002 : QuestScript
 			new CollectItemObjective(650239, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -496,11 +463,11 @@ public class FKatyn13Quest1003 : QuestScript
 			new CollectItemObjective(650241, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -533,10 +500,10 @@ public class FKatyn13Quest1004 : QuestScript
 			new KillObjective(15, new[] { MonsterId.Rootcrystal_02 }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -552,21 +519,25 @@ public class FKatyn13Quest1005 : QuestScript
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
+		SetUnlock(QuestUnlockType.Sequential);
 		AddQuestGiver(L("[Bounty Hunter] Tadas"), "f_katyn_13");
 
 		AddObjective("killSpiders", L("Kill Bushspiders and gather a shrine-fragment"),
 			new KillObjective(10, new[] { MonsterId.Bushspider }));
 
 		AddObjective("killStatue", L("Defeat the Fallen Statue"),
-			new KillObjective(1, new[] { MonsterId.Boss_Fallen_Statue }));
+			new LayeredKillObjective(
+				spawnList: new[] { new KillSpec(MonsterId.Boss_Fallen_Statue, 1) },
+				resetIdent: "killSpiders",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -605,10 +576,10 @@ public class FKatyn13Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Arburn_Pokubu_Green }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

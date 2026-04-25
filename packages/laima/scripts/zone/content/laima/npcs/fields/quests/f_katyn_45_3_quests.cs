@@ -51,11 +51,8 @@ public class FKatyn453QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He spits into the half-ring, dispersing it*{/}"));
 
-						if (await dialog.YesNo(L("Twenty. Break the ring-starters first. If you find a closed ring, walk around it - never through. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If you hear giggling from inside a ring - that's the ring working on the last thing that crossed it. Keep moving. Don't turn."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If you hear giggling from inside a ring - that's the ring working on the last thing that crossed it. Keep moving. Don't turn."));
 						break;
 
 					case "info":
@@ -119,11 +116,8 @@ public class FKatyn453QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She binds the rosary in waxed paper, ties it with a strand of her own grey hair, and presses it into your hand*{/}"));
 
-						if (await dialog.YesNo(L("Eastern edge, past the mushroom hill. Do not speak to a fisher casting into the dry bowl. They will answer, and you do not want them to. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Genute wears a blue kerchief. If the woman at the memorial wears red, she is not Genute. Walk on. Come back. Try at dawn."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Genute wears a blue kerchief. If the woman at the memorial wears red, she is not Genute. Walk on. Come back. Try at dawn."));
 						break;
 
 					case "info":
@@ -229,11 +223,8 @@ public class FKatyn453QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She draws a long copper hook from her sleeve and passes it to you. It is warm, as if it had just been in water*{/}"));
 
-						if (await dialog.YesNo(L("Below the bell. Trailing frond only. Eight. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If the bell pulses toward you after you cut - drop the frond and walk away. The bell remembers you now. Fronds can be replaced."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If the bell pulses toward you after you cut - drop the frond and walk away. The bell remembers you now. Fronds can be replaced."));
 						break;
 
 					case "info":
@@ -367,11 +358,8 @@ public class FKatyn453QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She presses the drift-gauge into your hand. It is cool and slightly damp despite the dry air*{/}"));
 
-						if (await dialog.YesNo(L("Four bowls. Needle still: inert. Needle toward the bowl: drowning. Needle away from the bowl: something worse than drowning. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If the needle swings away, step back three paces and then walk - don't turn to look at the bowl. I mean this. Don't look."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If the needle swings away, step back three paces and then walk - don't turn to look at the bowl. I mean this. Don't look."));
 						break;
 
 					case "info":
@@ -494,11 +482,11 @@ public class BreakTheClosingRingsQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Mushroom_Boy_Yellow }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10)); // Large HP Potion
-		AddReward(new ItemReward(640007, 10)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 }
 
@@ -525,10 +513,10 @@ public class ARosaryForTheDrownedPondQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_3.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10));  // Large HP Potion
-		AddReward(new ItemReward(640007, 10));  // Large SP Potion
+		AddReward(new ItemReward(640004, 2));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -565,11 +553,11 @@ public class JellyfishTearFrondsQuest : QuestScript
 			new CollectItemObjective(650852, 8));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
-		AddReward(new ItemReward(640012, 3));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -622,10 +610,10 @@ public class WhichDryBowlsStillDrownQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_3.Quest1004.BowlsChecked", 4, true));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

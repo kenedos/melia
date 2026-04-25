@@ -49,12 +49,9 @@ public class FWhitetrees231QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("Good. I'd do it myself, but my orders are to watch and report."));
 
-						if (await dialog.YesNo(L("The Lyoni have massed along the northern ridge and the central grove. Cut their numbers down before they reach the Pystis road. Can you handle it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Look for them in the packs - they hunt in groups. The biggest cluster is on the ridge north of here."));
-							await dialog.Msg(L("Twenty-five should break their cohesion. Good hunting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Look for them in the packs - they hunt in groups. The biggest cluster is on the ridge north of here."));
+						await dialog.Msg(L("Twenty-five should break their cohesion. Good hunting."));
 						break;
 
 					case "info":
@@ -119,12 +116,9 @@ public class FWhitetrees231QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*Relief washes over his face*{/}"));
 
-						if (await dialog.YesNo(L("Bless you. Eisenis waits at the central crossroads of Emmet - head east from here. Just hand him the letter and come back for payment. Will you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The letter's sealed with pine resin - Saulene's mark. Don't break it."));
-							await dialog.Msg(L("Eisenis is the old druid. White beard, green robes. You can't miss him."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The letter's sealed with pine resin - Saulene's mark. Don't break it."));
+						await dialog.Msg(L("Eisenis is the old druid. White beard, green robes. You can't miss him."));
 						break;
 
 					case "info":
@@ -224,12 +218,9 @@ public class FWhitetrees231QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She presses her hands together in thanks*{/}"));
 
-						if (await dialog.YesNo(L("Each marked tree will give one piece of inner bark - no more. Five bark pieces, five trees. Use your knife gently, ask first. Will you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The ribbons are pale green - easy to miss if you rush. Look at the trunks, not the canopy."));
-							await dialog.Msg(L("Be wary - the Tot sometimes burst from the undergrowth. Their poison sap lingers on the bark if they touch it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The ribbons are pale green - easy to miss if you rush. Look at the trunks, not the canopy."));
+						await dialog.Msg(L("Be wary - the Tot sometimes burst from the undergrowth. Their poison sap lingers on the bark if they touch it."));
 						break;
 
 					case "info":
@@ -364,12 +355,9 @@ public class FWhitetrees231QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She thrusts a charcoal pencil and paper at you*{/}"));
 
-						if (await dialog.YesNo(L("Four markers. Observe each for a moment - the pencil rubbings will tell me which tribe claims it and whether the lines are shifting. Will you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The markers are in the clearings - places where the trees thin. One near each main grove."));
-							await dialog.Msg(L("You don't need to fight. Just watch, rub, move on. Don't linger once you're done."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The markers are in the clearings - places where the trees thin. One near each main grove."));
+						await dialog.Msg(L("You don't need to fight. Just watch, rub, move on. Don't linger once you're done."));
 						break;
 
 					case "info":
@@ -491,11 +479,11 @@ public class LyoniThinningQuest : QuestScript
 			new KillObjective(25, new[] { MonsterId.Kucarry_Lioni }));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Normal Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Normal Stamina Potion
 		AddReward(new ItemReward(501127, 1));  // Steel Chain Gloves
 	}
 }
@@ -523,10 +511,10 @@ public class LetterForEisenisQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_23_1.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -563,11 +551,11 @@ public class WhiteLeafBarkQuest : QuestScript
 			new CollectItemObjective(666051, 5));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Normal Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Normal Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -620,11 +608,11 @@ public class TracksInTheClearingsQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_23_1.Quest1004.MarkersVisited", 4, true));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Normal Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Normal Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

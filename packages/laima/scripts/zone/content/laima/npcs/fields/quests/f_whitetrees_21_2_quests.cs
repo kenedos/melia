@@ -476,11 +476,11 @@ public class ThePilgrimsRestQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_21_2.Quest1001.StonesVisited", 4, true));
 
 		AddReward(new ExpReward(1100, 750));
-		AddReward(new SilverReward(8500));
+		AddReward(new SilverReward(2100));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 11)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 7));  // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 1));  // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -529,10 +529,10 @@ public class BellsOfTheWildQuest : QuestScript
 			new CollectItemObjective(663351, 5));
 
 		AddReward(new ExpReward(1100, 750));
-		AddReward(new SilverReward(8500));
+		AddReward(new SilverReward(2100));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8));  // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -573,11 +573,11 @@ public class WaterfallOfferingQuest : QuestScript
 			new CollectItemObjective(667232, 5));
 
 		AddReward(new ExpReward(1100, 750));
-		AddReward(new SilverReward(8500));
+		AddReward(new SilverReward(2100));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 6));  // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 1));  // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -630,11 +630,11 @@ public class TheUnsettledGroveQuest : QuestScript
 			new KillObjective(35, new[] { MonsterId.Kucarry_Zeffi }));
 
 		AddReward(new ExpReward(1400, 1000));
-		AddReward(new SilverReward(10500));
+		AddReward(new SilverReward(2600));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 11)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 7));  // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 1));  // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(201106, 1));  // Mallet
 	}
 }

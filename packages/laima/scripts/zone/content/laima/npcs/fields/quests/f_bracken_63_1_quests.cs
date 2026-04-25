@@ -667,10 +667,10 @@ public class JungleEntryPatrolQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Folibu }));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 }
 
@@ -697,10 +697,10 @@ public class HerbGatherersPleaQuest : QuestScript
 			new KillObjective(18, new[] { MonsterId.Ferrot }));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 }
 
@@ -730,11 +730,11 @@ public class ElevatorMaintenanceQuest : QuestScript
 			new CollectItemObjective(650585, 4));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
 	}
 
@@ -784,11 +784,11 @@ public class WaterfallSanctuaryQuest : QuestScript
 			new CollectItemObjective(666246, 4));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
 	}
 
@@ -843,11 +843,11 @@ public class LostInTheMistQuest : QuestScript
 			new CollectItemObjective(650442, 5));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 		AddReward(new ItemReward(531122, 1)); // Plate Armor
 	}
 
@@ -898,10 +898,10 @@ public class PathwayPurgeQuest : QuestScript
 			new KillObjective(15, new[] { MonsterId.Folibu }));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 8)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 		AddReward(new ItemReward(927011, 1)); // Recipe - Grand Spontoon
 	}
 }

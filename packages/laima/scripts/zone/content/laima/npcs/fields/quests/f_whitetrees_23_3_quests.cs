@@ -49,12 +49,9 @@ public class FWhitetrees233QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He grins wide, revealing a missing tooth*{/}"));
 
-						if (await dialog.YesNo(L("Twenty Rafflet ought to do it. Mind the pollen - tie a cloth over your nose if you've got one. Ready to help?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("They favor the damp patches along the eastern path. You'll hear them before you see them - they hum when they bloom."));
-							await dialog.Msg(L("Oh, and leave the Fragolin and Cloverin be. They're harmless - the berry-sisters especially. Never hurt a soul."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They favor the damp patches along the eastern path. You'll hear them before you see them - they hum when they bloom."));
+						await dialog.Msg(L("Oh, and leave the Fragolin and Cloverin be. They're harmless - the berry-sisters especially. Never hurt a soul."));
 						break;
 
 					case "info":
@@ -120,12 +117,9 @@ public class FWhitetrees233QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She brightens and carefully seals the letter with a wax-dot*{/}"));
 
-						if (await dialog.YesNo(L("Sigute's at the northern warp - the one to Orsha. She'll add it to her bag and take it on her next run. Come back when she has it? I'll be here practicing. Trying to.")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Oh - and if the berry-sisters follow you, don't shoo them. They just like watching people. They followed me for an hour yesterday."));
-							await dialog.Msg(L("{#666666}*Three Fragolin tilt their heads at exactly the same angle*{/}"));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Oh - and if the berry-sisters follow you, don't shoo them. They just like watching people. They followed me for an hour yesterday."));
+						await dialog.Msg(L("{#666666}*Three Fragolin tilt their heads at exactly the same angle*{/}"));
 						break;
 
 					case "info":
@@ -225,12 +219,9 @@ public class FWhitetrees233QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She pats flour off her apron*{/}"));
 
-						if (await dialog.YesNo(L("Five ripe ones, bright red - the Fragolin will guide your hand to the right berries if you're patient. Will you go?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Look for bushes with a sister or two lingering nearby. That's the sign the fruit is ready."));
-							await dialog.Msg(L("If a Fragolin startles - sometimes a shy sister jumps out when you reach for a berry - don't hurt her. They hum when they're upset, just wait and they'll settle."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Look for bushes with a sister or two lingering nearby. That's the sign the fruit is ready."));
+						await dialog.Msg(L("If a Fragolin startles - sometimes a shy sister jumps out when you reach for a berry - don't hurt her. They hum when they're upset, just wait and they'll settle."));
 						break;
 
 					case "info":
@@ -363,12 +354,9 @@ public class FWhitetrees233QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She touches your wrist briefly in thanks*{/}"));
 
-						if (await dialog.YesNo(L("Four items, leading west toward the Parias warp. Each one will tell you if she was hurrying, frightened, or calm. Will you follow them?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The Fragolin-sisters will watch over you as you walk. They followed Eglė yesterday - they'll follow you too."));
-							await dialog.Msg(L("{#666666}*Two Fragolin-sisters nod in perfect synchrony from the underbrush*{/}"));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The Fragolin-sisters will watch over you as you walk. They followed Eglė yesterday - they'll follow you too."));
+						await dialog.Msg(L("{#666666}*Two Fragolin-sisters nod in perfect synchrony from the underbrush*{/}"));
 						break;
 
 					case "info":
@@ -489,11 +477,11 @@ public class PoisonousBloomsQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Rafflet }));
 
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(5000));
+		AddReward(new SilverReward(1200));
 		AddReward(new ItemReward(640081, 1));  // Lv2 EXP Card
-		AddReward(new ItemReward(640002, 10)); // Small HP Potion
-		AddReward(new ItemReward(640005, 10)); // Small SP Potion
-		AddReward(new ItemReward(640008, 3));  // Small Stamina Potion
+		AddReward(new ItemReward(640002, 2)); // Small HP Potion
+		AddReward(new ItemReward(640005, 2)); // Small SP Potion
+		AddReward(new ItemReward(640008, 1));  // Small Stamina Potion
 	}
 }
 
@@ -520,10 +508,10 @@ public class FirstLetterHomeQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_23_3.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(6500));
+		AddReward(new SilverReward(1600));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Card
-		AddReward(new ItemReward(640002, 10)); // Small HP Potion
-		AddReward(new ItemReward(640005, 10)); // Small SP Potion
+		AddReward(new ItemReward(640002, 2)); // Small HP Potion
+		AddReward(new ItemReward(640005, 2)); // Small SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -560,11 +548,11 @@ public class SweetHarvestQuest : QuestScript
 			new CollectItemObjective(663299, 5));
 
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(6500));
+		AddReward(new SilverReward(1600));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Card
-		AddReward(new ItemReward(640002, 10)); // Small HP Potion
-		AddReward(new ItemReward(640005, 10)); // Small SP Potion
-		AddReward(new ItemReward(640008, 3));  // Small Stamina Potion
+		AddReward(new ItemReward(640002, 2)); // Small HP Potion
+		AddReward(new ItemReward(640005, 2)); // Small SP Potion
+		AddReward(new ItemReward(640008, 1));  // Small Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -617,10 +605,10 @@ public class TheLostApprenticeQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_23_3.Quest1004.TrailVisited", 4, true));
 
 		AddReward(new ExpReward(1600, 1100));
-		AddReward(new SilverReward(8000));
+		AddReward(new SilverReward(2000));
 		AddReward(new ItemReward(640081, 3));  // Lv2 EXP Card
-		AddReward(new ItemReward(640002, 12)); // Small HP Potion
-		AddReward(new ItemReward(640005, 12)); // Small SP Potion
+		AddReward(new ItemReward(640002, 3)); // Small HP Potion
+		AddReward(new ItemReward(640005, 3)); // Small SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

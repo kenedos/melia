@@ -51,11 +51,8 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She sets the snare-wire down and pulls a folded map from her coat*{/}"));
 
-						if (await dialog.YesNo(L("Twenty Black Maize. Central field, western slope too if you run short. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Strike at the stalk-joint, not the tassel. Tassels spray spore when cut - you'll choke if you swing high."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Strike at the stalk-joint, not the tassel. Tassels spray spore when cut - you'll choke if you swing high."));
 						break;
 
 					case "info":
@@ -119,11 +116,8 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She rolls the bundle tight, binds it with a leather thong, and passes it over with a grunt*{/}"));
 
-						if (await dialog.YesNo(L("Southern gorge-bend. Juris. Don't unroll the bundle - salt will spill. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("His mark-slip is stamped with a tanning-iron, not a seal. You'll know it when you see it - it smells like his shop."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("His mark-slip is stamped with a tanning-iron, not a seal. You'll know it when you see it - it smells like his shop."));
 						break;
 
 					case "info":
@@ -226,11 +220,8 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She pulls a second basket from her pack and tosses it up*{/}"));
 
-						if (await dialog.YesNo(L("Only dry husks. Check the ground at stalk-bases, not the tassels. Eight is the order. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If a husk crumbles when you pick it up, it's too old - skip it. Poultice-makers refuse crumble-stock."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If a husk crumbles when you pick it up, it's too old - skip it. Poultice-makers refuse crumble-stock."));
 						break;
 
 					case "info":
@@ -364,12 +355,9 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She tears a sketch-page loose and marks four points with a charcoal nub*{/}"));
 
-						if (await dialog.YesNo(L("Four sites. Dung fresh or old, hoof-print deep or shallow, bark-rub high on the tree or low. Describe each. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fresh dung and deep prints mean they're staying - which is what we want. Old or shallow signs mean they're already drifting on to wherever, and the refuge-claim fails."));
-							await dialog.Msg(L("High bark-rubs mean a bull. Low bark-rubs mean a calf. A calf is the whole argument - it means they're still breeding."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fresh dung and deep prints mean they're staying - which is what we want. Old or shallow signs mean they're already drifting on to wherever, and the refuge-claim fails."));
+						await dialog.Msg(L("High bark-rubs mean a bull. Low bark-rubs mean a calf. A calf is the whole argument - it means they're still breeding."));
 						break;
 
 					case "info":
@@ -492,11 +480,11 @@ public class TheBlackMaizeBlightQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Zibu_Maize }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 12)); // Large HP Potion
-		AddReward(new ItemReward(640007, 8)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 }
 
@@ -523,10 +511,10 @@ public class HuntresssHideOrderQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_huevillage_58_2.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 12));  // Large HP Potion
-		AddReward(new ItemReward(640007, 8));  // Large SP Potion
+		AddReward(new ItemReward(640004, 3));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -563,11 +551,11 @@ public class MaizeHusksForTheForagerQuest : QuestScript
 			new CollectItemObjective(650850, 8));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 13));  // Large HP Potion
-		AddReward(new ItemReward(640007, 9));  // Large SP Potion
-		AddReward(new ItemReward(640012, 3));  // Recovery Potion
+		AddReward(new ItemReward(640004, 3));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -620,10 +608,10 @@ public class TheLoxodonHerdQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_huevillage_58_2.Quest1004.SitesChecked", 4, true));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 13)); // Large HP Potion
-		AddReward(new ItemReward(640007, 9)); // Large SP Potion
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

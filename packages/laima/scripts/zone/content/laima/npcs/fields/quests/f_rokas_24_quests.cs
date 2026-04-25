@@ -45,12 +45,9 @@ public class FRokas24QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Hogma Warriors and fifteen Hogma Combat?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Warriors up top, Combat flanking. Mind the two-on-one."));
-							await dialog.Msg(L("Every trophy they drop is going back on the statue."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Warriors up top, Combat flanking. Mind the two-on-one."));
+						await dialog.Msg(L("Every trophy they drop is going back on the statue."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FRokas24QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill Big Cockatries and bring sixteen plume feathers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Red or normal, doesn't matter - I sort them later. Just sixteen clean plumes."));
-							await dialog.Msg(L("Watch the dive. A big one drops straight down."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Red or normal, doesn't matter - I sort them later. Just sixteen clean plumes."));
+						await dialog.Msg(L("Watch the dive. A big one drops straight down."));
 						break;
 
 					case "info":
@@ -175,11 +169,8 @@ public class FRokas24QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Tontus and fifteen Dandels along the pilgrim road?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Blessings on your blade, traveler. I'll be praying."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Blessings on your blade, traveler. I'll be praying."));
 						break;
 
 					case "info":
@@ -238,12 +229,9 @@ public class FRokas24QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Pinos, fifteen Geppettos, and gather six pinewood knots?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The knots are gummy when they drop - don't worry, they clean up."));
-							await dialog.Msg(L("Six is enough to resume production."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The knots are gummy when they drop - don't worry, they clean up."));
+						await dialog.Msg(L("Six is enough to resume production."));
 						break;
 
 					case "info":
@@ -310,11 +298,8 @@ public class FRokas24QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Big Red Cockatries and bring down the matron when she descends?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten breeders. She'll feel it. She always feels it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten breeders. She'll feel it. She always feels it."));
 						break;
 
 					case "info":
@@ -393,11 +378,8 @@ public class FRokas24QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Hogma Warriors and twelve Cockatries on the south passage?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The Hogma spit, the Cockatries scream. Just don't get in the way of either."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The Hogma spit, the Cockatries scream. Just don't get in the way of either."));
 						break;
 
 					case "info":
@@ -462,11 +444,11 @@ public class FRokas24Quest1001 : QuestScript
 			new KillObjective(15, new[] { MonsterId.Hogma_Combat }));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -490,11 +472,11 @@ public class FRokas24Quest1002 : QuestScript
 			new CollectItemObjective(650100, 16));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 8));
-		AddReward(new ItemReward(640007, 8));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -531,10 +513,10 @@ public class FRokas24Quest1003 : QuestScript
 			new KillObjective(15, new[] { MonsterId.Dandel }));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -564,11 +546,11 @@ public class FRokas24Quest1004 : QuestScript
 			new CollectItemObjective(650011, 6));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -605,11 +587,11 @@ public class FRokas24Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Big_Cockatries_Red }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -636,10 +618,10 @@ public class FRokas24Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Cockatries }));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }

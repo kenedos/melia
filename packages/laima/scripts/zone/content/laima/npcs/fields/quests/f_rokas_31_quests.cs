@@ -266,10 +266,10 @@ public class CrossroadsWarningQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(3000, 2000));
-		AddReward(new SilverReward(10000));
+		AddReward(new SilverReward(2500));
 		AddReward(new ItemReward(122114, 1)); // Dio Two-handed Sword
-		AddReward(new ItemReward(640002, 10)); // Small HP potions
-		AddReward(new ItemReward(640005, 15)); // Small SP potions
+		AddReward(new ItemReward(640002, 2)); // Small HP potions
+		AddReward(new ItemReward(640005, 3)); // Small SP potions
 		AddReward(new ItemReward(640081, 2)); // Lv2 EXP Cards
 	}
 }
@@ -299,10 +299,10 @@ public class GuardianOfZemynaQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(4000, 3000));
-		AddReward(new SilverReward(12000));
+		AddReward(new SilverReward(3000));
 		AddReward(new ItemReward(142105, 1)); // Magic Rod
-		AddReward(new ItemReward(640002, 15)); // Small HP potions
-		AddReward(new ItemReward(640005, 20)); // Small SP potions
+		AddReward(new ItemReward(640002, 3)); // Small HP potions
+		AddReward(new ItemReward(640005, 5)); // Small SP potions
 		AddReward(new ItemReward(640081, 2)); // Lv2 EXP Cards
 	}
 }

@@ -45,12 +45,9 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Silence twenty-two Gray Winged Frogs from the west marsh?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Bless you! The marsh sits right past the treeline - you'll hear them long before you see them."));
-							await dialog.Msg(L("Twenty-two should restore some semblance of silence. Please. I'm begging."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Bless you! The marsh sits right past the treeline - you'll hear them long before you see them."));
+						await dialog.Msg(L("Twenty-two should restore some semblance of silence. Please. I'm begging."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Gather five Green Rafflesia pollen sacs from intact flowers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wonderful! Twist the sac off at the base - the pollen stays dry that way."));
-							await dialog.Msg(L("And do keep your distance. Some of them are lungers."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wonderful! Twist the sac off at the base - the pollen stays dry that way."));
+						await dialog.Msg(L("And do keep your distance. Some of them are lungers."));
 						break;
 
 					case "info":
@@ -240,12 +234,9 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Siaulav Archers and dismantle four nest-roosts?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Good. The roosts are platforms at the tree joints - you'll see the hanging fletchings from a good distance."));
-							await dialog.Msg(L("Wear something that doesn't rustle. Siaulav hear everything."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Good. The roosts are platforms at the tree joints - you'll see the hanging fletchings from a good distance."));
+						await dialog.Msg(L("Wear something that doesn't rustle. Siaulav hear everything."));
 						break;
 
 					case "info":
@@ -377,12 +368,9 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Recover five marking-tags and kill twelve Green Rafflesia blocking the survey route?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thank you. The tags are yellow cloth wrapped around little wooden posts - he'd have placed them near the Gribas, or dropped them along the way."));
-							await dialog.Msg(L("Five tags is enough to know where he made it to. Please, tell me it's not as far as I fear."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thank you. The tags are yellow cloth wrapped around little wooden posts - he'd have placed them near the Gribas, or dropped them along the way."));
+						await dialog.Msg(L("Five tags is enough to know where he made it to. Please, tell me it's not as far as I fear."));
 						break;
 
 					case "info":
@@ -506,12 +494,9 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin ten Green Rafflesia to draw out the Griba Baron, then bring him down?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten Rafflesia first. Come back when the count's done - I'll sense when he's near."));
-							await dialog.Msg(L("When he emerges, don't dawdle. A Baron-sized Ent hits like a falling tree because it basically is one."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten Rafflesia first. Come back when the count's done - I'll sense when he's near."));
+						await dialog.Msg(L("When he emerges, don't dawdle. A Baron-sized Ent hits like a falling tree because it basically is one."));
 						break;
 
 					case "info":
@@ -592,12 +577,9 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Siaulav Archers and twelve Flying Flogs along the Crossroads?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve of each. The Crossroads are the main stretch - you'll run into both species on every bend."));
-							await dialog.Msg(L("When it's done, the carts roll again, and I'll sleep without flinching at every creak."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve of each. The Crossroads are the main stretch - you'll run into both species on every bend."));
+						await dialog.Msg(L("When it's done, the carts roll again, and I'll sleep without flinching at every creak."));
 						break;
 
 					case "info":
@@ -668,10 +650,10 @@ public class TheFrogChorusQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Flying_Flog_White }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
 	}
 }
 
@@ -698,11 +680,11 @@ public class PollenRunQuest : QuestScript
 			new CollectItemObjective(650581, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -754,11 +736,11 @@ public class SiaulavEvictionQuest : QuestScript
 			new CollectItemObjective(650750, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 14)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
 	}
 
@@ -811,11 +793,11 @@ public class TheMissingApprenticeQuest : QuestScript
 			new CollectItemObjective(650672, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
 	}
 
@@ -866,11 +848,11 @@ public class TheGribaBaronQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Mushroom_Ent_Red }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 14)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(531122, 1)); // Plate Armor
 	}
 
@@ -911,10 +893,10 @@ public class BarhaCrossroadsQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Flying_Flog_White }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
 		AddReward(new ItemReward(512207, 1)); // Hasta Plate Boots
 	}
 }

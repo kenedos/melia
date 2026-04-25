@@ -51,11 +51,8 @@ public class FKatyn451QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He nods once, and relief shows only at the corners of his mouth*{/}"));
 
-						if (await dialog.YesNo(L("Twenty. Hit the east nests first. If an arrow-shaft goes past you from behind - drop prone, don't turn. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Their arrows whistle low. If you hear the whistle twice from the same direction, you're being ranged. Move."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Their arrows whistle low. If you hear the whistle twice from the same direction, you're being ranged. Move."));
 						break;
 
 					case "info":
@@ -119,11 +116,8 @@ public class FKatyn451QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She presses the book into your hands, then wraps your fingers around it for a moment*{/}"));
 
-						if (await dialog.YesNo(L("South-bend. Tautvydas wears a grey tracker-cord. Don't open the book on the way - the forest reads over your shoulder. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If you reach a fork that isn't on any path you've walked, go back. Don't reason it out. The forest wins arguments."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If you reach a fork that isn't on any path you've walked, go back. Don't reason it out. The forest wins arguments."));
 						break;
 
 					case "info":
@@ -228,11 +222,8 @@ public class FKatyn451QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She pulls a seam-ripper from her apron pocket and passes it to you. The handle is warm*{/}"));
 
-						if (await dialog.YesNo(L("Seam, not fabric. Eight patches. Don't hum while you cut - the stitches remember melodies. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If a Socket steps out while you're cutting, raise your blade and keep cutting. They're slow to decide. Be faster."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If a Socket steps out while you're cutting, raise your blade and keep cutting. They're slow to decide. Be faster."));
 						break;
 
 					case "info":
@@ -366,11 +357,8 @@ public class FKatyn451QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He tears a sketch from his book, marks four points, and passes it over with a compass-disc no bigger than a coin*{/}"));
 
-						if (await dialog.YesNo(L("Four cairns. Compass at each - note the tip-stone's direction. Safe-way is north-east. Any other direction is turned. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If a cairn points back the way you came - that's not a cairn anymore. That's a trap. Step away from it, don't touch it, and walk out along the opposite heading."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If a cairn points back the way you came - that's not a cairn anymore. That's a trap. Step away from it, don't touch it, and walk out along the opposite heading."));
 						break;
 
 					case "info":
@@ -492,10 +480,10 @@ public class TheArchersOnTheBendsQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Stoulet_Bow_Blue }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10)); // Large HP Potion
-		AddReward(new ItemReward(640007, 10)); // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 }
 
@@ -522,10 +510,10 @@ public class TheTrailBookQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_1.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11));  // Large HP Potion
-		AddReward(new ItemReward(640007, 11));  // Large SP Potion
+		AddReward(new ItemReward(640004, 2));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -562,11 +550,11 @@ public class SocketHoodPatchesQuest : QuestScript
 			new CollectItemObjective(650853, 8));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11));  // Large HP Potion
-		AddReward(new ItemReward(640007, 11));  // Large SP Potion
-		AddReward(new ItemReward(640012, 3));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -619,10 +607,10 @@ public class WhichCairnsWalkedQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_1.Quest1004.CairnsChecked", 4, true));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

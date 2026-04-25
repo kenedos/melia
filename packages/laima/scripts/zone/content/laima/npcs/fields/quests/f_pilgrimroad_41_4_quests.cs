@@ -43,11 +43,8 @@ public class FPilgrimroad414QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty-five Purple Repusbunnies?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty-five. Mind the burrows."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty-five. Mind the burrows."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FPilgrimroad414QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Bow Repusbunnies and bring eight fletchings?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fletchings, not arrows. Arrows snap."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fletchings, not arrows. Arrows snap."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FPilgrimroad414QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Tree-Mage Stubs and bring five bark strips?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Strip clean. Bark with moss won't read."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Strip clean. Bark with moss won't read."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FPilgrimroad414QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break twelve Rootcrystals near the waystones?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve. Keep count."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve. Keep count."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FPilgrimroad414QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Purple Repusbunnies and defeat the Warren-King when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FPilgrimroad414QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Purple Repusbunnies, Bow Repusbunnies, Tree-Mage Stubs?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FPilgrimroad414Quest1001 : QuestScript
 			new KillObjective(45, new[] { MonsterId.Repusbunny_Purple }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FPilgrimroad414Quest1002 : QuestScript
 			new CollectItemObjective(650254, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FPilgrimroad414Quest1003 : QuestScript
 			new CollectItemObjective(650256, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,11 +514,11 @@ public class FPilgrimroad414Quest1004 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Rootcrystal_05 }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -562,11 +544,11 @@ public class FPilgrimroad414Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Repusbunny_Purple }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -595,10 +577,10 @@ public class FPilgrimroad414Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Stub_Tree_Mage }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }

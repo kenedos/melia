@@ -47,11 +47,8 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Twenty. Knee-seam first. Don't shatter them too close to the spring - shard-dust in the water turns it cloudy for a week. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If you hear a grinding sound behind you - a statue has started walking early. Turn and strike before it reaches you."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If you hear a grinding sound behind you - a statue has started walking early. Turn and strike before it reaches you."));
 						break;
 
 					case "info":
@@ -110,11 +107,8 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("South plot. Don't unwrap the flask - sun-dust dulls the light. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Saule wears a yellow headband. Anyone else at the plot, walk on - she's alone most days."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Saule wears a yellow headband. Anyone else at the plot, walk on - she's alone most days."));
 						break;
 
 					case "info":
@@ -210,11 +204,8 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Still pools. Cup your hand under the orb, don't pinch it. Eight. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If an orb bursts in your palm, wipe the red before it dries. Dried Infro-ink doesn't come off skin for a week."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If an orb bursts in your palm, wipe the red before it dries. Dried Infro-ink doesn't come off skin for a week."));
 						break;
 
 					case "info":
@@ -330,11 +321,8 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Four sun-dials. Shadow-position against true sun. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("A stopped dial means the grove-light at that dial has replaced the real sun. The dial sees noon forever. So do you, while you stand there - which is not as pleasant as it sounds."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("A stopped dial means the grove-light at that dial has replaced the real sun. The dial sees noon forever. So do you, while you stand there - which is not as pleasant as it sounds."));
 						break;
 
 					case "info":
@@ -433,11 +421,11 @@ public class StatuesThatWalkAtDuskQuest : QuestScript
 		AddObjective("killStatue", "Break Shardstatues in the grove",
 			new KillObjective(20, new[] { MonsterId.Shardstatue }));
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
-		AddReward(new ItemReward(640011, 3));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
+		AddReward(new ItemReward(640011, 1));
 	}
 }
 
@@ -459,10 +447,10 @@ public class TheSpringWaterFlaskQuest : QuestScript
 		AddObjective("deliverFlask", "Deliver the flask and return with cordials",
 			new VariableCheckObjective("Laima.Quests.f_siauliai_46_1.Quest1002.Delivered", 1, true));
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -494,11 +482,11 @@ public class InfroBloodOrbsQuest : QuestScript
 		AddObjective("collectOrbs", "Gather Infro Blood-orbs from still pools",
 			new CollectItemObjective(650855, 8));
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
-		AddReward(new ItemReward(640011, 3));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
+		AddReward(new ItemReward(640011, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -540,10 +528,10 @@ public class TheSunDialsQuest : QuestScript
 		AddObjective("readDials", "Read the four grove sun-dials",
 			new VariableCheckObjective("Laima.Quests.f_siauliai_46_1.Quest1004.DialsChecked", 4, true));
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)

@@ -45,12 +45,9 @@ public class FOrchard341QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Chase off twenty Red Truffles from the apple rows?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wonderful! They're all through the eastern rows - you can't miss them, they're round and bright red."));
-							await dialog.Msg(L("Don't hurt them too badly - a solid scare should do. Twenty ought to clear the orchard for a while."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wonderful! They're all through the eastern rows - you can't miss them, they're round and bright red."));
+						await dialog.Msg(L("Don't hurt them too badly - a solid scare should do. Twenty ought to clear the orchard for a while."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FOrchard341QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Pick five giant peaches from the special trees for the festival entry?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Oh hooray! Look for the trees that curve down from the weight - those are the ones with giants ripe enough to pick."));
-							await dialog.Msg(L("Be gentle! A bruised giant peach is just a sad giant peach."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Oh hooray! Look for the trees that curve down from the weight - those are the ones with giants ripe enough to pick."));
+						await dialog.Msg(L("Be gentle! A bruised giant peach is just a sad giant peach."));
 						break;
 
 					case "info":
@@ -240,12 +234,9 @@ public class FOrchard341QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Clear fifteen Green Eldigos from the berry patch and gather four baskets of wildberries?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Oh bless you! Shoo the Eldigos - fifteen of them, at least - and then the bushes are yours."));
-							await dialog.Msg(L("Four baskets is all I need. Any more and I'll run out of crust before I run out of filling!"));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Oh bless you! Shoo the Eldigos - fifteen of them, at least - and then the bushes are yours."));
+						await dialog.Msg(L("Four baskets is all I need. Any more and I'll run out of crust before I run out of filling!"));
 						break;
 
 					case "info":
@@ -366,12 +357,9 @@ public class FOrchard341QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Recover five scattered picnic baskets and kill twelve Green Corpse Flowers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thank you! The baskets are all through the southern clearing - bright checkered cloth, you can't miss them."));
-							await dialog.Msg(L("And please, do shoo those flowers. Twelve of them should quiet the whole meadow down."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thank you! The baskets are all through the southern clearing - bright checkered cloth, you can't miss them."));
+						await dialog.Msg(L("And please, do shoo those flowers. Twelve of them should quiet the whole meadow down."));
 						break;
 
 					case "info":
@@ -494,12 +482,9 @@ public class FOrchard341QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten regular Red Truffles to draw out the Queen, then bring her down?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Yes! I've been waiting six festivals for someone brave enough. Kill the ten first - I'll wait here."));
-							await dialog.Msg(L("When it's done, come see me and I'll point you to where she'll bounce out."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Yes! I've been waiting six festivals for someone brave enough. Kill the ten first - I'll wait here."));
+						await dialog.Msg(L("When it's done, come see me and I'll point you to where she'll bounce out."));
 						break;
 
 					case "info":
@@ -581,12 +566,9 @@ public class FOrchard341QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Green Eldigos and twelve Red Truffles from the festival grounds?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thank you! Both species, twelve apiece. The grounds cover a fair stretch - you'll find them wandering the whole perimeter."));
-							await dialog.Msg(L("Clear that, and I can finally sleep tonight."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thank you! Both species, twelve apiece. The grounds cover a fair stretch - you'll find them wandering the whole perimeter."));
+						await dialog.Msg(L("Clear that, and I can finally sleep tonight."));
 						break;
 
 					case "info":
@@ -725,10 +707,10 @@ public class AppleAvalancheQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Truffle_Red }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
 	}
 }
 
@@ -755,11 +737,11 @@ public class TheGiantPeachHuntQuest : QuestScript
 			new CollectItemObjective(661093, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -811,11 +793,11 @@ public class PieContestProvisionsQuest : QuestScript
 			new CollectItemObjective(650807, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
 	}
 
@@ -866,11 +848,11 @@ public class TheGreatPicnicRescueQuest : QuestScript
 			new CollectItemObjective(662098, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
 	}
 
@@ -921,11 +903,11 @@ public class TheQueenTruffleQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Truffle_Big }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 14)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(531122, 1)); // Plate Armor
 	}
 
@@ -966,10 +948,10 @@ public class FestivalGroundsQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Truffle_Red }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
 		AddReward(new ItemReward(502202, 1)); // Valtas Plate Gauntlents
 	}
 }

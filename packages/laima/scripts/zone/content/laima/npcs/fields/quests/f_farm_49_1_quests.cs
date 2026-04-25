@@ -50,12 +50,9 @@ public class FFarm491QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He nods once, grateful but tired*{/}"));
 
-						if (await dialog.YesNo(L("Fifteen Blue Spion Archers. They favor the eastern orchards and the southern rose-garden. Can you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Take this - a recipe for a Wreech Bow. Lady Greene's armory had a dozen; we lost them all. This recipe is the last of the house."));
-							await dialog.Msg(L("Close with them fast. Their arrows are poison-tipped - a clean cut heals, a grazing scratch festers."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Take this - a recipe for a Wreech Bow. Lady Greene's armory had a dozen; we lost them all. This recipe is the last of the house."));
+						await dialog.Msg(L("Close with them fast. Their arrows are poison-tipped - a clean cut heals, a grazing scratch festers."));
 						break;
 
 					case "info":
@@ -138,11 +135,8 @@ public class FFarm491QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She wipes her hands on her apron and unfolds a letter that's been rewritten four times*{/}"));
 
-						if (await dialog.YesNo(L("Saulius is at the Aqueduct warp. Give him this. Hear his reply, bring it back. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The letter's blotted in one place. I couldn't write 'Lady Greene is gone' without crying. Tell him it's the same to me if he wants to rewrite that line."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The letter's blotted in one place. I couldn't write 'Lady Greene is gone' without crying. Tell him it's the same to me if he wants to rewrite that line."));
 						break;
 
 					case "info":
@@ -181,7 +175,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 		});
 
 		// =====================================================================
-		// QUEST 1003: Tama Down Feathers
+		// QUEST 1003: Dandel Wingpieces
 		// =====================================================================
 		// Widow-Gardener Rasa - Mourning pillows for empty children's beds
 		//---------------------------------------------------------------------
@@ -197,8 +191,8 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("{#666666}*A grey-haired widow sews a small pillowcase by the fallen rose-hedge, her hands gentle with each stitch*{/}"));
 				await dialog.Msg(L("The Greene children had three beds in the nursery. Three beds, three pillowcases, no children left to use them. I'm stuffing them anyway."));
 
-				var response = await dialog.Select(L("Orange Tamas shed soft down when they molt - peaceful creatures, they'll let you gather if you're gentle. Five down-tufts would fill each pillow. Three pillowcases. I'd be grateful."),
-					Option(L("I'll gather five down-tufts"), "help"),
+				var response = await dialog.Select(L("Orange Dandels shed soft wingpieces when they drift through the orchard - peaceful creatures, they'll let you gather if you're gentle. Five wingpieces would fill each pillow. Three pillowcases. I'd be grateful."),
+					Option(L("I'll gather five wingpieces"), "help"),
 					Option(L("Why stuff pillows for empty beds?"), "info"),
 					Option(L("That's somebody else's grief"), "leave")
 				);
@@ -208,12 +202,9 @@ public class FFarm491QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She looks up with a small, grateful smile*{/}"));
 
-						if (await dialog.YesNo(L("Approach the Tamas slowly. They won't bite if you move soft. Five down-tufts, that's all. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If a Tama startles, just kneel and wait. They settle in a count of ten."));
-							await dialog.Msg(L("Lady Greene taught me that trick. She was gentle with every animal on the estate."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If a Dandel startles, just kneel and wait. They settle in a count of ten."));
+						await dialog.Msg(L("Lady Greene taught me that trick. She was gentle with every animal on the estate."));
 						break;
 
 					case "info":
@@ -232,8 +223,8 @@ public class FFarm491QuestNpcsScript : GeneralScript
 
 				if (featherCount >= 5)
 				{
-					await dialog.Msg(L("{#666666}*She weighs each tuft, nodding as the down catches the light*{/}"));
-					await dialog.Msg(L("Soft. Clean. No blood, no panic on the feathers. You gathered kindly."));
+					await dialog.Msg(L("{#666666}*She weighs each wingpiece, nodding as it catches the light*{/}"));
+					await dialog.Msg(L("Soft. Clean. No blood, no panic on the wingpieces. You gathered kindly."));
 					await dialog.Msg(L("{#666666}*She tucks them into a pillowcase, one at a time*{/}"));
 					await dialog.Msg(L("Here - my thanks. Small coin, quiet thanks. The pillows will rest on the beds by nightfall."));
 
@@ -241,7 +232,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				}
 				else
 				{
-					await dialog.Msg(L("Five tufts. Gentle hands. The Tamas know the difference."));
+					await dialog.Msg(L("Five wingpieces. Gentle hands. The Dandels know the difference."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
@@ -258,14 +249,14 @@ public class FFarm491QuestNpcsScript : GeneralScript
 
 		void AddTamaDownSpot(int spotNumber, int x, int z, int direction)
 		{
-			AddNpc(47247, L("Tama Molt-Spot"), "f_farm_49_1", x, z, direction, async dialog =>
+			AddNpc(47247, L("Dandel Wing-Patch"), "f_farm_49_1", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_farm_49_1", 1003);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*Orange down-feathers drift in a grass hollow where a Tama has been grooming*{/}"));
+					await dialog.Msg(L("{#666666}*Orange wingpieces drift in a grass hollow where a Dandel has been grooming*{/}"));
 					return;
 				}
 
@@ -274,7 +265,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 
 				if (gathered)
 				{
-					await dialog.Msg(L("{#666666}*The molt-spot is gathered clean. A fresh tuft will drift in tomorrow*{/}"));
+					await dialog.Msg(L("{#666666}*The wing-patch is gathered clean. A fresh wingpiece will drift in tomorrow*{/}"));
 					return;
 				}
 
@@ -284,9 +275,9 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				{
 					character.Variables.Perm.Set(spawnedKey, true);
 
-					if (SpawnTempMonsters(character, MonsterId.Tama_Orange, 1, 70, TimeSpan.FromMinutes(1)))
+					if (SpawnTempMonsters(character, MonsterId.Dandel_Orange, 1, 70, TimeSpan.FromMinutes(1)))
 					{
-						character.ServerMessage(L("{#FF6666}An Orange Tama shuffles over, curious about the gathered down!{/}"));
+						character.ServerMessage(L("{#FF6666}An Orange Dandel drifts over, curious about the gathered wingpieces!{/}"));
 					}
 				}
 
@@ -298,11 +289,11 @@ public class FFarm491QuestNpcsScript : GeneralScript
 					character.Variables.Perm.Set(variableKey, true);
 
 					var currentCount = character.Inventory.CountItem(662067);
-					character.ServerMessage(LF("Down-tufts gathered: {0}/5", currentCount));
+					character.ServerMessage(LF("Wingpieces gathered: {0}/5", currentCount));
 
 					if (currentCount >= 5)
 					{
-						character.ServerMessage(L("{#FFD700}All tufts gathered! Return to Widow-Gardener Rasa.{/}"));
+						character.ServerMessage(L("{#FFD700}All wingpieces gathered! Return to Widow-Gardener Rasa.{/}"));
 					}
 				}
 				else
@@ -346,12 +337,9 @@ public class FFarm491QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He sets the bridle down very carefully*{/}"));
 
-						if (await dialog.YesNo(L("Four places. Don't move anything - Rasa says belongings stay where they fall. Tell me what's there, that's all. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The granary stands north of the barn-ruin. The old well is in the east paddock. The field-shrine's out by the orchard row. The root-cellar hatch is just behind the farmhouse kitchen door."));
-							await dialog.Msg(L("Don't take anything. Just look."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The granary stands north of the barn-ruin. The old well is in the east paddock. The field-shrine's out by the orchard row. The root-cellar hatch is just behind the farmhouse kitchen door."));
+						await dialog.Msg(L("Don't take anything. Just look."));
 						break;
 
 					case "info":
@@ -474,11 +462,11 @@ public class BlueSpionArchersQuest : QuestScript
 			new KillObjective(15, new[] { MonsterId.Spion_Bow_Blue }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 		AddReward(new ItemReward(924069, 1));  // Recipe - Wreech Bow
 	}
 }
@@ -506,10 +494,10 @@ public class TheManorIsLostQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_49_1.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -523,17 +511,17 @@ public class TheManorIsLostQuest : QuestScript
 	}
 }
 
-// Quest 1003 CLASS: Tama Down Feathers
+// Quest 1003 CLASS: Dandel Wingpieces
 //-----------------------------------------------------------------------------
 
-public class TamaDownFeathersQuest : QuestScript
+public class DandelWingpiecesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_farm_49_1", 1003);
-		SetName("Tama Down Feathers");
+		SetName("Dandel Wingpieces");
 		SetType(QuestType.Sub);
-		SetDescription("Widow-Gardener Rasa needs five Tama down-tufts to stuff mourning-pillows for the empty beds in the Greene children's nursery.");
+		SetDescription("Widow-Gardener Rasa needs five Orange Dandel wingpieces to stuff mourning-pillows for the empty beds in the Greene children's nursery.");
 		SetLocation("f_farm_49_1");
 		SetAutoTracked(true);
 
@@ -542,15 +530,15 @@ public class TamaDownFeathersQuest : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver("[Widow-Gardener] Rasa", "f_farm_49_1");
 
-		AddObjective("collectFeathers", "Gather Tama down-tufts from molt-spots",
+		AddObjective("collectFeathers", "Gather Orange Dandel wingpieces from wing-patches",
 			new CollectItemObjective(662067, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 4));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -603,10 +591,10 @@ public class TheLastGreeneQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_49_1.Quest1004.RoomsVisited", 4, true));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)

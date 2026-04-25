@@ -51,12 +51,9 @@ public class FKatyn452QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He does not smile. His relief is only in the shoulders easing*{/}"));
 
-						if (await dialog.YesNo(L("Twenty. Don't stop in the center of a spiral if you find one already formed. Walk out of it first, then strike. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If you hear breathing behind you and nothing's there - walk, don't run. Running is what the trees seem to want."));
-							await dialog.Msg(L("And don't answer if something calls your name in a voice you know. Nothing in this wood should know your name."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If you hear breathing behind you and nothing's there - walk, don't run. Running is what the trees seem to want."));
+						await dialog.Msg(L("And don't answer if something calls your name in a voice you know. Nothing in this wood should know your name."));
 						break;
 
 					case "info":
@@ -120,12 +117,9 @@ public class FKatyn452QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She ties the last knot, tests the weight, and presses the charm into your palm. The bells chime once - small, high, clean*{/}"));
 
-						if (await dialog.YesNo(L("The Deep Shrine, south past the watching-oak. Don't ring the bells while you walk - they answer what they shouldn't. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If a tree seems to lean toward you, keep your eyes on the path. Leaning trees test for eye-contact. Deny it."));
-							await dialog.Msg(L("Dalia will be at the shrine-stone. If she isn't, leave the charm on the stone and come back to me. Do not search."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If a tree seems to lean toward you, keep your eyes on the path. Leaning trees test for eye-contact. Deny it."));
+						await dialog.Msg(L("Dalia will be at the shrine-stone. If she isn't, leave the charm on the stone and come back to me. Do not search."));
 						break;
 
 					case "info":
@@ -230,12 +224,9 @@ public class FKatyn452QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She pulls a small curved bark-knife from her apron and offers it hilt-first*{/}"));
 
-						if (await dialog.YesNo(L("Closed knots only. Cut shallow - scar the bark, don't wound the tree. Eight strips. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If a knot opens while you cut, walk away. Return to that tree never. The wood keeps a grudge with very slow teeth."));
-							await dialog.Msg(L("And don't hum while you work. The bark remembers melodies."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If a knot opens while you cut, walk away. Return to that tree never. The wood keeps a grudge with very slow teeth."));
+						await dialog.Msg(L("And don't hum while you work. The bark remembers melodies."));
 						break;
 
 					case "info":
@@ -369,12 +360,9 @@ public class FKatyn452QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He tears the sketch-page loose, marks four points with a charcoal nub, and does not quite meet your eyes when handing it over*{/}"));
 
-						if (await dialog.YesNo(L("Four trees. Wave a hand past each knot once. Watch whether the grain shifts to follow. Describe what you see. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Closed knot: grain still, tight ring. Weeping sap: grain still, clear bead of sap. Tracking: grain ripples toward your hand, slow, like a pupil focusing."));
-							await dialog.Msg(L("If one tracks you, leave immediately. Do not return alone. Do not return even with company."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Closed knot: grain still, tight ring. Weeping sap: grain still, clear bead of sap. Tracking: grain ripples toward your hand, slow, like a pupil focusing."));
+						await dialog.Msg(L("If one tracks you, leave immediately. Do not return alone. Do not return even with company."));
 						break;
 
 					case "info":
@@ -496,11 +484,11 @@ public class TheCirclingRidimedQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Ridimed_Blue }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10)); // Large HP Potion
-		AddReward(new ItemReward(640007, 10)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 }
 
@@ -527,10 +515,10 @@ public class TheWardingCharmQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_2.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10));  // Large HP Potion
-		AddReward(new ItemReward(640007, 10));  // Large SP Potion
+		AddReward(new ItemReward(640004, 2));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -567,11 +555,11 @@ public class BarkFromTheWatchingTreesQuest : QuestScript
 			new CollectItemObjective(650851, 8));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11));  // Large HP Potion
-		AddReward(new ItemReward(640007, 11));  // Large SP Potion
-		AddReward(new ItemReward(640012, 3));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2));  // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -624,10 +612,10 @@ public class WhichKnotEyesAreOpenQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_2.Quest1004.TreesChecked", 4, true));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

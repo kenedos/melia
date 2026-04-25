@@ -43,11 +43,8 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty-five Rabbees?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty-five. Mind the stingers."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty-five. Mind the stingers."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Honeybeans and bring eight wax-pods?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eight pods. Don't squash."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eight pods. Don't squash."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Siaulambs and bring five fleece-bundles?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Five bundles. Shear clean."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Five bundles. Shear clean."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break twelve Rootcrystals and bring eight dust-sachets?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eight sachets. Cloth-tight."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eight sachets. Cloth-tight."));
 						break;
 
 					case "info":
@@ -286,11 +274,8 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Siaulambs and defeat the Pendinmire when it emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Rabbees, Honeybeans, Siaulambs?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -428,10 +410,10 @@ public class FSiauliai464Quest1001 : QuestScript
 			new KillObjective(45, new[] { MonsterId.Rabbee }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -457,11 +439,11 @@ public class FSiauliai464Quest1002 : QuestScript
 			new CollectItemObjective(650262, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -497,11 +479,11 @@ public class FSiauliai464Quest1003 : QuestScript
 			new CollectItemObjective(650263, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -537,11 +519,11 @@ public class FSiauliai464Quest1004 : QuestScript
 			new CollectItemObjective(650264, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -577,11 +559,11 @@ public class FSiauliai464Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Pendinmire }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -610,10 +592,10 @@ public class FSiauliai464Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Siaulamb }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }

@@ -433,11 +433,11 @@ public class FloronSporeDriftQuest : QuestScript
 		AddObjective("killFloron", "Thin Florons in the spore-drift",
 			new KillObjective(20, new[] { MonsterId.Floron }));
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 }
 
@@ -459,10 +459,10 @@ public class ThePressedFlowerBookQuest : QuestScript
 		AddObjective("deliverBook", "Deliver the book and return with the ribbon-reply",
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_56_1.Quest1002.Delivered", 1, true));
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -494,11 +494,11 @@ public class BudnyPollenSacsQuest : QuestScript
 		AddObjective("collectSacs", "Gather shed Budny pollen-sacs",
 			new CollectItemObjective(650856, 8));
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -540,10 +540,10 @@ public class TheNightPrunersMarkQuest : QuestScript
 		AddObjective("inspectSaplings", "Inspect the four flagged saplings",
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_56_1.Quest1004.SaplingsChecked", 4, true));
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
 	}
 
 	public override void OnComplete(Character character, Quest quest)

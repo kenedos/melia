@@ -773,10 +773,10 @@ public class ShadowsOfThePlateauQuest : QuestScript
 
 		// Rewards - Simple (1/10) Level 30
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 8));  // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2));  // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -818,11 +818,11 @@ public class PlateauPatrolQuest : QuestScript
 
 		// Rewards - Moderate (5/10) Level 30
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(922064, 1));  // Recipe - Krag Rod
 	}
 }
@@ -851,11 +851,11 @@ public class EchoesInTheJarsQuest : QuestScript
 
 		// Rewards - Moderate (5/10) Level 30
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5));  // Recovery Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 		AddReward(new ItemReward(581120, 1));  // Intel Fedimian Chain
 	}
 
@@ -898,11 +898,11 @@ public class UnlockingTheTowerQuest : QuestScript
 
 		// Rewards - Complex (7/10) Level 30
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 2));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 11)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 13)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 6));  // Recovery Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 		AddReward(new ItemReward(923016, 1));  // Recipe - Karsto Staff
 	}
 
@@ -955,11 +955,11 @@ public class ThePrecariousCrossingQuest : QuestScript
 
 		// Rewards - Simple (3/10) Level 30
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 8));  // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2));  // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

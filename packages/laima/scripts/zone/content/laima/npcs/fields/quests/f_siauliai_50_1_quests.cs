@@ -469,11 +469,11 @@ public class WarningTheFarmersQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(750, 500));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640081, 3));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 5));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(181103, 1));  // Dokyu Bow
 	}
 
@@ -525,11 +525,11 @@ public class ClearingTheFieldsQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(850, 570));
-		AddReward(new SilverReward(10500));
+		AddReward(new SilverReward(2600));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 6));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(531104, 1));  // Hard Leather Armor
 	}
 
@@ -571,10 +571,10 @@ public class TheSeedOfCorruptionQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 9)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 9)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -614,11 +614,11 @@ public class RabbitProblemQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 1));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -656,11 +656,11 @@ public class HopeAmongTheFieldsQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 1));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 5));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

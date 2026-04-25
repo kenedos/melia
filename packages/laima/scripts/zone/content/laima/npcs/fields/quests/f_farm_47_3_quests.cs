@@ -49,12 +49,9 @@ public class FFarm473QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He grunts, approving*{/}"));
 
-						if (await dialog.YesNo(L("Twenty should break their hunting pattern. They favor the western rows and the aqueduct-side hedgerows. Can you handle it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Watch the stalks - they crouch low. Rustle means arrow incoming."));
-							await dialog.Msg(L("And wear anything heavy. Leather, if you've got it. The poison sinks through cloth."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Watch the stalks - they crouch low. Rustle means arrow incoming."));
+						await dialog.Msg(L("And wear anything heavy. Leather, if you've got it. The poison sinks through cloth."));
 						break;
 
 					case "info":
@@ -119,11 +116,8 @@ public class FFarm473QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She presses the letter into your hand*{/}"));
 
-						if (await dialog.YesNo(L("Through the south warp. Jonas is an old man, white beard down to his chest - can't miss him. Bring his reply back. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Tell him I'll send Keposeed husks next week - Eglė's stitching masks for our hands, and I'll spare him a dozen."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Tell him I'll send Keposeed husks next week - Eglė's stitching masks for our hands, and I'll spare him a dozen."));
 						break;
 
 					case "info":
@@ -223,12 +217,9 @@ public class FFarm473QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She pauses her stitching and smiles*{/}"));
 
-						if (await dialog.YesNo(L("Five pods across the fields. Approach gently - the Keposeeds are skittish, they'll startle and fly. If one flies, just wait for the husk to settle. Ready?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The inner shell is the pale one - white-violet, about the size of your palm. Leave the outer pod; that part's alive."));
-							await dialog.Msg(L("And cover your mouth while you gather. The husks are clean, but the air around them isn't."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The inner shell is the pale one - white-violet, about the size of your palm. Leave the outer pod; that part's alive."));
+						await dialog.Msg(L("And cover your mouth while you gather. The husks are clean, but the air around them isn't."));
 						break;
 
 					case "info":
@@ -360,12 +351,9 @@ public class FFarm473QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He unfolds the map with trembling hands*{/}"));
 
-						if (await dialog.YesNo(L("Four cracks. Don't step in them - the pollen is thickest right at the edge. Note what you see and keep walking. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("One near the aqueduct, one in the old cabbage rows, one at the eastern fence line, one by the abandoned well."));
-							await dialog.Msg(L("If any have grown wider since last week... come back faster than you think."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("One near the aqueduct, one in the old cabbage rows, one at the eastern fence line, one by the abandoned well."));
+						await dialog.Msg(L("If any have grown wider since last week... come back faster than you think."));
 						break;
 
 					case "info":
@@ -486,11 +474,11 @@ public class NeedlersInTheBarleyQuest : QuestScript
 			new KillObjective(20, new[] { MonsterId.Cronewt_Bow }));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 4));  // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 		AddReward(new ItemReward(531142, 1));  // Hunting Armor
 	}
 }
@@ -518,10 +506,10 @@ public class PollenWarningQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_47_3.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -558,11 +546,11 @@ public class AntiPollenMasksQuest : QuestScript
 			new CollectItemObjective(662163, 5));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 3));  // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -615,10 +603,10 @@ public class PortalCrackSurveyQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_47_3.Quest1004.CracksVisited", 4, true));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

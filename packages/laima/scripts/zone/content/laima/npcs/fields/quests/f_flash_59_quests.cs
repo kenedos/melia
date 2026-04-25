@@ -45,12 +45,9 @@ public class FFlash59QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Grey Jukopus from the square?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. Keep moving - their touch leaves marks, and marks become stone."));
-							await dialog.Msg(L("If a limb goes numb and grey, run. Don't fight through it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. Keep moving - their touch leaves marks, and marks become stone."));
+						await dialog.Msg(L("If a limb goes numb and grey, run. Don't fight through it."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FFlash59QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Crack five Rootcrystals and bring back their cursebinding cores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Strike clean. The cores ring if they're good - the dead ones crumble to grey dust."));
-							await dialog.Msg(L("Five good cores. That's what I need."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Strike clean. The cores ring if they're good - the dead ones crumble to grey dust."));
+						await dialog.Msg(L("Five good cores. That's what I need."));
 						break;
 
 					case "info":
@@ -130,14 +124,14 @@ public class FFlash59QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var coreCount = character.Inventory.CountItem(650316);
+				var coreCount = character.Inventory.CountItem(663068);
 
 				if (coreCount >= 5)
 				{
 					await dialog.Msg(L("Five, and every one of them rings. You have a good ear for clean cores."));
 					await dialog.Msg(L("Take your pay. I'll start the ward-work tonight - the inner square will hold for the season."));
 
-					character.Inventory.Remove(650316, 5, InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(663068, 5, InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -176,12 +170,9 @@ public class FFlash59QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Rambears and recover four statued-garrison caches?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fifteen should clear the sleeping ground. The caches are under the boundary-stones - which are soldiers too, most of them."));
-							await dialog.Msg(L("Treat the stones with respect. They can't move, but something in them still watches."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fifteen should clear the sleeping ground. The caches are under the boundary-stones - which are soldiers too, most of them."));
+						await dialog.Msg(L("Treat the stones with respect. They can't move, but something in them still watches."));
 						break;
 
 					case "info":
@@ -205,7 +196,7 @@ public class FFlash59QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Four caches. Four soldiers back in the record. The archive will match them to families if families still exist."));
 					await dialog.Msg(L("Take your pay. I'll carve their names on a proper plaque - stone fighting stone."));
 
-					character.Inventory.Remove(650476, character.Inventory.CountItem(650476), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650675, character.Inventory.CountItem(650675), InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -266,11 +257,11 @@ public class FFlash59QuestNpcsScript : GeneralScript
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650476, 1, InventoryAddType.PickUp);
+					character.Inventory.Add(650675, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
 					character.ServerMessage(L("Recovered: Statued-Garrison Cache"));
 
-					var currentCount = character.Inventory.CountItem(650476);
+					var currentCount = character.Inventory.CountItem(650675);
 					character.ServerMessage(LF("Caches recovered: {0}/4", currentCount));
 
 					if (currentCount >= 4)
@@ -314,12 +305,9 @@ public class FFlash59QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Wand-Goblins and recover five petrifier-cant pages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Pages are folded small and oiled against damp. Check every belt-pouch."));
-							await dialog.Msg(L("Their chanting lands as a greying touch - not full stone, but lingering. Close fast, don't let them complete a verse."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Pages are folded small and oiled against damp. Check every belt-pouch."));
+						await dialog.Msg(L("Their chanting lands as a greying touch - not full stone, but lingering. Close fast, don't let them complete a verse."));
 						break;
 
 					case "info":
@@ -343,7 +331,7 @@ public class FFlash59QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Five pages. And twelve goblins silenced. The cant's contained - for this batch, anyway."));
 					await dialog.Msg(L("Take your pay. The pages go in the sealed case tonight. Two of them had live sigils - I'll neutralize those myself."));
 
-					character.Inventory.Remove(650630, character.Inventory.CountItem(650630), InventoryItemRemoveMsg.Given);
+					character.Inventory.Remove(650783, character.Inventory.CountItem(650783), InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
@@ -389,12 +377,9 @@ public class FFlash59QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Rambears and bring down the Stone-Scarred Alpha when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. Don't rush - if you face him unready, his stone-side will send you home in pieces."));
-							await dialog.Msg(L("He leads with the stone shoulder. Stay off his right side."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. Don't rush - if you face him unready, his stone-side will send you home in pieces."));
+						await dialog.Msg(L("He leads with the stone shoulder. Stay off his right side."));
 						break;
 
 					case "info":
@@ -475,12 +460,9 @@ public class FFlash59QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Grey Jukopus and twelve Wand-Goblins along the cursed perimeter?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve and twelve. Low threats at the ankles, high threats chanting from the ridges. Stay covered."));
-							await dialog.Msg(L("Clear them, and three caravans roll through by week's end."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve and twelve. Low threats at the ankles, high threats chanting from the ridges. Stay covered."));
+						await dialog.Msg(L("Clear them, and three caravans roll through by week's end."));
 						break;
 
 					case "info":
@@ -552,10 +534,10 @@ public class StoneWetJukopusQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Jukopus_Gray }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -579,24 +561,24 @@ public class CursebindingCoresQuest : QuestScript
 		AddQuestGiver(L("[Ward-Smith] Radek"), "f_flash_59");
 
 		AddObjective("gatherCores", L("Gather cursebinding vein cores"),
-			new CollectItemObjective(650316, 5));
+			new CollectItemObjective(663068, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650316, character.Inventory.CountItem(650316), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663068, character.Inventory.CountItem(663068), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650316, character.Inventory.CountItem(650316), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663068, character.Inventory.CountItem(663068), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -623,19 +605,19 @@ public class TheStatuedGarrisonQuest : QuestScript
 			new KillObjective(15, new[] { MonsterId.Rambear }));
 
 		AddObjective("recoverCaches", L("Recover statued-garrison caches"),
-			new CollectItemObjective(650476, 4));
+			new CollectItemObjective(650675, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650476, character.Inventory.CountItem(650476), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650675, character.Inventory.CountItem(650675), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 4; i++)
 		{
@@ -646,7 +628,7 @@ public class TheStatuedGarrisonQuest : QuestScript
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650476, character.Inventory.CountItem(650476), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650675, character.Inventory.CountItem(650675), InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 4; i++)
 		{
@@ -678,25 +660,25 @@ public class PetrifierCantQuest : QuestScript
 		AddObjective("killWandGoblins", L("Kill Wand-Goblins"),
 			new KillObjective(12, new[] { MonsterId.Goblin2_Wand1 }));
 
-		AddObjective("gatherPages", L("Recover petrifier-cant pages"),
-			new CollectItemObjective(650630, 5));
+		AddObjective("gatherPages", L("Recover petrifier-cant pages from Wand-Goblins"),
+			new CollectItemObjective(650783, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650630, character.Inventory.CountItem(650630), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650783, character.Inventory.CountItem(650783), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650630, character.Inventory.CountItem(650630), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650783, character.Inventory.CountItem(650783), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -726,11 +708,11 @@ public class TheStoneScarredAlphaQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Rambear }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -760,10 +742,10 @@ public class TheCursedPerimeterQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Goblin2_Wand1 }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

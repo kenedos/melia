@@ -43,11 +43,8 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Carcashus?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Beeteros and bring six wings?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Whole wings. Don't tear."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Whole wings. Don't tear."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Mentiwoods and bring six sap-vials?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Vial at the sap-drip."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Vial at the sap-drip."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Tiny Mages and bring five reagent-pouches?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Intact pouches only."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Intact pouches only."));
 						break;
 
 					case "info":
@@ -286,11 +274,8 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Beetows and defeat the Queen when she surfaces?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. She surfaces to lay new eggs when the drones thin."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. She surfaces to lay new eggs when the drones thin."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Carcashus and twelve Beetows?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Standard."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Standard."));
 						break;
 
 					case "info":
@@ -427,10 +409,10 @@ public class FHuevillage584Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Carcashu }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -456,11 +438,11 @@ public class FHuevillage584Quest1002 : QuestScript
 			new CollectItemObjective(650099, 6));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -496,11 +478,11 @@ public class FHuevillage584Quest1003 : QuestScript
 			new CollectItemObjective(650103, 6));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -536,11 +518,11 @@ public class FHuevillage584Quest1004 : QuestScript
 			new CollectItemObjective(650109, 5));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -576,11 +558,11 @@ public class FHuevillage584Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Beetow }));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -606,10 +588,10 @@ public class FHuevillage584Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Beetow }));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }

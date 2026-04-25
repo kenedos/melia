@@ -43,11 +43,8 @@ public class FRemains38QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty InfroBurks?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. Watch the vines."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. Watch the vines."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FRemains38QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-eight Lizardmen and bring eight scale-plates?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Plates only. Clean scales, no cracks."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Plates only. Clean scales, no cracks."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FRemains38QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill sixteen Stub Tree Mages and bring six bark-sheets?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't crease them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't crease them."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FRemains38QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Long Arms and bring eight sinew-cords?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cords intact. Don't slash the tendon."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cords intact. Don't slash the tendon."));
 						break;
 
 					case "info":
@@ -269,8 +257,6 @@ public class FRemains38QuestNpcsScript : GeneralScript
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_remains_38", 1005);
-			var bossSpawnedKey = "Laima.Quests.f_remains_38.Quest1005.BossSpawned";
-
 			dialog.SetTitle(L("Saulius"));
 
 			if (!character.Quests.Has(questId))
@@ -286,11 +272,8 @@ public class FRemains38QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve InfroBurks and defeat the Devilglove when it emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve."));
 						break;
 
 					case "info":
@@ -308,28 +291,14 @@ public class FRemains38QuestNpcsScript : GeneralScript
 				if (!quest.TryGetProgress("killBurks", out var pObj)) return;
 				if (!quest.TryGetProgress("killBoss", out var bObj)) return;
 
-				if (pObj.Done && bObj.Done)
+				if (bObj.Done)
 				{
 					await dialog.Msg(L("Orchard's ours."));
-					character.Variables.Perm.Remove(bossSpawnedKey);
 					character.Quests.Complete(questId);
 				}
-				else if (pObj.Done && !bObj.Done)
+				else if (pObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(bossSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(bossSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Boss_Devilglove, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("It comes!"));
-							character.ServerMessage(L("{#FF9966}The Devilglove emerges from the orchard!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("Find it."));
-					}
+					await dialog.Msg(L("It comes! Find it and end it."));
 				}
 				else
 				{
@@ -364,11 +333,8 @@ public class FRemains38QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - InfroBurks, Lizardmen, Long Arms?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -428,10 +394,10 @@ public class FRemains38Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.InfroBurk }));
 
 		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(21000));
+		AddReward(new SilverReward(5200));
 		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 8));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -457,11 +423,11 @@ public class FRemains38Quest1002 : QuestScript
 			new CollectItemObjective(650258, 8));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -497,10 +463,10 @@ public class FRemains38Quest1003 : QuestScript
 			new CollectItemObjective(650260, 6));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -536,11 +502,11 @@ public class FRemains38Quest1004 : QuestScript
 			new CollectItemObjective(650261, 8));
 
 		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(29000));
+		AddReward(new SilverReward(7200));
 		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 9));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -566,21 +532,25 @@ public class FRemains38Quest1005 : QuestScript
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
+		SetUnlock(QuestUnlockType.Sequential);
 		AddQuestGiver(L("[Bounty Hunter] Saulius"), "f_remains_38");
 
 		AddObjective("killBurks", L("Kill InfroBurks"),
 			new KillObjective(12, new[] { MonsterId.InfroBurk }));
 
 		AddObjective("killBoss", L("Defeat the Devilglove"),
-			new KillObjective(1, new[] { MonsterId.Boss_Devilglove }));
+			new LayeredKillObjective(
+				spawnList: new[] { new KillSpec(MonsterId.Boss_Devilglove, 1) },
+				resetIdent: "killBurks",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
-		AddReward(new ItemReward(640012, 3));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -609,9 +579,9 @@ public class FRemains38Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Long_Arm }));
 
 		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(36000));
+		AddReward(new SilverReward(9000));
 		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 10));
-		AddReward(new ItemReward(640007, 10));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }

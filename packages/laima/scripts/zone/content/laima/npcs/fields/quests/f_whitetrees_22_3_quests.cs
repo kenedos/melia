@@ -49,12 +49,9 @@ public class FWhitetrees223QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("Good. The Gulaks den in the western scree; the Manes hunt the central paths."));
 
-						if (await dialog.YesNo(L("Cut twenty Manes and ten Gulaks. Break their numbers before the temple spillover gets worse. Can you do this?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Start with the Manes - they're the bolder of the two. The Gulaks you'll find west, near the temple warp."));
-							await dialog.Msg(L("And stay well clear of the temple itself. Whatever Narvas is now, it isn't a place for soldiers."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Start with the Manes - they're the bolder of the two. The Gulaks you'll find west, near the temple warp."));
+						await dialog.Msg(L("And stay well clear of the temple itself. Whatever Narvas is now, it isn't a place for soldiers."));
 						break;
 
 					case "info":
@@ -121,12 +118,9 @@ public class FWhitetrees223QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She presses a sealed scroll into your hand*{/}"));
 
-						if (await dialog.YesNo(L("Follow the path west, past the central ruins, to the temple warp. You'll find Laimis in a cluster of grey tents. Hand him the dispatch, hear his reply, and come back. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The path's crossed by Hohens - mind yourself. If you have to run, run straight through."));
-							await dialog.Msg(L("Laimis doesn't speak much. Whatever he tells you, bring it back word for word."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The path's crossed by Hohens - mind yourself. If you have to run, run straight through."));
+						await dialog.Msg(L("Laimis doesn't speak much. Whatever he tells you, bring it back word for word."));
 						break;
 
 					case "info":
@@ -228,12 +222,9 @@ public class FWhitetrees223QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He sets down the chalk and nods seriously*{/}"));
 
-						if (await dialog.YesNo(L("Five fragments, scattered across the plateau ruins. The Manes guard some of them - pulling a flag might bring one down on you. Still willing?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Look for the bright red - the dye held even through the demon war."));
-							await dialog.Msg(L("Any fragment with a gold thread is from the old guard regiment. Those I'd particularly like back."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Look for the bright red - the dye held even through the demon war."));
+						await dialog.Msg(L("Any fragment with a gold thread is from the old guard regiment. Those I'd particularly like back."));
 						break;
 
 					case "info":
@@ -366,12 +357,9 @@ public class FWhitetrees223QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She hands you a roll of paper and a chalk stick*{/}"));
 
-						if (await dialog.YesNo(L("Press the paper against the stone, rub gently. The names will appear. Four memorials - they stand in the clearings where the cadets fell. Will you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Take your time. Each stone deserves a proper rubbing, not a hurried one."));
-							await dialog.Msg(L("And - if you pass the westernmost stone - leave a pebble on top. It belongs to the class that tried to relieve Narvas Temple. They should not be forgotten even by me."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Take your time. Each stone deserves a proper rubbing, not a hurried one."));
+						await dialog.Msg(L("And - if you pass the westernmost stone - leave a pebble on top. It belongs to the class that tried to relieve Narvas Temple. They should not be forgotten even by me."));
 						break;
 
 					case "info":
@@ -493,11 +481,11 @@ public class BlackBeastsOfThePlateauQuest : QuestScript
 			new KillObjective(10, new[] { MonsterId.Hohen_Gulak_Black }));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 		AddReward(new ItemReward(531151, 1));  // Veteran Tunic
 	}
 }
@@ -525,10 +513,10 @@ public class LetterToTheAbbotQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_22_3.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10)); // Large HP Potion
-		AddReward(new ItemReward(640007, 10));  // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -565,11 +553,11 @@ public class TatteredStandardsQuest : QuestScript
 			new CollectItemObjective(661037, 5));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11));  // Large SP Potion
-		AddReward(new ItemReward(640012, 3));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -622,10 +610,10 @@ public class WarMemorialSurveyQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_whitetrees_22_3.Quest1004.MemorialsVisited", 4, true));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11));  // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

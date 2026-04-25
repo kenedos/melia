@@ -47,11 +47,8 @@ public class FKatyn12QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Twenty. North bracken. Don't drink from the Letas for an hour after you kill one. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Their saliva is the corruption. Wipe your blade after each strike, or the next hit doubles through."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Their saliva is the corruption. Wipe your blade after each strike, or the next hit doubles through."));
 						break;
 
 					case "info":
@@ -109,11 +106,8 @@ public class FKatyn12QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("East sample-hut. Don't shake the vial - sediment skews the reading. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Brone's slip is inked in iron-gall. You'll know it by the smell."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Brone's slip is inked in iron-gall. You'll know it by the smell."));
 						break;
 
 					case "info":
@@ -209,11 +203,8 @@ public class FKatyn12QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Exhale-breaths only. Eight vials. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If an Operor inhales while you stopper - it takes a word out of you. Usually a small one. Sometimes not."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If an Operor inhales while you stopper - it takes a word out of you. Usually a small one. Sometimes not."));
 						break;
 
 					case "info":
@@ -329,11 +320,8 @@ public class FKatyn12QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Four stones. Hand a hand's-breadth above each. Warm, cold, silent. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Warm means benediction holds. Cold means it's drained. Silent means the stone hears nothing now - and is no longer a stone in any useful sense."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Warm means benediction holds. Cold means it's drained. Silent means the stone hears nothing now - and is no longer a stone in any useful sense."));
 						break;
 
 					case "info":
@@ -432,11 +420,11 @@ public class ChupacabrasOnTheStreamPathQuest : QuestScript
 		AddObjective("killChupacabra", "Defeat Corrupt Chupacabras on the stream-banks",
 			new KillObjective(20, new[] { MonsterId.Chupacabra_Green }));
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 4));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -458,10 +446,10 @@ public class TheWaterSampleQuest : QuestScript
 		AddObjective("deliverSample", "Deliver the sample and return with the slip",
 			new VariableCheckObjective("Laima.Quests.f_katyn_12.Quest1002.Delivered", 1, true));
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -493,11 +481,11 @@ public class OperorFogVialsQuest : QuestScript
 		AddObjective("collectFog", "Trap Operor fog into vials",
 			new CollectItemObjective(650854, 8));
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 4));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -539,10 +527,10 @@ public class TheChapelStonesQuest : QuestScript
 		AddObjective("readStones", "Read the four chapel-stones",
 			new VariableCheckObjective("Laima.Quests.f_katyn_12.Quest1004.StonesChecked", 4, true));
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)

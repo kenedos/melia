@@ -45,12 +45,9 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Lemurs in the Downtown district?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. Move fast - they pack in, and a packed Lemur pack is worse than the curse."));
-							await dialog.Msg(L("Ward-cotton in your ears. You'll thank me."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. Move fast - they pack in, and a packed Lemur pack is worse than the curse."));
+						await dialog.Msg(L("Ward-cotton in your ears. You'll thank me."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Crack five Rootcrystals and bring back the curseglass cores?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Look for the ones with a clear sheen inside. That's the vitrified core."));
-							await dialog.Msg(L("Five clear ones. I'll work them into windows tonight."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Look for the ones with a clear sheen inside. That's the vitrified core."));
+						await dialog.Msg(L("Five clear ones. I'll work them into windows tonight."));
 						break;
 
 					case "info":
@@ -176,12 +170,9 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Hammer-Goblins and recover four civic record-volumes?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Fifteen. Record-volumes are leather-bound, clasp-locked - they don't crumble. Look in the vault niches."));
-							await dialog.Msg(L("Bring them unopened. Chain-of-custody matters for legal validity."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Fifteen. Record-volumes are leather-bound, clasp-locked - they don't crumble. Look in the vault niches."));
+						await dialog.Msg(L("Bring them unopened. Chain-of-custody matters for legal validity."));
 						break;
 
 					case "info":
@@ -314,12 +305,9 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Wand-Goblins and recover five ritual-brand pages?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Pages are in oiled scroll-cases. Check every goblin's belt. Pages are the priority over kills."));
-							await dialog.Msg(L("Don't open the scroll-cases. Live sigils. Bring them sealed."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Pages are in oiled scroll-cases. Check every goblin's belt. Pages are the priority over kills."));
+						await dialog.Msg(L("Don't open the scroll-cases. Live sigils. Bring them sealed."));
 						break;
 
 					case "info":
@@ -389,12 +377,9 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin ten Lemurs and bring down the Stonefrosted Alpha when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. He hits hard with a rime-slam. Stay mobile."));
-							await dialog.Msg(L("Good hunting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. He hits hard with a rime-slam. Stay mobile."));
+						await dialog.Msg(L("Good hunting."));
 						break;
 
 					case "info":
@@ -475,12 +460,9 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Lemurs and twelve Hammer-Goblins along the Downtown perimeter?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve and twelve. Lemurs at the feet, Hammers from the rises. Mind both."));
-							await dialog.Msg(L("Clear them, and three caravans roll by week's end."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve and twelve. Lemurs at the feet, Hammers from the rises. Mind both."));
+						await dialog.Msg(L("Clear them, and three caravans roll by week's end."));
 						break;
 
 					case "info":
@@ -549,10 +531,10 @@ public class LemurHowlQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Lemur }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -576,11 +558,11 @@ public class DowntownCurseglassQuest : QuestScript
 			new CollectItemObjective(650257, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -617,11 +599,11 @@ public class CivicRecordsQuest : QuestScript
 			new CollectItemObjective(650785, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -670,11 +652,11 @@ public class RitualBrandPagesQuest : QuestScript
 			new CollectItemObjective(650825, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -711,11 +693,11 @@ public class TheStonefrostedAlphaQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Lemur }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -742,10 +724,10 @@ public class DowntownPerimeterQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Goblin2_Hammer }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

@@ -50,13 +50,10 @@ public class FFarm472QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He exhales, the spear shaft loosening in his grip*{/}"));
 
-						if (await dialog.YesNo(L("Fifteen Shamans. They cluster near the portal warp - south edge of the map - and hit the bridge supports from there. Will you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Take this dagger - Arde-forged. The fire bites demon-flesh harder than anything else I've got."));
-							character.Inventory.Add(113001, 1, InventoryAddType.PickUp);
-							await dialog.Msg(L("Stay low when they cast. The lightning arcs straight - duck and it passes over."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Take this dagger - Arde-forged. The fire bites demon-flesh harder than anything else I've got."));
+						character.Inventory.Add(113001, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("Stay low when they cast. The lightning arcs straight - duck and it passes over."));
 						break;
 
 					case "info":
@@ -121,12 +118,9 @@ public class FFarm472QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She folds the protocol carefully, tucking it into a water-proof oilcloth*{/}"));
 
-						if (await dialog.YesNo(L("Mykolas is at Tenants' Farm through the north warp. Tell him red pins come first. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If Mykolas argues, tell him it's not negotiable - the plan has to be ready before the bell rings."));
-							await dialog.Msg(L("And if you pass Gintaras near the portal - tell him the ward-survey is still waiting."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If Mykolas argues, tell him it's not negotiable - the plan has to be ready before the bell rings."));
+						await dialog.Msg(L("And if you pass Gintaras near the portal - tell him the ward-survey is still waiting."));
 						break;
 
 					case "info":
@@ -226,11 +220,8 @@ public class FFarm472QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She hands you a copper-lined pouch*{/}"));
 
-						if (await dialog.YesNo(L("The pouch holds the charge. Drop each pod straight in, don't squeeze. Five pods and the circle is done. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Touch only the stem. The fluff itself is soft but the static hurts. Startled Dandels buzz past - if one lands in your hair, shake it off, don't swat it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Touch only the stem. The fluff itself is soft but the static hurts. Startled Dandels buzz past - if one lands in your hair, shake it off, don't swat it."));
 						break;
 
 					case "info":
@@ -362,12 +353,9 @@ public class FFarm472QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He hands you a piece of charcoal and a square of vellum*{/}"));
 
-						if (await dialog.YesNo(L("Rub the charcoal over the crack on each stone. The fracture pattern will transfer. Don't stand still near the portal - demons see movement less than they smell blood. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Four stones. They ring the warp point. Walk the circle counter-clockwise - superstition, but mine."));
-							await dialog.Msg(L("If you smell metal in your mouth, the pollen is getting to you. Back off for a count of ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Four stones. They ring the warp point. Walk the circle counter-clockwise - superstition, but mine."));
+						await dialog.Msg(L("If you smell metal in your mouth, the pollen is getting to you. Back off for a count of ten."));
 						break;
 
 					case "info":
@@ -489,10 +477,10 @@ public class AqueductSiegeQuest : QuestScript
 			new KillObjective(15, new[] { MonsterId.Kepari_Mage }));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
 	}
 }
 
@@ -519,10 +507,10 @@ public class RefugeeProtocolQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_47_2.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -559,11 +547,11 @@ public class ChargedDandelPodsQuest : QuestScript
 			new CollectItemObjective(663355, 5));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 3));  // Recovery Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -616,11 +604,11 @@ public class BrokenWardStonesQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_47_2.Quest1004.StonesVisited", 4, true));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 4));  // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

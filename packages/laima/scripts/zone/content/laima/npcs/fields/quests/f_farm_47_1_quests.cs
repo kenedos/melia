@@ -50,12 +50,9 @@ public class FFarm471QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He sets the splintered pallet down carefully, as if it were a child's shoe*{/}"));
 
-						if (await dialog.YesNo(L("Eighteen. They cluster near the central barn and the northern hedgerow. Can you do it before dusk?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Take these - leather pants. My brother wore them when he was farmhand-militia. He'd want them on someone defending a barn."));
-							await dialog.Msg(L("And mind the puppet-strings on their arms. Cut those first - disarms the Lightning magic."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Take these - leather pants. My brother wore them when he was farmhand-militia. He'd want them on someone defending a barn."));
+						await dialog.Msg(L("And mind the puppet-strings on their arms. Cut those first - disarms the Lightning magic."));
 						break;
 
 					case "info":
@@ -120,11 +117,8 @@ public class FFarm471QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He folds the requisition and seals it with a thumb-print in blackberry ink*{/}"));
 
-						if (await dialog.YesNo(L("Izolde is at the Cobalt Forest warp - northern edge of the farm. Give her this and tell her the silver is at the barn-gate when the cart arrives. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("If she haggles, remind her we've paid on time for six years running. Our coin is as good as Klaipeda's."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("If she haggles, remind her we've paid on time for six years running. Our coin is as good as Klaipeda's."));
 						break;
 
 					case "info":
@@ -223,12 +217,9 @@ public class FFarm471QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She hands you a bone spatula and a wax-lined pouch*{/}"));
 
-						if (await dialog.YesNo(L("Scrape the amber-soft resin, drop it in the pouch, move on. Five clumps, five trees. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't touch the resin with bare fingers - it sticks for three days and the Pinos smell it on you."));
-							await dialog.Msg(L("If a Pino startles and swarms you, back off. They calm down if you stand still for a count of ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't touch the resin with bare fingers - it sticks for three days and the Pinos smell it on you."));
+						await dialog.Msg(L("If a Pino startles and swarms you, back off. They calm down if you stand still for a count of ten."));
 						break;
 
 					case "info":
@@ -360,12 +351,9 @@ public class FFarm471QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He hands you the tally-board and a spare nub of chalk*{/}"));
 
-						if (await dialog.YesNo(L("Four barns. Check stove, pallets, door-seal, bell-rope. Tick each off as you find it ready. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The barns are spread - north, south, east, west of the central yard."));
-							await dialog.Msg(L("If a barn isn't ready, leave the tally un-ticked. I'll send Agne to fix it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The barns are spread - north, south, east, west of the central yard."));
+						await dialog.Msg(L("If a barn isn't ready, leave the tally un-ticked. I'll send Agne to fix it."));
 						break;
 
 					case "info":
@@ -486,11 +474,11 @@ public class GeppettoAttacksQuest : QuestScript
 			new KillObjective(18, new[] { MonsterId.Geppetto_White }));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(522112, 1));  // Pokubon Leather Pants
 	}
 }
@@ -518,10 +506,10 @@ public class SupplyLineToCobaltQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_47_1.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -558,11 +546,11 @@ public class PinoResinQuest : QuestScript
 			new CollectItemObjective(650609, 5));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -615,10 +603,10 @@ public class BarnReadinessQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_47_1.Quest1004.BarnsVisited", 4, true));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

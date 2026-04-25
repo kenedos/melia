@@ -43,11 +43,8 @@ public class FRemains37QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty-five Stub Trees along the Stele Road?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-five. They ambush in clusters."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-five. They ambush in clusters."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FRemains37QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Tamas and bring seven husks?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Whole husks only."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Whole husks only."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FRemains37QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty TreeAmbulos and bring six prime bark-planks?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Chest sections. Thick as a hand."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Chest sections. Thick as a hand."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FRemains37QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break twelve Rootcrystals and bring eight shards?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eight. They hum when they're ready."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eight. They hum when they're ready."));
 						break;
 
 					case "info":
@@ -286,11 +274,8 @@ public class FRemains37QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Stub Trees and defeat the Ancient when it emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. It feels each."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. It feels each."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FRemains37QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Stub Trees, twelve Tamas, and twelve TreeAmbulos?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six total. Standard."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six total. Standard."));
 						break;
 
 					case "info":
@@ -428,10 +410,10 @@ public class FRemains37Quest1001 : QuestScript
 			new KillObjective(35, new[] { MonsterId.Stub_Tree }));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
 	}
 }
 
@@ -457,11 +439,11 @@ public class FRemains37Quest1002 : QuestScript
 			new CollectItemObjective(650094, 7));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
-		AddReward(new ItemReward(640011, 6));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
+		AddReward(new ItemReward(640011, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -497,11 +479,11 @@ public class FRemains37Quest1003 : QuestScript
 			new CollectItemObjective(650098, 6));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
-		AddReward(new ItemReward(640011, 6));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
+		AddReward(new ItemReward(640011, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -537,11 +519,11 @@ public class FRemains37Quest1004 : QuestScript
 			new CollectItemObjective(650235, 8));
 
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
-		AddReward(new ItemReward(640011, 6));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
+		AddReward(new ItemReward(640011, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -577,11 +559,11 @@ public class FRemains37Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Stub_Tree }));
 
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 3));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
-		AddReward(new ItemReward(640011, 6));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
+		AddReward(new ItemReward(640011, 1));
 	}
 }
 
@@ -610,10 +592,10 @@ public class FRemains37Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.TreeAmbulo }));
 
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 3));
-		AddReward(new ItemReward(640003, 12));
-		AddReward(new ItemReward(640006, 12));
-		AddReward(new ItemReward(640011, 6));
+		AddReward(new ItemReward(640003, 3));
+		AddReward(new ItemReward(640006, 3));
+		AddReward(new ItemReward(640011, 1));
 	}
 }

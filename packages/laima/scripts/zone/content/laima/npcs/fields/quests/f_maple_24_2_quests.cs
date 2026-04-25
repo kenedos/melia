@@ -43,11 +43,8 @@ public class FMaple242QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Thin forty-five Zeuni Kucarries?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty-five. Mind the burrows."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty-five. Mind the burrows."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FMaple242QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Numani Kucarries and bring eight clean pelts?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cut along the flank, not the spine."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cut along the flank, not the spine."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FMaple242QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Zabbi Kucarries and bring five paired fangs?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Paired means both from one jaw."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Paired means both from one jaw."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FMaple242QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break twelve Rootcrystals and bring eight resonant slivers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wrap them. They sing to each other."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wrap them. They sing to each other."));
 						break;
 
 					case "info":
@@ -286,11 +274,8 @@ public class FMaple242QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Zabbi Kucarries and defeat the Pack-Elder when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FMaple242QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Zeuni, Numani, Zabbi Kucarries?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -428,10 +410,10 @@ public class FMaple242Quest1001 : QuestScript
 			new KillObjective(45, new[] { MonsterId.Kucarry_Zeuni }));
 
 		AddReward(new ExpReward(1000, 700));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
 	}
 }
 
@@ -457,11 +439,11 @@ public class FMaple242Quest1002 : QuestScript
 			new CollectItemObjective(650244, 8));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -497,11 +479,11 @@ public class FMaple242Quest1003 : QuestScript
 			new CollectItemObjective(650246, 5));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -537,11 +519,11 @@ public class FMaple242Quest1004 : QuestScript
 			new CollectItemObjective(650247, 8));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -577,11 +559,11 @@ public class FMaple242Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Kucarry_Zabbi }));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 }
 
@@ -610,10 +592,10 @@ public class FMaple242Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Kucarry_Zabbi }));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 }

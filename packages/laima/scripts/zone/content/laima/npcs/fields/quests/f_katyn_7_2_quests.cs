@@ -43,11 +43,8 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Sakmoli on the shore?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. Watch the wet sand."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. Watch the wet sand."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-eight Ellomago and bring seven fading spirits?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Salt the jars before sealing."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Salt the jars before sealing."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill eighteen Red Jellyfish and bring six blue corals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Cut clean. Their sting holds an hour after they die."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Cut clean. Their sting holds an hour after they die."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill eighteen Ridimed in the bog?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eighteen. Don't sink past the knee."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eighteen. Don't sink past the knee."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Sakmoli and defeat the Alpha when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Sakmoli, Ridimed, Red Jellyfish?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FKatyn72Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Sakmoli }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FKatyn72Quest1002 : QuestScript
 			new CollectItemObjective(664096, 7));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FKatyn72Quest1003 : QuestScript
 			new CollectItemObjective(668044, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 4));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FKatyn72Quest1004 : QuestScript
 			new KillObjective(18, new[] { MonsterId.Ridimed }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 14));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FKatyn72Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Sakmoli }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -594,10 +576,10 @@ public class FKatyn72Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Jellyfish_Red }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

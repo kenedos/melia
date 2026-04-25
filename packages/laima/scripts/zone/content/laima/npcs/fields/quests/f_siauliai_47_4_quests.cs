@@ -49,12 +49,9 @@ public class FSiauliai474QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He straightens, momentarily recovering a long-dormant authority*{/}"));
 
-						if (await dialog.YesNo(L("Fifteen should scatter what's left. They nest in the middle orchards and the western pear-row. The Orange corruption seems to draw them. Will you take the work?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Mind their spellwork - they cast Earth, mostly. Stonetraps, rootbinds. Move quick, don't stand still."));
-							await dialog.Msg(L("And if you find the Baron's old rod in their nests - return it to me. He carried one very like it."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Mind their spellwork - they cast Earth, mostly. Stonetraps, rootbinds. Move quick, don't stand still."));
+						await dialog.Msg(L("And if you find the Baron's old rod in their nests - return it to me. He carried one very like it."));
 						break;
 
 					case "info":
@@ -119,12 +116,9 @@ public class FSiauliai474QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She folds the dispatch with practiced creases and hands it over*{/}"));
 
-						if (await dialog.YesNo(L("Rokas is at the Tenants' Farm warp - north edge of the estate. Hear his reply word for word and come back. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't press him if he's embarrassed. Just note what he says."));
-							await dialog.Msg(L("And if he asks after the Baron - tell him the lamps are still lit."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't press him if he's embarrassed. Just note what he says."));
+						await dialog.Msg(L("And if he asks after the Baron - tell him the lamps are still lit."));
 						break;
 
 					case "info":
@@ -224,12 +218,9 @@ public class FSiauliai474QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He grins and sets aside the solder*{/}"));
 
-						if (await dialog.YesNo(L("Five bush-nests across the estate - the Hammings shed there when they molt. Pluck the longest feather from each nest. Watch for Popolions sniffing around; they scavenge what the Hammings drop. Will you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Wear gloves if you have them - the static bites."));
-							await dialog.Msg(L("And don't go after the Hammings themselves. They're prickly birds, but they molt on their own schedule."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Wear gloves if you have them - the static bites."));
+						await dialog.Msg(L("And don't go after the Hammings themselves. They're prickly birds, but they molt on their own schedule."));
 						break;
 
 					case "info":
@@ -361,12 +352,9 @@ public class FSiauliai474QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She places the key-ring in your palm and closes your fingers around it*{/}"));
 
-						if (await dialog.YesNo(L("Walk slowly. Note what's there, note what's not. The Baron's taste was... particular. You'll recognize his hand in what's kept. Will you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Start wherever suits you. The greenhouse is furthest south, the pavilion nearest the Gytis warp."));
-							await dialog.Msg(L("And if you find anything fragile - leave it. A list is enough. I'm not asking you to carry forty years of a man's life in your pockets."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Start wherever suits you. The greenhouse is furthest south, the pavilion nearest the Gytis warp."));
+						await dialog.Msg(L("And if you find anything fragile - leave it. A list is enough. I'm not asking you to carry forty years of a man's life in your pockets."));
 						break;
 
 					case "info":
@@ -488,11 +476,11 @@ public class MagesInTheOrchardsQuest : QuestScript
 			new KillObjective(15, new[] { MonsterId.Spion_Mage }));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(142119, 1));  // Thresh Rod
 	}
 }
@@ -520,10 +508,10 @@ public class RentLedgerDispatchQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_siauliai_47_4.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -560,11 +548,11 @@ public class StormfeathersQuest : QuestScript
 			new CollectItemObjective(667174, 5));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 3));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -617,10 +605,10 @@ public class TheManorsLostRoomsQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_siauliai_47_4.Quest1004.RoomsVisited", 4, true));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

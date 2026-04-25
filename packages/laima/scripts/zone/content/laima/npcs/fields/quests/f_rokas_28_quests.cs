@@ -514,11 +514,11 @@ public class ScorpionSuppressionQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(500, 340));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 1));  // Lv2 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 5));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 	}
 }
 
@@ -548,11 +548,11 @@ public class ValleyPatrolQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 5));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(602117, 1));  // Argint Bracelet
 	}
 }
@@ -581,11 +581,11 @@ public class MonumentsOfTheValleyQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 5));  // Stamina Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640009, 1));  // Stamina Potion
 		AddReward(new ItemReward(141108, 1));  // Owl Rod
 	}
 
@@ -630,11 +630,11 @@ public class DesertHerbalistQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(1200, 800));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640081, 2));  // Lv2 EXP Cards
-		AddReward(new ItemReward(640003, 8));  // Normal HP Potions
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potions
-		AddReward(new ItemReward(640009, 3));  // Stamina Potions
+		AddReward(new ItemReward(640003, 2));  // Normal HP Potions
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potions
+		AddReward(new ItemReward(640009, 1));  // Stamina Potions
 		AddReward(new ItemReward(581127, 1));  // Magic Pendant
 	}
 

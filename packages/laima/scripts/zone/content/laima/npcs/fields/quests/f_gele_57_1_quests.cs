@@ -455,11 +455,11 @@ public class PantoPopulationControlQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 10)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 10)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 	}
 }
 
@@ -486,11 +486,11 @@ public class HoneyForTheHivesQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 4)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 		AddReward(new ItemReward(502113, 1)); // Drake Leather Gloves
 	}
 
@@ -543,11 +543,11 @@ public class MerchantsPantoProblemQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 		AddReward(new ItemReward(920010, 1)); // Recipe - Panto Sword
 	}
 
@@ -587,11 +587,11 @@ public class GorgeDeliveryServiceQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(3800, 2700));
-		AddReward(new SilverReward(16000));
+		AddReward(new SilverReward(4000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -633,11 +633,11 @@ public class GorgePatrolQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(4200, 3200));
-		AddReward(new SilverReward(24000));
+		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 12)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 12)); // Normal SP Potion
-		AddReward(new ItemReward(640011, 5)); // Recovery Potion
+		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640011, 1)); // Recovery Potion
 		AddReward(new ItemReward(512113, 1)); // Drake Leather Boots
 	}
 }

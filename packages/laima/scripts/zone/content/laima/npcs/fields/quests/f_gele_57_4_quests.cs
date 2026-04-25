@@ -51,11 +51,8 @@ public class FGele574QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He nods, and the tension in his shoulders eases by a fraction*{/}"));
 
-						if (await dialog.YesNo(L("Eighteen Rodelin. The chapel memorial paths are thickest. Can you do it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Speak their name if you know it. If not, speak any chapel-word - 'rest,' 'return,' 'release.' The words matter more than the blade."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Speak their name if you know it. If not, speak any chapel-word - 'rest,' 'return,' 'release.' The words matter more than the blade."));
 						break;
 
 					case "info":
@@ -120,11 +117,8 @@ public class FGele574QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He rolls the parchment twice, slides it into a leather tube, seals the cap with chapel wax*{/}"));
 
-						if (await dialog.YesNo(L("The Akmens Ridge warp is at the garden's north edge. Emilis keeps a ridge-watch shelter just past the crossing. Will you go?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("He'll recognize the chapel wax. Don't crack it before he does - the seal's half the authority."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("He'll recognize the chapel wax. Don't crack it before he does - the seal's half the authority."));
 						break;
 
 					case "info":
@@ -230,12 +224,9 @@ public class FGele574QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She sets the pot down and tears a strip of linen from her apron*{/}"));
 
-						if (await dialog.YesNo(L("Wrap each sapling's roots in this linen. Eight strips, eight saplings. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The largest cluster is northwest, near the old arboretum stone. Smaller clusters scatter toward the memorial paths."));
-							await dialog.Msg(L("If a sapling shivers, wait. They settle in a count of six. Then lift from the base."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The largest cluster is northwest, near the old arboretum stone. Smaller clusters scatter toward the memorial paths."));
+						await dialog.Msg(L("If a sapling shivers, wait. They settle in a count of six. Then lift from the base."));
 						break;
 
 					case "info":
@@ -371,12 +362,9 @@ public class FGele574QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She tears a fresh page from her rubbing-book and marks four points*{/}"));
 
-						if (await dialog.YesNo(L("The plots are scattered across the memorial paths. Report each plot's cracks - inward or outward, fresh or weathered. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Inward cracks mean something pushed in from outside. Outward cracks mean something pushed out from within."));
-							await dialog.Msg(L("Pushed out from within is the one that ruins my sleep."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Inward cracks mean something pushed in from outside. Outward cracks mean something pushed out from within."));
+						await dialog.Msg(L("Pushed out from within is the one that ruins my sleep."));
 						break;
 
 					case "info":
@@ -500,11 +488,11 @@ public class TheGardensDeadWalkQuest : QuestScript
 			new KillObjective(18, new[] { MonsterId.Zombiegirl2_Brown }));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14));  // Normal HP Potion
-		AddReward(new ItemReward(640006, 10));  // Normal SP Potion
-		AddReward(new ItemReward(640011, 3));  // Recovery Potion
+		AddReward(new ItemReward(640003, 3));  // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 	}
 }
 
@@ -531,10 +519,10 @@ public class TheReliquaryListQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_gele_57_4.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14));  // Normal HP Potion
-		AddReward(new ItemReward(640006, 10));  // Normal SP Potion
+		AddReward(new ItemReward(640003, 3));  // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -571,11 +559,11 @@ public class SeedmiaSaplingsQuest : QuestScript
 			new CollectItemObjective(650720, 8));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14));  // Normal HP Potion
-		AddReward(new ItemReward(640006, 10));  // Normal SP Potion
-		AddReward(new ItemReward(640011, 3));  // Recovery Potion
+		AddReward(new ItemReward(640003, 3));  // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
+		AddReward(new ItemReward(640011, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -628,10 +616,10 @@ public class WhichGravesWereTouchedQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_gele_57_4.Quest1004.PlotsChecked", 4, true));
 
 		AddReward(new ExpReward(1900, 1430));
-		AddReward(new SilverReward(13000));
+		AddReward(new SilverReward(3200));
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 14));  // Normal HP Potion
-		AddReward(new ItemReward(640006, 10));  // Normal SP Potion
+		AddReward(new ItemReward(640003, 3));  // Normal HP Potion
+		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

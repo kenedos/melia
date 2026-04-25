@@ -49,12 +49,9 @@ public class FFarm492QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He nods grimly and hoists his broken axe*{/}"));
 
-						if (await dialog.YesNo(L("Eighteen should break the migration. They favor the eastern rows where the pollen settles thickest. Will you handle it?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Aim for the trunk. The Earth-magic's in the roots, but the mouth - yes, they've mouths - is on the trunk."));
-							await dialog.Msg(L("Good boots help. Pendinmire crossed this field last night. You'll want to move fast if you see those tracks."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Aim for the trunk. The Earth-magic's in the roots, but the mouth - yes, they've mouths - is on the trunk."));
+						await dialog.Msg(L("Good boots help. Pendinmire crossed this field last night. You'll want to move fast if you see those tracks."));
 						break;
 
 					case "info":
@@ -119,12 +116,9 @@ public class FFarm492QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He hands you a thick envelope sealed with dried tomato vine*{/}"));
 
-						if (await dialog.YesNo(L("Benas camps at the Myrkiti warp. Give him this and tell him Jonas-the-Elder sends his regards. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The envelope's tied with vine - that's my seal these days. Morta will know it on sight."));
-							await dialog.Msg(L("Mind the walking stumps on the northern path. Andrius was still killing them last I heard."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The envelope's tied with vine - that's my seal these days. Morta will know it on sight."));
+						await dialog.Msg(L("Mind the walking stumps on the northern path. Andrius was still killing them last I heard."));
 						break;
 
 					case "info":
@@ -222,12 +216,9 @@ public class FFarm492QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*She hands you five empty vials, stoppered with wax*{/}"));
 
-						if (await dialog.YesNo(L("One vial per Cyst. Five Cysts spread across the farm. Don't crush the vial - the sap burns through weak glass. Will you?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Quarter turn to uncork, press the tip into the sap-pore, quarter turn to seal. Easy enough if you're not panicking."));
-							await dialog.Msg(L("About one in five wakes up when tapped. Back away and it'll settle again. Don't try to fight it with the vial in your hand."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Quarter turn to uncork, press the tip into the sap-pore, quarter turn to seal. Easy enough if you're not panicking."));
+						await dialog.Msg(L("About one in five wakes up when tapped. Back away and it'll settle again. Don't try to fight it with the vial in your hand."));
 						break;
 
 					case "info":
@@ -242,7 +233,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var sapCount = character.Inventory.CountItem(666185);
+				var sapCount = character.Inventory.CountItem(650801);
 
 				if (sapCount >= 5)
 				{
@@ -307,10 +298,10 @@ public class FFarm492QuestNpcsScript : GeneralScript
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(666185, 1, InventoryAddType.PickUp);
+					character.Inventory.Add(650801, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
 
-					var currentCount = character.Inventory.CountItem(666185);
+					var currentCount = character.Inventory.CountItem(650801);
 					character.ServerMessage(LF("Sap vials filled: {0}/5", currentCount));
 
 					if (currentCount >= 5)
@@ -359,12 +350,9 @@ public class FFarm492QuestNpcsScript : GeneralScript
 					case "help":
 						await dialog.Msg(L("{#666666}*He hands you a charcoal stick and a folded parchment*{/}"));
 
-						if (await dialog.YesNo(L("Four sites. Move quietly; if you see the Pendinmire itself, drop to the ground and don't move. It has poor eyes for still things. Will you walk them?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("One near the southern woods, one by the broken fence, one at the bone pile, one on the claw-marked oak."));
-							await dialog.Msg(L("If you don't come back by sundown, I'll assume the worst and ring the evacuation bell."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("One near the southern woods, one by the broken fence, one at the bone pile, one on the claw-marked oak."));
+						await dialog.Msg(L("If you don't come back by sundown, I'll assume the worst and ring the evacuation bell."));
 						break;
 
 					case "info":
@@ -486,11 +474,11 @@ public class WalkingStumpsQuest : QuestScript
 			new KillObjective(18, new[] { MonsterId.Stub_Tree_Orange }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10)); // Large HP Potion
-		AddReward(new ItemReward(640007, 10)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 		AddReward(new ItemReward(511148, 1));  // Superior Skirmisher Boots
 	}
 }
@@ -518,10 +506,10 @@ public class JonassReplyQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_49_2.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 10)); // Large HP Potion
-		AddReward(new ItemReward(640007, 10)); // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -555,20 +543,20 @@ public class CystSapVialsQuest : QuestScript
 		AddQuestGiver("[Farmer] Ruta", "f_farm_49_2");
 
 		AddObjective("collectSap", "Tap Cyst growths for sap vials",
-			new CollectItemObjective(666185, 5));
+			new CollectItemObjective(650801, 5));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
-		AddReward(new ItemReward(640012, 4));  // Recovery Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1));  // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(666185,
-			character.Inventory.CountItem(666185),
+		character.Inventory.Remove(650801,
+			character.Inventory.CountItem(650801),
 			InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 5; i++)
@@ -580,8 +568,8 @@ public class CystSapVialsQuest : QuestScript
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(666185,
-			character.Inventory.CountItem(666185),
+		character.Inventory.Remove(650801,
+			character.Inventory.CountItem(650801),
 			InventoryItemRemoveMsg.Destroyed);
 
 		for (int i = 1; i <= 5; i++)
@@ -615,10 +603,10 @@ public class PendinmiresRangeQuest : QuestScript
 			new VariableCheckObjective("Laima.Quests.f_farm_49_2.Quest1004.SitesVisited", 4, true));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 11)); // Large HP Potion
-		AddReward(new ItemReward(640007, 11)); // Large SP Potion
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)

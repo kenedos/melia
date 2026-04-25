@@ -44,11 +44,8 @@ public class FTableland282QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-five Blue Siaulavs?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-five."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-five."));
 						break;
 
 					case "info":
@@ -103,11 +100,8 @@ public class FTableland282QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Blue Siaulav Mages and bring six mana feathers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Only the tail-shafts have mana. Pluck cleanly."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Only the tail-shafts have mana. Pluck cleanly."));
 						break;
 
 					case "info":
@@ -164,11 +158,8 @@ public class FTableland282QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Blue Siaulav Bows and bring seven sinews?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Seven. Don't shred them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Seven. Don't shred them."));
 						break;
 
 					case "info":
@@ -226,11 +217,8 @@ public class FTableland282QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty-five Blue Lapasapes?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("They flock aggressive. Don't get surrounded."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They flock aggressive. Don't get surrounded."));
 						break;
 
 					case "info":
@@ -286,11 +274,8 @@ public class FTableland282QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Blue Siaulavs and defeat the King when he dives?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. He's proud."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. He's proud."));
 						break;
 
 					case "info":
@@ -364,11 +349,8 @@ public class FTableland282QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Blue Siaulavs and twelve Blue Lapasapes?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Standard bounty."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Standard bounty."));
 						break;
 
 					case "info":
@@ -427,10 +409,10 @@ public class FTableland282Quest1001 : QuestScript
 			new KillObjective(25, new[] { MonsterId.Siaulav_Blue }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -456,11 +438,11 @@ public class FTableland282Quest1002 : QuestScript
 			new CollectItemObjective(650069, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -496,11 +478,11 @@ public class FTableland282Quest1003 : QuestScript
 			new CollectItemObjective(650070, 7));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -533,10 +515,10 @@ public class FTableland282Quest1004 : QuestScript
 			new KillObjective(35, new[] { MonsterId.Lapasape_Blue }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -562,11 +544,11 @@ public class FTableland282Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Siaulav_Blue }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -592,10 +574,10 @@ public class FTableland282Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Lapasape_Blue }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }

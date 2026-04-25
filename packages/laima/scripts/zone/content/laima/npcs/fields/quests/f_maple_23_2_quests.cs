@@ -44,11 +44,8 @@ public class FMaple232QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Yellow Leafnuts?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. Mind the drop - they fall in clusters."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. Mind the drop - they fall in clusters."));
 						break;
 
 					case "info":
@@ -104,11 +101,8 @@ public class FMaple232QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty Red Colimens and bring six intact shells?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Don't shatter them. Strike along the seam, not the dome."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't shatter them. Strike along the seam, not the dome."));
 						break;
 
 					case "info":
@@ -166,11 +160,8 @@ public class FMaple232QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Yellow Caros and bring eight prime pelts?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Only the prime ones - chest and back sections intact."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Only the prime ones - chest and back sections intact."));
 						break;
 
 					case "info":
@@ -228,11 +219,8 @@ public class FMaple232QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Break twelve Rootcrystals and gather seven sonorous shards?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Listen for the ring. If it doesn't ring, it's not sonorous."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Listen for the ring. If it doesn't ring, it's not sonorous."));
 						break;
 
 					case "info":
@@ -291,11 +279,8 @@ public class FMaple232QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Yellow Caros and slay the titan when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. He's territorial."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. He's territorial."));
 						break;
 
 					case "info":
@@ -369,11 +354,8 @@ public class FMaple232QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Leafnuts, twelve Caros, and twelve Colimens?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Three dozen total. Pystis quiets down for the season."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Three dozen total. Pystis quiets down for the season."));
 						break;
 
 					case "info":
@@ -433,10 +415,10 @@ public class FMaple232Quest1001 : QuestScript
 			new KillObjective(22, new[] { MonsterId.Leafnut_Yellow }));
 
 		AddReward(new ExpReward(1000, 700));
-		AddReward(new SilverReward(9000));
+		AddReward(new SilverReward(2200));
 		AddReward(new ItemReward(640081, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
 	}
 }
 
@@ -462,11 +444,11 @@ public class FMaple232Quest1002 : QuestScript
 			new CollectItemObjective(650015, 6));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -502,11 +484,11 @@ public class FMaple232Quest1003 : QuestScript
 			new CollectItemObjective(650016, 8));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -542,11 +524,11 @@ public class FMaple232Quest1004 : QuestScript
 			new CollectItemObjective(650145, 7));
 
 		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(11500));
+		AddReward(new SilverReward(2900));
 		AddReward(new ItemReward(640082, 1));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -582,11 +564,11 @@ public class FMaple232Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Caro_Yellow }));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 }
 
@@ -615,10 +597,10 @@ public class FMaple232Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Colimen_Red }));
 
 		AddReward(new ExpReward(3100, 2200));
-		AddReward(new SilverReward(15000));
+		AddReward(new SilverReward(3800));
 		AddReward(new ItemReward(640082, 2));
-		AddReward(new ItemReward(640003, 10));
-		AddReward(new ItemReward(640006, 10));
-		AddReward(new ItemReward(640009, 3));
+		AddReward(new ItemReward(640003, 2));
+		AddReward(new ItemReward(640006, 2));
+		AddReward(new ItemReward(640009, 1));
 	}
 }

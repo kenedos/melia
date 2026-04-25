@@ -43,11 +43,8 @@ public class FPilgrimroad415QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Brown Nukas?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty. Watch their charge."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty. Watch their charge."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FPilgrimroad415QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-eight Brown Lapasape and bring seven arrowheads?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Heads only. Shafts splinter."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Heads only. Shafts splinter."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FPilgrimroad415QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill eighteen Red Elma and bring six yellow-eyed petals?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Press them flat. Don't crush."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Press them flat. Don't crush."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FPilgrimroad415QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill eighteen Deadbornscab archers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Eighteen. Mind the high ground."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Eighteen. Mind the high ground."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FPilgrimroad415QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Brown Nukas and defeat the bull when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FPilgrimroad415QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Brown Nukas, Brown Lapasape, Deadbornscab archers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty-six."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty-six."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FPilgrimroad415Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Nuka_Brown }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 11));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FPilgrimroad415Quest1002 : QuestScript
 			new CollectItemObjective(650756, 7));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 5));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FPilgrimroad415Quest1003 : QuestScript
 			new CollectItemObjective(661076, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(72000));
+		AddReward(new SilverReward(18000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FPilgrimroad415Quest1004 : QuestScript
 			new KillObjective(18, new[] { MonsterId.Deadbornscab_Bow }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(70000));
+		AddReward(new SilverReward(17500));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FPilgrimroad415Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Nuka_Brown }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 7));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }
 
@@ -594,10 +576,10 @@ public class FPilgrimroad415Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Deadbornscab_Bow }));
 
 		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(75000));
+		AddReward(new SilverReward(18800));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 7));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 1));
 	}
 }

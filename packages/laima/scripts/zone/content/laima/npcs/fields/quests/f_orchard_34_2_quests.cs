@@ -45,12 +45,9 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Chase off twenty-two Ferret Slingers from the harvest fields?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two should do it. They travel in little cliques - clear a clique, the rest scatter."));
-							await dialog.Msg(L("Watch your forehead. Those acorns hurt."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two should do it. They travel in little cliques - clear a clique, the rest scatter."));
+						await dialog.Msg(L("Watch your forehead. Those acorns hurt."));
 						break;
 
 					case "info":
@@ -110,12 +107,9 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Gather five pristine giant acorns from the old oaks?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Bless you! Look for oaks with the low-hanging pods - those are the ones with giants ready to drop."));
-							await dialog.Msg(L("Mind the Searchers. Ferret Searchers think acorns are their personal property."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Bless you! Look for oaks with the low-hanging pods - those are the ones with giants ready to drop."));
+						await dialog.Msg(L("Mind the Searchers. Ferret Searchers think acorns are their personal property."));
 						break;
 
 					case "info":
@@ -241,12 +235,9 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Ferret Loaders and recover four stolen supply crates?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thank you! The crates are crimson - you can't miss them. Rudolf Logistics stamps everything red."));
-							await dialog.Msg(L("Loaders drop their haul the moment you make it clear you mean business. Fifteen should make it very clear."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thank you! The crates are crimson - you can't miss them. Rudolf Logistics stamps everything red."));
+						await dialog.Msg(L("Loaders drop their haul the moment you make it clear you mean business. Fifteen should make it very clear."));
 						break;
 
 					case "info":
@@ -379,12 +370,9 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve rogue Ferret Searchers and gather five peace-offering pouches from the safe paths?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The offerings are woven pouches, left at marker-stones by the tribe. Each one contains our apology in miniature - a pebble, a feather, a sweet."));
-							await dialog.Msg(L("Collect five, and the rogue Searchers will see their elders do not approve of them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The offerings are woven pouches, left at marker-stones by the tribe. Each one contains our apology in miniature - a pebble, a feather, a sweet."));
+						await dialog.Msg(L("Collect five, and the rogue Searchers will see their elders do not approve of them."));
 						break;
 
 					case "info":
@@ -507,12 +495,9 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Ferret Folk from the retinue, then bring down the Hoard-King when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten Folk first. Come back when the count's done - I'll know when he's close to emerging."));
-							await dialog.Msg(L("Don't underestimate him. He didn't get the crown by sitting still."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten Folk first. Come back when the count's done - I'll know when he's close to emerging."));
+						await dialog.Msg(L("Don't underestimate him. He didn't get the crown by sitting still."));
 						break;
 
 					case "info":
@@ -593,12 +578,9 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Ferret Patters and twelve Ferret Slingers along the Zeraha Road?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twelve of each. Patters work the ground-level, Slingers take the treetops - both are all along the road."));
-							await dialog.Msg(L("Clear them, and the festival carts roll again."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twelve of each. Patters work the ground-level, Slingers take the treetops - both are all along the road."));
+						await dialog.Msg(L("Clear them, and the festival carts roll again."));
 						break;
 
 					case "info":
@@ -670,10 +652,10 @@ public class PebbleBarrageQuest : QuestScript
 			new KillObjective(22, new[] { MonsterId.Ferret_Slinger }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
 	}
 }
 
@@ -700,11 +682,11 @@ public class TheAcornBountyQuest : QuestScript
 			new CollectItemObjective(661094, 5));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -756,11 +738,11 @@ public class TheStolenCratesQuest : QuestScript
 			new CollectItemObjective(650097, 4));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 14)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
 	}
 
@@ -813,11 +795,11 @@ public class TheChiefsApologyQuest : QuestScript
 			new CollectItemObjective(650096, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 13)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
 	}
 
@@ -868,11 +850,11 @@ public class TheHoardKingQuest : QuestScript
 			new KillObjective(1, new[] { MonsterId.Ferret_Loader }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 15)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 15)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 14)); // Recovery Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddReward(new ItemReward(640013, 3)); // Recovery Potion
 		AddReward(new ItemReward(531122, 1)); // Plate Armor
 	}
 
@@ -913,10 +895,10 @@ public class TheZerahaRoadQuest : QuestScript
 			new KillObjective(12, new[] { MonsterId.Ferret_Slinger }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 14)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 14)); // Normal SP Potion
+		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
+		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
 		AddReward(new ItemReward(502207, 1)); // Hasta Plate Gauntlets
 	}
 }

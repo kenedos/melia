@@ -43,11 +43,8 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill forty Caros?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Forty."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Forty."));
 						break;
 
 					case "info":
@@ -102,11 +99,8 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Tipios and bring eight prime feathers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Tail-feathers. Long and stiff."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Tail-feathers. Long and stiff."));
 						break;
 
 					case "info":
@@ -163,11 +157,8 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Tiny Bows and bring five quivers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Smallest quivers, hardest to spot."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Smallest quivers, hardest to spot."));
 						break;
 
 					case "info":
@@ -224,11 +215,8 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty Doyors?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Thirty. They hunt in sixes."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Thirty. They hunt in sixes."));
 						break;
 
 					case "info":
@@ -284,11 +272,8 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Caros and defeat the Upent Lord when he emerges?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("The Caros are his territory's lesser. He defends them."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The Caros are his territory's lesser. He defends them."));
 						break;
 
 					case "info":
@@ -362,11 +347,8 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve each - Caros, Tipios, Doyors?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Standard."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Standard."));
 						break;
 
 					case "info":
@@ -426,10 +408,10 @@ public class FHuevillage583Quest1001 : QuestScript
 			new KillObjective(40, new[] { MonsterId.Caro }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -455,11 +437,11 @@ public class FHuevillage583Quest1002 : QuestScript
 			new CollectItemObjective(650275, 8));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -495,11 +477,11 @@ public class FHuevillage583Quest1003 : QuestScript
 			new CollectItemObjective(650280, 5));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -532,10 +514,10 @@ public class FHuevillage583Quest1004 : QuestScript
 			new KillObjective(30, new[] { MonsterId.Doyor }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(32000));
+		AddReward(new SilverReward(8000));
 		AddReward(new ItemReward(640085, 1));
-		AddReward(new ItemReward(640004, 12));
-		AddReward(new ItemReward(640007, 8));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
 
@@ -561,11 +543,11 @@ public class FHuevillage583Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Upent }));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(45000));
+		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }
 
@@ -594,10 +576,10 @@ public class FHuevillage583Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Doyor }));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(57000));
+		AddReward(new SilverReward(14200));
 		AddReward(new ItemReward(640085, 3));
-		AddReward(new ItemReward(640004, 13));
-		AddReward(new ItemReward(640007, 9));
-		AddReward(new ItemReward(640012, 6));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }

@@ -529,9 +529,9 @@ public class FSiauliaiOutGoblinProblemQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(700, 500));
-		AddReward(new SilverReward(5000));
-		AddReward(new ItemReward(640002, 10)); // HP potions
-		AddReward(new ItemReward(640005, 10)); // SP potions
+		AddReward(new SilverReward(1200));
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 2)); // SP potions
 		AddReward(new ItemReward(601115, 1)); // Iron Bangle
 		AddReward(new ItemReward(640080, 6)); // Lv1 EXP Cards
 	}
@@ -567,9 +567,9 @@ public class FSiauliaiOutAlchemistRemedyQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(800, 400));
-		AddReward(new SilverReward(4000));
-		AddReward(new ItemReward(640002, 8)); // HP potions
-		AddReward(new ItemReward(640005, 8)); // SP potions
+		AddReward(new SilverReward(1000));
+		AddReward(new ItemReward(640002, 2)); // HP potions
+		AddReward(new ItemReward(640005, 2)); // SP potions
 		AddReward(new ItemReward(926009, 1)); // Recipe - Miner Hammer
 		AddReward(new ItemReward(640080, 5)); // Lv1 EXP Cards
 	}
@@ -613,7 +613,7 @@ public class FSiauliaiOutAncientRelicsQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(900, 600));
-		AddReward(new SilverReward(6500));
+		AddReward(new SilverReward(1600));
 		AddReward(new ItemReward(640100, 10)); // Small Recovery potions
 		AddReward(new ItemReward(640080, 6)); // Lv1 EXP Cards
 	}
@@ -665,9 +665,9 @@ public class FSiauliaiOutLostPendantQuest : QuestScript
 
 		// Rewards
 		AddReward(new ExpReward(400, 300));
-		AddReward(new SilverReward(1500));
-		AddReward(new ItemReward(640002, 4)); // HP potions
-		AddReward(new ItemReward(640005, 4)); // SP potions
+		AddReward(new SilverReward(400));
+		AddReward(new ItemReward(640002, 1)); // HP potions
+		AddReward(new ItemReward(640005, 1)); // SP potions
 		AddReward(new ItemReward(101115, 1)); // Old Kaskara
 		AddReward(new ItemReward(640080, 2)); // Lv1 EXP Cards
 	}

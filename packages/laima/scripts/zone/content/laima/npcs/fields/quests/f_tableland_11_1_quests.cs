@@ -44,11 +44,8 @@ public class FTableland111QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twenty-two Red Saltisdaughters?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Twenty-two. They hunt in threes."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Twenty-two. They hunt in threes."));
 						break;
 
 					case "info":
@@ -103,11 +100,8 @@ public class FTableland111QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Green Saltisdaughter Bows and bring six brand-arrows?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Arrowheads only. Leave the shafts."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Arrowheads only. Leave the shafts."));
 						break;
 
 					case "info":
@@ -164,11 +158,8 @@ public class FTableland111QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill fifteen Green Repusbunny Mages and bring five ward-stones?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Green-glowing. Don't touch the core."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Green-glowing. Don't touch the core."));
 						break;
 
 					case "info":
@@ -226,11 +217,8 @@ public class FTableland111QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill thirty White Grolls and bring eight tusks?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Pull the tusks clean. Snapped tusks sell for half."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Pull the tusks clean. Snapped tusks sell for half."));
 						break;
 
 					case "info":
@@ -288,11 +276,8 @@ public class FTableland111QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill ten Red Saltisdaughters and defeat the Champion when she answers?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Ten. She comes fast after."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Ten. She comes fast after."));
 						break;
 
 					case "info":
@@ -366,11 +351,8 @@ public class FTableland111QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (await dialog.YesNo(L("Kill twelve Red Saltisdaughters and twelve White Grolls?")))
-						{
-							character.Quests.Start(questId);
-							await dialog.Msg(L("Standard bounty."));
-						}
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Standard bounty."));
 						break;
 
 					case "info":
@@ -429,10 +411,10 @@ public class FTableland111Quest1001 : QuestScript
 			new KillObjective(22, new[] { MonsterId.Saltisdaughter_Red }));
 
 		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(60000));
+		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
 	}
 }
 
@@ -458,11 +440,11 @@ public class FTableland111Quest1002 : QuestScript
 			new CollectItemObjective(650052, 6));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -498,11 +480,11 @@ public class FTableland111Quest1003 : QuestScript
 			new CollectItemObjective(650065, 5));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -538,11 +520,11 @@ public class FTableland111Quest1004 : QuestScript
 			new CollectItemObjective(650068, 8));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -578,11 +560,11 @@ public class FTableland111Quest1005 : QuestScript
 			new KillObjective(1, new[] { MonsterId.Saltisdaughter_Red }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 15));
-		AddReward(new ItemReward(640007, 15));
-		AddReward(new ItemReward(640013, 14));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
 
@@ -608,10 +590,10 @@ public class FTableland111Quest1006 : QuestScript
 			new KillObjective(12, new[] { MonsterId.Groll_White }));
 
 		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(68000));
+		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 14));
-		AddReward(new ItemReward(640007, 14));
-		AddReward(new ItemReward(640013, 13));
+		AddReward(new ItemReward(640004, 3));
+		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640013, 3));
 	}
 }
