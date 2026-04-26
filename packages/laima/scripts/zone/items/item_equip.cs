@@ -46,7 +46,70 @@ public class ItemEquipScript : GeneralScript
 		// Apply item-specific equip effects
 		this.ApplyEquipEffects(character, item);
 
+		// Grant transform-costume skill if this item is in CostumeTransformDb
+		this.TryGrantCostumeTransformSkill(character, item);
+
 		return ItemEquipResult.Okay;
+	}
+
+	/// <summary>
+	/// If the item is a transform costume, grants the associated skill (e.g.
+	/// "MagicalGirl_MagicalBoyNox") so the player can cast the transform buff.
+	/// No-op for non-transform items or when the skill is already present.
+	/// </summary>
+	private void TryGrantCostumeTransformSkill(Character character, Item item)
+	{
+		if (!CostumeTransformDb.TryFindByBase(item.Data.ClassName, out var xform))
+			return;
+
+		if (!ZoneServer.Instance.Data.SkillDb.TryFind(xform.SkillName, out var skillData))
+		{
+			Log.Warning("Costume '{0}' references unknown skill '{1}'.", item.Data.ClassName, xform.SkillName);
+			return;
+		}
+
+		if (character.Skills.Get(skillData.Id) != null)
+			return;
+
+		var skill = new Skill(character, skillData.Id, 1, true);
+		character.Skills.Add(skill);
+	}
+
+	/// <summary>
+	/// If the item is a transform costume, removes the associated skill — but
+	/// only if no other equipped item still maps to the same skill (the
+	/// male/female variants often share a skill).
+	/// </summary>
+	private void TryRemoveCostumeTransformSkill(Character character, Item item)
+	{
+		if (!CostumeTransformDb.TryFindByBase(item.Data.ClassName, out var xform))
+			return;
+
+		// The transform buff (e.g. "TosRangerFormChange_Red_Buff") isn't caught
+		// by the generic strArg->buff lookup in SCP_ON_UNEQUIP_ITEM because the
+		// item's strArg points at the skill make name, not the buff. Remove it
+		// explicitly here so the character reverts to the base look on unequip.
+		if (ZoneServer.Instance.Data.BuffDb.TryFind(xform.BuffName, out var buffData))
+			character.Buffs.Remove(buffData.Id);
+
+		if (!ZoneServer.Instance.Data.SkillDb.TryFind(xform.SkillName, out var skillData))
+			return;
+
+		// Another equipped costume may share the same skill; if so, keep it.
+		foreach (var equip in character.Inventory.GetEquip().Values)
+		{
+			if (equip == null || equip == item || equip.Data == null)
+				continue;
+
+			if (CostumeTransformDb.TryFindByBase(equip.Data.ClassName, out var other)
+				&& string.Equals(other.SkillName, xform.SkillName, StringComparison.OrdinalIgnoreCase))
+			{
+				return;
+			}
+		}
+
+		if (character.Skills.Get(skillData.Id) != null)
+			character.Skills.Remove(skillData.Id);
 	}
 
 	[ScriptableFunction]
@@ -63,6 +126,9 @@ public class ItemEquipScript : GeneralScript
 
 		// Remove item-specific equip effects
 		this.RemoveEquipEffects(character, item);
+
+		// Revoke transform-costume skill if this item is in CostumeTransformDb
+		this.TryRemoveCostumeTransformSkill(character, item);
 
 		return ItemUnequipResult.Okay;
 	}
