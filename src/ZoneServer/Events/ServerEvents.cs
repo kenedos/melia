@@ -20,42 +20,42 @@ namespace Melia.Zone.Events
 		/// <summary>
 		/// Raised on every heartbeat tick.
 		/// </summary>
-		public readonly Event<TimeEventArgs> WorldTick = new();
+		public Event<TimeEventArgs> WorldTick = new();
 
 		/// <summary>
 		/// Raised every full real-life second.
 		/// </summary>
-		public readonly Event<TimeEventArgs> SecondTick = new();
+		public Event<TimeEventArgs> SecondTick = new();
 
 		/// <summary>
 		/// Raised every full real-life minute.
 		/// </summary>
-		public readonly Event<TimeEventArgs> MinuteTick = new();
+		public Event<TimeEventArgs> MinuteTick = new();
 
 		/// <summary>
 		/// Raised every full five real-life minutes.
 		/// </summary>
-		public readonly Event<TimeEventArgs> FiveMinutesTick = new();
+		public Event<TimeEventArgs> FiveMinutesTick = new();
 
 		/// <summary>
 		/// Raised every full fifteen real-life minutes.
 		/// </summary>
-		public readonly Event<TimeEventArgs> FifteenMinutesTick = new();
+		public Event<TimeEventArgs> FifteenMinutesTick = new();
 
 		/// <summary>
 		/// Raised every full twenty real-life minutes.
 		/// </summary>
-		public readonly Event<TimeEventArgs> TwentyMinutesTick = new();
+		public Event<TimeEventArgs> TwentyMinutesTick = new();
 
 		/// <summary>
 		/// Raised every full thirty real-life minutes.
 		/// </summary>
-		public readonly Event<TimeEventArgs> ThirtyMinutesTick = new();
+		public Event<TimeEventArgs> ThirtyMinutesTick = new();
 
 		/// <summary>
 		/// Raised every full real-life hour.
 		/// </summary>
-		public readonly Event<TimeEventArgs> HourTick = new();
+		public Event<TimeEventArgs> HourTick = new();
 
 		// Player Events
 		//-------------------------------------------------------------------
@@ -70,7 +70,7 @@ namespace Melia.Zone.Events
 		/// modifications to the character, but packets sent to the
 		/// client might not get handled as intended yet.
 		/// </remarks>
-		public readonly Event<PlayerEventArgs> PlayerLoggedIn = new();
+		public Event<PlayerEventArgs> PlayerLoggedIn = new();
 
 		/// <summary>
 		/// Raised after the player's client loaded the map and is ready
@@ -86,7 +86,7 @@ namespace Melia.Zone.Events
 		/// If the packet handling should be stopped after executing this
 		/// event, set CancelHandling on the arguments to true.
 		/// </remarks>
-		public readonly Event<PlayerGameReadyEventArgs> PlayerGameReady = new();
+		public Event<PlayerGameReadyEventArgs> PlayerGameReady = new();
 
 		/// <summary>
 		/// Raised when a player logged in completely.
@@ -97,48 +97,48 @@ namespace Melia.Zone.Events
 		/// around. At this point, the client is expected to be fully
 		/// loaded and ready to receive whatever you throw at it.
 		/// </remarks>
-		public readonly Event<PlayerEventArgs> PlayerReady = new();
+		public Event<PlayerEventArgs> PlayerReady = new();
 
 		/// <summary>
 		/// Raised when a player gains a new job or circle.
 		/// </summary>
-		public readonly Event<PlayerEventArgs> PlayerAdvancedJob = new();
+		public Event<PlayerEventArgs> PlayerAdvancedJob = new();
 
 		/// <summary>
 		/// Raised when a player says something in public chat.
 		/// </summary>
-		public readonly Event<PlayerChatEventArgs> PlayerChat = new();
+		public Event<PlayerChatEventArgs> PlayerChat = new();
 
 		/// <summary>
 		/// Raised when the level of a player's skill changed.
 		/// </summary>
-		public readonly Event<PlayerSkillLevelChangedEventArgs> PlayerSkillLevelChanged = new();
+		public Event<PlayerSkillLevelChangedEventArgs> PlayerSkillLevelChanged = new();
 
 		/// <summary>
 		/// Raised when a player gains new items, such as by picking them up
 		/// or buying them.
 		/// </summary>
-		public readonly Event<PlayerItemEventArgs> PlayerAddedItem = new();
+		public Event<PlayerItemEventArgs> PlayerAddedItem = new();
 
 		/// <summary>
 		/// Raised when a player loses items, such as by destroying or selling them.
 		/// </summary>
-		public readonly Event<PlayerItemEventArgs> PlayerRemovedItem = new();
+		public Event<PlayerItemEventArgs> PlayerRemovedItem = new();
 
 		/// <summary>
 		/// Raised when a dialog message is sent to a player.
 		/// </summary>
-		public readonly Event<PlayerDialogEventArgs> PlayerDialog = new();
+		public Event<PlayerDialogEventArgs> PlayerDialog = new();
 
 		/// <summary>
 		/// Raised when a player leaves a party.
 		/// </summary>
-		public readonly Event<PlayerEventArgs> PlayerLeftParty = new();
+		public Event<PlayerEventArgs> PlayerLeftParty = new();
 
 		/// <summary>
 		/// Raised when a player enters a map.
 		/// </summary>
-		public readonly Event<PlayerEventArgs> PlayerEnteredMap = new();
+		public Event<PlayerEventArgs> PlayerEnteredMap = new();
 
 		/// <summary>
 		/// Raised when a player's client has finished loading the map.
@@ -149,12 +149,12 @@ namespace Melia.Zone.Events
 		/// receive gameplay actions such as dungeon stage starts,
 		/// companion spawns, and other post-load operations.
 		/// </remarks>
-		public readonly Event<PlayerEventArgs> PlayerLoadComplete = new();
+		public Event<PlayerEventArgs> PlayerLoadComplete = new();
 
 		/// <summary>
 		/// Raised when a player leaves a map.
 		/// </summary>
-		public readonly Event<PlayerEventArgs> PlayerLeftMap = new();
+		public Event<PlayerEventArgs> PlayerLeftMap = new();
 
 		// Combat Events
 		//-------------------------------------------------------------------
@@ -162,7 +162,7 @@ namespace Melia.Zone.Events
 		/// <summary>
 		/// Raised when one entity kills another.
 		/// </summary>
-		public readonly Event<CombatEventArgs> EntityKilled = new();
+		public Event<CombatEventArgs> EntityKilled = new();
 
 		// Monster Events
 		//-------------------------------------------------------------------
@@ -170,32 +170,32 @@ namespace Melia.Zone.Events
 		/// <summary>
 		/// Raised when a player uses an item.
 		/// </summary>
-		public readonly Event<PlayerUsedItemEventArgs> PlayerUsedItem = new();
+		public Event<PlayerUsedItemEventArgs> PlayerUsedItem = new();
 
 		/// <summary>
 		/// Raised when a player completes a quest.
 		/// </summary>
-		public readonly Event<PlayerCompletedQuestEventArgs> PlayerCompletedQuest = new();
+		public Event<PlayerCompletedQuestEventArgs> PlayerCompletedQuest = new();
 
 		/// <summary>
 		/// Raised when a player starts a quest.
 		/// </summary>
-		public readonly Event<PlayerStartedQuestEventArgs> PlayerStartedQuest = new();
+		public Event<PlayerStartedQuestEventArgs> PlayerStartedQuest = new();
 
 		/// <summary>
 		/// Raised when a player abandons a quest.
 		/// </summary>
-		public readonly Event<PlayerAbandonedQuestEventArgs> PlayerAbandonedQuest = new();
+		public Event<PlayerAbandonedQuestEventArgs> PlayerAbandonedQuest = new();
 
 		/// <summary>
 		/// Raised when a quest's objectives have all been completed.
 		/// </summary>
-		public readonly Event<PlayerQuestObjectivesCompletedEventArgs> PlayerQuestObjectivesCompleted = new();
+		public Event<PlayerQuestObjectivesCompletedEventArgs> PlayerQuestObjectivesCompleted = new();
 
 		/// <summary>
 		/// Raised when a player's reputation with a faction changes.
 		/// </summary>
-		public readonly Event<ReputationEventArgs> PlayerReputationChanged = new();
+		public Event<ReputationEventArgs> PlayerReputationChanged = new();
 
 		/// <summary>
 		/// Raised when a monster is about to disappear.
@@ -205,6 +205,6 @@ namespace Melia.Zone.Events
 		/// because it died, its summoning time ran out, or it got
 		/// bored of our antics.
 		/// </remarks>
-		public readonly Event<MonsterEventArgs> MonsterDisappears = new();
+		public Event<MonsterEventArgs> MonsterDisappears = new();
 	}
 }
