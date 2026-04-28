@@ -1,11 +1,12 @@
 //--- Melia Script ----------------------------------------------------------
 // Poslinkis Forest Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for Katyn Forest (Poslinkis, high bube warband).
+// Restless ghosts of those who died in Poslinkis Forest.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Actors.Characters;
@@ -16,100 +17,100 @@ using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.Scripting.Dialogues;
 
 public class FKatyn13QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Spearline Kill
+		Npc AddGhostNpc(int model, string name, string map, double x, double z, double direction, DialogFunc dialog)
+		{
+			var npc = AddNpc(model, name, map, x, z, direction, dialog);
+			npc.AddEffect(new ColorEffect(255, 150, 50, 150, 0.01f));
+			return npc;
+		}
+
+		// Quest 1001: Border-ward speared at the treeline
 		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Border-Ward] Mindaugas"), "f_katyn_13", 0, 0, 0, async dialog =>
+		AddGhostNpc(154017, L("[Restless Soul] Border-Ward"), "f_katyn_13", -413, -2306, 225, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_13", 1001);
-
-			dialog.SetTitle(L("Mindaugas"));
+			dialog.SetTitle(L("Border-Ward"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("High Bube spears push the treeline. Kill forty, the warband backs off a week."));
-
-				var response = await dialog.Select(L("Kill?"),
-					Option(L("I'll kill"), "help"),
-					Option(L("Warband?"), "info"),
-					Option(L("Skip"), "leave")
+				await dialog.Msg(L("Spears... Spears in the dark... I never saw them coming..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Forty. Watch the hedge-flanks."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Poslinkis tribe. Spear-caste forward, arrow-caste behind. Same camp."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Treeline keeps pushing."));
-						break;
+					await dialog.Msg(L("Treeline patrol... Hedgerow flank... High Bube Spears... From the bracken... So fast..."));
+					await dialog.Msg(L("Three of them... All at once... I fell where I stand..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will avenge you"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Forty... Forty Spears... So no other ward... Falls in the bracken...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Forty... Forty Spears... So no other ward... Falls in the bracken..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killSpears", out var killObj)) return;
-
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("Treeline holds."));
+					await dialog.Msg(L("The treeline... Quiet at last... Take this... A ward's purse..."));
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Keep killing."));
-				}
+				else await dialog.Msg(L("More Spears... I can still hear them... In the bracken..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Warband's limping. A week, maybe ten days."));
+				await dialog.Msg(L("Quiet... So quiet... Thank you... Thank you..."));
 			}
 		});
 
-		// Quest 2: Arrow-Caste Fletching
+		// Quest 1002: Forester ghost killed by Archers
 		//-------------------------------------------------------------------------
-		AddNpc(147473, L("[Forester] Ruta"), "f_katyn_13", 800, 500, 0, async dialog =>
+		AddGhostNpc(155131, L("[Restless Soul] Pierced Forester"), "f_katyn_13", 1417, -826, 225, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_13", 1002);
-
-			dialog.SetTitle(L("Ruta"));
+			dialog.SetTitle(L("Pierced Forester"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("High Bube Archers fletch with a pitch we can't match. Kill thirty, bring eight fletchings."));
-
-				var response = await dialog.Select(L("Fletchings?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Pitch?"), "info"),
-					Option(L("Skip"), "leave")
+				await dialog.Msg(L("Arrows... Arrows in the rain... The pitch held the feathers..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Pitch side up. Don't smudge."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Resin-and-ash. Holds the feather through rain. Our foresters want the recipe."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Recipe stays theirs."));
-						break;
+					await dialog.Msg(L("I tracked the Archer-caste... To learn their pitch-recipe... Resin and ash... For our stillroom..."));
+					await dialog.Msg(L("They saw me first... Eight arrows... All eight held in the wet..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will get the recipe"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Thirty Archers... Eight fletchings... So our stillroom... Has the recipe at last...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Thirty Archers... Eight fletchings... So our stillroom... Has the recipe at last..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
@@ -117,57 +118,52 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killArchers", out var killObj)) return;
 				if (!quest.TryGetProgress("gatherFletchings", out var fObj)) return;
-
 				if (killObj.Done && fObj.Done)
 				{
-					await dialog.Msg(L("Eight fletchings. Pitch sample to the stillroom."));
+					await dialog.Msg(L("Eight pitch-fletchings... The stillroom will crack the recipe... My work was not wasted..."));
+					await dialog.Msg(L("Take this... Forester's purse... Damp from the rain... Honest..."));
 					character.Inventory.Remove(650239, character.Inventory.CountItem(650239), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Keep hunting."));
-				}
+				else await dialog.Msg(L("More Archers... More fletchings... The pitch must hold..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Stillroom cracked the pitch. Our arrows hold now."));
+				await dialog.Msg(L("The stillroom... I can almost smell the resin from here... Almost..."));
 			}
 		});
 
-		// Quest 3: Pokubu Green-Tongues
+		// Quest 1003: Herbwife ghost dead in butterfly bush
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Herbwife] Aldona-IV"), "f_katyn_13", -500, 500, 0, async dialog =>
+		AddGhostNpc(155132, L("[Restless Soul] Poisoned Herbwife"), "f_katyn_13", -1102, 2448, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_13", 1003);
-
-			dialog.SetTitle(L("Aldona"));
+			dialog.SetTitle(L("Poisoned Herbwife"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Arburn Pokubu Greens chew a root that swells their tongues green. Kill twenty-five, bring six tongues."));
-
-				var response = await dialog.Select(L("Tongues?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Root?"), "info"),
-					Option(L("Skip"), "leave")
+				await dialog.Msg(L("This bush... I died in this bush... The butterflies came after... So many butterflies..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Wrap in oiled cloth. Tongues dry to dust fast."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Root's a swamp-ivy, poison to us but the pokubu thrives. Tongue tells me the dose."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Dose stays guess."));
-						break;
+					await dialog.Msg(L("I followed a Pokubu Green... To study its tongue... For my salve... For the dose..."));
+					await dialog.Msg(L("It turned... It turned and bit me... My own tongue swelled green... I crawled into this bush... I never crawled out..."));
+					await dialog.Msg(L("The butterflies... They settle on me... They have settled on me for years..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will finish your salve"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Twenty-five Pokubu... Six tongues... Wrap them in oiled cloth... So my salve... Reaches the village...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Twenty-five Pokubu... Six tongues... Wrap them in oiled cloth... So my salve... Reaches the village..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
@@ -175,113 +171,51 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killPokubu", out var killObj)) return;
 				if (!quest.TryGetProgress("gatherTongues", out var tObj)) return;
-
 				if (killObj.Done && tObj.Done)
 				{
-					await dialog.Msg(L("Six tongues. I'll have a salve by week-end."));
+					await dialog.Msg(L("Six green tongues... The salve will reach the village... My work... My work finishes..."));
+					await dialog.Msg(L("Take this herbwife's purse... The butterflies will follow you out... I do not need them anymore..."));
 					character.Inventory.Remove(650241, character.Inventory.CountItem(650241), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Keep hunting."));
-				}
+				else await dialog.Msg(L("More tongues... Six tongues... For the salve..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Salve cures a swamp-ivy sting in an hour."));
+				await dialog.Msg(L("The butterflies are leaving... So am I... So am I..."));
 			}
 		});
 
-		// Quest 4: Crystal Line
+		// Quest 1005: Cemetery ghost — Fallen Statue boss bounty
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Crystal-Warder] Jurga"), "f_katyn_13", -1100, 100, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_katyn_13", 1004);
-
-			dialog.SetTitle(L("Jurga"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Poslinkis Rootcrystals line the old border. Break fifteen, they won't hum a warning to the warband."));
-
-				var response = await dialog.Select(L("Break?"),
-					Option(L("I'll break"), "help"),
-					Option(L("Warning?"), "info"),
-					Option(L("Skip"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Fifteen. Work quiet."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Warband planted them as a tripwire. Crystal hums, scouts come running."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Tripwire hums on."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("breakCrystals", out var killObj)) return;
-
-				if (killObj.Done)
-				{
-					await dialog.Msg(L("Line's dead."));
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Keep breaking."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Scouts don't come running anymore."));
-			}
-		});
-
-		// Quest 5: The Fallen Statue
-		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Tadas"), "f_katyn_13", 1800, -300, 0, async dialog =>
+		AddGhostNpc(154017, L("[Restless Soul] Cemetery Hunter"), "f_katyn_13", 766, 1011, 89, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_13", 1005);
-
-			dialog.SetTitle(L("Tadas"));
+			dialog.SetTitle(L("Cemetery Hunter"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("A Fallen Statue woke in the old shrine. Kill ten Bushspiders guarding the approach, then end it."));
-
-				var response = await dialog.Select(L("Statue?"),
-					Option(L("I'll face it"), "help"),
-					Option(L("Woke?"), "info"),
-					Option(L("Skip"), "leave")
+				await dialog.Msg(L("Graves... Graves in front of me... My grave is among them... I do not know which..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Ten."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Shrine was Poslinkis before the tribe. Something in the stone remembers."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Stone keeps waking."));
-						break;
+					await dialog.Msg(L("Bounty hunter... I tracked a Fallen Statue to the old shrine... The stone remembered me... It always remembers..."));
+					await dialog.Msg(L("Bushspiders at the approach... Then the Statue rose... I fell at its feet... They buried me here... With the others... With the others..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will end the Statue"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Ten Bushspiders first... Then the Statue rises... End it... End it... So I may know which grave is mine...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Ten Bushspiders first... Then the Statue rises... End it... End it... So I may know which grave is mine..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
@@ -289,83 +223,19 @@ public class FKatyn13QuestNpcsScript : GeneralScript
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killSpiders", out var pObj)) return;
 				if (!quest.TryGetProgress("killStatue", out var sObj)) return;
-
 				if (sObj.Done)
 				{
-					await dialog.Msg(L("Shrine's still."));
+					await dialog.Msg(L("The Statue is broken... I can see my grave now... The third from the gate... The third from the gate..."));
+					await dialog.Msg(L("Take this purse... I will lay myself in my own grave at last..."));
 					character.Inventory.Remove(650243, character.Inventory.CountItem(650243), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
-				else if (pObj.Done)
-				{
-					await dialog.Msg(L("It rises! Find it and end it."));
-				}
-				else
-				{
-					await dialog.Msg(L("Ten first. Bring back a shrine-fragment."));
-				}
+				else if (pObj.Done) await dialog.Msg(L("It rises... It rises... Find it... End it..."));
+				else await dialog.Msg(L("Bushspiders first... Bring back a shrine-fragment..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Shrine's quiet. Stone forgot again."));
-			}
-		});
-
-		// Quest 6: Poslinkis Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Militia-Captain] Kestutis"), "f_katyn_13", 1700, 1000, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_katyn_13", 1006);
-
-			dialog.SetTitle(L("Kestutis"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Forest sweep. Twelve Spears, twelve Archers, twelve Pokubu Greens."));
-
-				var response = await dialog.Select(L("Sweep?"),
-					Option(L("I'll do it"), "help"),
-					Option(L("Pay?"), "info"),
-					Option(L("Skip"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Thirty-six."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Fair."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Forest stays loud."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killSpears", out var spObj)) return;
-				if (!quest.TryGetProgress("killArchers", out var arObj)) return;
-				if (!quest.TryGetProgress("killPokubu", out var poObj)) return;
-
-				if (spObj.Done && arObj.Done && poObj.Done)
-				{
-					await dialog.Msg(L("Done."));
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Keep going."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Militia patrols the treeline now."));
+				await dialog.Msg(L("My grave... I know it now... I will rest..."));
 			}
 		});
 	}
@@ -380,15 +250,15 @@ public class FKatyn13Quest1001 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_13", 1001);
-		SetName(L("Spearline Kill"));
+		SetName(L("The Border-Ward's Spears"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill High Bube Spears pushing the Katyn treeline."));
+		SetDescription(L("A speared border-ward's ghost begs for the High Bube Spears that killed him to be put down."));
 		SetLocation("f_katyn_13");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Border-Ward] Mindaugas"), "f_katyn_13");
+		AddQuestGiver(L("[Restless Soul] Border-Ward"), "f_katyn_13");
 
 		AddObjective("killSpears", L("Kill High Bube Spears"),
 			new KillObjective(40, new[] { MonsterId.HighBube_Spear }));
@@ -406,15 +276,15 @@ public class FKatyn13Quest1002 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_13", 1002);
-		SetName(L("Arrow-Caste Fletchings"));
+		SetName(L("The Pierced Forester"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill High Bube Archers and bring pitch-fletchings for the stillroom."));
+		SetDescription(L("A forester's ghost begs for the High Bube Archers' pitch-fletchings to finish his stillroom work."));
 		SetLocation("f_katyn_13");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Forester] Ruta"), "f_katyn_13");
+		AddQuestGiver(L("[Restless Soul] Pierced Forester"), "f_katyn_13");
 
 		AddObjective("killArchers", L("Kill High Bube Archers"),
 			new KillObjective(30, new[] { MonsterId.HighBube_Archer }));
@@ -428,6 +298,8 @@ public class FKatyn13Quest1002 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650239, 0.40f, MonsterId.HighBube_Archer);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -446,15 +318,15 @@ public class FKatyn13Quest1003 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_13", 1003);
-		SetName(L("Pokubu Green-Tongues"));
+		SetName(L("The Poisoned Herbwife"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Arburn Pokubu Greens and bring green tongues for the herbwife."));
+		SetDescription(L("An herbwife's ghost in a butterfly bush begs for six Pokubu Green tongues so her unfinished salve may reach the village."));
 		SetLocation("f_katyn_13");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Herbwife] Aldona"), "f_katyn_13");
+		AddQuestGiver(L("[Restless Soul] Poisoned Herbwife"), "f_katyn_13");
 
 		AddObjective("killPokubu", L("Kill Arburn Pokubu Greens"),
 			new KillObjective(25, new[] { MonsterId.Arburn_Pokubu_Green }));
@@ -468,6 +340,8 @@ public class FKatyn13Quest1003 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650241, 0.45f, MonsterId.Arburn_Pokubu_Green);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -481,48 +355,22 @@ public class FKatyn13Quest1003 : QuestScript
 	}
 }
 
-public class FKatyn13Quest1004 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_katyn_13", 1004);
-		SetName(L("Crystal Tripwire"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Break Poslinkis Rootcrystals to silence the warband's tripwire line."));
-		SetLocation("f_katyn_13");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Crystal-Warder] Jurga"), "f_katyn_13");
-
-		AddObjective("breakCrystals", L("Break Poslinkis Rootcrystals"),
-			new KillObjective(15, new[] { MonsterId.Rootcrystal_02 }));
-
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-	}
-}
-
 public class FKatyn13Quest1005 : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_katyn_13", 1005);
-		SetName(L("The Fallen Statue"));
+		SetName(L("The Cemetery Hunter"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Bushspiders at the shrine approach and bring a shrine-fragment, then defeat the Fallen Statue when it rises."));
+		SetDescription(L("A bounty hunter's ghost in the cemetery begs for the Fallen Statue that killed him to be ended at last."));
 		SetLocation("f_katyn_13");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.Sequential);
-		AddQuestGiver(L("[Bounty Hunter] Tadas"), "f_katyn_13");
+		AddQuestGiver(L("[Restless Soul] Cemetery Hunter"), "f_katyn_13");
 
-		AddObjective("killSpiders", L("Kill Bushspiders and gather a shrine-fragment"),
+		AddObjective("killSpiders", L("Kill Bushspiders at the shrine approach"),
 			new KillObjective(10, new[] { MonsterId.Bushspider }));
 
 		AddObjective("killStatue", L("Defeat the Fallen Statue"),
@@ -548,38 +396,5 @@ public class FKatyn13Quest1005 : QuestScript
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650243, character.Inventory.CountItem(650243), InventoryItemRemoveMsg.Destroyed);
-	}
-}
-
-public class FKatyn13Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_katyn_13", 1006);
-		SetName(L("Poslinkis Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of High Bube Spears, High Bube Archers, and Arburn Pokubu Greens."));
-		SetLocation("f_katyn_13");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Militia-Captain] Kestutis"), "f_katyn_13");
-
-		AddObjective("killSpears", L("Kill High Bube Spears"),
-			new KillObjective(12, new[] { MonsterId.HighBube_Spear }));
-
-		AddObjective("killArchers", L("Kill High Bube Archers"),
-			new KillObjective(12, new[] { MonsterId.HighBube_Archer }));
-
-		AddObjective("killPokubu", L("Kill Arburn Pokubu Greens"),
-			new KillObjective(12, new[] { MonsterId.Arburn_Pokubu_Green }));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
 	}
 }

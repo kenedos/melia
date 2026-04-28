@@ -23,7 +23,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Lemuria Swarm
 		//-------------------------------------------------------------------------
-		AddNpc(20127, L("[Enceinte Warden] Oswin"), "f_flash_64", -570, 1370, 180, async dialog =>
+		AddNpc(20127, L("[Enceinte Warden] Oswin"), "f_flash_64", -579, 1498, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_64", 1001);
@@ -84,7 +84,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 		// Quest 2: Enceinte Wardstone Cores
 		//-------------------------------------------------------------------------
-		AddNpc(147410, L("[Wall-Warden] Petra"), "f_flash_64", 100, 800, 90, async dialog =>
+		AddNpc(147410, L("[Wall-Warden] Petra"), "f_flash_64", -31, 325, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_64", 1002);
@@ -147,7 +147,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 		// Quest 3: The Bunny Nests
 		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Warren-Inspector] Tobi"), "f_flash_64", 500, 200, 0, async dialog =>
+		AddNpc(20117, L("[Warren-Inspector] Tobi"), "f_flash_64", 556, 341, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_64", 1003);
@@ -216,73 +216,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Citizen Token Points
-		//-------------------------------------------------------------------------
-		void AddBurrowNest(int tokenNum, int x, int z, int direction)
-		{
-			AddNpc(12080, L("Curse-Warm Burrow"), "f_flash_64", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_flash_64", 1003);
-				var variableKey = $"Laima.Quests.f_flash_64.Quest1003.Token{tokenNum}";
-				var spawnedKey = $"Laima.Quests.f_flash_64.Quest1003.Token{tokenNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A burrow dug under a statued citizen, padded with nesting fur.*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already pulled this burrow's token*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Rubabos, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}Rubabos burst from the burrow, defending the nest!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Pulling citizen token from nesting fur..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650455, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Citizen Token"));
-
-					var currentCount = character.Inventory.CountItem(650455);
-					character.ServerMessage(LF("Tokens recovered: {0}/4", currentCount));
-
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All four tokens recovered! Return to Tobi.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You paused. Try again."));
-				}
-			});
-		}
-
-		AddBurrowNest(1, 300, 400, 0);
-		AddBurrowNest(2, -400, 500, 0);
-		AddBurrowNest(3, 700, -200, 0);
-		AddBurrowNest(4, -600, -300, 0);
-
 		// Quest 4: The Saltisdaughter Archers
 		//-------------------------------------------------------------------------
-		AddNpc(20142, L("[Curse-Warden] Alek"), "f_flash_64", 200, -500, 270, async dialog =>
+		AddNpc(20142, L("[Curse-Warden] Alek"), "f_flash_64", 242, -1188, 89, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_64", 1004);
@@ -353,7 +289,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Stone-Mother
 		//-------------------------------------------------------------------------
-		AddNpc(147473, L("[Bounty Hunter] Lira"), "f_flash_64", 900, -400, 270, async dialog =>
+		AddNpc(147473, L("[Bounty Hunter] Lira"), "f_flash_64", -150, 281, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_64", 1005);
@@ -437,7 +373,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 		// Quest 6: The Enceinte Wall Walk
 		//-------------------------------------------------------------------------
-		AddNpc(20018, L("[Wall Captain] Ember"), "f_flash_64", -700, -200, 45, async dialog =>
+		AddNpc(20018, L("[Wall Captain] Ember"), "f_flash_64", -116, 2084, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_64", 1006);
@@ -561,6 +497,8 @@ public class EnceinteWardstoneCoresQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650253, 0.40f, MonsterId.Lemuria);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -602,28 +540,18 @@ public class TheBunnyNestsQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650455, 0.40f, MonsterId.Rubabos);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650455, character.Inventory.CountItem(650455), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_64.Quest1003.Token{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_64.Quest1003.Token{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650455, character.Inventory.CountItem(650455), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_64.Quest1003.Token{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_64.Quest1003.Token{i}.Spawned");
-		}
 	}
 }
 
@@ -655,6 +583,8 @@ public class TheSaltisdaughterArchersQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650760, 0.50f, MonsterId.Saltisdaughter_Bow);
 	}
 
 	public override void OnComplete(Character character, Quest quest)

@@ -26,14 +26,14 @@ public class FGele574QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// QUEST 1001: The Garden's Dead Walk
 		// =====================================================================
-		// Chapel-Warden Tadas - Rodelin undead wandering from the crypts
+		// Chapel-Warden Vincas - Rodelin undead wandering from the crypts
 		//---------------------------------------------------------------------
-		AddNpc(20109, L("[Chapel-Warden] Tadas"), "f_gele_57_4", 340, 600, 90, async dialog =>
+		AddNpc(20109, L("[Chapel-Warden] Vincas"), "f_gele_57_4", 317, 867, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_4", 1001);
 
-			dialog.SetTitle(L("Tadas"));
+			dialog.SetTitle(L("Vincas"));
 
 			if (!character.Quests.Has(questId))
 			{
@@ -92,14 +92,14 @@ public class FGele574QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// QUEST 1002: The Reliquary-List
 		// =====================================================================
-		// Steward Mindaugas - Ridge-Watch needs the list of lost relics
+		// Steward Algis - Ridge-Watch needs the list of lost relics
 		//---------------------------------------------------------------------
-		AddNpc(20107, L("[Chapel-Steward] Mindaugas"), "f_gele_57_4", 1270, 2100, 270, async dialog =>
+		AddNpc(20107, L("[Chapel-Steward] Algis"), "f_gele_57_4", 1210, 2016, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_4", 1002);
 
-			dialog.SetTitle(L("Mindaugas"));
+			dialog.SetTitle(L("Algis"));
 
 			if (!character.Quests.Has(questId))
 			{
@@ -158,7 +158,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// RIDGE-WATCH EMILIS (Quest 1002 recipient)
 		// =====================================================================
-		AddNpc(20117, L("[Ridge-Watch] Emilis"), "f_gele_57_4", -890, 2440, 180, async dialog =>
+		AddNpc(20117, L("[Ridge-Watch] Emilis"), "f_gele_57_4", -949, 2207, 89, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_4", 1002);
@@ -171,18 +171,18 @@ public class FGele574QuestNpcsScript : GeneralScript
 				if (!delivered)
 				{
 					await dialog.Msg(L("{#666666}*A wind-weathered watchman breaks the chapel wax with his thumbnail and unrolls the list against his knee*{/}"));
-					await dialog.Msg(L("Mindaugas still writes like a clerk. Good. Let me see..."));
+					await dialog.Msg(L("Algis still writes like a clerk. Good. Let me see..."));
 					await dialog.Msg(L("{#666666}*He scans the entries, marking four with a quick tick and three with a circle*{/}"));
 					await dialog.Msg(L("Four matched on my shelf. Three passed through last week bound for Fedimian - I'll send a rider. The remaining ten are out in the wind."));
 					await dialog.Msg(L("{#666666}*He re-rolls the list, adds a short note, seals it with ridge-pitch instead of wax*{/}"));
-					await dialog.Msg(L("Pitch seal for the return. Chapel wax won't hold in the cold passes. Mindaugas will know the mark."));
+					await dialog.Msg(L("Pitch seal for the return. Chapel wax won't hold in the cold passes. Algis will know the mark."));
 
 					character.Variables.Perm.Set("Laima.Quests.f_gele_57_4.Quest1002.Delivered", 1);
-					character.ServerMessage(L("{#FFD700}Emilis's reply received. Return to Chapel-Steward Mindaugas.{/}"));
+					character.ServerMessage(L("{#FFD700}Emilis's reply received. Return to Chapel-Steward Algis.{/}"));
 				}
 				else
 				{
-					await dialog.Msg(L("Carry the pitch-sealed reply back to Mindaugas. He'll recognize the mark."));
+					await dialog.Msg(L("Carry the pitch-sealed reply back to Algis. He'll recognize the mark."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
@@ -201,7 +201,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Caretaker Neringa - Saving Seedmia saplings before the rot reaches them
 		//---------------------------------------------------------------------
-		AddNpc(20017, L("[Garden-Caretaker] Neringa"), "f_gele_57_4", -540, 1100, 45, async dialog =>
+		AddNpc(20017, L("[Garden-Caretaker] Neringa"), "f_gele_57_4", -1102, 679, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_4", 1003);
@@ -264,82 +264,11 @@ public class FGele574QuestNpcsScript : GeneralScript
 		});
 
 		// =====================================================================
-		// SEEDMIA SAPLING SPOTS
-		// =====================================================================
-		// For Quest 1003 - Seedmia Saplings
-		// =====================================================================
-
-		void AddSaplingSpot(int spotNumber, int x, int z, int direction)
-		{
-			AddNpc(47247, L("Seedmia Sapling"), "f_gele_57_4", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_gele_57_4", 1003);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A small Seedmia root-form sits quiet in the soil. She has not been marked for transplant*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_gele_57_4.Quest1003.Spot{spotNumber}";
-				var gathered = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (gathered)
-				{
-					await dialog.Msg(L("{#666666}*This sapling has already been lifted. A small hollow remains in the soil where she rooted*{/}"));
-					return;
-				}
-
-				var spawnedKey = $"Laima.Quests.f_gele_57_4.Quest1003.Spot{spotNumber}.Spawned";
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 15)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Npanto_Archer, 1, 70, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}A Panto Archer breaks cover - the sapling stirs of her own accord!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Lifting from the base..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(4));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650720, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-
-					var currentCount = character.Inventory.CountItem(650720);
-					character.ServerMessage(LF("Seedmia saplings gathered: {0}/8", currentCount));
-
-					if (currentCount >= 8)
-					{
-						character.ServerMessage(L("{#FFD700}All saplings gathered! Return to Garden-Caretaker Neringa.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("Gathering interrupted."));
-				}
-			});
-		}
-
-		AddSaplingSpot(1, -2175, 4, 0);
-		AddSaplingSpot(2, -2078, -218, 90);
-		AddSaplingSpot(3, -448, 593, 180);
-		AddSaplingSpot(4, -265, 604, 270);
-		AddSaplingSpot(5, -207, 471, 0);
-		AddSaplingSpot(6, -545, 1146, 90);
-		AddSaplingSpot(7, -590, 1062, 180);
-		AddSaplingSpot(8, -200, -845, 270);
-
-		// =====================================================================
 		// QUEST 1004: Which Graves Were Touched
 		// =====================================================================
 		// Memorial-Keeper Ieva - Tracing which plots were disturbed first
 		//---------------------------------------------------------------------
-		AddNpc(20151, L("[Memorial-Keeper] Ieva"), "f_gele_57_4", -430, 2100, 0, async dialog =>
+		AddNpc(20151, L("[Memorial-Keeper] Ieva"), "f_gele_57_4", -489, 1995, 180, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_gele_57_4", 1004);
@@ -475,14 +404,14 @@ public class TheGardensDeadWalkQuest : QuestScript
 		SetId("f_gele_57_4", 1001);
 		SetName("The Garden's Dead Walk");
 		SetType(QuestType.Sub);
-		SetDescription("Chapel-Warden Tadas needs eighteen Rodelin undead put back to rest before the chapel memorial paths become unwalkable.");
+		SetDescription("Chapel-Warden Vincas needs eighteen Rodelin undead put back to rest before the chapel memorial paths become unwalkable.");
 		SetLocation("f_gele_57_4");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Chapel-Warden] Tadas", "f_gele_57_4");
+		AddQuestGiver("[Chapel-Warden] Vincas", "f_gele_57_4");
 
 		AddObjective("killRodelin", "Defeat Rodelin undead",
 			new KillObjective(18, new[] { MonsterId.Zombiegirl2_Brown }));
@@ -506,14 +435,14 @@ public class TheReliquaryListQuest : QuestScript
 		SetId("f_gele_57_4", 1002);
 		SetName("The Reliquary-List");
 		SetType(QuestType.Sub);
-		SetDescription("Chapel-Steward Mindaugas's list of missing reliquaries must reach Ridge-Watch Emilis at the Akmens Ridge warp.");
+		SetDescription("Chapel-Steward Algis's list of missing reliquaries must reach Ridge-Watch Emilis at the Akmens Ridge warp.");
 		SetLocation("f_gele_57_4");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Chapel-Steward] Mindaugas", "f_gele_57_4");
+		AddQuestGiver("[Chapel-Steward] Algis", "f_gele_57_4");
 
 		AddObjective("deliverList", "Deliver the list to Emilis and return",
 			new VariableCheckObjective("Laima.Quests.f_gele_57_4.Quest1002.Delivered", 1, true));
@@ -564,6 +493,8 @@ public class SeedmiaSaplingsQuest : QuestScript
 		AddReward(new ItemReward(640003, 3));  // Normal HP Potion
 		AddReward(new ItemReward(640006, 2));  // Normal SP Potion
 		AddReward(new ItemReward(640011, 1));  // Recovery Potion
+
+		AddDrop(650720, 0.50f, MonsterId.Seedmia);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -571,12 +502,6 @@ public class SeedmiaSaplingsQuest : QuestScript
 		character.Inventory.Remove(650720,
 			character.Inventory.CountItem(650720),
 			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_gele_57_4.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_gele_57_4.Quest1003.Spot{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
@@ -584,12 +509,6 @@ public class SeedmiaSaplingsQuest : QuestScript
 		character.Inventory.Remove(650720,
 			character.Inventory.CountItem(650720),
 			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_gele_57_4.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_gele_57_4.Quest1003.Spot{i}.Spawned");
-		}
 	}
 }
 

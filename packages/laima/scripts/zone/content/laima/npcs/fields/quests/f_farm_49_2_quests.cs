@@ -26,7 +26,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Andrius - Orange Stumpy Trees invading tomato fields
 		//---------------------------------------------------------------------
-		AddNpc(20138, L("[Farmer] Andrius"), "f_farm_49_2", 1601, -1158, 180, async dialog =>
+		AddNpc(20138, L("[Farmer] Andrius"), "f_farm_49_2", 913, -1332, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1001);
@@ -91,14 +91,14 @@ public class FFarm492QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// QUEST 1002: Jonas's Reply
 		// =====================================================================
-		// Farmer Jonas-the-Elder - Tomato season reply for Morta
+		// Farmer Jonas - Tomato season reply for Morta
 		//---------------------------------------------------------------------
-		AddNpc(20117, L("[Farmer] Jonas-the-Elder"), "f_farm_49_2", 407, 466, 0, async dialog =>
+		AddNpc(20117, L("[Farmer] Jonas"), "f_farm_49_2", 593, 492, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1002);
 
-			dialog.SetTitle(L("Jonas-the-Elder"));
+			dialog.SetTitle(L("Jonas"));
 
 			if (!character.Quests.Has(questId))
 			{
@@ -181,29 +181,29 @@ public class FFarm492QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("{#666666}*He weighs the envelope, impressed*{/}"));
-			await dialog.Msg(L("Vine-seal. That's Jonas-the-Elder's mark, sure enough. Heavy envelope, too - must be a proper season forecast."));
+			await dialog.Msg(L("Vine-seal. That's Jonas's mark, sure enough. Heavy envelope, too - must be a proper season forecast."));
 			await dialog.Msg(L("Tell Jonas I'll deliver it first thing. And tell him I'll add my own news - the Baron Allerno steward's health, the weather from the thorn fields. Morta appreciates the full picture."));
 
 			character.Variables.Perm.Set("Laima.Quests.f_farm_49_2.Quest1002.Delivered", 1);
-			character.ServerMessage(L("{#FFD700}Letter delivered. Return to Jonas-the-Elder.{/}"));
+			character.ServerMessage(L("{#FFD700}Letter delivered. Return to Jonas.{/}"));
 		});
 
 		// =====================================================================
 		// QUEST 1003: Cyst Sap Vials
 		// =====================================================================
-		// Farmer Ruta - Apothecary-farmer distilling anti-pollen poultices
+		// Farmer Janina - Apothecary-farmer distilling anti-pollen poultices
 		//---------------------------------------------------------------------
-		AddNpc(157100, L("[Farmer] Ruta"), "f_farm_49_2", 379, -568, 90, async dialog =>
+		AddNpc(157100, L("[Farmer] Janina"), "f_farm_49_2", 298, -582, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1003);
 
-			dialog.SetTitle(L("Ruta"));
+			dialog.SetTitle(L("Janina"));
 
 			if (!character.Quests.Has(questId))
 			{
 				await dialog.Msg(L("{#666666}*A farmer with ink-stained fingertips labels tiny glass vials in careful rows*{/}"));
-				await dialog.Msg(L("Eglė stitches masks at Myrkiti. I distill what goes between the stitches. Cyst sap, boiled down with river-oil, makes a poultice that stops pollen burn in its tracks."));
+				await dialog.Msg(L("Goda stitches masks at Myrkiti. I distill what goes between the stitches. Cyst sap, boiled down with river-oil, makes a poultice that stops pollen burn in its tracks."));
 
 				var response = await dialog.Select(L("The Cysts grow on old trees - big, round, pulsing. They don't move; they can't. But they wake up angry when you tap them. I need five clean sap vials. Tap, fill, step back, next."),
 					Option(L("I'll gather five vials"), "help"),
@@ -306,7 +306,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 
 					if (currentCount >= 5)
 					{
-						character.ServerMessage(L("{#FFD700}All vials filled! Return to Farmer Ruta.{/}"));
+						character.ServerMessage(L("{#FFD700}All vials filled! Return to Farmer Janina.{/}"));
 					}
 				}
 				else
@@ -327,7 +327,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Vytis - Mapping the apex creature's territory
 		//---------------------------------------------------------------------
-		AddNpc(20118, L("[Farmer] Vytis"), "f_farm_49_2", 670, -2144, 0, async dialog =>
+		AddNpc(20118, L("[Farmer] Vytis"), "f_farm_49_2", -240, -1063, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1004);
@@ -461,7 +461,7 @@ public class WalkingStumpsQuest : QuestScript
 		SetId("f_farm_49_2", 1001);
 		SetName("Walking Stumps");
 		SetType(QuestType.Sub);
-		SetDescription("Farmer Andrius needs the Orange Stumpy Trees killed before they walk out of the forest and destroy Jonas-the-Elder's tomato crop.");
+		SetDescription("Farmer Andrius needs the Orange Stumpy Trees killed before they walk out of the forest and destroy Jonas's tomato crop.");
 		SetLocation("f_farm_49_2");
 		SetAutoTracked(true);
 
@@ -493,14 +493,14 @@ public class JonassReplyQuest : QuestScript
 		SetId("f_farm_49_2", 1002);
 		SetName("Jonas's Reply");
 		SetType(QuestType.Sub);
-		SetDescription("Jonas-the-Elder's reply to Morta needs to reach Courier Benas before he leaves for Myrkiti at dawn.");
+		SetDescription("Jonas's reply to Morta needs to reach Courier Benas before he leaves for Myrkiti at dawn.");
 		SetLocation("f_farm_49_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Farmer] Jonas-the-Elder", "f_farm_49_2");
+		AddQuestGiver("[Farmer] Jonas", "f_farm_49_2");
 
 		AddObjective("deliverReply", "Deliver Jonas's reply to Courier Benas",
 			new VariableCheckObjective("Laima.Quests.f_farm_49_2.Quest1002.Delivered", 1, true));
@@ -533,14 +533,14 @@ public class CystSapVialsQuest : QuestScript
 		SetId("f_farm_49_2", 1003);
 		SetName("Cyst Sap Vials");
 		SetType(QuestType.Sub);
-		SetDescription("Farmer Ruta needs five vials of Cyst sap to distill anti-pollen poultices for the masks at Myrkiti and Shaton.");
+		SetDescription("Farmer Janina needs five vials of Cyst sap to distill anti-pollen poultices for the masks at Myrkiti and Shaton.");
 		SetLocation("f_farm_49_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Farmer] Ruta", "f_farm_49_2");
+		AddQuestGiver("[Farmer] Janina", "f_farm_49_2");
 
 		AddObjective("collectSap", "Tap Cyst growths for sap vials",
 			new CollectItemObjective(650801, 5));

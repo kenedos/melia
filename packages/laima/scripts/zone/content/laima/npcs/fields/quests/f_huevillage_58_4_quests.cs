@@ -23,7 +23,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Carcashu Shellfall
 		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Glen-Ward] Saulius"), "f_huevillage_58_4", 0, 0, 0, async dialog =>
+		AddNpc(20060, L("[Glen-Ward] Saulius"), "f_huevillage_58_4", -78, -129, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_4", 1001);
@@ -79,7 +79,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Quest 2: Beeteros Wings
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Apothecary] Milda"), "f_huevillage_58_4", 100, -700, 0, async dialog =>
+		AddNpc(20114, L("[Apothecary] Milda"), "f_huevillage_58_4", -9, -705, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_4", 1002);
@@ -137,7 +137,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Quest 3: Mentiwood Sap
 		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Carpenter] Zigmas"), "f_huevillage_58_4", 500, -200, 0, async dialog =>
+		AddNpc(20117, L("[Carpenter] Zigmas"), "f_huevillage_58_4", 1219, -565, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_4", 1003);
@@ -195,7 +195,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Quest 4: Tiny Mage Reagents
 		//-------------------------------------------------------------------------
-		AddNpc(20116, L("[Mage-Tutor] Gerda"), "f_huevillage_58_4", -800, -400, 0, async dialog =>
+		AddNpc(20116, L("[Mage-Tutor] Gerda"), "f_huevillage_58_4", -1086, -660, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_4", 1004);
@@ -253,7 +253,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Beetow Queen
 		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Hive-Hunter] Nikas"), "f_huevillage_58_4", 1300, -500, 0, async dialog =>
+		AddNpc(47245, L("[Hive-Hunter] Nikas"), "f_huevillage_58_4", 1254, -894, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_4", 1005);
@@ -327,62 +327,6 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Quest 6: Septyni Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Caravan Master] Aiste-II"), "f_huevillage_58_4", -400, 700, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_huevillage_58_4", 1006);
-
-			dialog.SetTitle(L("Aiste"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Septyni sweep. Twelve Carcashus, twelve Beetows."));
-
-				var response = await dialog.Select(L("Sweep?"),
-					Option(L("I'll do it"), "help"),
-					Option(L("Pay?"), "info"),
-					Option(L("Skip"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Standard."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Fair."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Caravan rolls."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killCarcashus", out var cObj)) return;
-				if (!quest.TryGetProgress("killBeetows", out var bObj)) return;
-
-				if (cObj.Done && bObj.Done)
-				{
-					await dialog.Msg(L("Done."));
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Keep at it."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Caravan through."));
-			}
-		});
 	}
 }
 
@@ -443,6 +387,8 @@ public class FHuevillage584Quest1002 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 2));
 		AddReward(new ItemReward(640012, 1));
+
+		AddDrop(650099, 0.45f, MonsterId.Beeteros);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -483,6 +429,8 @@ public class FHuevillage584Quest1003 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 2));
 		AddReward(new ItemReward(640012, 1));
+
+		AddDrop(650103, 0.40f, MonsterId.Mentiwood);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -523,6 +471,8 @@ public class FHuevillage584Quest1004 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 2));
 		AddReward(new ItemReward(640012, 1));
+
+		AddDrop(650109, 0.50f, MonsterId.Tiny_Mage);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -566,32 +516,3 @@ public class FHuevillage584Quest1005 : QuestScript
 	}
 }
 
-public class FHuevillage584Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_huevillage_58_4", 1006);
-		SetName(L("Septyni Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of Carcashus and Beetows."));
-		SetLocation("f_huevillage_58_4");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Caravan Master] Aiste"), "f_huevillage_58_4");
-
-		AddObjective("killCarcashus", L("Kill Carcashus"),
-			new KillObjective(12, new[] { MonsterId.Carcashu }));
-
-		AddObjective("killBeetows", L("Kill Beetows"),
-			new KillObjective(12, new[] { MonsterId.Beetow }));
-
-		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
-	}
-}

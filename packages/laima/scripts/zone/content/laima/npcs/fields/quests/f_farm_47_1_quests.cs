@@ -27,7 +27,7 @@ public class FFarm471QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Vilius - Geppettos wrecking barn conversions
 		//---------------------------------------------------------------------
-		AddNpc(20138, L("[Farmer] Vilius"), "f_farm_47_1", 1527, -1336, 225, async dialog =>
+		AddNpc(20138, L("[Farmer] Vilius"), "f_farm_47_1", 1123, -990, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_1", 1001);
@@ -56,7 +56,7 @@ public class FFarm471QuestNpcsScript : GeneralScript
 						break;
 
 					case "info":
-						await dialog.Msg(L("Mykolas thinks the demon-pollen woke them up. Saule across the way says Lightning-creatures always drift toward disturbed wards."));
+						await dialog.Msg(L("Mykolas thinks the demon-pollen woke them up. Lina across the way says Lightning-creatures always drift toward disturbed wards."));
 						await dialog.Msg(L("Either way. They come. We kill. We keep the barns ready."));
 						break;
 
@@ -94,12 +94,36 @@ public class FFarm471QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Tenant-Farmer Mykolas - Refugee supply requisition
 		//---------------------------------------------------------------------
-		AddNpc(20117, L("[Tenant-Farmer] Mykolas"), "f_farm_47_1", -524, 933, 0, async dialog =>
+		AddNpc(20117, L("[Tenant-Farmer] Mykolas"), "f_farm_47_1", -619, 989, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_1", 1002);
+			var protocolQuestId = new QuestId("f_farm_47_2", 1002);
 
 			dialog.SetTitle(L("Mykolas"));
+
+			var protocolDelivered = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_2.Quest1002.Delivered", 0) >= 1;
+
+			if (character.Quests.IsActive(protocolQuestId) && !protocolDelivered)
+			{
+				if (character.Inventory.CountItem(650580) <= 0)
+				{
+					await dialog.Msg(L("{#666666}*He glances at your empty hands, then back at the barn ridge*{/}"));
+					await dialog.Msg(L("Audrone said she'd send a pin-marked map. Come back when you have it - I'm not laying out barns from memory."));
+					return;
+				}
+
+				await dialog.Msg(L("{#666666}*He unfolds the operation map, jaw tightening as he reads the pin assignments*{/}"));
+				await dialog.Msg(L("Red pins first. Myrkiti's children. Right."));
+				await dialog.Msg(L("{#666666}*He folds the map and tucks it inside his coat*{/}"));
+				await dialog.Msg(L("Tell Audrone I've got seven barns, thirty pallets each - more than she calculated. The big hay-barn has a coal stove; I'll prioritize that one for infants."));
+				await dialog.Msg(L("And tell her I'll have the barns ready in five days, not seven. No sense cutting it close when the portal's widening."));
+
+				character.Inventory.Remove(650580, 1, InventoryItemRemoveMsg.Given);
+				character.Variables.Perm.Set("Laima.Quests.f_farm_47_2.Quest1002.Delivered", 1);
+				character.ServerMessage(L("{#FFD700}Protocol delivered. Return to Audrone.{/}"));
+				return;
+			}
 
 			if (!character.Quests.Has(questId))
 			{
@@ -158,177 +182,90 @@ public class FFarm471QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Fedimian Merchant Izolde - Recipient for Quest 1002
 		//---------------------------------------------------------------------
-		AddNpc(147473, L("[Fedimian Merchant] Izolde"), "f_farm_47_1", 235, 1471, 180, async dialog =>
+		AddNpc(147473, L("[Fedimian Merchant] Izolde"), "f_farm_47_1", -1155, -81, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_1", 1002);
 
 			dialog.SetTitle(L("Izolde"));
 
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A Fedimian merchant counts coin by the Cobalt warp-stone, her cart-driver waiting with a patient horse*{/}"));
-				await dialog.Msg(L("Supplies, wool, lamp oil, dried oats. Cart runs at dawn and sundown. Need anything?"));
-				return;
-			}
-
+			var questActive = character.Quests.IsActive(questId);
 			var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_1.Quest1002.Delivered", 0) >= 1;
 
-			if (delivered)
+			if (questActive && !delivered)
 			{
-				await dialog.Msg(L("Tell Mykolas the cart arrives tomorrow at noon. Blankets, pallets, oats - full requisition."));
+				await dialog.Msg(L("{#666666}*She reads the requisition, tallying with a pencil*{/}"));
+				await dialog.Msg(L("Thirty blankets - I have forty in stock. Fifty pallets - I'll split two carts. Oats for three hundred - doable, but I'll need to pull from the Fedimian granary reserves."));
+				await dialog.Msg(L("{#666666}*She signs a confirmation slip and hands it to you*{/}"));
+				await dialog.Msg(L("Tell Mykolas cart arrives tomorrow at noon. Tell him I'm adding lamp-oil for the hay-barn stove at no extra charge. Children sleeping on straw in autumn need warmth more than cheaper books."));
+
+				character.Variables.Perm.Set("Laima.Quests.f_farm_47_1.Quest1002.Delivered", 1);
+				character.ServerMessage(L("{#FFD700}Requisition delivered. Return to Mykolas.{/}"));
 				return;
 			}
 
-			await dialog.Msg(L("{#666666}*She reads the requisition, tallying with a pencil*{/}"));
-			await dialog.Msg(L("Thirty blankets - I have forty in stock. Fifty pallets - I'll split two carts. Oats for three hundred - doable, but I'll need to pull from the Fedimian granary reserves."));
-			await dialog.Msg(L("{#666666}*She signs a confirmation slip and hands it to you*{/}"));
-			await dialog.Msg(L("Tell Mykolas cart arrives tomorrow at noon. Tell him I'm adding lamp-oil for the hay-barn stove at no extra charge. Children sleeping on straw in autumn need warmth more than cheaper books."));
+			await dialog.Msg(L("{#666666}*A Fedimian merchant counts coin by the Cobalt warp-stone, a wicker basket of farm goods at her feet*{/}"));
+			await dialog.Msg(L("Cart-fresh from the Fedimian side - berries, bread, mushrooms, milk. The kind Klaipeda's guilds charge triple for. What'll it be?"));
 
-			character.Variables.Perm.Set("Laima.Quests.f_farm_47_1.Quest1002.Delivered", 1);
-			character.ServerMessage(L("{#FFD700}Requisition delivered. Return to Mykolas.{/}"));
+			await dialog.OpenShop("IzoldeFruits");
 		});
 
 		// =====================================================================
-		// QUEST 1003: Pino Resin
-		// =====================================================================
-		// Barn-Mother Agne - Sealing barn doorframes against pollen
+		// Tailor Agne - Armband recipes and crafting lore
 		//---------------------------------------------------------------------
-		AddNpc(157100, L("[Barn-Mother] Agne"), "f_farm_47_1", -96, -340, 90, async dialog =>
+		AddNpc(152004, L("[Tailor] Agne"), "f_farm_47_1", 8, -221, 0, async dialog =>
 		{
 			var character = dialog.Player;
-			var questId = new QuestId("f_farm_47_1", 1003);
 
 			dialog.SetTitle(L("Agne"));
 
-			if (!character.Quests.Has(questId))
+			await dialog.Msg(L("{#666666}*A seamstress works a length of dyed cord through a half-finished armband, threads spread across her lap*{/}"));
+
+			var response = await dialog.Select(L("What can I do for you, traveler?"),
+				Option(L("What do you do here?"), "info"),
+				Option(L("Show me your recipes"), "shop"),
+				Option(L("Can you lend me a compass?"), "compass"),
+				Option(L("Just passing through"), "leave")
+			);
+
+			switch (response)
 			{
-				await dialog.Msg(L("{#666666}*A farmer presses amber resin into the cracks of a barn doorframe with a bone spatula*{/}"));
-				await dialog.Msg(L("Pine resin dries to amber in a day. Amber blocks pollen like stone blocks arrows. Every barn in my care gets a double-seal around the door and the window frames."));
+				case "info":
+					await dialog.Msg(L("I'm a tailor by trade - though most call me a sewstress, since the work is small enough to fit on my lap. I stitch armbands."));
+					await dialog.Msg(L("Cord, leather strap, a charm or two - simple enough to look at, but each has its own knot-pattern. The pattern is the point. A good armband is read by other adventurers the way a coat-of-arms is read by knights."));
+					await dialog.Msg(L("Old armbands are buried up and down the farm-road - Tenants', the Aqueduct, Myrkiti, Shaton. If you ever go hunting for them, ask me for a compass. The needle's tuned to the burrows - points right at the nearest one. Old tailor's trick."));
+					await dialog.Msg(L("Bring me anything you find and I'll tell you what knot-pattern it carries."));
+					break;
 
-				var response = await dialog.Select(L("I've sealed three barns. Four still to do, and I'm out of resin. The Pino-pools drip on their own if you find the right trees - scratched bark, low branches, faint amber smell. Can you gather five clumps?"),
-					Option(L("I'll gather five clumps"), "help"),
-					Option(L("How did you learn this?"), "info"),
-					Option(L("That's not farming"), "leave")
-				);
+				case "shop":
+					await dialog.Msg(L("Recipes are eighty thousand silver each. I trade them at cost - the value is in the crafting, not the paper."));
+					await dialog.OpenShop("AgneArmbandRecipes");
+					break;
 
-				switch (response)
-				{
-					case "help":
-						await dialog.Msg(L("{#666666}*She hands you a bone spatula and a wax-lined pouch*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Don't touch the resin with bare fingers - it sticks for three days and the Pinos smell it on you."));
-						await dialog.Msg(L("If a Pino startles and swarms you, back off. They calm down if you stand still for a count of ten."));
+				case "compass":
+					if (character.Inventory.CountItem(11200079) > 0)
+					{
+						await dialog.Msg(L("You've already got one. Open your palm and the needle should point toward the nearest burrow - if there's nothing buried in range, it just spins."));
 						break;
+					}
+					await dialog.Msg(L("{#666666}*She fishes a small brass compass from her sewing kit*{/}"));
+					await dialog.Msg(L("Old tailor's trick. The needle's tuned to the burrows - hold it flat and it'll point. North, south, east, west - it's not subtle, but it's honest."));
+					character.Inventory.Add(11200079, 1, InventoryAddType.PickUp);
+					await dialog.Msg(L("Take it. Lose it and come back - I keep a few spare."));
+					break;
 
-					case "info":
-						await dialog.Msg(L("My grandmother. She sealed barns during the demon war. Said 'amber outlasts armies, child.' She was right twice."));
-						await dialog.Msg(L("I don't know why the recipe works. I only know it does. Every sealed frame is one less way pollen gets to a child's lungs."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Fine. Then don't complain when you breathe a lungful of pollen in three months. Doors don't seal themselves."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var resinCount = character.Inventory.CountItem(650609);
-
-				if (resinCount >= 5)
-				{
-					await dialog.Msg(L("{#666666}*She tests each clump with the bone spatula; clean, soft, amber-warm*{/}"));
-					await dialog.Msg(L("Five clumps, all pollen-clean. Enough for two more barn-frames. I'll scrape what's left into the west doorway tonight."));
-					await dialog.Msg(L("Take these. A farmer's wage from the barn-mother's purse. The barns sleep safer because of you."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Five clumps. Scratched bark, low branches, amber smell."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Every barn on Tenants' has amber-sealed frames now. The pollen still drifts, but it doesn't cross the threshold."));
+				case "leave":
+					await dialog.Msg(L("Safe travels. Mind the loose threads on the road."));
+					break;
 			}
 		});
 
 		// =====================================================================
-		// PINO SAP POOLS
+		// QUEST 1004: Round Up the Carts
 		// =====================================================================
-		// For Quest 1003 - Pino Resin
-		// =====================================================================
-
-		void AddPinoSapPool(int poolNumber, int x, int z, int direction)
-		{
-			AddNpc(152012, L("Pino Sap-Pool"), "f_farm_47_1", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_farm_47_1", 1003);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*Amber resin drips from scratched bark into a small pool at the tree's root*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_farm_47_1.Quest1003.Pool{poolNumber}";
-				var gathered = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (gathered)
-				{
-					await dialog.Msg(L("{#666666}*The pool is scraped clean. A fresh drip is already forming at the bark*{/}"));
-					return;
-				}
-
-				var spawnedKey = $"Laima.Quests.f_farm_47_1.Quest1003.Pool{poolNumber}.Spawned";
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 15)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Pino_White, 1, 70, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}A White Pino darts out, hissing at the disturbed sap!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Scraping resin..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650609, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-
-					var currentCount = character.Inventory.CountItem(650609);
-					character.ServerMessage(LF("Resin clumps gathered: {0}/5", currentCount));
-
-					if (currentCount >= 5)
-					{
-						character.ServerMessage(L("{#FFD700}All clumps gathered! Return to Barn-Mother Agne.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("Scraping interrupted."));
-				}
-			});
-		}
-
-		AddPinoSapPool(1, -1279, 390, 0);
-		AddPinoSapPool(2, -243, -1261, 90);
-		AddPinoSapPool(3, -1070, 159, 180);
-		AddPinoSapPool(4, 120, -504, 270);
-		AddPinoSapPool(5, 548, -1245, 0);
-
-		// =====================================================================
-		// QUEST 1004: Barn Readiness
-		// =====================================================================
-		// Evacuation-Warden Rytis - Inspecting converted barns
+		// Soldier Rytis - Posted near the farm, helping recover supply carts
 		//---------------------------------------------------------------------
-		AddNpc(20125, L("[Evacuation-Warden] Rytis"), "f_farm_47_1", 100, 1400, 225, async dialog =>
+		AddNpc(20125, L("[Soldier] Rytis"), "f_farm_47_1", 407, 517, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_1", 1004);
@@ -337,13 +274,13 @@ public class FFarm471QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer in a heavy coat checks a wooden tally-board, ticking items off with a nub of chalk*{/}"));
-				await dialog.Msg(L("Mykolas assigned me evacuation-warden. I ring the bell, I count the barns, I send the families. Four barns are converted. Four still need inspection before the bell can ring in earnest."));
+				await dialog.Msg(L("{#666666}*A soldier in field colors leans on a halberd, a wooden tally-board braced against his hip*{/}"));
+				await dialog.Msg(L("Garrison posted me to Tenants' for the season - patrol the road, lend a hand where I can. Right now Mykolas is short bodies, and Izolde's cart-train rolled in at sunup with no one to organize it."));
 
-				var response = await dialog.Select(L("Each barn needs stove, pallets, door-seal, bell-rope. Check each one, mark it ready or not-ready. If any barn fails inspection, families get diverted. Can you walk all four?"),
-					Option(L("I'll inspect the barns"), "help"),
-					Option(L("What happens if the bell rings tonight?"), "info"),
-					Option(L("I've got my own chores"), "leave")
+				var response = await dialog.Select(L("Field hands dropped the supply carts where they stood and went straight back to the rows. They're scattered across the farm. Rain's an hour off. I need four marked on this tally so my squad can fetch them - I'd do it myself, but I can't leave the road. Can you find four?"),
+					Option(L("I'll round up the carts"), "help"),
+					Option(L("Why is a soldier doing farmer's work?"), "info"),
+					Option(L("Not my problem"), "leave")
 				);
 
 				switch (response)
@@ -352,98 +289,101 @@ public class FFarm471QuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*He hands you the tally-board and a spare nub of chalk*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The barns are spread - north, south, east, west of the central yard."));
-						await dialog.Msg(L("If a barn isn't ready, leave the tally un-ticked. I'll send Agne to fix it."));
+						await dialog.Msg(L("They're all over - north fields, south hedge, by the well, out past the orchard. Look for the canvas tarps."));
+						await dialog.Msg(L("Tick the board at four of them. That's enough for me to dispatch the squad."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("If the bell rings tonight, I send Myrkiti's families through the Aqueduct warp. They bed down in whatever barns are finished. If none are finished, they sleep in the yard under a wagon tarp."));
-						await dialog.Msg(L("That's why the inspection matters. 'Bed under a tarp' means pneumonia by week's end."));
+						await dialog.Msg(L("Bread comes from this farm. Garrison eats this farm's grain. Captain says a soldier who won't lift a sack when the harvest's at risk isn't worth his pay."));
+						await dialog.Msg(L("Besides - Mykolas paid Fedimian rates for those oats. Letting them rot would be a worse waste than any battle I've seen."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then chores first, children second. I'll note who said what when the bell rings."));
+						await dialog.Msg(L("Suit yourself. The road still needs walking either way."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var barnsVisited = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_1.Quest1004.BarnsVisited", 0);
+				var cartsFound = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_1.Quest1004.CartsFound", 0);
 
-				if (barnsVisited >= 4)
+				if (cartsFound >= 4)
 				{
-					await dialog.Msg(L("{#666666}*He reads the tally, ticks each box, and nods once*{/}"));
-					await dialog.Msg(L("All four ready. Stoves lit, pallets stacked, frames sealed, ropes hung. If the bell rings tonight, every Myrkiti family has a roof."));
-					await dialog.Msg(L("Take this. Farmer's purse, warden's seal. You can come back anytime - Tenants' remembers who prepared its barns."));
+					await dialog.Msg(L("{#666666}*He reads the tally and signals two soldiers down the road with a sharp whistle*{/}"));
+					await dialog.Msg(L("Four logged. Squad's moving on them now. Oats stay dry, Mykolas keeps his harvest, garrison keeps its bread."));
+					await dialog.Msg(L("Here. Soldier's purse, plus what I scrounged from the supply tent. You earned both."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("North, south, east, west. Stove, pallets, door-seal, bell-rope."));
+					await dialog.Msg(L("Look for the canvas tarps. Hedges, ditches, behind the well - they're out there."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The barns are ready. The bell hangs. We wait. And farm. And pray."));
+				await dialog.Msg(L("Carts are in, harvest's safe. Road still needs walking."));
 			}
 		});
 
 		// =====================================================================
-		// CONVERTED BARNS
+		// SCATTERED SUPPLY CARTS
 		// =====================================================================
-		// For Quest 1004 - Barn Readiness
+		// For Quest 1004 - Round Up the Carts
 		// =====================================================================
 
-		void AddBarnInspection(int barnNumber, string barnName, string observation, int x, int z, int direction)
+		void AddCartFinder(int cartNumber, string observation, int x, int z, int direction)
 		{
-			AddNpc(160060, L(barnName), "f_farm_47_1", x, z, direction, async dialog =>
+			AddNpc(45316, L("Supply Cart"), "f_farm_47_1", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_farm_47_1", 1004);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A converted hay-barn, pallets stacked inside the doorway*{/}"));
+					await dialog.Msg(L("{#666666}*A canvas-covered supply cart, parked off the path*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_farm_47_1.Quest1004.Barn{barnNumber}";
-				var inspected = character.Variables.Perm.GetBool(variableKey, false);
+				var variableKey = $"Laima.Quests.f_farm_47_1.Quest1004.Cart{cartNumber}";
+				var marked = character.Variables.Perm.GetBool(variableKey, false);
 
-				if (inspected)
+				if (marked)
 				{
-					await dialog.Msg(L("{#666666}*This barn is already inspected and ticked on the tally*{/}"));
+					await dialog.Msg(L("{#666666}*This cart is already ticked on the tally*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Inspecting barn..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Marking cart..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(2));
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Variables.Perm.Set(variableKey, true);
-					var barnsVisited = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_1.Quest1004.BarnsVisited", 0);
-					character.Variables.Perm.Set("Laima.Quests.f_farm_47_1.Quest1004.BarnsVisited", barnsVisited + 1);
+					var cartsFound = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_1.Quest1004.CartsFound", 0);
+					character.Variables.Perm.Set("Laima.Quests.f_farm_47_1.Quest1004.CartsFound", cartsFound + 1);
 
 					character.ServerMessage(L(observation));
-					character.ServerMessage(LF("Barns inspected: {0}/4", barnsVisited + 1));
+					character.ServerMessage(LF("Carts marked: {0}/4", cartsFound + 1));
 
-					if (barnsVisited + 1 >= 4)
+					if (cartsFound + 1 >= 4)
 					{
-						character.ServerMessage(L("{#FFD700}Inspection complete! Return to Warden Rytis.{/}"));
+						character.ServerMessage(L("{#FFD700}Enough carts marked! Return to Soldier Rytis.{/}"));
 					}
 				}
 				else
 				{
-					character.ServerMessage(L("Inspection interrupted."));
+					character.ServerMessage(L("Marking interrupted."));
 				}
 			});
 		}
 
-		AddBarnInspection(1, "North Barn", "Stove lit, pallets stacked, frames amber-sealed. Bell-rope hung and tested.", -1250, 400, 0);
-		AddBarnInspection(2, "South Barn", "Stove cold but laid; pallets stacked; frames sealed; bell-rope hung.", -220, -1240, 90);
-		AddBarnInspection(3, "East Barn", "The hay-barn with the coal stove. Warmest of the four. Ready for infants.", 200, -320, 180);
-		AddBarnInspection(4, "West Barn", "Smallest but cleanest. Reserved for the elders and the sick.", -1040, 180, 270);
+		AddCartFinder(1, "Sacks of oats under the tarp. Dry, for now.", 188, 341, 90);
+		AddCartFinder(2, "Wool blankets, neatly bundled. Heavy when wet.", -602, 773, 90);
+		AddCartFinder(3, "Pallets stacked four-deep. Rain would warp every plank.", 157, 1124, 0);
+		AddCartFinder(4, "Lamp-oil jugs in straw padding. Best not to leave these in the open.", -934, 323, 0);
+		AddCartFinder(5, "Dried beans in burlap. The mice would find these by morning.", -779, -1148, 90);
+		AddCartFinder(6, "More oats. Mykolas wasn't kidding about the order size.", 492, -309, 0);
+		AddCartFinder(7, "Salt and dried fish. Far from the kitchen, but it'll keep.", 963, 383, 0);
 	}
 }
 
@@ -479,7 +419,7 @@ public class GeppettoAttacksQuest : QuestScript
 		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
 		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
 		AddReward(new ItemReward(640009, 1));  // Stamina Potion
-		AddReward(new ItemReward(522112, 1));  // Pokubon Leather Pants
+		AddReward(new ItemReward(928003, 1));  // Recipe - Trident
 	}
 }
 
@@ -523,64 +463,7 @@ public class SupplyLineToCobaltQuest : QuestScript
 	}
 }
 
-// Quest 1003 CLASS: Pino Resin
-//-----------------------------------------------------------------------------
-
-public class PinoResinQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_farm_47_1", 1003);
-		SetName("Pino Resin");
-		SetType(QuestType.Sub);
-		SetDescription("Barn-Mother Agne needs five Varb Resin clumps from Pino sap-pools to seal the barn doorframes against demon-pollen.");
-		SetLocation("f_farm_47_1");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Barn-Mother] Agne", "f_farm_47_1");
-
-		AddObjective("collectResin", "Scrape resin from Pino sap-pools",
-			new CollectItemObjective(650609, 5));
-
-		AddReward(new ExpReward(1550, 1090));
-		AddReward(new SilverReward(2900));
-		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
-		AddReward(new ItemReward(640003, 2)); // Normal HP Potion
-		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
-		AddReward(new ItemReward(640009, 1));  // Stamina Potion
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650609,
-			character.Inventory.CountItem(650609),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1003.Pool{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1003.Pool{i}.Spawned");
-		}
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650609,
-			character.Inventory.CountItem(650609),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1003.Pool{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1003.Pool{i}.Spawned");
-		}
-	}
-}
-
-// Quest 1004 CLASS: Barn Readiness
+// Quest 1004 CLASS: Round Up the Carts
 //-----------------------------------------------------------------------------
 
 public class BarnReadinessQuest : QuestScript
@@ -588,19 +471,19 @@ public class BarnReadinessQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_farm_47_1", 1004);
-		SetName("Barn Readiness");
+		SetName("Round Up the Carts");
 		SetType(QuestType.Sub);
-		SetDescription("Evacuation-Warden Rytis has asked you to inspect the four converted barns on Tenants' Farm before the evacuation bell can be rung.");
+		SetDescription("Farmer Rytis needs four of the supply carts scattered around Tenants' Farm marked on his tally before the rain spoils the oats and pallets sitting in the open.");
 		SetLocation("f_farm_47_1");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Evacuation-Warden] Rytis", "f_farm_47_1");
+		AddQuestGiver("[Soldier] Rytis", "f_farm_47_1");
 
-		AddObjective("inspectBarns", "Inspect the converted barns",
-			new VariableCheckObjective("Laima.Quests.f_farm_47_1.Quest1004.BarnsVisited", 4, true));
+		AddObjective("findCarts", "Find and mark scattered supply carts",
+			new VariableCheckObjective("Laima.Quests.f_farm_47_1.Quest1004.CartsFound", 4, true));
 
 		AddReward(new ExpReward(3100, 2200));
 		AddReward(new SilverReward(3800));
@@ -611,19 +494,19 @@ public class BarnReadinessQuest : QuestScript
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_1.Quest1004.BarnsVisited");
-		for (int i = 1; i <= 4; i++)
+		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_1.Quest1004.CartsFound");
+		for (int i = 1; i <= 7; i++)
 		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1004.Barn{i}");
+			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1004.Cart{i}");
 		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_1.Quest1004.BarnsVisited");
-		for (int i = 1; i <= 4; i++)
+		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_1.Quest1004.CartsFound");
+		for (int i = 1; i <= 7; i++)
 		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1004.Barn{i}");
+			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_1.Quest1004.Cart{i}");
 		}
 	}
 }

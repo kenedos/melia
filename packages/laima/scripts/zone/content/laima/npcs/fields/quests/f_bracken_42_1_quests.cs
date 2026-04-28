@@ -147,7 +147,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 		// Quest 3: Doyor Fangs
 		//-------------------------------------------------------------------------
-		AddNpc(20112, L("[Dentist] Alda"), "f_bracken_42_1", -471, -476, 90, async dialog =>
+		AddNpc(147473, L("[Charm-Carver] Alda"), "f_bracken_42_1", -471, -476, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1003);
@@ -156,12 +156,12 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Half this village comes to me clutching their jaws, and I haven't had a batch of toothache powder in stock for three weeks."));
-				await dialog.Msg(L("Blue Doyor fangs, ground fine and mixed with willow bark, are the old village remedy. I need six clean fangs to brew the next batch - enough to last us through the cold months."));
+				await dialog.Msg(L("Caravan drivers won't roll the Khonot trail without a tooth-charm hung from the lead horse's bridle. Old road-superstition - and right now I haven't a single one to sell them."));
+				await dialog.Msg(L("Blue Doyor fangs are what I carve. Bored, threaded, etched with the old marks. Six clean fangs and I can string charms for the next caravan run."));
 
 				var response = await dialog.Select(L("Will you help me?"),
 					Option(L("I'll bring the fangs"), "help"),
-					Option(L("Toothache cure?"), "info"),
+					Option(L("Tooth-charms?"), "info"),
 					Option(L("Skip"), "leave")
 				);
 
@@ -169,16 +169,16 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Six fangs - the long canines, mind you, not the molars. And make sure they're not splintered. Cracked fangs ruin the powder."));
+						await dialog.Msg(L("Six fangs - the long canines, mind you, not the molars. And make sure they're not splintered. Cracked fangs split under the bow-drill and ruin the carving."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Old village remedy, passed down from my grandmother and her grandmother before her. Numbs the gum, dries up the rot, lets a sore tooth heal instead of festering."));
-						await dialog.Msg(L("Always works, when I can get the fangs. The Doyors used to wander right up to the village fence. Not anymore - they've gone shy and deep."));
+						await dialog.Msg(L("Drivers swear a Doyor fang on the harness keeps the canopy beasts off the lead horse. Whether that's true or just nerve-medicine, I couldn't say."));
+						await dialog.Msg(L("But every caravan that's come through with one of my charms has come through whole. Every caravan without one has lost something. Make of that what you will."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Pain doesn't wait for anyone. Half the village will be miserable until someone helps me brew that powder."));
+						await dialog.Msg(L("Caravan rolls in three days. If I've no charms to sell, the drivers will turn back at the trailhead - and the inland villages will go another month without grain."));
 						break;
 				}
 			}
@@ -190,8 +190,8 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 				if (killObj.Done && fObj.Done)
 				{
-					await dialog.Msg(L("Six clean fangs, every one of them sound. The powder will brew through the night and be ready by morning."));
-					await dialog.Msg(L("Take this for your trouble - and tell anyone in pain to come see me tomorrow."));
+					await dialog.Msg(L("Six clean fangs, every one of them sound. I'll have the charms strung and etched by the time the caravan reaches the trailhead."));
+					await dialog.Msg(L("Take this for your trouble - and if you're rolling out with the next caravan yourself, come back for one of the charms."));
 					character.Inventory.Remove(650692, character.Inventory.CountItem(650692), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
@@ -202,13 +202,13 @@ public class FBracken421QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Half the village smiles pain-free now. Word's spreading - I had a fellow ride in from two villages over yesterday."));
+				await dialog.Msg(L("Caravan rolled out yesterday with a fang on every lead bridle. Drivers paid double, and one came back asking for a second string already."));
 			}
 		});
 
 		// Quest 4: Folibu Wings
 		//-------------------------------------------------------------------------
-		AddNpc(20110, L("[Tinkerer] Kaspars"), "f_bracken_42_1", 776, 18, 0, async dialog =>
+		AddNpc(20118, L("[Tinkerer] Kaspars"), "f_bracken_42_1", 776, 18, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1004);
@@ -271,7 +271,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Gosaru King
 		//-------------------------------------------------------------------------
-		AddNpc(57231, L("[Bounty Hunter] Jekabs"), "f_bracken_42_1", -2, 833, 90, async dialog =>
+		AddNpc(47245, L("[Bounty Hunter] Jekabs"), "f_bracken_42_1", -2, 833, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_42_1", 1005);
@@ -394,6 +394,44 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Caravan went through without a scratch. You'll be the first I call when the next contract opens."));
 			}
 		});
+
+		// Gosaru Troupe Ambush Triggers (Quest 1001)
+		//-------------------------------------------------------------------------
+		AddGosaruAmbush(1, -83, -175);
+		AddGosaruAmbush(2, 56, -383);
+		AddGosaruAmbush(3, 444, -135);
+		AddGosaruAmbush(4, 320, 84);
+		AddGosaruAmbush(5, 289, 357);
+		AddGosaruAmbush(6, 122, -642);
+		AddGosaruAmbush(7, 87, -816);
+	}
+
+	private void AddGosaruAmbush(int index, int x, int z)
+	{
+		var questId = new QuestId("f_bracken_42_1", 1001);
+		var ambushKey = $"Laima.Quests.f_bracken_42_1.Quest1001.Ambush{index}";
+
+		AddAreaTrigger("f_bracken_42_1", x, z, 50, async (args) =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.IsDead)
+				return;
+
+			if (!character.Quests.IsActive(questId))
+				return;
+
+			if (character.Variables.Perm.GetBool(ambushKey, false))
+				return;
+
+			character.Variables.Perm.SetBool(ambushKey, true);
+
+			if (SpawnTempMonsters(character, MonsterId.Gosaru_Blue, 3, 70, TimeSpan.FromMinutes(1)))
+			{
+				character.ServerMessage(L("{#FF6666}Blue Gosarus drop from the canopy!{/}"));
+			}
+		});
 	}
 }
 
@@ -476,13 +514,13 @@ public class FBracken421Quest1003 : QuestScript
 		SetId("f_bracken_42_1", 1003);
 		SetName(L("Doyor Fangs"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Blue Doyors and bring fangs for toothache powder."));
+		SetDescription(L("Kill Blue Doyors and bring fangs for caravan tooth-charms."));
 		SetLocation("f_bracken_42_1");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Dentist] Alda"), "f_bracken_42_1");
+		AddQuestGiver(L("[Charm-Carver] Alda"), "f_bracken_42_1");
 
 		AddDrop(650692, 0.45f, MonsterId.Doyor_Blue);
 
@@ -583,6 +621,7 @@ public class FBracken421Quest1005 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 2));
 		AddReward(new ItemReward(640012, 1));
+		AddReward(new ItemReward(103309, 1));
 	}
 }
 

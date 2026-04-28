@@ -23,7 +23,7 @@ public class FFlash59QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Stone-Wet Jukopus
 		//-------------------------------------------------------------------------
-		AddNpc(20070, L("[Ward-Keeper] Halya"), "f_flash_59", 820, 800, 180, async dialog =>
+		AddNpc(20070, L("[Ward-Keeper] Halya"), "f_flash_59", 275, 602, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_59", 1001);
@@ -85,7 +85,7 @@ public class FFlash59QuestNpcsScript : GeneralScript
 
 		// Quest 2: Cursebinding Cores
 		//-------------------------------------------------------------------------
-		AddNpc(20071, L("[Ward-Smith] Radek"), "f_flash_59", 400, 600, 90, async dialog =>
+		AddNpc(20071, L("[Ward-Smith] Radek"), "f_flash_59", 1122, 84, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_59", 1002);
@@ -148,7 +148,7 @@ public class FFlash59QuestNpcsScript : GeneralScript
 
 		// Quest 3: The Statued Garrison
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Statue-Cataloguer] Dania"), "f_flash_59", -400, 200, 0, async dialog =>
+		AddNpc(20114, L("[Statue-Cataloguer] Dania"), "f_flash_59", -75, 119, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_59", 1003);
@@ -217,73 +217,9 @@ public class FFlash59QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Frontier Cache Points
-		//-------------------------------------------------------------------------
-		void AddFrontierCache(int cacheNum, int x, int z, int direction)
-		{
-			AddNpc(12080, L("Statued Boundary Stone"), "f_flash_59", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_flash_59", 1003);
-				var variableKey = $"Laima.Quests.f_flash_59.Quest1003.Cache{cacheNum}";
-				var spawnedKey = $"Laima.Quests.f_flash_59.Quest1003.Cache{cacheNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A grey figure frozen mid-salute, half-sunken in moss. The shape of a soldier is unmistakable.*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already recovered this soldier's cache*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Rambear, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}Stone-streaked Rambears lumber out, roused from the curse-warm boulder!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Digging beneath the statue..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650675, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Statued-Garrison Cache"));
-
-					var currentCount = character.Inventory.CountItem(650675);
-					character.ServerMessage(LF("Caches recovered: {0}/4", currentCount));
-
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All four caches recovered! Return to Dania.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You paused the dig."));
-				}
-			});
-		}
-
-		AddFrontierCache(1, 300, 400, 0);
-		AddFrontierCache(2, -200, 100, 0);
-		AddFrontierCache(3, 600, -200, 0);
-		AddFrontierCache(4, -500, 500, 0);
-
 		// Quest 4: Petrifier-Cant
 		//-------------------------------------------------------------------------
-		AddNpc(20121, L("[Curse-Scholar] Ivor"), "f_flash_59", 100, -300, 270, async dialog =>
+		AddNpc(20121, L("[Curse-Scholar] Ivor"), "f_flash_59", 99, -298, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_59", 1004);
@@ -354,7 +290,7 @@ public class FFlash59QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Stone-Scarred Alpha
 		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Stryker"), "f_flash_59", 900, -400, 270, async dialog =>
+		AddNpc(47245, L("[Bounty Hunter] Stryker"), "f_flash_59", 747, -476, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_59", 1005);
@@ -439,7 +375,7 @@ public class FFlash59QuestNpcsScript : GeneralScript
 
 		// Quest 6: The Cursed Perimeter
 		//-------------------------------------------------------------------------
-		AddNpc(155150, L("[Trail Master] Odessa"), "f_flash_59", -600, -200, 45, async dialog =>
+		AddNpc(155150, L("[Trail Master] Odessa"), "f_flash_59", -712, -309, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_59", 1006);
@@ -569,6 +505,8 @@ public class CursebindingCoresQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(663068, 0.40f, MonsterId.Jukopus_Gray);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -613,28 +551,18 @@ public class TheStatuedGarrisonQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650675, 0.40f, MonsterId.Rambear);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650675, character.Inventory.CountItem(650675), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_59.Quest1003.Cache{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_59.Quest1003.Cache{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650675, character.Inventory.CountItem(650675), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_59.Quest1003.Cache{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_59.Quest1003.Cache{i}.Spawned");
-		}
 	}
 }
 
@@ -669,6 +597,8 @@ public class PetrifierCantQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650783, 0.50f, MonsterId.Goblin2_Wand1);
 	}
 
 	public override void OnComplete(Character character, Quest quest)

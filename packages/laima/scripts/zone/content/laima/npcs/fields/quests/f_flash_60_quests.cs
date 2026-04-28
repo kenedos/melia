@@ -23,7 +23,7 @@ public class FFlash60QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Moya Scavengers
 		//-------------------------------------------------------------------------
-		AddNpc(20080, L("[Stallkeeper] Hedda"), "f_flash_60", -800, 1100, 180, async dialog =>
+		AddNpc(20080, L("[Stallkeeper] Hedda"), "f_flash_60", -978, 1379, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_60", 1001);
@@ -85,7 +85,7 @@ public class FFlash60QuestNpcsScript : GeneralScript
 
 		// Quest 2: Silvered Cores
 		//-------------------------------------------------------------------------
-		AddNpc(20081, L("[Ward-Jeweler] Talvi"), "f_flash_60", -200, 800, 90, async dialog =>
+		AddNpc(20081, L("[Ward-Jeweler] Talvi"), "f_flash_60", -877, 331, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_60", 1002);
@@ -148,7 +148,7 @@ public class FFlash60QuestNpcsScript : GeneralScript
 
 		// Quest 3: The Vendor Ledgers
 		//-------------------------------------------------------------------------
-		AddNpc(20120, L("[Archivist] Brys"), "f_flash_60", 400, 300, 0, async dialog =>
+		AddNpc(20120, L("[Archivist] Brys"), "f_flash_60", 299, -43, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_60", 1003);
@@ -217,73 +217,9 @@ public class FFlash60QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Vendor Ledger Points
-		//-------------------------------------------------------------------------
-		void AddStallFrame(int ledgerNum, int x, int z, int direction)
-		{
-			AddNpc(12080, L("Statued Stall Frame"), "f_flash_60", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_flash_60", 1003);
-				var variableKey = $"Laima.Quests.f_flash_60.Quest1003.Ledger{ledgerNum}";
-				var spawnedKey = $"Laima.Quests.f_flash_60.Quest1003.Ledger{ledgerNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A stall frame set in stone, its painted sign just readable.*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already pulled this stall's ledger*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Bavon, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}Bavon burst from the stall frame, scattering stone-dust!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Pulling ledger from stall frame..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650475, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Vendor Ledger"));
-
-					var currentCount = character.Inventory.CountItem(650475);
-					character.ServerMessage(LF("Ledgers recovered: {0}/4", currentCount));
-
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All four ledgers recovered! Return to Brys.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You eased the ledger back. Try again."));
-				}
-			});
-		}
-
-		AddStallFrame(1, 300, 200, 0);
-		AddStallFrame(2, -400, 400, 0);
-		AddStallFrame(3, 600, -100, 0);
-		AddStallFrame(4, -600, -300, 0);
-
 		// Quest 4: The Saltisdaughter Cabal
 		//-------------------------------------------------------------------------
-		AddNpc(20082, L("[Curse-Warden] Pavel"), "f_flash_60", 900, -400, 270, async dialog =>
+		AddNpc(20082, L("[Curse-Warden] Pavel"), "f_flash_60", 267, 1668, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_60", 1004);
@@ -354,7 +290,7 @@ public class FFlash60QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Stallmaster Alpha
 		//-------------------------------------------------------------------------
-		AddNpc(20083, L("[Bounty Hunter] Mira"), "f_flash_60", 100, -500, 270, async dialog =>
+		AddNpc(20083, L("[Bounty Hunter] Mira"), "f_flash_60", -896, -998, 44, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_60", 1005);
@@ -439,7 +375,7 @@ public class FFlash60QuestNpcsScript : GeneralScript
 
 		// Quest 6: Market Perimeter
 		//-------------------------------------------------------------------------
-		AddNpc(155160, L("[Caravan Master] Korin"), "f_flash_60", -900, -700, 45, async dialog =>
+		AddNpc(155160, L("[Caravan Master] Korin"), "f_flash_60", 789, -392, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_60", 1006);
@@ -563,6 +499,8 @@ public class SilveredCoresQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650317, 0.40f, MonsterId.Moya);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -604,28 +542,18 @@ public class TheVendorLedgersQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650475, 0.40f, MonsterId.Bavon);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650475, character.Inventory.CountItem(650475), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_60.Quest1003.Ledger{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_60.Quest1003.Ledger{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650475, character.Inventory.CountItem(650475), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_60.Quest1003.Ledger{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_60.Quest1003.Ledger{i}.Spawned");
-		}
 	}
 }
 
@@ -657,6 +585,8 @@ public class TheSaltisdaughterCabalQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650615, 0.50f, MonsterId.Saltisdaughter_Mage);
 	}
 
 	public override void OnComplete(Character character, Quest quest)

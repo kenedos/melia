@@ -899,7 +899,7 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		protected virtual void UpdatePhase()
 		{
-			if (this.Entity.IsDead)
+			if (this.Entity == null || this.Entity.IsDead)
 				return;
 
 			var hpPercent = (float)this.Entity.Hp / this.Entity.MaxHp;

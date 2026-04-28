@@ -24,21 +24,36 @@ public class FFarm473QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// QUEST 1001: Needlers in the Barley
 		// =====================================================================
-		// Farmer Stanislovas - Cronewts ambushing farmhands
+		// Farmer Stanislovas - Cronewts ambushing farmhands; father of Goda
 		//---------------------------------------------------------------------
-		AddNpc(20138, L("[Farmer] Stanislovas"), "f_farm_47_3", -559, -372, 270, async dialog =>
+		AddNpc(20138, L("[Farmer] Stanislovas"), "f_farm_47_3", -526, -273, 315, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_3", 1001);
+			var warningQuestId = new QuestId("f_farm_47_3", 1002);
 
 			dialog.SetTitle(L("Stanislovas"));
 
+			var warningDelivered = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_3.Quest1002.Delivered", 0) >= 1;
+
+			if (character.Quests.IsActive(warningQuestId) && !warningDelivered)
+			{
+				await dialog.Msg(L("{#666666}*He sets his bandaged arm down and unfolds Morta's letter, reading it twice*{/}"));
+				await dialog.Msg(L("Demon-pollen drifting south. I've already smelled it on the wind, but a written warning is a different thing - means Morta's serious enough to put it on paper."));
+				await dialog.Msg(L("Tell her I'll have the farmhands wrap their faces and shut the barley sheds by nightfall. Goda's mask-stitching will reach further than she thinks - I'll send her some for Morta's hands too."));
+				await dialog.Msg(L("{#666666}*He folds the letter and tucks it into his vest*{/}"));
+
+				character.Variables.Perm.Set("Laima.Quests.f_farm_47_3.Quest1002.Delivered", 1);
+				character.ServerMessage(L("{#FFD700}Warning delivered. Return to Farmer Morta.{/}"));
+				return;
+			}
+
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A thick-set farmer presses a bandaged arm, staring grimly down a barley row*{/}"));
-				await dialog.Msg(L("The Cronewts are in my barley. Needlers, every one - poison-tipped arrows they fire from the stalks before you even see 'em."));
+				await dialog.Msg(L("{#666666}*A thick-set farmer presses a bandaged arm, glancing toward his daughter Goda at her stitching*{/}"));
+				await dialog.Msg(L("The Cronewts are in my barley. Needlers, every one - poison-tipped arrows they fire from the stalks before you even see 'em. Goda's stitching breathing-masks faster than I can clear the stalks."));
 
-				var response = await dialog.Select(L("Two farmhands down already this week. Tinker Dovas from Baron Allerno sent me his stormfeather traps, but traps don't stop arrows. I need them cleared out before harvest, or there won't be a harvest."),
+				var response = await dialog.Select(L("Two farmhands down already. Tinker Dovas from Baron Allerno sent me his stormfeather traps, but traps don't stop arrows. I need them cleared out before harvest, or there won't be a harvest."),
 					Option(L("I'll kill the Needlers"), "help"),
 					Option(L("Why are they here suddenly?"), "info"),
 					Option(L("Find a hunter"), "leave")
@@ -93,7 +108,7 @@ public class FFarm473QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Morta - Warning for Shaton Farm
 		//---------------------------------------------------------------------
-		AddNpc(20116, L("[Farmer] Morta"), "f_farm_47_3", -491, 38, 0, async dialog =>
+		AddNpc(20116, L("[Farmer] Morta"), "f_farm_47_3", -1220, 579, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_3", 1002);
@@ -105,7 +120,7 @@ public class FFarm473QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("{#666666}*A worried farmer waves a folded letter and sneezes twice*{/}"));
 				await dialog.Msg(L("The pollen's drifting south now. You can taste it - metal, sweet-rotten, makes your eyes water. The demon-prison crack on the north ridge has been leaking for weeks."));
 
-				var response = await dialog.Select(L("Jonas-the-Elder runs Shaton Farm through the southern warp. He's got three greenhouses of tomatoes - if the pollen reaches his panes, his whole season dies in a week. I wrote him a warning to shut the vents. Carry it for me?"),
+				var response = await dialog.Select(L("Stanislovas works the barley fields east of here, near his daughter Goda's stitching shed. The pollen will hit his sheds before it hits anyone else's, and his farmhands haven't even started masking up. I wrote him a warning to wrap their faces and shut the sheds. Carry it for me?"),
 					Option(L("I'll deliver it"), "help"),
 					Option(L("What's the demon prison?"), "info"),
 					Option(L("Ask someone else"), "leave")
@@ -117,7 +132,7 @@ public class FFarm473QuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*She presses the letter into your hand*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Tell him I'll send Keposeed husks next week - Eglė's stitching masks for our hands, and I'll spare him a dozen."));
+						await dialog.Msg(L("Tell him I'll send Keposeed husks next week - he can pass them to Goda for extra masks. Faster the wraps go on, the fewer farmhands cough up blood."));
 						break;
 
 					case "info":
@@ -137,69 +152,44 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 				if (deliverObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She reads Jonas's reply and presses her hands together in relief*{/}"));
-					await dialog.Msg(L("Greenhouses sealed by sunset. Good. His tomatoes survive another season, ours might too."));
-					await dialog.Msg(L("Here - my thanks. Small coin, but honest. Tell me if you pass Eglė; she'll want the husks before supper."));
+					await dialog.Msg(L("{#666666}*She reads Stanislovas's reply and presses her hands together in relief*{/}"));
+					await dialog.Msg(L("Sheds shut by nightfall, masks on every farmhand. Good. His barley survives another season, ours might too."));
+					await dialog.Msg(L("Here - my thanks. Small coin, but honest. Tell me if you pass Goda; she'll want the husks before supper."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("South warp. White beard, runs the greenhouses. Go quickly - the wind's turning."));
+					await dialog.Msg(L("East from here, in the barley fields - thick-set man, bandaged arm. Go quickly, the wind's turning."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Jonas saved his tomato crop. Sent us a crate of them in thanks. The farmhands ate like nobility."));
+				await dialog.Msg(L("Stanislovas's farmhands are masked-up by now. Goda doubled her stitching pace. Keposeed husks for everyone."));
 			}
 		});
 
 		// =====================================================================
-		// Farmer Jonas-the-Elder - Recipient for Quest 1002
+		// Farmer Jonas - flavor NPC (no longer a quest recipient)
 		//---------------------------------------------------------------------
-		AddNpc(20117, L("[Farmer] Jonas-the-Elder"), "f_farm_47_3", -1628, -924, 45, async dialog =>
+		AddNpc(20117, L("[Farmer] Jonas"), "f_farm_47_3", -1628, -924, 45, async dialog =>
 		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_farm_47_3", 1002);
-
-			dialog.SetTitle(L("Jonas-the-Elder"));
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*An old farmer with a beard to his chest squints toward the distant greenhouses*{/}"));
-				await dialog.Msg(L("Every summer a new blight. Every winter a new frost. Farming is just bad weather with hope attached."));
-				return;
-			}
-
-			var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_3.Quest1002.Delivered", 0) >= 1;
-
-			if (delivered)
-			{
-				await dialog.Msg(L("Tell Morta the vents are shut. And tell her I'll trade husks for tomatoes, come autumn."));
-				return;
-			}
-
-			await dialog.Msg(L("{#666666}*He reads the warning, eyebrows climbing*{/}"));
-			await dialog.Msg(L("Demon-pollen, is it? Well. I've seen rot-mold and leaf-curl and the grey blight of '58. Add pollen to the list."));
-			await dialog.Msg(L("Tell Morta I'll shut every vent and every pane by sunset. The tomatoes will hold."));
-			await dialog.Msg(L("{#666666}*He squints north*{/}"));
-			await dialog.Msg(L("And tell her I'm grateful. Not every farmer would spare a letter for an old man's greenhouses. Send her my thanks - and tomatoes, when they ripen."));
-
-			character.Variables.Perm.Set("Laima.Quests.f_farm_47_3.Quest1002.Delivered", 1);
-			character.ServerMessage(L("{#FFD700}Warning delivered. Return to Farmer Morta.{/}"));
+			dialog.SetTitle(L("Jonas"));
+			await dialog.Msg(L("{#666666}*An old farmer with a beard to his chest squints toward the distant greenhouses*{/}"));
+			await dialog.Msg(L("Every summer a new blight. Every winter a new frost. Farming is just bad weather with hope attached."));
 		});
 
 		// =====================================================================
 		// QUEST 1003: Anti-Pollen Masks
 		// =====================================================================
-		// Farmer Eglė - Stitching breathing-masks from seed husks
+		// Farmer Goda - Stitching breathing-masks from seed husks
 		//---------------------------------------------------------------------
-		AddNpc(147420, L("[Farmer] Eglė"), "f_farm_47_3", -546, -292, 90, async dialog =>
+		AddNpc(147420, L("[Farmer] Goda"), "f_farm_47_3", -761, -261, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_3", 1003);
 
-			dialog.SetTitle(L("Eglė"));
+			dialog.SetTitle(L("Goda"));
 
 			if (!character.Quests.Has(questId))
 			{
@@ -263,7 +253,7 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 		void AddKeposeedPod(int podNumber, int x, int z, int direction)
 		{
-			AddNpc(152017, L("Drifting Kepa-Pod"), "f_farm_47_3", x, z, direction, async dialog =>
+			AddNpc(152050, L("Drifting Kepa-Pod"), "f_farm_47_3", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_farm_47_3", 1003);
@@ -307,7 +297,7 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 					if (currentCount >= 5)
 					{
-						character.ServerMessage(L("{#FFD700}All husks gathered! Return to Farmer Eglė.{/}"));
+						character.ServerMessage(L("{#FFD700}All husks gathered! Return to Farmer Goda.{/}"));
 					}
 				}
 				else
@@ -317,18 +307,21 @@ public class FFarm473QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddKeposeedPod(1, -605, -420, 0);
-		AddKeposeedPod(2, -1114, -420, 90);
-		AddKeposeedPod(3, -150, -730, 180);
-		AddKeposeedPod(4, -77, 30, 270);
-		AddKeposeedPod(5, -480, 50, 0);
+		AddKeposeedPod(1, -1039, -307, 44);
+		AddKeposeedPod(2, -1364, -476, 44);
+		AddKeposeedPod(3, -716, -414, 45);
+		AddKeposeedPod(4, -1568, -115, 44);
+		AddKeposeedPod(5, -1841, -9, 44);
+		AddKeposeedPod(6, -1642, 534, 44);
+		AddKeposeedPod(7, -1808, 271, 44);
+		AddKeposeedPod(8, -1230, 438, 44);
 
 		// =====================================================================
 		// QUEST 1004: Portal Crack Survey
 		// =====================================================================
 		// Farmer Dominykas - Logging the demon-prison seepage
 		//---------------------------------------------------------------------
-		AddNpc(20118, L("[Farmer] Dominykas"), "f_farm_47_3", -2181, 430, 90, async dialog =>
+		AddNpc(20118, L("[Farmer] Dominykas"), "f_farm_47_3", -2056, 836, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_3", 1004);
@@ -338,10 +331,10 @@ public class FFarm473QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(questId))
 			{
 				await dialog.Msg(L("{#666666}*An anxious farmer clutches a rolled map, glancing at the sky every few breaths*{/}"));
-				await dialog.Msg(L("Four cracks, that I've counted. Four holes in the earth across Myrkiti, all leaking orange pollen. The magistrates in Klaipeda won't listen to 'farmer's worries' without evidence."));
+				await dialog.Msg(L("Burrows. Tunnels gouged into the earth. Half a dozen of them across Myrkiti so far, mouths gaping wide enough for a man's arm, and orange pollen drifting out of every one. Whatever's down there dug up, not down. The magistrates in Klaipeda won't listen to 'farmer's worries' without evidence."));
 
-				var response = await dialog.Select(L("I need someone to walk each crack and mark it on my map. Proper notes - shape, size, smell, what's growing wrong nearby. If I bring the magistrates a numbered survey, they'll have to send a mage. Maybe seal them. Maybe not. But at least send one."),
-					Option(L("I'll survey the cracks"), "help"),
+				var response = await dialog.Select(L("I need someone to walk each burrow and mark it on my map. Proper notes - mouth-width, what the pollen smells like, what's wilting in a circle around it. If I bring the magistrates a numbered survey, they'll have to send a mage. Maybe seal the tunnels. Maybe not. But at least send one."),
+					Option(L("I'll survey the burrows"), "help"),
 					Option(L("Why not a mage already?"), "info"),
 					Option(L("I'm not a surveyor"), "leave")
 				);
@@ -352,17 +345,17 @@ public class FFarm473QuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*He unfolds the map with trembling hands*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("One near the aqueduct, one in the old cabbage rows, one at the eastern fence line, one by the abandoned well."));
-						await dialog.Msg(L("If any have grown wider since last week... come back faster than you think."));
+						await dialog.Msg(L("They're spread across the western fields. Look for ringed soil-mounds - that's the spoil from whatever dug the tunnel. The burrow mouth itself is dark and smells like scorched metal."));
+						await dialog.Msg(L("Don't reach into one. Pollen's bad enough at the rim. If any have widened since last week, come back faster than you think."));
 						break;
 
 					case "info":
 						await dialog.Msg(L("Mages cost silver. Farmers don't have silver. Klaipeda sends mages where the gold comes from - and we've been late on taxes two seasons running."));
-						await dialog.Msg(L("The demon prison leaked for months before anyone in a city noticed. If the cracks reach Klaipeda itself, maybe then. Until then, we survey our own."));
+						await dialog.Msg(L("The demon prison leaked for months before anyone in a city noticed. If the tunnels reach Klaipeda itself, maybe then. Until then, we survey our own."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Fine. But when the cracks widen, I'll remember who wouldn't walk."));
+						await dialog.Msg(L("Fine. But when the tunnels widen, I'll remember who wouldn't walk."));
 						break;
 				}
 			}
@@ -373,19 +366,19 @@ public class FFarm473QuestNpcsScript : GeneralScript
 				if (cracksVisited >= 4)
 				{
 					await dialog.Msg(L("{#666666}*He reads your notes, face tightening*{/}"));
-					await dialog.Msg(L("All four widening. The cabbage-row one doubled since last month. The well-crack is deeper than a man."));
+					await dialog.Msg(L("Every one of them widening. Two doubled in mouth-width since last month. The forked one is breathing pollen out of both arms now."));
 					await dialog.Msg(L("I'll ride to Klaipeda tomorrow. This survey will get a mage sent, or I'll camp outside the magistrate's door until one comes. Thank you - take this for the walking."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Four cracks. Aqueduct, cabbage rows, east fence, abandoned well."));
+					await dialog.Msg(L("The burrows are spread across the western fields. Look for ringed soil-mounds and the smell of scorched metal."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The magistrates sent a Pyromancer. She sealed two of the four cracks. Not enough, but a start."));
+				await dialog.Msg(L("The magistrates sent a Pyromancer. She sealed two of the tunnels and packed the rest with salt. Not enough, but a start."));
 			}
 		});
 
@@ -397,14 +390,14 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 		void AddPortalCrack(int crackNumber, string crackName, string observation, int x, int z, int direction)
 		{
-			AddNpc(153019, L(crackName), "f_farm_47_3", x, z, direction, async dialog =>
+			AddNpc(155010, L(crackName), "f_farm_47_3", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_farm_47_3", 1004);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A jagged crack in the earth breathes out faint orange pollen, smelling of scorched metal*{/}"));
+					await dialog.Msg(L("{#666666}*A burrow tunnel sunk into the field, its mouth ringed by mounded spoil. Faint orange pollen rises from the dark, smelling of scorched metal.*{/}"));
 					return;
 				}
 
@@ -417,7 +410,7 @@ public class FFarm473QuestNpcsScript : GeneralScript
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Surveying the crack..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Surveying the burrow..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
 
 				if (result == TimeActionResult.Completed)
 				{
@@ -426,7 +419,7 @@ public class FFarm473QuestNpcsScript : GeneralScript
 					character.Variables.Perm.Set("Laima.Quests.f_farm_47_3.Quest1004.CracksVisited", cracksVisited + 1);
 
 					character.ServerMessage(L(observation));
-					character.ServerMessage(LF("Cracks surveyed: {0}/4", cracksVisited + 1));
+					character.ServerMessage(LF("Burrows surveyed: {0}/4", cracksVisited + 1));
 
 					if (cracksVisited + 1 >= 4)
 					{
@@ -440,10 +433,12 @@ public class FFarm473QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddPortalCrack(1, "Aqueduct Crack", "Hairline fissure along the aqueduct footing. Pollen thick; stonework blackened.", -2170, 415, 0);
-		AddPortalCrack(2, "Cabbage-Row Crack", "Widest of the four. Cabbages within ten paces are pollen-yellow and slumped.", -1170, -240, 90);
-		AddPortalCrack(3, "East Fence Crack", "Hidden under weeds. Fence posts warped where the pollen touched wood.", 1000, 50, 180);
-		AddPortalCrack(4, "Abandoned Well Crack", "Deepest of the four. Pollen rises in visible threads from the well's edge.", -1630, -900, 270);
+		AddPortalCrack(1, "Demon Burrow", "Narrow mouth, fresh spoil ringed around it. Pollen seeps out in slow orange threads. Soil around the rim scorched black.", -1644, 859, 44);
+		AddPortalCrack(2, "Demon Burrow", "Wider mouth than the rest. Grass within five paces is yellow and slumped, leaves curled.", -1785, 522, 44);
+		AddPortalCrack(3, "Demon Burrow", "Long, slot-shaped opening parallel to the cart-track. Rim crusted with a fine yellow film.", -1771, 225, 44);
+		AddPortalCrack(4, "Demon Burrow", "Deepest of the lot - dark all the way down. Pollen rises in visible columns when the wind drops.", -1880, -219, 44);
+		AddPortalCrack(5, "Demon Burrow", "Half-hidden under flattened barley. The stalks above it are root-rotted and brittle.", -1101, 558, 44);
+		AddPortalCrack(6, "Demon Burrow", "Forked - two tunnel mouths diverging from a single spoil-ring. Both breathe pollen evenly.", -1337, 842, 44);
 	}
 }
 
@@ -493,7 +488,7 @@ public class PollenWarningQuest : QuestScript
 		SetId("f_farm_47_3", 1002);
 		SetName("Pollen Warning");
 		SetType(QuestType.Sub);
-		SetDescription("Farmer Morta needs a warning letter carried south to Jonas-the-Elder at Shaton Farm before the demon-pollen reaches his greenhouses.");
+		SetDescription("Farmer Morta needs a warning letter carried east to Farmer Stanislovas in the Myrkiti barley fields, so his farmhands can mask up and shut the sheds before the demon-pollen reaches them.");
 		SetLocation("f_farm_47_3");
 		SetAutoTracked(true);
 
@@ -502,7 +497,7 @@ public class PollenWarningQuest : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver("[Farmer] Morta", "f_farm_47_3");
 
-		AddObjective("deliverWarning", "Deliver Morta's warning to Jonas-the-Elder",
+		AddObjective("deliverWarning", "Deliver Morta's warning to Stanislovas",
 			new VariableCheckObjective("Laima.Quests.f_farm_47_3.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(1900, 1430));
@@ -533,14 +528,14 @@ public class AntiPollenMasksQuest : QuestScript
 		SetId("f_farm_47_3", 1003);
 		SetName("Anti-Pollen Masks");
 		SetType(QuestType.Sub);
-		SetDescription("Farmer Eglė needs five Kepari inner shells gathered from drifting seed-pods so she can stitch breathing-masks for Myrkiti's farmhands.");
+		SetDescription("Farmer Goda needs five Kepari inner shells gathered from drifting seed-pods so she can stitch breathing-masks for Myrkiti's farmhands.");
 		SetLocation("f_farm_47_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Farmer] Eglė", "f_farm_47_3");
+		AddQuestGiver("[Farmer] Goda", "f_farm_47_3");
 
 		AddObjective("collectHusks", "Gather inner shells from drifting Kepa-pods",
 			new CollectItemObjective(662163, 5));
@@ -559,7 +554,7 @@ public class AntiPollenMasksQuest : QuestScript
 			character.Inventory.CountItem(662163),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_3.Quest1003.Pod{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_3.Quest1003.Pod{i}.Spawned");
@@ -572,7 +567,7 @@ public class AntiPollenMasksQuest : QuestScript
 			character.Inventory.CountItem(662163),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_3.Quest1003.Pod{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_3.Quest1003.Pod{i}.Spawned");
@@ -588,9 +583,9 @@ public class PortalCrackSurveyQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_farm_47_3", 1004);
-		SetName("Portal Crack Survey");
+		SetName("Demon Burrow Survey");
 		SetType(QuestType.Sub);
-		SetDescription("Farmer Dominykas has asked you to survey the four demon-prison cracks across Myrkiti Farm so he can petition Klaipeda's magistrates for a proper sealing mage.");
+		SetDescription("Farmer Dominykas has asked you to survey the demon-burrows tunneled across Myrkiti Farm so he can petition Klaipeda's magistrates for a proper sealing mage.");
 		SetLocation("f_farm_47_3");
 		SetAutoTracked(true);
 
@@ -599,7 +594,7 @@ public class PortalCrackSurveyQuest : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver("[Farmer] Dominykas", "f_farm_47_3");
 
-		AddObjective("surveyCracks", "Survey the demon-prison cracks",
+		AddObjective("surveyCracks", "Survey the demon-prison burrows",
 			new VariableCheckObjective("Laima.Quests.f_farm_47_3.Quest1004.CracksVisited", 4, true));
 
 		AddReward(new ExpReward(1900, 1430));
@@ -612,7 +607,7 @@ public class PortalCrackSurveyQuest : QuestScript
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_3.Quest1004.CracksVisited");
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 6; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_3.Quest1004.Crack{i}");
 		}
@@ -621,7 +616,7 @@ public class PortalCrackSurveyQuest : QuestScript
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_3.Quest1004.CracksVisited");
-		for (int i = 1; i <= 4; i++)
+		for (int i = 1; i <= 6; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_3.Quest1004.Crack{i}");
 		}

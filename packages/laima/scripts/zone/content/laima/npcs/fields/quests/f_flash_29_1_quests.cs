@@ -23,7 +23,7 @@ public class FFlash291QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Minos Charge
 		//-------------------------------------------------------------------------
-		AddNpc(20120, L("[Fortress Watch] Havel"), "f_flash_29_1", -1000, -700, 180, async dialog =>
+		AddNpc(20120, L("[Fortress Watch] Havel"), "f_flash_29_1", -1421, -204, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_29_1", 1001);
@@ -85,12 +85,12 @@ public class FFlash291QuestNpcsScript : GeneralScript
 
 		// Quest 2: Seacore Cracking
 		//-------------------------------------------------------------------------
-		AddNpc(20121, L("[Tide-Warden] Iness"), "f_flash_29_1", -500, -200, 90, async dialog =>
+		AddNpc(20121, L("[Tide-Warden] Ines"), "f_flash_29_1", -570, -323, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_29_1", 1002);
 
-			dialog.SetTitle(L("Iness"));
+			dialog.SetTitle(L("Ines"));
 
 			if (!character.Quests.Has(questId))
 			{
@@ -148,7 +148,7 @@ public class FFlash291QuestNpcsScript : GeneralScript
 
 		// Quest 3: The Fortress Armament
 		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Quartermaster] Osk"), "f_flash_29_1", 400, 100, 0, async dialog =>
+		AddNpc(20117, L("[Quartermaster] Osk"), "f_flash_29_1", -1493, 298, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_29_1", 1003);
@@ -215,70 +215,6 @@ public class FFlash291QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Full re-equip done. Patrol walks faster, holds tighter. Three-month mortality down to zero."));
 			}
 		});
-
-		// Armament Niche Points
-		//-------------------------------------------------------------------------
-		void AddArmamentNiche(int cacheNum, int x, int z, int direction)
-		{
-			AddNpc(12080, L("Armament Niche"), "f_flash_29_1", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_flash_29_1", 1003);
-				var variableKey = $"Laima.Quests.f_flash_29_1.Quest1003.Cache{cacheNum}";
-				var spawnedKey = $"Laima.Quests.f_flash_29_1.Quest1003.Cache{cacheNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A sealed iron-clasp niche in the fortress wall, high and sheltered.*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already recovered this niche's cache*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Infroholder_Bow_Red, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}Infroholder Bowmen drop from the upper niches, bows drawn!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Prying the iron clasp..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650388, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Fortress Armament Cache"));
-
-					var currentCount = character.Inventory.CountItem(650388);
-					character.ServerMessage(LF("Caches recovered: {0}/4", currentCount));
-
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All four armament caches recovered! Return to Osk.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You set the clasp back. Try again."));
-				}
-			});
-		}
-
-		AddArmamentNiche(1, -800, 200, 0);
-		AddArmamentNiche(2, 200, 500, 0);
-		AddArmamentNiche(3, 600, -400, 0);
-		AddArmamentNiche(4, -200, -600, 0);
 
 		// Quest 4: The Green-Mage Cabal
 		//-------------------------------------------------------------------------
@@ -352,7 +288,7 @@ public class FFlash291QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Herd-Master
 		//-------------------------------------------------------------------------
-		AddNpc(20123, L("[Bounty Hunter] Drus"), "f_flash_29_1", 700, -300, 270, async dialog =>
+		AddNpc(20123, L("[Bounty Hunter] Drus"), "f_flash_29_1", 1292, 141, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_29_1", 1005);
@@ -436,7 +372,7 @@ public class FFlash291QuestNpcsScript : GeneralScript
 
 		// Quest 6: Seawall Perimeter
 		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Seawall Captain] Mara"), "f_flash_29_1", -200, -800, 45, async dialog =>
+		AddNpc(20059, L("[Seawall Captain] Mara"), "f_flash_29_1", -276, -533, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_29_1", 1006);
@@ -549,7 +485,7 @@ public class SeacoreCrackingQuest : QuestScript
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Tide-Warden] Iness"), "f_flash_29_1");
+		AddQuestGiver(L("[Tide-Warden] Ines"), "f_flash_29_1");
 
 		AddObjective("gatherSeacores", L("Gather rime-white seacores"),
 			new CollectItemObjective(663052, 5));
@@ -601,28 +537,18 @@ public class TheFortressArmamentQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650388, 0.40f, MonsterId.Infroholder_Bow_Red);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650388, character.Inventory.CountItem(650388), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_29_1.Quest1003.Cache{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_29_1.Quest1003.Cache{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650388, character.Inventory.CountItem(650388), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_29_1.Quest1003.Cache{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_29_1.Quest1003.Cache{i}.Spawned");
-		}
 	}
 }
 
@@ -654,6 +580,8 @@ public class TheGreenMageCabalQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650575, 0.50f, MonsterId.Minos_Mage_Green);
 	}
 
 	public override void OnComplete(Character character, Quest quest)

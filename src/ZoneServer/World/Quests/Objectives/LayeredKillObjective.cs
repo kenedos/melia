@@ -29,17 +29,24 @@ namespace Melia.Zone.World.Quests.Objectives
 		public int Count { get; }
 
 		/// <summary>
+		/// Optional buff applied to each spawned monster (e.g. EliteMonsterBuff).
+		/// </summary>
+		public BuffId? BuffId { get; }
+
+		/// <summary>
 		/// Creates a kill specification.
 		/// </summary>
 		/// <param name="monsterId"></param>
 		/// <param name="count"></param>
-		public KillSpec(int monsterId, int count = 1)
+		/// <param name="buffId"></param>
+		public KillSpec(int monsterId, int count = 1, BuffId? buffId = null)
 		{
 			if (count < 1)
 				throw new ArgumentException("Count must be >= 1.", nameof(count));
 
 			this.MonsterId = monsterId;
 			this.Count = count;
+			this.BuffId = buffId;
 		}
 	}
 
@@ -176,7 +183,7 @@ namespace Melia.Zone.World.Quests.Objectives
 			foreach (var spec in this.SpawnList)
 			{
 				for (var i = 0; i < spec.Count; i++)
-					this.SpawnOne(character, spec.MonsterId);
+					this.SpawnOne(character, spec.MonsterId, spec.BuffId);
 			}
 		}
 
@@ -186,7 +193,7 @@ namespace Melia.Zone.World.Quests.Objectives
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="monsterId"></param>
-		private void SpawnOne(Character character, int monsterId)
+		private void SpawnOne(Character character, int monsterId, BuffId? buffId = null)
 		{
 			if (character?.Map == null)
 				return;
@@ -223,6 +230,9 @@ namespace Melia.Zone.World.Quests.Objectives
 			spawnMob.Died += (deadMob, killer) => this.OnSpawnedDied(characterRef, deadMob, killer);
 
 			character.Map.AddMonster(spawnMob);
+
+			if (buffId.HasValue)
+				spawnMob.StartBuff(buffId.Value, 1, 0, TimeSpan.Zero, character);
 		}
 
 		/// <summary>

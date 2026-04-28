@@ -25,21 +25,21 @@ public class FFarm472QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// QUEST 1001: Aqueduct Siege
 		// =====================================================================
-		// Bridge-Farmer Mindaugas - Kepari Shamans assaulting the aqueduct
+		// Farmer Tadas - Kepari Shamans assaulting the aqueduct
 		//---------------------------------------------------------------------
-		AddNpc(20128, L("[Bridge-Farmer] Mindaugas"), "f_farm_47_2", 2559, -1202, 225, async dialog =>
+		AddNpc(20128, L("[Farmer] Tadas"), "f_farm_47_2", 1383, 1005, 89, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_2", 1001);
 
-			dialog.SetTitle(L("Mindaugas"));
+			dialog.SetTitle(L("Tadas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer in patched armor inspects a scorch-mark on the aqueduct's stone footing, knuckles white on a short spear*{/}"));
+				await dialog.Msg(L("{#666666}*A farmer in patched armor turns a scorched stone chip in his fingers, knuckles white on a short spear*{/}"));
 				await dialog.Msg(L("They're casting at the bridges now. Kepari Shamans - Velnias-race demon-flesh, right out of the prison gate. If one stone of that aqueduct cracks, four farms lose water before sundown."));
 
-				var response = await dialog.Select(L("I was a farmhand two months ago. Now I'm a bridge-warden with a farmer's spear. The magistrates won't send soldiers because 'the situation is being monitored.' I need them thinned. Fifteen shamans - that's enough to stop the next spell."),
+				var response = await dialog.Select(L("I was a farmhand two months ago. Now I'm holding a spear and watching the water for sparks. The magistrates won't send soldiers because 'the situation is being monitored.' I need them thinned. Fifteen shamans - that's enough to stop the next spell."),
 					Option(L("I'll kill the Shamans"), "help"),
 					Option(L("Why are they attacking the water?"), "info"),
 					Option(L("Sounds suicidal"), "leave")
@@ -51,13 +51,20 @@ public class FFarm472QuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*He exhales, the spear shaft loosening in his grip*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Take this dagger - Arde-forged. The fire bites demon-flesh harder than anything else I've got."));
-						character.Inventory.Add(113001, 1, InventoryAddType.PickUp);
+
+						if (!character.Variables.Perm.GetBool("Laima.Quests.f_farm_47_2.Quest1001.DaggerGiven", false))
+						{
+							await dialog.Msg(L("Hold on - take this knife before you go. It's nothing fancy, kitchen-grade steel my brother left behind, but it'll bite a Kepari deeper than a wooden spear-shaft will. Better than nothing."));
+							await dialog.Msg(L("{#666666}*He works a plain knife from his belt and presses it into your hand.*{/}"));
+							character.Inventory.Add(111001, 1, InventoryAddType.PickUp);
+							character.Variables.Perm.Set("Laima.Quests.f_farm_47_2.Quest1001.DaggerGiven", true);
+						}
+
 						await dialog.Msg(L("Stay low when they cast. The lightning arcs straight - duck and it passes over."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Ask them. They don't answer. The best guess Saule has is that they want the farms evacuated before something bigger comes through the portal."));
+						await dialog.Msg(L("Ask them. They don't answer. The best guess Lina has is that they want the farms evacuated before something bigger comes through the portal."));
 						await dialog.Msg(L("If the wells dry, we pack. If we pack, the demon prison has a clear road to Klaipeda. So we stay. And we fight."));
 						break;
 
@@ -86,7 +93,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The aqueduct still flows. Four farms still have water. Every day we hold the bridge is a day the villages don't evacuate."));
+				await dialog.Msg(L("The aqueduct still flows. Four farms still have water. Every day we hold is a day the villages don't pack."));
 			}
 		});
 
@@ -95,7 +102,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Audrone - Evacuation planning with Tenants' Farm
 		//---------------------------------------------------------------------
-		AddNpc(20161, L("[Farmer] Audrone"), "f_farm_47_2", -493, 960, 0, async dialog =>
+		AddNpc(20161, L("[Farmer] Audrone"), "f_farm_47_2", -172, 1790, 315, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_2", 1002);
@@ -107,7 +114,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("{#666666}*A farmer annotates a map of the farm cluster, marking each homestead with a colored pin*{/}"));
 				await dialog.Msg(L("If the portal widens tomorrow, I need to know which farm takes whose children. Red pins for Myrkiti, blue for Shaton, green for here. Tenants' Farm has the most barns - they shelter Myrkiti's families first."));
 
-				var response = await dialog.Select(L("I drafted a refugee protocol - who goes where, what supplies each host farm needs, who rings the evacuation bell. Mykolas at Tenants' Farm needs a copy before he can plan the barn conversions. Carry it through the north warp?"),
+				var response = await dialog.Select(L("I drafted a refugee protocol - who goes where, what supplies each host farm needs, who rings the evacuation bell. Mykolas at Tenants' Farm needs a copy before he can plan the barn conversions. Can you carry it for me towards Tenants' Farm?"),
 					Option(L("I'll deliver it to Mykolas"), "help"),
 					Option(L("Is it really that bad?"), "info"),
 					Option(L("That's the magistrate's job"), "leave")
@@ -116,11 +123,12 @@ public class FFarm472QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*She folds the protocol carefully, tucking it into a water-proof oilcloth*{/}"));
+						await dialog.Msg(L("{#666666}*She folds the pin-marked map into a waterproof oilcloth and presses it into your hands*{/}"));
 
 						character.Quests.Start(questId);
+						character.Inventory.Add(650580, 1, InventoryAddType.PickUp);
 						await dialog.Msg(L("If Mykolas argues, tell him it's not negotiable - the plan has to be ready before the bell rings."));
-						await dialog.Msg(L("And if you pass Gintaras near the portal - tell him the ward-survey is still waiting."));
+						await dialog.Msg(L("And if you pass Grimaras near the portal - tell him the ward-survey is still waiting."));
 						break;
 
 					case "info":
@@ -158,59 +166,27 @@ public class FFarm472QuestNpcsScript : GeneralScript
 		});
 
 		// =====================================================================
-		// Tenant-Farmer Mykolas - Recipient for Quest 1002
-		//---------------------------------------------------------------------
-		AddNpc(20117, L("[Tenant-Farmer] Mykolas"), "f_farm_47_2", 1888, 1061, 225, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_farm_47_2", 1002);
-
-			dialog.SetTitle(L("Mykolas"));
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A broad-shouldered tenant farmer chews a stalk of straw, eyes on a barn ridge in the distance*{/}"));
-				await dialog.Msg(L("Tenants' Farm is through the warp behind me. Quieter over there. For now."));
-				return;
-			}
-
-			var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_farm_47_2.Quest1002.Delivered", 0) >= 1;
-
-			if (delivered)
-			{
-				await dialog.Msg(L("Tell Audrone seven barns, thirty pallets. I'll have them cleared by week's end."));
-				return;
-			}
-
-			await dialog.Msg(L("{#666666}*He reads the protocol, jaw tightening*{/}"));
-			await dialog.Msg(L("Red pins first. Myrkiti's children. Right."));
-			await dialog.Msg(L("{#666666}*He folds the paper and tucks it inside his coat*{/}"));
-			await dialog.Msg(L("Tell Audrone I've got seven barns, thirty pallets each - more than she calculated. The big hay-barn has a coal stove; I'll prioritize that one for infants."));
-			await dialog.Msg(L("And tell her I'll have the barns ready in five days, not seven. No sense cutting it close when the portal's widening."));
-
-			character.Variables.Perm.Set("Laima.Quests.f_farm_47_2.Quest1002.Delivered", 1);
-			character.ServerMessage(L("{#FFD700}Protocol delivered. Return to Audrone.{/}"));
-		});
+		// Mykolas (recipient for Quest 1002) lives at f_farm_47_1
 
 		// =====================================================================
 		// QUEST 1003: Charged Dandel Pods
 		// =====================================================================
-		// Wardmaker-Farmer Saule - Ward-circles against demon-pollen
+		// Wardmaker-Farmer Lina - Ward-circles against demon-pollen
 		//---------------------------------------------------------------------
-		AddNpc(147419, L("[Wardmaker-Farmer] Saule"), "f_farm_47_2", 460, 4, 90, async dialog =>
+		AddNpc(147419, L("[Wardmaker-Farmer] Lina"), "f_farm_47_2", 491, -56, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_2", 1003);
 
-			dialog.SetTitle(L("Saule"));
+			dialog.SetTitle(L("Lina"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer winds copper wire around a tight bundle of dandelion fluff, crackling faintly with static*{/}"));
-				await dialog.Msg(L("Three generations of wardmakers in my family. My grandmother warded against frost, my mother against weevils. I ward against demon-pollen. A Dandel pod holds enough charge to keep a threshold clean for a month."));
+				await dialog.Msg(L("{#666666}*A farmer winds copper wire around a knotty round pod, the husk crackling faintly under her fingers*{/}"));
+				await dialog.Msg(L("Three generations of wardmakers in my family. My grandmother warded against frost, my mother against weevils. I ward against demon-pollen. One charged Dandel pod holds enough lightning to keep a threshold clean for a month."));
 
-				var response = await dialog.Select(L("I need five charged pods for a new ward-circle at the evacuation barn. The Dandels drift over the fields - pluck the ripe ones, the ones that prickle when you touch them. Left ones too long, they lose their spark; took ones too early, no charge at all."),
-					Option(L("I'll gather five pods"), "help"),
+				var response = await dialog.Select(L("I need six charged pods for a new ward-circle at the evacuation barn. The Dandels drift over the fields, snapping at gnats with those big toothed mouths - and every so often one drops a pod. The fresh ones still hum from the parent's lightning. Pluck the ripe ones, the ones that prickle when you touch them. Left ones too long, they go inert; took ones too early, no charge at all."),
+					Option(L("I'll gather six pods"), "help"),
 					Option(L("How do the wards work?"), "info"),
 					Option(L("Another farmer task"), "leave")
 				);
@@ -221,11 +197,11 @@ public class FFarm472QuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*She hands you a copper-lined pouch*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Touch only the stem. The fluff itself is soft but the static hurts. Startled Dandels buzz past - if one lands in your hair, shake it off, don't swat it."));
+						await dialog.Msg(L("Pluck them by the husk, not the spine. The husk's tough; the spine's where the charge lives, and it bites. If a Dandel comes circling overhead, don't swing at it - they hate the crack of a blade and they spit lightning when they're angry. Just stand still until it loses interest."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Copper coil, dandelion charge, salt circle, threshold stone. Close the loop, bind the corners, seal with the charge at sunrise."));
+						await dialog.Msg(L("Copper coil, pod-charge, salt circle, threshold stone. Close the loop, bind the corners, seal with the charge at sunrise."));
 						await dialog.Msg(L("Keeps the pollen out for a lunar month. Keeps most small demons out for three nights. Keeps a Kepari Shaman out for about one angry spell. Not forever. Never forever."));
 						break;
 
@@ -238,17 +214,17 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			{
 				var podCount = character.Inventory.CountItem(663355);
 
-				if (podCount >= 5)
+				if (podCount >= 6)
 				{
 					await dialog.Msg(L("{#666666}*She tests each pod with a copper pick; sparks jump neatly*{/}"));
-					await dialog.Msg(L("All five charged. Stem-plucked. No crushed fluff. You've a careful hand."));
+					await dialog.Msg(L("All six charged. Husk-plucked, spines unbroken. You've a careful hand."));
 					await dialog.Msg(L("Here - a farmer's wage with my own thanks folded in. The evacuation barn has its ward by sundown."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Five pods. Stem-pluck only. The copper pouch holds the charge - drop them straight in."));
+					await dialog.Msg(L("Six pods. Husk-pluck only, never the spine. The copper pouch holds the charge - drop them straight in."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
@@ -265,14 +241,14 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 		void AddDandelPod(int podNumber, int x, int z, int direction)
 		{
-			AddNpc(47246, L("Charged Dandel Pod"), "f_farm_47_2", x, z, direction, async dialog =>
+			AddNpc(153046, L("Charged Dandel Pod"), "f_farm_47_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_farm_47_2", 1003);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A dandelion head drifts at waist height, fluff crackling faintly with static*{/}"));
+					await dialog.Msg(L("{#666666}*A knotty pod sits low in the grass, husk crackling faintly with static. A Dandel must have shed it nearby.*{/}"));
 					return;
 				}
 
@@ -281,23 +257,17 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 				if (gathered)
 				{
-					await dialog.Msg(L("{#666666}*The stem has already been cut. A new pod will drift by tomorrow*{/}"));
+					await dialog.Msg(L("{#666666}*The husk has already been plucked. Another Dandel will shed a fresh pod here in a day or so.*{/}"));
 					return;
 				}
 
-				var spawnedKey = $"Laima.Quests.f_farm_47_2.Quest1003.Pod{podNumber}.Spawned";
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 15)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
+				var luredCount = LureNearbyEnemies(character,
+					new[] { MonsterId.Dandel_Orange, MonsterId.Dandel_White, MonsterId.Dandel },
+					150, 400);
+				if (luredCount > 0)
+					character.ServerMessage(L("{#FF6666}As you start plucking, the nearby Dandels turn on you.{/}"));
 
-					if (SpawnTempMonsters(character, MonsterId.Dandel_Orange, 1, 70, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}A startled Orange Dandel buzzes away from the pod!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Plucking stem..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Plucking pod..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
 
 				if (result == TimeActionResult.Completed)
 				{
@@ -305,11 +275,11 @@ public class FFarm472QuestNpcsScript : GeneralScript
 					character.Variables.Perm.Set(variableKey, true);
 
 					var currentCount = character.Inventory.CountItem(663355);
-					character.ServerMessage(LF("Charged pods gathered: {0}/5", currentCount));
+					character.ServerMessage(LF("Charged pods gathered: {0}/6", currentCount));
 
-					if (currentCount >= 5)
+					if (currentCount >= 6)
 					{
-						character.ServerMessage(L("{#FFD700}All pods gathered! Return to Saule.{/}"));
+						character.ServerMessage(L("{#FFD700}All pods gathered! Return to Lina.{/}"));
 					}
 				}
 				else
@@ -319,52 +289,60 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddDandelPod(1, -708, 1023, 0);
-		AddDandelPod(2, -432, 1196, 90);
-		AddDandelPod(3, 357, 1938, 180);
-		AddDandelPod(4, 529, 287, 270);
-		AddDandelPod(5, -615, 1724, 0);
+		AddDandelPod(1, 332, -7, 45);
+		AddDandelPod(2, 3, 378, 45);
+		AddDandelPod(3, 384, 557, 45);
+		AddDandelPod(4, 698, 460, 45);
+		AddDandelPod(5, 202, 984, 45);
+		AddDandelPod(6, 1382, 825, 45);
+		AddDandelPod(7, 1468, 1294, 45);
+		AddDandelPod(8, 249, 1220, 45);
 
 		// =====================================================================
 		// QUEST 1004: Broken Ward Stones
 		// =====================================================================
-		// Farmer Gintaras - Surveying the ancient warding circle at the portal
+		// Soldier Grimaras - Surveying the ancient warding circle at the portal
 		//---------------------------------------------------------------------
-		AddNpc(20125, L("[Farmer] Gintaras"), "f_farm_47_2", -1616, -1188, 45, async dialog =>
+		AddNpc(20125, L("[Soldier] Grimaras"), "f_farm_47_2", -1421, -1123, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_47_2", 1004);
 
-			dialog.SetTitle(L("Gintaras"));
+			dialog.SetTitle(L("Grimaras"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A quiet farmer sharpens a knife he will not use, the warp-circle's glow flickering across his hands*{/}"));
-				await dialog.Msg(L("The Ancients built a ring of warding stones around this portal. Four stones. Each one held a rune that kept the prison sealed."));
+				await dialog.Msg(L("{#666666}*A soldier in field colors leans on his halberd, the warp-circle's glow flickering across his breastplate*{/}"));
+				await dialog.Msg(L("Years ago the ground tore open in the middle of this field. No warning, no quake - one morning a hole into the demon prison was just there, and it has been there since. The Ancients rode out from Klaipeda within the week and laid four seals around it. Stone wards, each carved with a binding rune."));
+				await dialog.Msg(L("The seals don't close the portal. They never could. What they do is keep what's inside the prison from spilling out. A man can walk through that gate if he's stupid enough - the seals don't stop anyone going in. Nothing comes back the other way. That's the whole point."));
 
-				var response = await dialog.Select(L("The stones are cracked now. All four. A Fedimian mage could read the breaks - tell us when each seal failed, tell us why. I can't approach the portal myself; the pollen close to the warp knocks a man down. But you might. Survey each stone and bring the notes back."),
-					Option(L("I'll survey the stones"), "help"),
-					Option(L("Why did the seals fail?"), "info"),
+				var response = await dialog.Select(L("The seals are still holding, but stone weathers. Wind, frost, demon-pollen eating the carving year by year. The wardmage in Fedimian wants to know how much time we have before any of them give. Walk the circle, inspect each seal up close, note the wear - hairline cracks, runes worn shallow, edges crumbling. My orders keep me on the line; I can't break perimeter to do it myself."),
+					Option(L("I'll inspect the seals"), "help"),
+					Option(L("What happens if I go in?"), "info"),
 					Option(L("The portal's too close"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He hands you a piece of charcoal and a square of vellum*{/}"));
+						await dialog.Msg(L("{#666666}*He hands you a brass caliper and a soldier's notebook from his pack, then catches your wrist before you turn away*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Four stones. They ring the warp point. Walk the circle counter-clockwise - superstition, but mine."));
-						await dialog.Msg(L("If you smell metal in your mouth, the pollen is getting to you. Back off for a count of ten."));
+						await dialog.Msg(L("Listen. Look at me. Stay on this side of the portal. The seals around it are an outbound binding - whatever's on the inside trying to get out gets pinned, and that includes you. Cross that threshold and you don't come back. Not by sword, not by spell, not by prayer."));
+						await dialog.Msg(L("I have watched four people walk through that gate thinking they'd just take a quick look. None of them came back. So do me the favor: keep both feet outside the warp circle while you work. The seals you're surveying are at arm's reach from the edge - you don't need to step inside to read them."));
+						await dialog.Msg(L("Four seals. Ring the warp point. Walk the circle counter-clockwise - old soldier's habit, sweep your blind side first. Look close at each rune. Pitting in the strokes. Edges going soft. If you smell metal in your mouth, the pollen is getting to you. Back off for a count of ten."));
+						await dialog.Msg(L("Finish the survey and the wardmage in Fedimian sends a Seal Release Crystal back with my courier - one for the inspector. {#FF6666}Don't go in until you have it.{/} The crystal is the only way out, and she only cuts them for surveyors who already brought her the notes."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Saule says the seals were worn thin for centuries and the demon war finished them off. Mindaugas says someone broke them from outside. I don't know."));
-						await dialog.Msg(L("The ward-mage will know. That's why we need the rubbings."));
+						await dialog.Msg(L("{#666666}*He grips the haft of his halberd a little tighter*{/}"));
+						await dialog.Msg(L("You don't come back out. That's what happens. The seals are a one-way binding - they don't care whether you're a demon or a man, only that you crossed the threshold from the inside. Anything with a soul-tether trying to leave the prison gets pinned by the wards."));
+						await dialog.Msg(L("Three militiamen and a Pyromancer have walked through that gate in my time on this line. None of them came back. We hear them sometimes, on the wind. It carries from the other side."));
+						await dialog.Msg(L("The wardmage in Fedimian can attune a Seal Release Crystal to a single bearer - the crystal slips you past the binding on the way out. She makes them sparingly, and only for surveyors who give her something useful. So if you ever plan on going in there - finish the seal survey first, and don't lose the crystal."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("It is. But somebody has to walk it. Come back if you change your mind."));
+						await dialog.Msg(L("Understood. Somebody has to walk it. Come back if you change your mind."));
 						break;
 				}
 			}
@@ -374,21 +352,41 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 				if (stonesVisited >= 4)
 				{
-					await dialog.Msg(L("{#666666}*He spreads the rubbings, tracing each fracture line with the tip of his knife*{/}"));
-					await dialog.Msg(L("Three broken outward - as if pushed from the inside. One broken inward - as if struck from outside."));
-					await dialog.Msg(L("{#666666}*He sets the knife down carefully*{/}"));
-					await dialog.Msg(L("Someone broke the fourth seal. The demons did the rest. The wardmage in Klaipeda needs to see this. Take these for your walking."));
+					await dialog.Msg(L("{#666666}*He spreads your notes on his shield, running through each seal's measurements with a gloved finger*{/}"));
+					await dialog.Msg(L("Three of the seals show steady wear. Centuries of weather, even decay, nothing surprising. The fourth is eroding faster than the others. Pitted strokes. Edges going soft. The pollen is eating at it harder than wind ever could."));
+					await dialog.Msg(L("{#666666}*He folds the notes into his courier-pouch and hands you a small pale crystal in return*{/}"));
+					await dialog.Msg(L("Wardmage's standing offer. A Seal Release Crystal, attuned to your survey - she keeps a few cut and ready for whoever does her the favor. Keep it on you. If you ever set foot inside that prison, the crystal is what gets you back out."));
+					await dialog.Msg(L("The wardmage in Klaipeda needs to see this before that fourth seal fails. Soldier's purse for your trouble."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Four stones. Counter-clockwise. Don't linger at the portal."));
+					await dialog.Msg(L("Four seals. Counter-clockwise. Inspect each one closely. Don't linger at the portal."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The wardmage rode out two days ago. She's studying the rubbings. She hasn't spoken a word since she read them."));
+				await dialog.Msg(L("The wardmage rode out two days ago. She's drafting a re-carving plan for the fourth seal. The other three should hold for another generation, she thinks."));
+
+				if (character.Inventory.CountItem(650530) <= 0)
+				{
+					var response = await dialog.Select(L("You're not carrying the Seal Release Crystal she cut for you. Used it, lost it, or never picked it up - doesn't matter. The wardmage left a small stock with my courier for exactly this. Want a replacement?"),
+						Option(L("Yes, I'll take one"), "give"),
+						Option(L("No, I'm fine"), "decline")
+					);
+
+					if (response == "give")
+					{
+						await dialog.Msg(L("{#666666}*He digs a fresh pale crystal out of his courier-pouch and presses it into your hand*{/}"));
+						await dialog.Msg(L("Last one in the pouch. The courier rides for Fedimian tomorrow; she'll send more by week's end. Keep it on you this time."));
+						character.Inventory.Add(650530, 1, InventoryAddType.PickUp);
+					}
+					else
+					{
+						await dialog.Msg(L("Suit yourself. Come back if you change your mind - the pouch isn't going anywhere."));
+					}
+				}
 			}
 		});
 
@@ -407,20 +405,20 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*An ancient warding stone, its runes split by a deep fracture*{/}"));
+					await dialog.Msg(L("{#666666}*An ancient warding stone, its binding rune still legible beneath centuries of weather*{/}"));
 					return;
 				}
 
 				var variableKey = $"Laima.Quests.f_farm_47_2.Quest1004.Stone{stoneNumber}";
-				var rubbed = character.Variables.Perm.GetBool(variableKey, false);
+				var inspected = character.Variables.Perm.GetBool(variableKey, false);
 
-				if (rubbed)
+				if (inspected)
 				{
-					await dialog.Msg(L("{#666666}*You've already taken a rubbing from this stone*{/}"));
+					await dialog.Msg(L("{#666666}*You've already inspected this seal*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Taking rubbing..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Inspecting seal..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
 
 				if (result == TimeActionResult.Completed)
 				{
@@ -429,24 +427,24 @@ public class FFarm472QuestNpcsScript : GeneralScript
 					character.Variables.Perm.Set("Laima.Quests.f_farm_47_2.Quest1004.StonesVisited", stonesVisited + 1);
 
 					character.ServerMessage(L(observation));
-					character.ServerMessage(LF("Ward stones surveyed: {0}/4", stonesVisited + 1));
+					character.ServerMessage(LF("Seals inspected: {0}/4", stonesVisited + 1));
 
 					if (stonesVisited + 1 >= 4)
 					{
-						character.ServerMessage(L("{#FFD700}Survey complete! Return to Gintaras.{/}"));
+						character.ServerMessage(L("{#FFD700}Survey complete! Return to Grimaras.{/}"));
 					}
 				}
 				else
 				{
-					character.ServerMessage(L("Rubbing interrupted."));
+					character.ServerMessage(L("Inspection interrupted."));
 				}
 			});
 		}
 
-		AddWardStone(1, "North Ward Stone", "Fracture pushed outward from the core. The rune is shattered at the top.", -1560, -1100, 0);
-		AddWardStone(2, "East Ward Stone", "Fracture pushed outward. The rune's lower half is intact, the upper crumbled.", -1500, -1240, 90);
-		AddWardStone(3, "South Ward Stone", "Fracture pushed outward. The oldest of the four - weathered deep.", -1680, -1290, 180);
-		AddWardStone(4, "West Ward Stone", "Fracture pushed inward. The edges are clean, sharp. Recent. Deliberate.", -1720, -1130, 270);
+		AddWardStone(1, "East Ward Stone", "Edges worn smooth by wind. Rune still legible, strokes shallow but whole. Even decay.", -1561, -1138, 135);
+		AddWardStone(2, "South Ward Stone", "Lower half sound. The top has weathered down to faint grooves. Slow, even erosion.", -1555, -1244, 45);
+		AddWardStone(3, "West Ward Stone", "The oldest of the four - moss in every furrow, but the binding rune holds at the core.", -1667, -1239, 315);
+		AddWardStone(4, "North Ward Stone", "Erosion is sharp here, not gradual. The rune's strokes are pitted, the edges going soft. Something is eating at this seal faster than weather alone.", -1659, -1141, 225);
 	}
 }
 
@@ -464,14 +462,14 @@ public class AqueductSiegeQuest : QuestScript
 		SetId("f_farm_47_2", 1001);
 		SetName("Aqueduct Siege");
 		SetType(QuestType.Sub);
-		SetDescription("Bridge-Farmer Mindaugas needs the Kepari Shamans thinned before their spells crack the aqueduct supports.");
+		SetDescription("Farmer Tadas needs the Kepari Shamans thinned before their spells crack the aqueduct supports.");
 		SetLocation("f_farm_47_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Bridge-Farmer] Mindaugas", "f_farm_47_2");
+		AddQuestGiver("[Farmer] Tadas", "f_farm_47_2");
 
 		AddObjective("killShaman", "Defeat Kepari Shamans",
 			new KillObjective(15, new[] { MonsterId.Kepari_Mage }));
@@ -516,11 +514,19 @@ public class RefugeeProtocolQuest : QuestScript
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_2.Quest1002.Delivered");
+
+		var leftover = character.Inventory.CountItem(650580);
+		if (leftover > 0)
+			character.Inventory.Remove(650580, leftover, InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_farm_47_2.Quest1002.Delivered");
+
+		var leftover = character.Inventory.CountItem(650580);
+		if (leftover > 0)
+			character.Inventory.Remove(650580, leftover, InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -534,17 +540,17 @@ public class ChargedDandelPodsQuest : QuestScript
 		SetId("f_farm_47_2", 1003);
 		SetName("Charged Dandel Pods");
 		SetType(QuestType.Sub);
-		SetDescription("Wardmaker Saule needs five charged Dandel pods to complete a ward-circle at the evacuation barn before sundown.");
+		SetDescription("Wardmaker Lina needs five charged Dandel pods to complete a ward-circle at the evacuation barn before sundown.");
 		SetLocation("f_farm_47_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Wardmaker-Farmer] Saule", "f_farm_47_2");
+		AddQuestGiver("[Wardmaker-Farmer] Lina", "f_farm_47_2");
 
 		AddObjective("collectPods", "Gather charged Dandel pods",
-			new CollectItemObjective(663355, 5));
+			new CollectItemObjective(663355, 6));
 
 		AddReward(new ExpReward(1900, 1430));
 		AddReward(new SilverReward(3200));
@@ -560,7 +566,7 @@ public class ChargedDandelPodsQuest : QuestScript
 			character.Inventory.CountItem(663355),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_2.Quest1003.Pod{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_2.Quest1003.Pod{i}.Spawned");
@@ -573,7 +579,7 @@ public class ChargedDandelPodsQuest : QuestScript
 			character.Inventory.CountItem(663355),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_2.Quest1003.Pod{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_47_2.Quest1003.Pod{i}.Spawned");
@@ -589,18 +595,18 @@ public class BrokenWardStonesQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_farm_47_2", 1004);
-		SetName("Broken Ward Stones");
+		SetName("Eroding Seals");
 		SetType(QuestType.Sub);
-		SetDescription("Gintaras needs the four ancient ward stones around the demon-prison portal surveyed, so a Fedimian wardmage can read when and how each seal failed.");
+		SetDescription("Soldier Grimaras needs the four ancient ward stones ringing the demon-prison portal inspected for erosion, so a Fedimian wardmage can judge how long each seal will hold.");
 		SetLocation("f_farm_47_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Farmer] Gintaras", "f_farm_47_2");
+		AddQuestGiver("[Soldier] Grimaras", "f_farm_47_2");
 
-		AddObjective("surveyStones", "Take rubbings from the broken ward stones",
+		AddObjective("surveyStones", "Inspect the four ward stones for erosion",
 			new VariableCheckObjective("Laima.Quests.f_farm_47_2.Quest1004.StonesVisited", 4, true));
 
 		AddReward(new ExpReward(1900, 1430));
@@ -609,6 +615,7 @@ public class BrokenWardStonesQuest : QuestScript
 		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
 		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
 		AddReward(new ItemReward(640011, 1));  // Recovery Potion
+		AddReward(new ItemReward(650530, 1));  // Seal Release Crystal
 	}
 
 	public override void OnComplete(Character character, Quest quest)

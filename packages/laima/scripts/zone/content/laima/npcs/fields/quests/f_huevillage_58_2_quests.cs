@@ -24,76 +24,11 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 	protected override void Load()
 	{
 		// =====================================================================
-		// QUEST 1001: The Black Maize Blight
-		// =====================================================================
-		// Gorge-Trapper Adele - Zibu Maize overrunning the trap-lines
-		//---------------------------------------------------------------------
-		AddNpc(20109, L("[Gorge-Trapper] Adele"), "f_huevillage_58_2", -280, 200, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_huevillage_58_2", 1001);
-
-			dialog.SetTitle(L("Adele"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A wiry trapper in a patched gorge-coat checks the tension on a snare-wire, chewing on a maize-stalk*{/}"));
-				await dialog.Msg(L("Black Maize stalks snap my snares faster than I can reset them. Ten snares, three trapped kits this week. My livelihood is losing to weeds that walk."));
-
-				var response = await dialog.Select(L("Twenty Black Maize cleared. Hit the central maize-field first - that's where the mature stalks cluster. The younger ones scatter back to seed once the elders fall."),
-					Option(L("I'll clear twenty Black Maize"), "help"),
-					Option(L("Why not move your trap-lines?"), "info"),
-					Option(L("Weeds aren't my trade"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						await dialog.Msg(L("{#666666}*She sets the snare-wire down and pulls a folded map from her coat*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Strike at the stalk-joint, not the tassel. Tassels spray spore when cut - you'll choke if you swing high."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Three generations of Adele-women have trapped this gorge. We don't move for weeds - we clear them. That's family pride, inconvenient as it is."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Fair enough. Walk the west slope, then - less maize, more open ground."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killMaize", out var killObj)) return;
-
-				if (killObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*She grins, the first genuine one since you met her, and snaps a maize-stalk between her fingers*{/}"));
-					await dialog.Msg(L("Twenty stalks fewer, three snares re-set, tomorrow's trap-line in business again."));
-					await dialog.Msg(L("Trapper's pay, coin and a spare snare-wire. Useful if you ever try the trade."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Central maize-field. Strike at the joint, not the tassel."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The field's thinned enough that my snares held through a full week. First time in a year. I'll toast your name when the kits cure."));
-			}
-		});
-
-		// =====================================================================
 		// QUEST 1002: Huntress's Hide Order
 		// =====================================================================
 		// Huntress Silvia - Ultanun hide bundle delivery to Tanner Juris
 		//---------------------------------------------------------------------
-		AddNpc(20107, L("[Huntress] Silvia"), "f_huevillage_58_2", 640, 20, 180, async dialog =>
+		AddNpc(20107, L("[Huntress] Silvia"), "f_huevillage_58_2", 1010, 347, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_2", 1002);
@@ -156,7 +91,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// TANNER JURIS (Quest 1002 recipient)
 		// =====================================================================
-		AddNpc(20117, L("[Tanner] Juris"), "f_huevillage_58_2", 820, 100, 270, async dialog =>
+		AddNpc(20117, L("[Tanner] Juris"), "f_huevillage_58_2", 319, 1250, 315, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_2", 1002);
@@ -197,7 +132,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Forager Gedas - Husks for gorge-cure poultices
 		//---------------------------------------------------------------------
-		AddNpc(20017, L("[Forager] Gedas"), "f_huevillage_58_2", 414, -1100, 0, async dialog =>
+		AddNpc(20017, L("[Forager] Gedas"), "f_huevillage_58_2", -247, -1359, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_2", 1003);
@@ -257,82 +192,11 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 		});
 
 		// =====================================================================
-		// MAIZE HUSK SPOTS
-		// =====================================================================
-		// For Quest 1003 - Maize Husks for the Forager
-		// =====================================================================
-
-		void AddHuskSpot(int spotNumber, int x, int z, int direction)
-		{
-			AddNpc(47247, L("Dry Maize Husk"), "f_huevillage_58_2", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_huevillage_58_2", 1003);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A dry Black Maize husk lies in the leaf-litter. Without a forager's order, there's no reason to pick it up*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_huevillage_58_2.Quest1003.Spot{spotNumber}";
-				var gathered = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (gathered)
-				{
-					await dialog.Msg(L("{#666666}*This husk has already been taken. The ground-patch is cleared*{/}"));
-					return;
-				}
-
-				var spawnedKey = $"Laima.Quests.f_huevillage_58_2.Quest1003.Spot{spotNumber}.Spawned";
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 15)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Zibu_Maize, 1, 70, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}A Black Maize stalk uproots itself beside the husk!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Picking the husk..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650850, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-
-					var currentCount = character.Inventory.CountItem(650850);
-					character.ServerMessage(LF("Maize husks gathered: {0}/8", currentCount));
-
-					if (currentCount >= 8)
-					{
-						character.ServerMessage(L("{#FFD700}All husks gathered! Return to Forager Gedas.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("Gathering interrupted."));
-				}
-			});
-		}
-
-		AddHuskSpot(1, 414, -1103, 0);
-		AddHuskSpot(2, 598, -964, 90);
-		AddHuskSpot(3, 409, -791, 180);
-		AddHuskSpot(4, 250, -639, 270);
-		AddHuskSpot(5, 505, -536, 0);
-		AddHuskSpot(6, 286, -944, 90);
-		AddHuskSpot(7, -820, -122, 180);
-		AddHuskSpot(8, -540, -294, 270);
-
-		// =====================================================================
 		// QUEST 1004: The Loxodon Herd
 		// =====================================================================
 		// Naturalist Audra - Studying Red Loxodon movement patterns
 		//---------------------------------------------------------------------
-		AddNpc(20151, L("[Naturalist] Audra"), "f_huevillage_58_2", -60, 80, 45, async dialog =>
+		AddNpc(20151, L("[Naturalist] Audra"), "f_huevillage_58_2", -548, 133, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_2", 1004);
@@ -457,37 +321,6 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: The Black Maize Blight
-//-----------------------------------------------------------------------------
-
-public class TheBlackMaizeBlightQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_huevillage_58_2", 1001);
-		SetName("The Black Maize Blight");
-		SetType(QuestType.Sub);
-		SetDescription("Gorge-Trapper Adele needs twenty Black Maize cleared so her snare-lines can hold through the next week.");
-		SetLocation("f_huevillage_58_2");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Gorge-Trapper] Adele", "f_huevillage_58_2");
-
-		AddObjective("killMaize", "Defeat Black Maize in the gorge-fields",
-			new KillObjective(20, new[] { MonsterId.Zibu_Maize }));
-
-		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(8000));
-		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Large HP Potion
-		AddReward(new ItemReward(640007, 2)); // Large SP Potion
-		AddReward(new ItemReward(640012, 1));  // Recovery Potion
-	}
-}
-
 // Quest 1002 CLASS: Huntress's Hide Order
 //-----------------------------------------------------------------------------
 
@@ -556,6 +389,8 @@ public class MaizeHusksForTheForagerQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));  // Large HP Potion
 		AddReward(new ItemReward(640007, 2));  // Large SP Potion
 		AddReward(new ItemReward(640012, 1));  // Recovery Potion
+
+		AddDrop(650850, 0.50f, MonsterId.Zibu_Maize);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -563,12 +398,6 @@ public class MaizeHusksForTheForagerQuest : QuestScript
 		character.Inventory.Remove(650850,
 			character.Inventory.CountItem(650850),
 			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_huevillage_58_2.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_huevillage_58_2.Quest1003.Spot{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
@@ -576,12 +405,6 @@ public class MaizeHusksForTheForagerQuest : QuestScript
 		character.Inventory.Remove(650850,
 			character.Inventory.CountItem(650850),
 			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_huevillage_58_2.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_huevillage_58_2.Quest1003.Spot{i}.Spawned");
-		}
 	}
 }
 

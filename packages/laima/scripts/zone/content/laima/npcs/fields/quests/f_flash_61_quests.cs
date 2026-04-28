@@ -23,7 +23,7 @@ public class FFlash61QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Sword-Goblin Infestation
 		//-------------------------------------------------------------------------
-		AddNpc(20108, L("[Street Warden] Sebo"), "f_flash_61", -100, 1290, 180, async dialog =>
+		AddNpc(20108, L("[Street Warden] Sebo"), "f_flash_61", 82, 1365, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_61", 1001);
@@ -85,7 +85,7 @@ public class FFlash61QuestNpcsScript : GeneralScript
 
 		// Quest 2: Alley Cursecores
 		//-------------------------------------------------------------------------
-		AddNpc(156024, L("[Ward-Mason] Vera"), "f_flash_61", 300, 600, 90, async dialog =>
+		AddNpc(156024, L("[Ward-Mason] Vera"), "f_flash_61", 182, 1411, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_61", 1002);
@@ -146,144 +146,9 @@ public class FFlash61QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Quest 3: The Statued Shopkeepers
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Apprentice Cataloguer] Ingrid"), "f_flash_61", -400, 300, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_flash_61", 1003);
-
-			dialog.SetTitle(L("Ingrid"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Ruklys has seventy-three statued shopkeepers. Twenty-nine of them tucked a name-token under their aprons before stone took them."));
-				await dialog.Msg(L("Denden have built nests around the statues - the curse-warmth draws them. Thin the Denden, pull four name-tokens, and the plaque project gets four more names."));
-				await dialog.Msg(L("Seventy-three names is the goal. Every token is a step."));
-
-				var response = await dialog.Select(L("Denden and tokens?"),
-					Option(L("I'll recover the tokens"), "help"),
-					Option(L("Why under aprons?"), "info"),
-					Option(L("Let them be nameless"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Name-tokens are small, coin-sized, metal or polished wood. Under the apron line, tucked against the chest."));
-						await dialog.Msg(L("Treat them with respect. That's someone's whole identity."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Shopkeepers tuck receipts under aprons by habit. When they felt the curse taking them, they reached for the habit - and tucked their names in instead."));
-						await dialog.Msg(L("Last honest moment. Last honest pocket."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Seventy-three statues with no names is a city losing its own memory. I won't accept that."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killDenden", out var killObj)) return;
-				if (!quest.TryGetProgress("recoverTokens", out var tokenObj)) return;
-
-				if (killObj.Done && tokenObj.Done)
-				{
-					await dialog.Msg(L("Four tokens. Four more names for the plaque. I'll carve them tonight."));
-					await dialog.Msg(L("Take your pay. Stop by when the plaque reaches seventy-three - we'll have a reading."));
-
-					character.Inventory.Remove(650545, character.Inventory.CountItem(650545), InventoryItemRemoveMsg.Given);
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					var status = "";
-					if (!killObj.Done)
-						status += L("Kill more Denden. ");
-					if (!tokenObj.Done)
-						status += L("Recover more name-tokens. ");
-
-					await dialog.Msg(LF("Keep at it. {0}", status));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Sixty-one names on the plaque. Twelve to go."));
-			}
-		});
-
-		// Name-Token Points
-		//-------------------------------------------------------------------------
-		void AddStatuedShopkeeper(int tokenNum, int x, int z, int direction)
-		{
-			AddNpc(12080, L("Statued Shopkeeper"), "f_flash_61", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_flash_61", 1003);
-				var variableKey = $"Laima.Quests.f_flash_61.Quest1003.Token{tokenNum}";
-				var spawnedKey = $"Laima.Quests.f_flash_61.Quest1003.Token{tokenNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A figure frozen mid-transaction, stone hand extended as if offering change.*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already recovered this shopkeeper's token*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Denden, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}Denden swarm from the curse-warm nest!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Recovering name-token..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650545, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Shopkeeper's Name-Token"));
-
-					var currentCount = character.Inventory.CountItem(650545);
-					character.ServerMessage(LF("Tokens recovered: {0}/4", currentCount));
-
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All four tokens recovered! Return to Ingrid.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You paused. Try again."));
-				}
-			});
-		}
-
-		AddStatuedShopkeeper(1, 200, 400, 0);
-		AddStatuedShopkeeper(2, -200, -100, 0);
-		AddStatuedShopkeeper(3, 500, -300, 0);
-		AddStatuedShopkeeper(4, -500, 200, 0);
-
 		// Quest 4: Moyabu Curse-Brands
 		//-------------------------------------------------------------------------
-		AddNpc(20122, L("[Curse-Inspector] Thane"), "f_flash_61", 100, -400, 270, async dialog =>
+		AddNpc(20122, L("[Curse-Inspector] Thane"), "f_flash_61", -908, 0, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_61", 1004);
@@ -354,7 +219,7 @@ public class FFlash61QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Branded Warlord
 		//-------------------------------------------------------------------------
-		AddNpc(147509, L("[Bounty Hunter] Roma"), "f_flash_61", 800, -400, 270, async dialog =>
+		AddNpc(147509, L("[Bounty Hunter] Roma"), "f_flash_61", -739, 768, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_61", 1005);
@@ -437,73 +302,6 @@ public class FFlash61QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Quest 6: The Ruklys Corridor
-		//-------------------------------------------------------------------------
-		AddNpc(155170, L("[Caravan Master] Volka"), "f_flash_61", -700, -200, 45, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_flash_61", 1006);
-
-			dialog.SetTitle(L("Volka"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Ruklys corridor connects Roxona to Downtown. Right now it's shoulder-to-shoulder hostile."));
-				await dialog.Msg(L("Sword-Goblins in the main run, Denden in the alleys. Drivers refuse until both are thinned."));
-
-				var response = await dialog.Select(L("Both?"),
-					Option(L("I'll clear both"), "help"),
-					Option(L("Which is worse?"), "info"),
-					Option(L("Reroute the column"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Twelve and twelve. Goblins in the open, Denden in the alleys. Mind both flanks."));
-						await dialog.Msg(L("Clear the corridor and three columns roll by week's end."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Goblins hit hard in straight lines. Denden blindside from alleys. Whichever's in your face is worse."));
-						await dialog.Msg(L("Ward-charm in the pocket. It flares when Denden drop from above."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Reroute crosses deep curse-ground. Half my drivers would come home statued. Not an option."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killGoblins", out var gobObj)) return;
-				if (!quest.TryGetProgress("killDenden", out var denObj)) return;
-
-				if (gobObj.Done && denObj.Done)
-				{
-					await dialog.Msg(L("Both flanks thinned. Columns roll at dawn."));
-					await dialog.Msg(L("Take your pay. Drivers will remember you."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					var status = "";
-					if (!gobObj.Done)
-						status += L("Kill more Sword-Goblins. ");
-					if (!denObj.Done)
-						status += L("Kill more Denden. ");
-
-					await dialog.Msg(LF("Keep pushing. {0}", status));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Four columns through already. Corridor feels like a corridor again, not a gauntlet."));
-			}
-		});
 	}
 }
 
@@ -563,6 +361,8 @@ public class AlleyCursecoresQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650355, 0.40f, MonsterId.Goblin2_Sword);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -573,59 +373,6 @@ public class AlleyCursecoresQuest : QuestScript
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650355, character.Inventory.CountItem(650355), InventoryItemRemoveMsg.Destroyed);
-	}
-}
-
-public class TheStatuedShopkeepersQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_flash_61", 1003);
-		SetName(L("The Statued Shopkeepers"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Kill Denden nesting on the statued shopkeepers and recover four name-tokens for the memorial plaque."));
-		SetLocation("f_flash_61");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Apprentice Cataloguer] Ingrid"), "f_flash_61");
-
-		AddObjective("killDenden", L("Kill Denden"),
-			new KillObjective(15, new[] { MonsterId.Denden }));
-
-		AddObjective("recoverTokens", L("Recover shopkeeper name-tokens"),
-			new CollectItemObjective(650545, 4));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650545, character.Inventory.CountItem(650545), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_61.Quest1003.Token{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_61.Quest1003.Token{i}.Spawned");
-		}
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650545, character.Inventory.CountItem(650545), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_61.Quest1003.Token{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_61.Quest1003.Token{i}.Spawned");
-		}
 	}
 }
 
@@ -657,6 +404,8 @@ public class MoyabuCurseBrandsQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650665, 0.50f, MonsterId.Moyabu);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -701,33 +450,3 @@ public class TheBrandedWarlordQuest : QuestScript
 	}
 }
 
-public class TheRuklysCorridorQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_flash_61", 1006);
-		SetName(L("The Ruklys Corridor"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Kill Sword-Goblins in the main run and Denden in the alleys to reopen the Ruklys corridor."));
-		SetLocation("f_flash_61");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Caravan Master] Volka"), "f_flash_61");
-
-		AddObjective("killGoblins", L("Kill Sword-Goblins"),
-			new KillObjective(12, new[] { MonsterId.Goblin2_Sword }));
-
-		AddObjective("killDenden", L("Kill Denden"),
-			new KillObjective(12, new[] { MonsterId.Denden }));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
-	}
-}

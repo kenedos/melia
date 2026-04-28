@@ -27,7 +27,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Groundskeeper Saulius - Archers picking off messenger-lads
 		//---------------------------------------------------------------------
-		AddNpc(20109, L("[Groundskeeper] Saulius"), "f_farm_49_1", 2378, 909, 225, async dialog =>
+		AddNpc(20109, L("[Groundskeeper] Saulius"), "f_farm_49_1", 1623, 920, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_1", 1001);
@@ -85,7 +85,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Vida's letter went through to Aqueduct. The staff are formally released. We stay by choice now, not by oath."));
+				await dialog.Msg(L("Vidas's letter went through to Aqueduct. The staff are formally released. We stay by choice now, not by oath."));
 			}
 
 			// Also serves as recipient for Quest 1002 ("The Manor is Lost")
@@ -95,14 +95,14 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_farm_49_1.Quest1002.Delivered", 0) >= 1;
 				if (!delivered)
 				{
-					await dialog.Msg(L("{#666666}*You hold out Vida's final letter. He reads it standing, then folds it very carefully*{/}"));
+					await dialog.Msg(L("{#666666}*You hold out Vidas's final letter. He reads it standing, then folds it very carefully*{/}"));
 					await dialog.Msg(L("So. The house is released. The staff are free to go."));
 					await dialog.Msg(L("{#666666}*He tucks the letter into his coat, over his heart*{/}"));
-					await dialog.Msg(L("Tell Vida I'll pass it through to Audrone at Aqueduct by tonight's messenger. The Klaipeda magistrates will have a record by the new moon."));
+					await dialog.Msg(L("Tell Vidas I'll pass it through to Audrone at Aqueduct by tonight's messenger. The Klaipeda magistrates will have a record by the new moon."));
 					await dialog.Msg(L("And tell her I'm staying. Someone has to close the gate when the last of us leaves."));
 
 					character.Variables.Perm.Set("Laima.Quests.f_farm_49_1.Quest1002.Delivered", 1);
-					character.ServerMessage(L("{#FFD700}Letter delivered. Return to Estate Cook Vida.{/}"));
+					character.ServerMessage(L("{#FFD700}Letter delivered. Return to Estate Cook Vidas.{/}"));
 				}
 			}
 		});
@@ -110,18 +110,18 @@ public class FFarm491QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// QUEST 1002: The Manor is Lost
 		// =====================================================================
-		// Estate Cook Vida - Final letter releasing the staff
+		// Estate Cook Vidas - Final letter releasing the staff
 		//---------------------------------------------------------------------
-		AddNpc(20107, L("[Estate Cook] Vida"), "f_farm_49_1", 595, 488, 90, async dialog =>
+		AddNpc(20107, L("[Estate Cook] Vidas"), "f_farm_49_1", 655, 926, 315, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_1", 1002);
 
-			dialog.SetTitle(L("Vida"));
+			dialog.SetTitle(L("Vidas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A woman in a flour-dusted apron stirs a pot over a makeshift hearth, eyes red but hands steady*{/}"));
+				await dialog.Msg(L("{#666666}*A man in a flour-dusted apron stirs a pot over a makeshift hearth, eyes red but hands steady*{/}"));
 				await dialog.Msg(L("Kitchen's open for anyone still on the grounds. Soup tonight, bread if the oven holds. Won't starve while I'm cooking."));
 
 				var response = await dialog.Select(L("I've drafted the letter that ends our service. The Greene line is broken or fled - we can no longer serve a house that doesn't answer us. Carry it to Saulius at the Aqueduct warp? He'll send it through to Audrone for the magistrate's record."),
@@ -133,10 +133,10 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*She wipes her hands on her apron and unfolds a letter that's been rewritten four times*{/}"));
+						await dialog.Msg(L("{#666666}*He wipes his hands on his apron and unfolds a letter that's been rewritten four times*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The letter's blotted in one place. I couldn't write 'Lady Greene is gone' without crying. Tell him it's the same to me if he wants to rewrite that line."));
+						await dialog.Msg(L("The letter's blotted in one place. I couldn't write 'Lady Greene is gone' without breaking. Tell him it's the same to me if he wants to rewrite that line."));
 						break;
 
 					case "info":
@@ -156,9 +156,9 @@ public class FFarm491QuestNpcsScript : GeneralScript
 
 				if (deliverObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She listens to Saulius's reply and nods, blinking fast*{/}"));
+					await dialog.Msg(L("{#666666}*He listens to Saulius's reply and nods, blinking fast*{/}"));
 					await dialog.Msg(L("He's staying. Of course he's staying. Stubborn old man."));
-					await dialog.Msg(L("{#666666}*She pulls a small pouch from the apron pocket*{/}"));
+					await dialog.Msg(L("{#666666}*He pulls a small pouch from the apron pocket*{/}"));
 					await dialog.Msg(L("Here - honest pay, from what the staff still had pooled. Take the soup on your way out too. It's the last batch made with Greene barley."));
 
 					character.Quests.Complete(questId);
@@ -192,7 +192,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The Greene children had three beds in the nursery. Three beds, three pillowcases, no children left to use them. I'm stuffing them anyway."));
 
 				var response = await dialog.Select(L("Orange Dandels shed soft wingpieces when they drift through the orchard - peaceful creatures, they'll let you gather if you're gentle. Five wingpieces would fill each pillow. Three pillowcases. I'd be grateful."),
-					Option(L("I'll gather five wingpieces"), "help"),
+					Option(L("I'll gather four wingpieces"), "help"),
 					Option(L("Why stuff pillows for empty beds?"), "info"),
 					Option(L("That's somebody else's grief"), "leave")
 				);
@@ -232,7 +232,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				}
 				else
 				{
-					await dialog.Msg(L("Five wingpieces. Gentle hands. The Dandels know the difference."));
+					await dialog.Msg(L("Four wingpieces. Gentle hands. The Dandels know the difference."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
@@ -289,9 +289,9 @@ public class FFarm491QuestNpcsScript : GeneralScript
 					character.Variables.Perm.Set(variableKey, true);
 
 					var currentCount = character.Inventory.CountItem(662067);
-					character.ServerMessage(LF("Wingpieces gathered: {0}/5", currentCount));
+					character.ServerMessage(LF("Wingpieces gathered: {0}/4", currentCount));
 
-					if (currentCount >= 5)
+					if (currentCount >= 4)
 					{
 						character.ServerMessage(L("{#FFD700}All wingpieces gathered! Return to Widow-Gardener Rasa.{/}"));
 					}
@@ -307,14 +307,13 @@ public class FFarm491QuestNpcsScript : GeneralScript
 		AddTamaDownSpot(2, 173, 933, 90);
 		AddTamaDownSpot(3, -687, 895, 180);
 		AddTamaDownSpot(4, 599, -581, 270);
-		AddTamaDownSpot(5, -707, 870, 0);
 
 		// =====================================================================
 		// QUEST 1004: The Last Greene
 		// =====================================================================
 		// Former Stableboy Lukas - Seeking the truth of Lady Greene's end
 		//---------------------------------------------------------------------
-		AddNpc(20151, L("[Former Stableboy] Lukas"), "f_farm_49_1", -100, -800, 45, async dialog =>
+		AddNpc(20151, L("[Former Stableboy] Lukas"), "f_farm_49_1", -125, -477, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_1", 1004);
@@ -326,7 +325,7 @@ public class FFarm491QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("{#666666}*A young man in a half-buttoned stablecoat cleans a bridle that will never be worn again*{/}"));
 				await dialog.Msg(L("I was in the stables when the Spions came through. By the time I got to the farmhouse, it was already quiet. I've never looked past the gate since."));
 
-				var response = await dialog.Select(L("I need to know. Did Lady Greene die on the grounds, or did she flee? Saulius won't walk it. Vida can't. Rasa is older than these fences. But you - you're a traveler. Walk the four places where she'd have left a sign and tell me what you find. The granary, the old well, the field-shrine, and the root-cellar hatch."),
+				var response = await dialog.Select(L("I need to know. Did Lady Greene die on the grounds, or did she flee? Saulius won't walk it. Vidas can't. Rasa is older than these fences. But you - you're a traveler. Walk the four places where she'd have left a sign and tell me what you find. The granary, the old well, the field-shrine, and the root-cellar hatch."),
 					Option(L("I'll walk the four places"), "help"),
 					Option(L("Why do you need to know?"), "info"),
 					Option(L("Let the dead rest"), "leave")
@@ -481,16 +480,16 @@ public class TheManorIsLostQuest : QuestScript
 		SetId("f_farm_49_1", 1002);
 		SetName("The Manor is Lost");
 		SetType(QuestType.Sub);
-		SetDescription("Estate Cook Vida's final letter releasing Greene Manor's staff must reach Groundskeeper Saulius at the Aqueduct warp.");
+		SetDescription("Estate Cook Vidas's final letter releasing Greene Manor's staff must reach Groundskeeper Saulius at the Aqueduct warp.");
 		SetLocation("f_farm_49_1");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Estate Cook] Vida", "f_farm_49_1");
+		AddQuestGiver("[Estate Cook] Vidas", "f_farm_49_1");
 
-		AddObjective("deliverLetter", "Deliver Vida's letter to Saulius",
+		AddObjective("deliverLetter", "Deliver Vidas's letter to Saulius",
 			new VariableCheckObjective("Laima.Quests.f_farm_49_1.Quest1002.Delivered", 1, true));
 
 		AddReward(new ExpReward(11900, 8100));
@@ -521,7 +520,7 @@ public class DandelWingpiecesQuest : QuestScript
 		SetId("f_farm_49_1", 1003);
 		SetName("Dandel Wingpieces");
 		SetType(QuestType.Sub);
-		SetDescription("Widow-Gardener Rasa needs five Orange Dandel wingpieces to stuff mourning-pillows for the empty beds in the Greene children's nursery.");
+		SetDescription("Widow-Gardener Rasa needs four Orange Dandel wingpieces to stuff mourning-pillows for the empty beds in the Greene children's nursery.");
 		SetLocation("f_farm_49_1");
 		SetAutoTracked(true);
 
@@ -531,7 +530,7 @@ public class DandelWingpiecesQuest : QuestScript
 		AddQuestGiver("[Widow-Gardener] Rasa", "f_farm_49_1");
 
 		AddObjective("collectFeathers", "Gather Orange Dandel wingpieces from wing-patches",
-			new CollectItemObjective(662067, 5));
+			new CollectItemObjective(662067, 4));
 
 		AddReward(new ExpReward(11900, 8100));
 		AddReward(new SilverReward(15000));
@@ -547,7 +546,7 @@ public class DandelWingpiecesQuest : QuestScript
 			character.Inventory.CountItem(662067),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 4; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_1.Quest1003.Spot{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_1.Quest1003.Spot{i}.Spawned");
@@ -560,7 +559,7 @@ public class DandelWingpiecesQuest : QuestScript
 			character.Inventory.CountItem(662067),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 4; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_1.Quest1003.Spot{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_1.Quest1003.Spot{i}.Spawned");

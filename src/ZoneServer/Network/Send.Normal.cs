@@ -1207,20 +1207,20 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
-			/// Set an Actor's Color (Yellow, Magenta, Cyan, Alpha)
+			/// Set an Actor's Color (Blue, Green, Red, Alpha). Param names below are legacy/misleading — bytes are sent and interpreted as B, G, R, A.
 			/// </summary>
 			/// <param name="actor"></param>
-			/// <param name="yellow"></param>
-			/// <param name="magenta"></param>
-			/// <param name="cyan"></param>
-			/// <param name="alpha"></param>
+			/// <param name="yellow">Blue byte (0-255).</param>
+			/// <param name="magenta">Green byte (0-255).</param>
+			/// <param name="cyan">Red byte (0-255).</param>
+			/// <param name="alpha">Alpha byte (0-255).</param>
 			/// <param name="transitionDuration"></param>
 			/// <param name="b6"></param>
 			public static void SetActorColor(IActor actor,
 				byte yellow, byte magenta, byte cyan,
 				byte alpha, float transitionDuration, byte b6 = 1)
 			{
-				// color_R, color_G, color_B, colar_A, blendOption
+				// Bytes on the wire are B, G, R, A, blendOption.
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.SetActorColor);
 
@@ -1237,14 +1237,14 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
-			/// Set Entity's Color (Yellow, Magenta, Cyan, Alpha)
+			/// Set Entity's Color (Blue, Green, Red, Alpha). Param names below are legacy/misleading — bytes are sent and interpreted as B, G, R, A.
 			/// </summary>
 			/// <param name="conn"></param>
 			/// <param name="actor"></param>
-			/// <param name="yellow"></param>
-			/// <param name="magenta"></param>
-			/// <param name="cyan"></param>
-			/// <param name="alpha"></param>
+			/// <param name="yellow">Blue byte (0-255).</param>
+			/// <param name="magenta">Green byte (0-255).</param>
+			/// <param name="cyan">Red byte (0-255).</param>
+			/// <param name="alpha">Alpha byte (0-255).</param>
 			/// <param name="transitionDuration"></param>
 			/// <param name="b6"></param>
 			public static void SetActorColor(IZoneConnection conn, IActor actor,

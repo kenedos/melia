@@ -23,7 +23,7 @@ public class FFlash58QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Red Infroholder Raid
 		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[District-Ward] Vytautas"), "f_flash_58", 0, 0, 0, async dialog =>
+		AddNpc(20060, L("[District-Ward] Vytautas"), "f_flash_58", 696, -106, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_58", 1001);
@@ -79,7 +79,7 @@ public class FFlash58QuestNpcsScript : GeneralScript
 
 		// Quest 2: Socket Cores
 		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Cursebreaker] Algimantas"), "f_flash_58", 800, 500, 0, async dialog =>
+		AddNpc(20117, L("[Cursebreaker] Algimantas"), "f_flash_58", 962, 527, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_58", 1002);
@@ -137,7 +137,7 @@ public class FFlash58QuestNpcsScript : GeneralScript
 
 		// Quest 3: Mage Pages
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Scribe] Egle-III"), "f_flash_58", -500, 500, 0, async dialog =>
+		AddNpc(20114, L("[Scribe] Egle-III"), "f_flash_58", -1109, -71, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_58", 1003);
@@ -193,67 +193,9 @@ public class FFlash58QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Quest 4: Rootcrystal Shards
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Crystal-Warder] Dalia"), "f_flash_58", -1100, 100, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_flash_58", 1004);
-
-			dialog.SetTitle(L("Dalia"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Dingofasil Rootcrystals hum the curse's tone. Break twelve for eight corrupted shards."));
-
-				var response = await dialog.Select(L("Shards?"),
-					Option(L("I'll break"), "help"),
-					Option(L("Corrupted?"), "info"),
-					Option(L("Skip"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Cloth-gloves only. Don't palm them."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("They feed the curse. Eight less feed is eight less weight."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Curse endures."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("breakCrystals", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherShards", out var sObj)) return;
-
-				if (killObj.Done && sObj.Done)
-				{
-					await dialog.Msg(L("Eight shards. Curse weight shifts."));
-					character.Inventory.Remove(650281, character.Inventory.CountItem(650281), InventoryItemRemoveMsg.Given);
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Keep breaking."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Tone's thinner. District breathes."));
-			}
-		});
-
 		// Quest 5: The Stoneheart Alpha
 		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Ignas-II"), "f_flash_58", 1800, -300, 0, async dialog =>
+		AddNpc(47245, L("[Bounty Hunter] Ignas-II"), "f_flash_58", 1126, 1095, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_58", 1005);
@@ -327,63 +269,6 @@ public class FFlash58QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Quest 6: Dingofasil Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Militia-Captain] Petras"), "f_flash_58", 1700, 1000, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_flash_58", 1006);
-
-			dialog.SetTitle(L("Petras"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("District sweep. Twelve Infroholders, twelve Sockets, twelve Infroholder Mages."));
-
-				var response = await dialog.Select(L("Sweep?"),
-					Option(L("I'll do it"), "help"),
-					Option(L("Pay?"), "info"),
-					Option(L("Skip"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Thirty-six."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Fair."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("District stays locked."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killInfros", out var iObj)) return;
-				if (!quest.TryGetProgress("killSockets", out var sObj)) return;
-				if (!quest.TryGetProgress("killMages", out var mObj)) return;
-
-				if (iObj.Done && sObj.Done && mObj.Done)
-				{
-					await dialog.Msg(L("Done."));
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Keep going."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Militia patrols the block now."));
-			}
-		});
 	}
 }
 
@@ -444,6 +329,8 @@ public class FFlash58Quest1002 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650611, 0.40f, MonsterId.Socket_Purple);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -484,6 +371,8 @@ public class FFlash58Quest1003 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650677, 0.50f, MonsterId.Infroholder_Mage_Green);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -494,46 +383,6 @@ public class FFlash58Quest1003 : QuestScript
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650677, character.Inventory.CountItem(650677), InventoryItemRemoveMsg.Destroyed);
-	}
-}
-
-public class FFlash58Quest1004 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_flash_58", 1004);
-		SetName(L("Corrupted Shards"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Break Dingofasil Rootcrystals to gather corrupted shards."));
-		SetLocation("f_flash_58");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Crystal-Warder] Dalia"), "f_flash_58");
-
-		AddObjective("breakCrystals", L("Break Rootcrystals"),
-			new KillObjective(12, new[] { MonsterId.Rootcrystal_03 }));
-
-		AddObjective("gatherShards", L("Gather corrupted shards"),
-			new CollectItemObjective(650281, 8));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650281, character.Inventory.CountItem(650281), InventoryItemRemoveMsg.Destroyed);
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650281, character.Inventory.CountItem(650281), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
@@ -567,35 +416,3 @@ public class FFlash58Quest1005 : QuestScript
 	}
 }
 
-public class FFlash58Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_flash_58", 1006);
-		SetName(L("Dingofasil Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of Red Infroholders, Purple Sockets, and Green Infroholder Mages."));
-		SetLocation("f_flash_58");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Militia-Captain] Petras"), "f_flash_58");
-
-		AddObjective("killInfros", L("Kill Red Infroholders"),
-			new KillObjective(12, new[] { MonsterId.Infroholder_Red }));
-
-		AddObjective("killSockets", L("Kill Purple Sockets"),
-			new KillObjective(12, new[] { MonsterId.Socket_Purple }));
-
-		AddObjective("killMages", L("Kill Green Infroholder Mages"),
-			new KillObjective(12, new[] { MonsterId.Infroholder_Mage_Green }));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
-	}
-}

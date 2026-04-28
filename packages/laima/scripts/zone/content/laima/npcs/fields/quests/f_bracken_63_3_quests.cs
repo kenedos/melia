@@ -21,9 +21,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Dadan Gate Watch
+		// Quest 1: Dadan Pond Watch
 		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Scout] Tovin"), "f_bracken_63_3", 1500, -20, 270, async dialog =>
+		AddNpc(20059, L("[Scout] Tovin"), "f_bracken_63_3", 698, 600, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_3", 1001);
@@ -33,9 +33,10 @@ public class FBracken633QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(questId))
 			{
 				await dialog.Msg(L("Dadan Jungle. You made it through Knidos - good. But the corruption here is older. Deeper."));
-				await dialog.Msg(L("The Gosaru at the gate are the first wave. They've fully given in to the poison. We need them pushed back before anyone else comes through."));
+				await dialog.Msg(L("Quiet a moment. See those bushes ringing the pond? Gosaru are crouched in every one of them, watching the water."));
+				await dialog.Msg(L("They've fully given in to the poison. We need them thinned before they decide to break out and rush whoever passes through next."));
 
-				var response = await dialog.Select(L("How can I help?"),
+				var response = await dialog.Select(L("Will you flush them out for me?"),
 					Option(L("I'll drive the Gosaru back"), "help"),
 					Option(L("Why is it worse here?"), "info"),
 					Option(L("Later"), "leave")
@@ -45,7 +46,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Twenty should clear the gate approach. They'll be all around you, just inside the treeline."));
+						await dialog.Msg(L("Twenty should clear the bushes around the pond. They'll come at you the moment you push into the reeds."));
 						await dialog.Msg(L("Watch their claws - the corruption here burns as well as poisons."));
 						break;
 
@@ -66,25 +67,25 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("Twenty down. The gate is ours for now."));
+					await dialog.Msg(L("Twenty down. The reeds are quiet for the first time in a week."));
 					await dialog.Msg(L("Take your pay. You earned every coin of it."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("More Gosaru still press the gate. Keep thinning them."));
+					await dialog.Msg(L("More Gosaru still crouching in the bushes around the pond. Keep thinning them."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The gate is holding. Patrols can rotate through now without bleeding."));
+				await dialog.Msg(L("Pond's quiet. Nothing moving in the reeds anymore - patrols can pass without bleeding."));
 			}
 		});
 
 		// Quest 2: Heart Crystals
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Researcher] Miela"), "f_bracken_63_3", -100, 220, 180, async dialog =>
+		AddNpc(20114, L("[Researcher] Miela"), "f_bracken_63_3", -94, 524, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_3", 1002);
@@ -97,7 +98,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("To finish the antidote formula, I need five pristine crystal shards from the oldest Root Crystals here in Dadan."));
 				await dialog.Msg(L("They're the last ones still holding clean mineral matrix. Younger crystals in other jungles are already saturated."));
 
-				var response = await dialog.Select(L("Can you harvest them?"),
+				var response = await dialog.Select(L("Will you bring me the shards?"),
 					Option(L("I'll bring five shards"), "help"),
 					Option(L("Why pristine shards?"), "info"),
 					Option(L("Too dangerous"), "leave")
@@ -147,7 +148,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 		// Pristine Crystal Harvest Points
 		//-------------------------------------------------------------------------
-		void AddPristineCrystal(int nodeNum, int x, int z, int direction)
+		void AddPristineCrystal(int nodeNum, double x, double z, double direction)
 		{
 			AddNpc(46218, L("Pristine Root Crystal"), "f_bracken_63_3", x, z, direction, async dialog =>
 			{
@@ -204,15 +205,17 @@ public class FBracken633QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddPristineCrystal(1, -684, -701, 0);
-		AddPristineCrystal(2, -555, -450, 0);
-		AddPristineCrystal(3, -250, 300, 0);
-		AddPristineCrystal(4, 400, 130, 0);
-		AddPristineCrystal(5, -1100, 1050, 0);
+		AddPristineCrystal(1, -448.715, 288.18466, 45);
+		AddPristineCrystal(2, -924.7725, -15.992916, 45);
+		AddPristineCrystal(3, -37.748558, -425.46445, 45);
+		AddPristineCrystal(4, 272.47775, -610.41724, 45);
+		AddPristineCrystal(5, 179.1873, 172.795, 45);
+		AddPristineCrystal(6, 523.845, 108.45006, 45);
+		AddPristineCrystal(7, -26.807753, 623.41736, 45);
 
 		// Quest 3: The Beetle Blight
 		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Exterminator] Gregor"), "f_bracken_63_3", 500, -420, 90, async dialog =>
+		AddNpc(47245, L("[Exterminator] Gregor"), "f_bracken_63_3", 653, -721, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_3", 1003);
@@ -221,11 +224,11 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Bush Beetles are swarming the southern basin. Normal for this time of year."));
-				await dialog.Msg(L("What isn't normal is the hives. Four infested hives are pumping out corrupted beetles faster than I can burn them."));
+				await dialog.Msg(L("Bush Beetles are swarming the ridges north-east of here, right up against the Novaha Monastery gate."));
+				await dialog.Msg(L("Six infested hives are pumping out corrupted beetles faster than the monastery wardens can burn them."));
 				await dialog.Msg(L("Each hive needs to be scorched down to the wax, and the adult beetles cleared before they rebuild."));
 
-				var response = await dialog.Select(L("How do I burn the hives?"),
+				var response = await dialog.Select(L("Will you torch the hives for me?"),
 					Option(L("I'll burn the hives and kill the swarm"), "help"),
 					Option(L("Why the hive focus?"), "info"),
 					Option(L("Not my specialty"), "leave")
@@ -236,7 +239,8 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					case "help":
 						character.Quests.Start(questId);
 						await dialog.Msg(L("Take this torch oil - just pour it on the hive and it'll ignite on contact with the wax."));
-						await dialog.Msg(L("The hives sit in clusters along the southern basin. You can smell them before you see them."));
+						await dialog.Msg(L("The hives sit clustered along the slope north-east of here, on the approach to Novaha Monastery. You'll smell them before you see them."));
+						await dialog.Msg(L("Watch your step - getting close to a hive is enough to wake the brood inside. They'll come boiling out at you."));
 						break;
 
 					case "info":
@@ -257,7 +261,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 				if (killObj.Done && hiveObj.Done)
 				{
-					await dialog.Msg(L("All four hives, and the swarm cleared. The basin will be quiet for a long while."));
+					await dialog.Msg(L("Hives ash, swarm cleared. The Novaha approach will be quiet for a long while."));
 					await dialog.Msg(L("Good work. Here's your pay, with interest for the dirty part."));
 
 					character.Inventory.Remove(650809, character.Inventory.CountItem(650809), InventoryItemRemoveMsg.Given);
@@ -277,20 +281,19 @@ public class FBracken633QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Basin's clean. First breath of fresh air I've had in months."));
+				await dialog.Msg(L("Slope's clean all the way to the monastery gate. First breath of fresh air I've had in months."));
 			}
 		});
 
 		// Infested Hive Burn Points
 		//-------------------------------------------------------------------------
-		void AddInfestedHive(int hiveNum, int x, int z, int direction)
+		void AddInfestedHive(int hiveNum, int modelId, double x, double z, double direction)
 		{
-			AddNpc(12080, L("Infested Hive"), "f_bracken_63_3", x, z, direction, async dialog =>
+			AddNpc(modelId, L("Infested Hive"), "f_bracken_63_3", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_bracken_63_3", 1003);
 				var variableKey = $"Laima.Quests.f_bracken_63_3.Quest1003.Hive{hiveNum}";
-				var spawnedKey = $"Laima.Quests.f_bracken_63_3.Quest1003.Hive{hiveNum}.Spawned";
 
 				if (!character.Quests.IsActive(questId))
 				{
@@ -302,17 +305,6 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("{#666666}*This hive is already ash*{/}"));
 					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Bush_Beetle, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}Beetles swarm from the breached hive!{/}"));
-					}
 				}
 
 				var result = await character.TimeActions.StartAsync(
@@ -338,16 +330,42 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					character.ServerMessage(L("Torch oil spilled uselessly. Try again."));
 				}
 			});
+
+			AddAreaTrigger("f_bracken_63_3", x, z, 50, async (args) =>
+			{
+				if (args.Initiator is not Character character)
+					return;
+
+				if (character.IsDead)
+					return;
+
+				var questId = new QuestId("f_bracken_63_3", 1003);
+				if (!character.Quests.IsActive(questId))
+					return;
+
+				var variableKey = $"Laima.Quests.f_bracken_63_3.Quest1003.Hive{hiveNum}";
+				if (character.Variables.Perm.GetBool(variableKey, false))
+					return;
+
+				if (RandomProvider.Get().Next(100) >= 20)
+					return;
+
+				var amount = RandomProvider.Get().Next(2, 4);
+				if (SpawnTempMonsters(character, MonsterId.Bush_Beetle, amount, 80, TimeSpan.FromMinutes(1)))
+					character.ServerMessage(L("{#FF6666}Beetles boil out of the hive!{/}"));
+			});
 		}
 
-		AddInfestedHive(1, 668, -808, 0);
-		AddInfestedHive(2, 834, -176, 0);
-		AddInfestedHive(3, 500, -600, 0);
-		AddInfestedHive(4, 300, -900, 0);
+		AddInfestedHive(1, 151025, -467, -1034, 90);
+		AddInfestedHive(2, 151026, -361, -1316, 90);
+		AddInfestedHive(3, 151027, -75, -1217, 90);
+		AddInfestedHive(4, 151025, -74, -1036, 90);
+		AddInfestedHive(5, 151026, -212, -1108, 90);
+		AddInfestedHive(6, 151027, -159, -930, 90);
 
 		// Quest 4: The Missing Warden
 		//-------------------------------------------------------------------------
-		AddNpc(155018, L("[Warden] Saskia"), "f_bracken_63_3", -900, 900, 0, async dialog =>
+		AddNpc(155018, L("[Warden] Saskia"), "f_bracken_63_3", -990, 862, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_3", 1004);
@@ -356,12 +374,12 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("My partner Yuris went north two days ago to plant fresh trail markers before the caravans arrive."));
-				await dialog.Msg(L("He hasn't come back. The markers are still missing - I can see his handwriting should be on them."));
-				await dialog.Msg(L("And the Raffly up there have been unusually bold. I fear the worst."));
+				await dialog.Msg(L("My partner Yuris went north two days ago to inspect the warden pillars on the ridge. He's overdue."));
+				await dialog.Msg(L("Each pillar has a slot where wardens chisel their patrol notes. If he passed any of them, his marking will be on them."));
+				await dialog.Msg(L("And the Raffly up there have been unusually bold lately. I'd rather not assume the worst, but I need to know."));
 
-				var response = await dialog.Select(L("What do you need me to do?"),
-					Option(L("I'll find the markers and kill the Raffly"), "help"),
+				var response = await dialog.Select(L("Will you go look for him?"),
+					Option(L("I'll read the pillars and clear the Raffly"), "help"),
 					Option(L("What did Yuris look like?"), "info"),
 					Option(L("Hope he turns up"), "leave")
 				);
@@ -370,13 +388,13 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Thank you. The markers would be in a loop from here to the ridge and back."));
-						await dialog.Msg(L("Bring me even one and I'll know. And the Raffly... if they got him, at least thin them down."));
+						await dialog.Msg(L("Thank you. There are four warden pillars in a loop from the ridge back. Reading three is enough to be sure of his path."));
+						await dialog.Msg(L("Bring me a rubbing from each one you find. And the Raffly... if they're hunting up there, thin them down."));
 						break;
 
 					case "info":
 						await dialog.Msg(L("Taller than me, quiet, always whittling something between patrols."));
-						await dialog.Msg(L("If he's out there and alive, the markers will tell me. If he's not, the markers tell me that too."));
+						await dialog.Msg(L("He never skips a pillar - if he passed by, his mark will be on the stone. If he didn't, the stones tell me that too."));
 						break;
 
 					case "leave":
@@ -388,15 +406,13 @@ public class FBracken633QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killRaffly", out var killObj)) return;
-				var markerCount = character.Inventory.CountItem(650683);
+				var pillarCount = character.Variables.Perm.GetInt("Laima.Quests.f_bracken_63_3.Quest1004.PillarsRead", 0);
 
-				if (killObj.Done && markerCount >= 5)
+				if (killObj.Done && pillarCount >= 3)
 				{
-					await dialog.Msg(L("Five markers. And the writing on the last one... it cuts off mid-word."));
-					await dialog.Msg(L("So he's gone. I knew it. But thanks to you, I know. That's worth something."));
-					await dialog.Msg(L("Take this - it was half his anyway."));
-
-					character.Inventory.Remove(650683, 5, InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("Three pillars read - and one of them carried his mark with the words 'returning to Orsha' chiseled underneath."));
+					await dialog.Msg(L("So he's alive. Walked off the route on his own. That's a relief and a reckoning all at once."));
+					await dialog.Msg(L("Take this. I'll have words with him next time he passes through, but you've earned my thanks."));
 
 					character.Quests.Complete(questId);
 				}
@@ -405,74 +421,76 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					var status = "";
 					if (!killObj.Done)
 						status += L("Kill more Raffly. ");
-					if (markerCount < 5)
-						status += L("Find more trail markers. ");
+					if (pillarCount < 3)
+						status += L("Read more warden pillars. ");
 
 					await dialog.Msg(LF("Keep searching. {0}", status));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("I buried the markers under the old willow at the ridge. Closest thing to a grave I could give him."));
+				await dialog.Msg(L("Yuris in Orsha. Of all the places. He'll get an earful when he walks back through that gate."));
 			}
 		});
 
-		// Trail Marker Recovery Points
+		// Warden Pillar Reading Points
 		//-------------------------------------------------------------------------
-		void AddTrailMarker(int markerNum, int x, int z, int direction)
+		void AddWardenPillar(int pillarNum, int modelId, int x, int z, int direction)
 		{
-			AddNpc(47190, L("Warden's Trail Marker"), "f_bracken_63_3", x, z, direction, async dialog =>
+			AddNpc(modelId, L("Warden Pillar"), "f_bracken_63_3", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_bracken_63_3", 1004);
-				var variableKey = $"Laima.Quests.f_bracken_63_3.Quest1004.Marker{markerNum}";
+				var variableKey = $"Laima.Quests.f_bracken_63_3.Quest1004.Pillar{pillarNum}";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A carved wooden marker lies fallen in the moss*{/}"));
+					await dialog.Msg(L("{#666666}*A weathered stone pillar with a chisel-slot for warden marks*{/}"));
 					return;
 				}
 
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*You've already recovered this marker*{/}"));
+					await dialog.Msg(L("{#666666}*You've already taken a rubbing from this pillar*{/}"));
 					return;
 				}
 
 				var result = await character.TimeActions.StartAsync(
-					L("Recovering marker..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2)
+					L("Taking a rubbing..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2)
 				);
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650683, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Trail Marker"));
 
-					var currentCount = character.Inventory.CountItem(650683);
-					character.ServerMessage(LF("Markers recovered: {0}/5", currentCount));
+					var counterKey = "Laima.Quests.f_bracken_63_3.Quest1004.PillarsRead";
+					var currentCount = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, currentCount);
 
-					if (currentCount >= 5)
+					character.ServerMessage(L("Read: Warden Pillar"));
+					character.ServerMessage(LF("Pillars read: {0}/3", currentCount));
+
+					if (currentCount >= 3)
 					{
-						character.ServerMessage(L("{#FFD700}All markers recovered! Return to Saskia.{/}"));
+						await dialog.Msg(L("{#666666}*Yuris's mark is here - and beneath it, scraped fresh into the stone: 'returning to Orsha'*{/}"));
+						character.ServerMessage(L("{#FFD700}Yuris went back to Orsha. Return to Saskia.{/}"));
 					}
 				}
 				else
 				{
-					character.ServerMessage(L("Recovery cancelled."));
+					character.ServerMessage(L("Rubbing interrupted."));
 				}
 			});
 		}
 
-		AddTrailMarker(1, -1134, 1211, 0);
-		AddTrailMarker(2, -850, 1000, 0);
-		AddTrailMarker(3, -1200, 700, 0);
-		AddTrailMarker(4, -700, 1150, 0);
-		AddTrailMarker(5, -1350, 450, 0);
+		AddWardenPillar(1, 47190, -1285, 1178, 90);
+		AddWardenPillar(2, 47190, -1057, 1428, 90);
+		AddWardenPillar(3, 47190, -869, 1269, 90);
+		AddWardenPillar(4, 47190, -1471, 1086, 90);
 
 		// Quest 5: The Ellogua Trial
 		//-------------------------------------------------------------------------
-		AddNpc(20109, L("[Hunter] Dovas"), "f_bracken_63_3", 900, -200, 180, async dialog =>
+		AddNpc(20109, L("[Hunter] Dovas"), "f_bracken_63_3", 676, 34, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_3", 1005);
@@ -485,7 +503,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("They're cunning. They hunt in perfect silence, and they've been drawn to the corruption in ways the other monsters haven't."));
 				await dialog.Msg(L("Three of them prowl this stretch of jungle. I'm offering a bounty - one Ellogua fang each."));
 
-				var response = await dialog.Select(L("Three is a tall order."),
+				var response = await dialog.Select(L("Will you take the bounty?"),
 					Option(L("I'll take the bounty"), "help"),
 					Option(L("How do I find them?"), "info"),
 					Option(L("Find another hunter"), "leave")
@@ -534,7 +552,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 		// Quest 6: The Shrine Approach
 		//-------------------------------------------------------------------------
-		AddNpc(155145, L("[Pathfinder] Rozalie"), "f_bracken_63_3", -200, -300, 45, async dialog =>
+		AddNpc(155145, L("[Pathfinder] Rozalie"), "f_bracken_63_3", -144.26146, -158.07031, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_3", 1006);
@@ -543,21 +561,22 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("There's an old shrine deeper in the jungle. Most travelers don't know it exists - and that's fine."));
-				await dialog.Msg(L("But if the antidote researchers need to reach it, the path needs to be clear. Gosaru and Raffly have overrun the approach."));
+				await dialog.Msg(L("See that elevator behind me? It runs up to Badoca Hill - the high ridge above the canopy."));
+				await dialog.Msg(L("I'm convinced the old shrine sits up there. The Knidos maps marked a ruined altar near the cliff edge, and that elevator is the only way up."));
+				await dialog.Msg(L("Take the elevator, find the altar, and bring back any fragment you can pry loose. Miela's research needs proof the shrine is real."));
 
-				var response = await dialog.Select(L("Can I open the path?"),
-					Option(L("I'll clear the approach"), "help"),
-					Option(L("What's at the shrine?"), "info"),
-					Option(L("Not worth the trouble"), "leave")
+				var response = await dialog.Select(L("Will you go to Badoca Hill?"),
+					Option(L("I'll ride the elevator and find the altar"), "help"),
+					Option(L("Why does the shrine matter?"), "info"),
+					Option(L("Not now"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Both territories overlap along the approach path. You'll run into both on every stretch."));
-						await dialog.Msg(L("Thirty clears a reliable corridor. Anything less and they close it again within a day."));
+						await dialog.Msg(L("The altar's somewhere on the western ledge of Badoca Hill. Watch yourself - whatever is rooted there has been listening for a long time."));
+						await dialog.Msg(L("Touching the altar may stir what's drawn to it. Don't linger. Take a fragment and come back."));
 						break;
 
 					case "info":
@@ -566,39 +585,79 @@ public class FBracken633QuestNpcsScript : GeneralScript
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Maybe you're right. But someone has to open the path eventually."));
+						await dialog.Msg(L("The elevator isn't going anywhere. Come back when you're ready."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killGosaru", out var gosaruObj)) return;
-				if (!quest.TryGetProgress("killRaffly", out var rafflyObj)) return;
+				var fragmentCount = character.Inventory.CountItem(650601);
 
-				if (gosaruObj.Done && rafflyObj.Done)
+				if (fragmentCount >= 1)
 				{
-					await dialog.Msg(L("Approach is open. I can scout the shrine itself now."));
-					await dialog.Msg(L("This matters more than you know. Take this with my thanks."));
+					await dialog.Msg(L("You found it. The altar is real - and this fragment proves it."));
+					await dialog.Msg(L("Miela can work with this. Take this with my thanks."));
+
+					character.Inventory.Remove(650601, 1, InventoryItemRemoveMsg.Given);
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					var status = "";
-					if (!gosaruObj.Done)
-						status += L("Kill more Gosaru. ");
-					if (!rafflyObj.Done)
-						status += L("Kill more Raffly. ");
-
-					await dialog.Msg(LF("Keep pushing. {0}", status));
+					await dialog.Msg(L("Ride the elevator up to Badoca Hill. The altar is on the western ledge - bring me a fragment."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The approach is quiet. When the antidote's ready, the shrine will be waiting."));
+				await dialog.Msg(L("The fragment you brought matches the old Knidos sketches. The shrine is exactly where I thought."));
 			}
 		});
+
+		// Shrine Ruin Altar helper (Q1006)
+		//-------------------------------------------------------------------------
+		void AddShrineRuinAltar(double x, double z, double direction)
+		{
+			AddNpc(152008, L("Shrine Ruin Altar"), "f_bracken_63_3", x, z, direction, async dialog =>
+			{
+				var character = dialog.Player;
+				var questId = new QuestId("f_bracken_63_3", 1006);
+				var variableKey = "Laima.Quests.f_bracken_63_3.Quest1006.AltarTaken";
+
+				if (!character.Quests.IsActive(questId))
+				{
+					await dialog.Msg(L("{#666666}*A shattered altar of black stone, half-swallowed by roots.*{/}"));
+					return;
+				}
+
+				if (character.Variables.Perm.GetBool(variableKey, false))
+				{
+					await dialog.Msg(L("{#666666}*The altar's surface is bare where you pried the fragment loose.*{/}"));
+					return;
+				}
+
+				var luredCount = LureNearbyEnemies(character, 200, 500);
+				if (luredCount > 0)
+					character.ServerMessage(LF("{{#FF6666}}The altar pulses - the hill stirs against you!{{/}}"));
+
+				var result = await character.TimeActions.StartAsync(
+					L("Prying altar fragment..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(4)
+				);
+
+				if (result == TimeActionResult.Completed)
+				{
+					character.Inventory.Add(650601, 1, InventoryAddType.PickUp);
+					character.Variables.Perm.Set(variableKey, true);
+					character.ServerMessage(L("Recovered: Destroyed Altar Fragment"));
+					character.ServerMessage(L("{#FFD700}Return to Rozalie.{/}"));
+				}
+				else
+				{
+					character.ServerMessage(L("You let go of the altar. The fragment stays with the stone."));
+				}
+			});
+		}
+
+		AddShrineRuinAltar(-566.1832, -652.59015, 0);
 	}
 }
 
@@ -606,17 +665,17 @@ public class FBracken633QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: Dadan Gate Watch
+// Quest 1001 CLASS: Dadan Pond Watch
 //-----------------------------------------------------------------------------
 
-public class DadanGateWatchQuest : QuestScript
+public class DadanPondWatchQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_bracken_63_3", 1001);
-		SetName(L("Dadan Gate Watch"));
+		SetName(L("Dadan Pond Watch"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Drive back Gosaru pressing on the eastern gate of Dadan Jungle."));
+		SetDescription(L("Flush out the corrupted Gosaru hiding in the bushes around the pond in Dadan Jungle."));
 		SetLocation("f_bracken_63_3");
 		SetAutoTracked(true);
 
@@ -625,7 +684,7 @@ public class DadanGateWatchQuest : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver(L("[Scout] Tovin"), "f_bracken_63_3");
 
-		AddObjective("killGosaru", L("Drive back corrupted Gosaru"),
+		AddObjective("killGosaru", L("Flush corrupted Gosaru from the pond bushes"),
 			new KillObjective(20, new[] { MonsterId.Gosaru }));
 
 		AddReward(new ExpReward(15600, 10800));
@@ -670,7 +729,7 @@ public class HeartCrystalsQuest : QuestScript
 	{
 		character.Inventory.Remove(650726, character.Inventory.CountItem(650726), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 7; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1002.Shard{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1002.Shard{i}.Spawned");
@@ -681,7 +740,7 @@ public class HeartCrystalsQuest : QuestScript
 	{
 		character.Inventory.Remove(650726, character.Inventory.CountItem(650726), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 7; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1002.Shard{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1002.Shard{i}.Spawned");
@@ -699,7 +758,7 @@ public class TheBeetleBlightQuest : QuestScript
 		SetId("f_bracken_63_3", 1003);
 		SetName(L("The Beetle Blight"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Bush Beetles and scorch the infested hives breeding them in the southern basin."));
+		SetDescription(L("Kill Bush Beetles and scorch the infested hives breeding them on the slope below Novaha Monastery."));
 		SetLocation("f_bracken_63_3");
 		SetAutoTracked(true);
 
@@ -727,22 +786,16 @@ public class TheBeetleBlightQuest : QuestScript
 	{
 		character.Inventory.Remove(650809, character.Inventory.CountItem(650809), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 4; i++)
-		{
+		for (int i = 1; i <= 6; i++)
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1003.Hive{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1003.Hive{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650809, character.Inventory.CountItem(650809), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 4; i++)
-		{
+		for (int i = 1; i <= 6; i++)
 			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1003.Hive{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1003.Hive{i}.Spawned");
-		}
 	}
 }
 
@@ -756,7 +809,7 @@ public class TheMissingWardenQuest : QuestScript
 		SetId("f_bracken_63_3", 1004);
 		SetName(L("The Missing Warden"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Recover the lost trail markers and kill the emboldened Raffly that may have killed the missing warden."));
+		SetDescription(L("Read three of the four warden pillars on the ridge and clear the emboldened Raffly to find out what happened to Yuris."));
 		SetLocation("f_bracken_63_3");
 		SetAutoTracked(true);
 
@@ -768,8 +821,8 @@ public class TheMissingWardenQuest : QuestScript
 		AddObjective("killRaffly", L("Kill emboldened Raffly"),
 			new KillObjective(12, new[] { MonsterId.Raffly }));
 
-		AddObjective("findMarkers", L("Recover lost trail markers"),
-			new CollectItemObjective(650683, 5));
+		AddObjective("readPillars", L("Read warden pillars on the ridge"),
+			new VariableCheckObjective("Laima.Quests.f_bracken_63_3.Quest1004.PillarsRead", 3, true));
 
 		AddReward(new ExpReward(11000, 7500));
 		AddReward(new SilverReward(11200));
@@ -782,22 +835,18 @@ public class TheMissingWardenQuest : QuestScript
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650683, character.Inventory.CountItem(650683), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_bracken_63_3.Quest1004.PillarsRead");
 
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1004.Marker{i}");
-		}
+		for (int i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1004.Pillar{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650683, character.Inventory.CountItem(650683), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_bracken_63_3.Quest1004.PillarsRead");
 
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1004.Marker{i}");
-		}
+		for (int i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_bracken_63_3.Quest1004.Pillar{i}");
 	}
 }
 
@@ -828,7 +877,7 @@ public class TheElloguaTrialQuest : QuestScript
 		AddReward(new ItemReward(640085, 1)); // Lv5 EXP Card
 		AddReward(new ItemReward(640004, 3)); // Large HP Potion
 		AddReward(new ItemReward(640007, 2)); // Large SP Potion
-		AddReward(new ItemReward(531122, 1)); // Plate Armor
+		AddReward(new ItemReward(512186, 1)); // Tyla Plate Boots
 	}
 }
 
@@ -842,7 +891,7 @@ public class TheShrineApproachQuest : QuestScript
 		SetId("f_bracken_63_3", 1006);
 		SetName(L("The Shrine Approach"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Clear Gosaru and Raffly from the approach to the ancient shrine deep in Dadan Jungle."));
+		SetDescription(L("Ride the Badoca Hill elevator and pry a fragment from the ruined shrine altar for Rozalie."));
 		SetLocation("f_bracken_63_3");
 		SetAutoTracked(true);
 
@@ -851,11 +900,8 @@ public class TheShrineApproachQuest : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver(L("[Pathfinder] Rozalie"), "f_bracken_63_3");
 
-		AddObjective("killGosaru", L("Kill Gosaru from the approach"),
-			new KillObjective(15, new[] { MonsterId.Gosaru }));
-
-		AddObjective("killRaffly", L("Kill Raffly from the approach"),
-			new KillObjective(15, new[] { MonsterId.Raffly }));
+		AddObjective("collectAltarFragment", L("Recover a Destroyed Altar Fragment from the Badoca Hill shrine"),
+			new CollectItemObjective(650601, 1));
 
 		AddReward(new ExpReward(11000, 7500));
 		AddReward(new SilverReward(11200));
@@ -863,5 +909,17 @@ public class TheShrineApproachQuest : QuestScript
 		AddReward(new ItemReward(640004, 3)); // Large HP Potion
 		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 		AddReward(new ItemReward(502186, 1)); // Tyla Plate Gauntlets
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650601, character.Inventory.CountItem(650601), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_bracken_63_3.Quest1006.AltarTaken");
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650601, character.Inventory.CountItem(650601), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_bracken_63_3.Quest1006.AltarTaken");
 	}
 }

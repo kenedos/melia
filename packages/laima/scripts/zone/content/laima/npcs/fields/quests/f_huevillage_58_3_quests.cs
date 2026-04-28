@@ -23,7 +23,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Caro Overpopulation
 		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Forester] Akvile"), "f_huevillage_58_3", 0, 0, 0, async dialog =>
+		AddNpc(20060, L("[Forester] Akvile"), "f_huevillage_58_3", -238, 293, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_3", 1001);
@@ -79,7 +79,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		// Quest 2: Tipio Feathers
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Fletcher] Ruta-II"), "f_huevillage_58_3", -1200, -1200, 0, async dialog =>
+		AddNpc(20114, L("[Fletcher] Ruta-II"), "f_huevillage_58_3", -1064, -705, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_3", 1002);
@@ -137,7 +137,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		// Quest 3: Tiny Bow Quivers
 		//-------------------------------------------------------------------------
-		AddNpc(20011, L("[Scout-Captain] Norbertas"), "f_huevillage_58_3", 500, 200, 0, async dialog =>
+		AddNpc(20011, L("[Scout-Captain] Norbertas"), "f_huevillage_58_3", 468, -592, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_3", 1003);
@@ -195,7 +195,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		// Quest 4: Doyor Pack
 		//-------------------------------------------------------------------------
-		AddNpc(147473, L("[Huntress] Giedre"), "f_huevillage_58_3", 1700, -500, 0, async dialog =>
+		AddNpc(147473, L("[Huntress] Giedre"), "f_huevillage_58_3", 1735, -544, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_3", 1004);
@@ -309,7 +309,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Upent Lord
 		//-------------------------------------------------------------------------
-		AddNpc(147418, L("[Bounty Hunter] Egle-II"), "f_huevillage_58_3", 1100, -700, 0, async dialog =>
+		AddNpc(147418, L("[Bounty Hunter] Egle-II"), "f_huevillage_58_3", 152, -761, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_huevillage_58_3", 1005);
@@ -440,119 +440,6 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 		AddTerritoryStone(2, 1300, -500, 90);
 		AddTerritoryStone(3, 900, -800, 180);
 
-		// Quest 6: Cobalt Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Caravan Guard] Mindaugas-II"), "f_huevillage_58_3", -600, 700, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_huevillage_58_3", 1006);
-
-			dialog.SetTitle(L("Mindaugas"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A caravan-guard inspects a wagon-axle for splinter-cracks, knocking it twice with a knuckle*{/}"));
-				await dialog.Msg(L("Cobalt road runs my caravans through every fortnight - dye-bolts to Klaipeda, salt-bricks back, oats both ways. The road only stays profitable if it stays swept."));
-				await dialog.Msg(L("Old forester custom out here: each sweep is logged on the Forester Cairn at the road-bend. Stone for stone, tally for tally. The next caravan reads the cairn before they roll - tells them whether to risk a single guard or hire two extra."));
-
-				var response = await dialog.Select(L("Kill 12 Caros, 12 Tipios, and 12 Doyors, then drop a tally-stone on the Forester Cairn at the road-bend. Caravan-coin standard rate. Take the contract?"),
-					Option(L("I'll take the sweep"), "help"),
-					Option(L("Why log on a cairn instead of a ledger?"), "info"),
-					Option(L("Find another swordhand"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He hands you a smooth river-stone and a folded bill of marque*{/}"));
-						await dialog.Msg(L("Thirty-six kills. Standard count, no padding - the next caravan-guards check the cairn-stones against my expected ledger."));
-						await dialog.Msg(L("Cairn's at the road-bend, where the cobalt-trees thin out. Drop the stone on the south face. Don't disturb the older stones - those tell the road's history."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("A ledger only travels with the keeper. A cairn stays where the caravans need it. A guard a hundred leagues out can read the cairn and know whether the road was swept three days ago or three months ago."));
-						await dialog.Msg(L("Forester custom - older than the caravan-guild, older than Cobalt-village itself. Some stones at the cairn-base are two centuries old. We don't move those."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Then I hire double-guard for the next run, the dye-bolts cost more in Klaipeda, the wool-merchants raise their prices, and Cobalt loses another customer to the south road. All for a sweep."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killCaros", out var cObj)) return;
-				if (!quest.TryGetProgress("killTipios", out var tObj)) return;
-				if (!quest.TryGetProgress("killDoyors", out var dObj)) return;
-				if (!quest.TryGetProgress("logCairn", out var lObj)) return;
-
-				if (cObj.Done && tObj.Done && dObj.Done && lObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*He countersigns the bill of marque with a tar-stub, then weighs out the coin*{/}"));
-					await dialog.Msg(L("Cairn-stone laid clean, sweep math holds. Caravan-coin in full, plus a half-purse for the cairn-tradition - the elders insist."));
-					await dialog.Msg(L("Stop by next fortnight if you want the contract again. The road never stops needing it, and you've got a forester's eye for the cairn-work."));
-					character.Quests.Complete(questId);
-				}
-				else if (cObj.Done && tObj.Done && dObj.Done)
-				{
-					await dialog.Msg(L("Thirty-six kills, no padding. Now the cairn at the road-bend - south face, river-stone I gave you. Then come back."));
-				}
-				else
-				{
-					await dialog.Msg(L("Twelve of each. The road takes what the road takes; pace yourself."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Caravan through, single-guard rate. The next driver read your cairn-stone and didn't even slow at the bend. That's the highest compliment a road can pay you."));
-			}
-		});
-
-		// Forester Cairn for Quest 1006 tally
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Forester Cairn"), "f_huevillage_58_3", -700, 800, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_huevillage_58_3", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A weather-blackened cairn at the road bend, ringed with old tally-stones from past sweeps*{/}"));
-				return;
-			}
-
-			var loggedKey = "Laima.Quests.f_huevillage_58_3.Quest1006.CairnLogged";
-			if (character.Variables.Perm.GetBool(loggedKey, false))
-			{
-				await dialog.Msg(L("{#666666}*Your tally-stone sits on the cairn already*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killCaros", out var cObj)) return;
-			if (!quest.TryGetProgress("killTipios", out var tObj)) return;
-			if (!quest.TryGetProgress("killDoyors", out var dObj)) return;
-
-			if (!(cObj.Done && tObj.Done && dObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The cairn is ready, but you haven't finished the sweep*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Logging cairn..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(loggedKey, true);
-				character.ServerMessage(L("{#FFD700}Cairn logged. Return to Caravan Guard Mindaugas.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Logging interrupted."));
-			}
-		});
 	}
 }
 
@@ -613,6 +500,8 @@ public class FHuevillage583Quest1002 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 2));
 		AddReward(new ItemReward(640012, 1));
+
+		AddDrop(650275, 0.40f, MonsterId.Tipio);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -653,6 +542,8 @@ public class FHuevillage583Quest1003 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 2));
 		AddReward(new ItemReward(640012, 1));
+
+		AddDrop(650280, 0.40f, MonsterId.Tiny_Bow);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -756,48 +647,3 @@ public class FHuevillage583Quest1005 : QuestScript
 	}
 }
 
-public class FHuevillage583Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_huevillage_58_3", 1006);
-		SetName(L("Cobalt Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of Caros, Tipios, Doyors."));
-		SetLocation("f_huevillage_58_3");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Caravan Guard] Mindaugas"), "f_huevillage_58_3");
-
-		AddObjective("killCaros", L("Kill Caros"),
-			new KillObjective(12, new[] { MonsterId.Caro }));
-
-		AddObjective("killTipios", L("Kill Tipios"),
-			new KillObjective(12, new[] { MonsterId.Tipio }));
-
-		AddObjective("killDoyors", L("Kill Doyors"),
-			new KillObjective(12, new[] { MonsterId.Doyor }));
-
-		AddObjective("logCairn", L("Log the sweep at the Forester Cairn"),
-			new VariableCheckObjective("Laima.Quests.f_huevillage_58_3.Quest1006.CairnLogged", 1, true));
-
-		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(14200));
-		AddReward(new ItemReward(640085, 3));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_huevillage_58_3.Quest1006.CairnLogged");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_huevillage_58_3.Quest1006.CairnLogged");
-	}
-}

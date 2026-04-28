@@ -1,13 +1,12 @@
 //--- Melia Script ----------------------------------------------------------
 // Grynas Trails - Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quest NPCs and content for f_katyn_45_1. Trail-country through the dark
-// Katyn wood where cairns drift overnight, cloaked Sockets lean between
-// trunks, and Stoulet archers pick off travelers who walk one bend too far.
+// Restless ghosts of those who died on the Grynas Trails.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -18,389 +17,252 @@ using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
+using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.Scripting.Dialogues;
 
 public class FKatyn451QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// =====================================================================
-		// QUEST 1001: The Archers on the Bends
-		// =====================================================================
-		// Trail-Courier Rokas - Stoulet Archers picking off solo travelers
-		//---------------------------------------------------------------------
-		AddNpc(20109, L("[Trail-Courier] Rokas"), "f_katyn_45_1", -80, -740, 0, async dialog =>
+		Npc AddGhostNpc(int model, string name, string map, double x, double z, double direction, DialogFunc dialog)
+		{
+			var npc = AddNpc(model, name, map, x, z, direction, dialog);
+			npc.AddEffect(new ColorEffect(255, 150, 50, 150, 0.01f));
+			return npc;
+		}
+
+		// Quest 1001: Trail-Courier killed by archers
+		//-------------------------------------------------------------------------
+		AddGhostNpc(154017, L("[Restless Soul] Trail-Courier"), "f_katyn_45_1", -208, 939, 135, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_45_1", 1001);
-
-			dialog.SetTitle(L("Rokas"));
+			dialog.SetTitle(L("Trail-Courier"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A broad-shouldered courier leans on a trail-staff and listens to the wood more than he looks at it. A half-healed arrow-scar runs along one forearm*{/}"));
-				await dialog.Msg(L("Stoulet Archers are picking off lone walkers at the blind bends. They shoot and fade - you find the body two bends later, and the forest has already started to cover it."));
-
-				var response = await dialog.Select(L("Twenty Brown Stoulet Archers thinned. Take the trails clockwise - they nest east of the central fork. Will you?"),
-					Option(L("I'll thin twenty archers"), "help"),
-					Option(L("Why fade back into the woods?"), "info"),
-					Option(L("Trails aren't my problem"), "leave")
+				await dialog.Msg(L("The whistle... I heard the whistle twice... I should have moved..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						await dialog.Msg(L("{#666666}*He nods once, and relief shows only at the corners of his mouth*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Their arrows whistle low. If you hear the whistle twice from the same direction, you're being ranged. Move."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("The wood hides them. They don't hide themselves. There's a difference, and in Katyn, it matters. The trees here step aside when a Stoulet runs. They never do that for us."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Walk the center-stone route, then. Fewer blind bends. More Socket-cloaks leaning between trunks, but Sockets won't shoot unless you speak first."));
-						break;
+					await dialog.Msg(L("Stoulet Archers... Blind bend... Two whistles from the same direction... Range-fire..."));
+					await dialog.Msg(L("My pouch was full of letters... All for the southern post... All wet with my own blood..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will avenge you"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Twenty Archers... Twenty... So no other courier... Hears the whistle twice...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Twenty Archers... Twenty... So no other courier... Hears the whistle twice..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killArcher", out var killObj)) return;
-
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He listens again - a longer pause this time - then exhales*{/}"));
-					await dialog.Msg(L("Twenty. The bends are quieter for a week. I can run couriers in pairs instead of singles."));
-					await dialog.Msg(L("Courier's purse. And a whistle-knot - three sharp tugs means 'archer sighted.' Pass it on or keep it. Either way it earns its weight."));
-
+					await dialog.Msg(L("The bends are quiet... Take this courier's purse..."));
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("East nests. Drop prone on the second whistle. Twenty."));
-				}
+				else await dialog.Msg(L("More whistles... More whistles in the wood..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The bends held clean for a fortnight. Then an arrow whistled at dawn and we were back at it. Katyn is Katyn."));
+				await dialog.Msg(L("Quiet bends... Couriers walk in pairs now... I rest..."));
 			}
 		});
 
-		// =====================================================================
-		// QUEST 1002: The Trail-Book
-		// =====================================================================
-		// Tracker-Elder Giedre - Trail-book to her apprentice Tautvydas
-		//---------------------------------------------------------------------
-		AddNpc(20107, L("[Tracker-Elder] Giedre"), "f_katyn_45_1", -400, 180, 90, async dialog =>
+		// Quest 1002 giver: Tracker-Elder ghost
+		//-------------------------------------------------------------------------
+		AddGhostNpc(155131, L("[Restless Soul] Tracker-Elder"), "f_katyn_45_1", 388, -129, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_45_1", 1002);
-
-			dialog.SetTitle(L("Giedre"));
+			dialog.SetTitle(L("Tracker-Elder"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*An elder in patched tracker-leathers ties a leather cord around a small wax-sealed trail-book. Her fingers are steady; her eyes are tired*{/}"));
-				await dialog.Msg(L("Forty years I've kept this trail-book. It lists the real paths and the looping paths - which fork leads out, which fork leads you back to yourself three hours later in a different coat."));
-
-				var response = await dialog.Select(L("Carry the book to my apprentice Tautvydas at the south-bend. He's taking the trails over next season. Without the book, he'll learn by walking the looped paths - and not everyone who walks them comes out."),
-					Option(L("I'll carry the trail-book"), "help"),
-					Option(L("Looped paths? Different coat?"), "info"),
-					Option(L("Pass the book yourself"), "leave")
+				await dialog.Msg(L("The book... My trail-book... Forty years... I never delivered it..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						await dialog.Msg(L("{#666666}*She presses the book into your hands, then wraps your fingers around it for a moment*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("If you reach a fork that isn't on any path you've walked, go back. Don't reason it out. The forest wins arguments."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Some trail-forks in Katyn loop back to a point you already passed - but the point has changed. Same stone, different moss. Same tree, different bark. You in the same coat, but the coat isn't quite yours anymore."));
-						await dialog.Msg(L("The book marks these forks. Take the other branch, always. Even if the other branch looks wrong, the wrong branch is the right one."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("My knees are done. I'd be eight days on a two-hour walk. Someone young carries, or Tautvydas learns the hard way. Your call."));
-						break;
+					await dialog.Msg(L("My apprentice waits at the shrine... He waits forty years... Without the book... He learned the looped paths the hard way..."));
+					await dialog.Msg(L("I never reached him... A wrong-fork took me... A wrong-fork I had warned others against..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will deliver the book"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Tautvydas... At the shrine... Carry the book... Don't open it on the way... Don't...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Tautvydas... At the shrine... Carry the book... Don't open it on the way... Don't..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("deliverBook", out var deliverObj)) return;
-
 				if (deliverObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She receives Tautvydas's reply-token, reads the short note, and her eyes close for a long moment*{/}"));
-					await dialog.Msg(L("He's read the first chapter. Already marked the west-fork as the wrong-branch, which means he trusts the book. That's enough - the trails will have a tracker when I don't."));
-					await dialog.Msg(L("Elder's coin. And take this - a tracker-cord of my own. Thin, grey, nothing special. But it frays the way real forest-cord frays, and that helps the wood recognize you as someone who belongs on the path."));
-
+					await dialog.Msg(L("He read it... He marked the west-fork... He guessed right... I can rest..."));
+					await dialog.Msg(L("Take this elder's coin... My grey cord... You earned it..."));
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("South-bend. Grey cord. Don't open the book on the way."));
-				}
+				else await dialog.Msg(L("The shrine... Tautvydas waits... Forty years..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Tautvydas sent word he marked three new looped forks this week. Already finding routes I missed in forty years. The trails are in good hands."));
+				await dialog.Msg(L("The trails have a tracker... Both of us can rest now... Both..."));
 			}
 		});
 
-		// =====================================================================
-		// APPRENTICE-TRACKER TAUTVYDAS (Quest 1002 recipient)
-		// =====================================================================
-		AddNpc(47245, L("[Apprentice-Tracker] Tautvydas"), "f_katyn_45_1", 710, -580, 270, async dialog =>
+		// Quest 1002 recipient: Apprentice-Tracker ghost in front of shrine to the dead
+		//-------------------------------------------------------------------------
+		AddGhostNpc(155132, L("[Restless Soul] Apprentice-Tracker"), "f_katyn_45_1", 347, -559, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_45_1", 1002);
-
-			dialog.SetTitle(L("Tautvydas"));
+			dialog.SetTitle(L("Apprentice-Tracker"));
 
 			if (character.Quests.IsActive(questId))
 			{
 				var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_45_1.Quest1002.Delivered", 0) >= 1;
 				if (!delivered)
 				{
-					await dialog.Msg(L("{#666666}*A young tracker in a grey cord leans against a center-stone, listening to the wood without looking at it. He turns only when you're close enough to speak quietly*{/}"));
-					await dialog.Msg(L("{#666666}*He takes the trail-book with both hands, breaks the wax, and reads the first page standing. His eyes sharpen*{/}"));
-					await dialog.Msg(L("She finally sent it. Forty years and she sends it in a plain cord."));
-					await dialog.Msg(L("{#666666}*He tucks the book into an inner pocket, pulls a small carved token from his tracker-pouch, and inks a single rune on it*{/}"));
-					await dialog.Msg(L("Reply-token. West-fork is the looped one - I marked it before I read the chapter. Tell her I guessed right, and I trust the book to tell me what I haven't guessed yet."));
-
+					await dialog.Msg(L("The shrine... I have stood at the shrine forty years... Forty years she did not come..."));
+					await dialog.Msg(L("The lights... The candle-statues never go out... The dead are kind here..."));
+					await dialog.Msg(L("The book... You bring the book... At last... At last..."));
+					await dialog.Msg(L("I read it standing... West-fork is the looped one... I knew it... I knew it before I knew anything..."));
 					character.Variables.Perm.Set("Laima.Quests.f_katyn_45_1.Quest1002.Delivered", 1);
-					character.ServerMessage(L("{#FFD700}Tautvydas's reply-token received. Return to Tracker-Elder Giedre.{/}"));
+					character.ServerMessage(L("{#FFD700}Trail-book delivered. Return to the Tracker-Elder.{/}"));
 				}
-				else
-				{
-					await dialog.Msg(L("Carry the token back. She'll read the west-fork note by the rune's ink-pattern."));
-				}
+				else await dialog.Msg(L("Tell her... Tell her I guessed right... I will leave the shrine soon..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Three new loops marked this week. The wood doesn't like losing its ambushes. It'll try a fourth soon. I'm ready."));
+				await dialog.Msg(L("The shrine fades behind me... I never thought I would walk away from it..."));
 			}
 			else
 			{
-				await dialog.Msg(L("{#666666}*The apprentice listens to the wood. He does not offer conversation*{/}"));
-				await dialog.Msg(L("Trail-business only. I don't answer questions that don't come with a tracker's token."));
+				await dialog.Msg(L("Statues... Statues to the dead... I am one of them... I am one of them..."));
 			}
 		});
 
-		// =====================================================================
-		// QUEST 1003: Socket Hood-Patches
-		// =====================================================================
-		// Wards-Stitcher Danute - Hood-patches for stitched-silence cloaks
-		//---------------------------------------------------------------------
-		AddNpc(20017, L("[Wards-Stitcher] Danute"), "f_katyn_45_1", -930, 420, 0, async dialog =>
+		// Quest 1003: Wards-Stitcher ghost
+		//-------------------------------------------------------------------------
+		AddGhostNpc(154017, L("[Restless Soul] Wards-Stitcher"), "f_katyn_45_1", -985, -1004, 44, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_45_1", 1003);
-
-			dialog.SetTitle(L("Danute"));
+			dialog.SetTitle(L("Wards-Stitcher"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A spry older woman stitches a grey cloak-lining by lamp-light, her needle moving in a pattern that does not quite repeat. Every third stitch seems to vanish*{/}"));
-				await dialog.Msg(L("Socket cloaks dampen sound. You pass a Socket in full stride and hear nothing - not a footstep, not a breath. Strip the hood-patch from a fallen cloak and you get the same quiet, sewn flat into the cloth."));
-
-				var response = await dialog.Select(L("Eight hood-patches. Cut the patch at the seam, not the fabric - fabric cut wrong lets the silence out. Sockets fall only to hand-weapons; arrows slide through them. Will you gather?"),
-					Option(L("I'll gather eight hood-patches"), "help"),
-					Option(L("Why does silence stitch?"), "info"),
-					Option(L("Stitching is stitchers' work"), "leave")
+				await dialog.Msg(L("Silence... I sewed silence... I died in silence... No one heard..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						await dialog.Msg(L("{#666666}*She pulls a seam-ripper from her apron pocket and passes it to you. The handle is warm*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("If a Socket steps out while you're cutting, raise your blade and keep cutting. They're slow to decide. Be faster."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Old craft. The stitches form a pattern that absorbs sound - don't ask me the theory, I only know the pattern. Wardens who need quiet feet pay for a lined cloak. I sew what keeps them alive."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Fair. My needle is slow and my eyes aren't young. I'll find another gatherer. Maybe. Maybe not."));
-						break;
+					await dialog.Msg(L("Sockets stepped from between two trunks... I never heard them... My own stitches turned against me..."));
+					await dialog.Msg(L("Eight hood-patches I had cut... I would have sewn them into linings... My needle still in my hand..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will finish your work"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Eight patches... Cut at the seam... Not the fabric... So the silence... Saves a warden's life...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Eight patches... Cut at the seam... Not the fabric... So the silence... Saves a warden's life..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				var patchCount = character.Inventory.CountItem(650853);
-
 				if (patchCount >= 8)
 				{
-					await dialog.Msg(L("{#666666}*She holds each patch near her cheek, listening, and sets two aside without explanation*{/}"));
-					await dialog.Msg(L("Six stitch clean. Two carry a voice - a muttering, nothing you'd catch unless you sewed them. Those I'll boil a week; the voice washes out with hot lye."));
-					await dialog.Msg(L("Stitcher's coin. And a small scrap of clean silence-cloth - sewn into a boot-sole, it muffles footfalls enough to slip past a sleeping wolf. Useful trick."));
-
+					await dialog.Msg(L("Eight... Stitched clean... My linings will reach the wardens at last..."));
+					await dialog.Msg(L("Take this stitcher's coin... My silence-cloth scrap... For your boots..."));
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Seam cuts. Eight patches. No humming."));
-				}
+				else await dialog.Msg(L("Cut at the seam... Eight... Eight..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Five warden-cloaks lined and delivered this week. One ranger sent word the silence saved his life at a blind bend. The stitches work."));
+				await dialog.Msg(L("The wardens walk silent now... So do I... So do I..."));
 			}
 		});
 
-		// =====================================================================
-		// SOCKET HOOD-PATCH SPOTS
-		// =====================================================================
-		// For Quest 1003 - Socket Hood-Patches
-		// =====================================================================
-
-		void AddPatchSpot(int spotNumber, int x, int z, int direction)
-		{
-			AddNpc(47247, L("Fallen Socket Cloak"), "f_katyn_45_1", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_katyn_45_1", 1003);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A grey Socket cloak lies crumpled in the leaf-litter. Without a stitcher's order, there's no reason to rip seams*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_katyn_45_1.Quest1003.Spot{spotNumber}";
-				var gathered = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (gathered)
-				{
-					await dialog.Msg(L("{#666666}*The hood-patch is already cut. The rest of the cloak lies undisturbed*{/}"));
-					return;
-				}
-
-				var spawnedKey = $"Laima.Quests.f_katyn_45_1.Quest1003.Spot{spotNumber}.Spawned";
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 15)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Socket_Mage_Green, 1, 70, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}A Socket Mage steps out from between two trunks - you never heard it approach!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Ripping the seam..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(4));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650853, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-
-					var currentCount = character.Inventory.CountItem(650853);
-					character.ServerMessage(LF("Hood-patches gathered: {0}/8", currentCount));
-
-					if (currentCount >= 8)
-					{
-						character.ServerMessage(L("{#FFD700}All patches gathered! Return to Wards-Stitcher Danute.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("Cutting interrupted. The seam re-knits, slightly."));
-				}
-			});
-		}
-
-		AddPatchSpot(1, -969, -357, 0);
-		AddPatchSpot(2, -1331, -474, 90);
-		AddPatchSpot(3, -810, -715, 180);
-		AddPatchSpot(4, -205, 221, 270);
-		AddPatchSpot(5, 334, 245, 0);
-		AddPatchSpot(6, -884, -1113, 90);
-		AddPatchSpot(7, 599, -577, 180);
-		AddPatchSpot(8, 755, 380, 270);
-
-		// =====================================================================
-		// QUEST 1004: Which Cairns Walked
-		// =====================================================================
-		// Path-Warden Lukas - Cairns drifting overnight on the trail-forks
-		//---------------------------------------------------------------------
-		AddNpc(20151, L("[Path-Warden] Lukas"), "f_katyn_45_1", 270, 430, 180, async dialog =>
+		// Quest 1004: Path-Warden ghost
+		//-------------------------------------------------------------------------
+		AddGhostNpc(155131, L("[Restless Soul] Path-Warden"), "f_katyn_45_1", -2012, 292, 135, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_45_1", 1004);
-
-			dialog.SetTitle(L("Lukas"));
+			dialog.SetTitle(L("Path-Warden"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A young warden in trail-dust kneels beside a small cairn and sketches its stacked stones. He counts them twice - once looking, once by touch*{/}"));
-				await dialog.Msg(L("Four cairns mark the main trail-forks. All four are meant to point the safe way. Three moved overnight last week - pointed walkers into the looped branches. We had two people lost three days each before we caught it."));
-
-				var response = await dialog.Select(L("Walk the four cairns. Tell me which still point where they should point, and which have been turned. Don't re-arrange them - just describe. Will you?"),
-					Option(L("I'll walk the four cairns"), "help"),
-					Option(L("Who turns cairns at night?"), "info"),
-					Option(L("Trail-cairns are trail-warden work"), "leave")
+				await dialog.Msg(L("The cairn pointed at me... The cairn pointed at me... I should have walked opposite..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						await dialog.Msg(L("{#666666}*He tears a sketch from his book, marks four points, and passes it over with a compass-disc no bigger than a coin*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("If a cairn points back the way you came - that's not a cairn anymore. That's a trap. Step away from it, don't touch it, and walk out along the opposite heading."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("I don't know. Could be Sockets - they walk without sound, and cairns don't take long to rebuild. Could be the trees, rearranging their own shortcut-game. Could be something else. I measure. I don't guess."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Fair. I'll walk them myself over a week. But a week is two more walkers lost. Your call."));
-						break;
+					await dialog.Msg(L("West-fork cairn... Tip-stone pointed back at me... A trap, not a cairn... I should have walked opposite..."));
+					await dialog.Msg(L("I tried to fix it... I touched the stones... The wood took me into the loop... Three days... Then nothing..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will read the cairns for you"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Four cairns... Compass on each tip-stone... Don't touch... Don't touch... Tell me which point where...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Four cairns... Compass on each tip-stone... Don't touch... Don't touch... Tell me which point where..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				var cairnsChecked = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_45_1.Quest1004.CairnsChecked", 0);
-
 				if (cairnsChecked >= 4)
 				{
-					await dialog.Msg(L("{#666666}*He writes each compass-reading, and his pen slows at the last entry*{/}"));
-					await dialog.Msg(L("Cairn One: tip-stone north-east. Safe. Cairn Two: tip-stone north-east, correct. Cairn Three: tip-stone due south - turned ninety degrees clockwise. Cairn Four: tip-stone pointing back at me."));
-					await dialog.Msg(L("{#666666}*He closes the book and sets it down very carefully*{/}"));
-					await dialog.Msg(L("One turned. One trapped. I'll rebuild Three tonight and rope-off Four until a wardmage can walk the spot. Thank you for not touching them."));
-					await dialog.Msg(L("Warden's stipend, every coin. And if a cairn ever points at you - walk opposite, don't turn. Same rule for mirrors, in certain woods."));
-
+					await dialog.Msg(L("Two correct... One turned... One trap... I will warn the next warden... Through the trees..."));
+					await dialog.Msg(L("Take this warden's stipend... My compass-disc... Walk opposite to mirrors... To trap-cairns..."));
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Four cairns. Compass on the tip-stone. Note which point where. Don't touch."));
-				}
+				else await dialog.Msg(L("Four cairns... Don't touch... Just read..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Cairn Three rebuilt and holding. Cairn Four roped off - the wardmage's visit is scheduled for the new moon. Nobody's walked back-pointed since."));
+				await dialog.Msg(L("The west-fork is roped off... I helped someone at last... I rest..."));
 			}
 		});
 
-		// =====================================================================
-		// TRAIL CAIRNS
-		// =====================================================================
-		// For Quest 1004 - Which Cairns Walked
-		// =====================================================================
-
+		// Trail-cairn inspection points (kept as inspection pattern)
+		//-------------------------------------------------------------------------
 		void AddTrailCairn(int cairnNumber, string cairnName, string observation, int x, int z, int direction)
 		{
 			AddNpc(47251, L(cairnName), "f_katyn_45_1", x, z, direction, async dialog =>
@@ -410,16 +272,14 @@ public class FKatyn451QuestNpcsScript : GeneralScript
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A small trail-cairn beside the fork. Stones stacked hand-height. Without a warden's order, there's no reason to measure it*{/}"));
+					await dialog.Msg(L("{#666666}*A small trail-cairn beside the fork*{/}"));
 					return;
 				}
 
 				var variableKey = $"Laima.Quests.f_katyn_45_1.Quest1004.Cairn{cairnNumber}";
-				var checkedCairn = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (checkedCairn)
+				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*You have already read this cairn's tip-stone. The reading is logged*{/}"));
+					await dialog.Msg(L("{#666666}*Already read*{/}"));
 					return;
 				}
 
@@ -430,26 +290,72 @@ public class FKatyn451QuestNpcsScript : GeneralScript
 					character.Variables.Perm.Set(variableKey, true);
 					var cairnsChecked = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_45_1.Quest1004.CairnsChecked", 0);
 					character.Variables.Perm.Set("Laima.Quests.f_katyn_45_1.Quest1004.CairnsChecked", cairnsChecked + 1);
-
 					character.ServerMessage(L(observation));
 					character.ServerMessage(LF("Cairns read: {0}/4", cairnsChecked + 1));
-
 					if (cairnsChecked + 1 >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All cairns read! Return to Path-Warden Lukas.{/}"));
-					}
+						character.ServerMessage(L("{#FFD700}All cairns read! Return to the Path-Warden.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("Reading interrupted. The compass-needle settles."));
+					character.ServerMessage(L("Reading interrupted."));
 				}
 			});
 		}
 
-		AddTrailCairn(1, "North-Fork Cairn", "North-Fork: tip-stone oriented north-east. Correct. Stones set firm.", -66, 413, 0);
-		AddTrailCairn(2, "East-Fork Cairn", "East-Fork: tip-stone oriented north-east. Correct. Moss on the base undisturbed.", 647, 300, 90);
-		AddTrailCairn(3, "South-Fork Cairn", "South-Fork: tip-stone oriented due south. Turned ninety degrees clockwise - this cairn sends walkers into the loop.", 330, -595, 180);
-		AddTrailCairn(4, "West-Fork Cairn", "West-Fork: tip-stone points back toward the reader. A trap, not a cairn. You step away without touching it.", -435, 437, 270);
+		AddTrailCairn(1, "North-Fork Cairn", "North-Fork: tip-stone north-east. Correct.", -66, 413, 0);
+		AddTrailCairn(2, "East-Fork Cairn", "East-Fork: tip-stone north-east. Correct.", 647, 300, 90);
+		AddTrailCairn(3, "South-Fork Cairn", "South-Fork: tip-stone due south. Turned. Sends walkers into the loop.", 330, -595, 180);
+		AddTrailCairn(4, "West-Fork Cairn", "West-Fork: tip-stone points back at the reader. A trap, not a cairn.", -435, 437, 270);
+
+		// Quest 1005: Treasure-Seeker ghost — died at the chest
+		//-------------------------------------------------------------------------
+		AddGhostNpc(155132, L("[Restless Soul] Treasure-Seeker"), "f_katyn_45_1", -541, 663, 315, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_katyn_45_1", 1005);
+			dialog.SetTitle(L("Treasure-Seeker"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("The chest... The chest is right there... I died reaching for it..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
+				);
+				if (response == "info")
+				{
+					await dialog.Msg(L("I followed an old map... Sockets guarded the approach... I cut through them... My hand on the lid..."));
+					await dialog.Msg(L("The last Socket... Behind me... I never saw the blow... My fingers slid off the lid... My fingers..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will clear the path for the next seeker"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Twenty-five Sockets... Cut them all... So my hand... My hand finally rests on the lid... Through another's fingers...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Twenty-five Sockets... Cut them all... So my hand... My hand finally rests on the lid... Through another's fingers..."));
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killSockets", out var killObj)) return;
+				if (killObj.Done)
+				{
+					await dialog.Msg(L("The path... The path is clear at last... A seeker after me will reach the lid..."));
+					await dialog.Msg(L("Take this... A seeker's purse... I never spent it... Spend it for me..."));
+					character.Quests.Complete(questId);
+				}
+				else await dialog.Msg(L("More Sockets... Behind every trunk..."));
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("My fingers feel the lid... At last... At last..."));
+			}
+		});
 	}
 }
 
@@ -457,38 +363,29 @@ public class FKatyn451QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: The Archers on the Bends
-//-----------------------------------------------------------------------------
-
 public class TheArchersOnTheBendsQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_katyn_45_1", 1001);
-		SetName("The Archers on the Bends");
+		SetName("The Trail-Courier's Whistle");
 		SetType(QuestType.Sub);
-		SetDescription("Trail-Courier Rokas needs twenty Brown Stoulet Archers thinned before couriers can run the Katyn trails alone again.");
+		SetDescription("A courier's ghost begs for the Stoulet Archers that ranged him at the blind bend to be put down.");
 		SetLocation("f_katyn_45_1");
 		SetAutoTracked(true);
-
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Trail-Courier] Rokas", "f_katyn_45_1");
-
-		AddObjective("killArcher", "Defeat Brown Stoulet Archers on the trail-bends",
+		AddQuestGiver("[Restless Soul] Trail-Courier", "f_katyn_45_1");
+		AddObjective("killArcher", "Defeat Brown Stoulet Archers",
 			new KillObjective(20, new[] { MonsterId.Stoulet_Bow_Blue }));
-
 		AddReward(new ExpReward(3900, 2700));
 		AddReward(new SilverReward(5200));
-		AddReward(new ItemReward(640084, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2)); // Large HP Potion
-		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640084, 1));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 }
-
-// Quest 1002 CLASS: The Trail-Book
-//-----------------------------------------------------------------------------
 
 public class TheTrailBookQuest : QuestScript
 {
@@ -497,23 +394,20 @@ public class TheTrailBookQuest : QuestScript
 		SetId("f_katyn_45_1", 1002);
 		SetName("The Trail-Book");
 		SetType(QuestType.Sub);
-		SetDescription("Tracker-Elder Giedre's forty-year trail-book must reach her apprentice Tautvydas at the south-bend, and his rune-marked reply-token must return.");
+		SetDescription("A tracker-elder's ghost begs you to deliver her trail-book to her apprentice's ghost waiting at the shrine.");
 		SetLocation("f_katyn_45_1");
 		SetAutoTracked(true);
-
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Tracker-Elder] Giedre", "f_katyn_45_1");
-
-		AddObjective("deliverBook", "Deliver the trail-book and return with the reply-token",
+		AddQuestGiver("[Restless Soul] Tracker-Elder", "f_katyn_45_1");
+		AddObjective("deliverBook", "Deliver the trail-book to the Apprentice's ghost",
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_1.Quest1002.Delivered", 1, true));
-
 		AddReward(new ExpReward(6100, 4200));
 		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2));  // Large HP Potion
-		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new ItemReward(640084, 2));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -526,66 +420,43 @@ public class TheTrailBookQuest : QuestScript
 		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_1.Quest1002.Delivered");
 	}
 }
-
-// Quest 1003 CLASS: Socket Hood-Patches
-//-----------------------------------------------------------------------------
 
 public class SocketHoodPatchesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_katyn_45_1", 1003);
-		SetName("Socket Hood-Patches");
+		SetName("The Stitcher's Patches");
 		SetType(QuestType.Sub);
-		SetDescription("Wards-Stitcher Danute needs eight hood-patches cut at the seam from fallen Socket cloaks for her stitched-silence cloak-linings.");
+		SetDescription("A wards-stitcher's ghost begs for eight Socket hood-patches so her unfinished cloak-linings may save the wardens she could not.");
 		SetLocation("f_katyn_45_1");
 		SetAutoTracked(true);
-
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Wards-Stitcher] Danute", "f_katyn_45_1");
-
-		AddObjective("collectPatches", "Cut hood-patches from fallen Socket cloaks",
+		AddQuestGiver("[Restless Soul] Wards-Stitcher", "f_katyn_45_1");
+		AddObjective("collectPatches", "Cut hood-patches from Socket cloaks",
 			new CollectItemObjective(650853, 8));
-
 		AddReward(new ExpReward(6100, 4200));
 		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2));  // Large HP Potion
-		AddReward(new ItemReward(640007, 2));  // Large SP Potion
-		AddReward(new ItemReward(640012, 1));  // Recovery Potion
+		AddReward(new ItemReward(640084, 2));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
+
+		AddDrop(650853, 0.40f, MonsterId.Socket_Mage_Green);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650853,
-			character.Inventory.CountItem(650853),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_1.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_1.Quest1003.Spot{i}.Spawned");
-		}
+		character.Inventory.Remove(650853, character.Inventory.CountItem(650853), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650853,
-			character.Inventory.CountItem(650853),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_1.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_1.Quest1003.Spot{i}.Spawned");
-		}
+		character.Inventory.Remove(650853, character.Inventory.CountItem(650853), InventoryItemRemoveMsg.Destroyed);
 	}
 }
-
-// Quest 1004 CLASS: Which Cairns Walked
-//-----------------------------------------------------------------------------
 
 public class WhichCairnsWalkedQuest : QuestScript
 {
@@ -594,40 +465,58 @@ public class WhichCairnsWalkedQuest : QuestScript
 		SetId("f_katyn_45_1", 1004);
 		SetName("Which Cairns Walked");
 		SetType(QuestType.Sub);
-		SetDescription("Path-Warden Lukas has asked you to read the four trail-fork cairns and determine which still point north-east and which have been turned overnight.");
+		SetDescription("A path-warden's ghost begs for the four trail-fork cairns to be read so the next warden does not die at the trap-cairn he did.");
 		SetLocation("f_katyn_45_1");
 		SetAutoTracked(true);
-
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Path-Warden] Lukas", "f_katyn_45_1");
-
+		AddQuestGiver("[Restless Soul] Path-Warden", "f_katyn_45_1");
 		AddObjective("readCairns", "Read the four trail-fork cairns",
 			new VariableCheckObjective("Laima.Quests.f_katyn_45_1.Quest1004.CairnsChecked", 4, true));
-
 		AddReward(new ExpReward(6100, 4200));
 		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2)); // Large HP Potion
-		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640084, 2));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_1.Quest1004.CairnsChecked");
 		for (int i = 1; i <= 4; i++)
-		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_1.Quest1004.Cairn{i}");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_1.Quest1004.CairnsChecked");
 		for (int i = 1; i <= 4; i++)
-		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_1.Quest1004.Cairn{i}");
-		}
+	}
+}
+
+public class TheTreasureSeekerQuest : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_katyn_45_1", 1005);
+		SetName("The Treasure-Seeker's Hand");
+		SetType(QuestType.Sub);
+		SetDescription("A treasure-seeker's ghost died with his hand on the chest's lid. He begs for the Sockets that ambushed him to be cleared so the next seeker reaches what he could not.");
+		SetLocation("f_katyn_45_1");
+		SetAutoTracked(true);
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver("[Restless Soul] Treasure-Seeker", "f_katyn_45_1");
+		AddObjective("killSockets", "Defeat Sockets guarding the chest",
+			new KillObjective(25, new[] { MonsterId.Socket_Mage_Green }));
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2));
+		AddReward(new ItemReward(640004, 2));
+		AddReward(new ItemReward(640007, 2));
+		AddReward(new ItemReward(640012, 1));
 	}
 }

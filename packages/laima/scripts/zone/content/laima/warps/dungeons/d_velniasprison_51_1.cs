@@ -14,8 +14,10 @@ public class DVelniasprison511WarpsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Demon Prison District 1 to Aqueduct Bridge Area
-		AddWarpPortal(From("d_velniasprison_51_1", 16, 1730), To("f_farm_47_2", -1540, -1202));
+		// Demon Prison District 1 to Aqueduct Bridge Area exit handled by the
+		// Sealed Portal NPC in npcs/dungeons/d_velniasprison_51_1.cs - the seals
+		// pin anything trying to leave from inside, so the warp is replaced with
+		// a dialog NPC that requires a Seal Release Crystal to pass.
 
 		AddWarpPortal(From("d_velniasprison_51_1", 73, 965), To("d_velniasprison_51_1", 21, 445));
 		AddWarpPortal(From("d_velniasprison_51_1", 21, 499), To("d_velniasprison_51_1", 72, 1034));

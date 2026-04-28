@@ -1,11 +1,12 @@
 //--- Melia Script ----------------------------------------------------------
 // Katyn 7-2 Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for Katyn 7-2 (coastal graveyard, crypts, reef shore).
+// Restless ghost soldiers haunting the Katyn 7-2 coast. Each one died here.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Actors.Characters;
@@ -16,100 +17,101 @@ using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.Scripting.Dialogues;
 
 public class FKatyn72QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Sakmoli Tide
+		Npc AddGhostNpc(int model, string name, string map, double x, double z, double direction, DialogFunc dialog)
+		{
+			var npc = AddNpc(model, name, map, x, z, direction, dialog);
+			npc.AddEffect(new ColorEffect(255, 150, 50, 150, 0.01f));
+			return npc;
+		}
+
+		// Quest 1001: Drowned by Sakmoli — ghost between trees
 		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Shore-Warden] Mindaugas"), "f_katyn_7_2", 2750, 750, 0, async dialog =>
+		AddGhostNpc(154017, L("[Restless Soul] Drowned Soldier"), "f_katyn_7_2", 1833, 2343, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_7_2", 1001);
-
-			dialog.SetTitle(L("Mindaugas"));
+			dialog.SetTitle(L("Drowned Soldier"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Sakmoli wash up the dunes after every tide. Forty kills and the graves stay covered."));
-
-				var response = await dialog.Select(L("Kill?"),
-					Option(L("I'll kill"), "help"),
-					Option(L("Graves?"), "info"),
-					Option(L("Skip"), "leave")
+				await dialog.Msg(L("Tide... Tide... I drowned in the tide..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Forty. Watch the wet sand."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("They drag the bones up. We rebury at dusk, they unbury by dawn."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Tide keeps pulling."));
-						break;
+					await dialog.Msg(L("Patrol... I walked the patrol... The Sakmoli came up the dunes... Their teeth... Their teeth in the wet sand..."));
+					await dialog.Msg(L("They dragged me... Under... Under... I could not rise..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will avenge you"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Forty... Kill forty... So my soul... So my soul can rest...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Forty... Kill forty... So my soul... So my soul can rest..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killSakmoli", out var killObj)) return;
-
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("Shore quiets."));
+					await dialog.Msg(L("They are dead... They are dead... I can feel the tide letting go..."));
+					await dialog.Msg(L("Take this... A soldier's purse... I have no use for coin... Where I am going..."));
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Keep killing."));
-				}
+				else await dialog.Msg(L("More... More of them... I still hear them in the surf..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Reburied two rows yesterday."));
+				await dialog.Msg(L("Quiet... So quiet now... Thank you... Thank you..."));
 			}
 		});
 
-		// Quest 2: Ellomago Shades
+		// Quest 1002: Lost in the crypts — ghost between trees
 		//-------------------------------------------------------------------------
-		AddNpc(153142, L("[Exorcist] Ruta"), "f_katyn_7_2", 2200, -2800, 0, async dialog =>
+		AddGhostNpc(155131, L("[Restless Soul] Lost Sentinel"), "f_katyn_7_2", 1213, 2087, 315, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_7_2", 1002);
-
-			dialog.SetTitle(L("Ruta"));
+			dialog.SetTitle(L("Lost Sentinel"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Ellomago shades drift the crypt aisles. Kill twenty-eight, bring seven fading spirits to anchor the ward."));
-
-				var response = await dialog.Select(L("Spirits?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Anchor?"), "info"),
-					Option(L("Skip"), "leave")
+				await dialog.Msg(L("Walls... Walls all the same... I cannot find the door..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Salt the jars before sealing."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Each spirit weighs the ward. Seven and the crypt door holds till next moon."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Door creaks open."));
-						break;
+					await dialog.Msg(L("Crypt... I went into the crypt... The shades came... Ellomago... Eyes everywhere... Eyes... Eyes..."));
+					await dialog.Msg(L("My torch went out... I never saw the door again..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will silence the shades"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Twenty-eight... Drive them down... Drive them down... So I may find the door...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Twenty-eight... Drive them down... Drive them down... So I may find the door..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
@@ -117,57 +119,51 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killEllomago", out var killObj)) return;
 				if (!quest.TryGetProgress("gatherSpirits", out var sObj)) return;
-
 				if (killObj.Done && sObj.Done)
 				{
-					await dialog.Msg(L("Seven spirits sealed."));
+					await dialog.Msg(L("Light... I can see the door... I can see the door..."));
+					await dialog.Msg(L("Take this purse... I will not need it past the door..."));
 					character.Inventory.Remove(664096, character.Inventory.CountItem(664096), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Keep hunting."));
-				}
+				else await dialog.Msg(L("More eyes... I still hear them whispering... Whispering my name..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Ward holds. Crypt's quiet for once."));
+				await dialog.Msg(L("The door... The door is open... I will pass through soon... Soon..."));
 			}
 		});
 
-		// Quest 3: Red Jellyfish Reef
+		// Quest 1003: Killed by jellyfish — ghost between trees (reef victim)
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Reef-Harvester] Egle"), "f_katyn_7_2", 2000, 600, 90, async dialog =>
+		AddGhostNpc(155132, L("[Restless Soul] Stung Diver"), "f_katyn_7_2", 1753, 884, 135, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_7_2", 1003);
-
-			dialog.SetTitle(L("Egle"));
+			dialog.SetTitle(L("Stung Diver"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Red Jellyfish strangle the coral. Kill eighteen, bring six blue corals before the bloom suffocates the reef."));
-
-				var response = await dialog.Select(L("Coral?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Bloom?"), "info"),
-					Option(L("Skip"), "leave")
+				await dialog.Msg(L("Burning... Burning... The water was burning..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Cut clean. Their sting holds an hour after they die."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Reef breathes through the coral. Coral dies, fishery dies, village starves."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Reef chokes."));
-						break;
+					await dialog.Msg(L("Reef... I dove for coral... For my sister's wedding-bowl... Red... Red in the water... So many of them..."));
+					await dialog.Msg(L("They wrapped me... Like ropes... Like ropes of fire..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will cut them down"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Eighteen... Cut them... Cut them... Bring me the corals... So my sister... My sister still gets her bowl...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Eighteen... Cut them... Cut them... Bring me the corals... So my sister... My sister still gets her bowl..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
@@ -175,309 +171,168 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killJelly", out var killObj)) return;
 				if (!quest.TryGetProgress("gatherCoral", out var cObj)) return;
-
 				if (killObj.Done && cObj.Done)
 				{
-					await dialog.Msg(L("Six corals. Reef can rebuild from these."));
+					await dialog.Msg(L("The corals... Six... Blue... My sister... She will know..."));
+					await dialog.Msg(L("Take this... My diving-purse... Salt-stained... Honest..."));
 					character.Inventory.Remove(668044, character.Inventory.CountItem(668044), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
-				else
-				{
-					await dialog.Msg(L("Keep hunting."));
-				}
+				else await dialog.Msg(L("Burning... Still burning in the water..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Coral grafts taking. Reef colors back by autumn."));
+				await dialog.Msg(L("She has the bowl... She has the bowl... I felt her hold it..."));
 			}
 		});
 
-		// Quest 4: Ridimed Bog
+		// Quest 1004: Sunk in the bog — ghost between trees
 		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Bog-Warden] Jurate"), "f_katyn_7_2", 400, -600, 0, async dialog =>
+		AddGhostNpc(154017, L("[Restless Soul] Bog-Sunken"), "f_katyn_7_2", 3595, 652, 135, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_7_2", 1004);
-
-			dialog.SetTitle(L("Jurate"));
+			dialog.SetTitle(L("Bog-Sunken"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A bog-warden plants a fresh reed-stake into a soft patch of earth, then steps back to watch it sink half a fingerwidth*{/}"));
-				await dialog.Msg(L("West bog used to be solid ground, my grandfather's time. Then the Ridimed came and started churning it. Now it's half-marsh, and our salt-cart route runs straight through the worst of it."));
-				await dialog.Msg(L("Worse - the Ridimed dig. They've uncovered four old fisher-graves, dragged the bones up into the open. Old Katyn custom: bones don't belong above the line. We rebury or we accept the bad omen."));
-
-				var response = await dialog.Select(L("Kill 18 Ridimed to push them back, then rebury the four disturbed graves - I've reed-staked each one. Will you wade in?"),
-					Option(L("I'll wade in and do both"), "help"),
-					Option(L("Why does the line matter?"), "info"),
-					Option(L("Find a bog-walker"), "leave")
+				await dialog.Msg(L("Down... Down... The bog took me down..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She hands you a folded cloth bundle and a small clay jar of bog-water*{/}"));
-						await dialog.Msg(L("Eighteen Ridimed, no shortcuts. Don't sink past the knee - if you do, throw weight backward, never forward. Forward is where the bog wants you."));
-						await dialog.Msg(L("The four reed-stakes mark the open graves. At each one, fold the cloth over the bones, pour bog-water across the cloth, then mound dirt. Old Katyn rite. The dead expect it."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Katyn coast was built on the bones of fishers who never came home from a tide. The line - the bog-line, the grave-line - is what separates the living from those bones. When bones come up over the line, the line breaks."));
-						await dialog.Msg(L("Some say it's superstition. The fishers' widows say otherwise. Two of them won't walk the bog road since the bones came up - they take the long route around, three hours each way."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Then the salt-cart stops, the bones stay above the line, and the fishers' widows walk the long way until winter. I'll be here, planting reed-stakes for someone else."));
-						break;
+					await dialog.Msg(L("Salt-cart... Wheel cracked... I knelt to lift it... The Ridimed... They came up through the mud..."));
+					await dialog.Msg(L("Hands... So many hands... Pulling... Pulling..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will end the Ridimed"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Eighteen... End them... End them... So no other soldier... No other soldier...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Eighteen... End them... End them... So no other soldier... No other soldier..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killRidimed", out var killObj)) return;
-				if (!quest.TryGetProgress("reburyGraves", out var rObj)) return;
-
-				if (killObj.Done && rObj.Done)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She presses both hands flat to the bog-earth, breathes out long, then stands*{/}"));
-					await dialog.Msg(L("Bog's clear, bones are back under the line. The four graves will hold through the wet season - I checked the mounds myself this morning."));
-					await dialog.Msg(L("Take this. Bog-warden's purse, plus a stipend the widows asked me to add. Don't argue - they insisted."));
+					await dialog.Msg(L("The mud... The mud is quiet... I can feel the ground holding firm..."));
+					await dialog.Msg(L("Take this... A bog-soaked purse... The coin still good..."));
 					character.Quests.Complete(questId);
 				}
-				else if (!killObj.Done)
-				{
-					await dialog.Msg(L("Eighteen Ridimed first. No use reburying a grave the next Ridimed digs back up by sundown."));
-				}
-				else
-				{
-					await dialog.Msg(L("Bog's settling. Now the four reed-staked graves - cloth, bog-water, mound. Old rite, exactly as I told you."));
-				}
+				else await dialog.Msg(L("More hands... I still feel them... Reaching up..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Salt-cart through this morning, first run in a season. The two widows walked the bog road again last week - the short way, the way they used to. Neither said anything. Neither needed to."));
+				await dialog.Msg(L("The salt-carts roll... I can hear the wheels... Going on without me..."));
 			}
 		});
 
-		// Disturbed grave rebury points for Quest 1004
+		// Quest 1005: Killed by Sakmoli Alpha — ghost between trees
 		//-------------------------------------------------------------------------
-		void AddDisturbedGrave(int graveNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Disturbed Grave"), "f_katyn_7_2", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_katyn_7_2", 1004);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A reed-staked grave, bones half-uncovered by Ridimed claws*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_katyn_7_2.Quest1004.Grave{graveNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already reburied; the bog smooths the soil over it*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Reburying grave..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_7_2.Quest1004.GravesReburied", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_katyn_7_2.Quest1004.GravesReburied", count);
-					character.ServerMessage(LF("Graves reburied: {0}/4", count));
-
-					if (count >= 4)
-						character.ServerMessage(L("{#FFD700}All graves reburied! Return to Bog-Warden Jurate.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Reburial interrupted."));
-				}
-			});
-		}
-
-		AddDisturbedGrave(1, 300, -700, 0);
-		AddDisturbedGrave(2, 500, -500, 90);
-		AddDisturbedGrave(3, 200, -800, 180);
-		AddDisturbedGrave(4, 600, -400, 270);
-
-		// Quest 5: The Sakmoli Alpha
-		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Algirdas"), "f_katyn_7_2", 3500, -4200, 90, async dialog =>
+		AddGhostNpc(155131, L("[Restless Soul] Torn Hunter"), "f_katyn_7_2", 601, -349, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_7_2", 1005);
-			var alphaSpawnedKey = "Laima.Quests.f_katyn_7_2.Quest1005.AlphaSpawned";
-
-			dialog.SetTitle(L("Algirdas"));
+			dialog.SetTitle(L("Torn Hunter"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A bounty hunter sharpens a gutting-knife on a wet stone, the rasp rhythmic with the surf*{/}"));
-				await dialog.Msg(L("Sakmoli Alpha runs the tide-pack on the east shore. Old, scarred, smart enough to retreat into the breakers when a hunter comes calling. He won't fight on dry sand."));
-				await dialog.Msg(L("Three salt-pools at his roosting bay - that's where his pack rests at low tide. Salt the pools and the water sours; the pack scatters and the Alpha has to surface to drink fresh. Then we have him."));
-
-				var response = await dialog.Select(L("Salt the three Sakmoli tide-pools, then kill 10 of his pack to bait him out. He fights on dry sand only - dodge the first lunge, strike his flank. Will you take him?"),
-					Option(L("I'll take the Alpha"), "help"),
-					Option(L("Why salt and not poison?"), "info"),
-					Option(L("That's tide-work, not blade-work"), "leave")
+				await dialog.Msg(L("Big... So big... Bigger than the others..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He hands you three rough cakes of salt-brick wrapped in oilcloth*{/}"));
-						await dialog.Msg(L("Three cakes, three pools. Drop one in each, let it dissolve. Don't stay to watch - the pack smells the salt and comes up curious."));
-						await dialog.Msg(L("Then ten Sakmoli, no shortcuts. The Alpha surfaces around the eighth or ninth. Stand on the dry rim - he won't follow you off the wet line."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Poison kills the pack and the Alpha both. Salt only scatters them - the pack goes back to the deep, the Alpha surfaces alone. We want him alone, not the whole pack dead in the bay."));
-						await dialog.Msg(L("Dead Sakmoli rotting in the bay would foul the fishery for two seasons. Katyn villages can't afford that. So: salt, not poison. Old shore-rule."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Tide rolls on, the Alpha keeps pulling fishers under. The next widow will be along to ask where her husband went. I'll point her to you."));
-						break;
+					await dialog.Msg(L("I hunted the pack... I was good... I was so good... Until the Alpha came..."));
+					await dialog.Msg(L("Three times my size... Scarred old jaws... He took my arm... Then my throat..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will kill the Alpha"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Ten of his pack... Then him... Then him... Avenge... Avenge me...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Ten of his pack... Then him... Then him... Avenge... Avenge me..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("saltPools", out var sObj)) return;
 				if (!quest.TryGetProgress("killPack", out var pObj)) return;
 				if (!quest.TryGetProgress("killAlpha", out var aObj)) return;
-
-				if (sObj.Done && pObj.Done && aObj.Done)
+				var alphaKey = "Laima.Quests.f_katyn_7_2.Quest1005.AlphaSpawned";
+				if (pObj.Done && aObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He sheaths the gutting-knife and counts coin onto a salt-stained barrel-head*{/}"));
-					await dialog.Msg(L("Pools salted, Alpha down, tide-pack scattered to the deep. Fishery stays clean - that's what the villages will thank you for, not the kill itself."));
-					await dialog.Msg(L("Bounty plus a fishery-stipend. The fishers' guild voted on it last spring; you're the first to collect."));
-					character.Variables.Perm.Remove(alphaSpawnedKey);
+					await dialog.Msg(L("He is dead... He is dead... I can feel my arm again..."));
+					await dialog.Msg(L("My hunting-purse... It is yours... Yours..."));
+					character.Variables.Perm.Remove(alphaKey);
 					character.Quests.Complete(questId);
 				}
 				else if (pObj.Done && !aObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(alphaSpawnedKey, false);
+					var hasSpawned = character.Variables.Perm.GetBool(alphaKey, false);
 					if (!hasSpawned)
 					{
-						character.Variables.Perm.Set(alphaSpawnedKey, true);
+						character.Variables.Perm.Set(alphaKey, true);
 						if (SpawnTempMonsters(character, MonsterId.Sakmoli, 1, 150, TimeSpan.FromMinutes(5)))
 						{
-							await dialog.Msg(L("He comes!"));
+							await dialog.Msg(L("He comes... He comes for you now..."));
 							character.ServerMessage(L("{#FF9966}The Sakmoli Alpha rises from the breakers!{/}"));
 						}
 					}
-					else
-					{
-						await dialog.Msg(L("Find him."));
-					}
+					else await dialog.Msg(L("Find him... Find him..."));
 				}
-				else if (!sObj.Done)
-				{
-					await dialog.Msg(L("Three salt-cakes, three pools. The pack won't surface for the bait if the pools still run sweet."));
-				}
-				else
-				{
-					await dialog.Msg(L("Pools are sour, the pack's surfaced. Now ten of them - the Alpha shows by the eighth."));
-				}
+				else await dialog.Msg(L("The pack first... Thin them... Thin them..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Pack's leaderless, fishery's clean again. The fishers' guild posted a thank-you on the village board - they wrote 'a swordhand who understood the bay.' That's rare from them."));
+				await dialog.Msg(L("Avenged... I am avenged... I can rest..."));
 			}
 		});
 
-		// Sakmoli tide-pool salt points for Quest 1005
+		// Quest 1006: Died at the walls (siege victim) — different setting, two walls
 		//-------------------------------------------------------------------------
-		void AddTidePool(int poolNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Sakmoli Tide-Pool"), "f_katyn_7_2", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_katyn_7_2", 1005);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A salt-rimed tide-pool, kelp coiled at the bottom*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_katyn_7_2.Quest1005.Pool{poolNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already salted; the water clouds white*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Salting pool..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_7_2.Quest1005.PoolsSalted", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_katyn_7_2.Quest1005.PoolsSalted", count);
-					character.ServerMessage(LF("Tide-pools salted: {0}/3", count));
-
-					if (count >= 3)
-						character.ServerMessage(L("{#FFD700}All tide-pools salted! Now bait out the Alpha.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Salting interrupted."));
-				}
-			});
-		}
-
-		AddTidePool(1, 3300, -4000, 0);
-		AddTidePool(2, 3700, -4400, 90);
-		AddTidePool(3, 3500, -4500, 180);
-
-		// Quest 6: Katyn Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Militia-Captain] Tomas"), "f_katyn_7_2", 2700, 2400, 0, async dialog =>
+		AddGhostNpc(155132, L("[Restless Soul] Wall-Slain Captain"), "f_katyn_7_2", 2347, -2545, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_7_2", 1006);
-
-			dialog.SetTitle(L("Tomas"));
+			dialog.SetTitle(L("Wall-Slain Captain"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A militia-captain pins a fresh dune-patrol roster to a salt-warped board, fingers gritty with shore-sand*{/}"));
-				await dialog.Msg(L("Three monster-types contest the Katyn coast. Sakmoli on the wet sand, Ridimed in the bog-edges, Red Jellyfish in the tide-pools. We sweep weekly or the dune-line collapses."));
-				await dialog.Msg(L("The dune-watch is a string of three watchers strung along the cliff-tops. They can't see the kill from up there - they signal-flag down to me when the bell rings. No bell, no signal, no shift change. Old Pelke custom from the war years."));
-
-				var response = await dialog.Select(L("Kill 12 Sakmoli, 12 Ridimed, and 12 Red Jellyfish, then ring the Shore-Bell at the watch-cairn - one long peal carries to the dune-watch. Take the contract?"),
-					Option(L("I'll take the sweep"), "help"),
-					Option(L("Why a bell instead of a runner?"), "info"),
-					Option(L("Find a coastal hand"), "leave")
+				await dialog.Msg(L("They came over the wall... They came over both walls..."));
+				var response = await dialog.Select(L("..."),
+					Option(L("What happened?"), "info"),
+					Option(L("I will help you rest"), "help"),
+					Option(L("Leave"), "leave")
 				);
-
-				switch (response)
+				if (response == "info")
 				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She unhooks a small bronze pull-token from her belt and hands it across*{/}"));
-						await dialog.Msg(L("Thirty-six kills, no padding. The dune-watch counts the corpses on the next morning's tide-walk."));
-						await dialog.Msg(L("Bell's at the watch-cairn above the south crook. Hold the token to the rope-ring, pull once, count to four, release. One long peal - any shorter and the watchers think it's wind."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("A runner from the watch-cairn to me is forty minutes on a clear day. A bell-peal is four heartbeats. In a war, Pelke chose the bell. We never went back."));
-						await dialog.Msg(L("The bell also lets the next sweep-hand know whether anyone's been here today. The cliff-watchers count the peals across the week and report to me on Sundays."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Coast stays choked, dune-watch waits in the cold for a signal that never comes. I'll find a coastal hand if I have to swim them in myself."));
-						break;
+					await dialog.Msg(L("Siege... My company held this corner... The walls were our shield... Sakmoli came from the west wall... Ridimed from the east... Jellyfish in the moat..."));
+					await dialog.Msg(L("Surrounded... Three sides at once... I... I fell where I stand now..."));
+					var r2 = await dialog.Select(L("..."),
+						Option(L("I will break the siege"), "help"),
+						Option(L("Rest..."), "leave")
+					);
+					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Twelve of each... Twelve... Twelve... So my company... My company is finally relieved...")); }
+				}
+				else if (response == "help")
+				{
+					character.Quests.Start(questId);
+					await dialog.Msg(L("Twelve of each... Twelve... Twelve... So my company... My company is finally relieved..."));
 				}
 			}
 			else if (character.Quests.IsActive(questId))
@@ -486,71 +341,17 @@ public class FKatyn72QuestNpcsScript : GeneralScript
 				if (!quest.TryGetProgress("killSakmoli", out var sObj)) return;
 				if (!quest.TryGetProgress("killRidimed", out var rObj)) return;
 				if (!quest.TryGetProgress("killJelly", out var jObj)) return;
-				if (!quest.TryGetProgress("ringBell", out var bObj)) return;
-
-				if (sObj.Done && rObj.Done && jObj.Done && bObj.Done)
+				if (sObj.Done && rObj.Done && jObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She glances toward the cliff-watch, where two distant signal-flags have just dipped in answer to your bell*{/}"));
-					await dialog.Msg(L("Bell heard. Sweep counted. The dune-watch shifts at sundown, fed and warm. That's because of you."));
-					await dialog.Msg(L("Coin in full, plus a half-purse from the cliff-watchers' tin. They never come down to thank you in person - the bell is their thanks."));
+					await dialog.Msg(L("The walls... The walls are quiet... My company is relieved..."));
+					await dialog.Msg(L("Captain's purse... Take it... Take it... I will dissolve at last..."));
 					character.Quests.Complete(questId);
 				}
-				else if (sObj.Done && rObj.Done && jObj.Done)
-				{
-					await dialog.Msg(L("Sweep counts up. Now the bell - watch-cairn, south crook, one long peal. The cliff-watchers wait."));
-				}
-				else
-				{
-					await dialog.Msg(L("Twelve of each. Don't shortchange one - the dune-walk counts every species on Monday."));
-				}
+				else await dialog.Msg(L("Three sides... Still three sides... Cut them all..."));
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Dune-patrols held the line all season. The cliff-watchers signal-flagged a thank-you at last week's shift change - I had to ask them to repeat it twice. They're not used to thanking strangers."));
-			}
-		});
-
-		// Shore-Bell for Quest 1006
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Shore-Bell"), "f_katyn_7_2", 2700, 2300, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_katyn_7_2", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A bronze shore-bell hung from a watch-cairn, rope dark with sea-spray*{/}"));
-				return;
-			}
-
-			var rungKey = "Laima.Quests.f_katyn_7_2.Quest1006.BellRung";
-			if (character.Variables.Perm.GetBool(rungKey, false))
-			{
-				await dialog.Msg(L("{#666666}*Already rung; the dune-watch will have heard*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killSakmoli", out var sObj)) return;
-			if (!quest.TryGetProgress("killRidimed", out var rObj)) return;
-			if (!quest.TryGetProgress("killJelly", out var jObj)) return;
-
-			if (!(sObj.Done && rObj.Done && jObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The rope is in your hand, but you haven't finished the sweep*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Ringing bell..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(rungKey, true);
-				character.ServerMessage(L("{#FFD700}Shore-Bell rung. Return to Militia-Captain Tomas.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Ringing interrupted."));
+				await dialog.Msg(L("Relieved... My company is relieved... I am... I am..."));
 			}
 		});
 	}
@@ -565,17 +366,17 @@ public class FKatyn72Quest1001 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_7_2", 1001);
-		SetName(L("Sakmoli Tide"));
+		SetName(L("The Drowned Soldier"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Sakmoli washing up the Katyn shore."));
+		SetDescription(L("A drowned soldier's ghost begs for the Sakmoli that took him to be put down."));
 		SetLocation("f_katyn_7_2");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Shore-Warden] Mindaugas"), "f_katyn_7_2");
+		AddQuestGiver(L("[Restless Soul] Drowned Soldier"), "f_katyn_7_2");
 
-		AddObjective("killSakmoli", L("Kill Sakmoli"),
+		AddObjective("killSakmoli", L("Kill Sakmoli on the dunes"),
 			new KillObjective(40, new[] { MonsterId.Sakmoli }));
 
 		AddReward(new ExpReward(11900, 8100));
@@ -591,15 +392,15 @@ public class FKatyn72Quest1002 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_7_2", 1002);
-		SetName(L("Crypt Shades"));
+		SetName(L("The Lost Sentinel"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Ellomago and gather fading spirits to anchor the crypt ward."));
+		SetDescription(L("A sentinel's ghost lost in the crypts begs for the Ellomago shades to be silenced."));
 		SetLocation("f_katyn_7_2");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Exorcist] Ruta"), "f_katyn_7_2");
+		AddQuestGiver(L("[Restless Soul] Lost Sentinel"), "f_katyn_7_2");
 
 		AddObjective("killEllomago", L("Kill Ellomago"),
 			new KillObjective(28, new[] { MonsterId.Ellomago }));
@@ -613,6 +414,8 @@ public class FKatyn72Quest1002 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(664096, 0.40f, MonsterId.Ellomago);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -631,15 +434,15 @@ public class FKatyn72Quest1003 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_7_2", 1003);
-		SetName(L("Reef Harvest"));
+		SetName(L("The Stung Diver"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Red Jellyfish and gather blue corals before the bloom kills the reef."));
+		SetDescription(L("A drowned diver begs for the Red Jellyfish to be cut down and the corals he died for to be brought."));
 		SetLocation("f_katyn_7_2");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Reef-Harvester] Egle"), "f_katyn_7_2");
+		AddQuestGiver(L("[Restless Soul] Stung Diver"), "f_katyn_7_2");
 
 		AddObjective("killJelly", L("Kill Red Jellyfish"),
 			new KillObjective(18, new[] { MonsterId.Jellyfish_Red }));
@@ -653,6 +456,8 @@ public class FKatyn72Quest1003 : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(668044, 0.45f, MonsterId.Jellyfish_Red);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -671,41 +476,24 @@ public class FKatyn72Quest1004 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_7_2", 1004);
-		SetName(L("Bog Kill"));
+		SetName(L("The Bog-Sunken"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Ridimed crawling the west Katyn bog."));
+		SetDescription(L("A bog-drowned soldier begs for the Ridimed that pulled him under to be ended."));
 		SetLocation("f_katyn_7_2");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bog-Warden] Jurate"), "f_katyn_7_2");
+		AddQuestGiver(L("[Restless Soul] Bog-Sunken"), "f_katyn_7_2");
 
 		AddObjective("killRidimed", L("Kill Ridimed"),
 			new KillObjective(18, new[] { MonsterId.Ridimed }));
-
-		AddObjective("reburyGraves", L("Rebury the four disturbed graves"),
-			new VariableCheckObjective("Laima.Quests.f_katyn_7_2.Quest1004.GravesReburied", 4, true));
 
 		AddReward(new ExpReward(11900, 8100));
 		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1));
 		AddReward(new ItemReward(640004, 2));
 		AddReward(new ItemReward(640007, 3));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_7_2.Quest1004.GravesReburied");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_7_2.Quest1004.Grave{i}");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_7_2.Quest1004.GravesReburied");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_7_2.Quest1004.Grave{i}");
 	}
 }
 
@@ -714,20 +502,17 @@ public class FKatyn72Quest1005 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_7_2", 1005);
-		SetName(L("The Sakmoli Alpha"));
+		SetName(L("The Torn Hunter"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Sakmoli to drag the tide-pack Alpha from the breakers."));
+		SetDescription(L("A hunter's ghost begs for the Sakmoli Alpha that tore him apart to fall."));
 		SetLocation("f_katyn_7_2");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Algirdas"), "f_katyn_7_2");
+		AddQuestGiver(L("[Restless Soul] Torn Hunter"), "f_katyn_7_2");
 
-		AddObjective("saltPools", L("Salt the three Sakmoli tide-pools"),
-			new VariableCheckObjective("Laima.Quests.f_katyn_7_2.Quest1005.PoolsSalted", 3, true));
-
-		AddObjective("killPack", L("Kill Sakmoli"),
+		AddObjective("killPack", L("Kill Sakmoli pack"),
 			new KillObjective(10, new[] { MonsterId.Sakmoli }));
 
 		AddObjective("killAlpha", L("Defeat the Sakmoli Alpha"),
@@ -740,20 +525,6 @@ public class FKatyn72Quest1005 : QuestScript
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
 	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_7_2.Quest1005.PoolsSalted");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_7_2.Quest1005.Pool{i}");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_7_2.Quest1005.PoolsSalted");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_7_2.Quest1005.Pool{i}");
-	}
 }
 
 public class FKatyn72Quest1006 : QuestScript
@@ -761,15 +532,15 @@ public class FKatyn72Quest1006 : QuestScript
 	protected override void Load()
 	{
 		SetId("f_katyn_7_2", 1006);
-		SetName(L("Katyn Sweep"));
+		SetName(L("The Wall-Slain Captain"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of Sakmoli, Ridimed, and Red Jellyfish along the Katyn coast."));
+		SetDescription(L("A captain who fell at the walls begs for the three monsters that overran his company to be put down."));
 		SetLocation("f_katyn_7_2");
 		SetAutoTracked(true);
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Militia-Captain] Tomas"), "f_katyn_7_2");
+		AddQuestGiver(L("[Restless Soul] Wall-Slain Captain"), "f_katyn_7_2");
 
 		AddObjective("killSakmoli", L("Kill Sakmoli"),
 			new KillObjective(12, new[] { MonsterId.Sakmoli }));
@@ -780,24 +551,11 @@ public class FKatyn72Quest1006 : QuestScript
 		AddObjective("killJelly", L("Kill Red Jellyfish"),
 			new KillObjective(12, new[] { MonsterId.Jellyfish_Red }));
 
-		AddObjective("ringBell", L("Ring the Shore-Bell at the watch-cairn"),
-			new VariableCheckObjective("Laima.Quests.f_katyn_7_2.Quest1006.BellRung", 1, true));
-
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2));
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_7_2.Quest1006.BellRung");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_7_2.Quest1006.BellRung");
 	}
 }

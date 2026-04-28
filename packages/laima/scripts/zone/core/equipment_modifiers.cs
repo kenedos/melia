@@ -191,7 +191,7 @@ public class EquipmentCombatModifiersScript : GeneralScript
 	}
 
 	/// <summary>
-	/// MAC03_102 (203102): +1000 flat damage to Sadhu_EctoplasmAttack
+	/// MAC03_102 (203102): +1 flat damage per SPR to Sadhu_EctoplasmAttack
 	/// </summary>
 	[CombatCalcModifier(CombatCalcPhase.BeforeCalc, 203102)]
 	public static void MAC03_102(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)

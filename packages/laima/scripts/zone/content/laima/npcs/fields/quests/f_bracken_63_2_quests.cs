@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Quests;
@@ -44,9 +45,35 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
+						var waveSpawnedKey = "Laima.Quests.f_bracken_63_2.Quest1001.WavesSpawned";
 						character.Quests.Start(questId);
 						await dialog.Msg(L("Head south from here, they're everywhere along the tree line."));
 						await dialog.Msg(L("Twenty-two should cripple their pack for a while."));
+
+						if (!character.Variables.Perm.GetBool(waveSpawnedKey, false))
+						{
+							character.Variables.Perm.Set(waveSpawnedKey, true);
+							await dialog.Msg(L("{#FF6666}Watch out, the Loktanun are coming!{/}"));
+
+							_ = Task.Run(async () =>
+							{
+								for (var wave = 0; wave < 4; wave++)
+								{
+									if (character == null)
+										return;
+
+									SpawnTempMonsters(character, MonsterId.Loktanun, 6, 100, TimeSpan.FromMinutes(5));
+									character.ServerMessage(L("{#FF6666}The Loktanun emerge from the trees!{/}"));
+
+									if (wave < 3)
+										await Task.Delay(TimeSpan.FromSeconds(15));
+								}
+							});
+						}
+						else
+						{
+							await dialog.Msg(L("They should be somewhere nearby..."));
+						}
 						break;
 
 					case "info":
@@ -68,7 +95,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				if (killObj.Done)
 				{
 					await dialog.Msg(L("You did it. The frontier will be quiet for at least a few days now."));
-					await dialog.Msg(L("Take this - you earned it."));
+					await dialog.Msg(L("This dagger belonged to a scout who didn't make it back from the last sweep."));
+					await dialog.Msg(L("Better in your hands than rusting in a footlocker. Take it."));
 
 					character.Quests.Complete(questId);
 				}
@@ -210,10 +238,11 @@ public class FBracken632QuestNpcsScript : GeneralScript
 		AddSapNode(4, 295, 234, 90);
 		AddSapNode(5, 548, 639, 180);
 		AddSapNode(6, 622, 1198, 315);
+		AddSapNode(7, 705, 670, 225);
 
 		// Quest 3: Silencing the Shamans
 		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Witch Hunter] Alaric"), "f_bracken_63_2", -1280, 0, 90, async dialog =>
+		AddNpc(47245, L("[Witch Hunter] Alaric"), "f_bracken_63_2", -1394, 38, 180, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_2", 1003);
@@ -223,11 +252,11 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(questId))
 			{
 				await dialog.Msg(L("The Lapasape Mages on the western ridge aren't merely corrupted - they're channeling it."));
-				await dialog.Msg(L("They've planted blood totems across the ridge that drink in the poison and amplify it back into their spells."));
+				await dialog.Msg(L("They've anchored blood crystals across the ridge that drink in the poison and amplify it back into their spells."));
 
 				var response = await dialog.Select(L("Will you take this on?"),
-					Option(L("I'll cut them down and smash the totems"), "help"),
-					Option(L("Why do the totems matter?"), "info"),
+					Option(L("I'll cut them down and shatter the crystals"), "help"),
+					Option(L("Why do the crystals matter?"), "info"),
 					Option(L("Handle it yourself"), "leave")
 				);
 
@@ -235,13 +264,13 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The totems are planted across the western ridge. Break them with your weapon - they resist magic."));
-						await dialog.Msg(L("Without the totems the shamans are just tainted beasts. Thin them first so you can work in peace."));
+						await dialog.Msg(L("The crystals hover above the western ridge. Break them with your weapon - they resist magic."));
+						await dialog.Msg(L("Without the crystals the shamans are just tainted beasts. Thin them first so you can work in peace."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Take a totem down and every spell within a hundred paces loses half its bite."));
-						await dialog.Msg(L("Take all four down and the shamans can barely conjure at all."));
+						await dialog.Msg(L("Shatter a crystal and every spell within a hundred paces loses half its bite."));
+						await dialog.Msg(L("Shatter all four and the shamans can barely conjure at all."));
 						break;
 
 					case "leave":
@@ -257,7 +286,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (killObj.Done && totemObj.Done)
 				{
-					await dialog.Msg(L("Totems broken, shamans slain. The ridge is just a ridge again."));
+					await dialog.Msg(L("Crystals shattered, shamans slain. The ridge is just a ridge again."));
 					await dialog.Msg(L("Corruption still lingers in the earth, but the amplification is gone. That's a day's good work."));
 
 					character.Inventory.Remove(650601, character.Inventory.CountItem(650601), InventoryItemRemoveMsg.Given);
@@ -270,7 +299,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 					if (!killObj.Done)
 						status += L("Cut down more Lapasape Mages. ");
 					if (!totemObj.Done)
-						status += L("Shatter the remaining blood totems. ");
+						status += L("Shatter the remaining blood crystals. ");
 
 					await dialog.Msg(LF("Keep at it. {0}", status));
 				}
@@ -281,11 +310,11 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Blood Totem Shatter Points
+		// Blood Crystal Shatter Points
 		//-------------------------------------------------------------------------
 		void AddBloodTotem(int totemNum, int x, int z, int direction)
 		{
-			AddNpc(12080, L("Blood Totem"), "f_bracken_63_2", x, z, direction, async dialog =>
+			AddNpc(46214, L("Blood Crystal"), "f_bracken_63_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_bracken_63_2", 1003);
@@ -293,32 +322,40 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A weathered totem stained with dried blood*{/}"));
+					await dialog.Msg(L("{#666666}*A floating crystal pulses faintly with corrupted blood*{/}"));
 					return;
 				}
 
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*This totem has already been shattered*{/}"));
+					await dialog.Msg(L("{#666666}*This crystal has already been shattered*{/}"));
 					return;
 				}
 
 				var result = await character.TimeActions.StartAsync(
-					L("Shattering totem..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(4)
+					L("Shattering crystal..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(4)
 				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Inventory.Add(650601, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Destroyed Altar Fragment"));
+					character.ServerMessage(L("Recovered: Crystal Fragment"));
 
 					var currentCount = character.Inventory.CountItem(650601);
-					character.ServerMessage(LF("Totems shattered: {0}/4", currentCount));
+					character.ServerMessage(LF("Crystals shattered: {0}/4", currentCount));
+
+					if (RandomProvider.Get().Next(100) < 30)
+					{
+						if (SpawnTempMonsters(character, MonsterId.Lapasape_Mage, 2, 80, TimeSpan.FromMinutes(2)))
+						{
+							character.ServerMessage(L("{#FF6666}The shattered crystal draws angry shamans!{/}"));
+						}
+					}
 
 					if (currentCount >= 4)
 					{
-						character.ServerMessage(L("{#FFD700}All totems broken! Return to Alaric.{/}"));
+						character.ServerMessage(L("{#FFD700}All crystals shattered! Return to Alaric.{/}"));
 					}
 				}
 				else
@@ -328,10 +365,12 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddBloodTotem(1, -1500, -1400, 0);
-		AddBloodTotem(2, -1620, -500, 0);
-		AddBloodTotem(3, -1400, 200, 0);
-		AddBloodTotem(4, -1300, -700, 0);
+		AddBloodTotem(1, -1321, 156, 45);
+		AddBloodTotem(2, -1338, 301, 45);
+		AddBloodTotem(3, -1519, 352, 45);
+		AddBloodTotem(4, -1592, 227, 45);
+		AddBloodTotem(5, -1726, 176, 45);
+		AddBloodTotem(6, -1612, -26, 45);
 
 		// Quest 4: The Missing Survey
 		//-------------------------------------------------------------------------
@@ -346,6 +385,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I was mapping the corruption spread when a flock of Ponpon tore through my camp."));
 				await dialog.Msg(L("My survey pages scattered everywhere. Months of work, blown across this wretched jungle."));
+				await dialog.Msg(L("Worse - the Ponpon are dragging the pages back to their roosts. They're shredding my parchment to line their nests."));
 
 				var response = await dialog.Select(L("Can you help recover them?"),
 					Option(L("I'll find your pages and clear the flock"), "help"),
@@ -357,13 +397,15 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("They blew north and west of my camp. Eight pages - each is sealed, you can't miss them."));
+						await dialog.Msg(L("Look for Ponpon nests - that's where the pages will be, woven into the twigs and feathers."));
+						await dialog.Msg(L("Recover at least eight pages. The flock will swarm you the moment you disturb a nest, so be ready."));
 						await dialog.Msg(L("And please, put down at least ten Ponpon so I can work without being dive-bombed."));
 						break;
 
 					case "info":
 						await dialog.Msg(L("I'm charting how fast the corruption advances, where it stalls, where it accelerates."));
 						await dialog.Msg(L("If we understand the pattern, maybe we can predict where it strikes next."));
+						await dialog.Msg(L("The Ponpon line their nests with anything paper-soft. Once they took the pages, they wove them straight in."));
 						break;
 
 					case "leave":
@@ -407,7 +449,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		void AddSurveyPage(int pageNum, int x, int z, int direction)
 		{
-			AddNpc(154038, L("Scattered Survey Page"), "f_bracken_63_2", x, z, direction, async dialog =>
+			AddNpc(153057, L("Scattered Survey Page"), "f_bracken_63_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_bracken_63_2", 1004);
@@ -415,7 +457,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A sealed parchment flutters in the breeze*{/}"));
+					await dialog.Msg(L("{#666666}*A Ponpon nest of woven twigs - sealed parchment is bound into its lining*{/}"));
 					return;
 				}
 
@@ -450,14 +492,47 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddSurveyPage(1, 1206, -1025, 270);
-		AddSurveyPage(2, 1162, -1256, 270);
-		AddSurveyPage(3, 906, -791, 0);
-		AddSurveyPage(4, 460, -958, 0);
-		AddSurveyPage(5, 218, -958, 0);
-		AddSurveyPage(6, 181, -1243, 90);
-		AddSurveyPage(7, 461, -1374, 315);
-		AddSurveyPage(8, 610, -1186, 90);
+		var surveyPagePositions = new (int num, int x, int z)[]
+		{
+			(1, 162, -578),
+			(2, 444, -511),
+			(3, 687, -488),
+			(4, 732, -293),
+			(5, 788, -86),
+			(6, 624, 78),
+			(7, 267, 192),
+			(8, 100, 28),
+			(9, 441, -125),
+			(10, 316, -351),
+		};
+
+		foreach (var (num, x, z) in surveyPagePositions)
+		{
+			AddSurveyPage(num, x, z, 45);
+
+			var pageNum = num;
+			AddAreaTrigger("f_bracken_63_2", x, z, 50, async (args) =>
+			{
+				if (args.Initiator is not Character character)
+					return;
+
+				if (character.IsDead)
+					return;
+
+				var pageQuestId = new QuestId("f_bracken_63_2", 1004);
+				if (!character.Quests.IsActive(pageQuestId))
+					return;
+
+				var spawnedKey = $"Laima.Quests.f_bracken_63_2.Quest1004.Page{pageNum}.Spawned";
+				if (character.Variables.Perm.GetBool(spawnedKey, false))
+					return;
+
+				character.Variables.Perm.Set(spawnedKey, true);
+
+				if (SpawnTempMonsters(character, MonsterId.Ponpon, 3, 70, TimeSpan.FromMinutes(2)))
+					character.ServerMessage(L("{#FF6666}Ponpon erupt from the page nest!{/}"));
+			});
+		}
 
 		// Quest 5: The Tainted Alpha
 		//-------------------------------------------------------------------------
@@ -465,7 +540,6 @@ public class FBracken632QuestNpcsScript : GeneralScript
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_bracken_63_2", 1005);
-			var alphaSpawnedKey = "Laima.Quests.f_bracken_63_2.Quest1005.AlphaSpawned";
 
 			dialog.SetTitle(L("Niko"));
 
@@ -510,28 +584,11 @@ public class FBracken632QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Dead? You're certain? Show me a claw."));
 					await dialog.Msg(L("Gods. That's bigger than I remembered. Good work - the nesting ground will recover without that thing spreading corruption."));
 
-					character.Variables.Perm.Remove(alphaSpawnedKey);
-
 					character.Quests.Complete(questId);
 				}
 				else if (flockObj.Done && !alphaObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(alphaSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(alphaSpawnedKey, true);
-
-						if (SpawnTempMonsters(character, MonsterId.Tanu, 1, 150, TimeSpan.FromMinutes(3)))
-						{
-							await dialog.Msg(L("The flock is thinned enough. I can hear it moving - south, toward the old nesting ground."));
-							await dialog.Msg(L("{#FF6666}Go, quickly! It's emerging now!{/}"));
-							character.ServerMessage(L("{#FF6666}The Tainted Alpha emerges from the nesting ground!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("The alpha's out there. Don't let it slip back into the brush."));
-					}
+					await dialog.Msg(L("The alpha's out there with what's left of the flock. Don't let it slip back into the brush."));
 				}
 				else
 				{
@@ -555,7 +612,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Stoup Camp is the last safe waypoint east of Knidos, but the route to it is a mess."));
+				await dialog.Msg(L("The village up the road northwest is the last safe waypoint past Knidos, but the route to it is a mess."));
 				await dialog.Msg(L("Loktanun from the north and Ponpon from the ridges have flooded the whole length of trail."));
 
 				var response = await dialog.Select(L("Can you help clear the route?"),
@@ -591,7 +648,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				if (lokObj.Done && ponObj.Done)
 				{
 					await dialog.Msg(L("Route's clear. The caravan masters are going to cry when they hear."));
-					await dialog.Msg(L("Well-earned work. Take this with my thanks."));
+					await dialog.Msg(L("A trader left this pistol with me as collateral months back - never came back to claim it."));
+					await dialog.Msg(L("You earned it more than he ever did. Take it."));
 
 					character.Quests.Complete(questId);
 				}
@@ -611,6 +669,44 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Caravans are running again. First time in months."));
 			}
 		});
+
+		var trailAmbushPositions = new (int idx, int x, int z)[]
+		{
+			(1, 1203, 449),
+			(2, 1070, 460),
+			(3, 924, 470),
+			(4, 776, 472),
+			(5, 638, 481),
+			(6, 514, 461),
+		};
+
+		foreach (var (idx, x, z) in trailAmbushPositions)
+		{
+			var ambushIdx = idx;
+			AddAreaTrigger("f_bracken_63_2", x, z, 50, async (args) =>
+			{
+				if (args.Initiator is not Character character)
+					return;
+
+				if (character.IsDead)
+					return;
+
+				var ambushQuestId = new QuestId("f_bracken_63_2", 1006);
+				if (!character.Quests.IsActive(ambushQuestId))
+					return;
+
+				var ambushKey = $"Laima.Quests.f_bracken_63_2.Quest1006.Ambush{ambushIdx}.Spawned";
+				if (character.Variables.Perm.GetBool(ambushKey, false))
+					return;
+
+				character.Variables.Perm.Set(ambushKey, true);
+
+				SpawnTempMonsters(character, MonsterId.Loktanun, 2, 70, TimeSpan.FromMinutes(2));
+				SpawnTempMonsters(character, MonsterId.Ponpon, 2, 70, TimeSpan.FromMinutes(2));
+
+				character.ServerMessage(L("{#FF6666}Loktanun and Ponpon ambush from the brush!{/}"));
+			});
+		}
 	}
 }
 
@@ -645,6 +741,7 @@ public class KnidosFrontierWatchQuest : QuestScript
 		AddReward(new ItemReward(640082, 1)); // Lv3 EXP Card
 		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
 		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
+		AddReward(new ItemReward(112006, 1)); // Sketis Dagger
 	}
 }
 
@@ -710,7 +807,7 @@ public class SilencingTheShamansQuest : QuestScript
 		SetId("f_bracken_63_2", 1003);
 		SetName(L("Silencing the Shamans"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Slay Lapasape Mages on the western ridge and shatter the blood totems amplifying their corruption."));
+		SetDescription(L("Slay Lapasape Mages on the western ridge and shatter the blood crystals amplifying their corruption."));
 		SetLocation("f_bracken_63_2");
 		SetAutoTracked(true);
 
@@ -722,7 +819,7 @@ public class SilencingTheShamansQuest : QuestScript
 		AddObjective("killLapasape", L("Slay Lapasape Mages"),
 			new KillObjective(12, new[] { MonsterId.Lapasape_Mage }));
 
-		AddObjective("shatterTotems", L("Shatter blood totems"),
+		AddObjective("shatterTotems", L("Shatter blood crystals"),
 			new CollectItemObjective(650601, 4));
 
 		AddReward(new ExpReward(3800, 2700));
@@ -824,31 +921,29 @@ public class TheTaintedAlphaQuest : QuestScript
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
+		SetUnlock(QuestUnlockType.Sequential);
 		AddQuestGiver(L("[Tracker] Niko"), "f_bracken_63_2");
 
 		AddObjective("killKanchobirds", L("Thin the Kanchobird flock"),
 			new KillObjective(10, new[] { MonsterId.Kanchobird }));
 
-		AddObjective("killAlpha", L("Slay the tainted alpha"),
-			new KillObjective(1, new[] { MonsterId.Tanu }));
+		AddObjective("killAlpha", L("Slay the tainted alpha and its flock"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Kanchobird, 1, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Kanchobird, 5),
+				},
+				resetIdent: "killKanchobirds",
+				spawnDistance: 200,
+				lifetime: TimeSpan.FromMinutes(5)));
 
 		AddReward(new ExpReward(4200, 3200));
 		AddReward(new SilverReward(6000));
 		AddReward(new ItemReward(640082, 3)); // Lv3 EXP Card
 		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
 		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
-		AddReward(new ItemReward(531122, 1)); // Plate Armor
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_bracken_63_2.Quest1005.AlphaSpawned");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_bracken_63_2.Quest1005.AlphaSpawned");
+		AddReward(new ItemReward(163309, 1)); // Berthas Sketis Bow
 	}
 }
 
@@ -860,9 +955,9 @@ public class TheStoupCampRouteQuest : QuestScript
 	protected override void Load()
 	{
 		SetId("f_bracken_63_2", 1006);
-		SetName(L("The Stoup Camp Route"));
+		SetName(L("The Northwest Trail"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Clear Loktanun and Ponpon from the trail between Knidos Jungle and Stoup Camp."));
+		SetDescription(L("Clear Loktanun and Ponpon from the trail between Croa Village and Toan Valley."));
 		SetLocation("f_bracken_63_2");
 		SetAutoTracked(true);
 
@@ -882,6 +977,6 @@ public class TheStoupCampRouteQuest : QuestScript
 		AddReward(new ItemReward(640082, 3)); // Lv3 EXP Card
 		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
 		AddReward(new ItemReward(640006, 2)); // Normal SP Potion
-		AddReward(new ItemReward(501122, 1)); // Plate Gauntlets
+		AddReward(new ItemReward(302118, 1)); // Sketis Pistol
 	}
 }

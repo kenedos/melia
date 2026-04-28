@@ -23,7 +23,7 @@ public class FFlash63QuestNpcsScript : GeneralScript
 	{
 		// Quest 1: Lemur Howl
 		//-------------------------------------------------------------------------
-		AddNpc(20100, L("[District Warden] Grelle"), "f_flash_63", 900, 650, 180, async dialog =>
+		AddNpc(20100, L("[District Warden] Grelle"), "f_flash_63", -46, 1211, 180, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1001);
@@ -85,7 +85,7 @@ public class FFlash63QuestNpcsScript : GeneralScript
 
 		// Quest 2: Downtown Curseglass
 		//-------------------------------------------------------------------------
-		AddNpc(20101, L("[Glazier] Yuri"), "f_flash_63", 200, 400, 90, async dialog =>
+		AddNpc(20101, L("[Glazier] Yuri"), "f_flash_63", 239, 259, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1002);
@@ -148,7 +148,7 @@ public class FFlash63QuestNpcsScript : GeneralScript
 
 		// Quest 3: Civic Records
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Civic Scribe] Agatha"), "f_flash_63", -500, 200, 0, async dialog =>
+		AddNpc(20114, L("[Civic Scribe] Agatha"), "f_flash_63", 303, -980, 89, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1003);
@@ -217,73 +217,9 @@ public class FFlash63QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Civic Record Vault Points
-		//-------------------------------------------------------------------------
-		void AddVaultNiche(int recordNum, int x, int z, int direction)
-		{
-			AddNpc(12080, L("Record Vault Niche"), "f_flash_63", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_flash_63", 1003);
-				var variableKey = $"Laima.Quests.f_flash_63.Quest1003.Record{recordNum}";
-				var spawnedKey = $"Laima.Quests.f_flash_63.Quest1003.Record{recordNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A niche in the vault wall, half-choked with old bedding.*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already recovered this niche's record*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && RandomProvider.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Goblin2_Hammer, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}Hammer-Goblins spring out of the niche, hammers raised!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Recovering record-volume..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650785, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Civic Record-Volume"));
-
-					var currentCount = character.Inventory.CountItem(650785);
-					character.ServerMessage(LF("Records recovered: {0}/4", currentCount));
-
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All four records recovered! Return to Agatha.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You eased the volume back. Try again."));
-				}
-			});
-		}
-
-		AddVaultNiche(1, 400, 200, 0);
-		AddVaultNiche(2, -300, 400, 0);
-		AddVaultNiche(3, 600, -200, 0);
-		AddVaultNiche(4, -600, -100, 0);
-
 		// Quest 4: Ritual Brand Pages
 		//-------------------------------------------------------------------------
-		AddNpc(20102, L("[Curse-Scholar] Hedvig"), "f_flash_63", 100, -400, 270, async dialog =>
+		AddNpc(20102, L("[Curse-Scholar] Hedvig"), "f_flash_63", 104, -912, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1004);
@@ -354,7 +290,7 @@ public class FFlash63QuestNpcsScript : GeneralScript
 
 		// Quest 5: The Stonefrosted Alpha
 		//-------------------------------------------------------------------------
-		AddNpc(20103, L("[Bounty Hunter] Nikolai"), "f_flash_63", 800, -500, 270, async dialog =>
+		AddNpc(20103, L("[Bounty Hunter] Nikolai"), "f_flash_63", 952, -844, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1005);
@@ -437,73 +373,6 @@ public class FFlash63QuestNpcsScript : GeneralScript
 			}
 		});
 
-		// Quest 6: Downtown Perimeter
-		//-------------------------------------------------------------------------
-		AddNpc(20102, L("[Caravan Master] Brit"), "f_flash_63", -800, -400, 45, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_flash_63", 1006);
-
-			dialog.SetTitle(L("Brit"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("The Downtown perimeter connects Ruklys to the deep plateau. Lemurs swarming the low ground, Hammer-Goblins dug into the rises."));
-				await dialog.Msg(L("Drivers refuse until both sides thin. Can't say I blame them."));
-
-				var response = await dialog.Select(L("Both sides?"),
-					Option(L("I'll clear both"), "help"),
-					Option(L("Which is worse?"), "info"),
-					Option(L("Use another route"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Twelve and twelve. Lemurs at the feet, Hammers from the rises. Mind both."));
-						await dialog.Msg(L("Clear them, and three caravans roll by week's end."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Lemurs howl-strain you slow. Hammer-Goblins slam you flat. Whichever's on top of you is worse."));
-						await dialog.Msg(L("Together they're impassable. Apart, endurable."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("The other routes cross deeper curse-ground. Half my crew statued. Not an option."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killLemurs", out var lemObj)) return;
-				if (!quest.TryGetProgress("killHammers", out var hamObj)) return;
-
-				if (lemObj.Done && hamObj.Done)
-				{
-					await dialog.Msg(L("Both sides thinned. Caravans roll at dawn."));
-					await dialog.Msg(L("Take your pay. Drivers will speak your name around fires for a season."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					var status = "";
-					if (!lemObj.Done)
-						status += L("Kill more Lemurs. ");
-					if (!hamObj.Done)
-						status += L("Kill more Hammer-Goblins. ");
-
-					await dialog.Msg(LF("Keep pushing. {0}", status));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Four caravans through. Downtown's faint but present - it's still a district."));
-			}
-		});
 	}
 }
 
@@ -563,6 +432,8 @@ public class DowntownCurseglassQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650257, 0.40f, MonsterId.Lemur);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -604,28 +475,18 @@ public class CivicRecordsQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650785, 0.40f, MonsterId.Goblin2_Hammer);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650785, character.Inventory.CountItem(650785), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_63.Quest1003.Record{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_63.Quest1003.Record{i}.Spawned");
-		}
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
 		character.Inventory.Remove(650785, character.Inventory.CountItem(650785), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_63.Quest1003.Record{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_flash_63.Quest1003.Record{i}.Spawned");
-		}
 	}
 }
 
@@ -657,6 +518,8 @@ public class RitualBrandPagesQuest : QuestScript
 		AddReward(new ItemReward(640004, 3));
 		AddReward(new ItemReward(640007, 3));
 		AddReward(new ItemReward(640013, 1));
+
+		AddDrop(650825, 0.50f, MonsterId.Goblin2_Wand3);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
@@ -701,33 +564,3 @@ public class TheStonefrostedAlphaQuest : QuestScript
 	}
 }
 
-public class DowntownPerimeterQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_flash_63", 1006);
-		SetName(L("Downtown Perimeter"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Kill Lemurs on the low ground and Hammer-Goblins on the rises to reopen the Downtown perimeter."));
-		SetLocation("f_flash_63");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Caravan Master] Brit"), "f_flash_63");
-
-		AddObjective("killLemurs", L("Kill Lemurs"),
-			new KillObjective(12, new[] { MonsterId.Lemur }));
-
-		AddObjective("killHammers", L("Kill Hammer-Goblins"),
-			new KillObjective(12, new[] { MonsterId.Goblin2_Hammer }));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
-	}
-}
