@@ -126,6 +126,7 @@ namespace Melia.Zone.Commands
 			// VIP
 			this.Add("autoloot", "", "Toggles autolooting.", this.HandleAutoloot);
 			this.Add("rangepreview", "", "Toggles skill range preview.", this.HandleRangePreview);
+			this.Add("togglebell", "", "Toggles the day/night cycle bell sound.", this.HandleToggleBell);
 
 			// GMs
 			this.Add("name", "<new name>", "Changes character name.", this.HandleName);
@@ -4083,6 +4084,42 @@ namespace Melia.Zone.Commands
 				target.ServerMessage(Localization.Get("Skill range preview is now active."));
 			else
 				target.ServerMessage(Localization.Get("Skill range preview is now inactive."));
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Toggles the day/night cycle bell sound for the sender's account.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleToggleBell(Character sender, Character target, string message, string command, Arguments args)
+		{
+			var account = sender.Connection.Account;
+			var disabled = account.Variables.Perm.GetBool("Melia.DisableBellSound", false);
+
+			if (args.Count >= 1)
+			{
+				if (!bool.TryParse(args.Get(0), out var enabled))
+					return CommandResult.InvalidArgument;
+
+				disabled = !enabled;
+			}
+			else
+			{
+				disabled = !disabled;
+			}
+
+			account.Variables.Perm.SetBool("Melia.DisableBellSound", disabled);
+
+			if (disabled)
+				target.ServerMessage(Localization.Get("Bell sound is now disabled."));
+			else
+				target.ServerMessage(Localization.Get("Bell sound is now enabled."));
 
 			return CommandResult.Okay;
 		}
