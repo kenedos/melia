@@ -1,5 +1,6 @@
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.World.Actors.Effects
 {
@@ -26,6 +27,8 @@ namespace Melia.Zone.World.Actors.Effects
 
 		public override void ShowEffect(IZoneConnection conn, IActor actor)
 		{
+			if (!conn.LoadComplete)
+				return;
 			Send.ZC_NORMAL.UpdateCharacterLook(conn, actor, this.TransformClassName, this.Slot, 0, 1);
 		}
 
