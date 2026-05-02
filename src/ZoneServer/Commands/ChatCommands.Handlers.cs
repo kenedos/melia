@@ -145,6 +145,7 @@ namespace Melia.Zone.Commands
 			this.Add("madhatter", "", "Spawns all headgears.", this.HandleGetAllHats);
 			this.Add("heartofcards", "", "Spawns all boss cards at level 10.", this.HandleGetAllBossCards);
 			this.Add("heartofgems", "", "Spawns all gems at level 10.", this.HandleGetAllGems);
+			this.Add("cardgem", "<item id|name> <level> [amount]", "Spawns a card or gem at the given level.", this.HandleCardGem);
 			this.Add("levelup", "<levels>", "Changes character's level.", this.HandleLevelUp);
 			this.Add("joblevelup", "<levels>", "Changes character's job level (use negative values to downgrade).", this.HandleJobLevelUp);
 			this.Add("addexp", "<amount>", "Gives base exp to character.", this.HandleAddExp);
@@ -250,6 +251,8 @@ namespace Melia.Zone.Commands
 			this.AddAlias("mapinfo", "whomap");
 			this.AddAlias("goto", "jumpto");
 			this.AddAlias("resetdungeon", "resetdungeons");
+			this.AddAlias("cardgem", "card");
+			this.AddAlias("cardgem", "gem");
 		}
 
 		private CommandResult HandleDungeonMatchMaking(Character sender, Character target, string message, string commandName, Arguments args)
@@ -1787,6 +1790,70 @@ namespace Melia.Zone.Commands
 				target.ServerMessage(Localization.Get("{1} added {0} gems (level 10) to your inventory."), addedCount, sender.TeamName);
 				sender.ServerMessage(Localization.Get("Added {0} gems (level 10) to target's inventory."), addedCount);
 			}
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Adds a card or gem to target's inventory at the given level.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleCardGem(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.IndexedCount < 2)
+				return CommandResult.InvalidArgument;
+
+			if (!int.TryParse(args.Get(0), out var itemId))
+			{
+				var itemName = args.Get(0);
+				var matches = ZoneServer.Instance.Data.ItemDb.FindAll(a =>
+					(a.Group == ItemGroup.Card || a.Group == ItemGroup.Gem)
+					&& a.ClassName.Contains(itemName, StringComparison.InvariantCultureIgnoreCase));
+
+				if (matches.Length == 0)
+				{
+					sender.ServerMessage(Localization.Get("Card or gem '{0}' not found."), itemName);
+					return CommandResult.Okay;
+				}
+
+				itemId = matches.OrderBy(a => a.ClassName.GetLevenshteinDistance(itemName, false)).First().Id;
+			}
+
+			if (!ZoneServer.Instance.Data.ItemDb.TryFind(itemId, out var itemData))
+			{
+				sender.ServerMessage(Localization.Get("Item not found."));
+				return CommandResult.Okay;
+			}
+
+			if (itemData.Group != ItemGroup.Card && itemData.Group != ItemGroup.Gem)
+			{
+				sender.ServerMessage(Localization.Get("Item '{0}' is not a card or gem."), itemData.ClassName);
+				return CommandResult.Okay;
+			}
+
+			if (!int.TryParse(args.Get(1), out var level) || level < 1)
+				return CommandResult.InvalidArgument;
+
+			var amount = 1;
+			if (args.IndexedCount >= 3 && (!int.TryParse(args.Get(2), out amount) || amount < 1))
+				return CommandResult.InvalidArgument;
+
+			for (var i = 0; i < amount; i++)
+			{
+				var item = new Item(itemId);
+				item.SetLevel(level);
+				target.Inventory.Add(item, InventoryAddType.PickUp);
+			}
+
+			var typeLabel = itemData.Group == ItemGroup.Card ? "card" : "gem";
+			sender.ServerMessage(Localization.Get("Created {0} x{1} at level {2}."), typeLabel, amount, level);
+			if (sender != target)
+				target.ServerMessage(Localization.Get("{0} added a level {1} {2} (x{3}) to your inventory."), sender.TeamName, level, typeLabel, amount);
 
 			return CommandResult.Okay;
 		}
