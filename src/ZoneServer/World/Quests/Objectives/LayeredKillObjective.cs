@@ -85,6 +85,11 @@ namespace Melia.Zone.World.Quests.Objectives
 		public TimeSpan Lifetime { get; }
 
 		/// <summary>
+		/// Optional callback fired once when the spawn is triggered.
+		/// </summary>
+		public Action<Character> Triggered { get; set; }
+
+		/// <summary>
 		/// Creates a new layered-kill objective.
 		/// </summary>
 		/// <param name="spawnList"></param>
@@ -185,6 +190,8 @@ namespace Melia.Zone.World.Quests.Objectives
 				for (var i = 0; i < spec.Count; i++)
 					this.SpawnOne(character, spec.MonsterId, spec.BuffId);
 			}
+
+			this.Triggered?.Invoke(character);
 		}
 
 		/// <summary>

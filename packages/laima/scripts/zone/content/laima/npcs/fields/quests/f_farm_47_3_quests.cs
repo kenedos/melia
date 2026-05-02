@@ -38,9 +38,9 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(warningQuestId) && !warningDelivered)
 			{
-				await dialog.Msg(L("{#666666}*He sets his bandaged arm down and unfolds Morta's letter, reading it twice*{/}"));
-				await dialog.Msg(L("Demon-pollen drifting south. I've already smelled it on the wind, but a written warning is a different thing - means Morta's serious enough to put it on paper."));
-				await dialog.Msg(L("Tell her I'll have the farmhands wrap their faces and shut the barley sheds by nightfall. Goda's mask-stitching will reach further than she thinks - I'll send her some for Morta's hands too."));
+				await dialog.Msg(L("{#666666}*He unfolds Morta's letter and reads it through twice*{/}"));
+				await dialog.Msg(L("Demon-pollen drifting south. I've smelled it on the wind already, but a written warning's different. Means Morta's serious enough to put it on paper."));
+				await dialog.Msg(L("Tell her I'll have the farmhands wrap their faces and shut the barley sheds by nightfall. And Goda's been turning out masks faster than I thought — I'll send some over for Morta's lot too."));
 				await dialog.Msg(L("{#666666}*He folds the letter and tucks it into his vest*{/}"));
 
 				character.Variables.Perm.Set("Laima.Quests.f_farm_47_3.Quest1002.Delivered", 1);
@@ -50,10 +50,10 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A thick-set farmer presses a bandaged arm, glancing toward his daughter Goda at her stitching*{/}"));
-				await dialog.Msg(L("The Cronewts are in my barley. Needlers, every one - poison-tipped arrows they fire from the stalks before you even see 'em. Goda's stitching breathing-masks faster than I can clear the stalks."));
+				await dialog.Msg(L("{#666666}*A thick-set farmer is pressing a bandaged arm, glancing toward his daughter Goda*{/}"));
+				await dialog.Msg(L("The Cronewts are in my barley. Needlers, every one of them — poison arrows fired from the stalks before you even see 'em. Goda's stitching breathing-masks faster than I can clear the rows."));
 
-				var response = await dialog.Select(L("Two farmhands down already. Tinker Dovas from Baron Allerno sent me his stormfeather traps, but traps don't stop arrows. I need them cleared out before harvest, or there won't be a harvest."),
+				var response = await dialog.Select(L("Two farmhands down already. Tinker Dovas sent me his stormfeather traps, but traps don't stop arrows. I need the Needlers cleared out before harvest, or there won't be one."),
 					Option(L("I'll kill the Needlers"), "help"),
 					Option(L("Why are they here suddenly?"), "info"),
 					Option(L("Find a hunter"), "leave")
@@ -62,20 +62,20 @@ public class FFarm473QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He grunts, approving*{/}"));
+						await dialog.Msg(L("{#666666}*He grunts*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Watch the stalks - they crouch low. Rustle means arrow incoming."));
-						await dialog.Msg(L("And wear anything heavy. Leather, if you've got it. The poison sinks through cloth."));
+						await dialog.Msg(L("Watch the stalks — they hide low. If you hear a rustle, there's an arrow coming."));
+						await dialog.Msg(L("And wear something heavy. Leather, if you've got it. The poison goes right through cloth."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Ask the farmhands and they'll point at the cracks."));
-						await dialog.Msg(L("Demon-prison pollen seeped out a few months back. The monsters followed it. Cronewts that lived peaceful up by the thorns came south hunting anything that moves."));
+						await dialog.Msg(L("Ask the farmhands, they'll point you at the cracks."));
+						await dialog.Msg(L("Demon-prison pollen leaked out a few months back, and the monsters followed it down. The Cronewts used to be peaceful up by the thorns — now they come south hunting anything that moves."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Klaipeda hunters want five times what I can pay. Won't matter if the harvest fails anyway."));
+						await dialog.Msg(L("Klaipeda hunters want five times what I can pay. Won't matter much if the harvest fails anyway."));
 						break;
 				}
 			}
@@ -86,20 +86,20 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He exhales heavily, shoulders dropping with relief*{/}"));
-					await dialog.Msg(L("Twenty clean kills. The farmhands'll sleep tonight for the first time in a month."));
-					await dialog.Msg(L("Take this - hunting leathers, passed down from my grandfather. He'd want them on someone who uses them."));
+					await dialog.Msg(L("{#666666}*He lets out a long breath*{/}"));
+					await dialog.Msg(L("Twenty clean kills. The farmhands'll actually sleep tonight, first time in a month."));
+					await dialog.Msg(L("Here, take these — hunting leathers, passed down from my grandfather. He'd want them on someone who'll use them."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep at it. Western barley, aqueduct hedgerows. Listen for the rustle."));
+					await dialog.Msg(L("Keep at it. Western barley, the aqueduct hedgerows. Listen for the rustle."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Harvest came in three-quarters this year. Better than nothing, thanks to you."));
+				await dialog.Msg(L("Harvest came in at three-quarters this year. Better than nothing, thanks to you."));
 			}
 		});
 
@@ -117,10 +117,10 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A worried farmer waves a folded letter and sneezes twice*{/}"));
-				await dialog.Msg(L("The pollen's drifting south now. You can taste it - metal, sweet-rotten, makes your eyes water. The demon-prison crack on the north ridge has been leaking for weeks."));
+				await dialog.Msg(L("{#666666}*A worried farmer is waving a folded letter, and sneezes twice*{/}"));
+				await dialog.Msg(L("Pollen's drifting south now. You can taste it — metal, sort of sweet-rotten, makes your eyes water. The demon-prison crack on the north ridge has been leaking for weeks."));
 
-				var response = await dialog.Select(L("Stanislovas works the barley fields east of here, near his daughter Goda's stitching shed. The pollen will hit his sheds before it hits anyone else's, and his farmhands haven't even started masking up. I wrote him a warning to wrap their faces and shut the sheds. Carry it for me?"),
+				var response = await dialog.Select(L("Stanislovas works the barley fields east of here, near his daughter Goda's stitching shed. The pollen'll hit his sheds before anyone else's, and his farmhands haven't even started masking up. I wrote him a warning to wrap their faces and shut the sheds — can you carry it for me?"),
 					Option(L("I'll deliver it"), "help"),
 					Option(L("What's the demon prison?"), "info"),
 					Option(L("Ask someone else"), "leave")
@@ -129,19 +129,19 @@ public class FFarm473QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*She presses the letter into your hand*{/}"));
+						await dialog.Msg(L("{#666666}*She hands you the letter*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Tell him I'll send Keposeed husks next week - he can pass them to Goda for extra masks. Faster the wraps go on, the fewer farmhands cough up blood."));
+						await dialog.Msg(L("Tell him I'll send Keposeed husks next week — he can pass them to Goda for extra masks. Sooner everyone's wrapped up, fewer farmhands end up coughing blood."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("North of the thorn-maps there's a prison for demons - old, deep, sealed since before the war. Something broke the seal."));
-						await dialog.Msg(L("Pollen leaks out where the cracks are. Monsters that were quiet before are hungry now. The Klaipeda magistrates say they're 'investigating.' Meanwhile, we farm."));
+						await dialog.Msg(L("North of here there's an old prison for demons, sealed since before the war. Something broke the seal."));
+						await dialog.Msg(L("Pollen leaks out wherever there's a crack. Monsters that used to be quiet are hungry now. The Klaipeda magistrates say they're 'investigating.' Meanwhile, we farm."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then breathe through a cloth if you go south. Don't say I didn't warn you."));
+						await dialog.Msg(L("Then breathe through a cloth if you head south. Don't say I didn't warn you."));
 						break;
 				}
 			}
@@ -152,31 +152,33 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 				if (deliverObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She reads Stanislovas's reply and presses her hands together in relief*{/}"));
-					await dialog.Msg(L("Sheds shut by nightfall, masks on every farmhand. Good. His barley survives another season, ours might too."));
-					await dialog.Msg(L("Here - my thanks. Small coin, but honest. Tell me if you pass Goda; she'll want the husks before supper."));
+					await dialog.Msg(L("{#666666}*She reads Stanislovas's reply and visibly relaxes*{/}"));
+					await dialog.Msg(L("Sheds shut by nightfall, masks on every farmhand. Good. His barley survives another season, and ours might too."));
+					await dialog.Msg(L("Here, take this. Small coin, but honest. If you pass Goda, let her know — she'll want those husks before supper."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("East from here, in the barley fields - thick-set man, bandaged arm. Go quickly, the wind's turning."));
+					await dialog.Msg(L("East from here, in the barley fields. Thick-set man, bandaged arm. Go quickly — the wind's picking up."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Stanislovas's farmhands are masked-up by now. Goda doubled her stitching pace. Keposeed husks for everyone."));
+				await dialog.Msg(L("Stanislovas's farmhands are all masked up by now. Goda doubled her stitching pace. Keposeed husks for everyone."));
 			}
 		});
 
 		// =====================================================================
 		// Farmer Jonas - flavor NPC (no longer a quest recipient)
 		//---------------------------------------------------------------------
-		AddNpc(20117, L("[Farmer] Jonas"), "f_farm_47_3", -1628, -924, 45, async dialog =>
+		AddNpc(20117, L("[Farmer] Jonas"), "f_farm_47_3", -1906, -96, 90, async dialog =>
 		{
 			dialog.SetTitle(L("Jonas"));
-			await dialog.Msg(L("{#666666}*An old farmer with a beard to his chest squints toward the distant greenhouses*{/}"));
-			await dialog.Msg(L("Every summer a new blight. Every winter a new frost. Farming is just bad weather with hope attached."));
+			await dialog.Msg(L("{#666666}*An old farmer with a long beard pulls his hood up against the rain*{/}"));
+			await dialog.Msg(L("Three weeks of rain now. Three weeks. And the aqueduct up there's still running full — go figure."));
+			await dialog.Msg(L("My boots haven't been dry in a month. The barley loves it. I don't."));
+			await dialog.Msg(L("Every summer it's a new blight, every winter a new frost. Farming's mostly just bad weather and hope. Lately the weather's been winning."));
 		});
 
 		// =====================================================================
@@ -193,10 +195,10 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer stitches a seed-husk and a strip of linen into a crude mask, coughing twice into her elbow*{/}"));
-				await dialog.Msg(L("The Kepa-pods have a hollow inner shell - tough, porous. Stitch one between linen and you've got a mask that filters most of the demon-pollen. Not pretty, but it works."));
+				await dialog.Msg(L("{#666666}*A farmer is stitching a seed-husk and a strip of linen into a crude mask, coughing twice into her elbow*{/}"));
+				await dialog.Msg(L("The Kepa-pods have a hollow inner shell — tough but porous. Stitch one between two strips of linen and you've got a mask that filters out most of the demon-pollen. Not pretty, but it works."));
 
-				var response = await dialog.Select(L("I can stitch a mask an hour, but I can't gather husks and stitch both. The Keposeeds drift through the middle fields - shake a pod and the inner shell falls out. I need five. Will you gather them?"),
+				var response = await dialog.Select(L("I can stitch one mask an hour, but I can't gather husks and stitch at the same time. The Keposeeds drift through the middle fields — shake a pod and the inner shell falls right out. I need five. Will you gather them?"),
 					Option(L("I'll gather five husks"), "help"),
 					Option(L("Do they even help?"), "info"),
 					Option(L("I'm no pod-shaker"), "leave")
@@ -205,20 +207,20 @@ public class FFarm473QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*She pauses her stitching and smiles*{/}"));
+						await dialog.Msg(L("{#666666}*She smiles and sets her stitching aside*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The inner shell is the pale one - white-violet, about the size of your palm. Leave the outer pod; that part's alive."));
+						await dialog.Msg(L("The inner shell is the pale one — white-violet, about palm-sized. Leave the outer pod alone, that part's still alive."));
 						await dialog.Msg(L("And cover your mouth while you gather. The husks are clean, but the air around them isn't."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Better than breathing raw pollen, I'll tell you that much. Two farmhands keeled over last week - now they wear masks and they're back swinging scythes."));
-						await dialog.Msg(L("Maybe not pretty. But my hands itch less. My eyes water less. That's something."));
+						await dialog.Msg(L("Better than breathing raw pollen, I can tell you that. Two farmhands keeled over last week. Now they wear masks and they're back out swinging scythes."));
+						await dialog.Msg(L("Not pretty, sure, but my hands itch less and my eyes water less. That's something."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then breathe shallow if you pass the fields. Small mercies."));
+						await dialog.Msg(L("Then breathe shallow if you pass the fields. Take care."));
 						break;
 				}
 			}
@@ -228,20 +230,20 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 				if (husksCount >= 5)
 				{
-					await dialog.Msg(L("{#666666}*She weighs the husks in her palm, nodding at each one*{/}"));
-					await dialog.Msg(L("Clean separations. You didn't crush a single one. I'll have five more masks by supper."));
-					await dialog.Msg(L("Take these - saved from last season's honest earnings. Morta and the rest owe you as much as I do."));
+					await dialog.Msg(L("{#666666}*She turns each husk over in her hand*{/}"));
+					await dialog.Msg(L("All clean — you didn't crush a single one. I'll have five more masks by supper."));
+					await dialog.Msg(L("Take this — it's from last season's earnings. Morta and the others owe you as much as I do."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Five pods. Pale inner shell. Shake gently, don't crush."));
+					await dialog.Msg(L("Five pods, pale inner shell. Shake gently, don't crush them."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Every farmhand on Myrkiti has a mask now. The demon-pollen still drifts, but we breathe."));
+				await dialog.Msg(L("Every farmhand on Myrkiti has a mask now. The pollen still drifts, but at least we can breathe."));
 			}
 		});
 
@@ -330,10 +332,10 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*An anxious farmer clutches a rolled map, glancing at the sky every few breaths*{/}"));
-				await dialog.Msg(L("Burrows. Tunnels gouged into the earth. Half a dozen of them across Myrkiti so far, mouths gaping wide enough for a man's arm, and orange pollen drifting out of every one. Whatever's down there dug up, not down. The magistrates in Klaipeda won't listen to 'farmer's worries' without evidence."));
+				await dialog.Msg(L("{#666666}*An anxious farmer holds a rolled map, glancing up at the sky*{/}"));
+				await dialog.Msg(L("Burrows. Tunnels dug into the earth — half a dozen across Myrkiti so far, mouths wide enough to fit a man's arm, and orange pollen drifting out of every one. Whatever's down there dug up, not down. And the magistrates in Klaipeda won't listen to 'farmer's worries' without evidence."));
 
-				var response = await dialog.Select(L("I need someone to walk each burrow and mark it on my map. Proper notes - mouth-width, what the pollen smells like, what's wilting in a circle around it. If I bring the magistrates a numbered survey, they'll have to send a mage. Maybe seal the tunnels. Maybe not. But at least send one."),
+				var response = await dialog.Select(L("I need someone to walk each burrow and mark it on my map. Proper notes — how wide the mouth is, what the pollen smells like, what's wilting around it. If I bring the magistrates a numbered survey, they'll have to send a mage out. Maybe seal the tunnels, maybe not — but at least send one."),
 					Option(L("I'll survey the burrows"), "help"),
 					Option(L("Why not a mage already?"), "info"),
 					Option(L("I'm not a surveyor"), "leave")
@@ -342,16 +344,16 @@ public class FFarm473QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He unfolds the map with trembling hands*{/}"));
+						await dialog.Msg(L("{#666666}*He unfolds the map with shaky hands*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("They're spread across the western fields. Look for ringed soil-mounds - that's the spoil from whatever dug the tunnel. The burrow mouth itself is dark and smells like scorched metal."));
-						await dialog.Msg(L("Don't reach into one. Pollen's bad enough at the rim. If any have widened since last week, come back faster than you think."));
+						await dialog.Msg(L("They're spread across the western fields. Look for ringed mounds of soil — that's the dirt from whatever dug the tunnel. The burrow itself is dark and smells like scorched metal."));
+						await dialog.Msg(L("Don't reach into one. Pollen's bad enough at the rim. If any of them have widened since last week, come back as fast as you can."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Mages cost silver. Farmers don't have silver. Klaipeda sends mages where the gold comes from - and we've been late on taxes two seasons running."));
-						await dialog.Msg(L("The demon prison leaked for months before anyone in a city noticed. If the tunnels reach Klaipeda itself, maybe then. Until then, we survey our own."));
+						await dialog.Msg(L("Mages cost silver, and farmers don't have silver. Klaipeda sends mages where the gold is, and we've been late on taxes two seasons running."));
+						await dialog.Msg(L("The demon prison leaked for months before anyone in a city noticed. If the tunnels reach Klaipeda itself, maybe then. Until that happens, we survey our own."));
 						break;
 
 					case "leave":
@@ -365,15 +367,15 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 				if (cracksVisited >= 4)
 				{
-					await dialog.Msg(L("{#666666}*He reads your notes, face tightening*{/}"));
-					await dialog.Msg(L("Every one of them widening. Two doubled in mouth-width since last month. The forked one is breathing pollen out of both arms now."));
-					await dialog.Msg(L("I'll ride to Klaipeda tomorrow. This survey will get a mage sent, or I'll camp outside the magistrate's door until one comes. Thank you - take this for the walking."));
+					await dialog.Msg(L("{#666666}*He reads your notes, his expression hardening*{/}"));
+					await dialog.Msg(L("Every one of them is widening. Two doubled in mouth-width since last month. The forked one's breathing pollen out of both arms now."));
+					await dialog.Msg(L("I'll ride to Klaipeda tomorrow. This survey will get a mage sent — or I'll camp outside the magistrate's door until one comes. Thank you. Take this for the walking."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("The burrows are spread across the western fields. Look for ringed soil-mounds and the smell of scorched metal."));
+					await dialog.Msg(L("The burrows are out across the western fields. Look for ringed soil-mounds and the smell of scorched metal."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
@@ -420,6 +422,11 @@ public class FFarm473QuestNpcsScript : GeneralScript
 
 					character.ServerMessage(L(observation));
 					character.ServerMessage(LF("Burrows surveyed: {0}/4", cracksVisited + 1));
+
+					if (SpawnTempMonsters(character, MonsterId.Hohen_Ritter_Green, 1, 50, TimeSpan.FromMinutes(2)))
+					{
+						character.ServerMessage(L("{#FF6666}A demon emerges from the burrow!{/}"));
+					}
 
 					if (cracksVisited + 1 >= 4)
 					{
@@ -602,6 +609,7 @@ public class PortalCrackSurveyQuest : QuestScript
 		AddReward(new ItemReward(640082, 1));  // Lv3 EXP Card
 		AddReward(new ItemReward(640003, 3)); // Normal HP Potion
 		AddReward(new ItemReward(640006, 3)); // Normal SP Potion
+		AddReward(new ItemReward(521142, 1)); // Hunting Pants
 	}
 
 	public override void OnComplete(Character character, Quest quest)

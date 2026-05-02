@@ -36,10 +36,10 @@ public class FFarm471QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer holds a splintered pallet up to the light, shaking his head*{/}"));
-				await dialog.Msg(L("Third pallet this week. Geppettos come at dusk, tangle in the ropes, chew the pallet corners. If a child was sleeping on one of these, we'd be burying her."));
+				await dialog.Msg(L("{#666666}*A farmer is checking a splintered pallet*{/}"));
+				await dialog.Msg(L("Third pallet this week. The Geppettos come around at dusk and chew the corners up. If a kid had been sleeping on one of these... yeah. Doesn't bear thinking about."));
 
-				var response = await dialog.Select(L("Mykolas needs seven barns ready in five days. Geppettos wreck one in a night. Kill eighteen and we'll have a chance - they're Lightning-element, so they hate steel. Use it heavy."),
+				var response = await dialog.Select(L("Mykolas needs seven barns ready in five days, and the Geppettos can wreck one in a night. If you can kill eighteen of them, we'll have a chance. They're Lightning-element, so steel hurts them — use it heavy."),
 					Option(L("I'll kill the Geppettos"), "help"),
 					Option(L("Why did they suddenly appear?"), "info"),
 					Option(L("Find a proper hunter"), "leave")
@@ -48,20 +48,20 @@ public class FFarm471QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He sets the splintered pallet down carefully, as if it were a child's shoe*{/}"));
+						await dialog.Msg(L("{#666666}*He sets the pallet down*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Take these - leather pants. My brother wore them when he was farmhand-militia. He'd want them on someone defending a barn."));
-						await dialog.Msg(L("And mind the puppet-strings on their arms. Cut those first - disarms the Lightning magic."));
+						await dialog.Msg(L("Here, take these — leather pants. My brother wore them in the farmhand militia. Better on you than in a chest."));
+						await dialog.Msg(L("Oh, and watch out for the puppet-strings on their arms. Cut those first, that takes the lightning out of them."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Mykolas thinks the demon-pollen woke them up. Lina across the way says Lightning-creatures always drift toward disturbed wards."));
-						await dialog.Msg(L("Either way. They come. We kill. We keep the barns ready."));
+						await dialog.Msg(L("Mykolas reckons the demon-pollen woke them up. Lina says lightning-things always drift toward broken wards."));
+						await dialog.Msg(L("Either way, they keep coming and we keep killing them. That's the job right now."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("The hunters are in Klaipeda collecting bounties. We're here with splinters."));
+						await dialog.Msg(L("The real hunters are off in Klaipeda chasing bounties. Meanwhile we're out here pulling splinters out of pallets."));
 						break;
 				}
 			}
@@ -72,20 +72,20 @@ public class FFarm471QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He looks at the intact pallets, letting out a slow breath*{/}"));
-					await dialog.Msg(L("Eighteen. The barns will hold tonight. Maybe long enough to finish the last conversions."));
-					await dialog.Msg(L("Take this - farmer's purse, plus the pants. You earned them both twice over."));
+					await dialog.Msg(L("{#666666}*He glances over the intact pallets*{/}"));
+					await dialog.Msg(L("Eighteen. Alright. The barns'll hold tonight, and maybe long enough for us to finish the last few."));
+					await dialog.Msg(L("Take this — farmer's purse, plus the pants. You earned them both twice over."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Central barn, northern hedgerow. Cut the puppet-strings first."));
+					await dialog.Msg(L("Try the central barn and the northern hedgerow. And remember — cut the puppet-strings first."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Seven barns ready by week's end. If the bell rings, the children have somewhere to run."));
+				await dialog.Msg(L("Seven barns ready by week's end. If the bell rings, at least the kids have somewhere to run."));
 			}
 		});
 
@@ -108,16 +108,16 @@ public class FFarm471QuestNpcsScript : GeneralScript
 			{
 				if (character.Inventory.CountItem(650580) <= 0)
 				{
-					await dialog.Msg(L("{#666666}*He glances at your empty hands, then back at the barn ridge*{/}"));
-					await dialog.Msg(L("Audrone said she'd send a pin-marked map. Come back when you have it - I'm not laying out barns from memory."));
+					await dialog.Msg(L("{#666666}*He glances at your empty hands*{/}"));
+					await dialog.Msg(L("Audrone said she'd send a pin-marked map. Come back when you have it — I'm not laying out barns from memory."));
 					return;
 				}
 
-				await dialog.Msg(L("{#666666}*He unfolds the operation map, jaw tightening as he reads the pin assignments*{/}"));
-				await dialog.Msg(L("Red pins first. Myrkiti's children. Right."));
-				await dialog.Msg(L("{#666666}*He folds the map and tucks it inside his coat*{/}"));
-				await dialog.Msg(L("Tell Audrone I've got seven barns, thirty pallets each - more than she calculated. The big hay-barn has a coal stove; I'll prioritize that one for infants."));
-				await dialog.Msg(L("And tell her I'll have the barns ready in five days, not seven. No sense cutting it close when the portal's widening."));
+				await dialog.Msg(L("{#666666}*He unfolds the map and reads the pin assignments*{/}"));
+				await dialog.Msg(L("Red pins first. So Myrkiti's kids come here first. Alright."));
+				await dialog.Msg(L("{#666666}*He folds the map and tucks it into his coat*{/}"));
+				await dialog.Msg(L("Tell Audrone I've actually got seven barns at thirty pallets each — that's more than she figured. The big hay-barn has a coal stove, so I'll put the babies in there."));
+				await dialog.Msg(L("And tell her five days, not seven. No point cutting it close when the portal keeps widening."));
 
 				character.Inventory.Remove(650580, 1, InventoryItemRemoveMsg.Given);
 				character.Variables.Perm.Set("Laima.Quests.f_farm_47_2.Quest1002.Delivered", 1);
@@ -127,10 +127,10 @@ public class FFarm471QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*Mykolas hunches over a supply ledger, crossing items off as he writes*{/}"));
-				await dialog.Msg(L("Audrone's protocol is posted. Seven barns, thirty pallets - but pallets need blankets, and blankets I don't have. The Cobalt Forest merchants trade wool cheaper than Klaipeda's guilds."));
+				await dialog.Msg(L("{#666666}*Mykolas is hunched over a supply ledger, crossing items off*{/}"));
+				await dialog.Msg(L("Audrone's protocol is posted. Seven barns, thirty pallets — but pallets need blankets, and I haven't got any. The Cobalt Forest merchants sell wool cheaper than the Klaipeda guilds."));
 
-				var response = await dialog.Select(L("Izolde runs the Fedimian-side supply post through the Cobalt Forest warp. I've drafted the requisition - thirty blankets, fifty pallets, dried oats for three hundred. Carry it to her? She'll deliver by sundown if we pay up front."),
+				var response = await dialog.Select(L("Izolde runs the Fedimian supply post through the Cobalt Forest warp. I've drafted a requisition — thirty blankets, fifty pallets, dried oats for three hundred. Mind carrying it over? She'll deliver by sundown if we pay up front."),
 					Option(L("I'll carry the requisition"), "help"),
 					Option(L("Why Fedimian merchants?"), "info"),
 					Option(L("I'm busy"), "leave")
@@ -139,19 +139,19 @@ public class FFarm471QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He folds the requisition and seals it with a thumb-print in blackberry ink*{/}"));
+						await dialog.Msg(L("{#666666}*He folds the requisition and seals it with a thumb-print*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("If she haggles, remind her we've paid on time for six years running. Our coin is as good as Klaipeda's."));
+						await dialog.Msg(L("If she haggles, remind her we've paid on time for six years running. Our coin's as good as Klaipeda's."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Because Klaipeda's guilds triple the price when they smell crisis. Izolde doesn't. She sells at cost plus cart-fee, and she delivers when she says she will."));
-						await dialog.Msg(L("Most farmers this side of the aqueduct buy Fedimian wool. Klaipeda doesn't like it, but Klaipeda doesn't run our barns either."));
+						await dialog.Msg(L("Because Klaipeda's guilds triple the price the moment they smell a crisis. Izolde doesn't. She charges cost plus the cart-fee, and she delivers when she says she will."));
+						await dialog.Msg(L("Most farmers around here buy Fedimian wool. Klaipeda doesn't like that, but Klaipeda's not running our barns either."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then I'll walk it myself at dawn. Three hours each way, leaves me three hours less to count pallets."));
+						await dialog.Msg(L("Then I'll walk it myself at dawn. Three hours each way — three hours I'd rather spend counting pallets."));
 						break;
 				}
 			}
@@ -162,20 +162,20 @@ public class FFarm471QuestNpcsScript : GeneralScript
 
 				if (deliverObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He reads Izolde's confirmation and nods once*{/}"));
-					await dialog.Msg(L("Cart arrives tomorrow at noon. Blankets, pallets, oats - enough to shelter every Myrkiti child for a week. That's what I needed to know."));
-					await dialog.Msg(L("Here - a tenant's wage, paid honestly. You saved me three hours of walking and a day of worry."));
+					await dialog.Msg(L("{#666666}*He reads Izolde's confirmation and nods*{/}"));
+					await dialog.Msg(L("Cart arrives tomorrow at noon. Blankets, pallets, oats — enough to shelter every Myrkiti kid for a week. Good. That's what I needed to know."));
+					await dialog.Msg(L("Here, take this. A tenant's wage, paid honest. You saved me three hours of walking and a whole day of worrying."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Izolde is at the Cobalt Forest warp. North end of the farm. Don't lose the requisition - I've no copy."));
+					await dialog.Msg(L("Izolde's up at the Cobalt Forest warp, north end of the farm. Don't lose the requisition — I haven't got a copy."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The supplies came. Barns are ready. Audrone sent word - Myrkiti's children know which wagon is theirs."));
+				await dialog.Msg(L("Supplies came. Barns are ready. Audrone sent word — the Myrkiti kids know which wagon is theirs."));
 			}
 		});
 
@@ -195,17 +195,17 @@ public class FFarm471QuestNpcsScript : GeneralScript
 			if (questActive && !delivered)
 			{
 				await dialog.Msg(L("{#666666}*She reads the requisition, tallying with a pencil*{/}"));
-				await dialog.Msg(L("Thirty blankets - I have forty in stock. Fifty pallets - I'll split two carts. Oats for three hundred - doable, but I'll need to pull from the Fedimian granary reserves."));
+				await dialog.Msg(L("Thirty blankets — I've got forty in stock. Fifty pallets — I'll split that across two carts. Oats for three hundred is doable, but I'll have to pull from the Fedimian granary."));
 				await dialog.Msg(L("{#666666}*She signs a confirmation slip and hands it to you*{/}"));
-				await dialog.Msg(L("Tell Mykolas cart arrives tomorrow at noon. Tell him I'm adding lamp-oil for the hay-barn stove at no extra charge. Children sleeping on straw in autumn need warmth more than cheaper books."));
+				await dialog.Msg(L("Tell Mykolas the cart's there tomorrow at noon. And tell him I'm throwing in lamp-oil for the hay-barn stove at no extra charge. Kids sleeping on straw in autumn need it more than I do."));
 
 				character.Variables.Perm.Set("Laima.Quests.f_farm_47_1.Quest1002.Delivered", 1);
 				character.ServerMessage(L("{#FFD700}Requisition delivered. Return to Mykolas.{/}"));
 				return;
 			}
 
-			await dialog.Msg(L("{#666666}*A Fedimian merchant counts coin by the Cobalt warp-stone, a wicker basket of farm goods at her feet*{/}"));
-			await dialog.Msg(L("Cart-fresh from the Fedimian side - berries, bread, mushrooms, milk. The kind Klaipeda's guilds charge triple for. What'll it be?"));
+			await dialog.Msg(L("{#666666}*A Fedimian merchant is counting coin by the Cobalt warp-stone, a wicker basket of farm goods beside her*{/}"));
+			await dialog.Msg(L("Fresh off the Fedimian cart — berries, bread, mushrooms, milk. The kind Klaipeda charges triple for. What'll it be?"));
 
 			await dialog.OpenShop("IzoldeFruits");
 		});
@@ -219,7 +219,7 @@ public class FFarm471QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Agne"));
 
-			await dialog.Msg(L("{#666666}*A seamstress works a length of dyed cord through a half-finished armband, threads spread across her lap*{/}"));
+			await dialog.Msg(L("{#666666}*A seamstress is working a length of dyed cord through a half-finished armband*{/}"));
 
 			var response = await dialog.Select(L("What can I do for you, traveler?"),
 				Option(L("What do you do here?"), "info"),
@@ -231,14 +231,14 @@ public class FFarm471QuestNpcsScript : GeneralScript
 			switch (response)
 			{
 				case "info":
-					await dialog.Msg(L("I'm a tailor by trade - though most call me a sewstress, since the work is small enough to fit on my lap. I stitch armbands."));
-					await dialog.Msg(L("Cord, leather strap, a charm or two - simple enough to look at, but each has its own knot-pattern. The pattern is the point. A good armband is read by other adventurers the way a coat-of-arms is read by knights."));
-					await dialog.Msg(L("Old armbands are buried up and down the farm-road - Tenants', the Aqueduct, Myrkiti, Shaton. If you ever go hunting for them, ask me for a compass. The needle's tuned to the burrows - points right at the nearest one. Old tailor's trick."));
-					await dialog.Msg(L("Bring me anything you find and I'll tell you what knot-pattern it carries."));
+					await dialog.Msg(L("I'm a tailor — folks around here just call me the sewing lady. Mostly I stitch armbands."));
+					await dialog.Msg(L("Cord, a leather strap, a charm or two. Looks simple, but each one has its own knot-pattern, and that pattern means something. Other adventurers can read it like a badge."));
+					await dialog.Msg(L("There are old armbands buried all up and down the farm road — Tenants', the Aqueduct, Myrkiti, Shaton. If you go hunting for them, ask me for a compass. The needle points at the nearest burrow."));
+					await dialog.Msg(L("Bring me whatever you dig up and I'll tell you which pattern it carries."));
 					break;
 
 				case "shop":
-					await dialog.Msg(L("Recipes are eighty thousand silver each. I trade them at cost - the value is in the crafting, not the paper."));
+					await dialog.Msg(L("Recipes are eighty thousand silver. I sell them at cost — the value's in actually making them, not in the paper."));
 					await dialog.OpenShop("AgneArmbandRecipes");
 					break;
 
@@ -249,13 +249,13 @@ public class FFarm471QuestNpcsScript : GeneralScript
 						break;
 					}
 					await dialog.Msg(L("{#666666}*She fishes a small brass compass from her sewing kit*{/}"));
-					await dialog.Msg(L("Old tailor's trick. The needle's tuned to the burrows - hold it flat and it'll point. North, south, east, west - it's not subtle, but it's honest."));
+					await dialog.Msg(L("Old tailor's trick. Needle's tuned to the burrows — hold it flat and it'll point. Not subtle, but it works."));
 					character.Inventory.Add(11200079, 1, InventoryAddType.PickUp);
-					await dialog.Msg(L("Take it. Lose it and come back - I keep a few spare."));
+					await dialog.Msg(L("Take it. Lose it and come back — I've got a few spare."));
 					break;
 
 				case "leave":
-					await dialog.Msg(L("Safe travels. Mind the loose threads on the road."));
+					await dialog.Msg(L("Safe travels."));
 					break;
 			}
 		});
@@ -274,10 +274,10 @@ public class FFarm471QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A soldier in field colors leans on a halberd, a wooden tally-board braced against his hip*{/}"));
-				await dialog.Msg(L("Garrison posted me to Tenants' for the season - patrol the road, lend a hand where I can. Right now Mykolas is short bodies, and Izolde's cart-train rolled in at sunup with no one to organize it."));
+				await dialog.Msg(L("{#666666}*A soldier in field colors leans on a halberd, holding a wooden tally-board*{/}"));
+				await dialog.Msg(L("Garrison posted me to Tenants' for the season — patrol the road, help where I can. Right now Mykolas is short bodies, and Izolde's cart-train rolled in at sunup with nobody to sort it out."));
 
-				var response = await dialog.Select(L("Field hands dropped the supply carts where they stood and went straight back to the rows. They're scattered across the farm. Rain's an hour off. I need four marked on this tally so my squad can fetch them - I'd do it myself, but I can't leave the road. Can you find four?"),
+				var response = await dialog.Select(L("The field hands dropped the supply carts where they stood and went straight back to the rows. Now they're scattered all over the farm. Rain's an hour off. I need four of them marked on this tally so my squad can fetch them. I'd do it myself, but I can't leave the road. Can you find four?"),
 					Option(L("I'll round up the carts"), "help"),
 					Option(L("Why is a soldier doing farmer's work?"), "info"),
 					Option(L("Not my problem"), "leave")
@@ -286,16 +286,16 @@ public class FFarm471QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He hands you the tally-board and a spare nub of chalk*{/}"));
+						await dialog.Msg(L("{#666666}*He hands you the tally-board and a stub of chalk*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("They're all over - north fields, south hedge, by the well, out past the orchard. Look for the canvas tarps."));
-						await dialog.Msg(L("Tick the board at four of them. That's enough for me to dispatch the squad."));
+						await dialog.Msg(L("They're all over the place — north fields, south hedge, by the well, out past the orchard. Look for the canvas tarps."));
+						await dialog.Msg(L("Tick four of them off and that's enough for me to send the squad out."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Bread comes from this farm. Garrison eats this farm's grain. Captain says a soldier who won't lift a sack when the harvest's at risk isn't worth his pay."));
-						await dialog.Msg(L("Besides - Mykolas paid Fedimian rates for those oats. Letting them rot would be a worse waste than any battle I've seen."));
+						await dialog.Msg(L("Bread comes from this farm. Garrison eats this farm's grain. The captain says a soldier who won't lift a sack when the harvest's at risk isn't worth his pay, and he's right."));
+						await dialog.Msg(L("Besides, Mykolas paid Fedimian rates for those oats. Letting them rot would be a worse waste than any fight I've been in."));
 						break;
 
 					case "leave":
@@ -310,19 +310,19 @@ public class FFarm471QuestNpcsScript : GeneralScript
 				if (cartsFound >= 4)
 				{
 					await dialog.Msg(L("{#666666}*He reads the tally and signals two soldiers down the road with a sharp whistle*{/}"));
-					await dialog.Msg(L("Four logged. Squad's moving on them now. Oats stay dry, Mykolas keeps his harvest, garrison keeps its bread."));
+					await dialog.Msg(L("Four logged. Squad's moving on them now. Oats stay dry, Mykolas keeps his harvest, garrison keeps its bread. That's a good morning."));
 					await dialog.Msg(L("Here. Soldier's purse, plus what I scrounged from the supply tent. You earned both."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Look for the canvas tarps. Hedges, ditches, behind the well - they're out there."));
+					await dialog.Msg(L("Look for the canvas tarps. Hedges, ditches, behind the well — they're out there."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Carts are in, harvest's safe. Road still needs walking."));
+				await dialog.Msg(L("Carts are in, harvest's safe. Road still needs walking, though."));
 			}
 		});
 
@@ -377,11 +377,11 @@ public class FFarm471QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddCartFinder(1, "Sacks of oats under the tarp. Dry, for now.", 188, 341, 90);
-		AddCartFinder(2, "Wool blankets, neatly bundled. Heavy when wet.", -602, 773, 90);
-		AddCartFinder(3, "Pallets stacked four-deep. Rain would warp every plank.", 157, 1124, 0);
-		AddCartFinder(4, "Lamp-oil jugs in straw padding. Best not to leave these in the open.", -934, 323, 0);
-		AddCartFinder(5, "Dried beans in burlap. The mice would find these by morning.", -779, -1148, 90);
+		AddCartFinder(1, "Sacks of oats under the tarp. Still dry.", 188, 341, 90);
+		AddCartFinder(2, "Bundled wool blankets. These would be heavy soaked.", -602, 773, 90);
+		AddCartFinder(3, "Pallets stacked four-deep. Rain would warp these.", 157, 1124, 0);
+		AddCartFinder(4, "Lamp-oil jugs packed in straw. Shouldn't be left in the open.", -934, 323, 0);
+		AddCartFinder(5, "Dried beans in burlap. Mice would get to these by morning.", -779, -1148, 90);
 		AddCartFinder(6, "More oats. Mykolas wasn't kidding about the order size.", 492, -309, 0);
 		AddCartFinder(7, "Salt and dried fish. Far from the kitchen, but it'll keep.", 963, 383, 0);
 	}

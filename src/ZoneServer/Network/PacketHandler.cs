@@ -1599,10 +1599,16 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			if (monster is Mob)
+			if (monster is Mob mob)
 			{
 				// Optional: Check if the enemy specifically has a DialogComponent enabled
-				// For now, adhere to standard logic:
+				// For now, we are making hard checks instead:
+				if (mob.Vars.GetBool("Laima.Guards.IsGuard"))
+				{
+					Shortcuts.SayRandomGuardLine(mob);
+					return;
+				}
+
 				Log.Warning("CZ_CLICK_TRIGGER: User '{0}' tried to talk to an actual monster.", conn.Account.Name);
 				return;
 			}

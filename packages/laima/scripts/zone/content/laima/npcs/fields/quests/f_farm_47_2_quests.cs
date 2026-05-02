@@ -36,10 +36,10 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer in patched armor turns a scorched stone chip in his fingers, knuckles white on a short spear*{/}"));
-				await dialog.Msg(L("They're casting at the bridges now. Kepari Shamans - Velnias-race demon-flesh, right out of the prison gate. If one stone of that aqueduct cracks, four farms lose water before sundown."));
+				await dialog.Msg(L("{#666666}*A farmer in patched armor is gripping a short spear, turning a scorched stone chip in his other hand*{/}"));
+				await dialog.Msg(L("They're casting at the bridges now. Kepari Shamans — straight out of the demon prison. If one stone of that aqueduct cracks, four farms lose water before sundown."));
 
-				var response = await dialog.Select(L("I was a farmhand two months ago. Now I'm holding a spear and watching the water for sparks. The magistrates won't send soldiers because 'the situation is being monitored.' I need them thinned. Fifteen shamans - that's enough to stop the next spell."),
+				var response = await dialog.Select(L("Two months ago I was a farmhand. Now I'm holding a spear and watching for sparks on the water. The magistrates won't send soldiers — they say 'the situation's being monitored.' I need them thinned. Fifteen shamans should be enough to stop the next spell."),
 					Option(L("I'll kill the Shamans"), "help"),
 					Option(L("Why are they attacking the water?"), "info"),
 					Option(L("Sounds suicidal"), "leave")
@@ -48,28 +48,28 @@ public class FFarm472QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He exhales, the spear shaft loosening in his grip*{/}"));
+						await dialog.Msg(L("{#666666}*He exhales and lowers the spear*{/}"));
 
 						character.Quests.Start(questId);
 
 						if (!character.Variables.Perm.GetBool("Laima.Quests.f_farm_47_2.Quest1001.DaggerGiven", false))
 						{
-							await dialog.Msg(L("Hold on - take this knife before you go. It's nothing fancy, kitchen-grade steel my brother left behind, but it'll bite a Kepari deeper than a wooden spear-shaft will. Better than nothing."));
-							await dialog.Msg(L("{#666666}*He works a plain knife from his belt and presses it into your hand.*{/}"));
+							await dialog.Msg(L("Hold on — take this knife before you go. Nothing fancy, just a kitchen blade my brother left behind, but it'll cut a Kepari better than a wooden spear-shaft. Better than nothing."));
+							await dialog.Msg(L("{#666666}*He pulls a plain knife from his belt and hands it to you*{/}"));
 							character.Inventory.Add(111001, 1, InventoryAddType.PickUp);
 							character.Variables.Perm.Set("Laima.Quests.f_farm_47_2.Quest1001.DaggerGiven", true);
 						}
 
-						await dialog.Msg(L("Stay low when they cast. The lightning arcs straight - duck and it passes over."));
+						await dialog.Msg(L("Stay low when they cast. The lightning arcs straight — duck and it goes right over you."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Ask them. They don't answer. The best guess Lina has is that they want the farms evacuated before something bigger comes through the portal."));
-						await dialog.Msg(L("If the wells dry, we pack. If we pack, the demon prison has a clear road to Klaipeda. So we stay. And we fight."));
+						await dialog.Msg(L("Ask them yourself, they don't answer. Lina figures they want the farms cleared out before something bigger comes through the portal."));
+						await dialog.Msg(L("If the wells dry, we pack. If we pack, the demon prison has a clear road to Klaipeda. So we stay, and we fight."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Yeah, probably is. Come back if you change your mind. Or don't. I'll be here either way."));
+						await dialog.Msg(L("Yeah, probably. Come back if you change your mind. Or don't — I'll be here either way."));
 						break;
 				}
 			}
@@ -80,20 +80,20 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He listens to the aqueduct, the water running steady*{/}"));
-					await dialog.Msg(L("Fifteen down. The bridges held. That's a week of water, maybe two, before they regroup."));
-					await dialog.Msg(L("Take this - farmhand's purse, honest earnings. And keep the Arde dagger. You'll need it."));
+					await dialog.Msg(L("{#666666}*He listens to the aqueduct — water still running steady*{/}"));
+					await dialog.Msg(L("Fifteen down. The bridges held. That buys us a week of water, maybe two, before they regroup."));
+					await dialog.Msg(L("Take this — farmhand's purse, honest earnings. And keep the dagger. You'll need it more than I will."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Fifteen Shamans. Near the portal warp. Stay low when the lightning flies."));
+					await dialog.Msg(L("Fifteen Shamans, near the portal warp. Stay low when the lightning flies."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The aqueduct still flows. Four farms still have water. Every day we hold is a day the villages don't pack."));
+				await dialog.Msg(L("Aqueduct still flows. Four farms still have water. Every day we hold is a day the villages don't have to pack up."));
 			}
 		});
 
@@ -111,10 +111,10 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer annotates a map of the farm cluster, marking each homestead with a colored pin*{/}"));
-				await dialog.Msg(L("If the portal widens tomorrow, I need to know which farm takes whose children. Red pins for Myrkiti, blue for Shaton, green for here. Tenants' Farm has the most barns - they shelter Myrkiti's families first."));
+				await dialog.Msg(L("{#666666}*A farmer is marking a map of the farm cluster with colored pins*{/}"));
+				await dialog.Msg(L("If the portal widens tomorrow, I need to know which farm takes whose kids. Red pins for Myrkiti, blue for Shaton, green for here. Tenants' Farm has the most barns, so Myrkiti's families go there first."));
 
-				var response = await dialog.Select(L("I drafted a refugee protocol - who goes where, what supplies each host farm needs, who rings the evacuation bell. Mykolas at Tenants' Farm needs a copy before he can plan the barn conversions. Can you carry it for me towards Tenants' Farm?"),
+				var response = await dialog.Select(L("I drafted a refugee protocol — who goes where, what supplies each host farm needs, who rings the evacuation bell. Mykolas at Tenants' Farm needs a copy before he can plan the barn conversions. Can you carry it over to him?"),
 					Option(L("I'll deliver it to Mykolas"), "help"),
 					Option(L("Is it really that bad?"), "info"),
 					Option(L("That's the magistrate's job"), "leave")
@@ -123,21 +123,21 @@ public class FFarm472QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*She folds the pin-marked map into a waterproof oilcloth and presses it into your hands*{/}"));
+						await dialog.Msg(L("{#666666}*She wraps the pin-marked map in oilcloth and hands it over*{/}"));
 
 						character.Quests.Start(questId);
 						character.Inventory.Add(650580, 1, InventoryAddType.PickUp);
-						await dialog.Msg(L("If Mykolas argues, tell him it's not negotiable - the plan has to be ready before the bell rings."));
-						await dialog.Msg(L("And if you pass Grimaras near the portal - tell him the ward-survey is still waiting."));
+						await dialog.Msg(L("If Mykolas argues, tell him it's not negotiable. The plan has to be ready before the bell rings."));
+						await dialog.Msg(L("Oh — and if you pass Grimaras near the portal, tell him the ward-survey is still waiting."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("The magistrates sent one Pyromancer last week. She sealed two cracks and went back to Klaipeda. The portal is still open."));
-						await dialog.Msg(L("We plan for evacuation because the alternative is panic. Panic gets children trampled in a barn doorway. A protocol doesn't."));
+						await dialog.Msg(L("The magistrates sent one Pyromancer last week. She sealed two cracks and went back to Klaipeda. The portal's still open."));
+						await dialog.Msg(L("We plan for evacuation because the alternative is a panic, and a panic gets kids trampled in a barn doorway. A protocol doesn't."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("The magistrate's already had the letter six weeks. They 'review procedural recommendations.' Meanwhile we farm and pray."));
+						await dialog.Msg(L("The magistrate's already had the letter six weeks. They're 'reviewing procedural recommendations.' Meanwhile we farm and pray."));
 						break;
 				}
 			}
@@ -148,20 +148,20 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 				if (deliverObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She nods grimly as you report Mykolas's reply*{/}"));
-					await dialog.Msg(L("Seven barns, thirty pallets each. That's more capacity than I calculated. Good - we might fit everyone."));
-					await dialog.Msg(L("Take these. A farmer's thanks. If the bell rings tomorrow, your coin is the least we owe."));
+					await dialog.Msg(L("{#666666}*She nods as you report Mykolas's reply*{/}"));
+					await dialog.Msg(L("Seven barns, thirty pallets each. That's more space than I figured. Good — we might fit everyone."));
+					await dialog.Msg(L("Here, take these. A farmer's thanks. If the bell rings tomorrow, the coin is the least we owe you."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Through the north warp. Mykolas - older, broad man. Give him the protocol."));
+					await dialog.Msg(L("Through the north warp. Mykolas — older, broad-shouldered. Give him the protocol."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The protocol is posted at every farm house now. Children know which barn to run to. That's something."));
+				await dialog.Msg(L("The protocol's posted at every farmhouse now. The kids know which barn to run to. That's something."));
 			}
 		});
 
@@ -182,10 +182,10 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A farmer winds copper wire around a knotty round pod, the husk crackling faintly under her fingers*{/}"));
-				await dialog.Msg(L("Three generations of wardmakers in my family. My grandmother warded against frost, my mother against weevils. I ward against demon-pollen. One charged Dandel pod holds enough lightning to keep a threshold clean for a month."));
+				await dialog.Msg(L("{#666666}*A farmer is winding copper wire around a knotty round pod, the husk crackling faintly*{/}"));
+				await dialog.Msg(L("Three generations of wardmakers in my family. Grandma warded against frost, my mother against weevils, and I ward against demon-pollen. One charged Dandel pod is enough to keep a threshold clean for a whole month."));
 
-				var response = await dialog.Select(L("I need six charged pods for a new ward-circle at the evacuation barn. The Dandels drift over the fields, snapping at gnats with those big toothed mouths - and every so often one drops a pod. The fresh ones still hum from the parent's lightning. Pluck the ripe ones, the ones that prickle when you touch them. Left ones too long, they go inert; took ones too early, no charge at all."),
+				var response = await dialog.Select(L("I need six charged pods for a new ward-circle at the evacuation barn. The Dandels drift over the fields snapping at gnats, and every so often one drops a pod. The fresh ones still buzz a little — that's the ones I want. If they prickle when you touch them, they're ready. Wait too long and they go flat."),
 					Option(L("I'll gather six pods"), "help"),
 					Option(L("How do the wards work?"), "info"),
 					Option(L("Another farmer task"), "leave")
@@ -197,16 +197,16 @@ public class FFarm472QuestNpcsScript : GeneralScript
 						await dialog.Msg(L("{#666666}*She hands you a copper-lined pouch*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Pluck them by the husk, not the spine. The husk's tough; the spine's where the charge lives, and it bites. If a Dandel comes circling overhead, don't swing at it - they hate the crack of a blade and they spit lightning when they're angry. Just stand still until it loses interest."));
+						await dialog.Msg(L("Pluck them by the husk, not the spine. The husk's tough, but the spine's where the charge lives and it bites. And if a Dandel comes circling overhead, don't swing at it — they hate the sound of a blade and they'll spit lightning at you. Just stand still until it loses interest."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Copper coil, pod-charge, salt circle, threshold stone. Close the loop, bind the corners, seal with the charge at sunrise."));
-						await dialog.Msg(L("Keeps the pollen out for a lunar month. Keeps most small demons out for three nights. Keeps a Kepari Shaman out for about one angry spell. Not forever. Never forever."));
+						await dialog.Msg(L("Copper coil, pod-charge, salt circle, threshold stone. You close the loop, bind the corners, then seal it with the charge at sunrise. That's the whole trick."));
+						await dialog.Msg(L("Keeps the pollen out for about a month. Keeps most small demons out for three nights. Keeps a Kepari Shaman out for one angry spell, give or take. Nothing lasts forever."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then the barn has no ward tonight. Children sleep under unwarded roofs. Small decisions stack."));
+						await dialog.Msg(L("Then the barn has no ward tonight, and the kids sleep under an unwarded roof. Come back if you change your mind."));
 						break;
 				}
 			}
@@ -216,20 +216,20 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 				if (podCount >= 6)
 				{
-					await dialog.Msg(L("{#666666}*She tests each pod with a copper pick; sparks jump neatly*{/}"));
-					await dialog.Msg(L("All six charged. Husk-plucked, spines unbroken. You've a careful hand."));
-					await dialog.Msg(L("Here - a farmer's wage with my own thanks folded in. The evacuation barn has its ward by sundown."));
+					await dialog.Msg(L("{#666666}*She tests each pod with a copper pick — sparks jump neatly*{/}"));
+					await dialog.Msg(L("All six charged. Plucked clean, no broken spines. You've got a careful hand."));
+					await dialog.Msg(L("Here — a farmer's wage, plus my thanks. The evacuation barn'll have its ward by sundown."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Six pods. Husk-pluck only, never the spine. The copper pouch holds the charge - drop them straight in."));
+					await dialog.Msg(L("Six pods, husk-pluck only. Drop them straight into the copper pouch — that's what holds the charge."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The evacuation barn is warded. If the bell rings, the children sleep safe. That's what the wards are for."));
+				await dialog.Msg(L("Evacuation barn's warded. If the bell rings, the kids sleep safe. That's what wards are for."));
 			}
 		});
 
@@ -312,11 +312,11 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A soldier in field colors leans on his halberd, the warp-circle's glow flickering across his breastplate*{/}"));
-				await dialog.Msg(L("Years ago the ground tore open in the middle of this field. No warning, no quake - one morning a hole into the demon prison was just there, and it has been there since. The Ancients rode out from Klaipeda within the week and laid four seals around it. Stone wards, each carved with a binding rune."));
-				await dialog.Msg(L("The seals don't close the portal. They never could. What they do is keep what's inside the prison from spilling out. A man can walk through that gate if he's stupid enough - the seals don't stop anyone going in. Nothing comes back the other way. That's the whole point."));
+				await dialog.Msg(L("{#666666}*A soldier in field colors leans on his halberd, the warp-circle glowing behind him*{/}"));
+				await dialog.Msg(L("Years ago the ground tore open in the middle of this field. No warning, no quake — one morning a hole into the demon prison was just there, and it's been there ever since. The Ancients rode out from Klaipeda within the week and laid four seals around it. Stone wards, each carved with a binding rune."));
+				await dialog.Msg(L("The seals don't close the portal — they never could. What they do is keep what's inside the prison from spilling out. A man can walk through that gate if he's stupid enough; the seals don't stop anyone going in. Nothing comes back the other way. That's the whole point."));
 
-				var response = await dialog.Select(L("The seals are still holding, but stone weathers. Wind, frost, demon-pollen eating the carving year by year. The wardmage in Fedimian wants to know how much time we have before any of them give. Walk the circle, inspect each seal up close, note the wear - hairline cracks, runes worn shallow, edges crumbling. My orders keep me on the line; I can't break perimeter to do it myself."),
+				var response = await dialog.Select(L("The seals are holding, but stone weathers. Wind, frost, demon-pollen eating away at the carvings year by year. The wardmage in Fedimian wants to know how long before any of them give. Walk the circle, inspect each seal up close, note the wear — hairline cracks, runes worn shallow, edges crumbling. My orders keep me on the line, so I can't do it myself."),
 					Option(L("I'll inspect the seals"), "help"),
 					Option(L("What happens if I go in?"), "info"),
 					Option(L("The portal's too close"), "leave")
@@ -325,20 +325,20 @@ public class FFarm472QuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He hands you a brass caliper and a soldier's notebook from his pack, then catches your wrist before you turn away*{/}"));
+						await dialog.Msg(L("{#666666}*He hands you a brass caliper and a soldier's notebook from his pack, then grabs your wrist before you turn away*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Listen. Look at me. Stay on this side of the portal. The seals around it are an outbound binding - whatever's on the inside trying to get out gets pinned, and that includes you. Cross that threshold and you don't come back. Not by sword, not by spell, not by prayer."));
-						await dialog.Msg(L("I have watched four people walk through that gate thinking they'd just take a quick look. None of them came back. So do me the favor: keep both feet outside the warp circle while you work. The seals you're surveying are at arm's reach from the edge - you don't need to step inside to read them."));
-						await dialog.Msg(L("Four seals. Ring the warp point. Walk the circle counter-clockwise - old soldier's habit, sweep your blind side first. Look close at each rune. Pitting in the strokes. Edges going soft. If you smell metal in your mouth, the pollen is getting to you. Back off for a count of ten."));
-						await dialog.Msg(L("Finish the survey and the wardmage in Fedimian sends a Seal Release Crystal back with my courier - one for the inspector. {#FF6666}Don't go in until you have it.{/} The crystal is the only way out, and she only cuts them for surveyors who already brought her the notes."));
+						await dialog.Msg(L("Listen — stay on this side of the portal. The seals are a one-way binding. Anything trying to come out gets pinned, and that includes you if you cross. Step through that gate and you don't come back. Not by sword, not by spell, not by prayer."));
+						await dialog.Msg(L("I've watched four people walk through that gate thinking they'd just take a quick look. None of them came back. So do me a favor — keep both feet outside the warp circle while you work. The seals are at arm's reach from the edge. You don't need to step inside to read them."));
+						await dialog.Msg(L("Four seals around the warp point. Walk it counter-clockwise — old soldier's habit. Look close at each rune for pitting in the strokes or soft edges. If you start tasting metal, that's the pollen getting to you. Back off and count to ten."));
+						await dialog.Msg(L("Finish the survey and the wardmage in Fedimian sends a Seal Release Crystal back with my courier — one for the inspector. {#FF6666}Don't go in until you have it.{/} The crystal is the only way back out, and she only cuts them for surveyors who actually brought her the notes."));
 						break;
 
 					case "info":
 						await dialog.Msg(L("{#666666}*He grips the haft of his halberd a little tighter*{/}"));
-						await dialog.Msg(L("You don't come back out. That's what happens. The seals are a one-way binding - they don't care whether you're a demon or a man, only that you crossed the threshold from the inside. Anything with a soul-tether trying to leave the prison gets pinned by the wards."));
-						await dialog.Msg(L("Three militiamen and a Pyromancer have walked through that gate in my time on this line. None of them came back. We hear them sometimes, on the wind. It carries from the other side."));
-						await dialog.Msg(L("The wardmage in Fedimian can attune a Seal Release Crystal to a single bearer - the crystal slips you past the binding on the way out. She makes them sparingly, and only for surveyors who give her something useful. So if you ever plan on going in there - finish the seal survey first, and don't lose the crystal."));
+						await dialog.Msg(L("You don't come back out, that's what happens. The seals are a one-way binding — they don't care if you're a demon or a man, only that you crossed from the inside. Anything trying to leave the prison gets pinned."));
+						await dialog.Msg(L("Three militiamen and a Pyromancer have walked through that gate while I've been posted here. None of them came back. We hear them sometimes, when the wind's right."));
+						await dialog.Msg(L("The wardmage in Fedimian can tune a Seal Release Crystal to a single person — that's what slips you past the binding on the way out. She doesn't make many, and only for surveyors who bring her useful notes. So if you ever plan on going in there, finish the survey first, and don't lose the crystal."));
 						break;
 
 					case "leave":
@@ -352,39 +352,39 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 				if (stonesVisited >= 4)
 				{
-					await dialog.Msg(L("{#666666}*He spreads your notes on his shield, running through each seal's measurements with a gloved finger*{/}"));
-					await dialog.Msg(L("Three of the seals show steady wear. Centuries of weather, even decay, nothing surprising. The fourth is eroding faster than the others. Pitted strokes. Edges going soft. The pollen is eating at it harder than wind ever could."));
-					await dialog.Msg(L("{#666666}*He folds the notes into his courier-pouch and hands you a small pale crystal in return*{/}"));
-					await dialog.Msg(L("Wardmage's standing offer. A Seal Release Crystal, attuned to your survey - she keeps a few cut and ready for whoever does her the favor. Keep it on you. If you ever set foot inside that prison, the crystal is what gets you back out."));
-					await dialog.Msg(L("The wardmage in Klaipeda needs to see this before that fourth seal fails. Soldier's purse for your trouble."));
+					await dialog.Msg(L("{#666666}*He spreads your notes on his shield, going through each seal's measurements*{/}"));
+					await dialog.Msg(L("Three of the seals show even wear. Centuries of weather, nothing unusual. The fourth one is eroding faster than the others — pitted strokes, soft edges. The pollen's chewing at it harder than wind ever could."));
+					await dialog.Msg(L("{#666666}*He folds the notes into his courier-pouch and hands you a small pale crystal*{/}"));
+					await dialog.Msg(L("Wardmage's standing offer — a Seal Release Crystal, attuned to your survey. She keeps a few cut and ready for anyone who does her the favor. Hang on to it. If you ever set foot inside that prison, that crystal is how you get back out."));
+					await dialog.Msg(L("The wardmage in Klaipeda needs to see this before the fourth seal fails. Soldier's purse for your trouble."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Four seals. Counter-clockwise. Inspect each one closely. Don't linger at the portal."));
+					await dialog.Msg(L("Four seals, counter-clockwise. Inspect each one up close, and don't linger at the portal."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The wardmage rode out two days ago. She's drafting a re-carving plan for the fourth seal. The other three should hold for another generation, she thinks."));
+				await dialog.Msg(L("The wardmage rode out two days ago. She's drafting a re-carving plan for the fourth seal. The other three should hold another generation, she thinks."));
 
 				if (character.Inventory.CountItem(650530) <= 0)
 				{
-					var response = await dialog.Select(L("You're not carrying the Seal Release Crystal she cut for you. Used it, lost it, or never picked it up - doesn't matter. The wardmage left a small stock with my courier for exactly this. Want a replacement?"),
+					var response = await dialog.Select(L("You're not carrying the Seal Release Crystal she cut for you. Used it, lost it, never picked it up — doesn't matter. The wardmage left a small stock with my courier for exactly this. Want a replacement?"),
 						Option(L("Yes, I'll take one"), "give"),
 						Option(L("No, I'm fine"), "decline")
 					);
 
 					if (response == "give")
 					{
-						await dialog.Msg(L("{#666666}*He digs a fresh pale crystal out of his courier-pouch and presses it into your hand*{/}"));
-						await dialog.Msg(L("Last one in the pouch. The courier rides for Fedimian tomorrow; she'll send more by week's end. Keep it on you this time."));
+						await dialog.Msg(L("{#666666}*He digs a fresh pale crystal out of his courier-pouch and hands it to you*{/}"));
+						await dialog.Msg(L("Last one in the pouch. Courier rides for Fedimian tomorrow — she'll send more by week's end. Keep it on you this time."));
 						character.Inventory.Add(650530, 1, InventoryAddType.PickUp);
 					}
 					else
 					{
-						await dialog.Msg(L("Suit yourself. Come back if you change your mind - the pouch isn't going anywhere."));
+						await dialog.Msg(L("Suit yourself. Come back if you change your mind — the pouch isn't going anywhere."));
 					}
 				}
 			}

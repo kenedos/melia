@@ -16,6 +16,10 @@ public class FFarm492MobScript : GeneralScript
 		// Property Overrides -------------------------------
 
 
+		// Guards -------------------------------------------
+
+		AddCombatNpc(147410, "Farm Guard", "f_farm_49_2", 1778, 1370, 0, level: 60);
+
 		// Monster Spawners ---------------------------------
 
 		AddSpawner("f_farm_49_2.Id1", MonsterId.Stub_Tree_Orange, min: 19, max: 25, Seconds(25), tendency: TendencyType.Aggressive);

@@ -1292,6 +1292,19 @@ namespace Melia.Zone.World.Actors
 			=> entity.Components.Get<CombatComponent>()?.SetAttackState(inAttackState);
 
 		/// <summary>
+		/// Makes the entity display the given message as a chat bubble above
+		/// their head.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="format"></param>
+		/// <param name="args"></param>
+		public static void Say(this ICombatEntity entity, string format, params object[] args)
+		{
+			var message = args == null || args.Length == 0 ? format : string.Format(format, args);
+			Send.ZC_CHAT(entity, message);
+		}
+
+		/// <summary>
 		/// Sets the entity's casting state for a specific skill.
 		/// </summary>
 		/// <param name="entity"></param>

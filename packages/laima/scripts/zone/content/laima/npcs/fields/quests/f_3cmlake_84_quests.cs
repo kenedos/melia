@@ -34,7 +34,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A grizzled warden in oilskin watches the water carefully, one hand resting on the gaff at his belt.*{/}"));
+				await dialog.Msg(L("{#666666}*A grizzled warden in an oilskin coat keeps an eye on the water.*{/}"));
 				await dialog.Msg(L("There are 4 Pelke shrine markers around the reservoir. I need someone to activate each one so the priests can read the water and know where to perform their cleansing rites."));
 				await dialog.Msg(L("Be warned — when you activate a marker, the sound it makes draws the Pearlites in the water. They'll attack you while the marker reads. You'll have to fight them off until it finishes."));
 
@@ -52,7 +52,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 						break;
 
 					case "info":
-						await dialog.Msg(L("The markers absorb traces of whatever is in the water. When they're activated, the resonance carries through the reservoir — and the Pearlites react to it like blood in the shallows because the water here is so foul."));
+						await dialog.Msg(L("The markers pick up whatever's in the water. When you activate one, the sound spreads through the reservoir, and the Pearlites go for it because the water's so fouled right now."));
 						break;
 
 					case "leave":
@@ -69,7 +69,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 				if (vObj.Done || awakened >= 4)
 				{
-					await dialog.Msg(L("All four markers activated — three are deep purple, one barely gold. The priests will know exactly where to perform the cleansing. You did in an afternoon what my wardens couldn't manage in a week."));
+					await dialog.Msg(L("All four markers done. Three came up deep purple, one was barely gold. The priests will know where to start. My wardens couldn't have managed that in a week."));
 					character.Variables.Perm.Remove("Laima.Quests.f_3cmlake_84.Quest1001.Marker1");
 					character.Variables.Perm.Remove("Laima.Quests.f_3cmlake_84.Quest1001.Marker2");
 					character.Variables.Perm.Remove("Laima.Quests.f_3cmlake_84.Quest1001.Marker3");
@@ -85,7 +85,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The priests came right after you finished and started cleansing the worst stretches first. Two seasons later, half the shore is reading clean again."));
+				await dialog.Msg(L("The priests came in right after you finished. They started with the worst stretches. Half the shore reads clean again now."));
 			}
 		});
 
@@ -276,7 +276,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A warder kneels beside a half-buried Tree Root Crystal with her palm against it. The crystal gives off a clearly wrong vibration.*{/}"));
+				await dialog.Msg(L("{#666666}*A warder is reading a half-buried Tree Root Crystal. The thing is humming wrong.*{/}"));
 				await dialog.Msg(L("All the crystals around the reservoir have gone bad. They've absorbed the contaminated water and trapped the mana inside, where Pelke can't reclaim it."));
 				await dialog.Msg(L("The only way to fix it is to break the crystals open and release the trapped mana. Please break 8 of the worst ones on the deep shelf."));
 
@@ -398,10 +398,10 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A militia captain keeps her eyes fixed on the gate of Sienakal Graveyard, one hand never leaving the hilt of her saber.*{/}"));
-				await dialog.Msg(L("My post is here, watching that gate. Whatever's been stirring inside the graveyard hasn't come out yet — but if it does, I'm the only thing standing between it and the shrine."));
-				await dialog.Msg(L("Trouble is, the swarm out on the reservoir is thinning my patrols faster than I can replace them. I can't leave this gate, but I can't let the lakeshore turn into a second front either."));
-				await dialog.Msg(L("Thin them out for me — kill 12 Black Rajapearlites, 12 Blue Slimes, and 12 Sawpents. Quieter shore means I can keep my eyes where they need to be."));
+				await dialog.Msg(L("{#666666}*A militia captain is watching the gate of Sienakal Graveyard. Hand on her saber.*{/}"));
+				await dialog.Msg(L("My post is here. I watch that gate. Something's been moving around in there and if it comes out, I'm what's between it and the shrine."));
+				await dialog.Msg(L("Problem is, the swarm on the reservoir keeps chewing through my patrols. I can't leave the gate, but I can't let the shore go either."));
+				await dialog.Msg(L("Help me thin them out — 12 Black Rajapearlites, 12 Blue Slimes, and 12 Sawpents. If the shore's quiet I can keep my eyes here."));
 
 				var response = await dialog.Select(L("Will you take the contract?"),
 					Option(L("I'll do the sweep."), "help"),
@@ -417,7 +417,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 						break;
 
 					case "info":
-						await dialog.Msg(L("Sienakal hasn't been quiet lately. Lights moving where there shouldn't be any, sounds I won't repeat. If anything walks out of that gate, I'd rather face it with my back to a clear shore than a panicked one."));
+						await dialog.Msg(L("Sienakal hasn't been quiet. Lights moving where they shouldn't be, sounds I'd rather not describe. If something does come out of that gate, I'd rather not have a panic on the shore behind me at the same time."));
 						break;
 
 					case "leave":
@@ -434,7 +434,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 				if (pObj.Done && sObj.Done && wObj.Done)
 				{
-					await dialog.Msg(L("All three groups thinned out. The shore reads quiet from here for the first time in weeks. Now I can hold this gate without splitting my attention. Your pay's earned."));
+					await dialog.Msg(L("All three groups thinned out. Shore's quiet from here for the first time in weeks. Now I can watch this gate without splitting my attention. Pay's yours."));
 					character.Quests.Complete(questId);
 				}
 				else
@@ -444,7 +444,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The shore stays quiet. I can keep my watch on the graveyard gate without a knife in my back from the lakeside. That's worth more than coin."));
+				await dialog.Msg(L("Shore's still quiet. I can keep my watch on the gate without worrying about my back. Worth more than the silver, honestly."));
 			}
 		});
 	}

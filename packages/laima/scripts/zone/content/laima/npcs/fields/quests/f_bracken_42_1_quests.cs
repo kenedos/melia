@@ -33,9 +33,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Trade caravans used to roll through Khonot Forest without losing more than the odd horseshoe. Not anymore."));
-				await dialog.Msg(L("A troupe of Blue Gosaru has claimed the canopy along the western trail. They drop on travelers from the branches without warning, and the merchant guild has stopped sending escorts because too few come back."));
-				await dialog.Msg(L("If we don't break their numbers soon, the inland villages will be cut off from Orsha entirely."));
+				await dialog.Msg(L("Caravans used to come through Khonot Forest without much trouble. Not anymore."));
+				await dialog.Msg(L("There's a troupe of Blue Gosaru living in the trees along the western trail. They drop down on travelers without warning. The merchant guild stopped sending escorts because too many of them weren't coming back."));
+				await dialog.Msg(L("If we don't cut their numbers down soon, the inland villages are going to be cut off from Orsha completely."));
 
 				var response = await dialog.Select(L("Will you help thin the troupe?"),
 					Option(L("I'll kill them"), "help"),
@@ -47,17 +47,17 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Thirty-five should break their pack for a full season. Stay clear of the trees with the heaviest growth - that's where they nest and where they ambush from."));
-						await dialog.Msg(L("And keep your eyes upward as you walk. They're patient hunters."));
+						await dialog.Msg(L("Thirty-five should be enough to break the pack for a season. Stay away from the thickest trees — that's where they nest and where the ambushes come from."));
+						await dialog.Msg(L("And keep looking up while you walk. They're patient."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("They're smart. Smarter than apes have any right to be. They post lookouts, they signal each other across half a mile of canopy, and they bait travelers into the deeper brush before they strike."));
-						await dialog.Msg(L("I've watched them work. It's organized. That's what makes them dangerous."));
+						await dialog.Msg(L("They're smart. Way smarter than apes should be. They post lookouts and signal each other across the canopy, and they'll lure people into the deeper brush before jumping them."));
+						await dialog.Msg(L("I've watched them. It's organized. That's what makes them dangerous."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Don't take too long deciding. Every week the trail closes, another inland village stretches its larder thinner."));
+						await dialog.Msg(L("Don't think about it too long. Every week the trail's closed, another inland village runs lower on supplies."));
 						break;
 				}
 			}
@@ -68,18 +68,18 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("The canopy is quiet for the first time in months. The trail is open again."));
-					await dialog.Msg(L("Take your pay, with my thanks. You've done a season's work in a few days."));
+					await dialog.Msg(L("The canopy's quiet for the first time in months. The trail's open again."));
+					await dialog.Msg(L("Take your pay. You did in a few days what we couldn't manage in a season. Thank you."));
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("The branches still rustle with them. Keep at it - we're not there yet."));
+					await dialog.Msg(L("Branches are still moving with them up there. Keep at it."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Caravans are rolling through Khonot again. First time in months. The merchant guild sends their thanks every time one arrives."));
+				await dialog.Msg(L("Caravans are coming through Khonot again. First time in months. The merchant guild sends thanks every time one makes it through."));
 			}
 		});
 
@@ -94,8 +94,8 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Blue Gosarus carry a stone in their gut - a slow-grown crystal the canopy brutes use to channel whatever passes for thought between them."));
-				await dialog.Msg(L("Cracked open, those stones break into shards that hum to the touch. The Orsha mage-houses pay real silver for clean fragments, and the regular trappers won't go deep enough to reach the troupe."));
+				await dialog.Msg(L("Blue Gosarus carry a stone in their gut. Some kind of crystal — the apes use it to communicate with each other, near as anyone can tell."));
+				await dialog.Msg(L("If you crack one open, you get shards that hum when you touch them. The Orsha mage-houses pay good silver for clean ones. Trouble is, regular trappers won't go in deep enough to find the troupe."));
 
 				var response = await dialog.Select(L("Interested in the work?"),
 					Option(L("I'll harvest the shards"), "help"),
@@ -107,17 +107,17 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Cut the stone clean from the gut, then split it across the grain. The shards come apart on their own if you've found the right line."));
-						await dialog.Msg(L("Seven clean shards is the count. You'll crack more than that before you've found seven the mage-houses will look at twice."));
+						await dialog.Msg(L("Cut the stone out clean and split it across the grain. If you find the right line, the shards come apart on their own."));
+						await dialog.Msg(L("I need seven clean ones. You'll have to crack a lot more than seven to get that — the mage-houses are picky."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Translucent, no clouding, no fracture-lines through the body. A clean shard hums under your thumb. A bad one sits dead."));
-						await dialog.Msg(L("You'll know one when you feel it - the prime shards almost sing in the light."));
+						await dialog.Msg(L("Has to be see-through, no cloudy bits, no cracks. A clean one hums when you hold it. A bad one just sits there."));
+						await dialog.Msg(L("You'll feel the difference. The good ones almost ring."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Fair enough. There'll be another hunter along by week's end."));
+						await dialog.Msg(L("Fair enough. Another hunter'll come by before the week's out."));
 						break;
 				}
 			}
@@ -129,19 +129,19 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 				if (killObj.Done && sObj.Done)
 				{
-					await dialog.Msg(L("Seven clean shards, every one of them humming. The mage-houses will be stocked through next month, easy."));
-					await dialog.Msg(L("Here's your pay, and a little extra for the quality. We might do business again."));
+					await dialog.Msg(L("Seven clean ones, all humming. That'll keep the mage-houses stocked through next month, easy."));
+					await dialog.Msg(L("Here's your pay. Little extra for the quality. We could do business again."));
 					character.Inventory.Remove(666120, character.Inventory.CountItem(666120), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep cracking the stones. Seven clean shards is the count - the dud ones you can sell to apprentices."));
+					await dialog.Msg(L("Keep cracking stones. Seven clean ones is what I need. The duds you can sell to apprentices."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Sold out of Gosaru shards by week's end. The Orsha mage-houses are already asking when the next batch comes in."));
+				await dialog.Msg(L("Sold out of Gosaru shards by the end of the week. The Orsha mage-houses are already asking about the next batch."));
 			}
 		});
 
@@ -156,8 +156,8 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Caravan drivers won't roll the Khonot trail without a tooth-charm hung from the lead horse's bridle. Old road-superstition - and right now I haven't a single one to sell them."));
-				await dialog.Msg(L("Blue Doyor fangs are what I carve. Bored, threaded, etched with the old marks. Six clean fangs and I can string charms for the next caravan run."));
+				await dialog.Msg(L("Caravan drivers won't take the Khonot trail without a tooth-charm hanging off the lead horse's bridle. Old superstition. And I'm clean out of them right now."));
+				await dialog.Msg(L("I carve them from Blue Doyor fangs. Drilled, threaded, marked up. If you can bring me six clean fangs, I can have charms ready for the next caravan."));
 
 				var response = await dialog.Select(L("Will you help me?"),
 					Option(L("I'll bring the fangs"), "help"),
@@ -169,16 +169,16 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Six fangs - the long canines, mind you, not the molars. And make sure they're not splintered. Cracked fangs split under the bow-drill and ruin the carving."));
+						await dialog.Msg(L("Six fangs — the long canines, mind, not the molars. And make sure they're not cracked. Cracked ones split under the drill and the carving's ruined."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Drivers swear a Doyor fang on the harness keeps the canopy beasts off the lead horse. Whether that's true or just nerve-medicine, I couldn't say."));
-						await dialog.Msg(L("But every caravan that's come through with one of my charms has come through whole. Every caravan without one has lost something. Make of that what you will."));
+						await dialog.Msg(L("Drivers swear a Doyor fang on the harness keeps the canopy beasts off the lead horse. Maybe it's true, maybe it's just something to settle their nerves — I couldn't tell you."));
+						await dialog.Msg(L("All I know is, every caravan that goes out with one of my charms comes back fine. The ones without lose people. Take that for what it's worth."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Caravan rolls in three days. If I've no charms to sell, the drivers will turn back at the trailhead - and the inland villages will go another month without grain."));
+						await dialog.Msg(L("Caravan leaves in three days. If I haven't got charms to sell, the drivers will turn around at the trailhead, and the inland villages go another month without grain."));
 						break;
 				}
 			}
@@ -190,19 +190,19 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 				if (killObj.Done && fObj.Done)
 				{
-					await dialog.Msg(L("Six clean fangs, every one of them sound. I'll have the charms strung and etched by the time the caravan reaches the trailhead."));
-					await dialog.Msg(L("Take this for your trouble - and if you're rolling out with the next caravan yourself, come back for one of the charms."));
+					await dialog.Msg(L("Six clean fangs, all sound. I'll have the charms threaded and marked by the time the caravan rolls out."));
+					await dialog.Msg(L("Take this for your trouble. And if you're heading out with the next caravan yourself, come back for one of the charms."));
 					character.Inventory.Remove(650692, character.Inventory.CountItem(650692), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Still need those fangs. Keep hunting - and remember, the long canines, unsplintered."));
+					await dialog.Msg(L("Still need those fangs. Keep hunting. And remember — long canines, no cracks."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Caravan rolled out yesterday with a fang on every lead bridle. Drivers paid double, and one came back asking for a second string already."));
+				await dialog.Msg(L("Caravan rolled out yesterday with a fang on every lead bridle. Drivers paid double for them, and one was already back asking for a second string."));
 			}
 		});
 
@@ -217,9 +217,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("I'm building a glider. A real one - not a child's toy, not a model. A machine a grown man can ride."));
-				await dialog.Msg(L("Yellow Folibu wings are the only material in three days' ride that's both light enough and strong enough. Translucent, taut as drum-skin, and they don't tear under load."));
-				await dialog.Msg(L("Five intact wings is all I need to finish the prototype. Three years of calculations, and it all comes down to this."));
+				await dialog.Msg(L("I'm building a glider. A real one — not a toy, not a model. Big enough for a grown man to ride."));
+				await dialog.Msg(L("Yellow Folibu wings are the only thing in three days' ride that's both light enough and strong enough. They're see-through, tight as a drum, and they hold up under weight."));
+				await dialog.Msg(L("I just need five intact wings to finish the prototype. Three years of calculations, and it all comes down to this."));
 
 				var response = await dialog.Select(L("Want to be part of history?"),
 					Option(L("I'll harvest the wings"), "help"),
@@ -231,17 +231,17 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Tear them at the joint, never through the membrane. A puncture and the wing's useless to me - the air leaks straight through."));
-						await dialog.Msg(L("You'll kill more than five Folibus to get five clean wings. That's just the way of it."));
+						await dialog.Msg(L("Tear them at the joint, never through the membrane. One puncture and the wing's useless — the air leaks right through."));
+						await dialog.Msg(L("You'll have to kill more than five Folibus to get five clean wings. That's just how it goes."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("It will fly. It has to. I've been over the figures a thousand times - the lift surface, the keel weight, the trim of the membrane."));
-						await dialog.Msg(L("Five wings and I prove it. Or I don't, and I admit my whole life's work was a fool's errand. Either way, I have to know."));
+						await dialog.Msg(L("It will fly. It has to. I've been over the numbers a thousand times — the lift, the weight, the way the wing trims out."));
+						await dialog.Msg(L("Five wings and I'll know one way or the other. Either it works, or I've wasted my whole life. Either way, I need to find out."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then flight stays theoretical. For another year, anyway. Every furrier in Orsha calls me a fool, but the figures don't lie."));
+						await dialog.Msg(L("Then flight stays on paper. For another year, anyway. Every furrier in Orsha thinks I'm a fool, but the numbers don't lie."));
 						break;
 				}
 			}
@@ -253,19 +253,19 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 				if (killObj.Done && wObj.Done)
 				{
-					await dialog.Msg(L("Five wings, all of them whole! Look at this membrane - perfect, every one. Testing this weekend, on the ridge at dawn."));
-					await dialog.Msg(L("Take this with my thanks. If the glider works, your name goes in my notebook beside mine."));
+					await dialog.Msg(L("Five wings, all whole! Look at the membrane — perfect, every one. I'll test it on the ridge first thing this weekend."));
+					await dialog.Msg(L("Take this. If the glider works, your name goes in my notebook next to mine."));
 					character.Inventory.Remove(666172, character.Inventory.CountItem(666172), InventoryItemRemoveMsg.Given);
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep at it. Remember - tear at the joint, not through the membrane. Five intact wings."));
+					await dialog.Msg(L("Keep at it. Remember — tear at the joint, not through the membrane. Five intact wings."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The glider went six paces before it crashed into a tree. But it flew - it actually flew! Next prototype is already on the workbench."));
+				await dialog.Msg(L("The glider went six paces before it crashed into a tree. But it flew! It actually flew! Next prototype's already on the workbench."));
 			}
 		});
 
@@ -280,9 +280,9 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Forest-Ward Bronius will tell you to kill thirty-five Gosarus. That's a fine job for a forester. But the troupe won't stay broken."));
-				await dialog.Msg(L("There's a king to that pack. Three times the size of his troupe, and twice as cunning. He won't show himself while his apes are full strength."));
-				await dialog.Msg(L("Thin ten of his troupe and he'll come down from the canopy himself to defend them. That's when we have him."));
+				await dialog.Msg(L("Bronius'll tell you to kill thirty-five Gosarus. That's fine work, but the troupe won't stay broken for long."));
+				await dialog.Msg(L("There's a king in that pack. Three times the size of the rest, and a lot smarter. He won't come out while his apes are at full strength."));
+				await dialog.Msg(L("Kill ten of his troupe and he'll drop down from the canopy himself. That's our chance."));
 
 				var response = await dialog.Select(L("Will you take the bounty?"),
 					Option(L("I'll face the King"), "help"),
@@ -294,17 +294,17 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Kill exactly ten Blue Gosarus. The King will drop from the canopy as soon as the tenth falls."));
-						await dialog.Msg(L("Stay clear of the heavy branches. He doesn't climb down. He drops, and he brings half a tree with him."));
+						await dialog.Msg(L("Kill exactly ten Blue Gosarus. The King will come down as soon as the tenth one falls."));
+						await dialog.Msg(L("Stay away from the big branches. He doesn't climb down — he drops, and he takes half a tree with him."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Three times the size of a normal Blue Gosaru. Smart as a man, mean as a starving bear."));
-						await dialog.Msg(L("Tore the last hunter clean in half. I found his belt buckle, his coin purse, and nothing else. So go in respectful, or don't go in at all."));
+						await dialog.Msg(L("Three times the size of a regular Blue Gosaru. Smart as a man, and mean."));
+						await dialog.Msg(L("He tore the last hunter clean in half. All I found was a belt buckle and a coin purse. Go in respectful, or don't go in at all."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("His troupe grows every week. Eventually he'll come down whether anyone hunts him or not - and on his terms, that's worse."));
+						await dialog.Msg(L("His troupe gets bigger every week. Eventually he comes down whether anyone hunts him or not — and on his terms, that's worse for everyone."));
 						break;
 				}
 			}
@@ -316,22 +316,22 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 				if (kObj.Done)
 				{
-					await dialog.Msg(L("The King is dead? Show me the hide. Aye - that's him. That's the bastard."));
-					await dialog.Msg(L("Khonot's breathing again. Caravans will pass without escort soon. Pay's yours, with a hunter's bonus on top."));
+					await dialog.Msg(L("The King's dead? Show me the hide. Yeah — that's him. That's the bastard."));
+					await dialog.Msg(L("Khonot's safe again. Caravans will be running without escort soon. Pay's yours, with a hunter's bonus on top."));
 					character.Quests.Complete(questId);
 				}
 				else if (gObj.Done)
 				{
-					await dialog.Msg(L("The canopy's shaking - he's down! Find him and finish it before he climbs back."));
+					await dialog.Msg(L("The canopy's shaking — he's down! Find him and finish it before he climbs back up."));
 				}
 				else
 				{
-					await dialog.Msg(L("Ten of his troupe first. He won't show himself until they thin out - that's how it always works with the canopy kings."));
+					await dialog.Msg(L("Ten of his troupe first. He won't show until they thin out — that's how it works with the canopy kings."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Khonot's breathing. Caravans pass without escort now. You did real work - the kind that gets remembered."));
+				await dialog.Msg(L("Khonot's safe. Caravans run without escorts now. That was real work — the kind people remember."));
 			}
 		});
 
@@ -346,8 +346,8 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Standard caravan-protection contract. Khonot has three problem species - Gosarus, Doyors, and Tanus - and unless someone kills them on a schedule, they overrun the trails within a month."));
-				await dialog.Msg(L("Twelve of each. Doesn't matter what order, just bring me the count. The merchant guild pays per sweep, and they pay fair."));
+				await dialog.Msg(L("Standard caravan-protection contract. Khonot has three problem species — Gosarus, Doyors, and Tanus. Unless somebody kills them on a regular schedule, they take over the trails within a month."));
+				await dialog.Msg(L("Twelve of each. Doesn't matter what order, just give me the count when you're done. The merchant guild pays per sweep, and they pay fair."));
 
 				var response = await dialog.Select(L("Take the contract?"),
 					Option(L("I'll do the sweep"), "help"),
@@ -359,7 +359,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Thirty-six in total. Keep moving and you'll find them in any direction you walk - they're the whole forest's pulse."));
+						await dialog.Msg(L("Thirty-six total. Keep moving and you'll find them in any direction — they're all over the forest."));
 						break;
 
 					case "info":
@@ -367,7 +367,7 @@ public class FBracken421QuestNpcsScript : GeneralScript
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Caravan rolls through in three days regardless. Hope the trails are clear - or that the guild hires someone less choosy than you."));
+						await dialog.Msg(L("Caravan comes through in three days either way. Hope the trails are clear, or that the guild finds someone less choosy."));
 						break;
 				}
 			}
@@ -380,18 +380,18 @@ public class FBracken421QuestNpcsScript : GeneralScript
 
 				if (gObj.Done && dObj.Done && tObj.Done)
 				{
-					await dialog.Msg(L("Sweep done, full count, all three species. Caravan'll roll clean through Khonot now."));
-					await dialog.Msg(L("Take your pay, with my thanks. I'll mark you down for the next contract."));
+					await dialog.Msg(L("Sweep done, full count, all three species. Caravan will get through Khonot fine now."));
+					await dialog.Msg(L("Take your pay. Thanks. I'll mark you down for the next contract."));
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep at the sweep. Twelve of each is the count - Gosarus, Doyors, Tanus."));
+					await dialog.Msg(L("Keep at the sweep. Twelve of each — Gosarus, Doyors, Tanus."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Caravan went through without a scratch. You'll be the first I call when the next contract opens."));
+				await dialog.Msg(L("Caravan made it through without a scratch. You'll be the first I call when the next contract opens up."));
 			}
 		});
 

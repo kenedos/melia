@@ -1051,6 +1051,9 @@ namespace Melia.Zone.Scripting.AI
 				}
 				if (!this.IsHating(potentialEnemy) && this.Entity.Tendency == TendencyType.Aggressive)
 					amount *= 2.5f;
+
+				if (potentialEnemy is Mob potentialMob && potentialMob.Vars.GetBool("Laima.Guards.IsGuard"))
+					amount *= 2f;
 				// -----------------------
 
 				this.IncreaseHate(potentialEnemy, amount);
@@ -1184,6 +1187,21 @@ namespace Melia.Zone.Scripting.AI
 		public void AddHate(ICombatEntity entity, float amount)
 		{
 			this.IncreaseHate(entity, amount);
+		}
+
+		/// <summary>
+		/// Returns the highest current hate value across all tracked targets,
+		/// or 0 if there are none.
+		/// </summary>
+		public float GetMaxHate()
+		{
+			var max = 0f;
+			foreach (var hate in _hateLevels.Values)
+			{
+				if (hate > max)
+					max = hate;
+			}
+			return max;
 		}
 
 		/// <summary>
@@ -2187,6 +2205,19 @@ namespace Melia.Zone.Scripting.AI
 		protected bool IsUsingSkill()
 		{
 			return this.Entity.IsCasting();
+		}
+
+		/// <summary>
+		/// Returns true if the entity is still inside its current skill's
+		/// shoot-time window. Use this to gate parallel transitions that
+		/// would otherwise cut a skill animation short.
+		/// </summary>
+		protected bool IsBusyWithSkill()
+		{
+			if (this.IsUsingSkill())
+				return true;
+
+			return DateTime.UtcNow - _lastSkillUseTime < _lastSkillDuration;
 		}
 
 		#region TempVar Helpers

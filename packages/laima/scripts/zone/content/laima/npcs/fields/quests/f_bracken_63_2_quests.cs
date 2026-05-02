@@ -33,8 +33,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("You came through the Koru pass? Brave traveler. The deeper jungle is worse."));
-				await dialog.Msg(L("Loktanun swarm the frontier here. Their bite carries the same corruption rotting these trees."));
+				await dialog.Msg(L("You came through Koru pass? You're brave. It gets worse the deeper you go."));
+				await dialog.Msg(L("Loktanun are all over this frontier. Their bite carries the same corruption that's rotting these trees."));
 
 				var response = await dialog.Select(L("Will you stand the watch with me?"),
 					Option(L("I'll thin their numbers"), "help"),
@@ -77,13 +77,13 @@ public class FBracken632QuestNpcsScript : GeneralScript
 						break;
 
 					case "info":
-						await dialog.Msg(L("The corruption seeps up from the roots of the jungle itself."));
-						await dialog.Msg(L("Every creature that drinks the poisoned water turns hostile, eventually."));
-						await dialog.Msg(L("The Loktanun drank early and fell fastest."));
+						await dialog.Msg(L("The corruption comes up from the roots, somehow."));
+						await dialog.Msg(L("Anything that drinks the bad water goes hostile sooner or later."));
+						await dialog.Msg(L("The Loktanun drank early. They were the first to turn."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Don't wander off the marked trails. The mist hides worse than Loktanun."));
+						await dialog.Msg(L("Don't wander off the marked trails. There's worse than Loktanun in the mist."));
 						break;
 				}
 			}
@@ -94,9 +94,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("You did it. The frontier will be quiet for at least a few days now."));
+					await dialog.Msg(L("You did it. Frontier should be quiet for a few days, at least."));
 					await dialog.Msg(L("This dagger belonged to a scout who didn't make it back from the last sweep."));
-					await dialog.Msg(L("Better in your hands than rusting in a footlocker. Take it."));
+					await dialog.Msg(L("Better in your hands than rusting in a footlocker. It's yours."));
 
 					character.Quests.Complete(questId);
 				}
@@ -122,8 +122,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("A living sample, please! I need fresh sap from the Tainted Bracken clusters that have sprouted right around the village."));
-				await dialog.Msg(L("The bracken pulls poison straight from the soil and weeps it back out as red sap. If I can isolate what corrupts it, I can start brewing an antidote."));
+				await dialog.Msg(L("I need a fresh sample, please! Sap from the Tainted Bracken clusters growing around the village."));
+				await dialog.Msg(L("The bracken pulls poison up out of the soil and bleeds it out as red sap. If I can figure out what's corrupting it, I can start working on an antidote."));
 
 				var response = await dialog.Select(L("Will you gather the samples?"),
 					Option(L("I'll collect six samples"), "help"),
@@ -135,17 +135,17 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Six clusters should be enough to begin. Tap the bleeding stems carefully with the sample vial."));
-						await dialog.Msg(L("They're growing right at the edges of the village - you can't miss the red ones. Be cautious - some react poorly when disturbed."));
+						await dialog.Msg(L("Six should be enough to start with. Tap the bleeding stems carefully with the vial."));
+						await dialog.Msg(L("They're right at the edges of the village — you can't miss the red ones. Be careful, though. Some react badly when you disturb them."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Tainted Bracken roots run shallow but deep enough to drink whatever's poisoning the ground."));
-						await dialog.Msg(L("Their sap is potent enough that I can study the corruption itself, not just its effects."));
+						await dialog.Msg(L("Tainted Bracken roots are shallow, but deep enough to soak up whatever's poisoning the ground."));
+						await dialog.Msg(L("The sap is strong enough that I can study the corruption directly, not just what it does."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Fair. The jungle eats careless people."));
+						await dialog.Msg(L("Fair enough. The jungle isn't kind to careless people."));
 						break;
 				}
 			}
@@ -155,8 +155,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (sapCount >= 6)
 				{
-					await dialog.Msg(L("All six vials! And the hue is exactly what I feared - sickly red, not the healthy amber of true bracken."));
-					await dialog.Msg(L("This will keep my lab busy for weeks. Thank you."));
+					await dialog.Msg(L("All six vials! And the color's exactly what I was afraid of — sickly red, not the amber you'd see in healthy bracken."));
+					await dialog.Msg(L("This will keep me busy in the lab for weeks. Thank you."));
 
 					character.Inventory.Remove(650527, 6, InventoryItemRemoveMsg.Given);
 
@@ -251,8 +251,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("The Lapasape Mages on the western ridge aren't merely corrupted - they're channeling it."));
-				await dialog.Msg(L("They've anchored blood crystals across the ridge that drink in the poison and amplify it back into their spells."));
+				await dialog.Msg(L("The Lapasape Mages on the western ridge aren't just corrupted. They're using it."));
+				await dialog.Msg(L("They've set blood crystals up all over the ridge — the things soak up the poison and feed it into their spells."));
 
 				var response = await dialog.Select(L("Will you take this on?"),
 					Option(L("I'll cut them down and shatter the crystals"), "help"),
@@ -264,17 +264,17 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The crystals hover above the western ridge. Break them with your weapon - they resist magic."));
-						await dialog.Msg(L("Without the crystals the shamans are just tainted beasts. Thin them first so you can work in peace."));
+						await dialog.Msg(L("The crystals hover above the western ridge. Smash them with your weapon — they resist magic."));
+						await dialog.Msg(L("Without the crystals, the shamans are just tainted beasts. Thin them out first so you can work in peace."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Shatter a crystal and every spell within a hundred paces loses half its bite."));
-						await dialog.Msg(L("Shatter all four and the shamans can barely conjure at all."));
+						await dialog.Msg(L("Break one crystal and every spell within a hundred paces is half as strong."));
+						await dialog.Msg(L("Break all four and the shamans can barely cast anything."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("If you change your mind, the ridge is west of here. You can smell it before you see it."));
+						await dialog.Msg(L("If you change your mind, the ridge is west of here. You'll smell it before you get there."));
 						break;
 				}
 			}
@@ -286,8 +286,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 				if (killObj.Done && totemObj.Done)
 				{
-					await dialog.Msg(L("Crystals shattered, shamans slain. The ridge is just a ridge again."));
-					await dialog.Msg(L("Corruption still lingers in the earth, but the amplification is gone. That's a day's good work."));
+					await dialog.Msg(L("Crystals broken, shamans dead. The ridge is just a ridge again."));
+					await dialog.Msg(L("There's still corruption in the ground, but it's not getting boosted anymore. That's good work for one day."));
 
 					character.Inventory.Remove(650601, character.Inventory.CountItem(650601), InventoryItemRemoveMsg.Given);
 
@@ -306,7 +306,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The ridge is calmer now. The shamans that remain are just beasts, not priests."));
+				await dialog.Msg(L("Ridge is quieter now. The shamans that are left are just beasts, not priests."));
 			}
 		});
 
@@ -383,9 +383,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("I was mapping the corruption spread when a flock of Ponpon tore through my camp."));
-				await dialog.Msg(L("My survey pages scattered everywhere. Months of work, blown across this wretched jungle."));
-				await dialog.Msg(L("Worse - the Ponpon are dragging the pages back to their roosts. They're shredding my parchment to line their nests."));
+				await dialog.Msg(L("I was mapping how the corruption spreads when a flock of Ponpon ripped through my camp."));
+				await dialog.Msg(L("My survey pages scattered everywhere. Months of work, blown all over this miserable jungle."));
+				await dialog.Msg(L("And worse — the Ponpon are dragging the pages back to their nests. They're shredding my parchment to line them."));
 
 				var response = await dialog.Select(L("Can you help recover them?"),
 					Option(L("I'll find your pages and clear the flock"), "help"),
@@ -397,15 +397,15 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Look for Ponpon nests - that's where the pages will be, woven into the twigs and feathers."));
-						await dialog.Msg(L("Recover at least eight pages. The flock will swarm you the moment you disturb a nest, so be ready."));
-						await dialog.Msg(L("And please, put down at least ten Ponpon so I can work without being dive-bombed."));
+						await dialog.Msg(L("Look for Ponpon nests — that's where the pages are, woven into the twigs and feathers."));
+						await dialog.Msg(L("Recover at least eight pages. The flock will swarm you the moment you touch a nest, so be ready for it."));
+						await dialog.Msg(L("And please, kill at least ten Ponpon so I can work without getting dive-bombed."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("I'm charting how fast the corruption advances, where it stalls, where it accelerates."));
-						await dialog.Msg(L("If we understand the pattern, maybe we can predict where it strikes next."));
-						await dialog.Msg(L("The Ponpon line their nests with anything paper-soft. Once they took the pages, they wove them straight in."));
+						await dialog.Msg(L("I'm tracking how fast the corruption moves. Where it slows down, where it speeds up."));
+						await dialog.Msg(L("If we figure out the pattern, maybe we can guess where it'll hit next."));
+						await dialog.Msg(L("The Ponpon line their nests with anything soft. Once they had the pages, they wove them right in."));
 						break;
 
 					case "leave":
@@ -630,8 +630,8 @@ public class FBracken632QuestNpcsScript : GeneralScript
 						break;
 
 					case "info":
-						await dialog.Msg(L("The Loktanun own the ground, the Ponpon own the air above it."));
-						await dialog.Msg(L("Travelers get pincered between them. Nothing moves east without paying a toll in blood."));
+						await dialog.Msg(L("Loktanun rule the ground, Ponpon rule the air above it."));
+						await dialog.Msg(L("Travelers get caught between the two. Nothing makes it east without losing people."));
 						break;
 
 					case "leave":

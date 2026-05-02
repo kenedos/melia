@@ -26,7 +26,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Andrius - Orange Stumpy Trees invading tomato fields
 		//---------------------------------------------------------------------
-		AddNpc(20138, L("[Farmer] Andrius"), "f_farm_49_2", 913, -1332, 0, async dialog =>
+		AddNpc(20138, L("[Farmer] Andrius"), "f_farm_49_2", 559, -1267, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1001);
@@ -84,7 +84,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The stumps have stayed in their forest for three nights running. Long may it last."));
+				await dialog.Msg(L("The stumps have stayed in their forest three nights running. Hope it stays that way."));
 			}
 		});
 
@@ -93,7 +93,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Jonas - Tomato season reply for Morta
 		//---------------------------------------------------------------------
-		AddNpc(20117, L("[Farmer] Jonas"), "f_farm_49_2", 593, 492, 90, async dialog =>
+		AddNpc(20117, L("[Farmer] Jonas"), "f_farm_49_2", 626.1717f, 647.68665f, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1002);
@@ -102,32 +102,33 @@ public class FFarm492QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*The old farmer you met at the Myrkiti warp taps the glass of a sealed greenhouse with a knuckle, listening for cracks*{/}"));
-				await dialog.Msg(L("Panes held through the night. Tomatoes are still red, still round, still mine. Morta's warning was worth its weight in gold."));
+				await dialog.Msg(L("{#666666}*The old farmer you met at the Myrkiti farm looks up from a basket of tomatoes, grinning*{/}"));
+				await dialog.Msg(L("Hey, you again! Look at this field - the whole thing's red. Last week I thought half of it would rot before harvest."));
+				await dialog.Msg(L("That warning Morta sent us? That's what saved it. We got the husks and masks on in time, and the pollen just blew right past."));
 
-				var response = await dialog.Select(L("I've written her a proper reply - season forecast, a thank-you, and a standing offer to trade husks for tomatoes every autumn. Courier Benas heads north tomorrow at dawn. Take the letter to him before he sets off?"),
-					Option(L("I'll carry it to Benas"), "help"),
-					Option(L("Write her yourself?"), "info"),
+				var response = await dialog.Select(L("I wrote her a thank-you letter last night. The courier, Benas, is heading north tomorrow morning. Can you bring it to him before he leaves?"),
+					Option(L("Sure, I'll take it"), "help"),
+					Option(L("Why not write her yourself later?"), "info"),
 					Option(L("Find your own courier"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He hands you a thick envelope sealed with dried tomato vine*{/}"));
+						await dialog.Msg(L("{#666666}*He pulls an envelope out of his vest and hands it over*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The envelope's tied with vine - that's my seal these days. Morta will know it on sight."));
-						await dialog.Msg(L("Mind the walking stumps on the northern path. Andrius was still killing them last I heard."));
+						await dialog.Msg(L("I tied it with tomato vine instead of wax. Morta'll laugh, but she'll know it's from me."));
+						await dialog.Msg(L("Watch yourself on the road north. Andrius is still dealing with those walking stumps."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("These old hands write slow. Benas writes a full letter in the time I draft three lines. He adds his own news too - weather from up north, who's sick, who's selling what."));
-						await dialog.Msg(L("A courier letter is half a newspaper around here. Faster if you can read it, fancier if you can't."));
+						await dialog.Msg(L("My hands aren't fast anymore. Benas writes a whole letter in the time I write three lines."));
+						await dialog.Msg(L("Plus he adds news from up north - who's sick, what the weather's like, that kind of thing. Morta likes hearing it."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then I'll wait for next week's run. Morta'll be patient - she always is."));
+						await dialog.Msg(L("Alright, I'll wait for next week's run then. She won't mind."));
 						break;
 				}
 			}
@@ -138,27 +139,27 @@ public class FFarm492QuestNpcsScript : GeneralScript
 
 				if (deliverObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He smiles, a hand resting on the greenhouse frame*{/}"));
-					await dialog.Msg(L("Good. Benas has the letter. Morta will have her season forecast by sundown."));
-					await dialog.Msg(L("Here - a crate of fresh tomatoes from the saved crop. Take three for yourself. You've earned them twice over."));
+					await dialog.Msg(L("{#666666}*He sets his basket down and smiles*{/}"));
+					await dialog.Msg(L("Good. Benas has it. Morta'll be reading it by sundown, and complaining about my handwriting by supper."));
+					await dialog.Msg(L("Here, take these tomatoes. Three of the best ones. Slice them thick, add a little salt - that's all you need."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Benas is at the Myrkiti warp. Ahead of you on the map, north. Go before he leaves."));
+					await dialog.Msg(L("Benas is up at the new settlement, north of here. They're laying out vineyard rows up there. Go before he leaves."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Morta's husks arrived yesterday. Half my farmhands wear her masks now. We trade like neighbors ought to."));
+				await dialog.Msg(L("Morta sent us two crates of husks yesterday. Half my farmhands have masks now. That's how neighbors should be."));
 			}
 		});
 
 		// =====================================================================
 		// Courier Benas - Recipient for Quest 1002
 		//---------------------------------------------------------------------
-		AddNpc(20125, L("[Courier] Benas"), "f_farm_49_2", 1976, 1472, 225, async dialog =>
+		AddNpc(20125, L("[Courier] Benas"), "f_farm_49_2", -1889, 916, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1002);
@@ -167,8 +168,9 @@ public class FFarm492QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.IsActive(questId))
 			{
-				await dialog.Msg(L("{#666666}*A courier checks the weight of his satchel, glancing north along the road*{/}"));
-				await dialog.Msg(L("North run tomorrow at dawn. Bring any mail now - I seal the bag at sundown."));
+				await dialog.Msg(L("{#666666}*A courier checks his satchel while workers hammer stakes into the slope behind him*{/}"));
+				await dialog.Msg(L("Big plans for this place - they're putting in a vineyard. Grapes next year, wine the year after, if the weather plays nice."));
+				await dialog.Msg(L("I head out at dawn. If you've got mail, hand it over now. I'm closing up the bag at sundown."));
 				return;
 			}
 
@@ -176,13 +178,13 @@ public class FFarm492QuestNpcsScript : GeneralScript
 
 			if (delivered)
 			{
-				await dialog.Msg(L("Jonas's letter is bagged. Morta'll have it by lunch tomorrow."));
+				await dialog.Msg(L("Jonas's letter is in the bag. Morta'll have it by lunch tomorrow."));
 				return;
 			}
 
-			await dialog.Msg(L("{#666666}*He weighs the envelope, impressed*{/}"));
-			await dialog.Msg(L("Vine-seal. That's Jonas's mark, sure enough. Heavy envelope, too - must be a proper season forecast."));
-			await dialog.Msg(L("Tell Jonas I'll deliver it first thing. And tell him I'll add my own news - the Baron Allerno steward's health, the weather from the thorn fields. Morta appreciates the full picture."));
+			await dialog.Msg(L("{#666666}*He looks at the envelope and laughs*{/}"));
+			await dialog.Msg(L("Tied with tomato vine. Yeah, that's Jonas alright. Feels heavy too - he must've written her a long one."));
+			await dialog.Msg(L("Tell him I'll deliver it first thing. And I'll let her know about the vineyard going in up here. Maybe she'll send me a bottle when it's done."));
 
 			character.Variables.Perm.Set("Laima.Quests.f_farm_49_2.Quest1002.Delivered", 1);
 			character.ServerMessage(L("{#FFD700}Letter delivered. Return to Jonas.{/}"));
@@ -193,7 +195,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 		// =====================================================================
 		// Farmer Janina - Apothecary-farmer distilling anti-pollen poultices
 		//---------------------------------------------------------------------
-		AddNpc(157100, L("[Farmer] Janina"), "f_farm_49_2", 298, -582, 90, async dialog =>
+		AddNpc(157100, L("[Farmer] Janina"), "f_farm_49_2", 1831, 1421, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1003);
@@ -227,7 +229,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then breathe shallow if you cross the south fields. My poultices go to those who ask for them, not those who wouldn't."));
+						await dialog.Msg(L("Then breathe shallow if you cross the south fields. My poultices go to people who ask for them, not the ones who can't be bothered."));
 						break;
 				}
 			}
@@ -262,7 +264,7 @@ public class FFarm492QuestNpcsScript : GeneralScript
 
 		void AddCystGrowth(int cystNumber, int x, int z, int direction)
 		{
-			AddNpc(152011, L("Cyst Growth"), "f_farm_49_2", x, z, direction, async dialog =>
+			AddNpc(MonsterId.Cyst, L("Cyst Growth"), "f_farm_49_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_farm_49_2", 1003);
@@ -288,7 +290,8 @@ public class FFarm492QuestNpcsScript : GeneralScript
 				{
 					character.Variables.Perm.Set(spawnedKey, true);
 
-					if (SpawnTempMonsters(character, MonsterId.Cyst, 1, 70, TimeSpan.FromMinutes(1)))
+					var spawnCount = RandomProvider.Get().Next(1, 3);
+					if (SpawnTempMonsters(character, MonsterId.Cyst, spawnCount, 50, TimeSpan.FromMinutes(1)))
 					{
 						character.ServerMessage(L("{#FF6666}The Cyst wakes up, furious!{/}"));
 					}
@@ -316,18 +319,21 @@ public class FFarm492QuestNpcsScript : GeneralScript
 			});
 		}
 
-		AddCystGrowth(1, 604, 1253, 0);
-		AddCystGrowth(2, -74, -1294, 90);
-		AddCystGrowth(3, -1289, -1260, 180);
-		AddCystGrowth(4, 62, -969, 270);
-		AddCystGrowth(5, -1541, -1416, 0);
+		AddCystGrowth(1, 637, 1348, 45);
+		AddCystGrowth(2, 418, 1235, 45);
+		AddCystGrowth(3, 603, 1057, 45);
+		AddCystGrowth(4, 995, 1185, 45);
+		AddCystGrowth(5, -159, 1044, 45);
+		AddCystGrowth(6, -284, 807, 45);
+		AddCystGrowth(7, 1681, 1149, 45);
+		AddCystGrowth(8, 1854, 1289, 45);
 
 		// =====================================================================
 		// QUEST 1004: Pendinmire's Range
 		// =====================================================================
 		// Farmer Vytis - Mapping the apex creature's territory
 		//---------------------------------------------------------------------
-		AddNpc(20118, L("[Farmer] Vytis"), "f_farm_49_2", -240, -1063, 0, async dialog =>
+		AddNpc(20118, L("[Farmer] Vytis"), "f_farm_49_2", 914, -1334, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_farm_49_2", 1004);
@@ -339,111 +345,54 @@ public class FFarm492QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("{#666666}*A grey-haired farmer measures a massive paw-print with his belt, the flattened grass around it still fresh*{/}"));
 				await dialog.Msg(L("Pendinmire. The old hunters said it'd never cross the thorn ridge. The old hunters were wrong."));
 
-				var response = await dialog.Select(L("The Pendinmire has been stalking Shaton's southern border for a month. I need its range mapped before I decide which fields to abandon. Four sign-sites - flattened grass, broken fences, bone piles, claw-marks on trees. Walk them, note them, come back."),
-					Option(L("I'll survey the sign-sites"), "help"),
-					Option(L("Is it going to attack someone?"), "info"),
+				var response = await dialog.Select(L("It ate two oxen last week. If we don't put it down before harvest, it takes a farmhand next. I need it killed - one hunter, one shot, finished. Are you that hunter?"),
+					Option(L("I'll kill the Pendinmire"), "help"),
+					Option(L("Why one hunter?"), "info"),
 					Option(L("That thing could eat a cow"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He hands you a charcoal stick and a folded parchment*{/}"));
+						await dialog.Msg(L("{#666666}*He nods once, slow, and points south*{/}"));
 
 						character.Quests.Start(questId);
-						await dialog.Msg(L("One near the southern woods, one by the broken fence, one at the bone pile, one on the claw-marked oak."));
+						await dialog.Msg(L("Track it past the bone pile. It rests at midday. Hit it from the flank - the throat, if you can reach it."));
 						await dialog.Msg(L("If you don't come back by sundown, I'll assume the worst and ring the evacuation bell."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("It ate two oxen last week. Farmhands boarded up the southern barn. Children stay inside after dusk."));
-						await dialog.Msg(L("If its range includes the village well, we pack and leave. Simple as that. I need the map to know."));
+						await dialog.Msg(L("A pack draws its attention - it scatters them and picks them off one by one. One hunter it doesn't see coming. That's the only odds I'll bet a life on."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("It could eat a cow, yes. It has. Whether it eats a man is what I'm trying to figure out before it does."));
+						await dialog.Msg(L("Yeah, it could eat a cow. Already has. I'm trying to figure out if it'll eat a person before it actually does."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var sitesVisited = character.Variables.Perm.GetInt("Laima.Quests.f_farm_49_2.Quest1004.SitesVisited", 0);
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killPendinmire", out var killObj)) return;
 
-				if (sitesVisited >= 4)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He spreads your marked map across his knees and traces the Pendinmire's range*{/}"));
-					await dialog.Msg(L("The range stops short of the well by a furlong. Good. We stay."));
-					await dialog.Msg(L("The fields south of the bone pile - those we abandon. Better to lose a harvest than lose a farmhand."));
-					await dialog.Msg(L("Thank you. Take this. A farmer's savings, quietly offered."));
+					await dialog.Msg(L("{#666666}*He exhales, shoulders dropping*{/}"));
+					await dialog.Msg(L("It's down. The southern fields are ours again. Tomatoes stand a chance, and so do my farmhands."));
+					await dialog.Msg(L("Take these - skirmisher boots, broken in but sound. A man who walks his fields knows good leather."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Four sign-sites. Quiet, slow, low if you see it. Come back by sundown."));
+					await dialog.Msg(L("South of the bone pile, around midday. Flank it. Don't let it see you first."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The southern fields are fallow this year. The Pendinmire crosses them at dusk. The village stays."));
+				await dialog.Msg(L("The southern fields are quiet again. Pendinmire's gone. The village stays."));
 			}
 		});
-
-		// =====================================================================
-		// PENDINMIRE SIGN-SITES
-		// =====================================================================
-		// For Quest 1004 - Pendinmire's Range
-		// =====================================================================
-
-		void AddSignSite(int siteNumber, string siteName, string observation, int x, int z, int direction)
-		{
-			AddNpc(152080, L(siteName), "f_farm_49_2", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_farm_49_2", 1004);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*Disturbed ground marks the passage of something very large*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_farm_49_2.Quest1004.Site{siteNumber}";
-				var noted = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (noted)
-				{
-					await dialog.Msg(L("{#666666}*You've already noted this site*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Noting site..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var sitesVisited = character.Variables.Perm.GetInt("Laima.Quests.f_farm_49_2.Quest1004.SitesVisited", 0);
-					character.Variables.Perm.Set("Laima.Quests.f_farm_49_2.Quest1004.SitesVisited", sitesVisited + 1);
-
-					character.ServerMessage(L(observation));
-					character.ServerMessage(LF("Sign-sites noted: {0}/4", sitesVisited + 1));
-
-					if (sitesVisited + 1 >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}Survey complete! Return to Farmer Vytis.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("Noting interrupted."));
-				}
-			});
-		}
-
-		AddSignSite(1, "Flattened Grass", "A thirty-pace circle pressed flat. The Pendinmire slept here.", -778, 434, 0);
-		AddSignSite(2, "Broken Fence", "Fence posts snapped at the base. One is bitten clean through.", -1245, 674, 90);
-		AddSignSite(3, "Bone Pile", "Ox bones, cleaned. Two skulls, shattered where the jaw closed.", 1626, 1147, 180);
-		AddSignSite(4, "Claw-Marked Oak", "Claw-marks four palms wide, chest-height. The Pendinmire stands taller than a horse.", 2083, 1411, 270);
 	}
 }
 
@@ -479,7 +428,7 @@ public class WalkingStumpsQuest : QuestScript
 		AddReward(new ItemReward(640004, 2)); // Large HP Potion
 		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 		AddReward(new ItemReward(640012, 1));  // Recovery Potion
-		AddReward(new ItemReward(511148, 1));  // Superior Skirmisher Boots
+		AddReward(new ItemReward(501148, 1));  // Superior Skirmisher Gloves
 	}
 }
 
@@ -559,7 +508,7 @@ public class CystSapVialsQuest : QuestScript
 			character.Inventory.CountItem(650801),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_2.Quest1003.Cyst{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_2.Quest1003.Cyst{i}.Spawned");
@@ -572,7 +521,7 @@ public class CystSapVialsQuest : QuestScript
 			character.Inventory.CountItem(650801),
 			InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
+		for (int i = 1; i <= 8; i++)
 		{
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_2.Quest1003.Cyst{i}");
 			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_2.Quest1003.Cyst{i}.Spawned");
@@ -590,7 +539,7 @@ public class PendinmiresRangeQuest : QuestScript
 		SetId("f_farm_49_2", 1004);
 		SetName("Pendinmire's Range");
 		SetType(QuestType.Sub);
-		SetDescription("Farmer Vytis needs the Pendinmire's territory mapped so Shaton knows which fields to abandon before the apex beast claims them.");
+		SetDescription("Farmer Vytis needs the Pendinmire killed before it claims Shaton's southern fields and the farmhands working them.");
 		SetLocation("f_farm_49_2");
 		SetAutoTracked(true);
 
@@ -599,31 +548,14 @@ public class PendinmiresRangeQuest : QuestScript
 		SetUnlock(QuestUnlockType.AllAtOnce);
 		AddQuestGiver("[Farmer] Vytis", "f_farm_49_2");
 
-		AddObjective("surveySites", "Note the Pendinmire's sign-sites",
-			new VariableCheckObjective("Laima.Quests.f_farm_49_2.Quest1004.SitesVisited", 4, true));
+		AddObjective("killPendinmire", "Defeat the Pendinmire",
+			new KillObjective(1, new[] { MonsterId.Pendinmire }));
 
 		AddReward(new ExpReward(11000, 7500));
 		AddReward(new SilverReward(11200));
 		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
 		AddReward(new ItemReward(640004, 2)); // Large HP Potion
 		AddReward(new ItemReward(640007, 2)); // Large SP Potion
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_farm_49_2.Quest1004.SitesVisited");
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_2.Quest1004.Site{i}");
-		}
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_farm_49_2.Quest1004.SitesVisited");
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_farm_49_2.Quest1004.Site{i}");
-		}
+		AddReward(new ItemReward(511148, 1));  // Superior Skirmisher Boots
 	}
 }
