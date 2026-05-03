@@ -17,6 +17,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 using Yggdrasil.Logging;
 using Yggdrasil.Util;
@@ -555,6 +556,18 @@ namespace Melia.Zone.World.Actors.Characters
 						else if (ZoneServer.Instance.Data.HeadTypeDb.TryFind(character.Gender, strArg, out var headData))
 							Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, hairItem.Id, EquipSlot.Hair, headData.Index);
 					}
+				}
+
+				// Replay briquetting (weapon/equipment appearance overrides) for each newly visible character
+				foreach (var equipPair in character.Inventory.GetEquip())
+				{
+					var equipItem = equipPair.Value;
+					if (equipItem == null || equipItem is DummyEquipItem)
+						continue;
+
+					var equipBriquettingIndex = (int)equipItem.Properties.GetFloat(PropertyName.BriquettingIndex);
+					if (equipBriquettingIndex > 0)
+						Send.ZC_NORMAL.UpdateCharacterLook(this.Connection, character, equipBriquettingIndex, equipPair.Key);
 				}
 
 				if (character.HasParty || character.HasGuild)
