@@ -69,6 +69,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// </summary>
 		private static void RemoveFromQuickSlots(Character character, SkillId skillId)
 		{
+			if (ZoneServer.Instance.Data.SkillDb.TryFind(skillId, out _))
+				return;
+
 			var serialized = character.Variables.Perm.Get<string>("Melia.QuickSlotList", null);
 			if (string.IsNullOrEmpty(serialized))
 				return;
@@ -165,8 +168,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 						calcProperty.Invalidate();
 				}
 				var conn = this.Character?.Connection;
-			if (conn != null)
-				Send.ZC_OBJECT_PROPERTY(conn, skill);
+				if (conn != null)
+					Send.ZC_OBJECT_PROPERTY(conn, skill);
 			}
 		}
 	}
