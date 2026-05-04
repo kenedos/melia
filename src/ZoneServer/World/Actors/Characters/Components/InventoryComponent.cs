@@ -1555,9 +1555,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// Sending ZC_ITEM_INVENTORY_LIST stopped working at some point.
 			// Third time's the charm, I bet ZC_ITEM_INVENTORY_DIVISION_LIST
 			// is way better than the previous options!
-			//Send.ZC_ITEM_INVENTORY_LIST(this.Character);
 
 			Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character);
+			Send.ZC_ITEM_INVENTORY_DIVISION_LIST(this.Character);
 			Send.ZC_EQUIP_GEM_INFO(this.Character);
 		}
 
