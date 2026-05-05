@@ -16,11 +16,12 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 		private const float BasePercent = 0.10f;
 		private const float PercentPerLevel = 0.02f;
 		private const float FlatPatkPerInt = 0.5f;
+		private const int MaxScalingLevel = 15;
 
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
-			var skillLevel = buff.NumArg1;
+			var skillLevel = Math.Min(MaxScalingLevel, buff.NumArg1);
 			var casterInt = buff.NumArg2;
 
 			var byAbility = 1f;

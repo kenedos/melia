@@ -12,6 +12,8 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 	[BuffHandler(BuffId.BigHeadMode)]
 	public class BigHeadModeOverride : BuffHandler
 	{
+		private const int MaxScalingLevel = 15;
+
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
@@ -23,7 +25,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 				Send.ZC_NORMAL.SetActorRenderOption(target, "bigheadmode", true);
 			}
 
-			var skillLevel = buff.NumArg1;
+			var skillLevel = Math.Min(MaxScalingLevel, buff.NumArg1);
 
 			var byAbility = 1f;
 			if (caster.TryGetSkill(buff.SkillId, out var skill))

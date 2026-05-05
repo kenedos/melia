@@ -11,10 +11,12 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 	[BuffHandler(BuffId.Transpose_Buff)]
 	public class Transpose_BuffOverride : BuffHandler
 	{
+		private const int MaxScalingLevel = 15;
+
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
-			var skillLevel = buff.NumArg1;
+			var skillLevel = Math.Min(MaxScalingLevel, buff.NumArg1);
 
 			var rate = Math.Min(1f, 0.40f + 0.04f * skillLevel);
 
