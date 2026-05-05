@@ -38,11 +38,6 @@ namespace Melia.Barracks
 		private readonly Dictionary<string, int> _zoneServerNames = new();
 
 		/// <summary>
-		/// Returns the server's inter-server communicator.
-		/// </summary>
-		public Communicator Communicator { get; private set; }
-
-		/// <summary>
 		/// Returns a reference to the server's packet handlers.
 		/// </summary>
 		public PacketHandler PacketHandler { get; } = new PacketHandler();

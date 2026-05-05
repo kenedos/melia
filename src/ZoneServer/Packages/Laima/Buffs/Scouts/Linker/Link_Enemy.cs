@@ -9,6 +9,7 @@ using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
+using System;
 
 namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 {
@@ -22,7 +23,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 	[BuffHandler(BuffId.Link_Enemy)]
 	public class Link_EnemyOverride : BuffHandler
 	{
-		private const float BaseDamageReduction = -0.30f;
+		private const float BaseDamageReduction = -0.50f;
 		private const float DamageIncreasePerSkillLevel = 0.03f;
 		private const float MaxHorizontalDistance = 200f;
 		private const int DistanceCheckIntervalMs = 500;
@@ -70,7 +71,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Linker
 			if (!linkTargets.Any())
 				return;
 
-			var skillLevel = buff.NumArg1;
+			var skillLevel = Math.Min(10, buff.NumArg1);
 			var abilityMultiplier = 1f;
 
 			if (buff.Caster is ICombatEntity caster && caster.TryGetSkill(buff.SkillId, out var buffSkill))
