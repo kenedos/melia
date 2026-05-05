@@ -6445,8 +6445,7 @@ namespace Melia.Zone.Network
 				Log.Warning("CZ_CHANGE_REPRESENTATION_CLASS: User '{0}' tried to select a class they don't have {1}.", conn.Account.Name, jobId.ToString());
 				return;
 			}
-			character.JobId = jobId;
-			Send.ZC_NORMAL.UpdateSkillUI(character);
+			character.VisualJobId = jobId;
 			character.AddonMessage(AddonMessage.UPDATE_REPRESENTATION_CLASS_ICON, "None", (int)jobId);
 		}
 

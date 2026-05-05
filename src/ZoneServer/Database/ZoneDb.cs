@@ -50,6 +50,9 @@ namespace Melia.Zone.Database
 					character.Name = reader.GetString("name");
 					character.TeamName = reader.GetString("teamName");
 					character.JobId = (JobId)reader.GetInt16("job");
+					character.VisualJobId = (JobId)reader.GetInt32Safe("visualJob", (int)character.JobId);
+					if (character.VisualJobId == 0)
+						character.VisualJobId = character.JobId;
 					character.Gender = (Gender)reader.GetByte("gender");
 					character.Hair = reader.GetInt32("hair");
 					character.SkinColor = reader.GetUInt32("skinColor");
@@ -160,6 +163,7 @@ namespace Melia.Zone.Database
 								cmd.AddParameter("@characterId", character.DbId);
 								cmd.Set("name", character.Name);
 								cmd.Set("job", (short)character.JobId);
+								cmd.Set("visualJob", (short)character.VisualJobId);
 								cmd.Set("gender", (byte)character.Gender);
 								cmd.Set("hair", character.Hair);
 								cmd.Set("skinColor", character.SkinColor);

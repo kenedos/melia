@@ -120,7 +120,7 @@ namespace Melia.Zone.Database
 									AccountId = reader.GetInt64("accountId"),
 									Name = reader.GetString("name"),
 									TeamName = reader.GetString("teamName"),
-									VisualJobId = (JobId)reader.GetInt16("job"),
+									VisualJobId = (JobId)reader.GetInt32Safe("visualJob", reader.GetInt16("job")),
 									Gender = (Gender)reader.GetByte("gender"),
 									Hair = reader.GetInt32("hair"),
 									MapId = reader.GetInt32("zone"),
@@ -169,7 +169,6 @@ namespace Melia.Zone.Database
 
 								if (memberDict.TryGetValue(charId, out var member))
 								{
-									member.VisualJobId = jobId;
 									switch (jobIndex)
 									{
 										case 0: member.FirstJobId = jobId; break;

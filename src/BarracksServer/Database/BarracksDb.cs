@@ -182,6 +182,7 @@ namespace Melia.Barracks.Database
 					cmd.Set("gender", character.Gender);
 					cmd.Set("hair", character.Hair);
 					cmd.Set("skinColor", character.SkinColor);
+					cmd.Set("visualJob", character.VisualJobId);
 
 					cmd.Set("zone", character.MapId);
 					cmd.Set("x", character.Position.X);
@@ -317,6 +318,9 @@ namespace Melia.Barracks.Database
 							character.AccountId = accountId;
 							character.Name = reader.GetStringSafe("name");
 							character.JobId = (JobId)reader.GetInt16("job");
+							character.VisualJobId = (JobId)reader.GetInt32Safe("visualJob", (int)character.JobId);
+							if (character.VisualJobId == 0)
+								character.VisualJobId = character.JobId;
 							character.Gender = (Gender)reader.GetByte("gender");
 							character.Hair = reader.GetInt32("hair");
 							character.SkinColor = reader.GetUInt32("skinColor");
@@ -387,7 +391,10 @@ namespace Melia.Barracks.Database
 					}
 
 					if (character.Jobs.Count == 0)
+					{
 						character.Jobs.Add(character.JobId);
+						character.VisualJobId = character.JobId;
+					}
 
 					this.LoadVars(character.Variables.Perm, "vars_characters", "characterId", character.DbId);
 				}

@@ -39,7 +39,7 @@ namespace Melia.Shared.Network.Helpers
 
 			if (Versions.Protocol > 500)
 			{
-				packet.PutInt((int)appearancePc.JobId); // i1. 5001 on Scout, maybe display job?
+				packet.PutInt((int)appearancePc.VisualJobId);
 				packet.PutUInt(appearancePc.SkinColor);
 				packet.PutInt(appearancePc.ChatBalloon); // i2 1 or 0
 			}
@@ -188,6 +188,11 @@ namespace Melia.Shared.Network.Helpers
 		/// Returns the character's chat balloon id.
 		/// </summary>
 		int ChatBalloon { get; }
+
+		/// <summary>
+		/// Returns the character's visual job id.
+		/// </summary>
+		JobId VisualJobId { get; }
 
 		/// <summary>
 		/// Returns a bitmask specifying the visibility of certain

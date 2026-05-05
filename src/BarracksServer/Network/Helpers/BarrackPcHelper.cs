@@ -63,7 +63,7 @@ namespace Melia.Barracks.Network.Helpers
 				packet.PutShort((short)jobId);
 
 			packet.PutInt(0);
-			packet.PutInt((int)pc.JobId);
+			packet.PutInt((int)pc.VisualJobId);
 
 			packet.PutLong(pc.ObjectId);
 			packet.PutShort(0); // Additional properties count?
