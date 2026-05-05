@@ -93,17 +93,20 @@ public class PcPetAiScript : AiScript
 		if (!this.InRangeOf(master, MaxMasterDistance))
 			return;
 
-		// Find nearby enemies within view range, sorted by distance to master
-		var nearbyEnemies = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, _viewRange)
+		// Only aggro enemies that are close to the pet itself and to the master,
+		// so the pet doesn't run off to pull distant mobs.
+		const float AggroRange = 200f;
+		var nearbyEnemies = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, AggroRange)
 				.Where(e => !e.IsDead && this.IsHostileTowards(e) && e.Position.InRange2D(master.Position, MaxMasterDistance))
-				.OrderBy(e => e.Position.Get2DDistance(master.Position))
+				.OrderBy(e => e.Position.Get2DDistance(this.Entity.Position))
 				.ToList();
 
 		if (nearbyEnemies.Any())
 		{
-			var closestToMaster = nearbyEnemies.First();
-			// Increase hate enough to trigger aggro
-			this.IncreaseHate(closestToMaster, 150);
+			var closest = nearbyEnemies.First();
+			// Clear any stale hate from previous fights so we commit to this one
+			this.RemoveAllHate();
+			this.IncreaseHate(closest, 150);
 
 			// Check enemies will pick up the most hated target
 			this.CheckEnemies();
@@ -297,11 +300,11 @@ public class PcPetAiScript : AiScript
 			yield return true;
 		}
 
+		// Target died or is gone. Clear all accumulated hate so the pet doesn't
+		// immediately rush to a far-away mob that picked up hate from AoE/skills.
+		// The Idle state's CheckAggressiveMode will re-acquire a nearby target.
 		_target = null;
-		this.CheckEnemies();
-
-		if (_target != null)
-			yield break;
+		this.RemoveAllHate();
 
 		if (EnableReturnHome)
 			this.StartRoutine("ReturnHome", this.ReturnHome());

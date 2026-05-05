@@ -108,7 +108,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 				.Where(t => !existingHandles.Contains(t.Handle))
 				.OrderBy(t => t.IsBuffActive(BuffId.Link_Enemy) ? 1 : 0)
 				.ThenBy(t => t.GetDistance(firstTarget))
-				.Take(MaxLinkTargets);
+				.Take(MaxLinkTargets + skill.Level / 2);
 
 			var newTargets = new List<ICombatEntity>();
 
