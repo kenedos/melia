@@ -453,6 +453,21 @@ namespace Melia.Zone.Skills
 		/// <summary>
 		/// Increases skill's overheat counter by 1 if the skill can
 		/// overheat and updates the client. Activates cooldown once
+		/// the skill's max overheat is reached. Returns whether the
+		/// skill overheated or not.
+		/// </summary>
+		/// /// <param name="overheatCooldown"></param>
+		/// <returns
+		public bool IncreaseOverheat(TimeSpan overheatCooldown)
+		{
+			var overheatMaxCount = this.OverheatMaxCount;
+
+			return this.IncreaseOverheat(overheatMaxCount, overheatCooldown);
+		}
+
+		/// <summary>
+		/// Increases skill's overheat counter by 1 if the skill can
+		/// overheat and updates the client. Activates cooldown once
 		/// the given max overheat is reached. Returns whether the
 		/// skill overheated or not.
 		/// </summary>
