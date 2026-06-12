@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -47,14 +46,14 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		}
 
 		/// <summary>
-		/// Handles skill, applying a debuff to the target
+		/// Handles skill, dealing damage on a straight line.
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
 		/// <param name="originPos"></param>
 		/// <param name="farPos"></param>
-		/// <param name="target"></param>
-		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		/// <param name="skillTarget"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity skillTarget)
 		{
 			if (!caster.TrySpendSp(skill))
 			{
@@ -65,62 +64,35 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			skill.IncreaseOverheat();
 			caster.TurnTowards(farPos);
 			caster.SetAttackState(true);
-			var shape = new Square(caster.Position.GetRelative2D(caster.Direction, 15), caster.Direction, 75, 20);
+
+			var shape = new Square(caster.Position.GetRelative2D(caster.Direction, 15), caster.Direction, 300, 20);
+			// [Arts] Shaped Charge
+			// Increase AOE Ratio to 10
 			var maxTargetCount = caster.IsAbilityActive(AbilityId.Arquebusier22) ? 10 : 6;
 
+			// The pad is just visual, the skill itself handles the damaging
 			var pad = Pad.Create(PadName.shootpad_LuckyStrike, caster, skill, farPos, shape, new PadOptions
 			{
 				LifeTime = TimeSpan.FromSeconds(2),
 				UpdateInterval = TimeSpan.FromMilliseconds(250),
-				MaxActorCount = maxTargetCount,
+				MaxActorCount = 0,
 			});
 
 			caster.Map.AddPad(pad);
-			Debug.ShowShape(caster.Map, shape);
-			
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, target.Position);
+
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
+
+			this.Attack(shape, caster, skill, maxTargetCount);
 		}
 
-		/// <summary>
-		/// Handler for the Linear Shooting pad.
-		/// </summary>
-		[PadHandler(PadName.shootpad_LuckyStrike)]
-		public class shootpad_LuckyStrike : ICreatePadHandler, IEnterPadHandler, IDestroyPadHandler
+		private void Attack(Square shape, ICombatEntity caster, Skill skill, int maxTargetCount)
 		{
-			private const float FlyDistance = 1000;
-			private const float FlySpeedForward = 400;
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, shape, maxTargetCount);
 
-			/// <summary>
-			/// Called when the pad is created.
-			/// </summary>
-			/// <param name="sender"></param>
-			/// <param name="args"></param>
-			public void Created(object sender, PadTriggerArgs args)
+			foreach (var target in targets)
 			{
-				var pad = args.Trigger;
-				var caster = args.Creator;
-
-				pad.Movement.Speed = FlySpeedForward;
-				pad.Trigger.MaxActorCount = caster.IsAbilityActive(AbilityId.Arquebusier22) ? 10 : 6;
-
-				TaskHelper.CallSafe(this.FlyForward(pad, caster));
-			}
-
-			public void Entered(object sender, PadTriggerActorArgs args)
-			{
-				var pad = args.Trigger;
-				var caster = args.Creator;
-				var target = args.Initiator;
-				var skill = pad.Skill;
-
-				// [Arts] Shaped Charge
-				// Increase AOE Ratio to 10
-				var maxTargetCount = caster.IsAbilityActive(AbilityId.Arquebusier22) ? 10 : 6;
-
-				if (!caster.CanDamage(target) || pad.Variables.GetInt("Targets") >= maxTargetCount) return;
-
 				var skillHitResult = SCR_SkillHit(caster, target, skill);
 
 				// [Arts] Shaped Charge
@@ -141,32 +113,62 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				}
 
 				Send.ZC_HIT_INFO(caster, target, hit);
-				pad.Variables.SetInt("Targets", pad.Variables.GetInt("Targets") + 1);
 			}
+		}
+	}
 
-			public void Destroyed(object sender, PadTriggerArgs args)
-			{
-				var pad = args.Trigger;
-				var creator = args.Creator;
+	/// <summary>
+	/// Handler for the Linear Shooting pad.
+	/// </summary>
+	[PadHandler(PadName.shootpad_LuckyStrike)]
+	public class shootpad_LuckyStrike : ICreatePadHandler, IDestroyPadHandler
+	{
+		private const float FlyDistance = 1000;
+		private const float FlySpeedForward = 400;
 
-				Send.ZC_NORMAL.PadUpdate(pad, false);
-				pad.Variables.SetInt("Targets", 0);
-			}
+		/// <summary>
+		/// Called when the pad is created.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
+		public void Created(object sender, PadTriggerArgs args)
+		{
+			var pad = args.Trigger;
+			var caster = args.Creator;
 
-			/// <summary>
-			/// Makes shield fly a certain distance forward, in the direction
-			/// the creator is facing.
-			/// </summary>
-			/// <param name="pad"></param>
-			/// <param name="creator"></param>
-			/// <returns></returns>
-			private async Task FlyForward(Pad pad, ICombatEntity caster)
-			{
-				var dest = caster.Position.GetRelative2D(caster.Direction, FlyDistance);
-				var moveTime = pad.Movement.MoveTo(dest);
+			pad.Movement.Speed = FlySpeedForward;
+			pad.Trigger.MaxActorCount = 0;
 
-				await Task.Delay(moveTime);
-			}
+			TaskHelper.CallSafe(this.FlyForward(pad, caster));
+		}
+
+		/// <summary>
+		/// Called pn Pad destroy (life cycle)
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		public void Destroyed(object sender, PadTriggerArgs args)
+		{
+			var pad = args.Trigger;
+			var creator = args.Creator;
+
+			Send.ZC_NORMAL.PadUpdate(pad, false);
+		}
+
+		/// <summary>
+		/// Makes shield fly a certain distance forward, in the direction
+		/// the creator is facing.
+		/// </summary>
+		/// <param name="pad"></param>
+		/// <param name="caster"></param>
+		/// <returns></returns>
+		private async Task FlyForward(Pad pad, ICombatEntity caster)
+		{
+			var dest = caster.Position.GetRelative2D(caster.Direction, FlyDistance);
+			var moveTime = pad.Movement.MoveTo(dest);
+
+			await Task.Delay(moveTime);
 		}
 	}
 }
