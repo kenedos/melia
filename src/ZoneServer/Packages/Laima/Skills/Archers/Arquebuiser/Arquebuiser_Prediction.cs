@@ -70,9 +70,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 				var splashArea = new Circle(farPos, SplashRadius);
 				this.ApplyDebuffInArea(skill, caster, splashArea);
-
-				Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-				
 			} else
 			{
 				skill.IncreaseOverheat();
@@ -84,6 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				caster.StartBuff(BuffId.Prediction_Buff, skill.Level, accuracyReinforceRateBonus, duration, caster);
 			}
 
+			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 		}
 
