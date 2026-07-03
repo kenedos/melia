@@ -16,7 +16,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 	/// </summary>
 	public class JobComponent : CharacterComponent
 	{
-		private static readonly Regex JobClassName = new(@"^Char(?<class>[1-4])_(?<index>[0-9]{1,2})$", RegexOptions.Compiled);
+		private static readonly Regex JobClassName = new(@"^Char(?<class>[1-5])_(?<index>[0-9]{1,2})$", RegexOptions.Compiled);
 
 		private readonly Dictionary<JobId, Job> _jobs = new();
 

@@ -172,8 +172,15 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			// Drain stamina during movement, recover otherwise
 			if (character.Movement.IsMoving)
 			{
-				var runDrain = (int)character.Properties.GetFloat(PropertyName.Sta_Run, 0);
-				stamina = Math2.Clamp(0, maxStamina, stamina - runDrain);
+				var runDrain = character.Properties.GetFloat(PropertyName.Sta_Run, 0);
+
+				if (character.TryGetBuff(BuffId.Agility_Buff, out var agilityBuff))
+				{
+					var reductionRate = agilityBuff.NumArg3;
+					runDrain *= 1f - reductionRate;
+				}
+
+				stamina = Math2.Clamp(0, maxStamina, stamina - (int)runDrain);
 			}
 			else
 			{

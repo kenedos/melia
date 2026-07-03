@@ -14,6 +14,7 @@
 { skillId: 53, className: "Pistol_Attack", name: "Basic Attack", maxRange: 180, speedRateAffectedByDex: true, speedRateAffectedByBuff: true },
 { skillId: 57, className: "Pistol_Attack2", name: "Basic Attack", maxRange: 180, speedRateAffectedByDex: true, speedRateAffectedByBuff: true },
 { skillId: 58, className: "Cannon_Attack", name: "Basic Attack", maxRange: 280, speedRateAffectedByDex: true, speedRateAffectedByBuff: true },
+{ skillId: 75, className: "DoubleBullet_Attack", name: "Serial Bullet Sub Attack", splashRange: 20, splashHeight: 25, splashAngle: 0, splashRate: 3, maxRange: 140, factor: 100, factorByLevel: 0, atkAdd: 0, atkAddByLevel: 0, cooldownTime: 500, enableCastMove: true, enableCastRotate: false, useType: "Force", attackType: "Gun", activationType: "ActiveSkill" },
 
 // Swordsman
 //---------------------------------------------------------------------------
@@ -182,6 +183,9 @@
 { skillId: 11707, className: "Matador_CorridaFinale", name: "Corrida Finale", basicSp: 31, splashRate: 0, factor: 185, factorByLevel: 35, hitCount: 1, multiHitCount: 12, cooldownTime: 15000 },
 { skillId: 11708, className: "Matador_CorridaFinale_Hidden", name: "Corrida Finale: Raging Bull", basicSp: 31, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 11709, className: "Matador_Muleta_Faena", name: "Faena", basicSp: 42, splashRate: 5, factor: 202, factorByLevel: 34, hitCount: 1, multiHitCount: 17, cooldownTime: 300 },
+
+// Nakmuay
+//---------------------------------------------------------------------------
 { skillId: 11801, className: "NakMuay_RamMuay", name: "Ram Muay", splashRate: 0, factor: 29.4, factorByLevel: 11, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
 { skillId: 11802, className: "NakMuay_TeKha", name: "Te Kha", basicSp: 45, splashRate: 0, factor: 104, factorByLevel: 24, hitCount: 1, multiHitCount: 4, cooldownTime: 15000 },
 { skillId: 11803, className: "NakMuay_SokChiang", name: "Sok Chiang", basicSp: 45, splashRate: 0, factor: 111, factorByLevel: 26, hitCount: 1, multiHitCount: 4, cooldownTime: 15000 },
@@ -191,6 +195,9 @@
 { skillId: 11807, className: "NakMuay_TeKha_Normal", name: "Muay Thai Te Kha", basicSp: 45, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 4, cooldownTime: 15000 },
 { skillId: 11808, className: "NakMuay_SokChiang_Normal", name: "Muay Thai Sok Chiang", basicSp: 45, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 4, cooldownTime: 15000 },
 { skillId: 11809, className: "NakMuay_TeTrong_Normal", name: "Muay Thai Te Trong", basicSp: 46, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 2, cooldownTime: 15000 },
+
+// Retiarius
+//---------------------------------------------------------------------------
 { skillId: 11901, className: "Retiarii_FishingNetsDraw", name: "Pull Rete", basicSp: 27, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 11902, className: "Retiarii_ThrowingFishingNet", name: "Throw Rete", basicSp: 27, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 11903, className: "Retiarii_DaggerGuard", name: "Dagger Guard", basicSp: 34, splashRate: 0, factorByLevel: 3, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
@@ -422,6 +429,9 @@
 { skillId: 21207, className: "Warlock_Sabbath", name: "Ghastly Trail", basicSp: 75, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
 { skillId: 21208, className: "Warlock_DemonScratch", name: "Demon Scratch", basicSp: 82, splashRate: 0, factor: 121, factorByLevel: 23, hitCount: 1, multiHitCount: 6, cooldownTime: 10000, overheatCount: "0" },
 { skillId: 21209, className: "Warlock_Mastema_PhantomPain", name: "Mastema: Phantom Pain", splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1 },
+
+// Rune Caster
+//---------------------------------------------------------------------------
 { skillId: 21301, className: "RuneCaster_Hagalaz", name: "Rune of Destruction", basicSp: 108, splashRate: 10, factor: 183, factorByLevel: 21, hitCount: 1, multiHitCount: 5, cooldownTime: 15000 },
 { skillId: 21302, className: "RuneCaster_Isa", name: "Rune of Earth", basicSp: 83, splashRate: 1, factor: 56, factorByLevel: 94, hitCount: 1, multiHitCount: 8, cooldownTime: 12500, overheatCount: "2" },
 { skillId: 21303, className: "RuneCaster_Thurisaz", name: "Rune of Repulsion", basicSp: 164, splashRate: 4, factor: 71, factorByLevel: 12, hitCount: 1, multiHitCount: 10, cooldownTime: 10000 },
@@ -430,6 +440,8 @@
 { skillId: 21306, className: "RuneCaster_Stan", name: "Rune of Rock", basicSp: 112, splashRate: 30, factor: 102, factorByLevel: 24, hitCount: 1, multiHitCount: 5, cooldownTime: 10000 },
 { skillId: 21307, className: "RuneCaster_Ehwaz", name: "Rune of Gravity", basicSp: 112, splashRate: 30, factor: 44, factorByLevel: 10, hitCount: 1, multiHitCount: 20, cooldownTime: 15000 },
 { skillId: 21308, className: "RuneCaster_Berkana", name: "Rune of Beginning", basicSp: 136, splashRate: 4, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
+
+
 { skillId: 21401, className: "Sage_Portal", name: "Portal", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1 },
 { skillId: 21402, className: "Sage_WarptoFriend", name: "Warp to Friend", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 1800000 },
 { skillId: 21403, className: "Sage_MicroDimension", name: "Micro Dimension", basicSp: 59, splashRate: 0, factor: 90, factorByLevel: 15, hitCount: 1, multiHitCount: 2, cooldownTime: 15000, overheatCount: "3" },
@@ -1125,14 +1137,16 @@
 { skillId: 50708, className: "Linker_ElectricShock", name: "Electric Shock", basicSp: 31, splashRate: 0, factor: 49, factorByLevel: 4.9, hitCount: 1, multiHitCount: 7, cooldownTime: 7000, overheatCount: "2" },
 { skillId: 50709, className: "Linker_SpiritualChain", name: "Spiritual Chain", basicSp: 60, splashRate: 0, factor: 42, factorByLevel: 21, hitCount: 1, multiHitCount: 1, cooldownTime: 8000 },
 
+// Enchanter
+//---------------------------------------------------------------------------
 { skillId: 50801, className: "Enchanter_Agility", name: "Agility", basicSp: 39, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 20000 },
 { skillId: 50802, className: "Enchanter_EnchantArmor", name: "Enchant Armor", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1 },
-{ skillId: 50803, className: "Enchanter_EnchantLightning", name: "Enchant Weapon", splashRate: 3, factor: 50, factorByLevel: 15, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
+{ skillId: 50809, className: "Enchanter_EnchantWeaponToggle", name: "Enchant Weapon", splashRate: 3, factor: 50, factorByLevel: 15, hitCount: 1, multiHitCount: 1, cooldownTime: 0, useType: "Self", activationType: "ActiveSkill" },
 { skillId: 50804, className: "Enchanter_EnchantEarth", name: "Enchant Earth", basicSp: 42, splashRate: 0, factor: 5, factorByLevel: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 50805, className: "Enchanter_LightningHands", name: "Lightning Hands", basicSp: 45, splashRate: 0, factor: 250, factorByLevel: 14, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 50806, className: "Enchanter_OverReinforce", name: "Over-Reinforce", basicSp: 42, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 50807, className: "Enchanter_EnchantGlove", name: "Enchant Glove", basicSp: 45, splashRate: 0, factor: 5, factorByLevel: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
-{ skillId: 50808, className: "Enchanter_EnchantAura", name: "Enchant Aura", splashRate: 0, factor: 56, factorByLevel: 94, hitCount: 1, multiHitCount: 1, cooldownTime: 1000 },
+{ skillId: 50808, className: "Enchanter_EnchantAura", name: "Enchant Aura", basicSp: 15, splashRate: 0, factor: 56, factorByLevel: 94, hitCount: 1, multiHitCount: 1, cooldownTime: 1000 },
 
 // Rogue
 //---------------------------------------------------------------------------
@@ -1145,13 +1159,18 @@
 { skillId: 50907, className: "Rogue_KnifeThrowing", name: "Knife Throw", basicSp: 21, splashRate: 2, factor: 157, factorByLevel: 15.4, shootTime: 200, hitCount: 1, multiHitCount: 2, cooldownTime: 5000, overheatCount: "2" },
 { skillId: 50908, className: "Rogue_Backstab_DOT", name: "Backstab: Massive Bleeding", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 12500 },
 
+// Schwarzer Reiter
+//---------------------------------------------------------------------------
 { skillId: 51001, className: "Schwarzereiter_ConcentratedFire", name: "Concentrated Fire", basicSp: 54, splashRate: 0, factor: 162, factorByLevel: 27, hitCount: 1, multiHitCount: 10, cooldownTime: 12500, overheatCount: "0" },
 { skillId: 51002, className: "Schwarzereiter_Caracole", name: "Caracole", basicSp: 58, splashRate: 10, factor: 132, factorByLevel: 25, hitCount: 1, multiHitCount: 10, cooldownTime: 15000 },
-{ skillId: 51003, className: "Schwarzereiter_Limacon", name: "Limacon", splashRate: 0, factor: 85.4, factorByLevel: 14, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
+{ skillId: 51003, className: "Schwarzereiter_Limacon", name: "Limacon", splashRate: 2, splashRange: 10, splashHeight: 50, basicSp: 6, factor: 100, factorByLevel: 15, atkAdd: 25, atkAddByLevel: 25, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
 { skillId: 51004, className: "Schwarzereiter_RetreatShot", name: "Retreat Shot", basicSp: 56, splashRate: 0, factor: 163, factorByLevel: 43, hitCount: 1, multiHitCount: 33, cooldownTime: 10000 },
 { skillId: 51005, className: "Schwarzereiter_EvasiveAction", name: "Evasive Action", basicSp: 42, splashRate: 0, factor: 18, factorByLevel: 3, hitCount: 1, multiHitCount: 1, cooldownTime: 22500 },
 { skillId: 51006, className: "Schwarzereiter_AssaultFire", name: "Marching Fire", basicSp: 53, splashRate: 0, factor: 122, factorByLevel: 23, hitCount: 1, multiHitCount: 25, cooldownTime: 15000 },
-{ skillId: 51008, className: "Schwarzereiter_DoubleBullet", name: "Serial Bullet", basicSp: 27, splashRate: 0, factor: 142, factorByLevel: 33, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
+{ skillId: 51008, className: "Schwarzereiter_DoubleBullet", name: "Serial Bullet", basicSp: 27, factor: 142, factorByLevel: 33, cooldownTime: 0, useType: "Self", activationType: "ActiveSkill" },
+
+// Bullet Marker
+//---------------------------------------------------------------------------
 { skillId: 51101, className: "Bulletmarker_SilverBullet", name: "Silver Bullet", basicSp: 67, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 51102, className: "Bulletmarker_Tase", name: "Tase", basicSp: 57, splashRate: -999, factor: 100, hitCount: 1, multiHitCount: 13, cooldownTime: 15000 },
 { skillId: 51103, className: "Bulletmarker_NapalmBullet", name: "Napalm Bullet", basicSp: 47, splashRate: 10, factor: 118, factorByLevel: 20, hitCount: 1, multiHitCount: 4, cooldownTime: 10000, overheatCount: "2" },

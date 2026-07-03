@@ -6,7 +6,6 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
 namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
@@ -20,19 +19,48 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 	{
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Direction dir)
 		{
-			if (!caster.TrySpendSp(skill))
+			// Toggle OFF
+			if (caster.TryGetBuff(BuffId.DoubleBullet_Toggle_Buff, out _))
 			{
-				caster.ServerMessage(Localization.Get("Not enough SP."));
+				caster.StopBuff(BuffId.DoubleBullet_Toggle_Buff);
+
+				Send.ZC_NORMAL.UpdateSkillEffect(
+					caster,
+					0,
+					originPos,
+					caster.Direction,
+					Position.Zero);
+
+				SkillResetCooldown(skill, caster);
 				return;
 			}
+
+			// Toggle ON
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, Position.Zero);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Direction, Position.Zero);
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
+
+			try
+			{
+				caster.StartBuff(
+					BuffId.DoubleBullet_Toggle_Buff,
+					skill.Level,
+					0f,
+					TimeSpan.Zero,
+					caster,
+					skill.Id);
+			}
+			catch (Exception ex)
+			{
+				caster.ServerMessage(ex.Message);
+			}
+
 			SkillResetCooldown(skill, caster);
-			caster.StartBuff(BuffId.DoubleBullet_Buff, 1f, 0f, TimeSpan.Zero, caster, skill.Id);
+
+			caster.SetAttackState(false);
 		}
 	}
 }

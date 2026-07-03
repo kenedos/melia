@@ -136,6 +136,7 @@ namespace Melia.Zone.Commands
 			this.Add("identify", "", "Identifies all unidentified items in inventory.", this.HandleIdentify);
 			this.Add("appraise", "", "Identifies all unidentified items in inventory.", this.HandleIdentify);
 			this.Add("refine", "<slot> <amount>", "Refines equipment. Slot 0 = all equipped items.", this.HandleRefine);
+			this.Add("transcendtest", "<slot> [stage=+1]", "Tests transcendence on equipped item.", this.HandleTranscendTest);
 			this.Add("itemprop", "<objectid> <property> <value>", "Sets an item property by ObjectId. Example: /itemprop 12345 PR 4", this.HandleItemProp);
 			this.Add("silver", "<modifier>", "Spawns silver.", this.HandleSilver);
 			this.Add("droptest", "<item id|name> [count=1] [radius=50]", "Drops items on the ground for pickup testing.", this.HandleDropTest);
@@ -6069,6 +6070,77 @@ namespace Melia.Zone.Commands
 			}
 
 			return CommandResult.Okay;
+		}
+
+		private const int BlessedGemItemId = 646045; // Troque pelo ID real da Blessed Gem
+		private CommandResult HandleTranscendTest(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			var equips = target.Inventory.GetEquip();
+
+			var equip = equips.Values.FirstOrDefault(item =>
+				item != null &&
+				item.ObjectId > 0 &&
+				item.Data.Type == ItemType.Equip);
+
+			if (equip == null)
+			{
+				sender.ServerMessage("No valid equipped item found.");
+				return CommandResult.Okay;
+			}
+
+			var currentStage = (int)equip.Properties.GetFloat(PropertyName.Transcend, 0);
+
+			if (currentStage >= 10)
+			{
+				sender.ServerMessage("This item is already at max transcendence.");
+				return CommandResult.Okay;
+			}
+
+			var nextStage = currentStage + 1;
+			var requiredGems = GetRequiredBlessedGems(nextStage);
+
+			var blessedGem = target.Inventory.GetItems().Values.FirstOrDefault(item =>
+				item != null &&
+				item.Id == BlessedGemItemId &&
+				item.Amount >= requiredGems);
+
+			if (blessedGem == null)
+			{
+				sender.ServerMessage($"Not enough Blessed Gems. Required: {requiredGems}.");
+				return CommandResult.Okay;
+			}
+
+			target.Inventory.Remove(blessedGem.ObjectId, requiredGems, InventoryItemRemoveMsg.Used);
+
+			equip.Properties.SetFloat(PropertyName.Transcend, nextStage);
+			equip.Properties.InvalidateAll();
+
+			Send.ZC_OBJECT_PROPERTY(target, equip);
+			target.InvalidateProperties();
+			target.AddonMessage("INV_ITEM_LIST_GET");
+			target.AddonMessage("EQUIP_ITEM_LIST_UPDATE");
+
+			sender.ServerMessage($"Transcend test: {equip.Data.ClassName} {currentStage} -> {nextStage}. Blessed Gems used: {requiredGems}.");
+
+			return CommandResult.Okay;
+		}
+
+		private static int GetRequiredBlessedGems(int stage)
+		{
+			return stage switch
+			{
+				1 => 1,
+				2 => 2,
+				3 => 4,
+				4 => 8,
+				5 => 16,
+				6 => 32,
+				7 => 64,
+				8 => 128,
+				9 => 256,
+				10 => 512,
+				_ => 0,
+			};
 		}
 
 		/// <summary>

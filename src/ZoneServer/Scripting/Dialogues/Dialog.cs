@@ -709,6 +709,18 @@ namespace Melia.Zone.Scripting.Dialogues
 			throw new OperationCanceledException("Dialog closed by script.");
 		}
 
+		public void End()
+		{
+			this.State = DialogState.Ended;
+			this.ExpectedResponseType = DialogResponseType.None;
+
+			Send.ZC_DIALOG_CLOSE(this.Player.Connection);
+			Send.ZC_LEAVE_TRIGGER(this.Player.Connection);
+
+			if (_connection?.CurrentDialog == this)
+				_connection.CurrentDialog = null;
+		}
+
 		/// <summary>
 		/// Opens the player's personal storage.
 		/// </summary>

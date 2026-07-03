@@ -12,6 +12,7 @@ using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -588,7 +589,15 @@ namespace Melia.Zone.World.Actors.Characters
 				}
 
 				character.ShowEffects(this.Connection);
+
+				// Remove Serial Bullet ao relogar/reaparecer para evitar bug de animação/estado
+				character.RemoveBuff(BuffId.DoubleBullet_Toggle_Buff);
+
 				Send.ZC_BUFF_LIST(this.Connection, character);
+
+				// Reaplica o ataque principal correto após buffs/efeitos serem enviados ao client.
+				// Corrige relog com Serial Bullet ativo voltando para Pistol_Attack.
+				SchwarzerReiterAttackHelper.UpdateMainAttack(character);
 			}
 		}
 

@@ -294,6 +294,7 @@ namespace Melia.Shared.Game.Const
 		public const string Enchanter_Empowering = "Enchanter_Empowering";
 		public const string Enchanter_EnchantAura = "Enchanter_EnchantAura";
 		public const string Enchanter_EnchantLightning = "Enchanter_EnchantLightning";
+		public const string Enchanter_EnchantGlove = "Enchanter_EnchantGlove";
 		public const string Enervation_Pad = "Enervation_Pad";
 		public const string Engineer_ArrowTurret_Circle = "Engineer_ArrowTurret_Circle";
 		public const string Engineer_ArrowTurret_Default = "Engineer_ArrowTurret_Default";

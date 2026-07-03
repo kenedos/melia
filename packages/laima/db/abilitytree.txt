@@ -1382,12 +1382,23 @@
 
 // Enchanter
 //---------------------------------------------------------------------------
+{ category: "Enchanter", classId: 1, abilityId: 215001, jobId: 5008, className: "Enchanter_Bomb", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_CraftEnchantRound", argNum: 1 } },
+{ category: "Enchanter", classId: 2, abilityId: 215002, jobId: 5008, className: "Enchanter1", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Enchanter", classId: 3, abilityId: 215003, jobId: 5008, className: "Enchanter2", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Enchanter", classId: 402, abilityId: 215004, jobId: 5008, className: "Enchanter3", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_300LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 300 } },
+{ category: "Enchanter", classId: 405, abilityId: 215005, jobId: 5008, className: "Enchanter4", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_EnchantLightning", argNum: 1 } },
+{ category: "Enchanter", classId: 406, abilityId: 215006, jobId: 5008, className: "Enchanter5", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_OverReinforce", argNum: 1 } },
+{ category: "Enchanter", classId: 7, abilityId: 215007, jobId: 5008, className: "Enchanter6", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_CraftEnchantRound", argNum: 1 } },
+{ category: "Enchanter", classId: 8, abilityId: 215008, jobId: 5008, className: "Enchanter7", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_CraftEnchantRound", argNum: 1 } },
+{ category: "Enchanter", classId: 9, abilityId: 215009, jobId: 5008, className: "Enchanter8", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_Agility", argNum: 1 } },
 { category: "Enchanter", classId: 101, abilityId: 215010, jobId: 5008, className: "Enchanter9", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_EnchantGlove", argNum: 1 } },
 { category: "Enchanter", classId: 201, abilityId: 215011, jobId: 5008, className: "Enchanter10", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_Agility", argNum: 1 } },
 { category: "Enchanter", classId: 301, abilityId: 215012, jobId: 5008, className: "Enchanter11", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_EnchantLightning", argNum: 1 } },
 { category: "Enchanter", classId: 401, abilityId: 215013, jobId: 5008, className: "Enchanter12", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_EnchantEarth", argNum: 1 } },
+{ category: "Enchanter", classId: 501, abilityId: 215014, jobId: 5008, className: "Enchanter13", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_LightningHands", argNum: 1 } },
+{ category: "Enchanter", classId: 15, abilityId: 215015, jobId: 5008, className: "Enchanter14", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_EnchantGlove", argNum: 1 } },
 { category: "Enchanter", classId: 1001, abilityId: 215016, jobId: 5008, className: "Enchanter15", maxLevel: 1, priceTimeScript: 'HIDDENABIL_PRICE_COND_JOBLEVEL', unlockScript: { name: "UNLOCK_ABIL_JOB_LEVEL", argStr: "Char5_8", argNum: 45 } },
+{ category: "Enchanter", classId: 1002, abilityId: 215017, jobId: 5008, className: "Enchanter16", maxLevel: 30, priceTimeScript: 'HIDDENABIL_PRICE_COND_REINFORCE', unlockScript: { name: "UNLOCK_ABIL_OTHERABILITY", argStr: "Enchanter13", argNum: 65 } },
 { category: "Enchanter", classId: 403, abilityId: 215018, jobId: 5008, className: "Enchanter17", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Enchanter_EnchantAura", argNum: 1 } },
 { category: "Enchanter", classId: 1101, abilityId: 215019, jobId: 5008, className: "Enchanter18", maxLevel: 30, priceTimeScript: 'HIDDENABIL_PRICE_COND_REINFORCE', unlockScript: { name: "UNLOCK_ABIL_OTHERABILITY", argStr: "Enchanter17", argNum: 65 } },
 
@@ -1412,15 +1423,34 @@
 { category: "Schwarzereiter", classId: 101, abilityId: 311001, jobId: 5011, className: "Schwarzereiter11", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Schwarzereiter_ConcentratedFire", argNum: 1 } },
 { category: "Schwarzereiter", classId: 201, abilityId: 311002, jobId: 5011, className: "Schwarzereiter12", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Schwarzereiter_Caracole", argNum: 1 } },
 { category: "Schwarzereiter", classId: 301, abilityId: 311003, jobId: 5011, className: "Schwarzereiter13", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Schwarzereiter_Limacon", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 401, abilityId: 311004, jobId: 5011, className: "Schwarzereiter14", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Schwarzereiter_RetreatShot", argNum: 1 } },
 { category: "Schwarzereiter", classId: 1, abilityId: 311005, jobId: 5011, className: "Schwarzereiter1", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 2, abilityId: 311006, jobId: 5011, className: "Schwarzereiter2", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 402, abilityId: 311007, jobId: 5011, className: "Schwarzereiter3", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+
 { category: "Schwarzereiter", classId: 202, abilityId: 311009, jobId: 5011, className: "Schwarzereiter16", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_100LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 203, abilityId: 311010, jobId: 5011, className: "Schwarzereiter17", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Schwarzereiter", classId: 302, abilityId: 311011, jobId: 5011, className: "Schwarzereiter18", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Schwarzereiter", classId: 601, abilityId: 311012, jobId: 5011, className: "Schwarzereiter19", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Schwarzereiter_AssaultFire", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 6, abilityId: 311013, jobId: 5011, className: "Schwarzereiter4", maxLevel: 10, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 603, abilityId: 311014, jobId: 5011, className: "Schwarzereiter20", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+
+{ category: "Schwarzereiter", classId: 1001, abilityId: 311015, jobId: 5011, className: "Schwarzereiter21", maxLevel: 30, priceTimeScript: 'ABIL_ARTS_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 1002, abilityId: 311016, jobId: 5011, className: "Schwarzereiter22", maxLevel: 30, priceTimeScript: 'ABIL_ARTS_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 1003, abilityId: 311017, jobId: 5011, className: "Schwarzereiter23", maxLevel: 30, priceTimeScript: 'ABIL_ARTS_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 1004, abilityId: 311018, jobId: 5011, className: "Schwarzereiter24", maxLevel: 30, priceTimeScript: 'ABIL_ARTS_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 1005, abilityId: 311019, jobId: 5011, className: "Schwarzereiter25", maxLevel: 30, priceTimeScript: 'ABIL_ARTS_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+
 { category: "Schwarzereiter", classId: 4, abilityId: 311020, jobId: 5011, className: "Schwarzereiter26", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 303, abilityId: 311021, jobId: 5011, className: "Schwarzereiter27", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Schwarzereiter", classId: 501, abilityId: 311022, jobId: 5011, className: "Schwarzereiter28", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Schwarzereiter_DoubleBullet", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 1006, abilityId: 311023, jobId: 5011, className: "Schwarzereiter29", maxLevel: 30, priceTimeScript: 'ABIL_ARTS_PRICE', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 604, abilityId: 311024, jobId: 5011, className: "Schwarzereiter30", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Schwarzereiter", classId: 3, abilityId: 311025, jobId: 5011, className: "Schwarzereiter31", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_300LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 304, abilityId: 311026, jobId: 5011, className: "Schwarzereiter32", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Schwarzereiter", classId: 602, abilityId: 311027, jobId: 5011, className: "Schwarzereiter33", maxLevel: 100, priceTimeScript: 'ABIL_REINFORCE_PRICE', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Schwarzereiter_EvasiveAction", argNum: 1 } },
-{ category: "Schwarzereiter", classId: 5, abilityId: 311029, jobId: 5011, className: "Schwarzereiter35", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_300LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 5, abilityId: 311028, jobId: 5011, className: "Schwarzereiter34", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Schwarzereiter", classId: 7, abilityId: 311029, jobId: 5011, className: "Schwarzereiter35", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_300LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 
 // Bulletmarker
 //---------------------------------------------------------------------------

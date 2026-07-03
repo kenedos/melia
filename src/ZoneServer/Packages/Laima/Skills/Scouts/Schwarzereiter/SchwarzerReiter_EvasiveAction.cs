@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.Packages;
@@ -7,11 +6,14 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 {
 	/// <summary>
-	/// Handler for the Schwarzereiter skill Evasive Action.
+	/// Handler for the Schwarzer Reiter skill Evasive Action.
+	/// SkillId: 51005
+	/// ClassName: Schwarzereiter_EvasiveAction
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Schwarzereiter_EvasiveAction)]
@@ -19,11 +21,18 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 	{
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Direction dir)
 		{
+			if (caster is not Character character || !character.IsRiding)
+			{
+				caster.ServerMessage(Localization.Get("You must be mounted on a companion."));
+				return;
+			}
+
 			if (!caster.TrySpendSp(skill))
 			{
 				caster.ServerMessage(Localization.Get("Not enough SP."));
 				return;
 			}
+
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
@@ -31,13 +40,25 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Direction, Position.Zero);
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
 
-			skill.Run(this.HandleSkill(caster, skill));
-		}
+			// Base Evasive Action duration.
+			var duration = TimeSpan.FromMilliseconds(300000);
 
-		private async Task HandleSkill(ICombatEntity caster, Skill skill)
-		{
-			caster.StartBuff(BuffId.EvasiveAction_Buff, 1f, 0f, TimeSpan.Zero, caster, skill.Id);
-			await skill.Wait(TimeSpan.FromMilliseconds(110));
+			// [Arts] Evasive Action: Duration increases the buff duration.
+			if (character.IsAbilityActive(AbilityId.Schwarzereiter33))
+			{
+				duration += TimeSpan.FromMilliseconds(100000);
+			}
+
+			// Apply Evasive Action buff.
+			caster.StartBuff(
+				BuffId.EvasiveAction_Buff,
+				skill.Level,
+				0f,
+				duration,
+				caster,
+				skill.Id);
+
+			caster.SetAttackState(false);
 		}
 	}
 }

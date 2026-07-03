@@ -1,7 +1,7 @@
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.Network;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Buffs.Handlers.Scouts.Schwarzereiter
@@ -19,19 +19,15 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Schwarzereiter
 
 			if (caster is Character character)
 			{
-				Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.Pistol_Attack2);
-				Send.ZC_NORMAL.SetSubAttackSkill(character, SkillId.None);
+				SchwarzerReiterAttackHelper.UpdateMainAttack(character);
 			}
 		}
 
 		public override void OnEnd(Buff buff)
 		{
-			var caster = buff.Caster;
-
-			if (caster is Character character)
+			if (buff.Caster is Character character)
 			{
-				Send.ZC_NORMAL.SetMainAttackSkill(character, SkillId.None);
-				Send.ZC_NORMAL.SetSubAttackSkill(character, SkillId.None);
+				SchwarzerReiterAttackHelper.UpdateMainAttack(character);
 			}
 		}
 	}

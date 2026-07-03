@@ -1627,6 +1627,7 @@
 		Enchanter_Agility = 50801,
 		Enchanter_EnchantArmor = 50802,
 		Enchanter_EnchantLightning = 50803,
+		Enchanter_EnchantWeaponToggle = 50809,
 		Enchanter_EnchantEarth = 50804,
 		Enchanter_LightningHands = 50805,
 		Enchanter_OverReinforce = 50806,

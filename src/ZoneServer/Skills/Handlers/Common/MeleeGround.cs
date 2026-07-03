@@ -19,8 +19,18 @@ namespace Melia.Zone.Skills.Handlers.Common
 	/// </summary>
 	[SkillHandler(SkillId.Normal_Attack, SkillId.Normal_Attack_TH, SkillId.Hammer_Attack, SkillId.Hammer_Attack_TH, SkillId.Common_DaggerAries,
 		SkillId.Sword_Attack, SkillId.SpearMaster_Attack, SkillId.SpearMaster_Attack_TH, SkillId.Common_StaffAttack)]
-	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler
+	public class MeleeGroundSkillHandler : IMeleeGroundSkillHandler, IGroundSkillHandler
 	{
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		{
+			var targets = new List<ICombatEntity>();
+
+			if (target != null)
+				targets.Add(target);
+
+			this.Handle(skill, caster, originPos, farPos, targets);
+		}
+
 		/// <summary>
 		/// Handles usage of the skill.
 		/// </summary>

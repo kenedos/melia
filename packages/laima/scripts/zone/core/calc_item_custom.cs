@@ -93,7 +93,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		var maxAtk = itemATK * damageRange;
 		//Log.Debug("Calculated Max ATK: {0}", maxAtk);
-		return MathF.Round(maxAtk + GetReinforceAddValueAtk(item, PropertyName.ATK), MidpointRounding.AwayFromZero);
+		return MathF.Round(maxAtk + GetReinforceAddValueAtk(item, PropertyName.ATK) + GetTranscendAddValue(item, maxAtk), MidpointRounding.AwayFromZero);
 	}
 
 
@@ -151,7 +151,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		var minAtk = itemATK * (2 - damageRange);
 		//Log.Debug("Calculated Min ATK: {0} + {1}", minAtk, GetReinforceAddValueAtk(item, PropertyName.ATK));
-		return MathF.Round(minAtk + GetReinforceAddValueAtk(item, PropertyName.ATK), MidpointRounding.AwayFromZero);
+		return MathF.Round(minAtk + GetReinforceAddValueAtk(item, PropertyName.ATK) + GetTranscendAddValue(item, minAtk), MidpointRounding.AwayFromZero);
 	}
 
 	[ScriptableFunction]
@@ -203,7 +203,7 @@ public class ItemCalculationsScript : GeneralScript
 			itemATK = changeBasicProp;
 
 		//Log.Debug("Calculated MATK: {0}", itemATK);
-		return MathF.Round(itemATK + GetReinforceAddValueAtk(item, PropertyName.MATK), MidpointRounding.AwayFromZero);
+		return MathF.Round(itemATK + GetReinforceAddValueAtk(item, PropertyName.MATK) + GetTranscendAddValue(item, itemATK), MidpointRounding.AwayFromZero);
 	}
 
 	/// <summary>
@@ -269,7 +269,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		basicDef = MathF.Floor(basicDef);
 		//Log.Debug("Calculated DEF: {0}", basicDef);
-		return MathF.Floor(basicDef + GetReinforceAddValueAtk(item, PropertyName.DEF));
+		return MathF.Floor(basicDef + GetReinforceAddValueAtk(item, PropertyName.DEF) + GetTranscendAddValue(item, basicDef));
 	}
 
 	/// <summary>
@@ -332,7 +332,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		basicMDef = MathF.Floor(basicMDef);
 		//Log.Debug("Calculated MDEF: {0}", basicMDef);
-		return MathF.Floor(basicMDef + GetReinforceAddValueAtk(item, PropertyName.MDEF));
+		return MathF.Floor(basicMDef + GetReinforceAddValueAtk(item, PropertyName.MDEF) + GetTranscendAddValue(item, basicMDef));
 	}
 
 	/// <summary>
@@ -470,6 +470,20 @@ public class ItemCalculationsScript : GeneralScript
 		if (classType == EquipType.Neck || classType == EquipType.Ring) value *= 0.25f;
 
 		return (int)Math.Round(value, MidpointRounding.AwayFromZero);
+	}
+
+	private float GetTranscendAddValue(Item item, float baseValue)
+	{
+		var transcendStage = item.Properties.GetFloat(PropertyName.Transcend, 0);
+
+		if (transcendStage <= 0)
+			return 0;
+
+		// The equipment property is being counted twice in the final character status.
+		// Apply half here so the final visible character bonus matches the intended value.
+		var transcendRate = transcendStage * 0.05f;
+
+		return MathF.Floor(baseValue * transcendRate);
 	}
 
 

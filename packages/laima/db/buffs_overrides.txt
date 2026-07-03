@@ -153,6 +153,8 @@
 { id: 3139, className: "Assassin_Target_Debuff", tags: ["IgnoreImmune"] },
 { id: 3166, className: "Barrier_MeleeAttack_Buff" },
 { id: 3167, className: "Barrier_MagicAttack_Buff" },
+{ id: 3197, className: "DoubleBullet_Toggle_Buff" },
+{ id: 3198, className: "DoubleBullet_Buff" },
 { id: 3245, className: "CarveZemina_Abil_Buff", tags: ["PainBarrier"] },
 { id: 5038, className: "ElectricShock", tags: ["Magic", "IndulgentiaRemove", "Shock"] },
 { id: 5040, className: "Invincible", tags: ["Magic"] },
