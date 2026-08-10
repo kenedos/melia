@@ -118,7 +118,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 		private void ShootFromMonster(Pad pad, Skill skill, ICombatEntity caster, IMonster sourceMonster)
 		{
 			var splashWidth = 70f + skill.Level;
-			var splashArea = new Square(sourceMonster.Position, pad.Direction.Right, SplashLength, splashWidth);
+			var splashArea = Square.Centered(sourceMonster.Position, pad.Direction.Right, SplashLength, splashWidth);
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 			var targetList = targets.Take(1);
 
