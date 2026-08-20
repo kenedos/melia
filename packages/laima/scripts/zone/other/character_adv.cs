@@ -22,9 +22,7 @@ public class CharacterAdvancementScript : GeneralScript
 		var character = args.Character;
 		var newJobId = args.Character.JobId;
 
-		// Grant defaults if the player chose the class for the first time
-		if (character.Job.Circle == JobCircle.First)
-			GrantDefaults(character, newJobId);
+		GrantDefaults(character, newJobId);
 	}
 
 	private static void GrantDefaults(Character character, JobId jobId)

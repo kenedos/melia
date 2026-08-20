@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 		private const float BaseFreezeChance = 40f;
 		private const float FreezeChancePerLevel = 4f;
 		private const int MaxTargets = 16;
-		private const int FreezeDurationMilliSeconds = 8000;
+		private const int FreezeDurationMilliSeconds = 4000;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{

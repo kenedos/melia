@@ -291,7 +291,7 @@ public class CKlaipeNpcScript : GeneralScript
 
 			// Trinkets
 			shop.AddItem(692001, amount: 1, price: 7280);
-			shop.AddItem(692002, amount: 1, price: 19311);
+			shop.AddItem(692002, amount: 1, price: 7280);
 		});
 	}
 
