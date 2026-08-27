@@ -149,6 +149,13 @@ public class COrshaNpcScript : GeneralScript
 		toras.AssociatedShopName = "TorasCompanions";
 		toras.ShopType = ShopType.Potion;
 
+		// Tutorial Triggers
+		//-------------------------------------------------------------------------
+		AddTutorialTrigger("c_orsha", -109.365, 362.765, "TUTO_PETSHOP");
+		AddTutorialTrigger("c_orsha", 231, 166, "TUTO_NPCSHOP");
+		AddTutorialTrigger("c_orsha", 21, 154, "TUTO_REIN");
+		AddTutorialTrigger("c_orsha", 308, 64, "TUTO_STORAGE");
+
 		// Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(115, "WARP_C_ORSHA", "c_orsha", 103.14, 176.14, 322.95, -46, L("Statue of Goddess Ausrine"), 154063);

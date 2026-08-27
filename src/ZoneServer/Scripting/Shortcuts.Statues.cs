@@ -244,6 +244,8 @@ namespace Melia.Zone.Scripting
 			character.AddonMessage("NOTICE_Dm_Clear", ScpArgMsg("STATUE_STAT_01"), 3);
 			dialog.DetachEffect(npc, "F_light024_orange");
 			character.RemoveSessionObject(effectSessionObject.Id);
+
+			character.ShowHelp("MINI_E_STATUE");
 		}
 
 		/// <summary>

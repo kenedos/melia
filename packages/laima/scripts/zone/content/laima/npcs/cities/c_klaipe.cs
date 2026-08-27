@@ -153,6 +153,13 @@ public class CKlaipeNpcScript : GeneralScript
 		christina.AssociatedShopName = "ChristinaCompanions";
 		christina.ShopType = ShopType.Potion;
 
+		// Tutorial Triggers
+		//-------------------------------------------------------------------------
+		AddTutorialTrigger("c_Klaipe", -1, -760, "TUTO_PETSHOP");
+		AddTutorialTrigger("c_Klaipe", 510.7029, -349.3194, "TUTO_NPCSHOP");
+		AddTutorialTrigger("c_Klaipe", 394, -475, "TUTO_REIN");
+		AddTutorialTrigger("c_Klaipe", 317, 279, "TUTO_STORAGE");
+
 		// Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(10017, "WARP_C_KLAIPE", "c_Klaipe", -206.574, 148.8251, 98.63973, 45, L("Statue of Goddess Ausrine"), 154039);

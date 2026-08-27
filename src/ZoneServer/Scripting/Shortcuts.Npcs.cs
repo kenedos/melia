@@ -433,6 +433,27 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Creates an area trigger that shows a tutorial to characters
+		/// entering it.
+		/// </summary>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="z"></param>
+		/// <param name="className"></param>
+		/// <param name="radius"></param>
+		/// <returns></returns>
+		public static Npc AddTutorialTrigger(string map, double x, double z, string className, double radius = 50)
+		{
+			return AddAreaTrigger(map, x, z, radius, args =>
+			{
+				if (args.Initiator is Character character && !character.IsDead)
+					character.ShowHelp(className);
+
+				return Task.CompletedTask;
+			});
+		}
+
+		/// <summary>
 		/// Helper function to create a treasure chest with a specific item and amount.
 		/// </summary>
 		/// <param name="map"></param>

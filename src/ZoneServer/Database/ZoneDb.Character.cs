@@ -556,6 +556,23 @@ namespace Melia.Zone.Database
 		}
 
 		/// <summary>
+		/// Removes all shown tutorials from the account.
+		/// </summary>
+		/// <param name="accountId"></param>
+		public void ResetHelp(long accountId)
+		{
+			if (accountId == 0)
+				return;
+
+			using (var conn = this.GetConnection())
+			using (var cmd = new MySqlCommand("DELETE FROM `help` WHERE `accountId` = @accountId", conn))
+			{
+				cmd.Parameters.AddWithValue("@accountId", accountId);
+				cmd.ExecuteNonQuery();
+			}
+		}
+
+		/// <summary>
 		/// Inserts companion in database.
 		/// </summary>
 		public void CreateCompanion(long accountId, long characterId, Companion companion)

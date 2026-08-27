@@ -644,6 +644,8 @@ namespace Melia.Zone.World.Actors.Monsters
 			this.Died?.Invoke(this, killer);
 			ZoneServer.Instance.ServerEvents.EntityKilled.Raise(new CombatEventArgs(this, killer));
 
+			beneficiary?.Tutorials.CheckMonsterKill(this);
+
 			// Rolled here, while buffs and combat state are still live; only
 			// the placement is deferred to the death broadcast.
 			if (_dropBeneficiary != null)

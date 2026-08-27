@@ -3856,6 +3856,8 @@ namespace Melia.Zone.Network
 
 			ZoneServer.Instance.ServerEvents.PlayerLoadComplete.Raise(new PlayerEventArgs(character));
 
+			character.Tutorials.CheckLeftCity();
+
 			//character.ShowHelp("TUTO_MOVE_KB");
 			//character.ShowHelp("TUTO_MOVE_JUMP");
 		}

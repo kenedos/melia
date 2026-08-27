@@ -600,6 +600,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				Send.ZC_EQUIP_GEM_INFO(this.Character);
 			}
 
+			if (addType == InventoryAddType.PickUp && inventoryType == InventoryType.Inventory)
+				this.Character.Tutorials.CheckItemPickup(item);
+
 			ZoneServer.Instance.ServerEvents.PlayerAddedItem.Raise(new PlayerItemEventArgs(this.Character, item.Id, amountToAdd));
 
 			return true;

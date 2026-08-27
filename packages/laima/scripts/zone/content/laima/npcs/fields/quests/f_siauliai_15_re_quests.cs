@@ -132,23 +132,14 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 				switch (response)
 				{
 					case "help":
-						if (character.Level < 3)
-						{
-							await dialog.Msg(L("{#666666}*He looks you over skeptically*{/}"));
-							await dialog.Msg(L("No offense, friend, but those Kepas are tougher than they look. You'd need to be at least level 3 to handle them safely."));
-							await dialog.Msg(L("Come back when you're stronger, and I'll still need the help."));
-						}
-						else
-						{
-							await dialog.Msg(L("{#666666}*He jumps to his feet*{/}"));
-							await dialog.Msg(L("You'd do that? Oh, thank the goddess!"));
+						await dialog.Msg(L("{#666666}*He jumps to his feet*{/}"));
+						await dialog.Msg(L("You'd do that? Oh, thank the goddess!"));
 
-							if (await dialog.YesNo(L("My goods are scattered all over this area. Those poisoned Kepas probably dragged some of it around. Can you recover what you can find?")))
-							{
-								character.Quests.Start(questId);
-								await dialog.Msg(L("Thank you! Look for scattered crates and packages. The Kepas might have taken some of it too."));
-								await dialog.Msg(L("Bring me back 8 packages and I can salvage at least part of my business!"));
-							}
+						if (await dialog.YesNo(L("My goods are scattered all over this area. Those poisoned Kepas probably dragged some of it around. Can you recover what you can find?")))
+						{
+							character.Quests.Start(questId);
+							await dialog.Msg(L("Thank you! Look for scattered crates and packages. The Kepas might have taken some of it too."));
+							await dialog.Msg(L("Bring me back 8 packages and I can salvage at least part of my business!"));
 						}
 						break;
 

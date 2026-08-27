@@ -14,6 +14,8 @@ namespace Melia.Zone.World.Actors.Characters
 	// ===================================================================
 	public partial class Character
 	{
+		private const int DungeonTutorialLevel = 25;
+
 		#region Stats Properties
 		/// <summary>
 		/// Gets or sets the character's current job id.
@@ -319,8 +321,6 @@ namespace Melia.Zone.World.Actors.Characters
 			if (amount < 1)
 				throw new ArgumentException("Amount can't be lower than 1.");
 
-			this.ShowHelp("TUTO_STATPOINT");
-
 			var statsPerLevel = ZoneServer.Instance.Conf.World.StatsPerLevel;
 			var extraStatsLevels = ZoneServer.Instance.Conf.World.ExtraStatsLevels;
 
@@ -345,6 +345,12 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 
 			var newLevel = this.Properties.Modify(PropertyName.Lv, amount);
+
+			this.ShowHelp("TUTO_STATPOINT");
+
+			if (newLevel >= DungeonTutorialLevel)
+				this.ShowHelp("TUTO_INSTANT_DUNGEON");
+
 			if (newLevel >= ZoneServer.Instance.Conf.World.MaxLevel && !this.Variables.Perm.Has("Melia.MaxLevel.AchievedTime"))
 			{
 				this.Variables.Perm.Set("Melia.MaxLevel.AchievedTime", GameClock.Now.Ticks.ToString());

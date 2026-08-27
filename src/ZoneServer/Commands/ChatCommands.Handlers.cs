@@ -189,6 +189,8 @@ namespace Melia.Zone.Commands
 			this.Add("equipset", "[set name] [grade=Legend] [refine=15]", "Gives equipment matching set name, with grade/refine in any order. No args = Savinose Dysnai.", this.HandleEquipSet);
 			this.Add("allabilities", "[level]", "Learns all abilities for character's jobs at the given level, or their max level if omitted.", this.HandleMaxAbilities);
 			this.Add("allskills", "", "Learns all skills for character's jobs at max level.", this.HandleAllSkills);
+			this.Add("tutorial", "<class name>", "Opens a tutorial window by its class name, even if it was seen before.", this.HandleTutorial);
+			this.Add("resettutorials", "", "Resets all tutorials seen on the account, so they show up again.", this.HandleResetTutorials);
 
 			// Dev
 			this.Add("test", "", "", this.HandleTest);
@@ -4102,6 +4104,59 @@ namespace Melia.Zone.Commands
 			sender.ServerMessage("  - AccountWareHouseExtend");
 			sender.ServerMessage("  - BasicAccountWarehouseSlotCount");
 			sender.ServerMessage("Relog to see changes take effect.");
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Opens a tutorial window on the target's client.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleTutorial(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.Count != 1)
+				return CommandResult.InvalidArgument;
+
+			var className = args.Get(0);
+
+			if (ZoneServer.Instance.Data.HelpDb.Find(className) == null)
+			{
+				sender.ServerMessage(Localization.Get("Tutorial '{0}' not found."), className);
+				return CommandResult.Okay;
+			}
+
+			target.ShowHelp(className, true);
+
+			sender.ServerMessage(Localization.Get("Opened tutorial '{0}'."), className);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Resets all tutorials seen on the target's account.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleResetTutorials(Character sender, Character target, string message, string command, Arguments args)
+		{
+			ZoneServer.Instance.Database.ResetHelp(target.AccountDbId);
+			target.Tutorials.Reset();
+
+			Send.ZC_HELP_LIST(target);
+
+			if (sender != target)
+				sender.ServerMessage(Localization.Get("Reset all tutorials seen on {0}'s account."), target.TeamName);
+
+			target.ServerMessage(Localization.Get("All tutorials seen on your account were reset."));
 
 			return CommandResult.Okay;
 		}

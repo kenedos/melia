@@ -59,7 +59,10 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Jobs.ModifySkillPoints(this.JobId, amount);
 
 			if (amount > 0)
+			{
 				this.FullHeal();
+				this.Tutorials.CheckJobChangeAvailable();
+			}
 
 			Send.ZC_OBJECT_PROPERTY(this);
 			Send.ZC_NORMAL.UpdateSkillUI(this);
@@ -294,6 +297,8 @@ namespace Melia.Zone.World.Actors.Characters
 
 			this.JobId = jobId;
 			this.Jobs.Add(newJob);
+
+			this.Tutorials.CheckJobAdvancement(jobId);
 
 			ZoneServer.Instance.ServerEvents.PlayerAdvancedJob.Raise(new PlayerEventArgs(this));
 

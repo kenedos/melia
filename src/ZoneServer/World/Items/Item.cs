@@ -810,6 +810,8 @@ namespace Melia.Zone.World.Items
 			Send.ZC_OBJECT_PROPERTY(character.Connection, this);
 			if (isBroken || isFixed)
 				character.InvalidateProperties();
+
+			character.Tutorials.CheckLowDurability(this);
 		}
 
 		public void Appraisal()

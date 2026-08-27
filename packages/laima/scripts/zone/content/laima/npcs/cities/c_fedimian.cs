@@ -152,6 +152,13 @@ public class CFedimianNpcScript : GeneralScript
 		doras.AssociatedShopName = "DorasCompanions";
 		doras.ShopType = ShopType.Potion;
 
+		// Tutorial Triggers
+		//-------------------------------------------------------------------------
+		AddTutorialTrigger("c_fedimian", -74, 99, "TUTO_PETSHOP");
+		AddTutorialTrigger("c_fedimian", -631.32, -174.9, "TUTO_NPCSHOP");
+		AddTutorialTrigger("c_fedimian", -219.15, -558.35, "TUTO_REIN");
+		AddTutorialTrigger("c_fedimian", -170, -218, "TUTO_STORAGE");
+
 		// Emoticon Chest
 		//-------------------------------------------------------------------------
 		AddPlatformNpc("c_fedimian", 139, 945, 867, 0, "blue");
