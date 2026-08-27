@@ -1290,6 +1290,13 @@ namespace Melia.Test.Balance.Sfr
 				return true;
 			}
 
+			// A passive is registered on load, and its damage lands through the skill that spends what it set up.
+			if (handlers.TryGetPassiveSkillHandler<IPassiveSkillHandler>(skill.Id, out var passive))
+			{
+				passive.Handle(skill, caster);
+				return true;
+			}
+
 			return false;
 		}
 

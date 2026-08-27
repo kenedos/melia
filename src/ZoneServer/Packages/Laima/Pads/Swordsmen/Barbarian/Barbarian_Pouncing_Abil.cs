@@ -31,7 +31,7 @@ namespace Melia.Zone.Pads.Handlers
 			var creator = args.Creator;
 			var skill = pad.Skill;
 
-			if (!creator.IsBuffActive(BuffId.Pouncing_Buff))
+			if (!creator.IsBuffActive(BuffId.Pouncing_Buff) || !creator.IsCasting(skill))
 			{
 				pad.Destroy();
 				return;
@@ -40,8 +40,7 @@ namespace Melia.Zone.Pads.Handlers
 			pad.Direction = creator.Direction;
 			pad.SetRectangleRange(creator.Direction, 35f, 90f);
 
-			// Deal damage using PadDamageEnemy
-			PadDamageEnemy(pad, 1f, 0, 0, "", 3, 0f, 0f);
+			PadDamageEnemy(pad, 1f, multiHits: 3);
 		}
 	}
 }

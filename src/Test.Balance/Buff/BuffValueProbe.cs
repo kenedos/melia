@@ -10,6 +10,7 @@ using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Test.Balance.Sfr;
 using Melia.Zone;
+using Melia.Zone.Buffs.Base;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -560,6 +561,12 @@ namespace Melia.Test.Balance.Buff
 						if (applyBuff && landed.Length > 0 && !landed.Any(application.OnEnemy ? focus.IsBuffActive : character.IsBuffActive))
 							Apply(subject, buffSkill, character, mobs, buffLevel);
 
+						// Re-asserted every tick rather than set once, because a
+						// stacking buff's handler decays it back off inside the
+						// window.
+						if (applyBuff && subject.Stacks > 0)
+							HoldStacks(subject, application.OnEnemy ? mobs.Cast<ICombatEntity>() : [character], landed);
+
 						// Re-read after every swing rather than once up front:
 						// ShootTime divides by SklSpdRate, which is where an
 						// attack-speed buff lands, so a fixed interval would
@@ -606,6 +613,43 @@ namespace Melia.Test.Balance.Buff
 
 				foreach (var ally in allies)
 					SyntheticActors.Cleanup(ally);
+			}
+		}
+
+		/// <summary>
+		/// Holds a stacking buff's overbuff counter at the count the dial
+		/// declares, on whichever side the buff landed.
+		/// </summary>
+		/// <remarks>
+		/// Set rather than incremented, so the handler's own cap and decay both
+		/// lose to it: what is being measured is what the buff is worth at that
+		/// many stacks, and letting the count drift would fold the decay rate
+		/// into a reading that is supposed to be magnitude alone.
+		/// </remarks>
+		/// <param name="subject"></param>
+		/// <param name="holders"></param>
+		/// <param name="landed"></param>
+		private static void HoldStacks(BuffSubject subject, IEnumerable<ICombatEntity> holders, BuffId[] landed)
+		{
+			foreach (var holder in holders)
+			{
+				var changed = false;
+
+				foreach (var buffId in landed)
+				{
+					if (!holder.TryGetBuff(buffId, out var buff) || buff.OverbuffCounter == subject.Stacks)
+						continue;
+
+					// Set again after activating, because a handler's own stack
+					// cap runs on activation and would clamp the held count.
+					buff.OverbuffCounter = subject.Stacks;
+					buff.Activate(ActivationType.Overbuff);
+					buff.OverbuffCounter = subject.Stacks;
+					changed = true;
+				}
+
+				if (changed)
+					holder.Properties.InvalidateAll();
 			}
 		}
 
@@ -784,7 +828,7 @@ namespace Melia.Test.Balance.Buff
 				_saved[1] = (data.CaptionRatio2, data.CaptionRatio2ByLevel);
 				_saved[2] = (data.CaptionRatio3, data.CaptionRatio3ByLevel);
 
-				Install(data, slots, scale, subject.PinnedSlots);
+				Install(data, slots, scale, subject.PinnedMagnitudes);
 
 				if (ZoneServer.Instance.Data.SkillDb.TryFind(subject.SkillId, out var shared) && !ReferenceEquals(shared, data))
 				{
@@ -794,7 +838,7 @@ namespace Melia.Test.Balance.Buff
 					_savedShared[1] = (shared.CaptionRatio2, shared.CaptionRatio2ByLevel);
 					_savedShared[2] = (shared.CaptionRatio3, shared.CaptionRatio3ByLevel);
 
-					Install(shared, slots, scale, subject.PinnedSlots);
+					Install(shared, slots, scale, subject.PinnedMagnitudes);
 				}
 
 				skill.Properties.InvalidateAll();

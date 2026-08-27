@@ -311,11 +311,10 @@ namespace Melia.Test.Balance.Buff
 			if (subject.PinnedSlots == null || subject.PinnedSlots.Count == 0)
 				return slots;
 
-			var cap = Math.Max(1, subject.MaxLevel);
 			var merged = slots.ToDictionary(s => s.Key, s => s.Value);
 
-			foreach (var (slot, atCap) in subject.PinnedSlots)
-				merged[slot] = Split(atCap, cap);
+			foreach (var (slot, pin) in subject.PinnedSlots)
+				merged[slot] = (Round(pin.Base), Round(pin.ByLevel));
 
 			return merged;
 		}
@@ -717,14 +716,25 @@ namespace Melia.Test.Balance.Buff
 
 			var priced = new ConcurrentBag<BuffPrice>();
 			var held = new ConcurrentBag<(string Skill, string Reason)>();
+			var heldPins = new ConcurrentBag<(string Name, IReadOnlyDictionary<int, (float Base, float ByLevel)> Slots)>();
 			var queue = new ConcurrentQueue<BuffSubject>();
+
+			// A pin is authored rather than solved, so a row the pass cannot
+			// price still carries whatever BuffDials.PinnedRatios holds it at.
+			void Hold(BuffSubject subject, string reason)
+			{
+				held.Add((subject.SkillClassName, reason));
+
+				if (subject.PinnedSlots.Count > 0)
+					heldPins.Add((subject.SkillClassName, subject.PinnedSlots));
+			}
 
 			foreach (var subject in subjects)
 			{
 				if (subject.IsAnchor)
 					priced.Add(result.Anchor);
 				else if (BuffDials.Excluded.TryGetValue(subject.SkillClassName, out var excluded))
-					held.Add((subject.SkillClassName, excluded));
+					Hold(subject, excluded);
 				else
 					queue.Enqueue(subject);
 			}
@@ -735,11 +745,26 @@ namespace Melia.Test.Balance.Buff
 				{
 					try
 					{
-						priced.Add(Price(subject, pool));
+						var price = Price(subject, pool);
+
+						// A solve that never reached its target has not measured
+						// a magnitude, it has picked the least bad of the scales
+						// it happened to try - and that scale can point the wrong
+						// way, shrinking a buff that read under budget. Held for
+						// the same reason a buff with no readable axis is.
+						if (!price.Converged)
+						{
+							Hold(subject, $"solved short of the tolerance, landing {price.Value:0.000} against " +
+								$"{price.TargetValue:0.000} after {price.Measurements} measurement(s)");
+
+							continue;
+						}
+
+						priced.Add(price);
 					}
 					catch (Exception ex)
 					{
-						held.Add((subject.SkillClassName, ex.Message.Replace(subject.SkillClassName + ": ", "")));
+						Hold(subject, ex.Message.Replace(subject.SkillClassName + ": ", ""));
 					}
 				}
 			}
@@ -753,7 +778,7 @@ namespace Melia.Test.Balance.Buff
 
 			if (write)
 			{
-				Write(result.Prices);
+				Write(result.Prices.Select(p => (p.SkillClassName, p.Slots)).Concat(heldPins));
 				result.Written = true;
 			}
 
@@ -764,19 +789,19 @@ namespace Melia.Test.Balance.Buff
 		/// Writes the priced magnitudes back to the rows that own them.
 		/// </summary>
 		/// <param name="prices"></param>
-		private static void Write(IEnumerable<BuffPrice> prices)
+		private static void Write(IEnumerable<(string Name, IReadOnlyDictionary<int, (float Base, float ByLevel)> Slots)> prices)
 		{
-			var byName = prices.ToDictionary(p => p.SkillClassName);
+			var byName = prices.ToDictionary(p => p.Name, p => p.Slots);
 			var lines = File.ReadAllLines(SfrData.OverridesPath);
 
 			var rewritten = lines.Select(line =>
 			{
 				var name = Regex.Match(line, @"className: ""([^""]+)""");
 
-				if (!name.Success || !byName.TryGetValue(name.Groups[1].Value, out var price))
+				if (!name.Success || !byName.TryGetValue(name.Groups[1].Value, out var slots))
 					return line;
 
-				foreach (var (slot, values) in price.Slots.OrderByDescending(s => s.Key))
+				foreach (var (slot, values) in slots.OrderByDescending(s => s.Key))
 				{
 					line = SfrPricer.SetField(line, $"captionRatio{slot}", values.Base.ToString(CultureInfo.InvariantCulture));
 					line = SfrPricer.SetField(line, $"captionRatio{slot}ByLevel", values.ByLevel.ToString(CultureInfo.InvariantCulture),

@@ -142,6 +142,9 @@ namespace Melia.Shared.Configuration.Files
 		public float EliteSpawnChance { get; protected set; }
 		public float EliteHPSPRate { get; protected set; }
 		public float EliteStatRate { get; protected set; }
+		public float EliteAtkRate { get; protected set; }
+		public float EliteDefRate { get; protected set; }
+		public float EliteSecondaryStatRate { get; protected set; }
 		public float EliteExpRate { get; protected set; }
 		public int EliteRolls { get; protected set; }
 		public float EliteGuaranteedItemThreshold { get; protected set; }
@@ -156,6 +159,9 @@ namespace Melia.Shared.Configuration.Files
 		public bool MythicAlwaysAggressive { get; protected set; }
 		public float MythicHPSPRate { get; protected set; }
 		public float MythicStatRate { get; protected set; }
+		public float MythicAtkRate { get; protected set; }
+		public float MythicDefRate { get; protected set; }
+		public float MythicSecondaryStatRate { get; protected set; }
 		public float MythicExpRate { get; protected set; }
 		public int MythicRolls { get; protected set; }
 		public float MythicGuaranteedItemThreshold { get; protected set; }
@@ -377,6 +383,9 @@ namespace Melia.Shared.Configuration.Files
 			this.EliteSpawnChance = this.GetFloat("elite_spawn_chance", 2);
 			this.EliteHPSPRate = this.GetFloat("elite_hpsp_rate", 150);
 			this.EliteStatRate = this.GetFloat("elite_stat_rate", 150);
+			this.EliteAtkRate = this.GetFloat("elite_atk_rate", this.EliteStatRate);
+			this.EliteDefRate = this.GetFloat("elite_def_rate", this.EliteStatRate);
+			this.EliteSecondaryStatRate = this.GetFloat("elite_secondary_stat_rate", 100);
 			this.EliteExpRate = this.GetFloat("elite_exp_rate", 2);
 			this.EliteRolls = this.GetInt("elite_rolls", 2);
 			this.EliteGuaranteedItemThreshold = this.GetFloat("elite_guaranteed_item_threshold", 0.5f);
@@ -390,6 +399,9 @@ namespace Melia.Shared.Configuration.Files
 			this.MythicAlwaysAggressive = this.GetBool("mythic_always_aggressive", true);
 			this.MythicHPSPRate = this.GetFloat("mythic_hpsp_rate", 600);
 			this.MythicStatRate = this.GetFloat("mythic_stat_rate", 400);
+			this.MythicAtkRate = this.GetFloat("mythic_atk_rate", this.MythicStatRate);
+			this.MythicDefRate = this.GetFloat("mythic_def_rate", this.MythicStatRate);
+			this.MythicSecondaryStatRate = this.GetFloat("mythic_secondary_stat_rate", 100);
 			this.MythicExpRate = this.GetFloat("mythic_exp_rate", 3000);
 			this.MythicRolls = this.GetInt("mythic_rolls", 15);
 			this.MythicGuaranteedItemThreshold = this.GetFloat("mythic_guaranteed_item_threshold", 5);

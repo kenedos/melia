@@ -1,9 +1,8 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
-using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
@@ -101,7 +100,7 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 
 		/// <summary>
 		/// Handles the offensive portion of Frenzy.
-		/// Increases damage dealt by 5% per stack.
+		/// Increases damage dealt by the skill's third caption ratio per stack.
 		/// </summary>
 		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.Frenzy_Buff)]
 		public void OnAttackBeforeBonuses(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
@@ -110,14 +109,8 @@ namespace Melia.Zone.Buffs.Handlers.Swordsman.Barbarian
 				return;
 
 			var bonusPerStack = GetCaptionRatio(buff, 3) / 100f;
-			var byAbility = 1f;
-			if (buff.Caster is ICombatEntity casterEntity && casterEntity.TryGetSkill(buff.SkillId, out var buffSkill))
-			{
-				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
-				byAbility += SCR_Get_AbilityReinforceRate(buffSkill);
-			}
 
-			skillHitResult.Damage *= 1f + (bonusPerStack * buff.OverbuffCounter * byAbility);
+			skillHitResult.Damage *= 1f + (bonusPerStack * buff.OverbuffCounter);
 		}
 
 		/// <summary>

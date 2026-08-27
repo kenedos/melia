@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
@@ -70,10 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 		/// </summary>
 		private float CalculateDamageBonus(ICombatEntity caster, Skill skill)
 		{
-			var damageBonus = skill.Properties.GetFloat(PropertyName.CaptionRatio) / 100f;
-
-			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
-			return damageBonus * (1f + SCR_Get_AbilityReinforceRate(skill));
+			return skill.Properties.GetFloat(PropertyName.CaptionRatio) / 100f;
 		}
 	}
 }

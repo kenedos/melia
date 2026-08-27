@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
@@ -181,6 +181,36 @@ namespace Melia.Test.Balance.Buff
 		public const float HighCritChance = 90f;
 
 		/// <summary>
+		/// Chance the enemy evades in the scenario accuracy is priced on.
+		/// </summary>
+		/// <remarks>
+		/// Heavier than LoadedChance, and it has to be. An accuracy buff can
+		/// be worth at most `1 / (1 - dodge)` in a scenario and exactly 1.000
+		/// in one the enemy never evades, so against an unweighted mean its
+		/// ceiling is set by how much dodge the whole grid contains. At B3's
+		/// 40% alone that ceiling is 1.067 against a budget of 1.207 - not
+		/// close, and no solve can reach it however wide the scale goes. B3
+		/// stays the moderate case and this is the one that gives hit rate
+		/// enough room to price against.
+		/// </remarks>
+		public const float EvasiveChance = 75f;
+
+		/// <summary>
+		/// Critical chance a scenario that does not pin one reads the
+		/// character at.
+		/// </summary>
+		/// <remarks>
+		/// An axis left undeclared is not neutral, it is pinned wherever the
+		/// reference gear happens to land - which is 4% here, so eight of the
+		/// ten scenarios priced every critical buff against a character that
+		/// never criticals, and the magnitude that took to reach budget is
+		/// then spent by a build that criticals most of its swings. Declared
+		/// for the same reason the enemy's rolls are: the fight has to contain
+		/// the thing the buff acts on.
+		/// </remarks>
+		public const float BaselineCritChance = 40f;
+
+		/// <summary>
 		/// Characters in the party scenario.
 		/// </summary>
 		public const int PartySize = 4;
@@ -246,6 +276,12 @@ namespace Melia.Test.Balance.Buff
 				Name = "solo, evasive and blocking character",
 				CharacterDodgeChance = LoadedChance,
 				CharacterBlockChance = LoadedChance,
+			},
+			new()
+			{
+				Id = "B11",
+				Name = "solo, highly evasive enemy",
+				MobDodgeChance = EvasiveChance,
 			},
 		];
 
@@ -331,8 +367,8 @@ namespace Melia.Test.Balance.Buff
 		/// <param name="reference"></param>
 		public static void LoadCharacter(BuffScenario scenario, ICombatEntity character, ICombatEntity reference)
 		{
-			if (scenario.CharacterCritChance is { } critical)
-				Aim(character, PropertyName.CRTHR, PropertyName.CRTHR_BM, reference.Properties.GetFloat(PropertyName.CRTDR) + critical / CritSlope);
+			var critical = scenario.CharacterCritChance ?? BaselineCritChance;
+			Aim(character, PropertyName.CRTHR, PropertyName.CRTHR_BM, reference.Properties.GetFloat(PropertyName.CRTDR) + critical / CritSlope);
 
 			if (scenario.CharacterDodgeChance is { } dodge)
 				Aim(character, PropertyName.DR, PropertyName.DR_BM, reference.Properties.GetFloat(PropertyName.HR) + dodge / DodgeSlope);

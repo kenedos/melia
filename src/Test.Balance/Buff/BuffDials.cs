@@ -309,14 +309,15 @@ namespace Melia.Test.Balance.Buff
 		public static readonly Dictionary<string, string> Excluded = [];
 
 		/// <summary>
-		/// Caption ratio slots held at a chosen magnitude per skill level,
+		/// Caption ratio slots held at a chosen base and per-level magnitude,
 		/// which the pass measures against but never solves or scales.
 		/// </summary>
 		/// <remarks>
 		/// For a slot whose number is the mechanic rather than a dial on it: a
 		/// player reads "10% a level" off the tooltip and builds a rotation on
 		/// it, and a solver free to move it makes that number a function of
-		/// every other dial in the model.
+		/// every other dial in the model. The pair is written to the row as it
+		/// stands, so a pin can be flat where the growth rule would not be.
 		///
 		/// Not an exemption from the budget. A pinned slot is installed live in
 		/// every window, so what it is worth counts against the buff's
@@ -328,11 +329,39 @@ namespace Melia.Test.Balance.Buff
 		/// a caption ratio the pass can solve", so a row whose every slot is
 		/// pinned leaves the roster entirely.
 		/// </remarks>
-		public static readonly Dictionary<string, Dictionary<int, float>> PinnedRatios = new()
+		public static readonly Dictionary<string, Dictionary<int, (float Base, float ByLevel)>> PinnedRatios = new()
 		{
 			// The multi-hit chance the class is built around, and what the
 			// tooltip promises: 10% a level, half the swings at its cap of five.
-			["Scout_DoubleAttack"] = new() { [2] = 10f },
+			["Scout_DoubleAttack"] = new() { [2] = (0f, 10f) },
+
+			// The rage the class is named for, read as one number the player
+			// keeps in their head rather than a curve: 150% and 10%, flat at
+			// every level.
+			["Barbarian_Frenzy"] = new() { [1] = (150f, 0f), [2] = (10f, 0f) },
+		};
+
+		/// <summary>
+		/// Stacks a buff built on OverbuffCounter is held at for the length of
+		/// a window, and what each count represents.
+		/// </summary>
+		/// <remarks>
+		/// A stacking buff otherwise measures its unstacked value and prices at
+		/// nothing: the probe applies one stack, the handler decays it, and a
+		/// magnitude that is entirely per stack reads flat at every scale. The
+		/// count is held rather than applied once, because the decay would take
+		/// it back off inside the window.
+		///
+		/// Held at the cap the handler enforces, which is the same convention
+		/// every other axis of the model already uses - a magnitude is priced at
+		/// maxLevel, not at the level a player happens to be. It prices the best
+		/// case, so a buff whose stacks are hard to hold is what Premiums is
+		/// for.
+		/// </remarks>
+		public static readonly Dictionary<string, int> StackCounts = new()
+		{
+			// 6 + (level - 1) * 14/9, capped at 20, per Frenzy_Buff.CapStacks.
+			["Barbarian_Frenzy"] = 20,
 		};
 
 		/// <summary>

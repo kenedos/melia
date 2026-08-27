@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -129,28 +129,12 @@ namespace Melia.Test.Balance.Buff
 				this.Write(string.Join(", ", unauthored.Select(p => $"`{p.SkillClassName}`")));
 			}
 
-			var missed = result.Prices.Where(p => !p.Converged).ToArray();
-
-			if (missed.Length > 0)
-			{
-				this.Write();
-				this.Write("## Solved short of the tolerance");
-				this.Write();
-				this.Write("The closest scale found is written, and the miss is what the buff's own axis would not give " +
-					"up - a rate near its ceiling needs a very wide scale before the reading moves at all.");
-				this.Write();
-
-				foreach (var price in missed.OrderByDescending(p => Math.Abs(p.Value - p.TargetValue)))
-					this.Write($"- `{price.SkillClassName}` - landed {price.Value:0.000} against {price.TargetValue:0.000} " +
-						$"after {price.Measurements} measurement(s)");
-			}
-
 			if (result.NotPriced.Count > 0)
 			{
 				this.Write();
 				this.Write("## Not priced");
 				this.Write();
-				this.Write("These keep whatever magnitudes the file already carries.");
+				this.Write("These keep whatever magnitudes the file already carries, except for any slot BuffDials.PinnedRatios holds, which is written from the dial.");
 				this.Write();
 
 				foreach (var (skill, reason) in result.NotPriced.OrderBy(n => n.Reason).ThenBy(n => n.Skill))

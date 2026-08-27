@@ -48,15 +48,27 @@ namespace Melia.Test.Balance.Buff
 		public IReadOnlyDictionary<int, float> Slots { get; init; }
 
 		/// <summary>
-		/// The slots BuffDials.PinnedRatios holds at a chosen magnitude, at the
-		/// skill's own cap, which the pass measures against but never solves.
+		/// The base and per-level terms BuffDials.PinnedRatios holds a slot at,
+		/// which the pass writes as they stand but never solves.
 		/// </summary>
 		/// <remarks>
 		/// Kept out of Slots so the solver cannot move them, and installed live
 		/// in every window regardless, so what they are worth still counts
 		/// against the buff's budget.
 		/// </remarks>
-		public IReadOnlyDictionary<int, float> PinnedSlots { get; init; } = new Dictionary<int, float>();
+		public IReadOnlyDictionary<int, (float Base, float ByLevel)> PinnedSlots { get; init; } = new Dictionary<int, (float, float)>();
+
+		/// <summary>
+		/// The magnitude each pinned slot reaches at the skill's own cap, which
+		/// is what a window installs it at.
+		/// </summary>
+		public IReadOnlyDictionary<int, float> PinnedMagnitudes { get; init; } = new Dictionary<int, float>();
+
+		/// <summary>
+		/// Stacks the window holds this buff's OverbuffCounter at, or zero to
+		/// leave it wherever applying it left it.
+		/// </summary>
+		public int Stacks { get; init; }
 
 		/// <summary>
 		/// The magnitude each declared slot actually holds in the file right
@@ -234,7 +246,8 @@ namespace Melia.Test.Balance.Buff
 			{
 				var maxLevel = SfrData.SkillMaxLevel(skillName);
 				var slots = new Dictionary<int, float>();
-				var pinned = new Dictionary<int, float>();
+				var pinned = new Dictionary<int, (float Base, float ByLevel)>();
+				var pinnedMagnitudes = new Dictionary<int, float>();
 				var written = new Dictionary<int, float>();
 				var held = BuffDials.PinnedRatios.GetValueOrDefault(skillName);
 
@@ -244,8 +257,9 @@ namespace Melia.Test.Balance.Buff
 					// row, so the pin holds whatever the file was left carrying.
 					if (held != null && held.TryGetValue(slot, out var pin))
 					{
-						pinned[slot] = pin * maxLevel;
-						written[slot] = pin * maxLevel;
+						pinned[slot] = pin;
+						pinnedMagnitudes[slot] = pin.Base + pin.ByLevel * maxLevel;
+						written[slot] = pinnedMagnitudes[slot];
 						continue;
 					}
 
@@ -281,6 +295,8 @@ namespace Melia.Test.Balance.Buff
 					IsPartyWide = PartyWide().Contains(skillName),
 					Slots = slots,
 					PinnedSlots = pinned,
+					PinnedMagnitudes = pinnedMagnitudes,
+					Stacks = BuffDials.StackCounts.GetValueOrDefault(skillName, 0),
 					WrittenMagnitudes = written,
 					MaxLevel = maxLevel,
 					DurationSeconds = entry.Num("captionTime", 0) + entry.Num("captionTimeByLevel", 0) * maxLevel,

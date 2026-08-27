@@ -1,5 +1,6 @@
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.Scripting.ScriptableEvents;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -15,11 +16,11 @@ namespace Melia.Zone.Buffs.Handlers
 	/// <remarks>
 	/// Uses two layers of protection:
 	/// 1. LockType.GetDamaged prevents receiving damage from new attacks
-	/// 2. IBuffCombatDefenseAfterCalc sets damage to 0 for any attacks that
+	/// 2. The AfterCalc combat hook sets damage to 0 for any attacks that
 	///    slip through (e.g., already-targeted skills, delayed damage)
 	/// </remarks>
 	[BuffHandler(BuffId.Skill_NoDamage_Buff)]
-	public class Skill_NoDamage_Buff : BuffHandler, IBuffCombatDefenseAfterCalcHandler
+	public class Skill_NoDamage_Buff : BuffHandler
 	{
 		/// <summary>
 		/// Called when the buff is activated, makes target untargetable.
@@ -42,8 +43,12 @@ namespace Melia.Zone.Buffs.Handlers
 		/// This catches attacks from entities that already had a target reference
 		/// before the lock was applied.
 		/// </summary>
-		public void OnDefenseAfterCalc(Buff buff, ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.Skill_NoDamage_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
+			if (!target.IsBuffActive(BuffId.Skill_NoDamage_Buff))
+				return;
+
 			skillHitResult.Damage = 0;
 			skillHitResult.Result = HitResultType.Dodge;
 		}

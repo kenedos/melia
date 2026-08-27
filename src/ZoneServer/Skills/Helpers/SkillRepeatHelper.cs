@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Util;
+using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
@@ -32,7 +33,7 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="attack"></param>
 		/// <param name="probe"></param>
 		public static void Request(Skill skill, ICombatEntity caster, ICombatEntity target, Func<ICombatEntity, bool> attack, Action probe = null)
-			=> Request(skill, caster, () => attack(target), () => CanAttack(skill, caster, target), probe);
+			=> Request(skill, caster, () => attack(target), () => CanAttack(skill, caster, target), probe, () => Send.ZC_SKILL_FORCE_TARGET(caster, null, skill));
 
 		/// <summary>
 		/// Executes the attack and keeps repeating it at the skill's interval
@@ -43,7 +44,7 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="attack"></param>
 		/// <param name="probe"></param>
 		public static void Request(Skill skill, ICombatEntity caster, Func<bool> attack, Action probe = null)
-			=> Request(skill, caster, attack, () => true, probe);
+			=> Request(skill, caster, attack, () => true, probe, null);
 
 		/// <summary>
 		/// Executes the attack and keeps repeating it at the skill's interval
@@ -54,7 +55,8 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="attack"></param>
 		/// <param name="canAttack"></param>
 		/// <param name="probe"></param>
-		private static void Request(Skill skill, ICombatEntity caster, Func<bool> attack, Func<bool> canAttack, Action probe)
+		/// <param name="cancel"></param>
+		private static void Request(Skill skill, ICombatEntity caster, Func<bool> attack, Func<bool> canAttack, Action probe, Action cancel)
 		{
 			var now = GameClock.Now;
 			var interval = GetInterval(skill);
@@ -70,6 +72,15 @@ namespace Melia.Zone.Skills.Helpers
 			}
 
 			skill.Vars.Set(LastRequestVar, now);
+
+			// The client keeps asking with a dead target until it retargets,
+			// and it waits for an answer before it moves on.
+			if (!canAttack())
+			{
+				skill.Vars.Set(RepeatUntilVar, now);
+				cancel?.Invoke();
+				return;
+			}
 
 			// Only the request that starts a chain fires directly, the loop
 			// paces every attack after it so the two can't bunch up.
@@ -96,7 +107,7 @@ namespace Melia.Zone.Skills.Helpers
 				return;
 
 			skill.Vars.SetBool(RepeatRunningVar, true);
-			skill.Run(Repeat(skill, caster, attack, canAttack));
+			skill.Run(Repeat(skill, caster, attack, canAttack, cancel));
 		}
 
 		/// <summary>
@@ -155,8 +166,11 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="caster"></param>
 		/// <param name="attack"></param>
 		/// <param name="canAttack"></param>
-		private static async Task Repeat(Skill skill, ICombatEntity caster, Func<bool> attack, Func<bool> canAttack)
+		/// <param name="cancel"></param>
+		private static async Task Repeat(Skill skill, ICombatEntity caster, Func<bool> attack, Func<bool> canAttack, Action cancel)
 		{
+			var aborted = false;
+
 			try
 			{
 				while (true)
@@ -166,7 +180,14 @@ namespace Melia.Zone.Skills.Helpers
 					if (!skill.Vars.TryGet<DateTime>(RepeatUntilVar, out var repeatUntil) || GameClock.Now >= repeatUntil)
 						break;
 
-					if (caster.IsDead || !canAttack())
+					if (caster.IsDead)
+						break;
+
+					// A chain that ends for any other reason than the client
+					// letting go leaves its last request unanswered.
+					aborted = true;
+
+					if (!canAttack())
 						break;
 
 					// Overheat charges run out mid chain, and the client is
@@ -176,11 +197,16 @@ namespace Melia.Zone.Skills.Helpers
 
 					if (!attack())
 						break;
+
+					aborted = false;
 				}
 			}
 			finally
 			{
 				skill.Vars.SetBool(RepeatRunningVar, false);
+
+				if (aborted)
+					cancel?.Invoke();
 			}
 		}
 	}

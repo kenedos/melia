@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection.Emit;
 using Melia.Shared.Packages;
@@ -57,9 +57,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			var duration = TimeSpan.FromSeconds(60);
 			var accuracy = caster.Properties.GetFloat(PropertyName.HR);
 			var critResistReduce = skill.Properties.GetFloat(PropertyName.CaptionRatio) + accuracy * (skill.Properties.GetFloat(PropertyName.CaptionRatio2) / 100f);
-
-			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
-			critResistReduce *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			var splashArea = new Circle(target.Position, SpreadRadius);
 

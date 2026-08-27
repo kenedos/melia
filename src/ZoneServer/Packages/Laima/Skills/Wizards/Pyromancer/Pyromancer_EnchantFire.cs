@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -57,9 +57,6 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			var damageMultiplierIncrease = skill.Properties.GetFloat(PropertyName.CaptionRatio) / 100f;
-
-			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
-			damageMultiplierIncrease *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			caster.StartBuff(BuffId.EnchantFire_Buff, skill.Level, damageMultiplierIncrease, skill.Properties.CaptionTime, caster);
 

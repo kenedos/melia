@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
@@ -48,9 +48,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 
 			if (caster is Character character)
 			{
-				var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
-				reincarnateChance = Math.Min(100f, reincarnateChance * (1f + SCR_Get_AbilityReinforceRate(skill)));
-
 				if (character.TryGetActiveAbilityLevel(AbilityId.Chronomancer3, out var doubleLevel))
 					doubleCloneChance = doubleLevel * 0.5f;
 			}

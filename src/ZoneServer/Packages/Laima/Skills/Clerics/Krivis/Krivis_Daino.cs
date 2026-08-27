@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Packages;
 using Melia.Shared.L10N;
@@ -41,9 +41,6 @@ namespace Melia.Zone.Skills.Handlers.Kriwi
 			await skill.Wait(TimeSpan.FromMilliseconds(590));
 
 			var healBonus = skill.Properties.GetFloat(PropertyName.CaptionRatio) / 100f;
-
-			var SCR_Get_AbilityReinforceRate = ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate");
-			healBonus *= 1f + SCR_Get_AbilityReinforceRate(skill);
 
 			caster.StartBuff(BuffId.Daino_Buff, skill.Level, healBonus, skill.Properties.CaptionTime, caster);
 

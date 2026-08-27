@@ -36,6 +36,8 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 	[SkillHandler(SkillId.Barbarian_Pouncing)]
 	public class Barbarian_PouncingOverride : IDynamicCasted
 	{
+		private static readonly TimeSpan ChannelDuration = TimeSpan.FromMilliseconds(3500);
+
 		/// <summary>
 		/// Called when the user starts casting the skill.
 		/// </summary>
@@ -51,7 +53,9 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
-			caster.StartBuff(BuffId.Pouncing_Buff, TimeSpan.Zero);
+
+			caster.StopBuff(BuffId.Pouncing_Buff);
+			caster.StartBuff(BuffId.Pouncing_Buff, ChannelDuration);
 
 			var padName = PadName.Barbarian_Pouncing;
 			var length = 70f;
@@ -66,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 
 			var pad = new Pad(padName, caster, skill, new Square(caster.Position, caster.Direction, length, 35));
 			pad.Position = caster.Position;
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(3500);
+			pad.Trigger.LifeTime = ChannelDuration;
 			pad.Movement.Speed = 100;
 
 			caster.Map.AddPad(pad);

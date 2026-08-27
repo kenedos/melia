@@ -45,12 +45,22 @@ namespace Melia.Zone.Buffs.Handlers.Monster
 			var propertyOverrides = new PropertyOverrides();
 			propertyOverrides.Add(PropertyName.MHP, monster.Properties.GetFloat(PropertyName.MHP) * worldConf.EliteHPSPRate / 100f);
 			propertyOverrides.Add(PropertyName.MSP, monster.Properties.GetFloat(PropertyName.MSP) * worldConf.EliteHPSPRate / 100f);
-			propertyOverrides.Add(PropertyName.MINPATK, monster.Properties.GetFloat(PropertyName.MINPATK) * worldConf.EliteStatRate / 100f);
-			propertyOverrides.Add(PropertyName.MAXPATK, monster.Properties.GetFloat(PropertyName.MAXPATK) * worldConf.EliteStatRate / 100f);
-			propertyOverrides.Add(PropertyName.MINMATK, monster.Properties.GetFloat(PropertyName.MINMATK) * worldConf.EliteStatRate / 100f);
-			propertyOverrides.Add(PropertyName.MAXMATK, monster.Properties.GetFloat(PropertyName.MAXMATK) * worldConf.EliteStatRate / 100f);
-			propertyOverrides.Add(PropertyName.DEF, monster.Properties.GetFloat(PropertyName.DEF) * worldConf.EliteStatRate / 100f);
-			propertyOverrides.Add(PropertyName.MDEF, monster.Properties.GetFloat(PropertyName.MDEF) * worldConf.EliteStatRate / 100f);
+			var atkRate = worldConf.EliteAtkRate / 100f;
+			var defRate = worldConf.EliteDefRate / 100f;
+			var secondaryRate = worldConf.EliteSecondaryStatRate / 100f;
+			propertyOverrides.Add(PropertyName.MINPATK, monster.Properties.GetFloat(PropertyName.MINPATK) * atkRate);
+			propertyOverrides.Add(PropertyName.MAXPATK, monster.Properties.GetFloat(PropertyName.MAXPATK) * atkRate);
+			propertyOverrides.Add(PropertyName.MINMATK, monster.Properties.GetFloat(PropertyName.MINMATK) * atkRate);
+			propertyOverrides.Add(PropertyName.MAXMATK, monster.Properties.GetFloat(PropertyName.MAXMATK) * atkRate);
+			propertyOverrides.Add(PropertyName.DEF, monster.Properties.GetFloat(PropertyName.DEF) * defRate);
+			propertyOverrides.Add(PropertyName.MDEF, monster.Properties.GetFloat(PropertyName.MDEF) * defRate);
+			propertyOverrides.Add(PropertyName.CRTHR, monster.Properties.GetFloat(PropertyName.CRTHR) * secondaryRate);
+			propertyOverrides.Add(PropertyName.CRTATK, monster.Properties.GetFloat(PropertyName.CRTATK) * secondaryRate);
+			propertyOverrides.Add(PropertyName.CRTDR, monster.Properties.GetFloat(PropertyName.CRTDR) * secondaryRate);
+			propertyOverrides.Add(PropertyName.DR, monster.Properties.GetFloat(PropertyName.DR) * secondaryRate);
+			propertyOverrides.Add(PropertyName.HR, monster.Properties.GetFloat(PropertyName.HR) * secondaryRate);
+			propertyOverrides.Add(PropertyName.BLK, monster.Properties.GetFloat(PropertyName.BLK) * secondaryRate);
+			propertyOverrides.Add(PropertyName.BLK_BREAK, monster.Properties.GetFloat(PropertyName.BLK_BREAK) * secondaryRate);
 
 			// Make them nimbler
 			var runSpeed = monster.Properties.GetFloat(PropertyName.RunMSPD);

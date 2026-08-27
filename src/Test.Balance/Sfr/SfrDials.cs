@@ -543,9 +543,20 @@ namespace Melia.Test.Balance.Sfr
 		/// </remarks>
 		public static readonly Dictionary<string, float> SkillSfrMultipliers = new()
 		{
+			// Drastic decrease to SFR due to linking mechanic
 			["Linker_JointPenalty"] = 0.1f,
+
+			// Really hard skill to emulate because it deals more damage when moving
 			["Rodelero_ShieldCharge"] = 0.1f,
+
+			// Not sure on this one but simulations always seem very rough on it
 			["Peltasta_ShieldLob"] = 2.1f,
+
+			// Buffed skills due to quiver mechanics
+			["Fletcher_BarbedArrow"] = 1.4f,
+			["Fletcher_BodkinPoint"] = 1.4f,
+			["Fletcher_CrossFire"] = 1.3f,
+			["Fletcher_Singijeon"] = 1.3f,
 		};
 
 		/// <summary>
@@ -561,6 +572,12 @@ namespace Melia.Test.Balance.Sfr
 		public static readonly Dictionary<string, string> PressTriggers = new()
 		{
 			["Sapper_Claymore"] = "Sapper_DetonateTraps",
+
+			// A Fletcher arrow only loads the quiver; Arrow Shot fires it.
+			["Fletcher_BodkinPoint"] = "Fletcher_FletcherArrowShot",
+			["Fletcher_BarbedArrow"] = "Fletcher_FletcherArrowShot",
+			["Fletcher_CrossFire"] = "Fletcher_FletcherArrowShot",
+			["Fletcher_Singijeon"] = "Fletcher_FletcherArrowShot",
 		};
 
 		/// <summary>

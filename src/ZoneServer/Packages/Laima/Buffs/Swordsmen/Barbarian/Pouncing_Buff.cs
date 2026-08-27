@@ -1,6 +1,7 @@
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Buffs.Handlers
@@ -14,10 +15,13 @@ namespace Melia.Zone.Buffs.Handlers
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
+			if (activationType != ActivationType.Start)
+				return;
+
 			if (buff.Caster is not Character character)
 				return;
 
-			character.Properties.SetFloat(PropertyName.DashRun, 0);
+			character.StopBuff(BuffId.DashRun);
 			character.Properties.Modify(PropertyName.Jumpable, -1);
 		}
 

@@ -1272,24 +1272,23 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var stat = properties.GetFloat(PropertyName.DEX);
 
-		var level = properties.GetFloat(PropertyName.Lv);
+		var baseValue = 5;
 
-		var byLevel = 0f;
+		var level = properties.GetFloat(PropertyName.Lv);
 		var byStat = 0d;
 
 		if (!Feature.IsEnabled("NewDEXFormula"))
 		{
-			byStat = stat * 2.5f;
+			byStat = stat * 1.55f;
 		}
 		else
 		{
-			byLevel = level;
-			byStat = (stat * 2f) + (Math.Floor(stat / 10f) * (byLevel * 0.05f));
+			byStat = (stat * 2f) + (Math.Floor(stat / 10f) * (level * 0.05f));
 		}
 
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.CRTATK);
 
-		var value = byLevel + byStat + byItem;
+		var value = baseValue + byStat + byItem;
 
 		var byBuffs = properties.GetFloat(PropertyName.CRTATK_BM);
 

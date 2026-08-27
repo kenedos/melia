@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Test.Balance.Sfr;
 using Melia.Zone.Scripting;
@@ -91,13 +91,16 @@ namespace Melia.Test.Balance.Buff
 		}
 
 		/// <summary>
-		/// A scenario that declares no stat axis leaves both sides alone.
+		/// A scenario that declares no stat axis leaves both sides alone, bar
+		/// the critical chance every scenario is held at.
 		/// </summary>
 		/// <remarks>
-		/// The baseline has to stay the baseline. If Load moved anything on a
-		/// scenario that asked for nothing, every buff's level-swept reading -
-		/// the one B1 carries alone - would be taken under conditions the grid
-		/// never declared.
+		/// The baseline has to stay the baseline. If Load moved anything the
+		/// grid had not declared, every buff's level-swept reading - the one B1
+		/// carries alone - would be taken under undeclared conditions. The
+		/// character's critical chance is the one axis the grid does declare
+		/// for every scenario, so it is checked against BaselineCritChance
+		/// rather than against the untouched pair.
 		/// </remarks>
 		[Fact]
 		public void PlainScenariosTouchNothing()
@@ -122,16 +125,61 @@ namespace Melia.Test.Balance.Buff
 
 			try
 			{
-				foreach (var name in new[] { PropertyName.DR, PropertyName.BLK, PropertyName.CRTHR, PropertyName.HR })
+				foreach (var name in new[] { PropertyName.DR, PropertyName.BLK, PropertyName.HR })
 				{
 					Assert.Equal(bareCharacter.Properties.GetFloat(name), loadedCharacter.Properties.GetFloat(name), 3);
 					Assert.Equal(bareMob.Properties.GetFloat(name), loadedMob.Properties.GetFloat(name), 3);
 				}
+
+				Assert.Equal(bareMob.Properties.GetFloat(PropertyName.CRTHR), loadedMob.Properties.GetFloat(PropertyName.CRTHR), 3);
+				this.Check(plain, "character critical", BuffScenarios.BaselineCritChance, Critical(loadedCharacter, loadedMob));
 			}
 			finally
 			{
 				SyntheticActors.Cleanup(loadedCharacter, loadedMob);
 				SyntheticActors.Cleanup(bareCharacter, bareMob);
+			}
+		}
+
+		/// <summary>
+		/// Reports the rolls the reference pair makes with no scenario loaded,
+		/// at each level the pricer sweeps.
+		/// </summary>
+		/// <remarks>
+		/// The natural rate is what an axis reads at in every scenario that
+		/// does not pin it, so it decides what a buff acting on that axis can
+		/// possibly be worth. It is reported rather than asserted: these are
+		/// the combat scripts' own numbers, and the point is to have them
+		/// written down next to the grid that has to account for them.
+		/// </remarks>
+		[Fact]
+		public void ReportsTheNaturalRolls()
+		{
+			if (!BalanceSuites.BuffEnabled)
+			{
+				_output.WriteLine(BalanceSuites.SkipMessage(BalanceSuites.BuffVariable));
+				return;
+			}
+
+			foreach (var level in ScenarioMatrix.CharacterLevels)
+			{
+				var job = JobCatalog.Entries.First(e => e.SkillPrefix == BuffDials.AnchorSkill.Split('_')[0]);
+				var stat = JobCatalog.GetPrimaryStat(job);
+
+				var character = SyntheticActors.CreateCharacter(job.JobId, level, StatSpread.AllIn(stat, level));
+				ReferenceGear.Equip(character, job);
+
+				var mob = SyntheticActors.CreateMob(SfrDefenseProbe.FindHostileReferenceMob(level).Id);
+
+				try
+				{
+					_output.WriteLine($"level {level}: character criticals {Critical(character, mob):0.0}%, " +
+						$"mob dodges {Dodge(character, mob):0.0}%, mob blocks {Block(character, mob):0.0}%");
+				}
+				finally
+				{
+					SyntheticActors.Cleanup(character, mob);
+				}
 			}
 		}
 

@@ -31,7 +31,7 @@
 { skillId: 10002, className: "Swordman_Bash", name: "Bash", basicSp: 8, lvUpSpendSp: 1.33, splashRate: 10, factor: 76, factorByLevel: 15.2, cooldownTime: 4000, overheatCount: "3" },
 { skillId: 10003, className: "Swordman_GungHo", name: "Gung Ho", basicSp: 32, lvUpSpendSp: 5.33, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 30000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 3, captionTime: 300 },
 { skillId: 10005, className: "Swordman_PainBarrier", name: "Pain Barrier", basicSp: 32, lvUpSpendSp: 5.33, factor: 0, factorByLevel: 0, cooldownTime: 30000, overheatCount: "0", captionTime: 10, captionTimeByLevel: 4 },
-{ skillId: 10009, className: "Swordman_Bear", name: "Bear", basicSp: 32, lvUpSpendSp: 5.33, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 30000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 3.6, captionRatio1Max: 80, captionTime: 300 },
+{ skillId: 10009, className: "Swordman_Bear", name: "Bear", basicSp: 32, lvUpSpendSp: 5.33, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 30000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 3.4, captionRatio1Max: 80, captionTime: 300 },
 { skillId: 10010, className: "Swordman_Liberate", name: "Liberate", basicSp: 27, lvUpSpendSp: 4.5, splashRate: 0, factor: 100, factorByLevel: 0, cooldownGroup: "Liberate", cooldownTime: 60000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 100, captionTime: 0, captionTimeByLevel: 30 },
 
 // Peltasta
@@ -39,16 +39,16 @@
 { skillId: 10102, className: "Peltasta_RimBlow", name: "Rim Blow", basicSp: 11, lvUpSpendSp: 0.57, splashRate: 6, factor: 57, factorByLevel: 3.1, cooldownTime: 4000, overheatCount: "2" },
 { skillId: 10103, className: "Peltasta_SwashBuckling", name: "Swash Buckling", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 4, factor: 100, factorByLevel: 0, atkAdd: 0, cooldownTime: 10000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 2.3, captionRatio2: 0, captionRatio2ByLevel: 2.2, captionRatio2Max: 75, captionRatio3: 0, captionRatio3ByLevel: 2.2, captionRatio3Max: 75, captionTime: 5, captionTimeByLevel: 2 },
 { skillId: 10104, className: "Peltasta_Guardian", name: "Guardian", basicSp: 28, lvUpSpendSp: 1.93, splashRate: 0, factor: 100, factorByLevel: 0, cooldownTime: 30000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 6.2, captionRatio2: 0, captionRatio2ByLevel: 1.1, captionTime: 15 },
-{ skillId: 10105, className: "Peltasta_ShieldLob", name: "Shield Lob", basicSp: 13, lvUpSpendSp: 0.67, splashRate: 3, factor: 37, factorByLevel: 2.0, cooldownTime: 8000, overheatCount: "2" },
+{ skillId: 10105, className: "Peltasta_ShieldLob", name: "Shield Lob", basicSp: 13, lvUpSpendSp: 0.67, splashRate: 3, factor: 79, factorByLevel: 4.3, cooldownTime: 8000, overheatCount: "2" },
 { skillId: 10106, className: "Peltasta_HighGuard", name: "High Guard", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 0, factor: 100, factorByLevel: 0, cooldownTime: 10000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 1.8, captionRatio2: 0, captionRatio2ByLevel: 2.5, captionTime: 0 },
 { skillId: 10109, className: "Peltasta_Langort", name: "Langort", basicSp: 9, lvUpSpendSp: 0.46, splashRate: 3, factor: 121, factorByLevel: 6.5, cooldownTime: 2000, overheatCount: "3" },
-{ skillId: 10110, className: "Peltasta_HardShield", name: "Hard Shield", basicSp: 34, lvUpSpendSp: 1.74, splashRate: 0, factor: 100.0, factorByLevel: 5.0, cooldownTime: 60000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 7.3, captionTime: 300 },
+{ skillId: 10110, className: "Peltasta_HardShield", name: "Hard Shield", basicSp: 34, lvUpSpendSp: 1.74, splashRate: 0, factor: 100.0, factorByLevel: 5.0, cooldownTime: 60000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 6.9, captionTime: 300 },
 
 // Highlander
 //---------------------------------------------------------------------------
 { skillId: 10201, className: "Highlander_WagonWheel", name: "Wagon Wheel", basicSp: 16, lvUpSpendSp: 0.83, splashRate: 6, factor: 131, factorByLevel: 7.1, cooldownTime: 8000, overheatCount: "0" },
 { skillId: 10202, className: "Highlander_CartarStroke", name: "Cartar Stroke", basicSp: 17, lvUpSpendSp: 0.88, splashRate: 10, factor: 59, factorByLevel: 3.2, cooldownTime: 8000, overheatCount: "0", enableCastMove: true },
-{ skillId: 10204, className: "Highlander_CrossGuard", name: "Cross Guard", basicSp: 15, lvUpSpendSp: 0.77, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 0, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 50, captionRatio2: 0, captionRatio2ByLevel: 5, captionTime: 5 },
+{ skillId: 10204, className: "Highlander_CrossGuard", name: "Cross Guard", basicSp: 0, lvUpSpendSp: 0, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 0, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 50, captionRatio2: 0, captionRatio2ByLevel: 5, captionTime: 5 },
 { skillId: 10205, className: "Highlander_Moulinet", name: "Moulinet", basicSp: 18, lvUpSpendSp: 1.24, splashRate: 0, factor: 138, factorByLevel: 10.2, cooldownTime: 15000, overheatCount: "2" },
 { skillId: 10207, className: "Highlander_SkyLiner", name: "Skyliner", basicSp: 8, lvUpSpendSp: 0.41, splashRate: 7, factor: 76, factorByLevel: 7.56, cooldownTime: 3000, overheatCount: "0" },
 { skillId: 10208, className: "Highlander_CrossCut", name: "Crosscut", basicSp: 13, lvUpSpendSp: 0.67, splashRate: 4, factor: 73, factorByLevel: 4.0, cooldownTime: 7000, overheatCount: "2" },
@@ -58,7 +58,7 @@
 //---------------------------------------------------------------------------
 { skillId: 10301, className: "Hoplite_Stabbing", name: "Stabbing", basicSp: 19, lvUpSpendSp: 1.31, splashRate: -99, factor: 50, factorByLevel: 3.7, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "2" },
 { skillId: 10302, className: "Hoplite_Pierce", name: "Pierce", basicSp: 11, lvUpSpendSp: 0.57, splashRate: 4, factor: 98, factorByLevel: 5.3, hitCount: 1, multiHitCount: 4, cooldownTime: 7000, overheatCount: "3" },
-{ skillId: 10303, className: "Hoplite_Finestra", name: "Finestra", basicSp: 27, lvUpSpendSp: 1.38, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 2.1, captionRatio2: 0, captionRatio2ByLevel: 1.2, captionTime: 300 },
+{ skillId: 10303, className: "Hoplite_Finestra", name: "Finestra", basicSp: 27, lvUpSpendSp: 1.38, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 2.7, captionRatio2: 0, captionRatio2ByLevel: 1.1, captionTime: 300 },
 { skillId: 10304, className: "Hoplite_SynchroThrusting", name: "Synchro Thrusting", basicSp: 10, lvUpSpendSp: 0.52, splashRate: 0, factor: 219, factorByLevel: 11.9, hitCount: 1, multiHitCount: 3, cooldownTime: 4000, overheatCount: "3" },
 { skillId: 10305, className: "Hoplite_LongStride", name: "Long Stride", basicSp: 15, lvUpSpendSp: 0.78, splashRate: 0, factor: 962, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "3" },
 { skillId: 10306, className: "Hoplite_ThrouwingSpear", name: "Spear Throw", basicSp: 12, lvUpSpendSp: 0.62, splashRate: 16, factor: 56, factorByLevel: 3.0, hitCount: 1, multiHitCount: 3, cooldownTime: 9000, overheatCount: "3" },
@@ -72,9 +72,9 @@
 { skillId: 10403, className: "Barbarian_Savagery", name: "Savagery", basicSp: 23, lvUpSpendSp: 1.19, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 21500 },
 { skillId: 10404, className: "Barbarian_StompingKick", name: "Stomping Kick", basicSp: 7, lvUpSpendSp: 0.36, splashRate: 10, factor: 111, factorByLevel: 6.1, hitCount: 1, multiHitCount: 1, cooldownTime: 0, overheatCount: "0" },
 { skillId: 10405, className: "Barbarian_Warcry", name: "Warcry", basicSp: 19, lvUpSpendSp: 0.97, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, overheatCount: "0", captionRatio1: 4, captionRatio1ByLevel: 1 },
-{ skillId: 10406, className: "Barbarian_Frenzy", name: "Frenzy", basicSp: 40, lvUpSpendSp: 2.04, splashRate: 0, factorByLevel: 1.4, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 115.6, captionRatio2: 0, captionRatio2ByLevel: 7.7, captionRatio3: 0, captionRatio3ByLevel: 3.1 },
+{ skillId: 10406, className: "Barbarian_Frenzy", name: "Frenzy", basicSp: 40, lvUpSpendSp: 2.04, splashRate: 0, factorByLevel: 1.4, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 150, captionRatio1ByLevel: 0, captionRatio2: 10, captionRatio2ByLevel: 0, captionRatio3: 0, captionRatio3ByLevel: 0.2 },
 { skillId: 10407, className: "Barbarian_GiantSwing", name: "Giant Swing", basicSp: 27, lvUpSpendSp: 1.4, splashRate: 2, factor: 1673, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
-{ skillId: 10408, className: "Barbarian_Pouncing", name: "Pouncing", basicSp: 16, lvUpSpendSp: 1.1, splashRate: 10, factor: 5, factorByLevel: 1.0, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, overheatCount: "0", enableCastMove: true },
+{ skillId: 10408, className: "Barbarian_Pouncing", name: "Pouncing", basicSp: 16, lvUpSpendSp: 1.1, splashRate: 10, factor: 5, factorByLevel: 1.0, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, overheatCount: "0", enableCastMove: true, enableCastRotate: true },
 { skillId: 10410, className: "Barbarian_Seism", name: "Seism", basicSp: 13, lvUpSpendSp: 0.67, splashRate: 10, factor: 61, factorByLevel: 3.3, hitCount: 1, multiHitCount: 1, cooldownTime: 7000, overheatCount: "2" },
 { skillId: 10411, className: "Barbarian_Cleave", name: "Cleave", basicSp: 12, lvUpSpendSp: 0.62, splashRate: 4, factor: 395, factorByLevel: 21.6, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, overheatCount: "2" },
 
@@ -570,14 +570,14 @@
 { skillId: 30004, className: "Archer_SwiftStep", name: "Swift Step", basicSp: 32, lvUpSpendSp: 5.33, factor: 0, factorByLevel: 0, cooldownTime: 30000, overheatCount: "0", captionRatio1: 5, captionRatio1ByLevel: 1, captionRatio2: 0, captionRatio2ByLevel: 10 },
 { skillId: 30005, className: "Archer_ObliqueShot", name: "Oblique Shot", basicSp: 5, lvUpSpendSp: 0.83, factor: 93, factorByLevel: 18.6, cooldownTime: 0, overheatCount: "0", maxRange: 250 },
 { skillId: 30007, className: "Archer_TwinArrows", name: "Twin Arrow", basicSp: 5, lvUpSpendSp: 0.83, factor: 133, factorByLevel: 26.6, cooldownTime: 0, overheatCount: "0", maxRange: 250 },
-{ skillId: 30008, className: "Archer_Concentration", name: "Concentration", basicSp: 17, lvUpSpendSp: 2.83, cooldownTime: 15000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 201.7 },
+{ skillId: 30008, className: "Archer_Concentration", name: "Concentration", basicSp: 17, lvUpSpendSp: 2.83, cooldownTime: 15000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 35.7 },
 { skillId: 30009, className: "Archer_Jump", name: "Leap", basicSp: 12, lvUpSpendSp: 2, factor: 20, factorByLevel: 4, cooldownTime: 5000, overheatCount: "0", shootTime: 200 },
 
 // Ranger
 //---------------------------------------------------------------------------
 { skillId: 30101, className: "Ranger_Barrage", name: "Barrage", basicSp: 6, lvUpSpendSp: 0.31, factor: 24, factorByLevel: 1.3, cooldownTime: 0, overheatCount: "0", maxRange: 250, enableCastMove: true },
 { skillId: 30103, className: "Ranger_CriticalShot", name: "Double Take", basicSp: 12, lvUpSpendSp: 0.61, factor: 163, factorByLevel: 16.3, cooldownTime: 3000, overheatCount: "0" },
-{ skillId: 30104, className: "Ranger_SteadyAim", name: "Steady Aim", activationType: "ActiveSkill", basicSp: 26, lvUpSpendSp: 1.34, factor: 0, factorByLevel: 0, cooldownTime: 10000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 9.7 },
+{ skillId: 30104, className: "Ranger_SteadyAim", name: "Steady Aim", activationType: "ActiveSkill", basicSp: 26, lvUpSpendSp: 1.34, factor: 0, factorByLevel: 0, cooldownTime: 10000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 3.2, captionTime: 300 },
 { skillId: 30107, className: "Ranger_SpiralArrow", name: "Spiral Arrow", basicSp: 10, lvUpSpendSp: 0.52, factor: 168, factorByLevel: 9.1, cooldownTime: 8000, overheatCount: "5", maxRange: 250 },
 { skillId: 30110, className: "Ranger_Scan", name: "Scan", basicSp: 5, lvUpSpendSp: 0.26, factor: 100, factorByLevel: 0, cooldownTime: 0, overheatCount: "0", maxRange: 250, captionRatio1: 0, captionRatio1ByLevel: 0.1, captionRatio2: 0, captionRatio2ByLevel: 0.1 },
 { skillId: 30111, className: "Ranger_Strafe", name: "Strafe", basicSp: 12, lvUpSpendSp: 0.61, factor: 96, factorByLevel: 9.6, cooldownTime: 3000, maxRange: 250, overheatCount: "0", shootTime: 150 },
@@ -600,7 +600,7 @@
 { skillId: 30303, className: "Sapper_PunjiStake", name: "Punji Stake", basicSp: 26, lvUpSpendSp: 1.34, basicCast: 1500, splashRate: 0, factor: 525, factorByLevel: 28.6, hitCount: 1, multiHitCount: 5, cooldownTime: 10000, overheatCount: "2", speedRateAffectedByDex: false, castInterruptible: true },
 { skillId: 30304, className: "Sapper_DetonateTraps", name: "Detonate Traps", basicSp: 9, lvUpSpendSp: 0.47, splashRate: 0, factor: 70, factorByLevel: 35, hitCount: 1, multiHitCount: 1, cooldownTime: 1000 },
 { skillId: 30305, className: "Sapper_Cover", name: "Conceal", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
-{ skillId: 30306, className: "Sapper_BroomTrap", name: "Broom Trap", basicSp: 44, lvUpSpendSp: 2.25, basicCast: 2500, splashRate: 0, factor: 70, factorByLevel: 3.8, hitCount: 1, multiHitCount: 13, cooldownTime: 12000, speedRateAffectedByDex: false, castInterruptible: true },
+{ skillId: 30306, className: "Sapper_BroomTrap", name: "Broom Trap", basicSp: 44, lvUpSpendSp: 2.25, basicCast: 2500, splashRate: 0, factor: 65, factorByLevel: 3.5, hitCount: 1, multiHitCount: 13, cooldownTime: 12000, speedRateAffectedByDex: false, castInterruptible: true },
 { skillId: 30307, className: "Sapper_CollarBomb", name: "Collar Bomb", basicSp: 20, lvUpSpendSp: 1.03, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 30308, className: "Sapper_SpikeShooter", name: "Spike Shooter", basicSp: 26, lvUpSpendSp: 1.79, basicCast: 1500, splashRate: 0, factor: 359, factorByLevel: 26.5, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "2", speedRateAffectedByDex: false, castInterruptible: true },
 { skillId: 30309, className: "Sapper_DamageTrap", name: "Continuous-type Trap", basicSp: 33, lvUpSpendSp: 1.71, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 125000 },
@@ -632,7 +632,7 @@
 { skillId: 30503, className: "Wugushi_Bewitch", name: "Bewitch", basicSp: 20, lvUpSpendSp: 1.03, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 13500 },
 { skillId: 30504, className: "Wugushi_WugongGu", name: "Wugong Gu", basicSp: 10, lvUpSpendSp: 0.52, splashRate: 0, factor: 199, factorByLevel: 10.9, hitCount: 1, multiHitCount: 1, cooldownTime: 3000, overheatCount: "2" },
 { skillId: 30505, className: "Wugushi_ThrowGuPot", name: "Poison Pot", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 0, factor: 28, factorByLevel: 1.5, hitCount: 1, multiHitCount: 1, cooldownTime: 11000 },
-{ skillId: 30506, className: "Wugushi_JincanGu", name: "Golden Frog", basicSp: 21, lvUpSpendSp: 1.07, splashRate: 0, factor: 111, factorByLevel: 6.0, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
+{ skillId: 30506, className: "Wugushi_JincanGu", name: "Golden Frog", basicSp: 21, lvUpSpendSp: 1.07, splashRate: 0, factor: 112, factorByLevel: 6.1, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
 { skillId: 30507, className: "Wugushi_Zhendu", name: "Zhendu", basicSp: 26, lvUpSpendSp: 1.34, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 1.5, captionRatio2: 0, captionRatio2ByLevel: 1.5, captionTime: 300 },
 { skillId: 30508, className: "Wugushi_LatentVenom", name: "Latent Venom", basicSp: 11, lvUpSpendSp: 0.57, splashRate: 0, factor: 204, factorByLevel: 11.1, hitCount: 1, multiHitCount: 1, cooldownTime: 4000, overheatCount: "2" },
 { skillId: 30509, className: "Wugushi_WideMiasma", name: "Wide Miasma", basicSp: 18, lvUpSpendSp: 0.92, splashRate: 0, factor: 14, factorByLevel: 0.7, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
@@ -645,7 +645,7 @@
 { skillId: 30803, className: "Fletcher_BarbedArrow", name: "Barbed Arrow", basicSp: 15, lvUpSpendSp: 0.78, splashRate: 0, factor: 88, maxRange: 200, factorByLevel: 8.8, hitCount: 1, multiHitCount: 5, cooldownTime: 6000 },
 { skillId: 30804, className: "Fletcher_CrossFire", name: "Crossfire", basicSp: 20, lvUpSpendSp: 1.02, splashRate: 10, factor: 172, maxRange: 200, factorByLevel: 17.2, hitCount: 1, multiHitCount: 2, cooldownTime: 12000 },
 { skillId: 30805, className: "Fletcher_MagicArrow", name: "Magic Arrow", basicSp: 18, lvUpSpendSp: 0.93, splashRate: -1, factor: 994, factorByLevel: 54.2, hitCount: 1, multiHitCount: 20, cooldownTime: 10000 },
-{ skillId: 30806, className: "Fletcher_Singijeon", name: "Divine Machine Arrow", basicSp: 18, lvUpSpendSp: 0.92, splashRate: 8, maxRange: 200, factor: 286, factorByLevel: 28.6, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
+{ skillId: 30806, className: "Fletcher_Singijeon", name: "Divine Machine Arrow", basicSp: 18, lvUpSpendSp: 0.92, splashRate: 8, maxRange: 200, factor: 286, factorByLevel: 28.6, hitCount: 1, multiHitCount: 2, shootTime: 450, cancelTime: 400, cooldownTime: 10000 },
 { skillId: 30807, className: "Fletcher_BroadHead_DOT", name: "Broadhead", basicSp: 20, lvUpSpendSp: 1.03, splashRate: -1, factor: 27, factorByLevel: 44.1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "0" },
 { skillId: 30808, className: "Fletcher_FletcherArrowShot", name: "Fletcher Arrow Shot", basicSp: 4, lvUpSpendSp: 0.21, splashRate: -1, maxRange: 200, factor: 11, factorByLevel: 0.7, hitCount: 1, multiHitCount: 1, cooldownTime: 0, overheatCount: "0", enableCastMove: true },
 { skillId: 30809, className: "Fletcher_CatenaChainArrow", name: "Catena Chain Arrow", basicSp: 20, lvUpSpendSp: 1.38, splashRate: -1, maxRange: 200, factor: 125, factorByLevel: 23.1, hitCount: 1, multiHitCount: 1, cooldownTime: 12000 },
@@ -820,7 +820,7 @@
 
 // Priest
 //---------------------------------------------------------------------------
-{ skillId: 40201, className: "Priest_Aspersion", name: "Aspersion", basicSp: 53, lvUpSpendSp: 2.74, basicCast: 2000, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: true, captionRatio1: 0, captionRatio1ByLevel: 2.1, captionTime: 300 },
+{ skillId: 40201, className: "Priest_Aspersion", name: "Aspersion", basicSp: 53, lvUpSpendSp: 2.74, basicCast: 2000, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: true, captionRatio1: 0, captionRatio1ByLevel: 1.9, captionTime: 300 },
 { skillId: 40202, className: "Priest_Monstrance", name: "Monstrance", basicSp: 34, lvUpSpendSp: 1.76, basicCast: 600, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: false, captionRatio1: 20, captionRatio1ByLevel: 2, captionRatio2: 3, captionRatio2ByLevel: 1, captionTime: 20 },
 { skillId: 40203, className: "Priest_Blessing", name: "Blessing", basicSp: 53, lvUpSpendSp: 2.74, basicCast: 2000, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: true, captionRatio1: 0, captionRatio1ByLevel: 1, captionTime: 300 },
 { skillId: 40204, className: "Priest_Resurrection", name: "Resurrection", basicSp: 49, lvUpSpendSp: 17.15, basicCast: 0, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 30000, overheatCount: "0"},
@@ -868,18 +868,18 @@
 { skillId: 40607, className: "Paladin_Conviction", name: "Conviction", basicSp: 13, lvUpSpendSp: 0.67, splashRate: 4, factor: 200, factorByLevel: 10.9, hitCount: 1, multiHitCount: 4, cooldownTime: 6000, overheatCount: "3" },
 { skillId: 40608, className: "Paladin_Sanctuary", name: "Sanctuary", basicSp: 88, lvUpSpendSp: 4.5, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 8000 },
 { skillId: 40609, className: "Paladin_Demolition", name: "Demolition", basicSp: 55, lvUpSpendSp: 2.81, basicCast: 4000, splashRate: 10, factor: 140, factorByLevel: 7.6, hitCount: 1, multiHitCount: 7, cooldownTime: 5000, enableCastMove: true },
-{ skillId: 40610, className: "Paladin_StoneSkin", name: "Stone Skin", basicSp: 44, lvUpSpendSp: 2.28, basicCast: 3000, splashRate: 1, factor: 38, factorByLevel: 25, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, captionRatio1: 0, captionRatio1ByLevel: 1.2, captionRatio1Max: 90, captionTime: 300 },
+{ skillId: 40610, className: "Paladin_StoneSkin", name: "Stone Skin", basicSp: 44, lvUpSpendSp: 2.28, basicCast: 3000, splashRate: 1, factor: 38, factorByLevel: 25, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, captionRatio1: 0, captionRatio1ByLevel: 1.1, captionRatio1Max: 90, captionTime: 300 },
 
 // Monk
 //---------------------------------------------------------------------------
-{ skillId: 40701, className: "Monk_IronSkin", name: "Iron Skin", basicSp: 17, lvUpSpendSp: 0.88, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, captionRatio1: 0, captionRatio1ByLevel: 1.8 },
+{ skillId: 40701, className: "Monk_IronSkin", name: "Iron Skin", basicSp: 17, lvUpSpendSp: 0.88, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, captionRatio1: 0, captionRatio1ByLevel: 1.7 },
 { skillId: 40702, className: "Monk_DoublePunch", name: "Double Punch", basicSp: 14, lvUpSpendSp: 0.72, splashRate: 0, factor: 28, factorByLevel: 2.8, hitCount: 2, multiHitCount: 1, cooldownTime: 0 },
 { skillId: 40703, className: "Monk_PalmStrike", name: "Palm Strike", basicSp: 15, lvUpSpendSp: 0.78, splashRate: 6, factor: 159, factorByLevel: 8.7, shootTime: 300, hitCount: 1, multiHitCount: 1, cooldownTime: 7000, overheatCount: "2", enableCastMove: false },
 { skillId: 40704, className: "Monk_HandKnife", name: "Hand Knife", basicSp: 15, lvUpSpendSp: 0.77, splashRate: 6, factor: 105, factorByLevel: 5.7, hitCount: 1, multiHitCount: 6, cooldownTime: 6000, overheatCount: "2" },
 { skillId: 40705, className: "Monk_1InchPunch", name: "One Inch Punch", basicSp: 17, lvUpSpendSp: 0.87, splashRate: 2, factor: 727, factorByLevel: 39.1, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "2" },
 { skillId: 40706, className: "Monk_EnergyBlast", name: "Energy Blast", basicSp: 64, lvUpSpendSp: 4.41, basicCast: 3000, splashRate: 1, factor: 36, factorByLevel: 2.7, hitCount: 1, multiHitCount: 20, cooldownTime: 15000 },
 { skillId: 40707, className: "Monk_God_Finger_Flicking", name: "God Finger Flick", basicSp: 21, lvUpSpendSp: 1.07, splashRate: 2, factor: 618, factorByLevel: 33.3, hitCount: 1, multiHitCount: 1, cooldownTime: 9000, overheatCount: "0" },
-{ skillId: 40708, className: "Monk_Golden_Bell_Shield", name: "Golden Bell Shield", basicSp: 31, lvUpSpendSp: 2.14, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 25000, captionRatio1: 0, captionRatio1ByLevel: 3.5 },
+{ skillId: 40708, className: "Monk_Golden_Bell_Shield", name: "Golden Bell Shield", basicSp: 31, lvUpSpendSp: 2.14, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 25000, captionRatio1: 0, captionRatio1ByLevel: 3.4 },
 { skillId: 40709, className: "Monk_1InchPunch_DOT", name: "One Inch Punch: Continuous Damage", basicSp: 15, lvUpSpendSp: 0.78, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, overheatCount: "3" },
 
 { skillId: 40801, className: "Pardoner_Simony", name: "Simony", splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
@@ -1068,7 +1068,7 @@
 
 // Assassin
 //---------------------------------------------------------------------------
-{ skillId: 50101, className: "Assassin_Hasisas", name: "Hasisas", basicSp: 18, lvUpSpendSp: 0.93, factor: 100, factorByLevel: 0, cooldownTime: 10000, overheatCount: "0", captionRatio3: 0, captionRatio3ByLevel: 5.7 },
+{ skillId: 50101, className: "Assassin_Hasisas", name: "Hasisas", basicSp: 18, lvUpSpendSp: 0.93, factor: 100, factorByLevel: 0, cooldownTime: 10000, overheatCount: "0", captionRatio3: 0, captionRatio3ByLevel: 2.2 },
 { skillId: 50102, className: "Assassin_Behead", name: "Behead", basicSp: 10, lvUpSpendSp: 0.52, splashRate: -99, factor: 56, factorByLevel: 3.1, cooldownTime: 4000, speedRateAffectedByDex: true, overheatCount: "2" },
 { skillId: 50103, className: "Assassin_InstantaneousAcceleration", name: "Instant Acceleration", basicSp: 13, lvUpSpendSp: 0.67, splashRate: 3, factor: 104, factorByLevel: 5.6, cooldownTime: 8000, overheatCount: "2" },
 { skillId: 50104, className: "Assassin_HallucinationSmoke", name: "Hallucination Smoke", basicSp: 15, lvUpSpendSp: 0.77, factor: 100, factorByLevel: 0, cooldownTime: 5000, overheatCount: "0", captionTime: 5, captionTimeByLevel: 1 },
