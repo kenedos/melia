@@ -1,15 +1,19 @@
 //--- Melia Script ----------------------------------------------------------
-// Grynas Training Camp - Quest NPCs
+// Grynas Training Ground Quest NPCs
 //--- Description -----------------------------------------------------------
-// A mix of the living and the dead haunt this dark-forest tract.
+// The Dievdirbys school, where carvers are taught to cut protective statues,
+// and where the blackening coming down out of the hills is first measured.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -17,294 +21,423 @@ using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.Effects;
-using Melia.Zone.Scripting.Dialogues;
 
 public class FKatyn452QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		Npc AddGhostNpc(int model, string name, string map, double x, double z, double direction, DialogFunc dialog)
-		{
-			var npc = AddNpc(model, name, map, x, z, direction, dialog);
-			npc.AddEffect(new ColorEffect(255, 150, 50, 150, 0.01f));
-			return npc;
-		}
-
-		// Quest 1001: Marius (Woodwarden) — alive, normal NPC position
+		// Quest 1001: Three Samples for the Blackening
 		//---------------------------------------------------------------------
-		AddNpc(20109, L("[Woodwarden] Marius"), "f_katyn_45_2", 977, 645, 45, async dialog =>
+		AddNpc(156005, L("[Dievdirbys] Esol"), "f_katyn_45_2", -713, 1680, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_45_2", 1001);
-			dialog.SetTitle(L("Marius"));
+
+			dialog.SetTitle(L("Esol"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A hollow-eyed warden leans against a trunk whose bark has puckered into something like a face*{/}"));
-				await dialog.Msg(L("Ridimed are circling lone walkers in slow inward spirals. The trees hear them. The knots turn. Something is being rehearsed."));
-				var response = await dialog.Select(L("Will you put twenty of them down?"),
-					Option(L("I'll put down twenty"), "help"),
-					Option(L("Rehearsing what?"), "info"),
-					Option(L("Not my problem"), "leave")
+				await dialog.Msg(L("{#666666}*He's turning a split branch over in his hands, frowning at the cut face*{/}"));
+				await dialog.Msg(L("You'll do. I need a pair of hands that isn't already exhausted from teaching — twenty-two years running this ground, sixty carvers taught, and this is the first summer the wood comes off the field black in the middle. Note that. First time. Twenty-two years."));
+				await dialog.Msg(L("I need to know how far up the food chain it has gone. Bring me 4 Black Old Kepa Stems, 4 Red Puragi Hooks and 4 Blue Ridimed Leaves and I can chart it."));
+
+				var response = await dialog.Select(L("Three species, three samples each. Will you collect them, or shall I write 'no assistant' into the report?"),
+					Option(L("I'll bring all 3 sets"), "help"),
+					Option(L("Black in the middle?"), "info"),
+					Option(L("Ask your trainees"), "leave")
 				);
+
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Don't run. Don't answer your own name if the wood calls it."));
+						await dialog.Msg(L("Take the samples from things you kill on the field itself, not the edges. I want the middle of the ground, by the practice stumps. Edge samples skew the data."));
 						break;
+
 					case "info":
-						await dialog.Msg(L("I don't know. Old foresters say the Ridimed copy what the wood teaches them. I don't want to be here when the lesson ends."));
+						await dialog.Msg(L("Cut a branch here and the outer two rings test pale, healthy. The heartwood is black as a burn. Dying inward-out — which, for the record, is not how anything is supposed to die."));
+						await dialog.Msg(L("A statue carved from that wood holds a crystal for roughly a month before it splits. I've burned fourteen finished pieces this season. Fourteen. I counted."));
 						break;
+
 					case "leave":
-						await dialog.Msg(L("Walk the edge-paths, then. The middle is where the spirals form."));
+						await dialog.Msg(L("My trainees are 15 and 16. I've already sent one of them out on this road once. I'd rather not repeat the experiment."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killRidimed", out var killObj)) return;
-				if (killObj.Done)
+				if (!quest.TryGetProgress("collectStems", out var stemObj)) return;
+				if (!quest.TryGetProgress("collectHooks", out var hookObj)) return;
+				if (!quest.TryGetProgress("collectLeaves", out var leafObj)) return;
+
+				if (stemObj.Done && hookObj.Done && leafObj.Done)
 				{
-					await dialog.Msg(L("The wood's quieter. Not quiet. Quieter. Take your purse and a salt-pouch."));
+					await dialog.Msg(L("{#666666}*He lays the three sets out in a row and cuts one of each open*{/}"));
+					await dialog.Msg(L("Black through the Kepa. Black through the Puragi. The Ridimed leaves are only edged — so it's moving upward, and it hasn't finished. Write that down somewhere, would you, in case I forget I said it."));
+					await dialog.Msg(L("Take the school's fee. Reserved for guest carvers, and no guest carver's climbed this road in three years. Consider yourself the control group."));
+
 					character.Quests.Complete(questId);
 				}
-				else await dialog.Msg(L("Twenty. Don't stop in the center of a spiral."));
+				else
+				{
+					await dialog.Msg(L("Still short on one of the three. All 4 of each, and from the middle of the field - the edges will read wrong."));
+				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The knots stopped turning for three nights. Then started again, slower. We count that a win in this wood."));
+				await dialog.Msg(L("I've pinned the chart in the workshop. Three lines on it. All three point at the hills past the ridge. I don't love a chart that agrees with itself that cleanly."));
 			}
 		});
 
-		// Quest 1002 giver: Nijole (Shrine-Keeper) — alive, shrine position
+		// Quest 1002: What the Stumps Are Doing
 		//---------------------------------------------------------------------
-		AddNpc(20107, L("[Shrine-Keeper] Nijole"), "f_katyn_45_2", 268, 136, 45, async dialog =>
+		AddNpc(156005, L("[Dievdirbys] Rutalen"), "f_katyn_45_2", -20, 994, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_katyn_45_2", 1002);
-			dialog.SetTitle(L("Nijole"));
+
+			dialog.SetTitle(L("Rutalen"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A quiet keeper braids red thread through a small bone-and-wax charm*{/}"));
-				await dialog.Msg(L("The Deep Shrine's ward-thread snapped on the new moon. My sister kept that shrine. She is gone now, but her ghost still tends the stone. The charm I'm finishing replaces the thread."));
-				var response = await dialog.Select(L("Carry this charm to my sister Dalia at the cliff-shrine. Bring back her ward-token so I know the replacement took."),
-					Option(L("I'll carry the charm"), "help"),
-					Option(L("Her ghost?"), "info"),
-					Option(L("Shrine business stays with shrines"), "leave")
+				await dialog.Msg(L("{#666666}*He has one palm flat against a stump and doesn't move it, even as he looks up*{/}"));
+				await dialog.Msg(L("Give me a moment. Please. I don't trust what I'm feeling right now and I don't want to lose count halfway through convincing myself I imagined it. Four practice stumps on this field — two hundred years of trainees cutting the same four, and I've put my own hands on every one of them."));
+				await dialog.Msg(L("Esol wants his samples off dead animals. I want somebody else's hand on each of the 4 stumps, telling me what they feel — because I've stopped trusting mine, and that frightens me rather more than the wood does."));
+
+				var response = await dialog.Select(L("Would you check them? Just — tell me if I'm imagining it. Please."),
+					Option(L("I'll check all 4 stumps"), "help"),
+					Option(L("Why not check them yourself?"), "info"),
+					Option(L("Stumps are stumps"), "leave")
 				);
+
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Don't ring the bells on the path. The cliff-shrine answers only its own bells."));
+						await dialog.Msg(L("Palm flat on the cut face and wait. A living stump is cool. A blackened one is warm and it will feel like it is warm for a reason."));
 						break;
+
 					case "info":
-						await dialog.Msg(L("She jumped. The wood was speaking through her, and she would not let it. Her ghost still tends the stone where she fell."));
+						await dialog.Msg(L("Because I've wanted them to be fine for six weeks straight, and a man who wants a particular answer is the worst possible instrument for finding the true one. I know that. Doesn't help."));
+						await dialog.Msg(L("Esol taught me that lesson himself, on this very field, on one of these very stumps. I've been ignoring it since June, if you want the honest count."));
 						break;
+
 					case "leave":
-						await dialog.Msg(L("Then her stone keeps swallowing words. I'll find another carrier."));
+						await dialog.Msg(L("These stumps have had the hands of every carver in the order on them. If they are not stumps any more, that matters more than the road does."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("deliverCharm", out var deliverObj)) return;
-				if (deliverObj.Done)
+				if (!quest.TryGetProgress("checkStumps", out var stumpObj)) return;
+
+				if (stumpObj.Done)
 				{
-					await dialog.Msg(L("Her token. Warm. The ward took. That's all I needed to know."));
-					await dialog.Msg(L("Keeper's coin. And a strand of charm-thread - keeps small things from speaking to you at night."));
+					await dialog.Msg(L("All 4 warm. Not one cool. Six weeks I've been telling myself it was just the summer heat. Six weeks."));
+					await dialog.Msg(L("Take my carving fee. I am not going to be taking work for a while and it will only sit in the box."));
+
 					character.Quests.Complete(questId);
 				}
-				else await dialog.Msg(L("South-east. The cliff. Don't ring the bells."));
+				else
+				{
+					await dialog.Msg(L("Still stumps unchecked. Palm flat, and give it a slow count of 5 before you decide."));
+				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("My sister's stone speaks again. She and I exchange words across death. Strange comfort, but a comfort still."));
+				await dialog.Msg(L("We're cutting new practice stumps from the northern stand tomorrow. Two hundred years of hands on those four, and we're walking away from them in a single morning. I don't know how to feel about that, so I've decided not to."));
 			}
 		});
 
-		// Quest 1002 recipient: Dalia (Deep-Shrine) — GHOST, staring down cliff
+		// Quest 1002 inspection points - the practice stumps
 		//---------------------------------------------------------------------
-		AddGhostNpc(155131, L("[Restless Soul] Cliff-Sister"), "f_katyn_45_2", 2105, 436, 45, async dialog =>
+		void AddPracticeStump(int stumpNumber, string stumpName, string observation, int x, int z, int direction)
 		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_katyn_45_2", 1002);
-			dialog.SetTitle(L("Cliff-Sister"));
-
-			if (character.Quests.IsActive(questId))
-			{
-				var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_45_2.Quest1002.Delivered", 0) >= 1;
-				if (!delivered)
-				{
-					await dialog.Msg(L("The cliff... I stare down the cliff... I jumped from this cliff..."));
-					await dialog.Msg(L("The wood... The wood was speaking through me... I would not let it... So I jumped... I jumped..."));
-					await dialog.Msg(L("The bells... My sister's bells... You bring the charm... At last..."));
-					await dialog.Msg(L("{#666666}*She binds the charm to a small shrine-stone at the cliff edge. The stone settles*{/}"));
-					await dialog.Msg(L("Carry her my token... Tell her... Tell her I no longer hear the wood..."));
-					character.Variables.Perm.Set("Laima.Quests.f_katyn_45_2.Quest1002.Delivered", 1);
-					character.ServerMessage(L("{#FFD700}Cliff-Sister's ward-token received. Return to Shrine-Keeper Nijole.{/}"));
-				}
-				else await dialog.Msg(L("Back to her... Back to my sister... Tell her I am quiet at last..."));
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The stone speaks clean again... I hear my sister... Twice a day..."));
-			}
-			else
-			{
-				await dialog.Msg(L("The cliff... The cliff... I cannot look away..."));
-			}
-		});
-
-		// Quest 1003: Egle (Dream-Herbalist) — GHOST, looking at pond (drowned)
-		//---------------------------------------------------------------------
-		AddGhostNpc(154017, L("[Restless Soul] Pond-Herbalist"), "f_katyn_45_2", -519, 1476, 45, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_katyn_45_2", 1003);
-			dialog.SetTitle(L("Pond-Herbalist"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("The pond... The pond... I see my own face in the pond... It is not my face anymore..."));
-				var response = await dialog.Select(L("..."),
-					Option(L("What happened?"), "info"),
-					Option(L("I will help you rest"), "help"),
-					Option(L("Leave"), "leave")
-				);
-				if (response == "info")
-				{
-					await dialog.Msg(L("Bark-strips... I cut bark from a watching-tree... A knot opened... I should have walked away..."));
-					await dialog.Msg(L("It chased me to the pond... It pushed me under... I drank the pond... I drank the pond..."));
-					var r2 = await dialog.Select(L("..."),
-						Option(L("I will finish your dream-draught"), "help"),
-						Option(L("Rest..."), "leave")
-					);
-					if (r2 == "help") { character.Quests.Start(questId); await dialog.Msg(L("Eight bark-strips... Closed knots only... Never an open knot... Never... Never...")); }
-				}
-				else if (response == "help")
-				{
-					character.Quests.Start(questId);
-					await dialog.Msg(L("Eight bark-strips... Closed knots only... Never an open knot... Never... Never..."));
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var barkCount = character.Inventory.CountItem(650851);
-				if (barkCount >= 8)
-				{
-					await dialog.Msg(L("Eight strips... My draught will steep at last... I see my face again... My own face..."));
-					await dialog.Msg(L("Take this herbalist's purse... Salt-water vial... For when something follows you..."));
-					character.Quests.Complete(questId);
-				}
-				else await dialog.Msg(L("Closed knots... Don't hum... The bark remembers melodies..."));
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The pond shows my face... My own face at last... I will leave the pond..."));
-			}
-		});
-
-		// Quest 1004: Audrius (Forest-Scholar) — alive, staring at creepy statues
-		//---------------------------------------------------------------------
-		AddNpc(20151, L("[Forest-Scholar] Audrius"), "f_katyn_45_2", -842, -815, 225, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_katyn_45_2", 1004);
-			dialog.SetTitle(L("Audrius"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A young scholar studies a circle of weathered statues. He does not turn his back on them*{/}"));
-				await dialog.Msg(L("These statues watch the wood, and the wood watches them. Four trees nearby keep their knot-eyes open through the day. My paper called this folklore. My eyes call it otherwise."));
-				var response = await dialog.Select(L("Walk the four marked trees. Tell me whether each knot is closed, weeping sap, or - the worst case - actively tracking your hand. Will you?"),
-					Option(L("I'll walk the four trees"), "help"),
-					Option(L("Tracking?"), "info"),
-					Option(L("Not for trees"), "leave")
-				);
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Closed knot: still grain. Weeping: clear sap. Tracking: grain follows your hand."));
-						await dialog.Msg(L("If one tracks - leave. Don't return alone. Don't return."));
-						break;
-					case "info":
-						await dialog.Msg(L("Tracking means the tree has enough awareness to follow gestures. We don't want this wood to be active."));
-						break;
-					case "leave":
-						await dialog.Msg(L("Fair. I'll walk them myself. Slower, but my eyes still work. For now."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var treesChecked = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_45_2.Quest1004.TreesChecked", 0);
-				if (treesChecked >= 4)
-				{
-					await dialog.Msg(L("One tree fully active. Above the threshold my paper called folklore. I'll forward this to Fedimian tonight."));
-					await dialog.Msg(L("Scholar's stipend. Thank you. The fourth tree gets a keep-clear circle."));
-					character.Quests.Complete(questId);
-				}
-				else await dialog.Msg(L("Four trees. Wave past each knot. Don't stare back."));
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Wardmage set a circle around the active tree. It closed for a week, then re-opened. We watch."));
-			}
-		});
-
-		// Watching-tree inspection points (kept as inspection pattern)
-		//---------------------------------------------------------------------
-		void AddKnotTree(int treeNumber, string treeName, string observation, int x, int z, int direction)
-		{
-			AddNpc(47251, L(treeName), "f_katyn_45_2", x, z, direction, async dialog =>
+			AddNpc(157008, stumpName, "f_katyn_45_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
-				var questId = new QuestId("f_katyn_45_2", 1004);
+				var questId = new QuestId("f_katyn_45_2", 1002);
+				var variableKey = $"Laima.Quests.f_katyn_45_2.Quest1002.Stump{stumpNumber}";
+				var counterKey = "Laima.Quests.f_katyn_45_2.Quest1002.StumpsChecked";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A marked tree*{/}"));
+					await dialog.Msg(L("{#666666}*A practice stump, its cut face scarred by two centuries of trainees*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_katyn_45_2.Quest1004.Tree{treeNumber}";
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*Already read*{/}"));
+					await dialog.Msg(L("{#666666}*You already checked this one*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Waving past the knot..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(
+					L("Reading the cut face..."), L("Cancel"), "PRAY", TimeSpan.FromSeconds(3)
+				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Variables.Perm.Set(variableKey, true);
-					var treesChecked = character.Variables.Perm.GetInt("Laima.Quests.f_katyn_45_2.Quest1004.TreesChecked", 0);
-					character.Variables.Perm.Set("Laima.Quests.f_katyn_45_2.Quest1004.TreesChecked", treesChecked + 1);
-					character.ServerMessage(L(observation));
-					character.ServerMessage(LF("Trees read: {0}/4", treesChecked + 1));
-					if (treesChecked + 1 >= 4)
-						character.ServerMessage(L("{#FFD700}All trees read! Return to Forest-Scholar Audrius.{/}"));
+
+					var checkedCount = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, checkedCount);
+
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Stumps checked: {0}/4", checkedCount));
+
+					if (checkedCount >= 4)
+						character.ServerMessage(L("{#FFD700}All 4 stumps checked. Return to Dievdirbys Rutalen.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("Reading interrupted. You step back a pace."));
+					character.ServerMessage(L("You take your hand off the stump."));
 				}
 			});
 		}
 
-		AddKnotTree(1, "West Watching-Tree", "West Tree: knot closed tight, grain still. Dormant.", -299, 1111, 90);
-		AddKnotTree(2, "North Watching-Tree", "North Tree: ringed by fresh sap. Grain still.", 502, 790, 180);
-		AddKnotTree(3, "East Watching-Tree", "East Tree: sap beading and grain shifted half an inch sideways as your hand passed.", 1120, 10, 270);
-		AddKnotTree(4, "Deep Watching-Tree", "Deep Tree: grain followed your hand across a full arc. Knot remained open.", 595, -1781, 0);
+		AddPracticeStump(1, L("Practice Stump"),
+			L("First Stump: warm, and warmest at the heart of the cut."), -835, 1278, 0);
+		AddPracticeStump(2, L("Practice Stump"),
+			L("Second Stump: warm. A black ring shows two fingers in from the bark."), -393, 1642, 90);
+		AddPracticeStump(3, L("Practice Stump"),
+			L("Third Stump: warm, and the sap standing on the face runs dark."), -713, 1680, 180);
+		AddPracticeStump(4, L("Practice Stump"),
+			L("Fourth Stump: warm. Two hundred years of carved initials, and the newest ones are already blackening."), -950, 1750, 270);
+
+		// Quest 1003: The Old Carving Knife
+		//---------------------------------------------------------------------
+		AddNpc(157005, L("[Trainee Carver] Lerid"), "f_katyn_45_2", -775, 1559, 0, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_katyn_45_2", 1003);
+
+			dialog.SetTitle(L("Lerid"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*He's pacing a tight circle in the grass, checking the same empty patch of ground over and over*{/}"));
+				await dialog.Msg(L("You didn't happen to see a Kepa carrying a knife on your way in? No? Didn't think so. I put Rutalen's old carving knife down for one minute — one minute — and a Black Old Kepa took it. Not knocked it off. Took it. Walked off with it tucked under its arm like it had somewhere to be."));
+				await dialog.Msg(L("That knife is 90 years old and it is not mine to lose. Kill 15 Black Old Kepa on the field, get it back, and let's — not mention the 'one minute' part to Rutalen."));
+
+				var response = await dialog.Select(L("Will you find it? I'd rather not explain this twice."),
+					Option(L("I'll hunt the Kepa and get the knife back"), "help"),
+					Option(L("A Kepa picked something up?"), "info"),
+					Option(L("Just tell him"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The one that has it will be slower than the rest and it will keep turning to face you. That's the whole tell and it's a good one."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Old Kepas do not pick things up. Never have, not once, in the entire time this school's kept records. I've been on this field two years, and I watched one carry a knife like it knew what a knife was for."));
+						await dialog.Msg(L("I told Esol. He wrote it down without a word, then sat very still for a long moment. That frightened me rather more than the Kepa did, if I'm honest."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("I'm going to anyway. I'd simply rather walk back in there holding the knife than empty-handed, if it's all the same to you."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killKepa", out var killObj)) return;
+				if (!quest.TryGetProgress("findKnife", out var itemObj)) return;
+
+				if (killObj.Done && itemObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*He checks the edge against his thumbnail before anything else*{/}"));
+					await dialog.Msg(L("Not a nick in it. Ninety years old, dragged around a field by a Kepa for a full day, and it's still true. Small mercies."));
+					await dialog.Msg(L("Take everything in my kit box. I've a second knife and I'd rather owe you than owe Rutalen."));
+
+					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("You've thinned them right out and no knife. Keep going - the one carrying it doesn't run with the others."));
+				}
+				else
+				{
+					await dialog.Msg(L("Still Kepas out on the field. Look for the slow one."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("I gave it back and told him the truth. He said a knife that gets stolen by a Kepa has a better story than most, and then he told me to sweep the workshop."));
+			}
+		});
+
+		// Quest 1004: The Sculpture at the Broken Obelisk
+		//---------------------------------------------------------------------
+		AddNpc(157004, L("[Dievdirbys] Ajel"), "f_katyn_45_2", 1321, -398, 180, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_katyn_45_2", 1004);
+			var placedKey = "Laima.Quests.f_katyn_45_2.Quest1004.Placed";
+
+			dialog.SetTitle(L("Ajel"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*He's set a wrapped bundle down carefully in the grass, catching his breath from the climb*{/}"));
+				await dialog.Msg(L("Ah — good, someone with legs that still work. Mine complained the whole climb up from the road, the moment the ring was lit. There's a broken obelisk on the eastern edge of this ground, oldest thing the order owns, older than my patience for scree slopes."));
+				await dialog.Msg(L("I've carved a purifying sculpture to stand at its foot, but it needs charging. Bring me 5 Faintly Glowing Orbs off the Blue Ridimed and then set the sculpture at the obelisk yourself."));
+
+				var response = await dialog.Select(L("Well? Will you charge it and set it, or shall I drag this bundle up the scree myself and give my knees something to really complain about?"),
+					Option(L("I'll gather the orbs and set the sculpture"), "help"),
+					Option(L("What broke the obelisk?"), "info"),
+					Option(L("Set it yourself"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						character.Inventory.Add(668041, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("The orbs sit in the Ridimed's crown and go dark within a minute of the thing dying, so take them straight off. Carry the sculpture face-down until you set it — face-up, it just glowers at you the whole climb."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Nobody knows. It was broken when the order arrived, and the order arrived four hundred years ago. Four centuries and we still can't read the writing on the standing half. Humbling, that."));
+						await dialog.Msg(L("What I can tell you is that the blackening stops 40 paces short of it on every side. That is not nothing."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("I would. I am 64 and the obelisk is up a scree slope and I have already had that argument with my knees this morning."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (character.Variables.Perm.GetBool(placedKey, false))
+				{
+					await dialog.Msg(L("It took? Good — didn't want to climb back up here to check. It'll hold that circle a year, and by then somebody should have gone up into the hills to find the source."));
+					await dialog.Msg(L("Take the order's road purse - the second one. Esol will sign for it and grumble, which is how the order has always paid for anything."));
+
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Orbs first, then the obelisk. It's on the eastern edge, up the scree - you'll see the standing half from the field."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Two rings lit on the road and one circle held at the obelisk. That is the most standing ground the order has had in a decade, and it is still not enough. Never is, in this line of work."));
+			}
+		});
+
+		// Quest 1004 delivery point - the broken obelisk
+		//---------------------------------------------------------------------
+		AddNpc(147501, L("Broken Obelisk"), "f_katyn_45_2", 873, 5, 315, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_katyn_45_2", 1004);
+			var placedKey = "Laima.Quests.f_katyn_45_2.Quest1004.Placed";
+
+			if (!character.Quests.IsActive(questId))
+			{
+				await dialog.Msg(L("{#666666}*Half an obelisk, snapped clean, with writing on it that nobody has read in 400 years*{/}"));
+				return;
+			}
+
+			if (character.Variables.Perm.GetBool(placedKey, false))
+			{
+				await dialog.Msg(L("{#666666}*The purifying sculpture stands at the foot of the standing half, lit from inside*{/}"));
+				return;
+			}
+
+			if (!character.Quests.TryGetById(questId, out var quest)) return;
+			if (!quest.TryGetProgress("collectOrbs", out var orbObj)) return;
+
+			if (!orbObj.Done)
+			{
+				await dialog.Msg(L("{#666666}*The sculpture is dead weight in your hands. It needs charging before it will do anything here*{/}"));
+				return;
+			}
+
+			var result = await character.TimeActions.StartAsync(
+				L("Setting the sculpture..."), L("Cancel"), "PRAY", TimeSpan.FromSeconds(5)
+			);
+
+			if (result == TimeActionResult.Completed)
+			{
+				character.Variables.Perm.Set(placedKey, true);
+				character.Quests.CompleteObjective(questId, "placeSculpture");
+				character.ServerMessage(L("{#FFD700}The sculpture takes the charge and lights. Return to Dievdirbys Ajel.{/}"));
+			}
+			else
+			{
+				character.ServerMessage(L("You lift the sculpture back onto your shoulder."));
+			}
+		});
+
+		// Quest 1005: Esol's Verdict
+		//---------------------------------------------------------------------
+		AddNpc(156005, L("[Dievdirbys] Esol"), "f_katyn_45_2", -650, 1740, 225, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_katyn_45_2", 1005);
+
+			dialog.SetTitle(L("Esol"));
+
+			if (!character.Quests.Has(questId))
+			{
+				if (!character.Quests.HasCompleted(new QuestId("f_katyn_45_2", 1001))
+					|| !character.Quests.HasCompleted(new QuestId("f_katyn_45_2", 1002))
+					|| !character.Quests.HasCompleted(new QuestId("f_katyn_45_2", 1003))
+					|| !character.Quests.HasCompleted(new QuestId("f_katyn_45_2", 1004)))
+				{
+					await dialog.Msg(L("I have samples, stump readings, a stolen knife and an obelisk to account for. Finish all 4 and then I will put them together in front of you."));
+					return;
+				}
+
+				await dialog.Msg(L("{#666666}*He's spread every report out on the workbench and hasn't looked up from them in a while*{/}"));
+				await dialog.Msg(L("Good, you're back. I'd started talking to the reports instead of an actual person, which is a bad sign in a man my age. Three sample lines pointing at the ridge. Four warm stumps. A Kepa that carried a knife like it had been told to. A circle at the obelisk the blackening will not cross."));
+				await dialog.Msg(L("I want to say what it adds up to out loud, with somebody standing there who has actually walked the ground. Once I write it down, the order has to act on it. Stay while I say it."));
+
+				var response = await dialog.Select(L("Sit. Stand. I don't care which. Will you hear the verdict, or not?"),
+					Option(L("I'll hear your verdict"), "help"),
+					Option(L("You already know what it says"), "info"),
+					Option(L("Write it and send it"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						character.Quests.CompleteObjective(questId, "hearVerdict");
+						await dialog.Msg(L("It's not a sickness in the wood. Something in the hills past this ridge is calling, and the wood and the animals are both answering it. Simple, once you stop looking for a simpler answer."));
+						await dialog.Msg(L("Four hundred years of carving on this field, and we've been treating the symptom the entire time. Go up into the hills. Whatever's there has been there longer than we have. Longer than the order, certainly."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("I know what the evidence says. Knowing and signing your name under it are different acts and only one of them sends trainees into the hills."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("I have written 3 drafts. Every one of them ends with the same sentence and I keep burning them at that sentence."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				await dialog.Msg(L("Take the school's whole reserve. If I am right about the hills there will not be a school here to spend it."));
+
+				character.Quests.Complete(questId);
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("The report went to Fedimian this morning under my name and Rutalen's. Ajel has gone up the ridge ahead of the reply, which is exactly what I would have done at his age and exactly what I told him not to do."));
+			}
+		});
 	}
 }
 
@@ -312,136 +445,238 @@ public class FKatyn452QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class TheCirclingRidimedQuest : QuestScript
+// Quest 1001 CLASS: Three Samples for the Blackening
+//-----------------------------------------------------------------------------
+
+public class ThreeSamplesForTheBlackeningQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_katyn_45_2", 1001);
-		SetName("The Circling Ridimed");
+		SetName(L("Three Samples for the Blackening"));
 		SetType(QuestType.Sub);
-		SetDescription("Woodwarden Marius needs twenty Blue Ridimed put down before their inward spirals complete whatever the wood is rehearsing.");
+		SetDescription(L("Wood cut on the training field comes off black at the heart and pale at the bark, which is not how anything dies. The school's master needs samples from three species to chart how far the blackening has climbed."));
 		SetLocation("f_katyn_45_2");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Woodwarden] Marius", "f_katyn_45_2");
-		AddObjective("killRidimed", "Defeat Blue Ridimed",
-			new KillObjective(20, new[] { MonsterId.Ridimed_Blue }));
-		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(8000));
-		AddReward(new ItemReward(640085, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddQuestGiver(L("[Dievdirbys] Esol"), "f_katyn_45_2");
+
+		AddObjective("collectStems", L("Collect Black Old Kepa Stems"),
+			new CollectItemObjective(668032, 4));
+
+		AddObjective("collectHooks", L("Collect Red Puragi Hooks"),
+			new CollectItemObjective(668033, 4));
+
+		AddObjective("collectLeaves", L("Collect Blue Ridimed Leaves"),
+			new CollectItemObjective(668034, 4));
+
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(668032, 0.45f, MonsterId.Pappus_Kepa_Purple);
+		AddDrop(668033, 0.45f, MonsterId.Puragi_Red);
+		AddDrop(668034, 0.45f, MonsterId.Ridimed_Blue);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(668032, character.Inventory.CountItem(668032), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668033, character.Inventory.CountItem(668033), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668034, character.Inventory.CountItem(668034), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(668032, character.Inventory.CountItem(668032), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668033, character.Inventory.CountItem(668033), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668034, character.Inventory.CountItem(668034), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class TheWardingCharmQuest : QuestScript
+// Quest 1002 CLASS: What the Stumps Are Doing
+//-----------------------------------------------------------------------------
+
+public class WhatTheStumpsAreDoingQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_katyn_45_2", 1002);
-		SetName("The Warding Charm");
+		SetName(L("What the Stumps Are Doing"));
 		SetType(QuestType.Sub);
-		SetDescription("Shrine-Keeper Nijole's warding charm must reach her sister's ghost at the cliff-shrine, and her ward-token must return.");
+		SetDescription(L("Trainees have cut the same 4 practice stumps for 200 years. The carver who owns the field has wanted them to be fine for 6 weeks and no longer trusts his own hands on them. Read all 4."));
 		SetLocation("f_katyn_45_2");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Shrine-Keeper] Nijole", "f_katyn_45_2");
-		AddObjective("deliverCharm", "Deliver the charm to the Cliff-Sister and return with the token",
-			new VariableCheckObjective("Laima.Quests.f_katyn_45_2.Quest1002.Delivered", 1, true));
-		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(8000));
-		AddReward(new ItemReward(640085, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
+		AddQuestGiver(L("[Dievdirbys] Rutalen"), "f_katyn_45_2");
+
+		AddObjective("checkStumps", L("Read the 4 practice stumps on the training field"),
+			new VariableCheckObjective("Laima.Quests.f_katyn_45_2.Quest1002.StumpsChecked", 4, true));
+
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1002.Delivered");
+		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1002.StumpsChecked");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_2.Quest1002.Stump{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1002.Delivered");
+		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1002.StumpsChecked");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_2.Quest1002.Stump{i}");
 	}
 }
 
-public class BarkFromTheWatchingTreesQuest : QuestScript
+// Quest 1003 CLASS: The Old Carving Knife
+//-----------------------------------------------------------------------------
+
+public class TheOldCarvingKnifeQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_katyn_45_2", 1003);
-		SetName("The Pond-Herbalist's Bark");
+		SetName(L("The Old Carving Knife"));
 		SetType(QuestType.Sub);
-		SetDescription("A drowned herbalist's ghost begs for eight bark-strips from closed-knot watching-trees so her unfinished dream-draught may steep.");
+		SetDescription(L("A Black Old Kepa picked up a 90-year-old carving knife and walked off with it, which is not something an Old Kepa has ever done. Kill them on the field and bring the knife back to the trainee who lost it."));
 		SetLocation("f_katyn_45_2");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Restless Soul] Pond-Herbalist", "f_katyn_45_2");
-		AddObjective("collectBark", "Gather twisted bark-strips",
-			new CollectItemObjective(650851, 8));
-		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddQuestGiver(L("[Trainee Carver] Lerid"), "f_katyn_45_2");
 
-		AddDrop(650851, 0.40f, MonsterId.Pappus_Kepa_Purple);
+		AddObjective("killKepa", L("Kill Black Old Kepa on the training field"),
+			new KillObjective(15, new[] { MonsterId.Pappus_Kepa_Purple }));
+
+		AddObjective("findKnife", L("Recover the Old Carving Knife"),
+			new CollectItemObjective(668036, 1));
+
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(668036, 0.20f, MonsterId.Pappus_Kepa_Purple);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650851, character.Inventory.CountItem(650851), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668036, character.Inventory.CountItem(668036), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650851, character.Inventory.CountItem(650851), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668036, character.Inventory.CountItem(668036), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class WhichKnotEyesAreOpenQuest : QuestScript
+// Quest 1004 CLASS: The Sculpture at the Broken Obelisk
+//-----------------------------------------------------------------------------
+
+public class TheSculptureAtTheBrokenObeliskQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_katyn_45_2", 1004);
-		SetName("Which Knot-Eyes Are Open");
+		SetName(L("The Sculpture at the Broken Obelisk"));
 		SetType(QuestType.Sub);
-		SetDescription("Forest-Scholar Audrius has asked you to read the four watching-trees and determine which still sleep, which weep sap, and which actively track movement.");
+		SetDescription(L("The blackening stops 40 paces short of the broken obelisk on every side. Charge a purifying sculpture with orbs taken from Blue Ridimed and set it at the obelisk's foot to hold that circle."));
 		SetLocation("f_katyn_45_2");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Forest-Scholar] Audrius", "f_katyn_45_2");
-		AddObjective("readTrees", "Read the four watching-trees",
-			new VariableCheckObjective("Laima.Quests.f_katyn_45_2.Quest1004.TreesChecked", 4, true));
-		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Dievdirbys] Ajel"), "f_katyn_45_2");
+
+		AddObjective("collectOrbs", L("Collect Faintly Glowing Orbs from Blue Ridimed"),
+			new CollectItemObjective(668040, 5));
+
+		AddObjective("placeSculpture", L("Set the purifying sculpture at the broken obelisk"),
+			new ManualObjective());
+
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(668040, 0.45f, MonsterId.Ridimed_Blue);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1004.TreesChecked");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_2.Quest1004.Tree{i}");
+		character.Inventory.Remove(668040, character.Inventory.CountItem(668040), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668041, character.Inventory.CountItem(668041), InventoryItemRemoveMsg.Destroyed);
+
+		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1004.Placed");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1004.TreesChecked");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_katyn_45_2.Quest1004.Tree{i}");
+		character.Inventory.Remove(668040, character.Inventory.CountItem(668040), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(668041, character.Inventory.CountItem(668041), InventoryItemRemoveMsg.Destroyed);
+
+		character.Variables.Perm.Remove("Laima.Quests.f_katyn_45_2.Quest1004.Placed");
+	}
+}
+
+// Quest 1005 CLASS: Esol's Verdict
+//-----------------------------------------------------------------------------
+
+public class EsolsVerdictQuest : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_katyn_45_2", 1005);
+		SetName(L("Esol's Verdict"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Samples, stump readings, a stolen knife and a circle the blackening will not cross. The school's master wants to say what they add up to out loud, in front of someone who has walked the ground."));
+		SetLocation("f_katyn_45_2");
+		SetAutoTracked(true);
+
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[Dievdirbys] Esol"), "f_katyn_45_2");
+
+		AddPrerequisite(new CompletedPrerequisite("f_katyn_45_2", 1001));
+		AddPrerequisite(new CompletedPrerequisite("f_katyn_45_2", 1002));
+		AddPrerequisite(new CompletedPrerequisite("f_katyn_45_2", 1003));
+		AddPrerequisite(new CompletedPrerequisite("f_katyn_45_2", 1004));
+
+		AddObjective("hearVerdict", L("Hear Dievdirbys Esol's verdict"),
+			new ManualObjective());
+
+		AddReward(new ExpReward(16000, 11000));
+		AddReward(new SilverReward(20000));
+		AddReward(new ItemReward(640084, 3)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 }

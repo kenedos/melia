@@ -1,58 +1,66 @@
 //--- Melia Script ----------------------------------------------------------
-// Tableland 72 Quest NPCs
+// Sventimas Exile Zone - Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for the high tableland beyond Ibre.
+// Quest NPCs and content for f_tableland_72 map. Thirty-one convoys
+// received and a village that does not add up.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FTableland72QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: White Spion Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Plateau-Ward] Mindaugas"), "f_tableland_72", 400, -1000, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1001: A Village Nobody Provisioned
+		// =====================================================================
+		// Priest Kaleims - the White Spions in the plots
+		//---------------------------------------------------------------------
+		AddNpc(155043, L("[Priest] Kaleims"), "f_tableland_72", -425, 70, 266, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_72", 1001);
 
-			dialog.SetTitle(L("Mindaugas"));
+			dialog.SetTitle(L("Kaleims"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("White Spions cluster the upper terraces. Forty kills and the herd-trails open again."));
+				await dialog.Msg(L("{#666666}*A village priest is turning a spade in a vegetable plot, in a cassock, badly and with great determination*{/}"));
+				await dialog.Msg(L("Bless me, a face I don't know. You're not sentenced here, are you — no, you'd have the look. Come, walk the row with me while I ruin it."));
+				await dialog.Msg(L("Nobody provisions an exile zone. The Kingdom walks people up here, sets them down, and the word delivered goes in a ledger. So we grow food, and the White Spions eat it. Kill 30 of them and bring me 8 of their essence - it goes into the ground and doubles what the plots give."));
 
-				var response = await dialog.Select(L("Will you open the trails for us?"),
-					Option(L("I'll kill"), "help"),
-					Option(L("Trails?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you clear the plots?"),
+					Option(L("I'll clear them and get the essence"), "help"),
+					Option(L("Nobody sends anything at all?"), "info"),
+					Option(L("Petition Roxona"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Forty. Mind the wind on the ledges."));
+						await dialog.Msg(L("They come in off the west scrub at dusk, always the same 4 gaps in the hedge. Stand in a gap and you will not have to walk far."));
+						await dialog.Msg(L("The essence is in the sac behind the head. Take it whole - a burst one is worth nothing to the ground."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Cattle drovers can't reach the high pasture while Spions own it."));
+						await dialog.Msg(L("Salt, twice a year, because salt is in the sentence. Nothing else. I have been priest here 6 years and I have received salt 12 times and nothing else 12 times."));
+						await dialog.Msg(L("I do not say that bitterly any more. Sventimas feeds Sventimas. It is the one thing here that nobody has to be told to do."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Trails stay closed."));
+						await dialog.Msg(L("I have written 9 petitions. 4 were answered. All 4 answers said the sentence had been carried out correctly, which was not the question in any of them."));
 						break;
 				}
 			}
@@ -60,498 +68,378 @@ public class FTableland72QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killSpions", out var killObj)) return;
+				if (!quest.TryGetProgress("collectEssence", out var essObj)) return;
 
-				if (killObj.Done)
+				if (killObj.Done && essObj.Done)
 				{
-					await dialog.Msg(L("Pasture's clear."));
+					await dialog.Msg(L("{#666666}*He works all 8 into the row he has just turned and then stands with the spade and looks at the plot for a while*{/}"));
+					await dialog.Msg(L("That is a second crop where there was one. 412 people eat off these plots and every one of them will notice by the middle of next month."));
+					await dialog.Msg(L("Take the chapel's box. It is alms, given by people who have nothing, for exactly this - somebody from outside doing something for Sventimas without being sentenced to it."));
+
 					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Plots are quiet. 8 whole sacs and I can dress the ground before the frost."));
 				}
 				else
 				{
-					await dialog.Msg(L("Keep killing."));
+					await dialog.Msg(L("30 of them. Stand in one of the hedge gaps at dusk and they will come to you."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First herd up the ledges yesterday."));
+				await dialog.Msg(L("Second crop is up. Arntas has started saying it is a miracle and I have started correcting him in front of people, which he enjoys enormously."));
 			}
 		});
 
-		// Quest 2: Lapasape Moss
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Herbalist] Reda"), "f_tableland_72", -450, -950, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1002: Herbs for a Village with No Physician
+		// =====================================================================
+		// Villager Argis - sikljien off the Brown Lapasapes
+		//---------------------------------------------------------------------
+		AddNpc(155035, L("[Villager] Argis"), "f_tableland_72", -46, -42, 199, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_72", 1002);
 
-			dialog.SetTitle(L("Reda"));
+			dialog.SetTitle(L("Argis"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Brown Lapasapes hoard blue moss in their fur. Kill twenty-five and bring six tufts."));
+				await dialog.Msg(L("{#666666}*A villager is packing something into a clay shell with a stick, very slowly and with his tongue between his teeth*{/}"));
+				await dialog.Msg(L("Don't come closer than that, if it's all the same to you. Not that I don't want the company — I just wouldn't want to be the reason it ends."));
+				await dialog.Msg(L("I was sentenced up here for making things that go off. I still make them, because it turns out an exile zone has a great deal of use for a man who can move rock. What we have not got is a physician, or any herb worth the name. Bring me 6 sikljien off the Brown Lapasapes."));
 
-				var response = await dialog.Select(L("Will you bring me the tufts?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Why blue?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you get me the sikljien?"),
+					Option(L("I'll bring 6"), "help"),
+					Option(L("You still make bombs?"), "info"),
+					Option(L("Grow your own herbs"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
+						character.Inventory.Add(663135, 1, InventoryAddType.PickUp);
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Tufts only. The roots wilt off-stone."));
+						await dialog.Msg(L("Take one of mine. Not to fight with - to get out. If a Lapasape group closes on you, put it behind them and go, and do not be proud about it."));
+						await dialog.Msg(L("Sikljien grows in the wet under them, north in the wood. Pull the whole root or it is just a leaf."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Blue moss steeps a salve that mends wind-burn. Plateau winters demand it."));
+						await dialog.Msg(L("I make them for a well shaft and a road cut and once for a rockfall over the north path. Same hands, same trade, and up here nobody has ever asked me to stop."));
+						await dialog.Msg(L("Kaleims knew what I was inside a week and he has never mentioned it once. That is the only sermon he has ever preached at me and it worked."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Salve runs out by next moon."));
+						await dialog.Msg(L("On this? The plots barely make turnips. Sikljien wants wet shade and there is none inside the hedge."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killLapasapes", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherMoss", out var mObj)) return;
+				if (!quest.TryGetProgress("collectHerbs", out var herbObj)) return;
 
-				if (killObj.Done && mObj.Done)
+				if (herbObj.Done)
 				{
-					await dialog.Msg(L("Six tufts. Salve sets tonight."));
-					character.Inventory.Remove(668020, character.Inventory.CountItem(668020), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He splits a root with a thumbnail, smells it, and looks genuinely relieved*{/}"));
+					await dialog.Msg(L("Whole roots, all 6. That is fever draught for the winter for 412 people, made by a bomb-maker in a shed, which is the most Sventimas sentence I have ever said."));
+					await dialog.Msg(L("Take this. I dug it out of the north cut and it is not mine and it is not anybody's, and I would rather it went down the road with somebody than sat in my shed."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("North, in the wet wood, under the Brown Lapasapes. 6 whole roots."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Salve jars on the way to Ibre already."));
+				await dialog.Msg(L("Draught's made and stoppered and Kaleims has it in the chapel where nobody has to ask me for it. That was his idea and it was a good one."));
 			}
 		});
 
-		// Quest 3: Cronewt Needler Crystals
-		//-------------------------------------------------------------------------
-		AddNpc(20116, L("[Crystal-Cutter] Velta"), "f_tableland_72", 1250, -550, 270, async dialog =>
+		// =====================================================================
+		// QUEST 1003: The Magicians in the North Cut
+		// =====================================================================
+		// Villager D'Ailan - the road out of the village
+		//---------------------------------------------------------------------
+		AddNpc(155038, L("[Villager] D'Ailan"), "f_tableland_72", -73, 24, 173, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_72", 1003);
 
-			dialog.SetTitle(L("Velta"));
+			dialog.SetTitle(L("D'Ailan"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Blue Cronewt Mages grow needler crystals along their spines. Kill eighteen, bring five crystals."));
+				await dialog.Msg(L("{#666666}*A villager is stacking cut wood against a wall in courses, squaring every layer before starting the next*{/}"));
+				await dialog.Msg(L("You're not from the village. Fine, doesn't matter — I've got no patience left for pleasantries anyway, so I'll just say it."));
+				await dialog.Msg(L("There is 1 path off this shelf that a person can walk carrying something, and it is the north cut, and the Blue Cronewt Magicians have been in it since midsummer. Kill 20 of them. That is the whole of what I want and I am not going to dress it up."));
 
-				var response = await dialog.Select(L("Will you bring me the crystals?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Use?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you clear the north cut?"),
+					Option(L("I'll clear the cut"), "help"),
+					Option(L("Where does the cut go?"), "info"),
+					Option(L("You're exiles. Stay put"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Pinch the base. They snap clean."));
+						await dialog.Msg(L("They fight from the walls of the cut, not the floor. Do not look for them at your own height."));
+						await dialog.Msg(L("And they will not follow you out of it. Whatever holds them in that cut holds them tighter than any of them wants."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Cut right, they replace lens-glass for far-sight scopes. Plateau watchtowers want a dozen."));
+						await dialog.Msg(L("Kadumel, and then the fortress outpost, and then anywhere. Not that any of us are going. A sentence is a sentence and I am 11 years into 20."));
+						await dialog.Msg(L("It is about the carrying. If the north cut is shut we cannot trade a single thing off this shelf, and a village that cannot trade is a village that is only ever going to be what the Kingdom left here."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Towers stay near-blind."));
+						await dialog.Msg(L("I have stayed put 11 years. What I have not done is stop being a man who can move 40 pounds of worked timber to somewhere that will pay for it."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killMages", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherCrystals", out var cObj)) return;
+				if (!quest.TryGetProgress("killMagicians", out var killObj)) return;
 
-				if (killObj.Done && cObj.Done)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("Five crystals. Cutting begins at dusk."));
-					character.Inventory.Remove(663123, character.Inventory.CountItem(663123), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He walks up into the cut with a load already on his shoulder before you have finished telling him*{/}"));
+					await dialog.Msg(L("Open. 11 years and this is the first autumn Sventimas is going to sell something instead of eating it."));
+					await dialog.Msg(L("Take the carry-money. It is the first coin this village has earned and I would like the first of it to leave the shelf in somebody's pocket who chose to come here."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("North cut. They fight from the walls. 20 of them."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First scope tested. Watchtower sees the river bend now."));
+				await dialog.Msg(L("4 loads down to Kadumel and 4 loads of coin back. Kaleims wanted it in the chapel box and the village voted him down, which he has told me 3 times was the best thing that has happened here."));
 			}
 		});
 
-		// Quest 4: Red Hohen Orben
-		//-------------------------------------------------------------------------
-		AddNpc(147473, L("[Hunter] Jurgita"), "f_tableland_72", 500, -200, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1004: Four Hundred and Twelve
+		// =====================================================================
+		// Villager Emils - the count that does not work
+		//---------------------------------------------------------------------
+		AddNpc(152065, L("[Villager] Emils"), "f_tableland_72", -98, 113, 208, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_72", 1004);
 
-			dialog.SetTitle(L("Jurgita"));
+			dialog.SetTitle(L("Emils"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A hunter with a hooded falcon perched on her glove, the bird restless*{/}"));
-				await dialog.Msg(L("Red Hohen Orben drift through the wind-eddies above the upper terrace. They look harmless - just bobbing balls of red-tinted air - until a hawk flies through one. Then they clamp shut, and the hawk doesn't come back."));
-				await dialog.Msg(L("Three of my hawks died last week. The four falconry-perches on the cliff-edge are torn down too - the Orben snap the perch-cords for sport. Without perches, even the surviving hawks can't rest between flights."));
+				await dialog.Msg(L("{#666666}*A villager has a wall of the hut covered in scratched fives, in blocks, going back years*{/}"));
+				await dialog.Msg(L("Someone new. Good — I need a person who hasn't already decided the answer, and everyone in this village decided it years ago."));
+				await dialog.Msg(L("31 convoys have been received at Sventimas. 40 to a convoy. That is 1,240 people and this village has 412, and I have counted the 412 myself, twice, by name. Nobody has ever asked where the rest are. Go and read the 4 orbs out on the east ground for me."));
 
-				var response = await dialog.Select(L("Burst 15 Red Hohen Orben to clear the eddies, then re-string the four falconry-perches the Orben tore down. The hawks need both - sky cleared and perches standing. Will you?"),
-					Option(L("I'll burst the Orben and re-string the perches"), "help"),
-					Option(L("Why did three of your hawks die?"), "info"),
-					Option(L("Find a falconer"), "leave")
+				var response = await dialog.Select(L("Will you read the 4 orbs?"),
+					Option(L("I'll read all 4"), "help"),
+					Option(L("Could people just have died?"), "info"),
+					Option(L("Your count is wrong"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
+						character.Inventory.Add(663132, 1, InventoryAddType.PickUp);
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She hands over a long thin needle and a coil of waxed perch-cord*{/}"));
-						await dialog.Msg(L("Fifteen Orben, no shortcuts. Strike from below. Underside's membrane, top's hardened crystal. A blade goes through the underside - a hammer wouldn't crack the top."));
-						await dialog.Msg(L("Then the four perches. Knot the cord back to the cliff-post with a falconer's hitch - one loop over, one through, two ends taut. Don't tie a regular knot or the perch swings, and a swinging perch terrifies a hawk."));
+						await dialog.Msg(L("Take the detection orb. Hold it up to each of theirs and it will show you which way theirs is turned. That is all I want - the direction, 4 times."));
+						await dialog.Msg(L("They are a long walk east and there are 6 of them out there. Read any 4. If 4 agree I do not need the other 2."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("They flew through Orben without seeing them. Red-tinted air against a red sunset - no hawk's eye can tell them apart. The Orben clamp shut on contact. It's defensive, not predatory, but the result is the same - a falcon caught and crushed before it knew what happened."));
-						await dialog.Msg(L("Three was bad enough. If I lose another, I won't have a falconry left. The trade dies with my generation. I never took on apprentices."));
+						await dialog.Msg(L("828 of them? We bury our dead in a field I can see from here and I have counted the field as well. There are 61 in it."));
+						await dialog.Msg(L("I have been doing this 4 years. Every answer anybody gives me falls apart in an afternoon and this one falls apart faster than most."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Hawks stay grounded, the falconry contracts dry up, the trade ends one falconer earlier than it had to. I won't be the last - there are still others on the south coast. But it stings to be one of the last."));
+						await dialog.Msg(L("Then correct it. I will give you the list and you can walk the village and read it out and I will thank you sincerely, because I have wanted to be wrong about this since the second year."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("burstOrben", out var killObj)) return;
-				if (!quest.TryGetProgress("restringPerches", out var pObj)) return;
+				var read = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_72.Quest1004.Read", 0);
 
-				if (killObj.Done && pObj.Done)
+				if (read >= 4)
 				{
-					await dialog.Msg(L("{#666666}*She unhoods the falcon; it stretches its wings and settles back on the glove*{/}"));
-					await dialog.Msg(L("Eddies are clear. Perches knotted with falconer's hitches - I checked each one. The hawks fly the upper terrace at dawn for the first time in a fortnight."));
-					await dialog.Msg(L("Take this. Hunter's purse, and a moulted feather from this falcon's last shed. Carry it. Falconers will know you walk with the trade. So will the hawks."));
+					await dialog.Msg(L("{#666666}*They scratch the 4 directions onto the wall under the blocks of fives and then stand back from the wall*{/}"));
+					await dialog.Msg(L("All 4 turned the same way. Not at the village. Not at the north cut. At the road - the stretch of the Ibre road where the convoys come up."));
+					await dialog.Msg(L("Somebody put 6 orbs on this shelf pointed at the exact piece of ground where 828 people stopped existing. Take this. Then go to Arntas, because he has been asking his figurine the same question for 3 years."));
+
 					character.Quests.Complete(questId);
-				}
-				else if (!killObj.Done)
-				{
-					await dialog.Msg(L("Fifteen Orben first. Re-stringing perches while the eddies still hold Orben is just setting dinner out for the next clamp. Burst them all before you knot."));
 				}
 				else
 				{
-					await dialog.Msg(L("Eddies are clear, air's true again. Now the four perches - falconer's hitch, two ends taut, no swing. Take your time on the knots."));
+					await dialog.Msg(LF("6 orbs on the east ground. Hold mine to theirs and read the direction. {0} of 4 read.", read));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Hawks back on the wing this morning. All five, including the youngest - she'd never flown the upper terrace before. Caught a stooped Tipio at first hour. The trade lives another generation. Yours, if you ever want it."));
+				await dialog.Msg(L("I have written 412 and 1,240 at the top of the wall with the direction under them, and I have stopped scratching fives. There is no more counting to do. There is only somebody who will read it."));
 			}
 		});
 
-		// Falconry-perch re-string points for Quest 1004
-		//-------------------------------------------------------------------------
-		void AddFalconryPerch(int perchNumber, int x, int z, int direction)
+		// =====================================================================
+		// WATCHING ORBS
+		// =====================================================================
+		// For Quest 1004 - Four Hundred and Twelve
+		// =====================================================================
+
+		void AddWatchingOrb(int orbNumber, string orbName, string reading, int x, int z, int direction)
 		{
-			AddNpc(47190, L("Falconry-Perch"), "f_tableland_72", x, z, direction, async dialog =>
+			AddNpc(151022, L(orbName), "f_tableland_72", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_tableland_72", 1004);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A wooden falconry-perch, jess-cord trailing in the dust*{/}"));
+					await dialog.Msg(L("{#666666}*An orb on a worked stone base, turned deliberately, not settled*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_tableland_72.Quest1004.Perch{perchNumber}";
+				var variableKey = $"Laima.Quests.f_tableland_72.Quest1004.Orb{orbNumber}";
+
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*Already re-strung; the cord runs taut*{/}"));
+					await dialog.Msg(L("{#666666}*You have this one's direction already*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Knotting cord..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Reading the orb..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
 
-				if (result == TimeActionResult.Completed)
+				if (result != TimeActionResult.Completed)
 				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_72.Quest1004.PerchesStrung", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_tableland_72.Quest1004.PerchesStrung", count);
-					character.ServerMessage(LF("Falconry-perches re-strung: {0}/4", count));
+					character.ServerMessage(L("Reading interrupted."));
+					return;
+				}
 
-					if (count >= 4)
-						character.ServerMessage(L("{#FFD700}All perches re-strung! Return to Hunter Jurgita.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Knotting interrupted."));
-				}
+				character.Variables.Perm.Set(variableKey, true);
+
+				var read = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_72.Quest1004.Read", 0) + 1;
+				character.Variables.Perm.Set("Laima.Quests.f_tableland_72.Quest1004.Read", read);
+
+				character.ServerMessage(L(reading));
+				character.ServerMessage(LF("Orbs read: {0}/4", read));
+
+				if (read >= 4)
+					character.ServerMessage(L("{#FFD700}All 4 orbs read. Return to Emils.{/}"));
 			});
 		}
 
-		AddFalconryPerch(1, 400, -100, 0);
-		AddFalconryPerch(2, 600, -300, 90);
-		AddFalconryPerch(3, 700, -100, 180);
-		AddFalconryPerch(4, 500, -400, 270);
+		AddWatchingOrb(1, "North Watching Orb", "Turned northwest. The base has been reset at least once - there are two seatings.", 1057, 818, 0);
+		AddWatchingOrb(2, "Middle Watching Orb", "Northwest. Same angle to within a hand's width.", 984, 554, 0);
+		AddWatchingOrb(3, "South Watching Orb", "Northwest again, from 400 paces further south, so it is not pointed at a place near itself.", 1464, 435, 0);
+		AddWatchingOrb(4, "Ridge Watching Orb", "Northwest. Four orbs, one heading, and the heading crosses the Ibre road.", 1440, 796, 0);
 
-		// Quest 5: The White Alpha
-		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Darius"), "f_tableland_72", 700, 1200, 90, async dialog =>
+		// =====================================================================
+		// The Watch-Orb - atmosphere at the village edge
+		//---------------------------------------------------------------------
+		AddNpc(153157, L("Village Watch-Orb"), "f_tableland_72", -422, -62, 298, async dialog =>
+		{
+			await dialog.Msg(L("{#666666}*A squat device on a post at the edge of the village, which everybody here calls the monitor and assumes is watching them*{/}"));
+			await dialog.Msg(L("{#666666}*It faces outward. It has always faced outward. In 6 years nobody in Sventimas has walked round the back of it to check what outward means*{/}"));
+		});
+
+		// =====================================================================
+		// QUEST 1005: What the Figurine Faces
+		// =====================================================================
+		// Priest Arntas - three years of asking the same question
+		//---------------------------------------------------------------------
+		AddNpc(155046, L("[Priest] Arntas"), "f_tableland_72", -394, 83, 248, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_72", 1005);
-			var alphaSpawnedKey = "Laima.Quests.f_tableland_72.Quest1005.AlphaSpawned";
 
-			dialog.SetTitle(L("Darius"));
+			dialog.SetTitle(L("Arntas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A bounty hunter cleaning Spion-musk off his boot with the back of a knife*{/}"));
-				await dialog.Msg(L("The White Spion alpha leads the upper-terrace pack. Big, mean, smart enough to stay in his den unless he's insulted directly. He's killed three drovers this season - two gored, one trampled."));
-				await dialog.Msg(L("Three scent-mounds outside his den-mouth mark his territory. Stomp them flat - that's the worst insult you can give a Spion alpha. He'll come out fighting instead of waiting in the den for the pack to flush you."));
+				if (!character.Quests.HasCompleted(new QuestId("f_tableland_72", 1004)))
+				{
+					await dialog.Msg(L("{#666666}*He looks up from a small worn figurine cupped in both hands*{/}"));
+					await dialog.Msg(L("Forgive me, I was praying — or trying to. Emils has 6 orbs on the east ground and no directions. Go and get them for him. I have asked my question for 3 years and it will keep another day."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Crush the three Spion scent-mounds outside his den, then kill 10 White Spions to flush him out. He fights when his territory's defaced. Will you take him?"),
-					Option(L("I'll take the alpha"), "help"),
-					Option(L("Why not just smoke the den?"), "info"),
-					Option(L("Find a Spion specialist"), "leave")
+				await dialog.Msg(L("{#666666}*He sets the figurine down very carefully, like it might be listening*{/}"));
+				await dialog.Msg(L("Northwest. Across the Ibre road. Then the figurine and the orbs and whatever is under Mandara are all one thing, and it is a very long instrument, and Sventimas is somewhere in the middle of it."));
+				await dialog.Msg(L("The figurine stands out in the south scrub and I have prayed at it 3 years without once asking the obvious question, which is what it is looking at. The Red Hohen Orbens hold that ground. Kill 25 and take the 2 standing over it."));
+
+				var response = await dialog.Select(L("Will you go to the figurine?"),
+					Option(L("I'll take the ground and the pair"), "help"),
+					Option(L("Why did nobody ask?"), "info"),
+					Option(L("Break the figurine"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
+						character.Inventory.Add(663136, 1, InventoryAddType.PickUp);
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He hands over a stiff-bristled scrub-brush and a pair of leather over-boots*{/}"));
-						await dialog.Msg(L("Three mounds, stomp each one. Wear the over-boots - the musk soaks through normal leather and the smell stays for a week. Stomp them to powder. Don't just kick them aside."));
-						await dialog.Msg(L("Then ten Spions. The alpha comes out around the eighth. He charges straight, like a bull-Nuka but smaller and faster. Sidestep at the last second. His momentum throws him past you."));
+						await dialog.Msg(L("Take the purification sphere. It will not cleanse anything - I have stopped pretending it will. What it does is keep your own head your own for about 4 minutes, and 4 minutes is enough to look at something and walk back."));
+						await dialog.Msg(L("Orbens are lv92 and they are not from this shelf and they do not behave like anything else on it. Do not fight more than 2 at once and do not fight any of them uphill."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Smoke would flush him, but it'd also kill his pack inside the den - cubs included. Drovers won't take that contract. The cubs are protected under the old herd-codes. Stomping the mounds sends the same message and lets the cubs flee or stay."));
-						await dialog.Msg(L("Old hunter's compromise. The alpha dies, the territory empties, but the bloodline survives in whichever cub strikes off on her own. Easier on the drove-trade's conscience."));
+						await dialog.Msg(L("Because it is called the cursed statue, and once a thing has a name people stop looking at it. I have said the word cursed at that figurine 3 years running and it saved me from having to say anything more useful."));
+						await dialog.Msg(L("Kaleims asked once, in the second year, what it faced. I told him it faced away from the village and that was a mercy. That was the last time either of us mentioned it."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Pack grows. Drovers stop using the upper road. The drover-trade shrinks and prices climb in Klaipeda. I'll be here when you change your mind."));
+						await dialog.Msg(L("If it is one end of an instrument, breaking it tells whoever built it that somebody in Sventimas has worked it out. There are 412 people here and no walls."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("crushMounds", out var mObj)) return;
-				if (!quest.TryGetProgress("killPack", out var pObj)) return;
-				if (!quest.TryGetProgress("killAlpha", out var aObj)) return;
+				if (!quest.TryGetProgress("clearScrub", out var scrubObj)) return;
+				if (!quest.TryGetProgress("takeThePair", out var pairObj)) return;
 
-				if (mObj.Done && pObj.Done && aObj.Done)
+				if (scrubObj.Done && pairObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He grins and tosses over a coin pouch*{/}"));
-					await dialog.Msg(L("Mounds crushed flat, pack broken, alpha dropped clean. The cubs scattered south - at least one survivor, if the drover-codes still mean anything. Territory's open for the next pack."));
-					await dialog.Msg(L("Bounty plus a drover-stipend. The drovers' guild voted on it after the third gored herder. They'll pay anyone who clears the upper-terrace alpha. You're the first to actually do it."));
-					character.Variables.Perm.Remove(alphaSpawnedKey);
+					await dialog.Msg(L("{#666666}*He walks out to the figurine himself with the sphere in one hand and comes back with his other hand shaking, and does not hide it*{/}"));
+					await dialog.Msg(L("Northwest. The same heading as the orbs, the same heading as whatever is under Mandara. It faces the Ibre road and it has faced it since before this village existed."));
+					await dialog.Msg(L("Take the chapel's own. It came up the road with me 3 years ago and I have not needed it once. Go on to the Kalejimas road - the Steel Heights above the prison. If this line goes anywhere, it goes there, and there is nobody on that ground who is not paid to be."));
+
 					character.Quests.Complete(questId);
 				}
-				else if (pObj.Done && !aObj.Done)
+				else if (scrubObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(alphaSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(alphaSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Spion_White, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("He comes!"));
-							character.ServerMessage(L("{#FF9966}The White Alpha emerges from the ridge cave!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("Find him."));
-					}
-				}
-				else if (!mObj.Done)
-				{
-					await dialog.Msg(L("Three scent-mounds first. Stomp them to powder. Over-boots only - the musk soaks through normal leather."));
+					await dialog.Msg(L("Scrub's clear. The 2 over the figurine have not moved. They are standing where anybody praying at it would have to stand."));
 				}
 				else
 				{
-					await dialog.Msg(L("Mounds are flat. Now ten Spions - the alpha comes out around the eighth. Sidestep his charge."));
+					await dialog.Msg(L("25 Orbens first, and never more than 2 at once. I am not going to bury somebody for my 3 years of not asking."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Terrace's quiet. Drovers are using the upper road again - first time this season. The drovers' guild posted your description on every staging-post. Nobody knows your name. The description ends 'asks for no thanks.' True or not, that's how the trade tells it now."));
+				await dialog.Msg(L("I have moved the chapel service out to the figurine. 412 people standing behind a thing that faces northwest, once a week, looking the way it looks. Kaleims says that is not a service and I have told him it is the first honest one I have held."));
 			}
 		});
 
-		// Spion scent-mound crush points for Quest 1005
-		//-------------------------------------------------------------------------
-		void AddScentMound(int moundNumber, int x, int z, int direction)
+		// =====================================================================
+		// The Cursed Figurine - atmosphere in the south scrub
+		//---------------------------------------------------------------------
+		AddNpc(153155, L("Cursed Figurine"), "f_tableland_72", -576, -1223, 334, async dialog =>
 		{
-			AddNpc(47190, L("Spion Scent-Mound"), "f_tableland_72", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_tableland_72", 1005);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A pungent mound of Spion-musk and dirt outside the den*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_tableland_72.Quest1005.Mound{moundNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already flat; the scent disperses*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Crushing mound..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_72.Quest1005.MoundsCrushed", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_tableland_72.Quest1005.MoundsCrushed", count);
-					character.ServerMessage(LF("Scent-mounds crushed: {0}/3", count));
-
-					if (count >= 3)
-						character.ServerMessage(L("{#FFD700}All mounds crushed! Now bait out the Alpha.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Crushing interrupted."));
-				}
-			});
-		}
-
-		AddScentMound(1, 600, 1100, 0);
-		AddScentMound(2, 800, 1300, 90);
-		AddScentMound(3, 500, 1400, 180);
-
-		// Quest 6: Tableland Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Militia-Captain] Kazimieras"), "f_tableland_72", -400, 700, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_tableland_72", 1006);
-
-			dialog.SetTitle(L("Kazimieras"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A militia-captain at a tally-cord already heavy with last week's knots*{/}"));
-				await dialog.Msg(L("The upper road serves the survey-camps and the falconry contracts both. We sweep it weekly or those contracts collapse and the whole upper terrace empties out. Drovers, surveyors, falconers - all of them depend on this road."));
-				await dialog.Msg(L("Three species contest the upper road. White Spions in the open, Cronewt Mages in the brush-pockets, Brown Lapasapes on the verges. The Upper Road Bell at the road's head signals the militia when the sweep's done. They hold off the perimeter walk until they hear it."));
-
-				var response = await dialog.Select(L("Kill 12 White Spions, 12 Blue Cronewt Mages, and 12 Brown Lapasapes, then ring the Upper Road Bell at the road's head. The militia waits on the bell. Take it?"),
-					Option(L("I'll take the sweep"), "help"),
-					Option(L("Why a tally-cord on top of the bell?"), "info"),
-					Option(L("Find a road-walker"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She hands over a small wooden token carved with the militia's road-mark*{/}"));
-						await dialog.Msg(L("Thirty-six kills, no padding. The militia perimeter-walk counts the corpses on the morning sweep."));
-						await dialog.Msg(L("Bell at the road's head, just past the survey-camp turnoff. Slot the token into the bell-ring, pull the rope once, count to three, release. One long peal carries up the terrace and back."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Bell tells the militia. Tally-cord tells me. The bell-peal is loud and public, the cord is private and exact. One knot per twenty-four kills. At month's end I count the knots and pay the contractors whose count matched."));
-						await dialog.Msg(L("Trust but verify. Old militia saying. The bell's the trust, the cord's the verify."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Plateau stays unwalked, falconers stay grounded, survey-camps wait. I'll find a road-walker even if I have to pull from the militia rolls. That eats into our patrol hours."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killSpions", out var sObj)) return;
-				if (!quest.TryGetProgress("killMages", out var mObj)) return;
-				if (!quest.TryGetProgress("killLapasapes", out var lObj)) return;
-				if (!quest.TryGetProgress("ringBell", out var bObj)) return;
-
-				if (sObj.Done && mObj.Done && lObj.Done && bObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*She adds a fresh knot to the tally-cord and counts coin from a militia-stamped pouch*{/}"));
-					await dialog.Msg(L("Bell heard. Sweep counted. Cord gets another knot. Falconers and surveyors can work the upper terrace tomorrow without flinching at every shadow."));
-					await dialog.Msg(L("Coin in full plus a quarter-purse for the clean bell-form. Some contractors panic-pull the rope and we get two short peals. That's the danger-call and the militia turns out armed. You didn't. Worth the extra."));
-					character.Quests.Complete(questId);
-				}
-				else if (sObj.Done && mObj.Done && lObj.Done)
-				{
-					await dialog.Msg(L("Sweep done. Now the Upper Road Bell - token in the ring, single rope-pull, count to three. Militia's listening."));
-				}
-				else
-				{
-					await dialog.Msg(L("Twelve of each. The Cronewt Mages cluster in the brush-pockets - work them in pairs if you can. Don't let them open distance. Their ranged work is brutal."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Militia walks the upper road now, paid by the contract-cycle. Three falconers reported their hawks flying again. Two survey-camps asked to expand. Your bell-peal carried up the terrace - they say one drover heard it from the staging-post and started walking."));
-			}
-		});
-
-		// Upper Road Bell for Quest 1006
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Upper Road Bell"), "f_tableland_72", -350, 750, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_tableland_72", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A bronze road-bell hung at the upper road's head*{/}"));
-				return;
-			}
-
-			var rungKey = "Laima.Quests.f_tableland_72.Quest1006.BellRung";
-			if (character.Variables.Perm.GetBool(rungKey, false))
-			{
-				await dialog.Msg(L("{#666666}*Already rung*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killSpions", out var sObj)) return;
-			if (!quest.TryGetProgress("killMages", out var mObj)) return;
-			if (!quest.TryGetProgress("killLapasapes", out var lObj)) return;
-
-			if (!(sObj.Done && mObj.Done && lObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The rope is in your hand, but the sweep isn't done*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Ringing bell..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(rungKey, true);
-				character.ServerMessage(L("{#FFD700}Upper Road Bell rung. Return to Militia-Captain Kazimieras.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Ringing interrupted."));
-			}
+			await dialog.Msg(L("{#666666}*A worked figure standing alone in the south scrub, older than the village and set into ground that was levelled for it*{/}"));
+			await dialog.Msg(L("{#666666}*It faces northwest, across the shelf, over the road the convoys come up. It has never been turned and there is no mechanism by which it could be*{/}"));
 		});
 	}
 }
@@ -560,245 +448,226 @@ public class FTableland72QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class FTableland72Quest1001 : QuestScript
+// Quest 1001 CLASS: A Village Nobody Provisioned
+//-----------------------------------------------------------------------------
+
+public class AVillageNobodyProvisionedQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_72", 1001);
-		SetName(L("White Spion Sweep"));
+		SetName(L("A Village Nobody Provisioned"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill White Spions overrunning the plateau terraces."));
+		SetDescription(L("Sventimas receives salt twice a year and nothing else. The plots feed 412 people and the White Spions are eating them. Kaleims needs the plots cleared and 8 whole essence sacs to dress the ground."));
 		SetLocation("f_tableland_72");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Plateau-Ward] Mindaugas"), "f_tableland_72");
+		AddQuestGiver(L("[Priest] Kaleims"), "f_tableland_72");
 
-		AddObjective("killSpions", L("Kill White Spions"),
-			new KillObjective(40, new[] { MonsterId.Spion_White }));
+		AddObjective("killSpions", L("Kill White Spions in the village plots"),
+			new KillObjective(30, new[] { MonsterId.Spion_White }));
 
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 3));
+		AddObjective("collectEssence", L("Recover whole White Spion essence"),
+			new CollectItemObjective(663131, 8));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(663131, 0.35f, MonsterId.Spion_White);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(663131, character.Inventory.CountItem(663131), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(663131, character.Inventory.CountItem(663131), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FTableland72Quest1002 : QuestScript
+// Quest 1002 CLASS: Herbs for a Village with No Physician
+//-----------------------------------------------------------------------------
+
+public class HerbsForAVillageWithNoPhysicianQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_72", 1002);
-		SetName(L("Blue Lapasape Moss"));
+		SetName(L("Herbs for a Village with No Physician"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Brown Lapasapes and bring blue moss tufts for wind-burn salve."));
+		SetDescription(L("Sventimas has no physician and no herb worth the name. Argis can make fever draught for the whole village out of 6 whole sikljien roots, which grow in the wet under the Brown Lapasapes."));
 		SetLocation("f_tableland_72");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Herbalist] Reda"), "f_tableland_72");
+		AddQuestGiver(L("[Villager] Argis"), "f_tableland_72");
 
-		AddObjective("killLapasapes", L("Kill Brown Lapasapes"),
-			new KillObjective(25, new[] { MonsterId.Lapasape_Brown }));
+		AddObjective("collectHerbs", L("Pull whole sikljien roots in the north wood"),
+			new CollectItemObjective(663134, 6));
 
-		AddObjective("gatherMoss", L("Gather blue moss tufts"),
-			new CollectItemObjective(668020, 6));
+		AddReward(new ExpReward(11900, 8100));
+		AddReward(new SilverReward(15000));
+		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
+		AddDrop(663134, 0.35f, MonsterId.Lapasape_Brown);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(668020, character.Inventory.CountItem(668020), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663134, character.Inventory.CountItem(663134), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663135, character.Inventory.CountItem(663135), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(668020, character.Inventory.CountItem(668020), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663134, character.Inventory.CountItem(663134), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663135, character.Inventory.CountItem(663135), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FTableland72Quest1003 : QuestScript
+// Quest 1003 CLASS: The Magicians in the North Cut
+//-----------------------------------------------------------------------------
+
+public class TheMagiciansInTheNorthCutQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_72", 1003);
-		SetName(L("Needler Crystals"));
+		SetName(L("The Magicians in the North Cut"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Blue Cronewt Mages and bring needler crystals for far-sight scopes."));
+		SetDescription(L("The north cut is the only path off the shelf a person can walk carrying something, and the Blue Cronewt Magicians have held it since midsummer. Without it Sventimas cannot trade a single thing."));
 		SetLocation("f_tableland_72");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Crystal-Cutter] Velta"), "f_tableland_72");
+		AddQuestGiver(L("[Villager] D'Ailan"), "f_tableland_72");
 
-		AddObjective("killMages", L("Kill Blue Cronewt Mages"),
-			new KillObjective(18, new[] { MonsterId.Cronewt_Mage_Blue }));
-
-		AddObjective("gatherCrystals", L("Gather needler crystals"),
-			new CollectItemObjective(663123, 5));
+		AddObjective("killMagicians", L("Kill Blue Cronewt Magicians in the north cut"),
+			new KillObjective(20, new[] { MonsterId.Cronewt_Mage_Blue }));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(663123, character.Inventory.CountItem(663123), InventoryItemRemoveMsg.Destroyed);
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(663123, character.Inventory.CountItem(663123), InventoryItemRemoveMsg.Destroyed);
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
-public class FTableland72Quest1004 : QuestScript
+// Quest 1004 CLASS: Four Hundred and Twelve
+//-----------------------------------------------------------------------------
+
+public class FourHundredAndTwelveQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_72", 1004);
-		SetName(L("Wind-Eddy Burst"));
+		SetName(L("Four Hundred and Twelve"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Burst Red Hohen Orben to clear the upper-pass eddies for falconers."));
+		SetDescription(L("Thirty-one convoys of 40 have been received at Sventimas and Emils has counted 412 people by name, twice. Six orbs stand on the east ground. Read the direction of 4 of them."));
 		SetLocation("f_tableland_72");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Hunter] Jurgita"), "f_tableland_72");
+		AddQuestGiver(L("[Villager] Emils"), "f_tableland_72");
 
-		AddObjective("burstOrben", L("Burst Red Hohen Orben"),
-			new KillObjective(15, new[] { MonsterId.Hohen_Orben_Red }));
-
-		AddObjective("restringPerches", L("Re-string the four falconry-perches"),
-			new VariableCheckObjective("Laima.Quests.f_tableland_72.Quest1004.PerchesStrung", 4, true));
+		AddObjective("readOrbs", L("Read the direction of 4 watching orbs"),
+			new VariableCheckObjective("Laima.Quests.f_tableland_72.Quest1004.Read", 4, true));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1004.PerchesStrung");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_72.Quest1004.Perch{i}");
+		character.Inventory.Remove(663132, character.Inventory.CountItem(663132), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1004.Read");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_72.Quest1004.Orb{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1004.PerchesStrung");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_72.Quest1004.Perch{i}");
+		character.Inventory.Remove(663132, character.Inventory.CountItem(663132), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1004.Read");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_72.Quest1004.Orb{i}");
 	}
 }
 
-public class FTableland72Quest1005 : QuestScript
+// Quest 1005 CLASS: What the Figurine Faces
+//-----------------------------------------------------------------------------
+
+public class WhatTheFigurineFacesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_72", 1005);
-		SetName(L("The White Alpha"));
+		SetName(L("What the Figurine Faces"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill White Spions to draw out the alpha leading the upper-terrace pack."));
+		SetDescription(L("Arntas has prayed at the cursed figurine for 3 years without asking what it is looking at. The Red Hohen Orbens hold the south scrub around it, and 2 of them stand exactly where a person praying would have to stand."));
 		SetLocation("f_tableland_72");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Darius"), "f_tableland_72");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Priest] Arntas"), "f_tableland_72");
 
-		AddObjective("crushMounds", L("Crush the three Spion scent-mounds"),
-			new VariableCheckObjective("Laima.Quests.f_tableland_72.Quest1005.MoundsCrushed", 3, true));
+		AddPrerequisite(new CompletedPrerequisite("f_tableland_72", 1004));
 
-		AddObjective("killPack", L("Kill White Spions"),
-			new KillObjective(10, new[] { MonsterId.Spion_White }));
+		AddObjective("clearScrub", L("Kill Red Hohen Orbens in the south scrub"),
+			new KillObjective(25, new[] { MonsterId.Hohen_Orben_Red }));
 
-		AddObjective("killAlpha", L("Defeat the White Alpha"),
-			new KillObjective(1, new[] { MonsterId.Spion_White }));
+		AddObjective("takeThePair", L("Take the pair standing over the figurine"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Hohen_Orben_Red, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Lapasape_Brown, 3),
+				},
+				resetIdent: "clearScrub",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
+		AddReward(new ExpReward(60000, 40000));
+		AddReward(new SilverReward(50000));
+		AddReward(new ItemReward(603128, 1)); // Schaffen Bracelet Fragment
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1005.MoundsCrushed");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_72.Quest1005.Mound{i}");
+		character.Inventory.Remove(663136, character.Inventory.CountItem(663136), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1005.MoundsCrushed");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_72.Quest1005.Mound{i}");
-	}
-}
-
-public class FTableland72Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_tableland_72", 1006);
-		SetName(L("Tableland Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of White Spions, Blue Cronewt Mages, and Brown Lapasapes."));
-		SetLocation("f_tableland_72");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Militia-Captain] Kazimieras"), "f_tableland_72");
-
-		AddObjective("killSpions", L("Kill White Spions"),
-			new KillObjective(12, new[] { MonsterId.Spion_White }));
-
-		AddObjective("killMages", L("Kill Blue Cronewt Mages"),
-			new KillObjective(12, new[] { MonsterId.Cronewt_Mage_Blue }));
-
-		AddObjective("killLapasapes", L("Kill Brown Lapasapes"),
-			new KillObjective(12, new[] { MonsterId.Lapasape_Brown }));
-
-		AddObjective("ringBell", L("Ring the Upper Road Bell"),
-			new VariableCheckObjective("Laima.Quests.f_tableland_72.Quest1006.BellRung", 1, true));
-
-		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(18800));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1006.BellRung");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_72.Quest1006.BellRung");
+		character.Inventory.Remove(663136, character.Inventory.CountItem(663136), InventoryItemRemoveMsg.Destroyed);
 	}
 }

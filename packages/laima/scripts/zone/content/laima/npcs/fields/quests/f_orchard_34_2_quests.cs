@@ -1,253 +1,66 @@
 //--- Melia Script ----------------------------------------------------------
-// Zeraha Quest NPCs
+// Zeraha Forest Quest NPCs
 //--- Description -----------------------------------------------------------
-// Cheerful Ferret-tribe quests for the Zeraha orchard map.
+// Ferret carrying country, and the scholar who intends to find out what
+// changed here two years ago by walking among them as one of them.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FOrchard342QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Pebble Barrage
-		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Harvest Foreman] Tamas"), "f_orchard_34_2", 1480, 1270, 270, async dialog =>
+		// Quest 1001: Drowsy Herb
+		//---------------------------------------------------------------------
+		AddNpc(147473, L("[Herb-Scholar] Ausrine"), "f_orchard_34_2", 1011, 82, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_34_2", 1001);
 
-			dialog.SetTitle(L("Tamas"));
+			dialog.SetTitle(L("Ausrine"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Welcome to Zeraha! Well - welcome to the part of Zeraha that isn't currently being pelted with acorns."));
-				await dialog.Msg(L("The Ferret Slingers have decided my harvest crew is a fantastic target. Every five minutes - thwack, thwack, right on the forehead."));
-				await dialog.Msg(L("Nobody's been seriously hurt, but half my crew won't come back to work until the Slingers are taught a lesson."));
+				await dialog.Msg(L("{#666666}*She's crouched over a notebook balanced on her knee, sniffing at a crushed leaf and muttering the same word three times*{/}"));
+				await dialog.Msg(L("Don't mind me, I talk to myself when I'm working — it's the only company that doesn't interrupt. Actually! Stay a moment, you might be useful. The Ferrets of Zeraha have hauled drowsy herb out of these woods since before anyone kept records. Burn it in camp, keeps them calm as anything."));
+				await dialog.Msg(L("Two years ago they just... stopped burning it. Started stockpiling instead! Kill 20 Ferret Loaders, bring me 10 bales — I want to know exactly what a Ferret smells like after two years of not sleeping properly. Fascinating, don't you think?"));
 
-				var response = await dialog.Select(L("Will you scare them off for me?"),
-					Option(L("I'll scare off the Slingers"), "help"),
-					Option(L("Can't you just wear helmets?"), "info"),
-					Option(L("Dodge better"), "leave")
+				var response = await dialog.Select(L("Will you take the herb off the Loaders? Say yes, I'm dying to know."),
+					Option(L("I'll hunt the Loaders and bring 10 bales"), "help"),
+					Option(L("Stockpiling it for what?"), "info"),
+					Option(L("Ask them for a bale"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Twenty-two should do it. They travel in little cliques - clear a clique, the rest scatter."));
-						await dialog.Msg(L("Watch your forehead. Those acorns hurt."));
+						await dialog.Msg(L("A Loader under a full bale can't turn quickly — take them from the side and the bale comes off intact, which is the only way I can use it. Wonderful, go on!"));
 						break;
 
 					case "info":
-						await dialog.Msg(L("We've tried. They just aim lower. A Ferret Slinger will absolutely hit you in the knee on purpose."));
-						await dialog.Msg(L("Smart little devils. Just... unproductive to work around."));
+						await dialog.Msg(L("That is the entire question, isn't it! They're carrying it somewhere, in quantity, and none of it's being burned in a camp anymore."));
+						await dialog.Msg(L("A trail-warden two valleys west told me the exact same thing about resin. Stopped trading, started hauling. Same two years, same direction of travel. I could just scream."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Easy for you to say - you haven't had an acorn to the ear at ten paces."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("chaseSlingers", out var killObj)) return;
-
-				if (killObj.Done)
-				{
-					await dialog.Msg(L("Quiet at last! My crew is already back at the trees. You've saved this season's harvest."));
-					await dialog.Msg(L("Take this with the company's thanks."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Still hearing thwacks out there. Keep after them."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Not a single acorn to the forehead in a week. I'd forgotten how peaceful that was."));
-			}
-		});
-
-		// Quest 2: The Acorn Bounty
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Collector] Wren"), "f_orchard_34_2", 0, 0, 180, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_34_2", 1002);
-
-			dialog.SetTitle(L("Wren"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Have you seen the old oaks in Zeraha? They're ancient - and their acorns are the size of turnips."));
-				await dialog.Msg(L("The Alemeth bakers pay handsomely for pristine giants. One acorn makes three loaves of acorn bread, and the flour keeps all winter."));
-				await dialog.Msg(L("I'd climb for them myself but my back won't forgive me. A sharp-eyed scavenger like you though..."));
-
-				var response = await dialog.Select(L("Will you gather five giant acorns for me?"),
-					Option(L("I'll gather five giant acorns"), "help"),
-					Option(L("Acorn bread? Really?"), "info"),
-					Option(L("Climb your own trees"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Bless you! Look for oaks with the low-hanging pods - those are the ones with giants ready to drop."));
-						await dialog.Msg(L("Mind the Searchers. Ferret Searchers think acorns are their personal property."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Slightly nutty, slightly sweet, holds butter like you wouldn't believe."));
-						await dialog.Msg(L("It's the entire reason Alemeth's festival bakers do so well. Their secret ingredient comes from my trees."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("My knees would disagree, but fair enough."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var acornCount = character.Inventory.CountItem(661094);
-
-				if (acornCount >= 5)
-				{
-					await dialog.Msg(L("Five beauties! Look at the shine on these shells - the bakers will weep."));
-					await dialog.Msg(L("Take this with my thanks. You've earned it twice over."));
-
-					character.Inventory.Remove(661094, 5, InventoryItemRemoveMsg.Given);
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(LF("Still a few more to go. You've got {0} of five.", acornCount));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The Alemeth bakers sent a case of acorn bread by way of thanks. I saved a loaf for you!"));
-			}
-		});
-
-		// Giant Acorn Tree Points
-		//-------------------------------------------------------------------------
-		void AddOakTree(int nodeNum, int x, int z, int direction)
-		{
-			AddNpc(46218, L("Low-Pod Oak"), "f_orchard_34_2", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_orchard_34_2", 1002);
-				var variableKey = $"Laima.Quests.f_orchard_34_2.Quest1002.Acorn{nodeNum}";
-				var spawnedKey = $"Laima.Quests.f_orchard_34_2.Quest1002.Acorn{nodeNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*An old oak whose pods sag with unusually heavy acorns*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already plucked this tree's giant acorn*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && GameRandom.Get().Next(100) < 30)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Ferret_Searcher, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}A pair of Ferret Searchers scramble out, chittering angrily!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Plucking giant acorn..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(661094, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Plucked: Giant Acorn"));
-
-					var currentCount = character.Inventory.CountItem(661094);
-					character.ServerMessage(LF("Giant acorns plucked: {0}/5", currentCount));
-
-					if (currentCount >= 5)
-					{
-						character.ServerMessage(L("{#FFD700}All giants gathered! Return to Wren.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You lowered the acorn back. Try again."));
-				}
-			});
-		}
-
-		AddOakTree(1, 200, 620, 0);
-		AddOakTree(2, -300, 500, 0);
-		AddOakTree(3, 400, 900, 0);
-		AddOakTree(4, -100, 300, 0);
-		AddOakTree(5, 620, 720, 0);
-
-		// Quest 3: The Stolen Crates
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Caravan Master] Rudolf"), "f_orchard_34_2", -1000, 1500, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_34_2", 1003);
-
-			dialog.SetTitle(L("Rudolf"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Last night a pack of Ferret Loaders ran off with four of my supply crates. Four!"));
-				await dialog.Msg(L("The crates are too heavy for them to get far - they've just stashed them in their scrub-camp up the northwest ridge."));
-				await dialog.Msg(L("I need the crates back, and the Loaders... well, let's just say a strong word from a capable traveler would improve their manners."));
-
-				var response = await dialog.Select(L("Will you retrieve the crates and teach them a lesson?"),
-					Option(L("I'll retrieve the crates and thin the Loaders"), "help"),
-					Option(L("Why Ferret Loaders specifically?"), "info"),
-					Option(L("File a claim"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Thank you! The crates are crimson - you can't miss them. Rudolf Logistics stamps everything red."));
-						await dialog.Msg(L("Loaders drop their haul the moment you make it clear you mean business. Fifteen should make it very clear."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Loaders are the pack-carriers of the tribe. Built like little brick walls, faster than they look."));
-						await dialog.Msg(L("They don't hurt anyone - they just run off with things. Constantly. With alarming dedication."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("File a claim? With who? Zeraha hasn't had a magistrate since before the war."));
+						await dialog.Msg(L("Oh, I have. Stood on the ridge three days with salt and an open hand, and forty Ferrets walked past without turning their heads. Not one! Extraordinary, really, in the worst way."));
 						break;
 				}
 			}
@@ -255,372 +68,342 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killLoaders", out var killObj)) return;
-				if (!quest.TryGetProgress("recoverCrates", out var crateObj)) return;
+				if (!quest.TryGetProgress("collectHerb", out var itemObj)) return;
 
-				if (killObj.Done && crateObj.Done)
+				if (killObj.Done && itemObj.Done)
 				{
-					await dialog.Msg(L("All four crates! And the Loaders properly spooked - they'll think twice before the next raid."));
-					await dialog.Msg(L("Good work. Here's your share, straight from the crates you just saved."));
+					await dialog.Msg(L("{#666666}*She cuts a bale open and buries her face in it without any dignity at all*{/}"));
+					await dialog.Msg(L("Fresh cut, this week, never near a fire! They're harvesting it faster than ever and using none of it. Isn't that just— sorry. Delightful data. Terrible situation."));
+					await dialog.Msg(L("Take the field grant. The academy gave it to me for porters and I haven't been able to hire one within three valleys, so it's just sitting there being useless, like most academy money."));
 
-					character.Inventory.Remove(650097, character.Inventory.CountItem(650097), InventoryItemRemoveMsg.Given);
+					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Plenty down, not enough bales. Half of them carry crates, not herb — go for the wide loads, obviously."));
+				}
+				else
+				{
+					await dialog.Msg(L("Still Loaders on the haul road. They move in a line and don't break it for anything, stubborn creatures."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Ten bales, and I've burned one myself. Works exactly as described! So whatever they're doing, it isn't because the herb stopped working. Which raises more questions than it answers, frankly."));
+			}
+		});
+
+		// Quest 1002: The Slingers on the Ridge
+		//---------------------------------------------------------------------
+		AddNpc(147484, L("[Caravan Master] Rudenis"), "f_orchard_34_2", 1284, 1118, 225, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_orchard_34_2", 1002);
+
+			dialog.SetTitle(L("Rudenis"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*He's pacing beside a stalled cart, counting crates off a ledger and swearing under his breath every third one*{/}"));
+				await dialog.Msg(L("You look like someone who can hold a weapon. Good, come here. Six carts a month through Zeraha, twenty-two years, never lost one. Last month? Lost two. Both on the ridge, where the road narrows, of course."));
+				await dialog.Msg(L("Ferret Slingers up on the rock, dropping stones the size of a fist. Kill thirty of them and I can run a cart through without budgeting for a coffin."));
+
+				var response = await dialog.Select(L("Well? Will you clear the ridge or not — I haven't got all day, and neither do my carts."),
+					Option(L("I'll kill the Ferret Slingers"), "help"),
+					Option(L("They never did this before?"), "info"),
+					Option(L("Go round the ridge"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Get up on the rock with them. Down on the road you're a target; up there they're just small, angry, and out of stones fast."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Twenty-two years on this road. They used to sit on that rock and watch us go by, and one of them always waved. I waved back for twenty of those years, like an idiot."));
+						await dialog.Msg(L("Then two years ago the waving stopped, and last month the stones started. Somebody tell me those aren't related, because I can't sleep thinking they are."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("Round trip's four days. My carts carry fruit. Four days turns a cart of fruit into a cart of compost with a driver's wages stapled to it."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killSlingers", out var killObj)) return;
+
+				if (killObj.Done)
+				{
+					await dialog.Msg(L("Two carts through the narrows yesterday, nothing came off the rock. Drivers noticed. Drivers always notice — except when I'm right, apparently."));
+					await dialog.Msg(L("Take the month's haulage. It's a lot of coin and, for once, I've got a month where I can actually spare it."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					var status = "";
-					if (!killObj.Done)
-						status += L("Kill more Ferret Loaders from the camp. ");
-					if (!crateObj.Done)
-						status += L("Recover more stolen supply crates. ");
-
-					await dialog.Msg(LF("Keep at it. {0}", status));
+					await dialog.Msg(L("Still Slingers on the rock. They'll hear the cart before they see it, so quiet won't save you either."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Three solid days without a theft. New record."));
+				await dialog.Msg(L("Drove the narrows myself Thursday. Looked up the whole way. Nothing waved. Didn't expect it to, but a man can be disappointed anyway."));
 			}
 		});
 
-		// Stolen Crate Points
-		//-------------------------------------------------------------------------
-		void AddStolenCrate(int crateNum, int x, int z, int direction)
+		// Quest 1003: Terrible Scent
+		//---------------------------------------------------------------------
+		AddNpc(147484, L("[Caravan Master] Rudenis"), "f_orchard_34_2", -763, -666, 90, async dialog =>
 		{
-			AddNpc(12080, L("Stolen Supply Crate"), "f_orchard_34_2", x, z, direction, async dialog =>
+			var character = dialog.Player;
+			var questId = new QuestId("f_orchard_34_2", 1003);
+
+			dialog.SetTitle(L("Rudenis"));
+
+			if (!character.Quests.Has(questId))
 			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_orchard_34_2", 1003);
-				var variableKey = $"Laima.Quests.f_orchard_34_2.Quest1003.Crate{crateNum}";
-				var spawnedKey = $"Laima.Quests.f_orchard_34_2.Quest1003.Crate{crateNum}.Spawned";
+				await dialog.Msg(L("{#666666}*He waves you over before you've even finished walking up, one hand still on an empty crate*{/}"));
+				await dialog.Msg(L("You again, good — the ridge's clear, but now my crates are vanishing off the wagons. One, two a night, from camps I've got a watch posted on. A watch! Might as well post a scarecrow."));
+				await dialog.Msg(L("The Ferret Empty Porters carry a scent gland every other Ferret in this forest gives a wide berth. Bring me 8 of them and I'll paint my crates with it myself."));
 
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A red-stamped supply crate, half-buried in scrub*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already recovered this crate*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && GameRandom.Get().Next(100) < 40)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Ferret_Loader, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF9966}Ferret Loaders scramble to defend their haul!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Recovering crate..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
+				var response = await dialog.Select(L("Will you get the scent?"),
+					Option(L("I'll bring you 8 scent glands"), "help"),
+					Option(L("Why do they avoid it?"), "info"),
+					Option(L("Post more guards"), "leave")
 				);
 
-				if (result == TimeActionResult.Completed)
+				switch (response)
 				{
-					character.Inventory.Add(650097, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Stolen Supply Crate"));
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Don't open the gland out there, and don't put it in your pack next to food. I've made both mistakes on the same day, and I do not recommend either."));
+						break;
 
-					var currentCount = character.Inventory.CountItem(650097);
-					character.ServerMessage(LF("Crates recovered: {0}/4", currentCount));
+					case "info":
+						await dialog.Msg(L("An Empty Porter's one that's already delivered. Whatever the scent means to them, it means 'nothing here,' and no Ferret in Zeraha wastes a step on nothing."));
+						await dialog.Msg(L("Twenty-two years and I never needed to know that. This year I've learned more about Ferrets than any sane cart-master should have to."));
+						break;
 
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All crates recovered! Return to Rudolf.{/}"));
-					}
+					case "leave":
+						await dialog.Msg(L("I've got three guards on a six-cart camp and the crates go anyway. They don't fight the guards. They wait. Almost respectful, if it weren't robbery."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("collectScent", out var itemObj)) return;
+
+				if (itemObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*He takes the jar at arm's length and holds it there for the entire conversation*{/}"));
+					await dialog.Msg(L("Eight. That's every crate on the northern run painted, and my drivers are going to hate me for a month straight."));
+					await dialog.Msg(L("Take the northern run's insurance. Haven't had to claim it in twenty-two years — rather it went to you than some clerk in Fedimian."));
+
+					character.Quests.Complete(questId);
 				}
 				else
 				{
-					character.ServerMessage(L("You set the crate down again."));
+					await dialog.Msg(L("Still short. The Empty Porters come back down the haul road unladen — that's how you spot them, empty-handed and smug about it."));
 				}
-			});
-		}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Six nights, no crates gone. Drivers ride upwind of their own wagons now, and I've stopped apologizing for making them."));
+			}
+		});
 
-		AddStolenCrate(1, -800, 1700, 0);
-		AddStolenCrate(2, -500, 1500, 0);
-		AddStolenCrate(3, -700, 1800, 0);
-		AddStolenCrate(4, -400, 1600, 0);
-
-		// Quest 4: The Chief's Apology
-		//-------------------------------------------------------------------------
-		AddNpc(155018, L("[Chief] Burrows"), "f_orchard_34_2", 720, 820, 0, async dialog =>
+		// Quest 1004: The Ferret Cairns
+		//---------------------------------------------------------------------
+		AddNpc(147473, L("[Herb-Scholar] Ausrine"), "f_orchard_34_2", -681, 1697, 180, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_34_2", 1004);
 
-			dialog.SetTitle(L("Burrows"));
+			dialog.SetTitle(L("Ausrine"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Greetings, tall-friend. I am Burrows, chief of the peaceable Ferret Folk of Zeraha."));
-				await dialog.Msg(L("A splinter of my tribe - the Searchers - have forgotten their manners. They snatch, they bite, they shame our name."));
-				await dialog.Msg(L("I cannot raise paws against my own. But if a stranger thins the rogues, and gathers peace-offerings along the safe paths, I will honour both with the tribe's trust."));
+				await dialog.Msg(L("{#666666}*She looks up from four sketches pinned to a board, tapping each one in turn like she's counting them again*{/}"));
+				await dialog.Msg(L("Perfect timing, honestly! There are four Ferret cairns in this forest, each with a carved wooden piece at the base. I've drawn all four — same carving, every one. Isn't that marvelous?"));
+				await dialog.Msg(L("Take this incense and burn it at each cairn. The smoke settles whatever's watching it long enough for you to lift the piece and look at the underside. Go on, go on, I'll be right here dying of curiosity."));
 
-				var response = await dialog.Select(L("Will you handle the rogues and gather the offerings?"),
-					Option(L("I'll handle the rogues and gather the offerings"), "help"),
-					Option(L("Why can't you discipline your own?"), "info"),
-					Option(L("Tribe drama isn't my problem"), "leave")
+				var response = await dialog.Select(L("Will you visit the four cairns for me? Please say yes, I've been waiting weeks."),
+					Option(L("I'll burn incense at all 4 cairns"), "help"),
+					Option(L("What's on the underside?"), "info"),
+					Option(L("Just take the pieces"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The offerings are woven pouches, left at marker-stones by the tribe. Each one contains our apology in miniature - a pebble, a feather, a sweet."));
-						await dialog.Msg(L("Collect five, and the rogue Searchers will see their elders do not approve of them."));
+						character.Inventory.Add(667017, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("Light it downwind and stand in the smoke yourself — it works on you too, and trust me, you'll want it working on you."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("If I strike my own, I splinter the tribe further. If a stranger strikes them, I mourn privately and the tribe holds together."));
-						await dialog.Msg(L("It is not the tall-folk way. But it is ours."));
+						await dialog.Msg(L("I don't know! Every Ferret in the forest will fight over a cairn piece and none of them will turn one over — I've watched them not do it for an entire year."));
+						await dialog.Msg(L("A thing nobody will look at the back of is a thing somebody was told not to look at the back of. That is not animal behavior, and it is driving me mad."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then go your way, tall-friend. The offer will remain if you return."));
+						await dialog.Msg(L("Lift a piece without the smoke and you'll have every Ferret within a mile on you inside a minute. I've watched that too — spectacular, dreadful, don't do it."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killSearchers", out var killObj)) return;
-				var pouchCount = character.Inventory.CountItem(650096);
+				if (!quest.TryGetProgress("visitCairns", out var cairnObj)) return;
 
-				if (killObj.Done && pouchCount >= 5)
+				if (cairnObj.Done)
 				{
-					await dialog.Msg(L("Five offerings, and the rogues brought low. The tribe will mourn, and then it will mend."));
-					await dialog.Msg(L("You carry our trust now, tall-friend. Take this - a gift from my own stores."));
-
-					character.Inventory.Remove(650096, 5, InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("All four carvings the same on the face, all four different on the back — and the four backs together make a line of script I've seen exactly once before, in a demon-war archive in Fedimian!"));
+					await dialog.Msg(L("Take the whole grant. I'm going to need a Ferret's skin, not a porter, and I'd rather you were paid before I explain why."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					var status = "";
-					if (!killObj.Done)
-						status += L("Kill more rogue Searchers. ");
-					if (pouchCount < 5)
-						status += L("Gather more peace-offering pouches. ");
-
-					await dialog.Msg(LF("Take your time. {0}", status));
+					await dialog.Msg(L("Cairns still unvisited. All four, and burn the incense before you touch anything — please, for both our sakes."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The tribe speaks your name at the fireside now, tall-friend. Always welcome at our hearths."));
+				await dialog.Msg(L("Four pieces, one sentence, and it's an instruction! Somebody wrote an instruction into this forest, and the Ferrets have been carrying it around for two years. I haven't slept."));
 			}
 		});
 
-		// Peace Offering Points
-		//-------------------------------------------------------------------------
-		void AddOfferingStone(int offeringNum, int x, int z, int direction)
+		// Quest 1004 interaction points - the Ferret cairns
+		//---------------------------------------------------------------------
+		void AddFerretCairn(int cairnNumber, string observation, int x, int z, int direction)
 		{
-			AddNpc(47190, L("Marker-Stone Offering"), "f_orchard_34_2", x, z, direction, async dialog =>
+			AddNpc(47222, L("Ferret Cairn"), "f_orchard_34_2", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_orchard_34_2", 1004);
-				var variableKey = $"Laima.Quests.f_orchard_34_2.Quest1004.Offering{offeringNum}";
+				var variableKey = $"Laima.Quests.f_orchard_34_2.Quest1004.Cairn{cairnNumber}";
+				var counterKey = "Laima.Quests.f_orchard_34_2.Quest1004.CairnsVisited";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A woven pouch rests atop a moss-covered marker-stone*{/}"));
+					await dialog.Msg(L("{#666666}*A stacked cairn with a carved wooden piece wedged at its base*{/}"));
 					return;
 				}
 
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*You've already collected this offering*{/}"));
+					await dialog.Msg(L("{#666666}*This piece is back where you found it, face up*{/}"));
 					return;
 				}
 
+				var luredCount = LureNearbyEnemies(character, 450, 350);
+				if (luredCount > 0)
+					character.ServerMessage(LF("{{#FF6666}}The incense does not settle everything - {0} drawn in!{{/}}", luredCount));
+
 				var result = await character.TimeActions.StartAsync(
-					L("Lifting pouch..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2)
+					L("Burning incense and lifting the piece..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(5)
 				);
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650096, 1, InventoryAddType.PickUp);
+					character.Inventory.Add(667021, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Collected: Peace-Offering Pouch"));
 
-					var currentCount = character.Inventory.CountItem(650096);
-					character.ServerMessage(LF("Offerings collected: {0}/5", currentCount));
+					var visited = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, visited);
 
-					if (currentCount >= 5)
-					{
-						character.ServerMessage(L("{#FFD700}All offerings collected! Return to Chief Burrows.{/}"));
-					}
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Cairns read: {0}/4", visited));
+
+					if (visited >= 4)
+						character.ServerMessage(L("{#FFD700}All 4 undersides copied. Return to Ausrine.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("You left the pouch on the stone."));
+					character.ServerMessage(L("The incense gutters out and you put the piece back."));
 				}
 			});
 		}
 
-		AddOfferingStone(1, 500, 600, 0);
-		AddOfferingStone(2, 800, 700, 0);
-		AddOfferingStone(3, 300, 800, 0);
-		AddOfferingStone(4, 600, 900, 0);
-		AddOfferingStone(5, 900, 600, 0);
+		AddFerretCairn(1, L("First underside: three short marks and a long one, cut deep."), 403, 1532, 0);
+		AddFerretCairn(2, L("Second underside: the same hand, and the cuts run the other way."), -85, 1559, 90);
+		AddFerretCairn(3, L("Third underside: worn almost smooth, but the shape is unmistakable."), 1180, 1136, 180);
+		AddFerretCairn(4, L("Fourth underside: fresh. Somebody cut this one within the year."), 742, -953, 270);
 
-		// Quest 5: The Hoard-King
-		//-------------------------------------------------------------------------
-		AddNpc(20109, L("[Bounty Hunter] Dag"), "f_orchard_34_2", 1100, 0, 270, async dialog =>
+		// Quest 1005: The Ferret Transformation Scroll
+		//---------------------------------------------------------------------
+		AddNpc(147473, L("[Herb-Scholar] Ausrine"), "f_orchard_34_2", 256, -738, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_34_2", 1005);
-			var kingSpawnedKey = "Laima.Quests.f_orchard_34_2.Quest1005.KingSpawned";
 
-			dialog.SetTitle(L("Dag"));
+			dialog.SetTitle(L("Ausrine"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("There's a ferret in these woods who styles himself 'Hoard-King'. Sits on a nest of stolen coins and chatters orders at the rest."));
-				await dialog.Msg(L("He won't show his face while his retinue's intact. But thin the surrounding Ferret Folk enough - about ten of them - and his pride brings him out."));
-				await dialog.Msg(L("Bounty's posted: the Hoard-King's coin-pile, plus my personal contribution for whoever brings his crown in."));
+				if (!character.Quests.HasCompleted(new QuestId("f_orchard_34_2", 1004)))
+				{
+					await dialog.Msg(L("The four cairn pieces first, please. I am not writing a transformation scroll off half a sentence — that's how scholars end up embarrassed, or dead, and I'd rather be neither."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Want the contract?"),
-					Option(L("I'll take the bounty"), "help"),
-					Option(L("What crown?"), "info"),
-					Option(L("Leave him to his coins"), "leave")
+				await dialog.Msg(L("{#666666}*She's holding up a half-sewn Ferret pelt against her own shoulders, checking the fit in a hand mirror*{/}"));
+				await dialog.Msg(L("Don't laugh! I've thought this through more than it looks, I promise. The instruction on the cairns tells them where to carry everything. I can read where. I cannot read who's receiving it, and no Ferret is going to tell a human."));
+				await dialog.Msg(L("So — I write a transformation scroll and walk in as one of them! I need six blank scroll leaves off the Searchers, and when the disguise fails — and it will — I'll need you standing right next to me."));
+
+				var response = await dialog.Select(L("Will you go in with her?"),
+					Option(L("I'll get the scrolls and stand with you"), "help"),
+					Option(L("Why will it fail?"), "info"),
+					Option(L("Send the pieces to Fedimian"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Ten Folk first. Come back when the count's done - I'll know when he's close to emerging."));
-						await dialog.Msg(L("Don't underestimate him. He didn't get the crown by sitting still."));
+						await dialog.Msg(L("The Searchers carry blanks in a hip roll. When we go in, stay behind me until the scroll drops — after that, stay in front, please, I mean it."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("A circle of woven twigs, set with pilfered buttons and a polished bottle cap."));
-						await dialog.Msg(L("Ridiculous to look at. But every ferret in Zeraha salutes when he wears it."));
+						await dialog.Msg(L("Because it's a scent-based people and I'm writing a shape-based scroll! I'll look correct and smell entirely wrong, and I'll have about four minutes."));
+						await dialog.Msg(L("Four minutes is enough to see who's at the end of the haul road. It is not enough to walk back out. I've done the math three times hoping it changes."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Maybe next week. The bounty keeps climbing."));
+						await dialog.Msg(L("Fedimian will read it in three months and send a commission in six. The haul road is two years old and accelerating. We don't have three months, let alone six."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killRetinue", out var retObj)) return;
-				if (!quest.TryGetProgress("killKing", out var kingObj)) return;
+				if (!quest.TryGetProgress("collectBlanks", out var blankObj)) return;
+				if (!quest.TryGetProgress("theFourMinutes", out var fightObj)) return;
 
-				if (retObj.Done && kingObj.Done)
+				if (blankObj.Done && fightObj.Done)
 				{
-					await dialog.Msg(L("Crown in hand? That's him. That's really him."));
-					await dialog.Msg(L("Bounty paid in full, plus the contribution I promised. And the tribe will be quieter for it - Burrows will thank you too, I wager."));
-
-					character.Variables.Perm.Remove(kingSpawnedKey);
+					await dialog.Msg(L("I saw it! I'm not going to describe it standing out in the open — I'm writing it down tonight and sending four copies by four different roads."));
+					await dialog.Msg(L("Take this — it was in the receiving pit, and it isn't a Ferret thing, and it isn't a Zeraha thing. Somebody carried it here. Somebody."));
 
 					character.Quests.Complete(questId);
 				}
-				else if (retObj.Done && !kingObj.Done)
+				else if (blankObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(kingSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(kingSpawnedKey, true);
-
-						if (SpawnTempMonsters(character, MonsterId.Ferret_Loader, 1, 120, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("His retinue's thin enough. He's emerging now - I can hear the rattle of his coin-pile from here."));
-							await dialog.Msg(L("{#FF9966}Go, quickly! He doesn't stay in the open long!{/}"));
-							character.ServerMessage(L("{#FF9966}The Hoard-King emerges to defend his pile!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("He's out there. Don't let him scurry back into his burrow."));
-					}
+					await dialog.Msg(L("Scroll's written! Walk in beside me and count to four minutes. Exactly four, please, I timed it."));
 				}
 				else
 				{
-					await dialog.Msg(L("His retinue's still thick. Thin them first, then he'll come out."));
+					await dialog.Msg(L("Still short of blanks. The Searchers keep them dry in a hip roll — it comes off whole if you're careful."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The crown's nailed to my post. The bounty board finally has something worth bragging about."));
-			}
-		});
-
-		// Quest 6: The Zeraha Road
-		//-------------------------------------------------------------------------
-		AddNpc(155145, L("[Pathfinder] Jenna"), "f_orchard_34_2", 900, -400, 45, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_34_2", 1006);
-
-			dialog.SetTitle(L("Jenna"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("The Zeraha Road runs southeast into Alemeth - shortest route to the festival for half the province."));
-				await dialog.Msg(L("Right now it's a gauntlet. Ferret Patters block the carts, Slingers pelt the drivers. Caravans are turning back, and festival supplies aren't getting through."));
-
-				var response = await dialog.Select(L("Will you clear the road for the carts?"),
-					Option(L("I'll clear the road"), "help"),
-					Option(L("Which is worse?"), "info"),
-					Option(L("Use another road"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Twelve of each. Patters work the ground-level, Slingers take the treetops - both are all along the road."));
-						await dialog.Msg(L("Clear them, and the festival carts roll again."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Patters get under your feet, Slingers pelt you from above. Both are about equally irritating, honestly."));
-						await dialog.Msg(L("Together though, they shut the road down completely."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("The other roads add a week to the trip. Not an option if the festival's to have food."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killPatters", out var pattObj)) return;
-				if (!quest.TryGetProgress("killSlingers", out var slingObj)) return;
-
-				if (pattObj.Done && slingObj.Done)
-				{
-					await dialog.Msg(L("Road's clear! The first caravan rolled through an hour ago - the drivers are beaming."));
-					await dialog.Msg(L("Take your pay, and know that every festival pie owes you a slice."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					var status = "";
-					if (!pattObj.Done)
-						status += L("Kill more Ferret Patters. ");
-					if (!slingObj.Done)
-						status += L("Kill more Ferret Slingers. ");
-
-					await dialog.Msg(LF("Keep pushing. {0}", status));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The caravans are running on schedule. The festival might actually have jam this year."));
+				await dialog.Msg(L("Four copies gone by four roads. If even one reaches Fedimian intact, this stops being my problem and starts being an army's. Frankly, good."));
 			}
 		});
 	}
@@ -630,276 +413,230 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: Pebble Barrage
+// Quest 1001 CLASS: Drowsy Herb
 //-----------------------------------------------------------------------------
 
-public class PebbleBarrageQuest : QuestScript
+public class DrowsyHerbQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_2", 1001);
-		SetName(L("Pebble Barrage"));
+		SetName(L("Drowsy Herb"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Chase off the Ferret Slingers pelting the harvest crew with acorns."));
+		SetDescription(L("The Ferrets of Zeraha have burned drowsy herb in their camps for longer than anyone has kept records. Two years ago they stopped burning it and started hauling it somewhere in quantity."));
 		SetLocation("f_orchard_34_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Harvest Foreman] Tamas"), "f_orchard_34_2");
+		AddQuestGiver(L("[Herb-Scholar] Ausrine"), "f_orchard_34_2");
 
-		AddObjective("chaseSlingers", L("Chase off Ferret Slingers"),
-			new KillObjective(22, new[] { MonsterId.Ferret_Slinger }));
+		AddObjective("killLoaders", L("Kill Ferret Loaders on the haul road"),
+			new KillObjective(20, new[] { MonsterId.Ferret_Loader }));
 
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddObjective("collectHerb", L("Collect bales of Drowsy Herb"),
+			new CollectItemObjective(667016, 10));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(667016, 0.50f, MonsterId.Ferret_Loader);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(667016, character.Inventory.CountItem(667016), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(667016, character.Inventory.CountItem(667016), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1002 CLASS: The Acorn Bounty
+// Quest 1002 CLASS: The Slingers on the Ridge
 //-----------------------------------------------------------------------------
 
-public class TheAcornBountyQuest : QuestScript
+public class TheSlingersOnTheRidgeQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_2", 1002);
-		SetName(L("The Acorn Bounty"));
+		SetName(L("The Slingers on the Ridge"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Gather giant acorns from Zeraha's ancient oaks for the Alemeth festival bakers."));
+		SetDescription(L("For 20 years the Ferret Slingers sat on the ridge rock and watched the carts go by, and one of them always waved. Last month they started dropping stones instead, and 2 carts did not come through."));
 		SetLocation("f_orchard_34_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Collector] Wren"), "f_orchard_34_2");
+		AddQuestGiver(L("[Caravan Master] Rudenis"), "f_orchard_34_2");
 
-		AddObjective("gatherAcorns", L("Gather giant acorns"),
-			new CollectItemObjective(661094, 5));
+		AddObjective("killSlingers", L("Kill Ferret Slingers on the ridge"),
+			new KillObjective(30, new[] { MonsterId.Ferret_Slinger }));
 
 		AddReward(new ExpReward(11900, 8100));
 		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(661094, character.Inventory.CountItem(661094), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1002.Acorn{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1002.Acorn{i}.Spawned");
-		}
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(661094, character.Inventory.CountItem(661094), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1002.Acorn{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1002.Acorn{i}.Spawned");
-		}
+		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
-// Quest 1003 CLASS: The Stolen Crates
+// Quest 1003 CLASS: Terrible Scent
 //-----------------------------------------------------------------------------
 
-public class TheStolenCratesQuest : QuestScript
+public class TerribleScentQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_2", 1003);
-		SetName(L("The Stolen Crates"));
+		SetName(L("Terrible Scent"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Ferret Loaders raiding Rudolf's caravan and recover the stolen supply crates from their northwestern camp."));
+		SetDescription(L("Crates go off the wagons one or two a night from camps with a posted watch. A Ferret Empty Porter carries a scent gland that means 'this one has nothing', and no Ferret in Zeraha wastes a step on nothing."));
 		SetLocation("f_orchard_34_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Caravan Master] Rudolf"), "f_orchard_34_2");
+		AddQuestGiver(L("[Caravan Master] Rudenis"), "f_orchard_34_2");
 
-		AddObjective("killLoaders", L("Kill Ferret Loaders"),
-			new KillObjective(15, new[] { MonsterId.Ferret_Loader }));
-
-		AddObjective("recoverCrates", L("Recover stolen supply crates"),
-			new CollectItemObjective(650097, 4));
+		AddObjective("collectScent", L("Collect scent glands from Ferret Empty Porters"),
+			new CollectItemObjective(667022, 8));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(667022, 0.50f, MonsterId.Ferret_Patter);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650097, character.Inventory.CountItem(650097), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1003.Crate{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1003.Crate{i}.Spawned");
-		}
+		character.Inventory.Remove(667022, character.Inventory.CountItem(667022), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650097, character.Inventory.CountItem(650097), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1003.Crate{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1003.Crate{i}.Spawned");
-		}
+		character.Inventory.Remove(667022, character.Inventory.CountItem(667022), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1004 CLASS: The Chief's Apology
+// Quest 1004 CLASS: The Ferret Cairns
 //-----------------------------------------------------------------------------
 
-public class TheChiefsApologyQuest : QuestScript
+public class TheFerretCairnsQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_2", 1004);
-		SetName(L("The Chief's Apology"));
+		SetName(L("The Ferret Cairns"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill the rogue Ferret Searchers and gather Chief Burrows' peace-offering pouches from the marker-stones."));
+		SetDescription(L("Every Ferret in Zeraha will fight over a cairn piece and not one of them will turn one over. A thing nobody will look at the back of is a thing somebody was told not to look at the back of."));
 		SetLocation("f_orchard_34_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Chief] Burrows"), "f_orchard_34_2");
+		AddQuestGiver(L("[Herb-Scholar] Ausrine"), "f_orchard_34_2");
 
-		AddObjective("killSearchers", L("Kill rogue Ferret Searchers"),
-			new KillObjective(12, new[] { MonsterId.Ferret_Searcher }));
-
-		AddObjective("collectOfferings", L("Collect peace-offering pouches"),
-			new CollectItemObjective(650096, 5));
+		AddObjective("visitCairns", L("Burn incense and read the underside of all 4 cairn pieces"),
+			new VariableCheckObjective("Laima.Quests.f_orchard_34_2.Quest1004.CairnsVisited", 4, true));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650096, character.Inventory.CountItem(650096), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667017, character.Inventory.CountItem(667017), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667021, character.Inventory.CountItem(667021), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1004.Offering{i}");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_orchard_34_2.Quest1004.CairnsVisited");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1004.Cairn{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650096, character.Inventory.CountItem(650096), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667017, character.Inventory.CountItem(667017), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667021, character.Inventory.CountItem(667021), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1004.Offering{i}");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_orchard_34_2.Quest1004.CairnsVisited");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_2.Quest1004.Cairn{i}");
 	}
 }
 
-// Quest 1005 CLASS: The Hoard-King
+// Quest 1005 CLASS: The Ferret Transformation Scroll
 //-----------------------------------------------------------------------------
 
-public class TheHoardKingQuest : QuestScript
+public class TheFerretTransformationScrollQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_2", 1005);
-		SetName(L("The Hoard-King"));
+		SetName(L("The Ferret Transformation Scroll"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Thin the Hoard-King's retinue of Ferret Folk to draw him out, then bring him down for the bounty."));
+		SetDescription(L("The cairn instruction says where everything is being carried but not who is receiving it. A shape-based scroll on a scent-based people buys about 4 minutes at the end of the haul road."));
 		SetLocation("f_orchard_34_2");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Dag"), "f_orchard_34_2");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Herb-Scholar] Ausrine"), "f_orchard_34_2");
 
-		AddObjective("killRetinue", L("Kill the Hoard-King's retinue"),
-			new KillObjective(10, new[] { MonsterId.Ferret_Folk }));
+		AddPrerequisite(new CompletedPrerequisite("f_orchard_34_2", 1004));
 
-		AddObjective("killKing", L("Defeat the Hoard-King"),
-			new KillObjective(1, new[] { MonsterId.Ferret_Loader }));
+		AddObjective("collectBlanks", L("Collect Empty Scrolls from Ferret Searchers"),
+			new CollectItemObjective(667019, 6));
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-		AddReward(new ItemReward(531122, 1)); // Plate Armor
+		AddObjective("theFourMinutes", L("Hold the receiving pit when the disguise fails"),
+			new LayeredKillObjective(
+				spawnList: new[] {
+					new KillSpec(MonsterId.Ferret_Loader, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Ferret_Searcher, 3),
+				},
+				resetIdent: "collectBlanks",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
+
+		AddReward(new ExpReward(60000, 40000));
+		AddReward(new SilverReward(50000));
+		AddReward(new ItemReward(603113, 1)); // Svenus Bracelet
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(667019, 0.45f, MonsterId.Ferret_Searcher);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_orchard_34_2.Quest1005.KingSpawned");
+		character.Inventory.Remove(667019, character.Inventory.CountItem(667019), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_orchard_34_2.Quest1005.KingSpawned");
-	}
-}
-
-// Quest 1006 CLASS: The Zeraha Road
-//-----------------------------------------------------------------------------
-
-public class TheZerahaRoadQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_orchard_34_2", 1006);
-		SetName(L("The Zeraha Road"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Clear the Ferret Patters and Slingers harassing festival caravans along the Zeraha Road."));
-		SetLocation("f_orchard_34_2");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Pathfinder] Jenna"), "f_orchard_34_2");
-
-		AddObjective("killPatters", L("Kill Ferret Patters from the road"),
-			new KillObjective(12, new[] { MonsterId.Ferret_Patter }));
-
-		AddObjective("killSlingers", L("Kill Ferret Slingers from the road"),
-			new KillObjective(12, new[] { MonsterId.Ferret_Slinger }));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(502207, 1)); // Hasta Plate Gauntlets
+		character.Inventory.Remove(667019, character.Inventory.CountItem(667019), InventoryItemRemoveMsg.Destroyed);
 	}
 }

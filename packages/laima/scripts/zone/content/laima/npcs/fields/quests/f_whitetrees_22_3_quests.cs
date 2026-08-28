@@ -1,12 +1,12 @@
 //--- Melia Script ----------------------------------------------------------
-// Izoliacjia Plateau - Quest NPCs
+// Narvas Approach - Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quest NPCs and content for f_whitetrees_22_3 map.
+// Quest NPCs and content for f_whitetrees_22_3 map. Five detection
+// installations, and four of them are detectors.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -23,433 +23,405 @@ public class FWhitetrees223QuestNpcsScript : GeneralScript
 	protected override void Load()
 	{
 		// =====================================================================
-		// QUEST 1001: Black Beasts of the Plateau
+		// QUEST 1001: Nothing Was Supposed to Come This Far
 		// =====================================================================
-		// Sergeant Zigmas - Military reclamation follow-up
+		// Abbey Guard Tautvydas - the Black Hohens on the approach
 		//---------------------------------------------------------------------
-		AddNpc(20128, L("[Sergeant] Zigmas"), "f_whitetrees_22_3", 1379, 897, 270, async dialog =>
+		AddNpc(20128, L("[Abbey Guard] Tautvydas"), "f_whitetrees_22_3", -606, -1052, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_whitetrees_22_3", 1001);
 
-			dialog.SetTitle(L("Zigmas"));
+			dialog.SetTitle(L("Tautvydas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A sergeant scowls across the plateau*{/}"));
-				await dialog.Msg(L("The commander in Orsha thinks clearing the Yakmap was enough. He's wrong."));
+				await dialog.Msg(L("{#666666}*A guard has a spear grounded and is watching a treeline he clearly did not expect to have to watch*{/}"));
+				await dialog.Msg(L("Stay behind me a moment. ...Right, nothing yet. Sorry — you'll have to forgive the manners, this treeline's had me jumpy for a season."));
+				await dialog.Msg(L("I have stood the Narvas approach 8 years. In 8 years the worst thing on this ground was a Yakmap eating somebody's lunch. This season we have Black Hohen Manes and nobody can tell me where they came from. Kill 30 and bring me 8 of their essence."));
 
-				var response = await dialog.Select(L("When Narvas Temple fell last spring, the demons inside didn't stay put. They've been pushing the Black Hohens out of their dens - and the Hohens are pushing toward our training grounds. The beasts are mad with fear, and mad beasts bite twice as hard."),
-					Option(L("I'll kill them"), "help"),
-					Option(L("What happened at the temple?"), "info"),
-					Option(L("Sounds like your fight"), "leave")
+				var response = await dialog.Select(L("Will you take the treeline?"),
+					Option(L("I'll clear them and get the essence"), "help"),
+					Option(L("Nobody knows where they came from?"), "info"),
+					Option(L("Shut the approach"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("Good. The Gulaks den in the western scree; the Manes hunt the central paths."));
-
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Start with the Manes - they're the bolder of the two. The Gulaks you'll find west, near the temple warp."));
-						await dialog.Msg(L("And stay well clear of the temple itself. Whatever Narvas is now, it isn't a place for soldiers."));
+						await dialog.Msg(L("They work the treeline and they will not come onto open grass, which is the one advantage this ground gives anybody. Fight them out of the trees."));
+						await dialog.Msg(L("The essence sits behind the plate at the shoulder. Cut it out before it cools or it is not worth carrying up to the Abbey."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("{#666666}*He pauses*{/}"));
-						await dialog.Msg(L("Demons came up from somewhere beneath the foundations. Took the brothers before they could raise the alarm."));
-						await dialog.Msg(L("The few who fled camp here on the plateau now. You might meet one - Brother Laimis. Don't press him on it."));
+						await dialog.Msg(L("Not one person. Brother Aistis has walked this ground every week for 11 years and he says they were not here in the spring and they were here by midsummer, and there is no road onto this shelf they could have used."));
+						await dialog.Msg(L("Which means they walked. From wherever the Hohens actually live, all the way here, past everything in between."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Run if you must. I'll still be here holding the line."));
+						await dialog.Msg(L("Shut it and Narvas has no road. There are 60 people in that abbey and every loaf they eat comes over this ground."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killMane", out var maneObj)) return;
-				if (!quest.TryGetProgress("killGulak", out var gulakObj)) return;
+				if (!quest.TryGetProgress("killManes", out var killObj)) return;
+				if (!quest.TryGetProgress("collectEssence", out var essObj)) return;
 
-				if (maneObj.Done && gulakObj.Done)
+				if (killObj.Done && essObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He nods once, approving*{/}"));
-					await dialog.Msg(L("That'll thin them enough to hold the line for another month. Maybe two."));
-					await dialog.Msg(L("Take this. Veteran's tunic - served me well before the temple fell. You've earned it more than I need it now."));
+					await dialog.Msg(L("{#666666}*He lays the 8 essences out on his cloak and counts them twice, which is more attention than he has given anything all month*{/}"));
+					await dialog.Msg(L("8 of them, and Aistis can send that up to Narvas and somebody in the library can go and find out what a Hohen is and why one is standing on our road."));
+					await dialog.Msg(L("Take the guard-post's purse. We are paid out of the Abbey's alms and we have not had a thing to spend it on in 8 years."));
 
 					character.Quests.Complete(questId);
 				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Treeline's thinner. 8 essences, behind the shoulder plate, cut warm."));
+				}
 				else
 				{
-					await dialog.Msg(L("Keep at it. Manes in the central grove, Gulaks west near the temple warp."));
+					await dialog.Msg(L("30 Manes and fight them out of the trees. They will not follow you onto grass."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The Hohens are quieter now. But the temple still bleeds demons. We'll need a real campaign before long."));
+				await dialog.Msg(L("Approach is walkable again. The bread cart came over this morning without an escort for the first time since midsummer and the carter did not even know there had been a problem."));
 			}
 		});
 
 		// =====================================================================
-		// QUEST 1002: Letter to the Abbot
+		// QUEST 1002: Globes for the Fifth Station
 		// =====================================================================
-		// Quartermaster Rimvyda - Dispatch for Narvas refugees
+		// Chandler Ausma - the Abbey's supply of stored light
 		//---------------------------------------------------------------------
-		AddNpc(20107, L("[Quartermaster] Rimvyda"), "f_whitetrees_22_3", 1456, 1129, 180, async dialog =>
+		AddNpc(20116, L("[Chandler] Ausma"), "f_whitetrees_22_3", -1341, -1138, 285, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_whitetrees_22_3", 1002);
 
-			dialog.SetTitle(L("Rimvyda"));
+			dialog.SetTitle(L("Ausma"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A weary quartermaster tallies crates of salt pork and bandages, her ledger stained with dust*{/}"));
-				await dialog.Msg(L("These supplies were bound for Narvas Temple. Now they're bound for whatever's left of Narvas."));
+				await dialog.Msg(L("{#666666}*A chandler is turning a spent globe over in her hands, looking at how it went out rather than that it did*{/}"));
+				await dialog.Msg(L("Oh — don't mind me muttering. A new face is a nice change from talking to dead glass. Give me a moment and I'll tell you what's wrong with it."));
+				await dialog.Msg(L("I keep Narvas in light. 40 lamps in the abbey and 5 out here on Aistis's stations, and the station globes drain 4 times as fast as the abbey ones. The Black Hohen Gulaks carry a globe that stores charge. Bring me 6."));
 
-				var response = await dialog.Select(L("Brother Laimis leads the few monks who escaped the desecration. They camp near the western warp - they can't go home, and Orsha's walls are too full for refugees. I need someone to deliver a dispatch confirming we'll redirect the caravan to his camp."),
-					Option(L("I'll carry the dispatch"), "help"),
-					Option(L("What happened at Narvas?"), "info"),
-					Option(L("I have my own concerns"), "leave")
+				var response = await dialog.Select(L("Will you bring me 6 globes?"),
+					Option(L("I'll bring 6"), "help"),
+					Option(L("Why do the stations drain faster?"), "info"),
+					Option(L("Use ordinary lamps"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*She presses a sealed scroll into your hand*{/}"));
-
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The path's crossed by Hohens - mind yourself. If you have to run, run straight through."));
-						await dialog.Msg(L("Laimis doesn't speak much. Whatever he tells you, bring it back word for word."));
+						await dialog.Msg(L("Take them charged. A Gulak that has been dead an hour has a flat globe and a flat globe is glass."));
+						await dialog.Msg(L("They come at you straight and slowly and that is not a kindness, it is because they do not need to hurry."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("{#666666}*She sets down her quill and rubs her eyes*{/}"));
-						await dialog.Msg(L("The Narvas brothers guarded something beneath the temple - relics from before the demon war, they said. Sealed vaults."));
-						await dialog.Msg(L("The seals broke. Or were broken. The demons came up from below in a single night."));
-						await dialog.Msg(L("Six brothers made it out. The rest... we don't know. We don't want to know."));
+						await dialog.Msg(L("That is a very good question and I have asked it for 6 years and been told it is the weather. Same globe, same charge, same maker. In the abbey it lasts a season. On a station it lasts 6 weeks."));
+						await dialog.Msg(L("Something out there is using them. I am a chandler, so what I know about it is that it costs me 34 globes a year."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then move along. I've a hundred crates left to count."));
+						await dialog.Msg(L("The stations will not take a flame. There is no wick housing on any of the 5 - they were built for globes, by somebody who assumed whoever kept them would have globes."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("deliverDispatch", out var deliverObj)) return;
+				if (!quest.TryGetProgress("collectGlobes", out var globeObj)) return;
 
-				if (deliverObj.Done)
+				if (globeObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She reads Laimis's reply slowly, then folds it with care*{/}"));
-					await dialog.Msg(L("Bless that man. He's still thinking of others even after what he's seen."));
-					await dialog.Msg(L("Here - these are yours. The Narvas brothers asked me to thank anyone who helped them keep faith. Consider this their thanks and mine."));
+					await dialog.Msg(L("{#666666}*She seats one in a test cradle and it comes up bright and stays bright, and she watches it for a full minute*{/}"));
+					await dialog.Msg(L("Charged and holding. 6 globes is a year of stations, and I have not had a year of stations since I took the post."));
+					await dialog.Msg(L("Take the chandlery's money. And go and stand at the fifth station some evening and tell me whether the globe in it looks like the globe in the other 4, because I have never been able to decide."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Laimis is at the western warp. Grey tents, quiet camp. Find him."));
+					await dialog.Msg(L("6 globes, off the Gulaks, and take them charged. A flat one is glass."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The caravan reached the refugee camp. For what it's worth, the brothers ate well this week."));
+				await dialog.Msg(L("All 5 stations globed and 2 spare on the shelf. And the fifth one has drained a third already in 9 days, and the other 4 have not moved. I have written that in the chandlery book where somebody will have to read it."));
 			}
 		});
 
 		// =====================================================================
-		// Brother Laimis - Narvas refugee, recipient for Quest 1002
-		//---------------------------------------------------------------------
-		AddNpc(20117, L("[Brother] Laimis"), "f_whitetrees_22_3", -1468, 102, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_whitetrees_22_3", 1002);
-
-			dialog.SetTitle(L("Laimis"));
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A monk in soot-stained robes tends a small cook-fire, his rosary missing several beads*{/}"));
-				await dialog.Msg(L("Peace to you, traveler. The plateau gives poor shelter, but better than where we came from."));
-				return;
-			}
-
-			var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_whitetrees_22_3.Quest1002.Delivered", 0) >= 1;
-
-			if (delivered)
-			{
-				await dialog.Msg(L("Tell Rimvyda we are grateful. Tell her the brothers pray for Orsha's walls."));
-				return;
-			}
-
-			await dialog.Msg(L("{#666666}*He reads the dispatch without expression, lips moving once in silent thanks*{/}"));
-			await dialog.Msg(L("Tell Rimvyda the camp has twenty-three souls now. Two more found us yesterday - burned, but alive."));
-			await dialog.Msg(L("Tell her we will pray for the caravan's safe passage. The demons test the western ridges every third night."));
-			await dialog.Msg(L("{#666666}*He looks toward the temple warp, eyes empty*{/}"));
-			await dialog.Msg(L("And tell her - if she finds an Orsha priest willing to ride out - we need someone to consecrate the graves we could not bury."));
-
-			character.Variables.Perm.Set("Laima.Quests.f_whitetrees_22_3.Quest1002.Delivered", 1);
-			character.ServerMessage(L("{#FFD700}Dispatch delivered. Return to Quartermaster Rimvyda.{/}"));
-		});
-
+		// QUEST 1003: The Mambo on the Ledge
 		// =====================================================================
-		// QUEST 1003: Tattered Standards
-		// =====================================================================
-		// Engineer Aldas - Restoring the training grounds
+		// Yardsman Gedas - the east ledge above the abbey road
 		//---------------------------------------------------------------------
-		AddNpc(20109, L("[Engineer] Aldas"), "f_whitetrees_22_3", -17, -16, 0, async dialog =>
+		AddNpc(20117, L("[Yardsman] Gedas"), "f_whitetrees_22_3", 291, -1149, 285, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_whitetrees_22_3", 1003);
 
-			dialog.SetTitle(L("Aldas"));
+			dialog.SetTitle(L("Gedas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*An engineer sketches foundation lines on a weathered map, mortar bucket at his feet*{/}"));
-				await dialog.Msg(L("The commander wants the training grounds rebuilt by winter. I've got two apprentices and a plateau full of ghosts."));
+				await dialog.Msg(L("{#666666}*A yardsman is stacking barrels and keeps stopping to look up at a ledge above the road*{/}"));
+				await dialog.Msg(L("Mind the barrels — good, you're quick on your feet, that'll help. I could use someone who isn't already sick of hearing me complain about that ledge."));
+				await dialog.Msg(L("I run the yard where the abbey road turns. Everything Narvas eats gets unloaded here and loaded again, and there are Yak Mambos on the ledge over the turn that come down onto it. Kill 25 of them."));
 
-				var response = await dialog.Select(L("Before the demons came, every barrack flew an Orsha standard. When the grounds fell, the Hohens dragged the banners into their dens for bedding. I need five torn flag fragments recovered - the old cloth still carries the regiment marks. They matter to the men who survived."),
-					Option(L("I'll recover the fragments"), "help"),
-					Option(L("Why does the cloth matter?"), "info"),
-					Option(L("Sounds like busywork"), "leave")
+				var response = await dialog.Select(L("Will you clear the ledge?"),
+					Option(L("I'll clear the Mambos"), "help"),
+					Option(L("Aren't Mambos usually higher up?"), "info"),
+					Option(L("Move the yard"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He sets down the chalk and nods seriously*{/}"));
-
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Look for the bright red - the dye held even through the demon war."));
-						await dialog.Msg(L("Any fragment with a gold thread is from the old guard regiment. Those I'd particularly like back."));
+						await dialog.Msg(L("Do not fight them on the ledge. Fight them at the bottom of it where they have to come to you - a Mambo that is above you is a completely different animal to one that is not."));
+						await dialog.Msg(L("They come down at dusk. So go at noon and take them one at a time out of the shade."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("A standard is a soldier's second life. The cloth holds the names of every man who fought beneath it."));
-						await dialog.Msg(L("The old sergeant at Narvas used to say the temple and the training grounds shared the same flag. Now both are ruins - but the flag, we can rebuild."));
+						await dialog.Msg(L("They are. That is exactly it. Mambos hold the high ground and the ledge is not high ground, it is a shelf above a cart yard."));
+						await dialog.Msg(L("Something moved them off the tops. I have run this yard 12 years and I have never once had to think about what is above the ledge, and now I do."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then don't waste my mortar. I've walls to raise."));
+						await dialog.Msg(L("The road turns here because the ground turns here. There is no other yard. That is why there is one."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var fragmentCount = character.Inventory.CountItem(661037);
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killMambos", out var killObj)) return;
 
-				if (fragmentCount >= 5)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He spreads the fragments across his worktable*{/}"));
-					await dialog.Msg(L("Four regiments accounted for... and one from Narvas. The brothers carried this into the temple the night it fell."));
-					await dialog.Msg(L("{#666666}*He folds the Narvas fragment separately, reverently*{/}"));
-					await dialog.Msg(L("Thank you. Every standard raised on the rebuilt wall is a name that didn't die forgotten."));
+					await dialog.Msg(L("{#666666}*He climbs the ledge himself, walks the length of it, and comes back down looking more thoughtful than relieved*{/}"));
+					await dialog.Msg(L("Clear. And there is nothing up there. No den, no bones, no reason for a Mambo to be on it at all. They were not living there. They were pushed onto it."));
+					await dialog.Msg(L("Take the yard's cut. And tell Aistis about the ledge - he keeps a list of things that have moved and I think this belongs on it."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Five fragments. Red cloth, gold thread where you can find it. Check the Mane dens."));
+					await dialog.Msg(L("Fight them at the bottom of the ledge, at noon, one at a time. 25 of them."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The west wall flies three new standards this morning. The brothers stood and saluted when we raised them."));
+				await dialog.Msg(L("Yard's been clear 11 days and I have got 3 weeks of backlog off the turn. And every evening I look at that ledge, which I never did before, and I expect I always will now."));
 			}
 		});
 
 		// =====================================================================
-		// BANNER FRAGMENTS
+		// QUEST 1004: Five Stations
 		// =====================================================================
-		// For Quest 1003 - Tattered Standards
-		// =====================================================================
-
-		void AddBannerFragment(int fragmentNumber, int x, int z, int direction)
-		{
-			AddNpc(160168, L("Tattered Orsha Standard"), "f_whitetrees_22_3", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_whitetrees_22_3", 1003);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A ragged piece of red cloth, half-buried in the ruin. The weave looks old*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_whitetrees_22_3.Quest1003.Fragment{fragmentNumber}";
-				var collected = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (collected)
-				{
-					await dialog.Msg(L("{#666666}*The fragment is already recovered. Only a scrap of fallen thread remains*{/}"));
-					return;
-				}
-
-				var spawnedKey = $"Laima.Quests.f_whitetrees_22_3.Quest1003.Fragment{fragmentNumber}.Spawned";
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && GameRandom.Get().Next(100) < 20)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Hohen_Mane_Black, 1, 70, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}A Black Hohen Mane leaps from the rubble!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Recovering fragment..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(661037, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-
-					var currentCount = character.Inventory.CountItem(661037);
-					character.ServerMessage(LF("Banner fragments recovered: {0}/5", currentCount));
-
-					if (currentCount >= 5)
-					{
-						character.ServerMessage(L("{#FFD700}All fragments recovered! Return to Engineer Aldas.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("Recovery interrupted."));
-				}
-			});
-		}
-
-		AddBannerFragment(1, 583, 873, 0);
-		AddBannerFragment(2, -680, -1130, 90);
-		AddBannerFragment(3, -25, 5, 180);
-		AddBannerFragment(4, -1050, 290, 270);
-		AddBannerFragment(5, -290, -600, 0);
-
-		// =====================================================================
-		// QUEST 1004: War Memorial Survey
-		// =====================================================================
-		// Historian Dainora - Archive expansion project
+		// Installer Bronius - reading the array he did not build
 		//---------------------------------------------------------------------
-		AddNpc(157100, L("[Historian] Dainora"), "f_whitetrees_22_3", -44, 1080, 180, async dialog =>
+		AddNpc(20109, L("[Installer] Bronius"), "f_whitetrees_22_3", 453, 403, 236, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_whitetrees_22_3", 1004);
 
-			dialog.SetTitle(L("Dainora"));
+			dialog.SetTitle(L("Bronius"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A historian in ink-stained robes unfolds a large sheet of rubbing paper*{/}"));
-				await dialog.Msg(L("Four cadet memorials stand on this plateau. Four classes of recruits who died here before they ever became soldiers."));
+				await dialog.Msg(L("{#666666}*An installer has a station panel open and is looking into it the way you look into something you have opened many times and never understood*{/}"));
+				await dialog.Msg(L("Ah, company. Come look at this with me — a second pair of eyes that hasn't gone numb to it might actually see something."));
+				await dialog.Msg(L("Narvas Abbey keeps 5 auxiliary detection stations on this ground. I service them. I have serviced them 9 years and I could not tell you what any of them detects. Go and read the plate inside 4 of them and tell me what is written."));
 
-				var response = await dialog.Select(L("Orsha's archive has no record of their names. The war took so much of our paper that we recorded only survivors. I want to change that - starting with these four stones. Each bears a roll call carved into the granite."),
-					Option(L("I'll take the rubbings"), "help"),
-					Option(L("Who were they?"), "info"),
-					Option(L("Names don't bring people back"), "leave")
+				var response = await dialog.Select(L("Will you read the 4 plates?"),
+					Option(L("I'll read all 4"), "help"),
+					Option(L("Nine years and no idea?"), "info"),
+					Option(L("Ask the Abbey"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*She hands you a roll of paper and a chalk stick*{/}"));
-
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Take your time. Each stone deserves a proper rubbing, not a hurried one."));
-						await dialog.Msg(L("And - if you pass the westernmost stone - leave a pebble on top. It belongs to the class that tried to relieve Narvas Temple. They should not be forgotten even by me."));
+						await dialog.Msg(L("The plate is behind the globe cradle, face down, and it is stamped not written, so it will not have faded. Lift the cradle, do not unseat it."));
+						await dialog.Msg(L("Read the whole plate. Everybody reads the top line and stops, and the top line is the same on all 5."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Three classes of cadets - boys and girls of fifteen, sixteen, seventeen. They held the plateau while Orsha's army was pinned south."));
-						await dialog.Msg(L("The fourth memorial is for the class that marched from here to Narvas Temple the morning the demons broke the seals. None of them came back. Laimis was the only one who saw them fall."));
+						await dialog.Msg(L("I know what to clean, what to replace, and how often. That is what an installer is given. Nobody has ever handed me a purpose along with a maintenance schedule."));
+						await dialog.Msg(L("I have asked. Twice. Both times a very kind librarian looked in the register and told me the commissioning entry is there and the purpose column is blank."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("That's a soldier's answer. The archive disagrees."));
+						await dialog.Msg(L("The Abbey's answer is that they were installed before the current chapter and the current chapter has 60 people and a leaking roof. It is not a conspiracy. It is 200 years of nobody having time."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var memorialsVisited = character.Variables.Perm.GetInt("Laima.Quests.f_whitetrees_22_3.Quest1004.MemorialsVisited", 0);
+				var read = character.Variables.Perm.GetInt("Laima.Quests.f_whitetrees_22_3.Quest1004.Read", 0);
 
-				if (memorialsVisited >= 4)
+				if (read >= 4)
 				{
-					await dialog.Msg(L("{#666666}*She smooths the rubbings across her lap and reads the names in silence*{/}"));
-					await dialog.Msg(L("One hundred and forty-two cadets. Two volunteer cooks. One stable-boy who took a spear when the perimeter broke."));
-					await dialog.Msg(L("Every name will have a line in the Orsha archive by the new year. Thank you - this is the quiet work that history forgets to do."));
+					await dialog.Msg(L("{#666666}*He lays the 4 readings out on the open panel and goes very still over the fourth one*{/}"));
+					await dialog.Msg(L("Three of them say RECEIVE. The fourth says RECEIVE as well. And I have serviced the fifth station 9 years and I can tell you from memory that its plate does not say RECEIVE."));
+					await dialog.Msg(L("It is not a detection array with 5 stations. It is 4 detectors and 1 of something else, and the one that drains 4 times as fast is the one that is not a detector. Take this and go and find Aistis."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Four memorials across the clearings. Press the paper, rub the chalk, move on."));
+					await dialog.Msg(LF("Behind the globe cradle, face down, stamped. Read the whole plate. {0} of 4 read.", read));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The rubbings are bound into the archive now. Brother Laimis asked to read them when they were ready."));
+				await dialog.Msg(L("I have written a proper schedule for the first time in 9 years, with a column for what each station is for. 4 of the 5 columns say RECEIVE and the fifth one I have left blank, because I would rather it was visibly blank than quietly filled in."));
 			}
 		});
 
 		// =====================================================================
-		// CADET MEMORIALS
+		// DETECTION STATIONS
 		// =====================================================================
-		// For Quest 1004 - War Memorial Survey
+		// For Quest 1004 - Five Stations
 		// =====================================================================
 
-		void AddCadetMemorial(int memorialNumber, int x, int z, int direction)
+		void AddDetectionStation(int stationNumber, string stationName, string plate, int x, int z, int direction)
 		{
-			AddNpc(150231, L("Cadet Memorial"), "f_whitetrees_22_3", x, z, direction, async dialog =>
+			AddNpc(153015, L(stationName), "f_whitetrees_22_3", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_whitetrees_22_3", 1004);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A weathered granite stone carved with rows of names. Some entries are fresh, some a generation old*{/}"));
+					await dialog.Msg(L("{#666666}*An auxiliary detection station on a low plinth, with a globe cradle at the top and a serviced, oiled panel*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_whitetrees_22_3.Quest1004.Memorial{memorialNumber}";
-				var observed = character.Variables.Perm.GetBool(variableKey, false);
+				var variableKey = $"Laima.Quests.f_whitetrees_22_3.Quest1004.Station{stationNumber}";
 
-				if (observed)
+				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*You've already taken a rubbing from this stone*{/}"));
+					await dialog.Msg(L("{#666666}*The cradle is back down on this one and the plate is under it again*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Taking rubbing..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Lifting the cradle..."), "Cancel", "SITREAD", TimeSpan.FromSeconds(3));
 
-				if (result == TimeActionResult.Completed)
+				if (result != TimeActionResult.Completed)
 				{
-					character.Variables.Perm.Set(variableKey, true);
-					var memorialsVisited = character.Variables.Perm.GetInt("Laima.Quests.f_whitetrees_22_3.Quest1004.MemorialsVisited", 0);
-					character.Variables.Perm.Set("Laima.Quests.f_whitetrees_22_3.Quest1004.MemorialsVisited", memorialsVisited + 1);
-
-					character.ServerMessage(LF("Memorials surveyed: {0}/4", memorialsVisited + 1));
-
-					if (memorialsVisited + 1 >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All memorials surveyed! Return to Historian Dainora.{/}"));
-					}
+					character.ServerMessage(L("Reading interrupted."));
+					return;
 				}
-				else
-				{
-					character.ServerMessage(L("Rubbing interrupted."));
-				}
+
+				character.Variables.Perm.Set(variableKey, true);
+
+				var read = character.Variables.Perm.GetInt("Laima.Quests.f_whitetrees_22_3.Quest1004.Read", 0) + 1;
+				character.Variables.Perm.Set("Laima.Quests.f_whitetrees_22_3.Quest1004.Read", read);
+
+				character.ServerMessage(L(plate));
+				character.ServerMessage(LF("Station plates read: {0}/4", read));
+
+				if (read >= 4)
+					character.ServerMessage(L("{#FFD700}All 4 plates read. Return to Installer Bronius.{/}"));
 			});
 		}
 
-		AddCadetMemorial(1, 770, 955, 0);
-		AddCadetMemorial(2, -1455, 240, 90);
-		AddCadetMemorial(3, 120, 35, 180);
-		AddCadetMemorial(4, 180, -1180, 270);
+		AddDetectionStation(1, "First Detection Station", "Top line: NARVAS AUXILIARY. Under it, stamped: RECEIVE.", 362, 304, 0);
+		AddDetectionStation(2, "Second Detection Station", "Same top line. RECEIVE. Globe barely drained.", 473, 465, 0);
+		AddDetectionStation(3, "Third Detection Station", "RECEIVE. The plate is bedded in older metal than the plinth.", 465, 261, 0);
+		AddDetectionStation(4, "Fourth Detection Station", "RECEIVE, like the other three. Four of five, and all four only listen.", 541, 373, 0);
+
+		// =====================================================================
+		// QUEST 1005: The One That Answers
+		// =====================================================================
+		// Friar Aistis - eleven years of walking an array
+		//---------------------------------------------------------------------
+		AddNpc(155045, L("[Friar] Aistis"), "f_whitetrees_22_3", -128, 1203, 264, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_whitetrees_22_3", 1005);
+
+			dialog.SetTitle(L("Aistis"));
+
+			if (!character.Quests.Has(questId))
+			{
+				if (!character.Quests.HasCompleted(new QuestId("f_whitetrees_22_3", 1004)))
+				{
+					await dialog.Msg(L("{#666666}*A friar looks up from a small logbook, pencil still against the page*{/}"));
+					await dialog.Msg(L("Peace be with you — but I'm afraid I've nothing yet worth saying. Bronius has 4 plates he has never lifted a cradle to read. Go and read them with him. I have walked this array 11 years and I would rather hear it from the metal than from myself."));
+					return;
+				}
+
+				await dialog.Msg(L("{#666666}*He closes the logbook without marking his place, which he has apparently never done before*{/}"));
+				await dialog.Msg(L("Four say RECEIVE. I have walked all 5 of these stations every week for 11 years and reported nothing detected 570 times, and I was right every time, because 4 of them were listening for something that was never going to come from out here."));
+				await dialog.Msg(L("The fifth does not listen. It answers, and it has been answering something for longer than this abbey has existed. The Yakmaps hold the ground round it - kill 30, and then take the 2 Gulaks that have been standing on the fifth plinth since midsummer."));
+
+				var response = await dialog.Select(L("Will you go to the fifth station?"),
+					Option(L("I'll take the fifth plinth"), "help"),
+					Option(L("Answering what?"), "info"),
+					Option(L("Switch it off"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Inventory.Add(663306, 1, InventoryAddType.PickUp);
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Take my note. It is 11 years of nothing detected, dated, with the 570th entry crossed out and rewritten, and if I do not come back off this ground it is the only version of this that exists."));
+						await dialog.Msg(L("Yakmaps first, all round the plinth. The 2 Gulaks will not step off it and I would like to know why before you find out for me."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("I do not know. The register's commissioning entry names a builder and the builder's other work is listed as one line: further south, past Roxona."));
+						await dialog.Msg(L("I have never been past Roxona. I have walked 4 miles of the same 5 stations for 11 years and written the same word 570 times, and I would very much like the 571st entry to say something else."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("With what? It has no switch, no wick, no lever and no seam. It has a cradle for a globe and a plate that does not say RECEIVE, and everything else about it is one piece of worked stone."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("clearStationGround", out var groundObj)) return;
+				if (!quest.TryGetProgress("takeThePlinth", out var plinthObj)) return;
+
+				if (groundObj.Done && plinthObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*He walks to the fifth station, lifts the cradle himself, and reads the plate out loud, and then reads it again quietly*{/}"));
+					await dialog.Msg(L("SEND. One word, in the same stamp, on the same metal. Four listen and one sends, and Ausma has been feeding the one that sends 34 globes a year for 6 years without anybody once asking her why."));
+					await dialog.Msg(L("Take this. It is the abbey's and I have asked for it and it has been given. My 571st entry is going to be a full page and I am going to carry it to Narvas myself, and after that I am going to walk further south than I have ever been."));
+
+					character.Quests.Complete(questId);
+				}
+				else if (groundObj.Done)
+				{
+					await dialog.Msg(L("Ground's clear. The 2 on the plinth have not moved and they are facing outward, which I have been trying not to think about for a month."));
+				}
+				else
+				{
+					await dialog.Msg(L("30 Yakmaps first, all round it. I am not sending anybody onto that plinth with the ground still full."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("571 entries. The last one says SEND and it says what the plate on the fifth station says and it says who built it, and the abbey has read it and the abbey does not know either."));
+				await dialog.Msg(L("Ausma has stopped globing the fifth station. 9 days and it is still lit, off nothing, which is the first thing this ground has ever told me without being asked."));
+			}
+		});
 	}
 }
 
@@ -457,181 +429,222 @@ public class FWhitetrees223QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: Black Beasts of the Plateau
+// Quest 1001 CLASS: Nothing Was Supposed to Come This Far
 //-----------------------------------------------------------------------------
 
-public class BlackBeastsOfThePlateauQuest : QuestScript
+public class NothingWasSupposedToComeThisFarQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_whitetrees_22_3", 1001);
-		SetName("Black Beasts of the Plateau");
+		SetName(L("Nothing Was Supposed to Come This Far"));
 		SetType(QuestType.Sub);
-		SetDescription("Sergeant Zigmas needs the Black Hohens killed before the demon spillover from the fallen Narvas Temple pushes them into Orsha's recovering training grounds.");
+		SetDescription(L("Black Hohen Manes arrived on the Narvas approach between spring and midsummer, and there is no road onto this shelf they could have used. Clear the treeline and bring 8 of their essence up to the abbey."));
 		SetLocation("f_whitetrees_22_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Sergeant] Zigmas", "f_whitetrees_22_3");
+		AddQuestGiver(L("[Abbey Guard] Tautvydas"), "f_whitetrees_22_3");
 
-		AddObjective("killMane", "Defeat Black Hohen Mane",
-			new KillObjective(20, new[] { MonsterId.Hohen_Mane_Black }));
-		AddObjective("killGulak", "Defeat Black Hohen Gulak",
-			new KillObjective(10, new[] { MonsterId.Hohen_Gulak_Black }));
+		AddObjective("killManes", L("Kill Black Hohen Manes on the treeline"),
+			new KillObjective(30, new[] { MonsterId.Hohen_Mane_Black }));
 
-		AddReward(new ExpReward(11000, 7500));
+		AddObjective("collectEssence", L("Cut essence from behind the shoulder plate"),
+			new CollectItemObjective(663308, 8));
+
+		AddReward(new ExpReward(15600, 10800));
 		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2)); // Large HP Potion
-		AddReward(new ItemReward(640007, 2)); // Large SP Potion
-		AddReward(new ItemReward(640012, 1));  // Recovery Potion
-		AddReward(new ItemReward(531151, 1));  // Veteran Tunic
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(663308, 0.35f, MonsterId.Hohen_Mane_Black);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(663308, character.Inventory.CountItem(663308), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(663308, character.Inventory.CountItem(663308), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1002 CLASS: Letter to the Abbot
+// Quest 1002 CLASS: Globes for the Fifth Station
 //-----------------------------------------------------------------------------
 
-public class LetterToTheAbbotQuest : QuestScript
+public class GlobesForTheFifthStationQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_whitetrees_22_3", 1002);
-		SetName("Letter to the Abbot");
+		SetName(L("Globes for the Fifth Station"));
 		SetType(QuestType.Sub);
-		SetDescription("Quartermaster Rimvyda needs a dispatch carried to Brother Laimis, leader of the Narvas Temple refugees camped near the western warp.");
+		SetDescription(L("Narvas Abbey's 5 outlying stations drain 4 times faster than its 40 indoor lamps, and the stations will not take a flame. The Black Hohen Gulaks carry globes that store a charge."));
 		SetLocation("f_whitetrees_22_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Quartermaster] Rimvyda", "f_whitetrees_22_3");
+		AddQuestGiver(L("[Chandler] Ausma"), "f_whitetrees_22_3");
 
-		AddObjective("deliverDispatch", "Deliver the dispatch to Brother Laimis",
-			new VariableCheckObjective("Laima.Quests.f_whitetrees_22_3.Quest1002.Delivered", 1, true));
+		AddObjective("collectGlobes", L("Take charged globes from Black Hohen Gulaks"),
+			new CollectItemObjective(663309, 6));
 
-		AddReward(new ExpReward(15600, 10800));
+		AddReward(new ExpReward(11000, 7500));
 		AddReward(new SilverReward(8000));
-		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
+		AddReward(new ItemReward(640085, 1)); // Lv5 EXP Card
 		AddReward(new ItemReward(640004, 2)); // Large HP Potion
-		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+
+		AddDrop(663309, 0.35f, MonsterId.Hohen_Gulak_Black);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_22_3.Quest1002.Delivered");
+		character.Inventory.Remove(663309, character.Inventory.CountItem(663309), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_22_3.Quest1002.Delivered");
+		character.Inventory.Remove(663309, character.Inventory.CountItem(663309), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1003 CLASS: Tattered Standards
+// Quest 1003 CLASS: The Mambo on the Ledge
 //-----------------------------------------------------------------------------
 
-public class TatteredStandardsQuest : QuestScript
+public class TheMamboOnTheLedgeQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_whitetrees_22_3", 1003);
-		SetName("Tattered Standards");
+		SetName(L("The Mambo on the Ledge"));
 		SetType(QuestType.Sub);
-		SetDescription("Engineer Aldas is rebuilding the training grounds and needs five torn Orsha regiment banner fragments recovered from the plateau ruins.");
+		SetDescription(L("Yak Mambos hold the high ground, and the ledge over Gedas's cart yard is not high ground. They have come down onto the abbey road turn and the yard cannot work under them."));
 		SetLocation("f_whitetrees_22_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Engineer] Aldas", "f_whitetrees_22_3");
+		AddQuestGiver(L("[Yardsman] Gedas"), "f_whitetrees_22_3");
 
-		AddObjective("collectFragments", "Recover tattered Orsha standards",
-			new CollectItemObjective(661037, 5));
+		AddObjective("killMambos", L("Kill Yak Mambos at the foot of the ledge"),
+			new KillObjective(25, new[] { MonsterId.Yakmambo }));
 
-		AddReward(new ExpReward(11000, 7500));
+		AddReward(new ExpReward(15600, 10800));
 		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2)); // Large HP Potion
-		AddReward(new ItemReward(640007, 2));  // Large SP Potion
-		AddReward(new ItemReward(640012, 1));  // Recovery Potion
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(661037,
-			character.Inventory.CountItem(661037),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1003.Fragment{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1003.Fragment{i}.Spawned");
-		}
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(661037,
-			character.Inventory.CountItem(661037),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1003.Fragment{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1003.Fragment{i}.Spawned");
-		}
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
-// Quest 1004 CLASS: War Memorial Survey
+// Quest 1004 CLASS: Five Stations
 //-----------------------------------------------------------------------------
 
-public class WarMemorialSurveyQuest : QuestScript
+public class FiveStationsQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_whitetrees_22_3", 1004);
-		SetName("War Memorial Survey");
+		SetName(L("Five Stations"));
 		SetType(QuestType.Sub);
-		SetDescription("Historian Dainora has asked you to take rubbings from the four cadet memorials scattered across Izoliacjia Plateau.");
+		SetDescription(L("Bronius has serviced the abbey's 5 detection stations for 9 years without being told what they detect, and the register's purpose column is blank. Lift the globe cradle in 4 of them and read the plate underneath."));
 		SetLocation("f_whitetrees_22_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Historian] Dainora", "f_whitetrees_22_3");
+		AddQuestGiver(L("[Installer] Bronius"), "f_whitetrees_22_3");
 
-		AddObjective("visitMemorials", "Take rubbings from cadet memorials",
-			new VariableCheckObjective("Laima.Quests.f_whitetrees_22_3.Quest1004.MemorialsVisited", 4, true));
+		AddObjective("readPlates", L("Read the plate in 4 detection stations"),
+			new VariableCheckObjective("Laima.Quests.f_whitetrees_22_3.Quest1004.Read", 4, true));
 
-		AddReward(new ExpReward(11000, 7500));
+		AddReward(new ExpReward(15600, 10800));
 		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2)); // Large HP Potion
-		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_22_3.Quest1004.MemorialsVisited");
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1004.Memorial{i}");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_22_3.Quest1004.Read");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1004.Station{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_22_3.Quest1004.MemorialsVisited");
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1004.Memorial{i}");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_whitetrees_22_3.Quest1004.Read");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_whitetrees_22_3.Quest1004.Station{i}");
+	}
+}
+
+// Quest 1005 CLASS: The One That Answers
+//-----------------------------------------------------------------------------
+
+public class TheOneThatAnswersQuest : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_whitetrees_22_3", 1005);
+		SetName(L("The One That Answers"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Four of Narvas Abbey's stations are stamped RECEIVE. The fifth is not, it drains four times as fast, and two Black Hohen Gulaks have stood on its plinth facing outward since midsummer."));
+		SetLocation("f_whitetrees_22_3");
+		SetAutoTracked(true);
+
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Friar] Aistis"), "f_whitetrees_22_3");
+
+		AddPrerequisite(new CompletedPrerequisite("f_whitetrees_22_3", 1004));
+
+		AddObjective("clearStationGround", L("Kill Yakmaps around the fifth station"),
+			new KillObjective(30, new[] { MonsterId.Yakmab }));
+
+		AddObjective("takeThePlinth", L("Take the pair standing on the fifth plinth"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Hohen_Gulak_Black, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Hohen_Mane_Black, 3),
+				},
+				resetIdent: "clearStationGround",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
+
+		AddReward(new ExpReward(39000, 27000));
+		AddReward(new SilverReward(32000));
+		AddReward(new ItemReward(583121, 1)); // Manosierdi Necklace
+		AddReward(new ItemReward(640085, 3)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(663306, character.Inventory.CountItem(663306), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(663306, character.Inventory.CountItem(663306), InventoryItemRemoveMsg.Destroyed);
 	}
 }

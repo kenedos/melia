@@ -1,581 +1,411 @@
 //--- Melia Script ----------------------------------------------------------
 // Gateway of the Great King Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for the Gateway of the Great King map.
+// The expedition camp at the canyon mouth, where four generations of the Jonas
+// house have run a dig that has never dug anything.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FRokas24QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Hogma Warband
-		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Gate Marshal] Einar"), "f_rokas_24", 850, -1800, 0, async dialog =>
+		// Quest 1001: Ninety Years, Eleven Crates
+		//---------------------------------------------------------------------
+		AddNpc(156169, L("[Recorder] Gailas Jonas"), "f_rokas_24", 672, -2109, 283, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_rokas_24", 1001);
 
-			dialog.SetTitle(L("Einar"));
+			dialog.SetTitle(L("Gailas Jonas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Hogma warbands have taken the whole gate stretch. Warriors up front, Combat-class behind them, all drilled and mean."));
-				await dialog.Msg(L("They've been chipping the Great King's statue for trophy stones. I won't abide defacement. Not here."));
-				await dialog.Msg(L("Kill thirty Hogma - mixed Warriors and Combat - and their chant breaks. That's when the statue gets peace again."));
+				await dialog.Msg(L("{#666666}*He's stamping a ledger page, checking the seal against the light before he sets it aside*{/}"));
+				await dialog.Msg(L("A visitor to the camp — well, you've picked a bad season for it. My house has recorded this excavation for 4 generations. 90 years of season returns, and the whole of what has come out of this canyon fits in 11 crates."));
+				await dialog.Msg(L("The Hogma took the spring supply train in the west draw and I cannot file a return on stores I do not have. Kill 25 of them and bring me 8 bundles of the research supplies back."));
 
-				var response = await dialog.Select(L("Will you break the chant for us?"),
-					Option(L("I'll break the chant"), "help"),
-					Option(L("Chant?"), "info"),
-					Option(L("Let them have it"), "leave")
+				var response = await dialog.Select(L("Will you go into the west draw?"),
+					Option(L("I'll recover 8 bundles"), "help"),
+					Option(L("Eleven crates in ninety years?"), "info"),
+					Option(L("Order more from Fedimian"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Warriors up top, Combat flanking. Mind the two-on-one."));
-						await dialog.Msg(L("Every trophy they drop is going back on the statue."));
+						await dialog.Msg(L("They break the crates and keep the sacking, so look for canvas, not for boxes. Anything still tied is ours."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("They chant while they chip. A guttural verse, over and over. It's how they keep rhythm."));
-						await dialog.Msg(L("Thin the numbers enough and the chant collapses. Then the rest scatter."));
+						await dialog.Msg(L("11. I have counted them. My grandfather counted them. There is a ledger in the tent with 90 years of nothing in it, kept beautifully."));
+						await dialog.Msg(L("I have asked my father twice what we are actually doing here. The first time he changed the subject and the second time he said I would be told when it was my turn."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Not while I'm the marshal here."));
+						await dialog.Msg(L("Fedimian approves this expedition's stores on 90 years of precedent and 0 questions. I would rather not be the Jonas who made them look at it."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killWarriors", out var warriorObj)) return;
-				if (!quest.TryGetProgress("killCombat", out var combatObj)) return;
+				if (!quest.TryGetProgress("killHogma", out var killObj)) return;
+				if (!quest.TryGetProgress("collectSupplies", out var itemObj)) return;
 
-				if (warriorObj.Done && combatObj.Done)
+				if (killObj.Done && itemObj.Done)
 				{
-					await dialog.Msg(L("Chant's broken. The gate stretch is quiet for the first time in weeks."));
-					await dialog.Msg(L("Statue goes back together this month. Take your pay."));
+					await dialog.Msg(L("{#666666}*He checks each bundle against a manifest and initials the corner of the page*{/}"));
+					await dialog.Msg(L("8 of 9. I can carry 1 lost bundle as spoilage and nobody in Fedimian will ever read the line."));
+					await dialog.Msg(L("Take the recovery allowance. It exists because my great-grandfather thought supply trains would be attacked, and he was right for 90 years running."));
 
 					character.Quests.Complete(questId);
 				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Draw's clear. Now go over the ground - the bundles will be scattered where they broke the crates open."));
+				}
 				else
 				{
-					await dialog.Msg(L("Keep at it. Break the chant for good."));
+					await dialog.Msg(L("Still Hogma in the draw. Clear them first or you will be carrying canvas with an axe behind you."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Statue's patched. Pilgrims are coming through again."));
+				await dialog.Msg(L("Stores filed and the season signed off. 90 years and I am the first Jonas to lose a bundle, which I have decided to be quietly proud of."));
 			}
 		});
 
-		// Quest 2: Cockatrie Killings
-		//-------------------------------------------------------------------------
-		AddNpc(147473, L("[Falconer] Yrsa"), "f_rokas_24", 880, 600, 0, async dialog =>
+		// Quest 1002: Nineteen Years, No Trenches
+		//---------------------------------------------------------------------
+		AddNpc(20158, L("[Historian] Beard"), "f_rokas_24", 1598, -185, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_rokas_24", 1002);
 
-			dialog.SetTitle(L("Yrsa"));
+			dialog.SetTitle(L("Beard"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Cockatries nest thick along the east cliffs. Small ones in swarms, big ones bullying pilgrims off the road."));
-				await dialog.Msg(L("Bring me sixteen feathers from Big Cockatries - red and normal both. The plumes are worth a fortune to Fedimian's fletchers."));
+				await dialog.Msg(L("{#666666}*He's squinting up at a bird nest through a battered eyeglass, one hand shading the sun*{/}"));
+				await dialog.Msg(L("Ah — company! Marvelous, hold this thought for me before it evaporates like all the good ones do. Nineteen years on this expedition, and I have opened precisely zero trenches. Not refused, mind you — never refused! Every season the permission is 'pending,' and every season it stays pending right up until the snow makes the whole question moot."));
+				await dialog.Msg(L("So instead I read bird nests. Cockats, specifically — they line the things with whatever glittering nonsense they scrounge off the canyon floor, bless their thieving little hearts. Bring me 10 gold pieces out of them and I'll have a full assemblage without ever once touching a spade!"));
 
-				var response = await dialog.Select(L("Will you bring me the plumes?"),
-					Option(L("I'll bring them"), "help"),
-					Option(L("Why the big ones?"), "info"),
-					Option(L("Skip the cliffs"), "leave")
+				var response = await dialog.Select(L("Will you go through the nests?"),
+					Option(L("I'll bring you 10 pieces"), "help"),
+					Option(L("Nineteen years of pending?"), "info"),
+					Option(L("Dig anyway"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Red or normal, doesn't matter - I sort them later. Just sixteen clean plumes."));
-						await dialog.Msg(L("Watch the dive. A big one drops straight down."));
+						await dialog.Msg(L("Off the birds, not out of the nests. A nest with a Cockat still on it is a nest you will be carried away from."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("The small ones shed in handfuls. Worthless fluff. The big ones have structure - shafts a fletcher can trust."));
-						await dialog.Msg(L("A dozen Fedimian bowmen are waiting on this shipment."));
+						await dialog.Msg(L("Nineteen for me! Gorath's up to 24, if you can believe it. Kefek came out here a young man and now has grey in his beard, and he's never broken ground either. It's practically a tradition at this point."));
+						await dialog.Msg(L("Four historians, seventy-eight years between the lot of us, and not one spadeful to show for it. At some point that stops being bad luck, doesn't it? And starts looking like a policy."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("The cliffs don't skip you. Remember that."));
+						await dialog.Msg(L("And be sent home, and the next man is told the same thing, and the ground stays shut. I would rather be here reading birds' nests than not here at all."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				var feathers = character.Inventory.CountItem(650100);
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("collectPieces", out var itemObj)) return;
 
-				if (feathers >= 16)
+				if (itemObj.Done)
 				{
-					await dialog.Msg(L("Sixteen clean plumes, look at these shafts. The fletchers are going to weep."));
-					await dialog.Msg(L("Take your pay. I'll be back here on the next shipment."));
-
-					character.Inventory.Remove(650100, 16, InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He lays the pieces out on a board and groups them without touching any of them twice*{/}"));
+					await dialog.Msg(L("All 10 the same alloy and 7 of them the same stamp. That is not scavenging, that is 1 hoard being carried up out of 1 place."));
+					await dialog.Msg(L("Take my season's stipend. I have nowhere to spend it and no trench to spend it on."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(LF("Keep plucking. {0} of sixteen.", feathers));
+					await dialog.Msg(L("Not enough for an assemblage. Work the eastern shelf - that is where the big ones nest."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Those arrows reached Fedimian last week. Full order paid out."));
+				await dialog.Msg(L("I filed the assemblage. Gailas signed it, and then he asked me, very carefully, where in the canyon the birds go down. I do not think he was making conversation."));
 			}
 		});
 
-		// Quest 3: Tontus Tally
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Pilgrim] Halli"), "f_rokas_24", -700, -200, 0, async dialog =>
+		// Quest 1003: Six Years on the Contract
+		//---------------------------------------------------------------------
+		AddNpc(147415, L("[Mercenary] Mirta"), "f_rokas_24", 1138, 998, 16, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_rokas_24", 1003);
 
-			dialog.SetTitle(L("Halli"));
+			dialog.SetTitle(L("Mirta"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A pilgrim on a flat stone beside the road, working a prayer-string bead by bead*{/}"));
-				await dialog.Msg(L("Tontus and Dandels are thick on this road. I'm not a fighter - I count steps from one waystone to the next, and I pray for those of us walking behind."));
-				await dialog.Msg(L("But there are four of us walking behind who haven't made it past the third waystone. Three days they've been kneeling on the verge, weeping, unable to go further. They've seen too much. They need a witness more than a guard."));
+				await dialog.Msg(L("{#666666}*She's leaning against a boulder with a whetstone going, sizing you up without breaking rhythm*{/}"));
+				await dialog.Msg(L("You walk like someone who's actually used that blade, not just carried it. Good, I like the odds better already. Six years on this contract, guarding an excavation where — get this — nobody has excavated one single thing. So what I actually guard is four old men and a tent full of paper. Thrilling work."));
+				await dialog.Msg(L("Cockatrices came down onto the north shelf in numbers I've genuinely never seen, and I've seen a lot. Kill 30 of them before one of my old men wanders up there with a notebook and gets himself eaten."));
 
-				var response = await dialog.Select(L("Kill 20 Tontus and 15 Dandels to clear the road, and sit with each of the four broken pilgrims long enough to be a witness. Will you do both?"),
-					Option(L("I'll clear the road and sit with the four"), "help"),
-					Option(L("How many pilgrims behind you?"), "info"),
-					Option(L("Turn back, this isn't my pilgrimage"), "leave")
+				var response = await dialog.Select(L("Will you clear the north shelf?"),
+					Option(L("I'll kill 30 Cockatrices"), "help"),
+					Option(L("Six years guarding paper?"), "info"),
+					Option(L("Take the old men's notebooks away"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She gives you a small wooden prayer-bead*{/}"));
-						await dialog.Msg(L("Blessings on your blade and on your patience. The Tontus first, where you can find them - then sit with the four. They are kneeling along the verge, you cannot miss them."));
-						await dialog.Msg(L("Don't tell them anything. Just sit. They'll know what to do with the silence."));
+						await dialog.Msg(L("They come at you in a line and the line has a middle. Break the middle and the 2 halves will not re-form, they just circle."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Forty, give or take. Three elders among them. One pregnant woman walking for her unborn. Two children walking for siblings the demon-war took."));
-						await dialog.Msg(L("They each have their reason. None of them planned for the Tontus to be this thick on Pelke's road. We will not leave any of them behind."));
+						await dialog.Msg(L("It is the best contract I have ever had and it is the only one I have ever been frightened by. 6 years and the pay has never once been late."));
+						await dialog.Msg(L("Nobody pays a mercenary on time for 6 years to watch nothing happen. Somebody is paying me to make sure nothing happens."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("No turning back. The goddess calls, and I count my steps. The four kneeling pilgrims will rise when they rise. I will wait with them."));
+						await dialog.Msg(L("Try it. Beard will bite you. Gorath will write to Fedimian about you. I have thought about it more than I am comfortable admitting."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killTontus", out var tontusObj)) return;
-				if (!quest.TryGetProgress("killDandels", out var dandelObj)) return;
-				if (!quest.TryGetProgress("comfortPilgrims", out var pObj)) return;
+				if (!quest.TryGetProgress("killCockatrice", out var killObj)) return;
 
-				if (tontusObj.Done && dandelObj.Done && pObj.Done)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She watches the four pilgrims walking past, each nodding to her in turn*{/}"));
-					await dialog.Msg(L("Blessed goddess. The road is open and the four are walking again - I see them now, threading through the waystones, eyes still red but steps steady."));
-					await dialog.Msg(L("Take this offering. Pilgrim's purse, earned not tithed. The four will write your name in the shrine-book at the journey's end. They asked me to ask if you have one."));
+					await dialog.Msg(L("Shelf is clear and I walked it twice. 6 years and that is the first honest afternoon's work I have been given."));
+					await dialog.Msg(L("Take it out of the contract's contingency. There is 6 years of contingency in that purse and no contingencies."));
 
 					character.Quests.Complete(questId);
 				}
-				else if (tontusObj.Done && dandelObj.Done)
-				{
-					await dialog.Msg(L("Road's clear of monsters. Now the four on the verge - sit with each, just sit. They have been kneeling three days; another quarter-hour will heal them more than a swordswing."));
-				}
 				else
 				{
-					await dialog.Msg(L("Pray with me. Keep swinging. The Tontus do not pause for prayer; my prayer is for you, not them."));
+					await dialog.Msg(L("Still thick up there. Work the shelf edge - in the open they have to come to you across bare rock."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("All forty reached the shrine. Three miracles recorded in the shrine-book - and a fourth, which the cantor wrote as 'a swordhand who sat with the broken'. The pregnant woman gave birth at the shrine three days later. She wants you named godparent if she ever finds you again."));
+				await dialog.Msg(L("They came back within the week and they came from the same direction, which is up the canyon. Nothing on this ridge should be walking up out of that canyon."));
 			}
 		});
 
-		// Distressed pilgrim comfort points for Quest 1003
-		//-------------------------------------------------------------------------
-		void AddDistressedPilgrim(int pilgrimNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Weeping Pilgrim"), "f_rokas_24", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_rokas_24", 1003);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A weeping pilgrim on the verge*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_rokas_24.Quest1003.Pilgrim{pilgrimNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already comforted; the pilgrim is gathering their pack*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Comforting pilgrim..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_rokas_24.Quest1003.PilgrimsComforted", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_rokas_24.Quest1003.PilgrimsComforted", count);
-					character.ServerMessage(LF("Pilgrims comforted: {0}/4", count));
-
-					if (count >= 4)
-						character.ServerMessage(L("{#FFD700}All pilgrims comforted! Return to Halli.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Comfort interrupted."));
-				}
-			});
-		}
-
-		AddDistressedPilgrim(1, -600, -100, 0);
-		AddDistressedPilgrim(2, -800, -300, 90);
-		AddDistressedPilgrim(3, -500, -250, 180);
-		AddDistressedPilgrim(4, -700, -50, 270);
-
-		// Quest 4: Pino-Geppetto Grove
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Toymaker] Leif"), "f_rokas_24", -200, -1950, 0, async dialog =>
+		// Quest 1004: The Season's Returns
+		//---------------------------------------------------------------------
+		AddNpc(20117, L("[Historian] Gorath"), "f_rokas_24", -1468, -1328, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_rokas_24", 1004);
 
-			dialog.SetTitle(L("Leif"));
+			dialog.SetTitle(L("Gorath"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Pinos and Geppettos used to be harmless. A novelty for the shop. Now they gang up and trample my lumber."));
-				await dialog.Msg(L("Kill twelve Pinos and fifteen Geppettos. Bring me six pinewood knots from the grove - those are the ones the creatures chew on."));
+				await dialog.Msg(L("{#666666}*He's rifling through a stack of blank forms, exhaling hard through his nose at every empty one*{/}"));
+				await dialog.Msg(L("If you're looking for the historian who digs, wrong camp, wrong century. Twenty-four years here and I have become, against every ambition I ever had, the man who collects everyone else's paperwork. Not what I trained for. It is, apparently, what I am now. Wonderful."));
+				await dialog.Msg(L("Three postings up the canyon, one reading device out west, season closes in 9 days, and none of them have sent so much as a scrap. Go to all 4, drag their returns out of them, and bring the lot back to me."));
 
-				var response = await dialog.Select(L("Will you clear the grove for me?"),
-					Option(L("I'll clear the grove"), "help"),
-					Option(L("Why do they chew knots?"), "info"),
-					Option(L("Buy lumber elsewhere"), "leave")
+				var response = await dialog.Select(L("Will you walk the postings?"),
+					Option(L("I'll visit all 4"), "help"),
+					Option(L("What reading device?"), "info"),
+					Option(L("Make them come to you"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The knots are gummy when they drop - don't worry, they clean up."));
-						await dialog.Msg(L("Six is enough to resume production."));
+						await dialog.Msg(L("Take the reading off the device last. The 3 men will tell you what they think and the device will tell you what is, and I want those in that order."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Sap-rich. The knots are where the tree hoarded its strongest sap. Toy mouths, apparently, go for it like candy."));
+						await dialog.Msg(L("The Eye of the Great King. It sits out west and it does something none of us has ever been told, and it is on every season return since the expedition opened."));
+						await dialog.Msg(L("Line 9. 'Eye: lit.' 90 years of line 9 saying lit, in 4 different hands."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Lumber from the north is twice the price and half the grain. Please help."));
+						await dialog.Msg(L("They are 60, 58 and 71 and they are spread over 3 miles of canyon. If I could make them come to me I would have retired 6 years ago."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killPinos", out var pinoObj)) return;
-				if (!quest.TryGetProgress("killGeppettos", out var gepObj)) return;
-				if (!quest.TryGetProgress("gatherKnots", out var knotObj)) return;
+				if (!quest.TryGetProgress("collectReturns", out var checkObj)) return;
 
-				if (pinoObj.Done && gepObj.Done && knotObj.Done)
+				if (checkObj.Done)
 				{
-					await dialog.Msg(L("Six knots, all clean. The grove's breathing again."));
-					await dialog.Msg(L("Your pay, plus a little doll for luck. Don't laugh - it really works."));
-
-					character.Inventory.Remove(650011, character.Inventory.CountItem(650011), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He writes the first 3 returns straight into the ledger and then stops with the pen down for a long time*{/}"));
+					await dialog.Msg(L("Line 9. 90 years of 'Eye: lit' and I am about to write 'Eye: dark' under my own name."));
+					await dialog.Msg(L("Take the collection fee and take it now, because the moment this ledger goes to Fedimian I expect this camp to stop being a quiet posting."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					var status = "";
-					if (!pinoObj.Done) status += L("More Pinos. ");
-					if (!gepObj.Done) status += L("More Geppettos. ");
-					if (!knotObj.Done) status += L("More pinewood knots. ");
-					await dialog.Msg(LF("{0}", status));
+					await dialog.Msg(L("Not all 4. Kefek is up at the north head, Badat is mid-canyon, Grinus is on the west rim, and the Eye is beyond Grinus."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First toys of the new batch are on the shelves. The grove's hum is a lot softer now."));
+				await dialog.Msg(L("The ledger went out on the fast rider. 24 years of line 9 and the first time I have written something in it that anybody will actually read."));
 			}
 		});
 
-		// Quest 5: The Cockatrie Matron
-		//-------------------------------------------------------------------------
-		AddNpc(147418, L("[Huntress] Siv"), "f_rokas_24", 1100, 700, 0, async dialog =>
+		// Quest 1004 collection points - the canyon postings
+		//---------------------------------------------------------------------
+		void AddPosting(int postingNumber, int model, string postingName, string observation, int x, int z, int direction)
 		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_rokas_24", 1005);
-			var matronSpawnedKey = "Laima.Quests.f_rokas_24.Quest1005.MatronSpawned";
-
-			dialog.SetTitle(L("Siv"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A huntress oiling a length of chain*{/}"));
-				await dialog.Msg(L("There's a matron above the cliffs. Biggest Cockatrie you'll ever meet - wingspan would shadow this whole campsite. She spawns the red line, the dangerous ones, the ones the Falconer keeps asking for plumes from."));
-				await dialog.Msg(L("Three of her egg-clutches sit along the cliff path. Scatter them and her hatch cycle breaks - she has to defend the breeders directly, no more relying on the next generation. That's when we have her."));
-
-				var response = await dialog.Select(L("Scatter the three Cockatrie egg-clutches along the cliff path, then kill 10 Big Red Cockatries to draw her down. She fights when her hatch is gone. Will you hunt her?"),
-					Option(L("I'll hunt the matron"), "help"),
-					Option(L("Why the red line specifically?"), "info"),
-					Option(L("Not this one"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She tosses you a leather glove, the gauntlet stiff with old Cockatrie-musk*{/}"));
-						await dialog.Msg(L("Three clutches first - kick the eggs over the edge, don't smash them in place. Smashed eggs draw the matron the wrong direction. Cliff-edge eggs send her thinking the brood-pull's gone south."));
-						await dialog.Msg(L("Then ten breeders. She comes down around the eighth. When she dives, drop flat - dive-claws clear the rim if you're prone. Then strike up into her chest as she banks."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("The red ones are her direct hatch - the firstborn of each cycle, raised on her milk and her instruction. Bigger, meaner, louder. She throws them out onto the cliffs to test them."));
-						await dialog.Msg(L("The red survivors become her next generation of breeders. Killing the red line collapses her bloodline - the village won't see another red Cockatrie for ten years, maybe twenty."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Fair. She is not subtle prey - and a hunter who chooses their fights badly does not get a second cliff-fight. I'll hold the bounty for someone with the right wrist for it."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("scatterEggs", out var eObj)) return;
-				if (!quest.TryGetProgress("killBreeders", out var breederObj)) return;
-				if (!quest.TryGetProgress("killMatron", out var matronObj)) return;
-
-				if (eObj.Done && breederObj.Done && matronObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*She folds an enormous feather carefully into oilcloth*{/}"));
-					await dialog.Msg(L("Eggs scattered, matron's wingspan across the cliff-path. Biggest feather I've ever recovered - the Falconer's going to weep when he sees it."));
-					await dialog.Msg(L("Season's safe, bloodline collapsed, red line broken for a generation. Take your bounty - and this glove. The musk's set in; it'll mean luck against any Cockatrie you meet for a year."));
-
-					character.Variables.Perm.Remove(matronSpawnedKey);
-
-					character.Quests.Complete(questId);
-				}
-				else if (breederObj.Done && !matronObj.Done)
-				{
-					var hasSpawned = character.Variables.Perm.GetBool(matronSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(matronSpawnedKey, true);
-
-						if (SpawnTempMonsters(character, MonsterId.Big_Cockatries_Red, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("She's screaming. You hear it? She's coming down."));
-							character.ServerMessage(L("{#FF9966}The Matron descends from the cliffs!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("She's out there. Finish her before she retreats."));
-					}
-				}
-				else if (!eObj.Done)
-				{
-					await dialog.Msg(L("Three clutches first - along the cliff path. Kick them over the edge, don't smash them in place. The matron must read the wrong direction or she won't dive."));
-				}
-				else
-				{
-					await dialog.Msg(L("Eggs are scattered, the brood-pull's broken. Now ten breeders. She comes at the eighth, dives at the ninth, screams at the tenth. Wait her out."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The cliffs sing a different song this season - higher, thinner, no red note in it. Red line's broken for a generation. The Falconer mounted the matron's feather above his shop-door and won't let anyone touch it."));
-			}
-		});
-
-		// Cockatrie egg-clutch scatter points for Quest 1005
-		//-------------------------------------------------------------------------
-		void AddEggClutch(int clutchNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Cockatrie Egg-Clutch"), "f_rokas_24", x, z, direction, async dialog =>
+			AddNpc(model, postingName, "f_rokas_24", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
-				var questId = new QuestId("f_rokas_24", 1005);
+				var questId = new QuestId("f_rokas_24", 1004);
+				var variableKey = $"Laima.Quests.f_rokas_24.Quest1004.Posting{postingNumber}";
+				var counterKey = "Laima.Quests.f_rokas_24.Quest1004.ReturnsCollected";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A clutch of red-tinged Cockatrie eggs nestled in cliff scrub*{/}"));
+					await dialog.Msg(L("{#666666}*A canyon posting of the royal mausoleum expedition*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_rokas_24.Quest1005.Clutch{clutchNumber}";
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*Already scattered; only shells left*{/}"));
+					await dialog.Msg(L("{#666666}*You already took this return*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Scattering eggs..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(
+					L("Taking the season's return..."), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(3)
+				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_rokas_24.Quest1005.ClutchesScattered", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_rokas_24.Quest1005.ClutchesScattered", count);
-					character.ServerMessage(LF("Egg-clutches scattered: {0}/3", count));
 
-					if (count >= 3)
-						character.ServerMessage(L("{#FFD700}All clutches scattered! Now bait out the Matron.{/}"));
+					var collected = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, collected);
+
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Returns collected: {0}/4", collected));
+
+					if (collected >= 4)
+						character.ServerMessage(L("{#FFD700}All 4 returns collected. Take them to Gorath.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("Scattering interrupted."));
+					character.ServerMessage(L("You leave the posting without a return."));
 				}
 			});
 		}
 
-		AddEggClutch(1, 1100, 800, 0);
-		AddEggClutch(2, 1300, 600, 90);
-		AddEggClutch(3, 900, 900, 180);
+		AddPosting(1, 147422, L("[Historian] Kefek"),
+			L("Kefek, north head: 'Nothing to report. Same as last season. Same as the 22 before it.'"), -1041, 1647, 0);
+		AddPosting(2, 20109, L("[Historian] Badat"),
+			L("Badat, mid-canyon: 'Cockat flocks moving up the canyon and not down it. I have written this 3 seasons running.'"), -574, -770, 270);
+		AddPosting(3, 20139, L("[Historian] Grinus"),
+			L("Grinus, west rim: 'Ground temperature at the rim up 4 degrees since spring. I would like somebody to tell me why that is not interesting.'"), -1593, 53, 251);
+		AddPosting(4, 147475, L("Eye of the Great King"),
+			L("The Eye: a mirrored cube on a socket, cold to the hand and completely dark. Line 9 has said 'lit' for 90 years."), -695, 264, 284);
 
-		// Quest 6: Great King's Passage
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Road Warden] Gunnar"), "f_rokas_24", -500, -3400, 0, async dialog =>
+		// Quest 1005: What Came Up the Canyon
+		//---------------------------------------------------------------------
+		AddNpc(147425, L("[Recorder] Florijonas"), "f_rokas_24", -745, 216, 0, async dialog =>
 		{
 			var character = dialog.Player;
-			var questId = new QuestId("f_rokas_24", 1006);
+			var questId = new QuestId("f_rokas_24", 1005);
 
-			dialog.SetTitle(L("Gunnar"));
+			dialog.SetTitle(L("Florijonas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A road warden by a charcoal brazier on the gate-step, breath fogging in the south wind*{/}"));
-				await dialog.Msg(L("South passage is the worst stretch on the Great King's road. Hogma Warriors push from the east; Cockatries dive from the west. Neither side likes the other and neither side cares which pilgrim they catch in the crossfire."));
-				await dialog.Msg(L("We sweep it weekly or it's not a passage anymore. And the pilgrim caravans won't roll without a green banner on the gate-pole - that's the signal that the south passage is held for the next seven days."));
+				if (!character.Quests.HasCompleted(new QuestId("f_rokas_24", 1004)))
+				{
+					await dialog.Msg(L("{#666666}*He's sitting cross-legged in front of the Eye, not looking up as your shadow falls across him*{/}"));
+					await dialog.Msg(L("Walk Gorath's returns first. I have sat beside this thing for 31 years and I will not be the man who tells you before the ledger does."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Kill 12 Hogma Warriors and 12 Cockatries to clear the south passage, then haul up the green banner on the gate-pole. Pilgrim caravans roll on the banner. Will you clear both?"),
-					Option(L("I'll clear both sides and raise the banner"), "help"),
-					Option(L("Which side is worse?"), "info"),
-					Option(L("Not my fight"), "leave")
+				await dialog.Msg(L("{#666666}*He gets up slowly, joints stiff from sitting, and finally faces you*{/}"));
+				await dialog.Msg(L("So you have seen it dark. I have sat beside the Eye for 31 years and it went out in the spring, and I have written 'lit' in every return since, in my own hand, because my son has 90 years of a family's word to carry."));
+				await dialog.Msg(L("It is not a lamp. It is the outer gate, and it is open. The Cockats are not nesting here, they were pushed out of the canyon. Kill 20 Cockatrices to get to the gate mouth, and put down what has come up to sit in it."));
+
+				var response = await dialog.Select(L("Will you go to the gate mouth?"),
+					Option(L("I'll clear the gate mouth"), "help"),
+					Option(L("You falsified the returns?"), "info"),
+					Option(L("Tell Gailas yourself"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He gives you a folded green pennant from a hook by the brazier*{/}"));
-						await dialog.Msg(L("Twelve of each, no shortcuts. The Hogma spit firebrand-globs at distance; the Cockatries dive from above. Stand against a stone wall when you can - it covers both lines of attack."));
-						await dialog.Msg(L("Banner's the green pennant. Haul-line is on the south side of the gate-pole. Tie it off with a double bowline knot - the south wind's brutal and a single knot won't hold past the second day."));
+						character.Inventory.Add(650319, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("Take the report. It is the only copy of what this expedition actually is, and if I am wrong about the gate I would rather it were in somebody's hands than in mine."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Hogma are smarter, Cockatries are faster. Hogma fight in formation; Cockatries fight in dives. Pilgrims prefer neither. I prefer neither. The wind off the south crook prefers neither either - it strips the warmth out of you within an hour."));
-						await dialog.Msg(L("If I had to choose, I'd say the Cockatries. Hogma die when killed; Cockatries scream a death-call that brings two more from the cliffs. Plan the order of your sweep accordingly."));
+						await dialog.Msg(L("For 5 months. Before you judge that, understand what the true return does: it says the Great King's outer gate is open and the Jonas house has been paid for 90 years to keep it shut."));
+						await dialog.Msg(L("There is no dig. There has never been a dig. There is a seal in 3 courses and we are the paperwork that stops anyone asking about it."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Pilgrims wait for nobody. Including you. I'll be here at the brazier when you change your mind, or when the next swordhand passes through. Whichever comes first."));
+						await dialog.Msg(L("I will. After. He asked me twice what we do here and both times I sent him away, and I am not doing it a third time with the gate open behind me."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killHogma", out var hogmaObj)) return;
-				if (!quest.TryGetProgress("killCockatries", out var cockObj)) return;
-				if (!quest.TryGetProgress("raiseBanner", out var bObj)) return;
+				if (!quest.TryGetProgress("clearMouth", out var mouthObj)) return;
+				if (!quest.TryGetProgress("killFlock", out var flockObj)) return;
 
-				if (hogmaObj.Done && cockObj.Done && bObj.Done)
+				if (mouthObj.Done && flockObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He squints south through the gate-arch and points at a pinprick of green movement on the far horizon*{/}"));
-					await dialog.Msg(L("Banner up - and look there, that's the pilgrim caravan-banner answering from the south camp. They saw your green pennant within the hour. They'll be here by tomorrow noon."));
-					await dialog.Msg(L("Your pay. Buy warm cider somewhere out of this wind - the south crook's no place for celebration. Drink to the pilgrims who walked because of your sweep."));
+					await dialog.Msg(L("{#666666}*He walks to the Eye, puts a hand flat on the socket, and holds it there until his arm shakes*{/}"));
+					await dialog.Msg(L("Still cold. Clearing the mouth does not close a gate - it only means somebody can walk down to the second course and look."));
+					await dialog.Msg(L("Take the chain off the gate mouth. And go down the canyon to the Overlong Bridge and find Morkus Jonas, who is my brother, and tell him line 9 says dark. He will know what to do with that and I no longer do."));
 
 					character.Quests.Complete(questId);
 				}
-				else if (hogmaObj.Done && cockObj.Done)
+				else if (mouthObj.Done)
 				{
-					await dialog.Msg(L("Passage is clear of monsters. Now the green pennant - haul-line, double bowline, south side of the pole. The pilgrims won't move without it."));
+					await dialog.Msg(L("The mouth is open. What is sitting in it did not come out of this ridge and it will not leave on its own."));
 				}
 				else
 				{
-					await dialog.Msg(L("Both sides need pushing. Hogma east, Cockatries west. Don't let either think the south passage belongs to them again."));
+					await dialog.Msg(L("Too many birds between here and the mouth. Clear them, or you will arrive at the gate with a flock behind you."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Passage held for ten days - a record since I took the wardenship. The pilgrim caravan that answered your banner had a cantor in it; he made me name the swordhand for the dawn invocation. I gave him a description; he wrote a song instead of a name. They sing it at the south camp now."));
-			}
-		});
-
-		// Road-Banner for Quest 1006
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Road-Banner Pole"), "f_rokas_24", -450, -3450, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_rokas_24", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A weathered banner-pole at the south gate, green pennant rolled at its base*{/}"));
-				return;
-			}
-
-			var raisedKey = "Laima.Quests.f_rokas_24.Quest1006.BannerRaised";
-			if (character.Variables.Perm.GetBool(raisedKey, false))
-			{
-				await dialog.Msg(L("{#666666}*The green pennant flies above the gate*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killHogma", out var hogmaObj)) return;
-			if (!quest.TryGetProgress("killCockatries", out var cockObj)) return;
-
-			if (!(hogmaObj.Done && cockObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The pole is ready, but you haven't cleared both sides*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Raising banner..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(raisedKey, true);
-				character.ServerMessage(L("{#FFD700}Road-Banner raised. Return to Road Warden Gunnar.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Raising interrupted."));
+				await dialog.Msg(L("I told Gailas. All of it, the falsified returns first, because that was the part I owed him. He wrote it down. Of course he wrote it down. He is a Jonas."));
 			}
 		});
 	}
@@ -585,254 +415,222 @@ public class FRokas24QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class FRokas24Quest1001 : QuestScript
+// Quest 1001 CLASS: Ninety Years, Eleven Crates
+//-----------------------------------------------------------------------------
+
+public class NinetyYearsElevenCratesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_rokas_24", 1001);
-		SetName(L("Hogma Warband"));
+		SetName(L("Ninety Years, Eleven Crates"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Hogma Warriors and Hogma Combat at the Gateway so the Great King's statue can be repaired."));
+		SetDescription(L("The Jonas house has recorded the royal mausoleum expedition for 4 generations and 90 years. The Hogma took the spring supply train in the west draw and the season's return cannot be filed without the stores."));
 		SetLocation("f_rokas_24");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Gate Marshal] Einar"), "f_rokas_24");
+		AddQuestGiver(L("[Recorder] Gailas Jonas"), "f_rokas_24");
 
-		AddObjective("killWarriors", L("Kill Hogma Warriors"),
-			new KillObjective(15, new[] { MonsterId.Hogma_Warrior }));
+		AddObjective("killHogma", L("Kill Hogma Warriors in the west draw"),
+			new KillObjective(25, new[] { MonsterId.Hogma_Warrior }));
 
-		AddObjective("killCombat", L("Kill Hogma Combat"),
-			new KillObjective(15, new[] { MonsterId.Hogma_Combat }));
+		AddObjective("collectSupplies", L("Recover Research Aid Supplies"),
+			new CollectItemObjective(650317, 8));
 
-		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ExpReward(15600, 10800));
+		AddReward(new SilverReward(11200));
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(650317, 0.35f, MonsterId.Hogma_Warrior);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650317, character.Inventory.CountItem(650317), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650317, character.Inventory.CountItem(650317), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FRokas24Quest1002 : QuestScript
+// Quest 1002 CLASS: Nineteen Years, No Trenches
+//-----------------------------------------------------------------------------
+
+public class NineteenYearsNoTrenchesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_rokas_24", 1002);
-		SetName(L("Cockatrie Plumes"));
+		SetName(L("Nineteen Years, No Trenches"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Big Cockatries and deliver sixteen plume feathers to Fedimian's fletchers."));
+		SetDescription(L("A historian who has never been permitted to open a trench in 19 years reads the Cockat nests instead, since they line them with whatever they carry up off the canyon floor."));
 		SetLocation("f_rokas_24");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Falconer] Yrsa"), "f_rokas_24");
+		AddQuestGiver(L("[Historian] Beard"), "f_rokas_24");
 
-		AddObjective("gatherPlumes", L("Gather Cockatrie plumes"),
-			new CollectItemObjective(650100, 16));
+		AddObjective("collectPieces", L("Recover Golden Pieces from the Cockats"),
+			new CollectItemObjective(650316, 10));
 
-		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(5200));
-		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ExpReward(15600, 10800));
+		AddReward(new SilverReward(11200));
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+
+		AddDrop(650316, 0.45f, MonsterId.Big_Cockatries);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650100, character.Inventory.CountItem(650100), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650316, character.Inventory.CountItem(650316), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650100, character.Inventory.CountItem(650100), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650316, character.Inventory.CountItem(650316), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FRokas24Quest1003 : QuestScript
+// Quest 1003 CLASS: Six Years on the Contract
+//-----------------------------------------------------------------------------
+
+public class SixYearsOnTheContractQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_rokas_24", 1003);
-		SetName(L("Pilgrim Road Cleanup"));
+		SetName(L("Six Years on the Contract"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Tontus and Dandels along the pilgrim road so travelers can pass safely."));
+		SetDescription(L("The expedition's mercenary has been paid on time for 6 years to guard a dig that never digs. Cockatrices have come down onto the north shelf in numbers she has never seen."));
 		SetLocation("f_rokas_24");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Pilgrim] Halli"), "f_rokas_24");
+		AddQuestGiver(L("[Mercenary] Mirta"), "f_rokas_24");
 
-		AddObjective("killTontus", L("Kill Tontus"),
-			new KillObjective(20, new[] { MonsterId.Tontus }));
+		AddObjective("killCockatrice", L("Kill Cockatrices on the north shelf"),
+			new KillObjective(30, new[] { MonsterId.Cockatries }));
 
-		AddObjective("killDandels", L("Kill Dandels"),
-			new KillObjective(15, new[] { MonsterId.Dandel }));
-
-		AddObjective("comfortPilgrims", L("Comfort the four weeping pilgrims"),
-			new VariableCheckObjective("Laima.Quests.f_rokas_24.Quest1003.PilgrimsComforted", 4, true));
-
-		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1003.PilgrimsComforted");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_rokas_24.Quest1003.Pilgrim{i}");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1003.PilgrimsComforted");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_rokas_24.Quest1003.Pilgrim{i}");
+		AddReward(new ExpReward(11000, 7500));
+		AddReward(new SilverReward(8000));
+		AddReward(new ItemReward(640085, 1)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 }
 
-public class FRokas24Quest1004 : QuestScript
+// Quest 1004 CLASS: The Season's Returns
+//-----------------------------------------------------------------------------
+
+public class TheSeasonsReturnsQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_rokas_24", 1004);
-		SetName(L("Pino-Geppetto Grove"));
+		SetName(L("The Season's Returns"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Thin the Pinos and Geppettos and gather pinewood knots for the toymaker."));
+		SetDescription(L("The season closes in 9 days and 3 postings up the canyon and a reading device out west have not sent in their returns. Line 9 of that return has read 'Eye: lit' for 90 years."));
 		SetLocation("f_rokas_24");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Toymaker] Leif"), "f_rokas_24");
+		AddQuestGiver(L("[Historian] Gorath"), "f_rokas_24");
 
-		AddObjective("killPinos", L("Kill Pinos"),
-			new KillObjective(12, new[] { MonsterId.Pino }));
+		AddObjective("collectReturns", L("Collect the returns from all 4 canyon postings"),
+			new VariableCheckObjective("Laima.Quests.f_rokas_24.Quest1004.ReturnsCollected", 4, true));
 
-		AddObjective("killGeppettos", L("Kill Geppettos"),
-			new KillObjective(15, new[] { MonsterId.Geppetto }));
-
-		AddObjective("gatherKnots", L("Gather pinewood knots"),
-			new CollectItemObjective(650011, 6));
-
-		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(9000));
-		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ExpReward(15600, 10800));
+		AddReward(new SilverReward(11200));
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650011, character.Inventory.CountItem(650011), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1004.ReturnsCollected");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_rokas_24.Quest1004.Posting{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650011, character.Inventory.CountItem(650011), InventoryItemRemoveMsg.Destroyed);
+		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1004.ReturnsCollected");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_rokas_24.Quest1004.Posting{i}");
 	}
 }
 
-public class FRokas24Quest1005 : QuestScript
+// Quest 1005 CLASS: What Came Up the Canyon
+//-----------------------------------------------------------------------------
+
+public class WhatCameUpTheCanyonQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_rokas_24", 1005);
-		SetName(L("The Cockatrie Matron"));
+		SetName(L("What Came Up the Canyon"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill ten Big Red Cockatries to draw out and slay their matron."));
+		SetDescription(L("The Eye of the Great King is not a lamp - it is the outer gate, and it went dark in the spring. The Cockats were pushed out of the canyon, not nesting in it. Clear the gate mouth and put down what has come up to sit in it."));
 		SetLocation("f_rokas_24");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Huntress] Siv"), "f_rokas_24");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Recorder] Florijonas"), "f_rokas_24");
 
-		AddObjective("scatterEggs", L("Scatter the three Cockatrie egg-clutches"),
-			new VariableCheckObjective("Laima.Quests.f_rokas_24.Quest1005.ClutchesScattered", 3, true));
+		AddPrerequisite(new CompletedPrerequisite("f_rokas_24", 1004));
 
-		AddObjective("killBreeders", L("Kill Big Red Cockatries"),
-			new KillObjective(10, new[] { MonsterId.Big_Cockatries_Red }));
+		AddObjective("clearMouth", L("Kill Cockatrices between the rim and the gate mouth"),
+			new KillObjective(20, new[] { MonsterId.Cockatries }));
 
-		AddObjective("killMatron", L("Defeat the Matron"),
-			new KillObjective(1, new[] { MonsterId.Big_Cockatries_Red }));
+		AddObjective("killFlock", L("Put down what is sitting in the gate mouth"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Big_Cockatries, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Big_Cockatries_Red, 3),
+				},
+				resetIdent: "clearMouth",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(9000));
-		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ExpReward(39000, 27000));
+		AddReward(new SilverReward(32000));
+		AddReward(new ItemReward(583101, 1)); // Conqueror
+		AddReward(new ItemReward(640085, 3)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1005.ClutchesScattered");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_rokas_24.Quest1005.Clutch{i}");
+		character.Inventory.Remove(650319, character.Inventory.CountItem(650319), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1005.ClutchesScattered");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_rokas_24.Quest1005.Clutch{i}");
-	}
-}
-
-public class FRokas24Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_rokas_24", 1006);
-		SetName(L("Great King's Passage"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Kill Hogma Warriors and Cockatries contesting the south passage."));
-		SetLocation("f_rokas_24");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Road Warden] Gunnar"), "f_rokas_24");
-
-		AddObjective("killHogma", L("Kill Hogma Warriors"),
-			new KillObjective(12, new[] { MonsterId.Hogma_Warrior }));
-
-		AddObjective("killCockatries", L("Kill Cockatries"),
-			new KillObjective(12, new[] { MonsterId.Cockatries }));
-
-		AddObjective("raiseBanner", L("Raise the Road-Banner at the south gate"),
-			new VariableCheckObjective("Laima.Quests.f_rokas_24.Quest1006.BannerRaised", 1, true));
-
-		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1006.BannerRaised");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_rokas_24.Quest1006.BannerRaised");
+		character.Inventory.Remove(650319, character.Inventory.CountItem(650319), InventoryItemRemoveMsg.Destroyed);
 	}
 }

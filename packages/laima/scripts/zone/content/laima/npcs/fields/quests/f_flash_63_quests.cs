@@ -21,42 +21,41 @@ public class FFlash63QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Lemur Howl
+		// Quest 1001: The Roosting Floor
 		//-------------------------------------------------------------------------
-		AddNpc(20100, L("[District Warden] Grelle"), "f_flash_63", -46, 1211, 180, async dialog =>
+		AddNpc(20141, L("[Kingdom Army] Rofhdel"), "f_flash_63", 936, 920, 273, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1001);
 
-			dialog.SetTitle(L("Grelle"));
+			dialog.SetTitle(L("Rofhdel"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Welcome to Downtown. Used to be the civic heart. Now it's mostly Lemurs and an awful lot of noise."));
-				await dialog.Msg(L("The howl alone drives off any ward-crew that tries to work here. Worse than that - prolonged exposure stiffens the joints. Slow petrification, by sound."));
-				await dialog.Msg(L("Thin twenty-two and the volume drops enough for my crew to get a shift in. That's the goal."));
+				await dialog.Msg(L("{#666666}*He's marking names off a tally board without looking up*{/}"));
+				await dialog.Msg(L("Great, another straggler. Or are you actually good for something? Nine of us left holding half of Downtown, and I haven't got the patience left to find out which one you are the slow way."));
+				await dialog.Msg(L("Lemurs took the upper floors of the counting house and they scream all night — every night, like clockwork, the universe's idea of a joke. Two of my nine haven't slept in a week. Kill 22 of them and I get my watch rotation back, and maybe my sense of humor with it."));
 
-				var response = await dialog.Select(L("Will you kill the Lemurs for me?"),
-					Option(L("I'll handle the Lemurs"), "help"),
-					Option(L("Stiffens by sound?"), "info"),
-					Option(L("Try another district"), "leave")
+				var response = await dialog.Select(L("Will you clear the roosts for me?"),
+					Option(L("I'll kill the Lemurs"), "help"),
+					Option(L("Nine soldiers? That's all?"), "info"),
+					Option(L("Not right now"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Twenty-two. Move fast - they pack in, and a packed pack is the worst part."));
-						await dialog.Msg(L("Cotton in the ears. You'll thank me."));
+						await dialog.Msg(L("Take the stairwells, not the street. They drop on you from the ledges out there."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("My senior ward-hand worked a month without ear cotton. He doesn't bend his left knee anymore. We learned."));
-						await dialog.Msg(L("Cotton, or short shifts, or both. I prefer both."));
+						await dialog.Msg(L("We had forty when the curse came down off the plateau. Eleven greyed over standing at their posts — didn't even get to sit down first, lucky them. The rest walked, and I don't blame them one bit."));
+						await dialog.Msg(L("The relief column keeps not arriving. That's the whole story of this district, really. Write it on my tombstone, save everyone the trouble later."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("If Downtown doesn't come back, the rest of the city has nothing to come back to. So we work."));
+						await dialog.Msg(L("Suit yourself. We'll still be here — awake, miserable, waiting — whenever your nerve catches up to you."));
 						break;
 				}
 			}
@@ -67,73 +66,188 @@ public class FFlash63QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("Volume's down. My crew's working their first full shift in six months."));
-					await dialog.Msg(L("Pay's yours. Two cotton plugs on the house."));
+					await dialog.Msg(L("Quiet up there, finally. My night watch heard nothing but rain last night, and one of them actually cried about it. Grown man. Tears. Over rain."));
+					await dialog.Msg(L("Pay's yours. Take a drink from the post barrel on your way out — you've earned it more than half this garrison has."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Still howling. Keep at it."));
+					await dialog.Msg(L("Still screaming up on the counting house floors. Go finish it before I lose what's left of my nerves along with theirs."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Three ward-lines reset. First ward-work in Downtown since the magistrate turned to stone."));
+				await dialog.Msg(L("Rotation's running properly again — four on, eight off. First good sleep this garrison's had since spring, and I intend to enjoy every miserable hour of it."));
 			}
 		});
 
-		// Quest 2: Civic Records
+		// Quest 1002: Bills of the Relief Column
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Civic Scribe] Agatha"), "f_flash_63", 303, -980, 89, async dialog =>
+		AddNpc(20128, L("[Kalis Knights] Adjutant Hans"), "f_flash_63", 160, -1097, 90, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_flash_63", 1002);
+
+			dialog.SetTitle(L("Hans"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*He's holding a torn bill flat against a crate, comparing it line by line to one already in his hand*{/}"));
+				await dialog.Msg(L("You'll want to look at this too, then. A stranger's eye counts for something, in matters like these. The Kingdom Army has bills nailed to every board in this quarter — a promised relief column, a full reclamation of Downtown by winter, signed and sealed."));
+				await dialog.Msg(L("There is no column. I have checked the muster rolls in Fedimian myself, in person, twice. Families are sitting in cursed houses on the strength of a lie, and every week a few more of them grey over waiting for it to arrive. Pull down 7 of those bills and bring them to me — I intend to file every one as evidence."));
+
+				var response = await dialog.Select(L("Will you take the bills down?"),
+					Option(L("I'll bring you the bills"), "help"),
+					Option(L("Why not just tell Rofhdel?"), "info"),
+					Option(L("That's between soldiers"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The boards are along the old market run, south of the army post. Peel them off whole — the seal must remain intact when I present one before a magistrate. A torn seal is worth nothing in a court of law."));
+						await dialog.Msg(L("And watch yourself while you work. The Lemurs down there have learned that a person standing still is a person not looking up, and I would rather not add your name to a different kind of file."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("I did. He did not write them — someone above him did, and Rofhdel is too exhausted and too loyal to argue with an official seal."));
+						await dialog.Msg(L("So I will argue with it in his place. That, precisely, is what an adjutant is for."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("It stopped being soldier's business the day civilians began believing them. Now it is a matter of record, and record-keeping happens to be my business."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("collectBills", out var billObj)) return;
+
+				if (billObj.Done)
+				{
+					await dialog.Msg(L("Seals intact, every one. That is sufficient to place before the magistrate's court in Fedimian, and I intend to do exactly that the moment the ink dries on my report."));
+					await dialog.Msg(L("Payment comes from the Knights' own purse, not the Army's. I would rather it came from us — call it a matter of principle."));
+
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Still bills on the boards. Continue down the market run — there are more of them than the Army would like anyone counting."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Two families packed up and left for Orsha the very day the boards went bare. Two families who will not grey over on the strength of a lie. I consider that a conviction, whether or not any court ever sees the file."));
+			}
+		});
+
+		// Quest 1002 collection points - Royal Army bills on the market-run boards
+		//-------------------------------------------------------------------------
+		void AddPropagandaBoard(int boardNum, int x, int z, int direction)
+		{
+			AddNpc(154038, L("Royal Army Bill"), "f_flash_63", x, z, direction, async dialog =>
+			{
+				var character = dialog.Player;
+				var questId = new QuestId("f_flash_63", 1002);
+				var variableKey = $"Laima.Quests.f_flash_63.Quest1002.Board{boardNum}";
+
+				if (!character.Quests.IsActive(questId))
+				{
+					await dialog.Msg(L("{#666666}*A wax-sealed army bill nailed to a market board, promising relief by winter*{/}"));
+					return;
+				}
+
+				if (character.Variables.Perm.GetBool(variableKey, false))
+				{
+					await dialog.Msg(L("{#666666}*You already stripped this board*{/}"));
+					return;
+				}
+
+				var luredCount = LureNearbyEnemies(character, 350, 300);
+				if (luredCount > 0)
+					character.ServerMessage(LF("{{#FF6666}}Something drops off the ledges - {0} closing in!{{/}}", luredCount));
+
+				var result = await character.TimeActions.StartAsync(
+					L("Peeling the bill loose..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
+				);
+
+				if (result == TimeActionResult.Completed)
+				{
+					character.Inventory.Add(664013, 1, InventoryAddType.PickUp);
+					character.Variables.Perm.Set(variableKey, true);
+					character.ServerMessage(L("Recovered: Royal Army Propaganda"));
+
+					var currentCount = character.Inventory.CountItem(664013);
+					character.ServerMessage(LF("Bills recovered: {0}/5", currentCount));
+
+					if (currentCount >= 5)
+						character.ServerMessage(L("{#FFD700}That's enough for the court. Return to Adjutant Hans.{/}"));
+				}
+				else
+				{
+					character.ServerMessage(L("You leave the bill on the board."));
+				}
+			});
+		}
+
+		AddPropagandaBoard(1, 460, -551, 0);
+		AddPropagandaBoard(2, 338, -523, 0);
+		AddPropagandaBoard(3, 294, -595, 0);
+		AddPropagandaBoard(4, 300, -928, 0);
+		AddPropagandaBoard(5, 157, -776, 0);
+		AddPropagandaBoard(6, 355, -1053, 0);
+
+		// Quest 1003: What the Chargers Took
+		//-------------------------------------------------------------------------
+		AddNpc(20103, L("[Grave-Robber] Steponas"), "f_flash_63", -258, 300, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1003);
 
-			dialog.SetTitle(L("Agatha"));
+			dialog.SetTitle(L("Steponas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Grelle send you? She does that. We share work when she has a spare pair of hands."));
-				await dialog.Msg(L("Downtown's civic records are in the vaults - deeds, marriage rolls, debt ledgers. Hammer-Goblins curl up on them for warmth and chew the corners."));
-				await dialog.Msg(L("Without those records, two hundred families lose their property claims. Get me four volumes, intact, and Downtown still legally exists."));
+				await dialog.Msg(L("{#666666}*He freezes with a crowbar half-wedged under a cellar door, then relaxes when he sees you're no Knight*{/}"));
+				await dialog.Msg(L("Oh — not the watch! Ha, good, you had me worried for a second there. Look, before you say anything: yes, I dig up other people's cellars, and no, I don't feel bad about it. Everyone down here's dead or gone, and silver's never once cared whose pocket it ends up in."));
+				await dialog.Msg(L("Only trouble is some Goblin Chargers found my cache under the bathhouse and hauled off six whole bags of it — cheeky little thieves, stealing from a thief! Kill 15 of them, bring me back 4 bags, and I'll cut you in. Honest coin, dishonest silver — funny how that works out."));
 
-				var response = await dialog.Select(L("Will you bring me the volumes?"),
-					Option(L("I'll bring the volumes"), "help"),
-					Option(L("Why do they lie on the books?"), "info"),
-					Option(L("Maybe later"), "leave")
+				var response = await dialog.Select(L("Will you get my bags back?"),
+					Option(L("I'll get your bags"), "help"),
+					Option(L("Who do you dig for?"), "info"),
+					Option(L("Find your own bags"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Fifteen Hammer-Goblins should clear the main vault. Volumes are leather-bound and clasped - look in the niches."));
-						await dialog.Msg(L("Bring them unopened. Chain-of-custody matters for legal validity."));
+						await dialog.Msg(L("They nest west of the bathhouse steps. Look for the one running heavy with a limp — that's your bag-carrier, hehe."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("The pages give off a slight warmth. Something about the curse-script the records are sealed with. The goblins aren't malicious - they just like a warm bed."));
-						await dialog.Msg(L("Inconvenient, all the same."));
+						await dialog.Msg(L("Amanda runs the crew, out past the north gate in the Enceinte. Lost twelve people under a wall footing last month, poor thing, hasn't been right since."));
+						await dialog.Msg(L("Me? I stick to boring cellars and quiet corpses. Boring's how you keep your skin on, friend — remember that."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("If Downtown legally folds, the families who owned property here lose everything. I'd rather not let that happen."));
+						await dialog.Msg(L("Suit yourself! The bags aren't going anywhere either way — goblins don't spend silver, they just sit on it like fat little dragons. It'll keep."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killHammerGoblins", out var killObj)) return;
-				if (!quest.TryGetProgress("recoverRecords", out var recObj)) return;
+				if (!quest.TryGetProgress("killChargers", out var killObj)) return;
+				if (!quest.TryGetProgress("recoverBags", out var bagObj)) return;
 
-				if (killObj.Done && recObj.Done)
+				if (killObj.Done && bagObj.Done)
 				{
-					await dialog.Msg(L("Four volumes, intact. That's two hundred families with their legal identity restored."));
-					await dialog.Msg(L("Pay's yours. Your name goes in the margin of the restoration order."));
-
-					character.Inventory.Remove(650785, character.Inventory.CountItem(650785), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("Four bags! And two of them still sealed with wax — meaning nobody's pawed through them, hehe, lucky us."));
+					await dialog.Msg(L("Here's your cut. The real cut, mind you, not the one I'd normally try to talk you down to."));
 
 					character.Quests.Complete(questId);
 				}
@@ -141,70 +255,67 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				{
 					var status = "";
 					if (!killObj.Done)
-						status += L("More Hammer-Goblins still in the vaults. ");
-					if (!recObj.Done)
-						status += L("More record-volumes still missing. ");
+						status += L("More Goblin Chargers still nesting by the steps. ");
+					if (!bagObj.Done)
+						status += L("More bags still out there. ");
 
 					await dialog.Msg(LF("Keep at it. {0}", status));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("One family sent me a hand-stitched blanket as thanks. Their great-grandmother's trade. I almost cried."));
+				await dialog.Msg(L("Bought myself a proper lockbox with the last bag and buried it somewhere no goblin will ever sniff out. Probably. Hehe."));
 			}
 		});
 
-		// Quest 3: Ritual Brand Pages
+		// Quest 1004: Faded Stones
 		//-------------------------------------------------------------------------
-		AddNpc(20102, L("[Curse-Scholar] Hedvig"), "f_flash_63", 104, -912, 90, async dialog =>
+		AddNpc(20121, L("[Curse-Scholar] Vaida"), "f_flash_63", 98, -130, 225, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1004);
 
-			dialog.SetTitle(L("Hedvig"));
+			dialog.SetTitle(L("Vaida"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("There's a ritual operation working out of the old bath-house. Wand-Goblins, but they're being directed - someone literate is feeding them sigil pages."));
-				await dialog.Msg(L("The pages are a sigil-chain. Complete and chanted, it fires petrification across a city block at once. Population zero on whatever's caught inside."));
-				await dialog.Msg(L("Twelve goblins, five pages. Pages are the priority - the chain doesn't fire if I have any of them."));
+				await dialog.Msg(L("{#666666}*She lowers a spyglass from the ruined windowsill and looks at you like you're a new variable*{/}"));
+				await dialog.Msg(L("You walk steady, for someone standing this close to a petrification district. Interesting. I've logged the Goblin Magicians through this glass for three days running. Small grey stones, worn at the belt. Not rocks. Fragments of people, catalogued and carried like trophies."));
+				await dialog.Msg(L("Someone is breaking up the petrified and distributing the fragments as charms. Unacceptable, and also, professionally, fascinating. Kill 12 of the Magicians, bring me 5 stones, and I will read the grain to determine who they were."));
 
-				var response = await dialog.Select(L("Will you bring me the pages?"),
-					Option(L("I'll bring the pages"), "help"),
-					Option(L("Block-petrification, really?"), "info"),
-					Option(L("Evacuate Downtown"), "leave")
+				var response = await dialog.Select(L("Will you bring me the stones?"),
+					Option(L("I'll bring the stones"), "help"),
+					Option(L("You can read a person from stone?"), "info"),
+					Option(L("That's grim work"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Pages are in oiled scroll-cases on every goblin's belt. Don't open them - the sigils are still active and they bite into eyes that read them."));
-						await dialog.Msg(L("Bring them sealed. I'll handle the rest."));
+						await dialog.Msg(L("Wrap them in cloth before pocketing. Bare skin against a faded stone numbs the fingers for roughly a day — I've tested this personally, more than once."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Yes. There's a reason the original mage who started this curse died horribly. The work bends back on whoever runs it. The cabal doesn't care - they think they're holy."));
-						await dialog.Msg(L("Same Saltisdaughter outfit Pavel's burning plates over in Roxona. They're networked across districts. Each district pulls a different limb."));
+						await dialog.Msg(L("The curse fixes a subject mid-moment. The grain preserves that moment precisely — the direction of a turn, the position of the hands."));
+						await dialog.Msg(L("It is how the Saltisdaughter cabal was traced through the market district. Same method. Worse district, worse results."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("To where? Half the adjacent districts are already half-cursed. Downtown is the fallback for everyone else. We can't move it."));
+						await dialog.Msg(L("Grim, yes. Correctly noted. But left unread, they remain rocks in perpetuity, which I consider the greater failure."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killWandGoblins", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherPages", out var pageObj)) return;
+				if (!quest.TryGetProgress("killMagicians", out var killObj)) return;
+				if (!quest.TryGetProgress("gatherStones", out var stoneObj)) return;
 
-				if (killObj.Done && pageObj.Done)
+				if (killObj.Done && stoneObj.Done)
 				{
-					await dialog.Msg(L("Five sealed cases. The chain's broken - they don't have the full sequence anymore."));
-					await dialog.Msg(L("Pay's yours. I'll run the counter-ritual tonight. Smoke goes blue when it takes."));
-
-					character.Inventory.Remove(650825, character.Inventory.CountItem(650825), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("Five stones. Five names, by tomorrow night. Three from the same household — the grain runs identically in all three, which is its own small tragedy."));
+					await dialog.Msg(L("Take your payment. I have letters to write, and I do not expect to enjoy it."));
 
 					character.Quests.Complete(questId);
 				}
@@ -212,38 +323,37 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				{
 					var status = "";
 					if (!killObj.Done)
-						status += L("More Wand-Goblins still chanting. ");
-					if (!pageObj.Done)
-						status += L("More pages still missing. ");
+						status += L("More Goblin Magicians still carrying charms. ");
+					if (!stoneObj.Done)
+						status += L("More faded stones still to recover. ");
 
 					await dialog.Msg(LF("Keep at it. {0}", status));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Smoke went blue. Counter-ritual took. The block-petrifier threat is off the table for now."));
+				await dialog.Msg(L("Four of the five had family in Orsha. The letters went out with the Knights' courier. One family wrote back. I filed the reply. I did not expect to keep rereading it."));
 			}
 		});
 
-		// Quest 4: The Stonefrosted Alpha
+		// Quest 1005: The Stone Froster
 		//-------------------------------------------------------------------------
-		AddNpc(20103, L("[Bounty Hunter] Nikolai"), "f_flash_63", 952, -844, 0, async dialog =>
+		AddNpc(47245, L("[Bounty Hunter] Kestas"), "f_flash_63", -113, 1407, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_flash_63", 1005);
-			var alphaSpawnedKey = "Laima.Quests.f_flash_63.Quest1005.AlphaSpawned";
 
-			dialog.SetTitle(L("Nikolai"));
+			dialog.SetTitle(L("Kestas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Got a contract you'll like. Or hate. Depends on the day."));
-				await dialog.Msg(L("There's an Alpha Lemur out east that caught a bad variant of the curse - a cold-strain that crusted his fur with rime that doesn't melt. Hits like a hammer, leads with the cold."));
-				await dialog.Msg(L("Lesser Lemurs defer to him. Drop ten, he comes out to set them straight. Bounty's on the rime-pelt - it's the only material that makes true cold-wards."));
+				await dialog.Msg(L("{#666666}*He looks you over once, head to boots, the way he'd size up a bounty board*{/}"));
+				await dialog.Msg(L("You'll do. There's a thing living in the old cistern under the north block — big, slow, and cold enough that the air in front of it snows in summer."));
+				await dialog.Msg(L("The Stone Froster, they call it. What it breathes on frosts first and greys after — the curse, walking around on legs like it owns the place. Kill 10 Goblin Chargers by the cistern mouth, make a racket, and it'll come up to see who's disturbing its nap."));
 
 				var response = await dialog.Select(L("So? Want the contract?"),
 					Option(L("I'll take the contract"), "help"),
-					Option(L("What's a cold-ward?"), "info"),
+					Option(L("Where did it come from?"), "info"),
 					Option(L("Pass"), "leave")
 				);
 
@@ -251,62 +361,45 @@ public class FFlash63QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Ten. He hits with a rime-slam that staggers most people once. Don't get hit twice."));
-						await dialog.Msg(L("Stay mobile. He's heavy."));
+						await dialog.Msg(L("Don't stand in the white air. Looks like fog, isn't fog — that's the front edge of its breath, and it'll cost you fingers."));
+						await dialog.Msg(L("Keep moving, keep it in front of you. Slow and cold doesn't mean stupid, but it does mean it can't turn worth a damn."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Ward against the cold-curse strain. The variant that traps you conscious inside the stone."));
-						await dialog.Msg(L("Bad way to go. Cold-wards prevent it. Limited supply because his rime is the only source."));
+						await dialog.Msg(L("Nobody knows, and I've stopped asking. The scholars figure the curse settled into something already down there and grew itself a body."));
+						await dialog.Msg(L("Kill it clean and Vaida gets a whole specimen to study instead of scraps off a belt. Worth more than my fee, honestly — not that I'll be telling her that."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Bounty climbs every week. I'll be here."));
+						await dialog.Msg(L("The bounty climbs every month nobody takes it. I'll be right here when the number finally tempts you."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killPack", out var packObj)) return;
-				if (!quest.TryGetProgress("killAlpha", out var alphaObj)) return;
+				if (!quest.TryGetProgress("drawItOut", out var drawObj)) return;
+				if (!quest.TryGetProgress("killStoneFroster", out var bossObj)) return;
 
-				if (packObj.Done && alphaObj.Done)
+				if (drawObj.Done && bossObj.Done)
 				{
-					await dialog.Msg(L("Rime-pelt intact. Cold-wards for a year off that one piece."));
-					await dialog.Msg(L("Bounty paid, plus my cut. Good work."));
-
-					character.Variables.Perm.Remove(alphaSpawnedKey);
+					await dialog.Msg(L("It's down. Cistern's dripping instead of frosting — first good sign this block's had in a year, and I'll take credit for all of it."));
+					await dialog.Msg(L("Full bounty. And this — came off a Knight who didn't need it anymore. Better worn than sitting in a drawer gathering dust."));
 
 					character.Quests.Complete(questId);
 				}
-				else if (packObj.Done && !alphaObj.Done)
+				else if (drawObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(alphaSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(alphaSpawnedKey, true);
-
-						if (SpawnTempMonsters(character, MonsterId.Lemur, 1, 120, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("Pack's thinned. That howl - three octaves down. He's coming."));
-							await dialog.Msg(L("{#FF9966}Move - the rime glints right before he slams.{/}"));
-							character.ServerMessage(L("{#FF9966}The Stonefrosted Alpha charges out, rime-fur steaming!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("He's loose. Don't lose him - he heals up if he goes back behind cover."));
-					}
+					await dialog.Msg(L("It heard you. Get back to the cistern mouth before it settles again."));
 				}
 				else
 				{
-					await dialog.Msg(L("Pack's still tight. He won't show."));
+					await dialog.Msg(L("Not enough noise yet. It won't climb for a scuffle."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Pelt shipped to the cold-ward forge. A dozen wards going out next week. Saved a few lungs already."));
+				await dialog.Msg(L("Vaida's got the carcass under canvas and hasn't slept in two days. Says the grain runs clean through it. I don't know what that means and I've decided I don't want to."));
 			}
 		});
 	}
@@ -316,146 +409,210 @@ public class FFlash63QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class LemurHowlQuest : QuestScript
+// Quest 1001 CLASS: The Roosting Floor
+//-----------------------------------------------------------------------------
+
+public class TheRoostingFloorQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_flash_63", 1001);
-		SetName(L("Lemur Howl"));
+		SetName(L("The Roosting Floor"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Grelle's ward-crew can't work through the Lemur howl. Thin the pack so a full shift can run."));
+		SetDescription(L("Lemurs have roosted in the counting house above Rofhdel's post and his watch can't sleep through the noise. Kill enough of them to give the garrison its rotation back."));
 		SetLocation("f_flash_63");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[District Warden] Grelle"), "f_flash_63");
+		AddQuestGiver(L("[Kingdom Army] Rofhdel"), "f_flash_63");
 
-		AddObjective("killLemurs", L("Kill howl-cursed Lemurs"),
+		AddObjective("killLemurs", L("Kill Lemurs around the counting house"),
 			new KillObjective(22, new[] { MonsterId.Lemur }));
 
 		AddReward(new ExpReward(11900, 8100));
 		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
+		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
-public class CivicRecordsQuest : QuestScript
+// Quest 1002 CLASS: Bills of the Relief Column
+//-----------------------------------------------------------------------------
+
+public class BillsOfTheReliefColumnQuest : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_flash_63", 1002);
+		SetName(L("Bills of the Relief Column"));
+		SetType(QuestType.Sub);
+		SetDescription(L("Adjutant Hans says the Kingdom Army's relief column does not exist, and its bills are keeping families in cursed houses. Strip the bills off the market-run boards and bring them to him with the seals intact."));
+		SetLocation("f_flash_63");
+		SetAutoTracked(true);
+
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.AllAtOnce);
+		AddQuestGiver(L("[Kalis Knights] Adjutant Hans"), "f_flash_63");
+
+		AddObjective("collectBills", L("Strip Royal Army bills from the market boards"),
+			new CollectItemObjective(664013, 5));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(664013, character.Inventory.CountItem(664013), InventoryItemRemoveMsg.Destroyed);
+
+		for (var i = 1; i <= 9; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_flash_63.Quest1002.Board{i}");
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(664013, character.Inventory.CountItem(664013), InventoryItemRemoveMsg.Destroyed);
+
+		for (var i = 1; i <= 9; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_flash_63.Quest1002.Board{i}");
+	}
+}
+
+// Quest 1003 CLASS: What the Chargers Took
+//-----------------------------------------------------------------------------
+
+public class WhatTheChargersTookQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_flash_63", 1003);
-		SetName(L("Civic Records"));
+		SetName(L("What the Chargers Took"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Two hundred families' property claims rest on Downtown's civic record-volumes. Clear the Hammer-Goblins on the vault niches and recover four volumes intact."));
+		SetDescription(L("Goblin Chargers raided Steponas's salvage cache under the bathhouse. Clear the nest and recover the stuffed bags they hauled off."));
 		SetLocation("f_flash_63");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Civic Scribe] Agatha"), "f_flash_63");
+		AddQuestGiver(L("[Grave-Robber] Steponas"), "f_flash_63");
 
-		AddObjective("killHammerGoblins", L("Kill Hammer-Goblins"),
+		AddObjective("killChargers", L("Kill Goblin Chargers"),
 			new KillObjective(15, new[] { MonsterId.Goblin2_Hammer }));
 
-		AddObjective("recoverRecords", L("Recover civic record-volumes"),
-			new CollectItemObjective(650785, 4));
+		AddObjective("recoverBags", L("Recover Stuffed Bags"),
+			new CollectItemObjective(663219, 4));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 
-		AddDrop(650785, 0.40f, MonsterId.Goblin2_Hammer);
+		AddDrop(663219, 0.40f, MonsterId.Goblin2_Hammer);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650785, character.Inventory.CountItem(650785), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663219, character.Inventory.CountItem(663219), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650785, character.Inventory.CountItem(650785), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(663219, character.Inventory.CountItem(663219), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class RitualBrandPagesQuest : QuestScript
+// Quest 1004 CLASS: Faded Stones
+//-----------------------------------------------------------------------------
+
+public class FadedStonesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_flash_63", 1004);
-		SetName(L("Ritual Brand Pages"));
+		SetName(L("Faded Stones"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Hedvig has traced a Saltisdaughter ritual to the old bath-house. Kill the Wand-Goblins running it and recover five sigil-chain pages before they fire the chant."));
+		SetDescription(L("The Goblin Magicians of Downtown wear charms cut from petrified people. Kill them and bring Vaida the faded stones so the dead can be named."));
 		SetLocation("f_flash_63");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Curse-Scholar] Hedvig"), "f_flash_63");
+		AddQuestGiver(L("[Curse-Scholar] Vaida"), "f_flash_63");
 
-		AddObjective("killWandGoblins", L("Kill ritual Wand-Goblins"),
+		AddObjective("killMagicians", L("Kill Goblin Magicians"),
 			new KillObjective(12, new[] { MonsterId.Goblin2_Wand3 }));
 
-		AddObjective("gatherPages", L("Recover sigil-chain pages"),
-			new CollectItemObjective(650825, 5));
+		AddObjective("gatherStones", L("Recover Faded Stones"),
+			new CollectItemObjective(667121, 5));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 
-		AddDrop(650825, 0.50f, MonsterId.Goblin2_Wand3);
+		AddDrop(667121, 0.50f, MonsterId.Goblin2_Wand3);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650825, character.Inventory.CountItem(650825), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667121, character.Inventory.CountItem(667121), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650825, character.Inventory.CountItem(650825), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667121, character.Inventory.CountItem(667121), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class TheStonefrostedAlphaQuest : QuestScript
+// Quest 1005 CLASS: The Stone Froster
+//-----------------------------------------------------------------------------
+
+public class TheStoneFrosterQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_flash_63", 1005);
-		SetName(L("The Stonefrosted Alpha"));
+		SetName(L("The Stone Froster"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Nikolai has a contract on a cold-cursed Alpha Lemur whose rime-pelt is the only source of true cold-wards. Thin the pack to draw him out."));
+		SetDescription(L("A Stone Froster nests in the cistern under the north block and its breath greys whatever it touches. Make enough noise at the cistern mouth to draw it up, then put it down."));
 		SetLocation("f_flash_63");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Nikolai"), "f_flash_63");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Bounty Hunter] Kestas"), "f_flash_63");
 
-		AddObjective("killPack", L("Thin the Lemur pack"),
-			new KillObjective(10, new[] { MonsterId.Lemur }));
+		AddObjective("drawItOut", L("Kill Goblin Chargers by the cistern mouth"),
+			new KillObjective(10, new[] { MonsterId.Goblin2_Hammer }));
 
-		AddObjective("killAlpha", L("Defeat the Stonefrosted Alpha"),
-			new KillObjective(1, new[] { MonsterId.Lemur }));
+		AddObjective("killStoneFroster", L("Defeat the Stone Froster"),
+			new LayeredKillObjective(
+				spawnList: new[] { new KillSpec(MonsterId.Boss_Stonefroster, 1) },
+				resetIdent: "drawItOut",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 1));
+		AddReward(new ExpReward(60000, 40000));
+		AddReward(new SilverReward(50000));
+		AddReward(new ItemReward(603116, 1)); // Basme Bracelet
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 }

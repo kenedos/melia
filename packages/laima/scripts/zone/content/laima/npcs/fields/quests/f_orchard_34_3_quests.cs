@@ -1,251 +1,66 @@
 //--- Melia Script ----------------------------------------------------------
 // Barha Forest Quest NPCs
 //--- Description -----------------------------------------------------------
-// Cheerful woodland quests for Barha Forest, continuing the orchard tone.
+// The three researchers building a neutralizer for what was spilled one ridge
+// over in Alemeth, and the fourth one lying in the old sanctuary.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FOrchard343QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: The Frog Chorus
-		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Villager] Lida"), "f_orchard_34_3", -1500, 500, 90, async dialog =>
+		// Quest 1001: Barha Herb
+		//---------------------------------------------------------------------
+		AddNpc(20157, L("[Researcher] Aidas"), "f_orchard_34_3", -748, 425, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_34_3", 1001);
 
-			dialog.SetTitle(L("Lida"));
+			dialog.SetTitle(L("Aidas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Have you ever tried to sleep through a Flying Flog chorus? It's like being in a bathtub with twenty opera singers."));
-				await dialog.Msg(L("The whole west marsh is thick with them. Four nights running - nobody in my cottage has slept more than an hour."));
-				await dialog.Msg(L("We don't want them gone for good. Just... thinned. Dramatically."));
+				await dialog.Msg(L("{#666666}*He's crouched at the edge of a stripped herb bed, turning a bare stem over in his fingers like it personally offended him*{/}"));
+				await dialog.Msg(L("A traveler, out here? Marvelous. You've found the right disaster to wander into. Three of us came out to Barha to build a neutralizer for what got spilled in Alemeth. Six months ago. We're still stuck on the first ingredient. The FIRST one."));
+				await dialog.Msg(L("Barha Herb's the base, and the Orange Siaulav Archers strip the beds faster than we can cut. Kill 20 of them, bring me 10 bundles out of their stores. Simple, in theory."));
 
-				var response = await dialog.Select(L("Will you silence the chorus for me?"),
-					Option(L("I'll silence twenty-two frogs"), "help"),
-					Option(L("Earplugs don't work?"), "info"),
-					Option(L("Move houses"), "leave")
+				var response = await dialog.Select(L("Will you get the herb, or is that too much to ask of this forest too?"),
+					Option(L("I'll hunt the archers and bring 10 bundles"), "help"),
+					Option(L("Six months on one ingredient?"), "info"),
+					Option(L("Buy the herb elsewhere"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Bless you! The marsh sits right past the treeline - you'll hear them long before you see them."));
-						await dialog.Msg(L("Twenty-two should restore some semblance of silence. Please. I'm begging."));
+						await dialog.Msg(L("They shoot from the bed edges and retreat into the middle of the patch — which is where their stores are, conveniently. Follow them in, don't wait for a better opening. There isn't one."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Wax earplugs? Tried them. Cotton? Tried it. Prayer? Oh, I've tried prayer."));
-						await dialog.Msg(L("These frogs croak through walls. I swear they aim."));
+						await dialog.Msg(L("Six months on an ingredient we can only harvest in a fortnight-long window, in a forest where everything else wants it too. Yes. That about sums up my year."));
+						await dialog.Msg(L("Sirea told the academy it'd take a year. The academy funded six months. We're working the difference out of our own pockets — and out of Sarma, apparently."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Move? My grandmother built this cottage. I'm not letting the frogs win."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("silenceFrogs", out var killObj)) return;
-
-				if (killObj.Done)
-				{
-					await dialog.Msg(L("Oh, the silence. The sweet, sweet silence."));
-					await dialog.Msg(L("Take this with my deepest thanks. And a pillow - you deserve a really good nap."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Still hearing the croak-opera out there. Keep silencing them!"));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Slept twelve hours straight last night. Twelve! I'd forgotten what dreams looked like."));
-			}
-		});
-
-		// Quest 2: Pollen Run
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Perfumer] Inara"), "f_orchard_34_3", 0, 400, 180, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_34_3", 1002);
-
-			dialog.SetTitle(L("Inara"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("Green Rafflesia pollen. Ever smelled it? Heaven in a sneeze."));
-				await dialog.Msg(L("It's the base note for my entire festival-edition line. I'd harvest it myself but Rafflesia don't exactly hold still for it."));
-				await dialog.Msg(L("Five pollen sacs, five intact flowers. That's all I need."));
-
-				var response = await dialog.Select(L("Will you gather five?"),
-					Option(L("I'll collect the pollen"), "help"),
-					Option(L("Do Rafflesia bite?"), "info"),
-					Option(L("Use another flower"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Wonderful! Twist the sac off at the base - the pollen stays dry that way."));
-						await dialog.Msg(L("And do keep your distance. Some of them are lungers."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Bite? Technically no. Snap shut around your arm like a bear trap? Absolutely."));
-						await dialog.Msg(L("I've seen pickers walk away with a flower stuck to their elbow for three days."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("There is no other flower. That's rather the point."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var pollenCount = character.Inventory.CountItem(650581);
-
-				if (pollenCount >= 5)
-				{
-					await dialog.Msg(L("Five pristine sacs! The scent is already filling my shop - I can retire on this batch alone."));
-					await dialog.Msg(L("Take this. A little silver, and a few sample bottles from the last batch."));
-
-					character.Inventory.Remove(650581, 5, InventoryItemRemoveMsg.Given);
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(LF("Still gathering? You have {0} of five.", pollenCount));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The festival perfume launched! The judges called it 'improbably wearable.' High praise."));
-			}
-		});
-
-		// Rafflesia Pollen Points
-		//-------------------------------------------------------------------------
-		void AddRafflesiaBloom(int nodeNum, int x, int z, int direction)
-		{
-			AddNpc(46218, L("Intact Green Rafflesia"), "f_orchard_34_3", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_orchard_34_3", 1002);
-				var variableKey = $"Laima.Quests.f_orchard_34_3.Quest1002.Pollen{nodeNum}";
-				var spawnedKey = $"Laima.Quests.f_orchard_34_3.Quest1002.Pollen{nodeNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A Rafflesia bloom hangs heavy with pollen - motionless, for now*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already harvested this bloom's pollen sac*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && GameRandom.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Rafflesia_Green, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#99CC66}A pair of Rafflesia lunge from the undergrowth!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Twisting off pollen sac..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650581, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Harvested: Rafflesia Pollen Sac"));
-
-					var currentCount = character.Inventory.CountItem(650581);
-					character.ServerMessage(LF("Pollen sacs gathered: {0}/5", currentCount));
-
-					if (currentCount >= 5)
-					{
-						character.ServerMessage(L("{#FFD700}All five sacs gathered! Return to Inara.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You stepped back just in time."));
-				}
-			});
-		}
-
-		AddRafflesiaBloom(1, 1100, -280, 0);
-		AddRafflesiaBloom(2, -365, -145, 0);
-		AddRafflesiaBloom(3, 900, -150, 0);
-		AddRafflesiaBloom(4, -200, 50, 0);
-		AddRafflesiaBloom(5, 1200, 100, 0);
-
-		// Quest 3: Siaulav Eviction
-		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Ranger] Kaspar"), "f_orchard_34_3", -1300, 600, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_34_3", 1003);
-
-			dialog.SetTitle(L("Kaspar"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("The Siaulav Archers have squatted the northwest ridge for three months. Not legally, mind you - that's crown land."));
-				await dialog.Msg(L("They've built four nest-roosts up there. Little woven platforms with feathers and arrow-fletchings hanging everywhere. Charming, if you ignore that they keep shooting at my patrols."));
-
-				var response = await dialog.Select(L("Want them cleared out?"),
-					Option(L("I'll evict them and dismantle the roosts"), "help"),
-					Option(L("Can't you just negotiate?"), "info"),
-					Option(L("Let them stay"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Good. The roosts are platforms at the tree joints - you'll see the hanging fletchings from a good distance."));
-						await dialog.Msg(L("Wear something that doesn't rustle. Siaulav hear everything."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("They don't negotiate. They trill. And then they shoot. It's a short conversation."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Tell that to the crown. I'd love to 'let them stay' but the paperwork says otherwise."));
+						await dialog.Msg(L("Barha Herb grows in Barha. That's the entire reason the word 'Barha' is in its name. Elsewhere isn't an option, believe me, I've checked."));
 						break;
 				}
 			}
@@ -253,134 +68,128 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killArchers", out var killObj)) return;
-				if (!quest.TryGetProgress("dismantleRoosts", out var roostObj)) return;
+				if (!quest.TryGetProgress("collectHerb", out var itemObj)) return;
 
-				if (killObj.Done && roostObj.Done)
+				if (killObj.Done && itemObj.Done)
 				{
-					await dialog.Msg(L("Ridge is clear. Paperwork satisfied. Crown happy."));
-					await dialog.Msg(L("Your share is in this pouch. Honest crown pay, no tricks."));
-
-					character.Inventory.Remove(650750, character.Inventory.CountItem(650750), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He weighs the bundles on a field balance and writes the figure down twice*{/}"));
+					await dialog.Msg(L("Ten bundles is a full base. First time in six months we've had a full anything."));
+					await dialog.Msg(L("Take the equipment budget. We've no equipment left to buy — just a list of things we can't make, growing longer by the week."));
 
 					character.Quests.Complete(questId);
 				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Plenty of archers down and my balance is still empty. The stores are in the middle of the beds, not on the bodies. Obviously."));
+				}
 				else
 				{
-					var status = "";
-					if (!killObj.Done)
-						status += L("Kill more Siaulav Archers. ");
-					if (!roostObj.Done)
-						status += L("Dismantle more nest-roosts. ");
-
-					await dialog.Msg(LF("Keep at it. {0}", status));
+					await dialog.Msg(L("Still Siaulav on the herb beds. They won't leave one while there's a stem still standing in it — stubborn as the forest itself."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Ridge has stayed quiet. Patrols can walk the whole length without ducking."));
+				await dialog.Msg(L("Base is made and settling. Vide says it smells right, and Vide's been wrong about that exactly once in four years. So — cautiously, I believe her."));
 			}
 		});
 
-		// Nest-Roost Dismantle Points
-		//-------------------------------------------------------------------------
-		void AddNestRoost(int roostNum, int x, int z, int direction)
-		{
-			AddNpc(12080, L("Siaulav Nest-Roost"), "f_orchard_34_3", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_orchard_34_3", 1003);
-				var variableKey = $"Laima.Quests.f_orchard_34_3.Quest1003.Roost{roostNum}";
-				var spawnedKey = $"Laima.Quests.f_orchard_34_3.Quest1003.Roost{roostNum}.Spawned";
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A woven platform hangs between branches, fletchings swaying*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*This roost has already been dismantled*{/}"));
-					return;
-				}
-
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && GameRandom.Get().Next(100) < 40)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Siaulav_Bow_Orange, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF9966}Furious Siaulav Archers drop from the canopy!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Dismantling roost..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(4)
-				);
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650750, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Dismantled: Siaulav Nest-Roost"));
-
-					var currentCount = character.Inventory.CountItem(650750);
-					character.ServerMessage(LF("Roosts dismantled: {0}/4", currentCount));
-
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All roosts down! Return to Kaspar.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("You let the roost hang for now."));
-				}
-			});
-		}
-
-		AddNestRoost(1, -1420, 650, 0);
-		AddNestRoost(2, -1300, 800, 0);
-		AddNestRoost(3, -1500, 400, 0);
-		AddNestRoost(4, -1250, 550, 0);
-
-		// Quest 4: The Missing Apprentice
-		//-------------------------------------------------------------------------
-		AddNpc(155018, L("[Forager] Master Vondel"), "f_orchard_34_3", 200, 600, 0, async dialog =>
+		// Quest 1002: Griba's Slimy Juice
+		//---------------------------------------------------------------------
+		AddNpc(147485, L("[Researcher] Vide"), "f_orchard_34_3", 518, 371, 0, async dialog =>
 		{
 			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_34_3", 1004);
+			var questId = new QuestId("f_orchard_34_3", 1002);
 
-			dialog.SetTitle(L("Vondel"));
+			dialog.SetTitle(L("Vide"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("My apprentice Tomas went out three days ago with a satchel of marking-tags. Supposed to count and tag every Big Red Griba in Barha."));
-				await dialog.Msg(L("He hasn't come back. The Rafflesia are thick in the center of the forest - he must have gotten overwhelmed."));
-				await dialog.Msg(L("I keep hoping he just fell asleep under a tree. But the tags should still be out there either way."));
+				await dialog.Msg(L("{#666666}*She glances up from a stained workbench, still holding a flask at arm's length, and quickly sets it down out of sight*{/}"));
+				await dialog.Msg(L("Oh — don't mention this flask to Aidas, would you? Our little secret. Since you're here, though: a neutralizer has to bind to the thing it's neutralizing, and the only substance in this forest that binds to the Alemeth solution is the juice off a Big Red Griba. Isn't that deliciously inconvenient?"));
+				await dialog.Msg(L("I found that out entirely by accident — by spilling a sample on one, if you must know. Bring me 10 lots of the juice before Aidas thinks to ask how I found out."));
 
-				var response = await dialog.Select(L("Will you recover the tags for me?"),
-					Option(L("I'll recover the tags and clear the Rafflesia"), "help"),
-					Option(L("What's a marking-tag?"), "info"),
-					Option(L("Sorry for your loss"), "leave")
+				var response = await dialog.Select(L("Will you collect the juice? Quietly, ideally."),
+					Option(L("I'll bring you 10 lots of juice"), "help"),
+					Option(L("You spilled a sample?"), "info"),
+					Option(L("Tell Aidas yourself"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Thank you. The tags are yellow cloth wrapped around little wooden posts - he'd have placed them near the Gribas, or dropped them along the way."));
-						await dialog.Msg(L("Five tags is enough to know where he made it to. Please, tell me it's not as far as I fear."));
+						await dialog.Msg(L("It comes off the cap, not the stalk, and it goes hard in about an hour. Bring it sealed, or you'll bring me a lump — and then I'll have to explain the lump."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("A wooden post wrapped in yellow cloth, numbered. You tie it near a specimen so surveyors can find it later."));
-						await dialog.Msg(L("Tomas made thirty of them himself. Each one's got his initials burned in."));
+						await dialog.Msg(L("I dropped a flask. The Griba went from red to grey in four seconds flat and stopped being a Griba, and I just... stood there and watched. Then I went and got another flask, obviously."));
+						await dialog.Msg(L("Most useful thing anyone on this team has done in six months, and I got there by being clumsy. I've made peace with about half of that. The other half is delightful."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("He isn't lost - he's just late. He's always just late."));
+						await dialog.Msg(L("I will tell him, eventually. I'd like the results in hand first, though — Aidas is a good man who turns into a very bad one the moment procedure's involved."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("collectJuice", out var itemObj)) return;
+
+				if (itemObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*She tips one jar into another and the two liquids refuse to mix at all*{/}"));
+					await dialog.Msg(L("Ten, all still liquid! That's the binder, and there's enough for three attempts — two more than I actually expected."));
+					await dialog.Msg(L("Take my share of the stipend. I've been sleeping in a tent for six months. Nothing to spend it on out here but more tent."));
+
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Still short. The big ones on the eastern shelf carry the most — the small ones are barely worth the walk, trust me."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("Told Aidas. He asked three questions about procedure and then said 'well done' in a voice like a man passing a kidney stone. Worth it, honestly."));
+			}
+		});
+
+		// Quest 1003: Rafflesia on the Path
+		//---------------------------------------------------------------------
+		AddNpc(152064, L("[Researcher] Sirea"), "f_orchard_34_3", -206, -153, 270, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_orchard_34_3", 1003);
+
+			dialog.SetTitle(L("Sirea"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*She's folding a letter back into its envelope with the sharp motions of someone who already knows the answer will be no*{/}"));
+				await dialog.Msg(L("You're not with the academy, are you. Good — then you can actually be useful. I lead this team, and I've spent six months writing to an academy that funds half of what it approves. That's not the immediate problem, though."));
+				await dialog.Msg(L("The immediate problem is Green Rafflesia on the path between camp and the sanctuary, and Sarma is in the sanctuary. Kill 30 of them. I want to reach her twice a day, not once."));
+
+				var response = await dialog.Select(L("Will you clear the sanctuary path? I don't have time to ask twice."),
+					Option(L("I'll kill the Green Rafflesia"), "help"),
+					Option(L("What happened to Sarma?"), "info"),
+					Option(L("Move her to the camp"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They spray before they close, so the first thing you'll know about one is the smell. If you can smell it, you're already inside its reach. Move fast."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Rafflesia sap, three weeks ago, on that path — carrying a crate she should have let one of us carry. She hasn't been able to stand since Tuesday."));
+						await dialog.Msg(L("She spilled the Alemeth solution in spring and has been trying to outwork it ever since. This is what outworking it looks like. I won't sugarcoat it."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("The sanctuary is stone, cool, and has a roof. The camp is three tents in a forest that grew forty feet in a summer. She stays exactly where she is."));
 						break;
 				}
 			}
@@ -388,237 +197,162 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killRafflesia", out var killObj)) return;
-				var tagCount = character.Inventory.CountItem(650672);
 
-				if (killObj.Done && tagCount >= 5)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("Five tags. His initials on all of them."));
-					await dialog.Msg(L("The last tag was at the center. He made it farther than I dared hope - but he didn't make it back."));
-					await dialog.Msg(L("Thank you. I'll retire the Griba survey. It was never worth this. Take this - he would have wanted you to have it."));
-
-					character.Inventory.Remove(650672, 5, InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("I walked it twice today. Two visits — and the second one, she was awake for."));
+					await dialog.Msg(L("Take the team's contingency fund. There's no contingency left to have. It's just money in a box now."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					var status = "";
-					if (!killObj.Done)
-						status += L("Clear more Rafflesia from the route. ");
-					if (tagCount < 5)
-						status += L("Recover more marking-tags. ");
-
-					await dialog.Msg(LF("Keep searching. {0}", status));
+					await dialog.Msg(L("Still Rafflesia on the path. They sit where the ground's wet — on that path, that's most of it."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("I buried the tags in the cedar grove. No body to bury, but the tags were his writing. It'll have to do."));
+				await dialog.Msg(L("Twice a day, four days straight. She's started arguing with me about the dilution table again, which I am choosing to read as an improvement."));
 			}
 		});
 
-		// Marking Tag Recovery Points
-		//-------------------------------------------------------------------------
-		void AddMarkingTag(int tagNum, int x, int z, int direction)
+		// Quest 1004: The Barha Antidote
+		//---------------------------------------------------------------------
+		AddNpc(152064, L("[Researcher] Sirea"), "f_orchard_34_3", 1179, 480, 90, async dialog =>
 		{
-			AddNpc(47190, L("Apprentice's Marking-Tag"), "f_orchard_34_3", x, z, direction, async dialog =>
+			var character = dialog.Player;
+			var questId = new QuestId("f_orchard_34_3", 1004);
+
+			dialog.SetTitle(L("Sirea"));
+
+			if (!character.Quests.Has(questId))
 			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_orchard_34_3", 1004);
-				var variableKey = $"Laima.Quests.f_orchard_34_3.Quest1004.Tag{tagNum}";
+				await dialog.Msg(L("{#666666}*She meets you at the sanctuary door before you can knock, already pulling it shut behind her*{/}"));
+				await dialog.Msg(L("Good, the path's walkable again — I felt the difference this morning. This is the sanctuary, and this is Sarma, and the ordinary Barha antidote has stopped touching her. Three weeks of sap is past what the ordinary recipe was written for."));
+				await dialog.Msg(L("Here's the recipe list for the enhanced one. Bring me 8 lots of Sticky Rafflesia Sap and 6 Neutralizer Catalysts off the Gray Winged Frogs. I can make it tonight, if you move quickly."));
 
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A yellow-wrapped wooden post lies in the leaf litter*{/}"));
-					return;
-				}
-
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*You've already recovered this marking-tag*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(
-					L("Recovering tag..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2)
+				var response = await dialog.Select(L("Will you gather both? I need them today, not eventually."),
+					Option(L("I'll bring the sap and the catalysts"), "help"),
+					Option(L("Sap cures sap?"), "info"),
+					Option(L("Send for a physician"), "leave")
 				);
 
-				if (result == TimeActionResult.Completed)
+				switch (response)
 				{
-					character.Inventory.Add(650672, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Marking-Tag"));
+					case "help":
+						character.Quests.Start(questId);
+						character.Inventory.Add(661138, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("Sap first, catalyst second — do not carry them in the same bag. The catalyst will start working on the sap early, and you'll bring me warm water instead of medicine."));
+						break;
 
-					var currentCount = character.Inventory.CountItem(650672);
-					character.ServerMessage(LF("Tags recovered: {0}/5", currentCount));
+					case "info":
+						await dialog.Msg(L("The sap is what's in her. The enhanced antidote uses more of it, not less — you teach the body the shape of the thing by giving it a shape it can survive."));
+						await dialog.Msg(L("Same principle as the neutralizer, at a smaller scale, on a person instead of a forest. Sarma worked it out. From a cot. On Tuesday. Don't ask me how."));
+						break;
 
-					if (currentCount >= 5)
-					{
-						character.ServerMessage(L("{#FFD700}All five tags recovered! Return to Vondel.{/}"));
-					}
+					case "leave":
+						await dialog.Msg(L("The nearest physician is five days away and has never seen Rafflesia sap in his life. I've seen it three times this year alone. We don't have five days."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("collectSap", out var sapObj)) return;
+				if (!quest.TryGetProgress("collectCatalyst", out var catObj)) return;
+
+				if (sapObj.Done && catObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*She mixes them on the altar stone because it's the only flat surface in the building*{/}"));
+					await dialog.Msg(L("It's gone the color the list says it should. Six months of nothing going the color it should, and it's the one recipe I didn't write."));
+					await dialog.Msg(L("Take everything in the sanctuary box. It's offerings from people who walked out here for a roof, and I don't think any of them would mind."));
+
+					character.Quests.Complete(questId);
+				}
+				else if (sapObj.Done)
+				{
+					await dialog.Msg(L("Sap's in. Still need catalyst — the frogs carry it, in the wet ground west of here."));
 				}
 				else
 				{
-					character.ServerMessage(L("You left the tag where it lay."));
+					await dialog.Msg(L("Still short of sap. Take it off the Rafflesia bodies before it sets — it sets fast in open air."));
 				}
-			});
-		}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("She sat up this morning and asked for the flask count. I gave her the flask count. She said it was wrong. She was right. Of course she was."));
+			}
+		});
 
-		AddMarkingTag(1, 58, 566, 0);
-		AddMarkingTag(2, -100, 450, 0);
-		AddMarkingTag(3, 250, 650, 0);
-		AddMarkingTag(4, 0, 700, 0);
-		AddMarkingTag(5, 150, 520, 0);
-
-		// Quest 5: The Griba Baron
-		//-------------------------------------------------------------------------
-		AddNpc(20109, L("[Bounty Hunter] Lark"), "f_orchard_34_3", 500, -200, 270, async dialog =>
+		// Quest 1005: The Overgrowth Solution Neutralizer
+		//---------------------------------------------------------------------
+		AddNpc(147486, L("[Assistant] Gatre"), "f_orchard_34_3", -453, -463, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_34_3", 1005);
-			var baronSpawnedKey = "Laima.Quests.f_orchard_34_3.Quest1005.BaronSpawned";
 
-			dialog.SetTitle(L("Lark"));
+			dialog.SetTitle(L("Gatre"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("There's a rumour circling the foragers' guild. The Big Red Gribas in Barha have a... baron."));
-				await dialog.Msg(L("Twice as tall as the regulars, stalks like saplings, cap big enough to shade a picnic. Nobody's seen him for more than thirty seconds before he lumbers back into the brush."));
-				await dialog.Msg(L("The Rafflesia around him act as his bodyguards. Thin them - say, ten - and his pride brings him out."));
+				if (!character.Quests.HasCompleted(new QuestId("f_orchard_34_3", 1004)))
+				{
+					await dialog.Msg(L("Sarma has to be able to sit up before we mix anything, please. Get Sirea what she needs for the enhanced antidote first, and — then come back to me, I promise it'll be worth the wait."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Want the contract?"),
-					Option(L("Count me in"), "help"),
-					Option(L("Why do you want him?"), "info"),
-					Option(L("Pass"), "leave")
+				await dialog.Msg(L("{#666666}*He's grinning at nothing in particular, still dusty from the ridge crossing, a corked flask cradled like it might break*{/}"));
+				await dialog.Msg(L("Oh — you made it over too! Good, good. I carried six flasks of the original batch over the ridge, and Sarma checked my arithmetic from a cot, which is a sentence I intend to repeat for the rest of my life, honestly."));
+				await dialog.Msg(L("The neutralizer's mixed, and it has to be poured at the old sanctuary well — it feeds both valleys. The Big Red Griba have taken the well. Kill 25 of them, and — I should say — something older is going to come out of the well after them. Sorry, again, I should lead with these things."));
+
+				var response = await dialog.Select(L("Will you take the well? Please — we're so close."),
+					Option(L("I'll clear the well and hold it"), "help"),
+					Option(L("Something older?"), "info"),
+					Option(L("Pour it in the stream instead"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Ten Rafflesia first. Come back when the count's done - I'll sense when he's near."));
-						await dialog.Msg(L("When he emerges, don't dawdle. A Baron-sized Ent hits like a falling tree because it basically is one."));
+						await dialog.Msg(L("Clear the Griba first, keep your back to the well head. Whatever comes up will come up behind you if you're standing anywhere else."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Mounted cap for the festival stage. The organizers want it as a centerpiece - they'll pay a barony's ransom for one."));
-						await dialog.Msg(L("No pun intended. Actually, yes, pun intended."));
+						await dialog.Msg(L("Kurmis. It's been in that well since before the sanctuary was roofed, and it's never once come out — never had a reason to, until now."));
+						await dialog.Msg(L("Sarma's solution has been in the groundwater for six months. That's six months of reason, apparently."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Bounty's posted. Come back if you change your mind."));
+						await dialog.Msg(L("The stream is one valley. The well is the water table, and the water table is both — and Auste's mother is eighty-one and lives on the other one. So, no, I don't think we skip this."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killGuards", out var guardObj)) return;
-				if (!quest.TryGetProgress("killBaron", out var baronObj)) return;
+				if (!quest.TryGetProgress("clearWell", out var wellObj)) return;
+				if (!quest.TryGetProgress("holdTheWell", out var bossObj)) return;
 
-				if (guardObj.Done && baronObj.Done)
+				if (wellObj.Done && bossObj.Done)
 				{
-					await dialog.Msg(L("He's down? You actually dropped the Baron?"));
-					await dialog.Msg(L("The festival committee's going to faint. Cap will be on the main stage by sundown. Your bounty, paid in full."));
-
-					character.Variables.Perm.Remove(baronSpawnedKey);
+					await dialog.Msg(L("Poured, all six flasks — the well ran grey, then ran clear! Vide's downstream taking readings and shouting numbers back up the path."));
+					await dialog.Msg(L("Take this. It came up out of the well with the Kurmis, and none of the four of us wants it anywhere near the camp."));
 
 					character.Quests.Complete(questId);
 				}
-				else if (guardObj.Done && !baronObj.Done)
+				else if (wellObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(baronSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(baronSpawnedKey, true);
-
-						if (SpawnTempMonsters(character, MonsterId.Mushroom_Ent_Red, 1, 130, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("The Rafflesia are thinned enough. I can feel the ground shifting - he's coming out."));
-							await dialog.Msg(L("{#FF6666}Go, go! He won't stay in the open if the Rafflesia regrow!{/}"));
-							character.ServerMessage(L("{#FF6666}The Griba Baron lumbers into view!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("He's out there, tall as a church steeple. Don't let him retreat."));
-					}
+					await dialog.Msg(L("Well head is clear. Stand on it. It's already coming — I can feel it, don't ask me how."));
 				}
 				else
 				{
-					await dialog.Msg(L("The guards are still thick. Thin them first."));
+					await dialog.Msg(L("Too many Griba on the well. We can't get a flask within 20 paces of the head."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Cap's on the festival stage. Kids are taking turns standing under it like it's a parasol."));
-			}
-		});
-
-		// Quest 6: Barha Crossroads
-		//-------------------------------------------------------------------------
-		AddNpc(155145, L("[Pathfinder] Bram"), "f_orchard_34_3", -700, 400, 45, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_34_3", 1006);
-
-			dialog.SetTitle(L("Bram"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("The Barha Crossroads run from Alemeth through here to the pilgrim road. Right now it's a shooting gallery."));
-				await dialog.Msg(L("Siaulav Archers snipe from the ridge. Flying Flogs dive-bomb the carts. The caravans won't risk it anymore."));
-
-				var response = await dialog.Select(L("Will you clear the crossroads for the carts?"),
-					Option(L("I'll clear both groups"), "help"),
-					Option(L("Which is worse?"), "info"),
-					Option(L("Use another route"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Twelve of each. The Crossroads are the main stretch - you'll run into both species on every bend."));
-						await dialog.Msg(L("When it's done, the carts roll again, and I'll sleep without flinching at every creak."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Siaulav shoot at your head. Flying Flogs land on your head. Pick your poison."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Not really an option. This is the only route between Alemeth and the pilgrim road."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killArchers", out var archObj)) return;
-				if (!quest.TryGetProgress("killFrogs", out var frogObj)) return;
-
-				if (archObj.Done && frogObj.Done)
-				{
-					await dialog.Msg(L("Crossroads is clear. First caravan rolled through an hour ago - the drivers looked giddy."));
-					await dialog.Msg(L("Take your pay. You've opened the only road between two forests."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					var status = "";
-					if (!archObj.Done)
-						status += L("Kill more Siaulav Archers. ");
-					if (!frogObj.Done)
-						status += L("Kill more Flying Flogs. ");
-
-					await dialog.Msg(LF("Keep pushing. {0}", status));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The Crossroads are running on schedule. Three caravans a day, not one arrow loosed."));
+				await dialog.Msg(L("Alemeth's growth is four inches down on the week. Four inches isn't much. Four inches is the first number that's gone the right way in a year, and I intend to celebrate every single one of them."));
 			}
 		});
 	}
@@ -628,276 +362,216 @@ public class FOrchard343QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: The Frog Chorus
+// Quest 1001 CLASS: Barha Herb
 //-----------------------------------------------------------------------------
 
-public class TheFrogChorusQuest : QuestScript
+public class BarhaHerbQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_3", 1001);
-		SetName(L("The Frog Chorus"));
+		SetName(L("Barha Herb"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Silence the Gray Winged Frogs in the west marsh before Lida loses what remains of her sanity."));
+		SetDescription(L("Barha Herb is the base of the neutralizer and it can only be harvested in a fortnight-long window, in a forest where the Orange Siaulav Archers strip the beds faster than three researchers can cut."));
 		SetLocation("f_orchard_34_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Villager] Lida"), "f_orchard_34_3");
+		AddQuestGiver(L("[Researcher] Aidas"), "f_orchard_34_3");
 
-		AddObjective("silenceFrogs", L("Silence Gray Winged Frogs"),
-			new KillObjective(22, new[] { MonsterId.Flying_Flog_White }));
+		AddObjective("killArchers", L("Kill Orange Siaulav Archers on the herb beds"),
+			new KillObjective(20, new[] { MonsterId.Siaulav_Bow_Orange }));
 
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
+		AddObjective("collectHerb", L("Collect bundles of Barha Herb"),
+			new CollectItemObjective(661135, 10));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(661135, 0.50f, MonsterId.Siaulav_Bow_Orange);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(661135, character.Inventory.CountItem(661135), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(661135, character.Inventory.CountItem(661135), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1002 CLASS: Pollen Run
+// Quest 1002 CLASS: Griba's Slimy Juice
 //-----------------------------------------------------------------------------
 
-public class PollenRunQuest : QuestScript
+public class GribasSlimyJuiceQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_3", 1002);
-		SetName(L("Pollen Run"));
+		SetName(L("Griba's Slimy Juice"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Gather Green Rafflesia pollen sacs for the perfumer Inara's festival-edition fragrance."));
+		SetDescription(L("A neutralizer has to bind to the thing it neutralizes, and the only substance in Barha Forest that binds to the Alemeth solution is the juice off a Big Red Griba's cap."));
 		SetLocation("f_orchard_34_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Perfumer] Inara"), "f_orchard_34_3");
+		AddQuestGiver(L("[Researcher] Vide"), "f_orchard_34_3");
 
-		AddObjective("gatherPollen", L("Gather Rafflesia pollen sacs"),
-			new CollectItemObjective(650581, 5));
+		AddObjective("collectJuice", L("Collect Griba's Slimy Juice from Big Red Griba"),
+			new CollectItemObjective(661136, 10));
 
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(661136, 0.50f, MonsterId.Mushroom_Ent_Red);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650581, character.Inventory.CountItem(650581), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1002.Pollen{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1002.Pollen{i}.Spawned");
-		}
+		character.Inventory.Remove(661136, character.Inventory.CountItem(661136), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650581, character.Inventory.CountItem(650581), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1002.Pollen{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1002.Pollen{i}.Spawned");
-		}
+		character.Inventory.Remove(661136, character.Inventory.CountItem(661136), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1003 CLASS: Siaulav Eviction
+// Quest 1003 CLASS: Rafflesia on the Path
 //-----------------------------------------------------------------------------
 
-public class SiaulavEvictionQuest : QuestScript
+public class RafflesiaOnThePathQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_3", 1003);
-		SetName(L("Siaulav Eviction"));
+		SetName(L("Rafflesia on the Path"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Evict the squatting Siaulav Archers from the northwest ridge and dismantle their nest-roosts."));
+		SetDescription(L("Green Rafflesia have taken the path between the research camp and the old sanctuary, and the team leader can only make the walk to her poisoned colleague once a day instead of twice."));
 		SetLocation("f_orchard_34_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Ranger] Kaspar"), "f_orchard_34_3");
+		AddQuestGiver(L("[Researcher] Sirea"), "f_orchard_34_3");
 
-		AddObjective("killArchers", L("Kill Siaulav Archers"),
-			new KillObjective(15, new[] { MonsterId.Siaulav_Bow_Orange }));
+		AddObjective("killRafflesia", L("Kill Green Rafflesia on the sanctuary path"),
+			new KillObjective(30, new[] { MonsterId.Rafflesia_Green }));
 
-		AddObjective("dismantleRoosts", L("Dismantle nest-roosts"),
-			new CollectItemObjective(650750, 4));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-		AddReward(new ItemReward(926012, 1)); // Recipe - Shield Breaker
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650750, character.Inventory.CountItem(650750), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1003.Roost{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1003.Roost{i}.Spawned");
-		}
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650750, character.Inventory.CountItem(650750), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1003.Roost{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1003.Roost{i}.Spawned");
-		}
+		AddReward(new ExpReward(11900, 8100));
+		AddReward(new SilverReward(15000));
+		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
-// Quest 1004 CLASS: The Missing Apprentice
+// Quest 1004 CLASS: The Barha Antidote
 //-----------------------------------------------------------------------------
 
-public class TheMissingApprenticeQuest : QuestScript
+public class TheBarhaAntidoteQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_3", 1004);
-		SetName(L("The Missing Apprentice"));
+		SetName(L("The Barha Antidote"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Recover the marking-tags Tomas left behind and kill the Rafflesia that blocked his survey route."));
+		SetDescription(L("Three weeks of Rafflesia sap is past what the ordinary Barha antidote was written for. The enhanced recipe teaches the body the shape of the thing by giving it a shape it can survive."));
 		SetLocation("f_orchard_34_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Forager] Master Vondel"), "f_orchard_34_3");
+		AddQuestGiver(L("[Researcher] Sirea"), "f_orchard_34_3");
 
-		AddObjective("killRafflesia", L("Kill Rafflesia blocking the route"),
-			new KillObjective(12, new[] { MonsterId.Rafflesia_Green }));
+		AddObjective("collectSap", L("Collect Sticky Rafflesia Sap"),
+			new CollectItemObjective(661141, 8));
 
-		AddObjective("recoverTags", L("Recover apprentice's marking-tags"),
-			new CollectItemObjective(650672, 5));
+		AddObjective("collectCatalyst", L("Collect Neutralizer Catalysts from Gray Winged Frogs"),
+			new CollectItemObjective(661139, 6));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-		AddReward(new ItemReward(941035, 1)); // Recipe - Ferret Marauder Shield
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(661141, 0.50f, MonsterId.Rafflesia_Green);
+		AddDrop(661139, 0.45f, MonsterId.Flying_Flog_White);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650672, character.Inventory.CountItem(650672), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1004.Tag{i}");
-		}
+		character.Inventory.Remove(661138, character.Inventory.CountItem(661138), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(661141, character.Inventory.CountItem(661141), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(661139, character.Inventory.CountItem(661139), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650672, character.Inventory.CountItem(650672), InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 5; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_34_3.Quest1004.Tag{i}");
-		}
+		character.Inventory.Remove(661138, character.Inventory.CountItem(661138), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(661141, character.Inventory.CountItem(661141), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(661139, character.Inventory.CountItem(661139), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1005 CLASS: The Griba Baron
+// Quest 1005 CLASS: The Overgrowth Solution Neutralizer
 //-----------------------------------------------------------------------------
 
-public class TheGribaBaronQuest : QuestScript
+public class TheOvergrowthSolutionNeutralizerQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_34_3", 1005);
-		SetName(L("The Griba Baron"));
+		SetName(L("The Overgrowth Solution Neutralizer"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Thin the Rafflesia guarding the legendary Griba Baron, then bring him down for the festival centerpiece."));
+		SetDescription(L("The neutralizer has to go into the old sanctuary well, which feeds both valleys. Big Red Griba have taken the well head, and the Kurmis that has sat in the water since before the sanctuary was roofed now has a reason to come out."));
 		SetLocation("f_orchard_34_3");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Lark"), "f_orchard_34_3");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Assistant] Gatre"), "f_orchard_34_3");
 
-		AddObjective("killGuards", L("Kill Rafflesia guarding the Baron"),
-			new KillObjective(10, new[] { MonsterId.Rafflesia_Green }));
+		AddPrerequisite(new CompletedPrerequisite("f_orchard_34_3", 1004));
 
-		AddObjective("killBaron", L("Defeat the Griba Baron"),
-			new KillObjective(1, new[] { MonsterId.Mushroom_Ent_Red }));
+		AddObjective("clearWell", L("Kill Big Red Griba at the sanctuary well"),
+			new KillObjective(25, new[] { MonsterId.Mushroom_Ent_Red }));
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-		AddReward(new ItemReward(531122, 1)); // Plate Armor
-	}
+		AddObjective("holdTheWell", L("Hold the well head while the neutralizer is poured"),
+			new LayeredKillObjective(
+				spawnList: new[] {
+					new KillSpec(MonsterId.Boss_Kurmis, 1),
+					new KillSpec(MonsterId.Rafflesia_Green, 2, BuffId.EliteMonsterBuff),
+				},
+				resetIdent: "clearWell",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_orchard_34_3.Quest1005.BaronSpawned");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_orchard_34_3.Quest1005.BaronSpawned");
-	}
-}
-
-// Quest 1006 CLASS: Barha Crossroads
-//-----------------------------------------------------------------------------
-
-public class BarhaCrossroadsQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_orchard_34_3", 1006);
-		SetName(L("Barha Crossroads"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Clear Siaulav Archers and Flying Flogs from the Barha Crossroads so the caravans between forests can roll again."));
-		SetLocation("f_orchard_34_3");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Pathfinder] Bram"), "f_orchard_34_3");
-
-		AddObjective("killArchers", L("Kill Siaulav Archers from the Crossroads"),
-			new KillObjective(12, new[] { MonsterId.Siaulav_Bow_Orange }));
-
-		AddObjective("killFrogs", L("Kill Flying Flogs from the Crossroads"),
-			new KillObjective(12, new[] { MonsterId.Flying_Flog_White }));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv3 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Normal HP Potion
-		AddReward(new ItemReward(640007, 3)); // Normal SP Potion
-		AddReward(new ItemReward(512207, 1)); // Hasta Plate Boots
+		AddReward(new ExpReward(60000, 40000));
+		AddReward(new SilverReward(50000));
+		AddReward(new ItemReward(583115, 1)); // Rupesciu Necklace
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 }

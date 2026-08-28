@@ -1,58 +1,66 @@
 //--- Melia Script ----------------------------------------------------------
-// Pilgrim Road Quest NPCs
+// Rasvoy Lake Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for the Salvia pilgrim road, overrun by Minos and Lapasape.
+// The abbey's lakeside relay, where nothing has come down the Mavern road in
+// weeks and a Green Minos warband is sitting on the north shore cut.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FPilgrimroad413QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Clear the Road
-		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Pilgrim-Warden] Brone"), "f_pilgrimroad_41_3", -900, 500, 0, async dialog =>
+		// Quest 1001: The Orbs off the Supply Party
+		//---------------------------------------------------------------------
+		AddNpc(155126, L("[Monk] Stella"), "f_pilgrimroad_41_3", -723, 545, 279, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_3", 1001);
 
-			dialog.SetTitle(L("Brone"));
+			dialog.SetTitle(L("Stella"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Minos packs are choking the Salvia road and the pilgrims can't get through. Kill forty Green Minos and the caravan can move tonight."));
+				await dialog.Msg(L("{#666666}*She's kneeling at the water's edge with her ear tilted toward a small stone bowl, utterly still*{/}"));
+				await dialog.Msg(L("One moment - I was listening for a warmth that hasn't come. There, it's gone now, and so are you a stranger instead of a returning face. I have kept the lake relay for Mavern Abbey for 8 years. Everything that walks to the abbey stops here first and everything the abbey sends down passes through my hands."));
+				await dialog.Msg(L("3 supply parties are overdue and the Green Minos on the abbey road are carrying the relay orbs from the last one. Kill 25 of them and bring me 6 orbs back."));
 
-				var response = await dialog.Select(L("Will you open the road for the caravan?"),
-					Option(L("I'll kill"), "help"),
-					Option(L("Caravan?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you go up the abbey road?"),
+					Option(L("I'll recover 6 orbs"), "help"),
+					Option(L("What is a relay orb for?"), "info"),
+					Option(L("3 parties is a search, not an errand"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Forty of them. The road'll open up bit by bit."));
+						await dialog.Msg(L("They hang them off the belt because they're warm. Follow the road up from the water and you'll be walking through the warband inside 200 paces."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Grain wagons, relic boxes, folks on foot - all stopped for a week now."));
+						await dialog.Msg(L("It holds a name. When a party leaves the abbey the orbs are keyed to who is in it, and when the party arrives the orbs go cold."));
+						await dialog.Msg(L("All 6 of the ones I can hear from here are still warm, which is the part I have not written down and do not intend to."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Pilgrims will keep waiting, then."));
+						await dialog.Msg(L("It would be, if there were anyone to search. There is a boatman who won't go north and 4 pilgrims stranded on the far shore, and there is me."));
 						break;
 				}
 			}
@@ -60,497 +68,341 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killMinos", out var killObj)) return;
+				if (!quest.TryGetProgress("collectOrbs", out var itemObj)) return;
 
-				if (killObj.Done)
+				if (killObj.Done && itemObj.Done)
 				{
-					await dialog.Msg(L("Road's walkable. The caravan rolls at dawn."));
+					await dialog.Msg(L("{#666666}*She lays the orbs out in a row on the stone and holds a hand flat above each one*{/}"));
+					await dialog.Msg(L("6 warm. I'll send the names up to the abbey tonight and the abbey will do what abbeys do, which is send 4 more people down the same road."));
+					await dialog.Msg(L("Take the relay purse. It exists to pay boatmen and I have not been able to pay one to go anywhere useful in a month."));
+
 					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("The road's quieter. The orbs will be on the ones you've already put down - go back over the ground rather than pushing further up."));
 				}
 				else
 				{
-					await dialog.Msg(L("Keep killing."));
+					await dialog.Msg(L("Still too many on the road. Work it from the water upward, not from the top down."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First wagon got through. The pilgrims were blessing your name."));
+				await dialog.Msg(L("6 names went up and 6 lamps were lit for them at the abbey. I could see them from here for the first time in weeks, and I sat on this stone and watched until they went out."));
 			}
 		});
 
-		// Quest 2: Bow-Minos Quivers
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Road-Marshal] Ysanne"), "f_pilgrimroad_41_3", 200, 100, 0, async dialog =>
+		// Quest 1002: The East Shore Is Stripped
+		//---------------------------------------------------------------------
+		AddNpc(152064, L("[Weary Pilgrim] Danute"), "f_pilgrimroad_41_3", 962, 110, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_3", 1002);
 
-			dialog.SetTitle(L("Ysanne"));
+			dialog.SetTitle(L("Danute"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Bow-Minos pick off pilgrims from the ridges. Kill twenty-five and bring me eight quivers for the militia armoury."));
+				await dialog.Msg(L("{#666666}*She's sitting with her knees drawn up, watching the far shore like it might move closer if she stares hard enough*{/}"));
+				await dialog.Msg(L("You came from the water side? Then maybe you're the first useful thing to wash up here in a week. 12 days on the wrong shore. There are 5 of us, the boatman won't cross at night, and 2 of my party have been drinking lake water since the flasks ran out."));
+				await dialog.Msg(L("The herb that settles it grows all along this shore and the Brown Lapasape Mages have stripped every stand of it and are carrying it around in bundles. Get me 10 of them."));
 
-				var response = await dialog.Select(L("Will you bring me the quivers?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Ridges?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you get the herb?"),
+					Option(L("I'll bring you 10 bundles"), "help"),
+					Option(L("Why are they collecting it?"), "info"),
+					Option(L("Boil the water instead"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Eight quivers. Try to keep them intact."));
+						await dialog.Msg(L("They keep the bundles dry, so they hold them up when they wade. That's the moment - they're slow and they won't drop them."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("They're on the north and east ridges, shooting from cover. Close the distance fast."));
+						await dialog.Msg(L("I've watched them for 12 days and they aren't eating it. They carry it east and come back without it, and then they go and get more."));
+						await dialog.Msg(L("Something east of this shore wants a great deal of a plant that only settles a stomach, and I have stopped trying to make that make sense."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Pilgrims will keep getting picked off, then."));
+						await dialog.Msg(L("With what? We have 1 pot, and the last time we lit a fire on this shore we had Lapasape in the camp inside an hour."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killBows", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherQuivers", out var qObj)) return;
+				if (!quest.TryGetProgress("collectHerb", out var itemObj)) return;
 
-				if (killObj.Done && qObj.Done)
+				if (itemObj.Done)
 				{
-					await dialog.Msg(L("Eight quivers. The militia scouts can arm up tonight."));
-					character.Inventory.Remove(650251, character.Inventory.CountItem(650251), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*She breaks a stem, smells the cut, and starts sorting the bundles without waiting*{/}"));
+					await dialog.Msg(L("All 10 still green. That's both of them dosed for 5 days and enough over for whoever gets sick next, and someone will."));
+					await dialog.Msg(L("Take this. It's the offering I've carried since Orsha and I am not going to reach the abbey with it anyway."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("Not enough. Try further up the shore where the reeds thicken - that's where they're working now."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The scouts clean the ridges every morning now."));
+				await dialog.Msg(L("Both are keeping food down. One of them walked to the water and back on her own this morning, which 12 days ago I would not have counted as news."));
 			}
 		});
 
-		// Quest 3: Lapasape Grimoires
-		//-------------------------------------------------------------------------
-		AddNpc(153142, L("[Cantor] Ilse"), "f_pilgrimroad_41_3", -1000, -300, 0, async dialog =>
+		// Quest 1003: The West Shore Path
+		//---------------------------------------------------------------------
+		AddNpc(156110, L("[Boatman] Row"), "f_pilgrimroad_41_3", -737, 378, 8, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_3", 1003);
 
-			dialog.SetTitle(L("Ilse"));
+			dialog.SetTitle(L("Row"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("The Brown Lapasape Mages have hexed the pilgrim wells. Kill thirty and bring me six grimoires for the shrine."));
+				await dialog.Msg(L("{#666666}*He's bailing an empty boat that clearly doesn't need bailing, just to have something to do with his hands*{/}"));
+				await dialog.Msg(L("Don't mind me, habit from the navy days. You waiting on a crossing, or just wandering? Either way, sit - 26 years on salt water and 4 on this lake, and I'll tell you the lake is worse. On salt water the thing that wants you is in the water."));
+				await dialog.Msg(L("Green Minos Archers have the west shore path, and that path is how my passengers get down to the boat. Kill 25 of them and I can load in daylight like a man with a trade."));
 
-				var response = await dialog.Select(L("Will you bring me the grimoires?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Wells?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you clear the shore path?"),
+					Option(L("I'll kill 25 Minos Archers"), "help"),
+					Option(L("Why won't you cross at night?"), "info"),
+					Option(L("Move your landing"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Whatever you do, don't read the margins."));
+						await dialog.Msg(L("They shoot down the path, not across it. Get off the path into the scrub and they have to come to you, and a Minos coming to you is a much simpler animal."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Pilgrims drink the water and get sick. The grimoires let the shrine trace the hex and break it."));
+						await dialog.Msg(L("Because they wade. In the dark you don't see them wade and the first you know is the boat sitting 3 inches lower than it should."));
+						await dialog.Msg(L("I've been boarded twice in my life. Once by the Kingdom navy and once on this lake, and the navy was the polite one."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("The wells stay poisoned, then."));
+						await dialog.Msg(L("There's 1 shelf on this whole west shore you can bring a loaded boat onto. I know, because I spent a fortnight looking for a second."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killMages", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherGrimoires", out var gObj)) return;
+				if (!quest.TryGetProgress("killArchers", out var killObj)) return;
 
-				if (killObj.Done && gObj.Done)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("Six grimoires. The shrine should break the hex by morning prayers."));
-					character.Inventory.Remove(650252, character.Inventory.CountItem(650252), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("Walked the path down at noon carrying a barrel on my shoulder and nothing put a shaft in it. First time this year."));
+					await dialog.Msg(L("Here's your fare back and then some. And if you want crossing, you get crossing, and you don't pay - that's the arrangement now."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("Still shooting down the path. Work the upper end where the scrub comes in close, they've no lane there."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Two wells cleansed so far. Four more to go."));
+				await dialog.Msg(L("Took 5 across yesterday and 5 back, in daylight, with the boat sitting where it ought to. I have started whistling again and the monk has noticed."));
 			}
 		});
 
-		// Quest 4: Crystal Breaking
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Road-Mason] Caelum"), "f_pilgrimroad_41_3", 800, 800, 0, async dialog =>
+		// Quest 1004: Three Lamps Unlit
+		//---------------------------------------------------------------------
+		AddNpc(155035, L("[Abbey Courier] Nerijus"), "f_pilgrimroad_41_3", 850, 127, 27, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_3", 1004);
 
-			dialog.SetTitle(L("Caelum"));
+			dialog.SetTitle(L("Nerijus"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A road-mason inspecting a freshly cracked flagstone*{/}"));
-				await dialog.Msg(L("Twenty years I've been laying stones for the Salvia pilgrimage. Twenty years of frost and cart-wheels, and the road held up fine. Then last spring the rootcrystals started pushing up through the bedrock."));
-				await dialog.Msg(L("Every morning now I find another flagstone split. My crew can re-lay one a day, but the crystals crack three. The math doesn't favour us."));
+				await dialog.Msg(L("{#666666}*He's pacing a short line of shore, satchel clutched to his chest, glancing at the water every few steps*{/}"));
+				await dialog.Msg(L("You're not the boatman - shame, but talk to me anyway. I carry for the abbey and I am on the wrong side of a lake with a sealed satchel, which is the single most useless thing a courier can be."));
+				await dialog.Msg(L("The abbey signals across by lamp. 3 signal stones on this shore, all 3 dark, and until one lights the far side thinks nobody is here. Go to all 3 and see what's wrong with them."));
 
-				var response = await dialog.Select(L("Break twenty Rootcrystals along the road, and walk the four chalk-marked splits so I know where to start re-laying. Will you help?"),
-					Option(L("I'll break the crystals and walk the splits"), "help"),
-					Option(L("Why not just patch the cracks?"), "info"),
-					Option(L("That's mason work, not mine"), "leave")
+				var response = await dialog.Select(L("Will you walk the signal stones?"),
+					Option(L("I'll check all 3 stones"), "help"),
+					Option(L("Can't you just shout?"), "info"),
+					Option(L("Give me the satchel, I'll walk it"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He gives you a chalk-stub and a heavy wedge-iron*{/}"));
-						await dialog.Msg(L("The crystals shatter sharp - they'll cut through boot-leather if you're not careful. Strike low and step back."));
-						await dialog.Msg(L("Four chalk-crosses mark the worst splits: east bend, south crook, north verge, west arc. Mark a wedge over each cross. That'll tell my crew where to start re-laying."));
+						await dialog.Msg(L("Look at the bowl and the wick channel both. A stone that won't light and a stone that has been made not to light look nothing alike up close."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Patching cracks while the crystals are still growing is pointless. The crystal pushes the stone up from below, and the patch pops loose by the next thaw."));
-						await dialog.Msg(L("You have to break the crystal at the source, then re-lay clean. That's the only way the road outlasts me."));
+						await dialog.Msg(L("Across 2 miles of open water into the wind. The stones exist because shouting was tried, and there is a monk buried at Ouaas who is the reason it stopped being tried."));
+						await dialog.Msg(L("The lamps are also how the abbey counts who is still on the road. 3 dark stones reads, up there, as nobody left alive on this shore."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then the road falls apart, and pilgrims take the old shepherd-path through Lapasape country. Six of them didn't come back last year."));
+						await dialog.Msg(L("It's sealed to my hand. If you open it the wax records that it was opened, and then it isn't a message any more, it's a rumour."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("breakCrystals", out var killObj)) return;
-				if (!quest.TryGetProgress("surveySplits", out var surveyObj)) return;
+				if (!quest.TryGetProgress("checkStones", out var checkObj)) return;
 
-				if (killObj.Done && surveyObj.Done)
+				if (checkObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He checks your chalk-marks against his crew-roster*{/}"));
-					await dialog.Msg(L("Twenty crystals broken, four splits chalked. My crew starts at the east bend at first light - that's the worst of them, the one I lose sleep over."));
-					await dialog.Msg(L("Take this. Mason's purse, with a bit extra on top. You bought us a whole season."));
+					await dialog.Msg(L("{#666666}*He listens to all 3 accounts without interrupting, then swears quietly and precisely*{/}"));
+					await dialog.Msg(L("Wick channels packed with lake clay. All 3. Wind doesn't pack clay into a channel from underneath."));
+					await dialog.Msg(L("Take the courier's road money. I'm going to clear those channels tonight and light all 3 at once, and whoever packed them can watch me do it."));
+
 					character.Quests.Complete(questId);
-				}
-				else if (!killObj.Done)
-				{
-					await dialog.Msg(L("Break the crystals first. No use chalking splits while fresh ones are still pushing up."));
 				}
 				else
 				{
-					await dialog.Msg(L("Crystals are down. I could feel the bedrock settle from here. Now go mark each of the four chalk-crosses with a wedge-mark."));
+					await dialog.Msg(L("Not all 3 yet. They're spread along the shore between the reeds and the north point - you'll not miss a stone, they're chest high."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("All four splits got relaid clean. Heard a pilgrim humming a hymn on the east bend last evening - first time in months."));
+				await dialog.Msg(L("3 lamps burning by dark and an answering lamp off the abbey wall inside the hour. My satchel goes up with the next crossing and I get to stop being useless."));
 			}
 		});
 
-		// Cracked flagstone survey points for Quest 1004
-		//-------------------------------------------------------------------------
-		void AddCrackedFlagstone(int splitNumber, int x, int z, int direction)
+		// Quest 1004 collection points - the abbey signal stones
+		//---------------------------------------------------------------------
+		void AddSignalStone(int stoneNumber, string observation, int x, int z, int direction)
 		{
-			AddNpc(47190, L("Cracked Flagstone"), "f_pilgrimroad_41_3", x, z, direction, async dialog =>
+			AddNpc(47190, L("Abbey Signal Stone"), "f_pilgrimroad_41_3", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_pilgrimroad_41_3", 1004);
+				var variableKey = $"Laima.Quests.f_pilgrimroad_41_3.Quest1004.Stone{stoneNumber}";
+				var counterKey = "Laima.Quests.f_pilgrimroad_41_3.Quest1004.StonesChecked";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A cracked flagstone, fractured by a rootcrystal pushing up from below*{/}"));
+					await dialog.Msg(L("{#666666}*A chest-high shore stone with a lamp bowl cut into the top*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_pilgrimroad_41_3.Quest1004.Split{splitNumber}";
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*Already chalked and noted for the mason crew*{/}"));
+					await dialog.Msg(L("{#666666}*You already looked this one over*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Surveying split..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(
+					L("Looking over the signal stone..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
+				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_pilgrimroad_41_3.Quest1004.SplitsSurveyed", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_pilgrimroad_41_3.Quest1004.SplitsSurveyed", count);
-					character.ServerMessage(LF("Splits surveyed: {0}/4", count));
 
-					if (count >= 4)
-						character.ServerMessage(L("{#FFD700}All splits surveyed! Return to Road-Mason Caelum.{/}"));
+					var checkedCount = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, checkedCount);
+
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Signal stones checked: {0}/3", checkedCount));
+
+					if (checkedCount >= 3)
+						character.ServerMessage(L("{#FFD700}All 3 stones checked. Return to Nerijus.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("Survey interrupted."));
+					character.ServerMessage(L("You leave the stone unchecked."));
 				}
 			});
 		}
 
-		AddCrackedFlagstone(1, -1020, 443, 0);
-		AddCrackedFlagstone(2, -984, -393, 90);
-		AddCrackedFlagstone(3, 248, -160, 180);
-		AddCrackedFlagstone(4, 795, 316, 270);
+		AddSignalStone(1,
+			L("First Stone: dry oil in the bowl and a wick channel packed solid with grey lake clay."), 780, 426, 0);
+		AddSignalStone(2,
+			L("Second Stone: the same clay, packed from underneath, and pressed in with something narrower than a finger."), 989, 1036, 0);
+		AddSignalStone(3,
+			L("Third Stone: clay again, and 4 shallow scrapes on the bowl rim where a hand braced to reach in."), 1179, 429, 258);
 
-		// Quest 5: The Minos Warchief
-		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Doran"), "f_pilgrimroad_41_3", -800, -900, 0, async dialog =>
+		// Quest 1005: What the Mirror Shows
+		//---------------------------------------------------------------------
+		AddNpc(155126, L("[Monk] Stella"), "f_pilgrimroad_41_3", 1001, 1197, 275, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_3", 1005);
-			var warchiefSpawnedKey = "Laima.Quests.f_pilgrimroad_41_3.Quest1005.WarchiefSpawned";
 
-			dialog.SetTitle(L("Doran"));
+			dialog.SetTitle(L("Stella"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A bounty hunter cleaning his crossbow with an oiled rag*{/}"));
-				await dialog.Msg(L("There's a warchief running the Salvia Minos. Big one, scarred down the snout. He's drilled discipline into his pack so they hunt in groups of five instead of mobs."));
-				await dialog.Msg(L("Salvia put a bounty on him after he ambushed a relic-cart and dragged the cantor into the reeds. The cantor's bones came back. The relic didn't."));
+				if (!character.Quests.HasCompleted(new QuestId("f_pilgrimroad_41_3", 1001)))
+				{
+					await dialog.Msg(L("Bring me the orbs off the supply party first. I'll not go to the north cut guessing at how many are already dead up there."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Scout the three pack-banners his sub-clans stake along the road, then kill 12 Green Minos to bait him out and finish him. Pay's good. Will you take it?"),
-					Option(L("I'll take the bounty"), "help"),
-					Option(L("Why scout the banners first?"), "info"),
-					Option(L("That's not my fight"), "leave")
+				await dialog.Msg(L("{#666666}*She's holding a small hand mirror up to the lamplight, turning it slowly, and doesn't look away from it as you approach*{/}"));
+				await dialog.Msg(L("Good, you're back - I need eyes I trust for this one. A letter came up from Salvia Forest. Friar Clark's altar was emptied by widlings and he wanted to know whether anything like it had happened here. Something like it has been happening here for a month."));
+				await dialog.Msg(L("The warband holds the north cut where the road turns for Ouaas, and 2 of them do nothing but stand over a standard. Kill 20 Green Minos to open the cut, then take the standard down. Carry my Mirror of Truth while you do it."));
+
+				var response = await dialog.Select(L("Will you take the north cut?"),
+					Option(L("I'll break the warband's standard"), "help"),
+					Option(L("What does the mirror do?"), "info"),
+					Option(L("Send to the abbey for soldiers"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He points down the road*{/}"));
-						await dialog.Msg(L("Three banners staked at the north verge, the south crook, and the east bend. Read the dye-marks on each - that tells me which sub-clans still answer to him."));
-						await dialog.Msg(L("Then 12 Green Minos. His pride'll drag him out by the tenth or so. When he comes, fight him on open ground - he's stronger in the reeds."));
+						character.Inventory.Add(666107, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("Keep it out of the satchel and facing the fight. It shows a thing as it is, and a thing as it is has to be looked at while it's still standing up."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("The banners tell us how deep his hold runs. If only one clan answers, killing him fractures the rest. If all three answer, the next chief is already lined up and we've only bought a month."));
-						await dialog.Msg(L("Salvia wants the banners catalogued before the kill. The scribes draw a paycheck too."));
+						await dialog.Msg(L("Every relay monk is issued one. It shows what a thing actually is rather than what it is doing, and it is worth nothing at all in a quiet year."));
+						await dialog.Msg(L("Mine has been blank for 8 years. It stopped being blank the week the first supply party failed to arrive."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then the warchief eats another cantor and Salvia raises the bounty. I'll be here if you change your mind."));
+						await dialog.Msg(L("The abbey has 40 people in it and 31 of them are over 60. That is why there is a monk keeping a relay hut on a lake instead of a garrison."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("scoutBanners", out var sObj)) return;
-				if (!quest.TryGetProgress("killPack", out var pObj)) return;
-				if (!quest.TryGetProgress("killWarchief", out var wObj)) return;
+				if (!quest.TryGetProgress("openCut", out var cutObj)) return;
+				if (!quest.TryGetProgress("takeStandard", out var standardObj)) return;
 
-				if (sObj.Done && pObj.Done && wObj.Done)
+				if (cutObj.Done && standardObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He hands you a heavy coin pouch*{/}"));
-					await dialog.Msg(L("Warchief's down, banners catalogued. Salvia's scribes can sleep easy, and the packs scatter by morning."));
-					await dialog.Msg(L("Full bounty, plus a stipend for the banner-work. Drink the first cup for the cantor."));
-					character.Variables.Perm.Remove(warchiefSpawnedKey);
+					await dialog.Msg(L("{#666666}*She takes the mirror back and turns it over twice before she says anything*{/}"));
+					await dialog.Msg(L("The warband didn't come out of this forest. It came down the Ouaas road, and what the mirror caught behind it was not a Minos and was not standing on the ground."));
+					await dialog.Msg(L("Take the blade off the standard. It came out of the abbey armoury 40 years ago and it should not have been on that road. I'm writing to Ouaas Memorial tonight - Monk Matas keeps the ground up there, and I would like him to walk his ring and count."));
+
 					character.Quests.Complete(questId);
 				}
-				else if (pObj.Done && !wObj.Done)
+				else if (cutObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(warchiefSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(warchiefSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Minos_Green, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("Here he comes!"));
-							character.ServerMessage(L("{#FF9966}The Minos Warchief storms the pilgrim road!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("Go find him."));
-					}
-				}
-				else if (!sObj.Done)
-				{
-					await dialog.Msg(L("Banners first. Three of them - north verge, south crook, east bend. Read the dye, mark the colours, then we go for the kill."));
+					await dialog.Msg(L("The cut's open. The standard is still up and the 2 who tend it will not leave it, so it has to be done at the standard itself."));
 				}
 				else
 				{
-					await dialog.Msg(L("Banners are read. Now kill twelve of the pack - he won't show his face for anything less."));
+					await dialog.Msg(L("The cut is still packed with them. Open it first - you don't want the warband behind you when the standard comes down."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The packs are leaderless and the road's holding up. The cantor's family came by last week to thank Salvia for the kill - I sent them to thank you instead."));
-			}
-		});
-
-		// Warchief banner scout points for Quest 1005
-		//-------------------------------------------------------------------------
-		void AddWarchiefBanner(int bannerNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Warchief Pack-Banner"), "f_pilgrimroad_41_3", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_pilgrimroad_41_3", 1005);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A staked Minos pack-banner, dyed in pack colours*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_pilgrimroad_41_3.Quest1005.Banner{bannerNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already noted in your scout tally*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Scouting banner..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_pilgrimroad_41_3.Quest1005.BannersScouted", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_pilgrimroad_41_3.Quest1005.BannersScouted", count);
-					character.ServerMessage(LF("Banners scouted: {0}/3", count));
-
-					if (count >= 3)
-						character.ServerMessage(L("{#FFD700}All banners scouted! Now bait out the Warchief.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Scouting interrupted."));
-				}
-			});
-		}
-
-		AddWarchiefBanner(1, -330, 1012, 0);
-		AddWarchiefBanner(2, -1112, -1029, 90);
-		AddWarchiefBanner(3, 248, -160, 180);
-
-		// Quest 6: Pilgrim Road Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Militia-Captain] Marek"), "f_pilgrimroad_41_3", 1000, 900, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_41_3", 1006);
-
-			dialog.SetTitle(L("Marek"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A militia-captain going over a sweep-roster with a young scribe*{/}"));
-				await dialog.Msg(L("The Salvia pilgrim road needs a real sweep every fortnight or the packs reclaim it within a week. We don't have the manpower. The militia's only forty strong, and the road is fourteen leagues."));
-				await dialog.Msg(L("So we hire it out - per-head bounty, posted at every waystone. The catch is the cantor's ledger. Pelke's pilgrimage tax depends on the count, so it has to be logged or it never happened."));
-
-				var response = await dialog.Select(L("Kill 12 Green Minos, 12 Bow-Minos, and 12 Brown Lapasape Mages, then chalk your tally on the slate at the wayside Pilgrim Shrine. Standard rate. Take it?"),
-					Option(L("I'll take the sweep"), "help"),
-					Option(L("Why does the count need logging?"), "info"),
-					Option(L("Find someone else"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She gives you a tally-marker*{/}"));
-						await dialog.Msg(L("Twelve of each, no shortcuts. The shrine slate is on the south bend, up at lintel height - you can't miss it. Chalk three rows of four, then sign your initials underneath."));
-						await dialog.Msg(L("If a cantor questions the tally, send them to me. I countersign at sundown."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Pelke charges a per-pilgrim safety levy on the Salvia route. The levy goes up with how many monsters we cleared that fortnight - more kills, more levy, more pilgrims making it through alive."));
-						await dialog.Msg(L("Without the shrine-log, the cantors assume zero kills and the levy collapses. Then we don't get paid, the militia goes home, and the road belongs to the Minos again."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Road stays contested, the levy lapses, and the militia goes hungry. I'll be here if you reconsider."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killMinos", out var mObj)) return;
-				if (!quest.TryGetProgress("killBows", out var bObj)) return;
-				if (!quest.TryGetProgress("killMages", out var gObj)) return;
-				if (!quest.TryGetProgress("logTally", out var lObj)) return;
-
-				if (mObj.Done && bObj.Done && gObj.Done && lObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*She countersigns the slate-rubbing and hands you a heavy purse*{/}"));
-					await dialog.Msg(L("Tally's logged, levy holds. Full Salvia coin, with the militia's regards."));
-					await dialog.Msg(L("The cantors will read your initials at the next pilgrimage gathering. Drink to that."));
-					character.Quests.Complete(questId);
-				}
-				else if (mObj.Done && bObj.Done && gObj.Done)
-				{
-					await dialog.Msg(L("Sweep's complete. Now go mark the shrine-slate on the south bend - three rows of four, your initials underneath."));
-				}
-				else
-				{
-					await dialog.Msg(L("Twelve Green Minos, twelve Bow-Minos, twelve Lapasape Mages. Keep at it - the shrine's waiting."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The militia patrols the road every hour now, paid by your sweep's levy. The cantors mention you in the dawn invocation - they don't say your name, just call you 'the swordhand who held the road.'"));
-			}
-		});
-
-		// Pilgrim Shrine for Quest 1006 tally log
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Wayside Pilgrim Shrine"), "f_pilgrimroad_41_3", -800, -900, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_41_3", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A wayside shrine to Pelke, slate lintel chalked with old pilgrim tallies*{/}"));
-				return;
-			}
-
-			var loggedKey = "Laima.Quests.f_pilgrimroad_41_3.Quest1006.TallyLogged";
-			if (character.Variables.Perm.GetBool(loggedKey, false))
-			{
-				await dialog.Msg(L("{#666666}*Your tally is already chalked on the slate*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killMinos", out var mObj)) return;
-			if (!quest.TryGetProgress("killBows", out var bObj)) return;
-			if (!quest.TryGetProgress("killMages", out var gObj)) return;
-
-			if (!(mObj.Done && bObj.Done && gObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The slate is ready, but you haven't finished the sweep yet*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Chalking tally..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(loggedKey, true);
-				character.ServerMessage(L("{#FFD700}Tally logged on the shrine lintel. Return to Militia-Captain Marek.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Logging interrupted."));
+				await dialog.Msg(L("A supply party came down the road on its own feet this week and the orbs went cold in my hand as they walked in. 8 years I've waited to feel that and it took 4 seconds."));
 			}
 		});
 	}
@@ -560,243 +412,222 @@ public class FPilgrimroad413QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class FPilgrimroad413Quest1001 : QuestScript
+// Quest 1001 CLASS: The Orbs off the Supply Party
+//-----------------------------------------------------------------------------
+
+public class TheOrbsOffTheSupplyPartyQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_3", 1001);
-		SetName(L("Clear the Road"));
+		SetName(L("The Orbs off the Supply Party"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Green Minos choking the Salvia pilgrim road."));
+		SetDescription(L("3 supply parties out of Mavern Abbey are overdue, and the Green Minos holding the abbey road are wearing the last party's relay orbs on their belts. Kill them and bring the orbs back to the lakeside relay."));
 		SetLocation("f_pilgrimroad_41_3");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Pilgrim-Warden] Brone"), "f_pilgrimroad_41_3");
+		AddQuestGiver(L("[Monk] Stella"), "f_pilgrimroad_41_3");
 
-		AddObjective("killMinos", L("Kill Green Minos"),
-			new KillObjective(40, new[] { MonsterId.Minos_Green }));
+		AddObjective("killMinos", L("Kill Green Minos on the abbey road"),
+			new KillObjective(25, new[] { MonsterId.Minos_Green }));
 
-		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(5200));
-		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
+		AddObjective("collectOrbs", L("Recover Maven Abbey Orbs"),
+			new CollectItemObjective(666114, 6));
+
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(666114, 0.35f, MonsterId.Minos_Green);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(666114, character.Inventory.CountItem(666114), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(666114, character.Inventory.CountItem(666114), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FPilgrimroad413Quest1002 : QuestScript
+// Quest 1002 CLASS: The East Shore Is Stripped
+//-----------------------------------------------------------------------------
+
+public class TheEastShoreIsStrippedQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_3", 1002);
-		SetName(L("Bow-Minos Quivers"));
+		SetName(L("The East Shore Is Stripped"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Bow-Minos and bring quivers for the militia armoury."));
+		SetDescription(L("5 pilgrims have been stranded on the far shore for 12 days and 2 of them are drinking lake water. The herb that settles it has been stripped off the whole shore by Brown Lapasape Mages, who are carrying it east in bundles."));
 		SetLocation("f_pilgrimroad_41_3");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Road-Marshal] Ysanne"), "f_pilgrimroad_41_3");
+		AddQuestGiver(L("[Weary Pilgrim] Danute"), "f_pilgrimroad_41_3");
 
-		AddObjective("killBows", L("Kill Bow-Minos"),
-			new KillObjective(25, new[] { MonsterId.Minos_Bow_Green }));
-
-		AddObjective("gatherQuivers", L("Gather Bow-Minos quivers"),
-			new CollectItemObjective(650251, 8));
+		AddObjective("collectHerb", L("Take Herb of Restoration bundles off the Lapasape Mages"),
+			new CollectItemObjective(666116, 10));
 
 		AddReward(new ExpReward(6100, 4200));
 		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+
+		AddDrop(666116, 0.45f, MonsterId.Lapasape_Mage_Brown);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650251, character.Inventory.CountItem(650251), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666116, character.Inventory.CountItem(666116), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650251, character.Inventory.CountItem(650251), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666116, character.Inventory.CountItem(666116), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FPilgrimroad413Quest1003 : QuestScript
+// Quest 1003 CLASS: The West Shore Path
+//-----------------------------------------------------------------------------
+
+public class TheWestShorePathQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_3", 1003);
-		SetName(L("Hex-Grimoires"));
+		SetName(L("The West Shore Path"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Brown Lapasape Mages and bring hex-grimoires for the shrine."));
+		SetDescription(L("The only path down to the lake's one loading shelf is held by Green Minos Archers, and the boatman cannot bring passengers to his boat in daylight. Kill 25 of them."));
 		SetLocation("f_pilgrimroad_41_3");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Cantor] Ilse"), "f_pilgrimroad_41_3");
+		AddQuestGiver(L("[Boatman] Row"), "f_pilgrimroad_41_3");
 
-		AddObjective("killMages", L("Kill Brown Lapasape Mages"),
-			new KillObjective(30, new[] { MonsterId.Lapasape_Mage_Brown }));
+		AddObjective("killArchers", L("Kill Green Minos Archers on the west shore path"),
+			new KillObjective(25, new[] { MonsterId.Minos_Bow_Green }));
 
-		AddObjective("gatherGrimoires", L("Gather hex-grimoires"),
-			new CollectItemObjective(650252, 6));
-
-		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650252, character.Inventory.CountItem(650252), InventoryItemRemoveMsg.Destroyed);
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650252, character.Inventory.CountItem(650252), InventoryItemRemoveMsg.Destroyed);
+		AddReward(new ExpReward(3900, 2700));
+		AddReward(new SilverReward(5200));
+		AddReward(new ItemReward(640084, 1)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 }
 
-public class FPilgrimroad413Quest1004 : QuestScript
+// Quest 1004 CLASS: Three Lamps Unlit
+//-----------------------------------------------------------------------------
+
+public class ThreeLampsUnlitQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_3", 1004);
-		SetName(L("Crystal Breaking"));
+		SetName(L("Three Lamps Unlit"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Break Rootcrystals splitting the pilgrim road."));
+		SetDescription(L("Mavern Abbey signals across the lake by lamp, and all 3 signal stones on this shore are dark - which the abbey reads as nobody left alive on it. Walk all 3 and find out what is wrong with them."));
 		SetLocation("f_pilgrimroad_41_3");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Road-Mason] Caelum"), "f_pilgrimroad_41_3");
+		AddQuestGiver(L("[Abbey Courier] Nerijus"), "f_pilgrimroad_41_3");
 
-		AddObjective("breakCrystals", L("Break Rootcrystals"),
-			new KillObjective(20, new[] { MonsterId.Rootcrystal_01 }));
+		AddObjective("checkStones", L("Check all 3 abbey signal stones"),
+			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_3.Quest1004.StonesChecked", 3, true));
 
-		AddObjective("surveySplits", L("Survey the four chalked flagstone splits"),
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_3.Quest1004.SplitsSurveyed", 4, true));
-
-		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(5200));
-		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1004.SplitsSurveyed");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_3.Quest1004.Split{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1004.StonesChecked");
+
+		for (var i = 1; i <= 3; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_3.Quest1004.Stone{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1004.SplitsSurveyed");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_3.Quest1004.Split{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1004.StonesChecked");
+
+		for (var i = 1; i <= 3; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_3.Quest1004.Stone{i}");
 	}
 }
 
-public class FPilgrimroad413Quest1005 : QuestScript
+// Quest 1005 CLASS: What the Mirror Shows
+//-----------------------------------------------------------------------------
+
+public class WhatTheMirrorShowsQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_3", 1005);
-		SetName(L("The Minos Warchief"));
+		SetName(L("What the Mirror Shows"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Green Minos to bait the warchief, then end him."));
+		SetDescription(L("The Green Minos warband holds the north cut where the abbey road turns for Ouaas, and 2 of them do nothing but stand over a standard. Open the cut and take the standard down while carrying the relay monk's Mirror of Truth."));
 		SetLocation("f_pilgrimroad_41_3");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Doran"), "f_pilgrimroad_41_3");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Monk] Stella"), "f_pilgrimroad_41_3");
 
-		AddObjective("scoutBanners", L("Scout the three Warchief pack-banners"),
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_3.Quest1005.BannersScouted", 3, true));
+		AddPrerequisite(new CompletedPrerequisite("f_pilgrimroad_41_3", 1001));
 
-		AddObjective("killPack", L("Kill Green Minos"),
-			new KillObjective(12, new[] { MonsterId.Minos_Green }));
+		AddObjective("openCut", L("Kill Green Minos holding the north cut"),
+			new KillObjective(20, new[] { MonsterId.Minos_Green }));
 
-		AddObjective("killWarchief", L("Defeat the Minos Warchief"),
-			new KillObjective(1, new[] { MonsterId.Minos_Green }));
+		AddObjective("takeStandard", L("Take down the warband's standard"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Minos_Green, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Minos_Bow_Green, 3),
+				},
+				resetIdent: "openCut",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(9000));
-		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ExpReward(16000, 11000));
+		AddReward(new SilverReward(20000));
+		AddReward(new ItemReward(103114, 1)); // Holy Blade
+		AddReward(new ItemReward(640084, 3)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1005.BannersScouted");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_3.Quest1005.Banner{i}");
+		character.Inventory.Remove(666107, character.Inventory.CountItem(666107), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1005.BannersScouted");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_3.Quest1005.Banner{i}");
-	}
-}
-
-public class FPilgrimroad413Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_pilgrimroad_41_3", 1006);
-		SetName(L("Pilgrim Road Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of Green Minos, Bow-Minos, and Brown Lapasape Mages."));
-		SetLocation("f_pilgrimroad_41_3");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Militia-Captain] Marek"), "f_pilgrimroad_41_3");
-
-		AddObjective("killMinos", L("Kill Green Minos"),
-			new KillObjective(12, new[] { MonsterId.Minos_Green }));
-
-		AddObjective("killBows", L("Kill Bow-Minos"),
-			new KillObjective(12, new[] { MonsterId.Minos_Bow_Green }));
-
-		AddObjective("killMages", L("Kill Brown Lapasape Mages"),
-			new KillObjective(12, new[] { MonsterId.Lapasape_Mage_Brown }));
-
-		AddObjective("logTally", L("Log the tally at the wayside Pilgrim Shrine"),
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_3.Quest1006.TallyLogged", 1, true));
-
-		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(9000));
-		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1006.TallyLogged");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_3.Quest1006.TallyLogged");
+		character.Inventory.Remove(666107, character.Inventory.CountItem(666107), InventoryItemRemoveMsg.Destroyed);
 	}
 }

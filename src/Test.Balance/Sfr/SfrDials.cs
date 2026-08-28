@@ -557,6 +557,9 @@ namespace Melia.Test.Balance.Sfr
 			["Fletcher_BodkinPoint"] = 1.4f,
 			["Fletcher_CrossFire"] = 1.3f,
 			["Fletcher_Singijeon"] = 1.3f,
+
+			// Buffed due to race restrictions
+			["Priest_TurnUndead"] = 1.6f,
 		};
 
 		/// <summary>

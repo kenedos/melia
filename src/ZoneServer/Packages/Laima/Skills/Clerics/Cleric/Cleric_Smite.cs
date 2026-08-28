@@ -12,6 +12,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.SkillUseFunctions;
+using System.Linq;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 {
@@ -62,10 +63,13 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Cleric
 
 			await skill.Wait(aniTime);
 
-			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea)
+				.OrderBy(t => t.IsRaceType(RaceType.Velnias) ? 1 : 0)
+				.OrderBy(t => t.IsBuffActive(BuffId.Conviction_Debuff) ? 1 : 0)
+				.LimitBySDR(caster, skill);
 			var hits = new List<SkillHitInfo>();
 
-			foreach (var target in targets.LimitBySDR(caster, skill))
+			foreach (var target in targets)
 			{
 				SkillModifier modifier;
 

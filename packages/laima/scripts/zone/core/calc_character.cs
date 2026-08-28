@@ -1584,10 +1584,10 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var byStat = 0d;
 		if (!Feature.IsEnabled("NewINTFormula"))
-			byStat += statINT * 1.3f;
+			byStat += statINT * 0.25f;
 
 		if (!Feature.IsEnabled("NewSPRFormula"))
-			byStat += statSPR * 3.25f;
+			byStat += statSPR * 1.25f;
 		else
 			byStat += (statSPR) + (Math.Floor(statSPR / 10f) * (byLevel * 0.03f));
 

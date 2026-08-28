@@ -1,58 +1,66 @@
 //--- Melia Script ----------------------------------------------------------
-// Mesafasla Plateau Quest NPCs
+// Mesafasla - Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for the Mesafasla tableland, paired with Stogas.
+// Quest NPCs and content for f_tableland_28_1 map. A post with an
+// establishment for 40 doing a company's work with 9.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FTableland281QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Bunny Overrun
-		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Plateau-Warden] Stogas"), "f_tableland_28_1", 0, 0, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1001: Rations for Forty
+		// =====================================================================
+		// Quartermaster Rimgaile - feeding 9 off an establishment for 40
+		//---------------------------------------------------------------------
+		AddNpc(20141, L("[Quartermaster] Rimgaile"), "f_tableland_28_1", 719, -18, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_28_1", 1001);
 
-			dialog.SetTitle(L("Stogas"));
+			dialog.SetTitle(L("Rimgaile"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Green Repusbunnies strip the plateau grass to bare rock. Kill forty before the tableland starves."));
+				await dialog.Msg(L("{#666666}*A quartermaster is cutting a return sheet down the middle with a knife rather than crossing it out*{/}"));
+				await dialog.Msg(L("Oh, look. A new face — and not one of mine, so you get to leave when I'm done with you, lucky thing. Sit down, don't sit down, I don't care, just don't touch the sheet."));
+				await dialog.Msg(L("This post is on the books for forty. There are nine of us breathing. Roxona bills me for forty rations, I sign for forty rations, and the day I write '9' on this ledger is the day some clerk decides Mesafasla doesn't need to exist. So — kill 30 Green Lepusbunnies, and bring me 6 pelts off the Assassins. For the fiction, understand. Everything here is for the fiction."));
 
-				var response = await dialog.Select(L("Will you save the grass for us?"),
-					Option(L("I'll kill"), "help"),
-					Option(L("Grass?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Care to keep the fiction alive with me?"),
+					Option(L("I'll clear them and get the pelts"), "help"),
+					Option(L("What do you want pelts for?"), "info"),
+					Option(L("Write 9 on the sheet"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Forty. The warren's east of the crag."));
+						await dialog.Msg(L("The plain ones are everywhere, breeding like the paperwork does. Not dangerous — just endless. Work outward from the post and don't let a knot of them box you in."));
+						await dialog.Msg(L("The Assassins, west of here, are a different animal — six pelts, and I mean exactly six. Bring me seven and I'll assume you're skimming."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Thin soil up here. Once the grass goes, the wind takes the dirt."));
+						await dialog.Msg(L("Linings, obviously. Nine bodies, four greatcoats, and this shelf hits freezing by mid-month — do the arithmetic yourself."));
+						await dialog.Msg(L("I *could* requisition coats properly. Eleven weeks of paperwork, and it'd arrive sized for forty men, thirty-one of which would sit in a Roxona warehouse looking smug. So. Pelts. Much faster, and nobody official has to know."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Plateau bleeds."));
+						await dialog.Msg(L("Mm-hm. And then some clerk in Roxona sees '9' and decides that's not a post, that's a detachment, and detachments get folded into whoever's nearest. There is no whoever's nearest. We *are* the nearest."));
 						break;
 				}
 			}
@@ -60,497 +68,360 @@ public class FTableland281QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killBunnies", out var killObj)) return;
+				if (!quest.TryGetProgress("collectPelts", out var peltObj)) return;
 
-				if (killObj.Done)
+				if (killObj.Done && peltObj.Done)
 				{
-					await dialog.Msg(L("Herd's trimmed. Grass gets a season."));
+					await dialog.Msg(L("{#666666}*She lays the 6 pelts fur-side down and starts measuring them against a folded coat, muttering measurements to herself*{/}"));
+					await dialog.Msg(L("Five linings out of six pelts — and the sixth goes to Petras, because that boy stands on a cairn for four hours at a stretch and has never once asked me for a single thing. Someone should reward that kind of foolishness."));
+					await dialog.Msg(L("Here's your pay, out of the thirty-one rations I sign for and never draw. Cleanest coin on this post, and I'd rather it went to you than back to a Roxona warehouse."));
+
 					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Ground's thinner already, good. Six pelts off the Assassins in the west and I can start cutting linings."));
 				}
 				else
 				{
-					await dialog.Msg(L("Keep killing."));
+					await dialog.Msg(L("Thirty of the plain ones first, working outward. They won't kill you. They will simply never, ever stop arriving, which is somehow worse."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Seedlings sprouting on the east ridge already."));
+				await dialog.Msg(L("Nine linings finished, two spare — and Gomen refused his until every last one of us had one. Man's going to be the last person on this shelf to be warm, and he looks positively delighted about it."));
 			}
 		});
 
-		// Quest 2: Bow-Bunny Fletchings
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Fletcher] Vaidile"), "f_tableland_28_1", 800, 500, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1002: The Firebreak Nobody Ordered
+		// =====================================================================
+		// Sapper Vaitkus - cutting a break alone
+		//---------------------------------------------------------------------
+		AddNpc(20156, L("[Sapper] Vaitkus"), "f_tableland_28_1", 1260, -609, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_28_1", 1002);
 
-			dialog.SetTitle(L("Vaidile"));
+			dialog.SetTitle(L("Vaitkus"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Bow-Repusbunnies carry reed-fletchings the wind-hunters envy. Kill twenty, bring eight fletchings."));
+				await dialog.Msg(L("{#666666}*A sapper is dragging cut scrub into a windrow, humming tunelessly to himself, with a rake worn down to half a head*{/}"));
+				await dialog.Msg(L("Oh, HAH! A person! An actual person, walking, with a face! Come here, come here, you have to see this — nobody's stopped to talk to me since the second week of autumn, and I've started narrating my own work out loud, which is a bad sign, I'm told."));
+				await dialog.Msg(L("Firebreak. Across the whole east shelf, fourteen hundred paces of it, cut by yours truly, solo, over — well, since the second week of autumn, we've established that. What I don't have is anything to actually start the burn with! You'd think that'd be the easy part. Bring me 6 flints off the Red Saltisdaughter Magicians and let's finally set something on fire."));
 
-				var response = await dialog.Select(L("Will you bring me the fletchings?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Reed?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("So? Fancy helping a man commit some very controlled arson?"),
+					Option(L("I'll bring 6 flints"), "help"),
+					Option(L("Who ordered a firebreak?"), "info"),
+					Option(L("Burn it with a torch"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Don't crease them."));
+						await dialog.Msg(L("They carry them in a hip pouch and strike them one-handed — I've watched them do it forty times now and I still can't manage it, it's honestly a little humiliating."));
+						await dialog.Msg(L("Take them off the ones working alone! A Magician in a group will just set the grass alight around you and wait, and that's a much worse afternoon for everyone involved."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Plateau-reed fletches straighter than anything lowland. Wind shapes it."));
+						await dialog.Msg(L("Nobody! That's rather the beauty of it. If the east shelf goes up it runs downwind into Mesafasla in about forty minutes, and there are nine of us to fight it, so — somebody should probably do something, yes?"));
+						await dialog.Msg(L("I asked for a work party. Got told the establishment's forty and to draw the party from it. There is no party! So there's me, a rake, and fourteen hundred paces, and I have made my peace with it, mostly."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Arrows stay crooked."));
+						await dialog.Msg(L("Ah — no, no, a torch just burns what's in front of it. A struck flint in the wind burns the *line*, in the order I laid it. It's the difference between a firebreak and just... more fire. Bad fire. The kind I'm trying to prevent!"));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killArchers", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherFletchings", out var fObj)) return;
+				if (!quest.TryGetProgress("collectFlints", out var flintObj)) return;
 
-				if (killObj.Done && fObj.Done)
+				if (flintObj.Done)
 				{
-					await dialog.Msg(L("Eight good ones. Quiver's worth a week."));
-					character.Inventory.Remove(650266, character.Inventory.CountItem(650266), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He strikes one against the back of the rake head, gets a spark on the second try, and grins about it for far too long*{/}"));
+					await dialog.Msg(L("Six! Marvelous. I only need two — I'll keep the other four, because there's going to be a second autumn, and I'm under no illusion anyone else is cutting this break with me."));
+					await dialog.Msg(L("Here, out of the works allowance — meant for forty sappers, drawn by one, so it's easily the least suspicious money on this whole shelf."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("Six flints, off the Red Magicians — and only the ones working alone, remember!"));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First quiver flies true. Crag-hunters owe me."));
+				await dialog.Msg(L("It's burned and it HELD! Fourteen hundred paces of bare ground, and I spent the whole night on the windward side with a wet sack just in case — but look at it! The shelf can catch now and Mesafasla's still standing come morning. I'm rather proud, honestly."));
 			}
 		});
 
-		// Quest 3: Mage Ember-Dust
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Alchemist] Rutenis"), "f_tableland_28_1", -500, 500, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1003: The West Is Not Patrolled
+		// =====================================================================
+		// Outrider Danguole - the assassins on the Stogas road
+		//---------------------------------------------------------------------
+		AddNpc(20143, L("[Outrider] Danguole"), "f_tableland_28_1", -89, 231, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_28_1", 1003);
 
-			dialog.SetTitle(L("Rutenis"));
+			dialog.SetTitle(L("Danguole"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Red Saltisdaughter Mages burn ember-dust in their palms. Kill sixteen, bring six dust pinches."));
+				await dialog.Msg(L("{#666666}*An outrider is scrubbing a saddle that has no horse anywhere within a mile of it*{/}"));
+				await dialog.Msg(L("Ha — you walked in on two feet as well, I see. Welcome to the club. My patrol's the Stogas road, west, three times a day, official. I've managed four times in eight weeks. All on foot. Some outrider I am."));
+				await dialog.Msg(L("Green Lepusbunny Assassins own the middle of that road, and they take the horse first — every single time, like it's a rule they wrote themselves. Kill 20 of them and I get a road back. Maybe even a horse someday, who knows."));
 
-				var response = await dialog.Select(L("Will you bring me the ember-dust?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Ember?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Fancy earning me back a road?"),
+					Option(L("I'll clear the road"), "help"),
+					Option(L("Take the horse first?"), "info"),
+					Option(L("Ride around them"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Wax-paper packets. Don't breathe it."));
+						await dialog.Msg(L("They come from the sides, never straight on — cowards, the lot of them, and I mean that with real professional respect. Don't stop moving in the middle of the road. That's exactly where they want you, and they've had eight weeks to get good at it."));
+						await dialog.Msg(L("They don't chase, at least. Get forty paces clear and you get to pick which three you fight instead of the other way around."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Ember-dust holds heat weeks after the mage dies. Lamp-oil of the plateau."));
+						await dialog.Msg(L("Every time. Not the rider — the horse. It goes down, they're simply gone, and you're standing in the road holding an empty saddle with four miles to walk. Very dignified."));
+						await dialog.Msg(L("I've lost three horses that way. Walked the last one back myself, leading her — she made two hundred paces before she went, and I wasn't leaving her out there for them to pick clean."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Lamps stay cold."));
+						await dialog.Msg(L("Around's the shelf edge on one side, Vedas ground on the other, and nobody on this whole post is riding onto Vedas ground. Not even me, and I'm reckless."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killMages", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherDust", out var dObj)) return;
+				if (!quest.TryGetProgress("killAssassins", out var killObj)) return;
 
-				if (killObj.Done && dObj.Done)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("Six pinches. Lamps for a month."));
-					character.Inventory.Remove(650267, character.Inventory.CountItem(650267), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*She has the saddle up on her shoulder before you've even finished the sentence*{/}"));
+					await dialog.Msg(L("Road's open! Stogas is four hours west, and they haven't seen a rider from us since the action — bet they're wondering why."));
+					await dialog.Msg(L("Take the mount allowance. I've drawn it every month for a horse I don't have, and it's been sitting in a tin making me feel exactly as pathetic as you'd expect. Might as well be useful now."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("West, on the road, and they come from the sides. Twenty of them. Keep moving and don't be a target."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Whole plateau lit tonight. First time in years."));
+				await dialog.Msg(L("Three patrols a day, five days running! Ades over at Stogas sent a rider back with a note that just says GOOD in enormous letters — which, coming from Ades, is basically a love letter."));
 			}
 		});
 
-		// Quest 4: Rootcrystal Field
-		//-------------------------------------------------------------------------
-		AddNpc(20116, L("[Crystal-Cutter] Silute"), "f_tableland_28_1", -1100, 100, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1004: The Line to Vedas
+		// =====================================================================
+		// Signal-Clerk Petras - four cairns and no answer
+		//---------------------------------------------------------------------
+		AddNpc(155034, L("[Signal-Clerk] Petras"), "f_tableland_28_1", 1978, 599, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_28_1", 1004);
 
-			dialog.SetTitle(L("Silute"));
+			dialog.SetTitle(L("Petras"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A crystal-cutter at a fresh fissure with a length of brass-wire and a scribe-stick*{/}"));
-				await dialog.Msg(L("The bluff drops two hundred feet at the south crag. Bedrock holds it up, and that's exactly what the rootcrystals are pushing through. Every crystal that surfaces splits the shelf a fingerwidth wider."));
-				await dialog.Msg(L("My grandfather said the bluff would last a thousand years. He was wrong. The rootcrystals weren't around in his time. If I can't measure the worst cracks before next thaw, the south crag drops and takes the militia camp with it."));
+				await dialog.Msg(L("{#666666}*A signal clerk stands on a low cairn with a shuttered lamp, lips moving as he counts flashes under his breath*{/}"));
+				await dialog.Msg(L("Give me — sorry, one second, I have to finish the count or I start over, I know that's — there. Sorry! You're the first person to climb up here in... longer than I'd like to say out loud, actually."));
+				await dialog.Msg(L("There's, um, four cairns on the east shelf — together they're the signal line to Vedas. I've sent the evening call up that line every night for eight weeks and nothing's ever come back down it. Could you — I mean, would you walk the four and tell me what state they're in? Please?"));
 
-				var response = await dialog.Select(L("Break 14 Rootcrystals to stop the push, then press a wedge into each of the four paint-marked shelf-cracks. The wedges tell me which cracks are still spreading. Both jobs - will you?"),
-					Option(L("I'll break the crystals and gauge the cracks"), "help"),
-					Option(L("Why not just evacuate the camp?"), "info"),
-					Option(L("Bluff work isn't my work"), "leave")
+				var response = await dialog.Select(L("Would that be all right? I don't want to be a bother."),
+					Option(L("I'll walk the 4 cairns"), "help"),
+					Option(L("Nothing at all in 8 weeks?"), "info"),
+					Option(L("Stop sending"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She hands over four iron wedges and a small mallet*{/}"));
-						await dialog.Msg(L("Fourteen crystals first. Strike low and watch the spray - the shards carry the same crack-energy that splits the bedrock. They'll cut right through boot-leather."));
-						await dialog.Msg(L("The four shelf-cracks are paint-marked yellow. Push the wedge into each one until it stops, then tap once with the mallet. If it sinks further, the crack's still spreading. If it holds, the crack's settled."));
+						await dialog.Msg(L("Oh — thank you, really. Check the lamp housing, the shutter cord, and the step. Please don't relight anything, even if it looks cold — I need to know it was cold when you found it, that's, um, important for the report."));
+						await dialog.Msg(L("They stand in a square on the east ground. You can actually see all four from any one of them — that was the whole point, I think, when somebody built them."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("The militia camp could pack up in a day. The waystone-shrine on the south crag can't. It's stone-anchored, three centuries old, the only consecrated shrine on the high tableland."));
-						await dialog.Msg(L("If the shrine's gone, the pilgrims stop coming. If the pilgrims stop, the camp has no reason to be here. The whole settlement depends on the bluff being there in the morning. So we save the bluff."));
+						await dialog.Msg(L("Nothing. Fifty-six evenings, and — I'm nineteen, this is the only posting I've ever had, so I don't even really know if that's... normal? I keep meaning to ask someone and then not asking."));
+						await dialog.Msg(L("Rimgaile says it isn't normal. Gomen doesn't say anything at all when I bring it up, which I've started finding worse than an actual answer, if I'm honest."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then the south crag drops at the next bad thaw and the shrine goes with it. I'll measure the cracks alone, write down the numbers, and watch the line widen on my own gauge. It'll have to be enough."));
+						await dialog.Msg(L("N-no, I can't stop — if I stop, and somebody up there finally lights one, there'd be nobody down here watching for it. I'd rather send into nothing for a year than miss it just once. Sorry. I know that sounds silly."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("breakCrystals", out var killObj)) return;
-				if (!quest.TryGetProgress("gaugeCracks", out var gObj)) return;
+				var walked = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_28_1.Quest1004.Walked", 0);
 
-				if (killObj.Done && gObj.Done)
+				if (walked >= 4)
 				{
-					await dialog.Msg(L("{#666666}*She checks each wedge against her brass-wire gauge*{/}"));
-					await dialog.Msg(L("Crystals broken, all four wedges holding. The shelf's settled. Bluff stands another year, maybe two if the next thaw is gentle."));
-					await dialog.Msg(L("Crystal-cutter's purse, plus a stipend from the shrine-cantors. They asked me to thank the swordhand who saved their stones - so I'm doing it for them. They're up at the shrine praying you'll come through again someday."));
+					await dialog.Msg(L("{#666666}*He listens all the way through without once looking away from the northeast*{/}"));
+					await dialog.Msg(L("All four sound. All four oiled. All four with a full lamp. So the line isn't broken — it's never been broken — it's been carrying my call perfectly for fifty-six nights to a post that just... isn't there."));
+					await dialog.Msg(L("Here, the lamp allowance, take it — and, um, please don't tell Rimgaile I sat down on the step when you told me that. I'd rather she kept thinking I took it standing up."));
+
 					character.Quests.Complete(questId);
-				}
-				else if (!killObj.Done)
-				{
-					await dialog.Msg(L("Crystals first. Wedging cracks while the bedrock's still moving would just give us the wrong reading."));
 				}
 				else
 				{
-					await dialog.Msg(L("Crystals down, bedrock settling. Now the four wedges - paint-marked cracks, mallet-tap, watch if it sinks. Take your time."));
+					await dialog.Msg(LF("They stand in a square on the east ground. {0} of 4 walked so far. Please don't relight anything!", walked));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Surveyors walked the bluff at first thaw. All four wedges held, south crag's stable, the waystone-shrine still stands. The shrine-cantors said they'd carve your description on the lintel. I told them you wouldn't want it. They're doing it anyway."));
+				await dialog.Msg(L("I still send it, every evening. Gomen's come out and stood with me the last six nights, and he doesn't say anything either — so now there's two of us not saying anything at a cairn, which is, somehow, so much better than being alone up here."));
 			}
 		});
 
-		// Shelf-crack gauge points for Quest 1004
-		//-------------------------------------------------------------------------
-		void AddShelfCrack(int crackNumber, int x, int z, int direction)
+		// =====================================================================
+		// SIGNAL CAIRNS
+		// =====================================================================
+		// For Quest 1004 - The Line to Vedas
+		// =====================================================================
+
+		void AddSignalCairn(int cairnNumber, string cairnName, string finding, int x, int z, int direction)
 		{
-			AddNpc(47190, L("Shelf-Crack"), "f_tableland_28_1", x, z, direction, async dialog =>
+			AddNpc(155051, L(cairnName), "f_tableland_28_1", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_tableland_28_1", 1004);
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A paint-marked crack splitting the bedrock shelf*{/}"));
+					await dialog.Msg(L("{#666666}*A low signal cairn with a shuttered lamp on top, the housing recently oiled*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_tableland_28_1.Quest1004.Crack{crackNumber}";
+				var variableKey = $"Laima.Quests.f_tableland_28_1.Quest1004.Cairn{cairnNumber}";
+
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*Already wedged; the crack reads steady*{/}"));
+					await dialog.Msg(L("{#666666}*You have already checked this one over. The shutter cord runs clean*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Wedging crack..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(L("Checking the cairn..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
 
-				if (result == TimeActionResult.Completed)
+				if (result != TimeActionResult.Completed)
 				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_28_1.Quest1004.CracksGauged", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_tableland_28_1.Quest1004.CracksGauged", count);
-					character.ServerMessage(LF("Shelf-cracks gauged: {0}/4", count));
+					character.ServerMessage(L("Check interrupted."));
+					return;
+				}
 
-					if (count >= 4)
-						character.ServerMessage(L("{#FFD700}All cracks gauged! Return to Crystal-Cutter Silute.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Wedging interrupted."));
-				}
+				character.Variables.Perm.Set(variableKey, true);
+
+				var walked = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_28_1.Quest1004.Walked", 0) + 1;
+				character.Variables.Perm.Set("Laima.Quests.f_tableland_28_1.Quest1004.Walked", walked);
+
+				character.ServerMessage(L(finding));
+				character.ServerMessage(LF("Cairns walked: {0}/4", walked));
+
+				if (walked >= 4)
+					character.ServerMessage(L("{#FFD700}All 4 cairns walked. Return to Signal-Clerk Petras.{/}"));
 			});
 		}
 
-		AddShelfCrack(1, -1000, 200, 0);
-		AddShelfCrack(2, -1300, -100, 90);
-		AddShelfCrack(3, -900, -200, 180);
-		AddShelfCrack(4, -1200, 300, 270);
+		AddSignalCairn(1, "First Signal Cairn", "Housing sound, shutter cord new, lamp full. Somebody has been up here this week.", 1659, 936, 315);
+		AddSignalCairn(2, "Second Signal Cairn", "Sound. Step swept. Oil can stowed under the lip with the cap on.", 1659, 816, 315);
+		AddSignalCairn(3, "Third Signal Cairn", "Sound. The cord has been replaced twice by the wear marks on the housing.", 1781, 936, 315);
+		AddSignalCairn(4, "Fourth Signal Cairn", "Sound, oiled, full. Nothing on this line has failed. Nothing on this line ever did.", 1781, 816, 315);
 
-		// Quest 5: The Warren-Matriarch
-		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Bounty Hunter] Gediminas"), "f_tableland_28_1", 1800, -300, 0, async dialog =>
+		// =====================================================================
+		// QUEST 1005: Sixty Forms a Day
+		// =====================================================================
+		// Assistant Commander Gomen - the mark on the cancellation
+		//---------------------------------------------------------------------
+		AddNpc(20107, L("[Assistant Commander] Gomen"), "f_tableland_28_1", 522, -695, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_tableland_28_1", 1005);
-			var matriarchSpawnedKey = "Laima.Quests.f_tableland_28_1.Quest1005.MatriarchSpawned";
 
-			dialog.SetTitle(L("Gediminas"));
+			dialog.SetTitle(L("Gomen"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A bounty hunter strings a horn-bow, the arms creaking*{/}"));
-				await dialog.Msg(L("The Bow-Repusbunny Matriarch runs the deep warren below the west crag. She's old, accurate at fifty paces, and smart enough to stay underground except to scout."));
-				await dialog.Msg(L("Three scouting-stones at the burrow-mouths let her see the surface without surfacing. Foul those stones with bear-grease and she has to come up herself to look. That's when we get her."));
+				if (!character.Quests.HasCompleted(new QuestId("f_tableland_28_1", 1004)))
+				{
+					await dialog.Msg(L("{#666666}*He does not look up from the stack in front of him*{/}"));
+					await dialog.Msg(L("If you are looking for work, I have none to give you. Signal-Clerk Petras is on his cairn. Walk his line with him first. Whatever you intend to say to me will keep — it has kept eight weeks already, it can keep a little longer."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Foul the three deep-burrow scouting-stones with bear-grease, then kill 10 Bow-Repusbunny archers to flush her out. She shoots horn-bow at fifty paces. Will you take her?"),
-					Option(L("I'll take the Matriarch"), "help"),
-					Option(L("Why not just dig her out?"), "info"),
-					Option(L("Find a horn-bow specialist"), "leave")
+				await dialog.Msg(L("{#666666}*He looks up when your shadow crosses the desk, then returns his eyes to the slip in front of him*{/}"));
+				await dialog.Msg(L("You again. Sit, if there is anywhere to sit."));
+				await dialog.Msg(L("{#666666}*He reads the cancellation slip through once, sets it down precisely, and rests one finger on his own mark at the bottom*{/}"));
+				await dialog.Msg(L("That is my mark. I did not write what is above it. I sign between sixty and ninety forms a day. I have done so for eleven years without fail. Somewhere in one of those stacks, this was placed in front of me, and I put my hand to it without reading a word."));
+				await dialog.Msg(L("I cannot give you a name. I can give you the ground between here and Vedas, which no one has held since the action. Kill 20 Red Saltisdaughter Magicians. Take the pair who have made a station of the old company line. I ask this of you formally, and I will not pretend it is a small thing."));
+
+				var response = await dialog.Select(L("Will you take the ground back?"),
+					Option(L("I'll take the ground"), "help"),
+					Option(L("You really never read it?"), "info"),
+					Option(L("Then somebody used you"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
+						character.Inventory.Add(666042, 1, InventoryAddType.PickUp);
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She hands over a small clay tub of bear-grease wrapped in oilcloth*{/}"));
-						await dialog.Msg(L("Three stones, three smears. Use the back of your knife to spread the grease - skin-touch lasts a day, knife-spread lasts a week. She reads scent off the stone, not sight."));
-						await dialog.Msg(L("Then ten archers. She surfaces around the eighth, takes one shot from cover, then closes for melee. Stay below the burrow-mound's lip - she shoots flat, and a high stance is a free target."));
+						await dialog.Msg(L("Take my memo. It is written plainly, it is signed, and it states exactly what I have told you. It is the first document in eleven years that I have read four times before setting my hand to it."));
+						await dialog.Msg(L("The Magicians, first. The pair on the old line are Assassins, and they have chosen their ground. Do not permit them to choose yours."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Digging out a Repusbunny warren takes a sapper-team of ten and three days. Killing the matriarch takes one swordhand and an afternoon. You do the math."));
-						await dialog.Msg(L("And the warren collapses on itself once she dies. The survivors scatter, the deep chambers fall in, the whole problem ends. With a sapper-dig, they'd just relocate to the next set of crags."));
+						await dialog.Msg(L("Sixty a day. Requisitions. Drafts. Transfers. Condemnations. Ration returns. Three separate forms for a single broken cart. No man reads sixty forms. Every man signs sixty forms."));
+						await dialog.Msg(L("I have known this for eleven years and called it simply the job. It transpires it is a door, and someone walked through it, and forty-one men now stand on Vedas ground because of a habit I permitted myself."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Warren grows. She breeds three new archer-cohorts a season. Inside a year the militia camp is ringed with bow-fire and we abandon the bluff. I'll be here when you reconsider."));
+						await dialog.Msg(L("Yes. That is not a defence, and I offer it as none. A man who can be used as I was used should not hold my post. I have written that down as well, for the record."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("foulStones", out var sObj)) return;
-				if (!quest.TryGetProgress("killScouts", out var pObj)) return;
-				if (!quest.TryGetProgress("killMatriarch", out var aObj)) return;
+				if (!quest.TryGetProgress("clearMagicians", out var magObj)) return;
+				if (!quest.TryGetProgress("takeTheLine", out var lineObj)) return;
 
-				if (sObj.Done && pObj.Done && aObj.Done)
+				if (magObj.Done && lineObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She unstrings the horn-bow*{/}"));
-					await dialog.Msg(L("Stones fouled, matriarch down, warren collapsed by sundown. The militia camp can sleep easy tonight - first time in months."));
-					await dialog.Msg(L("Bounty plus a horn-bow stipend. You used your own bow on her last shot, and the militia council voted it counted as horn-work. Drink to the warren that won't be ringing our crags anymore."));
-					character.Variables.Perm.Remove(matriarchSpawnedKey);
+					await dialog.Msg(L("{#666666}*He receives the report standing, and does not sit for any part of it*{/}"));
+					await dialog.Msg(L("The line is open. Danguole may ride it. Petras may walk it. A grave detail may reach Vedas from this side without the long road through Roxona. That is a full account of what your work has purchased."));
+					await dialog.Msg(L("Take this. It is mine, not the Kingdom's — it has sat in a chest since I was given this post by a man who told me the entire duty was to read everything. Carry my memo to whoever will accept it. If none will, carry it to the necromancers. They remain the only people on this shelf still writing things down properly."));
+
 					character.Quests.Complete(questId);
 				}
-				else if (pObj.Done && !aObj.Done)
+				else if (magObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(matriarchSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(matriarchSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Repusbunny_Bow_Green, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("She comes!"));
-							character.ServerMessage(L("{#FF9966}The Warren-Matriarch bursts from the deep burrow!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("Find her."));
-					}
-				}
-				else if (!sObj.Done)
-				{
-					await dialog.Msg(L("Three scouting-stones first. Bear-grease, spread it with the knife. She won't surface while she can still see the surface from below."));
+					await dialog.Msg(L("The Magicians are cleared from the ground. The two on the old company line remain. They have not moved in eight weeks, and I see no reason they intend to start."));
 				}
 				else
 				{
-					await dialog.Msg(L("Stones fouled, she's blind. Now ten archers - she surfaces around the eighth, one shot, then closes in."));
+					await dialog.Msg(L("The Magicians first. I will not send anyone onto the old line while the shelf behind them still stands full."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Burrows collapsed, plateau's quiet, bow-fire gone. The militia camp pinned a thank-you on the canteen door. Took me three reads to realize it was meant for you. They aren't poets."));
-			}
-		});
-
-		// Scouting-stone foul points for Quest 1005
-		//-------------------------------------------------------------------------
-		void AddScoutingStone(int stoneNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Scouting-Stone"), "f_tableland_28_1", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_tableland_28_1", 1005);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A polished scouting-stone, scent-marked by something deep underground*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_tableland_28_1.Quest1005.Stone{stoneNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already greased; the scent runs sour*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Fouling stone..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_tableland_28_1.Quest1005.StonesFouled", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_tableland_28_1.Quest1005.StonesFouled", count);
-					character.ServerMessage(LF("Scouting-stones fouled: {0}/3", count));
-
-					if (count >= 3)
-						character.ServerMessage(L("{#FFD700}All scouting-stones fouled! Now bait out the Matriarch.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Fouling interrupted."));
-				}
-			});
-		}
-
-		AddScoutingStone(1, 1700, -200, 0);
-		AddScoutingStone(2, 1900, -500, 90);
-		AddScoutingStone(3, 1600, -400, 180);
-
-		// Quest 6: Tableland Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Militia-Captain] Tautvydas"), "f_tableland_28_1", 1700, 1000, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_tableland_28_1", 1006);
-
-			dialog.SetTitle(L("Tautvydas"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A militia-captain at a board pinned with a fresh sweep-roster*{/}"));
-				await dialog.Msg(L("Plateau's bigger than the militia can patrol on foot. So we contract sweeps out and signal the camp by bell when one's done. Old mountain custom - the bell carries up the plateau when nothing else does."));
-				await dialog.Msg(L("Three species contest the plateau: Repusbunnies on the open ground, Bow-Repusbunnies on the crag-rim, Saltisdaughter Mages in the salt-flats. We need each one thinned before the camp can sleep through a full night."));
-
-				var response = await dialog.Select(L("Kill 12 Repusbunnies, 12 Bow-Repusbunnies, and 12 Saltisdaughter Mages, then ring the Crag-Bell at the camp edge - one peal, carries the whole plateau. Will you take the contract?"),
-					Option(L("I'll take the sweep"), "help"),
-					Option(L("Why not just post more militia?"), "info"),
-					Option(L("Find another swordhand"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She unhooks the bell-pull and hands it over*{/}"));
-						await dialog.Msg(L("Thirty-six kills, no padding. Dawn-patrol counts the corpse-piles before sun-up."));
-						await dialog.Msg(L("Crag-Bell sits on a stone arch at the camp edge. Hook the pull onto the rope, draw down once, count to three, release. Single long peal. The camp knows the difference between sweep-bell, danger-bell, and meal-bell. Don't muddle the count."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("More militia means more wages, more rations, more wagons up a road that washes out twice a year. The camp's forty strong because that's what the budget allows. We fill in with contractors who don't need permanent rations."));
-						await dialog.Msg(L("It's not the system I'd build. It's the one the council funded. The bell-tradition keeps the contract work honest, at least."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Plateau stays wild and the dawn-patrol takes more losses. I'll be at the bell-board if you reconsider."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killBunnies", out var bObj)) return;
-				if (!quest.TryGetProgress("killArchers", out var aObj)) return;
-				if (!quest.TryGetProgress("killMages", out var mObj)) return;
-				if (!quest.TryGetProgress("ringBell", out var lObj)) return;
-
-				if (bObj.Done && aObj.Done && mObj.Done && lObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*The bell-echo is still rolling across the plateau*{/}"));
-					await dialog.Msg(L("Bell still carrying. Sweep done, count holds, dawn-patrol gets a rest in the morning. Plateau hasn't been this quiet at sundown all season."));
-					await dialog.Msg(L("Coin in full plus a half-purse for the clean bell-form. Some contractors muddle the peals and we have to send a runner. You didn't. Worth the extra."));
-					character.Quests.Complete(questId);
-				}
-				else if (bObj.Done && aObj.Done && mObj.Done)
-				{
-					await dialog.Msg(L("Sweep done. Now the Crag-Bell at the camp edge - bell-pull, single peal, count to three. Don't sound it twice. That's the danger-call and the camp will turn out armed."));
-				}
-				else
-				{
-					await dialog.Msg(L("Twelve of each. Salt-flats are the worst stretch - the Mages cluster around the brine-pools. Do the open ground first if you're flagging."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Militia camps the crag in shifts now, paid by your sweep-levy. Dawn-patrol's logged a clean perimeter ten days running. I can't remember the last time that happened. The camp toasts you at supper. Some of the newer hands think you're a folk-tale."));
-			}
-		});
-
-		// Crag-Bell for Quest 1006
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Crag-Bell"), "f_tableland_28_1", 1750, 1050, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_tableland_28_1", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A bronze bell hung from a stone arch on the crag's edge*{/}"));
-				return;
-			}
-
-			var rungKey = "Laima.Quests.f_tableland_28_1.Quest1006.BellRung";
-			if (character.Variables.Perm.GetBool(rungKey, false))
-			{
-				await dialog.Msg(L("{#666666}*Already rung*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killBunnies", out var bObj)) return;
-			if (!quest.TryGetProgress("killArchers", out var aObj)) return;
-			if (!quest.TryGetProgress("killMages", out var mObj)) return;
-
-			if (!(bObj.Done && aObj.Done && mObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The rope is in your hand, but the sweep isn't done*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Ringing bell..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(rungKey, true);
-				character.ServerMessage(L("{#FFD700}Crag-Bell rung. Return to Militia-Captain Tautvydas.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Ringing interrupted."));
+				await dialog.Msg(L("The memo went down to Roxona six days ago. Nothing has returned, and I did not expect it to. It is written, it is signed, and it exists somewhere other than in my own head. That is the whole of what I was able to do about it."));
+				await dialog.Msg(L("I still sign sixty a day. I read every one now. It takes until midnight, and Rimgaile has stopped telling me to go to bed — I believe she has given up on that particular argument."));
 			}
 		});
 	}
@@ -560,244 +431,222 @@ public class FTableland281QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class FTableland281Quest1001 : QuestScript
+// Quest 1001 CLASS: Rations for Forty
+//-----------------------------------------------------------------------------
+
+public class RationsForFortyQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_28_1", 1001);
-		SetName(L("Bunny Overrun"));
+		SetName(L("Rations for Forty"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Green Repusbunnies stripping the plateau grass."));
+		SetDescription(L("Mesafasla has an establishment for 40 and 9 people on it. Rimgaile needs the Green Lepusbunnies pushed off the post ground and 6 Assassin pelts to line winter coats she cannot requisition."));
 		SetLocation("f_tableland_28_1");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Plateau-Warden] Stogas"), "f_tableland_28_1");
+		AddQuestGiver(L("[Quartermaster] Rimgaile"), "f_tableland_28_1");
 
-		AddObjective("killBunnies", L("Kill Green Repusbunnies"),
-			new KillObjective(40, new[] { MonsterId.Repusbunny_Green }));
+		AddObjective("killBunnies", L("Kill Green Lepusbunnies around the post"),
+			new KillObjective(30, new[] { MonsterId.Repusbunny_Green }));
 
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
+		AddObjective("collectPelts", L("Recover Lepusbunny Assassin pelts"),
+			new CollectItemObjective(666043, 6));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(666043, 0.35f, MonsterId.Repusbunny_Bow_Green);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(666043, character.Inventory.CountItem(666043), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(666043, character.Inventory.CountItem(666043), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FTableland281Quest1002 : QuestScript
+// Quest 1002 CLASS: The Firebreak Nobody Ordered
+//-----------------------------------------------------------------------------
+
+public class TheFirebreakNobodyOrderedQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_28_1", 1002);
-		SetName(L("Reed-Fletchings"));
+		SetName(L("The Firebreak Nobody Ordered"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Green Bow-Repusbunnies and bring reed-fletchings for the wind-hunters."));
+		SetDescription(L("Vaitkus has cut 1,400 paces of firebreak across the east shelf on his own and has nothing to start the burn with. The Red Saltisdaughter Magicians carry flints at the hip."));
 		SetLocation("f_tableland_28_1");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Fletcher] Vaidile"), "f_tableland_28_1");
+		AddQuestGiver(L("[Sapper] Vaitkus"), "f_tableland_28_1");
 
-		AddObjective("killArchers", L("Kill Green Bow-Repusbunnies"),
-			new KillObjective(20, new[] { MonsterId.Repusbunny_Bow_Green }));
+		AddObjective("collectFlints", L("Recover flints from Red Saltisdaughter Magicians"),
+			new CollectItemObjective(666044, 6));
 
-		AddObjective("gatherFletchings", L("Gather reed-fletchings"),
-			new CollectItemObjective(650266, 8));
+		AddReward(new ExpReward(11900, 8100));
+		AddReward(new SilverReward(15000));
+		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
+		AddDrop(666044, 0.35f, MonsterId.Saltisdaughter_Mage_Red);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650266, character.Inventory.CountItem(650266), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666044, character.Inventory.CountItem(666044), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650266, character.Inventory.CountItem(650266), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666044, character.Inventory.CountItem(666044), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FTableland281Quest1003 : QuestScript
+// Quest 1003 CLASS: The West Is Not Patrolled
+//-----------------------------------------------------------------------------
+
+public class TheWestIsNotPatrolledQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_28_1", 1003);
-		SetName(L("Ember-Dust Pinches"));
+		SetName(L("The West Is Not Patrolled"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Red Saltisdaughter Mages and bring ember-dust for the plateau lamps."));
+		SetDescription(L("Danguole has made her Stogas patrol 4 times in 8 weeks, on foot, because the Green Lepusbunny Assassins hold the middle of the road and take the horse first."));
 		SetLocation("f_tableland_28_1");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Alchemist] Rutenis"), "f_tableland_28_1");
+		AddQuestGiver(L("[Outrider] Danguole"), "f_tableland_28_1");
 
-		AddObjective("killMages", L("Kill Red Saltisdaughter Mages"),
-			new KillObjective(16, new[] { MonsterId.Saltisdaughter_Mage_Red }));
-
-		AddObjective("gatherDust", L("Gather ember-dust pinches"),
-			new CollectItemObjective(650267, 6));
+		AddObjective("killAssassins", L("Kill Green Lepusbunny Assassins on the Stogas road"),
+			new KillObjective(20, new[] { MonsterId.Repusbunny_Bow_Green }));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650267, character.Inventory.CountItem(650267), InventoryItemRemoveMsg.Destroyed);
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650267, character.Inventory.CountItem(650267), InventoryItemRemoveMsg.Destroyed);
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
-public class FTableland281Quest1004 : QuestScript
+// Quest 1004 CLASS: The Line to Vedas
+//-----------------------------------------------------------------------------
+
+public class TheLineToVedasQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_28_1", 1004);
-		SetName(L("Rootcrystal Field"));
+		SetName(L("The Line to Vedas"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Break Rootcrystals splitting the tableland bedrock."));
+		SetDescription(L("Petras has sent the evening call up the 4 east cairns for 56 nights and nothing has come back. Walk the line and find out whether the fault is in the cairns."));
 		SetLocation("f_tableland_28_1");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Crystal-Cutter] Silute"), "f_tableland_28_1");
+		AddQuestGiver(L("[Signal-Clerk] Petras"), "f_tableland_28_1");
 
-		AddObjective("breakCrystals", L("Break Rootcrystals"),
-			new KillObjective(14, new[] { MonsterId.Rootcrystal_03 }));
+		AddObjective("walkCairns", L("Walk the 4 signal cairns"),
+			new VariableCheckObjective("Laima.Quests.f_tableland_28_1.Quest1004.Walked", 4, true));
 
-		AddObjective("gaugeCracks", L("Gauge the four shelf-cracks"),
-			new VariableCheckObjective("Laima.Quests.f_tableland_28_1.Quest1004.CracksGauged", 4, true));
-
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1004.CracksGauged");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_28_1.Quest1004.Crack{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1004.Walked");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_28_1.Quest1004.Cairn{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1004.CracksGauged");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_28_1.Quest1004.Crack{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1004.Walked");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_28_1.Quest1004.Cairn{i}");
 	}
 }
 
-public class FTableland281Quest1005 : QuestScript
+// Quest 1005 CLASS: Sixty Forms a Day
+//-----------------------------------------------------------------------------
+
+public class SixtyFormsADayQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_tableland_28_1", 1005);
-		SetName(L("The Warren-Matriarch"));
+		SetName(L("Sixty Forms a Day"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Bow-Repusbunnies to flush the Warren-Matriarch from the deep burrow."));
+		SetDescription(L("The mark on the cancelled requisition is Gomen's and he did not write it. He cannot give a name. He can give back the ground between Mesafasla and Vedas, which nobody has held since the action."));
 		SetLocation("f_tableland_28_1");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Gediminas"), "f_tableland_28_1");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Assistant Commander] Gomen"), "f_tableland_28_1");
 
-		AddObjective("foulStones", L("Foul the three deep-burrow scouting-stones"),
-			new VariableCheckObjective("Laima.Quests.f_tableland_28_1.Quest1005.StonesFouled", 3, true));
+		AddPrerequisite(new CompletedPrerequisite("f_tableland_28_1", 1004));
 
-		AddObjective("killScouts", L("Kill Green Bow-Repusbunnies"),
-			new KillObjective(10, new[] { MonsterId.Repusbunny_Bow_Green }));
+		AddObjective("clearMagicians", L("Kill Red Saltisdaughter Magicians on the old company line"),
+			new KillObjective(20, new[] { MonsterId.Saltisdaughter_Mage_Red }));
 
-		AddObjective("killMatriarch", L("Defeat the Warren-Matriarch"),
-			new KillObjective(1, new[] { MonsterId.Repusbunny_Bow_Green }));
+		AddObjective("takeTheLine", L("Take the pair holding the old company line"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Repusbunny_Bow_Green, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Saltisdaughter_Mage_Red, 3),
+				},
+				resetIdent: "clearMagicians",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
+		AddReward(new ExpReward(60000, 40000));
+		AddReward(new SilverReward(50000));
+		AddReward(new ItemReward(603127, 1)); // Himil Legacy
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1005.StonesFouled");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_28_1.Quest1005.Stone{i}");
+		character.Inventory.Remove(666042, character.Inventory.CountItem(666042), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1005.StonesFouled");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_tableland_28_1.Quest1005.Stone{i}");
-	}
-}
-
-public class FTableland281Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_tableland_28_1", 1006);
-		SetName(L("Tableland Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of Repusbunnies, Bow-Repusbunnies, and Saltisdaughter Mages."));
-		SetLocation("f_tableland_28_1");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Militia-Captain] Tautvydas"), "f_tableland_28_1");
-
-		AddObjective("killBunnies", L("Kill Green Repusbunnies"),
-			new KillObjective(12, new[] { MonsterId.Repusbunny_Green }));
-
-		AddObjective("killArchers", L("Kill Green Bow-Repusbunnies"),
-			new KillObjective(12, new[] { MonsterId.Repusbunny_Bow_Green }));
-
-		AddObjective("killMages", L("Kill Red Saltisdaughter Mages"),
-			new KillObjective(12, new[] { MonsterId.Saltisdaughter_Mage_Red }));
-
-		AddObjective("ringBell", L("Ring the Crag-Bell"),
-			new VariableCheckObjective("Laima.Quests.f_tableland_28_1.Quest1006.BellRung", 1, true));
-
-		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(18800));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1006.BellRung");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_tableland_28_1.Quest1006.BellRung");
+		character.Inventory.Remove(666042, character.Inventory.CountItem(666042), InventoryItemRemoveMsg.Destroyed);
 	}
 }

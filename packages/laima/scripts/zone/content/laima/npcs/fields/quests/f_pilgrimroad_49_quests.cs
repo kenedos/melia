@@ -1,16 +1,19 @@
 //--- Melia Script ----------------------------------------------------------
-// Thaumas Trail - Quest NPCs
+// Genar Field Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quest NPCs and content for f_pilgrimroad_49 map. Pilgrim road leading
-// toward Fedimian, overrun by Tini demon-folk spilling from the prison-cracks.
+// The last open ground before the altar road, where the markers are cut for
+// the pilgrims who do not finish the walk.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -23,46 +26,170 @@ public class FPilgrimroad49QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// =====================================================================
-		// QUEST 1001: Trail Pest Kill
-		// =====================================================================
-		// Trail-Warden Balys - Brown Tinis picking off lone pilgrims
+		// Quest 1001: Forty Blanks in the Yard
 		//---------------------------------------------------------------------
-		AddNpc(20109, L("[Trail-Warden] Balys"), "f_pilgrimroad_49", -1050, -2450, 0, async dialog =>
+		AddNpc(155035, L("[Stonecutter] Antanas"), "f_pilgrimroad_49", 1423, -425, 250, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_49", 1001);
 
-			dialog.SetTitle(L("Balys"));
+			dialog.SetTitle(L("Antanas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A warden in a patched Fedimian tabard, his half-helm dented*{/}"));
-				await dialog.Msg(L("Four pilgrims this week. Four. Brown Tinis ambush singles on the beetle-path, then scatter before the rest of the caravan catches up."));
+				await dialog.Msg(L("{#666666}*He's counting an empty row of stone blanks with his finger, frowning harder each time the count comes up short*{/}"));
+				await dialog.Msg(L("You're not here for a marker, are you? Good, I've had enough of those this week. 311 stones in 19 years. That's how many people started this walk and stopped on my stretch of it, and every one of them has a marker because I cut it."));
+				await dialog.Msg(L("The Green Tini Archers have been dragging my blanks off the yard to build up their shooting berms. Kill 25 of them and bring me back 8 blanks before I'm cutting names into nothing."));
 
-				var response = await dialog.Select(L("I need them thinned. Twenty Brown Tinis. Hit the main cluster south of here - that's where they den. The rest will scatter once their numbers break."),
-					Option(L("I'll thin the Brown Tinis"), "help"),
-					Option(L("Why so many Tinis now?"), "info"),
-					Option(L("Pilgrims travel at their own risk"), "leave")
+				var response = await dialog.Select(L("Will you go out to the berms?"),
+					Option(L("I'll bring back 8 blanks"), "help"),
+					Option(L("They're using gravestones as walls?"), "info"),
+					Option(L("Quarry more stone"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*Relief crosses his weathered face*{/}"));
-
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Watch your flanks. Brown Tinis strike in pairs - one draws, the other comes from behind."));
-						await dialog.Msg(L("And if you see their Archers - Green Tinis with bows - those are harder. Don't engage unless you're close already."));
+						await dialog.Msg(L("The blanks are the flat ones with a squared foot. Anything rounded is field rock and I don't want it back."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Used to be a Tini every fortnight, maybe. Now they come in packs. Something stirred them out of wherever they nested."));
-						await dialog.Msg(L("A refugee from Aqueduct told me the prison-cracks opened wider down south. Seed-pollen first, then the Tinis started boiling up the trail."));
+						await dialog.Msg(L("Blanks so far. Blanks are stone and stone is stone and I can be reasonable about blanks."));
+						await dialog.Msg(L("Last week they took a finished one off the south trail. It had a name on it. I have been unreasonable ever since and I intend to stay that way."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then the road stays closed, and the pilgrims stay stranded. Your call."));
+						await dialog.Msg(L("The seam that gives this stone is 4 days east and it takes 3 men and a cart. I have me and a barrow."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("killArchers", out var killObj)) return;
+				if (!quest.TryGetProgress("collectBlanks", out var itemObj)) return;
+
+				if (killObj.Done && itemObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*He stands each blank on its foot and taps it once with a knuckle, listening*{/}"));
+					await dialog.Msg(L("8, and 7 of them ring clean. That's 7 people who get a marker this month who weren't going to."));
+					await dialog.Msg(L("Take the yard money. I get paid by the stone and I have been paid for stones I couldn't cut, which has been sitting badly with me."));
+
+					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Berms are quiet. Now go and pull the blanks out of them - they're built in flat side down."));
+				}
+				else
+				{
+					await dialog.Msg(L("Still shooting off those berms. Clear them before you start hauling or you'll be carrying stone with arrows in you."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("7 cut and set this week. A woman came up the road looking for one of the names and I was able to walk her to it, which is the whole job in one sentence."));
+			}
+		});
+
+		// Quest 1002: Six Stones a Day
+		//---------------------------------------------------------------------
+		AddNpc(152065, L("[Letterer] Giedra"), "f_pilgrimroad_49", -266, 1171, 304, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_pilgrimroad_49", 1002);
+
+			dialog.SetTitle(L("Giedra"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*She's holding a chisel an inch above stone, waiting for her hand to stop shaking before she taps it*{/}"));
+				await dialog.Msg(L("Don't talk for a second, I nearly ruined that one. There. Antanas cuts them and I letter them. 4 strokes to a letter, 6 stones on a good day, and the cut only shows once it's had the lime wash."));
+				await dialog.Msg(L("The lime comes off the chalk banks and the Brown Tini have been rolling in it and carrying it away in their coats. Bring me 10 measures of the powder."));
+
+				var response = await dialog.Select(L("Will you get the lime?"),
+					Option(L("I'll bring you 10 measures"), "help"),
+					Option(L("Why do they roll in it?"), "info"),
+					Option(L("Letter them without the wash"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("Beat it out of the coat rather than scraping - scraped lime comes off grey and grey wash makes a name harder to read, not easier."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Mites. It kills whatever lives in the coat and they've clearly worked that out, which is more than the Tini on the east side have worked out about anything."));
+						await dialog.Msg(L("I have been trying to resent them for it for a month and I keep failing, because it is genuinely quite clever."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("Then in 3 years the cut weathers over and the stone says nothing. A blank stone is worse than no stone. It looks like somebody meant to and didn't."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("collectLime", out var itemObj)) return;
+
+				if (itemObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*She wets a thumb, touches the powder, and holds it up against the white of her sleeve*{/}"));
+					await dialog.Msg(L("Bright. That's a month of washing at 6 stones a day and I'll not have to water it down once."));
+					await dialog.Msg(L("Take this. It's what I'd have spent on lime if I'd had to buy it from Fedimian, and Fedimian charges like the stones are for them."));
+
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Not enough. Work the north field where the chalk comes up - that's the ground they're rolling on."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("31 stones washed and every one of them readable from the road. That was the whole point and it took a month to be able to do it."));
+			}
+		});
+
+		// Quest 1003: Nine Miles of South Trail
+		//---------------------------------------------------------------------
+		AddNpc(155038, L("[Trail-Warden] Kestas"), "f_pilgrimroad_49", -1192, -2045, 302, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_pilgrimroad_49", 1003);
+
+			dialog.SetTitle(L("Kestas"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*He stops mid-stride at the sound of your footsteps, head tilted, like he's checking your gait against a list of ones he knows*{/}"));
+				await dialog.Msg(L("New boots, new stride - you're not from around here. I walk 9 miles of south trail and back, every day, and I have walked it 6 years. I know it by the sound my boots make on it."));
+				await dialog.Msg(L("The Brown Tini have taken the last 2 miles of it and I've lost 2 markers off that stretch already. Kill 30 of them and I get my trail back."));
+
+				var response = await dialog.Select(L("Will you take the south trail?"),
+					Option(L("I'll kill 30 Brown Tini"), "help"),
+					Option(L("What happened to the markers?"), "info"),
+					Option(L("Reroute the trail"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They pile up in the low ground and come at you all at once out of it. Fight on the rise and they have to come up to you one at a time."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Gone. Not broken, not knocked over - gone, foot and all, and a marker foot is buried 2 feet down."));
+						await dialog.Msg(L("Something took the trouble to dig 2 gravestones out of the ground and carry them off, and I have walked this trail 6 years and cannot tell you why."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("The trail goes where the 300 stones are. You don't move a trail away from the stones, you move the trouble away from the trail."));
 						break;
 				}
 			}
@@ -73,392 +200,210 @@ public class FPilgrimroad49QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He listens to the count, then exhales slowly*{/}"));
-					await dialog.Msg(L("Twenty. The south cluster won't mount a full ambush for a week, maybe two. I can run a caravan through by tomorrow."));
-					await dialog.Msg(L("Take this - warden's pay, from my own purse. Fedimian will cover it once the dispatch reports are in."));
+					await dialog.Msg(L("Walked the full 9 this morning and back again. Boots sounded the same the whole way, which they have not done since spring."));
+					await dialog.Msg(L("Take the warden's purse. I draw it for walking a trail and I've spent a month walking 7 miles of one."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("South beetle-cluster. Watch your flanks. Brown Tinis strike in pairs."));
+					await dialog.Msg(L("Still thick down there. Work the low ground at the far end - the last 2 miles, not the near stretch."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First caravan made it through clean. Second one had one graze-wound. That's as good as this road's been in months."));
+				await dialog.Msg(L("I found where the 2 markers went. Both of them are out east on the Manahas road, stood up in a wall with the letters facing inward, and I have not told Antanas yet."));
 			}
 		});
 
-		// =====================================================================
-		// QUEST 1002: The Unfinished Pilgrimage
-		// =====================================================================
-		// Pilgrim-Priest Petras - Rites scroll for Fedimian's Katyn waystation
+		// Quest 1004: Fourteen Hundred Names
 		//---------------------------------------------------------------------
-		AddNpc(20107, L("[Pilgrim-Priest] Petras"), "f_pilgrimroad_49", 1370, -100, 180, async dialog =>
+		AddNpc(155034, L("[Binder] Tomalov"), "f_pilgrimroad_49", -87, -329, 0, async dialog =>
 		{
 			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_49", 1002);
+			var questId = new QuestId("f_pilgrimroad_49", 1004);
 
-			dialog.SetTitle(L("Petras"));
+			dialog.SetTitle(L("Tomalov"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A road-stained priest with a bundle of wax-sealed scrolls, his robe singed at the hem*{/}"));
-				await dialog.Msg(L("I left Klaipeda with three apprentices. Green Tini Archers caught us at the crossing. I alone made it this far. I dare not take another step."));
+				await dialog.Msg(L("{#666666}*He looks up slowly from a thick, well-worn ledger, adjusting a pair of spectacles that have slid halfway down his nose*{/}"));
+				await dialog.Msg(L("Ah - another name to add to the book, or a pair of legs I can borrow? Either's welcome. I keep the road register. 1,400 names in it, every one of them a person who came through Genar Field and which way they went out, and I stitch and bind the thing myself."));
+				await dialog.Msg(L("Walkers cut their mark on the register stone at whichever road end they leave by. There are 3 stones and I have not been out to any of them in 5 weeks. Go and read all 3 for me."));
 
-				var response = await dialog.Select(L("The rites-scroll must reach Waystation-Keeper Urte at the Grynas Trails crossing - she holds the Katyn wardings. Without it, her waystation falls silent and the next caravan through has no sanctuary. Will you carry it?"),
-					Option(L("I'll carry the scroll to Urte"), "help"),
-					Option(L("Why not retreat to Klaipeda?"), "info"),
-					Option(L("I'm not a messenger"), "leave")
+				var response = await dialog.Select(L("Will you read the register stones?"),
+					Option(L("I'll read all 3 stones"), "help"),
+					Option(L("Why does the register matter?"), "info"),
+					Option(L("Walk out and read them yourself"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
-						await dialog.Msg(L("{#666666}*He gives you the scroll-bundle, slow and careful*{/}"));
-
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The scroll-wax bears the Fedimian seal. Do not break it. Urte will know the mark."));
-						await dialog.Msg(L("And if you see the apprentices' bodies on the path - do not touch them. The Tinis lay traps over the fallen."));
+						await dialog.Msg(L("Count the marks and look at the depth of them. A mark cut by somebody in a hurry looks nothing like a mark cut by somebody who has decided to turn back."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Because the rites must reach Fedimian. Three apprentices died for this bundle. Retreat turns their deaths into wasted breath."));
-						await dialog.Msg(L("Our order teaches: the scroll travels, or the scroll-bearer dies trying. I have failed at the second. Someone must not fail the first."));
+						await dialog.Msg(L("Because Antanas cuts a stone for anyone who stops here and a stone needs a name. The register is where the name comes from."));
+						await dialog.Msg(L("If somebody walks out of Genar Field and is never seen again, the register is the difference between a marker and a blank slab, and I have already explained to you what a blank slab looks like."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then I pray the next traveler is braver. Walk on, friend."));
+						await dialog.Msg(L("I have. For 11 years. I am 71 and the west stone is a mile and a half out and I got halfway to it last month and had to sit down in the road."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("deliverScroll", out var deliverObj)) return;
+				if (!quest.TryGetProgress("readStones", out var checkObj)) return;
 
-				if (deliverObj.Done)
+				if (checkObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He reads Urte's reply, then presses it to his forehead*{/}"));
-					await dialog.Msg(L("She accepted the rites. The Katyn waystation stays lit for another season. My apprentices' deaths are not wasted."));
-					await dialog.Msg(L("{#666666}*He offers a small silver icon from his robe*{/}"));
-					await dialog.Msg(L("Take this. It is all I carry that is mine, and not the order's. Walk blessed, pilgrim."));
+					await dialog.Msg(L("{#666666}*He copies all 3 counts into the register in a hand that has not changed in 40 years*{/}"));
+					await dialog.Msg(L("34 out west, 19 out north, and 4 east. 4, on the Manahas road, in 5 weeks - and Manahas is the road everybody takes."));
+					await dialog.Msg(L("Take the binder's money. And go and tell Antanas about the east stone, because I think he already knows and has not said it out loud."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Urte's waystation is northwest, at the Grynas Trails warp. The Fedimian seal - do not break it."));
+					await dialog.Msg(L("Not all 3 yet. West at the field road, north at the altar road, east where the Manahas road leaves the ground."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("I begin the return pilgrimage to Klaipeda at first light. The order will send new apprentices. The rites continue."));
+				await dialog.Msg(L("1,400 names and I have started a second column beside the east ones. I would very much like that column to stop growing."));
 			}
 		});
 
-		// =====================================================================
-		// WAYSTATION-KEEPER URTE (Quest 1002 recipient)
-		// =====================================================================
-		AddNpc(20114, L("[Waystation-Keeper] Urte"), "f_pilgrimroad_49", 1500, -1620, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_49", 1002);
-
-			dialog.SetTitle(L("Urte"));
-
-			if (character.Quests.IsActive(questId))
-			{
-				var delivered = character.Variables.Perm.GetInt("Laima.Quests.f_pilgrimroad_49.Quest1002.Delivered", 0) >= 1;
-				if (!delivered)
-				{
-					await dialog.Msg(L("{#666666}*A keeper in a grey wool cloak, watching the trail*{/}"));
-					await dialog.Msg(L("{#666666}*You present the Fedimian-sealed scroll bundle*{/}"));
-					await dialog.Msg(L("From Petras. So he made it that far, at least. The seal is unbroken - good."));
-					await dialog.Msg(L("{#666666}*She writes a short reply on a waystation slip and rolls it tight*{/}"));
-					await dialog.Msg(L("Tell him the waystation accepts the rites. Tell him the Katyn lamp will burn through winter. And tell him - the apprentices' names will be on the next Fedimian remembrance slate."));
-
-					character.Variables.Perm.Set("Laima.Quests.f_pilgrimroad_49.Quest1002.Delivered", 1);
-					character.ServerMessage(L("{#FFD700}Urte's reply received. Return to Pilgrim-Priest Petras.{/}"));
-				}
-				else
-				{
-					await dialog.Msg(L("Carry my reply back to Petras. He waits at the dandel crossing."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The Katyn waystation lamp is lit. Pilgrims can rest here again. It is a small thing, but the road is built of small things."));
-			}
-			else
-			{
-				await dialog.Msg(L("{#666666}*The keeper watches the trail*{/}"));
-				await dialog.Msg(L("Travelers pass; I keep lamps. That is the waystation's simple contract."));
-			}
-		});
-
-		// =====================================================================
-		// QUEST 1003: Rootcrystal Shards
-		// =====================================================================
-		// Crystal-Gatherer Morta - Shards for pilgrim-blessing trades
+		// Quest 1004 collection points - the register stones
 		//---------------------------------------------------------------------
-		AddNpc(20017, L("[Crystal-Gatherer] Morta"), "f_pilgrimroad_49", -1200, 480, 45, async dialog =>
+		void AddRegisterStone(int stoneNumber, string observation, int x, int z, int direction)
 		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_49", 1003);
-
-			dialog.SetTitle(L("Morta"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A thin-framed woman beside a split rootcrystal, her fingers wrapped in crystal-dust-stained rags*{/}"));
-				await dialog.Msg(L("I trade shards at Fedimian's waystation for pilgrim-blessings. One shard, one blessing - that's the fair rate. But the Tinis took my last haul."));
-
-				var response = await dialog.Select(L("Eight Rootcrystal shards. The clusters here are rich, but the crystals crack wrong if struck in haste. Take your time, and the shards come clean. Will you gather for me?"),
-					Option(L("I'll gather eight shards"), "help"),
-					Option(L("Why not gather yourself?"), "info"),
-					Option(L("Trade crystals somewhere safer"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						await dialog.Msg(L("{#666666}*She smiles, crystal-dust at the corners of her eyes*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("The big clusters are northwest, along the old trail. Smaller ones scatter toward the southern bend."));
-						await dialog.Msg(L("If a Tini appears while you're gathering - run first, fight second. The shards aren't worth a wound."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("My eyes are going. The crystal-dust eats sight, a little each year. I can still strike clean, but I can't see a Tini coming at thirty paces."));
-						await dialog.Msg(L("One more season, maybe two. Then I retire to the waystation and trade from a chair."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Crystals only grow here. The road is what the road is. I'll manage."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var shardCount = character.Inventory.CountItem(650555);
-
-				if (shardCount >= 8)
-				{
-					await dialog.Msg(L("{#666666}*She weighs each shard between thumb and forefinger, nodding slowly*{/}"));
-					await dialog.Msg(L("Clean breaks. Base-struck, not crown-struck. You listened."));
-					await dialog.Msg(L("{#666666}*She draws a small pouch and a waystation-token from her gathering-basket*{/}"));
-					await dialog.Msg(L("Here - a gatherer's share. And a waystation-token; Urte honors these for a hot meal."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Strike at the base. Eight shards. Take your time."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The shards traded clean for pilgrim-blessings. I sleep under the waystation roof tonight."));
-			}
-		});
-
-		// =====================================================================
-		// ROOTCRYSTAL SHARD SPOTS
-		// =====================================================================
-		// For Quest 1003 - Rootcrystal Shards
-		// =====================================================================
-
-		void AddCrystalSpot(int spotNumber, int x, int z, int direction)
-		{
-			AddNpc(47247, L("Rootcrystal Cluster"), "f_pilgrimroad_49", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_pilgrimroad_49", 1003);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A veined rootcrystal hums quietly in the soil. Striking now would shatter it to waste*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_pilgrimroad_49.Quest1003.Spot{spotNumber}";
-				var gathered = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (gathered)
-				{
-					await dialog.Msg(L("{#666666}*This cluster is already worked. The base is cleanly broken, shards removed*{/}"));
-					return;
-				}
-
-				var spawnedKey = $"Laima.Quests.f_pilgrimroad_49.Quest1003.Spot{spotNumber}.Spawned";
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && GameRandom.Get().Next(100) < 18)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Tiny_Brown, 1, 70, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FF6666}A Brown Tini lunges from the crystal shadow!{/}"));
-					}
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Striking the crystal base..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(4));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Inventory.Add(650555, 1, InventoryAddType.PickUp);
-					character.Variables.Perm.Set(variableKey, true);
-
-					var currentCount = character.Inventory.CountItem(650555);
-					character.ServerMessage(LF("Rootcrystal shards gathered: {0}/8", currentCount));
-
-					if (currentCount >= 8)
-					{
-						character.ServerMessage(L("{#FFD700}All shards gathered! Return to Crystal-Gatherer Morta.{/}"));
-					}
-				}
-				else
-				{
-					character.ServerMessage(L("Gathering interrupted."));
-				}
-			});
-		}
-
-		AddCrystalSpot(1, -1009, -2132, 0);
-		AddCrystalSpot(2, -894, -136, 90);
-		AddCrystalSpot(3, -1218, 480, 180);
-		AddCrystalSpot(4, -1236, 901, 270);
-		AddCrystalSpot(5, -25, 990, 0);
-		AddCrystalSpot(6, 1193, 31, 90);
-		AddCrystalSpot(7, 265, -364, 180);
-		AddCrystalSpot(8, 983, 1409, 270);
-
-		// =====================================================================
-		// QUEST 1004: The Silent Seals
-		// =====================================================================
-		// Pilgrim-Archivist Darija - Checking mile-shrine wardmage seals
-		//---------------------------------------------------------------------
-		AddNpc(20151, L("[Pilgrim-Archivist] Darija"), "f_pilgrimroad_49", 2350, 160, 270, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_49", 1004);
-
-			dialog.SetTitle(L("Darija"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A thin archivist in Fedimian grey unrolls a hand-drawn trail map, pinning the corners with pebbles*{/}"));
-				await dialog.Msg(L("The Fedimian wardmage went silent three weeks ago. The last thing his desk-clerk recorded was a set of rubbings - from Aqueduct Bridge, by a Gintaras."));
-
-				var response = await dialog.Select(L("There are four mile-shrines along the Thaumas Trail. Each holds a wardmage seal tied to the Fedimian working. If any seal is broken or corrupted, we'll know the silence is not absence - it is consumption. Walk the four. Tell me what you find."),
-					Option(L("I'll walk the four mile-shrines"), "help"),
-					Option(L("What does 'consumed' mean here?"), "info"),
-					Option(L("Seals are archivist business"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						await dialog.Msg(L("{#666666}*She weights the map with a fifth pebble and circles four points*{/}"));
-
-						character.Quests.Start(questId);
-						await dialog.Msg(L("The shrines are stone pillars marked with a wardmage's sigil. The seal is a wax disc set into the pillar's face."));
-						await dialog.Msg(L("Clean wax means the seal holds. Cracked wax means it weakened. Black wax means - something drank it through the working."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("A wardmage's silence can mean three things. One: he's dead. Two: he's fled. Three: something came through the working and took him. Three is the worst."));
-						await dialog.Msg(L("If the seals are black, it's three. And if it's three, Fedimian has a problem that pilgrim-archivists cannot solve alone."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Then I walk them myself, in time. But I have the knees of an archivist, not a trail-warden. It will take me a season."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var shrinesChecked = character.Variables.Perm.GetInt("Laima.Quests.f_pilgrimroad_49.Quest1004.ShrinesChecked", 0);
-
-				if (shrinesChecked >= 4)
-				{
-					await dialog.Msg(L("{#666666}*She listens without writing, then slowly picks up her pen*{/}"));
-					await dialog.Msg(L("West: cracked. North: cracked. East: black. South: black."));
-					await dialog.Msg(L("{#666666}*She steadies herself*{/}"));
-					await dialog.Msg(L("Two drained. The working is half-consumed. The wardmage was taken through the south seal - it's closest to the Aqueduct side."));
-					await dialog.Msg(L("I send a report to Fedimian tonight. Take this - an archivist's stipend, paid in full for field-work. You earned every coin."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(L("Four mile-shrines. West, north, east, south. Read each, tell me the wax."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Fedimian dispatched a war-mage to replace the silent one. The Thaumas Trail will have a new set of seals by the new moon. This time we guard them."));
-			}
-		});
-
-		// =====================================================================
-		// MILE-SHRINES
-		// =====================================================================
-		// For Quest 1004 - The Silent Seals
-		// =====================================================================
-
-		void AddMileShrine(int shrineNumber, string shrineName, string observation, int x, int z, int direction)
-		{
-			AddNpc(47251, L(shrineName), "f_pilgrimroad_49", x, z, direction, async dialog =>
+			AddNpc(47190, L("Register Stone"), "f_pilgrimroad_49", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_pilgrimroad_49", 1004);
+				var variableKey = $"Laima.Quests.f_pilgrimroad_49.Quest1004.Stone{stoneNumber}";
+				var counterKey = "Laima.Quests.f_pilgrimroad_49.Quest1004.StonesRead";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A weathered stone mile-shrine, a wardmage's sigil faintly visible beneath trail-dust*{/}"));
+					await dialog.Msg(L("{#666666}*A register stone at the road end, its face crowded with cut marks*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_pilgrimroad_49.Quest1004.Shrine{shrineNumber}";
-				var checkedShrine = character.Variables.Perm.GetBool(variableKey, false);
-
-				if (checkedShrine)
+				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*You have already read this seal*{/}"));
+					await dialog.Msg(L("{#666666}*You already counted this one*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Reading the wardmage seal..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(
+					L("Counting the marks..."), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(3)
+				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Variables.Perm.Set(variableKey, true);
-					var shrinesChecked = character.Variables.Perm.GetInt("Laima.Quests.f_pilgrimroad_49.Quest1004.ShrinesChecked", 0);
-					character.Variables.Perm.Set("Laima.Quests.f_pilgrimroad_49.Quest1004.ShrinesChecked", shrinesChecked + 1);
 
-					character.ServerMessage(L(observation));
-					character.ServerMessage(LF("Mile-shrines read: {0}/4", shrinesChecked + 1));
+					var read = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, read);
 
-					if (shrinesChecked + 1 >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All mile-shrines read! Return to Pilgrim-Archivist Darija.{/}"));
-					}
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Register stones read: {0}/3", read));
+
+					if (read >= 3)
+						character.ServerMessage(L("{#FFD700}All 3 stones read. Return to Tomalov.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("Reading interrupted."));
+					character.ServerMessage(L("You leave the stone uncounted."));
 				}
 			});
 		}
 
-		AddMileShrine(1, "West Mile-Shrine", "West seal: wax cracked through the sigil's heart. Not drained - weakened.", -1780, -310, 90);
-		AddMileShrine(2, "North Mile-Shrine", "North seal: wax cracked along the sigil's rim. Warding still holds, barely.", -20, 1000, 180);
-		AddMileShrine(3, "East Mile-Shrine", "East seal: wax blackened. Something drank through this working.", 1700, -40, 270);
-		AddMileShrine(4, "South Mile-Shrine", "South seal: wax blackened and pitted. A single fingerprint impressed into the center, pressed from the inside.", 2050, -1300, 0);
+		AddRegisterStone(1,
+			L("West Stone: 34 marks in 5 weeks, most of them cut shallow and fast by people going back the way they came."), -2275, -648, 255);
+		AddRegisterStone(2,
+			L("North Stone: 19 marks, all of them deep and squared off. Nobody cuts a mark like that unless they mean to finish the walk."), -86, 1279, 89);
+		AddRegisterStone(3,
+			L("East Stone: 4 marks in 5 weeks on the road everybody takes, and the stone's foot has been dug at and packed back in."), 2338, 145, 34);
+
+		// Quest 1005: The Wall with the Letters Inward
+		//---------------------------------------------------------------------
+		AddNpc(155035, L("[Stonecutter] Antanas"), "f_pilgrimroad_49", 2338, 225, 214, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_pilgrimroad_49", 1005);
+
+			dialog.SetTitle(L("Antanas"));
+
+			if (!character.Quests.Has(questId))
+			{
+				if (!character.Quests.HasCompleted(new QuestId("f_pilgrimroad_49", 1001)))
+				{
+					await dialog.Msg(L("Get my blanks off the berms first. I'll not walk up this road to count what's out here until the yard can still cut a stone when I get back."));
+					return;
+				}
+
+				await dialog.Msg(L("{#666666}*He's standing at the yard gate with his coat already on, chisel bag slung over one shoulder like he means to march somewhere*{/}"));
+				await dialog.Msg(L("Good, you again - I was about to go looking for you. Kestas found his 2 markers. They're out on the Manahas road stood up in a wall, letters facing inward, and there are 40 more stones in that wall that came out of my ground."));
+				await dialog.Msg(L("Tomalov's east stone says 4 people took this road in 5 weeks and it's the road everybody takes. Kill 20 Green Tini Archers to open the wall, then take down the 2 Magicians standing behind it."));
+
+				var response = await dialog.Select(L("Will you go up the Manahas road?"),
+					Option(L("I'll pull the wall down"), "help"),
+					Option(L("Why letters inward?"), "info"),
+					Option(L("It's only stone"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("The 2 behind it don't move off the wall. Everything else does, so empty the ground first and then walk in at them."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Because somebody wanted the names read from the inside. Tini don't read. 40 stones, squared, courses laid true, and letters turned in to face whatever is standing in there."));
+						await dialog.Msg(L("I cut 40 of those stones. I know what every one of them says and I would like to know who it is being said to."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("It's 311 stones in 19 years and 40 of them are in a wall. It stopped being only stone somewhere around the third one."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("openWall", out var wallObj)) return;
+				if (!quest.TryGetProgress("killMagicians", out var mageObj)) return;
+
+				if (wallObj.Done && mageObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*He walks the fallen courses reading every stone aloud, foot to foot, and does not skip one*{/}"));
+					await dialog.Msg(L("40. I've got all 40 and I can set every one of them back where it came from, and I'm going to do it in the order I cut them."));
+					await dialog.Msg(L("Take the hammer off the wall foot. It's Orsha work, it isn't mine, and somebody laid those courses with it. Tomalov's second column can stop where it is."));
+
+					character.Quests.Complete(questId);
+				}
+				else if (wallObj.Done)
+				{
+					await dialog.Msg(L("Ground's clear. The 2 behind the wall are still standing there and they'll stand there until you go in."));
+				}
+				else
+				{
+					await dialog.Msg(L("Too many archers on the courses. Take them off it first - you don't want to be pulling stone with shafts coming down at you."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("31 stones back in the ground and 9 to go, and Giedra has re-washed every one. Tomalov put 11 marks on the east stone this week, which is what that road ought to look like."));
+			}
+		});
 	}
 }
 
@@ -466,178 +411,212 @@ public class FPilgrimroad49QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: Trail Pest Kill
+// Quest 1001 CLASS: Forty Blanks in the Yard
 //-----------------------------------------------------------------------------
 
-public class TrailPestCullQuest : QuestScript
+public class FortyBlanksInTheYardQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_49", 1001);
-		SetName("Trail Pest Kill");
+		SetName(L("Forty Blanks in the Yard"));
 		SetType(QuestType.Sub);
-		SetDescription("Trail-Warden Balys needs twenty Brown Tinis thinned before pilgrim caravans can move along the Thaumas Trail again.");
+		SetDescription(L("The stonecutter has cut 311 markers in 19 years for the pilgrims who stop on this stretch. The Green Tini Archers have been dragging his uncut blanks off the yard to build up their shooting berms."));
 		SetLocation("f_pilgrimroad_49");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Trail-Warden] Balys", "f_pilgrimroad_49");
+		AddQuestGiver(L("[Stonecutter] Antanas"), "f_pilgrimroad_49");
 
-		AddObjective("killTini", "Defeat Brown Tinis",
-			new KillObjective(20, new[] { MonsterId.Tiny_Brown }));
+		AddObjective("killArchers", L("Kill Green Tini Archers on the berms"),
+			new KillObjective(25, new[] { MonsterId.Tiny_Bow_Green }));
+
+		AddObjective("collectBlanks", L("Recover the tombstone blanks"),
+			new CollectItemObjective(662159, 8));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(8000));
-		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
+		AddReward(new SilverReward(11200));
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
 		AddReward(new ItemReward(640004, 2)); // Large HP Potion
 		AddReward(new ItemReward(640007, 2)); // Large SP Potion
-		AddReward(new ItemReward(640012, 1));  // Recovery Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(662159, 0.40f, MonsterId.Tiny_Bow_Green);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(662159, character.Inventory.CountItem(662159), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(662159, character.Inventory.CountItem(662159), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1002 CLASS: The Unfinished Pilgrimage
+// Quest 1002 CLASS: Six Stones a Day
 //-----------------------------------------------------------------------------
 
-public class TheUnfinishedPilgrimageQuest : QuestScript
+public class SixStonesADayQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_49", 1002);
-		SetName("The Unfinished Pilgrimage");
+		SetName(L("Six Stones a Day"));
 		SetType(QuestType.Sub);
-		SetDescription("Pilgrim-Priest Petras's Fedimian rites-scroll must reach Waystation-Keeper Urte at the Grynas Trails crossing.");
+		SetDescription(L("A cut name does not show until it has had the lime wash, and without it the stone weathers blank in 3 years. The Brown Tini have been rolling in the chalk banks and carrying the lime away in their coats."));
 		SetLocation("f_pilgrimroad_49");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Pilgrim-Priest] Petras", "f_pilgrimroad_49");
+		AddQuestGiver(L("[Letterer] Giedra"), "f_pilgrimroad_49");
 
-		AddObjective("deliverScroll", "Deliver the rites-scroll to Urte and return",
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_49.Quest1002.Delivered", 1, true));
+		AddObjective("collectLime", L("Beat Lime Powder out of the Brown Tini coats"),
+			new CollectItemObjective(662160, 10));
 
 		AddReward(new ExpReward(15600, 10800));
-		AddReward(new SilverReward(8000));
-		AddReward(new ItemReward(640085, 1));  // Lv5 EXP Card
-		AddReward(new ItemReward(640004, 2));  // Large HP Potion
-		AddReward(new ItemReward(640007, 2));  // Large SP Potion
+		AddReward(new SilverReward(11200));
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+
+		AddDrop(662160, 0.45f, MonsterId.Tiny_Brown);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_49.Quest1002.Delivered");
+		character.Inventory.Remove(662160, character.Inventory.CountItem(662160), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_49.Quest1002.Delivered");
+		character.Inventory.Remove(662160, character.Inventory.CountItem(662160), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1003 CLASS: Rootcrystal Shards
+// Quest 1003 CLASS: Nine Miles of South Trail
 //-----------------------------------------------------------------------------
 
-public class RootcrystalShardsQuest : QuestScript
+public class NineMilesOfSouthTrailQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_49", 1003);
-		SetName("Rootcrystal Shards");
+		SetName(L("Nine Miles of South Trail"));
 		SetType(QuestType.Sub);
-		SetDescription("Crystal-Gatherer Morta needs eight Rootcrystal shards cleanly broken from the Thaumas Trail clusters.");
+		SetDescription(L("The Brown Tini have taken the last 2 miles of the south trail, and 2 markers have gone off that stretch - dug out foot and all. Kill 30 of them."));
 		SetLocation("f_pilgrimroad_49");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Crystal-Gatherer] Morta", "f_pilgrimroad_49");
+		AddQuestGiver(L("[Trail-Warden] Kestas"), "f_pilgrimroad_49");
 
-		AddObjective("collectShards", "Gather Rootcrystal shards from the clusters",
-			new CollectItemObjective(650555, 8));
+		AddObjective("killTini", L("Kill Brown Tini on the last 2 miles of south trail"),
+			new KillObjective(30, new[] { MonsterId.Tiny_Brown }));
 
 		AddReward(new ExpReward(11000, 7500));
-		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
+		AddReward(new SilverReward(8000));
+		AddReward(new ItemReward(640085, 1)); // Lv5 EXP Card
 		AddReward(new ItemReward(640004, 2)); // Large HP Potion
 		AddReward(new ItemReward(640007, 2)); // Large SP Potion
-		AddReward(new ItemReward(640012, 1));  // Recovery Potion
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650555,
-			character.Inventory.CountItem(650555),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1003.Spot{i}.Spawned");
-		}
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650555,
-			character.Inventory.CountItem(650555),
-			InventoryItemRemoveMsg.Destroyed);
-
-		for (int i = 1; i <= 8; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1003.Spot{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1003.Spot{i}.Spawned");
-		}
 	}
 }
 
-// Quest 1004 CLASS: The Silent Seals
+// Quest 1004 CLASS: Fourteen Hundred Names
 //-----------------------------------------------------------------------------
 
-public class TheSilentSealsQuest : QuestScript
+public class FourteenHundredNamesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_49", 1004);
-		SetName("The Silent Seals");
+		SetName(L("Fourteen Hundred Names"));
 		SetType(QuestType.Sub);
-		SetDescription("Pilgrim-Archivist Darija has asked you to read the wardmage seals at the four mile-shrines along the Thaumas Trail and determine whether the silent Fedimian wardmage was consumed through his own working.");
+		SetDescription(L("The road register holds 1,400 names and which way each of them left Genar Field, and the marks are cut on 3 register stones at the road ends. The binder is 71 and has not reached one in 5 weeks."));
 		SetLocation("f_pilgrimroad_49");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver("[Pilgrim-Archivist] Darija", "f_pilgrimroad_49");
+		AddQuestGiver(L("[Binder] Tomalov"), "f_pilgrimroad_49");
 
-		AddObjective("readShrines", "Read the four mile-shrine seals",
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_49.Quest1004.ShrinesChecked", 4, true));
+		AddObjective("readStones", L("Count the marks on all 3 register stones"),
+			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_49.Quest1004.StonesRead", 3, true));
 
-		AddReward(new ExpReward(11000, 7500));
+		AddReward(new ExpReward(15600, 10800));
 		AddReward(new SilverReward(11200));
-		AddReward(new ItemReward(640085, 2));  // Lv5 EXP Card
+		AddReward(new ItemReward(640085, 2)); // Lv5 EXP Card
 		AddReward(new ItemReward(640004, 2)); // Large HP Potion
 		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_49.Quest1004.ShrinesChecked");
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1004.Shrine{i}");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_49.Quest1004.StonesRead");
+
+		for (var i = 1; i <= 3; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1004.Stone{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_49.Quest1004.ShrinesChecked");
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1004.Shrine{i}");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_49.Quest1004.StonesRead");
+
+		for (var i = 1; i <= 3; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_49.Quest1004.Stone{i}");
+	}
+}
+
+// Quest 1005 CLASS: The Wall with the Letters Inward
+//-----------------------------------------------------------------------------
+
+public class TheWallWithTheLettersInwardQuest : QuestScript
+{
+	protected override void Load()
+	{
+		SetId("f_pilgrimroad_49", 1005);
+		SetName(L("The Wall with the Letters Inward"));
+		SetType(QuestType.Sub);
+		SetDescription(L("40 finished markers are standing in a wall out on the Manahas road, courses laid true and every name turned to face inward. Open the wall and take down the 2 Tini Magicians standing behind it."));
+		SetLocation("f_pilgrimroad_49");
+		SetAutoTracked(true);
+
+		SetReceive(QuestReceiveType.Manual);
+		SetCancelable(true);
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Stonecutter] Antanas"), "f_pilgrimroad_49");
+
+		AddPrerequisite(new CompletedPrerequisite("f_pilgrimroad_49", 1001));
+
+		AddObjective("openWall", L("Kill Green Tini Archers on the wall courses"),
+			new KillObjective(20, new[] { MonsterId.Tiny_Bow_Green }));
+
+		AddObjective("killMagicians", L("Take down the 2 Magicians behind the wall"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Tiny_Mage, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Tiny_Bow_Green, 3),
+				},
+				resetIdent: "openWall",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
+
+		AddReward(new ExpReward(39000, 27000));
+		AddReward(new SilverReward(32000));
+		AddReward(new ItemReward(203110, 1)); // Iron Fist
+		AddReward(new ItemReward(640085, 3)); // Lv5 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 }

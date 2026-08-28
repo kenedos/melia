@@ -1,63 +1,128 @@
 //--- Melia Script ----------------------------------------------------------
 // Seir Rainforest Quest NPCs
 //--- Description -----------------------------------------------------------
-// Ferret-cartel quests for the deeper rainforest map.
+// The Ferret trade country, the saplings that will no longer take root in it,
+// and the demon bleeding into the soil under all of it.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
-using Melia.Shared.Util;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FOrchard324QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Canopy Volley
-		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Ranger] Vittorin"), "f_orchard_32_4", 1400, 40, 270, async dialog =>
+		// Quest 1001: Ceyral Saplings
+		//---------------------------------------------------------------------
+		AddNpc(147473, L("[Sapling-Keeper] Ruta"), "f_orchard_32_4", 905, 549, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_32_4", 1001);
 
-			dialog.SetTitle(L("Vittorin"));
+			dialog.SetTitle(L("Ruta"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Seir Rainforest looks peaceful until you look up. Ferret Archers nest in every canopy, and they shoot first."));
-				await dialog.Msg(L("The trade road through here has been abandoned for a month. Merchants say the arrows aren't aimed to kill - they're aimed to scare. That's almost worse."));
-				await dialog.Msg(L("Thin out the canopy archers and the merchants will come back. Without them, Alemeth's festival loses its spice trade."));
+				await dialog.Msg(L("{#666666}*She's on her knees over an empty planting row, staring at a hole where a sapling should be*{/}"));
+				await dialog.Msg(L("Third one this row, gone by morning. I plant Ceyral - the only tree that will hold this soil once the rain gets into it - and I have put 400 saplings into this rainforest in 6 years."));
+				await dialog.Msg(L("The Ferret Searchers dig them up the same week and carry them off. Get me 10 saplings back off them so I have something to replant with."));
 
-				var response = await dialog.Select(L("Will you kill the canopy archers?"),
-					Option(L("I'll kill the canopy"), "help"),
-					Option(L("Aimed to scare?"), "info"),
-					Option(L("Reroute the road"), "leave")
+				var response = await dialog.Select(L("Will you get the saplings back?"),
+					Option(L("I'll recover 10 saplings"), "help"),
+					Option(L("Why do they dig them up?"), "info"),
+					Option(L("Plant somewhere else"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Twenty-two. Look up often - they love to drop shots right past your ear."));
-						await dialog.Msg(L("Good hunting."));
+						await dialog.Msg(L("A Searcher carries them in a hip sling and it will drop the sling before it drops anything else. Push one hard and you get the whole sling."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Every arrow's been a warning shot. They're marking territory, not hunting."));
-						await dialog.Msg(L("Doesn't matter. A warning shot still turns merchants around."));
+						await dialog.Msg(L("They did not, for the first 4 years. They walked past my rows the way you walk past a fence. Something changed 2 years ago and now they take every single one."));
+						await dialog.Msg(L("They are not eating them. I have followed a Searcher for half a day and watched it put a sapling down on bare rock and walk away."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("The reroute crosses the abbey pass. Two weeks longer, with twice the bandits. It's Seir or nothing."));
+						await dialog.Msg(L("There is nowhere else. This is the slope that goes into the river when the rain comes, and it comes every year."));
+						break;
+				}
+			}
+			else if (character.Quests.IsActive(questId))
+			{
+				if (!character.Quests.TryGetById(questId, out var quest)) return;
+				if (!quest.TryGetProgress("collectSaplings", out var itemObj)) return;
+
+				if (itemObj.Done)
+				{
+					await dialog.Msg(L("{#666666}*She checks each root ball with a thumbnail before setting it down*{/}"));
+					await dialog.Msg(L("Ten, and 8 of them still alive. That is a full row and I will have them in the ground before dark."));
+					await dialog.Msg(L("Take the planting fund. The Kingdom pays it by the sapling and it has never once asked whether the saplings survived."));
+
+					character.Quests.Complete(questId);
+				}
+				else
+				{
+					await dialog.Msg(L("Still short. The Searchers work the northern gullies - that is where my rows were."));
+				}
+			}
+			else if (character.Quests.HasCompleted(questId))
+			{
+				await dialog.Msg(L("The row is in and 2 of them have gone brown at the tip already. That is not a Searcher. That is the ground."));
+			}
+		});
+
+		// Quest 1002: The Archers on the Trail
+		//---------------------------------------------------------------------
+		AddNpc(147484, L("[Trail-Warden] Sabas"), "f_orchard_32_4", 1435, 34, 270, async dialog =>
+		{
+			var character = dialog.Player;
+			var questId = new QuestId("f_orchard_32_4", 1002);
+
+			dialog.SetTitle(L("Sabas"));
+
+			if (!character.Quests.Has(questId))
+			{
+				await dialog.Msg(L("{#666666}*He steps out from behind a tree trunk with a hand still on his knife, then lets go of it once he sees your face*{/}"));
+				await dialog.Msg(L("Sorry - can't be too careful on this stretch any more. I have walked the Seir trail for 9 years and traded with the Ferrets the whole time. Salt for resin, and neither side ever counted too hard."));
+				await dialog.Msg(L("Now their Archers shoot at the trail from the canopy and I have lost 2 porters. Kill 30 of them, because I would very much like to go back to trading."));
+
+				var response = await dialog.Select(L("Will you clear the trail?"),
+					Option(L("I'll kill the Ferret Archers"), "help"),
+					Option(L("You traded with them?"), "info"),
+					Option(L("Trade a different route"), "leave")
+				);
+
+				switch (response)
+				{
+					case "help":
+						character.Quests.Start(questId);
+						await dialog.Msg(L("They shoot from the canopy and drop when you get close. Kill them on the ground - in the branches you will spend all day looking up."));
+						break;
+
+					case "info":
+						await dialog.Msg(L("Nine years. I know their supply soldiers by sight. One of them used to leave a resin block on the trail stone for me and take the salt without ever showing itself."));
+						await dialog.Msg(L("The block stopped 2 years ago. I put salt out for a month anyway, which tells you what sort of trader I am."));
+						break;
+
+					case "leave":
+						await dialog.Msg(L("There is one trail through this rainforest and it is this one. The rest is river and gulley."));
 						break;
 				}
 			}
@@ -68,441 +133,276 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 
 				if (killObj.Done)
 				{
-					await dialog.Msg(L("Canopy's quiet. I can hear the river again - that's how I know it's safe."));
-					await dialog.Msg(L("Take your pay. The merchants will owe you a round when they get back."));
+					await dialog.Msg(L("Walked the trail end to end with a full pack and nothing came out of the canopy. I did not enjoy it as much as I expected to."));
+					await dialog.Msg(L("Take the warden's cut. It is 9 years of salt money and it has been sitting in a strongbox getting damp."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Still arrows coming down. Keep climbing."));
+					await dialog.Msg(L("Still archers up there. You will hear the branch move before you hear anything else."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First caravan through yesterday. Not one arrow. Like old times."));
+				await dialog.Msg(L("I put a salt block on the trail stone again last night. It was gone this morning and there was no resin. So something is still taking it, and it is not trading."));
 			}
 		});
 
-		// Quest 2: Rainforest Crystal Bloom
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Crystal Scholar] Immre"), "f_orchard_32_4", 900, 550, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_32_4", 1002);
-
-			dialog.SetTitle(L("Immre"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("The Rootcrystals in Seir bloom differently than any I've seen. Petal-like growths, pale violet, swollen with mana."));
-				await dialog.Msg(L("I can't get close - they lash out like something alive. But you can crack them open."));
-				await dialog.Msg(L("Five blooms is all I need. One paper's worth of research, and then I go home to Fedimian with something the Academy has never catalogued."));
-
-				var response = await dialog.Select(L("Will you crack the blooms for me?"),
-					Option(L("I'll break five Rootcrystals"), "help"),
-					Option(L("Why are they alive?"), "info"),
-					Option(L("Do your own fieldwork"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Look for the ones with the violet swellings - those are the bloomed ones. Dull grey clusters are dormant."));
-						await dialog.Msg(L("Bring me five. I'll cite you in the footnotes."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Theory is they're absorbing residual mana from something deeper in the forest. A ley-line, perhaps - or worse."));
-						await dialog.Msg(L("Either way, the blooms are the proof. If I can test one, I'll know which."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("The last scholar who tried lost three fingers. I'd rather keep mine, thank you."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				var bloomCount = character.Inventory.CountItem(650310);
-
-				if (bloomCount >= 5)
-				{
-					await dialog.Msg(L("Five! And the color - exquisite. Still warm with mana, look at that."));
-					await dialog.Msg(L("Take this with my thanks. I'll dedicate the paper to you if you'd like - or keep your name out of it, no offense taken."));
-
-					character.Inventory.Remove(650310, 5, InventoryItemRemoveMsg.Given);
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					await dialog.Msg(LF("Keep cracking them. You've got {0} of five.", bloomCount));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The paper's drafted. The Academy is going to lose its mind over the mana readings."));
-			}
-		});
-
-		// Quest 3: The Contraband Stash
-		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Customs Officer] Brenna"), "f_orchard_32_4", -1000, -600, 90, async dialog =>
+		// Quest 1003: Purifying the Soil
+		//---------------------------------------------------------------------
+		AddNpc(152064, L("[Priest of Vakarine] Ivona"), "f_orchard_32_4", -1051, -660, 45, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_32_4", 1003);
 
-			dialog.SetTitle(L("Brenna"));
+			dialog.SetTitle(L("Ivona"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Ferret Searchers have been combing Seir for months. They're not foraging - they're working for somebody."));
-				await dialog.Msg(L("Every so often a Searcher buries a little seed pouch. Contraband. Narcotic spores, by the smell of it."));
-				await dialog.Msg(L("I need four pouches for evidence, and the Searcher count down a good bit so the network stalls while Orsha moves on the leadership."));
+				await dialog.Msg(L("{#666666}*She's kneeling at the shrine, sorting a stack of scrolls into a neat, deliberate row without looking up right away*{/}"));
+				await dialog.Msg(L("You have good timing - I was about to go looking for someone with steady legs. Ruta plants trees that die. Sabas trades with Ferrets that shoot at him. Both date it to 2 years ago, and neither has walked out to the western gullies to look at the ground."));
+				await dialog.Msg(L("I have. There are 4 patches out there where the soil runs black and nothing grows. Take these purification scrolls and burn one on each patch."));
 
-				var response = await dialog.Select(L("Will you bring me the pouches?"),
-					Option(L("I'll do both"), "help"),
-					Option(L("Narcotic spores?"), "info"),
-					Option(L("Call in the garrison"), "leave")
+				var response = await dialog.Select(L("Will you burn the scrolls?"),
+					Option(L("I'll purify all 4 patches"), "help"),
+					Option(L("What's in the soil?"), "info"),
+					Option(L("That won't fix a rainforest"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("The pouches are small, wrapped in oiled leaves. Look for disturbed soil under the Searcher routes."));
-						await dialog.Msg(L("Don't open them. Don't even smell them. Just bring them to me sealed."));
+						character.Inventory.Add(667024, 4, InventoryAddType.PickUp);
+						await dialog.Msg(L("Burn it flat on the patch, not held up. The scroll has to be touching what it is cleaning or it purifies a very holy piece of air."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Dried spores from some kind of fungal tree. Mixed with tobacco, they're stronger than anything we've seen."));
-						await dialog.Msg(L("Two caravans from Fedimian lost half their crew to the stuff last month. I'm putting a stop to it."));
+						await dialog.Msg(L("Blood. Not animal blood and not spilled - seeping, from underneath, steadily, for about 2 years."));
+						await dialog.Msg(L("A Ceyral sapling put into that will die in a fortnight. A Ferret that walks over it every day for 2 years will do something else, and it has."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("The garrison is stretched thin. That's why I'm out here alone. That's why I'm asking you."));
+						await dialog.Msg(L("No. It will tell me how deep the source is by how fast the black comes back, which is the only thing I can measure from up here."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killSearchers", out var killObj)) return;
-				if (!quest.TryGetProgress("recoverPouches", out var pouchObj)) return;
+				if (!quest.TryGetProgress("purifyPatches", out var patchObj)) return;
 
-				if (killObj.Done && pouchObj.Done)
+				if (patchObj.Done)
 				{
-					await dialog.Msg(L("Four pouches, all sealed. That's the evidence I needed."));
-					await dialog.Msg(L("Orsha will move on the cartel leadership tonight. Your name goes in the report, if you want credit."));
-
-					character.Inventory.Remove(650700, character.Inventory.CountItem(650700), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("All 4 clean, and 3 of them went black again before you got back to me. The source is directly under this forest and it is not deep."));
+					await dialog.Msg(L("Take what the shrine has. It has been collecting offerings for 2 years from people whose trees keep dying and it has never once helped them."));
 
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					var status = "";
-					if (!killObj.Done)
-						status += L("Kill more Ferret Searchers. ");
-					if (!pouchObj.Done)
-						status += L("Recover more contraband seed pouches. ");
-
-					await dialog.Msg(LF("Keep at it. {0}", status));
+					await dialog.Msg(L("Patches still unburned. All 4, out in the western gullies where the ground drops."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The cartel's top three are in Orsha's cells. Paperwork's a nightmare but the forest is cleaner."));
+				await dialog.Msg(L("Three of four back to black inside an hour. If I have the arithmetic right, the thing bleeding is about 40 paces down and directly beneath the searcher gullies."));
 			}
 		});
 
-		// Contraband Seed Pouch Points
-		//-------------------------------------------------------------------------
-		void AddPouchStash(int pouchNum, int x, int z, int direction)
+		// Quest 1003 interaction points - the blackened soil patches
+		//---------------------------------------------------------------------
+		void AddTaintedPatch(int patchNumber, string observation, int x, int z, int direction)
 		{
-			AddNpc(12080, L("Disturbed Soil"), "f_orchard_32_4", x, z, direction, async dialog =>
+			AddNpc(47200, L("Blackened Soil"), "f_orchard_32_4", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_orchard_32_4", 1003);
-				var variableKey = $"Laima.Quests.f_orchard_32_4.Quest1003.Pouch{pouchNum}";
-				var spawnedKey = $"Laima.Quests.f_orchard_32_4.Quest1003.Pouch{pouchNum}.Spawned";
+				var variableKey = $"Laima.Quests.f_orchard_32_4.Quest1003.Patch{patchNumber}";
+				var counterKey = "Laima.Quests.f_orchard_32_4.Quest1003.PatchesPurified";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*Loose soil, recently turned*{/}"));
+					await dialog.Msg(L("{#666666}*A patch of soil gone black, with nothing growing on it*{/}"));
 					return;
 				}
 
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*You've already dug up this stash*{/}"));
+					await dialog.Msg(L("{#666666}*The ash of your scroll is already darkening again*{/}"));
 					return;
 				}
 
-				var hasSpawned = character.Variables.Perm.GetBool(spawnedKey, false);
-				if (!hasSpawned && GameRandom.Get().Next(100) < 35)
-				{
-					character.Variables.Perm.Set(spawnedKey, true);
-
-					if (SpawnTempMonsters(character, MonsterId.Ferret_Searcher, 2, 80, TimeSpan.FromMinutes(1)))
-					{
-						character.ServerMessage(L("{#FFCC66}Ferret Searchers scramble out from the brush to defend the stash!{/}"));
-					}
-				}
+				var luredCount = LureNearbyEnemies(character, 500, 400);
+				if (luredCount > 0)
+					character.ServerMessage(LF("{{#FF6666}}The burning scroll carries - {0} drawn in!{{/}}", luredCount));
 
 				var result = await character.TimeActions.StartAsync(
-					L("Digging up stash..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3)
+					L("Burning the purification scroll..."), L("Cancel"), "PRAY", TimeSpan.FromSeconds(5)
 				);
 
 				if (result == TimeActionResult.Completed)
 				{
-					character.Inventory.Add(650700, 1, InventoryAddType.PickUp);
 					character.Variables.Perm.Set(variableKey, true);
-					character.ServerMessage(L("Recovered: Contraband Seed Pouch"));
 
-					var currentCount = character.Inventory.CountItem(650700);
-					character.ServerMessage(LF("Pouches recovered: {0}/4", currentCount));
+					var purified = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, purified);
 
-					if (currentCount >= 4)
-					{
-						character.ServerMessage(L("{#FFD700}All four pouches recovered! Return to Brenna.{/}"));
-					}
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Patches purified: {0}/4", purified));
+
+					if (purified >= 4)
+						character.ServerMessage(L("{#FFD700}All 4 patches burned. Return to Priest Ivona.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("You stopped digging."));
+					character.ServerMessage(L("The scroll goes out before it catches."));
 				}
 			});
 		}
 
-		AddPouchStash(1, -500, -300, 0);
-		AddPouchStash(2, -800, -550, 0);
-		AddPouchStash(3, -1200, -600, 0);
-		AddPouchStash(4, -700, -750, 0);
+		AddTaintedPatch(1, L("The first patch runs clean and pale under the ash."), -183, 1370, 0);
+		AddTaintedPatch(2, L("The second patch clears, and the black creeps back in at the edge as you watch."), -835, 992, 90);
+		AddTaintedPatch(3, L("The third patch takes twice as long to burn through."), 9, 669, 180);
+		AddTaintedPatch(4, L("The fourth patch clears and is grey again before you have stood up."), -295, 1420, 270);
 
-		// Quest 4: The Cartel Ledgers
-		//-------------------------------------------------------------------------
-		AddNpc(47245, L("[Investigator] Marek"), "f_orchard_32_4", -100, 500, 180, async dialog =>
+		// Quest 1004: The Earth Flower
+		//---------------------------------------------------------------------
+		AddNpc(147473, L("[Sapling-Keeper] Ruta"), "f_orchard_32_4", 470, 912, 180, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_32_4", 1004);
 
-			dialog.SetTitle(L("Marek"));
+			dialog.SetTitle(L("Ruta"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Ferret Vendors aren't vendors. They're bookkeepers. Every one of them carries a little ledger stitched from bark."));
-				await dialog.Msg(L("Those ledgers track routes, suppliers, buyers - the whole cartel, written in a chittering shorthand I'm finally starting to crack."));
-				await dialog.Msg(L("Bring me five ledgers. Kill twelve Vendors while you're at it so the network runs thin. I'll do the translation."));
+				await dialog.Msg(L("{#666666}*She waves you over before you've even finished walking up, already mid-thought*{/}"));
+				await dialog.Msg(L("Good, you're still here - I've been turning an idea over since this morning. The Earth Flower used to grow all through these gullies. Put one at the head of a Ceyral row and the whole row takes; it does something to the soil I cannot do with a spade."));
+				await dialog.Msg(L("There has not been one in 2 years, but the Ferret Merchants hoard seeds. Kill 15 of them and bring me 6 Earth Flower Seeds."));
 
-				var response = await dialog.Select(L("Will you bring me the ledgers?"),
-					Option(L("I'll bring the ledgers"), "help"),
-					Option(L("How do they chitter a ledger?"), "info"),
-					Option(L("Read them yourself"), "leave")
+				var response = await dialog.Select(L("Will you get the seeds?"),
+					Option(L("I'll hunt the Merchants and bring 6 seeds"), "help"),
+					Option(L("The Merchants hoard seeds?"), "info"),
+					Option(L("A flower won't beat black soil"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Vendors always drop their ledgers when struck - they're light sleepers and lighter pocketed."));
-						await dialog.Msg(L("Twelve Vendors, five ledgers. Simple math, complicated fieldwork."));
+						await dialog.Msg(L("A Merchant carries its hoard on its back and it will not put the pack down for anything, so the pack comes off it dead or not at all."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Dots, scratches, little tooth-marks. Each mark is a cargo type, each row is a week."));
-						await dialog.Msg(L("If you squint it's almost elegant. Which is maddening, because these are ferrets."));
+						await dialog.Msg(L("They hoard everything. That is the whole of their trade. What is unusual is that they have kept these particular seeds for 2 years and never once put one in the ground."));
+						await dialog.Msg(L("Sabas thinks they are saving them. I think something told them to take them out of the ground and nobody told them what to do next."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("I'm trying to. Hard to read a ledger still clutched in a defiant paw."));
+						await dialog.Msg(L("Ivona says the source is 40 paces down. I cannot dig 40 paces. I can put a flower at the head of a row and I am going to."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killVendors", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherLedgers", out var ledgerObj)) return;
+				if (!quest.TryGetProgress("killMerchants", out var killObj)) return;
+				if (!quest.TryGetProgress("collectSeeds", out var itemObj)) return;
 
-				if (killObj.Done && ledgerObj.Done)
+				if (killObj.Done && itemObj.Done)
 				{
-					await dialog.Msg(L("Five ledgers! And twelve Vendors cooler than they were this morning. The network's gutted."));
-					await dialog.Msg(L("Take your pay. I'll be up all night translating."));
-
-					character.Inventory.Remove(650420, character.Inventory.CountItem(650420), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*She rolls a seed between her fingers and it leaves a green smear*{/}"));
+					await dialog.Msg(L("Alive. Two years in a Ferret pack and still alive. That is a tougher seed than I am a gardener."));
+					await dialog.Msg(L("Take the rest of the planting fund. If the flower takes, I will have earned it back by spring, and if it does not, I will not need it."));
 
 					character.Quests.Complete(questId);
 				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Plenty of Merchants down and I still need seeds. Not every pack has them - go for the heavy ones."));
+				}
 				else
 				{
-					var status = "";
-					if (!killObj.Done)
-						status += L("Kill more Ferret Vendors. ");
-					if (!ledgerObj.Done)
-						status += L("Recover more cartel ledgers. ");
-
-					await dialog.Msg(LF("Keep going. {0}", status));
+					await dialog.Msg(L("Still Merchants moving through the gullies. They travel loaded and they travel slow."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Translated every ledger. Orsha has the supplier names, the buyer names, everything."));
+				await dialog.Msg(L("One of the 6 has opened. An Earth Flower of Vigor at the head of my northern row and the whole row is still green. First green row in 2 years."));
 			}
 		});
 
-		// Quest 5: The Cartel Kingpin
-		//-------------------------------------------------------------------------
-		AddNpc(20011, L("[Bounty Captain] Levko"), "f_orchard_32_4", 1350, 110, 270, async dialog =>
+		// Quest 1005: What Is Bleeding Under the Gullies
+		//---------------------------------------------------------------------
+		AddNpc(152064, L("[Priest of Vakarine] Ivona"), "f_orchard_32_4", -1714, 870, 90, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_orchard_32_4", 1005);
-			var kingpinSpawnedKey = "Laima.Quests.f_orchard_32_4.Quest1005.KingpinSpawned";
 
-			dialog.SetTitle(L("Levko"));
+			dialog.SetTitle(L("Ivona"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("The Bearers are the cartel's muscle. Big, armored, mean when roused. They answer to one ferret - the Kingpin."));
-				await dialog.Msg(L("The Kingpin doesn't show himself while his Bearers are intact. Kill ten Bearers, and his pride - and a lot of shouting in chittering ferret-cant - will bring him out."));
-				await dialog.Msg(L("Bounty's set. His seal-ring alone is worth more than a house in Orsha."));
+				if (!character.Quests.HasCompleted(new QuestId("f_orchard_32_4", 1003)))
+				{
+					await dialog.Msg(L("Burn the 4 scrolls first. Until I know how fast the black comes back I am guessing, and I would rather not send anybody down a hole on a guess."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Want the contract?"),
-					Option(L("I'll take the Kingpin"), "help"),
-					Option(L("Seal-ring?"), "info"),
-					Option(L("Leave the crown"), "leave")
+				await dialog.Msg(L("{#666666}*She's already standing, scroll case slung over one shoulder, waiting for you rather than working*{/}"));
+				await dialog.Msg(L("Forty paces down under the searcher gullies there is a cut in the rock, and there is a Zaura sitting in it, bleeding into the water table."));
+				await dialog.Msg(L("That is 2 years of demon blood in everything that grows here and everything that walks on it. Kill 25 Ferret Searchers off the gully mouth so it cannot use them, then go down and finish it."));
+
+				var response = await dialog.Select(L("Will you go down the cut?"),
+					Option(L("I'll kill the Zaura"), "help"),
+					Option(L("Why is it just sitting there?"), "info"),
+					Option(L("Seal the cut instead"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Ten Bearers. Don't rush the count - he won't come out till they're thinned for real."));
-						await dialog.Msg(L("When he shows, he shows hard. Good luck."));
+						await dialog.Msg(L("It fights in the water and the water is its. Get it onto the dry shelf at the cut mouth - it is slow to follow and it does not like the change."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("A huge ring carved from amber, stamped with the cartel mark. Every Vendor bows to it."));
-						await dialog.Msg(L("Crack the ring, and every Vendor in Seir loses their permission slip."));
+						await dialog.Msg(L("Because it is not hunting. It is watering. Two years of Searchers digging up saplings and putting them down on bare rock, and I have finally understood that it was clearing ground."));
+						await dialog.Msg(L("Something down there wants nothing growing over it. I have no idea what comes next and I would like the bleeding stopped before I find out."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Maybe. The bounty doesn't expire."));
+						await dialog.Msg(L("Seal it and the water table carries the blood anyway. The rock is not the problem. The thing in it is."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killBearers", out var bearerObj)) return;
-				if (!quest.TryGetProgress("killKingpin", out var kingObj)) return;
+				if (!quest.TryGetProgress("clearGullies", out var gullyObj)) return;
+				if (!quest.TryGetProgress("killZaura", out var bossObj)) return;
 
-				if (bearerObj.Done && kingObj.Done)
+				if (gullyObj.Done && bossObj.Done)
 				{
-					await dialog.Msg(L("The ring! Amber's cracked but the stamp's clean - that's him."));
-					await dialog.Msg(L("Bounty paid, plus my share. The cartel's done in Seir."));
-
-					character.Variables.Perm.Remove(kingpinSpawnedKey);
+					await dialog.Msg(L("It is dead and the water in the cut ran clear within the hour. I have never seen anything reverse that fast and I do not entirely trust it."));
+					await dialog.Msg(L("Take this from the shrine. Somebody left it 2 years ago with a note asking for their orchard back, and their orchard is back."));
 
 					character.Quests.Complete(questId);
 				}
-				else if (bearerObj.Done && !kingObj.Done)
+				else if (gullyObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(kingpinSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(kingpinSpawnedKey, true);
-
-						if (SpawnTempMonsters(character, MonsterId.Ferret_Vendor, 1, 120, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("Bearers are thin enough. Listen - the chittering's picked up. He's coming."));
-							await dialog.Msg(L("{#FF9966}Move, now! He won't give you twice!{/}"));
-							character.ServerMessage(L("{#FF9966}The Cartel Kingpin emerges, screaming orders!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("He's out there. Hunt him down before he slips back in."));
-					}
+					await dialog.Msg(L("The gully mouth is clear. Go down. It will know you are coming the moment you are in the water."));
 				}
 				else
 				{
-					await dialog.Msg(L("Bearers still thick on the ground. Thin them, then he'll come."));
+					await dialog.Msg(L("Too many Searchers at the gully mouth. It will pull them down on top of you the moment you are in the cut."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Ring's in the case on my wall. The cartel's splinter-groups are fighting each other now. Progress."));
-			}
-		});
-
-		// Quest 6: Seir Trail Cleanup
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Caravan Master] Denys"), "f_orchard_32_4", -1700, 870, 45, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_orchard_32_4", 1006);
-
-			dialog.SetTitle(L("Denys"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("The Seir Trail is the only way out of the rainforest west. It's thick with Archers up top and Searchers at the roots."));
-				await dialog.Msg(L("The caravans want assurance both species are thinned before they commit. Festival season's at stake."));
-
-				var response = await dialog.Select(L("Will you clear the trail for the caravans?"),
-					Option(L("I'll clear both"), "help"),
-					Option(L("Which is worse?"), "info"),
-					Option(L("Try the river route"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("Twelve of each. Archers up top, Searchers down at the roots. Watch in both directions."));
-						await dialog.Msg(L("Festival carts are staged already. Clear the trail and they roll by morning."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Archers shoot from the canopy. Searchers pin your ankles in the roots. I hate the ankles more, personally."));
-						await dialog.Msg(L("Neither one is worse than the other. But together they shut the trail down."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("The river route washed out last month. Not passable till spring."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killArchers", out var archerObj)) return;
-				if (!quest.TryGetProgress("killSearchers", out var searcherObj)) return;
-
-				if (archerObj.Done && searcherObj.Done)
-				{
-					await dialog.Msg(L("Both species thinned to safe numbers. Caravans roll out at dawn."));
-					await dialog.Msg(L("Take your cut. Every festival stall owes you a toast."));
-
-					character.Quests.Complete(questId);
-				}
-				else
-				{
-					var status = "";
-					if (!archerObj.Done)
-						status += L("Kill more Ferret Archers. ");
-					if (!searcherObj.Done)
-						status += L("Kill more Ferret Searchers. ");
-
-					await dialog.Msg(LF("Keep pushing. {0}", status));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Three caravans through yesterday. The festival committee sent a thank-you cask."));
+				await dialog.Msg(L("Sabas found a resin block on the trail stone this morning. Nine years of that, then 2 years of nothing, then a resin block. They are coming back to themselves."));
 			}
 		});
 	}
@@ -512,241 +412,212 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-// Quest 1001 CLASS: Canopy Volley
+// Quest 1001 CLASS: Ceyral Saplings
 //-----------------------------------------------------------------------------
 
-public class CanopyVolleyQuest : QuestScript
+public class CeyralSaplingsQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_32_4", 1001);
-		SetName(L("Canopy Volley"));
+		SetName(L("Ceyral Saplings"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Ferret Archers nesting in the Seir Rainforest canopy so merchant caravans can return."));
+		SetDescription(L("Ceyral is the only tree that holds the Seir slope when the rains come, and Ferret Searchers have dug up every sapling planted in 2 years - then set them down on bare rock and walked away."));
 		SetLocation("f_orchard_32_4");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Ranger] Vittorin"), "f_orchard_32_4");
+		AddQuestGiver(L("[Sapling-Keeper] Ruta"), "f_orchard_32_4");
 
-		AddObjective("killArchers", L("Kill Ferret Archers"),
-			new KillObjective(22, new[] { MonsterId.Ferret_Archer }));
+		AddObjective("collectSaplings", L("Recover Ceyral Saplings from Ferret Searchers"),
+			new CollectItemObjective(664104, 10));
 
 		AddReward(new ExpReward(11900, 8100));
 		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
 		AddReward(new ItemReward(640004, 3)); // Large HP Potion
 		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+
+		AddDrop(664104, 0.50f, MonsterId.Ferret_Searcher);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(664104, character.Inventory.CountItem(664104), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(664104, character.Inventory.CountItem(664104), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1002 CLASS: Rainforest Crystal Bloom
+// Quest 1002 CLASS: The Archers on the Trail
 //-----------------------------------------------------------------------------
 
-public class RainforestCrystalBloomQuest : QuestScript
+public class TheArchersOnTheTrailQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_32_4", 1002);
-		SetName(L("Rainforest Crystal Bloom"));
+		SetName(L("The Archers on the Trail"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Break bloomed Rootcrystals in Seir Rainforest and bring their violet blooms to the crystal scholar."));
+		SetDescription(L("Nine years of quiet trade between the Seir trail and the Ferret folk ended 2 years ago. Their archers now shoot the trail from the canopy and the trail-warden has lost 2 porters."));
 		SetLocation("f_orchard_32_4");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Crystal Scholar] Immre"), "f_orchard_32_4");
+		AddQuestGiver(L("[Trail-Warden] Sabas"), "f_orchard_32_4");
 
-		AddObjective("gatherBlooms", L("Gather rainforest crystal blooms"),
-			new CollectItemObjective(650310, 5));
+		AddObjective("killArchers", L("Kill Ferret Archers along the Seir trail"),
+			new KillObjective(30, new[] { MonsterId.Ferret_Archer }));
 
 		AddReward(new ExpReward(11900, 8100));
 		AddReward(new SilverReward(15000));
 		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
 		AddReward(new ItemReward(640004, 3)); // Large HP Potion
 		AddReward(new ItemReward(640007, 3)); // Large SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650310, character.Inventory.CountItem(650310), InventoryItemRemoveMsg.Destroyed);
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650310, character.Inventory.CountItem(650310), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1003 CLASS: The Contraband Stash
+// Quest 1003 CLASS: Purifying the Soil
 //-----------------------------------------------------------------------------
 
-public class TheContrabandStashQuest : QuestScript
+public class PurifyingTheSoilQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_32_4", 1003);
-		SetName(L("The Contraband Stash"));
+		SetName(L("Purifying the Soil"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Ferret Searchers combing the rainforest and dig up four contraband seed pouches for customs evidence."));
+		SetDescription(L("Four patches in the western gullies run black and grow nothing, and the priest wants to know how fast the black returns after a burning - it is the only way she can measure how deep the source lies."));
 		SetLocation("f_orchard_32_4");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Customs Officer] Brenna"), "f_orchard_32_4");
+		AddQuestGiver(L("[Priest of Vakarine] Ivona"), "f_orchard_32_4");
 
-		AddObjective("killSearchers", L("Kill Ferret Searchers"),
-			new KillObjective(15, new[] { MonsterId.Ferret_Searcher }));
-
-		AddObjective("recoverPouches", L("Recover contraband seed pouches"),
-			new CollectItemObjective(650700, 4));
+		AddObjective("purifyPatches", L("Burn a purification scroll on each of the 4 blackened patches"),
+			new VariableCheckObjective("Laima.Quests.f_orchard_32_4.Quest1003.PatchesPurified", 4, true));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
 		AddReward(new ItemReward(640004, 3)); // Large HP Potion
 		AddReward(new ItemReward(640007, 3)); // Large SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650700, character.Inventory.CountItem(650700), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667024, character.Inventory.CountItem(667024), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_32_4.Quest1003.Pouch{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_32_4.Quest1003.Pouch{i}.Spawned");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_orchard_32_4.Quest1003.PatchesPurified");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_32_4.Quest1003.Patch{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650700, character.Inventory.CountItem(650700), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667024, character.Inventory.CountItem(667024), InventoryItemRemoveMsg.Destroyed);
 
-		for (int i = 1; i <= 4; i++)
-		{
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_32_4.Quest1003.Pouch{i}");
-			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_32_4.Quest1003.Pouch{i}.Spawned");
-		}
+		character.Variables.Perm.Remove("Laima.Quests.f_orchard_32_4.Quest1003.PatchesPurified");
+
+		for (var i = 1; i <= 4; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_orchard_32_4.Quest1003.Patch{i}");
 	}
 }
 
-// Quest 1004 CLASS: The Cartel Ledgers
+// Quest 1004 CLASS: The Earth Flower
 //-----------------------------------------------------------------------------
 
-public class TheCartelLedgersQuest : QuestScript
+public class TheEarthFlowerQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_32_4", 1004);
-		SetName(L("The Cartel Ledgers"));
+		SetName(L("The Earth Flower"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Ferret Vendors and recover their bark-stitched ledgers to expose the cartel's trade network."));
+		SetDescription(L("An Earth Flower at the head of a Ceyral row makes the whole row take. There has not been one in the Seir gullies for 2 years, but the Ferret Merchants have been hoarding the seeds without ever planting one."));
 		SetLocation("f_orchard_32_4");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Investigator] Marek"), "f_orchard_32_4");
+		AddQuestGiver(L("[Sapling-Keeper] Ruta"), "f_orchard_32_4");
 
-		AddObjective("killVendors", L("Kill Ferret Vendors"),
-			new KillObjective(12, new[] { MonsterId.Ferret_Vendor }));
+		AddObjective("killMerchants", L("Kill Ferret Merchants in the gullies"),
+			new KillObjective(15, new[] { MonsterId.Ferret_Bearer_Elite }));
 
-		AddObjective("gatherLedgers", L("Recover cartel ledgers"),
-			new CollectItemObjective(650420, 5));
+		AddObjective("collectSeeds", L("Collect Earth Flower Seeds"),
+			new CollectItemObjective(667025, 6));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
 		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
 		AddReward(new ItemReward(640004, 3)); // Large HP Potion
 		AddReward(new ItemReward(640007, 3)); // Large SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(667025, 0.45f, MonsterId.Ferret_Bearer_Elite);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650420, character.Inventory.CountItem(650420), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667025, character.Inventory.CountItem(667025), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650420, character.Inventory.CountItem(650420), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(667025, character.Inventory.CountItem(667025), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-// Quest 1005 CLASS: The Cartel Kingpin
+// Quest 1005 CLASS: What Is Bleeding Under the Gullies
 //-----------------------------------------------------------------------------
 
-public class TheCartelKingpinQuest : QuestScript
+public class WhatIsBleedingUnderTheGulliesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_orchard_32_4", 1005);
-		SetName(L("The Cartel Kingpin"));
+		SetName(L("What Is Bleeding Under the Gullies"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill ten Ferret Bearers from the Kingpin's guard, then bring him down when his pride draws him out."));
+		SetDescription(L("Forty paces below the searcher gullies a Zaura sits in a cut in the rock, bleeding into the water table. Two years of that is in everything that grows here and everything that walks on it."));
 		SetLocation("f_orchard_32_4");
 		SetAutoTracked(true);
 
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Captain] Levko"), "f_orchard_32_4");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Priest of Vakarine] Ivona"), "f_orchard_32_4");
 
-		AddObjective("killBearers", L("Kill the Kingpin's Bearer guard"),
-			new KillObjective(10, new[] { MonsterId.Ferret_Bearer_Elite }));
+		AddPrerequisite(new CompletedPrerequisite("f_orchard_32_4", 1003));
 
-		AddObjective("killKingpin", L("Defeat the Cartel Kingpin"),
-			new KillObjective(1, new[] { MonsterId.Ferret_Vendor }));
+		AddObjective("clearGullies", L("Kill Ferret Searchers at the gully mouth"),
+			new KillObjective(25, new[] { MonsterId.Ferret_Searcher }));
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
+		AddObjective("killZaura", L("Defeat the Zaura"),
+			new LayeredKillObjective(
+				spawnList: new[] { new KillSpec(MonsterId.Boss_Zawra, 1) },
+				resetIdent: "clearGullies",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
+
+		AddReward(new ExpReward(60000, 40000));
+		AddReward(new SilverReward(50000));
+		AddReward(new ItemReward(583114, 1)); // Nelajmes Necklace
 		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
 		AddReward(new ItemReward(640004, 3)); // Large HP Potion
 		AddReward(new ItemReward(640007, 3)); // Large SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
-	}
-}
-
-// Quest 1006 CLASS: Seir Trail Cleanup
-//-----------------------------------------------------------------------------
-
-public class SeirTrailCleanupQuest : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_orchard_32_4", 1006);
-		SetName(L("Seir Trail Cleanup"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Kill Ferret Archers in the canopy and Ferret Searchers in the roots to reopen the Seir Trail."));
-		SetLocation("f_orchard_32_4");
-		SetAutoTracked(true);
-
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Caravan Master] Denys"), "f_orchard_32_4");
-
-		AddObjective("killArchers", L("Kill Ferret Archers"),
-			new KillObjective(12, new[] { MonsterId.Ferret_Archer }));
-
-		AddObjective("killSearchers", L("Kill Ferret Searchers"),
-			new KillObjective(12, new[] { MonsterId.Ferret_Searcher }));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
-		AddReward(new ItemReward(640004, 3)); // Large HP Potion
-		AddReward(new ItemReward(640007, 3)); // Large SP Potion
-		AddReward(new ItemReward(640013, 3)); // Recovery Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 }

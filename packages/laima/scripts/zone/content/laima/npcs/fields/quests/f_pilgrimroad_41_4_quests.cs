@@ -1,555 +1,408 @@
 //--- Melia Script ----------------------------------------------------------
-// Pilgrim Road West Quest NPCs
+// Sekta Forest Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for the west section of Pilgrim Road.
+// The last camp before the Grynas road, where the pilgrim board is the only
+// institution left and the whole forest has been moving in one direction.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FPilgrimroad414QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Purple Repusbunny Kill
-		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Tollwarden] Mindaugas"), "f_pilgrimroad_41_4", -400, 100, 0, async dialog =>
+		// Quest 1001: Eleven Days Since the Cart
+		//---------------------------------------------------------------------
+		AddNpc(155045, L("[Friar] Dorma"), "f_pilgrimroad_41_4", 1222, 334, 282, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_4", 1001);
 
-			dialog.SetTitle(L("Mindaugas"));
+			dialog.SetTitle(L("Dorma"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Purple Repusbunnies are swarming the west road. Forty-five kills and pilgrims can walk again."));
+				await dialog.Msg(L("{#666666}*He's dragging a single knife across a whetstone, testing the edge against his thumbnail after every pass*{/}"));
+				await dialog.Msg(L("If you've come to pray, I'm afraid I've traded the chapel in for a butcher's block. 40 walkers in this camp, 11 days since a supply cart came up from the lake, and 1 knife between the lot of us. I took orders to keep a chapel. I am running a butcher's yard."));
+				await dialog.Msg(L("The Blue Lepusbunnies are the only meat left in Sekta and there are far too many of them. Kill 25 and bring me back 8 cuts and the camp eats twice tomorrow."));
 
-				var response = await dialog.Select(L("Will you clear the road for the pilgrims?"),
-					Option(L("I'll kill"), "help"),
-					Option(L("Pilgrims?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you go out for meat?"),
+					Option(L("I'll bring you 8 cuts"), "help"),
+					Option(L("Why are there so many of them?"), "info"),
+					Option(L("Walk them down to the lake"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Forty-five of them. Watch out for the burrows."));
+						await dialog.Msg(L("Take them in the open. In the thicket they go to ground and come back at you from behind, and I have had 2 people opened up learning that."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("The caravan's been camped behind the waystones for three days. The road needs clearing."));
+						await dialog.Msg(L("Because they came here. This forest held maybe 60 of them in a good year and there are hundreds now, all of them west of the fork and none of them east."));
+						await dialog.Msg(L("They didn't breed into that. Something moved them, and it moved them the same way it moved everything else on this road."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Road stays blocked, then."));
+						await dialog.Msg(L("40 people, half of them with feet they can't stand on, down a road with a Minos warband on it. I'd be walking them to a quieter place to die."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killBunnies", out var killObj)) return;
+				if (!quest.TryGetProgress("killLepusbunny", out var killObj)) return;
+				if (!quest.TryGetProgress("collectMeat", out var itemObj)) return;
 
-				if (killObj.Done)
+				if (killObj.Done && itemObj.Done)
 				{
-					await dialog.Msg(L("The caravan's moving."));
+					await dialog.Msg(L("{#666666}*He weighs the cuts in both hands before he looks up*{/}"));
+					await dialog.Msg(L("8. That's a pot tonight and a pot in the morning, and nobody has to be told they're waiting until tomorrow."));
+					await dialog.Msg(L("Take the chapel box. There has been no chapel to spend it on since the roof came in, and there are 40 people who ate because of you."));
+
 					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("Plenty down out there. Go back over them - the cuts are on the ground where you left them, not further out."));
 				}
 				else
 				{
-					await dialog.Msg(L("Keep killing."));
+					await dialog.Msg(L("Not enough yet. West of the fork, in the open, where they don't have thicket to fall back into."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("First pilgrims passed through at dawn."));
+				await dialog.Msg(L("2 hot meals and an argument about salt. I have never in my life been so glad to hear people complain about something small."));
 			}
 		});
 
-		// Quest 2: Bowbunny Fletchings
-		//-------------------------------------------------------------------------
-		AddNpc(20059, L("[Caravan-Guard] Jurga"), "f_pilgrimroad_41_4", 600, 600, 0, async dialog =>
+		// Quest 1002: Forty Pairs of Feet
+		//---------------------------------------------------------------------
+		AddNpc(155035, L("[Pilgrim] Vados"), "f_pilgrimroad_41_4", 1175, 335, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_4", 1002);
 
-			dialog.SetTitle(L("Jurga"));
+			dialog.SetTitle(L("Vados"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Bow Repusbunnies pick pilgrims off from the ridge. Kill thirty and bring me eight fletchings so we can mark the range."));
+				await dialog.Msg(L("{#666666}*He's holding an empty jar up to the light, scraping the last of the salve out with one finger*{/}"));
+				await dialog.Msg(L("Ah - fresh feet, good, mine gave out three roads ago. I made foot salve in Orsha for 22 years and I walked out here to stop. Now there are 40 pairs of feet in this camp and 2 jars left, so that plan is finished."));
+				await dialog.Msg(L("The root it draws from is the pale one under the old plantings, and the Stumpy Tree Magicians pull it up and cart it off whole. Get me 10 roots and I'll have salve in 6 days."));
 
-				var response = await dialog.Select(L("Will you bring me the fletchings?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Mark?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you get the roots?"),
+					Option(L("I'll bring you 10 roots"), "help"),
+					Option(L("What do the Magicians want with roots?"), "info"),
+					Option(L("6 days is too long"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Fletchings, not whole arrows. The arrows snap."));
+						await dialog.Msg(L("Whole roots only. If it's snapped the milk runs out of it in an hour and you've carried a stick back to me."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("The fletchings tell us their draw weight. From the draw we figure the range, and from the range we know where to station shields."));
+						await dialog.Msg(L("Nothing. That's what's odd. A Stumpy Tree Magician has no use for a root and they've cleared 3 plantings of it since spring."));
+						await dialog.Msg(L("The friar says everything in this forest moved one way at once. I only know that everything that grows in it is going the same way."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Pilgrims will keep getting shot, then."));
+						await dialog.Msg(L("It is. It's also 6 days, which is a number, and 'we have no salve' is not a number. I'll take the 6 days."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killBowBunnies", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherFletchings", out var fObj)) return;
+				if (!quest.TryGetProgress("collectRoots", out var itemObj)) return;
 
-				if (killObj.Done && fObj.Done)
+				if (itemObj.Done)
 				{
-					await dialog.Msg(L("Eight fletchings. We've got the range mapped now."));
-					character.Inventory.Remove(650254, character.Inventory.CountItem(650254), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He snaps one root at the tip and watches the milk bead up before nodding*{/}"));
+					await dialog.Msg(L("Every one of them whole. That's 9 jars, which is 40 pairs of feet twice over with some left for the ones who go on to Grynas."));
+					await dialog.Msg(L("Take my walking money. I had it saved for the abbey gate offering and I am not going to reach the gate on these feet regardless."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("Still short. Work the old plantings west of the board - that's where they're digging now."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The shield line holds. Ridge is quieter now."));
+				await dialog.Msg(L("9 jars and a queue. I have not made salve in 4 years and my hands remembered it before I did, which was unsettling and quite nice."));
 			}
 		});
 
-		// Quest 3: Mage-Stub Bark
-		//-------------------------------------------------------------------------
-		AddNpc(153142, L("[Hedge-Witch] Vaiva"), "f_pilgrimroad_41_4", -500, 500, 0, async dialog =>
+		// Quest 1003: The Second Watch
+		//---------------------------------------------------------------------
+		AddNpc(155036, L("[Pilgrim] Eli"), "f_pilgrimroad_41_4", 1245, 395, 270, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_4", 1003);
 
-			dialog.SetTitle(L("Vaiva"));
+			dialog.SetTitle(L("Eli"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Tree-Mage Stubs carry rootspell in their bark. Kill fifteen and bring me five strips."));
+				await dialog.Msg(L("{#666666}*He's sitting bolt upright against a supply crate, eyes fixed on the scrub line even in broad daylight*{/}"));
+				await dialog.Msg(L("Sorry - I don't stop watching easily anymore, even now. I keep the second watch. 3 shifts a night between 4 of us who can still stand up, and the second is the one where they come."));
+				await dialog.Msg(L("The Blue Lepusbunny Assassins have been into the camp itself twice. Kill 25 of them off the camp edge and the second watch stops being the one nobody will take."));
 
-				var response = await dialog.Select(L("Will you bring me the strips?"),
-					Option(L("I'll bring"), "help"),
-					Option(L("Rootspell?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you clear the camp edge?"),
+					Option(L("I'll kill 25 of the Assassins"), "help"),
+					Option(L("What happened the 2 times?"), "info"),
+					Option(L("Move the camp"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Strip them clean - bark with moss on it won't read."));
+						await dialog.Msg(L("They come in low along the scrub line, always from the same 2 directions. Stand in the open and make them cross it and you'll see them coming."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("It's older than the road itself. Hedge-charms can still pull power from it when nothing else answers."));
+						await dialog.Msg(L("The first time they took a pack and the second time they took a man. He was sleeping 8 feet from me and I was awake and I did not hear it happen."));
+						await dialog.Msg(L("I have kept the second watch every night since and I will keep keeping it, but I would like to be keeping it against something noisier."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Hedge goes silent, then."));
+						await dialog.Msg(L("This is the only flat ground between the fork and the Grynas road with water on it. We moved twice already to get here."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killStubs", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherBark", out var bObj)) return;
+				if (!quest.TryGetProgress("killAssassins", out var killObj)) return;
 
-				if (killObj.Done && bObj.Done)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("Five strips. The hedge wards will hold for the month."));
-					character.Inventory.Remove(650256, character.Inventory.CountItem(650256), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("Nothing crossed the scrub line last night. I stood the whole second watch listening to 40 people breathe and it was the best 3 hours I've had out here."));
+					await dialog.Msg(L("Take the watch purse. It's what we'd have paid a guard with if any guard would take this road."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("Still coming in. Work the scrub line rather than the deep thicket - that's the ground they use."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Wards are burning green. That's a good sign."));
+				await dialog.Msg(L("2 people volunteered for the second watch this morning. I said yes before either of them could think about it properly."));
 			}
 		});
 
-		// Quest 4: Waystone Rootcrystals
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Waystone-Keeper] Darius"), "f_pilgrimroad_41_4", -1100, -500, 0, async dialog =>
+		// Quest 1004: Sixty-One Notices
+		//---------------------------------------------------------------------
+		AddNpc(155034, L("[Pilgrim] George"), "f_pilgrimroad_41_4", 646, -44, 278, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_4", 1004);
 
-			dialog.SetTitle(L("Darius"));
+			dialog.SetTitle(L("George"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*An old waystone-keeper next to a silent rune-stone*{/}"));
-				await dialog.Msg(L("My grandmother kept these waystones. So did her mother. Eight generations, and none of them ever saw the ley-lines bend the way they're bending now."));
-				await dialog.Msg(L("Rootcrystals are pushing up between the markers. Pilgrims walking by eye end up a league off-route, sometimes two. Last week a wool-cart drove three days west when it should have gone north - the driver swore the road kept turning under his wheels."));
+				await dialog.Msg(L("{#666666}*He's standing very straight in front of the board, hands clasped, the posture of a man guarding something he can't actually verify*{/}"));
+				await dialog.Msg(L("Traveler - can you read? Please say yes, and don't ask why that's my first question. I've minded this board 3 weeks. People hand me a paper, I pin it up, and everyone who comes through reads it and picks a road off it. 61 notices up there now."));
+				await dialog.Msg(L("I can't read one of them. Walk the main board and the 2 fork boards and tell me what's actually written, because I've been sending people down roads on faith."));
 
-				var response = await dialog.Select(L("Break 12 Rootcrystals, then re-true the four ley-marker waystones along the road. Lay your hand flat on each marker - the ley reads through the palm. Will you do it?"),
-					Option(L("I'll break the crystals and re-true the markers"), "help"),
-					Option(L("How does a waystone bend?"), "info"),
-					Option(L("That sounds like priest-work"), "leave")
+				var response = await dialog.Select(L("Will you read the boards?"),
+					Option(L("I'll read all 3 boards"), "help"),
+					Option(L("Why are you minding a board you can't read?"), "info"),
+					Option(L("Take them all down"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He blesses your palm with iron-water from a clay cup*{/}"));
-						await dialog.Msg(L("Break the crystals first - 12 of them between the markers. Strike clean, and don't let the shards touch the rune-lines or the ley sours."));
-						await dialog.Msg(L("Then the four marker-stones. Lay your right hand flat on each carved face and count to ten. The runes will hum if the line is true. If they buzz, the marker's still tangled - step back to the last one and try again."));
+						await dialog.Msg(L("Read me the dates as well as the words. A notice can be perfectly true and 5 weeks old, and out here that's the same as a lie."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("A ley-line is a path the world remembers. The waystones don't make the line - they just hold it where pilgrims can read it by eye."));
-						await dialog.Msg(L("The crystals push the bedrock, and the bedrock carries the line. If the bedrock moves, the line drifts, and the pilgrims drift with it. Some don't come back."));
+						await dialog.Msg(L("Because the man who minded it before me died at the fork and somebody had to stand here. Nobody asked me whether I could read and I did not think it was the moment to say so."));
+						await dialog.Msg(L("I've kept them in the order they were handed to me. That's the one thing I could do properly and I have done it every day."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("It is priest work in a sense. But the priests are at Salvia, and the wool-cart is still out there somewhere. I'll wait here for someone less particular."));
+						await dialog.Msg(L("Then people pick a road with nothing at all to pick it with. A wrong notice is bad. No notice is how the last man ended up at the fork."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("breakCrystals", out var killObj)) return;
-				if (!quest.TryGetProgress("retrueMarkers", out var rObj)) return;
+				if (!quest.TryGetProgress("readBoards", out var checkObj)) return;
 
-				if (killObj.Done && rObj.Done)
+				if (checkObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He checks his copper pendulum - it stops dead-true on the road's axis*{/}"));
-					await dialog.Msg(L("Ley reads straight from here to the next caravan-stop. The markers are humming clean and the runes are warm to the palm again."));
-					await dialog.Msg(L("Take this. Old waystone-keeper's coin, minted back in my grandmother's day. Spends the same as new."));
+					await dialog.Msg(L("{#666666}*He makes you repeat the Grynas notice twice and gets very still*{/}"));
+					await dialog.Msg(L("So the Salvia road is open, the lake road is open, and the Grynas notice is 5 weeks old and says a thing that stopped being true 4 weeks ago."));
+					await dialog.Msg(L("Take the board keeper's money. I'm pulling that notice down myself and I'm going to remember which pin it was on."));
+
 					character.Quests.Complete(questId);
-				}
-				else if (!killObj.Done)
-				{
-					await dialog.Msg(L("The crystals are still pushing on the bedrock. No use re-truing markers while the line keeps bending under your feet."));
 				}
 				else
 				{
-					await dialog.Msg(L("Crystals are down and the ley is settling. Now go re-true the four markers. Right palm flat, count to ten, listen for the hum."));
+					await dialog.Msg(L("Not all 3. The fork boards are out where the roads split - one east toward Grynas, one north toward Salvia."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Three caravans through this week, none drifted. The wool-cart found its way back too - driver swears he heard the markers humming as he passed each one. He's not wrong."));
+				await dialog.Msg(L("I've had 9 people through since and I told all 9 of them the truth. One of them offered to teach me letters on the way to the abbey and I have said yes."));
 			}
 		});
 
-		// Ley-marker waystones for Quest 1004
-		//-------------------------------------------------------------------------
-		void AddLeyMarker(int markerNumber, int x, int z, int direction)
+		// Quest 1004 collection points - the pilgrim boards
+		//---------------------------------------------------------------------
+		void AddPilgrimBoard(int boardNumber, string observation, int x, int z, int direction)
 		{
-			AddNpc(47190, L("Ley-Marker Waystone"), "f_pilgrimroad_41_4", x, z, direction, async dialog =>
+			AddNpc(152007, L("Pilgrim Board"), "f_pilgrimroad_41_4", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_pilgrimroad_41_4", 1004);
+				var variableKey = $"Laima.Quests.f_pilgrimroad_41_4.Quest1004.Board{boardNumber}";
+				var counterKey = "Laima.Quests.f_pilgrimroad_41_4.Quest1004.BoardsRead";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A weathered ley-marker waystone, ley-runes faintly glowing*{/}"));
+					await dialog.Msg(L("{#666666}*A pilgrim board, layered with pinned paper*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_pilgrimroad_41_4.Quest1004.Marker{markerNumber}";
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*Already re-trued; the runes hum steady*{/}"));
+					await dialog.Msg(L("{#666666}*You already read this board*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Re-truing waystone..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(
+					L("Reading the notices..."), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(3)
+				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_pilgrimroad_41_4.Quest1004.MarkersTrued", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_pilgrimroad_41_4.Quest1004.MarkersTrued", count);
-					character.ServerMessage(LF("Marker-stones re-trued: {0}/4", count));
 
-					if (count >= 4)
-						character.ServerMessage(L("{#FFD700}All marker-stones re-trued! Return to Waystone-Keeper Darius.{/}"));
+					var read = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, read);
+
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Boards read: {0}/3", read));
+
+					if (read >= 3)
+						character.ServerMessage(L("{#FFD700}All 3 boards read. Return to George.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("Re-truing interrupted."));
+					character.ServerMessage(L("You leave the board unread."));
 				}
 			});
 		}
 
-		AddLeyMarker(1, -900, -300, 0);
-		AddLeyMarker(2, -300, 200, 90);
-		AddLeyMarker(3, 700, 700, 180);
-		AddLeyMarker(4, 1500, -700, 270);
+		AddPilgrimBoard(1,
+			L("Main Board: 61 notices, dated in the order they were handed over. The newest is 3 days old and says the lake road is open."), 596, -44, 278);
+		AddPilgrimBoard(2,
+			L("Salvia Fork: a fresh hand, 6 days old - the Salvia altar is closed and the waystation is a hospital, but the road itself is walkable."), -62, 1308, 93);
+		AddPilgrimBoard(3,
+			L("Grynas Fork: 5 weeks old, and it says the Grynas statue ring is dark and the road is shut. It was reopened 4 weeks ago."), 1782, -1371, 262);
 
-		// Quest 5: The Warren-King
-		//-------------------------------------------------------------------------
-		AddNpc(147473, L("[Bounty Hunter] Saule"), "f_pilgrimroad_41_4", 1800, -900, 0, async dialog =>
+		// Quest 1005: Everything Went One Way
+		//---------------------------------------------------------------------
+		AddNpc(155037, L("[Pilgrim] David"), "f_pilgrimroad_41_4", 1128, 370, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_pilgrimroad_41_4", 1005);
-			var alphaSpawnedKey = "Laima.Quests.f_pilgrimroad_41_4.Quest1005.AlphaSpawned";
 
-			dialog.SetTitle(L("Saule"));
+			dialog.SetTitle(L("David"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A bounty hunter sharpening a curved blade*{/}"));
-				await dialog.Msg(L("There's a Warren-King in the west tunnels. Twice my size, scarred from forty fights, and smart enough to bolt before any single hunter can pin him."));
-				await dialog.Msg(L("That's the trick - he never fights. He runs. I've staked out three burrow-holes that are his escape routes. Plug them, and he'll have to stand."));
+				if (!character.Quests.HasCompleted(new QuestId("f_pilgrimroad_41_4", 1001)))
+				{
+					await dialog.Msg(L("Eat first and let the camp eat. What I've got to say has kept 4 days and it will keep until Dorma has meat in the pot."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Plug the three staked burrow-holes, then kill 10 Repusbunnies to draw him up. He won't show his face for less than ten of his own pack dead. Are you in?"),
-					Option(L("I'm in"), "help"),
-					Option(L("Why doesn't he just fight?"), "info"),
-					Option(L("That's a hunter's job, not mine"), "leave")
+				await dialog.Msg(L("{#666666}*He's sitting apart from the rest of the camp, drawing lines in the dirt with a stick and rubbing them out just as fast*{/}"));
+				await dialog.Msg(L("You've eaten? Good, then you'll actually listen. I came down from the Grynas road in 4 days and I counted the whole way, because I had nothing else to do with my head. Every animal I passed was moving west and none of them were moving east."));
+				await dialog.Msg(L("They aren't fleeing this forest. They're being packed into it, and the warren west of the fork is where it stops. Kill 20 Blue Lepusbunnies to open the warren, then put down the 2 does that hold it. Carry the friar's rosary while you do."));
+
+				var response = await dialog.Select(L("Will you go into the warren?"),
+					Option(L("I'll break the warren"), "help"),
+					Option(L("Packed in by what?"), "info"),
+					Option(L("Then we should go east, not west"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She taps three spots on a charcoal-sketched map*{/}"));
-						await dialog.Msg(L("North slope, south crook, east scree. Each hole has a pine wedge I cut to size - jam it in deep and pack it with dirt and stones."));
-						await dialog.Msg(L("Then ten kills. He'll come up shooting - he uses a Repusbunny bow, full draw. Take cover behind the warren-mounds."));
+						character.Inventory.Add(666103, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("The 2 does don't run and they don't chase. Everything else in there does both, so clear the ground before you go near them."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Survival, mostly. Bunnies that fight die quick. The ones that bolt and start a new warren keep breeding. Warren-Kings are the ones smart enough to figure that out. Hard to hunt, but easy to wait out if we had the time."));
-						await dialog.Msg(L("We don't. He's been killing caravan-guards on the west road every fortnight for a season. The widows have stopped asking when their husbands are coming home."));
+						await dialog.Msg(L("I don't know. I know a carver on the Grynas road told me the same thing happened to his statue ring and that it always fails from the hills down, never from the road up."));
+						await dialog.Msg(L("The lake monk says her warband came down the Ouaas road. The friar in Salvia says widlings emptied his altar. Every one of us is pointing at a different piece of the same direction."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("The warren grows, more widows, and the caravan-guards stop signing up. I'll be here if you change your mind."));
+						await dialog.Msg(L("East is Grynas and Grynas is already answered. West of the fork is 40 people's food and the reason none of us can stay here."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("plugBurrows", out var bObj)) return;
-				if (!quest.TryGetProgress("killPack", out var pObj)) return;
-				if (!quest.TryGetProgress("killAlpha", out var aObj)) return;
+				if (!quest.TryGetProgress("openWarren", out var warrenObj)) return;
+				if (!quest.TryGetProgress("killDoes", out var doesObj)) return;
 
-				if (bObj.Done && pObj.Done && aObj.Done)
+				if (warrenObj.Done && doesObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*She tosses you a leather purse*{/}"));
-					await dialog.Msg(L("Burrows plugged, king's down, and the warren will collapse on itself by week's end. The caravan-guards are drinking at my expense tonight, and I'm going to tell them why."));
-					character.Variables.Perm.Remove(alphaSpawnedKey);
+					await dialog.Msg(L("{#666666}*He turns the rosary over and finds the abbey mark rubbed flat on one side*{/}"));
+					await dialog.Msg(L("Worn smooth. Dorma's carried that 30 years and it went dull in 4 days out there, and I'd like somebody at Ouaas to tell me why."));
+					await dialog.Msg(L("Keep the chain off the warren floor - there was abbey silver in that hole and no abbey walker ever went into it. I'm carrying word north to Monk Matas at the memorial, and I'm going by the lake so Stella hears it too."));
+
 					character.Quests.Complete(questId);
 				}
-				else if (pObj.Done && !aObj.Done)
+				else if (warrenObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(alphaSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(alphaSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Repusbunny_Purple, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("Here he comes!"));
-							character.ServerMessage(L("{#FF9966}The Warren-King emerges from the west warren!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("Go find him."));
-					}
-				}
-				else if (!bObj.Done)
-				{
-					await dialog.Msg(L("Three burrow-holes still open. North slope, south crook, east scree. Plug them or he runs the moment you draw a blade."));
+					await dialog.Msg(L("The warren's open. The 2 does are still standing over the middle of it and they will not come out to you."));
 				}
 				else
 				{
-					await dialog.Msg(L("Burrows are sealed. Now kill ten of his pack - he won't surface for a single one less."));
+					await dialog.Msg(L("Too many still in the runs. Open it up first or you'll have the whole warren at your back at the does."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("The warren collapsed in on itself. The widows came around asking whose blade did it - I told them mine, but they didn't believe me. They were right not to."));
-			}
-		});
-
-		// Burrow-hole plug points for Quest 1005
-		//-------------------------------------------------------------------------
-		void AddBurrowHole(int burrowNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Warren Burrow-Hole"), "f_pilgrimroad_41_4", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_pilgrimroad_41_4", 1005);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A burrow-hole on the warren ridge, freshly dug*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_pilgrimroad_41_4.Quest1005.Burrow{burrowNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already plugged with stone and turf*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Plugging burrow..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_pilgrimroad_41_4.Quest1005.BurrowsPlugged", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_pilgrimroad_41_4.Quest1005.BurrowsPlugged", count);
-					character.ServerMessage(LF("Burrows plugged: {0}/3", count));
-
-					if (count >= 3)
-						character.ServerMessage(L("{#FFD700}All burrows plugged! Now bait out the Warren-King.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Plugging interrupted."));
-				}
-			});
-		}
-
-		AddBurrowHole(1, 1500, -800, 0);
-		AddBurrowHole(2, 1900, -1100, 90);
-		AddBurrowHole(3, 1600, -1200, 180);
-
-		// Quest 6: West Road Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Road-Marshal] Aldona"), "f_pilgrimroad_41_4", 1700, 1000, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_41_4", 1006);
-
-			dialog.SetTitle(L("Aldona"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*A road-marshal pinning a fresh ledger-page to her board*{/}"));
-				await dialog.Msg(L("The west stretch is the worst on the whole pilgrim road. Three monster types, none of them small, all of them territorial. We have to sweep it weekly or it doesn't stay swept."));
-				await dialog.Msg(L("The Marshal's office in Salvia doesn't pay on a hunter's word. They pay on tally-stones. One stone per kill, dropped on the Toll-Stone Cairn at the bend, counted by the cantor on Sundays."));
-
-				var response = await dialog.Select(L("Kill 12 Repusbunnies, 12 Bow Repusbunnies, and 12 Tree-Mage Stubs, then drop one tally-stone on the Toll-Stone Cairn for the marshal-rolls. Take the contract?"),
-					Option(L("I'll take the contract"), "help"),
-					Option(L("Why tally-stones, not coin-receipts?"), "info"),
-					Option(L("Find a closer hunter"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*She gives you a smooth river-stone*{/}"));
-						await dialog.Msg(L("Thirty-six kills. Don't pad the count - the cantor weighs the cairn-stones against my ledger and the math has to add up."));
-						await dialog.Msg(L("The cairn's at the toll bend, where the road kinks south. Drop the stone, let it lie. I'll countersign after."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Coin-receipts can be forged or lost in the post. A river-stone in a sealed cairn can't. It's an old Pelke custom from the demon war - simple and honest."));
-						await dialog.Msg(L("Pay scales with the count, so don't lie about the kills. If I undercount you, complain to me. If you overcount, the cantor finds out by Sunday and the marshal's office bans you for a year."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Then the west stretch stays thick and the next pilgrim-cart pays for it. There's always a closer hunter, but rarely a willing one."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killBunnies", out var bObj)) return;
-				if (!quest.TryGetProgress("killBowBunnies", out var wObj)) return;
-				if (!quest.TryGetProgress("killStubs", out var sObj)) return;
-				if (!quest.TryGetProgress("dropTally", out var tObj)) return;
-
-				if (bObj.Done && wObj.Done && sObj.Done && tObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*She marks your ledger-row in tar-ink and counts coin into a cloth*{/}"));
-					await dialog.Msg(L("Sweep's done, cairn-stone dropped, math adds up. Honest marshal's coin."));
-					await dialog.Msg(L("Stop by next fortnight if you want the contract again. The road never stops needing it."));
-					character.Quests.Complete(questId);
-				}
-				else if (bObj.Done && wObj.Done && sObj.Done)
-				{
-					await dialog.Msg(L("Sweep's complete. Now drop your tally-stone on the cairn at the toll bend - I can't pay until the cantor counts it."));
-				}
-				else
-				{
-					await dialog.Msg(L("Twelve of each. Keep the river-stone in your pocket. Keep at it."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("The marshal's patrols cover the west stretch hourly now, wages paid by your levy. The cantor still weighs your stone every Sunday - says it's heavier than it should be. That's his way of giving a compliment."));
-			}
-		});
-
-		// Toll-Stone Cairn for Quest 1006 tally
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Toll-Stone Cairn"), "f_pilgrimroad_41_4", 1700, 1100, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_pilgrimroad_41_4", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*A weather-worn cairn beside the toll bend, ringed with old tally-stones*{/}"));
-				return;
-			}
-
-			var droppedKey = "Laima.Quests.f_pilgrimroad_41_4.Quest1006.TallyDropped";
-			if (character.Variables.Perm.GetBool(droppedKey, false))
-			{
-				await dialog.Msg(L("{#666666}*Your tally-stone is already on the cairn*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killBunnies", out var bObj)) return;
-			if (!quest.TryGetProgress("killBowBunnies", out var wObj)) return;
-			if (!quest.TryGetProgress("killStubs", out var sObj)) return;
-
-			if (!(bObj.Done && wObj.Done && sObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The cairn is ready to receive a tally-stone, but you haven't finished the sweep*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Dropping tally-stone..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(droppedKey, true);
-				character.ServerMessage(L("{#FFD700}Tally-stone laid on the cairn. Return to Road-Marshal Aldona.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Drop interrupted."));
+				await dialog.Msg(L("The forest is quiet west of the fork and 3 deer walked back east through the camp this morning. First thing I've seen go that way in 4 days."));
 			}
 		});
 	}
@@ -559,245 +412,222 @@ public class FPilgrimroad414QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class FPilgrimroad414Quest1001 : QuestScript
+// Quest 1001 CLASS: Eleven Days Since the Cart
+//-----------------------------------------------------------------------------
+
+public class ElevenDaysSinceTheCartQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_4", 1001);
-		SetName(L("Purple Repusbunny Kill"));
+		SetName(L("Eleven Days Since the Cart"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Purple Repusbunnies blocking the west pilgrim road."));
+		SetDescription(L("40 walkers are camped in Sekta Forest with no supply cart in 11 days. The Blue Lepusbunnies are the only meat left, and there are far too many of them for a forest this size."));
 		SetLocation("f_pilgrimroad_41_4");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Tollwarden] Mindaugas"), "f_pilgrimroad_41_4");
+		AddQuestGiver(L("[Friar] Dorma"), "f_pilgrimroad_41_4");
 
-		AddObjective("killBunnies", L("Kill Purple Repusbunnies"),
-			new KillObjective(45, new[] { MonsterId.Repusbunny_Purple }));
+		AddObjective("killLepusbunny", L("Kill Blue Lepusbunnies west of the fork"),
+			new KillObjective(25, new[] { MonsterId.Repusbunny_Purple }));
 
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
+		AddObjective("collectMeat", L("Recover Lepusbunny Meat"),
+			new CollectItemObjective(666106, 8));
+
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
+
+		AddDrop(666106, 0.40f, MonsterId.Repusbunny_Purple);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(666106, character.Inventory.CountItem(666106), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(666106, character.Inventory.CountItem(666106), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FPilgrimroad414Quest1002 : QuestScript
+// Quest 1002 CLASS: Forty Pairs of Feet
+//-----------------------------------------------------------------------------
+
+public class FortyPairsOfFeetQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_4", 1002);
-		SetName(L("Bowbunny Fletchings"));
+		SetName(L("Forty Pairs of Feet"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Bow Repusbunnies and bring fletchings to map the ridge shots."));
+		SetDescription(L("The camp is down to 2 jars of foot salve for 40 walkers. The pale root it draws from grows under the old plantings, and the Stumpy Tree Magicians have been pulling it up whole and carting it off."));
 		SetLocation("f_pilgrimroad_41_4");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Caravan-Guard] Jurga"), "f_pilgrimroad_41_4");
+		AddQuestGiver(L("[Pilgrim] Vados"), "f_pilgrimroad_41_4");
 
-		AddObjective("killBowBunnies", L("Kill Bow Repusbunnies"),
-			new KillObjective(30, new[] { MonsterId.Repusbunny_Bow_Purple }));
-
-		AddObjective("gatherFletchings", L("Gather fletchings"),
-			new CollectItemObjective(650254, 8));
+		AddObjective("collectRoots", L("Recover Abandoned Plant Roots from the Stumpy Tree Magicians"),
+			new CollectItemObjective(666105, 10));
 
 		AddReward(new ExpReward(23800, 16200));
 		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+
+		AddDrop(666105, 0.55f, MonsterId.Stub_Tree_Mage);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650254, character.Inventory.CountItem(650254), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666105, character.Inventory.CountItem(666105), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650254, character.Inventory.CountItem(650254), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(666105, character.Inventory.CountItem(666105), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FPilgrimroad414Quest1003 : QuestScript
+// Quest 1003 CLASS: The Second Watch
+//-----------------------------------------------------------------------------
+
+public class TheSecondWatchQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_4", 1003);
-		SetName(L("Mage-Stub Bark"));
+		SetName(L("The Second Watch"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Tree-Mage Stubs and bring rootspell bark for hedge wards."));
+		SetDescription(L("Blue Lepusbunny Assassins have come into the Sekta camp twice, and the second watch is the shift nobody will take. Kill 25 of them off the camp edge."));
 		SetLocation("f_pilgrimroad_41_4");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Hedge-Witch] Vaiva"), "f_pilgrimroad_41_4");
+		AddQuestGiver(L("[Pilgrim] Eli"), "f_pilgrimroad_41_4");
 
-		AddObjective("killStubs", L("Kill Tree-Mage Stubs"),
-			new KillObjective(15, new[] { MonsterId.Stub_Tree_Mage }));
+		AddObjective("killAssassins", L("Kill Blue Lepusbunny Assassins on the camp edge"),
+			new KillObjective(25, new[] { MonsterId.Repusbunny_Bow_Purple }));
 
-		AddObjective("gatherBark", L("Gather bark strips"),
-			new CollectItemObjective(650256, 5));
-
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650256, character.Inventory.CountItem(650256), InventoryItemRemoveMsg.Destroyed);
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650256, character.Inventory.CountItem(650256), InventoryItemRemoveMsg.Destroyed);
+		AddReward(new ExpReward(11900, 8100));
+		AddReward(new SilverReward(15000));
+		AddReward(new ItemReward(640086, 1)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
 	}
 }
 
-public class FPilgrimroad414Quest1004 : QuestScript
+// Quest 1004 CLASS: Sixty-One Notices
+//-----------------------------------------------------------------------------
+
+public class SixtyOneNoticesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_4", 1004);
-		SetName(L("Waystone Tangles"));
+		SetName(L("Sixty-One Notices"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Break Rootcrystals bending the waystone ley off the west road."));
+		SetDescription(L("The man minding the Sekta pilgrim board cannot read a word of it, and everyone coming through picks a road off what is pinned there. Read the main board and both fork boards for him."));
 		SetLocation("f_pilgrimroad_41_4");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Waystone-Keeper] Darius"), "f_pilgrimroad_41_4");
+		AddQuestGiver(L("[Pilgrim] George"), "f_pilgrimroad_41_4");
 
-		AddObjective("breakCrystals", L("Break Rootcrystals"),
-			new KillObjective(12, new[] { MonsterId.Rootcrystal_05 }));
+		AddObjective("readBoards", L("Read the main board and both fork boards"),
+			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_4.Quest1004.BoardsRead", 3, true));
 
-		AddObjective("retrueMarkers", L("Re-true the four ley-marker waystones"),
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_4.Quest1004.MarkersTrued", 4, true));
-
-		AddReward(new ExpReward(11900, 8100));
-		AddReward(new SilverReward(15000));
-		AddReward(new ItemReward(640086, 1));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
+		AddReward(new ExpReward(23800, 16200));
+		AddReward(new SilverReward(17000));
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1004.MarkersTrued");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_4.Quest1004.Marker{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1004.BoardsRead");
+
+		for (var i = 1; i <= 3; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_4.Quest1004.Board{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1004.MarkersTrued");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_4.Quest1004.Marker{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1004.BoardsRead");
+
+		for (var i = 1; i <= 3; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_4.Quest1004.Board{i}");
 	}
 }
 
-public class FPilgrimroad414Quest1005 : QuestScript
+// Quest 1005 CLASS: Everything Went One Way
+//-----------------------------------------------------------------------------
+
+public class EverythingWentOneWayQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_pilgrimroad_41_4", 1005);
-		SetName(L("The Warren-King"));
+		SetName(L("Everything Went One Way"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Purple Repusbunnies to draw out the Warren-King from the west warren."));
+		SetDescription(L("A walker down from Grynas counted every animal he passed and every one was moving west. The Lepusbunnies are not fleeing Sekta - they are being packed into it, and the warren west of the fork is where it stops."));
 		SetLocation("f_pilgrimroad_41_4");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Bounty Hunter] Saule"), "f_pilgrimroad_41_4");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Pilgrim] David"), "f_pilgrimroad_41_4");
 
-		AddObjective("plugBurrows", L("Plug the three Warren burrow-holes"),
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_4.Quest1005.BurrowsPlugged", 3, true));
+		AddPrerequisite(new CompletedPrerequisite("f_pilgrimroad_41_4", 1001));
 
-		AddObjective("killPack", L("Kill Purple Repusbunnies"),
-			new KillObjective(10, new[] { MonsterId.Repusbunny_Purple }));
+		AddObjective("openWarren", L("Kill Blue Lepusbunnies in the warren runs"),
+			new KillObjective(20, new[] { MonsterId.Repusbunny_Purple }));
 
-		AddObjective("killAlpha", L("Defeat the Warren-King"),
-			new KillObjective(1, new[] { MonsterId.Repusbunny_Purple }));
+		AddObjective("killDoes", L("Put down the 2 does holding the warren"),
+			new LayeredKillObjective(
+				spawnList: new[]
+				{
+					new KillSpec(MonsterId.Repusbunny_Purple, 2, BuffId.EliteMonsterBuff),
+					new KillSpec(MonsterId.Repusbunny_Bow_Purple, 3),
+				},
+				resetIdent: "openWarren",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-		AddReward(new ExpReward(23800, 16200));
-		AddReward(new SilverReward(17000));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
+		AddReward(new ExpReward(60000, 40000));
+		AddReward(new SilverReward(50000));
+		AddReward(new ItemReward(583113, 1)); // Pejnus Necklace
+		AddReward(new ItemReward(640086, 2)); // Lv6 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640013, 1)); // Large Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1005.BurrowsPlugged");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_4.Quest1005.Burrow{i}");
+		character.Inventory.Remove(666103, character.Inventory.CountItem(666103), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1005.BurrowsPlugged");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_pilgrimroad_41_4.Quest1005.Burrow{i}");
-	}
-}
-
-public class FPilgrimroad414Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_pilgrimroad_41_4", 1006);
-		SetName(L("West Road Sweep"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Standard sweep of Purple Repusbunnies, Bow Repusbunnies, and Tree-Mage Stubs."));
-		SetLocation("f_pilgrimroad_41_4");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Road-Marshal] Aldona"), "f_pilgrimroad_41_4");
-
-		AddObjective("killBunnies", L("Kill Purple Repusbunnies"),
-			new KillObjective(12, new[] { MonsterId.Repusbunny_Purple }));
-
-		AddObjective("killBowBunnies", L("Kill Bow Repusbunnies"),
-			new KillObjective(12, new[] { MonsterId.Repusbunny_Bow_Purple }));
-
-		AddObjective("killStubs", L("Kill Tree-Mage Stubs"),
-			new KillObjective(12, new[] { MonsterId.Stub_Tree_Mage }));
-
-		AddObjective("dropTally", L("Lay a tally-stone on the Toll-Stone Cairn"),
-			new VariableCheckObjective("Laima.Quests.f_pilgrimroad_41_4.Quest1006.TallyDropped", 1, true));
-
-		AddReward(new ExpReward(26400, 18000));
-		AddReward(new SilverReward(18800));
-		AddReward(new ItemReward(640086, 2));
-		AddReward(new ItemReward(640004, 3));
-		AddReward(new ItemReward(640007, 3));
-		AddReward(new ItemReward(640013, 3));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1006.TallyDropped");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_pilgrimroad_41_4.Quest1006.TallyDropped");
+		character.Inventory.Remove(666103, character.Inventory.CountItem(666103), InventoryItemRemoveMsg.Destroyed);
 	}
 }

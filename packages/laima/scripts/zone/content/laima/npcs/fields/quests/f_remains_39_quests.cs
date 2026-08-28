@@ -1,58 +1,66 @@
 //--- Melia Script ----------------------------------------------------------
 // Escanciu Village Quest NPCs
 //--- Description -----------------------------------------------------------
-// Quests for Escanciu Village.
+// A village that grew up inside the fence, five inscriptions standing around
+// it, and a sixth in the square that somebody broke this month.
 //---------------------------------------------------------------------------
 
 using System;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Quests;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
-using Melia.Zone.World.Actors;
 
 public class FRemains39QuestNpcsScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Quest 1: Gravegolem Graveyard
-		//-------------------------------------------------------------------------
-		AddNpc(20060, L("[Gravekeeper] Ema"), "f_remains_39", 1000, 300, 0, async dialog =>
+		// Quest 1001: Sixty-One Households
+		//---------------------------------------------------------------------
+		AddNpc(20118, L("[Village Elder] Moje"), "f_remains_39", 363, 144, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_remains_39", 1001);
 
-			dialog.SetTitle(L("Ema"));
+			dialog.SetTitle(L("Moje"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Gravegolems have risen in the east plots. Twenty-five need breaking before the ceremony."));
+				await dialog.Msg(L("{#666666}*He's bent over a household roll, running a thumb down a list of names longer than it should be*{/}"));
+				await dialog.Msg(L("A stranger. In Escanciu. Sit down, don't sit down, I don't care — we get few enough of you that I've forgotten what's polite. 61 households when I took the roll. Nine walked out this spring, and every last one gave me the same non-answer: they simply did not want to be here anymore."));
+				await dialog.Msg(L("Now the Gravegolems are hauling the broken stone out of my square, piece by piece, like carrion birds with better manners. Kill 25 of them, bring me back 8 pieces, before there's nothing left of it to put together."));
 
-				var response = await dialog.Select(L("Will you break the golems for us?"),
-					Option(L("I'll kill"), "help"),
-					Option(L("Ceremony?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you go after the Gravegolems?"),
+					Option(L("I'll recover 8 pieces"), "help"),
+					Option(L("Why did 9 households leave?"), "info"),
+					Option(L("It's only broken stone"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Shatter the cores. They won't rebuild."));
+						await dialog.Msg(L("They take it east and they do not come back the same way. Follow the drag marks rather than the golems and you will find where the pieces are going."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Village remembrance rite. Every year."));
+						await dialog.Msg(L("Because the square stone came down and nobody in this village will say out loud that it mattered. It has stood there since before Escanciu was a village."));
+						await dialog.Msg(L("You do not put a settlement on a bare hill and then build 61 houses in a ring around a rock. You build the ring because the rock is why the hill is safe."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Villagers grieve anyway."));
+						await dialog.Msg(L("So is a wall. I have been elder 22 years and I can tell the difference between a thing falling down and a thing being taken down, and that stone was taken down."));
 						break;
 				}
 			}
@@ -60,497 +68,374 @@ public class FRemains39QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
 				if (!quest.TryGetProgress("killGolems", out var killObj)) return;
+				if (!quest.TryGetProgress("collectPieces", out var itemObj)) return;
 
-				if (killObj.Done)
+				if (killObj.Done && itemObj.Done)
 				{
-					await dialog.Msg(L("Plots quiet. Ceremony tomorrow."));
+					await dialog.Msg(L("{#666666}*He turns each piece until the broken edges face him, then sets them down in the shape they used to make*{/}"));
+					await dialog.Msg(L("8, and that is most of a face. Linas can set that. 22 years and this is the first useful hour I have had since the spring."));
+					await dialog.Msg(L("Take the village purse. 52 households paid into it against a bad winter and this is worse than a bad winter."));
+
 					character.Quests.Complete(questId);
+				}
+				else if (killObj.Done)
+				{
+					await dialog.Msg(L("East ground's quieter. Now go over it - the pieces are lying where the golems dropped them, not still being carried."));
 				}
 				else
 				{
-					await dialog.Msg(L("Keep breaking."));
+					await dialog.Msg(L("Still hauling. Clear them out first or they will carry off what you set down while your back is turned."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Ceremony went well. Thank you."));
+				await dialog.Msg(L("2 of the 9 households have written asking whether the square stone is going back up. I have not answered yet, because I would like the answer to be yes."));
 			}
 		});
 
-		// Quest 2: Zolem Cores
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Stonewright] Vilis"), "f_remains_39", 400, -500, 0, async dialog =>
+		// Quest 1002: Forty Years in the West Cut
+		//---------------------------------------------------------------------
+		AddNpc(20158, L("[Woodcutter] Ruoval"), "f_remains_39", -1265, 507, 277, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_remains_39", 1002);
 
-			dialog.SetTitle(L("Vilis"));
+			dialog.SetTitle(L("Ruoval"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Zolems carry earth-cores. Kill twenty, bring six clean cores for masonry binding."));
+				await dialog.Msg(L("{#666666}*He lowers his axe mid-swing when he hears you on the path and doesn't pick it back up*{/}"));
+				await dialog.Msg(L("You'll forgive me not finishing that cut — truth be told I'm glad of any excuse to put the axe down these days. Forty years I've cut the west stand. Thirty-nine of them, the Zolems out there were just rocks with moss on. A rock, mind — you walked past it, it stayed a rock, that was the whole arrangement between us."));
+				await dialog.Msg(L("Now they walk. And each one's got a stone rattling around its middle that rings like a bell when you split it open. Bring me 10 of those, would you? I need to know whether I've gone mad, and I'd rather hear it from someone else's mouth."));
 
-				var response = await dialog.Select(L("Will you bring me the cores?"),
-					Option(L("I'll bring them"), "help"),
-					Option(L("Masonry?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you split some open?"),
+					Option(L("I'll bring you 10 stones"), "help"),
+					Option(L("What do you think it is?"), "info"),
+					Option(L("Cut somewhere else"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Heart of the beast. Sift the rubble."));
+						await dialog.Msg(L("Hit them on the seam where the moss stops. Anywhere else and you will blunt an axe and annoy a rock."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Bind stone to stone. Stronger than mortar."));
+						await dialog.Msg(L("I think somebody is winding the whole valley up like a clock. The frogs came up out of the water, the golems came in off the east, and my rocks stood up."));
+						await dialog.Msg(L("40 years is long enough to know that all 3 of those happening in one spring is not 3 things."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Wall crumbles without."));
+						await dialog.Msg(L("The west stand is the only stand. Everything else within a day of here is either the square or somebody's roof."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killZolems", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherCores", out var cObj)) return;
+				if (!quest.TryGetProgress("collectStones", out var itemObj)) return;
 
-				if (killObj.Done && cObj.Done)
+				if (itemObj.Done)
 				{
-					await dialog.Msg(L("Six cores. Wall holds."));
-					character.Inventory.Remove(650240, character.Inventory.CountItem(650240), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("{#666666}*He taps each one against his axe head and listens with his eyes shut*{/}"));
+					await dialog.Msg(L("All 10 ring the same note. Rocks do not do that. Worked stone does that, and somebody worked 10 of these and put them inside 10 animals."));
+					await dialog.Msg(L("Take my cutting money. I am not mad, which is worth more to me than the money is."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep at it."));
+					await dialog.Msg(L("Not enough to be sure with. Work the deep cut south of me - that is where they stood up first."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Wall stands a generation now."));
+				await dialog.Msg(L("I took one to Linas. He turned it over twice and said it was cut by the same hand as the square stone, and then he sat down on his own doorstep."));
 			}
 		});
 
-		// Quest 3: Hook Thorn
-		//-------------------------------------------------------------------------
-		AddNpc(20114, L("[Seamstress] Rima"), "f_remains_39", -500, 200, 0, async dialog =>
+		// Quest 1003: As Far As the Second Stone
+		//---------------------------------------------------------------------
+		AddNpc(20154, L("[Village Youth] Cahill"), "f_remains_39", 211, 425, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_remains_39", 1003);
 
-			dialog.SetTitle(L("Rima"));
+			dialog.SetTitle(L("Cahill"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("Hook thorns work as curved needles. Kill twenty Hooks, five prime thorns."));
+				await dialog.Msg(L("{#666666}*He's pacing a short line back and forth near the second stone, like he's daring himself to cross it*{/}"));
+				await dialog.Msg(L("Oh — hah! Don't mind me, I'm just— you actually walked in from outside! Past the stones and everything! Nineteen years old and I've never once gone further than the second inscription. Nobody ever forbade it, we just don't, and until this spring I never once stopped to ask myself why that was!"));
+				await dialog.Msg(L("But now the Winged Frogs are coming up out of the west water and into the lane, right past the line, bold as anything — so! Kill 25 of them, and I swear I'll walk out there myself and see what's actually on the other side."));
 
-				var response = await dialog.Select(L("Will you bring me the thorns?"),
-					Option(L("I'll bring them"), "help"),
-					Option(L("Curved?"), "info"),
-					Option(L("Skip"), "leave")
+				var response = await dialog.Select(L("Will you clear the west lane?"),
+					Option(L("I'll kill 25 Winged Frogs"), "help"),
+					Option(L("Nobody stopped you?"), "info"),
+					Option(L("Stay inside the stones"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Longest thorn from the hump."));
+						await dialog.Msg(L("They go up before they come at you, so they are always above you when they land. Watch the shadow, not the frog."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("For stitching boots. Saddler can't work without."));
+						await dialog.Msg(L("No. That is the part I cannot get past. There is no rule, no story, no old woman warning anybody. 61 households and every single one of us just turns round at the stones."));
+						await dialog.Msg(L("I asked my father and he had to sit and think about it and then he could not answer."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Boots unmade."));
+						await dialog.Msg(L("That is what everyone says and nobody can tell me why they say it. I have decided that is not a good enough reason for the rest of my life."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killHooks", out var killObj)) return;
-				if (!quest.TryGetProgress("gatherThorns", out var tObj)) return;
+				if (!quest.TryGetProgress("killFrogs", out var killObj)) return;
 
-				if (killObj.Done && tObj.Done)
+				if (killObj.Done)
 				{
-					await dialog.Msg(L("Five thorns. Boots go out this week."));
-					character.Inventory.Remove(650245, character.Inventory.CountItem(650245), InventoryItemRemoveMsg.Given);
+					await dialog.Msg(L("Lane's clear and I got as far as the third inscription and stood on the far side of it for a count of 20. Nothing happened at all."));
+					await dialog.Msg(L("Take this. It is what I had saved to leave with, and I have decided I would rather stay and know why."));
+
 					character.Quests.Complete(questId);
 				}
 				else
 				{
-					await dialog.Msg(L("Keep hunting."));
+					await dialog.Msg(L("Still coming up the lane. Work the water edge west of the inscription rather than the lane itself."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Dozen pairs of boots shipped."));
+				await dialog.Msg(L("I have walked to 4 of the 5 now. The fifth is up by the Fedimian road and I am saving it, which is a stupid thing to do and I am doing it anyway."));
 			}
 		});
 
-		// Quest 4: Flog Swarm
-		//-------------------------------------------------------------------------
-		AddNpc(20118, L("[Beekeeper-Monk] Ambrozijs"), "f_remains_39", -600, 500, 0, async dialog =>
+		// Quest 1004: Agayla Fleury, Five Times
+		//---------------------------------------------------------------------
+		AddNpc(20152, L("[Stonewright] Linas"), "f_remains_39", 430, 421, 267, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_remains_39", 1004);
 
-			dialog.SetTitle(L("Ambrozijs"));
+			dialog.SetTitle(L("Linas"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*A monk in beekeeper's veil lifts a brood-comb to the light, frowning at the bees that aren't there*{/}"));
-				await dialog.Msg(L("My hives have fed Escanciu's monastery for thirty years. Honey for the kitchens, wax for the candles, mead for the festival days. Last spring my Mother Abbess used to say I was the monastery's quiet treasury."));
-				await dialog.Msg(L("Then the Flogs came. They chase my bees from the flowers and tear through my hive-canopies for the brood-combs. Four canopies torn open in a fortnight; the bees roost in the rain and die in the rain."));
+				await dialog.Msg(L("{#666666}*He's running a thumbnail along a chisel mark, muttering a decade to himself before he notices you've stopped beside him*{/}"));
+				await dialog.Msg(L("Give me a moment — no, actually, stay, tell me what you make of this, since you clearly have an eye. I cut stone for this village and I can date a chisel-mark to the decade, thank you very much. The 5 inscriptions round Escanciu were cut 300 years ago by one man, one season, one hand — I'd stake my reputation on it."));
+				await dialog.Msg(L("The square stone was broken open this month, and a mason does not simply set a sixth stone without first confirming the other five are sound — that would be sloppy, and I am many things but I am not sloppy. Go to all 5 and look at the faces for me."));
 
-				var response = await dialog.Select(L("Kill 25 Flying Flogs to push them off the cloister flowers, then re-thatch the four torn hive-canopies. Will you take the work, traveler?"),
-					Option(L("I'll kill the Flogs and re-thatch the canopies"), "help"),
-					Option(L("Why are the Flogs after the bees?"), "info"),
-					Option(L("Find another beekeeper-hand"), "leave")
+				var response = await dialog.Select(L("Will you check the inscriptions?"),
+					Option(L("I'll check all 5"), "help"),
+					Option(L("One man cut 5 stones?"), "info"),
+					Option(L("Set the sixth first"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He blesses your blade with a wisp of beeswax-incense from a clay thurible*{/}"));
-						await dialog.Msg(L("Twenty-five Flogs, no shortcuts. Strike low - they roost head-down on the cloister-trees and dive when threatened. The dive's their weakest moment."));
-						await dialog.Msg(L("Then the four canopies in the cloister garden. Reed-thatch is stacked beside each one - lay it across the frame in three overlapping layers, weight the corners with garden-stones. The bees re-roost the same evening."));
+						await dialog.Msg(L("Look at the base as much as the face. A stone that has been leaned on shows it at the foot 10 years before it shows anywhere else."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Same flowers, same hours, same nectar. Bees and Flogs evolved on the same cloister flowers - until last spring they kept to opposite times of day. Bees mornings, Flogs evenings."));
-						await dialog.Msg(L("Then a wet spring shifted the Flog roosting season. Now they overlap with the bees, and the bees lose - smaller, gentler, lower-priority on a Flog's hunting list. Wet weather kept the cloister flowers blooming, and that broke the truce."));
+						await dialog.Msg(L("One man cut 434, if the Stele Road clerks are right, and they are. I have seen a rubbing off the road and it is the same tooth, the same angle, the same tired left hand at the end of a long line."));
+						await dialog.Msg(L("Nobody carves 434 stones for the dead. You carve 434 stones because you are drawing a shape and you need it to still be there in 300 years."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then the monastery starves slow. Honey first, then candles, then mead, then the brothers' patience. I will pray for someone less occupied."));
+						await dialog.Msg(L("If the shape is broken somewhere else as well then setting the sixth mends nothing, and I will have spent a week telling 61 households it was fixed."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killFlogs", out var killObj)) return;
-				if (!quest.TryGetProgress("rethatchCanopies", out var cObj)) return;
+				if (!quest.TryGetProgress("checkStones", out var checkObj)) return;
 
-				if (killObj.Done && cObj.Done)
+				if (checkObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He smiles, a slow tired smile, and listens for a long moment to the cloister*{/}"));
-					await dialog.Msg(L("Listen - the cloister hums again. Bees on the flowers, no Flog-shadows on the canopies. The first time in months I've heard the morning-hum at full volume."));
-					await dialog.Msg(L("Take this. Beekeeper's purse, plus a sealed jar of last spring's honey from the Mother Abbess's stores. She insisted. The monastery owes you one whole season of breakfasts."));
+					await dialog.Msg(L("{#666666}*He listens to all 5 reports and draws the village in the dirt with the point of a chisel*{/}"));
+					await dialog.Msg(L("All 5 sound, all 5 facing in, and the square stone in the middle of them. It is not a boundary at all - the 5 are a ring and the sixth is the middle of it."));
+					await dialog.Msg(L("Take the mason's fee. I can set the sixth, and I would like the spirit in the west lane to be standing there when I do."));
+
 					character.Quests.Complete(questId);
-				}
-				else if (!killObj.Done)
-				{
-					await dialog.Msg(L("Twenty-five Flogs first. The canopies will tear again before they're up if a Flog is still hunting the cloister."));
 				}
 				else
 				{
-					await dialog.Msg(L("Flogs are gone. Now the four canopies - reed-thatch in three overlapping layers, garden-stones on each corner. The bees know to re-roost; we just have to make a roof."));
+					await dialog.Msg(L("Not all 5. 2 west of the village, 2 east of it, and 1 up by the Fedimian road."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Honey flows again, three jars to the kitchens this morning. The Mother Abbess sends her blessing - she said to thank 'the swordhand who became a beekeeper for an afternoon.' She has a poet's tongue when she chooses."));
+				await dialog.Msg(L("434 stones on one line up the road, and a ring of 5 around one village at the end of it. I have cut stone 30 years and I have never once been frightened by a shape before."));
 			}
 		});
 
-		// Hive-canopy thatch points for Quest 1004
-		//-------------------------------------------------------------------------
-		void AddHiveCanopy(int canopyNumber, int x, int z, int direction)
+		// Quest 1004 collection points - the Agayla Fleury inscriptions
+		//---------------------------------------------------------------------
+		void AddAgaylaStone(int stoneNumber, string observation, int x, int z, int direction)
 		{
-			AddNpc(47190, L("Hive-Canopy"), "f_remains_39", x, z, direction, async dialog =>
+			AddNpc(47191, L("Agayla Fleury's Inscription"), "f_remains_39", x, z, direction, async dialog =>
 			{
 				var character = dialog.Player;
 				var questId = new QuestId("f_remains_39", 1004);
+				var variableKey = $"Laima.Quests.f_remains_39.Quest1004.Stone{stoneNumber}";
+				var counterKey = "Laima.Quests.f_remains_39.Quest1004.StonesChecked";
 
 				if (!character.Quests.IsActive(questId))
 				{
-					await dialog.Msg(L("{#666666}*A reed-thatched hive canopy, half-torn open by Flog claws*{/}"));
+					await dialog.Msg(L("{#666666}*A standing inscription cut with the name AGAYLA FLEURY, its face turned toward the village*{/}"));
 					return;
 				}
 
-				var variableKey = $"Laima.Quests.f_remains_39.Quest1004.Canopy{canopyNumber}";
 				if (character.Variables.Perm.GetBool(variableKey, false))
 				{
-					await dialog.Msg(L("{#666666}*Already re-thatched; bees clustering underneath*{/}"));
+					await dialog.Msg(L("{#666666}*You already looked this one over*{/}"));
 					return;
 				}
 
-				var result = await character.TimeActions.StartAsync(L("Re-thatching canopy..."), "Cancel", "SITGROPE", TimeSpan.FromSeconds(3));
+				var result = await character.TimeActions.StartAsync(
+					L("Checking the face and the base..."), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(3)
+				);
 
 				if (result == TimeActionResult.Completed)
 				{
 					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_remains_39.Quest1004.CanopiesThatched", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_remains_39.Quest1004.CanopiesThatched", count);
-					character.ServerMessage(LF("Hive-canopies re-thatched: {0}/4", count));
 
-					if (count >= 4)
-						character.ServerMessage(L("{#FFD700}All canopies re-thatched! Return to Beekeeper-Monk Ambrozijs.{/}"));
+					var checkedCount = character.Variables.Perm.GetInt(counterKey, 0) + 1;
+					character.Variables.Perm.Set(counterKey, checkedCount);
+
+					character.ServerMessage(observation);
+					character.ServerMessage(LF("Inscriptions checked: {0}/5", checkedCount));
+
+					if (checkedCount >= 5)
+						character.ServerMessage(L("{#FFD700}All 5 inscriptions checked. Return to Linas.{/}"));
 				}
 				else
 				{
-					character.ServerMessage(L("Thatching interrupted."));
+					character.ServerMessage(L("You leave the inscription unchecked."));
 				}
 			});
 		}
 
-		AddHiveCanopy(1, -500, 600, 0);
-		AddHiveCanopy(2, -700, 400, 90);
-		AddHiveCanopy(3, -400, 300, 180);
-		AddHiveCanopy(4, -800, 700, 270);
+		AddAgaylaStone(1,
+			L("South-West Stone: sound, base undisturbed, and the face is turned in toward the village square."), -623, -377, 350);
+		AddAgaylaStone(2,
+			L("West Stone: sound, and the line under the name reads 'and no further' with nothing after it."), -611, 214, 350);
+		AddAgaylaStone(3,
+			L("South-East Stone: sound, and somebody has been keeping the moss off the face for a long time."), 930, -98, 350);
+		AddAgaylaStone(4,
+			L("East Stone: sound, and the foot sits on a cut course that runs off west under the village."), 881, 467, 350);
+		AddAgaylaStone(5,
+			L("North Stone: sound, facing in like the rest, and its shadow at noon falls straight down the lane to the square."), 1001, 1294, 350);
 
-		// Quest 5: The Hallowventor Menace
-		//-------------------------------------------------------------------------
-		AddNpc(20117, L("[Exorcist] Basilijs"), "f_remains_39", 200, 300, 0, async dialog =>
+		// The broken square stone
+		//---------------------------------------------------------------------
+		AddNpc(47192, L("Broken Square Stone"), "f_remains_39", 156, 172, 301, async dialog =>
+		{
+			var character = dialog.Player;
+
+			if (character.Quests.HasCompleted(new QuestId("f_remains_39", 1005)))
+			{
+				await dialog.Msg(L("{#666666}*The stone stands again, set on its old foot, the joins packed with lead*{/}"));
+				await dialog.Msg(L("{#666666}*The name is cut small and low, the way a man signs the last of 434: LUKAS OF ESCANCIU, MASON. And under it, the only date on any stone in the whole line*{/}"));
+				return;
+			}
+
+			await dialog.Msg(L("{#666666}*The stump of a memorial in the middle of the square, snapped off a hand's width above the foot*{/}"));
+			await dialog.Msg(L("{#666666}*The break is bright. Whatever did this was done within the month, and it was struck from the outside of the ring inward*{/}"));
+		});
+
+		// The soldier's pack
+		//---------------------------------------------------------------------
+		AddNpc(47161, L("Old Military Pack"), "f_remains_39", -766, 413, 330, async dialog =>
+		{
+			await dialog.Msg(L("{#666666}*A soldier's pack rotted down to buckles and a mason's kit: 4 chisels, a wooden mallet, and a wax block worn to nothing*{/}"));
+			await dialog.Msg(L("{#666666}*It has lain here a very long time and nothing has taken it apart, which for a leather pack in an open lane should not be possible*{/}"));
+		});
+
+		// Quest 1005: The Name That Was Struck Off
+		//---------------------------------------------------------------------
+		AddNpc(154017, L("[Wandering Spirit] The Mason"), "f_remains_39", -644, 479, 0, async dialog =>
 		{
 			var character = dialog.Player;
 			var questId = new QuestId("f_remains_39", 1005);
-			var champSpawnedKey = "Laima.Quests.f_remains_39.Quest1005.ChampSpawned";
 
-			dialog.SetTitle(L("Basilijs"));
+			dialog.SetTitle(L("Wandering Spirit"));
 
 			if (!character.Quests.Has(questId))
 			{
-				await dialog.Msg(L("{#666666}*An exorcist trims a candle-wick to length, then sets the candle alight from a smaller one already burning*{/}"));
-				await dialog.Msg(L("Escanciu village has a haunting. Not the noisy kind - this one is quiet. Things rearrange themselves overnight. Children dream of someone who isn't there. The bell on the chapel rings at three in the morning with no hand on the rope."));
-				await dialog.Msg(L("There's a Hallowventor champion anchoring it. He doesn't haunt the village himself - his presence near the burial-stones lets weaker shades through into the houses. Until he's gone, the haunting deepens."));
+				if (!character.Quests.HasCompleted(new QuestId("f_remains_39", 1004)))
+				{
+					await dialog.Msg(L("{#666666}*It turns toward you the moment you're close, as though it had been waiting for footsteps and not caring whose*{/}"));
+					await dialog.Msg(L("{#666666}*Its mouth moves, and no name comes out of it*{/}"));
+					await dialog.Msg(L("Have the stonewright check the 5 first. I cannot tell you which of them is wrong. I cannot tell you anything with a name in it."));
+					return;
+				}
 
-				var response = await dialog.Select(L("Bless the three roadside shrines along the village path to break his hold on the dead, then kill 10 of his flock to draw him out. The chapel needs this done. Will you?"),
-					Option(L("I'll bless the shrines and face the Champion"), "help"),
-					Option(L("What kind of haunting?"), "info"),
-					Option(L("That's priest-work entirely"), "leave")
+				await dialog.Msg(L("{#666666}*It does not turn this time — it has clearly been standing here, waiting, since you were last seen*{/}"));
+				await dialog.Msg(L("I cut 434 stones. Ruklys, Lydia Schaffen, Agayla Fleury - 3 friends who let me use their names, because a marker gets moved and a memorial does not, and I needed the line to hold longer than anybody's memory of why."));
+				await dialog.Msg(L("The sixth is mine and it is the only real grave in 434 stones. Somebody broke it from the outside this month. Kill 20 Gravegolems to get the last pieces back off the east ground, and then stand with me while what has been leaning on the ring comes through it."));
+
+				var response = await dialog.Select(L("Will you stand at the square?"),
+					Option(L("I'll get the pieces and stand with you"), "help"),
+					Option(L("What was the ring built around?"), "info"),
+					Option(L("Say your own name"), "leave")
 				);
 
 				switch (response)
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He hands you a small clay phial of consecrated oil and a folded slip of paper with the rite written in clear hand*{/}"));
-						await dialog.Msg(L("Three shrines on the village path - oil on the lintel-stone, recite the rite from the paper, mark the doorway with your thumb. The shrines remember whoever blesses them last; choose your blessings carefully in life."));
-						await dialog.Msg(L("Then ten Hallowventors. The Champion manifests around the eighth - tall, paler than mist, doesn't speak. End him quickly; he doesn't fight, but his presence drains the will from a swordhand."));
+						character.Inventory.Add(650520, 1, InventoryAddType.PickUp);
+						await dialog.Msg(L("Carry my sword. It is chipped because I cut 434 stones with a mason's kit and defended none of them with this, and I would like it to be there at the end."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Quiet hauntings are the dangerous ones. Loud hauntings exhaust themselves; quiet hauntings settle in. Inside a year, the village forgets what an unhaunted morning feels like and starts blaming itself for the dread."));
-						await dialog.Msg(L("Two of the Escanciu families have already moved their elders to Salvia. Two more are talking about it. Without the chapel, the village hollows out by autumn."));
+						await dialog.Msg(L("Nothing. That is what everybody gets wrong. The ring was not drawn around a thing - the ring is the safe ground, and the line up the road is the long side of it."));
+						await dialog.Msg(L("61 households live inside it and not one of them knows they turn round at the stones because I made them do it 300 years ago."));
 						break;
 
 					case "leave":
-						await dialog.Msg(L("Then the haunting spreads, the chapel closes, the village hollows. I will keep a candle for you regardless. Some prayers go in both directions."));
+						await dialog.Msg(L("{#666666}*Its mouth moves for a long time and nothing comes*{/}"));
+						await dialog.Msg(L("It is cut on the stone in the square, low down, the way a man signs the last one. When the stone stands I will be able to hear it said."));
 						break;
 				}
 			}
 			else if (character.Quests.IsActive(questId))
 			{
 				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("blessShrines", out var bObj)) return;
-				if (!quest.TryGetProgress("killFlock", out var fObj)) return;
-				if (!quest.TryGetProgress("killChamp", out var cObj)) return;
+				if (!quest.TryGetProgress("recoverPieces", out var piecesObj)) return;
+				if (!quest.TryGetProgress("killReaverpede", out var bossObj)) return;
 
-				if (bObj.Done && fObj.Done && cObj.Done)
+				if (piecesObj.Done && bossObj.Done)
 				{
-					await dialog.Msg(L("{#666666}*He bows his head a long moment, then makes the sign of the candle over both your hands*{/}"));
-					await dialog.Msg(L("Shrines blessed, Champion dispelled, village rests. The chapel-bell rang once at dawn this morning - one hand on the rope, that of the chapel-keeper. The first natural ring in months."));
-					await dialog.Msg(L("Take this. Exorcist's purse, modest as our order requires. The village families will thank you in their own way - probably with bread you'll find on your bedroll for weeks."));
-					character.Variables.Perm.Remove(champSpawnedKey);
+					await dialog.Msg(L("{#666666}*It watches Linas pack the joins with lead and does not move until the stone is standing*{/}"));
+					await dialog.Msg(L("Lukas. That is the whole of it. 300 years and it took a stonewright, a woodcutter and a boy of 19 who would not stop asking why."));
+					await dialog.Msg(L("Take the blade out of the square. It was under the foot of my stone and it is not mine - somebody put it there, and whoever burned the Ruklys face and blanked the garden stone is still walking the line taking it down. The ring holds tonight. It will not hold on its own."));
+
 					character.Quests.Complete(questId);
 				}
-				else if (fObj.Done && !cObj.Done)
+				else if (piecesObj.Done)
 				{
-					var hasSpawned = character.Variables.Perm.GetBool(champSpawnedKey, false);
-					if (!hasSpawned)
-					{
-						character.Variables.Perm.Set(champSpawnedKey, true);
-						if (SpawnTempMonsters(character, MonsterId.Hallowventor, 1, 150, TimeSpan.FromMinutes(5)))
-						{
-							await dialog.Msg(L("He manifests!"));
-							character.ServerMessage(L("{#FF9966}The Hallowventor Champion manifests!{/}"));
-						}
-					}
-					else
-					{
-						await dialog.Msg(L("Find him before he fades."));
-					}
-				}
-				else if (!bObj.Done)
-				{
-					await dialog.Msg(L("The three shrines first. Oil on the lintel, rite from the paper, mark the doorway. The Champion can't be drawn while his hold on the dead still runs the village path."));
+					await dialog.Msg(L("The pieces are back. Now stand at the square, because it comes up through the broken foot and it will not wait for the lead to set."));
 				}
 				else
 				{
-					await dialog.Msg(L("Shrines bless clean. Now ten of his flock - the Champion manifests around the eighth. Brace yourself; his presence drains the will."));
+					await dialog.Msg(L("Pieces first. A stone set short is a gap, and a gap in the ring is the same as no ring at all."));
 				}
 			}
 			else if (character.Quests.HasCompleted(questId))
 			{
-				await dialog.Msg(L("Village sleeps and dreams again. The two families who moved their elders to Salvia are talking about bringing them back. The third family already has - the elder said the morning-quiet finally felt like quiet, not like waiting."));
-			}
-		});
-
-		// Roadside shrines for Quest 1005
-		//-------------------------------------------------------------------------
-		void AddRoadsideShrine(int shrineNumber, int x, int z, int direction)
-		{
-			AddNpc(47190, L("Roadside Shrine"), "f_remains_39", x, z, direction, async dialog =>
-			{
-				var character = dialog.Player;
-				var questId = new QuestId("f_remains_39", 1005);
-
-				if (!character.Quests.IsActive(questId))
-				{
-					await dialog.Msg(L("{#666666}*A weather-worn roadside shrine, candle stubs at the base*{/}"));
-					return;
-				}
-
-				var variableKey = $"Laima.Quests.f_remains_39.Quest1005.Shrine{shrineNumber}";
-				if (character.Variables.Perm.GetBool(variableKey, false))
-				{
-					await dialog.Msg(L("{#666666}*Already blessed; the candles burn steady*{/}"));
-					return;
-				}
-
-				var result = await character.TimeActions.StartAsync(L("Blessing shrine..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-				if (result == TimeActionResult.Completed)
-				{
-					character.Variables.Perm.Set(variableKey, true);
-					var count = character.Variables.Perm.GetInt("Laima.Quests.f_remains_39.Quest1005.ShrinesBlessed", 0) + 1;
-					character.Variables.Perm.Set("Laima.Quests.f_remains_39.Quest1005.ShrinesBlessed", count);
-					character.ServerMessage(LF("Roadside shrines blessed: {0}/3", count));
-
-					if (count >= 3)
-						character.ServerMessage(L("{#FFD700}All shrines blessed! Now bait out the Champion.{/}"));
-				}
-				else
-				{
-					character.ServerMessage(L("Blessing interrupted."));
-				}
-			});
-		}
-
-		AddRoadsideShrine(1, 200, 200, 0);
-		AddRoadsideShrine(2, 400, 400, 90);
-		AddRoadsideShrine(3, 100, 500, 180);
-
-		// Quest 6: Escanciu Sweep
-		//-------------------------------------------------------------------------
-		AddNpc(155146, L("[Village Elder] Augustas"), "f_remains_39", 0, 0, 0, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_remains_39", 1006);
-
-			dialog.SetTitle(L("Augustas"));
-
-			if (!character.Quests.Has(questId))
-			{
-				await dialog.Msg(L("{#666666}*An old village elder watching the road from the chapel-step*{/}"));
-				await dialog.Msg(L("Escanciu has stood here for two centuries. Nine generations of my family have been laid to rest in our burial-ground. The village pays its own way, sweeps its own road, and never asks Salvia for help unless we have to."));
-				await dialog.Msg(L("Three monsters contest our patrol-circuit. Gravegolems wander out of the burial-ground. Zolems push up through the cellar-floors. Hooks roost in the rafters of the abandoned mill. We've never had all three at once before this season."));
-
-				var response = await dialog.Select(L("Kill 12 Gravegolems, 12 Zolems, and 12 Hooks on the patrol-circuit, then ring the Village Bell to signal the elders the patrol's done. Will you walk the round?"),
-					Option(L("I'll walk the round"), "help"),
-					Option(L("Why ring the bell?"), "info"),
-					Option(L("Find a younger swordhand"), "leave")
-				);
-
-				switch (response)
-				{
-					case "help":
-						character.Quests.Start(questId);
-						await dialog.Msg(L("{#666666}*He hands you a copper key on a worn lanyard*{/}"));
-						await dialog.Msg(L("Thirty-six kills, no padding. The patrol-circuit runs burial-ground, cellar-row, mill-loft, in that order. Gravegolems first - they wander, so easier in the morning."));
-						await dialog.Msg(L("Bell's at the village square. Use the key to unlock the rope-housing. One long peal - the elders count from their windows. Two peals means trouble; one means clear."));
-						break;
-
-					case "info":
-						await dialog.Msg(L("Village too small for a watch-runner. Bell carries to every house in Escanciu. The elders sleep in their daylight chairs at this age - the bell is what tells them the patrol-circuit is done and they can take their nap properly."));
-						await dialog.Msg(L("Pelke's old custom from the demon war. We never went back. A bell peal is a small thing that means a great deal to old people in winter."));
-						break;
-
-					case "leave":
-						await dialog.Msg(L("Then I pay the next swordhand who walks past, and they will. There always is one. There is rarely one I trust to ring the bell properly."));
-						break;
-				}
-			}
-			else if (character.Quests.IsActive(questId))
-			{
-				if (!character.Quests.TryGetById(questId, out var quest)) return;
-				if (!quest.TryGetProgress("killGolems", out var gObj)) return;
-				if (!quest.TryGetProgress("killZolems", out var zObj)) return;
-				if (!quest.TryGetProgress("killHooks", out var hObj)) return;
-				if (!quest.TryGetProgress("ringBell", out var bObj)) return;
-
-				if (gObj.Done && zObj.Done && hObj.Done && bObj.Done)
-				{
-					await dialog.Msg(L("{#666666}*He smiles at the bell-tower like he's listening to an old friend*{/}"));
-					await dialog.Msg(L("Patrol done, bell rung clean - I heard it from here, two seconds long, perfect form. The elders are taking their afternoon naps as we speak."));
-					await dialog.Msg(L("Village fund, paid honest. And a loaf of dawn-bread the chapel-keeper baked for whoever did the round - she said you'd come by today, somehow."));
-					character.Quests.Complete(questId);
-				}
-				else if (gObj.Done && zObj.Done && hObj.Done)
-				{
-					await dialog.Msg(L("Patrol complete. Now the bell at the square - copper key, rope-housing, one long peal. The elders are listening."));
-				}
-				else
-				{
-					await dialog.Msg(L("Burial-ground, cellar-row, mill-loft. Twelve of each. Take your time on the mill-loft - the rafters give if you weight one beam too long."));
-				}
-			}
-			else if (character.Quests.HasCompleted(questId))
-			{
-				await dialog.Msg(L("Another week of peace - first uninterrupted week in months. The chapel-keeper's dawn-bread is on the church step every morning now, with no name on the basket. We all pretend not to know who it's for."));
-			}
-		});
-
-		// Village Bell for Quest 1006
-		//-------------------------------------------------------------------------
-		AddNpc(47190, L("Village Bell"), "f_remains_39", 50, 50, 90, async dialog =>
-		{
-			var character = dialog.Player;
-			var questId = new QuestId("f_remains_39", 1006);
-
-			if (!character.Quests.IsActive(questId))
-			{
-				await dialog.Msg(L("{#666666}*The village bell, hanging from a stone arch in the square*{/}"));
-				return;
-			}
-
-			var rungKey = "Laima.Quests.f_remains_39.Quest1006.BellRung";
-			if (character.Variables.Perm.GetBool(rungKey, false))
-			{
-				await dialog.Msg(L("{#666666}*Already rung; the elders heard*{/}"));
-				return;
-			}
-
-			if (!character.Quests.TryGetById(questId, out var quest)) return;
-			if (!quest.TryGetProgress("killGolems", out var gObj)) return;
-			if (!quest.TryGetProgress("killZolems", out var zObj)) return;
-			if (!quest.TryGetProgress("killHooks", out var hObj)) return;
-
-			if (!(gObj.Done && zObj.Done && hObj.Done))
-			{
-				await dialog.Msg(L("{#666666}*The rope is in your hand, but you haven't finished the patrol*{/}"));
-				return;
-			}
-
-			var result = await character.TimeActions.StartAsync(L("Ringing bell..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-			if (result == TimeActionResult.Completed)
-			{
-				character.Variables.Perm.Set(rungKey, true);
-				character.ServerMessage(L("{#FFD700}Village Bell rung. Return to Village Elder Augustas.{/}"));
-			}
-			else
-			{
-				character.ServerMessage(L("Ringing interrupted."));
+				await dialog.Msg(L("{#666666}*It stands in the lane facing the square, and for the first time it is not walking*{/}"));
+				await dialog.Msg(L("61 households and 9 of them coming back. Tell the epigraphers on the road what the shape is. They have the 434 and they do not have the middle."));
 			}
 		});
 	}
@@ -560,243 +445,218 @@ public class FRemains39QuestNpcsScript : GeneralScript
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
 
-public class FRemains39Quest1001 : QuestScript
+// Quest 1001 CLASS: Sixty-One Households
+//-----------------------------------------------------------------------------
+
+public class SixtyOneHouseholdsQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_remains_39", 1001);
-		SetName(L("Gravegolem Graveyard"));
+		SetName(L("Sixty-One Households"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Gravegolems risen in the east plots before the remembrance rite."));
+		SetDescription(L("The memorial in the Escanciu square was broken this spring and 9 households have walked out since. The Gravegolems are carrying the broken pieces off to the east ground."));
 		SetLocation("f_remains_39");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Gravekeeper] Ema"), "f_remains_39");
+		AddQuestGiver(L("[Village Elder] Moje"), "f_remains_39");
 
-		AddObjective("killGolems", L("Kill Gravegolems"),
+		AddObjective("killGolems", L("Kill Gravegolems on the east ground"),
 			new KillObjective(25, new[] { MonsterId.Gravegolem }));
 
-		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(5200));
-		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
+		AddObjective("collectPieces", L("Recover Destroyed Tombstone Fragments"),
+			new CollectItemObjective(650545, 8));
+
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
+
+		AddDrop(650545, 0.35f, MonsterId.Gravegolem);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650545, character.Inventory.CountItem(650545), InventoryItemRemoveMsg.Destroyed);
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		character.Inventory.Remove(650545, character.Inventory.CountItem(650545), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FRemains39Quest1002 : QuestScript
+// Quest 1002 CLASS: Forty Years in the West Cut
+//-----------------------------------------------------------------------------
+
+public class FortyYearsInTheWestCutQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_remains_39", 1002);
-		SetName(L("Earth-Cores"));
+		SetName(L("Forty Years in the West Cut"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Zolems and gather earth-cores for masonry binding."));
+		SetDescription(L("For 39 years the Zolems in the west stand were rocks with moss on them. This spring they stood up, and each one carries a stone at its centre that rings when it is split."));
 		SetLocation("f_remains_39");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Stonewright] Vilis"), "f_remains_39");
+		AddQuestGiver(L("[Woodcutter] Ruoval"), "f_remains_39");
 
-		AddObjective("killZolems", L("Kill Zolems"),
-			new KillObjective(20, new[] { MonsterId.Zolem }));
-
-		AddObjective("gatherCores", L("Gather earth-cores"),
-			new CollectItemObjective(650240, 6));
+		AddObjective("collectStones", L("Recover Zolem Magic Stones from the west cut"),
+			new CollectItemObjective(650761, 10));
 
 		AddReward(new ExpReward(6100, 4200));
 		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+
+		AddDrop(650761, 0.45f, MonsterId.Zolem);
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650240, character.Inventory.CountItem(650240), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650761, character.Inventory.CountItem(650761), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Inventory.Remove(650240, character.Inventory.CountItem(650240), InventoryItemRemoveMsg.Destroyed);
+		character.Inventory.Remove(650761, character.Inventory.CountItem(650761), InventoryItemRemoveMsg.Destroyed);
 	}
 }
 
-public class FRemains39Quest1003 : QuestScript
+// Quest 1003 CLASS: As Far As the Second Stone
+//-----------------------------------------------------------------------------
+
+public class AsFarAsTheSecondStoneQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_remains_39", 1003);
-		SetName(L("Curved Needles"));
+		SetName(L("As Far As the Second Stone"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Hooks and gather thorns for seamstress needles."));
+		SetDescription(L("Nobody in Escanciu walks past the inscriptions and nobody can say why. The Winged Frogs have come up out of the west water past the line and into the lane. Kill 25 of them."));
 		SetLocation("f_remains_39");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Seamstress] Rima"), "f_remains_39");
+		AddQuestGiver(L("[Village Youth] Cahill"), "f_remains_39");
 
-		AddObjective("killHooks", L("Kill Hooks"),
-			new KillObjective(20, new[] { MonsterId.Hook }));
+		AddObjective("killFrogs", L("Kill Winged Frogs in the west lane"),
+			new KillObjective(25, new[] { MonsterId.Flying_Flog }));
 
-		AddObjective("gatherThorns", L("Gather thorns"),
-			new CollectItemObjective(650245, 5));
-
-		AddReward(new ExpReward(6100, 4200));
-		AddReward(new SilverReward(7200));
-		AddReward(new ItemReward(640084, 2));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650245, character.Inventory.CountItem(650245), InventoryItemRemoveMsg.Destroyed);
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Inventory.Remove(650245, character.Inventory.CountItem(650245), InventoryItemRemoveMsg.Destroyed);
+		AddReward(new ExpReward(3900, 2700));
+		AddReward(new SilverReward(5200));
+		AddReward(new ItemReward(640084, 1)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
 	}
 }
 
-public class FRemains39Quest1004 : QuestScript
+// Quest 1004 CLASS: Agayla Fleury, Five Times
+//-----------------------------------------------------------------------------
+
+public class AgaylaFleuryFiveTimesQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_remains_39", 1004);
-		SetName(L("Flog Swarm"));
+		SetName(L("Agayla Fleury, Five Times"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Flying Flogs raiding the monastery bee hives."));
+		SetDescription(L("5 inscriptions stand around Escanciu, all cut 300 years ago by one hand in one season. The stonewright will not try to set the broken sixth until he knows the other 5 are still whole."));
 		SetLocation("f_remains_39");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Beekeeper-Monk] Ambrozijs"), "f_remains_39");
+		AddQuestGiver(L("[Stonewright] Linas"), "f_remains_39");
 
-		AddObjective("killFlogs", L("Kill Flying Flogs"),
-			new KillObjective(25, new[] { MonsterId.Flying_Flog }));
+		AddObjective("checkStones", L("Check the faces and bases of all 5 inscriptions"),
+			new VariableCheckObjective("Laima.Quests.f_remains_39.Quest1004.StonesChecked", 5, true));
 
-		AddObjective("rethatchCanopies", L("Re-thatch the four hive-canopies"),
-			new VariableCheckObjective("Laima.Quests.f_remains_39.Quest1004.CanopiesThatched", 4, true));
-
-		AddReward(new ExpReward(3900, 2700));
-		AddReward(new SilverReward(5200));
-		AddReward(new ItemReward(640084, 1));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
+		AddReward(new ExpReward(6100, 4200));
+		AddReward(new SilverReward(7200));
+		AddReward(new ItemReward(640084, 2)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 2)); // Large HP Potion
+		AddReward(new ItemReward(640007, 2)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1004.CanopiesThatched");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_remains_39.Quest1004.Canopy{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1004.StonesChecked");
+
+		for (var i = 1; i <= 5; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_remains_39.Quest1004.Stone{i}");
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1004.CanopiesThatched");
-		for (int i = 1; i <= 4; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_remains_39.Quest1004.Canopy{i}");
+		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1004.StonesChecked");
+
+		for (var i = 1; i <= 5; i++)
+			character.Variables.Perm.Remove($"Laima.Quests.f_remains_39.Quest1004.Stone{i}");
 	}
 }
 
-public class FRemains39Quest1005 : QuestScript
+// Quest 1005 CLASS: The Name That Was Struck Off
+//-----------------------------------------------------------------------------
+
+public class TheNameThatWasStruckOffQuest : QuestScript
 {
 	protected override void Load()
 	{
 		SetId("f_remains_39", 1005);
-		SetName(L("The Hallowventor Champion"));
+		SetName(L("The Name That Was Struck Off"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Kill Hallowventors to draw out their champion."));
+		SetDescription(L("The mason who cut all 434 stones put his own name on the sixth, in the middle of the ring, and it is the only real grave in the whole line. Somebody broke it from the outside this month."));
 		SetLocation("f_remains_39");
 		SetAutoTracked(true);
+
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Exorcist] Basilijs"), "f_remains_39");
+		SetUnlock(QuestUnlockType.Sequential);
+		AddQuestGiver(L("[Wandering Spirit] The Mason"), "f_remains_39");
 
-		AddObjective("blessShrines", L("Bless the three roadside shrines"),
-			new VariableCheckObjective("Laima.Quests.f_remains_39.Quest1005.ShrinesBlessed", 3, true));
+		AddPrerequisite(new CompletedPrerequisite("f_remains_39", 1004));
 
-		AddObjective("killFlock", L("Kill Hallowventors"),
-			new KillObjective(10, new[] { MonsterId.Hallowventor }));
+		AddObjective("recoverPieces", L("Kill Gravegolems holding the last of the pieces"),
+			new KillObjective(20, new[] { MonsterId.Gravegolem }));
 
-		AddObjective("killChamp", L("Defeat the Champion"),
-			new KillObjective(1, new[] { MonsterId.Hallowventor }));
+		AddObjective("killReaverpede", L("Hold the square against what comes up through the broken foot"),
+			new LayeredKillObjective(
+				spawnList: new[] { new KillSpec(MonsterId.Boss_Reaverpede, 1) },
+				resetIdent: "recoverPieces",
+				spawnDistance: 100,
+				lifetime: TimeSpan.FromMinutes(5)));
 
-		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(9000));
-		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-		AddReward(new ItemReward(640012, 1));
+		AddReward(new ExpReward(16000, 11000));
+		AddReward(new SilverReward(20000));
+		AddReward(new ItemReward(123103, 1)); // Naktis
+		AddReward(new ItemReward(640084, 3)); // Lv4 EXP Card
+		AddReward(new ItemReward(640004, 3)); // Large HP Potion
+		AddReward(new ItemReward(640007, 3)); // Large SP Potion
+		AddReward(new ItemReward(640012, 1)); // Recovery Potion
 	}
 
 	public override void OnComplete(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1005.ShrinesBlessed");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_remains_39.Quest1005.Shrine{i}");
+		character.Inventory.Remove(650520, character.Inventory.CountItem(650520), InventoryItemRemoveMsg.Destroyed);
 	}
 
 	public override void OnCancel(Character character, Quest quest)
 	{
-		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1005.ShrinesBlessed");
-		for (int i = 1; i <= 3; i++)
-			character.Variables.Perm.Remove($"Laima.Quests.f_remains_39.Quest1005.Shrine{i}");
-	}
-}
-
-public class FRemains39Quest1006 : QuestScript
-{
-	protected override void Load()
-	{
-		SetId("f_remains_39", 1006);
-		SetName(L("Village Patrol"));
-		SetType(QuestType.Sub);
-		SetDescription(L("Patrol Escanciu Village killing Gravegolems, Zolems, and Hooks."));
-		SetLocation("f_remains_39");
-		SetAutoTracked(true);
-		SetReceive(QuestReceiveType.Manual);
-		SetCancelable(true);
-		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("[Village Elder] Augustas"), "f_remains_39");
-
-		AddObjective("killGolems", L("Kill Gravegolems"),
-			new KillObjective(12, new[] { MonsterId.Gravegolem }));
-
-		AddObjective("killZolems", L("Kill Zolems"),
-			new KillObjective(12, new[] { MonsterId.Zolem }));
-
-		AddObjective("killHooks", L("Kill Hooks"),
-			new KillObjective(12, new[] { MonsterId.Hook }));
-
-		AddObjective("ringBell", L("Ring the Village Bell"),
-			new VariableCheckObjective("Laima.Quests.f_remains_39.Quest1006.BellRung", 1, true));
-
-		AddReward(new ExpReward(8700, 6000));
-		AddReward(new SilverReward(9000));
-		AddReward(new ItemReward(640084, 3));
-		AddReward(new ItemReward(640004, 2));
-		AddReward(new ItemReward(640007, 2));
-	}
-
-	public override void OnComplete(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1006.BellRung");
-	}
-
-	public override void OnCancel(Character character, Quest quest)
-	{
-		character.Variables.Perm.Remove("Laima.Quests.f_remains_39.Quest1006.BellRung");
+		character.Inventory.Remove(650520, character.Inventory.CountItem(650520), InventoryItemRemoveMsg.Destroyed);
 	}
 }
