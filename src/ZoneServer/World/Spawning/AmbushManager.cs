@@ -5,6 +5,7 @@ using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.AI;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -93,9 +94,10 @@ namespace Melia.Zone.World.Spawning
 
 			state.LastSeenTime = now;
 
-			// Ambushing a player who isn't going anywhere would just
-			// be a spawn in their face.
-			if (!IsWalking(character) || now < state.CooldownEndTime)
+			// Ambushing a player who isn't going anywhere would just be a
+			// spawn in their face, and nothing lies in wait for someone
+			// it can't see.
+			if (!IsWalking(character) || character.IsBuffActiveByKeyword(BuffTag.Cloaking) || now < state.CooldownEndTime)
 			{
 				state.LastTestPosition = character.Position;
 				state.LastRollTime = now;
@@ -340,13 +342,10 @@ namespace Melia.Zone.World.Spawning
 		/// <returns></returns>
 		private static bool IsAmbushMap(Map map)
 		{
-			if (map == null || map == Map.Limbo || map.IsDormant)
+			if (map == null || map == Map.Limbo || map.IsDormant || map.IsCity)
 				return false;
 
-			if (map.IsInstance || map.IsCity)
-				return false;
-
-			return map.Data?.Type == MapType.Field;
+			return map.IsField;
 		}
 
 		/// <summary>

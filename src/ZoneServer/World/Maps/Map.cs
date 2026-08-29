@@ -128,6 +128,8 @@ namespace Melia.Zone.World.Maps
 		public bool IsCity { get; set; }
 		public bool IsTOSHeroZone => this.Data?.Tags.Has(SkillTag.ExpertSkill) ?? false;
 		public bool IsInstance => this.Data?.Type == MapType.Instance;
+		public bool IsDungeon => this.Data?.Type == MapType.Dungeon;
+		public bool IsField => this.Data?.Type == MapType.Field;
 		public bool TeleportDisabled { get; internal set; }
 		public bool IsDormant { get; private set; }
 

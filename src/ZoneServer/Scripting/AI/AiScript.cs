@@ -334,6 +334,9 @@ namespace Melia.Zone.Scripting.AI
 			if (!this.TryGetMaster(out var master))
 				return;
 
+			if (this.HasPatrolFormation && !this.EntityGone(master))
+				return;
+
 			if (this.EntityGone(master) || !this.InRangeOf(master, MaxMasterDistance))
 			{
 				_target = null;
@@ -1805,6 +1808,7 @@ namespace Melia.Zone.Scripting.AI
 						_lastAttackerHandle = hitEventAlert.Attacker.Handle;
 
 						this.OnTakeDamage(hitEventAlert.Attacker, hitEventAlert.Damage);
+						this.AlertPatrolGroup(hitEventAlert.Attacker);
 						this.TryPanicFlee(hitEventAlert.Attacker);
 
 						if (!this.IsPanicking)
@@ -2120,7 +2124,14 @@ namespace Melia.Zone.Scripting.AI
 		}
 
 		/// <summary>
-		/// Returns the AI's master, or null if it doesn't have one.
+		/// Returns the handle of the AI's master, or zero if it doesn't
+		/// have one.
+		/// </summary>
+		public int MasterHandle => _masterHandle;
+
+		/// <summary>
+		/// Returns the AI's master, or null if it doesn't have one or it
+		/// is no longer on its map.
 		/// </summary>
 		/// <returns></returns>
 		public ICombatEntity GetMaster()

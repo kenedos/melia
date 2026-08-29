@@ -219,7 +219,7 @@ namespace Melia.Zone.Commands
 			this.Add("cubeinfo", "<group|item_class>", "Shows contents of a cube/gacha by group name or item class.", this.HandleCubeInfo);
 			this.Add("cubelist", "[filter]", "Lists all available cube/gacha groups.", this.HandleCubeList);
 			this.Add("patrolnodes", "[range=1500]", "Shows the patrol nodes around you.", this.HandlePatrolNodes);
-			this.Add("patrolinfo", "[range=500]", "Reports the patrol state of this map.", this.HandlePatrolInfo);
+			this.Add("patrolinfo", "", "Writes the patrol state of this map to patrolinfo.txt in the temp folder.", this.HandlePatrolInfo);
 
 			// Test ZC_NORMAL Packets.
 			this.Add("timeactiontarget", "<player> <anim> <secs> [msg]", "Shows a time action bar to another player.", this.HandleTimeActionOnlyTarget);
@@ -6374,15 +6374,12 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandlePatrolInfo(Character sender, Character target, string message, string command, Arguments args)
 		{
-			var range = 500f;
-			if (args.Count > 0 && !float.TryParse(args.Get(0), out range))
-			{
-				sender.ServerMessage(Localization.Get("Invalid range."));
-				return CommandResult.InvalidArgument;
-			}
+			var filePath = Path.Combine(Path.GetTempPath(), "patrolinfo.txt");
+			var lines = ZoneServer.Instance.World.Patrols.GetStatus(sender);
 
-			foreach (var line in ZoneServer.Instance.World.Patrols.GetStatus(sender, range))
-				sender.ServerMessage(line);
+			File.WriteAllLines(filePath, lines);
+
+			sender.ServerMessage(Localization.Get("Patrol report written to {0}."), filePath);
 
 			return CommandResult.Okay;
 		}

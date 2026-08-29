@@ -23,10 +23,22 @@ namespace Melia.Zone.World.Patrols
 	{
 		private static readonly TimeSpan CheckInterval = TimeSpan.FromSeconds(2);
 
+		private static readonly BuffId[] RareMonsterBuffIds =
+		[
+			BuffId.SuperDrop,
+			BuffId.SuperExp,
+			BuffId.SuperMonGen,
+			BuffId.EliteMonsterBuff,
+			BuffId.Mythic_Chain_Lightning_Buff,
+			BuffId.Mythic_Boosting_Morale_Buff,
+			BuffId.Mythic_Puddle_Buff,
+			BuffId.Mythic_Bomb_Buff,
+			BuffId.Mythic_InfectiousDisease_Buff,
+			BuffId.Mythic_Link_Buff,
+		];
+
 		private const string NodeEffectName = "F_light110_pink_ground_loop";
 
-		private const string DungeonPrefix = "d_";
-		private const string InstancedDungeonPrefix = "id_";
 		private const float NodeEffectDuration = 10000f;
 
 		private TimeSpan _checkDelay = CheckInterval;
@@ -133,13 +145,21 @@ namespace Melia.Zone.World.Patrols
 			{
 				var mob = (Mob)monster;
 
-				if (!mob.Components.TryGet<AiComponent>(out var ai) || ai.Script.PatrolConsidered)
+				if (!mob.Components.TryGet<AiComponent>(out var ai))
+					continue;
+
+				// A patrol that lost members picks up any of its own kind
+				// it walks past.
+				if (ai.Script.HasPatrolRoute)
+				{
+					this.TopUpGroup(monsters, mob, conf.PatrolGroupSize, conf.PatrolGroupRadius);
+					continue;
+				}
+
+				if (ai.Script.PatrolConsidered)
 					continue;
 
 				ai.Script.AssignPatrol(null);
-
-				if (mob.IsBuffActive(BuffId.EliteMonsterBuff))
-					continue;
 
 				if (GameRandom.Get().NextDouble() * 100 >= conf.PatrolChance)
 					continue;
@@ -151,7 +171,7 @@ namespace Melia.Zone.World.Patrols
 
 				// A lone monster wandering a dungeon reads as a stray, so
 				// a patrol only exists if there's a group to walk it.
-				if (this.AssignFollowers(monsters, mob, conf.PatrolGroupSize, conf.PatrolGroupRadius) == 0)
+				if (this.AssignFollowers(monsters, mob, conf.PatrolGroupSize, conf.PatrolGroupRadius, 1) == 0)
 					ai.Script.AssignPatrol(null);
 			}
 		}
@@ -162,16 +182,17 @@ namespace Melia.Zone.World.Patrols
 		/// </summary>
 		/// <param name="monsters"></param>
 		/// <param name="leader"></param>
-		/// <param name="groupSize"></param>
+		/// <param name="amount"></param>
 		/// <param name="groupRadius"></param>
+		/// <param name="firstSlot"></param>
 		/// <returns></returns>
-		private int AssignFollowers(List<IMonster> monsters, Mob leader, int groupSize, float groupRadius)
+		private int AssignFollowers(List<IMonster> monsters, Mob leader, int amount, float groupRadius, int firstSlot)
 		{
 			var followerCount = 0;
 
 			foreach (var monster in monsters)
 			{
-				if (followerCount >= groupSize)
+				if (followerCount >= amount)
 					break;
 
 				// A patrol is one kind of monster moving together, never
@@ -187,16 +208,77 @@ namespace Melia.Zone.World.Patrols
 
 				// Monsters that were passed over for leading a patrol are
 				// still free to walk in one.
-				if (ai.Script.HasPatrolRoute || ai.Script.HasPatrolFormation || ai.Script.GetMaster() != null)
+				if (ai.Script.HasPatrolRoute || ai.Script.HasPatrolFormation || ai.Script.MasterHandle != 0)
 					continue;
 
-				ai.Script.SetPatrolFormationSlot(followerCount + 1);
+				// Jackpot, elite, and mythic monsters lead their own
+				// patrols, they never walk in someone else's.
+				if (IsRareMonster(mob))
+					continue;
+
+				ai.Script.SetPatrolFormationSlot(firstSlot + followerCount);
 				ai.Script.SetMaster(leader);
 
 				followerCount++;
 			}
 
 			return followerCount;
+		}
+
+		/// <summary>
+		/// Returns the amount of monsters following the given leader.
+		/// </summary>
+		/// <param name="monsters"></param>
+		/// <param name="leader"></param>
+		/// <returns></returns>
+		private int CountFollowers(List<IMonster> monsters, Mob leader)
+		{
+			var followerCount = 0;
+
+			foreach (var monster in monsters)
+			{
+				if (monster is not Mob mob || !mob.Components.TryGet<AiComponent>(out var ai))
+					continue;
+
+				// The handle is what the follower actually holds on to, so
+				// counting on it doesn't miss anyone the map lookup can't
+				// resolve for a moment.
+				if (ai.Script.MasterHandle == leader.Handle)
+					followerCount++;
+			}
+
+			return followerCount;
+		}
+
+		/// <summary>
+		/// Fills a patrol group back up to its size with monsters of the
+		/// leader's kind that it passes by.
+		/// </summary>
+		/// <param name="monsters"></param>
+		/// <param name="leader"></param>
+		/// <param name="groupSize"></param>
+		/// <param name="groupRadius"></param>
+		private void TopUpGroup(List<IMonster> monsters, Mob leader, int groupSize, float groupRadius)
+		{
+			var followerCount = 0;
+			var lastSlot = 0;
+
+			foreach (var monster in monsters)
+			{
+				if (monster is not Mob mob || !mob.Components.TryGet<AiComponent>(out var ai))
+					continue;
+
+				if (ai.Script.MasterHandle != leader.Handle)
+					continue;
+
+				followerCount++;
+				lastSlot = Math.Max(lastSlot, ai.Script.PatrolFormationSlot);
+			}
+
+			if (followerCount >= groupSize)
+				return;
+
+			this.AssignFollowers(monsters, leader, groupSize - followerCount, groupRadius, lastSlot + 1);
 		}
 
 		/// <summary>
@@ -242,19 +324,18 @@ namespace Melia.Zone.World.Patrols
 
 		/// <summary>
 		/// Returns a report about the patrol state of the character's
-		/// map and the monsters around them.
+		/// map and every patrol group on it.
 		/// </summary>
 		/// <param name="character"></param>
-		/// <param name="range"></param>
 		/// <returns></returns>
-		public List<string> GetStatus(Character character, float range)
+		public List<string> GetStatus(Character character)
 		{
 			var lines = new List<string>();
 			var map = character.Map;
 			var conf = ZoneServer.Instance.Conf.World;
 
-			lines.Add($"Map '{map.ClassName}': type {map.Data?.Type}, instance {map.IsInstance}, dynamic {map is DynamicMap}, dormant {map.IsDormant}, patrols {(IsPatrolMap(map) ? "allowed" : "BLOCKED")}.");
-			lines.Add($"Conf: enabled {conf.PatrolEnabled}, chance {conf.PatrolChance}%, group {conf.PatrolGroupSize}.");
+			lines.Add($"Map '{map.ClassName}': type {map.Data?.Type}, dungeon {map.IsDungeon}, dynamic {map is DynamicMap}, dormant {map.IsDormant}, patrols {(IsPatrolMap(map) ? "allowed" : "BLOCKED")}.");
+			lines.Add($"Conf: enabled {conf.PatrolEnabled}, chance {conf.PatrolChance}%, group size {conf.PatrolGroupSize}, group radius {conf.PatrolGroupRadius}.");
 
 			var graph = this.GetGraph(map);
 			if (graph == null)
@@ -269,41 +350,72 @@ namespace Melia.Zone.World.Patrols
 
 			var monsters = map.GetMonsters(a => a is Mob mob && IsPatrolMob(mob));
 			var considered = 0;
-			var patrolling = 0;
+			var leaders = 0;
+			var followers = 0;
 
 			foreach (var monster in monsters)
 			{
-				if (!monster.Components.TryGet<AiComponent>(out var ai))
+				if (monster is not Mob mob || !mob.Components.TryGet<AiComponent>(out var ai))
 					continue;
 
 				if (ai.Script.PatrolConsidered)
 					considered++;
 
 				if (ai.Script.HasPatrolRoute)
-					patrolling++;
+					leaders++;
+				else if (ai.Script.MasterHandle != 0)
+					followers++;
 			}
 
-			lines.Add($"Monsters: {monsters.Count} eligible, {considered} considered, {patrolling} on a route.");
+			lines.Add($"Monsters: {monsters.Count} eligible, {considered} considered, {leaders} leaders, {followers} followers.");
+			lines.Add("");
 
 			foreach (var monster in monsters)
 			{
-				if (monster is not Mob mob)
+				if (monster is not Mob leader || !leader.Components.TryGet<AiComponent>(out var leaderAi))
 					continue;
 
-				if (!mob.Position.InRange2D(character.Position, range))
+				if (!leaderAi.Script.HasPatrolRoute)
 					continue;
 
-				if (!mob.Components.TryGet<AiComponent>(out var ai))
-					continue;
+				var distance = (int)leader.Position.Get2DDistance(character.Position);
+				lines.Add($"Leader {leader.Name} ({leader.Handle}), {distance} away, routine '{leaderAi.Script.CurrentRoutine}', rare {IsRareMonster(leader)}:");
 
-				var master = ai.Script.GetMaster();
-				var role = ai.Script.HasPatrolRoute ? "leader" : master != null ? "follower" : "none";
+				var groupCount = 0;
 
-				lines.Add($"  {mob.Name} ({mob.Handle}): routine '{ai.Script.CurrentRoutine}', patrol {role}, considered {ai.Script.PatrolConsidered}.");
+				foreach (var member in monsters)
+				{
+					if (member is not Mob mob || !mob.Components.TryGet<AiComponent>(out var ai))
+						continue;
 
-				if (lines.Count > 15)
-					break;
+					if (ai.Script.MasterHandle != leader.Handle)
+						continue;
+
+					groupCount++;
+
+					var followerDistance = (int)mob.Position.Get2DDistance(leader.Position);
+					lines.Add($"  slot {ai.Script.PatrolFormationSlot}: {mob.Name} ({mob.Handle}), {followerDistance} from leader, routine '{ai.Script.CurrentRoutine}'.");
+				}
+
+				lines.Add($"  {groupCount} followers.");
+				lines.Add("");
 			}
+
+			var strays = new List<string>();
+
+			foreach (var monster in monsters)
+			{
+				if (monster is not Mob mob || !mob.Components.TryGet<AiComponent>(out var ai))
+					continue;
+
+				if (ai.Script.HasPatrolRoute || ai.Script.MasterHandle != 0)
+					continue;
+
+				strays.Add($"  {mob.Name} ({mob.Handle}): routine '{ai.Script.CurrentRoutine}', considered {ai.Script.PatrolConsidered}, rare {IsRareMonster(mob)}.");
+			}
+
+			lines.Add($"Monsters in no group: {strays.Count}.");
+			lines.AddRange(strays);
 
 			return lines;
 		}
@@ -318,17 +430,24 @@ namespace Melia.Zone.World.Patrols
 			if (map == null || map == Map.Limbo || map is DynamicMap || map.IsDormant)
 				return false;
 
-			if (map.IsInstance)
-				return false;
+			return map.IsDungeon;
+		}
 
-			// Instanced dungeons are named apart from the dungeons that
-			// are part of the world.
-			if (map.ClassName.StartsWith(InstancedDungeonPrefix))
-				return false;
+		/// <summary>
+		/// Returns true if the monster is a jackpot, elite, or mythic
+		/// monster.
+		/// </summary>
+		/// <param name="mob"></param>
+		/// <returns></returns>
+		private static bool IsRareMonster(Mob mob)
+		{
+			for (var i = 0; i < RareMonsterBuffIds.Length; ++i)
+			{
+				if (mob.IsBuffActive(RareMonsterBuffIds[i]))
+					return true;
+			}
 
-			// Most dungeons are typed as fields in the client's map data,
-			// so their names are the more reliable signal.
-			return map.Data?.Type == MapType.Dungeon || map.ClassName.StartsWith(DungeonPrefix);
+			return false;
 		}
 
 		/// <summary>

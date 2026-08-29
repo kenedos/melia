@@ -1,8 +1,12 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Patrols;
 
 namespace Melia.Zone.Scripting.AI
@@ -11,6 +15,11 @@ namespace Melia.Zone.Scripting.AI
 	{
 		private const float StalledLegDistance = 10;
 		private const int StalledLegDelay = 1000;
+
+		private const float PatrolAlertRange = 500;
+		private const float PatrolAlertHate = 200;
+
+		private static readonly TimeSpan PatrolAlertCooldown = TimeSpan.FromSeconds(1);
 
 		private const float FormationSpacing = 25;
 		private const float FormationArriveDistance = 30;
@@ -21,6 +30,7 @@ namespace Melia.Zone.Scripting.AI
 		private int _patrolNodeIndex;
 		private int _patrolPreviousIndex = -1;
 		private int _patrolFormationSlot;
+		private DateTime _lastPatrolAlertTime = DateTime.MinValue;
 
 		/// <summary>
 		/// Returns true if the entity was already considered for a
@@ -38,6 +48,12 @@ namespace Melia.Zone.Scripting.AI
 		/// formation.
 		/// </summary>
 		public bool HasPatrolFormation => _patrolFormationSlot > 0;
+
+		/// <summary>
+		/// Returns the entity's slot in its leader's formation, counting
+		/// from one, or zero if it has none.
+		/// </summary>
+		public int PatrolFormationSlot => _patrolFormationSlot;
 
 		/// <summary>
 		/// Puts the entity in the given slot of its leader's formation,
@@ -64,6 +80,43 @@ namespace Melia.Zone.Scripting.AI
 			_patrolVisits = route != null ? new int[route.Count] : null;
 			_patrolNodeIndex = route?.GetNearestNodeIndex(this.Entity.Position) ?? 0;
 			_patrolPreviousIndex = -1;
+		}
+
+		/// <summary>
+		/// Makes the rest of the entity's patrol group hate its
+		/// attacker, so a pack answers an attack on any of its members.
+		/// </summary>
+		/// <param name="attacker"></param>
+		protected virtual void AlertPatrolGroup(ICombatEntity attacker)
+		{
+			if (attacker == null || this.Entity == null)
+				return;
+
+			// The leader carries the group's handle, everyone else holds
+			// it as their master.
+			var leaderHandle = this.HasPatrolRoute ? this.Entity.Handle : _masterHandle;
+			if (leaderHandle == 0 || (!this.HasPatrolRoute && !this.HasPatrolFormation))
+				return;
+
+			if ((GameClock.Now - _lastPatrolAlertTime) < PatrolAlertCooldown)
+				return;
+
+			_lastPatrolAlertTime = GameClock.Now;
+
+			var candidates = this.Entity.Map.GetAttackableEnemiesInPosition(attacker, this.Entity.Position, PatrolAlertRange);
+			foreach (var candidate in candidates)
+			{
+				if (candidate.Handle == this.Entity.Handle || candidate is not Mob mob || mob.IsDead)
+					continue;
+
+				if (!mob.Components.TryGet<AiComponent>(out var ai))
+					continue;
+
+				if (mob.Handle != leaderHandle && ai.Script.MasterHandle != leaderHandle)
+					continue;
+
+				ai.Script.QueueEventAlert(new HateIncreaseAlert(attacker, PatrolAlertHate));
+			}
 		}
 
 		/// <summary>
