@@ -94,6 +94,17 @@ namespace Melia.Shared.Configuration.Files
 		public float MonsterHelpCallChance { get; protected set; }
 		public float MonsterPanicFleeChance { get; protected set; }
 		public float MonsterEliteAscensionChance { get; protected set; }
+		public bool PatrolEnabled { get; protected set; }
+		public float PatrolChance { get; protected set; }
+		public int PatrolGroupSize { get; protected set; }
+		public float PatrolGroupRadius { get; protected set; }
+		public bool PatrolWalk { get; protected set; }
+		public int PatrolNodeSampleStep { get; protected set; }
+		public float PatrolNodeMinClearance { get; protected set; }
+		public float PatrolNodeSpacing { get; protected set; }
+		public float PatrolEdgeMaxLength { get; protected set; }
+		public float PatrolRouteRadius { get; protected set; }
+		public int PatrolRouteMaxNodes { get; protected set; }
 
 		// quests.conf
 		public bool DisplayQuestObjectives { get; protected set; }
@@ -291,6 +302,18 @@ namespace Melia.Shared.Configuration.Files
 			this.MonsterHelpCallChance = this.GetFloat("monster_help_call_chance", 0.3f);
 			this.MonsterPanicFleeChance = this.GetFloat("monster_panic_flee_chance", 0.3f);
 			this.MonsterEliteAscensionChance = this.GetFloat("monster_elite_ascension_chance", 0.0005f);
+
+			this.PatrolEnabled = this.GetBool("patrol_enabled", true);
+			this.PatrolChance = this.GetFloat("patrol_chance", 35);
+			this.PatrolGroupSize = this.GetInt("patrol_group_size", 3);
+			this.PatrolGroupRadius = this.GetFloat("patrol_group_radius", 250);
+			this.PatrolWalk = this.GetBool("patrol_walk", true);
+			this.PatrolNodeSampleStep = this.GetInt("patrol_node_sample_step", 25);
+			this.PatrolNodeMinClearance = this.GetFloat("patrol_node_min_clearance", 40);
+			this.PatrolNodeSpacing = this.GetFloat("patrol_node_spacing", 200);
+			this.PatrolEdgeMaxLength = this.GetFloat("patrol_edge_max_length", 600);
+			this.PatrolRouteRadius = this.GetFloat("patrol_route_radius", 1200);
+			this.PatrolRouteMaxNodes = this.GetInt("patrol_route_max_nodes", 6);
 
 			this.SilverDropAmount = this.GetFloat("silver_drop_amount", 100);
 			this.SilverDropRate = this.GetFloat("silver_drop_rate", 100);

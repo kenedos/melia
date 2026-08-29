@@ -218,6 +218,8 @@ namespace Melia.Zone.Commands
 			this.Add("resetteamstorage", "", "Resets team storage properties (expansions) to default.", this.HandleResetTeamStorage);
 			this.Add("cubeinfo", "<group|item_class>", "Shows contents of a cube/gacha by group name or item class.", this.HandleCubeInfo);
 			this.Add("cubelist", "[filter]", "Lists all available cube/gacha groups.", this.HandleCubeList);
+			this.Add("patrolnodes", "[range=1500]", "Shows the patrol nodes around you.", this.HandlePatrolNodes);
+			this.Add("patrolinfo", "[range=500]", "Reports the patrol state of this map.", this.HandlePatrolInfo);
 
 			// Test ZC_NORMAL Packets.
 			this.Add("timeactiontarget", "<player> <anim> <secs> [msg]", "Shows a time action bar to another player.", this.HandleTimeActionOnlyTarget);
@@ -6357,6 +6359,59 @@ namespace Melia.Zone.Commands
 					break;
 				}
 			}
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Reports the patrol state of the sender's map.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandlePatrolInfo(Character sender, Character target, string message, string command, Arguments args)
+		{
+			var range = 500f;
+			if (args.Count > 0 && !float.TryParse(args.Get(0), out range))
+			{
+				sender.ServerMessage(Localization.Get("Invalid range."));
+				return CommandResult.InvalidArgument;
+			}
+
+			foreach (var line in ZoneServer.Instance.World.Patrols.GetStatus(sender, range))
+				sender.ServerMessage(line);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Shows the patrol nodes around the sender.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandlePatrolNodes(Character sender, Character target, string message, string command, Arguments args)
+		{
+			var range = 1500f;
+			if (args.Count > 0 && !float.TryParse(args.Get(0), out range))
+			{
+				sender.ServerMessage(Localization.Get("Invalid range."));
+				return CommandResult.InvalidArgument;
+			}
+
+			if (!ZoneServer.Instance.World.Patrols.TryShowNodes(sender, range, out var shownCount, out var nodeCount, out var edgeCount))
+			{
+				sender.ServerMessage(Localization.Get("No patrol graph for this map yet, building it now. Try again in a moment."));
+				return CommandResult.Okay;
+			}
+
+			sender.ServerMessage(Localization.Get("Showing {0} of {1} patrol nodes ({2} connections)."), shownCount, nodeCount, edgeCount);
 
 			return CommandResult.Okay;
 		}

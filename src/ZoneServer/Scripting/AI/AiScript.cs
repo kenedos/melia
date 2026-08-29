@@ -161,6 +161,8 @@ namespace Melia.Zone.Scripting.AI
 			this.InitializeSkillRotation();
 			this.Setup();
 
+			this.During("Patrol", this.CheckEnemies);
+
 			// Stagger hate updates across monsters to avoid thundering herd
 			_hateUpdateAccumulator = TimeSpan.FromMilliseconds(-(combatEntity.Handle % 500));
 
@@ -581,7 +583,16 @@ namespace Melia.Zone.Scripting.AI
 
 			_target = null;
 
-			if (this.Entity is IMonster monster && monster.SpawnPosition != Position.Zero)
+			if (this.TryGetPatrolAnchor(out var patrolAnchor))
+			{
+				const float patrolHomeRadius = 30f;
+				if (this.Entity.Position.Get2DDistance(patrolAnchor) > patrolHomeRadius)
+				{
+					this.SetRunning(true);
+					yield return this.MoveTo(patrolAnchor);
+				}
+			}
+			else if (this.Entity is IMonster monster && monster.SpawnPosition != Position.Zero)
 			{
 				const float homeRadius = 30f;
 				if (monster.Position.Get2DDistance(monster.SpawnPosition) > homeRadius)
@@ -790,8 +801,22 @@ namespace Melia.Zone.Scripting.AI
 			var master = this.GetMaster();
 			if (master != null)
 			{
+				if (this.HasPatrolFormation)
+				{
+					this.StartRoutine("Patrol", this.PatrolFollow(master));
+					yield break;
+				}
+
 				yield return this.Animation("IDLE");
 				yield return this.Follow(master);
+				yield break;
+			}
+
+			// Patrolling monsters are meant to be away from their spawn
+			// point, so they take over before the leashing check.
+			if (this.HasPatrolRoute)
+			{
+				this.StartRoutine("Patrol", this.Patrol());
 				yield break;
 			}
 
@@ -1609,7 +1634,9 @@ namespace Melia.Zone.Scripting.AI
 			if (!ZoneServer.Instance.Conf.World.MonstersReturnHome)
 				return false;
 
-			var distance = this.Entity.Position.Get2DDistance(this.CreationPosition.Value);
+			var homePosition = this.TryGetPatrolAnchor(out var patrolAnchor) ? patrolAnchor : this.CreationPosition.Value;
+
+			var distance = this.Entity.Position.Get2DDistance(homePosition);
 			var allowedDistance = _wanderRange * (1 + _extraWanderRangeRate);
 
 			return (distance >= allowedDistance);
@@ -1958,6 +1985,9 @@ namespace Melia.Zone.Scripting.AI
 			_tempVars.Clear();
 			_usedSkillHistory.Clear();
 			_movement = null;
+			_patrolRoute = null;
+			_patrolVisits = null;
+			_patrolFormationSlot = 0;
 			this.Entity = null;
 			this.Owner = null;
 		}

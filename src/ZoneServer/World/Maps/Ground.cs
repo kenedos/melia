@@ -19,6 +19,9 @@ namespace Melia.Zone.World.Maps
 		private const int MaxGridDimension = 512;
 		private const float BarycentricEpsilon = 0.0001f;
 
+		private const float ClearanceQueryRange = 50f;
+		private const float ClearanceQueryMaxRange = 4096f;
+
 		private GroundData _data;
 		private DMesh3 _mesh;
 		private DMeshAABBTree3 _spatial;
@@ -46,6 +49,9 @@ namespace Melia.Zone.World.Maps
 
 		[ThreadStatic]
 		private static List<int> OutlineQueryBuffer;
+
+		[ThreadStatic]
+		private static List<int> ClearanceQueryBuffer;
 
 		/// <summary>Returns the width of the ground in world units.</summary>
 		public int SizeX => _right - _left;
@@ -884,6 +890,86 @@ namespace Melia.Zone.World.Maps
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Returns the distance from the given position to the nearest
+		/// ground boundary via out. Returns false if the position isn't
+		/// on valid ground or no boundary could be found.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="clearance"></param>
+		/// <returns></returns>
+		public bool TryGetClearance(Position pos, out float clearance)
+		{
+			clearance = 0;
+
+			if (_outlines == null || _outlines.Length == 0)
+				return false;
+
+			if (!this.IsValidPosition(pos))
+				return false;
+
+			if (_outlineQuadTree == null)
+			{
+				var nearest = float.MaxValue;
+				for (var i = 0; i < _outlines.Length; i++)
+					nearest = Math.Min(nearest, DistanceToOutline(pos, _outlines[i]));
+
+				clearance = nearest;
+				return true;
+			}
+
+			var candidates = ClearanceQueryBuffer ??= new List<int>();
+
+			for (var range = ClearanceQueryRange; range <= ClearanceQueryMaxRange; range *= 2)
+			{
+				candidates.Clear();
+				_outlineQuadTree.Query(new AxisAlignedBox2d(pos.X - range, pos.Z - range, pos.X + range, pos.Z + range), candidates);
+
+				var nearest = float.MaxValue;
+				foreach (var candidateIdx in candidates)
+					nearest = Math.Min(nearest, DistanceToOutline(pos, _outlines[candidateIdx]));
+
+				// A boundary further away than the queried box can't be
+				// trusted, a closer one might sit just outside of it.
+				if (nearest <= range)
+				{
+					clearance = nearest;
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Returns the distance from the position to the outline segment.
+		/// </summary>
+		/// <param name="pos"></param>
+		/// <param name="outline"></param>
+		/// <returns></returns>
+		private static float DistanceToOutline(Position pos, LineF outline)
+		{
+			var startX = outline.Point1.X;
+			var startZ = outline.Point1.Y;
+			var deltaX = outline.Point2.X - startX;
+			var deltaZ = outline.Point2.Y - startZ;
+
+			var lengthSquared = deltaX * deltaX + deltaZ * deltaZ;
+			var offsetX = pos.X - startX;
+			var offsetZ = pos.Z - startZ;
+
+			if (lengthSquared <= float.Epsilon)
+				return (float)Math.Sqrt(offsetX * offsetX + offsetZ * offsetZ);
+
+			var projection = (offsetX * deltaX + offsetZ * deltaZ) / lengthSquared;
+			projection = Math.Max(0, Math.Min(1, projection));
+
+			var closestX = pos.X - (startX + deltaX * projection);
+			var closestZ = pos.Z - (startZ + deltaZ * projection);
+
+			return (float)Math.Sqrt(closestX * closestX + closestZ * closestZ);
 		}
 
 		/// <summary>

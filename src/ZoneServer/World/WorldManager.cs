@@ -16,6 +16,7 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
+using Melia.Zone.World.Patrols;
 using Melia.Zone.World.Spawning;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
@@ -114,6 +115,11 @@ namespace Melia.Zone.World
 		/// all loaded maps.
 		/// </summary>
 		public MapManager Maps { get; } = new MapManager();
+
+		/// <summary>
+		/// Returns the manager for the monster patrols of dungeon maps.
+		/// </summary>
+		public PatrolManager Patrols { get; } = new PatrolManager();
 
 		/// <summary>
 		/// Returns the world's trades.
@@ -268,6 +274,7 @@ namespace Melia.Zone.World
 		{
 			this.Heartbeat.Add(new TimeEventRaiser());
 			this.Heartbeat.Add(new AmbushManager());
+			this.Heartbeat.Add(this.Patrols);
 			if (Feature.IsEnabled(FeatureId.DayNightCycle))
 				this.Heartbeat.Add(this.DayNightCycle = new DayNightCycle());
 			if (Feature.IsEnabled(FeatureId.BattleManager))
