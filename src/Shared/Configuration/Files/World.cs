@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -86,6 +86,14 @@ namespace Melia.Shared.Configuration.Files
 		// monsters.conf
 		public TimeSpan DefaultMinRespawn { get; protected set; }
 		public TimeSpan DefaultMaxRespawn { get; protected set; }
+		public float AmbushChance { get; protected set; }
+		public int AmbushMinMonsters { get; protected set; }
+		public int AmbushMaxMonsters { get; protected set; }
+		public int AmbushDistance { get; protected set; }
+		public int AmbushCooldownSeconds { get; protected set; }
+		public float MonsterHelpCallChance { get; protected set; }
+		public float MonsterPanicFleeChance { get; protected set; }
+		public float MonsterEliteAscensionChance { get; protected set; }
 
 		// quests.conf
 		public bool DisplayQuestObjectives { get; protected set; }
@@ -273,6 +281,16 @@ namespace Melia.Shared.Configuration.Files
 			this.FreeRoamMonsters = this.GetBool("free_roam_monsters", false);
 			this.MonstersReturnHome = this.GetBool("monsters_return_home", true);
 			this.MonsterStagger = this.GetBool("monster_stagger", false);
+
+			this.AmbushChance = this.GetFloat("ambush_chance", 10);
+			this.AmbushMinMonsters = this.GetInt("ambush_min_monsters", 2);
+			this.AmbushMaxMonsters = this.GetInt("ambush_max_monsters", 4);
+			this.AmbushDistance = this.GetInt("ambush_distance", 30);
+			this.AmbushCooldownSeconds = this.GetInt("ambush_cooldown_seconds", 60);
+
+			this.MonsterHelpCallChance = this.GetFloat("monster_help_call_chance", 0.3f);
+			this.MonsterPanicFleeChance = this.GetFloat("monster_panic_flee_chance", 0.3f);
+			this.MonsterEliteAscensionChance = this.GetFloat("monster_elite_ascension_chance", 0.0005f);
 
 			this.SilverDropAmount = this.GetFloat("silver_drop_amount", 100);
 			this.SilverDropRate = this.GetFloat("silver_drop_rate", 100);

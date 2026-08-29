@@ -915,7 +915,7 @@ public class PathwayPurgeQuest : QuestScript
 
 public class FBracken631DangerZonesScript : GeneralScript
 {
-	private const int PoisonDamage = 500;
+	private const int PoisonDamage = 80;
 	private const int PoisonDuration = 10;
 	private const int TriggerChance = 30;
 

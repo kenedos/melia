@@ -163,9 +163,13 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					.ToArray();
 			}
 
+			var map = this.Entity.Map;
+			if (map == null)
+				return null;
+
 			foreach (var handle in handles)
 			{
-				if (!this.Entity.Map.TryGetCombatEntity(handle, out var attacker))
+				if (!map.TryGetCombatEntity(handle, out var attacker))
 					continue;
 				if (attacker.IsDead)
 					continue;

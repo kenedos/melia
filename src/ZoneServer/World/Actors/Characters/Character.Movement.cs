@@ -441,6 +441,21 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Returns true if the monster was sent to the character's client
+		/// and can be referenced by packets.
+		/// </summary>
+		/// <param name="monster"></param>
+		/// <returns></returns>
+		public bool IsMonsterVisible(IMonster monster)
+		{
+			if (monster == null)
+				return false;
+
+			lock (_lookAroundLock)
+				return _visibleMonsters.Contains(monster);
+		}
+
+		/// <summary>
 		/// Updates visible entities around character.
 		/// </summary>
 		public void LookAround()

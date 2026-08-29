@@ -1,4 +1,4 @@
-// ===================================================================
+﻿// ===================================================================
 // CharacterCombat.cs - Combat and health management
 // ===================================================================
 using System;
@@ -200,6 +200,9 @@ namespace Melia.Zone.World.Actors.Characters
 			{
 				ZoneServer.Instance.World.BountyManager.ClaimBounty(killerCharacter, this);
 			}
+
+			this.ModifyHpSafe(0, out _, out var hpPriority);
+			Send.ZC_UPDATE_ALL_STATUS(this, hpPriority);
 
 			Send.ZC_DEAD(this);
 

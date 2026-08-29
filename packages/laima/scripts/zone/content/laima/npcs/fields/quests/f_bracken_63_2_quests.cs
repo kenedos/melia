@@ -547,7 +547,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(questId))
 			{
 				await dialog.Msg(L("Something in the southern nesting ground is wrong - bigger than wrong."));
-				await dialog.Msg(L("The Kanchobirds down there have been dragged into something else. Something's been feeding them, pushing them."));
+				await dialog.Msg(L("The Canchobirds down there have been dragged into something else. Something's been feeding them, pushing them."));
 				await dialog.Msg(L("There's an alpha. I've seen its tracks. Twice the size of the flock, and the corruption's thicker in it."));
 
 				var response = await dialog.Select(L("Will you take the hunt?"),
@@ -560,12 +560,12 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				{
 					case "help":
 						character.Quests.Start(questId);
-						await dialog.Msg(L("Kill ten birds to bait it out. The alpha won't emerge while the flock is full."));
+						await dialog.Msg(L("Kill ten Canchobirds to bait it out. The alpha won't emerge while the flock is full."));
 						await dialog.Msg(L("When the flock thins, it'll come hunting. Come back here then and I'll flush it into the open for you."));
 						break;
 
 					case "info":
-						await dialog.Msg(L("Not a Kanchobird anymore. Something twisted - bigger claws, poison drooling from the beak."));
+						await dialog.Msg(L("Not a Canchobird anymore. Something twisted - bigger claws, poison drooling from the beak."));
 						await dialog.Msg(L("Might be Tanu-kin turned rogue. Whatever it is, it shouldn't exist."));
 						break;
 
@@ -916,7 +916,7 @@ public class TheTaintedAlphaQuest : QuestScript
 		SetId("f_bracken_63_2", 1005);
 		SetName(L("The Tainted Alpha"));
 		SetType(QuestType.Sub);
-		SetDescription(L("Thin the Kanchobird flock to bait out the tainted alpha, then slay it before it spreads the corruption."));
+		SetDescription(L("Thin the Canchobird flock to bait out the tainted alpha, then slay it before it spreads the corruption."));
 		SetLocation("f_bracken_63_2");
 		SetAutoTracked(true);
 
@@ -925,7 +925,7 @@ public class TheTaintedAlphaQuest : QuestScript
 		SetUnlock(QuestUnlockType.Sequential);
 		AddQuestGiver(L("[Tracker] Niko"), "f_bracken_63_2");
 
-		AddObjective("killKanchobirds", L("Thin the Kanchobird flock"),
+		AddObjective("killKanchobirds", L("Thin the Canchobird flock"),
 			new KillObjective(10, new[] { MonsterId.Kanchobird }));
 
 		AddObjective("killAlpha", L("Slay the tainted alpha and its flock"),

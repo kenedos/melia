@@ -12,6 +12,7 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Maps;
 using Yggdrasil.Ai.Enumerable;
 using Yggdrasil.Logging;
 using Yggdrasil.Scheduling;
@@ -59,6 +60,9 @@ namespace Melia.Zone.Scripting.AI
 		protected float[] _phaseThresholds = [];
 
 		protected DateTime _lastHelpCallTime = DateTime.MinValue;
+
+		protected TimeSpan _panicFleeDuration = TimeSpan.FromSeconds(10);
+		private DateTime _panicFleeEndTime = DateTime.MinValue;
 
 		protected int MaxChaseDistance = 400;
 		protected int MaxMasterDistance = 200;
@@ -306,6 +310,9 @@ namespace Melia.Zone.Scripting.AI
 
 		protected virtual void CheckEnemies()
 		{
+			if (this.IsPanicking)
+				return;
+
 			var mostHated = this.GetMostHated();
 			if (mostHated != null && (_target != mostHated || _target == null))
 			{
@@ -340,6 +347,9 @@ namespace Melia.Zone.Scripting.AI
 
 		protected virtual void CheckTarget()
 		{
+			if (this.IsPanicking)
+				return;
+
 			if (this.Entity.IsLocked(LockType.Attack))
 			{
 				return;
@@ -459,6 +469,9 @@ namespace Melia.Zone.Scripting.AI
 		/// </summary>
 		protected virtual void CheckFear()
 		{
+			if (this.IsPanicking)
+				return;
+
 			// Check if the entity has any fear debuff
 			if (!this.IsFeared())
 				return;
@@ -813,7 +826,7 @@ namespace Melia.Zone.Scripting.AI
 			var helpCallRange = 200f;
 
 			// Determine call chance and cooldown based on monster rank
-			var actualCallChance = 0.003f; // 0.3% chance;
+			var actualCallChance = ZoneServer.Instance.Conf.World.MonsterHelpCallChance;
 			var actualCooldown = TimeSpan.FromSeconds(30);
 
 			if (this.Entity is Mob mob)
@@ -821,13 +834,13 @@ namespace Melia.Zone.Scripting.AI
 				if (mob.Rank == MonsterRank.Boss)
 				{
 					// Bosses: 20% chance, 15 second cooldown
-					actualCallChance = 0.20f;
+					actualCallChance = 20f;
 					actualCooldown = TimeSpan.FromSeconds(15);
 				}
 				else if (mob.IsBuffActive(BuffId.EliteMonsterBuff))
 				{
 					// Elite monsters: 10% chance, 20 second cooldown
-					actualCallChance = 0.10f;
+					actualCallChance = 10f;
 					actualCooldown = TimeSpan.FromSeconds(20);
 				}
 				// Regular monsters use default values (1% chance, 30 second cooldown)
@@ -838,7 +851,7 @@ namespace Melia.Zone.Scripting.AI
 				return;
 
 			// Random chance check
-			if (GameRandom.Get().NextDouble() > actualCallChance)
+			if (GameRandom.Get().NextDouble() * 100 >= actualCallChance)
 				return;
 
 			// Find nearby allies of same type
@@ -895,6 +908,181 @@ namespace Melia.Zone.Scripting.AI
 
 			_lastHelpCallTime = GameClock.Now;
 		}
+
+		/// <summary>
+		/// Returns true while the entity is panicking and fleeing from
+		/// its attacker.
+		/// </summary>
+		protected bool IsPanicking => GameClock.Now < _panicFleeEndTime;
+
+		/// <summary>
+		/// Gives a peaceful monster a chance to panic, running from its
+		/// attacker while luring nearby allies onto it.
+		/// </summary>
+		/// <param name="attacker"></param>
+		protected virtual void TryPanicFlee(ICombatEntity attacker)
+		{
+			if (this.IsPanicking)
+				return;
+
+			if (attacker == null || attacker.IsDead)
+				return;
+
+			if (this.Entity is Summon)
+				return;
+
+			if (this.Entity is not Mob mob)
+				return;
+
+			if (mob.IsDead || mob.Rank != MonsterRank.Normal || mob.Tendency != TendencyType.Peaceful)
+				return;
+
+			if (mob.IsBuffActive(BuffId.EliteMonsterBuff))
+				return;
+
+			var map = mob.Map;
+			if (map == null || map == Map.Limbo || map.IsInstance)
+				return;
+
+			if (GameRandom.Get().NextDouble() * 100 >= ZoneServer.Instance.Conf.World.MonsterPanicFleeChance)
+				return;
+
+			_panicFleeEndTime = GameClock.Now + _panicFleeDuration;
+			_target = null;
+
+			this.ExecuteOnce(this.Emoticon("I_emo_exclamation"));
+			this.ExecuteOnce(this.Say("Please, help!"));
+
+			this.StartRoutine("PanicFlee", this.PanicFlee(attacker));
+		}
+
+		/// <summary>
+		/// Makes the monster run away from its attacker for the panic
+		/// duration, luring nearby allies onto the attacker as it goes.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <returns></returns>
+		protected virtual IEnumerable PanicFlee(ICombatEntity attacker)
+		{
+			const float FleeDistance = 150f;
+			const float LureRange = 300f;
+			const float LureHate = 150f;
+
+			this.SetRunning(true);
+
+			while (this.IsPanicking && !this.Entity.IsDead)
+			{
+				var threatPosition = attacker.Position;
+
+				Character closestCharacter = null;
+				var closestDist = double.MaxValue;
+				var nearbyEnemies = this.Entity.Map.GetAttackableEnemiesInPosition(this.Entity, this.Entity.Position, 200);
+				foreach (var e in nearbyEnemies)
+				{
+					if (e is Character c && !c.IsDead)
+					{
+						var dist = c.Position.Get2DDistance(this.Entity.Position);
+						if (dist < closestDist)
+						{
+							closestDist = dist;
+							closestCharacter = c;
+						}
+					}
+				}
+
+				if (closestCharacter != null)
+					threatPosition = closestCharacter.Position;
+
+				this.LureNearbyAllies(attacker, LureRange, LureHate);
+
+				var awayVector = (this.Entity.Position - threatPosition).Normalize2D();
+				var idealDestination = this.Entity.Position + (awayVector * FleeDistance);
+
+				if (this.Entity.Map.Ground.TryGetNearestValidPosition(idealDestination, this.Entity.AgentRadius, out var validDestination, maxDistance: 100f))
+					yield return this.MoveTo(validDestination, wait: false);
+
+				yield return this.Wait(300);
+			}
+
+			this.ResetMoveSpeed();
+
+			if (EnableReturnHome)
+				this.StartRoutine("ReturnHome", this.ReturnHome());
+			else
+				this.StartRoutine("Idle", this.Idle());
+
+			yield break;
+		}
+
+		/// <summary>
+		/// Increases the hate nearby allies of the same type hold for
+		/// the given attacker.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="range"></param>
+		/// <param name="hateAmount"></param>
+		protected void LureNearbyAllies(ICombatEntity attacker, float range, float hateAmount)
+		{
+			if (attacker == null || this.Entity is not Mob selfMob)
+				return;
+
+			var candidates = this.Entity.Map.GetAttackableEnemiesInPosition(attacker, this.Entity.Position, range);
+			foreach (var candidate in candidates)
+			{
+				if (candidate is not Mob ally || ally.Id != selfMob.Id || ally.Handle == selfMob.Handle || ally.IsDead)
+					continue;
+
+				if (!ally.Components.TryGet<AiComponent>(out var ai) || ai.Script.Target != null)
+					continue;
+
+				ai.Script.QueueEventAlert(new HateIncreaseAlert(attacker, hateAmount));
+			}
+		}
+
+		/// <summary>
+		/// Gives the entity a chance to ascend into an elite monster,
+		/// healing it to full and granting it the elite buff.
+		/// </summary>
+		protected virtual void TryBecomeElite()
+		{
+			if (this.Entity is Summon)
+				return;
+
+			if (this.Entity is not Mob mob)
+				return;
+
+			if (mob.IsDead)
+				return;
+
+			if (mob.Rank == MonsterRank.Boss ||
+				mob.Rank == MonsterRank.MISC ||
+				mob.Rank == MonsterRank.Material ||
+				mob.Rank == MonsterRank.NPC)
+				return;
+
+			if (mob.IsBuffActive(BuffId.EliteMonsterBuff))
+				return;
+
+			var map = mob.Map;
+			if (map == null || map == Map.Limbo || map.IsInstance)
+				return;
+
+			var worldConf = ZoneServer.Instance.Conf.World;
+			if (mob.Level < worldConf.EliteMinLevel)
+				return;
+
+			if (GameRandom.Get().NextDouble() * 100 >= worldConf.MonsterEliteAscensionChance)
+				return;
+
+			this.ExecuteOnce(this.Say("Unlimited power!!"));
+
+			mob.StartBuff(BuffId.EliteMonsterBuff, 1, 0, TimeSpan.Zero, mob);
+			mob.HealToFull();
+
+			if (worldConf.EliteAlwaysAggressive)
+				mob.Tendency = TendencyType.Aggressive;
+		}
+
 		/// <summary>
 		/// Checks HP and updates phase state automatically
 		/// </summary>
@@ -1590,7 +1778,13 @@ namespace Melia.Zone.Scripting.AI
 						_lastAttackerHandle = hitEventAlert.Attacker.Handle;
 
 						this.OnTakeDamage(hitEventAlert.Attacker, hitEventAlert.Damage);
-						this.TryCallForHelp(hitEventAlert.Attacker);
+						this.TryPanicFlee(hitEventAlert.Attacker);
+
+						if (!this.IsPanicking)
+						{
+							this.TryCallForHelp(hitEventAlert.Attacker);
+							this.TryBecomeElite();
+						}
 					}
 
 					if (entityWasAttacked || masterWasAttacked)
@@ -1600,7 +1794,7 @@ namespace Melia.Zone.Scripting.AI
 						// If we don't have a target, or we're returning home, check for enemies to start combat
 						// This handles the case where the target was cleared above, was already null, 
 						// or we're returning home and need to re-engage when attacked
-						if (_target == null || this.CurrentRoutine == "ReturnHome")
+						if (!this.IsPanicking && (_target == null || this.CurrentRoutine == "ReturnHome"))
 						{
 							this.CheckEnemies();
 						}

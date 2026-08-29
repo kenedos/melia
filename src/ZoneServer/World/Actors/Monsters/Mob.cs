@@ -610,8 +610,6 @@ namespace Melia.Zone.World.Actors.Monsters
 			if (Interlocked.Exchange(ref _killed, 1) != 0)
 				return;
 
-			this.ScheduleDeathBroadcast();
-
 			this.Components.Get<BaseSkillComponent>()?.CancelCurrentSkill();
 
 			this.Properties.SetFloat(PropertyName.HP, 0);
@@ -650,6 +648,8 @@ namespace Melia.Zone.World.Actors.Monsters
 			// the placement is deferred to the death broadcast.
 			if (_dropBeneficiary != null)
 				_pendingDrops = this.GenerateAllDropStacks(_dropBeneficiary);
+
+			this.ScheduleDeathBroadcast();
 
 			this.Buffs?.RemoveAll();
 
@@ -700,6 +700,9 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="force"></param>
 		private bool FlushDeathBroadcast(bool force)
 		{
+			Character beneficiary;
+			List<DropStack> pendingDrops;
+
 			lock (_deathBroadcastLock)
 			{
 				if (!_deathBroadcastPending)
@@ -709,6 +712,11 @@ namespace Melia.Zone.World.Actors.Monsters
 					return false;
 
 				_deathBroadcastPending = false;
+
+				beneficiary = _dropBeneficiary;
+				pendingDrops = _pendingDrops;
+				_dropBeneficiary = null;
+				_pendingDrops = null;
 			}
 
 			Send.ZC_SKILL_CAST_CANCEL(this);
@@ -717,11 +725,6 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (this.Effects?.Count != 0)
 				Send.ZC_NORMAL.ClearEffects(this);
-
-			var beneficiary = _dropBeneficiary;
-			var pendingDrops = _pendingDrops;
-			_dropBeneficiary = null;
-			_pendingDrops = null;
 
 			if (pendingDrops != null && beneficiary != null && beneficiary.IsOnline && beneficiary.Connection != null)
 				this.DropStacks(beneficiary, pendingDrops);
@@ -764,15 +767,30 @@ namespace Melia.Zone.World.Actors.Monsters
 			var beneficiary = killer;
 
 			var topAttacker = this.Components.Get<CombatComponent>()?.GetTopAttackerByDamage();
-			if (topAttacker != null)
+			if (topAttacker != null && ResolveOwningCharacter(topAttacker) != null)
 				beneficiary = topAttacker;
 
-			if (beneficiary.Components.Get<AiComponent>()?.Script.GetMaster() is Character master)
-				beneficiary = master;
-			else if (beneficiary is Summon summon && summon.Owner is Character summonOwner)
-				beneficiary = summonOwner;
+			return ResolveOwningCharacter(beneficiary);
+		}
 
-			return beneficiary as Character;
+		/// <summary>
+		/// Returns the character the given entity acts for, be it the
+		/// entity itself, its AI master, or its summoner.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		private static Character ResolveOwningCharacter(ICombatEntity entity)
+		{
+			if (entity is Character character)
+				return character;
+
+			if (entity.Components.Get<AiComponent>()?.Script.GetMaster() is Character master)
+				return master;
+
+			if (entity is Summon summon && summon.Owner is Character summonOwner)
+				return summonOwner;
+
+			return null;
 		}
 
 		/// <summary>

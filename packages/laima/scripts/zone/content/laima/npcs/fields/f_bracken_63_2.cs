@@ -39,7 +39,7 @@ public class FBracken632NpcScript : GeneralScript
 
 public class FBracken632DangerZonesScript : GeneralScript
 {
-	private const int PoisonDamage = 500;
+	private const int PoisonDamage = 80;
 	private const int PoisonDuration = 10;
 	private const int TriggerChance = 30;
 

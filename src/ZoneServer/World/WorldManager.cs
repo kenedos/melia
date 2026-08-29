@@ -267,6 +267,7 @@ namespace Melia.Zone.World
 		private void InitUpdatables()
 		{
 			this.Heartbeat.Add(new TimeEventRaiser());
+			this.Heartbeat.Add(new AmbushManager());
 			if (Feature.IsEnabled(FeatureId.DayNightCycle))
 				this.Heartbeat.Add(this.DayNightCycle = new DayNightCycle());
 			if (Feature.IsEnabled(FeatureId.BattleManager))
