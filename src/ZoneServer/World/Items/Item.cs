@@ -137,6 +137,18 @@ namespace Melia.Zone.World.Items
 		/// </summary>
 		public DateTime LootProtectionEnd { get; private set; } = DateTime.MinValue;
 
+		/// <summary>
+		/// Returns whether the item was classified as trash loot for the
+		/// character it dropped for.
+		/// </summary>
+		public bool IsTrashLoot { get; private set; }
+
+		/// <summary>
+		/// Returns the time at which trash loot becomes available to be
+		/// picked up.
+		/// </summary>
+		public DateTime TrashPickUpTime { get; private set; } = DateTime.MinValue;
+
 
 		/// <summary>
 		/// Returns the persistent ObjectId of the character who originally dropped the item.
@@ -313,6 +325,8 @@ namespace Melia.Zone.World.Items
 			this.RePickUpTime = other.RePickUpTime;
 			this.OwnerHandle = other.OwnerHandle;
 			this.LootProtectionEnd = other.LootProtectionEnd;
+			this.IsTrashLoot = other.IsTrashLoot;
+			this.TrashPickUpTime = other.TrashPickUpTime;
 
 			this.Properties.CopyFrom(other.Properties);
 			this.CopyGemSockets(other);
@@ -779,6 +793,17 @@ namespace Melia.Zone.World.Items
 					this.OriginalOwnerCharacterId = 0;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Marks the item as trash loot, delaying when it can be picked
+		/// up by the character it dropped for.
+		/// </summary>
+		/// <param name="pickUpDelay"></param>
+		public void SetTrashLoot(TimeSpan pickUpDelay)
+		{
+			this.IsTrashLoot = true;
+			this.TrashPickUpTime = DateTime.Now.Add(pickUpDelay);
 		}
 
 		/// <summary>

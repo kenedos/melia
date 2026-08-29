@@ -217,18 +217,30 @@ namespace Melia.Zone.World.Quests
 		/// Unlocks objectives based on which objectives have been completed
 		/// if this quest uses sequential unlocking.
 		/// </summary>
-		public void UpdateUnlock()
+		/// <returns>
+		/// The progresses that went from locked to unlocked during this call.
+		/// </returns>
+		public List<QuestProgress> UpdateUnlock()
 		{
+			var unlocked = new List<QuestProgress>();
+
 			if (this.Data.UnlockType != QuestUnlockType.Sequential)
-				return;
+				return unlocked;
 
 			for (var i = 0; i < _progresses.Count - 1; ++i)
 			{
-				if (_progresses[i].Done)
-					_progresses[i + 1].Unlocked = true;
-				else
+				if (!_progresses[i].Done)
 					break;
+
+				var next = _progresses[i + 1];
+				if (next.Unlocked)
+					continue;
+
+				next.Unlocked = true;
+				unlocked.Add(next);
 			}
+
+			return unlocked;
 		}
 
 		/// <summary>

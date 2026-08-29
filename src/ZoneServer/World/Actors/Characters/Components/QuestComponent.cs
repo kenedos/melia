@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.ObjectProperties;
@@ -259,6 +259,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Updates the quest's sequential unlocks and notifies every
+		/// objective that just became unlocked.
+		/// </summary>
+		/// <param name="quest"></param>
+		private void UpdateUnlock(Quest quest)
+		{
+			var unlocked = quest.UpdateUnlock();
+
+			for (var i = 0; i < unlocked.Count; i++)
+				unlocked[i].Objective.OnUnlocked(this.Character, quest);
+		}
+
+		/// <summary>
 		/// Iterates over the quests' objectives, runs the given function
 		/// over all objectives with the given type, and updates the quest
 		/// if any progresses changed.
@@ -278,7 +291,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 					if (quest.ChangesOnLastUpdate)
 					{
-						quest.UpdateUnlock();
+						this.UpdateUnlock(quest);
 
 						if (quest.Status == QuestStatus.Success && !quest.IsCompletable)
 							quest.Status = QuestStatus.InProgress;
@@ -310,7 +323,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 					if (quest.ChangesOnLastUpdate)
 					{
-						quest.UpdateUnlock();
+						this.UpdateUnlock(quest);
 					}
 				}
 			}
@@ -440,7 +453,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			this.InitialChecks(quest);
 
 			quest.Status = QuestStatus.InProgress;
-			quest.UpdateUnlock();
+			this.UpdateUnlock(quest);
 
 			if (quest.StartTime == DateTime.MinValue)
 				quest.StartTime = DateTime.Now;
@@ -704,7 +717,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (!progress.Done)
 					{
 						progress.SetDone();
-						quest.UpdateUnlock();
+						this.UpdateUnlock(quest);
 						this.UpdateQuestProgress(questId, progress.Objective.Id);
 						this.UpdateClient_UpdateQuest(quest);
 					}
@@ -734,7 +747,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					if (!progress.Done)
 					{
 						progress.SetDone();
-						quest.UpdateUnlock();
+						this.UpdateUnlock(quest);
 						this.UpdateQuestProgress(questId, progress.Objective.Id);
 						this.UpdateClient_UpdateQuest(quest);
 					}
@@ -1442,7 +1455,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 									 $"for Quest {quest.Data.Id.Value} by reaching {visitObjective.TargetPosition} (Radius: {visitObjective.TargetRadius}).");
 
 							progress.SetDone();
-							quest.UpdateUnlock(); // Potentially unlocks next objective
+							this.UpdateUnlock(quest); // Potentially unlocks next objective
 							questModifiedInThisIteration = true; // Mark that quest state changed
 
 							// --- Handle OnProgress/OnSuccess Callbacks ---
@@ -1514,7 +1527,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 							if (progress.Count >= variableObjective.TargetCount)
 							{
 								progress.SetDone();
-								quest.UpdateUnlock(); // Potentially unlocks next objective
+								this.UpdateUnlock(quest); // Potentially unlocks next objective
 								questModifiedInThisIteration = true; // Mark that quest state changed
 
 								// Handle OnProgress/OnSuccess Callbacks

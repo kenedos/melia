@@ -86,6 +86,17 @@ namespace Melia.Zone.World.Quests
 		}
 
 		/// <summary>
+		/// Called when this objective goes from locked to unlocked on a
+		/// character's quest, such as when the preceding objective of a
+		/// sequential quest was completed.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="quest"></param>
+		public virtual void OnUnlocked(Character character, Quest quest)
+		{
+		}
+
+		/// <summary>
 		/// Called when a quest with this objective is completed.
 		/// </summary>
 		/// <param name="character"></param>

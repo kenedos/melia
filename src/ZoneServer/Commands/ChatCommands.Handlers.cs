@@ -126,6 +126,7 @@ namespace Melia.Zone.Commands
 
 			// VIP
 			this.Add("autoloot", "", "Toggles autolooting.", this.HandleAutoloot);
+			this.Add("lootfilter", "<grade|off>", "Sets the minimum item grade to pick up.", this.HandleLootFilter);
 			this.Add("rangepreview", "", "Toggles skill range preview.", this.HandleRangePreview);
 			this.Add("togglebell", "", "Toggles the day/night cycle bell sound.", this.HandleToggleBell);
 
@@ -4234,6 +4235,42 @@ namespace Melia.Zone.Commands
 				target.ServerMessage(Localization.Get("Autoloot is now inactive."));
 			else
 				target.ServerMessage(Localization.Get("Autoloot is now active for items up to a drop chance of {0}%."), autoloot);
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Sets the minimum item grade the character picks up.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleLootFilter(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.Count == 0)
+			{
+				var currentGrade = LootFilter.GetFilterGrade(sender);
+
+				if (currentGrade == ItemGrade.None)
+					target.ServerMessage(Localization.Get("Loot filter is inactive."));
+				else
+					target.ServerMessage(Localization.Get("Loot filter is picking up items of grade {0} and above."), currentGrade.ToString());
+
+				return CommandResult.Okay;
+			}
+
+			if (!LootFilter.TryParseFilterGrade(args.Get(0), out var grade))
+				return CommandResult.InvalidArgument;
+
+			LootFilter.SetFilterGrade(sender, grade);
+
+			if (grade == ItemGrade.None)
+				target.ServerMessage(Localization.Get("Loot filter is now inactive."));
+			else
+				target.ServerMessage(Localization.Get("Loot filter is now picking up items of grade {0} and above."), grade.ToString());
 
 			return CommandResult.Okay;
 		}

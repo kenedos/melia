@@ -52,16 +52,20 @@ namespace Melia.Zone.World.Quests.Objectives
 
 	/// <summary>
 	/// Objective that warps the character to a private map layer and
-	/// spawns a list of monsters there once the objective becomes
+	/// spawns a list of monsters there the moment the objective becomes
 	/// unlocked (typically via <see cref="QuestUnlockType.Sequential"/>).
 	/// All spawned monsters must be killed by the character to complete.
 	/// If any spawned monster dies without the character getting credit
-	/// (timer expires, killed by someone else, etc.), this objective
+	/// (timer expires, killed by someone else, etc.), or the character
+	/// leaves the map with the encounter still running, this objective
 	/// resets and may also reset a named prerequisite objective so the
 	/// player has to redo it before retriggering the spawn.
 	/// </summary>
 	public class LayeredKillObjective : QuestObjective
 	{
+		private readonly object _spawnSyncLock = new();
+		private readonly Dictionary<long, List<Mob>> _spawnedMobs = new();
+
 		/// <summary>
 		/// Monsters spawned on the private layer.
 		/// </summary>
@@ -109,23 +113,52 @@ namespace Melia.Zone.World.Quests.Objectives
 		}
 
 		/// <summary>
-		/// Subscribes to kill events.
+		/// Subscribes to the events that arm, disarm, and repair the spawn.
 		/// </summary>
 		public override void Load()
 		{
-			ZoneServer.Instance.ServerEvents.EntityKilled.Subscribe(this.OnEntityKilled);
 			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Subscribe(this.OnPlayerAbandonedQuest);
+			ZoneServer.Instance.ServerEvents.PlayerLeftMap.Subscribe(this.OnPlayerLeftMap);
+			ZoneServer.Instance.ServerEvents.PlayerReady.Subscribe(this.OnPlayerReady);
 		}
 
 		/// <summary>
-		/// Unsubscribes from kill events.
+		/// Unsubscribes from the events subscribed to in Load.
 		/// </summary>
 		public override void Unload()
 		{
-			ZoneServer.Instance.ServerEvents.EntityKilled.Unsubscribe(this.OnEntityKilled);
 			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Unsubscribe(this.OnPlayerAbandonedQuest);
+			ZoneServer.Instance.ServerEvents.PlayerLeftMap.Unsubscribe(this.OnPlayerLeftMap);
+			ZoneServer.Instance.ServerEvents.PlayerReady.Unsubscribe(this.OnPlayerReady);
 		}
 
+		/// <summary>
+		/// Spawns the encounter as soon as the preceding objective
+		/// completes, on the character's current map.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="quest"></param>
+		public override void OnUnlocked(Character character, Quest quest)
+		{
+			if (character?.Map == null || character.Map == Map.Limbo)
+				return;
+			if (!character.IsOnline || !character.Map.TryGetCharacter(character.Handle, out _))
+				return;
+			if (!quest.TryGetProgress(this.Ident, out var progress) || progress.Done)
+				return;
+			if (this.IsSpawned(character, quest))
+				return;
+			if (!this.IsQuestLocation(character, quest))
+				return;
+
+			this.SpawnAll(character, quest);
+		}
+
+		/// <summary>
+		/// Tears the encounter down when the quest is dropped.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
 		private void OnPlayerAbandonedQuest(object sender, PlayerAbandonedQuestEventArgs args)
 		{
 			var character = args.Character;
@@ -137,56 +170,61 @@ namespace Melia.Zone.World.Quests.Objectives
 				return;
 
 			character.Variables.Temp.Remove(key);
+			this.DespawnAll(character);
 			this.ReturnFromLayer(character);
 		}
 
 		/// <summary>
-		/// Polls on every kill so the spawn fires as soon as the
-		/// objective is unlocked.
+		/// Fails the encounter when the character leaves the map it was
+		/// spawned on, which also covers logging out.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="args"></param>
-		private void OnEntityKilled(object sender, CombatEventArgs args)
+		private void OnPlayerLeftMap(object sender, PlayerEventArgs args)
 		{
-			if (args.Target is not IMonster)
+			var character = args.Character;
+			if (character == null)
 				return;
 
-			Character character;
-			if (args.Target is Mob mob)
+			this.DespawnAll(character);
+
+			character.Quests.UpdateObjectives<LayeredKillObjective>((quest, objective, progress) =>
 			{
-				character = mob.GetKillBeneficiary(args.Attacker);
-				if (character == null)
+				if (objective != this)
 					return;
-			}
-			else if (args.Attacker is Character attackerCharacter)
-			{
-				character = attackerCharacter;
-			}
-			else
-			{
-				return;
-			}
+				if (progress.Done)
+					return;
+				if (!objective.IsSpawned(character, quest))
+					return;
 
-			this.TrySpawn(character);
+				objective.ClearSpawned(character, quest);
+				objective.Fail(character, quest, progress);
+			});
 		}
 
 		/// <summary>
-		/// Spawns the monsters on a private layer if this objective is
-		/// unlocked and the spawn has not yet happened.
+		/// Relocks any encounter that is armed but has no monsters behind
+		/// it, which is the state a character loads in with after logging
+		/// out mid-encounter.
 		/// </summary>
-		/// <param name="character"></param>
-		private void TrySpawn(Character character)
+		/// <param name="sender"></param>
+		/// <param name="args"></param>
+		private void OnPlayerReady(object sender, PlayerEventArgs args)
 		{
+			var character = args.Character;
+			if (character == null)
+				return;
+
 			character.Quests.UpdateObjectives<LayeredKillObjective>((quest, objective, progress) =>
 			{
-				if (progress.Done)
+				if (objective != this)
 					return;
-				if (!progress.Unlocked)
+				if (progress.Done)
 					return;
 				if (objective.IsSpawned(character, quest))
 					return;
 
-				objective.SpawnAll(character, quest);
+				objective.Fail(character, quest, progress);
 			});
 		}
 
@@ -216,6 +254,7 @@ namespace Melia.Zone.World.Quests.Objectives
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="monsterId"></param>
+		/// <param name="buffId"></param>
 		private void SpawnOne(Character character, int monsterId, BuffId? buffId = null)
 		{
 			if (character?.Map == null)
@@ -252,6 +291,7 @@ namespace Melia.Zone.World.Quests.Objectives
 			var characterRef = character;
 			spawnMob.Died += (deadMob, killer) => this.OnSpawnedDied(characterRef, deadMob, killer);
 
+			this.Track(character, spawnMob);
 			character.Map.AddMonster(spawnMob);
 
 			if (buffId.HasValue)
@@ -268,6 +308,11 @@ namespace Melia.Zone.World.Quests.Objectives
 		/// <param name="killer"></param>
 		private void OnSpawnedDied(Character character, Mob mob, ICombatEntity killer)
 		{
+			this.Untrack(character, mob);
+
+			if (!character.IsOnline)
+				return;
+
 			var killedByCharacter = mob.GetKillBeneficiary(killer) == character;
 
 			character.Quests.UpdateObjectives<LayeredKillObjective>((quest, objective, progress) =>
@@ -290,26 +335,119 @@ namespace Melia.Zone.World.Quests.Objectives
 						objective.Completed?.Invoke(character, this);
 						character.Quests.CompleteObjective(quest.Data.Id.Value, objective.Ident);
 						objective.ClearSpawned(character, quest);
+						objective.DespawnAll(character);
 						objective.ReturnFromLayer(character);
 					}
 				}
 				else
 				{
 					objective.ClearSpawned(character, quest);
-					progress.Count = 0;
-					progress.Unlocked = false;
-
-					if (!string.IsNullOrEmpty(objective.ResetIdent) && quest.TryGetProgress(objective.ResetIdent, out var prereqProgress))
-					{
-						prereqProgress.Count = 0;
-						prereqProgress.Done = false;
-						character.Quests.UpdateQuestProgress(quest.Data.Id.Value, prereqProgress.Objective.Id);
-					}
-
-					character.Quests.UpdateQuestProgress(quest.Data.Id.Value, objective.Id);
+					objective.DespawnAll(character);
+					objective.Fail(character, quest, progress);
 					objective.ReturnFromLayer(character);
 				}
 			});
+		}
+
+		/// <summary>
+		/// Relocks this objective and wipes the prerequisite so the
+		/// encounter has to be earned again before it can respawn.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="quest"></param>
+		/// <param name="progress"></param>
+		private void Fail(Character character, Quest quest, QuestProgress progress)
+		{
+			progress.Count = 0;
+			progress.Unlocked = false;
+
+			if (!string.IsNullOrEmpty(this.ResetIdent) && quest.TryGetProgress(this.ResetIdent, out var prereqProgress))
+			{
+				prereqProgress.Count = 0;
+				prereqProgress.Done = false;
+				character.Quests.UpdateQuestProgress(quest.Data.Id.Value, prereqProgress.Objective.Id);
+			}
+
+			character.Quests.UpdateQuestProgress(quest.Data.Id.Value, this.Id);
+		}
+
+		/// <summary>
+		/// Returns true if the character is standing on one of the maps
+		/// the quest takes place on.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="quest"></param>
+		private bool IsQuestLocation(Character character, Quest quest)
+		{
+			var location = quest.Data.Location;
+			if (string.IsNullOrWhiteSpace(location))
+				return true;
+
+			var mapClassName = character.Map.ClassName;
+
+			foreach (var mapName in location.Split(','))
+			{
+				if (mapName.Trim().Equals(mapClassName, StringComparison.InvariantCultureIgnoreCase))
+					return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Adds a spawned monster to the character's tracking list.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="mob"></param>
+		private void Track(Character character, Mob mob)
+		{
+			lock (_spawnSyncLock)
+			{
+				if (!_spawnedMobs.TryGetValue(character.ObjectId, out var mobs))
+					_spawnedMobs[character.ObjectId] = mobs = new List<Mob>();
+
+				mobs.Add(mob);
+			}
+		}
+
+		/// <summary>
+		/// Removes a spawned monster from the character's tracking list.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="mob"></param>
+		private void Untrack(Character character, Mob mob)
+		{
+			lock (_spawnSyncLock)
+			{
+				if (!_spawnedMobs.TryGetValue(character.ObjectId, out var mobs))
+					return;
+
+				mobs.Remove(mob);
+
+				if (mobs.Count == 0)
+					_spawnedMobs.Remove(character.ObjectId);
+			}
+		}
+
+		/// <summary>
+		/// Removes every monster this objective spawned for the character,
+		/// so none are left behind on an abandoned layer.
+		/// </summary>
+		/// <param name="character"></param>
+		private void DespawnAll(Character character)
+		{
+			List<Mob> mobs;
+
+			lock (_spawnSyncLock)
+			{
+				if (!_spawnedMobs.TryGetValue(character.ObjectId, out mobs))
+					return;
+
+				_spawnedMobs.Remove(character.ObjectId);
+			}
+
+			foreach (var mob in mobs)
+				mob.Map?.RemoveMonster(mob);
 		}
 
 		/// <summary>

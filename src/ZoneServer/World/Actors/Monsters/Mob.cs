@@ -1206,6 +1206,9 @@ namespace Melia.Zone.World.Actors.Monsters
 					lootingChance = 1;
 				var grade = this.DetermineItemGrade(lootingChance, dropItem);
 				this.ApplyItemGrade(dropItem, grade);
+
+				if (LootFilter.IsTrashLoot(killer, dropItem, grade))
+					dropItem.SetTrashLoot(TimeSpan.FromSeconds(ZoneServer.Instance.Conf.World.TrashLootPickUpDelay));
 			}
 
 			var autolootThreshold = killer?.Variables.Perm.Get("Melia.Autoloot", 0);

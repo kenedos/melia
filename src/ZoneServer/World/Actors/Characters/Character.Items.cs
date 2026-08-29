@@ -65,6 +65,9 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public void PickUp(ItemMonster itemMonster)
 		{
+			if (itemMonster.Item.IsTrashLoot && !LootFilter.IsGraceActive(this))
+				LootFilter.RegisterTrashPickUp(this);
+
 			itemMonster.PickedUp = true;
 			itemMonster.Item.ClearProtections();
 

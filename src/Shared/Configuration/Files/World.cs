@@ -34,6 +34,13 @@ namespace Melia.Shared.Configuration.Files
 		public int DropDisappearSeconds { get; protected set; }
 		public bool Littering { get; protected set; }
 		public bool TargetedLittering { get; protected set; }
+		public bool TrashLootEnabled { get; protected set; }
+		public int TrashLootLevelGap { get; protected set; }
+		public int TrashLootMaxGrade { get; protected set; }
+		public int TrashLootPickUpDelay { get; protected set; }
+		public int TrashLootGraceSeconds { get; protected set; }
+		public int TrashLootGraceMaxSeconds { get; protected set; }
+		public int TrashLootGraceDecaySeconds { get; protected set; }
 
 		// exp.conf
 		public float ExpRate { get; protected set; }
@@ -330,6 +337,13 @@ namespace Melia.Shared.Configuration.Files
 			this.DropDisappearSeconds = this.GetInt("drop_disappear_time", 100);
 			this.Littering = this.GetBool("littering", false);
 			this.TargetedLittering = this.GetBool("targeted_littering", false);
+			this.TrashLootEnabled = this.GetBool("trash_loot_enabled", true);
+			this.TrashLootLevelGap = this.GetInt("trash_loot_level_gap", 20);
+			this.TrashLootMaxGrade = this.GetInt("trash_loot_max_grade", 2);
+			this.TrashLootPickUpDelay = this.GetInt("trash_loot_pick_up_delay", 10);
+			this.TrashLootGraceSeconds = this.GetInt("trash_loot_grace_time", 60);
+			this.TrashLootGraceMaxSeconds = this.GetInt("trash_loot_grace_max_time", 3840);
+			this.TrashLootGraceDecaySeconds = this.GetInt("trash_loot_grace_decay_time", 86400);
 
 			this.StorageFee = this.GetInt("storage_fee", 20);
 			this.StorageExtCost = this.GetInt("storage_ext_cost", 20);
