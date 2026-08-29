@@ -261,7 +261,7 @@ namespace Melia.Zone.World.Groups
 			if (this.TryGetMember(character.ObjectId, out var member))
 			{
 				member.ActiveJobId = character.JobId;
-				member.JobCircles = GroupMember.BuildJobCircles(character);
+				member.JobCircles = character.Jobs.GetCircleString();
 
 				Send.ZC_NORMAL.PartyJobCircles(this);
 			}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -207,6 +208,27 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			lock (_jobs)
 				return _jobs.Values.OrderBy(a => a.SelectionDate).ToArray();
+		}
+
+		/// <summary>
+		/// Returns the character's jobs as "jobId:circle:level" entries,
+		/// for the client's windows that have no field of their own for a
+		/// job's circle.
+		/// </summary>
+		/// <returns></returns>
+		public string GetCircleString()
+		{
+			var sb = new StringBuilder();
+
+			foreach (var job in this.GetList())
+			{
+				if (sb.Length > 0)
+					sb.Append(' ');
+
+				sb.Append((int)job.Id).Append(':').Append(Math.Max(1, (int)job.Circle)).Append(':').Append(job.Level);
+			}
+
+			return sb.ToString();
 		}
 
 		/// <summary>

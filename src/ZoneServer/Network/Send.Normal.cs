@@ -3742,6 +3742,28 @@ namespace Melia.Zone.Network
 
 
 			/// <summary>
+			/// Sends a character's jobs and their circles to the receiver, as
+			/// a single "name|teamName|activeJobId|jobId:circle:level" entry,
+			/// for the windows that inspect one character.
+			/// </summary>
+			/// <param name="receiver"></param>
+			/// <param name="character"></param>
+			public static void CompareJobCircles(Character receiver, Character character)
+			{
+				if (!ZoneServer.Instance.Conf.World.ClassCircleSystem)
+					return;
+
+				var jobCircles = character.Jobs.GetCircleString();
+				if (jobCircles.Length == 0)
+					return;
+
+				var sb = new StringBuilder();
+				sb.Append(character.Name).Append('|').Append(character.TeamName).Append('|').Append((int)character.JobId).Append('|').Append(jobCircles);
+
+				receiver.AddonMessage("LAIMA_COMPARE_JOB_CIRCLES", sb.ToString());
+			}
+
+			/// <summary>
 			/// Sends every group member's jobs and their circles to the
 			/// group's clients, as "name|teamName|activeJobId|jobId:circle:level"
 			/// entries separated by semicolons.

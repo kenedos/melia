@@ -4969,6 +4969,9 @@ namespace Melia.Zone.Network
 			// information from the relation server, as there's a request
 			// op for it. This is not sent currently though.
 
+			// The window is drawn from the response, so the circles have to
+			// be in place before it arrives.
+			Send.ZC_NORMAL.CompareJobCircles(character, targetCharacter);
 			Send.ZC_PROPERTY_COMPARE(conn, targetCharacter, openWindow, like);
 			if (like)
 			{

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using Melia.Shared.Game.Const;
+﻿using Melia.Shared.Game.Const;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.World;
 using Melia.Zone.World.Actors.Characters;
@@ -38,26 +36,6 @@ namespace Melia.Zone.World.Groups
 		public string JobCircles { get; set; }
 
 		public abstract Properties Properties { get; }
-
-		/// <summary>
-		/// Returns the character's jobs as "jobId:circle:level" entries,
-		/// which the party UI has no data of its own for.
-		/// </summary>
-		/// <param name="character"></param>
-		public static string BuildJobCircles(Character character)
-		{
-			var sb = new StringBuilder();
-
-			foreach (var job in character.Jobs.GetList())
-			{
-				if (sb.Length > 0)
-					sb.Append(' ');
-
-				sb.Append((int)job.Id).Append(':').Append(Math.Max(1, (int)job.Circle)).Append(':').Append(job.Level);
-			}
-
-			return sb.ToString();
-		}
 		public short Channel { get; set; }
 
 		public static PartyMember ToPartyMember(Character character)
@@ -82,7 +60,7 @@ namespace Melia.Zone.World.Groups
 				Stance = character.Stance,
 				IsOnline = character.Connection?.LoggedIn ?? false,
 				ActiveJobId = character.JobId,
-				JobCircles = BuildJobCircles(character),
+				JobCircles = character.Jobs.GetCircleString(),
 			};
 			var i = 0;
 			foreach (var job in character.Jobs.GetList())
@@ -130,7 +108,7 @@ namespace Melia.Zone.World.Groups
 				Stance = character.Stance,
 				IsOnline = character.Connection?.LoggedIn ?? false,
 				ActiveJobId = character.JobId,
-				JobCircles = BuildJobCircles(character),
+				JobCircles = character.Jobs.GetCircleString(),
 			};
 			var i = 0;
 			foreach (var job in character.Jobs.GetList())
