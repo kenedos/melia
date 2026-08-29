@@ -39,6 +39,7 @@ namespace Melia.Zone.World
 			Send.ZC_PARTY_INFO(character, party);
 			Send.ZC_ADDON_MSG(character, AddonMessage.PARTY_JOIN, 0, "None");
 			Send.ZC_PARTY_LIST(party);
+			Send.ZC_NORMAL.PartyJobCircles(party);
 			Send.ZC_NORMAL.ShowParty(character);
 			this.Add(party);
 			return party;

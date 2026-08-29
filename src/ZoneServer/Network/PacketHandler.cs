@@ -487,6 +487,8 @@ namespace Melia.Zone.Network
 				// The skill UI updates above run before ZC_START_GAME, so the
 				// addons aren't up yet to receive the circles they carry.
 				Send.ZC_NORMAL.JobCircles(character);
+				if (conn.Party != null)
+					Send.ZC_NORMAL.PartyJobCircles(conn.Party);
 				Send.ZC_NORMAL.CaptionRatios(character);
 				Send.ZC_NORMAL.CaptionOverrides(character);
 			}

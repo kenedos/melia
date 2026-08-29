@@ -155,6 +155,7 @@ namespace Melia.Zone.World
 			{
 				Send.ZC_PARTY_INFO(character, this);
 				Send.ZC_PARTY_LIST(this);
+				Send.ZC_NORMAL.PartyJobCircles(this);
 				Send.ZC_PARTY_ENTER(character, this);
 				Send.ZC_ADDON_MSG(character, AddonMessage.PARTY_JOIN, 0, "None");
 				Send.ZC_UPDATE_ALL_STATUS(character, 0);
@@ -204,6 +205,7 @@ namespace Melia.Zone.World
 
 			// Notify all party members about the change
 			Send.ZC_PARTY_LIST(this);
+			Send.ZC_NORMAL.PartyJobCircles(this);
 		}
 
 		/// <summary>

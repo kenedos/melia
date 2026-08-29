@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Melia.Shared.Database;
 using Melia.Shared.Game.Const;
 using Yggdrasil.Db.MySql.SimpleCommands;
@@ -146,7 +147,9 @@ namespace Melia.Zone.Database
 					var memberDict = offlineMembers.ToDictionary(m => m.DbId);
 					var idParams = memberIds.Select((id, i) => $"@id{i}").ToArray();
 
-					using (var mc = new MySqlCommand($"SELECT `characterId`, `jobId` FROM `jobs` WHERE `characterId` IN ({string.Join(",", idParams)}) ORDER BY `characterId`, `selectionDate` ASC", conn))
+					var jobCircles = new Dictionary<long, StringBuilder>();
+
+					using (var mc = new MySqlCommand($"SELECT `characterId`, `jobId`, `circle` FROM `jobs` WHERE `characterId` IN ({string.Join(",", idParams)}) ORDER BY `characterId`, `selectionDate` ASC", conn))
 					{
 						for (var i = 0; i < memberIds.Count; i++)
 							mc.Parameters.AddWithValue(idParams[i], memberIds[i]);
@@ -170,6 +173,7 @@ namespace Melia.Zone.Database
 								if (memberDict.TryGetValue(charId, out var member))
 								{
 									member.VisualJobId = jobId;
+									member.ActiveJobId = jobId;
 									switch (jobIndex)
 									{
 										case 0: member.FirstJobId = jobId; break;
@@ -178,9 +182,24 @@ namespace Melia.Zone.Database
 										case 3: member.FourthJobId = jobId; break;
 									}
 									jobIndex++;
+
+									if (!jobCircles.TryGetValue(charId, out var sb))
+										jobCircles[charId] = sb = new StringBuilder();
+
+									if (sb.Length > 0)
+										sb.Append(' ');
+
+									// A job's level is derived from its EXP, which offline members don't load.
+									sb.Append((int)jobId).Append(':').Append(Math.Max(1, reader.GetInt32("circle"))).Append(":0");
 								}
 							}
 						}
+					}
+
+					foreach (var member in offlineMembers)
+					{
+						if (jobCircles.TryGetValue(member.DbId, out var sb))
+							member.JobCircles = sb.ToString();
 					}
 				}
 

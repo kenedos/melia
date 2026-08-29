@@ -3742,6 +3742,46 @@ namespace Melia.Zone.Network
 
 
 			/// <summary>
+			/// Sends every group member's jobs and their circles to the
+			/// group's clients, as "name|teamName|activeJobId|jobId:circle:level"
+			/// entries separated by semicolons.
+			/// </summary>
+			/// <remarks>
+			/// Both names are sent because the party UI displays the team name
+			/// for some members and the character name for others.
+			/// </remarks>
+			/// <param name="group"></param>
+			public static void PartyJobCircles(IGroup group)
+			{
+				if (!ZoneServer.Instance.Conf.World.ClassCircleSystem)
+					return;
+
+				var members = group.GetMembers();
+
+				var sb = new StringBuilder();
+				foreach (var member in members)
+				{
+					if (string.IsNullOrEmpty(member.JobCircles))
+						continue;
+
+					if (sb.Length > 0)
+						sb.Append(';');
+
+					sb.Append(member.Name).Append('|').Append(member.TeamName).Append('|').Append((int)member.ActiveJobId).Append('|').Append(member.JobCircles);
+				}
+
+				if (sb.Length == 0)
+					return;
+
+				var message = sb.ToString();
+				foreach (var member in members)
+				{
+					var character = ZoneServer.Instance.World.GetCharacter(c => c.ObjectId == member.ObjectId);
+					character?.AddonMessage("LAIMA_PARTY_JOB_CIRCLES", message);
+				}
+			}
+
+			/// <summary>
 			/// Update the group's leader.
 			/// </summary>
 			/// <param name="group"></param>

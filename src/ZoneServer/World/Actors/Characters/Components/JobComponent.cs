@@ -101,6 +101,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// The client rebuilds its skill tree on the job change, so the
 			// circles have to be in place before it hears about one.
 			Send.ZC_NORMAL.JobCircles(this.Character);
+			this.Character.Connection?.Party?.UpdateMemberJobs(this.Character);
 			Send.ZC_PC(this.Character, PcUpdateType.Job, (int)job.Id, 0);
 			Send.ZC_NORMAL.UpdateSkillUI(this.Character);
 			this.Character.Properties.SetFloat(PropertyName.Job, (int)job.Id);
@@ -267,6 +268,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// The client rebuilds its skill tree on the job change, so the
 			// circles have to be in place before it hears about one.
 			Send.ZC_NORMAL.JobCircles(this.Character);
+			this.Character.Connection?.Party?.UpdateMemberJobs(this.Character);
 			Send.ZC_PC(this.Character, PcUpdateType.Job, (int)job.Id, 0);
 			Send.ZC_NORMAL.UpdateSkillUI(this.Character);
 			Send.ZC_SKILL_LIST(this.Character);

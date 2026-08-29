@@ -251,8 +251,25 @@ namespace Melia.Zone.World.Groups
 			}
 		}
 
+		/// <summary>
+		/// Updates the member's jobs and sends the group's job circles to
+		/// its clients.
+		/// </summary>
+		/// <param name="character"></param>
+		public void UpdateMemberJobs(Character character)
+		{
+			if (this.TryGetMember(character.ObjectId, out var member))
+			{
+				member.ActiveJobId = character.JobId;
+				member.JobCircles = GroupMember.BuildJobCircles(character);
+
+				Send.ZC_NORMAL.PartyJobCircles(this);
+			}
+		}
+
 		public void UpdateMember(Character character, bool isOnline = true)
 		{
+			this.UpdateMemberJobs(character);
 			this.UpdateMemberData(character, isOnline);
 			this.UpdateMemberInfo(character, isOnline);
 			if (isOnline)
