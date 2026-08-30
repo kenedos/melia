@@ -17,6 +17,8 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 	[SkillHandler(SkillId.Schwarzereiter_Limacon)]
 	public class SchwarzerReiter_LimaconOverride : ISelfSkillHandler
 	{
+		private static readonly TimeSpan BuffDelay = TimeSpan.FromMilliseconds(600);
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Direction dir)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -36,12 +38,31 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(600));
-			caster.TryGetEquipItem(EquipSlot.LeftHand, out var leftHandWeapon);
-			caster.TryGetEquipItem(EquipSlot.RightHand, out var rightHandWeapon);
-			if ((leftHandWeapon != null && leftHandWeapon.Data.EquipType1 == EquipType.Pistol) ||
-				(rightHandWeapon != null && rightHandWeapon.Data.EquipType1 == EquipType.Pistol))
-				caster.StartBuff(BuffId.Limacon_Buff, 1f, 0f, TimeSpan.Zero, caster, skill.Id);
+			await skill.Wait(BuffDelay);
+
+			// Pressing the skill again ends the stance.
+			if (caster.IsBuffActive(BuffId.Limacon_Buff))
+			{
+				caster.StopBuff(BuffId.Limacon_Buff);
+				return;
+			}
+
+			if (!HasPistolEquipped(caster))
+				return;
+
+			caster.StartBuff(BuffId.Limacon_Buff, skill.Level, 0f, TimeSpan.Zero, caster, skill.Id);
+		}
+
+		/// <summary>
+		/// Returns whether the caster is wielding a pistol.
+		/// </summary>
+		/// <param name="caster"></param>
+		private static bool HasPistolEquipped(ICombatEntity caster)
+		{
+			if (caster.TryGetEquipItem(EquipSlot.RightHand, out var rightHand) && rightHand.Data.EquipType1 == EquipType.Pistol)
+				return true;
+
+			return caster.TryGetEquipItem(EquipSlot.LeftHand, out var leftHand) && leftHand.Data.EquipType1 == EquipType.Pistol;
 		}
 	}
 }

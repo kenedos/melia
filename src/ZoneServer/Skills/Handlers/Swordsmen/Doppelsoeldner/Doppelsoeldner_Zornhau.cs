@@ -80,7 +80,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 					modifier.HitCount += deepCutLevel;
 
 				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier = dovBuff.NumArg2;
+					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
@@ -92,10 +92,10 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				// TODO: On latest the game actually no longer applies this,
 				// even though it still lists it in the description. Should
 				// probably have some kind of feature to turn this on/off.
-				target.StartBuff(BuffId.Common_Shock, skill.Level, 0, DebuffDuration, caster);
+				target.StartBuff(BuffId.Common_Shock, skill.Level, 0, DebuffDuration, caster, skill.Id);
 
 				if (caster.IsAbilityActive(AbilityId.Doppelsoeldner36))
-					target.StartBuff(BuffId.Zornhau_Debuff, skill.Level, skillHitResult.Damage * 0.2f, DebuffDuration, caster);
+					target.StartBuff(BuffId.Zornhau_Debuff, skill.Level, skillHitResult.Damage * 0.2f, DebuffDuration, caster, skill.Id);
 
 				var buffRemoveChance = BuffRemoveChancePerLevel * skill.Level;
 				target.RemoveRandomBuff(buffRemoveChance);
@@ -107,7 +107,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			if (hitSomething)
 			{
 				var duration = TimeSpan.FromSeconds(3);
-				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster);
+				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Zucken);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

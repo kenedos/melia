@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -21,6 +22,14 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 	[SkillHandler(SkillId.Musketeer_PenetrationShot)]
 	public class Musketeer_PenetrationShotOverride : IGroundSkillHandler
 	{
+		private const float TargetOffset = 10f;
+		private const float TargetDistance = 170f;
+		private const float TargetWidth = 35f;
+		private const int MaxTargetsPerVolley = 2;
+		private const int VolleyCount = 3;
+		private static readonly TimeSpan VolleyDelay = TimeSpan.FromMilliseconds(300);
+		private static readonly TimeSpan CancelDelay = TimeSpan.FromMilliseconds(150);
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,22 +50,21 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = caster.Position.GetRelative(farPos, distance: 10f);
-			// LimitBySR
-			var targetList = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 170f, 35f, 2);
-			var hits = SkillTargetDamage(skill, caster, targetList, 1f);
-			await skill.Wait(TimeSpan.FromMilliseconds(300));
-			targetPos = originPos.GetRelative(farPos, distance: 10f);
-			// LimitBySR
-			targetList = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 170f, 35f, 2);
-			hits.AddRange(SkillTargetDamage(skill, caster, targetList, 1f));
-			await skill.Wait(TimeSpan.FromMilliseconds(300));
-			targetPos = originPos.GetRelative(farPos, distance: 10f);
-			// LimitBySR
-			targetList = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 170f, 35f, 2);
-			hits.AddRange(SkillTargetDamage(skill, caster, targetList, 1f));
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
+			var targetPos = originPos.GetRelative(farPos, distance: TargetOffset);
+			var hits = new List<SkillHitInfo>();
+
+			for (var i = 0; i < VolleyCount; ++i)
+			{
+				var targetList = SkillSelectEnemiesInSquare(caster, targetPos, 0f, TargetDistance, TargetWidth, MaxTargetsPerVolley);
+				hits.AddRange(SkillTargetDamage(skill, caster, targetList));
+
+				if (i < VolleyCount - 1)
+					await skill.Wait(VolleyDelay);
+			}
+
+			await skill.Wait(CancelDelay);
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
+
 			SkillResultKnockTarget(caster, skill, KnockType.Motion, KnockDirection.TowardsTarget, 150, 10, 0, 1, 2, hits);
 		}
 	}

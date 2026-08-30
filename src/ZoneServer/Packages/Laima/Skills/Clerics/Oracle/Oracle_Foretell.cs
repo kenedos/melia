@@ -45,10 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position targetPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(790));
-			var pad = PadName.Oracle_Foretell;
-			if (caster.IsAbilityActive(AbilityId.Oracle24))
-				pad = PadName.Oracle_Foretell_Abil;
-			SkillCreatePad(caster, skill, targetPos, 0f, pad);
+			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Oracle_Foretell);
 		}
 	}
 }

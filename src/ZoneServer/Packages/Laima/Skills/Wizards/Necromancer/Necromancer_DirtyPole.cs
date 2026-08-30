@@ -20,8 +20,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_DirtyPole)]
 	public class Necromancer_DirtyPoleOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(800);
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -44,9 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 20, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 600;
-			var damageDelay = 800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay: 800, aniTime: 600);
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			var targetPos = originPos.GetRelative(farPos, distance: 20f);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Necromancer_DirtyWall);

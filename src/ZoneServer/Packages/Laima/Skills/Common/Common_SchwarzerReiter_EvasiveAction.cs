@@ -17,6 +17,8 @@ namespace Melia.Zone.Skills.Handlers.Common
 	[SkillHandler(SkillId.Common_Schwarzereiter_EvasiveAction)]
 	public class Common_SchwarzerReiter_EvasiveActionOverride : ISelfSkillHandler
 	{
+		private const int BuffDurationSeconds = 8;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Direction dir)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -36,7 +38,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
-			caster.StartBuff(BuffId.EvasiveAction_Buff, 1f, 0f, TimeSpan.Zero, caster, skill.Id);
+			caster.StartBuff(BuffId.EvasiveAction_Buff, skill.Level, 0f, TimeSpan.FromSeconds(BuffDurationSeconds), caster, skill.Id);
 			await skill.Wait(TimeSpan.FromMilliseconds(110));
 		}
 	}

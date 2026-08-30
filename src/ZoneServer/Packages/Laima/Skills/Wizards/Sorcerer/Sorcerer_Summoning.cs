@@ -154,7 +154,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			if (character.IsAbilityActive(AbilityId.Sorcerer18))
 			{
 				var abilityLevel = character.GetAbilityLevel(AbilityId.Sorcerer18);
-				summon.StartBuff(BuffId.Summoning_Overwork_Buff, abilityLevel, 0, TimeSpan.Zero, character);
+				summon.StartBuff(BuffId.Summoning_Overwork_Buff, abilityLevel, 0, TimeSpan.Zero, character, skill.Id);
 			}
 
 			// Activate the summon
@@ -164,7 +164,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			character.Summons.AddSummon(summon);
 
 			// Apply PC_Summon buff
-			summon.StartBuff(BuffId.Ability_buff_PC_Summon, TimeSpan.Zero, summon);
+			summon.StartBuff(BuffId.Ability_buff_PC_Summon, skill.Level, 0, TimeSpan.Zero, summon, skill.Id);
 
 			// Reset quickslot cooldown for this monster
 			Send.ZC_ADDON_MSG(character, "QUICKSLOT_MONSTER_RESET_COOLDOWN", argStr: monsterClassName);

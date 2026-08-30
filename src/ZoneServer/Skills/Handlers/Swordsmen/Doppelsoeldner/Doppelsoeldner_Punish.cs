@@ -100,10 +100,10 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				var modifier = new SkillModifier();
 
 				if (target.IsStateActive(StateType.KnockedDown))
-					modifier.DamageMultiplier = KnockdownMultiplier;
+					modifier.DamageMultiplier *= KnockdownMultiplier;
 
 				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier = dovBuff.NumArg2;
+					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
@@ -112,7 +112,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				skillHit.HitEffect = HitEffect.Impact;
 				hits.Add(skillHit);
 
-				target.StartBuff(BuffId.DecreaseHeal_Debuff, skill.Level, this.GetHealingReduction(skill), TimeSpan.FromSeconds(5), caster);
+				target.StartBuff(BuffId.DecreaseHeal_Debuff, skill.Level, this.GetHealingReduction(skill), TimeSpan.FromSeconds(5), caster, skill.Id);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

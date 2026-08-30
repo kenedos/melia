@@ -72,7 +72,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				var modifier = SkillModifier.Default;
 
 				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier = dovBuff.NumArg2;
+					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 				if (caster.IsAbilityActive(AbilityId.Doppelsoeldner2) && target.ArmorMaterial == ArmorMaterialType.Cloth)
 					modifier.ForcedCritical = true;

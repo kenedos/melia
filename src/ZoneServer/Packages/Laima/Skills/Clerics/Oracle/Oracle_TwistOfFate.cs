@@ -46,16 +46,8 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 
 			var dmgRate = GameRandom.Get().Next(8 * skill.Level - 7, 8 * skill.Level + 1);
 
-			if (target is not Character)
-			{
-				if (target is Mob mob && mob.Rank == MonsterRank.Boss)
-				{
-					if (mob.Data.Rank == MonsterRank.Boss)
-					{
-						dmgRate /= 2;
-					}
-				}
-			}
+			if (target is Mob mob && mob.Rank == MonsterRank.Boss)
+				dmgRate /= 2;
 
 			var damage = (float)Math.Floor(target.Properties.GetFloat(PropertyName.MHP) * dmgRate / 100f);
 

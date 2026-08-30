@@ -14,6 +14,8 @@ using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Shared.Util;
+using Melia.Zone.Skills.Combat;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 {
@@ -292,10 +294,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			CancelCurrentOrder(mainSummon);
 
 			// Apply the Obey status buff to the summon
-			mainSummon.StartBuff(BuffId.Sorcerer_Obey_Status_Buff, TimeSpan.Zero, caster);
+			mainSummon.StartBuff(BuffId.Sorcerer_Obey_Status_Buff, 1, 0, TimeSpan.Zero, caster, SkillId.Sorcerer_Obey);
 
 			// Apply the PC defense buff to the caster
-			caster.StartBuff(BuffId.Sorcerer_Obey_PC_DEF_Buff, TimeSpan.Zero, caster);
+			caster.StartBuff(BuffId.Sorcerer_Obey_PC_DEF_Buff, 1, 0, TimeSpan.Zero, caster, SkillId.Sorcerer_Obey);
 
 			// Send control object packet to client
 			// This enables the Summoning_Buff UI for controlling the summon
@@ -429,10 +431,13 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 						Send.ZC_NORMAL.PlayEffect(bat, "I_explosion012_dark", 0.5f);
 
 						// Deal damage
-						var skill = bat.GetSkill(SkillId.Mon_pcskill_summon_Familiar_Skill_1);
-						if (skill != null)
+						if (caster.TryGetSkill(SkillId.Sorcerer_SummonFamiliar, out var familiarSkill))
 						{
-							// TODO: Calculate and apply damage
+							var skillHitResult = SCR_SkillHit(caster, target, familiarSkill);
+							target.TakeDamage(skillHitResult.Damage, caster);
+
+							var hitInfo = new HitInfo(caster, target, familiarSkill, skillHitResult, TimeSpan.Zero);
+							Send.ZC_HIT_INFO(caster, target, hitInfo);
 						}
 
 						// Kill the bat

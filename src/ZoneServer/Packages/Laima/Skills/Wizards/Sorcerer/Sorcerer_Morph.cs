@@ -171,7 +171,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			character.Summons.AddSummon(newSummon);
 
 			// Apply PC_Summon buff
-			newSummon.StartBuff(BuffId.Ability_buff_PC_Summon, TimeSpan.Zero, newSummon);
+			newSummon.StartBuff(BuffId.Ability_buff_PC_Summon, skill.Level, 0, TimeSpan.Zero, newSummon, skill.Id);
 
 			// Send property updates
 			//Send.ZC_OBJECT_PROPERTY(newSummon, PropertyName.Scale);

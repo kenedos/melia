@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -11,7 +10,6 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.SkillUseFunctions;
-using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
 namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 {
@@ -22,7 +20,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 	[SkillHandler(SkillId.Musketeer_Snipe)]
 	public class Musketeer_SnipeOverride : IGroundSkillHandler, IDynamicCasted
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(150);
+		private const int InitialExposedStacks = 3;
+		private static readonly TimeSpan HitAniTime = TimeSpan.FromMilliseconds(150);
 
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -31,7 +30,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
-			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
+			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out _))
 			{
 				caster.ServerMessage(Localization.Get("No target location specified."));
 				return;
@@ -44,10 +43,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var aniTime = TimeSpan.FromMilliseconds(150);
-
 			var hits = new List<SkillHitInfo>();
 			var forceId = ForceId.GetNew();
+
 			if (target != null)
 			{
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 22);
@@ -59,7 +57,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 					var skillHitResult = SCR_SkillHit(caster, currentTarget, skill);
 					currentTarget.TakeDamage(skillHitResult.Damage, caster);
 
-					var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, aniTime, TimeSpan.Zero);
+					var skillHit = new SkillHitInfo(caster, currentTarget, skill, skillHitResult, HitAniTime, TimeSpan.Zero);
 					skillHit.ForceId = forceId;
 					hits.Add(skillHit);
 				}
@@ -70,6 +68,29 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, hits);
 
+			this.AddExposedStack(caster, skill);
+		}
+
+		/// <summary>
+		/// Adds a Sniper Exposed stack, starting the buff at its initial
+		/// count when the caster is not exposed yet.
+		/// </summary>
+		/// <param name="caster"></param>
+		/// <param name="skill"></param>
+		private void AddExposedStack(ICombatEntity caster, Skill skill)
+		{
+			if (caster.IsBuffActive(BuffId.Musketeer_Snipe_UseStack_Buff))
+			{
+				caster.StartBuff(BuffId.Musketeer_Snipe_UseStack_Buff, skill.Level, 0, TimeSpan.Zero, caster, skill.Id);
+				return;
+			}
+
+			var buff = caster.StartBuff(BuffId.Musketeer_Snipe_UseStack_Buff, skill.Level, 0, TimeSpan.Zero, caster, skill.Id);
+			if (buff == null)
+				return;
+
+			buff.OverbuffCounter = InitialExposedStacks;
+			buff.NotifyUpdate();
 		}
 	}
 }

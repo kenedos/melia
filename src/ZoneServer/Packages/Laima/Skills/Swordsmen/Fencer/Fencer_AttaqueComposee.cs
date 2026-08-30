@@ -20,7 +20,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	[SkillHandler(SkillId.Fencer_AttaqueComposee)]
 	public class Fencer_AttaqueComposeeOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		private static readonly (int HitDelay, int AniTime)[] HitTimings = [(300, 100), (450, 150)];
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,16 +42,13 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
+			caster.StartBuff(BuffId.Flanconnade_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(800), caster, skill.Id);
+
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 100;
-			var damageDelay = 300;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 20, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 150;
-			damageDelay = 450;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+
+			foreach (var timing in HitTimings)
+				await SkillAttack(caster, skill, splashArea, timing.HitDelay, timing.AniTime);
 		}
 	}
 }

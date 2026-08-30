@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 			var time = 25000;
 			if (caster.IsAbilityActive(AbilityId.Oracle18))
 				time = 11000 + caster.GetAbilityLevel(AbilityId.Oracle18) * 1000;
-			SkillTargetBuff(skill, caster, skillTargets, BuffId.DeathVerdict_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(time));
+			SkillTargetBuff(skill, caster, skillTargets, BuffId.DeathVerdict_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(time), skill.Id);
 			var time2 = 25000;
 			if (caster.IsAbilityActive(AbilityId.Oracle18))
 				time2 = 11000 + caster.GetAbilityLevel(AbilityId.Oracle18) * 1000;

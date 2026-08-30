@@ -730,6 +730,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (this.Has(BuffId.Cure_Buff))
 				return true;
 
+			if (buffData.Removable && this.Has(BuffId.Prophecy_Buff))
+				return true;
+
 			// Cannot apply debuffs to bosses when they have shield,
 			// but allow damage-over-time buffs through
 			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss && mob.Shield > 0)

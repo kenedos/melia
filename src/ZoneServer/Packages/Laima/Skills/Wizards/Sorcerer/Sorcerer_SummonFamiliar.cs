@@ -70,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			CreateFamiliarBats(character, skill);
 
 			// Start the buff that manages bat lifecycle
-			character.StartBuff(BuffId.sorcerer_bat, TimeSpan.FromSeconds((int)skill.Properties.CaptionTime.TotalSeconds));
+			character.StartBuff(BuffId.sorcerer_bat, skill.Level, 0, skill.Properties.CaptionTime, character, skill.Id);
 		}
 
 		/// <summary>
@@ -119,7 +119,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 				var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 				Send.ZC_SYNC_START(character, skillHandle, 1);
 				Send.ZC_MSPD(character, summon, 0, summon.Properties.GetFloat(PropertyName.MSPD));
-				summon.StartBuff(BuffId.Ability_buff_PC_Summon, TimeSpan.Zero, summon);
+				summon.StartBuff(BuffId.Ability_buff_PC_Summon, skill.Level, 0, TimeSpan.Zero, summon, skill.Id);
 				Send.ZC_SYNC_END(character, skillHandle, 0);
 				Send.ZC_SYNC_EXEC_BY_SKILL_TIME(character, skillHandle, skill.Data.DefaultHitDelay);
 			}

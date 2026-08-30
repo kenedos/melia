@@ -110,7 +110,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			character.Variables.Temp.SetInt("SORCERER_SUMMONSALOON", summon.Handle);
 
 			// Apply PC_Summon buff
-			summon.StartBuff(BuffId.Ability_buff_PC_Summon, TimeSpan.Zero, summon);
+			summon.StartBuff(BuffId.Ability_buff_PC_Summon, skill.Level, 0, TimeSpan.Zero, summon, skill.Id);
 
 			// Check for Sorcerer17 ability - enables healing buff
 			if (character.IsAbilityActive(AbilityId.Sorcerer17))

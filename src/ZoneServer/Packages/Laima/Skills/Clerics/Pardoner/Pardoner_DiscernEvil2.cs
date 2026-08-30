@@ -43,9 +43,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 			var targetPos = originPos.GetRelative(farPos, distance: 40f);
-			caster.SetTargets(SkillSelectAlliesInCircle(caster, targetPos, 30f, 10));
+			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 30f, 10));
 			var skillTargets = caster.GetTargets();
-			SkillTargetBuff(skill, caster, skillTargets, BuffId.DiscernEvil_Buff, skill.Level, skill.Level, TimeSpan.FromMilliseconds(10000f));
+			SkillTargetBuff(skill, caster, skillTargets, BuffId.DiscernEvil_Buff, skill.Level, skill.Level, TimeSpan.FromMilliseconds(10000f), skill.Id);
 		}
 	}
 

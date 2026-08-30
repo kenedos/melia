@@ -20,7 +20,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	[SkillHandler(SkillId.Fencer_AttaqueAuFer)]
 	public class Fencer_AttaqueAuFerOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(380);
+		private static readonly (int HitDelay, int AniTime)[] HitTimings = [(380, 180)];
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -43,9 +44,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 180;
-			var damageDelay = 380;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+
+			foreach (var timing in HitTimings)
+				await SkillAttack(caster, skill, splashArea, timing.HitDelay, timing.AniTime);
 		}
 	}
 }

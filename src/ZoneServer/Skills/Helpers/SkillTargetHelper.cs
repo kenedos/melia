@@ -150,17 +150,17 @@ namespace Melia.Zone.Skills.Helpers
 			}
 		}
 
-		public static void SkillTargetBuffAbility(ICombatEntity caster, Skill skill, AbilityId abilityId, BuffId buffId, int level, int arg2, int applyTime, int addAbilTime, int over, int rate)
-			=> SkillTargetBuffAbility(caster, skill, caster.GetTargets(), abilityId, buffId, level, arg2, applyTime, addAbilTime, over, rate);
+		public static void SkillTargetBuffAbility(ICombatEntity caster, Skill skill, AbilityId abilityId, BuffId buffId, int level, int arg2, int applyTime, int addAbilTime, int over, int rate, SkillId skillId = SkillId.Normal_Attack)
+			=> SkillTargetBuffAbility(caster, skill, caster.GetTargets(), abilityId, buffId, level, arg2, applyTime, addAbilTime, over, rate, skillId);
 
-		public static void SkillTargetBuffAbility(ICombatEntity caster, Skill skill, IList<ICombatEntity> targets, AbilityId abilityId, BuffId buffId, int level, int arg2, int applyTime, int addAbilTime, int over, int rate)
+		public static void SkillTargetBuffAbility(ICombatEntity caster, Skill skill, IList<ICombatEntity> targets, AbilityId abilityId, BuffId buffId, int level, int arg2, int applyTime, int addAbilTime, int over, int rate, SkillId skillId = SkillId.Normal_Attack)
 		{
 			if (caster.TryGetActiveAbility(abilityId, out var ability))
 			{
 				foreach (var target in targets)
 				{
 					var adjustedArg2 = arg2 == -1 ? ability.Level : arg2;
-					target.StartBuff(buffId, level, adjustedArg2, TimeSpan.FromMilliseconds(applyTime + addAbilTime * ability.Level), caster);
+					target.StartBuff(buffId, level, adjustedArg2, TimeSpan.FromMilliseconds(applyTime + addAbilTime * ability.Level), caster, skillId);
 				}
 			}
 		}

@@ -19,7 +19,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_FleshHoop)]
 	public class Necromancer_FleshHoopOverride : IForceGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
+		private const float BuffDurationMs = 16000f;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 			var targetPos = originPos.GetRelative(farPos);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Necromancer_FleshHoop_abil);
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
-			caster.StartBuff(BuffId.FleshHoop_Buff, 1f, 0f, TimeSpan.FromMilliseconds(11000f), caster, skill.Id);
+			caster.StartBuff(BuffId.FleshHoop_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), caster, skill.Id);
 		}
 	}
 }

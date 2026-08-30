@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -11,9 +10,8 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
-using Yggdrasil.Geometry.Shapes;
+using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 {
@@ -44,89 +42,43 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
+			skill.Run(this.HandleSkill(caster, skill));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
-			var buffDuration = TimeSpan.FromMilliseconds((float)skill.Properties.CaptionTime.TotalMilliseconds);
+			var buffDuration = skill.Properties.CaptionTime;
+			var maxTargets = (int)skill.Properties.GetFloat(PropertyName.CaptionRatio);
 
-			// Apply buff to caster first
-			caster.StartBuff(BuffId.Indulgentia_Buff, skill.Level, 0f, buffDuration, caster, skill.Id);
+			var skillTargets = SkillSelectAlliesInCircle(caster, caster.Position, TargetRange, maxTargets);
+			if (!skillTargets.Contains(caster))
+				skillTargets.Add(caster);
 
-			// Get friendly targets in range
-			var targetPos = caster.Position.GetRelative(caster.Direction, TargetRange / 2);
-			var skillTargets = GetFriendlyTargetsInRange(caster, skill, targetPos, TargetRange, (int)skill.Properties.GetFloat(PropertyName.CaptionRatio));
-
-			// Apply buff to all friendly targets
 			foreach (var target in skillTargets)
-			{
-				if (target == caster)
-					continue;
-
 				target.StartBuff(BuffId.Indulgentia_Buff, skill.Level, 0f, buffDuration, caster, skill.Id);
-			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(110));
 
-			// Remove debuffs from all buffed targets (including caster)
-			RemoveDebuffsFromTarget(caster);
 			foreach (var target in skillTargets)
-			{
-				RemoveDebuffsFromTarget(target);
-			}
-		}
-
-		/// <summary>
-		/// Gets friendly targets in range (party members and self).
-		/// </summary>
-		private List<ICombatEntity> GetFriendlyTargetsInRange(ICombatEntity caster, Skill skill, Position center, float radius, int maxTargets)
-		{
-			var targets = new List<ICombatEntity>();
-
-			if (caster is Character character)
-			{
-				// Add party members in range
-				var party = character.Connection.Party;
-				if (party != null)
-				{
-					var members = caster.Map.GetPartyMembersInRange(character, radius, true);
-					foreach (var member in members)
-					{
-						if (targets.Count >= maxTargets)
-							break;
-						targets.Add(member);
-					}
-				}
-				else
-				{
-					// No party, just add self
-					targets.Add(caster);
-				}
-			}
-
-			return targets;
+				this.RemoveDebuffsFromTarget(target);
 		}
 
 		/// <summary>
 		/// Removes removable debuffs from the target.
 		/// </summary>
+		/// <param name="target"></param>
 		private void RemoveDebuffsFromTarget(ICombatEntity target)
 		{
 			var debuffsToRemove = new List<BuffId>();
 
-			// Check if the buff is a debuff and can be removed
 			foreach (var buff in target.Components.Get<BuffComponent>()
 				.GetAll(buff => buff.Data.Type == BuffType.Debuff && buff.Data.Removable))
 			{
-
 				debuffsToRemove.Add(buff.Id);
 			}
 
 			foreach (var buffId in debuffsToRemove)
-			{
 				target.RemoveBuff(buffId);
-			}
 		}
 	}
 }

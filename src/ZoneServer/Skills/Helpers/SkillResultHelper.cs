@@ -214,7 +214,7 @@ namespace Melia.Zone.Skills.Helpers
 			}
 		}
 
-		public static void SkillResultSelfBuff(ICombatEntity caster, Skill skill, BuffId buffId, int level, int arg2, float buffTime, int over, int percent, int updateTime)
+		public static void SkillResultSelfBuff(ICombatEntity caster, Skill skill, BuffId buffId, int level, int arg2, float buffTime, int over, int percent, int updateTime, SkillId skillId = SkillId.Normal_Attack)
 		{
 			if (caster is not Character && caster.CheckBoolTempVar("BUNSIN"))
 				return;
@@ -222,7 +222,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (percent < 100 && GameRandom.Get().Next(1, 101) > percent)
 				return;
 
-			var buff = caster.StartBuff(buffId, level, arg2, TimeSpan.FromMilliseconds(buffTime), caster);
+			var buff = caster.StartBuff(buffId, level, arg2, TimeSpan.FromMilliseconds(buffTime), caster, skillId);
 			if (buff == null)
 			{
 				Log.Warning($"SkillResultSelfBuff: Buff {buffId} is null.");

@@ -22,6 +22,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 	[SkillHandler(SkillId.Sorcerer_Desmodus)]
 	public class Sorcerer_DesmodusOverride : IGroundSkillHandler
 	{
+		private const float DebuffDurationMs = 20000f;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -68,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.Desmodus_Debuff, 1, 0f, 20000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Desmodus_Debuff, skill.Level, 0f, DebuffDurationMs, 1, 100, -1, hits);
 		}
 	}
 }

@@ -60,13 +60,15 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, hits);
 
-			foreach (var currentTarget in targetList.LimitBySDR(caster, skill))
+			foreach (var hit in hits)
 			{
 				Send.ZC_SYNC_START(caster, skillHandle, 1);
-				currentTarget.StartBuff(BuffId.Debrave_Debuff, TimeSpan.FromSeconds(4), caster);
+				hit.Target.StartBuff(BuffId.Debrave_Debuff, skill.Level, 0, TimeSpan.FromSeconds(4), caster, skill.Id);
 				Send.ZC_SYNC_END(caster, skillHandle, 0);
 				Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, TimeSpan.FromMilliseconds(400));
 			}
+
+			caster.StopBuff(BuffId.FleshHoop_Buff);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
@@ -12,7 +12,7 @@ namespace Melia.Zone.Buffs.Handlers
 {
 	/// <summary>
 	/// Handler for the Concentration Buff, which increases the target's
-	/// hit rate.
+	/// hit rate and critical rate.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Concentration_Buff)]
@@ -20,14 +20,17 @@ namespace Melia.Zone.Buffs.Handlers
 	{
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
-			var bonus = GetCaptionRatio(buff, 1) / 100f;
+			var hitRateBonus = GetCaptionRatio(buff, 1) / 100f;
+			var critRateBonus = GetCaptionRatio(buff, 2) / 100f;
 
-			AddPropertyModifier(buff, buff.Target, PropertyName.HR_RATE_BM, bonus);
+			AddPropertyModifier(buff, buff.Target, PropertyName.HR_RATE_BM, hitRateBonus);
+			AddPropertyModifier(buff, buff.Target, PropertyName.CRTHR_RATE_BM, critRateBonus);
 		}
 
 		public override void OnEnd(Buff buff)
 		{
 			RemovePropertyModifier(buff, buff.Target, PropertyName.HR_RATE_BM);
+			RemovePropertyModifier(buff, buff.Target, PropertyName.CRTHR_RATE_BM);
 		}
 
 		public override void WhileActive(Buff buff)

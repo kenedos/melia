@@ -81,7 +81,7 @@ namespace Melia.Test.Balance
 	}
 
 	/// <summary>
-	/// The 35 job classes in scope, taken from skill_gem_classes.cs, and the
+	/// The 45 job classes in scope, taken from skill_gem_classes.cs, and the
 	/// skills each of them owns.
 	/// </summary>
 	public static class JobCatalog
@@ -99,6 +99,8 @@ namespace Melia.Test.Balance
 			Job("Hoplite", JobId.Hoplite, true, EquipType.Spear, EquipType.THSpear),
 			Job("Cataphract", JobId.Cataphract, false, EquipType.THSpear, EquipType.Spear),
 			Job("Rodelero", JobId.Rodelero, true, EquipType.Sword),
+			Job("Doppelsoeldner", JobId.Doppelsoeldner, false, EquipType.THSword, EquipType.Sword),
+			Job("Fencer", JobId.Fencer, false, EquipType.Rapier, EquipType.Sword),
 
 			Job("Archer", JobId.Archer, false, EquipType.Bow, EquipType.THBow),
 			Job("Ranger", JobId.Ranger, false, EquipType.Bow, EquipType.THBow),
@@ -107,6 +109,8 @@ namespace Melia.Test.Balance
 			Job("Wugushi", JobId.Wugushi, false, EquipType.Bow, EquipType.THBow),
 			Job("Fletcher", JobId.Fletcher, false, EquipType.Bow, EquipType.THBow),
 			Job("Hunter", JobId.Hunter, false, EquipType.Bow, EquipType.THBow),
+			Job("Falconer", JobId.Falconer, false, EquipType.Bow, EquipType.THBow),
+			Job("Musketeer", JobId.Musketeer, false, EquipType.Musket, EquipType.THBow),
 
 			Job("Wizard", JobId.Wizard, false, EquipType.Staff, EquipType.THStaff, EquipType.Wand),
 			Job("Pyromancer", JobId.Pyromancer, false, EquipType.Staff, EquipType.THStaff, EquipType.Wand),
@@ -115,6 +119,8 @@ namespace Melia.Test.Balance
 			Job("Bokor", JobId.Bokor, false, EquipType.Staff, EquipType.THStaff, EquipType.Wand),
 			Job("Chronomancer", JobId.Chronomancer, false, EquipType.Staff, EquipType.THStaff, EquipType.Wand),
 			Job("Elementalist", JobId.Elementalist, false, EquipType.Staff, EquipType.THStaff, EquipType.Wand),
+			Job("Sorcerer", JobId.Sorcerer, false, EquipType.Staff, EquipType.THStaff, EquipType.Wand),
+			Job("Necromancer", JobId.Necromancer, false, EquipType.Staff, EquipType.THStaff, EquipType.Wand),
 
 			Job("Cleric", JobId.Cleric, true, EquipType.Mace, EquipType.THMace),
 			Job("Priest", JobId.Priest, true, EquipType.Mace, EquipType.THMace),
@@ -123,6 +129,8 @@ namespace Melia.Test.Balance
 			Job("Dievdirbys", JobId.Dievdirbys, true, EquipType.Mace, EquipType.THMace),
 			Job("Sadhu", JobId.Sadhu, false, EquipType.Mace, EquipType.THMace),
 			Job("Monk", JobId.Monk, false, EquipType.Mace, EquipType.THMace),
+			Job("Pardoner", JobId.Pardoner, true, EquipType.Mace, EquipType.THMace),
+			Job("Oracle", JobId.Oracle, true, EquipType.Mace, EquipType.THMace),
 
 			Job("Scout", JobId.Scout, false, EquipType.Dagger, EquipType.Pistol),
 			Job("Linker", JobId.Linker, false, EquipType.Dagger),
@@ -131,6 +139,8 @@ namespace Melia.Test.Balance
 			Job("Corsair", JobId.Corsair, false, EquipType.Pistol, EquipType.Dagger),
 			Job("Thaumaturge", JobId.Thaumaturge, false, EquipType.Dagger),
 			Job("Rogue", JobId.Rogue, false, EquipType.Dagger),
+			Job("Squire", JobId.Squire, false, EquipType.Sword, EquipType.Dagger),
+			Job("Schwarzereiter", JobId.SchwarzerReiter, false, EquipType.Pistol, EquipType.Dagger),
 		];
 
 		/// <summary>

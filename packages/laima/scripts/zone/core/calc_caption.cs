@@ -65,4 +65,21 @@ public class CaptionCalculationsScript : GeneralScript
 
 		return MathF.Min(90f, baseReduction * abilityMultiplier);
 	}
+
+	/// <summary>
+	/// Increase Magic Defense grants a flat magic defense bonus that scales
+	/// with the caster's SPR, mirroring IncreaseMagicDEF_Buff, so the tooltip
+	/// cannot be expressed as a per-level coefficient alone.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction("SCR_Get_CaptionRatio_Pardoner_IncreaseMagicDEF")]
+	[CaptionOverrideDependsOn(PropertyName.MNA, PropertyName.MNA_BM, PropertyName.MNA_ITEM_BM)]
+	public float SCR_Get_IncreaseMagicDEF_CaptionRatio(Skill skill)
+	{
+		var mna = skill.Owner.Properties.GetFloat(PropertyName.MNA);
+		var value = MathF.Floor(240 + ((skill.Level - 1) * 80) + ((skill.Level / 3f) * MathF.Pow(mna, 0.9f)));
+
+		return value + value * ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate")(skill);
+	}
 }

@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			var duration = TimeSpan.FromMinutes(30);
 			var damage = BaseDamageMultiplier + DamageMultiplierPerLevel * skill.Level;
 
-			target.StartBuff(BuffId.DeedsOfValor, skill.Level, damage, duration, caster);
+			target.StartBuff(BuffId.DeedsOfValor, skill.Level, damage, duration, caster, skill.Id);
 
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, target, null);
 		}

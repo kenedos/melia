@@ -32,7 +32,7 @@ namespace Melia.Test.Balance
 	}
 
 	/// <summary>
-	/// The buffs and debuffs in scope: the ones the 35 classes grant through
+	/// The buffs and debuffs in scope: the ones the 45 classes grant through
 	/// their own skills.
 	/// </summary>
 	/// <remarks>

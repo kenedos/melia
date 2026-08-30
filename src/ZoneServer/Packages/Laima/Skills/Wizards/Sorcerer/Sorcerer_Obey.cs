@@ -8,7 +8,6 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
-using Melia.Zone.World.Actors;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -32,22 +31,19 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			// Check if caster has any sorcerer summons
-			if (caster is Character character)
+			var summons = SorcererSummonCommands.GetSorcererSummons(caster);
+			if (summons.Count == 0)
 			{
-				var summons = SorcererSummonCommands.GetSorcererSummons(caster);
-				if (summons.Count == 0)
-				{
-					caster.ServerMessage(Localization.Get("No summons available to control."));
-					return;
-				}
+				caster.ServerMessage(Localization.Get("No summons available to control."));
+				return;
+			}
 
-				// Check if summon is in a valid position (not in OBB)
-				var mainSummon = summons.FirstOrDefault();
-				if (mainSummon != null && mainSummon.IsInOBB())
-				{
-					caster.ServerMessage(Localization.Get("Cannot control summon in current position."));
-					return;
-				}
+			// Check if summon is in a valid position (not in OBB)
+			var mainSummon = summons.FirstOrDefault();
+			if (mainSummon != null && mainSummon.IsInOBB())
+			{
+				caster.ServerMessage(Localization.Get("Cannot control summon in current position."));
+				return;
 			}
 
 			if (!caster.TrySpendSp(skill))

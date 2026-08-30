@@ -20,7 +20,7 @@ namespace Melia.Zone.Pads.Handlers.Wizards.Necromancer
 
 			pad.SetRange(24f);
 			pad.SetUpdateInterval(1000);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(10000);
+			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(16000);
 			pad.Trigger.MaxActorCount = 5;
 		}
 

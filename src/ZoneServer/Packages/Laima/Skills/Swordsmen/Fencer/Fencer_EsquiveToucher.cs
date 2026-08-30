@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -20,7 +20,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	[SkillHandler(SkillId.Fencer_EsquiveToucher)]
 	public class Fencer_EsquiveToucherOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(950);
+		private static readonly (int HitDelay, int AniTime)[] HitTimings = [(950, 750), (1400, 450), (1800, 400), (1850, 100), (2100, 200)];
+		private const int BuffDurationMs = 3000;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,40 +43,13 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
+			caster.StartBuff(BuffId.EsquiveToucher_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), caster, skill.Id);
+
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 68, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 750;
-			var damageDelay = 950;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 68, width: 20, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 450;
-			damageDelay = 1400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 68, width: 20, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 400;
-			damageDelay = 1800;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 68, width: 20, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 100;
-			damageDelay = 1850;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 68, width: 20, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 200;
-			damageDelay = 2100;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			var buff = BuffId.EsquiveToucher_Buff;
-			if (caster.IsAbilityActive(AbilityId.Fencer23))
-				buff = BuffId.Skill_NoDamage_Buff;
-			var value = 1500;
-			if (ZoneServer.Instance.World.IsPVP)
-				value = 4000;
-			if (caster.IsAbilityActive(AbilityId.Fencer23))
-				value = 1500;
-			caster.StartBuff(buff, skill.Level, 0f, TimeSpan.FromMilliseconds(value), caster, skill.Id);
+
+			foreach (var timing in HitTimings)
+				await SkillAttack(caster, skill, splashArea, timing.HitDelay, timing.AniTime);
 		}
 	}
 }

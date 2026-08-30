@@ -40,14 +40,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			}
 
 			// Check if caster has any sorcerer summons
-			if (caster is Character character)
+			if (SorcererSummonCommands.GetSorcererSummons(caster).Count == 0)
 			{
-				var summons = SorcererSummonCommands.GetSorcererSummons(caster);
-				if (summons.Count == 0)
-				{
-					caster.ServerMessage(Localization.Get("No summons available to command."));
-					return;
-				}
+				caster.ServerMessage(Localization.Get("No summons available to command."));
+				return;
 			}
 
 			if (!caster.TrySpendSp(skill))
@@ -72,11 +68,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			// Wait for skill animation
 			await skill.Wait(TimeSpan.FromMilliseconds(700));
 
-			// Calculate attack range based on skill level
-			var attackRange = DefaultAttackRange;
-
 			// Order summons to attack at the target location
-			SorcererSummonCommands.OrderAttackGround(skill, caster, targetPos, attackRange);
+			SorcererSummonCommands.OrderAttackGround(skill, caster, targetPos, DefaultAttackRange);
 
 			// Play effect at target location to show command area
 			Send.ZC_NORMAL.SkillProjectile(caster, targetPos, "F_ground_target", 1f, "None", 0, 0, TimeSpan.Zero);

@@ -65,16 +65,19 @@ namespace Melia.Test.Balance.Sfr
 		{
 			["Swordman"] = "Swordsman", ["Highlander"] = "Swordsman", ["Peltasta"] = "Swordsman",
 			["Hoplite"] = "Swordsman", ["Barbarian"] = "Swordsman", ["Cataphract"] = "Swordsman",
-			["Rodelero"] = "Swordsman",
+			["Rodelero"] = "Swordsman", ["Doppelsoeldner"] = "Swordsman", ["Fencer"] = "Swordsman",
 			["Wizard"] = "Wizard", ["Pyromancer"] = "Wizard", ["Cryomancer"] = "Wizard",
 			["Psychokino"] = "Wizard", ["Chronomancer"] = "Wizard", ["Elementalist"] = "Wizard",
-			["Bokor"] = "Wizard",
+			["Bokor"] = "Wizard", ["Sorcerer"] = "Wizard", ["Necromancer"] = "Wizard",
 			["Archer"] = "Archer", ["QuarrelShooter"] = "Archer", ["Ranger"] = "Archer",
 			["Sapper"] = "Archer", ["Wugushi"] = "Archer", ["Fletcher"] = "Archer", ["Hunter"] = "Archer",
+			["Falconer"] = "Archer", ["Musketeer"] = "Archer",
 			["Cleric"] = "Cleric", ["Priest"] = "Cleric", ["Kriwi"] = "Cleric", ["Paladin"] = "Cleric",
 			["Dievdirbys"] = "Cleric", ["Sadhu"] = "Cleric", ["Monk"] = "Cleric",
+			["Pardoner"] = "Cleric", ["Oracle"] = "Cleric",
 			["Scout"] = "Scout", ["Assassin"] = "Scout", ["OutLaw"] = "Scout", ["Corsair"] = "Scout",
 			["Thaumaturge"] = "Scout", ["Linker"] = "Scout", ["Rogue"] = "Scout",
+			["Squire"] = "Scout", ["Schwarzereiter"] = "Scout",
 		};
 
 		/// <summary>

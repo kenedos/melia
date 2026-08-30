@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -21,7 +20,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Squire
 	[SkillHandler(SkillId.Squire_DeadlyCombo)]
 	public class Squire_DeadlyComboOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(250);
+		private const int HitDelay = 250;
+		private const int AniTime = 50;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -44,9 +45,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Squire
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 40, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 50;
-			var damageDelay = 250;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			await SkillAttack(caster, skill, splashArea, HitDelay, AniTime);
 		}
 	}
 }

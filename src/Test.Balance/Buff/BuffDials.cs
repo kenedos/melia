@@ -339,6 +339,10 @@ namespace Melia.Test.Balance.Buff
 			// keeps in their head rather than a curve: 150% and 10%, flat at
 			// every level.
 			["Barbarian_Frenzy"] = new() { [1] = (150f, 0f), [2] = (10f, 0f) },
+
+			// How many allies the press reaches, which is the mechanic rather
+			// than a dial on it. Its heal factor is the slot left free.
+			["Pardoner_Indulgentia"] = new() { [1] = (4f, 1f) },
 		};
 
 		/// <summary>

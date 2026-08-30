@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -10,6 +9,7 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using System;
 
 namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 {
@@ -20,7 +20,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	[SkillHandler(SkillId.Fencer_Flanconnade)]
 	public class Fencer_FlanconnadeOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(400);
+		private static readonly (int HitDelay, int AniTime)[] HitTimings = [(400, 200), (600, 200)];
+		private const int BuffDurationMs = 500;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -41,17 +43,13 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
+			caster.StartBuff(BuffId.Flanconnade_Buff, 1f, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), caster, skill.Id);
+
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 35, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 200;
-			var damageDelay = 400;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 35, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 200;
-			damageDelay = 600;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
-			caster.StartBuff(BuffId.Flanconnade_Buff, 1f, 0f, TimeSpan.FromMilliseconds(500f), caster, skill.Id);
+
+			foreach (var timing in HitTimings)
+				await SkillAttack(caster, skill, splashArea, timing.HitDelay, timing.AniTime);
 		}
 	}
 }

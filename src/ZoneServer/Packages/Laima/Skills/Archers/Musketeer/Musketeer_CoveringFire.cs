@@ -10,7 +10,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
@@ -20,9 +19,12 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Musketeer_CoveringFire)]
-	public class Musketeer_CoveringFireOverride : IGroundSkillHandler, IDynamicCasted
+	public class Musketeer_CoveringFireOverride : IGroundSkillHandler
 	{
-		TimeSpan DamageDelay = TimeSpan.FromMilliseconds(100);
+		private const float SplashRadius = 50f;
+		private static readonly TimeSpan HitAniTime = TimeSpan.FromMilliseconds(100);
+		private static readonly TimeSpan FireDelay = TimeSpan.FromMilliseconds(5);
+		private static readonly TimeSpan CancelDelay = TimeSpan.FromMilliseconds(1000);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -49,14 +51,13 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position targetPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(5));
+			await skill.Wait(FireDelay);
 
-			var splashParam = skill.GetSplashParameters(caster, targetPos, targetPos, length: 50, width: 50, angle: 0);
+			var splashParam = skill.GetSplashParameters(caster, targetPos, targetPos, length: SplashRadius, width: SplashRadius, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
-			var results = new List<SkillHitResult>();
-			var hitTargets = new List<ICombatEntity>();
+			var hits = new List<SkillHitInfo>();
 
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
@@ -64,21 +65,15 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
-				results.Add(skillHitResult);
 
-				var hit = new HitInfo(caster, target, skill, skillHitResult);
-				hit.ResultType = skillHitResult.Result;
-				hit.AniTime = DamageDelay;
-
-				if (skillHitResult.Damage > 0)
-				{
-					hitTargets.Add(target);
-				}
-
-				Send.ZC_HIT_INFO(hit);
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, HitAniTime, TimeSpan.Zero);
+				skillHit.HitEffect = HitEffect.Impact;
+				hits.Add(skillHit);
 			}
 
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			Send.ZC_SKILL_HIT_INFO(caster, hits);
+
+			await skill.Wait(CancelDelay);
 			Send.ZC_NORMAL.SkillCancelCancel(caster, skill.Id);
 		}
 	}

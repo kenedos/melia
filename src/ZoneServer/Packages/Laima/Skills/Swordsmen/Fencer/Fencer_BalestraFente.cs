@@ -20,6 +20,13 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	[SkillHandler(SkillId.Fencer_BalestraFente)]
 	public class Fencer_BalestraFenteOverride : IGroundSkillHandler
 	{
+		private const float DashDistance = 80f;
+		private const float TargetDistance = 120f;
+		private const float TargetWidth = 25f;
+		private const int MaxTargets = 10;
+		private const int SelectDelay = 300;
+		private const int DamageDelay = 100;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -30,29 +37,34 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target?.Handle ?? 0, originPos, caster.Direction, Position.Zero);
-
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
+			skill.Run(this.HandleSkill(caster, skill));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
-			var startPos = caster.Position.GetRelative(caster.Direction, 0);
-			var targetPos = caster.Position.GetRelative(caster.Direction, 80);
-			await skill.Wait(TimeSpan.FromMilliseconds(300));
-			var value = skill.GetPVPValue(10);
-			var skillTargets = SkillSelectEnemiesInSquare(caster, startPos, 0f, 120f, 25f, value);
-			if (skillTargets == null || skillTargets.Count == 0)
+			var startPos = caster.Position;
+
+			await skill.Wait(TimeSpan.FromMilliseconds(SelectDelay));
+
+			var maxTargets = skill.GetPVPValue(MaxTargets);
+			var skillTargets = SkillSelectEnemiesInSquare(caster, startPos, 0f, TargetDistance, TargetWidth, maxTargets);
+
+			await skill.Wait(TimeSpan.FromMilliseconds(DamageDelay));
+
+			if (skillTargets.Count > 0)
+				SkillTargetDamage(skill, caster, skillTargets);
+
+			var dashPos = caster.Position.GetRelative(caster.Direction, DashDistance);
+			if (!caster.Map.Ground.TryGetNearestValidPosition(dashPos, out var validPosition))
 				return;
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			SkillTargetDamage(skill, caster, skillTargets, 1f);
-			caster.Position = targetPos;
-			Send.ZC_MOVE_STOP(caster, targetPos, 1);
+
+			caster.Position = validPosition;
+			Send.ZC_MOVE_STOP(caster, validPosition, 1);
 		}
 	}
 }

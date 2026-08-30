@@ -35,14 +35,10 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			}
 
 			// Check if caster has any sorcerer summons
-			if (caster is Character character)
+			if (SorcererSummonCommands.GetSorcererSummons(caster).Count == 0)
 			{
-				var summons = SorcererSummonCommands.GetSorcererSummons(caster);
-				if (summons.Count == 0)
-				{
-					caster.ServerMessage(Localization.Get("No summons available to command."));
-					return;
-				}
+				caster.ServerMessage(Localization.Get("No summons available to command."));
+				return;
 			}
 
 			if (!caster.TrySpendSp(skill))

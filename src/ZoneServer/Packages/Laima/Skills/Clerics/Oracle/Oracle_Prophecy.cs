@@ -18,6 +18,8 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 	[SkillHandler(SkillId.Oracle_Prophecy)]
 	public class Oracle_ProphecyOverride : IGroundSkillHandler
 	{
+		private static readonly TimeSpan BuffDelay = TimeSpan.FromMilliseconds(500);
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -38,8 +40,13 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			caster.StartBuff(BuffId.Prophecy_Buff, skill.Level, 0f, TimeSpan.Zero, caster, skill.Id);
+			await skill.Wait(BuffDelay);
+
+			var duration = skill.Properties.CaptionTime;
+			if (ZoneServer.Instance.World.IsPVP)
+				duration /= 2;
+
+			caster.StartBuff(BuffId.Prophecy_Buff, skill.Level, 0f, duration, caster, skill.Id);
 		}
 	}
 }

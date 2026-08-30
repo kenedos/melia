@@ -71,7 +71,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 		{
 			var hitDelay = TimeSpan.FromMilliseconds(400);
 			var aniTime1 = TimeSpan.FromMilliseconds(60);
-			var aniTime2 = TimeSpan.FromMilliseconds(60);
 			var delayBetweenHits = TimeSpan.FromMilliseconds(150);
 			var skillHitDelay = TimeSpan.Zero;
 
@@ -89,7 +88,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 					var modifier = SkillModifier.MultiHit(2);
 
 					if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-						modifier.FinalDamageMultiplier = dovBuff.NumArg2;
+						modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 					var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 					target.TakeDamage(skillHitResult.Damage, caster);
@@ -110,7 +109,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			if (hitSomething)
 			{
 				var duration = TimeSpan.FromSeconds(3);
-				caster.StartBuff(BuffId.Redel_Buff, skill.Level, 0, duration, caster);
+				caster.StartBuff(BuffId.Redel_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Redel);
 			}
 		}
 	}

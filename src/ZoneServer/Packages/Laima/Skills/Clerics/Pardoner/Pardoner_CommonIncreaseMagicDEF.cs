@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -21,6 +20,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 	[SkillHandler(SkillId.Common_Pardoner_IncreaseMagicDEF)]
 	public class Pardoner_CommonIncreaseMagicDefOverride : IGroundSkillHandler
 	{
+		private const float BuffRange = 150f;
+		private const int MaxTargets = 50;
+		private const float BuffDurationMs = 1800000f;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -42,10 +45,13 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
+
 			var targetPos = originPos.GetRelative(farPos);
-			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 150f, 50));
+			caster.SetTargets(SkillSelectAlliesInCircle(caster, targetPos, BuffRange, MaxTargets));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(90));
-			SkillTargetBuff(skill, caster, caster.GetTargets(), BuffId.IncreaseMagicDEF_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(1800000f));
+
+			SkillTargetBuff(skill, caster, caster.GetTargets(), BuffId.IncreaseMagicDEF_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), skill.Id);
 		}
 	}
 }

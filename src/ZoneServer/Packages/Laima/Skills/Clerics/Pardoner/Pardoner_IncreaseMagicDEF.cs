@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -9,7 +8,8 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using Melia.Zone.World.Actors.Characters;
+using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 {
@@ -40,39 +40,22 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
+			skill.Run(this.HandleSkill(caster, skill));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(600));
 
-			var buffDuration = TimeSpan.FromMilliseconds((float)skill.Properties.CaptionTime.TotalMilliseconds);
+			var buffDuration = skill.Properties.CaptionTime;
 
-			// NumArg1 = skill level for calculating MDEF bonus
-			// NumArg2 = caster's SPR at time of casting for buff calculation
-			var casterSpr = caster.Properties.GetFloat(PropertyName.MNA);
+			var skillTargets = SkillSelectAlliesInCircle(caster, caster.Position, BuffRange, MaxTargets);
+			if (!skillTargets.Contains(caster))
+				skillTargets.Add(caster);
 
-			// Apply buff to caster first
-			caster.StartBuff(BuffId.IncreaseMagicDEF_Buff, skill.Level, casterSpr, buffDuration, caster);
+			await skill.Wait(TimeSpan.FromMilliseconds(90));
 
-			// Find and buff party members in range
-			if (caster is Character character)
-			{
-				var party = character.Connection.Party;
-				if (party != null)
-				{
-					var members = caster.Map.GetPartyMembersInRange(character, BuffRange, true);
-
-					foreach (var member in members)
-					{
-						if (member == caster)
-							continue;
-
-						member.StartBuff(BuffId.IncreaseMagicDEF_Buff, skill.Level, casterSpr, buffDuration, caster);
-					}
-				}
-			}
+			SkillTargetBuff(skill, caster, skillTargets, BuffId.IncreaseMagicDEF_Buff, skill.Level, 0f, buffDuration, skill.Id);
 		}
 	}
 }

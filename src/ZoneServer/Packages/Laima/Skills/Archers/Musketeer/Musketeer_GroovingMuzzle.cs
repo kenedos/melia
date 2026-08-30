@@ -17,6 +17,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 	[SkillHandler(SkillId.Musketeer_GroovingMuzzle)]
 	public class Musketeer_GroovingMuzzleOverride : ISelfSkillHandler
 	{
+		private const float BuffDurationMs = 10000f;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Direction dir)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -33,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
 
-			caster.StartBuff(BuffId.GroovingMuzzle_UseStack_Buff, 0f, 0f, TimeSpan.FromMilliseconds(10000f), caster, skill.Id);
+			caster.StartBuff(BuffId.GroovingMuzzle_UseStack_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), caster, skill.Id);
 		}
 	}
 }

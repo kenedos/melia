@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -21,7 +19,9 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	[SkillHandler(SkillId.Fencer_Fleche)]
 	public class Fencer_FlecheOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(200);
+		private static readonly (int HitDelay, int AniTime)[] HitTimings = [(200, 0), (350, 150), (500, 150), (650, 150)];
+		private const float CritChanceBonus = 1f;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -44,16 +44,12 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 20, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 0;
-			var damageDelay = 200;
-			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 20, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 200;
-			damageDelay = 400;
-			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+
+			var modifier = new SkillModifier();
+			modifier.CritChanceMultiplier += CritChanceBonus;
+
+			foreach (var timing in HitTimings)
+				await SkillAttack(caster, skill, splashArea, timing.HitDelay, timing.AniTime, skillModifier: modifier);
 		}
 	}
 }

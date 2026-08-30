@@ -94,7 +94,7 @@ namespace Melia.Test.Balance
 		[Fact]
 		public void EveryInScopeClassCanBeBuilt()
 		{
-			Assert.Equal(35, JobCatalog.Entries.Length);
+			Assert.Equal(45, JobCatalog.Entries.Length);
 
 			foreach (var job in JobCatalog.Entries)
 			{

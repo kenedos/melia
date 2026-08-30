@@ -70,10 +70,10 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.MultiHit(3);
-				modifier.DefensePenetrationRate = 0.15f;
+				modifier.DefensePenetrationRate += 0.15f;
 
 				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier = dovBuff.NumArg2;
+					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
@@ -93,10 +93,10 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			foreach (var target in targets.LimitBySDR(caster, skill))
 			{
 				var modifier = SkillModifier.MultiHit(3);
-				modifier.DefensePenetrationRate = 0.15f;
+				modifier.DefensePenetrationRate += 0.15f;
 
 				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier = dovBuff.NumArg2;
+					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);

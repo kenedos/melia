@@ -19,8 +19,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	[SkillHandler(SkillId.Necromancer_CreateShoggoth)]
 	public class Necromancer_CreateShoggothOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))

@@ -36,7 +36,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 
 			var duration = TimeSpan.FromSeconds(60);
 
-			target.StartBuff(BuffId.Double_pay_earn_Buff, skill.Level, 0, duration, caster);
+			target.StartBuff(BuffId.Double_pay_earn_Buff, skill.Level, 0, duration, caster, skill.Id);
 
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, target, null);
 		}

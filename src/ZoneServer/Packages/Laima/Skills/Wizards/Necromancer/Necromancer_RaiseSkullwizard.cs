@@ -48,10 +48,11 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 				summon.Tendency = TendencyType.Aggressive;
 				summon.FromGround = true;
 				summon.Properties.SetFloat(PropertyName.Level, caster.Level);
+				summon.Properties.SetFloat(PropertyName.Lv, caster.Level);
 				summon.Properties.SetFloat(PropertyName.FIXMSPD_BM, 140f);
 
 				var attack = GameRandom.Get().Next((int)caster.Properties.GetFloat(PropertyName.MINMATK),
-					(int)caster.Properties.GetFloat(PropertyName.MINMATK))
+					(int)caster.Properties.GetFloat(PropertyName.MAXMATK) + 1)
 					* (skill.Properties.GetFloat(PropertyName.CaptionRatio) / 100f);
 				var life = caster.Properties.GetFloat(PropertyName.MHP) * (skill.Properties.GetFloat(PropertyName.CaptionRatio3) / 100f);
 				var defense = (caster.Properties.GetFloat(PropertyName.DEF)
@@ -62,16 +63,13 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 				summon.Properties.SetFloat(PropertyName.FixedLife, life);
 				summon.Properties.SetFloat(PropertyName.FixedDefence, defense);
 				summon.Properties.InvalidateAll();
+				summon.Components.Add(new LifeTimeComponent(summon, TimeSpan.FromMinutes(30)));
 				summon.SetState(true);
-
-				var ai = new AiComponent(summon, "BasicMonster", caster);
-				summon.Components.Add(ai);
 				summon.Direction = caster.Direction;
-				caster.Map.AddMonster(summon);
 
 				skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 				Send.ZC_SYNC_START(caster, skillHandle, 1);
-				summon.StartBuff(BuffId.Ability_buff_PC_Summon, TimeSpan.Zero);
+				summon.StartBuff(BuffId.Ability_buff_PC_Summon, skill.Level, 0, TimeSpan.Zero, summon, skill.Id);
 				Send.ZC_SYNC_END(caster, skillHandle, 0);
 				Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, skill.Data.DefaultHitDelay);
 			}

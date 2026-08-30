@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -19,14 +18,14 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Squire
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Squire_Arrest)]
-	public class Squire_ArrestOverride : IGroundSkillHandler, IDynamicCasted
+	public class Squire_ArrestOverride : IGroundSkillHandler
 	{
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			// TODO: No Implementation SKL_CANCEL_CANCEL
-
-		}
+		private const float TargetDistance = 120f;
+		private const float TargetWidth = 30f;
+		private const int BuffDelay = 550;
+		private const int BuffDurationMs = 10000;
+		private const int SlowDurationMs = 4000;
+		private const int SlowDurationPerAbilityLevel = 400;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -49,12 +48,22 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Squire
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			var targetPos = originPos.GetRelative(farPos);
-			var skillTargets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 120f, 30f, (int)skill.Properties.GetFloat(PropertyName.CaptionRatio));
-			if (skillTargets == null || skillTargets.Count == 0)
+			var maxTargets = (int)skill.Properties.GetFloat(PropertyName.CaptionRatio);
+
+			var skillTargets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, TargetDistance, TargetWidth, maxTargets);
+			if (skillTargets.Count == 0)
 				return;
-			await skill.Wait(TimeSpan.FromMilliseconds(550));
-			SkillTargetBuff(skill, caster, skillTargets, BuffId.Arrest, skill.Level, 0f, TimeSpan.FromMilliseconds(10000f));
-			//Check get_remove_buff_tooltip_Squire_Arrest
+
+			await skill.Wait(TimeSpan.FromMilliseconds(BuffDelay));
+
+			SkillTargetBuff(skill, caster, skillTargets, BuffId.Arrest, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), skill.Id);
+
+			await skill.Wait(TimeSpan.FromMilliseconds(BuffDurationMs));
+
+			foreach (var skillTarget in skillTargets)
+				skillTarget.StopBuff(BuffId.Arrest);
+
+			SkillTargetBuffAbility(caster, skill, skillTargets, AbilityId.Squire1, BuffId.UC_slowdown, 1, -1, SlowDurationMs, SlowDurationPerAbilityLevel, 1, 100, skill.Id);
 		}
 	}
 }

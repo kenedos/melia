@@ -191,7 +191,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			var buffId = this.GetBuffForPad(pad.Name);
 			if (buffId != BuffId.None)
 			{
-				target.StartBuff(buffId, TimeSpan.FromSeconds(30), pad.Creator);
+				target.StartBuff(buffId, pad.Skill.Level, 0, TimeSpan.FromSeconds(30), pad.Creator, pad.Skill.Id);
 			}
 		}
 

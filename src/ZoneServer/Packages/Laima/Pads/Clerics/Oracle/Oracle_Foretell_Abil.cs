@@ -21,7 +21,7 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Oracle
 			Send.ZC_NORMAL.PadUpdate(creator, pad, true);
 			pad.SetRange(80f);
 			pad.SetUpdateInterval(1000);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(20000);
+			pad.Trigger.LifeTime = pad.Skill.Properties.CaptionTime;
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)

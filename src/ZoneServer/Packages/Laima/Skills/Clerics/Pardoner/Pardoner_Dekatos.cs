@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
@@ -25,7 +24,9 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 	public class Pardoner_DekatosOverride : IGroundSkillHandler
 	{
 		private const float BuffDurationMs = 5000f;
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(500);
+		private const int HitDelay = 500;
+		private const int AniTime = 300;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -48,14 +49,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 300;
-			var damageDelay = 500;
 			var hits = new List<SkillHitInfo>();
 
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, HitDelay, AniTime, hits);
 
-			// Apply Dekatos_Buff to all hit targets
-			// The buff has a chance to execute non-boss monsters when it expires
 			var buffDuration = TimeSpan.FromMilliseconds(BuffDurationMs);
 
 			foreach (var hit in hits)
@@ -63,7 +60,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 				var target = hit.Target;
 				if (target != null && !target.IsDead)
 				{
-					target.StartBuff(BuffId.Dekatos_Buff, skill.Level, 0, buffDuration, caster);
+					target.StartBuff(BuffId.Dekatos_Buff, skill.Level, 0, buffDuration, caster, skill.Id);
 				}
 			}
 		}

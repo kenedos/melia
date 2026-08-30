@@ -15,12 +15,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Necromancer_Disinter)]
-	public class Necromancer_DisinterOverride : IGroundSkillHandler, IDynamicCasted
+	public class Necromancer_DisinterOverride : IGroundSkillHandler
 	{
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime) { }
-
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime) { }
-
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -32,7 +28,6 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
@@ -62,7 +57,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 					summon.StartBuff(buffId, skill.Level, 0, TimeSpan.FromSeconds(30), caster, skill.Id);
 				}
 
-				caster.StartBuff(BuffId.Disinter_PC_Buff, TimeSpan.FromSeconds(30), caster);
+				caster.StartBuff(BuffId.Disinter_PC_Buff, skill.Level, 0, TimeSpan.FromSeconds(30), caster, skill.Id);
 			}
 		}
 	}

@@ -22,7 +22,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 	[SkillHandler(SkillId.Musketeer_ButtStroke)]
 	public class Musketeer_ButtStrokeOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(300);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -46,16 +45,16 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 15, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 100;
-			var damageDelay = 300;
+			var hitDelay = 300;
+			var aniTime = 300;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 15, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 300;
-			damageDelay = 600;
+			hitDelay = 600;
+			aniTime = 300;
 			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
+			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			if (caster.IsAbilityActive(AbilityId.Musketeer8))
 				SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 3000f, 1, (int)(caster.GetAbilityLevel(AbilityId.Musketeer8) * 1.5), -1, hits);
 		}

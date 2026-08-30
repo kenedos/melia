@@ -21,7 +21,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 	[SkillHandler(SkillId.Musketeer_BayonetThrust)]
 	public class Musketeer_BayonetThrustOverride : IGroundSkillHandler
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(200);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -45,9 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 15, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 0;
-			var damageDelay = 200;
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay);
+			await SkillAttack(caster, skill, splashArea, hitDelay: 200, aniTime: 200);
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			var jumpDistance = 180f;
 			var leapPos = caster.Position.GetRelative(caster.Direction.Backwards, jumpDistance);

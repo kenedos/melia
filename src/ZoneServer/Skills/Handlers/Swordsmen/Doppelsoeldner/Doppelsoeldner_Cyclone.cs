@@ -24,7 +24,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.StartBuff(BuffId.Cyclone_EnableMovingShot_Buff, 1, 0, TimeSpan.Zero, caster);
+			caster.StartBuff(BuffId.Cyclone_EnableMovingShot_Buff, 1, 0, TimeSpan.Zero, caster, skill.Id);
 
 			// This has to be sent here to set the MovingShotable Property
 			// which isn't applied until after the character has the buff
@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 			}
 
 			if (caster.TryGetActiveAbilityLevel(AbilityId.Doppelsoeldner17, out var level))
-				caster.StartBuff(BuffId.Cyclone_Buff_ImmuneAbil, level, 0, TimeSpan.Zero, caster);
+				caster.StartBuff(BuffId.Cyclone_Buff_ImmuneAbil, level, 0, TimeSpan.Zero, caster, skill.Id);
 		}
 
 		/// <summary>
@@ -95,14 +95,6 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 			var totalHits = 17;
 			var attackWidth = 50f;
 			var delayBetweenRepeats = TimeSpan.FromMilliseconds(200);
-
-			// Doppelsoeldner35 makes a bigger but slower attack
-			if (caster.IsAbilityActive(AbilityId.Doppelsoeldner35))
-			{
-				totalHits = 10;
-				attackWidth = 75f;
-				delayBetweenRepeats = TimeSpan.FromMilliseconds(330);
-			}
 
 			for (var i = 0; i < totalHits; ++i)
 			{

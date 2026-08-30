@@ -59,8 +59,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, damageDelay, skillHitDelay);
 				skillHit.ForceId = ForceId.GetNew();
 
-				target.StartBuff(BuffId.NecromancerPoison_Debuff, TimeSpan.FromSeconds(20), caster);
-				target.StartBuff(BuffId.GatherCorpse_Debuff, TimeSpan.FromSeconds(6), caster);
+				target.StartBuff(BuffId.NecromancerPoison_Debuff, skill.Level, 0, TimeSpan.FromSeconds(20), caster, skill.Id);
+				target.StartBuff(BuffId.GatherCorpse_Debuff, skill.Level, 0, TimeSpan.FromSeconds(6), caster, skill.Id);
 
 				skillHits.Add(skillHit);
 			}

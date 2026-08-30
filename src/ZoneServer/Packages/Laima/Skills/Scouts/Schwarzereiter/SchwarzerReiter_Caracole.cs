@@ -10,7 +10,6 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 
@@ -23,7 +22,12 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 	[SkillHandler(SkillId.Schwarzereiter_Caracole)]
 	public class SchwarzerReiter_CaracoleOverride : IGroundSkillHandler, IDynamicCasted
 	{
-		protected TimeSpan DamageDelay { get; } = TimeSpan.FromMilliseconds(200);
+		private const int HitDelay = 200;
+		private const int AniTime = 0;
+		private const float SilenceDurationPerLevel = 500f;
+		private const float AccuracyDurationPerLevel = 1000f;
+		private const float MaxSilenceDurationMs = 5000f;
+		private static readonly TimeSpan DebuffDelay = TimeSpan.FromMilliseconds(500);
 
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
@@ -57,27 +61,19 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			var hitDelay = 0;
-			var damageDelay = 200;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, damageDelay, hits);
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			if (caster.TryGetActiveAbility(AbilityId.Schwarzereiter16, out var ability))
-				caster.StartBuff(BuffId.Caracole_Silence_Debuff, 1f, 0f, TimeSpan.FromMilliseconds(1f), caster, skill.Id);
-			var value = 500 * skill.Level;
+
+			await SkillAttack(caster, skill, splashArea, HitDelay, AniTime, hits);
+			await skill.Wait(DebuffDelay);
+
+			var silenceDuration = SilenceDurationPerLevel * skill.Level;
 			if (caster.IsAbilityActive(AbilityId.Schwarzereiter16))
-				value *= 2;
-			SkillResultTargetBuff(caster, skill, BuffId.Caracole_Silence_Debuff, skill.Level, 0f, value, 1, 100, -1, hits);
-			value = 1000 * skill.Level;
-			SkillResultTargetBuff(caster, skill, BuffId.Caracole_HR_Debuff, skill.Level, 0f, value, 1, 100, -1, hits);
-			if (caster.IsAbilityActive(AbilityId.Schwarzereiter17))
-			{
-				foreach (var hit in hits)
-				{
-					var hitTarget = hit.Target;
-					if (hitTarget == null || !hitTarget.IsDead) continue;
-				}
-			}
+				silenceDuration *= 2;
+
+			silenceDuration = Math.Min(MaxSilenceDurationMs, silenceDuration);
+
+			SkillResultTargetBuff(caster, skill, BuffId.Caracole_Silence_Debuff, skill.Level, 0f, silenceDuration, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Caracole_HR_Debuff, skill.Level, 0f, AccuracyDurationPerLevel * skill.Level, 1, 100, -1, hits);
 		}
 	}
 }

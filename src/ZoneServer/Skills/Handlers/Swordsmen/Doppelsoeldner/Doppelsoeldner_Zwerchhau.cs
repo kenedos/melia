@@ -73,24 +73,21 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 				var modifier = SkillModifier.MultiHit(3);
 
 				if (caster.TryGetBuff(BuffId.DeedsOfValor, out var dovBuff))
-					modifier.FinalDamageMultiplier = dovBuff.NumArg2;
+					modifier.FinalDamageMultiplier *= dovBuff.NumArg2;
 
 				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 				target.TakeDamage(skillHitResult.Damage, caster);
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
 
-				if (caster.IsAbilityActive(AbilityId.Doppelsoeldner38))
-				{
-					// TODO: This knockdown effect pulls the enemies towards you
-					skillHit.KnockBackInfo = new KnockBackInfo(caster.Position, target, skill);
-					skillHit.ApplyKnockBack(target);
-				}
-				else
-				{
-					skillHit.HitEffect = HitEffect.Impact;
-				}
+				skillHit.HitEffect = HitEffect.Impact;
 
+				if (caster.IsAbilityActive(AbilityId.Doppelsoeldner38) && target.IsKnockdownable())
+				{
+					skillHit.KnockBackInfo = new KnockBackInfo(caster, target, KnockBackType.KnockDown, 180, 60, KnockDirection.TowardsCaster);
+					skillHit.HitInfo.KnockBackType = KnockBackType.KnockDown;
+					target.ApplyKnockdown(caster, skill, skillHit);
+				}
 
 				hits.Add(skillHit);
 
@@ -100,7 +97,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Doppelsoeldner
 			if (caster.IsAbilityActive(AbilityId.Doppelsoeldner26) && hitSomething)
 			{
 				var duration = TimeSpan.FromSeconds(3);
-				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster);
+				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Zucken);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

@@ -33,13 +33,12 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
-			if (!caster.IsAbilityActive(AbilityId.Oracle23))
-			{
-				var time = (int)skill.Properties.CaptionTime.TotalMilliseconds;
-				if (caster.IsAbilityActive(AbilityId.Oracle20))
-					time += caster.GetAbilityLevel(AbilityId.Oracle20) * 1000;
-				caster.StartBuff(BuffId.DivineMight_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(time), caster, skill.Id);
-			}
+			var time = (int)skill.Properties.CaptionTime.TotalMilliseconds;
+			if (caster.IsAbilityActive(AbilityId.Oracle20))
+				time += caster.GetAbilityLevel(AbilityId.Oracle20) * 1000;
+
+			caster.StartBuff(BuffId.DivineMight_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(time), caster, skill.Id);
+
 			var targetPos = originPos.GetRelative(farPos);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Oracle_DivineMight);
 		}
