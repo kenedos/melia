@@ -21,6 +21,11 @@ namespace Melia.Zone.Buffs.Handlers.Swordsmen.Fencer
 			buff.Target.InvalidateProperties();
 		}
 
+		public override void WhileActive(Buff buff)
+		{
+			Fencer_RapierGuard.EndWithoutRapier(buff);
+		}
+
 		public override void OnEnd(Buff buff)
 		{
 			RemovePropertyModifier(buff, buff.Target, PropertyName.DR_BM);

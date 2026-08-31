@@ -100,7 +100,7 @@ namespace Melia.Test.Balance
 			Job("Cataphract", JobId.Cataphract, false, EquipType.THSpear, EquipType.Spear),
 			Job("Rodelero", JobId.Rodelero, true, EquipType.Sword),
 			Job("Doppelsoeldner", JobId.Doppelsoeldner, false, EquipType.THSword, EquipType.Sword),
-			Job("Fencer", JobId.Fencer, false, EquipType.Rapier, EquipType.Sword),
+			Job("Fencer", JobId.Fencer, true, EquipType.Rapier, EquipType.Sword),
 
 			Job("Archer", JobId.Archer, false, EquipType.Bow, EquipType.THBow),
 			Job("Ranger", JobId.Ranger, false, EquipType.Bow, EquipType.THBow),

@@ -110,6 +110,12 @@ namespace Melia.Zone.Buffs.Base
 	public interface IBuffOnCastStartHandler { void OnCastStart(Buff buff, ICombatEntity caster, Skill skill); }
 
 	/// <summary>
+	/// Called when the entity starts using a skill, before any of its hits
+	/// are dealt.
+	/// </summary>
+	public interface IBuffOnSkillUseHandler { void OnSkillUse(Buff buff, ICombatEntity caster, Skill skill); }
+
+	/// <summary>
 	/// Called on the target after a SkillHitInfo is created, allowing
 	/// modification of the HitInfo (e.g., changing HitType to Endure
 	/// for stagger immunity).

@@ -18,7 +18,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	{
 		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
 		{
-			caster.StartBuff(BuffId.Preparation_Buff, 1f, 0f, skill.Properties.CaptionTime, caster, skill.Id);
+			caster.StartBuff(BuffId.Preparation_Buff, skill.Level, 0f, skill.Properties.CaptionTime, caster, skill.Id);
 		}
 
 		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)

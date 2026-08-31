@@ -1,4 +1,4 @@
-// Melia
+﻿// Melia
 // Database file
 // 
 // Values: id, className, name, type, [tags], level, duration, updateTime, overBuff, buffExpUp, removable, removeOnDeath, removeBySkill, save, [updateProperties]
@@ -267,13 +267,13 @@
 { id: 260, className: "IncreaseMagicDEF_Buff", name: "Increase Magic Defense", type: "Buff", level: 1, duration: 0, updateTime: 10000, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: true, updateProperties: ["ALL"] },
 { id: 261, className: "SpeForceFom_Buff", name: "Special Formation", type: "Buff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
 { id: 262, className: "SpearLunge_Debuff", name: "Spear Lunge", type: "Debuff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
-{ id: 263, className: "Lunge_Buff", name: "Lunge", type: "Buff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
+{ id: 263, className: "Lunge_Buff", name: "Lunge", type: "Buff", level: 1, duration: 0, updateTime: 500, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
 { id: 264, className: "Lunge_Debuff", name: "Lunge", type: "Debuff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
 { id: 265, className: "AttaqueCoquille_Debuff", name: "Attaque Coquille", type: "Debuff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
-{ id: 266, className: "Preparation_Buff", name: "Preparation", type: "Buff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
-{ id: 267, className: "Preparation_Buff_End", name: "Preparation", type: "Buff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
-{ id: 268, className: "EsquiveToucher_Buff", name: "Esquive Toucher", type: "Buff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
-{ id: 269, className: "Flanconnade_Buff", name: "Flanconnade", type: "Buff", level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
+{ id: 266, className: "Preparation_Buff", name: "Preparation", type: "Buff", level: 1, duration: 0, updateTime: 500, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
+{ id: 267, className: "Preparation_Buff_End", name: "Preparation", type: "Buff", level: 1, duration: 0, updateTime: 500, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
+{ id: 268, className: "EsquiveToucher_Buff", name: "Esquive Toucher", type: "Buff", level: 1, duration: 0, updateTime: 500, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
+{ id: 269, className: "Flanconnade_Buff", name: "Flanconnade", type: "Buff", level: 1, duration: 0, updateTime: 500, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
 { id: 270, className: "UnlockChest_After_Buff", name: "Increased movement speed", type: "Buff", level: 1, duration: 15000, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
 { id: 271, className: "ShinobiCloaking_Buff", name: "Stealth", type: "Buff", tags: ["Cloaking"], level: 1, duration: 0, updateTime: 0, overBuff: 1, buffExpUp: 0, removable: true, removeOnDeath: true, removeBySkill: true, save: false, updateProperties: ["ALL"] },
 { id: 272, className: "ShootDown_Debuff", name: "Shootdown", type: "Debuff", level: 1, duration: 10000, updateTime: 100, overBuff: 1, buffExpUp: 0, removable: false, removeOnDeath: true, removeBySkill: true, save: false },

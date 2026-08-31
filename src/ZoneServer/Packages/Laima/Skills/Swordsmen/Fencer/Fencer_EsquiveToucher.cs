@@ -9,6 +9,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
 namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
@@ -22,6 +23,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 	{
 		private static readonly (int HitDelay, int AniTime)[] HitTimings = [(950, 750), (1400, 450), (1800, 400), (1850, 100), (2100, 200)];
 		private const int BuffDurationMs = 3000;
+		private const int MovementCheckIntervalMs = 100;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -49,7 +51,36 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			foreach (var timing in HitTimings)
-				await SkillAttack(caster, skill, splashArea, timing.HitDelay, timing.AniTime);
+			{
+				if (!await this.WaitWhileStanding(skill, caster, timing.AniTime))
+					break;
+
+				await SkillAttack(caster, skill, splashArea, timing.HitDelay);
+			}
+		}
+
+		/// <summary>
+		/// Waits for the given duration, returning false if the caster
+		/// started moving before it elapsed.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <param name="durationMs"></param>
+		private async Task<bool> WaitWhileStanding(Skill skill, ICombatEntity caster, int durationMs)
+		{
+			var remaining = durationMs;
+
+			while (remaining > 0)
+			{
+				var waitTime = Math.Min(remaining, MovementCheckIntervalMs);
+				await skill.Wait(TimeSpan.FromMilliseconds(waitTime));
+				remaining -= waitTime;
+
+				if (caster.Components.TryGet<MovementComponent>(out var movement) && movement.IsMoving)
+					return false;
+			}
+
+			return true;
 		}
 	}
 }

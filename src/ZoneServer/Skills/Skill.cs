@@ -698,6 +698,24 @@ namespace Melia.Zone.Skills
 			}
 
 			Interlocked.Exchange(ref _runnerCount, 0);
+
+			this.NotifyBuffsOnSkillUse();
+		}
+
+		/// <summary>
+		/// Notifies the owner's active buffs that implement
+		/// IBuffOnSkillUseHandler that this skill is being used.
+		/// </summary>
+		private void NotifyBuffsOnSkillUse()
+		{
+			if (this.Owner == null || !this.Owner.Components.TryGet<BuffComponent>(out var buffs))
+				return;
+
+			foreach (var buff in buffs.GetList())
+			{
+				if (buff.Handler is IBuffOnSkillUseHandler skillUseHandler)
+					skillUseHandler.OnSkillUse(buff, this.Owner, this);
+			}
 		}
 
 		/// <summary>

@@ -530,6 +530,7 @@ namespace Melia.Test.Balance.Sfr
 		public static readonly Dictionary<string, float> SkillSpMultipliers = new()
 		{
 			["Highlander_CrossGuard"] = 0f,
+			["Fencer_Preparation"] = 0f,
 		};
 
 		/// <summary>

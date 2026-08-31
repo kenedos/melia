@@ -39,7 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 			await skill.Wait(TimeSpan.FromMilliseconds(900));
 
 			if (caster.TryGetEquipItem(EquipSlot.RightHand, out var equipItem) && equipItem.Data.EquipType1 == EquipType.Rapier)
-				caster.StartBuff(BuffId.EpeeGarde_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(1800000f), caster, skill.Id);
+				caster.StartBuff(BuffId.EpeeGarde_Buff, skill.Level, 0f, TimeSpan.FromMinutes(5), caster, skill.Id);
 		}
 	}
 }
