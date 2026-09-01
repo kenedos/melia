@@ -42,6 +42,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private const double MoveIntervalAlpha = 1 / 16.0;
 		private const double MinOffsetCreepPerSample = 0.0005;
 		private const float SameDirectionThreshold = 0.99f;
+		private const double MaxSpeedTolerance = 1.5;
+		private static readonly TimeSpan MaxProjectionTime = TimeSpan.FromMilliseconds(500);
 
 		private float _lastClientTime;
 		private Direction _lastClientDir;
@@ -920,29 +922,83 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Returns the measured move speed, bounded by the speed the entity
+		/// is actually able to travel at.
+		/// </summary>
+		/// <remarks>
+		/// A sample spanning a warp, dash or knockback reports a speed no
+		/// movement could have produced, and one taken before a drastic
+		/// speed change outlives the speed it was measured at.
+		/// </remarks>
+		private double GetExtrapolationSpeed()
+		{
+			var maxSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD) * Movement.UnitsPerMspdSecond * MaxSpeedTolerance;
+			if (_measuredSpeed > maxSpeed)
+				return maxSpeed;
+
+			return _measuredSpeed;
+		}
+
+		/// <summary>
+		/// Returns the position the entity's client is projected to have it
+		/// at after the given lead time, or its current position if it isn't
+		/// moving under client control.
+		/// </summary>
+		/// <remarks>
+		/// The projection runs from the last position the client confirmed,
+		/// so callers asking for different lead times don't stack their
+		/// leads on top of each other's.
+		/// </remarks>
+		/// <param name="leadTime"></param>
+		public Position GetProjectedPosition(TimeSpan leadTime)
+		{
+			lock (_positionSyncLock)
+			{
+				if (!this.IsMoving || this.MoveTarget != MoveTargetType.Direction || !_hasClientSample)
+					return this.Entity.Position;
+
+				// Past the client's latency there's nothing left to catch up
+				// on, so that's as far as the gap since its last packet is
+				// taken to reach.
+				var latency = this.Entity is Character character ? character.Connection.ClientLatency : TimeSpan.Zero;
+				var elapsed = _extrapolatedTime;
+
+				if (elapsed > latency)
+					elapsed = latency;
+
+				var horizon = elapsed + leadTime;
+				if (horizon > MaxProjectionTime)
+					horizon = MaxProjectionTime;
+
+				var speed = this.GetExtrapolationSpeed();
+				var distance = speed * horizon.TotalSeconds;
+
+				if (distance <= 0)
+					return this.Entity.Position;
+
+				var position = _lastClientPos.GetRelative(this.Entity.Direction, (float)distance);
+
+				if (!this.Entity.Map.Ground.IsValidPosition(position))
+					return this.Entity.Position;
+
+				if (this.Entity.Map.Ground.TryGetHeightAt(position, out var height))
+					position.Y = height;
+
+				return position;
+			}
+		}
+
+		/// <summary>
 		/// Returns the position the entity is projected to occupy after the
 		/// configured lag compensation time, or its current position if it
 		/// isn't moving under client control.
 		/// </summary>
 		public Position GetLeadPosition()
 		{
-			var position = this.Entity.Position;
+			var jitter = Math.Min(_clientJitter, MaxLagCompensationJitter.TotalSeconds);
+			var leadTime = LagCompensationTime + TimeSpan.FromSeconds(jitter);
 
-			if (!this.IsMoving || this.MoveTarget != MoveTargetType.Direction)
-				return position;
-
-			if (_measuredSpeed <= 0)
-				return position;
-
-			var leadTime = LagCompensationTime.TotalSeconds + Math.Min(_clientJitter, MaxLagCompensationJitter.TotalSeconds);
-
-			var direction = this.Entity.Direction;
-			var distance = _measuredSpeed * leadTime;
-
-			position.X += (float)(direction.Cos * distance);
-			position.Z += (float)(direction.Sin * distance);
-
-			return position;
+			return this.GetProjectedPosition(leadTime);
 		}
 
 		/// <summary>
@@ -953,7 +1009,8 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		/// <param name="elapsed"></param>
 		private void UpdateExtrapolatedPosition(TimeSpan elapsed)
 		{
-			if (_measuredSpeed <= 0)
+			var measuredSpeed = this.GetExtrapolationSpeed();
+			if (measuredSpeed <= 0)
 				return;
 
 			var maxTime = _avgMoveInterval + _avgMoveInterval;
@@ -968,7 +1025,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			_extrapolatedTime += step;
 
 			var direction = this.Entity.Direction;
-			var distance = _measuredSpeed * step.TotalSeconds;
+			var distance = measuredSpeed * step.TotalSeconds;
 			var position = this.Entity.Position;
 
 			position.X += (float)(direction.Cos * distance);

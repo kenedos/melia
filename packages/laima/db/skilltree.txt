@@ -1,4 +1,4 @@
-// Melia
+﻿// Melia
 // Database file
 // 
 // This database is partially reference only, as the client will show only
@@ -68,6 +68,7 @@
 { jobId: 1009, skillId: 11007, skillName: "Redel", unlockLevel: 1, maxLevel: 10 },
 { jobId: 1009, skillId: 11009, skillName: "Zwerchhau", unlockLevel: 16, maxLevel: 10 },
 { jobId: 1009, skillId: 11005, skillName: "Cyclone", unlockLevel: 31, maxLevel: 10 },
+{ jobId: 1009, skillId: 11003, skillName: "Double Pay Earn", unlockLevel: 31, maxLevel: 10 },
 { jobId: 1010, skillId: 10502, skillName: "Montano", unlockLevel: 1, maxLevel: 10 },
 { jobId: 1010, skillId: 10503, skillName: "Targe Smash", unlockLevel: 1, maxLevel: 10 },
 { jobId: 1010, skillId: 10504, skillName: "Shield Push", unlockLevel: 1, maxLevel: 10 },

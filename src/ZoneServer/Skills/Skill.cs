@@ -26,6 +26,8 @@ namespace Melia.Zone.Skills
 	{
 		private static long ObjectIds = ObjectIdRanges.Skills;
 
+		private static readonly TimeSpan MeleeLeadTime = TimeSpan.FromMilliseconds(250);
+
 		private readonly object _ctsLock = new();
 		private CancellationTokenSource _cts;
 		private int _runnerCount;
@@ -612,11 +614,7 @@ namespace Melia.Zone.Skills
 			// not move past their AoEs when attacking.
 			var originTranslation = caster.Position;
 			if (caster is Character player && player.Movement.IsMoving)
-			{
-				var speed = (int)player.Properties.GetFloat(PropertyName.MSPD);
-				var translationPerSpeed = speed / 4;
-				originTranslation = caster.Position.GetRelative(caster.Direction, translationPerSpeed);
-			}
+				originTranslation = player.Movement.GetProjectedPosition(MeleeLeadTime);
 
 			if (originTranslation != caster.Position)
 				result.OriginPos = originTranslation;

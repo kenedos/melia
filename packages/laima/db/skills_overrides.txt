@@ -1,4 +1,4 @@
-﻿// Melia
+// Melia
 // Database file
 // 
 // Values: skillId, className, name, [basicSp], [basicCast], [splashType], [splashRange], [splashHeight], [splashAngle], [splashRate], [maxRange], [factor], [factorByLevel], [atkAdd], [atkAddByLevel], [cooldownTime], [overheatCount], [overheatDelay], [overheatGroup], [enableCastMove], [enableCastRotate], [castInterruptible], [useType], [attackType], [activationType]
@@ -115,16 +115,16 @@
 
 // Doppelsoeldner
 //---------------------------------------------------------------------------
-{ skillId: 11001, className: "Doppelsoeldner_DeedsOfValor", name: "Deeds of Valor", basicSp: 29, lvUpSpendSp: 1.5, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 45000 },
+{ skillId: 11001, className: "Doppelsoeldner_DeedsOfValor", name: "Deeds of Valor", basicSp: 26, lvUpSpendSp: 1.34, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 11002, className: "Doppelsoeldner_Mordschlag", name: "Mordschlag", basicSp: 12, lvUpSpendSp: 0.62, splashRate: 2, factor: 570, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "5" },
-{ skillId: 11003, className: "Doppelsoeldner_Double_pay_earn", name: "Double Pay Earn", basicSp: 33, lvUpSpendSp: 1.71, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 60000 },
-{ skillId: 11004, className: "Doppelsoeldner_Punish", name: "Punish", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 15, factor: 259, factorByLevel: 14.1, hitCount: 1, multiHitCount: 2, cooldownTime: 10000 },
-{ skillId: 11005, className: "Doppelsoeldner_Cyclone", name: "Cyclone", basicSp: 21, lvUpSpendSp: 1.45, splashRate: 8, factor: 432, factorByLevel: 32.0, hitCount: 1, multiHitCount: 33, cooldownTime: 10000 },
-{ skillId: 11006, className: "Doppelsoeldner_Zornhau", name: "Zornhau", basicSp: 14, lvUpSpendSp: 0.72, splashRate: 0, factor: 276, factorByLevel: 15.1, hitCount: 1, multiHitCount: 2, cooldownTime: 15000, overheatCount: "3" },
+{ skillId: 11003, className: "Doppelsoeldner_Double_pay_earn", name: "Double Pay Earn", basicSp: 28, lvUpSpendSp: 1.93, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
+{ skillId: 11004, className: "Doppelsoeldner_Punish", name: "Punish", basicSp: 15, lvUpSpendSp: 0.78, splashRate: 15, factor: 222, factorByLevel: 12.1, hitCount: 1, multiHitCount: 2, cooldownTime: 6000 },
+{ skillId: 11005, className: "Doppelsoeldner_Cyclone", name: "Cyclone", basicSp: 20, lvUpSpendSp: 1.38, splashRate: 8, factor: 410, factorByLevel: 30.4, hitCount: 1, multiHitCount: 33, cooldownTime: 8000 },
+{ skillId: 11006, className: "Doppelsoeldner_Zornhau", name: "Zornhau", basicSp: 11, lvUpSpendSp: 0.57, splashRate: 0, factor: 239, factorByLevel: 13.0, hitCount: 1, multiHitCount: 2, cooldownTime: 7000, overheatCount: "3" },
 { skillId: 11007, className: "Doppelsoeldner_Redel", name: "Redel", basicSp: 10, lvUpSpendSp: 0.52, splashRate: 0, factor: 37, factorByLevel: 14, hitCount: 1, multiHitCount: 10, cooldownTime: 1000 },
 { skillId: 11008, className: "Doppelsoeldner_Zucken", name: "Zucken", basicSp: 9, lvUpSpendSp: 0.47, splashRate: 0, factor: 46, factorByLevel: 17, hitCount: 1, multiHitCount: 8, cooldownTime: 1000 },
-{ skillId: 11009, className: "Doppelsoeldner_Zwerchhau", name: "Zwerchhau", basicSp: 17, lvUpSpendSp: 0.87, splashRate: 3, factor: 193, factorByLevel: 10.4, hitCount: 1, multiHitCount: 3, cooldownTime: 22500, overheatCount: "3" },
-{ skillId: 11010, className: "Doppelsoeldner_Sturzhau", name: "Sturtzhau", basicSp: 15, lvUpSpendSp: 0.77, splashRate: 3, factor: 97, factorByLevel: 5.2, hitCount: 1, multiHitCount: 8, cooldownTime: 10000, overheatCount: "2" },
+{ skillId: 11009, className: "Doppelsoeldner_Zwerchhau", name: "Zwerchhau", basicSp: 12, lvUpSpendSp: 0.61, splashRate: 3, factor: 111, factorByLevel: 6.0, hitCount: 1, multiHitCount: 3, cooldownTime: 8000, overheatCount: "3" },
+{ skillId: 11010, className: "Doppelsoeldner_Sturzhau", name: "Sturtzhau", basicSp: 14, lvUpSpendSp: 0.72, splashRate: 3, factor: 95, factorByLevel: 5.1, hitCount: 1, multiHitCount: 8, cooldownTime: 9000, overheatCount: "2" },
 { skillId: 11011, className: "Doppelsoeldner_Zornhau_Abil", name: "Zornhau: Lasting Shock", basicSp: 16, lvUpSpendSp: 0.83, splashRate: 0, factor: 44, factorByLevel: 22, hitCount: 1, multiHitCount: 1, cooldownTime: 22500, overheatCount: "3" },
 { skillId: 11012, className: "Doppelsoeldner_Double_pay_earn_Dummy", name: "Double Pay Earn", basicSp: 6, lvUpSpendSp: 0.31, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1 },
 
@@ -134,10 +134,10 @@
 { skillId: 11102, className: "Fencer_Lunge", name: "Lunge", basicSp: 20, lvUpSpendSp: 1.03, splashRate: 0, factor: 230, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
 { skillId: 11103, className: "Fencer_SeptEtoiles", name: "Sept Etoiles", basicSp: 16, lvUpSpendSp: 0.83, splashRate: 0, factor: 100, factorByLevel: 5.4, hitCount: 1, multiHitCount: 8, cooldownTime: 7000, overheatCount: "0" },
 { skillId: 11104, className: "Fencer_AttaqueCoquille", name: "Attaque Coquille", basicSp: 16, lvUpSpendSp: 0.83, splashRate: 0, factor: 912, hitCount: 1, multiHitCount: 1, cooldownTime: 8000 },
-{ skillId: 11105, className: "Fencer_EsquiveToucher", name: "Esquive Toucher", basicSp: 16, lvUpSpendSp: 0.83, splashRate: 0, factor: 152, factorByLevel: 8.3, hitCount: 1, multiHitCount: 5, cooldownTime: 4000 },
-{ skillId: 11106, className: "Fencer_Preparation", name: "Preparation", basicSp: 31, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0, captionRatio1: 0, captionRatio1ByLevel: 30, captionRatio2: 550, captionRatio2ByLevel: 0, captionTime: 3 },
+{ skillId: 11105, className: "Fencer_EsquiveToucher", name: "Esquive Toucher", basicSp: 15, lvUpSpendSp: 0.78, splashRate: 0, factor: 151, factorByLevel: 8.2, hitCount: 1, multiHitCount: 5, cooldownTime: 4000 },
+{ skillId: 11106, className: "Fencer_Preparation", name: "Preparation", basicSp: 31, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0, captionRatio1: 0, captionRatio1ByLevel: 6.7, captionRatio2: 0, captionRatio2ByLevel: 1.4, captionTime: 3 },
 { skillId: 11107, className: "Fencer_Flanconnade", name: "Flanconnade", basicSp: 12, lvUpSpendSp: 0.62, splashRate: 0, factor: 231, factorByLevel: 12.6, hitCount: 1, multiHitCount: 2, cooldownTime: 10000, overheatCount: "5" },
-{ skillId: 11108, className: "Fencer_BalestraFente", name: "Balestra Fente", basicSp: 16, lvUpSpendSp: 0.82, splashRate: 15, factor: 253, factorByLevel: 13.6, hitCount: 1, multiHitCount: 4, cooldownTime: 6000 },
+{ skillId: 11108, className: "Fencer_BalestraFente", name: "Balestra Fente", basicSp: 16, lvUpSpendSp: 0.82, splashRate: 15, factor: 243, factorByLevel: 13.1, hitCount: 1, multiHitCount: 4, cooldownTime: 6000 },
 { skillId: 11109, className: "Fencer_AttaqueAuFer", name: "Attaque au Fer", basicSp: 21, lvUpSpendSp: 1.09, splashRate: 0, factor: 971, hitCount: 1, multiHitCount: 1, cooldownTime: 17500 },
 { skillId: 11110, className: "Fencer_EpeeGarde", name: "Epee Garde", basicSp: 27, lvUpSpendSp: 1.38, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 1.1, captionRatio2: 0, captionRatio2ByLevel: 0.9 },
 { skillId: 11111, className: "Fencer_Fleche", name: "Fleche", basicSp: 12, lvUpSpendSp: 0.83, splashRate: 0, factor: 162, factorByLevel: 12.0, hitCount: 1, multiHitCount: 3, cooldownTime: 7000, overheatCount: "3" },
@@ -639,7 +639,7 @@
 { skillId: 30503, className: "Wugushi_Bewitch", name: "Bewitch", basicSp: 20, lvUpSpendSp: 1.03, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 13500 },
 { skillId: 30504, className: "Wugushi_WugongGu", name: "Wugong Gu", basicSp: 10, lvUpSpendSp: 0.52, splashRate: 0, factor: 199, factorByLevel: 10.9, hitCount: 1, multiHitCount: 1, cooldownTime: 3000, overheatCount: "2" },
 { skillId: 30505, className: "Wugushi_ThrowGuPot", name: "Poison Pot", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 0, factor: 28, factorByLevel: 1.5, hitCount: 1, multiHitCount: 1, cooldownTime: 11000 },
-{ skillId: 30506, className: "Wugushi_JincanGu", name: "Golden Frog", basicSp: 21, lvUpSpendSp: 1.07, splashRate: 0, factor: 110, factorByLevel: 5.9, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
+{ skillId: 30506, className: "Wugushi_JincanGu", name: "Golden Frog", basicSp: 21, lvUpSpendSp: 1.07, splashRate: 0, factor: 111, factorByLevel: 6.0, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
 { skillId: 30507, className: "Wugushi_Zhendu", name: "Zhendu", basicSp: 26, lvUpSpendSp: 1.34, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 1.5, captionRatio2: 0, captionRatio2ByLevel: 1.5, captionTime: 300 },
 { skillId: 30508, className: "Wugushi_LatentVenom", name: "Latent Venom", basicSp: 11, lvUpSpendSp: 0.57, splashRate: 0, factor: 204, factorByLevel: 11.1, hitCount: 1, multiHitCount: 1, cooldownTime: 4000, overheatCount: "2" },
 { skillId: 30509, className: "Wugushi_WideMiasma", name: "Wide Miasma", basicSp: 18, lvUpSpendSp: 0.92, splashRate: 0, factor: 14, factorByLevel: 0.7, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
@@ -842,7 +842,7 @@
 { skillId: 40402, className: "Dievdirbys_CarveZemina", name: "Statue of Goddess Zemyna", basicSp: 22, lvUpSpendSp: 1.14, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, captionRatio2: 15, captionRatio2ByLevel: 2, captionRatio3: 20, captionRatio3ByLevel: 3 },
 { skillId: 40403, className: "Dievdirbys_CarveLaima", name: "Statue of Goddess Laima", basicSp: 23, lvUpSpendSp: 1.18, splashRate: 0, factor: 10, factorByLevel: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, overheatCount: "0", captionRatio2: 20, captionRatio2ByLevel: 3, captionRatio3: 10, captionRatio3ByLevel: 1, captionTime: 15, captionTimeByLevel: 2 },
 { skillId: 40404, className: "Dievdirbys_Carve", name: "Carve Attack", basicSp: 12, lvUpSpendSp: 0.62, splashRate: -1, factor: 147, factorByLevel: 8.0, hitCount: 1, multiHitCount: 5, cooldownTime: 6000, overheatCount: "5" },
-{ skillId: 40405, className: "Dievdirbys_CarveOwl", name: "Carve Owl", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 0, factor: 127, factorByLevel: 6.9, hitCount: 1, multiHitCount: 33, overheatCount: "3", cooldownTime: 15000, captionRatio3: 20, captionRatio3ByLevel: 3, captionTime: 15, captionTimeByLevel: 2 },
+{ skillId: 40405, className: "Dievdirbys_CarveOwl", name: "Carve Owl", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 0, factor: 95, factorByLevel: 5.2, hitCount: 1, multiHitCount: 33, overheatCount: "3", cooldownTime: 15000, captionRatio3: 20, captionRatio3ByLevel: 3, captionTime: 15, captionTimeByLevel: 2 },
 { skillId: 40406, className: "Dievdirbys_CarveAustrasKoks", name: "Carve World Tree", basicSp: 29, lvUpSpendSp: 1.48, splashRate: 0, factor: 13, factorByLevel: 1.3, hitCount: 1, multiHitCount: 1, cooldownTime: 20000 },
 { skillId: 40407, className: "Dievdirbys_CarveAusirine", name: "Statue of Goddess Ausrine", basicSp: 24, lvUpSpendSp: 1.65, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, captionRatio2: 15, captionRatio2ByLevel: 2, captionRatio3: 20, captionRatio3ByLevel: 3 },
 

@@ -1,0 +1,120 @@
+﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Melia.Shared.Data.Database;
+using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
+using Melia.Shared.Packages;
+using Melia.Shared.World;
+using Melia.Zone.Network;
+using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Handlers;
+using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.SplashAreas;
+using Melia.Zone.World.Actors;
+using static Melia.Shared.Util.TaskHelper;
+using static Melia.Zone.Skills.SkillUseFunctions;
+
+namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Doppelsoeldner
+{
+	/// <summary>
+	/// Handler for the Doppelsoeldner skill Zornhau.
+	/// </summary>
+	[Package("laima")]
+	[SkillHandler(SkillId.Doppelsoeldner_Zornhau)]
+	public class Doppelsoeldner_ZornhauOverride : IGroundSkillHandler
+	{
+		private const int BuffRemoveChancePerLevel = 5;
+		private readonly static TimeSpan DebuffDuration = TimeSpan.FromSeconds(5);
+
+		/// <summary>
+		/// Handles skill, damaging targets.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <param name="originPos"></param>
+		/// <param name="farPos"></param>
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		{
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+
+			skill.IncreaseOverheat();
+			caster.TurnTowards(farPos);
+			caster.SetAttackState(true);
+
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 30, angle: 0);
+			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+
+			var targetHandle = target?.Handle ?? 0;
+
+			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
+
+			skill.Run(this.Attack(skill, caster, splashArea));
+		}
+
+		/// <summary>
+		/// Executes the actual attack after a delay.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <param name="splashArea"></param>
+		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
+		{
+			var hitDelay = TimeSpan.FromMilliseconds(400);
+			var aniTime = TimeSpan.FromMilliseconds(150);
+			var skillHitDelay = TimeSpan.Zero;
+
+			await skill.Wait(hitDelay);
+
+			var hits = new List<SkillHitInfo>();
+			var hitSomething = false;
+
+			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
+
+			foreach (var target in targets.LimitBySDR(caster, skill))
+			{
+				var modifier = SkillModifier.MultiHit(2);
+
+				if (caster.TryGetActiveAbilityLevel(AbilityId.Doppelsoeldner22, out var deepCutLevel))
+					modifier.HitCount += deepCutLevel;
+
+				var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
+				target.TakeDamage(skillHitResult.Damage, caster);
+
+				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+				skillHit.HitEffect = HitEffect.Impact;
+				hits.Add(skillHit);
+
+				// TODO: On latest the game actually no longer applies this,
+				// even though it still lists it in the description. Should
+				// probably have some kind of feature to turn this on/off.
+				target.StartBuff(BuffId.Common_Shock, skill.Level, 0, DebuffDuration, caster, skill.Id);
+
+				if (caster.IsAbilityActive(AbilityId.Doppelsoeldner36))
+					target.StartBuff(BuffId.Zornhau_Debuff, skill.Level, skillHitResult.Damage * 0.2f, DebuffDuration, caster, skill.Id);
+
+				var buffRemoveChance = BuffRemoveChancePerLevel * skill.Level;
+				target.RemoveRandomBuff(buffRemoveChance);
+
+				hitSomething = true;
+			}
+
+			// Must hit at least 1 enemy to continue combo?
+			if (hitSomething)
+			{
+				var duration = TimeSpan.FromSeconds(3);
+				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Zucken);
+			}
+
+			Send.ZC_SKILL_HIT_INFO(caster, hits);
+		}
+	}
+}
+

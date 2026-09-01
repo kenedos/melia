@@ -876,8 +876,6 @@ namespace Melia.Zone.Skills.Helpers
 			return true;
 		}
 
-		private const float UnitsPerMspdSecond = 2.5f;
-
 		public static Position GetLeadPosition(ICombatEntity target, int leadMs, ICombatEntity caster = null, float maxLeadDistance = 150f)
 		{
 			if (target == null || leadMs <= 0)
@@ -895,7 +893,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (speed <= 0f)
 				return target.Position.GetRelative(perpDir, lateralOffset * 0.5f);
 
-			var distance = speed * UnitsPerMspdSecond * (leadMs / 1000f);
+			var distance = speed * Movement.UnitsPerMspdSecond * (leadMs / 1000f);
 			if (distance > maxLeadDistance)
 				distance = maxLeadDistance;
 

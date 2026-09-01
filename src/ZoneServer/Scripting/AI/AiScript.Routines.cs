@@ -227,7 +227,7 @@ namespace Melia.Zone.Scripting.AI
 				// the current path is no longer useful.
 				var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
 				var distToTarget = (float)this.Entity.Position.Get2DDistance(target.Position);
-				var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
+				var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * Movement.UnitsPerMspdSecond) : 0f;
 
 				var destination = this.GetLeadPosition(target, travelSec);
 				destination = this.ApplyAllySeparation(destination);
@@ -255,12 +255,6 @@ namespace Melia.Zone.Scripting.AI
 			if (arrivedInRange)
 				yield return this.StopMove();
 		}
-
-		/// <summary>
-		/// World units covered per second, per point of MSPD. Empirically
-		/// a 30 MSPD entity travels ~75 units/s, so 1 MSPD ≈ 2.5 units/s.
-		/// </summary>
-		private const float UnitsPerMspdSecond = 2.5f;
 
 		/// <summary>
 		/// Returns the position the target will reach in
@@ -299,7 +293,7 @@ namespace Melia.Zone.Scripting.AI
 				return target.Position;
 
 			var targetSpeed = target.Properties.GetFloat(PropertyName.MSPD);
-			var distance = targetSpeed * UnitsPerMspdSecond * leadSec;
+			var distance = targetSpeed * Movement.UnitsPerMspdSecond * leadSec;
 			if (distance > MaxLeadDistance) distance = MaxLeadDistance;
 
 			var leadPos = target.Position.GetRelative(target.Direction, distance);
@@ -310,7 +304,7 @@ namespace Melia.Zone.Scripting.AI
 			if (mobSpeed > 0f)
 			{
 				var mobDistToLead = (float)this.Entity.Position.Get2DDistance(leadPos);
-				var mobTravelSec = mobDistToLead / (mobSpeed * UnitsPerMspdSecond);
+				var mobTravelSec = mobDistToLead / (mobSpeed * Movement.UnitsPerMspdSecond);
 				if (mobTravelSec > MaxLeadSeconds) return target.Position;
 			}
 
@@ -378,7 +372,7 @@ namespace Melia.Zone.Scripting.AI
 			// hit lands where the target will be when the cast resolves.
 			var mobSpeed = this.Entity.Properties.GetFloat(PropertyName.MSPD);
 			var distToTarget = (float)this.Entity.Position.Get2DDistance(_target.Position);
-			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * UnitsPerMspdSecond) : 0f;
+			var travelSec = mobSpeed > 0f ? distToTarget / (mobSpeed * Movement.UnitsPerMspdSecond) : 0f;
 			var leadSec = travelSec + shootSec;
 
 			var destination = this.GetLeadPosition(_target, leadSec);
