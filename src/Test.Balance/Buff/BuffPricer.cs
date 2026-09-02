@@ -462,6 +462,13 @@ namespace Melia.Test.Balance.Buff
 			var next = 1f;
 			var escalations = 0;
 
+			// The widest rung the ladder can reach. Most of the roster reads
+			// neutral at every scale - a buff whose magnitude never came from
+			// the caption ratios - and climbing to that answer a rung at a time
+			// spends four sweeps to learn what the top one says on its own.
+			var ceiling = Math.Min(BuffDials.MaxSlotScale, MathF.Pow(BuffDials.EscalationStep, BuffDials.EscalationSteps));
+			var probingCeiling = false;
+
 			for (var iteration = 0; iteration <= BuffDials.SolveIterations; ++iteration)
 			{
 				var reading = Sweep(subject, next, pool, slots);
@@ -469,6 +476,20 @@ namespace Melia.Test.Balance.Buff
 
 				var value = read(reading);
 				var excess = value - 1f;
+
+				// Alive somewhere below the top, so the rungs decide where: the
+				// ceiling's own reading is thrown away and the ladder runs from
+				// its first step, which is the scale the search would have
+				// sampled had the ceiling never been probed.
+				if (probingCeiling && excess > BuffDials.EffectTolerance)
+				{
+					probingCeiling = false;
+					next = Math.Min(BuffDials.MaxSlotScale, BuffDials.EscalationStep);
+					escalations = 1;
+					iteration--;
+
+					continue;
+				}
 
 				// A reading under the noise floor is not evidence the buff is
 				// worth nothing. Every axis here is a clamped gap - block is
@@ -479,8 +500,17 @@ namespace Melia.Test.Balance.Buff
 				// neutral.
 				if (excess <= BuffDials.EffectTolerance)
 				{
-					if (next >= BuffDials.MaxSlotScale || escalations >= BuffDials.EscalationSteps)
+					if (probingCeiling || next >= BuffDials.MaxSlotScale || escalations >= BuffDials.EscalationSteps)
 						throw new InvalidOperationException($"{subject.SkillClassName}: measured at or below neutral up to x{next:0.##}, so there is nothing to price.");
+
+					if (escalations == 0 && next < ceiling)
+					{
+						probingCeiling = true;
+						next = ceiling;
+						iteration--;
+
+						continue;
+					}
 
 					next = Math.Min(BuffDials.MaxSlotScale, next * BuffDials.EscalationStep);
 					escalations++;

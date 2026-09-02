@@ -52,7 +52,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Doppelsoeldner
 			caster.StopBuff(BuffId.Redel_Buff);
 
 			skill.IncreaseOverheat();
-			caster.TurnTowards(farPos);
 			caster.SetAttackState(true);
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 30, angle: 0);

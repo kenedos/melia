@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+	<RunConfiguration>
+		<!-- Env vars only reach the tests when the host is a separate process. -->
+		<InIsolation>true</InIsolation>
+		<TestSessionTimeout>0</TestSessionTimeout>
+		<EnvironmentVariables>
+			<BALANCE_SFR>1</BALANCE_SFR>
+			<BALANCE_SFR_APPLY>1</BALANCE_SFR_APPLY>
+			<BALANCE_BUFF>1</BALANCE_BUFF>
+			<BALANCE_BUFF_APPLY>1</BALANCE_BUFF_APPLY>
+		</EnvironmentVariables>
+	</RunConfiguration>
+</RunSettings>

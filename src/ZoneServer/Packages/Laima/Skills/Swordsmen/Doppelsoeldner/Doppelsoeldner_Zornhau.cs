@@ -44,8 +44,9 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Doppelsoeldner
 			}
 
 			skill.IncreaseOverheat();
-			caster.TurnTowards(farPos);
 			caster.SetAttackState(true);
+
+			caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, TimeSpan.FromSeconds(3), caster, SkillId.Doppelsoeldner_Zucken);
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 30, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
@@ -104,13 +105,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Doppelsoeldner
 				target.RemoveRandomBuff(buffRemoveChance);
 
 				hitSomething = true;
-			}
-
-			// Must hit at least 1 enemy to continue combo?
-			if (hitSomething)
-			{
-				var duration = TimeSpan.FromSeconds(3);
-				caster.StartBuff(BuffId.Zucken_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Zucken);
 			}
 
 			Send.ZC_SKILL_HIT_INFO(caster, hits);

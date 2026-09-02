@@ -733,6 +733,23 @@ namespace Melia.Test.Balance.Sfr
 		/// </remarks>
 		public const float DefenseTrimShare = 0.2f;
 
+		/// <summary>
+		/// How many standard errors a defence reading has to clear before it is
+		/// priced rather than read as no defensive value at all.
+		/// </summary>
+		/// <remarks>
+		/// A press whose trials disagree about whether it prevented one swing
+		/// or none has not measured a rider, it has measured its own noise, and
+		/// pricing that noise is what made a trap, a summon and a DoT come back
+		/// with a different factor on every run - the same skill reading 0.19
+		/// swings prevented one run and 1.23 the next. The estimator is fine;
+		/// what was missing is the question of whether it has anything to
+		/// estimate. Below this the rider is dropped, which is the same answer
+		/// the model already gives a press with no defensive effect, and the
+		/// factor stops depending on which side of the noise a run landed on.
+		/// </remarks>
+		public const float DefenseSignificance = 2f;
+
 
 
 
@@ -866,15 +883,39 @@ namespace Melia.Test.Balance.Sfr
 		/// How many times the whole low/high scenario pair is repeated.
 		/// </summary>
 		/// <remarks>
-		/// One, because a press is reproducible now. Under the virtual clock
-		/// every scenario reading - reach, hit count, SP charge slope - comes
-		/// out bit-identical run to run, so repeating the pair costs three
-		/// times the windows to produce three copies of the same number. It
-		/// was three while the probe ran on the wall clock and a volley landed
-		/// a different number of arrows inside the window each time. Raise it
-		/// only if something reintroduces real time into a press.
+		/// Three, because a press is reproducible only as far as its own
+		/// handler is. Most scenario readings do come out bit-identical under
+		/// the virtual clock, and this was one on that basis. A handler with an
+		/// async tail is the exception: VirtualClock completes its waiters
+		/// inline, but the runtime runs a continuation inline only while its
+		/// stack-depth guard allows and queues it to the thread pool past that,
+		/// so a trap's pad or a summon's volley lands one tick either side of
+		/// the count window depending on the call depth at that moment. At one
+		/// trial that flips the hit count outright - Sapper_LegHoldTrap read
+		/// 1.167 hit equivalents one run and 1.000 the next, a 17% swing in its
+		/// factor. The median across trials is what absorbs it.
 		/// </remarks>
-		public const int ScenarioTrials = 1;
+		public const int ScenarioTrials = 5;
+
+		/// <summary>
+		/// How far a newly priced number has to sit from the one already in the
+		/// file before it is written, as a fraction of it.
+		/// </summary>
+		/// <remarks>
+		/// A press is a measurement, and a measurement carries noise the trials
+		/// narrow but never remove. Written straight out, a reading sitting near
+		/// a rounding boundary alternates between two neighbouring integers on
+		/// every run for no reason a reader could act on - Wugushi_JincanGu read
+		/// 2.207 to 2.221 hit equivalents and wrote factor 110 or 111 by which
+		/// side of 110.5 it landed. Below this the row keeps what it has.
+		///
+		/// This is the one place the pass looks at its own output, and it is
+		/// deliberately not the measurement: the price is computed from the
+		/// probe alone, exactly as before, and what the current value decides is
+		/// only whether writing it down is worth a line of diff. Set well under
+		/// any deliberate re-tune, so a dial change still lands.
+		/// </remarks>
+		public const float RewriteTolerance = 0.05f;
 
 		/// <summary>
 		/// Floor on the window a press's delivery is counted over, in

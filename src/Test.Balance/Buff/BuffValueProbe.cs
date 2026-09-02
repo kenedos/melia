@@ -133,6 +133,8 @@ namespace Melia.Test.Balance.Buff
 	{
 		private const int TickMs = 25;
 
+		private static readonly ConcurrentDictionary<string, WindowReading> _controls = new();
+
 		/// <summary>
 		/// Runs one body on BuffDials.RosterWorkers threads and waits for all of
 		/// them.
@@ -212,7 +214,9 @@ namespace Melia.Test.Balance.Buff
 					// Control and treatment stay on one flow so the seed they
 					// share is the same GameRandom instance.
 					DeterministicRandom.Seed(SkillPressProbe.Seed + trial);
-					var control = RunOn(pool, m => RunWindow(job, subject, buffLevel, characterLevel, slotScale, false, m, scenario, alsoHeld, slotsOverride));
+
+					var control = _controls.GetOrAdd(ControlKey(subject, job, buffLevel, characterLevel, scenario, alsoHeld, trial),
+						_ => RunOn(pool, m => RunWindow(job, subject, buffLevel, characterLevel, slotScale, false, m, scenario, alsoHeld, slotsOverride)));
 
 					DeterministicRandom.Seed(SkillPressProbe.Seed + trial);
 					var treatment = RunOn(pool, m => RunWindow(job, subject, buffLevel, characterLevel, slotScale, applyBuff, m, scenario, alsoHeld, slotsOverride));
@@ -297,6 +301,34 @@ namespace Melia.Test.Balance.Buff
 		/// <param name="work"></param>
 		private static WindowReading RunOn(ArenaPool pool, Func<Map, WindowReading> work)
 			=> pool != null ? pool.Use(work) : work(SyntheticActors.GetArena());
+
+		/// <summary>
+		/// Identifies a control window by everything that can change what it
+		/// reads.
+		/// </summary>
+		/// <remarks>
+		/// The scale and the slot seeds are deliberately absent. Both reach a
+		/// window through BuffCaptionScope alone, and a control window applies
+		/// no buff, so nothing in it ever reads a caption ratio: the same seed
+		/// over the same fight returns the same numbers at every scale the
+		/// solve tries. A solve costs one control per scenario and level
+		/// instead of one per scale, and the pair is still measured against a
+		/// control taken under exactly its own conditions.
+		/// </remarks>
+		/// <param name="subject"></param>
+		/// <param name="job"></param>
+		/// <param name="buffLevel"></param>
+		/// <param name="characterLevel"></param>
+		/// <param name="scenario"></param>
+		/// <param name="alsoHeld"></param>
+		/// <param name="trial"></param>
+		private static string ControlKey(BuffSubject subject, JobEntry job, int buffLevel, int characterLevel,
+			BuffScenario scenario, BuffSubject[] alsoHeld, int trial)
+		{
+			var held = alsoHeld == null ? "" : string.Join(',', alsoHeld.Select(s => s.SkillClassName));
+
+			return string.Join('|', subject.SkillClassName, job.SkillPrefix, buffLevel, characterLevel, scenario.Id, trial, held);
+		}
 
 		/// <summary>
 		/// Returns the trimmed mean of the per-pair ratios between two matched

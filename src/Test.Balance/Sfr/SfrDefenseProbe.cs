@@ -163,7 +163,7 @@ namespace Melia.Test.Balance.Sfr
 					SkillLevel = skillLevel,
 					ControlDamageTaken = controls.Average(),
 					TreatmentDamageTaken = treatments.Average(),
-					SwingsPrevented = Math.Max(0f, PairedTrimmedMean(controls, treatments)) / Math.Max(1f, basicSwing),
+					SwingsPrevented = Math.Max(0f, PairedEstimate(controls, treatments)) / Math.Max(1f, basicSwing),
 					Controls = controls,
 					Treatments = treatments,
 					BasicSwing = basicSwing,
@@ -225,6 +225,27 @@ namespace Melia.Test.Balance.Sfr
 		/// the right one and converges as 1/sqrt(n); the trim is what keeps the
 		/// outlier window from carrying it.
 		/// </remarks>
+		/// <param name="controls"></param>
+		/// <param name="treatments"></param>
+		private static float PairedEstimate(float[] controls, float[] treatments)
+		{
+			var estimate = PairedTrimmedMean(controls, treatments);
+
+			if (estimate <= 0f || controls.Length < 2)
+				return estimate;
+
+			var differences = controls.Zip(treatments, (c, t) => c - t).ToArray();
+			var mean = differences.Average();
+			var variance = differences.Sum(d => (d - mean) * (d - mean)) / (differences.Length - 1);
+			var error = MathF.Sqrt(variance / differences.Length);
+
+			return estimate < error * SfrDials.DefenseSignificance ? 0f : estimate;
+		}
+
+		/// <summary>
+		/// Returns the trimmed mean of the per-pair differences, whether or not
+		/// the trials agree on one.
+		/// </summary>
 		/// <param name="controls"></param>
 		/// <param name="treatments"></param>
 		private static float PairedTrimmedMean(float[] controls, float[] treatments)
@@ -295,7 +316,7 @@ namespace Melia.Test.Balance.Sfr
 					SkillLevel = skillLevel,
 					ControlDamageTaken = controls.Average(),
 					TreatmentDamageTaken = treatments.Average(),
-					SwingsPrevented = Math.Max(0f, PairedTrimmedMean(controls, treatments)) / Math.Max(1f, basicSwing),
+					SwingsPrevented = Math.Max(0f, PairedEstimate(controls, treatments)) / Math.Max(1f, basicSwing),
 					Controls = controls,
 					Treatments = treatments,
 					BasicSwing = basicSwing,

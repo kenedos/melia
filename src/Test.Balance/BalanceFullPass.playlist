@@ -1,0 +1,19 @@
+<Playlist Version="2.0">
+	<Rule Name="Includes" Match="Any">
+		<Rule Match="All">
+			<Property Name="Class" Value="Melia.Test.Balance.Sfr.SfrPricingTests" />
+		</Rule>
+		<Rule Match="All">
+			<Property Name="Class" Value="Melia.Test.Balance.Buff.BuffPricingTests" />
+		</Rule>
+		<Rule Match="All">
+			<Property Name="Class" Value="Melia.Test.Balance.Buff.BuffValueTests" />
+		</Rule>
+		<Rule Match="All">
+			<Property Name="Class" Value="Melia.Test.Balance.Buff.BuffScenarioTests" />
+		</Rule>
+		<Rule Match="All">
+			<Property Name="Class" Value="Melia.Test.Balance.Buff.BuffStackingTests" />
+		</Rule>
+	</Rule>
+</Playlist>

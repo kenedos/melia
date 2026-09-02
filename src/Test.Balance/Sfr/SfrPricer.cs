@@ -1096,16 +1096,16 @@ namespace Melia.Test.Balance.Sfr
 
 					if (spPriced.TryGetValue(name.Groups[1].Value, out var sp))
 					{
-						line = SetField(line, "basicSp", sp.Cost.ToString(CultureInfo.InvariantCulture));
-						line = SetField(line, "lvUpSpendSp", sp.CostByLevel.ToString("0.##", CultureInfo.InvariantCulture), after: "basicSp");
+						line = SetField(line, "basicSp", Settled(line, "basicSp", sp.Cost).ToString(CultureInfo.InvariantCulture));
+						line = SetField(line, "lvUpSpendSp", Settled(line, "lvUpSpendSp", sp.CostByLevel).ToString("0.##", CultureInfo.InvariantCulture), after: "basicSp");
 					}
 
 					if (!priced.TryGetValue(name.Groups[1].Value, out var price))
 						return line;
 
-					line = Regex.Replace(line, @"\bfactor: [0-9.]+", "factor: " + price.Factor, RegexOptions.None);
+					line = Regex.Replace(line, @"\bfactor: [0-9.]+", "factor: " + Settled(line, "factor", price.Factor), RegexOptions.None);
 					line = Regex.Replace(line, @"\bfactorByLevel: [0-9.]+",
-						"factorByLevel: " + price.FactorByLevel.ToString("0.0", CultureInfo.InvariantCulture));
+						"factorByLevel: " + Settled(line, "factorByLevel", price.FactorByLevel).ToString("0.0", CultureInfo.InvariantCulture));
 
 					return line;
 				});
@@ -1114,6 +1114,31 @@ namespace Melia.Test.Balance.Sfr
 			}
 
 			return result;
+		}
+
+		/// <summary>
+		/// Returns the priced value, or the one the line already carries when
+		/// the two are within RewriteTolerance of each other.
+		/// </summary>
+		/// <remarks>
+		/// Rounding is what makes this necessary rather than cosmetic: two
+		/// readings a thousandth apart become different integers when they
+		/// straddle a boundary, and the file then changes on every run without
+		/// anything having been learned.
+		/// </remarks>
+		/// <param name="line"></param>
+		/// <param name="field"></param>
+		/// <param name="priced"></param>
+		private static float Settled(string line, string field, float priced)
+		{
+			var match = Regex.Match(line, $@"{field}: (-?[0-9.]+)");
+
+			if (!match.Success || !float.TryParse(match.Groups[1].Value, NumberStyles.Float, CultureInfo.InvariantCulture, out var current))
+				return priced;
+
+			var span = Math.Max(Math.Abs(current), 1f);
+
+			return Math.Abs(priced - current) <= span * SfrDials.RewriteTolerance ? current : priced;
 		}
 
 		/// <summary>

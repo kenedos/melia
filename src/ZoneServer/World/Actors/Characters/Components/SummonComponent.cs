@@ -46,7 +46,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public bool TryGetSummon(int handle, out Summon summon)
 		{
 			lock (_summons)
-				summon = _summons.First(s => s.Handle == handle);
+				summon = _summons.FirstOrDefault(s => s.Handle == handle);
 			return summon != null;
 		}
 

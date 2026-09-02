@@ -52,8 +52,9 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Doppelsoeldner
 			caster.StopBuff(BuffId.Zucken_Buff);
 
 			skill.IncreaseOverheat();
-			caster.TurnTowards(farPos);
 			caster.SetAttackState(true);
+
+			caster.StartBuff(BuffId.Redel_Buff, skill.Level, 0, TimeSpan.FromSeconds(3), caster, SkillId.Doppelsoeldner_Redel);
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 30, angle: 0);
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
@@ -107,12 +108,6 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Doppelsoeldner
 
 				await skill.Wait(delayBetweenHits);
 				hits.Clear();
-			}
-
-			if (hitSomething)
-			{
-				var duration = TimeSpan.FromSeconds(3);
-				caster.StartBuff(BuffId.Redel_Buff, skill.Level, 0, duration, caster, SkillId.Doppelsoeldner_Redel);
 			}
 		}
 	}

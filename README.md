@@ -52,20 +52,20 @@ When enabled via `packages.conf`, the Laima package adds:
 Laima provides a massive expansion of combat functionality with hundreds
 of skill, buff, pad, and ability handlers.
 
-**Swordsman tree** — Swordsman, Barbarian, Cataphract, Highlander,
-Hoplite, Peltasta, Rodelero
+**Swordsman tree** — Swordsman, Barbarian, Cataphract, Doppelsoeldner,
+Fencer, Highlander, Hoplite, Peltasta, Rodelero
 
-**Archer tree** — Archer, Hunter, Quarrel Shooter, Ranger, Sapper,
-Wugushi, Fletcher, Falconer
+**Archer tree** — Archer, Falconer, Fletcher, Hunter, Musketeer,
+Quarrel Shooter, Ranger, Sapper, Wugushi
 
-**Cleric tree** — Cleric, Dievdirbys, Krivis, Monk, Paladin, Priest,
-Sadhu
+**Cleric tree** — Cleric, Dievdirbys, Krivis, Monk, Oracle, Paladin,
+Pardoner, Priest, Sadhu
 
-**Scout tree** — Scout, Assassin, Corsair, Linker, Outlaw,
-Rogue, Thaumaturge
+**Scout tree** — Scout, Assassin, Corsair, Linker, Outlaw, Rogue,
+Schwarze Reiter, Squire, Thaumaturge
 
-**Wizard tree** — Wizard, Bokor, Cryomancer, Elementalist,
-Psychokino, Pyromancer, Chronomancer
+**Wizard tree** — Wizard, Bokor, Chronomancer, Cryomancer, Elementalist,
+Necromancer, Psychokino, Pyromancer, Sorcerer
 
 **Monsters** — Extensive monster skill handlers covering boss and field
 monster abilities
@@ -201,69 +201,83 @@ directly from the bin directories.
 Balance Harness
 -----------------------------------------------------------------------------
 
-`src/Test.Balance` is a test project that measures and prices the skill
-roster. It holds two independent halves.
+`src/Test.Balance` measures the skill roster on a headless zone server and
+writes what it finds to `packages/laima/db/skills_overrides.txt`. It prices
+three things:
 
-### Skill factor pricing
+- **Skill damage** — `factor` and `factorByLevel`
+- **SP costs** — `basicSp` and `lvUpSpendSp`
+- **Buff strength** — `captionRatio1` to `captionRatio3`
 
-Computes a skill's `factor` and `factorByLevel` from first principles: its
-cast time, cooldown, overheat, hit count, the buffs it applies, and the
-splash geometry its handler actually builds. Nothing reads the skill's
-current factor, so the pass never compounds with itself, and it needs
-neither a running server nor a database.
+Every value it writes is sent to the client by the server, so none of this
+needs the game client to be edited or repacked. Change a number, restart the
+zone server, and both the tooltip and the effect follow. The same goes for a
+skill's splash rate (`sr`), if you want to edit that one by hand.
 
-Run it from the project root:
+It presses real skills at real monsters, so it needs a MySQL server running
+per `user/conf/database.conf`.
 
-    # dry run - prices the roster, writes nothing
-    dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests
+### Running it
 
-    # the same, with the summary on the terminal
-    dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests --logger "console;verbosity=detailed"
+`Test.Balance` is both a test project and a console app. Set it as the
+startup project and run it, and it prices everything, writes the results and
+prints a timing summary. Reports land in `logs/balance/`.
 
-    # explain a single skill instead of the roster
-    BALANCE_SFR_SKILL=Swordman_Bash dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests.PriceRoster --logger "console;verbosity=detailed"
+To run one half at a time, or to see what a pass would do without writing:
 
-**To write the prices into `packages/laima/db/skills_overrides.txt`**, set
-`BALANCE_SFR_APPLY=1`:
+```
+# skills and SP costs - dry run, then apply
+dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests
+BALANCE_SFR_APPLY=1 dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests
 
-    BALANCE_SFR_APPLY=1 dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests
+# buffs - dry run, then apply
+BALANCE_BUFF=1 dotnet test src/Test.Balance/Test.Balance.csproj --filter BuffPricingTests.PriceBuffs
+BALANCE_BUFF=1 BALANCE_BUFF_APPLY=1 dotnet test src/Test.Balance/Test.Balance.csproj --filter BuffPricingTests.PriceBuffs
 
-That rewrites the `factor` and `factorByLevel` of every skill the model can
-account for, and leaves every other field and every other line untouched.
-Skills it cannot account for keep their current values and are listed in the
-report. **Take a diff before committing** - it touches around 120 skills.
+# one skill, or one buff, instead of the whole roster
+BALANCE_SFR_SKILL=Swordman_Bash dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests.PriceRoster
+BALANCE_BUFF=1 BALANCE_BUFF_SKILL=Swordman_GungHo dotnet test src/Test.Balance/Test.Balance.csproj --filter BuffPricingTests.PriceBuffs
+```
 
-Every run leaves its summary in `logs/balance/sfr-prices.md` whether or not
-the terminal showed it, so the detailed logger flag is a convenience rather
-than a requirement.
+In PowerShell, set the variables first with `$env:BALANCE_SFR_APPLY = "1"`.
 
-The environment variables above use shell syntax. In PowerShell, set them
-first instead:
+A pass rewrites its own fields on every skill it can account for and leaves
+everything else in the file untouched. Skills it cannot account for keep
+their current values and are listed in the report. Take a diff before
+committing — a full run touches well over a hundred skills.
 
-    $env:BALANCE_SFR_APPLY = "1"
-    dotnet test src/Test.Balance/Test.Balance.csproj --filter SfrPricingTests
-    Remove-Item Env:\BALANCE_SFR_APPLY
+### Tuning
 
-Every dial the model has lives in `src/Test.Balance/Sfr/SfrDials.cs`, with
-the reasoning for each in its doc comment.
+The numbers behind both models live in `src/Test.Balance/Sfr/SfrDials.cs` and
+`src/Test.Balance/Buff/BuffDials.cs`, each with its reasoning in a comment.
+The ones worth knowing:
+
+- **`AnchorSkill` / `AnchorFactor`** and **`AnchorRatio`** set the power
+  level of the whole roster. Everything else is priced against them, so
+  raising one raises every skill or every buff together.
+- **`CirclePremium`** and **`SlopeShare`** decide what a later circle is
+  worth, and how much of a skill sits in its per-level term.
+- **`ScenarioWeights`** decides how much single-target performance counts
+  against crowds.
+- **`SpAnchorCost`** does for SP what the anchor factor does for damage.
+- **`Excluded`** and **`PinnedRatios`** take a buff out of the pass, or hold
+  it at hand-written numbers.
+
+Change one, run a dry pass, and read the report before applying.
 
 ### Damage sweeps
 
-The other half boots a real zone server on a synthetic arena and fires real
-skills at real monsters across the scenario matrix, producing the CSVs and
-report in `logs/balance/`. This needs a **MySQL server running** per
-`user/conf/database.conf`, and a full sweep takes minutes, so it is opt-in:
+A separate pass fires skills across the scenario matrix and writes the CSVs
+and report in `logs/balance/`. It takes minutes, so it is opt-in:
 
-    BALANCE_SWEEP=1 dotnet test src/Test.Balance/Test.Balance.csproj --filter SweepTests.SkillMatrix
-    dotnet test src/Test.Balance/Test.Balance.csproj --filter SweepTests.Report
+```
+BALANCE_SWEEP=1 dotnet test src/Test.Balance/Test.Balance.csproj --filter SweepTests.SkillMatrix
+dotnet test src/Test.Balance/Test.Balance.csproj --filter SweepTests.Report
+```
 
-Without `BALANCE_SWEEP=1` the sweeps skip themselves and report as passed.
 `BALANCE_SWEEP_CLASSES`, `BALANCE_SWEEP_CHAR_LEVELS` and
 `BALANCE_SWEEP_SKILL_LEVELS` narrow a run.
 
-Running the project with no filter runs everything that is not opt-in, which
-includes the server-backed coverage tests - so a plain `dotnet test` on this
-project still needs the database up.
 
 Further Reading
 -----------------------------------------------------------------------------
