@@ -50,18 +50,17 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 
 			var centerPos = caster.Position.GetRelative(caster.Direction, CenterDistance);
-			var targets = SkillSelectEnemiesInCircle(caster, centerPos, Radius, OracleSkillHelper.GetTargetCount(skill));
+			var targets = SkillSelectEnemiesInCircle(caster, centerPos, Radius);
 
 			if (caster is not Character character)
 				return;
 
 			OracleSkillHelper.HideDropPreviews(character);
 
-			foreach (var skillTarget in targets)
-			{
-				if (skillTarget is not Mob monster)
-					continue;
+			var maxTargets = OracleSkillHelper.GetTargetCount(skill);
 
+			foreach (var monster in OracleSkillHelper.SelectRerollTargets(character, targets, maxTargets))
+			{
 				var dropStacks = monster.RerollDrops(character);
 				OracleSkillHelper.ShowDropPreview(character, monster, dropStacks);
 

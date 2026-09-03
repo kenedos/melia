@@ -88,6 +88,11 @@ namespace Melia.Zone.World.Actors.Components
 
 			lock (_positionSyncLock)
 			{
+				// The caller is documented as not needing to supply one, and
+				// both the arrival snap and the clients move to this point.
+				if (this.Actor.Map?.Ground.TryGetHeightAt(destination, out var destinationHeight) ?? false)
+					destination = destination.WithHeight(destinationHeight);
+
 				// Don't move if the actor is already at the destination
 				if (destination == this.Actor.Position)
 					return TimeSpan.Zero;

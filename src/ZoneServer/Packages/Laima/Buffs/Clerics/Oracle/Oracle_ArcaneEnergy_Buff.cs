@@ -20,7 +20,7 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Oracle
 
 			var baseMsp = target.Properties.GetFloat(PropertyName.MSP) - target.Properties.GetFloat(PropertyName.MSP_BM);
 			var addSp = (float)Math.Floor(baseMsp * 0.03f * buffArg1);
-			var addSta = 5f + buffArg1 * 4f;
+			var addSta = buffArg1 * 2f;
 
 			AddPropertyModifier(buff, target, PropertyName.MSP_BM, addSp);
 			AddPropertyModifier(buff, target, PropertyName.MaxSta_BM, addSta);

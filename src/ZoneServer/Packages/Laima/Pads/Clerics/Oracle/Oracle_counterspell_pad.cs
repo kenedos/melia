@@ -1,4 +1,3 @@
-using System;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Network;
@@ -11,16 +10,28 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Oracle
 {
 	[Package("laima")]
 	[PadHandler(PadName.counterspell_pad)]
-	public class Oracle_counterspell_padOverride : ICreatePadHandler, IEnterPadHandler, ILeavePadHandler, IUpdatePadHandler
+	public class Oracle_counterspell_padOverride : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, ILeavePadHandler, IUpdatePadHandler
 	{
 		public void Created(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
 			var skill = pad.Skill;
 
-			pad.SetRange(50f);
+			Send.ZC_NORMAL.PadUpdate(pad, true);
+			pad.SetRange(30f);
 			pad.SetUpdateInterval(1000);
-			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(15000 + skill.Level * 1000);
+			pad.Trigger.LifeTime = skill.Properties.CaptionTime;
+			pad.BlocksMagicPads = true;
+
+			PadKillEnemyMagicPads(pad);
+		}
+
+		public void Destroyed(object sender, PadTriggerArgs args)
+		{
+			var pad = args.Trigger;
+
+			PadRemoveBuff(pad, RelationType.All, 0, 0, BuffId.CounterSpell_Buff);
+			Send.ZC_NORMAL.PadUpdate(pad, false);
 		}
 
 		public void Entered(object sender, PadTriggerActorArgs args)
@@ -46,6 +57,9 @@ namespace Melia.Zone.Pads.Handlers.Clerics.Oracle
 
 		public void Updated(object sender, PadTriggerArgs args)
 		{
+			var pad = args.Trigger;
+
+			PadKillEnemyMagicPads(pad);
 		}
 	}
 }

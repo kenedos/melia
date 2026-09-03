@@ -1309,10 +1309,14 @@ namespace Melia.Zone.World.Maps
 
 		#region Pad Management
 		/// <summary>
-		/// Adds a pad to the map and activates its trigger.
+		/// Adds a pad to the map and activates its trigger. Magic pads
+		/// suppressed by an enemy's blocking pad are dropped instead.
 		/// </summary>
 		public void AddPad(Pad pad)
 		{
+			if (this.IsMagicPadBlocked(pad))
+				return;
+
 			pad.Map = this;
 
 			lock (_pads)
@@ -1320,6 +1324,34 @@ namespace Melia.Zone.World.Maps
 
 			this.UpdateVisibility();
 			pad.Components.Get<TriggerComponent>()?.OnAddedToMap();
+		}
+
+		/// <summary>
+		/// Returns true if the given pad is a magic pad standing inside a
+		/// pad that blocks magic for one of its creator's enemies.
+		/// </summary>
+		/// <param name="pad"></param>
+		private bool IsMagicPadBlocked(Pad pad)
+		{
+			if (!pad.IsMagic || pad.Creator == null)
+				return false;
+
+			lock (_pads)
+			{
+				foreach (var other in _pads.Values)
+				{
+					if (!other.BlocksMagicPads || other.Layer != pad.Layer)
+						continue;
+
+					if (!other.Creator.IsEnemy(pad.Creator))
+						continue;
+
+					if (other.Area?.IsInside(pad.Position) ?? false)
+						return true;
+				}
+			}
+
+			return false;
 		}
 
 		/// <summary>

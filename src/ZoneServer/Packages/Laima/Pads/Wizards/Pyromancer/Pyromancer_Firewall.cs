@@ -53,7 +53,11 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			if (creator.IsEnemy(initiator))
 			{
 				var skillHitResult = SCR_SkillHit(creator, initiator, skill);
-				initiator.StartBuff(BuffId.FireWall_Debuff, skill.Level, skillHitResult.Damage, TimeSpan.FromSeconds(DebuffDuration), creator);
+
+				// A nullified hit leaves the burn nothing to tick for.
+				if (skillHitResult.Damage > 0)
+					initiator.StartBuff(BuffId.FireWall_Debuff, skill.Level, skillHitResult.Damage, TimeSpan.FromSeconds(DebuffDuration), creator);
+
 				pad.Trigger.LifeTime -= TimeSpan.FromSeconds(2);
 
 				if (pad.Trigger.LifeTime < TimeSpan.Zero)

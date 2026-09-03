@@ -1,4 +1,4 @@
-// Melia
+﻿// Melia
 // Database file
 // 
 // Values: skillId, className, name, [basicSp], [basicCast], [splashType], [splashRange], [splashHeight], [splashAngle], [splashRate], [maxRange], [factor], [factorByLevel], [atkAdd], [atkAddByLevel], [cooldownTime], [overheatCount], [overheatDelay], [overheatGroup], [enableCastMove], [enableCastRotate], [castInterruptible], [useType], [attackType], [activationType]
@@ -354,7 +354,7 @@
 { skillId: 20302, className: "Psychokino_Telekinesis", name: "Telekinesis", basicSp: 36, lvUpSpendSp: 1.86, splashRate: 5, factor: 0, factorByLevel: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 20303, className: "Psychokino_Swap", name: "Swap", basicSp: 28, lvUpSpendSp: 1.45, basicCast: 500, splashRate: 5, factor: 0, factorByLevel: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 3000, maxRange: 150, castInterruptible: true, captionRatio1: 3, captionRatio1ByLevel: 1 },
 { skillId: 20304, className: "Psychokino_Teleportation", name: "Teleportation",  basicSp: 20, lvUpSpendSp: 1.03, basicCast: 300, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 3000, overheatCount: "0", castInterruptible: true, overheatCount: "2", captionRatio1: 80, captionRatio1ByLevel: 24 },
-{ skillId: 20305, className: "Psychokino_MagneticForce", name: "Magnetic Force", basicSp: 56, lvUpSpendSp: 2.9, basicCast: 3500, splashRate: 0, factor: 72, factorByLevel: 3.9, hitCount: 1, multiHitCount: 1, cooldownTime: 9000, castInterruptible: true },
+{ skillId: 20305, className: "Psychokino_MagneticForce", name: "Magnetic Force", basicSp: 56, lvUpSpendSp: 2.9, basicCast: 3500, splashRate: 0, factor: 96, factorByLevel: 5.2, hitCount: 1, multiHitCount: 1, cooldownTime: 9000, castInterruptible: true },
 { skillId: 20306, className: "Psychokino_Raise", name: "Raise", basicSp: 51, lvUpSpendSp: 2.61, basicCast: 1500, splashRate: 5, factor: 0, factorByLevel: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, castInterruptible: true, captionRatio1: 4, captionRatio1ByLevel: 2, captionTime: 3, captionTimeByLevel: 0.2 },
 { skillId: 20307, className: "Psychokino_GravityPole", name: "Gravity Pole", basicSp: 83, lvUpSpendSp: 5.72, splashRate: 1, factor: 29, factorByLevel: 5.8, hitCount: 1, multiHitCount: 1, cooldownTime: 20000, castInterruptible: false },
 { skillId: 20308, className: "Psychokino_HeavyGravity", name: "Heavy Gravity", basicSp: 69, lvUpSpendSp: 3.53, basicCast: 4500, splashRate: 1, factor: 48, factorByLevel: 2.6, hitCount: 1, multiHitCount: 5, cooldownTime: 10000, castInterruptible: true },
@@ -612,7 +612,7 @@
 { skillId: 30308, className: "Sapper_SpikeShooter", name: "Spike Shooter", basicSp: 26, lvUpSpendSp: 1.79, basicCast: 1500, splashRate: 0, factor: 359, factorByLevel: 26.5, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "2", speedRateAffectedByDex: false, castInterruptible: true },
 { skillId: 30309, className: "Sapper_DamageTrap", name: "Continuous-type Trap", basicSp: 33, lvUpSpendSp: 1.71, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 125000 },
 { skillId: 30310, className: "Sapper_SpringTrap", name: "Spring Trap", basicSp: 17, lvUpSpendSp: 0.88, basicCast: 800, splashRate: 0, factor: 1672, factorByLevel: 91.2, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "3", speedRateAffectedByDex: false, castInterruptible: true },
-{ skillId: 30311, className: "Sapper_LegHoldTrap", name: "Leghold Trap", basicSp: 19, lvUpSpendSp: 0.97, basicCast: 800, splashRate: 0, factor: 1819, factorByLevel: 97.9, hitCount: 1, multiHitCount: 10, cooldownTime: 10000, overheatCount: "3", speedRateAffectedByDex: false, castInterruptible: true },
+{ skillId: 30311, className: "Sapper_LegHoldTrap", name: "Leghold Trap", basicSp: 19, lvUpSpendSp: 0.97, basicCast: 800, splashRate: 0, factor: 2122, factorByLevel: 114.3, hitCount: 1, multiHitCount: 10, cooldownTime: 10000, overheatCount: "3", speedRateAffectedByDex: false, castInterruptible: true },
 { skillId: 30312, className: "Sapper_SpikeShooter_Hidden", name: "Spike Shooter: Penetration", basicSp: 11, lvUpSpendSp: 0.57, splashRate: 0, hitCount: 1, multiHitCount: 1 },
 
 // Hunter
@@ -639,7 +639,7 @@
 { skillId: 30503, className: "Wugushi_Bewitch", name: "Bewitch", basicSp: 20, lvUpSpendSp: 1.03, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 13500 },
 { skillId: 30504, className: "Wugushi_WugongGu", name: "Wugong Gu", basicSp: 10, lvUpSpendSp: 0.52, splashRate: 0, factor: 199, factorByLevel: 10.9, hitCount: 1, multiHitCount: 1, cooldownTime: 3000, overheatCount: "2" },
 { skillId: 30505, className: "Wugushi_ThrowGuPot", name: "Poison Pot", basicSp: 18, lvUpSpendSp: 0.93, splashRate: 0, factor: 28, factorByLevel: 1.5, hitCount: 1, multiHitCount: 1, cooldownTime: 11000 },
-{ skillId: 30506, className: "Wugushi_JincanGu", name: "Golden Frog", basicSp: 21, lvUpSpendSp: 1.07, splashRate: 0, factor: 110, factorByLevel: 5.9, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
+{ skillId: 30506, className: "Wugushi_JincanGu", name: "Golden Frog", basicSp: 21, lvUpSpendSp: 1.07, splashRate: 0, factor: 111, factorByLevel: 6.0, hitCount: 1, multiHitCount: 1, cooldownTime: 14000 },
 { skillId: 30507, className: "Wugushi_Zhendu", name: "Zhendu", basicSp: 26, lvUpSpendSp: 1.34, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 1.5, captionRatio2: 0, captionRatio2ByLevel: 1.5, captionTime: 300 },
 { skillId: 30508, className: "Wugushi_LatentVenom", name: "Latent Venom", basicSp: 11, lvUpSpendSp: 0.57, splashRate: 0, factor: 204, factorByLevel: 11.1, hitCount: 1, multiHitCount: 1, cooldownTime: 4000, overheatCount: "2" },
 { skillId: 30509, className: "Wugushi_WideMiasma", name: "Wide Miasma", basicSp: 18, lvUpSpendSp: 0.92, splashRate: 0, factor: 14, factorByLevel: 0.7, hitCount: 1, multiHitCount: 1, cooldownTime: 10000 },
@@ -913,18 +913,18 @@
 // Oracle
 //---------------------------------------------------------------------------
 { skillId: 41001, className: "Oracle_CallOfDeities", name: "Call of Deities", basicSp: 31, lvUpSpendSp: 1.6, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
-{ skillId: 41002, className: "Oracle_ArcaneEnergy", name: "Arcane Energy", basicSp: 31, lvUpSpendSp: 1.6, splashRate: 0, factor: 28, factorByLevel: 47, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionTime: 0, captionTimeByLevel: 1 },
+{ skillId: 41002, className: "Oracle_ArcaneEnergy", name: "Arcane Energy", basicSp: 31, lvUpSpendSp: 1.6, basicCast: 3000, castInterruptible: true, splashRate: 0, factor: 28, factorByLevel: 47, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 3, captionRatio2: 0, captionRatio2ByLevel: 2, captionTime: 300 },
 { skillId: 41003, className: "Oracle_Change", name: "Change", basicSp: 24, lvUpSpendSp: 1.24, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, overheatCount: "2" },
-{ skillId: 41004, className: "Oracle_Clairvoyance", name: "Clairvoyance", basicSp: 21, lvUpSpendSp: 1.09, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, captionRatio1: 0, captionRatio1ByLevel: 0.55 },
-{ skillId: 41005, className: "Oracle_CounterSpell", name: "Counter Spell", basicSp: 29, lvUpSpendSp: 1.5, splashRate: 0, factor: 56, factorByLevel: 93, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
+{ skillId: 41004, className: "Oracle_Clairvoyance", name: "Clairvoyance", basicSp: 18, lvUpSpendSp: 0.92, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, captionRatio1: 0, captionRatio1ByLevel: 1.20 },
+{ skillId: 41005, className: "Oracle_CounterSpell", name: "Counter Spell", basicSp: 73, lvUpSpendSp: 3.78, splashRate: 0, factor: 56, factorByLevel: 93, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, captionTime: 2.5, captionTimeByLevel: 0.5 },
 { skillId: 41006, className: "Oracle_Forecast", name: "Forecast", basicSp: 24, lvUpSpendSp: 1.24, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, captionRatio1: 100 },
-{ skillId: 41007, className: "Oracle_Ressetting", name: "Resetting", basicSp: 33, lvUpSpendSp: 1.71, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "2", captionRatio1: 0, captionRatio1ByLevel: 0.7 },
-{ skillId: 41008, className: "Oracle_DeathVerdict", name: "Death Sentence", basicSp: 24, lvUpSpendSp: 1.24, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, captionRatio1: 0, captionRatio1ByLevel: 0.42 },
-{ skillId: 41009, className: "Oracle_Prophecy", name: "Prophecy", basicSp: 31, lvUpSpendSp: 1.6, splashRate: 0, factor: 151, factorByLevel: 23, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionTime: 30 },
+{ skillId: 41007, className: "Oracle_Ressetting", name: "Resetting", basicSp: 22, lvUpSpendSp: 1.52, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, overheatCount: "2", captionRatio1: 0, captionRatio1ByLevel: 0.7 },
+{ skillId: 41008, className: "Oracle_DeathVerdict", name: "Death Sentence", basicSp: 52, lvUpSpendSp: 2.69, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, captionRatio1: 0, captionRatio1ByLevel: 0.42 },
+{ skillId: 41009, className: "Oracle_Prophecy", name: "Prophecy", basicSp: 31, lvUpSpendSp: 1.6, basicCast: 3000, castInterruptible: true, splashRate: 0, factor: 151, factorByLevel: 23, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 2, captionTime: 300 },
 { skillId: 41010, className: "Oracle_SwitchGender", name: "Gender Switch", basicSp: 8, lvUpSpendSp: 0.41, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, overheatCount: "2" },
-{ skillId: 41011, className: "Oracle_Foretell", name: "Foretell", basicSp: 28, lvUpSpendSp: 1.43, splashRate: 0, factor: 24, factorByLevel: 2, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, captionRatio1: 24, captionRatio1ByLevel: 2, captionTime: 20 },
-{ skillId: 41012, className: "Oracle_TwistOfFate", name: "Twist of Fate", basicSp: 28, lvUpSpendSp: 1.93, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 7000 },
-{ skillId: 41013, className: "Oracle_DivineMight", name: "Divine Might", basicSp: 32, lvUpSpendSp: 1.64, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 15, cooldownTime: 30000, captionTime: 20, captionTimeByLevel: 0.5 },
+{ skillId: 41011, className: "Oracle_Foretell", name: "Foretell", basicSp: 77, lvUpSpendSp: 3.93, splashRate: 0, factor: 24, factorByLevel: 2, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, captionRatio1: 0, captionRatio1ByLevel: 3, captionTime: 30 },
+{ skillId: 41012, className: "Oracle_TwistOfFate", name: "Twist of Fate", basicSp: 62, lvUpSpendSp: 4.27, splashRate: 0, maxRange: 60, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 6000, useType: "MeleeGround", captionRatio1: 0, captionRatio1ByLevel: 1, captionRatio1Max: 8 },
+{ skillId: 41013, className: "Oracle_DivineMight", name: "Divine Might", basicSp: 32, lvUpSpendSp: 1.64, basicCast: 3000, castInterruptible: true, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 15, cooldownTime: 30000, captionRatio1: 0, captionRatio1ByLevel: 3, captionTime: 300 },
 
 { skillId: 41101, className: "PlagueDoctor_HealingFactor", name: "Healing Factor", basicSp: 98, splashRate: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 22500 },
 { skillId: 41102, className: "PlagueDoctor_Incineration", name: "Incineration", basicSp: 62, splashRate: 1, factor: 35, factorByLevel: 59, hitCount: 1, multiHitCount: 15, cooldownTime: 15000, overheatCount: "0" },

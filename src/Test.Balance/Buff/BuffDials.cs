@@ -347,9 +347,15 @@ namespace Melia.Test.Balance.Buff
 			// How many enemies each press reads or sentences, rounded up by
 			// the handler. The rate is picked so the last point of the skill
 			// is worth taking, which pricing has no way to know.
-			["Oracle_Clairvoyance"] = new() { [1] = (0f, 0.55f) },
+			["Oracle_Clairvoyance"] = new() { [1] = (0f, 1.20f) },
 			["Oracle_Ressetting"] = new() { [1] = (0f, 0.7f) },
 			["Oracle_DeathVerdict"] = new() { [1] = (0f, 0.42f) },
+
+			// The chance the circle is built around, read as one number the
+			// player keeps in their head: 3% a level, 45% at its cap. It is
+			// the row's only slot, so the pin takes the press out of the pass
+			// entirely rather than leaving a scalar to solve beside it.
+			["Oracle_Foretell"] = new() { [1] = (0f, 3f) },
 		};
 
 		/// <summary>

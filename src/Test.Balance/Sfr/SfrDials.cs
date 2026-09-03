@@ -531,6 +531,12 @@ namespace Melia.Test.Balance.Sfr
 		{
 			["Highlander_CrossGuard"] = 0f,
 			["Fencer_Preparation"] = 0f,
+
+			// Oracle spells trade instant cast time for SP cost
+			["Oracle_CounterSpell"] = 3f,
+			["Oracle_DeathVerdict"] = 3f,
+			["Oracle_Foretell"] = 3f,
+			["Oracle_TwistOfFate"] = 3f,
 		};
 
 		/// <summary>

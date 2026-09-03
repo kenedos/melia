@@ -150,7 +150,37 @@ namespace Melia.Test.Balance.Buff
 			"src/ZoneServer/Packages/Laima/Skills",
 		];
 
+		/// <summary>
+		/// Roots holding the pad handlers, whose sources name the buffs a
+		/// skill applies through the ground rather than directly.
+		/// </summary>
+		private static readonly string[] PadHandlerRoots =
+		[
+			"src/ZoneServer/Pads/Handlers",
+			"src/ZoneServer/Packages/Laima/Pads",
+		];
+
 		private static readonly Regex SkillHandlerAttribute = new(@"\[SkillHandler\(SkillId\.(\w+)\)\]", RegexOptions.Compiled);
+
+		private static readonly Regex PadHandlerAttribute = new(@"\[PadHandler\(PadName\.(\w+)\)\]", RegexOptions.Compiled);
+
+		/// <summary>
+		/// A pad the skill's handler creates, whose own handler is then read
+		/// for the buffs the press really lands.
+		/// </summary>
+		private static readonly Regex PadReference = new(@"PadName\.(\w+)", RegexOptions.Compiled);
+
+		/// <summary>
+		/// A buff a pad handler applies, through any of PadHelper's apply
+		/// helpers or a direct StartBuff.
+		/// </summary>
+		/// <remarks>
+		/// The helper's own name is captured alongside the buff so the remove
+		/// helpers can be dropped: PadTargetBuffRemove and PadRemoveBuff both
+		/// name the buff they take back off, and reading either as an
+		/// application makes every pad look like it grants what it cleans up.
+		/// </remarks>
+		private static readonly Regex PadBuffApplication = new(@"\b(Pad\w*Buff\w*|StartBuff\w*)\([^;]*?BuffId\.(\w+)", RegexOptions.Compiled);
 
 		/// <summary>
 		/// A buff the handler actually applies, rather than one it merely
@@ -371,6 +401,8 @@ namespace Melia.Test.Balance.Buff
 
 				_grants = [];
 
+				var padGrants = PadGrants();
+
 				foreach (var root in SkillHandlerRoots)
 				{
 					var path = Path.Combine(SfrData.Root, root);
@@ -389,6 +421,8 @@ namespace Melia.Test.Balance.Buff
 						var buffs = BuffApplication.Matches(text)
 							.Select(m => Enum.TryParse<BuffId>(m.Groups[1].Value, out var id) ? id : BuffId.None)
 							.Where(id => id != BuffId.None)
+							.Union(PadReference.Matches(text)
+								.SelectMany(m => padGrants.GetValueOrDefault(m.Groups[1].Value, [])))
 							.Distinct()
 							.ToArray();
 
@@ -408,6 +442,56 @@ namespace Melia.Test.Balance.Buff
 
 				return _grants;
 			}
+		}
+
+		/// <summary>
+		/// Maps each pad name to the buffs its handler applies.
+		/// </summary>
+		/// <remarks>
+		/// A press that buffs through the ground names no buff of its own -
+		/// its handler creates a pad and the pad's handler is what applies
+		/// anything. Without this every such press reads as granting nothing
+		/// and cannot be priced at all, which is what held Foretell and every
+		/// other pad buff out of the pass.
+		/// </remarks>
+		private static Dictionary<string, BuffId[]> PadGrants()
+		{
+			var grants = new Dictionary<string, BuffId[]>();
+
+			foreach (var root in PadHandlerRoots)
+			{
+				var path = Path.Combine(SfrData.Root, root);
+
+				if (!Directory.Exists(path))
+					continue;
+
+				foreach (var file in Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories))
+				{
+					var text = File.ReadAllText(file);
+					var handler = PadHandlerAttribute.Match(text);
+
+					if (!handler.Success)
+						continue;
+
+					var buffs = PadBuffApplication.Matches(text)
+						.Where(m => !m.Groups[1].Value.Contains("Remove"))
+						.Select(m => Enum.TryParse<BuffId>(m.Groups[2].Value, out var id) ? id : BuffId.None)
+						.Where(id => id != BuffId.None)
+						.Distinct()
+						.ToArray();
+
+					if (buffs.Length == 0)
+						continue;
+
+					var padName = handler.Groups[1].Value;
+
+					grants[padName] = grants.TryGetValue(padName, out var existing)
+						? existing.Union(buffs).ToArray()
+						: buffs;
+				}
+			}
+
+			return grants;
 		}
 	}
 }

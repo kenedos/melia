@@ -7,7 +7,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
-using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 {
@@ -16,8 +16,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Oracle_DivineMight)]
-	public class Oracle_DivineMightOverride : IGroundSkillHandler
+	public class Oracle_DivineMightOverride : IGroundSkillHandler, IDynamicCasted
 	{
+		private const int BuffRange = 300;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -37,10 +39,26 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 			if (caster.IsAbilityActive(AbilityId.Oracle20))
 				time += caster.GetAbilityLevel(AbilityId.Oracle20) * 1000;
 
-			caster.StartBuff(BuffId.DivineMight_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(time), caster, skill.Id);
+			var duration = TimeSpan.FromMilliseconds(time);
 
-			var targetPos = originPos.GetRelative(farPos);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Oracle_DivineMight);
+			caster.StartBuff(BuffId.DivineMight_Buff, skill.Level, 0f, duration, caster, skill.Id);
+
+			// Buff party members
+			if (caster is Character character)
+			{
+				var party = character.Connection.Party;
+				if (party != null)
+				{
+					var members = caster.Map.GetPartyMembersInRange(character, BuffRange, true);
+					foreach (var member in members)
+					{
+						if (member == caster)
+							continue;
+
+						member.StartBuff(BuffId.DivineMight_Buff, skill.Level, 0f, duration, caster, skill.Id);
+					}
+				}
+			}
 		}
 	}
 }

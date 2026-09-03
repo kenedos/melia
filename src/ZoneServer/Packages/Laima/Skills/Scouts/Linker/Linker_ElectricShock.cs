@@ -83,6 +83,10 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Linker
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill);
 
+			// A nullified hit leaves the shock nothing to tick for.
+			if (skillHitResult.Damage <= 0)
+				return;
+
 			// StartBuff handles stacking automatically via OnActivate/OnExtend
 			var buff = target.StartBuff(BuffId.ElectricShock_Debuff, skill.Level, skillHitResult.Damage, duration, caster);
 			if (buff == null)

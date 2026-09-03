@@ -1,4 +1,5 @@
 ﻿using System;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
@@ -121,6 +122,11 @@ namespace Melia.Zone.Buffs.Base
 	/// for stagger immunity).
 	/// </summary>
 	public interface IBuffOnHitInfoCreatedHandler { void OnHitInfoCreated(Buff buff, SkillHitInfo skillHitInfo); }
+
+	/// <summary>
+	/// Called on the buff that made its target resist an incoming debuff.
+	/// </summary>
+	public interface IBuffOnDebuffResistedHandler { void OnDebuffResisted(Buff buff, BuffId buffId, IActor caster); }
 
 	/// <summary>
 	/// Called on the target before a knockback is applied.

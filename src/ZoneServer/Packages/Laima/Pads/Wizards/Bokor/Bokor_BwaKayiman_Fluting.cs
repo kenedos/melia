@@ -38,6 +38,11 @@ namespace Melia.Zone.Pads.Handlers
 				return;
 
 			var skillHitResult = SCR_SkillHit(creator, initiator, skill);
+
+			// A nullified hit leaves the pollution nothing to tick for.
+			if (skillHitResult.Damage <= 0)
+				return;
+
 			initiator.StartBuff(BuffId.Pollution_Debuff, skill.Level, skillHitResult.Damage, TimeSpan.FromSeconds(3), creator);
 		}
 

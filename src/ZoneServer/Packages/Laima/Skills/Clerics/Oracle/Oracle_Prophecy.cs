@@ -8,6 +8,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 {
@@ -16,8 +17,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Oracle_Prophecy)]
-	public class Oracle_ProphecyOverride : IGroundSkillHandler
+	public class Oracle_ProphecyOverride : IGroundSkillHandler, IDynamicCasted
 	{
+		private const int BuffRange = 300;
+
 		private static readonly TimeSpan BuffDelay = TimeSpan.FromMilliseconds(500);
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
@@ -47,6 +50,23 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 				duration /= 2;
 
 			caster.StartBuff(BuffId.Prophecy_Buff, skill.Level, 0f, duration, caster, skill.Id);
+
+			// Buff party members
+			if (caster is Character character)
+			{
+				var party = character.Connection.Party;
+				if (party != null)
+				{
+					var members = caster.Map.GetPartyMembersInRange(character, BuffRange, true);
+					foreach (var member in members)
+					{
+						if (member == caster)
+							continue;
+
+						member.StartBuff(BuffId.Prophecy_Buff, skill.Level, 0f, duration, caster, skill.Id);
+					}
+				}
+			}
 		}
 	}
 }

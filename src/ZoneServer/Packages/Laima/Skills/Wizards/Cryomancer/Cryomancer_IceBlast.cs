@@ -80,6 +80,10 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 				if (currentTarget.TryGetBuff(BuffId.IceBlast_Debuff, out var iceBlastBuff))
 					continue;
 
+				// A nullified hit leaves the debuff nothing to tick for.
+				if (skillHitResult.Damage <= 0)
+					continue;
+
 				var debuff = currentTarget.StartBuff(BuffId.IceBlast_Debuff, skill.Level, skillHitResult.Damage / multihitCount, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
 				debuff?.SetUpdateTime(DebuffUpdateTimeMilliseconds);
 			}
@@ -104,6 +108,10 @@ namespace Melia.Zone.Skills.Handlers.Cryomancer
 					continue;
 
 				var skillHitResult = SCR_SkillHit(caster, currentTarget, skill);
+
+				// A nullified hit leaves the debuff nothing to tick for.
+				if (skillHitResult.Damage <= 0)
+					continue;
 
 				var debuff = currentTarget.StartBuff(BuffId.IceBlast_Debuff, skill.Level, skillHitResult.Damage, TimeSpan.FromSeconds(DebuffDurationSeconds), caster);
 				debuff?.SetUpdateTime(DebuffUpdateTimeMilliseconds);

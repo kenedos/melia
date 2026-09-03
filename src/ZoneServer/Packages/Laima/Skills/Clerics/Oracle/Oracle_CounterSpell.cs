@@ -34,15 +34,13 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
-			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
+			skill.Run(this.HandleSkill(caster, skill));
 		}
 
-		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			// TODO: Destroy magic-type pads in the area before creating CounterSpell pad
-			// Requires map.GetPadsInRange() or similar API to enumerate nearby pads
-			var targetPos = originPos.GetRelative(farPos);
+			var targetPos = caster.Position;
 			var pad_name = PadName.counterspell_pad;
 			if (caster.IsAbilityActive(AbilityId.Oracle33))
 				pad_name = PadName.counterspell_abil_pad;

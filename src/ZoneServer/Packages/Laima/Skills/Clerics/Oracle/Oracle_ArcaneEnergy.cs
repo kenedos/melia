@@ -8,6 +8,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 {
@@ -16,8 +17,10 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Oracle_ArcaneEnergy)]
-	public class Oracle_ArcaneEnergyOverride : IGroundSkillHandler
+	public class Oracle_ArcaneEnergyOverride : IGroundSkillHandler, IDynamicCasted
 	{
+		private const int BuffRange = 300;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -39,7 +42,27 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(790));
-			caster.StartBuff(BuffId.ArcaneEnergy_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(SCR_GET_ArcaneEnergy_Bufftime(skill) * 1000), caster, skill.Id);
+
+			var duration = TimeSpan.FromMilliseconds(SCR_GET_ArcaneEnergy_Bufftime(skill) * 1000);
+
+			caster.StartBuff(BuffId.ArcaneEnergy_Buff, skill.Level, 0f, duration, caster, skill.Id);
+
+			// Buff party members
+			if (caster is Character character)
+			{
+				var party = character.Connection.Party;
+				if (party != null)
+				{
+					var members = caster.Map.GetPartyMembersInRange(character, BuffRange, true);
+					foreach (var member in members)
+					{
+						if (member == caster)
+							continue;
+
+						member.StartBuff(BuffId.ArcaneEnergy_Buff, skill.Level, 0f, duration, caster, skill.Id);
+					}
+				}
+			}
 		}
 
 		private float SCR_GET_ArcaneEnergy_Bufftime(Skill skill)

@@ -50,6 +50,10 @@ namespace Melia.Zone.Pads.Handlers
 			var skillHitResult = SCR_SkillHit(creator, initiator, skill);
 			var damage = (int)skillHitResult.Damage;
 
+			// A nullified hit leaves the bleed nothing to tick for.
+			if (damage <= 0)
+				return;
+
 			var duration = (int)((7 + 0.3f * skill.Level) * 1000);
 
 			var buffId = BuffId.BleedingPierce_Debuff;

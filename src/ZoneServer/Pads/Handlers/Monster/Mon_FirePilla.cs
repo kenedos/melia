@@ -48,6 +48,12 @@ namespace Melia.Zone.Pads.Handlers
 			var skill = pad.Skill;
 
 			var skillHitResult = SCR_SkillHit(creator, initiator, skill);
+
+			// A nullified hit has nothing for the burn to tick for, and the
+			// buff is the only thing that damages.
+			if (skillHitResult.Damage <= 0)
+				return;
+
 			PadTargetBuff(pad, initiator, RelationType.Enemy, 0, 0, BuffId.Mon_FirePilla, skill.Level, (int)skillHitResult.Damage, 3000, 1, 100);
 		}
 		public void Updated(object sender, PadTriggerArgs args)
@@ -59,6 +65,10 @@ namespace Melia.Zone.Pads.Handlers
 			foreach (var target in pad.Trigger.GetAttackableEntities(creator))
 			{
 				var skillHitResult = SCR_SkillHit(creator, target, skill);
+
+				if (skillHitResult.Damage <= 0)
+					continue;
+
 				PadTargetBuff(pad, target, RelationType.Enemy, 0, 0, BuffId.Mon_FirePilla, skill.Level, (int)skillHitResult.Damage, 3000, 1, 100);
 			}
 		}

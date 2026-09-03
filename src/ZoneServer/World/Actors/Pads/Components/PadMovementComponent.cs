@@ -28,6 +28,9 @@ namespace Melia.Zone.World.Actors.Pads.Components
 		/// <param name="speed"></param>
 		protected override void UpdateMoveTo(Position pos, Position dest, float speed)
 		{
+			if (this.Pad.Map == null)
+				return;
+
 			Send.ZC_NORMAL.PadMoveTo(this.Pad, dest, speed);
 		}
 
@@ -37,6 +40,9 @@ namespace Melia.Zone.World.Actors.Pads.Components
 		/// <param name="pos"></param>
 		protected override void UpdateStop(Position pos)
 		{
+			if (this.Pad.Map == null)
+				return;
+
 			// It's possible there's a dedicated packet for stopping pad movement,
 			// but for now we'll just send a move with a very high speed, so it
 			// snaps there instantly and stops moving. Alternatively, we could

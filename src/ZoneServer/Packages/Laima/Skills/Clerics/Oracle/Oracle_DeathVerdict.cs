@@ -27,7 +27,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 		private const float Radius = 70f;
 		private const int MinDurationSeconds = 5;
 		private const int MaxDurationSeconds = 30;
-		private const int MaxHitsToKill = 100;
+		private const int MaxHitsToKill = 50;
 		private const float ResetRatePerLevel = 0.1f;
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)

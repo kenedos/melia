@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
@@ -21,6 +23,8 @@ namespace Melia.Zone.Skills.Helpers
 		// A system message with no text, so the balloon shows only the item
 		private const string PreviewMessage = "JunkSilverGachaResultInRaidRewardSmall";
 		private const string PreviewTargetsVar = "Melia.Oracle.DropPreviewTargets";
+		private const float DeprioritizedDropChance = 10f;
+		private const float ProtectedDropChance = 1f;
 		// The client keys one balloon frame per actor handle and accumulates
 		// items into it; this is the addon function that empties and hides one
 		private const string ClearBalloonScript = "ITEM_BALLOON_CLEAR({0})";
@@ -38,6 +42,61 @@ namespace Melia.Zone.Skills.Helpers
 			// A per-level coefficient like 0.6 lands just above a whole
 			// number in float, which would grant a target a level too early
 			return (int)Math.Ceiling(Math.Round(value, 4));
+		}
+
+		/// <summary>
+		/// Returns the monsters worth rolling again for the given character,
+		/// the ones already holding something uncommon last and the ones
+		/// holding something genuinely rare not at all.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="targets"></param>
+		/// <param name="maxTargets"></param>
+		/// <returns></returns>
+		public static List<Mob> SelectRerollTargets(Character character, IList<ICombatEntity> targets, int maxTargets)
+		{
+			var candidates = new List<(Mob Monster, int Rank)>();
+
+			foreach (var target in targets)
+			{
+				if (target is not Mob monster)
+					continue;
+
+				var rarest = GetRarestDropChance(monster.PeekDrops(character));
+
+				// Rolling again could lose it, so it is left alone entirely
+				if (rarest <= ProtectedDropChance)
+					continue;
+
+				candidates.Add((monster, rarest <= DeprioritizedDropChance ? 1 : 0));
+			}
+
+			// OrderBy is stable, so monsters of equal worth stay in the
+			// distance order they were selected in
+			return candidates
+				.OrderBy(a => a.Rank)
+				.Take(maxTargets)
+				.Select(a => a.Monster)
+				.ToList();
+		}
+
+		/// <summary>
+		/// Returns the lowest drop chance among the given stacks, or no
+		/// chance at all if there are none.
+		/// </summary>
+		/// <param name="dropStacks"></param>
+		/// <returns></returns>
+		private static float GetRarestDropChance(List<DropStack> dropStacks)
+		{
+			var rarest = float.MaxValue;
+
+			if (dropStacks == null)
+				return rarest;
+
+			foreach (var stack in dropStacks)
+				rarest = Math.Min(rarest, stack.DropChance);
+
+			return rarest;
 		}
 
 		/// <summary>

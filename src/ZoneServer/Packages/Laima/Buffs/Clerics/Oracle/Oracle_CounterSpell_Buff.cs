@@ -1,4 +1,3 @@
-using System;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
@@ -11,29 +10,25 @@ using Melia.Zone.World.Actors;
 namespace Melia.Zone.Buffs.Handlers.Clerics.Oracle
 {
 	/// <summary>
-	/// Handle for the CounterSpell buff, which reduces incoming magic
+	/// Handle for the CounterSpell buff, which nullifies incoming magic
 	/// damage while active.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.CounterSpell_Buff)]
 	public class Oracle_CounterSpell_BuffOverride : BuffHandler
 	{
-		private const float ReductionBase = 0.05f;
-		private const float ReductionPerLevel = 0.02f;
-		private const float MaxReduction = 0.9f;
-
-		[CombatCalcModifier(CombatCalcPhase.BeforeCalc_Defense, BuffId.CounterSpell_Buff)]
-		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
+		[CombatCalcModifier(CombatCalcPhase.AfterCalc, BuffId.CounterSpell_Buff)]
+		public void OnDefenseAfterCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
-			if (!target.TryGetBuff(BuffId.CounterSpell_Buff, out var buff))
+			if (!target.IsBuffActive(BuffId.CounterSpell_Buff))
 				return;
 
-			if (skill?.Data?.AttackType != SkillAttackType.Magic)
+			if (skill?.Data?.AttackType != SkillAttackType.Magic && skill?.Data?.ClassType != SkillClassType.Magic)
 				return;
 
-			var reduction = MathF.Min(MaxReduction, ReductionBase + ReductionPerLevel * buff.NumArg1);
-
-			modifier.DamageMultiplier *= 1f - reduction;
+			skillHitResult.Damage = 0;
+			skillHitResult.Effect = HitEffect.SAFETY;
+			skillHitResult.Result = HitResultType.Miss;
 		}
 	}
 }

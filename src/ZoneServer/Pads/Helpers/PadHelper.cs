@@ -446,6 +446,22 @@ namespace Melia.Zone.Pads.Helpers
 			}
 		}
 
+		/// <summary>
+		/// Destroys every magic pad of the pad creator's enemies whose area
+		/// overlaps the pad's own.
+		/// </summary>
+		/// <param name="pad"></param>
+		public static void PadKillEnemyMagicPads(Pad pad)
+		{
+			var targetPads = pad.Map.GetPads(other => other != pad && other.IsMagic && other.Layer == pad.Layer && pad.Creator.IsEnemy(other.Creator));
+
+			foreach (var targetPad in targetPads)
+			{
+				if ((pad.Area?.IsInside(targetPad.Position) ?? false) || (targetPad.Area?.IsInside(pad.Position) ?? false))
+					targetPad.Destroy();
+			}
+		}
+
 		public static void PadSelectPadKill(Pad pad, string padName, float searchRange)
 		{
 			var targetPads = pad.Map.GetPadsAt(pad.Position, searchRange);

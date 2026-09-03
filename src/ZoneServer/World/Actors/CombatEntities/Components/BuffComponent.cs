@@ -721,17 +721,29 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!isDebuff)
 				return false;
 
-			if (this.Has(BuffId.Skill_MomentaryImmune_Buff))
+			if (this.TryGet(BuffId.Skill_MomentaryImmune_Buff, out var momentaryImmuneBuff))
+			{
+				this.NotifyBuffOnDebuffResisted(momentaryImmuneBuff, buffId, caster);
 				return true;
+			}
 
-			if (this.Has(BuffId.Rampage_Buff) && buffData.Removable)
+			if (buffData.Removable && this.TryGet(BuffId.Rampage_Buff, out var rampageBuff))
+			{
+				this.NotifyBuffOnDebuffResisted(rampageBuff, buffId, caster);
 				return true;
+			}
 
-			if (this.Has(BuffId.Cure_Buff))
+			if (this.TryGet(BuffId.Cure_Buff, out var cureBuff))
+			{
+				this.NotifyBuffOnDebuffResisted(cureBuff, buffId, caster);
 				return true;
+			}
 
-			if (buffData.Removable && this.Has(BuffId.Prophecy_Buff))
+			if (this.TryGet(BuffId.Prophecy_Buff, out var prophecyBuff))
+			{
+				this.NotifyBuffOnDebuffResisted(prophecyBuff, buffId, caster);
 				return true;
+			}
 
 			// Cannot apply debuffs to bosses when they have shield,
 			// but allow damage-over-time buffs through
@@ -744,14 +756,20 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			if (this.TryGet(BuffId.Cyclone_Buff_ImmuneAbil, out var cycloneImmuneBuff)
 				&& GameRandom.Get().Next(100) < cycloneImmuneBuff.NumArg1 * 15)
+			{
+				this.NotifyBuffOnDebuffResisted(cycloneImmuneBuff, buffId, caster);
 				return true;
+			}
 
 			if (this.TryGet(BuffId.Ausirine_Buff, out var ausirineBuff))
 			{
 				var skillLevel = ausirineBuff.NumArg1;
 				var resistanceChance = 30 + (3 * skillLevel);
 				if (GameRandom.Get().Next(100) < resistanceChance)
+				{
+					this.NotifyBuffOnDebuffResisted(ausirineBuff, buffId, caster);
 					return true;
+				}
 			}
 
 			// Check card/item debuff resistance
@@ -767,6 +785,19 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Notifies the given buff that it made the entity resist an
+		/// incoming debuff.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <param name="buffId"></param>
+		/// <param name="caster"></param>
+		private void NotifyBuffOnDebuffResisted(Buff buff, BuffId buffId, IActor caster)
+		{
+			if (buff.Handler is IBuffOnDebuffResistedHandler handler)
+				handler.OnDebuffResisted(buff, buffId, caster);
 		}
 
 		/// <summary>

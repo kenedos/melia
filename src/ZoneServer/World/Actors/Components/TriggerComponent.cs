@@ -274,6 +274,9 @@ namespace Melia.Zone.World.Actors.Components
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
+			if (_destroyed || this.Actor.Map == null)
+				return;
+
 			// Make sure the elapsed time is not the full update time if
 			// we run for the first time, since the component might not
 			// have been around for the full update interval, which would
