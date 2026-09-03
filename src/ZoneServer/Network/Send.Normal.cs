@@ -2751,6 +2751,54 @@ namespace Melia.Zone.Network
 			}
 
 			/// <summary>
+			/// Shows an item balloon above the given actor, for the given
+			/// character only.
+			/// </summary>
+			/// <param name="character"></param>
+			/// <param name="actor"></param>
+			/// <param name="item"></param>
+			/// <param name="type"></param>
+			/// <param name="style"></param>
+			/// <param name="systemMessage"></param>
+			/// <param name="duration"></param>
+			public static void ShowItemBalloon(Character character, IActor actor, Item item, string type = "reward_itembox", string style = "{@st43}", string systemMessage = "AppraisalSuccess", float duration = 3)
+			{
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.ShowItemBalloon);
+
+				packet.PutByte(1);
+				packet.PutInt(actor.Handle);
+				packet.PutByte(0);
+				packet.AddStringId(style);
+				packet.AddMessageId(systemMessage);
+				packet.PutShort(1);
+				packet.PutByte(0);
+				packet.PutFloat(duration);
+				packet.PutFloat(0);
+				packet.PutLpString(type);
+
+				// An empty balloon still writes the full body, so the client
+				// reads the display fields instead of running off the end
+				if (item == null)
+				{
+					packet.PutInt(0);
+					packet.PutInt(0);
+					packet.PutShort(0);
+
+					character.Connection.Send(packet);
+					return;
+				}
+
+				var properties = item.Properties.GetAll();
+				packet.PutInt(item.Amount);
+				packet.PutInt(item.Id);
+				packet.PutShort(properties.GetByteCount());
+				packet.AddProperties(properties);
+
+				character.Connection.Send(packet);
+			}
+
+			/// <summary>
 			/// Play Item Get Animation
 			/// </summary>
 			/// <param name="character"></param>

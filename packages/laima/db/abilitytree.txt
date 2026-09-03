@@ -1083,6 +1083,8 @@
 { category: "Oracle", classId: 101, abilityId: 411032, jobId: 4008, className: "Oracle32", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Oracle", classId: 503, abilityId: 411033, jobId: 4008, className: "Oracle33", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
 { category: "Oracle", classId: 401, abilityId: 411034, jobId: 4008, className: "Oracle34", maxLevel: 1, priceTimeScript: 'ABIL_COMMON_PRICE_1LV', unlockScript: { name: "UNLOCK_BASE_LEVEL", argStr: "", argNum: 1 } },
+{ category: "Oracle", classId: 1301, abilityId: 411008, jobId: 4008, className: "Oracle8", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_100LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Oracle_DeathVerdict", argNum: 1 } },
+{ category: "Oracle", classId: 1302, abilityId: 411013, jobId: 4008, className: "Oracle13", maxLevel: 5, priceTimeScript: 'ABIL_COMMON_PRICE_100LV', unlockScript: { name: "UNLOCK_ABIL_SKILL", argStr: "Oracle_DeathVerdict", argNum: 1 } },
 
 // Monk
 //---------------------------------------------------------------------------

@@ -7,7 +7,10 @@ using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Monsters;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 
 namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
@@ -19,6 +22,11 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 	[SkillHandler(SkillId.Oracle_Clairvoyance)]
 	public class Oracle_ClairvoyanceOverride : IGroundSkillHandler
 	{
+		private const string GroundEffectName = "F_cleric_clairvoyance_ground";
+		private const float GroundEffectDuration = 3000;
+		private const float CenterDistance = 35f;
+		private const float Radius = 70f;
+
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
 			if (!caster.TrySpendSp(skill))
@@ -40,9 +48,28 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Oracle
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			var targetPos = originPos.GetRelative(farPos);
-			var targetList = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 40f, 20f, 1);
-			await skill.Wait(TimeSpan.FromMilliseconds(290));
+
+			var centerPos = caster.Position.GetRelative(caster.Direction, CenterDistance);
+			var targets = SkillSelectEnemiesInCircle(caster, centerPos, Radius, OracleSkillHelper.GetTargetCount(skill));
+
+			if (caster is not Character character)
+				return;
+
+			OracleSkillHelper.HideDropPreviews(character);
+
+			if (targets.Count == 0)
+				return;
+
+			foreach (var skillTarget in targets)
+			{
+				if (skillTarget is not Mob monster)
+					continue;
+
+				var dropStacks = monster.PeekDrops(character);
+				OracleSkillHelper.ShowDropPreview(character, monster, dropStacks);
+
+				await caster.PlayEffectToGround(GroundEffectName, monster.Position, 1f, GroundEffectDuration);
+			}
 		}
 	}
 }

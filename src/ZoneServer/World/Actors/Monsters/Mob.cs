@@ -44,6 +44,8 @@ namespace Melia.Zone.World.Actors.Monsters
 		private DateTime _deathBroadcastTime;
 		private Character _dropBeneficiary;
 		private List<DropStack> _pendingDrops;
+		private Character _preRollBeneficiary;
+		private List<DropStack> _preRolledDrops;
 		private Position _position;
 
 		/// <summary>
@@ -647,7 +649,18 @@ namespace Melia.Zone.World.Actors.Monsters
 			// Rolled here, while buffs and combat state are still live; only
 			// the placement is deferred to the death broadcast.
 			if (_dropBeneficiary != null)
-				_pendingDrops = this.GenerateAllDropStacks(_dropBeneficiary);
+			{
+				if (_preRolledDrops != null && _preRollBeneficiary == _dropBeneficiary)
+				{
+					// Static drops added after the roll would be lost otherwise
+					_pendingDrops = new List<DropStack>(_preRolledDrops);
+					_pendingDrops.AddRange(this.GenerateStaticDropStacks());
+				}
+				else
+				{
+					_pendingDrops = this.GenerateAllDropStacks(_dropBeneficiary);
+				}
+			}
 
 			this.ScheduleDeathBroadcast();
 
@@ -741,6 +754,8 @@ namespace Melia.Zone.World.Actors.Monsters
 			this.Died = null;
 			_dropBeneficiary = null;
 			_pendingDrops = null;
+			_preRollBeneficiary = null;
+			_preRolledDrops = null;
 			this.FixedDrops.Clear();
 			//this.Vars.Clear();
 			while (this.StaticDrops.TryTake(out _)) { }
@@ -956,6 +971,40 @@ namespace Melia.Zone.World.Actors.Monsters
 			result.AddRange(this.GenerateMapBonusDropStacks(killer, mapBonusRerolls));
 
 			return result;
+		}
+
+		/// <summary>
+		/// Returns the items the monster is going to drop for the given
+		/// character, rolling and remembering them if that didn't happen yet.
+		/// </summary>
+		/// <param name="killer"></param>
+		/// <returns></returns>
+		public List<DropStack> PeekDrops(Character killer)
+		{
+			if (killer == null)
+				return new List<DropStack>();
+
+			if (_preRolledDrops != null && _preRollBeneficiary == killer)
+				return _preRolledDrops;
+
+			return this.RerollDrops(killer);
+		}
+
+		/// <summary>
+		/// Rolls the items the monster is going to drop for the given
+		/// character anew, discarding any previously rolled ones.
+		/// </summary>
+		/// <param name="killer"></param>
+		/// <returns></returns>
+		public List<DropStack> RerollDrops(Character killer)
+		{
+			if (killer == null)
+				return new List<DropStack>();
+
+			_preRollBeneficiary = killer;
+			_preRolledDrops = this.GenerateAllDropStacks(killer);
+
+			return _preRolledDrops;
 		}
 
 		/// <summary>

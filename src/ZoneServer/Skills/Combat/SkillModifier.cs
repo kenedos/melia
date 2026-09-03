@@ -226,6 +226,11 @@ namespace Melia.Zone.Skills.Combat
 		public bool ForcedEvade { get; set; }
 
 		/// <summary>
+		/// Gets or sets whether the attack can crit. Beats out ForcedCritical.
+		/// </summary>
+		public bool Uncrittable { get; set; }
+
+		/// <summary>
 		/// Gets or sets forced critical status.
 		/// </summary>
 		/// <remarks>

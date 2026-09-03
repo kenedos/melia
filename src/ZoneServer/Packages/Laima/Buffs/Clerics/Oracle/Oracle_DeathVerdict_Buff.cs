@@ -1,41 +1,42 @@
+using System;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Buffs.Base;
-using Melia.Zone.Scripting.ScriptableEvents;
-using Melia.Zone.Skills;
-using Melia.Zone.Skills.Combat;
+using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Monsters;
+using static Melia.Zone.Skills.SkillUseFunctions;
 
 namespace Melia.Zone.Buffs.Handlers.Clerics.Oracle
 {
 	/// <summary>
-	/// Handle for the Death Sentence buff, which increases damage
-	/// taken by the target. On expiration, deals accumulated damage
-	/// as Dark magic damage.
+	/// Handle for the Death Sentence buff, which kills the target outright
+	/// once it runs out.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.DeathVerdict_Buff)]
 	public class Oracle_DeathVerdict_BuffOverride : BuffHandler
 	{
+		private const float MspdReduceRatePerLevel = 0.15f;
+		private const string GaugeSkinName = "gauge_red";
+		private const string GaugeScript = "MAKE_GAUGE_BALLOON({0}, 0, {1}, 1, \"{2}\")";
+
 		public override void OnActivate(Buff buff, ActivationType activationType)
 		{
 			var target = buff.Target;
-			var skillLevel = buff.NumArg1;
-
-			var addDamageRate = (30f + skillLevel * 5f) / 100f;
-			buff.Vars.SetFloat("ADD_DAMAGE_RATE", addDamageRate);
-
-			buff.Vars.SetFloat("CumulativeDamage", 0);
 
 			if (buff.Caster is ICombatEntity caster)
 			{
 				var abilLevel = caster.GetAbilityLevel(AbilityId.Oracle8);
 				if (abilLevel > 0)
 				{
-					var mspdReduce = target.Properties.GetFloat(PropertyName.MSPD) * 0.15f * abilLevel;
+					var mspdReduce = target.Properties.GetFloat(PropertyName.MSPD) * MspdReduceRatePerLevel * abilLevel;
 					AddPropertyModifier(buff, target, PropertyName.MSPD_BM, -mspdReduce);
 				}
 			}
+
+			this.UpdateGauge(buff, buff.Duration.TotalSeconds);
 		}
 
 		public override void OnEnd(Buff buff)
@@ -43,30 +44,38 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Oracle
 			var target = buff.Target;
 
 			RemovePropertyModifier(buff, target, PropertyName.MSPD_BM);
+			this.UpdateGauge(buff, 0);
 
-			if (!target.IsDead && buff.Caster is ICombatEntity caster)
-			{
-				var cumulativeDamage = buff.Vars.GetFloat("CumulativeDamage");
-				if (cumulativeDamage > 0)
-				{
-					var oracle13Level = caster.GetAbilityLevel(AbilityId.Oracle13);
-					if (oracle13Level > 0)
-						cumulativeDamage *= (1f - oracle13Level * 0.1f);
-
-					if (cumulativeDamage > 0)
-						target.TakeSimpleHit(cumulativeDamage, caster, SkillId.Oracle_DeathVerdict);
-				}
-			}
-		}
-
-		[CombatCalcModifier(CombatCalcPhase.BeforeCalc_Defense, BuffId.DeathVerdict_Buff)]
-		public void OnDefenseBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
-		{
-			if (!target.TryGetBuff(BuffId.DeathVerdict_Buff, out var buff))
+			if (target.IsDead || buff.Caster is not ICombatEntity caster)
 				return;
 
-			var addDamageRate = buff.Vars.GetFloat("ADD_DAMAGE_RATE");
-			modifier.DamageMultiplier += addDamageRate;
+			if (target is Mob)
+			{
+				target.TakeSimpleHit(target.Properties.GetFloat(PropertyName.HP), caster, SkillId.Oracle_DeathVerdict);
+				return;
+			}
+
+			// A player is not sentenced outright, only struck once
+			if (!caster.TryGetSkill(buff.SkillId, out var skill))
+				return;
+
+			var hitResult = SCR_SkillHit(caster, target, skill);
+			target.TakeSimpleHit(hitResult.Damage, caster, SkillId.Oracle_DeathVerdict);
+		}
+
+		/// <summary>
+		/// Shows the countdown bar above the target for the given number of
+		/// seconds, removing it when that is zero.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <param name="seconds"></param>
+		private void UpdateGauge(Buff buff, double seconds)
+		{
+			if (buff.Caster is not Character character || character.Connection == null)
+				return;
+
+			var script = string.Format(GaugeScript, buff.Target.Handle, (int)Math.Round(seconds), GaugeSkinName);
+			Send.ZC_EXEC_CLIENT_SCP(character.Connection, script);
 		}
 	}
 }

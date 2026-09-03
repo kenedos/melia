@@ -343,6 +343,13 @@ namespace Melia.Test.Balance.Buff
 			// How many allies the press reaches, which is the mechanic rather
 			// than a dial on it. Its heal factor is the slot left free.
 			["Pardoner_Indulgentia"] = new() { [1] = (4f, 1f) },
+
+			// How many enemies each press reads or sentences, rounded up by
+			// the handler. The rate is picked so the last point of the skill
+			// is worth taking, which pricing has no way to know.
+			["Oracle_Clairvoyance"] = new() { [1] = (0f, 0.55f) },
+			["Oracle_Ressetting"] = new() { [1] = (0f, 0.7f) },
+			["Oracle_DeathVerdict"] = new() { [1] = (0f, 0.42f) },
 		};
 
 		/// <summary>

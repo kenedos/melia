@@ -1173,6 +1173,8 @@ public class CombatCalculationsScript : GeneralScript
 		var attackType = modifier.AttackType == SkillAttackType.None ? skill.Data.AttackType : modifier.AttackType;
 		if (attackType == SkillAttackType.Magic)
 			return 0f;
+		if (modifier.Uncrittable)
+			return 0f;
 		if (modifier.ForcedCritical)
 			return 100f;
 
