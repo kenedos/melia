@@ -20,6 +20,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		private readonly Dictionary<CooldownId, Cooldown> _cooldowns = new Dictionary<CooldownId, Cooldown>();
 		private readonly Dictionary<SkillId, TimeSpan> _cooldownReductions = new Dictionary<SkillId, TimeSpan>();
 		private readonly List<Cooldown> _over = new List<Cooldown>();
+		private readonly Dictionary<CooldownId, GroupOverheat> _overheats = new Dictionary<CooldownId, GroupOverheat>();
 
 		/// <summary>
 		/// Extra flat time added to all skill cooldowns when they start.
@@ -88,7 +89,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				duration *= (1 - cdrRate);
 			}
 
-			return this.Start(skill.Data.CooldownGroup, duration);
+			return this.Start(skill.CooldownGroup, duration);
 		}
 
 
@@ -240,7 +241,90 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 					_cooldowns.Remove(cooldown.Id);
 					cooldown.OnCooldownChanged?.Invoke();
 				}
+
+				foreach (var overheat in _overheats.Values)
+				{
+					if (overheat.TimeRemaining <= TimeSpan.Zero)
+						continue;
+
+					overheat.TimeRemaining = Math2.Max(TimeSpan.Zero, overheat.TimeRemaining - elapsed);
+
+					if (overheat.TimeRemaining == TimeSpan.Zero)
+						overheat.Counter = 0;
+				}
 			}
+		}
+
+		/// <summary>
+		/// Returns the overheat counter shared by the skills using the
+		/// given cooldown group.
+		/// </summary>
+		/// <param name="cooldownId"></param>
+		/// <returns></returns>
+		public int GetOverheatCounter(CooldownId cooldownId)
+		{
+			lock (_syncLock)
+			{
+				if (_overheats.TryGetValue(cooldownId, out var overheat))
+					return overheat.Counter;
+			}
+
+			return 0;
+		}
+
+		/// <summary>
+		/// Sets the overheat counter shared by the skills using the given
+		/// cooldown group.
+		/// </summary>
+		/// <param name="cooldownId"></param>
+		/// <param name="counter"></param>
+		public void SetOverheatCounter(CooldownId cooldownId, int counter)
+		{
+			lock (_syncLock)
+				this.GetOrCreateOverheat(cooldownId).Counter = counter;
+		}
+
+		/// <summary>
+		/// Returns the time until the given cooldown group's overheat
+		/// counter is reset.
+		/// </summary>
+		/// <param name="cooldownId"></param>
+		/// <returns></returns>
+		public TimeSpan GetOverheatTimeRemaining(CooldownId cooldownId)
+		{
+			lock (_syncLock)
+			{
+				if (_overheats.TryGetValue(cooldownId, out var overheat))
+					return overheat.TimeRemaining;
+			}
+
+			return TimeSpan.Zero;
+		}
+
+		/// <summary>
+		/// Sets the time until the given cooldown group's overheat counter
+		/// is reset.
+		/// </summary>
+		/// <param name="cooldownId"></param>
+		/// <param name="timeRemaining"></param>
+		public void SetOverheatTimeRemaining(CooldownId cooldownId, TimeSpan timeRemaining)
+		{
+			lock (_syncLock)
+				this.GetOrCreateOverheat(cooldownId).TimeRemaining = timeRemaining;
+		}
+
+		/// <summary>
+		/// Returns the overheat state for the given cooldown group,
+		/// creating it if it doesn't exist yet.
+		/// </summary>
+		/// <param name="cooldownId"></param>
+		/// <returns></returns>
+		private GroupOverheat GetOrCreateOverheat(CooldownId cooldownId)
+		{
+			if (!_overheats.TryGetValue(cooldownId, out var overheat))
+				_overheats[cooldownId] = overheat = new GroupOverheat();
+
+			return overheat;
 		}
 
 		/// <summary>
@@ -269,6 +353,23 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				_cooldownReductions.Remove(skillId);
 			}
 		}
+	}
+
+	/// <summary>
+	/// An overheat counter shared by every skill using one cooldown group.
+	/// </summary>
+	public class GroupOverheat
+	{
+		/// <summary>
+		/// Returns the amount of times the group was used since its last
+		/// reset.
+		/// </summary>
+		public int Counter { get; set; }
+
+		/// <summary>
+		/// Returns the time until the counter is reset.
+		/// </summary>
+		public TimeSpan TimeRemaining { get; set; }
 	}
 
 	public class Cooldown

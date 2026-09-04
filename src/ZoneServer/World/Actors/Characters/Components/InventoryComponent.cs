@@ -703,10 +703,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (!item.IsStackable)
 				return item.Amount;
 
-			var itemId = item.Id;
 			var amount = item.Amount;
 			var cat = item.Data.Category;
-			var stacks = this.GetStacks(cat, itemId, inventoryType);
+			var stacks = this.GetStacks(cat, item, inventoryType);
 
 			// Fill stacks
 			foreach (var index in stacks)
@@ -806,9 +805,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// aren't full yet.
 		/// </summary>
 		/// <param name="cat"></param>
-		/// <param name="itemId"></param>
+		/// <param name="source"></param>
 		/// <returns></returns>
-		private List<int> GetStacks(InventoryCategory cat, int itemId, InventoryType inventoryType = InventoryType.Inventory)
+		private List<int> GetStacks(InventoryCategory cat, Item source, InventoryType inventoryType = InventoryType.Inventory)
 		{
 			var result = new List<int>();
 
@@ -817,7 +816,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				switch (inventoryType)
 				{
 					case InventoryType.PersonalStorage:
-						var index = _warehouse.FindIndex(item => item.Id == itemId && item.Amount < item.Data.MaxStack);
+						var index = _warehouse.FindIndex(item => item.CanStackWith(source) && item.Amount < item.Data.MaxStack);
 						result.Add(index);
 						break;
 					default:
@@ -826,7 +825,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 						for (var i = 0; i < categoryItems.Count; ++i)
 						{
 							var item = categoryItems[i];
-							if (item.Id == itemId && item.Amount < item.Data.MaxStack)
+							if (item.CanStackWith(source) && item.Amount < item.Data.MaxStack)
 								result.Add(i);
 						}
 						break;

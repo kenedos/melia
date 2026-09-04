@@ -63,6 +63,32 @@ namespace Melia.Zone.World.Items
 		public bool IsStackable => this.Data.MaxStack > 1;
 
 		/// <summary>
+		/// Returns true if the item carries a skill, which makes otherwise
+		/// identical stacks distinct.
+		/// </summary>
+		public bool IsSkillScroll => this.Data.ClassName.StartsWith("Scroll_SkillItem");
+
+		/// <summary>
+		/// Returns whether the given item may be merged into this one's
+		/// stack.
+		/// </summary>
+		/// <param name="other"></param>
+		/// <returns></returns>
+		public bool CanStackWith(Item other)
+		{
+			if (other == null || other.Id != this.Id)
+				return false;
+
+			if (this.IsSkillScroll)
+			{
+				return this.Properties.GetFloat(PropertyName.SkillType) == other.Properties.GetFloat(PropertyName.SkillType)
+					&& this.Properties.GetFloat(PropertyName.SkillLevel) == other.Properties.GetFloat(PropertyName.SkillLevel);
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Gets or sets item's globally unique db id.
 		/// </summary>
 		public long DbId { get; set; }

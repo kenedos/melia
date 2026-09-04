@@ -1748,6 +1748,14 @@ namespace Melia.Zone.World.Actors
 			=> entity.Components.Get<CooldownComponent>()?.Remove(cooldownId) ?? false;
 
 		/// <summary>
+		/// Returns all cooldowns that are currently active on the entity.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		public static Cooldown[] GetCooldowns(this ICombatEntity entity)
+			=> entity.Components.Get<CooldownComponent>()?.GetAll() ?? [];
+
+		/// <summary>
 		/// Starts the cooldown with a given id and duration.
 		/// </summary>
 		/// <param name="entity"></param>

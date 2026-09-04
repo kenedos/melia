@@ -4615,6 +4615,25 @@ namespace Melia.Zone.Commands
 					skill.StartCooldown(TimeSpan.Zero);
 			}
 
+			// The scroll cooldown belongs to no learned skill, so it's
+			// cleared by its group instead.
+			var scrollCooldownData = ZoneServer.Instance.Data.CooldownDb.Find(Skill.ScrollCooldownGroupName);
+			if (scrollCooldownData != null && target.Components.TryGet<CooldownComponent>(out var cooldowns))
+			{
+				cooldowns.Remove(scrollCooldownData.Id);
+				cooldowns.SetOverheatCounter(scrollCooldownData.Id, 0);
+				cooldowns.SetOverheatTimeRemaining(scrollCooldownData.Id, TimeSpan.Zero);
+			}
+
+			foreach (var cooldown in target.GetCooldowns())
+			{
+				if (ZoneServer.Instance.Data.CooldownDb.TryFind(cooldown.Id, out var cooldownData)
+					&& cooldownData.ClassName.StartsWith(Skill.ScrollChargeCooldownPrefix))
+				{
+					target.RemoveCooldown(cooldown.Id);
+				}
+			}
+
 			sender.ServerMessage(Localization.Get("Skill cooldowns reset."));
 
 			return CommandResult.Okay;

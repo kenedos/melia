@@ -1,0 +1,221 @@
+// Laima
+// Database file
+//
+// Simony Scroll Crafting Data
+// Defines which skills can be crafted into scrolls by the Pardoner's Simony
+// skill and the RuneCaster's Craft Magic Scrolls skill.
+//
+// The silver cost, material count and crafting time are formulas shared with
+// the client and are not configured here. Only the whitelist and the material
+// item are.
+//
+// Must stay in sync with the client's Simony table. After changing this file,
+// regenerate the scroll cooldown groups.
+//
+// Values: skillType, className, name, [canMake], [materialClassName]
+//---------------------------------------------------------------------------
+[
+// Cleric Skills
+//---------------------------------------------------------------------------
+{ skillType: 40001, className: "Cleric_Heal", name: "Heal", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40002, className: "Cleric_Cure", name: "Cure", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40008, className: "Cleric_Smite", name: "Smite", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40006, className: "Cleric_Fade", name: "Fade", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40007, className: "Cleric_PatronSaint", name: "Guardian Saint", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40003, className: "Cleric_SafetyZone", name: "Safety Zone", canMake: true, materialClassName: "misc_parchment" },
+
+// Priest Skills
+//---------------------------------------------------------------------------
+{ skillType: 40201, className: "Priest_Aspersion", name: "Aspersion", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40202, className: "Priest_Monstrance", name: "Monstrance", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40203, className: "Priest_Blessing", name: "Blessing", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40204, className: "Priest_Resurrection", name: "Resurrection", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40211, className: "Priest_TurnUndead", name: "Turn Undead", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40205, className: "Priest_Sacrament", name: "Sacrament", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40206, className: "Priest_Revive", name: "Revive", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40209, className: "Priest_MassHeal", name: "Mass Heal", canMake: true, materialClassName: "misc_parchment" },
+
+// Krivis Skills
+//---------------------------------------------------------------------------
+{ skillType: 40101, className: "Kriwi_Aukuras", name: "Aukuras", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40102, className: "Kriwi_Zalciai", name: "Zalciai", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40104, className: "Kriwi_Zaibas", name: "Zaibas", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40103, className: "Kriwi_Daino", name: "Daino", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40105, className: "Kriwi_DivineStigma", name: "Divine Stigma", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40106, className: "Kriwi_Melstis", name: "Piety", canMake: true, materialClassName: "misc_parchment" },
+
+// Druid Skills
+//---------------------------------------------------------------------------
+{ skillType: 40902, className: "Druid_Carnivory", name: "Carnivory", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40906, className: "Druid_Chortasmata", name: "Chortasmata", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40903, className: "Druid_ShapeShifting", name: "Shape Shifting", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40910, className: "Druid_Seedbomb", name: "Seed Bomb", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40904, className: "Druid_Transform", name: "Transform", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40911, className: "Druid_ThornVine", name: "Thorn", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40908, className: "Druid_Lycanthropy", name: "Lycanthropy", canMake: true, materialClassName: "misc_parchment" },
+
+// Sadhu Skills
+//---------------------------------------------------------------------------
+{ skillType: 40501, className: "Sadhu_OutofBody", name: "Out of Body", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40502, className: "Sadhu_Prakriti", name: "Prakriti", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40512, className: "Sadhu_Anila", name: "Enira", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40505, className: "Sadhu_Possession", name: "Possession", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40506, className: "Sadhu_TransmitPrana", name: "Transmit Prana", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40513, className: "Sadhu_Tanoti", name: "Tanoti", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40514, className: "Sadhu_Patati", name: "Patati", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40515, className: "Sadhu_Moksha", name: "Moksha", canMake: true, materialClassName: "misc_parchment" },
+
+// Dievdirbys Skills
+//---------------------------------------------------------------------------
+{ skillType: 40401, className: "Dievdirbys_CarveVakarine", name: "Statue of Goddess Vakarine", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40402, className: "Dievdirbys_CarveZemina", name: "Statue of Goddess Zemyna", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40404, className: "Dievdirbys_Carve", name: "Carve Attack", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40405, className: "Dievdirbys_CarveOwl", name: "Carve Owl", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40403, className: "Dievdirbys_CarveLaima", name: "Statue of Goddess Laima", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40406, className: "Dievdirbys_CarveAustrasKoks", name: "Carve World Tree", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40407, className: "Dievdirbys_CarveAusirine", name: "Statue of Goddess Ausrine", canMake: true, materialClassName: "misc_parchment" },
+
+// Oracle Skills
+//---------------------------------------------------------------------------
+{ skillType: 41002, className: "Oracle_ArcaneEnergy", name: "Arcane Energy", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41005, className: "Oracle_CounterSpell", name: "Counter Spell", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41009, className: "Oracle_Prophecy", name: "Prophecy", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41008, className: "Oracle_DeathVerdict", name: "Death Sentence", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41013, className: "Oracle_DivineMight", name: "Divine Might", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41011, className: "Oracle_Foretell", name: "Foretell", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41004, className: "Oracle_Clairvoyance", name: "Clairvoyance", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41012, className: "Oracle_TwistOfFate", name: "Twist of Fate", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41007, className: "Oracle_Ressetting", name: "Resetting", canMake: true, materialClassName: "misc_parchment" },
+
+// Monk Skills
+//---------------------------------------------------------------------------
+{ skillType: 40701, className: "Monk_IronSkin", name: "Iron Skin", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40702, className: "Monk_DoublePunch", name: "Double Punch", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40703, className: "Monk_PalmStrike", name: "Palm Strike", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40704, className: "Monk_HandKnife", name: "Hand Knife", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40705, className: "Monk_1InchPunch", name: "One Inch Punch", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40707, className: "Monk_God_Finger_Flicking", name: "God Finger Flick", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40706, className: "Monk_EnergyBlast", name: "Energy Blast", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40708, className: "Monk_Golden_Bell_Shield", name: "Golden Bell Shield", canMake: true, materialClassName: "misc_parchment" },
+
+// Pardoner Skills
+//---------------------------------------------------------------------------
+{ skillType: 40802, className: "Pardoner_Indulgentia", name: "Indulgentia", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40803, className: "Pardoner_DiscernEvil", name: "Discerning Evil", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40808, className: "Pardoner_IncreaseMagicDEF", name: "Increase Magic Defense", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40809, className: "Pardoner_Dekatos", name: "Dekatos", canMake: true, materialClassName: "misc_parchment" },
+
+// Paladin Skills
+//---------------------------------------------------------------------------
+{ skillType: 40610, className: "Paladin_StoneSkin", name: "Stone Skin", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40602, className: "Paladin_Restoration", name: "Restoration", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40603, className: "Paladin_ResistElements", name: "Resist Elements", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40607, className: "Paladin_Conviction", name: "Conviction", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40608, className: "Paladin_Sanctuary", name: "Sanctuary", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40609, className: "Paladin_Demolition", name: "Demolition", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 40606, className: "Paladin_Barrier", name: "Barrier", canMake: true, materialClassName: "misc_parchment" },
+
+// Chaplain Skills
+//---------------------------------------------------------------------------
+{ skillType: 41301, className: "Chaplain_LastRites", name: "Last Rites", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41307, className: "Chaplain_VisibleTalent", name: "Visible Talent", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41305, className: "Chaplain_Binatio", name: "Binatio", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41302, className: "Chaplain_BuildCappella", name: "Deploy Cappella", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41306, className: "Chaplain_ParaclitusTime", name: "Paraclitus Time", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41304, className: "Chaplain_Aspergillum", name: "Aspergillum", canMake: true, materialClassName: "misc_parchment" },
+
+// Plague Doctor Skills
+//---------------------------------------------------------------------------
+{ skillType: 41101, className: "PlagueDoctor_HealingFactor", name: "Healing Factor", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41102, className: "PlagueDoctor_Incineration", name: "Incineration", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41104, className: "PlagueDoctor_Fumigate", name: "Fumigate", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41110, className: "PlagueDoctor_Modafinil", name: "Modafinil", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41106, className: "PlagueDoctor_BeakMask", name: "Beak Mask", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41107, className: "PlagueDoctor_PlagueVapours", name: "Black Death Steam", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41105, className: "PlagueDoctor_Pandemic", name: "Pandemic", canMake: true, materialClassName: "misc_parchment" },
+
+// Kabbalist Skills
+//---------------------------------------------------------------------------
+{ skillType: 41201, className: "Kabbalist_RevengedSevenfold", name: "Revenged Sevenfold", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41203, className: "Kabbalist_Ayin_sof", name: "Ein Sof", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41204, className: "Kabbalist_Merkabah", name: "Merkabah", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41212, className: "Kabbalist_Anagrama", name: "Anagrama", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41202, className: "Kabbalist_Nachash", name: "Nachash", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41211, className: "Kabbalist_TheTreeOfSepiroth", name: "Tree of Sepiroth", canMake: true, materialClassName: "misc_parchment" },
+
+// Inquisitor Skills
+//---------------------------------------------------------------------------
+{ skillType: 41407, className: "Inquisitor_GodSmash", name: "God Smash", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41404, className: "Inquisitor_PearofAnguish", name: "Pear of Anguish", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41406, className: "Inquisitor_BreakingWheel", name: "Breaking Wheel", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41408, className: "Inquisitor_MalleusMaleficarum", name: "Malleus Maleficarum", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41401, className: "Inquisitor_IronMaiden", name: "Iron Maiden", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41409, className: "Inquisitor_Judgment", name: "Judgment", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41410, className: "Inquisitor_BreastRipper", name: "Ripper", canMake: true, materialClassName: "misc_parchment" },
+
+// Miko Skills
+//---------------------------------------------------------------------------
+{ skillType: 41601, className: "Miko_Gohei", name: "Gohei", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41603, className: "Miko_Hamaya", name: "Hamaya", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41604, className: "Miko_Kasiwade", name: "Clap", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41602, className: "Miko_HoukiBroom", name: "Sweeping", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41606, className: "Miko_Omikuji", name: "Omikuji", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41605, className: "Miko_KaguraDance", name: "Kagura", canMake: true, materialClassName: "misc_parchment" },
+
+// Zealot Skills
+//---------------------------------------------------------------------------
+{ skillType: 41701, className: "Zealot_Invulnerable", name: "Invulnerable ", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41702, className: "Zealot_Immolation", name: "Immolation", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41703, className: "Zealot_BeadyEyed", name: "Beady Eyed", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41704, className: "Zealot_Fanaticism", name: "Fanaticism ", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41705, className: "Zealot_FanaticIllusion", name: "Fanatic Illusion", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41706, className: "Zealot_BlindFaith", name: "Blind Faith", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41707, className: "Zealot_EmphasisTrust", name: "Emphatic Trust", canMake: true, materialClassName: "misc_parchment" },
+
+// Exorcist Skills
+//---------------------------------------------------------------------------
+{ skillType: 41801, className: "Exorcist_Rubric", name: "Rubric", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41802, className: "Exorcist_Entity", name: "Entity", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41803, className: "Exorcist_AquaBenedicta", name: "Aqua Benedicta", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41804, className: "Exorcist_Engkrateia", name: "Engkrateia", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41805, className: "Exorcist_Gregorate", name: "Gregorate", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41806, className: "Exorcist_Koinonia", name: "Grand Cross", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41807, className: "Exorcist_Katadikazo", name: "Katadikazo", canMake: true, materialClassName: "misc_parchment" },
+
+// Crusader Skills
+//---------------------------------------------------------------------------
+{ skillType: 41904, className: "Crusader_Chants", name: "Chant", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41901, className: "Crusader_HolySmash", name: "Holy Smash", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41907, className: "Crusader_RingOfLight", name: "Ring of Light", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41903, className: "Crusader_Sacred", name: "Sacred", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41906, className: "Crusader_Condemn", name: "Condemn", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41902, className: "Crusader_ProtectionOfGoddess", name: "Protection of Goddess", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 41905, className: "Crusader_Retaliation", name: "Retaliation", canMake: true, materialClassName: "misc_parchment" },
+
+// Lama Skills
+//---------------------------------------------------------------------------
+{ skillType: 42001, className: "Lama_Lamapose", name: "Vipashyana", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42002, className: "Lama_Avoid", name: "Glide", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42003, className: "Lama_Relax", name: "Shamatha", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42004, className: "Lama_Lamadash", name: "Langon", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42005, className: "Lama_StrongfistHanginglegs", name: "Strong Fist / Leg Trip", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42006, className: "Lama_PointkickEarthshock", name: "Point Kick / Break Mountain", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42007, className: "Lama_FlyingkickSuddenkick", name: "Sudden Kick / Flying Kick", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42008, className: "Lama_Endlessattacks", name: "Surging Wave", canMake: true, materialClassName: "misc_parchment" },
+
+// Pontifex Skills
+//---------------------------------------------------------------------------
+{ skillType: 42017, className: "Pontifex_Missa", name: "Mass", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42018, className: "Pontifex_EvilBurn", name: "Evil Burn", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42019, className: "Pontifex_Atonement", name: "Atonement", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42020, className: "Pontifex_Evangelism", name: "Evangelism", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42021, className: "Pontifex_Gospel", name: "Gospel", canMake: true, materialClassName: "misc_parchment" },
+{ skillType: 42022, className: "Pontifex_Didache", name: "Didache: Absolution", canMake: true, materialClassName: "misc_parchment" },
+
+// Wizard Skills
+//---------------------------------------------------------------------------
+{ skillType: 20007, className: "Wizard_MagicMissile", name: "Magic Missile", canMake: true, materialClassName: "misc_runeStone" },
+{ skillType: 20107, className: "Pyromancer_FlameGround", name: "Flame Ground", canMake: true, materialClassName: "misc_runeStone" },
+{ skillType: 21201, className: "Warlock_PoleofAgony", name: "Pole of Agony", canMake: true, materialClassName: "misc_runeStone" },
+
+]

@@ -505,6 +505,7 @@ namespace Melia.Zone.Network
 				var compressedData = packet.CompressData(p =>
 				{
 					var quickSlotsStr = serialized.Split('#', StringSplitOptions.RemoveEmptyEntries);
+					var claimedItemIds = new HashSet<long>();
 
 					p.PutByte(quickSlotRows);
 
@@ -518,32 +519,39 @@ namespace Melia.Zone.Network
 
 						if (type == QuickSlotType.Item)
 						{
-							if (character.Inventory.TryGetItemOrEquip(objectId, out var item) && item.Id == id)
+							// Object ids don't survive a relog, so a slot is
+							// saved with the item's database id and matched
+							// back to whichever object holds it now.
+							Item item = null;
+
+							if (objectId != 0)
+							{
+								item = character.Inventory.GetItems().Values.FirstOrDefault(a => a.Id == id && a.DbId == objectId)
+									?? character.Inventory.GetEquip().Values.FirstOrDefault(a => a.Id == id && a.DbId == objectId);
+
+								if (item == null && character.Inventory.TryGetItemOrEquip(objectId, out var sessionItem) && sessionItem.Id == id)
+									item = sessionItem;
+							}
+
+							if (item == null)
+							{
+								// Items of one class are interchangeable,
+								// except skill scrolls, where the skill and
+								// its level live on the item itself.
+								item = character.Inventory.GetItems().Values.FirstOrDefault(a => a.Id == id && (!a.IsSkillScroll || !claimedItemIds.Contains(a.ObjectId)))
+									?? character.Inventory.GetEquip().Values.FirstOrDefault(a => a.Id == id && (!a.IsSkillScroll || !claimedItemIds.Contains(a.ObjectId)));
+							}
+
+							if (item != null)
 							{
 								objectId = item.ObjectId;
+								claimedItemIds.Add(objectId);
 							}
 							else
 							{
-								item = character.Inventory.GetItems().Values.FirstOrDefault(item => item.Id == id);
-								if (item != null)
-								{
-									objectId = item.ObjectId;
-								}
-								else
-								{
-									item = character.Inventory.GetEquip().Values.FirstOrDefault(item => item.Id == id);
-
-									if (item != null)
-									{
-										objectId = item.ObjectId;
-									}
-									else
-									{
-										type = QuickSlotType.None;
-										id = 0;
-										objectId = 0;
-									}
-								}
+								type = QuickSlotType.None;
+								id = 0;
+								objectId = 0;
 							}
 						}
 

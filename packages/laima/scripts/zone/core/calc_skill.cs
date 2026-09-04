@@ -21,6 +21,12 @@ using static g4.RoundRectGenerator;
 
 public class SkillCalculationsScript : GeneralScript
 {
+	// Cooldown every skill cast from a skill scroll shares, in milliseconds
+	private const float ScrollCooldown = 30000f;
+
+	// Amount of scrolls that can be used before the shared cooldown starts
+	private const float ScrollOverheatCount = 3f;
+
 	/// <summary>
 	/// Returns skill's AoE Attack Ratio?
 	/// </summary>
@@ -554,6 +560,10 @@ public class SkillCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_GET_COOLDOWN(Skill skill)
 	{
+		// Every scroll shares one cooldown, so the skill's own is ignored
+		if (skill.IsItemSkill)
+			return ScrollCooldown;
+
 		var owner = skill.Owner;
 		var basicCooldown = (float)skill.Data.CooldownTime.TotalMilliseconds;
 
@@ -759,6 +769,24 @@ public class SkillCalculationsScript : GeneralScript
 		}
 
 		return (int)Math.Max(0, Math.Floor(ret));
+	}
+
+	/// <summary>
+	/// Calculates and returns the skill's available max overheat count,
+	/// indicating how many times the skill can be used before it goes on
+	/// cooldown.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public float GET_SKILL_OVERHEAT_COUNT(Skill skill)
+	{
+		// Every scroll shares one overheat counter, so a set amount of
+		// scrolls can be used before the shared cooldown starts
+		if (skill.IsItemSkill)
+			return ScrollOverheatCount;
+
+		return Math.Max(0, skill.Data.OverheatCount);
 	}
 
 	/// <summary>

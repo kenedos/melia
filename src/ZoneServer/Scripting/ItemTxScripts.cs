@@ -26,5 +26,11 @@ namespace Melia.Zone.Scripting
 		/// The transaction failed.
 		/// </summary>
 		Fail,
+
+		/// <summary>
+		/// The transaction was successful and the script accounted for the
+		/// item itself, so the item it was given must not be consumed.
+		/// </summary>
+		OkayKeepItem,
 	}
 }

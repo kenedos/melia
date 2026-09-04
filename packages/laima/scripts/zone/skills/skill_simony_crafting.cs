@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Simony Skill Scroll Crafting
 //--- Description -----------------------------------------------------------
 // Handles the Pardoner's Simony skill scroll crafting transaction.
@@ -29,8 +29,20 @@ public class SimonyCraftingScript : GeneralScript
 	private const int EnchanterSkillTypeMin = 20000;
 	private const int EnchanterSkillTypeMax = 30000;
 
-	// Crafting time in seconds per scroll
+	// Crafting time in seconds per scroll at crafting skill level 1
 	private const float BaseCraftTimePerScroll = 3.0f;
+
+	// Silver cost per level of the skill the scroll is made from
+	private const int PricePerSkillLevel = 500;
+
+	// Share of a skill's max level a scroll of it can reach
+	private const float ScrollLevelRate = 0.4f;
+
+	// Temp variable marking a craft that hasn't finished yet
+	private const string CraftingVarName = "Melia.Simony.Crafting";
+
+	// Animation the character is put into while crafting
+	private const string CraftAnimation = "MAKING";
 
 	// Bottle item names for crafting
 	private const string SimonyBottle = "misc_parchment";
@@ -43,14 +55,13 @@ public class SimonyCraftingScript : GeneralScript
 	/// </summary>
 	/// <param name="character">The character crafting the scroll.</param>
 	/// <param name="item">The item used to trigger crafting (if any).</param>
-	/// <param name="numArgs">Arguments: [0] = skillType, [1] = level, [2] = count</param>
+	/// <param name="numArgs">Arguments: [0] = skillType, [1] = count</param>
 	/// <returns>Transaction result.</returns>
 	[ScriptableFunction]
 	public ItemTxResult SCR_SKILLITEM_MAKE(Character character, Item item, int[] numArgs)
 	{
 		if (numArgs == null || numArgs.Length < 2)
 		{
-			//Log.Debug("SCR_SKILLITEM_MAKE: Failed - Invalid arguments. Expected 3 args (skillType, level, count).");
 			Log.Debug("SCR_SKILLITEM_MAKE: Failed - Invalid arguments. Expected 2 args (skillType, count).");
 			return ItemTxResult.Fail;
 		}
@@ -61,6 +72,14 @@ public class SimonyCraftingScript : GeneralScript
 		if (count <= 0 || count > 999)
 		{
 			Log.Debug("SCR_SKILLITEM_MAKE: Failed - Invalid count: {0}", count);
+			return ItemTxResult.Fail;
+		}
+
+		// A craft only spends its materials once it finishes, so a second
+		// one may not start while the first is running
+		if (character.CheckBoolTempVar(CraftingVarName))
+		{
+			character.ServerMessage("You are already crafting a scroll.");
 			return ItemTxResult.Fail;
 		}
 
@@ -94,15 +113,11 @@ public class SimonyCraftingScript : GeneralScript
 			return ItemTxResult.Fail;
 		}
 
-		// Maximum scroll level is min of character's skill level and crafting skill level
-		var level = 1;
-		var maxLevel = Math.Min(characterSkill.Level, craftingSkill.Level);
-		if (level > maxLevel || level <= 0)
-		{
-			Log.Debug("SCR_SKILLITEM_MAKE: Failed - Requested level {0} exceeds max level {1}", level, maxLevel);
-			character.ServerMessage("You can only craft scrolls up to level {0}.", maxLevel);
-			return ItemTxResult.Fail;
-		}
+		// Scroll level is the min of the character's skill level and crafting
+		// skill level, capped to a share of the skill's own max level
+		var level = Math.Min(characterSkill.Level, craftingSkill.Level);
+		level = Math.Min(level, GetMaxScrollLevel(character, characterSkill));
+		level = Math.Max(1, level);
 
 		// Calculate material costs
 		var price = GetSkillMatPrice(characterSkill, level);
@@ -127,7 +142,7 @@ public class SimonyCraftingScript : GeneralScript
 		}
 
 		// Calculate crafting time
-		var craftTimeSec = GetSkillItemMakeTime(characterSkill, count);
+		var craftTimeSec = GetSkillItemMakeTime(craftingSkillName, craftingSkill, count);
 
 		// Apply ReduceCraftTime_Buff if active
 		if (character.TryGetBuff(BuffId.ReduceCraftTime_Buff, out var reduceBuff))
@@ -137,9 +152,12 @@ public class SimonyCraftingScript : GeneralScript
 		}
 
 		// Start the crafting process
+		character.SetTempVar(CraftingVarName, 1f);
 		_ = DoCrafting(character, skillType, level, count, craftingSkillName, bottleName, totalBottles, totalPrice, craftTimeSec);
 
-		return ItemTxResult.Okay;
+		// The materials are spent by the craft itself, so the parchment
+		// the transaction was started with must survive it.
+		return ItemTxResult.OkayKeepItem;
 	}
 
 	/// <summary>
@@ -157,13 +175,16 @@ public class SimonyCraftingScript : GeneralScript
 			// Play crafting sound
 			character.PlaySound("system_craft_bargauge");
 
-			// Determine animation based on crafting skill
-			var anim = craftingSkillName == "Enchanter_CraftMagicScrolls" ? "MAKING" : "MAKING_SIMONY";
-
-			// Wait for crafting time
-			// In a full implementation, this would use DOTIMEACTION_R equivalent
-			// For now, we'll just wait the duration
-			await Task.Delay(TimeSpan.FromSeconds(craftTimeSec));
+			// The time action holds the animation for the duration and ends
+			// itself if the character moves
+			var result = await character.TimeActions.StartAsync("Crafting scroll...", "Cancel", CraftAnimation, TimeSpan.FromSeconds(craftTimeSec));
+			if (result != TimeActionResult.Completed)
+			{
+				character.ExecuteClientScript("SKILLITEM_MAKE_CANCEL()");
+				character.PlaySound("system_craft_potion_fail");
+				character.ServerMessage("Crafting cancelled.");
+				return;
+			}
 
 			// Check if character is still valid and can complete crafting
 			if (character == null || !character.IsOnline)
@@ -216,6 +237,10 @@ public class SimonyCraftingScript : GeneralScript
 			Log.Error("SCR_SKILLITEM_MAKE: Error during crafting - {0}", ex.Message);
 			character?.PlaySound("system_craft_potion_fail");
 		}
+		finally
+		{
+			character?.RemoveTempVar(CraftingVarName);
+		}
 	}
 
 	/// <summary>
@@ -236,7 +261,7 @@ public class SimonyCraftingScript : GeneralScript
 		else if (skillType > EnchanterSkillTypeMin && skillType < EnchanterSkillTypeMax)
 		{
 			craftingSkill = character.Skills.Get(SkillId.RuneCaster_CraftMagicScrolls);
-			craftingSkillName = "Enchanter_CraftMagicScrolls";
+			craftingSkillName = "RuneCaster_CraftMagicScrolls";
 		}
 		// Enchanter skills (20000-30000) use CraftMagicScrolls
 		else if (skillType > EnchanterSkillTypeMin && skillType < EnchanterSkillTypeMax)
@@ -271,26 +296,24 @@ public class SimonyCraftingScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Returns the highest level a scroll of the given skill can be
+	/// crafted at, which scales with the level the character could raise
+	/// the skill to.
+	/// </summary>
+	private int GetMaxScrollLevel(Character character, Skill characterSkill)
+	{
+		var maxLevel = character.Skills.GetMaxLevel(characterSkill.Id);
+		if (maxLevel <= 0)
+			maxLevel = characterSkill.Level;
+
+		return Math.Max(1, (int)Math.Ceiling(maxLevel * ScrollLevelRate));
+	}
+
+	/// <summary>
 	/// Calculates the silver cost for crafting a skill scroll.
 	/// </summary>
 	private long GetSkillMatPrice(Skill skill, int level)
-	{
-		// Check if we have Simony database entry for custom pricing
-		var skillType = (int)skill.Id;
-		if (ZoneServer.Instance.Data.SimonyDb.TryFind(skillType, out var simonyData))
-		{
-			// Use database base cost, scaled by level
-			return simonyData.BaseCost + (level * 500L);
-		}
-
-		// Default formula: Base price scales with skill level and rank
-		var basePrice = 1000L;
-		var levelMultiplier = level * 500L;
-		//var skillRankMultiplier = (int)skill.Data.Rank * 200L;
-		var skillRankMultiplier = (int)1 * 200L;
-
-		return basePrice + levelMultiplier + skillRankMultiplier;
-	}
+		=> level * (long)PricePerSkillLevel;
 
 	/// <summary>
 	/// Gets the bottle item and count required for crafting.
@@ -298,38 +321,26 @@ public class SimonyCraftingScript : GeneralScript
 	private (string bottleName, int count) GetSkillMatItem(string craftingSkillName, Skill skill, int level)
 	{
 		var skillType = (int)skill.Id;
+		var isRuneCraft = craftingSkillName == "RuneCaster_CraftMagicScrolls";
+		var bottleName = isRuneCraft ? RuneBottle : SimonyBottle;
 
-		// Check Simony database for custom materials
 		if (ZoneServer.Instance.Data.SimonyDb.TryFind(skillType, out var simonyData))
-		{
-			// Material count scales with level
-			var scaledCount = simonyData.MaterialCount + (level / 5);
-			return (simonyData.MaterialClassName, scaledCount);
-		}
+			bottleName = simonyData.MaterialClassName;
 
-		// Default: Determine bottle type based on crafting skill
-		var bottleName = craftingSkillName == "Enchanter_CraftMagicScrolls" ? EnchanterBottle : SimonyBottle;
-
-		// Bottle count scales with level
-		var count = 1 + (level / 5);
-
-		return (bottleName, count);
+		return (bottleName, isRuneCraft ? level * 2 : level);
 	}
 
 	/// <summary>
-	/// Calculates the crafting time in seconds.
+	/// Calculates the crafting time in seconds, which shortens as the
+	/// crafting skill levels up.
 	/// </summary>
-	private float GetSkillItemMakeTime(Skill skill, int count)
+	private float GetSkillItemMakeTime(string craftingSkillName, Skill craftingSkill, int count)
 	{
-		var skillType = (int)skill.Id;
+		var perScroll = BaseCraftTimePerScroll;
 
-		// Check Simony database for custom craft time
-		if (ZoneServer.Instance.Data.SimonyDb.TryFind(skillType, out var simonyData))
-		{
-			return simonyData.CraftTime * count;
-		}
+		if (craftingSkillName == "Pardoner_Simony")
+			perScroll = Math.Max(1f, BaseCraftTimePerScroll - (craftingSkill.Level - 1));
 
-		// Default: Base time per scroll, increases with count
-		return BaseCraftTimePerScroll * count;
+		return perScroll * count;
 	}
 }

@@ -1233,6 +1233,7 @@ namespace Melia.Zone.Network
 
 			var serialized = new StringBuilder("#");
 			var rows = (byte)20;
+			var character = conn.SelectedCharacter;
 
 			packet.UncompressData(compressedSize, p =>
 			{
@@ -1243,6 +1244,11 @@ namespace Melia.Zone.Network
 					var type = (QuickSlotType)p.GetByte();
 					var classId = p.GetInt();
 					var objectId = p.GetLong();
+
+					// Object ids are only valid for the session, so the
+					// slot is saved with the item's database id instead.
+					if (type == QuickSlotType.Item && character.Inventory.TryGetItemOrEquip(objectId, out var item) && item.DbId != 0)
+						objectId = item.DbId;
 
 					serialized.AppendFormat("{0},{1},{2}#", type, classId, objectId);
 				}
@@ -1265,7 +1271,6 @@ namespace Melia.Zone.Network
 			// I'm certain of it! There's absolutely no reason to refactor
 			// any of this! It's perfect! Perfect, I tell you!
 
-			var character = conn.SelectedCharacter;
 			character.Variables.Perm.SetByte("Melia.QuickSlotRows", Math.Clamp(rows, (byte)20, (byte)40));
 			character.Variables.Perm.SetString("Melia.QuickSlotList", serialized.ToString());
 		}
@@ -2083,6 +2088,7 @@ namespace Melia.Zone.Network
 
 			var character = conn.SelectedCharacter;
 			var skillId = SkillId.None;
+			var scrollItemId = 0L;
 			Skill skill;
 
 			if (id >= ObjectIdRanges.Items && character.Inventory.TryGetItem(id, out var item))
@@ -2100,7 +2106,7 @@ namespace Melia.Zone.Network
 				}
 
 				skill = new Skill(character, skillId, (int)skillLevel, isItemSkill: true);
-				character.Inventory.Remove(id, 1, InventoryItemRemoveMsg.Used);
+				scrollItemId = id;
 			}
 			else
 			{
@@ -2139,6 +2145,10 @@ namespace Melia.Zone.Network
 						target = ce;
 				}
 			}
+
+			// The scroll is only spent once the cast is going through
+			if (scrollItemId != 0)
+				character.Inventory.Remove(scrollItemId, 1, InventoryItemRemoveMsg.Used);
 
 			// Try to use skill
 			try
@@ -3808,7 +3818,7 @@ namespace Melia.Zone.Network
 					return;
 				}
 
-				if (item != null)
+				if (item != null && result != ItemTxResult.OkayKeepItem)
 					character.Inventory.Remove(worldId, msg: InventoryItemRemoveMsg.Used);
 			}
 			catch (Exception ex)
