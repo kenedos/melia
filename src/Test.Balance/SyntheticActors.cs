@@ -17,6 +17,7 @@ using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Actors.Pads;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
 
 namespace Melia.Test.Balance
@@ -162,10 +163,77 @@ namespace Melia.Test.Balance
 			character.Position = ResolvePosition(arena, position);
 			arena.AddCharacter(character);
 
+			GiveReferenceSilver(character, level);
+
 			properties.SetFloat(PropertyName.HP, properties.GetFloat(PropertyName.MHP));
 			properties.SetFloat(PropertyName.SP, properties.GetFloat(PropertyName.MSP));
 
 			return character;
+		}
+
+		/// <summary>
+		/// Silver a character carries at the anchor levels.
+		/// </summary>
+		/// <remarks>
+		/// Pardoner_Dekatos is the only press in the game that reads the
+		/// player's purse, and it refuses to cast at all when the purse cannot
+		/// pay its cost - so a silverless character would have it come back
+		/// from the roster pass as a press that could not be dispatched, not
+		/// as a weak one. What the purse is worth to it is swept separately by
+		/// SfrPricingTests.Silver, which sets its own.
+		/// </remarks>
+		private static readonly (int Level, double Silver)[] SilverAnchors =
+		[
+			(1, 1_000),
+			(30, 100_000),
+			(60, 1_000_000),
+			(90, 50_000_000),
+		];
+
+		/// <summary>
+		/// Returns the silver a reference character of the given level
+		/// carries.
+		/// </summary>
+		/// <remarks>
+		/// Interpolated in the exponent and flat past the last anchor. What a
+		/// player holds grows by orders of magnitude across the curve, so a
+		/// linear interpolation between two anchors reads as the higher one
+		/// for almost every level between them.
+		/// </remarks>
+		/// <param name="level"></param>
+		public static int ReferenceSilver(int level)
+		{
+			if (level <= SilverAnchors[0].Level)
+				return (int)SilverAnchors[0].Silver;
+
+			for (var i = 1; i < SilverAnchors.Length; ++i)
+			{
+				var (highLevel, highSilver) = SilverAnchors[i];
+
+				if (level > highLevel)
+					continue;
+
+				var (lowLevel, lowSilver) = SilverAnchors[i - 1];
+				var share = (double)(level - lowLevel) / (highLevel - lowLevel);
+				var log = Math.Log10(lowSilver) + share * (Math.Log10(highSilver) - Math.Log10(lowSilver));
+
+				return (int)Math.Pow(10, log);
+			}
+
+			return (int)SilverAnchors[^1].Silver;
+		}
+
+		/// <summary>
+		/// Puts the level's reference silver in the character's inventory.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="level"></param>
+		private static void GiveReferenceSilver(Character character, int level)
+		{
+			var silver = ReferenceSilver(level);
+
+			if (silver > 0)
+				character.Inventory.AddSilent(new Item(ItemId.Silver, silver));
 		}
 
 		/// <summary>

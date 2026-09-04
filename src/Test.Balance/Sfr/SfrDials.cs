@@ -567,6 +567,9 @@ namespace Melia.Test.Balance.Sfr
 
 			// Buffed due to race restrictions
 			["Priest_TurnUndead"] = 1.6f,
+
+			// Decreased due to attack gain based on Silver
+			["Pardoner_Dekatos"] = 0.4f,
 		};
 
 		/// <summary>

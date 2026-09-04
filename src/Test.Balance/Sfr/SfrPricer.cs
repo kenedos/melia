@@ -1086,34 +1086,60 @@ namespace Melia.Test.Balance.Sfr
 			}
 
 			if (write)
+				ApplyPrices(priced, spPriced);
+
+			return result;
+		}
+
+		/// <summary>
+		/// Writes the given factors and SP costs into the overrides file and
+		/// returns how many skill lines were rewritten.
+		/// </summary>
+		/// <remarks>
+		/// Every line the two sets have no price for is left exactly as it is,
+		/// so this is as much the single-skill write as it is the roster's.
+		/// </remarks>
+		/// <param name="priced"></param>
+		/// <param name="spPriced"></param>
+		public static int ApplyPrices(IReadOnlyDictionary<string, (int Factor, float FactorByLevel)> priced, IReadOnlyDictionary<string, SfrSpPrice> spPriced)
+		{
+			var lines = File.ReadAllLines(SfrData.OverridesPath);
+			var written = 0;
+
+			for (var i = 0; i < lines.Length; ++i)
 			{
-				var rewritten = lines.Select(line =>
+				var line = lines[i];
+				var name = Regex.Match(line, @"className: ""([^""]+)""");
+
+				if (!name.Success)
+					continue;
+
+				var hasSp = spPriced.TryGetValue(name.Groups[1].Value, out var sp);
+				var hasFactor = priced.TryGetValue(name.Groups[1].Value, out var price);
+
+				if (!hasSp && !hasFactor)
+					continue;
+
+				if (hasSp)
 				{
-					var name = Regex.Match(line, @"className: ""([^""]+)""");
+					line = SetField(line, "basicSp", Settled(line, "basicSp", sp.Cost).ToString(CultureInfo.InvariantCulture));
+					line = SetField(line, "lvUpSpendSp", Settled(line, "lvUpSpendSp", sp.CostByLevel).ToString("0.##", CultureInfo.InvariantCulture), after: "basicSp");
+				}
 
-					if (!name.Success)
-						return line;
-
-					if (spPriced.TryGetValue(name.Groups[1].Value, out var sp))
-					{
-						line = SetField(line, "basicSp", Settled(line, "basicSp", sp.Cost).ToString(CultureInfo.InvariantCulture));
-						line = SetField(line, "lvUpSpendSp", Settled(line, "lvUpSpendSp", sp.CostByLevel).ToString("0.##", CultureInfo.InvariantCulture), after: "basicSp");
-					}
-
-					if (!priced.TryGetValue(name.Groups[1].Value, out var price))
-						return line;
-
+				if (hasFactor)
+				{
 					line = Regex.Replace(line, @"\bfactor: [0-9.]+", "factor: " + Settled(line, "factor", price.Factor), RegexOptions.None);
 					line = Regex.Replace(line, @"\bfactorByLevel: [0-9.]+",
 						"factorByLevel: " + Settled(line, "factorByLevel", price.FactorByLevel).ToString("0.0", CultureInfo.InvariantCulture));
+				}
 
-					return line;
-				});
-
-				File.WriteAllLines(SfrData.OverridesPath, rewritten);
+				lines[i] = line;
+				written++;
 			}
 
-			return result;
+			File.WriteAllLines(SfrData.OverridesPath, lines);
+
+			return written;
 		}
 
 		/// <summary>

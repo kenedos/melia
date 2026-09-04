@@ -76,7 +76,7 @@ namespace Melia.Test.Balance.Buff
 		/// </summary>
 		/// <remarks>
 		/// Not read by the pricer - Slots is what that solves from. This is for
-		/// the diagnostics that ask what the roster currently does: BuffValueTests
+		/// the diagnostics that ask what the roster currently does: Values
 		/// measures a row at the magnitude it is actually live at, and a pricing
 		/// pass would defeat the point of asking that by substituting its own
 		/// seed instead.

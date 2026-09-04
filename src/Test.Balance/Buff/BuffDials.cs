@@ -414,7 +414,7 @@ namespace Melia.Test.Balance.Buff
 
 			// Its flat half snapshots caster INT at cast time (SwellHands_Buff.cs),
 			// and Thaumaturge_SwellBrain raises INT first in the stack a player
-			// actually presses - BuffStackingTests.StacksDoNotCompound measured the
+			// actually presses - Stacking.StacksDoNotCompound measured the
 			// pair at 1.47x their solo product, over the 1.25x tolerance. Solo
 			// measurement cannot see this: it is a rotation-order synergy between
 			// two buffs, not a cost or a gain either axis carries alone.

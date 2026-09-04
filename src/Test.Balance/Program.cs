@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Melia.Test.Balance.Buff;
@@ -44,15 +44,15 @@ namespace Melia.Test.Balance
 			Run("Sfr.PriceRoster", sfr.PriceRoster);
 			Run("Sfr.PriceIsRepeatable", sfr.PriceIsRepeatable);
 
-			var scenarios = new BuffScenarioTests(host, output);
+			var scenarios = new BuffPricingTests.Scenarios(host, output);
 			Run("Buff.ScenariosProduceTheChancesTheyDeclare", scenarios.ScenariosProduceTheChancesTheyDeclare);
 			Run("Buff.PlainScenariosTouchNothing", scenarios.PlainScenariosTouchNothing);
 			Run("Buff.ReportsTheNaturalRolls", scenarios.ReportsTheNaturalRolls);
 
-			var stacking = new BuffStackingTests(host, output);
+			var stacking = new BuffPricingTests.Stacking(host, output);
 			Run("Buff.StacksDoNotCompound", stacking.StacksDoNotCompound);
 
-			var values = new BuffValueTests(host, output);
+			var values = new BuffPricingTests.Values(host, output);
 			Run("Buff.MeasureBuffs", values.MeasureBuffs);
 			Run("Buff.NoiseFloorIsFlat", values.NoiseFloorIsFlat);
 			Run("Buff.ScopeFollowsTheData", values.ScopeFollowsTheData);

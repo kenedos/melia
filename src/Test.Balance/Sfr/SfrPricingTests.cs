@@ -19,7 +19,7 @@ namespace Melia.Test.Balance.Sfr
 	/// rewrites skills_overrides.txt.
 	/// </remarks>
 	[Collection(BalanceCollection.Name)]
-	public class SfrPricingTests
+	public partial class SfrPricingTests
 	{
 		/// <summary>
 		/// Environment variable that lets the pass write.
@@ -45,6 +45,12 @@ namespace Melia.Test.Balance.Sfr
 
 		private readonly ITestOutputHelper _output;
 		private readonly List<string> _lines = [];
+
+		/// <summary>
+		/// The one skill the run was narrowed to, or null when it prices the
+		/// whole roster.
+		/// </summary>
+		internal static string SingleSkill => Environment.GetEnvironmentVariable(SkillVariable);
 
 		/// <summary>
 		/// Creates the fixture.
@@ -100,6 +106,12 @@ namespace Melia.Test.Balance.Sfr
 			if (!BalanceSuites.SfrEnabled)
 			{
 				_output.WriteLine(BalanceSuites.SkipMessage(BalanceSuites.SfrVariable));
+				return;
+			}
+
+			if (!string.IsNullOrEmpty(SingleSkill))
+			{
+				_output.WriteLine($"Skipped. {SkillVariable} narrows this run to {SingleSkill}.");
 				return;
 			}
 
@@ -356,6 +368,12 @@ namespace Melia.Test.Balance.Sfr
 				return;
 			}
 
+			if (!string.IsNullOrEmpty(SingleSkill))
+			{
+				_output.WriteLine($"Skipped. {SkillVariable} narrows this run to {SingleSkill}.");
+				return;
+			}
+
 			var skillName = Environment.GetEnvironmentVariable(RepeatVariable);
 
 			if (string.IsNullOrEmpty(skillName))
@@ -555,6 +573,12 @@ namespace Melia.Test.Balance.Sfr
 			catch (Exception ex)
 			{
 				Write($"{skillName}: {ex.Message}");
+
+				// The press still charges the bar even when the damage model
+				// will not price it, so SP is written on its own here.
+				if (Environment.GetEnvironmentVariable(ApplyVariable) == "1")
+					Apply(skillName, null, TrySp(skillName, press));
+
 				_output.WriteLine("report saved to " + SaveReport());
 				return;
 			}
@@ -591,7 +615,76 @@ namespace Melia.Test.Balance.Sfr
 				+ $"  {(r.Sp.Kinds.Length > 0 ? string.Join(", ", r.Sp.Kinds) : "plain")}");
 			Write($"  basicSp: {r.Sp.Cost}, lvUpSpendSp: {r.Sp.CostByLevel:0.##}");
 
+			if (Environment.GetEnvironmentVariable(ApplyVariable) == "1")
+				Apply(skillName, r, r.Sp);
+
 			_output.WriteLine("report saved to " + SaveReport());
+		}
+
+		/// <summary>
+		/// Returns the skill's SP price, or null when it cannot be priced.
+		/// </summary>
+		/// <param name="skillName"></param>
+		/// <param name="press"></param>
+		private static SfrSpPrice TrySp(string skillName, SfrMeasuredPress press)
+		{
+			try
+			{
+				return SfrPricer.PriceSp(skillName, press);
+			}
+			catch (Exception)
+			{
+				return null;
+			}
+		}
+
+		/// <summary>
+		/// Writes one skill's priced factor and SP cost into the overrides
+		/// file, on the same terms the roster run writes them.
+		/// </summary>
+		/// <param name="skillName"></param>
+		/// <param name="price"></param>
+		/// <param name="sp"></param>
+		private void Apply(string skillName, SfrPrice price, SfrSpPrice sp)
+		{
+			var priced = new Dictionary<string, (int Factor, float FactorByLevel)>();
+			var spPriced = new Dictionary<string, SfrSpPrice>();
+
+			if (price != null)
+				priced[skillName] = (price.Factor, price.FactorByLevel);
+
+			// A channel bills its cost every tick, so writing the whole press
+			// budget as the per-tick cost over-charges it by however many ticks
+			// it runs, and only a measured charge count rules that out.
+			var billsPerTick = sp != null && sp.Charges <= 1f
+				&& SfrData.Skills.TryGetValue(skillName, out var entry) && SfrPricer.IsChannel(entry);
+
+			if (sp != null && !billsPerTick)
+				spPriced[skillName] = sp;
+
+			if (billsPerTick)
+				Write($"  SP not written: {skillName} channels and its charge count was not measured");
+
+			if (priced.Count == 0 && spPriced.Count == 0)
+			{
+				Write($"  nothing written for {skillName}");
+				return;
+			}
+
+			var written = SfrPricer.ApplyPrices(priced, spPriced);
+
+			if (written == 0)
+			{
+				Write($"  nothing written: {skillName} has no line in {Path.GetFileName(SfrData.OverridesPath)}");
+				return;
+			}
+
+			Write($"  written to {Path.GetFileName(SfrData.OverridesPath)}: "
+				+ string.Join(", ", new[]
+				{
+					price != null ? $"factor {price.Factor}, factorByLevel {price.FactorByLevel:0.0}" : null,
+					spPriced.Count > 0 ? $"basicSp {sp.Cost}, lvUpSpendSp {sp.CostByLevel:0.##}" : null,
+				}.Where(part => part != null)));
 		}
 	}
 }

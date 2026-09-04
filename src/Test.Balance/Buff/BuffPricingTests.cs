@@ -13,13 +13,13 @@ namespace Melia.Test.Balance.Buff
 	/// The buff pricing pass, and the guard that keeps its anchor still.
 	/// </summary>
 	/// <remarks>
-	/// BuffValueTests measures what a buff is worth; this prices it. The two
+	/// Values measures what a buff is worth; this prices it. The two
 	/// stay apart because a reading that cannot be explained is not one to
 	/// write back, and only the write here is opt-in - it rewrites
 	/// skills_overrides.txt.
 	/// </remarks>
 	[Collection(BalanceCollection.Name)]
-	public class BuffPricingTests
+	public partial class BuffPricingTests
 	{
 		/// <summary>
 		/// Environment variable that lets the pass write.
@@ -50,6 +50,12 @@ namespace Melia.Test.Balance.Buff
 
 		private readonly ITestOutputHelper _output;
 		private readonly List<string> _lines = [];
+
+		/// <summary>
+		/// The one buff the run was narrowed to, or null when it prices the
+		/// whole roster.
+		/// </summary>
+		internal static string SingleBuff => Environment.GetEnvironmentVariable(SkillVariable);
 
 		/// <summary>
 		/// Creates the fixture.

@@ -32,7 +32,6 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Pardoner
 			var SCR_CalculateHeal = ScriptableFunctions.Combat.Get("SCR_CalculateHeal");
 			var healAmount = SCR_CalculateHeal(caster, target, skill, new SkillModifier(), new SkillHitResult());
 
-			healAmount *= GetCaptionRatio(buff, 2) / 100f;
 			healAmount *= buff.NumArg2;
 
 			if (healAmount > 0)
