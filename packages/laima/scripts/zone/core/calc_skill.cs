@@ -1,4 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
+//--- Melia Script ----------------------------------------------------------
 // Skill Calculation Script
 //--- Description -----------------------------------------------------------
 // Functions that calculate skill-related values, such as properties.
@@ -22,7 +22,7 @@ using static g4.RoundRectGenerator;
 public class SkillCalculationsScript : GeneralScript
 {
 	// Cooldown every skill cast from a skill scroll shares, in milliseconds
-	private const float ScrollCooldown = 30000f;
+	private const float ScrollCooldown = 60000f;
 
 	// Amount of scrolls that can be used before the shared cooldown starts
 	private const float ScrollOverheatCount = 3f;
@@ -576,24 +576,6 @@ public class SkillCalculationsScript : GeneralScript
 			basicCooldown = cooldownSec * 1000f;
 		}
 
-		if (skill.Id == SkillId.Cleric_Cure)
-		{
-			if (owner is Character character)
-			{
-				var jobList = new[] { JobId.Dievdirbys, JobId.Miko, JobId.Oracle, JobId.Kabbalist, JobId.Pardoner, JobId.Priest, JobId.PlagueDoctor };
-
-				foreach (var job in jobList)
-				{
-					if (character.Jobs.Has(job, JobCircle.Second))
-					{
-						basicCooldown -= 3000;
-					}
-				}
-			}
-
-			basicCooldown = Math.Max(1000, basicCooldown);
-		}
-
 		if (skill.Data.Tags.Has(SkillTag.BasicSkill))
 		{
 			return basicCooldown;
@@ -740,19 +722,6 @@ public class SkillCalculationsScript : GeneralScript
 			{
 				basicCooldown = 1000;
 			}
-		}
-
-		if (ZoneServer.Instance.World.IsPVP)
-		{
-			if (skill.Id == SkillId.Cleric_Heal) basicCooldown += 2000;
-			if (skill.Id == SkillId.Priest_Revive) basicCooldown = 900000;
-			if (skill.Id == SkillId.Priest_Resurrection && owner.IsAbilityActive(AbilityId.Priest39))
-				basicCooldown = 600000;
-		}
-
-		if (owner.Map.IsGTW && skill.Id == SkillId.Priest_Resurrection && owner.IsAbilityActive(AbilityId.Priest39))
-		{
-			basicCooldown = 600000;
 		}
 
 		// Floor cooldown to the nearest second, then convert back to milliseconds.

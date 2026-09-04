@@ -21,21 +21,39 @@ namespace Melia.Zone.Skills.Helpers
 		/// </summary>
 		public static void ShowRangePreview(ICombatEntity caster, Skill skill, IShapeF area, TimeSpan? duration = null)
 		{
-			if (caster is not Character character)
-			{
-				if (caster is not Mob || caster is Companion)
-					return;
-			}
-			else if (!character.Variables.Temp.GetBool("Melia.RangePreview"))
-			{
+			if (!IsPreviewEnabled(caster))
 				return;
-			}
 
 			var effectiveDuration = duration ?? (skill.Data.ShootTime < SkillConstants.MaxShootTimeForPreview
 				? skill.Data.ShootTime
 				: SkillConstants.DefaultDebugShapeDuration);
 
 			Debug.ShowShape(caster.Map, area, effectiveDuration);
+		}
+
+		/// <summary>
+		/// Draws a debug outline of an area a skill searched, for the default
+		/// duration. For areas resolved without a skill's timings to size the
+		/// preview by.
+		/// </summary>
+		public static void ShowRangePreview(ICombatEntity caster, IShapeF area)
+		{
+			if (!IsPreviewEnabled(caster))
+				return;
+
+			Debug.ShowShape(caster.Map, area, SkillConstants.DefaultDebugShapeDuration);
+		}
+
+		/// <summary>
+		/// Returns whether the caster should be shown range previews.
+		/// </summary>
+		/// <param name="caster"></param>
+		private static bool IsPreviewEnabled(ICombatEntity caster)
+		{
+			if (caster is not Character character)
+				return caster is Mob && caster is not Companion;
+
+			return character.Variables.Temp.GetBool("Melia.RangePreview");
 		}
 
 		/// <summary>

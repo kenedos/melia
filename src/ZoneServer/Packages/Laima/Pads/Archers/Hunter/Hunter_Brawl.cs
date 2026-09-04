@@ -25,7 +25,7 @@ namespace Melia.Zone.Pads.Handlers
 			pad.SetRange(90f);
 			pad.SetUpdateInterval(1000);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(5000);
-			pad.Trigger.MaxActorCount = skill.GetPVPValue(10);
+			pad.Trigger.MaxActorCount = 10;
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)

@@ -218,7 +218,8 @@ namespace Melia.Shared.Game.Const
 		/// Returns the max level a skill can be raised to on a job that is
 		/// on the given circle. A skill gains five levels for its own circle
 		/// and five more for every circle gained past it, so an unlock level
-		/// 1 skill caps at 5/10/15 and an unlock level 16 skill at 0/5/10.
+		/// 1 skill caps at 5/10/15 and an unlock level 16 skill at 0/5/10,
+		/// never going past the cap its skill tree entry sets.
 		/// </summary>
 		/// <param name="circle"></param>
 		/// <param name="unlockLevel"></param>
@@ -233,11 +234,7 @@ namespace Melia.Shared.Game.Const
 			if (unlockedCircles <= 0)
 				return 0;
 
-			// Single level skills are switches rather than scaling skills.
-			if (dataMaxLevel <= 1)
-				return dataMaxLevel;
-
-			return unlockedCircles * SkillLevelsPerCircle;
+			return Math.Min(dataMaxLevel, unlockedCircles * SkillLevelsPerCircle);
 		}
 	}
 

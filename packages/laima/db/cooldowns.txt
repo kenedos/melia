@@ -2379,7 +2379,7 @@
 
 // Skill Scroll Cooldown Group
 //---------------------------------------------------------------------------
-{ id: 60000, className: "Scroll_SkillItem", isOverheat: false, overheatResetTime: 30000 },
-{ id: 60001, className: "Scroll_SkillItem_Charge1", isOverheat: false, overheatResetTime: 30000 },
-{ id: 60002, className: "Scroll_SkillItem_Charge2", isOverheat: false, overheatResetTime: 30000 },
+{ id: 60000, className: "Scroll_SkillItem", isOverheat: false, overheatResetTime: 60000 },
+{ id: 60001, className: "Scroll_SkillItem_Charge1", isOverheat: false, overheatResetTime: 60000 },
+{ id: 60002, className: "Scroll_SkillItem_Charge2", isOverheat: false, overheatResetTime: 60000 },
 ]

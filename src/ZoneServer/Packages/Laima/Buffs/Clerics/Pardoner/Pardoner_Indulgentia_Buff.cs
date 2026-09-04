@@ -2,6 +2,7 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.Packages;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Scripting;
+using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 
@@ -10,7 +11,6 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Pardoner
 	/// <summary>
 	/// Handler for the Indulgentia buff.
 	/// Recovers HP continuously while the buff is active.
-	/// The amount of HP recovered increases by 10% when the Guardian Saint buff is active.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.Indulgentia_Buff)]
@@ -27,12 +27,13 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Pardoner
 				return;
 
 			if (!caster.TryGetSkill(SkillId.Pardoner_Indulgentia, out var skill))
-				return;
+				skill = new Skill(caster, SkillId.Pardoner_Indulgentia, (int)buff.NumArg1);
 
 			var SCR_CalculateHeal = ScriptableFunctions.Combat.Get("SCR_CalculateHeal");
 			var healAmount = SCR_CalculateHeal(caster, target, skill, new SkillModifier(), new SkillHitResult());
 
 			healAmount *= GetCaptionRatio(buff, 2) / 100f;
+			healAmount *= buff.NumArg2;
 
 			if (healAmount > 0)
 				target.Heal(healAmount, 0);

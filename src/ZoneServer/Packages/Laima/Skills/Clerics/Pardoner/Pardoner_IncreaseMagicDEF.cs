@@ -20,7 +20,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Pardoner_IncreaseMagicDEF)]
-	public class Pardoner_IncreaseMagicDEFOverride : IGroundSkillHandler
+	public class Pardoner_IncreaseMagicDEFOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float BuffRange = 150f;
 		private const int MaxTargets = 50;

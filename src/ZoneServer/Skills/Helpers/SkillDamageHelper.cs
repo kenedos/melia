@@ -350,12 +350,14 @@ namespace Melia.Zone.Skills.Helpers
 		public static List<ICombatEntity> SkillSelectEnemiesInCircle(ICombatEntity caster, Position position, float radius, int maxTargets = 0)
 		{
 			var circle = new CircleF(position, radius);
+			ShowRangePreview(caster, circle);
 			return caster.Map.GetAttackableEnemiesIn(caster, circle, maxTargets);
 		}
 
 		public static List<ICombatEntity> SkillSelectAlliesInCircle(ICombatEntity caster, Position position, float radius, int maxTargets = 0)
 		{
 			var circle = new CircleF(position, radius);
+			ShowRangePreview(caster, circle);
 			return caster.Map.GetAliveAlliedEntitiesIn(caster, circle, maxTargets);
 		}
 
@@ -363,6 +365,7 @@ namespace Melia.Zone.Skills.Helpers
 		{
 			var direction = caster.Direction.AddDegreeAngle(angle);
 			var square = new Square(originPos, direction, distance, width);
+			ShowRangePreview(caster, square);
 			return caster.Map.GetAttackableEnemiesIn(caster, square, maxTargets);
 		}
 
@@ -370,6 +373,7 @@ namespace Melia.Zone.Skills.Helpers
 		{
 			var direction = caster.Direction;
 			var fan = new Fan(position, direction, distance, angle);
+			ShowRangePreview(caster, fan);
 			return caster.Map.GetAttackableEnemiesIn(caster, fan, maxTargets);
 		}
 

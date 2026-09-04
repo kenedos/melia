@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -63,8 +63,6 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 		/// <param name="skill"></param>
 		private async Task Fire(ICombatEntity caster, Skill skill)
 		{
-			var maxTargets = skill.GetPVPValue(MaxTargets);
-
 			while (caster.IsBuffActive(BuffId.AssaultFire_Buff))
 			{
 				await skill.Wait(FireInterval);
@@ -72,7 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Schwarzereiter
 				if (caster.IsDead)
 					break;
 
-				var targets = SkillSelectEnemiesInSquare(caster, caster.Position, 0f, FireDistance, FireWidth, maxTargets);
+				var targets = SkillSelectEnemiesInSquare(caster, caster.Position, 0f, FireDistance, FireWidth, MaxTargets);
 				if (targets.Count > 0)
 					SkillTargetDamage(skill, caster, targets);
 			}

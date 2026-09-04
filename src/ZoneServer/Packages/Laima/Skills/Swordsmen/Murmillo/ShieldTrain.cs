@@ -47,8 +47,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Murmillo
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			var targetPos = originPos.GetRelative(farPos, distance: 4.4258108f);
-			var value = skill.GetPVPValue(10);
-			var skillTargets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 100f, 35f, value);
+			var skillTargets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, 100f, 35f, 10);
 			if (skillTargets == null || skillTargets.Count == 0)
 				return;
 

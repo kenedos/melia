@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Melia.Shared.Game.Const;
@@ -47,7 +47,7 @@ namespace Melia.Shared.Data.Database
 			if (entry.ContainsKey("holdTime"))
 				data.HoldTime = entry.ReadList<int>("holdTime").Select(a => TimeSpan.FromMilliseconds(a)).ToList();
 			if (entry.ContainsKey("splashType"))
-				data.SplashType = (SplashType)entry.ReadInt("splashType");
+				data.SplashType = entry.ReadEnum<SplashType>("splashType");
 			if (entry.ContainsKey("splashRange"))
 				data.SplashRange = entry.ReadFloat("splashRange");
 			if (entry.ContainsKey("splashHeight"))

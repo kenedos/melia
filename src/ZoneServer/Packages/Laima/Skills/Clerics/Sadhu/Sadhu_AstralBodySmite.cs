@@ -49,8 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
 			var targetPos = originPos.GetRelative(farPos, distance: 50f);
-			var value = skill.GetPVPValue(5);
-			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 60f, value));
+			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 60f, 5));
 			var targets = caster.GetTargets();
 			caster.StartBuff(BuffId.Sadhu_Soul_Pre_Buff, 1f, 0f, TimeSpan.Zero, caster);
 			caster.StartBuff(BuffId.Sadhu_Soul_Buff, 1f, 0f, TimeSpan.FromMilliseconds(60000f), caster);

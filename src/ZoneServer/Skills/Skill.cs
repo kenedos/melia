@@ -704,18 +704,6 @@ namespace Melia.Zone.Skills
 		}
 
 		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="value"></param>
-		/// <returns></returns>
-		public int GetPVPValue(float value)
-		{
-			if (this.Owner.Map.IsPVP && value > 2)
-				value = MathF.Sqrt(value - 2) + MathF.Min(2, value);
-			return (int)value;
-		}
-
-		/// <summary>
 		/// Calculates positions and direction for use in splash areas.
 		/// </summary>
 		/// <param name="caster"></param>

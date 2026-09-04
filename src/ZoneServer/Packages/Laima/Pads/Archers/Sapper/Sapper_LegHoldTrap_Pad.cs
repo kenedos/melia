@@ -32,7 +32,7 @@ namespace Melia.Zone.Pads.HandlersOverride.Archers.Sapper
 			pad.SetRange(PadRange);
 			pad.SetUpdateInterval(UpdateIntervalMs);
 			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(PadLifetimeMs);
-			pad.Trigger.MaxActorCount = skill.GetPVPValue(10);
+			pad.Trigger.MaxActorCount = 10;
 		}
 
 		public void Destroyed(object sender, PadTriggerArgs args)

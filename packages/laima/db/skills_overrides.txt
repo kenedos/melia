@@ -810,7 +810,7 @@
 // Cleric
 //---------------------------------------------------------------------------
 { skillId: 40001, className: "Cleric_Heal", name: "Heal", basicSp: 22, lvUpSpendSp: 3.67, basicCast: 1000, splashRate: 0, factor: 100.0, factorByLevel: 20.0, cooldownTime: 5000, overheatCount: "0", castInterruptible: true},
-{ skillId: 40002, className: "Cleric_Cure", name: "Cure", basicSp: 28, lvUpSpendSp: 4.67, basicCast: 0, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 12000, overheatCount: "0", captionTime: 5, captionTimeByLevel: 2 },
+{ skillId: 40002, className: "Cleric_Cure", name: "Cure", basicSp: 28, lvUpSpendSp: 4.67, basicCast: 0, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 12000, overheatCount: "0", captionTime: 0, captionTimeByLevel: 2 },
 { skillId: 40003, className: "Cleric_SafetyZone", name: "Safety Zone", basicSp: 50, lvUpSpendSp: 8.33, basicCast: 1500, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 12000, overheatCount: "0", castInterruptible: true, captionRatio1: 6, captionRatio1ByLevel: 1 },
 { skillId: 40006, className: "Cleric_Fade", name: "Fade", basicSp: 39, lvUpSpendSp: 6.5, basicCast: 0, splashRate: 0, factor: 0, factorByLevel: 0.0, cooldownTime: 30000, overheatCount: "0", captionRatio1: 10, captionRatio1ByLevel: 4 },
 { skillId: 40007, className: "Cleric_PatronSaint", name: "Guardian Saint", basicSp: 39, lvUpSpendSp: 6.5, basicCast: 0, splashRate: 1, factor: 0, factorByLevel: 0.0, cooldownTime: 30000, overheatCount: "0", captionRatio1: 15, captionRatio1ByLevel: 3, captionTime: 300 },
@@ -889,15 +889,18 @@
 { skillId: 40708, className: "Monk_Golden_Bell_Shield", name: "Golden Bell Shield", basicSp: 31, lvUpSpendSp: 2.14, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 25000, captionRatio1: 0, captionRatio1ByLevel: 3.4 },
 { skillId: 40709, className: "Monk_1InchPunch_DOT", name: "One Inch Punch: Continuous Damage", basicSp: 15, lvUpSpendSp: 0.78, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, overheatCount: "3" },
 
+// Pardoner
+//---------------------------------------------------------------------------
 { skillId: 40801, className: "Pardoner_Simony", name: "Simony", basicSp: 8, lvUpSpendSp: 0.41, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
-{ skillId: 40802, className: "Pardoner_Indulgentia", name: "Indulgentia", basicSp: 37, lvUpSpendSp: 1.91, splashRate: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, captionRatio1: 4, captionRatio1ByLevel: 1, captionRatio2: 50, captionRatio2ByLevel: 25, captionTime: 10 },
+{ skillId: 40802, className: "Pardoner_Indulgentia", name: "Indulgentia", basicSp: 37, lvUpSpendSp: 1.91, basicCast: 1500, splashRate: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, castInterruptible: true, captionRatio1: 5, captionRatio1ByLevel: 0, captionRatio2: 50, captionRatio2ByLevel: 25, captionTime: 10 },
 { skillId: 40803, className: "Pardoner_DiscernEvil", name: "Discerning Evil", basicSp: 24, lvUpSpendSp: 1.24, splashRate: 1, factor: 96, factorByLevel: 5.2, hitCount: 1, multiHitCount: 28, cooldownTime: 15000 },
 { skillId: 40804, className: "Pardoner_Oblation", name: "Oblation", basicSp: 8, lvUpSpendSp: 0.41, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
 { skillId: 40805, className: "Pardoner_SpellShop", name: "Spell Shop", basicSp: 8, lvUpSpendSp: 0.55, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
 { skillId: 40806, className: "Pardoner_SignDispeller", name: "Dispeller Crafting", basicSp: 39, lvUpSpendSp: 2.02, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 150000 },
 { skillId: 40807, className: "Pardoner_CraftBooster", name: "Craft Booster", basicSp: 39, lvUpSpendSp: 2.02, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 150000 },
-{ skillId: 40808, className: "Pardoner_IncreaseMagicDEF", name: "Increase Magic Defense", basicSp: 37, lvUpSpendSp: 1.89, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 43500, captionTime: 1800 },
+{ skillId: 40808, className: "Pardoner_IncreaseMagicDEF", name: "Increase Magic Defense", basicSp: 37, lvUpSpendSp: 1.89, basicCast: 3000, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 43500, castInterruptible: true, captionTime: 1800 },
 { skillId: 40809, className: "Pardoner_Dekatos", name: "Dekatos", basicSp: 16, lvUpSpendSp: 0.82, splashRate: 5, factor: 432, factorByLevel: 23.3, hitCount: 1, multiHitCount: 1, cooldownTime: 10000, overheatCount: "3" },
+
 { skillId: 40901, className: "Druid_Telepath", name: "Telepath", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },
 { skillId: 40902, className: "Druid_Carnivory", name: "Carnivory", basicSp: 94, splashRate: 0, factor: 148, factorByLevel: 34, hitCount: 1, multiHitCount: 1, cooldownTime: 15000 },
 { skillId: 40903, className: "Druid_ShapeShifting", name: "Shape Shifting", basicSp: 128, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 60000 },

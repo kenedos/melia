@@ -44,8 +44,6 @@ public class BuffItemScripts : GeneralScript
 	public ItemUseResult SCR_USE_ChallengeModeReset(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
 		// Check if character is in a basic field, dungeon, or city
-		// IS_BASIC_FIELD_DUNGEON: IsIndun != 1 AND IsPVPServer != 1 AND IsMissionInst != 1
-		//   AND (MapType == 'Field' OR MapType == 'Dungeon')
 		var mapData = character.Map.Data;
 		var isBasicFieldDungeon = !character.Map.IsInstance &&
 								  (mapData.Type == MapType.Field || mapData.Type == MapType.Dungeon);
