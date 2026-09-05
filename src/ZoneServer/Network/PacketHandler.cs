@@ -5097,6 +5097,9 @@ namespace Melia.Zone.Network
 							break;
 					}
 
+					if (character.Skills.TryGet((SkillId)skillId, out var shopSkill))
+						shop.Level = shopSkill.Level;
+
 					if (Versions.Protocol > 500)
 					{
 						if (skillId != (int)SkillId.Pardoner_Oblation)
@@ -5285,9 +5288,17 @@ namespace Melia.Zone.Network
 			var shop = conn.ActiveShop = shopOwner.Connection.ShopCreated;
 			conn.ActiveShopOwnerHandle = shopOwner.Handle;
 
+			// Written once for the whole request, ahead of the items, and
+			// not repeated per item.
+			var indexOrSkillId = packet.GetInt();
+
 			for (var i = 0; i < itemCount; i++)
 			{
-				var indexOrSkillId = packet.GetInt();
+				// The count is the client's, so a truncated list would
+				// read past the end of the buffer and throw.
+				if (packet.Remaining < 16)
+					break;
+
 				var worldId = packet.GetLong();
 				var itemAmount = packet.GetInt();
 				var i0 = packet.GetInt();

@@ -449,6 +449,11 @@ namespace Melia.Zone.World.Actors.Characters
 		public PersonalStorage PersonalStorage { get; }
 
 		/// <summary>
+		/// Returns the character's Pardoner offering box.
+		/// </summary>
+		public OblationStorage OblationBox { get; }
+
+		/// <summary>
 		/// Returns the character's team storage.
 		/// </summary>
 		public TeamStorage TeamStorage => this.Connection.Account.TeamStorage;
@@ -542,6 +547,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Properties = new CharacterProperties(this);
 			this.Etc = new PCEtc(this);
 			this.PersonalStorage = new PersonalStorage(this);
+			this.OblationBox = new OblationStorage(this);
 			this.AddSessionObjects();
 		}
 

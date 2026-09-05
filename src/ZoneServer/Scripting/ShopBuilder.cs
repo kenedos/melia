@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -299,6 +300,12 @@ namespace Melia.Zone.Scripting
 			if (!character.Inventory.TryGetItem(itemId, out var item))
 				return;
 
+			if (shop.Type == PersonalShopType.Oblation)
+			{
+				HandleOfferToOblationBox(character, shopOwner, shop, item, itemAmount);
+				return;
+			}
+
 			// Find the matching product by item class ID, since the
 			// client may not send a reliable product index for buyshops.
 			var matchedKey = -1;
@@ -339,10 +346,90 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Handle visitor offering items to a Pardoner's Oblation box.
+		/// The box takes any item the game buys back, at a rate the skill
+		/// sets, so it has no product list to match against.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="shopOwner"></param>
+		/// <param name="shop"></param>
+		/// <param name="item"></param>
+		/// <param name="itemAmount"></param>
+		private static void HandleOfferToOblationBox(Character character, Character shopOwner, ShopData shop, Item item, int itemAmount)
+		{
+			if (itemAmount < 1 || item.Amount < itemAmount)
+				return;
+
+			// Offering to your own box would hand the owner the church's
+			// premium without anyone having been paid for the item
+			if (character == shopOwner)
+				return;
+
+			var pricePerUnit = PardonerSkillHelper.GetOblationPrice(shopOwner, item);
+			if (pricePerUnit <= 0)
+			{
+				character.SystemMessage("Auto_SangJeom_PanMae_BulKaNeung");
+				return;
+			}
+
+			var box = shopOwner.OblationBox;
+
+			if (box.GetItemCount() >= PardonerSkillHelper.GetOblationCapacity(shopOwner))
+			{
+				character.SystemMessage("ExceedItemGetLimit");
+				return;
+			}
+
+			var totalCost = pricePerUnit * itemAmount;
+
+			if (shopOwner.Inventory.CountItem(ItemId.Silver) < totalCost)
+			{
+				character.SystemMessage("NOT_ENOUGH_MONEY");
+				return;
+			}
+
+			var offeredItem = new Item(item, itemAmount);
+
+			if (character.Inventory.Remove(item, itemAmount, InventoryItemRemoveMsg.Given) != InventoryResult.Success)
+				return;
+
+			if (box.Offer(offeredItem, pricePerUnit) != StorageResult.Success)
+			{
+				character.Inventory.Add(offeredItem, InventoryAddType.New);
+				return;
+			}
+
+			if (shopOwner.RemoveItem(ItemId.Silver, totalCost) != totalCost)
+			{
+				box.Consume(offeredItem.ObjectId);
+				character.Inventory.Add(offeredItem, InventoryAddType.New);
+				return;
+			}
+
+			character.AddItem(ItemId.Silver, totalCost);
+		}
+
+		/// <summary>
 		/// Closes a shop if it's empty and notifies all parties.
 		/// </summary>
 		public static void CloseShopIfEmpty(IZoneConnection conn, Character shopOwner, ShopData shop)
 		{
+			// An Oblation box starts empty and stays open until its owner
+			// closes it, so it never runs out of anything to sell. This runs
+			// once per purchase packet, after every item in it was offered.
+			if (shop.Type == PersonalShopType.Oblation)
+			{
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+
+				PardonerSkillHelper.RefreshOblationBox(shopOwner);
+
+				if (conn.SelectedCharacter != null)
+					PardonerSkillHelper.SendOblationShop(conn.SelectedCharacter, shopOwner);
+
+				return;
+			}
+
 			if (shop.Products.Count == 0)
 			{
 				shop.IsClosed = true;

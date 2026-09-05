@@ -151,6 +151,27 @@ namespace Melia.Zone.Database
 		}
 
 		/// <summary>
+		/// INTERNAL USE: Saves what the character paid for the items in
+		/// their offering box, within an existing transaction.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="conn"></param>
+		/// <param name="trans"></param>
+		internal void InternalSaveOblationPricesPaid(Character character, MySqlConnection conn, MySqlTransaction trans)
+		{
+			foreach (var item in character.OblationBox.GetItems().Values)
+			{
+				using (var cmd = new UpdateCommand("UPDATE `storage_oblation` SET {parameters} WHERE `characterId` = @characterId AND `itemId` = @itemId", conn, trans))
+				{
+					cmd.AddParameter("@characterId", character.DbId);
+					cmd.AddParameter("@itemId", item.DbId);
+					cmd.Set("pricePaid", character.OblationBox.GetPricePaid(item.ObjectId));
+					cmd.Execute();
+				}
+			}
+		}
+
+		/// <summary>
 		/// INTERNAL USE: Saves storage items within an existing transaction.
 		/// </summary>
 		internal void InternalSaveStorage(Storage storage, string tableName, string idFieldName, long id, MySqlConnection conn, MySqlTransaction trans)

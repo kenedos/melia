@@ -12,6 +12,7 @@ using Melia.Zone.Events;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.Hooking;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -974,6 +975,14 @@ namespace Melia.Zone.Scripting.Dialogues
 
 			Send.ZC_EXEC_CLIENT_SCP(conn, $"M_CPS_END('{shopName}','{pointScript}')");
 		}
+
+		/// <summary>
+		/// Opens the player's Pardoner offering box, streaming its
+		/// contents to their client first.
+		/// </summary>
+		/// <param name="atChurch">Whether the box is open to donations.</param>
+		public void OpenOblationBox(bool atChurch)
+			=> PardonerSkillHelper.SendOblationBox(this.Player, atChurch);
 
 		/// <summary>
 		/// Opens a custom companion shop with the given name.

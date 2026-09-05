@@ -16,6 +16,8 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
+using Melia.Zone.World.Storages;
 // using Melia.Zone.World.Houses; // Removed: Houses namespace deleted
 using Melia.Zone.World.Quests;
 using MySqlConnector;
@@ -64,6 +66,36 @@ namespace Melia.Zone.Database
 
 			character.PersonalStorage.InitSize();
 			this.LoadStorage(character.PersonalStorage, "storage_personal", "characterId", character.DbId);
+
+			character.OblationBox.SetStorageSize(OblationStorage.MaxSize);
+			this.LoadStorage(character.OblationBox, "storage_oblation", "characterId", character.DbId);
+			this.LoadOblationPricesPaid(character);
+		}
+
+		/// <summary>
+		/// Reads back what the character paid for each item in their
+		/// offering box.
+		/// </summary>
+		/// <param name="character"></param>
+		private void LoadOblationPricesPaid(Character character)
+		{
+			var itemsByDbId = new Dictionary<long, Item>();
+			foreach (var item in character.OblationBox.GetItems().Values)
+				itemsByDbId[item.DbId] = item;
+
+			using (var conn = this.GetConnection())
+			using (var cmd = new MySqlCommand("SELECT `itemId`, `pricePaid` FROM `storage_oblation` WHERE `characterId` = @characterId", conn))
+			{
+				cmd.Parameters.AddWithValue("@characterId", character.DbId);
+				using (var reader = cmd.ExecuteReader())
+				{
+					while (reader.Read())
+					{
+						if (itemsByDbId.TryGetValue(reader.GetInt64("itemId"), out var item))
+							character.OblationBox.SetPricePaid(item.ObjectId, reader.GetInt32("pricePaid"));
+					}
+				}
+			}
 		}
 
 		private void LoadAchievements(Character character)

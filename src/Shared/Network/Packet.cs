@@ -58,6 +58,12 @@ namespace Melia.Shared.Network
 		public int Length => _buffer.Length;
 
 		/// <summary>
+		/// Returns the number of bytes in the packet's buffer that
+		/// haven't been read yet.
+		/// </summary>
+		public int Remaining => _buffer.Length - _buffer.Index;
+
+		/// <summary>
 		/// Packet's op.
 		/// </summary>
 		public int Op { get; protected set; }

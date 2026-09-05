@@ -82,4 +82,15 @@ public class CaptionCalculationsScript : GeneralScript
 
 		return value + value * ScriptableFunctions.Skill.Get("SCR_Get_AbilityReinforceRate")(skill);
 	}
+
+	/// <summary>
+	/// Oblation's offering box holds a flat seven items per skill level.
+	/// The client sizes its own grid from the same figure, so the reinforce
+	/// ability the generic formula folds in would put the two out of step.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction("SCR_Get_CaptionRatio_Pardoner_Oblation")]
+	public float SCR_Get_Oblation_CaptionRatio(Skill skill)
+		=> skill.Data.CaptionRatio1 + (skill.Data.CaptionRatio1ByLevel * skill.Level);
 }

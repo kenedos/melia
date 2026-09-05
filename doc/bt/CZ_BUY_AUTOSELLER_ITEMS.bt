@@ -4,11 +4,11 @@
 //      File: CZ_BUY_AUTOSELLER_ITEMS.bt
 //   Authors: Salman T. Khan
 //   Version: i339415
-//   Purpose: 
-//  Category: 
-// File Mask: 
-//  ID Bytes: 
-//   History: 
+//   Purpose:
+//  Category:
+// File Mask:
+//  ID Bytes:
+//   History:
 //------------------------------------------------
 
 #include "inc/common.bt"
@@ -17,10 +17,10 @@ ClientHeaderDynamic header;
 ShopType shopType; // 0
 int buyerHandle; // 8519
 int itemCount; // 1
+int indexOrSkillId; // Once for the request, 0 when opened without a skill name
 local int i;
 for (i = 0; i < itemCount; i++)
 {
-    int indexOrSkillId;
     int64 worldId; // Item World Id?
     int amount;
     int i0;
