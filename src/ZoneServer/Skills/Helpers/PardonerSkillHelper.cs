@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Storages;
-using Yggdrasil.Logging;
 
 namespace Melia.Zone.Skills.Helpers
 {
@@ -20,10 +21,19 @@ namespace Melia.Zone.Skills.Helpers
 		/// <summary>
 		/// How long the church takes to accept a new set of offerings.
 		/// </summary>
-		public static readonly TimeSpan ChurchDonationCooldown = TimeSpan.FromHours(24);
+		public static readonly TimeSpan ChurchDonationCooldown = TimeSpan.FromSeconds(24);
+
+		/// <summary>
+		/// How long a full offering box is left standing before its shop
+		/// closes itself.
+		/// </summary>
+		public static readonly TimeSpan FullBoxCloseDelay = TimeSpan.FromMinutes(5);
 
 		private const string DonationTimeVar = "Melia.Pardoner.LastChurchDonation";
 		private const string SelectionVar = "Melia.Pardoner.OblationSelection";
+
+		// What a batch may hold, leaving room for the call that wraps it.
+		private const int MaxBatchLength = ClientScript.ScriptMaxLength - 64;
 
 		/// <summary>
 		/// Returns how many items the given Pardoner's offering box holds,
@@ -103,7 +113,7 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="atChurch"></param>
 		public static void SendOblationBox(Character pardoner, bool atChurch)
 		{
-			StreamOblationBox(pardoner, pardoner.Connection);
+			StreamOblationBox(pardoner, pardoner);
 
 			var cooldown = (int)GetChurchDonationCooldown(pardoner).TotalSeconds;
 
@@ -117,9 +127,24 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="pardoner"></param>
 		public static void RefreshOblationBox(Character pardoner)
 		{
-			StreamOblationBox(pardoner, pardoner.Connection);
+			StreamOblationBox(pardoner, pardoner);
 
 			Send.ZC_EXEC_CLIENT_SCP(pardoner.Connection, $"M_REFRESH_OBLATION_BOX({GetOblationCapacity(pardoner)})");
+
+			NotifyOblationBoxViewers(pardoner);
+		}
+
+		/// <summary>
+		/// Sends the given Pardoner's offering box to everyone who has it
+		/// open, so a box that changed under them doesn't stay on screen.
+		/// </summary>
+		/// <param name="pardoner"></param>
+		private static void NotifyOblationBoxViewers(Character pardoner)
+		{
+			var viewers = pardoner.Map.GetCharacters(a => a != pardoner && a.Connection != null && a.Connection.ActiveShopOwnerHandle == pardoner.Handle);
+
+			foreach (var viewer in viewers)
+				SendOblationShop(viewer, pardoner);
 		}
 
 		/// <summary>
@@ -131,7 +156,7 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="pardoner"></param>
 		public static void SendOblationShop(Character donor, Character pardoner)
 		{
-			StreamOblationBox(pardoner, donor.Connection);
+			StreamOblationBox(pardoner, donor);
 
 			var rate = (int)GetOblationRate(pardoner);
 
@@ -140,31 +165,35 @@ namespace Melia.Zone.Skills.Helpers
 
 		/// <summary>
 		/// Sends the contents of the given Pardoner's offering box to the
-		/// given connection.
+		/// given viewer.
 		/// </summary>
 		/// <param name="pardoner"></param>
-		/// <param name="conn"></param>
-		private static void StreamOblationBox(Character pardoner, IZoneConnection conn)
+		/// <param name="viewer"></param>
+		private static void StreamOblationBox(Character pardoner, Character viewer)
 		{
+			var conn = viewer.Connection;
 			var box = pardoner.OblationBox;
+
+			ItemPreview.Show(viewer, box.GetItems().Values);
 
 			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.BeginRecv('OblationBox')");
 
 			var sb = new StringBuilder();
 			foreach (var itemKv in box.GetItems())
 			{
-				var position = itemKv.Key;
 				var item = itemKv.Value;
-				var props = SerializeItemProperties(item);
 				var pricePaid = box.GetPricePaid(item.ObjectId);
+				var entry = string.Format("{{{0},{1},{2},{3},{4},'{5}'}},", itemKv.Key, item.Id, item.Amount, pricePaid, GetChurchDonationPrice(pardoner, item.ObjectId), item.ObjectId);
 
-				sb.AppendFormat("{{{0},{1},{2},{3},{4},{5}}},", position, item.Id, item.Amount, pricePaid, GetChurchDonationPrice(pardoner, item.ObjectId), props);
-
-				if (sb.Length > ClientScript.ScriptMaxLength * 0.8)
+				// Flushed before the entry rather than after it, so a batch
+				// can never be built past the length the client accepts.
+				if (sb.Length > 0 && sb.Length + entry.Length > MaxBatchLength)
 				{
 					Send.ZC_EXEC_CLIENT_SCP(conn, $"Melia.Comm.Recv('OblationBox', {{ {sb} }})");
 					sb.Clear();
 				}
+
+				sb.Append(entry);
 			}
 
 			if (sb.Length > 0)
@@ -175,22 +204,59 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
-		/// Returns the item's properties as a lua table, so the box window
-		/// can show the same tooltip the inventory would.
+		/// Closes the given Pardoner's offering box shop once the box has
+		/// been full long enough to be doing nothing but taking up room.
 		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		private static string SerializeItemProperties(Item item)
+		/// <remarks>
+		/// A Pardoner who is there to empty it gets the grace period; one
+		/// who is autotrading is not coming back to empty anything, so
+		/// their shop closes as soon as the box fills.
+		/// </remarks>
+		/// <param name="pardoner"></param>
+		public static void UpdateFullBoxTimer(Character pardoner)
 		{
-			try
+			var shop = pardoner.Connection?.ShopCreated;
+			if (shop == null || shop.Type != PersonalShopType.Oblation || shop.IsClosed)
+				return;
+
+			var box = pardoner.OblationBox;
+			var capacity = GetOblationCapacity(pardoner);
+
+			if (capacity <= 0 || box.GetItemCount() < capacity)
 			{
-				return item.SerializePropertiesToLua();
+				box.FullSince = null;
+				return;
 			}
-			catch (Exception ex)
+
+			if (pardoner.IsAutoTrading)
 			{
-				Log.Warning("PardonerSkillHelper.SerializeItemProperties: Failed to serialize item '{0}'. {1}", item.Id, ex.Message);
-				return "nil";
+				CloseOblationShop(pardoner, shop);
+				return;
 			}
+
+			box.FullSince ??= DateTime.Now;
+
+			if (DateTime.Now - box.FullSince.Value >= FullBoxCloseDelay)
+				CloseOblationShop(pardoner, shop);
+		}
+
+		/// <summary>
+		/// Closes the given Pardoner's offering box shop.
+		/// </summary>
+		/// <param name="pardoner"></param>
+		/// <param name="shop"></param>
+		private static void CloseOblationShop(Character pardoner, ShopData shop)
+		{
+			shop.IsClosed = true;
+			pardoner.OblationBox.FullSince = null;
+
+			Send.ZC_AUTOSELLER_LIST(pardoner.Connection, pardoner);
+			Send.ZC_AUTOSELLER_TITLE(pardoner);
+			Send.ZC_NORMAL.ShopAnimation(pardoner, "Squire_Repair", 1, 0);
+
+			pardoner.Connection.ShopCreated = null;
+
+			pardoner.ServerMessage(Localization.Get("Your Offering Box is full. The shop has closed."));
 		}
 
 		/// <summary>

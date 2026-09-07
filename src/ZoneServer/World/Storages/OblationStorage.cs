@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Melia.Shared.Game.Const;
 using Melia.Zone.World.Actors.Characters;
@@ -33,6 +34,17 @@ namespace Melia.Zone.World.Storages
 		/// Character that owns this offering box.
 		/// </summary>
 		public Character Owner { get; }
+
+		/// <summary>
+		/// When the box last filled up, or null while it has room.
+		/// </summary>
+		/// <remarks>
+		/// A full box takes no more offers, so the shop standing in a town
+		/// is only in the way; this is what the wait before closing it is
+		/// measured from. It is deliberately not saved - a box that was
+		/// full before a restart gets the full wait again.
+		/// </remarks>
+		public DateTime? FullSince { get; set; }
 
 		/// <summary>
 		/// Creates new offering box.

@@ -17,7 +17,7 @@ function ShopItemList_New(name)
 	return result
 end
 
-function ShopItem_New(classId, itemId, count, price, properties)
+function ShopItem_New(classId, itemId, count, price, properties, worldId)
 	local result = {}
 	result.classID = classId
 	result.type = itemId
@@ -26,6 +26,7 @@ function ShopItem_New(classId, itemId, count, price, properties)
 	result.ItemType = "Item"
 	result.iesID = ""
 	result.properties = properties or {}
+	result.worldId = worldId or "0"
 	function result:GetIDSpace() return "Item" end
 	function result:GetIcon()
 		local cls = GetClassByType(self:GetIDSpace(), self.type)

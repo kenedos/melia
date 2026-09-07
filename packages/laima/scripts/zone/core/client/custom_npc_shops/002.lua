@@ -12,7 +12,7 @@ Melia.OverrideIn(session, "GetShopItemList", function(original)
 end)
 
 -- Function executed from the server to load a new shop.
--- itemData format: { productId, itemId, amount, price, properties (table) }
+-- itemData format: { productId, itemId, amount, price, properties (table), worldId }
 function M_SET_CUSTOM_SHOP(items)
 
 	local customShop = M_CUSTOM_SHOP
@@ -21,7 +21,7 @@ function M_SET_CUSTOM_SHOP(items)
 	for i = 1, #items do
 		local itemData = items[i]
 		-- Pass properties table (5th element) for tooltip display
-		local item = ShopItem_New(itemData[1], itemData[2], itemData[3], itemData[4], itemData[5])
+		local item = ShopItem_New(itemData[1], itemData[2], itemData[3], itemData[4], itemData[5], itemData[6])
 
 		customShop:AddItem(item)
 	end

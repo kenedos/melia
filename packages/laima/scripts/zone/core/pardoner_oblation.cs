@@ -12,6 +12,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Items;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class PardonerOblationScript : GeneralScript
@@ -22,6 +23,7 @@ public class PardonerOblationScript : GeneralScript
 	private const int ActionOpen = 3;
 	private const int ActionRefresh = 4;
 	private const int ActionShopInfo = 5;
+	private const int ActionListType = 6;
 
 	/// <summary>
 	/// Handles the offering box window's requests.
@@ -29,15 +31,25 @@ public class PardonerOblationScript : GeneralScript
 	/// <param name="character"></param>
 	/// <param name="numArg1">The action to take.</param>
 	/// <param name="numArg2">The box position, or the box owner's handle.</param>
-	/// <param name="numArg3">Whether the window was opened at the church.</param>
+	/// <param name="numArg3">The church flag, or the client's item list type.</param>
 	/// <returns></returns>
 	[ScriptableFunction]
 	public CustomCommandResult SCR_LAIMA_OBLATION_BOX(Character character, int numArg1, int numArg2, int numArg3)
 	{
-		// Anyone can look into a box they're offering to; the rest is the
-		// owner acting on their own.
+		// Any window can name the item list it previews from, and anyone
+		// can look into a box they're offering to; the rest is the owner
+		// acting on their own.
+		if (numArg1 == ActionListType)
+		{
+			ItemPreview.SetListType(character, numArg2);
+			return CustomCommandResult.Okay;
+		}
+
 		if (numArg1 == ActionShopInfo)
+		{
+			ItemPreview.SetListType(character, numArg3);
 			return this.SendShopInfo(character, numArg2);
+		}
 
 		if (!character.TryGetSkill(SkillId.Pardoner_Oblation, out _))
 			return CustomCommandResult.Fail;
@@ -49,6 +61,7 @@ public class PardonerOblationScript : GeneralScript
 				return CustomCommandResult.Okay;
 
 			case ActionRefresh:
+				ItemPreview.SetListType(character, numArg3);
 				PardonerSkillHelper.RefreshOblationBox(character);
 				return CustomCommandResult.Okay;
 

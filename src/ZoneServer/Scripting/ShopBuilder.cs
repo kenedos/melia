@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World;
@@ -17,6 +18,8 @@ namespace Melia.Zone.Scripting
 	/// </summary>
 	public class ShopBuilder
 	{
+		private const string OwnerFundsWarnedVar = "Melia.Oblation.OwnerFundsWarned";
+
 		private readonly ShopData _shopData;
 		private int _productClassId = 100_001;
 
@@ -384,7 +387,14 @@ namespace Melia.Zone.Scripting
 
 			if (shopOwner.Inventory.CountItem(ItemId.Silver) < totalCost)
 			{
-				character.SystemMessage("NOT_ENOUGH_MONEY");
+				// The box owner is the one paying, and one offer failing
+				// this way means every later one in the same batch will too.
+				if (!character.Variables.Temp.GetBool(OwnerFundsWarnedVar, false))
+				{
+					character.Variables.Temp.SetBool(OwnerFundsWarnedVar, true);
+					character.ServerMessage(Localization.Get("The Offering Box owner doesn't have enough silver to buy that."));
+				}
+
 				return;
 			}
 
@@ -419,13 +429,14 @@ namespace Melia.Zone.Scripting
 			// once per purchase packet, after every item in it was offered.
 			if (shop.Type == PersonalShopType.Oblation)
 			{
+				conn.SelectedCharacter?.Variables.Temp.SetBool(OwnerFundsWarnedVar, false);
+
 				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
 				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
 
+				// Refreshing the box also reaches everyone browsing it,
+				// the buyer included.
 				PardonerSkillHelper.RefreshOblationBox(shopOwner);
-
-				if (conn.SelectedCharacter != null)
-					PardonerSkillHelper.SendOblationShop(conn.SelectedCharacter, shopOwner);
 
 				return;
 			}

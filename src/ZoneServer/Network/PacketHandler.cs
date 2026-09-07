@@ -2418,6 +2418,10 @@ namespace Melia.Zone.Network
 				foreach (var socketedItems in items.Values.Where(a => a.HasSockets))
 					Send.ZC_EQUIP_GEM_INFO(character, socketedItems);
 			}
+			else if (ItemPreview.IsPreviewList(character, (int)type))
+			{
+				ItemPreview.Resend(character);
+			}
 			else
 				Send.ZC_SOLD_ITEM_DIVISION_LIST(character, type, new Dictionary<int, Item>());
 		}
@@ -5367,6 +5371,20 @@ namespace Melia.Zone.Network
 			}
 
 			// Visitor opening a sellshop - send custom shop data via Melia.Comm and open dialog
+			// The items themselves go over as a preview list, so their
+			// sockets and gems reach the client's tooltip.
+			var shopItems = new List<Item>();
+			foreach (var productData in shop.Products.Values)
+			{
+				if (productData.ItemWorldIds.Count == 0)
+					continue;
+
+				if (shopOwner.Inventory.TryGetItem(productData.ItemWorldIds[0], out var shopItem))
+					shopItems.Add(shopItem);
+			}
+
+			ItemPreview.Show(character, shopItems);
+
 			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.BeginRecv('CustomShop')");
 
 			var sb = new StringBuilder();
@@ -5374,10 +5392,11 @@ namespace Melia.Zone.Network
 			{
 				// Get item properties for tooltip display
 				var propsStr = "nil";
+				var worldId = 0L;
 				if (productData.ItemWorldIds.Count > 0)
 				{
-					var firstWorldId = productData.ItemWorldIds[0];
-					if (shopOwner.Inventory.TryGetItem(firstWorldId, out var item))
+					worldId = productData.ItemWorldIds[0];
+					if (shopOwner.Inventory.TryGetItem(worldId, out var item))
 					{
 						try
 						{
@@ -5391,14 +5410,18 @@ namespace Melia.Zone.Network
 					}
 				}
 
-				// Format: { productId, itemId, amount, price, properties }
-				sb.AppendFormat("{{ {0},{1},{2},{3},{4} }},", productData.Id, productData.ItemId, productData.Amount, productData.Price, propsStr);
+				// Format: { productId, itemId, amount, price, properties, worldId }
+				var entry = string.Format("{{ {0},{1},{2},{3},{4},'{5}' }},", productData.Id, productData.ItemId, productData.Amount, productData.Price, propsStr, worldId);
 
-				if (sb.Length > ClientScript.ScriptMaxLength * 0.8)
+				// Flushed before the entry rather than after it: a socketed
+				// item's properties alone can outgrow what the client takes.
+				if (sb.Length > 0 && sb.Length + entry.Length > ClientScript.ScriptMaxLength - 64)
 				{
 					Send.ZC_EXEC_CLIENT_SCP(conn, $"Melia.Comm.Recv('CustomShop', {{ {sb} }})");
 					sb.Clear();
 				}
+
+				sb.Append(entry);
 			}
 
 			if (sb.Length > 0)
