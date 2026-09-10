@@ -577,7 +577,7 @@ namespace Melia.Test.Balance.Buff
 					// live. Both halves of a pair sample from the same seed and
 					// the same count, so the only thing that can move this is
 					// the buff itself.
-					var incoming = HitSampler.Sample(focus, character, new Skill(focus, SkillId.Normal_Attack, 1), BuffDials.IncomingSamples);
+					var incoming = SampleIncoming(mobs, character);
 
 					recorder.Clear();
 
@@ -634,7 +634,7 @@ namespace Melia.Test.Balance.Buff
 					}
 
 					return new WindowReading(landed, application.OnEnemy, application.Observed,
-						recorder.TotalDamage(), incoming.EffectivePerCast,
+						recorder.TotalDamage(), incoming,
 						mobs.Sum(recorder.HitsOn), BuffDials.IncomingSamples);
 				}
 			}
@@ -646,6 +646,41 @@ namespace Melia.Test.Balance.Buff
 				foreach (var ally in allies)
 					SyntheticActors.Cleanup(ally);
 			}
+		}
+
+		/// <summary>
+		/// Returns what one incoming swing gets through for, averaged over the
+		/// attack types the ring swings.
+		/// </summary>
+		/// <remarks>
+		/// One mob per attack type, each sampled for an equal share of
+		/// BuffDials.IncomingSamples, so the total count is unchanged and every
+		/// window still fixes it by construction. The mean is flat because the
+		/// split is: what is being read is what the character takes from a
+		/// fight that contains both kinds of swing, and nothing measures which
+		/// kind it meets more often.
+		///
+		/// Without the magic half a buff that only raises MDEF mitigates
+		/// nothing the probe can see, reads 1.000 at every scale and is held
+		/// as unpriceable for a reason that belongs to the probe.
+		/// </remarks>
+		/// <param name="mobs"></param>
+		/// <param name="character"></param>
+		private static float SampleIncoming(List<Mob> mobs, Character character)
+		{
+			var attacks = BuffDials.IncomingAttacks;
+			var share = BuffDials.IncomingSamples / attacks.Length;
+			var total = 0f;
+
+			for (var i = 0; i < attacks.Length; ++i)
+			{
+				var mob = mobs[i % mobs.Count];
+				var sample = HitSampler.Sample(mob, character, new Skill(mob, attacks[i], 1), share);
+
+				total += sample.EffectivePerCast;
+			}
+
+			return total / attacks.Length;
 		}
 
 		/// <summary>

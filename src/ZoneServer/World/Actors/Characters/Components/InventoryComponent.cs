@@ -432,6 +432,53 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Returns the object ids of stacks of the given item that together
+		/// hold the requested amount and that can all stack with each other.
+		/// </summary>
+		/// <remarks>
+		/// Items of one class are usually interchangeable, but not always -
+		/// skill scrolls of one class carry different skills. Callers that
+		/// hand out items picked by class id use this to keep a selection
+		/// from mixing.
+		/// </remarks>
+		/// <param name="itemId"></param>
+		/// <param name="amount"></param>
+		/// <param name="objectIds"></param>
+		/// <returns></returns>
+		public bool TryGetMatchingStacks(int itemId, int amount, out List<long> objectIds)
+		{
+			objectIds = new List<long>();
+
+			var candidates = this.GetItems(a => a.Id == itemId).Values.ToList();
+
+			foreach (var anchorItem in candidates)
+			{
+				var stacks = new List<long>();
+				var total = 0;
+
+				foreach (var item in candidates)
+				{
+					if (!item.CanStackWith(anchorItem))
+						continue;
+
+					stacks.Add(item.ObjectId);
+					total += item.Amount;
+
+					if (total >= amount)
+						break;
+				}
+
+				if (total < amount)
+					continue;
+
+				objectIds = stacks;
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Returns item by world id, or null if it doesn't exist.
 		/// </summary>
 		/// <param name="worldId"></param>

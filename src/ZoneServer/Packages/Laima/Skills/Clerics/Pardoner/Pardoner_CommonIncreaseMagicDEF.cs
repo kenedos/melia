@@ -51,7 +51,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Pardoner
 
 			await skill.Wait(TimeSpan.FromMilliseconds(90));
 
-			SkillTargetBuff(skill, caster, caster.GetTargets(), BuffId.IncreaseMagicDEF_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), skill.Id);
+			SkillTargetBuff(skill, caster, caster.GetTargets(), BuffId.IncreaseMagicDEF_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), SkillId.Pardoner_IncreaseMagicDEF);
 		}
 	}
 }

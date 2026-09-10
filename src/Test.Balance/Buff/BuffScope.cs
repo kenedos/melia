@@ -192,8 +192,14 @@ namespace Melia.Test.Balance.Buff
 		/// SwashBuckling_Debuff read as "granted by six Peltasta skills" and was
 		/// filed as unpriceable on that basis, when only Peltasta_SwashBuckling
 		/// starts it and the other five are the base handlers it overrides.
+		///
+		/// SkillTargetHelper's own apply helpers count too, and reading only
+		/// StartBuff missed them: a press that hands its targets to
+		/// SkillTargetBuff names no buff the scan could see, so it granted
+		/// nothing, the probe had nothing to fall back on, and it was held as
+		/// "the press applied no buff and none could be applied directly".
 		/// </remarks>
-		private static readonly Regex BuffApplication = new(@"StartBuff\w*\(\s*BuffId\.(\w+)", RegexOptions.Compiled);
+		private static readonly Regex BuffApplication = new(@"\b(?:StartBuff\w*|Skill\w*Buff\w*)\([^;]*?BuffId\.(\w+)", RegexOptions.Compiled);
 
 		/// <summary>
 		/// A press that puts its buff on the caster's party rather than only on

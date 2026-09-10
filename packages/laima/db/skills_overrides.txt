@@ -898,7 +898,7 @@
 { skillId: 40805, className: "Pardoner_SpellShop", name: "Spell Shop", basicSp: 8, lvUpSpendSp: 0.55, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
 { skillId: 40806, className: "Pardoner_SignDispeller", name: "Dispeller Crafting", basicSp: 39, lvUpSpendSp: 2.02, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 150000 },
 { skillId: 40807, className: "Pardoner_CraftBooster", name: "Craft Booster", basicSp: 39, lvUpSpendSp: 2.02, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 150000 },
-{ skillId: 40808, className: "Pardoner_IncreaseMagicDEF", name: "Increase Magic Defense", basicSp: 85, lvUpSpendSp: 4.34, basicCast: 3000, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 43500, castInterruptible: true, captionTime: 1800 },
+{ skillId: 40808, className: "Pardoner_IncreaseMagicDEF", name: "Increase Magic Defense", basicSp: 85, lvUpSpendSp: 4.34, basicCast: 3000, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, castInterruptible: true, captionRatio1: 0, captionRatio1ByLevel: 1.9, captionRatio2: 0, captionRatio2ByLevel: 6.2, captionTime: 300 },
 { skillId: 40809, className: "Pardoner_Dekatos", name: "Dekatos", basicSp: 13, lvUpSpendSp: 0.66, splashRate: 0, factor: 134, factorByLevel: 7.2, hitCount: 1, multiHitCount: 1, cooldownTime: 5000, overheatCount: "3", captionRatio1: 0, captionRatio1ByLevel: 1000 },
 
 { skillId: 40901, className: "Druid_Telepath", name: "Telepath", splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000 },

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Melia.Shared.Game.Const;
 
 namespace Melia.Test.Balance.Buff
 {
@@ -119,6 +120,32 @@ namespace Melia.Test.Balance.Buff
 		/// prices exactly that for the skills that carry it.
 		/// </remarks>
 		public const int IncomingSamples = 4000;
+
+		/// <summary>
+		/// Basic attacks the ring swings, which is what decides whether an
+		/// incoming hit is read against DEF or against MDEF.
+		/// </summary>
+		/// <remarks>
+		/// Half and half. A ring that only ever swings physically prices every
+		/// magic-defense buff at exactly 1.000 - Cleric_Fade and
+		/// Pardoner_IncreaseMagicDEF both read as doing nothing, and no scale
+		/// moves them, so they land in NOT PRICED for a reason that is the
+		/// probe's rather than the buff's. Two entries rather than a share,
+		/// because the split has to be a whole number of samples and an even
+		/// one is the only split nothing has to justify.
+		///
+		/// Magic_Attack is Normal_Attack's classType Magic counterpart and
+		/// reads the monster's own mAttack, which the data carries for every
+		/// monster alongside its pAttack. It carries the heavier factor of the
+		/// two (121 against 100), so an even split of samples is a little more
+		/// than an even split of damage - the two rows are real skills and
+		/// their factors are left as they are rather than flattened.
+		/// </remarks>
+		public static readonly SkillId[] IncomingAttacks =
+		[
+			SkillId.Normal_Attack,
+			SkillId.Magic_Attack,
+		];
 
 		/// <summary>
 		/// Buffs solved at once by a roster pass.

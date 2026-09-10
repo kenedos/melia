@@ -25,6 +25,7 @@ using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Services;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.Util;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors;
@@ -1024,9 +1025,7 @@ namespace Melia.Zone.Network
 				// If the entire stack was discarded, we can simply drop
 				// the item. If only a part of the stack was discarded,
 				// we need to create a new stack, with the selected amount.
-				// TODO: We might need to copy values and properties from
-				//   the original stack to the new stack.
-				var dropItem = (fullStack ? item : new Item(item.Id, amount));
+				var dropItem = (fullStack ? item : new Item(item, amount));
 				dropItem.SetRePickUpProtection(character);
 				dropItem.Drop(character.Map, character.Position, dropDir, 30, character.Layer);
 			}
@@ -2093,19 +2092,13 @@ namespace Melia.Zone.Network
 
 			if (id >= ObjectIdRanges.Items && character.Inventory.TryGetItem(id, out var item))
 			{
-				item.Properties.TryGetFloat(PropertyName.SkillType, out var skillType);
-				skillId = (SkillId)skillType;
-				item.Properties.TryGetFloat(PropertyName.SkillLevel, out var skillLevel);
-
-				if (skillId == SkillId.None && item.Data.ClassName.StartsWith("Scroll_SkillItem_"))
-					Enum.TryParse(item.Data.ClassName.Substring("Scroll_SkillItem_".Length), out skillId);
-				if (skillLevel == 0)
+				if (!SkillScrollHelper.TryGetScrollSkill(character, item, out skill))
 				{
-					var skillTree = ZoneServer.Instance.Data.SkillTreeDb.Find(entry => entry.SkillId == skillId);
-					skillLevel = skillTree?.MaxLevel ?? 1;
+					Log.Warning("CZ_SKILL_GROUND: User '{0}' tried to use an item that carries no skill ({1}).", conn.Account.Name, item.Data.ClassName);
+					return;
 				}
 
-				skill = new Skill(character, skillId, (int)skillLevel, isItemSkill: true);
+				skillId = skill.Id;
 				scrollItemId = id;
 			}
 			else
@@ -2148,7 +2141,10 @@ namespace Melia.Zone.Network
 
 			// The scroll is only spent once the cast is going through
 			if (scrollItemId != 0)
+			{
 				character.Inventory.Remove(scrollItemId, 1, InventoryItemRemoveMsg.Used);
+				SkillScrollHelper.SetReleaseAnimation(character, skill);
+			}
 
 			// Try to use skill
 			try
@@ -2266,7 +2262,7 @@ namespace Melia.Zone.Network
 				return;
 
 			// Check skill
-			if (!character.Skills.TryGet(skillId, out var skill))
+			if (!character.Skills.TryGet(skillId, out var skill) && !SkillScrollHelper.TryGetScrollSkill(character, skillId, out skill))
 			{
 				Log.Warning("CZ_DYNAMIC_CASTING_START: User '{0}' tried to use a skill they don't have ({1}).", conn.Account.Name, skillId);
 				return;
@@ -2274,6 +2270,7 @@ namespace Melia.Zone.Network
 
 			character.SetCastingState(true, skill);
 			Send.ZC_NORMAL.Skill_DynamicCastStart(character, skill.Id);
+			SkillScrollHelper.PlayCastAnimation(character, skill);
 			character.Variables.Temp.Set("Melia.Cast.Skill", skill);
 
 			if (ZoneServer.Instance.SkillHandlers.TryGetHandler<IDynamicCasted>(skillId, out var handler))
@@ -2295,7 +2292,7 @@ namespace Melia.Zone.Network
 			var character = conn.SelectedCharacter;
 
 			// Check skill
-			if (!character.Skills.TryGet(skillId, out var skill))
+			if (!character.Skills.TryGet(skillId, out var skill) && !SkillScrollHelper.TryGetScrollSkill(character, skillId, out skill))
 			{
 				Log.Warning("CZ_DYNAMIC_CASTING_END: User '{0}' tried to cast a skill they don't have ({1}).", conn.Account.Name, skillId);
 				return;
@@ -2303,6 +2300,7 @@ namespace Melia.Zone.Network
 
 			character.SetCastingState(false, skill);
 			Send.ZC_NORMAL.Skill_DynamicCastEnd(character, skill.Id, castTime);
+			SkillScrollHelper.ResetCastAnimation(character, skill);
 			character.Variables.Temp.Remove("Melia.Cast.Skill");
 
 			if (ZoneServer.Instance.SkillHandlers.TryGetHandler<IDynamicCasted>(skillId, out var handler))
@@ -5175,28 +5173,10 @@ namespace Melia.Zone.Network
 
 							// IMPORTANT: For sell shops, verify the seller has the items and track by world ID
 							// Get the actual items from inventory to store their unique world IDs
-							var items = character.Inventory.GetItems(item => item.Id == itemId);
-							var worldIds = new List<long>();
-							var totalAmount = 0;
-
-							foreach (var itemEntry in items)
-							{
-								var item = itemEntry.Value;
-								var takeAmount = Math.Min(item.Amount, requiredAmount - totalAmount);
-								if (takeAmount > 0)
-								{
-									worldIds.Add(item.ObjectId); // Store unique world ID once per stack
-									totalAmount += takeAmount;
-								}
-
-								if (totalAmount >= requiredAmount)
-									break;
-							}
-
-							if (totalAmount < requiredAmount)
+							if (!character.Inventory.TryGetMatchingStacks(itemId, requiredAmount, out var worldIds))
 							{
 								character.SystemMessage("YouDontHaveEnoughItems");
-								Log.Warning("CZ_REGISTER_AUTOSELLER: Player doesn't have enough items to sell. ItemId: {0}, Required: {1}, Found: {2}", itemId, requiredAmount, totalAmount);
+								Log.Warning("CZ_REGISTER_AUTOSELLER: Player doesn't have enough items to sell. ItemId: {0}, Required: {1}", itemId, requiredAmount);
 								return;
 							}
 
@@ -5218,28 +5198,10 @@ namespace Melia.Zone.Network
 
 							// IMPORTANT: For sell shops, verify the seller has the items and track by world ID
 							// Get the actual items from inventory to store their unique world IDs
-							var items = character.Inventory.GetItems(item => item.Id == itemId);
-							var worldIds = new List<long>();
-							var totalAmount = 0;
-
-							foreach (var itemEntry in items)
-							{
-								var item = itemEntry.Value;
-								var takeAmount = Math.Min(item.Amount, requiredAmount - totalAmount);
-								if (takeAmount > 0)
-								{
-									worldIds.Add(item.ObjectId); // Store unique world ID once per stack
-									totalAmount += takeAmount;
-								}
-
-								if (totalAmount >= requiredAmount)
-									break;
-							}
-
-							if (totalAmount < requiredAmount)
+							if (!character.Inventory.TryGetMatchingStacks(itemId, requiredAmount, out var worldIds))
 							{
 								character.SystemMessage("YouDontHaveEnoughItems");
-								Log.Warning("CZ_REGISTER_AUTOSELLER: Player doesn't have enough items to sell. ItemId: {0}, Required: {1}, Found: {2}", itemId, requiredAmount, totalAmount);
+								Log.Warning("CZ_REGISTER_AUTOSELLER: Player doesn't have enough items to sell. ItemId: {0}, Required: {1}", itemId, requiredAmount);
 								return;
 							}
 

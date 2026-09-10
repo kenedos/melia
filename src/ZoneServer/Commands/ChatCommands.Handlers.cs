@@ -4974,13 +4974,15 @@ namespace Melia.Zone.Commands
 
 				// Find the item - use worldId if provided, otherwise fall back to itemId search
 				Item foundItem = null;
-				if (worldId != 0 && sender.Inventory.TryGetItem(worldId, out var itemByWorldId))
+				if (worldId != 0)
 				{
-					if (itemByWorldId.Id == itemId)
+					// Items of one class are not always interchangeable, so a
+					// named item that's gone is an error, not a reason to pick
+					// another one of its class.
+					if (sender.Inventory.TryGetItem(worldId, out var itemByWorldId) && itemByWorldId.Id == itemId)
 						foundItem = itemByWorldId;
 				}
-
-				if (foundItem == null)
+				else
 				{
 					// Fall back to search by itemId
 					var items = sender.Inventory.GetItems(item => item.Id == itemId);

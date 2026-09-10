@@ -787,7 +787,6 @@ namespace Melia.Zone.World.Maps
 			if (!newItem.Item.IsStackable)
 				return;
 
-			var itemId = newItem.Item.Id;
 			var layer = newItem.Layer;
 			var pos = newItem.Position;
 			var ownerId = newItem.Item.OwnerCharacterId;
@@ -803,7 +802,7 @@ namespace Melia.Zone.World.Maps
 				{
 					if (monster == newItem || monster is not ItemMonster im)
 						continue;
-					if (im.PickedUp || im.Item.Id != itemId || im.Layer != layer || im.Item.OwnerCharacterId != ownerId)
+					if (im.PickedUp || !im.Item.CanStackWith(newItem.Item) || im.Layer != layer || im.Item.OwnerCharacterId != ownerId)
 						continue;
 					if (!im.Position.InRange2D(pos, itemMergeRange))
 						continue;

@@ -139,7 +139,7 @@ namespace Melia.Zone.World.Storages
 					if (!existingItem.IsStackable)
 						continue;
 
-					if (existingItem.Data.ClassName != item.Data.ClassName)
+					if (!existingItem.CanStackWith(item))
 						continue;
 
 					result.Add(existingItemPosition, existingItem);
@@ -445,7 +445,7 @@ namespace Melia.Zone.World.Storages
 			}
 			else
 			{
-				var canBeStacked = existingItem.IsStackable && item.IsStackable && existingItem.Data.ClassName == item.Data.ClassName;
+				var canBeStacked = existingItem.IsStackable && item.IsStackable && existingItem.CanStackWith(item);
 
 				// Cannot stack item, add to any available position
 				if (!canBeStacked)
