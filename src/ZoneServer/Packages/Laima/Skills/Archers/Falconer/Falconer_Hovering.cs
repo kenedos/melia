@@ -78,6 +78,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			if (caster.TryGetActiveAbilityLevel(AbilityId.Falconer3, out var abilLevel))
 				duration += abilLevel * 3000;
 
+			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(duration);
+
 			var endTime = GameClock.LocalNow.AddMilliseconds(duration);
 
 			// Falconer4: Hovering: Attack Speed Buff - reduced attack interval
@@ -109,7 +111,6 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			}
 
 			// Cleanup
-			hawk.Vars.Set("Hawk.Hovering.Active", false);
 			caster.PlayGroundEffect(targetPos, "F_archer_hovering_end", 1f);
 			pad.Destroy();
 		}

@@ -393,6 +393,23 @@ namespace Melia.Test.Balance.Sfr
 		};
 
 		/// <summary>
+		/// The premium a base-job skill takes, against the level the anchor
+		/// sets.
+		/// </summary>
+		/// <remarks>
+		/// Below one, so a base skill tops out under the budget rather than on
+		/// it. At 0.75 the base ceiling is 144 against the anchor's 192, which
+		/// widens the advanced ladder from 1.20 / 1.25 / 1.30 over base to
+		/// 1.60 / 1.67 / 1.74 - base skills are meant to fall behind as a
+		/// character advances rather than stay within a third of everything.
+		///
+		/// It also lifts a fresh C1 skill against a maxed base one from 0.46x
+		/// to 0.61x, which SlopeShare cannot do: that dial only moves where
+		/// inside a curve the ceiling sits, never the ceiling itself.
+		/// </remarks>
+		public const float BasePremium = 0.75f;
+
+		/// <summary>
 		/// How much of a skill's ceiling is bought by levelling it rather than
 		/// by unlocking it, by the circle the skill belongs to.
 		/// </summary>
@@ -401,11 +418,33 @@ namespace Melia.Test.Balance.Sfr
 		/// the previous circle's skill was already sitting at instead of at
 		/// half of it. 0.50 is the base pool's share and reproduces the
 		/// retired doubling rule exactly, which is what holds the anchor.
+		///
+		/// The share is also what a skill gem is worth, and that is what moved
+		/// C1 and C2 off their original 0.45 and 0.35. A gem adds one level, so
+		/// on a skill at its cap it buys SlopeShare / maxLevel of that skill's
+		/// damage - against a colored gem's roughly 4% on everything the
+		/// character does. At 0.45 a C1 gem bought 3.0%, less than the generic
+		/// gem it competes with for the same socket, which made the scarcer
+		/// item the worse pick.
+		///
+		/// The ceiling does not move with this dial - CirclePremium sets that -
+		/// so a maxed skill reads exactly what it read before and only the
+		/// curve into it changes.
+		///
+		/// C1 is the one that had to give something up. A gem is one level out
+		/// of fifteen, so 1/15 = 6.7% is the ceiling even at a share of 1.0, and
+		/// 0.66 is what 1.10x the colored gem costs. It puts a level-one C1
+		/// press at 88 against a base skill's 115, so the level-one ladder is
+		/// no longer monotonic - 115 / 88 / 132 / 196 across base, C1, C2, C3 -
+		/// and a fresh C1 skill opens below the base pool's own first point.
+		/// That is a deliberate trade: the front-loading was worth less than a
+		/// skill gem being worth taking, and a C1 skill still passes the base
+		/// pool after two points.
 		/// </remarks>
 		public static readonly Dictionary<int, float> SlopeShare = new()
 		{
-			[1] = 0.45f,
-			[2] = 0.35f,
+			[1] = 0.66f,
+			[2] = 0.50f,
 			[3] = 0.27f,
 		};
 
@@ -413,7 +452,7 @@ namespace Melia.Test.Balance.Sfr
 		/// The slope share every base-job skill takes, whatever circle it
 		/// sits in.
 		/// </summary>
-		public const float BaseSlopeShare = 0.50f;
+		public const float BaseSlopeShare = 0.3333f;
 
 		/// <summary>
 		/// What a channel earns for paying its SP over the hold rather than up

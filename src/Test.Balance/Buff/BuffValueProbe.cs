@@ -460,9 +460,10 @@ namespace Melia.Test.Balance.Buff
 				var stat = JobCatalog.GetPrimaryStat(job);
 
 				var spread = BuffScenarios.Spread(scenario, stat, characterLevel);
+				var gear = BuffDials.GearFor(characterLevel);
 
 				character = SyntheticActors.CreateCharacter(job.JobId, characterLevel, spread, arena: arena);
-				ReferenceGear.Equip(character, job);
+				ReferenceGear.Equip(character, job, gear);
 
 				var buffSkill = SyntheticActors.GiveSkill(character, subject.SkillId, buffLevel);
 				var basicSkill = SyntheticActors.GiveSkill(character, BasicAttackOf(character, job), 1);
@@ -480,7 +481,7 @@ namespace Melia.Test.Balance.Buff
 					var ally = SyntheticActors.CreateCharacter(job.JobId, characterLevel, spread,
 						new Position(i * 15f, 0, -15f), arena);
 
-					ReferenceGear.Equip(ally, job);
+					ReferenceGear.Equip(ally, job, gear);
 					SyntheticActors.GiveSkill(ally, subject.SkillId, buffLevel);
 					allySkills.Add(SyntheticActors.GiveSkill(ally, BasicAttackOf(ally, job), 1));
 
@@ -663,6 +664,15 @@ namespace Melia.Test.Balance.Buff
 		/// Without the magic half a buff that only raises MDEF mitigates
 		/// nothing the probe can see, reads 1.000 at every scale and is held
 		/// as unpriceable for a reason that belongs to the probe.
+		///
+		/// Per hit rather than per cast, which is what makes the two halves
+		/// comparable. HitsPerCast comes from HandlerHitCounts, which counts
+		/// the SCR_SkillHit calls in the handler source - and Magic_Attack
+		/// shares Common/TargetSkill.cs with the other basic attacks, whose two
+		/// calls are two code paths rather than two hits. Read per cast, a
+		/// magic swing counted double and physical came to only 31% of what the
+		/// character took, which inflated every dodge, block and physical
+		/// defense buff on the roster.
 		/// </remarks>
 		/// <param name="mobs"></param>
 		/// <param name="character"></param>
@@ -677,7 +687,7 @@ namespace Melia.Test.Balance.Buff
 				var mob = mobs[i % mobs.Count];
 				var sample = HitSampler.Sample(mob, character, new Skill(mob, attacks[i], 1), share);
 
-				total += sample.EffectivePerCast;
+				total += sample.EffectiveMean;
 			}
 
 			return total / attacks.Length;

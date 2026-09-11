@@ -883,23 +883,23 @@ namespace Melia.Zone.World.Items
 			{
 				// red = STR
 				case 643501:
-					this.AddGemRandomOption(1, PropertyName.STR, "STAT", 3 * this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.STR, "STAT", this.GemLevel);
 					break;
 				// blue = INT
 				case 643502:
-					this.AddGemRandomOption(1, PropertyName.INT, "STAT", 3 * this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.INT, "STAT", this.GemLevel);
 					break;
 				// green = CON
 				case 643503:
-					this.AddGemRandomOption(1, PropertyName.CON, "STAT", 3 * this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.CON, "STAT", this.GemLevel);
 					break;
 				// yellow = DEX
 				case 643504:
-					this.AddGemRandomOption(1, PropertyName.DEX, "STAT", 3 * this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.DEX, "STAT", this.GemLevel);
 					break;
 				// white = SPR
 				case 643817:
-					this.AddGemRandomOption(1, PropertyName.MNA, "STAT", 3 * this.GemLevel);
+					this.AddGemRandomOption(1, PropertyName.MNA, "STAT", this.GemLevel);
 					break;
 			}
 		}

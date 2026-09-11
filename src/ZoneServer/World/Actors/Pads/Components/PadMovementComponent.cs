@@ -1,4 +1,7 @@
-﻿using Melia.Shared.World;
+﻿using System;
+using System.Threading.Tasks;
+using Melia.Shared.Util;
+using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Components;
 
@@ -18,6 +21,41 @@ namespace Melia.Zone.World.Actors.Pads.Components
 		public PadMovementComponent(Pad pad) : base(pad)
 		{
 			this.Pad = pad;
+		}
+
+		/// <summary>
+		/// Moves the pad to the given destination and returns once it
+		/// arrived there.
+		/// </summary>
+		/// <remarks>
+		/// The wait is deliberately not tied to the skill's cancellation
+		/// token, so a pad in flight still reaches its destination once
+		/// the skill that spawned it ends.
+		/// </remarks>
+		/// <param name="destination"></param>
+		public async Task MoveToAsync(Position destination)
+		{
+			var moveTime = this.MoveTo(destination);
+			await GameClock.Delay(moveTime);
+		}
+
+		/// <summary>
+		/// Moves the pad to the given destination and destroys it once it
+		/// arrived there.
+		/// </summary>
+		/// <remarks>
+		/// The canonical way to fly a projectile pad. Awaiting the move
+		/// and destroying the pad by hand risks leaking it onto the map
+		/// forever if the wait is cancellable.
+		/// </remarks>
+		/// <param name="destination"></param>
+		/// <param name="earlyDestroy">Time to cut off the end of the move.</param>
+		public async Task MoveToAndDestroy(Position destination, TimeSpan earlyDestroy = default)
+		{
+			var moveTime = this.MoveTo(destination) - earlyDestroy;
+			await GameClock.Delay(moveTime);
+
+			this.Pad.Destroy();
 		}
 
 		/// <summary>

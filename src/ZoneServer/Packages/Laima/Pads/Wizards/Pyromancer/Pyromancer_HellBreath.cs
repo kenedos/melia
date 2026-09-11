@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
@@ -17,6 +17,7 @@ namespace Melia.Zone.Pads.Handlers
 	{
 		private const int KnockbackDistance = 30;
 		private const int KnockbackVelocityPerAbilityLevel = 5;
+		private const int LifeTimeMs = 3000;
 
 		/// <summary>
 		/// Initializes the Hell Breath pad
@@ -29,6 +30,7 @@ namespace Melia.Zone.Pads.Handlers
 			Send.ZC_NORMAL.PadUpdate(pad, true);
 			pad.SetRange(30);
 			pad.Trigger.MaxConcurrentUseCount = 2;
+			pad.Trigger.LifeTime = TimeSpan.FromMilliseconds(LifeTimeMs);
 		}
 
 		/// <summary>

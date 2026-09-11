@@ -1,12 +1,18 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Melia.Shared.Game.Const;
 using Melia.Test.Balance.Sfr;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -169,7 +175,7 @@ namespace Melia.Test.Balance.Buff
 					var stat = JobCatalog.GetPrimaryStat(job);
 
 					var character = SyntheticActors.CreateCharacter(job.JobId, level, StatSpread.AllIn(stat, level));
-					ReferenceGear.Equip(character, job);
+					ReferenceGear.Equip(character, job, BuffDials.GearFor(level));
 
 					var mob = SyntheticActors.CreateMob(SfrDefenseProbe.FindHostileReferenceMob(level).Id);
 
@@ -184,6 +190,365 @@ namespace Melia.Test.Balance.Buff
 					}
 				}
 			}
+
+			/// <summary>
+			/// Reports what each gear tier is actually worth, and how much of an
+			/// incoming swing is physical against magical, at every level the
+			/// pricer sweeps.
+			/// </summary>
+			/// <remarks>
+			/// Both halves of the model this exists to keep honest are otherwise
+			/// invisible. A defensive buff's price depends on where the character
+			/// sits on attack/defense, so the tiers have to really span a range
+			/// rather than being three names for similar numbers; and the incoming
+			/// split is even in samples but not in damage, because Magic_Attack
+			/// carries the heavier factor and MDEF and DEF are not equal. Both are
+			/// reported rather than asserted, for the reason ReportsTheNaturalRolls
+			/// gives: the point is to have the grid's own conditions written down
+			/// instead of reasoned about from outside.
+			/// </remarks>
+			[Fact]
+			public void ReportsTheGearTiers()
+			{
+				if (!BalanceSuites.BuffEnabled)
+				{
+					_output.WriteLine(BalanceSuites.SkipMessage(BalanceSuites.BuffVariable));
+					return;
+				}
+
+				var job = JobCatalog.Entries.First(e => e.SkillPrefix == BuffDials.AnchorSkill.Split('_')[0]);
+				var stat = JobCatalog.GetPrimaryStat(job);
+
+				foreach (var level in ScenarioMatrix.CharacterLevels)
+				{
+					var tier = BuffDials.GearFor(level);
+
+					var character = SyntheticActors.CreateCharacter(job.JobId, level, StatSpread.AllIn(stat, level));
+					var set = ReferenceGear.Equip(character, job, tier);
+
+					var mob = SyntheticActors.CreateMob(SfrDefenseProbe.FindHostileReferenceMob(level).Id);
+
+					try
+					{
+						var def = character.Properties.GetFloat(PropertyName.DEF);
+						var mdef = character.Properties.GetFloat(PropertyName.MDEF);
+						var patk = character.Properties.GetFloat(PropertyName.MAXPATK);
+						var matk = character.Properties.GetFloat(PropertyName.MAXMATK);
+
+						var physical = HitSampler.Sample(mob, character, new Skill(mob, SkillId.Normal_Attack, 1), 2000);
+						var magical = HitSampler.Sample(mob, character, new Skill(mob, SkillId.Magic_Attack, 1), 2000);
+						var total = physical.EffectiveMean + magical.EffectiveMean;
+						var share = total <= 0 ? 0 : physical.EffectiveMean / total * 100;
+
+						_output.WriteLine($"level {level} {tier}: {set}");
+						_output.WriteLine($"    DEF {def:N0}  MDEF {mdef:N0}  PATK {patk:N0}  MATK {matk:N0}");
+						_output.WriteLine($"    mob pAtk {mob.Data.PhysicalAttackMax:N0}  mAtk {mob.Data.MagicalAttackMax:N0}");
+						_output.WriteLine($"    incoming physical {physical.EffectiveMean:N1} per hit (landed {physical.Mean:N1}, dodge {physical.DodgeRate * 100:0.0}%, block {physical.BlockRate * 100:0.0}%)");
+						_output.WriteLine($"    incoming magical  {magical.EffectiveMean:N1} per hit (landed {magical.Mean:N1}, dodge {magical.DodgeRate * 100:0.0}%, block {magical.BlockRate * 100:0.0}%)");
+						_output.WriteLine($"    physical is {share:0.0}% of what the character takes");
+					}
+					finally
+					{
+						SyntheticActors.Cleanup(character, mob);
+					}
+				}
+			}
+
+			/// <summary>
+			/// Reports what each layer of the endgame loadout is worth, one at a
+			/// time.
+			/// </summary>
+			/// <remarks>
+			/// The question this answers is whether gems and cards outweigh the
+			/// equipment they sit in. If they do, the gear axis is really a gem
+			/// axis wearing gear's name, and a defensive buff is being priced
+			/// against a character whose defenses come from somewhere the item
+			/// tiers do not describe. Reported rather than asserted, for the
+			/// reason ReportsTheNaturalRolls gives.
+			/// </remarks>
+			[Fact]
+			public void ReportsWhereEndgamePowerComesFrom()
+			{
+				if (!BalanceSuites.BuffEnabled)
+				{
+					_output.WriteLine(BalanceSuites.SkipMessage(BalanceSuites.BuffVariable));
+					return;
+				}
+
+				var job = JobCatalog.Entries.First(e => e.SkillPrefix == BuffDials.AnchorSkill.Split('_')[0]);
+				var stat = JobCatalog.GetPrimaryStat(job);
+				var level = ScenarioMatrix.CharacterLevels[^1];
+
+				string[] sets = ["Raffye", "Blint"];
+
+				var layers = new (string Name, GearLoadout Loadout)[]
+				{
+					("set only", new(ItemGrade.Normal, 0, false, 0, false, sets)),
+					("+ Legend, identified", new(ItemGrade.Legend, 0, true, 0, false, sets)),
+					("+ refine 15", new(ItemGrade.Legend, 15, true, 0, false, sets)),
+					("+ gems", new(ItemGrade.Legend, 15, true, 10, false, sets)),
+					("+ cards", new(ItemGrade.Legend, 15, true, 10, true, sets)),
+				};
+
+				var previous = (Def: 0f, MDef: 0f, Dealt: 0f, Taken: 0f);
+
+				foreach (var (name, loadout) in layers)
+				{
+					var character = SyntheticActors.CreateCharacter(job.JobId, level, StatSpread.AllIn(stat, level));
+
+					try
+					{
+						ReferenceGear.Equip(character, job, loadout);
+
+						var mob = SyntheticActors.CreateMob(SfrDefenseProbe.FindHostileReferenceMob(level).Id);
+
+						try
+						{
+							var def = character.Properties.GetFloat(PropertyName.DEF);
+							var mdef = character.Properties.GetFloat(PropertyName.MDEF);
+
+							// Damage rather than the raw stats alone, because
+							// identification rolls critical rate, resistances and
+							// ADD_ bonuses as readily as it rolls DEF - reading
+							// three properties makes a layer that lands on any of
+							// those look like it did nothing at all.
+							var dealt = HitSampler.Sample(character, mob, new Skill(character, SkillId.Normal_Attack, 1), 2000).EffectiveMean;
+							var takenPhysical = HitSampler.Sample(mob, character, new Skill(mob, SkillId.Normal_Attack, 1), 2000).EffectiveMean;
+							var takenMagical = HitSampler.Sample(mob, character, new Skill(mob, SkillId.Magic_Attack, 1), 2000).EffectiveMean;
+							var taken = (takenPhysical + takenMagical) / 2;
+
+							_output.WriteLine($"{name,-22} DEF {def,7:N0}  MDEF {mdef,7:N0}  " +
+								$"deals {dealt,8:N1} ({Growth(dealt, previous.Dealt)})  " +
+								$"takes {taken,7:N1} ({Growth(taken, previous.Taken)})");
+
+							previous = (def, mdef, dealt, taken);
+						}
+						finally
+						{
+							SyntheticActors.Cleanup(character, mob);
+						}
+					}
+					catch
+					{
+						SyntheticActors.Cleanup(character);
+						throw;
+					}
+				}
+			}
+
+			/// <summary>
+			/// Reports what each item grade is worth, holding everything else
+			/// at the endgame loadout.
+			/// </summary>
+			/// <remarks>
+			/// Grade raises nothing on an item directly - the only thing it
+			/// drives is how many random options identification rolls (Magic
+			/// one or two, Rare two, Unique two or three, Legend three or four,
+			/// Goddess three or four), so the ladder is really a ladder of
+			/// rolled bonuses and its steps are not evenly spaced.
+			/// </remarks>
+			[Fact]
+			public void ReportsGradesAgainstEachOther()
+			{
+				if (!BalanceSuites.BuffEnabled)
+				{
+					_output.WriteLine(BalanceSuites.SkipMessage(BalanceSuites.BuffVariable));
+					return;
+				}
+
+				var job = JobCatalog.Entries.First(e => e.SkillPrefix == BuffDials.AnchorSkill.Split('_')[0]);
+				var stat = JobCatalog.GetPrimaryStat(job);
+				var level = ScenarioMatrix.CharacterLevels[^1];
+
+				string[] sets = ["Raffye", "Blint"];
+				ItemGrade[] grades = [ItemGrade.Magic, ItemGrade.Rare, ItemGrade.Unique, ItemGrade.Legend, ItemGrade.Goddess];
+
+				var first = 0f;
+
+				foreach (var grade in grades)
+				{
+					var character = SyntheticActors.CreateCharacter(job.JobId, level, StatSpread.AllIn(stat, level));
+					var mob = SyntheticActors.CreateMob(SfrDefenseProbe.FindHostileReferenceMob(level).Id);
+
+					try
+					{
+						// The same seed for every grade, so what moves between
+						// them is the number of options identification rolls
+						// and not which options it happened to roll.
+						DeterministicRandom.Seed(HitSampler.DefaultSeed);
+						ReferenceGear.Equip(character, job, new GearLoadout(grade, 15, true, 10, true, sets));
+						DeterministicRandom.Reset();
+
+						var dealt = Dealt(character, mob, SyntheticActors.GiveSkill(character, SkillId.Normal_Attack, 1));
+						var taken = Taken(character, mob);
+
+						if (first <= 0)
+							first = dealt;
+
+						var weapon = character.Inventory.GetItem(EquipSlot.RightHand);
+						var itemAtk = weapon?.Properties.GetFloat(PropertyName.MAXATK) ?? 0;
+
+						_output.WriteLine($"{grade,-8} weapon MAXATK {itemAtk,7:N0}  deals {dealt,8:N1} ({Growth(dealt, first)} vs Magic)  takes {taken,7:N1}");
+					}
+					finally
+					{
+						SyntheticActors.Cleanup(character, mob);
+					}
+				}
+			}
+
+			/// <summary>
+			/// Reports a colored gem against a skill gem, on a damage skill and
+			/// on a buff.
+			/// </summary>
+			/// <remarks>
+			/// The two are not interchangeable and the comparison is the point:
+			/// a colored gem grants a stat and so raises everything the
+			/// character does, and it stacks - every socket can hold another
+			/// one. A skill gem raises one skill by one level and does not
+			/// stack with itself, so a character holds at most one per skill.
+			/// The design target is that a skill gem beats a colored one on the
+			/// skill it touches, but not by so much that the choice stops being
+			/// a choice.
+			///
+			/// The skill gem is applied as GemLevel_BM on the skill, which is
+			/// exactly the end state Inventory.RefreshGemSkills produces from a
+			/// socketed one, without needing the socket to be wired up here.
+			/// </remarks>
+			[Fact]
+			public void ReportsGemsAgainstSkillGems()
+			{
+				if (!BalanceSuites.BuffEnabled)
+				{
+					_output.WriteLine(BalanceSuites.SkipMessage(BalanceSuites.BuffVariable));
+					return;
+				}
+
+				var job = JobCatalog.Entries.First(e => e.SkillPrefix == BuffDials.AnchorSkill.Split('_')[0]);
+				var stat = JobCatalog.GetPrimaryStat(job);
+				var level = ScenarioMatrix.CharacterLevels[^1];
+				var skillLevel = SfrData.SkillMaxLevel("Swordman_Bash");
+
+				string[] sets = ["Raffye", "Blint"];
+				var bare = new GearLoadout(ItemGrade.Legend, 15, true, 0, true, sets);
+
+				(float Basic, float Bash) Read(Action<Character, GearSet, Skill> apply)
+				{
+					var character = SyntheticActors.CreateCharacter(job.JobId, level, StatSpread.AllIn(stat, level));
+					var mob = SyntheticActors.CreateMob(SfrDefenseProbe.FindHostileReferenceMob(level).Id);
+
+					try
+					{
+						DeterministicRandom.Seed(HitSampler.DefaultSeed);
+						var set = ReferenceGear.Equip(character, job, bare);
+						DeterministicRandom.Reset();
+
+						var basic = SyntheticActors.GiveSkill(character, SkillId.Normal_Attack, 1);
+						var bash = SyntheticActors.GiveSkill(character, SkillId.Swordman_Bash, skillLevel);
+
+						// After the skills exist, because GiveSkill rebuilds one
+						// and would drop a GemLevel_BM set before it.
+						apply?.Invoke(character, set, bash);
+
+						character.Properties.InvalidateAll();
+						basic.Properties.InvalidateAll();
+						bash.Properties.InvalidateAll();
+
+						return (Dealt(character, mob, basic), Dealt(character, mob, bash));
+					}
+					finally
+					{
+						SyntheticActors.Cleanup(character, mob);
+					}
+				}
+
+				var none = Read(null);
+
+				var colored = Read((character, set, _) =>
+				{
+					var weapon = set.Weapon;
+
+					if (weapon == null)
+						return;
+
+					var gem = new Item(643501);
+					gem.SetLevel(10);
+
+					weapon.CreateSocket(0);
+					weapon.SocketGem(gem);
+				});
+
+				var skillGem = Read((_, _, bash) =>
+				{
+					bash.Properties.SetFloat(PropertyName.GemLevel_BM, 1);
+					bash.Properties.InvalidateAll();
+				});
+
+				// The reinforce ability at its cap, which is what an enhance
+				// attribute is: 0.5% of the skill's factor per level and a
+				// further 10% at 100, so 60% maxed. Only the enhance ones are
+				// read here - the rest change what a skill does rather than how
+				// hard it hits, and no single number describes that.
+				var reinforced = Read((character, _, bash) =>
+				{
+					if (bash.Data.ReinforceAbility != 0)
+						character.Abilities.Learn(bash.Data.ReinforceAbility, 100);
+				});
+
+				_output.WriteLine($"{"no gem",-22} basic {none.Basic,8:N1}                 Bash {none.Bash,8:N1}");
+				_output.WriteLine($"{"red gem lv10 (+10 STR)",-22} basic {colored.Basic,8:N1} ({Growth(colored.Basic, none.Basic)})  Bash {colored.Bash,8:N1} ({Growth(colored.Bash, none.Bash)})");
+				_output.WriteLine($"{"Bash skill gem (+1 lv)",-22} basic {skillGem.Basic,8:N1} ({Growth(skillGem.Basic, none.Basic)})  Bash {skillGem.Bash,8:N1} ({Growth(skillGem.Bash, none.Bash)})");
+				_output.WriteLine($"{"Bash enhance attr 100",-22} basic {reinforced.Basic,8:N1} ({Growth(reinforced.Basic, none.Basic)})  Bash {reinforced.Bash,8:N1} ({Growth(reinforced.Bash, none.Bash)})");
+
+				// A buff gem raises the buff's own level, so what it buys is the
+				// step between one caption magnitude and the next rather than
+				// any damage of its own.
+				var gungHo = ZoneServer.Instance.Data.SkillDb.Find(SkillId.Swordman_GungHo);
+
+				if (gungHo != null)
+				{
+					float Ratio(int lv) => gungHo.CaptionRatio1 + gungHo.CaptionRatio1ByLevel * lv;
+
+					var cap = SfrData.SkillMaxLevel("Swordman_GungHo");
+
+					_output.WriteLine($"{"GungHo skill gem",-22} +1 level is {Ratio(cap):0.0}% -> {Ratio(cap + 1):0.0}% attack " +
+						$"({Growth(Ratio(cap + 1), Ratio(cap))} on the buff)");
+
+					// A buff's enhance attribute multiplies the caption ratio
+					// through the same reinforce rate, and every buff the
+					// character holds carries its own - which is why buff
+					// attributes compound where a damage skill's does not.
+					_output.WriteLine($"{"GungHo enhance attr 100",-22} the same 60% on the caption: {Ratio(cap):0.0}% -> {Ratio(cap) * 1.60f:0.0}% attack (x1.60 on the buff)");
+				}
+			}
+
+			/// <summary>
+			/// Returns what one hit of a skill lands for.
+			/// </summary>
+			/// <param name="character"></param>
+			/// <param name="mob"></param>
+			/// <param name="skillId"></param>
+			/// <param name="skillLevel"></param>
+			private static float Dealt(Character character, Mob mob, Skill skill)
+				=> HitSampler.Sample(character, mob, skill, 2000).EffectiveMean;
+
+			/// <summary>
+			/// Returns what one incoming hit lands for, averaged over the two
+			/// attack types the ring swings.
+			/// </summary>
+			/// <param name="character"></param>
+			/// <param name="mob"></param>
+			private static float Taken(Character character, Mob mob)
+				=> (HitSampler.Sample(mob, character, new Skill(mob, SkillId.Normal_Attack, 1), 2000).EffectiveMean
+					+ HitSampler.Sample(mob, character, new Skill(mob, SkillId.Magic_Attack, 1), 2000).EffectiveMean) / 2;
+
+			/// <summary>
+			/// Formats one layer's step as a multiple of the layer below it.
+			/// </summary>
+			/// <param name="value"></param>
+			/// <param name="previous"></param>
+			private static string Growth(float value, float previous)
+				=> previous <= 0 ? "base" : $"x{value / previous:0.00}";
 
 			/// <summary>
 			/// Builds the pair a scenario describes and loads it, or an unloaded

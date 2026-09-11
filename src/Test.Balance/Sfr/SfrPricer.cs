@@ -532,14 +532,29 @@ namespace Melia.Test.Balance.Sfr
 			var levels = SfrData.SkillMaxLevel(skillName);
 
 			// The floor holds a priced press above zero, but an override to
-			// zero is a free press by design and passes under it.
-			var cost = target <= 0f ? 0 : Math.Max(SfrDials.MinSpCost, (int)Math.Round(target / Math.Max(charges, SfrDials.MinSpChargeSlope)));
+			// zero is a free press by design and passes under it. This is what
+			// the press costs at its own cap, which is where the SFR it is
+			// charged against is also priced.
+			var atCap = target <= 0f ? 0f : target / Math.Max(charges, SfrDials.MinSpChargeSlope);
 
 			// SCR_Get_SpendSP reads level minus one where the factor reads the
 			// level itself, so this share is what holds SP proportional to SFR
 			// at every level rather than only at the cap.
+			//
+			// Anchored on the cap rather than on level one, which is the fix for
+			// a shape dial moving what a maxed press costs. SlopeShare only
+			// decides where inside a curve the ceiling sits - the ceiling itself
+			// does not move - so a maxed skill deals what it always dealt and
+			// must cost what it always cost. Anchored at level one instead,
+			// raising the C1 share from 0.45 to 0.66 left Peltasta_RimBlow's
+			// basicSp at 11 while its level-one SFR fell 134 to 88, which pushed
+			// lvUpSpendSp 0.57 to 1.26 and made a maxed press cost 51% more for
+			// exactly the same damage.
 			var share = SfrData.SlopeShare(skillName);
-			var spGrowth = share / Math.Max(levels * (1f - share) + share, 1e-6f);
+			var levelOneShare = (1f - share) + share / Math.Max(levels, 1);
+
+			var cost = atCap <= 0f ? 0 : Math.Max(SfrDials.MinSpCost, (int)Math.Round(atCap * levelOneShare));
+			var costByLevel = atCap * share / Math.Max(levels, 1);
 
 			return new SfrSpPrice
 			{
@@ -553,7 +568,7 @@ namespace Melia.Test.Balance.Sfr
 				// damage per SP is flat across levels and circles. Fractional
 				// because SCR_Get_SpendSP floors the total, not the slope, and
 				// a floor of 1 here would overcharge a 15-level skill fourfold.
-				CostByLevel = MathF.Round(cost * spGrowth, 2),
+				CostByLevel = MathF.Round(costByLevel, 2),
 			};
 		}
 

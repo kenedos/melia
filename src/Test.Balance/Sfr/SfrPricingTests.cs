@@ -125,10 +125,13 @@ namespace Melia.Test.Balance.Sfr
 			Assert.Equal((int)SfrDials.AnchorFactor, price.Factor);
 
 			// calc_skill.cs reads factor + factorByLevel * level, so this is
-			// what the skill actually deals the moment it is learned.
+			// what the skill actually deals the moment it is learned. The range
+			// tracks BaseSlopeShare: the anchor's factor is held at
+			// AnchorFactor either way, and the share decides how much the first
+			// point adds on top of it.
 			var levelOne = price.Factor + price.FactorByLevel;
 
-			Assert.InRange(levelOne, 113f, 117f);
+			Assert.InRange(levelOne, 104f, 108f);
 		}
 
 		/// <summary>

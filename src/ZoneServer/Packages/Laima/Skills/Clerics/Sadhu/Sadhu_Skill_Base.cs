@@ -188,7 +188,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 
 		private async Task ReturnToBodyAsync(ICombatEntity caster, Skill skill, BuffId buffId)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(750));
+			await skill.Wait(750, false);
 
 			skill.IncreaseOverheat();
 

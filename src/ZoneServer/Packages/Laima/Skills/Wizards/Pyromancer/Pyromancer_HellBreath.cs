@@ -114,9 +114,7 @@ namespace Melia.Zone.Skills.Handlers.Pyromancer
 			if (pad == null)
 				return;
 			var destination = pad.Position.GetRelative(caster.Direction, MaxDistance);
-			var moveTime = pad.Movement.MoveTo(destination);
-			await skill.Wait(moveTime);
-			pad.Destroy();
+			await pad.Movement.MoveToAndDestroy(destination);
 		}
 	}
 }

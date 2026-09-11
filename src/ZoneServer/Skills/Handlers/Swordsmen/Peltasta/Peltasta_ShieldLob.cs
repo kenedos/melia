@@ -126,9 +126,8 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 		private async Task FlyForward(Pad pad, ICombatEntity creator)
 		{
 			var dest = creator.Position.GetRelative2D(creator.Direction, ShieldFlyDistance);
-			var moveTime = pad.Movement.MoveTo(dest);
 
-			await GameClock.Delay(moveTime);
+			await pad.Movement.MoveToAsync(dest);
 		}
 
 		/// <summary>
@@ -163,8 +162,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Peltasta
 			if (creator.Components.TryGet<MovementComponent>(out var movement) && movement.IsMoving)
 				finalDest = creator.Position.GetRelative2D(creator.Direction, 50);
 
-			var moveTime = pad.Movement.MoveTo(finalDest);
-			await GameClock.Delay(moveTime);
+			await pad.Movement.MoveToAsync(finalDest);
 		}
 
 		/// <summary>

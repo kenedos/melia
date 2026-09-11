@@ -63,9 +63,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			var destination = pad.Position.GetRelative(caster.Direction, MaxDistance);
 			// Effect seems to teleport back to caster's position at end
 			// if we don't decrease the milliseconds
-			var moveTime = pad.Movement.MoveTo(destination) - TimeSpan.FromMilliseconds(200);
-			await skill.Wait(moveTime);
-			pad.Destroy();
+			await pad.Movement.MoveToAndDestroy(destination, TimeSpan.FromMilliseconds(200));
 		}
 	}
 }

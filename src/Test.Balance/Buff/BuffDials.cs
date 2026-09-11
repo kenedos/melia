@@ -148,6 +148,42 @@ namespace Melia.Test.Balance.Buff
 		];
 
 		/// <summary>
+		/// What a character wears at each level of the grid.
+		/// </summary>
+		/// <remarks>
+		/// Gear is an axis, not a constant, and it has to be: incoming damage
+		/// is attack * (r^1.2 / (r^1.2 + 1)) on r = attack/defense, so a buff
+		/// granting a percentage of damage taken is worth the same at every r
+		/// and a buff granting a percentage of defense is not. Measured at one
+		/// gear point the two price against each other by accident; measured
+		/// across the range a character really passes through they price to
+		/// the same average mitigation, which is the whole point.
+		///
+		/// The low end is level-appropriate Normal gear rather than nothing at
+		/// all. Nothing at all was tried and it fails the other way: a shield
+		/// block buff is worth exactly zero with no shield, so a third of the
+		/// blend read 1.000 for a structural reason and the solver inflated
+		/// the magnitude to compensate - Peltasta_HardShield came out higher
+		/// than it had been before there was an axis at all.
+		///
+		/// A level the map does not name wears the reference set, so the grid
+		/// degrades to what it was rather than to nothing.
+		/// </remarks>
+		public static readonly Dictionary<int, GearTier> GearTiers = new()
+		{
+			[15] = GearTier.Starter,
+			[50] = GearTier.Mid,
+			[99] = GearTier.Endgame,
+		};
+
+		/// <summary>
+		/// Returns the gear a character at the given level is measured in.
+		/// </summary>
+		/// <param name="characterLevel"></param>
+		public static GearTier GearFor(int characterLevel)
+			=> GearTiers.GetValueOrDefault(characterLevel, GearTier.Mid);
+
+		/// <summary>
 		/// Buffs solved at once by a roster pass.
 		/// </summary>
 		/// <remarks>
@@ -202,6 +238,7 @@ namespace Melia.Test.Balance.Buff
 		/// </summary>
 		public const float EffectTolerance = 0.01f;
 
+
 		/// <summary>
 		/// Whether a buff's magnitude grows from nothing, so every point of it
 		/// is bought with a skill point.
@@ -210,11 +247,11 @@ namespace Melia.Test.Balance.Buff
 		/// captionRatioN is written as zero and the whole magnitude lives in
 		/// captionRatioNByLevel, which is the shape Swordman_GungHo already
 		/// has: 3% a level, 15% at its cap of five, and nothing given away at
-		/// level one. Deliberately not SfrDials' factor rule, where the base
-		/// carries half the value and a level-one skill already reads most of
-		/// what a maxed one does - a buff is pressed at whatever level it is
-		/// taken to, and a flat base makes the first point worth many times
-		/// what the last one is.
+		/// level one. Deliberately not SfrData.SlopeShare's split, where the
+		/// base carries most of the value and a level-one skill already reads a
+		/// good share of what a maxed one does - a skill has to function the
+		/// moment it is learned, and a buff does not. It is the one place the
+		/// two models part; the premiums and ceilings are shared.
 		/// </remarks>
 		public const bool GrowsFromZero = true;
 
@@ -306,13 +343,19 @@ namespace Melia.Test.Balance.Buff
 		/// earlier one's, on the same premium the damage pass gives a factor.
 		/// </summary>
 		/// <remarks>
-		/// Off. A buff is already the better point at the later circles - the
-		/// damage skills there trade animation for cooldown, so a point in one
-		/// moves less of the timeline than a point in a buff does. Paying the
-		/// circle premium on magnitude as well widens that gap in the circles
-		/// where it is already widest.
+		/// On, and read from SfrData.CirclePremium so the buff roster and the
+		/// damage roster take the same ladder - base 0.75, then 1.20 / 1.25 /
+		/// 1.30 by circle.
+		///
+		/// It used to be off, on the reasoning in "A buff point against a
+		/// damage point": advanced damage skills trade animation for cooldown,
+		/// so a point in one moves less of the timeline than a point in a buff
+		/// does, and paying the premium on magnitude as well widened that gap
+		/// where it was already widest. That tilt is real and is now accepted -
+		/// one ladder that both halves of the model share is worth more than a
+		/// second-order correction only one half applies.
 		/// </remarks>
-		public const bool ApplyCirclePremium = false;
+		public const bool ApplyCirclePremium = true;
 
 		/// <summary>
 		/// Presses that declare caption ratios and are still not this pass's to

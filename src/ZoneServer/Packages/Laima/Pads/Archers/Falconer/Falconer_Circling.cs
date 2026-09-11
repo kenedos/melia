@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Melia.Shared.Packages;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
@@ -40,6 +40,15 @@ namespace Melia.Zone.Pads.Handlers
 		public void Destroyed(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
+			var creator = args.Creator;
+
+			// The pad is shared with Hovering, which flags the hawk on start.
+			if (pad.Skill?.Id == SkillId.Falconer_Hovering && creator is Character character)
+			{
+				var hawk = character.Companions.ActiveBirdCompanion;
+				if (hawk != null)
+					hawk.Vars.Set("Hawk.Hovering.Active", false);
+			}
 
 			Send.ZC_NORMAL.PadRemoveEffect(pad, "F_archer_circling_ground");
 			Send.ZC_NORMAL.PadUpdate(pad, false);

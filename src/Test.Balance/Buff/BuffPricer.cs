@@ -285,6 +285,19 @@ namespace Melia.Test.Balance.Buff
 		/// Returns the base and per-level terms one magnitude at cap is written
 		/// as.
 		/// </summary>
+		/// <remarks>
+		/// A buff grows from zero where a damage skill does not, and that is
+		/// the one place the two models deliberately part. SfrData.SlopeShare
+		/// splits a factor between unlocking and levelling because a skill has
+		/// to function the moment it is learned; a buff is pressed at whatever
+		/// level it is taken to, and a flat base would make its first point
+		/// worth many times its last on a press that is taken to cap or not
+		/// taken at all.
+		///
+		/// The premiums are shared - see BuffDials.ApplyCirclePremium - so a
+		/// buff and a damage skill on the same job sit on the same ladder of
+		/// ceilings. Only the shape of the climb differs.
+		/// </remarks>
 		/// <param name="atCap"></param>
 		/// <param name="cap"></param>
 		private static (float Base, float ByLevel) Split(float atCap, int cap)
@@ -469,6 +482,19 @@ namespace Melia.Test.Balance.Buff
 			var ceiling = Math.Min(BuffDials.MaxSlotScale, MathF.Pow(BuffDials.EscalationStep, BuffDials.EscalationSteps));
 			var probingCeiling = false;
 
+			// Three quarters of the roster reads neutral however wide the scale
+			// goes, and learning that costs two full-width sweeps - which is
+			// most of the pass, spent on subjects it then rejects. The widest
+			// rung at one level answers the same question: a buff the scale
+			// cannot move at level 50 is not one it moves at 15 or 99 either.
+			// Its reading is thrown away rather than fed to the fit, because a
+			// triage value and a full-width value are not the same number.
+			var triage = Sweep(subject, ceiling, pool, slots, triage: true);
+			measurements++;
+
+			if (read(triage) - 1f <= BuffDials.EffectTolerance)
+				throw new InvalidOperationException($"{subject.SkillClassName}: measured at or below neutral up to x{ceiling:0.##}, so there is nothing to price.");
+
 			for (var iteration = 0; iteration <= BuffDials.SolveIterations; ++iteration)
 			{
 				var reading = Sweep(subject, next, pool, slots);
@@ -584,12 +610,17 @@ namespace Melia.Test.Balance.Buff
 		/// slot of a multi-slot buff. Any slot it omits reads zero.
 		/// </param>
 		public static BuffLevelSweep Sweep(BuffSubject subject, float scale, ArenaPool pool = null,
-			IReadOnlyDictionary<int, float> slotsOverride = null)
+			IReadOnlyDictionary<int, float> slotsOverride = null, bool triage = false)
 		{
 			var job = JobCatalog.Entries.FirstOrDefault(e => e.SkillPrefix == subject.ClassName)
 				?? throw new InvalidOperationException($"{subject.SkillClassName}: no job entry for class '{subject.ClassName}'.");
 
-			var levels = ScenarioMatrix.CharacterLevelsFor(job);
+			// A triage sweep reads the scenarios at one level instead of the
+			// whole grid, which is a third of the windows for the one question
+			// it is asked: does the scale move this buff at all.
+			int[] levels = triage
+				? [BuffDials.ProbeLevel]
+				: ScenarioMatrix.CharacterLevelsFor(job);
 			var readings = new Dictionary<int, BuffValueResult>();
 			var scenarios = new Dictionary<string, float>();
 
@@ -603,11 +634,14 @@ namespace Melia.Test.Balance.Buff
 					: reading;
 			}
 
-			// The level grid runs on the first scenario and the rest run at one
-			// level, rather than every scenario at every level. The full cross
-			// product is five times the cost for a second reading of the same
-			// two effects - what the levels are there to catch is a flat bonus
-			// decaying, and one scenario shows that as well as five do.
+			// Every scenario at every level, rather than the level grid on the
+			// first scenario alone. The levels carry the gear tiers now
+			// (BuffDials.GearTiers), and gear is what separates a buff granting
+			// a percentage of damage reduction from one granting a percentage
+			// of defense - reading that on one scenario left it at a ninth of
+			// the blend and priced the two against each other by accident. The
+			// cost is the full cross product, which is what it takes for the
+			// average to be an average over gear rather than over geometry.
 			foreach (var level in levels)
 				readings[level] = Read(BuffScenarios.All[0], level);
 
@@ -615,16 +649,28 @@ namespace Melia.Test.Balance.Buff
 
 			foreach (var scenario in BuffScenarios.All.Skip(1))
 			{
-				var reading = Read(scenario, BuffDials.ProbeLevel);
+				var measured = new List<BuffValueResult>();
 
-				// A scenario whose rotation landed nothing has measured nothing,
-				// and counting it as 1.000 would drag every buff's value toward
-				// neutral. The skill rotation does this to a class whose first
-				// damage skill the harness cannot dispatch.
-				if (reading.ControlDealt <= 0)
+				foreach (var level in levels)
+				{
+					var reading = Read(scenario, level);
+
+					// A scenario whose rotation landed nothing has measured
+					// nothing, and counting it as 1.000 would drag every buff's
+					// value toward neutral. The skill rotation does this to a
+					// class whose first damage skill the harness cannot
+					// dispatch, and the naked tier does it to a character with
+					// no weapon to swing.
+					if (reading.ControlDealt <= 0)
+						continue;
+
+					measured.Add(reading);
+				}
+
+				if (measured.Count == 0)
 					continue;
 
-				scenarios[scenario.Id] = reading.Value;
+				scenarios[scenario.Id] = measured.Average(r => r.Value);
 			}
 
 			return new BuffLevelSweep

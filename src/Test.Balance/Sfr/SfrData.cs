@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -482,7 +482,7 @@ namespace Melia.Test.Balance.Sfr
 		public static float CirclePremium(string skillName)
 		{
 			if (BaseClasses.Contains(ClassOf(skillName)))
-				return 1f;
+				return SfrDials.BasePremium;
 
 			return SfrDials.CirclePremium.TryGetValue(SkillCircle(skillName), out var v) ? v : 1f;
 		}
