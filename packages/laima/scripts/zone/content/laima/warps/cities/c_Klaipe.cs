@@ -31,5 +31,8 @@ public class c_KlaipeWarpsScript : GeneralScript
 
 		// Klaipeda to Beauty Shop
 		AddWarp(10063, "KLAPEDA_TO_BEAUTYSHOP", 180, From("c_Klaipe", -1055.639, 635.0443), To("c_barber_dress", -14, -58));
+
+		// Klaipeda to Laima's Sanctuary
+		AddWarp(106, "KLAPEDA_TO_CATHEDRAL_MEDIUM", 270, From("c_Klaipe", -1095, -678), To("c_klaipe_cathedral_medium", 518, 305));
 	}
 }

@@ -75,7 +75,7 @@
 { mapId: 1006, className: "c_orsha", name: "Orsha", type: "City", level: 0, nearbyCity: "c_orsha", defaultPosition: { x: -1214, y: 495, z: 329 } },
 { mapId: 1007, className: "c_nunnery", name: "Saalus Convent", type: "City", level: 0, nearbyCity: "c_fedimian", defaultPosition: { x: 490, y: -75, z: 151 } },
 { mapId: 1008, className: "c_barber_dress", name: "Beauty Shop", type: "City", level: 0, nearbyCity: "c_Klaipe", defaultPosition: { x: 0, y: 0, z: 0 } },
-{ mapId: 1009, className: "c_klaipe_cathedral_medium", name: "Laima's Sanctuary", type: "Field", level: 450, nearbyCity: "c_Klaipe", defaultPosition: { x: 445, y: -82, z: 234 } },
+{ mapId: 1009, className: "c_klaipe_cathedral_medium", name: "Laima's Sanctuary", type: "City", level: 0, nearbyCity: "c_Klaipe", defaultPosition: { x: 445, y: -82, z: 234 } },
 { mapId: 1021, className: "f_siauliai_west", name: "West Siauliai Woods", type: "Field", level: 1, nearbyCity: "c_Klaipe", defaultPosition: { x: -599, y: 260, z: -1377 } },
 { mapId: 1031, className: "f_siauliai_est", name: "Unused-Siauliai", type: "Field", level: 0, nearbyCity: "c_Klaipe", defaultPosition: { x: -2607, y: 23, z: -1670 } },
 { mapId: 1032, className: "f_siauliai_2", name: "East Siauliai Woods", type: "Field", level: 6, nearbyCity: "c_Klaipe", defaultPosition: { x: -2414, y: 244, z: -1150 } },

@@ -32,6 +32,7 @@ namespace Melia.Zone.Scripting
 			"WARP_C_KLAIPE",
 			"WARP_C_ORSHA",
 			"WARP_C_FEDIMIAN",
+			"WARP_C_KLAIPE_CATHEDRAL_MEDIUM",
 		};
 
 		private const int StatueGenTypeMin = 100_000;
