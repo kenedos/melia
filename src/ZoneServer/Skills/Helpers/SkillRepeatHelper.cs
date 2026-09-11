@@ -17,7 +17,13 @@ namespace Melia.Zone.Skills.Helpers
 		private const string RepeatUntilVar = "Melia.RepeatUntil";
 		private const string RepeatRunningVar = "Melia.RepeatRunning";
 		private const string LastRequestVar = "Melia.RepeatLastRequest";
+		private const string LastAttackVar = "Melia.RepeatLastAttack";
+		private const string LastLoopAttackVar = "Melia.RepeatLastLoopAttack";
+		private const string ClientCadenceVar = "Melia.RepeatClientCadence";
 		private static readonly TimeSpan MinInterval = TimeSpan.FromMilliseconds(50);
+		private static readonly TimeSpan LoopGrace = TimeSpan.FromMilliseconds(50);
+		private const double CadenceSmoothing = 0.3;
+		private static readonly TimeSpan ProbeMinLatency = TimeSpan.FromMilliseconds(50);
 		private static readonly TimeSpan ChainGapMargin = TimeSpan.FromMilliseconds(250);
 		private static readonly TimeSpan MinRoundTripAllowance = TimeSpan.FromMilliseconds(400);
 		private static readonly TimeSpan MaxRoundTripAllowance = TimeSpan.FromMilliseconds(2000);
@@ -73,6 +79,9 @@ namespace Melia.Zone.Skills.Helpers
 
 			skill.Vars.Set(LastRequestVar, now);
 
+			if (chained)
+				UpdateClientCadence(skill, caster, requestGap);
+
 			// The client keeps asking with a dead target until it retargets,
 			// and it waits for an answer before it moves on.
 			if (!canAttack())
@@ -82,9 +91,9 @@ namespace Melia.Zone.Skills.Helpers
 				return;
 			}
 
-			// Only the request that starts a chain fires directly, the loop
-			// paces every attack after it so the two can't bunch up.
-			if (!running && !attack())
+			// The client paces itself, so its requests drive the attacks and
+			// the loop only fills in for the ones that come too late.
+			if (!TryAttack(skill, attack, now, GetPace(skill), probe))
 				return;
 
 			// A single tap is only ever one attack, repeating starts once a
@@ -96,7 +105,9 @@ namespace Melia.Zone.Skills.Helpers
 				// Acknowledging again releases the client's request gate, so
 				// it asks for the next attack a round trip sooner and a held
 				// button is recognized that much earlier.
-				probe?.Invoke();
+				if (NeedsProbe(caster))
+					probe?.Invoke();
+
 				return;
 			}
 
@@ -109,6 +120,54 @@ namespace Melia.Zone.Skills.Helpers
 			skill.Vars.SetBool(RepeatRunningVar, true);
 			skill.Run(Repeat(skill, caster, attack, canAttack, cancel));
 		}
+
+		/// <summary>
+		/// Executes the attack unless the loop just made one, and returns
+		/// whether the chain may go on.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="attack"></param>
+		/// <param name="now"></param>
+		/// <param name="pace"></param>
+		/// <param name="ack"></param>
+		private static bool TryAttack(Skill skill, Func<bool> attack, DateTime now, TimeSpan pace, Action ack)
+		{
+			// The client keeps its own attack speed and is never held back to
+			// the server's, so only the loop's own beat is covered here. The
+			// client won't ask again until it's answered, so a request the loop
+			// already attacked for is acknowledged rather than dropped.
+			if (skill.Vars.TryGet<DateTime>(LastLoopAttackVar, out var lastLoopAttack) && now - lastLoopAttack < pace)
+			{
+				ack?.Invoke();
+				return true;
+			}
+
+			skill.Vars.Set(LastAttackVar, now);
+
+			return attack();
+		}
+
+		/// <summary>
+		/// Returns whether the client fell behind the rate the skill is meant
+		/// to be used at, leaving the loop to attack in its place.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="interval"></param>
+		private static bool IsPaceLost(Skill skill, TimeSpan interval)
+		{
+			if (!skill.Vars.TryGet<DateTime>(LastAttackVar, out var lastAttack))
+				return true;
+
+			return GameClock.Now - lastAttack >= interval + LoopGrace;
+		}
+
+		/// <summary>
+		/// Returns whether the client is far enough away for the extra
+		/// acknowledgement to buy it anything.
+		/// </summary>
+		/// <param name="caster"></param>
+		private static bool NeedsProbe(ICombatEntity caster)
+			=> caster is Character character && character.Connection.ClientLatency >= ProbeMinLatency;
 
 		/// <summary>
 		/// Returns whether the target can still be attacked with the skill.
@@ -147,6 +206,43 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
+		/// Records how fast the client asks for the skill once the delay of
+		/// getting each answer back to it is taken out.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <param name="requestGap"></param>
+		private static void UpdateClientCadence(Skill skill, ICombatEntity caster, TimeSpan requestGap)
+		{
+			var roundTrip = TimeSpan.Zero;
+
+			if (caster is Character character)
+				roundTrip = character.Connection.ClientLatency + character.Connection.ClientLatency;
+
+			var cadence = requestGap - roundTrip;
+			if (cadence < MinInterval)
+				cadence = MinInterval;
+
+			if (skill.Vars.TryGet<TimeSpan>(ClientCadenceVar, out var known))
+				cadence = known + TimeSpan.FromTicks((long)((cadence - known).Ticks * CadenceSmoothing));
+
+			skill.Vars.Set(ClientCadenceVar, cadence);
+		}
+
+		/// <summary>
+		/// Returns the rate the loop attacks at, which is the one the client
+		/// manages on its own once latency is taken out of it.
+		/// </summary>
+		/// <param name="skill"></param>
+		private static TimeSpan GetPace(Skill skill)
+		{
+			if (skill.Vars.TryGet<TimeSpan>(ClientCadenceVar, out var cadence))
+				return cadence;
+
+			return GetInterval(skill);
+		}
+
+		/// <summary>
 		/// Returns the interval the skill is meant to be used at.
 		/// </summary>
 		/// <param name="skill"></param>
@@ -156,6 +252,23 @@ namespace Melia.Zone.Skills.Helpers
 			var interval = TimeSpan.FromMilliseconds(shootTime);
 
 			return interval < MinInterval ? MinInterval : interval;
+		}
+
+		/// <summary>
+		/// Returns how long the loop may sleep before the client's next attack
+		/// is due, so that it wakes up exactly when one is missing.
+		/// </summary>
+		/// <param name="skill"></param>
+		private static TimeSpan GetNextCheck(Skill skill)
+		{
+			if (skill.Vars.TryGet<DateTime>(LastAttackVar, out var lastAttack))
+			{
+				var remaining = lastAttack + GetPace(skill) + LoopGrace - GameClock.Now;
+				if (remaining > MinInterval)
+					return remaining;
+			}
+
+			return MinInterval;
 		}
 
 		/// <summary>
@@ -175,7 +288,7 @@ namespace Melia.Zone.Skills.Helpers
 			{
 				while (true)
 				{
-					await skill.Wait(GetInterval(skill));
+					await skill.Wait(GetNextCheck(skill));
 
 					if (!skill.Vars.TryGet<DateTime>(RepeatUntilVar, out var repeatUntil) || GameClock.Now >= repeatUntil)
 						break;
@@ -194,6 +307,17 @@ namespace Melia.Zone.Skills.Helpers
 					// refused the skill on cooldown, so the loop must be too.
 					if (skill.IsOnCooldown)
 						break;
+
+					// The client's own requests pace the chain while they keep
+					// arriving in time, and attacking over them desyncs it.
+					if (!IsPaceLost(skill, GetPace(skill)))
+					{
+						aborted = false;
+						continue;
+					}
+
+					skill.Vars.Set(LastAttackVar, GameClock.Now);
+					skill.Vars.Set(LastLoopAttackVar, GameClock.Now);
 
 					if (!attack())
 						break;
