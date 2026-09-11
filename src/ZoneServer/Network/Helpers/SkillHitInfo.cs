@@ -31,7 +31,9 @@ namespace Melia.Zone.Network.Helpers
 				packet.PutShort((short)skillHitInfo.HitDelay.TotalMilliseconds);
 				packet.PutByte((byte)skillHitInfo.HitEffect);
 				packet.PutByte(0);
-				packet.PutInt(0);
+				packet.PutByte(skillHitInfo.TargetIndex);
+				packet.PutByte(skillHitInfo.HitFrameIndex);
+				packet.PutShort(0);
 			}
 			else
 			{

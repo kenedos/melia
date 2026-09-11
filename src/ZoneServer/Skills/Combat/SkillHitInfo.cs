@@ -88,6 +88,19 @@ namespace Melia.Zone.Skills.Combat
 		}
 
 		/// <summary>
+		/// Gets or sets the index of the hit frame this hit belongs to,
+		/// which the client's force effects use to pick the hits they
+		/// fly at.
+		/// </summary>
+		public byte HitFrameIndex { get; set; }
+
+		/// <summary>
+		/// Gets or sets the index of this hit's target within its hit
+		/// frame.
+		/// </summary>
+		public byte TargetIndex { get; set; }
+
+		/// <summary>
 		/// Gets or sets the number of hits that are displayed. The damage
 		/// is split evenly between the hits.
 		/// </summary>

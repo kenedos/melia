@@ -25,6 +25,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 	public class Wizard_MagicMissileOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const int MaxTargets = 5;
+		private const int MissileCount = 3;
 		private const int RicochetTargets = 3;
 		private const float SubSplashAreaSize = 200;
 		private const float RicochetSpeed = 150;
@@ -59,18 +60,44 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 
 			var skillHits = new List<SkillHitInfo>();
 
-			foreach (var missileTarget in targets)
+			foreach (var (missileTarget, hitFrameIndex, targetIndex) in GetMissileHits(targets))
 			{
 				var skillHitResult = SCR_SkillHit(caster, missileTarget, skill);
 				missileTarget.TakeDamage(skillHitResult.Damage, caster);
 
 				var skillHit = new SkillHitInfo(caster, missileTarget, skill, skillHitResult, aniTime, skillHitDelay);
+				skillHit.ForceId = ForceId.GetNew();
+				skillHit.HitFrameIndex = hitFrameIndex;
+				skillHit.TargetIndex = targetIndex;
+
 				skillHits.Add(skillHit);
 			}
 
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, skillHits);
 
 			skill.Run(this.Ricochet(skill, caster, skillHits));
+		}
+
+		/// <summary>
+		/// Returns the hits the missiles cause, spread across the skill's
+		/// hit frames, together with the index of the frame they belong
+		/// to and their index within it.
+		/// </summary>
+		/// <param name="targets"></param>
+		private static IEnumerable<(ICombatEntity Target, byte HitFrameIndex, byte TargetIndex)> GetMissileHits(List<ICombatEntity> targets)
+		{
+			if (targets.Count == 0)
+				yield break;
+
+			// Each missile flies at the hits of one frame, so every frame
+			// needs at least one hit for its missile to home in on
+			var slotCount = Math.Max(MissileCount, targets.Count);
+
+			for (var hitFrameIndex = 0; hitFrameIndex < MissileCount; ++hitFrameIndex)
+			{
+				for (var i = hitFrameIndex; i < slotCount; i += MissileCount)
+					yield return (targets[i % targets.Count], (byte)hitFrameIndex, (byte)(i / MissileCount));
+			}
 		}
 
 		/// <summary>
@@ -83,7 +110,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 		{
 			var bullets = new List<(ICombatEntity Target, SkillHitResult Result, int ForceId, TimeSpan Delay)>();
 
-			foreach (var skillHit in skillHits)
+			foreach (var skillHit in skillHits.DistinctBy(a => a.Target))
 			{
 				var sourceTarget = skillHit.Target;
 
@@ -133,53 +160,5 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 
 			return TimeSpan.FromMilliseconds(travelTime);
 		}
-
-		// A shot into a bunch of monsters. The character hit 3 different
-		// monsters once and each monster creates at least 3 bullets of
-		// its own, hitting other nearby monsters. The numbers are
-		// shortened handles.
-		// Notably, each original target gets hit 3 times in total. What's
-		// still unclear is what "5 Bullets" in the description means.
-		// If it were a limit, you would expect more than 4 hits out
-		// of 829, because as the first ricochet source it should be
-		// able to go up to the max.
-		// 
-		// character -> 829
-		// character -> 805
-		// character -> 460
-		// 829 -> 460
-		// 829 -> 810
-		// 829 -> 805
-		// 829 -> 460
-		// 805 -> 810
-		// 805 -> 886
-		// 805 -> 829
-		// 460 -> 805
-		// 460 -> 829
-		// 460 -> 810
-		// 
-		// Shot at 3 monsters
-		// 
-		// character -> 459
-		// character -> 422
-		// character -> 459
-		// 459 -> 519
-		// 459 -> 422
-		// 422 -> 459
-		// 422 -> 519
-		// 459 -> 519
-		// 459 -> 422
-		// 
-		// New theory. The numer of ricochets is the number of monsters
-		// in the splash area - 1. If you have two targets, you get one
-		// additional bullet out of each hit, matching up our findings
-		// for hitting two targets. If you hit three targets, you get
-		// two additional bullets, matching the test above.
-		// The first log above is more difficult to explain, because
-		// 829 sent four bullets and the others only three, but maybe
-		// 829 had four targets in range and the others only three...?
-		// Although it was a large group and that seems unlikely as well.
-		// Regardless, there does appear to be some kind of scaling based
-		// on the targets involved.
 	}
 }
