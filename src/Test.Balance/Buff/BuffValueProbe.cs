@@ -133,6 +133,12 @@ namespace Melia.Test.Balance.Buff
 	{
 		private const int TickMs = 25;
 
+		/// <summary>
+		/// Floor under one damage type's mean, so a half mitigated to nothing
+		/// cannot take the geometric blend to zero with it.
+		/// </summary>
+		private const double MinimumIncoming = 1e-3;
+
 		private static readonly ConcurrentDictionary<string, WindowReading> _controls = new();
 
 		/// <summary>
@@ -656,10 +662,19 @@ namespace Melia.Test.Balance.Buff
 		/// <remarks>
 		/// One mob per attack type, each sampled for an equal share of
 		/// BuffDials.IncomingSamples, so the total count is unchanged and every
-		/// window still fixes it by construction. The mean is flat because the
-		/// split is: what is being read is what the character takes from a
-		/// fight that contains both kinds of swing, and nothing measures which
-		/// kind it meets more often.
+		/// window still fixes it by construction.
+		///
+		/// Combined geometrically, not flat, so each damage type carries half
+		/// the reading whatever it hits for. An arithmetic mean is dominated by
+		/// whichever half lands harder, and the two halves do not land alike:
+		/// dodge and block take their cut out of the physical swings alone,
+		/// magic arrives whole. A physical-defense buff was therefore working
+		/// on the smaller share of the blend and had to be scaled further to
+		/// reach the same value - Pardoner_SpellShop's two defense slots priced
+		/// 5.1 against 4.0 for what is the same knob on opposite damage types.
+		/// The ratio of geometric means is the geometric mean of the per-type
+		/// ratios, so the same fractional cut on either side now reads the
+		/// same.
 		///
 		/// Without the magic half a buff that only raises MDEF mitigates
 		/// nothing the probe can see, reads 1.000 at every scale and is held
@@ -680,17 +695,19 @@ namespace Melia.Test.Balance.Buff
 		{
 			var attacks = BuffDials.IncomingAttacks;
 			var share = BuffDials.IncomingSamples / attacks.Length;
-			var total = 0f;
+			var product = 1d;
 
 			for (var i = 0; i < attacks.Length; ++i)
 			{
 				var mob = mobs[i % mobs.Count];
 				var sample = HitSampler.Sample(mob, character, new Skill(mob, attacks[i], 1), share);
 
-				total += sample.EffectiveMean;
+				// A half mitigated to nothing would take the product with it and
+				// leave a ratio against zero.
+				product *= Math.Max(sample.EffectiveMean, MinimumIncoming);
 			}
 
-			return total / attacks.Length;
+			return (float)Math.Pow(product, 1d / attacks.Length);
 		}
 
 		/// <summary>

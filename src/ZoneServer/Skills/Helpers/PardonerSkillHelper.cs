@@ -8,16 +8,31 @@ using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Storages;
+using Yggdrasil.Logging;
 
 namespace Melia.Zone.Skills.Helpers
 {
 	/// <summary>
-	/// Shared functionality for the Pardoner's Oblation offering box.
+	/// Shared functionality for the Pardoner's Oblation offering box and
+	/// Spell Shop.
 	/// </summary>
 	public static class PardonerSkillHelper
 	{
+		/// <summary>
+		/// The buffs a Spell Shop sells, and the material one sale of each
+		/// costs its owner.
+		/// </summary>
+		private static readonly Dictionary<BuffId, (string ItemClassName, int Amount)> SpellShopBuffs = new()
+		{
+			[BuffId.SpellShop_Sacrament_Buff] = ("food_007", 10),
+			[BuffId.SpellShop_Blessing_Buff] = ("Drug_powder", 10),
+			[BuffId.SpellShop_IncreaseMagicDEF_Buff] = ("Drug_holywater", 10),
+			[BuffId.SpellShop_Aspersion_Buff] = ("Drug_holywater", 10),
+		};
+
 		/// <summary>
 		/// How long the church takes to accept a new set of offerings.
 		/// </summary>
@@ -230,31 +245,25 @@ namespace Melia.Zone.Skills.Helpers
 
 			if (pardoner.IsAutoTrading)
 			{
-				CloseOblationShop(pardoner, shop);
+				CloseOblationShop(pardoner);
 				return;
 			}
 
 			box.FullSince ??= DateTime.Now;
 
 			if (DateTime.Now - box.FullSince.Value >= FullBoxCloseDelay)
-				CloseOblationShop(pardoner, shop);
+				CloseOblationShop(pardoner);
 		}
 
 		/// <summary>
 		/// Closes the given Pardoner's offering box shop.
 		/// </summary>
 		/// <param name="pardoner"></param>
-		/// <param name="shop"></param>
-		private static void CloseOblationShop(Character pardoner, ShopData shop)
+		private static void CloseOblationShop(Character pardoner)
 		{
-			shop.IsClosed = true;
 			pardoner.OblationBox.FullSince = null;
 
-			Send.ZC_AUTOSELLER_LIST(pardoner.Connection, pardoner);
-			Send.ZC_AUTOSELLER_TITLE(pardoner);
-			Send.ZC_NORMAL.ShopAnimation(pardoner, "Squire_Repair", 1, 0);
-
-			pardoner.Connection.ShopCreated = null;
+			ShopBuilder.ClosePersonalShop(pardoner);
 
 			pardoner.ServerMessage(Localization.Get("Your Offering Box is full. The shop has closed."));
 		}
@@ -361,5 +370,190 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="pardoner"></param>
 		public static void StartChurchDonationCooldown(Character pardoner)
 			=> pardoner.Variables.Perm.SetLong(DonationTimeVar, DateTime.Now.Ticks);
+
+		/// <summary>
+		/// Returns whether the given buff is one a Spell Shop may sell.
+		/// </summary>
+		/// <param name="buffId"></param>
+		/// <returns></returns>
+		public static bool IsSpellShopBuff(BuffId buffId)
+			=> SpellShopBuffs.ContainsKey(buffId);
+
+		/// <summary>
+		/// Returns how many times the given Pardoner can still sell the
+		/// given buff before they run out of the material it takes.
+		/// </summary>
+		/// <param name="pardoner"></param>
+		/// <param name="buffId"></param>
+		/// <returns></returns>
+		public static int GetSpellShopStock(Character pardoner, BuffId buffId)
+		{
+			if (!TryGetSpellShopMaterial(buffId, out var itemId, out var amount))
+				return 0;
+
+			return pardoner.Inventory.CountItem(itemId) / amount;
+		}
+
+		/// <summary>
+		/// Returns how long the buffs the given Pardoner sells last.
+		/// </summary>
+		/// <param name="pardoner"></param>
+		/// <returns></returns>
+		public static TimeSpan GetSpellShopBuffDuration(Character pardoner)
+		{
+			if (!pardoner.TryGetSkill(SkillId.Pardoner_SpellShop, out var skill))
+				return TimeSpan.Zero;
+
+			return skill.Properties.CaptionTime;
+		}
+
+		/// <summary>
+		/// Updates how many of each buff the given Pardoner's Spell Shop
+		/// still has the materials to sell.
+		/// </summary>
+		/// <param name="pardoner"></param>
+		/// <param name="shop"></param>
+		public static void RefreshSpellShopStock(Character pardoner, ShopData shop)
+		{
+			foreach (var product in shop.Products.Values)
+				product.RequiredAmount = GetSpellShopStock(pardoner, (BuffId)product.ItemId);
+		}
+
+		/// <summary>
+		/// Gives the buyer the buff the given Spell Shop lists under the
+		/// given index, paying the shop's owner for it.
+		/// </summary>
+		/// <param name="buyer"></param>
+		/// <param name="pardoner"></param>
+		/// <param name="shop"></param>
+		/// <param name="index"></param>
+		public static void SellSpellShopBuff(Character buyer, Character pardoner, ShopData shop, int index)
+		{
+			var product = shop.GetProduct(index);
+			if (product == null)
+			{
+				Log.Warning("SellSpellShopBuff: '{0}' asked for buff {1} of '{2}'s shop, which lists {3}.", buyer.Name, index, pardoner.Name, shop.Products.Count);
+				return;
+			}
+
+			var buffId = (BuffId)product.ItemId;
+
+			if (!TryGetSpellShopMaterial(buffId, out var itemId, out var materialAmount))
+			{
+				Log.Warning("SellSpellShopBuff: '{0}'s shop lists buff {1}, which no Spell Shop sells.", pardoner.Name, product.ItemId);
+				return;
+			}
+
+			// The shop pays for itself out of its owner's materials, so
+			// selling to yourself would be a free buff.
+			if (buyer == pardoner)
+			{
+				buyer.ServerMessage(Localization.Get("You can't buy from your own Spell Shop."));
+				return;
+			}
+
+			if (pardoner.Inventory.CountItem(itemId) < materialAmount)
+			{
+				buyer.SystemMessage("NotEnoughStock");
+				return;
+			}
+
+			if (buyer.Inventory.CountItem(ItemId.Silver) < product.Price)
+			{
+				buyer.SystemMessage("NotEnoughSilver");
+				return;
+			}
+
+			if (!TakeSpellShopMaterial(pardoner, itemId, materialAmount))
+			{
+				Log.Warning("SellSpellShopBuff: Couldn't take {0}x {1} from '{2}'.", materialAmount, itemId, pardoner.Name);
+				return;
+			}
+
+			if (buyer.RemoveItem(ItemId.Silver, product.Price) != product.Price)
+			{
+				pardoner.AddItem(itemId, materialAmount);
+				buyer.SystemMessage("NotEnoughSilver");
+				return;
+			}
+
+			pardoner.AddItem(ItemId.Silver, product.Price);
+
+			shop.History.Add(new ShopSaleData
+			{
+				ClassId = product.ItemId,
+				Price = product.Price,
+				Amount = 1,
+				BuyerName = buyer.Name,
+			});
+
+			// Neither side's inventory window redraws its counts off the
+			// add and remove alone, the same as any other shop transaction.
+			if (!pardoner.IsAutoTrading)
+			{
+				Send.ZC_ADDON_MSG(pardoner, AddonMessage.INV_ITEM_CHANGE_COUNT, 0, null);
+				Send.ZC_NORMAL.AutoSellerHistory(pardoner.Connection, shop);
+			}
+
+			Send.ZC_ADDON_MSG(buyer, AddonMessage.INV_ITEM_CHANGE_COUNT, 0, null);
+
+			buyer.StartBuff(buffId, product.Amount, 0, GetSpellShopBuffDuration(pardoner), pardoner, SkillId.Pardoner_SpellShop);
+		}
+
+		/// <summary>
+		/// Takes one sale's worth of material out of the given Pardoner's
+		/// inventory, and returns whether all of it could be taken.
+		/// </summary>
+		/// <remarks>
+		/// Stack by stack, the way a consumable is spent, rather than by
+		/// item id: that path tells the client to redraw the stack it left
+		/// standing, and the by-id one only does so once a stack empties.
+		/// </remarks>
+		/// <param name="pardoner"></param>
+		/// <param name="itemId"></param>
+		/// <param name="amount"></param>
+		/// <returns></returns>
+		private static bool TakeSpellShopMaterial(Character pardoner, int itemId, int amount)
+		{
+			while (amount > 0)
+			{
+				if (!pardoner.Inventory.TryFindItem(itemId, out var material))
+					return false;
+
+				var take = Math.Min(amount, material.Amount);
+
+				if (pardoner.Inventory.Remove(material, take, InventoryItemRemoveMsg.Used) != InventoryResult.Success)
+					return false;
+
+				amount -= take;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// Returns the item and the amount of it one sale of the given
+		/// buff costs, if a Spell Shop can sell the buff at all.
+		/// </summary>
+		/// <param name="buffId"></param>
+		/// <param name="itemId"></param>
+		/// <param name="amount"></param>
+		/// <returns></returns>
+		private static bool TryGetSpellShopMaterial(BuffId buffId, out int itemId, out int amount)
+		{
+			itemId = 0;
+			amount = 0;
+
+			if (!SpellShopBuffs.TryGetValue(buffId, out var material))
+				return false;
+
+			if (!ZoneServer.Instance.Data.ItemDb.TryFind(material.ItemClassName, out var itemData))
+				return false;
+
+			itemId = itemData.Id;
+			amount = material.Amount;
+
+			return true;
+		}
 	}
 }

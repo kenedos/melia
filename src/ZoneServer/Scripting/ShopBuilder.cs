@@ -420,6 +420,59 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Closes the given character's personal shop and takes it off
+		/// every screen that has it open.
+		/// </summary>
+		/// <remarks>
+		/// An empty shop title is what tells a browsing client to close the
+		/// window it has open on this owner, so this has to run while the
+		/// owner is still on the map and there is a map to broadcast it to.
+		/// </remarks>
+		/// <param name="shopOwner"></param>
+		public static void ClosePersonalShop(Character shopOwner)
+		{
+			var conn = shopOwner.Connection;
+			var shop = conn?.ShopCreated;
+
+			if (shop == null)
+				return;
+
+			shop.IsClosed = true;
+
+			Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+
+			// Everyone browsing it gets the closed list while the shop is
+			// still there to send, and forgets it afterwards, so a handle
+			// that gets reused isn't taken for a shop they had open.
+			foreach (var viewer in GetShopViewers(shopOwner))
+			{
+				Send.ZC_AUTOSELLER_LIST(viewer.Connection, shopOwner);
+
+				viewer.Connection.ActiveShop = null;
+				viewer.Connection.ActiveShopOwnerHandle = 0;
+			}
+
+			Send.ZC_AUTOSELLER_TITLE(shopOwner);
+			Send.ZC_NORMAL.ShopAnimation(shopOwner, shop.ShopAnimation, 1, 0);
+
+			conn.ShopCreated = null;
+		}
+
+		/// <summary>
+		/// Returns every character on the owner's map with the owner's shop
+		/// open.
+		/// </summary>
+		/// <param name="shopOwner"></param>
+		/// <returns></returns>
+		private static Character[] GetShopViewers(Character shopOwner)
+		{
+			if (shopOwner.Map == null)
+				return Array.Empty<Character>();
+
+			return shopOwner.Map.GetCharacters(a => a != shopOwner && a.Connection != null && a.Connection.ActiveShopOwnerHandle == shopOwner.Handle);
+		}
+
+		/// <summary>
 		/// Closes a shop if it's empty and notifies all parties.
 		/// </summary>
 		public static void CloseShopIfEmpty(IZoneConnection conn, Character shopOwner, ShopData shop)
@@ -443,14 +496,7 @@ namespace Melia.Zone.Scripting
 
 			if (shop.Products.Count == 0)
 			{
-				shop.IsClosed = true;
-
-				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
-				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
-				Send.ZC_AUTOSELLER_TITLE(shopOwner);
-				Send.ZC_NORMAL.ShopAnimation(shopOwner, "Squire_Repair", 1, 0);
-
-				shopOwner.Connection.ShopCreated = null;
+				ClosePersonalShop(shopOwner);
 
 				shopOwner.ServerMessage("All items purchased. Shop closed.");
 				Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('personal_shop_target')");

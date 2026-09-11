@@ -6,6 +6,7 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Database;
 using Melia.Shared.Network;
 using Melia.Zone.Database;
+using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Services;
 using Melia.Zone.World;
@@ -366,6 +367,10 @@ namespace Melia.Zone.Network
 				var campfires = character.Map.GetMonsters(m => m.Id == 46011 && m.OwnerHandle == character.Handle);
 				foreach (var campfire in campfires)
 					character.Map.RemoveMonster(campfire);
+
+				// Before the character leaves the map, while there are still
+				// people on it to tell. An autotrading owner never gets here.
+				ShopBuilder.ClosePersonalShop(character);
 
 				character.CloseEyes();
 				character.Map.RemoveCharacter(character);

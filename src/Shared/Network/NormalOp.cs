@@ -354,7 +354,7 @@ namespace Melia.Shared.Network
 																 // OLD: AUTOSELLER_TITLE = 0x11B
 			public const int Unknown_11A = 0x11C;                // LATEST. Old: ENABLE_PREVIEW_SKILL_RANGE = 0x11C
 																 // OLD: ENABLE_PREVIEW_HITRADIUS = 0x11D
-			public const int Shop_Unknown11C = 0x11E;            // LATEST. Old: TRANSFORM_TO_MONSTER = 0x11E
+			public const int AutoSellerHistory = 0x11E;          // LATEST. Old: TRANSFORM_TO_MONSTER = 0x11E
 			public const int EnableHitRadiusPreview = 0x11F;           // OLD: CONNECT_LINK_TEXTURE = 0x11F
 			public const int Transmutation = 0x120;              // LATEST. Old: ARG_OBJECT = 0x120
 			public const int Unknown_121 = 0x121;                // LATEST. Old: JUMP_ROPE = 0x121
@@ -771,7 +771,7 @@ namespace Melia.Shared.Network
 			public const int OLD_AUTOSELLER_TITLE = 0x11B;
 			// LATEST Unknown_11A = 0x11C. Old ENABLE_PREVIEW_SKILL_RANGE = 0x11C
 			public const int OLD_ENABLE_PREVIEW_HITRADIUS = 0x11D;
-			// LATEST Shop_Unknown11C = 0x11E. Old TRANSFORM_TO_MONSTER = 0x11E
+			// LATEST AutoSellerHistory = 0x11E. Old TRANSFORM_TO_MONSTER = 0x11E
 			public const int OLD_CONNECT_LINK_TEXTURE = 0x11F;
 			// LATEST Transmutation = 0x120. Old ARG_OBJECT = 0x120
 			// LATEST Unknown_121 = 0x121. Old JUMP_ROPE = 0x121

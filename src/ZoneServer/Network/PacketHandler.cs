@@ -2956,13 +2956,7 @@ namespace Melia.Zone.Network
 					Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
 					Send.ZC_LOCK_KEY(character, "AUTOSELLER", false);
 
-					// Match the exact order from manual shop close (CZ_REGISTER_AUTOSELLER with itemCount -1)
-					// Use the conn overload to send only to seller, not broadcast to everyone
-					shopData.IsClosed = true;
-					Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
-					Send.ZC_AUTOSELLER_TITLE(shopOwner);
-					Send.ZC_NORMAL.ShopAnimation(shopOwner, "Squire_Repair", 1, 0);
-					shopOwner.Connection.ShopCreated = null;
+					ShopBuilder.ClosePersonalShop(shopOwner);
 
 					// Close seller's shop management UI (personal_sell_shop_my frame for sell shops)
 					Send.ZC_EXEC_CLIENT_SCP(shopOwner.Connection, "ui.CloseFrame('personal_sell_shop_my')");
@@ -5057,12 +5051,7 @@ namespace Melia.Zone.Network
 					Log.Warning("CZ_REGISTER_AUTOSELLER: Already has a shop open.");
 					return;
 				}
-				shop = character.Connection.ShopCreated;
-				shop.IsClosed = true;
-				Send.ZC_AUTOSELLER_LIST(conn, character);
-				Send.ZC_AUTOSELLER_TITLE(character);
-				Send.ZC_NORMAL.ShopAnimation(character, "Squire_Repair", 1, 0);
-				character.Connection.ShopCreated = null;
+				ShopBuilder.ClosePersonalShop(character);
 			}
 			else
 			{
@@ -5075,26 +5064,33 @@ namespace Melia.Zone.Network
 						Name = shopName,
 						EffectId = group
 					};
-					switch (group)
+					// Matched by name, because the packet string ids
+					// behind these groups change between client versions.
+					switch (packetString.Name)
 					{
-						case 8657:
+						case "Buff":
 							shop.Type = PersonalShopType.SpellShop;
 							break;
-						case 3076:
+						case "Awakening":
 							shop.Type = PersonalShopType.ItemAwakening;
 							break;
-						case 4376:
+						case "Squire_Repair":
 							shop.Type = PersonalShopType.Repair;
 							break;
-						case 8565:
+						case "Portal":
 							shop.Type = PersonalShopType.Portal;
 							break;
-						// Oblation
-						case 8590:
+						case "GemRoasting":
+							shop.Type = PersonalShopType.GemRoasting;
+							break;
+						case "FoodTable":
+							shop.Type = PersonalShopType.FoodTable;
+							break;
+						case "Oblation":
 							shop.Type = PersonalShopType.Oblation;
 							break;
 						default:
-							Log.Debug("Unknown Shop Type: {0}", group);
+							Log.Debug("Unknown Shop Type: {0}", packetString.Name);
 							shop.Type = PersonalShopType.Personal;
 							break;
 					}
@@ -5128,8 +5124,16 @@ namespace Melia.Zone.Network
 								}
 								else
 								{
+									if (shop.Type == PersonalShopType.SpellShop && !PardonerSkillHelper.IsSpellShopBuff((BuffId)itemId))
+									{
+										Log.Warning("CZ_REGISTER_AUTOSELLER: User '{0}' tried to sell buff {1}, which no Spell Shop sells.", conn.Account.Name, itemId);
+										return;
+									}
+
 									product.ItemId = itemId;
 									product.Price = requiredAmount;
+									product.Amount = shop.Level;
+									product.RequiredAmount = PardonerSkillHelper.GetSpellShopStock(character, (BuffId)itemId);
 									shop.AddProduct(product);
 								}
 							}
@@ -5215,8 +5219,8 @@ namespace Melia.Zone.Network
 				shop.OwnerHandle = character.Handle;
 				character.Connection.ShopCreated = shop;
 				Send.ZC_AUTOSELLER_LIST(conn, character);
-				Send.ZC_NORMAL.Shop_Unknown11C(conn, "Squire", shop.Type);
-				Send.ZC_NORMAL.ShopAnimation(character, "Squire_Repair", 1, 1);
+				Send.ZC_NORMAL.AutoSellerHistory(conn, shop);
+				Send.ZC_NORMAL.ShopAnimation(character, shop.ShopAnimation, 1, 1);
 				Send.ZC_AUTOSELLER_TITLE(character);
 
 				Log.Debug("CZ_REGISTER_AUTOSELLER: {0}, {1} item(s), Type: {2}", shopName, itemCount, shop.Type);
@@ -5305,8 +5309,27 @@ namespace Melia.Zone.Network
 				return;
 			}
 
+			var alreadyOpen = conn.ActiveShopOwnerHandle == shopOwner.Handle;
+
 			var shop = conn.ActiveShop = shopOwner.Connection.ShopCreated;
 			conn.ActiveShopOwnerHandle = shopOwner.Handle;
+
+			// A Spell Shop is bought from through this same request, which
+			// carries the buff's list index. Merely opening the shop sends
+			// -1 there, and leaves the amount beside it uninitialized.
+			if (shop.Type == PersonalShopType.SpellShop)
+			{
+				if (alreadyOpen && optionSelected >= 0)
+					PardonerSkillHelper.SellSpellShopBuff(character, shopOwner, shop, optionSelected);
+
+				// The owner's materials are what's for sale, and they can
+				// spend them anywhere between two visitors.
+				PardonerSkillHelper.RefreshSpellShopStock(shopOwner, shop);
+
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
+				return;
+			}
 
 			// ============================================================
 			// BUYSHOP (IsCustom=false) - Visitor wants to SELL items TO shop owner

@@ -26,6 +26,7 @@
 //   - i367254: Added 0x5A, 0x88, 0x1BD
 //   - i370844: Looks like a shift 0x1BC -> 0x1BF (2 or 3 Bytes)
 //   - i403038: The ops were moved to inc/NormalOp.bt
+//   - Named 0x11E AutoSellerHistory and documented it
 //------------------------------------------------
 
 #include "inc/common.bt"
@@ -196,6 +197,28 @@ switch (NormalOpToStr(type))
         float f10;
         float f11;
         int i3;
+        break;
+    }
+
+    case "AutoSellerHistory":
+    {
+        typedef struct
+        {
+            int classId;    // 370, 359, 358, 360 (Item or Buff class, by shop type)
+            int price;
+            int amount;
+            lpString buyer;
+        }
+        AutoSellerSale <optimize=false>;
+
+        int packetString;   // 9807, see packeteffects.xml. Matches the group the shop was registered with
+        int shopType;       // 0 (0 = Buff Shop, 2 = Repair Shop, 3 = Gem Roasting, 4 = Oblation, 5 = Food Table, 9 = Portal Shop, 10 = Item Awakening)
+        int saleCount;
+
+        // The client prints `buyer` in place of `price` and `amount`
+        // wherever it isn't empty, which is what officials send.
+        if (saleCount > 0)
+            AutoSellerSale sales[saleCount];
         break;
     }
 

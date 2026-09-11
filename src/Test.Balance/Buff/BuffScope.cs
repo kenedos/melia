@@ -446,6 +446,13 @@ namespace Melia.Test.Balance.Buff
 					}
 				}
 
+				foreach (var (skillName, buffs) in BuffDials.Grants)
+				{
+					_grants[skillName] = _grants.TryGetValue(skillName, out var scanned)
+						? scanned.Union(buffs).ToArray()
+						: buffs;
+				}
+
 				return _grants;
 			}
 		}

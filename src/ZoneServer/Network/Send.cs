@@ -4932,12 +4932,12 @@ namespace Melia.Zone.Network
 			using var packet = Packet.Rent(Op.ZC_AUTOSELLER_LIST);
 
 			packet.PutInt(character.Handle);
-			packet.AddStringId(shop.ShopAnimation);
+			packet.PutInt(shop.EffectId);
 			packet.PutByte(shop.IsClosed);
 			packet.PutInt((int)shop.Type);
-			packet.PutInt(shop.SkillIcon);
 			if (!shop.IsClosed)
 			{
+				packet.PutInt(shop.SkillIcon);
 				packet.PutInt(shop.Level);
 				packet.PutString(shop.Name, 64);
 				packet.PutInt(shop.Products.Count);
@@ -4947,14 +4947,13 @@ namespace Melia.Zone.Network
 					packet.PutInt(product.RequiredAmount); // Amount Left
 					packet.PutInt(product.Price);
 					packet.PutInt(product.Amount);
-					if (shop.SkillIcon == 0)
-						packet.PutEmptyBin(260);
-					else
-						packet.PutEmptyBin(256);
+					packet.PutEmptyBin(260);
 				}
+				packet.PutInt(0); // Seller property count
 			}
 			else
 			{
+				packet.PutInt(0);
 				packet.PutInt(0);
 				packet.PutString("", 64);
 				packet.PutInt(0);
@@ -4983,28 +4982,25 @@ namespace Melia.Zone.Network
 			packet.PutInt(shop.EffectId);
 			packet.PutByte(shop.IsClosed);
 			packet.PutInt((int)shop.Type);
-			packet.PutInt(shop.SkillIcon);
 			if (!shop.IsClosed)
 			{
+				packet.PutInt(shop.SkillIcon);
 				packet.PutInt(shop.Level);
 				packet.PutString(shop.Name, 64);
 				packet.PutInt(shop.Products.Count);
-				if (shop.SkillIcon == (int)SkillId.Pardoner_Oblation)
-					packet.PutInt(0);
 				foreach (var product in shop.Products.Values)
 				{
 					packet.PutInt(product.ItemId);
 					packet.PutInt(product.RequiredAmount); // Amount Left
 					packet.PutInt(product.Price);
 					packet.PutInt(product.Amount);
-					if (shop.SkillIcon == 0)
-						packet.PutEmptyBin(260);
-					else
-						packet.PutEmptyBin(256);
+					packet.PutEmptyBin(260);
 				}
+				packet.PutInt(0); // Seller property count
 			}
 			else
 			{
+				packet.PutInt(0);
 				packet.PutInt(0);
 				packet.PutString("", 64);
 				packet.PutInt(0);

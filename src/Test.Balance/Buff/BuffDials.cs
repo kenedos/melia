@@ -137,9 +137,11 @@ namespace Melia.Test.Balance.Buff
 		/// Magic_Attack is Normal_Attack's classType Magic counterpart and
 		/// reads the monster's own mAttack, which the data carries for every
 		/// monster alongside its pAttack. It carries the heavier factor of the
-		/// two (121 against 100), so an even split of samples is a little more
-		/// than an even split of damage - the two rows are real skills and
-		/// their factors are left as they are rather than flattened.
+		/// two (121 against 100), and the two halves do not land alike besides:
+		/// dodge and block take their cut out of the physical swings alone.
+		/// Neither has to be flattened, because SampleIncoming combines the
+		/// halves geometrically rather than flat, which makes each damage type
+		/// carry half the reading whatever it hits for.
 		/// </remarks>
 		public static readonly SkillId[] IncomingAttacks =
 		[
@@ -449,6 +451,27 @@ namespace Melia.Test.Balance.Buff
 		{
 			// 6 + (level - 1) * 14/9, capped at 20, per Frenzy_Buff.CapStacks.
 			["Barbarian_Frenzy"] = 20,
+		};
+
+		/// <summary>
+		/// Buffs a press lands that no handler source names.
+		/// </summary>
+		/// <remarks>
+		/// BuffScope.Grants scans the skill and pad handler sources, which
+		/// covers every press that applies its own buff. The Spell Shop's four
+		/// are started on the buyer by PardonerSkillHelper.SellSpellShopBuff,
+		/// from a helper the scan does not read, so without an entry here the
+		/// probe has nothing to apply and the row reports that the press
+		/// applied no buff.
+		/// </remarks>
+		public static readonly Dictionary<string, BuffId[]> Grants = new()
+		{
+			["Pardoner_SpellShop"] =
+			[
+				BuffId.SpellShop_Blessing_Buff,
+				BuffId.SpellShop_Aspersion_Buff,
+				BuffId.SpellShop_IncreaseMagicDEF_Buff,
+			],
 		};
 
 		/// <summary>

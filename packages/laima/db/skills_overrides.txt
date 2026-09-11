@@ -325,7 +325,7 @@
 { skillId: 20002, className: "Wizard_Lethargy", name: "Lethargy", basicSp: 10, lvUpSpendSp: 0.9, basicCast: 500, splashRate: 0, maxRange: 150, factor: 100.0, factorByLevel: 0.0, cooldownTime: 5000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 0.2, captionRatio2: 0, captionRatio2ByLevel: 0.2 },
 { skillId: 20004, className: "Wizard_ReflectShield", name: "Magic Shield", basicSp: 27, lvUpSpendSp: 2.45, basicCast: 3000, splashRate: 0, factor: 100.0, factorByLevel: 0.0, cooldownTime: 15000, overheatCount: "0", castInterruptible: true },
 { skillId: 20005, className: "Wizard_EarthQuake", name: "Earthquake", basicSp: 14, lvUpSpendSp: 1.27, basicCast: 1000, splashRate: 0, factor: 286, factorByLevel: 28.6, cooldownTime: 8000, overheatCount: "0" },
-{ skillId: 20007, className: "Wizard_MagicMissile", name: "Magic Missile", basicSp: 11, lvUpSpendSp: 1, basicCast: 1200, splashRate: 0, factor: 90, factorByLevel: 9.0, cooldownTime: 8000, overheatCount: "3", castInterruptible: false },
+{ skillId: 20007, className: "Wizard_MagicMissile", name: "Magic Missile", basicSp: 11, lvUpSpendSp: 1, basicCast: 1200, splashRate: 0, factor: 78, factorByLevel: 7.8, cooldownTime: 8000, overheatCount: "3", castInterruptible: false },
 { skillId: 20008, className: "Wizard_Teleportation", name: "Teleportation", basicSp: 11, lvUpSpendSp: 1.04, basicCast: 300, splashRate: 0, factor: 0, factorByLevel: 0, cooldownTime: 3000, overheatCount: "0", castInterruptible: true, captionRatio1: 80, captionRatio1ByLevel: 24, captionRatio1Max: 248 },
 
 // Pyromancer
@@ -612,7 +612,7 @@
 { skillId: 30308, className: "Sapper_SpikeShooter", name: "Spike Shooter", basicSp: 21, lvUpSpendSp: 1.43, basicCast: 1500, splashRate: 0, factor: 359, factorByLevel: 26.5, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "2", speedRateAffectedByDex: false, castInterruptible: true },
 { skillId: 30309, className: "Sapper_DamageTrap", name: "Continuous-type Trap", basicSp: 12, lvUpSpendSp: 1.43, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 125000 },
 { skillId: 30310, className: "Sapper_SpringTrap", name: "Spring Trap", basicSp: 7, lvUpSpendSp: 0.75, basicCast: 800, splashRate: 0, factor: 1034, factorByLevel: 133.8, hitCount: 1, multiHitCount: 1, cooldownTime: 8000, overheatCount: "3", speedRateAffectedByDex: false, castInterruptible: true },
-{ skillId: 30311, className: "Sapper_LegHoldTrap", name: "Leghold Trap", basicSp: 10, lvUpSpendSp: 0.95, basicCast: 800, splashRate: 0, factor: 1399, factorByLevel: 139.9, hitCount: 1, multiHitCount: 10, cooldownTime: 10000, overheatCount: "3", speedRateAffectedByDex: false, castInterruptible: true },
+{ skillId: 30311, className: "Sapper_LegHoldTrap", name: "Leghold Trap", basicSp: 10, lvUpSpendSp: 0.95, basicCast: 800, splashRate: 0, factor: 1632, factorByLevel: 163.2, hitCount: 1, multiHitCount: 10, cooldownTime: 10000, overheatCount: "3", speedRateAffectedByDex: false, castInterruptible: true },
 { skillId: 30312, className: "Sapper_SpikeShooter_Hidden", name: "Spike Shooter: Penetration", basicSp: 4, lvUpSpendSp: 0.47, splashRate: 0, hitCount: 1, multiHitCount: 1 },
 
 // Hunter
@@ -895,7 +895,7 @@
 { skillId: 40802, className: "Pardoner_Indulgentia", name: "Indulgentia", basicSp: 25, lvUpSpendSp: 2.84, basicCast: 1500, factor: 45, factorByLevel: 3, splashRate: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, castInterruptible: true, captionRatio1: 5, captionRatio1ByLevel: 0, captionTime: 10 },
 { skillId: 40803, className: "Pardoner_DiscernEvil", name: "Discerning Evil", basicSp: 9, lvUpSpendSp: 1.07, splashRate: 1, factor: 55, factorByLevel: 7.1, hitCount: 1, multiHitCount: 28, cooldownTime: 15000 },
 { skillId: 40804, className: "Pardoner_Oblation", name: "Oblation", basicSp: 3, lvUpSpendSp: 0.34, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0, captionRatio1: 0, captionRatio1ByLevel: 7, captionRatio2: 200, captionRatio2Max: 200, captionRatio3: 120, captionRatio3Max: 120 },
-{ skillId: 40805, className: "Pardoner_SpellShop", name: "Spell Shop", basicSp: 7, lvUpSpendSp: 0.46, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
+{ skillId: 40805, className: "Pardoner_SpellShop", name: "Spell Shop", basicSp: 7, lvUpSpendSp: 0.46, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0, captionRatio1: 0, captionRatio1ByLevel: 0.325, captionRatio2: 0, captionRatio2ByLevel: 1.2, captionRatio3: 0, captionRatio3ByLevel: 1.2, captionTime: 0, captionTimeByLevel: 540 },
 { skillId: 40806, className: "Pardoner_SignDispeller", name: "Dispeller Crafting", basicSp: 15, lvUpSpendSp: 1.72, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 150000 },
 { skillId: 40807, className: "Pardoner_CraftBooster", name: "Craft Booster", basicSp: 15, lvUpSpendSp: 1.72, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 150000 },
 { skillId: 40808, className: "Pardoner_IncreaseMagicDEF", name: "Increase Magic Defense", basicSp: 42, lvUpSpendSp: 3.79, basicCast: 3000, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 30000, castInterruptible: true, captionRatio1: 0, captionRatio1ByLevel: 2.5, captionRatio2: 0, captionRatio2ByLevel: 7, captionTime: 300 },

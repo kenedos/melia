@@ -4179,14 +4179,41 @@ namespace Melia.Zone.Network
 			/// <param name="packetString"></param>
 			/// <param name="shopType"></param>
 			/// <param name="i1"></param>
-			public static void Shop_Unknown11C(IZoneConnection conn, string packetString, PersonalShopType shopType, int i1 = 0)
+			/// <summary>
+			/// Sends the trade log of the given shop, which its owner sees
+			/// in their shop window.
+			/// </summary>
+			/// <remarks>
+			/// Sent empty when a shop opens, and again with the whole log
+			/// after every sale.
+			///
+			/// The client prints a sale's buyer name in place of its price
+			/// and amount wherever the name isn't empty, which is what
+			/// officials send, so those two are display-dead while a name
+			/// is attached.
+			/// </remarks>
+			/// <param name="conn"></param>
+			/// <param name="shop"></param>
+			public static void AutoSellerHistory(IZoneConnection conn, ShopData shop)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
-				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.Shop_Unknown11C);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.AutoSellerHistory);
 
-				packet.AddStringId(packetString);
-				packet.PutInt((int)shopType);
-				packet.PutInt(i1);
+				packet.PutInt(shop.EffectId);
+				packet.PutInt((int)shop.Type);
+				packet.PutInt(shop.History.Count);
+
+				foreach (var sale in shop.History)
+				{
+					packet.PutInt(sale.ClassId);
+					packet.PutInt(sale.Price);
+					packet.PutInt(sale.Amount);
+
+					// The client shows this in place of the price and amount
+					// wherever it isn't empty, which is what officials use it
+					// for - naming who bought.
+					packet.PutLpString(sale.BuyerName);
+				}
 
 				conn.Send(packet);
 			}

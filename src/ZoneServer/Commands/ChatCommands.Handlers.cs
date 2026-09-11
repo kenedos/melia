@@ -96,6 +96,7 @@ namespace Melia.Zone.Commands
 			this.Add("sageDelPos", "", "", this.HandleSageDeletePosition);
 			this.Add("sageOpenPortal", "", "", this.HandleSageOpenPortal);
 			this.Add("hmunclusSkl", "", "", this.HandleHomunculusSkill);
+			this.Add("lastuiopenpos", "<frame name>", "", this.HandleLastUiOpenPos);
 
 			// Custom Client Commands
 			this.Add("buyshop", "", "", this.HandleBuyShop);
@@ -5012,8 +5013,8 @@ namespace Melia.Zone.Commands
 
 			sender.Connection.ShopCreated = shop;
 			Send.ZC_AUTOSELLER_LIST(sender.Connection, sender);
-			Send.ZC_NORMAL.Shop_Unknown11C(sender.Connection, "Squire", shop.Type);
-			Send.ZC_NORMAL.ShopAnimation(sender, "Squire_Repair", 1, 1);
+			Send.ZC_NORMAL.AutoSellerHistory(sender.Connection, shop);
+			Send.ZC_NORMAL.ShopAnimation(sender, shop.ShopAnimation, 1, 1);
 			Send.ZC_AUTOSELLER_TITLE(sender);
 
 			Log.Debug("HandleSellShop: {0} opened sell shop '{1}' with {2} item(s)", sender.Name, title, shop.Products.Count);
@@ -5604,6 +5605,27 @@ namespace Melia.Zone.Commands
 			sender.Variables.Temp.SetFloat("MouseY", float.Parse(args.Get(1), CultureInfo.InvariantCulture));
 			sender.Variables.Temp.SetFloat("ScreenWidth", float.Parse(args.Get(2), CultureInfo.InvariantCulture));
 			sender.Variables.Temp.SetFloat("ScreenHeight", float.Parse(args.Get(3), CultureInfo.InvariantCulture));
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Stores the window the client just opened and where its owner
+		/// stood at the time.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleLastUiOpenPos(Character sender, Character target, string message, string command, Arguments args)
+		{
+			if (args.Count < 1)
+				return CommandResult.InvalidArgument;
+
+			sender.Variables.Temp.SetString("LastUiOpenFrame", args.Get(0));
+			sender.Variables.Temp.Set("LastUiOpenPos", sender.Position);
 
 			return CommandResult.Okay;
 		}

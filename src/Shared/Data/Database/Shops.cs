@@ -45,7 +45,9 @@ namespace Melia.Shared.Data.Database
 				return this.Type switch
 				{
 					PersonalShopType.SpellShop => "Pardoner_SpellShop",
+					PersonalShopType.Oblation => "Pardoner_Oblation",
 					PersonalShopType.Repair => "Squire_Repair",
+					PersonalShopType.FoodTable => "Squire_FoodTable",
 					PersonalShopType.Portal => "Sage_PortalShop",
 					_ => "Squire_Repair",
 				};
@@ -54,6 +56,11 @@ namespace Melia.Shared.Data.Database
 
 		public bool IsClosed { get; set; }
 		public int OwnerHandle { get; set; }
+
+		/// <summary>
+		/// The sales made through this shop, shown in its trade log.
+		/// </summary>
+		public List<ShopSaleData> History { get; set; } = new List<ShopSaleData>();
 
 		public int SkillIcon
 		{
@@ -81,6 +88,37 @@ namespace Melia.Shared.Data.Database
 			this.Products.TryGetValue(id, out var product);
 			return product;
 		}
+	}
+
+	/// <summary>
+	/// One sale made through a personal shop, as its trade log shows it.
+	/// </summary>
+	[Serializable]
+	public class ShopSaleData
+	{
+		/// <summary>
+		/// What was sold - an item class for a shop that sells items, a
+		/// buff class for one that sells buffs.
+		/// </summary>
+		public int ClassId { get; set; }
+
+		/// <summary>
+		/// What it sold for, which the log only shows while no buyer is
+		/// named beside it.
+		/// </summary>
+		public int Price { get; set; }
+
+		/// <summary>
+		/// How many were sold, which the log only shows while no buyer is
+		/// named beside it.
+		/// </summary>
+		public int Amount { get; set; }
+
+		/// <summary>
+		/// Who bought it. The log shows this in place of the price and
+		/// the amount, which is what officials do with it.
+		/// </summary>
+		public string BuyerName { get; set; }
 	}
 
 	[Serializable]

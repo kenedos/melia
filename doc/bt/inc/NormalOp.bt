@@ -345,7 +345,7 @@ string NormalOpToStr(NormalOp& value)
     ENUM_VALUE "Unknown" END;
     ENUM_VALUE "Unknown" END;
     ENUM_VALUE "Unknown" END;
-    ENUM_VALUE "Unknown" END;
+    ENUM_VALUE "AutoSellerHistory" END;
     ENUM_VALUE "Unknown" END;
     ENUM_VALUE "Unknown" END;
     ENUM_VALUE "Unknown" END;
