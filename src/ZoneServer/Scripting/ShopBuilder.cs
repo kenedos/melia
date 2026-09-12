@@ -650,6 +650,27 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Forgets the shop the given character is browsing if it belongs to
+		/// the given owner, without telling their client to close it.
+		/// </summary>
+		/// <remarks>
+		/// A client drops a shop's window along with the actor it belongs
+		/// to, so an owner leaving the viewer's screen closes it for them.
+		/// </remarks>
+		/// <param name="viewer"></param>
+		/// <param name="shopOwnerHandle"></param>
+		public static void ForgetShopView(Character viewer, int shopOwnerHandle)
+		{
+			var conn = viewer.Connection;
+
+			if (conn == null || conn.ActiveShopOwnerHandle != shopOwnerHandle)
+				return;
+
+			conn.ActiveShop = null;
+			conn.ActiveShopOwnerHandle = 0;
+		}
+
+		/// <summary>
 		/// Takes the shop the given character is browsing off their screen,
 		/// leaving it open for everyone else.
 		/// </summary>
@@ -662,13 +683,12 @@ namespace Melia.Zone.Scripting
 			if (shop == null)
 				return;
 
-			var shopOwnerHandle = conn.ActiveShopOwnerHandle;
-
 			conn.ActiveShop = null;
 			conn.ActiveShopOwnerHandle = 0;
 
-			Send.ZC_AUTOSELLER_LIST_CLOSED(conn, shopOwnerHandle, shop);
-
+			// Only the window comes down, and closing one that a client
+			// already closed itself costs nothing. Telling them the shop
+			// is closed would take it off the owner for good instead.
 			switch (shop.Type)
 			{
 				case PersonalShopType.SpellShop:

@@ -12,6 +12,7 @@ using Melia.Shared.Versioning;
 using Melia.Shared.World;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
+using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -610,7 +611,13 @@ namespace Melia.Zone.World.Actors.Characters
 		private void HandleDisappearingCharacters(List<Character> disappearCharacters)
 		{
 			for (var i = 0; i < disappearCharacters.Count; i++)
-				Send.ZC_LEAVE(this.Connection, disappearCharacters[i]);
+			{
+				var character = disappearCharacters[i];
+
+				ShopBuilder.ForgetShopView(this, character.Handle);
+
+				Send.ZC_LEAVE(this.Connection, character);
+			}
 		}
 
 		private void HandleAppearingMonsters(List<IMonster> appearMonsters)

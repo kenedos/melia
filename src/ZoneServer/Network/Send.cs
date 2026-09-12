@@ -4985,29 +4985,6 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Sends a closed shop list to one viewer, taking the given shop
-		/// off their screen without closing it for anyone else.
-		/// </summary>
-		/// <param name="conn"></param>
-		/// <param name="shopOwnerHandle"></param>
-		/// <param name="shop"></param>
-		public static void ZC_AUTOSELLER_LIST_CLOSED(IZoneConnection conn, int shopOwnerHandle, ShopData shop)
-		{
-			using var packet = Packet.Rent(Op.ZC_AUTOSELLER_LIST);
-
-			packet.PutInt(shopOwnerHandle);
-			packet.PutInt(shop.EffectId);
-			packet.PutByte(true);
-			packet.PutInt((int)shop.Type);
-			packet.PutInt(0);
-			packet.PutInt(0);
-			packet.PutString("", 64);
-			packet.PutInt(0);
-
-			conn.Send(packet);
-		}
-
-		/// <summary>
 		/// Show Shop Title
 		/// </summary>
 		/// <param name="conn"></param>
