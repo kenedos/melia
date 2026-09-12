@@ -815,6 +815,11 @@ namespace Melia.Zone.Skills
 			Interlocked.Exchange(ref _runnerCount, 0);
 
 			this.NotifyBuffsOnSkillUse();
+
+			// An Equipment Maintenance bonus lasts a number of attacks, and
+			// this is the one point every skill use passes through.
+			if (this.Data.AttackType != SkillAttackType.None)
+				Helpers.SquireSkillHelper.ConsumeMaintenance(this.Owner, false);
 		}
 
 		/// <summary>

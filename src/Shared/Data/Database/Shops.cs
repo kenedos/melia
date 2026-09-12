@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Melia.Shared.Game.Const;
 using Newtonsoft.Json.Linq;
 using Yggdrasil.Data.JSON;
 
@@ -38,10 +39,23 @@ namespace Melia.Shared.Data.Database
 		public Dictionary<int, ProductData> Products { get; set; } = new Dictionary<int, ProductData>();
 		public int Level { get; set; }
 		public int EffectId { get; set; }
+
+		/// <summary>
+		/// The skill the shop was opened with.
+		/// </summary>
+		/// <remarks>
+		/// Both Squire shops register as the same client shop type, so this is
+		/// what tells them apart.
+		/// </remarks>
+		public SkillId SkillId { get; set; } = SkillId.None;
+
 		public string ShopAnimation
 		{
 			get
 			{
+				if (this.SkillId == SkillId.Squire_EquipmentTouchUp)
+					return "Squire_EquipmentTouchUp";
+
 				return this.Type switch
 				{
 					PersonalShopType.SpellShop => "Pardoner_SpellShop",
@@ -66,6 +80,11 @@ namespace Melia.Shared.Data.Database
 		{
 			get
 			{
+				// The client looks this up as a skill class to pick the shop's
+				// UI, so a zero here leaves it with no window to open.
+				if (this.SkillId != SkillId.None)
+					return (int)this.SkillId;
+
 				return this.Type switch
 				{
 					PersonalShopType.ItemAwakening => 21007,

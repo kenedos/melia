@@ -2340,13 +2340,17 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Sends ZC_CAMPINFO to connection.
+		/// Sends ZC_CAMPINFO to connection, naming the map the account's
+		/// Base Camp stands on.
 		/// </summary>
 		/// <param name="conn"></param>
-		public static void ZC_CAMPINFO(IZoneConnection conn)
+		/// <param name="accountId"></param>
+		/// <param name="mapId">Zero when the account has no camp standing.</param>
+		public static void ZC_CAMPINFO(IZoneConnection conn, long accountId = 0, int mapId = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_CAMPINFO); // Size: 18 (12)
-			packet.PutEmptyBin(12);
+			packet.PutLong(accountId);
+			packet.PutFloat(mapId);
 			conn.Send(packet);
 		}
 

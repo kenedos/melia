@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
@@ -18,14 +19,31 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Squire
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Squire_Arrest)]
-	public class Squire_ArrestOverride : IGroundSkillHandler
+	public class Squire_ArrestOverride : IGroundSkillHandler, IDynamicCasted
 	{
 		private const float TargetDistance = 120f;
-		private const float TargetWidth = 30f;
+		private const float TargetWidth = 60f;
 		private const int BuffDelay = 550;
 		private const int BuffDurationMs = 10000;
-		private const int SlowDurationMs = 4000;
-		private const int SlowDurationPerAbilityLevel = 400;
+		private const string VarBoundTargets = "Melia.Arrest.BoundTargets";
+
+		/// <summary>
+		/// Releases everything the bind is holding, since it lasts only as
+		/// long as the channel does.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <param name="maxCastTime"></param>
+		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
+		{
+			if (!skill.Vars.TryGet<List<ICombatEntity>>(VarBoundTargets, out var boundTargets))
+				return;
+
+			skill.Vars.Remove(VarBoundTargets);
+
+			foreach (var boundTarget in boundTargets)
+				boundTarget.StopBuff(BuffId.Arrest);
+		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
 		{
@@ -47,10 +65,9 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Squire
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
 			var maxTargets = (int)skill.Properties.GetFloat(PropertyName.CaptionRatio);
 
-			var skillTargets = SkillSelectEnemiesInSquare(caster, targetPos, 0f, TargetDistance, TargetWidth, maxTargets);
+			var skillTargets = SkillSelectEnemiesInSquare(caster, originPos, 0f, TargetDistance, TargetWidth, maxTargets);
 			if (skillTargets.Count == 0)
 				return;
 
@@ -58,12 +75,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Squire
 
 			SkillTargetBuff(skill, caster, skillTargets, BuffId.Arrest, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), skill.Id);
 
-			await skill.Wait(TimeSpan.FromMilliseconds(BuffDurationMs));
-
-			foreach (var skillTarget in skillTargets)
-				skillTarget.StopBuff(BuffId.Arrest);
-
-			SkillTargetBuffAbility(caster, skill, skillTargets, AbilityId.Squire1, BuffId.UC_slowdown, 1, -1, SlowDurationMs, SlowDurationPerAbilityLevel, 1, 100, skill.Id);
+			skill.Vars.Set(VarBoundTargets, skillTargets);
 		}
 	}
 }

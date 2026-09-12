@@ -5035,14 +5035,8 @@ namespace Melia.Zone.Network
 				return;
 			}
 
-			var skillId = 0;
-			switch (packetString.Name)
-			{
-				case "Buff":
-				case "Oblation":
-					skillId = packet.GetInt();
-					break;
-			}
+			// Every shop sends the skill it was opened with.
+			var skillId = packet.Remaining >= 4 ? packet.GetInt() : 0;
 
 			if (character.Connection.ShopCreated != null)
 			{
@@ -5064,38 +5058,49 @@ namespace Melia.Zone.Network
 						Name = shopName,
 						EffectId = group
 					};
-					// Matched by name, because the packet string ids
-					// behind these groups change between client versions.
-					switch (packetString.Name)
+					shop.SkillId = (SkillId)skillId;
+
+					// The skill is what the client resolves the shop's own UI
+					// from, and unlike the group's packet string it is the same
+					// in every client version.
+					switch (shop.SkillId)
 					{
-						case "Buff":
-							shop.Type = PersonalShopType.SpellShop;
-							break;
-						case "Awakening":
-							shop.Type = PersonalShopType.ItemAwakening;
-							break;
-						case "Squire_Repair":
+						// Both Squire shops register as the client's one
+						// Squire type, so only the skill tells them apart.
+						case SkillId.Squire_Repair:
+						case SkillId.Squire_EquipmentTouchUp:
 							shop.Type = PersonalShopType.Repair;
 							break;
-						case "Portal":
-							shop.Type = PersonalShopType.Portal;
-							break;
-						case "GemRoasting":
-							shop.Type = PersonalShopType.GemRoasting;
-							break;
-						case "FoodTable":
+						case SkillId.Squire_FoodTable:
 							shop.Type = PersonalShopType.FoodTable;
 							break;
-						case "Oblation":
-							shop.Type = PersonalShopType.Oblation;
-							break;
 						default:
-							Log.Debug("Unknown Shop Type: {0}", packetString.Name);
-							shop.Type = PersonalShopType.Personal;
+							switch (packetString.Name)
+							{
+								case "Buff":
+									shop.Type = PersonalShopType.SpellShop;
+									break;
+								case "Awakening":
+									shop.Type = PersonalShopType.ItemAwakening;
+									break;
+								case "Portal":
+									shop.Type = PersonalShopType.Portal;
+									break;
+								case "GemRoasting":
+									shop.Type = PersonalShopType.GemRoasting;
+									break;
+								case "Oblation":
+									shop.Type = PersonalShopType.Oblation;
+									break;
+								default:
+									Log.Debug("Unknown Shop Type: {0}", packetString.Name);
+									shop.Type = PersonalShopType.Personal;
+									break;
+							}
 							break;
 					}
 
-					if (character.Skills.TryGet((SkillId)skillId, out var shopSkill))
+					if (character.Skills.TryGet(shop.SkillId, out var shopSkill))
 						shop.Level = shopSkill.Level;
 
 					if (Versions.Protocol > 500)
@@ -5121,6 +5126,32 @@ namespace Melia.Zone.Network
 									product.Amount = amount;
 									product.RequiredAmount = requiredAmount;
 									shop.Products.Add(index, product);
+								}
+								else if (shop.Type == PersonalShopType.FoodTable)
+								{
+									if (!SquireSkillHelper.IsDish(itemId))
+									{
+										Log.Warning("CZ_REGISTER_AUTOSELLER: User '{0}' tried to serve dish {1}, which no Refreshment Table serves.", conn.Account.Name, itemId);
+										return;
+									}
+
+									product.ItemId = itemId;
+									product.Price = price;
+									product.Amount = shop.Level;
+									product.RequiredAmount = SquireSkillHelper.GetDishStock(character, itemId, shop.Level);
+									shop.AddProduct(product);
+								}
+								// A Repair or Equipment Maintenance shop carries
+								// one product that holds nothing but the fee its
+								// owner set, since the items it works on are the
+								// visitor's own.
+								else if (SquireSkillHelper.IsServiceShop(shop))
+								{
+									product.ItemId = itemId;
+									product.Price = price;
+									product.Amount = shop.Level;
+									product.RequiredAmount = requiredAmount;
+									shop.AddProduct(product);
 								}
 								else
 								{
@@ -5306,7 +5337,8 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Request to close an open player shop.
+		/// Request to take a player shop's window off the sender's screen,
+		/// leaving the shop itself open for everyone else.
 		/// </summary>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
@@ -5318,26 +5350,7 @@ namespace Melia.Zone.Network
 
 			var character = conn.SelectedCharacter;
 
-			if (conn.ActiveShop == null)
-			{
-				Log.Warning("CZ_AUTOSELLER_BUYER_CLOSE: {0} has no shop open.", conn.Account.Name);
-				return;
-			}
-			// The window is down on the client either way, so the character
-			// is no longer browsing whatever the handle resolves to.
-			conn.ActiveShop = null;
-			conn.ActiveShopOwnerHandle = 0;
-			Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
-			Send.ZC_LOCK_KEY(character, "AUTOSELLER", false);
-			switch (shopType)
-			{
-				case 2:
-					Send.ZC_EXEC_CLIENT_SCP(conn, ClientScripts.SQUIRE_REPAIR_CANCEL);
-					break;
-				default:
-					Log.Warning("CZ_AUTOSELLER_BUYER_CLOSE: {0} shop type close not implemented.", shopType);
-					break;
-			}
+			ShopBuilder.CloseShopView(character);
 		}
 
 		/// <summary>

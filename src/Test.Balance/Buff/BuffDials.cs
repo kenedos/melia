@@ -407,6 +407,13 @@ namespace Melia.Test.Balance.Buff
 			// tooltip promises: 10% a level, half the swings at its cap of five.
 			["Scout_DoubleAttack"] = new() { [2] = (0f, 10f) },
 
+			// The Squire's two service shops buff an item rather than a
+			// character, and their numbers are the client's own hardcoded
+			// ones, so there is nothing here to price. Every slot they
+			// declare is pinned, which takes them off the roster entirely.
+			["Squire_Repair"] = new() { [1] = (0f, 5f) },
+			["Squire_EquipmentTouchUp"] = new() { [1] = (0f, 0.7f) },
+
 			// The rage the class is named for, read as one number the player
 			// keeps in their head rather than a curve: 150% and 10%, flat at
 			// every level.

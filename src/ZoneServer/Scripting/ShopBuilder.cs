@@ -318,6 +318,15 @@ namespace Melia.Zone.Scripting
 		/// </summary>
 		public static void HandleSellToBuyShop(IZoneConnection conn, Character character, Character shopOwner, ShopData shop, int index, long itemId, int itemAmount)
 		{
+			// A Squire's shop works on the visitor's own gear rather than
+			// taking it, so the item is usually equipped and never changes
+			// hands.
+			if (SquireSkillHelper.IsServiceShop(shop))
+			{
+				SquireSkillHelper.ServiceItem(shopOwner, character, shop, itemId);
+				return;
+			}
+
 			if (!character.Inventory.TryGetItem(itemId, out var item))
 				return;
 
@@ -537,6 +546,35 @@ namespace Melia.Zone.Scripting
 				return;
 			}
 
+			// A Refreshment Table is eaten from through this same request,
+			// carrying the dish's list index, exactly as a Spell Shop is
+			// bought from.
+			if (SquireSkillHelper.IsFoodTable(shop))
+			{
+				if (alreadyOpen && optionSelected >= 0)
+					SquireSkillHelper.ServeFood(character, shopOwner, shop, optionSelected);
+
+				SquireSkillHelper.RefreshFoodTableStock(shopOwner, shop);
+
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
+				return;
+			}
+
+			// A service shop's level decides what it charges and how much it
+			// gives, and the client previews both from its own copy of it, so
+			// the two have to be reading the same number rather than whatever
+			// the owner's skill was when they set the shop up.
+			if (SquireSkillHelper.IsServiceShop(shop))
+			{
+				if (shopOwner.Skills.TryGet(shop.SkillId, out var serviceSkill))
+					shop.Level = serviceSkill.Level;
+
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
+				return;
+			}
+
 			// ============================================================
 			// BUYSHOP (IsCustom=false) - Visitor wants to SELL items TO shop owner
 			// Uses ZC_AUTOSELLER_LIST packet only (Laima3 style)
@@ -650,6 +688,32 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Rebuilds the equipment list in a Squire service shop's window, if
+		/// the given character has one up.
+		/// </summary>
+		/// <remarks>
+		/// Those windows list the character's own equipped items, which they
+		/// read once on opening, so changing what is worn leaves the list
+		/// showing gear that is no longer there.
+		/// </remarks>
+		/// <param name="character"></param>
+		public static void RefreshServiceShopEquipment(Character character)
+		{
+			var conn = character.Connection;
+			if (conn == null)
+				return;
+
+			var shop = conn.ActiveShop ?? conn.ShopCreated;
+			if (shop == null || !SquireSkillHelper.IsServiceShop(shop))
+				return;
+
+			var frameName = shop.SkillId == SkillId.Squire_EquipmentTouchUp ? "itembuffopen" : "itembuffrepair";
+			var listFunc = shop.SkillId == SkillId.Squire_EquipmentTouchUp ? "SQUIRE_BUFF_EQUIP_CTRL" : "UPDATE_REPAIR140731_LIST";
+
+			Send.ZC_EXEC_CLIENT_SCP(conn, $"local f = ui.GetFrame('{frameName}'); if f ~= nil and f:IsVisible() == 1 then {listFunc}(f) end");
+		}
+
+		/// <summary>
 		/// Forgets the shop the given character is browsing if it belongs to
 		/// the given owner, without telling their client to close it.
 		/// </summary>
@@ -678,13 +742,21 @@ namespace Melia.Zone.Scripting
 		public static void CloseShopView(Character viewer)
 		{
 			var conn = viewer.Connection;
-			var shop = conn?.ActiveShop;
-
-			if (shop == null)
+			if (conn == null)
 				return;
+
+			// A shop's own owner has no view of it, and their client still
+			// waits to be told to drop the window.
+			var shop = conn.ActiveShop ?? conn.ShopCreated;
 
 			conn.ActiveShop = null;
 			conn.ActiveShopOwnerHandle = 0;
+
+			Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
+			Send.ZC_LOCK_KEY(viewer, "AUTOSELLER", false);
+
+			if (shop == null)
+				return;
 
 			// Only the window comes down, and closing one that a client
 			// already closed itself costs nothing. Telling them the shop
@@ -699,6 +771,18 @@ namespace Melia.Zone.Scripting
 					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('oblation_sell')");
 					break;
 
+				case PersonalShopType.FoodTable:
+					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('foodtable_ui')");
+					break;
+
+				// Both Squire shops share this type, so only the skill says
+				// which of the two windows is up.
+				case PersonalShopType.Repair:
+					Send.ZC_EXEC_CLIENT_SCP(conn, shop.SkillId == SkillId.Squire_EquipmentTouchUp
+						? "ui.CloseFrame('itembuffopen')"
+						: "ui.CloseFrame('itembuffrepair')");
+					break;
+
 				default:
 					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('personal_shop_target')");
 
@@ -709,9 +793,6 @@ namespace Melia.Zone.Scripting
 					}
 					break;
 			}
-
-			Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
-			Send.ZC_LOCK_KEY(viewer, "AUTOSELLER", false);
 		}
 
 		/// <summary>

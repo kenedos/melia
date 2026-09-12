@@ -11,6 +11,7 @@ using Melia.Zone.Events.Arguments;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.AI;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -137,6 +138,11 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 
 			this.Components.Get<CombatComponent>().SetAttackState(true);
+
+			// An Equipment Maintenance bonus on armor is spent by being hit.
+			if (damage > 0)
+				SquireSkillHelper.ConsumeMaintenance(this, true);
+
 			this.ModifyHpSafe(-damage, out _, out _);
 
 			this.Components.Get<CombatComponent>()?.RegisterHit(attacker, damage);

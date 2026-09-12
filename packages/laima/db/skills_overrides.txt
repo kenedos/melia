@@ -892,8 +892,8 @@
 // Pardoner
 //---------------------------------------------------------------------------
 { skillId: 40801, className: "Pardoner_Simony", name: "Simony", basicSp: 3, lvUpSpendSp: 0.34, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
-{ skillId: 40802, className: "Pardoner_Indulgentia", name: "Indulgentia", basicSp: 25, lvUpSpendSp: 2.84, basicCast: 1500, factor: 45, factorByLevel: 3, splashRate: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, castInterruptible: true, captionRatio1: 5, captionRatio1ByLevel: 0, captionTime: 10 },
-{ skillId: 40803, className: "Pardoner_DiscernEvil", name: "Discerning Evil", basicSp: 9, lvUpSpendSp: 1.07, enableAngle: 180, splashType: "Circle", splashRange: 15, splashHeight: 40, splashAngle: 0, splashRate: 1, factor: 55, factorByLevel: 7.1, hitCount: 1, multiHitCount: 28, cooldownTime: 5000, captionTime: 3.7143, captionTimeByLevel: 0.2857 },
+{ skillId: 40802, className: "Pardoner_Indulgentia", name: "Indulgentia", basicSp: 17, lvUpSpendSp: 1.9, basicCast: 1500, factor: 45, factorByLevel: 3, splashRate: 1, hitCount: 1, multiHitCount: 1, cooldownTime: 15000, castInterruptible: true, captionRatio1: 5, captionRatio1ByLevel: 0, captionTime: 10 },
+{ skillId: 40803, className: "Pardoner_DiscernEvil", name: "Discerning Evil", basicSp: 7, lvUpSpendSp: 0.75, enableAngle: 180, splashType: "Circle", splashRange: 15, splashHeight: 40, splashAngle: 0, splashRate: 1, factor: 18, factorByLevel: 2.3, hitCount: 1, multiHitCount: 28, cooldownTime: 5000, captionTime: 3.7143, captionTimeByLevel: 0.2857 },
 { skillId: 40804, className: "Pardoner_Oblation", name: "Oblation", basicSp: 3, lvUpSpendSp: 0.34, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0, captionRatio1: 0, captionRatio1ByLevel: 7, captionRatio2: 200, captionRatio2Max: 200, captionRatio3: 120, captionRatio3Max: 120 },
 { skillId: 40805, className: "Pardoner_SpellShop", name: "Spell Shop", basicSp: 7, lvUpSpendSp: 0.46, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0, captionRatio1: 0, captionRatio1ByLevel: 0.325, captionRatio2: 0, captionRatio2ByLevel: 1.2, captionRatio3: 0, captionRatio3ByLevel: 1.2, captionTime: 0, captionTimeByLevel: 540 },
 { skillId: 40806, className: "Pardoner_SignDispeller", name: "Dispeller Crafting", basicSp: 15, lvUpSpendSp: 1.72, splashRate: 1, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 150000 },
@@ -1099,12 +1099,12 @@
 { skillId: 50206, className: "OutLaw_Aggress", name: "Aggress", basicSp: 12, lvUpSpendSp: 1.06, splashRate: 0, factor: 100, factorByLevel: 0, cooldownTime: 15000, overheatCount: "0", captionRatio1: 0, captionRatio1ByLevel: 3, captionRatio2: 0, captionRatio2ByLevel: 2, captionRatio3: 0, captionRatio3ByLevel: 3 },
 { skillId: 50207, className: "OutLaw_Rampage", name: "Rampage", basicSp: 18, lvUpSpendSp: 1.22, splashRate: 15, factor: 27, factorByLevel: 2.0, cooldownTime: 15000, overheatCount: "0" },
 
-{ skillId: 50301, className: "Squire_Repair", name: "Repair", basicSp: 4, lvUpSpendSp: 0.4, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 1000 },
-{ skillId: 50302, className: "Squire_Arrest", name: "Arrest", basicSp: 32, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 22500, captionRatio1: 1, captionRatio1ByLevel: 1 },
-{ skillId: 50303, className: "Squire_Camp", name: "Base Camp", basicSp: 4, lvUpSpendSp: 0.34, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
-{ skillId: 50304, className: "Squire_FoodTable", name: "Refreshment Table", basicSp: 4, lvUpSpendSp: 0.34, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
-{ skillId: 50305, className: "Squire_DeadlyCombo", name: "Deadly Combo", basicSp: 12, lvUpSpendSp: 0.82, splashRate: 5, factor: 511, factorByLevel: 37.8, hitCount: 1, multiHitCount: 3, cooldownTime: 15000, overheatCount: "3" },
-{ skillId: 50306, className: "Squire_EquipmentTouchUp", name: "Equipment Maintenance", basicSp: 4, lvUpSpendSp: 0.4, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 1000 },
+{ skillId: 50301, className: "Squire_Repair", name: "Repair", basicSp: 5, lvUpSpendSp: 0.6, splashRate: 0, factor: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 1000, captionRatio1: 0, captionRatio1ByLevel: 5 },
+{ skillId: 50302, className: "Squire_Arrest", name: "Arrest", basicSp: 32, splashRate: 0, factor: 100, hitCount: 1, multiHitCount: 1, cooldownTime: 9000, captionRatio1: 1, captionRatio1ByLevel: 1 },
+{ skillId: 50303, className: "Squire_Camp", name: "Base Camp", basicSp: 6, lvUpSpendSp: 0.51, splashRate: 0, factor: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
+{ skillId: 50304, className: "Squire_FoodTable", name: "Refreshment Table", basicSp: 6, lvUpSpendSp: 0.51, splashRate: 0, factor: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 0 },
+{ skillId: 50305, className: "Squire_DeadlyCombo", name: "Deadly Combo", basicSp: 10, lvUpSpendSp: 0.72, splashRate: 5, factor: 130, factorByLevel: 9.6, hitCount: 1, multiHitCount: 3, cooldownTime: 10000, overheatCount: "3" },
+{ skillId: 50306, className: "Squire_EquipmentTouchUp", name: "Equipment Maintenance", basicSp: 5, lvUpSpendSp: 0.6, splashRate: 0, factor: 0, hitCount: 1, multiHitCount: 1, cooldownTime: 1000, captionRatio1: 0, captionRatio1ByLevel: 0.7 },
 
 // Corsair
 //---------------------------------------------------------------------------

@@ -1252,6 +1252,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Update character
 			this.HandleAppearanceChanges(slot);
+			ShopBuilder.RefreshServiceShopEquipment(this.Character);
 
 			// Update client
 			Send.ZC_ITEM_REMOVE(this.Character, item.ObjectId, 1, InventoryItemRemoveMsg.Equipped, InventoryType.Inventory);
@@ -1324,6 +1325,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Update character
 			this.HandleAppearanceChanges(slot);
+			ShopBuilder.RefreshServiceShopEquipment(this.Character);
 
 			// Update client
 			Send.ZC_ITEM_EQUIP_LIST(this.Character);

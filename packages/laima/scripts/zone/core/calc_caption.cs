@@ -17,6 +17,8 @@ using System;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
+using Melia.Zone.Skills.Helpers;
+using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors;
 
 public class CaptionCalculationsScript : GeneralScript
@@ -76,4 +78,26 @@ public class CaptionCalculationsScript : GeneralScript
 	[ScriptableFunction("SCR_Get_CaptionRatio_Pardoner_Oblation")]
 	public float SCR_Get_Oblation_CaptionRatio(Skill skill)
 		=> skill.Data.CaptionRatio1 + (skill.Data.CaptionRatio1ByLevel * skill.Level);
+
+	/// <summary>
+	/// How many of the wearer's own attacks a maintained weapon lasts,
+	/// which grows with the Squire's DEX and STR as well as the level.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction("SCR_Get_CaptionRatio2_Squire_EquipmentTouchUp")]
+	[CaptionOverrideDependsOn(PropertyName.DEX, PropertyName.STR)]
+	public float SCR_Get_EquipmentTouchUp_CaptionRatio2(Skill skill)
+		=> skill.Owner is Character squire ? SquireSkillHelper.GetMaintenanceCount(squire, skill.Level, false) : 0;
+
+	/// <summary>
+	/// How many hits a maintained armor piece lasts, on the same terms as
+	/// a weapon's count but on the armor's own curve.
+	/// </summary>
+	/// <param name="skill"></param>
+	/// <returns></returns>
+	[ScriptableFunction("SCR_Get_CaptionRatio3_Squire_EquipmentTouchUp")]
+	[CaptionOverrideDependsOn(PropertyName.DEX, PropertyName.STR)]
+	public float SCR_Get_EquipmentTouchUp_CaptionRatio3(Skill skill)
+		=> skill.Owner is Character squire ? SquireSkillHelper.GetMaintenanceCount(squire, skill.Level, true) : 0;
 }

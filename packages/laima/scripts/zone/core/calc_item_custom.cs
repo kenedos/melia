@@ -119,7 +119,7 @@ public class ItemCalculationsScript : GeneralScript
 			return 0;
 
 		//Log.Debug("Calculated Max ATK: {0}", maxAtk);
-		return MathF.Round(maxAtk + GetReinforceAddValue(item, PropertyName.ATK, maxAtk), MidpointRounding.AwayFromZero);
+		return MathF.Round(maxAtk + GetReinforceAddValue(item, PropertyName.ATK, maxAtk), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
 	}
 
 
@@ -132,7 +132,7 @@ public class ItemCalculationsScript : GeneralScript
 			return 0;
 
 		//Log.Debug("Calculated Min ATK: {0} + {1}", minAtk, GetReinforceAddValue(item, PropertyName.ATK, minAtk));
-		return MathF.Round(minAtk + GetReinforceAddValue(item, PropertyName.ATK, minAtk), MidpointRounding.AwayFromZero);
+		return MathF.Round(minAtk + GetReinforceAddValue(item, PropertyName.ATK, minAtk), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
 	}
 
 	[ScriptableFunction]
@@ -143,7 +143,7 @@ public class ItemCalculationsScript : GeneralScript
 			return 0;
 
 		//Log.Debug("Calculated MATK: {0}", itemATK);
-		return MathF.Round(itemATK + GetReinforceAddValue(item, PropertyName.MATK, itemATK), MidpointRounding.AwayFromZero);
+		return MathF.Round(itemATK + GetReinforceAddValue(item, PropertyName.MATK, itemATK), MidpointRounding.AwayFromZero) + GetMaintenanceAddValue(item);
 	}
 
 	/// <summary>
@@ -160,7 +160,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		basicDef = MathF.Floor(basicDef);
 		//Log.Debug("Calculated DEF: {0}", basicDef);
-		return MathF.Floor(basicDef + GetReinforceAddValue(item, PropertyName.DEF, basicDef));
+		return MathF.Floor(basicDef + GetReinforceAddValue(item, PropertyName.DEF, basicDef)) + GetMaintenanceAddValue(item);
 	}
 
 	/// <summary>
@@ -177,7 +177,7 @@ public class ItemCalculationsScript : GeneralScript
 
 		basicMDef = MathF.Floor(basicMDef);
 		//Log.Debug("Calculated MDEF: {0}", basicMDef);
-		return MathF.Floor(basicMDef + GetReinforceAddValue(item, PropertyName.MDEF, basicMDef));
+		return MathF.Floor(basicMDef + GetReinforceAddValue(item, PropertyName.MDEF, basicMDef)) + GetMaintenanceAddValue(item);
 	}
 
 	/// <summary>
@@ -282,6 +282,19 @@ public class ItemCalculationsScript : GeneralScript
 
 		return 0;
 	}
+
+	/// <summary>
+	/// Returns the flat bonus a Squire's Equipment Maintenance adds to the
+	/// item's attack or defense.
+	/// </summary>
+	/// <remarks>
+	/// The stats it raises are calculated properties, so the bonus is added
+	/// here rather than written onto them. A stat the item does not have
+	/// returns before this is reached, so a weapon gains no defense from it.
+	/// </remarks>
+	/// <param name="item"></param>
+	private float GetMaintenanceAddValue(Item item)
+		=> item.Properties.GetFloat(PropertyName.BuffValue);
 
 	/// <summary>
 	/// Gain per reinforce level, as a ratio of the item's own base value.
