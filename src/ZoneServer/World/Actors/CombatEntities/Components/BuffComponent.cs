@@ -88,6 +88,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			Send.ZC_BUFF_ADD(this.Entity, buff);
 
 			this.BuffStarted?.Invoke(this.Entity, buff);
+			this.NotifyBuffsOnDebuffApplied(buff);
 		}
 
 		/// <summary>
@@ -697,7 +698,24 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			this.BuffStarted?.Invoke(this.Entity, buff);
 
+			if (isNew)
+				this.NotifyBuffsOnDebuffApplied(buff);
+
 			return buff;
+		}
+
+		/// <summary>
+		/// Notifies the entity's other active buffs that a debuff was
+		/// applied to it.
+		/// </summary>
+		/// <param name="debuff"></param>
+		private void NotifyBuffsOnDebuffApplied(Buff debuff)
+		{
+			if (debuff.Data.Type != BuffType.Debuff)
+				return;
+
+			foreach (var buff in this.GetAll(a => a != debuff && a.Handler is IBuffOnDebuffAppliedHandler))
+				((IBuffOnDebuffAppliedHandler)buff.Handler).OnDebuffApplied(buff, debuff);
 		}
 
 		/// <summary>

@@ -13,14 +13,27 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Pardoner
 	/// <summary>
 	/// Handler for the Discerning Evil debuff, which damages the target in
 	/// regular intervals. The damage grows with the number of debuffs the
-	/// target is under.
+	/// target is under, and the target's debuffs run longer for as long as
+	/// it lasts.
 	/// </summary>
 	[Package("laima")]
 	[BuffHandler(BuffId.DiscernEvil_Buff)]
-	public class Pardoner_DiscernEvil_BuffOverride : BuffHandler
+	public class Pardoner_DiscernEvil_BuffOverride : BuffHandler, IBuffOnDebuffAppliedHandler
 	{
-		private const float DamageBonusPerDebuff = 0.02f;
+		private const float DamageBonusPerDebuff = 0.05f;
 		private const int MaxCountedDebuffs = 5;
+		private const string VarExtended = "Melia.Buff.DiscernEvil.Extended";
+
+		public override void OnActivate(Buff buff, ActivationType activationType)
+		{
+			foreach (var debuff in buff.Target.Components.Get<BuffComponent>().GetAll(a => a.Data.Type == BuffType.Debuff))
+				this.ExtendDebuff(buff, debuff);
+		}
+
+		public void OnDebuffApplied(Buff buff, Buff debuff)
+		{
+			this.ExtendDebuff(buff, debuff);
+		}
 
 		public override void WhileActive(Buff buff)
 		{
@@ -36,7 +49,7 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Pardoner
 				return;
 
 			var modifier = new SkillModifier();
-			modifier.DamageMultiplier += this.GetDebuffCount(target) * DamageBonusPerDebuff * buff.NumArg1;
+			modifier.DamageMultiplier += this.GetDebuffCount(target) * DamageBonusPerDebuff;
 
 			var skillHitResult = SCR_SkillHit(caster, target, skill, modifier);
 			target.TakeDamage(skillHitResult.Damage, caster);
@@ -45,6 +58,25 @@ namespace Melia.Zone.Buffs.Handlers.Clerics.Pardoner
 			hitInfo.Type = HitType.Holy;
 
 			Send.ZC_HIT_INFO(caster, target, hitInfo);
+		}
+
+		/// <summary>
+		/// Extends the given debuff's remaining duration once, by as long as
+		/// Discerning Evil's own sentence runs.
+		/// </summary>
+		/// <param name="buff"></param>
+		/// <param name="debuff"></param>
+		private void ExtendDebuff(Buff buff, Buff debuff)
+		{
+			if (!debuff.HasDuration || debuff.Data.Tags.HasAny(BuffTag.IgnoreDiscernEvil))
+				return;
+
+			if (debuff.Vars.GetBool(VarExtended))
+				return;
+
+			debuff.IncreaseDuration(debuff.RemainingDuration + GetCaptionTime(buff));
+			debuff.Vars.SetBool(VarExtended, true);
+			debuff.NotifyUpdate();
 		}
 
 		/// <summary>

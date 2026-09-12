@@ -129,6 +129,12 @@ namespace Melia.Zone.Buffs.Base
 	public interface IBuffOnDebuffResistedHandler { void OnDebuffResisted(Buff buff, BuffId buffId, IActor caster); }
 
 	/// <summary>
+	/// Called on the target's other active buffs when a debuff is newly
+	/// applied to it.
+	/// </summary>
+	public interface IBuffOnDebuffAppliedHandler { void OnDebuffApplied(Buff buff, Buff debuff); }
+
+	/// <summary>
 	/// Called on the target before a knockback is applied.
 	/// Return KnockResult.Prevent to block the knockback.
 	/// </summary>
