@@ -54,11 +54,14 @@ namespace Melia.Shared.Data.Database
 		public bool TryFind(string name, out JobData data)
 		{
 			data = default;
+
+			var searchName = name?.Replace(" ", "") ?? "";
+
 			foreach (var entry in this.Entries.Values)
 			{
-				if (string.Equals(entry.Name, name, StringComparison.OrdinalIgnoreCase))
+				if (string.Equals(entry.Name?.Replace(" ", ""), searchName, StringComparison.OrdinalIgnoreCase))
 					data = entry;
-				if (string.Equals(entry.ClassName, name, StringComparison.OrdinalIgnoreCase))
+				if (string.Equals(entry.ClassName?.Replace(" ", ""), searchName, StringComparison.OrdinalIgnoreCase))
 					data = entry;
 				if (data != null)
 					break;

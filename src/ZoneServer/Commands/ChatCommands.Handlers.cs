@@ -3605,13 +3605,26 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleAddJob(Character sender, Character target, string message, string command, Arguments args)
 		{
-			if (args.Count == 0)
+			if (args.IndexedCount == 0)
 				return CommandResult.InvalidArgument;
+
+			// The job name may consist of multiple words, so everything but
+			// an optional trailing circle number is part of it.
+			var nameArgCount = args.IndexedCount;
+			var circleArg = (string)null;
+
+			if (nameArgCount >= 2 && int.TryParse(args.Get(nameArgCount - 1), out _))
+			{
+				circleArg = args.Get(nameArgCount - 1);
+				nameArgCount--;
+			}
+
+			var jobIdent = string.Join(" ", Enumerable.Range(0, nameArgCount).Select(i => args.Get(i)));
 
 			JobId jobId;
 
 			// Try to parse as integer (job ID)
-			if (int.TryParse(args.Get(0), out var iJobId))
+			if (int.TryParse(jobIdent, out var iJobId))
 			{
 				jobId = (JobId)iJobId;
 				if (!ZoneServer.Instance.Data.JobDb.Contains(jobId))
@@ -3623,10 +3636,9 @@ namespace Melia.Zone.Commands
 			// Otherwise, try to find by name or class name
 			else
 			{
-				var jobName = args.Get(0);
-				if (!ZoneServer.Instance.Data.JobDb.TryFind(jobName, out var jobData))
+				if (!ZoneServer.Instance.Data.JobDb.TryFind(jobIdent, out var jobData))
 				{
-					sender.ServerMessage(Localization.Get("Job '{0}' not found. Use job ID or job name/class name."), jobName);
+					sender.ServerMessage(Localization.Get("Job '{0}' not found. Use job ID or job name/class name."), jobIdent);
 					return CommandResult.Okay;
 				}
 				jobId = jobData.Id;
@@ -3635,9 +3647,9 @@ namespace Melia.Zone.Commands
 			var job = target.Jobs.Get(jobId);
 			JobCircle circle;
 
-			if (args.Count >= 2)
+			if (circleArg != null)
 			{
-				if (!int.TryParse(args.Get(1), out var iCircle) || iCircle < (int)JobCircle.First || !Enum.IsDefined(typeof(JobCircle), (short)iCircle))
+				if (!int.TryParse(circleArg, out var iCircle) || iCircle < (int)JobCircle.First || !Enum.IsDefined(typeof(JobCircle), (short)iCircle))
 					return CommandResult.InvalidArgument;
 
 				circle = (JobCircle)iCircle;
