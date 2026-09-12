@@ -33,7 +33,7 @@ int forceId;
 byte b8;
 byte b9;
 float f1;
-float f2;
+float damageRatio;
 int attackCount;
 byte align1;
 float f3;

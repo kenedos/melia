@@ -4,6 +4,8 @@ using Melia.Shared.Network;
 using Melia.Shared.Network.Helpers;
 using Melia.Shared.Versioning;
 using Melia.Zone.Skills.Combat;
+using Melia.Zone.World.Actors;
+using Yggdrasil.Util;
 
 namespace Melia.Zone.Network.Helpers
 {
@@ -49,12 +51,18 @@ namespace Melia.Zone.Network.Helpers
 			packet.PutShort(0);
 			packet.PutShort(0);
 
-			packet.PutShort(0); // count1
+			var additionalPacket = skillHitInfo.AdditionalPacket;
+			var additionalPacketSize = additionalPacket?.Length ?? 0;
+
+			packet.PutShort((short)additionalPacketSize); // count1
 			packet.PutByte(skillHitInfo.VarInfoCount); // count2
 			packet.PutByte(0);
 
 			if (skillHitInfo.IsKnockBack)
 				packet.AddKnockbackInfo(skillHitInfo.KnockBackInfo);
+
+			if (additionalPacketSize > 0)
+				packet.PutBin(additionalPacket);
 
 			// for count2
 			{
@@ -83,6 +91,72 @@ namespace Melia.Zone.Network.Helpers
 		}
 
 		/// <summary>
+		/// Adds the body of a hit info packet to the packet.
+		/// </summary>
+		/// <param name="packet"></param>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="hitInfo"></param>
+		public static void AddHitInfoPacket(this Packet packet, ICombatEntity attacker, ICombatEntity target, HitInfo hitInfo)
+		{
+			packet.PutInt(target.Handle);
+			packet.PutInt(attacker.Handle);
+			packet.PutInt((int)hitInfo.SkillId);
+
+			packet.AddHitInfo(hitInfo);
+
+			packet.PutByte(0);
+			packet.PutInt(0);
+			packet.PutInt(0);
+			packet.PutInt(hitInfo.ForceId);
+			if (Versions.Client > KnownVersions.ClosedBeta1)
+			{
+				packet.PutByte(0);
+				packet.PutByte(0);
+				packet.PutFloat(hitInfo.UnkFloat1);
+				packet.PutFloat(hitInfo.DamageRatio);
+				packet.PutInt(hitInfo.HitCount);
+				packet.PutByte(1);
+				packet.PutInt(0);
+				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
+			}
+			else
+			{
+				packet.PutByte(1);
+				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
+			}
+		}
+
+		/// <summary>
+		/// Returns a framed hit info packet, for embedding in the additional
+		/// packet of a skill hit.
+		/// </summary>
+		/// <remarks>
+		/// An embedded packet carries its own header, with the id and checksum
+		/// fields left at zero the way official's embedded packets do, and is
+		/// padded out to the size its op declares.
+		/// </remarks>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="hitInfo"></param>
+		public static byte[] BuildHitInfoPacket(ICombatEntity attacker, ICombatEntity target, HitInfo hitInfo)
+		{
+			using var packet = Packet.Rent(Op.ZC_HIT_INFO);
+
+			packet.AddHitInfoPacket(attacker, target, hitInfo);
+
+			var op = OpTable.GetOp(Op.ZC_HIT_INFO);
+			var headerSize = Versions.Client >= 174236 ? sizeof(short) + sizeof(int) + sizeof(int) : sizeof(short) + sizeof(int);
+			var buffer = new byte[Math.Max(OpTable.GetSize(op), headerSize + packet.Length)];
+
+			buffer[0] = (byte)(op & 0xFF);
+			buffer[1] = (byte)((op >> 8) & 0xFF);
+			packet.Build(ref buffer, headerSize);
+
+			return buffer;
+		}
+
+		/// <summary>
 		/// Adds hit info data to the packet.
 		/// </summary>
 		/// <param name="packet"></param>
@@ -101,8 +175,8 @@ namespace Melia.Zone.Network.Helpers
 
 			packet.PutShort((short)hitInfo.ResultType);
 
-			packet.PutByte(0);
-			packet.PutByte(0);
+			packet.PutByte(hitInfo.IsHit);
+			packet.PutByte((byte)Math2.Clamp(0, byte.MaxValue, (int)hitInfo.HitDelay.TotalMilliseconds));
 			packet.PutByte(0);
 			packet.PutByte(0);
 		}

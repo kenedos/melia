@@ -112,6 +112,17 @@ namespace Melia.Zone.Skills.Combat
 		public byte VarInfoCount { get; set; } = 2;
 
 		/// <summary>
+		/// Gets or sets packets embedded in this hit, which the client
+		/// executes once the hit lands. Leave empty for none.
+		/// </summary>
+		/// <remarks>
+		/// Official carries a ZC_SYNC_EXEC here to fire the effects a
+		/// preceding sync block queued up. Whole framed packets go in,
+		/// concatenated, headers and all.
+		/// </remarks>
+		public byte[] AdditionalPacket { get; set; }
+
+		/// <summary>
 		/// Gets or sets the knock back information. Leave empty for none.
 		/// </summary>
 		public KnockBackInfo KnockBackInfo { get; set; }

@@ -52,10 +52,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 			var explosionDamage = baseDamage * BonusDamageRatio;
 
 			// Add explosion damage
-			skillHitResult.Damage += explosionDamage;
-
-			// Display as 2 hits for the explosion effect
-			skillHitResult.HitCount += 1;
+			skillHitResult.AddExtraLine(explosionDamage);
 
 			// TODO: Play explosion effect
 			// PlayEffect(target, "F_explosion065_violet", 1, 1, 'BOT')

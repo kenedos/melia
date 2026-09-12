@@ -39,19 +39,37 @@ namespace Melia.Zone.Buffs.Handlers
 				Send.ZC_MOVE_SPEED(character);
 		}
 
+		/// <summary>
+		/// Doubles the attack, which the client shows as a second shot.
+		/// </summary>
+		/// <param name="attacker"></param>
+		/// <param name="target"></param>
+		/// <param name="skill"></param>
+		/// <param name="modifier"></param>
+		/// <param name="skillHitResult"></param>
 		[CombatCalcModifier(CombatCalcPhase.BeforeCalc, BuffId.RunningShot_Buff)]
 		public void OnAttackBeforeCalc(ICombatEntity attacker, ICombatEntity target, Skill skill, SkillModifier modifier, SkillHitResult skillHitResult)
 		{
 			if (!attacker.TryGetBuff(BuffId.RunningShot_Buff, out var buff))
 				return;
 
-			if (skill.IsNormalAttack || skill.Id == SkillId.Bow_Hanging_Attack || skill.Id == SkillId.Cannon_Attack || skill.Id == SkillId.DoubleGun_Attack)
-			{
-				var factor = buff.NumArg2;
-				modifier.DamageMultiplier += factor / 100f;
-				modifier.HitCount += 1;
-			}
+			if (!this.IsRunningShotAttack(skill))
+				return;
+
+			var factor = buff.NumArg2;
+
+			// Halved because the hit count doubles the damage before splitting
+			// it, landing the pair on 2x plus the factor rather than 2x times it.
+			modifier.DamageMultiplier += factor / 200f;
+			modifier.HitCount += 1;
 		}
+
+		/// <summary>
+		/// Returns whether the buff's extra shot applies to the given skill.
+		/// </summary>
+		/// <param name="skill"></param>
+		private bool IsRunningShotAttack(Skill skill)
+			=> skill.IsNormalAttack || skill.Id == SkillId.Bow_Hanging_Attack || skill.Id == SkillId.Cannon_Attack || skill.Id == SkillId.DoubleGun_Attack;
 
 		private float GetMovingShotBonus(Buff buff)
 		{

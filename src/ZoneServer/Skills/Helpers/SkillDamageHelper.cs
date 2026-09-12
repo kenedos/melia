@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Shared.Util;
 using Melia.Zone.Buffs;
 using Melia.Zone.Network;
+using Melia.Zone.Network.Helpers;
 using Melia.Zone.Pads;
 using Melia.Zone.Scripting.AI;
 using Melia.Zone.Skills.Combat;
@@ -222,6 +224,8 @@ namespace Melia.Zone.Skills.Helpers
 					skillHit.HitEffect = HitEffect.Impact;
 					if (skillModifier == SkillModifier.Default)
 						skillHit.VarInfoCount = 0;
+					ApplyExtraLines(skillHit);
+
 					hits.Add(skillHit);
 				}
 			}
@@ -271,6 +275,75 @@ namespace Melia.Zone.Skills.Helpers
 				pad.Destroy();
 				skill.Vars.Remove($"Melia.{skill.Id}.PadHandle");
 			}
+		}
+
+		/// <summary>
+		/// How far apart the extra damage lines on one hit are spaced, so they
+		/// read as separate numbers rather than landing on top of each other.
+		/// </summary>
+		private static readonly TimeSpan ExtraLineDelay = TimeSpan.FromMilliseconds(50);
+
+		/// <summary>
+		/// Deals the extra damage lines added to the hit and embeds them in
+		/// it, to be shown as numbers of their own beside the hit's damage.
+		/// </summary>
+		/// <remarks>
+		/// A line goes in as a whole ZC_HIT_INFO packet inside the hit's
+		/// AdditionalPacket, which the client executes when the hit lands.
+		/// That is the only shape the format offers for a line whose damage
+		/// differs from the hit's: a second entry in the hit array reads as a
+		/// separate attack, and the hit's own HitCount divides its damage into
+		/// equal parts rather than adding to it.
+		///
+		/// A line's damage is split across the hit's display count, because
+		/// the client runs the embedded packet for each hit it draws. The
+		/// damage itself still lands once, in full.
+		///
+		/// The lines are dealt here rather than where they were added, because
+		/// each line's HitInfo has to read the HP the one before it left. A
+		/// site that does not pass its hits through this drops the lines
+		/// entirely, dealing no damage for them.
+		/// </remarks>
+		/// <param name="hit"></param>
+		public static void ApplyExtraLines(SkillHitInfo hit)
+		{
+			var extraLines = hit.HitResult.ExtraLines;
+			if (extraLines.Count == 0)
+				return;
+
+			var attacker = hit.Attacker;
+			var target = hit.Target;
+			var mainDamage = hit.HitInfo.Damage;
+			var hitDelay = hit.HitDelay;
+			var embedded = new List<byte[]>();
+
+			// The client runs an embedded packet once per displayed hit, so a
+			// line riding on a hit that splits is shown in as many parts.
+			var displayCount = Math.Max(1, hit.HitCount);
+
+			foreach (var line in extraLines)
+			{
+				if (target.IsDead)
+					break;
+
+				target.TakeDamage(line.Damage, attacker);
+
+				var skillId = line.SkillId != SkillId.None ? line.SkillId : hit.Skill.Id;
+				var lineInfo = new HitInfo(attacker, target, skillId, line.Damage / displayCount, hit.Skill.Data.HitType, HitResultType.Hit);
+
+				lineInfo.HitDelay = hitDelay + ExtraLineDelay * embedded.Count;
+				lineInfo.AttackType = (HitAttackType)hit.AttackType;
+				lineInfo.DamageRatio = mainDamage > 0 ? line.Damage / mainDamage : 0;
+
+				embedded.Add(HitInfoHelpers.BuildHitInfoPacket(attacker, target, lineInfo));
+			}
+
+			extraLines.Clear();
+
+			if (embedded.Count == 0)
+				return;
+
+			hit.AdditionalPacket = embedded.Count == 1 ? embedded[0] : embedded.SelectMany(b => b).ToArray();
 		}
 
 		public static void SkillHitCircle(ICombatEntity caster, Skill skill, Position position, float range, List<SkillHitInfo> hits = null)

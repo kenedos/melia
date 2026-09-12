@@ -70,6 +70,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+			SkillDamageHelper.ApplyExtraLines(skillHit);
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 		}
@@ -143,6 +144,7 @@ namespace Melia.Zone.Skills.Handlers.Common
 			target.TakeDamage(skillHitResult.Damage, caster);
 
 			var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, aniTime, skillHitDelay);
+			SkillDamageHelper.ApplyExtraLines(skillHit);
 
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill, skillHit);
 

@@ -3027,32 +3027,7 @@ namespace Melia.Zone.Network
 		{
 			using var packet = Packet.Rent(Op.ZC_HIT_INFO);
 
-			packet.PutInt(target.Handle);
-			packet.PutInt(attacker.Handle);
-			packet.PutInt((int)hitInfo.SkillId);
-
-			packet.AddHitInfo(hitInfo);
-
-			packet.PutByte(0);
-			packet.PutInt(0);
-			packet.PutInt(0);
-			packet.PutInt(hitInfo.ForceId);
-			if (Versions.Client > KnownVersions.ClosedBeta1)
-			{
-				packet.PutByte(0);
-				packet.PutByte(0);
-				packet.PutFloat(hitInfo.UnkFloat1);
-				packet.PutFloat(hitInfo.UnkFloat2);
-				packet.PutInt(hitInfo.HitCount);
-				packet.PutByte(1);
-				packet.PutInt(0);
-				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
-			}
-			else
-			{
-				packet.PutByte(1);
-				packet.PutInt((int)hitInfo.AniTime.TotalMilliseconds);
-			}
+			packet.AddHitInfoPacket(attacker, target, hitInfo);
 
 			target.Map.Broadcast(packet, target);
 		}
@@ -5005,6 +4980,29 @@ namespace Melia.Zone.Network
 				packet.PutString("", 64);
 				packet.PutInt(0);
 			}
+
+			conn.Send(packet);
+		}
+
+		/// <summary>
+		/// Sends a closed shop list to one viewer, taking the given shop
+		/// off their screen without closing it for anyone else.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="shopOwnerHandle"></param>
+		/// <param name="shop"></param>
+		public static void ZC_AUTOSELLER_LIST_CLOSED(IZoneConnection conn, int shopOwnerHandle, ShopData shop)
+		{
+			using var packet = Packet.Rent(Op.ZC_AUTOSELLER_LIST);
+
+			packet.PutInt(shopOwnerHandle);
+			packet.PutInt(shop.EffectId);
+			packet.PutByte(true);
+			packet.PutInt((int)shop.Type);
+			packet.PutInt(0);
+			packet.PutInt(0);
+			packet.PutString("", 64);
+			packet.PutInt(0);
 
 			conn.Send(packet);
 		}

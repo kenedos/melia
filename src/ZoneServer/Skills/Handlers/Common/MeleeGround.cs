@@ -8,6 +8,7 @@ using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
 using static Melia.Zone.Skills.SkillUseFunctions;
@@ -109,6 +110,8 @@ namespace Melia.Zone.Skills.Handlers.Common
 					hitAniTime = TimeSpan.FromMilliseconds(aniTime.TotalMilliseconds / skillHitResult.HitCount);
 
 				var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, hitAniTime, skillHitDelay);
+				SkillDamageHelper.ApplyExtraLines(skillHit);
+
 				hits.Add(skillHit);
 			}
 

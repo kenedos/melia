@@ -5296,128 +5296,13 @@ namespace Melia.Zone.Network
 			var amount = packet.GetInt();
 			var character = conn.SelectedCharacter;
 
-			// Check distance
-			if (!character.Map.TryGetCharacter(shopOwnerHandle, out var shopOwner) || !shopOwner.Position.InRange2D(character.Position, 25))
+			if (!character.Map.TryGetCharacter(shopOwnerHandle, out var shopOwner))
 			{
 				character.SystemMessage("FarFromFoodTable");
 				return;
 			}
 
-			if (shopOwner.Connection.ShopCreated == null)
-			{
-				Log.Warning("CZ_OPEN_AUTOSELLER: {0} has no shop open.", conn.Account.Name);
-				return;
-			}
-
-			var alreadyOpen = conn.ActiveShopOwnerHandle == shopOwner.Handle;
-
-			var shop = conn.ActiveShop = shopOwner.Connection.ShopCreated;
-			conn.ActiveShopOwnerHandle = shopOwner.Handle;
-
-			// A Spell Shop is bought from through this same request, which
-			// carries the buff's list index. Merely opening the shop sends
-			// -1 there, and leaves the amount beside it uninitialized.
-			if (shop.Type == PersonalShopType.SpellShop)
-			{
-				if (alreadyOpen && optionSelected >= 0)
-					PardonerSkillHelper.SellSpellShopBuff(character, shopOwner, shop, optionSelected);
-
-				// The owner's materials are what's for sale, and they can
-				// spend them anywhere between two visitors.
-				PardonerSkillHelper.RefreshSpellShopStock(shopOwner, shop);
-
-				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
-				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
-				return;
-			}
-
-			// ============================================================
-			// BUYSHOP (IsCustom=false) - Visitor wants to SELL items TO shop owner
-			// Uses ZC_AUTOSELLER_LIST packet only (Laima3 style)
-			// ============================================================
-			if (!shop.IsCustom)
-			{
-				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
-				return;
-			}
-
-			// ============================================================
-			// SELLSHOP (IsCustom=true) - Visitor wants to BUY items FROM shop owner
-			// Uses MeliaCustomShop dialog system
-			// ============================================================
-
-			// Owner clicking their own sellshop - show management UI
-			if (character.Handle == shopOwner.Handle)
-			{
-				Send.ZC_EXEC_CLIENT_SCP(conn, string.Format(
-					"MY_AUTOSELL_LIST('PersonalShop', {0})",
-					(int)PersonalShopType.PersonalSell));
-				return;
-			}
-
-			// Visitor opening a sellshop - send custom shop data via Melia.Comm and open dialog
-			// The items themselves go over as a preview list, so their
-			// sockets and gems reach the client's tooltip.
-			var shopItems = new List<Item>();
-			foreach (var productData in shop.Products.Values)
-			{
-				if (productData.ItemWorldIds.Count == 0)
-					continue;
-
-				if (shopOwner.Inventory.TryGetItem(productData.ItemWorldIds[0], out var shopItem))
-					shopItems.Add(shopItem);
-			}
-
-			ItemPreview.Show(character, shopItems);
-
-			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.BeginRecv('CustomShop')");
-
-			var sb = new StringBuilder();
-			foreach (var productData in shop.Products.Values)
-			{
-				// Get item properties for tooltip display
-				var propsStr = "nil";
-				var worldId = 0L;
-				if (productData.ItemWorldIds.Count > 0)
-				{
-					worldId = productData.ItemWorldIds[0];
-					if (shopOwner.Inventory.TryGetItem(worldId, out var item))
-					{
-						try
-						{
-							propsStr = item.SerializePropertiesToLua();
-						}
-						catch (Exception ex)
-						{
-							Log.Warning("Failed to serialize item properties for shop: {0}", ex.Message);
-							propsStr = "nil";
-						}
-					}
-				}
-
-				// Format: { productId, itemId, amount, price, properties, worldId }
-				var entry = string.Format("{{ {0},{1},{2},{3},{4},'{5}' }},", productData.Id, productData.ItemId, productData.Amount, productData.Price, propsStr, worldId);
-
-				// Flushed before the entry rather than after it: a socketed
-				// item's properties alone can outgrow what the client takes.
-				if (sb.Length > 0 && sb.Length + entry.Length > ClientScript.ScriptMaxLength - 64)
-				{
-					Send.ZC_EXEC_CLIENT_SCP(conn, $"Melia.Comm.Recv('CustomShop', {{ {sb} }})");
-					sb.Clear();
-				}
-
-				sb.Append(entry);
-			}
-
-			if (sb.Length > 0)
-			{
-				Send.ZC_EXEC_CLIENT_SCP(conn, $"Melia.Comm.Recv('CustomShop', {{ {sb} }})");
-				sb.Clear();
-			}
-
-			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.ExecData('CustomShop', M_SET_CUSTOM_SHOP)");
-			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.EndRecv('CustomShop')");
-			Send.ZC_DIALOG_TRADE(conn, "MeliaCustomShop");
+			ShopBuilder.RequestShopOpen(conn, character, shopOwner, optionSelected);
 		}
 
 		/// <summary>
@@ -5438,20 +5323,8 @@ namespace Melia.Zone.Network
 				Log.Warning("CZ_AUTOSELLER_BUYER_CLOSE: {0} has no shop open.", conn.Account.Name);
 				return;
 			}
-			var shop = conn.ActiveShop;
-
-			if (!character.Map.TryGetCharacter(shopOwnerHandle, out var shopOwner))
-			{
-				Log.Warning("CZ_AUTOSELLER_BUYER_CLOSE: {0} shop owner not found.", conn.Account.Name);
-				return;
-			}
-
-			if (shop != shopOwner.Connection.ShopCreated)
-			{
-				Log.Warning("CZ_AUTOSELLER_BUYER_CLOSE: {0} tried to close a different shop than the one open.", conn.Account.Name);
-				return;
-			}
-
+			// The window is down on the client either way, so the character
+			// is no longer browsing whatever the handle resolves to.
 			conn.ActiveShop = null;
 			conn.ActiveShopOwnerHandle = 0;
 			Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);

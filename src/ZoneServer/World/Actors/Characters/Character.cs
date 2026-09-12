@@ -625,6 +625,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Components.Update(elapsed);
 			this.UpdateResurrection(elapsed);
 			PardonerSkillHelper.UpdateFullBoxTimer(this);
+			ShopBuilder.UpdateShopDistance(this);
 			this.Properties.FlushCompanionPropertyUpdates();
 			this.FlushDueStackPickups();
 		}

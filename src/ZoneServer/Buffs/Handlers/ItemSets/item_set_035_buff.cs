@@ -44,11 +44,7 @@ namespace Melia.Zone.Buffs.Handlers.ItemSets
 				return;
 
 			// Add 15% bonus damage as Ice magic true damage
-			var bonusDamage = skillHitResult.Damage * BonusDamageRatio;
-			skillHitResult.Damage += bonusDamage;
-
-			// Add extra hit line to display
-			skillHitResult.HitCount += 1;
+			skillHitResult.AddExtraLine(skillHitResult.Damage * BonusDamageRatio);
 		}
 	}
 }

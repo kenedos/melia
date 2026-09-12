@@ -68,14 +68,38 @@ namespace Melia.Zone.Skills.Combat
 		public HitAttackType AttackType { get; set; } = HitAttackType.None;
 
 		/// <summary>
+		/// Gets or sets whether the hit lands, which official sets on every
+		/// hit it sends.
+		/// </summary>
+		public bool IsHit { get; set; } = true;
+
+		/// <summary>
+		/// Gets or sets the hit's delay, which holds the damage back until
+		/// the attack it belongs to connects.
+		/// </summary>
+		/// <remarks>
+		/// Zero on a skill's own hits, which take their timing from the skill
+		/// packet instead. A hit sent outside one has no such timing and
+		/// displays the moment it arrives unless this is set, which is what
+		/// makes an added line read as a second attack rather than as part of
+		/// the one it belongs to. Capped at a byte on the wire.
+		/// </remarks>
+		public TimeSpan HitDelay { get; set; }
+
+		/// <summary>
 		/// Gets or sets the hit's unknown float 1.
 		/// </summary>
 		public float UnkFloat1 { get; set; } = 0f;
 
 		/// <summary>
-		/// Gets or sets the hit's unknown float 2.
+		/// Gets or sets the share of the attack's damage this hit deals, for
+		/// a hit that rides on another one.
 		/// </summary>
-		public float UnkFloat2 { get; set; } = 0f;
+		/// <remarks>
+		/// Zero on an attack's own hit. Official's added damage lines carry
+		/// their ratio here, 0.15 for a Spell Shop Sacrament hit.
+		/// </remarks>
+		public float DamageRatio { get; set; } = 0f;
 
 		/// <summary>
 		/// Gets or sets the delay before the damage is shown.

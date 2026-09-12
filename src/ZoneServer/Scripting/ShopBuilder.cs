@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
+using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World;
@@ -18,6 +20,22 @@ namespace Melia.Zone.Scripting
 	/// </summary>
 	public class ShopBuilder
 	{
+		/// <summary>
+		/// How far away a character may ask for a shop to be opened from.
+		/// </summary>
+		/// <remarks>
+		/// The client walks the character up to a shop it was told to open
+		/// and asks once it's happy with the distance, which leaves this as
+		/// a cap on requests rather than a distance anyone stands at.
+		/// </remarks>
+		public const int ShopRequestRange = 80;
+
+		/// <summary>
+		/// How far a character may get from a shop's owner before the shop
+		/// is taken off their screen.
+		/// </summary>
+		public const int ShopCloseRange = 80;
+
 		private const string OwnerFundsWarnedVar = "Melia.Oblation.OwnerFundsWarned";
 
 		private readonly ShopData _shopData;
@@ -456,6 +474,224 @@ namespace Melia.Zone.Scripting
 			Send.ZC_NORMAL.ShopAnimation(shopOwner, shop.ShopAnimation, 1, 0);
 
 			conn.ShopCreated = null;
+		}
+
+		/// <summary>
+		/// Walks the given character to the owner of the shop they asked to
+		/// open as necessary, and opens it for them once they're there.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="character"></param>
+		/// <param name="shopOwner"></param>
+		/// <param name="optionSelected"></param>
+		public static void RequestShopOpen(IZoneConnection conn, Character character, Character shopOwner, int optionSelected)
+		{
+			// Nothing but a client that was made to send it asks to shop
+			// from farther away than one can be clicked from.
+			if (!character.Position.InRange2D(shopOwner.Position, ShopRequestRange))
+			{
+				character.SystemMessage("FarFromFoodTable");
+				return;
+			}
+
+			OpenShopView(conn, character, shopOwner, optionSelected);
+		}
+
+		/// <summary>
+		/// Opens the given owner's shop on the given character's client.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="character"></param>
+		/// <param name="shopOwner"></param>
+		/// <param name="optionSelected"></param>
+		private static void OpenShopView(IZoneConnection conn, Character character, Character shopOwner, int optionSelected)
+		{
+			if (shopOwner.Map != character.Map)
+				return;
+
+			if (shopOwner.Connection.ShopCreated == null)
+			{
+				Log.Warning("OpenShopView: {0} has no shop open.", shopOwner.Name);
+				return;
+			}
+
+			var alreadyOpen = conn.ActiveShopOwnerHandle == shopOwner.Handle;
+
+			var shop = conn.ActiveShop = shopOwner.Connection.ShopCreated;
+			conn.ActiveShopOwnerHandle = shopOwner.Handle;
+
+			// A Spell Shop is bought from through this same request, which
+			// carries the buff's list index. Merely opening the shop sends
+			// -1 there, and leaves the amount beside it uninitialized.
+			if (shop.Type == PersonalShopType.SpellShop)
+			{
+				if (alreadyOpen && optionSelected >= 0)
+					PardonerSkillHelper.SellSpellShopBuff(character, shopOwner, shop, optionSelected);
+
+				// The owner's materials are what's for sale, and they can
+				// spend them anywhere between two visitors.
+				PardonerSkillHelper.RefreshSpellShopStock(shopOwner, shop);
+
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+				Send.ZC_AUTOSELLER_LIST(shopOwner.Connection, shopOwner);
+				return;
+			}
+
+			// ============================================================
+			// BUYSHOP (IsCustom=false) - Visitor wants to SELL items TO shop owner
+			// Uses ZC_AUTOSELLER_LIST packet only (Laima3 style)
+			// ============================================================
+			if (!shop.IsCustom)
+			{
+				Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
+				return;
+			}
+
+			// ============================================================
+			// SELLSHOP (IsCustom=true) - Visitor wants to BUY items FROM shop owner
+			// Uses MeliaCustomShop dialog system
+			// ============================================================
+
+			// Owner clicking their own sellshop - show management UI
+			if (character.Handle == shopOwner.Handle)
+			{
+				Send.ZC_EXEC_CLIENT_SCP(conn, string.Format(
+					"MY_AUTOSELL_LIST('PersonalShop', {0})",
+					(int)PersonalShopType.PersonalSell));
+				return;
+			}
+
+			// Visitor opening a sellshop - send custom shop data via Melia.Comm and open dialog
+			// The items themselves go over as a preview list, so their
+			// sockets and gems reach the client's tooltip.
+			var shopItems = new List<Item>();
+			foreach (var productData in shop.Products.Values)
+			{
+				if (productData.ItemWorldIds.Count == 0)
+					continue;
+
+				if (shopOwner.Inventory.TryGetItem(productData.ItemWorldIds[0], out var shopItem))
+					shopItems.Add(shopItem);
+			}
+
+			ItemPreview.Show(character, shopItems);
+
+			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.BeginRecv('CustomShop')");
+
+			var sb = new StringBuilder();
+			foreach (var productData in shop.Products.Values)
+			{
+				// Get item properties for tooltip display
+				var propsStr = "nil";
+				var worldId = 0L;
+				if (productData.ItemWorldIds.Count > 0)
+				{
+					worldId = productData.ItemWorldIds[0];
+					if (shopOwner.Inventory.TryGetItem(worldId, out var item))
+					{
+						try
+						{
+							propsStr = item.SerializePropertiesToLua();
+						}
+						catch (Exception ex)
+						{
+							Log.Warning("Failed to serialize item properties for shop: {0}", ex.Message);
+							propsStr = "nil";
+						}
+					}
+				}
+
+				// Format: { productId, itemId, amount, price, properties, worldId }
+				var entry = string.Format("{{ {0},{1},{2},{3},{4},'{5}' }},", productData.Id, productData.ItemId, productData.Amount, productData.Price, propsStr, worldId);
+
+				// Flushed before the entry rather than after it: a socketed
+				// item's properties alone can outgrow what the client takes.
+				if (sb.Length > 0 && sb.Length + entry.Length > ClientScript.ScriptMaxLength - 64)
+				{
+					Send.ZC_EXEC_CLIENT_SCP(conn, $"Melia.Comm.Recv('CustomShop', {{ {sb} }})");
+					sb.Clear();
+				}
+
+				sb.Append(entry);
+			}
+
+			if (sb.Length > 0)
+			{
+				Send.ZC_EXEC_CLIENT_SCP(conn, $"Melia.Comm.Recv('CustomShop', {{ {sb} }})");
+				sb.Clear();
+			}
+
+			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.ExecData('CustomShop', M_SET_CUSTOM_SHOP)");
+			Send.ZC_EXEC_CLIENT_SCP(conn, "Melia.Comm.EndRecv('CustomShop')");
+			Send.ZC_DIALOG_TRADE(conn, "MeliaCustomShop");
+		}
+
+
+		/// <summary>
+		/// Closes the shop the given character is browsing if they walked
+		/// out of reach of its owner or the shop is no longer there.
+		/// </summary>
+		/// <param name="character"></param>
+		public static void UpdateShopDistance(Character character)
+		{
+			var conn = character.Connection;
+			var shop = conn?.ActiveShop;
+
+			if (shop == null || conn.ActiveShopOwnerHandle == 0)
+				return;
+
+			if (character.Map != null && character.Map.TryGetCharacter(conn.ActiveShopOwnerHandle, out var shopOwner))
+			{
+				if (shopOwner.Connection?.ShopCreated == shop && !shop.IsClosed && shopOwner.Position.InRange2D(character.Position, ShopCloseRange))
+					return;
+			}
+
+			CloseShopView(character);
+		}
+
+		/// <summary>
+		/// Takes the shop the given character is browsing off their screen,
+		/// leaving it open for everyone else.
+		/// </summary>
+		/// <param name="viewer"></param>
+		public static void CloseShopView(Character viewer)
+		{
+			var conn = viewer.Connection;
+			var shop = conn?.ActiveShop;
+
+			if (shop == null)
+				return;
+
+			var shopOwnerHandle = conn.ActiveShopOwnerHandle;
+
+			conn.ActiveShop = null;
+			conn.ActiveShopOwnerHandle = 0;
+
+			Send.ZC_AUTOSELLER_LIST_CLOSED(conn, shopOwnerHandle, shop);
+
+			switch (shop.Type)
+			{
+				case PersonalShopType.SpellShop:
+					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('buffseller_target')");
+					break;
+
+				case PersonalShopType.Oblation:
+					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('oblation_sell')");
+					break;
+
+				default:
+					Send.ZC_EXEC_CLIENT_SCP(conn, "ui.CloseFrame('personal_shop_target')");
+
+					if (shop.IsCustom)
+					{
+						Send.ZC_DIALOG_CLOSE(conn);
+						Send.ZC_LEAVE_TRIGGER(conn);
+					}
+					break;
+			}
+
+			Send.ZC_ENABLE_CONTROL(conn, "AUTOSELLER", true);
+			Send.ZC_LOCK_KEY(viewer, "AUTOSELLER", false);
 		}
 
 		/// <summary>
