@@ -41,6 +41,18 @@ namespace Melia.Shared.Data.Database
 		public int EffectId { get; set; }
 
 		/// <summary>
+		/// Who the shop's owner opened it to - 0 for themselves, 1 for
+		/// their guild, 2 for everyone.
+		/// </summary>
+		public int Shared { get; set; }
+
+		/// <summary>
+		/// The handle of the actor the shop put in the world, for the
+		/// shops that stand on one.
+		/// </summary>
+		public int PropHandle { get; set; }
+
+		/// <summary>
 		/// The skill the shop was opened with.
 		/// </summary>
 		/// <remarks>

@@ -4928,7 +4928,19 @@ namespace Melia.Zone.Network
 					packet.PutInt(product.Amount);
 					packet.PutEmptyBin(260);
 				}
-				packet.PutInt(0); // Seller property count
+
+				// A Refreshment Table's window reads its owner and who they
+				// opened it to from here, in place of the property list
+				// every other shop ends with.
+				if (shop.Type == PersonalShopType.FoodTable)
+				{
+					packet.PutLong(character.ObjectId);
+					packet.PutInt(shop.Shared);
+				}
+				else
+				{
+					packet.PutInt(0); // Seller property count
+				}
 			}
 			else
 			{
@@ -4975,7 +4987,19 @@ namespace Melia.Zone.Network
 					packet.PutInt(product.Amount);
 					packet.PutEmptyBin(260);
 				}
-				packet.PutInt(0); // Seller property count
+
+				// A Refreshment Table's window reads its owner and who they
+				// opened it to from here, in place of the property list
+				// every other shop ends with.
+				if (shop.Type == PersonalShopType.FoodTable)
+				{
+					packet.PutLong(character.ObjectId);
+					packet.PutInt(shop.Shared);
+				}
+				else
+				{
+					packet.PutInt(0); // Seller property count
+				}
 			}
 			else
 			{

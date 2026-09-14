@@ -4746,7 +4746,7 @@ namespace Melia.Zone.Network
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.StatusEffect);
 
 				packet.PutInt(actor.Handle);
-				packet.PutFloat(duration);
+				packet.PutInt((int)duration);
 				packet.PutLpString(effectName);
 				packet.PutLpString(effectType);
 

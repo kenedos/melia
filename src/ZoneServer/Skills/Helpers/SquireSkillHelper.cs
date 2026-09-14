@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
 using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
@@ -74,6 +75,9 @@ namespace Melia.Zone.Skills.Helpers
 			new(6, BuffId.squire_food6_buff, 6, null, [("food_038", 6)]),
 		];
 
+		private const int SharedWithGuild = 1;
+		private const int SharedWithEveryone = 2;
+
 		private static readonly TimeSpan FoodBuffDuration = TimeSpan.FromMinutes(45);
 		private static readonly TimeSpan FoodBuffDurationPerAbilityLevel = TimeSpan.FromMinutes(1);
 
@@ -123,6 +127,12 @@ namespace Melia.Zone.Skills.Helpers
 			if (shop.Level < dish.SkillLevel)
 			{
 				eater.SystemMessage("NotEnoughMaterial");
+				return;
+			}
+
+			if (!IsServedTo(eater, squire, shop))
+			{
+				eater.ServerMessage(Localization.Get("This table isn't serving you."));
 				return;
 			}
 
@@ -180,6 +190,24 @@ namespace Melia.Zone.Skills.Helpers
 			}
 
 			Send.ZC_ADDON_MSG(eater, AddonMessage.INV_ITEM_CHANGE_COUNT, 0, null);
+		}
+
+		/// <summary>
+		/// Returns whether the given table's owner opened it to the given
+		/// character.
+		/// </summary>
+		/// <param name="eater"></param>
+		/// <param name="squire"></param>
+		/// <param name="shop"></param>
+		private static bool IsServedTo(Character eater, Character squire, ShopData shop)
+		{
+			if (eater == squire || shop.Shared >= SharedWithEveryone)
+				return true;
+
+			if (shop.Shared == SharedWithGuild)
+				return squire.GuildId != 0 && eater.GuildId == squire.GuildId;
+
+			return false;
 		}
 
 		/// <summary>

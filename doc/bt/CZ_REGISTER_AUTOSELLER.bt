@@ -17,9 +17,9 @@ typedef struct
 {
     int classId;
     int index;
-    int i1;
     int price;
     int amount;
+    int i1;
     byte unk1[260];
 }
 AutoSellerItem <optimize=false, read=readAutoSellerItem>;
@@ -35,17 +35,17 @@ typedef struct
 {
     int classId;
     int index;
-    int i1;
     int price;
-    int amount;
+    int skillLevel;
+    int i1;
     byte unk1[256];
 }
-AutoSellerBuff <optimize=false, read=readAutoSellerBuff>;
+AutoSellerSkillItem <optimize=false, read=readAutoSellerSkillItem>;
 
-string readAutoSellerBuff(AutoSellerBuff& v)
+string readAutoSellerSkillItem(AutoSellerSkillItem& v)
 {
     string result;
-    SPrintf(result, "%d, %d for %d each", v.classId, v.amount, v.price);
+    SPrintf(result, "%d for %d each", v.classId, v.price);
     return result;
 }
 
@@ -56,7 +56,14 @@ int count; // -1 = close shop
 int group; // see packeteffects.xml, PersonalShop = 270065, 690006 = RepairShop
 int skillId;
 
-if (count > 0 && (skillId != 40805 && skillId != 40804))
-    AutoSellerItem items[count];
-else
-    AutoSellerBuff buffs[count];
+if (count > 0)
+{
+    if (skillId == 0)
+        AutoSellerItem items[count];
+    else
+        AutoSellerSkillItem skillItems[count];
+}
+
+// Only shops that can be opened to others - Refreshment Table, Spell Shop
+if (!FEof())
+    int shared; // 0 = owner, 1 = guild, 2 = everyone

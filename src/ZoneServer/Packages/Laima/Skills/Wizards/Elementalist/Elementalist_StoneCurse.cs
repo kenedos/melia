@@ -50,6 +50,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			var castTimeMs = skill.Data.BasicCast * castingSpeed / 100f;
 			skill.Vars.Set(VarCastTimeMs, castTimeMs);
 
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
+
 			skill.Run(this.HandleCasting(caster, skill));
 		}
 
@@ -72,7 +74,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 		{
 			caster.RemoveBuff(BuffId.Chainreaction_Runpad_Buff);
 			caster.StopSound("skl_eff_lightningsphere_cast", "skl_eff_lightningsphere_cast");
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 		}
 
 		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
@@ -80,10 +82,8 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			var targetHandle = target?.Handle ?? 0;
-
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 			var padsSnapshot = skill.Vars.Get<List<Pad>>(VarPads);

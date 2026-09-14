@@ -292,6 +292,15 @@ namespace Melia.Zone.Scripting
 			if (result != TimeActionResult.Completed)
 				return;
 
+			await OpenWarpDestinations(dialog);
+		}
+
+		/// <summary>
+		/// Lets the character travel to the warp statues they unlocked.
+		/// </summary>
+		/// <param name="dialog"></param>
+		public static async Task OpenWarpDestinations(Dialog dialog)
+		{
 			if (ZoneServer.Instance.Conf.World.FastTravelEnabled)
 			{
 				await dialog.ExecuteScript("SIMPLEMAP_OPEN_WARP_MODE()");

@@ -26,7 +26,7 @@ int sellerItemCount; // 0 (Count?)
 typedef struct
 {
     int itemIdorSkillId; // Could be
-    int amount;
+    int remainCount;
     int cost;
     int level; // Used with Buff Shop
     byte bin[260]; // Portal Shop value: f_pilgrimroad_41_3#-812#62#639
@@ -57,7 +57,12 @@ if (sellerItemCount > 0)
 {
     SellerItem items[sellerItemCount];
 }
-if (!FEof())
+if (type == 5) // Food Table
+{
+    int64 sellerCID;
+    int shared; // 0 = owner, 1 = guild, 2 = everyone
+}
+else if (!FEof())
 {
     int i1;
     if (i1 > 0)

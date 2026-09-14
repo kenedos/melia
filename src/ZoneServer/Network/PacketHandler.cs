@@ -5136,7 +5136,7 @@ namespace Melia.Zone.Network
 									}
 
 									product.ItemId = itemId;
-									product.Price = price;
+									product.Price = requiredAmount;
 									product.Amount = shop.Level;
 									product.RequiredAmount = SquireSkillHelper.GetDishStock(character, itemId, shop.Level);
 									shop.AddProduct(product);
@@ -5148,9 +5148,9 @@ namespace Melia.Zone.Network
 								else if (SquireSkillHelper.IsServiceShop(shop))
 								{
 									product.ItemId = itemId;
-									product.Price = price;
+									product.Price = requiredAmount;
 									product.Amount = shop.Level;
-									product.RequiredAmount = requiredAmount;
+									product.RequiredAmount = 0;
 									shop.AddProduct(product);
 								}
 								else
@@ -5168,6 +5168,11 @@ namespace Melia.Zone.Network
 									shop.AddProduct(product);
 								}
 							}
+
+							// Written once behind the whole list, saying who
+							// the owner opened the shop to.
+							if (packet.Remaining >= 4)
+								shop.Shared = packet.GetInt();
 						}
 					}
 					else
@@ -5251,6 +5256,7 @@ namespace Melia.Zone.Network
 				character.Connection.ShopCreated = shop;
 				Send.ZC_AUTOSELLER_LIST(conn, character);
 				Send.ZC_NORMAL.AutoSellerHistory(conn, shop);
+				ShopBuilder.CreateShopProp(character, shop);
 				Send.ZC_NORMAL.ShopAnimation(character, shop.ShopAnimation, 1, 1);
 				Send.ZC_AUTOSELLER_TITLE(character);
 

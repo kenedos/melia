@@ -10,6 +10,7 @@ using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Yggdrasil.Logging;
 
@@ -37,6 +38,11 @@ namespace Melia.Zone.Scripting
 		public const int ShopCloseRange = 80;
 
 		private const string OwnerFundsWarnedVar = "Melia.Oblation.OwnerFundsWarned";
+
+		private const int FoodTableMonsterId = 57457;
+		private const string FoodTableDialogName = "SQUIRE_FOODTABLE";
+		private const float FoodTableRange = 100;
+		private const float FoodTableScale = 0.5f;
 
 		private readonly ShopData _shopData;
 		private int _productClassId = 100_001;
@@ -464,6 +470,8 @@ namespace Melia.Zone.Scripting
 			if (shop == null)
 				return;
 
+			RemoveShopProp(shopOwner, shop);
+
 			shop.IsClosed = true;
 
 			Send.ZC_AUTOSELLER_LIST(conn, shopOwner);
@@ -483,6 +491,49 @@ namespace Melia.Zone.Scripting
 			Send.ZC_NORMAL.ShopAnimation(shopOwner, shop.ShopAnimation, 1, 0);
 
 			conn.ShopCreated = null;
+		}
+
+		/// <summary>
+		/// Puts the actor the given shop stands on into the world, if it
+		/// has one.
+		/// </summary>
+		/// <remarks>
+		/// A Refreshment Table is a real object in the world, unlike every
+		/// other personal shop, which is nothing but an animation and a
+		/// balloon on its owner.
+		/// </remarks>
+		/// <param name="shopOwner"></param>
+		/// <param name="shop"></param>
+		public static void CreateShopProp(Character shopOwner, ShopData shop)
+		{
+			if (shop.Type != PersonalShopType.FoodTable || shopOwner.Map == null)
+				return;
+
+			var name = "!@#${TeamName}_foodtable$*$TeamName$*$" + shopOwner.Name + "#@!";
+
+			var table = new Npc(FoodTableMonsterId, name, shopOwner.Position, shopOwner.Direction);
+			table.DialogName = FoodTableDialogName;
+			table.Properties.SetFloat(PropertyName.Range, FoodTableRange);
+			table.Properties.SetFloat(PropertyName.Scale, FoodTableScale);
+
+			shopOwner.Map.AddMonster(table);
+			shop.PropHandle = table.Handle;
+		}
+
+		/// <summary>
+		/// Takes the actor the given shop stands on back out of the world.
+		/// </summary>
+		/// <param name="shopOwner"></param>
+		/// <param name="shop"></param>
+		private static void RemoveShopProp(Character shopOwner, ShopData shop)
+		{
+			if (shop.PropHandle == 0)
+				return;
+
+			if (shopOwner.Map != null && shopOwner.Map.TryGetMonster(shop.PropHandle, out var prop))
+				shopOwner.Map.RemoveMonster(prop);
+
+			shop.PropHandle = 0;
 		}
 
 		/// <summary>

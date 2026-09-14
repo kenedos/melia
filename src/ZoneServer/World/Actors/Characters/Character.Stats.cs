@@ -246,6 +246,14 @@ namespace Melia.Zone.World.Actors.Characters
 			if (this.IsDead)
 				return;
 
+			var bonusExpRate = this.Properties.GetFloat(PropertyName.BonusExp_BM) / 100f;
+			var bonusJobExpRate = this.Properties.GetFloat(PropertyName.BonusJobExp_BM) / 100f;
+
+			if (bonusExpRate != 0)
+				exp = (long)(exp * (1 + bonusExpRate));
+			if (bonusJobExpRate != 0)
+				jobExp = (long)(jobExp * (1 + bonusJobExpRate));
+
 			// Base EXP
 			this.Exp += exp;
 			this.TotalExp += exp;
