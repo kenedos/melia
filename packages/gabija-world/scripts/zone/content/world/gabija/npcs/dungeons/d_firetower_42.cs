@@ -1,0 +1,16 @@
+//--- Melia Script ----------------------------------------------------------
+// Mage Tower 2F
+//--- Description -----------------------------------------------------------
+// NPCs found in and around Mage Tower 2F.
+//---------------------------------------------------------------------------
+
+using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting;
+using static Melia.Zone.Scripting.Shortcuts;
+
+public class DFiretower42NpcScript : GeneralScript
+{
+	protected override void Load()
+	{
+	}
+}

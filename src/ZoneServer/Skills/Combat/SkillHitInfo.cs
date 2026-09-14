@@ -116,7 +116,7 @@ namespace Melia.Zone.Skills.Combat
 		/// executes once the hit lands. Leave empty for none.
 		/// </summary>
 		/// <remarks>
-		/// Official carries a ZC_SYNC_EXEC here to fire the effects a
+		/// The game carries a ZC_SYNC_EXEC here to fire the effects a
 		/// preceding sync block queued up. Whole framed packets go in,
 		/// concatenated, headers and all.
 		/// </remarks>

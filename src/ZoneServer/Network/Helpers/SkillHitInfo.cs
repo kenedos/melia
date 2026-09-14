@@ -133,7 +133,7 @@ namespace Melia.Zone.Network.Helpers
 		/// </summary>
 		/// <remarks>
 		/// An embedded packet carries its own header, with the id and checksum
-		/// fields left at zero the way official's embedded packets do, and is
+		/// fields left at zero the way the game's embedded packets do, and is
 		/// padded out to the size its op declares.
 		/// </remarks>
 		/// <param name="attacker"></param>

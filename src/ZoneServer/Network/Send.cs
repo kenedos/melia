@@ -630,7 +630,7 @@ namespace Melia.Zone.Network
 			// but it's a bit long for that. A couple dozens updates
 			// ago there were also only two bytes before the properties,
 			// but one garbage byte at the end of the packet to pad it.
-			// We'll just mimic the official packets for now.
+			// We'll just mimic the game's packets for now.
 			//
 			// Alternative theory: It could also be a string that wasn't
 			// zeroed, and maybe a few bytes or something.
@@ -1157,7 +1157,7 @@ namespace Melia.Zone.Network
 		/// <param name="conn"></param>
 		public static void ZC_OPTION_LIST(IZoneConnection conn)
 		{
-			// Officials don't always send all options, but only the ones
+			// The game doesn't always send all options, but only the ones
 			// that were changed from their default values, resulting in
 			// an empty string in this packet if no options were changed
 			// yet. We could technically do that as well, but we'd need
@@ -2899,7 +2899,7 @@ namespace Melia.Zone.Network
 			var s1 = 1;
 
 			// Items don't seem to disappear with our default, 1, nor with
-			// 2, which is used on officials. 4 does get rid of the items
+			// 2, which is used in the game. 4 does get rid of the items
 			// though. However, if you use 4, the pick up animation doesn't
 			// play. I'm guessing the item can't be removed if it's supposed
 			// to get picked up for this very reason, so we'll check whether
@@ -3505,7 +3505,7 @@ namespace Melia.Zone.Network
 
 			packet.PutInt(revealedMaps.Length);
 
-			// Officials appear to compress the actual data nowadays, but it seems
+			// The game appears to compress the actual data nowadays, but it seems
 			// like the client can still handle the raw data as well.
 			foreach (var revealedMap in revealedMaps)
 			{

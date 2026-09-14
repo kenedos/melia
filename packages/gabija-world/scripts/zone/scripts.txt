@@ -1,0 +1,5 @@
+// Melia
+// Script List File
+//---------------------------------------------------------------------------
+
+require "content/world/gabija/scripts.txt"

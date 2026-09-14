@@ -197,7 +197,7 @@ namespace Melia.Zone.World.Actors.Pads
 		/// <remarks>
 		/// We currently allow null names for pads, in which case no
 		/// handler will be registered, but this might change in the
-		/// future. If at all possible, the official name of the pad
+		/// future. If at all possible, the game's name of the pad
 		/// should be used.
 		/// </remarks>
 		/// <param name="name">The name of the pad, as defined in the client and the PadName enum.</param>

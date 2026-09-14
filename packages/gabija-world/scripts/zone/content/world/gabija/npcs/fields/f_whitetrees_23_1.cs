@@ -1,0 +1,16 @@
+//--- Melia Script ----------------------------------------------------------
+// Emmet Forest
+//--- Description -----------------------------------------------------------
+// NPCs found in and around Emmet Forest.
+//---------------------------------------------------------------------------
+
+using Melia.Shared.Game.Const;
+using Melia.Zone.Scripting;
+using static Melia.Zone.Scripting.Shortcuts;
+
+public class FWhitetrees231NpcScript : GeneralScript
+{
+	protected override void Load()
+	{
+	}
+}

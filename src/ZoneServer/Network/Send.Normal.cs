@@ -4219,7 +4219,7 @@ namespace Melia.Zone.Network
 			///
 			/// The client prints a sale's buyer name in place of its price
 			/// and amount wherever the name isn't empty, which is what
-			/// officials send, so those two are display-dead while a name
+			/// the game sends, so those two are display-dead while a name
 			/// is attached.
 			/// </remarks>
 			/// <param name="conn"></param>
@@ -4240,7 +4240,7 @@ namespace Melia.Zone.Network
 					packet.PutInt(sale.Amount);
 
 					// The client shows this in place of the price and amount
-					// wherever it isn't empty, which is what officials use it
+					// wherever it isn't empty, which is what the game uses it
 					// for - naming who bought.
 					packet.PutLpString(sale.BuyerName);
 				}
@@ -4539,7 +4539,7 @@ namespace Melia.Zone.Network
 						// id 1 becomes "Ch 2", etc. Because of this we
 						// can't just send anything here, it needs to be
 						// a sequential number starting from 0 to match
-						// official behavior.
+						// the game's behavior.
 
 						zpacket.PutShort(channelId);
 						zpacket.PutShort(zoneServerInfo.CurrentPlayers);

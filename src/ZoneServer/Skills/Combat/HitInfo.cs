@@ -68,7 +68,7 @@ namespace Melia.Zone.Skills.Combat
 		public HitAttackType AttackType { get; set; } = HitAttackType.None;
 
 		/// <summary>
-		/// Gets or sets whether the hit lands, which official sets on every
+		/// Gets or sets whether the hit lands, which the game sets on every
 		/// hit it sends.
 		/// </summary>
 		public bool IsHit { get; set; } = true;
@@ -96,7 +96,7 @@ namespace Melia.Zone.Skills.Combat
 		/// a hit that rides on another one.
 		/// </summary>
 		/// <remarks>
-		/// Zero on an attack's own hit. Official's added damage lines carry
+		/// Zero on an attack's own hit. The game's added damage lines carry
 		/// their ratio here, 0.15 for a Spell Shop Sacrament hit.
 		/// </remarks>
 		public float DamageRatio { get; set; } = 0f;

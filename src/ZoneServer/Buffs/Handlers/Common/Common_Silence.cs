@@ -1,4 +1,4 @@
-using Melia.Shared.Game.Const;
+﻿using Melia.Shared.Game.Const;
 using Melia.Zone.Buffs.Base;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors;
@@ -10,7 +10,7 @@ namespace Melia.Zone.Buffs.Handlers.Common
 	/// <summary>
 	/// Handle for Silence, prevents attacks
 	/// (Should we prevent magic attacks only instead? that'd be cool, albeit
-	/// not official behaviour).
+	/// not the game's behaviour).
 	/// </summary>
 	[BuffHandler(BuffId.Common_Silence, BuffId.UC_silence)]
 	public class Common_Silence : BuffHandler

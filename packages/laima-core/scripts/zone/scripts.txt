@@ -1,0 +1,14 @@
+// Melia
+// Script List File
+//---------------------------------------------------------------------------
+
+const/**/*
+core/**/*
+items/**/*
+ais/**/*
+
+other/character_init.cs
+other/character_adv.cs
+other/kill_events.cs
+
+require "scripts_custom.txt"

@@ -1,0 +1,55 @@
+using System.Threading.Tasks;
+using Melia.Shared.Data.Database;
+using Melia.Shared.Game.Const;
+using Melia.Shared.L10N;
+using Melia.Shared.Packages;
+using Melia.Shared.World;
+using Melia.Zone.Network;
+using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Handlers.Base;
+using Melia.Zone.World.Actors;
+using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using System;
+
+namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
+{
+	/// <summary>
+	/// Handler for the Fencer skill Flanconnade.
+	/// </summary>
+	[Package("laima-skills")]
+	[SkillHandler(SkillId.Fencer_Flanconnade)]
+	public class Fencer_FlanconnadeOverride : IGroundSkillHandler
+	{
+		private static readonly (int HitDelay, int AniTime)[] HitTimings = [(400, 200), (600, 200)];
+		private const int BuffDurationMs = 500;
+
+		public void Handle(Skill skill, ICombatEntity caster, Position originPos, Position farPos, ICombatEntity target)
+		{
+			if (!caster.TrySpendSp(skill))
+			{
+				caster.ServerMessage(Localization.Get("Not enough SP."));
+				return;
+			}
+			skill.IncreaseOverheat();
+			caster.SetAttackState(true);
+
+			var targetHandle = target?.Handle ?? 0;
+			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
+			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
+
+			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));
+		}
+
+		private async Task HandleSkill(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		{
+			caster.StartBuff(BuffId.Flanconnade_Buff, 1f, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), caster, skill.Id);
+
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 35, angle: 10f);
+			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+
+			foreach (var timing in HitTimings)
+				await SkillAttack(caster, skill, splashArea, timing.HitDelay, timing.AniTime);
+		}
+	}
+}

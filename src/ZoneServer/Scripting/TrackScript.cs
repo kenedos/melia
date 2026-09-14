@@ -261,7 +261,7 @@ namespace Melia.Zone.Scripting
 			{
 				if (actor is ICombatEntity combatEntity)
 				{
-					// Official implementation sets the tendency to attack?
+					// Sets the tendency to attack?
 					// Can I just add the movement component here instead?
 					if (actor is Character)
 						continue;

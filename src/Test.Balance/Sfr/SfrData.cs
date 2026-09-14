@@ -160,27 +160,27 @@ namespace Melia.Test.Balance.Sfr
 		/// <summary>
 		/// Path to the base skill data.
 		/// </summary>
-		public static string SkillsPath => Path.Combine(Root, "packages", "laima", "db", "skills.txt");
+		public static string SkillsPath => Path.Combine(Root, "packages", "laima-skills", "db", "skills.txt");
 
 		/// <summary>
 		/// Path to the override file the pricer writes.
 		/// </summary>
-		public static string OverridesPath => Path.Combine(Root, "packages", "laima", "db", "skills_overrides.txt");
+		public static string OverridesPath => Path.Combine(Root, "packages", "laima-skills", "db", "skills_overrides.txt");
 
 		/// <summary>
 		/// Path to the buff data the tick rates come from.
 		/// </summary>
-		public static string BuffsPath => Path.Combine(Root, "packages", "laima", "db", "buffs.txt");
+		public static string BuffsPath => Path.Combine(Root, "packages", "laima-skills", "db", "buffs.txt");
 
 		/// <summary>
 		/// Path to the skill tree the level caps come from.
 		/// </summary>
-		public static string SkillTreePath => Path.Combine(Root, "packages", "laima", "db", "skilltree.txt");
+		public static string SkillTreePath => Path.Combine(Root, "packages", "laima-skills", "db", "skilltree.txt");
 
 		/// <summary>
 		/// Path to the class list that bounds the pricer's scope.
 		/// </summary>
-		public static string GemClassesPath => Path.Combine(Root, "packages", "laima", "scripts", "zone", "core", "skill_gem_classes.cs");
+		public static string GemClassesPath => Path.Combine(Root, "packages", "laima-core", "scripts", "zone", "core", "skill_gem_classes.cs");
 
 		/// <summary>
 		/// Path to the measured sweep, read only for the basic-attack rates.

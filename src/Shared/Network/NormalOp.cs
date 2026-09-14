@@ -55,7 +55,7 @@ namespace Melia.Shared.Network
 		public static class Zone
 		{
 			// Currently in Laima(4) + 1 Shift at some point (390044)
-			// In Official is + 2 Shift (from Laima) (400000+)
+			// In the game it is + 2 Shift (from Laima) (400000+)
 
 			public const int TimeActionStart = 0x00;             // LATEST. Old: TIME_ACTION = 0x00
 			public const int TimeActionEnd = 0x01;               // LATEST. Old: TIME_ACTION_RESULT = 0x01

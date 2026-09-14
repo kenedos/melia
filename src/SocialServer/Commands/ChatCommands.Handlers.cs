@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using Melia.Shared.ObjectProperties;
 using Melia.Social.Database;
 using Melia.Social.Network;
@@ -18,7 +18,7 @@ namespace Melia.Social.Commands
 		/// </summary>
 		public ChatCommands()
 		{
-			// Official
+			// Client commands
 			this.Add("w", "<teamName> <message>", "", this.HandleWhisper);
 			this.Add("f", "<chatId> <message>", "", this.HandleChatRoomChat);
 			this.Add("p", "<message>", "", this.HandlePartyChat);

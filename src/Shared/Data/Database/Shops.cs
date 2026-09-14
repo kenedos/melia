@@ -147,7 +147,7 @@ namespace Melia.Shared.Data.Database
 
 		/// <summary>
 		/// Who bought it. The log shows this in place of the price and
-		/// the amount, which is what officials do with it.
+		/// the amount, which is what the game does with it.
 		/// </summary>
 		public string BuyerName { get; set; }
 	}

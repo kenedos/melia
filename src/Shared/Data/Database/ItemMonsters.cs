@@ -16,7 +16,7 @@ namespace Melia.Shared.Data.Database
 	/// </summary>
 	/// <remarks>
 	/// This is a lookup database for item drops, since the items become
-	/// "monsters" as drops. Officially, this data is auto-generated
+	/// "monsters" as drops. In the game, this data is auto-generated
 	/// based on the client-data by iterating over the items and
 	/// varous other databases.
 	/// </remarks>

@@ -677,7 +677,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			// 
 			// Update: By now we know that this is in fact how it works,
 			// but we also know that warps aren't triggered on a delay
-			// as we initially assumed (see below). The official behavior
+			// as we initially assumed (see below). The game's behavior
 			// is to either warp on contact (classic) or after confirming
 			// the warp in a dialog (newer versions). But since I'm not
 			// a fan of either option we'll keep our own implementation.
@@ -688,7 +688,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				return;
 
 			// Wait 1s to see if the character actually wants to warp
-			// (indicated by him not moving). Official behavior unknown,
+			// (indicated by him not moving). The game's behavior unknown,
 			// as I have never played the game =<
 			GameClock.Delay(1000).ContinueWith(_ =>
 			{

@@ -13,7 +13,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Assassin
 	[BuffHandler(BuffId.HallucinationSmoke_Buff)]
 	internal class HallucinationSmoke_Buff : BuffHandler
 	{
-		// Official bonus rate is unknown
+		// The game's bonus rate is unknown
 		private const float CRTHRBonus = 0.2f;
 
 		/// <summary>

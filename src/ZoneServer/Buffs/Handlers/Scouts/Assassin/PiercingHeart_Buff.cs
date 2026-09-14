@@ -13,7 +13,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Assassin
 	[BuffHandler(BuffId.PiercingHeart_Buff)]
 	internal class PiercingHeart_Buff : BuffHandler
 	{
-		// Official bonus rate is unknown
+		// The game's bonus rate is unknown
 		private const float CRTHRBonus = 0.5f;
 
 		/// <summary>

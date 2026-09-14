@@ -1,0 +1,10 @@
+// Melia
+// Script List File
+//---------------------------------------------------------------------------
+
+tracks/**/*
+
+instances/dungeons/**/*
+instances/npcs/**/*
+instances/mobs/**/*
+instances/warps/**/*

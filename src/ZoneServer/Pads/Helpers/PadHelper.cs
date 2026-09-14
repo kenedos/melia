@@ -330,8 +330,6 @@ namespace Melia.Zone.Pads.Helpers
 				return;
 			if (caster.IsDead)
 				return;
-
-			// Official code searches for normal skill if it's null.
 			if (skill == null)
 				return;
 

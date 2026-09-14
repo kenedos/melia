@@ -178,14 +178,14 @@ namespace Melia.Zone.Commands
 			this.Add("broadcast", "<message>", "Broadcasts text message to all players.", this.HandleBroadcast);
 			this.Add("b", "<message>", "Alias for broadcast.", this.HandleBroadcast);
 			this.Add("kick", "<team name>", "Kicks the player with the given team name if they're online.", this.HandleKick);
-			this.Add("runscp", "<script> <handle>", "Official GM Command for various purpose.", this.HandleRunScript);
-			this.Add("killmon", "<handle>", "Official GM Command for killing a monster.", this.HandleKillMonster);
+			this.Add("runscp", "<script> <handle>", "GM command for various purpose.", this.HandleRunScript);
+			this.Add("killmon", "<handle>", "GM command for killing a monster.", this.HandleKillMonster);
 			this.Add("fixcam", "", "Fixes the character's camera in place.", this.HandleFixCamera);
 			this.Add("daytime", "[timeOfDay=day|night|dawn|dusk]", "Sets the current day time.", this.HandleDayTime);
 			this.Add("storage", "", "Opens personal storage.", this.HandlePersonalStorage);
 			this.Add("teamstorage", "", "Opens team storage.", this.HandleTeamStorage);
 			this.Add("medals", "<modifier>", "Modifies the amount of medals/TP.", this.HandleMedals);
-			this.Add("killmonsters", "<handle>", "Official GM Command for killing all monster on the map.", this.HandleKillMonsters);
+			this.Add("killmonsters", "<handle>", "GM command for killing all monster on the map.", this.HandleKillMonsters);
 			this.Add("items", "", "Spawns all the items.", this.HandleGetAllItems);
 			this.Add("dungeon", "<id>", "", this.HandleDungeonMatchMaking);
 			this.Add("equipset", "[set name] [grade=Legend] [refine=15]", "Gives equipment matching set name, with grade/refine in any order. No args = Savinose Dysnai.", this.HandleEquipSet);
@@ -240,7 +240,7 @@ namespace Melia.Zone.Commands
 			this.Add("addeffect", "<effect_name> [scale]", "Adds a persistent effect to the target.", this.HandleAddEffect);
 			this.Add("removeeffectbyname", "<effect_name>", "Removes a persistent effect from the target.", this.HandleRemoveEffectByName);
 
-			// Official GM Commands
+			// Client GM commands
 			this.Add("safe", "<state>", "Toggles whether the character is invincible or not.", this.HandleSafe);
 			this.Add("run", "<script name> <options>", "Runs a script on the server for specific behavior.", this.HandleRun);
 
@@ -439,7 +439,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official command for running scripts.
+		/// Client command for running scripts.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -480,7 +480,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official command for invincibility.
+		/// Client command for invincibility.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -2999,7 +2999,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to get a Member Info For Act?
+		/// Client slash command to get a Member Info For Act?
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3041,7 +3041,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to change a party name
+		/// Client slash command to change a party name
 		/// </summary>
 		/// <example>
 		/// /partyname 0 0 1 Fun Party
@@ -3084,7 +3084,7 @@ namespace Melia.Zone.Commands
 
 
 		/// <summary>
-		/// Official slash command to invite to a party
+		/// Client slash command to invite to a party
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3123,7 +3123,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to invite a character to a party
+		/// Client slash command to invite a character to a party
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3170,7 +3170,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to expel a member from a party
+		/// Client slash command to expel a member from a party
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3291,7 +3291,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to run script before leaving a guild
+		/// Client slash command to run script before leaving a guild
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3321,7 +3321,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to leave a guild
+		/// Client slash command to leave a guild
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3348,7 +3348,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to hire a pet
+		/// Client slash command to hire a pet
 		/// </summary>
 		/// <example>/pethire 3 Pet</example>
 		/// <param name="sender"></param>
@@ -3456,7 +3456,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to raise pet stats
+		/// Client slash command to raise pet stats
 		/// </summary>
 		/// <example>/petstat 528525790635969 MHP 1</example>
 		/// <param name="sender"></param>
@@ -3513,7 +3513,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to read collections?
+		/// Client slash command to read collections?
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -3555,7 +3555,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to return to quest giver.
+		/// Client slash command to return to quest giver.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -4714,7 +4714,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Handle Official Run Script command
+		/// Handle the client's Run Script command
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -4765,7 +4765,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Handle Official GM Kill Monster command
+		/// Handle the client's GM Kill Monster command
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -4795,7 +4795,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command, purpose unknown.
+		/// Client slash command, purpose unknown.
 		/// </summary>
 		/// <param name="character"></param>
 		/// <param name="message"></param>
@@ -4804,9 +4804,6 @@ namespace Melia.Zone.Commands
 		/// <returns></returns>
 		private CommandResult HandleReqUpdateEquip(Character sender, Character target, string message, string command, Arguments args)
 		{
-			// Command is sent when the inventory is opened, purpose unknown,
-			// officials don't seem to send anything back.
-
 			// Comment in the client's Lua files:
 			//   내구도 회복 유료템 때문에 정확한 값을 지금 알아야 함.
 			//   (Durability recovery Due to the paid system, you need to know the correct value now.)
@@ -4815,7 +4812,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command, exchanges silver for ability points.
+		/// Client slash command, exchanges silver for ability points.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5092,7 +5089,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to invite a character to a guild
+		/// Client slash command to invite a character to a guild
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5140,7 +5137,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command, increase guild exp up.
+		/// Client slash command, increase guild exp up.
 		/// </summary>
 		/// <example>
 		/// /guildexpup 527456344001753 9
@@ -5160,7 +5157,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to for fast travel (warp statues).
+		/// Client slash command to for fast travel (warp statues).
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5236,7 +5233,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to set Homunculus Skill
+		/// Client slash command to set Homunculus Skill
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5280,7 +5277,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to save Sage Portal Skill Position
+		/// Client slash command to save Sage Portal Skill Position
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5330,7 +5327,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to delete Sage Portal Skill Position
+		/// Client slash command to delete Sage Portal Skill Position
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5387,7 +5384,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to delete Sage Open Portal
+		/// Client slash command to delete Sage Open Portal
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>
@@ -5496,7 +5493,7 @@ namespace Melia.Zone.Commands
 		}
 
 		/// <summary>
-		/// Official slash command to Memo Portal
+		/// Client slash command to Memo Portal
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="target"></param>

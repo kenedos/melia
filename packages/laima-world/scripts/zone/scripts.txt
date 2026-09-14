@@ -1,0 +1,8 @@
+// Melia
+// Script List File
+//---------------------------------------------------------------------------
+
+minigames/**/*
+custom/**/*
+
+require "content/world/laima/scripts.txt"

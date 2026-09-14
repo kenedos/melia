@@ -231,7 +231,7 @@ namespace Melia.Barracks.Network
 								// id 1 becomes "Ch 2", etc. Because of this we
 								// can't just send anything here, it needs to be
 								// a sequential number starting from 0 to match
-								// official behavior.
+								// the game's behavior.
 
 								zpacket.PutShort(channelId);
 								zpacket.PutShort(zoneServerInfo.CurrentPlayers);

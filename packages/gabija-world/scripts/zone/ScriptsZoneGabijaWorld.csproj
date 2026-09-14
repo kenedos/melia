@@ -1,0 +1,27 @@
+<Project>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+		<OutputPath>..\..\..\..\user\tmp\build\scripts\zone_gabija_world\bin\</OutputPath>
+		<BaseIntermediateOutputPath>..\..\..\..\user\tmp\build\scripts\zone_gabija_world\obj\</BaseIntermediateOutputPath>
+	</PropertyGroup>
+	<PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+		<OutputPath>..\..\..\..\user\tmp\build\scripts\zone_gabija_world\bin\</OutputPath>
+		<BaseIntermediateOutputPath>..\..\..\..\user\tmp\build\scripts\zone_gabija_world\obj\</BaseIntermediateOutputPath>
+	</PropertyGroup>
+	<Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<OutputType>Library</OutputType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+	</PropertyGroup>
+	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+	<!-- Upstream packages; the runtime compiles every enabled package as one assembly -->
+	<ItemGroup>
+		<Compile Include="..\..\..\laima-core\scripts\zone\**\*.cs" Exclude="..\..\..\laima-core\scripts\zone\obj\**\*.cs;..\..\..\laima-core\scripts\zone\bin\**\*.cs" LinkBase="laima-core" />
+		<Compile Include="..\..\..\laima-skills\scripts\zone\**\*.cs" Exclude="..\..\..\laima-skills\scripts\zone\obj\**\*.cs;..\..\..\laima-skills\scripts\zone\bin\**\*.cs" LinkBase="laima-skills" />
+		<Compile Include="..\..\..\world-shared\scripts\zone\**\*.cs" Exclude="..\..\..\world-shared\scripts\zone\obj\**\*.cs;..\..\..\world-shared\scripts\zone\bin\**\*.cs" LinkBase="world-shared" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\..\..\src\ZoneServer\ZoneServer.csproj" />
+		<ProjectReference Include="..\..\..\..\src\Shared\Shared.csproj" />
+	</ItemGroup>
+</Project>

@@ -60,7 +60,7 @@
 		//private long _skillObjectIds = 0x000054B600000000;
 
 		// It seems like abilities and session objects use the same
-		// id pool on officials, so we'll do the same for now.
+		// id pool in the game, so we'll do the same for now.
 		//public Ability(AbilityId abilityId, int level)
 		//{
 		//	this.ObjectId = ZoneServer.Instance.World.CreateSessionObjectId();

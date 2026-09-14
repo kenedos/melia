@@ -65,7 +65,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Archer
 
 			if (this.TryGetBounceTarget(caster, target, skill, out var bounceTarget))
 			{
-				// On officials, the bounce shot plays before the original target
+				// In the game, the bounce shot plays before the original target
 				// is hit. Uncommenting this delay will fix this, delaying the
 				// bounce shot animation.
 				// var bounceHitDelay = TimeSpan.FromMilliseconds(420);

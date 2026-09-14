@@ -332,7 +332,7 @@ namespace Melia.Zone.Network
 				Send.ZC_MYPAGE_MAP(conn);
 				Send.ZC_GUESTPAGE_MAP(conn);
 				Send.ZC_NORMAL.UpdateSkillUI(character);
-				// Official server sends Skintone Object Property around here
+				// The game sends Skintone Object Property around here
 				Send.ZC_ITEM_EQUIP_LIST(character);
 				Send.ZC_NORMAL.SetSkillsProperties(conn);
 				Send.ZC_SKILL_LIST(character);
@@ -3947,7 +3947,7 @@ namespace Melia.Zone.Network
 
 			item.IsLocked = lockItem;
 
-			// Officials send the dict key as the item name, we might want
+			// The game sends the dict key as the item name, we might want
 			// to add those to the item data.
 			// <Item> item locked.
 			// <Item> item unlocked.

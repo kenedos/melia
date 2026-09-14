@@ -1706,7 +1706,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			// Sending ZC_ITEM_INVENTORY_INDEX_LIST stopped working at some
-			// point after the iCBT2, officials send a full list now.
+			// point after the iCBT2, the game sends a full list now.
 			//Send.ZC_ITEM_INVENTORY_INDEX_LIST(this.Character);
 
 			// Sending ZC_ITEM_INVENTORY_LIST stopped working at some point.

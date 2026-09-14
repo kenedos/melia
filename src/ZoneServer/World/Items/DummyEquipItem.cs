@@ -17,7 +17,7 @@ namespace Melia.Zone.World.Items
 		/// Returns an empty object id.
 		/// </summary>
 		/// <remarks>
-		/// Officials set the object id of dummy items to 0, though
+		/// The game sets the object id of dummy items to 0, though
 		/// whether this is actually necessary is currently unknown.
 		/// This does affect packet structures however.
 		/// </remarks>

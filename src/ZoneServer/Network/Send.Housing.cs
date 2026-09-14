@@ -188,7 +188,7 @@ namespace Melia.Zone.Network
 		/// <summary>
 		/// Response to CZ_HOUSING_REQUEST_PREVIEW
 		/// </summary>
-		/// <remarks>Official Server splits it upto 128 count per packet</remarks>
+		/// <remarks>The game splits it upto 128 count per packet</remarks>
 		/// <param name="conn"></param>
 		/// <param name="guildId"></param>
 		/// <param name="guildMapId"></param>

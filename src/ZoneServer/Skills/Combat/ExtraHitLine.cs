@@ -23,7 +23,7 @@ namespace Melia.Zone.Skills.Combat
 		/// attribute it to the skill that was used.
 		/// </summary>
 		/// <remarks>
-		/// Official gives an added line its own id rather than the attack's -
+		/// Gives an added line its own id rather than the attack's -
 		/// a Spell Shop Sacrament hit arrives as SpellShop_Sacrament_AddBlow,
 		/// not as the basic attack it rode in on.
 		/// </remarks>

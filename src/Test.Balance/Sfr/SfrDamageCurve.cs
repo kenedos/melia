@@ -9,7 +9,7 @@ namespace Melia.Test.Balance.Sfr
 	/// </summary>
 	/// <remarks>
 	/// Traced from SCR_SkillHit into SCR_CalculateDamage in
-	/// packages/laima/scripts/zone/core/calc_combat.cs. The NewDefenseFormula
+	/// packages/laima-core/scripts/zone/core/calc_combat.cs. The NewDefenseFormula
 	/// branch mitigates the attack first, on a ratio the factor is not part of,
 	/// and multiplies the skill factor in afterwards. Damage is therefore affine
 	/// in the factor, not curved by it, and inverting needs no iteration.

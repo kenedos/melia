@@ -11,7 +11,7 @@ namespace Melia.Social.Commands
 	/// </summary>
 	public partial class ChatCommands : CommandManager<ChatCommand, ChatCommandFunc>
 	{
-		private const string OfficialPrefix = "/";
+		private const string CommandPrefix = "/";
 
 		/// <summary>
 		/// Adds command with the given parameters.
@@ -53,12 +53,12 @@ namespace Melia.Social.Commands
 		/// <returns></returns>
 		public bool TryExecute(SocialUser user, string message)
 		{
-			if (!message.StartsWith(OfficialPrefix))
+			if (!message.StartsWith(CommandPrefix))
 				return false;
 
 			var args = new Arguments(message);
 			var arg0 = args.Get(0);
-			var commandName = arg0.Trim(OfficialPrefix[0]);
+			var commandName = arg0.Trim(CommandPrefix[0]);
 
 			// Check command
 			var command = this.GetCommand(commandName);
@@ -94,7 +94,7 @@ namespace Melia.Social.Commands
 					break;
 
 				case CommandResult.InvalidArgument:
-					Log.Warning(Localization.Get("Invalid argument, usage: {0}{1} {2}"), OfficialPrefix, command.Name, command.Usage);
+					Log.Warning(Localization.Get("Invalid argument, usage: {0}{1} {2}"), CommandPrefix, command.Name, command.Usage);
 					break;
 
 				case CommandResult.Break:
