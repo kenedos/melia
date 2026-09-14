@@ -239,7 +239,7 @@ namespace Melia.Zone.Skills.Helpers
 
 			var skill = new Skill(caster, skillId);
 
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, caster.Position, ForceId.GetNew(), null);
 			return true;
 		}

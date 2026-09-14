@@ -46,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 					Send.ZC_NORMAL.SkillToggle(toggleOffChar, SkillId.None);
 
 				Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-				Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+				Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 				Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 				caster.StopBuff(BuffId.Aiming_Hawk_Buff);
@@ -69,7 +69,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 				Send.ZC_NORMAL.SkillToggle(toggleOnChar, skill.Id);
 
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 			skill.Run(this.HandleAimingActive(skill, caster, hawk));

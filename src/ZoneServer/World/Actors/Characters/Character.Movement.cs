@@ -457,6 +457,35 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Returns true if the actor was sent to the character's client and
+		/// can be referenced by handle in subsequent packets.
+		/// </summary>
+		/// <param name="actor"></param>
+		/// <returns></returns>
+		public bool IsActorVisible(IActor actor)
+		{
+			if (actor == null)
+				return false;
+
+			if (actor == this)
+				return true;
+
+			lock (_lookAroundLock)
+			{
+				if (actor is IMonster monster)
+					return _visibleMonsters.Contains(monster);
+
+				if (actor is Character character)
+					return _visibleCharacters.Contains(character);
+
+				if (actor is Pad pad)
+					return _visiblePads.Contains(pad);
+			}
+
+			return true;
+		}
+
+		/// <summary>
 		/// Updates visible entities around character.
 		/// </summary>
 		public void LookAround()
@@ -605,6 +634,7 @@ namespace Melia.Zone.World.Actors.Characters
 
 				character.ShowEffects(this.Connection);
 				Send.ZC_BUFF_LIST(this.Connection, character);
+				Send.ZC_NORMAL.UpdateSkillEffect(this.Connection, character, 0, character.Position, character.Direction, character.Position);
 			}
 		}
 
@@ -715,6 +745,7 @@ namespace Melia.Zone.World.Actors.Characters
 					Send.ZC_OWNER(this, monster);
 
 				Send.ZC_FACTION(this.Connection, monster, entity.Faction);
+				Send.ZC_NORMAL.UpdateSkillEffect(this.Connection, entity, 0, entity.Position, entity.Direction, entity.Position);
 
 				if (entity.HasBuffs())
 					Send.ZC_BUFF_LIST(this.Connection, entity);

@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			{
 				skill.IncreaseOverheat();
 				caster.SetAttackState(true);
-				Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, Position.Zero);
+				Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 				Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 				this.DestroyCatenaPad(caster, skill);

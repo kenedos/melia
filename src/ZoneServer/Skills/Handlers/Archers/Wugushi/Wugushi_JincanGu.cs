@@ -50,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, caster.Position, caster.Position);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, farPos, caster.Position.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, farPos, caster.Position.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 			skill.Run(this.CreateAttackArea(skill, caster, farPos));

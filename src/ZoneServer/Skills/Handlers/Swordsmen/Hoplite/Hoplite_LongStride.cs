@@ -81,6 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Hoplite
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, targetPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(targetPos), targetPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, targetPos, null);
 
 			Send.ZC_NORMAL.LeapJump(caster, targetPos, 0, 0, 0.5f, 0.7f, 0.7f, 90);

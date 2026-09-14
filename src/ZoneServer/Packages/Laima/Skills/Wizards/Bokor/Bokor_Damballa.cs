@@ -64,7 +64,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Bokor
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);

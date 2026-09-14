@@ -164,7 +164,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Fletcher
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 			selectedBuff.DecreaseOverbuff();
 			if (selectedBuff.OverbuffCounter <= 0)
 				caster.StopBuff(selectedBuff.Id);

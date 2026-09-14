@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Priest
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, skill));

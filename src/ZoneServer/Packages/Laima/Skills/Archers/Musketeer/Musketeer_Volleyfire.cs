@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 
 			var targetHandle = target.Handle;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_FORCE_TARGET(caster, target, skill);
 
 			skill.Run(this.HandleSkill(caster, skill, target));

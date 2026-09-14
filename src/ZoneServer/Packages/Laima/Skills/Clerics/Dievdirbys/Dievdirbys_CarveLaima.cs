@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Clerics.Dievdirbys
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 			Send.ZC_SKILL_RANGE_SQUARE(caster, originPos, farPos, 21, false);
 

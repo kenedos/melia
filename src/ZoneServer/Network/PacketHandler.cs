@@ -581,7 +581,14 @@ namespace Melia.Zone.Network
 		{
 			var accountId = packet.GetLong();
 
-			//Send.ZC_CAMPINFO(conn);
+			var character = conn.SelectedCharacter;
+			if (character == null)
+				return;
+
+			if (BaseCampHelper.TryGet(character, out var camp))
+				Send.ZC_CAMPINFO(conn, accountId, camp.MapId);
+			else
+				Send.ZC_CAMPINFO(conn, accountId);
 		}
 
 		/// <summary>

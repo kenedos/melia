@@ -49,6 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Highlander
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
 			skill.Run(this.Attack(skill, caster, splashArea));

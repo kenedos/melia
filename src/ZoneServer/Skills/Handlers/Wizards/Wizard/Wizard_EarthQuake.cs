@@ -74,7 +74,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Wizard
 			var targetHandle = target?.Handle ?? 0;
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, skillHits);
 		}
 	}

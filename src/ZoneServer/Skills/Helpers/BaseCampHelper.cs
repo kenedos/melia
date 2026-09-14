@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Melia.Shared.L10N;
-using Melia.Shared.World;
+using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
@@ -64,7 +64,7 @@ namespace Melia.Zone.Skills.Helpers
 			this.Npc = npc;
 			this.OwnerObjectId = owner.ObjectId;
 			this.OwnerName = owner.Name;
-			this.OwnerAccountId = owner.Connection?.Account?.Id ?? 0;
+			this.OwnerAccountId = owner.AccountDbId;
 			this.SkillLevel = skillLevel;
 			this.MapId = owner.MapId;
 		}
@@ -269,7 +269,7 @@ namespace Melia.Zone.Skills.Helpers
 		/// <param name="camp"></param>
 		public static TimeSpan GetRemainingTime(BaseCamp camp)
 		{
-			var remaining = camp.ExpirationTime - DateTime.Now;
+			var remaining = camp.ExpirationTime - GameClock.LocalNow;
 
 			return remaining > TimeSpan.Zero ? remaining : TimeSpan.Zero;
 		}
@@ -279,7 +279,7 @@ namespace Melia.Zone.Skills.Helpers
 		/// </summary>
 		/// <param name="camp"></param>
 		private static bool IsStanding(BaseCamp camp)
-			=> camp.Npc.Map != null && camp.Npc.Map != Map.Limbo && DateTime.Now < camp.ExpirationTime;
+			=> camp.Npc.Map != null && camp.Npc.Map != Map.Limbo && GameClock.LocalNow < camp.ExpirationTime;
 
 		/// <summary>
 		/// Takes the camp out of the world and tells its owner it's gone.

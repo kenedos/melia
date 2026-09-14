@@ -28,7 +28,7 @@ namespace Melia.Zone.Skills.Handlers.Swordsmen.Fencer
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, Position.Zero);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Direction, originPos);
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
 
 			skill.Run(this.HandleSkill(caster, skill));

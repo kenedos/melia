@@ -60,7 +60,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 			caster.StartBuff(BuffId.Skill_NoDamage_Buff, 0, 0, TimeSpan.FromMilliseconds(1300), caster);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Position.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Position.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 			caster.RemoveRandomDebuff(this.GetRemoveDebuffChance(skill));

@@ -36,6 +36,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.QuarrelShooter
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 		}
 	}

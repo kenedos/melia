@@ -1215,7 +1215,37 @@ namespace Melia.Zone.Network
 				packet.PutDirection(direction);
 				packet.PutPosition(farPos);
 
-				entity.Map.Broadcast(packet, entity);
+				entity.Map.BroadcastToViewers(packet, entity);
+			}
+
+			/// <summary>
+			/// Seeds the skill effect state for entity on a single client,
+			/// so effects built before the next update aren't rooted at the
+			/// map's origin.
+			/// </summary>
+			/// <param name="conn"></param>
+			/// <param name="entity"></param>
+			/// <param name="targetHandle"></param>
+			/// <param name="originPos"></param>
+			/// <param name="direction"></param>
+			/// <param name="farPos"></param>
+			public static void UpdateSkillEffect(IZoneConnection conn, ICombatEntity entity, int targetHandle, Position originPos, Direction direction, Position farPos)
+			{
+				using var packet = Packet.Rent(Op.ZC_NORMAL);
+				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.UpdateSkillEffect);
+
+				packet.PutInt(entity.Handle);
+				if (Versions.Protocol > 500)
+					packet.PutInt(0);
+				else
+					packet.PutByte(0);
+				packet.PutInt(0);
+				packet.PutInt(targetHandle);
+				packet.PutPosition(originPos);
+				packet.PutDirection(direction);
+				packet.PutPosition(farPos);
+
+				conn.Send(packet);
 			}
 
 			/// <summary>
@@ -1251,7 +1281,7 @@ namespace Melia.Zone.Network
 				packet.PutDirection(direction);
 				packet.PutPosition(farPos);
 
-				entity.Map.Broadcast(packet, entity);
+				entity.Map.BroadcastToViewers(packet, entity);
 			}
 
 			/// <summary>

@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, Position.Zero);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, dir, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, dir, originPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, Position.Zero, ForceId.GetNew(), null);
 
 			caster.StartBuff(BuffId.Zhendu_Buff, skill.Level, 0f, skill.Properties.CaptionTime, caster, skill.Id);

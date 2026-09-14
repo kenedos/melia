@@ -59,7 +59,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Sorcerer
 			var skillHandle = ZoneServer.Instance.World.CreateSkillHandle();
 
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, caster.Position, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
 			Send.ZC_SYNC_END(caster, skillHandle, 0);
 			Send.ZC_SYNC_EXEC_BY_SKILL_TIME(caster, skillHandle, skill.Data.DefaultHitDelay);

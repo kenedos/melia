@@ -96,7 +96,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Falconer
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 
 			// 3. ZC_NORMAL UpdateSkillEffect
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 
 			// 4. Buff + SetMainAttackSkill in sync block with SYNC_EXEC_BY_SKILL_TIME
 			var syncKey1 = hawk.GenerateSyncKey();

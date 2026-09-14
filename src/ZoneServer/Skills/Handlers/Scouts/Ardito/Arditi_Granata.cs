@@ -56,7 +56,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Ardito
 			var castPosition = caster.Position.GetRelative(direction, CastLength);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, originPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Position.GetDirection(castPosition), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Position.GetDirection(castPosition), castPosition);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, originPos, ForceId.GetNew(), null);
 
 			skill.Run(this.Attack(skill, caster, originPos, farPos, castPosition));

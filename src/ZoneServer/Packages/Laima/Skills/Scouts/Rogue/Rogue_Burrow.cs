@@ -35,7 +35,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 
 			var targetHandle = target?.Handle ?? 0;
 			var buffActive = caster.IsBuffActive(BuffId.Burrow_Rogue);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, buffActive ? 1 : 0, targetHandle, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, buffActive ? 1 : 0, targetHandle, caster.Position, caster.Direction, caster.Position);
 
 			skill.Run(this.HandleSkill(skill, caster));
 

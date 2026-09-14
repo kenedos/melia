@@ -61,7 +61,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Swordsmen.Hoplite
 			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, target?.Handle ?? 0, originPos, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, target?.Handle ?? 0, originPos, caster.Direction, originPos);
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);

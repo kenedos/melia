@@ -98,6 +98,12 @@ namespace Melia.Zone.World.Maps
 		[ThreadStatic]
 		private static HashSet<IZoneConnection> _broadcastSentConnections;
 
+		[ThreadStatic]
+		private static List<ICombatEntity> _broadcastViewerBuffer;
+
+		[ThreadStatic]
+		private static HashSet<IZoneConnection> _broadcastViewerConnections;
+
 		#endregion
 
 		#region Properties
@@ -2437,6 +2443,59 @@ namespace Melia.Zone.World.Maps
 					continue;
 
 				if (character.Layer != source.Layer)
+					continue;
+
+				var conn = character.Connection;
+				if (conn == null)
+					continue;
+
+				if (!sentConnections.Add(conn))
+					continue;
+
+				conn.Send(packet);
+			}
+		}
+
+		/// <summary>
+		/// Broadcasts a packet to all characters within visible range of the
+		/// source actor, skipping clients that haven't been sent the source
+		/// yet and therefore can't resolve its handle.
+		/// </summary>
+		/// <param name="packet"></param>
+		/// <param name="source"></param>
+		public virtual void BroadcastToViewers(Packet packet, IActor source)
+		{
+			var sentConnections = _broadcastViewerConnections ??= new HashSet<IZoneConnection>();
+			sentConnections.Clear();
+
+			var queryBuffer = _broadcastViewerBuffer ??= new List<ICombatEntity>();
+			queryBuffer.Clear();
+
+			if (_spatialIndex != null)
+			{
+				_spatialIndex.QueryCircle(source.Position, VisibleRange, queryBuffer);
+			}
+			else
+			{
+				lock (_characters)
+				{
+					foreach (var character in _characters.Values)
+						queryBuffer.Add(character);
+				}
+			}
+
+			foreach (var entity in queryBuffer)
+			{
+				if (entity is not Character character)
+					continue;
+
+				if (character.Layer != source.Layer)
+					continue;
+
+				if (!character.Position.InRange2D(source.Position, VisibleRange))
+					continue;
+
+				if (!character.IsActorVisible(source))
 					continue;
 
 				var conn = character.Connection;

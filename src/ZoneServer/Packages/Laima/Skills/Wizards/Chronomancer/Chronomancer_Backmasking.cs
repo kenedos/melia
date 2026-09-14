@@ -28,7 +28,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Chronomancer
 			skill.IncreaseOverheat();
 			caster.SetAttackState(true);
 
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			this.RefreshFriendlyPads(caster, skill, farPos);

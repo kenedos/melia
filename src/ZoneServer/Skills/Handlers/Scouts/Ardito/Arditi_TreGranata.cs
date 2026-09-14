@@ -49,7 +49,7 @@ namespace Melia.Zone.Skills.Handlers.Ardito
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, caster.Direction, originPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, ForceId.GetNew(), null);
 
 			skill.Run(this.CreateAttackArea(skill, caster, farPos, caster.Direction));

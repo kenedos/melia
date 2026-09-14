@@ -26,7 +26,7 @@ namespace Melia.Zone.Skills.Handlers.Clerics.Sadhu
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			caster.StopBuff(BuffId.OOBE_Soulmaster_Buff);

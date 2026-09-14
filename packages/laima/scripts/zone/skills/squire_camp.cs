@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
+using Melia.Shared.Util;
 using Melia.Zone;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
@@ -19,6 +20,7 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Yggdrasil.Util.Commands;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class SquireCampScript : GeneralScript
@@ -42,13 +44,64 @@ public class SquireCampScript : GeneralScript
 	private const string BuildAnimation = "SKL_SQUIRE_TENT_BORN";
 	private readonly static TimeSpan BuildTime = TimeSpan.FromSeconds(23);
 
-	private readonly static TimeSpan BaseDuration = TimeSpan.FromHours(1);
-	private readonly static TimeSpan DurationPerSkillLevel = TimeSpan.FromMinutes(30);
-
 	protected override void Load()
 	{
 		CreateSuppliesShop();
+
+		AddChatCommand("basecamplist", "", "", 0, 99, HandleBaseCampList);
+		AddChatCommand("basecampwarp", "<camp handle>", "", 0, 99, HandleBaseCampWarp);
 	}
+
+	/// <summary>
+	/// Hands the client the camps the character may travel to, for the
+	/// travel UI's own list.
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="target"></param>
+	/// <param name="message"></param>
+	/// <param name="commandName"></param>
+	/// <param name="args"></param>
+	private CommandResult HandleBaseCampList(Character sender, Character target, string message, string commandName, Arguments args)
+	{
+		var entries = new List<string>();
+
+		foreach (var camp in BaseCampHelper.GetReachableCamps(sender))
+		{
+			var remaining = (int)BaseCampHelper.GetRemainingTime(camp).TotalMinutes;
+
+			entries.Add(string.Join(",", camp.Npc.Handle, Sanitize(camp.OwnerName), Sanitize(BaseCampHelper.GetMapName(camp)), remaining));
+		}
+
+		Send.ZC_EXEC_CLIENT_SCP(sender.Connection, $"SIMPLEMAP_SET_BASECAMPS(\"{string.Join("|", entries)}\")");
+
+		return CommandResult.Okay;
+	}
+
+	/// <summary>
+	/// Sends the character to one of the camps they may travel to.
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="target"></param>
+	/// <param name="message"></param>
+	/// <param name="commandName"></param>
+	/// <param name="args"></param>
+	private CommandResult HandleBaseCampWarp(Character sender, Character target, string message, string commandName, Arguments args)
+	{
+		if (args.Count < 1 || !int.TryParse(args.Get(0), out var handle))
+			return CommandResult.Okay;
+
+		if (!BaseCampHelper.TryWarpTo(sender, handle))
+			sender.ServerMessage(L("That Base Camp is no longer standing."));
+
+		return CommandResult.Okay;
+	}
+
+	/// <summary>
+	/// Strips the characters the client's list format uses as separators.
+	/// </summary>
+	/// <param name="text"></param>
+	private static string Sanitize(string text)
+		=> text.Replace("\"", "").Replace(",", "").Replace("|", "");
 
 	/// <summary>
 	/// Creates the shop a Base Camp keeps stocked.
@@ -190,7 +243,12 @@ public class SquireCampScript : GeneralScript
 	/// </summary>
 	/// <param name="skillLevel"></param>
 	private static TimeSpan GetCampDuration(int skillLevel)
-		=> BaseDuration + DurationPerSkillLevel * skillLevel;
+	{
+		if (!ZoneServer.Instance.Data.SkillDb.TryFind(SkillId.Squire_Camp, out var skillData))
+			return TimeSpan.Zero;
+
+		return TimeSpan.FromHours(skillData.CaptionRatio2 + skillData.CaptionRatio2ByLevel * skillLevel);
+	}
 
 	/// <summary>
 	/// Puts a camp down where the character is standing.
@@ -206,7 +264,8 @@ public class SquireCampScript : GeneralScript
 		var npc = new Npc(CampMonsterId, name, creator.Position, creator.Direction);
 		npc.Layer = creator.Layer;
 		npc.OwnerHandle = creator.Handle;
-		npc.DisappearTime = DateTime.Now + GetCampDuration(skillLevel);
+		npc.Faction = FactionType.Neutral;
+		npc.DisappearTime = GameClock.LocalNow + GetCampDuration(skillLevel);
 		npc.Properties.SetFloat(PropertyName.Range, CampRange);
 		npc.SetClickTrigger(CampDialogName, CampDialog);
 
@@ -214,7 +273,7 @@ public class SquireCampScript : GeneralScript
 
 		BaseCampHelper.Register(new BaseCamp(npc, creator, skillLevel));
 
-		Send.ZC_CAMPINFO(creator.Connection, creator.Connection.Account.Id, creator.Map.Data.Id);
+		Send.ZC_CAMPINFO(creator.Connection, creator.AccountDbId, creator.Map.Data.Id);
 
 		if (hadCamp)
 			creator.ServerMessage(L("Your previous Base Camp was taken down."));

@@ -33,7 +33,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_FORCE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, skill, originPos, farPos));

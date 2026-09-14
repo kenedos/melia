@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 
 			caster.Map.AddPad(pad);
 
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, caster.Position, null);
 
 			// Reduces the Poison property resistance of enemies

@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Barbarian
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, originPos, Position.Zero);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
 
 			var splashParam = skill.GetSplashParameters(caster, caster.Position, caster.Position, length: 0, width: 250, angle: 0);

@@ -36,7 +36,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			caster.StartBuff(BuffId.Crescendo_Bane_Buff, skill.Level, 0, TimeSpan.FromSeconds(15), caster);
 
 			Send.ZC_SKILL_READY(caster, skill, caster.Position, caster.Position);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, caster.Position, caster.Direction, caster.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, caster.Position, null);
 		}
 	}

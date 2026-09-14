@@ -32,7 +32,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Musketeer
 			var farPos = new Position(originPos);
 			farPos.X += 100;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, 0, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_TARGET(caster, skill, caster);
 
 			caster.StartBuff(BuffId.GroovingMuzzle_UseStack_Buff, skill.Level, 0f, TimeSpan.FromMilliseconds(BuffDurationMs), caster, skill.Id);

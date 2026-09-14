@@ -59,7 +59,7 @@ namespace Melia.Zone.Skills.HandlersOverrides.Wizards.Psychokino
 
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 
 			skill.Run(this.HandleSkill(skill, caster, originPos, farPos));
 

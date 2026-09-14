@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Corsair
 
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 
 			var position = GetRelativePosition(PosType.Self, caster, distance: 20, height: 20);
 			Send.ZC_GROUND_EFFECT(caster, position, "F_scout_behead001", 0.60000002f, 0f, 0f, 0f);

@@ -53,7 +53,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Elementalist
 
 			var targetHandle = target?.Handle ?? 0;
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 
 			var effectPosition = originPos.GetRelative(caster.Position, height: -10);
 			Send.ZC_GROUND_EFFECT(caster, effectPosition, "E_wizard_burst_shot_line", 0.5f, 0, 0, caster.Direction.DegreeAngle);

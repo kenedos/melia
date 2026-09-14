@@ -44,7 +44,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Sapper
 			var targetPos = originPos.GetRelative(caster.Direction, distance: SpawnDistance);
 
 			Send.ZC_SKILL_READY(caster, skill, skillHandle, originPos, farPos);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, targetHandle, originPos, originPos.GetDirection(farPos), farPos);
 
 			Send.ZC_SYNC_START(caster, skillHandle, 1);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Archer_SpikeShooter);

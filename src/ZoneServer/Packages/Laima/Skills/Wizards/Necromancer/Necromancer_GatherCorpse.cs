@@ -41,7 +41,7 @@ namespace Melia.Zone.Skills.Handlers.Wizards.Necromancer
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, designatedTarget.Position, Position.Zero);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, designatedTarget.Handle, caster.Position, designatedTarget.Direction, Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, designatedTarget.Handle, caster.Position, designatedTarget.Direction, caster.Position);
 
 			var damageDelay = TimeSpan.Zero;
 			var skillHitDelay = skill.Properties.HitDelay;

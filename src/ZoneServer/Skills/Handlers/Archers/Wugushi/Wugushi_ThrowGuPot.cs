@@ -51,7 +51,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Wugushi
 			caster.SetAttackState(true);
 
 			Send.ZC_SKILL_READY(caster, skill, caster.Position, caster.Position);
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, farPos, caster.Position.GetDirection(farPos), Position.Zero);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, caster.Handle, farPos, caster.Position.GetDirection(farPos), farPos);
 
 			Send.ZC_NORMAL.SkillProjectile(caster, farPos, "I_archer_poison_pot_force#Bip01 R Hand", 0.5f, "", 1, 10, TimeSpan.FromSeconds(0.6f), TimeSpan.Zero, 500);
 
