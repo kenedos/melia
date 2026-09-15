@@ -32,7 +32,7 @@ end
 
 function M_CHASE_UPDATE_VISIBILITY()
 	local frmQuestInfo = ui.GetFrame("questinfoset_2")
-	local hasTrackedQuests = Melia.Quests.CountTracked() > 0
+	local hasTrackedQuests = #M_CHASE_GET_TRACKED() > 0
 
 	if hasTrackedQuests then
 		M_CHASE_REDRAW(frmQuestInfo)

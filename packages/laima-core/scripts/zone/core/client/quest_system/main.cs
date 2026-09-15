@@ -9,6 +9,7 @@ using Melia.Shared.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Yggdrasil.Logging;
 using Yggdrasil.Util.Commands;
 using static Melia.Zone.Scripting.Shortcuts;
@@ -19,7 +20,7 @@ public class CustomQuestSystemClientScript : ClientScript
 	{
 		this.LoadAllScripts();
 
-		AddChatCommand("quest", "<complete|cancel>", "", 0, 99, HandleQuest);
+		AddChatCommand("quest", "<cancel|track|warp>", "", 0, 99, HandleQuest);
 		AddChatCommand("questsearch", "<text>", "", 0, 99, HandleQuestSearch);
 	}
 
@@ -63,15 +64,21 @@ public class CustomQuestSystemClientScript : ClientScript
 
 		switch (action)
 		{
-			case "complete":
+			case "warp":
 			{
 				if (!quest.ObjectivesCompleted)
 				{
-					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to complete a quest they didn't complete yet.", sender.Username);
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to warp back on a quest that isn't done.", sender.Username);
 					return CommandResult.Okay;
 				}
 
-				sender.Quests.Complete(quest);
+				if (!QuestComponent.TryGetPhaseDestination(quest, out var mapClassName, out var position))
+				{
+					sender.ServerMessage(L("There's nowhere to return to for this quest."));
+					return CommandResult.Okay;
+				}
+
+				sender.Warp(mapClassName, position);
 				break;
 			}
 			case "cancel":

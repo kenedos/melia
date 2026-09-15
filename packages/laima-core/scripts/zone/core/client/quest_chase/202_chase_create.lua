@@ -1,3 +1,6 @@
+M_CHASE_ICON_SIZE = 32
+M_CHASE_TITLE_X = 40
+
 function M_CHASE_REDRAW(frame)
 	local ctrl = GET_CHILD(frame, "member", "ui::CGroupBox")
 
@@ -12,17 +15,11 @@ function M_CHASE_REDRAW(frame)
 		return
 	end
 
-	local quests = Melia.Quests.GetAll()
-	local x = 0
+	local quests = M_CHASE_GET_TRACKED()
 	local y = 0
 
 	for i = 1, #quests do
-		local quest = quests[i]
-
-		if quest.Tracked and quest.Objectives ~= nil and #quest.Objectives > 0 then
-			local height = M_CHASE_CREATE_QUEST(frame, ctrl, quest, x, y)
-			y = y + height
-		end
+		y = y + M_CHASE_CREATE_QUEST(frame, ctrl, quests[i], 0, y)
 	end
 
 	frame:Invalidate()
@@ -30,24 +27,29 @@ end
 
 function M_CHASE_CREATE_QUEST(frame, ctrl, quest, x, y)
 	local width = frame:GetWidth() - x - SCROLL_WIDTH
+	local titleX = M_CHASE_TITLE_X
 
 	local ctrlQuest = ctrl:CreateOrGetControlSet("emptyset2", "_Q_" .. quest.ObjectId, x, y)
-	tolua.cast(ctrlQuest, "ui::CControlSet")
-	
-	local skinName = frame:GetUserConfig("CTRLSETSKINNAME")
-	ctrlQuest:SetSkinName(skinName)
-	ctrlQuest:Resize(width, 30)
-	
-	local lblTitle = ctrlQuest:CreateOrGetControl("richtext", "title", 0, 0, ctrlQuest:GetWidth(), 30)
-	lblTitle:SetText(QUEST_TITLE_FONT .. quest.Name)
-	lblTitle:EnableHitTest(0)
-	
-	local titleHeight = lblTitle:GetHeight()
+	ctrlQuest = tolua.cast(ctrlQuest, "ui::CControlSet")
 
-	local objectivesHeight = M_CHASE_CREATE_OBJECTIVES(ctrlQuest, quest, 0, titleHeight + 5)
+	ctrlQuest:SetSkinName(frame:GetUserConfig("CTRLSETSKINNAME"))
+	ctrlQuest:Resize(width, 30)
+
+	M_CHASE_SET_STATE_ICON(ctrlQuest, quest)
+
+	local lblTitle = ctrlQuest:CreateOrGetControl("richtext", "title", titleX, 0, width - titleX, 30)
+	lblTitle:SetText(QUEST_TITLE_FONT .. M_QUESTS_GET_STYLE(quest).color .. quest.Name)
+	lblTitle:EnableHitTest(0)
+
+	local titleHeight = lblTitle:GetHeight()
+	if titleHeight < M_CHASE_ICON_SIZE then
+		titleHeight = M_CHASE_ICON_SIZE
+	end
+
+	local objectivesHeight = M_CHASE_CREATE_OBJECTIVES(ctrlQuest, quest, titleX - 10, titleHeight + 5)
 	local height = titleHeight + objectivesHeight + 3
-	
-	ctrlQuest:Resize(ctrlQuest:GetWidth(), height)
+
+	ctrlQuest:Resize(width, height)
 
 	return height
 end

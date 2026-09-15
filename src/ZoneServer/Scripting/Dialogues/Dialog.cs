@@ -286,7 +286,8 @@ namespace Melia.Zone.Scripting.Dialogues
 
 			// Prepend dialog class name if one was set. This controls the
 			// portrait and also the title if no custom title was set.
-			if (this.Npc != null && !message.Contains(NpcDialogTextSeperator) && this.Portrait != null)
+			// No NPC check: a track's dialog has no NPC, but a portrait it set is still wanted.
+			if (!message.Contains(NpcDialogTextSeperator) && this.Portrait != null)
 			{
 				message = this.Portrait + NpcDialogTextSeperator + message;
 			}

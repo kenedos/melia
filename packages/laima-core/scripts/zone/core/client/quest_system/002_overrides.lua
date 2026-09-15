@@ -34,3 +34,7 @@ Melia.Override("QUEST_FILTER_UPDATE", function(original, frame, control, argStr,
 
 	M_QUESTS_UPDATE_LIST()
 end)
+
+Melia.Override("CLICK_QUEST_MAP_TITLE", function(original, ctrl)
+	M_QUESTS_TOGGLE_SECTION(ctrl)
+end)

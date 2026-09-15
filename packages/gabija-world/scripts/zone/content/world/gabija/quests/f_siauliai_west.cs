@@ -27,7 +27,8 @@ public class SiaulWestMeetTitasQuest : QuestScript
 		SetAutoTracked(true);
 		SetCancelable(true);
 
-		SetPhase(QuestStatus.Possible, "SIAUL_WEST_MEET_TITAS_AUTO", "f_siauliai_west", L("Talk to the Sentry"));
+		// The client's StartNPC is an auto-grant trigger; the Sentry is who the player talks to.
+		SetPhase(QuestStatus.Possible, "SIAU_FRON_NPC_01", "f_siauliai_west", L("Talk to the Sentry"));
 		SetPhase(QuestStatus.InProgress, "SIAU_FRON_NPC_01", "f_siauliai_west", L("Talk to the Sentry"));
 		SetPhase(QuestStatus.Success, "SIAUL_WEST_CAMP_MANAGER", "f_siauliai_west", L("Talk to Knight Titas at the West Forest camp"));
 
@@ -110,7 +111,19 @@ public class SiaulWestStatusTuto1Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1003, QuestStatus.Completed));
 
-		AddObjective("spendStat", L("Talk to the Scout"), new ManualObjective());
+		AddObjective("spendStat", L("Open the info window with 'F1' and spend a stat point"), new VariableCheckObjective(NormalTxFunctionsScript.StatPointsSpentVarName, 1, isPermanent: true));
+	}
+
+	/// <summary>
+	/// Called when a character succeeded in quest objectives.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <param name="quest"></param>
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		base.OnSuccess(character, quest);
+
+		character.Quests.Complete(quest);
 	}
 }
 

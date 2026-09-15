@@ -1,50 +1,20 @@
-local QuestIcons = {
-	Main = "MAIN",
-	Sub = "SUB",
-	Repeat = "REPEAT",
-	Party = "PARTY",
-	KeyItem = "except",
+-- Colors match the quest_list_oneline control set's own userconfig.
+M_QUEST_TYPE_STYLE = {
+	Main    = { icon = "MAIN",     color = "{#ff9b0d}", name = "Main Quest",     label = "Main Quests" },
+	Sub     = { icon = "SUB",      color = "{#09bcff}", name = "Side Quest",     label = "Side Quests" },
+	Repeat  = { icon = "REPEAT",   color = "{#55EE55}", name = "Repeatable",     label = "Repeatable" },
+	Party   = { icon = "PARTY",    color = "{#FF8800}", name = "Party Quest",    label = "Party Quests" },
+	KeyItem = { icon = "KEYQUEST", color = "{#ff6fa2}", name = "Key Item Quest", label = "Key Item Quests" },
 }
 
-function M_QUESTS_SET_NAME(questCtrl, quest)
-	local txtName = GET_CHILD(questCtrl, "name", "ui::CRichText")
-	local lvlText = GET_CHILD(questCtrl, "level", "ui::CRichText")
+M_QUEST_TYPE_ORDER = { "Main", "Sub", "Repeat", "Party", "KeyItem" }
 
-	txtName:SetText("{@s16}{#ffffff}" .. quest.Name)
-	lvlText:SetText("{#ffffff}" .. "Lv " .. quest.Level)
+function M_QUESTS_GET_STYLE(quest)
+	return M_QUEST_TYPE_STYLE[quest.Type] or M_QUEST_TYPE_STYLE.Sub
 end
 
-function M_QUESTS_SET_ICON(questCtrl, quest)
-	local iconName = "minimap_clear"
-	local questmark = GET_CHILD(questCtrl, "questmark", "ui::CPicture")
-
-	if not quest.Done then
-		questmark:EnableHitTest(1)
-		questmark:SetTextTooltip("{@st59}The quest is in progress.{/}")
-	else
-		questmark:EnableHitTest(1)
-		questmark:SetTextTooltip("{@st59}The quest's objectives have been cleared.{/}")
-	end
-
-	if QuestIcons[quest.Type] then
-		local nr = quest.Done and 3 or 1
-		iconName = "minimap_" .. nr .. "_" .. QuestIcons[quest.Type]
-	end
-
-	questmark:SetImage(iconName)
-	questmark:ShowWindow(1)
-end
-
-function M_QUESTS_SET_BUTTONS(questCtrl, quest)
-	local shareParty = GET_CHILD_RECURSIVELY(questCtrl, "shareParty")
-	local questPositionCheck = GET_CHILD_RECURSIVELY(questCtrl, "questPositionCheck")
-	local abandonquest_try = GET_CHILD_RECURSIVELY(questCtrl, "abandonquest_try")
-	local dialogReplay = GET_CHILD_RECURSIVELY(questCtrl, "dialogReplay")
-	local abandon = GET_CHILD_RECURSIVELY(questCtrl, "abandon")
-
-	shareParty:ShowWindow(0)
-	questPositionCheck:ShowWindow(0)
-	abandonquest_try:ShowWindow(0)
-	dialogReplay:ShowWindow(0)
-	abandon:ShowWindow(0)
+-- minimap_2_* is in progress, minimap_3_* is ready to hand in.
+function M_QUESTS_GET_ICON(quest)
+	local state = quest.Done and 3 or 2
+	return "minimap_" .. state .. "_" .. M_QUESTS_GET_STYLE(quest).icon
 end

@@ -41,6 +41,7 @@ public class SiauWestStartTrack : TrackScript
 			Faction = FactionType.Neutral,
 			Level = 1,
 			Ai = "TrackWaitMonster",
+			EndPosition = new Position(-576, 260, -719),
 		}));
 
 		actors.Add(AddTrackActor(character, 10020, -622, 261, -760, 0, sentry));
@@ -54,6 +55,14 @@ public class SiauWestStartTrack : TrackScript
 	{
 		switch (frame)
 		{
+			// Frame 33's line is an inline-Lua keyframe the client never reports, so it plays here.
+			case 34:
+				track.Dialog.SetTitle(L("Knight Titas"));
+				track.Dialog.SetPortrait("Dlg_port_WESTFOREST_MANAGER");
+				await ShowDialog(track, L("What's your business here?{nl}Did the goddess tell you to go to Klaipeda in a dream as well?"));
+				await ShowDialog(track, L("If that's so, go and find Uska, the knight commander of Klaipeda.{nl}But there's something I need to tell you first. Come with me."));
+				break;
+
 			case 64:
 				character.StopLayer();
 				break;

@@ -22,7 +22,8 @@ public class TrackWaitMonsterAiScript : AiScript
 
 	protected override IEnumerable Idle()
 	{
-		yield return Animation("IDLE");
+		// No animation: the cutscene drives its actors' animations itself.
+		yield return Wait(1000);
 	}
 
 	protected override IEnumerable Attack()

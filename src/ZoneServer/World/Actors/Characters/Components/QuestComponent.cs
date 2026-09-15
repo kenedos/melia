@@ -4,9 +4,11 @@ using System.Linq;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Modifiers;
 using Melia.Zone.World.Quests.Objectives;
@@ -34,6 +36,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 	{
 		private readonly static TimeSpan AutoReceiveDelay = TimeSpan.FromMinutes(1);
 		private readonly static TimeSpan LocationCheckInterval = TimeSpan.FromSeconds(1);
+
+		// The distance the client's own return warp puts the player in front of the NPC.
+		private const float ReturnWarpNpcDistance = 20;
+		private const float ReturnWarpStepDistance = 5;
 
 		private readonly object _syncLock = new();
 		private readonly List<Quest> _quests = new();
@@ -1146,18 +1152,117 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Returns the display name of the NPC with the given unique name,
-		/// or the unique name itself if no such NPC is in the world.
+		/// Returns the phase the quest is in, based on its status and
+		/// whether its objectives are done.
 		/// </summary>
+		/// <param name="quest"></param>
+		/// <param name="phase"></param>
+		/// <returns></returns>
+		public static bool TryGetCurrentPhase(Quest quest, out QuestPhase phase)
+		{
+			var status = quest.ObjectivesCompleted ? QuestStatus.Success : quest.Status;
+
+			if (quest.Data.TryGetPhase(status, out phase))
+				return true;
+			if (quest.Data.TryGetPhase(QuestStatus.InProgress, out phase))
+				return true;
+
+			return quest.Data.TryGetPhase(QuestStatus.Possible, out phase);
+		}
+
+		/// <summary>
+		/// Returns the map and position the quest's current phase points at,
+		/// which is where the quest's return warp sends the character.
+		/// </summary>
+		/// <param name="quest"></param>
+		/// <param name="mapClassName"></param>
+		/// <param name="position"></param>
+		/// <returns></returns>
+		public static bool TryGetPhaseDestination(Quest quest, out string mapClassName, out Position position)
+		{
+			mapClassName = null;
+			position = Position.Zero;
+
+			var hasPhase = TryGetCurrentPhase(quest, out var phase);
+
+			// Quests with no phases still name their giver, who takes the turn-in in practice.
+			var npcUniqueNames = new[] { hasPhase ? phase.NpcUniqueName : null, quest.Data.EndNpcUniqueName, quest.Data.StartNpcUniqueName };
+
+			foreach (var npcUniqueName in npcUniqueNames)
+			{
+				if (string.IsNullOrEmpty(npcUniqueName))
+					continue;
+
+				if (!ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == npcUniqueName, out var npc))
+					continue;
+
+				mapClassName = npc.Map.ClassName;
+				position = GetReturnWarpPosition(npc);
+
+				return true;
+			}
+
+			if (!hasPhase || string.IsNullOrEmpty(phase.MapClassName) || phase.Position == Position.Zero)
+				return false;
+
+			mapClassName = phase.MapClassName;
+			position = phase.Position;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Returns the spot in front of the NPC that the return warp puts
+		/// the character on, closing in on the NPC and then searching around
+		/// the spot when what's directly in front isn't standable.
+		/// </summary>
+		/// <param name="npc"></param>
+		/// <returns></returns>
+		private static Position GetReturnWarpPosition(IMonster npc)
+		{
+			var npcPosition = npc.Position;
+			var ground = npc.Map.Ground;
+
+			// Stepping inwards keeps the player in front of the NPC and every step reachable from them.
+			for (var distance = ReturnWarpNpcDistance; distance >= ReturnWarpStepDistance; distance -= ReturnWarpStepDistance)
+			{
+				var stepPosition = npcPosition.GetRelative(npc.Direction, distance);
+
+				if (ground.AnyObstacles(npcPosition, stepPosition) || !ground.TryGetHeightAt(stepPosition, out var stepHeight))
+					continue;
+
+				return stepPosition.WithHeight(stepHeight);
+			}
+
+			var targetPosition = npcPosition.GetRelative(npc.Direction, ReturnWarpNpcDistance);
+
+			if (ground.TryGetNearestValidPosition(targetPosition, out var nearestPosition))
+				return nearestPosition;
+
+			return npcPosition;
+		}
+
+		/// <summary>
+		/// Returns the display name of the NPC with the given unique name,
+		/// or null if no such NPC is in the world.
+		/// </summary>
+		/// <remarks>
+		/// A quest phase can name a trigger rather than an NPC, and the
+		/// player has no use for the internal name of something they can't
+		/// talk to.
+		/// </remarks>
 		/// <param name="uniqueName"></param>
 		/// <returns></returns>
 		private static string GetNpcDisplayName(string uniqueName)
 		{
+			if (string.IsNullOrEmpty(uniqueName))
+				return null;
+
 			if (!ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == uniqueName, out var npc))
-				return uniqueName;
+				return null;
 
 			if (string.IsNullOrEmpty(npc.Name))
-				return uniqueName;
+				return null;
 
 			return npc.Name.Replace("{nl}", " ").Trim();
 		}
@@ -1204,6 +1309,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			var rewardsTable = new LuaTable();
 			foreach (var reward in quest.Data.Rewards)
 			{
+				if (!reward.Displayed)
+					continue;
+
 				var rewardTable = new LuaTable();
 				rewardTable.Insert("Text", reward.ToString());
 				rewardTable.Insert("Icon", reward.Icon);
@@ -1257,12 +1365,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			questTable.Insert("Rewards", rewardsTable);
 
 			// Add quest giver information if available
-			if (!string.IsNullOrEmpty(quest.Data.StartNpcUniqueName))
-				questTable.Insert("QuestGiver", GetNpcDisplayName(quest.Data.StartNpcUniqueName));
+			var questGiverName = GetNpcDisplayName(quest.Data.StartNpcUniqueName);
+
+			if (!string.IsNullOrEmpty(questGiverName))
+				questTable.Insert("QuestGiver", questGiverName);
 
 			// Add quest giver location if available
 			if (!string.IsNullOrEmpty(questGiverLocationName))
 				questTable.Insert("QuestGiverLocation", questGiverLocationName);
+
+			// The client's return warp compares this with the map it's on to
+			// tell a local warp from a map change.
+			if (quest.ObjectivesCompleted && TryGetPhaseDestination(quest, out var warpMapClassName, out _))
+				questTable.Insert("WarpMap", warpMapClassName);
 
 			return questTable;
 		}

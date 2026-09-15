@@ -62,6 +62,12 @@ public class NormalTxFunctionsScript : GeneralScript
 		return NormalTxResult.Fail;
 	}
 
+	/// <summary>
+	/// Name of the variable holding how many stat points the character has
+	/// ever spent, which quests watch to see the player use one.
+	/// </summary>
+	public const string StatPointsSpentVarName = "Melia.StatPointsSpent";
+
 	[ScriptableFunction]
 	public NormalTxResult SCR_TX_STAT_UP(Character character, int[] numArgs)
 	{
@@ -88,6 +94,7 @@ public class NormalTxFunctionsScript : GeneralScript
 
 			//characterProperties.UsedStat += stat;
 			character.Properties.Modify(PropertyName.UsedStat, addPoints);
+			character.Variables.Perm.SetInt(StatPointsSpentVarName, (int)character.Properties.GetFloat(PropertyName.UsedStat));
 
 			switch (i)
 			{

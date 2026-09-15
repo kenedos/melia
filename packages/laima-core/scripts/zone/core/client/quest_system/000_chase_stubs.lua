@@ -1,4 +1,4 @@
--- Fallbacks for worlds that keep the client's own chase window.
+-- Fallbacks for when the chase window scripts have not been sent yet.
 if M_QUESTS_SET_CHASE == nil then
 	function M_QUESTS_SET_CHASE(questCtrl, quest)
 		local chkChase = GET_CHILD(questCtrl, "chase", "ui::CCheckBox")

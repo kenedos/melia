@@ -216,6 +216,33 @@ namespace Melia.Zone.Scripting
 			character.StopLayer();
 		}
 
+		/// <summary>
+		/// Shows a message from the track and waits for the player to
+		/// confirm it, returning quietly if the track ends first.
+		/// </summary>
+		/// <remarks>
+		/// A track's dialog is cancelled when the track ends, and closing a
+		/// dialog throws by design, so the wait has to tolerate both. The
+		/// player's own OnProgress runs from a packet handler, where an
+		/// escaping cancellation surfaces as an unhandled exception.
+		/// </remarks>
+		/// <param name="track"></param>
+		/// <param name="message"></param>
+		/// <returns></returns>
+		protected static async Task ShowDialog(Track track, string message)
+		{
+			if (track.Dialog == null)
+				return;
+
+			try
+			{
+				await track.Dialog.Msg(message);
+			}
+			catch (OperationCanceledException)
+			{
+			}
+		}
+
 		protected static void CreateBattleBoxInLayer(Character character, Track track)
 		{
 			track.HasBattleBoxInLayer = true;

@@ -18,6 +18,12 @@ namespace Melia.Zone.World.Quests
 		public virtual string Icon { get; } = "icon_item_silver";
 
 		/// <summary>
+		/// Returns whether the reward is listed in the client's reward
+		/// display.
+		/// </summary>
+		public virtual bool Displayed { get; } = true;
+
+		/// <summary>
 		/// Gives reward to character.
 		/// </summary>
 		/// <param name="character"></param>

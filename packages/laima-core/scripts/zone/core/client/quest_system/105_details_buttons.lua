@@ -3,8 +3,9 @@ function M_QUESTS_DETAILS_ADD_BUTTONS(frame, x, y, quest)
 
 	x = frame:GetWidth() / 2 - (160 / 2)
 	
+	-- A quest is handed in to its NPC, never from this window.
 	if quest.Done then
-		height = height + M_QUESTS_DETAILS_ADD_BUTTON(frame, x, y + height, "QuestCompleteButton", "Complete", { skin = "test_red_button", tooltip = "Complete the quest.", onLBtnDown = "M_QUESTS_COMPLETE", onLBtnDownArgStr = quest.ObjectId })
+		height = height + M_QUESTS_DETAILS_ADD_BUTTON(frame, x, y + height, "QuestWarpButton", "Return", { skin = "test_gray_button", tooltip = "Warp back to the quest's NPC.", onLBtnDown = "M_QUESTS_WARP", onLBtnDownArgStr = quest.ObjectId })
 	elseif quest.Cancelable then
 		height = height + M_QUESTS_DETAILS_ADD_BUTTON(frame, x, y + height, "QuestCancelButton", "Abandon", { skin = "test_gray_button", tooltip = "Abandon the quest.", onLBtnDown = "M_QUESTS_CANCEL", onLBtnDownArgStr = quest.ObjectId })
 	end
@@ -42,9 +43,9 @@ function M_QUESTS_DETAILS_ADD_BUTTON(frame, x, y, name, text, args)
 	return button:GetHeight()
 end
 
-function M_QUESTS_COMPLETE(frame, control, argStr, argNum)
+function M_QUESTS_WARP(frame, control, argStr, argNum)
 	local questObjectId = argStr
-	Melia.Quests.RequestComplete(questObjectId)
+	Melia.Quests.RequestWarp(questObjectId)
 end
 
 function M_QUESTS_CANCEL(frame, control, argStr, argNum)

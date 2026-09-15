@@ -1,57 +1,59 @@
-local _searchText = ""
+M_QUESTS_SEARCH_TEXT = ""
+M_QUESTS_COLLAPSED = {}
 
 function M_QUESTS_SET_SEARCH(text)
-	_searchText = string.lower(text or "")
+	M_QUESTS_SEARCH_TEXT = string.lower(text or "")
 	M_QUESTS_UPDATE_LIST()
 end
 
+function M_QUESTS_IS_FILTERED(quest, filters)
+	if filters[quest.Type] == false then
+		return true
+	end
+
+	if quest.Tracked and filters["Chase"] ~= true then
+		return true
+	end
+
+	if M_QUESTS_SEARCH_TEXT == "" then
+		return false
+	end
+
+	local name = string.lower(quest.Name or "")
+	local location = string.lower(quest.Location or "")
+	local inName = string.find(name, M_QUESTS_SEARCH_TEXT, 1, true)
+	local inLocation = string.find(location, M_QUESTS_SEARCH_TEXT, 1, true)
+
+	return inName == nil and inLocation == nil
+end
+
 function M_QUESTS_DRAW_LIST(frame, quests)
-	local x = 10
 	local y = 0
 
 	frame:DeleteAllControl()
 
 	local filters = GET_QUEST_MODE_OPTION()
+	local sections = {}
 
 	for i = 1, #quests do
 		local quest = quests[i]
 
-		local filtered = filters[quest.Type] == false
-		if quest.Tracked and filters["Chase"] ~= true then
-			filtered = true
+		if not M_QUESTS_IS_FILTERED(quest, filters) then
+			local typeName = M_QUEST_TYPE_STYLE[quest.Type] and quest.Type or "Sub"
+			sections[typeName] = sections[typeName] or {}
+			table.insert(sections[typeName], quest)
 		end
+	end
 
-		if not filtered and _searchText ~= "" then
-			local name = string.lower(quest.Name or "")
-			local location = string.lower(quest.Location or "")
-			if not string.find(name, _searchText, 1, true) and not string.find(location, _searchText, 1, true) then
-				filtered = true
-			end
-		end
+	for i = 1, #M_QUEST_TYPE_ORDER do
+		local typeName = M_QUEST_TYPE_ORDER[i]
+		local section = sections[typeName]
 
-		if not filtered then
-			y = y + M_QUESTS_DRAW_QUEST(frame, quest, i, x, y)
+		if section ~= nil and #section > 0 then
+			M_QUESTS_SORT_SECTION(section)
+			y = y + M_QUESTS_DRAW_SECTION(frame, typeName, section, y)
 		end
 	end
 
 	frame:Invalidate()
-end
-
-function M_QUESTS_DRAW_QUEST(frame, quest, i, x, y)
-	local questCtrl = frame:CreateOrGetControlSet("quest_list_oneline", "QuestItemTest" .. i, 10, y)
-	AUTO_CAST(questCtrl)
-	
-	if i % 2 == 0 then
-		questCtrl:SetSkinName("chat_window_2")
-	end
-
-	M_QUESTS_SET_NAME(questCtrl, quest)
-	M_QUESTS_SET_ICON(questCtrl, quest)
-	M_QUESTS_SET_BUTTONS(questCtrl, quest)
-	M_QUESTS_SET_CHASE(questCtrl, quest)
-
-	questCtrl:SetEventScript(ui.LBUTTONDOWN, "M_QUESTS_CLICK_INFO")
-	questCtrl:SetEventScriptArgString(ui.LBUTTONDOWN, quest.ObjectId)
-
-	return questCtrl:GetHeight()
 end

@@ -2,7 +2,7 @@
 // Quest Chase Window
 //--- Description -----------------------------------------------------------
 // Replaces the client's quest tracker with the one driven by the custom
-// quest system. Worlds that leave this out keep the client's own tracker.
+// quest system.
 //---------------------------------------------------------------------------
 
 using Melia.Zone.Scripting;

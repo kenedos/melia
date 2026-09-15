@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Quests;
@@ -199,7 +200,17 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					// Catches up a character who spent their point before the scout brought it up.
+					character.Variables.Perm.SetInt(NormalTxFunctionsScript.StatPointsSpentVarName, (int)character.Properties.GetFloat(PropertyName.UsedStat));
 					character.Quests.Start(StatusTuto);
+
+					if (character.Quests.IsCompletable(StatusTuto))
+					{
+						await dialog.Msg(L("Ah - you've done it already. Then you know the shape of it."));
+						character.Quests.Complete(StatusTuto);
+						return;
+					}
+
 					character.ServerMessage(L("Press 'F1' to check your stats."));
 				}
 				return;
@@ -207,6 +218,12 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(StatusTuto))
 			{
+				if (!character.Quests.IsCompletable(StatusTuto))
+				{
+					await dialog.Msg(L("Open the info window with 'F1' and put the point somewhere. It matters that you decide early what you mean to become."));
+					return;
+				}
+
 				await dialog.Msg(L("It matters that you decide early what you mean to become. It's never an easy thing."));
 				await dialog.Msg(L("There. That's how it's done - simple enough. With the goddesses gone and nobody sure what comes next, you'll want to keep at it."));
 				character.Quests.Complete(StatusTuto);

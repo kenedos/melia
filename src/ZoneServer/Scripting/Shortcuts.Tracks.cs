@@ -134,7 +134,8 @@ namespace Melia.Zone.Scripting
 			else
 				monster.Components.Add(new AiComponent(monster, string.IsNullOrEmpty(spec.Ai) ? "BasicMonster" : spec.Ai));
 
-			character.Map.AddMonster(monster);
+			// Added at once, since the cutscene packet names it by handle right after.
+			character.Map.AddMonsterNow(monster);
 
 			var overrides = new PropertyOverrides();
 

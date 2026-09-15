@@ -65,8 +65,8 @@ Melia.Quests.CountTracked = function()
 	return result
 end
 
-Melia.Quests.RequestComplete = function(questObjectId)
-	ui.Chat("/quest complete " .. questObjectId)
+Melia.Quests.RequestWarp = function(questObjectId)
+	M_QUESTS_WARP_START(questObjectId)
 end
 
 Melia.Quests.RequestCancel = function(questObjectId)

@@ -33,6 +33,12 @@ namespace Melia.Zone.World.Quests.Rewards
 		public override string Icon => "Item:" + this.ItemClassId;
 
 		/// <summary>
+		/// Returns whether the reward is listed in the client's reward
+		/// display.
+		/// </summary>
+		public override bool Displayed => false;
+
+		/// <summary>
 		/// Creates a reward that takes back the given item.
 		/// </summary>
 		/// <param name="itemClassName"></param>

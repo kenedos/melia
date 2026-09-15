@@ -92,6 +92,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				actors = Array.Empty<IActor>();
 			track.Actors = actors;
 
+			// The cutscene addresses its cast by handle, so the client has to
+			// have been told about every one of them before it starts.
+			this.Character.LookAround();
+
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x6B, true, this.Character.Name);
