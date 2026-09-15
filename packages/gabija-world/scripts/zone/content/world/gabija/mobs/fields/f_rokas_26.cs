@@ -130,9 +130,5 @@ public class FRokas26MobScript : GeneralScript
 		AddSpawnPoint("f_rokas_26.Id6", "f_rokas_26", Rectangle(1203, -1768, 30));
 		AddSpawnPoint("f_rokas_26.Id6", "f_rokas_26", Rectangle(1092, -1873, 30));
 		AddSpawnPoint("f_rokas_26.Id6", "f_rokas_26", Rectangle(-70, 1573, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Shnayim, "f_rokas_26", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Denoptic, "f_rokas_26", 1, Hours(6), Hours(12));
 	}
 }

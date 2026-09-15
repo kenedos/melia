@@ -144,8 +144,5 @@ public class DStartower601MobScript : GeneralScript
 		AddSpawnPoint("d_startower_60_1.Id7", "d_startower_60_1", Rectangle(1685, -2317, 40));
 		AddSpawnPoint("d_startower_60_1.Id7", "d_startower_60_1", Rectangle(1777, -2111, 40));
 		AddSpawnPoint("d_startower_60_1.Id7", "d_startower_60_1", Rectangle(1848, -2325, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.FD_Boss_Necrovanter, "d_startower_60_1", 1, Hours(2), Hours(4));
 	}
 }

@@ -118,9 +118,5 @@ public class FKatyn13MobScript : GeneralScript
 		AddSpawnPoint("f_katyn_13.Id7", "f_katyn_13", Rectangle(32, 1479, 30));
 		AddSpawnPoint("f_katyn_13.Id7", "f_katyn_13", Rectangle(-893, -838, 30));
 		AddSpawnPoint("f_katyn_13.Id7", "f_katyn_13", Rectangle(-653, 78, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Mushwort, "f_katyn_13", 1, Hours(2), Hours(4));
-		AddBossSpawner(MonsterId.Boss_Woodspirit_Green, "f_katyn_13", 1, Hours(2), Hours(4));
 	}
 }

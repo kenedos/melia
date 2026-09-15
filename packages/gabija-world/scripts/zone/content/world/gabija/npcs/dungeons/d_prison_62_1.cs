@@ -14,7 +14,7 @@ public class DPrison621NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(6, 40120, "Statue of Goddess Vakarine", "d_prison_62_1", -511.9751, 326.1438, 86.08859, -3, "WARP_D_PRISON_62_1", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(6, "WARP_D_PRISON_62_1", "d_prison_62_1", -511.9751, 326.1438, 86.08859, -3);
 
 	}
 }

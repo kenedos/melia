@@ -147,8 +147,5 @@ public class FRemains37MobScript : GeneralScript
 		AddSpawnPoint("f_remains_37.Id8", "f_remains_37", Rectangle(393, 2670, 250));
 		AddSpawnPoint("f_remains_37.Id8", "f_remains_37", Rectangle(779, 2771, 250));
 		AddSpawnPoint("f_remains_37.Id8", "f_remains_37", Rectangle(693, 2559, 250));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_MagBurk, "f_remains_37", 1, Hours(6), Hours(12));
 	}
 }

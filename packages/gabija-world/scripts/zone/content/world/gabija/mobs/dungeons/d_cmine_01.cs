@@ -235,12 +235,5 @@ public class DCmine01MobScript : GeneralScript
 
 		// 'Goblin_Miners_Q1' GenType 535 Spawn Points
 		AddSpawnPoint("d_cmine_01.Id12", "d_cmine_01", Rectangle(-723, -892, 300));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Salamander, "d_cmine_01", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Strongholder, "d_cmine_01", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Spector_F, "d_cmine_01", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Spector_M, "d_cmine_01", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Bearkaras, "d_cmine_01", 1, Hours(6), Hours(12));
 	}
 }

@@ -129,8 +129,5 @@ public class DVelniasprison514MobScript : GeneralScript
 
 		// 'Mushroom_Ent_Green' GenType 30 Spawn Points
 		AddSpawnPoint("d_velniasprison_51_4.Id7", "d_velniasprison_51_4", Rectangle(-1360, 368, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Dionys, "d_velniasprison_51_4", 1, Hours(2), Hours(4));
 	}
 }

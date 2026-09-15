@@ -14,7 +14,7 @@ public class FRemains373NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(33, 40120, "Statue of Goddess Vakarine", "f_remains_37_3", 455.1151, 80.3744, -1175.304, 0, "WARP_F_REMAINS_37_3", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(33, "WARP_F_REMAINS_37_3", "f_remains_37_3", 455.1151, 80.3744, -1175.304, 0);
 		
 		// [Kedoran Merchant Alliance]{nl} Relic Collector
 		//-------------------------------------------------------------------------

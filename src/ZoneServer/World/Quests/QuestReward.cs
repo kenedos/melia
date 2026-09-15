@@ -21,7 +21,8 @@ namespace Melia.Zone.World.Quests
 		/// Gives reward to character.
 		/// </summary>
 		/// <param name="character"></param>
-		public abstract void Give(Character character);
+		/// <param name="quest"></param>
+		public abstract void Give(Character character, Quest quest);
 
 		/// <summary>
 		/// Initializes reward.

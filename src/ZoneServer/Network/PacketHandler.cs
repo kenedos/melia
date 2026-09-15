@@ -5851,9 +5851,10 @@ namespace Melia.Zone.Network
 				}
 				Send.ZC_NORMAL.SetupCutscene(character, false, false, true);
 
-				// End the track now that the client cinematic is complete
-				character.Tracks.End(track.Id);
-				//character.Tracks.Progress(track.Id, frame);
+				// A track that locked the player into a battle box runs on
+				// into the fight, and ends with the quest, not the cinematic.
+				if (!track.HasBattleBoxInLayer)
+					character.Tracks.End(track.Id);
 			}
 		}
 

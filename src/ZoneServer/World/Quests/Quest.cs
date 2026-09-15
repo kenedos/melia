@@ -6,6 +6,7 @@ using System.Threading;
 using Melia.Shared.Data.Database;
 using Melia.Shared.ObjectProperties;
 using Melia.Zone.Scripting;
+using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Quests
 {
@@ -65,6 +66,16 @@ namespace Melia.Zone.World.Quests
 		/// Returns the quest's data.
 		/// </summary>
 		public QuestData Data { get; }
+
+		/// <summary>
+		/// Returns the variables of this character's instance of the quest.
+		/// </summary>
+		/// <remarks>
+		/// Unlike the shared variables on the quest's data, these belong to
+		/// one character's copy of the quest. They are temporary and are not
+		/// saved across server restarts.
+		/// </remarks>
+		public Variables Vars { get; } = new Variables();
 
 		/// <summary>
 		/// Returns the quest's static data.

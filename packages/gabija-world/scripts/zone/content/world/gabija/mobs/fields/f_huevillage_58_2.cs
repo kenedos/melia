@@ -99,9 +99,5 @@ public class FHuevillage582MobScript : GeneralScript
 
 		// 'Rudas_Loxodon' GenType 45 Spawn Points
 		AddSpawnPoint("f_huevillage_58_2.Id9", "f_huevillage_58_2", Rectangle(-57, 81, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Moldyhorn, "f_huevillage_58_2", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Woodspirit_Blue, "f_huevillage_58_2", 1, Hours(2), Hours(4));
 	}
 }

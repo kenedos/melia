@@ -130,8 +130,5 @@ public class FGele571MobScript : GeneralScript
 
 		// 'Panto_Javelin_Gele' GenType 149 Spawn Points
 		AddSpawnPoint("f_gele_57_1.Id10", "f_gele_57_1", Rectangle(721, -514, 100));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Capria, "f_gele_57_1", 1, Hours(6), Hours(12));
 	}
 }

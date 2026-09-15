@@ -14,6 +14,6 @@ public class FKatyn72NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(1, 40120, "Statue of Goddess Vakarine", "f_katyn_7_2", -188, 256, -2292, 91, "WARP_F_KATYN_7_2", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(1, "WARP_F_KATYN_7_2", "f_katyn_7_2", -188, 256, -2292, 91);
 	}
 }

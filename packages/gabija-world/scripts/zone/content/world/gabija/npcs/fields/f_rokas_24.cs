@@ -14,7 +14,7 @@ public class FRokas24NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(3, 40120, "Statue of Goddess Vakarine", "f_rokas_24", 913, 123, -1882, 0, "WARP_F_ROKAS_24", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(3, "WARP_F_ROKAS_24", "f_rokas_24", 913, 123, -1882, 0);
 		
 		// Merchant Davio
 		//-------------------------------------------------------------------------

@@ -120,9 +120,5 @@ public class FHuevillage581MobScript : GeneralScript
 		AddSpawnPoint("f_huevillage_58_1.Id8", "f_huevillage_58_1", Rectangle(-359, -143, 35));
 		AddSpawnPoint("f_huevillage_58_1.Id8", "f_huevillage_58_1", Rectangle(-545, -185, 35));
 		AddSpawnPoint("f_huevillage_58_1.Id8", "f_huevillage_58_1", Rectangle(-605, -1110, 35));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Moyabruka, "f_huevillage_58_1", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Merregina, "f_huevillage_58_1", 1, Hours(6), Hours(12));
 	}
 }

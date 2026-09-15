@@ -14,6 +14,6 @@ public class DLimestonecave521NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(25, 40120, "Statue of Goddess Vakarine", "d_limestonecave_52_1", -514.34, 0, -617.36, -13, "WARP_D_LIMESTONE_52_1", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(25, "WARP_D_LIMESTONE_52_1", "d_limestonecave_52_1", -514.34, 0, -617.36, -13);
 	}
 }

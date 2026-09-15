@@ -64,6 +64,11 @@ public class GuardAiScript : AiScript
 
 	protected override bool TryGetRandomSkill(out Skill skill)
 	{
+		// A model with its own attack keeps it, so the client plays the
+		// animation that model actually has.
+		if (this.Entity is Mob mob && mob.Data.Skills.Count > 0)
+			return base.TryGetRandomSkill(out skill);
+
 		skill = null;
 
 		if (!this.Entity.Components.TryGet<BaseSkillComponent>(out var skills))

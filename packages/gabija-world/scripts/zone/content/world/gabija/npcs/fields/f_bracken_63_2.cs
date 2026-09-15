@@ -26,7 +26,7 @@ public class FBracken632NpcScript : GeneralScript
 		
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(304, 40120, "Statue of Goddess Vakarine", "f_bracken_63_2", 196.9207, 284.1552, 998.8207, 90, "WARP_F_BRACKEN_63_2", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(304, "WARP_F_BRACKEN_63_2", "f_bracken_63_2", 196.9207, 284.1552, 998.8207, 90);
 
 	}
 }

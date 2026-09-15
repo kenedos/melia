@@ -14,6 +14,6 @@ public class FRemains38NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(74, 40120, "Statue of Goddess Vakarine", "f_remains_38", 340.66, 277.95, -457.09, 0, "WARP_F_REMAINS_38", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(74, "WARP_F_REMAINS_38", "f_remains_38", 340.66, 277.95, -457.09, 0);
 	}
 }

@@ -251,6 +251,39 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Puts the character at the top of the given track actor's hate
+		/// list, so it comes for them the moment it can act.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="track"></param>
+		/// <param name="actorIndex">Index of the actor in the track's cast.</param>
+		/// <param name="hate"></param>
+		protected static void InsertTrackHate(Character character, Track track, int actorIndex, int hate = 999)
+		{
+			if (track.Actors == null || actorIndex < 0 || actorIndex >= track.Actors.Length)
+				return;
+
+			if (track.Actors[actorIndex] is ICombatEntity entity)
+				entity.InsertHate(character, hate);
+		}
+
+		/// <summary>
+		/// Removes the given track actor from the map, for the cutscene
+		/// commands that kill off an actor mid-track.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="track"></param>
+		/// <param name="actorIndex">Index of the actor in the track's cast.</param>
+		protected static void RemoveTrackActor(Character character, Track track, int actorIndex)
+		{
+			if (track.Actors == null || actorIndex < 0 || actorIndex >= track.Actors.Length)
+				return;
+
+			if (track.Actors[actorIndex] is IMonster monster && track.Actors[actorIndex] != character)
+				character.Map.RemoveMonster(monster);
+		}
+
+		/// <summary>
 		/// Usually enables aggressive behavior of track monsters
 		/// </summary>
 		/// <param name="character"></param>
@@ -265,8 +298,14 @@ namespace Melia.Zone.Scripting
 					// Can I just add the movement component here instead?
 					if (actor is Character)
 						continue;
+					if (combatEntity is Mob monster)
+						monster.Position = monster.SpawnPosition;
+
 					combatEntity.Components.Add(new MovementComponent(combatEntity));
 					combatEntity.Tendency = TendencyType.Aggressive;
+
+					if (combatEntity.Components.TryGet<AiComponent>(out var aiComponent))
+						aiComponent.Script.RefreshMovement();
 				}
 			}
 		}

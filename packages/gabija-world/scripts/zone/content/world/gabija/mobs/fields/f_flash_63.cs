@@ -217,8 +217,5 @@ public class FFlash63MobScript : GeneralScript
 		AddSpawnPoint("f_flash_63.Id8", "f_flash_63", Rectangle(1044, -1201, 50));
 		AddSpawnPoint("f_flash_63.Id8", "f_flash_63", Rectangle(1131, -1286, 50));
 		AddSpawnPoint("f_flash_63.Id8", "f_flash_63", Rectangle(1103, -1363, 50));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Stonefroster, "f_flash_63", 1, Hours(2), Hours(4));
 	}
 }

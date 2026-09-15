@@ -252,8 +252,5 @@ public class FOrchard324MobScript : GeneralScript
 		AddSpawnPoint("f_orchard_32_4.Id6", "f_orchard_32_4", Rectangle(-1632, 806, 40));
 		AddSpawnPoint("f_orchard_32_4.Id6", "f_orchard_32_4", Rectangle(-1561, 999, 40));
 		AddSpawnPoint("f_orchard_32_4.Id6", "f_orchard_32_4", Rectangle(-1479, 876, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Zawra, "f_orchard_32_4", 1, Hours(2), Hours(4));
 	}
 }

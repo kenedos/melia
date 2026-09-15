@@ -88,10 +88,5 @@ public class FKatyn7MobScript : GeneralScript
 
 		// 'Fisherman' GenType 10022 Spawn Points
 		AddSpawnPoint("f_katyn_7.Id10", "f_katyn_7", Rectangle(-2046, 1274, 400));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Deadbone, "f_katyn_7", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Saltistter, "f_katyn_7", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Zombiegirl2_Helm, "f_katyn_7", 1, Hours(2), Hours(4));
 	}
 }

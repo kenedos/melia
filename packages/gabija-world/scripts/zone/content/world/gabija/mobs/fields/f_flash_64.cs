@@ -171,8 +171,5 @@ public class FFlash64MobScript : GeneralScript
 		AddSpawnPoint("f_flash_64.Id10", "f_flash_64", Rectangle(-450, -1710, 20));
 		AddSpawnPoint("f_flash_64.Id10", "f_flash_64", Rectangle(-491, -1635, 20));
 		AddSpawnPoint("f_flash_64.Id10", "f_flash_64", Rectangle(-442, -1575, 20));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Gargoyle, "f_flash_64", 1, Hours(2), Hours(4));
 	}
 }

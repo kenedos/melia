@@ -135,8 +135,5 @@ public class FGele573MobScript : GeneralScript
 		AddSpawnPoint("f_gele_57_3.Id9", "f_gele_57_3", Rectangle(915, 86, 20));
 		AddSpawnPoint("f_gele_57_3.Id9", "f_gele_57_3", Rectangle(840, -28, 20));
 		AddSpawnPoint("f_gele_57_3.Id9", "f_gele_57_3", Rectangle(853, 209, 20));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Minotaurs, "f_gele_57_3", 1, Hours(6), Hours(12));
 	}
 }

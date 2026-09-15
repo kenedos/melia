@@ -14,6 +14,6 @@ public class FTableland282NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(45, 40120, "Statue of Goddess Vakarine", "f_tableland_28_2", 863.4312, 247.0137, 1283.108, 90, "WARP_F_TABLELAND_28_2", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(45, "WARP_F_TABLELAND_28_2", "f_tableland_28_2", 863.4312, 247.0137, 1283.108, 90);
 	}
 }

@@ -30,6 +30,6 @@ public class COrshaNpcScript : GeneralScript
 		
 		// Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
-		AddNpc(115, 154063, "Statue of Goddess Ausrine", "c_orsha", 103.14, 176.14, 322.95, -46, "WARP_C_ORSHA", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(115, "WARP_C_ORSHA", "c_orsha", 103.14, 176.14, 322.95, -46, L("Statue of Goddess Ausrine"), 154063);
 	}
 }

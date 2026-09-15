@@ -164,11 +164,5 @@ public class DThorn21MobScript : GeneralScript
 		AddSpawnPoint("d_thorn_21.Id9", "d_thorn_21", Rectangle(1601, 1254, 30));
 		AddSpawnPoint("d_thorn_21.Id9", "d_thorn_21", Rectangle(1401, 1058, 30));
 		AddSpawnPoint("d_thorn_21.Id9", "d_thorn_21", Rectangle(1385, 1353, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Gaigalas, "d_thorn_21", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Honeypin, "d_thorn_21", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Molich, "d_thorn_21", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Bramble, "d_thorn_21", 1, Hours(6), Hours(12));
 	}
 }

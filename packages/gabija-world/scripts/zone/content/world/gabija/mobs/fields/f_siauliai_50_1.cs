@@ -153,8 +153,5 @@ public class FSiauliai501MobScript : GeneralScript
 		AddSpawnPoint("f_siauliai_50_1.Id10", "f_siauliai_50_1", Rectangle(-971, 1445, 50));
 		AddSpawnPoint("f_siauliai_50_1.Id10", "f_siauliai_50_1", Rectangle(-982, 1293, 50));
 		AddSpawnPoint("f_siauliai_50_1.Id10", "f_siauliai_50_1", Rectangle(-826, 1440, 50));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Gorgon, "f_siauliai_50_1", 1, Hours(6), Hours(12));
 	}
 }

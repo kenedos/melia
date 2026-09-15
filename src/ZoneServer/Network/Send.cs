@@ -6162,8 +6162,8 @@ namespace Melia.Zone.Network
 			using var packet = Packet.Rent(Op.ZC_CREATE_SCROLLLOCKBOX);
 
 			packet.PutInt(actor.Handle);
-			packet.PutPosition2D(leftPos);
-			packet.PutPosition2D(rightPos);
+			packet.PutPosition(leftPos);
+			packet.PutPosition(rightPos);
 			packet.PutFloat(width);
 
 			character.Connection.Send(packet);

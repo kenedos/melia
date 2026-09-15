@@ -155,8 +155,5 @@ public class DThorn23MobScript : GeneralScript
 		AddSpawnPoint("d_thorn_23.Id14", "d_thorn_23", Rectangle(-996, 250, 30));
 		AddSpawnPoint("d_thorn_23.Id14", "d_thorn_23", Rectangle(-328, 337, 30));
 		AddSpawnPoint("d_thorn_23.Id14", "d_thorn_23", Rectangle(-85, 559, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Rajapearl, "d_thorn_23", 1, Hours(2), Hours(4));
 	}
 }

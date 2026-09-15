@@ -227,8 +227,5 @@ public class DAbbey643MobScript : GeneralScript
 		AddSpawnPoint("d_abbey_64_3.Id8", "d_abbey_64_3", Rectangle(1302, -411, 40));
 		AddSpawnPoint("d_abbey_64_3.Id8", "d_abbey_64_3", Rectangle(1193, -151, 40));
 		AddSpawnPoint("d_abbey_64_3.Id8", "d_abbey_64_3", Rectangle(1111, -523, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Deathweaver, "d_abbey_64_3", 1, Hours(6), Hours(12));
 	}
 }

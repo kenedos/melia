@@ -96,8 +96,5 @@ public class IdCatacomb01MobScript : GeneralScript
 		AddSpawnPoint("id_catacomb_01.Id7", "id_catacomb_01", Rectangle(635, 2443, 35));
 		AddSpawnPoint("id_catacomb_01.Id7", "id_catacomb_01", Rectangle(396, 2730, 35));
 		AddSpawnPoint("id_catacomb_01.Id7", "id_catacomb_01", Rectangle(428, 1964, 35));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.FD_Boss_Abomination, "id_catacomb_01", 1, Hours(2), Hours(4));
 	}
 }

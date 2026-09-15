@@ -132,8 +132,5 @@ public class FKatyn451MobScript : GeneralScript
 
 		// 'Stoulet_Bow_Blue' GenType 19 Spawn Points
 		AddSpawnPoint("f_katyn_45_1.Id7", "f_katyn_45_1", Rectangle(-340, 233, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Silva_Griffin, "f_katyn_45_1", 1, Hours(2), Hours(4));
 	}
 }

@@ -14,7 +14,7 @@ public class CNunneryNpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(10, 40120, "Statue of Goddess Vakarine", "c_nunnery", 105, -75, 4, 405, "WARP_C_NUNNERY", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(10, "WARP_C_NUNNERY", "c_nunnery", 105, -75, 4, 405);
 		
 		// Merchant Running from the Petrifying Frost
 		//-------------------------------------------------------------------------

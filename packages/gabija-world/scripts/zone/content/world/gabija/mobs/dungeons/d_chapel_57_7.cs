@@ -125,8 +125,5 @@ public class DChapel577MobScript : GeneralScript
 		AddSpawnPoint("d_chapel_57_7.Id7", "d_chapel_57_7", Rectangle(-1117, -98, 40));
 		AddSpawnPoint("d_chapel_57_7.Id7", "d_chapel_57_7", Rectangle(-839, -273, 40));
 		AddSpawnPoint("d_chapel_57_7.Id7", "d_chapel_57_7", Rectangle(-783, -15, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Gesti, "d_chapel_57_7", 1, Hours(2), Hours(4));
 	}
 }

@@ -91,9 +91,5 @@ public class DCmine9MobScript : GeneralScript
 
 		// 'FD_Bat_Big' GenType 1052 Spawn Points
 		AddSpawnPoint("d_cmine_9.Id7", "d_cmine_9", Rectangle(556, 115, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Kubas, "d_cmine_9", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.FD_Boss_Kubas, "d_cmine_9", 1, Hours(2), Hours(4));
 	}
 }

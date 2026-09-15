@@ -14,6 +14,6 @@ public class FRokas30NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(650, 40120, "Statue of Goddess Vakarine", "f_rokas_30", 825.83, 148.17, -989.87, 90, "WARP_F_ROKAS_30", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(650, "WARP_F_ROKAS_30", "f_rokas_30", 825.83, 148.17, -989.87, 90);
 	}
 }

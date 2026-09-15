@@ -372,6 +372,33 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Adds an invisible area trigger to the world, which runs the given
+		/// function when a character steps into it.
+		/// </summary>
+		/// <remarks>
+		/// The counterpart to the client's hidden trigger objects, which is
+		/// how a quest phase is bound to a place rather than an NPC.
+		/// </remarks>
+		/// <param name="uniqueName">Name the trigger is addressed by, such as a quest's phase NPC.</param>
+		/// <param name="map">Map class name to place the trigger on.</param>
+		/// <param name="x"></param>
+		/// <param name="z"></param>
+		/// <param name="radius">Radius of the area that triggers the function.</param>
+		/// <param name="onEnter"></param>
+		/// <returns></returns>
+		public static Npc AddQuestTrigger(string uniqueName, string map, double x, double z, double radius, TriggerActorFuncAsync onEnter)
+		{
+			var npc = AddNpc(MonsterId.HiddenTrigger, "", uniqueName, map, x, z, 0);
+			if (npc == null)
+				return null;
+
+			npc.SetTriggerArea(Spot(npc.Position.X, npc.Position.Z, radius));
+			npc.SetEnterTrigger(uniqueName, onEnter);
+
+			return npc;
+		}
+
+		/// <summary>
 		/// Creates a custom shop.
 		/// </summary>
 		/// <param name="name"></param>

@@ -121,9 +121,5 @@ public class FRokas27MobScript : GeneralScript
 		AddSpawnPoint("f_rokas_27.Id7", "f_rokas_27", Rectangle(1108, -632, 30));
 		AddSpawnPoint("f_rokas_27.Id7", "f_rokas_27", Rectangle(938, -628, 30));
 		AddSpawnPoint("f_rokas_27.Id7", "f_rokas_27", Rectangle(1073, -459, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_TombLord, "f_rokas_27", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Confinedion, "f_rokas_27", 1, Hours(6), Hours(12));
 	}
 }

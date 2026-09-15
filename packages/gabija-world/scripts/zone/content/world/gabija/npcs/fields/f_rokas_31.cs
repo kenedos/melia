@@ -14,6 +14,6 @@ public class FRokas31NpcScript : GeneralScript
 	{
 		// Statue of Goddess Zemyna
 		//-------------------------------------------------------------------------
-		AddNpc(621, 40110, "Statue of Goddess Zemyna", "f_rokas_31", 496, 107, -27, -10, "F_ROKAS_31_EV_55_001", "F_ROKAS_31_EV_55_001", "F_ROKAS_31_EV_55_001");
+		AddStatPointStatue(621, "F_ROKAS_31_EV_55_001", "f_rokas_31", 496, 107, -27, -10);
 	}
 }

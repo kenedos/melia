@@ -216,8 +216,5 @@ public class FBracken633MobScript : GeneralScript
 
 		// 'Sec_Bubbe_Fighter' GenType 323 Spawn Points
 		AddSpawnPoint("f_bracken_63_3.Id7", "f_bracken_63_3", Rectangle(834, -176, 400));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Gremlin, "f_bracken_63_3", 1, Hours(2), Hours(4));
 	}
 }

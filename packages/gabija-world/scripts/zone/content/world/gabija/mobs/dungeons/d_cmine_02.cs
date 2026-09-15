@@ -105,10 +105,5 @@ public class DCmine02MobScript : GeneralScript
 
 		// 'Goblin_Archer' GenType 535 Spawn Points
 		AddSpawnPoint("d_cmine_02.Id6", "d_cmine_02", Rectangle(-587, 318, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Ginklas, "d_cmine_02", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Stone_Whale, "d_cmine_02", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Carapace, "d_cmine_02", 1, Hours(6), Hours(12));
 	}
 }

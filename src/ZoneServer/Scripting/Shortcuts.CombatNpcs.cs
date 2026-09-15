@@ -218,21 +218,37 @@ namespace Melia.Zone.Scripting
 			mob.Position = pos;
 			mob.SpawnPosition = pos;
 			mob.Direction = dir;
-			mob.Faction = FactionType.Our_Forces;
-			mob.Tendency = TendencyType.Aggressive;
 
 			if (!string.IsNullOrEmpty(name))
 				mob.Name = name;
 
-			mob.Vars.SetBool("Laima.Guards.IsGuard", true);
-
+			MakeCombatNpc(mob);
 			mob.Components.Add(new MovementComponent(mob));
-			mob.Components.Add(new AiComponent(mob, "Guard"));
-
 			mob.ApplyOverrides(GenerateGuardStats(level));
 
 			mapObj.AddMonster(mob);
 			return mob;
+		}
+
+		/// <summary>
+		/// Turns the given monster into a combat NPC that fights alongside
+		/// players, giving it the faction, tendency and AI every one of them
+		/// shares.
+		/// </summary>
+		/// <remarks>
+		/// The movement component is left to the caller, as a cutscene actor
+		/// only gets one once the cutscene hands it over to the fight. An owner
+		/// makes the NPC's kills count for them.
+		/// </remarks>
+		/// <param name="mob"></param>
+		/// <param name="owner"></param>
+		public static void MakeCombatNpc(Mob mob, ICombatEntity owner = null)
+		{
+			mob.Faction = FactionType.Our_Forces;
+			mob.Tendency = TendencyType.Aggressive;
+			mob.Vars.SetBool("Laima.Guards.IsGuard", true);
+
+			mob.Components.Add(new AiComponent(mob, "Guard", owner));
 		}
 
 		/// <summary>

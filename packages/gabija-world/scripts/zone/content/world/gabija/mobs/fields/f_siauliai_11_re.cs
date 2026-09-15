@@ -366,8 +366,5 @@ public class FSiauliai11ReMobScript : GeneralScript
 		// 'Onion_Red_Elite' GenType 319 Spawn Points
 		AddSpawnPoint("f_siauliai_11_re.Id11", "f_siauliai_11_re", Rectangle(-474, 291, 9999));
 		AddSpawnPoint("f_siauliai_11_re.Id11", "f_siauliai_11_re", Rectangle(-355, 853, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Woodspirit, "f_siauliai_11_re", 1, Hours(2), Hours(4));
 	}
 }

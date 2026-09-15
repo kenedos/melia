@@ -125,8 +125,5 @@ public class FCastle204MobScript : GeneralScript
 
 		// 'Templeslave_Sword_Black' GenType 29 Spawn Points
 		AddSpawnPoint("f_castle_20_4.Id5", "f_castle_20_4", Rectangle(16, -248, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Ebonypawn, "f_castle_20_4", 1, Hours(2), Hours(4));
 	}
 }

@@ -302,9 +302,5 @@ public class FSiauliai16MobScript : GeneralScript
 		AddSpawnPoint("f_siauliai_16.Id12", "f_siauliai_16", Rectangle(165, 1608, 30));
 		AddSpawnPoint("f_siauliai_16.Id12", "f_siauliai_16", Rectangle(808, 1882, 30));
 		AddSpawnPoint("f_siauliai_16.Id12", "f_siauliai_16", Rectangle(353, 1368, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Lepus, "f_siauliai_16", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Sparnas, "f_siauliai_16", 1, Hours(6), Hours(12));
 	}
 }

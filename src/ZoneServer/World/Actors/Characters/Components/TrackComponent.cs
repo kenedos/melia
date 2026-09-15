@@ -63,6 +63,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(trackId) == 1)
 				return false;
 
+			// The delay is what separates accepting a quest from its cutscene,
+			// so it has to run before the cutscene is sent, not after.
+			if (startDelay > TimeSpan.Zero)
+			{
+				await GameClock.Delay(startDelay);
+
+				if (this.ActiveTrack != null)
+					return false;
+			}
+
 			var track = Track.Create(trackId);
 
 			track.Status = TrackStatus.Started;
@@ -88,8 +98,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, actors);
 
 			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
-
-			await GameClock.Delay(track.Data.StartDelay);
 
 			return true;
 		}
@@ -121,20 +129,23 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (this.ActiveTrack == null || this.ActiveTrack.Id != trackId)
 				return;
 
-			if (TrackScript.TryGet(trackId, out var trackScript))
-				trackScript.OnComplete(this.Character, this.ActiveTrack);
+			// Detached before OnComplete runs, so the quest status it sets
+			// cannot come back around and end the same track again.
+			var track = this.ActiveTrack;
+			this.ActiveTrack = null;
 
-			this.TrackCompleted?.Invoke(this.Character, this.ActiveTrack);
+			if (TrackScript.TryGet(trackId, out var trackScript))
+				trackScript.OnComplete(this.Character, track);
+
+			this.TrackCompleted?.Invoke(this.Character, track);
 
 			// Clean up the track dialog to prevent blocking future NPC interactions
-			if (this.ActiveTrack.Dialog != null)
+			if (track.Dialog != null)
 			{
-				this.ActiveTrack.Dialog.State = DialogState.Ended;
+				track.Dialog.State = DialogState.Ended;
 				this.Character.Connection.CurrentDialog?.Cancel();
 				this.Character.Connection.CurrentDialog = null;
 			}
-
-			this.ActiveTrack = null;
 		}
 
 		/// <summary>
@@ -145,18 +156,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (this.ActiveTrack == null)
 				return;
 
-			if (TrackScript.TryGet(this.ActiveTrack.Id, out var trackScript))
-				trackScript.OnCancel(this.Character, this.ActiveTrack);
+			var track = this.ActiveTrack;
+			this.ActiveTrack = null;
+
+			if (TrackScript.TryGet(track.Id, out var trackScript))
+				trackScript.OnCancel(this.Character, track);
 
 			// Clean up the track dialog to prevent blocking future NPC interactions
-			if (this.ActiveTrack.Dialog != null)
+			if (track.Dialog != null)
 			{
-				this.ActiveTrack.Dialog.State = DialogState.Ended;
+				track.Dialog.State = DialogState.Ended;
 				this.Character.Connection.CurrentDialog?.Cancel();
 				this.Character.Connection.CurrentDialog = null;
 			}
-
-			this.ActiveTrack = null;
 		}
 	}
 }

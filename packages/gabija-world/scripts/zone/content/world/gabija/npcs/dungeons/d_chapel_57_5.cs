@@ -14,6 +14,6 @@ public class DChapel575NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(24, 40120, "Statue of Goddess Vakarine", "d_chapel_57_5", -1429.68, 0.55, 1033.58, 76, "WARP_D_CHAPEL_57_5", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(24, "WARP_D_CHAPEL_57_5", "d_chapel_57_5", -1429.68, 0.55, 1033.58, 76);
 	}
 }

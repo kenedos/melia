@@ -78,8 +78,5 @@ public class FPilgrimroad50MobScript : GeneralScript
 		AddSpawnPoint("f_pilgrimroad_50.Id5", "f_pilgrimroad_50", Rectangle(2102, -1019, 40));
 		AddSpawnPoint("f_pilgrimroad_50.Id5", "f_pilgrimroad_50", Rectangle(2054, -843, 40));
 		AddSpawnPoint("f_pilgrimroad_50.Id5", "f_pilgrimroad_50", Rectangle(1023, -910, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Fireload, "f_pilgrimroad_50", 1, Hours(6), Hours(12));
 	}
 }

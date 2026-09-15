@@ -390,9 +390,5 @@ public class FSiauliai15ReMobScript : GeneralScript
 		AddSpawnPoint("f_siauliai_15_re.Id12", "f_siauliai_15_re", Rectangle(631, -271, 25));
 		AddSpawnPoint("f_siauliai_15_re.Id12", "f_siauliai_15_re", Rectangle(443, -365, 25));
 		AddSpawnPoint("f_siauliai_15_re.Id12", "f_siauliai_15_re", Rectangle(491, -215, 25));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Bebraspion, "f_siauliai_15_re", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_RytaSwort, "f_siauliai_15_re", 1, Hours(2), Hours(4));
 	}
 }

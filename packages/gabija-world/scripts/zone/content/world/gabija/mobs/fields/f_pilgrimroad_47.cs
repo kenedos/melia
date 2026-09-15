@@ -96,8 +96,5 @@ public class FPilgrimroad47MobScript : GeneralScript
 		AddSpawnPoint("f_pilgrimroad_47.Id7", "f_pilgrimroad_47", Rectangle(-1783, -1655, 20));
 		AddSpawnPoint("f_pilgrimroad_47.Id7", "f_pilgrimroad_47", Rectangle(-1718, -1852, 20));
 		AddSpawnPoint("f_pilgrimroad_47.Id7", "f_pilgrimroad_47", Rectangle(-1596, -1641, 20));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Glutton, "f_pilgrimroad_47", 1, Hours(2), Hours(4));
 	}
 }

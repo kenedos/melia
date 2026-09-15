@@ -14,7 +14,7 @@ public class DFiretower692NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(2, 40120, "Statue of Goddess Vakarine", "d_firetower_69_2", 931.0221, 119.6176, -2366.862, 90, "WARP_D_FIRETOWER_69_2", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(2, "WARP_D_FIRETOWER_69_2", "d_firetower_69_2", 931.0221, 119.6176, -2366.862, 90);
 
 	}
 }

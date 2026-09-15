@@ -14,6 +14,6 @@ public class FHuevillage584NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(43, 40120, "Statue of Goddess Vakarine", "f_huevillage_58_4", 20.74365, -8.675209, -837.3439, 90, "WARP_F_HUEVILLAGE_58_4", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(43, "WARP_F_HUEVILLAGE_58_4", "f_huevillage_58_4", 20.74365, -8.675209, -837.3439, 90);
 	}
 }

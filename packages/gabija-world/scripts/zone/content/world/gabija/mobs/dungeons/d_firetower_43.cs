@@ -111,8 +111,5 @@ public class DFiretower43MobScript : GeneralScript
 
 		// 'Pyran' GenType 238 Spawn Points
 		AddSpawnPoint("d_firetower_43.Id9", "d_firetower_43", Rectangle(-741, -817, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Mineloader, "d_firetower_43", 1, Hours(6), Hours(12));
 	}
 }

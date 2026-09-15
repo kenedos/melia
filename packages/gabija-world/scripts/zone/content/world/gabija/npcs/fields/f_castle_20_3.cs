@@ -14,7 +14,7 @@ public class FCastle203NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(31, 40120, "Statue of Goddess Vakarine", "f_castle_20_3", 228.12, 143.62, -694.9, 90, "WARP_CASTLE_20_3", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(31, "WARP_CASTLE_20_3", "f_castle_20_3", 228.12, 143.62, -694.9, 90);
 
 	}
 }

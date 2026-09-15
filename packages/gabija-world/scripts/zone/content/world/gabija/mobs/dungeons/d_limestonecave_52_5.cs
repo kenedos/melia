@@ -194,8 +194,5 @@ public class DLimestonecave525MobScript : GeneralScript
 		AddSpawnPoint("d_limestonecave_52_5.Id6", "d_limestonecave_52_5", Rectangle(1644, 960, 15));
 		AddSpawnPoint("d_limestonecave_52_5.Id6", "d_limestonecave_52_5", Rectangle(491, 972, 15));
 		AddSpawnPoint("d_limestonecave_52_5.Id6", "d_limestonecave_52_5", Rectangle(-275, 871, 15));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Rambandgad, "d_limestonecave_52_5", 1, Hours(2), Hours(4));
 	}
 }

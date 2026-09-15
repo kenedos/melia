@@ -142,6 +142,15 @@ namespace Melia.Zone.Scripting.AI
 		public bool IsSuspended => _suspensionTime > TimeSpan.Zero;
 
 		/// <summary>
+		/// Re-caches the entity's movement component.
+		/// </summary>
+		/// <remarks>
+		/// Needed when the component is added after the AI was initialized.
+		/// </remarks>
+		internal void RefreshMovement()
+			=> _movement = this.Entity?.Components.Get<MovementComponent>();
+
+		/// <summary>
 		/// Initializes AI for the given entity, setting the initial hostility and tendency.
 		/// </summary>
 		/// <param name="combatEntity"></param>

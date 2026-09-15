@@ -14,7 +14,7 @@ public class DCmine661NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(106, 40120, "Statue of Goddess Vakarine", "d_cmine_66_1", -83.88259, 414.5081, -1486.561, 90, "WARP_D_CMINE_66_1", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(106, "WARP_D_CMINE_66_1", "d_cmine_66_1", -83.88259, 414.5081, -1486.561, 90);
 
 	}
 }

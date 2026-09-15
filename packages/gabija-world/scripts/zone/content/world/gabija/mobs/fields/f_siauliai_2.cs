@@ -257,10 +257,5 @@ public class FSiauliai2MobScript : GeneralScript
 		// 'Popolion_Blue' GenType 10036 Spawn Points
 		AddSpawnPoint("f_siauliai_2.Id10", "f_siauliai_2", Rectangle(-391, 1104, 300));
 		AddSpawnPoint("f_siauliai_2.Id10", "f_siauliai_2", Rectangle(-772, 1040, 300));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Poata, "f_siauliai_2", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Tutu, "f_siauliai_2", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Goblin_Warrior, "f_siauliai_2", 1, Hours(6), Hours(12));
 	}
 }

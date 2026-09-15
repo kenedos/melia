@@ -9,6 +9,7 @@ namespace Melia.Shared.Game.Const
 	public static class MonsterId
 	{
 		public const int FireBall = 12083;
+		public const int HiddenTrigger = 20040;
 		public const int WarpSpot = 20050;
 		public const int SearchTrigger = 20170;
 		public const int Zombie = 57006;

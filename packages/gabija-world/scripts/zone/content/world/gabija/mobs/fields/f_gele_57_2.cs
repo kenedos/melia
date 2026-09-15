@@ -224,9 +224,5 @@ public class FGele572MobScript : GeneralScript
 		AddSpawnPoint("f_gele_57_2.Id13", "f_gele_57_2", Rectangle(-1247, 542, 20));
 		AddSpawnPoint("f_gele_57_2.Id13", "f_gele_57_2", Rectangle(-1108, 316, 20));
 		AddSpawnPoint("f_gele_57_2.Id13", "f_gele_57_2", Rectangle(-1243, 142, 20));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Carnivore, "f_gele_57_2", 1, Hours(2), Hours(4));
-		AddBossSpawner(MonsterId.Boss_Simorph, "f_gele_57_2", 1, Hours(6), Hours(12));
 	}
 }

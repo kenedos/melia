@@ -256,9 +256,5 @@ public class FGele574MobScript : GeneralScript
 		AddSpawnPoint("f_gele_57_4.Id15", "f_gele_57_4", Rectangle(-276, -781, 10));
 		AddSpawnPoint("f_gele_57_4.Id15", "f_gele_57_4", Rectangle(-235, -835, 10));
 		AddSpawnPoint("f_gele_57_4.Id15", "f_gele_57_4", Rectangle(-164, -874, 10));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Chapparition, "f_gele_57_4", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Nepenthes, "f_gele_57_4", 1, Hours(6), Hours(12));
 	}
 }

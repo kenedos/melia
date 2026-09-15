@@ -172,8 +172,5 @@ public class DUnderfortress69MobScript : GeneralScript
 		AddSpawnPoint("d_underfortress_69.Id5", "d_underfortress_69", Rectangle(-656, -2147, 40));
 		AddSpawnPoint("d_underfortress_69.Id5", "d_underfortress_69", Rectangle(-1304, -2316, 40));
 		AddSpawnPoint("d_underfortress_69.Id5", "d_underfortress_69", Rectangle(-1206, -1678, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Mandara, "d_underfortress_69", 1, Hours(2), Hours(4));
 	}
 }

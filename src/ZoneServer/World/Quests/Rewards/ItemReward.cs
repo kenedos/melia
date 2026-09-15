@@ -67,7 +67,8 @@ namespace Melia.Zone.World.Quests.Rewards
 		/// Gives the item to the character.
 		/// </summary>
 		/// <param name="character"></param>
-		public override void Give(Character character)
+		/// <param name="quest"></param>
+		public override void Give(Character character, Quest quest)
 		{
 			character.Inventory.Add(this.ItemClassId, this.Amount, InventoryAddType.PickUp);
 		}

@@ -14,6 +14,6 @@ public class FFarm493NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(7, 40120, "Statue of Goddess Vakarine", "f_farm_49_3", 941.8351, 293.2046, 12.10072, 0, "WARP_F_FARM_49_3", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(7, "WARP_F_FARM_49_3", "f_farm_49_3", 941.8351, 293.2046, 12.10072, 0);
 	}
 }

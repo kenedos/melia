@@ -109,11 +109,5 @@ public class FHuevillage584MobScript : GeneralScript
 		AddSpawnPoint("f_huevillage_58_4.Id7", "f_huevillage_58_4", Rectangle(1270, -250, 25));
 		AddSpawnPoint("f_huevillage_58_4.Id7", "f_huevillage_58_4", Rectangle(1309, 787, 25));
 		AddSpawnPoint("f_huevillage_58_4.Id7", "f_huevillage_58_4", Rectangle(267, 665, 25));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Clymen, "f_huevillage_58_4", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Mothstem, "f_huevillage_58_4", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Harpeia, "f_huevillage_58_4", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Merge, "f_huevillage_58_4", 1, Hours(6), Hours(12));
 	}
 }

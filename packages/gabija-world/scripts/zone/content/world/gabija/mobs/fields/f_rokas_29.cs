@@ -91,8 +91,5 @@ public class FRokas29MobScript : GeneralScript
 		AddSpawnPoint("f_rokas_29.Id7", "f_rokas_29", Rectangle(392, 1773, 40));
 		AddSpawnPoint("f_rokas_29.Id7", "f_rokas_29", Rectangle(443, 2094, 40));
 		AddSpawnPoint("f_rokas_29.Id7", "f_rokas_29", Rectangle(232, 1948, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Rajatoad, "f_rokas_29", 1, Hours(6), Hours(12));
 	}
 }

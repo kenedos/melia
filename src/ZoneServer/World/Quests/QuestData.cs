@@ -98,6 +98,25 @@ namespace Melia.Zone.World.Quests
 		public List<QuestModifier> Modifiers { get; } = new List<QuestModifier>();
 
 		/// <summary>
+		/// Returns the quest's phases, indexed by the status the quest is
+		/// in while the phase is active.
+		/// </summary>
+		/// <remarks>
+		/// Only the Possible, InProgress and Success statuses are used.
+		/// </remarks>
+		public Dictionary<QuestStatus, QuestPhase> Phases { get; } = new Dictionary<QuestStatus, QuestPhase>();
+
+		/// <summary>
+		/// Returns the phase for the given status via out, returns false
+		/// if the quest doesn't define one.
+		/// </summary>
+		/// <param name="status"></param>
+		/// <param name="phase"></param>
+		/// <returns></returns>
+		public bool TryGetPhase(QuestStatus status, out QuestPhase phase)
+			=> this.Phases.TryGetValue(status, out phase);
+
+		/// <summary>
 		/// Returns the quest giver npc.
 		/// </summary>
 		public string StartNpcUniqueName { get; set; } = null;

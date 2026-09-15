@@ -141,8 +141,5 @@ public class DZachariel32MobScript : GeneralScript
 
 		// 'Zinutekas_Elite' GenType 3021 Spawn Points
 		AddSpawnPoint("d_zachariel_32.Id9", "d_zachariel_32", Rectangle(56, 94, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Achat, "d_zachariel_32", 1, Hours(6), Hours(12));
 	}
 }

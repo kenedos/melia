@@ -14,7 +14,7 @@ public class CFedimianNpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(10, 40120, "Statue of Goddess Vakarine", "c_fedimian", -280, 162, -239, 7, "WARP_C_FEDIMIAN", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(10, "WARP_C_FEDIMIAN", "c_fedimian", -280, 162, -239, 7);
 		
 		// [Item Merchant]{nl}  Muras
 		//-------------------------------------------------------------------------

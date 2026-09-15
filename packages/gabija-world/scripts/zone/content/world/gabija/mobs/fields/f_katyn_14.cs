@@ -120,8 +120,5 @@ public class FKatyn14MobScript : GeneralScript
 		AddSpawnPoint("f_katyn_14.Id7", "f_katyn_14", Rectangle(-481, -789, 30));
 		AddSpawnPoint("f_katyn_14.Id7", "f_katyn_14", Rectangle(-673, -938, 30));
 		AddSpawnPoint("f_katyn_14.Id7", "f_katyn_14", Rectangle(-484, -563, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Werewolf, "f_katyn_14", 1, Hours(6), Hours(12));
 	}
 }

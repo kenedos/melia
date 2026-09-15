@@ -129,8 +129,5 @@ public class DVelniasprison511MobScript : GeneralScript
 		AddSpawnPoint("d_velniasprison_51_1.Id7", "d_velniasprison_51_1", Rectangle(-363, 28, 200));
 		AddSpawnPoint("d_velniasprison_51_1.Id7", "d_velniasprison_51_1", Rectangle(493, -25, 200));
 		AddSpawnPoint("d_velniasprison_51_1.Id7", "d_velniasprison_51_1", Rectangle(32, 1069, 200));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Blud, "d_velniasprison_51_1", 1, Hours(6), Hours(12));
 	}
 }

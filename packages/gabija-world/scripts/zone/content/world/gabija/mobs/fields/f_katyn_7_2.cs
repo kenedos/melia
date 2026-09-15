@@ -178,10 +178,5 @@ public class FKatyn72MobScript : GeneralScript
 		AddSpawnPoint("f_katyn_7_2.Id11", "f_katyn_7_2", Rectangle(1735, 1405, 30));
 		AddSpawnPoint("f_katyn_7_2.Id11", "f_katyn_7_2", Rectangle(1756, 1207, 30));
 		AddSpawnPoint("f_katyn_7_2.Id11", "f_katyn_7_2", Rectangle(1838, 932, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Throneweaver, "f_katyn_7_2", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Fallen_Statue, "f_katyn_7_2", 1, Hours(2), Hours(4));
-		AddBossSpawner(MonsterId.Boss_Golem_Gray, "f_katyn_7_2", 1, Hours(6), Hours(12));
 	}
 }

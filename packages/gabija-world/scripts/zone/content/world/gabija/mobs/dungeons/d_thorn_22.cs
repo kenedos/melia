@@ -166,9 +166,5 @@ public class DThorn22MobScript : GeneralScript
 		AddSpawnPoint("d_thorn_22.Id9", "d_thorn_22", Rectangle(-1386, 80, 20));
 		AddSpawnPoint("d_thorn_22.Id9", "d_thorn_22", Rectangle(-1194, 210, 20));
 		AddSpawnPoint("d_thorn_22.Id9", "d_thorn_22", Rectangle(-1272, 512, 20));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_GiantWoodGoblin_Red, "d_thorn_22", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Ironbaum, "d_thorn_22", 1, Hours(6), Hours(12));
 	}
 }

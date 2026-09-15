@@ -14,6 +14,6 @@ public class DStartower601NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(21, 40120, "Statue of Goddess Vakarine", "d_startower_60_1", -28.21613, -106.1569, -2381.822, 90, "WARP_D_STARTOWER_60_1", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(21, "WARP_D_STARTOWER_60_1", "d_startower_60_1", -28.21613, -106.1569, -2381.822, 90);
 	}
 }

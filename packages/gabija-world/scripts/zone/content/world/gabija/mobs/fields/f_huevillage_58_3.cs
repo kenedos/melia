@@ -116,8 +116,5 @@ public class FHuevillage583MobScript : GeneralScript
 		AddSpawnPoint("f_huevillage_58_3.Id7", "f_huevillage_58_3", Rectangle(846, -32, 25));
 		AddSpawnPoint("f_huevillage_58_3.Id7", "f_huevillage_58_3", Rectangle(430, 438, 25));
 		AddSpawnPoint("f_huevillage_58_3.Id7", "f_huevillage_58_3", Rectangle(329, 224, 25));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Colimencia, "f_huevillage_58_3", 1, Hours(6), Hours(12));
 	}
 }

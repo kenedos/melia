@@ -124,9 +124,5 @@ public class DFiretower44MobScript : GeneralScript
 
 		// 'Minivern_Elite' GenType 228 Spawn Points
 		AddSpawnPoint("d_firetower_44.Id6", "d_firetower_44", Rectangle(601, -732, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Yonazolem, "d_firetower_44", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Grinender, "d_firetower_44", 1, Hours(6), Hours(12));
 	}
 }

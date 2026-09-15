@@ -174,8 +174,5 @@ public class FCoral322MobScript : GeneralScript
 		AddSpawnPoint("f_coral_32_2.Id7", "f_coral_32_2", Rectangle(-1122, 346, 100));
 		AddSpawnPoint("f_coral_32_2.Id7", "f_coral_32_2", Rectangle(-1644, 1048, 100));
 		AddSpawnPoint("f_coral_32_2.Id7", "f_coral_32_2", Rectangle(-44, 945, 100));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Crabil, "f_coral_32_2", 1, Hours(6), Hours(12));
 	}
 }

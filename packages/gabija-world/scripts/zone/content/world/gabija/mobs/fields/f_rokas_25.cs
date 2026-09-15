@@ -171,8 +171,5 @@ public class FRokas25MobScript : GeneralScript
 		AddSpawnPoint("f_rokas_25.Id7", "f_rokas_25", Rectangle(2502, -603, 30));
 		AddSpawnPoint("f_rokas_25.Id7", "f_rokas_25", Rectangle(3056, -268, 30));
 		AddSpawnPoint("f_rokas_25.Id7", "f_rokas_25", Rectangle(1568, -1166, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_BiteRegina, "f_rokas_25", 1, Hours(6), Hours(12));
 	}
 }

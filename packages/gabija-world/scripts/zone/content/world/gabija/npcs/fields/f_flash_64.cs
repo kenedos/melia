@@ -14,10 +14,10 @@ public class FFlash64NpcScript : GeneralScript
 	{
 		// Statue of Goddess Zemyna
 		//-------------------------------------------------------------------------
-		AddNpc(7, 40110, "Statue of Goddess Zemyna", "f_flash_64", -570.1172, 885.3875, 1373.78, 105, "F_FLASH_64_EV_55_001", "F_FLASH_64_EV_55_001", "F_FLASH_64_EV_55_001");
+		AddStatPointStatue(7, "F_FLASH_64_EV_55_001", "f_flash_64", -570.1172, 885.3875, 1373.78, 105);
 		
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(27, 40120, "Statue of Goddess Vakarine", "f_flash_64", -142.5398, 745.6932, -1353.881, 0, "WARP_F_FLASH_64", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(27, "WARP_F_FLASH_64", "f_flash_64", -142.5398, 745.6932, -1353.881, 0);
 	}
 }

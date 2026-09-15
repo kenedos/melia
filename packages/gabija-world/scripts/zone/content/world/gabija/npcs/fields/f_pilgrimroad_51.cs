@@ -14,7 +14,7 @@ public class FPilgrimroad51NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(7, 40120, "Statue of Goddess Vakarine", "f_pilgrimroad_51", 746.57, 571.14, 1650.72, 99, "WARP_F_PILGRIMROAD_51", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(7, "WARP_F_PILGRIMROAD_51", "f_pilgrimroad_51", 746.57, 571.14, 1650.72, 99);
 		
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------

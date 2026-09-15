@@ -2,4 +2,6 @@
 // Script List File
 //---------------------------------------------------------------------------
 
+custom/**/*
+
 require "content/world/gabija/scripts.txt"

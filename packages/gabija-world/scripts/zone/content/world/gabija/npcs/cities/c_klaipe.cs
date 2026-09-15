@@ -30,7 +30,7 @@ public class CKlaipeNpcScript : GeneralScript
 		
 		// Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
-		AddNpc(10017, 154039, "Statue of Goddess Ausrine", "c_Klaipe", -206.574, 148.8251, 98.63973, 45, "WARP_C_KLAIPE", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(10017, "WARP_C_KLAIPE", "c_Klaipe", -206.574, 148.8251, 98.63973, 45, L("Statue of Goddess Ausrine"), 154039);
 
 	}
 }

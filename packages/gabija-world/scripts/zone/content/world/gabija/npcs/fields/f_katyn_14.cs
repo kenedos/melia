@@ -14,6 +14,6 @@ public class FKatyn14NpcScript : GeneralScript
 	{
 		// Statue of Goddess Zemyna
 		//-------------------------------------------------------------------------
-		AddNpc(587, 40110, "Statue of Goddess Zemyna", "f_katyn_14", -2765, 306, -1058, 40, "F_KATYN_14_EV_55_001", "F_KATYN_14_EV_55_001", "F_KATYN_14_EV_55_001");
+		AddStatPointStatue(587, "F_KATYN_14_EV_55_001", "f_katyn_14", -2765, 306, -1058, 40);
 	}
 }

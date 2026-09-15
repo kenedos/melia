@@ -143,8 +143,5 @@ public class FRemains39MobScript : GeneralScript
 		AddSpawnPoint("f_remains_39.Id11", "f_remains_39", Rectangle(934, 734, 200));
 		AddSpawnPoint("f_remains_39.Id11", "f_remains_39", Rectangle(1010, 1079, 200));
 		AddSpawnPoint("f_remains_39.Id11", "f_remains_39", Rectangle(996, 1415, 200));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Reaverpede, "f_remains_39", 1, Hours(6), Hours(12));
 	}
 }

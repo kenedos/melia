@@ -136,9 +136,5 @@ public class FSiauliaiOutMobScript : GeneralScript
 		// 'Onion_Red_Elite' GenType 10042 Spawn Points
 		AddSpawnPoint("f_siauliai_out.Id12", "f_siauliai_out", Rectangle(1151, -937, 9999));
 		AddSpawnPoint("f_siauliai_out.Id12", "f_siauliai_out", Rectangle(-824, -1566, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Chafer_Sout, "f_siauliai_out", 1, Hours(2), Hours(4));
-		AddBossSpawner(MonsterId.Boss_Goblin_Warrior_Red, "f_siauliai_out", 1, Hours(6), Hours(12));
 	}
 }

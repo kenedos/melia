@@ -14,6 +14,6 @@ public class FMaple232NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(7, 40120, "Statue of Goddess Vakarine", "f_maple_23_2", 1185.827, 0, 56.20589, 5, "WARP_C_MAPLE_23_2", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(7, "WARP_C_MAPLE_23_2", "f_maple_23_2", 1185.827, 0, 56.20589, 5);
 	}
 }

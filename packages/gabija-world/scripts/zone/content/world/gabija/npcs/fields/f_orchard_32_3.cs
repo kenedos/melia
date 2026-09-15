@@ -14,6 +14,6 @@ public class FOrchard323NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(31, 40120, "Statue of Goddess Vakarine", "f_orchard_32_3", -356.5365, 0.8661499, 716.4241, 90, "WARP_F_ORCHARD_32_3", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(31, "WARP_F_ORCHARD_32_3", "f_orchard_32_3", -356.5365, 0.8661499, 716.4241, 90);
 	}
 }

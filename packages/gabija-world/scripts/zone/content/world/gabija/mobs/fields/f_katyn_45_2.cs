@@ -245,8 +245,5 @@ public class FKatyn452MobScript : GeneralScript
 
 		// 'Ridimed_Blue' GenType 13 Spawn Points
 		AddSpawnPoint("f_katyn_45_2.Id5", "f_katyn_45_2", Rectangle(253, -114, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Sequoia_TRACK, "f_katyn_45_2", 1, Hours(2), Hours(4));
 	}
 }

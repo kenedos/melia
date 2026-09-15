@@ -211,9 +211,5 @@ public class FRemains40MobScript : GeneralScript
 		AddSpawnPoint("f_remains_40.Id8", "f_remains_40", Rectangle(3322, 2550, 100));
 		AddSpawnPoint("f_remains_40.Id8", "f_remains_40", Rectangle(3370, 2692, 100));
 		AddSpawnPoint("f_remains_40.Id8", "f_remains_40", Rectangle(3544, 2603, 100));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Moa, "f_remains_40", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Devilglove, "f_remains_40", 1, Hours(6), Hours(12));
 	}
 }

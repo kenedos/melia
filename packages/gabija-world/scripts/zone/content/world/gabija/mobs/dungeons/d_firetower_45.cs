@@ -108,8 +108,5 @@ public class DFiretower45MobScript : GeneralScript
 		AddSpawnPoint("d_firetower_45.Id9", "d_firetower_45", Rectangle(660, 1364, 25));
 		AddSpawnPoint("d_firetower_45.Id9", "d_firetower_45", Rectangle(353, 1408, 25));
 		AddSpawnPoint("d_firetower_45.Id9", "d_firetower_45", Rectangle(646, 1169, 25));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Helgasercle, "d_firetower_45", 1, Hours(6), Hours(12));
 	}
 }

@@ -51,7 +51,7 @@ namespace Melia.Zone.Skills.Helpers
 		private static bool IsPreviewEnabled(ICombatEntity caster)
 		{
 			if (caster is not Character character)
-				return caster is Mob && caster is not Companion;
+				return caster is Mob mob && mob is not Companion && mob.MonsterType != RelationType.Friendly;
 
 			return character.Variables.Temp.GetBool("Melia.RangePreview");
 		}

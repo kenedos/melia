@@ -177,9 +177,5 @@ public class DThorn20MobScript : GeneralScript
 		AddSpawnPoint("d_thorn_20.Id9", "d_thorn_20", Rectangle(-671, -619, 25));
 		AddSpawnPoint("d_thorn_20.Id9", "d_thorn_20", Rectangle(-183, -414, 25));
 		AddSpawnPoint("d_thorn_20.Id9", "d_thorn_20", Rectangle(-120, -313, 25));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Archon, "d_thorn_20", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Spector_Gh, "d_thorn_20", 1, Hours(6), Hours(12));
 	}
 }

@@ -14,6 +14,6 @@ public class FGele574NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(50, 40120, "Statue of Goddess Vakarine", "f_gele_57_4", -755, -80, 491, 35, "WARP_F_GELE_57_4", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(50, "WARP_F_GELE_57_4", "f_gele_57_4", -755, -80, 491, 35);
 	}
 }

@@ -14,6 +14,6 @@ public class FWhitetrees212NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(8, 40120, "Statue of Goddess Vakarine", "f_whitetrees_21_2", 793.81, -52.46, 118.36, 0, "WARP_WHITETREES_21_2", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(8, "WARP_WHITETREES_21_2", "f_whitetrees_21_2", 793.81, -52.46, 118.36, 0);
 	}
 }

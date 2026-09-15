@@ -85,10 +85,5 @@ public class DCathedral54MobScript : GeneralScript
 		AddSpawnPoint("d_cathedral_54.Id5", "d_cathedral_54", Rectangle(-366, 1347, 30));
 		AddSpawnPoint("d_cathedral_54.Id5", "d_cathedral_54", Rectangle(-1192, 675, 30));
 		AddSpawnPoint("d_cathedral_54.Id5", "d_cathedral_54", Rectangle(-666, 672, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Riteris, "d_cathedral_54", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Riteris_Blue, "d_cathedral_54", 1, Hours(2), Hours(4));
-		AddBossSpawner(MonsterId.Boss_Riteris_Brown, "d_cathedral_54", 1, Hours(2), Hours(4));
 	}
 }

@@ -14,6 +14,8 @@ namespace Melia.Zone.World.Quests.Modifiers
 	/// </summary>
 	public class ItemDropModifier : QuestModifier
 	{
+		private const string PityVarName = "Melia.Quests.DropMisses.";
+
 		/// <summary>
 		/// Returns the item id that a monster drops.
 		/// </summary>
@@ -29,6 +31,17 @@ namespace Melia.Zone.World.Quests.Modifiers
 		/// objective.
 		/// </summary>
 		public HashSet<int> MonsterIds { get; }
+
+		/// <summary>
+		/// Returns the number of kills without a drop after which the drop
+		/// is guaranteed, or 0 if there is no such pity counter.
+		/// </summary>
+		public int FixedCount { get; set; }
+
+		/// <summary>
+		/// Returns the amount of the item that drops at once.
+		/// </summary>
+		public int Amount { get; set; } = 1;
 
 		public ItemDropModifier(int itemId, float dropChance, params int[] monsterIds)
 		{
@@ -82,16 +95,24 @@ namespace Melia.Zone.World.Quests.Modifiers
 
 			character.Quests.UpdateModifiers<ItemDropModifier>((quest, modifier, progress) =>
 			{
-				if (modifier.IsTarget(monster))
+				if (!modifier.IsTarget(monster))
+					return;
+
+				var dropped = GameRandom.Get().NextDouble() < modifier.DropChance;
+
+				if (modifier.FixedCount > 0)
 				{
-					// Check drop chance
-				var rnd = GameRandom.Get();
-				if (rnd.NextDouble() < modifier.DropChance)
-				{
-					// Add item directly to player's inventory
-					character.Inventory.Add(modifier.ItemId, 1, InventoryAddType.PickUp);
+					var varName = PityVarName + modifier.ItemId;
+					var misses = quest.Vars.GetInt(varName, 0);
+
+					if (!dropped && ++misses >= modifier.FixedCount)
+						dropped = true;
+
+					quest.Vars.SetInt(varName, dropped ? 0 : misses);
 				}
-				}
+
+				if (dropped)
+					character.Inventory.Add(modifier.ItemId, modifier.Amount, InventoryAddType.PickUp);
 			});
 		}
 

@@ -99,8 +99,5 @@ public class FRokas28MobScript : GeneralScript
 		AddSpawnPoint("f_rokas_28.Id7", "f_rokas_28", Rectangle(427, 712, 30));
 		AddSpawnPoint("f_rokas_28.Id7", "f_rokas_28", Rectangle(1420, 1375, 30));
 		AddSpawnPoint("f_rokas_28.Id7", "f_rokas_28", Rectangle(1479, 843, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Ravinepede, "f_rokas_28", 1, Hours(6), Hours(12));
 	}
 }

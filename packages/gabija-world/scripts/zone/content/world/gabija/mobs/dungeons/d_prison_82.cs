@@ -228,8 +228,5 @@ public class DPrison82MobScript : GeneralScript
 
 		// 'Wendigo_Bow_White' GenType 11 Spawn Points
 		AddSpawnPoint("d_prison_82.Id5", "d_prison_82", Rectangle(700, 1182, 9999));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_ChiefGuard, "d_prison_82", 1, Hours(2), Hours(4));
 	}
 }

@@ -98,9 +98,5 @@ public class DCmine6MobScript : GeneralScript
 		AddSpawnPoint("d_cmine_6.Id6", "d_cmine_6", Rectangle(-782, -216, 50));
 		AddSpawnPoint("d_cmine_6.Id6", "d_cmine_6", Rectangle(-763, -24, 50));
 		AddSpawnPoint("d_cmine_6.Id6", "d_cmine_6", Rectangle(-632, -79, 50));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_NetherBovine, "d_cmine_6", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Mirtis, "d_cmine_6", 1, Hours(6), Hours(12));
 	}
 }

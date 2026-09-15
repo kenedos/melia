@@ -34,6 +34,29 @@ namespace Melia.Zone.World.Quests.Objectives
 		}
 
 		/// <summary>
+		/// Creates an objective to kill a certain amount of one of the
+		/// given types of monsters, identified by class name.
+		/// </summary>
+		/// <param name="amount"></param>
+		/// <param name="monsterClassNames"></param>
+		public KillObjective(int amount, params string[] monsterClassNames)
+		{
+			if (monsterClassNames == null || monsterClassNames.Length == 0)
+				throw new ArgumentException("Must specify at least one monster class name.");
+
+			this.TargetCount = amount;
+			this.MonsterIds = new HashSet<int>(monsterClassNames.Length);
+
+			foreach (var className in monsterClassNames)
+			{
+				if (!ZoneServer.Instance.Data.MonsterDb.TryFind(className, out var data))
+					throw new ArgumentException($"KillObjective: Unknown monster '{className}'.");
+
+				this.MonsterIds.Add(data.Id);
+			}
+		}
+
+		/// <summary>
 		/// Sets up event subscriptions.
 		/// </summary>
 		public override void Load()

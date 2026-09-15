@@ -14,6 +14,6 @@ public class DThorn391NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(33, 40120, "Statue of Goddess Vakarine", "d_thorn_39_1", 84.45702, 1216.375, 19.4914, 90, "WARP_D_THORN_39_1", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(33, "WARP_D_THORN_39_1", "d_thorn_39_1", 84.45702, 1216.375, 19.4914, 90);
 	}
 }

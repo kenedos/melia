@@ -30,7 +30,7 @@ public class DAbbey641NpcScript : GeneralScript
 		
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(32, 40120, "Statue of Goddess Vakarine", "d_abbey_64_1", 229.2671, 13.27824, 862.174, 90, "WARP_D_ABBEY_64_1", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(32, "WARP_D_ABBEY_64_1", "d_abbey_64_1", 229.2671, 13.27824, 862.174, 90);
 		
 		// Traveling Merchant Rose
 		//-------------------------------------------------------------------------

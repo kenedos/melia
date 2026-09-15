@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 30, angle: 30f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 15, width: 30, angle: 30f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}

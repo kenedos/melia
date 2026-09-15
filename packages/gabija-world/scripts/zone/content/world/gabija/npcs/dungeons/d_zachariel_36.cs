@@ -14,6 +14,6 @@ public class DZachariel36NpcScript : GeneralScript
 	{
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(3008, 40120, "Statue of Goddess Vakarine", "d_zachariel_36", -2509.775, 329.4753, -5506.343, 25, "WARP_D_ZACHARIEL_36", "STOUP_CAMP", "STOUP_CAMP");
+		AddWarpStatue(3008, "WARP_D_ZACHARIEL_36", "d_zachariel_36", -2509.775, 329.4753, -5506.343, 25);
 	}
 }

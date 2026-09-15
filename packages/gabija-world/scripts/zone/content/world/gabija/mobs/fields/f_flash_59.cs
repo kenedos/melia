@@ -210,8 +210,5 @@ public class FFlash59MobScript : GeneralScript
 		AddSpawnPoint("f_flash_59.Id8", "f_flash_59", Rectangle(772, -530, 30));
 		AddSpawnPoint("f_flash_59.Id8", "f_flash_59", Rectangle(794, -600, 30));
 		AddSpawnPoint("f_flash_59.Id8", "f_flash_59", Rectangle(902, -569, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Sparnashorn_2, "f_flash_59", 1, Hours(2), Hours(4));
 	}
 }

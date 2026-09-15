@@ -15,6 +15,14 @@ namespace Melia.Zone.World.Actors.Monsters
 	public interface IMonster : ISubActor, IMonsterAppearance, IMonsterAppearanceBase, ISpawn, IEffectTarget
 	{
 		/// <summary>
+		/// Returns the monster's display name.
+		/// </summary>
+		/// <remarks>
+		/// Declared here to resolve it between IActor and IMonsterAppearance.
+		/// </remarks>
+		new string Name { get; }
+
+		/// <summary>
 		/// Gets or sets what kind of "monster" the mob is.
 		/// </summary>
 		RelationType MonsterType { get; set; }

@@ -162,9 +162,5 @@ public class DChapel576MobScript : GeneralScript
 		AddSpawnPoint("d_chapel_57_6.Id9", "d_chapel_57_6", Rectangle(-473, 1790, 20));
 		AddSpawnPoint("d_chapel_57_6.Id9", "d_chapel_57_6", Rectangle(-693, 1896, 20));
 		AddSpawnPoint("d_chapel_57_6.Id9", "d_chapel_57_6", Rectangle(-472, 1324, 20));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Mummyghast, "d_chapel_57_6", 1, Hours(6), Hours(12));
-		AddBossSpawner(MonsterId.Boss_Malletwyvern, "d_chapel_57_6", 1, Hours(6), Hours(12));
 	}
 }

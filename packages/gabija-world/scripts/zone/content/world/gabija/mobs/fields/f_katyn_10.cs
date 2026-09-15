@@ -409,8 +409,5 @@ public class FKatyn10MobScript : GeneralScript
 		AddSpawnPoint("f_katyn_10.Id9", "f_katyn_10", Rectangle(-24, 673, 30));
 		AddSpawnPoint("f_katyn_10.Id9", "f_katyn_10", Rectangle(-145, 519, 30));
 		AddSpawnPoint("f_katyn_10.Id9", "f_katyn_10", Rectangle(34, 426, 30));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Sequoia, "f_katyn_10", 1, Hours(2), Hours(4));
 	}
 }

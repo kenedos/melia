@@ -151,8 +151,5 @@ public class FOrchard343MobScript : GeneralScript
 		AddSpawnPoint("f_orchard_34_3.Id7", "f_orchard_34_3", Rectangle(-598, 1238, 100));
 		AddSpawnPoint("f_orchard_34_3.Id7", "f_orchard_34_3", Rectangle(-647, 620, 100));
 		AddSpawnPoint("f_orchard_34_3.Id7", "f_orchard_34_3", Rectangle(-1366, 500, 100));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Kurmis, "f_orchard_34_3", 1, Hours(2), Hours(4));
 	}
 }

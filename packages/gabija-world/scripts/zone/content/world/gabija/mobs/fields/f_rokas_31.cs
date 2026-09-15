@@ -57,8 +57,5 @@ public class FRokas31MobScript : GeneralScript
 		AddSpawnPoint("f_rokas_31.Id5", "f_rokas_31", Rectangle(-22, -545, 40));
 		AddSpawnPoint("f_rokas_31.Id5", "f_rokas_31", Rectangle(-441, -103, 40));
 		AddSpawnPoint("f_rokas_31.Id5", "f_rokas_31", Rectangle(-750, 174, 40));
-
-		// Boss Spawners ---------------------------------
-		AddBossSpawner(MonsterId.Boss_Cactusvel, "f_rokas_31", 1, Hours(2), Hours(4));
 	}
 }
