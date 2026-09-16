@@ -184,6 +184,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Drasius1))
 				{
 					await dialog.Msg(L("Behind you! Don't let them surround us!"));
+					character.Quests.ReplayQuestTrack(Drasius1);
 					return;
 				}
 
@@ -282,7 +283,10 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(MeetNaglis);
+					await dialog.Msg(L("Watch out - a Large Kepa!"));
+				}
 
 				return;
 			}
@@ -291,7 +295,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.IsCompletable(MeetNaglis))
 				{
-					await dialog.Msg(L("Watch it! You can jump clear of its swing."));
+					await dialog.Msg(L("Watch it - keep clear of its swing."));
+					character.Quests.ReplayQuestTrack(MeetNaglis);
 					return;
 				}
 
@@ -347,6 +352,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(OnionBig))
 				{
 					await dialog.Msg(L("West of here, along the old farm road. That's where I'd look."));
+					character.Quests.ReplayQuestTrack(OnionBig);
 					return;
 				}
 
@@ -467,6 +473,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(BossGolem))
 				{
 					await dialog.Msg(L("One run-in with a golem will straighten them out."));
+					character.Quests.ReplayQuestTrack(BossGolem);
 					return;
 				}
 
@@ -563,6 +570,20 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Laimonas32))
+			{
+				if (!character.Quests.IsCompletable(Laimonas32))
+				{
+					await dialog.Msg(L("The light goes out of the stone. Something is moving in the brush behind you."));
+					character.Quests.ReplayQuestTrack(Laimonas32);
+					return;
+				}
+
+				await dialog.Msg(L("The brush has gone still. Whatever it was, it will not trouble the road again."));
+				character.Quests.Complete(Laimonas32);
+				return;
+			}
+
 			if (!character.Quests.Has(Laimonas32) && character.Quests.MeetsPrerequisites(Laimonas32))
 			{
 				await dialog.Msg(L("The light goes out of the stone. Something is moving in the brush behind you."));
@@ -608,6 +629,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(WoodSpirit))
 				{
 					await dialog.Msg(L("Hold the line. It comes up the road from the west."));
+					character.Quests.ReplayQuestTrack(WoodSpirit);
 					return;
 				}
 

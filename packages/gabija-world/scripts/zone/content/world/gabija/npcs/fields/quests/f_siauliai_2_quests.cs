@@ -62,6 +62,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Reclaim1))
 				{
 					await dialog.Msg(L("If you cannot even deal with Pokubu, you had best give up on entering the mining village."));
+					character.Quests.ReplayQuestTrack(Reclaim1);
 					return;
 				}
 
@@ -113,6 +114,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Camp4))
 				{
 					await dialog.Msg(L("It came for its cub. Watch for it near the camp."));
+					character.Quests.ReplayQuestTrack(Camp4);
 					return;
 				}
 
@@ -141,6 +143,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Request7))
 				{
 					await dialog.Msg(L("The Bube are pushing the refugees back. Clear the monsters chasing them."));
+					character.Quests.ReplayQuestTrack(Request7);
 					return;
 				}
 
@@ -218,6 +221,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Reclaim3))
 				{
 					await dialog.Msg(L("The mining village worries me, but things here are not good either. We must find a way before the monsters grow more."));
+					character.Quests.ReplayQuestTrack(Reclaim3);
 					return;
 				}
 
@@ -272,6 +276,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Act2Diss1Boss))
 				{
 					await dialog.Msg(L("Look out - it is still there!"));
+					character.Quests.ReplayQuestTrack(Act2Diss1Boss);
 					return;
 				}
 
@@ -330,6 +335,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Reclaim7))
 				{
 					await dialog.Msg(L("This is not a situation I am used to. If it comes to it, we may have to give up our own supplies and fend for ourselves until the next shipment."));
+					character.Quests.ReplayQuestTrack(Reclaim7);
 					return;
 				}
 
@@ -385,6 +391,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Request2))
 				{
 					await dialog.Msg(L("We have never sent a search party north. I would normally send a soldier, but the matter is urgent, so I ask you."));
+					character.Quests.ReplayQuestTrack(Request2);
 					return;
 				}
 
@@ -493,6 +500,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Request6))
 				{
 					await dialog.Msg(L("I am only a scout, but this was the first time I saw a Bube Fighter up close."));
+					character.Quests.ReplayQuestTrack(Request6);
 					return;
 				}
 

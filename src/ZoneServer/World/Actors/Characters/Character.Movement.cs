@@ -397,6 +397,7 @@ namespace Melia.Zone.World.Actors.Characters
 					this.CloseEyes();
 					foreach (var companion in this.Companions.GetList())
 						companion.Map?.RemoveMonster(companion);
+					this.Tracks.Cleanup();
 					this.Map?.RemoveCharacter(this);
 
 					ItemHookRegistry.Instance.UnregisterCharacter(this);

@@ -357,6 +357,7 @@ namespace Melia.Zone.Network
 
 			character.Components.Get<BaseSkillComponent>()?.CancelAllRunningSkills();
 			character.CancelOutOfBody();
+			character.Tracks.Cleanup();
 
 			// Strip temp buffs while the character is still on the map
 			// so that OnEnd handlers have full map context available.

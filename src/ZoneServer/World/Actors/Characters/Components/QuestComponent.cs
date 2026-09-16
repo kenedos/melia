@@ -38,7 +38,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly static TimeSpan AutoReceiveDelay = TimeSpan.FromMinutes(1);
 		private readonly static TimeSpan LocationCheckInterval = TimeSpan.FromSeconds(1);
 
-		private Dictionary<string, QuestMarkType> _questMarkTypes = new Dictionary<string, QuestMarkType>();
+		private Dictionary<string, (QuestMarkType Type, QuestType QuestType, string Icon)> _questMarkTypes = new();
 		private string _questMarkMapClassName;
 
 		// The distance the client's own return warp puts the player in front of the NPC.
@@ -462,7 +462,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			questScript?.OnStart(this.Character, quest);
 
 			this.UpdateClient_AddQuest(quest);
-			this.ResetQuestTrack(quest);
+			this.ResetQuestTrack(quest.Data.Id);
 			this.UpdateTrackBinding(quest);
 		}
 
@@ -867,10 +867,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// Clears the record of the quest's track having played, so that
 		/// starting the quest again plays the track again.
 		/// </summary>
-		/// <param name="quest"></param>
-		private void ResetQuestTrack(Quest quest)
+		/// <param name="questId"></param>
+		private void ResetQuestTrack(QuestId questId)
 		{
-			if (!QuestScript.TryGet(quest.Data.Id, out var questScript))
+			if (!QuestScript.TryGet(questId, out var questScript))
 				return;
 
 			var trackName = questScript.TrackData.TrackName;
@@ -935,6 +935,22 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.BeginTrack(questScript.TrackData);
 			return true;
+		}
+
+		/// <summary>
+		/// Clears the quest's track record and plays it again, so a track
+		/// that death or a relog interrupted can be restarted on demand.
+		/// </summary>
+		/// <param name="questId"></param>
+		/// <returns></returns>
+		public bool ReplayQuestTrack(QuestId questId)
+		{
+			if (this.Character.Tracks.ActiveTrack != null)
+				return false;
+
+			this.ResetQuestTrack(questId);
+
+			return this.StartQuestTrack(questId);
 		}
 
 		/// <summary>
@@ -1162,7 +1178,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (map == null || map == Map.Limbo)
 				return;
 
-			var markTypes = new Dictionary<string, QuestMarkType>();
+			var marks = new Dictionary<string, (QuestMarkType Type, QuestType QuestType, string Icon)>();
 
 			foreach (var questScript in QuestScript.GetAll())
 			{
@@ -1175,7 +1191,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				if (this.Has(questScript.Data.Id) || !this.MeetsPrerequisites(questScript))
 					continue;
 
-				AddMarkType(markTypes, phase.NpcUniqueName, QuestMarkType.Available);
+				var markType = QuestMarkType.Available;
+				AddMarkType(marks, phase.NpcUniqueName, markType, questScript.Data.Type, GetMarkIcon(markType, questScript.Data.Type));
 			}
 
 			foreach (var quest in this.GetList())
@@ -1189,7 +1206,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				if (!this.IsMarkPhaseOn(phase, map))
 					continue;
 
-				AddMarkType(markTypes, phase.NpcUniqueName, quest.ObjectivesCompleted ? QuestMarkType.Complete : QuestMarkType.InProgress);
+				var markType = quest.ObjectivesCompleted ? QuestMarkType.Complete : QuestMarkType.InProgress;
+				AddMarkType(marks, phase.NpcUniqueName, markType, quest.Data.Type, GetMarkIcon(markType, quest.Data.Type));
 			}
 
 			if (_questMarkMapClassName != map.ClassName)
@@ -1199,25 +1217,25 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			var npcs = map.GetNpcs(a => a.Id != MonsterId.HiddenTrigger && a.UniqueName != null
-				&& (markTypes.ContainsKey(a.UniqueName) || _questMarkTypes.ContainsKey(a.UniqueName)));
+				&& (marks.ContainsKey(a.UniqueName) || _questMarkTypes.ContainsKey(a.UniqueName)));
 
 			var marksTable = new LuaTable();
 			var resetsTable = new LuaTable();
 
 			foreach (var npc in npcs)
 			{
-				markTypes.TryGetValue(npc.UniqueName, out var markType);
-				_questMarkTypes.TryGetValue(npc.UniqueName, out var previousMarkType);
+				marks.TryGetValue(npc.UniqueName, out var mark);
+				_questMarkTypes.TryGetValue(npc.UniqueName, out var previousMark);
 
-				if (markType != previousMarkType && previousMarkType != QuestMarkType.None)
+				if (mark.Icon != previousMark.Icon && previousMark.Icon != null)
 					resetsTable.Insert(npc.Handle);
 
-				if (markType == QuestMarkType.None)
+				if (mark.Icon == null)
 					continue;
 
 				var markTable = new LuaTable();
 				markTable.Insert("Handle", npc.Handle);
-				markTable.Insert("Type", (int)markType);
+				markTable.Insert("Icon", mark.Icon);
 
 				marksTable.Insert(markTable);
 			}
@@ -1225,7 +1243,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			var lua = "Melia.QuestMarks.Set(" + marksTable.Serialize() + ", " + resetsTable.Serialize() + ")";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
-			_questMarkTypes = markTypes;
+			_questMarkTypes = marks;
 		}
 
 		/// <summary>
@@ -1245,18 +1263,64 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 		/// <summary>
 		/// Notes the marker for the NPC, keeping the more important one if
-		/// it already has a marker from another quest.
+		/// it already has a marker from another quest. A main quest shadows
+		/// a sub quest of the same kind, being the one the chain gives next.
 		/// </summary>
-		/// <param name="markTypes"></param>
+		/// <param name="marks"></param>
 		/// <param name="npcUniqueName"></param>
 		/// <param name="markType"></param>
-		private static void AddMarkType(Dictionary<string, QuestMarkType> markTypes, string npcUniqueName, QuestMarkType markType)
+		/// <param name="questType"></param>
+		/// <param name="icon"></param>
+		private static void AddMarkType(Dictionary<string, (QuestMarkType Type, QuestType QuestType, string Icon)> marks, string npcUniqueName, QuestMarkType markType, QuestType questType, string icon)
 		{
-			if (markTypes.TryGetValue(npcUniqueName, out var existingMarkType) && existingMarkType >= markType)
-				return;
+			if (marks.TryGetValue(npcUniqueName, out var existing))
+			{
+				if (existing.Type > markType)
+					return;
 
-			markTypes[npcUniqueName] = markType;
+				if (existing.Type == markType && (existing.QuestType == QuestType.Main || questType != QuestType.Main))
+					return;
+			}
+
+			marks[npcUniqueName] = (markType, questType, icon);
 		}
+
+		/// <summary>
+		/// Returns the effect name for the given marker state and quest
+		/// type, mirroring the client's own mark naming.
+		/// </summary>
+		/// <param name="markType"></param>
+		/// <param name="questType"></param>
+		/// <returns></returns>
+		private static string GetMarkIcon(QuestMarkType markType, QuestType questType)
+		{
+			var stateName = markType switch
+			{
+				QuestMarkType.Available => "possible",
+				QuestMarkType.InProgress => "progress",
+				QuestMarkType.Complete => "success",
+				_ => null,
+			};
+
+			if (stateName == null)
+				return null;
+
+			return "I_quest_mask_" + stateName + GetMarkTail(questType);
+		}
+
+		/// <summary>
+		/// Returns the effect name suffix for the given quest type.
+		/// </summary>
+		/// <param name="questType"></param>
+		/// <returns></returns>
+		private static string GetMarkTail(QuestType questType) => questType switch
+		{
+			QuestType.Sub => "_sub",
+			QuestType.Repeat => "_repeat",
+			QuestType.Party => "_party",
+			QuestType.KeyItem => "_key",
+			_ => "",
+		};
 
 		/// <summary>
 		/// Notifies the client that the quest was completed.

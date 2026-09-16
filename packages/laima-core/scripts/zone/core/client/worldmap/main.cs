@@ -182,6 +182,10 @@ public class WorldMapClientScript : ClientScript
 			turnInNpcs.Add(turnInNpcName);
 		}
 
+		// An NPC with several quests ready shows one icon, for the quest the
+		// player picks up next - a main quest, then the earlier chain step.
+		var startNpcQuests = new Dictionary<string, QuestScript>(StringComparer.OrdinalIgnoreCase);
+
 		foreach (var script in QuestScript.GetAll())
 		{
 			var data = script.Data;
@@ -201,6 +205,16 @@ public class WorldMapClientScript : ClientScript
 			if (turnInNpcs.Contains(data.StartNpcUniqueName))
 				continue;
 
+			if (startNpcQuests.TryGetValue(data.StartNpcUniqueName, out var existing)
+				&& !IsBetterStartQuest(script, existing))
+				continue;
+
+			startNpcQuests[data.StartNpcUniqueName] = script;
+		}
+
+		foreach (var script in startNpcQuests.Values)
+		{
+			var data = script.Data;
 			if (!TryFindNpcAcrossMaps(data.StartNpcUniqueName, out var startNpc, out var giverMapClassName, data.QuestGiverLocation))
 				continue;
 
@@ -208,6 +222,27 @@ public class WorldMapClientScript : ClientScript
 			var tooltip = string.IsNullOrEmpty(data.Name) ? "" : Localization.Get(data.Name);
 			icons.Add(CreateIconTable(imageName, giverMapClassName, startNpc.Position, tooltip));
 		}
+	}
+
+	/// <summary>
+	/// Returns true if the candidate is the quest an NPC should show when it
+	/// has more than one ready: a main quest beats anything else, and
+	/// otherwise the lower id - the earlier step in the chain - wins.
+	/// </summary>
+	/// <param name="candidate"></param>
+	/// <param name="existing"></param>
+	/// <returns></returns>
+	private static bool IsBetterStartQuest(QuestScript candidate, QuestScript existing)
+	{
+		var a = candidate.Data;
+		var b = existing.Data;
+
+		var aMain = a.Type == QuestType.Main;
+		var bMain = b.Type == QuestType.Main;
+		if (aMain != bMain)
+			return aMain;
+
+		return a.Id.Value < b.Id.Value;
 	}
 
 	private static bool TryFindNpcAcrossMaps(string name, out MonsterInName npc, out string mapClassName, string preferredMapClassName = null)

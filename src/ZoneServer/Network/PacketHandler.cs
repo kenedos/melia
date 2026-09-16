@@ -160,6 +160,7 @@ namespace Melia.Zone.Network
 					var removeStart = sw.ElapsedMilliseconds;
 					foreach (var companion in existingCharacter.Companions.GetList())
 						companion.Map?.RemoveMonster(companion);
+					existingCharacter.Tracks.Cleanup();
 					existingCharacter.Map?.RemoveCharacter(existingCharacter);
 					cleanupRemoveMs = sw.ElapsedMilliseconds - removeStart;
 

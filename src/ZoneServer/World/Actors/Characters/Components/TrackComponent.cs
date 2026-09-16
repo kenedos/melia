@@ -5,6 +5,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Tracks;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Shared.Util;
 
 namespace Melia.Zone.World.Actors.Characters.Components
@@ -12,8 +13,13 @@ namespace Melia.Zone.World.Actors.Characters.Components
 	public class TrackComponent : CharacterComponent
 	{
 		private readonly static TimeSpan DialogTimeout = TimeSpan.FromMinutes(2);
+		private readonly static TimeSpan DialogPollInterval = TimeSpan.FromMilliseconds(100);
 
 		public Track ActiveTrack { get; private set; }
+
+		private bool _disposed;
+		private int _trackLayer;
+		private int _returnLayer;
 
 		/// <summary>
 		/// Raised when the character starts a track.
@@ -60,6 +66,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return false;
 			if (this.ActiveTrack != null)
 				return false;
+			if (_disposed)
+				return false;
 			if (!string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(overrideTrackProperty) == 1)
 				return false;
 			if (string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(trackId) == 1)
@@ -71,9 +79,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			{
 				await GameClock.Delay(startDelay);
 
-				if (this.ActiveTrack != null)
+				if (_disposed || this.ActiveTrack != null)
 					return false;
 			}
+
+			// A dialog can be opened while the delay runs - talking to the
+			// quest giver once more is enough - and a track builds a dialog
+			// of its own, which throws while another is active. Hold the
+			// cutscene until the player is out of it.
+			if (!await this.WaitForDialogClose())
+				return false;
 
 			var track = Track.Create(trackId);
 
@@ -87,12 +102,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.ActiveTrack = track;
 
+			var returnLayer = this.Character.Layer;
 			IActor[] actors;
 			if (TrackScript.TryGet(track.Id, out var trackScript))
 				actors = trackScript.OnStart(this.Character, this.ActiveTrack);
 			else
 				actors = Array.Empty<IActor>();
 			track.Actors = actors;
+
+			// The track builds its own layer in OnStart; remember it and
+			// the layer to hand the character back to, so a disconnect can
+			// destroy the track's layer without touching anything shared.
+			this._returnLayer = returnLayer;
+			this._trackLayer = this.Character.Layer;
 
 			// The cutscene addresses its cast by handle, so the client has to
 			// have been told about every one of them before it starts.
@@ -104,6 +126,29 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, actors);
 
 			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Waits until the character is out of any open dialog, so a track
+		/// can build the dialog it speaks through.
+		/// </summary>
+		/// <remarks>
+		/// The dialog that accepted the quest is already waited out by
+		/// QuestComponent.BeginTrack, but a start delay reopens the window
+		/// and a second conversation can be running by the time it ends.
+		/// </remarks>
+		/// <returns>False if a track became active while waiting.</returns>
+		private async Task<bool> WaitForDialogClose()
+		{
+			while (this.Character.Connection.CurrentDialog != null)
+			{
+				await GameClock.Delay(DialogPollInterval);
+
+				if (_disposed || this.ActiveTrack != null)
+					return false;
+			}
 
 			return true;
 		}
@@ -206,6 +251,57 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				track.Dialog.State = DialogState.Ended;
 				this.Character.Connection.CurrentDialog?.Cancel();
 				this.Character.Connection.CurrentDialog = null;
+			}
+		}
+
+		/// <summary>
+		/// Tears down the character's track and the actors it spawned on
+		/// its private layer, for a disconnect that never reaches End or
+		/// Cancel and so would otherwise leave the cast behind.
+		/// </summary>
+		public void Cleanup()
+		{
+			_disposed = true;
+
+			var track = this.ActiveTrack;
+			if (track == null)
+				return;
+
+			this.ActiveTrack = null;
+
+			if (track.Dialog != null)
+			{
+				track.Dialog.State = DialogState.Ended;
+				track.Dialog.Cancel();
+
+				var connection = this.Character.Connection;
+				if (connection != null)
+				{
+					connection.CurrentDialog?.Cancel();
+					connection.CurrentDialog = null;
+				}
+			}
+
+			var map = this.Character.Map;
+
+			// The track created its own layer, so everything left on it
+			// belongs to the cutscene and can go. A track that did not move
+			// the character - a dungeon's shared party layer - only loses
+			// its own cast, never the layer itself.
+			if (this._trackLayer != this._returnLayer)
+			{
+				if (map != null)
+					map.RemoveEntitiesOnLayer(this._trackLayer);
+
+				this.Character.SetLayer(this._returnLayer, enabled: false);
+			}
+			else if (map != null && track.Actors != null)
+			{
+				foreach (var actor in track.Actors)
+				{
+					if (actor != this.Character && actor is IMonster monster)
+						map.RemoveMonster(monster);
+				}
 			}
 		}
 	}
