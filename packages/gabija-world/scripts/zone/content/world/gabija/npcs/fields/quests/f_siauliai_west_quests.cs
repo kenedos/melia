@@ -100,6 +100,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(WestForest);
+					character.Quests.CompleteObjective(WestForest, "acceptOrder");
 					await dialog.Msg(L("Good. Come back and tell me once you've made up your mind about the route."));
 				}
 				return;

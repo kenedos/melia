@@ -13,6 +13,7 @@ namespace Melia.Zone.World.Tracks
 		public string PropertyId { get; set; }
 		public bool Cancelable { get; set; } = false;
 		public TimeSpan StartDelay { get; set; } = TimeSpan.Zero;
+		public TimeSpan EndDelay { get; set; } = TimeSpan.Zero;
 		public int QuestId { get; set; }
 		public QuestStatus OriginalQuestStatus { get; set; } = QuestStatus.Possible;
 		public QuestStatus OnCompleteQuestStatus { get; set; }

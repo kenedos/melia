@@ -20,6 +20,8 @@ using Melia.Zone.World.Quests;
 
 public class WorldMapClientScript : ClientScript
 {
+	private const string IconsReadyFlag = "Melia.WorldIcons.Ready";
+
 	protected override void Load()
 	{
 		this.LoadAllScripts();
@@ -29,11 +31,34 @@ public class WorldMapClientScript : ClientScript
 		ZoneServer.Instance.ServerEvents.PlayerStartedQuest.Subscribe(this.OnPlayerStartedQuest);
 		ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Subscribe(this.OnPlayerAbandonedQuest);
 		ZoneServer.Instance.ServerEvents.PlayerQuestObjectivesCompleted.Subscribe(this.OnPlayerQuestObjectivesCompleted);
+		ZoneServer.Instance.ServerEvents.PlayerEnteredMap.Subscribe(this.OnPlayerEnteredMap);
 	}
 
 	protected override void Ready(Character character)
 	{
 		this.SendAllScripts(character);
+
+		// The icon lua is now resident client-side, so later map changes may
+		// stream their icons.
+		character.Variables.Temp.Set(IconsReadyFlag, true);
+
+		this.SendIcons(character);
+	}
+
+	/// <summary>
+	/// Re-sends the map's icons, since the icon list is built for the map
+	/// the character was on when it was last sent.
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="args"></param>
+	private void OnPlayerEnteredMap(object sender, PlayerEventArgs args)
+	{
+		var character = args.Character;
+
+		// PlayerEnteredMap also fires before Ready has shipped the lua.
+		if (!character.Variables.Temp.GetBool(IconsReadyFlag, false))
+			return;
+
 		this.SendIcons(character);
 	}
 
@@ -92,6 +117,9 @@ public class WorldMapClientScript : ClientScript
 
 	private void SendIcons(Character character)
 	{
+		if (character.Map == null)
+			return;
+
 		var mapClassName = character.Map.ClassName;
 		var icons = new List<LuaTable>();
 

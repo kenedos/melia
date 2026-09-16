@@ -123,6 +123,18 @@ namespace Melia.Zone.Scripting
 			=> this.Data.StartDelay = startDelay;
 
 		/// <summary>
+		/// Sets how long the track is held open after it is told to end, so
+		/// a closing beat can play before the cast is pulled.
+		/// </summary>
+		/// <remarks>
+		/// A track with a battle box already waits a short delay by default;
+		/// this overrides it.
+		/// </remarks>
+		/// <param name="endDelay"></param>
+		protected void SetEndDelay(TimeSpan endDelay)
+			=> this.Data.EndDelay = endDelay;
+
+		/// <summary>
 		/// Called when a character starts this track.
 		/// </summary>
 		/// <remarks>
@@ -168,9 +180,20 @@ namespace Melia.Zone.Scripting
 
 			if (track.Data.QuestId != 0)
 			{
-				character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OnCompleteQuestStatus);
 				if (track.Data.OnCompleteQuestStatus == QuestStatus.Completed)
+				{
 					character.Quests.Complete(track.Data.QuestId);
+				}
+				else
+				{
+					// The cutscene is the quest's objective for the phase it
+					// plays through, so mark it done together with the status.
+					if (track.Data.OnCompleteQuestStatus == QuestStatus.Success
+						&& character.Quests.TryGetById(track.Data.QuestId, out var quest))
+						quest.CompleteObjectives();
+
+					character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OnCompleteQuestStatus);
+				}
 			}
 
 			if (track.HasBattleBoxInLayer)

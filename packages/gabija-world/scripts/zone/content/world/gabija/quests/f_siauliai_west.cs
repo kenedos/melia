@@ -32,6 +32,8 @@ public class SiaulWestMeetTitasQuest : QuestScript
 		SetPhase(QuestStatus.InProgress, "SIAU_FRON_NPC_01", "f_siauliai_west", L("Talk to the Sentry"));
 		SetPhase(QuestStatus.Success, "SIAUL_WEST_CAMP_MANAGER", "f_siauliai_west", L("Talk to Knight Titas at the West Forest camp"));
 
+		// The arrival cutscene completes the objective; the turn-in is at
+		// Knight Titas.
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAU_WEST_START_TRACK", 1000, autoStart: false);
 
 		AddObjective("meetTitas", L("Talk to Knight Titas at the West Forest camp"), new ManualObjective());

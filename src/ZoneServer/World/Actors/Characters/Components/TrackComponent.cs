@@ -14,12 +14,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 	{
 		private readonly static TimeSpan DialogTimeout = TimeSpan.FromMinutes(2);
 		private readonly static TimeSpan DialogPollInterval = TimeSpan.FromMilliseconds(100);
+		private readonly static TimeSpan BattleEndDelay = TimeSpan.FromSeconds(2);
 
 		public Track ActiveTrack { get; private set; }
 
 		private bool _disposed;
 		private int _trackLayer;
 		private int _returnLayer;
+		private Track _endingTrack;
 
 		/// <summary>
 		/// Raised when the character starts a track.
@@ -66,6 +68,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return false;
 			if (this.ActiveTrack != null)
 				return false;
+			if (this._endingTrack != null)
+				return false;
 			if (_disposed)
 				return false;
 			if (!string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(overrideTrackProperty) == 1)
@@ -79,7 +83,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			{
 				await GameClock.Delay(startDelay);
 
-				if (_disposed || this.ActiveTrack != null)
+				if (_disposed || this.ActiveTrack != null || this._endingTrack != null)
 					return false;
 			}
 
@@ -98,6 +102,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			track.Data.OnStartQuestStatus = onStart;
 			track.Data.OnCompleteQuestStatus = onComplete;
 			track.Data.PropertyId = string.IsNullOrEmpty(overrideTrackProperty) ? trackId : overrideTrackProperty;
+
+			// Remember the status the quest was in before the track touched
+			// it, so cancelling the track only drops a quest that hadn't been
+			// accepted yet.
+			track.Data.OriginalQuestStatus = QuestStatus.Possible;
+			if (questId != 0 && this.Character.Quests.TryGetById(questId, out var quest))
+				track.Data.OriginalQuestStatus = quest.Status;
+
 			track.Dialog = new Dialog(this.Character, null);
 
 			this.ActiveTrack = track;
@@ -146,7 +158,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			{
 				await GameClock.Delay(DialogPollInterval);
 
-				if (_disposed || this.ActiveTrack != null)
+				if (_disposed || this.ActiveTrack != null || this._endingTrack != null)
 					return false;
 			}
 
@@ -193,6 +205,20 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return;
 			}
 
+			// A track that ran into a fight is held open a moment past the
+			// last kill, so the client can finish the death animation before
+			// the cast is pulled out from under it. A track can override the
+			// delay with SetEndDelay.
+			var endDelay = track.Data.EndDelay;
+			if (endDelay == TimeSpan.Zero && track.HasBattleBoxInLayer)
+				endDelay = BattleEndDelay;
+
+			if (endDelay > TimeSpan.Zero)
+			{
+				_ = this.CompleteAfterDelay(track, endDelay);
+				return;
+			}
+
 			this.Complete(track);
 		}
 
@@ -205,7 +231,40 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		private async Task CompleteAfterDialog(Track track, Task pendingDialog)
 		{
+			this._endingTrack = track;
+
 			await Task.WhenAny(pendingDialog, Task.Delay(DialogTimeout));
+
+			if (this._endingTrack != track)
+				return;
+
+			this._endingTrack = null;
+
+			if (_disposed || this.Character.Map == null)
+				return;
+
+			this.Complete(track);
+		}
+
+		/// <summary>
+		/// Holds the track open for the given delay before completing it.
+		/// </summary>
+		/// <param name="track"></param>
+		/// <param name="delay"></param>
+		/// <returns></returns>
+		private async Task CompleteAfterDelay(Track track, TimeSpan delay)
+		{
+			this._endingTrack = track;
+
+			await GameClock.Delay(delay);
+
+			if (this._endingTrack != track)
+				return;
+
+			this._endingTrack = null;
+
+			if (_disposed || this.Character.Map == null)
+				return;
 
 			this.Complete(track);
 		}
@@ -218,6 +277,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			if (TrackScript.TryGet(track.Id, out var trackScript))
 				trackScript.OnComplete(this.Character, track);
+
+			// OnComplete stops the track's layer, which makes the client
+			// hide the tracker; re-show it now that the quest state it
+			// carries is final.
+			this.Character.Quests.RefreshChase();
 
 			this.TrackCompleted?.Invoke(this.Character, track);
 
@@ -264,10 +328,13 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			_disposed = true;
 
 			var track = this.ActiveTrack;
+			this.ActiveTrack = null;
+
+			track ??= this._endingTrack;
+			this._endingTrack = null;
+
 			if (track == null)
 				return;
-
-			this.ActiveTrack = null;
 
 			if (track.Dialog != null)
 			{
@@ -291,9 +358,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (this._trackLayer != this._returnLayer)
 			{
 				if (map != null)
+				{
 					map.RemoveEntitiesOnLayer(this._trackLayer);
-
-				this.Character.SetLayer(this._returnLayer, enabled: false);
+					this.Character.SetLayer(this._returnLayer, enabled: false);
+				}
 			}
 			else if (map != null && track.Actors != null)
 			{

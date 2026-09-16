@@ -817,6 +817,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// Track achievement points for quest completion via server event
 			ZoneServer.Instance.ServerEvents.PlayerCompletedQuest.Raise(new PlayerCompletedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 
+			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
 			this.UpdateClient_CompleteQuest(quest);
 		}
@@ -836,6 +837,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Raise(new PlayerAbandonedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 
+			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
 		}
 
@@ -1096,6 +1098,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		public void UpdateClient()
 		{
 			var quests = this.GetList();
+
+			// The client tracks each quest's status in its own session
+			// property, so completed quests stop offering a start marker.
+			foreach (var quest in quests)
+				this.UpdateClient_QuestStatusProperty(quest);
+
 			foreach (var quest in quests.Where(a => a.InProgress))
 			{
 				// Re-check quest objectives to sync with current state (e.g., collection items in inventory)
@@ -1124,6 +1132,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
 			this.UpdateClient_QuestMarks();
+			this.UpdateClient_QuestStatusProperty(quest);
 
 			//Log.Debug(lua);
 		}
@@ -1146,6 +1155,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
 			this.UpdateClient_QuestMarks();
+			this.UpdateClient_QuestStatusProperty(quest);
 
 			//Log.Debug(lua);
 
@@ -1244,6 +1254,30 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
 			_questMarkTypes = marks;
+		}
+
+		/// <summary>
+		/// Re-shows the client's quest tracker, which the client hides when
+		/// the character's layer changes.
+		/// </summary>
+		public void RefreshChase()
+		{
+			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "M_CHASE_UPDATE_VISIBILITY()");
+		}
+
+		/// <summary>
+		/// Mirrors the quest's status onto the session property the client
+		/// tracks it by, so the client's own quest UI and minimap markers
+		/// agree with the quest's real state.
+		/// </summary>
+		/// <param name="quest"></param>
+		private void UpdateClient_QuestStatusProperty(Quest quest)
+		{
+			var propertyName = quest.QuestStaticData?.QuestProperty;
+			if (string.IsNullOrEmpty(propertyName) || propertyName == "None")
+				return;
+
+			this.Character.SetProperty(this.Character.SessionObjects.Main, propertyName, (float)quest.Status);
 		}
 
 		/// <summary>
