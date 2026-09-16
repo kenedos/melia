@@ -74,6 +74,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Knight Titas"));
+			dialog.SetPortrait("Dlg_port_WESTFOREST_MANAGER");
 
 			if (character.Quests.IsActive(MeetTitas))
 			{
@@ -620,6 +621,21 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
+		// The approach to the camp entrance, where the guards stop the player.
+		AddQuestTrigger("SIAUL_WEST_MEET_TITAS_TRIGGER", "f_siauliai_west", -570, -878, 60, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (!character.Quests.Has(MeetTitas) && character.Quests.MeetsPrerequisites(MeetTitas))
+				character.Quests.Start(MeetTitas);
+
+			if (character.Quests.IsActive(MeetTitas) && !character.Quests.IsCompletable(MeetTitas))
+				character.Quests.StartQuestTrack(MeetTitas);
+
+			await Task.CompletedTask;
+		});
+
 		AddQuestTrigger("SIALUL_WEST_ONION_BIG_TRIGGER", "f_siauliai_west", -1885, 102, 120, async args =>
 		{
 			if (args.Initiator is not Character character)

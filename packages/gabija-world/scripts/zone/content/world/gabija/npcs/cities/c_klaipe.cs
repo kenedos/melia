@@ -12,17 +12,9 @@ public class CKlaipeNpcScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// [Item Merchant]{nl}      Mirina
-		//-------------------------------------------------------------------------
-		AddNpc(1, 20115, "[Item Merchant]{nl}      Mirina", "c_Klaipe", 510.7029, -1.292879, -349.3194, 90, "EMILIA", "", "");
-		
 		// [Equipment Merchant]{nl}         Dunkel
 		//-------------------------------------------------------------------------
 		AddNpc(2, 20111, "[Equipment Merchant]{nl}         Dunkel", "c_Klaipe", 394, -1, -475, 90, "AKALABETH", "", "");
-		
-		// [Accessory Merchant]{nl}        Ronesa
-		//-------------------------------------------------------------------------
-		AddNpc(3, 20104, "[Accessory Merchant]{nl}        Ronesa", "c_Klaipe", 268.7077, -1.343773, -610.9401, 90, "ALFONSO", "ADDHELP_NPCSHOP", "");
 		
 		// [Blacksmith]{nl}    Zaras
 		//-------------------------------------------------------------------------

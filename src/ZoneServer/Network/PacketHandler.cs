@@ -1707,8 +1707,17 @@ namespace Melia.Zone.Network
 			if (character.Tracks.ActiveTrack != null)
 			{
 				var track = character.Tracks.ActiveTrack;
+				var dialogPending = track.PendingDialog != null && !track.PendingDialog.IsCompleted;
+
 				Send.ZC_DIALOG_CLOSE(conn);
-				Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
+
+				if (!dialogPending)
+					Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
+
+				if (ack == DialogAcknowledgement.Okay)
+					track.Dialog?.Resume(null, DialogResponseType.Ack);
+				else
+					track.Dialog?.Cancel();
 
 				return;
 			}

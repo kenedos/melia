@@ -146,6 +146,9 @@ namespace Melia.Zone.Scripting
 		/// </remarks>
 		public virtual async Task OnProgress(Character character, Track track, int frame)
 		{
+			if (track.PendingDialog != null && !track.PendingDialog.IsCompleted)
+				return;
+
 			Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
 			await Task.Yield();
 		}
@@ -241,6 +244,52 @@ namespace Melia.Zone.Scripting
 			catch (OperationCanceledException)
 			{
 			}
+		}
+
+		/// <summary>
+		/// Starts a sequence of messages from the track without holding up
+		/// the cutscene, for a closing frame to wait on with WaitForDialog.
+		/// </summary>
+		/// <remarks>
+		/// The client plays on through its own frames while a message is up,
+		/// so awaiting one here would let the track end underneath it and
+		/// leave the rest of the conversation playing out in the open world.
+		/// </remarks>
+		/// <param name="track"></param>
+		/// <param name="messages"></param>
+		protected static void StartDialog(Track track, params string[] messages)
+		{
+			track.PendingDialog = ShowDialogs(track, messages);
+		}
+
+		/// <summary>
+		/// Waits for the track's messages to be read, if any are still up.
+		/// </summary>
+		/// <param name="track"></param>
+		/// <returns></returns>
+		protected static async Task WaitForDialog(Track track)
+		{
+			var pendingDialog = track.PendingDialog;
+
+			if (pendingDialog != null)
+				await pendingDialog;
+		}
+
+		/// <summary>
+		/// Shows the given messages one after another.
+		/// </summary>
+		/// <param name="track"></param>
+		/// <param name="messages"></param>
+		/// <returns></returns>
+		private static async Task ShowDialogs(Track track, string[] messages)
+		{
+			foreach (var message in messages)
+				await ShowDialog(track, message);
+
+			var character = track.Dialog?.Player;
+
+			if (character != null && character.Tracks.ActiveTrack == track)
+				Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
 		}
 
 		protected static void CreateBattleBoxInLayer(Character character, Track track)

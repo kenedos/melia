@@ -9,6 +9,7 @@ using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Maps;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Modifiers;
 using Melia.Zone.World.Quests.Objectives;
@@ -36,6 +37,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 	{
 		private readonly static TimeSpan AutoReceiveDelay = TimeSpan.FromMinutes(1);
 		private readonly static TimeSpan LocationCheckInterval = TimeSpan.FromSeconds(1);
+
+		private Dictionary<string, QuestMarkType> _questMarkTypes = new Dictionary<string, QuestMarkType>();
+		private string _questMarkMapClassName;
 
 		// The distance the client's own return warp puts the player in front of the NPC.
 		private const float ReturnWarpNpcDistance = 20;
@@ -1103,6 +1107,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			var lua = "Melia.Quests.Add(" + questTable.Serialize() + ")";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
+			this.UpdateClient_QuestMarks();
+
 			//Log.Debug(lua);
 		}
 
@@ -1123,6 +1129,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			var lua = "Melia.Quests.Update(" + questTable.Serialize() + ")";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
+			this.UpdateClient_QuestMarks();
+
 			//Log.Debug(lua);
 
 			if (quest.ObjectivesCompleted && quest.Status < QuestStatus.Completed && _markerNotifiedSuccess.Add(quest.Data.Id.Value))
@@ -1139,6 +1147,115 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			var lua = $"Melia.Quests.Remove('{quest.ObjectIdStr}')";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+
+			this.UpdateClient_QuestMarks();
+		}
+
+		/// <summary>
+		/// Updates the markers displayed above the quest NPCs on the
+		/// character's current map.
+		/// </summary>
+		public void UpdateClient_QuestMarks()
+		{
+			var map = this.Character.Map;
+
+			if (map == null || map == Map.Limbo)
+				return;
+
+			var markTypes = new Dictionary<string, QuestMarkType>();
+
+			foreach (var questScript in QuestScript.GetAll())
+			{
+				if (!questScript.Data.TryGetPhase(QuestStatus.Possible, out var phase))
+					continue;
+
+				if (!this.IsMarkPhaseOn(phase, map))
+					continue;
+
+				if (this.Has(questScript.Data.Id) || !this.MeetsPrerequisites(questScript))
+					continue;
+
+				AddMarkType(markTypes, phase.NpcUniqueName, QuestMarkType.Available);
+			}
+
+			foreach (var quest in this.GetList())
+			{
+				if (!quest.InProgress)
+					continue;
+
+				if (!TryGetCurrentPhase(quest, out var phase))
+					continue;
+
+				if (!this.IsMarkPhaseOn(phase, map))
+					continue;
+
+				AddMarkType(markTypes, phase.NpcUniqueName, quest.ObjectivesCompleted ? QuestMarkType.Complete : QuestMarkType.InProgress);
+			}
+
+			if (_questMarkMapClassName != map.ClassName)
+			{
+				_questMarkTypes.Clear();
+				_questMarkMapClassName = map.ClassName;
+			}
+
+			var npcs = map.GetNpcs(a => a.Id != MonsterId.HiddenTrigger && a.UniqueName != null
+				&& (markTypes.ContainsKey(a.UniqueName) || _questMarkTypes.ContainsKey(a.UniqueName)));
+
+			var marksTable = new LuaTable();
+			var resetsTable = new LuaTable();
+
+			foreach (var npc in npcs)
+			{
+				markTypes.TryGetValue(npc.UniqueName, out var markType);
+				_questMarkTypes.TryGetValue(npc.UniqueName, out var previousMarkType);
+
+				if (markType != previousMarkType && previousMarkType != QuestMarkType.None)
+					resetsTable.Insert(npc.Handle);
+
+				if (markType == QuestMarkType.None)
+					continue;
+
+				var markTable = new LuaTable();
+				markTable.Insert("Handle", npc.Handle);
+				markTable.Insert("Type", (int)markType);
+
+				marksTable.Insert(markTable);
+			}
+
+			var lua = "Melia.QuestMarks.Set(" + marksTable.Serialize() + ", " + resetsTable.Serialize() + ")";
+			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+
+			_questMarkTypes = markTypes;
+		}
+
+		/// <summary>
+		/// Returns true if the phase puts a marker on an NPC on the given
+		/// map.
+		/// </summary>
+		/// <param name="phase"></param>
+		/// <param name="map"></param>
+		/// <returns></returns>
+		private bool IsMarkPhaseOn(QuestPhase phase, Map map)
+		{
+			if (string.IsNullOrWhiteSpace(phase.NpcUniqueName))
+				return false;
+
+			return string.IsNullOrEmpty(phase.MapClassName) || phase.MapClassName == map.ClassName;
+		}
+
+		/// <summary>
+		/// Notes the marker for the NPC, keeping the more important one if
+		/// it already has a marker from another quest.
+		/// </summary>
+		/// <param name="markTypes"></param>
+		/// <param name="npcUniqueName"></param>
+		/// <param name="markType"></param>
+		private static void AddMarkType(Dictionary<string, QuestMarkType> markTypes, string npcUniqueName, QuestMarkType markType)
+		{
+			if (markTypes.TryGetValue(npcUniqueName, out var existingMarkType) && existingMarkType >= markType)
+				return;
+
+			markTypes[npcUniqueName] = markType;
 		}
 
 		/// <summary>

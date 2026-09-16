@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
@@ -33,6 +34,12 @@ namespace Melia.Zone.World.Tracks
 		/// Returns the associated track dialog.
 		/// </summary>
 		public Dialog Dialog { get; set; }
+
+		/// <summary>
+		/// Gets or sets the dialog sequence the track is playing, which its
+		/// closing frame waits on before it hands the player back.
+		/// </summary>
+		public Task PendingDialog { get; set; }
 
 		/// <summary>
 		/// Returns the track's current frame.

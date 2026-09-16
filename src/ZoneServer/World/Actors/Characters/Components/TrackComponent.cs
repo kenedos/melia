@@ -11,6 +11,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 {
 	public class TrackComponent : CharacterComponent
 	{
+		private readonly static TimeSpan DialogTimeout = TimeSpan.FromMinutes(2);
+
 		public Track ActiveTrack { get; private set; }
 
 		/// <summary>
@@ -138,7 +140,38 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			var track = this.ActiveTrack;
 			this.ActiveTrack = null;
 
-			if (TrackScript.TryGet(trackId, out var trackScript))
+			var pendingDialog = track.PendingDialog;
+
+			if (pendingDialog != null && !pendingDialog.IsCompleted)
+			{
+				_ = this.CompleteAfterDialog(track, pendingDialog);
+				return;
+			}
+
+			this.Complete(track);
+		}
+
+		/// <summary>
+		/// Waits for the track's conversation to be read before completing
+		/// the track.
+		/// </summary>
+		/// <param name="track"></param>
+		/// <param name="pendingDialog"></param>
+		/// <returns></returns>
+		private async Task CompleteAfterDialog(Track track, Task pendingDialog)
+		{
+			await Task.WhenAny(pendingDialog, Task.Delay(DialogTimeout));
+
+			this.Complete(track);
+		}
+
+		/// <summary>
+		/// Completes the given track and cleans up after it.
+		/// </summary>
+		/// <param name="track"></param>
+		private void Complete(Track track)
+		{
+			if (TrackScript.TryGet(track.Id, out var trackScript))
 				trackScript.OnComplete(this.Character, track);
 
 			this.TrackCompleted?.Invoke(this.Character, track);
@@ -147,6 +180,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (track.Dialog != null)
 			{
 				track.Dialog.State = DialogState.Ended;
+				track.Dialog.Cancel();
 				this.Character.Connection.CurrentDialog?.Cancel();
 				this.Character.Connection.CurrentDialog = null;
 			}

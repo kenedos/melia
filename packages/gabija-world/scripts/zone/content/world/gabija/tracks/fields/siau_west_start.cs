@@ -59,12 +59,10 @@ public class SiauWestStartTrack : TrackScript
 			case 34:
 				track.Dialog.SetTitle(L("Knight Titas"));
 				track.Dialog.SetPortrait("Dlg_port_WESTFOREST_MANAGER");
-				await ShowDialog(track, L("What's your business here?{nl}Did the goddess tell you to go to Klaipeda in a dream as well?"));
-				await ShowDialog(track, L("If that's so, go and find Uska, the knight commander of Klaipeda.{nl}But there's something I need to tell you first. Come with me."));
-				break;
 
-			case 64:
-				character.StopLayer();
+				StartDialog(track,
+					L("What's your business here? Did the goddess tell you to go to Klaipeda in a dream as well?"),
+					L("If that's so, go and find Uska, the knight commander of Klaipeda. But there's something I need to tell you first. Come with me."));
 				break;
 		}
 
