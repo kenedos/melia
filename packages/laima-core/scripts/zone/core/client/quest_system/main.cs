@@ -6,6 +6,7 @@
 
 using System.Globalization;
 using Melia.Shared.Network;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
@@ -20,7 +21,7 @@ public class CustomQuestSystemClientScript : ClientScript
 	{
 		this.LoadAllScripts();
 
-		AddChatCommand("quest", "<cancel|track|warp>", "", 0, 99, HandleQuest);
+		AddChatCommand("quest", "<complete|cancel|track|warp>", "", 0, 99, HandleQuest);
 		AddChatCommand("questsearch", "<text>", "", 0, 99, HandleQuestSearch);
 	}
 
@@ -64,8 +65,31 @@ public class CustomQuestSystemClientScript : ClientScript
 
 		switch (action)
 		{
+			case "complete":
+			{
+				if (!ZoneServer.Instance.Conf.World.GetBool("quest_completion_from_ui", false))
+				{
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to complete a quest from the UI while it's disabled.", sender.Username);
+					return CommandResult.Okay;
+				}
+
+				if (!sender.Quests.IsCompletable(quest.Data.Id))
+				{
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to complete a quest that isn't completable.", sender.Username);
+					return CommandResult.Okay;
+				}
+
+				sender.Quests.Complete(quest);
+				break;
+			}
 			case "warp":
 			{
+				if (!ZoneServer.Instance.Conf.World.GetBool("quest_return_button", true))
+				{
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to warp back while the return button is disabled.", sender.Username);
+					return CommandResult.Okay;
+				}
+
 				if (!quest.ObjectivesCompleted)
 				{
 					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to warp back on a quest that isn't done.", sender.Username);

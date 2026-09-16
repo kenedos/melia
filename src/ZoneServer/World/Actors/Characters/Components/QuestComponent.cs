@@ -1402,13 +1402,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			// Quests with no phases still name their giver, who takes the turn-in in practice.
 			var npcUniqueNames = new[] { hasPhase ? phase.NpcUniqueName : null, quest.Data.EndNpcUniqueName, quest.Data.StartNpcUniqueName };
+			var phaseMapClassName = hasPhase ? phase.MapClassName : null;
 
 			foreach (var npcUniqueName in npcUniqueNames)
 			{
 				if (string.IsNullOrEmpty(npcUniqueName))
 					continue;
 
-				if (!ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == npcUniqueName, out var npc))
+				if (!TryFindQuestNpc(quest, npcUniqueName, phaseMapClassName, out var npc))
 					continue;
 
 				mapClassName = npc.Map.ClassName;
@@ -1424,6 +1425,39 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			position = phase.Position;
 
 			return true;
+		}
+
+		/// <summary>
+		/// Returns the NPC a quest names, whether it uses the NPC's unique
+		/// name or its display name, which is how custom quests point at
+		/// their giver.
+		/// </summary>
+		/// <param name="quest"></param>
+		/// <param name="npcName"></param>
+		/// <param name="mapClassName"></param>
+		/// <param name="npc"></param>
+		/// <returns></returns>
+		private static bool TryFindQuestNpc(Quest quest, string npcName, string mapClassName, out IMonster npc)
+		{
+			npc = null;
+
+			if (string.IsNullOrEmpty(npcName))
+				return false;
+
+			if (ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == npcName, out npc))
+				return true;
+
+			// The same display name can be used on several maps, so prefer the one the quest places it on.
+			var location = !string.IsNullOrEmpty(mapClassName) ? mapClassName : quest.Data.QuestGiverLocation;
+
+			if (!string.IsNullOrEmpty(location)
+				&& ZoneServer.Instance.World.TryGetMap(location, out var map)
+				&& map.TryGetMonster(a => GetNpcDisplayName(a) == npcName, out npc))
+			{
+				return true;
+			}
+
+			return ZoneServer.Instance.World.TryGetMonster(a => GetNpcDisplayName(a) == npcName, out npc);
 		}
 
 		/// <summary>
@@ -1458,25 +1492,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
-		/// Returns the display name of the NPC with the given unique name,
-		/// or null if no such NPC is in the world.
+		/// Returns the NPC's display name with the client's line break
+		/// removed, or null if it has none.
 		/// </summary>
-		/// <remarks>
-		/// A quest phase can name a trigger rather than an NPC, and the
-		/// player has no use for the internal name of something they can't
-		/// talk to.
-		/// </remarks>
-		/// <param name="uniqueName"></param>
+		/// <param name="npc"></param>
 		/// <returns></returns>
-		private static string GetNpcDisplayName(string uniqueName)
+		private static string GetNpcDisplayName(IMonster npc)
 		{
-			if (string.IsNullOrEmpty(uniqueName))
-				return null;
-
-			if (!ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == uniqueName, out var npc))
-				return null;
-
-			if (string.IsNullOrEmpty(npc.Name))
+			if (npc == null || string.IsNullOrEmpty(npc.Name))
 				return null;
 
 			return npc.Name.Replace("{nl}", " ").Trim();
@@ -1580,7 +1603,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			questTable.Insert("Rewards", rewardsTable);
 
 			// Add quest giver information if available
-			var questGiverName = GetNpcDisplayName(quest.Data.StartNpcUniqueName);
+			var questGiverName = TryFindQuestNpc(quest, quest.Data.StartNpcUniqueName, null, out var questGiver)
+				? GetNpcDisplayName(questGiver)
+				: null;
 
 			if (!string.IsNullOrEmpty(questGiverName))
 				questTable.Insert("QuestGiver", questGiverName);

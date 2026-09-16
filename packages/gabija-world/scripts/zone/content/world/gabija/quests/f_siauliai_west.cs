@@ -6,7 +6,6 @@
 //---------------------------------------------------------------------------
 
 using Melia.Zone.Scripting;
-using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -114,18 +113,6 @@ public class SiaulWestStatusTuto1Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(1003, QuestStatus.Completed));
 
 		AddObjective("spendStat", L("Open the info window with 'F1' and spend a stat point"), new VariableCheckObjective(NormalTxFunctionsScript.StatPointsSpentVarName, 1, isPermanent: true));
-	}
-
-	/// <summary>
-	/// Called when a character succeeded in quest objectives.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <param name="quest"></param>
-	public override void OnSuccess(Character character, Quest quest)
-	{
-		base.OnSuccess(character, quest);
-
-		character.Quests.Complete(quest);
 	}
 }
 

@@ -223,7 +223,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.IsCompletable(StatusTuto))
 				{
-					await dialog.Msg(L("Open the info window with 'F1' and put the point somewhere. It matters that you decide early what you mean to become."));
+					await dialog.Msg(L("Open the inventory window with 'F2', then use the 'Lv1 EXP Card' by right clicking it. This will give you enough experience to level up."));
+					await dialog.Msg(L("When you've gained a level, open the info window with 'F1' and put the point somewhere. It matters that you decide early what you mean to become."));
 					return;
 				}
 

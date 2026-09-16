@@ -567,7 +567,7 @@ public class EchoesOfAncientWarQuest : QuestScript
 		SetReceive(QuestReceiveType.Manual);
 		SetCancelable(true);
 		SetUnlock(QuestUnlockType.AllAtOnce);
-		AddQuestGiver(L("Raymond"), "c_orsha");
+		AddQuestGiver(L("[Relic Hunter] Raymond"), "c_orsha");
 
 		// Add quest item drops from specific monsters when quest is active
 		AddDrop(650732, 0.1f, MonsterId.Kucarry_Symbani);
