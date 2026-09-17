@@ -319,7 +319,17 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					// Catches up a character who learned a skill before the searcher brought it up.
+					character.Variables.Perm.SetInt(NormalTxFunctionsScript.SkillPointsSpentVarName, (int)character.Properties.GetFloat(PropertyName.UsedSkillPts));
 					character.Quests.Start(SkillTuto);
+
+					if (character.Quests.IsCompletable(SkillTuto))
+					{
+						await dialog.Msg(L("Ah - you've done it already. Then you know the shape of it."));
+						character.Quests.Complete(SkillTuto);
+						return;
+					}
+
 					character.ServerMessage(L("Press 'F3' to check your skills."));
 				}
 				return;
@@ -327,6 +337,12 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(SkillTuto))
 			{
+				if (!character.Quests.IsCompletable(SkillTuto))
+				{
+					await dialog.Msg(L("Open the skill window with 'F3' and put a point into a skill. Any skill you can use will do."));
+					return;
+				}
+
 				await dialog.Msg(L("Skills differ by class, but any of them makes a fight easier. And they do more than hit things."));
 				await dialog.Msg(L("Plenty worth having, isn't there? Use them well and they'll carry you through."));
 				await dialog.Msg(L("That reminds me - the assembly order. The squad leader is off to the right. Take it to him too."));

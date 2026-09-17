@@ -158,6 +158,12 @@ public class NormalTxFunctionsScript : GeneralScript
 		return NormalTxResult.Okay;
 	}
 
+	/// <summary>
+	/// Name of the variable holding how many skill points the character has
+	/// ever spent, which quests watch to see the player learn a skill.
+	/// </summary>
+	public const string SkillPointsSpentVarName = "Melia.SkillPointsSpent";
+
 	[ScriptableFunction]
 	public NormalTxResult SCR_TX_SKILL_UP(Character character, int[] numArgs)
 	{
@@ -251,6 +257,9 @@ public class NormalTxFunctionsScript : GeneralScript
 				passiveHandler.Handle(skill, character);
 
 			job.SkillPoints -= addLevels;
+
+			character.ModifyProperty(PropertyName.UsedSkillPts, addLevels);
+			character.Variables.Perm.SetInt(SkillPointsSpentVarName, (int)character.Properties.GetFloat(PropertyName.UsedSkillPts));
 
 			ZoneServer.Instance.ServerEvents.PlayerSkillLevelChanged.Raise(new PlayerSkillLevelChangedEventArgs(character, skill));
 		}

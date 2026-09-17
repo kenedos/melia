@@ -459,7 +459,7 @@ public class TutoSkillRunQuest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1014, QuestStatus.Completed));
 
-		AddObjective("learnSkill", L("Learn how to pick up a skill"), new ManualObjective());
+		AddObjective("learnSkill", L("Learn how to pick up a skill"), new VariableCheckObjective(NormalTxFunctionsScript.SkillPointsSpentVarName, 1, isPermanent: true));
 
 		AddReward(new ItemReward("Drug_HP1_Q", 1));
 	}

@@ -4,6 +4,7 @@ using System.Linq;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Game.Properties;
 using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
@@ -1109,10 +1110,40 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				// Re-check quest objectives to sync with current state (e.g., collection items in inventory)
 				this.InitialChecks(quest);
 
+				this.UpdateClient_AddQuestSessionObject(quest);
+
 				var questTable = this.QuestToTable(quest);
 
 				var lua = "Melia.Quests.Restore(" + questTable.Serialize() + ")";
 				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+			}
+
+			this.UpdateClient_NotifyQuests();
+		}
+
+		/// <summary>
+		/// Replays the client's new-quest notification for every available
+		/// quest, so the client rebuilds its tracker after a relog.
+		/// </summary>
+		private void UpdateClient_NotifyQuests()
+		{
+			foreach (var questScript in QuestScript.GetAll().OrderBy(a => a.Data.Id.Value))
+			{
+				var questId = questScript.Data.Id;
+
+				if (questId.NamespaceId != 0)
+					continue;
+
+				if (!ZoneServer.Instance.Data.QuestDb.Contains((int)questId.Value))
+					continue;
+
+				if (this.HasCompleted(questId))
+					continue;
+
+				if (!this.MeetsPrerequisites(questScript))
+					continue;
+
+				Send.ZC_ADDON_MSG(this.Character, AddonMessage.GET_NEW_QUEST, (int)questId.Value);
 			}
 		}
 
@@ -1130,6 +1161,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			var lua = "Melia.Quests.Add(" + questTable.Serialize() + ")";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
+
+			this.UpdateClient_AddQuestSessionObject(quest);
 
 			this.UpdateClient_QuestMarks();
 			this.UpdateClient_QuestStatusProperty(quest);
@@ -1749,6 +1782,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (this.TryGetById(questId, out var quest))
 			{
 				var progress = quest.Progresses[objectiveId];
+				this.UpdateClient_ObjectiveProperty(quest, objectiveId);
 				if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 					questScript.OnProgress(this.Character, quest, progress.Objective.Id, quest.ProgressValue(objectiveId));
 				if (quest.IsCompletable)
@@ -1770,6 +1804,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (this.TryGetById(questId, out var quest))
 			{
 				var progress = quest.Progresses[objectiveId];
+				this.UpdateClient_ObjectiveProperty(quest, objectiveId);
 				if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 					questScript.OnProgress(this.Character, quest, progress.Objective.Id, quest.ProgressValue(objectiveId));
 				if (quest.IsCompletable)
@@ -1778,6 +1813,62 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					questScript?.OnSuccess(this.Character, quest);
 					this.UpdateTrackBinding(quest);
 				}
+			}
+		}
+
+		/// <summary>
+		/// Creates the quest's own session object and sends it, so the
+		/// client's tracker has the object it reads counts from.
+		/// </summary>
+		/// <param name="quest"></param>
+		private void UpdateClient_AddQuestSessionObject(Quest quest)
+		{
+			if (quest.QuestStaticData == null || quest.SessionObjectStaticData == null)
+				return;
+
+			var questSessionObject = this.Character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
+			if (questSessionObject == null)
+				return;
+
+			Send.ZC_SESSION_OBJ_ADD(this.Character, questSessionObject, quest.QuestStaticData.Id);
+		}
+
+		/// <summary>
+		/// Mirrors an objective's progress onto the quest's own session
+		/// object, which the client's tracker reads its counts from.
+		/// </summary>
+		/// <param name="quest"></param>
+		/// <param name="objectiveId"></param>
+		private void UpdateClient_ObjectiveProperty(Quest quest, int objectiveId)
+		{
+			if (quest.QuestStaticData == null || quest.SessionObjectStaticData == null)
+				return;
+
+			var progress = quest.Progresses[objectiveId];
+
+			var questSessionObject = this.Character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
+			if (questSessionObject == null)
+				return;
+
+			var propertyName = progress.Objective is KillObjective
+				? $"KillMonster{objectiveId + 1}"
+				: $"QuestInfoValue{objectiveId + 1}";
+
+			if (!PropertyTable.Exists("SessionObject", propertyName))
+				return;
+
+			questSessionObject.Properties.SetFloat(propertyName, quest.ProgressValue(objectiveId));
+			Send.ZC_OBJECT_PROPERTY(this.Character, questSessionObject, propertyName);
+
+			if (progress.Done)
+			{
+				var goalPropertyName = $"Goal{objectiveId + 1}";
+
+				if (!PropertyTable.Exists("SessionObject", goalPropertyName))
+					return;
+
+				questSessionObject.Properties.SetFloat(goalPropertyName, 1);
+				Send.ZC_OBJECT_PROPERTY(this.Character, questSessionObject, goalPropertyName);
 			}
 		}
 

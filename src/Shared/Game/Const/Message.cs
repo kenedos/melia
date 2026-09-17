@@ -259,6 +259,7 @@
 		public const string REFRESH_INDUN_REWARD_HUD = "REFRESH_INDUN_REWARD_HUD"; // param: Indun_rokas1
 		public const string INDUN_REWARD_RESULT = "INDUN_REWARD_RESULT"; // param: 100#0#misc_BlessedStone;1/misc_talt#6#276659552#256121984#0#0#
 		public const string QUEST_UPDATE_ = "QUEST_UPDATE_";
+		public const string GET_NEW_QUEST = "GET_NEW_QUEST"; // param: quest class id
 		public const string ON_QUEST_UPDATED = "ON_QUEST_UPDATED";
 		public const string ON_DESTROY_NPC_ICON = "ON_DESTROY_NPC_ICON";
 
