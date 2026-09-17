@@ -44,90 +44,6 @@ namespace Melia.Zone.Scripting
 		/// <remarks>
 		/// Used in generated scripts.
 		/// </remarks>
-		/// <param name="character"></param>
-		/// <param name="monsterId"></param>
-		/// <param name="name"></param>
-		/// <param name="map"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="z"></param>
-		/// <param name="direction"></param>
-		/// <param name="dialogFuncName"></param>
-		/// <param name="enterFuncName"></param>
-		/// <param name="leaveFuncName"></param>
-		/// <param name="range"></param>
-		/// <returns></returns>
-		/// <exception cref="ArgumentException"></exception>
-		public static Npc AddNpc(Character character, int monsterId, string name, string map, double x, double y, double z, double direction, string dialogFuncName = "", string enterFuncName = "", string leaveFuncName = "", int state = -2, double range = 100, double scale = 1)
-		{
-			var mapObj = GetMapOrThrow(map);
-
-			var pos = new Position((float)x, (float)y, (float)z);
-
-			// Wrap name in localization code if applicable
-			if (Dialog.IsLocalizationKey(name))
-			{
-				name = Dialog.WrapLocalizationKey(name);
-			}
-			// Insert line breaks in tagged NPC names that don't have one
-			else if (name.StartsWith('[') && !name.Contains("{nl}"))
-			{
-				var endIndex = name.LastIndexOf("] ");
-				if (endIndex != -1)
-				{
-					// Remove space and insert new line instead.
-					name = name.Remove(endIndex + 1, 1);
-					name = name.Insert(endIndex + 1, "{nl}");
-				}
-			}
-
-			var location = new Location(mapObj.Id, pos);
-			var dir = new Direction(direction);
-
-			ZoneServer.Instance.DialogFunctions.TryGet(dialogFuncName, out var dialog);
-			ZoneServer.Instance.TriggerFunctions.TryGet(enterFuncName, out var enter);
-			ZoneServer.Instance.TriggerFunctions.TryGet(leaveFuncName, out var leave);
-
-			var uniqueId = Interlocked.Increment(ref UniqueNpcNameId);
-			var uniqueName = $"__NPC{uniqueId}__";
-			var monster = new Npc(monsterId, name, location, dir, 0);
-			monster.UniqueName = uniqueName;
-			if (dialog != null)
-			{
-				monster.SetClickTrigger(dialogFuncName, dialog);
-				var uniqueDialogName = $"{dialogFuncName}_{mapObj.Data.ClassName}";
-				// Account for multiple npcs using the same dialogue.
-				ZoneServer.Instance.World.NPCs.TryAdd(uniqueDialogName, monster);
-			}
-			if (enter != null || leave != null)
-				monster.SetTriggerArea(Spot(monster.Position.X, monster.Position.Z, range));
-			if (enter != null)
-				monster.SetEnterTrigger(enterFuncName, enter);
-			if (leave != null)
-				monster.SetLeaveTrigger(leaveFuncName, leave);
-
-			if (state != -2)
-				monster.State = (NpcState)state;
-			if (range != 0)
-				monster.Properties.SetFloat(PropertyName.Range, (float)range);
-			if (scale != 1)
-				monster.Properties.SetFloat(PropertyName.Scale, (float)scale);
-
-			monster.SetVisibilty(ActorVisibility.Track, character.ObjectId);
-			monster.AddEffect(new ScriptInvisibleEffect());
-			monster.Layer = character.Layer;
-
-			mapObj.AddMonster(monster);
-
-			return monster;
-		}
-
-		/// <summary>
-		/// Adds new NPC to the world.
-		/// </summary>
-		/// <remarks>
-		/// Used in generated scripts.
-		/// </remarks>
 		/// <param name="genType"></param>
 		/// <param name="monsterId"></param>
 		/// <param name="name"></param>
@@ -756,40 +672,6 @@ namespace Melia.Zone.Scripting
 				npc.DisappearTime = DateTime.Now.Add(lifeTime);
 			}
 
-			return npc;
-		}
-
-		/// <summary>
-		/// Adds a Track NPC, these are elevators, cable cars, 
-		/// moving platforms, etc. They work with the "Track" system of the
-		/// client. The client handles ALL of the track position calculation
-		/// and traversing.
-		/// </summary>
-		/// <param name="monsterId"></param>
-		/// <param name="name"></param>
-		/// <param name="map"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="z"></param>
-		/// <param name="direction"></param>
-		/// <param name="trackString"></param>
-		/// <param name="i1"></param>
-		/// <param name="i2"></param>
-		/// <returns></returns>
-		public static Npc AddTrackNPC(int monsterId, string name, string map, double x, double y, double z, double direction, string trackString, int i1 = 2, int i2 = 5)
-		{
-			if (string.IsNullOrEmpty(map) || map == "None")
-			{
-				Log.Debug($"Skipped adding Track NPC {monsterId} - {name} at {x},{y},{z} because of invalid map: {map}");
-				return null;
-			}
-			var npc = AddNpc(0, monsterId, name, map, x, y, z, direction);
-			npc.Visibility = ActorVisibility.Always;
-			npc.AddEffect(new ReviveEffect());
-			npc.AddEffect(new SetTrackPosition());
-			npc.AddEffect(new DirectionAPC(trackString, i1, i2));
-			//if (ZoneServer.Instance.Data.MapDb.TryFind(map, out var mapData))
-			//Log.Debug($"Adding Track NPC {monsterId} - {name} at {x},{y},{z} on {mapData.Name}");
 			return npc;
 		}
 

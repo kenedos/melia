@@ -241,6 +241,14 @@ namespace Melia.Zone.Scripting
 				//character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OriginalQuestStatus);
 			}
 
+			// A death or a relog cancels the track mid-fight, so the box it
+			// locked the character into has to go with it.
+			if (track.HasBattleBoxInLayer)
+			{
+				Send.ZC_REMOVE_SCROLLLOCKBOX(character);
+				track.HasBattleBoxInLayer = false;
+			}
+
 			// A party track's cast and layer are shared, so only the last
 			// member to leave tears them down.
 			if (track.Group != null)

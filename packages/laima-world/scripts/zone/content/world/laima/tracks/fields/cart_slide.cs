@@ -26,16 +26,16 @@ public class cartslide : TrackScript
 		base.OnStart(character, track);
 
 		var actors = new List<IActor>();
-		var mob0 = Shortcuts.AddNpc(character, 147474, "UnvisibleName", character.Map.ClassName, -2562.85, 788.7881, 1885.766, 187.8571);
+		var mob0 = Shortcuts.AddTrackNpc(character, 147474, "UnvisibleName", character.Map.ClassName, -2562.85, 788.7881, 1885.766, 187.8571);
 		actors.Add(mob0);
 
 		character.Position = new Position(-2246.587f, 788.7881f, 1924.998f);
 		actors.Add(character);
 
-		var mob1 = Shortcuts.AddNpc(character, 20150, "UnvisibleName", character.Map.ClassName, -2319.807, 801.6678, 2045.689, 1);
+		var mob1 = Shortcuts.AddTrackNpc(character, 20150, "UnvisibleName", character.Map.ClassName, -2319.807, 801.6678, 2045.689, 1);
 		actors.Add(mob1);
 
-		var mob2 = Shortcuts.AddNpc(character, 147355, "UnvisibleName", character.Map.ClassName, -2327.734, 801.6678, 2031.337, 1);
+		var mob2 = Shortcuts.AddTrackNpc(character, 147355, "UnvisibleName", character.Map.ClassName, -2327.734, 801.6678, 2031.337, 1);
 		actors.Add(mob2);
 
 		return actors.ToArray();

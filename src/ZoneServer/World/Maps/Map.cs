@@ -759,25 +759,6 @@ namespace Melia.Zone.World.Maps
 			return true;
 		}
 
-		/// <summary>
-		/// Adds the monster to the map at once, skipping the spawn queue
-		/// and its per-tick throttle.
-		/// </summary>
-		/// <remarks>
-		/// For actors something is about to reference by handle in the same
-		/// moment they're created, such as a cutscene's cast.
-		/// </remarks>
-		/// <param name="monster"></param>
-		/// <returns></returns>
-		public bool AddMonsterNow(IMonster monster)
-		{
-			if (this.IsDormant && monster is Mob mob && mob.Spawner != null)
-				return false;
-
-			this.AddMonsterInternal(monster);
-			return true;
-		}
-
 		private void AddMonsterInternal(IMonster monster)
 		{
 			monster.Map = this;

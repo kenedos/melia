@@ -30,7 +30,7 @@ public class fbracken631flume : TrackScript
 		character.Movement.MoveTo(new Position(-259.799f, 976.6173f, 2098.32f));
 		actors.Add(character);
 
-		var mob0 = Shortcuts.AddMonster(character, 155100, "", "f_bracken_63_1", -254.3194, 963.3553, 2126.975, 0);
+		var mob0 = Shortcuts.AddTrackMonster(character, 155100, "", "f_bracken_63_1", -254.3194, 963.3553, 2126.975, 0);
 		mob0.Visibility = ActorVisibility.Always;
 
 		actors.Add(mob0);

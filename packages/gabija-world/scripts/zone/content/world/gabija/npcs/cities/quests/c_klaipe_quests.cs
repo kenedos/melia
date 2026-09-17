@@ -7,6 +7,8 @@
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.Scripting.Hooking;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -92,83 +94,10 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			await dialog.Msg(L("The bishop remains in closed prayer. When you are ready, go at once to meet Ares in the eastern woods."));
 		});
 
-		// General Merchant Mirina
+		// Quest dialog hooks for the city's merchants
 		//-------------------------------------------------------------------------
-		AddNpc(20115, L("General Merchant Mirina"), "EMILIA", "c_Klaipe", 510.7029, -349.3194, 90, async dialog =>
-		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("General Merchant Mirina"));
-
-			if (character.Quests.IsCompletable(EastPrepare))
-			{
-				await dialog.Msg(L("Welcome! Ah, you must be a Revelator. I have been so hoping to meet you."));
-				await dialog.Msg(L("Klaipeda is full of expectation for the Revelators who dreamed of the goddess. I am one of them, too."));
-				await dialog.Msg(L("These are warp scrolls. Use one and you can travel to any goddess statue you like, or return to where you were."));
-				await dialog.Msg(L("I will give you more than the knights asked for. With so many Revelators about, surely things will get better than they are now?"));
-				character.Quests.Complete(EastPrepare);
-				return;
-			}
-
-			if (character.Quests.IsActive(EastPrepare))
-			{
-				await dialog.Msg(L("Pray at the Statue of Goddess Ausrine before you go, and come back to me for your warp scrolls."));
-				return;
-			}
-
-			if (!character.Quests.Has(EastPrepare1) && character.Quests.MeetsPrerequisites(EastPrepare1))
-			{
-				await dialog.Msg(L("Oh, that's right - Ronesa at the accessory shop said she has a gift she simply must give the Revelators."));
-
-				var answer = await dialog.Select(L("Would you like to drop by?"),
-					Option(L("Say you will drop by"), "accept"),
-					Option(L("Refuse"), "leave")
-				);
-
-				if (answer == "accept")
-				{
-					character.Quests.Start(EastPrepare1);
-					await dialog.Msg(L("Go straight to the left from here and you'll find Ronesa."));
-				}
-				return;
-			}
-
-			if (character.Quests.IsActive(EastPrepare1))
-			{
-				await dialog.Msg(L("Go straight to the left from here and you'll find Ronesa."));
-				return;
-			}
-
-			var pick = await dialog.Select(L("Is there anything you need?"),
-				Option(L("Trade"), "shop"),
-				Option(L("End"), "leave")
-			);
-
-			if (pick == "shop")
-				await dialog.OpenShop("Klapeda_Misc");
-		});
-
-		// Accessory Merchant Ronesa
-		//-------------------------------------------------------------------------
-		AddNpc(20104, L("Accessory Merchant Ronesa"), "ALFONSO", "c_Klaipe", 268.7077, -610.9401, 90, async dialog =>
-		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Accessory Merchant Ronesa"));
-
-			if (character.Quests.IsCompletable(EastPrepare1))
-			{
-				await dialog.Msg(L("Welcome! You're the Revelator who dreamed of the goddess, aren't you? All Klaipeda talks about is you."));
-				await dialog.Msg(L("I wonder if you really saw the vanished goddess in your dream... and what that dream was like. I'm curious, but I suppose you can't tell me."));
-				await dialog.Msg(L("That's all right. I believe the Revelators are the ones who have come to find the goddess."));
-				await dialog.Msg(L("Please, take this accessory. If armor guards against physical attacks, an accessory can protect you from magic."));
-				await dialog.Msg(L("I do hope it serves you well. May the goddess's blessing go with you..."));
-				character.Quests.Complete(EastPrepare1);
-				return;
-			}
-
-			await dialog.Msg(L("All Klaipeda talks about is the Revelators who dreamed of the goddess."));
-		});
+		ScriptHooks.Register(new DialogHook("Mirina", "BeforeDialog", MirinaDialog));
+		ScriptHooks.Register(new DialogHook("Ronesa", "BeforeDialog", RonesaDialog));
 
 		// Prayer trigger at the Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
@@ -182,6 +111,76 @@ public class KlaipeQuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
+	}
+
+	/// <summary>
+	/// Mirina's quest dialog, run before her shop dialog.
+	/// </summary>
+	private static async Task<HookResult> MirinaDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+
+		if (character.Quests.IsCompletable(EastPrepare))
+		{
+			await dialog.Msg(L("Welcome! Ah, you must be a Revelator. I have been so hoping to meet you."));
+			await dialog.Msg(L("Klaipeda is full of expectation for the Revelators who dreamed of the goddess. I am one of them, too."));
+			await dialog.Msg(L("These are warp scrolls. Use one and you can travel to any goddess statue you like, or return to where you were."));
+			await dialog.Msg(L("I will give you more than the knights asked for. With so many Revelators about, surely things will get better than they are now?"));
+			character.Quests.Complete(EastPrepare);
+			return HookResult.Break;
+		}
+
+		if (character.Quests.IsActive(EastPrepare))
+		{
+			await dialog.Msg(L("Pray at the Statue of Goddess Ausrine before you go, and come back to me for your warp scrolls."));
+			return HookResult.Break;
+		}
+
+		if (!character.Quests.Has(EastPrepare1) && character.Quests.MeetsPrerequisites(EastPrepare1))
+		{
+			await dialog.Msg(L("Oh, that's right - Ronesa at the accessory shop said she has a gift she simply must give the Revelators."));
+
+			var answer = await dialog.Select(L("Would you like to drop by?"),
+				Option(L("Say you will drop by"), "accept"),
+				Option(L("Refuse"), "leave")
+			);
+
+			if (answer == "accept")
+			{
+				character.Quests.Start(EastPrepare1);
+				await dialog.Msg(L("Go straight to the left from here and you'll find Ronesa."));
+			}
+			return HookResult.Break;
+		}
+
+		if (character.Quests.IsActive(EastPrepare1))
+		{
+			await dialog.Msg(L("Go straight to the left from here and you'll find Ronesa."));
+			return HookResult.Break;
+		}
+
+		return HookResult.Skip;
+	}
+
+	/// <summary>
+	/// Ronesa's quest dialog, run before her shop dialog.
+	/// </summary>
+	private static async Task<HookResult> RonesaDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+
+		if (character.Quests.IsCompletable(EastPrepare1))
+		{
+			await dialog.Msg(L("Welcome! You're the Revelator who dreamed of the goddess, aren't you? All Klaipeda talks about is you."));
+			await dialog.Msg(L("I wonder if you really saw the vanished goddess in your dream... and what that dream was like. I'm curious, but I suppose you can't tell me."));
+			await dialog.Msg(L("That's all right. I believe the Revelators are the ones who have come to find the goddess."));
+			await dialog.Msg(L("Please, take this accessory. If armor guards against physical attacks, an accessory can protect you from magic."));
+			await dialog.Msg(L("I do hope it serves you well. May the goddess's blessing go with you..."));
+			character.Quests.Complete(EastPrepare1);
+			return HookResult.Break;
+		}
+
+		return HookResult.Skip;
 	}
 }
 
@@ -229,7 +228,7 @@ public class EastPrepareQuest : QuestScript
 
 		SetPhase(QuestStatus.Possible, "KLAPEDA_USKA", "c_Klaipe", L("Move to Klaipeda and talk to Knight Commander Uska"));
 		SetPhase(QuestStatus.InProgress, "KLAIPE_AUSRINE_PRAYER", "c_Klaipe", L("Pray at the Statue of Goddess Ausrine"));
-		SetPhase(QuestStatus.Success, "EMILIA", "c_Klaipe", L("Talk to the General Merchant"));
+		SetPhase(QuestStatus.Success, "Mirina", "c_Klaipe", L("Talk to the General Merchant"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(1015, QuestStatus.Completed));
 
@@ -253,9 +252,9 @@ public class EastPrepare1Quest : QuestScript
 		SetAutoTracked(true);
 		SetCancelable(true);
 
-		SetPhase(QuestStatus.Possible, "EMILIA", "c_Klaipe", L("Talk to the General Merchant"));
-		SetPhase(QuestStatus.InProgress, "EMILIA", "c_Klaipe", L("Talk to the General Merchant"));
-		SetPhase(QuestStatus.Success, "ALFONSO", "c_Klaipe", L("Talk to the Accessory Merchant"));
+		SetPhase(QuestStatus.Possible, "Mirina", "c_Klaipe", L("Talk to the General Merchant"));
+		SetPhase(QuestStatus.InProgress, "Mirina", "c_Klaipe", L("Talk to the General Merchant"));
+		SetPhase(QuestStatus.Success, "Ronesa", "c_Klaipe", L("Talk to the Accessory Merchant"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(20236, QuestStatus.Completed));
 

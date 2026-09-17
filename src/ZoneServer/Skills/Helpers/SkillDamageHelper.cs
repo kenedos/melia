@@ -594,7 +594,9 @@ namespace Melia.Zone.Skills.Helpers
 
 			mob.Vars.SetInt("Melia.Summon.Skill", (int)skill.Id);
 			mob.Vars.Set("Melia.Summoner.Owner", caster);
+
 			caster.Map.AddMonster(mob);
+
 			mob.FromGround = true;
 			mob.DelayEnterWorld();
 			mob.EnterDelayedActor();

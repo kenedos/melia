@@ -39,7 +39,12 @@ public class SiaulWestLaimonas32Track : TrackScript
 		actors.Add(AddTrackActor(character, 400001, 1400, 285, 388, 0, escort));
 		actors.Add(AddTrackActor(character, 400001, 1429, 285, 448, 0, escort));
 
-		actors.Add(AddTrackActor(character, 41217, 1170, 285, 634, 116, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		var mushu = new TrackActorSpec
+		{
+			Ai = "BasicBoss",
+			EndPosition = new Position(1431, 285, 404),
+		};
+		actors.Add(AddTrackActor(character, 41217, 1170, 285, 634, 116, mushu));
 
 		actors.Add(AddTrackActor(character, 40110, 1687, 285, 366, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
 

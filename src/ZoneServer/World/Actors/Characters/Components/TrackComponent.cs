@@ -407,7 +407,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// A shared track's cast and layer belong to every member, so the
 			// loot only moves once the last of them has left.
 			if (track.Group == null || track.Group.Ended)
+			{
 				this.ReturnGroundItemsToBaseLayer();
+				this.RemoveRemainingLayerEntities();
+			}
 
 			// OnComplete stops the track's layer, which makes the client
 			// hide the tracker; re-show it now that the quest state it
@@ -441,7 +444,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				trackScript.OnCancel(this.Character, track);
 
 			if (track.Group == null || track.Group.Ended)
+			{
 				this.ReturnGroundItemsToBaseLayer();
+				this.RemoveRemainingLayerEntities();
+			}
 
 			// Clean up the track dialog to prevent blocking future NPC interactions
 			if (track.Dialog != null)
@@ -479,6 +485,23 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				monster.Layer = this._returnLayer;
 
 			this.Character.LookAround();
+		}
+
+		/// <summary>
+		/// Removes everything else the track left on its private layer,
+		/// including monsters a boss summoned there with a skill rather
+		/// than placed as part of the cast.
+		/// </summary>
+		private void RemoveRemainingLayerEntities()
+		{
+			if (this._trackLayer == this._returnLayer)
+				return;
+
+			var map = this.Character.Map;
+			if (map == null)
+				return;
+
+			map.RemoveEntitiesOnLayer(this._trackLayer);
 		}
 
 		/// <summary>

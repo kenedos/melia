@@ -30,14 +30,14 @@ public class forchard342Flume : TrackScript
 		character.Movement.MoveTo(new Position(1933.662f, 399.6894f, -455.4826f));
 		actors.Add(character);
 
-		var mob0 = Shortcuts.AddMonster(character, 155060, "", "f_orchard_34_2", 2105.654, 386.3208, -383.9777, 70.5);
+		var mob0 = Shortcuts.AddTrackMonster(character, 155060, "", "f_orchard_34_2", 2105.654, 386.3208, -383.9777, 70.5);
 		mob0.Visibility = ActorVisibility.Always;
 		actors.Add(mob0);
 
-		var mob1 = Shortcuts.AddMonster(character, 155061, "", "f_orchard_34_2", 2135.453, 388.0683, -395.2737, 0);
+		var mob1 = Shortcuts.AddTrackMonster(character, 155061, "", "f_orchard_34_2", 2135.453, 388.0683, -395.2737, 0);
 		actors.Add(mob1);
 
-		var mob2 = Shortcuts.AddMonster(character, 147501, "UnvisibleName", "f_orchard_34_2", 1906.933, 399.6894, -451.2874, 0);
+		var mob2 = Shortcuts.AddTrackMonster(character, 147501, "UnvisibleName", "f_orchard_34_2", 1906.933, 399.6894, -451.2874, 0);
 		actors.Add(mob2);
 
 		return actors.ToArray();

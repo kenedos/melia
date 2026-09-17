@@ -4,33 +4,411 @@
 // NPCs found in and around Fedimian.
 //---------------------------------------------------------------------------
 
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
 using Melia.Zone.Scripting;
+using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class CFedimianNpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+		CreateWeaponShop();
+		CreateArmorShop();
+		CreateAccessoryShop();
+		CreateMiscItemShop();
+		CreateDorasCompanionFoodShop();
+		CreateDorasCompanionShop();
+
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddWarpStatue(10, "WARP_C_FEDIMIAN", "c_fedimian", -280, 162, -239, 7);
-		
-		// [Item Merchant]{nl}  Muras
-		//-------------------------------------------------------------------------
-		AddNpc(108, 151034, "[Item Merchant]{nl}  Muras", "c_fedimian", -631.32, 169.31, -174.9, 0, "FED_TOOL", "", "");
-		
-		// [Equipment Merchant]{nl}  Yorgis
-		//-------------------------------------------------------------------------
-		AddNpc(109, 151035, "[Equipment Merchant]{nl}  Yorgis", "c_fedimian", -219.15, 178.05, -558.35, 90, "FED_EQUIP", "FED_EQUIP_HQ_REINFORCE", "FED_EQUIP_HQ_REINFORCE");
-		
-		// [Blacksmith]{nl}    Anna
-		//-------------------------------------------------------------------------
-		AddNpc(126, 151036, "[Blacksmith]{nl}    Anna", "c_fedimian", 120, 160, -504, 75, "BLACKSMITH_FEDIMIAN", "", "");
-		
-		// [Accessory Merchant]{nl}  Joana
-		//-------------------------------------------------------------------------
-		AddNpc(130, 151038, "[Accessory Merchant]{nl}  Joana", "c_fedimian", -130.2, 177.28, -496.14, 0, "FED_ACCESSORY", "", "");
+		AddWarpStatue(10, "WARP_C_FEDIMIAN", "c_fedimian", -280, 162, -239, 7, L("Statue of Goddess Vakarine"));
 
+		// [Item Merchant] Muras
+		//-------------------------------------------------------------------------
+		var muras = AddNpc(151034, L("[Item Merchant] Muras"), "Muras", "c_fedimian", -631.32, -174.9, 0, async dialog =>
+		{
+			dialog.SetTitle(L("Muras"));
+			dialog.SetPortrait("Dlg_port_Muras");
+
+			if (GameRandom.Get().NextDouble() >= 0.5)
+				await dialog.Msg(L("H-Hello there! C-Can I help you with some good consumables?"));
+			else
+				await dialog.Msg(L("O-Oh, hi. W-Welcome to my humble shop."));
+
+			await dialog.OpenShop("FedimianMiscItems");
+		});
+
+		muras.AssociatedShopName = "FedimianMiscItems";
+		muras.ShopType = ShopType.Potion;
+
+		// [Storage Keeper] Zadan
+		//-------------------------------------------------------------------------
+		AddNpc(156027, L("[Storage Keeper] Zadan"), "Zadan", "c_fedimian", -170, -218, 0, async dialog =>
+		{
+			dialog.SetTitle(L("Zadan"));
+			dialog.SetPortrait("Dlg_port_Zadan");
+
+			var response = await dialog.Select(L("Looking for a place to store your items safely? I'm just the guy."),
+				Option(L("Personal Storage"), "personal"),
+				Option(L("Team Storage"), "team"),
+				Option(L("Save Spawn Location"), "savelocation"),
+				Option(L("Cancel"), "cancel")
+			);
+
+			if (response == "personal")
+				await dialog.OpenPersonalStorage();
+			else if (response == "team")
+				await dialog.OpenTeamStorage();
+			else if (response == "savelocation")
+			{
+				await dialog.SaveLocation();
+				await dialog.Msg(L("Your location has been saved!"));
+			}
+		});
+
+		// [Equipment Merchant] Yorgis
+		//-------------------------------------------------------------------------
+		var yorgis = AddNpc(151035, L("[Equipment Merchant] Yorgis"), "Yorgis", "c_fedimian", -219.15, -558.35, 90, async dialog =>
+		{
+			dialog.SetTitle(L("Yorgis"));
+			dialog.SetPortrait("Dlg_port_Yorgis");
+
+			var response = await dialog.Select(L("Welcome! Only the best quality equipments around here!"),
+				Option(L("Weapons"), "weapon"),
+				Option(L("Armor"), "armor"),
+				Option(L("Cancel"), "cancel")
+			);
+
+			if (response == "weapon")
+				await dialog.OpenShop("FedimianWeapons");
+			else if (response == "armor")
+				await dialog.OpenShop("FedimianArmors");
+		});
+
+		yorgis.AssociatedShopName = "FedimianWeapons";
+		yorgis.ShopType = ShopType.Weapon;
+
+		// [Blacksmith] Anna
+		//-------------------------------------------------------------------------
+		AddNpc(126, 151036, L("[Blacksmith]{nl}Anna"), "c_fedimian", 120, 160, -504, 75, "FEDIMIAN_BLACKSMITH", "TUTO_REPAIR_NPC", "");
+
+		// [Accessory Merchant] Joana
+		//-------------------------------------------------------------------------
+		var joana = AddNpc(151038, L("[Accessory Merchant] Joana"), "Joana", "c_fedimian", -130.2, -496.14, 0, async dialog =>
+		{
+			dialog.SetTitle(L("Joana"));
+			dialog.SetPortrait("Dlg_port_Yoana");
+
+			if (await dialog.Hooks("BeforeDialog"))
+				await dialog.Msg(L("Accessories~! Everyone loves good looking jewelry!"));
+			else
+				await dialog.Msg(L("Accessories~! Everyone loves good looking jewelry!"));
+
+			await dialog.OpenShop("FedimianAccessories");
+		});
+
+		joana.AssociatedShopName = "FedimianAccessories";
+		joana.ShopType = ShopType.Accessory;
+
+		// [Companion Trader] Doras
+		//-------------------------------------------------------------------------
+		var doras = AddNpc(20058, L("[Companion Trader] Doras"), "Doras", "c_fedimian", -74, 99, 0, async dialog =>
+		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Doras"));
+			dialog.SetPortrait("Dlg_port_npc_tonus");
+
+			var options = dialog.CreateOptions(
+				Option(L("Adopt Companion"), "adopt"),
+				Option(L("Buy Pet Food"), "food"),
+				Option(ScpArgMsg("shop_companion_learnabil"), "learnabil", () => character.HasCompanions),
+				Option(ScpArgMsg("shop_companion_info"), "info"),
+				Option(L("Leave"), "leave")
+			);
+
+			var selectedOption = await dialog.Select(L("Hey there! My brother Toras runs a shop like this one back in Orsha, but Fedimian's where the real customers are. Looking to adopt a companion?"), options);
+
+			switch (selectedOption)
+			{
+				case "adopt":
+					await dialog.OpenCustomCompanionShop("DorasCompanions");
+					break;
+				case "learnabil":
+					dialog.OpenAddon(AddonMessage.COMPANION_UI_OPEN);
+					break;
+				case "info":
+					await dialog.Msg(L("Toras and I split up years ago. He took the war beasts, I took the clever ones. Every companion here's been raised to keep up with a scholar's pace."));
+					break;
+				case "food":
+					await dialog.OpenShop("DorasCompanionFood");
+					break;
+			}
+		});
+
+		doras.AssociatedShopName = "DorasCompanions";
+		doras.ShopType = ShopType.Potion;
+
+		// Tutorial Triggers
+		//-------------------------------------------------------------------------
+		AddTutorialTrigger("c_fedimian", -74, 99, "TUTO_PETSHOP");
+		AddTutorialTrigger("c_fedimian", -631.32, -174.9, "TUTO_NPCSHOP");
+		AddTutorialTrigger("c_fedimian", -219.15, -558.35, "TUTO_REIN");
+		AddTutorialTrigger("c_fedimian", -170, -218, "TUTO_STORAGE");
+	}
+
+	/// <summary>
+	/// Creates the misc item shop
+	/// </summary>
+	private void CreateMiscItemShop()
+	{
+		CreateShop("FedimianMiscItems", shop =>
+		{
+			shop.AddItem(640002, amount: 1, price: 80);
+			shop.AddItem(640003, amount: 1, price: 160);
+			shop.AddItem(640005, amount: 1, price: 120);
+			shop.AddItem(640006, amount: 1, price: 480);
+			shop.AddItem(640008, amount: 1, price: 80);
+			shop.AddItem(640009, amount: 1, price: 320);
+			shop.AddItem(640073, amount: 1, price: 500);
+			shop.AddItem(640156, amount: 1, price: 500);
+			shop.AddItem(640182, amount: 1, price: 500);
+			shop.AddItem(643002, amount: 1, price: 1500);
+			shop.AddItem(645337, amount: 1, price: 20);
+			shop.AddItem(645025, amount: 1, price: 5000);
+			shop.AddItem(645026, amount: 1, price: 50000);
+		});
+	}
+
+	/// <summary>
+	/// Creates the accessory shop
+	/// </summary>
+	private void CreateAccessoryShop()
+	{
+		CreateShop("FedimianAccessories", shop =>
+		{
+			shop.AddItem(601111, amount: 1, price: 180);
+			shop.AddItem(601112, amount: 1, price: 1296);
+			shop.AddItem(601113, amount: 1, price: 1296);
+			shop.AddItem(601114, amount: 1, price: 2592);
+			shop.AddItem(601121, amount: 1, price: 5184);
+			shop.AddItem(581112, amount: 1, price: 270);
+			shop.AddItem(581113, amount: 1, price: 1944);
+			shop.AddItem(581114, amount: 1, price: 1944);
+			shop.AddItem(581115, amount: 1, price: 3888);
+			shop.AddItem(581116, amount: 1, price: 7776);
+		});
+	}
+
+	/// <summary>
+	/// Creates the weapon shop with all available weapons
+	/// </summary>
+	private void CreateWeaponShop()
+	{
+		CreateShop("FedimianWeapons", shop =>
+		{
+			// One-Handed Swords
+			shop.AddItem(101126, amount: 1, price: 400);
+			shop.AddItem(101127, amount: 1, price: 3600);
+			shop.AddItem(101128, amount: 1, price: 4320);
+			shop.AddItem(101124, amount: 1, price: 6370);
+			shop.AddItem(101129, amount: 1, price: 7280);
+			shop.AddItem(101125, amount: 1, price: 19311);
+			shop.AddItem(101130, amount: 1, price: 19311);
+
+			// Two-Handed Swords
+			shop.AddItem(121102, amount: 1, price: 5760);
+			shop.AddItem(121120, amount: 1, price: 6912);
+			shop.AddItem(121118, amount: 1, price: 10192);
+			shop.AddItem(121121, amount: 1, price: 11648);
+			shop.AddItem(121119, amount: 1, price: 30987);
+
+			// Rods
+			shop.AddItem(141126, amount: 1, price: 400);
+			shop.AddItem(141127, amount: 1, price: 3600);
+			shop.AddItem(141128, amount: 1, price: 4320);
+			shop.AddItem(141124, amount: 1, price: 6370);
+			shop.AddItem(141129, amount: 1, price: 7280);
+			shop.AddItem(141125, amount: 1, price: 19311);
+
+			// Staves
+			shop.AddItem(271118, amount: 1, price: 640);
+			shop.AddItem(271119, amount: 1, price: 5760);
+			shop.AddItem(271120, amount: 1, price: 6912);
+			shop.AddItem(271116, amount: 1, price: 10192);
+			shop.AddItem(271121, amount: 1, price: 11648);
+			shop.AddItem(271117, amount: 1, price: 30897);
+
+			// Bows
+			shop.AddItem(161126, amount: 1, price: 640);
+			shop.AddItem(161127, amount: 1, price: 5760);
+			shop.AddItem(161128, amount: 1, price: 6912);
+			shop.AddItem(161124, amount: 1, price: 10192);
+			shop.AddItem(161129, amount: 1, price: 11648);
+			shop.AddItem(161125, amount: 1, price: 30897);
+
+			// Crossbows
+			shop.AddItem(181120, amount: 1, price: 3600);
+			shop.AddItem(181121, amount: 1, price: 4320);
+			shop.AddItem(181118, amount: 1, price: 6370);
+			shop.AddItem(181122, amount: 1, price: 7280);
+			shop.AddItem(181119, amount: 1, price: 19311);
+
+			// Clubs
+			shop.AddItem(201103, amount: 1, price: 400);
+			shop.AddItem(201127, amount: 1, price: 3600);
+			shop.AddItem(201126, amount: 1, price: 4320);
+			shop.AddItem(201128, amount: 1, price: 6370);
+			shop.AddItem(201124, amount: 1, price: 7280);
+			shop.AddItem(201125, amount: 1, price: 19311);
+
+			// Two-Handed Clubs
+			shop.AddItem(210100, amount: 1, price: 30897);
+
+			// Spears
+			shop.AddItem(241109, amount: 1, price: 6370);
+			shop.AddItem(241110, amount: 1, price: 7280);
+			shop.AddItem(241111, amount: 1, price: 19311);
+
+			// Two-Handed Spears
+			shop.AddItem(251107, amount: 1, price: 30897);
+
+			// Rapiers
+			shop.AddItem(311111, amount: 1, price: 3600);
+			shop.AddItem(311112, amount: 1, price: 7280);
+			shop.AddItem(311113, amount: 1, price: 19311);
+
+			// Pistols
+			shop.AddItem(301112, amount: 1, price: 3600);
+			shop.AddItem(301113, amount: 1, price: 7280);
+			shop.AddItem(301114, amount: 1, price: 19311);
+
+			// Daggers
+			shop.AddItem(111001, amount: 1, price: 3600);
+			shop.AddItem(111003, amount: 1, price: 7280);
+			shop.AddItem(111005, amount: 1, price: 19311);
+
+			// Trinkets
+			shop.AddItem(692001, amount: 1, price: 7280);
+			shop.AddItem(692002, amount: 1, price: 7280);
+		});
+	}
+
+	/// <summary>
+	/// Creates the armor shop with all available armor pieces
+	/// </summary>
+	private void CreateArmorShop()
+	{
+		CreateShop("FedimianArmors", shop =>
+		{
+			// Dunkel Quilted Armor Set
+			shop.AddItem(531129, amount: 1, price: 360);
+			shop.AddItem(521129, amount: 1, price: 360);
+			shop.AddItem(511129, amount: 1, price: 180);
+			shop.AddItem(501129, amount: 1, price: 180);
+
+			// Dunkel Cotton Armor Set
+			shop.AddItem(531130, amount: 1, price: 2592);
+			shop.AddItem(521130, amount: 1, price: 2592);
+			shop.AddItem(511130, amount: 1, price: 1296);
+			shop.AddItem(501130, amount: 1, price: 1296);
+
+			// Dunkel Hard Leather Set
+			shop.AddItem(531131, amount: 1, price: 2592);
+			shop.AddItem(521131, amount: 1, price: 2592);
+			shop.AddItem(511131, amount: 1, price: 1296);
+			shop.AddItem(501131, amount: 1, price: 1296);
+
+			// Dunkel Ring Mail Set
+			shop.AddItem(531132, amount: 1, price: 2592);
+			shop.AddItem(521132, amount: 1, price: 2592);
+			shop.AddItem(511132, amount: 1, price: 1296);
+			shop.AddItem(501132, amount: 1, price: 1296);
+
+			// Acolyte Set
+			shop.AddItem(531126, amount: 1, price: 5184);
+			shop.AddItem(521126, amount: 1, price: 5184);
+			shop.AddItem(511126, amount: 1, price: 2592);
+			shop.AddItem(501126, amount: 1, price: 2592);
+
+			// Mark Set
+			shop.AddItem(531106, amount: 1, price: 5184);
+			shop.AddItem(521106, amount: 1, price: 5184);
+			shop.AddItem(511106, amount: 1, price: 2592);
+			shop.AddItem(501106, amount: 1, price: 2592);
+
+			// Scale Set
+			shop.AddItem(531110, amount: 1, price: 5184);
+			shop.AddItem(521110, amount: 1, price: 5184);
+			shop.AddItem(511110, amount: 1, price: 2592);
+			shop.AddItem(501110, amount: 1, price: 2592);
+
+			// Superior Grima Set
+			shop.AddItem(531153, amount: 1, price: 10368);
+			shop.AddItem(521153, amount: 1, price: 10368);
+			shop.AddItem(511153, amount: 1, price: 5184);
+			shop.AddItem(501153, amount: 1, price: 5184);
+
+			// Hard Veris Set
+			shop.AddItem(531113, amount: 1, price: 10368);
+			shop.AddItem(521113, amount: 1, price: 10368);
+			shop.AddItem(511113, amount: 1, price: 5184);
+			shop.AddItem(501113, amount: 1, price: 5184);
+
+			// Full Plate Set
+			shop.AddItem(531137, amount: 1, price: 10368);
+			shop.AddItem(521137, amount: 1, price: 10368);
+			shop.AddItem(511137, amount: 1, price: 5184);
+			shop.AddItem(501137, amount: 1, price: 5184);
+
+			// Shields
+			shop.AddItem(221111, amount: 1, price: 400);
+			shop.AddItem(221112, amount: 1, price: 3600);
+			shop.AddItem(221105, amount: 1, price: 7280);
+			shop.AddItem(221113, amount: 1, price: 19311);
+		});
+	}
+
+	/// <summary>
+	/// Creates the companion food shop with custom prices
+	/// </summary>
+	private void CreateDorasCompanionFoodShop()
+	{
+		CreateShop("DorasCompanionFood", shop =>
+		{
+			shop.AddItem(640152, amount: 1, price: 600);
+			shop.AddItem(640231, amount: 1, price: 600);
+			shop.AddItem(640236, amount: 1, price: 600);
+			shop.AddItem(640249, amount: 1, price: 600);
+			shop.AddItem(640189, amount: 1, price: 600);
+			shop.AddItem(640188, amount: 1, price: 600);
+			shop.AddItem(640190, amount: 1, price: 600);
+		});
+	}
+
+	/// <summary>
+	/// Creates Doras's companion shop with custom prices
+	/// Fedimian mage city theme: familiars and scholarly companions
+	/// </summary>
+	private void CreateDorasCompanionShop()
+	{
+		CreateCompanionShop("DorasCompanions", shop =>
+		{
+			shop.AddCompanion("Velhider", price: 15000);
+			shop.AddCompanion("hoglan_Pet", price: 15000);
+			shop.AddCompanion("pet_hawk", price: 15000);
+
+			shop.AddCompanion("barn_owl", price: 80000);
+			shop.AddCompanion("pet_school_dodo", price: 80000);
+			shop.AddCompanion("pet_new_penguin", price: 80000);
+			shop.AddCompanion("pet_twnocelot", price: 80000);
+			shop.AddCompanion("pet_twnocelot_black", price: 80000);
+			shop.AddCompanion("pet_twnocelot_white", price: 80000);
+			shop.AddCompanion("pet_jpn3th_fox", price: 80000);
+			shop.AddCompanion("pet_nightrabbit", price: 80000);
+		});
 	}
 }

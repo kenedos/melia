@@ -4,10 +4,12 @@
 // The soldiers, villagers and hidden triggers the map's field quests run on.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -93,22 +95,6 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(WestForest) && character.Quests.MeetsPrerequisites(WestForest))
-			{
-				var answer = await dialog.Select(L("If you have time to spare, carry the assembly order to my soldiers. If not, go on to Klaipeda - I won't hold it against you."),
-					Option(L("Offer to carry the assembly order"), "accept"),
-					Option(L("Refuse"), "leave")
-				);
-
-				if (answer == "accept")
-				{
-					character.Quests.Start(WestForest);
-					character.Quests.CompleteObjective(WestForest, "acceptOrder");
-					await dialog.Msg(L("Good. Come back and tell me once you've made up your mind about the route."));
-				}
-				return;
-			}
-
 			if (character.Quests.IsActive(Knight))
 			{
 				await dialog.Msg(L("So he'll pass the rest of the order down himself. Well done."));
@@ -133,6 +119,22 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(WestForest) && character.Quests.MeetsPrerequisites(WestForest))
+			{
+				var answer = await dialog.Select(L("If you have time to spare, carry the assembly order to my soldiers. If not, go on to Klaipeda - I won't hold it against you."),
+					Option(L("Offer to carry the assembly order"), "accept"),
+					Option(L("Refuse"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(WestForest);
+					character.Quests.CompleteObjective(WestForest, "acceptOrder");
+					await dialog.Msg(L("Good. Come back and tell me once you've made up your mind about the route."));
+					return;
+				}
+			}
+
 			if (!character.Quests.Has(Hq01) && character.Quests.MeetsPrerequisites(Hq01))
 			{
 				await dialog.Msg(L("You've seen the recruitment notice, then. We are short of soldiers, that much is true."));
@@ -147,8 +149,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 					character.Quests.Start(Hq01);
 					await dialog.Msg(L("Even the offer is worth something. Go to Dvasia Peak instead - Julian's unit is opening the road to the Great King's Gate, and the monsters in the way need clearing."));
 					await dialog.Msg(L("Julian is the one running the operation there. He'll come out to meet you barefoot, I expect."));
+					return;
 				}
-				return;
 			}
 
 			if (character.Quests.IsActive(Hq01))
@@ -280,6 +282,31 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Searcher"));
 
+			if (character.Quests.IsActive(MeetNaglis) && character.Quests.IsCompletable(MeetNaglis))
+			{
+				await dialog.Msg(L("No monster that size belongs this far in. Strange times."));
+				await dialog.Msg(L("Thank you for the help. A Large Kepa this close to the road - Titas should hear about it."));
+				character.Quests.Complete(MeetNaglis);
+				return;
+			}
+
+			if (character.Quests.IsActive(SkillTuto) && character.Quests.IsCompletable(SkillTuto))
+			{
+				await dialog.Msg(L("Skills differ by class, but any of them makes a fight easier. And they do more than hit things."));
+				await dialog.Msg(L("Plenty worth having, isn't there? Use them well and they'll carry you through."));
+				await dialog.Msg(L("That reminds me - the assembly order. The squad leader is off to the right. Take it to him too."));
+				character.Quests.Complete(SkillTuto);
+				return;
+			}
+
+			if (character.Quests.IsActive(OnionBig) && character.Quests.IsCompletable(OnionBig))
+			{
+				await dialog.Msg(L("There was one after all. My gut has never been wrong yet."));
+				await dialog.Msg(L("That's how I lived through the Blessed Day."));
+				character.Quests.Complete(OnionBig);
+				return;
+			}
+
 			if (!character.Quests.Has(MeetNaglis) && character.Quests.MeetsPrerequisites(MeetNaglis))
 			{
 				var answer = await dialog.Select(L("This is a dangerous stretch. What brings you here?"),
@@ -291,24 +318,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(MeetNaglis);
 					await dialog.Msg(L("Watch out - a Large Kepa!"));
-				}
-
-				return;
-			}
-
-			if (character.Quests.IsActive(MeetNaglis))
-			{
-				if (!character.Quests.IsCompletable(MeetNaglis))
-				{
-					await dialog.Msg(L("Watch it - keep clear of its swing."));
-					character.Quests.ReplayQuestTrack(MeetNaglis);
 					return;
 				}
-
-				await dialog.Msg(L("No monster that size belongs this far in. Strange times."));
-				await dialog.Msg(L("Thank you for the help. A Large Kepa this close to the road - Titas should hear about it."));
-				character.Quests.Complete(MeetNaglis);
-				return;
 			}
 
 			if (!character.Quests.Has(SkillTuto) && character.Quests.MeetsPrerequisites(SkillTuto))
@@ -334,23 +345,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 					}
 
 					character.ServerMessage(L("Press 'F3' to check your skills."));
-				}
-				return;
-			}
-
-			if (character.Quests.IsActive(SkillTuto))
-			{
-				if (!character.Quests.IsCompletable(SkillTuto))
-				{
-					await dialog.Msg(L("Open the skill window with 'F3' and put a point into a skill. Any skill you can use will do."));
 					return;
 				}
-
-				await dialog.Msg(L("Skills differ by class, but any of them makes a fight easier. And they do more than hit things."));
-				await dialog.Msg(L("Plenty worth having, isn't there? Use them well and they'll carry you through."));
-				await dialog.Msg(L("That reminds me - the assembly order. The squad leader is off to the right. Take it to him too."));
-				character.Quests.Complete(SkillTuto);
-				return;
 			}
 
 			if (!character.Quests.Has(OnionBig) && character.Quests.MeetsPrerequisites(OnionBig))
@@ -364,22 +360,27 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(OnionBig);
 					await dialog.Msg(L("Any other day you could search all you like and find nothing. Odd, isn't it?"));
+					return;
 				}
+			}
+
+			if (character.Quests.IsActive(MeetNaglis))
+			{
+				await dialog.Msg(L("Watch it - keep clear of its swing."));
+				character.Quests.ReplayQuestTrack(MeetNaglis);
+				return;
+			}
+
+			if (character.Quests.IsActive(SkillTuto))
+			{
+				await dialog.Msg(L("Open the skill window with 'F3' and put a point into a skill. Any skill you can use will do."));
 				return;
 			}
 
 			if (character.Quests.IsActive(OnionBig))
 			{
-				if (!character.Quests.IsCompletable(OnionBig))
-				{
-					await dialog.Msg(L("West of here, along the old farm road. That's where I'd look."));
-					character.Quests.ReplayQuestTrack(OnionBig);
-					return;
-				}
-
-				await dialog.Msg(L("There was one after all. My gut has never been wrong yet."));
-				await dialog.Msg(L("That's how I lived through the Blessed Day."));
-				character.Quests.Complete(OnionBig);
+				await dialog.Msg(L("West of here, along the old farm road. That's where I'd look."));
+				character.Quests.ReplayQuestTrack(OnionBig);
 				return;
 			}
 
@@ -393,6 +394,30 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Squad Leader"));
+
+			if (character.Quests.IsActive(Soldier3) && character.Quests.IsCompletable(Soldier3))
+			{
+				await dialog.Msg(L("That's the last of them. The ground around the post is clear again."));
+				character.Quests.Complete(Soldier3);
+				return;
+			}
+
+			if (character.Quests.IsActive(HamingLeaf) && character.Quests.IsCompletable(HamingLeaf))
+			{
+				await dialog.Msg(L("Yes. That's enough of them."));
+				await dialog.Msg(L("Here - a pill that puts your stamina back on its feet. I have plenty, so take it as a gift."));
+				await dialog.Msg(L("Stamina comes back at a root crystal or with a rest. But when something is chasing you, there's no time for either, and then nothing is worth more than this."));
+				character.Quests.Complete(HamingLeaf);
+				return;
+			}
+
+			if (character.Quests.IsActive(BossGolem) && character.Quests.IsCompletable(BossGolem))
+			{
+				await dialog.Msg(L("My men told me about it, and I'd been worried since."));
+				await dialog.Msg(L("With the world in this state, anything that ends well is a good end."));
+				character.Quests.Complete(BossGolem);
+				return;
+			}
 
 			if (!character.Quests.Has(Soldier3) && character.Quests.MeetsPrerequisites(Soldier3))
 			{
@@ -415,21 +440,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Soldier3);
 					await dialog.Msg(L("Hunt the Hanaming nearby first. Gather their petals while you're at it."));
-				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Soldier3))
-			{
-				if (!character.Quests.IsCompletable(Soldier3))
-				{
-					await dialog.Msg(L("Revelator or goddess, nobody leaves before the task is done."));
 					return;
 				}
-
-				await dialog.Msg(L("That's the last of them. The ground around the post is clear again."));
-				character.Quests.Complete(Soldier3);
-				return;
 			}
 
 			if (!character.Quests.Has(HamingLeaf) && character.Quests.MeetsPrerequisites(HamingLeaf))
@@ -440,24 +452,10 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
-					character.Quests.Start(HamingLeaf);
-
-				return;
-			}
-
-			if (character.Quests.IsActive(HamingLeaf))
-			{
-				if (!character.Quests.IsCompletable(HamingLeaf))
 				{
-					await dialog.Msg(L("Revelator or goddess, nobody leaves before the task is done."));
+					character.Quests.Start(HamingLeaf);
 					return;
 				}
-
-				await dialog.Msg(L("Yes. That's enough of them."));
-				await dialog.Msg(L("Here - a pill that puts your stamina back on its feet. I have plenty, so take it as a gift."));
-				await dialog.Msg(L("Stamina comes back at a root crystal or with a rest. But when something is chasing you, there's no time for either, and then nothing is worth more than this."));
-				character.Quests.Complete(HamingLeaf);
-				return;
 			}
 
 			if (!character.Quests.Has(Knight) && character.Quests.MeetsPrerequisites(Knight))
@@ -471,9 +469,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Knight);
 					character.Quests.CompleteObjective(Knight, "reportToTitas");
+					return;
 				}
-
-				return;
 			}
 
 			if (!character.Quests.Has(BossGolem) && character.Quests.MeetsPrerequisites(BossGolem))
@@ -489,22 +486,26 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(BossGolem);
 					await dialog.Msg(L("Golems come through there. Carefree lot, my men."));
+					return;
 				}
+			}
+
+			if (character.Quests.IsActive(Soldier3))
+			{
+				await dialog.Msg(L("Revelator or goddess, nobody leaves before the task is done."));
+				return;
+			}
+
+			if (character.Quests.IsActive(HamingLeaf))
+			{
+				await dialog.Msg(L("Revelator or goddess, nobody leaves before the task is done."));
 				return;
 			}
 
 			if (character.Quests.IsActive(BossGolem))
 			{
-				if (!character.Quests.IsCompletable(BossGolem))
-				{
-					await dialog.Msg(L("One run-in with a golem will straighten them out."));
-					character.Quests.ReplayQuestTrack(BossGolem);
-					return;
-				}
-
-				await dialog.Msg(L("My men told me about it, and I'd been worried since."));
-				await dialog.Msg(L("With the world in this state, anything that ends well is a good end."));
-				character.Quests.Complete(BossGolem);
+				await dialog.Msg(L("One run-in with a golem will straighten them out."));
+				character.Quests.ReplayQuestTrack(BossGolem);
 				return;
 			}
 
@@ -518,6 +519,14 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Laimonas"));
+
+			if (character.Quests.IsActive(Laimonas1) && character.Quests.IsCompletable(Laimonas1))
+			{
+				await dialog.Msg(L("So the statue is unharmed. That is a relief."));
+				await dialog.Msg(L("Even the monsters here know enough to fear a goddess. Klaipeda is down the Tenet Garden road - go with her blessing."));
+				character.Quests.Complete(Laimonas1);
+				return;
+			}
 
 			if (!character.Quests.Has(Laimonas1) && character.Quests.MeetsPrerequisites(Laimonas1))
 			{
@@ -538,22 +547,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Laimonas1);
 					await dialog.Msg(L("That depends which goddess. Follow the right-hand road to its end - the Statue of Goddess Zemyna is there. Feel her grace for yourself."));
-				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Laimonas1))
-			{
-				if (!character.Quests.IsCompletable(Laimonas1))
-				{
-					await dialog.Msg(L("I do worry the monsters will do the statue harm. The world is ruined enough without that."));
 					return;
 				}
-
-				await dialog.Msg(L("So the statue is unharmed. That is a relief."));
-				await dialog.Msg(L("Even the monsters here know enough to fear a goddess. Klaipeda is down the Tenet Garden road - go with her blessing."));
-				character.Quests.Complete(Laimonas1);
-				return;
 			}
 
 			if (!character.Quests.Has(Laimonas4) && character.Quests.MeetsPrerequisites(Laimonas4))
@@ -567,7 +562,13 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Laimonas4);
 					await dialog.Msg(L("And while you're going - pass my regards to the guard captain."));
+					return;
 				}
+			}
+
+			if (character.Quests.IsActive(Laimonas1))
+			{
+				await dialog.Msg(L("I do worry the monsters will do the statue harm. The world is ruined enough without that."));
 				return;
 			}
 
@@ -590,8 +591,17 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Laimonas1) && !character.Quests.IsCompletable(Laimonas1))
 			{
+				var result = await character.TimeActions.StartAsync(L("Praying..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
+
+				if (result != TimeActionResult.Completed)
+					return;
+
 				await dialog.Msg(L("You bow your head. The stone warms under the moss, and for a moment the carving is lit from within."));
-				character.Quests.CompleteObjective(Laimonas1, "prayAtStatue");
+				character.Quests.Complete(Laimonas1);
+
+				await dialog.Msg(L("The light goes out of the stone. Something is moving in the brush behind you."));
+				character.Quests.Start(Laimonas32);
+				character.Quests.StartQuestTrack(Laimonas32);
 				return;
 			}
 

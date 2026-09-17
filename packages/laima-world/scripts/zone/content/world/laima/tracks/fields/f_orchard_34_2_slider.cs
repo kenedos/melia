@@ -27,14 +27,14 @@ public class forchard342slider : TrackScript
 		base.OnStart(character, track);
 
 		var actors = new List<IActor>();
-		var mob0 = Shortcuts.AddMonster(character, 155058, "", "f_orchard_34_2", -1797.292, 368.7016, 187.4255, 60.71429);
+		var mob0 = Shortcuts.AddTrackMonster(character, 155058, "", "f_orchard_34_2", -1797.292, 368.7016, 187.4255, 60.71429);
 		mob0.Visibility = ActorVisibility.Always;
 		actors.Add(mob0);
 
 		character.Movement.MoveTo(new Position(-1680.834f, 346.2044f, 58.14703f));
 		actors.Add(character);
 
-		var mob1 = Shortcuts.AddMonster(character, 147501, "UnvisibleName", "f_orchard_34_2", -1711.564, 346.2044, 59.92449, 0);
+		var mob1 = Shortcuts.AddTrackMonster(character, 147501, "UnvisibleName", "f_orchard_34_2", -1711.564, 346.2044, 59.92449, 0);
 		actors.Add(mob1);
 
 		return actors.ToArray();

@@ -1,11 +1,14 @@
 using System;
+using System.Threading;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Maps;
 using Yggdrasil.Logging;
 
 namespace Melia.Zone.Scripting
@@ -121,7 +124,7 @@ namespace Melia.Zone.Scripting
 			if (spec.Aggressive)
 				monster.Tendency = TendencyType.Aggressive;
 
-			monster.SetVisibilty(ActorVisibility.Track, character.ObjectId);
+			monster.Visibility = ActorVisibility.Always;
 			monster.AddEffect(new ScriptInvisibleEffect());
 
 			if (spec.EndPosition.HasValue)
@@ -135,7 +138,7 @@ namespace Melia.Zone.Scripting
 				monster.Components.Add(new AiComponent(monster, string.IsNullOrEmpty(spec.Ai) ? "BasicMonster" : spec.Ai));
 
 			// Added at once, since the cutscene packet names it by handle right after.
-			character.Map.AddMonsterNow(monster);
+			character.Map.AddMonster(monster);
 
 			var overrides = new PropertyOverrides();
 
@@ -155,6 +158,170 @@ namespace Melia.Zone.Scripting
 				monster.Properties.SetFloat(PropertyName.SDR, spec.SearchRange);
 
 			return monster;
+		}
+
+		/// <summary>
+		/// Spawning a monster for a track.
+		/// Used for monsters that spawn in tracks/cutscenes.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="mapName"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="faction"></param>
+		/// <param name="tendency"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static Mob AddTrackMonster(Character character, int monsterId, string name, string mapName, double x, double y, double z, double direction, string faction = "Monster", string tendency = "")
+		{
+			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterId, out var monsterData))
+			{
+				Log.Warning("AddMonster: Failed monster not found with id: {0}", monsterId);
+				throw new ArgumentException($"AddMonster: Monster '{monsterId}'  not found.");
+			}
+
+			Map map;
+			if (mapName != "None")
+				map = GetMapOrThrow(mapName);
+			else
+				map = character.Map;
+
+			var monster = new Mob(monsterData.Id, faction == "Our_Forces" ? RelationType.Friendly : RelationType.Enemy);
+			monster.Name = name;
+			monster.Position = new Position((float)x, (float)y, (float)z);
+			monster.Direction = new Direction(direction);
+			monster.Layer = character.Layer;
+			monster.SpawnPosition = monster.Position;
+			if (!string.IsNullOrEmpty(faction) && Enum.TryParse(typeof(FactionType), faction, true, out var factionType))
+				monster.Faction = (FactionType)factionType;
+
+			monster.Visibility = ActorVisibility.Always;
+			monster.AddEffect(new ScriptInvisibleEffect());
+			var ai = new AiComponent(monster, "BasicMonster");
+			monster.Components.Add(ai);
+
+			map.AddMonster(monster);
+
+			return monster;
+		}
+
+		/// <summary>
+		/// Adds new Track NPC to the world.
+		/// Used for npcs that spawn in tracks/cutscenes.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="dialogFuncName"></param>
+		/// <param name="enterFuncName"></param>
+		/// <param name="leaveFuncName"></param>
+		/// <param name="range"></param>
+		/// <returns></returns>
+		/// <exception cref="ArgumentException"></exception>
+		public static Npc AddTrackNpc(Character character, int monsterId, string name, string map, double x, double y, double z, double direction, string dialogFuncName = "", string enterFuncName = "", string leaveFuncName = "", int state = -2, double range = 100, double scale = 1)
+		{
+			var mapObj = GetMapOrThrow(map);
+
+			var pos = new Position((float)x, (float)y, (float)z);
+
+			// Wrap name in localization code if applicable
+			if (Dialog.IsLocalizationKey(name))
+			{
+				name = Dialog.WrapLocalizationKey(name);
+			}
+			// Insert line breaks in tagged NPC names that don't have one
+			else if (name.StartsWith('[') && !name.Contains("{nl}"))
+			{
+				var endIndex = name.LastIndexOf("] ");
+				if (endIndex != -1)
+				{
+					// Remove space and insert new line instead.
+					name = name.Remove(endIndex + 1, 1);
+					name = name.Insert(endIndex + 1, "{nl}");
+				}
+			}
+
+			var location = new Location(mapObj.Id, pos);
+			var dir = new Direction(direction);
+
+			ZoneServer.Instance.DialogFunctions.TryGet(dialogFuncName, out var dialog);
+			ZoneServer.Instance.TriggerFunctions.TryGet(enterFuncName, out var enter);
+			ZoneServer.Instance.TriggerFunctions.TryGet(leaveFuncName, out var leave);
+
+			var uniqueId = Interlocked.Increment(ref UniqueNpcNameId);
+			var uniqueName = $"__NPC{uniqueId}__";
+			var monster = new Npc(monsterId, name, location, dir, 0);
+			monster.UniqueName = uniqueName;
+			if (dialog != null)
+			{
+				monster.SetClickTrigger(dialogFuncName, dialog);
+				var uniqueDialogName = $"{dialogFuncName}_{mapObj.Data.ClassName}";
+				// Account for multiple npcs using the same dialogue.
+				ZoneServer.Instance.World.NPCs.TryAdd(uniqueDialogName, monster);
+			}
+			if (enter != null || leave != null)
+				monster.SetTriggerArea(Spot(monster.Position.X, monster.Position.Z, range));
+			if (enter != null)
+				monster.SetEnterTrigger(enterFuncName, enter);
+			if (leave != null)
+				monster.SetLeaveTrigger(leaveFuncName, leave);
+
+			if (state != -2)
+				monster.State = (NpcState)state;
+			if (range != 0)
+				monster.Properties.SetFloat(PropertyName.Range, (float)range);
+			if (scale != 1)
+				monster.Properties.SetFloat(PropertyName.Scale, (float)scale);
+
+			monster.Visibility = ActorVisibility.Always;
+			monster.AddEffect(new ScriptInvisibleEffect());
+			monster.Layer = character.Layer;
+
+			mapObj.AddMonster(monster);
+
+			return monster;
+		}
+
+		/// <summary>
+		/// Adds a Track NPC.
+		/// Used for elevators, cable cars, moving platforms, etc.
+		/// They also work with the "Track" system of the
+		/// client, although they are not necessarily in a cutscene.
+		/// and traversing.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="trackString"></param>
+		/// <param name="i1"></param>
+		/// <param name="i2"></param>
+		/// <returns></returns>
+		public static Npc AddTrackNPC(int monsterId, string name, string map, double x, double y, double z, double direction, string trackString, int i1 = 2, int i2 = 5)
+		{
+			if (string.IsNullOrEmpty(map) || map == "None")
+			{
+				Log.Debug($"Skipped adding Track NPC {monsterId} - {name} at {x},{y},{z} because of invalid map: {map}");
+				return null;
+			}
+			var npc = AddNpc(0, monsterId, name, map, x, y, z, direction);
+			npc.Visibility = ActorVisibility.Always;
+			npc.AddEffect(new ReviveEffect());
+			npc.AddEffect(new SetTrackPosition());
+			npc.AddEffect(new DirectionAPC(trackString, i1, i2));
+			//if (ZoneServer.Instance.Data.MapDb.TryFind(map, out var mapData))
+			//Log.Debug($"Adding Track NPC {monsterId} - {name} at {x},{y},{z} on {mapData.Name}");
+			return npc;
 		}
 	}
 }

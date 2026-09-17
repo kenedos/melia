@@ -158,53 +158,6 @@ namespace Melia.Zone.Scripting
 		/// <summary>
 		/// Spawning a monster for a track.
 		/// </summary>
-		/// <param name="monsterId"></param>
-		/// <param name="mapName"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="z"></param>
-		/// <param name="direction"></param>
-		/// <param name="faction"></param>
-		/// <param name="tendency"></param>
-		/// <returns></returns>
-		/// <exception cref="ArgumentException"></exception>
-		/// Shortcuts.AddMonster(0, 400001, "", "f_siauliai_west", -1231.022, 260.8354, -547.764, 16.875, "");
-		public static Mob AddMonster(Character character, int monsterId, string name, string mapName, double x, double y, double z, double direction, string faction = "Monster", string tendency = "")
-		{
-			if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterId, out var monsterData))
-			{
-				Log.Warning("AddMonster: Failed monster not found with id: {0}", monsterId);
-				throw new ArgumentException($"AddMonster: Monster '{monsterId}'  not found.");
-			}
-
-			Map map;
-			if (mapName != "None")
-				map = GetMapOrThrow(mapName);
-			else
-				map = character.Map;
-
-			var monster = new Mob(monsterData.Id, faction == "Our_Forces" ? RelationType.Friendly : RelationType.Enemy);
-			monster.Name = name;
-			monster.Position = new Position((float)x, (float)y, (float)z);
-			monster.Direction = new Direction(direction);
-			monster.Layer = character.Layer;
-			monster.SpawnPosition = monster.Position;
-			if (!string.IsNullOrEmpty(faction) && Enum.TryParse(typeof(FactionType), faction, true, out var factionType))
-				monster.Faction = (FactionType)factionType;
-
-			monster.SetVisibilty(ActorVisibility.Track, character.ObjectId);
-			monster.AddEffect(new ScriptInvisibleEffect());
-			var ai = new AiComponent(monster, "BasicMonster");
-			monster.Components.Add(ai);
-
-			map.AddMonster(monster);
-
-			return monster;
-		}
-
-		/// <summary>
-		/// Spawning a monster for a track.
-		/// </summary>
 		/// <param name="genType"></param>
 		/// <param name="monsterId"></param>
 		/// <param name="map"></param>
