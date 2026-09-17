@@ -262,8 +262,16 @@ namespace Melia.Zone.World.Actors.Characters
 					var startHp = this.Properties.GetFloat(PropertyName.MHP) * 0.25f;
 					this.Heal(startHp, 0);
 
-					var location = this.GetCityReturnLocation();
-					this.Warp(location);
+					if (this.HasVisitedCity())
+					{
+						var location = this.GetCityReturnLocation();
+						this.Warp(location);
+					}
+					else
+					{
+						var barracks = ZoneServer.Instance.Conf.Barracks;
+						this.Warp(barracks.StartMap, barracks.StartPosition);
+					}
 					break;
 				}
 				case ResurrectOptions.TryAgain:

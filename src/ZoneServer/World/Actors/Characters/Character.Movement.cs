@@ -188,6 +188,23 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.Y", location.Y);
 			this.Variables.Perm.SetFloat("Melia.CityReturnLocation.Z", location.Z);
 		}
+
+		/// <summary>
+		/// Returns whether the character has entered a city at least once.
+		/// </summary>
+		public bool HasVisitedCity()
+			=> this.Variables.Perm.GetBool("Melia.HasVisitedCity", false);
+
+		/// <summary>
+		/// Records that the character has entered a city.
+		/// </summary>
+		public void MarkVisitedCity()
+		{
+			if (this.Variables.Perm.GetBool("Melia.HasVisitedCity", false))
+				return;
+
+			this.Variables.Perm.SetBool("Melia.HasVisitedCity", true);
+		}
 		#endregion
 
 		#region Warping Methods

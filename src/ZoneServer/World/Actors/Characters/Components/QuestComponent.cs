@@ -1623,6 +1623,11 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			questTable.Insert("ObjectId", "0x" + quest.ObjectId.ToString("X16"));
 			questTable.Insert("ClassId", "0x" + quest.Data.Id.Value.ToString("X16"));
+
+			// Sent only for quests the client knows by id, so its absence marks a custom quest.
+			if (quest.QuestStaticData != null && quest.Data.Id.NamespaceId == 0)
+				questTable.Insert("ClientId", quest.QuestStaticData.Id);
+
 			questTable.Insert("Name", quest.Data.Name);
 			questTable.Insert("Description", quest.Data.Description);
 			questTable.Insert("Location", locationName);

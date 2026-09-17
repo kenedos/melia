@@ -424,6 +424,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 					return;
 				}
 
+				await dialog.Msg(L("That's the last of them. The ground around the post is clear again."));
 				character.Quests.Complete(Soldier3);
 				return;
 			}

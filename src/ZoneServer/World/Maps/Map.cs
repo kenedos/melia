@@ -565,6 +565,9 @@ namespace Melia.Zone.World.Maps
 		{
 			character.Map = this;
 
+			if (this.IsCity && character is not DummyCharacter)
+				character.MarkVisitedCity();
+
 			// The character has to be counted before the map is woken,
 			// otherwise the heartbeat can observe an awake map with no
 			// characters on it and immediately unload it again.

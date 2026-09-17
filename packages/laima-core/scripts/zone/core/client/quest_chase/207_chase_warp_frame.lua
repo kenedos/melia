@@ -2,12 +2,11 @@
 Melia.Override("OPEN_QUESTWARP_FRAME", function(original, frame)
 	local quests = M_CHASE_GET_RETURNABLE()
 
-	M_CHASE_WARP_FILL(frame, quests)
-
 	if #quests == 0 then
-		frame:ShowWindow(0)
-		return
+		return original(frame)
 	end
+
+	M_CHASE_WARP_FILL(frame, quests)
 
 	QuestWarpSelect_index = 0
 	QuestWarpMaxCount = #quests
@@ -22,12 +21,32 @@ Melia.Override("OPEN_QUESTWARP_FRAME", function(original, frame)
 	frame:ShowWindow(1)
 end)
 
+-- The client's list and ours share the frame, so only object-id entries are ours.
+local function M_CHASE_WARP_IS_OURS(frame, index)
+	if frame == nil then
+		return false
+	end
+
+	local classId = frame:GetUserValue("QUEST_WARP_CLASSID_" .. index)
+	return classId ~= nil and string.find(tostring(classId), "^0x") ~= nil
+end
+
 Melia.Override("QUESTWARP_QUESTID", function(original, frame, control, argStr, index)
-	M_CHASE_WARP_BY_INDEX(ui.GetFrame("questwarp"), index)
+	local warpFrame = ui.GetFrame("questwarp")
+
+	if not M_CHASE_WARP_IS_OURS(warpFrame, index) then
+		return original(frame, control, argStr, index)
+	end
+
+	M_CHASE_WARP_BY_INDEX(warpFrame, index)
 end)
 
 Melia.Override("QUESTWARP_ON_MSG", function(original, frame, msg, argStr, argNum)
 	if msg ~= "QUESTWARPSELECT_SELECT" then
+		return original(frame, msg, argStr, argNum)
+	end
+
+	if not M_CHASE_WARP_IS_OURS(frame, QuestWarpSelect_index) then
 		return original(frame, msg, argStr, argNum)
 	end
 

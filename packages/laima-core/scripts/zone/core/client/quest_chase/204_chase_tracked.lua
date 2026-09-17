@@ -16,7 +16,7 @@ function M_CHASE_GET_TRACKED()
 			local questType = M_QUEST_TYPE_STYLE[quest.Type] and quest.Type or "Sub"
 			local hasObjectives = quest.Objectives ~= nil and #quest.Objectives > 0
 
-			if questType == typeName and quest.Tracked and hasObjectives then
+			if questType == typeName and quest.Tracked and quest.ClientId == nil and hasObjectives then
 				table.insert(section, quest)
 			end
 		end

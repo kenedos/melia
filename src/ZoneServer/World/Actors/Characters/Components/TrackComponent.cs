@@ -278,6 +278,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (TrackScript.TryGet(track.Id, out var trackScript))
 				trackScript.OnComplete(this.Character, track);
 
+			this.ReturnGroundItemsToBaseLayer();
+
 			// OnComplete stops the track's layer, which makes the client
 			// hide the tracker; re-show it now that the quest state it
 			// carries is final.
@@ -309,6 +311,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (TrackScript.TryGet(track.Id, out var trackScript))
 				trackScript.OnCancel(this.Character, track);
 
+			this.ReturnGroundItemsToBaseLayer();
+
 			// Clean up the track dialog to prevent blocking future NPC interactions
 			if (track.Dialog != null)
 			{
@@ -316,6 +320,35 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				this.Character.Connection.CurrentDialog?.Cancel();
 				this.Character.Connection.CurrentDialog = null;
 			}
+		}
+
+		/// <summary>
+		/// Moves loot dropped on the track's private layer onto the layer
+		/// the character returns to.
+		/// </summary>
+		/// <remarks>
+		/// A track with a battle box leaves its drops behind when it ends,
+		/// because they spawned on the track's own layer. OnComplete/OnCancel
+		/// stop that layer before this runs, so the loot has already left the
+		/// client's view and LookAround sends it again on the return layer.
+		/// </remarks>
+		private void ReturnGroundItemsToBaseLayer()
+		{
+			if (this._trackLayer == this._returnLayer)
+				return;
+
+			var map = this.Character.Map;
+			if (map == null)
+				return;
+
+			var groundItems = map.GetMonsters(m => m.Layer == this._trackLayer && m is ItemMonster);
+			if (groundItems.Count == 0)
+				return;
+
+			foreach (var monster in groundItems)
+				monster.Layer = this._returnLayer;
+
+			this.Character.LookAround();
 		}
 
 		/// <summary>

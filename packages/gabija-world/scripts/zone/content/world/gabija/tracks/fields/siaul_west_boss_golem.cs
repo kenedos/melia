@@ -28,6 +28,8 @@ public class SiaulWestBossGolemTrack : TrackScript
 
 		var actors = new List<IActor>();
 
+		character.Movement.MoveTo(new Position(-644, 353, 997));
+
 		actors.Add(AddTrackActor(character, 57375, -541, 360, 1394, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 450221, -541, 360, 1394, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
@@ -36,7 +38,6 @@ public class SiaulWestBossGolemTrack : TrackScript
 		actors.Add(AddTrackActor(character, 10032, -623, 360, 1435, 19, soldier));
 		actors.Add(AddTrackActor(character, 10032, -463, 360, 1368, 12, soldier));
 
-		character.Movement.MoveTo(new Position(-644, 353, 997));
 		actors.Add(character);
 
 		return actors.ToArray();

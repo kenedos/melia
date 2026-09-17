@@ -27,6 +27,8 @@ public class SiaulWestOnionBigTrack : TrackScript
 
 		var actors = new List<IActor>();
 
+		character.Movement.MoveTo(new Position(-1905, 261, 61));
+
 		actors.Add(AddTrackActor(character, 57407, -1867, 261, 248, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		var kepa = new TrackActorSpec { Ai = "TrackWaitMonster" };
@@ -39,7 +41,6 @@ public class SiaulWestOnionBigTrack : TrackScript
 
 		actors.Add(AddTrackActor(character, 40080, -1693, 261, -150, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
 
-		character.Movement.MoveTo(new Position(-1905, 261, 61));
 		actors.Add(character);
 
 		return actors.ToArray();

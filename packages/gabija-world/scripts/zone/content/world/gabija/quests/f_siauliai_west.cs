@@ -296,7 +296,7 @@ public class SiaulWestSoldier3Quest : QuestScript
 
 		SetPhase(QuestStatus.Possible, "SIAUL_WEST_SOL3", "f_siauliai_west", L("Give the Squad Leader the order to fall back"));
 		SetPhase(QuestStatus.InProgress, "SIAUL_WEST_HANAMING_TRIGGER", "f_siauliai_west", L("Move to where the Hanaming appear"));
-		SetPhase(QuestStatus.Success, "SIAUL_WEST_HANAMING_TRIGGER", "f_siauliai_west", L("Chase the Hanaming"));
+		SetPhase(QuestStatus.Success, "SIAUL_WEST_SOL3", "f_siauliai_west", L("Report to the Squad Leader"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8350, QuestStatus.Completed));
 
@@ -320,7 +320,7 @@ public class SiaulWestHamingLeafQuest : QuestScript
 		SetAutoTracked(true);
 		SetCancelable(true);
 
-		SetPhase(QuestStatus.Possible, "SIAUL_WEST_HANAMING_TRIGGER", "f_siauliai_west", L("Move to the Hanaming habitat"));
+		SetPhase(QuestStatus.Possible, "SIAUL_WEST_SOL3", "f_siauliai_west", L("Move to the Hanaming habitat"));
 		SetPhase(QuestStatus.InProgress, "SIAUL_WEST_HANAMING_TRIGGER", "f_siauliai_west", L("Collect Hanaming Petals for the survey"));
 		SetPhase(QuestStatus.Success, "SIAUL_WEST_SOL3", "f_siauliai_west", L("Hand the Hanaming Petals to the Squad Leader"));
 
