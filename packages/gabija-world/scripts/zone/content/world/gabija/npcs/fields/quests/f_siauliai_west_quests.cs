@@ -589,15 +589,14 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Statue of Goddess Zemyna"));
 
+			var worshipResult = await WorshipStatPointStatue(dialog, "F_SIAULIAI_WEST_EV_55_001");
+			if (worshipResult == null)
+				return;
+
 			if (character.Quests.IsActive(Laimonas1) && !character.Quests.IsCompletable(Laimonas1))
 			{
-				var result = await character.TimeActions.StartAsync(L("Praying..."), "Cancel", "PRAY", TimeSpan.FromSeconds(3));
-
-				if (result != TimeActionResult.Completed)
-					return;
-
 				await dialog.Msg(L("You bow your head. The stone warms under the moss, and for a moment the carving is lit from within."));
-				character.Quests.Complete(Laimonas1);
+				character.Quests.CompleteObjective(Laimonas1, "prayAtStatue");
 
 				await dialog.Msg(L("The light goes out of the stone. Something is moving in the brush behind you."));
 				character.Quests.Start(Laimonas32);

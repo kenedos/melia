@@ -39,6 +39,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Knight Ares"));
+			dialog.SetPortrait("Dlg_port_OFFICER_IN_TACTICS");
 
 			if (!character.Quests.Has(Reclaim1) && character.Quests.MeetsPrerequisites(Reclaim1))
 			{
@@ -86,6 +87,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Request1);
+					character.Quests.CompleteObjective(Request1, "findClue");
 					await dialog.Msg(L("If you find anything that might be a clue, take it to the operations officer up there."));
 				}
 				return;
@@ -255,7 +257,10 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Act2Diss1);
+					character.Quests.CompleteObjective(Act2Diss1, "recoverSupplies");
+				}
 
 				return;
 			}

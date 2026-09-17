@@ -598,6 +598,22 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 		}
 
+		/// <summary>
+		/// Sends a monster's appearance to this character at once, without
+		/// the per-tick limit LookAround applies.
+		/// </summary>
+		/// <param name="monster"></param>
+		public void ShowMonster(IMonster monster)
+		{
+			lock (_lookAroundLock)
+			{
+				if (!_visibleMonsters.Add(monster))
+					return;
+			}
+
+			this.HandleAppearingSingleMonster(monster);
+		}
+
 		private void HandleAppearingCharacters(List<Character> appearCharacters)
 		{
 			for (var i = 0; i < appearCharacters.Count; i++)

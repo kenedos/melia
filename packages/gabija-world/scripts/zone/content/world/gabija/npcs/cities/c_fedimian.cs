@@ -28,7 +28,7 @@ public class CFedimianNpcScript : GeneralScript
 
 		// [Item Merchant] Muras
 		//-------------------------------------------------------------------------
-		var muras = AddNpc(151034, L("[Item Merchant] Muras"), "Muras", "c_fedimian", -631.32, -174.9, 0, async dialog =>
+		var muras = AddNpc(151034, L("[Item Merchant]{nl}Muras"), "Muras", "c_fedimian", -631.32, -174.9, 0, async dialog =>
 		{
 			dialog.SetTitle(L("Muras"));
 			dialog.SetPortrait("Dlg_port_Muras");
@@ -46,7 +46,7 @@ public class CFedimianNpcScript : GeneralScript
 
 		// [Storage Keeper] Zadan
 		//-------------------------------------------------------------------------
-		AddNpc(156027, L("[Storage Keeper] Zadan"), "Zadan", "c_fedimian", -170, -218, 0, async dialog =>
+		AddNpc(156027, L("[Storage Keeper]{nl}Zadan"), "Zadan", "c_fedimian", -170, -218, 0, async dialog =>
 		{
 			dialog.SetTitle(L("Zadan"));
 			dialog.SetPortrait("Dlg_port_Zadan");
@@ -71,7 +71,7 @@ public class CFedimianNpcScript : GeneralScript
 
 		// [Equipment Merchant] Yorgis
 		//-------------------------------------------------------------------------
-		var yorgis = AddNpc(151035, L("[Equipment Merchant] Yorgis"), "Yorgis", "c_fedimian", -219.15, -558.35, 90, async dialog =>
+		var yorgis = AddNpc(151035, L("[Equipment Merchant]{nl}Yorgis"), "Yorgis", "c_fedimian", -219.15, -558.35, 90, async dialog =>
 		{
 			dialog.SetTitle(L("Yorgis"));
 			dialog.SetPortrait("Dlg_port_Yorgis");
@@ -97,7 +97,7 @@ public class CFedimianNpcScript : GeneralScript
 
 		// [Accessory Merchant] Joana
 		//-------------------------------------------------------------------------
-		var joana = AddNpc(151038, L("[Accessory Merchant] Joana"), "Joana", "c_fedimian", -130.2, -496.14, 0, async dialog =>
+		var joana = AddNpc(151038, L("[Accessory Merchant]{nl}Joana"), "Joana", "c_fedimian", -130.2, -496.14, 0, async dialog =>
 		{
 			dialog.SetTitle(L("Joana"));
 			dialog.SetPortrait("Dlg_port_Yoana");
@@ -115,7 +115,7 @@ public class CFedimianNpcScript : GeneralScript
 
 		// [Companion Trader] Doras
 		//-------------------------------------------------------------------------
-		var doras = AddNpc(20058, L("[Companion Trader] Doras"), "Doras", "c_fedimian", -74, 99, 0, async dialog =>
+		var doras = AddNpc(20058, L("[Companion Trader]{nl}Doras"), "Doras", "c_fedimian", -74, 99, 0, async dialog =>
 		{
 			var character = dialog.Player;
 

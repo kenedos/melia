@@ -732,11 +732,17 @@ namespace Melia.Zone.World.Maps
 
 		#region Monster Management
 		/// <summary>
-		/// Queues a monster to be added to the map on the next update tick.
-		/// Returns false if the monster was rejected because the map is
-		/// dormant.
+		/// Adds a monster to the map, queued for the next update tick
+		/// unless it's added immediately. Returns false if the monster was
+		/// rejected because the map is dormant.
 		/// </summary>
-		public bool AddMonster(IMonster monster)
+		/// <param name="monster"></param>
+		/// <param name="immediate">
+		/// Adds the monster at once instead of through the per-tick queue,
+		/// for actors something references by handle right after creation,
+		/// such as a cutscene's cast.
+		/// </param>
+		public bool AddMonster(IMonster monster, bool immediate = false)
 		{
 			// Only block spawner-managed mobs on dormant maps. NPCs,
 			// treasure chests, minigame entities, and other non-spawner
@@ -749,7 +755,7 @@ namespace Melia.Zone.World.Maps
 			// Add non-spawner monsters (NPCs, warps, etc.) directly so
 			// their Map reference is set and lookups like HandleInteWarp
 			// see a valid map id before a player ever wakes the map.
-			if (this.IsDormant)
+			if (immediate || this.IsDormant)
 			{
 				this.AddMonsterInternal(monster);
 				return true;

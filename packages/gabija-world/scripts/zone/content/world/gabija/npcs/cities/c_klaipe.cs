@@ -25,7 +25,7 @@ public class CKlaipeNpcScript : GeneralScript
 
 		// Storage Keeper
 		//-------------------------------------------------------------------------
-		AddNpc(154018, L("[Storage Keeper] Rita"), "Rita", "c_Klaipe", 317, 279, 90.0, async dialog =>
+		AddNpc(154018, L("[Storage Keeper]{nl}Rita"), "Rita", "c_Klaipe", 317, 279, 90.0, async dialog =>
 		{
 			dialog.SetTitle(L("Rita"));
 			dialog.SetPortrait("WAREHOUSE_DLG");
@@ -51,7 +51,7 @@ public class CKlaipeNpcScript : GeneralScript
 
 		// General Merchant Mirina
 		//-------------------------------------------------------------------------
-		var mirina = AddNpc(20115, L("General Merchant Mirina"), "Mirina", "c_Klaipe", 510.7029, -349.3194, 90.0, async dialog =>
+		var mirina = AddNpc(20115, L("[Item Merchant]{nl}Mirina"), "Mirina", "c_Klaipe", 510.7029, -349.3194, 90.0, async dialog =>
 		{
 			dialog.SetTitle(L("Mirina"));
 			dialog.SetPortrait("Dlg_port_TOOL_DEALER");
@@ -62,9 +62,9 @@ public class CKlaipeNpcScript : GeneralScript
 					await dialog.Msg(L("Care for some potions or helpful consumables?{nl}Buy at Mirina's shop today!"));
 				else
 					await dialog.Msg(L("Mirina's shop at your service~"));
-			}
 
-			await dialog.OpenShop("KlaipedaMiscItems");
+				await dialog.OpenShop("KlaipedaMiscItems");
+			}
 		});
 
 		mirina.AssociatedShopName = "KlaipedaMiscItems";
@@ -73,7 +73,7 @@ public class CKlaipeNpcScript : GeneralScript
 		// Equipment Merchant
 		//-------------------------------------------------------------------------
 
-		var equipmentMerchant = AddNpc(20111, L("[Equipment Merchant] Dunkel"), "Dunkel", "c_Klaipe", 394, -475, 90.0, async dialog =>
+		var equipmentMerchant = AddNpc(20111, L("[Equipment Merchant]{nl}Dunkel"), "Dunkel", "c_Klaipe", 394, -475, 90.0, async dialog =>
 		{
 			dialog.SetTitle(L("Dunkel"));
 			dialog.SetPortrait("Dlg_port_vickers");
@@ -95,15 +95,16 @@ public class CKlaipeNpcScript : GeneralScript
 
 		// Accessory Merchant Ronesa
 		//-------------------------------------------------------------------------
-		var ronesa = AddNpc(20104, L("Accessory Merchant Ronesa"), "Ronesa", "c_Klaipe", 269, -611, 90.0, async dialog =>
+		var ronesa = AddNpc(20104, L("[Accessory Merchant]{nl}Ronesa"), "Ronesa", "c_Klaipe", 269, -611, 90.0, async dialog =>
 		{
 			dialog.SetTitle(L("Ronesa"));
 			dialog.SetPortrait("Dlg_port_KLAPEDA_ACCESSORY");
 
 			if (!await dialog.Hooks("BeforeDialog"))
+			{
 				await dialog.Msg(L("Welcome.{nl}Only hard-to-find stuff here."));
-
-			await dialog.OpenShop("KlaipedaAccessories");
+				await dialog.OpenShop("KlaipedaAccessories");
+			}
 		});
 
 		ronesa.AssociatedShopName = "KlaipedaAccessories";
@@ -115,7 +116,7 @@ public class CKlaipeNpcScript : GeneralScript
 
 		// [Companion Trader] Christina
 		//-------------------------------------------------------------------------
-		var christina = AddNpc(153005, L("[Companion Trader] Christina"), "Christina", "c_Klaipe", -1, -760, 90, async dialog =>
+		var christina = AddNpc(153005, L("[Companion Trader]{nl}Christina"), "Christina", "c_Klaipe", -1, -760, 90, async dialog =>
 		{
 			var character = dialog.Player;
 

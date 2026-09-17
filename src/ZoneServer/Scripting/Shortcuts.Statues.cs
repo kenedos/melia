@@ -213,11 +213,28 @@ namespace Melia.Zone.Scripting
 		/// <param name="dialog"></param>
 		private static async Task StatPointStatueDialog(Dialog dialog)
 		{
+			await WorshipStatPointStatue(dialog, dialog.Npc.DialogName);
+		}
+
+		/// <summary>
+		/// Runs a stat point statue's worship, granting the character a
+		/// permanent bonus stat point the first time.
+		/// </summary>
+		/// <remarks>
+		/// A statue that is also part of a quest passes its own stable key,
+		/// so one worship counts whether it happens through the quest or on
+		/// its own, and the point is never granted twice.
+		/// </remarks>
+		/// <param name="dialog"></param>
+		/// <param name="key">Stable key that identifies the statue in the character's variables.</param>
+		/// <returns>True if granted, false if the statue was already used, or null if the worship was cancelled.</returns>
+		public static async Task<bool?> WorshipStatPointStatue(Dialog dialog, string key)
+		{
 			var npc = dialog.Npc;
 			var character = dialog.Player;
 
-			if (IsStatueUsed(character, npc.DialogName, StatPointStatueVarPrefix))
-				return;
+			if (IsStatueUsed(character, key, StatPointStatueVarPrefix))
+				return false;
 
 			dialog.PlayAnimation("ON");
 			dialog.PlayAnimation("HOLD");
@@ -230,23 +247,25 @@ namespace Melia.Zone.Scripting
 				dialog.DetachEffect(npc, "F_light023_orange");
 				dialog.DetachEffect(npc, "F_light024_orange");
 				dialog.DetachEffect(npc, "statue_zemina_light1");
-				return;
+				return null;
 			}
 
 			dialog.AttachEffect(character, "F_pc_statue_wing", 10, EffectLocation.Top);
 
 			var effectSessionObject = character.SessionObjects.GetOrCreate("SSN_ATTACH_EFF");
 			if (effectSessionObject == null)
-				return;
+				return false;
 
 			character.SetMapNPCState(npc, NpcState.Unknown_20);
 			character.ModifyProperty(PropertyName.StatByBonus, 1);
-			MarkStatueUsed(character, npc.DialogName, StatPointStatueVarPrefix, npc.DialogName + "_P");
+			MarkStatueUsed(character, key, StatPointStatueVarPrefix, key + "_P");
 			character.AddonMessage("NOTICE_Dm_Clear", ScpArgMsg("STATUE_STAT_01"), 3);
 			dialog.DetachEffect(npc, "F_light024_orange");
 			character.RemoveSessionObject(effectSessionObject.Id);
 
 			character.ShowHelp("MINI_E_STATUE");
+
+			return true;
 		}
 
 		/// <summary>

@@ -138,7 +138,7 @@ namespace Melia.Zone.Scripting
 				monster.Components.Add(new AiComponent(monster, string.IsNullOrEmpty(spec.Ai) ? "BasicMonster" : spec.Ai));
 
 			// Added at once, since the cutscene packet names it by handle right after.
-			character.Map.AddMonster(monster);
+			character.Map.AddMonster(monster, immediate: true);
 
 			var overrides = new PropertyOverrides();
 
@@ -202,7 +202,7 @@ namespace Melia.Zone.Scripting
 			var ai = new AiComponent(monster, "BasicMonster");
 			monster.Components.Add(ai);
 
-			map.AddMonster(monster);
+			map.AddMonster(monster, immediate: true);
 
 			return monster;
 		}
@@ -284,7 +284,7 @@ namespace Melia.Zone.Scripting
 			monster.AddEffect(new ScriptInvisibleEffect());
 			monster.Layer = character.Layer;
 
-			mapObj.AddMonster(monster);
+			mapObj.AddMonster(monster, immediate: true);
 
 			return monster;
 		}

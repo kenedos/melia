@@ -26,11 +26,12 @@ public class KlaipeQuestNpcsScript : GeneralScript
 	{
 		// Knight Commander Uska
 		//-------------------------------------------------------------------------
-		AddNpc(20113, L("Knight Commander Uska"), "KLAPEDA_USKA", "c_Klaipe", -425, 172, 30, async dialog =>
+		AddNpc(20113, L("[Templar Master]{nl}Knight Commander Uska"), "KLAPEDA_USKA", "c_Klaipe", -425, 172, 30, async dialog =>
 		{
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Knight Commander Uska"));
+			dialog.SetPortrait("Dlg_port_KNIGHT_USKA");
 
 			if (!character.Quests.Has(GoToEast) && character.Quests.MeetsPrerequisites(GoToEast))
 			{
@@ -46,6 +47,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(GoToEast);
+					character.Quests.CompleteObjective(GoToEast, "hearDream");
 					await dialog.Msg(L("When you are ready to leave for the crystal mine, speak to me again. I will tell you where it is and how to enter."));
 				}
 				return;
@@ -123,7 +125,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 		if (character.Quests.IsCompletable(EastPrepare))
 		{
 			await dialog.Msg(L("Welcome! Ah, you must be a Revelator. I have been so hoping to meet you."));
-			await dialog.Msg(L("Klaipeda is full of expectation for the Revelators who dreamed of the goddess. I am one of them, too."));
+			await dialog.Msg(L("Klaipeda is full of hope and expectation for the Revelators who dreamed of the goddess. I am among those hoping, too."));
 			await dialog.Msg(L("These are warp scrolls. Use one and you can travel to any goddess statue you like, or return to where you were."));
 			await dialog.Msg(L("I will give you more than the knights asked for. With so many Revelators about, surely things will get better than they are now?"));
 			character.Quests.Complete(EastPrepare);
@@ -148,6 +150,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			if (answer == "accept")
 			{
 				character.Quests.Start(EastPrepare1);
+				character.Quests.CompleteObjective(EastPrepare1, "visitRonesa");
 				await dialog.Msg(L("Go straight to the left from here and you'll find Ronesa."));
 			}
 			return HookResult.Break;

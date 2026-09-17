@@ -31,7 +31,7 @@ public class SiaulWestLaimonas32Track : TrackScript
 		actors.Add(character);
 
 		var escort = new TrackActorSpec { Ai = "TrackWaitMonster" };
-		actors.Add(AddTrackActor(character, 41289, 1413, 285, 423, 0, escort));
+		actors.Add(AddTrackActor(character, 57198, 1413, 285, 423, 0, escort));
 		actors.Add(AddTrackActor(character, 400003, 1433, 285, 378, 0, escort));
 		actors.Add(AddTrackActor(character, 400003, 1464, 285, 403, 0, escort));
 		actors.Add(AddTrackActor(character, 400001, 1441, 285, 392, 0, escort));
@@ -67,6 +67,13 @@ public class SiaulWestLaimonas32Track : TrackScript
 				RemoveTrackActor(character, track, 4);
 				break;
 			case 19:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 7);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

@@ -128,6 +128,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// The cutscene addresses its cast by handle, so the client has to
 			// have been told about every one of them before it starts.
 			this.Character.LookAround();
+			this.ShowCast(track);
 
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
@@ -257,6 +258,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.Character.SetLayer(group.Layer);
 			this.Character.LookAround();
+			this.ShowCast(track);
 
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
@@ -266,6 +268,20 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
 
 			return true;
+		}
+
+		/// <summary>
+		/// Sends the track's cast to the character at once, so the cutscene
+		/// can address every handle the moment it starts.
+		/// </summary>
+		/// <param name="track"></param>
+		private void ShowCast(Track track)
+		{
+			foreach (var actor in track.Actors)
+			{
+				if (actor is IMonster monster)
+					this.Character.ShowMonster(monster);
+			}
 		}
 
 		/// <summary>

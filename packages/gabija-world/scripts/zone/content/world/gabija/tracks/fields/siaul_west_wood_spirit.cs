@@ -66,6 +66,17 @@ public class SiaulWestWoodSpiritTrack : TrackScript
 				RemoveTrackActor(character, track, 12);
 				break;
 			case 39:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 7);
+				RemoveTrackActor(character, track, 8);
+				RemoveTrackActor(character, track, 9);
+				RemoveTrackActor(character, track, 10);
+				RemoveTrackActor(character, track, 11);
+				RemoveTrackActor(character, track, 12);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

@@ -25,7 +25,7 @@ public class COrshaNpcScript : GeneralScript
 
 		// [Equipment Merchant] Jura
 		//-------------------------------------------------------------------------
-		var jura = AddNpc(20056, L("[Equipment Merchant] Jura"), "Jura", "c_orsha", 21, 154, 123.0, async dialog =>
+		var jura = AddNpc(20056, L("[Equipment Merchant]{nl}Jura"), "Jura", "c_orsha", 21, 154, 123.0, async dialog =>
 		{
 			dialog.SetTitle(L("Jura"));
 			dialog.SetPortrait("Dlg_port_Julla");
@@ -47,7 +47,7 @@ public class COrshaNpcScript : GeneralScript
 
 		// [Item Merchant] Alf
 		//-------------------------------------------------------------------------
-		var alf = AddNpc(20055, L("[Item Merchant] Alf"), "Alf", "c_orsha", 231, 166, 120.0, async dialog =>
+		var alf = AddNpc(20055, L("[Item Merchant]{nl}Alf"), "Alf", "c_orsha", 231, 166, 120.0, async dialog =>
 		{
 			dialog.SetTitle(L("Alf"));
 			dialog.SetPortrait("Dlg_port_Alf");
@@ -65,7 +65,7 @@ public class COrshaNpcScript : GeneralScript
 
 		// [Accessory Merchant] Jurus
 		//-------------------------------------------------------------------------
-		var jurus = AddNpc(20057, L("[Accessory Merchant] Jurus"), "Jurus", "c_orsha", 462.1917, -29.93526, -11.0, async dialog =>
+		var jurus = AddNpc(20057, L("[Accessory Merchant]{nl}Jurus"), "Jurus", "c_orsha", 462.1917, -29.93526, -11.0, async dialog =>
 		{
 			dialog.SetTitle(L("Jurus"));
 			dialog.SetPortrait("Dlg_port_Yurrs");
@@ -83,7 +83,7 @@ public class COrshaNpcScript : GeneralScript
 
 		// [Storage Keeper] Aisa
 		//-------------------------------------------------------------------------
-		AddNpc(20067, L("[Storage Keeper] Aisah"), "Aisah", "c_orsha", 308, 64, 90.0, async dialog =>
+		AddNpc(20067, L("[Storage Keeper]{nl}Aisah"), "Aisah", "c_orsha", 308, 64, 90.0, async dialog =>
 		{
 			dialog.SetTitle(L("Aisah"));
 			dialog.SetPortrait("Dlg_port_aisah");
@@ -112,7 +112,7 @@ public class COrshaNpcScript : GeneralScript
 
 		// [Companion Trader] Toras
 		//-------------------------------------------------------------------------
-		var toras = AddNpc(20058, L("[Companion Trader] Toras"), "Toras", "c_orsha", -109.365, 362.765, 104.0, async dialog =>
+		var toras = AddNpc(20058, L("[Companion Trader]{nl}Toras"), "Toras", "c_orsha", -109.365, 362.765, 104.0, async dialog =>
 		{
 			var character = dialog.Player;
 
