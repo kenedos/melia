@@ -3576,10 +3576,18 @@ namespace Melia.Zone.Commands
 
 			if (int.TryParse(args.Get(0), out var questId) && ZoneServer.Instance.Data.QuestDb.TryFind(questId, out var quest))
 			{
-				if (!sender.Quests.IsActive(questId) ||
-					string.IsNullOrEmpty(quest.EndNPC)
+				if (!sender.Quests.IsActive(questId))
+					return CommandResult.Okay;
+
+				if (string.IsNullOrEmpty(quest.EndNPC)
 					|| !ZoneServer.Instance.World.NPCs.TryGetValue($"{quest.EndNPC}_{quest.EndMap}", out var npc))
 				{
+					if (sender.Quests.TryGetById(questId, out var activeQuest)
+						&& QuestComponent.TryGetPhaseDestination(activeQuest, out var mapClassName, out var position))
+					{
+						sender.Warp(mapClassName, position);
+					}
+
 					return CommandResult.Okay;
 				}
 

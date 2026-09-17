@@ -15,4 +15,5 @@
 
 ClientHeaderFixed header;
 int sessionId;
-string questName;
+char questName[256];
+int64 l1;

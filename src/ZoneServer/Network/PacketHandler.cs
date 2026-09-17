@@ -5564,37 +5564,6 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// When warping from warp function
-		/// </summary>
-		/// <param name="conn"></param>
-		/// <param name="packet"></param>
-		[PacketHandler(Op.CZ_CLIENT_DIRECT)]
-		public void ZC_CLIENT_DIRECT(IZoneConnection conn, Packet packet)
-		{
-			var command = packet.GetByte();
-
-			// ZC_SET_POS
-			// ZC_RESET_VIEW
-			// ZC_ENTER_PC
-			// ZC_ADD_HP
-			// ZC_UPDATE_SP
-			// ZC_RESURRECT_SAVE_POINT_ACK
-			var character = conn.SelectedCharacter;
-			if (command == 1)
-			{
-				Send.ZC_RESET_VIEW(conn);
-				Send.ZC_SET_POS(character);
-				Send.ZC_ENTER_PC(conn, character);
-				Send.ZC_NORMAL.Revive(character);
-				character.Heal(1, 1);
-				//character.Heal(HealType.Hp, character.MaxHp / 2);
-				//character.Heal(HealType.Sp, character.Sp);
-				Send.ZC_RESURRECT_SAVE_POINT_ACK(character);
-
-			}
-		}
-
-		/// <summary>
 		/// Client request to summon a companion
 		/// </summary>
 		/// <param name="conn"></param>
@@ -5830,19 +5799,31 @@ namespace Melia.Zone.Network
 		[PacketHandler(Op.CZ_DIRECTION_MOVE_STATE)]
 		public void CZ_DIRECTION_MOVE_STATE(IZoneConnection conn, Packet packet)
 		{
-			var packetSize = packet.GetShort();
-			int count = ((packet.Length - 24) / 28) - 2;
+			packet.GetShort();
+			var entryCount = (packet.Length - 24) / 28;
 
 			var character = conn.SelectedCharacter;
 			var track = character.Tracks.ActiveTrack;
 			if (character != null && track != null)
 			{
+				// The packet carries an entry per timeline, so the director and
+				// any empty line before the cast are listed too. Skip them, or
+				// every actor reads the position of the actor before it.
+				var leading = entryCount - track.Actors.Length;
+				for (var i = 0; i < leading; i++)
+				{
+					packet.GetDirection();
+					packet.GetPosition();
+					packet.GetFloat();
+					packet.GetFloat();
+				}
+
 				// Need to get all possible quest dialogs based on quest state
 				track.Frame = -2;
 				Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
-				if (count != track.Actors.Length)
+				if (entryCount - 2 != track.Actors.Length)
 				{
-					Log.Warning("CZ_DIRECTION_MOVE_STATE: Count mismatch {0} != {1}", count, track.Actors.Length);
+					Log.Warning("CZ_DIRECTION_MOVE_STATE: Count mismatch {0} != {1}", entryCount - 2, track.Actors.Length);
 				}
 				foreach (var entity in track.Actors)
 				{

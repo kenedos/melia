@@ -35,7 +35,7 @@ function M_CHASE_WARP_FILL(frame, quests)
 		frame:SetUserValue("QUEST_WARP_CLASSID_" .. index, quest.ObjectId)
 
 		local button = frame:GetChild("warp" .. index .. "btn")
-		button:SetText("{@st66b}" .. M_QUESTS_GET_STYLE(quest).color .. quest.Name)
+		button:SetText("{@st66b}" .. M_QUESTS_GET_STYLE(quest).color .. "{ol}" .. quest.Name .. "{/}")
 		button:ShowWindow(1)
 	end
 end

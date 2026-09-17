@@ -1,5 +1,4 @@
--- Tracked quests, grouped by type and with the ones ready to hand in first.
-function M_CHASE_GET_TRACKED()
+function M_CHASE_GET_TRACKED(includeClient)
 	if Melia.Quests == nil or M_QUEST_TYPE_ORDER == nil then
 		return {}
 	end
@@ -16,7 +15,7 @@ function M_CHASE_GET_TRACKED()
 			local questType = M_QUEST_TYPE_STYLE[quest.Type] and quest.Type or "Sub"
 			local hasObjectives = quest.Objectives ~= nil and #quest.Objectives > 0
 
-			if questType == typeName and quest.Tracked and quest.ClientId == nil and hasObjectives then
+			if questType == typeName and quest.Tracked and (includeClient or quest.ClientId == nil) and hasObjectives then
 				table.insert(section, quest)
 			end
 		end
@@ -37,7 +36,7 @@ function M_CHASE_GET_TRACKED()
 end
 
 function M_CHASE_GET_RETURNABLE()
-	local quests = M_CHASE_GET_TRACKED()
+	local quests = M_CHASE_GET_TRACKED(true)
 	local result = {}
 
 	for i = 1, #quests do

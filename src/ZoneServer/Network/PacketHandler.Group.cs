@@ -1,5 +1,7 @@
 ﻿using Melia.Shared.Game.Const;
 using Melia.Shared.Network;
+using Melia.Zone.Scripting;
+using Melia.Zone.World.Quests;
 using Yggdrasil.Logging;
 
 namespace Melia.Zone.Network
@@ -114,10 +116,60 @@ namespace Melia.Zone.Network
 			}
 		}
 
+		/// <summary>
+		/// Shares the selected quest with eligible party members.
+		/// </summary>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_PARTY_SHARED_QUEST)]
+		public void CZ_PARTY_SHARED_QUEST(IZoneConnection conn, Packet packet)
+		{
+			var sessionId = packet.GetInt();
+			var questName = packet.GetString();
+
+			var character = conn.SelectedCharacter;
+			var party = character.Connection.Party;
+
+			if (party == null)
+				return;
+
+			if (!ZoneServer.Instance.Data.QuestDb.TryFind(questName, out var questData))
+			{
+				Log.Warning("CZ_PARTY_SHARED_QUEST: User '{0}' tried to share unknown quest '{1}'.", conn.Account.Name, questName);
+				return;
+			}
+
+			var questId = new QuestId(questData.Id);
+
+			if (!QuestScript.Exists(questId))
+			{
+				Log.Debug("CZ_PARTY_SHARED_QUEST: User '{0}' announced quest '{1}', which has no script.", conn.Account.Name, questName);
+				return;
+			}
+
+			// The client re-announces its quests on login, so a quest the
+			// character no longer holds is not an error.
+			if (!character.Quests.IsActive(questId))
+				return;
+
+			foreach (var member in party.GetPartyMembers())
+			{
+				if (member == character)
+					continue;
+
+				if (member.Quests.Has(questId))
+					continue;
+
+				if (!member.Quests.MeetsPrerequisites(questId))
+					continue;
+
+				member.Quests.Start(questId);
+			}
+		}
+
 		// TODO:
 		//CZ_PARTY_JOIN_BY_LINK
 		//CZ_PARTY_INVENTORY_LOAD
-		//CZ_PARTY_SHARED_QUEST
 		//CZ_PARTY_MEMBER_SKILL_USE
 		//CZ_PARTY_MEMBER_SKILL_ACCEPT
 	}

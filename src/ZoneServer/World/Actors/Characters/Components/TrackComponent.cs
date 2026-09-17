@@ -54,15 +54,21 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public async Task<bool> Start(QuestTrackData questTrackData, string overrideTrackProperty = "")
 		{
-			return await this.Start(questTrackData.TrackName, questTrackData.StartDelay, questTrackData.QuestId, questTrackData.OnTrackStart, questTrackData.OnTrackEnd, overrideTrackProperty);
+			return await this.Start(questTrackData.TrackName, questTrackData.StartDelay, questTrackData.QuestId, questTrackData.OnTrackStart, questTrackData.OnTrackEnd, overrideTrackProperty, questTrackData.PartyPlay);
 		}
 
 		/// <summary>
 		/// Start a track for a specific quest.
 		/// </summary>
 		/// <param name="trackId"></param>
+		/// <param name="startDelay"></param>
+		/// <param name="questId"></param>
+		/// <param name="onStart"></param>
+		/// <param name="onComplete"></param>
+		/// <param name="overrideTrackProperty"></param>
+		/// <param name="partyPlay"></param>
 		/// <returns></returns>
-		public async Task<bool> Start(string trackId, TimeSpan startDelay, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty = "")
+		public async Task<bool> Start(string trackId, TimeSpan startDelay, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty = "", bool partyPlay = false)
 		{
 			if (!this.Character.EyesOpen)
 				return false;
@@ -94,6 +100,59 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (!await this.WaitForDialogClose())
 				return false;
 
+			var party = partyPlay ? this.Character.Connection?.Party : null;
+
+			Track track;
+
+			if (party != null)
+			{
+				// Serialised so two members who finish their delay at the
+				// same moment cannot both spawn a cast. StartLock is held
+				// across the spawn, which takes the starters' quest locks;
+				// SyncLock is not, because the leave path takes it while
+				// holding a quest lock.
+				lock (TrackGroup.StartLock)
+				{
+					var group = TrackGroup.Find(party.ObjectId, questId, trackId, this.Character.MapId);
+					if (group != null)
+						return this.StartJoiningGroup(group, trackId, questId, onStart, onComplete, overrideTrackProperty);
+
+					track = this.CreateTrack(trackId, startDelay, questId, onStart, onComplete, overrideTrackProperty, party);
+				}
+			}
+			else
+			{
+				track = this.CreateTrack(trackId, startDelay, questId, onStart, onComplete, overrideTrackProperty, null);
+			}
+
+			// The cutscene addresses its cast by handle, so the client has to
+			// have been told about every one of them before it starts.
+			this.Character.LookAround();
+
+			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
+			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
+			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x6B, true, this.Character.Name);
+			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, track.Actors);
+
+			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
+
+			return true;
+		}
+
+		/// <summary>
+		/// Creates the track, runs its OnStart, and registers the shared
+		/// group when it belongs to a party.
+		/// </summary>
+		/// <param name="trackId"></param>
+		/// <param name="startDelay"></param>
+		/// <param name="questId"></param>
+		/// <param name="onStart"></param>
+		/// <param name="onComplete"></param>
+		/// <param name="overrideTrackProperty"></param>
+		/// <param name="party"></param>
+		/// <returns></returns>
+		private Track CreateTrack(string trackId, TimeSpan startDelay, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty, Party party)
+		{
 			var track = Track.Create(trackId);
 
 			track.Status = TrackStatus.Started;
@@ -102,6 +161,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			track.Data.OnStartQuestStatus = onStart;
 			track.Data.OnCompleteQuestStatus = onComplete;
 			track.Data.PropertyId = string.IsNullOrEmpty(overrideTrackProperty) ? trackId : overrideTrackProperty;
+			track.Owner = this.Character;
 
 			// Remember the status the quest was in before the track touched
 			// it, so cancelling the track only drops a quest that hadn't been
@@ -128,8 +188,74 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			this._returnLayer = returnLayer;
 			this._trackLayer = this.Character.Layer;
 
-			// The cutscene addresses its cast by handle, so the client has to
-			// have been told about every one of them before it starts.
+			if (party != null)
+			{
+				// A track's cast is only visible to the character it was
+				// spawned for, which would hide the whole cutscene from the
+				// party. The layer check keeps it off the field.
+				foreach (var actor in actors)
+				{
+					if (actor is Actor trackActor && trackActor.Visibility == ActorVisibility.Track)
+						trackActor.SetVisibilty(ActorVisibility.Party, party.ObjectId);
+				}
+
+				lock (TrackGroup.SyncLock)
+					track.Group = TrackGroup.CreateLocked(party.ObjectId, questId, trackId, track.Data.PropertyId, this.Character.MapId, this._trackLayer, actors, this.Character);
+			}
+
+			return track;
+		}
+
+		/// <summary>
+		/// Puts the character onto a party track's shared layer and plays
+		/// the cutscene for them, without spawning a second cast.
+		/// </summary>
+		/// <param name="group"></param>
+		/// <param name="trackId"></param>
+		/// <param name="questId"></param>
+		/// <param name="onStart"></param>
+		/// <param name="onComplete"></param>
+		/// <param name="overrideTrackProperty"></param>
+		/// <returns></returns>
+		private bool StartJoiningGroup(TrackGroup group, string trackId, int questId, QuestStatus onStart, QuestStatus onComplete, string overrideTrackProperty)
+		{
+			if (group.Ended || group.Owner == this.Character)
+				return false;
+
+			if (!group.TryJoin(this.Character))
+				return false;
+
+			var track = Track.Create(trackId);
+
+			track.Status = TrackStatus.Started;
+			track.Data.QuestId = questId;
+			track.Data.OnStartQuestStatus = onStart;
+			track.Data.OnCompleteQuestStatus = onComplete;
+			track.Data.PropertyId = string.IsNullOrEmpty(overrideTrackProperty) ? trackId : overrideTrackProperty;
+			track.Owner = group.Owner;
+			track.Group = group;
+
+			track.Data.OriginalQuestStatus = QuestStatus.Possible;
+			if (questId != 0 && this.Character.Quests.TryGetById(questId, out var quest))
+				track.Data.OriginalQuestStatus = quest.Status;
+
+			track.Dialog = new Dialog(this.Character, null);
+
+			this.ActiveTrack = track;
+
+			var returnLayer = this.Character.Layer;
+			var actors = group.BuildActorsFor(this.Character);
+			track.Actors = actors;
+
+			this._returnLayer = returnLayer;
+			this._trackLayer = group.Layer;
+
+			// The joiner starts where the party already is, so a kill the
+			// others made before they arrived still counts for them.
+			if (questId != 0)
+				this.Character.Quests.SyncProgressFrom(questId, group.Members);
+
+			this.Character.SetLayer(group.Layer);
 			this.Character.LookAround();
 
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
@@ -278,7 +404,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (TrackScript.TryGet(track.Id, out var trackScript))
 				trackScript.OnComplete(this.Character, track);
 
-			this.ReturnGroundItemsToBaseLayer();
+			// A shared track's cast and layer belong to every member, so the
+			// loot only moves once the last of them has left.
+			if (track.Group == null || track.Group.Ended)
+				this.ReturnGroundItemsToBaseLayer();
 
 			// OnComplete stops the track's layer, which makes the client
 			// hide the tracker; re-show it now that the quest state it
@@ -311,7 +440,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (TrackScript.TryGet(track.Id, out var trackScript))
 				trackScript.OnCancel(this.Character, track);
 
-			this.ReturnGroundItemsToBaseLayer();
+			if (track.Group == null || track.Group.Ended)
+				this.ReturnGroundItemsToBaseLayer();
 
 			// Clean up the track dialog to prevent blocking future NPC interactions
 			if (track.Dialog != null)
@@ -390,6 +520,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			// its own cast, never the layer itself.
 			if (this._trackLayer != this._returnLayer)
 			{
+				// A shared track's layer and cast outlive the member that
+				// dropped, unless they were the last one on it.
+				if (track.Group != null && !track.Group.Leave(this.Character))
+				{
+					this.Character.SetLayer(this._returnLayer, enabled: false);
+					return;
+				}
+
 				if (map != null)
 				{
 					map.RemoveEntitiesOnLayer(this._trackLayer);

@@ -5,5 +5,4 @@
 mobs/**/*
 npcs/**/*
 warps/**/*
-quests/**/*
 tracks/**/*

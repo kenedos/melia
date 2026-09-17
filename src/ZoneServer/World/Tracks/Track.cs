@@ -52,9 +52,34 @@ namespace Melia.Zone.World.Tracks
 		public IActor[] Actors { get; set; }
 
 		/// <summary>
-		/// Returns if a battle box is created.
+		/// Gets or sets the party the track is shared with, or null for a
+		/// track that only its own character plays.
 		/// </summary>
-		public bool HasBattleBoxInLayer { get; internal set; }
+		public TrackGroup Group { get; set; }
+
+		/// <summary>
+		/// Gets or sets the character that created the track and owns the
+		/// cast on its shared layer.
+		/// </summary>
+		public Character Owner { get; set; }
+
+		private bool _hasBattleBoxInLayer;
+
+		/// <summary>
+		/// Returns if a battle box is created, for the group when the track
+		/// is a party track.
+		/// </summary>
+		public bool HasBattleBoxInLayer
+		{
+			get => this.Group?.HasBattleBoxInLayer ?? this._hasBattleBoxInLayer;
+			internal set
+			{
+				this._hasBattleBoxInLayer = value;
+
+				if (value && this.Group != null)
+					this.Group.HasBattleBoxInLayer = true;
+			}
+		}
 
 		/// <summary>
 		/// Creates new track.

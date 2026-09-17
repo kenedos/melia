@@ -116,6 +116,18 @@ namespace Melia.Zone.World.Quests.Objectives
 		{
 			var result = new List<Character> { killer };
 
+			// A party track shares its kills with everyone on its layer,
+			// regardless of the party's own sharing settings.
+			var group = killer.Tracks?.ActiveTrack?.Group;
+			if (group != null)
+			{
+				foreach (var member in group.Members)
+				{
+					if (member != killer && member.Map == killer.Map && !result.Contains(member))
+						result.Add(member);
+				}
+			}
+
 			// Check if party quest sharing is enabled
 			if (!ZoneServer.Instance.Conf.World.PartyQuestSharingEnabled)
 				return result;
@@ -139,7 +151,7 @@ namespace Melia.Zone.World.Quests.Objectives
 
 			foreach (var member in partyMembers)
 			{
-				if (member != killer)
+				if (member != killer && !result.Contains(member))
 					result.Add(member);
 			}
 

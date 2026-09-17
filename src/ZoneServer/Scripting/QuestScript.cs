@@ -412,7 +412,11 @@ namespace Melia.Zone.Scripting
 		/// false for tracks a trigger plays, which is how a cutscene is bound
 		/// to a place rather than to the moment the quest is accepted.
 		/// </param>
-		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, int trackStartDelay = 0, bool autoStart = true)
+		/// <param name="partyPlay">
+		/// Whether party members watching the same track share one layer and
+		/// its objective progress instead of each playing their own copy.
+		/// </param>
+		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, int trackStartDelay = 0, bool autoStart = true, bool partyPlay = false)
 		{
 			this.TrackData.QuestId = (int)this.QuestId.Value;
 			this.TrackData.TrackName = track;
@@ -420,6 +424,7 @@ namespace Melia.Zone.Scripting
 			this.TrackData.OnTrackStart = onTrackStart;
 			this.TrackData.OnTrackEnd = onTrackEnd;
 			this.TrackData.AutoStart = autoStart;
+			this.TrackData.PartyPlay = partyPlay;
 		}
 
 		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, string effectName)

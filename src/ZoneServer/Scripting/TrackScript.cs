@@ -202,6 +202,16 @@ namespace Melia.Zone.Scripting
 				track.HasBattleBoxInLayer = false;
 			}
 
+			// A party track's cast and layer are shared, so only the last
+			// member to finish tears them down.
+			if (track.Group != null)
+			{
+				character.StopLayer();
+
+				if (!track.Group.Leave(character))
+					return;
+			}
+
 			foreach (var actor in track.Actors)
 			{
 				if (actor != character && actor is IMonster monster)
@@ -229,6 +239,16 @@ namespace Melia.Zone.Scripting
 				if (track.Data.OriginalQuestStatus == QuestStatus.Possible && character.Quests.TryGetById(track.Data.QuestId, out var quest))
 					character.Quests.Cancel(quest);
 				//character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OriginalQuestStatus);
+			}
+
+			// A party track's cast and layer are shared, so only the last
+			// member to leave tears them down.
+			if (track.Group != null)
+			{
+				character.StopLayer();
+
+				if (!track.Group.Leave(character))
+					return;
 			}
 
 			if (track.Actors != null)
@@ -315,20 +335,42 @@ namespace Melia.Zone.Scripting
 				Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
 		}
 
+		/// <summary>
+		/// Returns whether the character is a party member following a track
+		/// another character owns, whose cast and layer commands the owner
+		/// has already run.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="track"></param>
+		/// <returns></returns>
+		private static bool IsSharedFollower(Character character, Track track)
+			=> track.Group != null && track.Owner != null && track.Owner != character;
+
 		protected static void CreateBattleBoxInLayer(Character character, Track track)
 		{
+			if (IsSharedFollower(character, track))
+				return;
+
 			track.HasBattleBoxInLayer = true;
-			foreach (var actor in track.Actors)
+
+			// Every member gets the box around their own position, or they
+			// could simply walk out of the shared fight.
+			var members = track.Group != null ? (IEnumerable<Character>)track.Group.Members : new Character[] { character };
+
+			foreach (var member in members)
 			{
-				if (actor.Handle != character.Handle && actor is ICombatEntity combatEntity && character.CanTarget(combatEntity))
+				foreach (var actor in track.Actors)
 				{
-					var distance = (float)character.Position.Get2DDistance(actor.Position);
-					if (distance > 0)
-						distance = (float)Math.Floor(distance / 2 + 150);
-					var lPos = new Position(character.Position.X - distance, 0f, character.Position.Z - distance);
-					var rPos = new Position(character.Position.X + distance, 0f, character.Position.Z + distance);
-					var width = Math.Abs(lPos.X - rPos.X);
-					Send.ZC_CREATE_SCROLLLOCKBOX(character, actor, lPos, rPos, width);
+					if (actor.Handle != member.Handle && actor is ICombatEntity combatEntity && member.CanTarget(combatEntity))
+					{
+						var distance = (float)member.Position.Get2DDistance(actor.Position);
+						if (distance > 0)
+							distance = (float)Math.Floor(distance / 2 + 150);
+						var lPos = new Position(member.Position.X - distance, 0f, member.Position.Z - distance);
+						var rPos = new Position(member.Position.X + distance, 0f, member.Position.Z + distance);
+						var width = Math.Abs(lPos.X - rPos.X);
+						Send.ZC_CREATE_SCROLLLOCKBOX(member, actor, lPos, rPos, width);
+					}
 				}
 			}
 		}
@@ -359,11 +401,24 @@ namespace Melia.Zone.Scripting
 		/// <param name="hate"></param>
 		protected static void InsertTrackHate(Character character, Track track, int actorIndex, int hate = 999)
 		{
+			if (IsSharedFollower(character, track))
+				return;
+
 			if (track.Actors == null || actorIndex < 0 || actorIndex >= track.Actors.Length)
 				return;
 
-			if (track.Actors[actorIndex] is ICombatEntity entity)
-				entity.InsertHate(character, hate);
+			if (track.Actors[actorIndex] is not ICombatEntity entity)
+				return;
+
+			if (track.Group != null)
+			{
+				foreach (var member in track.Group.Members)
+					entity.InsertHate(member, hate);
+
+				return;
+			}
+
+			entity.InsertHate(character, hate);
 		}
 
 		/// <summary>
@@ -375,6 +430,9 @@ namespace Melia.Zone.Scripting
 		/// <param name="actorIndex">Index of the actor in the track's cast.</param>
 		protected static void RemoveTrackActor(Character character, Track track, int actorIndex)
 		{
+			if (IsSharedFollower(character, track))
+				return;
+
 			if (track.Actors == null || actorIndex < 0 || actorIndex >= track.Actors.Length)
 				return;
 
@@ -389,6 +447,9 @@ namespace Melia.Zone.Scripting
 		/// <param name="track"></param>
 		protected static void SetTrackTendency(Character character, Track track)
 		{
+			if (IsSharedFollower(character, track))
+				return;
+
 			foreach (var actor in track.Actors)
 			{
 				if (actor is ICombatEntity combatEntity)

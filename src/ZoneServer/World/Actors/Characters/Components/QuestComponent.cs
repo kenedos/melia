@@ -1822,6 +1822,77 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Raises the character's progress on the given quest to the furthest
+		/// point any of the source characters reached, so a player joining a
+		/// party track starts where the party already is.
+		/// </summary>
+		/// <param name="questId"></param>
+		/// <param name="sources"></param>
+		public void SyncProgressFrom(long questId, IEnumerable<Character> sources)
+		{
+			if (!this.TryGetById(questId, out var quest))
+				return;
+
+			var changed = false;
+
+			foreach (var source in sources)
+			{
+				if (source == this.Character || source?.Quests == null)
+					continue;
+
+				if (!source.Quests.TryGetById(questId, out var sourceQuest))
+					continue;
+
+				foreach (var src in sourceQuest.Progresses)
+				{
+					if (!quest.TryGetProgress(src.Objective.Ident, out var dst))
+						continue;
+
+					if (src.Count > dst.Count)
+					{
+						dst.Count = src.Count;
+						changed = true;
+					}
+
+					if (src.Done && !dst.Done)
+					{
+						dst.SetDone();
+						changed = true;
+					}
+
+					if (src.Unlocked && !dst.Unlocked)
+					{
+						dst.Unlocked = true;
+						changed = true;
+					}
+				}
+			}
+
+			if (!changed)
+				return;
+
+			lock (_syncLock)
+			{
+				for (var i = 0; i < quest.Progresses.Count; i++)
+					this.UpdateClient_ObjectiveProperty(quest, i);
+			}
+
+			this.UpdateClient_UpdateQuest(quest);
+
+			// Arriving on a fight the party has already won ends the track
+			// here, the same way the last kill would have.
+			if (quest.IsCompletable)
+			{
+				quest.Status = QuestStatus.Success;
+
+				if (QuestScript.TryGet(quest.Data.Id, out var questScript))
+					questScript.OnSuccess(this.Character, quest);
+
+				this.UpdateTrackBinding(quest);
+			}
+		}
+
+		/// <summary>
 		/// Creates the quest's own session object and sends it, so the
 		/// client's tracker has the object it reads counts from.
 		/// </summary>
@@ -2001,7 +2072,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 								if (quest.IsCompletable && quest.Status < QuestStatus.Success)
 								{
 									quest.Status = QuestStatus.Success;
-									Log.Debug($"Quest {quest.Data.Id.Value} now in Success state after variable check.");
 									callbackScript?.OnSuccess(this.Character, quest);
 								}
 
