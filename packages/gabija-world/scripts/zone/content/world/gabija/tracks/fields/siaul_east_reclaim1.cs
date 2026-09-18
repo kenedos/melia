@@ -45,6 +45,10 @@ public class SiaulEastReclaim1Track : TrackScript
 		{
 			case 19:
 				SetTrackTendency(character, track);
+				InsertTrackHate(character, track, 1);
+				InsertTrackHate(character, track, 2);
+				InsertTrackHate(character, track, 3);
+				InsertTrackHate(character, track, 4);
 				CreateBattleBoxInLayer(character, track);
 				break;
 		}

@@ -105,6 +105,20 @@ public class SiaulEastRequest7Track : TrackScript
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;
+			case 48:
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
+				break;
+			case 49:
+				RemoveTrackActor(character, track, 3);
+				InsertTrackHate(character, track, 11);
+				break;
+			case 50:
+				RemoveTrackActor(character, track, 6);
+				break;
+			case 51:
+				InsertTrackHate(character, track, 7);
+				break;
 		}
 
 		await base.OnProgress(character, track, frame);

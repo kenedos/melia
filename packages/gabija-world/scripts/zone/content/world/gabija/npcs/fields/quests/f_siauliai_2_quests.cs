@@ -4,6 +4,7 @@
 // The knights, guards and supply soldiers the map's field quests run on.
 //---------------------------------------------------------------------------
 
+using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
@@ -41,6 +42,43 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Knight Ares"));
 			dialog.SetPortrait("Dlg_port_OFFICER_IN_TACTICS");
 
+			if (character.Quests.IsActive(Reclaim1) && character.Quests.IsCompletable(Reclaim1))
+			{
+				await dialog.Msg(L("Well done. Now we move on to the main task."));
+				character.Quests.Complete(Reclaim1);
+				return;
+			}
+
+			if (character.Quests.IsActive(Camp4) && character.Quests.IsCompletable(Camp4))
+			{
+				await dialog.Msg(L("Are you hurt anywhere? I am grateful you killed the Poata, but that was truly reckless."));
+
+				var pick = await dialog.Select(L("Take one of the weapons we recovered."),
+					Option(L("Aras' Falchion"), "swd"),
+					Option(L("Soldier's Long Rod"), "stf"),
+					Option(L("Soldier's Short Bow"), "tbw"),
+					Option(L("Soldier's Iron Club"), "mac")
+				);
+
+				switch (pick)
+				{
+					case "swd": character.Quests.SelectReward(Camp4, 102115); break;
+					case "stf": character.Quests.SelectReward(Camp4, 142110); break;
+					case "tbw": character.Quests.SelectReward(Camp4, 162112); break;
+					case "mac": character.Quests.SelectReward(Camp4, 202111); break;
+				}
+
+				character.Quests.Complete(Camp4);
+				return;
+			}
+
+			if (character.Quests.IsActive(Request7) && character.Quests.IsCompletable(Request7))
+			{
+				await dialog.Msg(L("The fighting at the mining village seems very bad. It is too late to move troops, so you must go and support the mining village yourself."));
+				character.Quests.Complete(Request7);
+				return;
+			}
+
 			if (!character.Quests.Has(Reclaim1) && character.Quests.MeetsPrerequisites(Reclaim1))
 			{
 				await dialog.Msg(L("You mean to go to the crystal mine to find the light of salvation? But now is not a good time. The Bube horde is pouring out of the crystal mine."));
@@ -57,22 +95,8 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Reclaim1);
 					await dialog.Msg(L("First, retake the Bulbes farm the Pokubu have overrun. I trust this much will be simple for you."));
-				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Reclaim1))
-			{
-				if (!character.Quests.IsCompletable(Reclaim1))
-				{
-					await dialog.Msg(L("If you cannot even deal with Pokubu, you had best give up on entering the mining village."));
-					character.Quests.ReplayQuestTrack(Reclaim1);
 					return;
 				}
-
-				await dialog.Msg(L("Well done. Now we move on to the main task."));
-				character.Quests.Complete(Reclaim1);
-				return;
 			}
 
 			if (!character.Quests.Has(Request1) && character.Quests.MeetsPrerequisites(Request1))
@@ -89,14 +113,8 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 					character.Quests.Start(Request1);
 					character.Quests.CompleteObjective(Request1, "findClue");
 					await dialog.Msg(L("If you find anything that might be a clue, take it to the operations officer up there."));
+					return;
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Request1))
-			{
-				await dialog.Msg(L("The mining village is a problem, but if the eastern woods are like this too, I cannot guarantee Klaipeda's safety. We must hope the mining village holds."));
-				return;
 			}
 
 			if (!character.Quests.Has(Camp4) && character.Quests.MeetsPrerequisites(Camp4))
@@ -109,23 +127,10 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
-					character.Quests.Start(Camp4);
-
-				return;
-			}
-
-			if (character.Quests.IsActive(Camp4))
-			{
-				if (!character.Quests.IsCompletable(Camp4))
 				{
-					await dialog.Msg(L("It came for its cub. Watch for it near the camp."));
-					character.Quests.ReplayQuestTrack(Camp4);
+					character.Quests.Start(Camp4);
 					return;
 				}
-
-				await dialog.Msg(L("Are you hurt anywhere? I am grateful you killed the Poata, but that was truly reckless."));
-				character.Quests.Complete(Camp4);
-				return;
 			}
 
 			if (!character.Quests.Has(Request7) && character.Quests.MeetsPrerequisites(Request7))
@@ -138,22 +143,35 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Request7);
+					return;
+				}
+			}
 
+			if (character.Quests.IsActive(Reclaim1))
+			{
+				await dialog.Msg(L("If you cannot even deal with Pokubu, you had best give up on entering the mining village."));
+				character.Quests.ReplayQuestTrack(Reclaim1);
+				return;
+			}
+
+			if (character.Quests.IsActive(Request1))
+			{
+				await dialog.Msg(L("The mining village is a problem, but if the eastern woods are like this too, I cannot guarantee Klaipeda's safety. We must hope the mining village holds."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Camp4))
+			{
+				await dialog.Msg(L("It came for its cub. Watch for it near the camp."));
 				return;
 			}
 
 			if (character.Quests.IsActive(Request7))
 			{
-				if (!character.Quests.IsCompletable(Request7))
-				{
-					await dialog.Msg(L("The Bube are pushing the refugees back. Clear the monsters chasing them."));
-					character.Quests.ReplayQuestTrack(Request7);
-					return;
-				}
-
-				await dialog.Msg(L("The fighting at the mining village seems very bad. It is too late to move troops, so you must go and support the mining village yourself."));
-				character.Quests.Complete(Request7);
+				await dialog.Msg(L("The Bube are pushing the refugees back. Clear the monsters chasing them."));
+				character.Quests.ReplayQuestTrack(Request7);
 				return;
 			}
 
@@ -519,6 +537,74 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("The Bube Fighter keeps to the deep parts of the Nudegi logging camp."));
 		});
+
+		// Hidden triggers
+		//-------------------------------------------------------------------------
+		AddQuestTrigger("SIAUL_EAST_RECLAIM3", "f_siauliai_2", 487.26, -309.29, 250, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(Reclaim3) && !character.Quests.IsCompletable(Reclaim3))
+				character.Quests.StartQuestTrack(Reclaim3);
+
+			await Task.CompletedTask;
+		});
+
+		AddQuestTrigger("SIAUL_EAST_RECLAIM7", "f_siauliai_2", 462, -882, 120, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(Reclaim7) && !character.Quests.IsCompletable(Reclaim7))
+				character.Quests.StartQuestTrack(Reclaim7);
+
+			await Task.CompletedTask;
+		});
+
+		AddQuestTrigger("SIAUL_EAST_REQUEST2", "f_siauliai_2", -2124, 1122, 150, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(Request2) && !character.Quests.IsCompletable(Request2))
+				character.Quests.StartQuestTrack(Request2);
+
+			await Task.CompletedTask;
+		});
+
+		AddQuestTrigger("SIAUL_EAST_REQUEST6", "f_siauliai_2", 1886.66, -476.83, 100, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(Request6) && !character.Quests.IsCompletable(Request6))
+				character.Quests.StartQuestTrack(Request6);
+
+			await Task.CompletedTask;
+		});
+
+		AddQuestTrigger("SIAUL_EAST_CAMP4", "f_siauliai_2", 234, 427, 100, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(Camp4) && !character.Quests.IsCompletable(Camp4))
+				character.Quests.StartQuestTrack(Camp4);
+
+			await Task.CompletedTask;
+		});
+
+		AddQuestTrigger("SIAUL_EAST_CAMP4_2", "f_siauliai_2", 175, 363, 100, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(Camp4) && !character.Quests.IsCompletable(Camp4))
+				character.Quests.StartQuestTrack(Camp4);
+
+			await Task.CompletedTask;
+		});
 	}
 }
 
@@ -544,13 +630,14 @@ public class SiaulEastCamp4Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_MANAGER", "f_siauliai_2", L("Kill the Poata at the camp"));
 		SetPhase(QuestStatus.Success, "SIAUL_EAST_MANAGER", "f_siauliai_2", L("Talk to Knight Ares"));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_CAMP4_TRACK", 4000, partyPlay: true);
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_CAMP4_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new LevelPrerequisite(2));
 
 		AddObjective("killPoata", L("Kill the Poata at the camp"), new KillObjective(1, "boss_poata"));
 
 		AddReward(new ItemReward("expCard1", 1));
+		AddReward(new SelectItemReward("SWD02_115", "STF02_110", "TBW02_112", "MAC02_111"));
 	}
 }
 
@@ -626,7 +713,7 @@ public class SiaulEastReclaim3Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_RECLAIM3", "f_siauliai_2", L("Retake the supply depot"));
 		SetPhase(QuestStatus.Success, "SIAUL_EAST_SOLDIER9", "f_siauliai_2", L("Report to the border guard"));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_RECLAIM3_TRACK", 2000, partyPlay: true);
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_RECLAIM3_TRACK", 2000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(1033, QuestStatus.Completed));
 
@@ -680,7 +767,7 @@ public class SiaulEastReclaim7Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_RECLAIM7", "f_siauliai_2", L("Move below the supply depot"));
 		SetPhase(QuestStatus.Success, "SIAUL_EAST_SUPPLY_MANAGER", "f_siauliai_2", L("Report to the supply officer"));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_RECLAIM7_TRACK", 2000, partyPlay: true);
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_RECLAIM7_TRACK", 2000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(1036, QuestStatus.Completed));
 
@@ -735,7 +822,7 @@ public class SiaulEastRequest2Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_REQUEST2", "f_siauliai_2", L("Scout the northern area"));
 		SetPhase(QuestStatus.Success, "SIAUL_EAST_SUPPLY_MANAGER2", "f_siauliai_2", L("Report to the operations officer"));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_REQUEST2_TRACK", 4000, partyPlay: true);
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_REQUEST2_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(1038, QuestStatus.Completed));
 
@@ -818,7 +905,7 @@ public class SiaulEastRequest6Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_REQUEST6", "f_siauliai_2", L("Hunt the Vubbe Fighter"));
 		SetPhase(QuestStatus.Success, "SIAUL_EAST_SOLDIER8", "f_siauliai_2", L("Tell the scout the Vubbe Fighter is dead"));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_REQUEST6_TRACK", 4000, partyPlay: true);
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_EAST_REQUEST6_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(1039, QuestStatus.Completed));
 

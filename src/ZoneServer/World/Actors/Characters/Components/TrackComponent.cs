@@ -78,6 +78,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return false;
 			if (_disposed)
 				return false;
+
+			// A character standing on a layer is already inside another
+			// track's private layer, so a second cutscene must not be
+			// started on top of it. An instance dungeon is exempt, since
+			// its cutscenes play on the dungeon's own layer.
+			if (this.Character.Layer != 0 && this.Character.Dungeon.InstanceDungeon == null)
+				return false;
+
 			if (!string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(overrideTrackProperty) == 1)
 				return false;
 			if (string.IsNullOrEmpty(overrideTrackProperty) && this.Character.Etc.Properties.GetFloat(trackId) == 1)
