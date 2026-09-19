@@ -28,12 +28,12 @@ public class Gele574Mq09Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(942.33, -80.05, 1144.88));
+		character.Movement.MoveTo(new Position(942.33f, -80.05f, 1144.88f));
 
 		actors.Add(character);
-		actors.Add(AddTrackActor(character, 147371, 1255.23, -79.95, 1401.72, 32, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1300.89, -79.65, 1536.91) }));
+		actors.Add(AddTrackActor(character, 147371, 1255.23, -79.95, 1401.72, 32, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1300.89f, -79.65f, 1536.91f) }));
 		actors.Add(AddTrackActor(character, 147353, 1300.31, -79.65, 1502.05, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 41382, 1271.94, -79.65, 2136.56, 49, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1299.88, -79.65, 2001.97) }));
+		actors.Add(AddTrackActor(character, 41382, 1271.94, -79.65, 2136.56, 49, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1299.88f, -79.65f, 2001.97f) }));
 		actors.Add(AddTrackActor(character, 11281, 949.26, -80.05, 1187.92, 45, new TrackActorSpec
 		{
 			Name = L("Follower Algis"),
@@ -43,7 +43,7 @@ public class Gele574Mq09Track : TrackScript
 			WalkSpeed = 70,
 			CombatNpc = true,
 		}));
-		actors.Add(AddTrackActor(character, 147371, 1304.16, -79.65, 1999.78, 31, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1292.47, -79.65, 2130.51) }));
+		actors.Add(AddTrackActor(character, 147371, 1304.16, -79.65, 1999.78, 31, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1292.47f, -79.65f, 2130.51f) }));
 
 		return actors.ToArray();
 	}

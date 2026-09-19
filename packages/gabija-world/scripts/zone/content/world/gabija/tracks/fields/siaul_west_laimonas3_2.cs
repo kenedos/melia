@@ -27,7 +27,7 @@ public class SiaulWestLaimonas32Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(1676, 283, 341));
+		character.Movement.MoveTo(new Position(1676f, 283f, 341f));
 		actors.Add(character);
 
 		var escort = new TrackActorSpec { Ai = "TrackWaitMonster" };
@@ -42,7 +42,7 @@ public class SiaulWestLaimonas32Track : TrackScript
 		var mushu = new TrackActorSpec
 		{
 			Ai = "BasicBoss",
-			EndPosition = new Position(1431, 285, 404),
+			EndPosition = new Position(1431f, 285f, 404f),
 		};
 		actors.Add(AddTrackActor(character, 41217, 1170, 285, 634, 116, mushu));
 

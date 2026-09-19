@@ -417,8 +417,7 @@ public class Gele572Mq01Quest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE572_MQ_01_TRACK", 2000);
 
-		// The prior quest is not part of this map set; its level band stands in.
-		AddPrerequisite(new LevelPrerequisite(29));
+		AddPrerequisite(new QuestStatusPrerequisite(50006, QuestStatus.Completed));
 
 		AddObjective("meetMaster", L("Meet the Paladin Master"), new ManualObjective());
 	}

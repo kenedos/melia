@@ -21,6 +21,8 @@ public class KlaipeQuestNpcsScript : GeneralScript
 	private readonly static QuestId GoToEast = new QuestId(1027);
 	private readonly static QuestId EastPrepare = new QuestId(20236);
 	private readonly static QuestId EastPrepare1 = new QuestId(40010);
+	private readonly static QuestId Slate2 = new QuestId(20051);
+	private readonly static QuestId Slate3 = new QuestId(20052);
 
 	protected override void Load()
 	{
@@ -32,6 +34,60 @@ public class KlaipeQuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Knight Commander Uska"));
 			dialog.SetPortrait("Dlg_port_KNIGHT_USKA");
+
+			if (character.Quests.IsActive(Slate2) && character.Quests.IsCompletable(Slate2))
+			{
+				await dialog.Msg(L("So you finally returned. What did the Bokor Master tell you?"));
+				await dialog.Msg(L("What you've said is hard to believe. This revelation is from Goddess Laima and only when we collect all of them, she will return. Is that what you mean? Goddess Laima is also referred as the 'goddess in a book'. There is no other story mentioning her name other than the record that states that she picked the spot for the kingdom to be built to the Great King Zachariel. I'd like to ask you a favor. I have sinned because I was not able to fulfill my duties of guarding the kingdom on Medzio Diena. But I am not a Revelator. Even if I want to make up for my sins, my duty at the moment is to protect the many citizens of Klaipeda. So please find all the revelations. I will put my position as the Knight Commander of Klaipeda on the line and help you deal with it."));
+				character.Quests.Complete(Slate2);
+				return;
+			}
+
+			if (!character.Quests.Has(Slate3) && character.Quests.MeetsPrerequisites(Slate3))
+			{
+				await dialog.Msg(L("If the Bokor Master told you that I would know it... There's one place that comes to mind. The high gardens mentioned by the goddess may be a place in Gele Plateau. I heard the Paladin Master is there, upholding a long term promise."));
+
+				var answer = await dialog.Select(L("Will you go and meet the Paladin Master?"),
+					Option(L("I'll go and meet the Paladin Master"), "accept"),
+					Option(L("Cancel"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Slate3);
+					character.Quests.CompleteObjective(Slate3, "askMayor");
+					await dialog.Msg(L("Ask the mayor of the Miners' Village for directions to Gele Plateau. I will send the message to the Paladin Master first. May the blessings of the goddess be with you."));
+					await dialog.Msg(L("Oh, please do not reveal the fact that a revelation has been found unless it is absolutely necessary. Doing so may only create confusion if the rumors spread."));
+				}
+				return;
+			}
+
+			if (!character.Quests.Has(Slate2) && character.Quests.MeetsPrerequisites(Slate2))
+			{
+				await dialog.Msg(L("This stone slate is the Light of Salvation? It looks like just an old slate to me. It would be good to ask the Bokor Master to interpret this slate. She lives at the end of Klaipeda's Residential Area so go pay her a visit."));
+
+				var answer = await dialog.Select(L("Will you have the slate interpreted?"),
+					Option(L("I'll go visit the Bokor Master"), "accept"),
+					Option(L("I'll think about it little more"), "leave")
+				);
+
+				if (answer == "accept")
+					character.Quests.Start(Slate2);
+
+				return;
+			}
+
+			if (character.Quests.IsActive(Slate3))
+			{
+				await dialog.Msg(L("Ask the mayor of the Miners' Village for directions to Gele Plateau."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Slate2))
+			{
+				await dialog.Msg(L("The Bokor Master lives at the end of Klaipeda's Residential Area. Ask her to interpret the slate."));
+				return;
+			}
 
 			if (!character.Quests.Has(GoToEast) && character.Quests.MeetsPrerequisites(GoToEast))
 			{
@@ -264,5 +320,54 @@ public class EastPrepare1Quest : QuestScript
 		AddObjective("visitRonesa", L("Talk to the Accessory Merchant"), new ManualObjective());
 
 		AddReward(new ItemReward("BRC01_122", 1));
+	}
+}
+
+// 20051: Mysterious Slate (2)
+//-----------------------------------------------------------------------------
+public class Cmine6ToKatyn72Quest : QuestScript
+{
+	protected override void Load()
+	{
+		SetClientId(20051);
+		SetName(L("Mysterious Slate (2)"));
+		SetDescription(L("Knight Commander Uska wants the slate from the Crystal Mine interpreted by the Bokor Master."));
+		SetType(QuestType.Main);
+		SetLocation("c_Klaipe");
+		SetAutoTracked(true);
+
+		SetPhase(QuestStatus.Possible, "KLAPEDA_USKA", "c_Klaipe", L("Talk to Knight Commander Uska"), L("You followed the revelation of the goddess that the bishop saw in this dreams and obtained the Mysterious Slate. Talk to Knight Commander Uska about the Mysterious Slate."));
+		SetPhase(QuestStatus.InProgress, "MASTER_BOCORS", "c_voodoo", L("Ask the Bokor Master for interpretation of the revelation"), L("Ask the Bokor Master about the Mysterious Slate. She lives at the residential area in Klaipeda's left end."));
+		SetPhase(QuestStatus.Success, "KLAPEDA_USKA", "c_Klaipe", L("Talk to Knight Commander Uska"), L("The slate found in the Crystal Mines is both the revelation and Goddess Laima herself. It contains a message about finding the next revelation in a holy church. Return to Sir Uska as the Bokor Master says."));
+
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "CMINE6_TO_KATYN7_2_TRACK", 2000, autoStart: false);
+
+		AddPrerequisite(new QuestStatusPrerequisite(20050, QuestStatus.Completed));
+
+		AddObjective("askBokor", L("Ask the Bokor Master for interpretation of the revelation"), new ManualObjective());
+	}
+}
+
+// 20052: Mysterious Slate (3)
+//-----------------------------------------------------------------------------
+public class Cmine6ToKatyn73Quest : QuestScript
+{
+	protected override void Load()
+	{
+		SetClientId(20052);
+		SetName(L("Mysterious Slate (3)"));
+		SetDescription(L("The revelation points to Gele Plateau. The Miners' Village Mayor knows the way there."));
+		SetType(QuestType.Main);
+		SetLocation("c_Klaipe");
+		SetAutoTracked(true);
+		SetCancelable(true);
+
+		SetPhase(QuestStatus.Possible, "KLAPEDA_USKA", "c_Klaipe", L("Talk to Knight Commander Uska"), L("The details of slate found in Crystal Mines mentions revelation of the goddess about blocking the threats to Gele Plateau. Report about it to Commander Uska."));
+		SetPhase(QuestStatus.InProgress, "SIAULIAIOUT_CHIEF_A", "f_siauliai_out", L("Talk to the Miners' Village Mayor"), L("Knight Commander Uska thinks the high gardens in the revelation refers to an area in Gele Plateau and told you to go to the Paladin Master. Drop by the Mayor of the Miners' Village and ask for directions to Gele Plateau."));
+		SetPhase(QuestStatus.Success, "SIAULIAIOUT_CHIEF_A", "f_siauliai_out", L("Talk to the Miners' Village Mayor"), L("Knight Commander Uska thinks the high gardens in the revelation refers to an area in Gele Plateau and told you to go to the Paladin Master. Drop by the Mayor of the Miners' Village and ask for directions to Gele Plateau."));
+
+		AddPrerequisite(new QuestStatusPrerequisite(20051, QuestStatus.Completed));
+
+		AddObjective("askMayor", L("Talk to the Miners' Village Mayor"), new ManualObjective());
 	}
 }

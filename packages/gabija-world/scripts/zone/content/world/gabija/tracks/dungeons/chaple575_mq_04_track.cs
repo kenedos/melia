@@ -1,7 +1,7 @@
 //--- Melia Script ----------------------------------------------------------
-// The Wild Carnivore at Pasiulyma Field
+// The Unknocker under the church
 //--- Description -----------------------------------------------------------
-// A beast soaked in demonic energy, and the vines that answer for it.
+// Tomas lures the beast away from the altar.
 //---------------------------------------------------------------------------
 
 using System.Collections.Generic;
@@ -14,12 +14,12 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Tracks;
 using static Melia.Zone.Scripting.Shortcuts;
 
-[TrackScript("GELE572_MQ_07_TRACK")]
-public class Gele572Mq07Track : TrackScript
+[TrackScript("CHAPLE575_MQ_04_TRACK")]
+public class Chaple575Mq04Track : TrackScript
 {
 	protected override void Load()
 	{
-		SetId("GELE572_MQ_07_TRACK");
+		SetId("CHAPLE575_MQ_04_TRACK");
 	}
 
 	public override IActor[] OnStart(Character character, Track track)
@@ -28,12 +28,19 @@ public class Gele572Mq07Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(1012.64f, 462.12f, 1643.34f));
+		character.Movement.MoveTo(new Position(-468.49f, -39.42f, 581.33f));
 
-		actors.Add(AddTrackActor(character, 41238, 1014.73, 462.13, 1678.66, 0, new TrackActorSpec { Ai = "BasicBoss" }));
-		actors.Add(AddTrackActor(character, 47310, 1012.51, 462.12, 1661.84, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47310, 1014.13, 462.12, 1675.01, 11, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47310, 1012.81, 462.12, 1668.66, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 147358, -602.02, -17.56, 422.40, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Neutral, Name = L("Underground Central Barrier") }));
+		actors.Add(AddTrackActor(character, 41371, -572.24, -17.57, 418.33, 0, new TrackActorSpec { Ai = "BasicBoss" }));
+		actors.Add(AddTrackActor(character, 11282, -489, -37, 618, 0, new TrackActorSpec
+		{
+			Name = L("Follower Tomas"),
+			Faction = FactionType.Our_Forces,
+			MaxHp = 9999,
+			Level = 37,
+			CombatNpc = true,
+			EndPosition = new Position(-542.74f, -39.42f, 605.62f),
+		}));
 		actors.Add(character);
 
 		return actors.ToArray();
@@ -43,11 +50,6 @@ public class Gele572Mq07Track : TrackScript
 	{
 		switch (frame)
 		{
-			case 30:
-				RemoveTrackActor(character, track, 1);
-				RemoveTrackActor(character, track, 2);
-				RemoveTrackActor(character, track, 3);
-				break;
 			case 44:
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);

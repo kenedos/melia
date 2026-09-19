@@ -28,7 +28,7 @@ public class SiaulWestWoodSpiritTrack : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(1577, 210, -801));
+		character.Movement.MoveTo(new Position(1577f, 210f, -801f));
 		actors.Add(character);
 
 		var guard = new TrackActorSpec { Faction = FactionType.Neutral, Ai = "TrackWaitMonster" };

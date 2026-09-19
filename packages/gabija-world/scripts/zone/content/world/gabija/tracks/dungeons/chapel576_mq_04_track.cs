@@ -1,7 +1,7 @@
 //--- Melia Script ----------------------------------------------------------
-// The Wild Carnivore at Pasiulyma Field
+// Mummyghast at the church gate
 //--- Description -----------------------------------------------------------
-// A beast soaked in demonic energy, and the vines that answer for it.
+// The Light Crystal's glow draws something out of the dark.
 //---------------------------------------------------------------------------
 
 using System.Collections.Generic;
@@ -14,12 +14,12 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Tracks;
 using static Melia.Zone.Scripting.Shortcuts;
 
-[TrackScript("GELE572_MQ_07_TRACK")]
-public class Gele572Mq07Track : TrackScript
+[TrackScript("CHAPLE576_MQ_04_TRACK")]
+public class Chaple576Mq04Track : TrackScript
 {
 	protected override void Load()
 	{
-		SetId("GELE572_MQ_07_TRACK");
+		SetId("CHAPLE576_MQ_04_TRACK");
 	}
 
 	public override IActor[] OnStart(Character character, Track track)
@@ -28,13 +28,11 @@ public class Gele572Mq07Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(1012.64f, 462.12f, 1643.34f));
+		character.Movement.MoveTo(new Position(-1728.83f, 0.43f, 425.82f));
 
-		actors.Add(AddTrackActor(character, 41238, 1014.73, 462.13, 1678.66, 0, new TrackActorSpec { Ai = "BasicBoss" }));
-		actors.Add(AddTrackActor(character, 47310, 1012.51, 462.12, 1661.84, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47310, 1014.13, 462.12, 1675.01, 11, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47310, 1012.81, 462.12, 1668.66, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(character);
+		actors.Add(AddTrackActor(character, 41372, -1050.65, -1.79, 441.78, 110, new TrackActorSpec { Ai = "BasicBoss", EndPosition = new Position(-1407.02f, 0.42f, 419.56f) }));
+		actors.Add(AddTrackActor(character, 147379, -1777.94, 0.42, 425.98, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
 	}
@@ -43,12 +41,7 @@ public class Gele572Mq07Track : TrackScript
 	{
 		switch (frame)
 		{
-			case 30:
-				RemoveTrackActor(character, track, 1);
-				RemoveTrackActor(character, track, 2);
-				RemoveTrackActor(character, track, 3);
-				break;
-			case 44:
+			case 34:
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

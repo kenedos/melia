@@ -35,6 +35,8 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 	private readonly static QuestId Sout24 = new QuestId(40054);
 	private readonly static QuestId Sout31 = new QuestId(50004);
 	private readonly static QuestId Sout32 = new QuestId(50005);
+	private readonly static QuestId Slate3 = new QuestId(20052);
+	private readonly static QuestId ToGele = new QuestId(50006);
 
 	protected override void Load()
 	{
@@ -45,6 +47,27 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Miners' Village Mayor"));
+
+			if (character.Quests.IsActive(Slate3) && character.Quests.IsCompletable(Slate3))
+			{
+				await dialog.Msg(L("Welcome. Aren't you our town's savior? Go down from the middle of the Twin Bridge and you'll arrive at Srautas Gorge. Go further right through the Gorge and you'll reach Gele Plateau."));
+				dialog.ShowHelp("TUTO_INCOMPATIBLE");
+				character.Quests.Complete(Slate3);
+				return;
+			}
+
+			if (!character.Quests.Has(ToGele) && character.Quests.MeetsPrerequisites(ToGele))
+			{
+				await dialog.Msg(L("Go straight down from the Twin Bridge and you'll arrive at Srautas Gorge. Go further right through Srautas Gorge and you'll be able to get to Gele Plateau."));
+				character.Quests.Start(ToGele);
+				return;
+			}
+
+			if (character.Quests.IsActive(ToGele))
+			{
+				await dialog.Msg(L("Srautas Gorge lies down the Twin Bridge. The cable car there will carry you up to Gele Plateau."));
+				return;
+			}
 
 			if (character.Quests.IsActive(Sout01) && character.Quests.IsCompletable(Sout01))
 			{
@@ -1311,5 +1334,35 @@ public class SoutQ32Quest : QuestScript
 
 		AddReward(new ItemReward("expCard2", 2));
 		AddReward(new TakeItemReward("TOWN_PROVISIONS"));
+	}
+}
+
+// 50006: To Gele Plateau
+//-----------------------------------------------------------------------------
+public class SoutQ41Quest : QuestScript
+{
+	protected override void Load()
+	{
+		SetClientId(50006);
+		SetName(L("To Gele Plateau"));
+		SetDescription(L("The Mayor of the Miners' Village explains the road to Gele Plateau through Srautas Gorge."));
+		SetType(QuestType.Main);
+		SetLocation("f_siauliai_out");
+		SetAutoTracked(true);
+		SetCancelable(true);
+
+		SetPhase(QuestStatus.Possible, "SIAULIAIOUT_CHIEF_A", "f_siauliai_out", L("Talk to the Miners' Village Mayor"), L("Talk to the Miners' Village Mayor."));
+		SetPhase(QuestStatus.InProgress, "SOUT_Q_41_ARRIVE", "f_gele_57_1", L("Travel to Gele Plateau"), L("Go down from the Twin Bridge at the Miners' Village to get to Srautas Gorge, then take the cable car and go a bit further up to reach Gele Plateau."));
+		SetPhase(QuestStatus.Success, "SOUT_Q_41_ARRIVE", "f_gele_57_1", L("Travel to Gele Plateau"), L("Go down from the Twin Bridge at the Miners' Village to get to Srautas Gorge, then take the cable car and go a bit further up to reach Gele Plateau."));
+
+		AddPrerequisite(new QuestStatusPrerequisite(20052, QuestStatus.Completed));
+
+		AddObjective("travelToGele", L("Travel to Gele Plateau"), new ManualObjective());
+	}
+
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		// The trip itself is the quest; there is no turn-in NPC.
+		character.Quests.Complete(this.QuestId);
 	}
 }

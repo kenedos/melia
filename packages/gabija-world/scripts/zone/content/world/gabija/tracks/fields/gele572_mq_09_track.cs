@@ -28,7 +28,7 @@ public class Gele572Mq09Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(-1115.23, 462.37, 305.16));
+		character.Movement.MoveTo(new Position(-1115.23f, 462.37f, 305.16f));
 
 		actors.Add(AddTrackActor(character, 57072, -1136.21, 462.37, 417.13, 92, new TrackActorSpec { Ai = "TrackWaitMonster", MaxHp = 5000 }));
 		actors.Add(character);

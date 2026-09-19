@@ -29,6 +29,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq09 = new QuestId(8546);
 	private readonly static QuestId Hq01 = new QuestId(9102);
 	private readonly static QuestId Hq02 = new QuestId(9104);
+	private readonly static QuestId Reveal2 = new QuestId(30031);
 
 	protected override void Load()
 	{
@@ -306,6 +307,16 @@ public class FGele573QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The Chapparition will not bring back the lives of those who died."));
 				await dialog.Msg(L("It's a sad thing... But we can't just leave it like that."));
 				character.Quests.Complete(Hq02);
+				return;
+			}
+
+			if (!character.Quests.Has(Reveal2) && character.Quests.MeetsPrerequisites(Reveal2))
+			{
+				await dialog.Msg(L("So Gesti just ran away."));
+				await dialog.Msg(L("Fine. Since you got the revelation, we've completed the mission here."));
+				character.Quests.Start(Reveal2);
+				character.Quests.CompleteObjective(Reveal2, "tellStory");
+				character.Quests.Complete(Reveal2);
 				return;
 			}
 
@@ -818,5 +829,29 @@ public class Gele573Hq02Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(98));
 
 		AddObjective("killChapparition", L("Defeat spooky Chapparition"), new KillObjective(1, "F_boss_Chapparition"));
+	}
+}
+
+// 30031: The Hidden Sanctum's Revelation (2)
+//-----------------------------------------------------------------------------
+public class Chaple577Mq10AfterQuest : QuestScript
+{
+	protected override void Load()
+	{
+		SetClientId(30031);
+		SetName(L("The Hidden Sanctum's Revelation (2)"));
+		SetDescription(L("Tell the Paladin Master the story of the Tenet Church."));
+		SetType(QuestType.Main);
+		SetLocation("f_gele_57_3");
+		SetAutoTracked(true);
+		SetCancelable(true);
+
+		SetPhase(QuestStatus.Possible, "GELE573_MASTER", "f_gele_57_3", L("Tell the Paladin Master about the story so far"), L("Go to the Paladin Master in Nefritas Cliff."));
+		SetPhase(QuestStatus.InProgress, "GELE573_MASTER", "f_gele_57_3", L("Tell the Paladin Master about the story so far"), L("Tell the Paladin Master about the story so far."));
+		SetPhase(QuestStatus.Success, "GELE573_MASTER", "f_gele_57_3", L("Tell the Paladin Master about the story so far"), L("Tell the Paladin Master about the story so far."));
+
+		AddPrerequisite(new QuestStatusPrerequisite(8537, QuestStatus.Completed));
+
+		AddObjective("tellStory", L("Tell the Paladin Master about the story so far"), new ManualObjective());
 	}
 }

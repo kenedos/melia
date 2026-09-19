@@ -28,7 +28,7 @@ public class SiaulWestDrasius1Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(-1099, 261, -544));
+		character.Movement.MoveTo(new Position(-1099f, 261f, -544f));
 		actors.Add(character);
 
 		actors.Add(AddTrackActor(character, 10046, -1121, 261, -528, 54, new TrackActorSpec
@@ -44,25 +44,25 @@ public class SiaulWestDrasius1Track : TrackScript
 		actors.Add(AddTrackActor(character, 400001, -1231, 261, -548, 17, new TrackActorSpec
 		{
 			Ai = "TrackWaitMonster",
-			EndPosition = new Position(-1167, 261, -546),
+			EndPosition = new Position(-1167f, 261f, -546f),
 		}));
 
 		actors.Add(AddTrackActor(character, 400001, -1243, 261, -563, 0, new TrackActorSpec
 		{
 			Ai = "TrackWaitMonster",
-			EndPosition = new Position(-1170, 261, -578),
+			EndPosition = new Position(-1170f, 261f, -578f),
 		}));
 
 		actors.Add(AddTrackActor(character, 400001, -1263, 261, -517, 0, new TrackActorSpec
 		{
 			Ai = "TrackWaitMonster",
-			EndPosition = new Position(-1191, 261, -527),
+			EndPosition = new Position(-1191f, 261f, -527f),
 		}));
 
 		actors.Add(AddTrackActor(character, 400001, -1261, 261, -570, 0, new TrackActorSpec
 		{
 			Ai = "TrackWaitMonster",
-			EndPosition = new Position(-1154, 261, -591),
+			EndPosition = new Position(-1154f, 261f, -591f),
 		}));
 
 		actors.Add(AddTrackActor(character, 40070, -1277, 261, -614, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));

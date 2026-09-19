@@ -26,6 +26,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq06 = new QuestId(17150);
 	private readonly static QuestId Mq07 = new QuestId(17160);
 	private readonly static QuestId Rp1 = new QuestId(60151);
+	private readonly static QuestId ToGele = new QuestId(50006);
 
 	protected override void Load()
 	{
@@ -443,6 +444,18 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
 				character.Quests.StartQuestTrack(Mq07);
+
+			await Task.CompletedTask;
+		});
+
+		// The cable car that carries the player up to Gele Plateau.
+		AddQuestTrigger("SOUT_Q_41_ARRIVE", "f_gele_57_1", 640, 1489, 100, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(ToGele) && !character.Quests.IsCompletable(ToGele))
+				character.Quests.CompleteObjective(ToGele, "travelToGele");
 
 			await Task.CompletedTask;
 		});

@@ -27,7 +27,7 @@ public class SiaulWestOnionBigTrack : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(-1905, 261, 61));
+		character.Movement.MoveTo(new Position(-1905f, 261f, 61f));
 
 		actors.Add(AddTrackActor(character, 57407, -1867, 261, 248, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 

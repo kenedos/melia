@@ -1,7 +1,7 @@
 //--- Melia Script ----------------------------------------------------------
-// The Nepenthes at Piene Field
+// Gesti in the cathedral
 //--- Description -----------------------------------------------------------
-// Burning the fat wakes the sleeping plant, and its sap can be taken.
+// Algis brings you up to watch Gesti at work.
 //---------------------------------------------------------------------------
 
 using System.Collections.Generic;
@@ -14,12 +14,12 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Tracks;
 using static Melia.Zone.Scripting.Shortcuts;
 
-[TrackScript("GELE574_MQ_04_TRACK")]
-public class Gele574Mq04Track : TrackScript
+[TrackScript("CHAPLE577_MQ_01_TRACK")]
+public class Chaple577Mq01Track : TrackScript
 {
 	protected override void Load()
 	{
-		SetId("GELE574_MQ_04_TRACK");
+		SetId("CHAPLE577_MQ_01_TRACK");
 	}
 
 	public override IActor[] OnStart(Character character, Track track)
@@ -28,9 +28,11 @@ public class Gele574Mq04Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(2295.41f, 102.65f, -771.70f));
+		character.Movement.MoveTo(new Position(-632.67f, 35.92f, -958.09f));
 
-		actors.Add(AddTrackActor(character, 57015, 2314.19, 102.65, -722.37, 0, new TrackActorSpec { Ai = "BasicBoss" }));
+		actors.Add(AddTrackActor(character, 147371, -321.69, 35.92, -846.42, 310, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-317.52f, 35.92f, -776.33f) }));
+		actors.Add(AddTrackActor(character, 41230, -312.39, 35.92, -943.13, 0, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-272.13f, 35.92f, -1010.45f) }));
+		actors.Add(AddTrackActor(character, 147390, -633, 36, -934, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(character);
 
 		return actors.ToArray();

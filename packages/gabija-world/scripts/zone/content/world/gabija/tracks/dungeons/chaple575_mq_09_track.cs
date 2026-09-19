@@ -1,7 +1,7 @@
 //--- Melia Script ----------------------------------------------------------
-// The Wild Carnivore at Pasiulyma Field
+// Cyclops at the basement barrier
 //--- Description -----------------------------------------------------------
-// A beast soaked in demonic energy, and the vines that answer for it.
+// Vaidutis runs for the first floor while the Revelator breaks through.
 //---------------------------------------------------------------------------
 
 using System.Collections.Generic;
@@ -14,12 +14,12 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Tracks;
 using static Melia.Zone.Scripting.Shortcuts;
 
-[TrackScript("GELE572_MQ_07_TRACK")]
-public class Gele572Mq07Track : TrackScript
+[TrackScript("CHAPLE575_MQ_09_TRACK")]
+public class Chaple575Mq09Track : TrackScript
 {
 	protected override void Load()
 	{
-		SetId("GELE572_MQ_07_TRACK");
+		SetId("CHAPLE575_MQ_09_TRACK");
 	}
 
 	public override IActor[] OnStart(Character character, Track track)
@@ -28,13 +28,17 @@ public class Gele572Mq07Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(1012.64f, 462.12f, 1643.34f));
+		character.Movement.MoveTo(new Position(305.78f, 0.55f, -789.04f));
 
-		actors.Add(AddTrackActor(character, 41238, 1014.73, 462.13, 1678.66, 0, new TrackActorSpec { Ai = "BasicBoss" }));
-		actors.Add(AddTrackActor(character, 47310, 1012.51, 462.12, 1661.84, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47310, 1014.13, 462.12, 1675.01, 11, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47310, 1012.81, 462.12, 1668.66, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(character);
+		actors.Add(AddTrackActor(character, 57087, 487.85, 0.55, -851.05, 280, new TrackActorSpec { Ai = "BasicBoss", EndPosition = new Position(596.80f, 0.55f, -635.36f) }));
+		actors.Add(AddTrackActor(character, 11283, 499.52, 0.55, -795.50, 69, new TrackActorSpec
+		{
+			Name = L("Follower Vaidutis"),
+			Faction = FactionType.Neutral,
+			EndPosition = new Position(661.91f, 76.14f, -454.12f),
+		}));
+		actors.Add(AddTrackActor(character, 12082, 364.88, 0.55, -790.83, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
 	}
@@ -43,8 +47,7 @@ public class Gele572Mq07Track : TrackScript
 	{
 		switch (frame)
 		{
-			case 30:
-				RemoveTrackActor(character, track, 1);
+			case 41:
 				RemoveTrackActor(character, track, 2);
 				RemoveTrackActor(character, track, 3);
 				break;

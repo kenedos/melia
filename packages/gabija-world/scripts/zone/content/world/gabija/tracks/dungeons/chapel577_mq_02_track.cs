@@ -1,7 +1,7 @@
 //--- Melia Script ----------------------------------------------------------
-// The Minotaur at Flower Greeting Hill
+// Recapturing the Bell Tower
 //--- Description -----------------------------------------------------------
-// Kayetonas meets the demon that fell from the sky.
+// The Necroventer holds the tower. Take it back.
 //---------------------------------------------------------------------------
 
 using System.Collections.Generic;
@@ -14,12 +14,12 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Tracks;
 using static Melia.Zone.Scripting.Shortcuts;
 
-[TrackScript("GELE573_MQ_06_TRACK")]
-public class Gele573Mq06Track : TrackScript
+[TrackScript("CHAPLE577_MQ_02_TRACK")]
+public class Chaple577Mq02Track : TrackScript
 {
 	protected override void Load()
 	{
-		SetId("GELE573_MQ_06_TRACK");
+		SetId("CHAPLE577_MQ_02_TRACK");
 	}
 
 	public override IActor[] OnStart(Character character, Track track)
@@ -28,19 +28,23 @@ public class Gele573Mq06Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(319.72f, 281.96f, 557.22f));
+		character.Movement.MoveTo(new Position(-633.69f, 35.92f, -962.92f));
 
-		actors.Add(AddTrackActor(character, 41383, 245.54, 284.17, 998.78, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 11283, 265, 281, 545, 72, new TrackActorSpec
+		actors.Add(character);
+		actors.Add(AddTrackActor(character, 147352, 134, 165, -576, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 147358, -30.72, 35.93, -165.28, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Central Altar") }));
+		actors.Add(AddTrackActor(character, 11281, -633, 36, -934, 90, new TrackActorSpec
 		{
-			Name = L("Follower Kayetonas"),
+			Name = L("Follower Algis"),
 			Faction = FactionType.Our_Forces,
 			MaxHp = 9999,
-			Level = 25,
+			Level = 41,
+			WalkSpeed = 70,
 			CombatNpc = true,
-			EndPosition = new Position(258.73f, 284.17f, 913.45f),
+			EndPosition = new Position(-623.87f, 35.92f, -981.62f),
 		}));
-		actors.Add(character);
+		actors.Add(AddTrackActor(character, 152003, 207.31, 164.86, -582.23, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 41230, -560, 36, -900, 0, new TrackActorSpec { Ai = "BasicBoss" }));
 
 		return actors.ToArray();
 	}
@@ -49,10 +53,7 @@ public class Gele573Mq06Track : TrackScript
 	{
 		switch (frame)
 		{
-			case 13:
-				InsertTrackHate(character, track, 0);
-				break;
-			case 49:
+			case 15:
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

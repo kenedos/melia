@@ -28,15 +28,15 @@ public class Gele571Mq07Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(964.26, 266.20, 996.48));
+		character.Movement.MoveTo(new Position(964.26f, 266.20f, 996.48f));
 
 		actors.Add(character);
 		actors.Add(AddTrackActor(character, 57210, 667.83, 267.47, 1188.23, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
-		actors.Add(AddTrackActor(character, 147451, 950.72, 266.38, 963.03, 60, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(507.39, 267.47, 1072.59) }));
-		actors.Add(AddTrackActor(character, 147451, 980.37, 253.33, 961.09, 52, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(569.25, 267.47, 1016.21) }));
-		actors.Add(AddTrackActor(character, 147451, 999.48, 251.84, 995.80, 43, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(802.64, 267.47, 1362.91) }));
-		actors.Add(AddTrackActor(character, 147451, 980.46, 264.53, 1025.36, 56, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(697.45, 267.47, 1384.29) }));
+		actors.Add(AddTrackActor(character, 147451, 950.72, 266.38, 963.03, 60, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(507.39f, 267.47f, 1072.59f) }));
+		actors.Add(AddTrackActor(character, 147451, 980.37, 253.33, 961.09, 52, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(569.25f, 267.47f, 1016.21f) }));
+		actors.Add(AddTrackActor(character, 147451, 999.48, 251.84, 995.80, 43, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(802.64f, 267.47f, 1362.91f) }));
+		actors.Add(AddTrackActor(character, 147451, 980.46, 264.53, 1025.36, 56, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(697.45f, 267.47f, 1384.29f) }));
 
 		return actors.ToArray();
 	}

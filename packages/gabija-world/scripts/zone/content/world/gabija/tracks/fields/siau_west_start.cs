@@ -28,7 +28,7 @@ public class SiauWestStartTrack : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(-576, 261, -918));
+		character.Movement.MoveTo(new Position(-576f, 261f, -918f));
 		actors.Add(character);
 
 		var sentry = new TrackActorSpec { Name = L("Sentry"), Faction = FactionType.Neutral, Level = 1, Ai = "TrackWaitMonster" };
@@ -41,7 +41,7 @@ public class SiauWestStartTrack : TrackScript
 			Faction = FactionType.Neutral,
 			Level = 1,
 			Ai = "TrackWaitMonster",
-			EndPosition = new Position(-576, 260, -719),
+			EndPosition = new Position(-576f, 260f, -719f),
 		}));
 
 		actors.Add(AddTrackActor(character, 10020, -622, 261, -760, 0, sentry));
