@@ -149,7 +149,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				return;
 			}
 
-			await dialog.Msg(L("The bishop remains in closed prayer. When you are ready, go at once to meet Ares in the eastern woods."));
+			await dialog.Msg(L("There is nothing more I can tell you for now. Go, and may the goddess watch over you."));
 		});
 
 		// Quest dialog hooks for the city's merchants

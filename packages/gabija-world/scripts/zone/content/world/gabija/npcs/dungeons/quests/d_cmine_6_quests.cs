@@ -340,17 +340,6 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
-
-		AddQuestTrigger("MINE_3_BOSS", "d_cmine_6", 2103, 1957, 200, async args =>
-		{
-			if (args.Initiator is not Character character)
-				return;
-
-			if (character.Quests.IsActive(Boss) && !character.Quests.IsCompletable(Boss))
-				character.Quests.StartQuestTrack(Boss);
-
-			await Task.CompletedTask;
-		});
 	}
 }
 

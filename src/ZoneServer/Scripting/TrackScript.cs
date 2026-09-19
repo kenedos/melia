@@ -444,7 +444,7 @@ namespace Melia.Zone.Scripting
 			if (track.Actors == null || actorIndex < 0 || actorIndex >= track.Actors.Length)
 				return;
 
-			if (track.Actors[actorIndex] is IMonster monster && track.Actors[actorIndex] != character)
+			if (track.Actors[actorIndex] is IMonster monster && monster.Map != null && track.Actors[actorIndex] != character)
 				character.Map.RemoveMonster(monster);
 		}
 
@@ -458,22 +458,30 @@ namespace Melia.Zone.Scripting
 			if (IsSharedFollower(character, track))
 				return;
 
+			var members = track.Group != null ? (IEnumerable<Character>)track.Group.Members : new Character[] { character };
+
 			foreach (var actor in track.Actors)
 			{
-				if (actor is ICombatEntity combatEntity)
+				if (actor is Character || actor is not ICombatEntity combatEntity)
+					continue;
+
+				// An actor the cutscene already removed is off the map.
+				if (combatEntity.Map == null)
+					continue;
+
+				if (combatEntity is Mob monster)
+					monster.Position = monster.SpawnPosition;
+
+				combatEntity.Components.Add(new MovementComponent(combatEntity));
+				combatEntity.Tendency = TendencyType.Aggressive;
+
+				if (combatEntity.Components.TryGet<AiComponent>(out var aiComponent))
+					aiComponent.Script.RefreshMovement();
+
+				foreach (var member in members)
 				{
-					// Sets the tendency to attack?
-					// Can I just add the movement component here instead?
-					if (actor is Character)
-						continue;
-					if (combatEntity is Mob monster)
-						monster.Position = monster.SpawnPosition;
-
-					combatEntity.Components.Add(new MovementComponent(combatEntity));
-					combatEntity.Tendency = TendencyType.Aggressive;
-
-					if (combatEntity.Components.TryGet<AiComponent>(out var aiComponent))
-						aiComponent.Script.RefreshMovement();
+					if (member.CanTarget(combatEntity))
+						combatEntity.InsertHate(member);
 				}
 			}
 		}

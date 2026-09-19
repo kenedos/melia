@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
@@ -138,6 +139,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			this.Character.LookAround();
 			this.ShowCast(track);
 
+			this.Character.StopBuff(BuffId.DashRun);
+			this.Character.Movement.Stop();
+
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x6B, true, this.Character.Name);
@@ -267,6 +271,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			this.Character.SetLayer(group.Layer);
 			this.Character.LookAround();
 			this.ShowCast(track);
+
+			this.Character.StopBuff(BuffId.DashRun);
+			this.Character.Movement.Stop();
 
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
