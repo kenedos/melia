@@ -626,6 +626,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			if (!ZoneServer.Instance.Data.BuffDb.TryFind(a => a.Id == buffId, out var buffData))
 				throw new ArgumentException($"Buff Id '{buffId}' not found.");
 
+			// A buff death would strip, such as a stun from the killing hit, can't land on a corpse.
+			if (buffData.RemoveOnDeath && this.Entity.IsDead)
+				return null;
+
 			Buff buff;
 			bool isNew;
 			bool overbuffChanged = false;

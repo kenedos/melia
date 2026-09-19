@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
 using Melia.Zone.Buffs.Handlers;
 using Melia.Zone.Buffs.Handlers.Common;
 using Melia.Zone.Buffs.Handlers.Scout.Assassin;
@@ -210,7 +211,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.ModifyHpSafe(0, out _, out var hpPriority);
 			Send.ZC_UPDATE_ALL_STATUS(this, hpPriority);
 
-			Send.ZC_DEAD(this);
+			this.ScheduleDeathBroadcast();
 
 			if (this.IsDueling)
 				ZoneServer.Instance.World.Duels.EndDuel(this.Connection.ActiveDuel, killer);
@@ -231,6 +232,34 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
+		/// Broadcasts the character's death packet right away, whether it was
+		/// due yet or not. Used to make sure a death is announced before the
+		/// character leaves the map or comes back to life.
+		/// </summary>
+		public void FlushDeathBroadcast()
+			=> this.FlushDeathBroadcast(true);
+
+		/// <summary>
+		/// Broadcasts the character's death packet, optionally only once it's
+		/// due, and returns whether it was sent.
+		/// </summary>
+		/// <param name="force"></param>
+		private bool FlushDeathBroadcast(bool force)
+		{
+			if (!this.TryClaimDeathBroadcast(force))
+				return false;
+
+			// A revival during the grace window leaves nothing to announce.
+			if (!this.IsDead)
+				return false;
+
+			Send.ZC_DEAD(this);
+			this.IsDeathAnnounced = true;
+
+			return true;
+		}
+
+		/// <summary>
 		/// Resurrects the character if its dead.
 		/// </summary>
 		public void Resurrect(ResurrectOptions option, float hpPercent = 1f)
@@ -243,6 +272,9 @@ namespace Melia.Zone.World.Actors.Characters
 					return;
 				}
 			}
+
+			// The client must see the death before the revival.
+			this.FlushDeathBroadcast();
 
 			this.IsResurrecting = true;
 
@@ -286,6 +318,7 @@ namespace Melia.Zone.World.Actors.Characters
 			Send.ZC_RESURRECT_SAVE_POINT_ACK(this);
 			Send.ZC_RESURRECT(this);
 			this.IsResurrecting = false;
+			this.IsDeathAnnounced = false;
 
 			if (_companionsToReactivate != null)
 			{

@@ -383,6 +383,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			Send.ZC_SKILL_CAST_CANCEL(this);
 			Send.ZC_SKILL_DISABLE(this);
 			Send.ZC_DEAD(this);
+			this.IsDeathAnnounced = true;
 
 			this.Properties.SetFloat(PropertyName.HP, 0);
 			this.Components.Get<MovementComponent>()?.Stop();

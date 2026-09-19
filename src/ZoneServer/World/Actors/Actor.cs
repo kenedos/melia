@@ -5,6 +5,7 @@ using System.Linq;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Network;
 using Melia.Shared.World;
+using Melia.Shared.Util;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Components;
@@ -82,6 +83,18 @@ namespace Melia.Zone.World.Actors
 		/// Raised when the actor is removed from the map it's on.
 		/// </summary>
 		Action OnDisappear { get; }
+
+		/// <summary>
+		/// Returns true once the actor's death was announced to the clients.
+		/// </summary>
+		bool IsDeathAnnounced { get; }
+
+		/// <summary>
+		/// Holds a queued death back until a hit landing after the given
+		/// delay has been displayed by the clients.
+		/// </summary>
+		/// <param name="hitDelay"></param>
+		void DelayDeathBroadcast(TimeSpan hitDelay);
 	}
 
 	/// <summary>
@@ -178,6 +191,78 @@ namespace Melia.Zone.World.Actors
 		/// Returns the time when the actor is removed from the map.
 		/// </summary>
 		public DateTime DisappearTime { get; set; } = DateTime.MaxValue;
+
+		/// <summary>
+		/// Grace window that lets the killing blow's combat packets reach the
+		/// clients first, so the death always goes out after the hit that
+		/// caused it rather than before it.
+		/// </summary>
+		protected static readonly TimeSpan DeathBroadcastGrace = TimeSpan.FromMilliseconds(WorldManager.HeartbeatDelay * 2);
+
+		private readonly object _deathBroadcastLock = new();
+		private bool _deathBroadcastPending;
+		private DateTime _deathBroadcastTime;
+
+		/// <summary>
+		/// Returns true once the actor's death was announced to the clients.
+		/// </summary>
+		public bool IsDeathAnnounced { get; protected set; }
+
+		/// <summary>
+		/// Returns true while the actor's death is waiting to be announced.
+		/// </summary>
+		protected bool IsDeathBroadcastPending => _deathBroadcastPending;
+
+		/// <summary>
+		/// Queues the actor's death, to be announced once the clients have
+		/// had a chance to display the killing hit.
+		/// </summary>
+		protected void ScheduleDeathBroadcast()
+		{
+			lock (_deathBroadcastLock)
+			{
+				_deathBroadcastPending = true;
+				_deathBroadcastTime = GameClock.LocalNow + DeathBroadcastGrace;
+			}
+		}
+
+		/// <summary>
+		/// Holds a queued death back until a hit landing after the given
+		/// delay has been displayed by the clients.
+		/// </summary>
+		/// <param name="hitDelay"></param>
+		public void DelayDeathBroadcast(TimeSpan hitDelay)
+		{
+			lock (_deathBroadcastLock)
+			{
+				if (!_deathBroadcastPending)
+					return;
+
+				var dueTime = GameClock.LocalNow + hitDelay + DeathBroadcastGrace;
+				if (dueTime > _deathBroadcastTime)
+					_deathBroadcastTime = dueTime;
+			}
+		}
+
+		/// <summary>
+		/// Returns whether the queued death is to be announced now, taking
+		/// it off the queue if it is.
+		/// </summary>
+		/// <param name="force">Announces the death whether it's due yet or not.</param>
+		protected bool TryClaimDeathBroadcast(bool force)
+		{
+			lock (_deathBroadcastLock)
+			{
+				if (!_deathBroadcastPending)
+					return false;
+
+				if (!force && GameClock.LocalNow < _deathBroadcastTime)
+					return false;
+
+				_deathBroadcastPending = false;
+				return true;
+			}
+		}
 
 		/// <summary>
 		/// Raised when the actor is removed from the map it's on.

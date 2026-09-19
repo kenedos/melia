@@ -38,22 +38,13 @@ namespace Melia.Zone.World.Actors.Monsters
 	public partial class Mob : Actor, IMonster, ICombatEntity, IUpdateable
 	{
 		private readonly object _hpLock = new();
-		private readonly object _deathBroadcastLock = new();
+		private readonly object _pendingDropsLock = new();
 		private int _killed;
-		private bool _deathBroadcastPending;
-		private DateTime _deathBroadcastTime;
 		private Character _dropBeneficiary;
 		private List<DropStack> _pendingDrops;
 		private Character _preRollBeneficiary;
 		private List<DropStack> _preRolledDrops;
 		private Position _position;
-
-		/// <summary>
-		/// Grace window that lets the killing blow's skill packet reach the
-		/// senders first, so the death always goes out after the hit that
-		/// caused it rather than before it.
-		/// </summary>
-		private static readonly TimeSpan DeathBroadcastGrace = TimeSpan.FromMilliseconds(WorldManager.HeartbeatDelay * 2);
 
 		/// <summary>
 		/// How long the corpse remains on the map after its death is shown.
@@ -664,6 +655,9 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			this.ScheduleDeathBroadcast();
 
+			// A floor for the corpse's lifetime; the broadcast sets the final time.
+			this.DisappearTime = GameClock.LocalNow + DeathBroadcastGrace + CorpseDuration;
+
 			this.Buffs?.RemoveAll();
 
 			// Trigger Kill card effects
@@ -685,20 +679,6 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Queues the monster's death packets, to be broadcast once the
-		/// clients have had a chance to display the killing hit.
-		/// </summary>
-		private void ScheduleDeathBroadcast()
-		{
-			lock (_deathBroadcastLock)
-			{
-				_deathBroadcastPending = true;
-				_deathBroadcastTime = GameClock.LocalNow + DeathBroadcastGrace;
-				this.DisappearTime = _deathBroadcastTime + CorpseDuration;
-			}
-		}
-
-		/// <summary>
 		/// Broadcasts the monster's death packets right away, whether they
 		/// were due yet or not. Used to make sure a death is announced before
 		/// the monster leaves the map.
@@ -716,25 +696,23 @@ namespace Melia.Zone.World.Actors.Monsters
 			Character beneficiary;
 			List<DropStack> pendingDrops;
 
-			lock (_deathBroadcastLock)
+			if (!this.TryClaimDeathBroadcast(force))
+				return false;
+
+			lock (_pendingDropsLock)
 			{
-				if (!_deathBroadcastPending)
-					return false;
-
-				if (!force && GameClock.LocalNow < _deathBroadcastTime)
-					return false;
-
-				_deathBroadcastPending = false;
-
 				beneficiary = _dropBeneficiary;
 				pendingDrops = _pendingDrops;
 				_dropBeneficiary = null;
 				_pendingDrops = null;
 			}
 
+			this.DisappearTime = GameClock.LocalNow + CorpseDuration;
+
 			Send.ZC_SKILL_CAST_CANCEL(this);
 			Send.ZC_SKILL_DISABLE(this);
 			Send.ZC_DEAD(this);
+			this.IsDeathAnnounced = true;
 
 			if (this.Effects?.Count != 0)
 				Send.ZC_NORMAL.ClearEffects(this);
@@ -1741,7 +1719,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		/// <param name="elapsed"></param>
 		public virtual void Update(TimeSpan elapsed)
 		{
-			if (_deathBroadcastPending)
+			if (this.IsDeathBroadcastPending)
 				this.FlushDeathBroadcast(false);
 
 			this.Components.Update(elapsed);

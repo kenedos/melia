@@ -622,6 +622,9 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <param name="elapsed"></param>
 		public void Update(TimeSpan elapsed)
 		{
+			if (this.IsDeathBroadcastPending)
+				this.FlushDeathBroadcast(false);
+
 			this.Components.Update(elapsed);
 			this.UpdateResurrection(elapsed);
 			PardonerSkillHelper.UpdateFullBoxTimer(this);

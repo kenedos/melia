@@ -614,6 +614,9 @@ namespace Melia.Zone.World.Maps
 			// they aren't lost when the character leaves the map.
 			character.FlushAllStackPickups();
 
+			// Announce a still-pending death before the character leaves the map.
+			character.FlushDeathBroadcast();
+
 			// Only adjust the count if the character was actually on the
 			// map. An unconditional decrement lets any double-removal
 			// desync the count and unload the map under live players.

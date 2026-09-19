@@ -3029,6 +3029,12 @@ namespace Melia.Zone.Network
 		/// <param name="hitInfo"></param>
 		public static void ZC_HIT_INFO(ICombatEntity attacker, ICombatEntity target, HitInfo hitInfo)
 		{
+			// A hit whose target's death already went out would play on the corpse.
+			if (target.IsDeathAnnounced)
+				return;
+
+			target.DelayDeathBroadcast(hitInfo.HitDelay);
+
 			using var packet = Packet.Rent(Op.ZC_HIT_INFO);
 
 			packet.AddHitInfoPacket(attacker, target, hitInfo);
@@ -3061,12 +3067,20 @@ namespace Melia.Zone.Network
 		/// <param name="hits"></param>
 		public static void ZC_SKILL_HIT_INFO(IActor attacker, IEnumerable<SkillHitInfo> hits)
 		{
+			// Hits whose target's death already went out would play on the corpse.
+			var liveHits = hits.Where(a => !a.Target.IsDeathAnnounced).ToList();
+			if (liveHits.Count == 0)
+				return;
+
+			foreach (var skillHit in liveHits)
+				skillHit.Target.DelayDeathBroadcast(skillHit.HitDelay);
+
 			using var packet = Packet.Rent(Op.ZC_SKILL_HIT_INFO);
 
 			packet.PutInt(attacker.Handle);
-			packet.PutByte((byte)hits.Count());
+			packet.PutByte((byte)liveHits.Count);
 
-			foreach (var skillHit in hits)
+			foreach (var skillHit in liveHits)
 				packet.AddSkillHitInfo(skillHit);
 
 			attacker.Map.Broadcast(packet, attacker);
@@ -7892,6 +7906,10 @@ namespace Melia.Zone.Network
 			if (kbInfo == null)
 				return;
 
+			// A knockdown whose target's death already went out would move the corpse.
+			if (actor.IsDeathAnnounced)
+				return;
+
 			using var packet = Packet.Rent(Op.ZC_KNOCKDOWN_INFO);
 
 			packet.PutInt(actor.Handle);
@@ -7990,6 +8008,10 @@ namespace Melia.Zone.Network
 		/// <param name="knockBackInfo"></param>
 		public static void ZC_KNOCKDOWN_INFO(ICombatEntity entity, ICombatEntity target, KnockBackInfo knockBackInfo)
 		{
+			// A knockdown whose target's death already went out would move the corpse.
+			if (target.IsDeathAnnounced)
+				return;
+
 			using var packet = Packet.Rent(Op.ZC_KNOCKDOWN_INFO);
 
 			packet.PutInt(target.Handle);
