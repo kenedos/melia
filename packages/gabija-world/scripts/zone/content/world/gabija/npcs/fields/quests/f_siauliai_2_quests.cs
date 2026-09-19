@@ -81,7 +81,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Reclaim1) && character.Quests.MeetsPrerequisites(Reclaim1))
 			{
-				await dialog.Msg(L("You mean to go to the crystal mine to find the light of salvation? But now is not a good time. The Bube horde is pouring out of the crystal mine."));
+				await dialog.Msg(L("You mean to go to the crystal mine to find the light of salvation? But now is not a good time. The Vubbe horde is pouring out of the crystal mine."));
 				await dialog.Msg(L("And here in the eastern woods, monsters are multiplying and threatening even Klaipeda. Because of that, the mining village in between has become the middle of a battlefield."));
 				await dialog.Msg(L("We split our forces - some to hold the mining village, and I with the rest am investigating why the monsters are multiplying in the eastern woods."));
 				await dialog.Msg(L("So we cannot spare an escort for the Revelators. And yet we cannot disobey the bishop and the knight commander."));
@@ -111,8 +111,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Request1);
-					character.Quests.CompleteObjective(Request1, "findClue");
-					await dialog.Msg(L("If you find anything that might be a clue, take it to the operations officer up there."));
+					await dialog.Msg(L("If you find any clues, let the Operations Officer in the northern area know about it."));
 					return;
 				}
 			}
@@ -135,7 +134,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Request7) && character.Quests.MeetsPrerequisites(Request7))
 			{
-				await dialog.Msg(L("You really killed the Bube Fighter? Then the monsters will no longer multiply. We can rest a little easier now."));
+				await dialog.Msg(L("You really killed the Vubbe Fighter? Then the monsters will no longer multiply. We can rest a little easier now."));
 
 				var answer = await dialog.Select(L("Will you go on to the mining village?"),
 					Option(L("Say you will go to the mining village"), "accept"),
@@ -170,7 +169,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Request7))
 			{
-				await dialog.Msg(L("The Bube are pushing the refugees back. Clear the monsters chasing them."));
+				await dialog.Msg(L("The Vubbes are pushing the refugees back. Clear the monsters chasing them."));
 				character.Quests.ReplayQuestTrack(Request7);
 				return;
 			}
@@ -375,7 +374,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 		// Operations Officer
 		//-------------------------------------------------------------------------
-		AddNpc(20014, L("Operations Officer"), "SIAUL_EAST_SUPPLY_MANAGER2", "f_siauliai_2", -1290, 928, 0, async dialog =>
+		AddNpc(20014, L("Operations Officer"), "SIAUL_EAST_SUPPLY_MANAGER2", "f_siauliai_2", -1300, 828, 0, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -383,26 +382,32 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Request1))
 			{
-				await dialog.Msg(L("Did Sir Ares send you? This is a piece of Bube cloth. Hm... so that is what it is."));
+				if (!character.Quests.IsCompletable(Request1))
+				{
+					await dialog.Msg(L("It's very important to study the monsters at times like this. It's like weather forecasts where you try to understand the source to see what trends will happen."));
+					return;
+				}
+
+				await dialog.Msg(L("Were you sent by Aras? This is a piece of Vubbe clothing. Ah... I see..."));
 				character.Quests.Complete(Request1);
 				return;
 			}
 
 			if (!character.Quests.Has(Request2) && character.Quests.MeetsPrerequisites(Request2))
 			{
-				await dialog.Msg(L("Perhaps the Bube of the mining village have pushed all the way into these woods. That would explain the unnatural increase in monsters."));
-				await dialog.Msg(L("I should ask Sir Ares to search other places for Bube. Meanwhile, please look over the north."));
+				await dialog.Msg(L("I think the Vubbes from the Miners' Village have made their way into the woods. Maybe that's also a reason behind the abnormal surge in monsters."));
+				await dialog.Msg(L("I better ask Aras to search for Vubbes in other regions too. In the meantime, I would like you to take a look at the upper areas."));
 
 				var answer = await dialog.Select(L("Will you scout the northern woods?"),
 					Option(L("Say you will check"), "accept"),
 					Option(L("Tell him to see to it himself"), "leave"),
-					Option(L("Ask about the Bube"), "explain")
+					Option(L("Ask about the Vubbes"), "explain")
 				);
 
 				if (answer == "explain")
 				{
-					await dialog.Msg(L("They are not clever, but they form packs and have their own society. They used to be seen only occasionally deep in the mine... perhaps they mean to expand their territory."));
-					await dialog.Msg(L("Whatever the reason, the Bube widening their range is serious. If the old inhabitants lose their home, they will be pushed into ours."));
+					await dialog.Msg(L("They have low intelligence, but these monsters build groups and live as a community. They used to appear only occasionally in the deeper areas of the mines... Could they be expanding their forces?"));
+					await dialog.Msg(L("Whatever the reason is, the Vubbes expanding their territory is a big problem. Monsters that lose their territory to the Vubbes will be forced to make their way into our base."));
 					return;
 				}
 
@@ -416,23 +421,30 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.IsCompletable(Request2))
 				{
-					await dialog.Msg(L("We have never sent a search party north. I would normally send a soldier, but the matter is urgent, so I ask you."));
+					await dialog.Msg(L("We haven't searched the upper areas yet. Of course we should be sending troops, but I ask for your help as this is an urgent matter."));
 					character.Quests.ReplayQuestTrack(Request2);
 					return;
 				}
 
-				await dialog.Msg(L("You saw the Bube Fighter but lost it. Reports have come in from the south too that a Bube Fighter appeared."));
-				await dialog.Msg(L("For now, meet the scout at the bridge below the Bulbes farm. If the Bube Fighter is lost, this will become a long, hard fight."));
+				await dialog.Msg(L("You saw a Vubbe Fighter but missed it? We also got a report of Vubbe Fighter appearing in the Southern area."));
+				await dialog.Msg(L("First, talk to the Search Scout by the bridge in the lower area of Bulves Farm. This will become a tedious, drawn out campaign if we let that Vubbe Fighter run loose."));
 				character.Quests.Complete(Request2);
+				dialog.UnHideNPC("SIAUL_EAST_SOLDIER8");
 				return;
 			}
 
-			await dialog.Msg(L("The Bube of the mining village may be pushing into these woods. It does not sit well."));
+			if (character.Quests.HasCompleted(Request6))
+			{
+				await dialog.Msg(L("I heard the stories. So you defeated the Vubbe Fighter, huh? That's incredible."));
+				return;
+			}
+
+			await dialog.Msg(L("It's very important to study the monsters at times like this. It's like weather forecasts where you try to understand the source to see what trends will happen."));
 		});
 
 		// Supply Soldier
 		//-------------------------------------------------------------------------
-		AddNpc(20011, L("Supply Soldier"), "SIAUL_EAST_SOLDIER5", "f_siauliai_2", 741, 411, 0, async dialog =>
+		AddNpc(20011, L("Supply Soldier"), "SIAUL_EAST_SOLDIER5", "f_siauliai_2", 670, 440, 0, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -507,10 +519,10 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Request6) && character.Quests.MeetsPrerequisites(Request6))
 			{
-				await dialog.Msg(L("Ah, it is you. I heard about it from the operations officer. The Bube Fighter is hiding deep inside the Nudegi logging camp."));
+				await dialog.Msg(L("Ah, it is you. I heard about it from the operations officer. The Vubbe Fighter is hiding deep inside the Nudegi logging camp."));
 				await dialog.Msg(L("The order to kill it has come down, but waiting for reinforcements might be safer."));
 
-				var answer = await dialog.Select(L("Will you go after the Bube Fighter without waiting?"),
+				var answer = await dialog.Select(L("Will you go after the Vubbe Fighter without waiting?"),
 					Option(L("Say you will kill it now"), "accept"),
 					Option(L("Say you will wait for reinforcements"), "leave")
 				);
@@ -525,7 +537,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.IsCompletable(Request6))
 				{
-					await dialog.Msg(L("I am only a scout, but this was the first time I saw a Bube Fighter up close."));
+					await dialog.Msg(L("I am only a scout, but this was the first time I saw a Vubbe Fighter up close."));
 					character.Quests.ReplayQuestTrack(Request6);
 					return;
 				}
@@ -535,7 +547,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			await dialog.Msg(L("The Bube Fighter keeps to the deep parts of the Nudegi logging camp."));
+			await dialog.Msg(L("The Vubbe Fighter keeps to the deep parts of the Nudegi logging camp."));
 		});
 
 		// Hidden triggers
@@ -634,7 +646,7 @@ public class SiaulEastCamp4Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(2));
 
-		AddObjective("killPoata", L("Kill the Poata at the camp"), new KillObjective(1, "boss_poata"));
+		AddObjective("killPoata", L("Kill the Poata at the camp"), new KillObjective(1, "boss_poata") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 		AddReward(new SelectItemReward("SWD02_115", "STF02_110", "TBW02_112", "MAC02_111"));
@@ -663,7 +675,7 @@ public class SiaulEastReclaim1Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(40010, QuestStatus.Completed));
 
-		AddObjective("killPokubu", L("Kill the Pokubu on the farm"), new KillObjective(4, "Pokubu"));
+		AddObjective("killPokubu", L("Kill the Pokubu on the farm"), new KillObjective(4, "Pokubu") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -717,7 +729,7 @@ public class SiaulEastReclaim3Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1033, QuestStatus.Completed));
 
-		AddObjective("killChupacabra", L("Clear the supply depot of Chupacabra"), new KillObjective(10, "Chupacabra_Blue", "Chupacabra_Ibory"));
+		AddObjective("killChupacabra", L("Clear the supply depot of Chupacabra"), new KillObjective(10, "Chupacabra_Blue", "Chupacabra_Ibory") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -771,7 +783,7 @@ public class SiaulEastReclaim7Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1036, QuestStatus.Completed));
 
-		AddObjective("killWeaver", L("Kill the Weaver"), new KillObjective(5, "Weaver"));
+		AddObjective("killWeaver", L("Kill the Weaver"), new KillObjective(5, "Weaver") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -793,11 +805,13 @@ public class SiaulEastRequest1Quest : QuestScript
 
 		SetPhase(QuestStatus.Possible, "SIAUL_EAST_MANAGER", "f_siauliai_2", L("Talk to Knight Ares"));
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_MANAGER", "f_siauliai_2", L("Find a clue from the Popolion"));
-		SetPhase(QuestStatus.Success, "SIAUL_EAST_SUPPLY_MANAGER2", "f_siauliai_2", L("Deliver the Bube cloth piece"));
+		SetPhase(QuestStatus.Success, "SIAUL_EAST_SUPPLY_MANAGER2", "f_siauliai_2", L("Deliver the Piece of Vubbe Cloth"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(1032, QuestStatus.Completed));
 
-		AddObjective("findClue", L("Find a clue from the Popolion"), new ManualObjective());
+		AddPityDrop(650407, 0.1f, 10, 1, 400981);
+
+		AddObjective("findClue", L("Kill Popolion to find a clue"), new CollectItemObjective("SIAUL_EAST_REQUEST1_Blood", 1));
 
 		AddReward(new ItemReward("expCard1", 1));
 		AddReward(new TakeItemReward("SIAUL_EAST_REQUEST1_Blood"));
@@ -812,7 +826,7 @@ public class SiaulEastRequest2Quest : QuestScript
 	{
 		SetClientId(1039);
 		SetName(L("Ares' Commission (2)"));
-		SetDescription(L("The operations officer suspects the Bube are pushing in from the mining village. Scout the northern woods."));
+		SetDescription(L("The operations officer suspects the Vubbes are pushing in from the mining village. Scout the northern woods."));
 		SetType(QuestType.Main);
 		SetLocation("f_siauliai_2");
 		SetAutoTracked(true);
@@ -826,7 +840,7 @@ public class SiaulEastRequest2Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1038, QuestStatus.Completed));
 
-		AddObjective("killBube", L("Kill the Vubbe Fighter's minions"), new KillObjective(8, "Goblin_Miners", "Popolion_Blue", "Goblin_Spear_Q1", "Goblin_Spear_summon"));
+		AddObjective("killBube", L("Kill the Vubbe Fighter's minions"), new KillObjective(8, "Goblin_Miners", "Popolion_Blue", "Goblin_Spear_Q1", "Goblin_Spear_summon") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -909,7 +923,7 @@ public class SiaulEastRequest6Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1039, QuestStatus.Completed));
 
-		AddObjective("killFighter", L("Kill the Vubbe Fighter"), new KillObjective(1, "boss_Goblin_Warrior"));
+		AddObjective("killFighter", L("Kill the Vubbe Fighter"), new KillObjective(1, "boss_Goblin_Warrior") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 2));
 	}
@@ -923,7 +937,7 @@ public class SiaulEastRequest7Quest : QuestScript
 	{
 		SetClientId(1044);
 		SetName(L("Entering the Mining Village"));
-		SetDescription(L("The Bube have pushed the refugees back. Clear the monsters chasing them, then speak with Ares again."));
+		SetDescription(L("The Vubbes have pushed the refugees back. Clear the monsters chasing them, then speak with Ares again."));
 		SetType(QuestType.Main);
 		SetLocation("f_siauliai_2");
 		SetAutoTracked(true);
@@ -937,7 +951,7 @@ public class SiaulEastRequest7Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1043, QuestStatus.Completed));
 
-		AddObjective("killChasers", L("Kill the monsters chasing the refugees"), new KillObjective(7, "Goblin_Spear_Q1", "Goblin_Archer_Q1"));
+		AddObjective("killChasers", L("Kill the monsters chasing the refugees"), new KillObjective(7, "Goblin_Spear_Q1", "Goblin_Archer_Q1") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 		AddReward(new ItemReward("TOP01_116", 1));
@@ -992,7 +1006,7 @@ public class Act2Diss1_2BossQuest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(4203, QuestStatus.Completed));
 
-		AddObjective("killTutu", L("Kill the Tutu"), new KillObjective(1, "boss_tutu"));
+		AddObjective("killTutu", L("Kill the Tutu"), new KillObjective(1, "boss_tutu") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}

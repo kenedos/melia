@@ -19,6 +19,12 @@ namespace Melia.Zone.World.Quests.Objectives
 		public HashSet<int> MonsterIds { get; }
 
 		/// <summary>
+		/// Returns whether only kills made on the character's own layer
+		/// count towards this objective.
+		/// </summary>
+		public bool LayerOnly { get; init; }
+
+		/// <summary>
 		/// Creates an objective to kill a certain amount of one of the
 		/// given types of monsters.
 		/// </summary>
@@ -168,6 +174,9 @@ namespace Melia.Zone.World.Quests.Objectives
 			character.Quests.UpdateObjectives<KillObjective>((quest, objective, progress) =>
 			{
 				if (progress.Done)
+					return;
+
+				if (objective.LayerOnly && (character.Layer == 0 || monster.Layer != character.Layer))
 					return;
 
 				if (objective.IsTarget(monster))

@@ -805,7 +805,7 @@ public class SiaulWestDrasius1Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1002, QuestStatus.Completed));
 
-		AddObjective("killKepa", L("Kill the swarming Kepa"), new KillObjective(4, "Onion"));
+		AddObjective("killKepa", L("Kill the swarming Kepa"), new KillObjective(4, "Onion") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -914,7 +914,7 @@ public class SiaulWestMeetNaglisQuest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1004, QuestStatus.Completed));
 
-		AddObjective("killLargeKepa", L("Kill the charging Large Kepa"), new KillObjective(1, "Onion_Big"));
+		AddObjective("killLargeKepa", L("Kill the charging Large Kepa"), new KillObjective(1, "Onion_Big") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -940,7 +940,7 @@ public class SiaulWestOnionBigQuest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_WEST_ONION_BIG_TRACK", 4000, autoStart: false, partyPlay: true);
 
-		AddObjective("killHiddenKepa", L("Kill the Large Kepa"), new KillObjective(1, "Onion_Big_Q1"));
+		AddObjective("killHiddenKepa", L("Kill the Large Kepa"), new KillObjective(1, "Onion_Big_Q1") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -992,7 +992,7 @@ public class SiaulWestLaimonas32Quest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_WEST_LAIMONAS3_2_TRACK", 4000, autoStart: false, partyPlay: true);
 
-		AddObjective("killMushcaria", L("Kill the Mushcaria"), new KillObjective(1, "boss_mushcaria"));
+		AddObjective("killMushcaria", L("Kill the Mushcaria"), new KillObjective(1, "boss_mushcaria") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 3));
 		AddReward(new ItemReward("Drug_SP1_Q", 3));
@@ -1075,7 +1075,7 @@ public class SiaulWestBossGolemQuest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "SIAUL_WEST_BOSS_GOLEM_TRACK", 4000, autoStart: false, partyPlay: true);
 
-		AddObjective("killGolem", L("Kill the Golem"), new KillObjective(1, "boss_Golem"));
+		AddObjective("killGolem", L("Kill the Golem"), new KillObjective(1, "boss_Golem") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 3));
 		AddReward(new ItemReward("Drug_Haste1_Q", 3));
@@ -1128,7 +1128,7 @@ public class SiaulWestWoodSpiritQuest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1018, QuestStatus.Completed));
 
-		AddObjective("killRocktortuga", L("Kill the Rocktortuga that appeared"), new KillObjective(1, "boss_Rocktortuga"));
+		AddObjective("killRocktortuga", L("Kill the Rocktortuga that appeared"), new KillObjective(1, "boss_Rocktortuga") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 3));
 	}

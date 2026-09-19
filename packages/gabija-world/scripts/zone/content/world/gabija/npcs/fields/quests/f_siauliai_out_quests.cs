@@ -985,7 +985,7 @@ public class SoutQ13Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(6));
 
-		AddObjective("killVubbes", L("Defeat the Vubbes"), new KillObjective(8, "Goblin_Spear", "Goblin_Archer_Q2"));
+		AddObjective("killVubbes", L("Defeat the Vubbes"), new KillObjective(8, "Goblin_Spear", "Goblin_Archer_Q2") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -1013,7 +1013,7 @@ public class SoutQ14Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8067, QuestStatus.Completed));
 
-		AddObjective("killVubbes", L("Defeat the Vubbes"), new KillObjective(5, "Goblin_Spear", "Goblin_Archer_Q2"));
+		AddObjective("killVubbes", L("Defeat the Vubbes"), new KillObjective(5, "Goblin_Spear", "Goblin_Archer_Q2") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 2));
 	}
@@ -1041,7 +1041,7 @@ public class SoutQ15Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(6));
 
-		AddObjective("killFighter", L("Defeat the Red Vubbe Fighter"), new KillObjective(1, "boss_Goblin_Warrior_red"));
+		AddObjective("killFighter", L("Defeat the Red Vubbe Fighter"), new KillObjective(1, "boss_Goblin_Warrior_red") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 2));
 		AddReward(new ItemReward("Drug_SP1_Q", 30));
@@ -1100,7 +1100,7 @@ public class SoutSuddPrebossQuest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8076, QuestStatus.Completed));
 
-		AddObjective("killChafer", L("Defeat Chafer that is blocking the way"), new KillObjective(1, "boss_chafer_sout"));
+		AddObjective("killChafer", L("Defeat Chafer that is blocking the way"), new KillObjective(1, "boss_chafer_sout") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 3));
 		AddReward(new ItemReward("TreasureboxKey2", 1));
