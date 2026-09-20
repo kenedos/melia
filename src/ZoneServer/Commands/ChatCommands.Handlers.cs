@@ -69,6 +69,7 @@ namespace Melia.Zone.Commands
 			this.Add("buyabilpoint", "<amount>", "", this.HandleBuyAbilPoint);
 			this.Add("guildexpup", "", "", this.HandleGuildExpUp);
 			this.Add("intewarp", "<warp id> 0", "", this.HandleInteWarp);
+			this.Add("intewarpByItem", "<warp id> 0 <item world id>", "", this.HandleInteWarpByItem);
 			this.Add("intewarpByToken", "<destination>", "", this.HandleTokenWarp);
 			this.Add("mic", "<message>", "", this.HandleMic);
 			this.Add("hairgacha", "<type>", "", this.HandleHairGacha);
@@ -5225,6 +5226,90 @@ namespace Melia.Zone.Commands
 			if (!ZoneServer.Instance.World.NPCs.TryGetValue($"{warpData.ClassName}_{warpData.Zone}", out var npc))
 			{
 				Log.Debug("HandleInteWarp: Failed to find npc by class name '{0}': {1} : {2}", sender.Connection.Account.Name, commandName, warpData.ClassName);
+				return CommandResult.Okay;
+			}
+
+			if (unk1 == 0 || unk1 == 1)
+			{
+				var mapId = npc.Map.Id;
+				var newPosition = npc.Position.GetRelative(npc.Direction, 50);
+				var newDirection = -npc.Direction;
+				sender.SetDirection(newDirection);
+				sender.Warp(mapId, newPosition);
+			}
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Client slash command to warp via a consumed scroll item.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleInteWarpByItem(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			if (args.Count != 3)
+			{
+				Log.Debug("HandleInteWarpByItem: Invalid call by user '{0}': {1}", sender.Connection.Account.Name, commandName);
+				return CommandResult.Okay;
+			}
+
+			var warp = "";
+			WarpData warpData = null;
+			if (!int.TryParse(args.Get(0), out var warpId))
+			{
+				warp = args.Get(0);
+			}
+
+			if (ZoneServer.Instance.Data.MapDb.TryFind(warpId, out var mapData))
+			{
+				warp = mapData.ClassName;
+				warpId = 0;
+			}
+
+			if (warpId != 0 && !ZoneServer.Instance.Data.WarpDb.TryFind(warpId, out warpData))
+			{
+				Log.Debug("HandleInteWarpByItem: Failed to find warp by id {0}, User: '{1}': {2}", args.Get(0), sender.Connection.Account.Name, commandName);
+				return CommandResult.Okay;
+			}
+
+			if (!string.IsNullOrEmpty(warp) && !ZoneServer.Instance.Data.WarpDb.TryFind(warp, out warpData))
+			{
+				Log.Debug("HandleInteWarpByItem: Failed to find warp by name {0}, User: '{1}': {2}", args.Get(0), sender.Connection.Account.Name, commandName);
+				return CommandResult.Okay;
+			}
+
+			if (!int.TryParse(args.Get(1), out var unk1))
+			{
+				Log.Debug("HandleInteWarpByItem: Failed to find parse by second arg '{0}': {1}", sender.Connection.Account.Name, commandName);
+				return CommandResult.Okay;
+			}
+
+			if (!long.TryParse(args.Get(2), out var itemWorldId))
+			{
+				Log.Debug("HandleInteWarpByItem: Failed to parse item world id '{0}': {1}", sender.Connection.Account.Name, commandName);
+				return CommandResult.Okay;
+			}
+
+			if (!ZoneServer.Instance.World.NPCs.TryGetValue($"{warpData.ClassName}_{warpData.Zone}", out var npc))
+			{
+				Log.Debug("HandleInteWarpByItem: Failed to find npc by class name '{0}': {1} : {2}", sender.Connection.Account.Name, commandName, warpData.ClassName);
+				return CommandResult.Okay;
+			}
+
+			if (!sender.Inventory.TryGetItem(itemWorldId, out var scrollItem))
+			{
+				Log.Debug("HandleInteWarpByItem: Failed to find scroll item {0}, User: '{1}': {2}", itemWorldId, sender.Connection.Account.Name, commandName);
+				return CommandResult.Okay;
+			}
+
+			if (sender.Inventory.Remove(scrollItem, 1, InventoryItemRemoveMsg.Used) != InventoryResult.Success)
+			{
+				Log.Debug("HandleInteWarpByItem: Failed to remove scroll item {0}, User: '{1}': {2}", itemWorldId, sender.Connection.Account.Name, commandName);
 				return CommandResult.Okay;
 			}
 
