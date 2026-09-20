@@ -541,12 +541,12 @@ namespace Melia.Zone.Scripting.Dialogues
 		/// </remarks>
 		/// <param name="questClientId"></param>
 		/// <returns></returns>
-		public async Task<int> SelectQuestReward(int questClientId)
+		public async Task<int> SelectQuestReward(int questClientId, bool allowAckToConfirm = true)
 		{
 			this.Player.AddonMessage(AddonMessage.SHOW_QUEST_SEL_DLG, null, questClientId);
 
 			this.ExpectedResponseType = DialogResponseType.Select;
-			this.AcksAsDefaultSelect = true;
+			this.AcksAsDefaultSelect = allowAckToConfirm;
 
 			string response;
 			try { response = await this.GetClientResponse(); }
@@ -666,13 +666,19 @@ namespace Melia.Zone.Scripting.Dialogues
 				return;
 			}
 
-			var pick = await this.SelectQuestReward((int)questId.Value);
+			var hasSelectReward = this.Player.Quests.TryGetSelectItemReward(questId, out var reward);
+
+			// A quest with a pick-one-of reward can't be confirmed with
+			// the space bar's bare ack - the client itself blocks a mouse
+			// confirm the same way until an item is actually clicked, so
+			// the space bar has to be left with nothing to do here too.
+			var pick = await this.SelectQuestReward((int)questId.Value, allowAckToConfirm: !hasSelectReward);
 
 			// 0 is the client's own cancel response
 			if (pick == 0)
 				return;
 
-			if (this.Player.Quests.TryGetSelectItemReward(questId, out var reward) && pick >= 1 && pick <= reward.ItemClassIds.Count)
+			if (hasSelectReward && pick >= 1 && pick <= reward.ItemClassIds.Count)
 				this.Player.Quests.SelectReward(questId, reward.ItemClassIds[pick - 1]);
 
 			this.Player.Quests.Complete(questId);
