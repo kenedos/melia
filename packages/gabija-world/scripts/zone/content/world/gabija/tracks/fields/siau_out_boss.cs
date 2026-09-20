@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -33,7 +34,7 @@ public class SiauOutBossTrack : TrackScript
 		actors.Add(AddTrackActor(character, 400203, 1454.2178, 228.86983, 508.65002, 0, new TrackActorSpec { Ai = "BasicBoss" }));
 		actors.Add(AddTrackActor(character, 11160, 1380.3358, 229.55901, 507.60181, 33, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1439.7379f, 229.569f, 494.93356f) }));
 		actors.Add(AddTrackActor(character, 11160, 1452.542, 229.569, 600.01093, 42, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1466.429f, 225.24919f, 517.83826f) }));
-		actors.Add(AddTrackActor(character, 147392, 1650, 147, 438, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
+		actors.Add(AddTrackActor(character, 147392, 1650, 147, 438, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

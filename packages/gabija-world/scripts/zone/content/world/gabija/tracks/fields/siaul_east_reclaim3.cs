@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -37,9 +38,9 @@ public class SiaulEastReclaim3Track : TrackScript
 		actors.Add(AddTrackActor(character, 400961, 728.7802, 130.0327, -510.7052, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 400961, 691.7792, 130.0327, -536.3315, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
-		actors.Add(AddTrackActor(character, 45315, 484.8353, 130.0227, -509.8344, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
-		actors.Add(AddTrackActor(character, 45315, 480.3688, 130.0227, -471.7313, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
-		actors.Add(AddTrackActor(character, 45315, 579.6265, 130.0227, -454.002, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
+		actors.Add(AddTrackActor(character, 45315, 484.8353, 130.0227, -509.8344, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 45315, 480.3688, 130.0227, -471.7313, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 45315, 579.6265, 130.0227, -454.002, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
 
 		actors.Add(AddTrackActor(character, 20047, 579.3231, 130.0227, -448.8316, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
 		actors.Add(AddTrackActor(character, 20047, 484.5941, 130.0227, -512.1528, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));

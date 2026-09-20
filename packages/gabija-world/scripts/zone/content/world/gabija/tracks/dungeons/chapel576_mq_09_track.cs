@@ -30,7 +30,7 @@ public class Chaple576Mq09Track : TrackScript
 
 		character.Movement.MoveTo(new Position(-548.95f, 10.97f, 440.23f));
 
-		actors.Add(AddTrackActor(character, 147358, -523, 12, 446, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Central Altar") }));
+		actors.Add(AddTrackActor(character, 147358, -523, 12, 446, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Central Altar") }));
 		actors.Add(AddTrackActor(character, 47502, -525.00, 0.49, 304.46, 0, new TrackActorSpec { Ai = "BasicBoss" }));
 		actors.Add(AddTrackActor(character, 40069, -837.16, 2.83, 414.59, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 40069, -559.04, 1.39, 784.21, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));

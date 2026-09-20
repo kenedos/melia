@@ -33,7 +33,7 @@ public class Huevillage581Sq01Track : TrackScript
 		actors.Add(AddTrackActor(character, 47124, -1250, 230, 490, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Neutral, Name = L("Nugria Altar") }));
 		actors.Add(AddTrackActor(character, 20025, -397.5957, 230.9787, -162.95171, 121, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-969.63092f, 230.9787f, 330.80563f) }));
 		actors.Add(AddTrackActor(character, 20025, -363.27374, 230.9787, -162.91429, 189, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-947.07019f, 230.9787f, 362.02243f) }));
-		actors.Add(AddTrackActor(character, 147487, -805.69928, 229.36487, 227.8291, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 147487, -805.69928, 229.36487, 227.8291, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 20025, -810.88, 278.13226, 234.40625, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 20025, -628.14569, 229.36487, -53.80838, 3, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-621.53571f, 230.9787f, -53.663376f) }));
 

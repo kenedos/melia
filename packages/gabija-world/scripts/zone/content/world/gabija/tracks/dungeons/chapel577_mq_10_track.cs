@@ -30,7 +30,7 @@ public class Chaple577Mq10Track : TrackScript
 
 		character.Movement.MoveTo(new Position(831.48f, 35.92f, -1258.44f));
 
-		actors.Add(AddTrackActor(character, 47234, 949.82, 35.92, -1243.26, 15, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Revelation of the Goddess") }));
+		actors.Add(AddTrackActor(character, 47234, 949.82, 35.92, -1243.26, 15, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Revelation of the Goddess") }));
 		actors.Add(character);
 
 		return actors.ToArray();

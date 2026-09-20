@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -39,7 +40,7 @@ public class SiaulWestOnionBigTrack : TrackScript
 		actors.Add(AddTrackActor(character, 400001, -1798, 261, 193, 40, kepa));
 		actors.Add(AddTrackActor(character, 400001, -1818, 261, 251, 110, kepa));
 
-		actors.Add(AddTrackActor(character, 40080, -1693, 261, -150, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
+		actors.Add(AddTrackActor(character, 40080, -1693, 261, -150, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
 
 		actors.Add(character);
 

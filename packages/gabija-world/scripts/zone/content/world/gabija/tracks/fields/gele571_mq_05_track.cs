@@ -31,7 +31,7 @@ public class Gele571Mq05Track : TrackScript
 		character.Movement.MoveTo(new Position(782.32f, 368.01f, -1392.89f));
 
 		actors.Add(AddTrackActor(character, 57115, 792.61, 368.02, -1355.09, 72, new TrackActorSpec { Ai = "BasicBoss" }));
-		actors.Add(AddTrackActor(character, 47203, 793, 368, -1362, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Poata's Nest") }));
+		actors.Add(AddTrackActor(character, 47203, 793, 368, -1362, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Poata's Nest") }));
 
 		actors.Add(character);
 

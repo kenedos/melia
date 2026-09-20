@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -30,7 +31,7 @@ public class Act4Mine3EnterTrack : TrackScript
 
 		character.Movement.MoveTo(new Position(114.4157f, 183.9297f, -159.437f));
 
-		actors.Add(AddTrackActor(character, 151014, 129.075, 183.6362, -112.4293, 590, new TrackActorSpec { Ai = "TrackWaitMonster", Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 151014, 129.075, 183.6362, -112.4293, 590, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
 		actors.Add(AddTrackActor(character, 20024, 129.08, 183.64, -112.43, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = "UnvisibleName" }));
 		actors.Add(character);
 

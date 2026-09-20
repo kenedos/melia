@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -35,8 +36,8 @@ public class Mine1Crystal10Track : TrackScript
 		actors.Add(AddTrackActor(character, 11125, 1122.5378, 3.5999451, 94.292755, 64, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(698.30261f, 56.105515f, -83.444496f) }));
 		actors.Add(AddTrackActor(character, 11125, 1116.1083, 3.599905, 77.737038, 64, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(609.60681f, 17.045462f, 3.4723752f) }));
 		actors.Add(AddTrackActor(character, 41244, 1236.3376, 3.5899, 190.59451, 67, new TrackActorSpec { EndPosition = new Position(963.79156f, 4.9040103f, 36.910728f) }));
-		actors.Add(AddTrackActor(character, 147453, 748.1676, 17.458778, 103.72282, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 151004, 1072.24, 3.5899, 79.316086, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 147453, 748.1676, 17.458778, 103.72282, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 151004, 1072.24, 3.5899, 79.316086, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
 		actors.Add(AddTrackActor(character, 20024, 1115.4824, 3.5899, 68.214417, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = "UnvisibleName" }));
 
 		return actors.ToArray();

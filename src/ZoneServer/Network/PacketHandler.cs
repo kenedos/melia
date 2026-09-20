@@ -1747,7 +1747,14 @@ namespace Melia.Zone.Network
 			// escape is pressed, to cancel the dialog.
 			if (ack == DialogAcknowledgement.Okay)
 			{
-				conn.CurrentDialog.Resume(null, DialogResponseType.Ack);
+				// Confirming a quest reward window with the space bar sends
+				// a bare CZ_DIALOG_ACK rather than the CZ_DIALOG_SELECT a
+				// mouse click on its button sends, so it has to be resumed
+				// as a Select with the client's own no-selection sentinel.
+				if (conn.CurrentDialog.State == DialogState.Waiting && conn.CurrentDialog.ExpectedResponseType == DialogResponseType.Select && conn.CurrentDialog.AcksAsDefaultSelect)
+					conn.CurrentDialog.Resume("100", DialogResponseType.Select);
+				else
+					conn.CurrentDialog.Resume(null, DialogResponseType.Ack);
 			}
 			else
 			{

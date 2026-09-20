@@ -37,7 +37,7 @@ public class SiauOutAlcheTrack : TrackScript
 		actors.Add(AddTrackActor(character, 11120, 1248.7701, 197.92439, 237.68936, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 57266, 1331.5354, 197.91174, 153.59682, 21, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1326.6726f, 197.59752f, 211.90953f) }));
 		actors.Add(AddTrackActor(character, 57266, 1357.8835, 196.68309, 378.63419, 26, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1415.3765f, 196.68309f, 331.75012f) }));
-		actors.Add(AddTrackActor(character, 47226, 1335.5791, 147.36159, 284.73895, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
+		actors.Add(AddTrackActor(character, 47226, 1335.5791, 147.36159, 284.73895, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 20110, 1302.6486, 147.36159, 319.43243, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Vaidotas"), Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();

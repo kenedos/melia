@@ -37,9 +37,9 @@ public class Chaple577Mq09Track : TrackScript
 		actors.Add(AddTrackActor(character, 40071, -234.81, 35.92, -226.78, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 40071, -117.63, 35.92, -311.72, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 40071, 76.77, 35.92, -312.60, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 147352, 134, 165, -576, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 147373, 112.36, 164.86, -606.13, 4, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 152003, 207.14, 164.86, -582.65, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 147352, 134, 165, -576, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 147373, 112.36, 164.86, -606.13, 4, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 152003, 207.14, 164.86, -582.65, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

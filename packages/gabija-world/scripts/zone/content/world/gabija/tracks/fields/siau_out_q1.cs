@@ -42,7 +42,7 @@ public class SiauOutQ1Track : TrackScript
 		actors.Add(AddTrackActor(character, 11120, 390.11716, 37.4188, -1120.5322, 58, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(505.48935f, 37.4188f, -1044.0007f) }));
 		actors.Add(AddTrackActor(character, 10023, 251.12672, 37.4188, -1315.533, 64, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(354.09637f, 37.4188f, -1313.3849f) }));
 		actors.Add(AddTrackActor(character, 41206, 119.87142, 41.057682, -1452.5143, 54, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(107.95893f, 59.224022f, -1175.3545f) }));
-		actors.Add(AddTrackActor(character, 40120, 228, 42, -1210, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 40120, 228, 42, -1210, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

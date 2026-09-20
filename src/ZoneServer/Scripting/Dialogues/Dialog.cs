@@ -95,6 +95,14 @@ namespace Melia.Zone.Scripting.Dialogues
 		public DialogResponseType ExpectedResponseType { get; private set; }
 
 		/// <summary>
+		/// Returns true if a bare CZ_DIALOG_ACK, sent when the player
+		/// confirms with the space bar instead of clicking an option,
+		/// should resume this Select wait with the client's own
+		/// no-selection-made sentinel rather than being ignored.
+		/// </summary>
+		internal bool AcksAsDefaultSelect { get; private set; }
+
+		/// <summary>
 		/// Returns the data for a potentially open shop.
 		/// </summary>
 		public ShopData Shop { get; private set; }
@@ -538,7 +546,11 @@ namespace Melia.Zone.Scripting.Dialogues
 			this.Player.AddonMessage(AddonMessage.SHOW_QUEST_SEL_DLG, null, questClientId);
 
 			this.ExpectedResponseType = DialogResponseType.Select;
-			var response = await this.GetClientResponse();
+			this.AcksAsDefaultSelect = true;
+
+			string response;
+			try { response = await this.GetClientResponse(); }
+			finally { this.AcksAsDefaultSelect = false; }
 
 			if (!int.TryParse(response, out var selectedIndex))
 			{

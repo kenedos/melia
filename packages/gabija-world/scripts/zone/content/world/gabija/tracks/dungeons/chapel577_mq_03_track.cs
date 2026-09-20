@@ -31,11 +31,11 @@ public class Chaple577Mq03Track : TrackScript
 		character.Movement.MoveTo(new Position(119.08f, 164.87f, -600.97f));
 
 		actors.Add(character);
-		actors.Add(AddTrackActor(character, 147358, -27, 38, -137, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Sventove Central Altar") }));
+		actors.Add(AddTrackActor(character, 147358, -27, 38, -137, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Sventove Central Altar") }));
 		actors.Add(AddTrackActor(character, 147390, 110, 165, -579, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Follower Algis") }));
-		actors.Add(AddTrackActor(character, 147352, 134, 164, -576, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 147352, 134, 164, -576, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 147371, -129.44, 35.92, -139.33, 31, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-73.39f, 48.71f, -143.65f) }));
-		actors.Add(AddTrackActor(character, 152003, 207.33, 164.86, -582.63, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 152003, 207.33, 164.86, -582.63, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

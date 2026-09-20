@@ -32,8 +32,8 @@ public class Gele572Mq05Track : TrackScript
 
 		actors.Add(AddTrackActor(character, 57151, 988.86, 503.86, -1133.54, 9, new TrackActorSpec { Ai = "BasicBoss" }));
 		actors.Add(character);
-		actors.Add(AddTrackActor(character, 153067, 990.90, 503.86, -1143.57, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 153068, 985.11, 503.86, -1126.59, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 153067, 990.90, 503.86, -1143.57, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 153068, 985.11, 503.86, -1126.59, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 20026, 1003.61, 503.86, -1279.15, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();

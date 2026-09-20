@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -34,7 +35,7 @@ public class SiaulEastReclaim1Track : TrackScript
 		actors.Add(AddTrackActor(character, 401341, 184.7356, 130.0327, 188.8459, 39, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(217.78065f, 130.03270f, 166.33551f) }));
 		actors.Add(AddTrackActor(character, 401341, 244.9962, 130.0327, 205.5328, 30, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(254.44081f, 130.03270f, 178.88547f) }));
 		actors.Add(AddTrackActor(character, 401341, 387.402, 130.0327, 505.1969, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40120, 233, 157, 724, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 40120, 233, 157, 724, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

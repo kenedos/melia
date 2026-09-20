@@ -63,7 +63,7 @@ public class SiaulEastRequest7Track : TrackScript
 		actors.Add(AddTrackActor(character, 57192, 787.44415, 130.02271, 260.29916, 73, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(456.40231f, 130.02271f, 374.17734f) }));
 		actors.Add(AddTrackActor(character, 57193, 814.35852, 130.0327, 202.93602, 61, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(553.55096f, 130.03270f, 336.36453f) }));
 		actors.Add(AddTrackActor(character, 57192, 771.22968, 130.0327, 212.34544, 75, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(537.12018f, 130.03270f, 374.36612f) }));
-		actors.Add(AddTrackActor(character, 40120, 233, 157, 724, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 40120, 233, 157, 724, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 57192, 579.28333, 162.4583, 679.73444, 59, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(495.11145f, 130.02271f, 406.11945f) }));
 		actors.Add(AddTrackActor(character, 57192, 690.33923, 130.02271, 306.6019, 56, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(391.39587f, 130.02271f, 370.54623f) }));
 

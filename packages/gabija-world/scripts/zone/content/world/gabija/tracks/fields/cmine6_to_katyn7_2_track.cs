@@ -30,7 +30,7 @@ public class Cmine6ToKatyn72Track : TrackScript
 
 		actors.Add(AddTrackActor(character, 20136, -22.83, 0.01, 32.79, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 154040, -63.55, 0.01, -19.95, 10, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47234, -4.82, 0.01, -4.23, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 47234, -4.82, 0.01, -4.23, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

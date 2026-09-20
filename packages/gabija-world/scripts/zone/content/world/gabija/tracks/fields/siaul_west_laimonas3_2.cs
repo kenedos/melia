@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -46,7 +47,7 @@ public class SiaulWestLaimonas32Track : TrackScript
 		};
 		actors.Add(AddTrackActor(character, 41217, 1170, 285, 634, 116, mushu));
 
-		actors.Add(AddTrackActor(character, 40110, 1687, 285, 366, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
+		actors.Add(AddTrackActor(character, 40110, 1687, 285, 366, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

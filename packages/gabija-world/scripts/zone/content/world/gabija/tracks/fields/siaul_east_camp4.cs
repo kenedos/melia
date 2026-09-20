@@ -61,6 +61,7 @@ public class SiaulEastCamp4Track : TrackScript
 		actors.Add(AddTrackActor(character, 40120, 163.3164, 151.7621, 805.4705, 0, new TrackActorSpec
 		{
 			Ai = "TrackWaitMonster",
+			Faction = FactionType.Our_Forces,
 		}));
 
 		actors.Add(AddTrackActor(character, 41248, 353.1152, 130.0227, 509.4945, 187, new TrackActorSpec

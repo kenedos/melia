@@ -40,7 +40,7 @@ public class Chaple576Mq04After : TrackScript
 		}));
 		actors.Add(AddTrackActor(character, 20026, -1708.23, 0.42, 404.94, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(character);
-		actors.Add(AddTrackActor(character, 147379, -1777.82, 0.42, 425.83, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 147379, -1777.82, 0.42, 425.83, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 147399, -1911.56, -42.13, 390.54, 0, new TrackActorSpec
 		{
 			Name = L("Follower Donatas"),

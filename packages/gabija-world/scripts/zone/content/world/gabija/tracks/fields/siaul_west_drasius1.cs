@@ -65,7 +65,7 @@ public class SiaulWestDrasius1Track : TrackScript
 			EndPosition = new Position(-1154f, 261f, -591f),
 		}));
 
-		actors.Add(AddTrackActor(character, 40070, -1277, 261, -614, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 40070, -1277, 261, -614, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

@@ -29,10 +29,10 @@ public class ChapelGestiAfterRun : TrackScript
 		var actors = new List<IActor>();
 
 		actors.Add(AddTrackActor(character, 57055, -26.67, 48.71, -138.74, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Demon Queen Gesti") }));
-		actors.Add(AddTrackActor(character, 152003, 207.33, 164.86, -582.46, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 147352, 133.94, 164.86, -576.69, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 152003, 207.33, 164.86, -582.46, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 147352, 133.94, 164.86, -576.69, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 147390, 107.76, 164.86, -579.87, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = L("Follower Algis") }));
-		actors.Add(AddTrackActor(character, 147373, 114, 164, -611, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 147373, 114, 164, -611, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

@@ -7,6 +7,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -31,7 +32,7 @@ public class Mine1Crystal9Track : TrackScript
 		character.Movement.MoveTo(new Position(1023.8325f, 32.716499f, -1093.7736f));
 
 		actors.Add(AddTrackActor(character, 401141, 1306.8839, 32.716499, -896.01312, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 151007, 1295.7629, 32.716499, -905.01337, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 151007, 1295.7629, 32.716499, -905.01337, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
 		actors.Add(character);
 
 		return actors.ToArray();

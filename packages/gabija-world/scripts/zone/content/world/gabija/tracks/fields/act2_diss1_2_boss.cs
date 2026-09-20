@@ -44,9 +44,9 @@ public class Act2Diss1_2BossTrack : TrackScript
 
 		actors.Add(AddTrackActor(character, 20016, 661.28607, 130.02271, -453.11606, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Peaceful }));
 
-		actors.Add(AddTrackActor(character, 153056, 484.20767, 130.02271, -515.74225, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
-		actors.Add(AddTrackActor(character, 153056, 484.59668, 130.02271, -475.65164, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
-		actors.Add(AddTrackActor(character, 153056, 584.47369, 130.02271, -449.40775, 0, new TrackActorSpec { Ai = "MON_DUMMY" }));
+		actors.Add(AddTrackActor(character, 153056, 484.20767, 130.02271, -515.74225, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 153056, 484.59668, 130.02271, -475.65164, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
+		actors.Add(AddTrackActor(character, 153056, 584.47369, 130.02271, -449.40775, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
 
 		character.Movement.MoveTo(new Position(670.43182f, 130.02271f, -473.47852f));
 		actors.Add(character);
