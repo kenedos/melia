@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Veja Ravine Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Old Man of Andale Village, the Holy Pond, the injured villager and the
@@ -141,6 +141,11 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var purified18110 = await character.TimeActions.StartAsync(L("Purifying..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+					if (purified18110 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Mq02);
 					return;
 				}
@@ -156,6 +161,11 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var looked18170 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+					if (looked18170 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Sq03);
 					return;
 				}
@@ -234,7 +244,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq03))
 			{
 				await dialog.Msg(L("Behind you - they came out of the brush!"));
-				character.Quests.ReplayQuestTrack(Mq03);
+				character.Quests.ClearQuestTrack(Mq03);
 				return;
 			}
 
@@ -259,6 +269,11 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
 				await dialog.Msg(L("You lay both hands on the altar. The ring of script around it stays cold."));
+				var checked18130 = await character.TimeActions.StartAsync(L("Checking it..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+				if (checked18130 != TimeActionResult.Completed)
+					return;
+
 				character.Quests.CompleteObjective(Mq04, "checkPortal");
 				character.ServerMessage(L("The portal is not working."));
 				return;
@@ -384,7 +399,8 @@ public class Huevillage581Mq01Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30031, QuestStatus.Completed));
 
-		AddDrop(650654, 1f, 47472);
+		AddPityDrop("HUEVILLAGE_58_1_MQ01_ITEM1", 1.0f, 0, 1, "Tanu");
+
 		AddObjective("collectStones", L("Collect Tanu's Purifying Stone"), new CollectItemObjective("HUEVILLAGE_58_1_MQ01_ITEM1", 12));
 
 		AddReward(new ItemReward("expCard3", 2));

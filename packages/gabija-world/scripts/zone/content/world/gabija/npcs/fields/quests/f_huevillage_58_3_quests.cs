@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Cobalt Forest Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Andale Village priest and headman, the herbs and barrels their bomb is
@@ -11,6 +11,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -61,8 +62,8 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("You're the Revelator, right?"));
 
 				var answer = await dialog.Select(L("Upents are preying on the village so we can't hold the ritual right now."),
-					Option(L("Ask how to help defeat the Upent"), "accept"),
-					Option(L("About the Ritual"), "explain"),
+					Option(L("How do I deal with the Upents?"), "accept"),
+					Option(L("What ritual is this?"), "explain"),
 					Option(L("I'll wait then"), "leave")
 				);
 
@@ -218,6 +219,11 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
 			{
+				var gatheredFlower = await character.TimeActions.StartAsync(L("Gathering the flower..."), L("Cancel"), "#SITGROPESET", TimeSpan.FromSeconds(3));
+
+				if (gatheredFlower != TimeActionResult.Completed)
+					return;
+
 				character.Inventory.Add(ItemId.HUEVILLAGE_58_3_MQ02_ITEM1, 1, InventoryAddType.PickUp);
 				await dialog.Msg(L("You cut the flower at the stem. The scent of it clings to your hands."));
 				character.ServerMessage(L("You obtained the Strongly Scented Soul Flower. Return to the village priest."));
@@ -272,6 +278,11 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You set the Languid Herb Bomb down among the sleeping Upents and step back."));
 				character.Inventory.RemoveItem(ItemId.HUEVILLAGE_58_3_MQ03_ITEM2, 1);
+				var setBomb = await character.TimeActions.StartAsync(L("Setting the Languid Herb bomb..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+				if (setBomb != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq04);
 				return;
 			}
@@ -289,7 +300,12 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Sq01) && character.Quests.IsCompletable(Sq01))
 			{
-				await dialog.Msg(L("The bucket comes up on the rope with something tangled in the handle - a necklace, and a scrap of writing with it."));
+				var pulled20287 = await character.TimeActions.StartAsync(L("Pulling it out of the well..."), L("Cancel"), "DRAW", TimeSpan.FromSeconds(3));
+
+				if (pulled20287 != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The bucket comes up on the rope with something tangled in the handle - a necklace, and a scrap of writing with it."));
 				character.Quests.Complete(Sq01);
 				character.ServerMessage(L("You found someone's keepsake in the well!"));
 				return;
@@ -304,6 +320,11 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var looked20287 = await character.TimeActions.StartAsync(L("Looking into the well..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (looked20287 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Sq01);
 					character.ServerMessage(L("Look for a tool that can get the thing out of the well."));
 					return;

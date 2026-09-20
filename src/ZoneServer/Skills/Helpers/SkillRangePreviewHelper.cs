@@ -32,19 +32,6 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
-		/// Draws a debug outline of an area a skill searched, for the default
-		/// duration. For areas resolved without a skill's timings to size the
-		/// preview by.
-		/// </summary>
-		public static void ShowRangePreview(ICombatEntity caster, IShapeF area)
-		{
-			if (!IsPreviewEnabled(caster))
-				return;
-
-			Debug.ShowShape(caster.Map, area, SkillConstants.DefaultDebugShapeDuration);
-		}
-
-		/// <summary>
 		/// Returns whether the caster should be shown range previews.
 		/// </summary>
 		/// <param name="caster"></param>

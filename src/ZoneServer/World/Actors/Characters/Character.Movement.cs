@@ -447,6 +447,12 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public override bool CanSee(IActor actor)
 		{
+			// Checked ahead of the Always shortcut, since an NPC that is
+			// only there for part of a quest chain must stay away from
+			// everyone else regardless of its visibility flag.
+			if (actor is Npc conditionalNpc && conditionalNpc.VisibleTo != null && !conditionalNpc.VisibleTo(this))
+				return false;
+
 			if (actor.Visibility == ActorVisibility.Always)
 				return true;
 

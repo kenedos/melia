@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Capria at Spalva Junction
 //--- Description -----------------------------------------------------------
 // Molly's plan to tame the Pantos, and how it ends.
@@ -52,6 +52,10 @@ public class Gele571Mq07Track : TrackScript
 				RemoveTrackActor(character, track, 5);
 				break;
 			case 59:
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Gele Plateau Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Watchers of Gele Plateau and the totems and beasts their quests run on.
@@ -65,9 +65,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("Please bring me the Mali seeds on the way to Labure Highway."));
-				await dialog.Msg(L("They would be a good source of magic for the shaman doll."));
-
-				var answer = await dialog.Select(L("No problem"),
+				var answer = await dialog.Select(L("They would be a good source of magic for the shaman doll."),
 					Option(L("No problem"), "accept"),
 					Option(L("About the Pledge"), "explain"),
 					Option(L("I'll wait a little bit"), "leave")
@@ -89,12 +87,10 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("We need the rope for ceremony to make the shaman doll."));
 				await dialog.Msg(L("It's on the waist of the Panto Shaman in the Cottage."));
-				await dialog.Msg(L("Bring it to me."));
-
-				var answer = await dialog.Select(L("I will try"),
+				var answer = await dialog.Select(L("Bring it to me."),
 					Option(L("I will try"), "accept"),
 					Option(L("About the Cursed Doll"), "explain"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "explain")
@@ -114,11 +110,9 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
 				await dialog.Msg(L("The shaman doll is to be filled with Mushcaria's Enchanted Mane."));
-				await dialog.Msg(L("The Mushcaria should be in the Tustinti Plateau. Can you get its mane for me?"));
-
-				var answer = await dialog.Select(L("I'll get it"),
+				var answer = await dialog.Select(L("The Mushcaria should be in the Tustinti Plateau. Can you get its mane for me?"),
 					Option(L("I'll get it"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -190,6 +184,11 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Hm... I see."));
 				await dialog.Msg(L("It's not much yet, but we might be able to fix the shaman doll a little."));
+				var told60152 = await character.TimeActions.StartAsync(L("Passing on the information..."), L("Cancel"), "TALK", TimeSpan.FromSeconds(2));
+
+				if (told60152 != TimeActionResult.Completed)
+					return;
+
 				character.Quests.Complete(Rp1);
 				return;
 			}
@@ -197,11 +196,9 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("I can't stand seeing the Panto totems pressed with evil energy."));
-				await dialog.Msg(L("I'm going to break it with the shaman doll. Want to give it a try?"));
-
-				var answer = await dialog.Select(L("Alright, I'll help you"),
+				var answer = await dialog.Select(L("I'm going to break it with the shaman doll. Want to give it a try?"),
 					Option(L("Alright, I'll help you"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -216,12 +213,10 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("Won't you help me purify Labure Highway?"));
-				await dialog.Msg(L("The shaman doll finds the evil force but we have to purify it ourselves."));
-
-				var answer = await dialog.Select(L("Alright"),
+				var answer = await dialog.Select(L("The shaman doll finds the evil force but we have to purify it ourselves."),
 					Option(L("Alright"), "accept"),
 					Option(L("About the corrupted land with evil energy"), "explain"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "explain")
@@ -243,9 +238,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Rp1) && character.Quests.MeetsPrerequisites(Rp1))
 			{
 				await dialog.Msg(L("If we're going to use a shaman doll, we need more information."));
-				await dialog.Msg(L("There used to be nothing but Pantos here, but now I see other monsters hanging around."));
-
-				var answer = await dialog.Select(L("I will try"),
+				var answer = await dialog.Select(L("There used to be nothing but Pantos here, but now I see other monsters hanging around."),
 					Option(L("I will try"), "accept"),
 					Option(L("I'll find the other people"), "leave")
 				);
@@ -265,7 +258,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq05))
 			{
 				await dialog.Msg(L("With the totems broken, Simorph will come. Be ready."));
-				character.Quests.ReplayQuestTrack(Mq05);
+				character.Quests.ClearQuestTrack(Mq05);
 				return;
 			}
 
@@ -301,6 +294,11 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
 				await dialog.Msg(L("You set the shaman doll against the totem. It claws at the evil energy until the totem splits apart."));
+				var searchedIt = await character.TimeActions.StartAsync(L("Searching..."), L("Cancel"), "SITGROPE2_LOOP", TimeSpan.FromSeconds(2));
+
+				if (searchedIt != TimeActionResult.Completed)
+					return;
+
 				character.Quests.CompleteObjective(Mq04, "destroyTotems");
 				return;
 			}
@@ -315,7 +313,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
 			{
 				await dialog.Msg(L("The corruption stirs again. Simorph is near."));
-				character.Quests.ReplayQuestTrack(Mq05);
+				character.Quests.ClearQuestTrack(Mq05);
 				return;
 			}
 
@@ -333,6 +331,11 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
 			{
 				await dialog.Msg(L("The corrupted beast turns on you. There is nothing left of what it was."));
+				var provokedIt = await character.TimeActions.StartAsync(L("Provoking it..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (provokedIt != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq07);
 				return;
 			}
@@ -358,6 +361,11 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq09) && !character.Quests.IsCompletable(Mq09))
 			{
 				await dialog.Msg(L("The Mushcaria rears up, mane bristling with spirit energy."));
+				var proddedIt = await character.TimeActions.StartAsync(L("Prodding it..."), L("Cancel"), "SITGROPE_LOOP", TimeSpan.FromSeconds(3));
+
+				if (proddedIt != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq09);
 				return;
 			}
@@ -447,7 +455,8 @@ public class Gele572Mq03Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE572_NPC_BASIL", "f_gele_57_2", L("Collect Mali Seeds"), L("Collect Mali Seeds from the Mali along Labure Highway."));
 		SetPhase(QuestStatus.Success, "GELE572_NPC_BASIL", "f_gele_57_2", L("Talk to Watcher Basil"), L("Gathered enough Mali Seeds. Return to Watcher Basil."));
 
-		AddDrop(650702, 0.06f, 47529);
+		AddPityDrop("GELE572_MQ_08_ITEM", 0.6f, 4, 1, "Mally");
+
 		AddObjective("collectSeeds", L("Defeat Mali and obtain Mali Seeds"), new CollectItemObjective("GELE572_MQ_08_ITEM", 5));
 
 		AddReward(new ItemReward("expCard2", 2));
@@ -582,7 +591,8 @@ public class Gele572Mq08Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE572_NPC_BASIL", "f_gele_57_2", L("Collect ritual rope"), L("Collect the ritual rope from the Panto Wizards."));
 		SetPhase(QuestStatus.Success, "GELE572_NPC_BASIL", "f_gele_57_2", L("Talk to Watcher Basil"), L("Give the ritual rope to Watcher Basil."));
 
-		AddDrop(650588, 0.1f, 57573);
+		AddPityDrop("GELE572_MQ_03_ITEM", 1.0f, 0, 1, "Npanto_staff");
+
 		AddObjective("collectRope", L("Obtain ritual rope by defeating Panto Wizards"), new CollectItemObjective("GELE572_MQ_03_ITEM", 7));
 
 		AddReward(new ItemReward("expCard2", 2));
@@ -610,7 +620,8 @@ public class Gele572Mq09Quest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE572_MQ_09_TRACK", 6000, autoStart: false, partyPlay: true);
 
-		AddDrop(650589, 1f, 57072);
+		AddPityDrop("GELE572_MQ_05_ITEM", 1.0f, 0, 1, "boss_Mushcaria_Q2");
+
 		AddObjective("collectMane", L("Defeat Mushcaria and get Enchanted Mane"), new CollectItemObjective("GELE572_MQ_05_ITEM", 1));
 
 		AddReward(new ItemReward("expCard2", 3));

@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Miners' Village Quest NPCs
 //--- Description -----------------------------------------------------------
 // The villagers, soldiers and hidden triggers the map's field quests run on.
@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -109,12 +110,9 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("What's all this about a 'Light of Salvation' in the Crystal Mine? I have never seen such a thing."));
 				await dialog.Msg(L("I'm not sure if that is the reason, but the Vubbes suddenly rushed out of the Crystal Mine."));
 				await dialog.Msg(L("Those Vubbes took all the villagers they saw into the mines."));
-				await dialog.Msg(L("Please... Save the villagers."));
-				await dialog.Msg(L("I beg of you!"));
-
-				var answer = await dialog.Select(L("How do we get into the Crystal Mine?"),
-					Option(L("Ask how to enter the Crystal Mine"), "accept"),
-					Option(L("Take time to think for a while"), "leave")
+				var answer = await dialog.Select(L("Please... save the villagers. I beg of you!"),
+					Option(L("How do we get into the Crystal Mine?"), "accept"),
+					Option(L("Let me think on it for a while"), "leave")
 				);
 
 				if (answer == "accept")
@@ -138,7 +136,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you drive the Vubbes out of their base?"),
 					Option(L("I'll go to the Vubbe's base and defeat them"), "accept"),
-					Option(L("Disregard"), "leave")
+					Option(L("That is not my concern"), "leave")
 				);
 
 				if (answer == "accept")
@@ -153,7 +151,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The goddess must have sent help..."));
 				await dialog.Msg(L("Follow the pathway on the right to find the Vubbe Outpost."));
-				character.Quests.ReplayQuestTrack(Sout14);
+				character.Quests.ClearQuestTrack(Sout14);
 				return;
 			}
 
@@ -161,14 +159,14 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("To get to the Vubbe's base, go far right from here."));
 				await dialog.Msg(L("It is miserable that I can't do anything as a mayor."));
-				character.Quests.ReplayQuestTrack(Sout13);
+				character.Quests.ClearQuestTrack(Sout13);
 				return;
 			}
 
 			if (character.Quests.IsActive(Sout01))
 			{
 				await dialog.Msg(L("The Vubbes are still in the streets. Drive them off!"));
-				character.Quests.ReplayQuestTrack(Sout01);
+				character.Quests.ClearQuestTrack(Sout01);
 				return;
 			}
 
@@ -198,7 +196,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you help recover the relief supplies?"),
 					Option(L("I'll help retrieve the relief supplies"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -249,7 +247,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you clear the monsters around him?"),
 					Option(L("I'll defeat the monsters around"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -332,7 +330,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you bring the refugees to her?"),
 					Option(L("I'll bring the refugees"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -351,7 +349,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you clear the monsters around her?"),
 					Option(L("I'll defeat the menacing monsters"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -393,7 +391,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(SoutSudd))
 			{
 				await dialog.Msg(L("Chafer is out there on the road back to the village. Please deal with it."));
-				character.Quests.ReplayQuestTrack(SoutSudd);
+				character.Quests.ClearQuestTrack(SoutSudd);
 				return;
 			}
 
@@ -411,7 +409,13 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sout09) && !character.Quests.IsCompletable(Sout09))
 			{
 				await dialog.Msg(L("We were hiding from the monsters, but the healer lady is right - we cannot stay here."));
-				await dialog.Msg(L("We will follow you back to the village."));
+
+				var told = await character.TimeActions.StartAsync(L("Telling them where the healer is..."), L("Cancel"), "TALK", TimeSpan.FromSeconds(2));
+
+				if (told != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The refugees will follow you back to the village."));
 				character.Quests.CompleteObjective(Sout09, "bringRefugees");
 				return;
 			}
@@ -421,7 +425,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 		// Vaidotas at the Vubbe Outpost
 		//-------------------------------------------------------------------------
-		AddNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "SIAULIAIOUT_ALCHE", "f_siauliai_out", 1309.12, 331.73, 4, async dialog =>
+		AddConditionalNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "SIAULIAIOUT_ALCHE", "f_siauliai_out", 1309.12, 331.73, 4, IsVaidotasAtOutpost, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -430,11 +434,17 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Sout14) && character.Quests.IsCompletable(Sout14))
 			{
+				var freed = await character.TimeActions.StartAsync(L("Freeing Vaidotas..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (freed != TimeActionResult.Completed)
+					return;
+
 				await dialog.Msg(L("Thank you for saving me."));
 				await dialog.Msg(L("You must also be a Revelator who has come in search of the Light of Salvation."));
 				await dialog.Msg(L("Let's go to the Crystal Mine."));
 				await dialog.Msg(L("I will tell you the rest of the story at the Crystal Mine entrance."));
 				character.Quests.Complete(Sout14);
+				character.LookAround();
 				return;
 			}
 
@@ -443,6 +453,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("There were no villagers here, only Vubbes lying in wait."));
 				await dialog.Msg(L("At least the Red Vubbe Fighter will not trouble the mine road any longer."));
 				character.Quests.Complete(Sout15);
+				character.LookAround();
 				return;
 			}
 
@@ -451,7 +462,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 		// Vaidotas at the wagon barricade
 		//-------------------------------------------------------------------------
-		AddNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "SIAULIAIOUT_ALCHE_A", "f_siauliai_out", -38.88, -1021.81, 90, async dialog =>
+		AddConditionalNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "SIAULIAIOUT_ALCHE_A", "f_siauliai_out", -38.88, -1021.81, 90, IsVaidotasAtBarricade, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -484,7 +495,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I'll let you take care of the Vubbes."));
 				await dialog.Msg(L("I have things to attend to inside."));
-				character.Quests.ReplayQuestTrack(Sout16);
+				character.Quests.ClearQuestTrack(Sout16);
 				return;
 			}
 
@@ -539,20 +550,17 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sout20) && character.Quests.MeetsPrerequisites(Sout20))
 			{
-				await dialog.Msg(L("Oh, it seems like you have some Jukopus leaves and Kepa stems."));
-				await dialog.Msg(L("Can you share some with me?"));
+				await dialog.Msg(L("I want to treat the injured in our village, but I don't have enough materials to do so."));
 
-				var answer = await dialog.Select(L("Will you share the ingredients with her?"),
-					Option(L("OK, I'll give you some"), "accept"),
-					Option(L("Decline"), "leave")
+				var answer = await dialog.Select(L("Jukopus leaves and Kepa stems are what I need most. Could you gather some for me?"),
+					Option(L("I'll gather them for you"), "accept"),
+					Option(L("I have other business first"), "leave")
 				);
 
 				if (answer == "accept")
 				{
-					await dialog.Msg(L("Thank you very much."));
-					await dialog.Msg(L("I want to treat the injured in our village but I don't have enough materials to do so."));
+					await dialog.Msg(L("Thank you very much. The Jukopus and the Kepas are all around the village."));
 					character.Quests.Start(Sout20);
-					character.Quests.CompleteObjective(Sout20, "giveIngredients");
 				}
 				return;
 			}
@@ -564,7 +572,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -582,7 +590,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -600,7 +608,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -618,7 +626,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -631,7 +639,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Sout20))
 			{
-				await dialog.Msg(L("Bring me the Jukopus leaves and Kepa stems if you can spare them."));
+				await dialog.Msg(L("Jukopus and Kepas appear all around the Miners' Village."));
 				return;
 			}
 
@@ -670,7 +678,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Will you gather the soldiers' mementos?"),
 					Option(L("I'll gather the mementos"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -740,7 +748,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sout15) && character.Quests.MeetsPrerequisites(Sout15))
 			{
-				await dialog.Msg(L("There's a suspicious treasure box. Go and open it."));
+				await dialog.Msg(L("{#666666}*You pry the lid up. The chest is empty, and something behind you has stopped moving*{/}"));
 				character.Quests.Start(Sout15);
 				return;
 			}
@@ -755,10 +763,16 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			await dialog.Msg(L("The chest stands alone on the mining road. Something about it is wrong."));
 		});
 
+		// The wagons blocking the mine road
+		//-------------------------------------------------------------------------
+		AddBlockingWagon(1, -82, -612, 61);
+		AddBlockingWagon(2, -41, -608, 0);
+		AddBlockingWagon(3, -64, -557, 0);
+
 		// Hidden triggers
 		//-------------------------------------------------------------------------
 		// The approach to the Miners' Village, where the Vubbe raid begins.
-		AddQuestTrigger("SIAULIAIOUT_Q01", "f_siauliai_out", 275, -1262, 300, async args =>
+		AddQuestTrigger("SIAULIAIOUT_Q01", "f_siauliai_out", 506, -1622, 300, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -772,7 +786,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		AddQuestTrigger("SIAULIAIOUT_MIRTIS", "f_siauliai_out", 1864, 381, 200, async args =>
+		AddQuestTrigger("SIAULIAIOUT_MIRTIS", "f_siauliai_out", 1900, 130, 200, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -783,7 +797,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		AddQuestTrigger("SIAULIAIOUT_PREAL", "f_siauliai_out", 1309.12, 331.73, 100, async args =>
+		AddQuestTrigger("SIAULIAIOUT_PREAL", "f_siauliai_out", 1298, 307, 100, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -805,7 +819,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		AddQuestTrigger("SOUT_SUDD", "f_siauliai_out", -1606, -1760, 250, async args =>
+		AddQuestTrigger("SOUT_SUDD", "f_siauliai_out", -1532, -1751, 250, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -814,6 +828,43 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				character.Quests.StartQuestTrack(SoutSudd);
 
 			await Task.CompletedTask;
+		});
+	}
+
+	/// <summary>
+	/// Returns whether Vaidotas is still the Vubbes' captive at the outpost
+	/// for the given character.
+	/// </summary>
+	private static bool IsVaidotasAtOutpost(Character character)
+		=> character.Quests.IsActive(Sout14) || (character.Quests.Has(Sout15) && !character.Quests.HasCompleted(Sout15));
+
+	/// <summary>
+	/// Returns whether Vaidotas has been rescued and is waiting at the wagon
+	/// barricade for the given character.
+	/// </summary>
+	private static bool IsVaidotasAtBarricade(Character character)
+		=> character.Quests.HasCompleted(Sout14) && !character.Quests.HasCompleted(Sout16);
+
+	/// <summary>
+	/// Places one of the wagons barricading the mine road, which the
+	/// explosives clear.
+	/// </summary>
+	private void AddBlockingWagon(int number, double x, double z, int direction)
+	{
+		AddConditionalNpc(45315, L("Empty Wagon"), "SIAULIAIOUT_WAGON_" + number, "f_siauliai_out", x, z, direction,
+			character => !character.Quests.HasCompleted(Sout16), async dialog =>
+		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Empty Wagon"));
+
+			if (character.Quests.IsActive(Sout16))
+			{
+				await dialog.Msg(L("Vaidotas' explosives are already packed under the wheels. Stand back."));
+				return;
+			}
+
+			await dialog.Msg(L("A mining wagon, dragged across the road and left to rot."));
 		});
 	}
 }
@@ -1093,7 +1144,7 @@ public class SoutQ16Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8080, QuestStatus.Completed));
 
-		AddObjective("killVubbes", L("Defeat any Vubbe drawn out by the explosives"), new KillObjective(3, "Goblin_Miners_Q2"));
+		AddObjective("killVubbes", L("Defeat any Vubbe drawn out by the explosives"), new KillObjective(6, "Goblin_Miners_Q2") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard1", 2));
 		AddReward(new ItemReward("BRC01_105", 1));
@@ -1145,17 +1196,19 @@ public class SoutQ20Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "SOUT_PHARMACY", "f_siauliai_out", L("Talk to the Pharmacist Lady"));
-		SetPhase(QuestStatus.InProgress, "SOUT_PHARMACY", "f_siauliai_out", L("Give medicinal ingredients to Pharmacist Lady"));
-		SetPhase(QuestStatus.Success, "SOUT_PHARMACY", "f_siauliai_out", L("Pharmacist's Favor"));
+		SetPhase(QuestStatus.InProgress, "SOUT_PHARMACY", "f_siauliai_out", L("Get medicinal ingredients"));
+		SetPhase(QuestStatus.Success, "SOUT_PHARMACY", "f_siauliai_out", L("Give medicinal ingredients to Pharmacist Lady"));
 
 		AddPrerequisite(Or(new QuestStatusPrerequisite(8082, QuestStatus.InProgress), new QuestStatusPrerequisite(8082, QuestStatus.Completed)));
 		AddPrerequisite(new QuestStatusPrerequisite(8074, QuestStatus.Completed));
 		AddPrerequisite(new QuestStatusPrerequisite(8347, QuestStatus.Completed));
 		AddPrerequisite(new QuestStatusPrerequisite(8071, QuestStatus.Completed));
-		AddPrerequisite(new ItemPrerequisite("misc_0010", 5));
-		AddPrerequisite(new ItemPrerequisite("misc_0001", 5));
 
-		AddObjective("giveIngredients", L("Give medicinal ingredients to Pharmacist Lady"), new ManualObjective());
+		AddPityDrop("misc_0010", 0.5f, 3, 1, "Jukopus");
+		AddPityDrop("misc_0001", 0.5f, 3, 1, "Onion_Red");
+
+		AddObjective("collectLeaves", L("Collect Jukopus Leaves"), new CollectItemObjective("misc_0010", 5));
+		AddObjective("collectStems", L("Collect Kepa Stems"), new CollectItemObjective("misc_0001", 5));
 
 		AddReward(new TakeItemReward("misc_0010", 5));
 		AddReward(new TakeItemReward("misc_0001", 5));
@@ -1182,6 +1235,9 @@ public class SoutQ21Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(40050, QuestStatus.Completed));
 
+		AddPityDrop("misc_0010", 0.5f, 3, 1, "Jukopus");
+		AddPityDrop("misc_0001", 0.5f, 3, 1, "Onion_Red");
+
 		AddObjective("collectLeaves", L("Collect Jukopus Leaves"), new CollectItemObjective("misc_0010", 5));
 		AddObjective("collectStems", L("Collect Kepa Stems"), new CollectItemObjective("misc_0001", 5));
 
@@ -1198,7 +1254,7 @@ public class SoutQ22Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40052);
-		SetName(L("Pharmacist's Favor (2)"));
+		SetName(L("Pharmacist's Favor (3)"));
 		SetDescription(L("The Pharmacist Lady needs more Jukopus leaves and Kepa stems."));
 		SetType(QuestType.Sub);
 		SetLocation("f_siauliai_out");
@@ -1210,6 +1266,9 @@ public class SoutQ22Quest : QuestScript
 		SetPhase(QuestStatus.Success, "SOUT_PHARMACY", "f_siauliai_out", L("Give medicinal ingredients to Pharmacist Lady"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(40051, QuestStatus.Completed));
+
+		AddPityDrop("misc_0010", 0.5f, 3, 1, "Jukopus");
+		AddPityDrop("misc_0001", 0.5f, 3, 1, "Onion_Red");
 
 		AddObjective("collectLeaves", L("Collect Jukopus Leaves"), new CollectItemObjective("misc_0010", 5));
 		AddObjective("collectStems", L("Collect Kepa Stems"), new CollectItemObjective("misc_0001", 5));
@@ -1227,7 +1286,7 @@ public class SoutQ23Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40053);
-		SetName(L("Pharmacist's Favor (2)"));
+		SetName(L("Pharmacist's Favor (4)"));
 		SetDescription(L("The Pharmacist Lady needs more Jukopus leaves and Kepa stems."));
 		SetType(QuestType.Sub);
 		SetLocation("f_siauliai_out");
@@ -1239,6 +1298,9 @@ public class SoutQ23Quest : QuestScript
 		SetPhase(QuestStatus.Success, "SOUT_PHARMACY", "f_siauliai_out", L("Give medicinal ingredients to Pharmacist Lady"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(40052, QuestStatus.Completed));
+
+		AddPityDrop("misc_0010", 0.5f, 3, 1, "Jukopus");
+		AddPityDrop("misc_0001", 0.5f, 3, 1, "Onion_Red");
 
 		AddObjective("collectLeaves", L("Collect Jukopus Leaves"), new CollectItemObjective("misc_0010", 5));
 		AddObjective("collectStems", L("Collect Kepa Stems"), new CollectItemObjective("misc_0001", 5));
@@ -1256,7 +1318,7 @@ public class SoutQ24Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40054);
-		SetName(L("Pharmacist's Favor (2)"));
+		SetName(L("Pharmacist's Favor (5)"));
 		SetDescription(L("The Pharmacist Lady needs more Jukopus leaves and Kepa stems."));
 		SetType(QuestType.Sub);
 		SetLocation("f_siauliai_out");
@@ -1268,6 +1330,9 @@ public class SoutQ24Quest : QuestScript
 		SetPhase(QuestStatus.Success, "SOUT_PHARMACY", "f_siauliai_out", L("Give medicinal ingredients to Pharmacist Lady"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(40053, QuestStatus.Completed));
+
+		AddPityDrop("misc_0010", 0.5f, 3, 1, "Jukopus");
+		AddPityDrop("misc_0001", 0.5f, 3, 1, "Onion_Red");
 
 		AddObjective("collectLeaves", L("Collect Jukopus Leaves"), new CollectItemObjective("misc_0010", 5));
 		AddObjective("collectStems", L("Collect Kepa Stems"), new CollectItemObjective("misc_0001", 5));
@@ -1299,7 +1364,7 @@ public class SoutQ31Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8080, QuestStatus.Completed));
 
-		AddPityDrop(663002, 0.06f, 0, 1, 11120);
+		AddPityDrop("SOLDIRE_SQ31_RELIC", 0.6f, 4, 1, "Goblin_Spear");
 
 		AddObjective("collectMementos", L("Collect soldiers' mementos"), new CollectItemObjective("SOLDIRE_SQ31_RELIC", 6));
 
@@ -1328,7 +1393,7 @@ public class SoutQ32Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8080, QuestStatus.Completed));
 
-		AddPityDrop(663003, 0.10f, 0, 1, 11120);
+		AddPityDrop("TOWN_PROVISIONS", 1.0f, 0, 1, "Goblin_Spear");
 
 		AddObjective("collectFood", L("Collect Miners' Village Food"), new CollectItemObjective("TOWN_PROVISIONS", 10));
 

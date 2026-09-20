@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Algis at the opened gate
 //--- Description -----------------------------------------------------------
 // The gate falls, and Algis goes in after Gesti.
@@ -49,6 +49,11 @@ public class Chaple576Mq04After : TrackScript
 		}));
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 0);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

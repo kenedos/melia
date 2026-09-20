@@ -927,7 +927,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public bool StartQuestTrack(QuestId questId)
 		{
-			if (this.Character.Tracks.ActiveTrack != null)
+			// A track held back until the dialog closes is not active yet,
+			// so without this a second conversation queues it twice.
+			if (this.Character.Tracks.ActiveTrack != null || _pendingTrack != null)
 				return false;
 
 			if (!QuestScript.TryGet(questId, out var questScript))
@@ -941,6 +943,24 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Clears the record of the quest's track having played, so the
+		/// trigger that owns it can play it again.
+		/// </summary>
+		/// <remarks>
+		/// For a track bound to a place rather than to the quest's status.
+		/// Replaying such a track from the quest giver would stage the
+		/// cutscene wherever the player happens to be standing.
+		/// </remarks>
+		/// <param name="questId"></param>
+		public void ClearQuestTrack(QuestId questId)
+		{
+			if (this.Character.Tracks.ActiveTrack != null)
+				return;
+
+			this.ResetQuestTrack(questId);
+		}
+
+		/// <summary>
 		/// Clears the quest's track record and plays it again, so a track
 		/// that death or a relog interrupted can be restarted on demand.
 		/// </summary>
@@ -948,7 +968,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		public bool ReplayQuestTrack(QuestId questId)
 		{
-			if (this.Character.Tracks.ActiveTrack != null)
+			if (this.Character.Tracks.ActiveTrack != null || _pendingTrack != null)
 				return false;
 
 			this.ResetQuestTrack(questId);

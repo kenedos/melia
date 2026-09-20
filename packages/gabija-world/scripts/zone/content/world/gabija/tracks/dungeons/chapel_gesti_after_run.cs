@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Gesti flees the cathedral
 //--- Description -----------------------------------------------------------
 // Wounded and outplayed, Gesti withdraws from the Tenet Church.
@@ -35,6 +35,11 @@ public class ChapelGestiAfterRun : TrackScript
 		actors.Add(AddTrackActor(character, 147373, 114, 164, -611, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 0);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

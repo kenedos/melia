@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Red Vubbe Fighter
 //--- Description -----------------------------------------------------------
 // The chest on the mining road hides a Red Vubbe Fighter and its miners.
@@ -57,6 +57,11 @@ public class SiauOutBossTrack : TrackScript
 				RemoveTrackActor(character, track, 1);
 				break;
 			case 39:
+				RemoveTrackActor(character, track, 0);
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The hidden sanctuary
 //--- Description -----------------------------------------------------------
 // The Seal of Space opens the wall, and the revelation is inside.
@@ -34,6 +34,11 @@ public class Chaple577Mq10Track : TrackScript
 		actors.Add(character);
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 0);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

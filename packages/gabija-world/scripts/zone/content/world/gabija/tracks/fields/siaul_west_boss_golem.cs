@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Golem at Delong Rest Stop
 //--- Description -----------------------------------------------------------
 // The squad leader's missing men, and what they ran into.
@@ -51,6 +51,7 @@ public class SiaulWestBossGolemTrack : TrackScript
 				RemoveTrackActor(character, track, 0);
 				break;
 			case 74:
+				RemoveTrackActor(character, track, 0);
 				RemoveTrackActor(character, track, 2);
 				RemoveTrackActor(character, track, 3);
 				RemoveTrackActor(character, track, 4);

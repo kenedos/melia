@@ -341,6 +341,21 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Runs the active track's hand-over, when the client is done
+		/// playing the cinematic.
+		/// </summary>
+		public void HandOver()
+		{
+			var track = this.ActiveTrack;
+
+			if (track == null)
+				return;
+
+			if (TrackScript.TryGet(track.Id, out var trackScript))
+				trackScript.OnHandOver(this.Character, track);
+		}
+
+		/// <summary>
 		/// End a track.
 		/// </summary>
 		/// <param name="trackId"></param>

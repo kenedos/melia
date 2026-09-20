@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Honeypin at Karadas Path
 //--- Description -----------------------------------------------------------
 // The altar draws it out of the canopy the moment it starts working.
@@ -72,6 +72,10 @@ public class Thorn21Mq06Track : TrackScript
 				character.ServerMessage(L("Honeypin has suddenly appeared!"));
 				break;
 			case 34:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Septyni Glen Quest NPCs
 //--- Description -----------------------------------------------------------
 // Goddess Saule in her cage at the Grand Shrine, the two binding magic
@@ -11,6 +11,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -52,6 +53,11 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var checked18002 = await character.TimeActions.StartAsync(L("Checking it..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (checked18002 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Mq02);
 					return;
 				}
@@ -201,6 +207,11 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var freed18008 = await character.TimeActions.StartAsync(L("Removing the restraints..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+					if (freed18008 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Mq08);
 					return;
 				}
@@ -292,6 +303,11 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var looked18003 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (looked18003 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Mq03);
 					return;
 				}
@@ -325,6 +341,11 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var looked18004 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (looked18004 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Mq04);
 					return;
 				}
@@ -368,6 +389,11 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var broke18007 = await character.TimeActions.StartAsync(L("Breaking the barrier..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+					if (broke18007 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Mq07);
 					return;
 				}
@@ -633,7 +659,7 @@ public class Huevillage584Mq07Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(18006, QuestStatus.Completed));
 
-		AddPityDrop(650624, 1f, 1, 1, 47316);
+		AddPityDrop("HUEVILLAGE_58_4_MQ07_ITEM1", 1.0f, 0, 1, "boss_Clymen");
 
 		AddObjective("takeKey", L("Collect the Confinement Key"), new CollectItemObjective("HUEVILLAGE_58_4_MQ07_ITEM1", 1));
 

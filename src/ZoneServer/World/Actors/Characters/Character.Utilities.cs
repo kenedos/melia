@@ -284,7 +284,12 @@ namespace Melia.Zone.World.Actors.Characters
 		/// <param name="enabled">Value for the enabled flag on the layer change packet (ignored when silent).</param>
 		public void SetLayer(int layer, bool silent = false, bool enabled = true)
 		{
+			var previousLayer = this.Layer;
+
 			this.Layer = layer;
+
+			if (previousLayer != layer)
+				this.DropHateOnLayer(previousLayer);
 
 			if (!silent)
 				Send.ZC_SET_LAYER(this, this.Layer, enabled);
@@ -309,6 +314,30 @@ namespace Melia.Zone.World.Actors.Characters
 			}
 
 			this.LookAround();
+		}
+
+		/// <summary>
+		/// Makes every monster on the given layer forget the character.
+		/// </summary>
+		/// <remarks>
+		/// A cutscene or an instance takes the character out of reach of
+		/// whatever was chasing them, which would otherwise be left running
+		/// at a target it can no longer see.
+		/// </remarks>
+		/// <param name="layer"></param>
+		private void DropHateOnLayer(int layer)
+		{
+			var map = this.Map;
+			if (map == null)
+				return;
+
+			var monsters = map.GetMonsters(m => m.Layer == layer && m is ICombatEntity);
+
+			foreach (var monster in monsters)
+			{
+				if (monster is ICombatEntity combatEntity)
+					combatEntity.ForgetHate(this);
+			}
 		}
 
 		/// <summary>

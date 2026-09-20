@@ -1,15 +1,17 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Crystal Mine 1F Quest NPCs
 //--- Description -----------------------------------------------------------
 // Vaidotas and the purifiers of the first floor, and the quests that run the
 // player around the mine repairing them.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -18,6 +20,7 @@ using static Melia.Zone.Scripting.Shortcuts;
 
 public class DCmine01QuestNpcsScript : GeneralScript
 {
+	private readonly static QuestId ToTheMines = new QuestId(8082);
 	private readonly static QuestId Alchemist = new QuestId(4461);
 	private readonly static QuestId Crystal2 = new QuestId(4463);
 	private readonly static QuestId Crystal8 = new QuestId(4469);
@@ -38,6 +41,20 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Vaidotas"));
 			dialog.SetPortrait("Dlg_port_ALCHEMIST_1");
 
+			if (character.Quests.IsActive(ToTheMines) && !character.Quests.IsCompletable(ToTheMines))
+			{
+				await dialog.Msg(L("The Vubbes the blast drew in are still on the road. Deal with them first."));
+				return;
+			}
+
+			if (character.Quests.IsActive(ToTheMines))
+			{
+				await dialog.Msg(L("You made it through. I told you the explosives would be enough."));
+				await dialog.Msg(L("This is the Crystal Mine. The air down here is what killed every rescue party before us."));
+				character.Quests.Complete(ToTheMines);
+				return;
+			}
+
 			if (character.Quests.IsActive(Alchemist) && character.Quests.IsCompletable(Alchemist))
 			{
 				await dialog.Msg(L("The air is clearing already. Every purifier on this floor is turning again."));
@@ -52,7 +69,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("It's a legend about how a great demon was trapped in the Crystal Mine in the past."));
 
 				var answer = await dialog.Select(L("The toxic fumes have to be cleared before we can go any deeper."),
-					Option(L("Ask how to repair the purifier"), "accept"),
+					Option(L("How do I repair a purifier?"), "accept"),
 					Option(L("That seems difficult"), "leave")
 				);
 
@@ -93,7 +110,12 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					return;
 				}
 
-				await dialog.Msg(L("The repair is complete. The Entrance Purifier is running again."));
+				var repaired = await character.TimeActions.StartAsync(L("Repairing the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+				if (repaired != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The repair is complete. The Entrance Purifier is running again."));
 				character.Quests.Complete(Crystal2);
 				CheckPurifiersRepaired(character);
 				return;
@@ -108,8 +130,13 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var inspected = await character.TimeActions.StartAsync(L("Checking the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+					if (inspected != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Crystal2);
-					await dialog.Msg(L("A part is missing from the purifier. Retrieve Purifier Parts from the Vubbe with a question mark on its head."));
+					character.ServerMessage(L("A part is missing from the purifier. Retrieve Purifier Parts from the Vubbe with a question mark on its head."));
 				}
 
 				return;
@@ -146,7 +173,12 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					return;
 				}
 
-				await dialog.Msg(L("The Central Purifier is repaired. It is working properly again."));
+				var replaced = await character.TimeActions.StartAsync(L("Replacing the part..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+				if (replaced != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The Central Purifier is repaired. It is working properly again."));
 				character.Quests.Complete(Crystal9);
 				CheckPurifiersRepaired(character);
 				return;
@@ -161,11 +193,16 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var opened = await character.TimeActions.StartAsync(L("Opening the valve..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+					if (opened != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Crystal8);
-					await dialog.Msg(L("A vital part has broken. Use the Mine Compass to look for a replacement."));
+					character.ServerMessage(L("A vital part has broken. Use the Mine Compass to look for a replacement."));
 					character.Quests.CompleteObjective(Crystal8, "openValve");
 					character.Quests.Complete(Crystal8);
-					await dialog.Msg(L("The Mine Compass points to District 4. Go there and find the spare part."));
+					character.ServerMessage(L("The Mine Compass points to District 4. Go there and find the spare part."));
 					character.Quests.Start(Crystal9);
 				}
 
@@ -186,7 +223,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Crystal9) && !character.Quests.IsCompletable(Crystal9))
 			{
 				await dialog.Msg(L("Defeat the Bearkaras that appeared in front of the Spare Purifier."));
-				character.Quests.ReplayQuestTrack(Crystal9);
+				character.Quests.ClearQuestTrack(Crystal9);
 				return;
 			}
 
@@ -223,7 +260,14 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
+					var searched = await character.TimeActions.StartAsync(L("Looking the basket over..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+					if (searched != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Crystal10);
+				}
 
 				return;
 			}
@@ -247,7 +291,12 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					return;
 				}
 
-				await dialog.Msg(L("The Passage Purifier is repaired. It is running again."));
+				var repairedPassage = await character.TimeActions.StartAsync(L("Repairing the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+				if (repairedPassage != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The Passage Purifier is repaired. It is running again."));
 				character.Quests.Complete(Crystal19);
 				CheckPurifiersRepaired(character);
 				return;
@@ -271,13 +320,17 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var opened = await character.TimeActions.StartAsync(L("Opening the valve..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+					if (opened != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Crystal13);
-					await dialog.Msg(L("An important part is gone. Use the Mine Compass to search for it."));
+					character.ServerMessage(L("An important part is gone. Use the Mine Compass to search for it."));
 					character.Quests.CompleteObjective(Crystal13, "openValve");
 					character.Quests.Complete(Crystal13);
-					await dialog.Msg(L("The compass points to District 6. Search District 6 for the part."));
+					character.ServerMessage(L("The compass points to District 6. Search District 6 for the part."));
 					character.Quests.Start(Crystal18);
-					dialog.HideNPC("MINE_1_ELEVATOR");
 				}
 
 				return;
@@ -407,7 +460,7 @@ public class Mine1Crystal2Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(10));
 
-		AddPityDrop(661003, 1.0f, 0, 1, 57380);
+		AddPityDrop("MINE_1_CRYSTAL_2_ITEM", 1.0f, 0, 1, "Goblin_Miners_Q1");
 
 		AddObjective("findPart", L("Retrieve Purifier Parts"), new CollectItemObjective("MINE_1_CRYSTAL_2_ITEM", 1));
 
@@ -465,7 +518,7 @@ public class Mine1Crystal9Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(4469, QuestStatus.Completed));
 
-		AddPityDrop(661005, 1.0f, 0, 1, 401141);
+		AddPityDrop("MINE_1_CRYSTAL_9_ITEM", 1.0f, 0, 1, "boss_bearkaras");
 
 		AddObjective("takePart", L("Collect Purifier Parts from the Spare Purifier"), new CollectItemObjective("MINE_1_CRYSTAL_9_ITEM", 1));
 
@@ -555,7 +608,7 @@ public class Mine1Crystal18Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(4474, QuestStatus.Completed));
 
-		AddPityDrop(661006, 1.0f, 0, 1, 400703);
+		AddPityDrop("MINE_1_CRYSTAL_18_ITEM", 1.0f, 0, 1, "boss_Spector_m");
 
 		AddObjective("takePart", L("Retrieve Purifier Parts from Specter Monarch"), new CollectItemObjective("MINE_1_CRYSTAL_18_ITEM", 1));
 

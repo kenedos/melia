@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The circle at Vapsva Vacant Lot
 //--- Description -----------------------------------------------------------
 // Merge comes up out of the second circle with its Tiny Mages.
@@ -57,6 +57,7 @@ public class Huevillage584Mq04Track : TrackScript
 				track.Actors[2].AttachEffect("F_ground083_smoke", 3, EffectLocation.Bottom);
 				break;
 			case 29:
+				RemoveTrackActor(character, track, 0);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

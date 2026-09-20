@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Simorph at Valio Mountain Cabin Hill
 //--- Description -----------------------------------------------------------
 // The totems are broken, and the corruption answers.
@@ -48,6 +48,8 @@ public class Gele572Mq05Track : TrackScript
 				RemoveTrackActor(character, track, 3);
 				break;
 			case 34:
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

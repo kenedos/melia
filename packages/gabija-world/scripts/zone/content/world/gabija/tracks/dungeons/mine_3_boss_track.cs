@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Demons of the Closed Area
 //--- Description -----------------------------------------------------------
 // A swarm of bats bursts off the sealed crystal pillar, and the demon mirtis
@@ -104,6 +104,21 @@ public class Mine3BossTrack : TrackScript
 				RemoveTrackActor(character, track, 26);
 				break;
 			case 64:
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 7);
+				RemoveTrackActor(character, track, 8);
+				RemoveTrackActor(character, track, 9);
+				RemoveTrackActor(character, track, 10);
+				RemoveTrackActor(character, track, 11);
+				RemoveTrackActor(character, track, 12);
+				RemoveTrackActor(character, track, 13);
+				RemoveTrackActor(character, track, 14);
+				RemoveTrackActor(character, track, 15);
+				RemoveTrackActor(character, track, 16);
+				RemoveTrackActor(character, track, 17);
+				RemoveTrackActor(character, track, 18);
 				RemoveTrackActor(character, track, 1);
 				RemoveTrackActor(character, track, 2);
 				RemoveTrackActor(character, track, 18);

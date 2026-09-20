@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Mushcaria at the Statue
 //--- Description -----------------------------------------------------------
 // What comes up the road while the statue is still lit.
@@ -67,6 +67,13 @@ public class SiaulWestLaimonas32Track : TrackScript
 				RemoveTrackActor(character, track, 4);
 				break;
 			case 19:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 7);
 				RemoveTrackActor(character, track, 1);
 				RemoveTrackActor(character, track, 2);
 				RemoveTrackActor(character, track, 3);

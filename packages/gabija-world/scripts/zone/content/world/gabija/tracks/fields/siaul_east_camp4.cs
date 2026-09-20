@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Camp in Danger
 //--- Description -----------------------------------------------------------
 // A Poata charges the outpost to protect its cub, with the camp's guards
@@ -82,6 +82,7 @@ public class SiaulEastCamp4Track : TrackScript
 				RemoveTrackActor(character, track, 5);
 				break;
 			case 74:
+				RemoveTrackActor(character, track, 5);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				RemoveTrackActor(character, track, 0);

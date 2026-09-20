@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Scouting the Northern Woods
 //--- Description -----------------------------------------------------------
 // A Bube warband works at the northern edge of the woods, with carts, logs
@@ -91,6 +91,13 @@ public class SiaulEastRequest2Track : TrackScript
 		switch (frame)
 		{
 			case 29:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 12);
+				RemoveTrackActor(character, track, 13);
+				RemoveTrackActor(character, track, 14);
+				RemoveTrackActor(character, track, 15);
 				// The cutscene's DRT_KILL rows are Client="BOTH" and the client
 				// never reports those frames, so the despawns run here instead.
 				RemoveTrackActor(character, track, 1);

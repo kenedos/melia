@@ -1,15 +1,17 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Klaipeda Quest NPCs
 //--- Description -----------------------------------------------------------
 // The quest givers and merchants the city's field quests run on.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Scripting.Hooking;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -96,8 +98,8 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Honestly, I cannot look on you Revelators as pure hope. I carry a city on my shoulders - I cannot bear to fall into despair again."));
 
 				var answer = await dialog.Select(L("Well... in any case, the bishop also had the dream of revelation. He said to send the Revelator to the crystal mine when they arrive."),
-					Option(L("Say you came because of the dream"), "accept"),
-					Option(L("End"), "leave")
+					Option(L("The dream is why I came"), "accept"),
+					Option(L("Another time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -124,8 +126,8 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Knight Ares, stationed in the eastern woods, is in charge. Go and meet him."));
 
 				var answer = await dialog.Select(L("Why the goddess sent the Revelators only now, four years on... it is not for the likes of me to know her will. But I know you are the only hope we have left to hold on to."),
-					Option(L("Say you will go to the eastern woods"), "accept"),
-					Option(L("Say you will not go"), "leave")
+					Option(L("I'll head for the eastern woods"), "accept"),
+					Option(L("Not yet"), "leave")
 				);
 
 				if (answer == "accept")
@@ -165,7 +167,14 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(EastPrepare) && !character.Quests.IsCompletable(EastPrepare))
+			{
+				var prayed = await character.TimeActions.StartAsync(L("Paying your respects..."), L("Cancel"), "WORSHIP", TimeSpan.FromSeconds(2));
+
+				if (prayed != TimeActionResult.Completed)
+					return;
+
 				character.Quests.CompleteObjective(EastPrepare, "pray");
+			}
 
 			await Task.CompletedTask;
 		});
@@ -199,8 +208,8 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			await dialog.Msg(L("Oh, that's right - Ronesa at the accessory shop said she has a gift she simply must give the Revelators."));
 
 			var answer = await dialog.Select(L("Would you like to drop by?"),
-				Option(L("Say you will drop by"), "accept"),
-				Option(L("Refuse"), "leave")
+				Option(L("I'll drop by"), "accept"),
+				Option(L("Another time"), "leave")
 			);
 
 			if (answer == "accept")

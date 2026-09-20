@@ -166,6 +166,19 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Called when the client hands the cutscene's cast back to the
+		/// world, after the last frame it reports.
+		/// </summary>
+		/// <remarks>
+		/// A few timelines arm their fight on a frame past the last one the
+		/// client plays, which no OnProgress case can ever see. Those tracks
+		/// run their hand-over from here instead.
+		/// </remarks>
+		public virtual void OnHandOver(Character character, Track track)
+		{
+		}
+
+		/// <summary>
 		/// Called when a character completes this track successfully.
 		/// </summary>
 		/// <remarks>

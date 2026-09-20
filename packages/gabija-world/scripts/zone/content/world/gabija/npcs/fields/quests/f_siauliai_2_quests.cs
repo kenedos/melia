@@ -1,13 +1,15 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // East Siauliai Woods Quest NPCs
 //--- Description -----------------------------------------------------------
 // The knights, guards and supply soldiers the map's field quests run on.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -30,6 +32,10 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 	private readonly static QuestId Request7 = new QuestId(1044);
 	private readonly static QuestId Act2Diss1 = new QuestId(4203);
 	private readonly static QuestId Act2Diss1Boss = new QuestId(20131);
+
+	private const int SupplyCrateCount = 5;
+	private const int SupplyCratePlaced = 11;
+	private const string SupplyCrateVar = "Gabija.Quests.Act2Diss1.Crate";
 
 	protected override void Load()
 	{
@@ -87,8 +93,8 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("So we cannot spare an escort for the Revelators. And yet we cannot disobey the bishop and the knight commander."));
 
 				var answer = await dialog.Select(L("Hmm, how about this. Since we must test whether you can reach the mining village safely without an escort... would you help with our investigation here?"),
-					Option(L("Say you will accept the offer"), "accept"),
-					Option(L("Say you will wait until it is settled"), "leave")
+					Option(L("I'll help with your investigation"), "accept"),
+					Option(L("I'll wait until this is settled"), "leave")
 				);
 
 				if (answer == "accept")
@@ -103,9 +109,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The next task is finding why the monsters multiplied. The Popolion are greedy, so you may well find a decisive clue."));
 
-				var answer = await dialog.Select(L("Will you search the Popolion for a clue?"),
-					Option(L("Say you will find a clue"), "accept"),
-					Option(L("Say you will do it later"), "leave")
+				var answer = await dialog.Select(L("Cut a few of them open and see what they are hoarding. Will you?"),
+					Option(L("I'll find your clue"), "accept"),
+					Option(L("Later"), "leave")
 				);
 
 				if (answer == "accept")
@@ -120,9 +126,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Have you by any chance seen a Poata cub? We must drive it far away quickly, or the mother will keep prowling about."));
 
-				var answer = await dialog.Select(L("Will you deal with the Poata at the camp?"),
-					Option(L("Say you have not seen it"), "accept"),
-					Option(L("Say you will not bother"), "leave")
+				var answer = await dialog.Select(L("It is prowling the camp even now. Could you put it down?"),
+					Option(L("I haven't seen the cub, but I'll deal with the mother"), "accept"),
+					Option(L("That is not my concern"), "leave")
 				);
 
 				if (answer == "accept")
@@ -136,9 +142,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You really killed the Vubbe Fighter? Then the monsters will no longer multiply. We can rest a little easier now."));
 
-				var answer = await dialog.Select(L("Will you go on to the mining village?"),
-					Option(L("Say you will go to the mining village"), "accept"),
-					Option(L("Ask for a little time to prepare"), "leave")
+				var answer = await dialog.Select(L("The road to the mining village is yours to take now. Are you ready?"),
+					Option(L("I'll go to the mining village"), "accept"),
+					Option(L("Give me a little time to prepare"), "leave")
 				);
 
 				if (answer == "accept")
@@ -189,10 +195,10 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The mining village worries me too, but the fighting never lets us rest. If only the Chupacabra were dealt with, things would get easier."));
 
-				var answer = await dialog.Select(L("Will you hunt the Chupacabra for the guard?"),
-					Option(L("Say you will hunt the Chupacabra"), "accept"),
-					Option(L("Tell him to see to it himself"), "leave"),
-					Option(L("Ask about Ares' unit"), "explain")
+				var answer = await dialog.Select(L("Would you thin them out for us?"),
+					Option(L("I'll hunt the Chupacabra"), "accept"),
+					Option(L("See to it yourself"), "leave"),
+					Option(L("What is Sir Ares' unit doing out here?"), "explain")
 				);
 
 				if (answer == "explain")
@@ -225,9 +231,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Trusting your skill, I have one more request. The supply depot - I want its Chupacabra driven out as well."));
 
-				var answer = await dialog.Select(L("Will you retake the supply depot?"),
-					Option(L("Say you will retake it"), "accept"),
-					Option(L("Refuse"), "leave")
+				var answer = await dialog.Select(L("Drive them out of the depot and we can breathe again. Will you?"),
+					Option(L("I'll retake the depot"), "accept"),
+					Option(L("Not this time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -243,7 +249,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Reclaim3))
 				{
 					await dialog.Msg(L("The mining village worries me, but things here are not good either. We must find a way before the monsters grow more."));
-					character.Quests.ReplayQuestTrack(Reclaim3);
+					character.Quests.ClearQuestTrack(Reclaim3);
 					return;
 				}
 
@@ -263,20 +269,30 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Supply Officer"));
 
+			if (character.Quests.IsActive(Act2Diss1) && character.Quests.IsCompletable(Act2Diss1))
+			{
+				await dialog.Msg(L("Every crate accounted for. They cannot have gone far, I said, and there you have it."));
+				character.Quests.Complete(Act2Diss1);
+				return;
+			}
+
 			if (!character.Quests.Has(Act2Diss1) && character.Quests.MeetsPrerequisites(Act2Diss1))
 			{
 				await dialog.Msg(L("I am recovering the supplies bound for the mining village. The monsters stole them all."));
 				await dialog.Msg(L("But some of the crates contain dangerous explosives, so the recovery is very hard."));
 
-				var answer = await dialog.Select(L("Will you help recover the supplies?"),
-					Option(L("Say you will help"), "accept"),
-					Option(L("End"), "leave")
+				var answer = await dialog.Select(L("They are scattered all around the depot. Would you gather them up for me?"),
+					Option(L("I'll gather the crates"), "accept"),
+					Option(L("I would rather not handle explosives"), "leave")
 				);
 
 				if (answer == "accept")
 				{
+					for (var i = 1; i <= SupplyCratePlaced; ++i)
+						character.Variables.Perm.Set(SupplyCrateVar + i, false);
+
 					character.Quests.Start(Act2Diss1);
-					character.Quests.CompleteObjective(Act2Diss1, "recoverSupplies");
+					await dialog.Msg(LF("Bring me {0} of them and I can account for the rest. They are scattered all round the depot.", SupplyCrateCount));
 				}
 
 				return;
@@ -285,7 +301,6 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Act2Diss1))
 			{
 				await dialog.Msg(L("They cannot have gone far. If only a monster had stolen one and set it off, it would have been better."));
-				character.Quests.Complete(Act2Diss1);
 				return;
 			}
 
@@ -312,17 +327,17 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Reclaim6) && character.Quests.MeetsPrerequisites(Reclaim6))
 			{
-				await dialog.Msg(L("Since you are helping, please deal with the large gray Chupacabra too. It is one of the main thieves of the supplies."));
+				await dialog.Msg(L("Since you are helping, there is one more thing. The Chupacabra are the main thieves of the supplies."));
 
-				var answer = await dialog.Select(L("Will you deal with the large gray Chupacabra?"),
-					Option(L("Say you will deal with it"), "accept"),
-					Option(L("End"), "leave")
+				var answer = await dialog.Select(L("Thin them out and the crates might stop walking off. Will you?"),
+					Option(L("I'll thin out the Chupacabra"), "accept"),
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
 				{
 					character.Quests.Start(Reclaim6);
-					await dialog.Msg(L("Kill the Chupacabra and the large gray one is sure to appear. I leave it to you."));
+					await dialog.Msg(L("They prowl all around the depot. I leave it to you."));
 				}
 				return;
 			}
@@ -344,9 +359,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The Weaver movement by the lower stream looks suspicious. As if they mean to interfere with the supplies to the mining village."));
 
-				var answer = await dialog.Select(L("Will you clear the Weaver below the depot?"),
-					Option(L("Say you will clear them"), "accept"),
-					Option(L("End"), "leave")
+				var answer = await dialog.Select(L("Clear them off the lower stream before the next shipment moves. Can you?"),
+					Option(L("I'll clear the Weaver out"), "accept"),
+					Option(L("Another time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -360,7 +375,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Reclaim7))
 				{
 					await dialog.Msg(L("This is not a situation I am used to. If it comes to it, we may have to give up our own supplies and fend for ourselves until the next shipment."));
-					character.Quests.ReplayQuestTrack(Reclaim7);
+					character.Quests.ClearQuestTrack(Reclaim7);
 					return;
 				}
 
@@ -398,10 +413,10 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I think the Vubbes from the Miners' Village have made their way into the woods. Maybe that's also a reason behind the abnormal surge in monsters."));
 				await dialog.Msg(L("I better ask Aras to search for Vubbes in other regions too. In the meantime, I would like you to take a look at the upper areas."));
 
-				var answer = await dialog.Select(L("Will you scout the northern woods?"),
-					Option(L("Say you will check"), "accept"),
-					Option(L("Tell him to see to it himself"), "leave"),
-					Option(L("Ask about the Vubbes"), "explain")
+				var answer = await dialog.Select(L("Would you take a look at the upper area for me?"),
+					Option(L("I'll go and look"), "accept"),
+					Option(L("See to it yourself"), "leave"),
+					Option(L("What are the Vubbes?"), "explain")
 				);
 
 				if (answer == "explain")
@@ -422,7 +437,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Request2))
 				{
 					await dialog.Msg(L("We haven't searched the upper areas yet. Of course we should be sending troops, but I ask for your help as this is an urgent matter."));
-					character.Quests.ReplayQuestTrack(Request2);
+					character.Quests.ClearQuestTrack(Request2);
 					return;
 				}
 
@@ -454,9 +469,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Among the supplies to be sent to the mining village is Weaver Claw, but I have had no chance to get it. What am I to do."));
 
-				var answer = await dialog.Select(L("Will you gather the Weaver Claws for him?"),
-					Option(L("Say you will gather them"), "accept"),
-					Option(L("End"), "leave")
+				var answer = await dialog.Select(L("I cannot leave the crates to go hunting. Could you bring me the claws?"),
+					Option(L("I'll bring you the claws"), "accept"),
+					Option(L("Another time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -482,9 +497,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Truthfully, if not for the Pokubu, everything would be fine. They make such a nuisance that I have not done the supply recovery work properly - not a single one, in fact."));
 
-				var answer = await dialog.Select(L("Will you deal with the Pokubu?"),
-					Option(L("Say you will deal with them"), "accept"),
-					Option(L("End"), "leave")
+				var answer = await dialog.Select(L("If somebody thinned them out I could finally get to work. Would you?"),
+					Option(L("I'll deal with the Pokubu"), "accept"),
+					Option(L("Another time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -522,9 +537,9 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Ah, it is you. I heard about it from the operations officer. The Vubbe Fighter is hiding deep inside the Nudegi logging camp."));
 				await dialog.Msg(L("The order to kill it has come down, but waiting for reinforcements might be safer."));
 
-				var answer = await dialog.Select(L("Will you go after the Vubbe Fighter without waiting?"),
-					Option(L("Say you will kill it now"), "accept"),
-					Option(L("Say you will wait for reinforcements"), "leave")
+				var answer = await dialog.Select(L("Waiting might be safer. What will you do?"),
+					Option(L("I'll kill it now"), "accept"),
+					Option(L("I'll wait for the reinforcements"), "leave")
 				);
 
 				if (answer == "accept")
@@ -538,7 +553,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Request6))
 				{
 					await dialog.Msg(L("I am only a scout, but this was the first time I saw a Vubbe Fighter up close."));
-					character.Quests.ReplayQuestTrack(Request6);
+					character.Quests.ClearQuestTrack(Request6);
 					return;
 				}
 
@@ -549,6 +564,20 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("The Vubbe Fighter keeps to the deep parts of the Nudegi logging camp."));
 		});
+
+		// Scattered supply crates
+		//-------------------------------------------------------------------------
+		AddSupplyCrate(1, 301, -569);
+		AddSupplyCrate(2, 289, -758);
+		AddSupplyCrate(3, 176, -492);
+		AddSupplyCrate(4, 125, -247);
+		AddSupplyCrate(5, -158, -876);
+		AddSupplyCrate(6, -270, -581);
+		AddSupplyCrate(7, -223, -452);
+		AddSupplyCrate(8, 952, -742);
+		AddSupplyCrate(9, 728, -789);
+		AddSupplyCrate(10, 310, -335);
+		AddSupplyCrate(11, 600, -19);
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
@@ -585,7 +614,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		AddQuestTrigger("SIAUL_EAST_REQUEST6", "f_siauliai_2", 1886.66, -476.83, 100, async args =>
+		AddQuestTrigger("SIAUL_EAST_REQUEST6", "f_siauliai_2", 1887, -477, 200, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -596,7 +625,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		AddQuestTrigger("SIAUL_EAST_CAMP4", "f_siauliai_2", 234, 427, 100, async args =>
+		AddQuestTrigger("SIAUL_EAST_CAMP4", "f_siauliai_2", 164, 440, 100, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -607,7 +636,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		AddQuestTrigger("SIAUL_EAST_CAMP4_2", "f_siauliai_2", 175, 363, 100, async args =>
+		AddQuestTrigger("SIAUL_EAST_CAMP4_2", "f_siauliai_2", -46, 818, 100, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -616,6 +645,51 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				character.Quests.StartQuestTrack(Camp4);
 
 			await Task.CompletedTask;
+		});
+	}
+
+	/// <summary>
+	/// Places one of the supply crates the monsters dragged off, which the
+	/// player gathers back up for the supply officer.
+	/// </summary>
+	private void AddSupplyCrate(int number, int x, int z)
+	{
+		AddNpc(46212, L("Supply Crate"), "ACT2_DISS1_BOX_" + number, "f_siauliai_2", x, z, 177, async dialog =>
+		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Supply Crate"));
+
+			if (!character.Quests.IsActive(Act2Diss1) || character.Quests.IsCompletable(Act2Diss1))
+			{
+				await dialog.Msg(L("An empty crate, tipped on its side."));
+				return;
+			}
+
+			if (character.Variables.Perm.GetBool(SupplyCrateVar + number, false))
+			{
+				await dialog.Msg(L("{#666666}*You have already recovered this crate*{/}"));
+				return;
+			}
+
+			var result = await character.TimeActions.StartAsync(L("Recovering the supply crate..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
+
+			if (result != TimeActionResult.Completed)
+				return;
+
+			character.Variables.Perm.Set(SupplyCrateVar + number, true);
+
+			var recovered = 0;
+			for (var i = 1; i <= SupplyCratePlaced; ++i)
+			{
+				if (character.Variables.Perm.GetBool(SupplyCrateVar + i, false))
+					recovered++;
+			}
+
+			character.ServerMessage(LF("Supply crates recovered: {0}/{1}", recovered, SupplyCrateCount));
+
+			if (recovered >= SupplyCrateCount)
+				character.Quests.CompleteObjective(Act2Diss1, "recoverSupplies");
 		});
 	}
 }
@@ -743,19 +817,19 @@ public class SiaulEastReclaim6Quest : QuestScript
 	{
 		SetClientId(1036);
 		SetName(L("Nothing Goes as Planned (3)"));
-		SetDescription(L("The supply officer wants the large gray Chupacabra that steals the supplies dealt with."));
+		SetDescription(L("The supply officer wants the Chupacabra that steal the supplies thinned out."));
 		SetType(QuestType.Sub);
 		SetLocation("f_siauliai_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "SIAUL_EAST_SUPPLY_MANAGER", "f_siauliai_2", L("Hear the supply officer's request"));
-		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_SUPPLY_MANAGER", "f_siauliai_2", L("Kill the large gray Chupacabra"));
+		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_SUPPLY_MANAGER", "f_siauliai_2", L("Kill the Chupacabra raiding the supplies"));
 		SetPhase(QuestStatus.Success, "SIAUL_EAST_SUPPLY_MANAGER", "f_siauliai_2", L("Report to the supply officer"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(20131, QuestStatus.Completed));
 
-		AddObjective("killElite", L("Kill the large gray Chupacabra"), new KillObjective(7, "Chupacabra_Gray_Elite"));
+		AddObjective("killChupacabra", L("Kill the Chupacabra raiding the supplies"), new KillObjective(7, "Chupacabra_Blue"));
 
 		AddReward(new ItemReward("expCard1", 1));
 	}
@@ -809,7 +883,7 @@ public class SiaulEastRequest1Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1032, QuestStatus.Completed));
 
-		AddPityDrop(650407, 0.1f, 10, 1, 400981);
+		AddPityDrop("SIAUL_EAST_REQUEST1_Blood", 0.35f, 3, 1, "Popolion_Blue");
 
 		AddObjective("findClue", L("Kill Popolion to find a clue"), new CollectItemObjective("SIAUL_EAST_REQUEST1_Blood", 1));
 
@@ -866,7 +940,7 @@ public class SiaulEastRequest4Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(7));
 
-		AddPityDrop(650408, 0.1f, 0, 1, 41280);
+		AddPityDrop("SIAUL_EAST_REQUEST4_Claw", 1.0f, 0, 1, "Weaver");
 
 		AddObjective("collectClaws", L("Kill Weaver to collect Weaver Claws"), new CollectItemObjective("SIAUL_EAST_REQUEST4_Claw", 6));
 
@@ -978,7 +1052,7 @@ public class Act2Diss1Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(2));
 
-		AddObjective("recoverSupplies", L("Recover the scattered supply crates"), new ManualObjective());
+		AddObjective("recoverSupplies", L("Recover five of the scattered supply crates"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard1", 1));
 	}

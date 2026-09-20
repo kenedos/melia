@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Clearing the Mine Road
 //--- Description -----------------------------------------------------------
 // The explosives go up, the wagons burn, and the Vubbes come running.
@@ -42,6 +42,30 @@ public class SiauOutQ16Track : TrackScript
 		actors.Add(AddTrackActor(character, 40070, -125, 153, -443, 0, new TrackActorSpec { Ai = "MON_DUMMY", Name = L("Notice") }));
 
 		return actors.ToArray();
+	}
+
+	// The cutscene's own cast is three Vubbes; the rest come running once
+	// the camera lets go, outside the actor list the client indexes.
+	public override void OnHandOver(Character character, Track track)
+	{
+		AddRunningVubbe(character, -138, -712);
+		AddRunningVubbe(character, -14, -742);
+		AddRunningVubbe(character, -84, -676);
+	}
+
+	/// <summary>
+	/// Spawns one of the Vubbes the explosion draws in, already coming for
+	/// the player.
+	/// </summary>
+	private static void AddRunningVubbe(Character character, double x, double z)
+	{
+		var monster = AddTrackMonster(character, 106000, L("Vubbe Miner"), "None", x, 148, z, 0);
+
+		if (monster == null)
+			return;
+
+		monster.Tendency = TendencyType.Aggressive;
+		monster.InsertHate(character);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)
@@ -88,6 +112,9 @@ public class SiauOutQ16Track : TrackScript
 				RemoveTrackActor(character, track, 3);
 				break;
 			case 79:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
 				SetTrackTendency(character, track);
 				break;
 		}

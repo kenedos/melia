@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Sirdgela Forest Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Believers of Goddess Saule holding the line against the Thorn Forest.
@@ -120,7 +120,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("Rikaus is at Thorny Pillar Garden, north of here."));
-				character.Quests.ReplayQuestTrack(Mq02);
+				character.Quests.ClearQuestTrack(Mq02);
 				return;
 			}
 
@@ -181,7 +181,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq03))
 			{
 				await dialog.Msg(L("The shamans hold their rituals west of here. Break them where they stand."));
-				character.Quests.ReplayQuestTrack(Mq03);
+				character.Quests.ClearQuestTrack(Mq03);
 				return;
 			}
 
@@ -341,7 +341,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq07))
 			{
 				await dialog.Msg(L("Archon is summoned at the corrupted altar to the north-east."));
-				character.Quests.ReplayQuestTrack(Mq07);
+				character.Quests.ClearQuestTrack(Mq07);
 				return;
 			}
 

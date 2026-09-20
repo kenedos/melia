@@ -1,14 +1,16 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Crystal Mine 2F Quest NPCs
 //--- Description -----------------------------------------------------------
 // The circulation, auxiliary and main purifiers of the second floor, and the
 // pipes and supply devices they depend on.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -41,7 +43,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal4) && character.Quests.IsCompletable(Crystal4))
 			{
-				await dialog.Msg(L("All Purifier Pipes seem to be working properly. The Circulation Purifier starts up."));
+				var started = await character.TimeActions.StartAsync(L("Starting the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+				if (started != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("All Purifier Pipes seem to be working properly. The Circulation Purifier starts up."));
 				character.Quests.Complete(Crystal4);
 				CheckPurifiersRepaired(character);
 				return;
@@ -49,7 +56,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal2) && character.Quests.IsCompletable(Crystal2))
 			{
-				await dialog.Msg(L("The Purifier in District 3 is working properly now. The Circulation Purifier turns over, then stalls again."));
+				var worked = await character.TimeActions.StartAsync(L("Working the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+				if (worked != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The Purifier in District 3 is working properly now. The Circulation Purifier turns over, then stalls again."));
 				character.Quests.Complete(Crystal2);
 				character.Quests.Start(Crystal3);
 				return;
@@ -64,8 +76,13 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var inspected = await character.TimeActions.StartAsync(L("Checking the purifier..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (inspected != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Crystal2);
-					await dialog.Msg(L("The Circulation Purifier is unable to absorb the toxic fumes. Examine the purifier in District 3 and fix it."));
+					character.ServerMessage(L("The Circulation Purifier is unable to absorb the toxic fumes. Examine the purifier in District 3 and fix it."));
 				}
 
 				return;
@@ -96,7 +113,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal2) && !character.Quests.IsCompletable(Crystal2))
 			{
-				await dialog.Msg(L("The pipe is choked with crystal dust. You clear it and seat the coupling again."));
+				var cleared = await character.TimeActions.StartAsync(L("Checking the purifier pipe..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+				if (cleared != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The pipe is choked with crystal dust. You clear it and seat the coupling again."));
 				character.Quests.CompleteObjective(Crystal2, "repairPipe");
 				return;
 			}
@@ -122,7 +144,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal4) && !character.Quests.IsCompletable(Crystal4))
 			{
-				await dialog.Msg(L("You work the pipe back into shape. Air moves through it again."));
+				var straightened = await character.TimeActions.StartAsync(L("Checking the purifier pipe..."), L("Cancel"), "GROPE", TimeSpan.FromSeconds(3));
+
+				if (straightened != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You work the pipe back into shape. Air moves through it again."));
 				character.Quests.CompleteObjective(Crystal4, "checkPipe");
 				return;
 			}
@@ -130,7 +157,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Crystal3))
 			{
 				await dialog.Msg(L("The Carapace will not let you near the pipe."));
-				character.Quests.ReplayQuestTrack(Crystal3);
+				character.Quests.ClearQuestTrack(Crystal3);
 				return;
 			}
 
@@ -149,7 +176,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.IsCompletable(Crystal11))
 				{
-					await dialog.Msg(L("The Magic Supply Device is working well. Start the Auxiliary Purifier."));
+					var startedAux = await character.TimeActions.StartAsync(L("Starting the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+					if (startedAux != TimeActionResult.Completed)
+						return;
+
+					character.ServerMessage(L("The Magic Supply Device is working well. Start the Auxiliary Purifier."));
 					character.Quests.CompleteObjective(Crystal11, "activate");
 					return;
 				}
@@ -169,8 +201,13 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var inspectedAux = await character.TimeActions.StartAsync(L("Checking the purifier..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (inspectedAux != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Crystal5);
-					await dialog.Msg(L("It is drawing no power at all. Use the Mine Compass to check what you need to fix the Auxiliary Purifier."));
+					character.ServerMessage(L("It is drawing no power at all. Use the Mine Compass to check what you need to fix the Auxiliary Purifier."));
 					character.Quests.CompleteObjective(Crystal5, "inspect");
 					character.Quests.Complete(Crystal5);
 					await dialog.Msg(L("The Mine Compass points towards the Magic Supply Device in District 4."));
@@ -199,7 +236,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 					return;
 				}
 
-				await dialog.Msg(L("The lubricant frees the seized gears. The Magic Supply Device turns over."));
+				var oiled = await character.TimeActions.StartAsync(L("Oiling the gears..."), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(2));
+
+				if (oiled != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The lubricant frees the seized gears. The Magic Supply Device turns over."));
 				character.Quests.Complete(Crystal10);
 				character.Quests.Start(Crystal11);
 				return;
@@ -207,6 +249,11 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal7))
 			{
+				var looked = await character.TimeActions.StartAsync(L("Looking the device over..."), L("Cancel"), "LOOK_SIT", TimeSpan.FromSeconds(3));
+
+				if (looked != TimeActionResult.Completed)
+					return;
+
 				await dialog.Msg(L("The device is seized solid with rust."));
 				await dialog.Msg(L("Use the Mine Compass to check what you need to fix the Auxiliary Purifier."));
 				character.Quests.CompleteObjective(Crystal7, "inspect");
@@ -249,7 +296,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 			{
 				if (!character.Quests.IsCompletable(Crystal21))
 				{
-					await dialog.Msg(L("You fit the recovered part and bring the Main Purifier up to pressure."));
+					var repairedMain = await character.TimeActions.StartAsync(L("Repairing the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+					if (repairedMain != TimeActionResult.Completed)
+						return;
+
+					character.ServerMessage(L("You fit the recovered part and bring the Main Purifier up to pressure."));
 					character.Quests.CompleteObjective(Crystal21, "fitPart");
 					return;
 				}
@@ -269,8 +321,13 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var inspectedMain = await character.TimeActions.StartAsync(L("Looking the purifier over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (inspectedMain != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Crystal14);
-					await dialog.Msg(L("Parts have been torn out of it and carried off. Use the Mine Compass to locate the missing parts of the purifier."));
+					character.ServerMessage(L("Parts have been torn out of it and carried off. Use the Mine Compass to locate the missing parts of the purifier."));
 					character.Quests.CompleteObjective(Crystal14, "inspect");
 					character.Quests.Complete(Crystal14);
 					await dialog.Msg(L("The compass is pointing towards District 6."));
@@ -296,11 +353,16 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Crystal20))
 				{
 					await dialog.Msg(L("The Stone Whale is still guarding the parts."));
-					character.Quests.ReplayQuestTrack(Crystal20);
+					character.Quests.ClearQuestTrack(Crystal20);
 					return;
 				}
 
-				await dialog.Msg(L("You defeated the Stone Whale and got the parts. Return to the Main Purifier and fix it."));
+				var recovered = await character.TimeActions.StartAsync(L("Recovering the part..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
+
+				if (recovered != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You defeated the Stone Whale and got the parts. Return to the Main Purifier and fix it."));
 				character.Quests.Complete(Crystal20);
 				character.Quests.Start(Crystal21);
 				return;

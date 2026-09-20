@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The escape to Nugria Sanctum
 //--- Description -----------------------------------------------------------
 // The villagers who followed you shed their skins, and the girl at the altar
@@ -48,6 +48,17 @@ public class Huevillage581Mq11Track : TrackScript
 		actors.Add(AddTrackActor(character, 400102, -1022.85, 230.98, 440.22, 0, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-985.48645f, 230.9787f, 372.21805f) }));
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 6);
+		RemoveTrackActor(character, track, 9);
+		RemoveTrackActor(character, track, 10);
+		RemoveTrackActor(character, track, 11);
+		RemoveTrackActor(character, track, 12);
+		RemoveTrackActor(character, track, 13);
+		RemoveTrackActor(character, track, 14);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

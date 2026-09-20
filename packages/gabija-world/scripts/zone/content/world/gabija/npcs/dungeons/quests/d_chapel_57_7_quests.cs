@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Tenet Church 2F Quest NPCs
 //--- Description -----------------------------------------------------------
 // Follower Algis, the altars of the central hall and the sanctuary the
@@ -52,9 +52,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("You need the Seal of Space in order to enter the hidden sanctuary."));
-				await dialog.Msg(L("It's hidden in the Sventove Central Altar, but I just hope it's not too late."));
-
-				var answer = await dialog.Select(L("Let's go and find"),
+				var answer = await dialog.Select(L("It's hidden in the Sventove Central Altar, but I just hope it's not too late."),
 					Option(L("Let's go and find"), "accept"),
 					Option(L("Hide first"), "leave")
 				);
@@ -68,9 +66,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				await dialog.Msg(L("We must change our plan."));
-				await dialog.Msg(L("First, we'll need to go observe Gesti's actions."));
-
-				var answer = await dialog.Select(L("Begin immediately"),
+				var answer = await dialog.Select(L("First, we'll need to go observe Gesti's actions."),
 					Option(L("Begin immediately"), "accept"),
 					Option(L("Gesti might still be around"), "leave")
 				);
@@ -172,9 +168,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("Alright, bring back the Seal of Space from the Sventove Central Altar."));
-				await dialog.Msg(L("Can you do this?"));
-
-				var answer = await dialog.Select(L("I will bring it back secretly"),
+				var answer = await dialog.Select(L("Can you do this?"),
 					Option(L("I will bring it back secretly"), "accept"),
 					Option(L("About the Seal of Space"), "explain"),
 					Option(L("I'll observe the situation a little more"), "leave")
@@ -196,9 +190,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("We can't do anything about the destroyed altar, but the fragments still have power."));
-				await dialog.Msg(L("Gather the pieces and insert them into the 8 pillars of the Sventove Central Hall."));
-
-				var answer = await dialog.Select(L("I'll be cautious on my way"),
+				var answer = await dialog.Select(L("Gather the pieces and insert them into the 8 pillars of the Sventove Central Hall."),
 					Option(L("I'll be cautious on my way"), "accept"),
 					Option(L("Check Gesti's action and go"), "leave")
 				);
@@ -214,9 +206,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("It is too much for me to handle alone without any help from the other brothers."));
-				await dialog.Msg(L("I'd better use the Malda Altar."));
-
-				var answer = await dialog.Select(L("I'll activate the altar"),
+				var answer = await dialog.Select(L("I'd better use the Malda Altar."),
 					Option(L("I'll activate the altar"), "accept"),
 					Option(L("It will be okay"), "leave")
 				);
@@ -230,9 +220,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("Demons are going around the second floor searching every corner."));
-				await dialog.Msg(L("Activating the Auka Altar will divert their attention."));
-
-				var answer = await dialog.Select(L("No problem"),
+				var answer = await dialog.Select(L("Activating the Auka Altar will divert their attention."),
 					Option(L("No problem"), "accept"),
 					Option(L("I'll think about it for a while"), "leave")
 				);
@@ -246,9 +234,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
 				await dialog.Msg(L("It's hard to watch the Egnomes running around the Atgaila Chapel."));
-				await dialog.Msg(L("Please clean up the Egnomes."));
-
-				var answer = await dialog.Select(L("Sure, I'll defeat it"),
+				var answer = await dialog.Select(L("Please clean up the Egnomes."),
 					Option(L("Sure, I'll defeat it"), "accept"),
 					Option(L("I don't have time for that"), "leave")
 				);
@@ -262,9 +248,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
 				await dialog.Msg(L("All preparations have been made."));
-				await dialog.Msg(L("The barriers of the church will soon weaken Gesti."));
-
-				var answer = await dialog.Select(L("I trust you"),
+				var answer = await dialog.Select(L("The barriers of the church will soon weaken Gesti."),
 					Option(L("I trust you"), "accept"),
 					Option(L("About the Divine Sphere"), "explain"),
 					Option(L("I'm not yet ready"), "leave")
@@ -286,9 +270,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq10) && character.Quests.MeetsPrerequisites(Mq10))
 			{
 				await dialog.Msg(L("So you found the Seal of Space."));
-				await dialog.Msg(L("Honestly, I did not believe it when my friend, the Paladin Master, said a Savior would come."));
-
-				var answer = await dialog.Select(L("I'll go there"),
+				var answer = await dialog.Select(L("Honestly, I did not believe it when my friend, the Paladin Master, said a Savior would come."),
 					Option(L("I'll go there"), "accept"),
 					Option(L("There is still more to do"), "leave")
 				);
@@ -343,7 +325,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq10))
 			{
 				await dialog.Msg(L("The sanctuary is behind the seal. Find the revelation."));
-				character.Quests.ReplayQuestTrack(Mq10);
+				character.Quests.ClearQuestTrack(Mq10);
 				return;
 			}
 
@@ -411,6 +393,11 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq10) && !character.Quests.IsCompletable(Mq10))
 			{
 				await dialog.Msg(L("The Seal of Space turns in your hand. The wall folds away, revealing the sanctuary."));
+				var readMural = await character.TimeActions.StartAsync(L("Reading the mural..."), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
+
+				if (readMural != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq10);
 				return;
 			}

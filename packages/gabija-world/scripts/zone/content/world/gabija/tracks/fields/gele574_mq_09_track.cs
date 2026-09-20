@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Chasing Gesti into the Tenet Church
 //--- Description -----------------------------------------------------------
 // Algis joins you at the temple courtyard, and the gate is sealed behind her.
@@ -59,6 +59,8 @@ public class Gele574Mq09Track : TrackScript
 				RemoveTrackActor(character, track, 2);
 				break;
 			case 74:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

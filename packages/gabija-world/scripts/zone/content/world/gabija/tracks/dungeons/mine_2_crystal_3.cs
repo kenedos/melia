@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Carapace on the District 2 Pipe
 //--- Description -----------------------------------------------------------
 // A Carapace has bedded down on the purifier pipe with a Yekubite swarm
@@ -60,6 +60,12 @@ public class Mine2Crystal3Track : TrackScript
 				RemoveTrackActor(character, track, 6);
 				break;
 			case 33:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 8);
+				RemoveTrackActor(character, track, 9);
 				RemoveTrackActor(character, track, 1);
 				RemoveTrackActor(character, track, 8);
 				CreateBattleBoxInLayer(character, track);

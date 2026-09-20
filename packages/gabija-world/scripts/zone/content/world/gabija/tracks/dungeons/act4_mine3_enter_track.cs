@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Crystal Wall of the Closed Area
 //--- Description -----------------------------------------------------------
 // The Vubbe magic stones burn out the crystal wall sealing the closed area,
@@ -35,6 +35,11 @@ public class Act4Mine3EnterTrack : TrackScript
 		actors.Add(character);
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 0);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

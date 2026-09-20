@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Mysterious Slate
 //--- Description -----------------------------------------------------------
 // With Mirtis gone the crystal pillar splits open and gives up the slate it
@@ -35,6 +35,12 @@ public class Mine3Boss2BossTrack : TrackScript
 		actors.Add(AddTrackActor(character, 47234, 2042.0284, 56.932098, 1745.1373, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 1);
+		RemoveTrackActor(character, track, 2);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

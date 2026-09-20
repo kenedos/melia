@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Chafer on the Valley Road
 //--- Description -----------------------------------------------------------
 // Chafer bursts from the ground and swats the Kepa and Jukopus ahead of it.
@@ -56,6 +56,12 @@ public class SoutSuddPrebossTrack : TrackScript
 				RemoveTrackActor(character, track, 7);
 				break;
 			case 14:
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 7);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

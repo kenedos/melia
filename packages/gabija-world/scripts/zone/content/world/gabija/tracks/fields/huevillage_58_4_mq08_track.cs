@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Goddess Saule freed
 //--- Description -----------------------------------------------------------
 // The key turns, the vines give way and the statues holding her fall.
@@ -85,6 +85,12 @@ public class Huevillage584Mq08Track : TrackScript
 			case 46:
 				RemoveTrackActor(character, track, 1);
 				RemoveTrackActor(character, track, 2);
+				break;
+			case 54:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				CreateBattleBoxInLayer(character, track);
+				SetTrackTendency(character, track);
 				break;
 		}
 

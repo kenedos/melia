@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Sventove Central Altar
 //--- Description -----------------------------------------------------------
 // Gesti reaches the altar before you do.
@@ -38,6 +38,11 @@ public class Chaple577Mq03Track : TrackScript
 		actors.Add(AddTrackActor(character, 152003, 207.33, 164.86, -582.63, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 1);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

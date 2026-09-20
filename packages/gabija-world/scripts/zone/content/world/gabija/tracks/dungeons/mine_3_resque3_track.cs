@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Netherbovine's Attack
 //--- Description -----------------------------------------------------------
 // A Netherbovine answers the mine crystal and comes up out of the dark,
@@ -45,6 +45,7 @@ public class Mine3Resque3Track : TrackScript
 				RemoveTrackActor(character, track, 1);
 				break;
 			case 39:
+				RemoveTrackActor(character, track, 1);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

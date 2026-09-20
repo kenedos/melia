@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Vubbe Fighter at Nudegi
 //--- Description -----------------------------------------------------------
 // The scout and the player close in on the Vubbe Fighter at the logging camp.
@@ -30,7 +30,7 @@ public class SiaulEastRequest6Track : TrackScript
 		character.Movement.MoveTo(new Position(2107.0833f, 185.09489f, -69.346664f));
 		actors.Add(character);
 
-		actors.Add(AddTrackActor(character, 400201, 2067.6062, 185.09489, -169.27565, 50, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 400201, 2067.6062, 185.09489, -169.27565, 50, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(2089.10720f, 185.09489f, -274.69974f) }));
 		actors.Add(AddTrackActor(character, 57192, 2081.7092, 185.09489, -448.51422, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 57192, 1985.8104, 185.09489, -330.603, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 57192, 1920.6758, 185.09489, -361.58221, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));

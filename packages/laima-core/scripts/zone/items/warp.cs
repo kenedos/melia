@@ -32,6 +32,18 @@ public class WarpScript : GeneralScript
 		return ItemUseResult.Okay;
 	}
 
+	// Opens the same travel menu as a Statue of Goddess Vakarine.
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_ITEM_Warp(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		character.StartDialog(item, async (dialog) =>
+		{
+			await OpenWarpDestinations(dialog);
+		});
+
+		return ItemUseResult.Okay;
+	}
+
 	[ScriptableFunction]
 	public ItemUseResult SCR_USE_ITEM_WARP_ORSHA(Character character, Item item, string buffName, float numArg1, float numArg2)
 	{

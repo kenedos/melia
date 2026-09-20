@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The circle at Drugys Courtyard
 //--- Description -----------------------------------------------------------
 // Mothstem rises out of the circle with the Carcashu that feed it.
@@ -61,6 +61,7 @@ public class Huevillage584Mq03Track : TrackScript
 				track.Actors[2].AttachEffect("F_ground083_smoke#Dummy_emitter", 4, EffectLocation.Bottom);
 				break;
 			case 40:
+				RemoveTrackActor(character, track, 0);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

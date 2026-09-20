@@ -288,6 +288,36 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Adds an NPC that only exists for the characters the given
+		/// condition accepts.
+		/// </summary>
+		/// <remarks>
+		/// The world shows some NPCs only during part of a quest chain - a
+		/// captive who is not there until he is rescued, a barricade that is
+		/// gone once it is blown up. Two of them may stand on the same map at
+		/// once, each visible to a different set of players.
+		/// </remarks>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="uniqueName"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="visibleTo">Condition deciding whether the NPC is there for a character.</param>
+		/// <param name="dialog"></param>
+		/// <returns></returns>
+		public static Npc AddConditionalNpc(int monsterId, string name, string uniqueName, string map, double x, double z, double direction, Func<Character, bool> visibleTo, DialogFunc dialog = null)
+		{
+			var npc = AddNpc(monsterId, name, uniqueName, map, x, z, direction, dialog);
+
+			if (npc != null)
+				npc.VisibleTo = visibleTo;
+
+			return npc;
+		}
+
+		/// <summary>
 		/// Adds an invisible area trigger to the world, which runs the given
 		/// function when a character steps into it.
 		/// </summary>

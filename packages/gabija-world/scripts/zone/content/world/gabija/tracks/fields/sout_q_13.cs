@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Vubbe Base
 //--- Description -----------------------------------------------------------
 // A Vubbe camp drums and cooks outside the village, then turns on the player.
@@ -67,6 +67,12 @@ public class SoutQ13Track : TrackScript
 				character.ServerMessage(L("Defeat the Vubbes marching in!"));
 				break;
 			case 29:
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 7);
+				RemoveTrackActor(character, track, 13);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

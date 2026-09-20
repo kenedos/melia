@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Kvailas Forest Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Believers who watch Bramble, the altars of purification, its roots and
@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -315,6 +316,11 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
 			{
 				await dialog.Msg(L("You work the altar until the water in the basin runs clear."));
+				var startedAltar2 = await character.TimeActions.StartAsync(L("Starting the purification altar..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+				if (startedAltar2 != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq02);
 				return;
 			}
@@ -334,6 +340,11 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You set the altar working, quietly, the way Kazis asked."));
 				character.ServerMessage(L("The Altar of Purification is working!"));
+				var startedAltar6 = await character.TimeActions.StartAsync(L("Starting the purification altar..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+				if (startedAltar6 != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq06);
 				return;
 			}
@@ -553,7 +564,7 @@ public class Thorn21Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50003, QuestStatus.Completed));
 
-		AddPityDrop(650606, 0.45f, 6, 1, 400381);
+		AddPityDrop("THORN21_MQ04_BUGWING", 0.45f, 5, 1, "Matsum");
 
 		AddObjective("collectStamen", L("Obtain Matsum's Flower Stamen"), new CollectItemObjective("THORN21_MQ04_BUGWING", 4));
 

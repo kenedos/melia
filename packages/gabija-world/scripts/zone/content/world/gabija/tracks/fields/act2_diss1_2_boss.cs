@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Tutu Ambush
 //--- Description -----------------------------------------------------------
 // A Tutu bursts from the water and sends the Chupacabra at the supply officer.
@@ -28,13 +28,19 @@ public class Act2Diss1_2BossTrack : TrackScript
 
 		var actors = new List<IActor>();
 
-		actors.Add(AddTrackActor(character, 41210, -40.459595, 101.3127, -551.65527, 612, new TrackActorSpec { Ai = "BasicBoss" }));
-		actors.Add(AddTrackActor(character, 400961, 199.22469, 130.0327, -649.96228, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 400961, 211.9808, 130.0327, -597.46405, 15, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 400961, 263.82397, 130.0327, -682.19836, 15, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 400961, 210.1192, 130.0327, -575.46832, 11, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 400961, 306.94797, 130.0327, -650.95648, 3, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 400961, 268.3602, 130.0327, -602.18146, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 41210, -40.459595, 101.3127, -551.65527, 612, new TrackActorSpec
+		{
+			Ai = "BasicBoss",
+			Level = 7,
+			MaxHp = 600,
+			EndPosition = new Position(314.13336f, 130.02271f, -635.53241f),
+		}));
+		actors.Add(AddTrackActor(character, 400961, 199.22469, 130.0327, -649.96228, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Level = 6 }));
+		actors.Add(AddTrackActor(character, 400961, 211.9808, 130.0327, -597.46405, 15, new TrackActorSpec { Ai = "TrackWaitMonster", Level = 6, EndPosition = new Position(239.70688f, 130.0327f, -649.94958f) }));
+		actors.Add(AddTrackActor(character, 400961, 263.82397, 130.0327, -682.19836, 15, new TrackActorSpec { Ai = "TrackWaitMonster", Level = 6, EndPosition = new Position(268.85553f, 130.0327f, -631.04315f) }));
+		actors.Add(AddTrackActor(character, 400961, 210.1192, 130.0327, -575.46832, 11, new TrackActorSpec { Ai = "TrackWaitMonster", Level = 6, EndPosition = new Position(256.73865f, 130.0327f, -585.42108f) }));
+		actors.Add(AddTrackActor(character, 400961, 306.94797, 130.0327, -650.95648, 3, new TrackActorSpec { Ai = "TrackWaitMonster", Level = 6 }));
+		actors.Add(AddTrackActor(character, 400961, 268.3602, 130.0327, -602.18146, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Level = 6 }));
 
 		actors.Add(AddTrackActor(character, 20016, 661.28607, 130.02271, -453.11606, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Peaceful }));
 
@@ -48,6 +54,16 @@ public class Act2Diss1_2BossTrack : TrackScript
 		actors.Add(AddTrackActor(character, 20025, -41.616821, 101.3127, -532.22437, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
+	}
+
+	// The timeline arms the fight on frame 32, past its own last frame,
+	// so the client never reports it.
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 5);
+		RemoveTrackActor(character, track, 6);
+		CreateBattleBoxInLayer(character, track);
+		SetTrackTendency(character, track);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

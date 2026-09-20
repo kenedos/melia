@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Rocktortuga at the Klaipeda Checkpoint
 //--- Description -----------------------------------------------------------
 // Infrorocktors break on the guard line, and something larger follows.
@@ -35,7 +35,7 @@ public class SiaulWestWoodSpiritTrack : TrackScript
 		actors.Add(AddTrackActor(character, 10032, 1584, 210, -742, 0, guard));
 		actors.Add(AddTrackActor(character, 10032, 1586, 210, -866, 0, guard));
 
-		actors.Add(AddTrackActor(character, 41233, 1418, 210, -916, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 41233, 1418, 210, -916, 0, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(1476f, 210f, -893f) }));
 
 		var rocktor = new TrackActorSpec { Ai = "TrackWaitMonster" };
 		actors.Add(AddTrackActor(character, 41319, 1275, 210, -960, 43, rocktor));
@@ -66,6 +66,17 @@ public class SiaulWestWoodSpiritTrack : TrackScript
 				RemoveTrackActor(character, track, 12);
 				break;
 			case 39:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
+				RemoveTrackActor(character, track, 6);
+				RemoveTrackActor(character, track, 7);
+				RemoveTrackActor(character, track, 8);
+				RemoveTrackActor(character, track, 9);
+				RemoveTrackActor(character, track, 10);
+				RemoveTrackActor(character, track, 11);
+				RemoveTrackActor(character, track, 12);
 				RemoveTrackActor(character, track, 1);
 				RemoveTrackActor(character, track, 2);
 				RemoveTrackActor(character, track, 4);

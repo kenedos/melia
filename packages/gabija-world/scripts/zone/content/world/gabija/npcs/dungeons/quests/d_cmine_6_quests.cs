@@ -1,14 +1,16 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Crystal Mine 3F Quest NPCs
 //--- Description -----------------------------------------------------------
 // Vaidotas, the villagers the Vubbe took, and the sealed area where Mirtis
 // and the slate are waiting.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -86,7 +88,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Rescue1))
 				{
 					await dialog.Msg(L("The Crystal Spiders are still on us. Drive them off first."));
-					character.Quests.ReplayQuestTrack(Rescue1);
+					character.Quests.ClearQuestTrack(Rescue1);
 					return;
 				}
 
@@ -150,7 +152,14 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
+					var looked1047 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (looked1047 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Rescue3);
+				}
 
 				return;
 			}
@@ -188,6 +197,11 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var looked4220 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(2));
+
+					if (looked4220 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Enter);
 					await dialog.Msg(L("The barrier will only give way to the stones the Vubbe carry."));
 				}
@@ -244,7 +258,14 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
+					var looked1048 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (looked1048 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Boss);
+				}
 
 				return;
 			}
@@ -257,7 +278,14 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
+					var read20050 = await character.TimeActions.StartAsync(L("Reading the notice..."), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
+
+					if (read20050 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Slate);
+				}
 
 				return;
 			}
@@ -455,7 +483,7 @@ public class Act4Mine3EnterQuest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(12));
 
-		AddPityDrop(645002, 0.1f, 5, 1, 47456, 400209);
+		AddPityDrop("D_Bube_Mane", 1.0f, 0, 1, "bubbe_mage_priest", "GoblinWarrior");
 
 		AddObjective("collectStones", L("Defeat Vubbes and obtain Vubbe Magic Stones"), new CollectItemObjective("D_Bube_Mane", 10));
 

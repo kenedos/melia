@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Gesti at Uzbaiga Hillside
 //--- Description -----------------------------------------------------------
 // The trap is sprung, and Gesti learns the revelation was a lure.
@@ -39,6 +39,11 @@ public class Gele573Mq09After : TrackScript
 		actors.Add(AddTrackActor(character, 20024, 77.41, 350.07, -90.21, 6, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 2);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

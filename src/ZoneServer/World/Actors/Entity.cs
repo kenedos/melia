@@ -862,6 +862,14 @@ namespace Melia.Zone.World.Actors
 		}
 
 		/// <summary>
+		/// Drops all hate the entity holds towards the given target.
+		/// </summary>
+		public static void ForgetHate(this ICombatEntity entity, ICombatEntity target)
+		{
+			entity.Components.Get<AiComponent>()?.Script.QueueEventAlert(new HateResetAlert(target));
+		}
+
+		/// <summary>
 		/// Interrupts the entity's current skill cast.
 		/// </summary>
 		public static void Interrupt(this ICombatEntity entity)

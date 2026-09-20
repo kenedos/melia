@@ -462,6 +462,24 @@ namespace Melia.Zone.Scripting
 		}
 
 		/// <summary>
+		/// Adds an item drop modifier that is guaranteed to drop once the
+		/// character killed the given number of monsters without it, using
+		/// class names instead of ids.
+		/// </summary>
+		/// <param name="itemClassName">Class name of the item to drop</param>
+		/// <param name="dropChance">Drop probability (0.0 to 1.0, where 0.5 = 50%)</param>
+		/// <param name="fixedCount">Kills without a drop after which the drop is guaranteed</param>
+		/// <param name="amount">Amount that drops at once</param>
+		/// <param name="monsterClassNames">Class names of the monsters that should drop this item</param>
+		protected void AddPityDrop(string itemClassName, float dropChance, int fixedCount, int amount, params string[] monsterClassNames)
+		{
+			if (!ZoneServer.Instance.Data.ItemDb.TryFind(itemClassName, out var itemData))
+				throw new ArgumentException($"Item '{itemClassName}' not found in '{this.GetType().Name}'.");
+
+			this.AddDrop(new ItemDropModifier(itemData.Id, dropChance, monsterClassNames) { FixedCount = fixedCount, Amount = amount });
+		}
+
+		/// <summary>
 		/// Add an item drop modifier to a specific monster(s)
 		/// for the duration of an active quest.
 		/// </summary>

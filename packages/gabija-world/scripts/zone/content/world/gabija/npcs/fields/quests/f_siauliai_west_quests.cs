@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // West Siauliai Woods Quest NPCs
 //--- Description -----------------------------------------------------------
 // The soldiers, villagers and hidden triggers the map's field quests run on.
@@ -51,7 +51,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The road to Klaipeda is closed. Nobody gets through while the camp is on alert."));
 
 				var answer = await dialog.Select(L("If you want an answer, take it to Knight Titas. He's at the West Forest camp."),
-					Option(L("Say you'll go back to Titas"), "accept"),
+					Option(L("I'll take it back to Titas"), "accept"),
 					Option(L("Stay where you are"), "leave")
 				);
 
@@ -123,7 +123,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			{
 				var answer = await dialog.Select(L("If you have time to spare, carry the assembly order to my soldiers. If not, go on to Klaipeda - I won't hold it against you."),
 					Option(L("Offer to carry the assembly order"), "accept"),
-					Option(L("Refuse"), "leave")
+					Option(L("Not this time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -140,7 +140,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("You've seen the recruitment notice, then. We are short of soldiers, that much is true."));
 
 				var answer = await dialog.Select(L("But I can hardly hold out my hand to a Revelator."),
-					Option(L("Say you still want to help"), "accept"),
+					Option(L("I still want to help"), "accept"),
 					Option(L("Carry on your way"), "leave")
 				);
 
@@ -175,7 +175,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("It's dangerous here. The monsters have bred out of all measure since the Blessed Day."));
 
 				var answer = await dialog.Select(L("Kepa will be on us any moment. Go back, quickly."),
-					Option(L("Say you only came to deliver the assembly order"), "accept"),
+					Option(L("I only came to deliver the assembly order"), "accept"),
 					Option(L("Run away quickly"), "leave")
 				);
 
@@ -203,7 +203,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			{
 				var answer = await dialog.Select(L("Once you level up you can pick a stat and grow stronger in it. Want to check now?"),
 					Option(L("Try spending a stat point"), "accept"),
-					Option(L("Ask for a moment to think"), "leave")
+					Option(L("Give me a moment to think"), "leave")
 				);
 
 				if (answer == "accept")
@@ -244,8 +244,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("That's right, you came to deliver the assembly order, didn't you?"));
 
 				var answer = await dialog.Select(L("Find my bundles for me and I'll head back at once."),
-					Option(L("Offer to find the bundles for him"), "accept"),
-					Option(L("Say you'll wait until he finds them"), "leave")
+					Option(L("I'll find your bundles"), "accept"),
+					Option(L("I'll wait while you look"), "leave")
 				);
 
 				if (answer == "accept")
@@ -310,8 +310,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(MeetNaglis) && character.Quests.MeetsPrerequisites(MeetNaglis))
 			{
 				var answer = await dialog.Select(L("This is a dangerous stretch. What brings you here?"),
-					Option(L("Tell him there is an assembly order"), "accept"),
-					Option(L("Say it's nothing"), "leave")
+					Option(L("I'm carrying an assembly order"), "accept"),
+					Option(L("It's nothing"), "leave")
 				);
 
 				if (answer == "accept")
@@ -328,7 +328,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 				var answer = await dialog.Select(L("Learn a skill and you'll have something stronger to reach for."),
 					Option(L("Try learning a skill"), "accept"),
-					Option(L("Ask for a moment to think"), "leave")
+					Option(L("Give me a moment to think"), "leave")
 				);
 
 				if (answer == "accept")
@@ -353,7 +353,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			{
 				var answer = await dialog.Select(L("There may well be another Large Kepa out there. Would you take a look?"),
 					Option(L("Offer to look for it instead"), "accept"),
-					Option(L("End"), "leave")
+					Option(L("Another time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -380,7 +380,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(OnionBig))
 			{
 				await dialog.Msg(L("West of here, along the old farm road. That's where I'd look."));
-				character.Quests.ReplayQuestTrack(OnionBig);
+				character.Quests.ClearQuestTrack(OnionBig);
 				return;
 			}
 
@@ -424,9 +424,9 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("An assembly, already? The world may have ended, but an order like that with no warning is still hard to work with. I have tasks piled to the sky."));
 
 				var answer = await dialog.Select(L("Clear the Hanaming around the post and I can move sooner."),
-					Option(L("Offer to help with the task"), "accept"),
-					Option(L("About the monsters"), "explain"),
-					Option(L("Say you'll wait"), "leave")
+					Option(L("I'll clear the Hanaming"), "accept"),
+					Option(L("What are these Hanaming?"), "explain"),
+					Option(L("I'll wait"), "leave")
 				);
 
 				if (answer == "explain")
@@ -448,7 +448,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			{
 				var answer = await dialog.Select(L("The survey still wants petals. Three should do it."),
 					Option(L("Accept"), "accept"),
-					Option(L("End"), "leave")
+					Option(L("Another time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -461,8 +461,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Knight) && character.Quests.MeetsPrerequisites(Knight))
 			{
 				var answer = await dialog.Select(L("I owe you for that, so I'll send my own men with the rest of the order. Go back and tell Sir Titas as much."),
-					Option(L("Say you understand"), "accept"),
-					Option(L("End"), "leave")
+					Option(L("I'll tell Sir Titas"), "accept"),
+					Option(L("Another time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -478,8 +478,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("My men are long past due and there's been no word. Four years since the Blessed Day and discipline still slips."));
 
 				var answer = await dialog.Select(L("They said they were going to Delong Rest Stop."),
-					Option(L("Say you'll look into it"), "accept"),
-					Option(L("Say you'll be back soon"), "leave")
+					Option(L("I'll look into it"), "accept"),
+					Option(L("I'll be back soon"), "leave")
 				);
 
 				if (answer == "accept")
@@ -505,7 +505,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(BossGolem))
 			{
 				await dialog.Msg(L("One run-in with a golem will straighten them out."));
-				character.Quests.ReplayQuestTrack(BossGolem);
+				character.Quests.ClearQuestTrack(BossGolem);
 				return;
 			}
 
@@ -531,9 +531,9 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Laimonas1) && character.Quests.MeetsPrerequisites(Laimonas1))
 			{
 				var answer = await dialog.Select(L("Have you ever paid your respects at a goddess statue? The goddesses have gone from sight, but I believe they are somewhere still."),
-					Option(L("Ask what would happen"), "accept"),
-					Option(L("About the goddess statue"), "explain"),
-					Option(L("Say you're not interested"), "leave")
+					Option(L("What happens if I do?"), "accept"),
+					Option(L("What are the goddess statues for?"), "explain"),
+					Option(L("I'm not interested"), "leave")
 				);
 
 				if (answer == "explain")
@@ -554,8 +554,8 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Laimonas4) && character.Quests.MeetsPrerequisites(Laimonas4))
 			{
 				var answer = await dialog.Select(L("If you're bound for Klaipeda, do me a favor. The Infrorocktors make the trip there and back a misery."),
-					Option(L("Say you can do that much"), "accept"),
-					Option(L("Refuse"), "leave")
+					Option(L("I can do that much"), "accept"),
+					Option(L("Not this time"), "leave")
 				);
 
 				if (answer == "accept")
@@ -609,7 +609,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(Laimonas32))
 				{
 					await dialog.Msg(L("The light goes out of the stone. Something is moving in the brush behind you."));
-					character.Quests.ReplayQuestTrack(Laimonas32);
+					character.Quests.ClearQuestTrack(Laimonas32);
 					return;
 				}
 
@@ -663,7 +663,7 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (!character.Quests.IsCompletable(WoodSpirit))
 				{
 					await dialog.Msg(L("Hold the line. It comes up the road from the west."));
-					character.Quests.ReplayQuestTrack(WoodSpirit);
+					character.Quests.ClearQuestTrack(WoodSpirit);
 					return;
 				}
 
@@ -855,7 +855,7 @@ public class SiaulWestDrasius2Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20127, QuestStatus.Completed));
 
-		AddPityDrop(650405, 0.1f, 10, 1, 401501);
+		AddPityDrop("SIAUL_WEST_DRASIUS2_Bag", 1.0f, 0, 1, "Leaf_diving");
 
 		AddObjective("collectBundles", L("Kill Leaf Bugs to obtain Soldier's Belongings"), new CollectItemObjective("SIAUL_WEST_DRASIUS2_Bag", 5));
 
@@ -1045,7 +1045,7 @@ public class SiaulWestHamingLeafQuest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(1020, QuestStatus.Completed));
 
-		AddPityDrop(645024, 0.35f, 5, 1, 400941);
+		AddPityDrop("leaf_hanaming", 0.35f, 5, 1, "Hanaming");
 
 		AddObjective("collectPetals", L("Collect Hanaming Petals for the survey"), new CollectItemObjective("leaf_hanaming", 3));
 

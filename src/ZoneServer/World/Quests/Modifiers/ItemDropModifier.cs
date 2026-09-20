@@ -5,6 +5,7 @@ using Melia.Shared.Util;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
+using Yggdrasil.Logging;
 using Yggdrasil.Util;
 
 namespace Melia.Zone.World.Quests.Modifiers
@@ -61,6 +62,8 @@ namespace Melia.Zone.World.Quests.Modifiers
 				var monster = monsterIds[i];
 				if (ZoneServer.Instance.Data.MonsterDb.TryFind(monster, out var data))
 					this.MonsterIds.Add(data.Id);
+				else
+					Log.Warning("ItemDropModifier: Monster '{0}' not found, item {1} will not drop from it.", monster, itemId);
 			}
 		}
 

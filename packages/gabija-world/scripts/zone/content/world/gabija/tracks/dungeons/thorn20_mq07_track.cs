@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Archon at the corrupted altar
 //--- Description -----------------------------------------------------------
 // The shamans finish their summoning and are spent by it.
@@ -68,6 +68,9 @@ public class Thorn20Mq07Track : TrackScript
 				track.Actors[7].AttachEffect("F_burstup001_dark", 1.5f, EffectLocation.Bottom);
 				break;
 			case 29:
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
+				RemoveTrackActor(character, track, 4);
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);
 				break;

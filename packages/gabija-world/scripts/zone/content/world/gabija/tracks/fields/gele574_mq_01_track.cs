@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Biteregina at Rojus Plateau
 //--- Description -----------------------------------------------------------
 // A hive the forest never should have grown.
@@ -42,6 +42,7 @@ public class Gele574Mq01Track : TrackScript
 				RemoveTrackActor(character, track, 0);
 				break;
 			case 19:
+				RemoveTrackActor(character, track, 0);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

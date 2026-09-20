@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Cyclops at the basement barrier
 //--- Description -----------------------------------------------------------
 // Vaidutis runs for the first floor while the Revelator breaks through.
@@ -52,6 +52,8 @@ public class Chaple575Mq09Track : TrackScript
 				RemoveTrackActor(character, track, 3);
 				break;
 			case 44:
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

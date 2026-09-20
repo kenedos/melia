@@ -5842,6 +5842,8 @@ namespace Melia.Zone.Network
 				}
 				Send.ZC_NORMAL.SetupCutscene(character, false, false, true);
 
+				character.Tracks.HandOver();
+
 				// A track that locked the player into a battle box runs on
 				// into the fight, and ends with the quest, not the cinematic.
 				if (!track.HasBattleBoxInLayer)

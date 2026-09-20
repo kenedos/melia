@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The Wild Carnivore at Pasiulyma Field
 //--- Description -----------------------------------------------------------
 // A beast soaked in demonic energy, and the vines that answer for it.
@@ -49,6 +49,9 @@ public class Gele572Mq07Track : TrackScript
 				RemoveTrackActor(character, track, 3);
 				break;
 			case 44:
+				RemoveTrackActor(character, track, 1);
+				RemoveTrackActor(character, track, 2);
+				RemoveTrackActor(character, track, 3);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;

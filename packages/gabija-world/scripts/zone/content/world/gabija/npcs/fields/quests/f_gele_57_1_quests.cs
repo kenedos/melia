@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Srautas Gorge Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Watchers, the cable car parts and the Pantos the map's quests run on.
@@ -65,9 +65,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Look at this busted cable car."));
-				await dialog.Msg(L("It's still working, but the damage is pretty serious."));
-
-				var answer = await dialog.Select(L("I'll teach them a lesson"),
+				var answer = await dialog.Select(L("It's still working, but the damage is pretty serious."),
 					Option(L("I'll teach them a lesson"), "accept"),
 					Option(L("About the Watchers"), "explain"),
 					Option(L("Leave if for him to do it himself"), "leave")
@@ -93,9 +91,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It's the Pantos again."));
 				await dialog.Msg(L("They even stole the working parts."));
-				await dialog.Msg(L("Well then, we've got to take them back, right?"));
-
-				var answer = await dialog.Select(L("I'll get it to you"),
+				var answer = await dialog.Select(L("Well then, we've got to take them back, right?"),
 					Option(L("I'll get it to you"), "accept"),
 					Option(L("About repairing the cable car"), "explain"),
 					Option(L("I don't want to"), "leave")
@@ -119,9 +115,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("The Pantos hid some parts in the grasslands of Mieguista Slope."));
-				await dialog.Msg(L("Try to get me those for the time being since it's urgent."));
-
-				var answer = await dialog.Select(L("I'll bring it"),
+				var answer = await dialog.Select(L("Try to get me those for the time being since it's urgent."),
 					Option(L("I'll bring it"), "accept"),
 					Option(L("I don't have time"), "leave")
 				);
@@ -179,9 +173,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("I am looking for cable car parts, but I can't seem to find any."));
-				await dialog.Msg(L("Maybe the Zignuts at Nepavy Grassland swallowed them."));
-
-				var answer = await dialog.Select(L("I'll find it for you"),
+				var answer = await dialog.Select(L("Maybe the Zignuts at Nepavy Grassland swallowed them."),
 					Option(L("I'll find it for you"), "accept"),
 					Option(L("About the Holy Land"), "explain"),
 					Option(L("That's too bad (leave)"), "leave")
@@ -205,9 +197,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("I worked very hard to fix the cable car, but I'm still worried about the Poata."));
-				await dialog.Msg(L("A monster of that size could destroy the cable car."));
-
-				var answer = await dialog.Select(L("I'll go and hunt the Poata"),
+				var answer = await dialog.Select(L("A monster of that size could destroy the cable car."),
 					Option(L("I'll go and hunt the Poata"), "accept"),
 					Option(L("About the cable car"), "explain"),
 					Option(L("Don't worry. That will never happen"), "leave")
@@ -238,7 +228,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq06))
 			{
 				await dialog.Msg(L("The Poata's nest is at Margas Hill. Soil it and it will come out."));
-				character.Quests.ReplayQuestTrack(Mq06);
+				character.Quests.ClearQuestTrack(Mq06);
 				return;
 			}
 
@@ -278,9 +268,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("The Pantos were not always such violent monsters."));
-				await dialog.Msg(L("There must be a way to change them back."));
-
-				var answer = await dialog.Select(L("I will try"),
+				var answer = await dialog.Select(L("There must be a way to change them back."),
 					Option(L("I will try"), "accept"),
 					Option(L("About the Pantos"), "explain"),
 					Option(L("I'm busy"), "leave")
@@ -305,9 +293,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
-				await dialog.Msg(L("If you can persuade Capria, the Pantos should be tamed. Capria is the leader of the Pantos."));
-
-				var answer = await dialog.Select(L("I'm not sure but I'll give it a shot"),
+				var answer = await dialog.Select(L("If you can persuade Capria, the Pantos should be tamed. Capria is the leader of the Pantos."),
 					Option(L("I'm not sure but I'll give it a shot"), "accept"),
 					Option(L("About the Capri"), "explain"),
 					Option(L("Seems like a dangerous plan"), "leave")
@@ -331,9 +317,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Rp1) && character.Quests.MeetsPrerequisites(Rp1))
 			{
-				await dialog.Msg(L("The Pantos must have eaten something wrong to be acting like that."));
-
-				var answer = await dialog.Select(L("I'll help you"),
+				var answer = await dialog.Select(L("The Pantos must have eaten something wrong to be acting like that."),
 					Option(L("I'll help you"), "accept"),
 					Option(L("That is not needed"), "leave")
 				);
@@ -397,6 +381,11 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
 				await dialog.Msg(L("You soil the nest. The ground trembles - the Poata is coming."));
+				var fouledIt = await character.TimeActions.StartAsync(L("Fouling the water..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (fouledIt != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq06);
 				return;
 			}
@@ -443,7 +432,14 @@ public class FGele571QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
+			{
+				var petted = await character.TimeActions.StartAsync(L("Petting the Baby Pantos..."), L("Cancel"), "PET", TimeSpan.FromSeconds(2));
+
+				if (petted != TimeActionResult.Completed)
+					return;
+
 				character.Quests.StartQuestTrack(Mq07);
+			}
 
 			await Task.CompletedTask;
 		});
@@ -510,7 +506,8 @@ public class Gele571Mq02Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Defeat the Pantos and retrieve the gears"), L("Defeat the Pantos to get the cable car's gears back."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Talk to Watcher Gilbert"), L("Return the gears to Gilbert."));
 
-		AddDrop(650583, 0.08f, 57571);
+		AddPityDrop("GELE571_MQ_02_ITEM", 0.8f, 3, 1, "Npanto_baby");
+
 		AddObjective("collectGears", L("Defeat Pantos and get gears"), new CollectItemObjective("GELE571_MQ_02_ITEM", 8));
 
 		AddReward(new ItemReward("expCard2", 2));
@@ -586,7 +583,8 @@ public class Gele571Mq05Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE571_NPC_MATTHEW", "f_gele_57_1", L("Retrieve Cable Car Parts"), L("Defeat the Zignuts and retrieve the parts they swallowed."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_MATTHEW", "f_gele_57_1", L("Talk to Watcher Matthew"), L("Hand the cable car parts to Matthew."));
 
-		AddDrop(650585, 0.065f, 47473);
+		AddPityDrop("GELE571_MQ_05_ITEM", 0.65f, 4, 1, "Zignuts");
+
 		AddObjective("collectParts", L("Retrieve the cable car parts from Zignuts"), new CollectItemObjective("GELE571_MQ_05_ITEM", 7));
 
 		AddReward(new ItemReward("expCard2", 2));

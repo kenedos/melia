@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Meeting the Paladin Master
 //--- Description -----------------------------------------------------------
 // Uska sent you to Gele Plateau, and the Master is waiting.
@@ -34,6 +34,11 @@ public class Gele572Mq01Track : TrackScript
 		actors.Add(character);
 
 		return actors.ToArray();
+	}
+
+	public override void OnHandOver(Character character, Track track)
+	{
+		RemoveTrackActor(character, track, 0);
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)

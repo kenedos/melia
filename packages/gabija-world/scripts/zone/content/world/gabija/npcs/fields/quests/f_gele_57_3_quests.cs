@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Nefritas Cliff Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Watchers, the Followers and the barriers the cliff's quests run on.
@@ -44,9 +44,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("The barrier that used to stop the demons at Mazas Rest Place is broken."));
-				await dialog.Msg(L("I want to fix it, could you lend me your help?"));
-
-				var answer = await dialog.Select(L("I'll help if it's simple"),
+				var answer = await dialog.Select(L("I want to fix it, could you lend me your help?"),
 					Option(L("I'll help if it's simple"), "accept"),
 					Option(L("About the barriers in Nefritas Cliff"), "explain"),
 					Option(L("I'm busy on my way"), "leave")
@@ -71,9 +69,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				await dialog.Msg(L("Activating the Tree Guard Post Barrier is taking longer than I thought."));
-				await dialog.Msg(L("We have no time, let's charge it with demon souls instead."));
-
-				var answer = await dialog.Select(L("I'll help"),
+				var answer = await dialog.Select(L("We have no time, let's charge it with demon souls instead."),
 					Option(L("I'll help"), "accept"),
 					Option(L("I'll wait a little bit"), "leave")
 				);
@@ -112,9 +108,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("I didn't know the demons would use summoning circles to come through."));
-				await dialog.Msg(L("I suggest removing them all before they besiege us."));
-
-				var answer = await dialog.Select(L("I'll destroy the Demon Summoning Circles"),
+				var answer = await dialog.Select(L("I suggest removing them all before they besiege us."),
 					Option(L("I'll destroy the Demon Summoning Circles"), "accept"),
 					Option(L("It will be fine"), "leave")
 				);
@@ -127,9 +121,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
-				await dialog.Msg(L("It might be a bit extreme, but I'm thinking about eradicating all the demon's souls."));
-
-				var answer = await dialog.Select(L("Alright"),
+				var answer = await dialog.Select(L("It might be a bit extreme, but I'm thinking about eradicating all the demon's souls."),
 					Option(L("Alright"), "accept"),
 					Option(L("It's too difficult"), "leave")
 				);
@@ -145,9 +137,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("I'm exhausted and would like to rest for a bit."));
-				await dialog.Msg(L("I just need some time, so do you mind taking care of the demons around here?"));
-
-				var answer = await dialog.Select(L("I'll defeat the demons while resting"),
+				var answer = await dialog.Select(L("I just need some time, so do you mind taking care of the demons around here?"),
 					Option(L("I'll defeat the demons while resting"), "accept"),
 					Option(L("Cheer up and hold on"), "leave")
 				);
@@ -238,9 +228,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("I have received an urgent message from the Watchers."));
-				await dialog.Msg(L("A gigantic demon monster is coming this way. Quickly, follow me."));
-
-				var answer = await dialog.Select(L("I'll go with you"),
+				var answer = await dialog.Select(L("A gigantic demon monster is coming this way. Quickly, follow me."),
 					Option(L("I'll go with you"), "accept"),
 					Option(L("About the Followers"), "explain"),
 					Option(L("I need to prepare myself"), "leave")
@@ -323,9 +311,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
 				await dialog.Msg(L("Welcome. I'm glad to see that you've had a safe journey here."));
-				await dialog.Msg(L("Before anything else, there are a few things about this place that the Revelator should know."));
-
-				var answer = await dialog.Select(L("I'll ask"),
+				var answer = await dialog.Select(L("Before anything else, there are a few things about this place that the Revelator should know."),
 					Option(L("I'll ask"), "accept"),
 					Option(L("I'm not ready to hear it yet"), "leave")
 				);
@@ -341,9 +327,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
 				await dialog.Msg(L("Starting from now, I will focus on the Divine Sphere."));
-				await dialog.Msg(L("In the meantime, please use your skills so that nothing can disturb me."));
-
-				var answer = await dialog.Select(L("Yes, I'll help you concentrate"),
+				var answer = await dialog.Select(L("In the meantime, please use your skills so that nothing can disturb me."),
 					Option(L("Yes, I'll help you concentrate"), "accept"),
 					Option(L("I'll wait a little bit"), "leave")
 				);
@@ -356,10 +340,8 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq08) && character.Quests.MeetsPrerequisites(Mq08))
 			{
-				await dialog.Msg(L("The Paladin Master is looking for you."));
-
-				var answer = await dialog.Select(L("Ask what is happening"),
-					Option(L("Ask what is happening"), "accept"),
+				var answer = await dialog.Select(L("The Paladin Master is looking for you."),
+					Option(L("What is happening?"), "accept"),
 					Option(L("Wait a moment"), "leave")
 				);
 
@@ -373,11 +355,9 @@ public class FGele573QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Without the blessing from the goddess, you would probably be with the goddess now too."));
 				await dialog.Msg(L("Nonetheless, a lot of people are already like that without such blessing."));
-				await dialog.Msg(L("There is a spooky Chapparition slaying people in the Tenet Church. Find and defeat it."));
-
-				var answer = await dialog.Select(L("I will find and defeat Chapparition"),
+				var answer = await dialog.Select(L("There is a spooky Chapparition slaying people in the Tenet Church. Find and defeat it."),
 					Option(L("I will find and defeat Chapparition"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")
@@ -447,11 +427,9 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Hq01) && character.Quests.MeetsPrerequisites(Hq01))
 			{
-				await dialog.Msg(L("Vubbe Tokens, Panto Horns, Merog Hearts, and Hogma Teeth. That is a lot of stuff!"));
-
-				var answer = await dialog.Select(L("I will accept that bet"),
+				var answer = await dialog.Select(L("Vubbe Tokens, Panto Horns, Merog Hearts, and Hogma Teeth. That is a lot of stuff!"),
 					Option(L("I will accept that bet"), "accept"),
-					Option(L("Decline"), "leave")
+					Option(L("Not right now"), "leave")
 				);
 
 				if (answer == "accept")

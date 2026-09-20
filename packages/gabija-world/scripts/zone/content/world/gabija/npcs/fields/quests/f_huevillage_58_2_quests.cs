@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Vieta Gorge Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Andale Village elder and priest, the Ershike Altar, the sap buckets of
@@ -11,6 +11,7 @@ using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -112,8 +113,8 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("But some letters were erased since the Holy Pond became corrupted."));
 
 				var answer = await dialog.Select(L("If the letters are gone, then we will need to write them back on. Now that you've collected the Black Maize Venom, we will need White Oak Sap."),
-					Option(L("Ask how to restore it"), "accept"),
-					Option(L("Just leave"), "leave")
+					Option(L("How do we restore it?"), "accept"),
+					Option(L("I will leave it"), "leave")
 				);
 
 				if (answer == "accept")
@@ -130,8 +131,8 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I see you've completed making the dye."));
 
 				var answer = await dialog.Select(L("Now go and draw in new letters according to the faint patterns left on the Obelisk."),
-					Option(L("Ask where the Obelisk is located"), "accept"),
-					Option(L("About God"), "explain"),
+					Option(L("Where is the Obelisk?"), "accept"),
+					Option(L("Which god is this for?"), "explain"),
 					Option(L("Restore it yourself"), "leave")
 				);
 
@@ -200,6 +201,11 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var mixed20278 = await character.TimeActions.StartAsync(L("Mixing the ingredients..."), L("Cancel"), "FLASK", TimeSpan.FromSeconds(3));
+
+					if (mixed20278 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Mq03);
 					character.Quests.CompleteObjective(Mq03, "mixDye");
 					character.ServerMessage(L("The dye is complete. Take the dye from the altar."));
@@ -217,6 +223,11 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var combined20281 = await character.TimeActions.StartAsync(L("Combining the ingredients..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
+
+					if (combined20281 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Sq02);
 					character.ServerMessage(L("Defeat the monsters that reacted to the ominous energy!"));
 					return;
@@ -244,6 +255,11 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
 				await dialog.Msg(L("You follow the faint patterns left in the stone and draw the letters back in with the dye."));
+				var restored20279 = await character.TimeActions.StartAsync(L("Restoring the Obelisk..."), L("Cancel"), "READ", TimeSpan.FromSeconds(3));
+
+				if (restored20279 != TimeActionResult.Completed)
+					return;
+
 				character.Quests.CompleteObjective(Mq04, "restoreObelisk");
 				character.ServerMessage(L("Return to the Andale Village Priest."));
 				return;
@@ -258,6 +274,11 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var looked20282 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "READ", TimeSpan.FromSeconds(3));
+
+					if (looked20282 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Sq03);
 					return;
 				}
@@ -291,6 +312,11 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					var looked20280 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
+
+					if (looked20280 != TimeActionResult.Completed)
+						return;
+
 					character.Quests.Start(Sq01);
 					return;
 				}
@@ -359,7 +385,7 @@ public class Huevillage582Mq01Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(18130, QuestStatus.Completed));
 
-		AddPityDrop(650615, 0.35f, 5, 1, 57030);
+		AddPityDrop("HUEVILLAGE_58_2_MQ01_ITEM1", 0.35f, 5, 1, "Zibu_Maize");
 
 		AddObjective("collectVenom", L("Defeat Black Maize to obtain Black Maize Venom"), new CollectItemObjective("HUEVILLAGE_58_2_MQ01_ITEM1", 5));
 

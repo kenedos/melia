@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // The villagers on Melagingas Hill
 //--- Description -----------------------------------------------------------
 // The bomb goes off, and the villagers who came to watch shed their skins.
@@ -86,6 +86,8 @@ public class Huevillage583Mq04Track : TrackScript
 				character.ServerMessage(L("The effect of the bomb slows down your movement when you approach the nearby Upents!"));
 				break;
 			case 34:
+				RemoveTrackActor(character, track, 4);
+				RemoveTrackActor(character, track, 5);
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);
 				break;
