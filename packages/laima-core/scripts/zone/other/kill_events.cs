@@ -30,7 +30,7 @@ public class KillEventsScript : GeneralScript
 
 	private void OnRootCrystalKilled(Mob mob, ICombatEntity attacker)
 	{
-		var duration = TimeSpan.FromSeconds(15);
+		var duration = TimeSpan.FromSeconds(10);
 		var applied = new HashSet<ICombatEntity>();
 
 		void ApplyBuff(ICombatEntity target)

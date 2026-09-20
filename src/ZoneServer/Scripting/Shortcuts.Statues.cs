@@ -307,6 +307,9 @@ namespace Melia.Zone.Scripting
 		/// <param name="dialog"></param>
 		private static async Task WarpStatueDialog(Dialog dialog)
 		{
+			if (await dialog.Hooks("BeforeDialog"))
+				return;
+
 			var result = await dialog.TimeAction(ScpArgMsg("Auto_KyeongBae_Jung"), "WORSHIP", TimeSpan.FromSeconds(1));
 			if (result != TimeActionResult.Completed)
 				return;

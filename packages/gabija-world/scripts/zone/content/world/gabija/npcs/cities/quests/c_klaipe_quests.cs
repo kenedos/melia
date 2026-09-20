@@ -159,25 +159,9 @@ public class KlaipeQuestNpcsScript : GeneralScript
 		ScriptHooks.Register(new DialogHook("Mirina", "BeforeDialog", MirinaDialog));
 		ScriptHooks.Register(new DialogHook("Ronesa", "BeforeDialog", RonesaDialog));
 
-		// Prayer trigger at the Statue of Goddess Ausrine
+		// Prayer interaction at the Statue of Goddess Ausrine
 		//-------------------------------------------------------------------------
-		AddQuestTrigger("KLAIPE_AUSRINE_PRAYER", "c_Klaipe", -206.574, 98.63973, 80, async args =>
-		{
-			if (args.Initiator is not Character character)
-				return;
-
-			if (character.Quests.IsActive(EastPrepare) && !character.Quests.IsCompletable(EastPrepare))
-			{
-				var prayed = await character.TimeActions.StartAsync(L("Paying your respects..."), L("Cancel"), "WORSHIP", TimeSpan.FromSeconds(2));
-
-				if (prayed != TimeActionResult.Completed)
-					return;
-
-				character.Quests.CompleteObjective(EastPrepare, "pray");
-			}
-
-			await Task.CompletedTask;
-		});
+		ScriptHooks.Register(new DialogHook("c_Klaipe:WARP_C_KLAIPE", "BeforeDialog", AusrineStatueDialog));
 	}
 
 	/// <summary>
@@ -249,6 +233,26 @@ public class KlaipeQuestNpcsScript : GeneralScript
 		}
 
 		return HookResult.Skip;
+	}
+
+	/// <summary>
+	/// The Statue of Goddess Ausrine's quest dialog, run before its warp dialog.
+	/// </summary>
+	private static async Task<HookResult> AusrineStatueDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+
+		if (!character.Quests.IsActive(EastPrepare) || character.Quests.IsCompletable(EastPrepare))
+			return HookResult.Skip;
+
+		var prayed = await dialog.TimeAction(L("Paying your respects..."), L("Cancel"), "WORSHIP", TimeSpan.FromSeconds(2));
+		if (prayed != TimeActionResult.Completed)
+			return HookResult.Break;
+
+		character.Quests.CompleteObjective(EastPrepare, "pray");
+
+		await OpenWarpDestinations(dialog);
+		return HookResult.Break;
 	}
 }
 

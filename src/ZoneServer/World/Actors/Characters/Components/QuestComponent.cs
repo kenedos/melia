@@ -829,9 +829,22 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="quest"></param>
 		public void Cancel(Quest quest)
 		{
+			// A track's own OnCancel can call back into here for the same
+			// quest; without this, the two would cancel each other in a loop.
+			if (quest.Status == QuestStatus.Abandoned)
+				return;
+
 			quest.Status = QuestStatus.Abandoned;
 
 			_markerNotifiedSuccess.Remove(quest.Data.Id.Value);
+
+			// The quest window lets a cancelable quest be abandoned even
+			// while its track is playing, and the track has no other way to
+			// find out the quest is gone - it only ends on a quest status it
+			// will now never reach, stranding the player in its layer.
+			var activeTrack = this.Character.Tracks.ActiveTrack;
+			if (activeTrack != null && activeTrack.Data.QuestId == quest.Data.Id.Value)
+				this.Character.Tracks.Cancel();
 
 			if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 				questScript.OnCancel(this.Character, quest);
