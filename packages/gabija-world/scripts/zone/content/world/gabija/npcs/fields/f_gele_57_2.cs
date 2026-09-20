@@ -4,7 +4,6 @@
 // NPCs found in and around Gele Plateau.
 //---------------------------------------------------------------------------
 
-using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using static Melia.Zone.Scripting.Shortcuts;
 
@@ -19,14 +18,6 @@ public class FGele572NpcScript : GeneralScript
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
 		AddNpc(153, 147392, "Lv1 Treasure Chest", "f_gele_57_2", -1049.22, 418.99, -641.81, 90, "TREASUREBOX_LV_F_GELE_57_2153", "", "");
-
-		// Emoticon Chest
-		//-------------------------------------------------------------------------
-		AddPlatformNpc("f_gele_57_2", 1085, 543, -1204, 0, "green");
-		AddPlatformNpc("f_gele_57_2", 1045, 583, -1204, 0, "blue");
-		AddPlatformNpc("f_gele_57_2", 1005, 623, -1204, 0, "yellow");
-		AddPlatformNpc("f_gele_57_2", 980, 663, -1134, 0, "white");
-		AddFloatingTreasureChestSpawner("Laima.Treasures.f_gele_57_2.Chest1", "f_gele_57_2", 980, 663, -1134, 0, ItemId.EmoticonItem_Gabija_EarringRaid_1_4, monsterId: 147393);
 
 		// Lv1 Treasure Chest (Carnivore Necklace)
 		//-------------------------------------------------------------------------

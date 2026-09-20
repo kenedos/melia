@@ -160,13 +160,6 @@ public class COrshaNpcScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddWarpStatue(115, "WARP_C_ORSHA", "c_orsha", 103.14, 176.14, 322.95, -46, L("Statue of Goddess Ausrine"), 154063);
 
-		// Emoticon Chest
-		//-------------------------------------------------------------------------
-		AddPlatformNpc("c_orsha", -423, 489, 92, 0, "green");
-		AddPlatformNpc("c_orsha", -423, 529, 92, 0, "blue");
-		AddPlatformNpc("c_orsha", -423, 569, 92, 0, "white");
-		AddFloatingTreasureChestSpawner("Laima.Treasures.Orsha.Chest1", "c_orsha", -423, 569, 92, 0, ItemId.EmoticonItem_55_58, monsterId: 147393);
-
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
 		AddNpc(150, 147392, L("Lv1 Treasure Chest"), "c_orsha", -461.54, 505.13, -277, -135, "TREASUREBOX_LV_C_ORSHA150", "", "");

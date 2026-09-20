@@ -4,9 +4,6 @@
 // NPCs found in and around Woods of the Linked Bridges.
 //---------------------------------------------------------------------------
 
-using System;
-using Melia.Shared.Game.Const;
-using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using static Melia.Zone.Scripting.Shortcuts;
 
@@ -17,21 +14,6 @@ public class FSiauliai15ReNpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(10, "WARP_F_SIAULIAI_15RE", "f_siauliai_15_re", 372.0667, 878.1719, 194.3833, -4);
-
-		// Emoticon Chest
-		//-------------------------------------------------------------------------
-		AddPlatformNpc("f_siauliai_15_re", -903, 962, 1335, 0, "red");
-		AddMovingPlatformNpc("f_siauliai_15_re",
-			new Position(-903, 1002, 1277),
-			new Position(-903, 1002, 1145),
-			TimeSpan.FromSeconds(3), color: "blue");
-		AddPlatformNpc("f_siauliai_15_re", -973, 1032, 1145, 0, "yellow");
-		AddMovingPlatformNpc("f_siauliai_15_re",
-			new Position(-973, 1062, 1195),
-			new Position(-1133, 1062, 1195),
-			TimeSpan.FromSeconds(3), color: "green");
-		AddPlatformNpc("f_siauliai_15_re", -1187, 1097, 1193, 0, "white");
-		AddFloatingTreasureChestSpawner("Laima.Treasures.f_siauliai_15_re.Chest1", "f_siauliai_15_re", -1187, 1097, 1193, 90, ItemId.EmoticonItem_77_79, monsterId: 147393);
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------

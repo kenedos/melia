@@ -29,6 +29,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 	private readonly static QuestId Crystal13 = new QuestId(4474);
 	private readonly static QuestId Crystal18 = new QuestId(4479);
 	private readonly static QuestId Crystal19 = new QuestId(4480);
+	private readonly static QuestId Mine2Alchemist = new QuestId(4467);
 
 	protected override void Load()
 	{
@@ -60,6 +61,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The air is clearing already. Every purifier on this floor is turning again."));
 				await dialog.Msg(L("Let us go down to the second floor. The fumes there will be far worse."));
 				character.Quests.Complete(Alchemist);
+				character.Quests.Start(Mine2Alchemist);
 				return;
 			}
 
