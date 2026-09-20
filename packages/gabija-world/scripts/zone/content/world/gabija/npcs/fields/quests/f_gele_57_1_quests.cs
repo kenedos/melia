@@ -42,7 +42,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("As I'm the only one who can fix the cable car, I'll take a look."));
 				await dialog.Msg(L("Oh, of course, thanks for your help."));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -50,7 +50,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Well done."));
 				await dialog.Msg(L("Now attach this and grease it, then it should work correctly."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 				return;
 			}
 
@@ -58,14 +58,14 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Good work. These are the parts the Pantos stole."));
 				await dialog.Msg(L("I never imagined I'd be seeing them again like this."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Look at this busted cable car."));
-				var answer = await dialog.Select(L("It's still working, but the damage is pretty serious."),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("It's still working, but the damage is pretty serious."),
 					Option(L("I'll teach them a lesson"), "accept"),
 					Option(L("About the Watchers"), "explain"),
 					Option(L("Leave if for him to do it himself"), "leave")
@@ -91,7 +91,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It's the Pantos again."));
 				await dialog.Msg(L("They even stole the working parts."));
-				var answer = await dialog.Select(L("Well then, we've got to take them back, right?"),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("Well then, we've got to take them back, right?"),
 					Option(L("I'll get it to you"), "accept"),
 					Option(L("About repairing the cable car"), "explain"),
 					Option(L("I don't want to"), "leave")
@@ -115,7 +115,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("The Pantos hid some parts in the grasslands of Mieguista Slope."));
-				var answer = await dialog.Select(L("Try to get me those for the time being since it's urgent."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("Try to get me those for the time being since it's urgent."),
 					Option(L("I'll bring it"), "accept"),
 					Option(L("I don't have time"), "leave")
 				);
@@ -159,21 +159,21 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Alright. Thank you very much!"));
 				await dialog.Msg(L("Do you see that damaged cable car over there? I used to ride that when I was a kid."));
-				character.Quests.Complete(Mq05);
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq06) && character.Quests.IsCompletable(Mq06))
 			{
 				await dialog.Msg(L("Thank you! You've saved me and my friends from spending more than half of our lives just protecting the cable car."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("I am looking for cable car parts, but I can't seem to find any."));
-				var answer = await dialog.Select(L("Maybe the Zignuts at Nepavy Grassland swallowed them."),
+				var answer = await dialog.SelectQuestOffer(Mq05, L("Maybe the Zignuts at Nepavy Grassland swallowed them."),
 					Option(L("I'll find it for you"), "accept"),
 					Option(L("About the Holy Land"), "explain"),
 					Option(L("That's too bad (leave)"), "leave")
@@ -197,7 +197,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("I worked very hard to fix the cable car, but I'm still worried about the Poata."));
-				var answer = await dialog.Select(L("A monster of that size could destroy the cable car."),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("A monster of that size could destroy the cable car."),
 					Option(L("I'll go and hunt the Poata"), "accept"),
 					Option(L("About the cable car"), "explain"),
 					Option(L("Don't worry. That will never happen"), "leave")
@@ -247,28 +247,28 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Look at these gentle Pantos."));
 				await dialog.Msg(L("It's insane that we have to make the Pantos our enemies when the demons are charging in."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq07) && character.Quests.IsCompletable(Mq07))
 			{
 				await dialog.Msg(L("It got angry as soon as it saw the Baby Pantos? So the plan really did not work."));
-				character.Quests.Complete(Mq07);
+				await dialog.CompleteQuest(Mq07);
 				return;
 			}
 
 			if (character.Quests.IsActive(Rp1) && character.Quests.IsCompletable(Rp1))
 			{
 				await dialog.Msg(L("Did you destroy the roots, too?"));
-				character.Quests.Complete(Rp1);
+				await dialog.CompleteQuest(Rp1);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("The Pantos were not always such violent monsters."));
-				var answer = await dialog.Select(L("There must be a way to change them back."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("There must be a way to change them back."),
 					Option(L("I will try"), "accept"),
 					Option(L("About the Pantos"), "explain"),
 					Option(L("I'm busy"), "leave")
@@ -293,7 +293,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
-				var answer = await dialog.Select(L("If you can persuade Capria, the Pantos should be tamed. Capria is the leader of the Pantos."),
+				var answer = await dialog.SelectQuestOffer(Mq07, L("If you can persuade Capria, the Pantos should be tamed. Capria is the leader of the Pantos."),
 					Option(L("I'm not sure but I'll give it a shot"), "accept"),
 					Option(L("About the Capri"), "explain"),
 					Option(L("Seems like a dangerous plan"), "leave")
@@ -317,7 +317,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Rp1) && character.Quests.MeetsPrerequisites(Rp1))
 			{
-				var answer = await dialog.Select(L("The Pantos must have eaten something wrong to be acting like that."),
+				var answer = await dialog.SelectQuestOffer(Rp1, L("The Pantos must have eaten something wrong to be acting like that."),
 					Option(L("I'll help you"), "accept"),
 					Option(L("That is not needed"), "leave")
 				);

@@ -46,7 +46,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("So you're the one who wants to meet Goddess Saule."));
 				await dialog.Msg(L("If you're here about the pond, don't worry. Our priest is working on it."));
 
-				var answer = await dialog.Select(L("The priest is at Cerpe Crossroads. I heard he needed Black Maize Venom, so try getting that to him as a gift."),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("The priest is at Cerpe Crossroads. I heard he needed Black Maize Venom, so try getting that to him as a gift."),
 					Option(L("I'll meet the priest"), "accept"),
 					Option(L("I'm busy"), "leave")
 				);
@@ -92,7 +92,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Oh, thank you very much!"));
 				await dialog.Msg(L("You can count on me on helping you meet Goddess Saule."));
 				await dialog.Msg(L("Now that the Holy Pond has been purified, we just need to solve the problem with the Obelisk."));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -102,7 +102,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("After completing the rituals to cleanse your body, you will be able to meet the goddess."));
 				await dialog.Msg(L("Follow the road on the right to go to Cobalt Forest."));
 				await dialog.Msg(L("Our village priest there is waiting for you."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				character.ServerMessage(L("Go and find the Andale Village Priest of Cobalt Forest."));
 				return;
 			}
@@ -112,7 +112,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Magic letters are carved on the Obelisk."));
 				await dialog.Msg(L("But some letters were erased since the Holy Pond became corrupted."));
 
-				var answer = await dialog.Select(L("If the letters are gone, then we will need to write them back on. Now that you've collected the Black Maize Venom, we will need White Oak Sap."),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("If the letters are gone, then we will need to write them back on. Now that you've collected the Black Maize Venom, we will need White Oak Sap."),
 					Option(L("How do we restore it?"), "accept"),
 					Option(L("I will leave it"), "leave")
 				);
@@ -130,7 +130,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I see you've completed making the dye."));
 
-				var answer = await dialog.Select(L("Now go and draw in new letters according to the faint patterns left on the Obelisk."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("Now go and draw in new letters according to the faint patterns left on the Obelisk."),
 					Option(L("Where is the Obelisk?"), "accept"),
 					Option(L("Which god is this for?"), "explain"),
 					Option(L("Restore it yourself"), "leave")
@@ -187,14 +187,14 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq03) && character.Quests.IsCompletable(Mq03))
 			{
 				await dialog.Msg(L("The mixture on the altar stone has set into a dark, even coat. You lift it off."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				character.ServerMessage(L("Return to the Andale Village Priest."));
 				return;
 			}
 
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
-				var answer = await dialog.Select(L("The venom and the sap go into the bowl of the altar together, the way the priest described it."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("The venom and the sap go into the bowl of the altar together, the way the priest described it."),
 					Option(L("Combine the materials"), "accept"),
 					Option(L("Wait a while"), "leave")
 				);
@@ -208,7 +208,6 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 					character.Quests.Start(Mq03);
 					character.Quests.CompleteObjective(Mq03, "mixDye");
-					character.ServerMessage(L("The dye is complete. Take the dye from the altar."));
 					return;
 				}
 				return;
@@ -216,7 +215,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sq02) && character.Quests.MeetsPrerequisites(Sq02))
 			{
-				var answer = await dialog.Select(L("An ominous energy comes off the altar stone, and the beasts of the crossroads have turned toward it."),
+				var answer = await dialog.SelectQuestOffer(Sq02, L("An ominous energy comes off the altar stone, and the beasts of the crossroads have turned toward it."),
 					Option(L("Find out what is happening"), "accept"),
 					Option(L("Step away from the altar"), "leave")
 				);
@@ -229,7 +228,6 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Sq02);
-					character.ServerMessage(L("Defeat the monsters that reacted to the ominous energy!"));
 					return;
 				}
 				return;
@@ -267,7 +265,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sq03) && character.Quests.MeetsPrerequisites(Sq03))
 			{
-				var answer = await dialog.Select(L("Something has been circling the Obelisk, and the ground on its stream side is trodden flat."),
+				var answer = await dialog.SelectQuestOffer(Sq03, L("Something has been circling the Obelisk, and the ground on its stream side is trodden flat."),
 					Option(L("Check the Obelisk"), "accept"),
 					Option(L("Leave it be"), "leave")
 				);
@@ -305,7 +303,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sq01) && character.Quests.MeetsPrerequisites(Sq01))
 			{
-				var answer = await dialog.Select(L("A strong energy runs with the water here, and it is not coming from the current."),
+				var answer = await dialog.SelectQuestOffer(Sq01, L("A strong energy runs with the water here, and it is not coming from the current."),
 					Option(L("Find out what it is"), "accept"),
 					Option(L("Keep to the bank"), "leave")
 				);

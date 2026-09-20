@@ -44,7 +44,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Glad you're back safely."));
 				await dialog.Msg(L("Did any monsters attack?"));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -52,7 +52,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("That'll do."));
 				await dialog.Msg(L("I'll send the materials to the elderly, please go and get the explosives."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 				character.ServerMessage(L("Go and find the village headman."));
 				return;
 			}
@@ -61,7 +61,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You're the Revelator, right?"));
 
-				var answer = await dialog.Select(L("Upents are preying on the village so we can't hold the ritual right now."),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("Upents are preying on the village so we can't hold the ritual right now."),
 					Option(L("How do I deal with the Upents?"), "accept"),
 					Option(L("What ritual is this?"), "explain"),
 					Option(L("I'll wait then"), "leave")
@@ -80,7 +80,6 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq01);
 					await dialog.Msg(L("I'm thinking about making bombs from Languid Herbs."));
 					await dialog.Msg(L("Please bring me Languid Herbs from Narvas Curved Path."));
-					character.ServerMessage(L("Gather Languid Herbs at Narvas Curved Path."));
 					return;
 				}
 				return;
@@ -90,7 +89,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Please get the Strongly Scented Soul Flowers in Dvyni Wetland too."));
 
-				var answer = await dialog.Select(L("Languid Herbs alone will not be effective enough."),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("Languid Herbs alone will not be effective enough."),
 					Option(L("I'll try to find them"), "accept"),
 					Option(L("About the Goddess Statues"), "explain"),
 					Option(L("The force is enough"), "leave")
@@ -107,7 +106,6 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Mq02);
 					await dialog.Msg(L("I hope we'll be successful this time."));
-					character.ServerMessage(L("Look for the Strongly Scented Soul Flower in Dvyni Wetland."));
 					return;
 				}
 				return;
@@ -142,7 +140,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("It was in a small barrel?"));
 				await dialog.Msg(L("I must be getting old and mixed up."));
 				await dialog.Msg(L("Normal people would have been incinerated, but for a Revelator, it's different."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				return;
 			}
 
@@ -150,7 +148,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Explosives? Ah."));
 
-				var answer = await dialog.Select(L("Go to the warehouse lot at the upper side of the village."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("Go to the warehouse lot at the upper side of the village."),
 					Option(L("I will go get the explosives"), "accept"),
 					Option(L("That sounds dangerous"), "leave")
 				);
@@ -160,7 +158,6 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq03);
 					await dialog.Msg(L("It's probably in one of the bigger barrels."));
 					await dialog.Msg(L("Don't worry, they won't explode."));
-					character.ServerMessage(L("Bring the explosives from the barrels located at the upper side of the village."));
 					return;
 				}
 				return;
@@ -170,7 +167,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Here, this is a Languid Herb Bomb."));
 
-				var answer = await dialog.Select(L("Take it to Melaginags Cliff."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("Take it to Melaginags Cliff."),
 					Option(L("I'll use the bomb"), "accept"),
 					Option(L("I will prepare myself for a while"), "leave")
 				);
@@ -232,7 +229,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sq02) && character.Quests.MeetsPrerequisites(Sq02))
 			{
-				var answer = await dialog.Select(L("The wetland around the flower bed has been pressed flat, and the water in the hollows has not settled."),
+				var answer = await dialog.SelectQuestOffer(Sq02, L("The wetland around the flower bed has been pressed flat, and the water in the hollows has not settled."),
 					Option(L("Go to Dvyni Wetland"), "accept"),
 					Option(L("Keep to the path"), "leave")
 				);
@@ -306,14 +303,14 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 					return;
 
 				character.ServerMessage(L("The bucket comes up on the rope with something tangled in the handle - a necklace, and a scrap of writing with it."));
-				character.Quests.Complete(Sq01);
+				await dialog.CompleteQuest(Sq01);
 				character.ServerMessage(L("You found someone's keepsake in the well!"));
 				return;
 			}
 
 			if (!character.Quests.Has(Sq01) && character.Quests.MeetsPrerequisites(Sq01))
 			{
-				var answer = await dialog.Select(L("Something is lying at the bottom of the old well, too far down to make out."),
+				var answer = await dialog.SelectQuestOffer(Sq01, L("Something is lying at the bottom of the old well, too far down to make out."),
 					Option(L("Go to the old well"), "accept"),
 					Option(L("Leave the well alone"), "leave")
 				);
@@ -326,7 +323,6 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Sq01);
-					character.ServerMessage(L("Look for a tool that can get the thing out of the well."));
 					return;
 				}
 				return;

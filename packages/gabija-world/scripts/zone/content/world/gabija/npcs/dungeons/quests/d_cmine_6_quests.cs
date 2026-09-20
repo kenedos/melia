@@ -50,7 +50,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It's a single road from here on so you'll be able to find the people easily."));
 
-				var answer = await dialog.Select(L("The villagers the Vubbe took are trapped somewhere on this floor."),
+				var answer = await dialog.SelectQuestOffer(Rescue1, L("The villagers the Vubbe took are trapped somewhere on this floor."),
 					Option(L("Rescue the villagers and then search for the Light of Salvation"), "accept"),
 					Option(L("Quit"), "leave")
 				);
@@ -94,7 +94,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 				await dialog.Msg(L("Thank you for saving us."));
 				await dialog.Msg(L("It's like a dream to be saved by the Revelator."));
-				character.Quests.Complete(Rescue1);
+				await dialog.CompleteQuest(Rescue1);
 				return;
 			}
 
@@ -140,13 +140,13 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				}
 
 				await dialog.Msg(L("The Netherbovine is down. Whatever the crystal was calling, it will not come now."));
-				character.Quests.Complete(Rescue3);
+				await dialog.CompleteQuest(Rescue3);
 				return;
 			}
 
 			if (!character.Quests.Has(Rescue3) && character.Quests.MeetsPrerequisites(Rescue3))
 			{
-				var answer = await dialog.Select(L("The crystal is pulsing. Something in the dark is answering it."),
+				var answer = await dialog.SelectQuestOffer(Rescue3, L("The crystal is pulsing. Something in the dark is answering it."),
 					Option(L("Touch the crystal"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -184,13 +184,13 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				}
 
 				await dialog.Msg(L("You press the magic stones into the barrier. The stone blocking the Closed Area crumbles."));
-				character.Quests.Complete(Enter);
+				await dialog.CompleteQuest(Enter);
 				return;
 			}
 
 			if (!character.Quests.Has(Enter) && character.Quests.MeetsPrerequisites(Enter))
 			{
-				var answer = await dialog.Select(L("The Vubbes are disappearing near the Crystal Wall in the Closed Area. Check the barrier stone of the closed area."),
+				var answer = await dialog.SelectQuestOffer(Enter, L("The Vubbes are disappearing near the Crystal Wall in the Closed Area. Check the barrier stone of the closed area."),
 					Option(L("Examine the barrier stone"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -231,7 +231,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 				await dialog.Msg(L("Acquired the Mysterious Slate that was inside the Crystal Pillar."));
 				await dialog.Msg(L("Return to Klaipeda and talk to Knight Commander Uska about it."));
-				character.Quests.Complete(Slate);
+				await dialog.CompleteQuest(Slate);
 				dialog.HideNPC("CMINE6_TO_KATYN7_1_START");
 				return;
 			}
@@ -246,13 +246,13 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				}
 
 				await dialog.Msg(L("Mirtis is gone. The pillar has stopped screaming."));
-				character.Quests.Complete(Boss);
+				await dialog.CompleteQuest(Boss);
 				return;
 			}
 
 			if (!character.Quests.Has(Boss) && character.Quests.MeetsPrerequisites(Boss))
 			{
-				var answer = await dialog.Select(L("Something is sealed in the Crystal Pillar. Examine the pillar."),
+				var answer = await dialog.SelectQuestOffer(Boss, L("Something is sealed in the Crystal Pillar. Examine the pillar."),
 					Option(L("Examine the seal"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -272,7 +272,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Slate) && character.Quests.HasCompleted(Boss) && character.Quests.MeetsPrerequisites(Slate))
 			{
-				var answer = await dialog.Select(L("There is a huge Crystal Pillar in the closed area. Check out the Crystal Pillar."),
+				var answer = await dialog.SelectQuestOffer(Slate, L("There is a huge Crystal Pillar in the closed area. Check out the Crystal Pillar."),
 					Option(L("Check the pillar"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -310,7 +310,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				}
 
 				await dialog.Msg(L("You feed the charged crystal into the purifier. It draws hard and the haze thins."));
-				character.Quests.Complete(Repeat1);
+				await dialog.CompleteQuest(Repeat1);
 				return;
 			}
 
@@ -319,7 +319,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Attention! Please read."));
 				await dialog.Msg(L("Should the purifier be disabled, toxic substances will fill Crystal Mine 3F."));
 
-				var answer = await dialog.Select(L("The purifier is running low on power again."),
+				var answer = await dialog.SelectQuestOffer(Repeat1, L("The purifier is running low on power again."),
 					Option(L("I'll find the power"), "accept"),
 					Option(L("Not really my problem"), "leave")
 				);

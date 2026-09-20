@@ -42,7 +42,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You seem to live up to your reputation."));
 				await dialog.Msg(L("The people in our village just cowardly hope that the goddess will take care of everything."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 				return;
 			}
 
@@ -51,7 +51,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Aren't you the Revelator?"));
 				await dialog.Msg(L("So, what brings you to our village?"));
 
-				var answer = await dialog.Select(L("Goddess Saule? We haven't seen Her in a long time. The portal that leads to Goddess Saule doesn't open. I think it's because the Holy Pond is corrupted."),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("Goddess Saule? We haven't seen Her in a long time. The portal that leads to Goddess Saule doesn't open. I think it's because the Holy Pond is corrupted."),
 					Option(L("I'll purify the pond"), "accept"),
 					Option(L("About Goddess Saule"), "explain"),
 					Option(L("Think of another way"), "leave")
@@ -71,7 +71,6 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq01);
 					await dialog.Msg(L("The Tanus in Zvelgian Vacant Lot carry Purifying Stones."));
 					await dialog.Msg(L("They will be able to purify the Pond."));
-					character.ServerMessage(L("Use the cable car to move across to Zvelgian Vacant Lot."));
 					return;
 				}
 				return;
@@ -81,7 +80,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("By the way, did you see a young man from our village?"));
 
-				var answer = await dialog.Select(L("I told him to go check if the portal is working, but I have not heard from him since then."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("I told him to go check if the portal is working, but I have not heard from him since then."),
 					Option(L("I'll look for him"), "accept"),
 					Option(L("Cancel"), "leave")
 				);
@@ -128,13 +127,13 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq01) && character.Quests.IsCompletable(Mq01))
 			{
 				await dialog.Msg(L("Twelve stones, and the water takes every one of them without a sound."));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
-				var answer = await dialog.Select(L("The stones lie on the bed of the pond, waiting to be set working."),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("The stones lie on the bed of the pond, waiting to be set working."),
 					Option(L("Purify the pond"), "accept"),
 					Option(L("Leave it for now"), "leave")
 				);
@@ -154,7 +153,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sq03) && character.Quests.MeetsPrerequisites(Sq03))
 			{
-				var answer = await dialog.Select(L("The corruption in the pond goes deeper than the surface, and something below it is moving."),
+				var answer = await dialog.SelectQuestOffer(Sq03, L("The corruption in the pond goes deeper than the surface, and something below it is moving."),
 					Option(L("Look into the pond"), "accept"),
 					Option(L("Step back"), "leave")
 				);
@@ -200,7 +199,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq03) && character.Quests.IsCompletable(Mq03))
 			{
 				await dialog.Msg(L("Thank you for saving me."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				return;
 			}
 
@@ -210,7 +209,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Well, that's going to be a big problem."));
 				await dialog.Msg(L("Can you inform the elderly in Vieta Gorge about this for me?"));
 				await dialog.Msg(L("If you veer left and move up from here, you'll quickly arrive there."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				character.ServerMessage(L("Go and find the village elder of Vieta Gorge."));
 				return;
 			}
@@ -219,7 +218,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("So you're the Revelator the headman spoke about."));
 
-				var answer = await dialog.Select(L("I'm fine, please check the portal up at the sanctum."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("I'm fine, please check the portal up at the sanctum."),
 					Option(L("I'll check the sanctum for you"), "accept"),
 					Option(L("About the portal"), "explain"),
 					Option(L("Worry about the wound"), "leave")
@@ -281,7 +280,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Sq01) && character.Quests.MeetsPrerequisites(Sq01))
 			{
-				var answer = await dialog.Select(L("Something has taken root under the sanctum floor, and the stone above it has begun to split."),
+				var answer = await dialog.SelectQuestOffer(Sq01, L("Something has taken root under the sanctum floor, and the stone above it has begun to split."),
 					Option(L("Check the portal at Nugria Sanctum"), "accept"),
 					Option(L("Leave the sanctum alone"), "leave")
 				);
@@ -315,13 +314,13 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sq02) && character.Quests.IsCompletable(Sq02))
 			{
 				await dialog.Msg(L("With nothing left feeding it, the growth comes away from the ground in one piece."));
-				character.Quests.Complete(Sq02);
+				await dialog.CompleteQuest(Sq02);
 				return;
 			}
 
 			if (!character.Quests.Has(Sq02) && character.Quests.MeetsPrerequisites(Sq02))
 			{
-				var answer = await dialog.Select(L("The growth draws strength from every beast around it, and pulling at it now would only tighten its hold."),
+				var answer = await dialog.SelectQuestOffer(Sq02, L("The growth draws strength from every beast around it, and pulling at it now would only tighten its hold."),
 					Option(L("Clear the ground around it first"), "accept"),
 					Option(L("Leave it standing"), "leave")
 				);
@@ -329,7 +328,6 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Sq02);
-					character.ServerMessage(L("Defeat the monsters around the source of corruption and remove the source!"));
 					return;
 				}
 				return;

@@ -1004,6 +1004,52 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Returns the quest's pick-one-of reward, if it has one.
+		/// </summary>
+		/// <param name="questId"></param>
+		/// <param name="reward"></param>
+		/// <returns></returns>
+		public bool TryGetSelectItemReward(QuestId questId, out SelectItemReward reward)
+		{
+			lock (_syncLock)
+			{
+				foreach (var quest in _quests)
+				{
+					if (quest.Data.Id != questId)
+						continue;
+
+					reward = quest.Data.Rewards.OfType<SelectItemReward>().FirstOrDefault();
+					return reward != null;
+				}
+			}
+
+			reward = null;
+			return false;
+		}
+
+		/// <summary>
+		/// Returns true if the quest has at least one reward defined,
+		/// item, EXP, or otherwise.
+		/// </summary>
+		/// <param name="questId"></param>
+		/// <returns></returns>
+		public bool HasRewards(QuestId questId)
+		{
+			lock (_syncLock)
+			{
+				foreach (var quest in _quests)
+				{
+					if (quest.Data.Id != questId)
+						continue;
+
+					return quest.Data.Rewards.Count > 0;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Gives quest's rewards to character.
 		/// </summary>
 		/// <param name="quest"></param>

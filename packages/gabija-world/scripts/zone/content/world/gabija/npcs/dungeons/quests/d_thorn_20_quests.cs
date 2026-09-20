@@ -38,7 +38,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Every one of them has been heard out, and every one of them is still standing."));
 				await dialog.Msg(L("The forest has not taken this stretch yet. That is more than I expected of today."));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -46,7 +46,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The evil energy of Kvailas Forest is becoming stronger and our Believers are becoming weak."));
 
-				var answer = await dialog.Select(L("I am worried that we may lose to the forces of evil. If only the Revelator was with us..."),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("I am worried that we may lose to the forces of evil. If only the Revelator was with us..."),
 					Option(L("I am the Revelator and I'll help you"), "accept"),
 					Option(L("About the evil energy in the Thorn Forest"), "explain"),
 					Option(L("Kvailas Forest is more urgent"), "leave")
@@ -90,7 +90,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thanks."));
 				await dialog.Msg(L("I wonder what would have happened if you weren't here."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 
 				if (character.Quests.IsActive(Mq01))
 					character.Quests.CompleteObjective(Mq01, "helpRaminta");
@@ -102,7 +102,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("There is a demon that I want you to defeat."));
 
-				var answer = await dialog.Select(L("This monster is called Rikaus and it's at Thorny Pillar Garden. It has been spreading evil energy."),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("This monster is called Rikaus and it's at Thorny Pillar Garden. It has been spreading evil energy."),
 					Option(L("I'll take care of it right away"), "accept"),
 					Option(L("It will be safer to let the other Believers know"), "leave")
 				);
@@ -140,20 +140,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Thank you for your help."));
 				await dialog.Msg(L("Now the demons won't be able to act so freely."));
 
-				var pick = await dialog.Select(L("Take a pair of these off us. They were cut for the forest."),
-					Option(L("Sirdgela Pants"), "cloth"),
-					Option(L("Sirdgela Leather Pants"), "leather"),
-					Option(L("Sirdgela Scale Pants"), "plate")
-				);
-
-				switch (pick)
-				{
-					case "cloth": character.Quests.SelectReward(Mq03, 522166); break;
-					case "leather": character.Quests.SelectReward(Mq03, 522167); break;
-					case "plate": character.Quests.SelectReward(Mq03, 522168); break;
-				}
-
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 
 				if (character.Quests.IsActive(Mq01))
 					character.Quests.CompleteObjective(Mq01, "helpEvaldas");
@@ -163,7 +150,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
-				var answer = await dialog.Select(L("While the Merog Shamans are performing their rituals, you might have a chance to try something. Can you take care of them?"),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("While the Merog Shamans are performing their rituals, you might have a chance to try something. Can you take care of them?"),
 					Option(L("I can give it a try"), "accept"),
 					Option(L("I don't feel it"), "leave")
 				);
@@ -200,7 +187,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Who'd have thought that they would be using the power of our own altar?"));
 				await dialog.Msg(L("I don't know how I can face the goddess now."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 
 				if (character.Quests.IsActive(Mq01))
 					character.Quests.CompleteObjective(Mq01, "helpZaneta");
@@ -212,7 +199,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I did not know those demons could use summoning crystals."));
 
-				var answer = await dialog.Select(L("They may overwhelm us."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("They may overwhelm us."),
 					Option(L("I will destroy the summon crystal"), "accept"),
 					Option(L("You'll be able to run away"), "leave")
 				);
@@ -248,7 +235,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("We should be able to find a way to use it."));
 				await dialog.Msg(L("Those demons used our altars, so we can use theirs too."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 
 				if (character.Quests.IsActive(Mq01))
 					character.Quests.CompleteObjective(Mq01, "helpSimas");
@@ -260,7 +247,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I want to study the Demon Summoning Circle that has been emanating evil energy and summoning demons over there."));
 
-				var answer = await dialog.Select(L("It's a precious sample, so please go gentle so you don't break much of it."),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("It's a precious sample, so please go gentle so you don't break much of it."),
 					Option(L("Leave it to me"), "accept"),
 					Option(L("I don't want to be part of a weird research"), "leave")
 				);
@@ -299,20 +286,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Thanks."));
 				await dialog.Msg(L("They will not be able to attack us easily now."));
 
-				var pick = await dialog.Select(L("Archon's own, and a set of forest cloth besides. Take what suits you."),
-					Option(L("Sirdgela Robe"), "cloth"),
-					Option(L("Sirdgela Leather Tunic"), "leather"),
-					Option(L("Sirdgela Scale Mail"), "plate")
-				);
-
-				switch (pick)
-				{
-					case "cloth": character.Quests.SelectReward(Mq07, 532166); break;
-					case "leather": character.Quests.SelectReward(Mq07, 532167); break;
-					case "plate": character.Quests.SelectReward(Mq07, 532168); break;
-				}
-
-				character.Quests.Complete(Mq07);
+				await dialog.CompleteQuest(Mq07);
 
 				if (character.Quests.IsActive(Mq01))
 					character.Quests.CompleteObjective(Mq01, "helpOnute");
@@ -324,7 +298,7 @@ public class DThorn20QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The shamans are trying to summon Archon."));
 
-				var answer = await dialog.Select(L("It should frighten them if you can defeat Archon and destroy their summoning circles."),
+				var answer = await dialog.SelectQuestOffer(Mq07, L("It should frighten them if you can defeat Archon and destroy their summoning circles."),
 					Option(L("I'll defeat Archon"), "accept"),
 					Option(L("Leave the vicinity"), "leave")
 				);

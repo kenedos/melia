@@ -45,30 +45,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Is Brother Vaidutis alright? I came running when I heard the barrier break."));
 
-				var pick = await dialog.Select(L("Take a weapon from the church stores."),
-					Option(L("Tenet Sword"), "swd"),
-					Option(L("Tenet Two-handed Sword"), "hts"),
-					Option(L("Tenet Rod"), "rod"),
-					Option(L("Tenet Staff"), "stf"),
-					Option(L("Tenet Bow"), "bow"),
-					Option(L("Tenet Crossbow"), "xbow"),
-					Option(L("Tenet Mace"), "mac"),
-					Option(L("Tenet Spear"), "spr")
-				);
-
-				switch (pick)
-				{
-					case "swd": character.Quests.SelectReward(Mq0905, 102123); break;
-					case "hts": character.Quests.SelectReward(Mq0905, 122119); break;
-					case "rod": character.Quests.SelectReward(Mq0905, 142118); break;
-					case "stf": character.Quests.SelectReward(Mq0905, 272118); break;
-					case "bow": character.Quests.SelectReward(Mq0905, 162121); break;
-					case "xbow": character.Quests.SelectReward(Mq0905, 182117); break;
-					case "mac": character.Quests.SelectReward(Mq0905, 202120); break;
-					case "spr": character.Quests.SelectReward(Mq0905, 242115); break;
-				}
-
-				character.Quests.Complete(Mq0905);
+				await dialog.CompleteQuest(Mq0905);
 				return;
 			}
 
@@ -76,7 +53,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Well done."));
 				await dialog.Msg(L("Making the Light Crystal with this will be enough power to break the barrier."));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -84,7 +61,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Good job."));
 				await dialog.Msg(L("Their babbling laughter seems to have stopped."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				return;
 			}
 
@@ -92,14 +69,14 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It's not much... But it will have to do."));
 				await dialog.Msg(L("Thank you so much!"));
-				character.Quests.Complete(Rp1);
+				await dialog.CompleteQuest(Rp1);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("I studied the barrier at the gate, but the power of the basement altar is insufficient."));
-				var answer = await dialog.Select(L("Could you supply me with Power Crystals from the Corylus?"),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("Could you supply me with Power Crystals from the Corylus?"),
 					Option(L("Yeah, I'll collect them"), "accept"),
 					Option(L("I'll wait a little bit"), "leave")
 				);
@@ -113,7 +90,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("I would like to ask you to defeat Pawndel and Pawnd."));
-				var answer = await dialog.Select(L("They are demon sisters and they are quite a nuisance."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("They are demon sisters and they are quite a nuisance."),
 					Option(L("I will defeat it"), "accept"),
 					Option(L("I don't have time"), "leave")
 				);
@@ -127,7 +104,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Rp1) && character.Quests.MeetsPrerequisites(Rp1))
 			{
 				await dialog.Msg(L("I've lost all of my Holy Stones..."));
-				var answer = await dialog.Select(L("I don't know how much longer I'll be able to stay here."),
+				var answer = await dialog.SelectQuestOffer(Rp1, L("I don't know how much longer I'll be able to stay here."),
 					Option(L("I'll try to find them"), "accept"),
 					Option(L("I wish you good luck."), "leave")
 				);
@@ -177,7 +154,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It is an honor to fight with you, Revelator."));
 				await dialog.Msg(L("Could you drive the demons from this area while Follower Algis investigates?"));
-				character.Quests.Complete(Mq041);
+				await dialog.CompleteQuest(Mq041);
 				return;
 			}
 
@@ -185,7 +162,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you."));
 				await dialog.Msg(L("This is sufficient to make a transformation scroll."));
-				character.Quests.Complete(Mq05);
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 
@@ -193,7 +170,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Well done."));
 				await dialog.Msg(L("It will probably be difficult for them to trust each other from now on."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 				return;
 			}
 
@@ -201,7 +178,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Alright."));
 				await dialog.Msg(L("I think that should be enough for you to grasp their nature."));
-				character.Quests.Complete(Mq07);
+				await dialog.CompleteQuest(Mq07);
 				return;
 			}
 
@@ -209,7 +186,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Good job."));
 				await dialog.Msg(L("If there are any good demons left, the goddess will look after them."));
-				character.Quests.Complete(Mq08);
+				await dialog.CompleteQuest(Mq08);
 				return;
 			}
 
@@ -217,14 +194,14 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It was an ambush."));
 				await dialog.Msg(L("We would have been in big trouble without your help."));
-				character.Quests.Complete(Mq09);
+				await dialog.CompleteQuest(Mq09);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("My plan is to let you disguise as a demon."));
-				var answer = await dialog.Select(L("Please collect Pawndel and Pawnd's clothing first."),
+				var answer = await dialog.SelectQuestOffer(Mq05, L("Please collect Pawndel and Pawnd's clothing first."),
 					Option(L("That seems fun"), "accept"),
 					Option(L("That's blasphemous"), "leave")
 				);
@@ -238,7 +215,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("You can transform into a demon by using this scroll."));
-				var answer = await dialog.Select(L("Persuade the demons to go to the altar on their own."),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("Persuade the demons to go to the altar on their own."),
 					Option(L("Sounds fun"), "accept"),
 					Option(L("Looks like we'll be caught soon. Let's just stop."), "leave")
 				);
@@ -256,7 +233,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
 				await dialog.Msg(L("I'm thinking of converting the demons using the power of the altar."));
-				var answer = await dialog.Select(L("The converted demons will absorb the divine power and slowly start to die."),
+				var answer = await dialog.SelectQuestOffer(Mq07, L("The converted demons will absorb the divine power and slowly start to die."),
 					Option(L("I'll try to do it"), "accept"),
 					Option(L("I'll wait a little bit"), "leave")
 				);
@@ -270,7 +247,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq08) && character.Quests.MeetsPrerequisites(Mq08))
 			{
 				await dialog.Msg(L("The power of the altar makes conversion simple."));
-				var answer = await dialog.Select(L("First, you activate the power of Globejas Altar. Then, stay within its influence and fight the demons."),
+				var answer = await dialog.SelectQuestOffer(Mq08, L("First, you activate the power of Globejas Altar. Then, stay within its influence and fight the demons."),
 					Option(L("It could be difficult but I'll try"), "accept"),
 					Option(L("I need to find out more about the demons"), "leave")
 				);
@@ -286,7 +263,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
 				await dialog.Msg(L("The Central Altar that suppresses the power of the demons suddenly stopped."));
-				var answer = await dialog.Select(L("Could you take a look at what's going on?"),
+				var answer = await dialog.SelectQuestOffer(Mq09, L("Could you take a look at what's going on?"),
 					Option(L("I'll check on it"), "accept"),
 					Option(L("About the Church's altar"), "explain"),
 					Option(L("I'll wait a little bit"), "leave")
@@ -350,7 +327,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02) && character.Quests.IsCompletable(Mq02))
 			{
 				await dialog.Msg(L("The gate groans open under the Light Crystal's glow."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 
 				if (!character.Quests.Has(Mq041) && character.Quests.MeetsPrerequisites(Mq041))
 					character.Quests.Start(Mq041);

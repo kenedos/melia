@@ -41,7 +41,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("So you finally returned. What did the Bokor Master tell you?"));
 				await dialog.Msg(L("What you've said is hard to believe. This revelation is from Goddess Laima and only when we collect all of them, she will return. Is that what you mean? Goddess Laima is also referred as the 'goddess in a book'. There is no other story mentioning her name other than the record that states that she picked the spot for the kingdom to be built to the Great King Zachariel. I'd like to ask you a favor. I have sinned because I was not able to fulfill my duties of guarding the kingdom on Medzio Diena. But I am not a Revelator. Even if I want to make up for my sins, my duty at the moment is to protect the many citizens of Klaipeda. So please find all the revelations. I will put my position as the Knight Commander of Klaipeda on the line and help you deal with it."));
-				character.Quests.Complete(Slate2);
+				await dialog.CompleteQuest(Slate2);
 				return;
 			}
 
@@ -49,7 +49,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("If the Bokor Master told you that I would know it... There's one place that comes to mind. The high gardens mentioned by the goddess may be a place in Gele Plateau. I heard the Paladin Master is there, upholding a long term promise."));
 
-				var answer = await dialog.Select(L("Will you go and meet the Paladin Master?"),
+				var answer = await dialog.SelectQuestOffer(Slate3, L("Will you go and meet the Paladin Master?"),
 					Option(L("I'll go and meet the Paladin Master"), "accept"),
 					Option(L("Cancel"), "leave")
 				);
@@ -68,7 +68,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("This stone slate is the Light of Salvation? It looks like just an old slate to me. It would be good to ask the Bokor Master to interpret this slate. She lives at the end of Klaipeda's Residential Area so go pay her a visit."));
 
-				var answer = await dialog.Select(L("Will you have the slate interpreted?"),
+				var answer = await dialog.SelectQuestOffer(Slate2, L("Will you have the slate interpreted?"),
 					Option(L("I'll go visit the Bokor Master"), "accept"),
 					Option(L("I'll think about it little more"), "leave")
 				);
@@ -97,7 +97,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The kingdom has lost all hope. Its will to rise again is broken, and all that is left is to cry the goddess's name."));
 				await dialog.Msg(L("Honestly, I cannot look on you Revelators as pure hope. I carry a city on my shoulders - I cannot bear to fall into despair again."));
 
-				var answer = await dialog.Select(L("Well... in any case, the bishop also had the dream of revelation. He said to send the Revelator to the crystal mine when they arrive."),
+				var answer = await dialog.SelectQuestOffer(GoToEast, L("Well... in any case, the bishop also had the dream of revelation. He said to send the Revelator to the crystal mine when they arrive."),
 					Option(L("The dream is why I came"), "accept"),
 					Option(L("Another time"), "leave")
 				);
@@ -115,7 +115,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The bishop said to send the Revelators to the crystal mine. The goddess told him so in a dream."));
 				await dialog.Msg(L("But the mining village is in open conflict with the Bube, so entry is restricted. Knight Ares in the eastern woods is in charge - go and meet him."));
-				character.Quests.Complete(GoToEast);
+				await dialog.CompleteQuest(GoToEast);
 				return;
 			}
 
@@ -125,7 +125,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The bishop too had the dream of revelation during his closed prayer. He says the goddess told him there would be a light of salvation in the crystal mine."));
 				await dialog.Msg(L("Knight Ares, stationed in the eastern woods, is in charge. Go and meet him."));
 
-				var answer = await dialog.Select(L("Why the goddess sent the Revelators only now, four years on... it is not for the likes of me to know her will. But I know you are the only hope we have left to hold on to."),
+				var answer = await dialog.SelectQuestOffer(EastPrepare, L("Why the goddess sent the Revelators only now, four years on... it is not for the likes of me to know her will. But I know you are the only hope we have left to hold on to."),
 					Option(L("I'll head for the eastern woods"), "accept"),
 					Option(L("Not yet"), "leave")
 				);
@@ -193,7 +193,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			await dialog.Msg(L("Klaipeda is full of hope and expectation for the Revelators who dreamed of the goddess. I am among those hoping, too."));
 			await dialog.Msg(L("These are warp scrolls. Use one and you can travel to any goddess statue you like, or return to where you were."));
 			await dialog.Msg(L("I will give you more than the knights asked for. With so many Revelators about, surely things will get better than they are now?"));
-			character.Quests.Complete(EastPrepare);
+			await dialog.CompleteQuest(EastPrepare);
 			return HookResult.Break;
 		}
 
@@ -207,7 +207,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 		{
 			await dialog.Msg(L("Oh, that's right - Ronesa at the accessory shop said she has a gift she simply must give the Revelators."));
 
-			var answer = await dialog.Select(L("Would you like to drop by?"),
+			var answer = await dialog.SelectQuestOffer(EastPrepare1, L("Would you like to drop by?"),
 				Option(L("I'll drop by"), "accept"),
 				Option(L("Another time"), "leave")
 			);
@@ -244,7 +244,7 @@ public class KlaipeQuestNpcsScript : GeneralScript
 			await dialog.Msg(L("That's all right. I believe the Revelators are the ones who have come to find the goddess."));
 			await dialog.Msg(L("Please, take this accessory. If armor guards against physical attacks, an accessory can protect you from magic."));
 			await dialog.Msg(L("I do hope it serves you well. May the goddess's blessing go with you..."));
-			character.Quests.Complete(EastPrepare1);
+			await dialog.CompleteQuest(EastPrepare1);
 			return HookResult.Break;
 		}
 

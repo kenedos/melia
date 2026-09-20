@@ -42,7 +42,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you for helping out."));
 				await dialog.Msg(L("You've reduced my workload quite a bit."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				return;
 			}
 
@@ -50,7 +50,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you."));
 				await dialog.Msg(L("We might be able to go get more when more young men arrive."));
-				character.Quests.Complete(Mq08);
+				await dialog.CompleteQuest(Mq08);
 				return;
 			}
 
@@ -58,14 +58,14 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I forgot that Mushcaria was still alive."));
 				await dialog.Msg(L("Anyway, you did a good job."));
-				character.Quests.Complete(Mq09);
+				await dialog.CompleteQuest(Mq09);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("Please bring me the Mali seeds on the way to Labure Highway."));
-				var answer = await dialog.Select(L("They would be a good source of magic for the shaman doll."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("They would be a good source of magic for the shaman doll."),
 					Option(L("No problem"), "accept"),
 					Option(L("About the Pledge"), "explain"),
 					Option(L("I'll wait a little bit"), "leave")
@@ -87,7 +87,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("We need the rope for ceremony to make the shaman doll."));
 				await dialog.Msg(L("It's on the waist of the Panto Shaman in the Cottage."));
-				var answer = await dialog.Select(L("Bring it to me."),
+				var answer = await dialog.SelectQuestOffer(Mq08, L("Bring it to me."),
 					Option(L("I will try"), "accept"),
 					Option(L("About the Cursed Doll"), "explain"),
 					Option(L("Not right now"), "leave")
@@ -110,7 +110,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
 				await dialog.Msg(L("The shaman doll is to be filled with Mushcaria's Enchanted Mane."));
-				var answer = await dialog.Select(L("The Mushcaria should be in the Tustinti Plateau. Can you get its mane for me?"),
+				var answer = await dialog.SelectQuestOffer(Mq09, L("The Mushcaria should be in the Tustinti Plateau. Can you get its mane for me?"),
 					Option(L("I'll get it"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -153,7 +153,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
 			{
 				await dialog.Msg(L("The totems are broken? Then the shaman dolls did their part."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				return;
 			}
 
@@ -161,14 +161,14 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It's been a bit frightening ever since Simorph appeared around here."));
 				await dialog.Msg(L("Witnessing the Pantos becoming this corrupted is no different."));
-				character.Quests.Complete(Mq05);
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq06) && character.Quests.IsCompletable(Mq06))
 			{
 				await dialog.Msg(L("Every trace of the corruption is gone. Labure Highway can breathe again."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 				return;
 			}
 
@@ -176,7 +176,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It would have been a disaster if the Wild Carnivore had legs."));
 				await dialog.Msg(L("I'm glad it was killed beforehand."));
-				character.Quests.Complete(Mq07);
+				await dialog.CompleteQuest(Mq07);
 				return;
 			}
 
@@ -189,14 +189,14 @@ public class FGele572QuestNpcsScript : GeneralScript
 				if (told60152 != TimeActionResult.Completed)
 					return;
 
-				character.Quests.Complete(Rp1);
+				await dialog.CompleteQuest(Rp1);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("I can't stand seeing the Panto totems pressed with evil energy."));
-				var answer = await dialog.Select(L("I'm going to break it with the shaman doll. Want to give it a try?"),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("I'm going to break it with the shaman doll. Want to give it a try?"),
 					Option(L("Alright, I'll help you"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -213,7 +213,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("Won't you help me purify Labure Highway?"));
-				var answer = await dialog.Select(L("The shaman doll finds the evil force but we have to purify it ourselves."),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("The shaman doll finds the evil force but we have to purify it ourselves."),
 					Option(L("Alright"), "accept"),
 					Option(L("About the corrupted land with evil energy"), "explain"),
 					Option(L("Not right now"), "leave")
@@ -238,7 +238,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Rp1) && character.Quests.MeetsPrerequisites(Rp1))
 			{
 				await dialog.Msg(L("If we're going to use a shaman doll, we need more information."));
-				var answer = await dialog.Select(L("There used to be nothing but Pantos here, but now I see other monsters hanging around."),
+				var answer = await dialog.SelectQuestOffer(Rp1, L("There used to be nothing but Pantos here, but now I see other monsters hanging around."),
 					Option(L("I will try"), "accept"),
 					Option(L("I'll find the other people"), "leave")
 				);

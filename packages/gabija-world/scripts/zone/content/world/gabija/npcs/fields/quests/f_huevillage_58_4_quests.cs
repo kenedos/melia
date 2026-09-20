@@ -46,7 +46,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
-				var answer = await dialog.Select(L("The barrier holds the shrine shut, and behind it something is being held down."),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("The barrier holds the shrine shut, and behind it something is being held down."),
 					Option(L("Check the barrier at Saule Grand Shrine"), "accept"),
 					Option(L("Stay outside the barrier"), "leave")
 				);
@@ -89,7 +89,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("You are... the only true savior who will save this world."));
 				await dialog.Msg(L("The one who Goddess Laima talked about."));
 				await dialog.Msg(L("I am Saule, the goddess of the sun. I was the guardian of the revelation."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 				return;
 			}
 
@@ -97,7 +97,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Both circles are broken. The weight of them is off me at last."));
 				await dialog.Msg(L("But the cage itself is not theirs to hold, and it holds me still."));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -105,14 +105,14 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you."));
 				await dialog.Msg(L("I should be able to work with this amount of divine energy."));
-				character.Quests.Complete(Mq05);
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq06) && character.Quests.IsCompletable(Mq06))
 			{
 				await dialog.Msg(L("Clymen... I can feel its presence at the Ishpirki Access Road."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 				return;
 			}
 
@@ -120,7 +120,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("That is the key."));
 				await dialog.Msg(L("Please free me from this cage."));
-				character.Quests.Complete(Mq07);
+				await dialog.CompleteQuest(Mq07);
 				return;
 			}
 
@@ -134,7 +134,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("It is recovering by turning the forest into a thorn forest and extracting nourishment."));
 				await dialog.Msg(L("My Believers are waiting for you in Gate Route."));
 				await dialog.Msg(L("Please take back the revelation from Bramble."));
-				character.Quests.Complete(Mq08);
+				await dialog.CompleteQuest(Mq08);
 
 				if (!character.Quests.Has(Mq09))
 					character.Quests.Start(Mq09);
@@ -149,7 +149,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Trusting Laima's words, I have been fighting the Demon Lord Bramble, who tried to take over the revelation."));
 				await dialog.Msg(L("I have fought with it night and day to be able to hand the revelation to you."));
 
-				var answer = await dialog.Select(L("But, ultimately, Medzio Diena, that the demons caused broke the balance of power. The goddesses lost most of their strength since that day."),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("But, ultimately, Medzio Diena, that the demons caused broke the balance of power. The goddesses lost most of their strength since that day."),
 					Option(L("I'll destroy it"), "accept"),
 					Option(L("I need more time to prepare"), "leave")
 				);
@@ -168,7 +168,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("This cage is still confining me."));
 
-				var answer = await dialog.Select(L("We've got to find Clymen who has the key and is hiding in between the dimensional crack."),
+				var answer = await dialog.SelectQuestOffer(Mq05, L("We've got to find Clymen who has the key and is hiding in between the dimensional crack."),
 					Option(L("What should I do?"), "accept"),
 					Option(L("Wait until my strength is fully recovered"), "leave")
 				);
@@ -185,7 +185,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
-				var answer = await dialog.Select(L("I will now focus on finding Clymen. Please remove any nearby demons in order to moderate their evil energies."),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("I will now focus on finding Clymen. Please remove any nearby demons in order to moderate their evil energies."),
 					Option(L("I'll defeat the monsters nearby"), "accept"),
 					Option(L("I'm sorry, but I don't think I can"), "leave")
 				);
@@ -200,7 +200,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq08) && character.Quests.MeetsPrerequisites(Mq08))
 			{
-				var answer = await dialog.Select(L("The key turns in the lock of the cage, and the light of the restraining sphere begins to give."),
+				var answer = await dialog.SelectQuestOffer(Mq08, L("The key turns in the lock of the cage, and the light of the restraining sphere begins to give."),
 					Option(L("Remove the restraining sphere"), "accept"),
 					Option(L("Wait a moment longer"), "leave")
 				);
@@ -223,7 +223,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Bramble..."));
 				await dialog.Msg(L("It is a pity that it went against its foreseen fate."));
 
-				var answer = await dialog.Select(L("Please show me the revelation. And I will show you its meaning."),
+				var answer = await dialog.SelectQuestOffer(Mq11, L("Please show me the revelation. And I will show you its meaning."),
 					Option(L("Show the revelation"), "accept"),
 					Option(L("I'm not ready yet"), "leave")
 				);
@@ -296,7 +296,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
-				var answer = await dialog.Select(L("Dark energy runs along the lines of the circle, and it has been kept fed."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("Dark energy runs along the lines of the circle, and it has been kept fed."),
 					Option(L("Check the binding magic circle"), "accept"),
 					Option(L("Keep clear of the circle"), "leave")
 				);
@@ -334,7 +334,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
-				var answer = await dialog.Select(L("The second circle burns lower than the first, but the same hand drew it."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("The second circle burns lower than the first, but the same hand drew it."),
 					Option(L("Check the binding magic circle"), "accept"),
 					Option(L("Keep clear of the circle"), "leave")
 				);
@@ -382,7 +382,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
-				var answer = await dialog.Select(L("The goddess pointed out the seam of the barrier. Clymen is behind it, with the key."),
+				var answer = await dialog.SelectQuestOffer(Mq07, L("The goddess pointed out the seam of the barrier. Clymen is behind it, with the key."),
 					Option(L("Release the Demon Barrier"), "accept"),
 					Option(L("Leave the barrier closed"), "leave")
 				);

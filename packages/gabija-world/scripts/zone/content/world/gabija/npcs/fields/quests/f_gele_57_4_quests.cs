@@ -42,7 +42,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you so much!"));
 				await dialog.Msg(L("How did it come from such a far forest? Strange, huh?"));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -50,7 +50,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("They're not listening?"));
 				await dialog.Msg(L("Could the Panto Totems in Valyma Sanctum be causing problems?"));
-				character.Quests.Complete(Mq05);
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 
@@ -58,14 +58,14 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("As I thought, I still have some materials left."));
 				await dialog.Msg(L("Thank you though."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Biteregina, which used to live in the deep forest, has appeared here."));
-				var answer = await dialog.Select(L("It even built a hive at the upper side of Rojus Plateau. Since it's dangerous, can you defeat it?"),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("It even built a hive at the upper side of Rojus Plateau. Since it's dangerous, can you defeat it?"),
 					Option(L("It's easy"), "accept"),
 					Option(L("It looks dangerous"), "leave")
 				);
@@ -79,7 +79,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("I received a mysterious charm from the elders that will brainwash Pantos to stand on our side."));
-				var answer = await dialog.Select(L("Are you up for a challenge?"),
+				var answer = await dialog.SelectQuestOffer(Mq05, L("Are you up for a challenge?"),
 					Option(L("Accept immediately"), "accept"),
 					Option(L("It looks dangerous"), "leave")
 				);
@@ -97,7 +97,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("I will give you a stronger charm, so use it after destroying the Panto Totem."));
-				var answer = await dialog.Select(L("Just like you did last time. You got it?"),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("Just like you did last time. You got it?"),
 					Option(L("Trust him one more time"), "accept"),
 					Option(L("I will not be fooled again."), "leave")
 				);
@@ -146,7 +146,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Very good. Flowers in the fields should act like flowers in the fields."));
 				await dialog.Msg(L("Don't you think so?"));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 				return;
 			}
 
@@ -154,7 +154,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Good, good."));
 				await dialog.Msg(L("Let's see if it can resist waking up."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				return;
 			}
 
@@ -162,14 +162,14 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You have done what no other could easily do."));
 				await dialog.Msg(L("The goddess must be proud of you."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				await dialog.Msg(L("I can't do anything since the Seedmias are attacking us from every direction."));
-				var answer = await dialog.Select(L("Can you defeat them?"),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("Can you defeat them?"),
 					Option(L("Sure, I'll defeat it"), "accept"),
 					Option(L("Do it yourself"), "leave")
 				);
@@ -183,7 +183,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("I need the sap of Nepenthes, but it's not awake."));
-				var answer = await dialog.Select(L("I have no way to collect the sap if it doesn't wake up."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("I have no way to collect the sap if it doesn't wake up."),
 					Option(L("Yeah, I'll collect them"), "accept"),
 					Option(L("I'll wait a little bit"), "leave")
 				);
@@ -197,7 +197,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("Let's wake up the Nepenthes at Piene Field by burning it with this fat."));
-				var answer = await dialog.Select(L("The fluids will be of no use if they spoil, so we need to extract them while it's alive."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("The fluids will be of no use if they spoil, so we need to extract them while it's alive."),
 					Option(L("I'll be back quickly"), "accept"),
 					Option(L("Impossible"), "leave")
 				);
@@ -245,7 +245,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Amazing."));
 				await dialog.Msg(L("With this, my brothers at the church can fight without any worries."));
-				character.Quests.Complete(Mq07);
+				await dialog.CompleteQuest(Mq07);
 				return;
 			}
 
@@ -253,14 +253,14 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("They're getting swallowed up into them."));
 				await dialog.Msg(L("Very effective indeed."));
-				character.Quests.Complete(Mq08);
+				await dialog.CompleteQuest(Mq08);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
 				await dialog.Msg(L("I would like to say that my faith is like a first-class blade that can cut through these demons,"));
-				var answer = await dialog.Select(L("but in reality it isn't that simple. I hope you'll help us some."),
+				var answer = await dialog.SelectQuestOffer(Mq07, L("but in reality it isn't that simple. I hope you'll help us some."),
 					Option(L("I'll defeat the demons"), "accept"),
 					Option(L("I'm sorry, but I can't do it all by myself"), "leave")
 				);
@@ -274,7 +274,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq08) && character.Quests.MeetsPrerequisites(Mq08))
 			{
 				await dialog.Msg(L("The Demon Summoning Circles are the biggest problem here."));
-				var answer = await dialog.Select(L("If we scribble on the circles, do you think the summoning formulas will become tangled?"),
+				var answer = await dialog.SelectQuestOffer(Mq08, L("If we scribble on the circles, do you think the summoning formulas will become tangled?"),
 					Option(L("That's a reasonable opinion"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -312,7 +312,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
 				await dialog.Msg(L("I heard that the plan failed."));
-				var answer = await dialog.Select(L("I guess we have to do something before Gesti recovers."),
+				var answer = await dialog.SelectQuestOffer(Mq09, L("I guess we have to do something before Gesti recovers."),
 					Option(L("I will chase it immediately"), "accept"),
 					Option(L("I'm not ready yet"), "leave")
 				);
@@ -346,7 +346,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("This barrier is impossible to open from the outside."));
 				await dialog.Msg(L("Fortunately, the entrance to the basement looks secure."));
-				character.Quests.Complete(Mq09);
+				await dialog.CompleteQuest(Mq09);
 				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The 1st floor of the Tenet Church has been sealed by Gesti's powers."));
 				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Find the way up to the first floor through the basement!"));
 				return;

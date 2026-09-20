@@ -42,7 +42,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You are indeed the Revelator."));
 				await dialog.Msg(L("Now, we can concentrate on protecting the altar."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 				return;
 			}
 
@@ -50,7 +50,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thanks."));
 				await dialog.Msg(L("I will share them with the other brothers before the demons find out."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				return;
 			}
 
@@ -58,14 +58,14 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Great."));
 				await dialog.Msg(L("Please leave activating the altar to me and go meet Vaidas at Himnas Chapel."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				await dialog.Msg(L("The Yognomes are trying to eat the altar."));
-				var answer = await dialog.Select(L("I want you to defeat them."),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("I want you to defeat them."),
 					Option(L("I'll take care of it quickly"), "accept"),
 					Option(L("I'll go when it is safer"), "leave")
 				);
@@ -79,7 +79,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
 				await dialog.Msg(L("If you don't mind, can you get Eyes of Madness from Rodelins?"));
-				var answer = await dialog.Select(L("They are handy when you want to hide yourself from demons."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("They are handy when you want to hide yourself from demons."),
 					Option(L("Alright, I'll help you"), "accept"),
 					Option(L("I'll wait a little bit"), "leave")
 				);
@@ -93,7 +93,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("Don't worry, the barrier at the main entrance to the 1st floor can be offset by the church's power."));
-				var answer = await dialog.Select(L("That's what the altars are for."),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("That's what the altars are for."),
 					Option(L("I'm ready"), "accept"),
 					Option(L("I can't believe it"), "leave")
 				);
@@ -138,7 +138,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq05) && character.Quests.IsCompletable(Mq05))
 			{
 				await dialog.Msg(L("Good. This will be enough."));
-				character.Quests.Complete(Mq05);
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 
@@ -146,14 +146,14 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I'm thrilled to see that it went with a bang."));
 				await dialog.Msg(L("But I think further research is needed still."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("I am making a Holy Bomb to attack demons with."));
-				var answer = await dialog.Select(L("I can complete it if I obtain Purified Essence. Can you help me?"),
+				var answer = await dialog.SelectQuestOffer(Mq05, L("I can complete it if I obtain Purified Essence. Can you help me?"),
 					Option(L("Alright, I'll help you"), "accept"),
 					Option(L("It doesn't seem like a good idea"), "leave")
 				);
@@ -170,7 +170,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("I want to test it out on Glizardon."));
-				var answer = await dialog.Select(L("I'll give you the Holy Bomb. Can you put it onto a Glizardon's back?"),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("I'll give you the Holy Bomb. Can you put it onto a Glizardon's back?"),
 					Option(L("Hmm, alright"), "accept"),
 					Option(L("I need more preparation"), "leave")
 				);
@@ -211,7 +211,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I have never seen a stone filled with this much holiness."));
 				await dialog.Msg(L("Thank you very much for giving it so much effort."));
-				character.Quests.Complete(Mq07);
+				await dialog.CompleteQuest(Mq07);
 				return;
 			}
 
@@ -219,7 +219,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I would never have thought that you would defeat them this quickly."));
 				await dialog.Msg(L("Thank you for your help."));
-				character.Quests.Complete(Mq08);
+				await dialog.CompleteQuest(Mq08);
 				return;
 			}
 
@@ -227,14 +227,14 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Is Brother Vaidutis alright?"));
 				await dialog.Msg(L("I would have been in serious trouble if not for your help."));
-				character.Quests.Complete(Mq09);
+				await dialog.CompleteQuest(Mq09);
 				return;
 			}
 
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
 				await dialog.Msg(L("I only have one empty Holy Stone."));
-				var answer = await dialog.Select(L("Can you help me to fill this stone, please?"),
+				var answer = await dialog.SelectQuestOffer(Mq07, L("Can you help me to fill this stone, please?"),
 					Option(L("I can help you"), "accept"),
 					Option(L("Hold on a little longer"), "leave")
 				);
@@ -252,7 +252,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq08) && character.Quests.MeetsPrerequisites(Mq08))
 			{
 				await dialog.Msg(L("The attacks from the demons are quite aggressive."));
-				var answer = await dialog.Select(L("I think they would be discouraged if we could somehow defeat the Glizardons..."),
+				var answer = await dialog.SelectQuestOffer(Mq08, L("I think they would be discouraged if we could somehow defeat the Glizardons..."),
 					Option(L("I will try"), "accept"),
 					Option(L("That's too much to handle"), "leave")
 				);
@@ -266,7 +266,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
 				await dialog.Msg(L("It is reassuring to hear that Brother Tomas will be in charge of the altar."));
-				var answer = await dialog.Select(L("The demons have made a magic barrier at the basement's central altar. Break it and look for Brother Vaidutis."),
+				var answer = await dialog.SelectQuestOffer(Mq09, L("The demons have made a magic barrier at the basement's central altar. Break it and look for Brother Vaidutis."),
 					Option(L("I will go to the 1st floor"), "accept"),
 					Option(L("Look for another way"), "leave")
 				);

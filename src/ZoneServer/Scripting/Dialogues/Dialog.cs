@@ -19,6 +19,7 @@ using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
+using Melia.Zone.World.Quests;
 using Yggdrasil.Extensions;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Logging;
@@ -513,6 +514,156 @@ namespace Melia.Zone.Scripting.Dialogues
 			}
 
 			return selectedIndex;
+		}
+
+		/// <summary>
+		/// Opens the client's quest reward window for the given client-side
+		/// quest id and returns the index of the item the player picked
+		/// from that quest's Success_SelectItemName1-8, or 0 if the player
+		/// closed the window, or 100 if the quest has no select-item reward
+		/// to offer, both matching the client's own sentinel values.
+		/// </summary>
+		/// <remarks>
+		/// Confirmed against a capture of the game's own quest turn-in: the
+		/// server sends ZC_ADDON_MSG("SHOW_QUEST_SEL_DLG", questClientId),
+		/// which the client's questreward addon uses to look up the
+		/// reward data straight out of its own QuestProgressCheck_Auto
+		/// table, so this only works for a quest carrying a client id via
+		/// SetClientId.
+		/// </remarks>
+		/// <param name="questClientId"></param>
+		/// <returns></returns>
+		public async Task<int> SelectQuestReward(int questClientId)
+		{
+			this.Player.AddonMessage(AddonMessage.SHOW_QUEST_SEL_DLG, null, questClientId);
+
+			this.ExpectedResponseType = DialogResponseType.Select;
+			var response = await this.GetClientResponse();
+
+			if (!int.TryParse(response, out var selectedIndex))
+			{
+				Log.Warning("Dialog.SelectQuestReward: Unexpected non-integer response '{0}'.", response);
+				selectedIndex = 0;
+			}
+
+			return selectedIndex;
+		}
+
+		/// <summary>
+		/// Shows a menu with options to select from, with the game's own
+		/// quest reward preview attached for the quest being offered,
+		/// returns the key of the selected option.
+		/// </summary>
+		/// <param name="questId">The quest the options are offering to start.</param>
+		/// <param name="text">Text to display with the options.</param>
+		/// <param name="options">List of options to select from.</param>
+		/// <returns></returns>
+		public async Task<string> SelectQuestOffer(QuestId questId, string text, params DialogOption[] options)
+			=> await this.SelectQuestOffer(questId, text, (IEnumerable<DialogOption>)options);
+
+		/// <summary>
+		/// Shows a menu with options to select from, with the game's own
+		/// quest reward preview attached for the quest being offered,
+		/// returns the key of the selected option.
+		/// </summary>
+		/// <param name="questId">The quest the options are offering to start.</param>
+		/// <param name="text">Text to display with the options.</param>
+		/// <param name="options">List of options to select from.</param>
+		/// <returns></returns>
+		public async Task<string> SelectQuestOffer(QuestId questId, string text, IEnumerable<DialogOption> options)
+		{
+			var enabledOptions = options.Where(a => a.Enabled());
+			var optionsTexts = enabledOptions.Select(a => a.Text);
+			var selectedIndex = await this.SelectQuestOffer(questId, text, optionsTexts);
+
+			var response = enabledOptions.ElementAt(selectedIndex - 1).Key;
+			return response;
+		}
+
+		/// <summary>
+		/// Shows a menu with options to select from, with the game's own
+		/// quest reward preview attached for the quest being offered,
+		/// returns the index of the selected option, starting at 1.
+		/// Returns 0 in case of errors.
+		/// </summary>
+		/// <remarks>
+		/// Confirmed against a capture of the game's own quest offer: the
+		/// arguments carry the quest's own className as a leading entry,
+		/// right after the message and before the real options - the
+		/// client's dialogselect addon recognizes that entry as a
+		/// QuestProgressCheck class and renders the reward preview from it,
+		/// without it taking up a button or a slot in the response index.
+		/// </remarks>
+		/// <param name="questId">The quest the options are offering to start.</param>
+		/// <param name="text">Text to display with the options.</param>
+		/// <param name="options">List of options to select from.</param>
+		/// <returns></returns>
+		public async Task<int> SelectQuestOffer(QuestId questId, string text, IEnumerable<string> options)
+		{
+			if (this.Npc != null)
+			{
+				ZoneServer.Instance.ServerEvents.PlayerDialog.Raise(new PlayerDialogEventArgs(this.Player, this.Npc, this.GetNpcDialogTitle(), text));
+			}
+
+			text = this.FrameMessage(text);
+
+			var arguments = new List<string>();
+			arguments.Add(text);
+
+			if (ZoneServer.Instance.Data.QuestDb.TryFind((int)questId.Value, out var questData))
+				arguments.Add(questData.ClassName);
+
+			arguments.AddRange(options);
+
+			Send.ZC_DIALOG_SELECT(this.Player.Connection, arguments);
+
+			this.ExpectedResponseType = DialogResponseType.Select;
+			var response = await this.GetClientResponse();
+
+			// Parse selected index
+			if (!int.TryParse(response, out var selectedIndex))
+			{
+				Log.Warning("Dialog.SelectQuestOffer: Unexpected non-integer response '{0}'.", response);
+				selectedIndex = 0;
+				this.Close();
+			}
+			// Check range
+			else if (selectedIndex < 0 || selectedIndex > options.Count())
+			{
+				Log.Warning("Dialog.SelectQuestOffer: Unexpected out-of-range response '{0}/{1}'.", selectedIndex, options.Count());
+				selectedIndex = 0;
+				this.Close();
+			}
+
+			return selectedIndex;
+		}
+
+		/// <summary>
+		/// Completes the given quest, showing the game's own quest reward
+		/// window first. If the quest has a pick-one-of reward, the picked
+		/// item is applied before the quest is completed; a quest with no
+		/// select reward still shows the window, matching the game's own
+		/// behavior, and closes itself once the player confirms.
+		/// </summary>
+		/// <param name="questId"></param>
+		public async Task CompleteQuest(QuestId questId)
+		{
+			if (!this.Player.Quests.HasRewards(questId))
+			{
+				this.Player.Quests.Complete(questId);
+				return;
+			}
+
+			var pick = await this.SelectQuestReward((int)questId.Value);
+
+			// 0 is the client's own cancel response
+			if (pick == 0)
+				return;
+
+			if (this.Player.Quests.TryGetSelectItemReward(questId, out var reward) && pick >= 1 && pick <= reward.ItemClassIds.Count)
+				this.Player.Quests.SelectReward(questId, reward.ItemClassIds[pick - 1]);
+
+			this.Player.Quests.Complete(questId);
 		}
 
 		/// <summary>

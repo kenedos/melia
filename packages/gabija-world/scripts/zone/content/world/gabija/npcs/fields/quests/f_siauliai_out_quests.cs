@@ -53,7 +53,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Welcome. Aren't you our town's savior? Go down from the middle of the Twin Bridge and you'll arrive at Srautas Gorge. Go further right through the Gorge and you'll reach Gele Plateau."));
 				dialog.ShowHelp("TUTO_INCOMPATIBLE");
-				character.Quests.Complete(Slate3);
+				await dialog.CompleteQuest(Slate3);
 				return;
 			}
 
@@ -75,22 +75,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("What do we do?"));
 				await dialog.Msg(L("The Vubbes rushed in and kidnapped the villagers!"));
 
-				var pick = await dialog.Select(L("Take what the village can spare."),
-					Option(L("Mayor's Falchion"), "swd"),
-					Option(L("Chieftain's Long Rod"), "stf"),
-					Option(L("Mayor's Short Bow"), "tbw"),
-					Option(L("Mayor's Iron Club"), "mac")
-				);
-
-				switch (pick)
-				{
-					case "swd": character.Quests.SelectReward(Sout01, 101114); break;
-					case "stf": character.Quests.SelectReward(Sout01, 141114); break;
-					case "tbw": character.Quests.SelectReward(Sout01, 161114); break;
-					case "mac": character.Quests.SelectReward(Sout01, 201114); break;
-				}
-
-				character.Quests.Complete(Sout01);
+				await dialog.CompleteQuest(Sout01);
 				return;
 			}
 
@@ -98,7 +83,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("How can I express my gratitude."));
 				await dialog.Msg(L("I'm sure the goddess sent you to us."));
-				character.Quests.Complete(Sout13);
+				await dialog.CompleteQuest(Sout13);
 				return;
 			}
 
@@ -110,7 +95,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("What's all this about a 'Light of Salvation' in the Crystal Mine? I have never seen such a thing."));
 				await dialog.Msg(L("I'm not sure if that is the reason, but the Vubbes suddenly rushed out of the Crystal Mine."));
 				await dialog.Msg(L("Those Vubbes took all the villagers they saw into the mines."));
-				var answer = await dialog.Select(L("Please... save the villagers. I beg of you!"),
+				var answer = await dialog.SelectQuestOffer(Sout14, L("Please... save the villagers. I beg of you!"),
 					Option(L("How do we get into the Crystal Mine?"), "accept"),
 					Option(L("Let me think on it for a while"), "leave")
 				);
@@ -134,7 +119,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The Vubbes have built their base outside the village."));
 				await dialog.Msg(L("Now that we don't even have able-bodied soldiers, something serious might happen if we don't drive them out of their base."));
 
-				var answer = await dialog.Select(L("Will you drive the Vubbes out of their base?"),
+				var answer = await dialog.SelectQuestOffer(Sout13, L("Will you drive the Vubbes out of their base?"),
 					Option(L("I'll go to the Vubbe's base and defeat them"), "accept"),
 					Option(L("That is not my concern"), "leave")
 				);
@@ -185,7 +170,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I'll stay and aid the people left here."));
 				await dialog.Msg(L("There are more people who need more than my aid, so please go on ahead."));
-				character.Quests.Complete(Sout05);
+				await dialog.CompleteQuest(Sout05);
 				return;
 			}
 
@@ -194,7 +179,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Oh, you're just in time. We need your help."));
 				await dialog.Msg(L("Monsters stole all the aids and supplies meant for the refugees."));
 
-				var answer = await dialog.Select(L("Will you help recover the relief supplies?"),
+				var answer = await dialog.SelectQuestOffer(Sout05, L("Will you help recover the relief supplies?"),
 					Option(L("I'll help retrieve the relief supplies"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -227,7 +212,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sout07) && character.Quests.IsCompletable(Sout07))
 			{
 				await dialog.Msg(L("Alright. That'll be enough."));
-				character.Quests.Complete(Sout07);
+				await dialog.CompleteQuest(Sout07);
 				return;
 			}
 
@@ -235,7 +220,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Now I can return to the village with peace of mind."));
 				await dialog.Msg(L("This grace I shall never forget."));
-				character.Quests.Complete(Sout08);
+				await dialog.CompleteQuest(Sout08);
 				return;
 			}
 
@@ -245,7 +230,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("But as you can see my arms are shaking."));
 				await dialog.Msg(L("Can you defeat the monsters while I rest my arms for a while?"));
 
-				var answer = await dialog.Select(L("Will you clear the monsters around him?"),
+				var answer = await dialog.SelectQuestOffer(Sout08, L("Will you clear the monsters around him?"),
 					Option(L("I'll defeat the monsters around"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -261,7 +246,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I'm holding this because it looks like it's about to collapse."));
 				await dialog.Msg(L("We need some stones to do something about it."));
 
-				var answer = await dialog.Select(L("Will you gather stones to shore up the wall?"),
+				var answer = await dialog.SelectQuestOffer(Sout07, L("Will you gather stones to shore up the wall?"),
 					Option(L("I'll gather some stones for it"), "accept"),
 					Option(L("Better run away quickly"), "leave")
 				);
@@ -303,7 +288,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I see you came back safely."));
 				await dialog.Msg(L("Well then, I must also prepare to leave."));
-				character.Quests.Complete(Sout09);
+				await dialog.CompleteQuest(Sout09);
 				return;
 			}
 
@@ -311,7 +296,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you. The patient also regained his consciousness."));
 				await dialog.Msg(L("Though... I think there is a problem."));
-				character.Quests.Complete(Sout10);
+				await dialog.CompleteQuest(Sout10);
 				return;
 			}
 
@@ -319,7 +304,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you. Now I can feel at ease and return to the village."));
 				await dialog.Msg(L("May the blessing of the goddess always be with you."));
-				character.Quests.Complete(SoutSudd);
+				await dialog.CompleteQuest(SoutSudd);
 				return;
 			}
 
@@ -328,7 +313,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I came here to hide from the monsters, but even this area is becoming dangerous."));
 				await dialog.Msg(L("I'm trying to make it back to the village, so can you bring the other refugees to me?"));
 
-				var answer = await dialog.Select(L("Will you bring the refugees to her?"),
+				var answer = await dialog.SelectQuestOffer(Sout09, L("Will you bring the refugees to her?"),
 					Option(L("I'll bring the refugees"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -347,7 +332,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("And the patients have not recovered yet."));
 				await dialog.Msg(L("Somehow I'll treat this man. Can you defeat the monsters around?"));
 
-				var answer = await dialog.Select(L("Will you clear the monsters around her?"),
+				var answer = await dialog.SelectQuestOffer(Sout10, L("Will you clear the monsters around her?"),
 					Option(L("I'll defeat the menacing monsters"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -363,7 +348,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("This patient told us that Chafer has appeared."));
 				await dialog.Msg(L("Can you help us out and go check on it?"));
 
-				var answer = await dialog.Select(L("Will you deal with Chafer?"),
+				var answer = await dialog.SelectQuestOffer(SoutSudd, L("Will you deal with Chafer?"),
 					Option(L("Okay, I'll go look around again"), "accept"),
 					Option(L("That would not happen."), "leave")
 				);
@@ -443,7 +428,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("You must also be a Revelator who has come in search of the Light of Salvation."));
 				await dialog.Msg(L("Let's go to the Crystal Mine."));
 				await dialog.Msg(L("I will tell you the rest of the story at the Crystal Mine entrance."));
-				character.Quests.Complete(Sout14);
+				await dialog.CompleteQuest(Sout14);
 				character.LookAround();
 				return;
 			}
@@ -452,7 +437,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("There were no villagers here, only Vubbes lying in wait."));
 				await dialog.Msg(L("At least the Red Vubbe Fighter will not trouble the mine road any longer."));
-				character.Quests.Complete(Sout15);
+				await dialog.CompleteQuest(Sout15);
 				character.LookAround();
 				return;
 			}
@@ -476,7 +461,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The wagons can be demolished with these explosives that I have prepared."));
 				await dialog.Msg(L("I'm concerned about the Vubbes that will come after hearing the explosion, but with your skills, I think we'll be fine."));
 
-				var answer = await dialog.Select(L("Will you blow up the wagons?"),
+				var answer = await dialog.SelectQuestOffer(Sout16, L("Will you blow up the wagons?"),
 					Option(L("I'm ready to destroy the wagons"), "accept"),
 					Option(L("I'm not yet prepared"), "leave")
 				);
@@ -513,14 +498,14 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sout20) && character.Quests.IsCompletable(Sout20))
 			{
 				await dialog.Msg(L("I know you are doing your best but I will need more."));
-				character.Quests.Complete(Sout20);
+				await dialog.CompleteQuest(Sout20);
 				return;
 			}
 
 			if (character.Quests.IsActive(Sout24) && character.Quests.IsCompletable(Sout24))
 			{
 				await dialog.Msg(L("Well done. This armor should prove to be useful when worn at the Crystal Mine."));
-				character.Quests.Complete(Sout24);
+				await dialog.CompleteQuest(Sout24);
 				return;
 			}
 
@@ -528,7 +513,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you!"));
 				await dialog.Msg(L("I hope it would be helpful for you."));
-				character.Quests.Complete(Sout23);
+				await dialog.CompleteQuest(Sout23);
 				return;
 			}
 
@@ -536,7 +521,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you!"));
 				await dialog.Msg(L("I hope it would be helpful for you."));
-				character.Quests.Complete(Sout22);
+				await dialog.CompleteQuest(Sout22);
 				return;
 			}
 
@@ -544,7 +529,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you!"));
 				await dialog.Msg(L("I hope it would be helpful for you."));
-				character.Quests.Complete(Sout21);
+				await dialog.CompleteQuest(Sout21);
 				return;
 			}
 
@@ -552,7 +537,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I want to treat the injured in our village, but I don't have enough materials to do so."));
 
-				var answer = await dialog.Select(L("Jukopus leaves and Kepa stems are what I need most. Could you gather some for me?"),
+				var answer = await dialog.SelectQuestOffer(Sout20, L("Jukopus leaves and Kepa stems are what I need most. Could you gather some for me?"),
 					Option(L("I'll gather them for you"), "accept"),
 					Option(L("I have other business first"), "leave")
 				);
@@ -570,7 +555,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I still need more Jukopus Leaves and Kepa Stems."));
 				await dialog.Msg(L("But I don't want to just take them from you. How about trading it with the potions I have?"));
 
-				var answer = await dialog.Select(L("Will you gather more ingredients?"),
+				var answer = await dialog.SelectQuestOffer(Sout24, L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -588,7 +573,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I still need more Jukopus Leaves and Kepa Stems."));
 				await dialog.Msg(L("But I don't want to just take them from you. How about trading it with the potions I have?"));
 
-				var answer = await dialog.Select(L("Will you gather more ingredients?"),
+				var answer = await dialog.SelectQuestOffer(Sout23, L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -606,7 +591,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I still need more Jukopus Leaves and Kepa Stems."));
 				await dialog.Msg(L("But I don't want to just take them from you. How about trading it with the potions I have?"));
 
-				var answer = await dialog.Select(L("Will you gather more ingredients?"),
+				var answer = await dialog.SelectQuestOffer(Sout22, L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -624,7 +609,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I still need more Jukopus Leaves and Kepa Stems."));
 				await dialog.Msg(L("But I don't want to just take them from you. How about trading it with the potions I have?"));
 
-				var answer = await dialog.Select(L("Will you gather more ingredients?"),
+				var answer = await dialog.SelectQuestOffer(Sout21, L("Will you gather more ingredients?"),
 					Option(L("I'll get it."), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -665,7 +650,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you."));
 				await dialog.Msg(L("My comrades will now be able to rest in peace."));
-				character.Quests.Complete(Sout31);
+				await dialog.CompleteQuest(Sout31);
 				return;
 			}
 
@@ -676,7 +661,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Dear Revelator, I have a favor to ask of you."));
 				await dialog.Msg(L("Can you recover my comrades' mementos?"));
 
-				var answer = await dialog.Select(L("Will you gather the soldiers' mementos?"),
+				var answer = await dialog.SelectQuestOffer(Sout31, L("Will you gather the soldiers' mementos?"),
 					Option(L("I'll gather the mementos"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -708,7 +693,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Thank you."));
 				await dialog.Msg(L("This will at least get us through the next few days."));
-				character.Quests.Complete(Sout32);
+				await dialog.CompleteQuest(Sout32);
 				return;
 			}
 
@@ -717,7 +702,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Oh my God. The Vubbes stole all our food supplies."));
 				await dialog.Msg(L("They even took our food for today... Please help us, we need your strength."));
 
-				var answer = await dialog.Select(L("Will you recover the stolen food?"),
+				var answer = await dialog.SelectQuestOffer(Sout32, L("Will you recover the stolen food?"),
 					Option(L("I'll get back the food supplies from the Vubbes"), "accept"),
 					Option(L("Sorry, I'm busy"), "leave")
 				);

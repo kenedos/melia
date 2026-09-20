@@ -44,7 +44,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I only survived because of you."));
 				await dialog.Msg(L("I should warn the other Believers to be careful."));
-				character.Quests.Complete(Mq01);
+				await dialog.CompleteQuest(Mq01);
 				return;
 			}
 
@@ -52,7 +52,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Help me, please. Infro Holders are chasing after me."));
 
-				var answer = await dialog.Select(L("I don't stand a chance the way they're ganging up on me."),
+				var answer = await dialog.SelectQuestOffer(Mq01, L("I don't stand a chance the way they're ganging up on me."),
 					Option(L("I will protect you"), "accept"),
 					Option(L("It will be okay if you hide"), "leave")
 				);
@@ -88,7 +88,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Now I can relax and purify Thornbush Rest Place."));
 				await dialog.Msg(L("Thank you so much."));
-				character.Quests.Complete(Mq02);
+				await dialog.CompleteQuest(Mq02);
 				return;
 			}
 
@@ -96,7 +96,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Whenever I try to purify the Thornbush Rest Place, those monsters attack."));
 
-				var answer = await dialog.Select(L("Is there some way to avoid them?"),
+				var answer = await dialog.SelectQuestOffer(Mq02, L("Is there some way to avoid them?"),
 					Option(L("I will protect the altar from the monsters"), "accept"),
 					Option(L("I don't know"), "leave")
 				);
@@ -134,7 +134,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Are you hurt?"));
 				await dialog.Msg(L("I heard the sound of Honeypin's webs, but I am relieved to see you are okay."));
-				character.Quests.Complete(Mq06);
+				await dialog.CompleteQuest(Mq06);
 				return;
 			}
 
@@ -142,7 +142,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The Honeypin is hidden somewhere in Karadas Path, but I can't find it."));
 
-				var answer = await dialog.Select(L("My purification duties has been delayed because of that monster."),
+				var answer = await dialog.SelectQuestOffer(Mq06, L("My purification duties has been delayed because of that monster."),
 					Option(L("I'll help the purifying job"), "accept"),
 					Option(L("It's dangerous, give up"), "leave")
 				);
@@ -180,7 +180,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("I can feel Bramble suffering."));
 				await dialog.Msg(L("He is getting retribution for extracting all vigor from this land."));
-				character.Quests.Complete(Mq03);
+				await dialog.CompleteQuest(Mq03);
 				return;
 			}
 
@@ -188,7 +188,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("It will be hard for Bramble to recover now."));
 				await dialog.Msg(L("We can save the dying trees as well."));
-				character.Quests.Complete(Mq05);
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 
@@ -196,7 +196,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Great."));
 				await dialog.Msg(L("Now we're going to destroy the roots of Bramble."));
-				character.Quests.Complete(Mq04);
+				await dialog.CompleteQuest(Mq04);
 				return;
 			}
 
@@ -204,7 +204,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Now we can make a full-scale attack on Bramble."));
 				await dialog.Msg(L("I'll go on ahead to Giliaii Courtyard to keep an eye on Bramble, please come along."));
-				character.Quests.Complete(Mq09);
+				await dialog.CompleteQuest(Mq09);
 				character.ServerMessage(L("Move to Giliaii Courtyard."));
 				return;
 			}
@@ -213,7 +213,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You're the Savior the goddess sent. What an honor."));
 
-				var answer = await dialog.Select(L("Are you ready to fight Bramble?"),
+				var answer = await dialog.SelectQuestOffer(Mq04, L("Are you ready to fight Bramble?"),
 					Option(L("I'm ready"), "accept"),
 					Option(L("I'm not ready yet"), "leave")
 				);
@@ -234,7 +234,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Bramble is trying to recover by ingraining his roots around the Thorn Forest."));
 
-				var answer = await dialog.Select(L("Cutting those roots will hurt him."),
+				var answer = await dialog.SelectQuestOffer(Mq09, L("Cutting those roots will hurt him."),
 					Option(L("I'll destroy them"), "accept"),
 					Option(L("Give me some time"), "leave")
 				);
@@ -279,7 +279,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Bramble and the revelation are in the depths of Giliaii Courtyard."));
 
-				var answer = await dialog.Select(L("It must be agonizing since the roots for healing the scars have all been cut off."),
+				var answer = await dialog.SelectQuestOffer(Mq07, L("It must be agonizing since the roots for healing the scars have all been cut off."),
 					Option(L("I'll defeat Bramble and retrieve the revelation"), "accept"),
 					Option(L("Give me some time to prepare"), "leave")
 				);
@@ -362,7 +362,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 			{
-				var answer = await dialog.Select(L("A root as thick as a man, sunk into the hillside and drawing on it."),
+				var answer = await dialog.SelectQuestOffer(Mq03, L("A root as thick as a man, sunk into the hillside and drawing on it."),
 					Option(L("Check Sviesa Hill Areas"), "accept"),
 					Option(L("Leave the root alone"), "leave")
 				);
@@ -370,7 +370,6 @@ public class DThorn21QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq03);
-					character.ServerMessage(L("Gaigalas steps in the moment you touch the root!"));
 					return;
 				}
 				return;
@@ -396,7 +395,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
-				var answer = await dialog.Select(L("The second root runs the length of the lot, and the ground over it is dead."),
+				var answer = await dialog.SelectQuestOffer(Mq05, L("The second root runs the length of the lot, and the ground over it is dead."),
 					Option(L("Check Tankinta Vacant Lot"), "accept"),
 					Option(L("Leave the root alone"), "leave")
 				);
@@ -404,7 +403,6 @@ public class DThorn21QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq05);
-					character.ServerMessage(L("Molich steps in the moment you touch the root!"));
 					return;
 				}
 				return;

@@ -52,7 +52,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("You made it through. I told you the explosives would be enough."));
 				await dialog.Msg(L("This is the Crystal Mine. The air down here is what killed every rescue party before us."));
-				character.Quests.Complete(ToTheMines);
+				await dialog.CompleteQuest(ToTheMines);
 				return;
 			}
 
@@ -60,7 +60,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The air is clearing already. Every purifier on this floor is turning again."));
 				await dialog.Msg(L("Let us go down to the second floor. The fumes there will be far worse."));
-				character.Quests.Complete(Alchemist);
+				await dialog.CompleteQuest(Alchemist);
 				character.Quests.Start(Mine2Alchemist);
 				return;
 			}
@@ -70,7 +70,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Do you know the legend of Cunningham?"));
 				await dialog.Msg(L("It's a legend about how a great demon was trapped in the Crystal Mine in the past."));
 
-				var answer = await dialog.Select(L("The toxic fumes have to be cleared before we can go any deeper."),
+				var answer = await dialog.SelectQuestOffer(Alchemist, L("The toxic fumes have to be cleared before we can go any deeper."),
 					Option(L("How do I repair a purifier?"), "accept"),
 					Option(L("That seems difficult"), "leave")
 				);
@@ -118,14 +118,14 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					return;
 
 				character.ServerMessage(L("The repair is complete. The Entrance Purifier is running again."));
-				character.Quests.Complete(Crystal2);
+				await dialog.CompleteQuest(Crystal2);
 				CheckPurifiersRepaired(character);
 				return;
 			}
 
 			if (!character.Quests.Has(Crystal2) && character.Quests.MeetsPrerequisites(Crystal2))
 			{
-				var answer = await dialog.Select(L("The purifier stands silent. A panel hangs open where a part should sit."),
+				var answer = await dialog.SelectQuestOffer(Crystal2, L("The purifier stands silent. A panel hangs open where a part should sit."),
 					Option(L("Inspect the purifier"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -138,7 +138,6 @@ public class DCmine01QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal2);
-					character.ServerMessage(L("A part is missing from the purifier. Retrieve Purifier Parts from the Vubbe with a question mark on its head."));
 				}
 
 				return;
@@ -181,14 +180,14 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					return;
 
 				character.ServerMessage(L("The Central Purifier is repaired. It is working properly again."));
-				character.Quests.Complete(Crystal9);
+				await dialog.CompleteQuest(Crystal9);
 				CheckPurifiersRepaired(character);
 				return;
 			}
 
 			if (!character.Quests.Has(Crystal8) && character.Quests.MeetsPrerequisites(Crystal8))
 			{
-				var answer = await dialog.Select(L("The Central Purifier has seized. One of its valves will not turn."),
+				var answer = await dialog.SelectQuestOffer(Crystal8, L("The Central Purifier has seized. One of its valves will not turn."),
 					Option(L("Open the valve"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -201,10 +200,8 @@ public class DCmine01QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal8);
-					character.ServerMessage(L("A vital part has broken. Use the Mine Compass to look for a replacement."));
 					character.Quests.CompleteObjective(Crystal8, "openValve");
-					character.Quests.Complete(Crystal8);
-					character.ServerMessage(L("The Mine Compass points to District 4. Go there and find the spare part."));
+					await dialog.CompleteQuest(Crystal8);
 					character.Quests.Start(Crystal9);
 				}
 
@@ -250,13 +247,13 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				}
 
 				await dialog.Msg(L("The Cyclops is down. The miners can come back for their crystals."));
-				character.Quests.Complete(Crystal10);
+				await dialog.CompleteQuest(Crystal10);
 				return;
 			}
 
 			if (!character.Quests.Has(Crystal10) && character.Quests.MeetsPrerequisites(Crystal10))
 			{
-				var answer = await dialog.Select(L("The basket has been tipped over and the crystals scattered. Something heavy did this."),
+				var answer = await dialog.SelectQuestOffer(Crystal10, L("The basket has been tipped over and the crystals scattered. Something heavy did this."),
 					Option(L("Look around"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -299,7 +296,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					return;
 
 				character.ServerMessage(L("The Passage Purifier is repaired. It is running again."));
-				character.Quests.Complete(Crystal19);
+				await dialog.CompleteQuest(Crystal19);
 				CheckPurifiersRepaired(character);
 				return;
 			}
@@ -307,7 +304,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Crystal18) && character.Quests.IsCompletable(Crystal18))
 			{
 				await dialog.Msg(L("You have the part. Return it to the Passage Purifier and start the repair."));
-				character.Quests.Complete(Crystal18);
+				await dialog.CompleteQuest(Crystal18);
 				character.Quests.Start(Crystal19);
 				character.Quests.CompleteObjective(Crystal19, "fitPart");
 				return;
@@ -315,7 +312,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Crystal13) && character.Quests.MeetsPrerequisites(Crystal13))
 			{
-				var answer = await dialog.Select(L("The Passage Purifier is cold. A part has been torn out of its housing."),
+				var answer = await dialog.SelectQuestOffer(Crystal13, L("The Passage Purifier is cold. A part has been torn out of its housing."),
 					Option(L("Open the valve"), "accept"),
 					Option(L("Leave it alone"), "leave")
 				);
@@ -328,10 +325,8 @@ public class DCmine01QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal13);
-					character.ServerMessage(L("An important part is gone. Use the Mine Compass to search for it."));
 					character.Quests.CompleteObjective(Crystal13, "openValve");
-					character.Quests.Complete(Crystal13);
-					character.ServerMessage(L("The compass points to District 6. Search District 6 for the part."));
+					await dialog.CompleteQuest(Crystal13);
 					character.Quests.Start(Crystal18);
 				}
 
