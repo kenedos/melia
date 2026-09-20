@@ -19,5 +19,12 @@ public class DThorn19NpcScript : GeneralScript
 		// Track NPCs
 		//---------------------------------------------------------------------------
 
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(687, 147392, "Lv1 Treasure Chest", "d_thorn_19", 627, 600, 1910, 0, "TREASUREBOX_LV_D_THORN_19687", "", "");
+
+		// Lv3 Treasure Chest (Paper Crane)
+		//-------------------------------------------------------------------------
+		AddNpc(9001, 147393, "Lv3 Treasure Chest", "d_thorn_19", -1232, 526, -3124, 90, "TREASUREBOX_LV_D_THORN_199001", "", "");
 	}
 }

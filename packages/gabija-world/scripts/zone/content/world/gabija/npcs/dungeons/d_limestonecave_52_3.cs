@@ -12,5 +12,10 @@ public class DLimestonecave523NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "d_limestonecave_52_3", -1052.52, 0.1, 276.4, 90, "TREASUREBOX_LV_D_LIMESTONECAVE_52_31000", "", "");
 	}
 }

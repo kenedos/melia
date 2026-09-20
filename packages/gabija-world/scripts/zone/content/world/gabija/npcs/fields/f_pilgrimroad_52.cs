@@ -15,5 +15,13 @@ public class FPilgrimroad52NpcScript : GeneralScript
 		// Great Merchant Gilliam
 		//-------------------------------------------------------------------------
 		AddNpc(5, 20154, "Great Merchant Gilliam", "f_pilgrimroad_52", 205, 214, 553, 115, "REQ_SEMPLE_06", "", "");
+
+		// Hidden Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(46, 40030, "Hidden Treasure Chest", "f_pilgrimroad_52", 2652.372, 156.583, -374.2712, 90, "PILGRIM52_BOX", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(64, 147392, "Lv1 Treasure Chest", "f_pilgrimroad_52", 991.91, 234, 1860.75, 90, "TREASUREBOX_LV_F_PILGRIMROAD_5264", "", "");
 	}
 }

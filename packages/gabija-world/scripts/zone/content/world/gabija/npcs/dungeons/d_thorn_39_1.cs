@@ -15,5 +15,9 @@ public class DThorn391NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(33, "WARP_D_THORN_39_1", "d_thorn_39_1", 84.45702, 1216.375, 19.4914, 90);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "d_thorn_39_1", -797.54, 1216.48, -95.8, 135, "TREASUREBOX_LV_D_THORN_39_11000", "", "");
 	}
 }

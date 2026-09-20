@@ -20,5 +20,8 @@ public class DAbbey642NpcScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddNpc(306, 153119, "Traveling Merchant Rose", "d_abbey_64_2", 11, 982.54, -1272, -4, "ABBEY642_ROZE02", "", "");
 
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(660, 147392, "Lv1 Treasure Chest", "d_abbey_64_2", 97, 981, -1895, -45, "TREASUREBOX_LV_D_ABBEY_64_2660", "", "");
 	}
 }

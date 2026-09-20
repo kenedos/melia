@@ -15,5 +15,9 @@ public class FKatyn14NpcScript : GeneralScript
 		// Statue of Goddess Zemyna
 		//-------------------------------------------------------------------------
 		AddStatPointStatue(587, "F_KATYN_14_EV_55_001", "f_katyn_14", -2765, 306, -1058, 40);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(601, 147392, "Lv1 Treasure Chest", "f_katyn_14", -379.14, 248.79, -1016.75, 90, "TREASUREBOX_LV_F_KATYN_14601", "", "");
 	}
 }

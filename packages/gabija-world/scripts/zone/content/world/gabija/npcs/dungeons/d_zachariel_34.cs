@@ -12,5 +12,14 @@ public class DZachariel34NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(3027, 147392, "Lv1 Treasure Chest", "d_zachariel_34", -3221.72, 296.99, -22.04, 0, "TREASUREBOX_LV_D_ZACHARIEL_343027", "", "");
+
+		// Lv3 Treasure Chest (Red Tassel Hat)
+		//-------------------------------------------------------------------------
+		AddNpc(9001, 147393, "Lv3 Treasure Chest", "d_zachariel_34", 1940, 272, -442, 0, "TREASUREBOX_LV_D_ZACHARIEL_349001", "", "");
 	}
 }

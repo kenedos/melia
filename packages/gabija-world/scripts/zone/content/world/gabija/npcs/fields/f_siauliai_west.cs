@@ -36,5 +36,33 @@ public class FSiauliaiWestNpcScript : GeneralScript
 
 			await dialog.Msg(L("Keep to the road and keep your voice down. We've had enough noise out of those woods."));
 		});
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(2027, 147392, "Lv1 Treasure Chest", "f_siauliai_west", 1564, 210, -370, 270, "TREASUREBOX_LV_F_SIAULIAI_WEST2027", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(2032, 147392, "Lv1 Treasure Chest", "f_siauliai_west", -580, 260, -1417, 180, "TREASUREBOX_LV_F_SIAULIAI_WEST2032", "", "");
+
+		// Lv3 Treasure Chest (Cow Headband)
+		//-------------------------------------------------------------------------
+		AddNpc(2035, 147393, "Lv3 Treasure Chest", "f_siauliai_west", 185.81, 210.31, -856.9, 90, "TREASUREBOX_LV_F_SIAULIAI_WEST2035", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(2036, 147392, "Lv1 Treasure Chest", "f_siauliai_west", 1346.05, 210.31, -1087.24, 90, "TREASUREBOX_LV_F_SIAULIAI_WEST2036", "", "");
+
+		// Lv3 Treasure Chest (Muscharia Hat)
+		//-------------------------------------------------------------------------
+		AddNpc(9001, 147393, "Lv3 Treasure Chest", "f_siauliai_west", 1738, 283, 449, 315, "TREASUREBOX_LV_F_SIAULIAI_WEST9001", "", "");
+
+		// Lv1 Treasure Chest (Lv1 EXP Card)
+		//-------------------------------------------------------------------------
+		AddNpc(9002, 147392, "Lv1 Treasure Chest", "f_siauliai_west", -441, 360, 1561, 0, "TREASUREBOX_LV_F_SIAULIAI_WEST9002", "", "");
+
+		// Lv1 Treasure Chest (Lv1 EXP Card)
+		//-------------------------------------------------------------------------
+		AddNpc(9003, 147392, "Lv1 Treasure Chest", "f_siauliai_west", -2153, 261, -465, 90, "TREASUREBOX_LV_F_SIAULIAI_WEST9003", "", "");
 	}
 }

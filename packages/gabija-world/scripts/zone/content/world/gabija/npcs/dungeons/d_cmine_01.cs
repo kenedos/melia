@@ -15,5 +15,21 @@ public class DCmine01NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(529, "WARP_D_CMINE_01", "d_cmine_01", -1222.77, 316.34, -1230.72, 60);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(533, 147392, "Lv1 Treasure Chest", "d_cmine_01", 1316, 4, 730, 360, "TREASUREBOX_LV_D_CMINE_01533", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(541, 147392, "Lv1 Treasure Chest", "d_cmine_01", 645.39, 17.75, -27.96, 0, "TREASUREBOX_LV_D_CMINE_01541", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(542, 147392, "Lv1 Treasure Chest", "d_cmine_01", 331.21, 111.48, 494.6, 0, "TREASUREBOX_LV_D_CMINE_01542", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(543, 147392, "Lv1 Treasure Chest", "d_cmine_01", -1542.96, 154.8, 494.07, 90, "TREASUREBOX_LV_D_CMINE_01543", "", "");
 	}
 }

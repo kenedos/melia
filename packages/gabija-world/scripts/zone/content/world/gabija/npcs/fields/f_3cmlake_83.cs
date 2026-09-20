@@ -12,5 +12,10 @@ public class F3Cmlake83NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(172, 147392, "Lv1 Treasure Chest", "f_3cmlake_83", -664, 303, 819, 270, "TREASUREBOX_LV_F_3CMLAKE_83172", "", "");
 	}
 }

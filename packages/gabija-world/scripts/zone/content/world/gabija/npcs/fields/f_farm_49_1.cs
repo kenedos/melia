@@ -15,5 +15,13 @@ public class FFarm491NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(40, "WARP_F_FARM_49_1", "f_farm_49_1", -1180, 0, 1031, 405);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(42, 147392, "Lv1 Treasure Chest", "f_farm_49_1", -1043, 83, -1664, -135, "TREASUREBOX_LV_F_FARM_49_142", "", "");
+
+		// (Custom) Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_farm_49_1", -505, 65, -1257, 45, "TREASUREBOX_LV_F_SIAULIAI_35_11000", "", "");
 	}
 }

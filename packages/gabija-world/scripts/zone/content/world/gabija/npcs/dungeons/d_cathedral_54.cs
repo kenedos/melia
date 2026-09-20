@@ -12,5 +12,10 @@ public class DCathedral54NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(59, 147392, "Lv1 Treasure Chest", "d_cathedral_54", -1353.72, 3.95, -736.48, 90, "TREASUREBOX_LV_D_CATHEDRAL_5459", "", "");
 	}
 }

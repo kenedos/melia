@@ -15,5 +15,9 @@ public class FRokas31NpcScript : GeneralScript
 		// Statue of Goddess Zemyna
 		//-------------------------------------------------------------------------
 		AddStatPointStatue(621, "F_ROKAS_31_EV_55_001", "f_rokas_31", 496, 107, -27, -10);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(629, 147392, "Lv1 Treasure Chest", "f_rokas_31", -736, 107.1, -1088, 90, "TREASUREBOX_LV_F_ROKAS_31629", "", "");
 	}
 }

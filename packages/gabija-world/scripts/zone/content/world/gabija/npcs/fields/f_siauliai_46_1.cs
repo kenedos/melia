@@ -27,5 +27,9 @@ public class FSiauliai461NpcScript : GeneralScript
 		// Merchant Item Parcel
 		//-------------------------------------------------------------------------
 		AddNpc(16, 47161, "Merchant Item Parcel", "f_siauliai_46_1", 945.7625, 258.7639, -168.5284, 90, "SIAULIAI_46_1_SQ_03_BAG03", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(27, 147392, "Lv1 Treasure Chest", "f_siauliai_46_1", 954, 390.89, 1020.98, 90, "TREASUREBOX_LV_F_SIAULIAI_46_127", "", "");
 	}
 }

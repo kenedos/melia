@@ -15,5 +15,9 @@ public class FOrchard323NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(31, "WARP_F_ORCHARD_32_3", "f_orchard_32_3", -356.5365, 0.8661499, 716.4241, 90);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(228, 147392, "Lv1 Treasure Chest", "f_orchard_32_3", 156.49, 0.97, 627.23, -135, "TREASUREBOX_LV_F_ORCHARD_32_3228", "", "");
 	}
 }

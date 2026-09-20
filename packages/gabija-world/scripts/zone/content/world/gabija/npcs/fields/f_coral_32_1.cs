@@ -27,5 +27,9 @@ public class FCoral321NpcScript : GeneralScript
 		// Merchant Alliance Worker
 		//-------------------------------------------------------------------------
 		AddNpc(48, 147485, "Merchant Alliance Worker", "f_coral_32_1", -464.16, 236.2519, -1251.43, 21, "CORAL_32_1_WORKER2", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_coral_32_1", 376.18, 236.88, -1042.87, 225, "TREASUREBOX_LV_F_CORAL_32_11000", "", "");
 	}
 }

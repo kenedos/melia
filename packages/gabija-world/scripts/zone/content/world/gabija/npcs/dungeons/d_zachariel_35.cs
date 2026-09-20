@@ -12,5 +12,10 @@ public class DZachariel35NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(3026, 147392, "Lv1 Treasure Chest", "d_zachariel_35", -297, -53.77, 1524, 270, "TREASUREBOX_LV_D_ZACHARIEL_353026", "", "");
 	}
 }

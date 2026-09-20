@@ -23,5 +23,9 @@ public class FPilgrimroad51NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddNpc(22, 40120, "Statue of Goddess Vakarine", "f_pilgrimroad_51", 1544.68, 143.8, -1701.02, 96, "PILGRIM51_FGOD02", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(57, 147392, "Lv1 Treasure Chest", "f_pilgrimroad_51", -1512.41, 548.39, -2025.07, 90, "TREASUREBOX_LV_F_PILGRIMROAD_5157", "", "");
 	}
 }

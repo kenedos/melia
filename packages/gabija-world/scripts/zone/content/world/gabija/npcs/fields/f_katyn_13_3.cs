@@ -12,5 +12,10 @@ public class FKatyn133NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(10025, 147392, "Lv1 Treasure Chest", "f_katyn_13_3", -262, 199, -707, 45, "TREASUREBOX_LV_F_KATYN_710025", "", "");
 	}
 }

@@ -158,6 +158,19 @@ public class CFedimianNpcScript : GeneralScript
 		AddTutorialTrigger("c_fedimian", -631.32, -174.9, "TUTO_NPCSHOP");
 		AddTutorialTrigger("c_fedimian", -219.15, -558.35, "TUTO_REIN");
 		AddTutorialTrigger("c_fedimian", -170, -218, "TUTO_STORAGE");
+
+		// Emoticon Chest
+		//-------------------------------------------------------------------------
+		AddPlatformNpc("c_fedimian", 139, 945, 867, 0, "blue");
+		AddPlatformNpc("c_fedimian", 99, 985, 867, 0, "yellow");
+		AddPlatformNpc("c_fedimian", 59, 1025, 867, 0, "red");
+		AddPlatformNpc("c_fedimian", 19, 1065, 867, 0, "white");
+		AddFloatingTreasureChestSpawner("Laima.Treasures.c_fedimian.Chest1", "c_fedimian", 19, 1065, 867, 0, ItemId.EmoticonItem_59_63, monsterId: 147393);
+		AddPlatformNpc("c_fedimian", -21, 1025, 867, 0, "red");
+		AddPlatformNpc("c_fedimian", -61, 985, 867, 0, "yellow");
+		AddPlatformNpc("c_fedimian", -101, 945, 867, 0, "blue");
+		AddPlatformNpc("c_fedimian", -101, 905, 827, 0, "green");
+		AddPlatformNpc("c_fedimian", -101, 865, 787, 0, "red");
 	}
 
 	/// <summary>

@@ -20,5 +20,8 @@ public class DAbbey643NpcScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddWarpStatue(44, "WARP_D_ABBEY_64_3", "d_abbey_64_3", 735.2632, 451.2133, 487.0141, 45);
 
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(242, 147392, "Lv1 Treasure Chest", "d_abbey_64_3", 1372, 510, -812, 0, "TREASUREBOX_LV_D_ABBEY_64_3242", "", "");
 	}
 }

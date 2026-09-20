@@ -35,5 +35,9 @@ public class FPilgrimroad48NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(20, "WARP_F_PILGRIMROAD_48", "f_pilgrimroad_48", -260.2179, 382.684, 19.69579, 45);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(26, 147392, "Lv1 Treasure Chest", "f_pilgrimroad_48", 234, 546, 1479, 90, "TREASUREBOX_LV_F_PILGRIMROAD_4826", "", "");
 	}
 }

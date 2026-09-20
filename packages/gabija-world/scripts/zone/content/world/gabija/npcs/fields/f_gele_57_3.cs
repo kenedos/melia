@@ -15,5 +15,9 @@ public class FGele573NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(25, "WARP_F_GELE_57_3", "f_gele_57_3", -407.211, -107.0825, -1328.491, 15);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(40, 147392, "Lv1 Treasure Chest", "f_gele_57_3", 1150.08, 217.61, 817.83, 90, "TREASUREBOX_LV_F_GELE_57_340", "", "");
 	}
 }

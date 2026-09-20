@@ -15,5 +15,9 @@ public class DFiretower45NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(210, "WARP_D_FIRETOWER_45", "d_firetower_45", -1689.079, 420.4852, -643.7197, 90);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(219, 147392, "Lv1 Treasure Chest", "d_firetower_45", -1706.06, 607.02, -187.25, 90, "TREASUREBOX_LV_D_FIRETOWER_45219", "", "");
 	}
 }

@@ -12,5 +12,10 @@ public class FPilgrimroad414NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv3 Treasure Chest (Lepusbunny Headband)
+		//-------------------------------------------------------------------------
+		AddNpc(9001, 147393, "Lv3 Treasure Chest", "f_pilgrimroad_41_4", 112, -105, -864, 315, "TREASUREBOX_LV_F_PILGRIMROAD_41_49001", "", "");
 	}
 }

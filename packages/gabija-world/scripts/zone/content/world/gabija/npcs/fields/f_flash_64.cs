@@ -19,5 +19,9 @@ public class FFlash64NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(27, "WARP_F_FLASH_64", "f_flash_64", -142.5398, 745.6932, -1353.881, 0);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_flash_64", -560.66, 673.74, 526.11, 135, "TREASUREBOX_LV_F_FLASH_641000", "", "");
 	}
 }

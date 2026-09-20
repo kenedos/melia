@@ -15,5 +15,9 @@ public class DStartower601NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(21, "WARP_D_STARTOWER_60_1", "d_startower_60_1", -28.21613, -106.1569, -2381.822, 90);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(27, 147392, "Lv1 Treasure Chest", "d_startower_60_1", 265, 76, 1427, 90, "TREASUREBOX_LV_D_STARTOWER_60_127", "", "");
 	}
 }

@@ -15,5 +15,9 @@ public class DChapel576NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(18, "WARP_D_CHAPEL_57_6", "d_chapel_57_6", 1322.36, 0.16, 435.09, 270);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(30, 147392, "Lv1 Treasure Chest", "d_chapel_57_6", -660.85, 0.59, 117.06, 90, "TREASUREBOX_LV_D_CHAPEL_57_630", "", "");
 	}
 }

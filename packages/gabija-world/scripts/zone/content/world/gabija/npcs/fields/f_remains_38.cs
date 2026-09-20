@@ -15,5 +15,17 @@ public class FRemains38NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(74, "WARP_F_REMAINS_38", "f_remains_38", 340.66, 277.95, -457.09, 0);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(86, 147392, "Lv1 Treasure Chest", "f_remains_38", 973.32, 244.22, -1043.33, 0, "TREASUREBOX_LV_F_REMAINS_3886", "", "");
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(88, 147392, "Lv1 Treasure Chest", "f_remains_38", 1725.47, 370.31, 1206.89, 90, "TREASUREBOX_LV_F_REMAINS_3888", "", "");
+
+		// Lv3 Treasure Chest (Glasses from the Otherworld)
+		//-------------------------------------------------------------------------
+		AddNpc(9001, 147393, "Lv3 Treasure Chest", "f_remains_38", 539, 479, 1146, 0, "TREASUREBOX_LV_F_REMAINS_389001", "", "");
 	}
 }

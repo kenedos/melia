@@ -19,5 +19,9 @@ public class DUnderfortress592NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(37, "WARP_D_UNDERFORTRESS_59_2", "d_underfortress_59_2", 449.585, 0.377, -208.2484, -30);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(45, 147392, "Lv1 Treasure Chest", "d_underfortress_59_2", -963, 0, -1128, 90, "TREASUREBOX_LV_D_UNDERFORTRESS_59_245", "", "");
 	}
 }

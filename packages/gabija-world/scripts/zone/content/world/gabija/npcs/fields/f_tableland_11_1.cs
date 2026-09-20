@@ -12,5 +12,10 @@ public class FTableland111NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_tableland_11_1", -680.03, -109.71, 584.73, -45, "TREASUREBOX_LV_F_TABLELAND_11_11000", "", "");
 	}
 }

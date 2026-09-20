@@ -15,5 +15,9 @@ public class FKatyn451NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(7, "WARP_F_KATYN_45_1", "f_katyn_45_1", -2121.582, 128.0495, -254.6491, 0);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_katyn_45_1", -489.59, 159.83, 627.17, -45, "TREASUREBOX_LV_F_KATYN_45_11000", "", "");
 	}
 }

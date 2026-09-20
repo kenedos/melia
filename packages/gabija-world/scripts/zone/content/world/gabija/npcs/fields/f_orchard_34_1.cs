@@ -12,5 +12,14 @@ public class FOrchard341NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
+
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_orchard_34_1", -1538.84, -96.2, -433.86, 90, "TREASUREBOX_LV_F_ORCHARD_34_11000", "", "");
+
+		// Lv3 Treasure Chest (Tiger Swallowtail)
+		//-------------------------------------------------------------------------
+		AddNpc(9001, 147393, "Lv3 Treasure Chest", "f_orchard_34_1", -994, 41, 1009, 315, "TREASUREBOX_LV_F_ORCHARD_34_19001", "", "");
 	}
 }

@@ -19,5 +19,8 @@ public class DFiretower41NpcScript : GeneralScript
 		// Track NPCs
 		//---------------------------------------------------------------------------
 
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(126, 147392, "Lv1 Treasure Chest", "d_firetower_41", -2714.8, 1552.83, -1436.66, 90, "TREASUREBOX_LV_D_FIRETOWER_41126", "", "");
 	}
 }

@@ -19,5 +19,13 @@ public class FSiauliaiOutNpcScript : GeneralScript
 		// Statue of Goddess Zemyna
 		//-------------------------------------------------------------------------
 		AddStatPointStatue(10031, "F_SIAULIAI_OUT_EV_55_001", "f_siauliai_out", -2194, 40, -2055, 84);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(10054, 147392, "Lv1 Treasure Chest", "f_siauliai_out", 1224.35, 198.02, 279.95, 90, "TREASUREBOX_LV_F_SIAULIAI_OUT10054", "", "");
+
+		// Lv3 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(10023, 147393, "Lv3 Treasure Chest", "f_siauliai_out", 1451, 229, 577, 0, "TREASUREBOX_LV_F_SIAULIAI_210023", "", "");
 	}
 }

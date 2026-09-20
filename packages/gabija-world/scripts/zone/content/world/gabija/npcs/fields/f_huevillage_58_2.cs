@@ -15,5 +15,9 @@ public class FHuevillage582NpcScript : GeneralScript
 		// Statue of Goddess Vakarine
 		//-------------------------------------------------------------------------
 		AddWarpStatue(34, "WARP_F_HUEVILLAGE_58_2", "f_huevillage_58_2", -515.8, 271.89, -1541.66, 125);
+
+		// Lv1 Treasure Chest
+		//-------------------------------------------------------------------------
+		AddNpc(49, 147392, "Lv1 Treasure Chest", "f_huevillage_58_2", -159.95, 274.31, -1274.28, 90, "TREASUREBOX_LV_F_HUEVILLAGE_58_249", "", "");
 	}
 }
