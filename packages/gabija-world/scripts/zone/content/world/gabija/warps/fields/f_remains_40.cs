@@ -16,5 +16,8 @@ public class f_remains_40WarpsScript : GeneralScript
 
 		// Fedimian Suburbs to Fedimian
 		AddWarp(101, "WS_REMAINS40_TO_FEDMIAN", 205, From("f_remains_40", -2393, -1377), To("c_fedimian", 630, -89));
+
+		// Fedimian Suburbs to Mage Tower 1F
+		AddWarp(102, "WS_REMAINS40_TO_FIRETOWER41", 90, From("f_remains_40", 3541, 2726), To("d_firetower_41", -2230, -1410));
 	}
 }

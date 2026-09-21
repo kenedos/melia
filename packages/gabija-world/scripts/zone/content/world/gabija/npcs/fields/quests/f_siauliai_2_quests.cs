@@ -33,7 +33,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 	private readonly static QuestId Act2Diss1 = new QuestId(4203);
 	private readonly static QuestId Act2Diss1Boss = new QuestId(20131);
 
-	private const int SupplyCrateCount = 5;
+	private const int SupplyCrateCount = 4;
 	private const int SupplyCratePlaced = 11;
 	private const string SupplyCrateVar = "Gabija.Quests.Act2Diss1.Crate";
 
@@ -673,6 +673,12 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			character.ServerMessage(LF("Supply crates recovered: {0}/{1}", recovered, SupplyCrateCount));
 
+			if (character.Quests.TryGetById(Act2Diss1, out var quest) && quest.TryGetProgress("recoverSupplies", out var progress))
+			{
+				progress.Count = Math.Min(recovered, SupplyCrateCount);
+				character.Quests.UpdateQuestProgress(Act2Diss1, progress.Objective.Id);
+			}
+
 			if (recovered >= SupplyCrateCount)
 				character.Quests.CompleteObjective(Act2Diss1, "recoverSupplies");
 		});
@@ -1037,7 +1043,7 @@ public class Act2Diss1Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(2));
 
-		AddObjective("recoverSupplies", L("Recover five of the scattered supply crates"), new ManualObjective());
+		AddObjective("recoverSupplies", L("Recover four of the scattered supply crates"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard1", 1));
 	}

@@ -115,7 +115,12 @@ namespace Melia.Zone.Scripting
 			if (!string.IsNullOrEmpty(spec.Name))
 				monster.Name = spec.Name;
 
-			monster.Position = new Position((float)x, (float)y, (float)z);
+			// y is only a fallback for layers with no ground mesh to snap to.
+			var groundY = (float)y;
+			if (character.Map.Ground.TryGetHeightAt(new Position((float)x, (float)y, (float)z), out var height))
+				groundY = height;
+
+			monster.Position = new Position((float)x, groundY, (float)z);
 			monster.SpawnPosition = monster.Position;
 			monster.Direction = new Direction(direction);
 			monster.Layer = character.Layer;
