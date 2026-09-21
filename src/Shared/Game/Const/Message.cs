@@ -69,6 +69,15 @@
 		public const string ACCOUNT_UPDATE = "ACCOUNT_UPDATE";
 
 		/// <summary>
+		/// Update on Achievement Points
+		/// </summary>
+		public const string ACHIEVE_POINT = "ACHIEVE_POINT";
+		/// <summary>
+		/// Update on Achievement Reward
+		/// </summary>
+		public const string ACHIEVE_REWARD = "ACHIEVE_REWARD";
+
+		/// <summary>
 		/// Sent when successfully an ability is learned
 		/// </summary>
 		public const string SUCCESS_LEARN_ABILITY = "SUCCESS_LEARN_ABILITY";

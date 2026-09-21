@@ -729,7 +729,7 @@ namespace Melia.Zone.World.Actors.Characters
 			{
 				companion.Properties.Invalidate(dependents);
 
-				if (conn != null)
+				if (conn != null && conn.GameReady)
 					Send.ZC_OBJECT_PROPERTY(conn, companion, dependents);
 			}
 		}

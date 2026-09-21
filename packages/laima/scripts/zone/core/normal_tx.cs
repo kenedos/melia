@@ -99,11 +99,6 @@ public class NormalTxFunctionsScript : GeneralScript
 			}
 		}
 
-		// Official doesn't update UsedStat with this packet,
-		// but presumably the PROP_UPDATE below. Why send more
-		// packets than necessary though?
-		character.InvalidateProperties();
-
 		for (var i = 0; i < numArgs.Length; ++i)
 		{
 			var addPoints = numArgs[i];
@@ -120,6 +115,10 @@ public class NormalTxFunctionsScript : GeneralScript
 			}
 		}
 		Send.ZC_PC_PROP_UPDATE(character, (short)PropertyTable.GetId("PC", PropertyName.UsedStat), 0);
+		// Official doesn't update UsedStat with this packet,
+		// but presumably the PROP_UPDATE below. Why send more
+		// packets than necessary though?
+		character.InvalidateProperties();
 		character.AddonMessage("PC_PROPERTY_UPDATE_TO_SYSMENU");
 
 		/*

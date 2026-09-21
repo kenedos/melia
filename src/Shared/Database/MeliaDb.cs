@@ -359,28 +359,34 @@ namespace Melia.Shared.Database
 		/// <param name="properties"></param>
 		protected void SaveProperties(string databaseName, string idName, long id, Properties properties, MySqlConnection conn, MySqlTransaction trans)
 		{
-			var allProperties = properties.GetAll().ToList();
-
-			if (!allProperties.Any())
-				return;
-
-			// UPSERT properties (avoids gap lock deadlocks from DELETE-all + INSERT-all)
+			// propNamesInMemory comes from GetAll() so we correctly detect removals
 			var propNamesInMemory = new HashSet<string>();
-			foreach (var property in allProperties)
-			{
-				var typeStr = property is FloatProperty ? "f" : "s";
-				var valueStr = property.Serialize();
+			foreach (var property in properties.GetAll())
 				propNamesInMemory.Add(property.Ident);
 
-				using (var cmd = new MySqlCommand(
-					$"INSERT INTO `{databaseName}` (`{idName}`, `name`, `type`, `value`) VALUES (@id, @name, @type, @value) " +
-					$"ON DUPLICATE KEY UPDATE `type` = VALUES(`type`), `value` = VALUES(`value`)", conn, trans))
+			// Only UPSERT dirty properties for performance
+			var dirtyProperties = properties.GetDirty().ToList();
+
+			if (dirtyProperties.Any())
+			{
+				// Use batch insert for dirty properties
+				using (var batch = new BatchInsertCommand(databaseName,
+					"ON DUPLICATE KEY UPDATE `type` = VALUES(`type`), `value` = VALUES(`value`)",
+					conn, trans))
 				{
-					cmd.Parameters.AddWithValue("@id", id);
-					cmd.Parameters.AddWithValue("@name", property.Ident);
-					cmd.Parameters.AddWithValue("@type", typeStr);
-					cmd.Parameters.AddWithValue("@value", valueStr);
-					cmd.ExecuteNonQuery();
+					foreach (var property in dirtyProperties)
+					{
+						batch.AddRow(new Dictionary<string, object>
+						{
+							{ idName, id },
+							{ "name", property.Ident },
+							{ "type", property is FloatProperty ? "f" : "s" },
+							{ "value", property.Serialize() }
+						});
+					}
+
+					if (batch.HasRows)
+						batch.Execute();
 				}
 			}
 

@@ -51,11 +51,11 @@ namespace Melia.Zone.World.Groups
 				Position = character.Position,
 				Stance = character.Stance,
 				IsOnline = character.Connection?.LoggedIn ?? false,
+				VisualJobId = character.VisualJobId,
 			};
 			var i = 0;
 			foreach (var job in character.Jobs.GetList())
 			{
-				member.VisualJobId = job.Id;
 				switch (i)
 				{
 					case 0:

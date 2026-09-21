@@ -31,7 +31,7 @@ public class CollectionItemScripts : GeneralScript
 			character.SystemMessage("GetCollection");
 
 			Send.ZC_NORMAL.UnlockCollection(character, collectionData.Id);
-			Send.ZC_ADDON_MSG(character, AddonMessage.UPDATE_READ_COLLECTION_COUNT, 0, null);
+			character.AddonMessage(AddonMessage.UPDATE_READ_COLLECTION_COUNT);
 
 			return ItemUseResult.Okay;
 		}

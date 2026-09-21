@@ -25,8 +25,8 @@ local function RemoveObsoleteUiElements()
 	bodyGroup:SetMargin(bodyMargin.left, searchGroup:GetY() + searchGroup:GetHeight(), bodyMargin.right, bodyMargin.bottom)
 
 	statusFilterGroup:SetVisible(false)
-	levelFilter1:SetVisible(false)
-	levelFilter2:SetVisible(false)
+	if levelFilter1 ~= nil then levelFilter1:SetVisible(false) end
+	if levelFilter2 ~= nil then levelFilter2:SetVisible(false) end
 	tabCtrl:SetVisible(false)
 end
 

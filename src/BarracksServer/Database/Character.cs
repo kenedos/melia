@@ -83,6 +83,11 @@ namespace Melia.Barracks.Database
 		public JobId JobId { get; set; }
 
 		/// <summary>
+		/// Gets or sets character's visual job.
+		/// </summary>
+		public JobId VisualJobId { get; set; }
+
+		/// <summary>
 		/// Gets or sets character's gender.
 		/// </summary>
 		public Gender Gender { get; set; }

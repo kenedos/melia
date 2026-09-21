@@ -643,7 +643,17 @@ namespace Melia.Zone
 		{
 			try
 			{
-				_deadConnectionSweepService = new DeadConnectionSweepService(TimeSpan.FromSeconds(15));
+				var timeoutSeconds = this.Conf.World.DeadConnectionTimeoutSeconds;
+				if (timeoutSeconds <= 0)
+				{
+					Log.Info("DeadConnectionSweepService: Disabled via dead_connection_timeout_seconds.");
+					return;
+				}
+
+				var sweepInterval = TimeSpan.FromSeconds(this.Conf.World.DeadConnectionSweepIntervalSeconds);
+				var timeout = TimeSpan.FromSeconds(timeoutSeconds);
+
+				_deadConnectionSweepService = new DeadConnectionSweepService(sweepInterval, timeout);
 			}
 			catch (Exception ex)
 			{

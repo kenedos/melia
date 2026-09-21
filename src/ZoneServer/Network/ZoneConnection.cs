@@ -88,7 +88,8 @@ namespace Melia.Zone.Network
 		Duel ActiveDuel { get; set; }
 
 		/// <summary>
-		/// Gets or sets the last heartbeat.
+		/// Gets or sets the last time any packet was received from the
+		/// client (UTC).
 		/// </summary>
 		DateTime LastHeartBeat { get; set; }
 
@@ -218,7 +219,8 @@ namespace Melia.Zone.Network
 		public Duel ActiveDuel { get; set; }
 
 		/// <summary>
-		/// Gets or sets the last heartbeat.
+		/// Gets or sets the last time any packet was received from the
+		/// client (UTC).
 		/// </summary>
 		public DateTime LastHeartBeat { get; set; }
 
@@ -270,6 +272,11 @@ namespace Melia.Zone.Network
 		/// <param name="packet"></param>
 		protected override void OnPacketReceived(Packet packet)
 		{
+			// Any packet from the client proves the connection is alive.
+			// Stamp before handling so packets whose handlers throw still
+			// count as liveness. Read by DeadConnectionSweepService.
+			this.LastHeartBeat = DateTime.UtcNow;
+
 			ZoneServer.Instance.PacketHandler.Handle(this, packet);
 		}
 

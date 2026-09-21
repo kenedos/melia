@@ -13,6 +13,7 @@ namespace Melia.Shared.ObjectProperties
 	public class Properties : VariableContainer<string>
 	{
 		private readonly Dictionary<string, List<string>> _maxProperties = new();
+		private readonly HashSet<string> _dirty = new();
 		private readonly bool _checkNamespaceValidity;
 
 		/// <summary>
@@ -53,6 +54,7 @@ namespace Melia.Shared.ObjectProperties
 
 		/// <summary>
 		/// Creates the given property and adds it to this collection.
+		/// Newly created properties are marked dirty.
 		/// </summary>
 		/// <typeparam name="TVariable"></typeparam>
 		/// <param name="variable"></param>
@@ -66,7 +68,73 @@ namespace Melia.Shared.ObjectProperties
 			if (_checkNamespaceValidity && !PropertyTable.Exists(this.Namespace, variable.Ident))
 				throw new ArgumentException($"The property '{variable.Ident}' doesn't exist in the namespace '{this.Namespace}'.");
 
-			return base.Create(variable);
+			var result = base.Create(variable);
+
+			// New properties are dirty until saved
+			_dirty.Add(variable.Ident);
+
+			return result;
+		}
+
+		/// <summary>
+		/// Marks a property as dirty (changed since last save).
+		/// </summary>
+		/// <param name="ident"></param>
+		public void MarkDirty(string ident)
+		{
+			lock (_dirty)
+				_dirty.Add(ident);
+		}
+
+		/// <summary>
+		/// Returns only properties that have changed since the last
+		/// call to ClearDirty() (or creation).
+		/// </summary>
+		/// <returns></returns>
+		public PropertyList GetDirty()
+		{
+			var propertyList = new PropertyList(this.Namespace);
+
+			lock (_syncLock)
+			{
+				lock (_dirty)
+				{
+					foreach (var ident in _dirty)
+					{
+						if (_vars.TryGetValue(ident, out var variable) && variable is IProperty property)
+							propertyList.Add(property);
+					}
+				}
+			}
+
+			return propertyList;
+		}
+
+		/// <summary>
+		/// Clears all dirty flags. Call after a successful save.
+		/// </summary>
+		public void ClearDirty()
+		{
+			lock (_dirty)
+				_dirty.Clear();
+		}
+
+		/// <summary>
+		/// Returns the total number of properties (for benchmarking).
+		/// </summary>
+		public int Count()
+		{
+			lock (_syncLock)
+				return _vars.Count;
+		}
+
+		/// <summary>
+		/// Returns the number of dirty properties (for benchmarking).
+		/// </summary>
+		public int CountDirty()
+		{
+			lock (_dirty)
+				return _dirty.Count;
 		}
 
 		/// <summary>
@@ -308,6 +376,7 @@ namespace Melia.Shared.ObjectProperties
 				return this.Create(new FloatProperty(propertyName, value));
 
 			property.Value = value;
+			_dirty.Add(propertyName);
 			return property;
 		}
 
@@ -324,6 +393,7 @@ namespace Melia.Shared.ObjectProperties
 				return this.Create(new StringProperty(propertyName, value));
 
 			property.Value = value;
+			_dirty.Add(propertyName);
 			return property;
 		}
 
@@ -340,6 +410,7 @@ namespace Melia.Shared.ObjectProperties
 				return this.Create(new StringProperty(propertyName, value.ToString()));
 
 			property.Value = value.ToString();
+			_dirty.Add(propertyName);
 			return property;
 		}
 
@@ -356,7 +427,8 @@ namespace Melia.Shared.ObjectProperties
 				return this.Create(new FloatProperty(propertyName, modifier));
 
 			property.Value += modifier;
-			return property;
+			_dirty.Add(propertyName);
+			return property.Value;
 		}
 
 		/// <summary>

@@ -39,11 +39,6 @@ namespace Melia.Web
 		private EmbedIO.WebServer _guildServer;
 
 		/// <summary>
-		/// Returns the server's inter-server communicator.
-		/// </summary>
-		public Communicator Communicator { get; private set; }
-
-		/// <summary>
 		/// Returns reference to the server's database interface.
 		/// </summary>
 		public WebDb Database { get; } = new();

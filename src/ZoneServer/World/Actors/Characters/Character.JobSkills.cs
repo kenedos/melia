@@ -284,6 +284,8 @@ namespace Melia.Zone.World.Actors.Characters
 
 			this.JobId = jobId;
 			this.Jobs.Add(newJob);
+			this.VisualJobId = jobId;
+			this.AddonMessage(Shared.Game.Const.AddonMessage.UPDATE_REPRESENTATION_CLASS_ICON, "None", (int)jobId);
 
 			ZoneServer.Instance.ServerEvents.PlayerAdvancedJob.Raise(new PlayerEventArgs(this));
 

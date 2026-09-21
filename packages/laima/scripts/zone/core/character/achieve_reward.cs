@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 
@@ -55,13 +56,13 @@ public class AchievementReward : GeneralScript
 		{
 			character.SetEtcProperty(etcPropName, 1);
 			character.SystemMessage("GainAchieveHairBefore");
-			character.AddonMessage("ACHIEVE_REWARD");
+			character.AddonMessage(AddonMessage.ACHIEVE_REWARD);
 			return;
 		}
 
 		SetAllowHairColor(character, "black", achieveName);
 
 		character.SystemMessage("GainAchieveHairBlack");
-		character.AddonMessage("ACHIEVE_REWARD", "", 0);
+		character.AddonMessage(AddonMessage.ACHIEVE_REWARD);
 	}
 }

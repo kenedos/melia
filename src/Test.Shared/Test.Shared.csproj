@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
+    <IsTestProject>true</IsTestProject>
     <OutputType>Library</OutputType>
     <RootNamespace>Melia.Test.Shared</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>

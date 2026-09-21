@@ -404,28 +404,34 @@ namespace Melia.Zone.Util
 					var savedCount = ZoneServer.Instance.AutoSave?.SaveAllNow() ?? 0;
 					Log.Info("Saved {0} player(s).", savedCount);
 
-					// Disconnect everyone
-					var characters = ZoneServer.Instance.World.GetCharacters().ToList();
-					foreach (var character in characters)
+				// Disconnect everyone (including autotraders with DummyConnection,
+				// which are filtered out by the no-predicate GetCharacters()).
+				var characters = ZoneServer.Instance.World.GetCharacters(c => c.IsOnline || c.IsAutoTrading).ToList();
+				foreach (var character in characters)
+				{
+					try
 					{
-						try
-						{
-							character.MsgBox(
-								Localization.Get("Server Shutdown"),
-								Localization.Get("The server is shutting down: {0}"),
-								ShutdownReason ?? "maintenance"
-							);
+						character.MsgBox(
+							Localization.Get("Server Shutdown"),
+							Localization.Get("The server is shutting down: {0}"),
+							ShutdownReason ?? "maintenance"
+						);
 
-							character.Variables.Temp.SetBool("Melia.NoSave", true);
-							character.IsAutoTrading = false;
-							character.Connection?.Close();
-						}
-						catch (Exception ex)
-						{
-							Log.Error("Error disconnecting {0}: {1}", character.Name, ex.Message);
-							character.Connection?.Close();
-						}
+						character.Variables.Temp.SetBool("Melia.NoSave", true);
+						character.IsAutoTrading = false;
+						character.Connection?.Close();
+
+						// DummyConnection.Close() is a no-op, so explicitly
+						// remove from the map so WaitForPlayersToLeave can finish.
+						character.Map?.RemoveCharacter(character);
 					}
+					catch (Exception ex)
+					{
+						Log.Error("Error disconnecting {0}: {1}", character.Name, ex.Message);
+						character.Connection?.Close();
+						character.Map?.RemoveCharacter(character);
+					}
+				}
 
 					// Wait for disconnects to finish
 					WaitForPlayersToLeave(timeout: TimeSpan.FromSeconds(10));

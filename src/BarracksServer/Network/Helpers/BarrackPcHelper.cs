@@ -50,10 +50,10 @@ namespace Melia.Barracks.Network.Helpers
 			packet.PutShort(0);
 
 			// [i170175] maybe hat visibility?
-			packet.PutByte(1);
-			packet.PutByte(1);
-			packet.PutByte(1);
-			packet.PutByte(1);
+			packet.PutByte(pc.VisibleEquip.HasFlag(VisibleEquip.Headgear1));
+			packet.PutByte(pc.VisibleEquip.HasFlag(VisibleEquip.Headgear2));
+			packet.PutByte(pc.VisibleEquip.HasFlag(VisibleEquip.Headgear3));
+			packet.PutByte(pc.VisibleEquip.HasFlag(VisibleEquip.Wig));
 
 			// Job list?
 			// Example: A Mage that switched to Pyromancer has two
@@ -63,7 +63,7 @@ namespace Melia.Barracks.Network.Helpers
 				packet.PutShort((short)jobId);
 
 			packet.PutInt(0);
-			packet.PutInt((int)pc.JobId);
+			packet.PutInt((int)pc.VisualJobId);
 
 			packet.PutLong(pc.ObjectId);
 			packet.PutShort(0); // Additional properties count?

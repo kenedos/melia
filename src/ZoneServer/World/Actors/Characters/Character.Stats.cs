@@ -20,6 +20,11 @@ namespace Melia.Zone.World.Actors.Characters
 		public JobId JobId { get; set; }
 
 		/// <summary>
+		/// Gets or sets the character's visual job id, the character's class icon.
+		/// </summary>
+		public JobId VisualJobId { get; set; }
+
+		/// <summary>
 		/// Returns the class of the character's current job.
 		/// </summary>
 		public JobClass JobClass => this.JobId.ToClass();

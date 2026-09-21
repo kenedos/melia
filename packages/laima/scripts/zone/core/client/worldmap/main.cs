@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Melia.Shared.L10N;
 using Melia.Shared.Scripting;
 using Melia.Shared.World;
@@ -20,6 +21,8 @@ using Melia.Zone.World.Quests;
 
 public class WorldMapClientScript : ClientScript
 {
+	private const int MaxIconScriptBytes = 2000;
+
 	protected override void Load()
 	{
 		this.LoadAllScripts();
@@ -139,8 +142,9 @@ public class WorldMapClientScript : ClientScript
 			foreach (var entry in pending)
 				trial.Insert(entry);
 
-			var serializedLength = funcName.Length + 2 + trial.SerializedSize;
-			if (serializedLength > ScriptMaxLength)
+			var script = funcName + "(" + trial.Serialize() + ")";
+			var scriptByteLength = Encoding.UTF8.GetByteCount(script) + 1;
+			if (scriptByteLength > MaxIconScriptBytes)
 			{
 				if (pending.Count == 1)
 				{

@@ -257,7 +257,6 @@ namespace Melia.Zone.Network
 				map.AddCharacter(character);
 
 				conn.LoggedIn = true;
-				conn.LastHeartBeat = DateTime.Now;
 				conn.SessionKey = sessionKey;
 				character.IsOnline = true;
 
@@ -4414,17 +4413,17 @@ namespace Melia.Zone.Network
 		/// <summary>
 		/// Sent regularly from the client (every 10 seconds).
 		/// </summary>
+		/// <remarks>
+		/// No liveness handling here; ZoneConnection.OnPacketReceived
+		/// stamps LastHeartBeat for every received packet, and the
+		/// DeadConnectionSweepService handles stale connections.
+		/// </remarks>
 		/// <param name="conn"></param>
 		/// <param name="packet"></param>
 		[PacketHandler(Op.CZ_HEARTBEAT)]
 		public void CZ_HEARTBEAT(IZoneConnection conn, Packet packet)
 		{
 			var secondsSinceStart = packet.GetFloat();
-
-			// If it's been more than 60 seconds since last heart beat, disconnect the client.
-			if (conn.LastHeartBeat < DateTime.Now.AddSeconds(-60))
-				conn.Close();
-			conn.LastHeartBeat = DateTime.Now;
 		}
 
 		[PacketHandler(Op.CZ_WAREHOUSE_TAKE_LIST)]
@@ -4979,6 +4978,9 @@ namespace Melia.Zone.Network
 		{
 			var language = (Language)packet.GetShort();
 
+			if (conn.Account == null)
+				return;
+
 			if (!Enum.IsDefined(typeof(Language), language))
 			{
 				Log.Warning("CZ_SELECTED_LANGUAGE: Invalid language '{0}' received from '{1}'.", language, conn.Account.Name);
@@ -4987,6 +4989,7 @@ namespace Melia.Zone.Network
 
 			conn.Account.Language = language.ToString();
 			conn.SelectedLanguage = conn.Account.Language;
+			conn.Account.Variables.Perm.SetString("Melia.SelectedLanguage", conn.SelectedLanguage);
 		}
 
 		/// <summary>
@@ -6445,8 +6448,7 @@ namespace Melia.Zone.Network
 				Log.Warning("CZ_CHANGE_REPRESENTATION_CLASS: User '{0}' tried to select a class they don't have {1}.", conn.Account.Name, jobId.ToString());
 				return;
 			}
-			character.JobId = jobId;
-			Send.ZC_NORMAL.UpdateSkillUI(character);
+			character.VisualJobId = jobId;
 			character.AddonMessage(AddonMessage.UPDATE_REPRESENTATION_CLASS_ICON, "None", (int)jobId);
 		}
 

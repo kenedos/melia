@@ -236,14 +236,14 @@ public class ItemEtcScripts : GeneralScript
 		{
 			character.SetEtcProperty(etcPropName, 1);
 			character.SystemMessage("GainAchieveHairBefore");
-			character.AddonMessage("ACHIEVE_REWARD");
+			character.AddonMessage(AddonMessage.ACHIEVE_REWARD);
 			return;
 		}
 
 		SetAllowHairColor(character, color);
 
 		character.SystemMessage($"GainAchieveHair{color.ToUpperInvariant()[0] + color.Substring(1)}");
-		character.AddonMessage("ACHIEVE_REWARD", "", 0);
+		character.AddonMessage(AddonMessage.ACHIEVE_REWARD);
 	}
 
 	[ScriptableFunction]

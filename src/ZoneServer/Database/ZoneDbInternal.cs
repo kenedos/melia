@@ -86,6 +86,15 @@ namespace Melia.Zone.Database
 				}
 				// NOTE: We do NOT delete from the `items` table here. The item might have been traded
 				// to another player. Orphan cleanup should be a separate maintenance task.
+				//
+				// WARNING: The `cascadeDeleteItem` trigger (update_2021-10-13_1.sql) runs AFTER DELETE
+				// ON `inventory` and deletes the matching row from `items`. This contradicts the intent
+				// above: if the item was traded to another character, the trigger destroys the `items`
+				// row, corrupting the receiving character's inventory link.
+				//
+				// Resolution: Either DROP the trigger and add explicit orphan cleanup, or add an
+				// EXISTS guard to the DELETE so the trigger only fires for truly orphaned items.
+				// See .opencode/sync-issues.md SYNC-3 for full analysis.
 			}
 
 			// B) Find items to LINK/UPDATE: They are in memory.
@@ -460,18 +469,8 @@ namespace Melia.Zone.Database
 		{
 			if (!items.Any()) return;
 
-			var allProperties = items
-				.SelectMany(item => item.Properties.GetAll()
-					.Where(p => !(p is IUnsettableProperty))
-					.Select(prop => new { ItemId = item.DbId, Property = prop })
-				).ToList();
-
-			if (!allProperties.Any())
-			{
-				return;
-			}
-
 			// Build set of (itemId, propName) pairs in memory for later comparison
+			// (still uses GetAll() to correctly detect removed properties)
 			var propsInMemory = new Dictionary<long, HashSet<string>>();
 			foreach (var item in items)
 			{
@@ -484,26 +483,31 @@ namespace Melia.Zone.Database
 				propsInMemory[item.DbId] = names;
 			}
 
-			// UPSERT all properties (avoids gap lock deadlocks)
-			using (var batch = new BatchInsertCommand(databaseName, "ON DUPLICATE KEY UPDATE `type` = VALUES(`type`), `value` = VALUES(`value`)", conn, trans))
+			// UPSERT only dirty properties (avoids gap lock deadlocks)
+			var dirtyProperties = items
+				.SelectMany(item => item.Properties.GetDirty()
+					.Where(p => !(p is IUnsettableProperty))
+					.Select(prop => new { ItemId = item.DbId, Property = prop })
+				).ToList();
+
+			if (dirtyProperties.Any())
 			{
-				foreach (var item in items)
+				using (var batch = new BatchInsertCommand(databaseName, "ON DUPLICATE KEY UPDATE `type` = VALUES(`type`), `value` = VALUES(`value`)", conn, trans))
 				{
-					foreach (var property in item.Properties.GetAll())
+					foreach (var dp in dirtyProperties)
 					{
-						if (property is IUnsettableProperty) continue;
 						batch.AddRow(new Dictionary<string, object>
 						{
-							{ idName, item.DbId },
-							{ "name", property.Ident },
-							{ "type", property is FloatProperty ? "f" : "s" },
-							{ "value", property.Serialize() }
+							{ idName, dp.ItemId },
+							{ "name", dp.Property.Ident },
+							{ "type", dp.Property is FloatProperty ? "f" : "s" },
+							{ "value", dp.Property.Serialize() }
 						});
 					}
-				}
 
-				if (batch.HasRows)
-					batch.Execute();
+					if (batch.HasRows)
+						batch.Execute();
+				}
 			}
 
 			// Only delete properties that were removed from memory
@@ -548,75 +552,80 @@ namespace Melia.Zone.Database
 		}
 		internal void InternalSaveProperties(string databaseName, string idName, long id, Properties properties, MySqlConnection conn, MySqlTransaction trans)
 		{
-			var allProperties = properties.GetAll()
+			// propNamesInMemory comes from GetAll() so we correctly detect removals
+			var propNamesInMemory = new HashSet<string>();
+			foreach (var property in properties.GetAll())
+			{
+				if (property is IUnsettableProperty) continue;
+				if (databaseName == "character_properties" && BuffHandler.IsBuffTransientProperty(property.Ident)) continue;
+				propNamesInMemory.Add(property.Ident);
+			}
+
+			// Only UPSERT dirty properties for performance
+			var dirtyProperties = properties.GetDirty()
 				.Where(p => p is not IUnsettableProperty)
 				.Where(p => databaseName != "character_properties" || !BuffHandler.IsBuffTransientProperty(p.Ident))
 				.ToList();
 
-			if (!allProperties.Any())
+			// --- Step 1: Conditional Snapshotting (only dirty props) ---
+			if (dirtyProperties.Any())
 			{
-				return; // Nothing to save.
-			}
+				string logTableName = GetLogTableName(databaseName);
+				string logIdName = GetLogIdName(databaseName);
 
-			// --- Step 1: Conditional Snapshotting ---
-			string logTableName = GetLogTableName(databaseName);
-			string logIdName = GetLogIdName(databaseName);
-
-			if (logTableName != null && logIdName != null)
-			{
-				try
+				if (logTableName != null && logIdName != null)
 				{
-					// Snapshot all properties we are about to overwrite.
-					var propNamesToSnapshot = allProperties.Select(p => p.Ident).ToList();
-
-					if (propNamesToSnapshot.Any())
+					try
 					{
-						var snapshotParams = propNamesToSnapshot.Select((p, i) => $"@p{i}").ToArray();
+						var propNamesToSnapshot = dirtyProperties.Select(p => p.Ident).ToList();
 
-						var snapshotSql = $"INSERT INTO `{logTableName}` ({logIdName}, name, type, value, backupReason) " +
-										  $"SELECT @id, `name`, `type`, `value`, @backupReason " +
-										  $"FROM `{databaseName}` WHERE `{idName}` = @id AND `name` IN ({string.Join(",", snapshotParams)})";
-
-						using (var cmdSnapshot = new MySqlCommand(snapshotSql, conn, trans))
+						if (propNamesToSnapshot.Any())
 						{
-							cmdSnapshot.Parameters.AddWithValue("@id", id);
-							cmdSnapshot.Parameters.AddWithValue("@backupReason", $"pre_save_{databaseName}");
-							for (var i = 0; i < propNamesToSnapshot.Count; i++)
+							var snapshotParams = propNamesToSnapshot.Select((p, i) => $"@p{i}").ToArray();
+
+							var snapshotSql = $"INSERT INTO `{logTableName}` ({logIdName}, name, type, value, backupReason) " +
+											  $"SELECT @id, `name`, `type`, `value`, @backupReason " +
+											  $"FROM `{databaseName}` WHERE `{idName}` = @id AND `name` IN ({string.Join(",", snapshotParams)})";
+
+							using (var cmdSnapshot = new MySqlCommand(snapshotSql, conn, trans))
 							{
-								cmdSnapshot.Parameters.AddWithValue(snapshotParams[i], propNamesToSnapshot[i]);
+								cmdSnapshot.Parameters.AddWithValue("@id", id);
+								cmdSnapshot.Parameters.AddWithValue("@backupReason", $"pre_save_{databaseName}");
+								for (var i = 0; i < propNamesToSnapshot.Count; i++)
+								{
+									cmdSnapshot.Parameters.AddWithValue(snapshotParams[i], propNamesToSnapshot[i]);
+								}
+								cmdSnapshot.ExecuteNonQuery();
 							}
-							cmdSnapshot.ExecuteNonQuery();
 						}
 					}
-				}
-				catch (Exception ex)
-				{
-					Log.Warning($"Failed to snapshot properties for {idName}:{id} from {databaseName}. Continuing with save. Error: {ex.Message}");
-				}
-			}
-
-			// --- Step 2: Use UPSERT to insert/update properties (avoids gap lock deadlocks) ---
-			var propNamesInMemory = new HashSet<string>(allProperties.Select(p => p.Ident));
-
-			using (var batch = new BatchInsertCommand(
-				databaseName,
-				"ON DUPLICATE KEY UPDATE `type` = VALUES(`type`), `value` = VALUES(`value`)",
-				conn,
-				trans))
-			{
-				foreach (var property in allProperties)
-				{
-					batch.AddRow(new Dictionary<string, object>
+					catch (Exception ex)
 					{
-						{ idName, id },
-						{ "name", property.Ident },
-						{ "type", property is FloatProperty ? "f" : "s" },
-						{ "value", property.Serialize() }
-					});
+						Log.Warning($"Failed to snapshot properties for {idName}:{id} from {databaseName}. Continuing with save. Error: {ex.Message}");
+					}
 				}
 
-				if (batch.HasRows)
-					batch.Execute();
+				// --- Step 2: UPSERT only dirty properties ---
+				using (var batch = new BatchInsertCommand(
+					databaseName,
+					"ON DUPLICATE KEY UPDATE `type` = VALUES(`type`), `value` = VALUES(`value`)",
+					conn,
+					trans))
+				{
+					foreach (var property in dirtyProperties)
+					{
+						batch.AddRow(new Dictionary<string, object>
+						{
+							{ idName, id },
+							{ "name", property.Ident },
+							{ "type", property is FloatProperty ? "f" : "s" },
+							{ "value", property.Serialize() }
+						});
+					}
+
+					if (batch.HasRows)
+						batch.Execute();
+				}
 			}
 
 			// --- Step 3: Only delete properties that were removed ---
@@ -1555,33 +1564,60 @@ namespace Melia.Zone.Database
 
 		/// <summary>
 		/// INTERNAL USE: Saves revealed maps within an existing transaction.
+		/// Uses UPSERT + delete-only-removed pattern for incremental saves.
 		/// </summary>
 		internal void InternalSaveRevealedMaps(Account account, MySqlConnection conn, MySqlTransaction trans)
 		{
-			using (var mc = new MySqlCommand("DELETE FROM `revealedmaps` WHERE `accountId` = @accountId", conn, trans))
+			var revealedMaps = account.GetRevealedMaps();
+			var mapIdsInMemory = new HashSet<int>();
+
+			if (revealedMaps != null && revealedMaps.Length > 0)
 			{
-				mc.Parameters.AddWithValue("@accountId", account.Id);
-				mc.ExecuteNonQuery();
+				// UPSERT all maps currently in memory
+				using (var batch = new BatchInsertCommand("revealedmaps",
+					"ON DUPLICATE KEY UPDATE `explored` = VALUES(`explored`), `percentage` = VALUES(`percentage`)",
+					conn, trans))
+				{
+					foreach (var revealedMap in revealedMaps)
+					{
+						mapIdsInMemory.Add(revealedMap.MapId);
+						batch.AddRow(new Dictionary<string, object>
+						{
+							{ "accountId", account.Id },
+							{ "map", revealedMap.MapId },
+							{ "explored", revealedMap.Explored },
+							{ "percentage", revealedMap.Percentage }
+						});
+					}
+
+					if (batch.HasRows)
+						batch.Execute();
+				}
 			}
 
-			var revealedMaps = account.GetRevealedMaps();
-			if (revealedMaps == null) return;
-
-			using (var batch = new BatchInsertCommand("revealedmaps", null, conn, trans))
+			// Only delete maps that were removed from memory
+			var mapIdsInDb = new HashSet<int>();
+			using (var cmd = new MySqlCommand("SELECT `map` FROM `revealedmaps` WHERE `accountId` = @accountId", conn, trans))
 			{
-				foreach (var revealedMap in revealedMaps)
+				cmd.Parameters.AddWithValue("@accountId", account.Id);
+				using (var reader = cmd.ExecuteReader())
 				{
-					batch.AddRow(new Dictionary<string, object>
-					{
-						{ "accountId", account.Id },
-						{ "map", revealedMap.MapId },
-						{ "explored", revealedMap.Explored },
-						{ "percentage", revealedMap.Percentage }
-					});
+					while (reader.Read())
+						mapIdsInDb.Add(reader.GetInt32(0));
 				}
+			}
 
-				if (batch.HasRows)
-					batch.Execute();
+			var mapsToDelete = mapIdsInDb.Except(mapIdsInMemory).ToList();
+			if (mapsToDelete.Any())
+			{
+				var deleteParams = mapsToDelete.Select((id, i) => $"@map{i}").ToArray();
+				using (var cmd = new MySqlCommand($"DELETE FROM `revealedmaps` WHERE `accountId` = @accountId AND `map` IN ({string.Join(",", deleteParams)})", conn, trans))
+				{
+					cmd.Parameters.AddWithValue("@accountId", account.Id);
+					for (var i = 0; i < mapsToDelete.Count; i++)
+						cmd.Parameters.AddWithValue(deleteParams[i], mapsToDelete[i]);
+					cmd.ExecuteNonQuery();
+				}
 			}
 		}
 

@@ -55,6 +55,9 @@ public class GrimoireRefreshScript : GeneralScript
 		var character = args.Character;
 		Action<string> handler = _ => RefreshGrimoire(character);
 
+		if (!character.Jobs.Has(JobId.Sorcerer))
+			return;
+
 		foreach (var propertyName in WatchedProperties)
 		{
 			if (character.Properties.TryGet<CFloatProperty>(propertyName, out var property))
