@@ -9,6 +9,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Pads;
 using Melia.Zone.Pads.Handlers;
 using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Handlers.Archers.Arquebusier;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
@@ -85,6 +86,7 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
 
 			this.Attack(shape, caster, skill, maxTargetCount);
+			Arquebusier_ArquebusBarrage.TryActivate(caster, farPos);
 		}
 
 		private void Attack(Square shape, ICombatEntity caster, Skill skill, int maxTargetCount)

@@ -6,6 +6,7 @@ using Melia.Shared.Packages;
 using Melia.Shared.World;
 using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Handlers.Archers.Arquebusier;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.Skills.SplashAreas;
 using Melia.Zone.World.Actors;
@@ -18,30 +19,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	/// </summary>
 	[Package("laima")]
 	[SkillHandler(SkillId.Arquebusier_Salute)]
-	public class Arquebusier_Salute : IGroundSkillHandler, IDynamicCasted
+	public class Arquebusier_Salute : IGroundSkillHandler
 	{
 		private readonly static TimeSpan DelayBetweenHits = TimeSpan.FromMilliseconds(100);
 		private const float SplashRadius = 75;
-
-		/// <summary>
-		/// Called when the user starts casting the skill.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		public void StartDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastStart(caster, skill.Id);
-		}
-
-		/// <summary>
-		/// Called when the user stops casting the skill.
-		/// </summary>
-		/// <param name="skill"></param>
-		/// <param name="caster"></param>
-		public void EndDynamicCast(Skill skill, ICombatEntity caster, float maxCastTime)
-		{
-			Send.ZC_NORMAL.Skill_DynamicCastEnd(caster, skill.Id, maxCastTime);
-		}
 
 		/// <summary>
 		/// Handles skill, applying a debuff to the target
@@ -59,14 +40,19 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 				return;
 			}
 
+			// The salute lands where the player aimed, which is not
+			// necessarily the far end of the skill's range
+			if (!skill.Vars.TryGet<Position>("Melia.ToolGroundPos", out var targetPos))
+				targetPos = farPos;
+
 			caster.SetAttackState(true);
 			skill.IncreaseOverheat();
 
-			Send.ZC_NORMAL.UpdateSkillEffect(caster, target, farPos, target.Position);
-			Send.ZC_SKILL_READY(caster, skill, originPos, farPos);
+			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target, caster.Position, targetPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
-			Send.ZC_NORMAL.SkillProjectile(caster, farPos, "", 0.3f, "F_ground226", 1f, 75, TimeSpan.FromSeconds(0.5f), TimeSpan.FromSeconds(0), 1000, 1, TimeSpan.FromSeconds(0), 0, "None");
-			var splashArea = new Circle(farPos, SplashRadius);
+			Send.ZC_NORMAL.SkillProjectile(caster, targetPos, null, 0.3f, "F_ground226", 1f, SplashRadius, TimeSpan.FromSeconds(0.5f), TimeSpan.FromSeconds(0), 1000, 1, TimeSpan.FromSeconds(0), 0, "None");
+			var splashArea = new Circle(targetPos, SplashRadius);
 			skill.Run(this.Attack(skill, caster, splashArea));
 		}
 
@@ -98,6 +84,8 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 					skill.Run(this.DecreaseAccuracy(skill, target));
 				}
 			}
+
+			Arquebusier_ArquebusBarrage.TryActivate(caster, splashArea.OriginPos);
 		}
 
 		/// <summary>
