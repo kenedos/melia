@@ -22,7 +22,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 	public class Arquebusier_Salute : IGroundSkillHandler
 	{
 		private readonly static TimeSpan DelayBetweenHits = TimeSpan.FromMilliseconds(100);
+		private readonly static TimeSpan ProjectileDelay = TimeSpan.FromMilliseconds(100);
+		private readonly static TimeSpan ProjectileFlightTime = TimeSpan.FromMilliseconds(500);
 		private const float SplashRadius = 75;
+		private const float TargetCircleScale = 2.6f;
 
 		/// <summary>
 		/// Handles skill, applying a debuff to the target
@@ -50,8 +53,9 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 
 			Send.ZC_SKILL_READY(caster, skill, 1, originPos, farPos);
 			Send.ZC_NORMAL.UpdateSkillEffect(caster, target, caster.Position, targetPos);
+			Send.ZC_GROUND_EFFECT(caster, targetPos, "F_sys_target_pc", TargetCircleScale);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, null);
-			Send.ZC_NORMAL.SkillProjectile(caster, targetPos, null, 0.3f, "F_ground226", 1f, SplashRadius, TimeSpan.FromSeconds(0.5f), TimeSpan.FromSeconds(0), 1000, 1, TimeSpan.FromSeconds(0), 0, "None");
+
 			var splashArea = new Circle(targetPos, SplashRadius);
 			skill.Run(this.Attack(skill, caster, splashArea));
 		}
@@ -64,7 +68,10 @@ namespace Melia.Zone.Skills.Handlers.Archers.Ranger
 		/// <param name="splashArea"></param>
 		private async Task Attack(Skill skill, ICombatEntity caster, ISplashArea splashArea)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
+			await skill.Wait(ProjectileDelay);
+			Send.ZC_NORMAL.SkillProjectile(caster, splashArea.OriginPos, null, 0.3f, "E_archer_salute2", 1f, SplashRadius, ProjectileFlightTime, TimeSpan.Zero, 1000, 1, TimeSpan.Zero, 0, "None");
+
+			await skill.Wait(ProjectileFlightTime);
 
 			var targets = caster.Map.GetAttackableEnemiesIn(caster, splashArea);
 
