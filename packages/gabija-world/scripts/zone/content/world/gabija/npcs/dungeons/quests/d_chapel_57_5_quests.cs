@@ -398,6 +398,8 @@ public class Chaple575Mq02Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "CHAPEL_TOMAS", "d_chapel_57_5", L("Defeat Yognome"), L("Defeat the Yognomes trying to eat the altar."));
 		SetPhase(QuestStatus.Success, "CHAPEL_TOMAS", "d_chapel_57_5", L("Talk to Follower Tomas"), L("Return to Follower Tomas."));
 
+		AddPrerequisite(new LevelPrerequisite(30));
+
 		AddObjective("killYognome", L("Defeat Yognome"), new KillObjective(8, "Yognome"));
 
 		AddReward(new ItemReward("expCard3", 1));
@@ -424,6 +426,8 @@ public class Chaple575Mq03Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL_TOMAS", "d_chapel_57_5", L("Talk to Follower Tomas"), L("Return to Follower Tomas."));
 
 		AddPityDrop("CHAPLE575_MQ_03_ITEM", 0.8f, 3, 1, "zombiegirl2_chpel");
+
+		AddPrerequisite(new LevelPrerequisite(30));
 
 		AddObjective("collectEyes", L("Defeat Rodelins and obtain Eyes of Madness"), new CollectItemObjective("CHAPLE575_MQ_03_ITEM", 6));
 
@@ -479,6 +483,8 @@ public class Chaple575Mq05Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "CHAPLE575_MQ_05", "d_chapel_57_5", L("Obtained the Purified Essences"), L("Purify Vicious Essences at the Altar of Purification."));
 		SetPhase(QuestStatus.Success, "CHAPEL_TABERIJUS", "d_chapel_57_5", L("Talk to Follower Tiberius"), L("Return to Tiberius."));
 
+		AddPrerequisite(new LevelPrerequisite(30));
+
 		AddObjective("purifyEssence", L("Obtain the Purified Essence"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 1));
@@ -506,6 +512,7 @@ public class Chaple575Mq06Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL_TABERIJUS", "d_chapel_57_5", L("Talk to Follower Tiberius"), L("Return to Tiberius."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8523, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(30));
 
 		AddObjective("bombGlizardon", L("Defeat Glizardon using the Holy Bomb"), new ManualObjective());
 
@@ -533,6 +540,7 @@ public class Chaple575Mq07Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL_VIDAS", "d_chapel_57_5", L("Talk to Follower Vaidas"), L("Return to Vaidas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8524, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(30));
 
 		AddObjective("chargeStone", L("Charge the Holy Stone"), new ManualObjective());
 
@@ -560,6 +568,7 @@ public class Chaple575Mq08Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL_VIDAS", "d_chapel_57_5", L("Talk to Follower Vaidas"), L("Return to Vaidas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8524, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(30));
 
 		AddObjective("killGlizardon", L("Defeat Glizardon"), new KillObjective(2, "Glizardon"));
 

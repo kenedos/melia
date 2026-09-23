@@ -43,6 +43,9 @@ public class Gele572Mq05Track : TrackScript
 	{
 		switch (frame)
 		{
+			case 0:
+				character.ServerMessage(L("Destroying the totem made Simorph angry"));
+				break;
 			case 30:
 				RemoveTrackActor(character, track, 2);
 				RemoveTrackActor(character, track, 3);

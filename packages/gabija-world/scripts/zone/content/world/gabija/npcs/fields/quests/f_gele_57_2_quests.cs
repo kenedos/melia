@@ -457,6 +457,8 @@ public class Gele572Mq03Quest : QuestScript
 
 		AddPityDrop("GELE572_MQ_08_ITEM", 0.6f, 4, 1, "Mally");
 
+		AddPrerequisite(new LevelPrerequisite(19));
+
 		AddObjective("collectSeeds", L("Defeat Mali and obtain Mali Seeds"), new CollectItemObjective("GELE572_MQ_08_ITEM", 5));
 
 		AddReward(new ItemReward("expCard2", 2));
@@ -481,6 +483,8 @@ public class Gele572Mq04Quest : QuestScript
 		SetPhase(QuestStatus.Possible, "GELE572_NPC_MORI", "f_gele_57_2", L("Talk to Watcher Molly"), L("Watcher Molly in Gele Plateau is waiting for someone's help."));
 		SetPhase(QuestStatus.InProgress, "GELE572_MQ_05", "f_gele_57_2", L("Destroy Panto Totems with Shaman Dolls"), L("Summon a shaman doll and guide it to the Panto Totems."));
 		SetPhase(QuestStatus.Success, "GELE572_NPC_MORI", "f_gele_57_2", L("Talk to Watcher Molly"), L("The totems are broken. Tell Molly about it."));
+
+		AddPrerequisite(new LevelPrerequisite(19));
 
 		AddObjective("destroyTotems", L("Destroy Panto Totems with Shaman Dolls"), new ManualObjective());
 
@@ -509,8 +513,9 @@ public class Gele572Mq05Quest : QuestScript
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE572_MQ_05_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(17230, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(19));
 
-		AddObjective("killSimorph", L("Defeat Simorph"), new KillObjective(1, "boss_simorph") { LayerOnly = true });
+		AddObjective("killSimorph", L("Defeat Simorph"), new KillObjective(1, "boss_simorph"));
 
 		AddReward(new ItemReward("expCard2", 2));
 		AddReward(new TakeItemReward("GELE572_MQ_DOLL_01"));
@@ -536,6 +541,7 @@ public class Gele572Mq06Quest : QuestScript
 		SetPhase(QuestStatus.Success, "GELE572_NPC_MORI", "f_gele_57_2", L("Talk to Watcher Molly"), L("Tell Molly the corrupted land is purified."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(17240, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(19));
 
 		AddObjective("purifyLand", L("Purify the demon corrupted land"), new ManualObjective());
 
@@ -564,8 +570,9 @@ public class Gele572Mq07Quest : QuestScript
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE572_MQ_07_TRACK", 4000, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(17250, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(19));
 
-		AddObjective("killCarnivore", L("Defeat Wild Carnivore"), new KillObjective(1, "boss_Carnivore") { LayerOnly = true });
+		AddObjective("killCarnivore", L("Defeat Wild Carnivore"), new KillObjective(1, "boss_Carnivore"));
 
 		AddReward(new ItemReward("expCard2", 2));
 		AddReward(new SelectItemReward("HAND02_160", "HAND02_161", "HAND02_162"));
@@ -592,6 +599,8 @@ public class Gele572Mq08Quest : QuestScript
 		SetPhase(QuestStatus.Success, "GELE572_NPC_BASIL", "f_gele_57_2", L("Talk to Watcher Basil"), L("Give the ritual rope to Watcher Basil."));
 
 		AddPityDrop("GELE572_MQ_03_ITEM", 1.0f, 0, 1, "Npanto_staff");
+
+		AddPrerequisite(new LevelPrerequisite(19));
 
 		AddObjective("collectRope", L("Obtain ritual rope by defeating Panto Wizards"), new CollectItemObjective("GELE572_MQ_03_ITEM", 7));
 
@@ -622,6 +631,8 @@ public class Gele572Mq09Quest : QuestScript
 
 		AddPityDrop("GELE572_MQ_05_ITEM", 1.0f, 0, 1, "boss_Mushcaria_Q2");
 
+		AddPrerequisite(new LevelPrerequisite(19));
+
 		AddObjective("collectMane", L("Defeat Mushcaria and get Enchanted Mane"), new CollectItemObjective("GELE572_MQ_05_ITEM", 1));
 
 		AddReward(new ItemReward("expCard2", 3));
@@ -648,6 +659,8 @@ public class Gele572Rp1Quest : QuestScript
 		SetPhase(QuestStatus.Possible, "GELE572_NPC_MORI", "f_gele_57_2", L("Talk to Watcher Molly"), L("Watcher Molly is waiting for someone's help at Gele Plateau."));
 		SetPhase(QuestStatus.InProgress, "GELE572_NPC_MORI", "f_gele_57_2", L("Dealing with Nearby Monsters"), L("Defeat Spion Archers, Leaflies and Mali to give Molly advice."));
 		SetPhase(QuestStatus.Success, "GELE572_NPC_MORI", "f_gele_57_2", L("Report to Watcher Molly"), L("Report what you have learned about the monsters."));
+
+		AddPrerequisite(new LevelPrerequisite(22));
 
 		AddObjective("killLeafly", L("Defeat Leafly"), new KillObjective(3, "Leafly"));
 		AddObjective("killSpion", L("Defeat Spion Archer"), new KillObjective(4, "Spion_bow"));

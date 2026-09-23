@@ -45,6 +45,12 @@ public class Gele571Mq07Track : TrackScript
 	{
 		switch (frame)
 		{
+			case 16:
+				character.ServerMessage(L("The Baby Pantos are returning to Capria"));
+				break;
+			case 51:
+				character.ServerMessage(L("It seems that Capria is upset! Give up the plan and defeat Capria!"));
+				break;
 			case 55:
 				RemoveTrackActor(character, track, 2);
 				RemoveTrackActor(character, track, 3);

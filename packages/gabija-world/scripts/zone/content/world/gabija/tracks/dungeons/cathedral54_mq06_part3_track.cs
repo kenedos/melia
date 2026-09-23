@@ -33,10 +33,10 @@ public class Cathedral54Mq06Part3Track : TrackScript
 
 		character.Movement.MoveTo(new Position(1547.90f, 0.04f, -1515.45f));
 
-		// The altar itself stands on the map and is not spawned again here.
 		actors.Add(character);
 		actors.Add(AddTrackActor(character, 20025, 1502.64, -0.35, -1223.75, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 47234, 1547.04, 11.06, -1353.86, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Revelation Slate") }));
+		actors.Add(AddTrackActor(character, 154043, 1547.04, 11.06, -1353.86, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Altar of the Revelation") }));
 		actors.Add(AddTrackActor(character, 154042, 1519.97, 0.19, -1135.04, 4, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Candlestick") }));
 		actors.Add(AddTrackActor(character, 154044, 1554.03, 0.19, -1151.27, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Angel Statue") }));
 

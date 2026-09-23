@@ -550,6 +550,7 @@ public class Ftower42Mq03Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "FTOWER42_G_AI", "d_firetower_42", L("Talk to Grita"), L("You collected all the Flame Vapor. Ask Grita what to do next to complete the Jewel of Prominence."));
+		SetPhase(QuestStatus.InProgress, "FTOWER42_G_AI", "d_firetower_42", L("Charge the Jewel"), L("You should be able to gather the Essences of Fire when Flame Vapor is let out of the jewel. Fill the Jewel of Prominence with these essences."));
 		SetPhase(QuestStatus.Success, "FTOWER42_G_AI", "d_firetower_42", L("Talk to Grita"), L("You filled the Jewel of Prominence with the Essence of Fire. Talk to Grita."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8479, QuestStatus.Completed));
@@ -633,7 +634,7 @@ public class Ftower42Sq06Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "FTOWER42_MQ_05", "d_firetower_42", L("Defeat Archon"), L("Archon appeared as you were checking the Flame Fusion Machine. Defeat Archon."));
 		SetPhase(QuestStatus.Success, "FTOWER42_MQ_05", "d_firetower_42", L("Defeat Archon"), L("Archon appeared as you were checking the Flame Fusion Machine. Defeat Archon."));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER42_SQ_06_TRACK", "m_boss_b");
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER42_SQ_06_TRACK", "m_boss_b", 4000, partyPlay: true);
 
 		AddPrerequisite(new LevelPrerequisite(106));
 
@@ -697,7 +698,7 @@ public class Ftower42Sq02Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "FTOWER42_SQ_02", "d_firetower_42", L("Defeat Golem"), L("The Sealed Stone asked you to defeat the monitors and free its spirit. Do the Sealed Stone a favor."));
 		SetPhase(QuestStatus.Success, "FTOWER42_SQ_02", "d_firetower_42", L("Talk to the Sealed Stone"), L("Defeated the Golem. Talk to the Sealed Stone."));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER42_SQ_02_TRACK", "m_boss_b");
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER42_SQ_02_TRACK", "m_boss_b", 4000, partyPlay: true);
 
 		AddPrerequisite(new LevelPrerequisite(106));
 

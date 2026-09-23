@@ -480,6 +480,8 @@ public class Gele571Mq01Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Defeat Grummers and Zignuts"), L("Gilbert wants you to defeat the monsters that damaged the cable car."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Talk to Watcher Gilbert"), L("Tell Gilbert you taught the monsters a lesson."));
 
+		AddPrerequisite(new LevelPrerequisite(16));
+
 		AddObjective("killGrummer", L("Defeat Grummer"), new KillObjective(4, "Grummer"));
 		AddObjective("killZignuts", L("Defeat Zignuts"), new KillObjective(5, "Zignuts"));
 
@@ -508,6 +510,8 @@ public class Gele571Mq02Quest : QuestScript
 
 		AddPityDrop("GELE571_MQ_02_ITEM", 0.8f, 3, 1, "Npanto_baby");
 
+		AddPrerequisite(new LevelPrerequisite(16));
+
 		AddObjective("collectGears", L("Defeat Pantos and get gears"), new CollectItemObjective("GELE571_MQ_02_ITEM", 8));
 
 		AddReward(new ItemReward("expCard2", 2));
@@ -533,6 +537,8 @@ public class Gele571Mq03Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Find the lever handle latches"), L("Find the lever handle latches in the grass at Mieguista Slope."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Talk to Watcher Gilbert"), L("Return the lever handle latches to Gilbert."));
 
+		AddPrerequisite(new LevelPrerequisite(16));
+
 		AddObjective("findLatches", L("Find the lever handle latches"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard2", 2));
@@ -557,6 +563,8 @@ public class Gele571Mq04Quest : QuestScript
 		SetPhase(QuestStatus.Possible, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Talk to Watcher Molly"), L("Guards in Strautas are waiting for someone's help."));
 		SetPhase(QuestStatus.InProgress, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Give sugar beets to Baby Pantos"), L("Approach the Baby Pantos and use the sugar beets."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Talk to Watcher Molly"), L("Listen to Molly's next plans."));
+
+		AddPrerequisite(new LevelPrerequisite(16));
 
 		AddObjective("lurePantos", L("Give sugar beets to Baby Pantos"), new ManualObjective());
 
@@ -585,6 +593,8 @@ public class Gele571Mq05Quest : QuestScript
 
 		AddPityDrop("GELE571_MQ_05_ITEM", 0.65f, 4, 1, "Zignuts");
 
+		AddPrerequisite(new LevelPrerequisite(16));
+
 		AddObjective("collectParts", L("Retrieve the cable car parts from Zignuts"), new CollectItemObjective("GELE571_MQ_05_ITEM", 7));
 
 		AddReward(new ItemReward("expCard2", 2));
@@ -611,6 +621,8 @@ public class Gele571Mq06Quest : QuestScript
 		SetPhase(QuestStatus.Success, "GELE571_NPC_MATTHEW", "f_gele_57_1", L("Talk to Watcher Matthew"), L("Tell Matthew the Poata is dead."));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE571_MQ_05_TRACK", 4000, autoStart: false, partyPlay: true);
+
+		AddPrerequisite(new LevelPrerequisite(16));
 
 		AddObjective("killPoata", L("Defeat Poata"), new KillObjective(1, "boss_poata_Q1") { LayerOnly = true });
 
@@ -639,6 +651,7 @@ public class Gele571Mq07Quest : QuestScript
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE571_MQ_07_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(17130, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(16));
 
 		AddObjective("killCapria", L("Defeat Capria"), new KillObjective(1, "boss_capria") { LayerOnly = true });
 
@@ -666,6 +679,7 @@ public class Gele571Rp1Quest : QuestScript
 		SetPhase(QuestStatus.Success, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Talk to Watcher Molly"), L("Report back to Watcher Molly."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(17150, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(16));
 
 		AddObjective("removeStems", L("Remove the Plateau Sugar Beet Stems"), new ManualObjective());
 

@@ -37,10 +37,34 @@ public class Gele574Mq06Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Starts the Panto Archers and the Large Panto Spearman guarding the totem.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("DefGroup")
+			.Monster(57572, -1542.21, 7.34, -592.19, 0, respawnSeconds: 5, level: 35)
+			.Monster(57572, -1433.74, 7.18, -708.15, 0, respawnSeconds: 5, level: 35)
+			.Monster(57572, -1472.47, 7.4, -555.13, 0, respawnSeconds: 5, level: 35)
+			.Monster(57572, -1734.78, 7.21, -703.76, 0, respawnSeconds: 5, level: 35)
+			.Monster(57259, -1719.81, 7.18, -865.84, 0, aggressive: false, level: 35, maxHp: 40)
+			.Monster(57572, -1609.76, 7.18, -774.64, 0, respawnSeconds: 5, level: 35)
+			.Monster(57572, -1563.46, 7.18, -1072.19, 0, respawnSeconds: 5, level: 35)
+			.Monster(57572, -1638.19, 7.18, -1037.6, 0, respawnSeconds: 5, level: 35)
+			.On(s => s.Alive(4) <= 0, s => s.Game.CompleteObjective(8606, "controlPantos"), 1);
+
+		game.Start("DefGroup");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
+			case 13:
+				StartMinigame(character, track);
+				break;
 			case 14:
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);

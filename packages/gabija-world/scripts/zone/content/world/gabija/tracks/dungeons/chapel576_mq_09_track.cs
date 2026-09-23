@@ -54,6 +54,9 @@ public class Chaple576Mq09Track : TrackScript
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;
+			case 28:
+				character.ServerMessage(L("You've been caught in Mallet Wyvern's trap! Defeat Mallet Wyvern!"));
+				break;
 		}
 
 		await base.OnProgress(character, track, frame);

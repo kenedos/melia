@@ -568,6 +568,7 @@ public class Chaple577Mq05Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPLE577_ARUNE_02", "d_chapel_57_7", L("Talk to Follower Algis"), L("Return to Follower Algis."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(38));
 
 		AddObjective("killDemons", L("Defeat demons"), new KillObjective(10, "Egnome", "Spector_Gh", "colitile", "Infroholder_bow"));
 
@@ -594,6 +595,7 @@ public class Chaple577Mq06Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPLE577_ARUNE_02", "d_chapel_57_7", L("Talk to Follower Algis"), L("Return to Follower Algis."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(38));
 
 		AddObjective("chargeCrystal", L("Charge the low level spirit crystal"), new ManualObjective());
 
@@ -620,6 +622,7 @@ public class Chaple577Mq07Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPLE577_ARUNE_02", "d_chapel_57_7", L("Talk to Follower Algis"), L("Return to Follower Algis."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(38));
 
 		AddObjective("killEgnome", L("Defeat Egnome"), new KillObjective(2, "Egnome"));
 
@@ -681,6 +684,7 @@ public class Chaple577Mq10Quest : QuestScript
 		AddObjective("findRevelation", L("Find the revelation in the hidden sanctuary"), new ManualObjective());
 
 		AddReward(new ItemReward("stonetablet02", 1));
+		AddReward(new StatPointReward(3));
 	}
 
 	public override void OnSuccess(Character character, Quest quest)

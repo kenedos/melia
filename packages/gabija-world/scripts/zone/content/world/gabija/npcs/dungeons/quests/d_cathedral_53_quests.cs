@@ -41,6 +41,43 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 	private const string HiddenRelicVar = "Gabija.Cathedral53.HiddenRelic";
 	private const string AltarVar = "Gabija.Cathedral53.Altar";
 
+	/// <summary>
+	/// Dialog of the Meile Oratorium platform, on the map and inside its puzzle track.
+	/// </summary>
+	/// <param name="dialog"></param>
+	/// <returns></returns>
+	public static async Task MeilePlatformDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+
+		dialog.SetTitle(L("Writing on the Platform"));
+
+		if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
+		{
+			await dialog.Msg(L("A drop-shaped jewel has come out of the device."));
+			await dialog.CompleteQuest(Mq04);
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq04))
+		{
+			await dialog.Msg(L("Remember the holy number with your two eyes."));
+			await dialog.Msg(L("The light of candles drives away the evil dark."));
+
+			var lit = await character.TimeActions.StartAsync(L("Lighting the candles..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
+
+			if (lit != TimeActionResult.Completed)
+				return;
+
+			character.Quests.CompleteObjective(Mq04, "solveSecret");
+			character.ServerMessage(L("The candles of the Meile Oratorium burn in the right number."));
+			return;
+		}
+
+		await dialog.Msg(L("Remember the holy number with your two eyes."));
+		await dialog.Msg(L("The light of candles drives away the evil dark."));
+	}
+
 	protected override void Load()
 	{
 		// Bishop Aurelius' Spirit, waiting at the chancel
@@ -98,37 +135,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 
 		// Meile Oratorium Platform
 		//-------------------------------------------------------------------------
-		AddNpc(153023, L("Meile Oratorium Platform"), "CHATHEDRAL53_MQ04_HINT", "d_cathedral_53", -2363.94, -51.86, 47, async dialog =>
-		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Writing on the Platform"));
-
-			if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
-			{
-				await dialog.Msg(L("A drop-shaped jewel has come out of the device."));
-				await dialog.CompleteQuest(Mq04);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq04))
-			{
-				await dialog.Msg(L("Remember the holy number with your two eyes."));
-				await dialog.Msg(L("The light of candles drives away the evil dark."));
-
-				var lit = await character.TimeActions.StartAsync(L("Lighting the candles..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (lit != TimeActionResult.Completed)
-					return;
-
-				character.Quests.CompleteObjective(Mq04, "solveSecret");
-				character.ServerMessage(L("The candles of the Meile Oratorium burn in the right number."));
-				return;
-			}
-
-			await dialog.Msg(L("Remember the holy number with your two eyes."));
-			await dialog.Msg(L("The light of candles drives away the evil dark."));
-		});
+		AddNpc(153023, L("Meile Oratorium Platform"), "CHATHEDRAL53_MQ04_HINT", "d_cathedral_53", -2363.94, -51.86, 47, MeilePlatformDialog);
 
 		// The candle puzzle is staged when the platform is reached.
 		AddQuestTrigger("CHATHEDRAL53_MQ04_ARRIVE", "d_cathedral_53", -2200, -52, 200, async args =>

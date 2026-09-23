@@ -783,6 +783,7 @@ public class Ftower45Mq06Quest : QuestScript
 
 		AddReward(new ItemReward("expCard7", 1));
 		AddReward(new ItemReward("stonetablet05", 1));
+		AddReward(new StatPointReward(3));
 		AddReward(new TakeItemReward("FTOWER_FIRE_ESSENCE_2"));
 	}
 }

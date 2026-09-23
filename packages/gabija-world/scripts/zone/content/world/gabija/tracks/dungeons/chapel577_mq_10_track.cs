@@ -58,6 +58,9 @@ public class Chaple577Mq10Track : TrackScript
 				StartDialog(track, L("400 years would have passed by the time this revelation reaches you."),
 					L("Thank you in advance for your continued pursuit of finding this revelation."));
 				break;
+			case 44:
+				character.ServerMessage(L("You've received 'Revelation of the Goddess'!"));
+				break;
 		}
 
 		await base.OnProgress(character, track, frame);

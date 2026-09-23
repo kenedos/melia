@@ -789,6 +789,7 @@ public class Remains40Mq03Quest : QuestScript
 		AddObjective("readThirdMonument", L("Check the writings on the second monument"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard6", 1));
+		AddReward(new TakeItemReward("REMAINS40_MQ_03_ITEM"));
 	}
 }
 

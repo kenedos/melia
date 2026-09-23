@@ -172,6 +172,7 @@ public class DUnderfortress67QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Old Manager"));
+			dialog.SetPortrait("Dlg_port_Premier_Eminent");
 
 			if (character.Quests.IsActive(Mq030) && !character.Quests.IsCompletable(Mq030))
 			{
@@ -452,18 +453,21 @@ public class DUnderfortress67QuestNpcsScript : GeneralScript
 		// Hidden triggers
 		//-------------------------------------------------------------------------
 		// The soldier's house inside the castle walls, where the ring goes back.
-		AddQuestTrigger("UNDER_67_SQ030_NPC", "f_flash_64", -400.56, 710.55, 150, async args =>
+		AddConditionalNpc(40095, L("Soldier's House"), "UNDER_67_SQ030_NPC", "f_flash_64", -400.56, 710.55, 266, c => c.Quests.IsActive(Sq030) && !c.Quests.IsCompletable(Sq030), async dialog =>
 		{
-			if (args.Initiator is not Character character)
-				return;
+			var character = dialog.Player;
 
 			if (!character.Quests.IsActive(Sq030) || character.Quests.IsCompletable(Sq030))
 				return;
 
+			var placed = await character.TimeActions.StartAsync(L("Placing the ring..."), L("Cancel"), "BURY", TimeSpan.FromSeconds(2));
+
+			if (placed != TimeActionResult.Completed)
+				return;
+
 			character.Quests.CompleteObjective(Sq030, "takeTheRingHome");
 			character.ServerMessage(L("The ring goes back where it came from, and the spirit does not follow it in."));
-
-			await Task.CompletedTask;
+			character.LookAround();
 		});
 	}
 

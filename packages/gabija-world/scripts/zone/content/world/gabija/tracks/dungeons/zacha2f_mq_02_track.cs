@@ -40,10 +40,35 @@ public class Zacha2fMq02Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Starts the Echads that close in on the stone lanterns.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("gen")
+			.Monster(41275, -402.07, 648.12, -774.73, 0, respawnSeconds: 20)
+			.Monster(41275, -371.64, 648.12, -590.2, 0, respawnSeconds: 20)
+			.Monster(41275, -246.12, 648.12, -582.81, 0, respawnSeconds: 20)
+			.Monster(41275, -137.19, 648.12, -547.76, 0, respawnSeconds: 20)
+			.Monster(41275, 3.72, 648.12, -575.24, 0, respawnSeconds: 20)
+			.Monster(41275, 59.68, 648.12, -671.92, 0, respawnSeconds: 20)
+			.Monster(41275, 45.24, 648.12, -804.11, 0, respawnSeconds: 20)
+			.Monster(41275, 9.21, 648.12, -905.03, 0, respawnSeconds: 20)
+			.Monster(41275, -103.9, 648.12, -946.76, 0, respawnSeconds: 20)
+			.Monster(41275, -243.55, 648.12, -925.15, 0, respawnSeconds: 20);
+
+		game.Start("gen");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
+			case 3:
+				StartMinigame(character, track);
+				break;
 			case 7:
 				character.ServerMessage(L("Protect the Royal Mausoleum's Stone Lanterns from the guardians!"));
 				break;

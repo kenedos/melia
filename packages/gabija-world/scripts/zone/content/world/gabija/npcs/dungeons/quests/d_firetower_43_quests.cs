@@ -615,7 +615,7 @@ public class Ftower43Mq05Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "FTOWER43_MQ_05_MINENPC", "d_firetower_43", L("Defeat the hostile Mineloader"), L("Defeat the suddenly mobile Mineloader."));
 		SetPhase(QuestStatus.Success, "FTOWER43_MQ_05_MINENPC", "d_firetower_43", L("Defeat the hostile Mineloader"), L("Defeat the suddenly mobile Mineloader."));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER43_MQ_05_TRACK", "m_boss_c");
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER43_MQ_05_TRACK", "m_boss_c", 4000, partyPlay: true);
 
 		AddPrerequisite(new LevelPrerequisite(109));
 
@@ -821,7 +821,7 @@ public class Ftower43Sq05Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "FTOWER43_SQ_05", "d_firetower_43", L("Defeat Gray Golem"), L("As a suspicious desk has told you, the Gray Golem is chasing after you. It will be better to defeat the Gray Golem first."));
 		SetPhase(QuestStatus.Success, "FTOWER43_SQ_05", "d_firetower_43", L("Talk to the suspicious table"), L("It seems like you got out of danger. Talk to the weird and polite table."));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER43_SQ_05_TRACK", "m_boss_d");
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER43_SQ_05_TRACK", "m_boss_d", 4000, partyPlay: true);
 
 		AddPrerequisite(new LevelPrerequisite(109));
 

@@ -41,6 +41,7 @@ public class DVelniasprison511QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Demon Lord Hauberk"));
+			dialog.SetPortrait("Dlg_port_Hauberk_dark");
 
 			if (character.Quests.IsActive(Mq01) && character.Quests.IsCompletable(Mq01))
 			{

@@ -220,6 +220,7 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq05))
 			{
+				character.Quests.ClearQuestTrack(Mq05);
 				await dialog.Msg(L("Achat is at the far end of this floor."));
 				return;
 			}
@@ -426,13 +427,6 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("I have kept this floor since the Great King was laid down. I will keep it a while longer."));
 		});
 
-		// Achat, at the far end of the first floor
-		//-------------------------------------------------------------------------
-		// The client stages no cutscene for Achat and the map's own spawn table
-		// has none, so the quest's own spawner puts it where its phase marker is.
-		AddSpawner("d_zachariel_32.Achat", MonsterId.Boss_Achat, min: 1, max: 1, respawn: Minutes(5));
-		AddSpawnPoint("d_zachariel_32.Achat", "d_zachariel_32", Rectangle(50, 1191, 120));
-
 		// Hidden triggers
 		//-------------------------------------------------------------------------
 		// The hall of the four large cubes.
@@ -453,7 +447,7 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
-				character.ServerMessage(L("Achat is somewhere in this hall, and it is already corrupted."));
+				character.Quests.StartQuestTrack(Mq05);
 
 			await Task.CompletedTask;
 		});
@@ -621,7 +615,7 @@ public class Zacha1fMq02Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(71));
 
-		AddObjective("purifyCubes", L("Defeat the corrupted Guardians at the Royal Cubes"), new KillObjective(4, "npc_zachariel_cube_09") { LayerOnly = true });
+		AddObjective("purifyCubes", L("Defeat the corrupted Guardians at the Royal Cubes"), new KillObjective(4, "npc_zachariel_cube_09"));
 
 		AddReward(new ItemReward("expCard5", 2));
 	}
@@ -724,9 +718,11 @@ public class Zacha1fMq05Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "ZACHA1F_MQ_05", "d_zachariel_32", L("Defeat Achat"), L("Achat is already corrupted. Defeat Achat."));
 		SetPhase(QuestStatus.Success, "ZACHA1F_MQ_05", "d_zachariel_32", L("Defeat Achat"), L("Achat is already corrupted. Defeat Achat."));
 
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "ZACHA1F_MQ_05_TRACK", 4000, autoStart: false, partyPlay: true);
+
 		AddPrerequisite(new QuestStatusPrerequisite(8254, QuestStatus.Completed));
 
-		AddObjective("killAchat", L("Guardian Achat"), new KillObjective(1, "boss_Achat"));
+		AddObjective("killAchat", L("Guardian Achat"), new KillObjective(1, "boss_Achat") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard5", 2));
 		AddReward(new ItemReward("R_BRC03_105", 1));

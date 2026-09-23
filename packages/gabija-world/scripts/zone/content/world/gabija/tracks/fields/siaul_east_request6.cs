@@ -31,10 +31,10 @@ public class SiaulEastRequest6Track : TrackScript
 		actors.Add(character);
 
 		actors.Add(AddTrackActor(character, 400201, 2067.6062, 185.09489, -169.27565, 50, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(2089.10720f, 185.09489f, -274.69974f) }));
-		actors.Add(AddTrackActor(character, 57192, 2081.7092, 185.09489, -448.51422, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 57192, 1985.8104, 185.09489, -330.603, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 57192, 1920.6758, 185.09489, -361.58221, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 57192, 2116.1965, 185.09489, -387.33612, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 57260, 2081.7092, 185.09489, -448.51422, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 57260, 1985.8104, 185.09489, -330.603, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 57260, 1920.6758, 185.09489, -361.58221, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 57260, 2116.1965, 185.09489, -387.33612, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 
 		return actors.ToArray();
 	}

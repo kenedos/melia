@@ -400,6 +400,7 @@ public class Mine3Resque1Quest : QuestScript
 		AddObjective("killSpiders", L("Defeat the Crystal Spiders that suddenly appeared"), new KillObjective(7, "Quartz_weaver") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard2", 3));
+		AddReward(new TakeItemReward("CMINE_COMPASS_ITEM"));
 	}
 }
 
@@ -517,6 +518,7 @@ public class Cmine6ToKatyn71Quest : QuestScript
 
 		AddReward(new ItemReward("stonetablet01_noread", 1));
 		AddReward(new ItemReward("expCard2", 3));
+		AddReward(new StatPointReward(3));
 	}
 }
 

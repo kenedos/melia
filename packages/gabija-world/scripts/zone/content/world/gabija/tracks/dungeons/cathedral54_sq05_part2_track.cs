@@ -30,7 +30,7 @@ public class Cathedral54Sq05Part2Track : TrackScript
 
 		character.Movement.MoveTo(new Position(825.28f, 13.98f, 1183.32f));
 
-		// The altar itself stands on the map and is not spawned again here.
+		actors.Add(AddTrackActor(character, 47254, 826.33, 13.98, 1200.75, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces, Name = L("Karuna Altar") }));
 		actors.Add(AddTrackActor(character, 57311, 820.87, 13.98, 1240.55, 38, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 57367, 813.67, 3.09, 996.90, 37, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(804.65f, 3.09f, 1091.72f) }));
 		actors.Add(AddTrackActor(character, 57367, 840.80, 3.09, 963.64, 35, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(849.13f, 3.09f, 1054.65f) }));

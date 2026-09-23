@@ -44,28 +44,34 @@ public class SiauOutQ16Track : TrackScript
 		return actors.ToArray();
 	}
 
-	// The cutscene's own cast is three Vubbes; the rest come running once
-	// the camera lets go, outside the actor list the client indexes.
-	public override void OnHandOver(Character character, Track track)
-	{
-		AddRunningVubbe(character, -138, -712);
-		AddRunningVubbe(character, -14, -742);
-		AddRunningVubbe(character, -84, -676);
-	}
-
 	/// <summary>
-	/// Spawns one of the Vubbes the explosion draws in, already coming for
-	/// the player.
+	/// Starts the Vubbe miners the explosion draws out of the mine.
 	/// </summary>
-	private static void AddRunningVubbe(Character character, double x, double z)
+	private static void StartMinigame(Character character, Track track)
 	{
-		var monster = AddTrackMonster(character, 106000, L("Vubbe Miner"), "None", x, 148, z, 0);
+		var game = new TrackMinigame(character, track);
 
-		if (monster == null)
-			return;
+		game.Stage("DefGroup")
+			.Monster(106000, -79.39, 151.4, -440.5, 0, respawnSeconds: 10)
+			.Monster(106000, -97.71, 150.56, -414.69, 0, respawnSeconds: 10)
+			.Monster(106000, -98.75, 150.72, -317.44, 0, respawnSeconds: 10)
+			.Monster(106000, -73.3, 151.71, -369.01, 0, respawnSeconds: 10)
+			.Monster(106000, -93.6, 150.38, -348.04, 0, respawnSeconds: 10)
+			.Monster(57266, -94.79, 150.52, -284.55, 0, respawnSeconds: 10)
+			.Monster(106000, -76.99, 151.12, -276.06, 0, respawnSeconds: 10)
+			.Monster(106000, -83.61, 150.99, -318.74, 0, respawnSeconds: 10)
+			.Monster(106000, -106.28, 151.16, -330.83, 0, respawnSeconds: 10)
+			.Monster(106000, -98.7, 150.65, -381.61, 0, respawnSeconds: 10)
+			.Monster(106000, -69.51, 152.06, -396.93, 0, respawnSeconds: 10)
+			.Monster(106000, -61.99, 151.86, -355.92, 0, respawnSeconds: 10)
+			.Monster(106000, -72.39, 151.41, -336.77, 0, respawnSeconds: 10)
+			.Monster(106000, -82.17, 151.12, -342.99, 0, count: 2, respawnSeconds: 25)
+			.Monster(57266, -90.06, 150.42, -359.72, 0, count: 2, respawnSeconds: 25)
+			.Monster(106000, -85.28, 150.86, -394.69, 0, count: 2, respawnSeconds: 25)
+			.Monster(106000, -47.15, 152.68, -329.35, 0, count: 2, respawnSeconds: 25)
+			.Monster(106000, -68.93, 151.57, -304.09, 0, count: 2, respawnSeconds: 25);
 
-		monster.Tendency = TendencyType.Aggressive;
-		monster.InsertHate(character);
+		game.Start("DefGroup");
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)
@@ -110,6 +116,9 @@ public class SiauOutQ16Track : TrackScript
 				break;
 			case 59:
 				RemoveTrackActor(character, track, 3);
+				break;
+			case 67:
+				StartMinigame(character, track);
 				break;
 			case 79:
 				RemoveTrackActor(character, track, 1);

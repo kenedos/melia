@@ -547,6 +547,8 @@ public class Gele573Mq01Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE573_MQ_01", "f_gele_57_3", L("Collect Destroyed Barrier Piece"), L("Collect the pieces of the barrier at Mazas Rest Place."));
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Give the pieces to Follower Kayetonas."));
 
+		AddPrerequisite(new LevelPrerequisite(22));
+
 		AddObjective("collectPieces", L("Collect Destroyed Barrier Piece"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 2));
@@ -573,6 +575,8 @@ public class Gele573Mq02Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE573_BASIC_1", "f_gele_57_3", L("Charge the Tree Guard Post Barrier"), L("Defeat the demons around the Tree Guard Post Barrier and charge it."));
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Inform Follower Kayetonas the barrier has been charged."));
 
+		AddPrerequisite(new LevelPrerequisite(22));
+
 		AddObjective("chargeBarrier", L("Charge the Tree Guard Post Barrier"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 2));
@@ -598,6 +602,8 @@ public class Gele573Mq03Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE573_MQ_03_AI_KILL", "f_gele_57_3", L("Remove the Demon Summoning Circles"), L("Remove the summoning circles at Mairunas Knoll."));
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Tell Follower Kayetonas there were Demon Summoning Circles."));
 
+		AddPrerequisite(new LevelPrerequisite(22));
+
 		AddObjective("removeCircles", L("Remove the Demon Summoning Circles"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 2));
@@ -621,6 +627,8 @@ public class Gele573Mq04Quest : QuestScript
 		SetPhase(QuestStatus.Possible, "GELE573_KENNETH", "f_gele_57_3", L("Talk to Watcher Kenneth"), L("Watcher Kenneth is waiting for someone's help at Nefritas Cliff."));
 		SetPhase(QuestStatus.InProgress, "GELE573_MQ_04", "f_gele_57_3", L("Defeat severed demons' souls"), L("Weaken the demons and use the barrier to sever their souls."));
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Report to Follower Kayetonas."));
+
+		AddPrerequisite(new LevelPrerequisite(22));
 
 		AddObjective("severSouls", L("Defeat severed demons' souls"), new ManualObjective());
 
@@ -647,6 +655,8 @@ public class Gele573Mq05Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE573_KENNETH", "f_gele_57_3", L("Defeat the demon monsters nearby Kenneth"), L("Defeat the nearby monsters while Kenneth rests."));
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Tell Follower Kayetonas about it."));
 
+		AddPrerequisite(new LevelPrerequisite(22));
+
 		AddObjective("killDemons", L("Defeat demons"), new KillObjective(9, "puragi_green", "banshee", "zigri_brown"));
 
 		AddReward(new ItemReward("expCard3", 2));
@@ -672,6 +682,8 @@ public class Gele573Mq06Quest : QuestScript
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Talk to Follower Kayetonas."));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE573_MQ_06_TRACK", 4000, partyPlay: true);
+
+		AddPrerequisite(new LevelPrerequisite(22));
 
 		AddObjective("killMinotaur", L("Defeat Minotaur"), new KillObjective(1, "boss_Minotaurs") { LayerOnly = true });
 

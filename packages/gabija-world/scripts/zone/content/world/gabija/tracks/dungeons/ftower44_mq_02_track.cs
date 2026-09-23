@@ -16,14 +16,6 @@ using static Melia.Zone.Scripting.Shortcuts;
 [TrackScript("FTOWER44_MQ_02_TRACK")]
 public class Ftower44Mq02Track : TrackScript
 {
-	private readonly static double[,] MinivernSpots =
-	{
-		{ -140, 120 }, { -90, 300 }, { 10, 400 }, { 160, 430 }, { 320, 390 },
-		{ 430, 260 }, { 460, 110 }, { 420, -40 }, { 300, -150 }, { 150, -190 },
-		{ 0, -160 }, { -110, -50 }, { -60, 220 }, { 60, 330 }, { 250, 320 },
-		{ 380, 190 }, { 390, 20 }, { 280, -90 }, { 110, -120 }, { -30, 30 },
-	};
-
 	protected override void Load()
 	{
 		SetId("FTOWER44_MQ_02_TRACK");
@@ -37,18 +29,31 @@ public class Ftower44Mq02Track : TrackScript
 
 		actors.Add(AddTrackActor(character, 151050, 32, 440, 310, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces, Name = L("Sealed Stone") }));
 
-		// The client plays this phase as a minigame; the monsters its notice
-		// describes are spawned into the track's own layer instead.
-		for (var i = 0; i < MinivernSpots.GetLength(0); i++)
-			actors.Add(AddTrackActor(character, 57050, MinivernSpots[i, 0], 440, MinivernSpots[i, 1], 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-
 		return actors.ToArray();
+	}
+
+	/// <summary>
+	/// Starts the Minivern pairs the stabilizing device draws in.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("stage1")
+			.Monster(57050, 429.03, 398.53, 99.23, 0)
+			.Monster(57050, -193.5, 398.27, 107.94, 0)
+			.On(s => s.Alive(0, 1) <= 0, s => { s.Spawn(0, 2); s.Spawn(1, 2); });
+
+		game.Start("stage1");
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
+			case 1:
+				StartMinigame(character, track);
+				break;
 			case 4:
 				character.ServerMessage(L("As the magic stabilizing device came on, the monsters rushed in!"));
 				CreateBattleBoxInLayer(character, track);

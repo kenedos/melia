@@ -328,6 +328,7 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Premier Eminent"));
+			dialog.SetPortrait("Dlg_port_Premier_Eminent");
 
 			if (!character.Quests.Has(Mq020) && character.Quests.MeetsPrerequisites(Mq020))
 			{
@@ -364,6 +365,7 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Premier Eminent"));
+			dialog.SetPortrait("Dlg_port_Premier_Eminent");
 
 			if (!character.Quests.Has(Mq050) && character.Quests.MeetsPrerequisites(Mq050))
 			{

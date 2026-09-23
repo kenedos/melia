@@ -54,6 +54,9 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Welcome. Aren't you our town's savior? Go down from the middle of the Twin Bridge and you'll arrive at Srautas Gorge. Go further right through the Gorge and you'll reach Gele Plateau."));
 				dialog.ShowHelp("TUTO_INCOMPATIBLE");
 				await dialog.CompleteQuest(Slate3);
+
+				if (character.Quests.HasCompleted(Slate3) && !character.Quests.Has(ToGele))
+					character.Quests.Start(ToGele);
 				return;
 			}
 
@@ -1129,7 +1132,7 @@ public class SoutQ16Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8080, QuestStatus.Completed));
 
-		AddObjective("killVubbes", L("Defeat any Vubbe drawn out by the explosives"), new KillObjective(6, "Goblin_Miners_Q2") { LayerOnly = true });
+		AddObjective("killVubbes", L("Defeat any Vubbe drawn out by the explosives"), new KillObjective(6, "Goblin_Miners_Q2"));
 
 		AddReward(new ItemReward("expCard1", 2));
 		AddReward(new ItemReward("BRC01_105", 1));

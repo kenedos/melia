@@ -50,6 +50,7 @@ public class Vprison513Mq01Track : TrackScript
 		{
 			case 12:
 				track.Dialog.SetTitle(L("Demon Lord Hauberk"));
+				track.Dialog.SetPortrait("Dlg_port_Hauberk");
 				StartDialog(track,
 					L("So you're here to put me back in your little pocket eh.."),
 					L("Don't make me laugh. There is nothing to discuss between us!")

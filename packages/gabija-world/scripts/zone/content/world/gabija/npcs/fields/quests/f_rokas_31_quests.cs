@@ -228,6 +228,7 @@ public class FRokas31QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sub01))
 			{
 				await dialog.Msg(L("The Hogma are all over the ruins. Clear them out."));
+				character.Quests.ReplayQuestTrack(Sub01);
 				return;
 			}
 
@@ -511,11 +512,11 @@ public class Rokas31Sub01Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "ROKAS31_SUB_01_BOX", "f_rokas_31", L("Ambush of Hogmas"), L("Hogmas appeared when opening the Treasure Chest! Defeat them."));
 		SetPhase(QuestStatus.Success, "ROKAS31_SUB_01_BOX", "f_rokas_31", L("Ambush of Hogmas"), L("Hogmas appeared when opening the Treasure Chest! Defeat them."));
 
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "ROKAS31_SUB_01_TRACK", 4000, partyPlay: true);
+
 		AddPrerequisite(new LevelPrerequisite(68));
 
-		// The client's cutscene for this quest spawns no cast, so the kills are
-		// counted on the field rather than inside a private layer.
-		AddObjective("killHogma", L("Defeat the Hogmas"), new KillObjective(20, "hogma_warrior", "hogma_archer", "hogma_sorcerer", "warleader_hogma", "Hogma_combat", "Hogma_guard"));
+		AddObjective("killHogma", L("Defeat the Hogmas"), new KillObjective(20, "hogma_warrior", "hogma_archer", "hogma_sorcerer", "warleader_hogma", "Hogma_combat", "Hogma_guard") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard5", 2));
 	}

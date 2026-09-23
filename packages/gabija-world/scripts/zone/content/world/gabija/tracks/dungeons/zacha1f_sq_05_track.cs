@@ -31,10 +31,29 @@ public class Zacha1fSq05Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Starts the Zinutekas that guard the magic regulator.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("DefGroup")
+			.Monster(401301, 1014.34, 331.87, 1514.71, 0, count: 3, respawnSeconds: 15)
+			.Monster(401301, 1214.11, 331.87, 1517.99, 0, count: 3, respawnSeconds: 15)
+			.Monster(401301, 1211.74, 331.87, 1305.81, 0, count: 3, respawnSeconds: 15)
+			.Monster(401301, 1006.19, 331.87, 1302.42, 0, count: 3, respawnSeconds: 15);
+
+		game.Start("DefGroup");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
+			case 1:
+				StartMinigame(character, track);
+				break;
 			case 6:
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);

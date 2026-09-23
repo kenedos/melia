@@ -45,6 +45,7 @@ public class Underfortress69Mq050Track : TrackScript
 		{
 			case 13:
 				track.Dialog.SetTitle(L("Premier Eminent"));
+				track.Dialog.SetPortrait("Dlg_port_Premier_Eminent");
 				StartDialog(track,
 					L("I want you to meet the revelation of the goddess fast."),
 					L("To fulfill my lifelong wish...")
@@ -53,6 +54,7 @@ public class Underfortress69Mq050Track : TrackScript
 
 			case 40:
 				track.Dialog.SetTitle(L("Premier Eminent"));
+				track.Dialog.SetPortrait("Dlg_port_Premier_Eminent");
 				StartDialog(track,
 					L("Huh? What is this..."),
 					L("My strength... My body... It's crumbling?")

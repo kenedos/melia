@@ -34,10 +34,28 @@ public class Zacha1fMq03Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Starts the Vekarabe swarms the broken devices let loose.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("DefGroup")
+			.Monster(401081, -1111.05, 334.82, 397.73, -86, count: 5, respawnSeconds: 10)
+			.Monster(401081, -1002.2, 334.82, 354.65, -86, count: 5, respawnSeconds: 10)
+			.Monster(401081, -881.14, 334.82, 359.25, -86, count: 5, respawnSeconds: 10);
+
+		game.Start("DefGroup");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
+			case 3:
+				StartMinigame(character, track);
+				break;
 			case 0:
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);

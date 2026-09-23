@@ -698,6 +698,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Demon Lord Hauberk"));
+			dialog.SetPortrait("Dlg_port_Hauberk_dark");
 
 			if (character.Quests.IsActive(Pre01) && character.Quests.IsCompletable(Pre01))
 			{
@@ -1057,6 +1058,7 @@ public class Farm472Sq045Quest : QuestScript
 		AddPrerequisite(new ItemPrerequisite("FARM47_2_SQ_020_ITEM_1"));
 		AddPrerequisite(new ItemPrerequisite("FARM47_2_SQ_030_ITEM_1"));
 		AddPrerequisite(new ItemPrerequisite("FARM47_2_SQ_040_ITEM_1"));
+		AddPrerequisite(new LevelPrerequisite(79));
 
 		AddObjective("showFragments", L("Talk to Joana"), new ManualObjective());
 
@@ -1086,6 +1088,7 @@ public class Farm472Sq050Quest : QuestScript
 		SetPhase(QuestStatus.Success, "FARM47_JOANA", "f_farm_47_2", L("Hand it over to Joana"), L("Acquired the Sticky Sap from the monsters. Hand it over to Joana."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(40315, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(79));
 
 		AddObjective("collectSap", L("Obtain Sticky Sap from the monsters"), new CollectItemObjective("FARM47_2_SQ_050_ITEM_1", 9));
 
@@ -1115,6 +1118,7 @@ public class Farm472Sq060Quest : QuestScript
 		SetPhase(QuestStatus.Success, "FARM47_JOANA", "f_farm_47_2", L("Report to Joana"), L("The energy may not be bad since the monsters are disappearing. Tell this to Joana."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(40320, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(79));
 
 		AddObjective("testAura", L("Verifying the nature of the strange aura"), new ManualObjective());
 
@@ -1143,6 +1147,7 @@ public class Farm472Sq070Quest : QuestScript
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FARM47_2_SQ_070_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(40330, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(79));
 
 		AddObjective("gatherKindling", L("Obtain kindling from the Orange Dandel"), new CollectItemObjective("FARM47_2_SQ_070_ITEM_1", 5));
 		AddObjective("burnCircle", L("Destroy the magic circle"), new ManualObjective());
@@ -1173,6 +1178,7 @@ public class Farm472Sq080Quest : QuestScript
 		SetPhase(QuestStatus.Success, "FARM47_JOANA", "f_farm_47_2", L("Obtain the Goddess Statue from Joana"), L("Varas told you that you would be able to eliminate the magic circles easily using the mighty power of the Goddesses. Obtain the Goddess Statue from Joana."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(40340, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(79));
 
 		AddObjective("askJoana", L("Obtain the Goddess Statue from Joana"), new ManualObjective());
 
@@ -1199,6 +1205,7 @@ public class Farm472Sq081Quest : QuestScript
 		SetPhase(QuestStatus.Success, "FARM47_JONARIS", "f_farm_47_2", L("Report to Varas"), L("The crops became alive again. With the power of the Goddess Statue, the magic circles have disappeared and the crops became alive again. Report this to Varas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(40350, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(79));
 
 		AddObjective("checkCrops", L("Check the nearby crops"), new ManualObjective());
 

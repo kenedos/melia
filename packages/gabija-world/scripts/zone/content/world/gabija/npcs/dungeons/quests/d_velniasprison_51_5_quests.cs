@@ -51,6 +51,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Goddess Vakarine"));
+			dialog.SetPortrait("Dlg_port_vakarine2");
 
 			if (character.Quests.IsActive(Mq01) && character.Quests.IsCompletable(Mq01))
 			{

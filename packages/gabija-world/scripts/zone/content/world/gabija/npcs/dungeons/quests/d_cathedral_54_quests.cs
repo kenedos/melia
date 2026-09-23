@@ -681,7 +681,7 @@ public class Cathedral54Mq02Quest : QuestScript
 		SetClientId(20311);
 		SetName(L("Maven's Device (2)"));
 		SetDescription(L("The bishop has something urgent to say, and he says it at Uola Chapel."));
-		SetType(QuestType.Sub);
+		SetType(QuestType.Main);
 		SetLocation("d_cathedral_54");
 		SetAutoTracked(true);
 		SetCancelable(true);
@@ -957,6 +957,7 @@ public class Cathedral54Mq06Part3Quest : QuestScript
 
 		AddReward(new ItemReward("stonetablet06", 1));
 		AddReward(new ItemReward("expCard8", 3));
+		AddReward(new StatPointReward(3));
 		AddReward(new TakeItemReward("CHATHEDRAL53_MQ03_ITEM", 1));
 	}
 }
@@ -970,7 +971,7 @@ public class CathedralToVelniasprisonQuest : QuestScript
 		SetClientId(50027);
 		SetName(L("To Demon Prison District 1"));
 		SetDescription(L("The Revelation of the Great Cathedral names the Fortress of the Land, and the road to it runs through Gytis."));
-		SetType(QuestType.Sub);
+		SetType(QuestType.Main);
 		SetLocation("d_cathedral_54", "f_farm_47_2");
 		SetAutoTracked(true);
 		SetCancelable(true);

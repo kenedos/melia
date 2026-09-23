@@ -54,6 +54,7 @@ public class Ftower44Mq04Track : TrackScript
 		{
 			case 1:
 				track.Dialog.SetTitle(L("Grita"));
+				track.Dialog.SetPortrait("Dlg_port_Grita");
 				StartDialog(track, L("I will correct the disrupted magic of this tower. I will have to use magic at first, so monsters will rush in. Please protect me."));
 				break;
 			case 43:

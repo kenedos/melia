@@ -33,6 +33,11 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 	protected override void Load()
 	{
+		// The Chapparition, on its gentype anchor in the church
+		//-------------------------------------------------------------------------
+		AddSpawner("d_chapel_57_6.Chapparition", MonsterId.F_Boss_Chapparition, min: 1, max: 1, respawn: Minutes(5));
+		AddSpawnPoint("d_chapel_57_6.Chapparition", "d_chapel_57_6", Rectangle(217.25, 460.63, 40));
+
 		// Follower Vaidutis
 		//-------------------------------------------------------------------------
 		AddNpc(147400, L("Follower Vaidutis"), "CHAPEL_VIRGINIJA", "d_chapel_57_6", 961, -114, 0, async dialog =>
@@ -524,6 +529,8 @@ public class Chaple576Mq04Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Defeat Pawndel and Pawnd"), L("Defeat Pawndel and Pawnd at the Tenet Church 1F."));
 		SetPhase(QuestStatus.Success, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Talk to Follower Vaidutis"), L("Return to Vaidutis."));
 
+		AddPrerequisite(new LevelPrerequisite(34));
+
 		AddObjective("killPawndel", L("Defeat Pawndel"), new KillObjective(15, "Pawndel"));
 		AddObjective("killPawnd", L("Defeat Pawnd"), new KillObjective(15, "pawnd"));
 
@@ -576,6 +583,7 @@ public class Chaple576Mq05Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL576_DONATAS", "d_chapel_57_6", L("Talk to Follower Donatas"), L("Hand the clothes to Follower Donatas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8730, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(34));
 
 		AddPityDrop("CHAPLE576_MQ_05_ITEM", 0.7f, 3, 1, "Pawndel", "pawnd");
 
@@ -605,6 +613,7 @@ public class Chaple576Mq06Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL576_DONATAS", "d_chapel_57_6", L("Talk to Follower Donatas"), L("Return to Follower Donatas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8514, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(34));
 
 		AddObjective("lureDemons", L("Lure Pawndel and Pawnd to the Apsauga Altar"), new ManualObjective());
 
@@ -632,6 +641,7 @@ public class Chaple576Mq07Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL576_DONATAS", "d_chapel_57_6", L("Talk to Follower Donatas"), L("Return to Follower Donatas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8515, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(35));
 
 		AddPityDrop("CHAPLE576_MQ_07_1_ITEM", 0.8f, 3, 1, "pawnd");
 		AddPityDrop("CHAPLE576_MQ_07_2_ITEM", 0.8f, 3, 1, "Pawndel");
@@ -667,6 +677,7 @@ public class Chaple576Mq08Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL576_DONATAS", "d_chapel_57_6", L("Talk to Follower Donatas"), L("Return to Donatas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8451, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(34));
 
 		AddObjective("convertDemons", L("Convert demons at the Globejas Altar"), new ManualObjective());
 
@@ -695,6 +706,7 @@ public class Chaple576Mq09Quest : QuestScript
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "CHAPLE576_MQ_09_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(8730, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(34));
 
 		AddObjective("killMalletWyvern", L("Defeat Mallet Wyvern"), new KillObjective(1, "boss_Malletwyvern") { LayerOnly = true });
 
@@ -721,6 +733,7 @@ public class Chaple576Rp1Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Report back to Follower Vaidutis"), L("Take the orb crystals to Follower Vaidutis."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8525, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(34));
 
 		AddObjective("collectOrbs", L("Collect Orb Crystals"), new ManualObjective());
 

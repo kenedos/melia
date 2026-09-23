@@ -617,7 +617,7 @@ public class Siauliai461Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(16610, QuestStatus.Completed));
 
-		AddObjective("purifyRevelators", L("Purify the addled Revelators"), new KillObjective(5, "npc_dazz_KRV", "npc_dazz_SCT", "npc_dazz_ROD", "npc_dazz_MNK", "npc_dazz_BAR") { LayerOnly = true });
+		AddObjective("purifyRevelators", L("Purify the addled Revelators"), new KillObjective(5, "npc_dazz_KRV", "npc_dazz_SCT", "npc_dazz_ROD", "npc_dazz_MNK", "npc_dazz_BAR"));
 
 		AddReward(new ItemReward("expCard9", 2));
 	}

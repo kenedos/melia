@@ -55,6 +55,7 @@ public class Vprison514Mq01Track : TrackScript
 		{
 			case 79:
 				track.Dialog.SetTitle(L("Goddess Vakarine"));
+				track.Dialog.SetPortrait("Dlg_port_vakarine2");
 				StartDialog(track,
 					L("Aldona, Zydrone..."),
 					L("I'm sorry for being a burden to you both because of my feebleness.")
@@ -63,6 +64,7 @@ public class Vprison514Mq01Track : TrackScript
 
 			case 88:
 				track.Dialog.SetTitle(L("Goddess Vakarine"));
+				track.Dialog.SetPortrait("Dlg_port_vakarine2");
 				StartDialog(track,
 					L("Savior."),
 					L("As you can see, I cannot do anything myself at the moment."),

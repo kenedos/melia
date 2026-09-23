@@ -62,6 +62,7 @@ public class Ftower43Mq01Track : TrackScript
 		{
 			case 7:
 				track.Dialog.SetTitle(L("Antares"));
+				track.Dialog.SetPortrait("Dlg_port_antares");
 				StartDialog(track, L("What? You still try and disturb my experiments? I will not allow this!"));
 				break;
 			case 29:

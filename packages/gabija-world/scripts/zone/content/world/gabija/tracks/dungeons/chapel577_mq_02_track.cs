@@ -44,17 +44,29 @@ public class Chaple577Mq02Track : TrackScript
 			EndPosition = new Position(-623.87f, 35.92f, -981.62f),
 		}));
 		actors.Add(AddTrackActor(character, 152003, 207.31, 164.86, -582.23, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
-		actors.Add(AddTrackActor(character, 41230, -560, 36, -900, 0, new TrackActorSpec { Ai = "BasicBoss" }));
 
 		return actors.ToArray();
+	}
+
+	/// <summary>
+	/// Raises Necroventer beside the central altar.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("DefGroup")
+			.Monster(41230, -44.85, 164.86, -624.79, -40, aggressive: false);
+
+		game.Start("DefGroup");
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
-			case 15:
-				SetTrackTendency(character, track);
+			case 0:
+				StartMinigame(character, track);
 				CreateBattleBoxInLayer(character, track);
 				break;
 		}

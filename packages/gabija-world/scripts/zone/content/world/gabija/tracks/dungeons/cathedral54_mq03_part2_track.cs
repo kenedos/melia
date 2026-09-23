@@ -43,6 +43,7 @@ public class Cathedral54Mq03Part2Track : TrackScript
 		actors.Add(AddTrackActor(character, 57367, -953.48, 3.85, 1024.26, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(character);
 		actors.Add(AddTrackActor(character, 151001, -877.76, 3.85, 992.09, 0, new TrackActorSpec { Ai = "BT_Dummy", Faction = FactionType.Our_Forces, Name = L("Holy Symbol of Spiritual Power") }));
+		actors.Add(AddTrackActor(character, 151033, -1198.61, 3.85, 998.62, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces, Name = L("Bishop Aurelius' Spirit") }));
 
 		return actors.ToArray();
 	}

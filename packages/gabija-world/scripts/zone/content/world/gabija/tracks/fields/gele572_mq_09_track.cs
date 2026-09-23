@@ -40,6 +40,9 @@ public class Gele572Mq09Track : TrackScript
 	{
 		switch (frame)
 		{
+			case 14:
+				character.ServerMessage(L("Defeat Mushcaria and obtain its mane filled with spirits!"));
+				break;
 			case 19:
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);

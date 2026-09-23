@@ -41,6 +41,9 @@ public class Gele574Mq01Track : TrackScript
 			case 14:
 				RemoveTrackActor(character, track, 0);
 				break;
+			case 18:
+				character.ServerMessage(L("Defeat Biteregina!"));
+				break;
 			case 19:
 				RemoveTrackActor(character, track, 0);
 				SetTrackTendency(character, track);

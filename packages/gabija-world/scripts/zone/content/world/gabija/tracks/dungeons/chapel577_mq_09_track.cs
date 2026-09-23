@@ -54,9 +54,16 @@ public class Chaple577Mq09Track : TrackScript
 				StartDialog(track, L("The barrier is up and running."),
 					L("Please deal with Gesti while I activate the Divine Sphere."));
 				break;
+			case 30:
+				character.ServerMessage(L("The Holy Sphere has been activated!"));
+				character.ServerMessage(L("Protect yourself from Gesti while the Divine Sphere is being activated!"));
+				break;
 			case 32:
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
+				break;
+			case 38:
+				character.ServerMessage(L("Oppose Gesti until the Divine Sphere is activated!"));
 				break;
 			case 39:
 				track.Dialog.SetTitle(L("Demon Queen Gesti"));

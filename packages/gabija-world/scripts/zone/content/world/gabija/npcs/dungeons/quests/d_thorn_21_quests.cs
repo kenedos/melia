@@ -242,6 +242,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq09);
+					Thorn21Mq09Quest.CountCutRoots(character);
 					await dialog.Msg(L("The most important roots are at Sviesa Hill Areas and Tankinta Vacant Lot."));
 					await dialog.Msg(L("Cut them both."));
 					return;
@@ -540,6 +541,13 @@ public class Thorn21Mq03Quest : QuestScript
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("misc_NECK03_104_1", 1));
 	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		base.OnComplete(character, quest);
+
+		Thorn21Mq09Quest.CountCutRoots(character);
+	}
 }
 
 // 20271: Capturing Bramble (1)
@@ -598,6 +606,13 @@ public class Thorn21Mq05Quest : QuestScript
 
 		AddReward(new ItemReward("expCard3", 2));
 	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		base.OnComplete(character, quest);
+
+		Thorn21Mq09Quest.CountCutRoots(character);
+	}
 }
 
 // 20273: Purify Kvailas Forest (2)
@@ -648,9 +663,28 @@ public class Thorn21Mq09Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20271, QuestStatus.Completed));
 
-		AddObjective("cutRoots", L("Destroy Bramble's roots"), new KillObjective(2, "npc_bramble_root"));
+		AddObjective("cutRoot1", L("Destroy Bramble's root at Sviesa Hill Areas"), new ManualObjective());
+		AddObjective("cutRoot2", L("Destroy Bramble's root at Tankinta Vacant Lot"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 1));
+	}
+
+	/// <summary>
+	/// Marks off the roots already cut in the root quests of the Sviesa Hill Areas and Tankinta Vacant Lot.
+	/// </summary>
+	/// <param name="character"></param>
+	public static void CountCutRoots(Character character)
+	{
+		var mq09 = new QuestId(20295);
+
+		if (!character.Quests.IsActive(mq09))
+			return;
+
+		if (character.Quests.HasCompleted(new QuestId(20270)))
+			character.Quests.CompleteObjective(mq09, "cutRoot1");
+
+		if (character.Quests.HasCompleted(new QuestId(20272)))
+			character.Quests.CompleteObjective(mq09, "cutRoot2");
 	}
 }
 
@@ -719,6 +753,7 @@ public class Thorn21Mq08Quest : QuestScript
 		AddObjective("takeRevelation", L("Retrieve the revelation"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 1));
+		AddReward(new StatPointReward(3));
 		AddReward(new TakeItemReward("THORN21_MQ07_THORNDRUG", 1));
 	}
 

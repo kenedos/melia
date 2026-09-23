@@ -620,6 +620,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Cannoneer Master"));
+			dialog.SetPortrait("Dlg_port_EdaSakerBarazas");
 
 			if (character.Quests.IsActive(Cannoneer7) && character.Quests.IsCompletable(Cannoneer7))
 			{
@@ -694,6 +695,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Musketeer Master"));
+			dialog.SetPortrait("Dlg_port_AlothenMazarin");
 
 			if (character.Quests.IsActive(Musketeer7) && character.Quests.IsCompletable(Musketeer7))
 			{
@@ -768,6 +770,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Murmillo Master"));
+			dialog.SetPortrait("Dlg_port_Feliksia");
 
 			if (character.Quests.IsActive(Murmillo8) && character.Quests.IsCompletable(Murmillo8))
 			{
@@ -839,6 +842,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Lancer Master"));
+			dialog.SetPortrait("Dlg_port_NoirParesseus");
 
 			if (character.Quests.IsActive(Lancer8) && character.Quests.IsCompletable(Lancer8))
 			{
@@ -1611,7 +1615,6 @@ public class Underfortress67Hq1Quest : QuestScript
 
 		AddReward(new ItemReward("COLLECT_308", 1));
 		AddReward(new ItemReward("misc_scrollskulp", 1));
-		AddReward(new TakeItemReward("UNDER67_HIDDENQ1_ITEM1"));
 	}
 }
 
@@ -1667,6 +1670,7 @@ public class JobLancer81Quest : QuestScript
 		AddObjective("findTraces", L("Find the traces of the Order of the Tree of Truth"), new CollectItemObjective("JOB_LANCER_8_1_ITEM", 1));
 
 		AddReward(new ItemReward("COLLECT_308", 1));
+		AddReward(new TakeItemReward("JOB_LANCER_8_1_ITEM"));
 	}
 }
 
@@ -1748,7 +1752,7 @@ public class JobMusketeer81Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(285));
 
-		AddObjective("hitThePoles", L("Hit the practice pole of Musketeer at right times"), new KillObjective(3, "Monster_wood_carving") { LayerOnly = true });
+		AddObjective("hitThePoles", L("Hit the practice pole of Musketeer at right times"), new KillObjective(3, "Monster_wood_carving"));
 
 		AddReward(new ItemReward("COLLECT_308", 1));
 	}

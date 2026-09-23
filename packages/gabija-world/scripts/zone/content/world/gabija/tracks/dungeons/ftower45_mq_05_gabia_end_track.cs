@@ -51,6 +51,7 @@ public class Ftower45Mq05GabiaEndTrack : TrackScript
 		{
 			case 35:
 				track.Dialog.SetTitle(L("Goddess Gabija"));
+				track.Dialog.SetPortrait("Dlg_port_gabija");
 				StartDialog(track, L("Savior... Laima told us that she had dreamt about the collapse of the world. And among many Revelators, one Savior would save everyone."));
 				break;
 			case 52:
@@ -71,10 +72,12 @@ public class Ftower45Mq05GabiaEndTrack : TrackScript
 				break;
 			case 119:
 				track.Dialog.SetTitle(L("Goddess Gabija"));
+				track.Dialog.SetPortrait("Dlg_port_gabija");
 				StartDialog(track, L("This too is my ordeal and duty which Laima foresaw... I will tell you Laima's message."));
 				break;
 			case 132:
 				track.Dialog.SetTitle(L("Goddess Laima"));
+				track.Dialog.SetPortrait("Dlg_port_Raima");
 				StartDialog(track, L("I hope this revelation will reach you under the blessings of fire... I'll begin by trying to foresee the disasters that will occur in your time."));
 				break;
 			case 139:

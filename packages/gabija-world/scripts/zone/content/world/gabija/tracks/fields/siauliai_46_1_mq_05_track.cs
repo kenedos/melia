@@ -43,6 +43,7 @@ public class Siauliai461Mq05Track : TrackScript
 		{
 			case 24:
 				track.Dialog.SetTitle(L("Goddess Austeja"));
+				track.Dialog.SetPortrait("Dlg_port_Austeja2");
 				StartDialog(track,
 					L("I thank you again in the name of all fate."),
 					L("From here on, I will follow the stars to find Goddess Ausrine.")

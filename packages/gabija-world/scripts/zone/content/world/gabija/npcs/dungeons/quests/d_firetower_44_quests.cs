@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
@@ -572,6 +573,13 @@ public class Ftower44Mq01Quest : QuestScript
 		AddObjective("watchTheJewel", L("Defeat monsters and watch the state of the Jewel of Prominence"), new KillObjective(12, "new_desmodus_black", "wizards_marmotte", "flask", "minivern"));
 
 		AddReward(new ItemReward("expCard7", 1));
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		base.OnComplete(character, quest);
+
+		character.StopBuff(BuffId.FTOWER44_MQ_01);
 	}
 }
 

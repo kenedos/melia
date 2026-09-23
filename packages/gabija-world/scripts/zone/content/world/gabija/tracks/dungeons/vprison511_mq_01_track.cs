@@ -44,6 +44,7 @@ public class Vprison511Mq01Track : TrackScript
 		{
 			case 0:
 				track.Dialog.SetTitle(L("Demon Lord Hauberk"));
+				track.Dialog.SetPortrait("Dlg_port_Hauberk_dark");
 				StartDialog(track, L("You shouldn't trust anyone here. Not the goddess and not even yourself."));
 				break;
 

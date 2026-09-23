@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -26,8 +27,8 @@ public class Cathedral56Sq03Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		// The desk itself stands on the map and is not spawned again here.
 		actors.Add(AddTrackActor(character, 41232, -2109.80, 0.50, -434.57, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 47254, -2114.78, 0, -427.79, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces, Name = L("Cathedral Desk") }));
 
 		return actors.ToArray();
 	}
@@ -37,6 +38,8 @@ public class Cathedral56Sq03Track : TrackScript
 		switch (frame)
 		{
 			case 14:
+				// The desk the Linkroller breaks out of.
+				RemoveTrackActor(character, track, 1);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				character.ServerMessage(L("Defeat the Linkroller that was hiding as one of Maven's secrets!"));

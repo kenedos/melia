@@ -43,6 +43,7 @@ public class Underfortress69Mq060Track : TrackScript
 		{
 			case 59:
 				track.Dialog.SetTitle(L("Goddess Laima"));
+				track.Dialog.SetPortrait("Dlg_port_Raima");
 				StartDialog(track,
 					L("Saviors, who followed all the way here by having faith in the revelation."),
 					L("You are gradually getting closer to the truth.")

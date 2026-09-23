@@ -58,6 +58,7 @@ public class DUnderfortress68QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Old Manager"));
+			dialog.SetPortrait("Dlg_port_Premier_Eminent");
 
 			if (character.Quests.IsActive(Mq010) && character.Quests.IsCompletable(Mq010))
 			{

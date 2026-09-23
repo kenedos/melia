@@ -30,8 +30,8 @@ public class Cathedral56Sq01Track : TrackScript
 
 		character.Movement.MoveTo(new Position(-1536.97f, 0.50f, 336.37f));
 
-		// The door itself stands on the map and is not spawned again here.
 		actors.Add(AddTrackActor(character, 41351, -1535.55, 0.50, 64.64, 264, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(-1520.31f, 0.50f, 186.20f) }));
+		actors.Add(AddTrackActor(character, 153012, -1527.70, 0.49, 469.50, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces }));
 		actors.Add(character);
 		actors.Add(AddTrackActor(character, 20025, -1704.89, 0.50, 111.51, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 20025, -1406.62, 0.50, 4.62, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));

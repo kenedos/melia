@@ -46,6 +46,7 @@ public class Vprison513Mq05Track : TrackScript
 		{
 			case 18:
 				track.Dialog.SetTitle(L("Demon Lord Hauberk"));
+				track.Dialog.SetPortrait("Dlg_port_Hauberk");
 				StartDialog(track,
 					L("From the beginning, all of you were the same..."),
 					L("I have been fooled.")
@@ -54,6 +55,7 @@ public class Vprison513Mq05Track : TrackScript
 
 			case 46:
 				track.Dialog.SetTitle(L("Demon Lord Hauberk"));
+				track.Dialog.SetPortrait("Dlg_port_Hauberk");
 				StartDialog(track, L("My soul is mine, only mine!"));
 				break;
 

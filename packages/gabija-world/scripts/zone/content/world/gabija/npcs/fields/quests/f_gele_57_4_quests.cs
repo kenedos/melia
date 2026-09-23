@@ -482,6 +482,8 @@ public class Gele574Mq01Quest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE574_MQ_01_TRACK", 4000, autoStart: false, partyPlay: true);
 
+		AddPrerequisite(new LevelPrerequisite(25));
+
 		AddObjective("killBiteregina", L("Defeat Biteregina"), new KillObjective(1, "boss_BiteRegina_Q3") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard3", 2));
@@ -505,6 +507,8 @@ public class Gele574Mq02Quest : QuestScript
 		SetPhase(QuestStatus.Possible, "GELE574_ERRA", "f_gele_57_4", L("Talk to Watcher Erra"), L("Watcher Erra in Tenet Garden is waiting for someone's help."));
 		SetPhase(QuestStatus.InProgress, "GELE574_ERRA", "f_gele_57_4", L("Defeat Seedmia"), L("Defeat the Seedmias and return to Erra."));
 		SetPhase(QuestStatus.Success, "GELE574_ERRA", "f_gele_57_4", L("Talk to Watcher Erra"), L("Inform Erra that the Seedmias are dealt with."));
+
+		AddPrerequisite(new LevelPrerequisite(25));
 
 		AddObjective("killSeedmia", L("Defeat Seedmia"), new KillObjective(8, "seedmia"));
 
@@ -531,6 +535,8 @@ public class Gele574Mq03Quest : QuestScript
 		SetPhase(QuestStatus.Success, "GELE574_ERRA", "f_gele_57_4", L("Talk to Watcher Erra"), L("Return to Watcher Erra."));
 
 		AddPityDrop("GELE574_MQ_03_ITEM", 1.0f, 0, 1, "Mallardu");
+
+		AddPrerequisite(new LevelPrerequisite(25));
 
 		AddObjective("collectFat", L("Obtain Mallardu Fat"), new CollectItemObjective("GELE574_MQ_03_ITEM", 10));
 
@@ -560,6 +566,7 @@ public class Gele574Mq04Quest : QuestScript
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE574_MQ_04_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(8603, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(25));
 
 		AddObjective("extractSap", L("Extract Spiritually Enchanted Sap from Nepenthes"), new ManualObjective());
 
@@ -587,6 +594,8 @@ public class Gele574Mq05Quest : QuestScript
 		SetPhase(QuestStatus.Possible, "GELE574_REIKE", "f_gele_57_4", L("Talk to Watcher Rikke"), L("Watcher Rikke of Tenet Garden is waiting for someone's help."));
 		SetPhase(QuestStatus.InProgress, "GELE574_REIKE", "f_gele_57_4", L("Brainwash the Pantos"), L("Use the charm on the Pantos in Levanda Habitat."));
 		SetPhase(QuestStatus.Success, "GELE574_REIKE", "f_gele_57_4", L("Talk to Watcher Rikke"), L("Tell Rikke the brainwashed Pantos still attack the caster."));
+
+		AddPrerequisite(new LevelPrerequisite(25));
 
 		AddObjective("charmPantos", L("Brainwash the Pantos"), new ManualObjective());
 
@@ -616,6 +625,7 @@ public class Gele574Mq06Quest : QuestScript
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE574_MQ_06_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(8605, QuestStatus.Completed));
+		AddPrerequisite(new LevelPrerequisite(25));
 
 		AddObjective("controlPantos", L("Control the Pantos and defeat the Large Panto Spearmen"), new ManualObjective());
 
@@ -642,6 +652,8 @@ public class Gele574Mq07Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE574_ADRIJA", "f_gele_57_4", L("Defeat demons"), L("Defeat the demons along the way to the Temple Courtyard."));
 		SetPhase(QuestStatus.Success, "GELE574_ADRIJA", "f_gele_57_4", L("Talk to Follower Alfonsas"), L("Return to Follower Alfonsas."));
 
+		AddPrerequisite(new LevelPrerequisite(25));
+
 		AddObjective("killDemons", L("Defeat demons"), new KillObjective(12, "zombiegirl2_brown", "Colifly_bow"));
 
 		AddReward(new ItemReward("expCard3", 1));
@@ -665,6 +677,8 @@ public class Gele574Mq08Quest : QuestScript
 		SetPhase(QuestStatus.Possible, "GELE574_ADRIJA", "f_gele_57_4", L("Talk to Follower Alfonsas"), L("Follower Alfonsas of Tenet Garden is waiting for someone's help."));
 		SetPhase(QuestStatus.InProgress, "GELE574_MQ_08", "f_gele_57_4", L("Write over the Demon Summoning Circles"), L("Scribble over the demon summoning circles."));
 		SetPhase(QuestStatus.Success, "GELE574_ADRIJA", "f_gele_57_4", L("Talk to Follower Alfonsas"), L("Tell Follower Alfonsas the summoned demons were absorbed back."));
+
+		AddPrerequisite(new LevelPrerequisite(25));
 
 		AddObjective("scribbleCircle", L("Write over the Demon Summoning Circles"), new ManualObjective());
 

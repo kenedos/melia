@@ -418,10 +418,9 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 				if (lit != TimeActionResult.Completed)
 					return;
 
-				character.Inventory.RemoveItem(ItemId.ZACHA2F_SQ_03_ITEM, MagicSourcesNeeded);
-				character.Quests.CompleteObjective(Sq04, "lightLantern");
-
-				await dialog.Msg(L("The sources go in one by one and the lantern takes the fire."));
+				character.ServerMessage(L("The sources go in one by one and the lantern takes the fire."));
+				character.Quests.ClearQuestTrack(Sq04);
+				character.Quests.StartQuestTrack(Sq04);
 				return;
 			}
 
@@ -620,7 +619,7 @@ public class Zacha2fMq02Quest : QuestScript
 
 		// The client runs this phase as a protect-the-lantern minigame; the port
 		// makes it the guardian that attacks them.
-		AddObjective("killGuardian", L("Put down the guardian attacking the lanterns"), new KillObjective(1, "zachariel_guardian") { LayerOnly = true });
+		AddObjective("killGuardian", L("Put down the guardian attacking the lanterns"), new KillObjective(1, "zachariel_guardian"));
 
 		AddReward(new ItemReward("expCard5", 2));
 	}
@@ -832,11 +831,14 @@ public class Zacha2fSq04Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "ZACHA2F_SQ_04", "d_zachariel_33", L("Light up the stone lantern"), L("Restore magical power by reigniting the stone lantern of the Royal Mausoleum."));
 		SetPhase(QuestStatus.Success, "ZACHA2F_SQ_04", "d_zachariel_33", L("Light up the stone lantern"), L("Restore magical power by reigniting the stone lantern of the Royal Mausoleum."));
 
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "ZACHA2F_SQ_04_TRACK", 4000, autoStart: false, partyPlay: true);
+
 		AddPrerequisite(new QuestStatusPrerequisite(8435, QuestStatus.Completed));
 
 		AddObjective("lightLantern", L("Light up the stone lantern"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard5", 2));
+		AddReward(new TakeItemReward("ZACHA2F_SQ_03_ITEM", 8));
 	}
 
 	public override void OnSuccess(Character character, Quest quest)
@@ -871,7 +873,7 @@ public class Zacha2fSq05Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8436, QuestStatus.Completed));
 
-		AddObjective("clearVessels", L("Defeat the Guardians near the Magic Vessels"), new KillObjective(7, "Tombsinker", "Karas") { LayerOnly = true });
+		AddObjective("clearVessels", L("Defeat the Guardians near the Magic Vessels"), new KillObjective(7, "Tombsinker", "Karas"));
 
 		AddReward(new ItemReward("expCard5", 2));
 	}

@@ -896,7 +896,7 @@ public class Rokas29Mq2BridgeQuest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "ROKAS29_MQ2_TRACK", 4000, autoStart: false, partyPlay: true);
 
-		AddObjective("killGuardians", L("Defeat the monsters near the epitaph"), new KillObjective(5, "Zinute_Big", "zinutekas") { LayerOnly = true });
+		AddObjective("killGuardians", L("Defeat the monsters near the epitaph"), new KillObjective(5, "Zinute_Big", "zinutekas", "zinutekas_Q1") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard5", 1));
 	}
@@ -981,7 +981,7 @@ public class Rokas29Mq4BridgeQuest : QuestScript
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "ROKAS29_MQ4_TRACK", 4000, autoStart: false, partyPlay: true);
 
-		AddObjective("killZinutekas", L("Defeat Zinutekas"), new KillObjective(7, "zinutekas") { LayerOnly = true });
+		AddObjective("killZinutekas", L("Defeat Zinutekas"), new KillObjective(7, "zinutekas", "zinutekas_Q1") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard5", 1));
 		AddReward(new ItemReward("ROKAS29_SLATE4", 1));

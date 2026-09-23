@@ -47,6 +47,82 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 	private readonly static string[] KeyOrbs = { "Red", "Blue", "Yellow", "Green", "Purple" };
 
+	/// <summary>
+	/// Dialog of the Secret Statue, on the map and inside its puzzle track.
+	/// </summary>
+	/// <param name="dialog"></param>
+	/// <returns></returns>
+	public static async Task SecretStatueDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+
+		dialog.SetTitle(L("Secret Statue"));
+
+		if (character.Quests.IsActive(Mq05) && character.Quests.IsCompletable(Mq05))
+		{
+			dialog.SetTitle(L("Maven's Message"));
+
+			await dialog.Msg(L("I am glad that my life's masterpiece has protected the revelation well."));
+			await dialog.Msg(L("But, yours and my mission is not over yet. Savior, please open the door to Pasala Altar."));
+			await dialog.Msg(L("If you really wish to obtain the revelation of the goddess, you will receive it at the end..."));
+			await dialog.CompleteQuest(Mq05);
+			character.ServerMessage(L("Acquired Maven's key!"));
+			character.LookAround();
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq05))
+		{
+			await dialog.Msg(L("Four candlesticks stand around the statue, and the order matters as much as the number."));
+
+			var lit = await character.TimeActions.StartAsync(L("Lighting the candles in order..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
+
+			if (lit != TimeActionResult.Completed)
+				return;
+
+			character.Quests.CompleteObjective(Mq05, "solveSecret");
+			character.ServerMessage(L("The candles burn in Maven's order and the statue turns."));
+			return;
+		}
+
+		await dialog.Msg(L("A statue with a secret behind it, and it is not telling."));
+	}
+
+	/// <summary>
+	/// Dialog of a barrier candlestick, on the map and inside the sealed door's track.
+	/// </summary>
+	/// <param name="dialog"></param>
+	/// <param name="number"></param>
+	/// <returns></returns>
+	public static async Task BarrierCandleDialog(Dialog dialog, int number)
+	{
+		var character = dialog.Player;
+
+		dialog.SetTitle(L("Barrier Candlestick"));
+
+		if (character.Variables.Perm.GetBool(CandleVar + number, false))
+		{
+			await dialog.Msg(L("{#666666}*This candle is already out*{/}"));
+			return;
+		}
+
+		var blown = await character.TimeActions.StartAsync(L("Blowing the candle out..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (blown != TimeActionResult.Completed)
+			return;
+
+		character.Variables.Perm.Set(CandleVar + number, true);
+
+		if (!character.Variables.Perm.GetBool(CandleVar + 1, false) || !character.Variables.Perm.GetBool(CandleVar + 2, false))
+		{
+			character.ServerMessage(L("One candle is out. The barrier still holds on the other."));
+			return;
+		}
+
+		character.Quests.CompleteObjective(Mq07, "openTheDoor");
+		character.ServerMessage(L("Both candles are out and the sealed door has opened."));
+	}
+
 	protected override void Load()
 	{
 		// Bishop Aurelius' Spirit, at the Sanctuary entrance
@@ -170,41 +246,7 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 		// Secret Statue of the Small Reception Room
 		//-------------------------------------------------------------------------
-		AddNpc(153017, L("Secret Statue"), "CHATHEDRAL56_MQ05_PUZZLE", "d_cathedral_56", -222.93, -1280.34, 135, async dialog =>
-		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Secret Statue"));
-
-			if (character.Quests.IsActive(Mq05) && character.Quests.IsCompletable(Mq05))
-			{
-				dialog.SetTitle(L("Maven's Message"));
-
-				await dialog.Msg(L("I am glad that my life's masterpiece has protected the revelation well."));
-				await dialog.Msg(L("But, yours and my mission is not over yet. Savior, please open the door to Pasala Altar."));
-				await dialog.Msg(L("If you really wish to obtain the revelation of the goddess, you will receive it at the end..."));
-				await dialog.CompleteQuest(Mq05);
-				character.ServerMessage(L("Acquired Maven's key!"));
-				character.LookAround();
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05))
-			{
-				await dialog.Msg(L("Four candlesticks stand around the statue, and the order matters as much as the number."));
-
-				var lit = await character.TimeActions.StartAsync(L("Lighting the candles in order..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
-
-				if (lit != TimeActionResult.Completed)
-					return;
-
-				character.Quests.CompleteObjective(Mq05, "solveSecret");
-				character.ServerMessage(L("The candles burn in Maven's order and the statue turns."));
-				return;
-			}
-
-			await dialog.Msg(L("A statue with a secret behind it, and it is not telling."));
-		});
+		AddNpc(153017, L("Secret Statue"), "CHATHEDRAL56_MQ05_PUZZLE", "d_cathedral_56", -222.93, -1280.34, 135, SecretStatueDialog);
 
 		// The last secret is staged when the Small Reception Room is reached.
 		AddQuestTrigger("CHATHEDRAL56_MQ05_ARRIVE", "d_cathedral_56", -216.44, -1202.18, 200, async args =>
@@ -222,6 +264,18 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		this.AddBarrierCandle(1, -2093.69, -609.01);
 		this.AddBarrierCandle(2, -2096.10, -372.86);
+
+		// The sealed door's barrier is staged when the gallery is reached.
+		AddQuestTrigger("CHATHEDRAL56_MQ07_ARRIVE", "d_cathedral_56", -2052.06, -496.88, 200, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
+				character.Quests.StartQuestTrack(Mq07);
+
+			await Task.CompletedTask;
+		});
 
 		// The five orbs of Pasala Altar
 		//-------------------------------------------------------------------------
@@ -310,7 +364,9 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("There are many who trample on this sacred place."));
 				await dialog.Msg(L("I can't forgive them."));
 				await dialog.CompleteQuest(Sq04);
-				character.StartBuff(BuffId.CHATHEDRAL56_SQ04_HEAL, 1, 1, TimeSpan.FromMinutes(5), character);
+
+				if (character.Quests.HasCompleted(Sq04))
+					character.StartBuff(BuffId.CHATHEDRAL56_SQ04_HEAL, 1, 1, TimeSpan.FromMinutes(5), character);
 				return;
 			}
 
@@ -741,34 +797,7 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 	/// <param name="z"></param>
 	private void AddBarrierCandle(int number, double x, double z)
 	{
-		AddConditionalNpc(147358, L("Barrier Candlestick"), "CHATHEDRAL56_MQ07_HINT0" + number, "d_cathedral_56", x, z, 90, c => c.Quests.IsActive(Mq07), async dialog =>
-		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Barrier Candlestick"));
-
-			if (character.Variables.Perm.GetBool(CandleVar + number, false))
-			{
-				await dialog.Msg(L("{#666666}*This candle is already out*{/}"));
-				return;
-			}
-
-			var blown = await character.TimeActions.StartAsync(L("Blowing the candle out..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
-
-			if (blown != TimeActionResult.Completed)
-				return;
-
-			character.Variables.Perm.Set(CandleVar + number, true);
-
-			if (!character.Variables.Perm.GetBool(CandleVar + 1, false) || !character.Variables.Perm.GetBool(CandleVar + 2, false))
-			{
-				character.ServerMessage(L("One candle is out. The barrier still holds on the other."));
-				return;
-			}
-
-			character.Quests.CompleteObjective(Mq07, "openTheDoor");
-			character.ServerMessage(L("Both candles are out and the sealed door has opened."));
-		});
+		AddConditionalNpc(147358, L("Barrier Candlestick"), "CHATHEDRAL56_MQ07_HINT0" + number, "d_cathedral_56", x, z, 90, c => c.Quests.IsActive(Mq07), dialog => BarrierCandleDialog(dialog, number));
 	}
 
 	/// <summary>
@@ -1057,8 +1086,8 @@ public class Cathedral56Mq07Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "CHATHEDRAL56_MQ07_HINT01", "d_cathedral_56", L("Look for a way to open the sealed door"), L("Look for a way to open the sealed door."));
 		SetPhase(QuestStatus.Success, "CHATHEDRAL56_MQ07_HINT01", "d_cathedral_56", L("Go inside"), L("The sealed door is opened. Go inside."));
 
-		// The client's track is the candle minigame, which has no server-side
-		// equivalent; the candlesticks stand on the map instead.
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "CHATHEDRAL56_MQ07_TRACK", 4000, autoStart: false, partyPlay: true);
+
 		AddPrerequisite(new QuestStatusPrerequisite(20334, QuestStatus.Completed));
 
 		AddObjective("openTheDoor", L("Look for a way to open the sealed door"), new ManualObjective());
@@ -1070,6 +1099,9 @@ public class Cathedral56Mq07Quest : QuestScript
 
 		// The client names no turn-in NPC and chains straight on to the orbs.
 		character.Quests.Complete(this.QuestId);
+
+		if (!character.Quests.Has(new QuestId(20336)))
+			character.Quests.Start(new QuestId(20336));
 	}
 }
 

@@ -1,14 +1,10 @@
-local QuestMaskIcons = {
-	"I_quest_mask_possible", "I_quest_mask_possible_sub", "I_quest_mask_possible_repeat",
-	"I_quest_mask_possible_period", "I_quest_mask_possible_party", "I_quest_mask_possible_key",
-	"I_quest_mask_possible_key_old",
-	"I_quest_mask_progress", "I_quest_mask_progress_sub", "I_quest_mask_progress_repeat",
-	"I_quest_mask_progress_period", "I_quest_mask_progress_party", "I_quest_mask_progress_key",
-	"I_quest_mask_progress_key_old",
-	"I_quest_mask_success", "I_quest_mask_success_sub", "I_quest_mask_success_repeat",
-	"I_quest_mask_success_period", "I_quest_mask_success_party", "I_quest_mask_success_key",
-	"I_quest_mask_success_key_old",
-}
+local QuestMaskIcons = {}
+
+for _, state in ipairs({ "possible", "progress", "success" }) do
+	for _, kind in ipairs({ "", "_sub", "_repeat", "_period", "_party", "_key", "_key_old" }) do
+		QuestMaskIcons[#QuestMaskIcons + 1] = "I_quest_mask_" .. state .. kind
+	end
+end
 
 local function DetachQuestMasks(actor)
 	for i = 1, #QuestMaskIcons do

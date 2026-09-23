@@ -427,12 +427,19 @@ namespace Melia.Zone.Scripting
 			this.TrackData.PartyPlay = partyPlay;
 		}
 
-		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, string effectName)
+		/// <summary>
+		/// Sets a track for the quest that plays the given effect when it starts.
+		/// </summary>
+		/// <param name="onTrackStart">Status the track starts on.</param>
+		/// <param name="onTrackEnd">Status the track ends on.</param>
+		/// <param name="track">Name of the track to play.</param>
+		/// <param name="effectName">Effect played as the track starts.</param>
+		/// <param name="trackStartDelay">Delay in milliseconds before the track starts.</param>
+		/// <param name="autoStart">Whether reaching the start status plays the track by itself.</param>
+		/// <param name="partyPlay">Whether party members share one layer for the track.</param>
+		protected void SetTrack(QuestStatus onTrackStart, QuestStatus onTrackEnd, string track, string effectName, int trackStartDelay = 0, bool autoStart = true, bool partyPlay = false)
 		{
-			this.TrackData.QuestId = (int)this.QuestId.Value;
-			this.TrackData.TrackName = track;
-			this.TrackData.OnTrackStart = onTrackStart;
-			this.TrackData.OnTrackEnd = onTrackEnd;
+			this.SetTrack(onTrackStart, onTrackEnd, track, trackStartDelay, autoStart, partyPlay);
 			this.TrackData.EffectName = effectName;
 		}
 

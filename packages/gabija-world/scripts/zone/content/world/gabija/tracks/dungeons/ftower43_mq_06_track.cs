@@ -44,6 +44,7 @@ public class Ftower43Mq06Track : TrackScript
 		{
 			case 5:
 				track.Dialog.SetTitle(L("Antares"));
+				track.Dialog.SetPortrait("Dlg_port_antares");
 				StartDialog(track, L("When I release this valve, my grand experiment will be complete and you'll see a most spectacular sight!"));
 				break;
 			case 28:

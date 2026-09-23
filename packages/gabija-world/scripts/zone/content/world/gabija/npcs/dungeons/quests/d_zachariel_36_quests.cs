@@ -196,10 +196,9 @@ public class DZachariel36QuestNpcsScript : GeneralScript
 				if (placed != TimeActionResult.Completed)
 					return;
 
-				character.Inventory.RemoveItem(ItemId.ZACHA5F_MQ03_POT, 1);
-				character.Quests.CompleteObjective(Mq03, "placePot");
-
-				await dialog.Msg(L("The jar settles into the setting, and the will of the mausoleum begins to fill it."));
+				character.ServerMessage(L("The jar settles into the setting, and the will of the mausoleum begins to fill it."));
+				character.Quests.ClearQuestTrack(Mq03);
+				character.Quests.StartQuestTrack(Mq03);
 				return;
 			}
 
@@ -609,12 +608,15 @@ public class Zacha5fMq03Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "ZACHA5F_MQ_03", "d_zachariel_36", L("Place the Soul Pot"), L("Set the soul pot where the will of the Royal Mausoleum can fill it."));
 		SetPhase(QuestStatus.Success, "ZACHARIEL_GUARDIAN", "d_zachariel_36", L("Talk to the Secret Guardian"), L("The soul pot is set. Talk to the Secret Guardian."));
 
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "ZACHA5F_MQ_03_TRACK", 4000, autoStart: false, partyPlay: true);
+
 		AddPrerequisite(new QuestStatusPrerequisite(8389, QuestStatus.Completed));
 
 		AddObjective("placePot", L("Place the Soul Pot"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard6", 2));
 		AddReward(new ItemReward("ZACHA5F_MQ03_POT", 1));
+		AddReward(new TakeItemReward("ZACHA5F_MQ03_POT", 1));
 	}
 }
 
@@ -640,7 +642,7 @@ public class Zacha5fMq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8390, QuestStatus.Completed));
 
-		AddObjective("killRexipher", L("Defeat Rexipher"), new KillObjective(1, "boss_lecifer") { LayerOnly = true });
+		AddObjective("killRexipher", L("Defeat Rexipher"), new KillObjective(1, "boss_lecifer"));
 
 		AddReward(new ItemReward("expCard6", 3));
 		AddReward(new TakeItemReward("ZACHA5F_MQ03_POT", 1));
@@ -683,6 +685,7 @@ public class Zacha5fMq05Quest : QuestScript
 		AddReward(new ItemReward("expCard6", 3));
 		AddReward(new ItemReward("stonetablet04", 1));
 		AddReward(new ItemReward("COLLECT_117", 1));
+		AddReward(new StatPointReward(3));
 	}
 
 	public override void OnSuccess(Character character, Quest quest)

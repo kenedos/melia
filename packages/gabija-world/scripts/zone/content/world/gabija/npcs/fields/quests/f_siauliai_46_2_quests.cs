@@ -272,6 +272,7 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Goddess Austeja"));
+			dialog.SetPortrait("Dlg_port_Austeja2");
 
 			if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
 			{
@@ -871,6 +872,7 @@ public class Siauliai462Mq05Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI_46_2_AUSTEJA", "f_siauliai_46_2", L("Listen to Goddess Austeja's story"), L("Goddess Austeja told you that everything that is occurring at the apiary is the act of the demons that are trying to release the seal that is placed upon the Demon Lord."));
+		SetPhase(QuestStatus.InProgress, "SIAULIAI_46_2_AUSTEJA", "f_siauliai_46_2", L("Listen to Goddess Austeja's story"), L("Goddess Austeja told you that everything that is occurring at the apiary is the act of the demons that are trying to release the seal that is placed upon the Demon Lord."));
 		SetPhase(QuestStatus.Success, "SIAULIAI_46_2_AUSTEJA", "f_siauliai_46_2", L("Listen to Goddess Austeja's story"), L("Goddess Austeja told you that everything that is occurring at the apiary is the act of the demons that are trying to release the seal that is placed upon the Demon Lord."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(16430, QuestStatus.Completed));

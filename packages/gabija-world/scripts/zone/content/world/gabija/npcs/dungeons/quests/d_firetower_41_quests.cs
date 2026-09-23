@@ -671,7 +671,7 @@ public class Ftower41Sq06Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "FTOWER41_MQ_05", "d_firetower_41", L("Defeat Salamander"), L("The Salamander suddenly disappeared as you tried to inspect the Barrier Activation Device."));
 		SetPhase(QuestStatus.Success, "FTOWER41_MQ_05", "d_firetower_41", L("Defeat Salamander"), L("The Salamander suddenly disappeared as you tried to inspect the Barrier Activation Device."));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER41_SQ_06_TRACK", "m_boss_a");
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "FTOWER41_SQ_06_TRACK", "m_boss_a", 4000, partyPlay: true);
 
 		AddPrerequisite(new LevelPrerequisite(103));
 
@@ -797,6 +797,7 @@ public class Ftower41Sq04Quest : QuestScript
 
 		AddReward(new ItemReward("expCard7", 1));
 		AddReward(new TakeItemReward("FTOWER41_SQ_04_01"));
+		AddReward(new TakeItemReward("FTOWER41_SQ_03_SUB"));
 	}
 }
 
