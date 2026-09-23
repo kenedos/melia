@@ -30,9 +30,9 @@ public class SiaulEastReclaim7Track : TrackScript
 		character.Movement.MoveTo(new Position(470.5879f, 130.0327f, -867.5151f));
 		actors.Add(character);
 
-		actors.Add(AddTrackActor(character, 41280, 432.6587, 143.9776, -773.5017, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 41280, 429.99, 143.9776, -775.36, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 41280, 401.2621, 143.9776, -793.3062, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 41280, 492.1505, 130.0327, -801.9854, 54, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 41280, 461.43, 130.0327, -820.55, 54, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 41280, 424.5429, 143.9776, -831.7863, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 41280, 444.0817, 130.0327, -916.475, 0, new TrackActorSpec { Ai = "TrackWaitMonster", EndPosition = new Position(458.43521f, 130.03270f, -891.92999f) }));
 

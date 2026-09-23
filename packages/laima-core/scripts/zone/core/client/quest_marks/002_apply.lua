@@ -1,17 +1,3 @@
-local QuestMaskIcons = {}
-
-for _, state in ipairs({ "possible", "progress", "success" }) do
-	for _, kind in ipairs({ "", "_sub", "_repeat", "_period", "_party", "_key", "_key_old" }) do
-		QuestMaskIcons[#QuestMaskIcons + 1] = "I_quest_mask_" .. state .. kind
-	end
-end
-
-local function DetachQuestMasks(actor)
-	for i = 1, #QuestMaskIcons do
-		effect.DetachActorEffect(actor, QuestMaskIcons[i], 0)
-	end
-end
-
 function M_QUESTMARKS_RESET(resets)
 	if resets == nil then
 		return
@@ -62,7 +48,7 @@ function M_QUESTMARKS_APPLY(force)
 			local actor = world.GetActor(mark.Handle)
 
 			if actor ~= nil then
-				DetachQuestMasks(actor)
+				M_QUESTMARKS_DETACH_MASKS(actor)
 
 				local pos = actor:GetPos()
 				effect.AddActorEffect(actor, icon, Melia.QuestMarks.Scale, pos.x, pos.y + Melia.QuestMarks.Height, pos.z, -1)

@@ -18,6 +18,6 @@ public class DLimestonecave521NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(1000, 147392, "Lv1 Treasure Chest", "d_limestonecave_52_1", -318.91, -9.75, -990.9, 90, "TREASUREBOX_LV_D_LIMESTONECAVE_52_11000", "", "");
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "d_limestonecave_52_1", -318.68, -9.75, -987.27, 90, "TREASUREBOX_LV_D_LIMESTONECAVE_52_11000", "", "");
 	}
 }

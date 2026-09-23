@@ -16,7 +16,7 @@ public class FSiauliai474NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(34, 147392, "Lv1 Treasure Chest", "f_siauliai_47_4", 2146.31, 210.09, -767.64, 90, "TREASUREBOX_LV_F_SIAULIAI_47_434", "", "");
+		AddNpc(34, 147392, "Lv1 Treasure Chest", "f_siauliai_47_4", 2150.48, 210.09, -764.75, 90, "TREASUREBOX_LV_F_SIAULIAI_47_434", "", "");
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------

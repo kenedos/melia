@@ -146,18 +146,6 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("The Entrance Purifier hums steadily."));
 		});
 
-		// Entrance Purifier Parts
-		//-------------------------------------------------------------------------
-		AddNpc(151015, L("Entrance Purifier Parts"), "MINE_1_CRYSTAL_4", "d_cmine_01", -1036, -1461, 90, async dialog =>
-		{
-			await TakePurifierPart(dialog);
-		});
-
-		AddNpc(151015, L("Entrance Purifier Parts"), "MINE_1_CRYSTAL_4_2", "d_cmine_01", -743, -86, 90, async dialog =>
-		{
-			await TakePurifierPart(dialog);
-		});
-
 		// Central Purifier
 		//-------------------------------------------------------------------------
 		AddNpc(151006, L("Central Purifier"), "MINE_1_PURIFY_5", "d_cmine_01", 33, -44, 5, async dialog =>
@@ -301,15 +289,6 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Crystal18) && character.Quests.IsCompletable(Crystal18))
-			{
-				await dialog.Msg(L("You have the part. Return it to the Passage Purifier and start the repair."));
-				await dialog.CompleteQuest(Crystal18);
-				character.Quests.Start(Crystal19);
-				character.Quests.CompleteObjective(Crystal19, "fitPart");
-				return;
-			}
-
 			if (!character.Quests.Has(Crystal13) && character.Quests.MeetsPrerequisites(Crystal13))
 			{
 				var answer = await dialog.SelectQuestOffer(Crystal13, L("The Passage Purifier is cold. A part has been torn out of its housing."),
@@ -336,6 +315,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Crystal18))
 			{
 				await dialog.Msg(L("The compass points to District 6. Search District 6 for the part."));
+				character.Quests.ClearQuestTrack(Crystal18);
 				return;
 			}
 
@@ -386,24 +366,6 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			return;
 
 		character.Quests.CompleteObjective(Alchemist, "repairPurifiers");
-	}
-
-	/// <summary>
-	/// Hands the player the entrance purifier's replacement part.
-	/// </summary>
-	private static async Task TakePurifierPart(Dialog dialog)
-	{
-		var character = dialog.Player;
-
-		dialog.SetTitle(L("Entrance Purifier Parts"));
-
-		if (character.Quests.IsActive(Crystal2) && !character.Quests.IsCompletable(Crystal2))
-		{
-			await dialog.Msg(L("Every part in the pile is corroded through. The Vubbe have been carrying the good ones off."));
-			return;
-		}
-
-		await dialog.Msg(L("A pile of purifier parts, most of them beyond use."));
 	}
 }
 
@@ -523,6 +485,12 @@ public class Mine1Crystal9Quest : QuestScript
 		AddReward(new ItemReward("R_BRC02_101", 1));
 		AddReward(new TakeItemReward("MINE_1_CRYSTAL_9_ITEM"));
 	}
+
+	public override void OnStart(Character character, Quest quest)
+	{
+		base.OnStart(character, quest);
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 4{nl}Go to District 4 and look for the spare part"));
+	}
 }
 
 // 4471: Cyclops' Attack in the Crystal Mine
@@ -599,7 +567,7 @@ public class Mine1Crystal18Quest : QuestScript
 
 		SetPhase(QuestStatus.Possible, "MINE_1_PURIFY_7", "d_cmine_01", L("Use the Mine Compass"));
 		SetPhase(QuestStatus.InProgress, "MINE_1_CRYSTAL_18_TRIGGER", "d_cmine_01", L("Search District 6 for Purifier Parts"));
-		SetPhase(QuestStatus.Success, "MINE_1_PURIFY_7", "d_cmine_01", L("Search District 6 for Purifier Parts"));
+		SetPhase(QuestStatus.Success, "MINE_1_PURIFY_7", "d_cmine_01", L("Repair the Passage Purifier on 1F"));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "MINE_1_CRYSTAL_18_TRACK", 4000, autoStart: false, partyPlay: true);
 
@@ -611,6 +579,24 @@ public class Mine1Crystal18Quest : QuestScript
 
 		AddReward(new ItemReward("expCard2", 2));
 		AddReward(new ItemReward("misc_brcCrystal", 1));
+	}
+
+	public override void OnStart(Character character, Quest quest)
+	{
+		base.OnStart(character, quest);
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 6{nl}Go to District 6 and look for the part"));
+	}
+
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		base.OnSuccess(character, quest);
+
+		// The client names no turn-in; the part's recovery ends the quest and opens the repair.
+		var repairQuestId = new QuestId(4480);
+
+		character.Quests.Complete(this.QuestId);
+		character.Quests.Start(repairQuestId);
+		character.Quests.CompleteObjective(repairQuestId, "fitPart");
 	}
 }
 

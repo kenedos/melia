@@ -52,6 +52,9 @@ public class COrshaNpcScript : GeneralScript
 			dialog.SetTitle(L("Alf"));
 			dialog.SetPortrait("Dlg_port_Alf");
 
+			if (await dialog.Hooks("BeforeDialog"))
+				return;
+
 			if (GameRandom.Get().NextDouble() >= 0.5)
 				await dialog.Msg(L("Looking for potions or other useful items? You've come to the right place!"));
 			else
@@ -71,10 +74,9 @@ public class COrshaNpcScript : GeneralScript
 			dialog.SetPortrait("Dlg_port_Yurrs");
 
 			if (await dialog.Hooks("BeforeDialog"))
-				await dialog.Msg(L("Welcome to my accessory shop. I have some rare and unique items you might be interested in."));
-			else
-				await dialog.Msg(L("Greetings! Looking for something to enhance your style and power?"));
+				return;
 
+			await dialog.Msg(L("Greetings! Looking for something to enhance your style and power?"));
 			await dialog.OpenShop("OrshaAccessories");
 		});
 

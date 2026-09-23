@@ -22,6 +22,6 @@ public class FPilgrimroad55NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(900, 147392, "Lv1 Treasure Chest", "f_pilgrimroad_55", -1007.17, 331.96, 339.83, 0, "TREASUREBOX_LV_F_PILGRIMROAD_55900", "", "");
+		AddNpc(900, 147392, "Lv1 Treasure Chest", "f_pilgrimroad_55", -1008.1, 331.96, 336.24, 0, "TREASUREBOX_LV_F_PILGRIMROAD_55900", "", "");
 	}
 }

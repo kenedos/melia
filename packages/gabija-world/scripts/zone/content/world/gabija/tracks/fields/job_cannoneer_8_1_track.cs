@@ -32,7 +32,7 @@ public class JobCannoneer81Track : TrackScript
 		character.Movement.MoveTo(new Position(1432.50f, 662.24f, 444.97f));
 
 		actors.Add(character);
-		actors.Add(AddTrackActor(character, 58533, 1375.19, 662.20, 423.74, 0, new TrackActorSpec { Ai = "BT_Dummy", Name = L("Observation Orb") }));
+		actors.Add(AddTrackActor(character, 58533, 1379.94, 662.20, 433.06, 0, new TrackActorSpec { Ai = "BT_Dummy", Name = L("Observation Orb") }));
 
 		return actors.ToArray();
 	}

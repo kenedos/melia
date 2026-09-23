@@ -14,6 +14,6 @@ public class FWhitetrees233NpcScript : GeneralScript
 	{
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_whitetrees_23_3", 388.16, 219.3, 1280.83, 90, "TREASUREBOX_LV_F_WHITETREES_23_31000", "", "");
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_whitetrees_23_3", 387.29, 219.3, 1259.58, 90, "TREASUREBOX_LV_F_WHITETREES_23_31000", "", "");
 	}
 }

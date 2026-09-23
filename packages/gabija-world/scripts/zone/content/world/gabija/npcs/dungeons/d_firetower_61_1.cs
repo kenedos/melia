@@ -18,6 +18,6 @@ public class DFiretower611NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(1000, 147392, "Lv1 Treasure Chest", "d_firetower_61_1", 236.46, 146.86, -1513.29, 135, "TREASUREBOX_LV_D_FIRETOWER_61_11000", "", "");
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "d_firetower_61_1", 234.32, 146.86, -1511.19, 135, "TREASUREBOX_LV_D_FIRETOWER_61_11000", "", "");
 	}
 }

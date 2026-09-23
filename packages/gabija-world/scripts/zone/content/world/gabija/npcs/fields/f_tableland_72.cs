@@ -18,6 +18,6 @@ public class FTableland72NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_tableland_72", -581.2, 487.47, 149.56, 45, "TREASUREBOX_LV_F_TABLELAND_721000", "", "");
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_tableland_72", -578.17, 487.47, 149.86, 45, "TREASUREBOX_LV_F_TABLELAND_721000", "", "");
 	}
 }

@@ -18,6 +18,6 @@ public class FCastle651NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(202, 147392, "Lv1 Treasure Chest", "f_castle_65_1", 1317, -8.21, 1574.19, -90, "TREASUREBOX_LV_F_CASTLE_65_1202", "", "");
+		AddNpc(202, 147392, "Lv1 Treasure Chest", "f_castle_65_1", 1313.05, -8.21, 1573.44, -90, "TREASUREBOX_LV_F_CASTLE_65_1202", "", "");
 	}
 }

@@ -557,12 +557,12 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 		AddSupplyCrate(3, 176, -492);
 		AddSupplyCrate(4, 125, -247);
 		AddSupplyCrate(5, -158, -876);
-		AddSupplyCrate(6, -270, -581);
+		AddSupplyCrate(6, -260, -581);
 		AddSupplyCrate(7, -223, -452);
 		AddSupplyCrate(8, 952, -742);
-		AddSupplyCrate(9, 728, -789);
+		AddSupplyCrate(9, 729, -815);
 		AddSupplyCrate(10, 310, -335);
-		AddSupplyCrate(11, 600, -19);
+		AddSupplyCrate(11, 607, -19);
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------

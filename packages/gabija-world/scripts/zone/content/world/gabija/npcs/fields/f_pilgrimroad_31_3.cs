@@ -18,6 +18,6 @@ public class FPilgrimroad313NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(123, 147392, "Lv1 Treasure Chest", "f_pilgrimroad_31_3", -545.98, 125.48, -1684.74, 135, "TREASUREBOX_LV_F_PILGRIMROAD_31_3123", "", "");
+		AddNpc(123, 147392, "Lv1 Treasure Chest", "f_pilgrimroad_31_3", -546.47, 125.48, -1681.32, 135, "TREASUREBOX_LV_F_PILGRIMROAD_31_3123", "", "");
 	}
 }

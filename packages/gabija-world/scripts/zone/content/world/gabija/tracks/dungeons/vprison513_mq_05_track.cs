@@ -29,7 +29,7 @@ public class Vprison513Mq05Track : TrackScript
 
 		var actors = new List<IActor>();
 
-		character.Movement.MoveTo(new Position(938.96f, -17.01f, 123.19f));
+		character.Movement.MoveTo(new Position(919.60f, -17.01f, 147.72f));
 
 		actors.Add(character);
 		actors.Add(AddTrackActor(character, 57827, 1082.31, 30.34, 298.36, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Level = 160, Name = L("Demon Lord Hauberk") }));

@@ -133,14 +133,6 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("District 2 Purifier Pipe"));
 
-			if (character.Quests.IsActive(Crystal3) && character.Quests.IsCompletable(Crystal3))
-			{
-				await dialog.Msg(L("With the Carapace gone you can reach the pipe. It has been crushed flat."));
-				await dialog.CompleteQuest(Crystal3);
-				character.Quests.Start(Crystal4);
-				return;
-			}
-
 			if (character.Quests.IsActive(Crystal4) && !character.Quests.IsCompletable(Crystal4))
 			{
 				var straightened = await character.TimeActions.StartAsync(L("Checking the purifier pipe..."), L("Cancel"), "GROPE", TimeSpan.FromSeconds(3));
@@ -173,19 +165,13 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal11))
 			{
-				if (!character.Quests.IsCompletable(Crystal11))
-				{
-					var startedAux = await character.TimeActions.StartAsync(L("Starting the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+				var startedAux = await character.TimeActions.StartAsync(L("Starting the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
 
-					if (startedAux != TimeActionResult.Completed)
-						return;
-
-					character.ServerMessage(L("The Magic Supply Device is working well. Start the Auxiliary Purifier."));
-					character.Quests.CompleteObjective(Crystal11, "activate");
+				if (startedAux != TimeActionResult.Completed)
 					return;
-				}
 
-				await dialog.Msg(L("The Auxiliary Purifier is running again."));
+				character.ServerMessage(L("The Magic Supply Device is working well. The Auxiliary Purifier is running again."));
+				character.Quests.CompleteObjective(Crystal11, "activate");
 				await dialog.CompleteQuest(Crystal11);
 				CheckPurifiersRepaired(character);
 				return;
@@ -292,19 +278,13 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal21))
 			{
-				if (!character.Quests.IsCompletable(Crystal21))
-				{
-					var repairedMain = await character.TimeActions.StartAsync(L("Repairing the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+				var repairedMain = await character.TimeActions.StartAsync(L("Repairing the purifier..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
 
-					if (repairedMain != TimeActionResult.Completed)
-						return;
-
-					character.ServerMessage(L("You fit the recovered part and bring the Main Purifier up to pressure."));
-					character.Quests.CompleteObjective(Crystal21, "fitPart");
+				if (repairedMain != TimeActionResult.Completed)
 					return;
-				}
 
-				await dialog.Msg(L("The Main Purifier is repaired. The fumes on this floor are already thinning."));
+				character.ServerMessage(L("You fit the recovered part. The Main Purifier is repaired and the fumes are already thinning."));
+				character.Quests.CompleteObjective(Crystal21, "fitPart");
 				await dialog.CompleteQuest(Crystal21);
 				CheckPurifiersRepaired(character);
 				return;
@@ -491,6 +471,15 @@ public class Mine2Crystal3Quest : QuestScript
 
 		AddReward(new ItemReward("expCard2", 2));
 		AddReward(new ItemReward("misc_brcCrystal", 1));
+	}
+
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		base.OnSuccess(character, quest);
+
+		// The client names no turn-in; the Carapace's death ends the quest and opens the pipe check.
+		character.Quests.Complete(this.QuestId);
+		character.Quests.Start(new QuestId(4485));
 	}
 }
 

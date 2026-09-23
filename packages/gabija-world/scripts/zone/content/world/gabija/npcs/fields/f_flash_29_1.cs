@@ -16,6 +16,6 @@ public class FFlash291NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_flash_29_1", -1129.15, 0.12, -835.57, 135, "TREASUREBOX_LV_F_FLASH_29_11000", "", "");
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_flash_29_1", -1126.75, 0.12, -833.51, 135, "TREASUREBOX_LV_F_FLASH_29_11000", "", "");
 	}
 }

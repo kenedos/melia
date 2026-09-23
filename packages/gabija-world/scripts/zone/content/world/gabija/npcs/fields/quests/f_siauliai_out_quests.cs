@@ -834,13 +834,20 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 		=> character.Quests.HasCompleted(Sout14) && !character.Quests.HasCompleted(Sout16);
 
 	/// <summary>
+	/// Returns whether the wagons still block the mine road for the given
+	/// character, which they stop doing once the explosives went off.
+	/// </summary>
+	private static bool IsWagonBlockingRoad(Character character)
+		=> !character.Quests.HasCompleted(Sout16) && !character.Quests.IsCompletable(Sout16);
+
+	/// <summary>
 	/// Places one of the wagons barricading the mine road, which the
 	/// explosives clear.
 	/// </summary>
 	private void AddBlockingWagon(int number, double x, double z, int direction)
 	{
 		AddConditionalNpc(45315, L("Empty Wagon"), "SIAULIAIOUT_WAGON_" + number, "f_siauliai_out", x, z, direction,
-			character => !character.Quests.HasCompleted(Sout16), async dialog =>
+			IsWagonBlockingRoad, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -1137,6 +1144,12 @@ public class SoutQ16Quest : QuestScript
 		AddReward(new ItemReward("expCard1", 2));
 		AddReward(new ItemReward("BRC01_105", 1));
 		AddReward(new ItemReward("Scroll_Warp_quest", 10));
+	}
+
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		base.OnSuccess(character, quest);
+		character.LookAround();
 	}
 }
 

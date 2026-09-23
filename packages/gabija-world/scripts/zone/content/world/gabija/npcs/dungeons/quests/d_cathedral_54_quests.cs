@@ -285,7 +285,7 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 
 		// Priest Daram
 		//-------------------------------------------------------------------------
-		AddNpc(147386, L("Priest Daram"), "CHATHEDRAL54_SQ01_PART1", "d_cathedral_54", 910.68, -164.45, 60, async dialog =>
+		AddNpc(147386, L("Priest Daram"), "CHATHEDRAL54_SQ01_PART1", "d_cathedral_54", 920, -164.45, 60, async dialog =>
 		{
 			var character = dialog.Player;
 

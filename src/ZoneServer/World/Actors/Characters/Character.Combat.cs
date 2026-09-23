@@ -31,6 +31,7 @@ namespace Melia.Zone.World.Actors.Characters
 		{
 			this.ModifyHp(this.MaxHp);
 			this.ModifySp(this.MaxSp);
+			this.ModifyStamina(this.MaxStamina);
 		}
 
 		/// <summary>

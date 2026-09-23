@@ -12,14 +12,6 @@ public class DAbbey642NpcScript : GeneralScript
 {
 	protected override void Load()
 	{
-		// Traveling Merchant Rose
-		//-------------------------------------------------------------------------
-		AddNpc(304, 153119, "Traveling Merchant Rose", "d_abbey_64_2", 920.0567, 399.358, -114.0447, 189, "ABBEY642_ROZE01", "", "");
-		
-		// Traveling Merchant Rose
-		//-------------------------------------------------------------------------
-		AddNpc(306, 153119, "Traveling Merchant Rose", "d_abbey_64_2", 11, 982.54, -1272, -4, "ABBEY642_ROZE02", "", "");
-
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
 		AddNpc(660, 147392, "Lv1 Treasure Chest", "d_abbey_64_2", 97, 981, -1895, -45, "TREASUREBOX_LV_D_ABBEY_64_2660", "", "");

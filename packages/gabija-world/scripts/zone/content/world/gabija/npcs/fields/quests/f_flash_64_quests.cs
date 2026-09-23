@@ -82,7 +82,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	// The bonfires Edita scented for the Frosted souls.
 	private readonly static double[,] Bonfires =
 	{
-		{ -1181.16, -354.16 }, { -1246.27, 238.41 }, { -1071.97, 657.20 }, { -685.68, 753.57 },
+		{ -1181.16, -354.16 }, { -1246.27, 238.41 }, { -1071.97, 657.20 }, { -689.55, 753.8 },
 		{ -1437.44, -450.37 }, { -1371.18, 15.95 }, { -959.57, -224.94 }, { -1043.66, 97.78 },
 		{ -973.70, 513.25 },
 	};

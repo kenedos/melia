@@ -87,7 +87,7 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 
 		// Royal Mausoleum Cube Manual
 		//-------------------------------------------------------------------------
-		AddNpc(47252, L("Royal Mausoleum Cube Manual"), "ZACHA1F_MQ_02", "d_zachariel_32", -567, -929, 0, async dialog =>
+		AddNpc(47252, L("Royal Mausoleum Cube Manual"), "ZACHA1F_MQ_02", "d_zachariel_32", -567, -933, 0, async dialog =>
 		{
 			var character = dialog.Player;
 

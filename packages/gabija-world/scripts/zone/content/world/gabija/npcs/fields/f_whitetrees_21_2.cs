@@ -17,7 +17,7 @@ public class FWhitetrees212NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_whitetrees_21_2", 498.81, 114.39, 1433.28, 90, "TREASUREBOX_LV_F_WHITETREES_21_21000", "", "");
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_whitetrees_21_2", 496.28, 114.39, 1435.55, 90, "TREASUREBOX_LV_F_WHITETREES_21_21000", "", "");
 
 		// Lv1 Treasure Chest (Formine Necklace)
 		//-------------------------------------------------------------------------

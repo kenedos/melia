@@ -31,7 +31,7 @@ public class Zacha1fMq02Track : TrackScript
 		actors.Add(AddTrackActor(character, 47262, -1145, 252, -840, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 47262, -1154, 252, -1105, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 47262, -869, 252, -1113, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 47252, -567, 253, -929, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces, Name = L("Royal Mausoleum Cube Manual") }));
+		actors.Add(AddTrackActor(character, 47252, -567, 253, -933, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces, Name = L("Royal Mausoleum Cube Manual") }));
 
 		return actors.ToArray();
 	}

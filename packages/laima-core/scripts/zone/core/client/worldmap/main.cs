@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
 using Melia.Shared.Scripting;
 using Melia.Shared.World;
@@ -210,6 +211,25 @@ public class WorldMapClientScript : ClientScript
 			turnInNpcs.Add(turnInNpcName);
 		}
 
+		foreach (var quest in character.Quests.GetInProgress())
+		{
+			if (quest.ObjectivesCompleted || !quest.Data.TryGetPhase(QuestStatus.InProgress, out var phase))
+				continue;
+
+			if (string.IsNullOrEmpty(phase.NpcUniqueName))
+				continue;
+
+			if (!TryFindNpcAcrossMaps(phase.NpcUniqueName, out var placeNpc, out var placeMapClassName, phase.MapClassName))
+				continue;
+
+			// Only place-bound phases, since an NPC already carries its own marker.
+			if (placeNpc.Id != MonsterId.HiddenTrigger)
+				continue;
+
+			var tooltip = string.IsNullOrEmpty(quest.Data.Name) ? "" : Localization.Get(quest.Data.Name);
+			icons.Add(CreateIconTable(GetQuestProgressIconImage(quest.Data.Type), placeMapClassName, placeNpc.Position, tooltip));
+		}
+
 		// An NPC with several quests ready shows one icon, for the quest the
 		// player picks up next - a main quest, then the earlier chain step.
 		var startNpcQuests = new Dictionary<string, QuestScript>(StringComparer.OrdinalIgnoreCase);
@@ -327,6 +347,18 @@ public class WorldMapClientScript : ClientScript
 			case QuestType.Party: return "minimap_1_PARTY";
 			case QuestType.KeyItem: return "minimap_1_KEYQUEST";
 			default: return "minimap_1_SUB";
+		}
+	}
+
+	private static string GetQuestProgressIconImage(QuestType type)
+	{
+		switch (type)
+		{
+			case QuestType.Main: return "minimap_2_MAIN";
+			case QuestType.Repeat: return "minimap_2_REPEAT";
+			case QuestType.Party: return "minimap_2_PARTY";
+			case QuestType.KeyItem: return "minimap_2_KEYQUEST";
+			default: return "minimap_2_SUB";
 		}
 	}
 

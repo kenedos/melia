@@ -245,13 +245,13 @@ public class KlaipeQuestNpcsScript : GeneralScript
 		if (!character.Quests.IsActive(EastPrepare) || character.Quests.IsCompletable(EastPrepare))
 			return HookResult.Skip;
 
-		var prayed = await dialog.TimeAction(L("Paying your respects..."), L("Cancel"), "WORSHIP", TimeSpan.FromSeconds(2));
+		var prayed = await dialog.TimeAction(L("Worshipping the goddess statue..."), L("Cancel"), "WORSHIP", TimeSpan.FromSeconds(2));
 		if (prayed != TimeActionResult.Completed)
 			return HookResult.Break;
 
 		character.Quests.CompleteObjective(EastPrepare, "pray");
+		character.ServerMessage(L("You pray to the goddess for a safe journey. Visit the General Merchant for your warp scrolls."));
 
-		await OpenWarpDestinations(dialog);
 		return HookResult.Break;
 	}
 }
@@ -299,7 +299,7 @@ public class EastPrepareQuest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "KLAPEDA_USKA", "c_Klaipe", L("Move to Klaipeda and talk to Knight Commander Uska"));
-		SetPhase(QuestStatus.InProgress, "KLAIPE_AUSRINE_PRAYER", "c_Klaipe", L("Pray at the Statue of Goddess Ausrine"));
+		SetPhase(QuestStatus.InProgress, "c_Klaipe:WARP_C_KLAIPE", "c_Klaipe", L("Pray at the Statue of Goddess Ausrine"));
 		SetPhase(QuestStatus.Success, "Mirina", "c_Klaipe", L("Talk to the General Merchant"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(1015, QuestStatus.Completed));

@@ -14,6 +14,6 @@ public class FDcapital205NpcScript : GeneralScript
 	{
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_dcapital_20_5", 538.59, -10.96, 126.83, 90, "TREASUREBOX_LV_F_DCAPITAL_20_51000", "", "");
+		AddNpc(1000, 147392, "Lv1 Treasure Chest", "f_dcapital_20_5", 535.79, -10.96, 128.14, 90, "TREASUREBOX_LV_F_DCAPITAL_20_51000", "", "");
 	}
 }

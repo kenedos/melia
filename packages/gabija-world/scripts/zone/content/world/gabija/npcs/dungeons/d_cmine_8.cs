@@ -24,6 +24,6 @@ public class DCmine8NpcScript : GeneralScript
 
 		// Lv1 Treasure Chest
 		//-------------------------------------------------------------------------
-		AddNpc(700, 147392, "Lv1 Treasure Chest", "d_cmine_8", 140.29, 9.16, 191.32, 268, "TREASUREBOX_LV_D_CMINE_8700", "", "");
+		AddNpc(700, 147392, "Lv1 Treasure Chest", "d_cmine_8", 137.39, 9.16, 189.52, 268, "TREASUREBOX_LV_D_CMINE_8700", "", "");
 	}
 }

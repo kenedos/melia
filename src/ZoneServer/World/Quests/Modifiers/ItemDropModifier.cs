@@ -93,7 +93,8 @@ namespace Melia.Zone.World.Quests.Modifiers
 			if (args.Target is not Mob monster)
 				return;
 
-			if (args.Attacker is not Character character)
+			var character = monster.GetKillBeneficiary(args.Attacker);
+			if (character == null)
 				return;
 
 			character.Quests.UpdateModifiers<ItemDropModifier>((quest, modifier, progress) =>
