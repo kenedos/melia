@@ -684,7 +684,7 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			// Eventually we'll make it configurable. -- exec
 
 			var warpNpc = this.Entity.Map.GetNearbyWarp(prevPos);
-			if (warpNpc == null)
+			if (warpNpc == null || !warpNpc.CanBeUsedBy(character))
 				return;
 
 			// Wait 1s to see if the character actually wants to warp
@@ -694,6 +694,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			{
 				// Cancel if character moved in that time
 				if (character.Position != prevPos)
+					return;
+
+				if (!warpNpc.CanBeUsedBy(character))
 					return;
 
 				character.Warp(warpNpc.WarpLocation);

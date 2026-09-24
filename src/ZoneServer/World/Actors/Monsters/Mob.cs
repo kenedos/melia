@@ -386,6 +386,13 @@ namespace Melia.Zone.World.Actors.Monsters
 			}
 		}
 
+		private const float ShieldDamageRate = 5;
+		private const float ShieldRegenRate = 0.05f;
+		private static readonly TimeSpan ShieldRefillDelay = TimeSpan.FromSeconds(20);
+
+		private readonly object _shieldLock = new();
+		private DateTime _shieldBreakTime = DateTime.MinValue;
+
 		/// <summary>
 		/// Gets or sets if this mob is a special GTW objective (Amplifier, Boss).
 		/// </summary>
@@ -540,12 +547,11 @@ namespace Melia.Zone.World.Actors.Monsters
 				Send.MonsterSkillBalloonCancel(this);
 			}
 
-			// Apply damage to shield, then apply HP damage.
-			damage = this.ApplyToShield(damage);
+			this.Components.Get<CombatComponent>().SetAttackState(true);
+			this.DamageShield(damage);
 
 			var currentHp = this.Hp;
 
-			this.Components.Get<CombatComponent>().SetAttackState(true);
 			this.ModifyHpSafe(-damage, out _, out _);
 
 			// Register hits before potentially killing the monster,
@@ -564,33 +570,72 @@ namespace Melia.Zone.World.Actors.Monsters
 		}
 
 		/// <summary>
-		/// Applies damage to the monster's shield at 5x rate and returns
-		/// any remaining damage that passes through to HP.
+		/// Reduces the monster's debuff-blocking shield by the given damage.
 		/// </summary>
-		private float ApplyToShield(float damage)
+		private void DamageShield(float damage)
 		{
-			if (this.Shield > 0)
+			if (damage <= 0)
+				return;
+
+			// The value is sent inside the lock so concurrent hits reach the client in order.
+			lock (_shieldLock)
 			{
-				// Shield takes 5x damage
-				var shieldDamage = damage * 5;
-				var shieldBreak = (this.Shield - shieldDamage) < 0;
+				var shield = this.Shield;
+				if (shield <= 0)
+					return;
 
-				if (shieldBreak)
-				{
-					var remainingShieldHealth = this.Shield;
-					this.Shield = 0;
-					damage -= remainingShieldHealth / 5;
-					Send.ZC_UPDATE_SHIELD(this, this.Shield, 1);
-				}
-				else
-				{
-					this.Shield -= (int)shieldDamage;
-					Send.ZC_UPDATE_SHIELD(this, this.Shield, 0);
-					return 0;
-				}
+				var newShield = (int)Math.Max(0, shield - damage * ShieldDamageRate);
+				if (newShield == shield)
+					return;
+
+				this.Shield = newShield;
+				if (newShield == 0)
+					_shieldBreakTime = GameClock.Now;
+
+				Send.ZC_UPDATE_SHIELD(this, newShield, 0);
 			}
+		}
 
-			return damage;
+		/// <summary>
+		/// Refills the monster's shield once it has been depleted for long enough.
+		/// </summary>
+		public void UpdateShieldRefill()
+		{
+			if (_shieldBreakTime == DateTime.MinValue)
+				return;
+
+			lock (_shieldLock)
+			{
+				if (_shieldBreakTime == DateTime.MinValue || GameClock.Now - _shieldBreakTime < ShieldRefillDelay)
+					return;
+
+				_shieldBreakTime = DateTime.MinValue;
+				this.Shield = this.MaxShield;
+
+				Send.ZC_UPDATE_SHIELD(this, this.Shield, 0);
+			}
+		}
+
+		/// <summary>
+		/// Regenerates part of a depleted but unbroken shield while the monster is out of combat.
+		/// </summary>
+		public void RegenShield()
+		{
+			lock (_shieldLock)
+			{
+				if (_shieldBreakTime != DateTime.MinValue || this.CombatState.AttackState)
+					return;
+
+				var shield = this.Shield;
+				var maxShield = this.MaxShield;
+				if (shield <= 0 || shield >= maxShield)
+					return;
+
+				var newShield = Math.Min(maxShield, shield + Math.Max(1, (int)(maxShield * ShieldRegenRate)));
+				this.Shield = newShield;
+
+				Send.ZC_UPDATE_SHIELD(this, newShield, 0);
+			}
 		}
 
 		/// <summary>
@@ -1759,23 +1804,6 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (hpAmount > 0)
 				Send.ZC_ADD_HP(this, hpAmount, this.Hp, this.HpChangeCounter);
-		}
-
-		/// <summary>
-		/// Restore the monster's shield. Only works for boss monsters.
-		/// </summary>
-		public void HealShield(int amount)
-		{
-			if (this.IsDead)
-				return;
-
-			if (amount == 0)
-				return;
-
-			this.Shield = this.Shield + amount;
-
-			if (amount > 0)
-				Send.ZC_UPDATE_SHIELD(this, this.Shield, 1);
 		}
 
 		/// <summary>

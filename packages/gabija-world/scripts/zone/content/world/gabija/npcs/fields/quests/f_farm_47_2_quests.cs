@@ -362,7 +362,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 		// Head of Goddess Statue
 		//-------------------------------------------------------------------------
-		AddNpc(153050, L("Head of Goddess Statue"), "FARM47_HEAD_D", "f_farm_47_2", 2101.88, -1034.54, 90, async dialog =>
+		AddConditionalNpc(153050, L("Head of Goddess Statue"), "FARM47_HEAD_D", "f_farm_47_2", 2101.88, -1034.54, 90, c => !c.Quests.IsCompletable(Sq010) && !c.Quests.HasCompleted(Sq010), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -406,7 +406,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 		// Old Chest
 		//-------------------------------------------------------------------------
-		AddNpc(152019, L("Old Chest"), "FARM47_DRUM01_D", "f_farm_47_2", 925.31, -850.04, 14, async dialog =>
+		AddConditionalNpc(152019, L("Old Chest"), "FARM47_DRUM01_D", "f_farm_47_2", 925.31, -850.04, 14, c => !c.Quests.IsCompletable(Sq020) && !c.Quests.HasCompleted(Sq020), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -445,7 +445,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 		// Wooden Wine Cask
 		//-------------------------------------------------------------------------
-		AddNpc(147458, L("Wooden Wine Cask"), "FARM47_DRUM02_D", "f_farm_47_2", 981.07, -1829.82, 90, async dialog =>
+		AddConditionalNpc(147458, L("Wooden Wine Cask"), "FARM47_DRUM02_D", "f_farm_47_2", 981.07, -1829.82, 90, c => !c.Quests.HasCompleted(Sq030), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -495,7 +495,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 		// Wing of Goddess Statue
 		//-------------------------------------------------------------------------
-		AddNpc(153049, L("Wing of Goddess Statue"), "FARM47_WING_D", "f_farm_47_2", -58.28, -1763.47, 90, async dialog =>
+		AddConditionalNpc(153049, L("Wing of Goddess Statue"), "FARM47_WING_D", "f_farm_47_2", -58.28, -1763.47, 90, c => !c.Quests.IsCompletable(Sq040) && !c.Quests.HasCompleted(Sq040), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -850,8 +850,13 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 		if (character.Inventory.CountItem(ItemId.FARM47_2_SQ_030_ITEM_2) == 0)
 		{
+			var broken = await character.TimeActions.StartAsync(L("Breaking off a piece..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+			if (broken != TimeActionResult.Completed)
+				return;
+
 			character.Inventory.Add(ItemId.FARM47_2_SQ_030_ITEM_2, 1, InventoryAddType.PickUp);
-			await dialog.Msg(L("You break off a blunt piece, about the weight of a hammer's head."));
+			character.ServerMessage(L("You break off a blunt piece, about the weight of a hammer's head."));
 		}
 		else
 		{
@@ -879,8 +884,13 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 		if (character.Inventory.CountItem(ItemId.FARM47_2_SQ_030_ITEM_3) == 0)
 		{
+			var trimmed = await character.TimeActions.StartAsync(L("Trimming a rod..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+			if (trimmed != TimeActionResult.Completed)
+				return;
+
 			character.Inventory.Add(ItemId.FARM47_2_SQ_030_ITEM_3, 1, InventoryAddType.PickUp);
-			await dialog.Msg(L("You pull a straight rod out of the ashes and trim it down."));
+			character.ServerMessage(L("You pull a straight rod out of the ashes and trim it down."));
 		}
 		else
 		{

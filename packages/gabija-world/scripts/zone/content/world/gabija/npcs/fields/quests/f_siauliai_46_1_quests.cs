@@ -107,6 +107,19 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq03, L("The addled Revelators will march towards here soon. Please purify them before anyone gets hurt."),
+					Option(L("Leave it to me"), "accept"),
+					Option(L("Give me some time to prepare"), "leave")
+				);
+
+				if (answer == "accept")
+					character.Quests.Start(Mq03);
+
+				return;
+			}
+
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq04, L("Restore the weakened seal towers using the symbol of Goddess Austeja. There is the Rankis Seal and the Ranka Seal."),
@@ -148,6 +161,7 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The addled Revelators will march towards here soon."));
 				await dialog.Msg(L("Please purify them before anyone gets hurt."));
+				character.Quests.ReplayQuestTrack(Mq03);
 				return;
 			}
 
@@ -303,16 +317,22 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Austeja Altar"));
 
-			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
+			var restoring = character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02);
+			var offering = !character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02);
+
+			if (restoring || offering)
 			{
 				var restored = await character.TimeActions.StartAsync(L("Restoring the symbol..."), L("Cancel"), "PRAY", TimeSpan.FromSeconds(3));
 
 				if (restored != TimeActionResult.Completed)
 					return;
 
+				if (offering)
+					character.Quests.Start(Mq02);
+
 				character.Inventory.RemoveItem(ItemId.SIAULIAI_46_1_MQ_01_ITEM, FragmentsNeeded);
 				character.Inventory.Add(ItemId.SIAULIAI_46_1_MQ_02_ITEM, 1, InventoryAddType.PickUp);
-				character.ServerMessage(L("The Symbol of Goddess Austeja has been restored!"));
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Symbol of Goddess Austeja has been restored!"));
 				return;
 			}
 
@@ -401,15 +421,20 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Ranka Seal Tower"));
 
-			if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
+			var restoringRanka = character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05);
+			var offeringRanka = !character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05);
+
+			if (restoringRanka || offeringRanka)
 			{
 				var restored = await character.TimeActions.StartAsync(L("Giving the tower the goddess' power..."), L("Cancel"), "PRAY", TimeSpan.FromSeconds(3));
 
 				if (restored != TimeActionResult.Completed)
 					return;
 
-				character.Quests.CompleteObjective(Mq05, "restoreRanka");
-				character.Quests.StartQuestTrack(Mq05);
+				if (offeringRanka)
+					character.Quests.Start(Mq05);
+
+				character.Quests.ReplayQuestTrack(Mq05);
 				return;
 			}
 
@@ -485,8 +510,13 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		var picked = await character.TimeActions.StartAsync(L("Picking up the parcel..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (picked != TimeActionResult.Completed)
+			return;
+
 		character.Inventory.Add(ItemId.SIAULIAI_46_1_SQ_03_ITEM, 1, InventoryAddType.PickUp);
-		await dialog.Msg(L("The parcel is unopened, and Dulke's mark is still on the knot."));
+		character.ServerMessage(L("The parcel is unopened, and Dulke's mark is still on the knot."));
 	}
 
 	/// <summary>

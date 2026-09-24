@@ -739,8 +739,8 @@ namespace Melia.Zone.World.Actors.Characters
 			if (monster.Properties.TryGetFloat(PropertyName.Scale, out var scale) && scale != 1)
 				monster.ChangeScale(scale, 0);
 
-			if (monster is Mob mobBoss && mobBoss.Rank == MonsterRank.Boss)
-				Send.ZC_UPDATE_SHIELD(this.Connection, monster, mobBoss.Shield);
+			if (monster is Mob shieldedMob && shieldedMob.MaxShield > 0)
+				Send.ZC_UPDATE_SHIELD(this.Connection, monster, shieldedMob.Shield);
 
 			monster.ShowEffects(this.Connection);
 

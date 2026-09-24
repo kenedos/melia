@@ -22,6 +22,7 @@ using static Melia.Zone.Scripting.Shortcuts;
 public class DVelniasprison514QuestNpcsScript : GeneralScript
 {
 	private readonly static QuestId Mq01 = new QuestId(60012);
+	private readonly static QuestId District3Mq05 = new QuestId(60022);
 	private readonly static QuestId Mq02 = new QuestId(60013);
 	private readonly static QuestId Mq03 = new QuestId(60014);
 	private readonly static QuestId Mq04 = new QuestId(60015);
@@ -63,7 +64,7 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 	{
 		// Goddess Vakarine
 		//-------------------------------------------------------------------------
-		AddNpc(154010, L("Goddess Vakarine"), "VPRISON514_MQ_VAKARINE", "d_velniasprison_51_4", -1018.74, 1133.27, -13, async dialog =>
+		AddConditionalNpc(154010, L("Goddess Vakarine"), "VPRISON514_MQ_VAKARINE", "d_velniasprison_51_4", -1018.74, 1133.27, -13, c => !c.Quests.HasCompleted(District3Mq05), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -94,6 +95,25 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("The Evening Star, sitting in a prison because there was nowhere safer to put her."));
+		});
+
+		// The Corridor of Monitor, where Vakarine is first found
+		//-------------------------------------------------------------------------
+		AddQuestTrigger("VPRISON514_MQ_01_NPC", "d_velniasprison_51_4", -1073, 1305, 200, async args =>
+		{
+			if (args.Initiator is not Character character)
+				return;
+
+			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
+			{
+				character.Quests.Start(Mq01);
+				character.LookAround();
+			}
+
+			if (character.Quests.IsActive(Mq01) && !character.Quests.IsCompletable(Mq01))
+				character.Quests.StartQuestTrack(Mq01);
+
+			await Task.CompletedTask;
 		});
 
 		// Kupole Zydrone
@@ -514,8 +534,13 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		var lifted = await character.TimeActions.StartAsync(L("Lifting the shard..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (lifted != TimeActionResult.Completed)
+			return;
+
 		character.Inventory.Add(ItemId.VPRISON514_SQ_03_ITEM, 1, InventoryAddType.PickUp);
-		await dialog.Msg(L("You lift the shard out of the floor of the seal."));
+		character.ServerMessage(L("You lift the shard out of the floor of the seal."));
 	}
 }
 

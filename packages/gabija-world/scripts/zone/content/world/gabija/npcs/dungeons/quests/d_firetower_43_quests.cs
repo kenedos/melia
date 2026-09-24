@@ -231,7 +231,7 @@ public class DFiretower43QuestNpcsScript : GeneralScript
 
 		// The Magic Control Valve in the Laboratory
 		//-------------------------------------------------------------------------
-		AddNpc(147504, L("Magic Control Valve"), "FTOWER43_MQ_02_VALVE", "d_firetower_43", -1598, 708, 45, async dialog =>
+		AddConditionalNpc(147504, L("Magic Control Valve"), "FTOWER43_MQ_02_VALVE", "d_firetower_43", -1598, 708, 45, c => !c.Quests.IsCompletable(Mq02) && !c.Quests.HasCompleted(Mq02), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -262,7 +262,7 @@ public class DFiretower43QuestNpcsScript : GeneralScript
 
 		// The Immobile Mineloader
 		//-------------------------------------------------------------------------
-		AddNpc(147472, L("Immobile Mineloader"), "FTOWER43_MQ_05_MINENPC", "d_firetower_43", 669, -730, 266, async dialog =>
+		AddConditionalNpc(147472, L("Immobile Mineloader"), "FTOWER43_MQ_05_MINENPC", "d_firetower_43", 669, -730, 266, c => !c.Quests.IsCompletable(Mq05) && !c.Quests.HasCompleted(Mq05), async dialog =>
 		{
 			var character = dialog.Player;
 

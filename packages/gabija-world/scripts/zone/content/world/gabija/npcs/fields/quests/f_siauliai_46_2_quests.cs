@@ -127,6 +127,70 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq01, L("With the demons being unhindered by the weakening seal... And the villagers' thirst for action, we could be inviting disaster."),
+					Option(L("I will take care of it"), "accept"),
+					Option(L("Ignore it"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq01);
+					await dialog.Msg(L("We should get this done quickly, before the monsters rush in again."));
+				}
+
+				return;
+			}
+
+			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq02, L("First, bring me some demons' ashes that I will make the orb with. When the demons are pierced with these bee tree branches, they will be overwhelmed by the branch's divine power and turn into ash."),
+					Option(L("I will collect the ashes"), "accept"),
+					Option(L("Decline"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq02);
+					await dialog.Msg(L("Obviously, the goddess' powers can only indirectly affect demons. You will have to exhaust some of the demon's HP before using a branch on it."));
+				}
+
+				return;
+			}
+
+			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq03, L("Take this orb. I made it in a hurry, so it's not complete yet. You must fill it with magic at a place that is full of the goddess' holy energy."),
+					Option(L("I will fill the evil power"), "accept"),
+					Option(L("Decline"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq03);
+					await dialog.Msg(L("Palama Cliff is the nearest place you can do this at, so please head there. The demons will be marching in soon, so please hurry."));
+				}
+
+				return;
+			}
+
+			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq04, L("The weakened seal tower is near Stulr Road. I'm getting a little bothered about how quiet the demons have been recently."),
+					Option(L("I'll head out. No worries."), "accept"),
+					Option(L("Give me some time to prepare"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq04);
+					await dialog.Msg(L("Please hurry. I can feel that the seal is weak. May you have the goddess' blessings.."));
+				}
+
+				return;
+			}
+
 			if (!character.Quests.Has(Mq0101) && character.Quests.MeetsPrerequisites(Mq0101))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq0101, L("I would briefly explain the situation to you now, but I sense monsters coming this way. We've prepared a guardian stone at the edge of the village for times like this."),
@@ -317,6 +381,24 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Seal Tower"));
+
+			if (character.Quests.IsActive(Party100) && !character.Quests.IsCompletable(Party100))
+			{
+				var looked = await character.TimeActions.StartAsync(L("Looking the sealed tower over..."), L("Cancel"), "LOOK_SIT", TimeSpan.FromSeconds(2));
+
+				if (looked != TimeActionResult.Completed)
+					return;
+
+				character.Quests.ReplayQuestTrack(Party100);
+				return;
+			}
+
+			if (!character.Quests.Has(Party102) && character.Quests.MeetsPrerequisites(Party102))
+			{
+				await dialog.Msg(L("The tower still holds the scripture's power. Offer it to restore the seal."));
+				character.Quests.Start(Party102);
+				return;
+			}
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{

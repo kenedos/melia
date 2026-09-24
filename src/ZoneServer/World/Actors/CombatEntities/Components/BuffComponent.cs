@@ -767,9 +767,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				return true;
 			}
 
-			// Cannot apply debuffs to bosses when they have shield,
+			// Cannot apply debuffs to monsters when they have shield,
 			// but allow damage-over-time buffs through
-			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss && mob.Shield > 0)
+			if (this.Entity is Mob mob && mob.Shield > 0)
 			{
 				var handler = ZoneServer.Instance.BuffHandlers.GetHandler(buffId);
 				if (handler is not DamageOverTimeBuffHandler)

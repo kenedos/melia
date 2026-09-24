@@ -113,7 +113,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 		// District 3 Purifier Pipe
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147469, L("District 3 Purifier Pipe"), "MINE_2_CRYSTAL_2_PIPE", "d_cmine_02", -1220, -737, 90, c => c.Quests.IsActive(Crystal2) && !c.Quests.IsCompletable(Crystal2), async dialog =>
+		AddConditionalNpc(147469, L("District 3 Purifier Pipe"), "MINE_2_CRYSTAL_2_PIPE", "d_cmine_02", -1310, -737, 90, c => c.Quests.IsActive(Crystal2) && !c.Quests.IsCompletable(Crystal2), async dialog =>
 		{
 			var character = dialog.Player;
 

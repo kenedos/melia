@@ -891,8 +891,8 @@ public class FFlash64QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		for (var i = 0; i < PetrifiedSpots.GetLength(0); ++i)
 		{
-			AddNpc(PetrifiedModels[i], L("Petrified Victim"), i == 0 ? "FLASH64_SQ_06_NPC" : "FLASH64_SQ_06_NPC_" + (i + 1), "f_flash_64",
-				PetrifiedSpots[i, 0], PetrifiedSpots[i, 1], 90, this.UseLiberationElixir);
+			AddConditionalNpc(PetrifiedModels[i], L("Petrified Victim"), i == 0 ? "FLASH64_SQ_06_NPC" : "FLASH64_SQ_06_NPC_" + (i + 1), "f_flash_64",
+				PetrifiedSpots[i, 0], PetrifiedSpots[i, 1], 90, c => !c.Quests.HasCompleted(Sq06), this.UseLiberationElixir);
 		}
 
 		// Bonfires

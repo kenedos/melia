@@ -112,6 +112,13 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
+			{
+				await dialog.Msg(L("The crack is holding. There is one more thing I must ask of you."));
+				character.Quests.Start(Mq07);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Savior. We really appreciate your help in stopping Hauberk."));

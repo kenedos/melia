@@ -26,6 +26,7 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq03 = new QuestId(8490);
 	private readonly static QuestId Mq04 = new QuestId(8491);
 	private readonly static QuestId Mq05 = new QuestId(8492);
+	private readonly static QuestId GoddessGabija = new QuestId(8498);
 	private readonly static QuestId Sq01 = new QuestId(17017);
 	private readonly static QuestId Sq02 = new QuestId(17018);
 	private readonly static QuestId Sq03 = new QuestId(17019);
@@ -192,7 +193,7 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 
 		// The Magic Control Circle
 		//-------------------------------------------------------------------------
-		AddNpc(147469, L("Magic Control Circle"), "FTOWER44_MQ_04_NPC", "d_firetower_44", -1603, 614, 90, async dialog =>
+		AddConditionalNpc(147469, L("Magic Control Circle"), "FTOWER44_MQ_04_NPC", "d_firetower_44", -1603, 614, 90, c => !c.Quests.Has(GoddessGabija), async dialog =>
 		{
 			var character = dialog.Player;
 

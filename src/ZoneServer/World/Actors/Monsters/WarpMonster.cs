@@ -128,13 +128,32 @@ namespace Melia.Zone.World.Actors.Monsters
 				// allowing players to run away from map when they're
 				// frozen, stunned, knocked down, etc.
 
-				if (dialog.Npc is WarpMonster warpMonster)
+				if (dialog.Npc is WarpMonster warpMonster && warpMonster.CanBeUsedBy(dialog.Player))
 				{
 					dialog.Player.Warp(warpMonster.WarpLocation);
 				}
 
 				await Task.Yield();
 			});
+		}
+
+		/// <summary>
+		/// Returns true if the character is on the warp's layer, outside of any track, and allowed to see it.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <returns></returns>
+		public bool CanBeUsedBy(Character character)
+		{
+			if (character.Layer != this.Layer)
+				return false;
+
+			if (character.Tracks?.ActiveTrack != null)
+				return false;
+
+			if (this.VisibleTo != null && !this.VisibleTo(character))
+				return false;
+
+			return true;
 		}
 
 		/// <summary>

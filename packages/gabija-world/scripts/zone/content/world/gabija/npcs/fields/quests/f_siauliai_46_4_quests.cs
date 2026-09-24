@@ -67,6 +67,22 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq02, L("The bees are a problem but the monsters that came in from the other forests are a bigger problem. I'm sure they are here for the honey."),
+					Option(L("I'll take a look"), "accept"),
+					Option(L("I've done enough so just go my way"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq02);
+					await dialog.Msg(L("The monsters that smell sweet must have empty beehives. Goddess Austeja, we will need to borrow some of her help here."));
+				}
+
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Are you the person they sent here?"));
@@ -205,6 +221,38 @@ public class FSiauliai464QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("That is enough. Whoa, Joseph did find great talent,"));
 				await dialog.Msg(L("even though we lost the apiary and brewery."));
 				await dialog.CompleteQuest(Mq05);
+				return;
+			}
+
+			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq04, L("Don't you dare think of stopping me. I am going to blow them up, even if it's going to cost me my brewery! ..Can't even trust Revelators anymore now."),
+					Option(L("Calm down"), "accept"),
+					Option(L("He's not going to calm down. Let's just go."), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq04);
+					await dialog.Msg(L("I bet you won't be able to get it. Just know that if you fail, I will burn down my workshop."));
+				}
+
+				return;
+			}
+
+			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq05, L("Alright. You win. I won't burn down my workshop as I said. But I'm still pissed. All those years of work... because of those monsters.."),
+					Option(L("I'll defeat the monsters around, so lighten up dude."), "accept"),
+					Option(L("I've helped enough so I'm leaving"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq05);
+					await dialog.Msg(L("I won't think about burning down the forest again. I'm sure a person with abilities like yours can save our village."));
+				}
+
 				return;
 			}
 

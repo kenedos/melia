@@ -45,9 +45,10 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 				this.UpdateSp(elapsed);
 				this.UpdateStamina(elapsed);
 			}
-			if (this.Entity is Mob mob && mob.Rank == MonsterRank.Boss)
+			if (this.Entity is Mob mob)
 			{
-				this.UpdateShield(elapsed);
+				mob.UpdateShieldRefill();
+				this.UpdateShield(mob, elapsed);
 			}
 		}
 
@@ -86,6 +87,22 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 		}
 
 		/// <summary>
+		/// Updates the monster's shield regeneration.
+		/// </summary>
+		/// <param name="mob"></param>
+		/// <param name="elapsed"></param>
+		private void UpdateShield(Mob mob, TimeSpan elapsed)
+		{
+			_shieldTime -= elapsed;
+
+			if (_shieldTime <= TimeSpan.Zero)
+			{
+				mob.RegenShield();
+				_shieldTime = TimeSpan.FromMilliseconds(mob.Properties.GetFloat(PropertyName.RHPTIME));
+			}
+		}
+
+		/// <summary>
 		/// Updates the entity's stamina.
 		/// </summary>
 		/// <param name="elapsed"></param>
@@ -97,24 +114,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			{
 				this.RecoverStamina();
 				_staminaTime = TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.Sta_R_Delay));
-			}
-		}
-
-		/// <summary>
-		/// Updates entity's shields.
-		/// </summary>
-		/// <param name="elapsed"></param>
-		private void UpdateShield(TimeSpan elapsed)
-		{
-			_shieldTime -= elapsed;
-
-			if (_shieldTime <= TimeSpan.Zero)
-			{
-				if (this.Entity is Mob mob && !mob.CombatState.AttackState)
-					this.RecoverShield();
-
-				// Using HP Regen time
-				_shieldTime = TimeSpan.FromMilliseconds(this.Entity.Properties.GetFloat(PropertyName.RHPTIME));
 			}
 		}
 
@@ -142,22 +141,6 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 
 			if (rec > 0 && cur < max)
 				this.Entity.Heal(0, rec);
-		}
-
-		/// <summary>
-		/// Recovers some Shield.
-		/// </summary>
-		private void RecoverShield()
-		{
-			if (this.Entity is not Mob mob)
-				return;
-
-			var cur = mob.Shield;
-			var max = mob.MaxShield;
-			var rec = (int)this.Entity.Properties.GetFloat(PropertyName.RHP);
-
-			if (rec > 0 && cur < max)
-				mob.HealShield(rec);
 		}
 
 		/// <summary>

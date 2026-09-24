@@ -277,7 +277,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			lock (_syncLock)
 			{
-				foreach (var quest in _quests)
+				foreach (var quest in _quests.ToArray())
 				{
 					if (quest.Status != QuestStatus.InProgress && quest.Status != QuestStatus.Success)
 						continue;

@@ -229,8 +229,18 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal9) && !character.Quests.IsCompletable(Crystal9))
 			{
-				await dialog.Msg(L("Defeat the Bearkaras that appeared in front of the Spare Purifier."));
-				character.Quests.ClearQuestTrack(Crystal9);
+				if (character.Tracks.ActiveTrack != null)
+				{
+					await dialog.Msg(L("Defeat the Bearkaras that appeared in front of the Spare Purifier."));
+					return;
+				}
+
+				var searched = await character.TimeActions.StartAsync(L("Removing the parts..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+				if (searched != TimeActionResult.Completed)
+					return;
+
+				character.Quests.ReplayQuestTrack(Crystal9);
 				return;
 			}
 
@@ -368,17 +378,6 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
-		AddQuestTrigger("MINE_1_CRYSTAL_9_TRIGGER", "d_cmine_01", 1287, -994, 150, async args =>
-		{
-			if (args.Initiator is not Character character)
-				return;
-
-			if (character.Quests.IsActive(Crystal9) && !character.Quests.IsCompletable(Crystal9))
-				character.Quests.StartQuestTrack(Crystal9);
-
-			await Task.CompletedTask;
-		});
-
 		AddQuestTrigger("MINE_1_CRYSTAL_18_TRIGGER", "d_cmine_01", -1126, 428, 150, async args =>
 		{
 			if (args.Initiator is not Character character)
@@ -392,17 +391,27 @@ public class DCmine01QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Marks the floor's main quest done once all three purifiers run again.
+	/// Completes the floor's main quest and starts the next floor's once all three purifiers run again.
 	/// </summary>
 	public static void CheckPurifiersRepaired(Character character)
 	{
-		if (!character.Quests.IsActive(Alchemist) || character.Quests.IsCompletable(Alchemist))
+		if (!character.Quests.IsActive(Alchemist))
 			return;
 
 		if (!character.Quests.HasCompleted(Crystal2) || !character.Quests.HasCompleted(Crystal9) || !character.Quests.HasCompleted(Crystal19))
 			return;
 
 		character.Quests.CompleteObjective(Alchemist, "repairPurifiers");
+		character.Quests.Complete(Alchemist);
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("All the purifiers on 1F have been repaired!{nl}Go down to the 2nd floor and repair its purifiers!"));
+
+		if (!character.Quests.Has(Mine2Alchemist) && character.Quests.MeetsPrerequisites(Mine2Alchemist))
+		{
+			character.Quests.Start(Mine2Alchemist);
+			DCmine02QuestNpcsScript.CheckPurifiersRepaired(character);
+		}
+
+		character.LookAround();
 	}
 }
 

@@ -236,7 +236,7 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 
 		// The 2nd Transport Magic Circle
 		//-------------------------------------------------------------------------
-		AddNpc(147500, L("2nd Transport Magic Circle"), "FTOWER41_MQ_03", "d_firetower_41", -582, -1856, 90, async dialog =>
+		AddConditionalNpc(147500, L("2nd Transport Magic Circle"), "FTOWER41_MQ_03", "d_firetower_41", -582, -1856, 90, c => !c.Quests.IsCompletable(Mq03) && !c.Quests.HasCompleted(Mq03), async dialog =>
 		{
 			var character = dialog.Player;
 
