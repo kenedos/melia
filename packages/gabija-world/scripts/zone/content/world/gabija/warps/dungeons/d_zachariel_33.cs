@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Quests;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class d_zachariel_33WarpsScript : GeneralScript
@@ -21,7 +22,9 @@ public class d_zachariel_33WarpsScript : GeneralScript
 		AddWarp(10, "WS_ZACHA2F_02_TO_01", 180, From("d_zachariel_33", -1532, -434), To("d_zachariel_33", -1553, 19));
 
 		// Royal Mausoleum 2F to Royal Mausoleum 2F
-		AddWarp(7, "WS_ZACHA2F_03_TO_04", 135, From("d_zachariel_33", 515, 300), To("d_zachariel_33", 1126, 250));
+		var lanternRoomWarp = AddWarp(7, "WS_ZACHA2F_03_TO_04", 135, From("d_zachariel_33", 515, 300), To("d_zachariel_33", 1126, 250));
+		if (lanternRoomWarp != null)
+			lanternRoomWarp.VisibleTo = character => character.Quests.Has(new QuestId(8436));
 
 		// Royal Mausoleum 2F to Royal Mausoleum 2F
 		AddWarp(8, "WS_ZACHA2F_04_TO_03", 268, From("d_zachariel_33", 989, 252), To("d_zachariel_33", 434, 252));

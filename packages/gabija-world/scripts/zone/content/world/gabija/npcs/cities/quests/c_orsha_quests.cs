@@ -39,6 +39,7 @@ public class COrshaQuestNpcsScript : GeneralScript
 	private readonly static QuestId Abbay643Sq020 = new QuestId(50139);
 	private readonly static QuestId Abbay643Sq030 = new QuestId(50140);
 	private readonly static QuestId Abbay643Sq040 = new QuestId(50141);
+	private readonly static QuestId Katyn12Sq01 = new QuestId(30072);
 
 	protected override void Load()
 	{
@@ -586,6 +587,20 @@ public class COrshaQuestNpcsScript : GeneralScript
 	private static async Task<HookResult> JurusDialog(Dialog dialog)
 	{
 		var character = dialog.Player;
+
+		if (character.Quests.IsCompletable(Katyn12Sq01))
+		{
+			var told = await character.TimeActions.StartAsync(L("Talking about the letter"), L("Cancel"), "TALK", TimeSpan.FromSeconds(2));
+			if (told != TimeActionResult.Completed)
+				return HookResult.Break;
+
+			dialog.SetPortrait("Dlg_port_Yurrs");
+			await dialog.Msg(L("This letter is... left by Eras. This is the first time since ages ago that I have heard from him..."));
+			await dialog.Msg(L("But now he has gone into the arms of the goddess... Fate is so cruel and gruesome to bear."));
+			await dialog.Msg(L("Thank you for delivering this letter to me. At least, now I know what had happened to him."));
+			await dialog.CompleteQuest(Katyn12Sq01);
+			return HookResult.Break;
+		}
 
 		if (character.Quests.IsCompletable(Mq1_03))
 		{

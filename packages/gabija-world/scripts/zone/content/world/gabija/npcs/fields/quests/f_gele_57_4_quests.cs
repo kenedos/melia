@@ -27,6 +27,8 @@ public class FGele574QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq07 = new QuestId(8607);
 	private readonly static QuestId Mq08 = new QuestId(8608);
 	private readonly static QuestId Mq09 = new QuestId(8609);
+	private readonly static QuestId Gele573Mq08 = new QuestId(8545);
+	private readonly static QuestId Chapel576Mq041 = new QuestId(8730);
 
 	protected override void Load()
 	{
@@ -71,7 +73,10 @@ public class FGele574QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Mq01);
+					character.LookAround();
+				}
 
 				return;
 			}
@@ -107,6 +112,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Ah, and if a brainwashed Panto injures an attacking Panto, that Panto will be on our side as well."));
 					character.Quests.Start(Mq06);
 					character.Inventory.Add(650709, 1, InventoryAddType.PickUp);
+					character.LookAround();
 				}
 				return;
 			}
@@ -302,7 +308,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 		// Follower Algis at the road
 		//-------------------------------------------------------------------------
-		AddNpc(147390, L("Follower Algis"), "GELE574_ALLGES", "f_gele_57_4", 947, 1189, 68, async dialog =>
+		AddConditionalNpc(147390, L("Follower Algis"), "GELE574_ALLGES", "f_gele_57_4", 947, 1189, 68, c => c.Quests.HasCompleted(Gele573Mq08) && !c.Quests.IsCompletable(Mq09) && !c.Quests.HasCompleted(Mq09), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -335,7 +341,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 		// Follower Algis at the cathedral
 		//-------------------------------------------------------------------------
-		AddNpc(147390, L("Follower Algis"), "GELE574_ARUNE_1", "f_gele_57_4", 1305, 2033, 189, async dialog =>
+		AddConditionalNpc(147390, L("Follower Algis"), "GELE574_ARUNE_1", "f_gele_57_4", 1305, 2033, 189, c => (c.Quests.IsCompletable(Mq09) || c.Quests.HasCompleted(Mq09)) && !c.Quests.HasCompleted(Chapel576Mq041), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -347,6 +353,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("This barrier is impossible to open from the outside."));
 				await dialog.Msg(L("Fortunately, the entrance to the basement looks secure."));
 				await dialog.CompleteQuest(Mq09);
+				character.LookAround();
 				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The 1st floor of the Tenet Church has been sealed by Gesti's powers."));
 				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Find the way up to the first floor through the basement!"));
 				return;
@@ -357,7 +364,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 		// Small Beehive
 		//-------------------------------------------------------------------------
-		AddNpc(400121, L("Small Beehive"), "GELE574_MQ_01", "f_gele_57_4", -1017, 2085, 90, async dialog =>
+		AddConditionalNpc(400121, L("Small Beehive"), "GELE574_MQ_01", "f_gele_57_4", -1017, 2085, 90, c => c.Quests.IsActive(Mq01) && !c.Quests.IsCompletable(Mq01), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -365,11 +372,12 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq01) && !character.Quests.IsCompletable(Mq01))
 			{
-				await dialog.Msg(L("You tear the hive down. The buzzing stops - and then something far larger comes crashing through the trees."));
 				var clearedIt = await character.TimeActions.StartAsync(L("Clearing it away..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
 
 				if (clearedIt != TimeActionResult.Completed)
 					return;
+
+				character.ServerMessage(L("You tear the hive down. The buzzing stops - and then something far larger comes crashing through the trees."));
 
 				character.Quests.StartQuestTrack(Mq01);
 				return;
@@ -380,7 +388,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 		// Nepenthes
 		//-------------------------------------------------------------------------
-		AddNpc(147454, L("Nepenthes"), "GELE574_MQ_04", "f_gele_57_4", 2314, -722, -43, async dialog =>
+		AddConditionalNpc(147454, L("Nepenthes"), "GELE574_MQ_04", "f_gele_57_4", 2314, -722, -43, c => !c.Quests.IsCompletable(Mq04) && !c.Quests.HasCompleted(Mq04), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -388,11 +396,12 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				await dialog.Msg(L("You set the combustible fat alight. The Nepenthes shudders awake."));
 				var litIt4 = await character.TimeActions.StartAsync(L("Setting it alight..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(1));
 
 				if (litIt4 != TimeActionResult.Completed)
 					return;
+
+				character.ServerMessage(L("You set the combustible fat alight. The Nepenthes shudders awake."));
 
 				character.Quests.StartQuestTrack(Mq04);
 				return;
@@ -403,7 +412,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 		// Panto Totem
 		//-------------------------------------------------------------------------
-		AddNpc(147356, L("Panto Totem"), "GELE574_MQ_06", "f_gele_57_4", -1563, -792, 72, async dialog =>
+		AddConditionalNpc(147356, L("Panto Totem"), "GELE574_MQ_06", "f_gele_57_4", -1563, -792, 72, c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -411,11 +420,12 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
-				await dialog.Msg(L("You set the totem alight. As it burns, the charm's hold snaps into place."));
 				var litIt6 = await character.TimeActions.StartAsync(L("Lighting it..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
 
 				if (litIt6 != TimeActionResult.Completed)
 					return;
+
+				character.ServerMessage(L("You set the totem alight. As it burns, the charm's hold snaps into place."));
 
 				character.Quests.StartQuestTrack(Mq06);
 				return;
@@ -434,7 +444,12 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq08) && !character.Quests.IsCompletable(Mq08))
 			{
-				await dialog.Msg(L("You scrawl over the summoning circle. The formulas tangle, and the summoned demons are swallowed back in."));
+				var scrawled = await character.TimeActions.StartAsync(L("Scribbling over the circle..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (scrawled != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You scrawl over the summoning circle. The formulas tangle, and the summoned demons are swallowed back in."));
 				character.Quests.CompleteObjective(Mq08, "scribbleCircle");
 				return;
 			}

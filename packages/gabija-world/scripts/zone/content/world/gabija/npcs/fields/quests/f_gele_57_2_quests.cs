@@ -116,7 +116,10 @@ public class FGele572QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Mq09);
+					character.LookAround();
+				}
 
 				return;
 			}
@@ -154,6 +157,8 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The totems are broken? Then the shaman dolls did their part."));
 				await dialog.CompleteQuest(Mq04);
+				character.Quests.Start(Mq05);
+				character.LookAround();
 				return;
 			}
 
@@ -169,6 +174,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Every trace of the corruption is gone. Labure Highway can breathe again."));
 				await dialog.CompleteQuest(Mq06);
+				character.LookAround();
 				return;
 			}
 
@@ -177,6 +183,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("It would have been a disaster if the Wild Carnivore had legs."));
 				await dialog.Msg(L("I'm glad it was killed beforehand."));
 				await dialog.CompleteQuest(Mq07);
+				character.LookAround();
 				return;
 			}
 
@@ -206,6 +213,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("You can summon the shaman doll with this summon scroll."));
 					character.Quests.Start(Mq04);
 					character.Inventory.Add(650703, 1, InventoryAddType.PickUp);
+					character.LookAround();
 				}
 				return;
 			}
@@ -285,7 +293,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 		// Panto Totem
 		//-------------------------------------------------------------------------
-		AddNpc(153068, L("Panto Totem"), "GELE572_MQ_05", "f_gele_57_2", 975, -1131, 102, async dialog =>
+		AddConditionalNpc(153068, L("Panto Totem"), "GELE572_MQ_05", "f_gele_57_2", 975, -1131, 102, IsTotemShown, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -293,12 +301,12 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				await dialog.Msg(L("You set the shaman doll against the totem. It claws at the evil energy until the totem splits apart."));
-				var searchedIt = await character.TimeActions.StartAsync(L("Searching..."), L("Cancel"), "SITGROPE2_LOOP", TimeSpan.FromSeconds(2));
+				var broken = await character.TimeActions.StartAsync(L("Summoning the shaman doll..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
 
-				if (searchedIt != TimeActionResult.Completed)
+				if (broken != TimeActionResult.Completed)
 					return;
 
+				character.ServerMessage(L("You set the shaman doll against the totem. It claws at the evil energy until the totem splits apart."));
 				character.Quests.CompleteObjective(Mq04, "destroyTotems");
 				return;
 			}
@@ -312,8 +320,13 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
 			{
-				await dialog.Msg(L("The corruption stirs again. Simorph is near."));
-				character.Quests.ClearQuestTrack(Mq05);
+				var searched = await character.TimeActions.StartAsync(L("Searching..."), L("Cancel"), "SITGROPE2_LOOP", TimeSpan.FromSeconds(2));
+
+				if (searched != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The corruption stirs. Simorph is coming."));
+				character.Quests.ReplayQuestTrack(Mq05);
 				return;
 			}
 
@@ -322,7 +335,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 		// Wild Carnivore
 		//-------------------------------------------------------------------------
-		AddNpc(147450, L("Wild Carnivore"), "GELE572_MQ_07", "f_gele_57_2", 1014, 1678, 0, async dialog =>
+		AddConditionalNpc(147450, L("Wild Carnivore"), "GELE572_MQ_07", "f_gele_57_2", 1014, 1678, 0, c => c.Quests.HasCompleted(Mq06) && !c.Quests.IsCompletable(Mq07) && !c.Quests.HasCompleted(Mq07), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -330,13 +343,13 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
 			{
-				await dialog.Msg(L("The corrupted beast turns on you. There is nothing left of what it was."));
 				var provokedIt = await character.TimeActions.StartAsync(L("Provoking it..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
 
 				if (provokedIt != TimeActionResult.Completed)
 					return;
 
-				character.Quests.StartQuestTrack(Mq07);
+				character.ServerMessage(L("The corrupted beast turns on you. There is nothing left of what it was."));
+				character.Quests.ReplayQuestTrack(Mq07);
 				return;
 			}
 
@@ -352,7 +365,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 		// Mushcaria
 		//-------------------------------------------------------------------------
-		AddNpc(147462, L("Mushcaria"), "GELE572_MQ_09", "f_gele_57_2", -1136, 417, 19, async dialog =>
+		AddConditionalNpc(147462, L("Mushcaria"), "GELE572_MQ_09", "f_gele_57_2", -1136, 417, 19, c => c.Quests.IsActive(Mq09) && !c.Quests.IsCompletable(Mq09), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -360,12 +373,12 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq09) && !character.Quests.IsCompletable(Mq09))
 			{
-				await dialog.Msg(L("The Mushcaria rears up, mane bristling with spirit energy."));
 				var proddedIt = await character.TimeActions.StartAsync(L("Prodding it..."), L("Cancel"), "SITGROPE_LOOP", TimeSpan.FromSeconds(3));
 
 				if (proddedIt != TimeActionResult.Completed)
 					return;
 
+				character.ServerMessage(L("The Mushcaria rears up, mane bristling with spirit energy."));
 				character.Quests.StartQuestTrack(Mq09);
 				return;
 			}
@@ -383,6 +396,8 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 				character.Quests.Start(Mq01);
+			else if (character.Quests.IsActive(Mq01) && !character.Quests.IsCompletable(Mq01))
+				character.Quests.ReplayQuestTrack(Mq01);
 
 			await Task.CompletedTask;
 		});
@@ -398,6 +413,21 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
+	}
+
+	/// <summary>
+	/// Returns whether the Panto Totem stands for the given character, while
+	/// the shaman doll is sent at it and until Simorph answers.
+	/// </summary>
+	private static bool IsTotemShown(Character character)
+	{
+		if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
+			return true;
+
+		if (character.Quests.HasCompleted(Mq04) && !character.Quests.Has(Mq05))
+			return true;
+
+		return character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05);
 	}
 }
 

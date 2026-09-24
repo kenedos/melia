@@ -5,10 +5,14 @@
 // city once the Mage Tower has given up its revelation.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -19,6 +23,7 @@ public class CFedimianQuestNpcsScript : GeneralScript
 {
 	private readonly static QuestId ToTheTower1 = new QuestId(8471);
 	private readonly static QuestId ToPilgrimsWay = new QuestId(8512);
+	private readonly static QuestId SeirTempleRebuilding2 = new QuestId(80049);
 
 	protected override void Load()
 	{
@@ -61,6 +66,118 @@ public class CFedimianQuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("The Mage Tower stands past the Suburbs. Goddess Gabija has held it alone for far too long."));
+		});
+
+		// The Fedimian masters
+		//-------------------------------------------------------------------------
+		AddNpc(57227, L("[Druid Master]{nl}Gina Greene"), "JOB_DRUID3_1_NPC", "c_fedimian", 432.94, 808.29, 20, async dialog =>
+		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Druid Master"));
+			dialog.SetPortrait("Dlg_port_druid");
+
+			if (character.Quests.IsActive(SeirTempleRebuilding2))
+			{
+				if (character.Inventory.CountItem(ItemId.ORCHARD_324_SQ_SCROLL) > 0)
+				{
+					await dialog.Msg(L("A human sided with the demons... With the world as it is, who would have thought...?"));
+					return;
+				}
+
+				var explained = await character.TimeActions.StartAsync(L("Explaining the situation"), L("Cancel"), "TALK", TimeSpan.FromSeconds(1));
+				if (explained != TimeActionResult.Completed)
+					return;
+
+				await dialog.Msg(L("So the land was contaminated not by demons, but a human... With the world as it is, who would have thought...?"));
+				await dialog.Msg(L("I have a solution. I'm going to write you a purification scroll. That should be enough to solve the problem."));
+
+				character.Inventory.Add(ItemId.ORCHARD_324_SQ_SCROLL, 1, InventoryAddType.PickUp);
+				return;
+			}
+
+			switch (GameRandom.Get().Next(3))
+			{
+				case 0:
+					await dialog.Msg(L("Medzio Diena was not nature's will. After all, nature is governed by the goddesses, and they would never do harm to us all."));
+					break;
+				case 1:
+					await dialog.Msg(L("If the Mage Tower collapses, Fedimian won't be safe. The Demon Lord Helgasercle... the end of the obsession ends in such vain."));
+					break;
+				default:
+					await dialog.Msg(L("Ever since the Revelators who dreamt of the goddesses appeared, the hands of the demons released them one by one."));
+					await dialog.Msg(L("The same goes for the Great Cathedral. The proof that the Goddesses didn't abandon us is them."));
+					break;
+			}
+		});
+
+		AddNpc(147439, L("[Squire Master]{nl}Justina Legwyn"), "JOB_SQUIRE3_1_NPC", "c_fedimian", 694, 114, 90, async dialog =>
+		{
+			dialog.SetTitle(L("Squire Master"));
+			dialog.SetPortrait("Dlg_port_JustinaLegwyn");
+
+			if (dialog.Player.Quests.IsActive(SeirTempleRebuilding2))
+			{
+				await dialog.Msg(L("A method to purify the earth... I believe that the clerics might know more about this topic."));
+				return;
+			}
+
+			switch (GameRandom.Get().Next(3))
+			{
+				case 0:
+					await dialog.Msg(L("If you ask me what the strongest weapon is, my answer would be my faith. Faith to an ally that you can truly rely on."));
+					break;
+				case 1:
+					await dialog.Msg(L("We are in chaos nowadays, but we used to live in honorable times before. Well... that's all in the past now."));
+					break;
+				default:
+					await dialog.Msg(L("I heard not that long ago that thanks to the Revelators the demons failed to interfere with the Mage Tower."));
+					await dialog.Msg(L("If it were me I would have made sure no one would have even dared to think about it in the first place. So that what happened to my family won't happen ever again."));
+					break;
+			}
+		});
+
+		AddNpc(57238, L("[Rogue Master]{nl}Gema"), "MASTER_ROGUE", "c_fedimian", 169, 162.18, 90, async dialog =>
+		{
+			dialog.SetTitle(L("Rogue Master"));
+			dialog.SetPortrait("Dlg_port_Gema");
+
+			if (dialog.Player.Quests.IsActive(SeirTempleRebuilding2))
+			{
+				await dialog.Msg(L("I know a method to purify the demons. You need to hold your breath, so that no one will sense you. Then, quietly get closer to the lights..."));
+				await dialog.Msg(L("Darn. A method to purify the earth, but not the demons? You should've found Druid Master if that's the case. The order is wrong."));
+				return;
+			}
+
+			switch (GameRandom.Get().Next(3))
+			{
+				case 0:
+					await dialog.Msg(L("If I'm paid well, there's no reason I would stop a person who wants to learn my techniques. Rather, I would even welcome that person."));
+					await dialog.Msg(L("That doesn't mean they should follow my every move, though."));
+					break;
+				case 1:
+					await dialog.Msg(L("I have heard about the Revelator who drove out the demons from the Mage Tower. The Masters didn't do anything. Of course, I didn't do anything neither."));
+					break;
+				default:
+					await dialog.Msg(L("Everyone is just busy trying to survive after Medzio Diena, so they don't have time to think about going to the great cathedral."));
+					await dialog.Msg(L("But everyone relies on the Great Cathedral. The Revelator completed a huge task."));
+					break;
+			}
+		});
+
+		AddNpc(147443, L("[Doppelsoeldner Master]{nl}Guerra"), "MASTER_DOPPELSOELDNER", "c_fedimian", 220.70, -81.84, 0, async dialog =>
+		{
+			dialog.SetTitle(L("Doppelsoeldner Master"));
+			dialog.SetPortrait("Dlg_port_Guerra");
+
+			if (dialog.Player.Quests.IsActive(SeirTempleRebuilding2))
+			{
+				await dialog.Msg(L("You need my power? The price is bit steep. Is it a job worth that much?"));
+				await dialog.Msg(L("Hold on... A method to purify the earth? Hey... I'm just a mercenary. Go find the answers somewhere else."));
+				return;
+			}
+
+			await dialog.Msg(L("Worthwhile things always carry a degree of risk. Naturally, for big rewards, you'll have to put up with lots of danger."));
 		});
 
 		// Hidden triggers

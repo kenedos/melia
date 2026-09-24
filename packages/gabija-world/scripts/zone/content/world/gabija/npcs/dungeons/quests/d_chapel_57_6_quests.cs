@@ -48,7 +48,8 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq0905) && character.Quests.IsCompletable(Mq0905))
 			{
-				await dialog.Msg(L("Is Brother Vaidutis alright? I came running when I heard the barrier break."));
+				await dialog.Msg(L("I came to say that Gesti went up to the 2nd floor, and I let my guard down."));
+				await dialog.Msg(L("I would have been in big trouble if not for you."));
 
 				await dialog.CompleteQuest(Mq0905);
 				return;
@@ -92,6 +93,24 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
+			{
+				var answer = await dialog.SelectQuestOffer(Mq02, L("You should get ready before you take the Light Crystal to the entrance. It could attract a powerful monster."),
+					Option(L("I'll open the gate"), "accept"),
+					Option(L("I'll wait a little bit"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq02);
+					character.Inventory.Add(650726, 1, InventoryAddType.PickUp);
+					character.LookAround();
+					await dialog.Msg(L("I think I'll stay here to stop the demons from entering the basement."));
+				}
+
+				return;
+			}
+
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("I would like to ask you to defeat Pawndel and Pawnd."));
@@ -115,7 +134,10 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Rp1);
+					character.LookAround();
+				}
 
 				return;
 			}
@@ -129,6 +151,12 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq01))
 			{
 				await dialog.Msg(L("The Corylus hoard Power Crystals at the Worship Anteroom."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("I think I'll stay here to stop the demons from entering the basement."));
 				return;
 			}
 
@@ -149,7 +177,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 		// Follower Donatas
 		//-------------------------------------------------------------------------
-		AddNpc(147399, L("Follower Donatas"), "CHAPEL576_DONATAS", "d_chapel_57_6", -1674, 374, 110, async dialog =>
+		AddConditionalNpc(147399, L("Follower Donatas"), "CHAPEL576_DONATAS", "d_chapel_57_6", -1674, 374, 110, c => c.Quests.Has(Mq041), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -160,6 +188,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("It is an honor to fight with you, Revelator."));
 				await dialog.Msg(L("Could you drive the demons from this area while Follower Algis investigates?"));
 				await dialog.CompleteQuest(Mq041);
+				character.LookAround();
 				return;
 			}
 
@@ -337,6 +366,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				if (!character.Quests.Has(Mq041) && character.Quests.MeetsPrerequisites(Mq041))
 					character.Quests.Start(Mq041);
 
+				character.LookAround();
 				return;
 			}
 
@@ -351,6 +381,14 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The barrier is broken. Algis steps through the gate."));
 				character.Quests.Start(Mq041);
+				character.LookAround();
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq041) && !character.Quests.IsCompletable(Mq041))
+			{
+				await dialog.Msg(L("The barrier is broken. Algis steps through the gate."));
+				character.Quests.ReplayQuestTrack(Mq041);
 				return;
 			}
 
@@ -404,7 +442,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 		// Orb Crystal
 		//-------------------------------------------------------------------------
-		AddNpc(153105, L("Orb Crystal"), "CHAPLE576_RP_1_OBJ", "d_chapel_57_6", 343, 13, 90, async dialog =>
+		AddConditionalNpc(153105, L("Orb Crystal"), "CHAPLE576_RP_1_OBJ", "d_chapel_57_6", 343, 13, 90, c => c.Quests.IsActive(Rp1) && !c.Quests.IsCompletable(Rp1), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -412,9 +450,15 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Rp1) && !character.Quests.IsCompletable(Rp1))
 			{
-				await dialog.Msg(L("You prise an orb crystal loose from the cluster."));
+				var prised = await character.TimeActions.StartAsync(L("Prising the crystal loose..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (prised != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You prise an orb crystal loose from the cluster."));
 				character.Inventory.Add(664092, 1, InventoryAddType.PickUp);
 				character.Quests.CompleteObjective(Rp1, "collectOrbs");
+				character.LookAround();
 				return;
 			}
 

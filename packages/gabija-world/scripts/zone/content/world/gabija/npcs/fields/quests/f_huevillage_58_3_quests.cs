@@ -34,7 +34,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 	{
 		// Andale Village Priest
 		//-------------------------------------------------------------------------
-		AddNpc(147408, L("Andale Village Priest"), "HUEVILLAGE_58_3_MQ01_NPC", "f_huevillage_58_3", 438.90, -598.18, 90, async dialog =>
+		AddConditionalNpc(147408, L("Andale Village Priest"), "HUEVILLAGE_58_3_MQ01_NPC", "f_huevillage_58_3", 438.90, -598.18, 90, c => !IsVillageEmptied(c), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -129,7 +129,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		// Andale Village Headman
 		//-------------------------------------------------------------------------
-		AddNpc(147396, L("Andale Village Headman"), "HUEVILLAGE_58_3_MQ03_NPC", "f_huevillage_58_3", 562.93, -844.83, 90, async dialog =>
+		AddConditionalNpc(147396, L("Andale Village Headman"), "HUEVILLAGE_58_3_MQ03_NPC", "f_huevillage_58_3", 562.93, -844.83, 90, c => !IsVillageEmptied(c), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -222,7 +222,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 					return;
 
 				character.Inventory.Add(ItemId.HUEVILLAGE_58_3_MQ02_ITEM1, 1, InventoryAddType.PickUp);
-				await dialog.Msg(L("You cut the flower at the stem. The scent of it clings to your hands."));
+				character.ServerMessage(L("You cut the flower at the stem. The scent of it clings to your hands."));
 				character.ServerMessage(L("You obtained the Strongly Scented Soul Flower. Return to the village priest."));
 				return;
 			}
@@ -265,7 +265,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		// Sleeping Upent
 		//-------------------------------------------------------------------------
-		AddNpc(57019, L("Sleeping Upent"), "HUEVILLAGE_58_3_MQ04_NPC01", "f_huevillage_58_3", -1395.59, -1312.53, 104, async dialog =>
+		AddConditionalNpc(57019, L("Sleeping Upent"), "HUEVILLAGE_58_3_MQ04_NPC01", "f_huevillage_58_3", -1395.59, -1312.53, 104, c => !IsVillageEmptied(c), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -273,12 +273,13 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				await dialog.Msg(L("You set the Languid Herb Bomb down among the sleeping Upents and step back."));
-				character.Inventory.RemoveItem(ItemId.HUEVILLAGE_58_3_MQ03_ITEM2, 1);
 				var setBomb = await character.TimeActions.StartAsync(L("Setting the Languid Herb bomb..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
 
 				if (setBomb != TimeActionResult.Completed)
 					return;
+
+				character.Inventory.RemoveItem(ItemId.HUEVILLAGE_58_3_MQ03_ITEM2, 1);
+				character.ServerMessage(L("You set the Languid Herb Bomb down among the sleeping Upents and step back."));
 
 				character.Quests.StartQuestTrack(Mq04);
 				return;
@@ -347,8 +348,13 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Sq01) && character.Inventory.CountItem(ItemId.HUEVILLAGE_58_3_SQ01_BUCKET) == 0)
 			{
+				var taken = await character.TimeActions.StartAsync(L("Picking up the bucket..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (taken != TimeActionResult.Completed)
+					return;
+
 				character.Inventory.Add(ItemId.HUEVILLAGE_58_3_SQ01_BUCKET, 1, InventoryAddType.PickUp);
-				await dialog.Msg(L("The bucket is sound, and its handle will take a rope."));
+				character.ServerMessage(L("The bucket is sound, and its handle will take a rope."));
 				return;
 			}
 
@@ -365,8 +371,13 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Sq01) && character.Inventory.CountItem(ItemId.HUEVILLAGE_58_3_SQ01_ROPE) == 0)
 			{
+				var untied = await character.TimeActions.StartAsync(L("Untying the rope..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (untied != TimeActionResult.Completed)
+					return;
+
 				character.Inventory.Add(ItemId.HUEVILLAGE_58_3_SQ01_ROPE, 1, InventoryAddType.PickUp);
-				await dialog.Msg(L("You work a long rope loose from the canopy's guy lines."));
+				character.ServerMessage(L("You work a long rope loose from the canopy's guy lines."));
 				return;
 			}
 
@@ -382,7 +393,10 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
+			{
 				character.Quests.Complete(Mq04);
+				character.ServerMessage(L("You made it out of the village while the scent held. Andale Village stands empty behind you."));
+			}
 
 			await Task.CompletedTask;
 		});
@@ -410,8 +424,13 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		var cut = await character.TimeActions.StartAsync(L("Cutting the herb..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (cut != TimeActionResult.Completed)
+			return;
+
 		character.Inventory.Add(ItemId.HUEVILLAGE_58_3_MQ01_ITEM1, 1, InventoryAddType.PickUp);
-		await dialog.Msg(L("You cut a handful of the herb and wrap it."));
+		character.ServerMessage(L("You cut a handful of the herb and wrap it."));
 	}
 
 	/// <summary>
@@ -426,8 +445,13 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		if (character.Quests.IsActive(Mq03) && character.Inventory.CountItem(ItemId.HUEVILLAGE_58_3_MQ03_ITEM1) == 0)
 		{
+			var opened = await character.TimeActions.StartAsync(L("Opening the barrel..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+			if (opened != TimeActionResult.Completed)
+				return;
+
 			character.Inventory.Add(ItemId.HUEVILLAGE_58_3_MQ03_ITEM1, 1, InventoryAddType.PickUp);
-			await dialog.Msg(L("The small barrel is the one with the explosives in it after all."));
+			character.ServerMessage(L("The small barrel is the one with the explosives in it after all."));
 			return;
 		}
 
@@ -446,12 +470,24 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		if (character.Quests.IsActive(Mq03))
 		{
-			await dialog.Msg(L("Nothing in this one but sawdust. The headman said the bigger barrels."));
+			var opened = await character.TimeActions.StartAsync(L("Opening the barrel..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+			if (opened != TimeActionResult.Completed)
+				return;
+
+			character.ServerMessage(L("Nothing in this one but sawdust. The headman said the bigger barrels."));
 			return;
 		}
 
 		await dialog.Msg(L("A large barrel, empty and open to the weather."));
 	}
+
+	/// <summary>
+	/// Returns whether the villagers of Andale have left for the given
+	/// character, which they do once the Languid Herb bomb has gone off.
+	/// </summary>
+	private static bool IsVillageEmptied(Character character)
+		=> character.Quests.IsCompletable(Mq04) || character.Quests.HasCompleted(Mq04);
 }
 
 //-----------------------------------------------------------------------------

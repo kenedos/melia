@@ -31,6 +31,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq08 = new QuestId(18008);
 	private readonly static QuestId Mq09 = new QuestId(50003);
 	private readonly static QuestId Mq11 = new QuestId(18010);
+	private readonly static QuestId GirlInDanger = new QuestId(18190);
 
 	private const int OfferingToolsNeeded = 5;
 
@@ -38,7 +39,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 	{
 		// Grand Shrine Barrier
 		//-------------------------------------------------------------------------
-		AddNpc(147469, L("Grand Shrine Barrier"), "HUEVILLAGE_58_4_MQ01_NPC01", "f_huevillage_58_4", 43, -343, 90, async dialog =>
+		AddConditionalNpc(147469, L("Grand Shrine Barrier"), "HUEVILLAGE_58_4_MQ01_NPC01", "f_huevillage_58_4", 43, -343, 90, c => c.Quests.HasCompleted(GirlInDanger) && !c.Quests.IsCompletable(Mq02) && !c.Quests.HasCompleted(Mq02), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -76,7 +77,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Goddess Saule
 		//-------------------------------------------------------------------------
-		AddNpc(147385, L("Goddess Saule"), "HUEVILLAGE_58_4_SAULE_BEFORE", "f_huevillage_58_4", 21.42, -186.01, 0, async dialog =>
+		AddConditionalNpc(147385, L("Goddess Saule"), "HUEVILLAGE_58_4_SAULE_BEFORE", "f_huevillage_58_4", 21.42, -186.01, 0, c => c.Quests.HasCompleted(GirlInDanger), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -90,6 +91,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The one who Goddess Laima talked about."));
 				await dialog.Msg(L("I am Saule, the goddess of the sun. I was the guardian of the revelation."));
 				await dialog.CompleteQuest(Mq02);
+				character.LookAround();
 				return;
 			}
 
@@ -106,6 +108,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Thank you."));
 				await dialog.Msg(L("I should be able to work with this amount of divine energy."));
 				await dialog.CompleteQuest(Mq05);
+				character.LookAround();
 				return;
 			}
 
@@ -157,6 +160,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq01);
+					SyncBindingCircles(character);
 					await dialog.Msg(L("The Binding Magic Circles are located in Drugys Courtyard and Vapsva Vacant Lot."));
 					await dialog.Msg(L("Please hurry before I lose my consciousness."));
 					return;
@@ -176,6 +180,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq05);
+					character.LookAround();
 					await dialog.Msg(L("Please bring me the sacrifice tools in the Altar Grand Corridor."));
 					await dialog.Msg(L("I will try to use the divine power that dwells in the tool."));
 					return;
@@ -215,6 +220,14 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq08);
 					return;
 				}
+				return;
+			}
+
+			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
+			{
+				await dialog.Msg(L("My Believers are waiting for you in Gate Route."));
+				await dialog.Msg(L("Please take back the revelation from Bramble."));
+				character.Quests.Start(Mq09);
 				return;
 			}
 
@@ -288,7 +301,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Binding Magic Circle at Drugys Courtyard
 		//-------------------------------------------------------------------------
-		AddNpc(147417, L("Binding Magic Circle"), "HUEVILLAGE_58_4_MQ03_NPC01", "f_huevillage_58_4", -879, -737, 91, async dialog =>
+		AddConditionalNpc(147417, L("Binding Magic Circle"), "HUEVILLAGE_58_4_MQ03_NPC01", "f_huevillage_58_4", -879, -737, 91, c => !c.Quests.HasCompleted(Mq03), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -326,7 +339,7 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Binding Magic Circle at Vapsva Vacant Lot
 		//-------------------------------------------------------------------------
-		AddNpc(147417, L("Binding Magic Circle"), "HUEVILLAGE_58_4_MQ04_NPC01", "f_huevillage_58_4", 426, 705, 90, async dialog =>
+		AddConditionalNpc(147417, L("Binding Magic Circle"), "HUEVILLAGE_58_4_MQ04_NPC01", "f_huevillage_58_4", 426, 705, 90, c => !c.Quests.HasCompleted(Mq04), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -364,17 +377,17 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 
 		// Shrine Offering Tools
 		//-------------------------------------------------------------------------
-		AddNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC01", "f_huevillage_58_4", 528.19, -45.39, 90, this.TakeOfferingTool);
-		AddNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC02", "f_huevillage_58_4", 690.47, -60.85, 90, this.TakeOfferingTool);
-		AddNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC03", "f_huevillage_58_4", 860.05, -24.10, 90, this.TakeOfferingTool);
-		AddNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC04", "f_huevillage_58_4", 946.71, -390.39, 90, this.TakeOfferingTool);
-		AddNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC05", "f_huevillage_58_4", 808.60, -312.94, 90, this.TakeOfferingTool);
-		AddNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC06", "f_huevillage_58_4", 583.82, -401.98, 90, this.TakeOfferingTool);
-		AddNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC07", "f_huevillage_58_4", 371.24, -365.04, 90, this.TakeOfferingTool);
+		AddConditionalNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC01", "f_huevillage_58_4", 528.19, -45.39, 90, c => c.Quests.IsActive(Mq05), this.TakeOfferingTool);
+		AddConditionalNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC02", "f_huevillage_58_4", 690.47, -60.85, 90, c => c.Quests.IsActive(Mq05), this.TakeOfferingTool);
+		AddConditionalNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC03", "f_huevillage_58_4", 860.05, -24.10, 90, c => c.Quests.IsActive(Mq05), this.TakeOfferingTool);
+		AddConditionalNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC04", "f_huevillage_58_4", 946.71, -390.39, 90, c => c.Quests.IsActive(Mq05), this.TakeOfferingTool);
+		AddConditionalNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC05", "f_huevillage_58_4", 808.60, -312.94, 90, c => c.Quests.IsActive(Mq05), this.TakeOfferingTool);
+		AddConditionalNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC06", "f_huevillage_58_4", 583.82, -401.98, 90, c => c.Quests.IsActive(Mq05), this.TakeOfferingTool);
+		AddConditionalNpc(151022, L("Shrine Offering Tools"), "HUEVILLAGE_58_4_MQ05_NPC07", "f_huevillage_58_4", 371.24, -365.04, 90, c => c.Quests.IsActive(Mq05), this.TakeOfferingTool);
 
 		// Demon Barrier
 		//-------------------------------------------------------------------------
-		AddNpc(147372, L("Demon Barrier"), "HUEVILLAGE_58_4_MQ07_NPC01", "f_huevillage_58_4", 1296, -245, 90, async dialog =>
+		AddConditionalNpc(147372, L("Demon Barrier"), "HUEVILLAGE_58_4_MQ07_NPC01", "f_huevillage_58_4", 1296, -245, 90, c => !c.Quests.IsCompletable(Mq07) && !c.Quests.HasCompleted(Mq07), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -447,8 +460,29 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		var lifted = await character.TimeActions.StartAsync(L("Lifting the offering tool..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (lifted != TimeActionResult.Completed)
+			return;
+
 		character.Inventory.Add(ItemId.HUEVILLAGE_58_4_MQ05_ITEM1, 1, InventoryAddType.PickUp);
-		await dialog.Msg(L("There is divine energy left in this one. You lift it out of its stand."));
+		character.ServerMessage(L("There is divine energy left in this one. You lift it out of its stand."));
+	}
+
+	/// <summary>
+	/// Marks each binding magic circle the character already broke on
+	/// Release Goddess Saule (1), whichever order the two were done in.
+	/// </summary>
+	public static void SyncBindingCircles(Character character)
+	{
+		if (!character.Quests.IsActive(Mq01))
+			return;
+
+		if (character.Quests.HasCompleted(Mq03))
+			character.Quests.CompleteObjective(Mq01, "breakDrugys");
+
+		if (character.Quests.HasCompleted(Mq04))
+			character.Quests.CompleteObjective(Mq01, "breakVapsva");
 	}
 }
 
@@ -504,8 +538,8 @@ public class Huevillage584Mq01Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(18002, QuestStatus.Completed));
 
-		AddObjective("breakDrugys", L("Destroy the magic circle in Drugys Courtyard"), new KillObjective(1, "boss_Mothstem"));
-		AddObjective("breakVapsva", L("Destroy the magic circle in Vapsva Vacant Lot"), new KillObjective(1, "boss_Merge"));
+		AddObjective("breakDrugys", L("Destroy the magic circle in Drugys Courtyard"), new ManualObjective());
+		AddObjective("breakVapsva", L("Destroy the magic circle in Vapsva Vacant Lot"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 1));
 	}
@@ -545,6 +579,7 @@ public class Huevillage584Mq03Quest : QuestScript
 		// The kill is the quest; the client names no turn-in NPC.
 		character.ServerMessage(L("The circle in Drugys Courtyard has gone dark."));
 		character.Quests.Complete(this.QuestId);
+		FHuevillage584QuestNpcsScript.SyncBindingCircles(character);
 	}
 }
 
@@ -582,6 +617,7 @@ public class Huevillage584Mq04Quest : QuestScript
 		// The kill is the quest; the client names no turn-in NPC.
 		character.ServerMessage(L("The circle in Vapsva Vacant Lot has gone dark."));
 		character.Quests.Complete(this.QuestId);
+		FHuevillage584QuestNpcsScript.SyncBindingCircles(character);
 	}
 }
 

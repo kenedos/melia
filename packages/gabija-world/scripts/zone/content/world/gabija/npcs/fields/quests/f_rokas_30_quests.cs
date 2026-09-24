@@ -146,7 +146,7 @@ public class FRokas30QuestNpcsScript : GeneralScript
 
 		// Historian Cyrenia Odell, at the camp
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147345, L("Historian Cyrenia Odell"), "ROKAS30_ODEL", "f_rokas_30", 1551, 410, 90, c => !c.Quests.HasCompleted(Mq5), async dialog =>
+		AddConditionalNpc(147345, L("Historian Cyrenia Odell"), "ROKAS30_ODEL", "f_rokas_30", 1551, 410, 90, c => !c.Quests.IsCompletable(Mq5) && !c.Quests.HasCompleted(Mq5), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -181,7 +181,7 @@ public class FRokas30QuestNpcsScript : GeneralScript
 
 		// Historian Cyrenia Odell, at the Gedulah Altar
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147345, L("Historian Cyrenia Odell"), "ROKAS_ODEL2", "f_rokas_30", 145, 385, 90, c => c.Quests.HasCompleted(Mq5) && !c.Quests.HasCompleted(Mq8), async dialog =>
+		AddConditionalNpc(147345, L("Historian Cyrenia Odell"), "ROKAS_ODEL2", "f_rokas_30", 145, 385, 90, c => (c.Quests.IsCompletable(Mq5) || c.Quests.HasCompleted(Mq5)) && !c.Quests.HasCompleted(Mq8), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -354,6 +354,13 @@ public class FRokas30QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Mq5) && character.Quests.MeetsPrerequisites(Mq5))
+			{
+				await dialog.Msg(L("Rexipher has not reached this altar yet. Wake it before he does."));
+				character.Quests.Start(Mq5);
+				return;
+			}
+
 			await dialog.Msg(L("One of the four altars that keep the Royal Mausoleum shut. Its light is steady."));
 		});
 
@@ -430,6 +437,15 @@ public class FRokas30QuestNpcsScript : GeneralScript
 				character.Quests.CompleteObjective(Mq7, "wakeSviesa");
 
 				character.ServerMessage(L("The Sviesa Altar is awake. Rexipher did not reach this one."));
+				character.LookAround();
+				return;
+			}
+
+			if (!character.Quests.Has(Mq8) && character.Quests.MeetsPrerequisites(Mq8))
+			{
+				await dialog.Msg(L("The Sviesa Altar is awake. Cyrenia Odell should be close by."));
+				character.Quests.Start(Mq8);
+				character.LookAround();
 				return;
 			}
 

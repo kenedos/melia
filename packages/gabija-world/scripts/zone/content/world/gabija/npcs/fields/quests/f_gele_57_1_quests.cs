@@ -214,6 +214,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("Soil the Poata's nest at Margas Hill, and it will show up."));
 					character.Quests.Start(Mq06);
+					character.LookAround();
 					return;
 				}
 				return;
@@ -361,7 +362,12 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
 			{
-				await dialog.Msg(L("You dig through the grass and find a lever handle latch the Pantos left behind."));
+				var searched = await character.TimeActions.StartAsync(L("Searching the grass..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (searched != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You dig through the grass and find a lever handle latch the Pantos left behind."));
 				character.Inventory.Add(650582, 1, InventoryAddType.PickUp);
 				character.Quests.CompleteObjective(Mq03, "findLatches");
 				return;
@@ -372,7 +378,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 		// Poata's Nest
 		//-------------------------------------------------------------------------
-		AddNpc(47203, L("Poata's Nest"), "GELE571_MQ_05", "f_gele_57_1", 793, -1362, 126, async dialog =>
+		AddConditionalNpc(47203, L("Poata's Nest"), "GELE571_MQ_05", "f_gele_57_1", 793, -1362, 126, c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -380,12 +386,12 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
-				await dialog.Msg(L("You soil the nest. The ground trembles - the Poata is coming."));
-				var fouledIt = await character.TimeActions.StartAsync(L("Fouling the water..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+				var fouledIt = await character.TimeActions.StartAsync(L("Fouling the nest..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
 
 				if (fouledIt != TimeActionResult.Completed)
 					return;
 
+				character.ServerMessage(L("You soil the nest. The ground trembles - the Poata is coming."));
 				character.Quests.StartQuestTrack(Mq06);
 				return;
 			}
@@ -403,7 +409,12 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Rp1) && !character.Quests.IsCompletable(Rp1))
 			{
-				await dialog.Msg(L("You pull the sugar beet stems up by the roots and leave them to wither."));
+				var pulled = await character.TimeActions.StartAsync(L("Pulling up the stems..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (pulled != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You pull the sugar beet stems up by the roots and leave them to wither."));
 				character.Quests.CompleteObjective(Rp1, "removeStems");
 				return;
 			}

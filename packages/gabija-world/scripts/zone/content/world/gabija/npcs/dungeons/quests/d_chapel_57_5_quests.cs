@@ -121,6 +121,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04))
 			{
 				await dialog.Msg(L("The Unknocker guards the altar. I will lure it - strike then."));
+				character.Quests.ReplayQuestTrack(Mq04);
 				return;
 			}
 
@@ -180,6 +181,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Don't trust the water's effects too much, or Glizardon may find out about it."));
 					character.Quests.Start(Mq06);
 					character.Inventory.Add(650714, 1, InventoryAddType.PickUp);
+					character.LookAround();
 				}
 				return;
 			}
@@ -227,7 +229,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Is Brother Vaidutis alright?"));
 				await dialog.Msg(L("I would have been in serious trouble if not for your help."));
-				await dialog.CompleteQuest(Mq09);
+				await dialog.Msg(L("Vaidutis went up to the 1st floor. Go to him."));
 				return;
 			}
 
@@ -275,6 +277,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("The altars in the church are made to stop demons. Of course, only we, the Paladins, know how to use them."));
 					character.Quests.Start(Mq09);
+					character.LookAround();
 				}
 				return;
 			}
@@ -311,7 +314,12 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
 			{
-				await dialog.Msg(L("You hold the Vicious Essence over the altar. The darkness boils off, leaving a clear, purified essence behind."));
+				var purified = await character.TimeActions.StartAsync(L("Purifying the essence..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (purified != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You hold the Vicious Essence over the altar. The darkness boils off, leaving a clear, purified essence behind."));
 				character.Inventory.Add(650713, 1, InventoryAddType.PickUp);
 				character.Quests.CompleteObjective(Mq05, "purifyEssence");
 				return;
@@ -322,7 +330,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 		// Glizardon
 		//-------------------------------------------------------------------------
-		AddNpc(57021, L("Glizardon"), "CHAPLE575_MQ_06", "d_chapel_57_5", 192, 259, 90, async dialog =>
+		AddConditionalNpc(57021, L("Glizardon"), "CHAPLE575_MQ_06", "d_chapel_57_5", 192, 259, 90, c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -330,8 +338,14 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
-				await dialog.Msg(L("You clamp the Holy Bomb to the Glizardon's back and duck away. The blast is immediate."));
+				var planted = await character.TimeActions.StartAsync(L("Fastening the Holy Bomb..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (planted != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You clamp the Holy Bomb to the Glizardon's back and duck away. The blast is immediate."));
 				character.Quests.CompleteObjective(Mq06, "bombGlizardon");
+				character.LookAround();
 				return;
 			}
 
@@ -340,7 +354,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 		// Underground Central Barrier
 		//-------------------------------------------------------------------------
-		AddNpc(40071, L("Underground Central Barrier"), "CHAPLE575_MQ_09", "d_chapel_57_5", 363, -782, 90, async dialog =>
+		AddConditionalNpc(40071, L("Underground Central Barrier"), "CHAPLE575_MQ_09", "d_chapel_57_5", 363, -782, 90, c => c.Quests.IsActive(Mq09) && !c.Quests.IsCompletable(Mq09), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -348,11 +362,12 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq09) && !character.Quests.IsCompletable(Mq09))
 			{
-				await dialog.Msg(L("The barrier shudders where the Cyclops struck it. Break through."));
 				var brokeSeal = await character.TimeActions.StartAsync(L("Breaking the seal..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
 
 				if (brokeSeal != TimeActionResult.Completed)
 					return;
+
+				character.ServerMessage(L("The barrier shudders and gives way. Something massive stirs behind it."));
 
 				character.Quests.StartQuestTrack(Mq09);
 				return;

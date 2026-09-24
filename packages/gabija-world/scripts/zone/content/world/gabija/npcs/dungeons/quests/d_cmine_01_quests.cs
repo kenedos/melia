@@ -35,7 +35,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 	{
 		// Vaidotas
 		//-------------------------------------------------------------------------
-		AddNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "MINE_1_ALCHEMIST", "d_cmine_01", -1188, -1799, 90, async dialog =>
+		AddConditionalNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "MINE_1_ALCHEMIST", "d_cmine_01", -1188, -1799, 90, c => !c.Quests.HasCompleted(Mine2Alchemist), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -62,6 +62,17 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Let us go down to the second floor. The fumes there will be far worse."));
 				await dialog.CompleteQuest(Alchemist);
 				character.Quests.Start(Mine2Alchemist);
+				DCmine02QuestNpcsScript.CheckPurifiersRepaired(character);
+				character.LookAround();
+				return;
+			}
+
+			if (!character.Quests.Has(Mine2Alchemist) && character.Quests.MeetsPrerequisites(Mine2Alchemist))
+			{
+				await dialog.Msg(L("The second floor is still thick with fumes. Get its purifiers running and meet me on the third floor."));
+				character.Quests.Start(Mine2Alchemist);
+				DCmine02QuestNpcsScript.CheckPurifiersRepaired(character);
+				character.LookAround();
 				return;
 			}
 
@@ -78,7 +89,9 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Alchemist);
-					character.Inventory.Add(ItemId.CMINE_COMPASS_ITEM, 1);
+					if (!character.Inventory.HasItem(ItemId.CMINE_COMPASS_ITEM))
+						character.Inventory.Add(ItemId.CMINE_COMPASS_ITEM, 1);
+					CheckPurifiersRepaired(character);
 					await dialog.Msg(L("The purifier can be easily fixed by anyone, but it may be hard to find the parts needed."));
 					await dialog.Msg(L("In that case, use the compass that I gave you to search for them."));
 				}
@@ -196,6 +209,13 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Crystal9) && character.Quests.MeetsPrerequisites(Crystal9))
+			{
+				await dialog.Msg(L("The Central Purifier is still seized. The Mine Compass points to District 4."));
+				character.Quests.Start(Crystal9);
+				return;
+			}
+
 			await dialog.Msg(L("The Central Purifier hums steadily."));
 		});
 
@@ -307,8 +327,25 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					character.Quests.CompleteObjective(Crystal13, "openValve");
 					await dialog.CompleteQuest(Crystal13);
 					character.Quests.Start(Crystal18);
+					character.LookAround();
 				}
 
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal18) && character.Quests.MeetsPrerequisites(Crystal18))
+			{
+				await dialog.Msg(L("The Passage Purifier is still cold. The Mine Compass points to District 6."));
+				character.Quests.Start(Crystal18);
+				character.LookAround();
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal19) && character.Quests.MeetsPrerequisites(Crystal19))
+			{
+				character.Quests.Start(Crystal19);
+				character.Quests.CompleteObjective(Crystal19, "fitPart");
+				await dialog.Msg(L("The recovered part fits the housing. Start the purifier."));
 				return;
 			}
 
@@ -324,7 +361,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 		// Mine Lift
 		//-------------------------------------------------------------------------
-		AddNpc(151008, L("Mine Lift"), "MINE_1_ELEVATOR", "d_cmine_01", -1501, 707, 344, async dialog =>
+		AddConditionalNpc(151008, L("Mine Lift"), "MINE_1_ELEVATOR", "d_cmine_01", -1501, 707, 344, c => !c.Quests.IsActive(Crystal18), async dialog =>
 		{
 			await dialog.Msg(L("The lift creaks on its cable, waiting for a load."));
 		});
@@ -357,9 +394,9 @@ public class DCmine01QuestNpcsScript : GeneralScript
 	/// <summary>
 	/// Marks the floor's main quest done once all three purifiers run again.
 	/// </summary>
-	private static void CheckPurifiersRepaired(Character character)
+	public static void CheckPurifiersRepaired(Character character)
 	{
-		if (!character.Quests.IsActive(Alchemist))
+		if (!character.Quests.IsActive(Alchemist) || character.Quests.IsCompletable(Alchemist))
 			return;
 
 		if (!character.Quests.HasCompleted(Crystal2) || !character.Quests.HasCompleted(Crystal9) || !character.Quests.HasCompleted(Crystal19))
@@ -597,6 +634,7 @@ public class Mine1Crystal18Quest : QuestScript
 		character.Quests.Complete(this.QuestId);
 		character.Quests.Start(repairQuestId);
 		character.Quests.CompleteObjective(repairQuestId, "fitPart");
+		character.LookAround();
 	}
 }
 

@@ -27,12 +27,13 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq02 = new QuestId(18160);
 	private readonly static QuestId Sq03 = new QuestId(18170);
 	private readonly static QuestId Mq11 = new QuestId(18190);
+	private readonly static QuestId DrowsyScent = new QuestId(20286);
 
 	protected override void Load()
 	{
 		// Old Man of Andale Village
 		//-------------------------------------------------------------------------
-		AddNpc(147396, L("Old Man of Andale Village"), "HUEVILLAGE_58_1_MQ01_NPC", "f_huevillage_58_1", 200, -1300, 102, async dialog =>
+		AddConditionalNpc(147396, L("Old Man of Andale Village"), "HUEVILLAGE_58_1_MQ01_NPC", "f_huevillage_58_1", 200, -1300, 102, c => !IsVillageEmptied(c), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -43,6 +44,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("You seem to live up to your reputation."));
 				await dialog.Msg(L("The people in our village just cowardly hope that the goddess will take care of everything."));
 				await dialog.CompleteQuest(Mq02);
+				character.LookAround();
 				return;
 			}
 
@@ -190,7 +192,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 
 		// Injured Villager
 		//-------------------------------------------------------------------------
-		AddNpc(147407, L("Injured Villager"), "HUEVILLAGE_58_1_MQ03_NPC", "f_huevillage_58_1", -232, -434, 190, async dialog =>
+		AddConditionalNpc(147407, L("Injured Villager"), "HUEVILLAGE_58_1_MQ03_NPC", "f_huevillage_58_1", -232, -434, 190, c => c.Quests.HasCompleted(Mq02) && !IsVillageEmptied(c), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -267,14 +269,13 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				await dialog.Msg(L("You lay both hands on the altar. The ring of script around it stays cold."));
 				var checked18130 = await character.TimeActions.StartAsync(L("Checking it..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
 
 				if (checked18130 != TimeActionResult.Completed)
 					return;
 
 				character.Quests.CompleteObjective(Mq04, "checkPortal");
-				character.ServerMessage(L("The portal is not working."));
+				character.ServerMessage(L("You lay both hands on the altar. The ring of script around it stays cold. The portal is not working."));
 				return;
 			}
 
@@ -305,7 +306,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 
 		// Source of Corruption
 		//-------------------------------------------------------------------------
-		AddNpc(147372, L("Source of Corruption"), "HUEVILLAGE_58_1_SQ02_NPC", "f_huevillage_58_1", -179.40, 827.41, 90, async dialog =>
+		AddConditionalNpc(147372, L("Source of Corruption"), "HUEVILLAGE_58_1_SQ02_NPC", "f_huevillage_58_1", -179.40, 827.41, 90, c => !c.Quests.HasCompleted(Sq02), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -315,6 +316,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("With nothing left feeding it, the growth comes away from the ground in one piece."));
 				await dialog.CompleteQuest(Sq02);
+				character.LookAround();
 				return;
 			}
 
@@ -371,6 +373,13 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 	}
+
+	/// <summary>
+	/// Returns whether the villagers of Andale have left for the given
+	/// character, which they do once the Languid Herb bomb has gone off.
+	/// </summary>
+	private static bool IsVillageEmptied(Character character)
+		=> character.Quests.IsCompletable(DrowsyScent) || character.Quests.HasCompleted(DrowsyScent);
 }
 
 //-----------------------------------------------------------------------------

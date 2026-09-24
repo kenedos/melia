@@ -28,13 +28,18 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq06 = new QuestId(8533);
 	private readonly static QuestId Mq07 = new QuestId(8534);
 	private readonly static QuestId Mq09 = new QuestId(8536);
+	private readonly static QuestId Chapel576Mq041 = new QuestId(8730);
+
+	public const string PillarCountVar = "Gabija.Quests.Chaple577Mq04.Pillars";
+	private const string PillarVar = "Gabija.Quests.Chaple577Mq04.Pillar";
+	private const int PillarCount = 8;
 	private readonly static QuestId Mq10 = new QuestId(8537);
 
 	protected override void Load()
 	{
 		// Follower Algis at the cathedral door
 		//-------------------------------------------------------------------------
-		AddNpc(147390, L("Follower Algis"), "CHAPLE577_ARUNE_01", "d_chapel_57_7", -634, -934, 81, async dialog =>
+		AddConditionalNpc(147390, L("Follower Algis"), "CHAPLE577_ARUNE_01", "d_chapel_57_7", -634, -934, 81, c => c.Quests.HasCompleted(Chapel576Mq041) && !c.Quests.IsCompletable(Mq02) && !c.Quests.HasCompleted(Mq02), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -96,7 +101,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 		// Follower Algis at the bell tower
 		//-------------------------------------------------------------------------
-		AddNpc(147390, L("Follower Algis"), "CHAPLE577_ARUNE_02", "d_chapel_57_7", 110, -579, 180, async dialog =>
+		AddConditionalNpc(147390, L("Follower Algis"), "CHAPLE577_ARUNE_02", "d_chapel_57_7", 110, -579, 180, c => c.Quests.IsCompletable(Mq02) || c.Quests.HasCompleted(Mq02), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -122,6 +127,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Seems like Gesti has not noticed yet."));
 				await dialog.Msg(L("We better prepare the Divine Sphere."));
 				await dialog.CompleteQuest(Mq04);
+				character.LookAround();
 				return;
 			}
 
@@ -182,7 +188,10 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				}
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Mq03);
+					character.LookAround();
+				}
 
 				return;
 			}
@@ -198,6 +207,11 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					await dialog.Msg(L("I'll ring a bell to let you know when Gesti gets close, so please listen for it."));
+
+					for (var i = 1; i <= PillarCount; ++i)
+						character.Variables.Perm.Set(PillarVar + i, false);
+					character.Variables.Perm.SetInt(PillarCountVar, 0);
+
 					character.Quests.Start(Mq04);
 				}
 				return;
@@ -293,7 +307,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04))
 			{
-				await dialog.Msg(L("Insert the altar fragments into the eight pillars of the Sventove Central Hall."));
+				await dialog.Msg(LF("Insert the altar fragments into the eight pillars of the Sventove Central Hall. ({0}/{1})", character.Variables.Perm.GetInt(PillarCountVar, 0), PillarCount));
 				return;
 			}
 
@@ -348,14 +362,14 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 		// Sventove Central Altar
 		//-------------------------------------------------------------------------
-		AddNpc(147358, L("Sventove Central Altar"), "CHAPLE577_HOLY_1", "d_chapel_57_7", -27, -137, 45, async dialog =>
+		AddConditionalNpc(147358, L("Sventove Central Altar"), "CHAPLE577_HOLY_1", "d_chapel_57_7", -27, -137, 45, c => !c.Quests.Has(Mq03), async dialog =>
 		{
 			await dialog.Msg(L("The Sventove Central Altar pulses with a power that is not its own."));
 		});
 
 		// Altar Fragment
 		//-------------------------------------------------------------------------
-		AddNpc(147372, L("Altar Fragment"), "CHAPLE577_MQ_03", "d_chapel_57_7", -145, 122, 90, async dialog =>
+		AddConditionalNpc(147372, L("Altar Fragment"), "CHAPLE577_MQ_03", "d_chapel_57_7", -145, 122, 90, c => c.Quests.Has(Mq03) && !c.Quests.HasCompleted(Mq04), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -363,8 +377,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				await dialog.Msg(L("You gather the fragments of the destroyed altar and fit them into the pillar. It answers with a low chime."));
-				character.Quests.CompleteObjective(Mq04, "insertPillars");
+				await dialog.Msg(L("The fragments of the destroyed altar still hold power. Fit them into the eight pillars of the Sventove Central Hall."));
 				return;
 			}
 
@@ -373,14 +386,14 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 		// Central Pillars
 		//-------------------------------------------------------------------------
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_1", "d_chapel_57_7", -229, -309, 90, async dialog => await InsertPillar(dialog));
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_2", "d_chapel_57_7", -34, -298, 90, async dialog => await InsertPillar(dialog));
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_3", "d_chapel_57_7", 168, -298, 90, async dialog => await InsertPillar(dialog));
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_4", "d_chapel_57_7", 165, -133, 90, async dialog => await InsertPillar(dialog));
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_5", "d_chapel_57_7", 162, 41, 90, async dialog => await InsertPillar(dialog));
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_6", "d_chapel_57_7", -34, 39, 90, async dialog => await InsertPillar(dialog));
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_7", "d_chapel_57_7", -237, 37, 90, async dialog => await InsertPillar(dialog));
-		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_8", "d_chapel_57_7", -237, -134, 90, async dialog => await InsertPillar(dialog));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_1", "d_chapel_57_7", -229, -309, 90, async dialog => await InsertPillar(dialog, 1));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_2", "d_chapel_57_7", -34, -298, 90, async dialog => await InsertPillar(dialog, 2));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_3", "d_chapel_57_7", 168, -298, 90, async dialog => await InsertPillar(dialog, 3));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_4", "d_chapel_57_7", 165, -133, 90, async dialog => await InsertPillar(dialog, 4));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_5", "d_chapel_57_7", 162, 41, 90, async dialog => await InsertPillar(dialog, 5));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_6", "d_chapel_57_7", -34, 39, 90, async dialog => await InsertPillar(dialog, 6));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_7", "d_chapel_57_7", -237, 37, 90, async dialog => await InsertPillar(dialog, 7));
+		AddNpc(147457, L("Central Pillar"), "CHAPLE577_MQ_04_8", "d_chapel_57_7", -237, -134, 90, async dialog => await InsertPillar(dialog, 8));
 
 		// Sanctuary Mural
 		//-------------------------------------------------------------------------
@@ -422,20 +435,35 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	/// <summary>
 	/// Fits an altar fragment into one of the Sventove pillars.
 	/// </summary>
-	private static async Task InsertPillar(Dialog dialog)
+	private static async Task InsertPillar(Dialog dialog, int number)
 	{
 		var character = dialog.Player;
 
 		dialog.SetTitle(L("Central Pillar"));
 
-		if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
+		if (!character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
 		{
-			await dialog.Msg(L("You wedge the altar fragment into the pillar's socket. It hums, and the trap tightens another notch."));
-			character.Quests.CompleteObjective(Mq04, "insertPillars");
+			await dialog.Msg(L("A pillar of the Sventove Central Hall, cut with old sigils."));
 			return;
 		}
 
-		await dialog.Msg(L("A pillar of the Sventove Central Hall, cut with old sigils."));
+		if (character.Variables.Perm.GetBool(PillarVar + number, false))
+		{
+			await dialog.Msg(L("{#666666}*A fragment already sits in this pillar*{/}"));
+			return;
+		}
+
+		var inserted = await character.TimeActions.StartAsync(L("Inserting the altar fragment..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+		if (inserted != TimeActionResult.Completed)
+			return;
+
+		character.Variables.Perm.Set(PillarVar + number, true);
+
+		var count = character.Variables.Perm.GetInt(PillarCountVar, 0) + 1;
+		character.Variables.Perm.SetInt(PillarCountVar, count);
+
+		character.ServerMessage(LF("You wedge the altar fragment into the pillar's socket. It hums, and the trap tightens another notch. ({0}/{1})", count, PillarCount));
 	}
 }
 
@@ -543,7 +571,7 @@ public class Chaple577Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 
-		AddObjective("insertPillars", L("Make a trap at Sventove Central Hall"), new ManualObjective());
+		AddObjective("insertPillars", L("Make a trap at Sventove Central Hall"), new VariableCheckObjective(DChapel577QuestNpcsScript.PillarCountVar, 8, isPermanent: true));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}

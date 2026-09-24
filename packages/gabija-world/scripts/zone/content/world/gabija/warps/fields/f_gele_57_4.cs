@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Quests;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class f_gele_57_4WarpsScript : GeneralScript
@@ -15,7 +16,9 @@ public class f_gele_57_4WarpsScript : GeneralScript
 		AddWarp(1, "GELE574_TO_GELE573", 6, From("f_gele_57_4", -841, -155), To("f_gele_57_3", 199, 1086));
 
 		// Tenet Garden to Tenet Church 1F
-		AddWarp(3, "GELE574_TO_CHAPEL576", 183, From("f_gele_57_4", 1296.24, 2145.48), To("d_chapel_57_6", -1638, 448));
+		var chapelGateWarp = AddWarp(3, "GELE574_TO_CHAPEL576", 183, From("f_gele_57_4", 1296.24, 2145.48), To("d_chapel_57_6", -1638, 448));
+		if (chapelGateWarp != null)
+			chapelGateWarp.VisibleTo = character => character.Quests.HasCompleted(new QuestId(8730));
 
 		// Tenet Garden to Tenet Church B1
 		AddWarp(4, "GELE574_TO_CHAPEL575", 181, From("f_gele_57_4", 1072.8, 2046.17), To("d_chapel_57_5", -1258, 1095));

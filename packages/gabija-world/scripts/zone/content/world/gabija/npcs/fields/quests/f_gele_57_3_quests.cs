@@ -62,6 +62,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("The pieces of the destroyed barrier are scattered at Mazas Rest Place."));
 					await dialog.Msg(L("Collect them and give them to Kayetonas at Flower Greeting Hill."));
 					character.Quests.Start(Mq01);
+					character.LookAround();
 				}
 				return;
 			}
@@ -114,7 +115,10 @@ public class FGele573QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Mq03);
+					character.LookAround();
+				}
 
 				return;
 			}
@@ -271,22 +275,24 @@ public class FGele573QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I asked my precious friend Algis to go to the Tenet Church."));
 				await dialog.Msg(L("I won't lose to Gesti, but it is important to have some backup plan just in case."));
 				await dialog.CompleteQuest(Mq07);
+				character.LookAround();
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq09) && character.Quests.IsCompletable(Mq09))
 			{
-				await dialog.Msg(L("Sorry. My abilities weren't good enough."));
-				await dialog.Msg(L("Gesti has now realized that the Holy Relic is not the revelation, and is probably heading straight to the church."));
+				await dialog.Msg(L("The Throneweaver is down, but the Divine Sphere has not caught her yet. Stay close."));
 				await dialog.CompleteQuest(Mq09);
+				character.Quests.Start(Mq08);
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq08) && character.Quests.IsCompletable(Mq08))
 			{
-				await dialog.Msg(L("So Gesti just ran away."));
-				await dialog.Msg(L("Fine. Since you got the revelation, we've completed the mission."));
+				await dialog.Msg(L("Sorry. My abilities weren't good enough."));
+				await dialog.Msg(L("Gesti has now realized that the Holy Relic is not the revelation, and is probably heading straight to the church."));
 				await dialog.CompleteQuest(Mq08);
+				character.LookAround();
 				return;
 			}
 
@@ -320,6 +326,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("There is enough time, so go meet with Follower Algis first."));
 					character.Quests.Start(Mq07);
+					character.LookAround();
 				}
 				return;
 			}
@@ -382,6 +389,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq08))
 			{
 				await dialog.Msg(L("Gesti is near. We end this here."));
+				character.Quests.ReplayQuestTrack(Mq08);
 				return;
 			}
 
@@ -390,7 +398,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 		// Follower Algis
 		//-------------------------------------------------------------------------
-		AddNpc(11281, L("Follower Algis"), "GELE573_MQ_07_F", "f_gele_57_3", 86, -110, 90, async dialog =>
+		AddConditionalNpc(11281, L("Follower Algis"), "GELE573_MQ_07_F", "f_gele_57_3", 86, -110, 90, c => c.Quests.IsActive(Mq07), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -452,7 +460,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 		// Barrier Piece at Mazas Rest Place
 		//-------------------------------------------------------------------------
-		AddNpc(147380, L("Barrier Piece"), "GELE573_MQ_01", "f_gele_57_3", -233, -651, 90, async dialog =>
+		AddConditionalNpc(147380, L("Barrier Piece"), "GELE573_MQ_01", "f_gele_57_3", -233, -651, 90, c => c.Quests.IsActive(Mq01) && !c.Quests.IsCompletable(Mq01), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -460,9 +468,15 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq01) && !character.Quests.IsCompletable(Mq01))
 			{
-				await dialog.Msg(L("You gather the shattered pieces of the barrier from the ground."));
+				var gathered = await character.TimeActions.StartAsync(L("Gathering the barrier pieces..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (gathered != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You gather the shattered pieces of the barrier from the ground."));
 				character.Inventory.Add(650704, 1, InventoryAddType.PickUp);
 				character.Quests.CompleteObjective(Mq01, "collectPieces");
+				character.LookAround();
 				return;
 			}
 
@@ -479,7 +493,12 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
 			{
-				await dialog.Msg(L("You feed the barrier the demon souls you gathered. It hums and steadies."));
+				var charged = await character.TimeActions.StartAsync(L("Charging the barrier..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (charged != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You feed the barrier the demon souls you gathered. It hums and steadies."));
 				character.Quests.CompleteObjective(Mq02, "chargeBarrier");
 				return;
 			}
@@ -489,7 +508,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 		// Demon Summoning Circle
 		//-------------------------------------------------------------------------
-		AddNpc(147372, L("Demon Summoning Circle"), "GELE573_MQ_03_AI_KILL", "f_gele_57_3", 943, -625, 90, async dialog =>
+		AddConditionalNpc(147372, L("Demon Summoning Circle"), "GELE573_MQ_03_AI_KILL", "f_gele_57_3", 943, -625, 90, c => c.Quests.IsActive(Mq03) && !c.Quests.IsCompletable(Mq03), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -497,8 +516,14 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
 			{
-				await dialog.Msg(L("You scuff out the glowing sigils. The circle dies with a hiss."));
+				var erased = await character.TimeActions.StartAsync(L("Erasing the summoning circle..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (erased != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You scuff out the glowing sigils. The circle dies with a hiss."));
 				character.Quests.CompleteObjective(Mq03, "removeCircles");
+				character.LookAround();
 				return;
 			}
 
@@ -515,7 +540,12 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				await dialog.Msg(L("You turn the barrier's holy power on the severed souls. They scatter and fade."));
+				var severed = await character.TimeActions.StartAsync(L("Channelling the barrier..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (severed != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("You turn the barrier's holy power on the severed souls. They scatter and fade."));
 				character.Quests.CompleteObjective(Mq04, "severSouls");
 				return;
 			}

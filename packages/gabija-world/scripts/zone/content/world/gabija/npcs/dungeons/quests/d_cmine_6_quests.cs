@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
@@ -19,6 +20,7 @@ using static Melia.Zone.Scripting.Shortcuts;
 
 public class DCmine6QuestNpcsScript : GeneralScript
 {
+	private readonly static QuestId Mine2Alchemist = new QuestId(4467);
 	private readonly static QuestId Rescue1 = new QuestId(1045);
 	private readonly static QuestId Rescue3 = new QuestId(1047);
 	private readonly static QuestId Boss = new QuestId(1048);
@@ -39,7 +41,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 	{
 		// Vaidotas
 		//-------------------------------------------------------------------------
-		AddNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "MINE_3_ALCHEMIST", "d_cmine_6", -2181, -1677, 90, async dialog =>
+		AddConditionalNpc(20110, L("[Alchemist Master]{nl}Vaidotas"), "MINE_3_ALCHEMIST", "d_cmine_6", -2181, -1677, 90, c => c.Quests.HasCompleted(Mine2Alchemist) && !c.Quests.HasCompleted(Rescue1), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -58,6 +60,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Rescue1);
+					character.LookAround();
 					await dialog.Msg(L("I knew you would."));
 					await dialog.Msg(L("One more thing, the ground near the Closed Area is weak so the entrance has been blocked for a long time."));
 				}
@@ -77,24 +80,18 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 		// Miner
 		//-------------------------------------------------------------------------
-		AddNpc(20150, L("Miner"), "MINE_3_RESIENT1", "d_cmine_6", -1188, 104, 28, async dialog =>
+		AddConditionalNpc(20150, L("Miner"), "MINE_3_RESIENT1", "d_cmine_6", -1174, 96, 28, IsVillagerFreed, async dialog =>
 		{
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Miner"));
 
-			if (character.Quests.IsActive(Rescue1))
+			if (character.Quests.IsActive(Rescue1) && character.Quests.IsCompletable(Rescue1))
 			{
-				if (!character.Quests.IsCompletable(Rescue1))
-				{
-					await dialog.Msg(L("The Crystal Spiders are still on us. Drive them off first."));
-					character.Quests.ClearQuestTrack(Rescue1);
-					return;
-				}
-
 				await dialog.Msg(L("Thank you for saving us."));
 				await dialog.Msg(L("It's like a dream to be saved by the Revelator."));
 				await dialog.CompleteQuest(Rescue1);
+				character.LookAround();
 				return;
 			}
 
@@ -103,28 +100,35 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 		// Girl
 		//-------------------------------------------------------------------------
-		AddNpc(47236, L("Girl"), "MINE_3_GIRL", "d_cmine_6", -1207, 87, 72, async dialog =>
+		AddConditionalNpc(47236, L("Girl"), "MINE_3_GIRL", "d_cmine_6", -1207, 87, 72, IsVillagerFreed, async dialog =>
 		{
 			await dialog.Msg(L("I want to go home. Is the road outside safe now?"));
 		});
 
 		// Village Aunt
 		//-------------------------------------------------------------------------
-		AddNpc(20114, L("Village Aunt"), "D_CMINE_NPC01", "d_cmine_6", -1184, 111, 77, async dialog =>
+		AddConditionalNpc(20114, L("Village Aunt"), "D_CMINE_NPC01", "d_cmine_6", -1170, 120, 77, IsVillagerFreed, async dialog =>
 		{
 			await dialog.Msg(L("They kept us down here in the dark for days. I never want to see a crystal again."));
 		});
 
 		// Village Girl
 		//-------------------------------------------------------------------------
-		AddNpc(147473, L("Village Girl"), "D_CMINE_NPC02", "d_cmine_6", -1200, 98, 5, async dialog =>
+		AddConditionalNpc(147473, L("Village Girl"), "D_CMINE_NPC02", "d_cmine_6", -1200, 98, 5, IsVillagerFreed, async dialog =>
 		{
 			await dialog.Msg(L("You came all the way down here for us? Thank you."));
 		});
 
+		// Captive villagers
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(151009, L("Miner"), "MINE_3_RESIENT1_BIND", "d_cmine_6", -1174, 96, 28, IsVillagerBound, CaptiveDialog);
+		AddConditionalNpc(151012, L("Girl"), "MINE_3_GIRL_BIND", "d_cmine_6", -1207, 87, 72, IsVillagerBound, CaptiveDialog);
+		AddConditionalNpc(151010, L("Village Aunt"), "D_CMINE_NPC01_BIND", "d_cmine_6", -1170, 120, 77, IsVillagerBound, CaptiveDialog);
+		AddConditionalNpc(151011, L("Village Girl"), "D_CMINE_NPC02_BIND", "d_cmine_6", -1200, 98, 5, IsVillagerBound, CaptiveDialog);
+
 		// Mine Crystal
 		//-------------------------------------------------------------------------
-		AddNpc(151013, L("Mine Crystal"), "MINE_3_RESQUE3", "d_cmine_6", -669, -55, 90, async dialog =>
+		AddConditionalNpc(151013, L("Mine Crystal"), "MINE_3_RESQUE3", "d_cmine_6", -669, -55, 90, c => !c.Quests.HasCompleted(Rescue3), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -141,6 +145,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 				await dialog.Msg(L("The Netherbovine is down. Whatever the crystal was calling, it will not come now."));
 				await dialog.CompleteQuest(Rescue3);
+				character.LookAround();
 				return;
 			}
 
@@ -169,7 +174,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 		// Crystal Wall of the Closed Area
 		//-------------------------------------------------------------------------
-		AddNpc(151014, L("Barrier Stone of the Closed Area"), "CMINE3_BOSSROOM_OPEN", "d_cmine_6", 129, -112, 4, async dialog =>
+		AddConditionalNpc(151014, L("Barrier Stone of the Closed Area"), "CMINE3_BOSSROOM_OPEN", "d_cmine_6", 129, -112, 4, c => !c.Quests.HasCompleted(Enter), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -184,7 +189,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				}
 
 				await dialog.Msg(L("You press the magic stones into the barrier. The stone blocking the Closed Area crumbles."));
-				await dialog.CompleteQuest(Enter);
+				character.Quests.StartQuestTrack(Enter);
 				return;
 			}
 
@@ -214,7 +219,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 		// Crystal Pillar
 		//-------------------------------------------------------------------------
-		AddNpc(47233, L("Crystal Pillar"), "CMINE6_TO_KATYN7_1_START", "d_cmine_6", 2048, 1753, 243, async dialog =>
+		AddConditionalNpc(47233, L("Crystal Pillar"), "CMINE6_TO_KATYN7_1_START", "d_cmine_6", 2048, 1753, 243, c => !c.Quests.HasCompleted(Slate), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -232,7 +237,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Acquired the Mysterious Slate that was inside the Crystal Pillar."));
 				await dialog.Msg(L("Return to Klaipeda and talk to Knight Commander Uska about it."));
 				await dialog.CompleteQuest(Slate);
-				dialog.HideNPC("CMINE6_TO_KATYN7_1_START");
+				character.LookAround();
 				return;
 			}
 
@@ -285,6 +290,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Slate);
+					character.LookAround();
 				}
 
 				return;
@@ -325,7 +331,10 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Repeat1);
+					character.LookAround();
+				}
 
 				return;
 			}
@@ -339,7 +348,7 @@ public class DCmine6QuestNpcsScript : GeneralScript
 		{
 			var uniqueName = "CMINE6_RP_1_OBJ_" + (i + 1);
 
-			AddNpc(20025, L("Crystal Magic"), uniqueName, "d_cmine_6", CrystalMagicSpots[i, 0], CrystalMagicSpots[i, 1], 90, async dialog =>
+			AddConditionalNpc(20025, L("Crystal Magic"), uniqueName, "d_cmine_6", CrystalMagicSpots[i, 0], CrystalMagicSpots[i, 1], 90, c => c.Quests.IsActive(Repeat1) && !c.Quests.IsCompletable(Repeat1), async dialog =>
 			{
 				var character = dialog.Player;
 
@@ -347,8 +356,14 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 				if (character.Quests.IsActive(Repeat1) && !character.Quests.IsCompletable(Repeat1))
 				{
-					await dialog.Msg(L("The crystal takes the charge and holds it. This will carry the purifier."));
+					var charged = await character.TimeActions.StartAsync(L("Charging the crystal..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+					if (charged != TimeActionResult.Completed)
+						return;
+
+					character.ServerMessage(L("The crystal takes the charge and holds it. This will carry the purifier."));
 					character.Inventory.Add(ItemId.CMINE6_RP_1_ITEM, 1);
+					character.LookAround();
 					return;
 				}
 
@@ -356,18 +371,34 @@ public class DCmine6QuestNpcsScript : GeneralScript
 			});
 		}
 
-		// Hidden triggers
-		//-------------------------------------------------------------------------
-		AddQuestTrigger("MINE_3_RESQUE1", "d_cmine_6", -1251, -1730, 200, async args =>
-		{
-			if (args.Initiator is not Character character)
-				return;
+	}
 
-			if (character.Quests.IsActive(Rescue1) && !character.Quests.IsCompletable(Rescue1))
-				character.Quests.StartQuestTrack(Rescue1);
+	/// <summary>
+	/// Returns whether the villagers are still tied up for the given
+	/// character, waiting for the rescue.
+	/// </summary>
+	private static bool IsVillagerBound(Character character)
+		=> character.Quests.IsActive(Rescue1) && !character.Quests.IsCompletable(Rescue1);
 
-			await Task.CompletedTask;
-		});
+	/// <summary>
+	/// Returns whether the rescued villagers are still in the mine for the
+	/// given character, which they leave once the slate is found.
+	/// </summary>
+	private static bool IsVillagerFreed(Character character)
+		=> (character.Quests.IsCompletable(Rescue1) || character.Quests.HasCompleted(Rescue1)) && !character.Quests.Has(Slate);
+
+	/// <summary>
+	/// Dialog of the tied up villagers, which starts the rescue.
+	/// </summary>
+	private static async Task CaptiveDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+
+		if (!IsVillagerBound(character))
+			return;
+
+		await dialog.Msg(L("Help! Please, untie us before they come back!"));
+		character.Quests.ReplayQuestTrack(Rescue1);
 	}
 }
 
@@ -390,7 +421,7 @@ public class Mine3Resque1Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "MINE_3_ALCHEMIST", "d_cmine_6", L("Talk to Vaidotas"));
-		SetPhase(QuestStatus.InProgress, "MINE_3_RESIENT1", "d_cmine_6", L("Search for the villagers"));
+		SetPhase(QuestStatus.InProgress, "MINE_3_RESIENT1_BIND", "d_cmine_6", L("Search for the villagers"));
 		SetPhase(QuestStatus.Success, "MINE_3_RESIENT1", "d_cmine_6", L("Talk to the Miner"));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "MINE_3_RESQUE1_TRACK", 4000, autoStart: false, partyPlay: true);
@@ -480,7 +511,7 @@ public class Act4Mine3EnterQuest : QuestScript
 		SetPhase(QuestStatus.InProgress, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Collect Vubbe Magic Stones"));
 		SetPhase(QuestStatus.Success, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Insert Vubbe Magic Stones into the Crystal Wall"));
 
-		SetTrack(QuestStatus.Success, QuestStatus.Success, "ACT4_MINE3_ENTER_TRACK", 2000);
+		SetTrack(QuestStatus.Success, QuestStatus.Completed, "ACT4_MINE3_ENTER_TRACK", 2000, autoStart: false);
 
 		AddPrerequisite(new LevelPrerequisite(12));
 

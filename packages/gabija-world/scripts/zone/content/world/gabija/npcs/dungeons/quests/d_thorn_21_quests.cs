@@ -170,7 +170,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 		// Believer Jurga
 		//-------------------------------------------------------------------------
-		AddNpc(147397, L("Believer Jurga"), "THORN21_BELIEVER04", "d_thorn_21", -110.96, 116.21, 90, async dialog =>
+		AddConditionalNpc(147397, L("Believer Jurga"), "THORN21_BELIEVER04", "d_thorn_21", -110.96, 116.21, 90, c => !c.Quests.HasCompleted(Mq09), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -205,6 +205,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Now we can make a full-scale attack on Bramble."));
 				await dialog.Msg(L("I'll go on ahead to Giliaii Courtyard to keep an eye on Bramble, please come along."));
 				await dialog.CompleteQuest(Mq09);
+				character.LookAround();
 				character.ServerMessage(L("Move to Giliaii Courtyard."));
 				return;
 			}
@@ -270,7 +271,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 		// Believer Jurga at Giliaii Courtyard
 		//-------------------------------------------------------------------------
-		AddNpc(147397, L("Believer Jurga"), "THORN21_BELIEVER04_AFTER", "d_thorn_21", 4565.75, -58.03, 90, async dialog =>
+		AddConditionalNpc(147397, L("Believer Jurga"), "THORN21_BELIEVER04_AFTER", "d_thorn_21", 4565.75, -58.03, 90, c => c.Quests.HasCompleted(Mq09), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -316,11 +317,12 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
 			{
-				await dialog.Msg(L("You work the altar until the water in the basin runs clear."));
 				var startedAltar2 = await character.TimeActions.StartAsync(L("Starting the purification altar..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
 
 				if (startedAltar2 != TimeActionResult.Completed)
 					return;
+
+				character.ServerMessage(L("You work the altar until the water in the basin runs clear."));
 
 				character.Quests.StartQuestTrack(Mq02);
 				return;
@@ -339,12 +341,12 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
-				await dialog.Msg(L("You set the altar working, quietly, the way Kazis asked."));
-				character.ServerMessage(L("The Altar of Purification is working!"));
 				var startedAltar6 = await character.TimeActions.StartAsync(L("Starting the purification altar..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
 
 				if (startedAltar6 != TimeActionResult.Completed)
 					return;
+
+				character.ServerMessage(L("You set the altar working, quietly, the way Kazis asked. The Altar of Purification is working!"));
 
 				character.Quests.StartQuestTrack(Mq06);
 				return;
@@ -355,7 +357,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 		// Bramble's Root at Sviesa Hill Areas
 		//-------------------------------------------------------------------------
-		AddNpc(153011, L("Bramble's Root"), "THORN21_BRAMBLE01_ROOT", "d_thorn_21", 2800, -1325, 77, async dialog =>
+		AddConditionalNpc(153011, L("Bramble's Root"), "THORN21_BRAMBLE01_ROOT", "d_thorn_21", 2800, -1325, 77, c => !c.Quests.IsCompletable(Mq03) && !c.Quests.HasCompleted(Mq03), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -388,7 +390,7 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 		// Bramble's Root at Tankinta Vacant Lot
 		//-------------------------------------------------------------------------
-		AddNpc(153011, L("Bramble's Root"), "THORN21_BRAMBLE02_ROOT", "d_thorn_21", 3305, 1084, 82, async dialog =>
+		AddConditionalNpc(153011, L("Bramble's Root"), "THORN21_BRAMBLE02_ROOT", "d_thorn_21", 3305, 1084, 82, c => !c.Quests.IsCompletable(Mq05) && !c.Quests.HasCompleted(Mq05), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -429,7 +431,12 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq08) && !character.Quests.IsCompletable(Mq08))
 			{
-				await dialog.Msg(L("The slate is whole, and the script on it is the goddess' own."));
+				var taken = await character.TimeActions.StartAsync(L("Taking the revelation..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (taken != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The slate is whole, and the script on it is the goddess' own."));
 				character.Inventory.Add(ItemId.Stonetablet031, 1, InventoryAddType.PickUp);
 				character.Quests.CompleteObjective(Mq08, "takeRevelation");
 				return;

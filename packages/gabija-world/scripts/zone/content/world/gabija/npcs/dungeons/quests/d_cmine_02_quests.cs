@@ -64,6 +64,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				character.ServerMessage(L("The Purifier in District 3 is working properly now. The Circulation Purifier turns over, then stalls again."));
 				await dialog.CompleteQuest(Crystal2);
 				character.Quests.Start(Crystal3);
+				character.LookAround();
 				return;
 			}
 
@@ -82,8 +83,16 @@ public class DCmine02QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal2);
+					character.LookAround();
 				}
 
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal3) && character.Quests.MeetsPrerequisites(Crystal3))
+			{
+				await dialog.Msg(L("The Circulation Purifier still stalls. Check the Purifier Pipe in District 2."));
+				character.Quests.Start(Crystal3);
 				return;
 			}
 
@@ -104,7 +113,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 		// District 3 Purifier Pipe
 		//-------------------------------------------------------------------------
-		AddNpc(147469, L("District 3 Purifier Pipe"), "MINE_2_CRYSTAL_2_PIPE", "d_cmine_02", -1220, -737, 90, async dialog =>
+		AddConditionalNpc(147469, L("District 3 Purifier Pipe"), "MINE_2_CRYSTAL_2_PIPE", "d_cmine_02", -1220, -737, 90, c => c.Quests.IsActive(Crystal2) && !c.Quests.IsCompletable(Crystal2), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -119,6 +128,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 				character.ServerMessage(L("The pipe is choked with crystal dust. You clear it and seat the coupling again."));
 				character.Quests.CompleteObjective(Crystal2, "repairPipe");
+				character.LookAround();
 				return;
 			}
 
@@ -127,7 +137,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 		// District 2 Purifier Pipe
 		//-------------------------------------------------------------------------
-		AddNpc(151020, L("District 2 Purifier Pipe"), "MINE_2_CRYSTAL_3_PIPE", "d_cmine_02", -1815, 940, 90, async dialog =>
+		AddConditionalNpc(151020, L("District 2 Purifier Pipe"), "MINE_2_CRYSTAL_3_PIPE", "d_cmine_02", -1815, 940, 90, IsDistrict2PipeShown, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -142,6 +152,14 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 				character.ServerMessage(L("You work the pipe back into shape. Air moves through it again."));
 				character.Quests.CompleteObjective(Crystal4, "checkPipe");
+				character.LookAround();
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal4) && character.Quests.MeetsPrerequisites(Crystal4))
+			{
+				await dialog.Msg(L("The pipe has been crushed. Work it back into shape."));
+				character.Quests.Start(Crystal4);
 				return;
 			}
 
@@ -201,6 +219,20 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Crystal7) && character.Quests.MeetsPrerequisites(Crystal7))
+			{
+				await dialog.Msg(L("The Mine Compass points towards the Magic Supply Device in District 4."));
+				character.Quests.Start(Crystal7);
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal11) && character.Quests.MeetsPrerequisites(Crystal11))
+			{
+				await dialog.Msg(L("The Magic Supply Device is turning again. The Auxiliary Purifier is ready to start."));
+				character.Quests.Start(Crystal11);
+				return;
+			}
+
 			await dialog.Msg(L("The Auxiliary Purifier hums steadily."));
 		});
 
@@ -247,6 +279,13 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Crystal10) && character.Quests.MeetsPrerequisites(Crystal10))
+			{
+				await dialog.Msg(L("The device is still seized with rust. Something on this floor will shift it."));
+				character.Quests.Start(Crystal10);
+				return;
+			}
+
 			await dialog.Msg(L("The Magic Supply Device turns quietly."));
 		});
 
@@ -260,7 +299,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Crystal10) && !character.Quests.IsCompletable(Crystal10))
 			{
-				await dialog.Msg(L("A miner's can of lubricant, still half full. This will shift the rust."));
+				var taken = await character.TimeActions.StartAsync(L("Taking the lubricant..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+				if (taken != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("A miner's can of lubricant, still half full. This will shift the rust."));
 				character.Inventory.Add(ItemId.MINE_2_CRYSTAL_10_ITEM, 1);
 				return;
 			}
@@ -309,8 +353,24 @@ public class DCmine02QuestNpcsScript : GeneralScript
 					await dialog.CompleteQuest(Crystal14);
 					await dialog.Msg(L("The compass is pointing towards District 6."));
 					character.Quests.Start(Crystal20);
+					character.LookAround();
 				}
 
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal20) && character.Quests.MeetsPrerequisites(Crystal20))
+			{
+				await dialog.Msg(L("The compass is pointing towards District 6."));
+				character.Quests.Start(Crystal20);
+				character.LookAround();
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal21) && character.Quests.MeetsPrerequisites(Crystal21))
+			{
+				await dialog.Msg(L("The recovered part fits the housing. Start the purifier."));
+				character.Quests.Start(Crystal21);
 				return;
 			}
 
@@ -319,7 +379,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 		// Main Purifier Parts
 		//-------------------------------------------------------------------------
-		AddNpc(151016, L("Main Purifier Parts"), "MINE_2_CRYSTAL_20_PART", "d_cmine_02", 1559, -468, 90, async dialog =>
+		AddConditionalNpc(151016, L("Main Purifier Parts"), "MINE_2_CRYSTAL_20_PART", "d_cmine_02", 1559, -468, 90, c => c.Quests.IsActive(Crystal20), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -342,6 +402,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				character.ServerMessage(L("You defeated the Stone Whale and got the parts. Return to the Main Purifier and fix it."));
 				await dialog.CompleteQuest(Crystal20);
 				character.Quests.Start(Crystal21);
+				character.LookAround();
 				return;
 			}
 
@@ -374,9 +435,16 @@ public class DCmine02QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Returns whether the District 2 pipe is there for the given character,
+	/// from the Carapace's defeat until the pipe is worked back into shape.
+	/// </summary>
+	private static bool IsDistrict2PipeShown(Character character)
+		=> character.Quests.HasCompleted(Crystal3) && !character.Quests.IsCompletable(Crystal4) && !character.Quests.HasCompleted(Crystal4);
+
+	/// <summary>
 	/// Ends the floor's main quest once all three purifiers run again.
 	/// </summary>
-	private static void CheckPurifiersRepaired(Character character)
+	public static void CheckPurifiersRepaired(Character character)
 	{
 		if (!character.Quests.IsActive(Alchemist))
 			return;
@@ -386,6 +454,8 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 		character.Quests.CompleteObjective(Alchemist, "repairPurifiers");
 		character.Quests.Complete(Alchemist);
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("All the purifiers have been repaired!{nl}Go down to the 3rd floor and meet Vaidotas!"));
+		character.LookAround();
 	}
 }
 
@@ -480,6 +550,7 @@ public class Mine2Crystal3Quest : QuestScript
 		// The client names no turn-in; the Carapace's death ends the quest and opens the pipe check.
 		character.Quests.Complete(this.QuestId);
 		character.Quests.Start(new QuestId(4485));
+		character.LookAround();
 	}
 }
 

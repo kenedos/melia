@@ -28,6 +28,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq01 = new QuestId(20280);
 	private readonly static QuestId Sq02 = new QuestId(20281);
 	private readonly static QuestId Sq03 = new QuestId(20282);
+	private readonly static QuestId DrowsyScent = new QuestId(20286);
 
 	private const int WhiteOakSapNeeded = 3;
 
@@ -35,7 +36,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 	{
 		// Old Man of Andale Village
 		//-------------------------------------------------------------------------
-		AddNpc(147396, L("Old Man of Andale Village"), "HUEVILLAGE_58_2_MQ01_NPC", "f_huevillage_58_2", -186.69, -1570.87, 72, async dialog =>
+		AddConditionalNpc(147396, L("Old Man of Andale Village"), "HUEVILLAGE_58_2_MQ01_NPC", "f_huevillage_58_2", -186.69, -1570.87, 72, c => !IsVillageEmptied(c), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -80,7 +81,7 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 		// Andale Village Priest
 		//-------------------------------------------------------------------------
-		AddNpc(147409, L("Andale Village Priest"), "HUEVILLAGE_58_2_MQ02_NPC", "f_huevillage_58_2", -239.14, -200.18, 72, async dialog =>
+		AddConditionalNpc(147409, L("Andale Village Priest"), "HUEVILLAGE_58_2_MQ02_NPC", "f_huevillage_58_2", -239.14, -200.18, 72, c => !IsVillageEmptied(c), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -252,14 +253,13 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				await dialog.Msg(L("You follow the faint patterns left in the stone and draw the letters back in with the dye."));
 				var restored20279 = await character.TimeActions.StartAsync(L("Restoring the Obelisk..."), L("Cancel"), "READ", TimeSpan.FromSeconds(3));
 
 				if (restored20279 != TimeActionResult.Completed)
 					return;
 
 				character.Quests.CompleteObjective(Mq04, "restoreObelisk");
-				character.ServerMessage(L("Return to the Andale Village Priest."));
+				character.ServerMessage(L("You follow the faint patterns left in the stone and draw the letters back in with the dye. Return to the Andale Village Priest."));
 				return;
 			}
 
@@ -354,9 +354,21 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		var poured = await character.TimeActions.StartAsync(L("Collecting the sap..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (poured != TimeActionResult.Completed)
+			return;
+
 		character.Inventory.Add(ItemId.HUEVILLAGE_58_2_MQ02_ITEM, 1, InventoryAddType.PickUp);
-		await dialog.Msg(L("You tip the container and pour off the sap that has gathered in it."));
+		character.ServerMessage(L("You tip the container and pour off the sap that has gathered in it."));
 	}
+
+	/// <summary>
+	/// Returns whether the villagers of Andale have left for the given
+	/// character, which they do once the Languid Herb bomb has gone off.
+	/// </summary>
+	private static bool IsVillageEmptied(Character character)
+		=> character.Quests.IsCompletable(DrowsyScent) || character.Quests.HasCompleted(DrowsyScent);
 }
 
 //-----------------------------------------------------------------------------

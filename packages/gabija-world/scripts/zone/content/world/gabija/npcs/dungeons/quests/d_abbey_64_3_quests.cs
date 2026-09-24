@@ -311,6 +311,9 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I haven't been able to rest ever since arriving at the Koru Jungle... I should rest now."));
 				await dialog.Msg(L("Yes, it was all thanks to you. Thank you so much... really."));
 				await dialog.CompleteQuest(Mq050);
+
+				if (character.Quests.HasCompleted(Mq050))
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("Rose saw a strange light gathering at Letas Stream.{nl}Head through Karolis Springs, past Dadan Jungle."), 8);
 				return;
 			}
 

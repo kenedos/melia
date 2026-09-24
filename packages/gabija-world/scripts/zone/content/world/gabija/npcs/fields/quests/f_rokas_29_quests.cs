@@ -543,6 +543,13 @@ public class FRokas29QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Vacys2) && character.Quests.MeetsPrerequisites(Vacys2))
+			{
+				await dialog.Msg(L("My journal... Something is wrong. Stay close."));
+				character.Quests.Start(Vacys2);
+				return;
+			}
+
 			if (character.Quests.IsActive(Vacys1))
 			{
 				await dialog.Msg(L("The bag is somewhere south of here, below Serno Highland."));
@@ -724,7 +731,7 @@ public class FRokas29QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Vacys4) && !character.Quests.IsCompletable(Vacys4))
 			{
 				await dialog.Msg(L("The ground has been dug out already, and whatever did it is still close."));
-				character.Quests.ClearQuestTrack(Vacys4);
+				character.Quests.ReplayQuestTrack(Vacys4);
 				return;
 			}
 
@@ -754,7 +761,7 @@ public class FRokas29QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Vacys5) && !character.Quests.IsCompletable(Vacys5))
 			{
 				await dialog.Msg(L("The Hogma are still on this line. Clear them before you dig again."));
-				character.Quests.ClearQuestTrack(Vacys5);
+				character.Quests.ReplayQuestTrack(Vacys5);
 				return;
 			}
 
