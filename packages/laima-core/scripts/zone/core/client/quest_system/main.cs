@@ -5,6 +5,9 @@
 //---------------------------------------------------------------------------
 
 using System.Globalization;
+using System.Linq;
+using System.Text;
+using Melia.Shared.Game.Const;
 using Melia.Shared.Network;
 using Melia.Zone;
 using Melia.Zone.Scripting;
@@ -23,6 +26,37 @@ public class CustomQuestSystemClientScript : ClientScript
 
 		AddChatCommand("quest", "<complete|cancel|track|warp>", "", 0, 99, HandleQuest);
 		AddChatCommand("questsearch", "<text>", "", 0, 99, HandleQuestSearch);
+		AddChatCommand("questmarkdebug", "", "", 99, 99, HandleQuestMarkDebug);
+	}
+
+	private CommandResult HandleQuestMarkDebug(Character sender, Character target, string message, string commandName, Arguments args)
+	{
+		if (args.Count >= 2 && args.Get(0) == "zoom")
+		{
+			Send.ZC_EXEC_CLIENT_SCP(sender.Connection, "camera.CustomZoom(" + args.Get(1) + ", 0.3, 0) ui.SysMsg('zoom " + args.Get(1) + "')");
+			return CommandResult.Okay;
+		}
+
+		var map = sender.Map;
+		var npcs = map.GetNpcs(a => a.UniqueName != null && a.Id != MonsterId.HiddenTrigger)
+			.OrderBy(a => a.Position.Get2DDistance(sender.Position))
+			.Take(6)
+			.ToList();
+
+		var entries = string.Join(",", npcs.Select(a => "{\"" + map.ClassName + "_" + a.UniqueName.ToLowerInvariant() + "\"," + a.Handle + "}"));
+
+		var lua = new StringBuilder();
+		lua.Append("if QM_QU==nil then QM_QU=quest.QuestUpdate quest.QuestUpdate=function(a,b) ui.SysMsg('QU '..tostring(a)..' '..tostring(b)) return QM_QU(a,b) end end\n");
+		lua.Append("local k={" + entries + "} local done=false\n");
+		lua.Append("for i=1,#k do local t=_G['g_table_'..k[i][1]] local a=world.GetActor(k[i][2]) local s=k[i][1]\n");
+		lua.Append("if a then local p=a:GetPos() s=s..string.format(' actor=%.0f,%.0f,%.0f',p.x,p.y,p.z) end\n");
+		lua.Append("if t then local n=t[3] s=s..string.format(' event=%.0f,%.0f,%.0f',n[2],n[3],n[4])\n");
+		lua.Append("if not done then done=true QM_QU(k[i][1],'None') QM_QU(k[i][1],'I_quest_mask_possible') s=s..' FORCED' end end\n");
+		lua.Append("ui.SysMsg(s) end\n");
+
+		Send.ZC_EXEC_CLIENT_SCP(sender.Connection, lua.ToString());
+		sender.Quests.UpdateClient_QuestMarks();
+		return CommandResult.Okay;
 	}
 
 	protected override void Ready(Character character)
