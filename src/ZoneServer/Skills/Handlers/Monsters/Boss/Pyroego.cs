@@ -108,7 +108,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 100, angle: 45f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 1800;
+			hitDelay = 600;
 			aniTime = 600;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
@@ -157,11 +157,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var groupSizes = new[] { 3, 3, 3, 3, 4 };
 			for (var g = 0; g < groupSizes.Length; g++)
 			{
-				for (var i = 0; i < groupSizes[g]; i++)
-				{
-					var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 160, height: 1);
-					await MissileThrow(skill, caster, position, config);
-				}
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				foreach (var position in GetScatteredPositions(GetLeadPosition(target, 700, caster), groupSizes[g], 130, 45))
+					_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), config);
 
 				if (g < groupSizes.Length - 1)
 					await skill.Wait(TimeSpan.FromMilliseconds(100));
@@ -263,14 +263,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			for (var i = 0; i < 7; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 180, height: 1);
-				await MissileThrow(skill, caster, position, rightConfig);
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
 
-				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 150, height: 2);
+				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 2000, 80, caster), 250f);
+				_ = MissileThrow(skill, caster, position, rightConfig);
+
+				position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 2000, 80, caster), 250f);
 				if (i < 6)
-					await MissileThrow(skill, caster, position, leftConfig);
+					_ = MissileThrow(skill, caster, position, leftConfig);
 				else
-					await MissileThrow(skill, caster, position, new MissileConfig
+					_ = MissileThrow(skill, caster, position, new MissileConfig
 					{
 						Effect = new EffectConfig("I_force054_fire#Bip001 L Finger1", 2.5f),
 						EndEffect = new EffectConfig("I_explosion009_orange", 2f),
@@ -354,21 +357,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			for (var i = 0; i < 7; i++)
+			var baseDir = originPos.GetDirection(farPos);
+			var radial = new[] { 0f, -65f, -125f, 180f, 125f, 65f };
+			var lines = new List<Task>();
+			foreach (var angle in radial)
 			{
-				var startingPosition = originPos.GetRelative(farPos, distance: 20f);
-				var endingPosition = originPos.GetRelative(farPos, distance: 250f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, forwardConfig);
+				var lineDir = baseDir.AddDegreeAngle(angle);
+				lines.Add(EffectHitArrow(skill, caster, originPos.GetRelative(lineDir, 20f), originPos.GetRelative(lineDir, 250f), forwardConfig));
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 
-			for (var i = 0; i < 6; i++)
+			foreach (var angle in radial)
 			{
-				var startingPosition = originPos.GetRelative(farPos, distance: 250f);
-				var endingPosition = originPos.GetRelative(farPos, distance: 20f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, reverseConfig);
+				var lineDir = baseDir.AddDegreeAngle(angle);
+				lines.Add(EffectHitArrow(skill, caster, originPos.GetRelative(lineDir, 250f), originPos.GetRelative(lineDir, 20f), reverseConfig));
 			}
+			await Task.WhenAll(lines);
 		}
 	}
 
@@ -436,11 +441,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			for (var i = 0; i < 7; i++)
+			var baseDir = originPos.GetDirection(farPos);
+			var radial = new[] { 0f, -65f, -125f, 180f, 125f, 65f };
+			var lines = new List<Task>();
+			foreach (var angle in radial)
 			{
-				var startingPosition = originPos.GetRelative(farPos, distance: 20f);
-				var endingPosition = originPos.GetRelative(farPos, distance: 300f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, forwardConfig);
+				var lineDir = baseDir.AddDegreeAngle(angle);
+				lines.Add(EffectHitArrow(skill, caster, originPos.GetRelative(lineDir, 20f), originPos.GetRelative(lineDir, 300f), forwardConfig));
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
@@ -454,12 +461,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			SkillCreatePad(caster, skill, targetPos, 0.71808273f, PadName.Grinender_FirePillar);
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
-			for (var i = 0; i < 6; i++)
+			foreach (var angle in radial)
 			{
-				var startingPosition = originPos.GetRelative(farPos, distance: 300f);
-				var endingPosition = originPos.GetRelative(farPos, distance: 20f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, reverseConfig);
+				var lineDir = baseDir.AddDegreeAngle(angle);
+				lines.Add(EffectHitArrow(skill, caster, originPos.GetRelative(lineDir, 300f), originPos.GetRelative(lineDir, 20f), reverseConfig));
 			}
+			await Task.WhenAll(lines);
 		}
 	}
 }

@@ -11,6 +11,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -50,7 +51,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 70, width: 30, angle: 30f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 1300;
+			hitDelay = 500;
 			aniTime = 500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
@@ -84,7 +85,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1800));
-			var startingPosition = originPos.GetRelative(farPos, distance: 50f);
+			var startingPosition = originPos.GetRelative(farPos, distance: 50f, angle: 15f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 250f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
@@ -119,15 +120,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			startingPosition = originPos.GetRelative(farPos, distance: 50f);
+			startingPosition = originPos.GetRelative(farPos, distance: 50f, angle: -15f);
 			endingPosition = originPos.GetRelative(farPos, distance: 250f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			startingPosition = originPos.GetRelative(farPos, distance: 250f);
-			endingPosition = originPos.GetRelative(farPos, distance: 40f);
+			endingPosition = originPos.GetRelative(farPos, distance: 40f, angle: 20f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
 			startingPosition = originPos.GetRelative(farPos, distance: 250f);
-			endingPosition = originPos.GetRelative(farPos, distance: 45f);
+			endingPosition = originPos.GetRelative(farPos, distance: 45f, angle: -20f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
 		}
 	}
@@ -159,6 +160,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (2500, 3f, -13f), (4000, 215f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 			var startingPosition = originPos.GetRelative(farPos, distance: 20f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 230f);

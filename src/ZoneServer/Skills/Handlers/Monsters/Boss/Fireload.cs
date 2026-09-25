@@ -104,13 +104,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			var startingPosition = originPos.GetRelative(farPos, distance: 30f);
-			var endingPosition = originPos.GetRelative(farPos, distance: 250f);
+			var startingPosition = originPos.GetRelative(farPos, distance: 30f, angle: 30f);
+			var endingPosition = originPos.GetRelative(farPos, distance: 250f, angle: -30f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 10000f, 1, 10, -1, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			startingPosition = originPos.GetRelative(farPos, distance: 30f);
-			endingPosition = originPos.GetRelative(farPos, distance: 250f);
+			startingPosition = originPos.GetRelative(farPos, distance: 30f, angle: -30f);
+			endingPosition = originPos.GetRelative(farPos, distance: 250f, angle: 30f);
 			hits.Clear();
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 10000f, 1, 10, -1, hits);
@@ -195,11 +195,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				EffectMoveDelay = 0f,
 			};
 
-			for (var i = 0; i < 9; i++)
-			{
-				var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 160, height: 2);
-				await MissilePadThrow(skill, caster, position, config, 0f, "boss_firewall");
-			}
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			foreach (var position in GetScatteredPositions(target.Position, 9, 160, 50))
+				_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), config, 0f, "boss_firewall");
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 		}
 	}
 
@@ -282,11 +284,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				EffectMoveDelay = 0f,
 			};
 
-			for (var i = 0; i < 4; i++)
-			{
-				var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 160, height: 2);
-				await MissilePadThrow(skill, caster, position, config, 0f, "boss_firewall_red");
-			}
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			foreach (var position in GetScatteredPositions(target.Position, 4, 160, 50))
+				_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), config, 0f, "boss_firewall_red");
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 		}
 	}
 }

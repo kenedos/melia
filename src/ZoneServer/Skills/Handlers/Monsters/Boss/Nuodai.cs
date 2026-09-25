@@ -133,7 +133,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 					VerticalAngle = 0f,
 					InnerRange = 0f,
 				}, hits);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 50, -1, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 5000f, 1, 15, -1, hits);
 				hits.Clear();
 			}
 		}
@@ -200,30 +200,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(800));
-			var position = originPos.GetRelative(farPos);
-			await skill.Wait(TimeSpan.FromMilliseconds(300));
-			var hits = new List<SkillHitInfo>();
-			var startingPosition = originPos.GetRelative(farPos);
-			var endingPosition = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 250);
-			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
-			{
-				ArrowEffect = EffectConfig.None,
-				ArrowSpacing = 25f,
-				ArrowSpacingTime = 0.01f,
-				ArrowLifeTime = 1f,
-				PositionDelay = 1000f,
-				HitEffect = new EffectConfig("F_spark017_ice##1", 1f),
-				Range = 25f,
-				KnockdownPower = 150f,
-				Delay = 0f,
-				HitEffectSpacing = 25f,
-				HitTimeSpacing = 0.1f,
-				HitCount = 1,
-				HitDuration = 1000f,
-			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 10000f, 1, 30, -1, hits);
-			hits.Clear();
+			await skill.Wait(TimeSpan.FromMilliseconds(1100));
 			var config = new ArrowConfig
 			{
 				ArrowEffect = EffectConfig.None,
@@ -241,13 +218,18 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			for (var i = 0; i < 4; i++)
-			{
-				startingPosition = originPos.GetRelative(farPos);
-				endingPosition = originPos.GetRelative(farPos, distance: 250f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, config, hits);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 10000f, 1, 30, -1, hits);
-			}
+			var baseDir = originPos.GetDirection(GetLeadPosition(target, 1000, caster));
+			var lines = new List<Task>();
+			foreach (var angle in new[] { 0f, 20f, -20f, -45f, 45f })
+				lines.Add(this.Line(caster, skill, originPos, originPos.GetRelative(baseDir.AddDegreeAngle(angle), 250f), config));
+			await Task.WhenAll(lines);
+		}
+
+		private async Task Line(ICombatEntity caster, Skill skill, Position start, Position end, ArrowConfig config)
+		{
+			var hits = new List<SkillHitInfo>();
+			await EffectHitArrow(skill, caster, start, end, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 10000f, 1, 30, -1, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_mspblood, 1, 0f, 4000f, 1, 25, -1, hits);
 		}
 	}

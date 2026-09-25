@@ -281,15 +281,15 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 30, angle: 10f);
+			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 40, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 30, angle: 10f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 40, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 30, angle: 10f);
+			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 40, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			hitDelay = 200;
 			aniTime = 200;

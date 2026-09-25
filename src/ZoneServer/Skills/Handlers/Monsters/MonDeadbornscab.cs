@@ -90,12 +90,12 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 10, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 950;
+			hitDelay = 150;
 			aniTime = 150;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 10, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 1100;
+			hitDelay = 150;
 			aniTime = 150;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
@@ -174,12 +174,12 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 10, angle: 80f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 950;
+			hitDelay = 150;
 			aniTime = 150;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 10, angle: 80f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 1100;
+			hitDelay = 150;
 			aniTime = 150;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}

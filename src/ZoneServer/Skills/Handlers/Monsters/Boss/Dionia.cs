@@ -434,7 +434,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 				InnerRange = 0,
 			};
 
-			var ringAngles = new[] { 0f, -0.69813168f, -1.5707964f, -2.4434609f, -3.1415927f, 2.4434609f, 1.5707964f, 0.69813168f };
+			var ringAngles = new[] { 0f, -40f, -90f, -140f, 180f, 140f, 90f, 40f };
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 
@@ -455,7 +455,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters
 			}
 
 			// Outer ring: distance=150, second pass (offset angles)
-			var offsetAngles = new[] { 0.69813168f, -0.34906584f, -1.134464f, -2.0071287f, 2.0071287f, 1.134464f, 0.34906584f, -2.7925267f, 2.7925267f };
+			var offsetAngles = new[] { 40f, -20f, -65f, -115f, 115f, 65f, 20f, -160f, 160f };
 			foreach (var angle in offsetAngles)
 			{
 				var position = GetRelativePosition(PosType.Self, caster, target, distance: 150, angle: angle);

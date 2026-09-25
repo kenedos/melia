@@ -11,6 +11,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -175,6 +176,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (1800, 0f, 0f), (2100, 167f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var startingPosition = originPos.GetRelative(farPos);
 			var endingPosition = originPos.GetRelative(farPos, distance: 150f);

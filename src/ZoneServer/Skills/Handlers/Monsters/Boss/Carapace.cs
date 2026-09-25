@@ -63,11 +63,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			for (var i = 0; i < 22; i++)
 			{
 				if (i > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(250));
-				var position = originPos.GetNearestPositionWithinDistance(target.Position, 200f);
-				await MissileThrow(skill, caster, position, missileConfig);
+					await skill.Wait(TimeSpan.FromMilliseconds(500));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = GetLeadPositionScatter(target, 1000, 40, caster);
+				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 200f), missileConfig);
 			}
 
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			MonsterSkillSetCollisionDamage(caster, skill, false, 0.2f);
 		}
 	}
@@ -145,7 +149,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var hits = new List<SkillHitInfo>();
-			var position = originPos.GetRelative(farPos, distance: 10);
+			var position = originPos.GetRelative(farPos, distance: 40f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 2.5f),
@@ -162,10 +166,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			var targetPos = originPos.GetRelative(farPos, distance: 10);
+			var targetPos = originPos.GetRelative(farPos, distance: 40f);
 			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 30f, 50));
 			SkillResultTargetBuff(caster, skill, BuffId.UC_deprotect, 1, 0f, 6000f, 1, 100, -1, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -213,7 +217,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 4000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 4000f, 1, 15, -1, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(3000));
 			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 20, rand: 90, height: 1);
 			hits = hits = new List<SkillHitInfo>();
@@ -233,7 +237,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 4000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 4000f, 1, 15, -1, hits);
 		}
 	}
 }

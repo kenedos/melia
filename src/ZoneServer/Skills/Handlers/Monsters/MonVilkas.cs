@@ -510,7 +510,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 30, angle: 30f);
 			// Warning: Splash type mismatch. HitList frame type: Fan, SkillData type: Circle
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 1000;
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}

@@ -54,7 +54,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 3000f, 1, 50, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 3000f, 1, 15, -1, hits);
 		}
 	}
 
@@ -103,7 +103,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.merregina_pad);
 			targetPos = originPos.GetRelative(farPos, distance: 60, height: 1);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.merregina_pad);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 2000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 2000f, 1, 15, -1, hits);
 		}
 	}
 
@@ -149,12 +149,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			for (var i = 0; i < 10; i++)
 			{
-				var position = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
-				await MissileFall(caster, skill, position, config, hits);
-
-				if (i < 9)
+				if (i > 0)
 					await skill.Wait(TimeSpan.FromMilliseconds(200));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					return;
+
+				var position = GetLeadPositionScatter(target, 2600, 50, caster);
+				_ = MissileFall(caster, skill, originPos.GetNearestPositionWithinDistance(position, 200f), config);
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1200));
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			foreach (var position in GetScatteredPositions(GetLeadPosition(target, 2600, caster), 8, 100, 45))
+				_ = MissileFall(caster, skill, originPos.GetNearestPositionWithinDistance(position, 200f), config);
+
+			await skill.Wait(TimeSpan.FromMilliseconds(2600));
 		}
 	}
 

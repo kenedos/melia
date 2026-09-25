@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 75, width: 30, angle: 40f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 2100;
+			hitDelay = 1000;
 			aniTime = 1000;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(3500));
@@ -112,7 +112,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 0f,
 				InnerRange = 0f,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 10000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 10000f, 1, 40, -1, hits);
 		}
 	}
 

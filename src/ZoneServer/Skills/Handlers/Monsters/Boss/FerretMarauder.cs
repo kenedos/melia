@@ -12,6 +12,7 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -88,13 +89,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 110, width: 50, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 1700;
+			hitDelay = 100;
 			aniTime = 100;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 50, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 2500;
+			hitDelay = 800;
 			aniTime = 800;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
@@ -129,6 +130,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (1600, 4f, 97f), (1800, 94f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			var startingPosition = originPos.GetRelative(farPos);
 			var endingPosition = originPos.GetRelative(farPos, distance: 130f);

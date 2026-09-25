@@ -51,7 +51,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 1800;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 150, 30, 0, 0, 0, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 150, 30, 0, 0, 0, hits, 20);
 		}
 	}
 
@@ -125,7 +125,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1200));
 			var hits = new List<SkillHitInfo>();
-			var position = originPos.GetRelative(farPos, distance: 59.332268f);
+			var position = originPos.GetRelative(farPos, distance: 59f, angle: 40f);
 			_ = EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 3f),
@@ -144,7 +144,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			}, hits);
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			hits.Clear();
-			position = originPos.GetRelative(farPos, distance: 50.974472f);
+			position = originPos.GetRelative(farPos, distance: 51f, angle: -54f);
 			_ = EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 3f),

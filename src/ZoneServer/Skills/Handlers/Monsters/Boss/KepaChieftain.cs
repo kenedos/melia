@@ -12,6 +12,7 @@ using Melia.Zone.World.Actors;
 using Yggdrasil.Util;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -188,8 +189,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 50, angle: 10f);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 56f, angle: 17f), 50f);
 			var hitDelay = 1500;
 			var aniTime = 1700;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);

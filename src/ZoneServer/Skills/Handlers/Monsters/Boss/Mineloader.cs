@@ -11,6 +11,7 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -42,8 +43,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (2600, 0f, 0f), (3100, 170f, 0f));
+
 			var startingPosition = originPos.GetRelative(farPos, distance: 25f);
-			var endingPosition = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 160f));
+			var endingPosition = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 140f));
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = EffectConfig.None,
@@ -81,9 +84,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			//MonsterSkillSetCollisionDamage(caster, skill, true, 1f);
 			//await skill.Wait(TimeSpan.FromMilliseconds(1700));
 			//MonsterSkillSetCollisionDamage(caster, skill, false, 1f);
-
-			caster.Position = endingPosition;
-			Send.ZC_SET_POS(caster, endingPosition);
 		}
 	}
 
@@ -114,15 +114,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (2000, 0f, 0f), (6500, 214f, 1f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(2400));
-			var targetPos = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 200));
+			var targetPos = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 130f));
 			skill.Vars.Set("Melia.Pad.TargetPos", targetPos);
 			SkillCreatePad(caster, skill, originPos, 0f, PadName.mineloader_laser);
 			await skill.Wait(TimeSpan.FromMilliseconds(4300));
 			SkillRemovePad(caster, skill);
-
-			caster.Position = targetPos;
-			Send.ZC_SET_POS(caster, targetPos);
 		}
 	}
 
@@ -202,10 +201,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var targetPos = originPos.GetRelative(farPos, distance: 150);
 			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 180f, 20));
 			await skill.Wait(TimeSpan.FromMilliseconds(1800));
-			for (var i = 0; i < 3; i++)
+			if (!caster.Position.InRange2D(target.Position, 350))
+				return;
+
+			foreach (var scattered in GetScatteredPositions(GetLeadPosition(target, 900, caster), 3, 90, 60))
 			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
-				position = originPos.GetNearestPositionWithinDistance(position, 300f);
+				var position = originPos.GetNearestPositionWithinDistance(scattered, 300f);
 				_ = MissileThrow(skill, caster, position, new MissileConfig
 				{
 					Effect = new EffectConfig("I_force052_pink#Bone003", 1.5f),
@@ -253,10 +254,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			for (var wave = 0; wave < 3; wave++)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(wave == 0 ? 1900 : 1800));
-				for (var i = 0; i < 3; i++)
+				if (!caster.Position.InRange2D(target.Position, 350))
+					break;
+
+				foreach (var scattered in GetScatteredPositions(GetLeadPosition(target, 900, caster), 3, 90, 60))
 				{
-					var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
-					position = originPos.GetNearestPositionWithinDistance(position, 300f);
+					var position = originPos.GetNearestPositionWithinDistance(scattered, 300f);
 					_ = MissileThrow(skill, caster, position, new MissileConfig
 					{
 						Effect = new EffectConfig("I_force052_pink#Bone003", 1.5f),

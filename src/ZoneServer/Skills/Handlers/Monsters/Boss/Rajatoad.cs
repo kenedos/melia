@@ -79,7 +79,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			var startingPosition = originPos.GetRelative(farPos);
+			var startingPosition = originPos.GetRelative(farPos, distance: -20f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 165f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
@@ -141,19 +141,24 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitTime = 1000f,
 				HitCount = 1,
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 3f),
-				GroundDelay = 1000f,
+				GroundDelay = 1f,
 				EffectMoveDelay = 0f,
 			};
 
 			var delays = new[] { 1550, 1200, 1250 };
 			for (var i = 0; i < 4; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 200);
-				await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = GetLeadPositionScatter(target, 1000, 40, caster);
+				_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), config, 0f, "Rajatoad_bubble");
 
 				if (i < delays.Length)
 					await skill.Wait(TimeSpan.FromMilliseconds(delays[i]));
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 		}
 	}
 
@@ -235,43 +240,24 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitTime = 1000f,
 				HitCount = 1,
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 2f),
-				GroundDelay = 1000f,
+				GroundDelay = 1f,
 				EffectMoveDelay = 0f,
 			};
 
-			var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			await skill.Wait(TimeSpan.FromMilliseconds(1550));
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			await skill.Wait(TimeSpan.FromMilliseconds(1200));
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			await skill.Wait(TimeSpan.FromMilliseconds(1250));
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
-			position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 190);
-			await MissilePadThrow(skill, caster, position, config, 0f, "Rajatoad_bubble");
+			var waveCounts = new[] { 3, 3, 4, 5 };
+			var waits = new[] { 0, 1550, 1200, 1250 };
+			for (var wave = 0; wave < waveCounts.Length; wave++)
+			{
+				if (waits[wave] > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(waits[wave]));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				foreach (var position in GetScatteredPositions(GetLeadPosition(target, 1000, caster), waveCounts[wave], 150, 50))
+					_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), config, 0f, "Rajatoad_bubble");
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 		}
 	}
 }

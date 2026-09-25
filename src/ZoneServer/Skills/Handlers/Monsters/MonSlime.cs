@@ -83,7 +83,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			var area = new Circle(caster.Position, 40f);
+			var area = new SplashAreas.Circle(caster.Position, 40f);
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, area, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 4000f, 1, 10, -1, hits);

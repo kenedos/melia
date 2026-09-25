@@ -91,7 +91,7 @@ namespace Melia.Zone.Skills.Handlers.Mon
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 110, width: 10, angle: 10f);
 			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 850;
+			hitDelay = 100;
 			aniTime = 100;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 

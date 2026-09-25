@@ -40,7 +40,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, farPos, new EffectHitConfig
+			await EffectAndHit(skill, caster, originPos.GetRelative(farPos, distance: 46f, angle: 5f), new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.3", 3f),
 				PositionDelay = 1500,
@@ -56,7 +56,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -86,7 +86,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1600));
 			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, farPos, new EffectHitConfig
+			await EffectAndHit(skill, caster, originPos.GetRelative(farPos, distance: 50f), new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_sys_target_monster##0.8", 2.5f),
 				PositionDelay = 2300,
@@ -102,7 +102,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 70f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 4000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 4000f, 1, 15, -1, hits);
 		}
 	}
 
@@ -132,7 +132,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 			var hits = new List<SkillHitInfo>();
-			await EffectAndHit(skill, caster, farPos, new EffectHitConfig
+			await EffectAndHit(skill, caster, originPos.GetRelative(farPos, distance: 58f, angle: -1f), new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_sys_target_monster##0.8", 1.5f),
 				PositionDelay = 2000,
@@ -148,7 +148,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 

@@ -39,7 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
-			var position = originPos.GetRelative(farPos, distance: 0, angle: 0f);
+			var position = originPos.GetRelative(farPos, distance: 68f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 2.3f),
@@ -189,21 +189,30 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			var delays = new[] { 100, 100, 200, 200, 100, 100 };
 
-			var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 100, height: 1);
-			position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
-			await EffectAndHit(skill, caster, position, hitConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
-			hits.Clear();
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			var position = GetLeadPositionScatter(target, 2200, 20, caster);
+			_ = this.Blast(caster, skill, originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR] + 50), hitConfig);
 
 			foreach (var delay in delays)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(delay));
-				position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 100, height: 1);
-				position = originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR]);
-				await EffectAndHit(skill, caster, position, hitConfig, hits);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
-				hits.Clear();
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				position = GetLeadPositionScatter(target, 2200, 70, caster);
+				_ = this.Blast(caster, skill, originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR] + 50), hitConfig);
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(2200));
+		}
+
+		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
+		{
+			var hits = new List<SkillHitInfo>();
+			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
 
 		}
 	}

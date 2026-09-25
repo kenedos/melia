@@ -12,6 +12,7 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -76,13 +77,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 60, angle: 10f);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 52f, angle: -10f), 60f);
 			var hitDelay = 1900;
 			var aniTime = 2100;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -128,7 +128,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 80f,
 				InnerRange = 0f,
 			});
-			position = originPos.GetRelative(farPos, distance: 10);
+			position = originPos.GetRelative(farPos, distance: 40f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
@@ -175,7 +175,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(1900));
+			await skill.Wait(TimeSpan.FromMilliseconds(2100));
 			var matk = caster.Properties.GetFloat(PropertyName.MINMATK) + caster.Properties.GetFloat(PropertyName.MAXMATK) / 2;
 			caster.StartBuff(BuffId.Mon_Heal_Buff, skill.Level, matk, TimeSpan.FromMilliseconds(15000), caster);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
@@ -183,30 +183,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 200;
-			var aniTime = 200;
+			var hitDelay = 0;
+			var aniTime = 0;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 10, -1, hits);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
-			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 200;
-			aniTime = 200;
-			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 10, -1, hits);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
-			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 200;
-			aniTime = 200;
-			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 10, -1, hits);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
-			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 200;
-			aniTime = 200;
-			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 6000f, 1, 10, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 100);
@@ -336,12 +315,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			for (var i = 0; i < 7; i++)
 			{
-				position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 110, height: 1);
-				await EffectAndHit(skill, caster, position, config);
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 1000, 70, caster), 250f);
+				_ = EffectAndHit(skill, caster, position, config);
 
 				if (i < 6)
 					await skill.Wait(TimeSpan.FromMilliseconds(100));
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 		}
 	}
 }

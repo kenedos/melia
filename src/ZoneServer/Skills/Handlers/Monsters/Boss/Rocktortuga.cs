@@ -39,7 +39,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var hits = new List<SkillHitInfo>();
-			var position = originPos.GetRelative(farPos, distance: 20f);
+			var position = originPos.GetRelative(farPos, distance: 61f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 1.5f),
@@ -56,8 +56,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 10f,
 				InnerRange = 0,
 			}, hits);
-			foreach (var hit in hits)
-				SkillResultKnockTarget(caster, null, skill, hit, KnockType.Motion, KnockDirection.TowardsTarget, 150, 10, 0, 1, 5);
+			SkillResultKnockTarget(caster, skill, KnockType.Motion, KnockDirection.TowardsTarget, 150, 10, 0, 1, 5, hits, 20);
 		}
 	}
 
@@ -85,7 +84,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var position = originPos.GetRelative(farPos, distance: 20f);
+			var position = originPos.GetRelative(farPos, distance: 86f, angle: 2f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_sys_target_monster", 2f),

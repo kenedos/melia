@@ -15,6 +15,7 @@ using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Util;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -200,6 +201,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -207,9 +209,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (1500, 0f, 0f), (2500, 209f, 0f));
+
 			var startingPosition = originPos.GetRelative(farPos, distance: 0);
 			var endingPosition = originPos.GetRelative(farPos, distance: 250);
-			caster.MoveToLastValidPosition(startingPosition, endingPosition, 1500, 2500);
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{

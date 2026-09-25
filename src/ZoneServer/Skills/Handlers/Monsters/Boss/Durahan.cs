@@ -13,6 +13,7 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -133,10 +134,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
+			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -144,6 +147,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (1800, 0f, 0f), (2200, 30f, 0f), (3100, 160f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1800));
 			MonsterSkillSetCollisionDamage(caster, skill, true, 1f);
 			var config = new MissileConfig
@@ -160,12 +165,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = EffectConfig.None,
 			};
 
-			for (var i = 0; i < 20; i++)
+			var positions = GetScatteredPositions(originPos, 20, 110, 30);
+			for (var i = 0; i < positions.Count; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 80, height: 1);
-				await MissileThrow(skill, caster, position, config);
+				_ = MissileThrow(skill, caster, positions[i], config);
 
-				if (i < 19)
+				if (i < positions.Count - 1)
 					await skill.Wait(TimeSpan.FromMilliseconds(60));
 			}
 			await skill.Wait(TimeSpan.FromMilliseconds(260));

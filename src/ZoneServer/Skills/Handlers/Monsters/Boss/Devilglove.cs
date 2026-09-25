@@ -11,7 +11,9 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -40,8 +42,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 35);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 42f, angle: -1f), 35f);
 			var hitDelay = 1000;
 			var aniTime = 1200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -109,6 +110,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -116,6 +118,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (3000, 0f, 0f), (3050, 200f, 0f));
+
 			var hits = new List<SkillHitInfo>();
 			var startingPosition = originPos.GetRelative(farPos);
 			var endingPosition = originPos.GetRelative(farPos, distance: 220f);
@@ -183,7 +187,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 200, 10, 0, 0, 2, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 200, 10, 0, 0, 2, hits, 20);
 		}
 	}
 }

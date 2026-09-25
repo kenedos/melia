@@ -201,11 +201,16 @@ namespace Melia.Zone.Skills.Helpers
 			}
 		}
 
-		public static void SkillResultKnockTarget(ICombatEntity caster, Skill skill, KnockType knockType, KnockDirection knockDirection, float power, float verticalAngle, float horizontalAngle, int bound, int knockdownRank, List<SkillHitInfo> hits = null)
+		public static void SkillResultKnockTarget(ICombatEntity caster, Skill skill, KnockType knockType, KnockDirection knockDirection, float power, float verticalAngle, float horizontalAngle, int bound, int knockdownRank, List<SkillHitInfo> hits = null, int percent = 100)
 		{
+			if (hits == null)
+				return;
+
 			foreach (var hit in hits)
 			{
 				if (hit.HitInfo.ResultType == HitResultType.Dodge || hit.HitInfo.ResultType == HitResultType.Block)
+					continue;
+				if (percent < 100 && GameRandom.Get().Next(1, 101) > percent)
 					continue;
 				var key = GetSkillSyncKey(caster, hit.HitInfo);
 				StartSyncPacket(caster, key);

@@ -10,8 +10,10 @@ using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using System.Linq;
 using Melia.Zone.Skills.Helpers;
 
@@ -133,7 +135,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 				var hits = new List<SkillHitInfo>();
 				await SkillAttack(caster, skill, splashArea, delay, delay, hits);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 6000f, 1, 100, -1, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 6000f, 1, 40, -1, hits);
 			}
 		}
 	}
@@ -154,6 +156,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			caster.SetAttackState(true);
 
 			var forceId = ForceId.GetNew();
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, caster.Position, caster.Direction, target.Position);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, caster.Position, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, skill));
@@ -161,9 +164,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, Skill skill)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (3000, 0f, 0f), (3600, 250f, 0f));
+
 			var startingPosition = GetRelativePosition(PosType.Self, caster, distance: 50);
 			var endingPosition = GetRelativePosition(PosType.Self, caster, distance: 250);
-			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
+			var arrow = EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = new EffectConfig("F_sys_arrow_monster", 1),
 				ArrowSpacing = 25f,
@@ -180,10 +185,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			});
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
+			MonsterSkillSetCollisionDamage(caster, skill, true, 1f);
 			await skill.Wait(TimeSpan.FromMilliseconds(3100));
-			if (caster.Components.TryGet<MovementComponent>(out var movementComponent))
-				movementComponent.MoveTo(endingPosition);
-			//caster.Position = endingPosition;
+			MonsterSkillSetCollisionDamage(caster, skill, false, 1f);
+			await arrow;
 		}
 	}
 

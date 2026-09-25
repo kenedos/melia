@@ -47,6 +47,11 @@ namespace Melia.Zone.Skills.Helpers
 			TargetRandomDistance = 10,
 		}
 
+		/// <summary>
+		/// Minimum radius of a monster splash that lands away from the caster's body.
+		/// </summary>
+		private const float RemoteSplashMinRadius = 20f;
+
 		public static Position GetNearestPositionWithinDistance(this Position currentPosition, Position targetPosition, float maxDistance)
 		{
 			// Calculate the distance between the current and target positions
@@ -76,7 +81,6 @@ namespace Melia.Zone.Skills.Helpers
 			return nearestPosition;
 		}
 
-
 		public static Position GetRelativePosition(PosType posType, ICombatEntity caster, double distance = 0, double angle = 0, int rand = 0, int height = 0)
 		=> GetRelativePosition(posType, caster, caster, distance, angle, rand, height);
 
@@ -91,53 +95,62 @@ namespace Melia.Zone.Skills.Helpers
 				return caster.Position;
 			}
 
+			Position position;
 			switch (posType)
 			{
 				case PosType.Self:
-					return caster.Position.GetRelative(target.Direction.AddDegreeAngle(angleF), distanceF) + new Position(0, height, 0);
+					position = caster.Position.GetRelative(caster.Direction.AddDegreeAngle(angleF), distanceF) + new Position(0, height, 0);
+					break;
 
 				case PosType.Target:
-					return target.Position;
+					position = target.Position;
+					break;
 
 				case PosType.TargetDirection:
-					return caster.Position.GetRelative(target.Position, distanceF);
+					position = caster.Position.GetRelative(target.Position, distanceF);
+					break;
 
 				case PosType.TargetFront:
-					return target.Position.GetRelative(target.Direction.Backwards.AddDegreeAngle(angleF), distanceF) + new Position(0, height, 0);
+					position = target.Position.GetRelative(target.Direction.Backwards.AddDegreeAngle(angleF), distanceF) + new Position(0, height, 0);
+					break;
 
 				case PosType.TargetBack:
-					return target.Position.GetRelative(target.Direction.AddDegreeAngle(angleF), distanceF) + new Position(0, height, 0);
+					position = target.Position.GetRelative(target.Direction.AddDegreeAngle(angleF), distanceF) + new Position(0, height, 0);
+					break;
 
 				case PosType.TargetRandom:
-					var randomPos = target.Position.GetRandomInRange2D((int)rand, GameRandom.Get());
-					randomPos.Y += height;
-					return randomPos;
+					position = target.Position + new Position(0, height, 0);
+					break;
 
 				case PosType.TargetFrontRandom:
 					var randomAngle = GameRandom.Get().Next(-45, 46) + angleF;
 					var randomDirection = target.Direction.AddDegreeAngle(randomAngle);
-					var randomFrontPos = target.Position.GetRelative(randomDirection, distanceF);
-					randomFrontPos.Y += height;
-					return randomFrontPos;
+					position = target.Position.GetRelative(randomDirection, distanceF) + new Position(0, height, 0);
+					break;
 
 				case PosType.TargetDistance:
-					var relativePos = caster.Position.GetRelative(target.Position, distanceF + GameRandom.Get().Next(rand));
-					relativePos.Y += height;
-					return relativePos;
+					position = caster.Position.GetRelative(target.Position, distanceF) + new Position(0, height, 0);
+					break;
 
 				case PosType.TargetHeight:
-					return target.Position + new Position(0, height, 0);
+					position = target.Position + new Position(0, height, 0);
+					break;
 
 				case PosType.TargetRandomDistance:
-					var minDist = (int)distance / 2;
 					var maxDist = (int)distance;
-					var randomDistPos = target.Position.GetRandomInRange2D(minDist, maxDist, GameRandom.Get());
-					randomDistPos.Y += height;
-					return randomDistPos;
+					position = maxDist > 0 ? target.Position.GetRandomInRange2D(maxDist / 2, maxDist, GameRandom.Get()) : target.Position;
+					position.Y += height;
+					break;
 
 				default:
-					return target.Position;
+					position = target.Position;
+					break;
 			}
+
+			if (rand > 0)
+				position = position.GetRandomInRange2D(rand, GameRandom.Get());
+
+			return position;
 		}
 
 		/// <summary>
@@ -220,7 +233,7 @@ namespace Melia.Zone.Skills.Helpers
 				}
 				else
 				{
-					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(hitDelay), skillHitDelay);
+					var skillHit = new SkillHitInfo(caster, target, skill, skillHitResult, TimeSpan.FromMilliseconds(Math.Max(0, hitDelay - aniTime)), skillHitDelay);
 					skillHit.HitEffect = HitEffect.Impact;
 					if (skillModifier == SkillModifier.Default)
 						skillHit.VarInfoCount = 0;
@@ -684,6 +697,59 @@ namespace Melia.Zone.Skills.Helpers
 			await DoDamageOverTime(skill, caster, position, config.FlyTime + config.DelayTime, config.Range, config.HitTime, config.HitCount, config.DotEffect.Name, config.DotEffect.Scale, 0, 0, config.InnerRange, hits);
 		}
 
+		/// <summary>
+		/// Throws a bomb monster that explodes at its position once the fuse runs out, unless it is killed first.
+		/// </summary>
+		/// <param name="skill"></param>
+		/// <param name="caster"></param>
+		/// <param name="position"></param>
+		/// <param name="flyTime">Seconds until the bomb lands.</param>
+		/// <param name="missileEffect"></param>
+		/// <param name="groundEffect"></param>
+		/// <param name="fuseTime">Seconds between landing and exploding.</param>
+		/// <param name="className"></param>
+		/// <param name="explosionEffect"></param>
+		/// <param name="explosionRange"></param>
+		public static async Task ThrowBombModel(Skill skill, ICombatEntity caster, Position position, float flyTime, EffectConfig missileEffect, EffectConfig groundEffect, float fuseTime, string className, EffectConfig explosionEffect, float explosionRange)
+		{
+			if (caster.IsDead)
+				return;
+
+			Send.ZC_NORMAL.SkillProjectile(caster, position, missileEffect.Name, missileEffect.Scale, "None", 1f, explosionRange, TimeSpan.FromSeconds(flyTime));
+			await skill.Wait(TimeSpan.FromSeconds(flyTime));
+
+			var bomb = MonsterSkillCreateMob(skill, caster, className, position, 0f, "", "", 0, 0f, "None", "");
+			if (bomb == null)
+				return;
+
+			ShowRangePreview(caster, skill, GetPreviewArea(caster, bomb.Position, explosionRange), TimeSpan.FromSeconds(fuseTime));
+			if (groundEffect.Name != "None")
+				_ = caster.PlayEffectToGround(groundEffect.Name, bomb.Position, groundEffect.Scale);
+
+			await skill.Wait(TimeSpan.FromSeconds(fuseTime));
+			if (bomb.IsDead)
+				return;
+
+			await EffectAndHit(skill, caster, bomb.Position, new EffectHitConfig
+			{
+				GroundEffect = EffectConfig.None,
+				PositionDelay = 0,
+				Effect = explosionEffect,
+				Range = explosionRange,
+				KnockdownPower = 0f,
+				Delay = 0f,
+				HitCount = 1,
+				HitDuration = 1000f,
+				CasterEffect = EffectConfig.None,
+				CasterNodeName = "None",
+				KnockType = 0,
+				VerticalAngle = 0f,
+				InnerRange = 0,
+			});
+
+			bomb.Kill(null);
+		}
+
 		public static async Task EffectAndHit(Skill skill, ICombatEntity caster, Position position, EffectHitConfig config, List<SkillHitInfo> hitResults = null)
 		{
 			if (caster.IsDead)
@@ -745,19 +811,19 @@ namespace Melia.Zone.Skills.Helpers
 				return;
 
 			var dist = startingPosition.Get2DDistance(endingPosition);
-			var hitPointCount = 1;
-
-			if (config.HitEffectSpacing != 0)
-				hitPointCount = (int)Math.Floor(dist / config.HitEffectSpacing);
-
+			var hitPointCount = config.HitEffectSpacing != 0 ? (int)Math.Floor(dist / config.HitEffectSpacing) + 1 : 1;
+			var hitPoints = new List<Position>(hitPointCount);
 			for (var i = 0; i < hitPointCount; i++)
 			{
-				var di = (float)i / hitPointCount;
-				var px = startingPosition.X + (endingPosition.X - startingPosition.X) * di;
-				var py = startingPosition.Y + (endingPosition.Y - startingPosition.Y) * di;
-				var pz = startingPosition.Z + (endingPosition.Z - startingPosition.Z) * di;
-				ShowRangePreview(caster, skill, GetPreviewArea(caster, new Position(px, py, pz), config.Range));
+				var di = hitPointCount > 1 ? (float)i / (hitPointCount - 1) : 0f;
+				hitPoints.Add(new Position(
+					startingPosition.X + (endingPosition.X - startingPosition.X) * di,
+					startingPosition.Y + (endingPosition.Y - startingPosition.Y) * di,
+					startingPosition.Z + (endingPosition.Z - startingPosition.Z) * di));
 			}
+
+			foreach (var hitPoint in hitPoints)
+				ShowRangePreview(caster, skill, GetPreviewArea(caster, hitPoint, config.Range));
 
 			Send.ZC_NORMAL.PlayArrowEffect(caster, startingPosition, endingPosition,
 				config.ArrowEffect.Name, config.ArrowEffect.Scale, config.ArrowSpacing, config.ArrowSpacingTime, config.ArrowLifeTime);
@@ -766,25 +832,26 @@ namespace Melia.Zone.Skills.Helpers
 				await skill.Wait(TimeSpan.FromMilliseconds((int)config.PositionDelay));
 
 			skill.Vars.Set("Melia.Skill.vAngle", config.VerticalAngle);
-			for (var i = 0; i < hitPointCount; i++)
-			{
-				var di = (float)i / hitPointCount;
-				var dx = startingPosition.X + (endingPosition.X - startingPosition.X) * di;
-				var dy = startingPosition.Y + (endingPosition.Y - startingPosition.Y) * di;
-				var dz = startingPosition.Z + (endingPosition.Z - startingPosition.Z) * di;
-
-				await caster.PlayEffectToGround(config.HitEffect.Name, new Position(dx, dy, dz), config.HitEffect.Scale, config.HitTimeSpacing * i);
-			}
+			for (var i = 0; i < hitPoints.Count; i++)
+				await caster.PlayEffectToGround(config.HitEffect.Name, hitPoints[i], config.HitEffect.Scale, config.HitTimeSpacing * i);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(config.Delay));
-			for (var i = 0; i < hitPointCount; i++)
-			{
-				var di = (float)i / hitPointCount;
-				var dx = startingPosition.X + (endingPosition.X - startingPosition.X) * di;
-				var dy = startingPosition.Y + (endingPosition.Y - startingPosition.Y) * di;
-				var dz = startingPosition.Z + (endingPosition.Z - startingPosition.Z) * di;
 
-				await DoDamageOverTime(skill, caster, new Position(dx, dy, dz), config.HitTimeSpacing, config.Range, config.HitDuration, config.HitCount, "None", 1.0f, config.KnockdownPower, (int)config.KnockType, 0, hits);
+			var minDamageSpacing = caster is Character ? 0f : Math.Max(config.Range, RemoteSplashMinRadius) * 2;
+			var lastDamageDist = float.MinValue;
+			for (var i = 0; i < hitPoints.Count; i++)
+			{
+				var pointDist = (float)startingPosition.Get2DDistance(hitPoints[i]);
+				var isLast = i == hitPoints.Count - 1;
+
+				if ((caster is not Character && config.Range <= 0) || (!isLast && pointDist - lastDamageDist < minDamageSpacing))
+				{
+					await skill.Wait(TimeSpan.FromSeconds(config.HitTimeSpacing));
+					continue;
+				}
+				lastDamageDist = pointDist;
+
+				await DoDamageOverTime(skill, caster, hitPoints[i], config.HitTimeSpacing, config.Range, config.HitDuration, config.HitCount, "None", 1.0f, config.KnockdownPower, (int)config.KnockType, 0, hits);
 			}
 		}
 
@@ -830,6 +897,21 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
+		/// Returns the radius a splash of the given range actually hits with at the position.
+		/// </summary>
+		/// <param name="caster"></param>
+		/// <param name="position"></param>
+		/// <param name="range"></param>
+		public static float GetEffectiveSplashRange(ICombatEntity caster, Position position, float range)
+		{
+			var bodyRadius = SizeTypeRadius.GetRadius(caster.EffectiveSize);
+			if (caster is Character || position.InRange2D(caster.Position, bodyRadius))
+				return Math.Max(range, bodyRadius);
+
+			return Math.Max(range, RemoteSplashMinRadius);
+		}
+
+		/// <summary>
 		/// Performs splash damage at a position, hitting all valid targets within range.
 		/// </summary>
 		/// <param name="skill">The skill being used.</param>
@@ -850,7 +932,7 @@ namespace Melia.Zone.Skills.Helpers
 			if (!caster.Map.Ground.IsValidPosition(position))
 				return;
 
-			range = Math.Max(range, SizeTypeRadius.GetRadius(caster.EffectiveSize));
+			range = GetEffectiveSplashRange(caster, position, range);
 
 			var aniTime = skill.GetAniTime();
 			var hitDelay = skill.GetHitDelay();
@@ -993,6 +1075,32 @@ namespace Melia.Zone.Skills.Helpers
 			if (scatter <= 0)
 				return leadPos;
 			return leadPos.GetRandomInRange2D(scatter);
+		}
+
+		/// <summary>
+		/// Returns the center plus random positions within the radius, kept at least minSpacing apart.
+		/// </summary>
+		public static List<Position> GetScatteredPositions(Position center, int count, int radius, float minSpacing)
+		{
+			var result = new List<Position>();
+			if (count <= 0)
+				return result;
+
+			result.Add(center);
+
+			for (var i = 1; i < count; i++)
+			{
+				var candidate = center.GetRandomInRange2D(radius);
+				for (var attempt = 0; attempt < 12; attempt++)
+				{
+					if (result.TrueForAll(p => !p.InRange2D(candidate, minSpacing)))
+						break;
+					candidate = center.GetRandomInRange2D(radius);
+				}
+				result.Add(candidate);
+			}
+
+			return result;
 		}
 
 	}

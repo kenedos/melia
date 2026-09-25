@@ -118,12 +118,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(1900));
-			await skill.Wait(TimeSpan.FromMilliseconds(50));
-			await skill.Wait(TimeSpan.FromMilliseconds(50));
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
+			var missileEffect = new EffectConfig("I_force037_fire#Dummy_skl_shot", 1f);
+			var groundEffect = new EffectConfig("F_ground059_fire", 1f);
+			var explosionEffect = new EffectConfig("F_explosion050_fire", 1f);
+			foreach (var wait in new[] { 1900, 50, 50, 100, 100, 100 })
+			{
+				await skill.Wait(TimeSpan.FromMilliseconds(wait));
+				var position = originPos.GetRelative(farPos, distance: 152f, angle: 1f).GetRandomInRange2D(80);
+				_ = ThrowBombModel(skill, caster, position, 1f, missileEffect, groundEffect, 3f, "Sequoia_fire", explosionEffect, 60f);
+			}
 		}
 	}
 }

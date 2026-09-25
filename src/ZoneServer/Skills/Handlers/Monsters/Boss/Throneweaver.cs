@@ -18,6 +18,7 @@ using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 using static Melia.Zone.Skills.Helpers.SkillUtilHelper;
 using System.Linq;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -91,11 +92,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var targetPos = originPos.GetRelative(farPos);
 			await skill.Wait(TimeSpan.FromMilliseconds(1400));
-			for (var i = 0; i < 9; i++)
+			for (var i = 0; i < 10; i++)
 			{
-				var distance = 30 + GameRandom.Get().Next(30);
-				var position = target.Position.GetRandomInRange2D(distance, GameRandom.Get());
-				await MissileThrow(skill, caster, position, new MissileConfig
+				if (i == 5)
+					await skill.Wait(TimeSpan.FromMilliseconds(1800));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = GetLeadPositionScatter(target, 1200, 50, caster);
+				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), new MissileConfig
 				{
 					Effect = new EffectConfig("I_force011_green#Dummy_effect_tail", 1f),
 					EndEffect = new EffectConfig("F_explosion052_green##0.8", 1f),
@@ -138,13 +143,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
-			var spawnPos = originPos.GetRelative(farPos, distance: 77.427238f);
+			var spawnPos = originPos.GetRelative(farPos, distance: 77f, angle: 119f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 56.025826f);
+			spawnPos = originPos.GetRelative(farPos, distance: 56f, angle: -129f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 69.017403f);
+			spawnPos = originPos.GetRelative(farPos, distance: 69f, angle: -83f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 83.855644f);
+			spawnPos = originPos.GetRelative(farPos, distance: 84f, angle: 78f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 77.090309f);
 			MonsterSkillCreateMobPC(skill, caster, "Weaver_summon", spawnPos, 0f, "Swift-footed Weaver", "BasicMonster_ATK", 0, 0f, "None", "");
@@ -259,11 +264,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var targetPos = originPos.GetRelative(farPos);
 			await skill.Wait(TimeSpan.FromMilliseconds(1400));
-			for (var i = 0; i < 9; i++)
+			for (var i = 0; i < 10; i++)
 			{
-				var distance = 30 + GameRandom.Get().Next(30);
-				var position = target.Position.GetRandomInRange2D(distance, GameRandom.Get());
-				await MissileThrow(skill, caster, position, new MissileConfig
+				if (i == 5)
+					await skill.Wait(TimeSpan.FromMilliseconds(1800));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = GetLeadPositionScatter(target, 1200, 50, caster);
+				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), new MissileConfig
 				{
 					Effect = new EffectConfig("I_force011_green#Dummy_effect_tail", 1f),
 					EndEffect = new EffectConfig("F_explosion052_green##0.8", 1f),
@@ -346,8 +355,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 40);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 40f), 35f);
 			var hitDelay = 2700;
 			var aniTime = 2900;
 			var hits = new List<SkillHitInfo>();

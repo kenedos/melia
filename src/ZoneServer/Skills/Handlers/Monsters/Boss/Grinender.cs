@@ -48,8 +48,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 8000f, 1, 100, -1, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 1, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 8000f, 1, 40, -1, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 			var targetPos = originPos.GetRelative(caster.Direction.Left, 30f);
 			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Grinender_FirePillar);
 			targetPos = originPos.GetRelative(caster.Direction.Right, 30f);
@@ -81,7 +81,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var startingPosition = originPos.GetRelative(farPos);
+			var startingPosition = originPos.GetRelative(farPos, distance: -10f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 230f);
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
@@ -129,6 +129,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2010));
+
+			var missileEffect = new EffectConfig("I_force037_fire#Bip001 Ponytail2Nub", 1f);
+			var groundEffect = new EffectConfig("F_ground059_fire", 1f);
+			var explosionEffect = new EffectConfig("F_explosion050_fire", 1f);
+			foreach (var (distance, angle) in new[] { (52f, -94f), (136f, 139f), (201f, 88f), (40f, 119f), (120f, -175f), (162f, -127f), (197f, 1f), (170f, -56f), (158f, 47f) })
+			{
+				var position = originPos.GetRelative(farPos, distance: distance, angle: angle).GetRandomInRange2D(50);
+				_ = ThrowBombModel(skill, caster, position, 1.5f, missileEffect, groundEffect, 3f, "Grinender_Bomb", explosionEffect, 60f);
+			}
 		}
 	}
 

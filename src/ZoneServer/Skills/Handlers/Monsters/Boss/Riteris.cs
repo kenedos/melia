@@ -85,28 +85,28 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				InnerRange = 0f,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 73.848824f);
+			var position = originPos.GetRelative(farPos, distance: 74f, angle: 11f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 94.866814f);
+			position = originPos.GetRelative(farPos, distance: 95f, angle: 21f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 103.28733f);
+			position = originPos.GetRelative(farPos, distance: 103f, angle: 39f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 93.473053f);
+			position = originPos.GetRelative(farPos, distance: 93f, angle: 42f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 68.325783f);
+			position = originPos.GetRelative(farPos, distance: 68f, angle: 44f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 57.396526f);
+			position = originPos.GetRelative(farPos, distance: 57f, angle: 20f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 78.402107f);
+			position = originPos.GetRelative(farPos, distance: 78f, angle: 20f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
-			position = originPos.GetRelative(farPos, distance: 82.529999f);
+			position = originPos.GetRelative(farPos, distance: 83f, angle: 17f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
@@ -166,24 +166,24 @@ namespace Melia.Zone.Skills.Handlers.Mon
 				InnerRange = 0f,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 38.241978f);
+			var position = originPos.GetRelative(farPos, distance: 38f, angle: -97f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 77.199768f);
+			position = originPos.GetRelative(farPos, distance: 77f, angle: 56f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 58.235065f);
+			position = originPos.GetRelative(farPos, distance: 58f, angle: 24f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 80.819176f);
+			position = originPos.GetRelative(farPos, distance: 81f, angle: -134f);
 			await EffectAndHit(skill, caster, position, config);
-			position = originPos.GetRelative(farPos, distance: 49.115044f);
-			await EffectAndHit(skill, caster, position, config);
-			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 54.272079f);
+			position = originPos.GetRelative(farPos, distance: 49f, angle: 116f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 72.766518f);
+			position = originPos.GetRelative(farPos, distance: 54f, angle: 180f);
+			await EffectAndHit(skill, caster, position, config);
+			await skill.Wait(TimeSpan.FromMilliseconds(100));
+			position = originPos.GetRelative(farPos, distance: 73f, angle: -123f);
 			await EffectAndHit(skill, caster, position, config);
 		}
 	}

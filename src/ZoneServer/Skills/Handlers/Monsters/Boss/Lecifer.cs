@@ -192,12 +192,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var delays = new[] { 200, 200, 200, 150, 2400, 200, 200, 200, 200, 200 };
 			for (var i = 0; i < 11; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 150);
-				await EffectAndHit(skill, caster, position, config, hits);
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 1400, 80, caster), 250f);
+				_ = this.Blast(caster, skill, position, config);
 
 				if (i < delays.Length)
 					await skill.Wait(TimeSpan.FromMilliseconds(delays[i]));
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(2400));
+		}
+
+		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
+		{
+			var hits = new List<SkillHitInfo>();
+			await EffectAndHit(skill, caster, position, config, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 20, -1, hits);
 		}
 	}

@@ -12,6 +12,7 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using System.Linq;
 using Melia.Zone.Skills.Helpers;
 
@@ -177,10 +178,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				return;
 			}
 			skill.IncreaseOverheat();
+			caster.TurnTowards(target);
 			caster.SetAttackState(true);
 
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -188,6 +191,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (2000, 0f, 0f), (2600, 110f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1600));
 			var config = new EffectHitConfig
 			{

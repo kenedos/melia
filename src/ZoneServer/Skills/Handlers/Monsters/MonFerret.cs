@@ -13,6 +13,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using Yggdrasil.Geometry.Shapes;
 using Yggdrasil.Util;
+using Melia.Zone.Skills.SplashAreas;
 using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
@@ -178,22 +179,18 @@ namespace Melia.Zone.Skills.Handlers.Mon
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos, int hitDelay, int aniTime)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 15, width: 30, angle: 10f);
-			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 15f), 30f);
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 25, width: 30, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 1200;
+			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 25f), 30f);
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 30, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 1400;
+			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 35f), 30f);
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30, angle: 10f);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
-			hitDelay = 1400;
+			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 45f), 30f);
+			hitDelay = 0;
 			aniTime = 0;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}

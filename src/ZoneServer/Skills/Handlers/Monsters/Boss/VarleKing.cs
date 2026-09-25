@@ -15,6 +15,7 @@ using static Melia.Zone.Skills.SkillUseFunctions;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -102,6 +103,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (950, 0f, 0f), (1200, 128f, 4f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(950));
 			var hits = new List<SkillHitInfo>();
 			var startingPosition = originPos.GetRelative(farPos, distance: 40f);
@@ -123,8 +126,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			}, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_armorbreak, 1, 0f, 5000f, 1, 100, -1, hits);
-
-			caster.Position = caster.Map.Ground.GetLastValidPosition(caster.Position, caster.Position.GetRelative(caster.Direction, 110));
 		}
 	}
 
@@ -153,6 +154,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (550, 0f, 0f), (900, 114f, -1f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1300));
 			var position = originPos.GetRelative(farPos, distance: 130f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
@@ -189,8 +192,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 70f,
 			});
-
-			caster.Position = caster.Map.Ground.GetLastValidPosition(caster.Position, caster.Position.GetRelative(caster.Direction, 90));
 		}
 	}
 

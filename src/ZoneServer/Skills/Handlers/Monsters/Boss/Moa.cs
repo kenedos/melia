@@ -16,6 +16,7 @@ using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 using static Melia.Zone.Skills.Helpers.SkillUtilHelper;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -45,13 +46,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 40);
-			var splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 44f, angle: 7f), 30f);
 			var hitDelay = 1600;
 			var aniTime = 1800;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 40);
-			splashArea = skill.GetSplashArea(SplashType.Square, splashParam);
+			splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 47f, angle: 2f), 30f);
 			hitDelay = 1500;
 			aniTime = 1500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -126,7 +125,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.CasterForward, 150, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.CasterForward, 150, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -211,7 +210,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			// Fan attack with knockdown like skill 3
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 30, angle: 120f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			var hitDelay = 1800;
+			var hitDelay = 2000;
 			var aniTime = 2000;
 			var hits = new List<SkillHitInfo>();
 
@@ -246,7 +245,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			// Continue with the fan attack
 			await SkillAttack(caster, skill, splashArea, 0, aniTime - hitDelay, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.CasterForward, 150, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.CasterForward, 150, 30, 10, 1, 5, hits, 20);
 		}
 	}
 }

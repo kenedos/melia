@@ -161,12 +161,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			for (var i = 0; i < 3; i++)
-			{
-				var startingPosition = originPos.GetRelative(farPos, distance: 30f);
-				var endingPosition = originPos.GetRelative(farPos, distance: 250f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
-			}
+			var baseDir = originPos.GetDirection(farPos);
+			var startingPosition = originPos.GetRelative(baseDir, 30f);
+			var lines = new List<Task>();
+			foreach (var angle in new[] { 0f, 25f, -25f })
+				lines.Add(EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(baseDir.AddDegreeAngle(angle), 250f), config));
+			await Task.WhenAll(lines);
 		}
 	}
 
@@ -200,17 +200,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 25, angle: 20f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 4500;
+			hitDelay = 1500;
 			aniTime = 1500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 25, angle: 20f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 6000;
+			hitDelay = 1500;
 			aniTime = 1500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 25, angle: 20f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
-			hitDelay = 7000;
+			hitDelay = 1000;
 			aniTime = 1000;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}

@@ -292,8 +292,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			for (var i = 0; i < 3; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 50);
-				await MissileThrow(skill, caster, position, config);
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 700, 30, caster), 250f);
+				_ = MissileThrow(skill, caster, position, config);
 
 				if (i < 2)
 					await skill.Wait(TimeSpan.FromMilliseconds(1500));

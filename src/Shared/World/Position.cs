@@ -288,10 +288,11 @@ namespace Melia.Shared.World
 
 			if (angle != 0)
 			{
-				var direction = new Direction(angle);
+				var length2D = MathF.Sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+				var direction = this.GetDirection(other).AddDegreeAngle(angle);
 
-				deltaX *= direction.Cos;
-				deltaZ *= direction.Sin;
+				deltaX = direction.Cos * length2D;
+				deltaZ = direction.Sin * length2D;
 			}
 
 			var deltaXYZ = MathF.Sqrt((deltaX * deltaX) + (deltaY * deltaY) + (deltaZ * deltaZ));

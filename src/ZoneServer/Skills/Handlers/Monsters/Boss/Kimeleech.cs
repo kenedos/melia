@@ -12,7 +12,9 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -44,10 +46,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 35, angle: 10f);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 81f, angle: 2f), 35f);
 			var hitDelay = 1200;
-			var aniTime = 300;
+			var aniTime = 1400;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}
@@ -80,6 +81,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (1800, 0f, 0f), (4500, 160f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
 			var startingPosition = originPos.GetRelative(farPos, distance: 50f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 160f);
@@ -169,10 +172,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 90, width: 30, angle: 20f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 2200;
-			var aniTime = 300;
+			var aniTime = 2400;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 4000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 4000f, 1, 15, -1, hits);
 		}
 	}
 

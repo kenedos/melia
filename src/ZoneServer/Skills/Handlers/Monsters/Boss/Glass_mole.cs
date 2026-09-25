@@ -105,7 +105,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 1,
 				HitDuration = 1000f,
 			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 2000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 2000f, 1, 15, -1, hits);
 		}
 	}
 

@@ -54,12 +54,11 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
-		/// Same as GetPreviewArea but floors the range to the caster's body
-		/// radius, matching SplashDamage's effective hit area.
+		/// Same as GetPreviewArea but uses SplashDamage's effective hit radius.
 		/// </summary>
 		public static IShapeF GetPreviewArea(ICombatEntity caster, Position position, float range, float innerRange = 0)
 		{
-			range = Math.Max(range, SizeTypeRadius.GetRadius(caster.EffectiveSize));
+			range = SkillDamageHelper.GetEffectiveSplashRange(caster, position, range);
 			return GetPreviewArea(position, range, innerRange);
 		}
 	}

@@ -13,6 +13,7 @@ using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -113,8 +114,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 50, width: 45);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 56f, angle: -16f), 45f);
 			var hitDelay = 1300;
 			var aniTime = 1500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -150,7 +150,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2500;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 6000f, 1, 30, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 6000f, 1, 15, -1, hits);
 		}
 	}
 

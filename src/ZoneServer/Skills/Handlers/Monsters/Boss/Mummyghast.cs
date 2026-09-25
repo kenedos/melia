@@ -74,9 +74,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
 			await skill.Wait(TimeSpan.FromMilliseconds(1300));
-			var hits = new List<SkillHitInfo>();
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
 
 			var smokeHitConfig = new EffectHitConfig
 			{
@@ -95,102 +95,43 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var knockbackHitConfig = new EffectHitConfig
-			{
-				GroundEffect = EffectConfig.None,
-				PositionDelay = 700,
-				Effect = new EffectConfig("F_burstup003", 0.8f),
-				Range = 20f,
-				KnockdownPower = 150f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 4,
-				VerticalAngle = 60f,
-				InnerRange = 0,
-			};
+			var knockbackHitConfig = smokeHitConfig;
+			knockbackHitConfig.GroundEffect = EffectConfig.None;
+			knockbackHitConfig.KnockdownPower = 150f;
+			knockbackHitConfig.KnockType = 4;
 
-			var smokeKnockdownConfig = new EffectHitConfig
-			{
-				GroundEffect = new EffectConfig("F_ground068_smoke", 1f),
-				PositionDelay = 700,
-				Effect = new EffectConfig("F_burstup003", 0.8f),
-				Range = 20f,
-				KnockdownPower = 100f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 1,
-				VerticalAngle = 60f,
-				InnerRange = 0,
-			};
+			var smokeKnockdownConfig = smokeHitConfig;
+			smokeKnockdownConfig.KnockdownPower = 100f;
 
-			var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 1.4137681, angle: 135f, rand: 150);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
-			{
-				GroundEffect = new EffectConfig("F_ground068_smoke", 1f),
-				PositionDelay = 700,
-				Effect = new EffectConfig("F_burstup003", 0.8f),
-				Range = 25f,
-				KnockdownPower = 0f,
-				Delay = 0f,
-				HitCount = 1,
-				HitDuration = 1000f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 1,
-				VerticalAngle = 60f,
-				InnerRange = 0,
-			}, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 100, -1, hits);
-			hits.Clear();
+			var baseDir = originPos.GetDirection(farPos);
+			var tasks = new List<Task>();
 
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 1.4137681, angle: 135f, rand: 150);
-			await EffectAndHit(skill, caster, position, smokeHitConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 100, -1, hits);
-			hits.Clear();
+			foreach (var position in GetScatteredPositions(GetLeadPosition(target, 700, caster), 2, 120, 45))
+				tasks.Add(this.Blast(caster, skill, position, smokeHitConfig));
 
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
-			position = originPos.GetRelative(farPos, distance: 68, angle: -38f);
-			await EffectAndHit(skill, caster, position, knockbackHitConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 100, -1, hits);
-			hits.Clear();
+			tasks.Add(this.Blast(caster, skill, originPos.GetRelative(baseDir.AddDegreeAngle(-38f), 68f), knockbackHitConfig));
 
 			await skill.Wait(TimeSpan.FromMilliseconds(200));
-			position = originPos.GetRelative(farPos, distance: 68, angle: 34f);
-			await EffectAndHit(skill, caster, position, knockbackHitConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 100, -1, hits);
-			hits.Clear();
-
-			for (var i = 0; i < 5; i++)
-			{
-				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 1.4137681, angle: 135f, rand: 150);
-				await EffectAndHit(skill, caster, position, smokeHitConfig, hits);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 100, -1, hits);
-				hits.Clear();
-			}
+			tasks.Add(this.Blast(caster, skill, originPos.GetRelative(baseDir.AddDegreeAngle(34f), 68f), knockbackHitConfig));
+			foreach (var position in GetScatteredPositions(GetLeadPosition(target, 700, caster), 5, 140, 45))
+				tasks.Add(this.Blast(caster, skill, position, smokeHitConfig));
 
 			await skill.Wait(TimeSpan.FromMilliseconds(300));
-			var finalDelays = new[] { 0, 0, 0, 0, 100 };
-			for (var i = 0; i < 4; i++)
-			{
-				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 1.4137681, angle: 135f, rand: 150);
-				await EffectAndHit(skill, caster, position, smokeKnockdownConfig, hits);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 100, -1, hits);
-				hits.Clear();
-				if (finalDelays[i] > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(finalDelays[i]));
-			}
+			foreach (var position in GetScatteredPositions(GetLeadPosition(target, 700, caster), 4, 140, 45))
+				tasks.Add(this.Blast(caster, skill, position, smokeKnockdownConfig));
 
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			position = originPos.GetRelative(farPos, distance: 74, angle: -34f);
-			await EffectAndHit(skill, caster, position, knockbackHitConfig, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 100, -1, hits);
+			tasks.Add(this.Blast(caster, skill, originPos.GetRelative(baseDir.AddDegreeAngle(-34f), 74f), knockbackHitConfig));
 
+			await Task.WhenAll(tasks);
+		}
+
+		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
+		{
+			var hits = new List<SkillHitInfo>();
+			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 5000f, 1, 50, -1, hits);
 		}
 	}
 
@@ -298,11 +239,21 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				if (i > 0 && delays[i - 1] > 0)
 					await skill.Wait(TimeSpan.FromMilliseconds(delays[i - 1]));
 
-				var position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 100);
-				await EffectAndHit(skill, caster, position, hitConfig, hits);
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = GetLeadPositionScatter(target, 1500, 50, caster);
+				_ = this.Blast(caster, skill, originPos.GetNearestPositionWithinDistance(position, 250f), hitConfig);
 			}
 
-			SkillResultTargetBuff(caster, skill, BuffId.UC_fear, 1, 0f, 6000f, 1, 10, -1, hits);
+			await skill.Wait(TimeSpan.FromMilliseconds(1500));
+		}
+
+		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
+		{
+			var hits = new List<SkillHitInfo>();
+			await EffectAndHit(skill, caster, position, config, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_fear, 1, 0f, 6000f, 1, 5, -1, hits);
 		}
 	}
 }

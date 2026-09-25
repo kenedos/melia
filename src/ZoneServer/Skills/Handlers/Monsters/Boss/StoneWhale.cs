@@ -83,7 +83,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var position = originPos.GetRelative(farPos, distance: 10);
+			var position = originPos.GetRelative(farPos, distance: 63f, angle: -6f);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("F_sys_target_monster", 1.3f),
@@ -131,31 +131,31 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			var splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			var hitDelay = 3400;
-			var aniTime = 300;
+			var aniTime = 3600;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 15, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 300;
 			aniTime = 300;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 15, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 300;
 			aniTime = 300;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 15, -1, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 150, width: 20, angle: 50f);
 			splashArea = skill.GetSplashArea(SplashType.Fan, splashParam);
 			hitDelay = 300;
 			aniTime = 300;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_petrify, 1, 0f, 3000f, 1, 15, -1, hits);
 		}
 	}
 
@@ -189,7 +189,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_boss", 7f),
 				PositionDelay = 3300,
 				Effect = EffectConfig.None,
-				Range = 100f,
+				Range = 50f,
 				KnockdownPower = 0f,
 				Delay = 200f,
 				HitCount = 1,
@@ -203,9 +203,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var config = new EffectHitConfig
 			{
 				GroundEffect = new EffectConfig("None", 7f),
-				PositionDelay = 100,
+				PositionDelay = 0,
 				Effect = EffectConfig.None,
-				Range = 100f,
+				Range = 50f,
 				KnockdownPower = 0f,
 				Delay = 200f,
 				HitCount = 1,
@@ -217,9 +217,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			for (var i = 0; i < 7; i++)
+			foreach (var wait in new[] { 600, 600, 500, 200 })
 			{
-				position = originPos.GetRelative(farPos);
+				await skill.Wait(TimeSpan.FromMilliseconds(wait));
 				await EffectAndHit(skill, caster, position, config);
 			}
 		}
@@ -296,15 +296,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2500));
-			var spawnPos = originPos.GetRelative(farPos, distance: 89.927567f);
+			var spawnPos = originPos.GetRelative(farPos, distance: 90f, angle: 74f);
 			MonsterSkillCreateMob(skill, caster, "StonOrca_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 78.795387f);
+			spawnPos = originPos.GetRelative(farPos, distance: 79f, angle: -84f);
 			MonsterSkillCreateMob(skill, caster, "StonOrca_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 			spawnPos = originPos.GetRelative(farPos, distance: 78.033653f);
 			MonsterSkillCreateMob(skill, caster, "StonOrca_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 41.998669f);
+			spawnPos = originPos.GetRelative(farPos, distance: 42f, angle: 81f);
 			MonsterSkillCreateMob(skill, caster, "StonOrca_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 68.544388f);
+			spawnPos = originPos.GetRelative(farPos, distance: 69f, angle: -87f);
 			MonsterSkillCreateMob(skill, caster, "StonOrca_summon", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 		}
 	}

@@ -50,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 1200;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -85,7 +85,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2300;
 			var aniTime = 2500;
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
+			_ = SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));
 
 			var arrowConfig = new ArrowConfig
@@ -105,12 +105,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			for (var i = 0; i < 3; i++)
-			{
-				var startingPosition = originPos.GetRelative(farPos, distance: 40f);
-				var endingPosition = originPos.GetRelative(farPos, distance: 200f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, arrowConfig);
-			}
+			var baseDir = originPos.GetDirection(farPos);
+			var startingPosition = originPos.GetRelative(baseDir, 40f);
+			var lines = new List<Task>();
+			foreach (var angle in new[] { 0f, 30f, -30f })
+				lines.Add(EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(baseDir.AddDegreeAngle(angle), 200f), arrowConfig));
+			await Task.WhenAll(lines);
 		}
 	}
 
@@ -159,19 +159,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				EffectMoveDelay = 0f,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 161, angle: -58f, rand: 90, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, distance: 155.05614, angle: 0f, rand: 130, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 117.14211, angle: 100f, rand: 130, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 157.14589, angle: 28f, rand: 120, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			for (var i = 0; i < 3; i++)
+			if (caster.Position.InRange2D(target.Position, 300))
 			{
-				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 100, height: 2);
-				await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
+				foreach (var scattered in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 7, 140, 50))
+					_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(scattered, 250f), missileConfig, 0f, "Mon_PoisonPilla_orange");
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 		}
 	}
 
@@ -220,25 +214,20 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				EffectMoveDelay = 0f,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 161, angle: -58f, rand: 90, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			position = GetRelativePosition(PosType.TargetRandom, caster, target, distance: 155.05614, angle: 0f, rand: 130, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 117.14211, angle: 100f, rand: 130, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, distance: 157.14589, angle: 28f, rand: 120, height: 2);
-			await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
-			for (var i = 0; i < 3; i++)
+			if (caster.Position.InRange2D(target.Position, 300))
 			{
-				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 100, height: 2);
-				await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
+				foreach (var scattered in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 8, 140, 50))
+					_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(scattered, 250f), missileConfig, 0f, "Mon_PoisonPilla_orange");
 			}
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1900));
-			for (var i = 0; i < 7; i++)
+			if (caster.Position.InRange2D(target.Position, 300))
 			{
-				position = GetRelativePosition(PosType.TargetRandomDistance, caster, target, rand: 100, height: 2);
-				await MissilePadThrow(skill, caster, position, missileConfig, 0f, "Mon_PoisonPilla_orange");
+				foreach (var scattered in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 6, 140, 50))
+					_ = MissilePadThrow(skill, caster, originPos.GetNearestPositionWithinDistance(scattered, 250f), missileConfig, 0f, "Mon_PoisonPilla_orange");
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 		}
 	}
 }

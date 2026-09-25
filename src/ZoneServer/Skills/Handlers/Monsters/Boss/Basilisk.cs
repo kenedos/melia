@@ -11,6 +11,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -201,13 +202,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 80f,
 			};
 
-			var position = GetRelativePosition(PosType.TargetDistance, caster, target);
-			await MissileFall(caster, skill, position, missileConfig);
+			var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+			_ = MissileFall(caster, skill, position, missileConfig);
 			for (var i = 0; i < 4; i++)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(100));
-				position = GetRelativePosition(PosType.TargetDistance, caster, target);
-				await MissileFall(caster, skill, position, missileConfig);
+				position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+				_ = MissileFall(caster, skill, position, missileConfig);
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
@@ -258,6 +259,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (2000, 17f, 141f), (4000, 135f, -1f), (5500, 135f, -1f), (7500, 182f, -94f), (9000, 182f, -94f), (11000, 217f, 138f));
+
 			var targetPos = originPos.GetRelative(farPos);
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));
 
@@ -298,13 +301,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0f,
 			};
 
-			var position = GetRelativePosition(PosType.TargetHeight, caster, target);
-			await MissileFall(caster, skill, position, missileConfig);
+			var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+			_ = MissileFall(caster, skill, position, missileConfig);
 			for (var i = 0; i < 4; i++)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(100));
-				position = GetRelativePosition(PosType.TargetHeight, caster, target);
-				await MissileFall(caster, skill, position, missileConfig);
+				position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+				_ = MissileFall(caster, skill, position, missileConfig);
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
@@ -312,13 +315,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await EffectAndHit(skill, caster, position, burstHitConfig);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2700));
-			position = GetRelativePosition(PosType.TargetHeight, caster, target);
-			await MissileFall(caster, skill, position, missileConfig);
+			position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+			_ = MissileFall(caster, skill, position, missileConfig);
 			for (var i = 0; i < 4; i++)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(100));
-				position = GetRelativePosition(PosType.TargetHeight, caster, target);
-				await MissileFall(caster, skill, position, missileConfig);
+				position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+				_ = MissileFall(caster, skill, position, missileConfig);
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(400));
@@ -326,13 +329,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await EffectAndHit(skill, caster, position, burstHitConfig);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));
-			position = GetRelativePosition(PosType.TargetHeight, caster, target);
-			await MissileFall(caster, skill, position, missileConfig);
+			position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+			_ = MissileFall(caster, skill, position, missileConfig);
 			for (var i = 0; i < 4; i++)
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(100));
-				position = GetRelativePosition(PosType.TargetHeight, caster, target);
-				await MissileFall(caster, skill, position, missileConfig);
+				position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 600, 40, caster), 250f);
+				_ = MissileFall(caster, skill, position, missileConfig);
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(700));

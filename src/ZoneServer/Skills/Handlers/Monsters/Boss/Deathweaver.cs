@@ -9,6 +9,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Skills.Combat;
 using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
+using Melia.Zone.Skills.SplashAreas;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 
@@ -45,7 +46,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 1400;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_stun, 1, 0f, 2000f, 1, 15, -1, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_blind, 1, 0f, 10000f, 1, 100, -1, hits);
 		}
 	}
@@ -113,10 +114,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var aniTime = 300;
-			var attacks = new[] { (hitDelay: 2200, angle: 10f), (500, 10f), (1100, 30f) };
+			var attacks = new[] { (hitDelay: 2200, aniTime: 2400, angle: 10f), (300, 500, 10f), (900, 1100, 30f) };
 
-			foreach (var (hitDelay, angle) in attacks)
+			foreach (var (hitDelay, aniTime, angle) in attacks)
 			{
 				var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 30, width: 50, angle: angle);
 				var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
@@ -152,13 +152,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 35, width: 110);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 10f, angle: -28f), 110f);
 			var hitDelay = 3000;
 			var aniTime = 3000;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 }

@@ -97,45 +97,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(1100));
-
-			// Wave 1 - 2
-			for (var i = 0; i < 2; i++)
+			var waits = new[] { 1100, 1400, 500 };
+			foreach (var wait in waits)
 			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
-				_ = MissileWithFirewall(skill, caster, position);
-			}
-			for (var i = 0; i < 3; i++)
-			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 2);
-				_ = MissileWithFirewall(skill, caster, position);
-			}
+				await skill.Wait(TimeSpan.FromMilliseconds(wait));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
 
-			await skill.Wait(TimeSpan.FromMilliseconds(1400));
-
-			// Wave 2 - 5
-			for (var i = 0; i < 5; i++)
-			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
-				_ = MissileWithFirewall(skill, caster, position);
-			}
-
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
-
-			// Wave 3 - 5
-			for (var i = 0; i < 5; i++)
-			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
-				_ = MissileWithFirewall(skill, caster, position);
-			}
-
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
-
-			// Wave 4 - 5
-			for (var i = 0; i < 5; i++)
-			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 40, height: 1);
-				_ = MissileWithFirewall(skill, caster, position);
+				foreach (var position in GetScatteredPositions(GetLeadPosition(target, 1000, caster), 5, 100, 45))
+					_ = MissileWithFirewall(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f));
 			}
 		}
 
@@ -261,13 +231,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 3100;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits, 20);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 90, angle: 30f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 3600;
+			hitDelay = 500;
 			aniTime = 500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsCaster, 130, 10, 0, 1, 5, hits, 20);
 		}
 	}
 }

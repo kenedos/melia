@@ -111,13 +111,15 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			};
 
 			var delays = new[] { 50, 50, 50, 0, 50, 0 };
-			for (var i = 0; i < 7; i++)
+			var positions = caster.Position.InRange2D(target.Position, 300) ? GetScatteredPositions(GetLeadPosition(target, 1250, caster), 7, 120, 45) : new List<Position>();
+			for (var i = 0; i < positions.Count; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 130, height: 1);
-				await MissileThrow(skill, caster, position, config);
+				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(positions[i], 250f), config);
 				if (i < delays.Length)
 					await skill.Wait(TimeSpan.FromMilliseconds(delays[i]));
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1250));
 		}
 	}
 
@@ -167,12 +169,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitDuration = 1000f,
 			};
 
-			for (var i = 0; i < 3; i++)
-			{
-				var startingPosition = originPos.GetRelative(farPos, distance: 20f);
-				var endingPosition = originPos.GetRelative(farPos, distance: 200f);
-				await EffectHitArrow(skill, caster, startingPosition, endingPosition, config);
-			}
+			var baseDir = originPos.GetDirection(farPos);
+			var startingPosition = originPos.GetRelative(baseDir, 20f);
+			var lines = new List<Task>();
+			foreach (var angle in new[] { 0f, 25f, -25f })
+				lines.Add(EffectHitArrow(skill, caster, startingPosition, originPos.GetRelative(baseDir.AddDegreeAngle(angle), 200f), config));
+			await Task.WhenAll(lines);
 		}
 	}
 

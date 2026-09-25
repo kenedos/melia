@@ -46,8 +46,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 1800;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_bound, 1, 0f, 3000f, 1, 50, -1, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_bound, 1, 0f, 3000f, 1, 15, -1, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -77,12 +77,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 0, width: 110, angle: 10f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 2000;
-			var aniTime = 2000;
+			var hitDelay = 2900;
+			var aniTime = 3100;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_bound, 1, 0f, 2000f, 1, 100, -1, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_bound, 1, 0f, 2000f, 1, 15, -1, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -133,9 +133,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			{
 				if (i > 0)
 					await skill.Wait(TimeSpan.FromMilliseconds(900));
-				var position = originPos.GetRelative(farPos, distance: 40);
+				var position = originPos.GetRelative(farPos, distance: 80, angle: -3f);
 				await EffectAndHit(skill, caster, position, config, hits);
-				SkillResultTargetBuff(caster, skill, BuffId.UC_bound, 1, 0f, 3000f, 1, 100, -1, hits);
+				SkillResultTargetBuff(caster, skill, BuffId.UC_bound, 1, 0f, 3000f, 1, 15, -1, hits);
 				hits.Clear();
 			}
 		}

@@ -88,7 +88,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2300;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 4000f, 1, 50, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.Stun, 1, 0f, 4000f, 1, 15, -1, hits);
 		}
 	}
 
@@ -127,7 +127,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				if (i > 0)
 					await skill.Wait(TimeSpan.FromMilliseconds(100));
 
-				var position = GetRelativePosition(PosType.TargetHeight, caster, target);
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 1000, 35, caster), 250f);
 				var hitTime = i == 0 ? 0f : 1000f;
 				_ = MissileThrow(skill, caster, position, new MissileConfig
 				{

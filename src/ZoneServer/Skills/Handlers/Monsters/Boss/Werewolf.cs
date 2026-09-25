@@ -11,6 +11,7 @@ using Melia.Zone.Skills.Handlers.Base;
 using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -51,7 +52,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 80, width: 30, angle: 45f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 1500;
+			hitDelay = 300;
 			aniTime = 300;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
@@ -84,7 +85,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-			var startingPosition = originPos.GetRelative(farPos, distance: 25);
+			var startingPosition = originPos.GetRelative(farPos, distance: 25f, angle: -60f);
 			var endingPosition = originPos.GetRelative(farPos, distance: 170);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
@@ -141,13 +142,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 170, width: 30, angle: 20f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 2700;
+			hitDelay = 200;
 			aniTime = 200;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 170, width: 30, angle: 20f);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 3000;
+			hitDelay = 300;
 			aniTime = 300;
 			hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
@@ -172,6 +173,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
+			Send.ZC_NORMAL.UpdateSkillEffect(caster, target.Handle, originPos, originPos.GetDirection(farPos), farPos);
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
 
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
@@ -179,6 +181,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (2400, 0f, 0f), (4600, 214f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var hits = new List<SkillHitInfo>();
 			var startingPosition = originPos.GetRelative(farPos, distance: 0.32151899f);
@@ -234,17 +238,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			await skill.Wait(TimeSpan.FromMilliseconds(2600));
-			var spawnPos = originPos.GetRelative(farPos, distance: 104.20988f);
+			var spawnPos = originPos.GetRelative(farPos, distance: 104f, angle: -85f);
 			MonsterSkillCreateMob(skill, caster, "Worg", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 80.699883f);
+			spawnPos = originPos.GetRelative(farPos, distance: 81f, angle: -25f);
 			MonsterSkillCreateMob(skill, caster, "Worg", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 83.245842f);
+			spawnPos = originPos.GetRelative(farPos, distance: 83f, angle: 36f);
 			MonsterSkillCreateMob(skill, caster, "Worg", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 83.490692f);
+			spawnPos = originPos.GetRelative(farPos, distance: 83f, angle: -149f);
 			MonsterSkillCreateMob(skill, caster, "Worg", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 88.7258f);
+			spawnPos = originPos.GetRelative(farPos, distance: 89f, angle: 140f);
 			MonsterSkillCreateMob(skill, caster, "Worg", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
-			spawnPos = originPos.GetRelative(farPos, distance: 91.750519f);
+			spawnPos = originPos.GetRelative(farPos, distance: 92f, angle: 89f);
 			MonsterSkillCreateMob(skill, caster, "Worg", spawnPos, 0f, "", "BasicMonster_ATK", 0, 0f, "None", "");
 		}
 	}

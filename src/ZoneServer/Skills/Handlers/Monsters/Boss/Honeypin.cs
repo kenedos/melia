@@ -67,7 +67,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			}, hits);
 			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 4000f, 1, 30, -1, hits);
-			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 12000f, 1, 100, -1, hits);
+			SkillResultTargetBuff(caster, skill, BuffId.UC_poison, 1, hits.Sum(h => h.HitInfo.Damage) * 0.2f, 12000f, 1, 40, -1, hits);
 		}
 	}
 
@@ -190,7 +190,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				await skill.Wait(TimeSpan.FromMilliseconds(1350));
 				hits.Clear();
 				await EffectAndHit(skill, caster, position, config, hits);
-				SkillResultKnockTarget(caster, skill, KnockType.Motion, KnockDirection.TowardsTarget, 100, 10, 0, 1, 5, hits);
+				SkillResultKnockTarget(caster, skill, KnockType.Motion, KnockDirection.TowardsTarget, 100, 10, 0, 1, 5, hits, 20);
 
 				var validPos = caster.Map.Ground.GetLastValidPosition(caster.Position, position);
 				caster.Position = validPos;

@@ -36,31 +36,31 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(2900));
-
-			for (var wave = 0; wave < 2; wave++)
+			var config = new MissileConfig
 			{
-				for (var i = 0; i < 4; i++)
-				{
-					var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 30);
-					position = originPos.GetNearestPositionWithinDistance(position, 150f);
-					_ = MissileThrow(skill, caster, position, new MissileConfig
-					{
-						Effect = new EffectConfig("I_smoke018_spread_in#Dummy_head_effect", 0.5f),
-						EndEffect = new EffectConfig("I_smoke017_spread_out", 1f),
-						Range = 10f,
-						FlyTime = 1f,
-						DelayTime = 0f,
-						Gravity = 600f,
-						Speed = 1f,
-						HitTime = 3f,
-						HitCount = 1,
-						GroundEffect = new EffectConfig("F_sys_target_monster##0.5", 0.5f),
-					});
-				}
+				Effect = new EffectConfig("I_smoke018_spread_in#Dummy_head_effect", 0.5f),
+				EndEffect = new EffectConfig("I_smoke017_spread_out", 1f),
+				Range = 10f,
+				FlyTime = 1f,
+				DelayTime = 0f,
+				Gravity = 600f,
+				Speed = 1f,
+				HitTime = 3f,
+				HitCount = 1,
+				GroundEffect = new EffectConfig("F_sys_target_monster##0.5", 0.5f),
+			};
 
-				if (wave < 2)
-					await skill.Wait(TimeSpan.FromMilliseconds(600));
+			await skill.Wait(TimeSpan.FromMilliseconds(1600));
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			var positions = GetScatteredPositions(GetLeadPosition(target, 1000, caster), 5, 80, 45);
+			var waits = new[] { 0, 0, 200, 0, 200 };
+			for (var i = 0; i < positions.Count; i++)
+			{
+				if (waits[i] > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(waits[i]));
+				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(positions[i], 200f), config);
 			}
 		}
 	}
@@ -89,31 +89,31 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(3400));
-
-			for (var wave = 0; wave < 4; wave++)
+			var config = new MissileConfig
 			{
-				for (var i = 0; i < 2; i++)
-				{
-					var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 30);
-					position = originPos.GetNearestPositionWithinDistance(position, 150f);
-					_ = MissileThrow(skill, caster, position, new MissileConfig
-					{
-						Effect = new EffectConfig("I_smoke037_yellow#Dummy_head_effect", 1.5f),
-						EndEffect = new EffectConfig("F_explosion044", 0.5f),
-						Range = 10f,
-						FlyTime = 1f,
-						DelayTime = 0f,
-						Gravity = 600f,
-						Speed = 1f,
-						HitTime = 3f,
-						HitCount = 1,
-						GroundEffect = new EffectConfig("F_sys_target_monster##0.4", 0.5f),
-					});
-				}
+				Effect = new EffectConfig("I_smoke037_yellow#Dummy_head_effect", 1.5f),
+				EndEffect = new EffectConfig("F_explosion044", 0.5f),
+				Range = 10f,
+				FlyTime = 1f,
+				DelayTime = 0f,
+				Gravity = 600f,
+				Speed = 1f,
+				HitTime = 3f,
+				HitCount = 1,
+				GroundEffect = new EffectConfig("F_sys_target_monster##0.4", 0.5f),
+			};
 
-				if (wave < 3)
-					await skill.Wait(TimeSpan.FromMilliseconds(600));
+			var waits = new[] { 1400, 1000, 0, 1200, 0, 800, 1100, 0, 900, 0, 900 };
+			for (var i = 0; i < waits.Length; i++)
+			{
+				if (waits[i] > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(waits[i]));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					return;
+
+				var scatter = waits[i] > 0 ? 0 : 60;
+				var position = GetLeadPositionScatter(target, 1000, scatter, caster);
+				_ = MissileThrow(skill, caster, caster.Position.GetNearestPositionWithinDistance(position, 200f), config);
 			}
 		}
 	}

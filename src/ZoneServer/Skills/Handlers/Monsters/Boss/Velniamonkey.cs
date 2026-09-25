@@ -12,6 +12,7 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using Melia.Zone.Skills.Helpers;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
@@ -79,6 +80,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (1400, 1f, -75f), (2000, 106f, 1f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var position = originPos.GetRelative(farPos, distance: 110);
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
@@ -127,6 +130,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (1400, 0f, 0f), (1700, 56f, 1f));
+
 			var hitConfig = new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
@@ -197,13 +202,18 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = EffectConfig.None,
 			};
 
-			for (var i = 0; i < 19; i++)
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			var positions = GetScatteredPositions(GetLeadPosition(target, 1200, caster), 14, 140, 45);
+			for (var i = 0; i < positions.Count; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetHeight, caster, target, rand: 160, height: 2);
-				await MissileThrow(skill, caster, position, missileConfig);
-				if (i < 15)
+				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(positions[i], 250f), missileConfig);
+				if (i < positions.Count - 1)
 					await skill.Wait(TimeSpan.FromMilliseconds(50));
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1200));
 		}
 	}
 
@@ -235,8 +245,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var hitDelays = new[] { 2400, 100, 100, 100, 400, 100 };
-			var aniTimes = new[] { 2600, 2700, 2800, 2900, 3300, 3400 };
+			var hitDelays = new[] { 2400, 0, 0, 0, 200, 0 };
+			var aniTimes = new[] { 2600, 100, 100, 100, 400, 100 };
 
 			var hits = new List<SkillHitInfo>();
 			for (var i = 0; i < 6; i++)

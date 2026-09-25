@@ -12,8 +12,10 @@ using Melia.Zone.World.Actors;
 using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
+using static Melia.Zone.Skills.Helpers.SkillUseHelper;
 using System.Linq;
 using Melia.Zone.Skills.Helpers;
+using Yggdrasil.Geometry.Shapes;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -48,7 +50,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var aniTime = 2900;
 			var hits = new List<SkillHitInfo>();
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits);
+			SkillResultKnockTarget(caster, skill, KnockType.KnockDown, KnockDirection.TowardsTarget, 180, 30, 10, 1, 5, hits, 20);
 		}
 	}
 
@@ -126,12 +128,14 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
+			_ = MonsterSkillFollowMovePath(caster, skill, (2500, 0f, 0f), (4000, 120f, 0f));
+
 			await skill.Wait(TimeSpan.FromMilliseconds(2500));
 			MonsterSkillSetCollisionDamage(caster, skill, true, 1f);
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 			MonsterSkillSetCollisionDamage(caster, skill, false, 1f);
 			await skill.Wait(TimeSpan.FromMilliseconds(100));
-			var position = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 110));
+			var position = caster.Map.Ground.GetLastValidPosition(originPos, originPos.GetRelative(farPos, distance: 180f));
 			await EffectAndHit(skill, caster, position, new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
@@ -148,9 +152,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				VerticalAngle = 60f,
 				InnerRange = 0,
 			});
-
-			caster.Position = position;
-			Send.ZC_SET_POS(caster, position);
 		}
 	}
 
@@ -173,36 +174,19 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
-
+			Debug.MobSkillAnnounce(caster, skill);
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
 		}
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 60, width: 30);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			var hitDelay = 2900;
-			var aniTime = 3100;
 			var hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 55, width: 30);
-			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 3400;
-			aniTime = 300;
-			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 45, width: 30);
-			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 4300;
-			aniTime = 900;
-			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
-			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 40, width: 30);
-			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 4800;
-			aniTime = 500;
-			hits = new List<SkillHitInfo>();
-			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
+			foreach (var (distance, angle, hitDelay, aniTime) in new[] { (65f, 5f, 2900, 3100), (61f, -15f, 100, 300), (37f, 35f, 700, 900), (66f, 33f, 300, 500) })
+			{
+				var splashArea = new CircleF(originPos.GetRelative(farPos, distance: distance, angle: angle), 30f);
+				hits = new List<SkillHitInfo>();
+				await SkillAttack(caster, skill, splashArea, hitDelay, aniTime, hits);
+			}
 			SkillResultTargetBuff(caster, skill, BuffId.UC_flame, 600, hits.Sum(h => h.HitInfo.Damage) * 0.5f, 6000f, 1, 10, -1, hits);
 		}
 	}

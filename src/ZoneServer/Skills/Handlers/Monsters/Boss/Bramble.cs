@@ -14,6 +14,7 @@ using static Melia.Zone.Skills.Helpers.SkillDamageHelper;
 using static Melia.Zone.Skills.Helpers.SkillResultHelper;
 using static Melia.Zone.Skills.Helpers.SkillTargetHelper;
 using Melia.Zone.Skills.Helpers;
+using Melia.Zone.Skills.SplashAreas;
 
 namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 {
@@ -49,9 +50,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 
-			for (var i = 0; i < 6; i++)
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			var thorns = GetScatteredPositions(GetLeadPosition(target, 2250, caster), 6, 120, 40);
+			for (var i = 0; i < thorns.Count; i++)
 			{
-				var position = GetRelativePosition(PosType.Target, caster, target, rand: 120, height: 2);
+				var position = thorns[i];
 				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_sys_target_monster", 0.5f),
@@ -105,9 +110,11 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 
-			for (var i = 0; i < 17; i++)
+			if (!caster.Position.InRange2D(target.Position, 300))
+				return;
+
+			foreach (var position in GetScatteredPositions(GetLeadPosition(target, 2250, caster), 17, 130, 35))
 			{
-				var position = GetRelativePosition(PosType.Target, caster, target, rand: 120, height: 2);
 				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_sys_target_monster", 0.5f),
@@ -158,8 +165,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 120, width: 50, angle: 10f);
-			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
+			ISplashArea splashArea = new SplashAreas.Circle(originPos.GetRelative(farPos, distance: 108f, angle: -5f), 50f);
 			var hitDelay = 1700;
 			var aniTime = 1900;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
@@ -202,9 +208,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await skill.Wait(TimeSpan.FromMilliseconds(3000));
 
 			// Wave 1
-			for (var i = 0; i < 5; i++)
+			var thorns = caster.Position.InRange2D(target.Position, 300) ? GetScatteredPositions(GetLeadPosition(target, 2250, caster), 5, 100, 40) : new List<Position>();
+			for (var i = 0; i < thorns.Count; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 30, height: 2);
+				var position = thorns[i];
 				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_sys_target_monster", 0.5f),
@@ -227,9 +234,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 
 			// Wave 2
-			for (var i = 0; i < 5; i++)
+			thorns = caster.Position.InRange2D(target.Position, 300) ? GetScatteredPositions(GetLeadPosition(target, 2250, caster), 5, 100, 40) : new List<Position>();
+			for (var i = 0; i < thorns.Count; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetRandom, caster, target, rand: 30, height: 2);
+				var position = thorns[i];
 				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
 				{
 					GroundEffect = new EffectConfig("F_sys_target_monster", 0.5f),
@@ -356,10 +364,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0f,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 120f);
+			var position = originPos.GetRelative(farPos, distance: 100f);
 			await EffectAndHit(skill, caster, position, config);
 			await skill.Wait(TimeSpan.FromMilliseconds(1200));
-			position = originPos.GetRelative(farPos, distance: 120f);
+			position = originPos.GetRelative(farPos, distance: 100f);
 			await EffectAndHit(skill, caster, position, config);
 		}
 	}

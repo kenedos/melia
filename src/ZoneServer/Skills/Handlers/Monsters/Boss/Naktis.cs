@@ -93,27 +93,27 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 200, width: 12);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 2500;
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 200, width: 12);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 2700;
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 200, width: 12);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 2900;
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 200, width: 12);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 3100;
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 			splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 200, width: 12);
 			splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
-			hitDelay = 3300;
+			hitDelay = 200;
 			aniTime = 200;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
@@ -166,12 +166,17 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			for (var i = 0; i < 4; i++)
 			{
-				var position = GetRelativePosition(PosType.TargetDistance, caster, target, rand: 130, height: 1);
-				await EffectAndHit(skill, caster, position, config);
+				if (!caster.Position.InRange2D(target.Position, 300))
+					break;
+
+				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 700, 60, caster), 250f);
+				_ = EffectAndHit(skill, caster, position, config);
 
 				if (i < 3)
 					await skill.Wait(TimeSpan.FromMilliseconds(200));
 			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(700));
 		}
 	}
 
@@ -203,7 +208,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var splashParam = skill.GetSplashParameters(caster, originPos, farPos, length: 100, width: 100, angle: 15f);
 			var splashArea = skill.GetSplashArea(SplashType.Circle, splashParam);
 			var hitDelay = 2300;
-			var aniTime = 300;
+			var aniTime = 2500;
 			await SkillAttack(caster, skill, splashArea, hitDelay, aniTime);
 		}
 	}

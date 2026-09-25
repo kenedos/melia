@@ -60,9 +60,9 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0,
 			};
 
-			var position = originPos.GetRelative(farPos, distance: 10, angle: 30f);
+			var position = originPos.GetRelative(farPos, distance: 89f, angle: 31f);
 			await EffectAndHit(skill, caster, position, config);
-			position = originPos.GetRelative(farPos, distance: 10, angle: -30);
+			position = originPos.GetRelative(farPos, distance: 99f, angle: -24f);
 			await EffectAndHit(skill, caster, position, config);
 		}
 	}
@@ -159,8 +159,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));
 			var hits = new List<SkillHitInfo>();
-			var startingPosition = originPos;
-			var endingPosition = originPos.GetRelative(farPos, distance: 231.5899f);
+			var startingPosition = originPos.GetRelative(farPos, distance: 43f);
+			var endingPosition = originPos.GetRelative(farPos, distance: 232f);
 			await EffectHitArrow(skill, caster, startingPosition, endingPosition, new ArrowConfig
 			{
 				ArrowEffect = new EffectConfig("F_sys_arrow_monster", 1.2f),
