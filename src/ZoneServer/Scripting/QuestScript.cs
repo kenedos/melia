@@ -385,6 +385,14 @@ namespace Melia.Zone.Scripting
 			=> this.Data.AutoTrack = enabled;
 
 		/// <summary>
+		/// Sets whether characters who can take the quest may warp to its
+		/// giver before accepting it.
+		/// </summary>
+		/// <param name="enabled"></param>
+		protected void SetPossibleWarp(bool enabled)
+			=> this.Data.PossibleWarp = enabled;
+
+		/// <summary>
 		/// Sets how the quest is given to players.
 		/// </summary>
 		/// <param name="receiveType"></param>

@@ -679,6 +679,7 @@ public class Underfortress68Mq070Quest : QuestScript
 		SetLocation("d_underfortress_68");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "AMANDA_68_1", "d_underfortress_68", L("Talk to Grave Robber Amanda"), L("The identity of the Old Manager was Premier Eminent, who lived 600 years ago. Return to Amanda."));
 		SetPhase(QuestStatus.InProgress, "UNDER68_MQ7_TRACK", "d_underfortress_68", L("Move to the battlefield of the Fortress of the Land"), L("Amanda is having doubts about Premier Eminent. But first, meet up with Premier Eminent in the final battleground."));

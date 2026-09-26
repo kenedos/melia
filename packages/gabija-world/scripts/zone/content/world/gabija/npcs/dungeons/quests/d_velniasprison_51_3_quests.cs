@@ -391,6 +391,7 @@ public class Vprison513Mq01Quest : QuestScript
 		SetLocation("d_velniasprison_51_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON513_MQ_DAIVA_01", "d_velniasprison_51_3", L("Talk to Kupole Daiva"), L("You need to find Hauberk who ran away with the Chain of Reversion. Go to Kupole Daiva in District 3 of Demon Prison."));
 		SetPhase(QuestStatus.InProgress, "VPRISON513_MQ_DAIVA_01", "d_velniasprison_51_3", L("Pursue Demon Lord Hauberk"), L("Daiva says Hauberk must be after the weakened space of the prison. Defeat Hauberk who is looking for the space of the weakened prison at Nevirau Collapsed Area."));

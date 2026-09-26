@@ -837,6 +837,7 @@ public class Rokas29Mq1Quest : QuestScript
 		SetLocation("f_rokas_29");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "ROKAS29_MQ_REXITHER1", "f_rokas_29", L("Talk to Historian Rexipher"), L("Historian Rexipher is waiting for you along the path to the Royal Mausoleum. Talk to Rexipher in Rukas Plateau."));
 		SetPhase(QuestStatus.InProgress, "ROKAS29_MQ_DEVICE1", "f_rokas_29", L("Read the epitaph of Isvalyta Historic Site"), L("Historian Rexipher is asking for your cooperation for the common objective of getting to the Royal Mausoleum. Follow his guide and read the epitaph of Isvalyta Historic Site."));

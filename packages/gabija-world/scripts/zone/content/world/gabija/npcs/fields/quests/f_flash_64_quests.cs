@@ -1430,6 +1430,7 @@ public class Flash64Mq01Quest : QuestScript
 		SetLocation("f_flash_64");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "FLASH64_AMANDA", "f_flash_64", L("Talk to Grave Robber Amanda"), L("Grave Robber Amanda is waiting for someone's help in the Petrified City."));
 		SetPhase(QuestStatus.InProgress, "FLASH64_MQ_01_NPC", "f_flash_64", L("Collect the Record from the Ruklys Era"), L("Grave Robber Amanda told you that in order to go into the Fortress of the Land, you would need her help. Please collect the records from the Ruklys era."));
@@ -1513,6 +1514,7 @@ public class JobCannoneer71Quest : QuestScript
 		SetLocation("f_flash_64");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "CANNONEER_MASTER", "f_flash_64", L("Talk with the Cannoneer Master"), L("Talk with the Cannoneer Master at the Inner Enceinte District."));
 		SetPhase(QuestStatus.InProgress, "CANNONEER_MASTER", "f_flash_64", L("Defeat Flying-type and Walking-type monsters"), L("In order to use both aerial and ground attacks efficiently, defeat both a flying-type monster and a walking-type monster."));
@@ -1540,6 +1542,7 @@ public class JobMusketeer71Quest : QuestScript
 		SetLocation("f_flash_64");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "MUSKETEER_MASTER", "f_flash_64", L("Talk with the Musketeer Master"), L("Talk with the Musketeer Master at the Inner Enceinte District."));
 		SetPhase(QuestStatus.InProgress, "MUSKETEER_MASTER", "f_flash_64", L("Attack the monsters from the maximum distance"), L("Since you won't be able to attack enemies close ranged properly, attack the enemies from a long distance."));
@@ -1657,6 +1660,7 @@ public class JobLancer81Quest : QuestScript
 		SetLocation("f_flash_64", "f_maple_25_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "LANCER_MASTER", "f_flash_64", L("Talk with the Lancer Master"), L("Talk with the Lancer Master at the Inner Enceinte District."));
 		SetPhase(QuestStatus.InProgress, "JOB_LANCER_8_1", "f_maple_25_1", L("Find the traces of the Order of the Tree of Truth"), L("Go to Nheto Forest and find any traces related to the Order of the Tree of Truth."));
@@ -1687,6 +1691,7 @@ public class JobMurmillo81Quest : QuestScript
 		SetLocation("f_flash_64", "f_katyn_45_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "MURMILO_MASTER", "f_flash_64", L("Talk with the Murmillo Master"), L("Talk to the Murmillo Master at Inner Enceinte District."));
 		SetPhase(QuestStatus.InProgress, "JOB_MURMILLO_8_1", "f_katyn_45_1", L("Defeat Silva Griffin"), L("Go to Grynas Trail and defeat Silva Griffin."));
@@ -1715,6 +1720,7 @@ public class JobCannoneer81Quest : QuestScript
 		SetLocation("f_flash_64", "f_tableland_74");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "CANNONEER_MASTER", "f_flash_64", L("Talk with the Cannoneer Master"), L("Talk with the Cannoneer Master at the Inner Enceinte District."));
 		SetPhase(QuestStatus.InProgress, "JOB_CANNONEER_8_1", "f_tableland_74", L("Destroy Observation Orb"), L("The orbs can be found at Ghresmei Passage on Steel Heights."));
@@ -1743,6 +1749,7 @@ public class JobMusketeer81Quest : QuestScript
 		SetLocation("f_flash_64");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "MUSKETEER_MASTER", "f_flash_64", L("Talk with the Musketeer Master"), L("Talk with the Musketeer Master at the Inner Enceinte District."));
 		SetPhase(QuestStatus.InProgress, "JOB_MUSKETEER_8_1_WOOD_CARVING", "f_flash_64", L("Hit the practice pole of Musketeer at right times"), L("Move to the practice pole and attack when the pole shines. If you make three mistakes, you start anew."));

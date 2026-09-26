@@ -481,6 +481,7 @@ public class Huevillage582Mq04Quest : QuestScript
 		SetLocation("f_huevillage_58_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "HUEVILLAGE_58_2_MQ02_NPC", "f_huevillage_58_2", L("Talk to the Village Priest"), L("Got the dye for restoring the Obelisk. Return and talk to the Priest again for what to do next."));
 		SetPhase(QuestStatus.InProgress, "HUEVILLAGE_58_2_OBELISK_BEFORE", "f_huevillage_58_2", L("Restore the Obelisk"), L("Seems like the Obelisk can now be restored. Write back the erased letters on the Obelisk at Slepingas Stream."));
@@ -545,6 +546,7 @@ public class Huevillage582Sq02Quest : QuestScript
 		SetLocation("f_huevillage_58_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "HUEVILLAGE_58_2_MQ03_NPC", "f_huevillage_58_2", L("Check the Ershike Altar"), L("An ominous energy is felt from the Ershike altar. Find out what is happening."));
 		SetPhase(QuestStatus.InProgress, "HUEVILLAGE_58_2_MQ03_NPC", "f_huevillage_58_2", L("Defeat the monsters that reacted to the ominous energy"), L("The surrounding monsters turned aggressive when an ominous energy fumed from the Ershike Altar. Defeat those monsters."));

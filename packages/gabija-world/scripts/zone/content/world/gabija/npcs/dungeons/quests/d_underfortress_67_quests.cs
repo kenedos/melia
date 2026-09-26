@@ -583,6 +583,7 @@ public class Underfortress67Mq010Quest : QuestScript
 		SetLocation("d_underfortress_67");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "AMANDA_67_1", "d_underfortress_67", L("Speak with Grave Robber Amanda in the habitants' area"), L("What you found in the secret area is a strange scroll. Move back to the habitants' area and talk with Amanda again."));
 		SetPhase(QuestStatus.InProgress, "AMANDA_67_1", "d_underfortress_67", L("Defeat the demons"), L("The chest Amanda saw with a special power hidden inside was actually containing demons. Defeat the incoming demons first."));

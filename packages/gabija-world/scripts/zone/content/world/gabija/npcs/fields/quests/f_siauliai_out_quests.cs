@@ -1131,6 +1131,7 @@ public class SoutQ16Quest : QuestScript
 		SetLocation("f_siauliai_out");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAIOUT_ALCHE_A", "f_siauliai_out", L("Talk to Vaidotas"));
 		SetPhase(QuestStatus.InProgress, "SIAULIAIOUT_BLOCK", "f_siauliai_out", L("Defeat any Vubbe drawn out by the explosives"));
@@ -1417,6 +1418,7 @@ public class SoutQ41Quest : QuestScript
 		SetLocation("f_siauliai_out");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAIOUT_CHIEF_A", "f_siauliai_out", L("Talk to the Miners' Village Mayor"), L("Talk to the Miners' Village Mayor."));
 		SetPhase(QuestStatus.InProgress, "SOUT_Q_41_ARRIVE", "f_gele_57_1", L("Travel to Gele Plateau"), L("Go down from the Twin Bridge at the Miners' Village to get to Srautas Gorge, then take the cable car and go a bit further up to reach Gele Plateau."));

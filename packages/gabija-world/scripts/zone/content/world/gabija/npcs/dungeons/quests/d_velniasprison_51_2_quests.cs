@@ -343,6 +343,7 @@ public class Vprison512Mq01Quest : QuestScript
 		SetLocation("d_velniasprison_51_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON512_MQ_NORGAILE", "d_velniasprison_51_2", L("Talk to Kupole Arune"), L("The situation of Kupole placed on Shirtis Monitor Pass does not look good. Talk to Kupole Arune."));
 		SetPhase(QuestStatus.InProgress, "VPRISON512_MQ_NORGAILE", "d_velniasprison_51_2", L("Defeat the demons that arrived from the dimensional crack"), L("Kupole Arune says you need to stem the power of Demon Lord Nuaele to stabilize the goddess' barrier. Defeat Nuaele's subordinates."));

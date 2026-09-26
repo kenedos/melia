@@ -809,6 +809,7 @@ public class Siauliai462Mq0101Quest : QuestScript
 		SetLocation("f_siauliai_46_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI_46_2_MQ01_NPC", "f_siauliai_46_2", L("Talk with Priest Raeli"), L("It seems that Priest Raeli has something to say. Meet Priest Raeli."));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI_46_2_GUARDIAN", "f_siauliai_46_2", L("Activate the Guardian Stone"), L("Priest Raeli told you that more demons are incoming. Activate the Guardian Stone and stop the demons."));
@@ -1181,6 +1182,7 @@ public class PartyQ102Quest : QuestScript
 		SetLocation("f_siauliai_46_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI_46_2_SEAL", "f_siauliai_46_2", L("Offer the Goddess Austeja's Scripture to the Sealed Tower"), L("You've filled the Goddess Austeja's Scripture with sacred energy. Offer it to the Sealed Tower."));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI_46_2_SEAL", "f_siauliai_46_2", L("Offer the Goddess Austeja's Scripture to the Sealed Tower"), L("You've filled the Goddess Austeja's Scripture with sacred energy. Offer it to the Sealed Tower."));

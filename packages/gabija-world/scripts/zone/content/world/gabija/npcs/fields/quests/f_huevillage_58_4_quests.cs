@@ -783,6 +783,7 @@ public class Huevillage584Mq11Quest : QuestScript
 		SetLocation("f_huevillage_58_4");
 		SetAutoTracked(true);
 		SetCancelable(false);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "HUEVILLAGE_58_4_SAULE_BEFORE", "f_huevillage_58_4", L("Ask Goddess Saule about the revelation"), L("You defeated Bramble and obtained the revelation. Return to Goddess Saule to interpret the revelation."));
 		SetPhase(QuestStatus.InProgress, "HUEVILLAGE_58_4_SAULE_BEFORE", "f_huevillage_58_4", L("Ask Goddess Saule about the revelation"), L("You defeated Bramble and obtained the revelation. Return to Goddess Saule to interpret the revelation."));

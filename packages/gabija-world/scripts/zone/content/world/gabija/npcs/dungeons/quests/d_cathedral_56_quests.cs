@@ -958,6 +958,7 @@ public class Cathedral56Mq03Quest : QuestScript
 		SetLocation("d_cathedral_56");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "CHATHEDRAL56_MQ_BISHOP", "d_cathedral_56", L("Talk to Bishop Aurelius"), L("You are all prepared. Talk to Bishop Aurelius again."));
 		SetPhase(QuestStatus.InProgress, "CHATHEDRAL56_MQ_BISHOP", "d_cathedral_56", L("Lure the demons to Apgaule Altar"), L("Lure the demons to Apgaule Altar after using the Demon Transformation Scroll."));

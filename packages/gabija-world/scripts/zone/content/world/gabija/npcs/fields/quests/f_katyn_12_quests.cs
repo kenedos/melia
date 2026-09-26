@@ -1211,6 +1211,7 @@ public class Katyn12Mq10Quest : QuestScript
 		SetLocation("f_katyn_12");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "KATYN_12_NPC_02", "f_katyn_12", L("Report to Mardas"), L("The Soul Starvation is now destroyed. Report back to Mardas."));
 		SetPhase(QuestStatus.InProgress, "KATYN_12_NPC_01", "f_katyn_12", L("Report to Mardas"), L("The Soul Starvation is now destroyed. Report back to Mardas."));

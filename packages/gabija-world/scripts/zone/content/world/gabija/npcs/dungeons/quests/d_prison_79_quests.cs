@@ -977,6 +977,7 @@ public class Prison79Mq6Quest : QuestScript
 		SetLocation("d_prison_79");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_79_OBJ_5", "d_prison_79", L("Check the Red Lamp"), L("You have found the Red Lamp. See if you can light it."));
 		SetPhase(QuestStatus.InProgress, "PRISON_79_OBJ_5", "d_prison_79", L("Retrieve Oil for the Red Lamp by defeating monsters"), L("How to activate the Red Lamp : You need special Oil to light the Red Lamp. Monsters like the smell of the Red Lamp's Oil."));
@@ -1007,6 +1008,7 @@ public class Prison79Mq7Quest : QuestScript
 		SetLocation("d_prison_79");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_79_NPC_1", "d_prison_79", L("Talk to Zanas' Soul"), L("You have lit both Lamps. Return to Zanas' Spirit and ask about the location of the last Lamp."));
 		SetPhase(QuestStatus.InProgress, "PRISON_79_OBJ_6", "d_prison_79", L("Activate all of the Yellow Lamp's Magic Circles"), L("How to activate the Yellow Lamp : You must activate all of the Magic Circle to light the Yellow Lamp. First activate the Yellow Lamp to send magic to the Magic Circles and control them to activate it. Activating a Magic Circle will affect the nearby Circles and cause them to either be turned on or off."));
@@ -1034,6 +1036,7 @@ public class Prison79Mq8Quest : QuestScript
 		SetLocation("d_prison_79");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_79_NPC_1", "d_prison_79", L("Talk to Zanas' Soul"), L("All Lamps have been lit. Return to Zanas' Spirit and ask about the location of the King's Jewel."));
 		SetPhase(QuestStatus.InProgress, "PRISON_79_OBJ_8", "d_prison_79", L("Move to the Secret Device of Warehouse No. 1"), L("King's Red Jewel is hidden within the Secret Device at Warehouse No. 1. Go to Warehouse No. 1."));
@@ -1064,6 +1067,7 @@ public class Prison79Mq9Quest : QuestScript
 		SetLocation("d_prison_79");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_79_NPC_1", "d_prison_79", L("Talk to Zanas' Soul"), L("You have obtained the King's Red Jewel. Return to Zanas' Spirit."));
 		SetPhase(QuestStatus.InProgress, "PRISON_79_MQ_10_TRIGGER", "d_prison_79", L("Defeat the monsters on the way to Warehouse No. 4"), L("Zanas' Spirit says that you must disarm the Demon Barrier at the Storage Room. Defeat the monsters on the way there to allow Zanas' Spirit safe passage."));

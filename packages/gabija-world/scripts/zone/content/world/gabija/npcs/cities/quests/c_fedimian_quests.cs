@@ -216,6 +216,7 @@ public class ToTheTower01Quest : QuestScript
 		SetLocation("c_fedimian", "f_remains_40");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "FEDIMIAN_GRITA", "c_fedimian", L("Someone is looking for you"), L("There is a person who is looking for you in Fedimian. Go to the gigantic Goddess Statue in Fedimian."));
 		SetPhase(QuestStatus.InProgress, "REMAINS40_GRITA", "f_remains_40", L("Talk to Grita at the Karsta Hall Site"), L("Grita has gone ahead to the Karsta Hall Site in the Fedimian Suburbs. Follow her there."));

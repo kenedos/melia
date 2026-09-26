@@ -1005,6 +1005,7 @@ public class Prison78Mq1Quest : QuestScript
 		SetLocation("d_prison_78");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_78_OBJ_1", "d_prison_78", L("Listen to the Soul's voice"), L("There is a mysterious light in the air. Go closer to check what it is."));
 		SetPhase(QuestStatus.InProgress, "PRISON_78_NPC_1", "d_prison_78", L("Search for the source of the voice"), L("You hear the voice of someone looking for you from the mysterious light. Look for where it is coming from."));

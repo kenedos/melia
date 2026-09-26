@@ -734,6 +734,7 @@ public class Gele573Mq07Quest : QuestScript
 		SetLocation("f_gele_57_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "GELE573_MASTER", "f_gele_57_3", L("Talk to the Paladin Master"), L("The Paladin Master is waiting for you at Uzbaiga Hillside."));
 		SetPhase(QuestStatus.InProgress, "GELE573_MQ_07_F", "f_gele_57_3", L("Listen to Follower Algis' explanations"), L("Listen to Follower Algis before he leaves."));
@@ -865,6 +866,7 @@ public class Chaple577Mq10AfterQuest : QuestScript
 		SetLocation("f_gele_57_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "GELE573_MASTER", "f_gele_57_3", L("Tell the Paladin Master about the story so far"), L("Go to the Paladin Master in Nefritas Cliff."));
 		SetPhase(QuestStatus.InProgress, "GELE573_MASTER", "f_gele_57_3", L("Tell the Paladin Master about the story so far"), L("Tell the Paladin Master about the story so far."));

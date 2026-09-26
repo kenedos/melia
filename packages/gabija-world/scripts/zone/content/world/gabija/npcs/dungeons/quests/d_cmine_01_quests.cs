@@ -12,6 +12,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -201,11 +202,15 @@ public class DCmine01QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal8);
-					character.Quests.CompleteObjective(Crystal8, "openValve");
-					await dialog.CompleteQuest(Crystal8);
-					character.Quests.Start(Crystal9);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("An important device seems to be broken.{nl}Use the Mine Compass to look for a replacement part."), 5);
 				}
 
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal8))
+			{
+				await dialog.Msg(L("The valve is open, but the purifier still will not turn. Use the Mine Compass to find a replacement part."));
 				return;
 			}
 
@@ -334,12 +339,15 @@ public class DCmine01QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal13);
-					character.Quests.CompleteObjective(Crystal13, "openValve");
-					await dialog.CompleteQuest(Crystal13);
-					character.Quests.Start(Crystal18);
-					character.LookAround();
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("An important part seems to be missing.{nl}Use the Mine Compass to look for it."), 5);
 				}
 
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal13))
+			{
+				await dialog.Msg(L("A part has been torn out of the housing. Use the Mine Compass to find it."));
 				return;
 			}
 
@@ -412,6 +420,82 @@ public class DCmine01QuestNpcsScript : GeneralScript
 		}
 
 		character.LookAround();
+	}
+
+	/// <summary>
+	/// Points the Mine Compass at the part a purifier quest is looking for.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CMINE_COMPASS_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (!IsCompassUsable(character))
+		{
+			character.ServerMessage(L("The compass shows no reaction."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = UseCompassAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Returns whether a purifier quest on the character's floor is
+	/// waiting on the Mine Compass.
+	/// </summary>
+	private static bool IsCompassUsable(Character character) => character.Map.ClassName switch
+	{
+		"d_cmine_01" => character.Quests.IsActive(Crystal8) || character.Quests.IsActive(Crystal13),
+		"d_cmine_02" => DCmine02QuestNpcsScript.IsCompassUsable(character),
+		_ => false,
+	};
+
+	/// <summary>
+	/// Reads the compass over a timed action, then points it at the part
+	/// the waiting quest is looking for.
+	/// </summary>
+	private static async Task UseCompassAsync(Character character)
+	{
+		var result = await character.TimeActions.StartAsync(L("Checking the compass..."), L("Cancel"), "COMPASS", TimeSpan.FromSeconds(3));
+
+		if (result != TimeActionResult.Completed)
+			return;
+
+		var used = character.Map.ClassName switch
+		{
+			"d_cmine_01" => TryUseCompass(character),
+			"d_cmine_02" => DCmine02QuestNpcsScript.TryUseCompass(character),
+			_ => false,
+		};
+
+		if (!used)
+			character.ServerMessage(L("The compass shows no reaction."));
+	}
+
+	/// <summary>
+	/// Completes the 1F purifier quest waiting on the compass and starts
+	/// the search it points to, returns false if none was waiting.
+	/// </summary>
+	private static bool TryUseCompass(Character character)
+	{
+		if (character.Quests.IsActive(Crystal8))
+		{
+			character.Quests.Complete(Crystal8);
+			character.Quests.Start(Crystal9);
+			character.LookAround();
+			return true;
+		}
+
+		if (character.Quests.IsActive(Crystal13))
+		{
+			character.Quests.Complete(Crystal13);
+			character.Quests.Start(Crystal18);
+			character.LookAround();
+			return true;
+		}
+
+		return false;
 	}
 }
 
@@ -495,7 +579,7 @@ public class Mine1Crystal8Quest : QuestScript
 
 		AddPrerequisite(new ItemPrerequisite("CMINE_COMPASS_ITEM", 1));
 
-		AddObjective("openValve", L("Inspect the Central Purifier"), new ManualObjective());
+		AddObjective("useCompass", L("Use the Mine Compass"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard2", 1));
 	}
@@ -591,7 +675,7 @@ public class Mine1Crystal13Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(10));
 		AddPrerequisite(new ItemPrerequisite("CMINE_COMPASS_ITEM", 1));
 
-		AddObjective("openValve", L("Inspect the Passage Purifier on 1F"), new ManualObjective());
+		AddObjective("useCompass", L("Use the Mine Compass"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard2", 1));
 	}
@@ -643,6 +727,7 @@ public class Mine1Crystal18Quest : QuestScript
 		character.Quests.Complete(this.QuestId);
 		character.Quests.Start(repairQuestId);
 		character.Quests.CompleteObjective(repairQuestId, "fitPart");
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You found the part!{nl}Return to the Passage Purifier and repair it!"), 5);
 		character.LookAround();
 	}
 }

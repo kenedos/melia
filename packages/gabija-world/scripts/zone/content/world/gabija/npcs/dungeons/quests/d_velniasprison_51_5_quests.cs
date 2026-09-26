@@ -459,6 +459,7 @@ public class Vprison515Mq01Quest : QuestScript
 		SetLocation("d_velniasprison_51_5");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON515_MQ_VAKARINE", "d_velniasprison_51_5", L("Talk to Goddess Vakarine"), L("Prepared to close the dimensional crack. Talk to Goddess Vakarine in Demon Prison District 5."));
 		SetPhase(QuestStatus.InProgress, "VPRISON515_MQ_VAKARINE", "d_velniasprison_51_5", L("Perform ritual to close the dimensional crack"), L("Help Goddess Vakarine in her ritual to close the dimensional crack."));

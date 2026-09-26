@@ -953,6 +953,7 @@ public class SiaulEastRequest5Quest : QuestScript
 		SetLocation("f_siauliai_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAUL_EAST_SOLDIER5", "f_siauliai_2", L("Talk to the supply soldier"));
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_SOLDIER5", "f_siauliai_2", L("Kill the Pokubu"));
@@ -1007,6 +1008,7 @@ public class SiaulEastRequest7Quest : QuestScript
 		SetLocation("f_siauliai_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAUL_EAST_MANAGER", "f_siauliai_2", L("Report back to Knight Ares"));
 		SetPhase(QuestStatus.InProgress, "SIAUL_EAST_MANAGER", "f_siauliai_2", L("Kill the monsters chasing the refugees"));

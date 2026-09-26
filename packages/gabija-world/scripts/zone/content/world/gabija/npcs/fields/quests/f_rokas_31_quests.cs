@@ -479,6 +479,7 @@ public class Rokas31Rexither3Quest : QuestScript
 		SetLocation("f_rokas_31");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "ROKAS31_ODEL2", "f_rokas_31", L("Talk to Historian Cyrenia Odell"), L("Tell Cyrenia Odell about what happened."));
 		SetPhase(QuestStatus.InProgress, "ROKAS31_REXITHER3TRACK", "f_rokas_31", L("Pursue Rexipher at the Royal Mausoleum Entrance"), L("Cyrenia Odell says Rexipher's objective is the thing hidden in the Royal Mausoleum by the Great King Zachariel for the goddess. Follow Rexipher into the Royal Mausoleum."));

@@ -399,6 +399,7 @@ public class Huevillage581Mq01Quest : QuestScript
 		SetLocation("f_huevillage_58_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "HUEVILLAGE_58_1_MQ01_NPC", "f_huevillage_58_1", L("Search the portal in Veja Ravine"), L("As written on the revelation, go through Naslaite Cliff Path and arrive at Veja Ravine."));
 		SetPhase(QuestStatus.InProgress, "HUEVILLAGE_58_1_MQ01_NPC", "f_huevillage_58_1", L("Collect Purifying Stones from Tanu"), L("The Old Man said you need Purifying Stones of Tanu to activate the portal."));

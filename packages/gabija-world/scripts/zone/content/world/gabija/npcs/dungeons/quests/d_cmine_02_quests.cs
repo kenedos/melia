@@ -152,6 +152,7 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 				character.ServerMessage(L("You work the pipe back into shape. Air moves through it again."));
 				character.Quests.CompleteObjective(Crystal4, "checkPipe");
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You opened the pipe's valve.{nl}Return to the Circulation Purifier and start it again."), 5);
 				character.LookAround();
 				return;
 			}
@@ -210,19 +211,21 @@ public class DCmine02QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal5);
-					character.Quests.CompleteObjective(Crystal5, "inspect");
-					await dialog.CompleteQuest(Crystal5);
-					await dialog.Msg(L("The Mine Compass points towards the Magic Supply Device in District 4."));
-					character.Quests.Start(Crystal7);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Power is not being supplied properly.{nl}Try using the Mine Compass."), 5);
 				}
 
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal5))
+			{
+				await dialog.Msg(L("The purifier is drawing no power. Use the Mine Compass to find out why."));
 				return;
 			}
 
 			if (!character.Quests.Has(Crystal7) && character.Quests.MeetsPrerequisites(Crystal7))
 			{
 				await dialog.Msg(L("The Mine Compass points towards the Magic Supply Device in District 4."));
-				character.Quests.Start(Crystal7);
 				return;
 			}
 
@@ -263,19 +266,30 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (!character.Quests.Has(Crystal7) && character.Quests.MeetsPrerequisites(Crystal7))
+			{
+				var answer = await dialog.SelectQuestOffer(Crystal7, L("The Magic Supply Device has stopped. Nothing reaches the Auxiliary Purifier."),
+					Option(L("Inspect the device"), "accept"),
+					Option(L("Leave it alone"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					var looked = await character.TimeActions.StartAsync(L("Looking the device over..."), L("Cancel"), "LOOK_SIT", TimeSpan.FromSeconds(3));
+
+					if (looked != TimeActionResult.Completed)
+						return;
+
+					character.Quests.Start(Crystal7);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Magic Supply Device is rusted and will not work.{nl}Use the compass to find a way to remove the rust."), 5);
+				}
+
+				return;
+			}
+
 			if (character.Quests.IsActive(Crystal7))
 			{
-				var looked = await character.TimeActions.StartAsync(L("Looking the device over..."), L("Cancel"), "LOOK_SIT", TimeSpan.FromSeconds(3));
-
-				if (looked != TimeActionResult.Completed)
-					return;
-
-				await dialog.Msg(L("The device is seized solid with rust."));
-				await dialog.Msg(L("Use the Mine Compass to check what you need to fix the Auxiliary Purifier."));
-				character.Quests.CompleteObjective(Crystal7, "inspect");
-				await dialog.CompleteQuest(Crystal7);
-				await dialog.Msg(L("The compass points deeper into the floor. Something there will shift the rust."));
-				character.Quests.Start(Crystal10);
+				await dialog.Msg(L("The device is seized solid with rust. Use the Mine Compass to find a way to remove it."));
 				return;
 			}
 
@@ -291,21 +305,23 @@ public class DCmine02QuestNpcsScript : GeneralScript
 
 		// Lubricant
 		//-------------------------------------------------------------------------
-		AddNpc(147469, L("Lubricant"), "MINE_2_CRYSTAL_10_OIL", "d_cmine_02", 338, 1095, 90, async dialog =>
+		AddConditionalNpc(147354, L("Lubricant"), "MINE_2_CRYSTAL_10_OIL", "d_cmine_02", 338.03, -98.28, 1095.11, 90, IsSearchingForLubricant, async dialog =>
 		{
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Lubricant"));
 
-			if (character.Quests.IsActive(Crystal10) && !character.Quests.IsCompletable(Crystal10))
+			if (IsSearchingForLubricant(character))
 			{
 				var taken = await character.TimeActions.StartAsync(L("Taking the lubricant..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
 
-				if (taken != TimeActionResult.Completed)
+				if (taken != TimeActionResult.Completed || !IsSearchingForLubricant(character))
 					return;
 
 				character.ServerMessage(L("A miner's can of lubricant, still half full. This will shift the rust."));
 				character.Inventory.Add(ItemId.MINE_2_CRYSTAL_10_ITEM, 1);
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You found the lubricant!{nl}Go back and repair the Magic Supply Device."), 5);
+				character.LookAround();
 				return;
 			}
 
@@ -349,13 +365,15 @@ public class DCmine02QuestNpcsScript : GeneralScript
 						return;
 
 					character.Quests.Start(Crystal14);
-					character.Quests.CompleteObjective(Crystal14, "inspect");
-					await dialog.CompleteQuest(Crystal14);
-					await dialog.Msg(L("The compass is pointing towards District 6."));
-					character.Quests.Start(Crystal20);
-					character.LookAround();
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Parts of the purifier seem to be missing.{nl}Use the Mine Compass to look for them."), 5);
 				}
 
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal14))
+			{
+				await dialog.Msg(L("Parts have been torn out of the purifier. Use the Mine Compass to find them."));
 				return;
 			}
 
@@ -422,6 +440,22 @@ public class DCmine02QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
+		AddQuestTrigger("MINE_2_CRYSTAL_10_TRIGGER1", "d_cmine_02", -88, 942, 90, async args =>
+		{
+			if (args.Initiator is Character character && IsSearchingForLubricant(character))
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You hear machinery working across the way!{nl}There might be lubricant in District 5."), 5);
+
+			await Task.CompletedTask;
+		});
+
+		AddQuestTrigger("MINE_2_CRYSTAL_10_TRIGGER2", "d_cmine_02", 644, 675, 100, async args =>
+		{
+			if (args.Initiator is Character character && IsSearchingForLubricant(character))
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The sound of machinery is clear now!{nl}The lubricant must be close by in District 5."), 5);
+
+			await Task.CompletedTask;
+		});
+
 		AddQuestTrigger("MINE_2_CRYSTAL_20_TRIGGER", "d_cmine_02", 1654, -803, 150, async args =>
 		{
 			if (args.Initiator is not Character character)
@@ -442,6 +476,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 		=> character.Quests.HasCompleted(Crystal3) && !character.Quests.IsCompletable(Crystal4) && !character.Quests.HasCompleted(Crystal4);
 
 	/// <summary>
+	/// Returns whether the character is still looking for the lubricant.
+	/// </summary>
+	private static bool IsSearchingForLubricant(Character character)
+		=> character.Quests.IsActive(Crystal10) && !character.Quests.IsCompletable(Crystal10);
+
+	/// <summary>
 	/// Ends the floor's main quest once all three purifiers run again.
 	/// </summary>
 	public static void CheckPurifiersRepaired(Character character)
@@ -456,6 +496,47 @@ public class DCmine02QuestNpcsScript : GeneralScript
 		character.Quests.Complete(Alchemist);
 		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("All the purifiers have been repaired!{nl}Go down to the 3rd floor and meet Vaidotas!"), 10);
 		character.LookAround();
+	}
+
+	/// <summary>
+	/// Returns whether a 2F purifier quest is waiting on the Mine Compass.
+	/// </summary>
+	public static bool IsCompassUsable(Character character)
+		=> character.Quests.IsActive(Crystal5) || character.Quests.IsActive(Crystal7) || character.Quests.IsActive(Crystal14);
+
+	/// <summary>
+	/// Completes the 2F purifier quest waiting on the Mine Compass and
+	/// starts the search it points to, returns false if none was waiting.
+	/// </summary>
+	public static bool TryUseCompass(Character character)
+	{
+		if (character.Quests.IsActive(Crystal5))
+		{
+			character.Quests.Complete(Crystal5);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 4.{nl}Check the Magic Supply Device in District 4."), 5);
+			character.LookAround();
+			return true;
+		}
+
+		if (character.Quests.IsActive(Crystal7))
+		{
+			character.Quests.Complete(Crystal7);
+			character.Quests.Start(Crystal10);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is still pointing at District 4.{nl}Look around District 4 for a way to remove the rust."), 5);
+			character.LookAround();
+			return true;
+		}
+
+		if (character.Quests.IsActive(Crystal14))
+		{
+			character.Quests.Complete(Crystal14);
+			character.Quests.Start(Crystal20);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 6.{nl}Search District 6 for the parts."), 5);
+			character.LookAround();
+			return true;
+		}
+
+		return false;
 	}
 }
 
@@ -477,9 +558,9 @@ public class Mine2AlchemistQuest : QuestScript
 		SetAutoTracked(true);
 		SetCancelable(true);
 
-		SetPhase(QuestStatus.Possible, "MINE_2_PURIFY_1", "d_cmine_02", L("Repair the Purifiers on 2F"));
-		SetPhase(QuestStatus.InProgress, "MINE_2_PURIFY_1", "d_cmine_02", L("Repair the Purifiers on 2F"));
-		SetPhase(QuestStatus.Success, "MINE_2_PURIFY_1", "d_cmine_02", L("Repair the Purifiers on 2F"));
+		SetPhase(QuestStatus.Possible, "", "d_cmine_02", L("Repair the Purifiers on 2F"));
+		SetPhase(QuestStatus.InProgress, "", "d_cmine_02", L("Repair the Purifiers on 2F"));
+		SetPhase(QuestStatus.Success, "", "d_cmine_02", L("Repair the Purifiers on 2F"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(4461, QuestStatus.Completed));
 
@@ -550,6 +631,7 @@ public class Mine2Crystal3Quest : QuestScript
 		// The client names no turn-in; the Carapace's death ends the quest and opens the pipe check.
 		character.Quests.Complete(this.QuestId);
 		character.Quests.Start(new QuestId(4485));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You defeated the Carapace that was in the way.{nl}Check the Purifier Pipe in District 2."), 5);
 		character.LookAround();
 	}
 }
@@ -601,7 +683,7 @@ public class Mine2Crystal5Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(12));
 		AddPrerequisite(new ItemPrerequisite("CMINE_COMPASS_ITEM", 1));
 
-		AddObjective("inspect", L("Inspect the Auxiliary Purifier on 2F"), new ManualObjective());
+		AddObjective("useCompass", L("Use the Mine Compass"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard2", 1));
 	}
@@ -627,7 +709,7 @@ public class Mine2Crystal7Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(4486, QuestStatus.Completed));
 
-		AddObjective("inspect", L("Inspect the Magic Supply Device"), new ManualObjective());
+		AddObjective("useCompass", L("Use the Mine Compass"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard2", 1));
 	}
@@ -707,7 +789,7 @@ public class Mine2Crystal14Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(12));
 		AddPrerequisite(new ItemPrerequisite("CMINE_COMPASS_ITEM", 1));
 
-		AddObjective("inspect", L("Check the Main Purifier"), new ManualObjective());
+		AddObjective("useCompass", L("Use the Mine Compass"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard2", 1));
 	}

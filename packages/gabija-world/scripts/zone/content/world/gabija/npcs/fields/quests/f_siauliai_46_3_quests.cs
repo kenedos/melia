@@ -623,6 +623,7 @@ public class Siauliai463Mq01Quest : QuestScript
 		SetLocation("f_siauliai_46_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI_46_3_MQ01_NPC", "f_siauliai_46_3", L("Talk to Maras"), L("Talk with Maras who is investigating in Vilna Forest."));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI_46_3_BEEHIVE", "f_siauliai_46_3", L("Check the Sweet-smelling Beehives"), L("Maras wants you to check whether the monsters are going after honey or not. Obtain pieces of honey that would lure the monsters."));

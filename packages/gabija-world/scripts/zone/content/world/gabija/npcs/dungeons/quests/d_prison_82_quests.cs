@@ -1041,6 +1041,7 @@ public class Prison82Mq2Quest : QuestScript
 		SetLocation("d_prison_82");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_82_NPC_2", "d_prison_82", L("Talk to Zanas' Soul"), L("You feel great power from Nebulas. Ask Zanas' Spirit what has happened."));
 		SetPhase(QuestStatus.InProgress, "PRISON_82_OBJ_1", "d_prison_82", L("Defeat nearby monsters to retrieve the Observational Detector parts"), L("Zanas' Spirit wishes to see what is going on. Defeat nearby monsters and retrieve Observational Detector parts in order to repair and use it."));
@@ -1073,6 +1074,7 @@ public class Prison82Mq3Quest : QuestScript
 		SetLocation("d_prison_82");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_82_NPC_2", "d_prison_82", L("Talk to Zanas' Soul"), L("This is a much stronger Demon Barrier than the one you had disarmed. Tell this to Zanas' Spirit."));
 		SetPhase(QuestStatus.InProgress, "PRISON_82_NPC_2", "d_prison_82", L("Talk to Zanas' Soul"), L("This is a much stronger Demon Barrier than the one you had disarmed. Tell this to Zanas' Spirit."));

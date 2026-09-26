@@ -653,6 +653,7 @@ public class Bracken633Mq010Quest : QuestScript
 		SetLocation("f_bracken_63_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "BRACKEN633_ROZE01", "f_bracken_63_3", L("Follow Traveling Merchant Rose to Dadan Jungle"));
 		SetPhase(QuestStatus.InProgress, "BRACKEN633_MQ1_EVENT", "f_bracken_63_3", L("Find the demon laboratory and defeat the demons there"));

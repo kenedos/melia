@@ -891,6 +891,7 @@ public class OrshaMq1_04Quest : QuestScript
 		SetLocation("c_orsha", "f_siauliai_15_re");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "C_ORSHA_HAMONDAIL", "c_orsha", L("Talk with Inesa Hamondale"));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI15RE_CHERASIA", "f_siauliai_15_re", L("Talk to Agent Cherasia at the Woods of the Linked Bridges"));
@@ -939,6 +940,7 @@ public class OrshaMq2_02Quest : QuestScript
 		SetLocation("c_orsha");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "C_ORSHA_HAMONDAIL", "c_orsha", L("Talk with Inesa Hamondale"));
 		SetPhase(QuestStatus.InProgress, "Alf", "c_orsha", L("Talk to the Item Merchant"));
@@ -966,6 +968,7 @@ public class OrshaMq2_03Quest : QuestScript
 		SetLocation("c_orsha", "f_siauliai_11_re");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "C_ORSHA_PRANAS", "c_orsha", L("Talk with Priest Pranas"));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI11RE_PRANAS_1", "f_siauliai_11_re", L("Join Priest Pranas"));

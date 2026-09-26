@@ -700,6 +700,7 @@ public class Chaple577Mq10Quest : QuestScript
 		SetLocation("d_chapel_57_7");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "CHAPLE577_ARUNE_02", "d_chapel_57_7", L("Talk to Follower Algis"), L("Talk to Follower Algis again."));
 		SetPhase(QuestStatus.InProgress, "CHAPLE577_MQ_10", "d_chapel_57_7", L("Find the revelation in the hidden sanctuary"), L("Use the Seal of Space on the pillar and enter the sanctuary."));

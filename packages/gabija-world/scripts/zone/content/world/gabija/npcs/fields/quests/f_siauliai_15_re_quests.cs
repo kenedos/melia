@@ -873,6 +873,7 @@ public class Siau15reMq06Quest : QuestScript
 		SetLocation("f_siauliai_15_re", "f_siauliai_11_re");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI15RE_YEULIS", "f_siauliai_15_re", L("Deliver to Chaser Ulysses"));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI11RE_TALBASI", "f_siauliai_11_re", L("Talk to Chaser Talbasi at Paupys Crossing"));

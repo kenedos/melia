@@ -857,6 +857,80 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Marks the quest as completed without running its scripts or
+		/// giving its rewards, adding it to the log if it's not there.
+		/// </summary>
+		/// <param name="questId"></param>
+		public void ForceComplete(QuestId questId)
+		{
+			Quest quest;
+
+			lock (_syncLock)
+			{
+				quest = _quests.FirstOrDefault(q => q.Data.Id == questId);
+				if (quest == null)
+				{
+					quest = Quest.Create(questId);
+					quest.StartTime = DateTime.Now;
+					_quests.Add(quest);
+				}
+				else if (quest.Status == QuestStatus.Completed)
+				{
+					return;
+				}
+
+				quest.Status = QuestStatus.Completed;
+				quest.CompleteTime = DateTime.Now;
+				quest.CompleteObjectives();
+				_markerNotifiedSuccess.Remove(questId.Value);
+			}
+
+			this.UpdateClient_QuestStatusProperty(quest);
+			this.UpdateClient_CompleteQuest(quest);
+			this.UpdateClient_QuestMarks();
+		}
+
+		/// <summary>
+		/// Removes the quest from the character entirely, as if it had
+		/// never been started. Returns false if the character didn't
+		/// have it.
+		/// </summary>
+		/// <param name="questId"></param>
+		/// <returns></returns>
+		public bool Remove(QuestId questId)
+		{
+			Quest quest;
+
+			lock (_syncLock)
+			{
+				quest = _quests.FirstOrDefault(q => q.Data.Id == questId);
+				if (quest == null)
+					return false;
+			}
+
+			var activeTrack = this.Character.Tracks.ActiveTrack;
+			if (activeTrack != null && activeTrack.Data.QuestId == questId.Value)
+				this.Character.Tracks.Cancel();
+
+			if (_pendingTrack != null && _pendingTrack.QuestId == questId.Value)
+				_pendingTrack = null;
+
+			lock (_syncLock)
+			{
+				_quests.Remove(quest);
+				_markerNotifiedSuccess.Remove(questId.Value);
+			}
+
+			this.ResetQuestTrack(questId);
+
+			quest.Status = QuestStatus.Possible;
+			this.UpdateClient_QuestStatusProperty(quest);
+			this.UpdateClient_RemoveQuest(quest);
+
+			return true;
+		}
+
+		/// <summary>
 		/// Starts the given track, holding it back until the character is
 		/// out of the dialog that triggered it.
 		/// </summary>
@@ -1511,7 +1585,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				if (string.IsNullOrEmpty(npcUniqueName))
 					continue;
 
-				if (!TryFindQuestNpc(quest, npcUniqueName, phaseMapClassName, out var npc))
+				if (!TryFindQuestNpc(quest.Data, npcUniqueName, phaseMapClassName, out var npc))
 					continue;
 
 				mapClassName = npc.Map.ClassName;
@@ -1530,16 +1604,47 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Returns the map and position of the NPC that offers the quest,
+		/// which is where the return warp sends a character who can take it.
+		/// </summary>
+		/// <param name="questData"></param>
+		/// <param name="mapClassName"></param>
+		/// <param name="position"></param>
+		/// <returns></returns>
+		public static bool TryGetStartDestination(QuestData questData, out string mapClassName, out Position position)
+		{
+			mapClassName = null;
+			position = Position.Zero;
+
+			var hasPhase = questData.TryGetPhase(QuestStatus.Possible, out var phase);
+			var npcUniqueNames = new[] { hasPhase ? phase.NpcUniqueName : null, questData.StartNpcUniqueName };
+			var phaseMapClassName = hasPhase ? phase.MapClassName : null;
+
+			foreach (var npcUniqueName in npcUniqueNames)
+			{
+				if (!TryFindQuestNpc(questData, npcUniqueName, phaseMapClassName, out var npc))
+					continue;
+
+				mapClassName = npc.Map.ClassName;
+				position = GetReturnWarpPosition(npc);
+
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
 		/// Returns the NPC a quest names, whether it uses the NPC's unique
 		/// name or its display name, which is how custom quests point at
 		/// their giver.
 		/// </summary>
-		/// <param name="quest"></param>
+		/// <param name="questData"></param>
 		/// <param name="npcName"></param>
 		/// <param name="mapClassName"></param>
 		/// <param name="npc"></param>
 		/// <returns></returns>
-		private static bool TryFindQuestNpc(Quest quest, string npcName, string mapClassName, out IMonster npc)
+		private static bool TryFindQuestNpc(QuestData questData, string npcName, string mapClassName, out IMonster npc)
 		{
 			npc = null;
 
@@ -1550,7 +1655,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return true;
 
 			// The same display name can be used on several maps, so prefer the one the quest places it on.
-			var location = !string.IsNullOrEmpty(mapClassName) ? mapClassName : quest.Data.QuestGiverLocation;
+			var location = !string.IsNullOrEmpty(mapClassName) ? mapClassName : questData.QuestGiverLocation;
 
 			if (!string.IsNullOrEmpty(location)
 				&& ZoneServer.Instance.World.TryGetMap(location, out var map)
@@ -1710,7 +1815,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			questTable.Insert("Rewards", rewardsTable);
 
 			// Add quest giver information if available
-			var questGiverName = TryFindQuestNpc(quest, quest.Data.StartNpcUniqueName, null, out var questGiver)
+			var questGiverName = TryFindQuestNpc(quest.Data, quest.Data.StartNpcUniqueName, null, out var questGiver)
 				? GetNpcDisplayName(questGiver)
 				: null;
 

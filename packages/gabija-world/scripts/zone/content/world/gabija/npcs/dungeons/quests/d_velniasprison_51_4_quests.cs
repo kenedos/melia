@@ -561,6 +561,7 @@ public class Vprison514Mq01Quest : QuestScript
 		SetLocation("d_velniasprison_51_4");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON514_MQ_01_NPC", "d_velniasprison_51_4", L("Meet Goddess Vakarine"), L("Goddess Vakarine is waiting for your help at the Corridor of Monitor in the Demon's Prison."));
 		SetPhase(QuestStatus.InProgress, "VPRISON514_MQ_01_NPC", "d_velniasprison_51_4", L("Meet Goddess Vakarine"), L("Goddess Vakarine is waiting for your help at the Corridor of Monitor in the Demon's Prison."));
@@ -587,6 +588,7 @@ public class Vprison514Mq02Quest : QuestScript
 		SetLocation("d_velniasprison_51_4");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON514_MQ_ZYDRONE", "d_velniasprison_51_4", L("Talk to Kupole Zydrone"), L("Vakarine says that you need to complete the Evening Star Key to get rid of the power controlling Dionys. Go to Kupole Zydrone to complete the key."));
 		SetPhase(QuestStatus.InProgress, "VPRISON514_MQ_02_NPC_01", "d_velniasprison_51_4", L("Remove Small Dimensional Crack"), L("Kupole Zydrone asked you to remove the small dimensional cracks that interferes with charging the Evening Star Key."));
@@ -644,6 +646,7 @@ public class Vprison514Mq04Quest : QuestScript
 		SetLocation("d_velniasprison_51_4");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON514_MQ_ALDONA", "d_velniasprison_51_4", L("Talk to Kupole Aldona"), L("Kupole Zydrone asked you to deliver the Evening Star Key to Kupole Aldona, who is holding down Dionys."));
 		SetPhase(QuestStatus.InProgress, "VPRISON514_MQ_04_NPC_01", "d_velniasprison_51_4", L("Release the Seals"), L("Use the Evening Star Key to release the seal of Rearda, Kasa, and Rada to free the power of the goddess."));
@@ -702,6 +705,7 @@ public class Vprison514Mq06Quest : QuestScript
 		SetLocation("d_velniasprison_51_4");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON514_MQ_ALDONA", "d_velniasprison_51_4", L("Talk to Kupole Aldona"), L("Hauberk took the strong power sealed in Dionys and ran away. Ask Aldona what to do."));
 		SetPhase(QuestStatus.InProgress, "VPRISON514_MQ_VAKARINE", "d_velniasprison_51_4", L("Talk to Goddess Vakarine"), L("Tell Goddess Vakarine that Hauberk took the power in Dionys and ask what you should do."));

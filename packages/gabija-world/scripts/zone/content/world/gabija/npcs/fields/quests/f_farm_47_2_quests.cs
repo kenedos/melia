@@ -1266,6 +1266,7 @@ public class Vprison511MqPre01Quest : QuestScript
 		SetLocation("f_farm_47_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "VELNIASP511_PORTAL_MAGE", "f_farm_47_2", L("Talk to Hasta"), L("Meet Hasta at Aqueduct Bridge Area's Restricted Area."));
 		SetPhase(QuestStatus.InProgress, "VELNIASP511_PORTAL_HAUBERK", "f_farm_47_2", L("Talk to Demon Lord Hauberk"), L("The Demon Lord Hauberk whose spirit was inside Hasta appeared. Hauberk told you that he knows where Goddess Vakarine is. Ask him about Goddess Vakarine's location."));

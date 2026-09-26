@@ -574,6 +574,7 @@ public class Siauliai461Mq01Quest : QuestScript
 		SetLocation("f_siauliai_46_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI_46_1_MQ01_NPC", "f_siauliai_46_1", L("Talk to Priest Dazine"), L("Go to Priest Dazine in the Spring Light Woods."));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI_46_1_MQ_01_AREA", "f_siauliai_46_1", L("Collect the Fragmented Symbol of Austeja"), L("You need the Symbol of Austeja to cure the Revelators who are addled by the evil energy. First, collect the fragmented symbols of Austeja."));
@@ -612,6 +613,7 @@ public class Siauliai461Mq02Quest : QuestScript
 		SetLocation("f_siauliai_46_1");
 		SetAutoTracked(true);
 		SetCancelable(false);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI_46_1_ALTAR", "f_siauliai_46_1", L("Restore the symbol at the Austeja Altar"), L("Restore the fragments of the symbol at the Austeja Altar."));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI_46_1_ALTAR", "f_siauliai_46_1", L("Restore the symbol at the Austeja Altar"), L("Restore the fragments of the symbol at the Austeja Altar."));
@@ -700,6 +702,7 @@ public class Siauliai461Mq05Quest : QuestScript
 		SetLocation("f_siauliai_46_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI_46_1_DEADTREE02", "f_siauliai_46_1", L("Restore the goddess' powers to Rankis Seal Tower and Ranka Seal Tower"), L("Restored power to the first destroyed tower. Now the other destroyed tower has to be restored as well."));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI_46_1_DEADTREE02", "f_siauliai_46_1", L("Listen to Goddess Austeja's story"), L("Goddess Austeja appeared and is trying to tell you something. Listen to what she is saying."));

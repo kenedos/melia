@@ -348,6 +348,7 @@ public class Cmine6ToKatyn72Quest : QuestScript
 		SetType(QuestType.Main);
 		SetLocation("c_Klaipe");
 		SetAutoTracked(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "KLAPEDA_USKA", "c_Klaipe", L("Talk to Knight Commander Uska"), L("You followed the revelation of the goddess that the bishop saw in this dreams and obtained the Mysterious Slate. Talk to Knight Commander Uska about the Mysterious Slate."));
 		SetPhase(QuestStatus.InProgress, "MASTER_BOCORS", "c_voodoo", L("Ask the Bokor Master for interpretation of the revelation"), L("Ask the Bokor Master about the Mysterious Slate. She lives at the residential area in Klaipeda's left end."));

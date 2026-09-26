@@ -247,12 +247,36 @@ namespace Melia.Zone.Scripting
 		{
 			var mapObj = GetMapOrThrow(map);
 
-			if (ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == uniqueName, out _))
-				throw new ArgumentException($"An NPC with the unique name '{uniqueName}' already exists.");
-
 			var pos = new Position((float)x, 0, (float)z);
 			if (mapObj.Ground.TryGetHeightAt(pos, out var height))
 				pos.Y = height;
+
+			return AddNpc(monsterId, name, uniqueName, map, pos.X, pos.Y, pos.Z, direction, dialog);
+		}
+
+		/// <summary>
+		/// Adds an NPC with a unique name and a dialog at the exact given
+		/// height, for places where the ground lookup would pick the wrong
+		/// surface.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="uniqueName"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="dialog"></param>
+		/// <returns></returns>
+		public static Npc AddNpc(int monsterId, string name, string uniqueName, string map, double x, double y, double z, double direction, DialogFunc dialog = null)
+		{
+			var mapObj = GetMapOrThrow(map);
+
+			if (ZoneServer.Instance.World.TryGetMonster(a => a.UniqueName == uniqueName, out _))
+				throw new ArgumentException($"An NPC with the unique name '{uniqueName}' already exists.");
+
+			var pos = new Position((float)x, (float)y, (float)z);
 
 			// Wrap name in localization code if applicable
 			if (Dialog.IsLocalizationKey(name))
@@ -310,6 +334,31 @@ namespace Melia.Zone.Scripting
 		public static Npc AddConditionalNpc(int monsterId, string name, string uniqueName, string map, double x, double z, double direction, Func<Character, bool> visibleTo, DialogFunc dialog = null)
 		{
 			var npc = AddNpc(monsterId, name, uniqueName, map, x, z, direction, dialog);
+
+			if (npc != null)
+				npc.VisibleTo = visibleTo;
+
+			return npc;
+		}
+
+		/// <summary>
+		/// Adds an NPC that only exists for the characters the given
+		/// condition accepts, at the exact given height.
+		/// </summary>
+		/// <param name="monsterId"></param>
+		/// <param name="name"></param>
+		/// <param name="uniqueName"></param>
+		/// <param name="map"></param>
+		/// <param name="x"></param>
+		/// <param name="y"></param>
+		/// <param name="z"></param>
+		/// <param name="direction"></param>
+		/// <param name="visibleTo">Condition deciding whether the NPC is there for a character.</param>
+		/// <param name="dialog"></param>
+		/// <returns></returns>
+		public static Npc AddConditionalNpc(int monsterId, string name, string uniqueName, string map, double x, double y, double z, double direction, Func<Character, bool> visibleTo, DialogFunc dialog = null)
+		{
+			var npc = AddNpc(monsterId, name, uniqueName, map, x, y, z, direction, dialog);
 
 			if (npc != null)
 				npc.VisibleTo = visibleTo;

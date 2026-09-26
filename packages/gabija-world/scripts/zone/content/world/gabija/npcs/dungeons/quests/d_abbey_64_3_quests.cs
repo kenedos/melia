@@ -601,6 +601,7 @@ public class Abbay643Mq010Quest : QuestScript
 		SetLocation("d_abbey_64_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "ABBEY643_EDMONDA01", "d_abbey_64_3", L("Follow Edmundas Into the Novaha Institute to rescue Rose"));
 		SetPhase(QuestStatus.InProgress, "ABBEY643_EDMONDA01", "d_abbey_64_3", L("Find Black Materials to overload the device"));

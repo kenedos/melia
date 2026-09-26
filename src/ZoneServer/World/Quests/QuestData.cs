@@ -60,6 +60,12 @@ namespace Melia.Zone.World.Quests
 		public bool AutoTrack { get; set; } = false;
 
 		/// <summary>
+		/// Gets or sets whether characters who can take the quest may warp
+		/// to its giver before accepting it.
+		/// </summary>
+		public bool PossibleWarp { get; set; } = false;
+
+		/// <summary>
 		/// Gets or sets the start delay between meeting the quests
 		/// prerequisites and receiving it automatically. Applies only
 		/// to quests that start automatically.

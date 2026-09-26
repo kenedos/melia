@@ -579,6 +579,7 @@ public class Zacha2fMq01Quest : QuestScript
 		SetLocation("d_zachariel_33");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "ZACHARIEL33_GUARDIAN1", "d_zachariel_33", L("Talk to the Guardian Stone Statue"), L("You have to stop the demons attacking the Royal Mausoleum, while chasing Rexipher. Talk to the Guardian Stone Statue."));
 		SetPhase(QuestStatus.InProgress, "ZACHARIEL33_GUARDIAN1", "d_zachariel_33", L("Get the pieces of the Royal Slate"), L("Mausoleum Guardians are hoarding the pieces of the Royal Slate that Rexipher destroyed. Collect the pieces of the slate from the Royal Mausoleum Guardians."));

@@ -688,6 +688,7 @@ public class F3Cmlake84Mq02Quest : QuestScript
 		SetType(QuestType.Main);
 		SetLocation("f_3cmlake_84");
 		SetAutoTracked(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "3CMLAKE_84_OLDMAN", "f_3cmlake_84", L("Talk to Elder Aloizard"), L("Elder Aloizard seems to have recognized the images in the painting. Ask Elder Aloizard about the painting,"));
 		SetPhase(QuestStatus.InProgress, "3CMLAKE_84_ENTER1", "f_3cmlake_84", L("Go to the Jeneuam Corridor and find the Hydra"), L("A resident of the village came running, saying the Hydra has appeared. Go and check the Jeneuam Corridor, where the Hydra is said to be."));

@@ -20,6 +20,8 @@ namespace Melia.Zone.Skills.Helpers
 		private const string LastAttackVar = "Melia.RepeatLastAttack";
 		private const string LastLoopAttackVar = "Melia.RepeatLastLoopAttack";
 		private const string ClientCadenceVar = "Melia.RepeatClientCadence";
+		private const string AttackVar = "Melia.RepeatAttack";
+		private const string CanAttackVar = "Melia.RepeatCanAttack";
 		private static readonly TimeSpan MinInterval = TimeSpan.FromMilliseconds(50);
 		private static readonly TimeSpan LoopGrace = TimeSpan.FromMilliseconds(50);
 		private const double CadenceSmoothing = 0.3;
@@ -78,6 +80,8 @@ namespace Melia.Zone.Skills.Helpers
 			}
 
 			skill.Vars.Set(LastRequestVar, now);
+			skill.Vars.Set(AttackVar, attack);
+			skill.Vars.Set(CanAttackVar, canAttack);
 
 			if (chained)
 				UpdateClientCadence(skill, caster, requestGap);
@@ -118,7 +122,7 @@ namespace Melia.Zone.Skills.Helpers
 				return;
 
 			skill.Vars.SetBool(RepeatRunningVar, true);
-			skill.Run(Repeat(skill, caster, attack, canAttack, cancel));
+			skill.Run(Repeat(skill, caster, cancel));
 		}
 
 		/// <summary>
@@ -272,15 +276,13 @@ namespace Melia.Zone.Skills.Helpers
 		}
 
 		/// <summary>
-		/// Repeats the attack until the client stops requesting the skill or
-		/// the target can no longer be attacked.
+		/// Repeats the latest requested attack until the client stops
+		/// requesting the skill or the target can no longer be attacked.
 		/// </summary>
 		/// <param name="skill"></param>
 		/// <param name="caster"></param>
-		/// <param name="attack"></param>
-		/// <param name="canAttack"></param>
 		/// <param name="cancel"></param>
-		private static async Task Repeat(Skill skill, ICombatEntity caster, Func<bool> attack, Func<bool> canAttack, Action cancel)
+		private static async Task Repeat(Skill skill, ICombatEntity caster, Action cancel)
 		{
 			var aborted = false;
 
@@ -296,9 +298,8 @@ namespace Melia.Zone.Skills.Helpers
 					if (caster.IsDead)
 						break;
 
-					// A chain that ends for any other reason than the client
-					// letting go leaves its last request unanswered.
-					aborted = true;
+					if (!skill.Vars.TryGet<Func<bool>>(AttackVar, out var attack) || !skill.Vars.TryGet<Func<bool>>(CanAttackVar, out var canAttack))
+						break;
 
 					if (!canAttack())
 						break;
@@ -311,18 +312,17 @@ namespace Melia.Zone.Skills.Helpers
 					// The client's own requests pace the chain while they keep
 					// arriving in time, and attacking over them desyncs it.
 					if (!IsPaceLost(skill, GetPace(skill)))
-					{
-						aborted = false;
 						continue;
-					}
 
 					skill.Vars.Set(LastAttackVar, GameClock.Now);
 					skill.Vars.Set(LastLoopAttackVar, GameClock.Now);
 
+					// Requests are answered on arrival, only a loop attack that sent nothing leaves the client waiting.
 					if (!attack())
+					{
+						aborted = true;
 						break;
-
-					aborted = false;
+					}
 				}
 			}
 			finally

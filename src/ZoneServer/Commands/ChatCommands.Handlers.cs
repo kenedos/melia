@@ -35,6 +35,7 @@ using Melia.Zone.World.Dungeons;
 // using Melia.Zone.World.Houses; // Removed: Houses namespace deleted
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Maps;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Spawning;
 using Yggdrasil.Extensions;
 using Yggdrasil.Geometry.Shapes;
@@ -3578,7 +3579,18 @@ namespace Melia.Zone.Commands
 			if (int.TryParse(args.Get(0), out var questId) && ZoneServer.Instance.Data.QuestDb.TryFind(questId, out var quest))
 			{
 				if (!sender.Quests.IsActive(questId))
+				{
+					if (!sender.Quests.Has(questId)
+						&& QuestScript.TryGet(new QuestId(questId), out var questScript)
+						&& questScript.Data.PossibleWarp
+						&& sender.Quests.MeetsPrerequisites(questScript.QuestId)
+						&& QuestComponent.TryGetStartDestination(questScript.Data, out var startMapClassName, out var startPosition))
+					{
+						sender.Warp(startMapClassName, startPosition);
+					}
+
 					return CommandResult.Okay;
+				}
 
 				if (string.IsNullOrEmpty(quest.EndNPC)
 					|| !ZoneServer.Instance.World.NPCs.TryGetValue($"{quest.EndNPC}_{quest.EndMap}", out var npc))

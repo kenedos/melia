@@ -564,6 +564,7 @@ public class Underfortress65Mq050Quest : QuestScript
 		SetLocation("d_underfortress_65");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "AMANDA_65_2", "d_underfortress_65", L("Talk to Grave Robber Amanda"), L("You are ready to detonate the Resounding Bomb. Talk to Amanda."));
 		SetPhase(QuestStatus.InProgress, "AMANDA_65_3", "d_underfortress_65", L("Move to Drill Ground of Confliction with Amanda"), L("The Resounding Bomb has exploded. Before the Royal Army guards come back, move to the next area."));

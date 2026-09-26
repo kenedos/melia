@@ -837,6 +837,7 @@ public class Prison622Mq06Quest : QuestScript
 		SetLocation("d_prison_62_2", "d_prison_62_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON621_IRMA", "d_prison_62_2", L("Talk with Priest Irma"));
 		SetPhase(QuestStatus.InProgress, "PRISON623_IRMA_01", "d_prison_62_3", L("Talk to Priest Irma at Ashaq Underground Prison 3F"));

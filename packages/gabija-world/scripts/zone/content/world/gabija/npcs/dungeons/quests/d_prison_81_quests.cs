@@ -1050,6 +1050,7 @@ public class Prison81Mq9Quest : QuestScript
 		SetLocation("d_prison_81");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "PRISON_81_NPC_3", "d_prison_81", L("Talk to Zanas' Soul"), L("You have dealt massive damage to the Demons by activating the Secret Device. Return to Zanas' Spirit."));
 		SetPhase(QuestStatus.InProgress, "PRISON_81_MQ_10_TRIGGER", "d_prison_81", L("Defeat the monsters on the way to the Demon Barrier"), L("Zanas' Spirit says that he will go to the Demon Barrier by meeting with the Zanas' Spirit that had been blocked by Demon Magic. Defeat the monsters on the way to the Demon Barrier to help the two Zanas' Spirits meet."));

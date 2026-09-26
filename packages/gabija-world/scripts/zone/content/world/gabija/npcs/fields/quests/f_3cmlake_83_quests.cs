@@ -954,6 +954,7 @@ public class F3Cmlake83Mq01Quest : QuestScript
 		SetLocation("f_3cmlake_83");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "3CMLAKE_83_OLDMAN1", "f_3cmlake_83", L("Talk to Elder Aloizard"), L("Elder Aloizard looks deeply concerned about something. Talk to him."));
 		SetPhase(QuestStatus.InProgress, "3CMLAKE_83_OLDMAN1", "f_3cmlake_83", L("Defeat the monsters nearby"), L("Elder Aloizard wants to return to where the village residents are but is worried about the monsters. Clear out some monsters nearby to help Elder Aloizard return."));
@@ -1032,6 +1033,7 @@ public class F3Cmlake83Mq03Quest : QuestScript
 		SetLocation("f_3cmlake_83");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "3CMLAKE_83_LADY", "f_3cmlake_83", L("Deliver the diary to the Elder's Granddaughter"), L("You have found a burnt journal at the Wandering Sanctuary. Bring it to the elder's granddaughter."));
 		SetPhase(QuestStatus.InProgress, "3CMLAKE_83_ENTER1", "f_3cmlake_83", L("Search for Elder Aloizard"), L("The elder's granddaughter says he took off with a group of village youth and disappeared. Search for Elder Aloizard around the Anga Hall area."));

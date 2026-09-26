@@ -948,6 +948,7 @@ public class Cathedral54Mq06Part3Quest : QuestScript
 		SetLocation("d_cathedral_54");
 		SetAutoTracked(true);
 		SetCancelable(false);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "MQ05_PROOF_PRIST", "d_cathedral_54", L("Obtain the revelation of the Great Cathedral"), L("Obtain the revelation of the Great Cathedral by opening the Spirit's Scripture at the altar of the revelation."));
 		SetPhase(QuestStatus.InProgress, "CHATHEDRAL_FINAL_NPC", "d_cathedral_54", L("Obtain the revelation of the Great Cathedral"), L("Obtain the revelation of the Great Cathedral by opening the Spirit's Scripture at the altar of the revelation."));

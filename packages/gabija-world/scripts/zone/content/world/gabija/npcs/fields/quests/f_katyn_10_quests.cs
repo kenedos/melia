@@ -858,6 +858,7 @@ public class Katyn10Mq01Quest : QuestScript
 		SetLocation("f_katyn_10");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "KATYN_10_NPC_01", "f_katyn_10", L("Speak with Mardas"), L("Mardas seems to be chased by something. Listen to what Mardas has got to say."));
 		SetPhase(QuestStatus.InProgress, "KATYN_10_MQ_01_TRIGGER", "f_katyn_10", L("Investigate Bastymosi Field"), L("Mardas told you to run because the surrounding areas are filled with demons. Go to Bastymosi Field and see what's really happening."));

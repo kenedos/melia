@@ -1061,6 +1061,7 @@ public class ToTheTower02Quest : QuestScript
 		SetLocation("f_remains_40", "d_firetower_41");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "REMAINS40_GRITA", "f_remains_40", L("Talk to Grita at Fedimian Suburbs"), L("Grita is waiting at the Karsta Hall Site of the Fedimian Suburbs. Talk to Grita."));
 		SetPhase(QuestStatus.InProgress, "FTOWER41_GRITA_01", "d_firetower_41", L("Go to the Mage Tower"), L("Grita told you that Goddess Gabija is resisting the attacks of the demons at the Mage Tower. Go to the Mage Tower to help the goddess."));

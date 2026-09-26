@@ -609,6 +609,7 @@ public class Abbay641Mq010Quest : QuestScript
 		SetLocation("d_abbey_64_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "ABBEY641_ROZE01", "d_abbey_64_1", L("Follow Rose into the Novaha Monastery"));
 		SetPhase(QuestStatus.InProgress, "ABBEY641_GATE", "d_abbey_64_1", L("Talk to the people of the Croa Village"));

@@ -795,6 +795,7 @@ public class Underfortress69Mq010Quest : QuestScript
 		SetLocation("d_underfortress_69");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "AMANDA_69_1", "d_underfortress_69", L("Talk to Grave Robber Amanda"), L("Premier Eminent does not seem to be human. To reveal his identity, speak with Amanda."));
 		SetPhase(QuestStatus.InProgress, "AMANDA_69_1", "d_underfortress_69", L("Inspect Premier Eminent with the monocle"), L("Amanda asks you to see the real Premier Eminent for yourself. Use the monocle to find out the true identity of Premier Eminent."));
@@ -887,6 +888,7 @@ public class Underfortress69Mq040Quest : QuestScript
 		SetLocation("d_underfortress_69");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "AMANDA_69_2", "d_underfortress_69", L("Talk to Grave Robber Amanda"), L("You've activated the foundation stones at the Slepti Watchtower. Ask Amanda what to do next."));
 		SetPhase(QuestStatus.InProgress, "UNDER69_MQ4_DEVICE", "d_underfortress_69", L("Destroy the Demon Totems"), L("The foundation stones at the Ikveta Podium are not working properly due to the demon totems around them. Destroy the totems first."));
@@ -917,6 +919,7 @@ public class Underfortress69Mq050Quest : QuestScript
 		SetLocation("d_underfortress_69");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "EMINENT_69_2", "d_underfortress_69", L("Talk to Premier Eminent"), L("The defensive magic circle is active. Go back to Premier Eminent before he gets suspicious."));
 		SetPhase(QuestStatus.InProgress, "UNDER69_MQ5", "d_underfortress_69", L("Defeat Mandara"), L("The light from the device and the magic circle burns Premier Eminent! For now, defeat Mandara summoned by Premier Eminent!"));

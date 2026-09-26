@@ -762,6 +762,7 @@ public class Bracken632Mq010Quest : QuestScript
 		SetLocation("f_bracken_63_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "BRACKEN632_ROZE01", "f_bracken_63_2", L("Follow Traveling Merchant Rose to Knidos Jungle"));
 		SetPhase(QuestStatus.InProgress, "BRACKEN632_ROZE01", "f_bracken_63_2", L("Search in Croa Village to find out what happened"));
@@ -901,6 +902,7 @@ public class Bracken632Mq060Quest : QuestScript
 		SetLocation("f_bracken_63_2");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "BRACKEN632_ROZE03", "f_bracken_63_2", L("Talk to Traveling Merchant Rose"));
 		SetPhase(QuestStatus.InProgress, "BRACKEN632_ROZE03", "f_bracken_63_2", L("Talk to Traveling Merchant Rose"));

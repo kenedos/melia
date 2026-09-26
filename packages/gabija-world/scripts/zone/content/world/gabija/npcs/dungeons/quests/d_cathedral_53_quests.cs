@@ -794,6 +794,7 @@ public class Cathedral53Mq01Quest : QuestScript
 		SetLocation("d_cathedral_53");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "CHATHEDRAL53_MQ_BISHOP", "d_cathedral_53", L("Talk to Bishop Aurelius"), L("Someone is welcoming you at the Great Cathedral. Talk with Bishop Aurelius."));
 		SetPhase(QuestStatus.InProgress, "CHATHEDRAL53_MQ_BISHOP", "d_cathedral_53", L("Collect Spirit Essences"), L("Bishop Aurelius has been waiting for you for hundreds of years. In order for Bishop Aurelius to guide you, you need to collect Spirit Essences."));
@@ -852,6 +853,7 @@ public class Cathedral53Mq03Quest : QuestScript
 		SetLocation("d_cathedral_53");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "CHATHEDRAL53_MQ_BISHOP", "d_cathedral_53", L("Talk to Bishop Aurelius"), L("You've completed the vessel for the spirit. Talk with Bishop Aurelius."));
 		SetPhase(QuestStatus.InProgress, "CHATHEDRAL_BISHOP", "d_cathedral_53", L("Call Bishop Aurelius with the Spirit's Scripture"), L("You've captured the Bishop's Spirit in the completed vessel. Try calling out Bishop Aurelius using the Spirit's Scripture."));

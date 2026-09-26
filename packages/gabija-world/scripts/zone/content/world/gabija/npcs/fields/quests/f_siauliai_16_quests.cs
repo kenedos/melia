@@ -947,6 +947,7 @@ public class Siau16Mq01Quest : QuestScript
 		SetLocation("f_siauliai_16");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "SIAULIAI16_BOWEIN", "f_siauliai_16", L("Talk with Settler Browein"));
 		SetPhase(QuestStatus.InProgress, "SIAULIAI16_BOWEIN", "f_siauliai_16", L("Talk with Settler Browein"));

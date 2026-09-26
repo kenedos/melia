@@ -871,6 +871,7 @@ public class FOrchard323Mq01Quest : QuestScript
 		SetLocation("f_orchard_32_3");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "ORCHARD323_LEJA", "f_orchard_32_3", L("Talk to Druid Leja"), L("Leja looks hurt and in need of help. Talk to her."));
 		SetPhase(QuestStatus.InProgress, "ORCHARD323_HERB", "f_orchard_32_3", L("Collect the Herbs requested by Druid Leja"), L("Druid Leja got hurt trying to catch the ferrets that stole food from the village. Go to the place she instructed and collect herbs to help her regain her energy."));

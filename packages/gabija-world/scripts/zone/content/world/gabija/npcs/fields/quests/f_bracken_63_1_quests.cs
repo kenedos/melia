@@ -746,6 +746,7 @@ public class Bracken631Mq010Quest : QuestScript
 		SetLocation("f_bracken_63_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "BRACKEN631_TRADESMAN01", "f_bracken_63_1", L("Talk with Varas"));
 		SetPhase(QuestStatus.InProgress, "BRACKEN631_HIDEENTRACK01", "f_bracken_63_1", L("Go to the Herb Gatherers' Cabin to save the merchants"));

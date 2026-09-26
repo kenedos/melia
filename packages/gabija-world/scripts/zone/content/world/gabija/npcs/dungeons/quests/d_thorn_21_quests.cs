@@ -533,6 +533,7 @@ public class Thorn21Mq03Quest : QuestScript
 		SetLocation("d_thorn_21");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "THORN21_BRAMBLE01_ROOT", "d_thorn_21", L("Check Sviesa Hill Areas"), L("Believer Jurga says one of Bramble's roots is in Sviesa Hill Areas. Check Sviesa Hill Areas."));
 		SetPhase(QuestStatus.InProgress, "THORN21_BRAMBLE01_ROOT", "d_thorn_21", L("Cut Bramble's Root"), L("Approached the Bramble's roots but Gaigalas appeared. You must defeat Gaigalas before destroying Bramble's roots."));
@@ -599,6 +600,7 @@ public class Thorn21Mq05Quest : QuestScript
 		SetLocation("d_thorn_21");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "THORN21_BRAMBLE02_ROOT", "d_thorn_21", L("Check Tankinta Vacant Lot"), L("Believer Jurga says one of Bramble's roots is in Tankinta Vacant Lot. Check out Tankinta Vacant Lot."));
 		SetPhase(QuestStatus.InProgress, "THORN21_BRAMBLE02_ROOT", "d_thorn_21", L("Cut Bramble's Root"), L("Defeat Molich guarding the roots of Bramble."));
@@ -708,6 +710,7 @@ public class Thorn21Mq07Quest : QuestScript
 		SetLocation("d_thorn_21");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "THORN21_BELIEVER04_AFTER", "d_thorn_21", L("Talk to Believer Jurga"), L("You agreed to meet Believer Jurga in Giliaii Courtyard to plan a fight against Bramble."));
 		SetPhase(QuestStatus.InProgress, "THORN21_MQ07_TRACK", "d_thorn_21", L("Defeat Bramble and retrieve the revelation"), L("You arrived at Giliaii Courtyard where Bramble is. Defeat Bramble and retrieve the revelation!"));

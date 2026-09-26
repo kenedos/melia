@@ -845,6 +845,7 @@ public class FCastle651Mq01Quest : QuestScript
 		SetLocation("f_castle_65_1");
 		SetAutoTracked(true);
 		SetCancelable(true);
+		SetPossibleWarp(true);
 
 		SetPhase(QuestStatus.Possible, "CASTLE651_MQ_01", "f_castle_65_1", L("Talk to Mage Melchioras"), L("Mage Melchioras seems to have something to say to you. Talk to Mage Melchioras."));
 		SetPhase(QuestStatus.InProgress, "CASTLE651_MQ_01", "f_castle_65_1", L("Talk to Mage Melchioras"), L("After hearing that you're a Revelator, Mage Melchioras seems to want to tell you something. Listen to what he has to say."));
