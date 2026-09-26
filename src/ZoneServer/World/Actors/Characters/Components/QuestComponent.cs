@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using Melia.Shared.ObjectProperties;
 using Melia.Shared.Scripting;
 using Melia.Shared.Game.Const;
@@ -787,7 +788,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		{
 			lock (_syncLock)
 			{
-				foreach (var quest in _quests)
+				foreach (var quest in _quests.ToArray())
 				{
 					if (!quest.InProgress || quest.Data.Id.Value != questId)
 						continue;
@@ -932,7 +933,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 		/// <summary>
 		/// Starts the given track, holding it back until the character is
-		/// out of the dialog that triggered it.
+		/// out of the dialog that triggered it and the quest lock is free.
 		/// </summary>
 		/// <remarks>
 		/// A track opens a dialog of its own, which throws while another is active.
@@ -940,7 +941,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <param name="trackData"></param>
 		private void BeginTrack(QuestTrackData trackData)
 		{
-			if (this.Character.Connection.CurrentDialog != null)
+			// A party track start takes TrackGroup.StartLock, which is always taken before quest locks.
+			if (this.Character.Connection.CurrentDialog != null || Monitor.IsEntered(_syncLock))
 			{
 				_pendingTrack = trackData;
 				return;
@@ -1238,8 +1240,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				}
 			}
 
-			if (_pendingTrack != null && this.Character.Connection.CurrentDialog == null)
-				this.BeginTrack(_pendingTrack);
+			var pendingTrack = _pendingTrack;
+			if (pendingTrack != null && this.Character.Connection.CurrentDialog == null)
+				this.BeginTrack(pendingTrack);
 
 			// --- 3. Handle Auto-Receive Quests (Outside main lock if QuestScript.StartAuto... is safe) ---
 			_autoReceiveDelay = Math2.Max(TimeSpan.Zero, _autoReceiveDelay - elapsed);
@@ -2007,7 +2010,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (!this.TryGetById(questId, out var quest))
 				return;
 
-			var changed = false;
+			// Read outside this character's lock, so no two members' quest locks are ever nested.
+			var sourceProgresses = new List<(string Ident, int Count, bool Done, bool Unlocked)>();
 
 			foreach (var source in sources)
 			{
@@ -2018,8 +2022,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 					continue;
 
 				foreach (var src in sourceQuest.Progresses)
+					sourceProgresses.Add((src.Objective.Ident, src.Count, src.Done, src.Unlocked));
+			}
+
+			lock (_syncLock)
+			{
+				var changed = false;
+
+				foreach (var src in sourceProgresses)
 				{
-					if (!quest.TryGetProgress(src.Objective.Ident, out var dst))
+					if (!quest.TryGetProgress(src.Ident, out var dst))
 						continue;
 
 					if (src.Count > dst.Count)
@@ -2040,13 +2052,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 						changed = true;
 					}
 				}
-			}
 
-			if (!changed)
-				return;
+				if (!changed)
+					return;
 
-			lock (_syncLock)
-			{
 				for (var i = 0; i < quest.Progresses.Count; i++)
 					this.UpdateClient_ObjectiveProperty(quest, i);
 			}
@@ -2124,7 +2133,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 		public IList<Quest> GetCompletedQuests()
 		{
-			lock (_quests)
+			lock (_syncLock)
 				return _quests.Where(a => a.Status == QuestStatus.Completed).ToList();
 		}
 

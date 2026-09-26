@@ -368,19 +368,21 @@ namespace Melia.Zone.World.Maps
 
 		private void UpdateVisibility()
 		{
-			lock (_updateVisibleCharacters)
+			// Also called from AddPad on any thread; a pass already running covers it.
+			if (!Monitor.TryEnter(_updateVisibleCharacters))
+				return;
+
+			lock (_characters)
 			{
-				lock (_characters)
-				{
-					foreach (var character in _characters.Values)
-						_updateVisibleCharacters.Add(character);
-				}
-
-				foreach (var character in _updateVisibleCharacters)
-					character.LookAround();
-
-				_updateVisibleCharacters.Clear();
+				foreach (var character in _characters.Values)
+					_updateVisibleCharacters.Add(character);
 			}
+
+			foreach (var character in _updateVisibleCharacters)
+				character.LookAround();
+
+			_updateVisibleCharacters.Clear();
+			Monitor.Exit(_updateVisibleCharacters);
 		}
 
 		#endregion
@@ -659,15 +661,20 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public Character GetCharacter(Func<Character, bool> predicate)
 		{
-			lock (_characters)
+			var characters = RentSnapshot(_characters, out var count);
+			Character result = null;
+
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var character in _characters.Values)
+				if (predicate(characters[i]))
 				{
-					if (predicate(character))
-						return character;
+					result = characters[i];
+					break;
 				}
 			}
-			return null;
+
+			ReturnSnapshot(characters);
+			return result;
 		}
 
 		/// <summary>
@@ -690,8 +697,17 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public Character[] GetCharacters(Func<Character, bool> predicate)
 		{
-			lock (_characters)
-				return _characters.Values.Where(predicate).ToArray();
+			var characters = RentSnapshot(_characters, out var count);
+			var result = new List<Character>(count);
+
+			for (var i = 0; i < count; i++)
+			{
+				if (predicate(characters[i]))
+					result.Add(characters[i]);
+			}
+
+			ReturnSnapshot(characters);
+			return result.ToArray();
 		}
 
 		/// <summary>
@@ -705,16 +721,7 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleCharacters(Character character, List<Character> result)
-		{
-			lock (_characters)
-			{
-				foreach (var otherCharacter in _characters.Values)
-				{
-					if (otherCharacter != character && character.CanSee(otherCharacter))
-						result.Add(otherCharacter);
-				}
-			}
-		}
+			=> this.CollectVisibleCharacters(character, result);
 
 		/// <summary>
 		/// Adds all characters visible to the given character to the result set.
@@ -722,15 +729,27 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleCharacters(Character character, HashSet<Character> result)
+			=> this.CollectVisibleCharacters(character, result);
+
+		/// <summary>
+		/// Adds all characters visible to the given character to the result
+		/// collection, checking visibility outside of the character lock.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		private void CollectVisibleCharacters(Character character, ICollection<Character> result)
 		{
-			lock (_characters)
+			var characters = RentSnapshot(_characters, out var count);
+
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var otherCharacter in _characters.Values)
-				{
-					if (otherCharacter != character && character.CanSee(otherCharacter))
-						result.Add(otherCharacter);
-				}
+				var otherCharacter = characters[i];
+
+				if (otherCharacter != character && character.CanSee(otherCharacter))
+					result.Add(otherCharacter);
 			}
+
+			ReturnSnapshot(characters);
 		}
 		#endregion
 
@@ -1022,21 +1041,22 @@ namespace Melia.Zone.World.Maps
 		public List<ICombatEntity> GetAttackableEntitiesInRange(ICombatEntity attacker, Position position, float radius)
 		{
 			var result = new List<ICombatEntity>();
+			var entities = RentSnapshot(_combatEntities, out var count);
 
-			lock (_combatEntities)
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var entity in _combatEntities.Values)
-				{
-					if (!entity.Position.InRange2D(position, radius))
-						continue;
+				var entity = entities[i];
 
-					if (!attacker.CanDamage(entity))
-						continue;
+				if (!entity.Position.InRange2D(position, radius))
+					continue;
 
-					result.Add(entity);
-				}
+				if (!attacker.CanDamage(entity))
+					continue;
+
+				result.Add(entity);
 			}
 
+			ReturnSnapshot(entities);
 			return result;
 		}
 
@@ -1045,16 +1065,8 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public IMonster GetMonster(Func<IMonster, bool> predicate)
 		{
-			lock (_monsters)
-			{
-				foreach (var monster in _monsters.Values)
-				{
-					if (predicate(monster))
-						return monster;
-				}
-			}
-
-			return null;
+			this.TryGetMonster(predicate, out var monster);
+			return monster;
 		}
 
 		/// <summary>
@@ -1066,21 +1078,22 @@ namespace Melia.Zone.World.Maps
 		public List<ICombatEntity> GetAttackableEntitiesIn(ICombatEntity attacker, IShapeF shape)
 		{
 			var result = new List<ICombatEntity>();
+			var entities = RentSnapshot(_combatEntities, out var count);
 
-			lock (_combatEntities)
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var entity in _combatEntities.Values)
-				{
-					if (!attacker.CanDamage(entity))
-						continue;
+				var entity = entities[i];
 
-					if (!entity.IsCoveredBy(shape))
-						continue;
+				if (!attacker.CanDamage(entity))
+					continue;
 
-					result.Add(entity);
-				}
+				if (!entity.IsCoveredBy(shape))
+					continue;
+
+				result.Add(entity);
 			}
 
+			ReturnSnapshot(entities);
 			return result;
 		}
 
@@ -1100,20 +1113,20 @@ namespace Melia.Zone.World.Maps
 		/// </summary>
 		public bool TryGetMonster(Func<IMonster, bool> predicate, out IMonster monster)
 		{
-			lock (_monsters)
+			var monsters = RentSnapshot(_monsters, out var count);
+			monster = null;
+
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var m in _monsters.Values)
+				if (predicate(monsters[i]))
 				{
-					if (predicate(m))
-					{
-						monster = m;
-						return true;
-					}
+					monster = monsters[i];
+					break;
 				}
 			}
 
-			monster = null;
-			return false;
+			ReturnSnapshot(monsters);
+			return monster != null;
 		}
 
 		/// <summary>
@@ -1165,16 +1178,15 @@ namespace Melia.Zone.World.Maps
 		public List<IMonster> GetMonsters(Func<IMonster, bool> predicate)
 		{
 			var result = new List<IMonster>();
+			var monsters = RentSnapshot(_monsters, out var count);
 
-			lock (_monsters)
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var monster in _monsters.Values)
-				{
-					if (predicate(monster))
-						result.Add(monster);
-				}
+				if (predicate(monsters[i]))
+					result.Add(monsters[i]);
 			}
 
+			ReturnSnapshot(monsters);
 			return result;
 		}
 
@@ -1216,31 +1228,43 @@ namespace Melia.Zone.World.Maps
 		/// <param name="result"></param>
 		private void CollectVisibleMonsters(Character character, ICollection<IMonster> result)
 		{
-			IMonster[] monsters;
-			int count;
+			var monsters = RentSnapshot(_monsters, out var count);
 
-			lock (_monsters)
+			for (var i = 0; i < count; i++)
 			{
-				count = _monsters.Count;
-				monsters = ArrayPool<IMonster>.Shared.Rent(Math.Max(1, count));
-				_monsters.Values.CopyTo(monsters, 0);
+				var monster = monsters[i];
+
+				if (character.CanSee(monster))
+					result.Add(monster);
 			}
 
-			try
-			{
-				for (var i = 0; i < count; i++)
-				{
-					var monster = monsters[i];
+			ReturnSnapshot(monsters);
+		}
 
-					if (character.CanSee(monster))
-						result.Add(monster);
-				}
-			}
-			finally
+		/// <summary>
+		/// Copies the table's values into a pooled array under the table's
+		/// lock, so callers can run predicates on them without holding it.
+		/// </summary>
+		/// <param name="table"></param>
+		/// <param name="count"></param>
+		/// <returns></returns>
+		private static TValue[] RentSnapshot<TValue>(Dictionary<int, TValue> table, out int count)
+		{
+			lock (table)
 			{
-				ArrayPool<IMonster>.Shared.Return(monsters, clearArray: true);
+				count = table.Count;
+				var snapshot = ArrayPool<TValue>.Shared.Rent(Math.Max(1, count));
+				table.Values.CopyTo(snapshot, 0);
+				return snapshot;
 			}
 		}
+
+		/// <summary>
+		/// Returns a snapshot rented with RentSnapshot to the pool.
+		/// </summary>
+		/// <param name="snapshot"></param>
+		private static void ReturnSnapshot<TValue>(TValue[] snapshot)
+			=> ArrayPool<TValue>.Shared.Return(snapshot, clearArray: true);
 
 		/// <summary>
 		/// Returns all pads visible to the given character.
@@ -1253,16 +1277,7 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisiblePads(Character character, List<Pad> result)
-		{
-			lock (_pads)
-			{
-				foreach (var pad in _pads.Values)
-				{
-					if (character.CanSee(pad))
-						result.Add(pad);
-				}
-			}
-		}
+			=> this.CollectVisiblePads(character, result);
 
 		/// <summary>
 		/// Adds all pads visible to the given character to the result set.
@@ -1270,15 +1285,25 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisiblePads(Character character, HashSet<Pad> result)
+			=> this.CollectVisiblePads(character, result);
+
+		/// <summary>
+		/// Adds all pads visible to the given character to the result
+		/// collection, checking visibility outside of the pad lock.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		private void CollectVisiblePads(Character character, ICollection<Pad> result)
 		{
-			lock (_pads)
+			var pads = RentSnapshot(_pads, out var count);
+
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var pad in _pads.Values)
-				{
-					if (character.CanSee(pad))
-						result.Add(pad);
-				}
+				if (character.CanSee(pads[i]))
+					result.Add(pads[i]);
 			}
+
+			ReturnSnapshot(pads);
 		}
 
 		/// <summary>
@@ -1443,14 +1468,15 @@ namespace Melia.Zone.World.Maps
 		public Pad[] GetPads(Func<Pad, bool> func)
 		{
 			var result = new List<Pad>();
-			lock (_pads)
+			var pads = RentSnapshot(_pads, out var count);
+
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var pad in _pads.Values)
-				{
-					if (func(pad))
-						result.Add(pad);
-				}
+				if (func(pads[i]))
+					result.Add(pads[i]);
 			}
+
+			ReturnSnapshot(pads);
 			return result.ToArray();
 		}
 
@@ -1950,34 +1976,33 @@ namespace Melia.Zone.World.Maps
 			}
 			else
 			{
-				lock (_monsters)
+				var monsters = RentSnapshot(_monsters, out var monsterCount);
+				for (var i = 0; i < monsterCount; i++)
 				{
-					foreach (var monster in _monsters.Values)
-					{
-						var radius = (monster as ICombatEntity)?.AgentRadius ?? 0;
-						if (monster is TActor actor && area.IsInsideOrInRange(actor.Position, radius) && (predicate?.Invoke(actor) ?? true))
-							buffer.Add(actor);
-					}
-				}
-
-				lock (_characters)
-				{
-					foreach (var character in _characters.Values)
-					{
-						if (character is TActor actor && area.IsInsideOrInRange(actor.Position, ((ICombatEntity)character).AgentRadius) && (predicate?.Invoke(actor) ?? true))
-							buffer.Add(actor);
-					}
-				}
-			}
-
-			lock (_pads)
-			{
-				foreach (var pad in _pads.Values)
-				{
-					if (pad is TActor actor && area.IsInside(actor.Position) && (predicate?.Invoke(actor) ?? true))
+					var monster = monsters[i];
+					var radius = (monster as ICombatEntity)?.AgentRadius ?? 0;
+					if (monster is TActor actor && area.IsInsideOrInRange(actor.Position, radius) && (predicate?.Invoke(actor) ?? true))
 						buffer.Add(actor);
 				}
+				ReturnSnapshot(monsters);
+
+				var characters = RentSnapshot(_characters, out var characterCount);
+				for (var i = 0; i < characterCount; i++)
+				{
+					var character = characters[i];
+					if (character is TActor actor && area.IsInsideOrInRange(actor.Position, ((ICombatEntity)character).AgentRadius) && (predicate?.Invoke(actor) ?? true))
+						buffer.Add(actor);
+				}
+				ReturnSnapshot(characters);
 			}
+
+			var pads = RentSnapshot(_pads, out var padCount);
+			for (var i = 0; i < padCount; i++)
+			{
+				if (pads[i] is TActor actor && area.IsInside(actor.Position) && (predicate?.Invoke(actor) ?? true))
+					buffer.Add(actor);
+			}
+			ReturnSnapshot(pads);
 		}
 
 
@@ -2275,14 +2300,15 @@ namespace Melia.Zone.World.Maps
 		public List<WarpMonster> GetWarps(Func<WarpMonster, bool> predicate)
 		{
 			var result = new List<WarpMonster>();
-			lock (_monsters)
+			var monsters = RentSnapshot(_monsters, out var count);
+
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var monster in _monsters.Values)
-				{
-					if (monster is WarpMonster warp && (predicate == null || predicate(warp)))
-						result.Add(warp);
-				}
+				if (monsters[i] is WarpMonster warp && (predicate == null || predicate(warp)))
+					result.Add(warp);
 			}
+
+			ReturnSnapshot(monsters);
 			return result;
 		}
 
@@ -2309,14 +2335,15 @@ namespace Melia.Zone.World.Maps
 		public List<MonsterInName> GetNpcs(Func<MonsterInName, bool> predicate)
 		{
 			var result = new List<MonsterInName>();
-			lock (_monsters)
+			var monsters = RentSnapshot(_monsters, out var count);
+
+			for (var i = 0; i < count; i++)
 			{
-				foreach (var monster in _monsters.Values)
-				{
-					if (monster is MonsterInName npc && (predicate == null || predicate(npc)))
-						result.Add(npc);
-				}
+				if (monsters[i] is MonsterInName npc && (predicate == null || predicate(npc)))
+					result.Add(npc);
 			}
+
+			ReturnSnapshot(monsters);
 			return result;
 		}
 

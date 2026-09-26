@@ -54,6 +54,7 @@ namespace Melia.Zone.World.Actors.Characters
 		private int _destinationChannelId;
 		private readonly object _warpLock = new();
 		private readonly object _lookAroundLock = new();
+		private readonly object _lookAroundScanLock = new();
 		private readonly object _hpLock = new();
 		private readonly HashSet<IMonster> _visibleMonsters = new();
 		private readonly HashSet<Character> _visibleCharacters = new();

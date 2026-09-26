@@ -97,7 +97,7 @@ namespace Melia.Zone.World.Quests.Modifiers
 			if (character == null)
 				return;
 
-			character.Quests.UpdateModifiers<ItemDropModifier>((quest, modifier, progress) =>
+			character.Quests.UpdateModifiers<ItemDropModifier>((quest, modifier) =>
 			{
 				if (!modifier.IsTarget(monster))
 					return;

@@ -517,19 +517,33 @@ namespace Melia.Zone.World.Actors.Characters
 			if (!this.EyesOpen)
 				return;
 
+			// Visibility predicates run script code that may take other locks, such as the quest lock.
+			if (!Monitor.TryEnter(_lookAroundScanLock))
+				return;
+
+			this.LookAroundScanned();
+			Monitor.Exit(_lookAroundScanLock);
+		}
+
+		/// <summary>
+		/// Updates visible entities around character, with the scan lock held.
+		/// </summary>
+		private void LookAroundScanned()
+		{
 			int sentCount;
+
+			// Fill reusable scratch sets with currently visible entities
+			_currentVisMonsters.Clear();
+			this.Map.GetVisibleMonsters(this, _currentVisMonsters);
+
+			_currentVisChars.Clear();
+			this.Map.GetVisibleCharacters(this, _currentVisChars);
+
+			_currentVisPads.Clear();
+			this.Map.GetVisiblePads(this, _currentVisPads);
 
 			lock (_lookAroundLock)
 			{
-				// Fill reusable scratch sets with currently visible entities
-				_currentVisMonsters.Clear();
-				this.Map.GetVisibleMonsters(this, _currentVisMonsters);
-
-				_currentVisChars.Clear();
-				this.Map.GetVisibleCharacters(this, _currentVisChars);
-
-				_currentVisPads.Clear();
-				this.Map.GetVisiblePads(this, _currentVisPads);
 				// Compute appeared characters
 				_tempAppearChars.Clear();
 				foreach (var c in _currentVisChars)
@@ -852,7 +866,7 @@ namespace Melia.Zone.World.Actors.Characters
 			// Perform unthrottled initial visibility scan. Unlike
 			// LookAround(), this sends all monsters at once since
 			// the player expects to see everything on map entry.
-			lock (_lookAroundLock)
+			lock (_lookAroundScanLock)
 			{
 				// Get currently visible entities
 				_currentVisChars.Clear();
@@ -864,40 +878,43 @@ namespace Melia.Zone.World.Actors.Characters
 				_currentVisPads.Clear();
 				this.Map.GetVisiblePads(this, _currentVisPads);
 
-				// Compute newly appearing characters
-				_tempAppearChars.Clear();
-				foreach (var c in _currentVisChars)
-					if (!_visibleCharacters.Contains(c))
-						_tempAppearChars.Add(c);
+				lock (_lookAroundLock)
+				{
+					// Compute newly appearing characters
+					_tempAppearChars.Clear();
+					foreach (var c in _currentVisChars)
+						if (!_visibleCharacters.Contains(c))
+							_tempAppearChars.Add(c);
 
-				// Compute newly appearing monsters
-				_tempAppearMonsters.Clear();
-				foreach (var m in _currentVisMonsters)
-					if (!_visibleMonsters.Contains(m))
-						_tempAppearMonsters.Add(m);
+					// Compute newly appearing monsters
+					_tempAppearMonsters.Clear();
+					foreach (var m in _currentVisMonsters)
+						if (!_visibleMonsters.Contains(m))
+							_tempAppearMonsters.Add(m);
 
-				// Compute newly appearing pads
-				_tempAppearPads.Clear();
-				foreach (var p in _currentVisPads)
-					if (!_visiblePads.Contains(p))
-						_tempAppearPads.Add(p);
+					// Compute newly appearing pads
+					_tempAppearPads.Clear();
+					foreach (var p in _currentVisPads)
+						if (!_visiblePads.Contains(p))
+							_tempAppearPads.Add(p);
 
-				this.HandleAppearingCharacters(_tempAppearChars);
-				this.HandleAppearingMonsters(_tempAppearMonsters);
-				this.HandleAppearingPads(_tempAppearPads);
+					this.HandleAppearingCharacters(_tempAppearChars);
+					this.HandleAppearingMonsters(_tempAppearMonsters);
+					this.HandleAppearingPads(_tempAppearPads);
 
-				// Update visible sets
-				_visibleCharacters.Clear();
-				foreach (var c in _currentVisChars)
-					_visibleCharacters.Add(c);
+					// Update visible sets
+					_visibleCharacters.Clear();
+					foreach (var c in _currentVisChars)
+						_visibleCharacters.Add(c);
 
-				_visibleMonsters.Clear();
-				foreach (var m in _currentVisMonsters)
-					_visibleMonsters.Add(m);
+					_visibleMonsters.Clear();
+					foreach (var m in _currentVisMonsters)
+						_visibleMonsters.Add(m);
 
-				_visiblePads.Clear();
-				foreach (var p in _currentVisPads)
-					_visiblePads.Add(p);
+					_visiblePads.Clear();
+					foreach (var p in _currentVisPads)
+						_visiblePads.Add(p);
+				}
 			}
 		}
 

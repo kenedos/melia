@@ -160,21 +160,26 @@ namespace Melia.Zone.Scripting
 		/// <returns></returns>
 		public static void StartAutoReceiveQuests(Character character)
 		{
+			QuestScript[] autoReceiveQuests;
+
+			// Quest checks take the character's quest lock, which is held while scripts call TryGet.
 			lock (ScriptsSyncLock)
 			{
 				if (AutoReceiveQuests.Count == 0)
 					return;
 
-				foreach (var questScript in AutoReceiveQuests)
-				{
-					if (character.Quests.Has(questScript.Data.Id))
-						continue;
+				autoReceiveQuests = AutoReceiveQuests.ToArray();
+			}
 
-					if (!character.Quests.MeetsPrerequisites(questScript))
-						continue;
+			foreach (var questScript in autoReceiveQuests)
+			{
+				if (character.Quests.Has(questScript.Data.Id))
+					continue;
 
-					character.Quests.Start(questScript.Data.Id, questScript.Data.StartDelay);
-				}
+				if (!character.Quests.MeetsPrerequisites(questScript))
+					continue;
+
+				character.Quests.Start(questScript.Data.Id, questScript.Data.StartDelay);
 			}
 		}
 
