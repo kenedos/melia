@@ -92,6 +92,9 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
+		AddConditionalNpc(MonsterId.HiddenWall_150_150_150, "", "ORCHARD324_OBB", "f_orchard_32_4", -46.79, 870.94, 90, c => !c.Quests.HasCompleted(Mq01)
+			&& !c.Quests.IsCompletable(Mq01) && c.Tracks.ActiveTrack?.Data.QuestId != Mq01.Value);
+
 		// The Redemption Wards around the goddess
 		//-------------------------------------------------------------------------
 		for (var i = 0; i < Wards.GetLength(0); ++i)

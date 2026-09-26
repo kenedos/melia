@@ -39,6 +39,9 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 	{
 		// Grand Shrine Barrier
 		//-------------------------------------------------------------------------
+		AddConditionalNpc(MonsterId.HiddenWall_250_250_300, "", "HUEVILLAGE_58_4_MQ01_WALL01", "f_huevillage_58_4", 30, -182, 90, c => c.Quests.HasCompleted(GirlInDanger)
+			&& !c.Quests.IsCompletable(Mq02) && !c.Quests.HasCompleted(Mq02) && c.Tracks.ActiveTrack?.Data.QuestId != Mq02.Value);
+
 		AddConditionalNpc(147469, L("Grand Shrine Barrier"), "HUEVILLAGE_58_4_MQ01_NPC01", "f_huevillage_58_4", 43, -343, 90, c => c.Quests.HasCompleted(GirlInDanger) && !c.Quests.IsCompletable(Mq02) && !c.Quests.HasCompleted(Mq02), async dialog =>
 		{
 			var character = dialog.Player;

@@ -72,6 +72,13 @@ public class DPrison623QuestNpcsScript : GeneralScript
 		{ 151101, 1750.84, -12.73, 180 }, { 151101, 1682.78, -59.46, 90 },
 	};
 
+	private static readonly double[,] Fences =
+	{
+		{ 635.44, -2.64, 90 }, { 638.68, -107.70, 90 }, { 191.70, 390.05, 180 }, { -404.51, -1413.42, 180 },
+		{ -282.82, -1416.26, 180 }, { 520.44, -177.54, 180 }, { 437.35, -166.69, 180 }, { 1645.73, -763.60, 180 },
+		{ 1724.29, -766.34, 180 }, { 1791.07, -761.78, 180 },
+	};
+
 	protected override void Load()
 	{
 		// Priest Irma
@@ -590,7 +597,21 @@ public class DPrison623QuestNpcsScript : GeneralScript
 
 			await dialog.CompleteQuest(Hq1);
 		});
+
+		// The fences closing off the prison until the idol is destroyed
+		//-------------------------------------------------------------------------
+		for (var i = 0; i < Fences.GetLength(0); ++i)
+			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON623_MQ_02_WALL_" + (i + 1), "d_prison_62_3", Fences[i, 0], Fences[i, 1], Fences[i, 2], AreFencesStanding);
 	}
+
+	/// <summary>
+	/// Returns whether the fences still close off the prison for the character.
+	/// </summary>
+	private static bool AreFencesStanding(Character character)
+		=> (character.Quests.IsActive(Prison622Mq06) || character.Quests.HasCompleted(Prison622Mq06))
+		&& !character.Quests.HasCompleted(Mq03)
+		&& !character.Quests.IsCompletable(Mq03)
+		&& character.Tracks.ActiveTrack?.Data.QuestId != Mq03.Value;
 
 	/// <summary>
 	/// Returns whether Priest Irma rests in the Penitence Room after the

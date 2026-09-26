@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -1180,7 +1181,12 @@ namespace Melia.Zone.World.Maps
 		/// <summary>
 		/// Returns all monsters visible to the given character.
 		/// </summary>
-		public List<IMonster> GetVisibleMonsters(Character character) => this.GetMonsters(character.CanSee);
+		public List<IMonster> GetVisibleMonsters(Character character)
+		{
+			var result = new List<IMonster>();
+			this.GetVisibleMonsters(character, result);
+			return result;
+		}
 
 		/// <summary>
 		/// Adds all monsters visible to the given character to the result list.
@@ -1188,16 +1194,7 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleMonsters(Character character, List<IMonster> result)
-		{
-			lock (_monsters)
-			{
-				foreach (var monster in _monsters.Values)
-				{
-					if (character.CanSee(monster))
-						result.Add(monster);
-				}
-			}
-		}
+			=> this.CollectVisibleMonsters(character, result);
 
 		/// <summary>
 		/// Adds all monsters visible to the given character to the result set.
@@ -1205,14 +1202,43 @@ namespace Melia.Zone.World.Maps
 		/// <param name="character"></param>
 		/// <param name="result"></param>
 		public void GetVisibleMonsters(Character character, HashSet<IMonster> result)
+			=> this.CollectVisibleMonsters(character, result);
+
+		/// <summary>
+		/// Adds all monsters visible to the given character to the result
+		/// collection, checking visibility outside of the monster lock.
+		/// </summary>
+		/// <remarks>
+		/// CanSee runs conditional NPC predicates that take the character's
+		/// quest lock, which is held while quest updates query the map.
+		/// </remarks>
+		/// <param name="character"></param>
+		/// <param name="result"></param>
+		private void CollectVisibleMonsters(Character character, ICollection<IMonster> result)
 		{
+			IMonster[] monsters;
+			int count;
+
 			lock (_monsters)
 			{
-				foreach (var monster in _monsters.Values)
+				count = _monsters.Count;
+				monsters = ArrayPool<IMonster>.Shared.Rent(Math.Max(1, count));
+				_monsters.Values.CopyTo(monsters, 0);
+			}
+
+			try
+			{
+				for (var i = 0; i < count; i++)
 				{
+					var monster = monsters[i];
+
 					if (character.CanSee(monster))
 						result.Add(monster);
 				}
+			}
+			finally
+			{
+				ArrayPool<IMonster>.Shared.Return(monsters, clearArray: true);
 			}
 		}
 

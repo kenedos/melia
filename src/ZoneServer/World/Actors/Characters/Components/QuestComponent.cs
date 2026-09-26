@@ -816,12 +816,12 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.GiveRewards(quest);
 
-			// Track achievement points for quest completion via server event
-			ZoneServer.Instance.ServerEvents.PlayerCompletedQuest.Raise(new PlayerCompletedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
-
 			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
 			this.UpdateClient_CompleteQuest(quest);
+
+			// Raised after the client knows the new status, since handlers redraw the client's map icons from it.
+			ZoneServer.Instance.ServerEvents.PlayerCompletedQuest.Raise(new PlayerCompletedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 		}
 
 		/// <summary>
@@ -850,10 +850,10 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			if (QuestScript.TryGet(quest.Data.Id, out var questScript))
 				questScript.OnCancel(this.Character, quest);
 
-			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Raise(new PlayerAbandonedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
-
 			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
+
+			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Raise(new PlayerAbandonedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 		}
 
 		/// <summary>

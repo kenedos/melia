@@ -55,18 +55,18 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Request7) && character.Quests.IsCompletable(Request7))
+			{
+				await dialog.Msg(L("The fighting at the mining village seems very bad. It is too late to move troops, so you must go and support the mining village yourself."));
+				await dialog.CompleteQuest(Request7);
+				return;
+			}
+
 			if (character.Quests.IsActive(Camp4) && character.Quests.IsCompletable(Camp4))
 			{
 				await dialog.Msg(L("Are you hurt anywhere? I am grateful you killed the Poata, but that was truly reckless."));
 
 				await dialog.CompleteQuest(Camp4);
-				return;
-			}
-
-			if (character.Quests.IsActive(Request7) && character.Quests.IsCompletable(Request7))
-			{
-				await dialog.Msg(L("The fighting at the mining village seems very bad. It is too late to move troops, so you must go and support the mining village yourself."));
-				await dialog.CompleteQuest(Request7);
 				return;
 			}
 
@@ -107,22 +107,6 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				}
 			}
 
-			if (!character.Quests.Has(Camp4) && character.Quests.MeetsPrerequisites(Camp4))
-			{
-				await dialog.Msg(L("Have you by any chance seen a Poata cub? We must drive it far away quickly, or the mother will keep prowling about."));
-
-				var answer = await dialog.SelectQuestOffer(Camp4, L("It is prowling the camp even now. Could you put it down?"),
-					Option(L("I haven't seen the cub, but I'll deal with the mother"), "accept"),
-					Option(L("That is not my concern"), "leave")
-				);
-
-				if (answer == "accept")
-				{
-					character.Quests.Start(Camp4);
-					return;
-				}
-			}
-
 			if (!character.Quests.Has(Request7) && character.Quests.MeetsPrerequisites(Request7))
 			{
 				await dialog.Msg(L("You really killed the Vubbe Fighter? Then the monsters will no longer multiply. We can rest a little easier now."));
@@ -135,6 +119,22 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Request7);
+					return;
+				}
+			}
+
+			if (!character.Quests.Has(Camp4) && character.Quests.MeetsPrerequisites(Camp4))
+			{
+				await dialog.Msg(L("Have you by any chance seen a Poata cub? We must drive it far away quickly, or the mother will keep prowling about."));
+
+				var answer = await dialog.SelectQuestOffer(Camp4, L("It is prowling the camp even now. Could you put it down?"),
+					Option(L("I haven't seen the cub, but I'll deal with the mother"), "accept"),
+					Option(L("That is not my concern"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Camp4);
 					return;
 				}
 			}

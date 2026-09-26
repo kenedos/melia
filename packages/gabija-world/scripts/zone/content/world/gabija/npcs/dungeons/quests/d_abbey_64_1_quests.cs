@@ -566,7 +566,18 @@ public class DAbbey641QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Monument"));
 			await dialog.Msg(L("In honor of those sacrificed for the demons' monstrous experiments..."));
 		});
+
+		// Invisible walls
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(MonsterId.HiddenWall_40_50_100, "", "ABBEY641_MQ_HIDDENWAL", "d_abbey_64_1", -251.61, -933.42, 90, c => !IsPastProgress(c, Mq020));
+		AddConditionalNpc(MonsterId.HiddenWall_10_170_300, "", "ABBEY641_HIDDENWALL", "d_abbey_64_1", -428.67, -2000.60, 44, c => !IsPastProgress(c, Mq050));
 	}
+
+	/// <summary>
+	/// Returns whether the quest's cutscene is playing or already behind the character.
+	/// </summary>
+	private static bool IsPastProgress(Character character, QuestId questId)
+		=> character.Quests.HasCompleted(questId) || character.Quests.IsCompletable(questId) || character.Tracks.ActiveTrack?.Data.QuestId == questId.Value;
 
 	/// <summary>
 	/// Returns whether Rose waits in front of the Special Reading Room.

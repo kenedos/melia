@@ -756,6 +756,7 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 		AddBlockingWagon(1, -82, -612, 61);
 		AddBlockingWagon(2, -41, -608, 0);
 		AddBlockingWagon(3, -64, -557, 0);
+		AddConditionalNpc(MonsterId.HiddenWall_10_100_500, "", "SOUT_Q_16_WALL", "f_siauliai_out", -60.97, -605.29, 90, IsWagonBlockingRoad);
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------

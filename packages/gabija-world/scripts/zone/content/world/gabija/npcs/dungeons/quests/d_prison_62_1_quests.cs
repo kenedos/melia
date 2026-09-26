@@ -48,6 +48,13 @@ public class DPrison621QuestNpcsScript : GeneralScript
 
 	private static readonly string[] PackageTargets = { "Dumaro_blue", "wendigo_blue", "Sec_Yekubite", "Goblin_Miners_Blue" };
 
+	private static readonly double[,] Fences =
+	{
+		{ -496.63, -514.52, 180 }, { -977.18, 93.50, 90 }, { -313.84, 111.93, 90 }, { -564.91, 342.08, 180 },
+		{ -153.58, 1531.44, 90 }, { 725.25, 1369.21, 90 }, { 861.79, 1371.98, 90 }, { 1295.86, 1374.99, 90 },
+		{ -770.42, 85.86, 90 }, { -1379.10, 476.65, 180 }, { -1363.30, -287.79, 180 }, { 951.59, 1200.10, 90 },
+	};
+
 	protected override void Load()
 	{
 		// Priest Pranas
@@ -534,7 +541,18 @@ public class DPrison621QuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
+
+		// The fences closing off the prison until the idol is destroyed
+		//-------------------------------------------------------------------------
+		for (var i = 0; i < Fences.GetLength(0); ++i)
+			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON621_MQ_02_WALL_" + (i + 1), "d_prison_62_1", Fences[i, 0], Fences[i, 1], Fences[i, 2], AreFencesStanding);
 	}
+
+	/// <summary>
+	/// Returns whether the fences still close off the prison for the character.
+	/// </summary>
+	private static bool AreFencesStanding(Character character)
+		=> (character.Quests.IsActive(Mq01) || character.Quests.HasCompleted(Mq01)) && !character.Quests.HasCompleted(Mq07);
 
 	/// <summary>
 	/// Returns whether the Chasers are resting inside the prison.

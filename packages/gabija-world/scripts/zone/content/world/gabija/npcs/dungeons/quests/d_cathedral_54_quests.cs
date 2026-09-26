@@ -478,6 +478,10 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
+
+		// The wall sealing the room of the revelation
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(MonsterId.HiddenWall_10_170_300, "", "CATHEDRAL54_HIDDEN_WALL", "d_cathedral_54", 1584.30, -1864.70, 90, c => !c.Quests.HasCompleted(Mq05Part3));
 	}
 
 	/// <summary>

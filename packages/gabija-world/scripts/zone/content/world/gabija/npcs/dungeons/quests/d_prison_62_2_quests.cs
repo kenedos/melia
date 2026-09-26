@@ -83,6 +83,13 @@ public class DPrison622QuestNpcsScript : GeneralScript
 		{ 104.20, 1479.83 }, { 171.54, 1763.05 }, { 420.14, 1738.68 }, { 463.42, 1553.36 },
 	};
 
+	private static readonly double[,] Fences =
+	{
+		{ -446.24, 68.89, 90 }, { -448.86, -185.84, 90 }, { -1284.52, -295.71, 180 }, { -1289.92, 286.47, 180 },
+		{ -900.49, 67.14, 90 }, { -903.01, -194.19, 90 }, { -1785.23, 1396.29, 180 }, { 69.03, 1731.82, 90 },
+		{ -1398.62, 1693.99, 90 }, { 509.76, 1697.81, 90 }, { -132.78, -365.96, 180 },
+	};
+
 	protected override void Load()
 	{
 		// Priest Pranas
@@ -628,6 +635,11 @@ public class DPrison622QuestNpcsScript : GeneralScript
 					await Task.CompletedTask;
 				});
 		}
+
+		// The fences closing off the prison until the idol is destroyed
+		//-------------------------------------------------------------------------
+		for (var i = 0; i < Fences.GetLength(0); ++i)
+			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON622_MQ_02_WALL_" + (i + 1), "d_prison_62_2", Fences[i, 0], Fences[i, 1], Fences[i, 2], c => !c.Quests.HasCompleted(Mq02));
 	}
 
 	/// <summary>

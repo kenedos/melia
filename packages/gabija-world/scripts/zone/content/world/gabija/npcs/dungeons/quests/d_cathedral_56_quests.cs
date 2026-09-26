@@ -494,7 +494,20 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("A desk made to look like one of Maven's machines. It is neither."));
 		});
+
+		// The seal in front of Pasala Altar
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(MonsterId.HiddenWall_10_170_300, "", "CHATHEDRAL56_SEAL", "d_cathedral_56", -1539.82, 463.16, 90, IsPasalaSealed);
 	}
+
+	/// <summary>
+	/// Returns whether the seal still bars the way into Pasala Altar for the character.
+	/// </summary>
+	private static bool IsPasalaSealed(Character character)
+		=> !character.Quests.HasCompleted(Mq07)
+		&& !character.Quests.HasCompleted(Sq01)
+		&& !character.Quests.IsCompletable(Sq01)
+		&& character.Tracks.ActiveTrack?.Data.QuestId != Sq01.Value;
 
 	/// <summary>
 	/// The bishop's spirit at the Sanctuary entrance, who owns the demon

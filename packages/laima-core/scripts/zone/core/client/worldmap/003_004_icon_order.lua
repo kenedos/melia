@@ -27,9 +27,29 @@ function M_DRAW_MAP_ICONS(parent, icons, mapName, mapProp, prefix, width, height
 		end
 	end
 
+	M_RAISE_NATIVE_QUEST_ICONS(parent)
+
 	for i = 1, #quests do
 		quests[i]:MakeTopBetweenChild()
 	end
 
 	return names
+end
+
+-- The client tags its quest icons with Value2 1 and 2, raising 2 last.
+function M_RAISE_NATIVE_QUEST_ICONS(parent)
+	for value = 1, 2 do
+		local raise = {}
+
+		for i = 0, parent:GetChildCount() - 1 do
+			local child = parent:GetChildByIndex(i)
+			if child ~= nil and child:GetValue2() == value then
+				raise[#raise + 1] = child
+			end
+		end
+
+		for i = 1, #raise do
+			raise[i]:MakeTopBetweenChild()
+		end
+	end
 end
