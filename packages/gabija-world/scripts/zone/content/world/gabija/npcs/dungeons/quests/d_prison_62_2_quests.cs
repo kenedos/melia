@@ -790,7 +790,7 @@ public class Prison622Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60128, QuestStatus.Completed));
 
-		AddObjective("killWendigo", L("Defeat Wendigo Escapees"), new KillObjective(13, "Sec_escape_wendigo"));
+		AddObjective("killWendigo", L("Defeat Wendigo Escapees"), new KillObjective(5, "Sec_escape_wendigo"));
 
 		AddReward(new ItemReward("expCard2", 1));
 		AddReward(new TakeItemReward("PRISON622_MQ_04_ITEM", -1));

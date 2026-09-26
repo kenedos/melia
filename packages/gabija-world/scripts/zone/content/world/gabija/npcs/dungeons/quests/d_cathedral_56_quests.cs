@@ -909,7 +909,7 @@ public class Cathedral56Mq02_1Quest : QuestScript
 
 		AddPityDrop("CHATHEDRAL56_MQ02_1_ITEM", 0.3f, 7, 1, "Pawndel_blue", "Pawnd_purple", "NightMaiden_bow");
 
-		AddObjective("collectGarments", L("Collect demons' garments"), new CollectItemObjective("CHATHEDRAL56_MQ02_1_ITEM", 5));
+		AddObjective("collectGarments", L("Collect demons' garments"), new CollectItemObjective("CHATHEDRAL56_MQ02_1_ITEM", 8));
 
 		AddReward(new ItemReward("expCard8", 1));
 	}
@@ -1003,7 +1003,7 @@ public class Cathedral56Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20331, QuestStatus.Completed));
 
-		AddObjective("killDemons", L("Defeat the demons"), new KillObjective(6, "Pawndel_blue", "Pawnd_purple") { LayerOnly = true });
+		AddObjective("killDemons", L("Defeat the demons"), new KillObjective(7, "Pawndel_blue", "Pawnd_purple") { LayerOnly = true });
 
 		AddReward(new ItemReward("CHATHEDRAL56_MQ04_PART2_ITEM", 1));
 		AddReward(new ItemReward("expCard8", 1));

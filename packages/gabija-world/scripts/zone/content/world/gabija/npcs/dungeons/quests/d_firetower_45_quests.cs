@@ -837,7 +837,7 @@ public class Ftower45Sq02Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(17022, QuestStatus.Completed));
 
-		AddObjective("killDimmers", L("Defeat Dimmer"), new KillObjective(5, "dimmer"));
+		AddObjective("killDimmers", L("Defeat Dimmer"), new KillObjective(8, "dimmer"));
 		AddObjective("killPuppets", L("Defeat Black Shaman Doll"), new KillObjective(5, "tower_of_firepuppet_black"));
 		AddObjective("killDrakes", L("Defeat Black Drake"), new KillObjective(5, "Fire_Dragon_purple"));
 

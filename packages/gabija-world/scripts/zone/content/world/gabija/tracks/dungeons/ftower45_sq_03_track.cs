@@ -19,6 +19,7 @@ public class Ftower45Sq03Track : TrackScript
 	protected override void Load()
 	{
 		SetId("FTOWER45_SQ_03_TRACK");
+		SetActorLines(2, 4);
 	}
 
 	public override IActor[] OnStart(Character character, Track track)

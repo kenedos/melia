@@ -432,7 +432,7 @@ public class Vprison512Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60009, QuestStatus.Completed));
 
-		AddObjective("killHarugals", L("Defeat Harugals in the 4th Isolation Area"), new KillObjective(2, "Harugal"));
+		AddObjective("killHarugals", L("Defeat Harugals in the 4th Isolation Area"), new KillObjective(5, "Harugal"));
 
 		AddReward(new ItemReward("expCard8", 2));
 	}

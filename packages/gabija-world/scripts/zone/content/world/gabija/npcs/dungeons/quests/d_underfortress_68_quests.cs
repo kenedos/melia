@@ -549,7 +549,7 @@ public class Underfortress68Mq020Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50072, QuestStatus.Completed));
 
-		AddObjective("collectBones", L("Collect Demon Bones"), new CollectItemObjective("UNDER68_MQ2_ITEM01", 10));
+		AddObjective("collectBones", L("Collect Demon Bones"), new CollectItemObjective("UNDER68_MQ2_ITEM01", 7));
 
 		AddPityDrop("UNDER68_MQ2_ITEM01", 0.8f, 3, 1, "Deadbornscab_red");
 

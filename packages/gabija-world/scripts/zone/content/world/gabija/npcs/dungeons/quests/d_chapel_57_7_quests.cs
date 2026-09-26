@@ -652,7 +652,7 @@ public class Chaple577Mq07Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(38));
 
-		AddObjective("killEgnome", L("Defeat Egnome"), new KillObjective(2, "Egnome"));
+		AddObjective("killEgnome", L("Defeat Egnome"), new KillObjective(8, "Egnome"));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}

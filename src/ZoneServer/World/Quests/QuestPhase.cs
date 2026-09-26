@@ -52,6 +52,12 @@ namespace Melia.Zone.World.Quests
 		public float Radius { get; set; }
 
 		/// <summary>
+		/// Gets or sets where the return warp puts the character, in place
+		/// of the spot in front of the phase's NPC.
+		/// </summary>
+		public Position? WarpPosition { get; set; }
+
+		/// <summary>
 		/// Creates a new phase for the given status.
 		/// </summary>
 		/// <param name="status"></param>

@@ -858,7 +858,7 @@ public class Underfortress69Mq030Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50080, QuestStatus.Completed));
 
-		AddObjective("collectBlood", L("Collect Demon Blood"), new CollectItemObjective("UNDER69_MQ3_ITEM01", 13));
+		AddObjective("collectBlood", L("Collect Demon Blood"), new CollectItemObjective("UNDER69_MQ3_ITEM01", 4));
 		AddObjective("carveTheStone", L("Inscribe the letters with the demon blood"), new ManualObjective());
 
 		AddPityDrop("UNDER69_MQ3_ITEM01", 0.9f, 3, 1, "flask_blue");

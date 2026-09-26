@@ -1141,7 +1141,7 @@ public class SoutQ16Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8080, QuestStatus.Completed));
 
-		AddObjective("killVubbes", L("Defeat any Vubbe drawn out by the explosives"), new KillObjective(6, "Goblin_Miners_Q2"));
+		AddObjective("killVubbes", L("Defeat any Vubbe drawn out by the explosives"), new KillObjective(9, "Goblin_Archer_Q2", "Goblin_Miners_Q2"));
 
 		AddReward(new ItemReward("expCard1", 2));
 		AddReward(new ItemReward("BRC01_105", 1));

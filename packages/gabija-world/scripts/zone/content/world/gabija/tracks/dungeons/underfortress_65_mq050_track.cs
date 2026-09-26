@@ -20,6 +20,7 @@ public class Underfortress65Mq050Track : TrackScript
 	protected override void Load()
 	{
 		SetId("UNDERFORTRESS_65_MQ050_TRACK");
+		SetActorLines(2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15);
 	}
 
 	public override IActor[] OnStart(Character character, Track track)

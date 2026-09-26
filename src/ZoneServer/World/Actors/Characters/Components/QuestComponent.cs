@@ -1579,6 +1579,14 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			var hasPhase = TryGetCurrentPhase(quest, out var phase);
 
+			if (hasPhase && phase.WarpPosition.HasValue && !string.IsNullOrEmpty(phase.MapClassName))
+			{
+				mapClassName = phase.MapClassName;
+				position = phase.WarpPosition.Value;
+
+				return true;
+			}
+
 			// Quests with no phases still name their giver, who takes the turn-in in practice.
 			var npcUniqueNames = new[] { hasPhase ? phase.NpcUniqueName : null, quest.Data.EndNpcUniqueName, quest.Data.StartNpcUniqueName };
 			var phaseMapClassName = hasPhase ? phase.MapClassName : null;
@@ -1620,6 +1628,15 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			position = Position.Zero;
 
 			var hasPhase = questData.TryGetPhase(QuestStatus.Possible, out var phase);
+
+			if (hasPhase && phase.WarpPosition.HasValue && !string.IsNullOrEmpty(phase.MapClassName))
+			{
+				mapClassName = phase.MapClassName;
+				position = phase.WarpPosition.Value;
+
+				return true;
+			}
+
 			var npcUniqueNames = new[] { hasPhase ? phase.NpcUniqueName : null, questData.StartNpcUniqueName };
 			var phaseMapClassName = hasPhase ? phase.MapClassName : null;
 

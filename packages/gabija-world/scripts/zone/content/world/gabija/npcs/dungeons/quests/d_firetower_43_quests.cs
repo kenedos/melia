@@ -537,7 +537,7 @@ public class Ftower43Mq01Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8482, QuestStatus.Completed));
 
-		AddObjective("killRocktors", L("Defeat Red Infrorocktors"), new KillObjective(6, "InfroRocktor_red") { LayerOnly = true });
+		AddObjective("killRocktors", L("Defeat Red Infrorocktors"), new KillObjective(8, "InfroRocktor_red") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard7", 1));
 	}
@@ -656,7 +656,7 @@ public class Ftower43Mq07Quest : QuestScript
 
 		AddPityDrop("FTOWER43_MQ_07_ITEM", 1.0f, 0, 1, "InfroRocktor_red");
 
-		AddObjective("collectCores", L("Collect the cores of Red Infrorocktors"), new CollectItemObjective("FTOWER43_MQ_07_ITEM", 10));
+		AddObjective("collectCores", L("Collect the cores of Red Infrorocktors"), new CollectItemObjective("FTOWER43_MQ_07_ITEM", 6));
 
 		AddReward(new ItemReward("expCard7", 1));
 		AddReward(new TakeItemReward("FTOWER43_MQ_07_ITEM"));

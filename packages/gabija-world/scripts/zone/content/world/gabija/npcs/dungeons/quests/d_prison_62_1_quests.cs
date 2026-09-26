@@ -763,7 +763,7 @@ public class Prison621Mq07Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60120, QuestStatus.Completed));
 
-		AddObjective("rechargeOrb", L("Defeat Blue Dumaros and Blue Wendigos to recharge the Orb of Return"), new KillObjective(8, "Dumaro_blue", "wendigo_blue"));
+		AddObjective("rechargeOrb", L("Defeat Blue Dumaros and Blue Wendigos to recharge the Orb of Return"), new KillObjective(8, "Dumaro_blue", "Goblin_Miners_Blue", "Sec_Yekubite", "wendigo_blue"));
 
 		AddReward(new ItemReward("expCard2", 1));
 		AddReward(new ItemReward("Drug_SP1_Q", 20));

@@ -35,7 +35,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 	{
 		// The Chapparition, on its gentype anchor in the church
 		//-------------------------------------------------------------------------
-		AddSpawner("d_chapel_57_6.Chapparition", MonsterId.F_Boss_Chapparition, min: 1, max: 1, respawn: Minutes(5));
+		AddSpawner("d_chapel_57_6.Chapparition", MonsterId.Boss_Chapparition, min: 1, max: 1, respawn: Minutes(5));
 		AddSpawnPoint("d_chapel_57_6.Chapparition", "d_chapel_57_6", Rectangle(217.25, 460.63, 40));
 
 		// Follower Vaidutis
@@ -575,8 +575,8 @@ public class Chaple576Mq04Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(34));
 
-		AddObjective("killPawndel", L("Defeat Pawndel"), new KillObjective(15, "Pawndel"));
-		AddObjective("killPawnd", L("Defeat Pawnd"), new KillObjective(15, "pawnd"));
+		AddObjective("killPawndel", L("Defeat Pawndel"), new KillObjective(20, "Pawndel"));
+		AddObjective("killPawnd", L("Defeat Pawnd"), new KillObjective(10, "pawnd"));
 
 		AddReward(new ItemReward("expCard3", 1));
 	}

@@ -186,10 +186,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));
-			var targetPos = originPos.GetRelative(farPos);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Mirtis_line);
-			targetPos = originPos.GetRelative(farPos);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Mirtis_line);
+			CreateLines(caster, skill, originPos, farPos, 2300);
 			await skill.Wait(TimeSpan.FromMilliseconds(700));
 			var hits = new List<SkillHitInfo>();
 
@@ -219,9 +216,25 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				SkillResultTargetBuff(caster, skill, BuffId.UC_curse, 1, 0f, 6000f, 1, 10, -1, hits);
 				hits.Clear();
 			}
-			await skill.Wait(TimeSpan.FromMilliseconds(7500));
-			SkillRemovePad(caster, skill);
 		}
+
+		/// <summary>
+		/// Creates the cross of Mirtis_line pads, removed at the skill's MONSKL_REMOVE_PAD time.
+		/// </summary>
+		internal static void CreateLines(ICombatEntity caster, Skill skill, Position originPos, Position farPos, int createTimeMs)
+		{
+			var facing = originPos.GetDirection(farPos).DegreeAngle;
+			var lifeTime = TimeSpan.FromMilliseconds(LinesRemoveTimeMs - createTimeMs);
+
+			foreach (var angle in new[] { 0f, 90f })
+			{
+				var pad = SkillCreatePad(caster, skill, originPos, facing + angle, PadName.Mirtis_line);
+				if (pad != null)
+					pad.Trigger.LifeTime = lifeTime;
+			}
+		}
+
+		private const int LinesRemoveTimeMs = 13500;
 	}
 
 	[SkillHandler(SkillId.Mon_boss_mirtis_Skill_5)]
@@ -252,9 +265,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));
-			var targetPos = originPos.GetRelative(farPos);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Mirtis_line);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Mirtis_line);
+			Mon_boss_mirtis_Skill_4.CreateLines(caster, skill, originPos, farPos, 2300);
 
 			var config = new EffectHitConfig
 			{
@@ -284,7 +295,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			SkillRemovePad(caster, skill);
 		}
 
 		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)
@@ -323,9 +333,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2300));
-			var targetPos = originPos.GetRelative(farPos);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Mirtis_line);
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.Mirtis_line);
+			Mon_boss_mirtis_Skill_4.CreateLines(caster, skill, originPos, farPos, 2300);
+			skill.Run(this.CreateSecondLines(caster, skill, originPos, farPos));
 
 			var config = new EffectHitConfig
 			{
@@ -355,6 +364,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
+		}
+
+		private async Task CreateSecondLines(ICombatEntity caster, Skill skill, Position originPos, Position farPos)
+		{
+			await skill.Wait(TimeSpan.FromMilliseconds(1200));
+			Mon_boss_mirtis_Skill_4.CreateLines(caster, skill, originPos, farPos, 3500);
 		}
 
 		private async Task Blast(ICombatEntity caster, Skill skill, Position position, EffectHitConfig config)

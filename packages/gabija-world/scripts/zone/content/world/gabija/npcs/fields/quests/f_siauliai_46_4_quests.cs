@@ -505,7 +505,7 @@ public class Siauliai464Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(16010, QuestStatus.Completed));
 
-		AddObjective("drainOil", L("Remove the Lamp Oil"), new CollectItemObjective("SIAULIAI_46_4_MQ_03_ITEM", 6));
+		AddObjective("drainOil", L("Remove the Lamp Oil"), new CollectItemObjective("SIAULIAI_46_4_MQ_03_ITEM", 4));
 
 		AddReward(new ItemReward("expCard9", 2));
 		AddReward(new TakeItemReward("SIAULIAI_46_4_MQ_03_ITEM"));
@@ -560,7 +560,7 @@ public class Siauliai464Mq05Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(16030, QuestStatus.Completed));
 
-		AddObjective("killRaiders", L("Defeat the monsters who ruined the brewery business"), new KillObjective(15, "Siaulamb", "Pendinmire", "lantern_mushroom_orange"));
+		AddObjective("killRaiders", L("Defeat the monsters who ruined the brewery business"), new KillObjective(6, "Siaulamb", "Pendinmire", "lantern_mushroom_orange"));
 
 		AddReward(new ItemReward("expCard9", 2));
 	}

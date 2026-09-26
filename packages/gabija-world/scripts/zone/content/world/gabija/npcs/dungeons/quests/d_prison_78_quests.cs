@@ -1092,7 +1092,7 @@ public class Prison78Mq4Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30147, QuestStatus.Completed));
 
-		AddObjective("collectBlood", L("Obtain Kalejimas Demon Blood by defeating Demons"), new CollectItemObjective("PRISON_78_MQ_4_ITEM", 20));
+		AddObjective("collectBlood", L("Obtain Kalejimas Demon Blood by defeating Demons"), new CollectItemObjective("PRISON_78_MQ_4_ITEM", 12));
 
 		AddPityDrop("PRISON_78_MQ_4_ITEM", 1.0f, 0, 1, "TerraNymph_brown", "NightMaiden_mage_red", "Elet_blue");
 

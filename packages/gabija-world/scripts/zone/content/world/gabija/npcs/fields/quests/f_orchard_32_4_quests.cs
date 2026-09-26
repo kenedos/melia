@@ -938,7 +938,7 @@ public class FOrchard324Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(80043, QuestStatus.Completed));
 
-		AddObjective("collectBlood", L("Defeat Vikaras Mages and collect Demon Blood"), new CollectItemObjective("ORCHARD_324_MQ_04_ITEM", 10));
+		AddObjective("collectBlood", L("Defeat Vikaras Mages and collect Demon Blood"), new CollectItemObjective("ORCHARD_324_MQ_04_ITEM", 5));
 		AddPityDrop("ORCHARD_324_MQ_04_ITEM", 1.0f, 0, 1, "Sec_wolf_statue_mage");
 
 		AddReward(new TakeItemReward("ORCHARD_324_MQ_04_ITEM", -1));

@@ -5813,35 +5813,37 @@ namespace Melia.Zone.Network
 			var track = character.Tracks.ActiveTrack;
 			if (character != null && track != null)
 			{
-				// The packet carries an entry per timeline, so the director and
-				// any empty line before the cast are listed too. Skip them, or
-				// every actor reads the position of the actor before it.
-				var leading = entryCount - track.Actors.Length;
-				for (var i = 0; i < leading; i++)
+				var positions = new Position[entryCount];
+				for (var i = 0; i < entryCount; i++)
 				{
 					packet.GetDirection();
-					packet.GetPosition();
+					positions[i] = packet.GetPosition();
 					packet.GetFloat();
 					packet.GetFloat();
+				}
+
+				// The packet carries an entry per timeline line, so the director
+				// and every empty line are listed too.
+				var actorLines = track.Data.ActorLines;
+				if (actorLines != null && (actorLines.Length != track.Actors.Length || actorLines.Any(line => line < 0 || line >= entryCount)))
+				{
+					Log.Warning("CZ_DIRECTION_MOVE_STATE: Actor lines of track '{0}' don't match its {1} actors and {2} entries.", track.Id, track.Actors.Length, entryCount);
+					actorLines = null;
 				}
 
 				// Need to get all possible quest dialogs based on quest state
 				track.Frame = -2;
 				Send.ZC_NORMAL.SetTrackFrame(character, track.Frame);
-				if (entryCount - 2 != track.Actors.Length)
-				{
-					Log.Warning("CZ_DIRECTION_MOVE_STATE: Count mismatch {0} != {1}", entryCount - 2, track.Actors.Length);
-				}
-				foreach (var entity in track.Actors)
-				{
-					var direction = packet.GetDirection();
-					var position = packet.GetPosition();
-					var f1 = packet.GetFloat();
-					var f2 = packet.GetFloat();
 
-					//if (entity.Direction != Direction.South && position != Position.Zero)
-					//      entity.SetDirection(direction);
-					if (position != Position.Zero && entity is Character character1)
+				var leading = entryCount - track.Actors.Length;
+				for (var i = 0; i < track.Actors.Length; i++)
+				{
+					var line = actorLines?[i] ?? leading + i;
+					if (line < 0 || line >= entryCount)
+						continue;
+
+					var position = positions[line];
+					if (position != Position.Zero && track.Actors[i] is Character character1)
 					{
 						character1.SetPosition(position);
 						Send.ZC_SET_POS(character1);

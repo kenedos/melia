@@ -1034,7 +1034,7 @@ public class Farm472Sq040Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(79));
 
-		AddObjective("killCorrupted", L("Defeat Corrupted"), new KillObjective(1, "boss_Fallen_Statue_Q2") { LayerOnly = true });
+		AddObjective("collectWing", L("Defeat Corrupted"), new CollectItemObjective("FARM47_2_SQ_040_ITEM_1", 1));
 
 		AddPityDrop("FARM47_2_SQ_040_ITEM_1", 1.0f, 0, 1, "boss_Fallen_Statue_Q2");
 

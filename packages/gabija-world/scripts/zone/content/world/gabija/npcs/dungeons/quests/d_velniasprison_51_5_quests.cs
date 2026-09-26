@@ -493,7 +493,7 @@ public class Vprison515Mq02Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60023, QuestStatus.Completed));
 
-		AddObjective("collectTraces", L("Collect the traces of the metastasis"), new CollectItemObjective("VPRISON515_MQ_RUNE_EMPTY_ITEM", 8));
+		AddObjective("collectTraces", L("Collect the traces of the metastasis"), new CollectItemObjective("VPRISON515_MQ_RUNE_EMPTY_ITEM", 4));
 
 		AddPityDrop("VPRISON515_MQ_RUNE_EMPTY_ITEM", 0.75f, 3, 1, "Hohen_gulak", "Mushroom_boy_green", "Hohen_mage");
 
@@ -575,7 +575,7 @@ public class Vprison515Mq05Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60026, QuestStatus.Completed));
 
-		AddObjective("collectTokens", L("Collect the symbols of the condemned criminal"), new CollectItemObjective("VPRISON515_MQ_05_ITEM", 10));
+		AddObjective("collectTokens", L("Collect the symbols of the condemned criminal"), new CollectItemObjective("VPRISON515_MQ_05_ITEM", 5));
 
 		AddPityDrop("VPRISON515_MQ_05_ITEM", 1.0f, 0, 1, "Hohen_gulak", "Mushroom_boy_green", "Hohen_mage");
 

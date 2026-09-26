@@ -1578,8 +1578,8 @@ public class Underfortress66Sq010Quest : QuestScript
 		AddPrerequisite(new ItemPrerequisite("UNDERFORTRESS66_SQ_ITEM01"));
 		AddPrerequisite(new ItemPrerequisite("UNDERFORTRESS66_SQ_ITEM02"));
 
-		AddObjective("collectSeals", L("Get Ruklys' Army Seals"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM01", 6));
-		AddObjective("collectParchments", L("Get Ruklys' Army Parchments"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM02", 6));
+		AddObjective("collectSeals", L("Get Ruklys' Army Seals"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM01", 12));
+		AddObjective("collectParchments", L("Get Ruklys' Army Parchments"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM02", 12));
 
 		AddPityDrop("UNDERFORTRESS66_SQ_ITEM01", 0.8f, 3, 1, "Chafperor_mage_purple");
 		AddPityDrop("UNDERFORTRESS66_SQ_ITEM02", 0.8f, 3, 1, "ticen_mage_blue");

@@ -135,6 +135,16 @@ namespace Melia.Zone.Scripting
 			=> this.Data.EndDelay = endDelay;
 
 		/// <summary>
+		/// Sets the timeline line of each actor returned by OnStart, in order.
+		/// </summary>
+		/// <remarks>
+		/// Only needed when an empty timeline sits between two cast lines.
+		/// </remarks>
+		/// <param name="lines"></param>
+		protected void SetActorLines(params int[] lines)
+			=> this.Data.ActorLines = lines;
+
+		/// <summary>
 		/// Called when a character starts this track.
 		/// </summary>
 		/// <remarks>

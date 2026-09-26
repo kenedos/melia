@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -507,9 +508,11 @@ public class Act4Mine3EnterQuest : QuestScript
 		SetAutoTracked(true);
 		SetCancelable(true);
 
-		SetPhase(QuestStatus.Possible, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Check the Crystal Pillar in the Closed Area"));
-		SetPhase(QuestStatus.InProgress, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Collect Vubbe Magic Stones"));
-		SetPhase(QuestStatus.Success, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Insert Vubbe Magic Stones into the Crystal Wall"));
+		// The barrier stone is a wall, so the return warp uses the spot its track stands the player on.
+		var barrierFront = new Position(114.4157f, 183.9297f, -159.437f);
+		SetPhase(QuestStatus.Possible, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Check the Crystal Pillar in the Closed Area")).WarpPosition = barrierFront;
+		SetPhase(QuestStatus.InProgress, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Collect Vubbe Magic Stones")).WarpPosition = barrierFront;
+		SetPhase(QuestStatus.Success, "CMINE3_BOSSROOM_OPEN", "d_cmine_6", L("Insert Vubbe Magic Stones into the Crystal Wall")).WarpPosition = barrierFront;
 
 		SetTrack(QuestStatus.Success, QuestStatus.Completed, "ACT4_MINE3_ENTER_TRACK", 2000, autoStart: false);
 
@@ -517,7 +520,7 @@ public class Act4Mine3EnterQuest : QuestScript
 
 		AddPityDrop("D_Bube_Mane", 1.0f, 0, 1, "bubbe_mage_priest", "GoblinWarrior");
 
-		AddObjective("collectStones", L("Defeat Vubbes and obtain Vubbe Magic Stones"), new CollectItemObjective("D_Bube_Mane", 10));
+		AddObjective("collectStones", L("Defeat Vubbes and obtain Vubbe Magic Stones"), new CollectItemObjective("D_Bube_Mane", 5));
 
 		AddReward(new ItemReward("expCard2", 1));
 		AddReward(new TakeItemReward("D_Bube_Mane"));

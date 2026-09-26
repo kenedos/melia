@@ -956,7 +956,7 @@ public class Prison79Mq5Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30157, QuestStatus.Completed));
 
-		AddObjective("collectOil", L("Obtain Oil for the Blue Lamp from the nearby Oil Pouch"), new CollectItemObjective("PRISON_79_MQ_5_ITEM", 7));
+		AddObjective("collectOil", L("Obtain Oil for the Blue Lamp from the nearby Oil Pouch"), new CollectItemObjective("PRISON_79_MQ_5_ITEM", 5));
 
 		AddReward(new ItemReward("expCard12", 2));
 		AddReward(new ItemReward("Vis", 8260));

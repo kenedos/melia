@@ -849,7 +849,8 @@ public class Gele573Hq02Quest : QuestScript
 		// The gate was a script with no recoverable logic; the level band stands in.
 		AddPrerequisite(new LevelPrerequisite(98));
 
-		AddObjective("killChapparition", L("Defeat spooky Chapparition"), new KillObjective(1, "F_boss_Chapparition"));
+		// Deviation: the client row names boss_Chapparition_Q5, which the 2016 world lacks, so this uses boss_Chapparition.
+		AddObjective("killChapparition", L("Defeat spooky Chapparition"), new KillObjective(1, "boss_Chapparition"));
 	}
 }
 

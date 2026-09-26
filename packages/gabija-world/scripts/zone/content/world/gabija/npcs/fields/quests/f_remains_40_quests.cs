@@ -1041,7 +1041,7 @@ public class Remains40Sq05Quest : QuestScript
 
 		AddPityDrop("REMAINS40_SQ_05_ITEM", 1.0f, 0, 1, "Big_Cockatries");
 
-		AddObjective("collectTails", L("Collect Cockat tails"), new CollectItemObjective("REMAINS40_SQ_05_ITEM", 2));
+		AddObjective("collectTails", L("Collect Cockat tails"), new CollectItemObjective("REMAINS40_SQ_05_ITEM", 1));
 
 		AddReward(new ItemReward("expCard6", 2));
 		AddReward(new TakeItemReward("REMAINS40_SQ_05_ITEM"));

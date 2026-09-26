@@ -21,6 +21,7 @@ public class Mine3Boss2BossTrack : TrackScript
 	protected override void Load()
 	{
 		SetId("MINE_3_BOSS_2boss");
+		SetActorLines(2, 3, 5);
 	}
 
 	public override IActor[] OnStart(Character character, Track track)

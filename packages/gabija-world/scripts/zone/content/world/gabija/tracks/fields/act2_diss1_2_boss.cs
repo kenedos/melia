@@ -20,6 +20,7 @@ public class Act2Diss1_2BossTrack : TrackScript
 	protected override void Load()
 	{
 		SetId("ACT2_DISS1_2_BOSS_TRACK");
+		SetActorLines(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17);
 	}
 
 	public override IActor[] OnStart(Character character, Track track)

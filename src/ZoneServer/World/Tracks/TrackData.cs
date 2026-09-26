@@ -18,5 +18,6 @@ namespace Melia.Zone.World.Tracks
 		public QuestStatus OriginalQuestStatus { get; set; } = QuestStatus.Possible;
 		public QuestStatus OnCompleteQuestStatus { get; set; }
 		public QuestStatus OnStartQuestStatus { get; set; }
+		public int[] ActorLines { get; set; }
 	}
 }

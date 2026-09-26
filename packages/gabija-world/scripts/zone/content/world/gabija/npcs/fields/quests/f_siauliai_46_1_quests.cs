@@ -582,7 +582,7 @@ public class Siauliai461Mq01Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(16440, QuestStatus.Completed));
 
-		AddObjective("collectFragments", L("Retrieve the Fragmented Symbol of Austeja"), new CollectItemObjective("SIAULIAI_46_1_MQ_01_ITEM", 10));
+		AddObjective("collectFragments", L("Retrieve the Fragmented Symbol of Austeja"), new CollectItemObjective("SIAULIAI_46_1_MQ_01_ITEM", 8));
 
 		AddPityDrop("SIAULIAI_46_1_MQ_01_ITEM", 0.5f, 4, 1, "infro_Blud", "Shardstatue", "Siaulav");
 

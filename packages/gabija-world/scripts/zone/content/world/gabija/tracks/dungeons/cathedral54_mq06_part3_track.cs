@@ -23,6 +23,7 @@ public class Cathedral54Mq06Part3Track : TrackScript
 	protected override void Load()
 	{
 		SetId("CHATHEDRAL54_MQ06_PART3_TRACK");
+		SetActorLines(2, 4, 5, 6, 7, 8);
 	}
 
 	public override IActor[] OnStart(Character character, Track track)

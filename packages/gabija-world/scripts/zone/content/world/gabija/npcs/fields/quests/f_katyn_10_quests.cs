@@ -1007,7 +1007,7 @@ public class Katyn10Mq05Quest : QuestScript
 
 		AddPityDrop("KATYN_10_MQ_05_ITEM", 0.25f, 8, 1, "digo", "VelStool", "kodomor_purple", "eldigo", "beeteros_blue", "Spector_gh_red", "truffle_blue");
 
-		AddObjective("collectFragments", L("Retrieve Karolis Altar Fragment from the monsters by using the Guide Owl's Will"), new CollectItemObjective("KATYN_10_MQ_05_ITEM", 10));
+		AddObjective("collectFragments", L("Retrieve Karolis Altar Fragment from the monsters by using the Guide Owl's Will"), new CollectItemObjective("KATYN_10_MQ_05_ITEM", 5));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("Vis", 300));
