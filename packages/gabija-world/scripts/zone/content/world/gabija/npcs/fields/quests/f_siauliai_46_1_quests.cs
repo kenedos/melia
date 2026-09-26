@@ -332,7 +332,7 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 
 				character.Inventory.RemoveItem(ItemId.SIAULIAI_46_1_MQ_01_ITEM, FragmentsNeeded);
 				character.Inventory.Add(ItemId.SIAULIAI_46_1_MQ_02_ITEM, 1, InventoryAddType.PickUp);
-				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Symbol of Goddess Austeja has been restored!"));
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Symbol of Goddess Austeja has been restored!"), 5);
 				return;
 			}
 

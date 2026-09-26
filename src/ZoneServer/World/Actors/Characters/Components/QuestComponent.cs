@@ -285,7 +285,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 					quest.UpdateObjectives(updater);
 
-					if (quest.ChangesOnLastUpdate)
+					if (quest.ChangesOnLastUpdate && quest.Status != QuestStatus.Completed)
 					{
 						this.UpdateUnlock(quest);
 
@@ -1117,6 +1117,9 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				{
 					if (quest.Data.Id.Value != questId)
 						continue;
+
+					if (quest.Status == QuestStatus.Completed)
+						break;
 
 					quest.Status = status;
 

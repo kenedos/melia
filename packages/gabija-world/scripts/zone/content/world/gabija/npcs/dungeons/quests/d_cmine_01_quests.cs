@@ -403,7 +403,7 @@ public class DCmine01QuestNpcsScript : GeneralScript
 
 		character.Quests.CompleteObjective(Alchemist, "repairPurifiers");
 		character.Quests.Complete(Alchemist);
-		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("All the purifiers on 1F have been repaired!{nl}Go down to the 2nd floor and repair its purifiers!"));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("All the purifiers on 1F have been repaired!{nl}Go down to the 2nd floor and repair its purifiers!"), 10);
 
 		if (!character.Quests.Has(Mine2Alchemist) && character.Quests.MeetsPrerequisites(Mine2Alchemist))
 		{
@@ -535,7 +535,7 @@ public class Mine1Crystal9Quest : QuestScript
 	public override void OnStart(Character character, Quest quest)
 	{
 		base.OnStart(character, quest);
-		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 4{nl}Go to District 4 and look for the spare part"));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 4{nl}Go to District 4 and look for the spare part"), 10);
 	}
 }
 
@@ -630,7 +630,7 @@ public class Mine1Crystal18Quest : QuestScript
 	public override void OnStart(Character character, Quest quest)
 	{
 		base.OnStart(character, quest);
-		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 6{nl}Go to District 6 and look for the part"));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Mine Compass is pointing at District 6{nl}Go to District 6 and look for the part"), 10);
 	}
 
 	public override void OnSuccess(Character character, Quest quest)

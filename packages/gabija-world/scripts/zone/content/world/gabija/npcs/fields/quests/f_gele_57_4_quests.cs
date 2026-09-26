@@ -354,8 +354,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Fortunately, the entrance to the basement looks secure."));
 				await dialog.CompleteQuest(Mq09);
 				character.LookAround();
-				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The 1st floor of the Tenet Church has been sealed by Gesti's powers."));
-				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Find the way up to the first floor through the basement!"));
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The 1st floor of the Tenet Church has been sealed by Gesti's powers.{nl}Find the way up to the first floor through the basement!"), 10);
 				return;
 			}
 
