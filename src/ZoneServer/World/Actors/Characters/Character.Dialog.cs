@@ -54,17 +54,6 @@ namespace Melia.Zone.World.Actors.Characters
 		}
 
 		/// <summary>
-		/// Sends the states of the map's highlighted NPCs to the client
-		/// one by one, as the client's list packet deletes the map's
-		/// quest markers.
-		/// </summary>
-		public void UpdateClient_NpcStates()
-		{
-			foreach (var npc in this.Map.GetNpcs(a => a.State == NpcState.Highlighted))
-				Send.ZC_SET_NPC_STATE(this.Connection, npc, (short)npc.State);
-		}
-
-		/// <summary>
 		/// Set a map-specific NPC state.
 		/// </summary>
 		public void SetMapNPCState(Npc npc, NpcState state)

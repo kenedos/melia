@@ -9,6 +9,7 @@ using Melia.Shared.Game.Properties;
 using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
+using Melia.Zone.Network.Helpers;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Maps;
@@ -41,9 +42,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		private readonly static TimeSpan LocationCheckInterval = TimeSpan.FromSeconds(1);
 
 		private const int MaxMarkScriptLength = 1500;
-
-		private Dictionary<string, (QuestMarkType Type, QuestType QuestType, string Icon)> _questMarkTypes = new();
-		private string _questMarkMapClassName;
 
 		// The distance the client's own return warp puts the player in front of the NPC.
 		private const float ReturnWarpNpcDistance = 20;
@@ -1201,7 +1199,6 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			}
 
 			this.UpdateClient_NotifyQuests();
-			this.UpdateClient_QuestMarks();
 		}
 
 		/// <summary>
@@ -1247,8 +1244,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.UpdateClient_AddQuestSessionObject(quest);
 
-			this.UpdateClient_QuestMarks();
 			this.UpdateClient_QuestStatusProperty(quest);
+			this.UpdateClient_QuestMarks();
 
 			//Log.Debug(lua);
 		}
@@ -1270,8 +1267,8 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			var lua = "Melia.Quests.Update(" + questTable.Serialize() + ")";
 			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua);
 
-			this.UpdateClient_QuestMarks();
 			this.UpdateClient_QuestStatusProperty(quest);
+			this.UpdateClient_QuestMarks();
 
 			//Log.Debug(lua);
 
@@ -1336,62 +1333,26 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				AddMarkType(marks, phase.NpcUniqueName, markType, quest.Data.Type, GetMarkIcon(markType, quest.Data.Type));
 			}
 
-			if (_questMarkMapClassName != map.ClassName)
-			{
-				_questMarkTypes.Clear();
-				_questMarkMapClassName = map.ClassName;
-			}
+			var npcs = map.GetNpcs(a => a.Id != MonsterId.HiddenTrigger && a.UniqueName != null && marks.ContainsKey(a.UniqueName));
 
-			var npcs = map.GetNpcs(a => a.Id != MonsterId.HiddenTrigger && a.UniqueName != null
-				&& (marks.ContainsKey(a.UniqueName) || _questMarkTypes.ContainsKey(a.UniqueName)));
-
-			var lua = new StringBuilder();
+			var entries = new StringBuilder();
+			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Begin()");
 
 			foreach (var npc in npcs)
 			{
-				marks.TryGetValue(npc.UniqueName, out var mark);
+				entries.Append($"[\"{npc.GetClientDialogName()}\"]=\"{marks[npc.UniqueName].Icon}\",");
 
-				var icon = this.IsMarkNpcShown(npc) ? mark.Icon : null;
-				var call = $"quest.QuestUpdate(\"{GetMarkEventName(map, npc)}\",\"{icon ?? "None"}\")\n";
-
-				if (lua.Length + call.Length > MaxMarkScriptLength)
+				if (entries.Length > MaxMarkScriptLength)
 				{
-					Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua.ToString());
-					lua.Clear();
+					Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Add({" + entries + "})");
+					entries.Clear();
 				}
-
-				lua.Append(call);
 			}
 
-			if (lua.Length > 0)
-				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, lua.ToString());
+			if (entries.Length > 0)
+				Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Add({" + entries + "})");
 
-			_questMarkTypes = marks;
-		}
-
-		/// <summary>
-		/// Returns the name of the client's map event that carries the
-		/// NPC's marker, which the client builds from the map and the
-		/// event's file name.
-		/// </summary>
-		/// <param name="map"></param>
-		/// <param name="npc"></param>
-		/// <returns></returns>
-		private static string GetMarkEventName(Map map, MonsterInName npc)
-			=> map.ClassName + "_" + npc.UniqueName.ToLowerInvariant();
-
-		/// <summary>
-		/// Returns true if the NPC is on the character's client, as its
-		/// marker is drawn at a fixed spot rather than on the NPC.
-		/// </summary>
-		/// <param name="npc"></param>
-		/// <returns></returns>
-		private bool IsMarkNpcShown(MonsterInName npc)
-		{
-			if (npc is Npc conditionalNpc && conditionalNpc.VisibleTo != null && !conditionalNpc.VisibleTo(this.Character))
-				return false;
-
-			return this.Character.GetMapNPCState(npc) != NpcState.Invisible;
+			Send.ZC_EXEC_CLIENT_SCP(this.Character.Connection, "Melia.QuestMarks.Commit()");
 		}
 
 		/// <summary>
