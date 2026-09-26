@@ -55,7 +55,6 @@ end)
 Melia.Hook("MAP_OPEN", function(original, result, frame)
 
     local imgMap = GET_CHILD_RECURSIVELY(frame, "map")
-    imgMap:GetChild("mapRank"):ShowWindow(0)
     imgMap:GetChild("monlv"):ShowWindow(0)
 
 	return result

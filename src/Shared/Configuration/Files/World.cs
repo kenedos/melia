@@ -41,6 +41,7 @@ namespace Melia.Shared.Configuration.Files
 		public int TrashLootGraceSeconds { get; protected set; }
 		public int TrashLootGraceMaxSeconds { get; protected set; }
 		public int TrashLootGraceDecaySeconds { get; protected set; }
+		public bool MapDeathPenalty { get; protected set; }
 
 		// exp.conf
 		public float ExpRate { get; protected set; }
@@ -344,6 +345,7 @@ namespace Melia.Shared.Configuration.Files
 			this.TrashLootGraceSeconds = this.GetInt("trash_loot_grace_time", 60);
 			this.TrashLootGraceMaxSeconds = this.GetInt("trash_loot_grace_max_time", 3840);
 			this.TrashLootGraceDecaySeconds = this.GetInt("trash_loot_grace_decay_time", 86400);
+			this.MapDeathPenalty = this.GetBool("map_death_penalty", false);
 
 			this.StorageFee = this.GetInt("storage_fee", 20);
 			this.StorageExtCost = this.GetInt("storage_ext_cost", 20);

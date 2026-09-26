@@ -114,6 +114,12 @@ public class WorldMapClientScript : ClientScript
 		ZoneServer.Instance.IesMods.Add("worldmap2_data", 205, "Name", "White Tree Forest"); // sub_episode5
 		ZoneServer.Instance.IesMods.Add("worldmap2_data", 206, "Name", "Nicopolis"); // sub_episode6
 		ZoneServer.Instance.IesMods.Add("worldmap2_data", 207, "Name", "Memorial"); // sub_episode7
+
+		foreach (var rankData in ZoneServer.Instance.Data.MapRankDb.Entries.Values)
+		{
+			if (ZoneServer.Instance.Data.MapDb.TryFind(rankData.MapClassName, out var mapData))
+				ZoneServer.Instance.IesMods.Add("Map", mapData.Id, "MapRank", rankData.Rank);
+		}
 	}
 
 	private void SendIcons(Character character)

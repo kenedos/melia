@@ -53,6 +53,7 @@ namespace Melia.Shared.Data
 		public JobDb JobDb { get; } = new JobDb();
 		public MapDb MapDb { get; } = new MapDb();
 		public MapBonusDropsDb MapBonusDropsDb { get; }
+		public MapRankDb MapRankDb { get; } = new MapRankDb();
 		public MonsterDb MonsterDb { get; } = new MonsterDb();
 
 		public MonsterIconDb MonsterIconDb { get; } = new MonsterIconDb();

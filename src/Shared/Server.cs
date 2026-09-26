@@ -347,6 +347,7 @@ namespace Melia.Shared
 
 					this.LoadDb(this.Data.GlobalDropDb, "db/global_drops.txt");
 					this.LoadDb(this.Data.MapBonusDropsDb, "db/map_bonus_drops.txt");
+					this.LoadDb(this.Data.MapRankDb, "db/map_ranks.txt", true);
 					this.LoadDb(this.Data.TreasureDropDb, "db/treasure_drops.txt");
 					this.LoadDb(this.Data.TreasureSpawnPointDb, "db/treasure_spawn_points.txt");
 					this.LoadDb(this.Data.MinigameSpawnPointDb, "db/minigame_spawn_points.txt");
@@ -438,6 +439,7 @@ namespace Melia.Shared
 
 					this.LoadDb(this.Data.GlobalDropDb, "db/global_drops.txt");
 					this.LoadDb(this.Data.MapBonusDropsDb, "db/map_bonus_drops.txt");
+					this.LoadDb(this.Data.MapRankDb, "db/map_ranks.txt", true);
 					this.LoadDb(this.Data.TreasureDropDb, "db/treasure_drops.txt");
 					this.LoadDb(this.Data.TreasureSpawnPointDb, "db/treasure_spawn_points.txt");
 					this.LoadDb(this.Data.MinigameSpawnPointDb, "db/minigame_spawn_points.txt");
@@ -505,17 +507,18 @@ namespace Melia.Shared
 			}
 
 			// --- Load Base (System) Data ---
-			if (!File.Exists(systemPathToLoad))
+			if (File.Exists(systemPathToLoad))
+			{
+				db.LoadFile(systemPathToLoad);
+				foreach (var ex in db.GetWarnings())
+					Log.Warning(ex);
+			}
+			else if (!isOptional)
 			{
 				Log.Error("LoadDb: Base data file '{0}' not found.", systemPathToLoad);
-				if (!isOptional)
-					ConsoleUtil.Exit(1);
+				ConsoleUtil.Exit(1);
 				return;
 			}
-
-			db.LoadFile(systemPathToLoad);
-			foreach (var ex in db.GetWarnings())
-				Log.Warning(ex);
 
 			var isIndexedDb = db.GetType().Name.Contains("Indexed") || db.GetType().BaseType?.Name.Contains("Indexed") == true;
 
