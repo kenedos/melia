@@ -592,7 +592,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				if (newShield == 0)
 					_shieldBreakTime = GameClock.Now;
 
-				Send.ZC_UPDATE_SHIELD(this, newShield, 0);
+				this.SendShieldUpdate(newShield);
 			}
 		}
 
@@ -612,7 +612,7 @@ namespace Melia.Zone.World.Actors.Monsters
 				_shieldBreakTime = DateTime.MinValue;
 				this.Shield = this.MaxShield;
 
-				Send.ZC_UPDATE_SHIELD(this, this.Shield, 0);
+				this.SendShieldUpdate(this.Shield);
 			}
 		}
 
@@ -634,8 +634,21 @@ namespace Melia.Zone.World.Actors.Monsters
 				var newShield = Math.Min(maxShield, shield + Math.Max(1, (int)(maxShield * ShieldRegenRate)));
 				this.Shield = newShield;
 
-				Send.ZC_UPDATE_SHIELD(this, newShield, 0);
+				this.SendShieldUpdate(newShield);
 			}
+		}
+
+		/// <summary>
+		/// Sends the shield value to nearby clients, refreshing the boss
+		/// target gauge for boss monsters.
+		/// </summary>
+		/// <param name="shield"></param>
+		private void SendShieldUpdate(int shield)
+		{
+			// The client writes a refreshed value into the target gauge without checking the current target.
+			var refreshTargetGauge = this.Rank == MonsterRank.Boss ? (byte)1 : (byte)0;
+
+			Send.ZC_UPDATE_SHIELD(this, shield, refreshTargetGauge);
 		}
 
 		/// <summary>

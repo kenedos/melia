@@ -145,7 +145,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x6B, true, this.Character.Name);
-			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, track.Actors);
+			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, track.Actors, track.Data.ActorLines);
 
 			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
 
@@ -278,7 +278,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			Send.ZC_NORMAL.SetupCutscene(this.Character, true, false, true);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x77, true, track.Id);
 			Send.ZC_NORMAL.LoadCutscene(this.Character, 0x6B, true, this.Character.Name);
-			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, actors);
+			Send.ZC_NORMAL.StartCutscene(this.Character, track.Id, actors, track.Data.ActorLines);
 
 			this.TrackStarted?.Invoke(this.Character, this.ActiveTrack);
 

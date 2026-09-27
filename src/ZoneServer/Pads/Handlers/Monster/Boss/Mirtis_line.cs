@@ -22,6 +22,9 @@ namespace Melia.Zone.Pads.Handlers
 		private const float SpinDegreesPerUpdate = SpinRate * (180f / MathF.PI) * (UpdateTermMs / 1000f);
 		private const float BackstopLifeTimeMs = 30000f;
 
+		// The client draws the laser 45° off the pad's direction.
+		private const float AreaAngleOffset = 45f;
+
 		public void Created(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
@@ -66,7 +69,7 @@ namespace Melia.Zone.Pads.Handlers
 		/// <param name="pad"></param>
 		private static void SetLineArea(Pad pad)
 		{
-			pad.Area = Square.Centered(pad.Position, pad.Direction, Range * 2, HalfWidth);
+			pad.Area = Square.Centered(pad.Position, pad.Direction.AddDegreeAngle(AreaAngleOffset), Range * 2, HalfWidth);
 			pad.Trigger.Area = pad.Area;
 		}
 	}

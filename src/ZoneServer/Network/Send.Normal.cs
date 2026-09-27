@@ -2288,18 +2288,39 @@ namespace Melia.Zone.Network
 			/// <param name="character"></param>
 			/// <param name="trackName"></param>
 			/// <param name="actors"></param>
-			public static void StartCutscene(Character character, string trackName, params IActor[] actors)
+			/// <param name="actorLines">The timeline line of each actor, or null if the cast starts at line 2 without gaps.</param>
+			public static void StartCutscene(Character character, string trackName, IActor[] actors, int[] actorLines = null)
 			{
 				using var packet = Packet.Rent(Op.ZC_NORMAL);
 				packet.PutSubOp(NormalOpType.Zone, NormalOp.Zone.CutsceneTrack);
 
 				packet.PutLpString(trackName);
 				packet.PutLong(1);
-				packet.PutInt(actors.Length + 2);
-				packet.PutInt(0);
-				packet.PutInt(0);
-				for (var i = 0; i < actors.Length; i++)
-					packet.PutInt(actors[i].Handle);
+
+				// The client assigns the list's element N to timeline line N.
+				if (actorLines != null && actorLines.Length == actors.Length)
+				{
+					var lineCount = 0;
+					foreach (var line in actorLines)
+						lineCount = Math.Max(lineCount, line + 1);
+
+					var handles = new int[lineCount];
+					for (var i = 0; i < actors.Length; i++)
+						handles[actorLines[i]] = actors[i].Handle;
+
+					packet.PutInt(handles.Length);
+					foreach (var handle in handles)
+						packet.PutInt(handle);
+				}
+				else
+				{
+					packet.PutInt(actors.Length + 2);
+					packet.PutInt(0);
+					packet.PutInt(0);
+					for (var i = 0; i < actors.Length; i++)
+						packet.PutInt(actors[i].Handle);
+				}
+
 				packet.PutInt(1);
 				packet.PutInt(character.Handle);
 

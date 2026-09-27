@@ -3595,11 +3595,11 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Updates "shield" (?) for actor on nearby clients.
+		/// Updates the shield value of the actor.
 		/// </summary>
 		/// <param name="actor"></param>
 		/// <param name="shield"></param>
-		public static void ZC_UPDATE_SHIELD(IActor actor, long shield, byte b1 = 1)
+		public static void ZC_UPDATE_SHIELD(IActor actor, long shield, byte refreshTargetGauge = 1)
 		{
 			using var packet = Packet.Rent(Op.ZC_UPDATE_SHIELD);
 
@@ -3608,7 +3608,7 @@ namespace Melia.Zone.Network
 			if (Versions.Client > KnownVersions.PreReBuild)
 			{
 				packet.PutLong(shield);
-				packet.PutByte(b1);
+				packet.PutByte(refreshTargetGauge);
 			}
 			else if (Versions.Client > KnownVersions.ClosedBeta1 && Versions.Client <= KnownVersions.PreReBuild)
 			{
@@ -3621,11 +3621,11 @@ namespace Melia.Zone.Network
 		}
 
 		/// <summary>
-		/// Updates "shield" (?) for actor on nearby clients.
+		/// Updates the shield value of the actor.
 		/// </summary>
 		/// <param name="actor"></param>
 		/// <param name="shield"></param>
-		public static void ZC_UPDATE_SHIELD(IZoneConnection conn, IActor actor, long shield, byte b1 = 0)
+		public static void ZC_UPDATE_SHIELD(IZoneConnection conn, IActor actor, long shield, byte refreshTargetGauge = 0)
 		{
 			using var packet = Packet.Rent(Op.ZC_UPDATE_SHIELD);
 
@@ -3634,7 +3634,7 @@ namespace Melia.Zone.Network
 			if (Versions.Client > KnownVersions.PreReBuild)
 			{
 				packet.PutLong(shield);
-				packet.PutByte(b1);
+				packet.PutByte(refreshTargetGauge);
 			}
 			else if (Versions.Client > KnownVersions.ClosedBeta1 && Versions.Client <= KnownVersions.PreReBuild)
 			{

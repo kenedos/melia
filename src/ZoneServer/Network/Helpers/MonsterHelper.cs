@@ -38,8 +38,7 @@ namespace Melia.Zone.Network.Helpers
 			packet.PutInt(monster.MaxHp);
 			if (Versions.Protocol > 500)
 			{
-				packet.PutInt(monster.Shield);
-				packet.PutInt(monster.MaxShield);
+				packet.PutLong(monster.Shield);
 			}
 			else if (Versions.Client >= KnownVersions.OpenBeta)
 			{
