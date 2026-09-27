@@ -61,11 +61,9 @@ typedef struct
             byte b1;
             break;
     
-        // Part of many packets. Weirdly, the float
-        // is often times negative, but it is always
-        // a valid float.
+        // Negative; a magnitude above the target's stored shield zeroes it on the client.
         case 3:
-            float f1;
+            float shieldDamage;
             break;
     }
 }

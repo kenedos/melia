@@ -80,12 +80,11 @@ namespace Melia.Zone.Network.Helpers
 					}
 				}
 
-				// The purpose of type 3 is unknown, usually comes with a
-				// negative float.
+				// Type 3 is a negative shield damage; the client zeroes the target's shield when it exceeds it, 0 skips that.
 				if (skillHitInfo.VarInfoCount >= 2)
 				{
 					packet.PutByte(3);
-					packet.PutFloat(-1845);
+					packet.PutFloat(0);
 				}
 			}
 		}
