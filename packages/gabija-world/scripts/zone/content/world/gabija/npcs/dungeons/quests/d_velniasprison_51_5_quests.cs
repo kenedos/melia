@@ -6,12 +6,17 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Shared.World;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -26,6 +31,12 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq03 = new QuestId(60025);
 	private readonly static QuestId Mq04 = new QuestId(60026);
 	private readonly static QuestId Mq05 = new QuestId(60027);
+
+	private const string RuneMarkVar = "Gabija.Quests.Vprison515.RuneMark";
+	private readonly static Position LankineDistrict = new Position(-776, 67, 634);
+	private readonly static Position IshisulaDistrict = new Position(724, -66, 609);
+	private readonly static Position HehmastarDistrict = new Position(326, -65, -707);
+	private readonly static string[] RuneDemons = { "Hohen_gulak", "Mushroom_boy_green", "Hohen_mage" };
 	private readonly static QuestId Mq06 = new QuestId(60028);
 	private readonly static QuestId Mq07 = new QuestId(60042);
 	private readonly static QuestId Sq01 = new QuestId(60039);
@@ -362,10 +373,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
-			{
-				character.Quests.CompleteObjective(Mq03, "suppressLankine");
-				character.ServerMessage(L("The rune takes the demons of Lankine. Report it to Vakarine."));
-			}
+				character.ServerMessage(L("Demons gather in the Lankine Separation District. Use the Evening Star Rune on one of them."));
 
 			await Task.CompletedTask;
 		});
@@ -377,10 +385,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
-			{
-				character.Quests.CompleteObjective(Mq04, "suppressIshisula");
-				character.ServerMessage(L("The rune takes the demons of Ishisula. Report it to Vakarine."));
-			}
+				character.ServerMessage(L("Demons gather in the Ishisula Broken District. Use the Evening Star Rune on one of them."));
 
 			await Task.CompletedTask;
 		});
@@ -439,6 +444,79 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 		}
 
 		await dialog.Msg(L("The cracks Sigita named are shut. Go back and tell her."));
+	}
+
+	/// <summary>
+	/// Suppresses a nearby demon with the power of the Evening Star Rune.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_VPRISON515_MQ_RUNE_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_velniasprison_51_5" || character.Layer != 0)
+		{
+			character.ServerMessage(L("The rune does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		Position district;
+		float range;
+		if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
+			(district, range) = (LankineDistrict, 450);
+		else if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
+			(district, range) = (IshisulaDistrict, 500);
+		else if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
+			(district, range) = (HehmastarDistrict, 650);
+		else
+		{
+			character.ServerMessage(L("The rune does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var demon = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => RuneDemons.Contains(mob.Data.ClassName, StringComparer.OrdinalIgnoreCase) && !mob.Vars.Has(RuneMarkVar));
+
+		if (demon == null || character.Position.Get2DDistance(district) >= range)
+		{
+			character.ServerMessage(L("Use the rune on the demons gathered where Vakarine sent you."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		demon.PlayEffect("F_light018_yellow", 1f);
+
+		if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
+		{
+			character.Quests.CompleteObjective(Mq03, "suppressLankine");
+			character.ServerMessage(L("The rune takes the demons of Lankine. Report it to Vakarine."));
+		}
+		else if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
+		{
+			character.Quests.CompleteObjective(Mq04, "suppressIshisula");
+			character.ServerMessage(L("The rune takes the demons of Ishisula. Report it to Vakarine."));
+		}
+		else
+		{
+			demon.Vars.SetLong(RuneMarkVar, character.ObjectId);
+			character.ServerMessage(L("The rune binds the demon. Defeat it to take its Sealing Token."));
+		}
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Drops a Sealing Token from the demons the rune has bound.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || !mob.Vars.TryGetLong(RuneMarkVar, out var binderId))
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || character.ObjectId != binderId || !character.Quests.IsActive(Mq05) || character.Quests.IsCompletable(Mq05))
+			return;
+
+		character.Inventory.Add(ItemId.VPRISON515_MQ_05_ITEM, 1, InventoryAddType.PickUp);
 	}
 }
 
@@ -577,7 +655,6 @@ public class Vprison515Mq05Quest : QuestScript
 
 		AddObjective("collectTokens", L("Collect the symbols of the condemned criminal"), new CollectItemObjective("VPRISON515_MQ_05_ITEM", 5));
 
-		AddPityDrop("VPRISON515_MQ_05_ITEM", 1.0f, 0, 1, "Hohen_gulak", "Mushroom_boy_green", "Hohen_mage");
 
 		AddReward(new ItemReward("expCard9", 2));
 		AddReward(new TakeItemReward("VPRISON515_MQ_05_ITEM"));

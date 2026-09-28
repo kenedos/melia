@@ -6,12 +6,16 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -28,6 +32,8 @@ public class FRokas31QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sub01 = new QuestId(19370);
 	private readonly static QuestId Sub02 = new QuestId(19380);
 	private readonly static QuestId Sub03 = new QuestId(19390);
+
+	private const string NecklaceCarrierVar = "Gabija.Quests.Rokas31Sub03.NecklaceCarrier";
 	private readonly static QuestId Rp1 = new QuestId(60169);
 
 	protected override void Load()
@@ -377,6 +383,51 @@ public class FRokas31QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 	}
+
+	/// <summary>
+	/// Reads the Security Guard's scroll over a Hogma Captain, making the one carrying the necklace shine.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_ROKAS31_SUB_03_SCROLL(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_rokas_31" || !character.Quests.IsActive(Sub03) || character.Quests.IsCompletable(Sub03))
+		{
+			character.ServerMessage(L("The scroll does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var captain = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => mob.Data.ClassName == "warleader_hogma" && !mob.Vars.Has(NecklaceCarrierVar));
+
+		if (captain == null)
+		{
+			character.ServerMessage(L("There is no Hogma Captain to use the scroll on."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		captain.Vars.SetLong(NecklaceCarrierVar, character.ObjectId);
+		captain.PlayEffect("F_light018_yellow", 1f);
+		character.ServerMessage(L("The Hogma Captain's body shines. It is carrying the necklace!"));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Drops the necklace from the Hogma Captain the scroll marked.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || !mob.Vars.TryGetLong(NecklaceCarrierVar, out var markerId))
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || character.ObjectId != markerId || !character.Quests.IsActive(Sub03) || character.Quests.IsCompletable(Sub03))
+			return;
+
+		character.Inventory.Add(ItemId.ROKAS31_SUB_03_CERT, 1, InventoryAddType.PickUp);
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -578,8 +629,6 @@ public class Rokas31Sub03Quest : QuestScript
 		SetPhase(QuestStatus.Success, "ROKAS31_SUB", "f_rokas_31", L("Bring the necklace"), L("Found the necklace the Security Guard was looking for. Bring it to the Security Guard."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(19380, QuestStatus.Completed));
-
-		AddPityDrop("ROKAS31_SUB_03_CERT", 1.0f, 0, 1, "warleader_hogma");
 
 		AddObjective("takeNecklace", L("Obtain the Shabby-Looking Necklace"), new CollectItemObjective("ROKAS31_SUB_03_CERT", 1));
 

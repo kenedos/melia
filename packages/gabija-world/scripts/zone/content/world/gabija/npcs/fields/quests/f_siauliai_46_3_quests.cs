@@ -6,6 +6,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
@@ -506,12 +507,38 @@ public class FSiauliai463QuestNpcsScript : GeneralScript
 			return;
 
 		if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
-		{
-			character.Quests.CompleteObjective(Mq02, "testTheScent");
-			character.ServerMessage(L("The monsters walk straight past the comb. Tell Maras."));
-		}
+			character.ServerMessage(L("Monsters roam this farm. Use the Sweet Honeycomb Piece near one of them."));
 
 		await Task.CompletedTask;
+	}
+
+	/// <summary>
+	/// Spreads the honeycomb's fragrance at a nearby monster to see how it reacts.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_SIAULIAI_46_3_MQ_01_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_siauliai_46_3" || character.Layer != 0 || !character.Quests.IsActive(Mq02) || character.Quests.IsCompletable(Mq02))
+		{
+			character.ServerMessage(L("There is no need to use the honeycomb now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var monster = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => mob.Faction == FactionType.Monster);
+
+		if (monster == null)
+		{
+			character.ServerMessage(L("Use the honeycomb close to a monster."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.ServerMessage(L("The monster shows no particular reaction."));
+		character.Quests.CompleteObjective(Mq02, "testTheScent");
+		character.ServerMessage(L("The monsters are not after the honey. Tell Maras."));
+
+		return ItemUseResult.OkayNotConsumed;
 	}
 
 	/// <summary>

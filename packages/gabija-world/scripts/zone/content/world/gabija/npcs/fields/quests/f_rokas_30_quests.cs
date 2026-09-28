@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -38,6 +39,17 @@ public class FRokas30QuestNpcsScript : GeneralScript
 	private readonly static QuestId Pipoti3 = new QuestId(1055);
 	private readonly static QuestId Pipoti4 = new QuestId(1056);
 	private readonly static QuestId Pipoti5 = new QuestId(1057);
+
+	private readonly static Position Epitaph = new Position(-484.46f, 617.14f, -2083.19f);
+
+	private readonly static QuestId[] PipotiMarkQuests = { Pipoti2, Pipoti3, Pipoti4, Pipoti5 };
+	private readonly static Position[] PipotiMarks =
+	{
+		new Position(359f, 0, 1078f),
+		new Position(-220.82f, 0, 716.85f),
+		new Position(34.87f, 0, -311.34f),
+		new Position(-1491.98f, 0, -416.77f),
+	};
 
 	protected override void Load()
 	{
@@ -816,14 +828,86 @@ public class FRokas30QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Hq01) && !character.Quests.IsCompletable(Hq01))
-			{
-				character.Quests.CompleteObjective(Hq01, "burnOration");
-				character.Inventory.RemoveItem(ItemId.ROKAS_30_HQ01_ITEM, 1);
-				character.ServerMessage(L("The oration burns down to nothing in front of the epitaph. Report back to Historian Colin."));
-			}
+				character.ServerMessage(L("This is the epitaph. Burn the Ancient Writings in front of it."));
 
 			await Task.CompletedTask;
 		});
+	}
+
+	/// <summary>
+	/// Burns Historian Colin's oration in front of the epitaph at Nepatogus Field.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_ROKAS_30_HQ01_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (!character.Quests.IsActive(Hq01) || character.Quests.IsCompletable(Hq01))
+		{
+			character.ServerMessage(L("There is no reason to burn the oration now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Map.ClassName != "f_rokas_29" || character.Layer != 0 || character.Position.Get2DDistance(Epitaph) > 100)
+		{
+			character.ServerMessage(L("Burn the oration in front of the epitaph at Rukas Plateau."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.BurnOrationAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Burns the oration over a timed action and completes the objective.
+	/// </summary>
+	private async Task BurnOrationAsync(Character character)
+	{
+		var burned = await character.TimeActions.StartAsync(L("Burning the oration"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
+
+		if (burned != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Hq01) || character.Quests.IsCompletable(Hq01))
+			return;
+
+		character.Inventory.RemoveItem(ItemId.ROKAS_30_HQ01_ITEM, 1);
+		character.Quests.CompleteObjective(Hq01, "burnOration");
+		character.ServerMessage(L("You burned the oration."));
+	}
+
+	/// <summary>
+	/// Reads Stonemason Pipoti's map and points at the next marked spot.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_ROKAS30_PIPOTI_MAP(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		var index = Array.FindIndex(PipotiMarkQuests, questId => !character.Quests.HasCompleted(questId));
+
+		if (index < 0)
+		{
+			character.ServerMessage(L("Every mark on the map has been checked."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Map.ClassName != "f_rokas_30")
+		{
+			character.ServerMessage(L("The marks on the map are all in the King's Plateau."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var distance = character.Position.Get2DDistance(PipotiMarks[index]);
+
+		if (distance <= 200)
+			character.ServerMessage(L("This is the spot marked on the map."));
+		else if (distance <= 800)
+			character.ServerMessage(L("The marked spot is close by."));
+		else if (distance <= 1600)
+			character.ServerMessage(L("The marked spot is some distance away."));
+		else
+			character.ServerMessage(L("The marked spot is far from here."));
+
+		return ItemUseResult.OkayNotConsumed;
 	}
 }
 

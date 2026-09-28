@@ -915,6 +915,52 @@ public class FFarm472QuestNpcsScript : GeneralScript
 		if (character.Inventory.CountItem(ItemId.FARM47_2_SQ_030_ITEM_3) == 0)
 			return;
 
+		character.ServerMessage(L("You have both pieces. Use the Blunt Wooden Piece to fit it onto the shaft."));
+	}
+
+	/// <summary>
+	/// Fits the Blunt Wooden Piece onto the Wooden Rod Piece, making the wooden hammer.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_FARM47_2_SQ_030_ITEM_2(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_farm_47_2" || character.Layer != 0 || !character.Quests.IsActive(Sq030))
+		{
+			character.ServerMessage(L("There is nothing to do with it now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Inventory.CountItem(ItemId.FARM47_2_SQ_030_ITEM_4) != 0)
+		{
+			character.ServerMessage(L("You already made the wooden hammer."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Inventory.CountItem(ItemId.FARM47_2_SQ_030_ITEM_3) == 0)
+		{
+			character.ServerMessage(L("You need a Wooden Rod Piece for the shaft."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.MakeHammerAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Makes the wooden hammer over a timed action.
+	/// </summary>
+	private async Task MakeHammerAsync(Character character)
+	{
+		var made = await character.TimeActions.StartAsync(L("Making the wooden hammer"), L("Cancel"), "HAMMERING", TimeSpan.FromSeconds(2));
+
+		if (made != TimeActionResult.Completed)
+			return;
+
+		if (character.Inventory.CountItem(ItemId.FARM47_2_SQ_030_ITEM_4) != 0 || character.Inventory.CountItem(ItemId.FARM47_2_SQ_030_ITEM_3) == 0)
+			return;
+
 		character.Inventory.Add(ItemId.FARM47_2_SQ_030_ITEM_4, 1, InventoryAddType.PickUp);
 		character.ServerMessage(L("You fit the head onto the shaft. The wooden hammer will open the cask."));
 	}

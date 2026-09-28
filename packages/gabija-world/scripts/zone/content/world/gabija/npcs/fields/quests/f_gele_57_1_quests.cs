@@ -7,9 +7,14 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Maps;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -27,6 +32,14 @@ public class FGele571QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq07 = new QuestId(17160);
 	private readonly static QuestId Rp1 = new QuestId(60151);
 	private readonly static QuestId ToGele = new QuestId(50006);
+
+	private const int BabyPantoId = 147451;
+	private readonly static Position MollyRallyPoint = new Position(-262.60f, 95.99f, 300.90f);
+	private readonly static (double X, double Z)[] BabyPantoSpots =
+	{
+		(607.16, 528.50), (757.72, 568.46), (832.19, 389.37), (779.14, 312.72),
+		(681.05, 297.30), (565.13, 280.52), (411.60, 323.87), (376.72, 559.83),
+	};
 
 	protected override void Load()
 	{
@@ -310,6 +323,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq07);
+					character.LookAround();
 					await dialog.Msg(L("Take the Baby Pantos to Capria. Maybe it will listen."));
 					return;
 				}
@@ -340,6 +354,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq07))
 			{
 				await dialog.Msg(L("Capria is out past the junction. Be careful - it is not the Panto you knew."));
+				character.Quests.ClearQuestTrack(Mq07);
 				return;
 			}
 
@@ -422,39 +437,33 @@ public class FGele571QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("Thick sugar beet stems, sweet enough to draw every Panto on the plateau."));
 		});
 
+		// Baby Panto
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(147451, L("Baby Panto"), "GELE571_MQ_07", "f_gele_57_1", 980, 961, 90, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07), async dialog =>
+		{
+			var character = dialog.Player;
+
+			if (!character.Quests.IsActive(Mq07) || character.Quests.IsCompletable(Mq07))
+				return;
+
+			var petted = await character.TimeActions.StartAsync(L("Petting the Baby Panto..."), L("Cancel"), "PET", TimeSpan.FromSeconds(2));
+
+			if (petted != TimeActionResult.Completed)
+				return;
+
+			character.Quests.StartQuestTrack(Mq07);
+		});
+
+		// Baby Pantos on the sugar beet grounds
+		//-------------------------------------------------------------------------
+		for (var i = 0; i < BabyPantoSpots.Length; ++i)
+		{
+			var (x, z) = BabyPantoSpots[i];
+			AddNpc(BabyPantoId, L("Baby Panto"), i == 0 ? "GELE571_NPC_PANTO" : "GELE571_NPC_PANTO_" + (i + 1), "f_gele_57_1", x, z, 90, this.BabyPantoDialog);
+		}
+
 		// Hidden triggers
 		//-------------------------------------------------------------------------
-		// The Baby Panto grounds, where the sugar beets are scattered.
-		AddQuestTrigger("GELE571_MQ_04_LURE", "f_gele_57_1", 602, 408, 250, async args =>
-		{
-			if (args.Initiator is not Character character)
-				return;
-
-			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
-				character.Quests.CompleteObjective(Mq04, "lurePantos");
-
-			await Task.CompletedTask;
-		});
-
-		// The clearing where Capria is lured.
-		AddQuestTrigger("GELE571_MQ_07", "f_gele_57_1", 980, 961, 150, async args =>
-		{
-			if (args.Initiator is not Character character)
-				return;
-
-			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
-			{
-				var petted = await character.TimeActions.StartAsync(L("Petting the Baby Pantos..."), L("Cancel"), "PET", TimeSpan.FromSeconds(2));
-
-				if (petted != TimeActionResult.Completed)
-					return;
-
-				character.Quests.StartQuestTrack(Mq07);
-			}
-
-			await Task.CompletedTask;
-		});
-
 		// The cable car that carries the player up to Gele Plateau.
 		AddQuestTrigger("SOUT_Q_41_ARRIVE", "f_gele_57_1", 640, 1489, 100, async args =>
 		{
@@ -466,6 +475,56 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
+	}
+
+	/// <summary>
+	/// A Baby Panto, lured with Molly's sugar beets.
+	/// </summary>
+	private async Task BabyPantoDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+		var panto = dialog.Npc;
+
+		if (!character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
+		{
+			await dialog.Msg(L("The Baby Panto eyes you warily."));
+			return;
+		}
+
+		if (!character.Inventory.HasItem(ItemId.GELE571_MQ_04_ITEM))
+		{
+			await dialog.Msg(L("The Baby Panto won't come near you empty-handed."));
+			return;
+		}
+
+		var lured = await character.TimeActions.StartAsync(L("Luring the Baby Panto"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (lured != TimeActionResult.Completed)
+			return;
+
+		character.Quests.CompleteObjective(Mq04, "lurePantos");
+		character.ServerMessage(L("The Baby Panto seems to remember something and runs off somewhere!"));
+
+		RunToMolly(panto.Map, panto.Position);
+	}
+
+	/// <summary>
+	/// Sends a Baby Panto running back towards Watcher Molly.
+	/// </summary>
+	private static void RunToMolly(Map map, Position from)
+	{
+		var runner = new Mob(BabyPantoId, RelationType.Neutral);
+		runner.Position = from;
+		runner.SpawnPosition = from;
+
+		var movement = new MovementComponent(runner);
+		runner.Components.Add(movement);
+		runner.Components.Add(new LifeTimeComponent(runner, TimeSpan.FromSeconds(10)));
+
+		map.AddMonster(runner);
+
+		movement.SetMoveSpeedType(MoveSpeedType.Run);
+		movement.MoveTo(MollyRallyPoint);
 	}
 }
 

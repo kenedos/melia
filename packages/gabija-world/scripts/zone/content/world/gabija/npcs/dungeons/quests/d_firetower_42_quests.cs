@@ -8,11 +8,14 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -32,6 +35,9 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq04 = new QuestId(17010);
 	private readonly static QuestId Sq05 = new QuestId(17011);
 	private readonly static QuestId Sq06 = new QuestId(8504);
+
+	private readonly static Position JewelSearchCenter = new Position(2236, 65, -729);
+	private const string RodSearchesVar = "Gabija.Quests.Ftower42Mq01.RodSearches";
 
 	private readonly static double[,] FlameVaporSpots =
 	{
@@ -146,8 +152,8 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq03);
-					character.Quests.CompleteObjective(Mq03, "fillWithEssence");
 					await dialog.Msg(L("Don't worry. It won't hurt you or explode."));
+					await dialog.Msg(L("Use the Jewel of Prominence to let the Flame Vapor out, and the Essence of Fire will gather in it."));
 				}
 				return;
 			}
@@ -184,13 +190,19 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq01))
 			{
-				await dialog.Msg(L("I pray that the goddess can endure until then. Use the rod where the monsters are thickest."));
+				await dialog.Msg(L("I pray that the goddess can endure until then. Sweep the rod around this part of the floor."));
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("Flame Vapor only appears for a moment. Walk the reading room and watch for it."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("Use the Jewel of Prominence. The Essence of Fire gathers once the Flame Vapor is let out of it."));
 				return;
 			}
 
@@ -472,6 +484,95 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 
 		await Task.CompletedTask;
 	}
+
+	/// <summary>
+	/// Sweeps the Flame Searching Stick over the floor, looking for the Jewel of Prominence.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_FTOWER42_MQ_01_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_firetower_42" || !character.Quests.IsActive(Mq01) || character.Quests.IsCompletable(Mq01))
+		{
+			character.ServerMessage(L("The stick does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Layer != 0 || character.Position.Get2DDistance(JewelSearchCenter) >= 900)
+		{
+			character.ServerMessage(L("The stick does not react. Search near where you met Grita."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.SearchForJewelAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Searches over a timed action, finding the jewel on a chance that
+	/// grows with every failed attempt.
+	/// </summary>
+	private async Task SearchForJewelAsync(Character character)
+	{
+		var searched = await character.TimeActions.StartAsync(L("Searching for the Jewel of Prominence"), L("Cancel"), "LOOK", TimeSpan.FromSeconds(2));
+
+		if (searched != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq01) || character.Quests.IsCompletable(Mq01))
+			return;
+
+		var searches = character.Variables.Temp.GetInt(RodSearchesVar, 0) + 1;
+
+		if (searches < 4 && GameRandom.Get().Next(100) >= 30)
+		{
+			character.Variables.Temp.SetInt(RodSearchesVar, searches);
+			character.ServerMessage(L("You found nothing."));
+			return;
+		}
+
+		character.Variables.Temp.Remove(RodSearchesVar);
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.Inventory.Add(ItemId.FTOWER_FIRE_ESSENCE, 1, InventoryAddType.PickUp);
+		character.ServerMessage(L("You found the Jewel of Prominence!"));
+	}
+
+	/// <summary>
+	/// Lets the Flame Vapor out of the Jewel of Prominence, gathering the Essence of Fire.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_FTOWER_FIRE_ESSENCE(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_firetower_42" || !character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
+		{
+			character.ServerMessage(L("The jewel does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.GatherEssenceAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Gathers the Essence of Fire over a timed action.
+	/// </summary>
+	private async Task GatherEssenceAsync(Character character)
+	{
+		var gathered = await character.TimeActions.StartAsync(L("Gathering the Essence of Fire"), L("Cancel"), "ABSORB", TimeSpan.FromSeconds(3));
+
+		if (gathered != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
+			return;
+
+		character.PlayEffect("F_burstup001_fire", 1f);
+		character.Quests.CompleteObjective(Mq03, "fillWithEssence");
+		character.ServerMessage(L("The Flame Vapor pours out of the jewel and the Essence of Fire gathers in it."));
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -497,10 +598,6 @@ public class Ftower42Mq01Quest : QuestScript
 		SetPhase(QuestStatus.Success, "FTOWER42_G_AI", "d_firetower_42", L("Talk to Grita"), L("You found the Jewel of Prominence. Talk to Grita."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8477, QuestStatus.Completed));
-
-		// The client reveals the Jewel through a detector-rod minigame; the
-		// port has the monster that carries it drop it instead.
-		AddPityDrop("FTOWER_FIRE_ESSENCE", 0.2f, 10, 1, "blindlem", "tower_of_firepuppet", "Chromadog", "slime_elite", "belegg");
 
 		AddObjective("findTheJewel", L("Search for the Jewel of Prominence"), new CollectItemObjective("FTOWER_FIRE_ESSENCE", 1));
 
@@ -555,7 +652,7 @@ public class Ftower42Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8479, QuestStatus.Completed));
 
-		AddObjective("fillWithEssence", L("Talk to Grita"), new ManualObjective());
+		AddObjective("fillWithEssence", L("Charge the Jewel"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard7", 1));
 	}

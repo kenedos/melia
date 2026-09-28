@@ -7,9 +7,11 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -27,6 +29,9 @@ public class FGele572QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq08 = new QuestId(17270);
 	private readonly static QuestId Mq09 = new QuestId(17280);
 	private readonly static QuestId Rp1 = new QuestId(60152);
+
+	private readonly static Position PantoTotem = new Position(975, 0, -1131);
+	private readonly static Position CorruptedLand = new Position(514, 418, -136);
 
 	protected override void Load()
 	{
@@ -301,13 +306,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				var broken = await character.TimeActions.StartAsync(L("Summoning the shaman doll..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
-
-				if (broken != TimeActionResult.Completed)
-					return;
-
-				character.ServerMessage(L("You set the shaman doll against the totem. It claws at the evil energy until the totem splits apart."));
-				character.Quests.CompleteObjective(Mq04, "destroyTotems");
+				await dialog.Msg(L("The evil energy wrapped around the Panto Totem keeps it from breaking. Summon the shaman doll with the summon scroll."));
 				return;
 			}
 
@@ -409,10 +408,76 @@ public class FGele572QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
-				character.Quests.CompleteObjective(Mq06, "purifyLand");
+				character.ServerMessage(L("Demon corrupted land. Summon the purification shaman doll here."));
 
 			await Task.CompletedTask;
 		});
+	}
+
+	/// <summary>
+	/// Summons the destroyer shaman doll against the Panto Totem.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_GELE572_MQ_DOLL_01(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_gele_57_2" || !character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
+		{
+			character.ServerMessage(L("There is nothing for the shaman doll to do here."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(PantoTotem) > 300)
+		{
+			character.ServerMessage(L("Summon the shaman doll near the Panto Totem."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.SummonDollAsync(character, Mq04, "destroyTotems", L("The destroyer shaman doll destroyed the Panto Totem!"));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Summons the purification shaman doll on the demon corrupted land.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult GELE572_MQ_05_RUNNPC(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_gele_57_2" || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+		{
+			character.ServerMessage(L("There is nothing for the shaman doll to do here."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(CorruptedLand) > 400)
+		{
+			character.ServerMessage(L("The shaman doll senses no corruption here. Search Labure Highway."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.SummonDollAsync(character, Mq06, "purifyLand", L("The purification shaman doll found the demon corrupted land and purified it!"));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Summons a shaman doll over a timed action and completes the objective it was sent for.
+	/// </summary>
+	private async Task SummonDollAsync(Character character, QuestId questId, string objectiveIdent, string message)
+	{
+		var summoned = await character.TimeActions.StartAsync(L("Summoning the shaman doll"), L("Cancel"), "SCROLL", TimeSpan.FromSeconds(2));
+
+		if (summoned != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(questId) || character.Quests.IsCompletable(questId))
+			return;
+
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.Quests.CompleteObjective(questId, objectiveIdent);
+		character.ServerMessage(message);
 	}
 
 	/// <summary>

@@ -6,12 +6,16 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -22,6 +26,8 @@ using static Melia.Zone.Scripting.Shortcuts;
 public class FHuevillage582QuestNpcsScript : GeneralScript
 {
 	private readonly static QuestId Mq01 = new QuestId(20276);
+
+	private const string VenomExtractedVar = "Gabija.Quests.Huevillage582Mq01.VenomExtracted";
 	private readonly static QuestId Mq02 = new QuestId(20277);
 	private readonly static QuestId Mq03 = new QuestId(20278);
 	private readonly static QuestId Mq04 = new QuestId(20279);
@@ -364,6 +370,38 @@ public class FHuevillage582QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Sprinkles Paralysis Powder on a weakened Black Maize and extracts its venom.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_HUEVILLAGE_58_2_MQ01_ITEM2(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_huevillage_58_2" || character.Layer != 0 || !character.Quests.IsActive(Mq01) || character.Quests.IsCompletable(Mq01))
+		{
+			character.ServerMessage(L("There is no need to use the powder now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var maizes = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.Where(mob => mob.Data.ClassName == "Zibu_Maize" && !mob.Vars.GetBool(VenomExtractedVar))
+			.ToList();
+
+		var maize = maizes.FirstOrDefault(mob => mob.Hp * 2 <= mob.MaxHp);
+		if (maize == null)
+		{
+			character.ServerMessage(maizes.Count == 0 ? L("Use the powder close to a Black Maize.") : L("The Black Maize is too lively. Weaken it below half its HP first."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		maize.Vars.SetBool(VenomExtractedVar, true);
+		maize.PlayEffect("F_smoke017_red", 1f);
+		character.Inventory.Add(ItemId.HUEVILLAGE_58_2_MQ01_ITEM1, 1, InventoryAddType.PickUp);
+		character.ServerMessage(L("The Black Maize is paralyzed. You extract its venom."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
 	/// Returns whether the villagers of Andale have left for the given
 	/// character, which they do once the Languid Herb bomb has gone off.
 	/// </summary>
@@ -394,8 +432,6 @@ public class Huevillage582Mq01Quest : QuestScript
 		SetPhase(QuestStatus.Success, "HUEVILLAGE_58_2_MQ02_NPC", "f_huevillage_58_2", L("Go to the Andale Village Priest"), L("Collected enough Black Maize Venom. Go to the Andale Village Priest at Cerpe Crossroads."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(18130, QuestStatus.Completed));
-
-		AddPityDrop("HUEVILLAGE_58_2_MQ01_ITEM1", 0.35f, 5, 1, "Zibu_Maize");
 
 		AddObjective("collectVenom", L("Defeat Black Maize to obtain Black Maize Venom"), new CollectItemObjective("HUEVILLAGE_58_2_MQ01_ITEM1", 5));
 

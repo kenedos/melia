@@ -6,11 +6,17 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Shared.World;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -31,6 +37,12 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq04 = new QuestId(17005);
 	private readonly static QuestId Sq05 = new QuestId(17006);
 	private readonly static QuestId Sq06 = new QuestId(8500);
+
+	public const string GemChargeVar = "Gabija.Quests.Ftower41Mq04.GemCharge";
+	public const int GemChargeNeeded = 10;
+	private const string GemPositionVar = "Gabija.Quests.Ftower41Mq04.GemPosition";
+	private const float GemRange = 300;
+	private readonly static string[] GemMonsters = { "rubblem", "flight_hope", "Fire_Dragon" };
 
 	protected override void Load()
 	{
@@ -158,6 +170,8 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Perm.SetInt(GemChargeVar, 0);
+					character.Variables.Temp.Remove(GemPositionVar);
 					character.Quests.Start(Mq04);
 					character.Inventory.Add(ItemId.FTOWER41_MQ_04_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("We can collect their energy to use it to recharge the Barrier Device."));
@@ -507,6 +521,66 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 	}
+
+	/// <summary>
+	/// Sets Grita's Absorbing Gem on the ground where the character stands.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_FTOWER41_MQ_04_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_firetower_41" || !character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
+		{
+			character.ServerMessage(L("The gem does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.SetGemAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Sets the gem down over a timed action.
+	/// </summary>
+	private async Task SetGemAsync(Character character)
+	{
+		var set = await character.TimeActions.StartAsync(L("Setting the gem"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+
+		if (set != TimeActionResult.Completed)
+			return;
+
+		character.Variables.Temp.Set(GemPositionVar, character.Position);
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.ServerMessage(L("The gem is set. Defeat the monsters around it to charge it with their life force."));
+	}
+
+	/// <summary>
+	/// Charges the Absorbing Gem with the life force of monsters defeated near it.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || !GemMonsters.Contains(mob.Data.ClassName))
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || !character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
+			return;
+
+		if (!character.Variables.Temp.TryGet<Position>(GemPositionVar, out var gemPosition) || mob.Position.Get2DDistance(gemPosition) > GemRange)
+			return;
+
+		var charge = Math.Min(GemChargeNeeded, character.Variables.Perm.GetInt(GemChargeVar, 0) + 1);
+		character.Variables.Perm.SetInt(GemChargeVar, charge);
+		mob.PlayEffect("F_light015_violet1", 1f);
+
+		if (charge >= GemChargeNeeded)
+		{
+			character.Variables.Temp.Remove(GemPositionVar);
+			character.ServerMessage(L("The Absorbing Gem is fully charged. Return to Grita."));
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -618,9 +692,7 @@ public class Ftower41Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8475, QuestStatus.Completed));
 
-		// The client leaves this phase to a minigame and records no objective;
-		// the gem is charged by what dies around it instead.
-		AddObjective("chargeTheGem", L("Charge the Absorbing Gem"), new KillObjective(10, "rubblem", "flight_hope", "Fire_Dragon"));
+		AddObjective("chargeTheGem", L("Charge the Absorbing Gem"), new VariableCheckObjective(DFiretower41QuestNpcsScript.GemChargeVar, DFiretower41QuestNpcsScript.GemChargeNeeded, isPermanent: true));
 
 		AddReward(new ItemReward("expCard7", 1));
 		AddReward(new TakeItemReward("FTOWER41_MQ_04_ITEM"));

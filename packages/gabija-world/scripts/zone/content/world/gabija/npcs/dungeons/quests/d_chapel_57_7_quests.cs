@@ -8,10 +8,12 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -34,6 +36,9 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	private const string PillarVar = "Gabija.Quests.Chaple577Mq04.Pillar";
 	private const int PillarCount = 8;
 	private readonly static QuestId Mq10 = new QuestId(8537);
+
+	private readonly static Position AukaAltar = new Position(-942, 0, -106);
+	private readonly static Position SanctuaryMural = new Position(801, 0, -1250);
 
 	protected override void Load()
 	{
@@ -240,7 +245,11 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Mq06);
+					character.Inventory.Add(ItemId.CHAPLE577_MQ_06_ITEM, 1, InventoryAddType.PickUp);
+					await dialog.Msg(L("Take this potion to the Auka Altar and use it there."));
+				}
 
 				return;
 			}
@@ -319,7 +328,10 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06))
 			{
-				await dialog.Msg(L("Charge the Auka Altar so the demons chase it instead of us."));
+				await dialog.Msg(L("Use the Lesser Potion of Light at the Auka Altar so the demons chase it instead of us."));
+
+				if (!character.Inventory.HasItem(ItemId.CHAPLE577_MQ_06_ITEM))
+					character.Inventory.Add(ItemId.CHAPLE577_MQ_06_ITEM, 1, InventoryAddType.PickUp);
 				return;
 			}
 
@@ -405,31 +417,97 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq10) && !character.Quests.IsCompletable(Mq10))
 			{
-				await dialog.Msg(L("The Seal of Space turns in your hand. The wall folds away, revealing the sanctuary."));
-				var readMural = await character.TimeActions.StartAsync(L("Reading the mural..."), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
-
-				if (readMural != TimeActionResult.Completed)
-					return;
-
-				character.Quests.StartQuestTrack(Mq10);
+				await dialog.Msg(L("A door that is not a door. Use the Seal of Space here to open the way into the sanctuary."));
 				return;
 			}
 
 			await dialog.Msg(L("A mural older than the church, hiding a door that is not a door."));
 		});
 
-		// Hidden triggers
-		//-------------------------------------------------------------------------
-		AddQuestTrigger("CHAPLE577_MQ_06_TRIGGER", "d_chapel_57_7", -942, -106, 400, async args =>
+	}
+
+	/// <summary>
+	/// Pours the Lesser Potion of Light into the Auka Altar, charging it.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHAPLE577_MQ_06(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_chapel_57_7" || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
 		{
-			if (args.Initiator is not Character character)
-				return;
+			character.ServerMessage(L("The potion does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
 
-			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
-				character.Quests.CompleteObjective(Mq06, "chargeCrystal");
+		if (character.Position.Get2DDistance(AukaAltar) > 400)
+		{
+			character.ServerMessage(L("Use the potion at the Auka Altar."));
+			return ItemUseResult.OkayNotConsumed;
+		}
 
-			await Task.CompletedTask;
-		});
+		if (!character.TimeActions.IsActive)
+			_ = this.ChargeAukaAltarAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Charges the Auka Altar over a timed action.
+	/// </summary>
+	private async Task ChargeAukaAltarAsync(Character character)
+	{
+		var charged = await character.TimeActions.StartAsync(L("Charging the Auka Altar"), L("Cancel"), "FLASK", TimeSpan.FromSeconds(3));
+
+		if (charged != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+			return;
+
+		character.Inventory.RemoveItem(ItemId.CHAPLE577_MQ_06_ITEM, 1);
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.Quests.CompleteObjective(Mq06, "chargeCrystal");
+		character.ServerMessage(L("The Auka Altar glows faintly. The demons turn towards it."));
+	}
+
+	/// <summary>
+	/// Opens the way into the hidden sanctuary with the Seal of Space.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_KEY_OF_LEGEND_01(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_chapel_57_7" || character.Layer != 0 || !character.Quests.IsActive(Mq10) || character.Quests.IsCompletable(Mq10))
+		{
+			character.ServerMessage(L("The Seal of Space does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(SanctuaryMural) > 100)
+		{
+			character.ServerMessage(L("Use the Seal of Space on the mural that hides the sanctuary."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.OpenSanctuaryAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Opens the sanctuary over a timed action and plays its track.
+	/// </summary>
+	private async Task OpenSanctuaryAsync(Character character)
+	{
+		var opened = await character.TimeActions.StartAsync(L("Checking"), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
+
+		if (opened != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq10) || character.Quests.IsCompletable(Mq10))
+			return;
+
+		character.ServerMessage(L("The Seal of Space turns in your hand. The wall folds away, revealing the sanctuary."));
+		character.Quests.StartQuestTrack(Mq10);
 	}
 
 	/// <summary>
@@ -628,6 +706,7 @@ public class Chaple577Mq06Quest : QuestScript
 		AddObjective("chargeCrystal", L("Charge the low level spirit crystal"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 2));
+		AddReward(new TakeItemReward("CHAPLE577_MQ_06_ITEM"));
 	}
 }
 

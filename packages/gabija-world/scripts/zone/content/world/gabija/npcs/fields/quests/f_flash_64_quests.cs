@@ -6,8 +6,10 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -39,6 +41,16 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	private readonly static QuestId Under66Sq010 = new QuestId(50062);
 	private readonly static QuestId Under67Hq1 = new QuestId(50259);
 	private readonly static QuestId Flash64Hq1 = new QuestId(50267);
+
+	private readonly static Position NeiveikiamaCastle = new Position(997, 457, 545);
+	private readonly static (string Map, Position Spot)[] FortressDistricts =
+	{
+		("d_underfortress_65", new Position(-133.23f, 0, -985.52f)),
+		("d_underfortress_66", new Position(1663.40f, 0, 395.43f)),
+		("d_underfortress_67", new Position(75.42f, 0, -768.88f)),
+		("d_underfortress_68", new Position(-274.03f, 0, -868.76f)),
+		("d_underfortress_69", new Position(1744.16f, 0, 1004.69f)),
+	};
 	private readonly static QuestId Lancer8 = new QuestId(90157);
 	private readonly static QuestId Murmillo8 = new QuestId(90158);
 	private readonly static QuestId Cannoneer8 = new QuestId(90161);
@@ -970,10 +982,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Sq08) && !character.Quests.IsCompletable(Sq08))
-			{
-				character.Quests.CompleteObjective(Sq08, "tryTheSolution");
-				character.ServerMessage(L("The solution does nothing to the petrified monsters but make them angry. Report it to Saliamonas."));
-			}
+				character.ServerMessage(L("Petrified monsters roam the castle. Use the Petrification Thawing Liquid on one of them."));
 
 			await Task.CompletedTask;
 		});
@@ -997,12 +1006,82 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			return;
 
 		if (character.Quests.IsActive(Under67Hq1, "noteArea" + number))
-		{
-			character.Quests.CompleteObjective(Under67Hq1, "noteArea" + number);
-			character.ServerMessage(L("You write the district up in Wilhelmina's notes."));
-		}
+			character.ServerMessage(L("Take out the Stationery Bag and note down what to be careful of here."));
 
 		await Task.CompletedTask;
+	}
+
+	/// <summary>
+	/// Tries the Petrification Thawing Liquid on a nearby monster.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_FLASH64_SQ_08_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_flash_64" || character.Layer != 0 || !character.Quests.IsActive(Sq08) || character.Quests.IsCompletable(Sq08))
+		{
+			character.ServerMessage(L("There is no need to use the liquid now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var monster = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => mob.Faction == FactionType.Monster);
+
+		if (monster == null || character.Position.Get2DDistance(NeiveikiamaCastle) > 450)
+		{
+			character.ServerMessage(L("Use the liquid on one of the monsters at Neiveikiama Castle."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		monster.PlayEffect("F_smoke017_red", 1f);
+		character.Quests.CompleteObjective(Sq08, "tryTheSolution");
+		character.ServerMessage(L("You used the Petrification Thawing Liquid, but the petrified part remains unchanged. Report it to Saliamonas."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Notes down the dangers of the fortress district the character stands in.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_UNDER67_HIDDENQ1_ITEM1(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		var index = Array.FindIndex(FortressDistricts, district => district.Map == character.Map.ClassName && character.Position.Get2DDistance(district.Spot) <= 160);
+
+		if (index < 0 || character.Layer != 0 || !character.Quests.IsActive(Under67Hq1))
+		{
+			character.ServerMessage(L("There is nothing worth noting down here."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var objectiveId = "noteArea" + (index + 1);
+		if (!character.Quests.IsActive(Under67Hq1, objectiveId))
+		{
+			character.ServerMessage(L("You have already written notes for this area."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.WriteNotesAsync(character, objectiveId);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Writes the notes over a timed action.
+	/// </summary>
+	private async Task WriteNotesAsync(Character character, string objectiveId)
+	{
+		var written = await character.TimeActions.StartAsync(L("Writing down precautions"), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(3));
+
+		if (written != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Under67Hq1, objectiveId))
+			return;
+
+		character.Quests.CompleteObjective(Under67Hq1, objectiveId);
+		character.ServerMessage(L("You write the district up in Wilhelmina's notes."));
 	}
 
 	/// <summary>

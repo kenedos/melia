@@ -8,9 +8,15 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Shared.World;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -25,6 +31,11 @@ public class DChapel575QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq05 = new QuestId(8523);
 	private readonly static QuestId Mq06 = new QuestId(8524);
 	private readonly static QuestId Mq07 = new QuestId(8525);
+
+	public const string HolyStoneChargeVar = "Gabija.Quests.Chaple575Mq07.StoneCharge";
+	public const int HolyStoneChargeNeeded = 10;
+	private const string HolyStonePositionVar = "Gabija.Quests.Chaple575Mq07.StonePosition";
+	private readonly static Position HolyStoneArea = new Position(-858, 0, -173);
 	private readonly static QuestId Mq08 = new QuestId(8526);
 	private readonly static QuestId Mq09 = new QuestId(8527);
 
@@ -245,6 +256,8 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("When you place the Holy Stone, it will absorb the lives of the nearby demons automatically."));
 					await dialog.Msg(L("Defeat the demons that have already had their life absorbed."));
+					character.Variables.Perm.SetInt(HolyStoneChargeVar, 0);
+					character.Variables.Temp.Remove(HolyStonePositionVar);
 					character.Quests.Start(Mq07);
 					character.Inventory.Add(650716, 1, InventoryAddType.PickUp);
 				}
@@ -336,14 +349,20 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Glizardon"));
 
+			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06) && !character.IsBuffActive(BuffId.CHAPLE575_MQ_06))
+			{
+				character.ServerMessage(L("The Glizardon would notice you. Drink the Namott Holy Water first."));
+				return;
+			}
+
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
-				var planted = await character.TimeActions.StartAsync(L("Fastening the Holy Bomb..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+				var planted = await character.TimeActions.StartAsync(L("Attaching"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
 
 				if (planted != TimeActionResult.Completed)
 					return;
 
-				character.ServerMessage(L("You clamp the Holy Bomb to the Glizardon's back and duck away. The blast is immediate."));
+				character.ServerMessage(L("You attached the Holy Bomb to the Glizardon!"));
 				character.Quests.CompleteObjective(Mq06, "bombGlizardon");
 				character.LookAround();
 				return;
@@ -376,18 +395,76 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("A dark barrier blocks the way to the first floor."));
 		});
 
-		// Hidden triggers
-		//-------------------------------------------------------------------------
-		AddQuestTrigger("CHAPLE575_MQ_07_TRIGGER", "d_chapel_57_5", -858, -173, 400, async args =>
+	}
+
+	/// <summary>
+	/// Drinks the Namott Holy Water, hiding the character from the demons for a while.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHAPLE575_MQ_06_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_chapel_57_5" || character.Layer != 0 || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
 		{
-			if (args.Initiator is not Character character)
-				return;
+			character.ServerMessage(L("There is no need to drink the holy water now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
 
-			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
-				character.Quests.CompleteObjective(Mq07, "chargeStone");
+		character.StartBuff(BuffId.CHAPLE575_MQ_06, 1, 0, TimeSpan.FromSeconds(10), character);
+		character.ServerMessage(L("You drank the Namott Holy Water. The demons cannot see you for a while!"));
 
-			await Task.CompletedTask;
-		});
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Places the empty Holy Stone to draw in the lives of the demons nearby.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHAPLE575_MQ_07_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_chapel_57_5" || character.Layer != 0 || !character.Quests.IsActive(Mq07) || character.Quests.IsCompletable(Mq07))
+		{
+			character.ServerMessage(L("The Holy Stone does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(HolyStoneArea) > 650)
+		{
+			character.ServerMessage(L("Place the Holy Stone where the demons gather, as Vaidas told you."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.Variables.Temp.Set(HolyStonePositionVar, character.Position);
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.ServerMessage(L("You placed the Holy Stone. Lure the demons to charge it!"));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Charges the placed Holy Stone with the lives of demons defeated near it.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || mob.Map?.ClassName != "d_chapel_57_5")
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || !character.Quests.IsActive(Mq07) || character.Quests.IsCompletable(Mq07))
+			return;
+
+		if (!character.Variables.Temp.TryGet<Position>(HolyStonePositionVar, out var stonePosition) || mob.Position.Get2DDistance(stonePosition) > 300)
+			return;
+
+		var charge = Math.Min(HolyStoneChargeNeeded, character.Variables.Perm.GetInt(HolyStoneChargeVar, 0) + 1);
+		character.Variables.Perm.SetInt(HolyStoneChargeVar, charge);
+		mob.PlayEffect("F_light015_violet1", 1f);
+
+		if (charge >= HolyStoneChargeNeeded)
+		{
+			character.Variables.Temp.Remove(HolyStonePositionVar);
+			character.ServerMessage(L("The Holy Stone is fully charged. Return to Vaidas."));
+		}
 	}
 }
 
@@ -557,7 +634,7 @@ public class Chaple575Mq07Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8524, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(30));
 
-		AddObjective("chargeStone", L("Charge the Holy Stone"), new ManualObjective());
+		AddObjective("chargeStone", L("Charge the Holy Stone"), new VariableCheckObjective(DChapel575QuestNpcsScript.HolyStoneChargeVar, DChapel575QuestNpcsScript.HolyStoneChargeNeeded, isPermanent: true));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new TakeItemReward("CHAPLE575_MQ_07_ITEM"));

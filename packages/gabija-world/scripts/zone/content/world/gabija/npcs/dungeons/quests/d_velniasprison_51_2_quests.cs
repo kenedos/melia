@@ -6,12 +6,17 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Shared.World;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -26,6 +31,8 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq03 = new QuestId(60009);
 	private readonly static QuestId Mq04 = new QuestId(60010);
 	private readonly static QuestId Mq05 = new QuestId(60011);
+
+	private readonly static Position ThirdIsolationArea = new Position(-1477, 395, -44);
 	private readonly static QuestId Sq01 = new QuestId(60031);
 	private readonly static QuestId Sq02 = new QuestId(60032);
 
@@ -309,10 +316,7 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
-			{
-				character.Quests.CompleteObjective(Mq03, "interrogate");
-				character.ServerMessage(L("Hauberk's seal reads the demons of the Third Isolation Area. Take what they gave up to Arune."));
-			}
+				character.ServerMessage(L("Demons of the Third Isolation Area. Suppress one with Hauberk's Seal Fragment."));
 
 			await Task.CompletedTask;
 		});
@@ -324,6 +328,35 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 	/// <param name="character"></param>
 	private bool IsAldonaWaiting(Character character)
 		=> character.Quests.IsActive(Mq05);
+
+	/// <summary>
+	/// Suppresses a nearby demon with Hauberk's Seal Fragment and reads Nuaele's plan out of it.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_VPRISON512_MQ_03_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_velniasprison_51_2" || character.Layer != 0 || !character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
+		{
+			character.ServerMessage(L("The seal fragment does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var demon = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => !mob.Data.ClassName.Equals("rootcrystal_05", StringComparison.OrdinalIgnoreCase));
+
+		if (demon == null || character.Position.Get2DDistance(ThirdIsolationArea) > 450)
+		{
+			character.ServerMessage(L("Use the seal fragment on a demon in the Third Isolation Area."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		demon.PlayEffect("F_lineup020_blue_mint", 1f);
+		character.Quests.CompleteObjective(Mq03, "interrogate");
+		character.ServerMessage(L("Hauberk's seal suppresses the demon and reads Nuaele's plan out of it. Take what it gave up to Arune."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
 }
 
 //-----------------------------------------------------------------------------

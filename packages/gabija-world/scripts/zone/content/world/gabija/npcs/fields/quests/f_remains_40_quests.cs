@@ -9,10 +9,12 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -37,6 +39,8 @@ public class FRemains40QuestNpcsScript : GeneralScript
 	private readonly static QuestId Hq01 = new QuestId(19041);
 	private readonly static QuestId ToTheTower1 = new QuestId(8471);
 	private readonly static QuestId ToTheTower2 = new QuestId(8472);
+
+	private readonly static Position JarChargingSpot = new Position(2485, 639, 3573);
 
 	private readonly static double[,] OldBoxSpots =
 	{
@@ -309,13 +313,7 @@ public class FRemains40QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
-				var charged = await character.TimeActions.StartAsync(L("Charging the jar..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
-
-				if (charged != TimeActionResult.Completed)
-					return;
-
-				character.Quests.CompleteObjective(Mq06, "chargeJar");
-				character.ServerMessage(L("The jar draws in the magic that hangs around the monument and goes still."));
+				await dialog.Msg(L("The magic hangs thick around the monument. Use the Strong Magical Power Absorption Jar here to charge it."));
 				return;
 			}
 
@@ -703,6 +701,67 @@ public class FRemains40QuestNpcsScript : GeneralScript
 		}
 
 		await dialog.Msg(L("An old box left behind when the farm was abandoned."));
+	}
+
+	/// <summary>
+	/// Charges the Strong Magical Power Absorption Jar at the Camp of Apiarists monument.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_REMAINS40_MQ_06_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_remains_40" || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+		{
+			character.ServerMessage(L("The jar does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(JarChargingSpot) > 250)
+		{
+			character.ServerMessage(L("The jar does not react. Install it where the magic hangs thick, by the monument at the Camp of Apiarists."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.ChargeJarAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Charges the jar over a timed action and completes the objective.
+	/// </summary>
+	private async Task ChargeJarAsync(Character character)
+	{
+		var charged = await character.TimeActions.StartAsync(L("Charging the jar..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+		if (charged != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+			return;
+
+		character.Quests.CompleteObjective(Mq06, "chargeJar");
+		character.ServerMessage(L("The jar draws in the magic that hangs around the monument and goes still."));
+	}
+
+	/// <summary>
+	/// Reads Zubeck's Secret Moves for a stat point.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_REMAINS40_MQ_07_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (!character.Quests.HasCompleted(Mq07))
+		{
+			character.ServerMessage(L("You cannot make sense of these moves yet."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.Inventory.Remove(item, 1, InventoryItemRemoveMsg.Used);
+		character.AddStatPoints(1);
+		character.PlayEffect("F_pc_StatPoint_up", 4, 1, EffectLocation.Bottom, 1);
+		character.ServerMessage(L("You used Zubeck's Secret Moves and gained 1 stat point."));
+
+		return ItemUseResult.OkayNotConsumed;
 	}
 }
 

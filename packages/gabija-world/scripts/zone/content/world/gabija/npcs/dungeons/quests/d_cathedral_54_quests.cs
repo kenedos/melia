@@ -6,12 +6,19 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Shared.World;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -38,6 +45,14 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 	private const int DocumentsPerBook = 2;
 
 	private const string FootholdVar = "Gabija.Cathedral54.Foothold";
+
+	public const string SymbolChargeVar = "Gabija.Cathedral54.SymbolCharge";
+	public const int SymbolChargeNeeded = 10;
+	public const string ReagentTestsVar = "Gabija.Cathedral54.ReagentTests";
+	public const int ReagentTestsNeeded = 5;
+	private const string SymbolPositionVar = "Gabija.Cathedral54.SymbolPosition";
+	private const string PurifiedVar = "Gabija.Cathedral54.Purified";
+	private const string ReagentTestedVar = "Gabija.Cathedral54.ReagentTested";
 	private const string BookVar = "Gabija.Cathedral54.Book";
 
 	protected override void Load()
@@ -316,6 +331,7 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Perm.SetInt(ReagentTestsVar, 0);
 					character.Quests.Start(Sq04);
 					character.Inventory.Add(ItemId.CATHEDRAL54_SQ04_PART2_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("Ah, I didn't mean trying it on yourself. I meant trying it on the demons."));
@@ -538,8 +554,10 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 
 			if (answer == "accept")
 			{
+				character.Variables.Perm.SetInt(SymbolChargeVar, 0);
+				character.Variables.Temp.Remove(SymbolPositionVar);
 				character.Quests.Start(Mq04);
-				await dialog.Msg(L("Defeat the demons nearby using the Holy Symbol of Spiritual Power. This will collect the magical power that is needed to obtain the third key."));
+				await dialog.Msg(L("Deploy the Holy Symbol of Spiritual Power and defeat the demons nearby. This will collect the magical power that is needed to obtain the third key."));
 				await dialog.Msg(L("Go to Karuna Altar when you've recharged the Holy Symbol of Spiritual Power. The third key is waiting for you."));
 			}
 			return;
@@ -642,6 +660,123 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 			character.Inventory.Add(ItemId.CHATHEDRAL54_SQ01_PART1_ITEM, DocumentsPerBook, InventoryAddType.PickUp);
 			character.ServerMessage(LF("Documents recovered: {0}/{1}", character.Inventory.CountItem(ItemId.CHATHEDRAL54_SQ01_PART1_ITEM), DocumentsNeeded));
 		});
+	}
+
+	/// <summary>
+	/// Deploys the Holy Symbol of Spiritual Power where the character stands.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CATHEDRAL54_MQ02_PART2_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_cathedral_54" || character.Layer != 0 || !character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
+		{
+			character.ServerMessage(L("The symbol does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.Variables.Temp.Set(SymbolPositionVar, character.Position);
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.ServerMessage(L("You deployed the Holy Symbol of Spiritual Power. Defeat the demons near it to recharge it."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Reads the Scroll of Purification over a nearby Stoulet.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CATHEDRAL54_SQ04_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_cathedral_54" || character.Layer != 0 || !character.Quests.IsActive(Sq03) || character.Quests.IsCompletable(Sq03))
+		{
+			character.ServerMessage(L("The scroll does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var demon = FindStoulet(character, PurifiedVar);
+		if (demon == null)
+		{
+			character.ServerMessage(L("Use the scroll close to a demon."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		demon.Vars.SetLong(PurifiedVar, character.ObjectId);
+		demon.PlayEffect("F_light018_yellow", 1f);
+		character.ServerMessage(L("The demon is wrapped in holy energy. Defeat it to collect the solvent."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Tests Priest Daram's reagent on a nearby Stoulet.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CATHEDRAL54_SQ04_PART2_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_cathedral_54" || character.Layer != 0 || !character.Quests.IsActive(Sq04) || character.Quests.IsCompletable(Sq04))
+		{
+			character.ServerMessage(L("There is nothing to test the reagent on right now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var demon = FindStoulet(character, ReagentTestedVar);
+		if (demon == null)
+		{
+			character.ServerMessage(L("Use the reagent close to a demon that has not been tested yet."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		demon.Vars.SetLong(ReagentTestedVar, character.ObjectId);
+		demon.PlayEffect("F_explosion049_fire", 1f);
+
+		var tests = Math.Min(ReagentTestsNeeded, character.Variables.Perm.GetInt(ReagentTestsVar, 0) + 1);
+		character.Variables.Perm.SetInt(ReagentTestsVar, tests);
+		character.ServerMessage(L("The reagent reacts violently with the demon's evil energy."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Returns the nearest Stoulet that has not been marked with the given variable.
+	/// </summary>
+	private static Mob FindStoulet(Character character, string markVar)
+	{
+		return character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => mob.Data.ClassName == "Stoulet_blue" && !mob.Vars.Has(markVar));
+	}
+
+	/// <summary>
+	/// Recharges the deployed symbol, and turns purified demons into solvent.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || mob.Map?.ClassName != "d_cathedral_54")
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null)
+			return;
+
+		if (character.Quests.IsActive(Sq03) && !character.Quests.IsCompletable(Sq03) && mob.Vars.TryGetLong(PurifiedVar, out var purifierId) && purifierId == character.ObjectId)
+			character.Inventory.Add(ItemId.CHATHEDRAL54_SQ03_PART1_ITEM, 1, InventoryAddType.PickUp);
+
+		if (!character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
+			return;
+
+		if (!character.Variables.Temp.TryGet<Position>(SymbolPositionVar, out var symbolPosition) || mob.Position.Get2DDistance(symbolPosition) > 300)
+			return;
+
+		var charge = Math.Min(SymbolChargeNeeded, character.Variables.Perm.GetInt(SymbolChargeVar, 0) + 1);
+		character.Variables.Perm.SetInt(SymbolChargeVar, charge);
+		mob.PlayEffect("F_light015_violet1", 1f);
+
+		if (charge >= SymbolChargeNeeded)
+		{
+			character.Variables.Temp.Remove(SymbolPositionVar);
+			character.ServerMessage(L("The Holy Symbol of Spiritual Power is recharged. Take it to Karuna Altar."));
+		}
 	}
 }
 
@@ -750,9 +885,7 @@ public class Cathedral54Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20312, QuestStatus.Completed));
 
-		// The client records no kill count for the recharge; the port sets one
-		// so the phase asks for the fight its own text describes.
-		AddObjective("rechargeSymbol", L("Recharge the Holy Symbol of Spiritual Power"), new KillObjective(10, "Stoulet_blue"));
+		AddObjective("rechargeSymbol", L("Recharge the Holy Symbol of Spiritual Power"), new VariableCheckObjective(DCathedral54QuestNpcsScript.SymbolChargeVar, DCathedral54QuestNpcsScript.SymbolChargeNeeded, isPermanent: true));
 
 		AddReward(new ItemReward("CHATHEDRAL54_MQ04_PART2_ITEM", 1));
 		AddReward(new ItemReward("expCard8", 2));
@@ -838,10 +971,6 @@ public class Cathedral54Sq03Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(130));
 		AddPrerequisite(new QuestStatusPrerequisite(20317, QuestStatus.Completed));
 
-		// The client leaves the solvent to its own script; the port drops it
-		// from the demons the phase names.
-		AddPityDrop("CHATHEDRAL54_SQ03_PART1_ITEM", 0.4f, 5, 1, "Stoulet_blue");
-
 		AddObjective("collectSolvents", L("Collect solvents by using the Scroll of Purification on the demons"), new CollectItemObjective("CHATHEDRAL54_SQ03_PART1_ITEM", 5));
 
 		AddReward(new ItemReward("expCard8", 1));
@@ -870,9 +999,7 @@ public class Cathedral54Sq04Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(130));
 
-		// The client records no count for the test; the port asks for the
-		// demons the phase names.
-		AddObjective("testReagent", L("Use the reagent Priest Daram created on the demons"), new KillObjective(5, "Stoulet_blue"));
+		AddObjective("testReagent", L("Use the reagent Priest Daram created on the demons"), new VariableCheckObjective(DCathedral54QuestNpcsScript.ReagentTestsVar, DCathedral54QuestNpcsScript.ReagentTestsNeeded, isPermanent: true));
 
 		AddReward(new ItemReward("expCard8", 1));
 		AddReward(new TakeItemReward("CATHEDRAL54_SQ04_PART2_ITEM", 1));

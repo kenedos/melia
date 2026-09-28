@@ -6,12 +6,17 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Shared.World;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -26,6 +31,9 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq03 = new QuestId(60020);
 	private readonly static QuestId Mq04 = new QuestId(60021);
 	private readonly static QuestId Mq05 = new QuestId(60022);
+
+	private const string HauberkHostVar = "Gabija.Quests.Vprison513Mq03.HauberkHost";
+	private readonly static Position IdingaConfinement = new Position(-1520, 30, 333);
 	private readonly static QuestId Sq01 = new QuestId(60036);
 	private readonly static QuestId Sq02 = new QuestId(60037);
 	private readonly static QuestId Sq03 = new QuestId(60038);
@@ -342,10 +350,7 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
-			{
-				character.Quests.CompleteObjective(Mq03, "chaseHauberk");
-				character.ServerMessage(L("The orb burns out. Hauberk gave up the body he was wearing and ran as a soul."));
-			}
+				character.ServerMessage(L("Hauberk is hiding in one of these demons. Use the Night Star Spectral Orb to find him."));
 
 			await Task.CompletedTask;
 		});
@@ -372,6 +377,52 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 	/// <param name="character"></param>
 	private bool IsDaivaAtGalutin(Character character)
 		=> character.Quests.HasCompleted(Sq01);
+
+	/// <summary>
+	/// Shines the Night Star Spectral Orb on a nearby demon, exposing Hauberk inside it.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_VPRISON513_MQ_03_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_velniasprison_51_3" || character.Layer != 0 || !character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
+		{
+			character.ServerMessage(L("The orb does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var demon = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 150)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => !mob.Data.ClassName.Equals("rootcrystal_05", StringComparison.OrdinalIgnoreCase) && !mob.Vars.Has(HauberkHostVar));
+
+		if (demon == null || character.Position.Get2DDistance(IdingaConfinement) >= 700)
+		{
+			character.ServerMessage(L("Use the orb on the demons at Idinga Solitary Confinement."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		demon.Vars.SetLong(HauberkHostVar, character.ObjectId);
+		demon.PlayEffect("F_light015_violet1", 1f);
+		character.ServerMessage(L("The orb shines on the demon. Hauberk is inside it! Defeat it."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Drives Hauberk out once the demon the orb exposed is defeated.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || !mob.Vars.TryGetLong(HauberkHostVar, out var finderId))
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || character.ObjectId != finderId || !character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
+			return;
+
+		character.Quests.CompleteObjective(Mq03, "chaseHauberk");
+		character.ServerMessage(L("Hauberk gave up the body he was wearing and ran as a soul."));
+	}
 }
 
 //-----------------------------------------------------------------------------

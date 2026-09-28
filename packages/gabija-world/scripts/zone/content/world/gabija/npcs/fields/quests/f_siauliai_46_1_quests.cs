@@ -8,6 +8,7 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -45,6 +46,8 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 	};
 
 	private readonly static int[] ParcelModels = { 47160, 47160, 47161 };
+
+	private readonly static Position SpringLightWoods = new Position(775, 391, 655);
 
 	// The spots the honey jelly draws Spring Light Grass out of.
 	private readonly static double[,] GrassSpots =
@@ -547,13 +550,58 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		var drawn = await character.TimeActions.StartAsync(L("Setting out the honey jelly..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+		await dialog.Msg(L("The ground here smells faintly sweet. Use the bee honey jelly to draw the grass out."));
+	}
+
+	/// <summary>
+	/// Sets out the bee honey jelly, drawing out any Spring Light Grass nearby.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_SIAULIAI_46_1_SQ_05_ITEM01(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_siauliai_46_1" || character.Layer != 0 || !character.Quests.IsActive(Sq05) || character.Quests.IsCompletable(Sq05))
+		{
+			character.ServerMessage(L("There is no need to use the honey jelly now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(SpringLightWoods) >= 500)
+		{
+			character.ServerMessage(L("Spring Light Grass only grows in the Spring Light Woods."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.DrawOutGrassAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Draws out the grass over a timed action, if a grass spot is close enough.
+	/// </summary>
+	private async Task DrawOutGrassAsync(Character character)
+	{
+		var drawn = await character.TimeActions.StartAsync(L("Setting out the honey jelly"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
 
 		if (drawn != TimeActionResult.Completed)
 			return;
 
+		if (!character.Quests.IsActive(Sq05) || character.Quests.IsCompletable(Sq05))
+			return;
+
+		var nearGrass = false;
+		for (var i = 0; i < GrassSpots.GetLength(0) && !nearGrass; ++i)
+			nearGrass = character.Position.Get2DDistance(new Position((float)GrassSpots[i, 0], 0, (float)GrassSpots[i, 1])) <= 150;
+
+		if (!nearGrass)
+		{
+			character.ServerMessage(L("You found nothing."));
+			return;
+		}
+
 		character.Inventory.Add(ItemId.SIAULIAI_46_1_SQ_05_ITEM02, 1, InventoryAddType.PickUp);
-		await dialog.Msg(L("The grass opens out of the ground where the jelly was set down."));
+		character.ServerMessage(L("You found Spring Light Grass!"));
 	}
 }
 

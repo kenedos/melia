@@ -6,8 +6,10 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -439,14 +441,7 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 
 				if (character.Quests.IsActive(Mq050) && !character.Quests.IsCompletable(Mq050))
 				{
-					var set = await character.TimeActions.StartAsync(L("Setting the barricade..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
-
-					if (set != TimeActionResult.Completed)
-						return;
-
-					character.Quests.CompleteObjective(Mq050, "setBarricade" + number);
-					character.LookAround();
-					character.ServerMessage(L("The barricade is up."));
+					await dialog.Msg(L("A gap in the camp's line. Use the Wood for Barricades here to close it."));
 					return;
 				}
 
@@ -622,12 +617,72 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		var missing = Enumerable.Range(1, BarricadeSpots.GetLength(0)).Count(number => character.Quests.IsActive(Mq050, "setBarricade" + number));
+		var needed = missing - character.Inventory.CountItem(ItemId.UNDER66_MQ6_ITEM01);
+
+		if (needed <= 0)
+		{
+			await dialog.Msg(L("You are carrying all the wood the barricades need."));
+			return;
+		}
+
 		var taken = await character.TimeActions.StartAsync(L("Taking a barricade out..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(2));
 
 		if (taken != TimeActionResult.Completed)
 			return;
 
+		character.Inventory.Add(ItemId.UNDER66_MQ6_ITEM01, needed, InventoryAddType.PickUp);
 		await dialog.Msg(L("The barricades come out in one piece, stakes and all. Set them where the line is open."));
+	}
+
+	/// <summary>
+	/// Sets up a barricade with the wood at the gap the character stands at.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_UNDER66_MQ6_ITEM01(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_underfortress_66" || character.Layer != 0 || !character.Quests.IsActive(Mq050) || character.Quests.IsCompletable(Mq050))
+		{
+			character.ServerMessage(L("There is nowhere to set a barricade now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var number = 0;
+		for (var i = 0; i < BarricadeSpots.GetLength(0) && number == 0; ++i)
+		{
+			if (character.Quests.IsActive(Mq050, "setBarricade" + (i + 1)) && character.Position.Get2DDistance(new Position((float)BarricadeSpots[i, 0], 0, (float)BarricadeSpots[i, 1])) <= 60)
+				number = i + 1;
+		}
+
+		if (number == 0)
+		{
+			character.ServerMessage(L("Set the barricade at one of the gaps in the camp's line."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.SetBarricadeAsync(character, number);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Sets up the barricade over a timed action.
+	/// </summary>
+	private async Task SetBarricadeAsync(Character character, int number)
+	{
+		var set = await character.TimeActions.StartAsync(L("Setting up the barricade"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+
+		if (set != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq050, "setBarricade" + number))
+			return;
+
+		character.Inventory.RemoveItem(ItemId.UNDER66_MQ6_ITEM01, 1);
+		character.Quests.CompleteObjective(Mq050, "setBarricade" + number);
+		character.LookAround();
+		character.ServerMessage(L("You set up the barricade!"));
 	}
 }
 

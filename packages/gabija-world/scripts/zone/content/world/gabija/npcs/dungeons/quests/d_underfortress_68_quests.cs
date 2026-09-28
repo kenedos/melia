@@ -6,8 +6,10 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -444,27 +446,9 @@ public class DUnderfortress68QuestNpcsScript : GeneralScript
 
 		dialog.SetTitle(L("Ruklys' Squad Member Spirit"));
 
-		if (character.Quests.IsActive(Mq030) && !character.Quests.IsCompletable(Mq030))
+		if ((character.Quests.IsActive(Mq040) && !character.Quests.IsCompletable(Mq040)) || (character.Quests.IsActive(Mq050) && !character.Quests.IsCompletable(Mq050)))
 		{
-			var drained = await character.TimeActions.StartAsync(L("Setting the Absorption Orb down..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
-
-			if (drained != TimeActionResult.Completed)
-				return;
-
-			character.Quests.CompleteObjective(Mq030, "fillTheOrb");
-			character.ServerMessage(L("The orb takes what it can hold. Bring it back to the keeper."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq040) && !character.Quests.IsCompletable(Mq040))
-		{
-			await this.BindSpirit(dialog, character, Mq040);
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq050) && !character.Quests.IsCompletable(Mq050))
-		{
-			await this.BindSpirit(dialog, character, Mq050);
+			await dialog.Msg(L("The spirit will not come willingly. Use the Restraint Token on it."));
 			return;
 		}
 
@@ -472,14 +456,86 @@ public class DUnderfortress68QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Places the Absorption Orb by a demon to drain its vitality.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_UNDER68_MQ3_ITEM01(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_underfortress_68" || !character.Quests.IsActive(Mq030) || character.Quests.IsCompletable(Mq030))
+		{
+			character.ServerMessage(L("The orb does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var demon = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => mob.Data.ClassName.Equals("Deadbornscab_red", StringComparison.OrdinalIgnoreCase));
+
+		if (demon == null)
+		{
+			character.ServerMessage(L("Place the orb near the Deadborn Scabs."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.FillOrbAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Fills the Absorption Orb over a timed action.
+	/// </summary>
+	private async Task FillOrbAsync(Character character)
+	{
+		var drained = await character.TimeActions.StartAsync(L("Setting the Absorption Orb down..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+
+		if (drained != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq030) || character.Quests.IsCompletable(Mq030))
+			return;
+
+		character.Quests.CompleteObjective(Mq030, "fillTheOrb");
+		character.ServerMessage(L("The orb drains the demons' vitality. Bring it back to the keeper."));
+	}
+
+	/// <summary>
+	/// Restrains a nearby Ruklys spirit with the Restraint Token.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_UNDER68_MQ4_ITEM01(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		var questId = character.Quests.IsActive(Mq040) && !character.Quests.IsCompletable(Mq040) ? Mq040 : Mq050;
+
+		if (character.Map.ClassName != "d_underfortress_68" || !character.Quests.IsActive(questId) || character.Quests.IsCompletable(questId))
+		{
+			character.ServerMessage(L("The token does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var nearSpirit = false;
+		for (var i = 0; i < Spirits.GetLength(0) && !nearSpirit; ++i)
+			nearSpirit = character.Position.Get2DDistance(new Position((float)Spirits[i, 0], 0, (float)Spirits[i, 1])) <= 60;
+
+		if (!nearSpirit)
+		{
+			character.ServerMessage(L("Use the token on one of Ruklys' squad member spirits."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.BindSpiritAsync(character, questId);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
 	/// Binds one spirit for whichever reading the keeper is working on.
 	/// </summary>
-	/// <param name="dialog"></param>
-	/// <param name="character"></param>
-	/// <param name="questId"></param>
-	private async Task BindSpirit(Dialog dialog, Character character, QuestId questId)
+	private async Task BindSpiritAsync(Character character, QuestId questId)
 	{
-		var bound = await character.TimeActions.StartAsync(L("Binding the spirit..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+		var bound = await character.TimeActions.StartAsync(L("Using the Restraint Token"), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
 
 		if (bound != TimeActionResult.Completed)
 			return;
@@ -494,7 +550,7 @@ public class DUnderfortress68QuestNpcsScript : GeneralScript
 			}
 		}
 
-		await dialog.Msg(L("You are carrying as many spirits as the token will hold."));
+		character.ServerMessage(L("You are carrying as many spirits as the token will hold."));
 	}
 }
 

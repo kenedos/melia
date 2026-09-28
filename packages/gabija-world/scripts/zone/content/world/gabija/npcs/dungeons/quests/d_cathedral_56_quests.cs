@@ -8,11 +8,13 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -46,6 +48,11 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 	private const string CursedOrbVar = "Gabija.Cathedral56.CursedOrb";
 
 	private readonly static string[] KeyOrbs = { "Red", "Blue", "Yellow", "Green", "Purple" };
+	private readonly static Position[] KeyOrbSpots =
+	{
+		new Position(-1672.60f, 0, 835.23f), new Position(-1673.53f, 0, 622.20f), new Position(-1436.67f, 0, 854.26f),
+		new Position(-1378.55f, 0, 693.38f), new Position(-1496.29f, 0, 567.74f),
+	};
 
 	/// <summary>
 	/// Dialog of the Secret Statue, on the map and inside its puzzle track.
@@ -780,6 +787,12 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 			if (character.Variables.Perm.GetBool(LureVar + number, false))
 				return;
 
+			if (!character.IsBuffActive(BuffId.CHATHEDRAL56_MQ03_BUFF))
+			{
+				character.ServerMessage(L("Naktis' servants would see through you. Use the Demon Transform Scroll first."));
+				return;
+			}
+
 			character.Variables.Perm.Set(LureVar + number, true);
 
 			var lured = 0;
@@ -840,14 +853,142 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 			if (!character.Quests.TryGetById(Mq08, out var quest) || !quest.TryGetProgress(objectiveId, out var progress) || progress.Done)
 				return;
 
-			var used = await character.TimeActions.StartAsync(L("Setting the key into the orb..."), L("Cancel"), "SITGROPESET2", TimeSpan.FromSeconds(2));
-
-			if (used != TimeActionResult.Completed)
-				return;
-
-			character.Quests.CompleteObjective(Mq08, objectiveId);
-			character.ServerMessage(LF("The {0} takes its key.", name));
+			await dialog.Msg(L("It looks like one of Maven's keys would fit. Use the key of the same color from your inventory."));
 		});
+	}
+
+	/// <summary>
+	/// Uses Maven's First Key, the red one.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHATHEDRAL53_MQ06_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+		=> this.UseMavenKey(character, 0);
+
+	/// <summary>
+	/// Uses Maven's Second Key, the blue one.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHATHEDRAL54_MQ01_PART1_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+		=> this.UseMavenKey(character, 1);
+
+	/// <summary>
+	/// Uses Maven's Fifth Key, the yellow one.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHATHEDRAL56_SQ01_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+		=> this.UseMavenKey(character, 2);
+
+	/// <summary>
+	/// Uses Maven's Fourth Key, the green one.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHATHEDRAL56_MQ04_PART2_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+		=> this.UseMavenKey(character, 3);
+
+	/// <summary>
+	/// Uses Maven's Third Key, the purple one.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHATHEDRAL54_MQ04_PART2_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+		=> this.UseMavenKey(character, 4);
+
+	/// <summary>
+	/// Sets one of Maven's keys into the orb of its color at Pasala Altar.
+	/// </summary>
+	private ItemUseResult UseMavenKey(Character character, int orbIndex)
+	{
+		if (character.Map.ClassName != "d_cathedral_56" || character.Layer != 0 || !character.Quests.IsActive(Mq08) || character.Quests.IsCompletable(Mq08))
+		{
+			character.ServerMessage(L("The key does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var nearest = -1;
+		for (var i = 0; i < KeyOrbSpots.Length; ++i)
+		{
+			if (character.Position.Get2DDistance(KeyOrbSpots[i]) <= 60)
+				nearest = i;
+		}
+
+		if (nearest < 0)
+		{
+			character.ServerMessage(L("Use the key in front of the orbs at Pasala Altar."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (nearest != orbIndex)
+		{
+			character.ServerMessage(L("The key does not fit this orb. Look at the colors."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var objectiveId = "orb" + KeyOrbs[orbIndex];
+		if (!character.Quests.TryGetById(Mq08, out var quest) || !quest.TryGetProgress(objectiveId, out var progress) || progress.Done)
+		{
+			character.ServerMessage(L("This orb already holds its key."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.SetKeyAsync(character, objectiveId);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Sets the key over a timed action.
+	/// </summary>
+	private async Task SetKeyAsync(Character character, string objectiveId)
+	{
+		var used = await character.TimeActions.StartAsync(L("Setting the key into the orb..."), L("Cancel"), "SITGROPESET2", TimeSpan.FromSeconds(2));
+
+		if (used != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq08) || character.Quests.IsCompletable(Mq08))
+			return;
+
+		character.Quests.CompleteObjective(Mq08, objectiveId);
+		character.ServerMessage(L("The orb takes its key."));
+	}
+
+	/// <summary>
+	/// Transforms the character into one of Naktis' servants with the Demon Transform Scroll.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHATHEDRAL56_MQ03_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_cathedral_56" || character.Layer != 0 || !character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
+		{
+			character.ServerMessage(L("There is no need to transform now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.IsBuffActive(BuffId.CHATHEDRAL56_MQ03_BUFF))
+		{
+			character.ServerMessage(L("You are already transformed."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.TransformAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Transforms the character over a timed action.
+	/// </summary>
+	private async Task TransformAsync(Character character)
+	{
+		var read = await character.TimeActions.StartAsync(L("Using the Demon Transform Scroll"), L("Cancel"), "SCROLL", TimeSpan.FromSeconds(2));
+
+		if (read != TimeActionResult.Completed)
+			return;
+
+		character.StartBuff(BuffId.CHATHEDRAL56_MQ03_BUFF, 1, 0, TimeSpan.FromSeconds(100), character);
+		character.PlayEffect("F_smoke019_dark", 1f);
+		character.ServerMessage(L("Transformation successful! Lure Naktis' servants to the Apgaule Altar."));
 	}
 
 	/// <summary>

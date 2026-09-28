@@ -527,10 +527,9 @@ public class DAbbey641QuestNpcsScript : GeneralScript
 				});
 		}
 
-		AddQuestTrigger("ABBEY64_2_HIDDENQ2_OBJ2", "d_abbey_64_1", 436.31, 851.78, 60, async args =>
+		AddConditionalNpc(20025, "UnvisibleName", "ABBEY64_2_HIDDENQ2_OBJ2", "d_abbey_64_1", 436.31, 851.78, 90, c => c.Quests.IsCompletable(Hq1), async dialog =>
 		{
-			if (args.Initiator is not Character character)
-				return;
+			var character = dialog.Player;
 
 			if (!character.Quests.IsCompletable(Hq1))
 				return;
@@ -539,7 +538,7 @@ public class DAbbey641QuestNpcsScript : GeneralScript
 			if (erected != TimeActionResult.Completed)
 				return;
 
-			character.Quests.Complete(Hq1);
+			await dialog.CompleteQuest(Hq1);
 			if (!character.Quests.HasCompleted(Hq1))
 				return;
 

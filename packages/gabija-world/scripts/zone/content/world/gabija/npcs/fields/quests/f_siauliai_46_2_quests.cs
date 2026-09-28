@@ -6,8 +6,10 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -38,6 +40,8 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 	private readonly static QuestId Party102 = new QuestId(50046);
 
 	private const int BranchesNeeded = 5;
+	private const string BranchBurnedVar = "Gabija.Quests.Siauliai462Mq02.Burned";
+	private readonly static Position AustejaAltar = new Position(-676, 0, 3692);
 	private const int PlanksNeeded = 10;
 
 	// The bee trees near the village.
@@ -661,44 +665,113 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
-			{
-				character.Quests.CompleteObjective(Mq03, "chargeOrb");
-				character.ServerMessage(L("The orb fills with the holy energy of the cliff. Take it back to Raeli."));
-			}
+				character.ServerMessage(L("The holy energy of Austeja's altar is strong here. Use the Orb of Residue to fill it."));
 
 			if (character.Quests.IsActive(Party101) && !character.Quests.IsCompletable(Party101))
-			{
-				character.Quests.CompleteObjective(Party101, "chargeScripture");
-				character.ServerMessage(L("The scripture fills with the holy energy of the altar. Offer it to the Seal Tower."));
-			}
+				character.ServerMessage(L("The holy energy of Austeja's altar is strong here. Use Goddess Austeja's Scripture to fill it."));
 
 			await Task.CompletedTask;
 		});
-
-		// Vulvini Farm and the fields beyond it, where the branches are used.
-		AddQuestTrigger("SIAULIAI_46_2_MQ_02_AREA", "f_siauliai_46_2", -1425, 3555, 400, this.BurnDemonsWithBranches);
-		AddQuestTrigger("SIAULIAI_46_2_MQ_02_AREA_2", "f_siauliai_46_2", -457, 4259, 400, this.BurnDemonsWithBranches);
 	}
 
 	/// <summary>
-	/// Burns the demons of the arable land with a bee tree branch.
+	/// Pierces a weakened demon with a bee tree branch, burning it to ash.
 	/// </summary>
-	/// <param name="args"></param>
-	private async Task BurnDemonsWithBranches(TriggerActorArgs args)
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_SIAULIAI_46_2_MQ_01_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
-		if (args.Initiator is not Character character)
+		if (character.Map.ClassName != "f_siauliai_46_2" || character.Layer != 0 || !character.Quests.IsActive(Mq02) || character.Quests.IsCompletable(Mq02))
+		{
+			character.ServerMessage(L("The branch does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var demons = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
+			.OfType<Mob>()
+			.Where(mob => mob.Faction == FactionType.Monster && !mob.IsDead && !mob.Vars.GetBool(BranchBurnedVar))
+			.ToList();
+
+		var demon = demons.FirstOrDefault(mob => mob.Hp * 2 <= mob.MaxHp);
+		if (demon == null)
+		{
+			character.ServerMessage(demons.Count == 0 ? L("Use the branch close to a demon.") : L("The demon is too strong. Weaken it below half its HP first."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		demon.Vars.SetBool(BranchBurnedVar, true);
+		demon.PlayEffect("F_burstup001_fire", 1f);
+		demon.Kill(character);
+
+		character.Inventory.Add(ItemId.SIAULIAI_46_2_MQ_02_ITEM, 1, InventoryAddType.PickUp);
+		character.ServerMessage(L("The branch's divine power overwhelms the demon and burns it to ash."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Fills the Orb of Residue with the holy energy around Austeja's altar.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_SIAULIAI_46_2_MQ_03_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_siauliai_46_2" || character.Layer != 0 || !character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
+		{
+			character.ServerMessage(L("The orb does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(AustejaAltar) > 250)
+		{
+			character.ServerMessage(L("Fill the orb near Austeja's altar at Palama Cliff."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.ChargeAtAltarAsync(character, Mq03, "chargeOrb", L("Filling the orb"), L("The orb fills with the holy energy of the cliff. Take it back to Raeli."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Fills Goddess Austeja's Scripture with the holy energy around her altar.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_PARTY_Q10_CRYSTAL(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (item.Id != ItemId.PARTY_Q10_CRYSTAL || character.Map.ClassName != "f_siauliai_46_2" || character.Layer != 0 || !character.Quests.IsActive(Party101) || character.Quests.IsCompletable(Party101))
+		{
+			character.ServerMessage(L("Nothing happens."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Position.Get2DDistance(AustejaAltar) > 250)
+		{
+			character.ServerMessage(L("Fill the scripture near Austeja's altar at Palama Cliff."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.ChargeAtAltarAsync(character, Party101, "chargeScripture", L("Filling the scripture"), L("The scripture fills with the holy energy of the altar. Offer it to the Seal Tower."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Fills a quest item with the altar's holy energy over a timed action.
+	/// </summary>
+	private async Task ChargeAtAltarAsync(Character character, QuestId questId, string objectiveIdent, string actionText, string message)
+	{
+		var charged = await character.TimeActions.StartAsync(actionText, L("Cancel"), "ABSORB", TimeSpan.FromSeconds(3));
+
+		if (charged != TimeActionResult.Completed)
 			return;
 
-		if (!character.Quests.IsActive(Mq02) || character.Quests.IsCompletable(Mq02))
+		if (!character.Quests.IsActive(questId) || character.Quests.IsCompletable(questId))
 			return;
 
-		if (character.Inventory.CountItem(ItemId.SIAULIAI_46_2_MQ_01_ITEM) < BranchesNeeded)
-			return;
-
-		character.Inventory.Add(ItemId.SIAULIAI_46_2_MQ_02_ITEM, BranchesNeeded, InventoryAddType.PickUp);
-		character.ServerMessage(L("The branches burn through the demons and leave their ashes behind."));
-
-		await Task.CompletedTask;
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.Quests.CompleteObjective(questId, objectiveIdent);
+		character.ServerMessage(message);
 	}
 
 	/// <summary>

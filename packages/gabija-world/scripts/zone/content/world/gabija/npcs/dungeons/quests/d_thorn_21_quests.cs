@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Items;
@@ -251,6 +252,12 @@ public class DThorn21QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq04) && character.Inventory.HasItem(ItemId.THORN21_MQ04_DRUG))
+			{
+				await dialog.Msg(L("Once you have four of Matsum's Flower Stamens, put them in the potion and shake it."));
+				return;
+			}
+
 			if (character.Quests.IsActive(Mq04))
 			{
 				await dialog.Msg(L("Try to hold it in even if it's dirty."));
@@ -458,6 +465,68 @@ public class DThorn21QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 	}
+
+	/// <summary>
+	/// Shakes Matsum's Flower Stamens into the Thorn Flower Fluid, making
+	/// the Enhanced Thorn Flower Stimulant.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_THORN21_MQ04_DRUG(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_thorn_21" || character.Layer != 0 || !character.Quests.IsActive(Mq04))
+		{
+			character.ServerMessage(L("Nothing happens."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.Inventory.CountItem(ItemId.THORN21_MQ04_BUGWING) < 4)
+		{
+			character.ServerMessage(L("You need four of Matsum's Flower Stamens to put in the potion."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.MakeStimulantAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Makes the stimulant over a timed action.
+	/// </summary>
+	private async Task MakeStimulantAsync(Character character)
+	{
+		var made = await character.TimeActions.StartAsync(L("Enhancing the Thorn Flower Stimulant"), L("Cancel"), "FLASK", TimeSpan.FromSeconds(3));
+
+		if (made != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq04) || character.Inventory.CountItem(ItemId.THORN21_MQ04_BUGWING) < 4)
+			return;
+
+		character.Inventory.RemoveItem(ItemId.THORN21_MQ04_DRUG, 1);
+		character.Inventory.Add(ItemId.THORN21_MQ07_THORNDRUG, 1, InventoryAddType.PickUp);
+		character.Quests.CompleteObjective(Mq04, "makeStimulant");
+		character.ServerMessage(L("You made the Enhanced Thorn Flower Stimulant."));
+	}
+
+	/// <summary>
+	/// Drinks the Enhanced Thorn Flower Stimulant against Bramble's evil energy.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_THORN21_MQ07_THORNDRUG(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_thorn_21" || character.Layer == 0 || !character.Quests.IsActive(Mq07))
+		{
+			character.ServerMessage(L("Save the stimulant for Bramble's evil energy."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.StartBuff(BuffId.THORN21_MQ07_THORNDRUG, 1, 0, TimeSpan.FromSeconds(4), character);
+		character.ServerMessage(L("The stimulant clears your head. Bramble's evil energy cannot reach you for now."));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -581,6 +650,7 @@ public class Thorn21Mq04Quest : QuestScript
 		AddPityDrop("THORN21_MQ04_BUGWING", 0.45f, 5, 1, "Matsum");
 
 		AddObjective("collectStamen", L("Obtain Matsum's Flower Stamen"), new CollectItemObjective("THORN21_MQ04_BUGWING", 4));
+		AddObjective("makeStimulant", L("Create the Thorn Flower Stimulant"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 1));
 		AddReward(new TakeItemReward("THORN21_MQ04_BUGWING"));

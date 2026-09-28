@@ -8,9 +8,14 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -324,7 +329,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06))
 			{
-				await dialog.Msg(L("Use the scroll and lure the demons to the Apsauga Altar."));
+				await dialog.Msg(L("Defeat a demon to gain some confidence, then use the scroll and lure the demons to the Apsauga Altar."));
 				return;
 			}
 
@@ -474,7 +479,18 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				return;
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
-				character.Quests.CompleteObjective(Mq06, "lureDemons");
+			{
+				if (character.IsBuffActive(BuffId.CHAPLE576_MQ_06_1))
+				{
+					character.StopBuff(BuffId.CHAPLE576_MQ_06_1);
+					character.Quests.CompleteObjective(Mq06, "lureDemons");
+					character.ServerMessage(L("The demons followed you to the Apsauga Altar without suspecting a thing!"));
+				}
+				else
+				{
+					character.ServerMessage(L("Transform into a demon with the Demon Transform Scroll and lure Pawndel and Pawnd here."));
+				}
+			}
 
 			await Task.CompletedTask;
 		});
@@ -490,6 +506,58 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
+	}
+
+	/// <summary>
+	/// Gives the character confidence once it defeats a Pawndel or Pawnd.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || (mob.Data.ClassName != "Pawndel" && mob.Data.ClassName != "pawnd"))
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+			return;
+
+		if (character.IsBuffActive(BuffId.CHAPLE576_MQ_06) || character.IsBuffActive(BuffId.CHAPLE576_MQ_06_1))
+			return;
+
+		character.StartBuff(BuffId.CHAPLE576_MQ_06, 1, 0, TimeSpan.FromSeconds(100), character);
+		character.ServerMessage(L("You defeated a demon and gained confidence. Use the Demon Transform Scroll!"));
+	}
+
+	/// <summary>
+	/// Transforms the character into a demon with the Demon Transform Scroll.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHAPLE576_MQ_06_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_chapel_57_6" || character.Layer != 0 || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+		{
+			character.ServerMessage(L("There is no need to transform now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (character.IsBuffActive(BuffId.CHAPLE576_MQ_06_1))
+		{
+			character.ServerMessage(L("You are already transformed."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.IsBuffActive(BuffId.CHAPLE576_MQ_06))
+		{
+			character.ServerMessage(L("You lack the confidence to pass as a demon. Defeat Pawndel or Pawnd first."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.StopBuff(BuffId.CHAPLE576_MQ_06);
+		character.StartBuff(BuffId.CHAPLE576_MQ_06_1, 1, 0, TimeSpan.FromSeconds(100), character);
+		character.PlayEffect("F_smoke019_dark", 1f);
+		character.ServerMessage(L("Transformed! Persuade Pawndel and Pawnd and lure them to the Apsauga Altar!"));
+
+		return ItemUseResult.OkayNotConsumed;
 	}
 }
 

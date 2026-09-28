@@ -6,12 +6,18 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -40,6 +46,15 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 	private const string RelicVar = "Gabija.Cathedral53.Relic";
 	private const string HiddenRelicVar = "Gabija.Cathedral53.HiddenRelic";
 	private const string AltarVar = "Gabija.Cathedral53.Altar";
+	private const string RevealedRelicVar = "Gabija.Cathedral53.RevealedRelic";
+
+	private readonly static string[] SummonableBishops = { "CHATHEDRAL_BISHOP", "CHATHEDRAL54_BISHOP_AFTER", "CHATHEDRAL56_BISHOP" };
+	private readonly static ConcurrentDictionary<long, Npc> SummonedBishops = new();
+
+	private readonly static double[,] HiddenRelicSpots =
+	{
+		{ 753.93, -88.17 }, { 786.18, -181.80 }, { 705.11, 210.50 }, { 1027.64, -165.88 }, { 990.39, 181.33 },
+	};
 
 	/// <summary>
 	/// Dialog of the Meile Oratorium platform, on the map and inside its puzzle track.
@@ -238,7 +253,10 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					for (var i = 1; i <= GracefulRelicsNeeded; ++i)
+					{
 						character.Variables.Perm.Set(HiddenRelicVar + i, false);
+						character.Variables.Perm.Set(RevealedRelicVar + i, false);
+					}
 
 					character.Quests.Start(Sq02);
 					character.Inventory.Add(ItemId.CATHEDRAL53_SQ02_ITEM, 1, InventoryAddType.PickUp);
@@ -281,11 +299,8 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		// The client keeps these as hidden triggers the Orb of Divine Detection
 		// reveals; the port places the relics themselves on those spots.
-		this.AddHiddenRelic(1, 753.93, -88.17);
-		this.AddHiddenRelic(2, 786.18, -181.80);
-		this.AddHiddenRelic(3, 705.11, 210.50);
-		this.AddHiddenRelic(4, 1027.64, -165.88);
-		this.AddHiddenRelic(5, 990.39, 181.33);
+		for (var i = 0; i < HiddenRelicSpots.GetLength(0); ++i)
+			this.AddHiddenRelic(i + 1, HiddenRelicSpots[i, 0], HiddenRelicSpots[i, 1]);
 
 		// Priest Aden
 		//-------------------------------------------------------------------------
@@ -476,10 +491,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 			if (answer == "accept")
 			{
 				character.Quests.Start(Mq03);
-				character.Quests.CompleteObjective(Mq03, "callTheBishop");
 				await dialog.Msg(L("It's simple. Just open the Spirit's Scripture in your inventory."));
-				character.ServerMessage(L("The Spirit's Scripture opens and the bishop stands beside the Altar of Stability."));
-				character.LookAround();
 			}
 			return;
 		}
@@ -753,7 +765,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 	/// <param name="z"></param>
 	private void AddHiddenRelic(int number, double x, double z)
 	{
-		AddConditionalNpc(151022, L("Graceful Relic"), "CATHEDRAL_SQ_OBJECT0" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Sq02), async dialog =>
+		AddConditionalNpc(151022, L("Graceful Relic"), "CATHEDRAL_SQ_OBJECT0" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Sq02) && c.Variables.Perm.GetBool(RevealedRelicVar + number, false), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -774,6 +786,86 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 			character.Inventory.Add(ItemId.CATHEDRAL53_SQ021_ITEM, 1, InventoryAddType.PickUp);
 			character.ServerMessage(LF("Graceful Relics recovered: {0}/{1}", character.Inventory.CountItem(ItemId.CATHEDRAL53_SQ021_ITEM), GracefulRelicsNeeded));
 		});
+	}
+
+	/// <summary>
+	/// Calls Bishop Aurelius' spirit out of the Spirit's Scripture, next to the character.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CHATHEDRAL53_MQ03_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (SummonedBishops.TryGetValue(character.ObjectId, out var summoned) && summoned.Map != null && summoned.DisappearTime > GameClock.LocalNow)
+		{
+			character.ServerMessage(L("Bishop Aurelius' spirit is already waiting."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var bishop = character.Map.GetMonsters(monster => monster is Npc npc && SummonableBishops.Contains(npc.UniqueName) && (npc.VisibleTo == null || npc.VisibleTo(character)))
+			.OfType<Npc>()
+			.FirstOrDefault();
+
+		if (bishop == null || character.Layer != 0)
+		{
+			character.ServerMessage(L("It cannot be used right now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var spirit = new Npc(bishop.Id, bishop.Name, character.Position.GetRelative(character.Direction, 30), character.Direction.Backwards);
+		spirit.Layer = character.Layer;
+		spirit.Faction = FactionType.Neutral;
+		spirit.DisappearTime = GameClock.LocalNow.AddSeconds(90);
+		spirit.VisibleTo = c => c == character;
+		spirit.SetClickTrigger(bishop.UniqueName, bishop.DialogFunc);
+
+		character.Map.AddMonster(spirit);
+		SummonedBishops[character.ObjectId] = spirit;
+
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.ServerMessage(L("The Spirit's Scripture opens and Bishop Aurelius' spirit appears beside you."));
+
+		if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
+			character.Quests.CompleteObjective(Mq03, "callTheBishop");
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Reveals the Graceful Relics hiding near the character with the Orb of Divine Detection.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_CATHEDRAL53_SQ_02_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_cathedral_53" || character.Layer != 0 || !character.Quests.IsActive(Sq02) || character.Quests.IsCompletable(Sq02))
+		{
+			character.ServerMessage(L("The orb does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var revealed = 0;
+		for (var i = 0; i < HiddenRelicSpots.GetLength(0); ++i)
+		{
+			var number = i + 1;
+			if (character.Variables.Perm.GetBool(RevealedRelicVar + number, false))
+				continue;
+
+			if (character.Position.Get2DDistance(new Position((float)HiddenRelicSpots[i, 0], 0, (float)HiddenRelicSpots[i, 1])) > 240)
+				continue;
+
+			character.Variables.Perm.Set(RevealedRelicVar + number, true);
+			revealed++;
+		}
+
+		if (revealed == 0)
+		{
+			character.ServerMessage(L("The orb senses no holy energy nearby."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.PlayEffect("F_light018_yellow", 1f);
+		character.ServerMessage(L("The orb glows, and a hidden relic reveals itself!"));
+		character.LookAround();
+
+		return ItemUseResult.OkayNotConsumed;
 	}
 }
 

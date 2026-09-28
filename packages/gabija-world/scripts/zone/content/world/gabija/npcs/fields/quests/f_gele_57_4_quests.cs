@@ -5,11 +5,18 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -456,19 +463,96 @@ public class FGele574QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("A demon summoning circle, its sigils still whole."));
 		});
 
-		// Hidden trigger
-		//-------------------------------------------------------------------------
-		// The Panto grounds in Levanda Habitat, where the charm is tried.
-		AddQuestTrigger("GELE574_MQ_05_LURE", "f_gele_57_4", -1202, -184, 350, async args =>
+	}
+
+	/// <summary>
+	/// Casts the Flimsy Charm's brainwashing curse on a nearby Panto Archer.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_GELE574_MQ_05_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_gele_57_4" || character.Layer != 0 || !character.Quests.IsActive(Mq05) || character.Quests.IsCompletable(Mq05))
 		{
-			if (args.Initiator is not Character character)
-				return;
+			character.ServerMessage(L("The charm does not react."));
+			return ItemUseResult.OkayNotConsumed;
+		}
 
-			if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
-				character.Quests.CompleteObjective(Mq05, "charmPantos");
+		var archer = FindPantoArcher(character, 100, BuffId.GELE574_MQ_05);
+		if (archer == null)
+		{
+			character.ServerMessage(L("Use the charm close to a Panto Archer."));
+			return ItemUseResult.OkayNotConsumed;
+		}
 
-			await Task.CompletedTask;
-		});
+		archer.StartBuff(BuffId.GELE574_MQ_05, 1, 0, TimeSpan.FromMinutes(1), character);
+		archer.InsertHate(character);
+		character.ServerMessage(L("The Panto Archer has been cursed with brainwashing! Defeat it!"));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Completes the brainwashing trial once a cursed Panto Archer is defeated.
+	/// </summary>
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
+	{
+		if (args.Target is not Mob mob || mob.Data.ClassName != "Npanto_archer" || !mob.IsBuffActive(BuffId.GELE574_MQ_05))
+			return;
+
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || !character.Quests.IsActive(Mq05) || character.Quests.IsCompletable(Mq05))
+			return;
+
+		character.Quests.CompleteObjective(Mq05, "charmPantos");
+	}
+
+	/// <summary>
+	/// Turns the Panto Archers around the character to its side with the Old Talisman.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_GELE574_MQ_06_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "f_gele_57_4" || character.Layer == 0 || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+		{
+			character.ServerMessage(L("Burn the Panto Totem in Valyma Sanctum first, then use the talisman."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var archer = FindPantoArcher(character, 150, BuffId.GELE574_MQ_06);
+		if (archer == null)
+		{
+			character.ServerMessage(L("Use the talisman close to a Panto Archer."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.Map.RemoveMonster(archer);
+
+		var ally = new Mob(archer.Id, RelationType.Friendly);
+		ally.Name = L("Brainwashed Panto");
+		ally.Position = archer.Position;
+		ally.SpawnPosition = archer.Position;
+		ally.Direction = archer.Direction;
+		ally.Layer = character.Layer;
+		ally.Components.Add(new MovementComponent(ally));
+		MakeCombatNpc(ally, character);
+
+		character.Map.AddMonster(ally, immediate: true);
+		ally.StartBuff(BuffId.GELE574_MQ_06, 1, 0, TimeSpan.FromMinutes(10), character);
+
+		character.ServerMessage(L("The Panto Archer falls under the talisman's control and fights at your side!"));
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Returns the nearest Panto Archer on the character's layer that does not carry the given buff yet.
+	/// </summary>
+	private static Mob FindPantoArcher(Character character, float range, BuffId excludedBuff)
+	{
+		return character.Map.GetAttackableEnemiesInPosition(character, character.Position, range)
+			.OfType<Mob>()
+			.FirstOrDefault(mob => mob.Data.ClassName == "Npanto_archer" && !mob.IsBuffActive(excludedBuff));
 	}
 }
 

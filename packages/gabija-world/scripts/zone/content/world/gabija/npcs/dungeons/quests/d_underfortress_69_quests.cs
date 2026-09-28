@@ -6,8 +6,10 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -625,23 +627,31 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 			AddQuestTrigger("UNDER69_SQ3_GHOST_CALL" + number, "d_underfortress_69", HornSpots[i, 0], HornSpots[i, 1], 100, args => this.BlowTheHorn(args, number));
 		}
 
-		// The Dievdirbys Master's carving tools, back at the West Forest.
-		AddQuestTrigger("JOB_DIEVDIRBYS2_NPC_TOOLS", "f_siauliai_west", -1076, 425, 150, async args =>
+		// Sculptor Tesla, the Dievdirbys Master at the West Forest
+		//-------------------------------------------------------------------------
+		AddNpc(47239, L("[Dievdirbys Master]{nl}Sculptor Tesla"), "JOB_DIEVDIRBYS2_NPC", "f_siauliai_west", -751, -362, 0, async dialog =>
 		{
-			if (args.Initiator is not Character character)
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Sculptor Tesla"));
+			dialog.SetPortrait("Dlg_port_SCULPTOR");
+
+			if (character.Quests.IsActive(Hq1) && !character.Quests.IsCompletable(Hq1))
+			{
+				var asked = await character.TimeActions.StartAsync(L("Asking for the carving tools..."), L("Cancel"), "TALK", TimeSpan.FromSeconds(3));
+
+				if (asked != TimeActionResult.Completed)
+					return;
+
+				character.Inventory.Add(ItemId.UNDER69_HIDDENQ1_ITEM1, 1, InventoryAddType.PickUp);
+				character.Quests.CompleteObjective(Hq1, "borrowTheTools");
+				character.ServerMessage(L("Stone carving tools? Yes, I have them right here."));
 				return;
+			}
 
-			if (!character.Quests.IsActive(Hq1) || character.Quests.IsCompletable(Hq1))
-				return;
-
-			var asked = await character.TimeActions.StartAsync(L("Asking for the carving tools..."), L("Cancel"), "TALK", TimeSpan.FromSeconds(3));
-
-			if (asked != TimeActionResult.Completed)
-				return;
-
-			character.Inventory.Add(ItemId.UNDER69_HIDDENQ1_ITEM1, 1, InventoryAddType.PickUp);
-			character.Quests.CompleteObjective(Hq1, "borrowTheTools");
-			character.ServerMessage(L("Sculptor Tesla lends the carving tools. Take them back to Amanda."));
+			await dialog.Msg(L("I have carved many owls for a long time to help Goddess Ausrine."));
+			await dialog.Msg(L("At one point in time, they got their lives and determination."));
+			await dialog.Msg(L("When I regained consciousness, a few hundred years had passed."));
 		});
 	}
 
@@ -656,12 +666,40 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 			return;
 
 		if (character.Quests.IsActive(Sq030, "blowHorn" + number))
-		{
-			character.Quests.CompleteObjective(Sq030, "blowHorn" + number);
-			character.ServerMessage(L("The horn carries across the battlegrounds."));
-		}
+			character.ServerMessage(L("The battlegrounds spread out below. Blow the horn from here."));
 
 		await Task.CompletedTask;
+	}
+
+	/// <summary>
+	/// Blows the retreat horn from the rise the character stands on.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_UNDER69_SQ3_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		if (character.Map.ClassName != "d_underfortress_69" || character.Layer != 0 || !character.Quests.IsActive(Sq030) || character.Quests.IsCompletable(Sq030))
+		{
+			character.ServerMessage(L("There is no one to hear the horn now."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		var number = 0;
+		for (var i = 0; i < HornSpots.GetLength(0) && number == 0; ++i)
+		{
+			if (character.Quests.IsActive(Sq030, "blowHorn" + (i + 1)) && character.Position.Get2DDistance(new Position((float)HornSpots[i, 0], 0, (float)HornSpots[i, 1])) <= 100)
+				number = i + 1;
+		}
+
+		if (number == 0)
+		{
+			character.ServerMessage(L("Blow the horn from one of the rises over the battlegrounds."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		character.Quests.CompleteObjective(Sq030, "blowHorn" + number);
+		character.ServerMessage(L("The horn carries across the battlegrounds."));
+
+		return ItemUseResult.OkayNotConsumed;
 	}
 
 	/// <summary>
@@ -1077,7 +1115,7 @@ public class Underfortress69Hq1Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "AMANDA_69_2", "d_underfortress_69", L("Talk to Amanda"), L("Amanda seems to be struggling with something. Talk to her and ask her what's wrong."));
-		SetPhase(QuestStatus.InProgress, "JOB_DIEVDIRBYS2_NPC_TOOLS", "f_siauliai_west", L("Ask the Dievdirbys Master for Help"), L("Borrow the carving tools from the Dievdirbys Master and bring them to Amanda."));
+		SetPhase(QuestStatus.InProgress, "JOB_DIEVDIRBYS2_NPC", "f_siauliai_west", L("Ask the Dievdirbys Master for Help"), L("Borrow the carving tools from the Dievdirbys Master and bring them to Amanda."));
 		SetPhase(QuestStatus.Success, "AMANDA_69_2", "d_underfortress_69", L("Talk to Amanda"), L("You have obtained the tools from the Dievdirbys Master. Bring them to Amanda."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(50085, QuestStatus.Completed));
