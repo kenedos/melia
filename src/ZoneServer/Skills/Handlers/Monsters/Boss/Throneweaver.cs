@@ -90,22 +90,28 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
-			await skill.Wait(TimeSpan.FromMilliseconds(1400));
-			for (var i = 0; i < 10; i++)
+			var throws = new (int Time, float FlyTime)[]
 			{
-				if (i == 5)
-					await skill.Wait(TimeSpan.FromMilliseconds(1800));
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
+				(1400, 1.2f), (1500, 1.2f), (1600, 1.2f), (1700, 1.2f), (1800, 1.2f),
+				(3600, 1f), (3700, 1f), (3800, 1f), (3900, 1f), (4000, 1f), (4000, 1f), (4100, 1f),
+			};
 
-				var position = GetLeadPositionScatter(target, 1200, 50, caster);
+			var elapsed = 0;
+			foreach (var (time, flyTime) in throws)
+			{
+				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+				elapsed = time;
+
+				if (!caster.Position.InRange2D(target.Position, 300))
+					continue;
+
+				var position = GetLeadPositionScatter(target, (int)(flyTime * 1000), 50, caster);
 				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), new MissileConfig
 				{
 					Effect = new EffectConfig("I_force011_green#Dummy_effect_tail", 1f),
 					EndEffect = new EffectConfig("F_explosion052_green##0.8", 1f),
 					Range = 10f,
-					FlyTime = 1.2f,
+					FlyTime = flyTime,
 					DelayTime = 0f,
 					Gravity = 800f,
 					Speed = 1f,
@@ -113,7 +119,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 					HitCount = 1,
 					GroundEffect = new EffectConfig("None", 2.5f),
 				});
-				await skill.Wait(TimeSpan.FromMilliseconds(100));
 			}
 		}
 	}
@@ -262,22 +267,28 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
-			await skill.Wait(TimeSpan.FromMilliseconds(1400));
-			for (var i = 0; i < 10; i++)
+			var throws = new (int Time, float FlyTime)[]
 			{
-				if (i == 5)
-					await skill.Wait(TimeSpan.FromMilliseconds(1800));
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
+				(1400, 1.2f), (1500, 1.2f), (1600, 1.2f), (1700, 1.2f), (1800, 1.2f),
+				(3600, 1f), (3700, 1f), (3800, 1f), (3900, 1f), (4000, 1f), (4000, 1f), (4100, 1f),
+			};
 
-				var position = GetLeadPositionScatter(target, 1200, 50, caster);
+			var elapsed = 0;
+			foreach (var (time, flyTime) in throws)
+			{
+				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+				elapsed = time;
+
+				if (!caster.Position.InRange2D(target.Position, 300))
+					continue;
+
+				var position = GetLeadPositionScatter(target, (int)(flyTime * 1000), 50, caster);
 				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), new MissileConfig
 				{
 					Effect = new EffectConfig("I_force011_green#Dummy_effect_tail", 1f),
 					EndEffect = new EffectConfig("F_explosion052_green##0.8", 1f),
 					Range = 10f,
-					FlyTime = 1.2f,
+					FlyTime = flyTime,
 					DelayTime = 0f,
 					Gravity = 800f,
 					Speed = 1f,
@@ -285,7 +296,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 					HitCount = 1,
 					GroundEffect = new EffectConfig("None", 2.5f),
 				});
-				await skill.Wait(TimeSpan.FromMilliseconds(100));
 			}
 		}
 	}

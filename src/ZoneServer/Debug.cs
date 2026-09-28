@@ -28,6 +28,11 @@ namespace Melia.Zone
 		private static int _rangePreviewCounter = 0;
 
 		/// <summary>
+		/// Returns whether mob skill announcements are sent.
+		/// </summary>
+		public static bool MobSkillAnnounceEnabled { get; set; }
+
+		/// <summary>
 		/// Temporarily visualizes the shape on the map using friendly
 		/// monsters and range previews.
 		/// </summary>
@@ -139,6 +144,9 @@ namespace Melia.Zone
 		/// <param name="skill"></param>
 		public static void MobSkillAnnounce(ICombatEntity caster, Skill skill)
 		{
+			if (!MobSkillAnnounceEnabled)
+				return;
+
 			Send.ZC_CHAT(caster, "Watch out! I'm using {0}!", skill.Data.ClassName);
 		}
 

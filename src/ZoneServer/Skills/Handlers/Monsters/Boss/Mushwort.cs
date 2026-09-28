@@ -206,12 +206,16 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-
-			for (var i = 0; i < 14; i++)
+			var waves = new (int Start, int Count)[] { (500, 11), (4500, 12) };
+			var elapsed = 0;
+			foreach (var wave in waves)
 			{
-				for (var j = 0; j < 3; j++)
+				for (var i = 0; i < wave.Count; i++)
 				{
+					var time = wave.Start + i * 250;
+					await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+					elapsed = time;
+
 					var angle = GameRandom.Get().NextDouble() * Math.PI * 2;
 					var distance = GameRandom.Get().NextDouble() * 300;
 					var missilePos = new Position(
@@ -236,8 +240,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 						GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 1.5f),
 					}));
 				}
-				if (i < 13)
-					await skill.Wait(TimeSpan.FromMilliseconds(400));
 			}
 		}
 	}
@@ -330,42 +332,33 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 180);
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
-
-			for (var waves = 0; waves < 2; waves++)
+			var throws = new (int Time, float FlyTime)[] { (1000, 1.3f), (1200, 1.3f), (1500, 1.3f), (4000, 1f), (4200, 1f), (4500, 1f) };
+			var elapsed = 0;
+			foreach (var (time, flyTime) in throws)
 			{
-				for (var i = 0; i < 6; i++)
+				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+				elapsed = time;
+
+				var angle = GameRandom.Get().NextDouble() * Math.PI * 2;
+				var distance = 20 + GameRandom.Get().NextDouble() * 40;
+				var missilePos = new Position(
+					target.Position.X + (float)(Math.Cos(angle) * distance),
+					target.Position.Y,
+					target.Position.Z + (float)(Math.Sin(angle) * distance)
+				);
+				skill.Run(MissileThrow(skill, caster, missilePos, new MissileConfig
 				{
-					for (var j = 0; j < 2; j++)
-					{
-						var angle = GameRandom.Get().NextDouble() * Math.PI * 2;
-						var distance = 20 + GameRandom.Get().NextDouble() * 40;
-						var missilePos = new Position(
-							target.Position.X + (float)(Math.Cos(angle) * distance),
-							target.Position.Y,
-							target.Position.Z + (float)(Math.Sin(angle) * distance)
-						);
-						skill.Run(MissileThrow(skill, caster, missilePos, new MissileConfig
-						{
-							Effect = new EffectConfig("I_mushwort_atk002_mash#Bip001 Neck", 1.2f),
-							EndEffect = new EffectConfig("F_explosion034_blue#1#1.5", 0.5f),
-							Range = 40f,
-							FlyTime = 1.3f,
-							DelayTime = 0f,
-							Gravity = 600f,
-							Speed = 1f,
-							HitTime = 1000f,
-							HitCount = 1,
-							GroundEffect = new EffectConfig("None", 3.5f),
-							// TargetEffect.Name = "F_sys_target_boss##0.5",
-							// TargetEffect.Scale = 1.5f,
-						}));
-					}
-					if (i < 5)
-						await skill.Wait(TimeSpan.FromMilliseconds(250));
-				}
-				await skill.Wait(TimeSpan.FromMilliseconds(3000));
+					Effect = new EffectConfig("I_mushwort_atk002_mash#Bip001 Neck", 1.2f),
+					EndEffect = new EffectConfig("F_explosion034_blue#1#1.5", 0.5f),
+					Range = 40f,
+					FlyTime = flyTime,
+					DelayTime = 0f,
+					Gravity = 600f,
+					Speed = 1f,
+					HitTime = 1000f,
+					HitCount = 1,
+					GroundEffect = new EffectConfig("None", 3.5f),
+				}));
 			}
 		}
 	}

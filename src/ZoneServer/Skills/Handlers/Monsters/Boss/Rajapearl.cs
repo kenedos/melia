@@ -202,9 +202,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
-			await skill.Wait(TimeSpan.FromMilliseconds(2300));
-
 			var config = new MissileConfig
 			{
 				Effect = new EffectConfig("I_circle006_violet", 1.5f),
@@ -221,15 +218,22 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				StartEasing = 0f,
 			};
 
-			for (var i = 0; i < 12; i++)
+			var waves = new (int Start, int Count, int Interval)[] { (2300, 12, 150), (4500, 13, 150), (8000, 13, 0) };
+			var elapsed = 0;
+			foreach (var wave in waves)
 			{
-				if (i > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(150));
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
+				for (var i = 0; i < wave.Count; i++)
+				{
+					var time = wave.Start + i * wave.Interval;
+					await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+					elapsed = time;
 
-				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 800, 60, caster), 250f);
-				_ = this.Fall(caster, skill, position, config);
+					if (!caster.Position.InRange2D(target.Position, 300))
+						continue;
+
+					var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 800, 60, caster), 250f);
+					_ = this.Fall(caster, skill, position, config);
+				}
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));

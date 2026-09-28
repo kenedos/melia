@@ -244,16 +244,46 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_monster", 1f),
 			};
 
-			for (var i = 0; i < 5; i++)
+			if (!caster.Position.InRange2D(target.Position, 250))
+				return;
+
+			var center = originPos.GetNearestPositionWithinDistance(GetLeadPosition(target, 1200, caster), skill.Properties[PropertyName.MaxR] + 50);
+			_ = MissileThrow(skill, caster, center, missileConfig);
+
+			var arrowConfig = new ArrowConfig
+			{
+				ArrowEffect = EffectConfig.None,
+				ArrowSpacing = 30f,
+				ArrowSpacingTime = 0.01f,
+				ArrowLifeTime = 1f,
+				PositionDelay = 1200f,
+				HitEffect = new EffectConfig("I_explosion006_blue", 1f),
+				Range = 15f,
+				KnockdownPower = 100f,
+				Delay = 0f,
+				HitEffectSpacing = 20f,
+				HitTimeSpacing = 0.05f,
+				HitCount = 1,
+				HitDuration = 1000f,
+				KnockType = (KnockType)1,
+			};
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1200));
+
+			var baseDir = originPos.GetDirection(farPos);
+			var points = new[] { 72f, -72f, 144f, 0f, -144f, 72f };
+			var lines = new List<Task>();
+			for (var i = 0; i < points.Length - 1; i++)
 			{
 				if (i > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(300));
-				if (!caster.Position.InRange2D(target.Position, 250))
-					break;
+					await skill.Wait(TimeSpan.FromMilliseconds(200));
 
-				var position = GetLeadPosition(target, 1200, caster);
-				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, skill.Properties[PropertyName.MaxR] + 50), missileConfig);
+				var start = center.GetRelative(baseDir.AddDegreeAngle(points[i]), 75f);
+				var end = center.GetRelative(baseDir.AddDegreeAngle(points[i + 1]), 75f);
+				lines.Add(EffectHitArrow(skill, caster, start, end, arrowConfig));
 			}
+
+			await Task.WhenAll(lines);
 		}
 	}
 

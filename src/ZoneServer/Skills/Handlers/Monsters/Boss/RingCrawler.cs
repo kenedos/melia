@@ -269,21 +269,21 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 
 			var baseDir = originPos.GetDirection(farPos);
-			var angles = new[] { 0f, -60f, -125f, 180f, 125f, 60f };
-			var tasks = new List<Task>();
-			for (var i = 0; i < angles.Length; i++)
+			var schedule = new (int Time, float Angle, bool Far)[]
 			{
-				if (i > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(350));
-				tasks.Add(EffectAndHit(skill, caster, originPos.GetRelative(baseDir.AddDegreeAngle(angles[i]), 50f), nearConfig));
-			}
+				(1500, 0f, false), (1850, -60f, false), (2200, -125f, false), (2550, 180f, false), (2900, 125f, false), (3250, 60f, false), (3600, 0f, false),
+				(5500, 0f, true), (5800, -60f, true), (6100, -125f, true), (6400, 180f, true), (6700, 125f, true), (7000, 60f, true), (7500, 0f, true),
+			};
 
-			await skill.Wait(TimeSpan.FromMilliseconds(1900));
-			for (var i = 0; i < angles.Length; i++)
+			var tasks = new List<Task>();
+			var elapsed = 1500;
+			foreach (var (time, angle, far) in schedule)
 			{
-				if (i > 0)
-					await skill.Wait(TimeSpan.FromMilliseconds(300));
-				tasks.Add(EffectAndHit(skill, caster, originPos.GetRelative(baseDir.AddDegreeAngle(-angles[i]), 100f), farConfig));
+				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+				elapsed = time;
+
+				var position = originPos.GetRelative(baseDir.AddDegreeAngle(angle), far ? 100f : 50f);
+				tasks.Add(EffectAndHit(skill, caster, position, far ? farConfig : nearConfig));
 			}
 			await Task.WhenAll(tasks);
 		}

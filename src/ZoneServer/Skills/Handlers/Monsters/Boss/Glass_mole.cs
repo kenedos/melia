@@ -194,9 +194,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
-
 			var missileConfig = new MissileConfig
 			{
 				Effect = new EffectConfig("I_glassmole_skl1_mash_down", 1f),
@@ -214,29 +211,23 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_monster", 0.40000001f),
 			};
 
-			var delays = new[] { 150, 150, 150, 150, 150, 150, 150, 150, 150 };
-			var position = originPos.GetRelative(farPos, rand: 80, height: 1);
-			await MissileFall(caster, skill, position, missileConfig);
-			foreach (var delay in delays)
+			var waves = new (int Start, int Count)[] { (500, 10), (4000, 9) };
+			var falls = new List<Task>();
+			var elapsed = 0;
+			foreach (var wave in waves)
 			{
-				await skill.Wait(TimeSpan.FromMilliseconds(delay));
-				position = originPos.GetRelative(farPos, rand: 80, height: 1);
-				await MissileFall(caster, skill, position, missileConfig);
+				for (var i = 0; i < wave.Count; i++)
+				{
+					var time = wave.Start + i * 150;
+					await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+					elapsed = time;
+
+					var position = originPos.GetRelative(farPos, rand: 80, height: 1);
+					falls.Add(MissileFall(caster, skill, position, missileConfig));
+				}
 			}
 
-			await skill.Wait(TimeSpan.FromMilliseconds(1650));
-			targetPos = originPos.GetRelative(farPos);
-			await skill.Wait(TimeSpan.FromMilliseconds(500));
-
-			var delays2 = new[] { 150, 150, 150, 150 };
-			position = originPos.GetRelative(farPos, rand: 80, height: 1);
-			await MissileFall(caster, skill, position, missileConfig);
-			foreach (var delay in delays2)
-			{
-				await skill.Wait(TimeSpan.FromMilliseconds(delay));
-				position = originPos.GetRelative(farPos, rand: 80, height: 1);
-				await MissileFall(caster, skill, position, missileConfig);
-			}
+			await Task.WhenAll(falls);
 		}
 	}
 }

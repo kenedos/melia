@@ -174,7 +174,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
 			Send.ZC_SKILL_MELEE_GROUND(caster, skill, farPos, forceId, null);
-			Debug.MobSkillAnnounce(caster, skill);
+			
 			skill.Run(this.HandleSkill(caster, target, skill, originPos, farPos));
 		}
 

@@ -182,8 +182,6 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetRelative(farPos);
-			await skill.Wait(TimeSpan.FromMilliseconds(2500));
 			var config = new MissileConfig
 			{
 				Effect = new EffectConfig("I_circle005_rize#Bone_Teil_R02", 0.7f),
@@ -198,17 +196,18 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 2f),
 			};
 
-			var delays = new[] { 50, 50, 50, 50, 200, 200 };
-			for (var i = 0; i < 7; i++)
+			var times = new[] { 2500, 2550, 2600, 2650, 2700, 2900, 3100, 4400, 4550, 4700, 5000, 5300, 5550, 5600, 5900, 6200 };
+			var elapsed = 0;
+			foreach (var time in times)
 			{
+				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+				elapsed = time;
+
 				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
+					continue;
 
 				var position = GetLeadPositionScatter(target, 1000, 70, caster);
 				_ = MissileThrow(skill, caster, originPos.GetNearestPositionWithinDistance(position, 250f), config);
-
-				if (i < delays.Length)
-					await skill.Wait(TimeSpan.FromMilliseconds(delays[i]));
 			}
 		}
 	}

@@ -597,6 +597,9 @@ namespace Melia.Zone.Scripting.AI
 				if (this.Entity.Components.TryGet<BaseSkillComponent>(out var skillComponent))
 					skillComponent.UseSkill(skill.Id);
 
+				if (this.Entity is Mob)
+					Debug.MobSkillAnnounce(this.Entity, skill);
+
 				handler.Handle(skill, this.Entity, target);
 			}
 			skillUsedSuccessfully = true;

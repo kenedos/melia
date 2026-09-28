@@ -202,34 +202,37 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var targetPos = originPos.GetRelative(farPos);
 			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 150f, 25));
-			await skill.Wait(TimeSpan.FromMilliseconds(150));
-
-			var waves = 16;
-			for (var i = 0; i < waves; i++)
+			var waves = new (int Start, int Count)[] { (150, 10), (3900, 13), (7500, 15) };
+			var elapsed = 0;
+			foreach (var wave in waves)
 			{
-				if (!caster.Position.InRange2D(target.Position, 300))
-					break;
-
-				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 1000, 70, caster), 250f);
-				_ = EffectAndHit(skill, caster, position, new EffectHitConfig
+				for (var i = 0; i < wave.Count; i++)
 				{
-					GroundEffect = new EffectConfig("F_burstup020_smoke", 0.5f),
-					PositionDelay = 1000,
-					Effect = new EffectConfig("F_burstup045", 0.8f),
-					Range = 30f,
-					KnockdownPower = 100f,
-					Delay = 0f,
-					HitCount = 1,
-					HitDuration = 1000f,
-					CasterEffect = EffectConfig.None,
-					CasterNodeName = "None",
-					KnockType = 1,
-					VerticalAngle = 60f,
-					InnerRange = 0,
-				});
+					var time = wave.Start + i * 150;
+					await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+					elapsed = time;
 
-				if (i < waves - 1)
-					await skill.Wait(TimeSpan.FromMilliseconds(300));
+					if (!caster.Position.InRange2D(target.Position, 300))
+						continue;
+
+					var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, 1000, 70, caster), 250f);
+					_ = EffectAndHit(skill, caster, position, new EffectHitConfig
+					{
+						GroundEffect = new EffectConfig("F_burstup020_smoke", 0.5f),
+						PositionDelay = 1000,
+						Effect = new EffectConfig("F_burstup045", 0.8f),
+						Range = 30f,
+						KnockdownPower = 100f,
+						Delay = 0f,
+						HitCount = 1,
+						HitDuration = 1000f,
+						CasterEffect = EffectConfig.None,
+						CasterNodeName = "None",
+						KnockType = 1,
+						VerticalAngle = 60f,
+						InnerRange = 0,
+					});
+				}
 			}
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1000));

@@ -193,23 +193,58 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			var targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.merregina_pad);
-			targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.merregina_pad);
-			targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.merregina_pad);
-			targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.merregina_pad);
-			targetPos = originPos.GetNearestPositionWithinDistance(target.Position, 150f);
-			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			SkillCreatePad(caster, skill, targetPos, 0f, PadName.merregina_pad);
+			var fallConfig = new MissileConfig
+			{
+				Effect = new EffectConfig("I_circle006_violet", 3f),
+				EndEffect = new EffectConfig("F_ground127_water", 0.6f),
+				DotEffect = EffectConfig.None,
+				Range = 20f,
+				FlyTime = 1f,
+				DelayTime = 0.6f,
+				Height = 300f,
+				Easing = 2f,
+				HitTime = 1000f,
+				HitCount = 1,
+				HitStartFix = 0f,
+				StartEasing = 0f,
+				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 2f),
+			};
 
-			//SkillResultTargetBuff(caster, skill, BuffId.UC_freeze, 1, 0f, 4000f, 1, 5, -1, hits);
+			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			for (var i = 0; i < 6; i++)
+			{
+				if (i > 0)
+					await skill.Wait(TimeSpan.FromMilliseconds(200));
+				if (!caster.Position.InRange2D(target.Position, 300))
+					continue;
+
+				var position = GetLeadPositionScatter(target, 1600, 100, caster);
+				_ = MissileFall(caster, skill, originPos.GetNearestPositionWithinDistance(position, 200f), fallConfig);
+			}
+
+			await skill.Wait(TimeSpan.FromMilliseconds(1500));
+			_ = EffectAndHit(skill, caster, originPos.GetRelative(farPos, distance: 150f), new EffectHitConfig
+			{
+				GroundEffect = new EffectConfig("F_sys_target_boss##0.5", 4f),
+				PositionDelay = 500,
+				Effect = new EffectConfig("F_burstup041_water_blue", 1f),
+				Range = 50f,
+				KnockdownPower = 0f,
+				Delay = 0f,
+				HitCount = 1,
+				HitDuration = 1000f,
+				CasterEffect = EffectConfig.None,
+				CasterNodeName = "None",
+				KnockType = 1,
+				VerticalAngle = 0f,
+				InnerRange = 0,
+			});
+
+			await skill.Wait(TimeSpan.FromMilliseconds(500));
+			SkillCreatePad(caster, skill, originPos.GetRelative(farPos, distance: 150f), 0f, PadName.merregina_pad);
+			SkillCreatePad(caster, skill, target.Position.GetRandomInRange2D(170), 0f, PadName.merregina_pad);
+			SkillCreatePad(caster, skill, target.Position.GetRandomInRange2D(170), 0f, PadName.merregina_pad);
+			SkillCreatePad(caster, skill, target.Position.GetRandomInRange2D(190), 0f, PadName.merregina_pad);
 		}
 	}
 }

@@ -208,6 +208,7 @@ namespace Melia.Zone.Commands
 			this.Add("feature", "<feature name> <enabled>", "Toggles a feature.", this.HandleFeature);
 			this.Add("resetcd", "", "Resets all skill cooldowns.", this.HandleResetSkillCooldown);
 			this.Add("nosave", "[enabled]", "Toggles whether the character will be saved on logout.", this.HandleNoSave);
+			this.Add("mobskillannounce", "[enabled]", "Toggles the chat announcements of monster skills.", this.HandleMobSkillAnnounce);
 			this.Add("callmonster", "", "Instructs nearest monster to move to character.", this.HandleCallMonster);
 			this.Add("sendmonster", "<x> [y] <z>", "Instructs nearest monster to walk to given position.", this.HandleSendMonster);
 			this.Add("savelocation", "<location memo>", "Saves a location to locations.txt in temp folder.", this.HandleSaveLocation);
@@ -5844,6 +5845,32 @@ namespace Melia.Zone.Commands
 				sender.ServerMessage(Localization.Get("The character was set to *not* be saved on logout."));
 			else
 				sender.ServerMessage(Localization.Get("The character was set to be saved on logout."));
+
+			return CommandResult.Okay;
+		}
+
+		/// <summary>
+		/// Enables or disables the chat announcements of monster skills.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="commandName"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleMobSkillAnnounce(Character sender, Character target, string message, string commandName, Arguments args)
+		{
+			var enabled = !Debug.MobSkillAnnounceEnabled;
+
+			if (args.Count > 0 && !bool.TryParse(args.Get(0), out enabled))
+				return CommandResult.InvalidArgument;
+
+			Debug.MobSkillAnnounceEnabled = enabled;
+
+			if (enabled)
+				sender.ServerMessage(Localization.Get("Monster skill announcements enabled."));
+			else
+				sender.ServerMessage(Localization.Get("Monster skill announcements disabled."));
 
 			return CommandResult.Okay;
 		}

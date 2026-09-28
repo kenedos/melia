@@ -292,7 +292,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				InnerRange = 0f,
 			};
 
-			var delays = new[] { 0, 0, 0, 1500, 0, 0, 0, 0, 0, 1300, 50, 50, 50, 50, 50, 50, 50 };
+			var delays = new[] { 0, 0, 0, 1500, 0, 0, 0, 0, 1300, 50, 50, 50, 50, 50, 50, 50 };
 			foreach (var delay in delays)
 			{
 				if (delay > 0)

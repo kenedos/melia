@@ -47,7 +47,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				Effect = new EffectConfig("F_rize008##1", 0.5f),
 				Range = 35f,
 				KnockdownPower = 0f,
-				Delay = 5000f,
+				Delay = 1500f,
 				HitCount = 2,
 				HitDuration = 500f,
 				CasterEffect = EffectConfig.None,
@@ -89,7 +89,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_monster", 1.3f),
 				PositionDelay = 2500,
 				Effect = EffectConfig.None,
-				Range = 35f,
+				Range = 45f,
 				KnockdownPower = 0f,
 				Delay = 200f,
 				HitCount = 1,
@@ -189,7 +189,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("F_sys_target_boss", 7f),
 				PositionDelay = 3300,
 				Effect = EffectConfig.None,
-				Range = 50f,
+				Range = 70f,
 				KnockdownPower = 0f,
 				Delay = 200f,
 				HitCount = 1,
@@ -205,7 +205,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("None", 7f),
 				PositionDelay = 0,
 				Effect = EffectConfig.None,
-				Range = 50f,
+				Range = 70f,
 				KnockdownPower = 0f,
 				Delay = 200f,
 				HitCount = 1,
@@ -238,7 +238,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			skill.IncreaseOverheat();
 			caster.TurnTowards(target);
 			caster.SetAttackState(true);
-
+			
 			var originPos = caster.Position;
 			var farPos = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
 			var forceId = ForceId.GetNew();
@@ -251,23 +251,43 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		{
 			var targetPos = GetRelativePosition(PosType.TargetDistance, caster, target);
 			caster.SetTargets(SkillSelectEnemiesInCircle(caster, targetPos, 150f, 20));
-			var position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
-			await EffectAndHit(skill, caster, position, new EffectHitConfig
+
+			var schedule = new (int Time, int HitCount, int Rand)[]
 			{
-				GroundEffect = new EffectConfig("F_sys_target_boss##0.8", 2.5f),
-				PositionDelay = 1500,
-				Effect = new EffectConfig("F_rize008##1", 0.5f),
-				Range = 35f,
-				KnockdownPower = 0f,
-				Delay = 500f,
-				HitCount = 2,
-				HitDuration = 500f,
-				CasterEffect = EffectConfig.None,
-				CasterNodeName = "None",
-				KnockType = 1,
-				VerticalAngle = 60f,
-				InnerRange = 0,
-			});
+				(3000, 2, 0), (3500, 3, 0), (4000, 3, 110), (4500, 3, 110), (5500, 3, 110),
+				(7000, 3, 0), (7500, 3, 0), (8000, 3, 110), (8500, 3, 110), (9000, 3, 110),
+			};
+
+			var blasts = new List<Task>();
+			var elapsed = 0;
+			foreach (var (time, hitCount, rand) in schedule)
+			{
+				await skill.Wait(TimeSpan.FromMilliseconds(time - elapsed));
+				elapsed = time;
+
+				var position = originPos.GetNearestPositionWithinDistance(target.Position, skill.Properties[PropertyName.MaxR]);
+				if (rand > 0)
+					position = position.GetRandomInRange2D(rand);
+
+				blasts.Add(EffectAndHit(skill, caster, position, new EffectHitConfig
+				{
+					GroundEffect = new EffectConfig("F_sys_target_boss##0.8", 2.5f),
+					PositionDelay = 1500,
+					Effect = new EffectConfig("F_rize008##1", 0.5f),
+					Range = 35f,
+					KnockdownPower = 0f,
+					Delay = 500f,
+					HitCount = hitCount,
+					HitDuration = 500f,
+					CasterEffect = EffectConfig.None,
+					CasterNodeName = "None",
+					KnockType = 1,
+					VerticalAngle = 60f,
+					InnerRange = 0,
+				}));
+			}
+
+			await Task.WhenAll(blasts);
 		}
 	}
 

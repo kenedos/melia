@@ -625,22 +625,22 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 				var position = originPos.GetNearestPositionWithinDistance(GetLeadPositionScatter(target, (int)(flyTimes[i] * 1000), 60, caster), 250f);
 				_ = MissileThrow(skill, caster, position, lobConfig);
-				await skill.Wait(TimeSpan.FromMilliseconds(100));
 			}
 
 			// Direct missiles in bursts of 2
 			await skill.Wait(TimeSpan.FromMilliseconds(2100));
 
+			var directs = new List<Task>();
 			for (var i = 0; i < 3; i++)
 			{
-				var position = originPos.GetRelative(farPos, distance: 55, rand: 50);
-				await MissileThrow(skill, caster, position, directConfig);
-				position = originPos.GetRelative(farPos, distance: 55, rand: 50);
-				await MissileThrow(skill, caster, position, directConfig);
-
-				if (i < 2)
+				if (i > 0)
 					await skill.Wait(TimeSpan.FromMilliseconds(100));
+
+				directs.Add(MissileThrow(skill, caster, originPos.GetRelative(farPos, distance: 55, rand: 50), directConfig));
+				directs.Add(MissileThrow(skill, caster, originPos.GetRelative(farPos, distance: 55, rand: 50), directConfig));
 			}
+
+			await Task.WhenAll(directs);
 
 			SkillResultTargetBuff(caster, skill, BuffId.UC_slowdown, 1, 0f, 8000f, 1, 45, -1, hits);
 		}

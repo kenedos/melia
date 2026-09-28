@@ -33,6 +33,9 @@ namespace Melia.Zone.Pads.Handlers
 			var initiator = args.Initiator;
 			var skill = pad.Skill;
 
+			if (initiator.MoveType == MoveType.Flying || initiator.IsJumping())
+				return;
+
 			if (PadTargetDamage(pad, initiator, skillHit: out SkillHitInfo skillHitResult))
 				SkillResultTargetBuff(creator, skill, skillHitResult, BuffId.UC_freeze, 1, 0, 3000, 1, 100);
 		}

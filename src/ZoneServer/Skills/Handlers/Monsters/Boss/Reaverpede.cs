@@ -147,6 +147,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				HitCount = 1,
 				GroundEffect = new EffectConfig("None", 0.5f),
 			});
+			await skill.Wait(TimeSpan.FromMilliseconds(400));
 			_ = MissileThrow(skill, caster, positions[3], new MissileConfig
 			{
 				Effect = new EffectConfig("I_maggotegg_atk_mash#B_chimney R2 02", 0.25f),
@@ -187,9 +188,12 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				GroundEffect = new EffectConfig("None", 0.5f),
 			});
 
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await skill.Wait(TimeSpan.FromMilliseconds(2200));
+			for (var i = 0; i < 3; i++)
+				MonsterSkillCreateMob(skill, caster, "maggot", positions[i], 0f, "", "BasicMonster_ATK", 0, 40f, "None", "");
 
-			for (var i = 0; i < 6; i++)
+			await skill.Wait(TimeSpan.FromMilliseconds(300));
+			for (var i = 3; i < 6; i++)
 				MonsterSkillCreateMob(skill, caster, "maggot", positions[i], 0f, "", "BasicMonster_ATK", 0, 40f, "None", "");
 		}
 	}
