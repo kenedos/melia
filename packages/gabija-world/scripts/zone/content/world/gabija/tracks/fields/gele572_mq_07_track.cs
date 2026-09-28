@@ -43,11 +43,6 @@ public class Gele572Mq07Track : TrackScript
 	{
 		switch (frame)
 		{
-			case 30:
-				RemoveTrackActor(character, track, 1);
-				RemoveTrackActor(character, track, 2);
-				RemoveTrackActor(character, track, 3);
-				break;
 			case 43:
 				character.ServerMessage(L("Defeat Wild Carnivore!"));
 				break;

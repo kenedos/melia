@@ -211,11 +211,20 @@ namespace Melia.Zone.Scripting
 				{
 					// The cutscene is the quest's objective for the phase it
 					// plays through, so mark it done together with the status.
+					Quest reachedSuccess = null;
 					if (track.Data.OnCompleteQuestStatus == QuestStatus.Success
 						&& character.Quests.TryGetById(track.Data.QuestId, out var quest))
+					{
+						if (quest.Status < QuestStatus.Success)
+							reachedSuccess = quest;
+
 						quest.CompleteObjectives();
+					}
 
 					character.Quests.UpdateQuestStatus(track.Data.QuestId, track.Data.OnCompleteQuestStatus);
+
+					if (reachedSuccess != null && QuestScript.TryGet(reachedSuccess.Data.Id, out var questScript))
+						questScript.OnSuccess(character, reachedSuccess);
 				}
 			}
 

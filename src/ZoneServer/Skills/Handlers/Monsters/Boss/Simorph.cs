@@ -200,7 +200,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
-			await skill.Wait(TimeSpan.FromMilliseconds(1000));
+			await skill.Wait(TimeSpan.FromMilliseconds(2000));
 			var config = new ArrowConfig
 			{
 				ArrowEffect = EffectConfig.None,

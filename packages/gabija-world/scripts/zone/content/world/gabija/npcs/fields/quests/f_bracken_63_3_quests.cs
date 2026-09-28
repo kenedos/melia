@@ -570,7 +570,7 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					var burned = character.Variables.Perm.GetInt(BoxCountVar, 0) + 1;
 					character.Variables.Perm.SetInt(BoxCountVar, burned);
 
-					dialog.Npc.PlayEffect("F_burstup001_fire", 1f);
+					dialog.Npc.PlayEffect("F_burstup005_fire", 1f);
 					character.ServerMessage(LF("Boxes of Poisonous Herbs burned: {0}/{1}", Math.Min(burned, 6), 6));
 					character.LookAround();
 

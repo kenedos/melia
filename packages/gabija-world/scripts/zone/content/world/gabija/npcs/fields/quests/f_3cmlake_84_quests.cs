@@ -606,7 +606,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 		var burned = character.Variables.Perm.GetInt(LabsBurnedVar, 0) + 1;
 		character.Variables.Perm.SetInt(LabsBurnedVar, burned);
 
-		dialog.Npc.PlayEffect("F_burstup001_fire", 1.5f);
+		dialog.Npc.PlayEffect("F_burstup005_fire", 1.5f);
 		character.ServerMessage(LF("Laboratories burned down: {0}/{1}", Math.Min(burned, 2), 2));
 
 		await Task.CompletedTask;

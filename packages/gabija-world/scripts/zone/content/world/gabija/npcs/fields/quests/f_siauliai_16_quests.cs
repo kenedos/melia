@@ -841,7 +841,7 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 					var lit = character.Variables.Perm.GetInt(BonfireCountVar, 0) + 1;
 					character.Variables.Perm.SetInt(BonfireCountVar, lit);
 
-					dialog.Npc.PlayEffect("F_burstup001_fire", 1f);
+					dialog.Npc.PlayEffect("F_burstup005_fire", 1f);
 					character.ServerMessage(LF("Bonfires lit: {0}/{1}", Math.Min(lit, 6), 6));
 					character.LookAround();
 

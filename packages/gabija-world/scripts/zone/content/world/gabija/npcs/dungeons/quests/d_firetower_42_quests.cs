@@ -569,7 +569,7 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 		if (!character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
 			return;
 
-		character.PlayEffect("F_burstup001_fire", 1f);
+		character.PlayEffect("F_burstup005_fire", 1f);
 		character.Quests.CompleteObjective(Mq03, "fillWithEssence");
 		character.ServerMessage(L("The Flame Vapor pours out of the jewel and the Essence of Fire gathers in it."));
 	}

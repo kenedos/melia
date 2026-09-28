@@ -5,12 +5,16 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -30,7 +34,6 @@ public class FGele572QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq09 = new QuestId(17280);
 	private readonly static QuestId Rp1 = new QuestId(60152);
 
-	private readonly static Position PantoTotem = new Position(975, 0, -1131);
 	private readonly static Position CorruptedLand = new Position(514, 418, -136);
 
 	protected override void Load()
@@ -264,7 +267,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04))
 			{
-				await dialog.Msg(L("Take the summon scroll to the Panto totem and break it."));
+				await dialog.Msg(L("Summon the shaman doll next to the Panto totems. It will break them for you."));
 				return;
 			}
 
@@ -304,12 +307,6 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Panto Totem"));
 
-			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
-			{
-				await dialog.Msg(L("The evil energy wrapped around the Panto Totem keeps it from breaking. Summon the shaman doll with the summon scroll."));
-				return;
-			}
-
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("The shattered totem spills its corruption across the ground. Something is coming."));
@@ -334,7 +331,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 		// Wild Carnivore
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147450, L("Wild Carnivore"), "GELE572_MQ_07", "f_gele_57_2", 1014, 1678, 0, c => c.Quests.HasCompleted(Mq06) && !c.Quests.IsCompletable(Mq07) && !c.Quests.HasCompleted(Mq07), async dialog =>
+		var carnivore = AddConditionalNpc(147450, L("Wild Carnivore"), "GELE572_MQ_07", "f_gele_57_2", 1014, 1678, 0, IsCarnivoreBound, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -354,17 +351,31 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
-				await dialog.Msg(L("The corrupted beast turns on you. There is nothing left of what it was."));
 				character.Quests.Start(Mq07);
+
+				var provokedIt = await character.TimeActions.StartAsync(L("Provoking it..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (provokedIt != TimeActionResult.Completed)
+					return;
+
+				character.ServerMessage(L("The corrupted beast turns on you. There is nothing left of what it was."));
+				character.Quests.StartQuestTrack(Mq07);
 				return;
 			}
 
 			await dialog.Msg(L("A beast swollen with demonic energy. It has to be put down."));
 		});
+		carnivore.AddEffect(new PlayAnimationEffect("event_std"));
+
+		// Vines binding the Wild Carnivore
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(57271, L("Vine"), "GELE572_BOSS_LOCK", "f_gele_57_2", 1012, 1668, 21, IsCarnivoreBound);
+		AddConditionalNpc(57271, L("Vine"), "GELE572_BOSS_LOCK_2", "f_gele_57_2", 1004, 1675, 9, IsCarnivoreBound);
+		AddConditionalNpc(57271, L("Vine"), "GELE572_BOSS_LOCK_3", "f_gele_57_2", 1012, 1661, 94, IsCarnivoreBound);
 
 		// Mushcaria
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147462, L("Mushcaria"), "GELE572_MQ_09", "f_gele_57_2", -1136, 417, 19, c => c.Quests.IsActive(Mq09) && !c.Quests.IsCompletable(Mq09), async dialog =>
+		var mushcaria = AddConditionalNpc(147462, L("Mushcaria"), "GELE572_MQ_09", "f_gele_57_2", -1136, 417, 19, c => c.Quests.IsActive(Mq09) && !c.Quests.IsCompletable(Mq09), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -384,6 +395,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("A great shaggy beast. Its mane carries a power the Watchers want."));
 		});
+		mushcaria.AddEffect(new PlayAnimationEffect("event_loop"));
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
@@ -426,16 +438,52 @@ public class FGele572QuestNpcsScript : GeneralScript
 			return ItemUseResult.OkayNotConsumed;
 		}
 
-		if (character.Position.Get2DDistance(PantoTotem) > 300)
+		if (FindPantoTotem(character) == null)
 		{
-			character.ServerMessage(L("Summon the shaman doll near the Panto Totem."));
+			character.ServerMessage(L("Summon the shaman doll near a Panto Totem."));
 			return ItemUseResult.OkayNotConsumed;
 		}
 
 		if (!character.TimeActions.IsActive)
-			_ = this.SummonDollAsync(character, Mq04, "destroyTotems", L("The destroyer shaman doll destroyed the Panto Totem!"));
+			_ = this.DestroyTotemAsync(character);
 
 		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Summons the destroyer shaman doll over a timed action and breaks the nearest Panto Totem.
+	/// </summary>
+	private async Task DestroyTotemAsync(Character character)
+	{
+		var summoned = await character.TimeActions.StartAsync(L("Summoning the shaman doll"), L("Cancel"), "SCROLL", TimeSpan.FromSeconds(2));
+
+		if (summoned != TimeActionResult.Completed)
+			return;
+
+		if (!character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
+			return;
+
+		var totem = FindPantoTotem(character);
+		if (totem == null)
+		{
+			character.ServerMessage(L("Summon the shaman doll near a Panto Totem."));
+			return;
+		}
+
+		character.PlayEffect("F_light018_yellow", 1f);
+		totem.PlayEffect("F_burstup001_dark", 1f);
+		character.ServerMessage(L("The destroyer shaman doll destroyed the Panto Totem!"));
+		totem.Kill(character);
+	}
+
+	/// <summary>
+	/// Returns the closest standing Panto Totem within the doll's reach, or null.
+	/// </summary>
+	private static Mob FindPantoTotem(Character character)
+	{
+		return character.Map.GetActorsInRange<Mob>(character.Position, 150, mob => mob.Id == MonsterId.Mon_Goat_Totem && !mob.IsDead && mob.Layer == character.Layer)
+			.OrderBy(mob => mob.Position.Get2DDistance(character.Position))
+			.FirstOrDefault();
 	}
 
 	/// <summary>
@@ -481,14 +529,18 @@ public class FGele572QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Returns whether the Panto Totem stands for the given character, while
-	/// the shaman doll is sent at it and until Simorph answers.
+	/// Returns whether the Wild Carnivore still stands bound for the given character.
+	/// </summary>
+	private static bool IsCarnivoreBound(Character character)
+	{
+		return character.Quests.HasCompleted(Mq06) && !character.Quests.IsCompletable(Mq07) && !character.Quests.HasCompleted(Mq07);
+	}
+
+	/// <summary>
+	/// Returns whether the shattered Panto Totem stands for the given character until Simorph answers.
 	/// </summary>
 	private static bool IsTotemShown(Character character)
 	{
-		if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
-			return true;
-
 		if (character.Quests.HasCompleted(Mq04) && !character.Quests.Has(Mq05))
 			return true;
 
@@ -576,14 +628,51 @@ public class Gele572Mq04Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "GELE572_NPC_MORI", "f_gele_57_2", L("Talk to Watcher Molly"), L("Watcher Molly in Gele Plateau is waiting for someone's help."));
-		SetPhase(QuestStatus.InProgress, "GELE572_MQ_05", "f_gele_57_2", L("Destroy Panto Totems with Shaman Dolls"), L("Summon a shaman doll and guide it to the Panto Totems."));
-		SetPhase(QuestStatus.Success, "GELE572_NPC_MORI", "f_gele_57_2", L("Talk to Watcher Molly"), L("The totems are broken. Tell Molly about it."));
+		SetPhase(QuestStatus.InProgress, "", "f_gele_57_2", L("Destroy Panto Totems with Shaman Dolls"), L("Use the Summon Scroll to summon a Shaman Doll and guide them to the Panto Totems. The doll will destroy the totems."));
+		SetPhase(QuestStatus.Success, "", "f_gele_57_2", L("Destroy Panto Totems with Shaman Dolls"), L("Use the Summon Scroll to summon a Shaman Doll and guide them to the Panto Totems. The doll will destroy the totems."));
 
 		AddPrerequisite(new LevelPrerequisite(19));
 
-		AddObjective("destroyTotems", L("Destroy Panto Totems with Shaman Dolls"), new ManualObjective());
+		AddObjective("destroyTotems", L("Destroy Panto Totems with Shaman Dolls"), new KillObjective(5, "mon_goat_totem"));
 
 		AddReward(new ItemReward("expCard2", 2));
+	}
+
+	public override void OnStart(Character character, Quest quest)
+	{
+		SyncTotemCounter(character, quest);
+	}
+
+	public override void OnProgress(Character character, Quest quest, int key, int progress)
+	{
+		SyncTotemCounter(character, quest);
+	}
+
+	/// <summary>
+	/// Mirrors the totem count onto the session object counter the client's tracker reads.
+	/// </summary>
+	private static void SyncTotemCounter(Character character, Quest quest)
+	{
+		if (quest.SessionObjectStaticData == null)
+			return;
+
+		var sessionObject = character.SessionObjects.GetOrCreate(quest.SessionObjectStaticData.Id);
+		if (sessionObject == null)
+			return;
+
+		sessionObject.Properties.SetFloat("QuestInfoValue1", quest.ProgressValue(0));
+		Send.ZC_OBJECT_PROPERTY(character, sessionObject, "QuestInfoValue1");
+	}
+
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		character.Quests.Complete(this.QuestId);
+	}
+
+	public override void OnComplete(Character character, Quest quest)
+	{
+		character.Quests.Start(new QuestId(17240));
+		character.LookAround();
 	}
 }
 
@@ -662,7 +751,7 @@ public class Gele572Mq07Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE572_MQ_07", "f_gele_57_2", L("Defeat Wild Carnivore in Pasiulyma Field"), L("Defeat the Wild Carnivore tainted by demon corruption."));
 		SetPhase(QuestStatus.Success, "GELE572_NPC_MORI", "f_gele_57_2", L("Talk to Watcher Molly"), L("Tell Molly the Wild Carnivore is dead."));
 
-		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE572_MQ_07_TRACK", 4000, partyPlay: true);
+		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "GELE572_MQ_07_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new QuestStatusPrerequisite(17250, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(19));

@@ -6,6 +6,7 @@
 
 using System;
 using Melia.Zone.Scripting;
+using Melia.Zone.World.Actors;
 using Melia.Shared.Game.Const;
 using Yggdrasil.Util;
 using static Melia.Zone.Scripting.Shortcuts;
@@ -24,7 +25,8 @@ public class FGele572MobScript : GeneralScript
 		AddSpawner("f_gele_57_2.Id6", MonsterId.Npanto_Sword, min: 12, max: 15, respawn: Seconds(25));
 		AddSpawner("f_gele_57_2.Id7", MonsterId.Npanto_Hand, amount: 3);
 		AddSpawner("f_gele_57_2.Id8", MonsterId.Rootcrystal_01, min: 10, max: 13, respawn: Minutes(1));
-		AddSpawner("f_gele_57_2.Id9", MonsterId.Mon_Goat_Totem, min: 8, max: 10, respawn: Seconds(15));
+		var pantoTotems = AddSpawner("f_gele_57_2.Id9", MonsterId.Mon_Goat_Totem, min: 8, max: 10, respawn: Seconds(15));
+		pantoTotems.Spawning += (_, args) => ((Actor)args.Monster).Faction = FactionType.Neutral;
 		AddSpawner("f_gele_57_2.Id10", MonsterId.Mally, min: 6, max: 7, respawn: Seconds(25));
 		AddSpawner("f_gele_57_2.Id11", MonsterId.Spion_Bow, min: 15, max: 20);
 		AddSpawner("f_gele_57_2.Id12", MonsterId.Spion_Bow, min: 8, max: 10);

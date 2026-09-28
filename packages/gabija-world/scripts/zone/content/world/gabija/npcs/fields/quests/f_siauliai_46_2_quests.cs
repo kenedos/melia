@@ -699,7 +699,7 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 		}
 
 		demon.Vars.SetBool(BranchBurnedVar, true);
-		demon.PlayEffect("F_burstup001_fire", 1f);
+		demon.PlayEffect("F_burstup005_fire", 1f);
 		demon.Kill(character);
 
 		character.Inventory.Add(ItemId.SIAULIAI_46_2_MQ_02_ITEM, 1, InventoryAddType.PickUp);

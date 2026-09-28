@@ -609,7 +609,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 					var burnt = character.Variables.Perm.GetInt(CartCountVar, 0) + 1;
 					character.Variables.Perm.SetInt(CartCountVar, burnt);
 
-					dialog.Npc.PlayEffect("F_burstup001_fire", 1f);
+					dialog.Npc.PlayEffect("F_burstup005_fire", 1f);
 					character.ServerMessage(LF("Smelly carts burned: {0}/{1}", Math.Min(burnt, 5), 5));
 					character.LookAround();
 				});
