@@ -375,9 +375,7 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Hq01) && character.Quests.MeetsPrerequisites(Hq01))
 			{
-				await dialog.Msg(L("Isn't that Drake Horn? You're going to sell all of them?"));
-
-				var answer = await dialog.SelectQuestOffer(Hq01, L("A horn like that is worth a great deal more once it has been made into something."),
+				var answer = await dialog.SelectQuestOffer(Hq01, L("Isn't that Drake Horn? You're going to sell all of them?"),
 					Option(L("I'll try making it"), "accept"),
 					Option(L("I don't need it"), "leave")
 				);
@@ -870,5 +868,6 @@ public class Firetower44Hq01Quest : QuestScript
 		AddObjective("craftTheBadge", L("Make the badge of Drake and give it to Furry Odd"), new CollectItemObjective("misc_drakeResc", 1));
 
 		AddReward(new TakeItemReward("misc_drakeResc"));
+		AddReward(new PropertyReward(PropertyName.STR, 1));
 	}
 }

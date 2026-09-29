@@ -34,7 +34,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byAdd = properties.GetFloat(PropertyName.STR_ADD);
 		var byTemp = character.Variables.Temp.GetFloat(PropertyName.STR_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.STR);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.STR) + character.Quests.GetRewardProperty(PropertyName.STR);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -56,7 +56,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byAdd = properties.GetFloat(PropertyName.CON_ADD);
 		var byTemp = character.Variables.Temp.GetFloat(PropertyName.CON_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.CON);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.CON) + character.Quests.GetRewardProperty(PropertyName.CON);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -78,7 +78,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byAdd = properties.GetFloat(PropertyName.INT_ADD);
 		var byTemp = character.Variables.Temp.GetFloat(PropertyName.INT_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.INT);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.INT) + character.Quests.GetRewardProperty(PropertyName.INT);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -100,7 +100,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byAdd = properties.GetFloat(PropertyName.MNA_ADD);
 		var byTemp = character.Variables.Temp.GetFloat(PropertyName.MNA_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.MNA);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.MNA) + character.Quests.GetRewardProperty(PropertyName.MNA);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -122,7 +122,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byAdd = properties.GetFloat(PropertyName.DEX_ADD);
 		var byTemp = character.Variables.Temp.GetFloat(PropertyName.DEX_TEMP);
 
-		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.DEX);
+		var rewardProperty = character.Variables.Perm.GetFloat(PropertyName.DEX) + character.Quests.GetRewardProperty(PropertyName.DEX);
 
 		var result = byJob + byStat + byBonus + byAdd + byTemp + rewardProperty;
 		return (float)Math.Floor(Math.Max(1, result));
@@ -503,7 +503,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItemRatio = (byLevel + byStat) * (character.Inventory.GetEquipProperties(PropertyName.MHPRatio) / 100f);
 		var byBonus = properties.GetFloat(PropertyName.MHP_Bonus);
 
-		var value = byLevel + byStat + byItem + byItemRatio + byBonus;
+		var byReward = character.Quests.GetRewardProperty(PropertyName.MHP);
+		var value = byLevel + byStat + byItem + byItemRatio + byBonus + byReward;
 
 		var byBuffs = properties.GetFloat(PropertyName.MHP_BM);
 		var byBuffRate = Math.Floor(value * properties.GetFloat(PropertyName.MHP_RATE_BM));
@@ -541,7 +542,8 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.MSP);
 		var byBonus = properties.GetFloat(PropertyName.MSP_Bonus);
 
-		var value = byLevel + byStat + byItem + byBonus;
+		var byReward = character.Quests.GetRewardProperty(PropertyName.MSP);
+		var value = byLevel + byStat + byItem + byBonus + byReward;
 
 		var byBuffs = properties.GetFloat(PropertyName.MSP_BM);
 		var byBuffRate = Math.Floor(value * properties.GetFloat(PropertyName.MSP_RATE_BM));
@@ -579,9 +581,9 @@ public class CharacterCalculationsScript : GeneralScript
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.MSTA);
 		var byBonus = properties.GetFloat(PropertyName.MAXSTA_Bonus, 0);
 		var byBuff = properties.GetFloat(PropertyName.MaxSta_BM, 0);
-		//var byReward = GetReward(PropertyName.MSTA);
+		var byReward = character.Quests.GetRewardProperty(PropertyName.MSTA);
 
-		var value = baseValue + byStat + byItem + byBonus + byBuff;
+		var value = baseValue + byStat + byItem + byBonus + byBuff + byReward;
 
 		return (int)(value * 1000);
 	}
@@ -858,7 +860,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byBuffs = properties.GetFloat(PropertyName.MaxWeight_BM);
 		var byBonus = properties.GetFloat(PropertyName.MaxWeight_Bonus);
 		var byBuffRate = (float)Math.Floor(value * properties.GetFloat(PropertyName.MaxWeight_RATE_BM));
-		value += byBuffs + byBonus + byBuffRate;
+		value += byBuffs + byBonus + byBuffRate + character.Quests.GetRewardProperty(PropertyName.MaxWeight);
 
 		return value;
 	}

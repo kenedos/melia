@@ -1153,11 +1153,14 @@ public class Remains40Hq01Quest : QuestScript
 		SetPhase(QuestStatus.Success, "REMAINS_40_HQ_01_TB", "f_remains_40", L("Find the Treasure Chest"), L("Find the treasure chest hidden somewhere in the Crystal Stream. It can be opened with the key Coben gave you."));
 
 		AddPrerequisite(new LevelPrerequisite(97));
-		AddPrerequisite(new QuestStatusPrerequisite(8458, QuestStatus.Completed));
+		AddPrerequisite(new PredicatePrerequisite(character => HiddenQuestGates.CompletedAll(character,
+			20198, 20199, 20201, 20204, 20205, 20206, 20207, 8404, 20221, 8728, 8729,
+			8752, 8753, 20224, 20225, 20226, 8755, 8756, 20244, 20219, 8458)));
 
 		AddObjective("openTheChest", L("Find the Treasure Chest"), new ManualObjective());
 
 		AddReward(new TakeItemReward("REMAINS_40_HQ_01_ITEM2"));
+		AddReward(new PropertyReward(PropertyName.MaxWeight, 100));
 	}
 }
 

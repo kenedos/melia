@@ -985,5 +985,7 @@ public class Firetower45Hq02Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(19061, QuestStatus.Completed));
 
 		AddObjective("findTheBookPage", L("Find the page of the book in the Mage Tower 3rd Floor Laboratory"), new ManualObjective());
+
+		AddReward(new PropertyReward(PropertyName.MSTA, 5));
 	}
 }

@@ -42,6 +42,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 	private readonly static QuestId Abbay643Mq050 = new QuestId(50144);
 	private readonly static QuestId Abbay643Hq1 = new QuestId(50261);
 
+	private const string VillagerStepVar = "Gabija.Bracken632.Hq1.Step";
+	private const string VillagerGoalVar = "Gabija.Bracken632.Hq1.Goal";
+
 	public const string SprayCountVar = "Gabija.Quests.Bracken632Sq040.Sprayed";
 	private const string SprayVar = "Gabija.Quests.Bracken632Sq040.Spray";
 	private const string HerbVar = "Gabija.Quests.Bracken632Sq020.Herb";
@@ -574,14 +577,12 @@ public class FBracken632QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(20063, L("Kornas"), "BRACKEN632_TOWN_PEAPLE1", "f_bracken_63_2", 217.24, 882.25, 90, AreVillagersBack, async dialog =>
 		{
-			var character = dialog.Player;
-
 			dialog.SetTitle(L("Kornas"));
 
-			if (GameRandom.Get().NextDouble() >= 0.5)
-				await dialog.Msg(L("Oh! You're the person who saved me and Rose. Where is she anyway?"));
-			else
-				await dialog.Msg(L("If it wasn't for you and Rose, we would have been subjected to horrific experiments. I want to thank Rose as well... She's coming soon I hope?"));
+			await TalkToVillager(dialog, 1,
+				L("Oh! You're the person who saved me and Rose. Where is she anyway?"),
+				L("If it wasn't for you and Rose, we would have been subjected to horrific experiments. I want to thank Rose as well... She's coming soon I hope?"),
+				L("Why isn't Rose coming?"));
 		});
 
 		AddConditionalNpc(153111, L("Rona"), "BRACKEN632_TOWN_PEAPLE2", "f_bracken_63_2", 686.62, 967.04, -26, AreVillagersBack, async dialog =>
@@ -612,13 +613,10 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.HasCompleted(Abbey642Hq2))
-			{
-				await dialog.Msg(L("There are still too many people that didn't make it back into town. I sincerely hope that... nothing has happened to them."));
-				return;
-			}
-
-			await dialog.Msg(L("My lord... I still get goosebumps even thinking about it. How did they think of using people as nourishment for the Divine Tree?"));
+			await TalkToVillager(dialog, 2,
+				L("My lord... I still get goosebumps even thinking about it. How did they think of using people as nourishment for the Divine Tree?"),
+				L("There are still too many people that didn't make it back into town. I sincerely hope that... nothing has happened to them."),
+				L("Oh, right! What about Rose and Edmundas? Are they alright?"));
 		});
 
 		AddConditionalNpc(20061, L("Anne"), "BRACKEN632_TOWN_PEAPLE3", "f_bracken_63_2", 221.36, 693.39, 90, AreVillagersBack, async dialog =>
@@ -649,22 +647,56 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			await dialog.Msg(L("I really treasured that necklace... But if it helped Rose find us all the way here, it was for a good cause."));
-			await dialog.Msg(L("By the way, where is Rose? And Edmundas?"));
-
-			if (character.Quests.HasCompleted(Abbay643Mq050))
-				character.Variables.Perm.Set(Abbey643AnneMissesRosePrerequisite.VarName, true);
+			await TalkToVillager(dialog, 3,
+				L("I really treasured that necklace... But if it helped Rose find us all the way here, it was for a good cause."),
+				L("By the way, where is Rose? And Edmundas?"),
+				L("I want to know about Rose and Edmundas."));
 		});
 
 		AddConditionalNpc(153110, L("Allonas"), "BRACKEN632_TOWN_PEAPLE4", "f_bracken_63_2", 279.36, 1157.42, 60, AreVillagersBack, async dialog =>
 		{
 			dialog.SetTitle(L("Allonas"));
 
-			if (GameRandom.Get().NextDouble() >= 0.5)
-				await dialog.Msg(L("The memories of being taken by the demons still hurt. Some of us haven't made it back yet, either..."));
-			else
-				await dialog.Msg(L("We're alive thanks to you and Rose... But I don't think the village will be the same again."));
+			await TalkToVillager(dialog, 4,
+				L("The memories of being taken by the demons still hurt. Some of us haven't made it back yet, either..."),
+				L("We're alive thanks to you and Rose... But I don't think the village will be the same again."),
+				L("What happened to Rose and Edmundas?"));
 		});
+	}
+
+	/// <summary>
+	/// Returns whether the character has heard both of what every one of
+	/// the four villagers has to say about Rose.
+	/// </summary>
+	public static bool AllVillagersTalked(Character character)
+	{
+		for (var villager = 1; villager <= 4; ++villager)
+		{
+			if (!character.Variables.Perm.GetBool(VillagerStepVar + villager, false) || !character.Variables.Perm.GetBool(VillagerGoalVar + villager, false))
+				return false;
+		}
+
+		return true;
+	}
+
+	/// <summary>
+	/// Speaks one of the villager's two lines at random and keeps track
+	/// of which ones the character has heard.
+	/// </summary>
+	private static async Task TalkToVillager(Dialog dialog, int villager, string first, string second, string hint)
+	{
+		var character = dialog.Player;
+		var isFirst = GameRandom.Get().NextDouble() >= 0.5;
+
+		await dialog.Msg(isFirst ? first : second);
+
+		if (character.Quests.Has(Abbay643Hq1))
+			return;
+
+		character.Variables.Perm.SetBool((isFirst ? VillagerStepVar : VillagerGoalVar) + villager, true);
+
+		if (AllVillagersTalked(character))
+			dialog.Chat(hint);
 	}
 
 	/// <summary>
@@ -1077,6 +1109,7 @@ public class Abbey642Hq1Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(50124, QuestStatus.Completed));
 		AddPrerequisite(new QuestStatusPrerequisite(50131, QuestStatus.Completed));
 		AddPrerequisite(new QuestStatusPrerequisite(50133, QuestStatus.Completed));
+		AddPrerequisite(new PredicatePrerequisite(character => HiddenQuestGates.ExploredAll(character, "d_abbey_64_1", "d_abbey_64_2", "d_abbey_64_3")));
 
 		AddObjective("findStone", L("Find a Stone to Use as Memorial"), new CollectItemObjective("ABBAY642_HIDDENQ1_ITEM", 1));
 

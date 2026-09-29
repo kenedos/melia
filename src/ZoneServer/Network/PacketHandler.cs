@@ -1303,6 +1303,8 @@ namespace Melia.Zone.Network
 				character.ToggleSitting();
 
 			Send.ZC_POSE(character, pose);
+
+			ZoneServer.Instance.ServerEvents.PlayerPosed.Raise(new PlayerPoseEventArgs(character, pose));
 		}
 
 		/// <summary>

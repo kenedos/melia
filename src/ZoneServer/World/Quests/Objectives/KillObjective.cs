@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
@@ -23,6 +24,16 @@ namespace Melia.Zone.World.Quests.Objectives
 		/// count towards this objective.
 		/// </summary>
 		public bool LayerOnly { get; init; }
+
+		/// <summary>
+		/// Returns the center of the area kills must happen in, if any.
+		/// </summary>
+		public Position? AreaCenter { get; init; }
+
+		/// <summary>
+		/// Returns the radius around AreaCenter that kills must happen in.
+		/// </summary>
+		public float AreaRadius { get; init; }
 
 		/// <summary>
 		/// Creates an objective to kill a certain amount of one of the
@@ -177,6 +188,9 @@ namespace Melia.Zone.World.Quests.Objectives
 					return;
 
 				if (objective.LayerOnly && (character.Layer == 0 || monster.Layer != character.Layer))
+					return;
+
+				if (objective.AreaCenter.HasValue && !monster.Position.InRange2D(objective.AreaCenter.Value, objective.AreaRadius))
 					return;
 
 				if (objective.IsTarget(monster))

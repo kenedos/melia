@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -34,6 +35,9 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq020 = new QuestId(50086);
 	private readonly static QuestId Sq030 = new QuestId(50087);
 	private readonly static QuestId Hq1 = new QuestId(50269);
+
+	private const string AmandaVisitedVar = "Gabija.Underfortress69.Hq1.Visited";
+	public const string RestedVar = "Gabija.Underfortress69.Hq1.Rested";
 
 	private const int PartsNeeded = 5;
 	private const int BloodNeeded = 4;
@@ -100,6 +104,23 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 
 	protected override void Load()
 	{
+		// Sitting down for a rest after meeting Amanda at the stone opens her hidden quest.
+		AddQuestTrigger("UNDER69_HIDDENQ1_IN_TRIGGER", "d_underfortress_69", 507.57, 479.63, 50, async args =>
+		{
+			if (args.Initiator is Character character && character.Quests.HasCompleted(Sq010) && !character.Quests.Has(Hq1))
+				character.Variables.Perm.SetBool(AmandaVisitedVar, true);
+
+			await Task.CompletedTask;
+		});
+
+		ZoneServer.Instance.ServerEvents.PlayerSitStatusChanged.Subscribe((sender, args) =>
+		{
+			var character = args.Character;
+
+			if (character.IsSitting && character.Variables.Perm.GetBool(AmandaVisitedVar, false) && character.Quests.HasCompleted(Sq010) && !character.Quests.Has(Hq1))
+				character.Variables.Perm.SetBool(RestedVar, true);
+		});
+
 		// Amanda, at the battleground gate
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(153040, L("[Amanda Grave Robbers]{nl}Amanda"), "AMANDA_69_1", "d_underfortress_69", 2120.20, 37.30, -38, this.IsAmandaAtTheGate, async dialog =>
@@ -1120,6 +1141,7 @@ public class Underfortress69Hq1Quest : QuestScript
 		SetPhase(QuestStatus.Success, "AMANDA_69_2", "d_underfortress_69", L("Talk to Amanda"), L("You have obtained the tools from the Dievdirbys Master. Bring them to Amanda."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(50085, QuestStatus.Completed));
+		AddPrerequisite(new PredicatePrerequisite(character => character.Variables.Perm.GetBool(DUnderfortress69QuestNpcsScript.RestedVar, false)));
 
 		AddObjective("borrowTheTools", L("Ask the Dievdirbys Master for Help"), new ManualObjective());
 

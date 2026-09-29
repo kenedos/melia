@@ -321,6 +321,8 @@ namespace Melia.Zone.World.Actors.Characters
 			this.IsResurrecting = false;
 			this.IsDeathAnnounced = false;
 
+			ZoneServer.Instance.ServerEvents.PlayerResurrected.Raise(new PlayerEventArgs(this));
+
 			if (_companionsToReactivate != null)
 			{
 				foreach (var comp in _companionsToReactivate)

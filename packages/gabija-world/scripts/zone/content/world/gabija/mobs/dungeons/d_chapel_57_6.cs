@@ -162,5 +162,8 @@ public class DChapel576MobScript : GeneralScript
 		AddSpawnPoint("d_chapel_57_6.Id9", "d_chapel_57_6", Rectangle(-473, 1790, 20));
 		AddSpawnPoint("d_chapel_57_6.Id9", "d_chapel_57_6", Rectangle(-693, 1896, 20));
 		AddSpawnPoint("d_chapel_57_6.Id9", "d_chapel_57_6", Rectangle(-472, 1324, 20));
+
+		// Hidden Quest Boss Spawner
+		AddBossSpawner(MonsterId.Boss_Chapparition, "d_chapel_57_6", 1, Hours(24), Hours(24));
 	}
 }

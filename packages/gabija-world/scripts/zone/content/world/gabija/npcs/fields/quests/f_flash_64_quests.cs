@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
@@ -42,6 +43,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	private readonly static QuestId Under67Sq010 = new QuestId(50069);
 	private readonly static QuestId Under67Hq1 = new QuestId(50259);
 	private readonly static QuestId Flash64Hq1 = new QuestId(50267);
+
+	private const string MurmilloTalkedVar = "Gabija.Flash64.Hq1.TalkedToMaster";
+	public const string MurmilloBareVar = "Gabija.Flash64.Hq1.Unlocked";
 
 	private readonly static Position NeiveikiamaCastle = new Position(997, 457, 545);
 	private readonly static (string Map, Position Spot)[] FortressDistricts =
@@ -111,6 +115,21 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	private readonly static double[] RecordFacings = { 214, 208, 52, 90, 203, -70, 21, 90, -60, 24, 90 };
 
 	// The Musketeer Master's practice poles.
+	private static bool IsHostileFaction(FactionType faction)
+		=> faction is FactionType.Monster or FactionType.Monster_Chaos1 or FactionType.Monster_Chaos2 or FactionType.Monster_Chaos3 or FactionType.Monster_Chaos4;
+
+	private static bool HasBareArmorSlot(Character character)
+	{
+		foreach (var slot in new[] { EquipSlot.Top, EquipSlot.Shoes, EquipSlot.Gloves })
+		{
+			var item = character.Inventory.GetEquip(slot);
+			if (item == null || item.Data.ClassName.StartsWith("No"))
+				return true;
+		}
+
+		return false;
+	}
+
 	private readonly static double[,] PracticePoles =
 	{
 		{ -450.79, -1710.91 }, { -491.80, -1635.80 }, { -442.97, -1575.67 },
@@ -118,6 +137,31 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 	protected override void Load()
 	{
+		// Killing with a bare armor slot, after meeting the Murmillo Master, opens his hidden quest and later proves it.
+		ZoneServer.Instance.ServerEvents.EntityKilled.Subscribe((sender, args) =>
+		{
+			if (args.Attacker is not Character character || args.Target is not Mob mob || !IsHostileFaction(mob.Faction))
+				return;
+
+			if (!HasBareArmorSlot(character))
+				return;
+
+			if (character.Quests.IsActive(Flash64Hq1) && !character.Quests.IsCompletable(Flash64Hq1))
+			{
+				var isStrong = mob.Level >= character.Level + 3 || (mob.Rank is MonsterRank.Elite or MonsterRank.Boss or MonsterRank.Special && mob.Level >= character.Level - 5);
+				if (isStrong)
+					character.Quests.CompleteObjective(Flash64Hq1, "proveStrength");
+
+				return;
+			}
+
+			if (!character.Quests.Has(Flash64Hq1) && character.Map.ClassName == "f_flash_64" && character.Variables.Perm.GetBool(MurmilloTalkedVar, false) && !character.Variables.Perm.GetBool(MurmilloBareVar, false))
+			{
+				character.Variables.Perm.SetBool(MurmilloBareVar, true);
+				character.ServerMessage(L("Defeated the monsters while equipping no more than 1 piece of armor, as requested by the Murmillo Master."));
+			}
+		});
+
 		// Wilhelmina Carriot
 		//-------------------------------------------------------------------------
 		AddNpc(20106, L("[Knights of Kaliss]{nl}Wilhelmina Carriot"), "FLASH64_KARRIAT", "f_flash_64", -365.77, -1319.78, 17, async dialog =>
@@ -792,6 +836,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Murmillo Master"));
 			dialog.SetPortrait("Dlg_port_Feliksia");
+
+			if (!character.Quests.Has(Flash64Hq1))
+				character.Variables.Perm.SetBool(MurmilloTalkedVar, true);
 
 			if (character.Quests.IsActive(Murmillo8) && character.Quests.IsCompletable(Murmillo8))
 			{
@@ -1697,6 +1744,7 @@ public class Underfortress67Hq1Quest : QuestScript
 		SetPhase(QuestStatus.Success, "FLASH64_KARRIAT", "f_flash_64", L("Talk to Wilhelmina Carriot"), L("You have completed your report on the environment inside the fortress. Return to Wilhelmina Carriot and talk to her."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(50084, QuestStatus.Completed));
+		AddPrerequisite(new PredicatePrerequisite(character => HiddenQuestGates.ExploredAll(character, "d_underfortress_65", "d_underfortress_66", "d_underfortress_67", "d_underfortress_68", "d_underfortress_69")));
 
 		AddObjective("noteArea1", L("Note down the Sentry Bailey"), new ManualObjective());
 		AddObjective("noteArea2", L("Note down the Drill Ground of Confliction"), new ManualObjective());
@@ -1727,9 +1775,9 @@ public class Flash64Hq1Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "MURMILO_MASTER", "f_flash_64", L("Defeat a Strong Monster While Equipping 3 or Less Armor Items"), L("To impress the Murmillo Master, defeat a strong monster while wearing three armour pieces or fewer."));
 		SetPhase(QuestStatus.Success, "MURMILO_MASTER", "f_flash_64", L("Talk with the Murmillo Master"), L("You have defeated a correct target monster while equipping 3 or less armor items. Talk to the Murmillo Master."));
 
-		AddPrerequisite(new LevelPrerequisite(186));
+		AddPrerequisite(new PredicatePrerequisite(character => character.Variables.Perm.GetBool(FFlash64QuestNpcsScript.MurmilloBareVar, false)));
 
-		AddObjective("proveStrength", L("Defeat a Strong Monster While Equipping 3 or Less Armor Items"), new KillObjective(1, "Rubabos"));
+		AddObjective("proveStrength", L("Defeat a Strong Monster While Equipping 3 or Less Armor Items"), new ManualObjective());
 
 		AddReward(new ItemReward("misc_scrollskulp", 1));
 	}

@@ -8,6 +8,7 @@ using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
@@ -35,6 +36,9 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 	private readonly static QuestId Laimonas4 = new QuestId(1018);
 	private readonly static QuestId WoodSpirit = new QuestId(1019);
 	private readonly static QuestId Hq01 = new QuestId(9100);
+
+	public const string RecruitmentNoticeVar = "Gabija.SiaulWest.Hq01.Notice";
+	public const string BulletinBoardVar = "Gabija.SiaulWest.Hq01.Bulletin";
 
 	protected override void Load()
 	{
@@ -122,25 +126,22 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Hq01) && character.Quests.MeetsPrerequisites(Hq01))
 			{
-				await dialog.Msg(L("You've seen the recruitment notice, then. We are short of soldiers, that much is true."));
-
-				var answer = await dialog.SelectQuestOffer(Hq01, L("But I can hardly hold out my hand to a Revelator."),
+				var answer = await dialog.SelectQuestOffer(Hq01, L("You must have seen the recruitment notice. It's true that we lack military manpower."),
 					Option(L("I still want to help"), "accept"),
-					Option(L("Carry on your way"), "leave")
+					Option(L("Continue going your way"), "leave")
 				);
 
 				if (answer == "accept")
 				{
 					character.Quests.Start(Hq01);
-					await dialog.Msg(L("Even the offer is worth something. Go to Dvasia Peak instead - Julian's unit is opening the road to the Great King's Gate, and the monsters in the way need clearing."));
-					await dialog.Msg(L("Julian is the one running the operation there. He'll come out to meet you barefoot, I expect."));
+					await dialog.Msg(L("Thanks for your words. But it would be better to support Julian's squad at Dvasia Peak instead of this place. We just need to exterminate all the monsters that interfere with the making of the route to the Gateway of the Great King."));
 					return;
 				}
 			}
 
 			if (character.Quests.IsActive(Hq01))
 			{
-				await dialog.Msg(L("Julian is at Dvasia Peak. He'll be glad of the help."));
+				await dialog.Msg(L("The person who is leading the mission at Dvasia Peak is Julian. Julian will really welcome me."));
 				return;
 			}
 
@@ -706,6 +707,41 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
+
+		// Soldier Recruitment Notices
+		//-------------------------------------------------------------------------
+		AddNpc(40070, L("Soldier Recruitment Notice"), "SIAUL_WEST_HQ01_INFO01", "f_siauliai_west", 1615.97, -713.26, 353, async dialog =>
+			await ReadRecruitmentNotice(dialog, 1, L("We want you! Protect your family and your kingdom. - Klaipeda Recruiting Station")));
+
+		AddNpc(40070, L("Soldier Recruitment Notice"), "SIAUL_WEST_HQ01_INFO02", "f_siauliai_west", -558.6, -1021.28, 269, async dialog =>
+			await ReadRecruitmentNotice(dialog, 2, L("We are seeking brave young men and women who will bring order to these chaotic times. The world needs you! - Klaipeda Recruiting Station")));
+
+		AddNpc(40070, L("Soldier Recruitment Notice"), "SIAUL_WEST_HQ01_INFO03", "f_siauliai_west", -1277.39, -614.18, 90, async dialog =>
+			await ReadRecruitmentNotice(dialog, 3, L("Honor. That is what your uniform will be made of. - Klaipeda Recruiting Station")));
+
+		// Bulletin Board
+		//-------------------------------------------------------------------------
+		AddNpc(40070, L("Bulletin Board"), "SIAUL1_BOARD7", "f_siauliai_west", -547, -453, 357, async dialog =>
+		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Bulletin Board"));
+			await dialog.Msg(L("The goddesses have disappeared. But if we fight bravely against the demons, perhaps the goddesses will return someday. - Laimonas"));
+
+			if (character.Variables.Perm.GetBool(RecruitmentNoticeVar + 1, false) && character.Variables.Perm.GetBool(RecruitmentNoticeVar + 2, false) && character.Variables.Perm.GetBool(RecruitmentNoticeVar + 3, false))
+				character.Variables.Perm.Set(BulletinBoardVar, true);
+		});
+	}
+
+	/// <summary>
+	/// Shows a recruitment notice and records that the character read it.
+	/// </summary>
+	private static async Task ReadRecruitmentNotice(Dialog dialog, int number, string text)
+	{
+		dialog.SetTitle(L("Soldier Recruitment Notice"));
+		await dialog.Msg(text);
+
+		dialog.Player.Variables.Perm.Set(RecruitmentNoticeVar + number, true);
 	}
 }
 
@@ -1123,20 +1159,22 @@ public class SiaulWestHq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9100);
-		SetName(L("Reinforcements"));
+		SetName(L("Military Support"));
 		SetDescription(L("Knight Titas sends you to Dvasia Peak, where Julian's unit is opening the road to the Great King's Gate."));
 		SetType(QuestType.Sub);
 		SetLocation("f_siauliai_west", "d_thorn_22");
 		SetAutoTracked(true);
 		SetCancelable(true);
 
-		SetPhase(QuestStatus.Possible, "SIAUL_WEST_CAMP_MANAGER", "f_siauliai_west", L("Talk to Knight Titas"));
-		SetPhase(QuestStatus.InProgress, "THORN22_JULIAN", "d_thorn_22", L("Kill monsters in Dvasia Peak"));
-		SetPhase(QuestStatus.Success, "THORN22_JULIAN", "d_thorn_22", L("Report to Commander Julian"));
+		SetPhase(QuestStatus.Possible, "SIAUL_WEST_CAMP_MANAGER", "f_siauliai_west", L("Talk to Knight Titas"), L("After reading the notice to recruit more soldiers, you feel like you should help. Talk to Knight Titas at West Siauliai Woods."));
+		SetPhase(QuestStatus.InProgress, "THORN22_JULIAN", "d_thorn_22", L("Defeat the monsters at Dvasia Peak"), L("Knight Titas told you that it will be better to help Julian's squad that is trying to penetrate the way to the Gateway of the Great King from Dvasia Peak. Defeat 100 monsters at Dvasia Peak."));
+		SetPhase(QuestStatus.Success, "THORN22_JULIAN", "d_thorn_22", L("Report to Commander Julian"), L("You've defeated many monsters at Dvasia Peak. Report to Commander Julian."));
 
-		AddPrerequisite(new LevelPrerequisite(100));
+		AddPrerequisite(new PredicatePrerequisite(character => character.Variables.Perm.GetBool(FSiauliaiWestQuestNpcsScript.BulletinBoardVar, false)));
 
-		AddObjective("clearDvasiaPeak", L("Kill monsters in Dvasia Peak"), new KillObjective(100, "Meleech", "RavineLerva", "TreeGool", "wood_goblin"));
+		AddObjective("clearDvasiaPeak", L("Defeat the monsters at Dvasia Peak"), new KillObjective(100, "Meleech", "RavineLerva", "TreeGool", "wood_goblin"));
+
+		AddReward(new PropertyReward(PropertyName.MSTA, 5));
 	}
 }
 

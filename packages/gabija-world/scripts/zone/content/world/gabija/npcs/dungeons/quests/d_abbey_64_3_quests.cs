@@ -573,17 +573,6 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 	}
 }
 
-/// <summary>
-/// Met once Anne in Knidos Jungle told the character she misses Rose.
-/// </summary>
-public class Abbey643AnneMissesRosePrerequisite : QuestPrerequisite
-{
-	public const string VarName = "Gabija.Quests.Abbay643Hq1.AnneMissesRose";
-
-	public override bool Met(Character character)
-		=> character.Variables.Perm.GetBool(VarName, false);
-}
-
 //-----------------------------------------------------------------------------
 // QUEST DEFINITIONS
 //-----------------------------------------------------------------------------
@@ -818,7 +807,7 @@ public class Abbay643Hq1Quest : QuestScript
 		SetPhase(QuestStatus.Success, "ABBEY643_ROZE01", "d_abbey_64_3", L("Deliver Anne's Letter to Rose"));
 
 		AddPrerequisite(new QuestStatusPrerequisite(50144, QuestStatus.Completed));
-		AddPrerequisite(new Abbey643AnneMissesRosePrerequisite());
+		AddPrerequisite(new PredicatePrerequisite(FBracken632QuestNpcsScript.AllVillagersTalked));
 
 		AddObjective("deliverLetter", L("Deliver Rose's Letter to Anne"), new CollectItemObjective("ABBAY64_3_HIDDENQ1_ITEM2", 1));
 

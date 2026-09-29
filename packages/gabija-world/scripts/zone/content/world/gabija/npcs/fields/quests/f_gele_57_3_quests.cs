@@ -7,6 +7,8 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -31,8 +33,26 @@ public class FGele573QuestNpcsScript : GeneralScript
 	private readonly static QuestId Hq02 = new QuestId(9104);
 	private readonly static QuestId Reveal2 = new QuestId(30031);
 
+	public const string AltarResurrectionsVar = "Gabija.Gele573.Hq02.Resurrections";
+
 	protected override void Load()
 	{
+		// Resurrecting at the central altar of Tenet Church 1F opens the Paladin Master's hidden quest.
+		ZoneServer.Instance.ServerEvents.PlayerResurrected.Subscribe((sender, args) =>
+		{
+			var character = args.Character;
+
+			if (character.Map.ClassName != "d_chapel_57_6" || character.Quests.Has(Hq02))
+				return;
+
+			if (!character.Position.InRange2D(new Position(-523, 1, 446), 80))
+				return;
+
+			var count = character.Variables.Perm.GetInt(AltarResurrectionsVar, 0);
+			if (count < 30)
+				character.Variables.Perm.SetInt(AltarResurrectionsVar, count + 1);
+		});
+
 		// Watcher Allen
 		//-------------------------------------------------------------------------
 		AddNpc(147422, L("Watcher Allen"), "GELE573_ALLEN", "f_gele_57_3", -770, -1083, 92, async dialog =>
@@ -360,9 +380,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Hq02) && character.Quests.MeetsPrerequisites(Hq02))
 			{
-				await dialog.Msg(L("Without the blessing from the goddess, you would probably be with the goddess now too."));
-				await dialog.Msg(L("Nonetheless, a lot of people are already like that without such blessing."));
-				var answer = await dialog.SelectQuestOffer(Hq02, L("There is a spooky Chapparition slaying people in the Tenet Church. Find and defeat it."),
+				var answer = await dialog.SelectQuestOffer(Hq02, L("Without the blessing from the goddess, you would probably be with the goddess now too. Nonetheless, a lot of people are already like without such blessing."),
 					Option(L("I will find and defeat Chapparition"), "accept"),
 					Option(L("Not right now"), "leave")
 				);
@@ -370,6 +388,12 @@ public class FGele573QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 					character.Quests.Start(Hq02);
 
+				return;
+			}
+
+			if (character.Quests.IsActive(Hq02))
+			{
+				await dialog.Msg(L("I will pray for that monster. If it even has a soul to listen to my prayer..."));
 				return;
 			}
 
@@ -493,13 +517,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
 			{
-				var charged = await character.TimeActions.StartAsync(L("Charging the barrier..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
-
-				if (charged != TimeActionResult.Completed)
-					return;
-
-				character.ServerMessage(L("You feed the barrier the demon souls you gathered. It hums and steadies."));
-				character.Quests.CompleteObjective(Mq02, "chargeBarrier");
+				await dialog.Msg(L("The barrier only takes in the souls of demons defeated near it."));
 				return;
 			}
 
@@ -607,7 +625,7 @@ public class Gele573Mq02Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(22));
 
-		AddObjective("chargeBarrier", L("Charge the Tree Guard Post Barrier"), new ManualObjective());
+		AddObjective("chargeBarrier", L("Charge the Tree Guard Post Barrier"), new KillObjective(7, "puragi_green", "banshee", "zigri_brown", "Deadbornscab_mage") { AreaCenter = new Position(249, 0, -733), AreaRadius = 230 });
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("Drug_SP1_Q", 30));
@@ -821,10 +839,14 @@ public class Gele573Hq01Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE_57_3_HQ01_NPC01", "f_katyn_7_2", L("Defeat the monsters roaming around the Owl Burial Ground"), L("Defeat forty monsters in the Owl Burial Ground."));
 		SetPhase(QuestStatus.Success, "GELE_57_3_HQ01_NPC01", "f_gele_57_3", L("Talk to James"), L("You've completed the bet with James. Talk to him."));
 
-		// The gate was a script with no recoverable logic; the level band stands in.
-		AddPrerequisite(new LevelPrerequisite(27));
+		AddPrerequisite(new ItemPrerequisite("misc_0013", 60));
+		AddPrerequisite(new ItemPrerequisite("misc_0018", 60));
+		AddPrerequisite(new ItemPrerequisite("misc_0048", 60));
+		AddPrerequisite(new ItemPrerequisite("misc_0061", 60));
 
 		AddObjective("killOwlGround", L("Defeat the monsters in Owl Burial Ground"), new KillObjective(40, "ellomago", "Ridimed", "jellyfish_red", "Sakmoli"));
+
+		AddReward(new PropertyReward(PropertyName.MSP, 20));
 	}
 }
 
@@ -846,11 +868,11 @@ public class Gele573Hq02Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "GELE573_MASTER", "f_gele_57_3", L("Defeat Field Boss Chapparition"), L("Find and defeat the spooky Chapparition in the Tenet Church."));
 		SetPhase(QuestStatus.Success, "GELE573_MASTER", "f_gele_57_3", L("Report to the Paladin Master"), L("Report to the Paladin Master."));
 
-		// The gate was a script with no recoverable logic; the level band stands in.
-		AddPrerequisite(new LevelPrerequisite(98));
+		AddPrerequisite(new PredicatePrerequisite(character => character.Variables.Perm.GetInt(FGele573QuestNpcsScript.AltarResurrectionsVar, 0) >= 3));
 
-		// Deviation: the client row names boss_Chapparition_Q5, which the 2016 world lacks, so this uses boss_Chapparition.
 		AddObjective("killChapparition", L("Defeat spooky Chapparition"), new KillObjective(1, "boss_Chapparition"));
+
+		AddReward(new PropertyReward(PropertyName.MSTA, 5));
 	}
 }
 

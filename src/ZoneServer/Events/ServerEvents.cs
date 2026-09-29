@@ -173,6 +173,21 @@ namespace Melia.Zone.Events
 		public Event<PlayerUsedItemEventArgs> PlayerUsedItem = new();
 
 		/// <summary>
+		/// Raised when a player sits down or stands up.
+		/// </summary>
+		public Event<PlayerEventArgs> PlayerSitStatusChanged = new();
+
+		/// <summary>
+		/// Raised when a player strikes a pose.
+		/// </summary>
+		public Event<PlayerPoseEventArgs> PlayerPosed = new();
+
+		/// <summary>
+		/// Raised when a player has been resurrected.
+		/// </summary>
+		public Event<PlayerEventArgs> PlayerResurrected = new();
+
+		/// <summary>
 		/// Raised when a player completes a quest.
 		/// </summary>
 		public Event<PlayerCompletedQuestEventArgs> PlayerCompletedQuest = new();

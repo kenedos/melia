@@ -139,6 +139,17 @@ namespace Melia.Zone.Events.Arguments
 	}
 
 	/// <summary>
+	/// Arguments for when a player strikes a pose.
+	/// </summary>
+	public class PlayerPoseEventArgs(Character character, int poseId) : PlayerEventArgs(character)
+	{
+		/// <summary>
+		/// Returns the id of the pose.
+		/// </summary>
+		public int PoseId { get; } = poseId;
+	}
+
+	/// <summary>
 	/// Arguments for when a player completes a quest.
 	/// </summary>
 	public class PlayerCompletedQuestEventArgs(Character character, int questId) : PlayerEventArgs(character)

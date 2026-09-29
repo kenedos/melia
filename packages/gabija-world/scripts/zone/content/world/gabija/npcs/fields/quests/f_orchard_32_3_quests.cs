@@ -26,6 +26,8 @@ using static Melia.Zone.Scripting.Shortcuts;
 public class FOrchard323QuestNpcsScript : GeneralScript
 {
 	private readonly static QuestId Hq1 = new QuestId(50275);
+
+	public const string OfferingToolsShownVar = "Gabija.Orchard323.Hq1.ToolsShown";
 	private readonly static QuestId Rp1 = new QuestId(60184);
 	private readonly static QuestId Mq01 = new QuestId(80018);
 	private readonly static QuestId Mq02 = new QuestId(80019);
@@ -404,13 +406,24 @@ public class FOrchard323QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (!character.Quests.Has(Hq1) && !character.Variables.Perm.GetBool(OfferingToolsShownVar, false) && character.Inventory.CountItem(ItemId.ORCHARD323_HIDDENQ1_ITEM) >= 1)
+		{
+			var shown = await dialog.Select(L("The tools we use to make offerings are completely gone."),
+				Option(L("Let me give you the things I got from the ferrets."), "show"),
+				Option(L("Just go"), "leave")
+			);
+
+			if (shown == "show")
+			{
+				character.Variables.Perm.SetBool(OfferingToolsShownVar, true);
+				await dialog.Msg(L("Those are our offering tools. Are you saying the ferrets had them? First the ferrets steal our food, now our offering tools too...?"));
+			}
+			return;
+		}
+
 		if (!character.Quests.Has(Hq1) && character.Quests.MeetsPrerequisites(Hq1))
 		{
-			await dialog.Msg(L("Those are our offering tools. Are you saying the ferrets had them? First the ferrets steal our food, now our offering tools too...?"));
-			await dialog.Msg(L("You're saying the ferrets were keeping these tools? We were looking for them all over the place."));
-			await dialog.Msg(L("Um, I dunno if it's too much to ask, but would you find our other offering tools? We need them to pray for peace in our village."));
-
-			var answer = await dialog.SelectQuestOffer(Hq1, L("You could say those tools are what's keeping our village safe all these years, so you know."),
+			var answer = await dialog.SelectQuestOffer(Hq1, L("You're saying the ferrets were keeping these tools? We were looking for them all over the place."),
 				Option(L("I'll get back the offering tools."), "accept"),
 				Option(L("Do it yourself."), "leave")
 			);
@@ -1244,7 +1257,7 @@ public class FOrchard323Hq1Quest : QuestScript
 		SetPhase(QuestStatus.Success, "ORCHARD323_MAYOR", "f_orchard_32_3", L("Talk to the Village Headman"), L("You have collected all of the offering tools. Return to the head of the village and give him the tools."));
 
 		AddPrerequisite(new ItemPrerequisite("ORCHARD323_HIDDENQ1_ITEM"));
-		AddPrerequisite(new LevelPrerequisite(90));
+		AddPrerequisite(new PredicatePrerequisite(character => character.Variables.Perm.GetBool(FOrchard323QuestNpcsScript.OfferingToolsShownVar, false)));
 
 		AddObjective("collectTools", L("Retrieve the Offering Tools"), new CollectItemObjective("ORCHARD323_HIDDENQ1_ITEM2", 10));
 		AddPityDrop("ORCHARD323_HIDDENQ1_ITEM2", 1.0f, 0, 1, "ferret_patter", "ferret_slinger");

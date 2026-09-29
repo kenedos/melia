@@ -12,7 +12,9 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
 using Melia.Shared.Util;
 using Melia.Shared.World;
+using Melia.Zone;
 using Melia.Zone.Events.Arguments;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
@@ -96,8 +98,36 @@ public class FCastle653QuestNpcsScript : GeneralScript
 		{ 1147.65, 172.26 }, { 949.25, 173.12 }, { 721.22, 25.01 }, { 596.72, 203.09 }, { -3.01, 685.74 }, { 201.91, 405.81 },
 	};
 
+	public const string MihailPoseUnlockVar = "Gabija.Castle653.Hq1.Unlocked";
+
 	protected override void Load()
 	{
+		// Showing Mihail the Best pose once the tower, church and fortress chains are done opens his hidden quest.
+		ZoneServer.Instance.ServerEvents.PlayerPosed.Subscribe((sender, args) =>
+		{
+			var character = args.Character;
+
+			if (args.PoseId != 3 || character.Map.ClassName != "f_castle_65_3" || character.Quests.Has(Hq1))
+				return;
+
+			if (character.Variables.Perm.GetBool(MihailPoseUnlockVar, false))
+				return;
+
+			if (!HiddenQuestGates.CompletedAll(character, 18010, 8392, 8498, 20341, 50084))
+				return;
+
+			var properties = character.Properties;
+			if (properties.GetFloat(PropertyName.STR) < 200 && properties.GetFloat(PropertyName.DEX) < 200 && properties.GetFloat(PropertyName.INT) < 200 && properties.GetFloat(PropertyName.MNA) < 200 && properties.GetFloat(PropertyName.CON) < 200)
+				return;
+
+			var mihail = character.Map.GetNpcs(npc => npc.UniqueName == "CASTLE653_MQ_04_2").FirstOrDefault(npc => npc.Position.InRange2D(character.Position, 50));
+			if (mihail == null)
+				return;
+
+			character.Variables.Perm.SetBool(MihailPoseUnlockVar, true);
+			Send.ZC_CHAT(character.Connection, mihail, L("You're looking good. What have you been doing?"));
+		});
+
 		// The Revelators at the crossroads entrance
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(155095, L("Revelator Yane"), "CASTLE653_MQ_01_1", "f_castle_65_3", -1690.17, -452.16, 43, c => c.Quests.Has(Manor652Mq05) && !c.Quests.HasCompleted(Mq01), this.YaneAtEntrance);
@@ -1510,8 +1540,7 @@ public class FCastle653Hq1Quest : QuestScript
 		SetPhase(QuestStatus.Success, "CASTLE653_MQ_04_2", "f_castle_65_3", L("Talk to Revelator Mihail"), L("Talk to Revelator Mihail."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(70448, QuestStatus.Completed));
-		AddPrerequisite(new QuestStatusPrerequisite(8498, QuestStatus.Completed));
-		AddPrerequisite(new QuestStatusPrerequisite(60042, QuestStatus.Completed));
+		AddPrerequisite(new PredicatePrerequisite(character => character.Variables.Perm.GetBool(FCastle653QuestNpcsScript.MihailPoseUnlockVar, false)));
 
 		AddObjective("tellStories", L("Tell Revelator Mihail About Your Adventures"), new ManualObjective());
 

@@ -130,10 +130,7 @@ public class FRokas30QuestNpcsScript : GeneralScript
 
 			if (!character.Quests.Has(Hq01) && character.Quests.MeetsPrerequisites(Hq01))
 			{
-				await dialog.Msg(L("This place is like a grave for many explorers and historians."));
-				await dialog.Msg(L("We are studying solid historical truths on top of their graves."));
-
-				var answer = await dialog.SelectQuestOffer(Hq01, L("Can you burn this oration in front of the epitaph at Nepatogus Field in Rukas Plateau? You have walked more of this valley than I have."),
+				var answer = await dialog.SelectQuestOffer(Hq01, L("I'm sorry... but, can you burn this oration in front of the epitaph at Nepatogus Field in Rukas Plateau? You have explored different areas of the valley. I think you are more than qualified to comfort their souls."),
 					Option(L("I will burn the oration and comfort the souls"), "accept"),
 					Option(L("Decline"), "leave")
 				);
@@ -142,14 +139,14 @@ public class FRokas30QuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Hq01);
 					character.Inventory.Add(ItemId.ROKAS_30_HQ01_ITEM, 1, InventoryAddType.PickUp);
-					await dialog.Msg(L("Nepatogus Field is at the far north-west of Rukas Plateau. The epitaph is easy to miss."));
 				}
 				return;
 			}
 
 			if (character.Quests.IsActive(Hq01))
 			{
-				await dialog.Msg(L("The epitaph is at Nepatogus Field, in Rukas Plateau. Burn it where they can see the smoke."));
+				await dialog.Msg(L("This place is like a grave for many explorers and historians."));
+				await dialog.Msg(L("We are studying solid historical truths on top of their graves."));
 				return;
 			}
 
@@ -1229,11 +1226,11 @@ public class Rokas30Hq01Quest : QuestScript
 		SetPhase(QuestStatus.InProgress, "ROKAS_30_HQ01_EPITAPH", "f_rokas_29", L("Burn the oration"), L("Historian Colin wants to honor the explorers who died while exploring this area. Burn the oration in their honor in front of the epitaph at Rukas Plateau."));
 		SetPhase(QuestStatus.Success, "ROKAS30_COLLIN", "f_rokas_30", L("Report to Colin"), L("Burned the oration in front of the epitaph in Rukas Plateau. Report to Historian Colin."));
 
-		// The client's only gate is a server-side script; the map's band is the
-		// substitute.
-		AddPrerequisite(new LevelPrerequisite(66));
+		AddPrerequisite(new PredicatePrerequisite(character => HiddenQuestGates.ExploredAll(character, "f_rokas_24", "f_rokas_25", "f_rokas_26", "f_rokas_27", "f_rokas_28", "f_rokas_29")));
 
 		AddObjective("burnOration", L("Burn the oration at the epitaph in Rukas Plateau"), new ManualObjective());
+
+		AddReward(new PropertyReward(PropertyName.INT, 1));
 	}
 }
 

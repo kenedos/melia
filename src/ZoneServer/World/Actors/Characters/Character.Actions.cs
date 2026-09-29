@@ -4,6 +4,7 @@
 using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Network;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Components;
@@ -35,6 +36,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.IsSitting = !this.IsSitting;
 			this.SitStatusChanged?.Invoke(this);
 			Send.ZC_REST_SIT(this);
+			ZoneServer.Instance.ServerEvents.PlayerSitStatusChanged.Raise(new PlayerEventArgs(this));
 		}
 
 		/// <summary>
@@ -50,6 +52,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.IsSitting = sittingState;
 			this.SitStatusChanged?.Invoke(this);
 			Send.ZC_REST_SIT(this);
+			ZoneServer.Instance.ServerEvents.PlayerSitStatusChanged.Raise(new PlayerEventArgs(this));
 		}
 
 		/// <summary>

@@ -223,6 +223,34 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Returns the sum of the given property's bonuses from all of the
+		/// character's completed quests.
+		/// </summary>
+		/// <param name="propertyName"></param>
+		/// <returns></returns>
+		public float GetRewardProperty(string propertyName)
+		{
+			var result = 0f;
+
+			lock (_syncLock)
+			{
+				foreach (var quest in _quests)
+				{
+					if (quest.Status != QuestStatus.Completed)
+						continue;
+
+					foreach (var reward in quest.Data.Rewards)
+					{
+						if (reward is PropertyReward propertyReward && propertyReward.Property == propertyName)
+							result += propertyReward.Amount;
+					}
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
 		/// Returns a list with all of the character's quests.
 		/// </summary>
 		/// <returns></returns>
