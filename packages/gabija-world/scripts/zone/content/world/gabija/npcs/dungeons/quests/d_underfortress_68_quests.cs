@@ -24,6 +24,7 @@ using static Melia.Zone.Scripting.Shortcuts;
 
 public class DUnderfortress68QuestNpcsScript : GeneralScript
 {
+	private readonly static QuestId Under67Mq060 = new QuestId(50068);
 	private readonly static QuestId Mq010 = new QuestId(50072);
 	private readonly static QuestId Mq020 = new QuestId(50073);
 	private readonly static QuestId Mq030 = new QuestId(50074);
@@ -61,6 +62,14 @@ public class DUnderfortress68QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Old Manager"));
 			dialog.SetPortrait("Dlg_port_Premier_Eminent");
+
+			if (character.Quests.IsActive(Under67Mq060) && character.Quests.IsCompletable(Under67Mq060))
+			{
+				await dialog.Msg(L("So you left the note safely. Then Amanda will find her own way in."));
+				await dialog.Msg(L("Now, about the revelation."));
+				await dialog.CompleteQuest(Under67Mq060);
+				return;
+			}
 
 			if (character.Quests.IsActive(Mq010) && character.Quests.IsCompletable(Mq010))
 			{

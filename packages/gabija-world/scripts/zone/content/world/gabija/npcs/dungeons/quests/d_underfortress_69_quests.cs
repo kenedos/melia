@@ -36,6 +36,7 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 	private readonly static QuestId Hq1 = new QuestId(50269);
 
 	private const int PartsNeeded = 5;
+	private const int BloodNeeded = 4;
 
 	// The battlefield traps the device's parts come out of.
 	private readonly static string[] TrapNames =
@@ -406,7 +407,7 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq030) && !character.Quests.IsCompletable(Mq030))
 			{
-				if (character.Inventory.CountItem(ItemId.UNDER69_MQ3_ITEM01) < 13)
+				if (character.Inventory.CountItem(ItemId.UNDER69_MQ3_ITEM01) < BloodNeeded)
 				{
 					await dialog.Msg(L("The letters on the pillar will not take anything but demon blood."));
 					return;
@@ -417,7 +418,6 @@ public class DUnderfortress69QuestNpcsScript : GeneralScript
 				if (carved != TimeActionResult.Completed)
 					return;
 
-				character.Inventory.RemoveItem(ItemId.UNDER69_MQ3_ITEM01, 13);
 				character.Quests.CompleteObjective(Mq030, "carveTheStone");
 				character.ServerMessage(L("The foundation stone of the magic circle is active!"));
 				return;
@@ -902,6 +902,7 @@ public class Underfortress69Mq030Quest : QuestScript
 		AddPityDrop("UNDER69_MQ3_ITEM01", 0.9f, 3, 1, "flask_blue");
 
 		AddReward(new ItemReward("expCard11", 2));
+		AddReward(new TakeItemReward("UNDER69_MQ3_ITEM01"));
 	}
 
 	public override void OnSuccess(Character character, Quest quest)

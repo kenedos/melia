@@ -39,6 +39,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	private readonly static QuestId Cannoneer7 = new QuestId(30118);
 	private readonly static QuestId Musketeer7 = new QuestId(30119);
 	private readonly static QuestId Under66Sq010 = new QuestId(50062);
+	private readonly static QuestId Under67Sq010 = new QuestId(50069);
 	private readonly static QuestId Under67Hq1 = new QuestId(50259);
 	private readonly static QuestId Flash64Hq1 = new QuestId(50267);
 
@@ -156,6 +157,14 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("This is enough."));
 				await dialog.Msg(L("Thank you for helping our research."));
 				await dialog.CompleteQuest(Under66Sq010);
+				return;
+			}
+
+			if (character.Quests.IsActive(Under67Sq010) && character.Quests.IsCompletable(Under67Sq010))
+			{
+				await dialog.Msg(L("These are readable. Ruklys' soldiers wrote more than I expected."));
+				await dialog.Msg(L("Here, I made copies for you. Kaliss pays for readable."));
+				await dialog.CompleteQuest(Under67Sq010);
 				return;
 			}
 

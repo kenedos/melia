@@ -27,6 +27,7 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq030 = new QuestId(50050);
 	private readonly static QuestId Mq040 = new QuestId(50051);
 	private readonly static QuestId Mq050 = new QuestId(50052);
+	private readonly static QuestId Under66Mq070 = new QuestId(50061);
 
 	private const int HerbsNeeded = 8;
 	private const int BombsNeeded = 3;
@@ -265,6 +266,18 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(153040, L("[Amanda Grave Robbers]{nl}Amanda"), "AMANDA_65_4", "d_underfortress_65", -350.48, 760.00, 90, this.IsAmandaAtTheWayDown, async dialog =>
 		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Amanda"));
+
+			if (character.Quests.IsActive(Under66Mq070) && character.Quests.IsCompletable(Under66Mq070))
+			{
+				await dialog.Msg(L("The box was full of scrolls of a defensive magic circle. Nobody drew them, and that is what worries me."));
+				await dialog.Msg(L("Keep them safe. We will need them further down."));
+				await dialog.CompleteQuest(Under66Mq070);
+				return;
+			}
+
 			await dialog.Msg(L("The way down to the Drill Ground of Confliction is clear. Go when you are ready."));
 		});
 

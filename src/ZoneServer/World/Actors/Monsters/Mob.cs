@@ -388,7 +388,11 @@ namespace Melia.Zone.World.Actors.Monsters
 
 		private const float ShieldDamageRate = 5;
 		private const float ShieldRegenRate = 0.05f;
-		private static readonly TimeSpan ShieldRefillDelay = TimeSpan.FromSeconds(20);
+		private const float ShieldHpDamageRate = 0.5f;
+		private const float BossShieldBaseRate = 100;
+		private const float BossShieldRatePerLevel = 1;
+		private const float BossShieldMaxRate = 200;
+		private static readonly TimeSpan ShieldRefillDelay = TimeSpan.FromSeconds(15);
 
 		private readonly object _shieldLock = new();
 		private DateTime _shieldBreakTime = DateTime.MinValue;
@@ -476,7 +480,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (this.Rank == MonsterRank.Boss)
 			{
-				this.Properties.SetFloat(PropertyName.ShieldRate, 100);
+				this.Properties.SetFloat(PropertyName.ShieldRate, Math.Min(BossShieldMaxRate, BossShieldBaseRate + _cachedLevel * BossShieldRatePerLevel));
 				this.Shield = this.MaxShield;
 				this.Properties.AutoUpdateMax(PropertyName.Shield, PropertyName.MShield);
 			}
@@ -548,7 +552,12 @@ namespace Melia.Zone.World.Actors.Monsters
 			}
 
 			this.Components.Get<CombatComponent>().SetAttackState(true);
+
+			var shielded = this.Shield > 0;
 			this.DamageShield(damage);
+
+			if (shielded)
+				damage *= ShieldHpDamageRate;
 
 			var currentHp = this.Hp;
 
