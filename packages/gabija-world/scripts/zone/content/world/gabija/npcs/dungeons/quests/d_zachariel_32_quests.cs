@@ -33,12 +33,6 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq05 = new QuestId(8432);
 	private readonly static QuestId Rp1 = new QuestId(60170);
 
-	private readonly static double[,] SleepingBoowookSpots =
-	{
-		{ -11, -1206 }, { -106.33, -1012.23 }, { 46.26, -551.92 }, { 88.26, -1006.39 },
-		{ -2.18, -690.25 }, { 167.84, -1061.87 }, { 27.68, -1397.34 }, { 333.28, -978.33 },
-	};
-
 	protected override void Load()
 	{
 		// Royal Mausoleum Foundation Stone
@@ -79,11 +73,20 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 
 		// Sleeping Boowook
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < SleepingBoowookSpots.GetLength(0); i++)
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var uniqueName = "ZACHA1F_MQ_01_MON" + (i + 1);
-			AddNpc(57565, L("Sleeping Boowook"), uniqueName, "d_zachariel_32", SleepingBoowookSpots[i, 0], SleepingBoowookSpots[i, 1], 90, this.WakeSleepingBoowook);
-		}
+			Prefix = "ZACHA1F_MQ_01_MON",
+			MonsterId = 57565,
+			Name = L("Sleeping Boowook"),
+			Map = "d_zachariel_32",
+			Points = [(-11, -1206, 90), (-106, -1012, 90), (46, -552, 90), (88, -1006, 90), (-2, -690, 90), (168, -1062, 90), (28, -1397, 90), (333, -978, 90)],
+			IsActive = c => c.Quests.IsActive(Mq01) && !c.Quests.IsCompletable(Mq01),
+			TimedLabel = L("Waking up"),
+			TimedAnim = "ABSORB",
+			Seconds = 3.5,
+			AggroRadius = 100,
+			IdleMessage = L("A guardian of the Royal Mausoleum, folded up and asleep where it was left."),
+		});
 
 		// Royal Mausoleum Cube Manual
 		//-------------------------------------------------------------------------
@@ -454,32 +457,6 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Wakes one of the guardians sleeping along the entrance hall.
-	/// </summary>
-	/// <param name="dialog"></param>
-	private async Task WakeSleepingBoowook(Dialog dialog)
-	{
-		var character = dialog.Player;
-
-		dialog.SetTitle(L("Sleeping Boowook"));
-
-		if (character.Quests.IsActive(Mq01) && !character.Quests.IsCompletable(Mq01))
-		{
-			var woken = await character.TimeActions.StartAsync(L("Working the awakening device..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
-
-			if (woken != TimeActionResult.Completed)
-				return;
-
-			character.Quests.CompleteObjective(Mq01, "wakeBoowook");
-
-			await dialog.Msg(L("The Boowook's shell comes apart and it stands, remembering what it was set here to do."));
-			return;
-		}
-
-		await dialog.Msg(L("A guardian of the Royal Mausoleum, folded up and asleep where it was left."));
-	}
-
-	/// <summary>
 	/// Breaks one of the two devices that keep calling corrupted guardians up.
 	/// </summary>
 	/// <param name="dialog"></param>
@@ -572,12 +549,12 @@ public class Zacha1fMq01Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "ZACHA1F_MQ_01", "d_zachariel_32", L("Read the Royal Mausoleum Foundation Stone"), L("There is a foundation stone in the Royal Mausoleum. Read it."));
-		SetPhase(QuestStatus.InProgress, "ZACHA1F_MQ_01_MON1", "d_zachariel_32", L("Wake the sleeping Boowook"), L("The Foundation Stone said to wake the sleeping Guardians and stop the demons when they intrude. Wake the sleeping Boowook and stop the demons."));
-		SetPhase(QuestStatus.Success, "ZACHA1F_MQ_01_MON1", "d_zachariel_32", L("Find another epitaph"), L("The epitaph felt like it was foretelling something that you should do from now on. You better move as written on the epitaph."));
+		SetPhase(QuestStatus.InProgress, "ZACHA1F_MQ_01_MON_0", "d_zachariel_32", L("Wake the sleeping Boowook"), L("The Foundation Stone said to wake the sleeping Guardians and stop the demons when they intrude. Wake the sleeping Boowook and stop the demons."));
+		SetPhase(QuestStatus.Success, "ZACHA1F_MQ_01_MON_0", "d_zachariel_32", L("Find another epitaph"), L("The epitaph felt like it was foretelling something that you should do from now on. You better move as written on the epitaph."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(9003, QuestStatus.Completed));
 
-		AddObjective("wakeBoowook", L("Wake the sleeping Boowook"), new ManualObjective());
+		AddObjective("wakeBoowook", L("Wake the sleeping Boowook"), new VariableCheckObjective(QuestSpots.CountVar("ZACHA1F_MQ_01_MON"), 5, isPermanent: false));
 
 		AddReward(new ItemReward("expCard5", 2));
 		AddReward(new TakeItemReward("ZACHA1F_REPAIR", 1));

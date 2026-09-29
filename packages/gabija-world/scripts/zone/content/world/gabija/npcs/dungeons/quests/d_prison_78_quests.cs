@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
@@ -39,7 +40,8 @@ public class DPrison78QuestNpcsScript : GeneralScript
 
 	private const string ZanasPortrait = "Dlg_port_zanas_prison";
 	private const string CircleVar = "Gabija.Prison78.Circle";
-	private const string CircleTimeVar = "Gabija.Prison78.CircleTime";
+	public const string ProtectionVar = "Gabija.Prison78.Protection";
+	private const int CircleCapacity = 35;
 	private const string ChestVar = "Gabija.Prison78.SupplyChest";
 	private const string TombstoneVar = "Gabija.Prison78.Tombstone";
 	private const string PasswordVar = "Gabija.Prison78.Password";
@@ -187,6 +189,10 @@ public class DPrison78QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.SetInt(ProtectionVar, 0);
+					for (var c = 1; c <= CircleSpots.GetLength(0); ++c)
+						character.Variables.Temp.Remove(CircleVar + c);
+
 					character.Quests.Start(Mq2);
 					await dialog.Msg(L("Great. There would be one at the interrogation room."));
 					await dialog.Msg(L("When you get on the magic circle, you will be protected."));
@@ -468,12 +474,7 @@ public class DPrison78QuestNpcsScript : GeneralScript
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < CircleSpots.GetLength(0); ++i)
-		{
-			var number = i + 1;
-
-			AddQuestTrigger(i == 0 ? "PRISON_78_OBJ_2" : "PRISON_78_OBJ_2_" + number, "d_prison_78", CircleSpots[i, 0], CircleSpots[i, 1], 40, args => this.StepOnTheCircle(args, number));
-		}
+		ZoneServer.Instance.ServerEvents.SecondTick.Subscribe((sender, args) => this.ChargeProtectionMagic());
 
 		AddQuestTrigger("PRISON_78_MQ_7_TRIGGER", "d_prison_78", 634, 1687, 300, async args =>
 		{
@@ -929,48 +930,36 @@ public class DPrison78QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Marks one of the Interrogation Room's protection magic circles, and
-	/// completes the Protection Magic once all three are held in time.
+	/// Fills the Protection Magic meter of every character standing on one
+	/// of the Interrogation Room's magic circles.
 	/// </summary>
-	/// <param name="args"></param>
-	/// <param name="number"></param>
-	private async Task StepOnTheCircle(TriggerActorArgs args, int number)
+	private void ChargeProtectionMagic()
 	{
-		if (args.Initiator is not Character character)
+		if (!ZoneServer.Instance.World.TryGetMap("d_prison_78", out var map))
 			return;
 
-		if (!character.Quests.IsActive(Mq2) || character.Quests.IsCompletable(Mq2))
-			return;
-
-		var now = DateTime.Now.Ticks;
-		var last = character.Variables.Temp.GetLong(CircleTimeVar, 0);
-
-		if (last == 0 || now - last > CircleWindow.Ticks)
+		foreach (var character in map.GetCharacters())
 		{
-			for (var i = 1; i <= CircleSpots.GetLength(0); ++i)
-				character.Variables.Temp.Remove(CircleVar + i);
+			if (character.Layer != 0 || !character.Quests.IsActive(Mq2) || character.Quests.IsCompletable(Mq2))
+				continue;
+
+			for (var i = 0; i < CircleSpots.GetLength(0); ++i)
+			{
+				var circle = new Position((float)CircleSpots[i, 0], character.Position.Y, (float)CircleSpots[i, 1]);
+				if (!character.Position.InRange2D(circle, 20))
+					continue;
+
+				var name = CircleVar + (i + 1);
+				var charge = character.Variables.Temp.GetInt(name, 0);
+				if (charge >= CircleCapacity)
+					continue;
+
+				var gain = Random(1, 4);
+				character.Variables.Temp.SetInt(name, charge + gain);
+				character.Variables.Temp.SetInt(ProtectionVar, Math.Min(100, character.Variables.Temp.GetInt(ProtectionVar, 0) + gain));
+				character.PlayEffect("F_light032_green", 1f);
+			}
 		}
-
-		character.Variables.Temp.SetBool(CircleVar + number, true);
-		character.Variables.Temp.SetLong(CircleTimeVar, now);
-
-		var held = 0;
-		for (var i = 1; i <= CircleSpots.GetLength(0); ++i)
-		{
-			if (character.Variables.Temp.GetBool(CircleVar + i, false))
-				held++;
-		}
-
-		if (held < CircleSpots.GetLength(0))
-		{
-			character.ServerMessage(LF("The protective magic takes hold ({0}/{1}). Hurry to the next magic circle!", held, CircleSpots.GetLength(0)));
-			return;
-		}
-
-		character.Quests.CompleteObjective(Mq2, "protection");
-		character.ServerMessage(L("The Protection Magic is complete. Return to Zanas' Soul."));
-
-		await Task.CompletedTask;
 	}
 
 	/// <summary>
@@ -1038,7 +1027,7 @@ public class Prison78Mq2Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30145, QuestStatus.Completed));
 
-		AddObjective("protection", L("Complete the Protection Magic"), new ManualObjective());
+		AddObjective("protection", L("Complete the Protection Magic"), new VariableCheckObjective(DPrison78QuestNpcsScript.ProtectionVar, 100, isPermanent: false));
 
 		AddReward(new ItemReward("expCard12", 1));
 		AddReward(new ItemReward("Vis", 8260));
@@ -1092,7 +1081,7 @@ public class Prison78Mq4Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30147, QuestStatus.Completed));
 
-		AddObjective("collectBlood", L("Obtain Kalejimas Demon Blood by defeating Demons"), new CollectItemObjective("PRISON_78_MQ_4_ITEM", 12));
+		AddObjective("collectBlood", L("Obtain Kalejimas Demon Blood by defeating Demons"), new CollectItemObjective("PRISON_78_MQ_4_ITEM", 20));
 
 		AddPityDrop("PRISON_78_MQ_4_ITEM", 1.0f, 0, 1, "TerraNymph_brown", "NightMaiden_mage_red", "Elet_blue");
 
@@ -1149,7 +1138,7 @@ public class Prison78Mq6Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30149, QuestStatus.Completed));
 
-		AddObjective("registerMagic", L("Defeat Demons to register their magic on the Magic Control Scroll"), new KillObjective(10, "TerraNymph_brown", "NightMaiden_mage_red", "Elet_blue"));
+		AddObjective("registerMagic", L("Defeat Demons to register their magic on the Magic Control Scroll"), new ScoreKillObjective(100, (mob, character) => character.Layer == 0 && character.Map.ClassName == "d_prison_78" && (mob.Rank == MonsterRank.Normal || mob.Rank == MonsterRank.Special || mob.Rank == MonsterRank.Elite || mob.Rank == MonsterRank.Material) ? (mob.Rank == MonsterRank.Elite ? Random(10, 16) : Random(3, 8)) : 0));
 
 		AddReward(new ItemReward("expCard12", 1));
 		AddReward(new ItemReward("Vis", 8260));

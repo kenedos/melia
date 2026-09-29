@@ -327,48 +327,52 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq05) && !character.Quests.IsCompletable(Mq05))
 			{
-				var purified = await character.TimeActions.StartAsync(L("Purifying the essence..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+				if (!character.Inventory.HasItem(ItemId.CHAPLE575_MQ_05_ITEM))
+				{
+					character.ServerMessage(L("You don't have enough Vicious Essences"));
+					return;
+				}
 
-				if (purified != TimeActionResult.Completed)
+				if (character.Inventory.CountItem(ItemId.CHAPLE575_MQ_05_1_ITEM) >= 15)
+				{
+					character.ServerMessage(L("Acquired enough Purified Essences"));
+					return;
+				}
+
+				var purified = await character.TimeActions.StartAsync(L("Purifying"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (purified != TimeActionResult.Completed || !character.Inventory.HasItem(ItemId.CHAPLE575_MQ_05_ITEM))
 					return;
 
-				character.ServerMessage(L("You hold the Vicious Essence over the altar. The darkness boils off, leaving a clear, purified essence behind."));
-				character.Inventory.Add(650713, 1, InventoryAddType.PickUp);
-				character.Quests.CompleteObjective(Mq05, "purifyEssence");
+				character.Inventory.RemoveItem(ItemId.CHAPLE575_MQ_05_ITEM, 1);
+				character.Inventory.Add(ItemId.CHAPLE575_MQ_05_1_ITEM, 1, InventoryAddType.PickUp);
+				character.ServerMessage(L("Acquired a Purified Essence"));
 				return;
 			}
 
 			await dialog.Msg(L("An altar set aside for cleansing tainted things."));
 		});
 
-		// Glizardon
+		// Glizardons
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(57021, L("Glizardon"), "CHAPLE575_MQ_06", "d_chapel_57_5", 192, 259, 90, c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06), async dialog =>
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Glizardon"));
-
-			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06) && !character.IsBuffActive(BuffId.CHAPLE575_MQ_06))
+			Prefix = "CHAPLE575_MQ_06",
+			MonsterId = 57021,
+			Name = L("Glizardon"),
+			Map = "d_chapel_57_5",
+			Points = [(911, 450, 90), (543, 399, 90), (191, 258, 90)],
+			IsActive = c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06),
+			Requirement = c => c.IsBuffActive(BuffId.CHAPLE575_MQ_06) ? null : L("The Glizardon would notice you. Drink the Namott Holy Water first."),
+			TimedLabel = L("Attaching"),
+			TimedAnim = "MAKING",
+			Seconds = 1,
+			IdleMessage = L("A hulking Glizardon, slow and sure of itself."),
+			OnDone = (character, npc) =>
 			{
-				character.ServerMessage(L("The Glizardon would notice you. Drink the Namott Holy Water first."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
-			{
-				var planted = await character.TimeActions.StartAsync(L("Attaching"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
-
-				if (planted != TimeActionResult.Completed)
-					return;
-
-				character.ServerMessage(L("You attached the Holy Bomb to the Glizardon!"));
-				character.Quests.CompleteObjective(Mq06, "bombGlizardon");
-				character.LookAround();
-				return;
-			}
-
-			await dialog.Msg(L("A hulking Glizardon, slow and sure of itself."));
+				character.ServerMessage(L("You've attached the Holy Bomb onto Glizardon!"));
+				character.RemoveBuff(BuffId.CHAPLE575_MQ_06);
+			},
 		});
 
 		// Underground Central Barrier
@@ -577,7 +581,9 @@ public class Chaple575Mq05Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(30));
 
-		AddObjective("purifyEssence", L("Obtain the Purified Essence"), new ManualObjective());
+		AddObjective("purifyEssence", L("Obtain the Purified Essence"), new CollectItemObjective("CHAPLE575_MQ_05_1_ITEM", 5));
+
+		AddPityDrop("CHAPLE575_MQ_05_ITEM", 1.0f, 0, 1, "zombiegirl2_chpel", "Yognome");
 
 		AddReward(new ItemReward("expCard3", 1));
 		AddReward(new TakeItemReward("CHAPLE575_MQ_05_1_ITEM"));
@@ -600,13 +606,13 @@ public class Chaple575Mq06Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "CHAPEL_TABERIJUS", "d_chapel_57_5", L("Talk to Follower Tiberius"), L("Tiberius is waiting for someone's help in the Tenet Church 1F."));
-		SetPhase(QuestStatus.InProgress, "CHAPLE575_MQ_06", "d_chapel_57_5", L("Defeat Glizardon using the Holy Bomb"), L("Put the Holy Bomb on a Glizardon's back."));
+		SetPhase(QuestStatus.InProgress, "CHAPLE575_MQ_06_2", "d_chapel_57_5", L("Defeat Glizardon using the Holy Bomb"), L("Put the Holy Bomb on a Glizardon's back."));
 		SetPhase(QuestStatus.Success, "CHAPEL_TABERIJUS", "d_chapel_57_5", L("Talk to Follower Tiberius"), L("Return to Tiberius."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8523, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(30));
 
-		AddObjective("bombGlizardon", L("Defeat Glizardon using the Holy Bomb"), new ManualObjective());
+		AddObjective("bombGlizardon", L("Defeat Glizardon using the Holy Bomb"), new VariableCheckObjective(QuestSpots.CountVar("CHAPLE575_MQ_06"), 2, isPermanent: false));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new TakeItemReward("CHAPLE575_MQ_06_ITEM"));

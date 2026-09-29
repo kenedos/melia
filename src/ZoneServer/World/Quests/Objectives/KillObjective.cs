@@ -36,6 +36,11 @@ namespace Melia.Zone.World.Quests.Objectives
 		public float AreaRadius { get; init; }
 
 		/// <summary>
+		/// Returns an extra condition a monster must meet to count, if any.
+		/// </summary>
+		public Func<IMonster, bool> Filter { get; init; }
+
+		/// <summary>
 		/// Creates an objective to kill a certain amount of one of the
 		/// given types of monsters.
 		/// </summary>
@@ -191,6 +196,9 @@ namespace Melia.Zone.World.Quests.Objectives
 					return;
 
 				if (objective.AreaCenter.HasValue && !monster.Position.InRange2D(objective.AreaCenter.Value, objective.AreaRadius))
+					return;
+
+				if (objective.Filter != null && !objective.Filter(monster))
 					return;
 
 				if (objective.IsTarget(monster))

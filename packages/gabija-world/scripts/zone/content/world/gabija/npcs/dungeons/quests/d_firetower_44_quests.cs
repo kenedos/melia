@@ -630,7 +630,7 @@ public class Ftower44Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8489, QuestStatus.Completed));
 
-		AddObjective("collectCrystals", L("Collect Flame Crystals"), new CollectItemObjective("FTOWER44_MQ_03_ITEM", 5));
+		AddObjective("collectCrystals", L("Collect Flame Crystals"), new CollectItemObjective("FTOWER44_MQ_03_ITEM", 3));
 
 		AddReward(new ItemReward("expCard7", 1));
 		AddReward(new ItemReward("FTOWER_FIRE_ESSENCE_2", 1));

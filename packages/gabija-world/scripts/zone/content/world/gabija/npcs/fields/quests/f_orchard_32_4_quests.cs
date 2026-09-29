@@ -44,7 +44,7 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 	private const string TotemVar = "Gabija.Quests.Orchard324Sq03.Totem";
 	private const string SaplingVar = "Gabija.Quests.Orchard324Rp1.Sapling";
 
-	private const int SaplingsNeeded = 10;
+	private const int SaplingsNeeded = 5;
 	private const int SuppressorRange = 150;
 	private const int TotemRange = 150;
 	private const int FlowerRange = 250;
@@ -938,7 +938,7 @@ public class FOrchard324Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(80043, QuestStatus.Completed));
 
-		AddObjective("collectBlood", L("Defeat Vikaras Mages and collect Demon Blood"), new CollectItemObjective("ORCHARD_324_MQ_04_ITEM", 5));
+		AddObjective("collectBlood", L("Defeat Vikaras Mages and collect Demon Blood"), new CollectItemObjective("ORCHARD_324_MQ_04_ITEM", 10));
 		AddPityDrop("ORCHARD_324_MQ_04_ITEM", 1.0f, 0, 1, "Sec_wolf_statue_mage");
 
 		AddReward(new TakeItemReward("ORCHARD_324_MQ_04_ITEM", -1));
@@ -1166,7 +1166,7 @@ public class FOrchard324Rp1Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(80047, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(90));
 
-		AddObjective("collectSaplings", L("Collect Ceyral Saplings"), new CollectItemObjective("ORCHARD324_RP_1_ITEM", 10));
+		AddObjective("collectSaplings", L("Collect Ceyral Saplings"), new CollectItemObjective("ORCHARD324_RP_1_ITEM", 5));
 
 		AddReward(new ItemReward("expCard6", 2));
 		AddReward(new TakeItemReward("ORCHARD324_RP_1_ITEM", -1));

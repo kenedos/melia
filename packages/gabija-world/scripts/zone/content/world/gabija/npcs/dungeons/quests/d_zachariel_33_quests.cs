@@ -276,11 +276,20 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 
 		// Guardian's Energy
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < GuardianEnergySpots.GetLength(0); i++)
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var uniqueName = "ZACHA2F_SQ_01_ENERGY" + (i + 1);
-			AddNpc(147469, L("Guardian's Energy"), uniqueName, "d_zachariel_33", GuardianEnergySpots[i, 0], GuardianEnergySpots[i, 1], 0, this.AbsorbGuardianEnergy);
-		}
+			Prefix = "ZACHA2F_SQ_01_ENERGY",
+			MonsterId = 147469,
+			Name = L("Guardian's Energy"),
+			Map = "d_zachariel_33",
+			Points = [(-1671, 173, 0), (-562, 111, 0), (-858, 296, 0), (-1546, 370, 0), (-1321, 318, 0), (-1528, 157, 0), (-1103, 206, 0), (-878, 134, 0)],
+			IsActive = c => c.Quests.IsActive(Sq01) && !c.Quests.IsCompletable(Sq01),
+			TimedLabel = L("Absorbing energy"),
+			TimedAnim = "MAKING",
+			Seconds = 3,
+			IdleMessage = L("What is left of a guardian, hanging in the air where it stood."),
+			OnDone = (character, npc) => character.ServerMessage(L("You've absorbed the Guardian's energy!")),
+		});
 
 		// Guardian of the Royal Family's Secret Treasure
 		//-------------------------------------------------------------------------
@@ -534,32 +543,6 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 		});
 	}
 
-	/// <summary>
-	/// Takes in the energy one of the guardians of the west gallery left behind.
-	/// </summary>
-	/// <param name="dialog"></param>
-	private async Task AbsorbGuardianEnergy(Dialog dialog)
-	{
-		var character = dialog.Player;
-
-		dialog.SetTitle(L("Guardian's Energy"));
-
-		if (character.Quests.IsActive(Sq01) && !character.Quests.IsCompletable(Sq01))
-		{
-			var absorbed = await character.TimeActions.StartAsync(L("Taking in the energy..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
-
-			if (absorbed != TimeActionResult.Completed)
-				return;
-
-			character.Quests.CompleteObjective(Sq01, "absorbEnergy");
-
-			await dialog.Msg(L("The energy goes into you, and something heavy turns over in the west wall."));
-			character.LookAround();
-			return;
-		}
-
-		await dialog.Msg(L("What is left of a guardian, hanging in the air where it stood."));
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -736,12 +719,12 @@ public class Zacha2fSq01Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "ZACHA2F_SQ", "d_zachariel_33", L("Read the Secret Location Manual"), L("Various writings on how to prepare when the demons attack are engraved on the epitaph. Read the epitaph."));
-		SetPhase(QuestStatus.InProgress, "ZACHA2F_SQ_01_ENERGY1", "d_zachariel_33", L("Obtain the Guardian Energy"), L("Find and absorb the Guardians' hidden energy to open the secret door."));
-		SetPhase(QuestStatus.Success, "ZACHA2F_SQ_01_ENERGY1", "d_zachariel_33", L("Obtain the Guardian Energy"), L("Find and absorb the Guardians' hidden energy to open the secret door."));
+		SetPhase(QuestStatus.InProgress, "ZACHA2F_SQ_01_ENERGY_0", "d_zachariel_33", L("Obtain the Guardian Energy"), L("Find and absorb the Guardians' hidden energy to open the secret door."));
+		SetPhase(QuestStatus.Success, "ZACHA2F_SQ_01_ENERGY_0", "d_zachariel_33", L("Obtain the Guardian Energy"), L("Find and absorb the Guardians' hidden energy to open the secret door."));
 
 		AddPrerequisite(new LevelPrerequisite(75));
 
-		AddObjective("absorbEnergy", L("Obtain the Guardian Energy"), new ManualObjective());
+		AddObjective("absorbEnergy", L("Obtain the Guardian Energy"), new VariableCheckObjective(QuestSpots.CountVar("ZACHA2F_SQ_01_ENERGY"), 7, isPermanent: false));
 
 		AddReward(new ItemReward("expCard5", 1));
 	}

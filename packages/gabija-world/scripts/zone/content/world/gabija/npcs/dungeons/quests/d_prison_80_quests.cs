@@ -788,7 +788,7 @@ public class Prison80Mq1Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30163, QuestStatus.Completed));
 
-		AddObjective("killMages", L("Defeat Red Socket Mages near the Hanging Room's Secret Device"), new KillObjective(17, "Socket_mage_red"));
+		AddObjective("killMages", L("Defeat Red Socket Mages near the Hanging Room's Secret Device"), new KillObjective(10, "Socket_mage_red"));
 
 		AddReward(new ItemReward("expCard12", 1));
 		AddReward(new ItemReward("Vis", 7440));

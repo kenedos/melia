@@ -6,6 +6,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Util;
@@ -14,6 +15,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
@@ -39,6 +41,9 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 	private readonly static Position JewelSearchCenter = new Position(2236, 65, -729);
 	private const string RodSearchesVar = "Gabija.Quests.Ftower42Mq01.RodSearches";
 
+	public const string FlameVaporVar = "Gabija.Quests.Ftower42Mq02.Vapor";
+	public const int FlameVaporNeeded = 500;
+	private readonly static ConcurrentDictionary<string, DateTime> VaporUntil = new();
 	private readonly static double[,] FlameVaporSpots =
 	{
 		{ 1931, -1195 }, { 2018, -1558 }, { 1711, -1458 }, { 1733, -1275 },
@@ -136,6 +141,7 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.SetInt(FlameVaporVar, 0);
 					character.Quests.Start(Mq02);
 					await dialog.Msg(L("You should walk around as much as you can. Flame Vapor only appears for a moment."));
 				}
@@ -459,30 +465,50 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 		// Hidden triggers
 		//-------------------------------------------------------------------------
 		// The Flame Vapor that leaks in the Large Reading Room.
+		QuestSpots.Add(new QuestSpotSpec
+		{
+			Prefix = "FTOWER42_MQ_02_C",
+			MonsterId = 20025,
+			Name = L("Flame Vapor"),
+			Map = "d_firetower_42",
+			Points = [(1931, -1195, 90), (2018, -1558, 90), (1711, -1458, 90), (1733, -1275, 90), (1532, -1376, 90), (1224, -1331, 90), (1157, -1482, 90)],
+			IsActive = c => c.Quests.IsActive(Mq02) && !c.Quests.IsCompletable(Mq02),
+			IsAvailable = (c, index) => VaporUntil.TryGetValue(c.ObjectId + "_" + index, out var until) && until > DateTime.Now,
+			TimedLabel = L("Collecting Flame Vapor"),
+			TimedAnim = "MAKING",
+			Seconds = 1.5,
+			RespawnSeconds = 1,
+			OnDone = (character, npc) =>
+			{
+				var charge = Math.Min(FlameVaporNeeded, character.Variables.Temp.GetInt(FlameVaporVar, 0) + Random(20, 41));
+				character.Variables.Temp.SetInt(FlameVaporVar, charge);
+			},
+		}, npc => npc.AddEffect(new AttachEffect("F_smoke130_blue_loop2", 1, EffectLocation.Top)));
+
 		for (var i = 0; i < FlameVaporSpots.GetLength(0); i++)
 		{
-			var uniqueName = "FTOWER42_MQ_02_" + (i + 1);
-			AddQuestTrigger(uniqueName, "d_firetower_42", FlameVaporSpots[i, 0], FlameVaporSpots[i, 1], 60, this.CatchFlameVapor);
+			var index = i;
+			AddQuestTrigger("FTOWER42_MQ_02_" + (i + 1), "d_firetower_42", FlameVaporSpots[i, 0], FlameVaporSpots[i, 1], 100, async args =>
+			{
+				if (args.Initiator is not Character character)
+					return;
+
+				if (!character.Quests.IsActive(Mq02) || character.Quests.IsCompletable(Mq02))
+					return;
+
+				var key = character.ObjectId + "_" + index;
+				var cooldownKey = key + "_cd";
+
+				if (VaporUntil.TryGetValue(cooldownKey, out var readyAt) && readyAt > DateTime.Now)
+					return;
+
+				VaporUntil[key] = DateTime.Now.AddSeconds(20);
+				VaporUntil[cooldownKey] = DateTime.Now.AddSeconds(10);
+				character.LookAround();
+
+				await Task.CompletedTask;
+			});
 		}
-	}
-
-	/// <summary>
-	/// Catches the Flame Vapor that leaks in the Large Reading Room, filling
-	/// the Jewel of Prominence with it.
-	/// </summary>
-	/// <param name="args"></param>
-	private async Task CatchFlameVapor(TriggerActorArgs args)
-	{
-		if (args.Initiator is not Character character)
-			return;
-
-		if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
-		{
-			character.Quests.CompleteObjective(Mq02, "catchFlameVapor");
-			character.ServerMessage(L("Flame Vapor rises out of the floor and the Jewel of Prominence drinks it in."));
-		}
-
-		await Task.CompletedTask;
 	}
 
 	/// <summary>
@@ -626,7 +652,7 @@ public class Ftower42Mq02Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8478, QuestStatus.Completed));
 
-		AddObjective("catchFlameVapor", L("Collect Flame Vapor"), new ManualObjective());
+		AddObjective("catchFlameVapor", L("Collect Flame Vapor"), new VariableCheckObjective(DFiretower42QuestNpcsScript.FlameVaporVar, DFiretower42QuestNpcsScript.FlameVaporNeeded, isPermanent: false));
 
 		AddReward(new ItemReward("expCard7", 1));
 	}

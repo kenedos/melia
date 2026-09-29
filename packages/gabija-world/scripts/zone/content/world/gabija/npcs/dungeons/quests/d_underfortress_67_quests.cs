@@ -32,7 +32,7 @@ public class DUnderfortress67QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq020 = new QuestId(50070);
 	private readonly static QuestId Sq030 = new QuestId(50071);
 
-	private const int MushroomsNeeded = 6;
+	private const int MushroomsNeeded = 5;
 
 	// The Tempas Mushrooms the certification ticket is made from.
 	private readonly static double[,] Mushrooms =
@@ -619,7 +619,7 @@ public class Underfortress67Mq020Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50063, QuestStatus.Completed));
 
-		AddObjective("searchTheDemons", L("Defeat the demons"), new KillObjective(10, "Rambear_brown", "Rambear_bow_brown", "Rambear_mage_brown"));
+		AddObjective("searchTheDemons", L("Defeat the demons"), new KillObjective(6, "Rambear_brown", "Rambear_bow_brown", "Rambear_mage_brown"));
 
 		AddReward(new ItemReward("expCard10", 2));
 	}
@@ -670,7 +670,7 @@ public class Underfortress67Mq040Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(50065, QuestStatus.Completed));
 
 		AddObjective("tellAmanda", L("Tell Amanda about the Old Manager"), new ManualObjective());
-		AddObjective("collectMushrooms", L("Collect Mushrooms"), new CollectItemObjective("UNDER67_MQ4_ITEM01", 6));
+		AddObjective("collectMushrooms", L("Collect Mushrooms"), new CollectItemObjective("UNDER67_MQ4_ITEM01", 5));
 
 		AddReward(new ItemReward("expCard10", 2));
 		AddReward(new TakeItemReward("UNDER67_MQ4_ITEM01"));
@@ -697,7 +697,7 @@ public class Underfortress67Mq050Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50066, QuestStatus.Completed));
 
-		AddObjective("collectCrystals", L("Collect Earth Crystals from the monsters"), new CollectItemObjective("UNDER67_MQ5_ITEM01", 3));
+		AddObjective("collectCrystals", L("Collect Earth Crystals from the monsters"), new CollectItemObjective("UNDER67_MQ5_ITEM01", 10));
 
 		AddPityDrop("UNDER67_MQ5_ITEM01", 0.7f, 3, 1, "dandel_white");
 

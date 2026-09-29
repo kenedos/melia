@@ -520,7 +520,7 @@ public class Act4Mine3EnterQuest : QuestScript
 
 		AddPityDrop("D_Bube_Mane", 1.0f, 0, 1, "bubbe_mage_priest", "GoblinWarrior");
 
-		AddObjective("collectStones", L("Defeat Vubbes and obtain Vubbe Magic Stones"), new CollectItemObjective("D_Bube_Mane", 5));
+		AddObjective("collectStones", L("Defeat Vubbes and obtain Vubbe Magic Stones"), new CollectItemObjective("D_Bube_Mane", 10));
 
 		AddReward(new ItemReward("expCard2", 1));
 		AddReward(new TakeItemReward("D_Bube_Mane"));

@@ -5,13 +5,17 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -34,6 +38,9 @@ public class FGele573QuestNpcsScript : GeneralScript
 	private readonly static QuestId Reveal2 = new QuestId(30031);
 
 	public const string AltarResurrectionsVar = "Gabija.Gele573.Hq02.Resurrections";
+	public const string SeveredSoulVar = "Gabija.Gele573.Mq04.Soul";
+	private const string SeveredSourceVar = "Gabija.Gele573.Mq04.Source";
+	private readonly static Position PumpuraBarrierPosition = new Position(823, 0, 90);
 
 	protected override void Load()
 	{
@@ -431,10 +438,40 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq07) && !character.Quests.IsCompletable(Mq07))
 			{
-				await dialog.Msg(L("I am about to head down this path to the church."));
-				await dialog.Msg(L("Our Paladin friend likes the word 'if' a lot."));
-				await dialog.Msg(L("Keep the Tenet Church in your mind. If the Master falls short, that is where the answer will be."));
-				character.Quests.CompleteObjective(Mq07, "hearAlgis");
+				while (!character.Quests.IsCompletable(Mq07))
+				{
+					var topic = await dialog.Select(L("The moment that the goddess foretold to the first Paladin has finally arrived. Come. Ask me anything."),
+						Option(L("About the Holy Relic"), "relic"),
+						Option(L("About the First Paladin"), "paladin"),
+						Option(L("About the next course of action"), "plan"),
+						Option(L("Quit"), "quit")
+					);
+
+					if (topic == "relic")
+					{
+						await dialog.Msg(L("A long, long time ago, there were nomads who suffered from a cursed plague. The honorable first Paladin removed the curse with a Holy Relic."));
+						await dialog.Msg(L("The Watchers are the descendants of those nomads. However, the Holy Relic was not meant for healing those people."));
+						character.Quests.CompleteObjective(Mq07, "aboutRelic");
+					}
+					else if (topic == "paladin")
+					{
+						await dialog.Msg(L("One day, the goddess requested the first Paladin to safeguard a divine revelation. The cursed nomads appeared just as the paladin mulled on how to keep it secret."));
+						await dialog.Msg(L("They and the first Paladin made three pledges before breaking the curse. To build the Tenet Church together. To conceal the Holy Relic within these grounds and worship its holiness. To gather and fight together when danger comes close to this location."));
+						await dialog.Msg(L("All this, was to protect the revelation hidden in the sanctum of the Tenet Church."));
+						character.Quests.CompleteObjective(Mq07, "aboutPaladin");
+					}
+					else if (topic == "plan")
+					{
+						await dialog.Msg(L("They say the Holy Relic was made to protect the revelations. This is what you need to use to lure in and defeat Gesti."));
+						await dialog.Msg(L("Anything can happen though. If the plan fails, then the final battle will likely happen in the Tenet Church."));
+						character.Quests.CompleteObjective(Mq07, "aboutPlan");
+					}
+					else
+					{
+						break;
+					}
+				}
+
 				return;
 			}
 
@@ -482,29 +519,26 @@ public class FGele573QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("A wager is a wager. The Owl Burial Ground is waiting."));
 		});
 
-		// Barrier Piece at Mazas Rest Place
+		// Barrier Pieces at Mazas Rest Place
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147380, L("Barrier Piece"), "GELE573_MQ_01", "f_gele_57_3", -233, -651, 90, c => c.Quests.IsActive(Mq01) && !c.Quests.IsCompletable(Mq01), async dialog =>
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Barrier Piece"));
-
-			if (character.Quests.IsActive(Mq01) && !character.Quests.IsCompletable(Mq01))
+			Prefix = "GELE573_MQ_01",
+			MonsterId = 147380,
+			Name = L("Barrier Piece"),
+			Map = "f_gele_57_3",
+			Points = [(-568, -915, 90), (-552, -808, 90), (-657, -807, 90), (-689, -650, 90), (-568, -593, 90), (-428, -775, 90), (-414, -923, 90), (-427, -482, 90), (-268, -498, 90), (-233, -651, 90)],
+			IsActive = c => c.Quests.IsActive(Mq01) && !c.Quests.IsCompletable(Mq01),
+			TimedLabel = L("Picking up"),
+			TimedAnim = "SITGROPESET2",
+			Seconds = 2,
+			AggroRadius = 180,
+			IdleMessage = L("Broken pieces of an old barrier lie scattered at Mazas Rest Place."),
+			OnDone = (character, npc) =>
 			{
-				var gathered = await character.TimeActions.StartAsync(L("Gathering the barrier pieces..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
-
-				if (gathered != TimeActionResult.Completed)
-					return;
-
-				character.ServerMessage(L("You gather the shattered pieces of the barrier from the ground."));
+				character.ServerMessage(L("Acquired a piece of the destroyed barrier"));
 				character.Inventory.Add(650704, 1, InventoryAddType.PickUp);
-				character.Quests.CompleteObjective(Mq01, "collectPieces");
-				character.LookAround();
-				return;
-			}
-
-			await dialog.Msg(L("Broken pieces of an old barrier lie scattered at Mazas Rest Place."));
+			},
 		});
 
 		// Tree Guard Post Barrier
@@ -524,28 +558,22 @@ public class FGele573QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("The Tree Guard Post Barrier flickers, not yet fully charged."));
 		});
 
-		// Demon Summoning Circle
+		// Demon Summoning Circles
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147372, L("Demon Summoning Circle"), "GELE573_MQ_03_AI_KILL", "f_gele_57_3", 943, -625, 90, c => c.Quests.IsActive(Mq03) && !c.Quests.IsCompletable(Mq03), async dialog =>
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Demon Summoning Circle"));
-
-			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
-			{
-				var erased = await character.TimeActions.StartAsync(L("Erasing the summoning circle..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
-
-				if (erased != TimeActionResult.Completed)
-					return;
-
-				character.ServerMessage(L("You scuff out the glowing sigils. The circle dies with a hiss."));
-				character.Quests.CompleteObjective(Mq03, "removeCircles");
-				character.LookAround();
-				return;
-			}
-
-			await dialog.Msg(L("A demon summoning circle glows faintly on the ground."));
+			Prefix = "GELE573_MQ_03",
+			MonsterId = 147372,
+			Name = L("Demon Summoning Circle"),
+			Map = "f_gele_57_3",
+			Points = [(630, -660, 90), (736, -760, 90), (877, -665, 90), (1003, -638, 90), (1123, -572, 90), (1165, -476, 90), (1080, -433, 90), (940, -473, 90), (808, -463, 90), (719, -537, 90), (1019, -304, 90), (871, -297, 90), (943, -625, 90)],
+			IsActive = c => c.Quests.IsActive(Mq03) && !c.Quests.IsCompletable(Mq03),
+			TimedLabel = L("Removing"),
+			TimedAnim = "MAKING",
+			Seconds = 2,
+			GuardClassNames = ["zigri_brown", "zigri_brown"],
+			GuardMessage = L("Defeat the monsters protecting the Demon Summoning Circle first!"),
+			OnDone = (character, npc) => character.ServerMessage(L("You've removed the Demon Summoning Circle!")),
 		});
 
 		// Pumpura Hill Barrier
@@ -558,18 +586,53 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				var severed = await character.TimeActions.StartAsync(L("Channelling the barrier..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+				var severed = await character.TimeActions.StartAsync(L("Barrier activating..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(1));
 
 				if (severed != TimeActionResult.Completed)
 					return;
 
-				character.ServerMessage(L("You turn the barrier's holy power on the severed souls. They scatter and fade."));
-				character.Quests.CompleteObjective(Mq04, "severSouls");
+				SeverSouls(character);
 				return;
 			}
 
 			await dialog.Msg(L("The barrier at Pumpura Hill pulses with holy power."));
 		});
+	}
+
+	/// <summary>
+	/// Splits the souls of the demons around the Pumpura Hill barrier into weak copies.
+	/// </summary>
+	private static void SeverSouls(Character character)
+	{
+		var now = GameClock.LocalNow;
+		var demons = character.Map.GetAttackableEnemiesInPosition(character, PumpuraBarrierPosition, 120)
+			.OfType<Mob>()
+			.Where(mob => mob.Race == RaceType.Velnias && !mob.Vars.GetBool(SeveredSoulVar, false) && !(mob.Vars.TryGet<DateTime>(SeveredSourceVar, out var until) && until > now))
+			.ToList();
+
+		if (demons.Count == 0)
+		{
+			character.ServerMessage(L("The barrier's power only works when there are weakened monsters around it."));
+			return;
+		}
+
+		foreach (var demon in demons)
+		{
+			demon.Vars.Set(SeveredSourceVar, now.AddSeconds(20));
+
+			var soul = new Mob(demon.Data.Id, RelationType.Enemy);
+			soul.Position = demon.Position;
+			soul.SpawnPosition = demon.Position;
+			soul.Level = 15;
+			soul.Vars.SetBool(SeveredSoulVar, true);
+			soul.Components.Add(new LifeTimeComponent(soul, TimeSpan.FromSeconds(20)));
+			soul.Components.Add(new MovementComponent(soul));
+			soul.Components.Add(new AiComponent(soul, "TrackWaitMonster"));
+
+			character.Map.AddMonster(soul);
+		}
+
+		character.ServerMessage(L("The demons' souls were separated by divine power. Defeat the separated souls!"));
 	}
 }
 
@@ -592,12 +655,12 @@ public class Gele573Mq01Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "GELE573_ALLEN", "f_gele_57_3", L("Talk to Watcher Allen"), L("Watcher Allen is waiting for someone's help at Nefritas Cliff."));
-		SetPhase(QuestStatus.InProgress, "GELE573_MQ_01", "f_gele_57_3", L("Collect Destroyed Barrier Piece"), L("Collect the pieces of the barrier at Mazas Rest Place."));
+		SetPhase(QuestStatus.InProgress, "GELE573_MQ_01_5", "f_gele_57_3", L("Collect Destroyed Barrier Piece"), L("Collect the pieces of the barrier at Mazas Rest Place."));
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Give the pieces to Follower Kayetonas."));
 
 		AddPrerequisite(new LevelPrerequisite(22));
 
-		AddObjective("collectPieces", L("Collect Destroyed Barrier Piece"), new ManualObjective());
+		AddObjective("collectPieces", L("Collect Destroyed Barrier Piece"), new CollectItemObjective("GELE573_MQ_01_ITEM", 5));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new SelectItemReward("LEG02_160", "LEG02_161", "LEG02_162"));
@@ -647,12 +710,12 @@ public class Gele573Mq03Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "GELE573_KENNETH", "f_gele_57_3", L("Talk to Watcher Kenneth"), L("Watcher Kenneth is waiting for someone's help at Nefritas Cliff."));
-		SetPhase(QuestStatus.InProgress, "GELE573_MQ_03_AI_KILL", "f_gele_57_3", L("Remove the Demon Summoning Circles"), L("Remove the summoning circles at Mairunas Knoll."));
+		SetPhase(QuestStatus.InProgress, "GELE573_MQ_03_12", "f_gele_57_3", L("Remove the Demon Summoning Circles"), L("Remove the summoning circles at Mairunas Knoll."));
 		SetPhase(QuestStatus.Success, "GELE573_KAROLINA", "f_gele_57_3", L("Talk to Follower Kayetonas"), L("Tell Follower Kayetonas there were Demon Summoning Circles."));
 
 		AddPrerequisite(new LevelPrerequisite(22));
 
-		AddObjective("removeCircles", L("Remove the Demon Summoning Circles"), new ManualObjective());
+		AddObjective("removeCircles", L("Remove the Demon Summoning Circles"), new VariableCheckObjective(QuestSpots.CountVar("GELE573_MQ_03"), 7, isPermanent: false));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}
@@ -678,7 +741,7 @@ public class Gele573Mq04Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(22));
 
-		AddObjective("severSouls", L("Defeat severed demons' souls"), new ManualObjective());
+		AddObjective("severSouls", L("Defeat severed demons' souls"), new KillObjective(10, "puragi_green", "banshee", "zigri_brown", "Deadbornscab_mage") { Filter = monster => monster is Mob mob && mob.Vars.GetBool(FGele573QuestNpcsScript.SeveredSoulVar, false) });
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("Drug_SP1_Q", 30));
@@ -760,7 +823,9 @@ public class Gele573Mq07Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(17200, QuestStatus.Completed));
 
-		AddObjective("hearAlgis", L("Listen to Follower Algis' explanations"), new ManualObjective());
+		AddObjective("aboutRelic", L("Ask about the Holy Relic"), new ManualObjective());
+		AddObjective("aboutPaladin", L("Ask about the First Paladin"), new ManualObjective());
+		AddObjective("aboutPlan", L("Ask about the next course of action"), new ManualObjective());
 	}
 }
 

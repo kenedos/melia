@@ -38,6 +38,8 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq02 = new QuestId(60037);
 	private readonly static QuestId Sq03 = new QuestId(60038);
 
+	public const string HauberkCountVar = "Gabija.Vprison513.Mq03.Exposed";
+
 	protected override void Load()
 	{
 		// Kupole Daiva, at the district gate
@@ -146,6 +148,7 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.SetInt(HauberkCountVar, 0);
 					character.Quests.Start(Mq03);
 					character.Inventory.Add(ItemId.VPRISON513_MQ_03_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("With this Night Star Spectral Orb, we can easily find Hauberk."));
@@ -420,7 +423,7 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 		if (character == null || character.ObjectId != finderId || !character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
 			return;
 
-		character.Quests.CompleteObjective(Mq03, "chaseHauberk");
+		character.Variables.Temp.SetInt(HauberkCountVar, character.Variables.Temp.GetInt(HauberkCountVar, 0) + 1);
 		character.ServerMessage(L("Hauberk gave up the body he was wearing and ran as a soul."));
 	}
 }
@@ -507,7 +510,7 @@ public class Vprison513Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60019, QuestStatus.Completed));
 
-		AddObjective("chaseHauberk", L("Pursue Hauberk"), new ManualObjective());
+		AddObjective("chaseHauberk", L("Pursue Hauberk"), new VariableCheckObjective(DVelniasprison513QuestNpcsScript.HauberkCountVar, 6, isPermanent: false));
 
 		AddReward(new ItemReward("expCard9", 2));
 		AddReward(new TakeItemReward("VPRISON513_MQ_03_ITEM"));

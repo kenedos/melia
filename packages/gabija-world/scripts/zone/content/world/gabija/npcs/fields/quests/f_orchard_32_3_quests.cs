@@ -958,7 +958,7 @@ public class FOrchard323Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(80019, QuestStatus.Completed));
 
-		AddObjective("collectFood", L("Take the Stolen Food back from the ferrets"), new CollectItemObjective("ORCHARD_323_MQ_03_ITEM2", 10));
+		AddObjective("collectFood", L("Take the Stolen Food back from the ferrets"), new CollectItemObjective("ORCHARD_323_MQ_03_ITEM2", 8));
 		AddPityDrop("ORCHARD_323_MQ_03_ITEM2", 0.6f, 3, 1, "ferret_patter", "ferret_searcher", "ferret_slinger");
 
 		AddReward(new ItemReward("expCard6", 4));

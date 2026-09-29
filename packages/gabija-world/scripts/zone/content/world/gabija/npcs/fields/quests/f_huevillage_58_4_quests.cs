@@ -426,6 +426,12 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("A demon barrier laid across the Ishpirki Access Road. The air inside it will not settle."));
 		});
 
+		// Stone statues around Saule
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(147388, L("Statue"), "HUEVILLAGE_58_4_MQ01_STONE_STATUE01", "f_huevillage_58_4", 107, -203, 272, c => c.Quests.HasCompleted(new QuestId(18190)) && !c.Quests.Has(new QuestId(18008)));
+		AddConditionalNpc(147387, L("Statue"), "HUEVILLAGE_58_4_MQ01_STONE_STATUE02", "f_huevillage_58_4", -53, -201, 98, c => c.Quests.HasCompleted(new QuestId(18190)) && !c.Quests.Has(new QuestId(18008)));
+		AddConditionalNpc(155052, L("UnvisibleName"), "HUEVILLAGE_58_4_MQ01_VINE01", "f_huevillage_58_4", 28, -188, 148, c => c.Quests.HasCompleted(new QuestId(18190)) && !c.Quests.Has(new QuestId(18008)));
+
 		// Hidden triggers
 		//-------------------------------------------------------------------------
 		// The way into Sirdgela Forest from Gate Route.

@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -34,7 +35,23 @@ public class FGele572QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq09 = new QuestId(17280);
 	private readonly static QuestId Rp1 = new QuestId(60152);
 
-	private readonly static Position CorruptedLand = new Position(514, 418, -136);
+	public const string DollKillVar = "Gabija.Gele572.DollKill";
+	private readonly static ConcurrentDictionary<string, DateTime> RevealedLand = new();
+	private QuestSpotSpec PurifySpots;
+	private QuestSpotSpec CreatePurifySpots() => new QuestSpotSpec
+	{
+		Prefix = "GELE572_MQ_06_ACT",
+		MonsterId = 57271,
+		Name = L("Demon Corrupted Land"),
+		Map = "f_gele_57_2",
+		Points = [(417, 454, 90), (565, 715, 90), (794, 1126, 90), (973, 851, 90), (1221, 1032, 90), (512, 133, 90), (406, -107, 90), (780, -174, 90)],
+		IsActive = c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06),
+		IsAvailable = (c, index) => RevealedLand.TryGetValue(c.ObjectId + "_" + index, out var until) && until > DateTime.Now,
+		TimedLabel = L("Purifying corrupted land"),
+		TimedAnim = "MAKING",
+		Seconds = 2,
+		OnDone = (character, npc) => character.ServerMessage(L("Purified the demon corrupted land!")),
+	};
 
 	protected override void Load()
 	{
@@ -202,6 +219,11 @@ public class FGele572QuestNpcsScript : GeneralScript
 				var told60152 = await character.TimeActions.StartAsync(L("Passing on the information..."), L("Cancel"), "TALK", TimeSpan.FromSeconds(2));
 
 				if (told60152 != TimeActionResult.Completed)
+					return;
+
+				var conveyed = await character.TimeActions.StartAsync(L("Conveying information"), L("Cancel"), "TALK", TimeSpan.FromSeconds(2));
+
+				if (conveyed != TimeActionResult.Completed)
 					return;
 
 				await dialog.CompleteQuest(Rp1);
@@ -397,6 +419,15 @@ public class FGele572QuestNpcsScript : GeneralScript
 		});
 		mushcaria.AddEffect(new PlayAnimationEffect("event_loop"));
 
+		// Corrupted lands the purification doll uncovers
+		//-------------------------------------------------------------------------
+		PurifySpots = CreatePurifySpots();
+		QuestSpots.Add(PurifySpots);
+
+		// Flower beside the shattered totem
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(45315, L("Flower"), "GELE572_MQ_05_001", "f_gele_57_2", 984, -1149, 90, IsTotemShown);
+
 		// Hidden triggers
 		//-------------------------------------------------------------------------
 		// The approach to the Paladin Master.
@@ -472,6 +503,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 
 		character.PlayEffect("F_light018_yellow", 1f);
 		totem.PlayEffect("F_burstup001_dark", 1f);
+		totem.Vars.SetBool(DollKillVar, true);
 		character.ServerMessage(L("The destroyer shaman doll destroyed the Panto Totem!"));
 		totem.Kill(character);
 	}
@@ -487,7 +519,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Summons the purification shaman doll on the demon corrupted land.
+	/// Summons the purification shaman doll, which finds the corrupted land nearby.
 	/// </summary>
 	[ScriptableFunction]
 	public ItemUseResult GELE572_MQ_05_RUNNPC(Character character, Item item, string strArg, float numArg1, float numArg2)
@@ -498,34 +530,39 @@ public class FGele572QuestNpcsScript : GeneralScript
 			return ItemUseResult.OkayNotConsumed;
 		}
 
-		if (character.Position.Get2DDistance(CorruptedLand) > 400)
+		if (QuestSpots.FindNearest(PurifySpots, character, 150) < 0)
 		{
 			character.ServerMessage(L("The shaman doll senses no corruption here. Search Labure Highway."));
 			return ItemUseResult.OkayNotConsumed;
 		}
 
 		if (!character.TimeActions.IsActive)
-			_ = this.SummonDollAsync(character, Mq06, "purifyLand", L("The purification shaman doll found the demon corrupted land and purified it!"));
+			_ = this.RevealCorruptedLandAsync(character);
 
 		return ItemUseResult.OkayNotConsumed;
 	}
 
 	/// <summary>
-	/// Summons a shaman doll over a timed action and completes the objective it was sent for.
+	/// Summons the doll over a timed action and lets it uncover the nearest corrupted land.
 	/// </summary>
-	private async Task SummonDollAsync(Character character, QuestId questId, string objectiveIdent, string message)
+	private async Task RevealCorruptedLandAsync(Character character)
 	{
 		var summoned = await character.TimeActions.StartAsync(L("Summoning the shaman doll"), L("Cancel"), "SCROLL", TimeSpan.FromSeconds(2));
 
 		if (summoned != TimeActionResult.Completed)
 			return;
 
-		if (!character.Quests.IsActive(questId) || character.Quests.IsCompletable(questId))
+		if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
 			return;
 
+		var index = QuestSpots.FindNearest(PurifySpots, character, 150);
+		if (index < 0)
+			return;
+
+		RevealedLand[character.ObjectId + "_" + index] = DateTime.Now.AddSeconds(45);
 		character.PlayEffect("F_light018_yellow", 1f);
-		character.Quests.CompleteObjective(questId, objectiveIdent);
-		character.ServerMessage(message);
+		character.ServerMessage(L("The Shaman Doll of Purification found corrupted land!"));
+		character.LookAround();
 	}
 
 	/// <summary>
@@ -633,7 +670,7 @@ public class Gele572Mq04Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(19));
 
-		AddObjective("destroyTotems", L("Destroy Panto Totems with Shaman Dolls"), new KillObjective(5, "mon_goat_totem"));
+		AddObjective("destroyTotems", L("Destroy Panto Totems with Shaman Dolls"), new KillObjective(5, "mon_goat_totem") { Filter = monster => monster is Mob mob && mob.Vars.GetBool(FGele572QuestNpcsScript.DollKillVar, false) });
 
 		AddReward(new ItemReward("expCard2", 2));
 	}
@@ -727,7 +764,7 @@ public class Gele572Mq06Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(17240, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(19));
 
-		AddObjective("purifyLand", L("Purify the demon corrupted land"), new ManualObjective());
+		AddObjective("purifyLand", L("Purify the demon corrupted land"), new VariableCheckObjective(QuestSpots.CountVar("GELE572_MQ_06_ACT"), 6, isPermanent: false));
 
 		AddReward(new ItemReward("expCard2", 2));
 	}

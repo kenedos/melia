@@ -74,15 +74,15 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 	// The spots the barricades go, and the barricades once they are up.
 	private readonly static double[,] BarricadeSpots =
 	{
-		{ 1383.29, 411.32 }, { 1332.50, 323.54 }, { 1420.12, 342.57 }, { 1420.24, 325.01 },
+		{ 1383.29, 411.32 }, { 1332.50, 323.54 }, { 1420.12, 342.57 }, { 1420.24, 325.01 }, { 1380, 396 }, { 1419, 359 }, { 1380, 381 }, { 1335, 346 }, { 1335, 364 },
 	};
 
 	private readonly static double[,] SetBarricades =
 	{
-		{ 1383.31, 411.55 }, { 1334.28, 323.98 }, { 1421.91, 342.60 }, { 1418.90, 325.23 },
+		{ 1383.31, 411.55 }, { 1334.28, 323.98 }, { 1421.91, 342.60 }, { 1418.90, 325.23 }, { 1380, 396 }, { 1419, 359 }, { 1380, 381 }, { 1335, 346 }, { 1335, 364 },
 	};
 
-	private readonly static double[] SetBarricadeFacings = { 264, 269, 267, 263 };
+	private readonly static double[] SetBarricadeFacings = { 264, 269, 267, 263, 265, 265, 265, 265, 265 };
 
 	protected override void Load()
 	{
@@ -448,6 +448,28 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("A gap in the camp's line that Delus wants closed."));
 			});
 		}
+
+		// Guards of the reclaimed camp
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ04", "d_underfortress_66", 1531, 413, 38, c => !c.Quests.HasCompleted(Mq040));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ04_2", "d_underfortress_66", 1476, 323, 119, c => !c.Quests.HasCompleted(Mq040));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ04_3", "d_underfortress_66", 1501, 403, 28, c => !c.Quests.HasCompleted(Mq040));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ04_4", "d_underfortress_66", 1465, 409, 48, c => !c.Quests.HasCompleted(Mq040));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ04_5", "d_underfortress_66", 1537, 350, 114, c => !c.Quests.HasCompleted(Mq040));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ04_6", "d_underfortress_66", 1511, 334, 176, c => !c.Quests.HasCompleted(Mq040));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ05", "d_underfortress_66", 1911, 438, 90, c => c.Quests.HasCompleted(Mq040) && !c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ05_2", "d_underfortress_66", 1993, 327, 268, c => c.Quests.HasCompleted(Mq040) && !c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ05_3", "d_underfortress_66", 1827, 276, 180, c => c.Quests.HasCompleted(Mq040) && !c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ05_4", "d_underfortress_66", 1871, 478, 206, c => c.Quests.HasCompleted(Mq040) && !c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ05_WARDEN", "d_underfortress_66", 1753, 440, 324, c => c.Quests.HasCompleted(Mq040) && !c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(20019, L("Royal Army Guard"), "UNDER66_MQ05_WARDEN_2", "d_underfortress_66", 1750, 336, 214, c => c.Quests.HasCompleted(Mq040) && !c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(154029, L("Petrified Kingdom Guard"), "FLASH_SOLDIER01", "d_underfortress_66", 1827, 277, 197, c => c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(154029, L("Petrified Kingdom Guard"), "FLASH_SOLDIER01_2", "d_underfortress_66", 1771, 330, 130, c => c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(154029, L("Petrified Kingdom Guard"), "FLASH_SOLDIER01_3", "d_underfortress_66", 1993, 327, 206, c => c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(154029, L("Petrified Kingdom Guard"), "FLASH_SOLDIER01_4", "d_underfortress_66", 1911, 438, 199, c => c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(154027, L("Petrified Kingdom Guard"), "FLASH_SOLDIER02", "d_underfortress_66", 1944, 386, 189, c => c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(154026, L("Petrified Kingdom Guard"), "FLASH_SOLDIER03", "d_underfortress_66", 1769, 424, 134, c => c.Quests.HasCompleted(Mq060));
+		AddConditionalNpc(154028, L("Petrified Kingdom Guard"), "FLASH_SOLDIER04", "d_underfortress_66", 1869, 473, 168, c => c.Quests.HasCompleted(Mq060));
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
@@ -828,6 +850,11 @@ public class Underfortress66Mq050Quest : QuestScript
 		AddObjective("setBarricade2", L("Set the second barricade"), new ManualObjective());
 		AddObjective("setBarricade3", L("Set the third barricade"), new ManualObjective());
 		AddObjective("setBarricade4", L("Set the fourth barricade"), new ManualObjective());
+		AddObjective("setBarricade5", L("Set the fifth barricade"), new ManualObjective());
+		AddObjective("setBarricade6", L("Set the sixth barricade"), new ManualObjective());
+		AddObjective("setBarricade7", L("Set the seventh barricade"), new ManualObjective());
+		AddObjective("setBarricade8", L("Set the eighth barricade"), new ManualObjective());
+		AddObjective("setBarricade9", L("Set the ninth barricade"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard10", 1));
 		AddReward(new ItemReward("UNDER66_MQ6_ITEM01", 1));

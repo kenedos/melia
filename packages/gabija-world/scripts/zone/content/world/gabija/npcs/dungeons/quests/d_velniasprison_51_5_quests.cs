@@ -33,6 +33,8 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq05 = new QuestId(60027);
 
 	private const string RuneMarkVar = "Gabija.Quests.Vprison515.RuneMark";
+	public const string LankineCountVar = "Gabija.Vprison515.Mq03.Bound";
+	public const string IshisulaCountVar = "Gabija.Vprison515.Mq04.Bound";
 	private readonly static Position LankineDistrict = new Position(-776, 67, 634);
 	private readonly static Position IshisulaDistrict = new Position(724, -66, 609);
 	private readonly static Position HehmastarDistrict = new Position(326, -65, -707);
@@ -42,8 +44,6 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq01 = new QuestId(60039);
 	private readonly static QuestId Sq02 = new QuestId(60040);
 	private readonly static QuestId Sq03 = new QuestId(60041);
-
-	private const int CracksToClose = 3;
 
 	// The small dimensional cracks of the Gavara Isolation District.
 	private readonly static double[,] CrackSpots =
@@ -85,6 +85,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The Kupoles have taken the demons you suppressed at Lankine."));
 				await dialog.Msg(L("It is not enough yet. Go on to the Ishisula Broken District."));
 				await dialog.CompleteQuest(Mq03);
+				character.Variables.Temp.SetInt(IshisulaCountVar, 0);
 				character.Quests.Start(Mq04);
 				return;
 			}
@@ -172,6 +173,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.SetInt(LankineCountVar, 0);
 					character.Quests.Start(Mq03);
 					await dialog.Msg(L("I also want you to collect the demons' Sealing Tokens at the Hehmastar Isolation District."));
 					await dialog.Msg(L("Those wield a large amount of power as well."));
@@ -358,11 +360,20 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 
 		// Small Dimensional Cracks of the Gavara Isolation District
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < CrackSpots.GetLength(0); ++i)
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			AddConditionalNpc(147372, L("Small Dimensional Crack"), i == 0 ? "VPRISON515_SQ_03_NPC" : "VPRISON515_SQ_03_NPC_" + (i + 1), "d_velniasprison_51_5",
-				CrackSpots[i, 0], CrackSpots[i, 1], 90, this.AreGavaraCracksOpen, this.CloseGavaraCrack);
-		}
+			Prefix = "VPRISON515_SQ_03_NPC",
+			MonsterId = 147372,
+			Name = L("Small Dimensional Crack"),
+			Map = "d_velniasprison_51_5",
+			Points = [(1362, -25, 90), (1290, -315, 90), (1284, -139, 90), (1223, 97, 90), (1325, 212, 90), (1566, 206, 90), (1621, 17, 90), (1516, -59, 90), (1463, 85, 90), (1334, 381, 90)],
+			IsActive = c => c.Quests.IsActive(Sq03) && !c.Quests.IsCompletable(Sq03),
+			TimedLabel = L("Removing"),
+			TimedAnim = "MAKING",
+			Seconds = 3,
+			IdleMessage = L("A crack the width of a finger, and it was not there yesterday."),
+			OnDone = (character, npc) => character.ServerMessage(L("You have removed the small dimensional crack")),
+		});
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
@@ -405,46 +416,6 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 	private bool IsCrackOpen(Character character)
 		=> !character.Quests.Has(Mq06);
 
-	/// <summary>
-	/// Returns whether the Gavara Isolation District still has cracks in it.
-	/// </summary>
-	/// <param name="character"></param>
-	private bool AreGavaraCracksOpen(Character character)
-		=> character.Quests.IsActive(Sq03);
-
-	/// <summary>
-	/// Closes one of the Gavara Isolation District's small cracks.
-	/// </summary>
-	/// <param name="dialog"></param>
-	private async Task CloseGavaraCrack(Dialog dialog)
-	{
-		var character = dialog.Player;
-
-		dialog.SetTitle(L("Small Dimensional Crack"));
-
-		if (!character.Quests.IsActive(Sq03))
-		{
-			await dialog.Msg(L("A crack the width of a finger, and it was not there yesterday."));
-			return;
-		}
-
-		var closed = await character.TimeActions.StartAsync(L("Closing the dimensional crack..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
-
-		if (closed != TimeActionResult.Completed)
-			return;
-
-		for (var i = 1; i <= CracksToClose; ++i)
-		{
-			if (character.Quests.IsActive(Sq03, "closeGavara" + i))
-			{
-				character.Quests.CompleteObjective(Sq03, "closeGavara" + i);
-				character.ServerMessage(L("The crack closes on itself."));
-				return;
-			}
-		}
-
-		await dialog.Msg(L("The cracks Sigita named are shut. Go back and tell her."));
-	}
 
 	/// <summary>
 	/// Suppresses a nearby demon with the power of the Evening Star Rune.
@@ -486,13 +457,15 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 
 		if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
 		{
-			character.Quests.CompleteObjective(Mq03, "suppressLankine");
-			character.ServerMessage(L("The rune takes the demons of Lankine. Report it to Vakarine."));
+			demon.Vars.SetLong(RuneMarkVar, character.ObjectId);
+			character.Variables.Temp.SetInt(LankineCountVar, character.Variables.Temp.GetInt(LankineCountVar, 0) + 1);
+			character.ServerMessage(L("The rune takes a demon of Lankine."));
 		}
 		else if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 		{
-			character.Quests.CompleteObjective(Mq04, "suppressIshisula");
-			character.ServerMessage(L("The rune takes the demons of Ishisula. Report it to Vakarine."));
+			demon.Vars.SetLong(RuneMarkVar, character.ObjectId);
+			character.Variables.Temp.SetInt(IshisulaCountVar, character.Variables.Temp.GetInt(IshisulaCountVar, 0) + 1);
+			character.ServerMessage(L("The rune takes a demon of Ishisula."));
 		}
 		else
 		{
@@ -571,7 +544,7 @@ public class Vprison515Mq02Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60023, QuestStatus.Completed));
 
-		AddObjective("collectTraces", L("Collect the traces of the metastasis"), new CollectItemObjective("VPRISON515_MQ_RUNE_EMPTY_ITEM", 4));
+		AddObjective("collectTraces", L("Collect the traces of the metastasis"), new CollectItemObjective("VPRISON515_MQ_RUNE_EMPTY_ITEM", 8));
 
 		AddPityDrop("VPRISON515_MQ_RUNE_EMPTY_ITEM", 0.75f, 3, 1, "Hohen_gulak", "Mushroom_boy_green", "Hohen_mage");
 
@@ -601,7 +574,7 @@ public class Vprison515Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60024, QuestStatus.Completed));
 
-		AddObjective("suppressLankine", L("Use Evening Star Rune on the demons."), new ManualObjective());
+		AddObjective("suppressLankine", L("Use Evening Star Rune on the demons."), new VariableCheckObjective(DVelniasprison515QuestNpcsScript.LankineCountVar, 7, isPermanent: false));
 
 		AddReward(new ItemReward("expCard9", 2));
 	}
@@ -627,7 +600,7 @@ public class Vprison515Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60025, QuestStatus.Completed));
 
-		AddObjective("suppressIshisula", L("Suppress demons using the Evening Star Rune"), new ManualObjective());
+		AddObjective("suppressIshisula", L("Suppress demons using the Evening Star Rune"), new VariableCheckObjective(DVelniasprison515QuestNpcsScript.IshisulaCountVar, 10, isPermanent: false));
 
 		AddReward(new ItemReward("expCard9", 2));
 	}
@@ -653,7 +626,7 @@ public class Vprison515Mq05Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60026, QuestStatus.Completed));
 
-		AddObjective("collectTokens", L("Collect the symbols of the condemned criminal"), new CollectItemObjective("VPRISON515_MQ_05_ITEM", 5));
+		AddObjective("collectTokens", L("Collect the symbols of the condemned criminal"), new CollectItemObjective("VPRISON515_MQ_05_ITEM", 10));
 
 
 		AddReward(new ItemReward("expCard9", 2));
@@ -790,15 +763,13 @@ public class Vprison515Sq03Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "VPRISON515_MQ_SIGITA", "d_velniasprison_51_5", L("Talk to Kupole Sigita"), L("It seems that small dimensional cracks keep expanding from various places. Talk to Kupole Sigita again."));
-		SetPhase(QuestStatus.InProgress, "VPRISON515_SQ_03_NPC", "d_velniasprison_51_5", L("Remove the Small Dimensional Crack"), L("Kupole Sigita said to remove the small dimensional crack of Gavara Isolation District to stop the disaster."));
+		SetPhase(QuestStatus.InProgress, "VPRISON515_SQ_03_NPC_0", "d_velniasprison_51_5", L("Remove the Small Dimensional Crack"), L("Kupole Sigita said to remove the small dimensional crack of Gavara Isolation District to stop the disaster."));
 		SetPhase(QuestStatus.Success, "VPRISON515_MQ_SIGITA", "d_velniasprison_51_5", L("Talk to Kupole Sigita"), L("You've eliminated all the dimensional cracks. Return to Kupole Sigita."));
 
 		AddPrerequisite(new LevelPrerequisite(153));
 		AddPrerequisite(new QuestStatusPrerequisite(60028, QuestStatus.Completed));
 
-		AddObjective("closeGavara1", L("Remove the first Small Dimensional Crack"), new ManualObjective());
-		AddObjective("closeGavara2", L("Remove the second Small Dimensional Crack"), new ManualObjective());
-		AddObjective("closeGavara3", L("Remove the third Small Dimensional Crack"), new ManualObjective());
+		AddObjective("closeGavara", L("Remove the Small Dimensional Cracks"), new VariableCheckObjective(QuestSpots.CountVar("VPRISON515_SQ_03_NPC"), 7, isPermanent: false));
 
 		AddReward(new ItemReward("expCard9", 1));
 	}

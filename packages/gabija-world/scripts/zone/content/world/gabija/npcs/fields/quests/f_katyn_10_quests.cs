@@ -1007,7 +1007,7 @@ public class Katyn10Mq05Quest : QuestScript
 
 		AddPityDrop("KATYN_10_MQ_05_ITEM", 0.25f, 8, 1, "digo", "VelStool", "kodomor_purple", "eldigo", "beeteros_blue", "Spector_gh_red", "truffle_blue");
 
-		AddObjective("collectFragments", L("Retrieve Karolis Altar Fragment from the monsters by using the Guide Owl's Will"), new CollectItemObjective("KATYN_10_MQ_05_ITEM", 5));
+		AddObjective("collectFragments", L("Retrieve Karolis Altar Fragment from the monsters by using the Guide Owl's Will"), new CollectItemObjective("KATYN_10_MQ_05_ITEM", 10));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("Vis", 300));
@@ -1227,7 +1227,7 @@ public class Katyn10Sq01Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(47));
 
-		AddObjective("killMonsters", L("Defeat monsters to supply magic to the Locked Chest"), new KillObjective(10, "digo", "VelStool", "kodomor_purple", "eldigo", "beeteros_blue", "Spector_gh_red", "truffle_blue"));
+		AddObjective("killMonsters", L("Defeat monsters to supply magic to the Locked Chest"), new ScoreKillObjective(5, (mob, character) => mob.Faction == FactionType.Monster && mob.Position.InRange2D(new Position(2540, 0, 736), 350) ? 1 : 0));
 
 		AddReward(new ItemReward("expCard3", 1));
 		AddReward(new ItemReward("Vis", 150));

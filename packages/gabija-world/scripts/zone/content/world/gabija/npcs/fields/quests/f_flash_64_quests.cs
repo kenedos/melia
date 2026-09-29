@@ -6,6 +6,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -62,8 +63,8 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	private readonly static QuestId Musketeer8 = new QuestId(90162);
 
 	private const int WillsNeeded = 5;
-	private const int RecordsNeeded = 5;
-	private const int BonfiresToLight = 3;
+	private const int RecordsNeeded = 4;
+	private const int BonfiresToLight = 4;
 
 	// The Royal Army guards dying at the Stone Icicle Square.
 	private readonly static int[] VictimModels = { 154023, 154023, 154023, 154023, 154026, 154026, 154026, 154029, 154029, 154029 };
@@ -134,6 +135,11 @@ public class FFlash64QuestNpcsScript : GeneralScript
 	{
 		{ -450.79, -1710.91 }, { -491.80, -1635.80 }, { -442.97, -1575.67 },
 	};
+
+	public const string FreedCountVar = "Gabija.Flash64.Sq06.Freed";
+	private const string FreedVictimsVar = "Gabija.Flash64.Sq06.FreedNames";
+
+	public const string CountTryTheSolution = "Gabija.Count.tryTheSolution";
 
 	protected override void Load()
 	{
@@ -409,6 +415,8 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.Set(FreedVictimsVar, new HashSet<string>());
+					character.Variables.Temp.SetInt(FreedCountVar, 0);
 					character.Quests.Start(Sq06);
 					character.Inventory.Add(ItemId.FLASH64_SQ_06_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("The angry souls might attack you."));
@@ -504,6 +512,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.SetInt(CountTryTheSolution, 0);
 					character.Quests.Start(Sq08);
 					character.Inventory.Add(ItemId.FLASH64_SQ_08_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("Thanks. First, would you use this melting solution on the monsters that are struggling due to the Petrifying Frost?"));
@@ -959,8 +968,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		for (var i = 0; i < PetrifiedSpots.GetLength(0); ++i)
 		{
-			AddConditionalNpc(PetrifiedModels[i], L("Petrified Victim"), i == 0 ? "FLASH64_SQ_06_NPC" : "FLASH64_SQ_06_NPC_" + (i + 1), "f_flash_64",
-				PetrifiedSpots[i, 0], PetrifiedSpots[i, 1], 90, c => !c.Quests.HasCompleted(Sq06), this.UseLiberationElixir);
+			var victimName = i == 0 ? "FLASH64_SQ_06_NPC" : "FLASH64_SQ_06_NPC_" + (i + 1);
+			AddConditionalNpc(PetrifiedModels[i], L("Petrified Victim"), victimName, "f_flash_64",
+				PetrifiedSpots[i, 0], PetrifiedSpots[i, 1], 90, c => !c.Quests.HasCompleted(Sq06) && !HasFreedVictim(c, victimName), this.UseLiberationElixir);
 		}
 
 		// Bonfires
@@ -1090,7 +1100,7 @@ public class FFlash64QuestNpcsScript : GeneralScript
 		}
 
 		monster.PlayEffect("F_smoke017_red", 1f);
-		character.Quests.CompleteObjective(Sq08, "tryTheSolution");
+		character.Variables.Temp.SetInt(CountTryTheSolution, character.Variables.Temp.GetInt(CountTryTheSolution, 0) + 1);
 		character.ServerMessage(L("You used the Petrification Thawing Liquid, but the petrified part remains unchanged. Report it to Saliamonas."));
 
 		return ItemUseResult.OkayNotConsumed;
@@ -1192,6 +1202,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 		await dialog.Msg(L("He gives you what he was carrying and a message for somebody in Kaliss."));
 	}
 
+	private static bool HasFreedVictim(Character character, string name)
+		=> character.Variables.Temp.Get<HashSet<string>>(FreedVictimsVar)?.Contains(name) ?? false;
+
 	/// <summary>
 	/// Uses Edita's Liberation Elixir on one of the petrified victims.
 	/// </summary>
@@ -1219,8 +1232,12 @@ public class FFlash64QuestNpcsScript : GeneralScript
 		if (used != TimeActionResult.Completed)
 			return;
 
-		character.Quests.CompleteObjective(Sq06, "freeTheSoul");
-		character.ServerMessage(L("The soul comes loose, says nothing of any use, and goes. Report it to Edita."));
+		var freed = character.Variables.Temp.Get<HashSet<string>>(FreedVictimsVar) ?? new HashSet<string>();
+		freed.Add(dialog.Npc.UniqueName);
+		character.Variables.Temp.Set(FreedVictimsVar, freed);
+		character.Variables.Temp.SetInt(FreedCountVar, freed.Count);
+		character.ServerMessage(L("The soul comes loose, says nothing of any use, and goes."));
+		character.LookAround();
 	}
 
 	/// <summary>
@@ -1435,7 +1452,7 @@ public class Flash64Sq06Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(186));
 		AddPrerequisite(new QuestStatusPrerequisite(8849, QuestStatus.Completed));
 
-		AddObjective("freeTheSoul", L("Release the petrified soldier"), new ManualObjective());
+		AddObjective("freeTheSoul", L("Release the petrified soldier"), new VariableCheckObjective(FFlash64QuestNpcsScript.FreedCountVar, 9, isPermanent: false));
 
 		AddReward(new ItemReward("expCard10", 2));
 		AddReward(new TakeItemReward("FLASH64_SQ_06_ITEM"));
@@ -1465,6 +1482,7 @@ public class Flash64Sq07Quest : QuestScript
 		AddObjective("lightBonfire1", L("Light the first bonfire in Vienti Fortress"), new ManualObjective());
 		AddObjective("lightBonfire2", L("Light the second bonfire in Vienti Fortress"), new ManualObjective());
 		AddObjective("lightBonfire3", L("Light the third bonfire in Vienti Fortress"), new ManualObjective());
+		AddObjective("lightBonfire4", L("Light the fourth bonfire in Vienti Fortress"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard10", 1));
 	}
@@ -1490,7 +1508,7 @@ public class Flash64Sq08Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(186));
 
-		AddObjective("tryTheSolution", L("Use the melting solution on the monsters at Neiveikiama Castle"), new ManualObjective());
+		AddObjective("tryTheSolution", L("Use the melting solution on the monsters at Neiveikiama Castle"), new VariableCheckObjective(FFlash64QuestNpcsScript.CountTryTheSolution, 7, isPermanent: false));
 
 		AddReward(new ItemReward("expCard10", 2));
 		AddReward(new TakeItemReward("FLASH64_SQ_08_ITEM"));
@@ -1573,7 +1591,7 @@ public class Flash64Mq01Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(190));
 
-		AddObjective("collectRecords", L("Collect the Record from the Ruklys Era"), new CollectItemObjective("FLASH64_MQ_01_ITEM", 5));
+		AddObjective("collectRecords", L("Collect the Record from the Ruklys Era"), new CollectItemObjective("FLASH64_MQ_01_ITEM", 4));
 
 		AddReward(new ItemReward("expCard10", 1));
 	}
@@ -1657,8 +1675,8 @@ public class JobCannoneer71Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(235));
 
-		AddObjective("studyFlying", L("Defeat a Flying-type monster"), new KillObjective(1, "Lemuria"));
-		AddObjective("studyWalking", L("Defeat a Walking-type monster"), new KillObjective(1, "Repusbunny", "Rubabos"));
+		AddObjective("studyFlying", L("Defeat a Flying-type monster"), new ScoreKillObjective(50, (mob, character) => character.Layer == 0 && mob.Faction == FactionType.Monster && (mob.MoveType == MoveType.Flying || mob.MoveType == MoveType.Fly) ? 1 : 0));
+		AddObjective("studyWalking", L("Defeat a Walking-type monster"), new ScoreKillObjective(50, (mob, character) => character.Layer == 0 && mob.Faction == FactionType.Monster && mob.MoveType == MoveType.Normal ? 1 : 0));
 
 		AddReward(new ItemReward("CAN01_103", 1));
 	}
@@ -1713,8 +1731,8 @@ public class Underfortress66Sq010Quest : QuestScript
 		AddPrerequisite(new ItemPrerequisite("UNDERFORTRESS66_SQ_ITEM01"));
 		AddPrerequisite(new ItemPrerequisite("UNDERFORTRESS66_SQ_ITEM02"));
 
-		AddObjective("collectSeals", L("Get Ruklys' Army Seals"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM01", 12));
-		AddObjective("collectParchments", L("Get Ruklys' Army Parchments"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM02", 12));
+		AddObjective("collectSeals", L("Get Ruklys' Army Seals"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM01", 6));
+		AddObjective("collectParchments", L("Get Ruklys' Army Parchments"), new CollectItemObjective("UNDERFORTRESS66_SQ_ITEM02", 6));
 
 		AddPityDrop("UNDERFORTRESS66_SQ_ITEM01", 0.8f, 3, 1, "Chafperor_mage_purple");
 		AddPityDrop("UNDERFORTRESS66_SQ_ITEM02", 0.8f, 3, 1, "ticen_mage_blue");

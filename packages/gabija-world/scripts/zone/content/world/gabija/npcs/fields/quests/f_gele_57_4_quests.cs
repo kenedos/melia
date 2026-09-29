@@ -29,6 +29,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq02 = new QuestId(8602);
 	private readonly static QuestId Mq03 = new QuestId(8603);
 	private readonly static QuestId Mq04 = new QuestId(8604);
+	public const string CharmedKillsVar = "Gabija.Gele574.Mq05.Charmed";
 	private readonly static QuestId Mq05 = new QuestId(8605);
 	private readonly static QuestId Mq06 = new QuestId(8606);
 	private readonly static QuestId Mq07 = new QuestId(8607);
@@ -100,6 +101,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("After using the charm on the Pantos, hit them several times."));
 					await dialog.Msg(L("Try that on the Pantos in Levanda Habitat."));
+					character.Variables.Temp.SetInt(CharmedKillsVar, 0);
 					character.Quests.Start(Mq05);
 					character.Inventory.Add(650613, 1, InventoryAddType.PickUp);
 				}
@@ -440,27 +442,30 @@ public class FGele574QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("A Panto totem, thick with old bindings."));
 		});
 
-		// Demon Summoning Circle
+		// Demon Summoning Circles
 		//-------------------------------------------------------------------------
-		AddNpc(147380, L("Demon Summoning Circle"), "GELE574_MQ_08", "f_gele_57_4", 81, 674, 90, async dialog =>
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Demon Summoning Circle"));
-
-			if (character.Quests.IsActive(Mq08) && !character.Quests.IsCompletable(Mq08))
+			Prefix = "GELE574_MQ_08",
+			MonsterId = 147380,
+			Name = L("Demon Summoning Circle"),
+			Map = "f_gele_57_4",
+			Points = [(159, 796, 90), (302, 828, 90), (786, 1073, 90), (751, 930, 90), (596, 949, 90), (603, 1084, 90), (394, 626, 90), (204, 575, 90), (81, 674, 90)],
+			IsActive = c => c.Quests.IsActive(Mq08) && !c.Quests.IsCompletable(Mq08),
+			TimedLabel = L("Scribbling"),
+			TimedAnim = "MAKING",
+			Seconds = 1,
+			IdleMessage = L("A demon summoning circle, its sigils still whole."),
+			OnDone = (character, npc) =>
 			{
-				var scrawled = await character.TimeActions.StartAsync(L("Scribbling over the circle..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+				character.ServerMessage(L("You scribbled on the Summoning Magic Circle"));
 
-				if (scrawled != TimeActionResult.Completed)
+				if (npc == null)
 					return;
 
-				character.ServerMessage(L("You scrawl over the summoning circle. The formulas tangle, and the summoned demons are swallowed back in."));
-				character.Quests.CompleteObjective(Mq08, "scribbleCircle");
-				return;
-			}
-
-			await dialog.Msg(L("A demon summoning circle, its sigils still whole."));
+				foreach (var demon in character.Map.GetAttackableEnemiesInPosition(character, npc.Position, 100).OfType<Mob>().Where(m => m.Data.ClassName == "zombiegirl2_brown" || m.Data.ClassName == "zigri_yellow").Take(3))
+					character.Map.RemoveMonster(demon);
+			},
 		});
 
 	}
@@ -504,7 +509,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 		if (character == null || !character.Quests.IsActive(Mq05) || character.Quests.IsCompletable(Mq05))
 			return;
 
-		character.Quests.CompleteObjective(Mq05, "charmPantos");
+		character.Variables.Temp.SetInt(CharmedKillsVar, character.Variables.Temp.GetInt(CharmedKillsVar, 0) + 1);
 	}
 
 	/// <summary>
@@ -695,7 +700,7 @@ public class Gele574Mq05Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(25));
 
-		AddObjective("charmPantos", L("Brainwash the Pantos"), new ManualObjective());
+		AddObjective("charmPantos", L("Brainwash the Pantos"), new VariableCheckObjective(FGele574QuestNpcsScript.CharmedKillsVar, 8, isPermanent: false));
 
 		AddReward(new ItemReward("expCard3", 1));
 		AddReward(new TakeItemReward("GELE574_MQ_05_ITEM"));
@@ -773,12 +778,12 @@ public class Gele574Mq08Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "GELE574_ADRIJA", "f_gele_57_4", L("Talk to Follower Alfonsas"), L("Follower Alfonsas of Tenet Garden is waiting for someone's help."));
-		SetPhase(QuestStatus.InProgress, "GELE574_MQ_08", "f_gele_57_4", L("Write over the Demon Summoning Circles"), L("Scribble over the demon summoning circles."));
+		SetPhase(QuestStatus.InProgress, "GELE574_MQ_08_8", "f_gele_57_4", L("Write over the Demon Summoning Circles"), L("Scribble over the demon summoning circles."));
 		SetPhase(QuestStatus.Success, "GELE574_ADRIJA", "f_gele_57_4", L("Talk to Follower Alfonsas"), L("Tell Follower Alfonsas the summoned demons were absorbed back."));
 
 		AddPrerequisite(new LevelPrerequisite(25));
 
-		AddObjective("scribbleCircle", L("Write over the Demon Summoning Circles"), new ManualObjective());
+		AddObjective("scribbleCircle", L("Write over the Demon Summoning Circles"), new VariableCheckObjective(QuestSpots.CountVar("GELE574_MQ_08"), 7, isPermanent: false));
 
 		AddReward(new ItemReward("expCard3", 1));
 	}

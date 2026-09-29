@@ -13,6 +13,7 @@ using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.Scripting.Hooking;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -678,6 +679,39 @@ public class OrshaFlowerBranchPrerequisite : QuestPrerequisite
 		}
 
 		return false;
+	}
+
+	/// <summary>
+	/// Crafts the Protection Barrier Crystal out of the Demon Essences.
+	/// </summary>
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_ABBAY643_SQ3_ITEM2(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		// TODO: Fix this
+		//if (character.Map.ClassName != "d_abbey_64_3" || !character.Quests.IsActive(Abbay643Sq030) || character.Quests.IsCompletable(Abbay643Sq030))
+		//	return ItemUseResult.OkayNotConsumed;
+
+		if (character.Inventory.CountItem(ItemId.ABBAY643_SQ3_ITEM01) < 8)
+		{
+			character.ServerMessage(L("You need 8 Demon Essences to craft the crystal."));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
+		if (!character.TimeActions.IsActive)
+			_ = this.CraftBarrierCrystalAsync(character);
+
+		return ItemUseResult.OkayNotConsumed;
+	}
+
+	private async Task CraftBarrierCrystalAsync(Character character)
+	{
+		var crafted = await character.TimeActions.StartAsync(L("Crafting Protective Barrier Crystal"), L("Cancel"), "CRAFT", TimeSpan.FromSeconds(1));
+
+		if (crafted != TimeActionResult.Completed || character.Inventory.CountItem(ItemId.ABBAY643_SQ3_ITEM01) < 8)
+			return;
+
+		character.Inventory.RemoveItem(ItemId.ABBAY643_SQ3_ITEM01, 8);
+		character.Inventory.Add(ItemId.ABBAY643_SQ4_ITEM1, 1, InventoryAddType.PickUp);
 	}
 }
 

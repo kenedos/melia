@@ -50,6 +50,8 @@ public class FSiauliai463QuestNpcsScript : GeneralScript
 		{ 1502.15, 1573.56 }, { 1520.34, 1502.06 }, { 1691.75, 1474.50 }, { 1686.26, 1547.95 },
 	};
 
+	public const string CountTestTheScent = "Gabija.Count.testTheScent";
+
 	protected override void Load()
 	{
 		// Maras
@@ -65,7 +67,8 @@ public class FSiauliai463QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Oh, this one is quite big."));
 				await dialog.Msg(L("Good job."));
 				await dialog.CompleteQuest(Mq01);
-				character.Quests.Start(Mq02);
+				character.Variables.Temp.SetInt(CountTestTheScent, 0);
+					character.Quests.Start(Mq02);
 				return;
 			}
 
@@ -535,7 +538,7 @@ public class FSiauliai463QuestNpcsScript : GeneralScript
 		}
 
 		character.ServerMessage(L("The monster shows no particular reaction."));
-		character.Quests.CompleteObjective(Mq02, "testTheScent");
+		character.Variables.Temp.SetInt(CountTestTheScent, character.Variables.Temp.GetInt(CountTestTheScent, 0) + 1);
 		character.ServerMessage(L("The monsters are not after the honey. Tell Maras."));
 
 		return ItemUseResult.OkayNotConsumed;
@@ -684,7 +687,7 @@ public class Siauliai463Mq02Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(16200, QuestStatus.Completed));
 
-		AddObjective("testTheScent", L("Spread the fragrance of honey to the monsters"), new ManualObjective());
+		AddObjective("testTheScent", L("Spread the fragrance of honey to the monsters"), new VariableCheckObjective(FSiauliai463QuestNpcsScript.CountTestTheScent, 3, isPermanent: false));
 
 		AddReward(new ItemReward("expCard9", 2));
 		AddReward(new TakeItemReward("SIAULIAI_46_3_MQ_01_ITEM"));

@@ -34,7 +34,7 @@ public class DUnderfortress68QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq070 = new QuestId(50089);
 
 	private const int EggsNeeded = 5;
-	private const int SpiritsToBring = 3;
+	private const int SpiritsToBring = 4;
 
 	// The Green Infroholder Eggs of the quarter's lower halls.
 	private readonly static double[,] Eggs =
@@ -614,7 +614,7 @@ public class Underfortress68Mq020Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50072, QuestStatus.Completed));
 
-		AddObjective("collectBones", L("Collect Demon Bones"), new CollectItemObjective("UNDER68_MQ2_ITEM01", 7));
+		AddObjective("collectBones", L("Collect Demon Bones"), new CollectItemObjective("UNDER68_MQ2_ITEM01", 10));
 
 		AddPityDrop("UNDER68_MQ2_ITEM01", 0.8f, 3, 1, "Deadbornscab_red");
 
@@ -673,6 +673,7 @@ public class Underfortress68Mq040Quest : QuestScript
 		AddObjective("bindSpirit1", L("Bring the first restrained spirit"), new ManualObjective());
 		AddObjective("bindSpirit2", L("Bring the second restrained spirit"), new ManualObjective());
 		AddObjective("bindSpirit3", L("Bring the third restrained spirit"), new ManualObjective());
+		AddObjective("bindSpirit4", L("Bring the fourth restrained spirit"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard11", 3));
 	}

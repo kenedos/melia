@@ -936,7 +936,7 @@ public class FOrchard342Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(80030, QuestStatus.Completed));
 
-		AddObjective("killFerrets", L("Defeat the ferrets"), new KillObjective(10, "ferret_folk", "ferret_loader") { LayerOnly = true });
+		AddObjective("killFerrets", L("Defeat the ferrets"), new KillObjective(20, "ferret_folk", "ferret_loader") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard6", 3));
 		AddReward(new ItemReward("Vis", 1710));
@@ -963,7 +963,7 @@ public class FOrchard342Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(80031, QuestStatus.Completed));
 
-		AddObjective("collectHerbs", L("Gather Drowsy Herbs"), new CollectItemObjective("ORCHARD_342_MQ_04_ITEM", 5));
+		AddObjective("collectHerbs", L("Gather Drowsy Herbs"), new CollectItemObjective("ORCHARD_342_MQ_04_ITEM", 6));
 
 		AddReward(new ItemReward("expCard6", 2));
 		AddReward(new ItemReward("Vis", 1140));

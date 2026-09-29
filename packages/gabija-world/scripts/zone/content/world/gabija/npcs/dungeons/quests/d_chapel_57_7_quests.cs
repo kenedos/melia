@@ -11,6 +11,7 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Items;
@@ -37,6 +38,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	private const int PillarCount = 8;
 	private readonly static QuestId Mq10 = new QuestId(8537);
 
+	public const string AukaChargeVar = "Gabija.Chaple577.Mq06.Charge";
 	private readonly static Position AukaAltar = new Position(-942, 0, -106);
 	private readonly static Position SanctuaryMural = new Position(801, 0, -1250);
 
@@ -246,6 +248,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.SetInt(AukaChargeVar, 0);
 					character.Quests.Start(Mq06);
 					character.Inventory.Add(ItemId.CHAPLE577_MQ_06_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("Take this potion to the Auka Altar and use it there."));
@@ -369,6 +372,27 @@ public class DChapel577QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddNpc(147357, L("Auka Altar"), "CHAPLE577_HOLY_3", "d_chapel_57_7", -942, -106, 45, async dialog =>
 		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Auka Altar"));
+
+			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
+			{
+				var operated = await character.TimeActions.StartAsync(L("Operating"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+
+				if (operated != TimeActionResult.Completed)
+					return;
+
+				_ = QuestSpots.RunChargePad(character, new Position(AukaAltar.X + 100, AukaAltar.Y, AukaAltar.Z), 30, 10000, 200, 50,
+					() => character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06),
+					enemy =>
+					{
+						character.Variables.Temp.SetInt(AukaChargeVar, Math.Min(100, character.Variables.Temp.GetInt(AukaChargeVar, 0) + 1));
+						enemy.TakeSimpleHit(20, character);
+					});
+				return;
+			}
+
 			await dialog.Msg(L("The Auka Altar has lost its old power."));
 		});
 
@@ -427,7 +451,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Pours the Lesser Potion of Light into the Auka Altar, charging it.
+	/// Drinks the Small Potion of Light, which keeps the demons from attacking for a while.
 	/// </summary>
 	[ScriptableFunction]
 	public ItemUseResult SCR_USE_CHAPLE577_MQ_06(Character character, Item item, string strArg, float numArg1, float numArg2)
@@ -438,35 +462,9 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			return ItemUseResult.OkayNotConsumed;
 		}
 
-		if (character.Position.Get2DDistance(AukaAltar) > 400)
-		{
-			character.ServerMessage(L("Use the potion at the Auka Altar."));
-			return ItemUseResult.OkayNotConsumed;
-		}
-
-		if (!character.TimeActions.IsActive)
-			_ = this.ChargeAukaAltarAsync(character);
+		character.StartBuff(BuffId.CHAPLE577_MQ_06_01, 1, 0, TimeSpan.FromSeconds(10), character);
 
 		return ItemUseResult.OkayNotConsumed;
-	}
-
-	/// <summary>
-	/// Charges the Auka Altar over a timed action.
-	/// </summary>
-	private async Task ChargeAukaAltarAsync(Character character)
-	{
-		var charged = await character.TimeActions.StartAsync(L("Charging the Auka Altar"), L("Cancel"), "FLASK", TimeSpan.FromSeconds(3));
-
-		if (charged != TimeActionResult.Completed)
-			return;
-
-		if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
-			return;
-
-		character.Inventory.RemoveItem(ItemId.CHAPLE577_MQ_06_ITEM, 1);
-		character.PlayEffect("F_light018_yellow", 1f);
-		character.Quests.CompleteObjective(Mq06, "chargeCrystal");
-		character.ServerMessage(L("The Auka Altar glows faintly. The demons turn towards it."));
 	}
 
 	/// <summary>
@@ -703,7 +701,7 @@ public class Chaple577Mq06Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(38));
 
-		AddObjective("chargeCrystal", L("Charge the low level spirit crystal"), new ManualObjective());
+		AddObjective("chargeCrystal", L("Charge the low level spirit crystal"), new VariableCheckObjective(DChapel577QuestNpcsScript.AukaChargeVar, 100, isPermanent: false));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new TakeItemReward("CHAPLE577_MQ_06_ITEM"));
@@ -731,7 +729,7 @@ public class Chaple577Mq07Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(38));
 
-		AddObjective("killEgnome", L("Defeat Egnome"), new KillObjective(8, "Egnome"));
+		AddObjective("killEgnome", L("Defeat Egnome"), new KillObjective(2, "Egnome"));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}

@@ -5,6 +5,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -35,11 +36,6 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 	private const int BabyPantoId = 147451;
 	private readonly static Position MollyRallyPoint = new Position(-262.60f, 95.99f, 300.90f);
-	private readonly static (double X, double Z)[] BabyPantoSpots =
-	{
-		(607.16, 528.50), (757.72, 568.46), (832.19, 389.37), (779.14, 312.72),
-		(681.05, 297.30), (565.13, 280.52), (411.60, 323.87), (376.72, 559.83),
-	};
 
 	protected override void Load()
 	{
@@ -367,28 +363,29 @@ public class FGele571QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("The Pantos watch the cable car as closely as we do."));
 		});
 
-		// Pile of Grass
+		// Piles of Grass
 		//-------------------------------------------------------------------------
-		AddNpc(47204, L("Pile of Grass"), "GELE571_MQ_03", "f_gele_57_1", -1502, 400, 90, async dialog =>
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Pile of Grass"));
-
-			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
+			Prefix = "GELE571_MQ_03",
+			MonsterId = 47204,
+			Name = L("Pile of Grass"),
+			Map = "f_gele_57_1",
+			Points = [(-1385, 683, 90), (-1227, 118, 90), (-1200, 512, 90), (-1501, 399, 90), (-1506, 76, 90), (-1192, -129, 90), (-1480, -180, 90), (-1392, 130, 90), (-1538, -71, 90)],
+			IsActive = c => c.Quests.IsActive(Mq03) && !c.Quests.IsCompletable(Mq03),
+			TimedLabel = L("Investigating"),
+			TimedAnim = "SITGROPESET",
+			Seconds = 2,
+			AggroRadius = 100,
+			IdleMessage = L("A heap of trampled grass. Nothing else is hidden here."),
+			OnDone = (character, npc) =>
 			{
-				var searched = await character.TimeActions.StartAsync(L("Searching the grass..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
-
-				if (searched != TimeActionResult.Completed)
-					return;
-
 				character.ServerMessage(L("You dig through the grass and find a lever handle latch the Pantos left behind."));
 				character.Inventory.Add(650582, 1, InventoryAddType.PickUp);
-				character.Quests.CompleteObjective(Mq03, "findLatches");
-				return;
-			}
 
-			await dialog.Msg(L("A heap of trampled grass. Nothing else is hidden here."));
+				if (Random(1, 11) >= 6 && npc != null && !character.Map.GetAttackableEnemiesInPosition(character, npc.Position, 100).Any())
+					QuestSpots.SpawnHostiles(character, npc.Position, "Zignuts", 3, TimeSpan.FromSeconds(180), 20);
+			},
 		});
 
 		// Poata's Nest
@@ -416,25 +413,19 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 		// Plateau Sugar Beet Stems
 		//-------------------------------------------------------------------------
-		AddNpc(47201, L("Plateau Sugar Beet Stems"), "GELE571_RP_1_OBJ", "f_gele_57_1", 1247, 626, 90, async dialog =>
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Plateau Sugar Beet Stems"));
-
-			if (character.Quests.IsActive(Rp1) && !character.Quests.IsCompletable(Rp1))
-			{
-				var pulled = await character.TimeActions.StartAsync(L("Pulling up the stems..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
-
-				if (pulled != TimeActionResult.Completed)
-					return;
-
-				character.ServerMessage(L("You pull the sugar beet stems up by the roots and leave them to wither."));
-				character.Quests.CompleteObjective(Rp1, "removeStems");
-				return;
-			}
-
-			await dialog.Msg(L("Thick sugar beet stems, sweet enough to draw every Panto on the plateau."));
+			Prefix = "GELE571_RP_1_OBJ",
+			MonsterId = 47201,
+			Name = L("Plateau Sugar Beet Stems"),
+			Map = "f_gele_57_1",
+			Points = [(1461, 384, 90), (1247, 626, 90), (1321, 463, 90), (1560, 501, 90), (1625, 721, 90), (1484, 924, 90), (1370, 921, 90), (1202, 969, 90), (1003, 889, 90), (758, 893, 90), (572, 932, 90), (465, 992, 90), (448, 1161, 90), (434, 1290, 90), (802, 1411, 90), (934, 1316, 90), (922, 1127, 90), (1027, 1048, 90), (1586, 67, 90), (1665, -46, 90), (1848, -62, 90), (1960, 62, 90), (1570, 217, 90), (1917, 207, 90), (1810, 314, 90)],
+			IsActive = c => c.Quests.IsActive(Rp1) && !c.Quests.IsCompletable(Rp1),
+			TimedLabel = L("Removing"),
+			TimedAnim = "SITGROPESET",
+			Seconds = 2,
+			IdleMessage = L("Thick sugar beet stems, sweet enough to draw every Panto on the plateau."),
+			OnDone = (character, npc) => character.ServerMessage(L("Removed the Plateau Sugar Beet Stems")),
 		});
 
 		// Baby Panto
@@ -456,11 +447,32 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 		// Baby Pantos on the sugar beet grounds
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < BabyPantoSpots.Length; ++i)
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var (x, z) = BabyPantoSpots[i];
-			AddNpc(BabyPantoId, L("Baby Panto"), i == 0 ? "GELE571_NPC_PANTO" : "GELE571_NPC_PANTO_" + (i + 1), "f_gele_57_1", x, z, 90, this.BabyPantoDialog);
-		}
+			Prefix = "GELE571_NPC_PANTO",
+			MonsterId = BabyPantoId,
+			Name = L("Baby Panto"),
+			Map = "f_gele_57_1",
+			Points = [(607, 528, 90), (757, 568, 90), (832, 389, 90), (779, 312, 90), (681, 297, 90), (565, 280, 90), (411, 323, 90), (376, 559, 90)],
+			IsActive = c => c.Quests.IsActive(Mq04) && !c.Quests.IsCompletable(Mq04),
+			TimedLabel = L("Luring Baby Panto"),
+			TimedAnim = "PET",
+			Seconds = 1.5,
+			IdleMessage = L("The Baby Panto eyes you warily."),
+			OnDone = (character, npc) =>
+			{
+				character.ServerMessage(L("It looks like the Baby Panto remembered something and started running somewhere!"));
+
+				if (npc != null)
+					RunToMolly(npc.Map, npc.Position);
+			},
+		});
+
+		// Baby Pantos around the one Capria's guard is watching
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_1", "f_gele_57_1", 950, 963, 180, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07));
+		AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_2", "f_gele_57_1", 999, 995, 45, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07));
+		AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_3", "f_gele_57_1", 980, 1025, 135, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07));
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
@@ -475,37 +487,6 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 			await Task.CompletedTask;
 		});
-	}
-
-	/// <summary>
-	/// A Baby Panto, lured with Molly's sugar beets.
-	/// </summary>
-	private async Task BabyPantoDialog(Dialog dialog)
-	{
-		var character = dialog.Player;
-		var panto = dialog.Npc;
-
-		if (!character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
-		{
-			await dialog.Msg(L("The Baby Panto eyes you warily."));
-			return;
-		}
-
-		if (!character.Inventory.HasItem(ItemId.GELE571_MQ_04_ITEM))
-		{
-			await dialog.Msg(L("The Baby Panto won't come near you empty-handed."));
-			return;
-		}
-
-		var lured = await character.TimeActions.StartAsync(L("Luring the Baby Panto"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
-
-		if (lured != TimeActionResult.Completed)
-			return;
-
-		character.Quests.CompleteObjective(Mq04, "lurePantos");
-		character.ServerMessage(L("The Baby Panto seems to remember something and runs off somewhere!"));
-
-		RunToMolly(panto.Map, panto.Position);
 	}
 
 	/// <summary>
@@ -604,12 +585,12 @@ public class Gele571Mq03Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Talk to Watcher Gilbert"), L("Guards in Strautas are waiting for someone's help."));
-		SetPhase(QuestStatus.InProgress, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Find the lever handle latches"), L("Find the lever handle latches in the grass at Mieguista Slope."));
+		SetPhase(QuestStatus.InProgress, "GELE571_MQ_03_0", "f_gele_57_1", L("Find the lever handle latches"), L("Find the lever handle latches in the grass at Mieguista Slope."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_GILBERT", "f_gele_57_1", L("Talk to Watcher Gilbert"), L("Return the lever handle latches to Gilbert."));
 
 		AddPrerequisite(new LevelPrerequisite(16));
 
-		AddObjective("findLatches", L("Find the lever handle latches"), new ManualObjective());
+		AddObjective("findLatches", L("Find the lever handle latches"), new CollectItemObjective("GELE571_MQ_01_ITEM", 4));
 
 		AddReward(new ItemReward("expCard2", 2));
 		AddReward(new TakeItemReward("GELE571_MQ_01_ITEM"));
@@ -631,12 +612,12 @@ public class Gele571Mq04Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Talk to Watcher Molly"), L("Guards in Strautas are waiting for someone's help."));
-		SetPhase(QuestStatus.InProgress, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Give sugar beets to Baby Pantos"), L("Approach the Baby Pantos and use the sugar beets."));
+		SetPhase(QuestStatus.InProgress, "GELE571_NPC_PANTO_0", "f_gele_57_1", L("Give sugar beets to Baby Pantos"), L("Approach the Baby Pantos and use the sugar beets."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Talk to Watcher Molly"), L("Listen to Molly's next plans."));
 
 		AddPrerequisite(new LevelPrerequisite(16));
 
-		AddObjective("lurePantos", L("Give sugar beets to Baby Pantos"), new ManualObjective());
+		AddObjective("lurePantos", L("Give sugar beets to Baby Pantos"), new VariableCheckObjective(QuestSpots.CountVar("GELE571_NPC_PANTO"), 4, isPermanent: false));
 
 		AddReward(new ItemReward("expCard2", 2));
 		AddReward(new TakeItemReward("GELE571_MQ_04_ITEM"));
@@ -745,13 +726,13 @@ public class Gele571Rp1Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Talk to Watcher Molly"), L("Watcher Molly at Srautas Gorge is waiting for your help."));
-		SetPhase(QuestStatus.InProgress, "GELE571_RP_1_OBJ", "f_gele_57_1", L("Remove the Plateau Sugar Beet Stems"), L("Get rid of the sugar beet stems Molly suspects are corrupting the Pantos."));
+		SetPhase(QuestStatus.InProgress, "GELE571_RP_1_OBJ_0", "f_gele_57_1", L("Remove the Plateau Sugar Beet Stems"), L("Get rid of the sugar beet stems Molly suspects are corrupting the Pantos."));
 		SetPhase(QuestStatus.Success, "GELE571_NPC_MARLEY", "f_gele_57_1", L("Talk to Watcher Molly"), L("Report back to Watcher Molly."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(17150, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(16));
 
-		AddObjective("removeStems", L("Remove the Plateau Sugar Beet Stems"), new ManualObjective());
+		AddObjective("removeStems", L("Remove the Plateau Sugar Beet Stems"), new VariableCheckObjective(QuestSpots.CountVar("GELE571_RP_1_OBJ"), 8, isPermanent: false));
 
 		AddReward(new ItemReward("expCard2", 2));
 	}

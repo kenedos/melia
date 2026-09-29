@@ -36,6 +36,9 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq01 = new QuestId(60031);
 	private readonly static QuestId Sq02 = new QuestId(60032);
 
+	public const string InterrogatedCountVar = "Gabija.Vprison512.Mq03.Interrogated";
+	private const string InterrogatedVar = "Gabija.Vprison512.Mq03.Marked";
+
 	protected override void Load()
 	{
 		// Kupole Arune
@@ -145,6 +148,7 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					character.Variables.Temp.SetInt(InterrogatedCountVar, 0);
 					character.Quests.Start(Mq03);
 					await dialog.Msg(L("Please interrogate the servants of Nuaele."));
 					await dialog.Msg(L("Since Hauberk is also a demon, it will be easy to read their minds. It becomes even easier when they are in their spirit form."));
@@ -343,7 +347,7 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 
 		var demon = character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100)
 			.OfType<Mob>()
-			.FirstOrDefault(mob => !mob.Data.ClassName.Equals("rootcrystal_05", StringComparison.OrdinalIgnoreCase));
+			.FirstOrDefault(mob => !mob.Data.ClassName.Equals("rootcrystal_05", StringComparison.OrdinalIgnoreCase) && !mob.Vars.GetBool(InterrogatedVar, false));
 
 		if (demon == null || character.Position.Get2DDistance(ThirdIsolationArea) > 450)
 		{
@@ -352,8 +356,9 @@ public class DVelniasprison512QuestNpcsScript : GeneralScript
 		}
 
 		demon.PlayEffect("F_lineup020_blue_mint", 1f);
-		character.Quests.CompleteObjective(Mq03, "interrogate");
-		character.ServerMessage(L("Hauberk's seal suppresses the demon and reads Nuaele's plan out of it. Take what it gave up to Arune."));
+		demon.Vars.SetBool(InterrogatedVar, true);
+		character.Variables.Temp.SetInt(InterrogatedCountVar, character.Variables.Temp.GetInt(InterrogatedCountVar, 0) + 1);
+		character.ServerMessage(L("Hauberk's seal suppresses the demon and reads Nuaele's plan out of it."));
 
 		return ItemUseResult.OkayNotConsumed;
 	}
@@ -439,7 +444,7 @@ public class Vprison512Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60008, QuestStatus.Completed));
 
-		AddObjective("interrogate", L("Interrogation of Nuaele's plan"), new ManualObjective());
+		AddObjective("interrogate", L("Interrogation of Nuaele's plan"), new VariableCheckObjective(DVelniasprison512QuestNpcsScript.InterrogatedCountVar, 5, isPermanent: false));
 
 		AddReward(new ItemReward("expCard8", 2));
 	}
@@ -465,7 +470,7 @@ public class Vprison512Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60009, QuestStatus.Completed));
 
-		AddObjective("killHarugals", L("Defeat Harugals in the 4th Isolation Area"), new KillObjective(5, "Harugal"));
+		AddObjective("killHarugals", L("Defeat Harugals in the 4th Isolation Area"), new KillObjective(2, "Harugal"));
 
 		AddReward(new ItemReward("expCard8", 2));
 	}

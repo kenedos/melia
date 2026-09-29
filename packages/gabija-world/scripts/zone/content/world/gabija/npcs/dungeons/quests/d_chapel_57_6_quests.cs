@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
+using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
@@ -35,6 +36,9 @@ public class DChapel576QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq09 = new QuestId(8518);
 	private readonly static QuestId Mq0905 = new QuestId(8527);
 	private readonly static QuestId Rp1 = new QuestId(60156);
+	public const string GlobejasCountVar = "Gabija.Chaple576.Mq08.Converted";
+	private const string GlobejasUntilVar = "Gabija.Chaple576.Mq08.Until";
+	private readonly static Position GlobejasAltarPosition = new Position(-523, 0, 1948);
 
 	protected override void Load()
 	{
@@ -294,6 +298,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					await dialog.Msg(L("The demons have stronger minds than you might think. It will take a lot of effort to make them forget about Gesti."));
+					character.Variables.Temp.SetInt(GlobejasCountVar, 0);
 					character.Quests.Start(Mq08);
 				}
 				return;
@@ -431,6 +436,27 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Globejas Altar"));
 
+			if (character.Quests.IsActive(Mq08) && !character.Quests.IsCompletable(Mq08))
+			{
+				var operated = await character.TimeActions.StartAsync(L("Operating"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(1));
+
+				if (operated != TimeActionResult.Completed)
+					return;
+
+				if (character.Variables.Temp.TryGet<DateTime>(GlobejasUntilVar, out var until) && until > DateTime.Now)
+				{
+					character.ServerMessage(L("The power of Globejas is already in effect!"));
+					return;
+				}
+
+				character.Variables.Temp.Set(GlobejasUntilVar, DateTime.Now.AddSeconds(45));
+
+				foreach (var enemy in character.Map.GetAttackableEnemiesInPosition(character, GlobejasAltarPosition, 550))
+					enemy.InsertHate(character, 1);
+
+				return;
+			}
+
 			await dialog.Msg(L("The Globejas Altar waits for someone to wake it."));
 		});
 
@@ -445,29 +471,25 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("An altar of protection, standing silent in the dark."));
 		});
 
-		// Orb Crystal
+		// Orb Crystals
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(153105, L("Orb Crystal"), "CHAPLE576_RP_1_OBJ", "d_chapel_57_6", 343, 13, 90, c => c.Quests.IsActive(Rp1) && !c.Quests.IsCompletable(Rp1), async dialog =>
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Orb Crystal"));
-
-			if (character.Quests.IsActive(Rp1) && !character.Quests.IsCompletable(Rp1))
+			Prefix = "CHAPLE576_RP_1_OBJ",
+			MonsterId = 153105,
+			Name = L("Orb Crystal"),
+			Map = "d_chapel_57_6",
+			Points = [(988, 262, 90), (1262, 292, 90), (1148, 256, 90), (1034, 297, 90), (820, 253, 90), (916, 291, 90), (824, 563, 90), (926, 554, 90), (978, 607, 90), (1070, 565, 90), (1159, 602, 90), (1237, 564, 90), (852, 303, 90), (1337, 553, 90), (1270, 614, 90), (1095, 285, 90), (120, 536, 90), (248, 597, 90), (169, 312, 90), (382, 537, 90), (365, 279, 90), (170, -193, 90), (343, 13, 90)],
+			IsActive = c => c.Quests.IsActive(Rp1) && !c.Quests.IsCompletable(Rp1),
+			TimedLabel = L("Collecting"),
+			TimedAnim = "SITGROPESET",
+			Seconds = 2,
+			IdleMessage = L("A cluster of dull orb crystals."),
+			OnDone = (character, npc) =>
 			{
-				var prised = await character.TimeActions.StartAsync(L("Prising the crystal loose..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
-
-				if (prised != TimeActionResult.Completed)
-					return;
-
-				character.ServerMessage(L("You prise an orb crystal loose from the cluster."));
+				character.ServerMessage(L("Acquired Orb Crystal."));
 				character.Inventory.Add(664092, 1, InventoryAddType.PickUp);
-				character.Quests.CompleteObjective(Rp1, "collectOrbs");
-				character.LookAround();
-				return;
-			}
-
-			await dialog.Msg(L("A cluster of dull orb crystals."));
+			},
 		});
 
 		// Hidden triggers
@@ -495,17 +517,6 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		// The Globejas Altar, where the demons are converted.
-		AddQuestTrigger("CHAPEL576_MQ_08_TRIGGER", "d_chapel_57_6", -523, 1948, 300, async args =>
-		{
-			if (args.Initiator is not Character character)
-				return;
-
-			if (character.Quests.IsActive(Mq08) && !character.Quests.IsCompletable(Mq08))
-				character.Quests.CompleteObjective(Mq08, "convertDemons");
-
-			await Task.CompletedTask;
-		});
 	}
 
 	/// <summary>
@@ -514,6 +525,17 @@ public class DChapel576QuestNpcsScript : GeneralScript
 	[On("EntityKilled")]
 	public void OnEntityKilled(object sender, CombatEventArgs args)
 	{
+		if (args.Target is not Mob altarMob)
+			return;
+
+		var converter = altarMob.GetKillBeneficiary(args.Attacker);
+		if (converter != null && converter.Quests.IsActive(Mq08) && !converter.Quests.IsCompletable(Mq08)
+			&& converter.Variables.Temp.TryGet<DateTime>(GlobejasUntilVar, out var globejasUntil) && globejasUntil > DateTime.Now
+			&& altarMob.Race == RaceType.Velnias && altarMob.Position.InRange2D(GlobejasAltarPosition, 550))
+		{
+			converter.Variables.Temp.SetInt(GlobejasCountVar, converter.Variables.Temp.GetInt(GlobejasCountVar, 0) + 1);
+		}
+
 		if (args.Target is not Mob mob || (mob.Data.ClassName != "Pawndel" && mob.Data.ClassName != "pawnd"))
 			return;
 
@@ -643,8 +665,8 @@ public class Chaple576Mq04Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(34));
 
-		AddObjective("killPawndel", L("Defeat Pawndel"), new KillObjective(20, "Pawndel"));
-		AddObjective("killPawnd", L("Defeat Pawnd"), new KillObjective(10, "pawnd"));
+		AddObjective("killPawndel", L("Defeat Pawndel"), new KillObjective(15, "Pawndel"));
+		AddObjective("killPawnd", L("Defeat Pawnd"), new KillObjective(15, "pawnd"));
 
 		AddReward(new ItemReward("expCard3", 1));
 	}
@@ -791,7 +813,7 @@ public class Chaple576Mq08Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8451, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(34));
 
-		AddObjective("convertDemons", L("Convert demons at the Globejas Altar"), new ManualObjective());
+		AddObjective("convertDemons", L("Convert demons at the Globejas Altar"), new VariableCheckObjective(DChapel576QuestNpcsScript.GlobejasCountVar, 12, isPermanent: false));
 
 		AddReward(new ItemReward("expCard3", 3));
 	}
@@ -841,13 +863,13 @@ public class Chaple576Rp1Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Talk to Follower Vaidutis"), L("Follower Vaidutis on the Ground Floor of Tenet Church is waiting for help."));
-		SetPhase(QuestStatus.InProgress, "CHAPLE576_RP_1_OBJ", "d_chapel_57_6", L("Collect Orb Crystals"), L("Collect orb crystals near the Worship Anteroom and Nuosirdum Chapel."));
+		SetPhase(QuestStatus.InProgress, "CHAPLE576_RP_1_OBJ_0", "d_chapel_57_6", L("Collect Orb Crystals"), L("Collect orb crystals near the Worship Anteroom and Nuosirdum Chapel."));
 		SetPhase(QuestStatus.Success, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Report back to Follower Vaidutis"), L("Take the orb crystals to Follower Vaidutis."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8525, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(34));
 
-		AddObjective("collectOrbs", L("Collect Orb Crystals"), new ManualObjective());
+		AddObjective("collectOrbs", L("Collect Orb Crystals"), new CollectItemObjective("CHAPLE576_RP_1_ITEM", 7));
 
 		AddReward(new ItemReward("expCard3", 1));
 		AddReward(new TakeItemReward("CHAPLE576_RP_1_ITEM"));

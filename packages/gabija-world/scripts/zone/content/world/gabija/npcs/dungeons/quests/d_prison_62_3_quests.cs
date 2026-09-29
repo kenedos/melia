@@ -469,8 +469,13 @@ public class DPrison623QuestNpcsScript : GeneralScript
 			if (!needsOrders || character.Inventory.CountItem(ItemId.PRISON623_MQ_05_ITEM) > 0)
 				return;
 
+			var opened = await character.TimeActions.StartAsync(L("Opening"), L("Cancel"), "SITABSORB", TimeSpan.FromSeconds(2));
+
+			if (opened != TimeActionResult.Completed)
+				return;
+
 			character.Inventory.Add(ItemId.PRISON623_MQ_05_ITEM, 1, InventoryAddType.PickUp);
-			await Task.CompletedTask;
+			character.ServerMessage(L("Acquired the Demon Orders"));
 		});
 
 		// The Cerberus cage

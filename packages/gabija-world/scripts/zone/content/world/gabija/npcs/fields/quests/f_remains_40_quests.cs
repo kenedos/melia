@@ -657,10 +657,22 @@ public class FRemains40QuestNpcsScript : GeneralScript
 
 		if (character.Quests.IsActive(questId) && !character.Quests.IsCompletable(questId))
 		{
-			var read = await character.TimeActions.StartAsync(L("Reading the monument..."), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
+			var neededItem = questId.Equals(Mq03) ? "REMAINS40_MQ_03_ITEM" : questId.Equals(Mq05) ? "REMAINS40_MQ_05_ITEM" : null;
+			var neededCount = questId.Equals(Mq03) ? 7 : 6;
+
+			if (neededItem != null && !character.Inventory.HasItem(neededItem, neededCount))
+			{
+				character.ServerMessage(questId.Equals(Mq03) ? L("You don't have enough Cockatrice Fat!") : L("You don't have enough Hallowventor Tusks!"));
+				return;
+			}
+
+			var read = await character.TimeActions.StartAsync(L("Checking the Contents"), L("Cancel"), "READ", TimeSpan.FromSeconds(2.5));
 
 			if (read != TimeActionResult.Completed)
 				return;
+
+			if (questId.Equals(Mq05))
+				character.Inventory.RemoveItem(neededItem, neededCount);
 
 			character.Quests.CompleteObjective(questId, objectiveIdent);
 
@@ -845,7 +857,10 @@ public class Remains40Mq03Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(97));
 		AddPrerequisite(new QuestStatusPrerequisite(8453, QuestStatus.Completed));
 
+		AddObjective("collectFat", L("Collect Cockatrice Fat"), new CollectItemObjective("REMAINS40_MQ_03_ITEM", 7));
 		AddObjective("readThirdMonument", L("Check the writings on the second monument"), new ManualObjective());
+
+		AddPityDrop("REMAINS40_MQ_03_ITEM", 1.0f, 0, 1, "Cockatries");
 
 		AddReward(new ItemReward("expCard6", 1));
 		AddReward(new TakeItemReward("REMAINS40_MQ_03_ITEM"));
@@ -900,7 +915,10 @@ public class Remains40Mq05Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(97));
 		AddPrerequisite(new QuestStatusPrerequisite(8455, QuestStatus.Completed));
 
+		AddObjective("collectTusks", L("Collect Hallowventor Tusks"), new CollectItemObjective("REMAINS40_MQ_05_ITEM", 6));
 		AddObjective("readFifthMonument", L("Check what is written on the fourth monument"), new ManualObjective());
+
+		AddPityDrop("REMAINS40_MQ_05_ITEM", 1.0f, 0, 1, "Hallowventor");
 
 		AddReward(new ItemReward("expCard6", 1));
 	}
@@ -1100,7 +1118,7 @@ public class Remains40Sq05Quest : QuestScript
 
 		AddPityDrop("REMAINS40_SQ_05_ITEM", 1.0f, 0, 1, "Big_Cockatries");
 
-		AddObjective("collectTails", L("Collect Cockat tails"), new CollectItemObjective("REMAINS40_SQ_05_ITEM", 1));
+		AddObjective("collectTails", L("Collect Cockat tails"), new CollectItemObjective("REMAINS40_SQ_05_ITEM", 2));
 
 		AddReward(new ItemReward("expCard6", 2));
 		AddReward(new TakeItemReward("REMAINS40_SQ_05_ITEM"));

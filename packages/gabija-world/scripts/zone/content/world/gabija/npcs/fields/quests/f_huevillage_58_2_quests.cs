@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.World;
 using Melia.Shared.Scripting;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
@@ -590,7 +591,7 @@ public class Huevillage582Sq02Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(16));
 
-		AddObjective("clearCrossroads", L("Defeat the monsters that reacted to the ominous energy"), new KillObjective(12, "Ultanun", "Zibu_Maize"));
+		AddObjective("clearCrossroads", L("Defeat the monsters that reacted to the ominous energy"), new ScoreKillObjective(10, (mob, character) => mob.Faction == FactionType.Monster && mob.Position.InRange2D(new Position(-439, 0, 234), 200) ? 1 : 0));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}

@@ -53,7 +53,7 @@ public class FKatyn12QuestNpcsScript : GeneralScript
 	private const string SpiritVar = "Gabija.Quests.Katyn12Rp1.Spirit";
 
 	private const int PurifyNeeded = 5;
-	private const int EvilNeeded = 5;
+	private const int EvilNeeded = 7;
 	private const int TreeTries = 3;
 	private const float NamottRange = 100;
 
@@ -1049,7 +1049,7 @@ public class Katyn12Mq05Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(30063, QuestStatus.Completed));
 
-		AddObjective("removeEvil", L("Clear out the evil energy contaminating the forest"), new VariableCheckObjective(FKatyn12QuestNpcsScript.EvilCountVar, 5, isPermanent: true));
+		AddObjective("removeEvil", L("Clear out the evil energy contaminating the forest"), new VariableCheckObjective(FKatyn12QuestNpcsScript.EvilCountVar, 7, isPermanent: true));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("Vis", 330));
@@ -1276,7 +1276,7 @@ public class Katyn12Sq02Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(51));
 
-		AddObjective("killMonsters", L("Defeat the nearby monsters disrupting the energy of the Letas Altar"), new KillObjective(10, "puragi", "Sec_zombiegirl2_chpel", "jellyfish_blue", "zigri", "chupacabra_green", "operor_blue"));
+		AddObjective("killMonsters", L("Defeat the nearby monsters disrupting the energy of the Letas Altar"), new ScoreKillObjective(12, (mob, character) => mob.Faction == FactionType.Monster && mob.Position.InRange2D(new Position(-2857, 0, 109), 600) ? 1 : 0));
 
 		AddReward(new ItemReward("expCard3", 1));
 		AddReward(new ItemReward("Vis", 150));
@@ -1340,7 +1340,7 @@ public class Katyn12Rp1Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(51));
 
-		AddObjective("collectSpirits", L("Retreiving Fading Spirits"), new CollectItemObjective("KATYN12_RP_1_ITEM", 5));
+		AddObjective("collectSpirits", L("Retreiving Fading Spirits"), new CollectItemObjective("KATYN12_RP_1_ITEM", 7));
 
 		AddReward(new ItemReward("expCard3", 1));
 		AddReward(new TakeItemReward("KATYN12_RP_1_ITEM", -1));

@@ -409,7 +409,7 @@ public class Huevillage581Mq01Quest : QuestScript
 
 		AddPityDrop("HUEVILLAGE_58_1_MQ01_ITEM1", 1.0f, 0, 1, "Tanu");
 
-		AddObjective("collectStones", L("Collect Tanu's Purifying Stone"), new CollectItemObjective("HUEVILLAGE_58_1_MQ01_ITEM1", 7));
+		AddObjective("collectStones", L("Collect Tanu's Purifying Stone"), new CollectItemObjective("HUEVILLAGE_58_1_MQ01_ITEM1", 12));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}
