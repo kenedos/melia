@@ -1310,6 +1310,7 @@ public class Cathedral56Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20336);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Secret at the End"));
 		SetDescription(L("Five orbs, five keys, and each key belongs to the orb of its own colour."));
 		SetType(QuestType.Main);

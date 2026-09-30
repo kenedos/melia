@@ -651,6 +651,7 @@ public class F3Cmlake84Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90010);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Clear the Corruption (1)"));
 		SetDescription(L("Elder Aloizard says Modis once saw people with black hoods doing something at the Nesuga Small Corridor. Go to the Nesuga Small Corridor and see if you can find any clues."));
 		SetType(QuestType.Main);

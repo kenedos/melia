@@ -783,6 +783,7 @@ public class Ftower42Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17007);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Suspicious Voice"));
 		SetDescription(L("A stone in the Large Reading Room asks for the things that watch it to be taken away."));
 		SetType(QuestType.Sub);
@@ -893,6 +894,7 @@ public class Ftower42Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17011);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Release Me"));
 		SetDescription(L("The stone in the office is held by the Blindlems and the shaman dolls around it."));
 		SetType(QuestType.Sub);

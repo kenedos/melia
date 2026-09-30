@@ -898,6 +898,7 @@ public class Siau15reSq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60094);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Overworked Agent"));
 		SetDescription(L("Agent Pierneef is helping other agents investigate the area. Defeat some monsters at the Zbuka Inner Court."));
 		SetType(QuestType.Sub);

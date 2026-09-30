@@ -1466,6 +1466,7 @@ public class Flash64Sq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8851);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Kaliss Wants the Truth"));
 		SetDescription(L("The bonfires of the Vienti Fortress are laid with a scent that quiets the Frosted souls."));
 		SetType(QuestType.Sub);
@@ -1661,6 +1662,7 @@ public class JobCannoneer71Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30118);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("From Ground to Air, From Ground to Ground"));
 		SetDescription(L("The Cannoneer Master wants both a flying and a walking target studied."));
 		SetType(QuestType.Main);
@@ -1716,6 +1718,7 @@ public class Underfortress66Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50062);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The seal which the monster possesses"));
 		SetDescription(L("Ruklys' army seals turn up on the monsters of the Fortress of the Land."));
 		SetType(QuestType.Sub);
@@ -1750,6 +1753,7 @@ public class Underfortress67Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50259);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Fortress of the Land"));
 		SetDescription(L("The Knights of Kaliss want the inside of the fortress written up before they walk into it."));
 		SetType(QuestType.Sub);
@@ -1808,6 +1812,7 @@ public class JobLancer81Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90157);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Make It Doubly Sure"));
 		SetDescription(L("The Order of the Tree of Truth left traces in Nheto Forest, and the other lancer did not come back."));
 		SetType(QuestType.Main);

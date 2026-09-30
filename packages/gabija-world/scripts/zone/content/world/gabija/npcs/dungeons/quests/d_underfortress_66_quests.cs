@@ -747,6 +747,7 @@ public class Underfortress66Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50056);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reclaim the Camp (1)"));
 		SetDescription(L("Delus will forget the trespass if the guards who fell behind are brought in."));
 		SetType(QuestType.Main);
@@ -776,6 +777,7 @@ public class Underfortress66Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50057);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reclaim the Camp (2)"));
 		SetDescription(L("The detachment has no equipment left that is not lying where somebody dropped it."));
 		SetType(QuestType.Main);
@@ -833,6 +835,7 @@ public class Underfortress66Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50059);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reclaim the Camp (4)"));
 		SetDescription(L("The camp's line has gaps in it and the supply boxes have barricades for them."));
 		SetType(QuestType.Main);

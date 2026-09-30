@@ -534,6 +534,7 @@ public class Huevillage584Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18001);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Release Goddess Saule (1)"));
 		SetDescription(L("Two binding magic circles hold the goddess down. Break both of them."));
 		SetType(QuestType.Main);

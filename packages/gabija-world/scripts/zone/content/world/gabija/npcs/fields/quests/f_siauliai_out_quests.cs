@@ -1191,6 +1191,7 @@ public class SoutQ20Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40050);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Pharmacist's Favor (1)"));
 		SetDescription(L("The Pharmacist Lady needs Jukopus leaves and Kepa stems to treat the wounded."));
 		SetType(QuestType.Sub);
@@ -1225,6 +1226,7 @@ public class SoutQ21Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40051);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Pharmacist's Favor (2)"));
 		SetDescription(L("The Pharmacist Lady needs more Jukopus leaves and Kepa stems."));
 		SetType(QuestType.Sub);
@@ -1257,6 +1259,7 @@ public class SoutQ22Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40052);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Pharmacist's Favor (3)"));
 		SetDescription(L("The Pharmacist Lady needs more Jukopus leaves and Kepa stems."));
 		SetType(QuestType.Sub);
@@ -1289,6 +1292,7 @@ public class SoutQ23Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40053);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Pharmacist's Favor (4)"));
 		SetDescription(L("The Pharmacist Lady needs more Jukopus leaves and Kepa stems."));
 		SetType(QuestType.Sub);
@@ -1321,6 +1325,7 @@ public class SoutQ24Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40054);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Pharmacist's Favor (5)"));
 		SetDescription(L("The Pharmacist Lady needs more Jukopus leaves and Kepa stems."));
 		SetType(QuestType.Sub);

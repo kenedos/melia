@@ -596,6 +596,7 @@ public class Thorn21Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20270);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Root of Sviesa Hill Areas"));
 		SetDescription(L("One of Bramble's roots is sunk into Sviesa Hill Areas, and Gaigalas is over it."));
 		SetType(QuestType.Sub);
@@ -664,6 +665,7 @@ public class Thorn21Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20272);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Root of Tankinta Vacant Lot"));
 		SetDescription(L("The second of Bramble's roots runs under Tankinta Vacant Lot, with Molich guarding it."));
 		SetType(QuestType.Sub);
@@ -729,6 +731,7 @@ public class Thorn21Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20295);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Capturing Bramble (2)"));
 		SetDescription(L("Bramble heals itself through the roots at Sviesa Hill Areas and Tankinta Vacant Lot. Cut them both."));
 		SetType(QuestType.Main);

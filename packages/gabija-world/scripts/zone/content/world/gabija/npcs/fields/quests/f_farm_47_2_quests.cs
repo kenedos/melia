@@ -1035,6 +1035,7 @@ public class Farm472Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40300);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unexpected Discovery (3)"));
 		SetDescription(L("The wine cask has to be opened carefully, so a wooden hammer is wanted first."));
 		SetType(QuestType.Sub);

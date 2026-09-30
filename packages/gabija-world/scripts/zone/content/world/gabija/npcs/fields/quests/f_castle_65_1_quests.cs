@@ -952,6 +952,7 @@ public class FCastle651Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70404);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroy the Magic Power Supply Device"));
 		SetDescription(L("It's time to blow up the Magic Power Supply Device. Go to the Ishinti Crossroads and place the charged orbs around the device."));
 		SetType(QuestType.Main);
@@ -1036,6 +1037,7 @@ public class FCastle651Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70407);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("For Those Who Remember Them"));
 		SetDescription(L("Follower Andrea was asked to contact a resident of Delmore Castle named Ardel, but all Delmore Castle residents are missing. Try and recover Ardel's diary."));
 		SetType(QuestType.Sub);

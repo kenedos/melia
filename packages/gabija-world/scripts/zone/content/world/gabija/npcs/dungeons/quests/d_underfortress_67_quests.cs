@@ -741,6 +741,7 @@ public class Underfortress67Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50069);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Soldiers' Story"));
 		SetDescription(L("Two of the Ruklys era books in the quarter are still readable, and Kaliss pays for readable."));
 		SetType(QuestType.Sub);

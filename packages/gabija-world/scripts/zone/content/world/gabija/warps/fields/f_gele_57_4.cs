@@ -18,7 +18,7 @@ public class f_gele_57_4WarpsScript : GeneralScript
 		// Tenet Garden to Tenet Church 1F
 		var chapelGateWarp = AddWarp(3, "GELE574_TO_CHAPEL576", 183, From("f_gele_57_4", 1296.24, 2145.48), To("d_chapel_57_6", -1638, 448));
 		if (chapelGateWarp != null)
-			chapelGateWarp.VisibleTo = character => character.Quests.HasCompleted(new QuestId(8730));
+			chapelGateWarp.VisibleTo = character => character.Quests.IsCompletable(new QuestId(8511)) || character.Quests.HasCompleted(new QuestId(8511));
 
 		// Tenet Garden to Tenet Church B1
 		AddWarp(4, "GELE574_TO_CHAPEL575", 181, From("f_gele_57_4", 1072.8, 2046.17), To("d_chapel_57_5", -1258, 1095));

@@ -614,6 +614,7 @@ public class Huevillage583Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20287);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mysterious Well"));
 		SetDescription(L("Something lies at the bottom of the old well of Cobalt Forest."));
 		SetType(QuestType.Sub);

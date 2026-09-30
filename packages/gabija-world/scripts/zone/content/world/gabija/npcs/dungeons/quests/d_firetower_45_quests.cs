@@ -824,6 +824,7 @@ public class Ftower45Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17023);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hot-blooded Simon Shaw (2)"));
 		SetDescription(L("Simon Shaw goes after Bearkaras and leaves the hall behind him to be held."));
 		SetType(QuestType.Sub);

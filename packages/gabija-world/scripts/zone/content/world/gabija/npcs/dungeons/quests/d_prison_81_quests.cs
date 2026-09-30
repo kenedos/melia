@@ -916,6 +916,7 @@ public class Prison81Mq5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30178);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Shard Collection(1)"));
 		SetDescription(L("The four shards that open the Supply Room's device are in the monsters' hands."));
 		SetType(QuestType.Main);

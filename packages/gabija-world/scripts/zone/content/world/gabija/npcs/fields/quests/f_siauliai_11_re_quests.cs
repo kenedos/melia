@@ -896,6 +896,7 @@ public class Siau11reMq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60100);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Large-Scale Search Operation (2)"));
 		SetDescription(L("Chaser Talbasi believes it's best to obtain more concrete clues before finding Priest Pranas. Search the recently discovered Paslaptis Hideout before meeting up with Agent Larena."));
 		SetType(QuestType.Main);

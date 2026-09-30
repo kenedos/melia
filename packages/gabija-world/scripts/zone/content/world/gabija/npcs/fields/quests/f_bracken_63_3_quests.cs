@@ -669,6 +669,7 @@ public class Bracken633Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50109);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Giant Bracken (2)"));
 		SetDescription(L("This laboratory seems to be related to the giant bracken. Look around and try to find any materials that might be related to it."));
 		SetType(QuestType.Main);

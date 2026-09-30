@@ -38,6 +38,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq08 = new QuestId(8608);
 	private readonly static QuestId Mq09 = new QuestId(8609);
 	private readonly static QuestId Gele573Mq08 = new QuestId(8545);
+	private readonly static QuestId Chapel576Mq02 = new QuestId(8511);
 	private readonly static QuestId Chapel576Mq041 = new QuestId(8730);
 
 	protected override void Load()
@@ -375,8 +376,8 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 		// Barrier over the church entrance
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(MonsterId.Block_Fence, "", "GELE574_ARUNE", "f_gele_57_4", 1283.33, 2141.86, 90, c => !c.Quests.HasCompleted(Chapel576Mq041));
-		AddConditionalNpc(MonsterId.Block_Fence, "", "GELE574_ARUNE_VFX", "f_gele_57_4", 1283.33, 2141.86, 0, c => !c.Quests.HasCompleted(Chapel576Mq041)).WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
+		AddConditionalNpc(MonsterId.Chaple_Gate_02, "", "GELE574_ARUNE", "f_gele_57_4", 1283.33, 2111.86, 0, c => !c.Quests.IsCompletable(Chapel576Mq02) && !c.Quests.HasCompleted(Chapel576Mq02));
+		AddConditionalNpc(MonsterId.Block_Fence, "", "GELE574_ARUNE_VFX", "f_gele_57_4", 1283.33, 2111.86, 0, c => !c.Quests.IsCompletable(Chapel576Mq02) && !c.Quests.HasCompleted(Chapel576Mq02)).WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
 
 		// Small Beehive
 		//-------------------------------------------------------------------------

@@ -582,6 +582,7 @@ public class Vprison514Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60013);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Evening Star Key (1)"));
 		SetDescription(L("The cracks in the Scars of Fighting Spirits have to be shut before the key can be charged."));
 		SetType(QuestType.Main);
@@ -640,6 +641,7 @@ public class Vprison514Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60015);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Evening Star Key (3)"));
 		SetDescription(L("The key is turned on the seals of Rearda, Kasa and Rada, and what they held goes into the suppressor."));
 		SetType(QuestType.Main);

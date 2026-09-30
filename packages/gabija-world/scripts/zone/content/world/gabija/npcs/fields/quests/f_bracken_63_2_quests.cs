@@ -788,6 +788,7 @@ public class Bracken632Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50099);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Where Did Everybody Go? (1)"));
 		SetDescription(L("Like Rose said, the residents of the Croa Village are nowhere to be seen. Search the village and find out what happened."));
 		SetType(QuestType.Main);

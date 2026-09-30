@@ -942,6 +942,7 @@ public class Underfortress69Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50082);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preparation (2)"));
 		SetDescription(L("The Ikveta Podium stone will not light while the Demon Totems stand around it."));
 		SetType(QuestType.Main);
@@ -1066,6 +1067,7 @@ public class Underfortress69Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50086);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Traitor's Diary"));
 		SetDescription(L("The pages of a Ruklys army journal are scattered over the whole battleground."));
 		SetType(QuestType.Sub);
@@ -1100,6 +1102,7 @@ public class Underfortress69Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50087);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Order to Retreat"));
 		SetDescription(L("A soldier's spirit never blew the retreat, and the horn is still where he dropped it."));
 		SetType(QuestType.Sub);

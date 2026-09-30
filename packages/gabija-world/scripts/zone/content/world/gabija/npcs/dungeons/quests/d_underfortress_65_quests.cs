@@ -556,6 +556,7 @@ public class Underfortress65Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50051);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Drawing Attention (3)"));
 		SetDescription(L("The bombs go at the upper hallway and the lower side of the gathering place."));
 		SetType(QuestType.Main);

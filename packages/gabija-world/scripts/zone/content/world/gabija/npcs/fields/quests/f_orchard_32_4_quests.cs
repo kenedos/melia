@@ -899,6 +899,7 @@ public class FOrchard324Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80043);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Release the Goddess"));
 		SetDescription(L("Goddess Lada seems to be losing Her conscience. Try and destroy the Redemption Wards closest to Goddess Lada."));
 		SetType(QuestType.Main);
@@ -1092,6 +1093,7 @@ public class FOrchard324Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80050);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Temple Rebuilding Preparation (3)"));
 		SetDescription(L("The village priest thinks the demon totems could be the cause of the contamination and wants you to destroy the ones in the Inega Vacant Lot and Odur Backyard, then use the scroll to purify the land there."));
 		SetType(QuestType.Sub);

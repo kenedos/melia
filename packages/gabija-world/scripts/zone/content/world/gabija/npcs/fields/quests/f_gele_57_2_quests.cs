@@ -870,6 +870,7 @@ public class Gele572Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60152);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Improvements"));
 		SetDescription(L("Molly needs to know what monsters now roam Gele Plateau before she uses the shaman dolls."));
 		SetType(QuestType.Repeat);

@@ -534,6 +534,7 @@ namespace Melia.Zone.Scripting
 			if (this.Data.Objectives.Exists(a => a.Ident == objective.Ident))
 				throw new ArgumentException($"Duplicate objective ident '{objective.Ident}' in '{this.GetType().Name}'.");
 
+			objective.Id = this.Data.Objectives.Count;
 			this.Data.Objectives.Add(objective);
 
 			return objective;

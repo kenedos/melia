@@ -619,6 +619,7 @@ public class Ftower41Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8474);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Gabija (4)"));
 		SetDescription(L("The fastest way up is the Transport Magic Circle, if it still works."));
 		SetType(QuestType.Main);

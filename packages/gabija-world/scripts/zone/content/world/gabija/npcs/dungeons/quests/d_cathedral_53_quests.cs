@@ -1151,6 +1151,7 @@ public class Cathedral53Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20308);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Research Reports of the Priests"));
 		SetDescription(L("Three priests are studying Naktis' curse in three separate places, and none of them can leave."));
 		SetType(QuestType.Sub);

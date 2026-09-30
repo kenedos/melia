@@ -658,6 +658,7 @@ public class Underfortress68Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50075);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Past of the Spirits (4)"));
 		SetDescription(L("The token holds a Ruklys spirit still long enough for the keeper to read it."));
 		SetType(QuestType.Main);
@@ -687,6 +688,7 @@ public class Underfortress68Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50076);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Past of the Spirits (5)"));
 		SetDescription(L("A second reading goes deeper, and the spirits pay for it."));
 		SetType(QuestType.Main);

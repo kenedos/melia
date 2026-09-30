@@ -45,11 +45,6 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 	protected override void Load()
 	{
-		// The Chapparition, on its gentype anchor in the church
-		//-------------------------------------------------------------------------
-		AddSpawner("d_chapel_57_6.Chapparition", MonsterId.Boss_Chapparition, min: 1, max: 1, respawn: Minutes(5));
-		AddSpawnPoint("d_chapel_57_6.Chapparition", "d_chapel_57_6", Rectangle(217.25, 460.63, 40));
-
 		// Follower Vaidutis
 		//-------------------------------------------------------------------------
 		AddNpc(147400, L("Follower Vaidutis"), "CHAPEL_VIRGINIJA", "d_chapel_57_6", 961, -114, 0, async dialog =>
@@ -72,6 +67,19 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Well done."));
 				await dialog.Msg(L("Making the Light Crystal with this will be enough power to break the barrier."));
 				await dialog.CompleteQuest(Mq01);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq02) && character.Quests.IsCompletable(Mq02))
+			{
+				await dialog.Msg(L("The barrier at the gate is gone. You defeated the demon that guarded it!"));
+				await dialog.Msg(L("Follower Algis is already going through to investigate the 1st floor."));
+				await dialog.CompleteQuest(Mq02);
+
+				if (!character.Quests.Has(Mq041) && character.Quests.MeetsPrerequisites(Mq041))
+					character.Quests.Start(Mq041);
+
+				character.LookAround();
 				return;
 			}
 
@@ -369,23 +377,11 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 		// Church Gate
 		//-------------------------------------------------------------------------
-		AddNpc(147379, L("Church Gate"), "CHAPLE576_MQ_04", "d_chapel_57_6", -1778, 426, 91, async dialog =>
+		AddConditionalNpc(147379, L("Church Gate"), "CHAPLE576_MQ_04", "d_chapel_57_6", -1778, 426, 91, c => !c.Quests.HasCompleted(Mq02) && !(c.Quests.IsActive(Mq02) && c.Quests.IsCompletable(Mq02)), async dialog =>
 		{
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Church Gate"));
-
-			if (character.Quests.IsActive(Mq02) && character.Quests.IsCompletable(Mq02))
-			{
-				await dialog.Msg(L("The gate groans open under the Light Crystal's glow."));
-				await dialog.CompleteQuest(Mq02);
-
-				if (!character.Quests.Has(Mq041) && character.Quests.MeetsPrerequisites(Mq041))
-					character.Quests.Start(Mq041);
-
-				character.LookAround();
-				return;
-			}
 
 			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
 			{
@@ -394,22 +390,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Mq041) && character.Quests.MeetsPrerequisites(Mq041))
-			{
-				await dialog.Msg(L("The barrier is broken. Algis steps through the gate."));
-				character.Quests.Start(Mq041);
-				character.LookAround();
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq041) && !character.Quests.IsCompletable(Mq041))
-			{
-				await dialog.Msg(L("The barrier is broken. Algis steps through the gate."));
-				character.Quests.ReplayQuestTrack(Mq041);
-				return;
-			}
-
-			await dialog.Msg(L("The gate stands open. The demons have not come this far yet."));
+			await dialog.Msg(L("A demonic barrier seals the church gate."));
 		});
 
 		// Central Altar
@@ -422,12 +403,12 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq09) && !character.Quests.IsCompletable(Mq09))
 			{
-				await dialog.Msg(L("You touch the altar and the pillar of light snaps out. A Mallet Wyvern drops from the rafters."));
 				var checkedAltar = await character.TimeActions.StartAsync(L("Checking the altar..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
 
 				if (checkedAltar != TimeActionResult.Completed)
 					return;
 
+				character.ServerMessage(L("You touch the altar and the pillar of light snaps out. A Mallet Wyvern drops from the rafters."));
 				character.Quests.StartQuestTrack(Mq09);
 				return;
 			}
@@ -762,7 +743,7 @@ public class Chaple576Mq02Quest : QuestScript
 
 		SetPhase(QuestStatus.Possible, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Talk to Follower Vaidutis"), L("The Essence of Light is ready. Talk to Follower Vaidutis."));
 		SetPhase(QuestStatus.InProgress, "CHAPLE576_MQ_04", "d_chapel_57_6", L("Open the church entrance"), L("Use the Light Crystal at the church entrance."));
-		SetPhase(QuestStatus.Success, "CHAPLE576_MQ_04", "d_chapel_57_6", L("Open the church entrance"), L("Open the church entrance."));
+		SetPhase(QuestStatus.Success, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Talk to Follower Vaidutis"), L("Return to Vaidutis."));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "CHAPLE576_MQ_04_TRACK", 4000, autoStart: false, partyPlay: true);
 
@@ -773,6 +754,12 @@ public class Chaple576Mq02Quest : QuestScript
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new TakeItemReward("CHAPLE576_MQ_02_ITEM_1"));
 	}
+
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		base.OnSuccess(character, quest);
+		character.LookAround();
+	}
 }
 
 // 8513: Demon Sisters
@@ -782,6 +769,7 @@ public class Chaple576Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8513);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Sisters"));
 		SetDescription(L("Defeat the demon sisters Pawndel and Pawnd around the Worship Anteroom."));
 		SetType(QuestType.Sub);
@@ -816,8 +804,8 @@ public class Chaple576Mq041Quest : QuestScript
 		SetAutoTracked(true);
 		SetCancelable(true);
 
-		SetPhase(QuestStatus.Possible, "CHAPLE576_MQ_04", "d_chapel_57_6", L("Open the Gate"), L("Open the church gates."));
-		SetPhase(QuestStatus.InProgress, "CHAPLE576_MQ_04", "d_chapel_57_6", L("Speak with Follower Algis"), L("Speak with Follower Algis at the gate."));
+		SetPhase(QuestStatus.Possible, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Open the Gate"), L("Open the church gates."));
+		SetPhase(QuestStatus.InProgress, "CHAPEL_VIRGINIJA", "d_chapel_57_6", L("Speak with Follower Algis"), L("Speak with Follower Algis at the gate."));
 		SetPhase(QuestStatus.Success, "CHAPEL576_DONATAS", "d_chapel_57_6", L("Talk to Follower Donatas"), L("Talk to Follower Donatas."));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "CHAPLE576_MQ_04_AFTER", 500, partyPlay: true);
@@ -893,6 +881,7 @@ public class Chaple576Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8451);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Get a Hold of Yourself! (1)"));
 		SetDescription(L("Collect the souls of the demon sisters and the Corylus."));
 		SetType(QuestType.Sub);

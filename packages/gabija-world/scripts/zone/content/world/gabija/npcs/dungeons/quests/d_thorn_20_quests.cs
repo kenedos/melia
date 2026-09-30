@@ -371,6 +371,7 @@ public class Thorn20Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20261);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Some Help"));
 		SetDescription(L("The Believers of Goddess Saule are spread thin across Sirdgela Forest. Hear out every one of them."));
 		SetType(QuestType.Sub);
@@ -514,6 +515,7 @@ public class Thorn20Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20267);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Something Blasphemous"));
 		SetDescription(L("The shamans are summoning Archon at one of the goddess' own altars."));
 		SetType(QuestType.Sub);

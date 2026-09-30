@@ -524,6 +524,7 @@ public class Gele571Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17100);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Fearless Ones"));
 		SetDescription(L("Gilbert wants the Grummers and Zignuts that damaged the cable car taught a lesson."));
 		SetType(QuestType.Sub);

@@ -880,6 +880,7 @@ public class Siauliai463Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16330);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Too Scared to Sow"));
 		SetDescription(L("The Radanza Farm still has to be sown, and Riesz will not walk out to it."));
 		SetType(QuestType.Sub);

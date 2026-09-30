@@ -32,16 +32,16 @@ public class Chaple576Mq09Track : TrackScript
 
 		actors.Add(AddTrackActor(character, 147358, -523, 12, 446, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = L("Central Altar") }));
 		actors.Add(AddTrackActor(character, 47502, -525.00, 0.49, 304.46, 0, new TrackActorSpec { Ai = "BasicBoss" }));
-		actors.Add(AddTrackActor(character, 40069, -837.16, 2.83, 414.59, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40069, -559.04, 1.39, 784.21, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40069, -222.37, 3.25, 492.01, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40069, -225.66, 3.25, 362.20, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40069, -492.71, 0.02, 88.71, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 40069, -837.16, 2.83, 414.59, 96, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 40069, -559.04, 1.39, 784.21, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 40069, -222.37, 3.25, 492.01, 91, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 40069, -225.66, 3.25, 362.20, 91, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 40069, -492.71, 0.02, 88.71, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
 		actors.Add(character);
-		actors.Add(AddTrackActor(character, 40069, -498.94, 1.02, 782.20, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40069, -841.19, 2.83, 475.63, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40069, -551.38, 0.02, 91.59, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-		actors.Add(AddTrackActor(character, 40069, -225.91, 3.25, 422.12, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 40069, -498.94, 1.02, 782.20, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 40069, -841.19, 2.83, 475.63, 91, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 40069, -551.38, 0.02, 91.59, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
+		actors.Add(AddTrackActor(character, 40069, -225.91, 3.25, 422.12, 91, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces, Name = "UnvisibleName" }));
 
 		return actors.ToArray();
 	}

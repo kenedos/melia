@@ -1057,6 +1057,7 @@ public class F3Cmlake83Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90004);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Corrupted Lake (5)"));
 		SetDescription(L("Elder Aloizard says that when the earth shook, he saw the old disc glow red and point towards somewhere. Find out where the old disc is pointing to."));
 		SetType(QuestType.Main);
