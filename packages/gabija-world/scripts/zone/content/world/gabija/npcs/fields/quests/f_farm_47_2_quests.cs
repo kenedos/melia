@@ -402,7 +402,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("The hollow where the statue's head lay, empty now."));
-		});
+		}).WithEffect("F_sys_trigger_point_yellow", 3f, EffectLocation.Bottom);
 
 		// Old Chest
 		//-------------------------------------------------------------------------
@@ -441,7 +441,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("The broken boards of the chest, scattered where it stood."));
-		});
+		}).WithEffect("F_sys_trigger_point_yellow", 3f, EffectLocation.Bottom);
 
 		// Wooden Wine Cask
 		//-------------------------------------------------------------------------
@@ -491,7 +491,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("The staves of the cask, split and lying where they fell."));
-		});
+		}).WithEffect("F_sys_trigger_point_yellow", 3f, EffectLocation.Bottom);
 
 		// Wing of Goddess Statue
 		//-------------------------------------------------------------------------
@@ -530,7 +530,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("Torn earth, where the Corrupted pulled itself out of the ground."));
-		});
+		}).WithEffect("F_sys_trigger_point_yellow", 3f, EffectLocation.Bottom);
 
 		// Strange Aura
 		//-------------------------------------------------------------------------
@@ -547,13 +547,14 @@ public class FFarm472QuestNpcsScript : GeneralScript
 				if (tested != TimeActionResult.Completed)
 					return;
 
+				dialog.Npc.PlayEffect("F_explosion004_yellow", 2f);
 				character.Quests.CompleteObjective(Sq060, "testAura");
 				character.ServerMessage(L("The aura closes over the wounded monster and it simply is not there any more. Tell Joana."));
 				return;
 			}
 
 			await dialog.Msg(L("Smoke that sparkles, drifting up out of nothing at all."));
-		});
+		}).WithEffect("F_levitation022_light", 2f, EffectLocation.Bottom).WithEffect("F_circle016", 2.5f, EffectLocation.Bottom);
 
 		// The magic circle Varas wants burnt, and the ground it leaves behind.
 		//-------------------------------------------------------------------------
@@ -751,7 +752,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("The seal in your pack warms, and the portal takes the shape of a door."));
 			character.Warp("d_velniasprison_51_1", -160, 167, 140);
-		});
+		}).WithEffect("F_circle25", 9.5f, EffectLocation.Middle);
 
 		// Baron Secretary Andol's Journal
 		//-------------------------------------------------------------------------
@@ -854,6 +855,7 @@ public class FFarm472QuestNpcsScript : GeneralScript
 
 			if (broken != TimeActionResult.Completed)
 				return;
+			dialog.Npc.AttachEffect("F_pc_making_finish_white", 1f, EffectLocation.Bottom);
 
 			character.Inventory.Add(ItemId.FARM47_2_SQ_030_ITEM_2, 1, InventoryAddType.PickUp);
 			character.ServerMessage(L("You break off a blunt piece, about the weight of a hammer's head."));

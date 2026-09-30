@@ -14,6 +14,9 @@ using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone;
+using Melia.Zone.World.Actors;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Monsters;
@@ -43,9 +46,9 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 	private const int GracefulRelicsNeeded = 5;
 
 	private const string EssenceVar = "Gabija.Cathedral53.Essence";
+	private const string ScriptureVar = "Gabija.Cathedral53.Scripture";
 	private const string RelicVar = "Gabija.Cathedral53.Relic";
 	private const string HiddenRelicVar = "Gabija.Cathedral53.HiddenRelic";
-	private const string AltarVar = "Gabija.Cathedral53.Altar";
 	private const string RevealedRelicVar = "Gabija.Cathedral53.RevealedRelic";
 
 	private readonly static string[] SummonableBishops = { "CHATHEDRAL_BISHOP", "CHATHEDRAL54_BISHOP_AFTER", "CHATHEDRAL56_BISHOP" };
@@ -473,6 +476,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 
 			if (answer == "accept")
 			{
+				character.Variables.Perm.Set(ScriptureVar, 0);
 				character.Quests.Start(Mq02);
 				await dialog.Msg(L("Oh, the vessel should be completed at the Altar of Stability."));
 				await dialog.Msg(L("I have spent centuries without a body, so I hope you get a decent scripture."));
@@ -582,9 +586,6 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 
 			if (answer == "accept")
 			{
-				character.Variables.Perm.Set(AltarVar + 1, false);
-				character.Variables.Perm.Set(AltarVar + 2, false);
-
 				character.Quests.Start(Mq06);
 				await dialog.Msg(L("You must thoroughly check the writings on the altar."));
 				await dialog.Msg(L("Well then, I will.. wait in the Grand Hall."));
@@ -626,7 +627,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 	/// <param name="z"></param>
 	private void AddSpiritEssence(int number, double x, double z)
 	{
-		AddConditionalNpc(46221, L("Spirit Essence"), "CHATHEDRAL53_MQ01_" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Mq01), async dialog =>
+		AddConditionalNpc(46221, L("Spirit Essence"), "CHATHEDRAL53_MQ01_" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Mq01) && !c.Variables.Perm.GetBool(EssenceVar + number, false), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -638,14 +639,34 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			var gathered = await character.TimeActions.StartAsync(L("Gathering the Spirit Essence..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+			var gathered = await character.TimeActions.StartAsync(L("Checking the Essence"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
 
 			if (gathered != TimeActionResult.Completed)
 				return;
 
 			character.Variables.Perm.Set(EssenceVar + number, true);
 			character.Inventory.Add(ItemId.CHATHEDRAL53_MQ01_ITEM, 1, InventoryAddType.PickUp);
-			character.ServerMessage(LF("Spirit Essence: {0}/{1}", character.Inventory.CountItem(ItemId.CHATHEDRAL53_MQ01_ITEM), SpiritEssencesNeeded));
+
+			if (GameRandom.Get().Next(10) + 1 < 8)
+			{
+				character.AddonMessage(AddonMessage.NOTICE_Dm_GetItem, L("You have obtained the Spirit Essence!"), 5);
+				return;
+			}
+
+			if (ZoneServer.Instance.Data.MonsterDb.TryFind("loftlem_blue", out var monsterData))
+			{
+				var monster = new Mob(monsterData.Id, RelationType.Enemy);
+				monster.Position = new Position((float)x, character.Position.Y, (float)z);
+				monster.SpawnPosition = monster.Position;
+				monster.Components.Add(new LifeTimeComponent(monster, TimeSpan.FromMinutes(2)));
+				monster.Components.Add(new MovementComponent(monster));
+				monster.Components.Add(new AiComponent(monster, "BasicMonster"));
+
+				character.Map.AddMonster(monster);
+				monster.InsertHate(character);
+			}
+
+			character.AddonMessage(AddonMessage.NOTICE_Dm_GetItem, L("You have collected the spirit essence!{nl}The flying dust has attracted the monsters."), 5);
 		});
 	}
 
@@ -667,18 +688,28 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 			dialog.SetTitle(name);
 
 			if (character.Inventory.CountItem(ItemId.CHATHEDRAL53_MQ02_ITEM) > 0)
-			{
-				await dialog.Msg(L("{#666666}*You are already carrying a scripture whole enough to hold a spirit*{/}"));
 				return;
-			}
 
-			var searched = await character.TimeActions.StartAsync(L("Looking the scripture over..."), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
+			var searched = await character.TimeActions.StartAsync(L("Checking the Scripture"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(3));
 
 			if (searched != TimeActionResult.Completed)
 				return;
 
+			var correct = character.Variables.Perm.GetInt(ScriptureVar, 0);
+			if (correct == 0)
+			{
+				correct = GameRandom.Get().Next(6) + 1;
+				character.Variables.Perm.Set(ScriptureVar, correct);
+			}
+
+			if (correct != number)
+			{
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("It's a very old and dirty scripture"), 5);
+				return;
+			}
+
 			character.Inventory.Add(ItemId.CHATHEDRAL53_MQ02_ITEM, 1, InventoryAddType.PickUp);
-			character.ServerMessage(L("The binding is whole and the pages are unburnt. This one will do."));
+			character.PlayEffect("F_pc_making_finish_white", 2f);
 		});
 	}
 
@@ -698,30 +729,43 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Writings on the Altar"));
 
-			await dialog.Msg(firstLine);
-			await dialog.Msg(secondLine);
+			var ident = number == 1 ? "insertMercy" : "insertSalvation";
+			var otherIdent = number == 1 ? "insertSalvation" : "insertMercy";
+			var hint = firstLine + " " + secondLine;
 
-			if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
-				return;
-
-			if (character.Variables.Perm.GetBool(AltarVar + number, false))
-				return;
-
-			var placed = await character.TimeActions.StartAsync(L("Setting the relic into the altar..."), L("Cancel"), "SITGROPESET2", TimeSpan.FromSeconds(2));
-
-			if (placed != TimeActionResult.Completed)
-				return;
-
-			character.Variables.Perm.Set(AltarVar + number, true);
-
-			if (!character.Variables.Perm.GetBool(AltarVar + 1, false) || !character.Variables.Perm.GetBool(AltarVar + 2, false))
+			if (character.Quests.IsActive(Mq06, ident))
 			{
-				character.ServerMessage(L("One altar answers. The other is still silent."));
+				var mercy = Option(L("Insert the Holy Relic of Mercy"), "mercy");
+				var salvation = Option(L("Insert the Holy Relic of Salvation"), "salvation");
+				var correct = number == 1 ? "mercy" : "salvation";
+
+				DialogOption[] options;
+
+				if (!character.Quests.IsActive(Mq06, otherIdent))
+					options = new[] { number == 1 ? mercy : salvation };
+				else
+					options = number == 1 ? new[] { mercy, salvation } : new[] { salvation, mercy };
+
+				var pick = await dialog.Select(hint, options);
+
+				if (pick == correct)
+				{
+					character.Quests.CompleteObjective(Mq06, ident);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("The relic matches the altar!"), 5);
+				}
+				else if (pick != null)
+				{
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("You can't insert the Holy Relic"), 5);
+				}
+
 				return;
 			}
 
-			character.Quests.CompleteObjective(Mq06, "insertRelic");
-			character.ServerMessage(L("Both altars answer, and Maven's Secret stirs."));
+			await dialog.Msg(firstLine);
+			await dialog.Msg(secondLine);
+
+			if (character.Quests.IsActive(Mq06) || character.Quests.HasCompleted(Mq06) || character.Quests.IsCompletable(Mq06))
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("Can see the altar with the holy water"), 5);
 		});
 	}
 
@@ -733,7 +777,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 	/// <param name="z"></param>
 	private void AddScripturalRelic(int number, double x, double z)
 	{
-		AddConditionalNpc(151022, L("Scriptural Relic"), "CHATHEDRAL53_SQ01_OBJECT0" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Sq01), async dialog =>
+		AddConditionalNpc(151022, L("Scriptural Relic"), "CHATHEDRAL53_SQ01_OBJECT0" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Sq01) && !c.Variables.Perm.GetBool(RelicVar + number, false), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -745,7 +789,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			var recovered = await character.TimeActions.StartAsync(L("Recovering the Scriptural Relic..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+			var recovered = await character.TimeActions.StartAsync(L("Recovering the Holy Relic"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
 
 			if (recovered != TimeActionResult.Completed)
 				return;
@@ -765,7 +809,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 	/// <param name="z"></param>
 	private void AddHiddenRelic(int number, double x, double z)
 	{
-		AddConditionalNpc(151022, L("Graceful Relic"), "CATHEDRAL_SQ_OBJECT0" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Sq02) && c.Variables.Perm.GetBool(RevealedRelicVar + number, false), async dialog =>
+		AddConditionalNpc(151022, L("Graceful Relic"), "CATHEDRAL_SQ_OBJECT0" + number, "d_cathedral_53", x, z, 90, c => c.Quests.IsActive(Sq02) && c.Variables.Perm.GetBool(RevealedRelicVar + number, false) && !c.Variables.Perm.GetBool(HiddenRelicVar + number, false), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -777,7 +821,7 @@ public class DCathedral53QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			var recovered = await character.TimeActions.StartAsync(L("Drawing the relic out with the orb..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+			var recovered = await character.TimeActions.StartAsync(L("Recovering the Holy Relic"), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
 
 			if (recovered != TimeActionResult.Completed)
 				return;
@@ -1008,7 +1052,7 @@ public class Cathedral53Mq05Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20303, QuestStatus.Completed));
 
-		AddPityDrop("CHATHEDRAL53_MQ05_ITEM", 0.1f, 20, 1, "loftlem_blue");
+		AddPityDrop("CHATHEDRAL53_MQ05_ITEM", 0.35f, 20, 1, "loftlem_blue");
 
 		AddObjective("retrieveRelic", L("Retrieve the Holy Relic of Salvation by defeating Loftlems"), new CollectItemObjective("CHATHEDRAL53_MQ05_ITEM", 1));
 
@@ -1037,7 +1081,8 @@ public class Cathedral53Mq06Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20304, QuestStatus.Completed));
 
-		AddObjective("insertRelic", L("Insert the Relic of Mercy into the altar at the Small Hall"), new ManualObjective());
+		AddObjective("insertMercy", L("Insert the Relic of Mercy into the altar at the Small Hall"), new ManualObjective());
+		AddObjective("insertSalvation", L("Insert the Relic of Salvation into the altar at the Small Hall"), new ManualObjective());
 
 		AddReward(new ItemReward("CHATHEDRAL53_MQ06_ITEM", 1));
 		AddReward(new ItemReward("expCard8", 2));
@@ -1150,7 +1195,7 @@ public class Cathedral53Sq05Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(128));
 
-		AddPityDrop("CATHEDRAL53_SQ_SAMPLE01", 0.6f, 3, 1, "Colifly");
+		AddPityDrop("CATHEDRAL53_SQ_SAMPLE01", 0.65f, 3, 1, "Colifly");
 
 		AddObjective("collectSamples", L("Obtain demon samples by defeating Colifly"), new CollectItemObjective("CATHEDRAL53_SQ_SAMPLE01", 12));
 
@@ -1180,7 +1225,7 @@ public class Cathedral53Sq06Quest : QuestScript
 		AddPrerequisite(new LevelPrerequisite(128));
 		AddPrerequisite(new QuestStatusPrerequisite(50000, QuestStatus.Completed));
 
-		AddPityDrop("CATHEDRAL53_SQ_SAMPLE02", 0.6f, 3, 1, "loftlem_blue");
+		AddPityDrop("CATHEDRAL53_SQ_SAMPLE02", 0.65f, 3, 1, "loftlem_blue");
 
 		AddObjective("collectSamples", L("Obtain demon samples by defeating Loftlem"), new CollectItemObjective("CATHEDRAL53_SQ_SAMPLE02", 6));
 

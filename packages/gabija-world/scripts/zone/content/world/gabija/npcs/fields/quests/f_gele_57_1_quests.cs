@@ -425,7 +425,11 @@ public class FGele571QuestNpcsScript : GeneralScript
 			TimedAnim = "SITGROPESET",
 			Seconds = 2,
 			IdleMessage = L("Thick sugar beet stems, sweet enough to draw every Panto on the plateau."),
-			OnDone = (character, npc) => character.ServerMessage(L("Removed the Plateau Sugar Beet Stems")),
+			OnDone = (character, npc) =>
+			{
+				npc?.PlayEffect("I_smoke011", 0.2f);
+				character.ServerMessage(L("Removed the Plateau Sugar Beet Stems"));
+			},
 		});
 
 		// Baby Panto

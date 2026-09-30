@@ -220,7 +220,7 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("The circle the tower's magic is steered from."));
-		});
+		}).WithEffect("F_ground018_fire", 5f, EffectLocation.Bottom);
 
 		// Grita, staying behind at the control circle
 		//-------------------------------------------------------------------------

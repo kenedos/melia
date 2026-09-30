@@ -15,6 +15,7 @@ using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
@@ -30,6 +31,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq03 = new QuestId(8603);
 	private readonly static QuestId Mq04 = new QuestId(8604);
 	public const string CharmedKillsVar = "Gabija.Gele574.Mq05.Charmed";
+	public const string SpearmenKillsVar = "Gabija.Gele574.Mq06.Spearmen";
 	private readonly static QuestId Mq05 = new QuestId(8605);
 	private readonly static QuestId Mq06 = new QuestId(8606);
 	private readonly static QuestId Mq07 = new QuestId(8607);
@@ -119,6 +121,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					await dialog.Msg(L("Ah, and if a brainwashed Panto injures an attacking Panto, that Panto will be on our side as well."));
+					character.Variables.Temp.SetInt(SpearmenKillsVar, 0);
 					character.Quests.Start(Mq06);
 					character.Inventory.Add(650709, 1, InventoryAddType.PickUp);
 					character.LookAround();
@@ -370,6 +373,11 @@ public class FGele574QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("The church is sealed. The basement is the way in."));
 		});
 
+		// Barrier over the church entrance
+		//-------------------------------------------------------------------------
+		AddConditionalNpc(MonsterId.Block_Fence, "", "GELE574_ARUNE", "f_gele_57_4", 1283.33, 2141.86, 90, c => !c.Quests.HasCompleted(Chapel576Mq041));
+		AddConditionalNpc(MonsterId.Block_Fence, "", "GELE574_ARUNE_VFX", "f_gele_57_4", 1283.33, 2141.86, 0, c => !c.Quests.HasCompleted(Chapel576Mq041)).WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
+
 		// Small Beehive
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(400121, L("Small Beehive"), "GELE574_MQ_01", "f_gele_57_4", -1017, 2085, 90, c => c.Quests.IsActive(Mq01) && !c.Quests.IsCompletable(Mq01), async dialog =>
@@ -458,6 +466,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			IdleMessage = L("A demon summoning circle, its sigils still whole."),
 			OnDone = (character, npc) =>
 			{
+				npc?.PlayEffect("F_wizard_shoggoth_cast_lineup", 2f);
 				character.ServerMessage(L("You scribbled on the Summoning Magic Circle"));
 
 				if (npc == null)
@@ -466,7 +475,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 				foreach (var demon in character.Map.GetAttackableEnemiesInPosition(character, npc.Position, 100).OfType<Mob>().Where(m => m.Data.ClassName == "zombiegirl2_brown" || m.Data.ClassName == "zigri_yellow").Take(3))
 					character.Map.RemoveMonster(demon);
 			},
-		});
+		}, npc => npc.AddEffect(new AttachEffect("F_ground050_lineup", 7f, EffectLocation.Bottom)));
 
 	}
 
@@ -544,6 +553,8 @@ public class FGele574QuestNpcsScript : GeneralScript
 
 		character.Map.AddMonster(ally, immediate: true);
 		ally.StartBuff(BuffId.GELE574_MQ_06, 1, 0, TimeSpan.FromMinutes(10), character);
+
+		character.Variables.Temp.SetInt(SpearmenKillsVar, character.Variables.Temp.GetInt(SpearmenKillsVar, 0) + 1);
 
 		character.ServerMessage(L("The Panto Archer falls under the talisman's control and fights at your side!"));
 
@@ -730,7 +741,7 @@ public class Gele574Mq06Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8605, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(25));
 
-		AddObjective("controlPantos", L("Control the Pantos and defeat the Large Panto Spearmen"), new ManualObjective());
+		AddObjective("controlPantos", L("Control the Pantos and defeat the Large Panto Spearmen"), new VariableCheckObjective(FGele574QuestNpcsScript.SpearmenKillsVar, 4, isPermanent: false));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new TakeItemReward("GELE574_MQ_06_ITEM"));

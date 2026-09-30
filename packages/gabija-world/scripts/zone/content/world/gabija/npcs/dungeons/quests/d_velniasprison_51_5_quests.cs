@@ -16,6 +16,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
@@ -356,7 +357,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 		AddConditionalNpc(20026, L("Dimensional Crack"), "VPRISON515_MQ_06_NPC", "d_velniasprison_51_5", -2.22, -97.66, 135, this.IsCrackOpen, async dialog =>
 		{
 			await dialog.Msg(L("A tear that goes all the way through, and something on the far side of it that is not this world."));
-		});
+		}).WithEffect("F_bg_light011_red_event", 20f, EffectLocation.Bottom).WithEffect("F_bg_light011_red_event", 20f, EffectLocation.Bottom);
 
 		// Small Dimensional Cracks of the Gavara Isolation District
 		//-------------------------------------------------------------------------
@@ -373,7 +374,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 			Seconds = 3,
 			IdleMessage = L("A crack the width of a finger, and it was not there yesterday."),
 			OnDone = (character, npc) => character.ServerMessage(L("You have removed the small dimensional crack")),
-		});
+		}, npc => npc.AddEffect(new AttachEffect("F_circle026_violet_whitehole_loop", 1f, EffectLocation.Bottom)));
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------
@@ -659,7 +660,7 @@ public class Vprison515Mq06Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(60026, QuestStatus.Completed));
 		AddPrerequisite(new QuestStatusPrerequisite(60025, QuestStatus.Completed));
 
-		AddObjective("guardVakarine", L("Protect Goddess Vakarine"), new ManualObjective());
+		AddObjective("guardVakarine", L("Protect Goddess Vakarine"), new ManualObjective(180));
 	}
 }
 

@@ -45,7 +45,6 @@ public class FBracken632QuestNpcsScript : GeneralScript
 	private const string VillagerStepVar = "Gabija.Bracken632.Hq1.Step";
 	private const string VillagerGoalVar = "Gabija.Bracken632.Hq1.Goal";
 
-	public const string SprayCountVar = "Gabija.Quests.Bracken632Sq040.Sprayed";
 	private const string SprayVar = "Gabija.Quests.Bracken632Sq040.Spray";
 	private const string HerbVar = "Gabija.Quests.Bracken632Sq020.Herb";
 
@@ -133,9 +132,9 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 		// The villagers' traces in the Croa Village
 		//-------------------------------------------------------------------------
-		AddQuestTrigger("BRACKEN632_TRACES01", "f_bracken_63_2", 487.47, 912.14, 60, async args => await this.CheckTrace(args, "checkCenter", L("(There's traces of something having been dragged here.)")));
-		AddQuestTrigger("BRACKEN632_TRACES02", "f_bracken_63_2", 715.17, 873.24, 60, async args => await this.CheckTrace(args, "checkHouse", L("(There's only demon footprints left all over, nothing else.)")));
-		AddQuestTrigger("BRACKEN632_TRACES03", "f_bracken_63_2", 368.82, 581.68, 60, async args => await this.CheckTrace(args, "checkWarehouse", L("(There doesn't seem to be any blood stains here.)")));
+		this.AddTrace("BRACKEN632_TRACES01", 487.47, 912.14, "checkCenter", L("(There's traces of something having been dragged here.)"));
+		this.AddTrace("BRACKEN632_TRACES02", 715.17, 873.24, "checkHouse", L("(There's only demon footprints left all over, nothing else.)"));
+		this.AddTrace("BRACKEN632_TRACES03", 368.82, 581.68, "checkWarehouse", L("(There doesn't seem to be any blood stains here.)"));
 
 		// Anne's beads
 		//-------------------------------------------------------------------------
@@ -503,7 +502,6 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				{
 					for (var i = 1; i <= Aconite.GetLength(0); ++i)
 						character.Variables.Temp.Remove(SprayVar + i);
-					character.Variables.Perm.SetInt(SprayCountVar, 0);
 
 					character.Quests.Start(Sq040);
 					character.LookAround();
@@ -713,21 +711,25 @@ public class FBracken632QuestNpcsScript : GeneralScript
 		=> character.Quests.IsActive(Sq020) && !character.Quests.IsCompletable(Sq020) && !character.Variables.Perm.GetBool(HerbVar + number, false);
 
 	/// <summary>
-	/// Checks one of the places in the Croa Village for traces of the
-	/// villagers.
+	/// Adds one of the villagers' traces that can be investigated.
 	/// </summary>
-	private async Task CheckTrace(TriggerActorArgs args, string objectiveIdent, string observation)
+	private void AddTrace(string uniqueName, double x, double z, string objectiveIdent, string observation)
 	{
-		if (args.Initiator is not Character character)
-			return;
+		AddConditionalNpc(40095, "UnvisibleName", uniqueName, "f_bracken_63_2", x, z, 90, c => c.Quests.IsActive(Mq010, objectiveIdent), async dialog =>
+		{
+			var character = dialog.Player;
 
-		if (!character.Quests.IsActive(Mq010, objectiveIdent))
-			return;
+			if (!character.Quests.IsActive(Mq010, objectiveIdent))
+				return;
 
-		character.Quests.CompleteObjective(Mq010, objectiveIdent);
-		character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, observation, 5);
+			var searched = await character.TimeActions.StartAsync(L("Investigating the evidence"), L("Cancel"), "LOOK", TimeSpan.FromSeconds(1.5));
 
-		await Task.CompletedTask;
+			if (searched != TimeActionResult.Completed)
+				return;
+
+			character.Quests.CompleteObjective(Mq010, objectiveIdent);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, observation, 5);
+		});
 	}
 
 	/// <summary>
@@ -769,9 +771,7 @@ public class FBracken632QuestNpcsScript : GeneralScript
 
 		character.Variables.Temp.SetLong(SprayVar + closest, DateTime.Now.Ticks);
 
-		var sprayed = character.Variables.Perm.GetInt(SprayCountVar, 0) + 1;
-		character.Variables.Perm.SetInt(SprayCountVar, sprayed);
-		character.ServerMessage(LF("Aconite sprayed: {0}/{1}", Math.Min(sprayed, SpraysNeeded), SpraysNeeded));
+		character.Quests.AddObjectiveProgress(Sq040, "sprayAconite");
 
 		return ItemUseResult.Okay;
 	}
@@ -1050,7 +1050,7 @@ public class Bracken632Sq040Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50106, QuestStatus.Completed));
 
-		AddObjective("sprayAconite", L("Spray the Loktanun Fluid on the Aconite"), new VariableCheckObjective(FBracken632QuestNpcsScript.SprayCountVar, 12, isPermanent: true));
+		AddObjective("sprayAconite", L("Spray the Loktanun Fluid on the Aconite"), new ManualObjective(12));
 
 		AddReward(new ItemReward("expCard3", 3));
 		AddReward(new ItemReward("Vis", 200));

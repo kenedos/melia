@@ -310,6 +310,7 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 				{
 					character.Quests.Start(Sq02);
 					await dialog.Msg(L("The door behind me is open. What is on the other side of it was left there to keep the treasure."));
+					character.PlayEffect("F_wizard_increasespeed_cast", 1f);
 					character.Warp("d_zachariel_33", -1532, 684, -480);
 				}
 				return;
@@ -319,6 +320,7 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Tomb Lord is still standing over the treasure."));
 				character.Quests.ClearQuestTrack(Sq02);
+				character.PlayEffect("F_wizard_increasespeed_cast", 1f);
 				character.Warp("d_zachariel_33", -1532, 684, -480);
 				return;
 			}

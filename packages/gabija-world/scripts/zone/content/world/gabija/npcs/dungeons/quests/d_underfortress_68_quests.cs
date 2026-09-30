@@ -439,6 +439,7 @@ public class DUnderfortress68QuestNpcsScript : GeneralScript
 
 		if (taken != TimeActionResult.Completed)
 			return;
+		dialog.Npc.PlayEffect("F_pc_making_finish_white", 2f);
 
 		character.Inventory.Add(ItemId.UNDER68_MQ1_ITEM01, 1, InventoryAddType.PickUp);
 		await dialog.Msg(L("The shell holds, and the weight of it pulls against your hand."));

@@ -31,11 +31,29 @@ public class Zacha1fSq04Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Sends Vekarabes at the player from five points around the regulator, a few at a time.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("DefGroup")
+			.Monster(401081, -1104.02, 332.60, 1521.03, count: 2, respawnSeconds: 10)
+			.Monster(401081, -903.93, 332.60, 1515.20, count: 2, respawnSeconds: 10)
+			.Monster(401081, -907.30, 332.60, 1302.04, count: 2, respawnSeconds: 10)
+			.Monster(401081, -1109.72, 332.60, 1298.93, count: 2, respawnSeconds: 10)
+			.Monster(401081, -1283.34, 347.83, 1458.38, count: 2, respawnSeconds: 10);
+
+		game.Start("DefGroup");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
 			case 0:
+				StartMinigame(character, track);
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);
 				break;

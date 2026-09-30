@@ -444,7 +444,7 @@ public class Thorn20Mq03Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(51));
 
-		AddObjective("killShamans", L("Defeat the Merog Shaman performing a ritual"), new KillObjective(3, "merog_wizzard"));
+		AddObjective("killShamans", L("Defeat the Merog Shaman performing a ritual"), new KillObjective(3, "merog_wizzard") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new SelectItemReward("LEG02_166", "LEG02_167", "LEG02_168"));

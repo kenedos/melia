@@ -5855,9 +5855,9 @@ namespace Melia.Zone.Network
 
 				character.Tracks.HandOver();
 
-				// A track that locked the player into a battle box runs on
-				// into the fight, and ends with the quest, not the cinematic.
-				if (!track.HasBattleBoxInLayer)
+				// A track that locked the player into a battle box, or was told
+				// to be held, runs on into the fight and ends with the quest.
+				if (!track.HasBattleBoxInLayer && !track.HoldOpen)
 					character.Tracks.End(track.Id);
 			}
 		}

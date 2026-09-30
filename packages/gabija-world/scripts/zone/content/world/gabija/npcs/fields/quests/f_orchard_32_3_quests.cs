@@ -155,7 +155,7 @@ public class FOrchard323QuestNpcsScript : GeneralScript
 				return;
 
 			character.Quests.ReplayQuestTrack(Mq05);
-		});
+		}).WithEffect("F_levitation005_dark_blue", 1.5f, EffectLocation.Bottom);
 
 		// The old well south of the workshop
 		//-------------------------------------------------------------------------

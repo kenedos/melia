@@ -24,6 +24,7 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 {
 	private readonly static QuestId Mq010 = new QuestId(50048);
 	private readonly static QuestId Mq020 = new QuestId(50049);
+	private const string GuardVar = "Gabija.Underfortress65.Guard.";
 	private readonly static QuestId Mq030 = new QuestId(50050);
 	private readonly static QuestId Mq040 = new QuestId(50051);
 	private readonly static QuestId Mq050 = new QuestId(50052);
@@ -179,6 +180,9 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
+					foreach (var guardName in GuardNames)
+						character.Variables.Perm.Set(GuardVar + guardName, false);
+
 					character.Quests.Start(Mq030);
 					await dialog.Msg(L("I will get ready to make Resounding Bombs."));
 					await dialog.Msg(L("Just knock them out and bring the bombs. Okay?"));
@@ -312,15 +316,22 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 
 				if (character.Quests.IsActive(Mq040) && !character.Quests.IsCompletable(Mq040))
 				{
-					var set = await character.TimeActions.StartAsync(L("Setting the Resounding Bomb..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+					if (!character.Quests.IsActive(Mq040, "setBomb" + number))
+					{
+						character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("This is the place where the Resounding Bomb is already set"), 4);
+						return;
+					}
+
+					var set = await character.TimeActions.StartAsync(L("Setting the bomb"), L("Cancel"), "BURY", TimeSpan.FromSeconds(1));
 
 					if (set != TimeActionResult.Completed)
 						return;
 
 					character.Inventory.RemoveItem(ItemId.UNDERFORTRESS65_MQ04_BOOM, 1);
 					character.Quests.CompleteObjective(Mq040, "setBomb" + number);
+					dialog.Npc.PlayEffect("F_smoke046", 0.5f);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've set the Resounding Bomb"), 4);
 					character.LookAround();
-					character.ServerMessage(L("The Resounding Bomb is set."));
 					return;
 				}
 
@@ -408,19 +419,20 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Inventory.CountItem(ItemId.UNDERFORTRESS65_MQ03_DRUG) >= BombsNeeded)
+		if (character.Variables.Perm.GetBool(GuardVar + dialog.Npc.UniqueName, false))
 		{
-			await dialog.Msg(L("You have as many bombs as Amanda asked for."));
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("This guard doesn't have a bomb"), 4);
 			return;
 		}
 
-		var robbed = await character.TimeActions.StartAsync(L("Taking the bombs off the guard..."), L("Cancel"), "HANDLING_LEFT", TimeSpan.FromSeconds(3));
+		var robbed = await character.TimeActions.StartAsync(L("Searching for the Bomb"), L("Cancel"), "SITGROPE2_LOOP", TimeSpan.FromSeconds(1));
 
 		if (robbed != TimeActionResult.Completed)
 			return;
 
+		character.Variables.Perm.Set(GuardVar + dialog.Npc.UniqueName, true);
 		character.Inventory.Add(ItemId.UNDERFORTRESS65_MQ03_DRUG, 1, InventoryAddType.PickUp);
-		await dialog.Msg(L("He goes down quietly, and his pack comes away with a bomb in it."));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Found the bomb"), 4);
 	}
 
 	/// <summary>

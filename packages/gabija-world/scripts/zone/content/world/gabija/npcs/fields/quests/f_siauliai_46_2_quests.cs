@@ -604,6 +604,7 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 				if (looked != TimeActionResult.Completed)
 					return;
 
+				dialog.Npc.PlayEffect("F_lineup003", 3f);
 				character.Quests.StartQuestTrack(Sq01);
 				return;
 			}
@@ -828,6 +829,7 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 
 		if (cut != TimeActionResult.Completed)
 			return;
+		dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f);
 
 		character.Inventory.Add(ItemId.SIAULIAI_46_2_MQ_01_ITEM, 1, InventoryAddType.PickUp);
 		await dialog.Msg(L("The branch comes away clean, and the cut smells of honey."));
@@ -859,6 +861,7 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 
 		if (split != TimeActionResult.Completed)
 			return;
+		dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f);
 
 		character.Inventory.Add(ItemId.SIAULIAI_46_2_SQ_03_ITEM, 2, InventoryAddType.PickUp);
 		await dialog.Msg(L("You split a couple of planks off the pile."));

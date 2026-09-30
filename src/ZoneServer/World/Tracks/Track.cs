@@ -63,6 +63,12 @@ namespace Melia.Zone.World.Tracks
 		/// </summary>
 		public Character Owner { get; set; }
 
+		/// <summary>
+		/// Gets or sets whether the track runs on past its cutscene, ending
+		/// with the quest instead.
+		/// </summary>
+		public bool HoldOpen { get; internal set; }
+
 		private bool _hasBattleBoxInLayer;
 
 		/// <summary>

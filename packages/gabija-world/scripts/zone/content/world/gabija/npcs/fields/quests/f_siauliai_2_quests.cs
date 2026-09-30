@@ -662,6 +662,7 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			if (result != TimeActionResult.Completed)
 				return;
 
+			dialog.Npc.PlayEffect("F_pc_making_finish_white", 2f);
 			character.Variables.Perm.Set(SupplyCrateVar + number, true);
 
 			var recovered = 0;

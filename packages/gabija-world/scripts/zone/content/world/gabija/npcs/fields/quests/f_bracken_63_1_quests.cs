@@ -32,7 +32,6 @@ public class FBracken631QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq050 = new QuestId(50098);
 	private readonly static QuestId Rp1 = new QuestId(60155);
 
-	public const string MerchantCountVar = "Gabija.Quests.Bracken631Mq030.Merchants";
 	private const string MerchantVar = "Gabija.Quests.Bracken631Mq030.Merchant";
 	private const string BagVar = "Gabija.Quests.Bracken631Sq010.Bag";
 	private const string GrassVar = "Gabija.Quests.Bracken631Sq030.Grass";
@@ -213,7 +212,6 @@ public class FBracken631QuestNpcsScript : GeneralScript
 				{
 					for (var i = 1; i <= 3; ++i)
 						character.Variables.Perm.Set(MerchantVar + i, false);
-					character.Variables.Perm.SetInt(MerchantCountVar, 0);
 
 					character.Quests.Start(Mq030);
 					character.Inventory.Add(ItemId.BRACKEN631_MQ3_ITEM01, 1, InventoryAddType.PickUp);
@@ -322,11 +320,16 @@ public class FBracken631QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq010) || character.Quests.IsCompletable(Sq010) || character.Variables.Perm.GetBool(BagVar + number, false))
 						return;
 
+					var packed = await character.TimeActions.StartAsync(L("Packing up"), L("Cancel"), "SITGROPESET", TimeSpan.FromSeconds(1.5));
+
+					if (packed != TimeActionResult.Completed)
+						return;
+
 					character.Variables.Perm.Set(BagVar + number, true);
 					character.Inventory.Add(ItemId.BRACKEN631_SQ1_ITEM01, 1, InventoryAddType.PickUp);
+					dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_GetItem, L("You've found Andres' Package!"), 5);
 					character.LookAround();
-
-					await Task.CompletedTask;
 				});
 		}
 
@@ -717,14 +720,16 @@ public class FBracken631QuestNpcsScript : GeneralScript
 		if (!IsMerchantHiding(character, number))
 			return;
 
+		var told = await character.TimeActions.StartAsync(L("Explaining to return to Rose"), L("Cancel"), "TALK", TimeSpan.FromSeconds(1.5));
+
+		if (told != TimeActionResult.Completed)
+			return;
+
 		await dialog.Msg(greeting);
 		await dialog.Msg(farewell);
 
 		character.Variables.Perm.Set(MerchantVar + number, true);
-		var found = character.Variables.Perm.GetInt(MerchantCountVar, 0) + 1;
-		character.Variables.Perm.SetInt(MerchantCountVar, found);
-
-		character.ServerMessage(LF("Merchants found: {0}/{1}", Math.Min(found, 3), 3));
+		character.Quests.AddObjectiveProgress(Mq030, "findMerchants");
 		character.LookAround();
 	}
 }
@@ -812,7 +817,7 @@ public class Bracken631Mq030Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50091, QuestStatus.Completed));
 
-		AddObjective("findMerchants", L("Find the merchants with Laswi"), new VariableCheckObjective(FBracken631QuestNpcsScript.MerchantCountVar, 3, isPermanent: true));
+		AddObjective("findMerchants", L("Find the merchants with Laswi"), new ManualObjective(3));
 
 		AddReward(new ItemReward("expCard2", 3));
 		AddReward(new ItemReward("Vis", 210));

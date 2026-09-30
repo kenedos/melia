@@ -37,11 +37,27 @@ public class Thorn20Mq03Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Places the three shamans performing the ritual.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("DefGroup")
+			.Monster(41439, -882.75, 517.65, 898.77, aggressive: false)
+			.Monster(41439, -743.45, 518.30, 1037.93, aggressive: false)
+			.Monster(41439, -911.36, 518.30, 1052.88, aggressive: false);
+
+		game.Start("DefGroup");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
 			case 0:
+				StartMinigame(character, track);
 				track.Actors[0].AttachEffect("F_ground122_dark", 2, EffectLocation.Bottom);
 				track.Actors[0].AttachEffect("F_bg_smoke003", 1.4f, EffectLocation.Bottom);
 				break;

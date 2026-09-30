@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -30,28 +32,13 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq040 = new QuestId(50132);
 	private readonly static QuestId Sq050 = new QuestId(50133);
 
-	public const string StoneCountVar = "Gabija.Quests.Abbay642Mq020.Stones";
-	private const string StoneVar = "Gabija.Quests.Abbay642Mq020.Stone";
-	public const string BelongingCountVar = "Gabija.Quests.Abbay642Sq020.Belongings";
-	private const string BelongingVar = "Gabija.Quests.Abbay642Sq020.Belonging";
-	private const string FragmentVar = "Gabija.Quests.Abbay642Sq040.Fragment";
-	public const string RelicCountVar = "Gabija.Quests.Abbay642Sq050.Relics";
 	private const string RelicVar = "Gabija.Quests.Abbay642Sq050.Relic";
-
-	private static readonly double[,] Stones =
-	{
-		{ -626.12, -1187.33 }, { -604.76, -1390.77 }, { -414.76, -1400.41 }, { -423.19, -1193.47 },
-	};
+	private const string DefenseHitsVar = "Gabija.Quests.Abbay642Mq040.DefenseHits";
+	private const int DefenseHitsNeeded = 10;
 
 	private static readonly double[,] Belongings =
 	{
 		{ -493.83, 2017.71, 6 }, { -584.59, 2325.93, -30 }, { -811.94, 2223.25, -9 }, { -859.06, 1961.80, -29 },
-	};
-
-	private static readonly double[,] Fragments =
-	{
-		{ 901.02, 1273.66 }, { 899.23, 1029.13 }, { 815.78, 1564.17 }, { 1115.54, 1679.46 }, { 1116.20, 1442.01 },
-		{ 604.71, 1644.89 }, { 535.81, 1384.64 },
 	};
 
 	private static readonly double[,] RelicSpots =
@@ -113,6 +100,23 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Edmundas"));
 
+			if (character.Quests.IsActive(Mq010) && !character.Quests.IsCompletable(Mq010))
+			{
+				await dialog.Msg(L("Are you here to... save me?"));
+				await dialog.Msg(L("Yes, I'm Edmundas but... um..."));
+				await dialog.Msg(L("Rose... in such a dangerous place?"));
+				await dialog.Msg(L("No... Rose... please take her and run away now..."));
+
+				var asked = await character.TimeActions.StartAsync(L("Asking about his identity"), L("Cancel"), "TALK", TimeSpan.FromSeconds(1.2));
+
+				if (asked != TimeActionResult.Completed)
+					return;
+
+				character.Quests.CompleteObjective(Mq010, "findEdmundas");
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've found Edmundas{nl}Tell Rose about this"), 3);
+				return;
+			}
+
 			if (character.Quests.IsCompletable(Mq030))
 			{
 				await dialog.Msg(L("Rose... she's...! That's why I told her to run... Why didn't she listen to me..."));
@@ -144,7 +148,11 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
+					character.Variables.Temp.SetInt(DefenseHitsVar + 1, 0);
+					character.Variables.Temp.SetInt(DefenseHitsVar + 2, 0);
 					character.Quests.Start(Mq040);
+				}
 
 				return;
 			}
@@ -167,10 +175,8 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 			if (args.Initiator is not Character character)
 				return;
 
-			if (!character.Quests.IsActive(Mq010, "findEdmundas"))
-				return;
-
-			character.Quests.CompleteObjective(Mq010, "findEdmundas");
+			if (character.Quests.IsActive(Mq010, "findEdmundas"))
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You caught up with someone who looks like Edmundas{nl}Talk with him"), 3);
 
 			await Task.CompletedTask;
 		});
@@ -203,10 +209,6 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					for (var i = 1; i <= Stones.GetLength(0); ++i)
-						character.Variables.Perm.Set(StoneVar + i, false);
-					character.Variables.Perm.SetInt(StoneCountVar, 0);
-
 					character.Quests.Start(Mq020);
 					character.LookAround();
 				}
@@ -235,30 +237,32 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 		// Magic Generating Stones in the inner State Chamber
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < Stones.GetLength(0); ++i)
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var number = i + 1;
+			Prefix = "ABBEY642_DEVICE",
+			MonsterId = 151057,
+			Name = "UnvisibleName",
+			Map = "d_abbey_64_2",
+			Points = [(-626.12, -1187.33, 90), (-604.76, -1390.77, 90), (-414.76, -1400.41, 90), (-423.19, -1193.47, 90)],
+			IsActive = c => c.Quests.IsActive(Mq020) && !c.Quests.IsCompletable(Mq020),
+			TimedLabel = L("Destroying the Crystal Pillar"),
+			TimedAnim = "ABSORB",
+			Seconds = 1.2,
+			OnDone = (character, npc) =>
+			{
+				character.Quests.AddObjectiveProgress(Mq020, "destroyStones");
+				npc?.PlayEffect("F_explosion014", 1f);
 
-			AddConditionalNpc(151057, "UnvisibleName", "ABBEY642_DEVICE0" + number, "d_abbey_64_2", Stones[i, 0], Stones[i, 1], 90,
-				character => !character.Quests.HasCompleted(Mq020) && !character.Variables.Perm.GetBool(StoneVar + number, false),
-				async dialog =>
+				if (Random(1, 10) > 3)
 				{
-					var character = dialog.Player;
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've destroyed the Crystal Pillar!"), 3);
+					return;
+				}
 
-					if (!character.Quests.IsActive(Mq020) || character.Quests.IsCompletable(Mq020) || character.Variables.Perm.GetBool(StoneVar + number, false))
-						return;
-
-					character.Variables.Perm.Set(StoneVar + number, true);
-					var destroyed = character.Variables.Perm.GetInt(StoneCountVar, 0) + 1;
-					character.Variables.Perm.SetInt(StoneCountVar, destroyed);
-
-					dialog.Npc.PlayEffect("F_explosion014", 1f);
-					character.ServerMessage(LF("Crystal pillars destroyed: {0}/{1}", Math.Min(destroyed, 4), 4));
-					character.LookAround();
-
-					await Task.CompletedTask;
-				});
-		}
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("You have destroyed the Crystal Pillar!{nl}The evil energy coming from it is affecting you."), 3);
+				_ = PoisonAsync(character, npc);
+			},
+		});
 
 		// The device holding Edmundas' shackles
 		//-------------------------------------------------------------------------
@@ -269,10 +273,21 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 			if (!character.Quests.IsActive(Mq040, "releaseShackles"))
 				return;
 
-			dialog.Npc.PlayEffect("F_light018_yellow", 1f);
-			character.Quests.CompleteObjective(Mq040, "releaseShackles");
+			var stopped = await character.TimeActions.StartAsync(L("Stopping the Demonic Power Vessel"), L("Cancel"), "ABSORB", TimeSpan.FromSeconds(1.2));
 
-			await Task.CompletedTask;
+			if (stopped != TimeActionResult.Completed)
+				return;
+
+			if (!character.IsBuffActive(BuffId.ABBEY642_MQ4_BUFF1) || !character.IsBuffActive(BuffId.ABBEY642_MQ4_BUFF2))
+			{
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("The defense device is running"), 3);
+				character.TakeSimpleHit(70, dialog.Npc);
+				return;
+			}
+
+			dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f);
+			character.Quests.CompleteObjective(Mq040, "releaseShackles");
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Demonic Power Vessel has been stopped"), 3);
 		});
 
 		// Experiment Victim Hilbeth
@@ -331,10 +346,6 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					for (var i = 1; i <= Belongings.GetLength(0); ++i)
-						character.Variables.Perm.Set(BelongingVar + i, false);
-					character.Variables.Perm.SetInt(BelongingCountVar, 0);
-
 					character.Quests.Start(Sq020);
 					character.LookAround();
 
@@ -408,10 +419,15 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 			if (!character.Quests.IsActive(Sq010) || character.Quests.IsCompletable(Sq010))
 				return;
 
-			character.Inventory.Add(ItemId.ABBAY642_SQ1_ITEM, 1, InventoryAddType.PickUp);
-			character.LookAround();
+			var checkedBag = await character.TimeActions.StartAsync(L("Checking the backpack"), L("Cancel"), "SITGROPESET", TimeSpan.FromSeconds(1.2));
 
-			await Task.CompletedTask;
+			if (checkedBag != TimeActionResult.Completed)
+				return;
+
+			character.Inventory.Add(ItemId.ABBAY642_SQ1_ITEM, 1, InventoryAddType.PickUp);
+			dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f, heightOffset: EffectLocation.Top);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("This is Hilbeth's backpack, because the bag contains herbs"), 3);
+			character.LookAround();
 		});
 
 		AddNpc(47160, "UnvisibleName", "d_abbey_64_2", 1413.19, 307.71, 19);
@@ -421,27 +437,33 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 		// The piles of bracken at the Collapsed Grand Corridor
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < Belongings.GetLength(0); ++i)
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var number = i + 1;
+			Prefix = "ABBEY642_BRACKEN",
+			MonsterId = 153116,
+			Name = "UnvisibleName",
+			Map = "d_abbey_64_2",
+			Points = [(Belongings[0, 0], Belongings[0, 1], Belongings[0, 2]), (Belongings[1, 0], Belongings[1, 1], Belongings[1, 2]), (Belongings[2, 0], Belongings[2, 1], Belongings[2, 2]), (Belongings[3, 0], Belongings[3, 1], Belongings[3, 2])],
+			IsActive = c => c.Quests.IsActive(Sq020) && !c.Quests.IsCompletable(Sq020),
+			TimedLabel = L("Checking the suspicous pile of brackens"),
+			TimedAnim = "SITGROPESET",
+			Seconds = 1.2,
+			OnDone = (character, npc) =>
+			{
+				var number = int.Parse(npc.UniqueName.Substring(npc.UniqueName.LastIndexOf('_') + 1)) + 1;
 
-			AddConditionalNpc(153116, "UnvisibleName", "ABBEY642_BRACKEN0" + number, "d_abbey_64_2", Belongings[i, 0], Belongings[i, 1], Belongings[i, 2],
-				character => character.Quests.IsActive(Sq020) && !character.Quests.IsCompletable(Sq020) && !character.Variables.Perm.GetBool(BelongingVar + number, false),
-				async dialog =>
+				if (character.Inventory.CountItem(BelongingItemId(number)) > 0)
 				{
-					var character = dialog.Player;
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("Nothing was found"), 3);
+					return;
+				}
 
-					if (!character.Quests.IsActive(Sq020) || character.Quests.IsCompletable(Sq020) || character.Variables.Perm.GetBool(BelongingVar + number, false))
-						return;
-
-					character.Variables.Perm.Set(BelongingVar + number, true);
-					character.Variables.Perm.SetInt(BelongingCountVar, character.Variables.Perm.GetInt(BelongingCountVar, 0) + 1);
-					character.Inventory.Add(BelongingItemId(number), 1, InventoryAddType.PickUp);
-					character.LookAround();
-
-					await dialog.Msg(BelongingText(number));
-				});
-		}
+				character.Inventory.Add(BelongingItemId(number), 1, InventoryAddType.PickUp);
+				character.Quests.AddObjectiveProgress(Sq020, "searchCorridor");
+				npc.PlayEffect("F_pc_making_finish_white", 1f, heightOffset: EffectLocation.Top);
+				character.ServerMessage(BelongingText(number));
+			},
+		});
 
 		AddNpc(153116, "UnvisibleName", "d_abbey_64_2", -603.64, 2184.68, -9);
 		AddNpc(153116, "UnvisibleName", "d_abbey_64_2", -577.34, 1952.41, 1);
@@ -482,9 +504,6 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					for (var i = 1; i <= Fragments.GetLength(0); ++i)
-						character.Variables.Perm.Set(FragmentVar + i, false);
-
 					character.Quests.Start(Sq040);
 					character.LookAround();
 				}
@@ -504,7 +523,6 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 				{
 					for (var i = 1; i <= RelicSpots.GetLength(0); ++i)
 						character.Variables.Perm.Set(RelicVar + i, false);
-					character.Variables.Perm.SetInt(RelicCountVar, 0);
 
 					character.Quests.Start(Sq050);
 					character.Inventory.Add(ItemId.ABBAY642_SQ5_ITEM01, 1, InventoryAddType.PickUp);
@@ -535,26 +553,24 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 		// Holy relic fragments at Gaile Chapel
 		//-------------------------------------------------------------------------
-		for (var i = 0; i < Fragments.GetLength(0); ++i)
+		QuestSpots.Add(new QuestSpotSpec
 		{
-			var number = i + 1;
-
-			AddConditionalNpc(151022, L("Holy Relic Fragment"), "ABBEY642_ORB_" + number, "d_abbey_64_2", Fragments[i, 0], Fragments[i, 1], 90,
-				character => character.Quests.IsActive(Sq040) && !character.Quests.IsCompletable(Sq040) && !character.Variables.Perm.GetBool(FragmentVar + number, false),
-				async dialog =>
-				{
-					var character = dialog.Player;
-
-					if (!character.Quests.IsActive(Sq040) || character.Quests.IsCompletable(Sq040) || character.Variables.Perm.GetBool(FragmentVar + number, false))
-						return;
-
-					character.Variables.Perm.Set(FragmentVar + number, true);
-					character.Inventory.Add(ItemId.ABBAY642_SQ4_ITEM01, 1, InventoryAddType.PickUp);
-					character.LookAround();
-
-					await Task.CompletedTask;
-				});
-		}
+			Prefix = "ABBEY642_ORB",
+			MonsterId = 151022,
+			Name = L("Holy Relic Fragment"),
+			Map = "d_abbey_64_2",
+			Points = [(901.02, 1273.66, 90), (899.23, 1029.13, 90), (815.78, 1564.17, 90), (1115.54, 1679.46, 90), (1116.20, 1442.01, 90), (604.71, 1644.89, 90), (535.81, 1384.64, 90)],
+			IsActive = c => c.Quests.IsActive(Sq040) && !c.Quests.IsCompletable(Sq040),
+			TimedLabel = L("Retrieving a Holy Relic fragment"),
+			TimedAnim = "SITGROPESET",
+			Seconds = 2,
+			OnDone = (character, npc) =>
+			{
+				character.Inventory.Add(ItemId.ABBAY642_SQ4_ITEM01, 1, InventoryAddType.PickUp);
+				npc?.PlayEffect("F_pc_making_finish_white", 1f, heightOffset: EffectLocation.Top);
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Acquired a Holy Relic fragment"), 3);
+			},
+		});
 
 		// The Novaha Relics placed around the monastery
 		//-------------------------------------------------------------------------
@@ -564,27 +580,77 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 			AddConditionalNpc(153026, L("Novaha Relic"), "ABBEY642_ORB_SET0" + number, "d_abbey_64_2", RelicSpots[i, 0], RelicSpots[i, 1], RelicSpots[i, 2],
 				character => character.Quests.HasCompleted(Sq050) || (character.Quests.IsActive(Sq050) && character.Variables.Perm.GetBool(RelicVar + number, false)));
+		}
 
-			AddQuestTrigger("ABBEY642_ORB_SETUP0" + number, "d_abbey_64_2", RelicSpots[i, 0], RelicSpots[i, 1], 60, async args =>
+		QuestSpots.Add(new QuestSpotSpec
+		{
+			Prefix = "ABBEY642_ORB_SETUP",
+			MonsterId = 40095,
+			Name = "UnvisibleName",
+			Map = "d_abbey_64_2",
+			Points = [(RelicSpots[0, 0], RelicSpots[0, 1], RelicSpots[0, 2]), (RelicSpots[1, 0], RelicSpots[1, 1], RelicSpots[1, 2]), (RelicSpots[2, 0], RelicSpots[2, 1], RelicSpots[2, 2])],
+			IsActive = c => c.Quests.IsActive(Sq050) && !c.Quests.IsCompletable(Sq050),
+			Requirement = c => c.Inventory.CountItem(ItemId.ABBAY642_SQ5_ITEM01) == 0 ? L("You need the holy relic Monk Abels gave you.") : null,
+			TimedLabel = L("Placing the Holy Relic"),
+			TimedAnim = "BURY",
+			Seconds = 1.2,
+			OnDone = (character, npc) =>
 			{
-				if (args.Initiator is not Character character)
-					return;
-
-				if (!character.Quests.IsActive(Sq050) || character.Quests.IsCompletable(Sq050) || character.Variables.Perm.GetBool(RelicVar + number, false))
-					return;
-
-				if (character.Inventory.CountItem(ItemId.ABBAY642_SQ5_ITEM01) == 0)
-					return;
+				var number = int.Parse(npc.UniqueName.Substring(npc.UniqueName.LastIndexOf('_') + 1)) + 1;
 
 				character.Variables.Perm.Set(RelicVar + number, true);
-				var placed = character.Variables.Perm.GetInt(RelicCountVar, 0) + 1;
-				character.Variables.Perm.SetInt(RelicCountVar, placed);
+				character.Quests.AddObjectiveProgress(Sq050, "placeRelics");
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Holy Relic has begun purifying the monastery"), 3);
+			},
+		});
+	}
 
-				character.ServerMessage(LF("Holy relics placed: {0}/{1}", Math.Min(placed, 3), 3));
-				character.LookAround();
+	/// <summary>
+	/// Counts an attack on one of the two defense devices, breaking it for
+	/// the attacker once it took enough.
+	/// </summary>
+	/// <param name="attacker"></param>
+	/// <param name="device">1 or 2, the device that was attacked.</param>
+	public static void OnDefenseHit(ICombatEntity attacker, int device)
+	{
+		if (attacker is not Character character || !character.Quests.IsActive(Mq040) || character.Quests.IsCompletable(Mq040))
+			return;
 
-				await Task.CompletedTask;
-			});
+		var buff = device == 1 ? BuffId.ABBEY642_MQ4_BUFF1 : BuffId.ABBEY642_MQ4_BUFF2;
+
+		if (character.IsBuffActive(buff))
+			return;
+
+		var hits = character.Variables.Temp.GetInt(DefenseHitsVar + device, 0);
+
+		if (hits < DefenseHitsNeeded)
+		{
+			character.Variables.Temp.SetInt(DefenseHitsVar + device, hits + 1);
+			return;
+		}
+
+		character.StartBuff(buff, TimeSpan.FromHours(1));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("The defense device has been broken"), 3);
+	}
+
+	/// <summary>
+	/// Poisons the character for a few seconds after a crystal pillar's evil energy hit them.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <param name="source"></param>
+	private static async Task PoisonAsync(Character character, IActor source)
+	{
+		character.StartBuff(BuffId.ABBEY642_MQ2_BUFF, 3, 0, TimeSpan.FromSeconds(5), source);
+
+		for (var i = 0; i < 5 && character.Map != null && !character.IsDead; ++i)
+		{
+			await Task.Delay(TimeSpan.FromSeconds(1));
+
+			if (character.Map == null || character.IsDead)
+				return;
+
+			character.TakeSimpleHit(70, source);
+			character.PlayEffect("F_fire018_purple", 1f);
 		}
 	}
 
@@ -667,7 +733,7 @@ public class Abbay642Mq020Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50125, QuestStatus.Completed));
 
-		AddObjective("destroyStones", L("Destroy the reason that is causing Edmundas' pain"), new VariableCheckObjective(DAbbey642QuestNpcsScript.StoneCountVar, 4, isPermanent: true));
+		AddObjective("destroyStones", L("Destroy the reason that is causing Edmundas' pain"), new ManualObjective(4));
 
 		AddReward(new ItemReward("expCard3", 3));
 	}
@@ -774,7 +840,7 @@ public class Abbay642Sq020Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50129, QuestStatus.Completed));
 
-		AddObjective("searchCorridor", L("Search the Collapsed Grand Corridor"), new VariableCheckObjective(DAbbey642QuestNpcsScript.BelongingCountVar, 4, isPermanent: true));
+		AddObjective("searchCorridor", L("Search the Collapsed Grand Corridor"), new ManualObjective(4));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new TakeItemReward("ABBAY642_SQ41_ITEM01", -1));
@@ -857,7 +923,7 @@ public class Abbay642Sq050Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50132, QuestStatus.Completed));
 
-		AddObjective("placeRelics", L("Place the Holy Relics to purify the monastery"), new VariableCheckObjective(DAbbey642QuestNpcsScript.RelicCountVar, 3, isPermanent: true));
+		AddObjective("placeRelics", L("Place the Holy Relics to purify the monastery"), new ManualObjective(3));
 
 		AddReward(new ItemReward("expCard3", 3));
 		AddReward(new TakeItemReward("ABBAY642_SQ5_ITEM01", 1));

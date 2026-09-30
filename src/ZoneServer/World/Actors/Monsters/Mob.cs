@@ -209,6 +209,12 @@ namespace Melia.Zone.World.Actors.Monsters
 		public event Action<Mob, ICombatEntity> Died;
 
 		/// <summary>
+		/// Raised when the monster took damage from an attacker, with the
+		/// amount that was dealt.
+		/// </summary>
+		public event Action<Mob, ICombatEntity, float> Damaged;
+
+		/// <summary>
 		/// Data entry for this monster.
 		/// </summary>
 		public MonsterData Data { get; private set; }
@@ -386,12 +392,10 @@ namespace Melia.Zone.World.Actors.Monsters
 			}
 		}
 
-		private const float ShieldDamageRate = 5;
+		private const float ShieldDamageRate = 2.5f;
 		private const float ShieldRegenRate = 0.05f;
 		private const float ShieldHpDamageRate = 0.5f;
-		private const float BossShieldBaseRate = 100;
-		private const float BossShieldRatePerLevel = 1;
-		private const float BossShieldMaxRate = 200;
+		private const float BossShieldRate = 100;
 		private static readonly TimeSpan ShieldRefillDelay = TimeSpan.FromSeconds(15);
 
 		private readonly object _shieldLock = new();
@@ -480,7 +484,7 @@ namespace Melia.Zone.World.Actors.Monsters
 
 			if (this.Rank == MonsterRank.Boss)
 			{
-				this.Properties.SetFloat(PropertyName.ShieldRate, Math.Min(BossShieldMaxRate, BossShieldBaseRate + _cachedLevel * BossShieldRatePerLevel));
+				this.Properties.SetFloat(PropertyName.ShieldRate, BossShieldRate);
 				this.Shield = this.MaxShield;
 				this.Properties.AutoUpdateMax(PropertyName.Shield, PropertyName.MShield);
 			}
@@ -568,6 +572,9 @@ namespace Melia.Zone.World.Actors.Monsters
 			// attacker.
 			if (attacker != null)
 				this.Components.Get<CombatComponent>()?.RegisterHit(attacker, damage);
+
+			if (attacker != null)
+				this.Damaged?.Invoke(this, attacker, damage);
 
 			if (this.Hp == 0)
 				this.Kill(attacker);
@@ -797,6 +804,7 @@ namespace Melia.Zone.World.Actors.Monsters
 		public void Cleanup()
 		{
 			this.Died = null;
+			this.Damaged = null;
 			_dropBeneficiary = null;
 			_pendingDrops = null;
 			_preRollBeneficiary = null;

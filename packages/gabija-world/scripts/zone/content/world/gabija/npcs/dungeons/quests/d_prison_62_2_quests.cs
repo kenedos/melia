@@ -537,7 +537,7 @@ public class DPrison622QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq02))
 				character.ServerMessage(LF("The idol's evil energy: {0}/{1}", character.Variables.Perm.GetInt(IdolEnergyVar, 0), IdolEnergyNeeded));
-		});
+		}).WithEffect("F_pattern008_violet_loop", 1f, EffectLocation.Bottom);
 
 		// Draznie's crystals
 		//-------------------------------------------------------------------------
@@ -580,6 +580,8 @@ public class DPrison622QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq01) || character.Quests.IsCompletable(Sq01) || character.Variables.Perm.GetBool(PowderVar + number, false))
 						return;
 
+					dialog.Npc.PlayEffect("F_ground012_light", 0.1f);
+					dialog.Npc.PlayEffect("F_pc_making_finish_orange", 2f);
 					character.Variables.Perm.Set(PowderVar + number, true);
 					character.Inventory.Add(ItemId.PRISON622_SQ_01_ITEM, 1, InventoryAddType.PickUp);
 					character.LookAround();
@@ -628,6 +630,7 @@ public class DPrison622QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Rp1) || character.Quests.IsCompletable(Rp1) || character.Variables.Perm.GetBool(FaultyTrapVar + number, false))
 						return;
 
+					dialog.Npc.PlayEffect("F_pc_making_finish_white", 2f);
 					character.Variables.Perm.Set(FaultyTrapVar + number, true);
 					character.Inventory.Add(ItemId.PRISON622_RP_1_ITEM, 1, InventoryAddType.PickUp);
 					character.LookAround();
@@ -639,7 +642,7 @@ public class DPrison622QuestNpcsScript : GeneralScript
 		// The fences closing off the prison until the idol is destroyed
 		//-------------------------------------------------------------------------
 		for (var i = 0; i < Fences.GetLength(0); ++i)
-			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON622_MQ_02_WALL_" + (i + 1), "d_prison_62_2", Fences[i, 0], Fences[i, 1], Fences[i, 2], c => !c.Quests.HasCompleted(Mq02));
+			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON622_MQ_02_WALL_" + (i + 1), "d_prison_62_2", Fences[i, 0], Fences[i, 1], Fences[i, 2], c => !c.Quests.HasCompleted(Mq02)).WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
 	}
 
 	/// <summary>

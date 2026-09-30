@@ -793,7 +793,7 @@ public class Abbay643Sq030Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50139, QuestStatus.Completed));
 
-		AddObjective("craftCrystal", L("Craft a Protection Barrier Crystal"), new CollectItemObjective("ABBAY643_SQ4_ITEM1", 1));
+		AddObjective("craftCrystal", L("Craft a Protection Barrier Crystal"), new ItemMeterObjective("ABBAY643_SQ3_ITEM01", "ABBAY643_SQ4_ITEM1", 10));
 		AddPityDrop("ABBAY643_SQ3_ITEM01", 0.5f, 4, 1, "Sec_Deadbornscab");
 
 		AddReward(new ItemReward("expCard3", 3));

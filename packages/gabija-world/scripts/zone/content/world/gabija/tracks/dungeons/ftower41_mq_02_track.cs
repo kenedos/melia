@@ -17,18 +17,6 @@ using static Melia.Zone.Scripting.Shortcuts;
 [TrackScript("FTOWER41_MQ_02_TRACK")]
 public class Ftower41Mq02Track : TrackScript
 {
-	private readonly static double[,] PhyraconSpots =
-	{
-		{ -1860, -1250 }, { -1750, -1180 }, { -1480, -1200 },
-		{ -1370, -1300 }, { -1400, -1560 }, { -1520, -1640 },
-	};
-
-	private readonly static double[,] DrakeSpots =
-	{
-		{ -1880, -1420 }, { -1810, -1560 }, { -1680, -1660 }, { -1550, -1180 },
-		{ -1330, -1440 }, { -1740, -1300 }, { -1460, -1660 }, { -1900, -1560 },
-	};
-
 	protected override void Load()
 	{
 		SetId("FTOWER41_MQ_02_TRACK");
@@ -46,15 +34,54 @@ public class Ftower41Mq02Track : TrackScript
 		actors.Add(AddTrackActor(character, 147500, -1611.45, 1552.73, -1402.07, 0, new TrackActorSpec { Ai = "MON_DUMMY", Faction = FactionType.Our_Forces, Name = L("1st Transport Magic Circle") }));
 		actors.Add(character);
 
-		// The client plays this phase as a minigame; the monsters its notice
-		// describes are spawned into the track's own layer instead.
-		for (var i = 0; i < PhyraconSpots.GetLength(0); i++)
-			actors.Add(AddTrackActor(character, 47397, PhyraconSpots[i, 0], 1552.73, PhyraconSpots[i, 1], 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-
-		for (var i = 0; i < DrakeSpots.GetLength(0); i++)
-			actors.Add(AddTrackActor(character, 401621, DrakeSpots[i, 0], 1552.73, DrakeSpots[i, 1], 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
-
 		return actors.ToArray();
+	}
+
+	/// <summary>
+	/// Sends four waves at the player, each once the last one is down.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("1st")
+			.Monster(47397, -1783.47, 1552.73, -1386.01)
+			.Monster(47397, -1445.27, 1552.73, -1424.37, -173)
+			.Monster(47397, -1607.88, 1552.73, -1262.93, -81)
+			.Monster(47397, -1592.18, 1552.73, -1551.68, 86)
+			.On(s => s.Alive() <= 0, s =>
+			{
+				s.Game.ClearStage("1st");
+				s.Game.StartStage("2st");
+			}, 1);
+
+		game.Stage("2st")
+			.Monster(401621, -1758.22, 1552.73, -1393.37)
+			.Monster(401621, -1482.53, 1552.73, -1415.56, -172)
+			.On(s => s.Alive() <= 0, s =>
+			{
+				s.Game.ClearStage("2st");
+				s.Game.StartStage("3rd");
+			}, 1);
+
+		game.Stage("3rd")
+			.Monster(47397, -1599.59, 1552.73, -1537.78, 94)
+			.Monster(47397, -1601.21, 1552.73, -1294.33, -77)
+			.On(s => s.Alive() <= 0, s =>
+			{
+				s.Game.ClearStage("3rd");
+				s.Game.StartStage("4th");
+			}, 1);
+
+		game.Stage("4th")
+			.Monster(401621, -1594.50, 1552.73, -1537.84, 96)
+			.Monster(401621, -1623.73, 1552.73, -1305.95, -77)
+			.Monster(401621, -1736.54, 1552.73, -1410.83, 3)
+			.Monster(401621, -1486.81, 1552.73, -1414.60, 175)
+			.Monster(401621, -1544.74, 1552.73, -1474.61, 136)
+			.Monster(401621, -1699.50, 1552.73, -1343.01, -35);
+
+		game.Start("1st");
 	}
 
 	public override async Task OnProgress(Character character, Track track, int frame)
@@ -62,6 +89,7 @@ public class Ftower41Mq02Track : TrackScript
 		switch (frame)
 		{
 			case 19:
+				StartMinigame(character, track);
 				SetTrackTendency(character, track);
 				CreateBattleBoxInLayer(character, track);
 				character.ServerMessage(L("Defeat the monsters interrupting Grita while she reads the magic circle!"));

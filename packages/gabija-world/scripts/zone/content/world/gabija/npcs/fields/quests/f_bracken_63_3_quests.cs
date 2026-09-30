@@ -6,13 +6,16 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
@@ -33,13 +36,9 @@ public class FBracken633QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq040 = new QuestId(50116);
 	private readonly static QuestId Rp1 = new QuestId(60163);
 
-	public const string DeviceCountVar = "Gabija.Quests.Bracken633Mq040.Devices";
 	private const string DeviceVar = "Gabija.Quests.Bracken633Mq040.Device";
-	public const string ShieldCountVar = "Gabija.Quests.Bracken633Sq020.Shields";
 	private const string ShieldVar = "Gabija.Quests.Bracken633Sq020.Shield";
-	public const string CauldronCountVar = "Gabija.Quests.Bracken633Sq030.Cauldrons";
 	private const string CauldronVar = "Gabija.Quests.Bracken633Sq030.Cauldron";
-	public const string BoxCountVar = "Gabija.Quests.Bracken633Sq040.Boxes";
 	private const string BoxVar = "Gabija.Quests.Bracken633Sq040.Box";
 	private const string LeafVar = "Gabija.Quests.Bracken633Rp1.Leaf";
 
@@ -151,7 +150,6 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				{
 					for (var i = 1; i <= Devices.GetLength(0); ++i)
 						character.Variables.Perm.Set(DeviceVar + i, false);
-					character.Variables.Perm.SetInt(DeviceCountVar, 0);
 
 					character.Quests.Start(Mq040);
 					character.LookAround();
@@ -262,15 +260,15 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Mq040) || character.Quests.IsCompletable(Mq040) || character.Variables.Perm.GetBool(DeviceVar + number, false))
 						return;
 
+					var done = await character.TimeActions.StartAsync(L("Removing the power source"), L("Cancel"), "ABSORB", TimeSpan.FromSeconds(1.5));
+
+					if (done != TimeActionResult.Completed)
+						return;
+
 					character.Variables.Perm.Set(DeviceVar + number, true);
-					var removed = character.Variables.Perm.GetInt(DeviceCountVar, 0) + 1;
-					character.Variables.Perm.SetInt(DeviceCountVar, removed);
-
 					dialog.Npc.PlayEffect("F_light018_yellow", 1f);
-					character.ServerMessage(LF("Power sources removed: {0}/{1}", Math.Min(removed, 3), 3));
-					character.LookAround();
-
-					await Task.CompletedTask;
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've removed the power source!"), 3);
+					character.Quests.AddObjectiveProgress(Mq040, "removePower");
 				});
 		}
 
@@ -339,7 +337,6 @@ public class FBracken633QuestNpcsScript : GeneralScript
 
 				for (var i = 1; i <= Cauldrons.GetLength(0); ++i)
 					character.Variables.Perm.Set(CauldronVar + i, false);
-				character.Variables.Perm.SetInt(CauldronCountVar, 0);
 
 				character.Quests.Start(Sq030);
 				character.LookAround();
@@ -409,7 +406,6 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				{
 					for (var i = 1; i <= Shields.GetLength(0); ++i)
 						character.Variables.Perm.Set(ShieldVar + i, false);
-					character.Variables.Perm.SetInt(ShieldCountVar, 0);
 
 					character.Quests.Start(Sq020);
 					character.LookAround();
@@ -434,7 +430,6 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				{
 					for (var i = 1; i <= Boxes.GetLength(0); ++i)
 						character.Variables.Perm.Set(BoxVar + i, false);
-					character.Variables.Perm.SetInt(BoxCountVar, 0);
 
 					character.Quests.Start(Sq040);
 					character.LookAround();
@@ -514,15 +509,18 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq020) || character.Quests.IsCompletable(Sq020) || character.Variables.Perm.GetBool(ShieldVar + number, false))
 						return;
 
+					foreach (var enemy in character.Map.GetAttackableEnemiesInPosition(character, character.Position, 100).OfType<Mob>())
+						enemy.InsertHate(character);
+
+					var done = await character.TimeActions.StartAsync(L("Stopping the Shield Creation Device"), L("Cancel"), "KICKBOX", TimeSpan.FromSeconds(0.7));
+
+					if (done != TimeActionResult.Completed)
+						return;
+
 					character.Variables.Perm.Set(ShieldVar + number, true);
-					var removed = character.Variables.Perm.GetInt(ShieldCountVar, 0) + 1;
-					character.Variables.Perm.SetInt(ShieldCountVar, removed);
-
-					dialog.Npc.PlayEffect("F_light018_yellow", 1f);
-					character.ServerMessage(LF("Protective barriers removed: {0}/{1}", Math.Min(removed, 4), 4));
-					character.LookAround();
-
-					await Task.CompletedTask;
+					dialog.Npc.PlayEffect("F_explosion013", 0.5f);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The Shield Creation Device is stopped"), 3);
+					character.Quests.AddObjectiveProgress(Sq020, "removeBarriers");
 				});
 		}
 
@@ -539,15 +537,15 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq030) || character.Quests.IsCompletable(Sq030) || character.Variables.Perm.GetBool(CauldronVar + number, false))
 						return;
 
+					var done = await character.TimeActions.StartAsync(L("Destroying the cauldron"), L("Cancel"), "KICKBOX", TimeSpan.FromSeconds(0.7));
+
+					if (done != TimeActionResult.Completed)
+						return;
+
 					character.Variables.Perm.Set(CauldronVar + number, true);
-					var destroyed = character.Variables.Perm.GetInt(CauldronCountVar, 0) + 1;
-					character.Variables.Perm.SetInt(CauldronCountVar, destroyed);
-
-					dialog.Npc.PlayEffect("F_ground058_smoke", 1f);
-					character.ServerMessage(LF("Demon Cauldrons destroyed: {0}/{1}", Math.Min(destroyed, 4), 4));
-					character.LookAround();
-
-					await Task.CompletedTask;
+					dialog.Npc.PlayEffect("F_smoke017_red_1", 0.8f);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("The cauldron has been destroyed"), 3);
+					character.Quests.AddObjectiveProgress(Sq030, "destroyCauldrons");
 				});
 		}
 
@@ -567,12 +565,8 @@ public class FBracken633QuestNpcsScript : GeneralScript
 						return;
 
 					character.Variables.Perm.Set(BoxVar + number, true);
-					var burned = character.Variables.Perm.GetInt(BoxCountVar, 0) + 1;
-					character.Variables.Perm.SetInt(BoxCountVar, burned);
-
 					dialog.Npc.PlayEffect("F_burstup005_fire", 1f);
-					character.ServerMessage(LF("Boxes of Poisonous Herbs burned: {0}/{1}", Math.Min(burned, 6), 6));
-					character.LookAround();
+					character.Quests.AddObjectiveProgress(Sq040, "burnBoxes");
 
 					await Task.CompletedTask;
 				});
@@ -758,7 +752,7 @@ public class Bracken633Mq040Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50110, QuestStatus.Completed));
 
-		AddObjective("removePower", L("Find the Power Supply Device and remove the power source"), new VariableCheckObjective(FBracken633QuestNpcsScript.DeviceCountVar, 3, isPermanent: true));
+		AddObjective("removePower", L("Find the Power Supply Device and remove the power source"), new ManualObjective(3));
 
 		AddReward(new ItemReward("expCard3", 3));
 		AddReward(new ItemReward("Vis", 300));
@@ -841,7 +835,7 @@ public class Bracken633Sq020Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50113, QuestStatus.Completed));
 
-		AddObjective("removeBarriers", L("Remove the Protective Barrier around the Demon Cauldrons"), new VariableCheckObjective(FBracken633QuestNpcsScript.ShieldCountVar, 4, isPermanent: true));
+		AddObjective("removeBarriers", L("Remove the Protective Barrier around the Demon Cauldrons"), new ManualObjective(4));
 
 		AddReward(new ItemReward("expCard3", 3));
 		AddReward(new ItemReward("Vis", 240));
@@ -868,7 +862,7 @@ public class Bracken633Sq030Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50114, QuestStatus.Completed));
 
-		AddObjective("destroyCauldrons", L("Destroy the Demon Cauldrons"), new VariableCheckObjective(FBracken633QuestNpcsScript.CauldronCountVar, 4, isPermanent: true));
+		AddObjective("destroyCauldrons", L("Destroy the Demon Cauldrons"), new ManualObjective(4));
 
 		AddReward(new ItemReward("expCard3", 3));
 		AddReward(new ItemReward("Vis", 240));
@@ -895,7 +889,7 @@ public class Bracken633Sq040Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50115, QuestStatus.Completed));
 
-		AddObjective("burnBoxes", L("Set the boxes of Poisonous Herbs on fire"), new VariableCheckObjective(FBracken633QuestNpcsScript.BoxCountVar, 6, isPermanent: true));
+		AddObjective("burnBoxes", L("Set the boxes of Poisonous Herbs on fire"), new ManualObjective(6));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("Vis", 160));

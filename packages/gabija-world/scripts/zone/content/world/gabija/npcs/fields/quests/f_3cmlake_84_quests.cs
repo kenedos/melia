@@ -34,7 +34,6 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq02 = new QuestId(90017);
 	private readonly static QuestId Sq03 = new QuestId(90018);
 
-	public const string LabsBurnedVar = "Gabija.Quests.Lake84Sq03.Burned";
 	private const string LabVar = "Gabija.Quests.Lake84Sq03.Lab";
 	private const string BaitVar = "Gabija.Quests.Lake84Mq06.Baited";
 	private const string HerbVar = "Gabija.Quests.Lake84Mq05.Herb";
@@ -42,7 +41,8 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 	private const int HerbsNeeded = 5;
 	private const int FlowersNeeded = 5;
-	private const int OilPerLab = 5;
+	private const int OilPerLab = 1;
+	private const int LabCount = 10;
 
 	private static readonly TimeSpan PlantRespawn = TimeSpan.FromSeconds(30);
 
@@ -84,18 +84,18 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 		AddConditionalNpc(153132, "UnvisibleName", "3CMLAKE_84_WORKBENCH3", "f_3cmlake_84", -209.92, 1803.39, 44, c => IsBurningLabs(c) || c.Quests.HasCompleted(Sq03), async dialog =>
 		{
-			await this.BurnLab(dialog, 1);
+			await BurnLab(dialog, 1);
 		});
 
 		AddConditionalNpc(153132, "UnvisibleName", "3CMLAKE_83_WORKBENCH2", "f_3cmlake_83", -46.96, 859.67, 294, c => IsBurningLabs(c) || c.Quests.HasCompleted(Sq03), async dialog =>
 		{
-			await this.BurnLab(dialog, 2);
+			await BurnLab(dialog, 6);
 		});
 
-		AddNpc(57013, "UnvisibleName", "3CMLAKE_84_OBJ1", "f_3cmlake_84", -117.43, 1712.16, 298);
-		AddNpc(153133, "UnvisibleName", "3CMLAKE_84_OBJ2", "f_3cmlake_84", -209.49, 1703.33, 1);
-		AddNpc(153131, "UnvisibleName", "3CMLAKE_84_OBJ3", "f_3cmlake_84", -147.21, 1839.75, 4);
-		AddNpc(153131, "UnvisibleName", "3CMLAKE_84_OBJ4", "f_3cmlake_84", -92.39, 1841.42, 4);
+		AddNpc(57013, "UnvisibleName", "3CMLAKE_84_OBJ1", "f_3cmlake_84", -117.43, 1712.16, 298, async dialog => await BurnLab(dialog, 2));
+		AddNpc(153133, "UnvisibleName", "3CMLAKE_84_OBJ2", "f_3cmlake_84", -209.49, 1703.33, 1, async dialog => await BurnLab(dialog, 3));
+		AddNpc(153131, "UnvisibleName", "3CMLAKE_84_OBJ3", "f_3cmlake_84", -147.21, 1839.75, 4, async dialog => await BurnLab(dialog, 4));
+		AddNpc(153131, "UnvisibleName", "3CMLAKE_84_OBJ4", "f_3cmlake_84", -92.39, 1841.42, 4, async dialog => await BurnLab(dialog, 5));
 
 		// Jeneuam Corridor, where the Hydra shows itself
 		//-------------------------------------------------------------------------
@@ -516,13 +516,12 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 
 			if (answer == "accept")
 			{
-				character.Variables.Perm.Set(LabVar + 1, false);
-				character.Variables.Perm.Set(LabVar + 2, false);
-				character.Variables.Perm.SetInt(LabsBurnedVar, 0);
+				for (var i = 1; i <= LabCount; ++i)
+					character.Variables.Perm.Set(LabVar + i, false);
 
 				character.Quests.Start(Sq03);
 
-				var oil = OilPerLab * 2 - character.Inventory.CountItem(ItemId.F_3CMLAKE_84_SQ_ITEM2);
+				var oil = OilPerLab * LabCount - character.Inventory.CountItem(ItemId.F_3CMLAKE_84_SQ_ITEM2);
 				if (oil > 0)
 					character.Inventory.Add(ItemId.F_3CMLAKE_84_SQ_ITEM2, oil, InventoryAddType.PickUp);
 
@@ -581,7 +580,7 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 	/// Pours Lanaldas' oil over one of the black hoods' laboratories and
 	/// sets it on fire.
 	/// </summary>
-	private async Task BurnLab(Dialog dialog, int number)
+	public static async Task BurnLab(Dialog dialog, int number)
 	{
 		var character = dialog.Player;
 
@@ -600,16 +599,16 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		var lit = await character.TimeActions.StartAsync(L("Lighting up"), L("Cancel"), "SITGROPESET2", TimeSpan.FromSeconds(2));
+
+		if (lit != TimeActionResult.Completed)
+			return;
+
 		character.Inventory.Remove(ItemId.F_3CMLAKE_84_SQ_ITEM2, OilPerLab, InventoryItemRemoveMsg.Given);
 		character.Variables.Perm.Set(LabVar + number, true);
-
-		var burned = character.Variables.Perm.GetInt(LabsBurnedVar, 0) + 1;
-		character.Variables.Perm.SetInt(LabsBurnedVar, burned);
+		character.Quests.AddObjectiveProgress(Sq03, "burnLabs");
 
 		dialog.Npc.PlayEffect("F_burstup005_fire", 1.5f);
-		character.ServerMessage(LF("Laboratories burned down: {0}/{1}", Math.Min(burned, 2), 2));
-
-		await Task.CompletedTask;
 	}
 
 	/// <summary>
@@ -784,7 +783,6 @@ public class F3Cmlake84Mq05Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(90013, QuestStatus.Completed));
 
-		AddObjective("haveMeat", L("Bait Meat"), new CollectItemObjective("F_3CMLAKE_84_MQ_ITEM3", 8));
 		AddObjective("collectHerbs", L("Collect Blue Herbs"), new CollectItemObjective("F_3CMLAKE_84_MQ_ITEM2", 5));
 
 		AddReward(new ItemReward("expCard5", 4));
@@ -905,7 +903,7 @@ public class F3Cmlake84Sq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(90017, QuestStatus.Completed));
 
-		AddObjective("burnLabs", L("Set fire to the laboratory"), new VariableCheckObjective(F3Cmlake84QuestNpcsScript.LabsBurnedVar, 2, isPermanent: true));
+		AddObjective("burnLabs", L("Set fire to the laboratory"), new ManualObjective(10));
 
 		AddReward(new ItemReward("expCard5", 3));
 		AddReward(new ItemReward("Vis", 600));

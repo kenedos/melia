@@ -44,6 +44,21 @@ public class Thorn20Mq04Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Keeps a stream of reinforcements coming while the crystals stand.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("DefGroup")
+			.Monster(41445, -1184.73, 583.26, -467.21, respawnSeconds: 2)
+			.Monster(41445, -982.56, 575.52, -467.75, respawnSeconds: 2)
+			.Monster(400381, -1027.31, 583.26, -271.07, respawnSeconds: 2);
+
+		game.Start("DefGroup");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
@@ -54,6 +69,7 @@ public class Thorn20Mq04Track : TrackScript
 				track.Actors[2].AttachEffect("F_bg_firetower_teleport", 1, EffectLocation.Bottom);
 				break;
 			case 29:
+				StartMinigame(character, track);
 				RemoveTrackActor(character, track, 11);
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);

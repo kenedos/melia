@@ -605,6 +605,7 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 						return;
 					}
 
+					dialog.Npc.AttachEffect("F_bg_fire001", 2f, EffectLocation.Bottom);
 					character.Variables.Perm.Set(CartVar + number, true);
 					var burnt = character.Variables.Perm.GetInt(CartCountVar, 0) + 1;
 					character.Variables.Perm.SetInt(CartCountVar, burnt);

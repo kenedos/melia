@@ -214,10 +214,13 @@ public class MinigameStage
 	/// <param name="aggressive">Whether the monsters go straight for the players.</param>
 	/// <param name="level">Level override, or 0 for the monster's own.</param>
 	/// <param name="maxHp">Max HP override, or 0 for the monster's own.</param>
+	/// <param name="faction">The faction the monsters are spawned with.</param>
+	/// <param name="name">Name override, or null for the monster's own.</param>
+	/// <param name="lifeSeconds">Seconds before a spawned monster vanishes, or 0 for never.</param>
 	/// <returns></returns>
-	public MinigameStage Monster(int monsterId, double x, double y, double z, double direction = 0, int count = 1, int respawnSeconds = 0, bool aggressive = true, int level = 0, int maxHp = 0)
+	public MinigameStage Monster(int monsterId, double x, double y, double z, double direction = 0, int count = 1, int respawnSeconds = 0, bool aggressive = true, int level = 0, int maxHp = 0, FactionType faction = FactionType.Monster, string name = null, int lifeSeconds = 0)
 	{
-		_spawns.Add(new MinigameSpawn(this, monsterId, new Position((float)x, (float)y, (float)z), direction, count, respawnSeconds, aggressive, level, maxHp));
+		_spawns.Add(new MinigameSpawn(this, monsterId, new Position((float)x, (float)y, (float)z), direction, count, respawnSeconds, aggressive, level, maxHp, faction, name, lifeSeconds));
 		return this;
 	}
 
@@ -243,6 +246,19 @@ public class MinigameStage
 	{
 		var spawns = spawnIndices.Length == 0 ? (IEnumerable<MinigameSpawn>)_spawns : spawnIndices.Where(i => i >= 0 && i < _spawns.Count).Select(i => _spawns[i]);
 		return spawns.Sum(a => a.AliveCount);
+	}
+
+	/// <summary>
+	/// Returns the living monsters of the given spawn point.
+	/// </summary>
+	/// <param name="spawnIndex"></param>
+	/// <returns></returns>
+	public IEnumerable<Mob> Living(int spawnIndex)
+	{
+		if (spawnIndex < 0 || spawnIndex >= _spawns.Count)
+			return Enumerable.Empty<Mob>();
+
+		return _spawns[spawnIndex].Living;
 	}
 
 	/// <summary>
@@ -347,13 +363,16 @@ internal class MinigameSpawn
 	private readonly bool _aggressive;
 	private readonly int _level;
 	private readonly int _maxHp;
+	private readonly FactionType _faction;
+	private readonly string _name;
+	private readonly int _lifeSeconds;
 	private readonly List<Mob> _mobs = new List<Mob>();
 
 	public IEnumerable<Mob> Living => _mobs.Where(a => !a.IsDead && a.Map != null);
 
 	public int AliveCount => this.Living.Count();
 
-	public MinigameSpawn(MinigameStage stage, int monsterId, Position position, double direction, int count, int respawnSeconds, bool aggressive, int level, int maxHp)
+	public MinigameSpawn(MinigameStage stage, int monsterId, Position position, double direction, int count, int respawnSeconds, bool aggressive, int level, int maxHp, FactionType faction, string name, int lifeSeconds)
 	{
 		_stage = stage;
 		_monsterId = monsterId;
@@ -364,6 +383,9 @@ internal class MinigameSpawn
 		_aggressive = aggressive;
 		_level = level;
 		_maxHp = maxHp;
+		_faction = faction;
+		_name = name;
+		_lifeSeconds = lifeSeconds;
 	}
 
 	public void SpawnInitial()
@@ -396,8 +418,15 @@ internal class MinigameSpawn
 		mob.SpawnPosition = pos;
 		mob.Direction = new Direction(_direction);
 		mob.Layer = character.Layer;
-		mob.Faction = FactionType.Monster;
+		mob.Faction = _faction;
 		mob.Visibility = ActorVisibility.Always;
+
+		if (_name != null)
+			mob.Name = _name;
+
+		if (_lifeSeconds > 0)
+			mob.Components.Add(new LifeTimeComponent(mob, TimeSpan.FromSeconds(_lifeSeconds)));
+
 		mob.AddEffect(new ScriptInvisibleEffect());
 
 		mob.Components.Add(new MovementComponent(mob));

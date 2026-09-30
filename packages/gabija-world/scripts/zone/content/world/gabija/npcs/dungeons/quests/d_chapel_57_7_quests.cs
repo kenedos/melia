@@ -6,14 +6,17 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -33,12 +36,13 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq09 = new QuestId(8536);
 	private readonly static QuestId Chapel576Mq041 = new QuestId(8730);
 
-	public const string PillarCountVar = "Gabija.Quests.Chaple577Mq04.Pillars";
+	private const string FragmentVar = "Gabija.Quests.Chaple577Mq04.Fragment";
 	private const string PillarVar = "Gabija.Quests.Chaple577Mq04.Pillar";
 	private const int PillarCount = 8;
+	private const int FragmentCount = 12;
+	public const string MaldaMarkVar = "Gabija.Chaple577.Mq05.Marked";
 	private readonly static QuestId Mq10 = new QuestId(8537);
 
-	public const string AukaChargeVar = "Gabija.Chaple577.Mq06.Charge";
 	private readonly static Position AukaAltar = new Position(-942, 0, -106);
 	private readonly static Position SanctuaryMural = new Position(801, 0, -1250);
 
@@ -217,7 +221,8 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 					for (var i = 1; i <= PillarCount; ++i)
 						character.Variables.Perm.Set(PillarVar + i, false);
-					character.Variables.Perm.SetInt(PillarCountVar, 0);
+					for (var i = 1; i <= FragmentCount; ++i)
+						character.Variables.Perm.Set(FragmentVar + i, false);
 
 					character.Quests.Start(Mq04);
 				}
@@ -248,7 +253,6 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					character.Variables.Temp.SetInt(AukaChargeVar, 0);
 					character.Quests.Start(Mq06);
 					character.Inventory.Add(ItemId.CHAPLE577_MQ_06_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("Take this potion to the Auka Altar and use it there."));
@@ -319,7 +323,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04))
 			{
-				await dialog.Msg(LF("Insert the altar fragments into the eight pillars of the Sventove Central Hall. ({0}/{1})", character.Variables.Perm.GetInt(PillarCountVar, 0), PillarCount));
+				await dialog.Msg(LF("Insert the altar fragments into the eight pillars of the Sventove Central Hall. ({0}/{1})", PillarsInserted(character), PillarCount));
 				return;
 			}
 
@@ -365,7 +369,28 @@ public class DChapel577QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddNpc(147357, L("Malda Altar"), "CHAPLE577_HOLY_2", "d_chapel_57_7", 1516, -104, 45, async dialog =>
 		{
-			await dialog.Msg(L("The Malda Altar stands quiet, waiting to be woken."));
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Malda Altar"));
+
+			if (!character.Quests.IsActive(Mq05) || character.Quests.IsCompletable(Mq05))
+			{
+				await dialog.Msg(L("The Malda Altar stands quiet, waiting to be woken."));
+				return;
+			}
+
+			var operated = await character.TimeActions.StartAsync(L("Operating"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(1));
+
+			if (operated != TimeActionResult.Completed)
+				return;
+
+			dialog.Npc.PlayEffect("F_circle019", 6f);
+
+			foreach (var enemy in character.Map.GetAttackableEnemiesInPosition(character, dialog.Npc.Position, 150).OfType<Mob>())
+			{
+				enemy.Vars.Set(MaldaMarkVar, GameClock.LocalNow.AddSeconds(30));
+				enemy.InsertHate(character);
+			}
 		});
 
 		// Auka Altar
@@ -387,7 +412,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 					() => character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06),
 					enemy =>
 					{
-						character.Variables.Temp.SetInt(AukaChargeVar, Math.Min(100, character.Variables.Temp.GetInt(AukaChargeVar, 0) + 1));
+						character.Quests.AddObjectiveProgress(Mq06, "chargeCrystal");
 						enemy.TakeSimpleHit(20, character);
 					});
 				return;
@@ -403,22 +428,20 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("The Sventove Central Altar pulses with a power that is not its own."));
 		});
 
-		// Altar Fragment
+		// Altar Fragments
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147372, L("Altar Fragment"), "CHAPLE577_MQ_03", "d_chapel_57_7", -145, 122, 90, c => c.Quests.Has(Mq03) && !c.Quests.HasCompleted(Mq04), async dialog =>
-		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(L("Altar Fragment"));
-
-			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
-			{
-				await dialog.Msg(L("The fragments of the destroyed altar still hold power. Fit them into the eight pillars of the Sventove Central Hall."));
-				return;
-			}
-
-			await dialog.Msg(L("A jagged fragment of the destroyed altar."));
-		});
+		this.AddFragment(1, -346, -197);
+		this.AddFragment(2, -340, -367);
+		this.AddFragment(3, -131, -380);
+		this.AddFragment(4, 64, -384);
+		this.AddFragment(5, 247, -377);
+		this.AddFragment(6, 259, -230);
+		this.AddFragment(7, 257, -46);
+		this.AddFragment(8, 250, 173);
+		this.AddFragment(9, 54, 150);
+		this.AddFragment(10, -329, 110);
+		this.AddFragment(11, -349, -12);
+		this.AddFragment(12, -145, 122);
 
 		// Central Pillars
 		//-------------------------------------------------------------------------
@@ -509,6 +532,48 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Adds one of the altar fragments scattered around the Sventove Central Hall.
+	/// </summary>
+	/// <param name="number"></param>
+	/// <param name="x"></param>
+	/// <param name="z"></param>
+	private void AddFragment(int number, double x, double z)
+	{
+		AddConditionalNpc(147372, L("Altar Fragment"), "CHAPLE577_MQ_03_" + number, "d_chapel_57_7", x, z, 90, c => c.Quests.IsActive(Mq04) && !c.Quests.IsCompletable(Mq04) && !c.Variables.Perm.GetBool(FragmentVar + number, false), async dialog =>
+		{
+			var character = dialog.Player;
+
+			dialog.SetTitle(L("Altar Fragment"));
+
+			if (!character.Quests.IsActive(Mq04) || character.Variables.Perm.GetBool(FragmentVar + number, false))
+				return;
+
+			var collected = await character.TimeActions.StartAsync(L("Collecting"), L("Cancel"), "SITGROPESET2", TimeSpan.FromSeconds(2));
+
+			if (collected != TimeActionResult.Completed)
+				return;
+
+			character.Variables.Perm.Set(FragmentVar + number, true);
+			character.Inventory.Add(ItemId.CHAPLE577_MQ_03_ITEM, 1, InventoryAddType.PickUp);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've collected an altar fragment{nl}Insert it into one of the central pillars"), 3);
+		}).WithEffect("I_spread_out001_light", 1.5f, EffectLocation.Bottom).WithEffect("F_levitation022_light", 0.5f, EffectLocation.Bottom);
+	}
+
+	/// <summary>
+	/// Returns how many pillars of the trap hold a fragment.
+	/// </summary>
+	private static int PillarsInserted(Character character)
+	{
+		var count = 0;
+		for (var i = 1; i <= PillarCount; ++i)
+		{
+			if (character.Variables.Perm.GetBool(PillarVar + i, false))
+				count++;
+		}
+		return count;
+	}
+
+	/// <summary>
 	/// Fits an altar fragment into one of the Sventove pillars.
 	/// </summary>
 	private static async Task InsertPillar(Dialog dialog, int number)
@@ -525,21 +590,25 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 		if (character.Variables.Perm.GetBool(PillarVar + number, false))
 		{
-			await dialog.Msg(L("{#666666}*A fragment already sits in this pillar*{/}"));
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("This pillar already has a fragment inserted"), 3);
 			return;
 		}
 
-		var inserted = await character.TimeActions.StartAsync(L("Inserting the altar fragment..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+		if (!character.Inventory.HasItem(ItemId.CHAPLE577_MQ_03_ITEM))
+		{
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("You do not have a fragment with you!"), 3);
+			return;
+		}
+
+		var inserted = await character.TimeActions.StartAsync(L("Inserting the fragment"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2.5));
 
 		if (inserted != TimeActionResult.Completed)
 			return;
 
+		character.Inventory.Remove(ItemId.CHAPLE577_MQ_03_ITEM, 1, InventoryItemRemoveMsg.Given);
 		character.Variables.Perm.Set(PillarVar + number, true);
-
-		var count = character.Variables.Perm.GetInt(PillarCountVar, 0) + 1;
-		character.Variables.Perm.SetInt(PillarCountVar, count);
-
-		character.ServerMessage(LF("You wedge the altar fragment into the pillar's socket. It hums, and the trap tightens another notch. ({0}/{1})", count, PillarCount));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("You've inserted the fragment"), 3);
+		character.Quests.AddObjectiveProgress(Mq04, "insertPillars");
 	}
 }
 
@@ -647,7 +716,7 @@ public class Chaple577Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 
-		AddObjective("insertPillars", L("Make a trap at Sventove Central Hall"), new VariableCheckObjective(DChapel577QuestNpcsScript.PillarCountVar, 8, isPermanent: true));
+		AddObjective("insertPillars", L("Make a trap at Sventove Central Hall"), new ManualObjective(8));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}
@@ -674,7 +743,7 @@ public class Chaple577Mq05Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(38));
 
-		AddObjective("killDemons", L("Defeat demons"), new KillObjective(10, "Egnome", "Spector_Gh", "colitile", "Infroholder_bow"));
+		AddObjective("killDemons", L("Defeat demons"), new ScoreKillObjective(10, (mob, c) => (mob.Data.ClassName is "Egnome" or "Spector_Gh" or "colitile" or "Infroholder_bow") && mob.Vars.TryGet<DateTime>(DChapel577QuestNpcsScript.MaldaMarkVar, out var until) && until > GameClock.LocalNow ? 1 : 0));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}
@@ -701,7 +770,7 @@ public class Chaple577Mq06Quest : QuestScript
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 		AddPrerequisite(new LevelPrerequisite(38));
 
-		AddObjective("chargeCrystal", L("Charge the low level spirit crystal"), new VariableCheckObjective(DChapel577QuestNpcsScript.AukaChargeVar, 100, isPermanent: false));
+		AddObjective("chargeCrystal", L("Charge the low level spirit crystal"), new ManualObjective(100));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new TakeItemReward("CHAPLE577_MQ_06_ITEM"));

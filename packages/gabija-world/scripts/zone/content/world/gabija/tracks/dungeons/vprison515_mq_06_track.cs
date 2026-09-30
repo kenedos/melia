@@ -12,12 +12,15 @@ using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Quests;
 using Melia.Zone.World.Tracks;
 using static Melia.Zone.Scripting.Shortcuts;
 
 [TrackScript("VPRISON515_MQ_06_TRACK")]
 public class Vprison515Mq06Track : TrackScript
 {
+	private const int DefenseSeconds = 180;
+
 	protected override void Load()
 	{
 		SetId("VPRISON515_MQ_06_TRACK");
@@ -45,13 +48,39 @@ public class Vprison515Mq06Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Sends the crack's spawn at the goddess for as long as the seal takes.
+	/// </summary>
+	private static void StartDefense(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+		var ticks = 0;
+
+		game.Stage("DefGroup")
+			.Monster(57720, -105.12, 26.79, -78.25, -89, count: 2, respawnSeconds: 20)
+			.Monster(57718, -152.03, 26.79, 3.74, -80, count: 2, respawnSeconds: 20)
+			.Monster(57718, -50.00, 26.79, 13.00, -89, count: 2, respawnSeconds: 20)
+			.Monster(57720, -62.00, 23.31, -43.00, -69, count: 2, respawnSeconds: 15)
+			.Monster(57718, -45.00, 26.79, 3.00, -91, count: 2, respawnSeconds: 20)
+			.On(s => true, s =>
+			{
+				if (++ticks > DefenseSeconds)
+					return;
+
+				foreach (var member in s.Game.Members)
+					member.Quests.AddObjectiveProgress(new QuestId(60028), "guardVakarine");
+			});
+
+		game.Start("DefGroup");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
 			case 49:
-				// The client plays the defence as a minigame; the seal holds
-				// with the cutscene either way.
+				HoldTrackOpen(track);
+				StartDefense(character, track);
 				character.ServerMessage(L("The crack is holding. Stay with the goddess until it is shut."));
 				break;
 		}

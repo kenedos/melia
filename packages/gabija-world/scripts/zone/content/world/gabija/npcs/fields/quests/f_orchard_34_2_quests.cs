@@ -174,8 +174,8 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 		// The great statue of Goddess Laima
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(47236, L("Mysterious Girl"), "ORCHARD342_GIRL", "f_orchard_34_2", -1753.73, 695.96, 190, c => c.Quests.Has(Mq06) && !c.Quests.Has(Mq07), this.Girl);
-		AddConditionalNpc(156036, L("Shiny Sapling"), "ORCHARD342_TREE", "f_orchard_34_2", -1784.86, 745.74, 90, c => c.Quests.Has(Mq06) && !c.Quests.IsActive(Mq08), this.Sapling);
-		AddConditionalNpc(156041, L("Goddess' Orb"), "ORCHARD342_HOLY_TALK", "f_orchard_34_2", -1784.86, 745.74, 90, c => c.Quests.IsActive(Mq08), this.GoddessOrb);
+		AddConditionalNpc(156036, L("Shiny Sapling"), "ORCHARD342_TREE", "f_orchard_34_2", -1784.86, 745.74, 90, c => c.Quests.Has(Mq06) && !c.Quests.IsActive(Mq08), this.Sapling).WithEffect("F_light054", 5f, EffectLocation.Bottom);
+		AddConditionalNpc(156041, L("Goddess' Orb"), "ORCHARD342_HOLY_TALK", "f_orchard_34_2", -1784.86, 745.74, 90, c => c.Quests.IsActive(Mq08), this.GoddessOrb).WithEffect("I_force036_green1", 5f, EffectLocation.Middle).WithEffect("F_cleric_barrier_ground", 4f, EffectLocation.Bottom).WithEffect("F_bg_light009_yellow", 4f, EffectLocation.Bottom).WithEffect("F_ground051_loop", 4f, EffectLocation.Bottom);
 
 		AddConditionalNpc(147413, "UnvisibleName", "ORCHARD342_CRYSTAL", "f_orchard_34_2", -1385.86, 1161.03, 280, IsCrystalCalling, async dialog =>
 		{

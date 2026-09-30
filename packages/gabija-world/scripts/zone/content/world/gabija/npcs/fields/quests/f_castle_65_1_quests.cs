@@ -111,7 +111,7 @@ public class FCastle651QuestNpcsScript : GeneralScript
 				c => IsSpellFound(c, number) && !(number == 3 && c.Quests.Has(Mq04)));
 		}
 
-		AddConditionalNpc(152068, "UnvisibleName", "CASTLE651_MQ_04_3", "f_castle_65_1", -1657.30, -1040.11, 43, c => c.Quests.IsActive(Mq04) && !c.Quests.IsCompletable(Mq04), this.ProtectedObject);
+		AddConditionalNpc(152068, "UnvisibleName", "CASTLE651_MQ_04_3", "f_castle_65_1", -1657.30, -1040.11, 43, c => c.Quests.IsActive(Mq04) && !c.Quests.IsCompletable(Mq04), this.ProtectedObject).WithEffect("F_light081_ground_orange_loop2", 1f, EffectLocation.Bottom);
 
 		// The Magic Power Supply Device at the Ishinti Crossroads
 		//-------------------------------------------------------------------------

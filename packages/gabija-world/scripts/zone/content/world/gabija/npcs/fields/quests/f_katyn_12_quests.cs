@@ -289,6 +289,8 @@ public class FKatyn12QuestNpcsScript : GeneralScript
 						return;
 					}
 
+					dialog.Npc.AttachEffect(character.Connection, "F_sys_trigger_point_blue", 3f, EffectLocation.Bottom);
+					dialog.Npc.AttachEffect(character.Connection, "F_magic_prison_line_blue", 3f, EffectLocation.Bottom);
 					character.Variables.Temp.SetLong(SpiritVar + number, DateTime.Now.Ticks);
 					character.Inventory.Add(ItemId.KATYN12_RP_1_ITEM, 1, InventoryAddType.PickUp);
 

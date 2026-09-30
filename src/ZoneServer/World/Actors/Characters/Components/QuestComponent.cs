@@ -785,6 +785,43 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		}
 
 		/// <summary>
+		/// Advances the objective on the quest with the given id by the
+		/// given amount, completing it once it reaches its target.
+		/// </summary>
+		/// <param name="questId"></param>
+		/// <param name="objectiveIdent"></param>
+		/// <param name="amount"></param>
+		public void AddObjectiveProgress(QuestId questId, string objectiveIdent, int amount = 1)
+		{
+			lock (_syncLock)
+			{
+				for (var i = 0; i < _quests.Count; i++)
+				{
+					var quest = _quests[i];
+					if (!quest.InProgress || quest.Data.Id != questId)
+						continue;
+
+					if (!quest.TryGetProgress(objectiveIdent, out var progress))
+						continue;
+
+					if (progress.Done || !progress.Unlocked)
+						continue;
+
+					progress.Count = Math.Min(progress.Objective.TargetCount, progress.Count + amount);
+
+					if (progress.Count >= progress.Objective.TargetCount)
+					{
+						progress.SetDone();
+						this.UpdateUnlock(quest);
+					}
+
+					this.UpdateQuestProgress(questId, progress.Objective.Id);
+					this.UpdateClient_UpdateQuest(quest);
+				}
+			}
+		}
+
+		/// <summary>
 		/// Completes the objective on all quests with the given id.
 		/// </summary>
 		/// <param name="questId"></param>
@@ -2285,32 +2322,16 @@ namespace Melia.Zone.World.Actors.Characters.Components
 							{
 								progress.SetDone();
 								this.UpdateUnlock(quest); // Potentially unlocks next objective
-								questModifiedInThisIteration = true; // Mark that quest state changed
-
-								// Handle OnProgress/OnSuccess Callbacks
-								if (QuestScript.TryGet(quest.Data.Id, out var callbackScript))
-								{
-									callbackScript.OnProgress(this.Character, quest, progress.Objective.Id, progress.Count);
-								}
-								else if (quest.Data.Id.NamespaceId != 0)
-								{
-									Log.Warning($"No QuestScript found for procedural quest {quest.Data.Id.Value} during VariableCheckObjective completion.");
-								}
-
-								if (quest.IsCompletable && quest.Status < QuestStatus.Success)
-								{
-									quest.Status = QuestStatus.Success;
-									callbackScript?.OnSuccess(this.Character, quest);
-								}
-
-								// If this quest is now fully done, no need to check its other objectives in this pass
-								if (quest.ObjectivesCompleted) break;
 							}
-							else
-							{
-								// Value changed but not complete yet - still need to update the client
-								questModifiedInThisIteration = true;
-							}
+
+							// Updates the client's session property, runs the
+							// script's callbacks and moves the quest and its
+							// track along once the last objective is done.
+							this.UpdateQuestProgress(quest.Data.Id, progress.Objective.Id);
+							questModifiedInThisIteration = true;
+
+							// If this quest is now fully done, no need to check its other objectives in this pass
+							if (quest.ObjectivesCompleted) break;
 						}
 					}
 				}

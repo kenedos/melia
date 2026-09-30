@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
+using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
@@ -46,11 +47,10 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 
 	private const string FootholdVar = "Gabija.Cathedral54.Foothold";
 
-	public const string SymbolChargeVar = "Gabija.Cathedral54.SymbolCharge";
 	public const int SymbolChargeNeeded = 10;
-	public const string ReagentTestsVar = "Gabija.Cathedral54.ReagentTests";
-	public const int ReagentTestsNeeded = 5;
+	public const int ReagentTestsNeeded = 10;
 	private const string SymbolPositionVar = "Gabija.Cathedral54.SymbolPosition";
+	private const string SymbolExpiresVar = "Gabija.Cathedral54.SymbolExpires";
 	private const string PurifiedVar = "Gabija.Cathedral54.Purified";
 	private const string ReagentTestedVar = "Gabija.Cathedral54.ReagentTested";
 	private const string BookVar = "Gabija.Cathedral54.Book";
@@ -331,7 +331,6 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					character.Variables.Perm.SetInt(ReagentTestsVar, 0);
 					character.Quests.Start(Sq04);
 					character.Inventory.Add(ItemId.CATHEDRAL54_SQ04_PART2_ITEM, 1, InventoryAddType.PickUp);
 					await dialog.Msg(L("Ah, I didn't mean trying it on yourself. I meant trying it on the demons."));
@@ -554,7 +553,6 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 
 			if (answer == "accept")
 			{
-				character.Variables.Perm.SetInt(SymbolChargeVar, 0);
 				character.Variables.Temp.Remove(SymbolPositionVar);
 				character.Quests.Start(Mq04);
 				await dialog.Msg(L("Deploy the Holy Symbol of Spiritual Power and defeat the demons nearby. This will collect the magical power that is needed to obtain the third key."));
@@ -651,14 +649,14 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			var gathered = await character.TimeActions.StartAsync(L("Gathering the loose pages..."), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
+			var gathered = await character.TimeActions.StartAsync(L("Examining"), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(2));
 
 			if (gathered != TimeActionResult.Completed)
 				return;
 
 			character.Variables.Perm.Set(BookVar + number, true);
 			character.Inventory.Add(ItemId.CHATHEDRAL54_SQ01_PART1_ITEM, DocumentsPerBook, InventoryAddType.PickUp);
-			character.ServerMessage(LF("Documents recovered: {0}/{1}", character.Inventory.CountItem(ItemId.CHATHEDRAL54_SQ01_PART1_ITEM), DocumentsNeeded));
+			character.AddonMessage(AddonMessage.NOTICE_Dm_GetItem, L("Found details about Naktis"), 5);
 		});
 	}
 
@@ -675,6 +673,7 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 		}
 
 		character.Variables.Temp.Set(SymbolPositionVar, character.Position);
+		character.Variables.Temp.Set(SymbolExpiresVar, GameClock.LocalNow.AddSeconds(58));
 		character.PlayEffect("F_light018_yellow", 1f);
 		character.ServerMessage(L("You deployed the Holy Symbol of Spiritual Power. Defeat the demons near it to recharge it."));
 
@@ -727,13 +726,43 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 		}
 
 		demon.Vars.SetLong(ReagentTestedVar, character.ObjectId);
-		demon.PlayEffect("F_explosion049_fire", 1f);
-
-		var tests = Math.Min(ReagentTestsNeeded, character.Variables.Perm.GetInt(ReagentTestsVar, 0) + 1);
-		character.Variables.Perm.SetInt(ReagentTestsVar, tests);
-		character.ServerMessage(L("The reagent reacts violently with the demon's evil energy."));
+		_ = TestReagentAsync(character, demon);
 
 		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Tests the reagent on a demon over a timed action and applies one of its three effects.
+	/// </summary>
+	private static async Task TestReagentAsync(Character character, Mob demon)
+	{
+		var result = await character.TimeActions.StartAsync(L("Use the medicine"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(1));
+
+		if (result != TimeActionResult.Completed)
+		{
+			demon.Vars.Remove(ReagentTestedVar);
+			return;
+		}
+
+		var roll = GameRandom.Get().Next(30) + 1;
+
+		if (roll <= 5)
+		{
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("There was no reaction"), 3);
+		}
+		else if (roll <= 15)
+		{
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("The monster fainted"), 3);
+			demon.StartBuff(BuffId.Stun, TimeSpan.FromSeconds(2), character);
+		}
+		else
+		{
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("The monster exploded"), 3);
+			demon.PlayEffect("F_explosion025", 0.5f);
+			demon.Kill(character);
+		}
+
+		character.Quests.AddObjectiveProgress(Sq04, "testReagent");
 	}
 
 	/// <summary>
@@ -765,14 +794,22 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 		if (!character.Quests.IsActive(Mq04) || character.Quests.IsCompletable(Mq04))
 			return;
 
-		if (!character.Variables.Temp.TryGet<Position>(SymbolPositionVar, out var symbolPosition) || mob.Position.Get2DDistance(symbolPosition) > 300)
+		if (!character.Variables.Temp.TryGet<Position>(SymbolPositionVar, out var symbolPosition) || !character.Variables.Temp.TryGet<DateTime>(SymbolExpiresVar, out var expires))
 			return;
 
-		var charge = Math.Min(SymbolChargeNeeded, character.Variables.Perm.GetInt(SymbolChargeVar, 0) + 1);
-		character.Variables.Perm.SetInt(SymbolChargeVar, charge);
+		if (GameClock.LocalNow > expires)
+		{
+			character.Variables.Temp.Remove(SymbolPositionVar);
+			return;
+		}
+
+		if (mob.Position.Get2DDistance(symbolPosition) > 100)
+			return;
+
+		character.Quests.AddObjectiveProgress(Mq04, "rechargeSymbol");
 		mob.PlayEffect("F_light015_violet1", 1f);
 
-		if (charge >= SymbolChargeNeeded)
+		if (character.Quests.IsCompletable(Mq04))
 		{
 			character.Variables.Temp.Remove(SymbolPositionVar);
 			character.ServerMessage(L("The Holy Symbol of Spiritual Power is recharged. Take it to Karuna Altar."));
@@ -885,7 +922,7 @@ public class Cathedral54Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20312, QuestStatus.Completed));
 
-		AddObjective("rechargeSymbol", L("Recharge the Holy Symbol of Spiritual Power"), new VariableCheckObjective(DCathedral54QuestNpcsScript.SymbolChargeVar, DCathedral54QuestNpcsScript.SymbolChargeNeeded, isPermanent: true));
+		AddObjective("rechargeSymbol", L("Recharge the Holy Symbol of Spiritual Power"), new ManualObjective(DCathedral54QuestNpcsScript.SymbolChargeNeeded));
 
 		AddReward(new ItemReward("CHATHEDRAL54_MQ04_PART2_ITEM", 1));
 		AddReward(new ItemReward("expCard8", 2));
@@ -999,7 +1036,7 @@ public class Cathedral54Sq04Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(130));
 
-		AddObjective("testReagent", L("Use the reagent Priest Daram created on the demons"), new VariableCheckObjective(DCathedral54QuestNpcsScript.ReagentTestsVar, DCathedral54QuestNpcsScript.ReagentTestsNeeded, isPermanent: true));
+		AddObjective("testReagent", L("Use the reagent Priest Daram created on the demons"), new ManualObjective(DCathedral54QuestNpcsScript.ReagentTestsNeeded));
 
 		AddReward(new ItemReward("expCard8", 1));
 		AddReward(new TakeItemReward("CATHEDRAL54_SQ04_PART2_ITEM", 1));

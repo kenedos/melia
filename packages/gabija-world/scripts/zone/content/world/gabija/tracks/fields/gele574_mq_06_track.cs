@@ -38,7 +38,7 @@ public class Gele574Mq06Track : TrackScript
 	}
 
 	/// <summary>
-	/// Starts the Panto Archers and the Large Panto Spearman guarding the totem.
+	/// Starts the Panto Archers guarding the totem.
 	/// </summary>
 	private static void StartMinigame(Character character, Track track)
 	{
@@ -49,11 +49,9 @@ public class Gele574Mq06Track : TrackScript
 			.Monster(57572, -1433.74, 7.18, -708.15, 0, respawnSeconds: 5, level: 35)
 			.Monster(57572, -1472.47, 7.4, -555.13, 0, respawnSeconds: 5, level: 35)
 			.Monster(57572, -1734.78, 7.21, -703.76, 0, respawnSeconds: 5, level: 35)
-			.Monster(57259, -1719.81, 7.18, -865.84, 0, aggressive: false, level: 35, maxHp: 40)
 			.Monster(57572, -1609.76, 7.18, -774.64, 0, respawnSeconds: 5, level: 35)
 			.Monster(57572, -1563.46, 7.18, -1072.19, 0, respawnSeconds: 5, level: 35)
-			.Monster(57572, -1638.19, 7.18, -1037.6, 0, respawnSeconds: 5, level: 35)
-			.On(s => s.Alive(4) <= 0, s => s.Game.CompleteObjective(8606, "controlPantos"), 1);
+			.Monster(57572, -1638.19, 7.18, -1037.6, 0, respawnSeconds: 5, level: 35);
 
 		game.Start("DefGroup");
 	}
@@ -62,6 +60,9 @@ public class Gele574Mq06Track : TrackScript
 	{
 		switch (frame)
 		{
+			case 0:
+				track.Actors[0].AttachEffect("F_bg_fire002", 5, EffectLocation.Bottom);
+				break;
 			case 13:
 				StartMinigame(character, track);
 				break;

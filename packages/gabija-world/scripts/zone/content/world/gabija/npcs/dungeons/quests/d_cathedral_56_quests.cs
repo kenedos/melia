@@ -6,14 +6,17 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -40,10 +43,12 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 	private const int DocumentsNeeded = 5;
 	private const int CursedOrbsNeeded = 10;
-	private const int CursedOrbsPerPickup = 2;
+	private const int CursedOrbRespawnSeconds = 60;
 
 	private const string DocumentVar = "Gabija.Cathedral56.Document";
 	private const string LureVar = "Gabija.Cathedral56.Lure";
+	private const int DemonCount = 30;
+	private const int DemonsNeeded = 8;
 	private const string CandleVar = "Gabija.Cathedral56.Candle";
 	private const string CursedOrbVar = "Gabija.Cathedral56.CursedOrb";
 
@@ -120,13 +125,14 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 		character.Variables.Perm.Set(CandleVar + number, true);
 
-		if (!character.Variables.Perm.GetBool(CandleVar + 1, false) || !character.Variables.Perm.GetBool(CandleVar + 2, false))
+		character.Quests.AddObjectiveProgress(Mq07, "openTheDoor");
+
+		if (!character.Quests.IsCompletable(Mq07))
 		{
 			character.ServerMessage(L("One candle is out. The barrier still holds on the other."));
 			return;
 		}
 
-		character.Quests.CompleteObjective(Mq07, "openTheDoor");
 		character.ServerMessage(L("Both candles are out and the sealed door has opened."));
 	}
 
@@ -224,11 +230,38 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 			await Task.CompletedTask;
 		});
 
-		// The three places the transformed Revelator is seen
+		// Demons that can be persuaded while disguised
 		//-------------------------------------------------------------------------
-		this.AddLurePoint(1, 331, 150);
-		this.AddLurePoint(2, -600, -92);
-		this.AddLurePoint(3, 929, 932);
+		this.AddPersuadableDemon(1, false, -965, -50);
+		this.AddPersuadableDemon(2, false, -1519, -546);
+		this.AddPersuadableDemon(3, false, -1102, 50);
+		this.AddPersuadableDemon(4, false, -981, 197);
+		this.AddPersuadableDemon(5, false, -624, -46);
+		this.AddPersuadableDemon(6, false, -1536, 93);
+		this.AddPersuadableDemon(7, false, -369, -87);
+		this.AddPersuadableDemon(8, false, -1049, -215);
+		this.AddPersuadableDemon(9, false, -1555, -348);
+		this.AddPersuadableDemon(10, false, -1546, -90);
+		this.AddPersuadableDemon(11, true, 66, -127);
+		this.AddPersuadableDemon(12, true, -1029, -72);
+		this.AddPersuadableDemon(13, true, 434, 210);
+		this.AddPersuadableDemon(14, true, 508, 646);
+		this.AddPersuadableDemon(15, true, 1124, 893);
+		this.AddPersuadableDemon(16, true, 1425, 604);
+		this.AddPersuadableDemon(17, true, 768, 927);
+		this.AddPersuadableDemon(18, true, 196, -372);
+		this.AddPersuadableDemon(19, true, -372, -90);
+		this.AddPersuadableDemon(20, true, -645, -87);
+		this.AddPersuadableDemon(21, true, 192, 157);
+		this.AddPersuadableDemon(22, false, 1703, -403);
+		this.AddPersuadableDemon(23, false, 1766, 413);
+		this.AddPersuadableDemon(24, false, -2094, -501);
+		this.AddPersuadableDemon(25, false, -2291, 428);
+		this.AddPersuadableDemon(26, false, -2104, -688);
+		this.AddPersuadableDemon(27, false, -2166, -296);
+		this.AddPersuadableDemon(28, false, -2011, -97);
+		this.AddPersuadableDemon(29, false, -2030, -211);
+		this.AddPersuadableDemon(30, false, -2176, 436);
 
 		// Apgaule Altar
 		//-------------------------------------------------------------------------
@@ -302,6 +335,8 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("The portal opens onto the Grand Corridor, at the far end where the altar of the revelation stands."));
 
+			character.PlayEffect("F_pc_warp_circle", 1f);
+			character.PlayEffect("F_pc_warp_light", 1f);
 			character.Warp("d_cathedral_54", 1542.78, 0.19, -2296.36);
 		});
 
@@ -386,9 +421,6 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					for (var i = 1; i <= 6; ++i)
-						character.Variables.Perm.Set(CursedOrbVar + i, false);
-
 					character.Quests.Start(Sq02);
 					await dialog.Msg(L("They are set all over the west of the Sanctuary. Ten of them would be a good start."));
 					character.LookAround();
@@ -583,7 +615,7 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 
 			if (answer == "accept")
 			{
-				for (var i = 1; i <= 3; ++i)
+				for (var i = 1; i <= DemonCount; ++i)
 					character.Variables.Perm.Set(LureVar + i, false);
 
 				character.Quests.Start(Mq03);
@@ -756,61 +788,57 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			var read = await character.TimeActions.StartAsync(L("Reading the document..."), L("Cancel"), "READ", TimeSpan.FromSeconds(2));
+			var read = await character.TimeActions.StartAsync(L("Checking the Contents"), L("Cancel"), "SITREAD", TimeSpan.FromSeconds(4));
 
 			if (read != TimeActionResult.Completed)
 				return;
 
 			character.Variables.Perm.Set(DocumentVar + number, true);
 			character.Inventory.Add(ItemId.CHATHEDRAL56_MQ01_ITEM, 1, InventoryAddType.PickUp);
-			character.ServerMessage(LF("Documents found: {0}/{1}", character.Inventory.CountItem(ItemId.CHATHEDRAL56_MQ01_ITEM), DocumentsNeeded));
+			character.AddonMessage(AddonMessage.NOTICE_Dm_GetItem, L("Found details on demon transformation"), 5);
 		});
 	}
 
 	/// <summary>
-	/// Adds one of the three places the transformed Revelator has to be seen
-	/// before the demons follow him to Apgaule Altar.
+	/// Adds one of the demons that follows a disguised Revelator to Apgaule Altar.
 	/// </summary>
 	/// <param name="number"></param>
+	/// <param name="isPawndel"></param>
 	/// <param name="x"></param>
 	/// <param name="z"></param>
-	private void AddLurePoint(int number, double x, double z)
+	private void AddPersuadableDemon(int number, bool isPawndel, double x, double z)
 	{
-		AddQuestTrigger("CHATHEDRAL56_MQ03_LURE" + number, "d_cathedral_56", x, z, 250, async args =>
+		var monsterId = isPawndel ? 57371 : 57370;
+		var name = isPawndel ? L("Blue Pawndel") : L("Black Pawnd");
+		var going = isPawndel ? L("I'll be there first!") : L("Confirm");
+
+		AddConditionalNpc(monsterId, name, "CHATHEDRAL56_MQ03_DEMON" + number, "d_cathedral_56", x, z, 90, c => c.Quests.IsActive(Mq03) && !c.Quests.IsCompletable(Mq03) && !c.Variables.Perm.GetBool(LureVar + number, false), async dialog =>
 		{
-			if (args.Initiator is not Character character)
-				return;
+			var character = dialog.Player;
 
-			if (!character.Quests.IsActive(Mq03) || character.Quests.IsCompletable(Mq03))
-				return;
-
-			if (character.Variables.Perm.GetBool(LureVar + number, false))
-				return;
+			dialog.SetTitle(name);
 
 			if (!character.IsBuffActive(BuffId.CHATHEDRAL56_MQ03_BUFF))
+				return;
+
+			string[] pitches = [L("I know where the key is"), L("I know the location of the key hidden by the humans"), L("There is a chance to impress Naktis")];
+			string[] urgings = [L("You have to find it quickly"), L("This is your only chance")];
+
+			var first = await dialog.Select(pitches[GameRandom.Get().Next(pitches.Length)], Option(L("What is it?"), "talk"), Option(L("It's nothing"), "leave"));
+			if (first != "talk")
+				return;
+
+			var second = await dialog.Select(urgings[GameRandom.Get().Next(urgings.Length)], Option(L("Then go without me"), "go"), Option(L("If you do not want to, just tell me"), "leave"));
+			if (second != "go")
 			{
-				character.ServerMessage(L("Naktis' servants would see through you. Use the Demon Transform Scroll first."));
+				await dialog.Msg(L("You are a little strange..."));
 				return;
 			}
 
 			character.Variables.Perm.Set(LureVar + number, true);
-
-			var lured = 0;
-			for (var i = 1; i <= 3; ++i)
-			{
-				if (character.Variables.Perm.GetBool(LureVar + i, false))
-					lured++;
-			}
-
-			character.ServerMessage(LF("Demons drawn toward Apgaule Altar: {0}/{1}", lured, 3));
-
-			if (lured >= 3)
-			{
-				character.Quests.CompleteObjective(Mq03, "lureTheDemons");
-				character.ServerMessage(L("Every demon that saw you is on its way to Apgaule Altar."));
-			}
-
-			await Task.CompletedTask;
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, name + L(" has been successfully persuaded!"), 3);
+			await dialog.Msg(going);
+			character.Quests.AddObjectiveProgress(Mq03, "lureTheDemons");
 		});
 	}
 
@@ -1000,28 +1028,43 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 	/// <param name="direction"></param>
 	private void AddCursedOrb(int number, double x, double z, double direction)
 	{
-		AddConditionalNpc(151022, L("Cursed Orb"), "CHATHEDRAL56_SQ02_KILL" + number, "d_cathedral_56", x, z, direction, c => c.Quests.IsActive(Sq02), async dialog =>
+		AddConditionalNpc(151022, L("Cursed Orb"), "CHATHEDRAL56_SQ02_KILL" + number, "d_cathedral_56", x, z, direction, c => c.Quests.IsActive(Sq02) && !IsOrbTaken(c, number), async dialog =>
 		{
 			var character = dialog.Player;
+			var npc = dialog.Npc;
 
 			dialog.SetTitle(L("Cursed Orb"));
 
-			if (character.Variables.Perm.GetBool(CursedOrbVar + number, false))
+			if (character.Quests.IsCompletable(Sq02) || IsOrbTaken(character, number))
+				return;
+
+			var guards = character.Map.GetAttackableEnemiesInPosition(character, npc.Position, 70).OfType<Mob>().Where(mob => mob.Faction == FactionType.Monster).ToList();
+			if (guards.Count > 0)
 			{
-				await dialog.Msg(L("{#666666}*You have already taken this orb*{/}"));
+				foreach (var guard in guards)
+					guard.InsertHate(character);
+
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("The demons are defending it!"), 3);
 				return;
 			}
 
-			var taken = await character.TimeActions.StartAsync(L("Lifting the cursed orb..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+			var taken = await character.TimeActions.StartAsync(L("Retrieving Cursed Orb"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
 
 			if (taken != TimeActionResult.Completed)
 				return;
 
-			character.Variables.Perm.Set(CursedOrbVar + number, true);
-			character.Inventory.Add(ItemId.CHATHEDRAL56_SQ02_ITEM, CursedOrbsPerPickup, InventoryAddType.PickUp);
-			character.ServerMessage(LF("Cursed orbs collected: {0}/{1}", character.Inventory.CountItem(ItemId.CHATHEDRAL56_SQ02_ITEM), CursedOrbsNeeded));
+			character.Variables.Temp.Set(CursedOrbVar + number, GameClock.LocalNow.AddSeconds(CursedOrbRespawnSeconds));
+			character.Inventory.Add(ItemId.CHATHEDRAL56_SQ02_ITEM, 1, InventoryAddType.PickUp);
+			npc.PlayEffect("I_bomb001_orange", 1f);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Acquired a Cursed Orb!"), 2);
 		});
 	}
+
+	/// <summary>
+	/// Returns whether the character has taken the orb recently.
+	/// </summary>
+	private static bool IsOrbTaken(Character character, int number)
+		=> character.Variables.Temp.TryGet<DateTime>(CursedOrbVar + number, out var until) && until > GameClock.LocalNow;
 }
 
 //-----------------------------------------------------------------------------
@@ -1107,7 +1150,7 @@ public class Cathedral56Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20330, QuestStatus.Completed));
 
-		AddObjective("lureTheDemons", L("Lure the demons to Apgaule Altar"), new ManualObjective());
+		AddObjective("lureTheDemons", L("Lure the demons to Apgaule Altar"), new ManualObjective(8));
 
 		AddReward(new ItemReward("expCard8", 1));
 		AddReward(new TakeItemReward("CHATHEDRAL56_MQ02_ITEM", 1));
@@ -1245,7 +1288,7 @@ public class Cathedral56Mq07Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(20334, QuestStatus.Completed));
 
-		AddObjective("openTheDoor", L("Look for a way to open the sealed door"), new ManualObjective());
+		AddObjective("openTheDoor", L("Look for a way to open the sealed door"), new ManualObjective(2));
 	}
 
 	public override void OnSuccess(Character character, Quest quest)

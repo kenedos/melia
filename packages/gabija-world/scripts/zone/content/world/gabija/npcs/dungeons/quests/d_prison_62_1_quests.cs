@@ -363,7 +363,7 @@ public class DPrison621QuestNpcsScript : GeneralScript
 				character.ServerMessage(L("The Orb of Return needs more of the demons' evil energy."));
 				return;
 			}
-		});
+		}).WithEffect("F_pattern008_violet_loop", 1f, EffectLocation.Bottom);
 
 		// Bishop Urbonas
 		//-------------------------------------------------------------------------
@@ -545,7 +545,7 @@ public class DPrison621QuestNpcsScript : GeneralScript
 		// The fences closing off the prison until the idol is destroyed
 		//-------------------------------------------------------------------------
 		for (var i = 0; i < Fences.GetLength(0); ++i)
-			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON621_MQ_02_WALL_" + (i + 1), "d_prison_62_1", Fences[i, 0], Fences[i, 1], Fences[i, 2], AreFencesStanding);
+			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON621_MQ_02_WALL_" + (i + 1), "d_prison_62_1", Fences[i, 0], Fences[i, 1], Fences[i, 2], AreFencesStanding).WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
 	}
 
 	/// <summary>

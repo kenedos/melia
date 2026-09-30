@@ -15,6 +15,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -40,10 +41,29 @@ public class FGele573QuestNpcsScript : GeneralScript
 	public const string AltarResurrectionsVar = "Gabija.Gele573.Hq02.Resurrections";
 	public const string SeveredSoulVar = "Gabija.Gele573.Mq04.Soul";
 	private const string SeveredSourceVar = "Gabija.Gele573.Mq04.Source";
+	private const string SeveredOriginalVar = "Gabija.Gele573.Mq04.Original";
 	private readonly static Position PumpuraBarrierPosition = new Position(823, 0, 90);
+	private static DateTime _pumpuraBarrierReadyAt = DateTime.MinValue;
+	private const int CirclesNeeded = 7;
 
 	protected override void Load()
 	{
+		// A severed soul takes its demon with it when a player destroys it.
+		ZoneServer.Instance.ServerEvents.EntityKilled.Subscribe((sender, args) =>
+		{
+			if (args.Target is not Mob soul || !soul.Vars.GetBool(SeveredSoulVar, false))
+				return;
+
+			var killer = args.Attacker == null ? null : soul.GetKillBeneficiary(args.Attacker);
+			if (killer == null)
+				return;
+
+			killer.ServerMessage(L("The demon's soul has been destroyed."));
+
+			if (soul.Vars.TryGet<Mob>(SeveredOriginalVar, out var original) && !original.IsDead)
+				original.Kill(null);
+		});
+
 		// Resurrecting at the central altar of Tenet Church 1F opens the Paladin Master's hidden quest.
 		ZoneServer.Instance.ServerEvents.PlayerResurrected.Subscribe((sender, args) =>
 		{
@@ -104,7 +124,8 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					await dialog.Msg(L("Defeat the demons around the Tree Guard Post Barrier. Their souls should fill its divine power a little."));
+					await dialog.Msg(L("Defeat the demons around the Tree Guard Post Barrier."));
+					await dialog.Msg(L("The souls of those demons should be able to fill its divine powers a little. I'm counting on you!"));
 					character.Quests.Start(Mq02);
 				}
 				return;
@@ -112,13 +133,28 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq01))
 			{
-				await dialog.Msg(L("Collect the barrier pieces at Mazas Rest Place. Kayetonas is at Flower Greeting Hill."));
+				if (character.Quests.IsCompletable(Mq01))
+				{
+					await dialog.Msg(L("I'm pretty dull and unsure on fixing the barrier, so could you inform to Kayetonas about it?"));
+					return;
+				}
+
+				await dialog.Msg(L("The barrier was made a long time ago."));
+				await dialog.Msg(L("And I failed to protect it, what do I tell our ancestors?"));
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq02))
 			{
-				await dialog.Msg(L("Charge the barrier at the Tree Guard Post. Kayetonas wants to hear of it."));
+				if (character.Quests.IsCompletable(Mq02))
+				{
+					await dialog.Msg(L("Good work."));
+					await dialog.Msg(L("Honestly, I had my doubts, but the results seem to be fine."));
+					await dialog.Msg(L("You just need to tell it like that to Kayetonas in Flower hill."));
+					return;
+				}
+
+				await dialog.Msg(L("All souls are pure. So even if it's a demon's soul, it can still provide some divine power."));
 				return;
 			}
 
@@ -181,19 +217,45 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq03))
 			{
-				await dialog.Msg(L("The summoning circles are at Mairunas Knoll. Remove them before they can be used again."));
+				if (character.Quests.IsCompletable(Mq03))
+				{
+					await dialog.Msg(L("You can't let your guard down just because the Demon Summoning Circles are gone."));
+					await dialog.Msg(L("We don't even know what caused them to appear in the first place."));
+					return;
+				}
+
+				await dialog.Msg(L("Even with this many demons, you still managed to make it through."));
+				await dialog.Msg(L("You may be the Revelator, but that's still impressive."));
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq04))
 			{
-				await dialog.Msg(L("The barrier at Pumpura Hill will sever the souls. Use it."));
+				if (character.Quests.IsCompletable(Mq04))
+				{
+					await dialog.Msg(L("Honestly, I had my doubts, but it seems to be working?"));
+					await dialog.Msg(L("Please let Kayetonas know about this."));
+					await dialog.Msg(L("I think he will be pleased, he is in Flower Greeting Hill."));
+					return;
+				}
+
+				await dialog.Msg(L("You better eliminate the severed souls as fast as possible."));
+				await dialog.Msg(L("Wouldn't it be scary if they resurrected again?"));
 				return;
 			}
 
 			if (character.Quests.IsActive(Mq05))
 			{
-				await dialog.Msg(L("Just a little longer. I can hold on."));
+				if (character.Quests.IsCompletable(Mq05))
+				{
+					await dialog.Msg(L("Now, I think I can live."));
+					await dialog.Msg(L("We have to keep it up and stop the demons."));
+					await dialog.Msg(L("Please tell Kayetonas that protecting this place isn't easy."));
+					return;
+				}
+
+				await dialog.Msg(L("Holding off against this many enemies is by itself a great feat."));
+				await dialog.Msg(L("It's all thanks to the Paladin Master."));
 				return;
 			}
 
@@ -539,7 +601,7 @@ public class FGele573QuestNpcsScript : GeneralScript
 				character.ServerMessage(L("Acquired a piece of the destroyed barrier"));
 				character.Inventory.Add(650704, 1, InventoryAddType.PickUp);
 			},
-		});
+		}, npc => npc.AddEffect(new AttachEffect("F_levitation006_loop", 0.5f, EffectLocation.Bottom)));
 
 		// Tree Guard Post Barrier
 		//-------------------------------------------------------------------------
@@ -573,7 +635,18 @@ public class FGele573QuestNpcsScript : GeneralScript
 			Seconds = 2,
 			GuardClassNames = ["zigri_brown", "zigri_brown"],
 			GuardMessage = L("Defeat the monsters protecting the Demon Summoning Circle first!"),
-			OnDone = (character, npc) => character.ServerMessage(L("You've removed the Demon Summoning Circle!")),
+			GuardEffect = "I_cleric_hexing_cast_dark",
+			GuardEffectScale = 2f,
+			OnDone = (character, npc) =>
+			{
+				npc?.PlayEffect("I_bomb001_orange", 1f);
+				character.Quests.AddObjectiveProgress(Mq03, "removeCircles");
+				character.ServerMessage(LF("You've removed the Demon Summoning Circle! ({0} / {1})", character.Variables.Temp.GetInt(QuestSpots.CountVar("GELE573_MQ_03"), 0), CirclesNeeded));
+			},
+		}, npc =>
+		{
+			npc.AddEffect(new AttachEffect("F_ground053_lineup", 7f, EffectLocation.Bottom));
+			npc.AddEffect(new AttachEffect("I_smoke007_green", 1f, EffectLocation.Bottom));
 		});
 
 		// Pumpura Hill Barrier
@@ -586,11 +659,18 @@ public class FGele573QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				var severed = await character.TimeActions.StartAsync(L("Barrier activating..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(1));
+				if (_pumpuraBarrierReadyAt > GameClock.LocalNow)
+				{
+					character.ServerMessage(L("The barrier's power is spent and it is recharging!"));
+					return;
+				}
+
+				var severed = await character.TimeActions.StartAsync(L("Barrier operating..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(1));
 
 				if (severed != TimeActionResult.Completed)
 					return;
 
+				dialog.Npc.PlayEffect("F_explosion004_yellow", 1f);
 				SeverSouls(character);
 				return;
 			}
@@ -607,24 +687,35 @@ public class FGele573QuestNpcsScript : GeneralScript
 		var now = GameClock.LocalNow;
 		var demons = character.Map.GetAttackableEnemiesInPosition(character, PumpuraBarrierPosition, 120)
 			.OfType<Mob>()
-			.Where(mob => mob.Race == RaceType.Velnias && !mob.Vars.GetBool(SeveredSoulVar, false) && !(mob.Vars.TryGet<DateTime>(SeveredSourceVar, out var until) && until > now))
+			.Where(mob => !mob.IsDead && mob.Race == RaceType.Velnias && !mob.Vars.GetBool(SeveredSoulVar, false) && !(mob.Vars.TryGet<DateTime>(SeveredSourceVar, out var until) && until > now))
+			.Where(mob => mob.Hp * 2 <= mob.MaxHp)
 			.ToList();
 
 		if (demons.Count == 0)
 		{
-			character.ServerMessage(L("The barrier's power only works when there are weakened monsters around it."));
+			character.ServerMessage(L("The barrier's power only works when there are weakened demon monsters around it."));
 			return;
 		}
+
+		_pumpuraBarrierReadyAt = now.AddSeconds(1);
 
 		foreach (var demon in demons)
 		{
 			demon.Vars.Set(SeveredSourceVar, now.AddSeconds(20));
 
+			if (demon.Components.TryGet<AiComponent>(out var ai))
+			{
+				ai.Script.ClearTarget();
+				ai.Script.Suspend(TimeSpan.FromSeconds(20));
+			}
+
 			var soul = new Mob(demon.Data.Id, RelationType.Enemy);
+			soul.Name = L("Separated Demon Soul");
 			soul.Position = demon.Position;
 			soul.SpawnPosition = demon.Position;
 			soul.Level = 15;
 			soul.Vars.SetBool(SeveredSoulVar, true);
+			soul.Vars.Set(SeveredOriginalVar, demon);
 			soul.Components.Add(new LifeTimeComponent(soul, TimeSpan.FromSeconds(20)));
 			soul.Components.Add(new MovementComponent(soul));
 			soul.Components.Add(new AiComponent(soul, "TrackWaitMonster"));
@@ -688,7 +779,7 @@ public class Gele573Mq02Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(22));
 
-		AddObjective("chargeBarrier", L("Charge the Tree Guard Post Barrier"), new KillObjective(7, "puragi_green", "banshee", "zigri_brown", "Deadbornscab_mage") { AreaCenter = new Position(249, 0, -733), AreaRadius = 230 });
+		AddObjective("chargeBarrier", L("Charge the Tree Guard Post Barrier"), new ScoreKillObjective(7, (mob, character) => mob.Race == RaceType.Velnias && mob.Position.InRange2D(new Position(249, 0, -733), 230) ? 1 : 0));
 
 		AddReward(new ItemReward("expCard3", 2));
 		AddReward(new ItemReward("Drug_SP1_Q", 30));
@@ -715,7 +806,7 @@ public class Gele573Mq03Quest : QuestScript
 
 		AddPrerequisite(new LevelPrerequisite(22));
 
-		AddObjective("removeCircles", L("Remove the Demon Summoning Circles"), new VariableCheckObjective(QuestSpots.CountVar("GELE573_MQ_03"), 7, isPermanent: false));
+		AddObjective("removeCircles", L("Remove the Demon Summoning Circles"), new ManualObjective(7));
 
 		AddReward(new ItemReward("expCard3", 2));
 	}

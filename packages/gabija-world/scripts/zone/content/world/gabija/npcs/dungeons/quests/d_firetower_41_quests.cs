@@ -38,10 +38,9 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 	private readonly static QuestId Sq05 = new QuestId(17006);
 	private readonly static QuestId Sq06 = new QuestId(8500);
 
-	public const string GemChargeVar = "Gabija.Quests.Ftower41Mq04.GemCharge";
-	public const int GemChargeNeeded = 10;
+	public const int GemChargeNeeded = 500;
 	private const string GemPositionVar = "Gabija.Quests.Ftower41Mq04.GemPosition";
-	private const float GemRange = 300;
+	private const float GemRange = 90;
 	private readonly static string[] GemMonsters = { "rubblem", "flight_hope", "Fire_Dragon" };
 
 	protected override void Load()
@@ -170,7 +169,6 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					character.Variables.Perm.SetInt(GemChargeVar, 0);
 					character.Variables.Temp.Remove(GemPositionVar);
 					character.Quests.Start(Mq04);
 					character.Inventory.Add(ItemId.FTOWER41_MQ_04_ITEM, 1, InventoryAddType.PickUp);
@@ -571,11 +569,10 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 		if (!character.Variables.Temp.TryGet<Position>(GemPositionVar, out var gemPosition) || mob.Position.Get2DDistance(gemPosition) > GemRange)
 			return;
 
-		var charge = Math.Min(GemChargeNeeded, character.Variables.Perm.GetInt(GemChargeVar, 0) + 1);
-		character.Variables.Perm.SetInt(GemChargeVar, charge);
+		character.Quests.AddObjectiveProgress(Mq04, "chargeTheGem", System.Random.Shared.Next(10, 51));
 		mob.PlayEffect("F_light015_violet1", 1f);
 
-		if (charge >= GemChargeNeeded)
+		if (character.Quests.IsCompletable(Mq04))
 		{
 			character.Variables.Temp.Remove(GemPositionVar);
 			character.ServerMessage(L("The Absorbing Gem is fully charged. Return to Grita."));
@@ -692,7 +689,7 @@ public class Ftower41Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8475, QuestStatus.Completed));
 
-		AddObjective("chargeTheGem", L("Charge the Absorbing Gem"), new VariableCheckObjective(DFiretower41QuestNpcsScript.GemChargeVar, DFiretower41QuestNpcsScript.GemChargeNeeded, isPermanent: true));
+		AddObjective("chargeTheGem", L("Charge the Absorbing Gem"), new ManualObjective(DFiretower41QuestNpcsScript.GemChargeNeeded));
 
 		AddReward(new ItemReward("expCard7", 1));
 		AddReward(new TakeItemReward("FTOWER41_MQ_04_ITEM"));

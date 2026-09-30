@@ -37,13 +37,41 @@ public class Farm472Sq020Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Sends the field's monsters at the player, in two waves.
+	/// </summary>
+	private static void StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("1st")
+			.Monster(57327, 807.81, 72.61, -1059.12)
+			.Monster(57327, 848.09, 72.61, -1106.61)
+			.Monster(57327, 906.85, 72.61, -1141.33, 56)
+			.Monster(57327, 965.88, 72.61, -1160.77, 101)
+			.Monster(57327, 1014.56, 72.61, -1133.53, 112)
+			.Monster(57327, 1058.65, 72.61, -1097.80, 146)
+			.Monster(57327, 1107.53, 72.61, -1056.46, 173)
+			.Monster(57327, 1148.66, 73.45, -989.93, -170)
+			.On(s => s.Elapsed >= 10, s => s.Game.StartStage("2nd"), 1);
+
+		game.Stage("2nd")
+			.Monster(57488, 751.21, 72.61, -1148.54)
+			.Monster(57488, 705.29, 72.61, -1083.47)
+			.Monster(57488, 833.72, 72.61, -1211.13, 55)
+			.Monster(57488, 961.63, 72.61, -1225.78, 80)
+			.Monster(57488, 1071.85, 72.61, -1178.34, 131)
+			.Monster(57488, 1151.25, 72.77, -1077.51, 168);
+
+		game.Start("1st");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
 			case 2:
-				// The client plays the break-in as a minigame; the fight the
-				// box arms is what the server owes it.
+				StartMinigame(character, track);
 				character.ServerMessage(L("Fight the monsters off and break the chest open!"));
 				break;
 

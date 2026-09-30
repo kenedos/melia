@@ -683,6 +683,7 @@ public class DPrison81QuestNpcsScript : GeneralScript
 		if (purified != TimeActionResult.Completed)
 			return;
 
+		dialog.Npc.PlayEffect("F_pc_making_finish_white", 1.5f, heightOffset: EffectLocation.Middle);
 		character.Variables.Perm.SetBool(LightCrystalVar + number, true);
 
 		var count = 0;

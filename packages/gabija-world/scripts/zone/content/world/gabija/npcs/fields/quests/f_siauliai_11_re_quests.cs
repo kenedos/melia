@@ -459,6 +459,7 @@ public class FSiauliai11ReQuestNpcsScript : GeneralScript
 			if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
 				return;
 
+			dialog.Npc.PlayEffect("F_pc_making_finish_white", 2f);
 			character.Inventory.Add(ItemId.SIAU11RE_MQ_06_ITEM, 1, InventoryAddType.PickUp);
 			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("You discovered a locked box. Bring it to Priest Pranas in Orsha."), 5);
 			character.LookAround();
@@ -618,6 +619,7 @@ public class FSiauliai11ReQuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq02) || character.Quests.IsCompletable(Sq02) || character.Variables.Perm.GetBool(CircleVar + number, false))
 						return;
 
+					dialog.Npc.PlayEffect("F_ground012_light", 0.25f);
 					character.Variables.Perm.Set(CircleVar + number, true);
 					var removed = character.Variables.Perm.GetInt(CircleCountVar, 0) + 1;
 					character.Variables.Perm.SetInt(CircleCountVar, removed);
@@ -743,6 +745,7 @@ public class FSiauliai11ReQuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq08) || character.Quests.IsCompletable(Sq08) || character.Variables.Perm.GetBool(PackageVar + number, false))
 						return;
 
+					dialog.Npc.PlayEffect("F_smoke046", 0.5f);
 					character.Variables.Perm.Set(PackageVar + number, true);
 					character.Inventory.Add(ItemId.SIAU11RE_SQ_08_ITEM, 1, InventoryAddType.PickUp);
 					character.LookAround();

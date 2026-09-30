@@ -386,6 +386,16 @@ namespace Melia.Zone.Scripting
 		private static bool IsSharedFollower(Character character, Track track)
 			=> track.Group != null && track.Owner != null && track.Owner != character;
 
+		/// <summary>
+		/// Keeps the track running past its cutscene, until the quest
+		/// reaches the status the track ends with.
+		/// </summary>
+		/// <param name="track"></param>
+		protected static void HoldTrackOpen(Track track)
+		{
+			track.HoldOpen = true;
+		}
+
 		protected static void CreateBattleBoxInLayer(Character character, Track track)
 		{
 			if (IsSharedFollower(character, track))

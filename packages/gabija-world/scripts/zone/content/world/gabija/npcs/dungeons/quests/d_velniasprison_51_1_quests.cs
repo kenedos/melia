@@ -563,7 +563,7 @@ public class Vprison511Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60004, QuestStatus.Completed));
 
-		AddObjective("drainAltar", L("Help Hauberk absorb Blut's powers"), new ManualObjective());
+		AddObjective("drainAltar", L("Help Hauberk absorb Blut's powers"), new ManualObjective(150));
 
 		AddReward(new ItemReward("expCard8", 3));
 	}

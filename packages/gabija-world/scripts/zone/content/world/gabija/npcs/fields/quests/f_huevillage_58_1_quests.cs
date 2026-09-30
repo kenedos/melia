@@ -315,6 +315,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sq02) && character.Quests.IsCompletable(Sq02))
 			{
 				await dialog.Msg(L("With nothing left feeding it, the growth comes away from the ground in one piece."));
+				dialog.Npc.PlayEffect("I_explosion007_light", 2f);
 				await dialog.CompleteQuest(Sq02);
 				character.LookAround();
 				return;
@@ -342,7 +343,7 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("A knot of blackened growth, sunk into the slope of Veidma Uphill."));
-		});
+		}).WithEffect("F_ground132_dark_green_loop", 5f, EffectLocation.Bottom);
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------

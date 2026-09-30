@@ -445,7 +445,7 @@ public class DPrison623QuestNpcsScript : GeneralScript
 				return;
 
 			character.Quests.StartQuestTrack(Mq03);
-		});
+		}).WithEffect("F_pattern008_violet_loop", 1f, EffectLocation.Bottom);
 
 		// The Penitence Room
 		//-------------------------------------------------------------------------
@@ -453,13 +453,13 @@ public class DPrison623QuestNpcsScript : GeneralScript
 		{
 			dialog.Player.Warp("d_prison_62_3", HiddenRoomEntry.X, HiddenRoomEntry.Y, HiddenRoomEntry.Z);
 			await Task.CompletedTask;
-		});
+		}).WithEffect("F_circle25", 9.5f, EffectLocation.Middle);
 
 		AddConditionalNpc(154069, L("Ashaq Underground Prison 3F"), "PRISON623_1_TO_PRISON623", "d_prison_62_3", 930, 674, 90, c => c.Quests.Has(Mq05), async dialog =>
 		{
 			dialog.Player.Warp("d_prison_62_3", HiddenRoomExit.X, HiddenRoomExit.Y, HiddenRoomExit.Z);
 			await Task.CompletedTask;
-		});
+		}).WithEffect("F_circle25", 9.5f, EffectLocation.Middle);
 
 		AddConditionalNpc(45324, L("Sealed Chest"), "PRISON623_MQ_05_NPC", "d_prison_62_3", 991.58, 997.43, 0, c => c.Quests.Has(Mq05) && !c.Quests.HasCompleted(Mq06), async dialog =>
 		{
@@ -513,6 +513,8 @@ public class DPrison623QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq02) || character.Quests.IsCompletable(Sq02) || character.Variables.Perm.GetBool(PouchVar + number, false))
 						return;
 
+					dialog.Npc.PlayEffect("F_pc_making_finish_white", 3f, heightOffset: EffectLocation.Middle);
+					dialog.Npc.PlayEffect("F_smoke046", 0.5f);
 					character.Variables.Perm.Set(PouchVar + number, true);
 					character.Inventory.Add(ItemId.PRISON623_SQ_02_ITEM, 1, InventoryAddType.PickUp);
 					character.LookAround();
@@ -539,6 +541,7 @@ public class DPrison623QuestNpcsScript : GeneralScript
 					if (character.Inventory.CountItem(ItemId.PRISON623_SQ_03_ITEM) == 0)
 						return;
 
+					dialog.Npc.PlayEffect("F_ground012_light", 0.1f);
 					character.Variables.Perm.Set(FragmentVar + number, true);
 					var purified = character.Variables.Perm.GetInt(PurifiedCountVar, 0) + 1;
 					character.Variables.Perm.SetInt(PurifiedCountVar, purified);
@@ -606,7 +609,7 @@ public class DPrison623QuestNpcsScript : GeneralScript
 		// The fences closing off the prison until the idol is destroyed
 		//-------------------------------------------------------------------------
 		for (var i = 0; i < Fences.GetLength(0); ++i)
-			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON623_MQ_02_WALL_" + (i + 1), "d_prison_62_3", Fences[i, 0], Fences[i, 1], Fences[i, 2], AreFencesStanding);
+			AddConditionalNpc(MonsterId.Block_Fence_2, "", "PRISON623_MQ_02_WALL_" + (i + 1), "d_prison_62_3", Fences[i, 0], Fences[i, 1], Fences[i, 2], AreFencesStanding).WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
 	}
 
 	/// <summary>

@@ -7,6 +7,7 @@
 using System;
 using Melia.Zone.Scripting;
 using Melia.Shared.Game.Const;
+using Melia.Zone.World.Actors.Monsters;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class DAbbey642MobScript : GeneralScript
@@ -19,8 +20,10 @@ public class DAbbey642MobScript : GeneralScript
 		AddSpawner("d_abbey_64_2.Id2", MonsterId.Firetower_Device_01_Q, amount: 2, tendency: TendencyType.Peaceful);
 		AddSpawner("d_abbey_64_2.Id3", MonsterId.Firetower_Valve_Q, amount: 2, tendency: TendencyType.Peaceful);
 		AddSpawner("d_abbey_64_2.Id4", MonsterId.Firetower_Valve_Q, amount: 2, tendency: TendencyType.Peaceful);
-		AddSpawner("d_abbey_64_2.Id5", MonsterId.Firetower_Defense_Q, amount: 1, tendency: TendencyType.Peaceful);
-		AddSpawner("d_abbey_64_2.Id6", MonsterId.Firetower_Defense_Q, amount: 1, tendency: TendencyType.Peaceful);
+		var firstDefense = AddSpawner("d_abbey_64_2.Id5", MonsterId.Firetower_Defense_Q, amount: 1, tendency: TendencyType.Peaceful);
+		firstDefense.Spawning += (_, args) => WatchDefense(args.Monster, 1);
+		var secondDefense = AddSpawner("d_abbey_64_2.Id6", MonsterId.Firetower_Defense_Q, amount: 1, tendency: TendencyType.Peaceful);
+		secondDefense.Spawning += (_, args) => WatchDefense(args.Monster, 2);
 		AddSpawner("d_abbey_64_2.Id7", MonsterId.Rootcrystal_01, min: 23, max: 30, respawn: Seconds(20), tendency: TendencyType.Peaceful);
 		AddSpawner("d_abbey_64_2.Id8", MonsterId.Crocoman, min: 27, max: 35, tendency: TendencyType.Aggressive);
 		AddSpawner("d_abbey_64_2.Id9", MonsterId.Lapezard, min: 23, max: 30, tendency: TendencyType.Aggressive);
@@ -338,5 +341,11 @@ public class DAbbey642MobScript : GeneralScript
 		AddSpawnPoint("d_abbey_64_2.Id13", "d_abbey_64_2", Rectangle(1689, 556, 20));
 		AddSpawnPoint("d_abbey_64_2.Id13", "d_abbey_64_2", Rectangle(1599, 326, 20));
 		AddSpawnPoint("d_abbey_64_2.Id13", "d_abbey_64_2", Rectangle(-544, 253, 20));
+	}
+
+	private static void WatchDefense(IMonster monster, int device)
+	{
+		if (monster is Mob mob)
+			mob.Damaged += (_, attacker, _) => DAbbey642QuestNpcsScript.OnDefenseHit(attacker, device);
 	}
 }

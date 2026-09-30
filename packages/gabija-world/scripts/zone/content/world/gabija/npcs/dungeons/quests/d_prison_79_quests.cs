@@ -689,6 +689,7 @@ public class DPrison79QuestNpcsScript : GeneralScript
 		if (taken != TimeActionResult.Completed)
 			return;
 
+		dialog.Npc.PlayEffect("F_pc_making_finish_white", 1.5f);
 		character.Variables.Perm.SetBool(OilPouchVar + number, true);
 		character.Inventory.Add(ItemId.PRISON_79_MQ_5_ITEM, 1, InventoryAddType.PickUp);
 	}

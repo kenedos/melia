@@ -379,7 +379,7 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("The gap opens onto a room that was never on any plan of this fortress."));
 			character.Warp("d_underfortress_65", -412.52, 303.23, 640);
-		});
+		}).WithEffect("F_circle25", 9.5f, EffectLocation.Middle);
 
 		// The guards who fell behind
 		//-------------------------------------------------------------------------

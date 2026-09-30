@@ -17,6 +17,7 @@ using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using static Melia.Zone.Scripting.Shortcuts;
@@ -41,6 +42,8 @@ public class QuestSpotSpec
 	public double AggroRadius;
 	public string[] GuardClassNames;
 	public string GuardMessage;
+	public string GuardEffect;
+	public float GuardEffectScale = 1;
 	public string IdleMessage;
 	public int RespawnSeconds;
 }
@@ -172,6 +175,7 @@ public static class QuestSpots
 				guards.RemoveAll(g => g.Map == null || g.IsDead);
 				if (guards.Count > 0)
 				{
+					MarkGuards(spec, guards);
 					if (spec.GuardMessage != null)
 						character.ServerMessage(spec.GuardMessage);
 					return;
@@ -180,6 +184,8 @@ public static class QuestSpots
 			else
 			{
 				SpawnGuards(spec, character, npc, key);
+				if (Guards.TryGetValue(key, out var spawned))
+					MarkGuards(spec, spawned);
 				if (spec.GuardMessage != null)
 					character.ServerMessage(spec.GuardMessage);
 				return;
@@ -269,6 +275,18 @@ public static class QuestSpots
 		}
 	}
 
+	/// <summary>
+	/// Attaches the spec's guard effect to every guard.
+	/// </summary>
+	private static void MarkGuards(QuestSpotSpec spec, List<Mob> guards)
+	{
+		if (spec.GuardEffect == null)
+			return;
+
+		foreach (var guard in guards)
+			guard.AttachEffect(spec.GuardEffect, spec.GuardEffectScale, EffectLocation.Top);
+	}
+
 	private static void SpawnGuards(QuestSpotSpec spec, Character character, Npc npc, string key)
 	{
 		var list = new List<Mob>();
@@ -291,5 +309,25 @@ public static class QuestSpots
 		}
 
 		Guards[key] = list;
+	}
+}
+
+/// <summary>
+/// Attaches the effects the game's simple AI puts on a placed NPC.
+/// </summary>
+public static class NpcEffectExtensions
+{
+	/// <summary>
+	/// Attaches a permanent effect to the NPC and returns the NPC.
+	/// </summary>
+	/// <param name="npc"></param>
+	/// <param name="effectName"></param>
+	/// <param name="scale"></param>
+	/// <param name="location"></param>
+	/// <returns></returns>
+	public static Npc WithEffect(this Npc npc, string effectName, float scale, EffectLocation location = EffectLocation.Bottom)
+	{
+		npc?.AddEffect(new AttachEffect(effectName, scale, location));
+		return npc;
 	}
 }

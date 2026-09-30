@@ -93,7 +93,7 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 		});
 
 		AddConditionalNpc(MonsterId.HiddenWall_150_150_150, "", "ORCHARD324_OBB", "f_orchard_32_4", -46.79, 870.94, 90, c => !c.Quests.HasCompleted(Mq01)
-			&& !c.Quests.IsCompletable(Mq01) && c.Tracks.ActiveTrack?.Data.QuestId != Mq01.Value);
+			&& !c.Quests.IsCompletable(Mq01) && c.Tracks.ActiveTrack?.Data.QuestId != Mq01.Value).WithEffect("F_ground12_red", 20f, EffectLocation.Bottom);
 
 		// The Redemption Wards around the goddess
 		//-------------------------------------------------------------------------
@@ -115,18 +115,18 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 					character.LookAround();
 
 					await Task.CompletedTask;
-				});
+				}).WithEffect("I_ground001_yellow_loop", 1f, EffectLocation.Bottom);
 		}
 
 		// The devices feeding the Kruvina
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(156039, L("Vitality Absorption Device"), "ORCHARD324_DRAIN", "f_orchard_32_4", -287.42, 1417.67, 90, c => !c.Quests.HasCompleted(Mq04), this.Drain);
+		AddConditionalNpc(156039, L("Vitality Absorption Device"), "ORCHARD324_DRAIN", "f_orchard_32_4", -287.42, 1417.67, 90, c => !c.Quests.HasCompleted(Mq04), this.Drain).WithEffect("F_levitation032_red_loop", 2f, EffectLocation.Bottom).WithEffect("F_pattern008_violet_loop", 1f, EffectLocation.Bottom);
 
 		AddConditionalNpc(155105, L("Kruvina Suppressor"), "ORCHARD324_DESPENSOR", "f_orchard_32_4", SuppressorSpot.X, SuppressorSpot.Z, 90, c => !c.Quests.HasCompleted(Mq05) && !c.Quests.IsCompletable(Mq05), async dialog =>
 		{
 			OverloadSuppressor(dialog.Player);
 			await Task.CompletedTask;
-		});
+		}).WithEffect("F_magic_prison_circle", 2f, EffectLocation.Bottom).WithEffect("F_levitation032_red_loop", 2f, EffectLocation.Bottom);
 
 		AddConditionalNpc(153118, L("Incomplete Kruvina"), "ORCHARD324_KRUVINA", "f_orchard_32_4", -1704.19, 887.56, 45, c => !c.Quests.HasCompleted(Mq06) && !c.Quests.IsCompletable(Mq06), async dialog =>
 		{
@@ -135,7 +135,7 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				character.Quests.StartQuestTrack(Mq06);
 
 			await Task.CompletedTask;
-		});
+		}).WithEffect("F_light096_red_loop", 1f, EffectLocation.Bottom);
 
 		AddQuestTrigger("ORCHARD324_KRUVINA_TRIGGER", "f_orchard_32_4", -1704.19, 887.56, 120, async args =>
 		{
@@ -163,7 +163,7 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 				{
 					PurifyTotem(dialog.Player, number);
 					await Task.CompletedTask;
-				});
+				}).WithEffect("F_levitation005_dark_blue", 1.5f, EffectLocation.Bottom);
 		}
 
 		// Ceyral Saplings near the Shulti Workshop

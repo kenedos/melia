@@ -356,6 +356,8 @@ public class FRokas30QuestNpcsScript : GeneralScript
 				if (sealed5 != TimeActionResult.Completed)
 					return;
 
+				dialog.Npc.PlayEffect("F_ground012_light", 1f);
+				dialog.Npc.AttachEffect("F_cleric_Revival_light", 2f, EffectLocation.Bottom);
 				character.Quests.CompleteObjective(Mq5, "wakeGedulah");
 
 				character.ServerMessage(L("The Gedulah Altar is awake. Cyrenia Odell has come up to the altar."));
@@ -443,6 +445,8 @@ public class FRokas30QuestNpcsScript : GeneralScript
 				if (opened != TimeActionResult.Completed)
 					return;
 
+				dialog.Npc.PlayEffect("F_ground012_light", 1f);
+				dialog.Npc.AttachEffect("F_cleric_Revival_light", 2f, EffectLocation.Bottom);
 				character.Quests.CompleteObjective(Mq7, "wakeSviesa");
 
 				character.ServerMessage(L("The Sviesa Altar is awake. Rexipher did not reach this one."));

@@ -216,7 +216,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
 			{
-				var gatheredFlower = await character.TimeActions.StartAsync(L("Gathering the flower..."), L("Cancel"), "#SITGROPESET", TimeSpan.FromSeconds(3));
+				var gatheredFlower = await character.TimeActions.StartAsync(L("Collecting"), L("Cancel"), "#SITGROPESET", TimeSpan.FromSeconds(3));
 
 				if (gatheredFlower != TimeActionResult.Completed)
 					return;
@@ -273,7 +273,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
 			{
-				var setBomb = await character.TimeActions.StartAsync(L("Setting the Languid Herb bomb..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
+				var setBomb = await character.TimeActions.StartAsync(L("Installing the Languid Herb bomb"), L("Cancel"), "MAKING", TimeSpan.FromSeconds(3));
 
 				if (setBomb != TimeActionResult.Completed)
 					return;
@@ -286,7 +286,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			}
 
 			await dialog.Msg(L("An Upent, asleep on the cliff shelf. Its flanks rise and fall slowly."));
-		});
+		}).WithEffect("I_emo_sleep", 4f, EffectLocation.Top);
 
 		// Old Well
 		//-------------------------------------------------------------------------
@@ -318,7 +318,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					var looked20287 = await character.TimeActions.StartAsync(L("Looking into the well..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+					var looked20287 = await character.TimeActions.StartAsync(L("Observing"), L("Cancel"), "LOOK_SIT", TimeSpan.FromSeconds(3));
 
 					if (looked20287 != TimeActionResult.Completed)
 						return;
@@ -424,11 +424,13 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		var cut = await character.TimeActions.StartAsync(L("Cutting the herb..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+		var cut = await character.TimeActions.StartAsync(L("Collecting"), L("Cancel"), "SITGROPESET2", TimeSpan.FromSeconds(3));
 
 		if (cut != TimeActionResult.Completed)
 			return;
 
+		dialog.Npc.PlayEffect("F_archer_entangle_active_smoke", 0.5f);
+		dialog.Npc.AttachEffect("F_spread_out013_green", 1f, EffectLocation.Bottom);
 		character.Inventory.Add(ItemId.HUEVILLAGE_58_3_MQ01_ITEM1, 1, InventoryAddType.PickUp);
 		character.ServerMessage(L("You cut a handful of the herb and wrap it."));
 	}
@@ -445,11 +447,12 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		if (character.Quests.IsActive(Mq03) && character.Inventory.CountItem(ItemId.HUEVILLAGE_58_3_MQ03_ITEM1) == 0)
 		{
-			var opened = await character.TimeActions.StartAsync(L("Opening the barrel..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+			var opened = await character.TimeActions.StartAsync(L("Searching"), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
 
 			if (opened != TimeActionResult.Completed)
 				return;
 
+			dialog.Npc.PlayEffect("F_burstup019_smoke", 1f);
 			character.Inventory.Add(ItemId.HUEVILLAGE_58_3_MQ03_ITEM1, 1, InventoryAddType.PickUp);
 			character.ServerMessage(L("The small barrel is the one with the explosives in it after all."));
 			return;
@@ -470,7 +473,7 @@ public class FHuevillage583QuestNpcsScript : GeneralScript
 
 		if (character.Quests.IsActive(Mq03))
 		{
-			var opened = await character.TimeActions.StartAsync(L("Opening the barrel..."), L("Cancel"), "SITGROPE", TimeSpan.FromSeconds(2));
+			var opened = await character.TimeActions.StartAsync(L("Searching"), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
 
 			if (opened != TimeActionResult.Completed)
 				return;

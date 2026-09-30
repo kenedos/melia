@@ -647,7 +647,7 @@ public class Thorn21Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50003, QuestStatus.Completed));
 
-		AddPityDrop("THORN21_MQ04_BUGWING", 0.45f, 5, 1, "Matsum");
+		AddPityDrop("THORN21_MQ04_BUGWING", 0.55f, 5, 1, "Matsum");
 
 		AddObjective("collectStamen", L("Obtain Matsum's Flower Stamen"), new CollectItemObjective("THORN21_MQ04_BUGWING", 4));
 		AddObjective("makeStimulant", L("Create the Thorn Flower Stimulant"), new ManualObjective());

@@ -4,7 +4,9 @@
 // The Demon Lord and the revelation it took, at the end of the Thorn Forest.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
@@ -38,6 +40,80 @@ public class Thorn21Mq07Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Lets the six patches of the courtyard flare up at random and poison
+	/// whoever stands in them without the Enhanced Thorn Flower Stimulant.
+	/// </summary>
+	private static void StartHazards(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+		var random = new Random();
+
+		var nodes = new (double X, double Z, int RestSeconds)[]
+		{
+			(5661.06, -315.42, 10), (5663.11, -105.50, 20), (5850.39, -319.12, 15),
+			(5934.21, -71.06, 5), (5787.59, -182.31, 5), (5652.19, -276.71, 5),
+		};
+
+		var stage = game.Stage("Stage01");
+		var armed = new bool[nodes.Length];
+		var ticks = new int[nodes.Length];
+		var cooldowns = new int[nodes.Length];
+		var restUntil = new DateTime[nodes.Length];
+
+		foreach (var node in nodes)
+			stage.Monster(12080, node.X, 333.20, node.Z, aggressive: false, level: 62);
+
+		stage.On(s => true, s =>
+		{
+			for (var i = 0; i < nodes.Length; ++i)
+			{
+				var hazard = s.Living(i).FirstOrDefault();
+				if (hazard == null || DateTime.Now < restUntil[i])
+					continue;
+
+				if (!armed[i])
+				{
+					armed[i] = random.Next(1, 8) <= 4;
+					continue;
+				}
+
+				ticks[i]++;
+
+				if (ticks[i] == 1)
+				{
+					hazard.PlayEffect("F_burstup001_red", 0.7f);
+				}
+				else if (ticks[i] >= 4 && ticks[i] < 10)
+				{
+					hazard.PlayEffect("F_smoke017_red_1", 0.7f);
+
+					foreach (var member in s.Game.Members)
+					{
+						if (member.IsDead || member.Map != hazard.Map || member.Layer != hazard.Layer || member.Position.Get2DDistance(hazard.Position) > 65)
+							continue;
+
+						if (member.IsBuffActive(BuffId.THORN21_MQ07_THORNDRUG))
+							continue;
+
+						member.StartBuff(BuffId.Rage_Rockto_spd_down, 3, 0, TimeSpan.FromSeconds(3), hazard);
+						member.TakeSimpleHit(90, hazard);
+						member.PlayEffect("F_smoke064_red", 1f);
+					}
+				}
+				else if (ticks[i] >= 10 && ++cooldowns[i] >= 4)
+				{
+					armed[i] = false;
+					ticks[i] = 0;
+					cooldowns[i] = 0;
+					restUntil[i] = DateTime.Now.AddSeconds(nodes[i].RestSeconds);
+				}
+			}
+		});
+
+		game.Start("Stage01");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
@@ -49,6 +125,7 @@ public class Thorn21Mq07Track : TrackScript
 				character.ServerMessage(L("Cross here after drinking the Enhanced Thorn Flower Stimulant!"));
 				break;
 			case 26:
+				StartHazards(character, track);
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);
 				break;

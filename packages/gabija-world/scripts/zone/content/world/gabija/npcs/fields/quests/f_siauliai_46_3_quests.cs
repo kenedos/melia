@@ -401,6 +401,7 @@ public class FSiauliai463QuestNpcsScript : GeneralScript
 				if (searched != TimeActionResult.Completed)
 					return;
 
+				dialog.Npc.PlayEffect("F_levitation007_green", 1f);
 				character.Inventory.Add(ItemId.SIAULIAI_46_3_MQ_03_ITEM, 1, InventoryAddType.PickUp);
 				character.ServerMessage(L("A piece has been broken out of the altar. Take it to Maras."));
 				return;
@@ -574,6 +575,7 @@ public class FSiauliai463QuestNpcsScript : GeneralScript
 
 			if (searched != TimeActionResult.Completed)
 				return;
+			dialog.Npc.PlayEffect("F_smoke038", 0.3f);
 
 			character.Inventory.Add(ItemId.SIAULIAI_46_3_MQ_01_ITEM, 1, InventoryAddType.PickUp);
 			await dialog.Msg(L("This comb came through whole, and it is a big one."));

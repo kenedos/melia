@@ -513,16 +513,16 @@ public class DZachariel36QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		var poured = await character.TimeActions.StartAsync(L("Pouring the magic source..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
+		var poured = await character.TimeActions.StartAsync(L("Pouring the magic source..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2.5));
 
 		if (poured != TimeActionResult.Completed)
 			return;
 
 		character.Inventory.RemoveItem(ItemId.ZACHA5F_MQ_01_ITEM, 1);
+		character.Quests.AddObjectiveProgress(Mq02, "pourSources");
 
-		if (character.Inventory.CountItem(ItemId.ZACHA5F_MQ_01_ITEM) < 1)
+		if (character.Quests.IsCompletable(Mq02))
 		{
-			character.Quests.CompleteObjective(Mq02, "pourSources");
 			await dialog.Msg(L("The last source runs into the cube, and the false revelation is whole."));
 			return;
 		}
@@ -584,7 +584,7 @@ public class Zacha5fMq02Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8388, QuestStatus.Completed));
 
-		AddObjective("pourSources", L("Pour the magic sources into the jars"), new ManualObjective());
+		AddObjective("pourSources", L("Pour the magic sources into the jars"), new ManualObjective(8));
 
 		AddReward(new ItemReward("expCard6", 1));
 	}
@@ -612,7 +612,7 @@ public class Zacha5fMq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8389, QuestStatus.Completed));
 
-		AddObjective("placePot", L("Place the Soul Pot"), new ManualObjective());
+		AddObjective("placePot", L("Place the Soul Pot"), new KillObjective(10, "schlesien_claw", "schlesien_darkmage") { LayerOnly = true });
 
 		AddReward(new ItemReward("expCard6", 2));
 		AddReward(new ItemReward("ZACHA5F_MQ03_POT", 1));

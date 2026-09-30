@@ -118,7 +118,7 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq02))
 			{
-				await dialog.Msg(L("The large cubes are west of here, down the side hall."));
+				await dialog.Msg(L("A Guardian who is corrupted by evil will forget its responsibility to protect the Royal Mausoleum. Defeat these Guardians near the large cubes."));
 				character.Quests.ClearQuestTrack(Mq02);
 				return;
 			}
@@ -578,21 +578,21 @@ public class Zacha1fMq02Quest : QuestScript
 	{
 		SetClientId(8211);
 		SetName(L("Guardian Purifying Device"));
-		SetDescription(L("The corrupted guardians gather at the large cubes and have to be put down there."));
+		SetDescription(L("The corrupted Boowook can't remember their mission. Defeat Boowook near the large cubes."));
 		SetType(QuestType.Sub);
 		SetLocation("d_zachariel_32");
 		SetAutoTracked(true);
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "ZACHA1F_MQ_02", "d_zachariel_32", L("Check the epitaph of the Royal Mausoleum"), L("Various writings on how to prepare when the demons attack are engraved on the epitaph. Read the epitaph."));
-		SetPhase(QuestStatus.InProgress, "ZACHA1F_MQ_02_CUBES", "d_zachariel_32", L("Defeat the corrupted Guardians at the Royal Cubes"), L("The corrupted Guardians can't remember their mission. Defeat them at the large cubes."));
-		SetPhase(QuestStatus.Success, "ZACHA1F_MQ_02", "d_zachariel_32", L("Read the epitaph again"), L("The cubes are clear. Read the epitaph again."));
+		SetPhase(QuestStatus.InProgress, "ZACHA1F_MQ_02_CUBES", "d_zachariel_32", L("Defeat Boowooks near a Royal Cube to absorb"), L("The corrupted Boowook can't remember their mission. Defeat Boowook near the large cubes."));
+		SetPhase(QuestStatus.Success, "ZACHA1F_MQ_02", "d_zachariel_32", L("Defeat Boowooks near a Royal Cube to absorb"), L("The corrupted Boowook can't remember their mission. Defeat Boowook near the large cubes."));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "ZACHA1F_MQ_02_TRACK", 4000, autoStart: false, partyPlay: true);
 
 		AddPrerequisite(new LevelPrerequisite(71));
 
-		AddObjective("purifyCubes", L("Defeat the corrupted Guardians at the Royal Cubes"), new KillObjective(4, "npc_zachariel_cube_09"));
+		AddObjective("purifyCubes", L("Defeat Boowooks near a Royal Cube to absorb"), new ManualObjective(8));
 
 		AddReward(new ItemReward("expCard5", 2));
 	}

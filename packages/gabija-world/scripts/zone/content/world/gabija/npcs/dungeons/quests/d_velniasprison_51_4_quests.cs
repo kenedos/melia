@@ -420,7 +420,7 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 
 				character.Quests.CompleteObjective(Mq02, "closeCrack" + number);
 				character.ServerMessage(L("The crack closes on itself."));
-			});
+			}).WithEffect("F_circle026_violet_whitehole_loop", 3f, EffectLocation.Middle);
 		}
 
 		// The seals of Rearda, Kasa and Rada
@@ -449,7 +449,7 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 
 				character.Quests.CompleteObjective(Mq04, "releaseSeal" + number);
 				character.ServerMessage(L("The seal gives, and the key takes what it held."));
-			});
+			}).WithEffect("F_cleric_bakarine_loop", 0.3f, EffectLocation.Bottom).WithEffect("F_light066_yellow_loop", 1f, EffectLocation.Bottom);
 		}
 
 		// Pieces of the Mark of Star
@@ -457,7 +457,7 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 		for (var i = 0; i < StarMarkSpots.GetLength(0); ++i)
 		{
 			AddConditionalNpc(20025, L("Mark of Star"), i == 0 ? "VPRISON514_SQ_03_NPC" : "VPRISON514_SQ_03_NPC_" + (i + 1), "d_velniasprison_51_4",
-				StarMarkSpots[i, 0], StarMarkSpots[i, 1], 90, this.AreStarMarksScattered, this.PickStarMark);
+				StarMarkSpots[i, 0], StarMarkSpots[i, 1], 90, this.AreStarMarksScattered, this.PickStarMark).WithEffect("F_sys_trigger_point_blue", 3f, EffectLocation.Bottom);
 		}
 
 		// The magic suppressor that holds Dionys
@@ -626,7 +626,7 @@ public class Vprison514Mq03Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(60013, QuestStatus.Completed));
 
-		AddObjective("guardZydrone", L("Protect Kupole Zydrone"), new ManualObjective());
+		AddObjective("guardZydrone", L("Protect Kupole Zydrone"), new ManualObjective(120));
 
 		AddReward(new ItemReward("expCard8", 2));
 		AddReward(new ItemReward("VPRISON514_MQ_04_ITEM", 1));

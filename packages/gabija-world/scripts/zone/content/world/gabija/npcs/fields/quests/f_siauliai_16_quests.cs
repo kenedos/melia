@@ -885,6 +885,8 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Sq05) || character.Quests.IsCompletable(Sq05) || character.Variables.Perm.GetBool(GoodsVar + number, false))
 						return;
 
+					dialog.Npc.PlayEffect("F_pc_making_finish_white", 2f);
+					dialog.Npc.PlayEffect("F_smoke066", 0.3f);
 					character.Variables.Perm.Set(GoodsVar + number, true);
 					character.Inventory.Add(ItemId.SIAU16_SQ_05_ITEM, 1, InventoryAddType.PickUp);
 					character.LookAround();

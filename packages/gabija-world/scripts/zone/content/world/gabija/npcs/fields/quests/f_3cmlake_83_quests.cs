@@ -160,10 +160,10 @@ public class F3Cmlake83QuestNpcsScript : GeneralScript
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(153132, "UnvisibleName", "3CMLAKE_83_WORKBENCH1", "f_3cmlake_83", -46.96, 859.67, 294, c => !c.Quests.Has(Lake84Sq03) && !c.Quests.HasCompleted(Lake84Sq03), this.Workbench);
 
-		AddNpc(57013, "UnvisibleName", "3CMLAKE_83_OBJ1", "f_3cmlake_83", -115.27, 787.02, 249);
-		AddNpc(153133, "UnvisibleName", "3CMLAKE_83_OBJ2", "f_3cmlake_83", -56.76, 655.28, 317);
-		AddNpc(153131, "UnvisibleName", "3CMLAKE_83_OBJ3", "f_3cmlake_83", -35.61, 795.18, 90);
-		AddNpc(153131, "UnvisibleName", "3CMLAKE_83_OBJ4", "f_3cmlake_83", -37.70, 753.72, 277);
+		AddNpc(57013, "UnvisibleName", "3CMLAKE_83_OBJ1", "f_3cmlake_83", -115.27, 787.02, 249, async dialog => await F3Cmlake84QuestNpcsScript.BurnLab(dialog, 7));
+		AddNpc(153133, "UnvisibleName", "3CMLAKE_83_OBJ2", "f_3cmlake_83", -56.76, 655.28, 317, async dialog => await F3Cmlake84QuestNpcsScript.BurnLab(dialog, 8));
+		AddNpc(153131, "UnvisibleName", "3CMLAKE_83_OBJ3", "f_3cmlake_83", -35.61, 795.18, 90, async dialog => await F3Cmlake84QuestNpcsScript.BurnLab(dialog, 9));
+		AddNpc(153131, "UnvisibleName", "3CMLAKE_83_OBJ4", "f_3cmlake_83", -37.70, 753.72, 277, async dialog => await F3Cmlake84QuestNpcsScript.BurnLab(dialog, 10));
 
 		// Anga Hall and the Drava Chapel Lot
 		//-------------------------------------------------------------------------

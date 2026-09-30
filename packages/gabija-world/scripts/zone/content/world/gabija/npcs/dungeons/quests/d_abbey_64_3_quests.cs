@@ -6,14 +6,18 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Util;
+using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
+using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
@@ -37,8 +41,6 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 
 	private const string AfterTrackId = "ABBAY_64_3_MQ040_AFTER_TRACK";
 
-	private const string BarrierVar = "Gabija.Quests.Abbay643Mq030.Barrier";
-	public const string CrystalCountVar = "Gabija.Quests.Abbay643Mq030.Crystals";
 	private const string CrystalVar = "Gabija.Quests.Abbay643Mq030.Crystal";
 	private const string SporeOrderVar = "Gabija.Quests.Abbay643Sq060.Order";
 	private const string SporeStepVar = "Gabija.Quests.Abbay643Sq060.Step";
@@ -60,6 +62,27 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 
 	protected override void Load()
 	{
+		// The Brown Hummingbirds carry the black material and two things that look like it.
+		ZoneServer.Instance.ServerEvents.EntityKilled.Subscribe((sender, args) =>
+		{
+			if (args.Target is not Mob mob || mob.Data.ClassName != "humming_bud_purple" || args.Attacker == null)
+				return;
+
+			var killer = mob.GetKillBeneficiary(args.Attacker);
+
+			if (killer == null || !killer.Quests.IsActive(Mq010) || killer.Quests.IsCompletable(Mq010))
+				return;
+
+			var roll = Random(1, 15);
+			var itemId = roll <= 5 ? ItemId.ABBAY643_MQ1_ITEM03 : roll <= 10 ? ItemId.ABBAY643_MQ1_ITEM02 : roll <= 13 ? ItemId.ABBAY643_MQ1_ITEM01 : 0;
+
+			if (itemId == 0)
+				return;
+
+			killer.Inventory.Add(itemId, 1, InventoryAddType.PickUp);
+			killer.AddonMessage(AddonMessage.NOTICE_Dm_GetItem, L("You've obtained the black material that Edmundas mentioned{nl}Hand it over to Edmundas"), 5);
+		});
+
 		// Edmundas at the first device
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(153110, L("Edmundas"), "ABBEY643_EDMONDA01", "d_abbey_64_3", 712.04, -141.24, 140, c => c.Quests.HasCompleted(Abbay642Mq040) && !c.Quests.HasCompleted(Mq020), async dialog =>
@@ -67,6 +90,40 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Edmundas"));
+
+			if (character.Quests.IsActive(Mq010) && !character.Quests.IsCompletable(Mq010))
+			{
+				var options = new List<DialogOption>();
+
+				if (character.Inventory.CountItem(ItemId.ABBAY643_MQ1_ITEM03) > 0)
+					options.Add(Option(L("Hand over the Brown Hummingbird Toenail"), "toenail"));
+
+				if (character.Inventory.CountItem(ItemId.ABBAY643_MQ1_ITEM02) > 0)
+					options.Add(Option(L("Hand over the Brown Hummingbird Crystal"), "crystal"));
+
+				if (character.Inventory.CountItem(ItemId.ABBAY643_MQ1_ITEM01) > 0)
+					options.Add(Option(L("Hand over the Brown Hummingbird Mucus"), "mucus"));
+
+				if (options.Count == 0)
+				{
+					await dialog.Msg(L("It was a black liquid."));
+					await dialog.Msg(L("Just bring me anything. I'll put it in the device and check."));
+					return;
+				}
+
+				options.Add(Option(L("End conversation"), "quit"));
+
+				var handed = await dialog.Select(L("It was a black liquid. Just bring me anything. I'll put it in the device and check."), options.ToArray());
+
+				if (handed == "toenail")
+					character.Inventory.Remove(ItemId.ABBAY643_MQ1_ITEM03, character.Inventory.CountItem(ItemId.ABBAY643_MQ1_ITEM03), InventoryItemRemoveMsg.Given);
+				else if (handed == "crystal")
+					character.Inventory.Remove(ItemId.ABBAY643_MQ1_ITEM02, character.Inventory.CountItem(ItemId.ABBAY643_MQ1_ITEM02), InventoryItemRemoveMsg.Given);
+				else if (handed == "mucus")
+					character.Quests.CompleteObjective(Mq010, "handOverMaterial");
+
+				return;
+			}
 
 			if (character.Quests.IsCompletable(Mq010))
 			{
@@ -170,8 +227,6 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 				{
 					for (var i = 1; i <= Crystals.GetLength(0); ++i)
 						character.Variables.Perm.Set(CrystalVar + i, false);
-					character.Variables.Perm.SetInt(CrystalCountVar, 0);
-					character.Variables.Perm.Set(BarrierVar, false);
 
 					character.Quests.Start(Mq030);
 					character.LookAround();
@@ -189,7 +244,7 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 			if (args.Initiator is not Character character)
 				return;
 
-			if (!character.Quests.IsActive(Mq030) || character.Quests.IsCompletable(Mq030) || character.Variables.Perm.GetBool(BarrierVar, false))
+			if (!character.Quests.IsActive(Mq030) || character.Quests.IsCompletable(Mq030) || character.IsBuffActive(BuffId.ABBAY643_MQ3_BUFF))
 				return;
 
 			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("The device inside the main building's atrium seems to be the protective shield device Edmundas mentioned."), 5);
@@ -201,13 +256,17 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 		{
 			var character = dialog.Player;
 
-			if (!character.Quests.IsActive(Mq030) || character.Quests.IsCompletable(Mq030) || character.Variables.Perm.GetBool(BarrierVar, false))
+			if (!character.Quests.IsActive(Mq030) || character.Quests.IsCompletable(Mq030))
 				return;
 
-			character.Variables.Perm.Set(BarrierVar, true);
-			character.PlayEffect("F_buff_basic009_blue", 1f);
+			var obtained = await character.TimeActions.StartAsync(L("Obtaining Protective Membrane"), L("Cancel"), "ABSORB", TimeSpan.FromSeconds(1.2));
 
-			await Task.CompletedTask;
+			if (obtained != TimeActionResult.Completed)
+				return;
+
+			character.StartBuff(BuffId.ABBAY643_MQ3_BUFF, 1, 0, TimeSpan.FromSeconds(30), dialog.Npc);
+			dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f, heightOffset: EffectLocation.Top);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("Acquired Protective Membrane"), 3);
 		});
 
 		for (var i = 0; i < CrystalCircles.GetLength(0); ++i)
@@ -226,21 +285,26 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 					if (!character.Quests.IsActive(Mq030) || character.Quests.IsCompletable(Mq030) || character.Variables.Perm.GetBool(CrystalVar + number, false))
 						return;
 
-					if (!character.Variables.Perm.GetBool(BarrierVar, false))
+					var destroying = await character.TimeActions.StartAsync(L("Destroying the Mind Control Crystal"), L("Cancel"), "ABSORB", TimeSpan.FromSeconds(1.2));
+
+					if (destroying != TimeActionResult.Completed)
+						return;
+
+					if (!character.IsBuffActive(BuffId.ABBAY643_MQ3_BUFF))
 					{
-						character.ServerMessage(L("The device inside the main building's atrium seems to be the protective shield device Edmundas mentioned."));
+						character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("Protective Membrane Required"), 3);
+						character.TakeSimpleHit(70, dialog.Npc);
+						character.Movement.Stop();
+						dialog.Npc.PlayEffect("F_archer_SiegeBurst_explosion", 0.6f, heightOffset: EffectLocation.Top);
 						return;
 					}
 
 					character.Variables.Perm.Set(CrystalVar + number, true);
-					var destroyed = character.Variables.Perm.GetInt(CrystalCountVar, 0) + 1;
-					character.Variables.Perm.SetInt(CrystalCountVar, destroyed);
+					character.Quests.AddObjectiveProgress(Mq030, "destroyCrystals");
 
-					dialog.Npc.PlayEffect("F_explosion014", 1f);
-					character.ServerMessage(LF("Mind Control Crystals destroyed: {0}/{1}", Math.Min(destroyed, 5), 5));
+					dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f, heightOffset: EffectLocation.Top);
+					character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've destroyed the Mind Control Crystal"), 3);
 					character.LookAround();
-
-					await Task.CompletedTask;
 				});
 		}
 
@@ -509,19 +573,22 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 
 		// The Protection Barrier Crystal
 		//-------------------------------------------------------------------------
-		AddQuestTrigger("ABBEY643_MAGIC_POINT01", "d_abbey_64_3", -1414.36, 115.37, 60, async args =>
+		AddNpc(40095, "UnvisibleName", "ABBEY643_MAGIC_POINT01", "d_abbey_64_3", -1414.36, 115.37, 90, async dialog =>
 		{
-			if (args.Initiator is not Character character)
-				return;
+			var character = dialog.Player;
 
 			if (!character.Quests.IsActive(Sq040, "placeCrystal") || character.Inventory.CountItem(ItemId.ABBAY643_SQ4_ITEM1) == 0)
 				return;
 
+			var placed = await character.TimeActions.StartAsync(L("Setting the Protective Barrier Crystal"), L("Cancel"), "ABSORB", TimeSpan.FromSeconds(1.2));
+
+			if (placed != TimeActionResult.Completed || character.Inventory.CountItem(ItemId.ABBAY643_SQ4_ITEM1) == 0)
+				return;
+
 			character.Inventory.RemoveItem(ItemId.ABBAY643_SQ4_ITEM1, 1);
+			dialog.Npc.PlayEffect("F_pc_making_finish_white", 1f, heightOffset: EffectLocation.Top);
 			character.Quests.CompleteObjective(Sq040, "placeCrystal");
 			character.LookAround();
-
-			await Task.CompletedTask;
 		});
 
 		AddConditionalNpc(103006, L("Protection Barrier Crystal"), "ABBEY643_MAGIC_CRYSTAL", "d_abbey_64_3", -1415.56, 116.93, 90, c => c.Quests.IsCompletable(Sq040) || c.Quests.HasCompleted(Sq040));
@@ -532,7 +599,7 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 		{
 			var number = i + 1;
 
-			AddNpc(154025, "UnvisibleName", "ABBEY643_SQ6_DEVICE0" + number, "d_abbey_64_3", SporeDevices[i, 0], SporeDevices[i, 1], SporeDevices[i, 2], async dialog =>
+			AddConditionalNpc(154025, "UnvisibleName", "ABBEY643_SQ6_DEVICE0" + number, "d_abbey_64_3", SporeDevices[i, 0], SporeDevices[i, 1], SporeDevices[i, 2], c => !IsPowerSourceRemoved(c, number), async dialog =>
 			{
 				await this.RemovePowerSource(dialog, number);
 			});
@@ -550,26 +617,48 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 		if (!character.Quests.IsActive(Sq060, "removePower"))
 			return;
 
+		var removing = await character.TimeActions.StartAsync(L("Removing the power source"), L("Cancel"), "ABSORB", TimeSpan.FromSeconds(2));
+
+		if (removing != TimeActionResult.Completed)
+			return;
+
 		var order = character.Variables.Perm.GetString(SporeOrderVar, "1234");
 		var step = character.Variables.Perm.GetInt(SporeStepVar, 0);
 
 		if (step >= order.Length || order[step] - '0' != number)
 		{
 			character.Variables.Perm.SetInt(SporeStepVar, 0);
-			dialog.Npc.PlayEffect("F_spread_out004_dark", 1f);
-			character.ServerMessage(L("The power sources have activated again."));
+			dialog.Npc.PlayEffect("F_explosion87", 0.7f, heightOffset: EffectLocation.Top);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("All power devices will reactivate due to the incorrect order of their releases"), 5);
+			character.LookAround();
 			return;
 		}
 
 		step++;
 		character.Variables.Perm.SetInt(SporeStepVar, step);
-		dialog.Npc.PlayEffect("F_light018_yellow", 1f);
-		character.ServerMessage(LF("Power sources removed: {0}/{1}", step, order.Length));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've removed the power source"), 5);
 
 		if (step >= order.Length)
+		{
 			character.Quests.CompleteObjective(Sq060, "removePower");
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("The Spore Breeding device will be stopped when removing all the power sources"), 5);
+		}
 
-		await Task.CompletedTask;
+		character.LookAround();
+	}
+
+	/// <summary>
+	/// Returns whether the character already removed the given power source of the spore breeding device in the current order.
+	/// </summary>
+	private static bool IsPowerSourceRemoved(Character character, int number)
+	{
+		if (!character.Quests.IsActive(Sq060, "removePower"))
+			return false;
+
+		var order = character.Variables.Perm.GetString(SporeOrderVar, "1234");
+		var step = character.Variables.Perm.GetInt(SporeStepVar, 0);
+
+		return order.Substring(0, Math.Min(step, order.Length)).Contains((char)('0' + number));
 	}
 }
 
@@ -598,8 +687,7 @@ public class Abbay643Mq010Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50128, QuestStatus.Completed));
 
-		AddObjective("findMaterials", L("Hand over all the items to Edmundas that can be obtained from the Brown Hummingbird"), new CollectItemObjective("ABBAY643_MQ1_ITEM01", 1));
-		AddPityDrop("ABBAY643_MQ1_ITEM01", 0.7f, 3, 1, "humming_bud_purple");
+		AddObjective("handOverMaterial", L("Hand over all the items to Edmundas that can be obtained from the Brown Hummingbird"), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 3));
 		AddReward(new TakeItemReward("ABBAY643_MQ1_ITEM01", -1));
@@ -654,7 +742,7 @@ public class Abbay643Mq030Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(50135, QuestStatus.Completed));
 
-		AddObjective("destroyCrystals", L("Destroy the Mind Control Crystals"), new VariableCheckObjective(DAbbey643QuestNpcsScript.CrystalCountVar, 5, isPermanent: true));
+		AddObjective("destroyCrystals", L("Destroy the Mind Control Crystals"), new ManualObjective(5));
 
 		AddReward(new ItemReward("expCard3", 3));
 	}

@@ -81,6 +81,7 @@ namespace Melia.Zone.Scripting.AI
 		private readonly List<ICombatEntity> _nearbyEnemiesBuffer = new();
 		private ICombatEntity _cachedMostHated;
 		private bool _mostHatedDirty = true;
+		private int _hateLayer;
 		private TimeSpan _hateUpdateAccumulator = TimeSpan.Zero;
 
 		private float _wanderRange = 300;
@@ -369,7 +370,7 @@ namespace Melia.Zone.Scripting.AI
 				return;
 			}
 
-			if (this.EntityGone(_target) || !this.InRangeOf(_target, MaxChaseDistance))
+			if (this.EntityGone(_target) || _target.Layer != this.Entity.Layer || !this.InRangeOf(_target, MaxChaseDistance))
 			{
 				_target = null;
 				if (EnableReturnHome)
@@ -1154,6 +1155,13 @@ namespace Melia.Zone.Scripting.AI
 		/// <param name="elapsed"></param>
 		private void UpdateHate(TimeSpan elapsed)
 		{
+			if (_hateLayer != this.Entity.Layer)
+			{
+				_hateLayer = this.Entity.Layer;
+				_target = null;
+				this.RemoveAllHate();
+			}
+
 			_nearbyEnemiesBuffer.Clear();
 			this.Entity.Map.GetAttackableEnemiesInPosition(
 				this.Entity, this.Entity.Position, _viewRange, _nearbyEnemiesBuffer);
@@ -1184,7 +1192,7 @@ namespace Melia.Zone.Scripting.AI
 				{
 					// Check if the entity is dead or gone from the map
 					var entity = this.Entity.Map.GetCombatEntity(handle);
-					if (entity == null || entity.IsDead || entity.IsBuffActive(BuffId.Pet_Dead))
+					if (entity == null || entity.IsDead || entity.Layer != this.Entity.Layer || entity.IsBuffActive(BuffId.Pet_Dead))
 					{
 						// Immediately remove hate for dead or gone entities (including dead pets)
 						_hateLevelsToRemove.Add(handle);
@@ -1294,6 +1302,9 @@ namespace Melia.Zone.Scripting.AI
 		protected void IncreaseHate(ICombatEntity entity, float amount)
 		{
 			if (this.Entity.IsBuffActive(BuffId.Lachrymator_Debuff))
+				return;
+
+			if (entity.Layer != this.Entity.Layer)
 				return;
 
 			var handle = entity.Handle;
@@ -1583,7 +1594,7 @@ namespace Melia.Zone.Scripting.AI
 					continue;
 				}
 
-				if (!this.CanBeHated(entity))
+				if (!this.CanBeHated(entity) || entity.Layer != this.Entity.Layer)
 					continue;
 
 				highestHate = hate;

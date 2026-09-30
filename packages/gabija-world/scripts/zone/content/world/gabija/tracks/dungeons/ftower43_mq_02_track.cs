@@ -4,6 +4,7 @@
 // The laboratory valve and the research Antares left scattered around it.
 //---------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
@@ -40,11 +41,35 @@ public class Ftower43Mq02Track : TrackScript
 		return actors.ToArray();
 	}
 
+	/// <summary>
+	/// Sends the laboratory's guards at the player once the valve is exposed, and again after half a minute.
+	/// </summary>
+	private static async Task StartMinigame(Character character, Track track)
+	{
+		var game = new TrackMinigame(character, track);
+
+		game.Stage("stage1")
+			.Monster(47394, -1621.58, 554.52, 733.08, count: 2)
+			.Monster(57053, -1601.28, 549.66, 661.58, count: 2)
+			.Monster(47394, -1553.73, 550.65, 704.72, count: 2)
+			.On(s => s.Elapsed >= 30, s =>
+			{
+				s.Spawn(0, 2);
+				s.Spawn(1, 2);
+				s.Spawn(2, 2);
+			}, 1);
+
+		await Task.Delay(TimeSpan.FromSeconds(4));
+
+		game.Start("stage1");
+	}
+
 	public override async Task OnProgress(Character character, Track track, int frame)
 	{
 		switch (frame)
 		{
 			case 4:
+				_ = StartMinigame(character, track);
 				CreateBattleBoxInLayer(character, track);
 				SetTrackTendency(character, track);
 				character.ServerMessage(L("Destroy the Magic Control Valve!"));
