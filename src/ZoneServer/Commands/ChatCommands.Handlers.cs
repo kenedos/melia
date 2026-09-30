@@ -5281,10 +5281,7 @@ namespace Melia.Zone.Commands
 			}
 
 			if (sender.WasWarpInterrupted())
-			{
-				sender.ServerMessage(Localization.Get("The teleport was interrupted."));
 				return CommandResult.Okay;
-			}
 
 			if (unk1 == 0 || unk1 == 1)
 			{

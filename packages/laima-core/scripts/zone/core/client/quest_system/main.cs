@@ -96,6 +96,9 @@ public class CustomQuestSystemClientScript : ClientScript
 					return CommandResult.Okay;
 				}
 
+				if (sender.WasWarpInterrupted())
+					return CommandResult.Okay;
+
 				if (!QuestComponent.TryGetPhaseDestination(quest, out var mapClassName, out var position))
 				{
 					sender.ServerMessage(L("There's nowhere to return to for this quest."));

@@ -5569,6 +5569,9 @@ namespace Melia.Zone.Network
 
 			var character = conn.SelectedCharacter;
 
+			if (type is 3 or 4)
+				character.BeginWarpChannel();
+
 			Send.ZC_CLIENT_DIRECT(character, type, argStr);
 		}
 

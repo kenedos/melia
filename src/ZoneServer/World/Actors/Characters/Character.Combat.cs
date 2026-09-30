@@ -114,17 +114,42 @@ namespace Melia.Zone.World.Actors.Characters
 		#endregion
 
 		#region Combat Methods
-		private static readonly TimeSpan WarpInterruptWindow = TimeSpan.FromSeconds(1.8);
+		private static readonly TimeSpan WarpChannelDuration = TimeSpan.FromSeconds(3);
+		private static readonly TimeSpan WarpInterruptHold = TimeSpan.FromSeconds(6);
 
-		private DateTime _lastDamagedTime = DateTime.MinValue;
+		private DateTime _warpChannelStart = DateTime.MinValue;
+		private bool _warpInterrupted;
 
 		/// <summary>
-		/// Returns true if the character took damage during the client's
-		/// warp animation that precedes a warp command.
+		/// Marks the start of the client's warp animation.
+		/// </summary>
+		public void BeginWarpChannel()
+		{
+			_warpChannelStart = GameClock.Now;
+			_warpInterrupted = false;
+		}
+
+		/// <summary>
+		/// Cancels the client's warp animation if it is still running.
+		/// </summary>
+		private void InterruptWarpChannel()
+		{
+			if (_warpInterrupted || GameClock.Now - _warpChannelStart > WarpChannelDuration)
+				return;
+
+			_warpInterrupted = true;
+			Send.ZC_SKILL_DISABLE(this);
+			Send.ZC_SET_POS(this, this.Position);
+			Send.ZC_MOVE_STOP(this, this.Position);
+		}
+
+		/// <summary>
+		/// Returns true if the warp the client is sending was interrupted
+		/// by a hit.
 		/// </summary>
 		public bool WasWarpInterrupted()
 		{
-			return GameClock.Now - _lastDamagedTime < WarpInterruptWindow;
+			return _warpInterrupted && GameClock.Now - _warpChannelStart < WarpInterruptHold;
 		}
 
 		/// <summary>
@@ -148,7 +173,7 @@ namespace Melia.Zone.World.Actors.Characters
 
 			if (damage > 0)
 			{
-				_lastDamagedTime = GameClock.Now;
+				this.InterruptWarpChannel();
 				this.Components.Get<CombatComponent>().TryInterruptCasting(out _);
 				this.Components.Get<TimeActionComponent>().End(TimeActionResult.CancelledByHit);
 			}
