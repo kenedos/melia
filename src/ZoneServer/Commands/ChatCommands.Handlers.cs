@@ -162,6 +162,7 @@ namespace Melia.Zone.Commands
 			this.Add("recallmap", "[map id/name]", "Warps all characters on given map back.", this.HandleRecallMap);
 			this.Add("recallall", "", "Warps all characters on the server back.", this.HandleRecallAll);
 			this.Add("heal", "[hp] [sp] [stamina]", "Heals the character's HP, SP, and Stamina.", this.HandleHeal);
+			this.Add("repair", "", "Repairs all equipped items to full durability.", this.HandleRepair);
 			this.Add("alive", "", "Revives the character if dead, or kills it if alive.", this.HandleAlive);
 			this.Add("clearinv", "", "Removes all items from inventory.", this.HandleClearInventory);
 			this.Add("addjob", "<job id|name> [circle]", "Adds a job to character by ID or name.", this.HandleAddJob);
@@ -264,6 +265,7 @@ namespace Melia.Zone.Commands
 			this.AddAlias("resetdungeon", "resetdungeons");
 			this.AddAlias("cardgem", "card");
 			this.AddAlias("cardgem", "gem");
+			this.AddAlias("repair", "repairall");
 		}
 
 		private CommandResult HandleDungeonMatchMaking(Character sender, Character target, string message, string commandName, Arguments args)
@@ -2833,6 +2835,37 @@ namespace Melia.Zone.Commands
 				sender.ServerMessage(Localization.Get("You have called {0} characters to target's location."), characters.Length);
 				target.ServerMessage(Localization.Get("{1} called {0} characters to your location."), characters.Length, sender.TeamName);
 			}
+		}
+
+		/// <summary>
+		/// Repairs all of the target's equipped items to full durability.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="target"></param>
+		/// <param name="message"></param>
+		/// <param name="command"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
+		private CommandResult HandleRepair(Character sender, Character target, string message, string command, Arguments args)
+		{
+			var repaired = 0;
+
+			foreach (var equip in target.Inventory.GetEquip().Values)
+			{
+				if (equip is DummyEquipItem || equip.MaxDurability <= 0 || equip.Durability >= equip.MaxDurability)
+					continue;
+
+				equip.ModifyDurability(target);
+				repaired++;
+			}
+
+			target.InvalidateProperties();
+
+			sender.ServerMessage(Localization.Get("Repaired {0} equipped item(s)."), repaired);
+			if (sender != target)
+				target.ServerMessage(Localization.Get("Your equipment was repaired by {0}."), sender.TeamName);
+
+			return CommandResult.Okay;
 		}
 
 		/// <summary>

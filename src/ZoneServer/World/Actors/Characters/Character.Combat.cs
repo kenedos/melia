@@ -174,6 +174,9 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public virtual void Kill(ICombatEntity killer)
 		{
+			// Must be read before the duel ends below, which clears the duel state.
+			var isWearExempt = EquipDurabilityHelper.IsWearExempt(this);
+
 			this.Properties.SetFloat(PropertyName.HP, 0);
 			this.Buffs.RemoveAll(b => b.Data.RemoveOnDeath);
 
@@ -219,7 +222,7 @@ namespace Melia.Zone.World.Actors.Characters
 			this.Tracks.Cancel();
 
 			// Durability damage on death
-			if (!this.Map.IsGTW && !this.Map.IsCity)
+			if (!isWearExempt)
 			{
 				foreach (var equip in this.Inventory.GetEquip().Values)
 				{

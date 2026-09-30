@@ -16,6 +16,7 @@ using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
 using Melia.Zone.Skills.Combat;
+using Melia.Zone.Skills.Helpers;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
@@ -216,6 +217,8 @@ public class CombatCalculationsScript : GeneralScript
 			// Nullify damage on successful classic block
 			if (!Feature.IsEnabled("NonNullifyBlocks"))
 			{
+				EquipDurabilityHelper.WearOnHitTaken(target, skillHitResult.Result, isMagicSkill, 0);
+				EquipDurabilityHelper.WearOnHitDealt(attacker, target, skillHitResult.Result, isMagicSkill, 0);
 				return 0;
 			}
 		}
@@ -391,6 +394,9 @@ public class CombatCalculationsScript : GeneralScript
 		var maxCap = ZoneServer.Instance.Conf.World.MaxDamageCap;
 
 		skillHitResult.Damage = Math2.Clamp(minCap, maxCap, skillHitResult.Damage);
+
+		EquipDurabilityHelper.WearOnHitTaken(target, skillHitResult.Result, isMagicSkill, skillHitResult.Damage);
+		EquipDurabilityHelper.WearOnHitDealt(attacker, target, skillHitResult.Result, isMagicSkill, skillHitResult.Damage);
 
 		return (int)skillHitResult.Damage;
 	}

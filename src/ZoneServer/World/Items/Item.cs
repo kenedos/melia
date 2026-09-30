@@ -29,6 +29,8 @@ namespace Melia.Zone.World.Items
 	{
 		private readonly List<Item> _gemSockets = new();
 
+		private const int DurabilityPerPoint = 100;
+
 		private static long ObjectIds = ObjectIdRanges.Items;
 
 		/// <summary>
@@ -860,6 +862,32 @@ namespace Melia.Zone.World.Items
 				this.Durability += amount;
 			Send.ZC_OBJECT_PROPERTY(character.Connection, this);
 			if (isBroken || isFixed)
+				character.InvalidateProperties();
+
+			character.Tutorials.CheckLowDurability(this);
+		}
+
+		/// <summary>
+		/// Wears the item's durability down by the given raw amount and
+		/// updates the client when the displayed value changes or the item
+		/// breaks.
+		/// </summary>
+		/// <param name="character"></param>
+		/// <param name="amount">Raw durability, 100 per displayed point.</param>
+		public void WearDurability(Character character, int amount)
+		{
+			if (amount <= 0 || this.Durability <= 0)
+				return;
+
+			var before = this.Durability;
+			this.Durability = before - amount;
+			var after = this.Durability;
+
+			if (after > 0 && before / DurabilityPerPoint == after / DurabilityPerPoint)
+				return;
+
+			Send.ZC_OBJECT_PROPERTY(character.Connection, this, PropertyName.Dur);
+			if (after == 0)
 				character.InvalidateProperties();
 
 			character.Tutorials.CheckLowDurability(this);
