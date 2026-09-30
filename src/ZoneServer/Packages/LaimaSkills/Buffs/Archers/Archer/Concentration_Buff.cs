@@ -38,6 +38,10 @@ namespace Melia.Zone.Buffs.Handlers
 			var targets = buff.Target.Map.GetAttackableEnemiesInPosition(buff.Target, buff.Target.Position, 100).Where(c => c.IsBuffActiveByKeyword(BuffTag.Cloaking)).ToList();
 			foreach (var target in targets)
 				target.StopBuffByTag(BuffTag.Cloaking);
+
+			var hidden = buff.Target.Map.GetAttackableEnemiesInPosition(buff.Target, buff.Target.Position, 100).Where(c => ConditionalCloaking.IsHiddenFrom(buff.Target, c)).ToList();
+			foreach (var target in hidden)
+				ConditionalCloaking.Break(target);
 		}
 
 		[CombatCalcModifier(CombatCalcPhase.BeforeBonuses, BuffId.Concentration_Buff)]

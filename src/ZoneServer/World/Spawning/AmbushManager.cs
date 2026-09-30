@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Util;
 using Melia.Shared.World;
+using Melia.Zone.Buffs;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting.AI;
 using Melia.Zone.World.Actors;
@@ -97,7 +98,7 @@ namespace Melia.Zone.World.Spawning
 			// Ambushing a player who isn't going anywhere would just be a
 			// spawn in their face, and nothing lies in wait for someone
 			// it can't see.
-			if (!IsWalking(character) || character.IsBuffActiveByKeyword(BuffTag.Cloaking) || now < state.CooldownEndTime)
+			if (!IsWalking(character) || (character.IsBuffActiveByKeyword(BuffTag.Cloaking) || ConditionalCloaking.IsActive(character)) || now < state.CooldownEndTime)
 			{
 				state.LastTestPosition = character.Position;
 				state.LastRollTime = now;

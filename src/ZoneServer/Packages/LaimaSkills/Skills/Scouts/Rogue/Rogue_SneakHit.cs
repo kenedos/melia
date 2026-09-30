@@ -28,11 +28,11 @@ namespace Melia.Zone.Skills.Handlers.Scouts.Rogue
 
 		/// <summary>
 		/// Called when any buff ends on the character.
-		/// If the buff has the "Cloaking" tag, starts SneakHit_Buff.
+		/// If the buff has the "Cloaking" tag or is a conditional cloak, starts SneakHit_Buff.
 		/// </summary>
 		public void OnBuffEnd(Skill skill, ICombatEntity target, Buff buff)
 		{
-			if (!buff.Data.Tags.Contains(BuffTag.Cloaking))
+			if (!buff.Data.Tags.Contains(BuffTag.Cloaking) && !ConditionalCloaking.IsConditionalCloak(buff.Id))
 				return;
 
 			target.StartBuff(BuffId.SneakHit_Buff, skill.Level, 0, TimeSpan.FromSeconds(3), target, skill.Id);

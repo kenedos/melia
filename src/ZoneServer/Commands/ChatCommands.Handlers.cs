@@ -3610,6 +3610,11 @@ namespace Melia.Zone.Commands
 				return CommandResult.Okay;
 			}
 
+			if (sender.WasWarpInterrupted())
+			{
+				return CommandResult.Okay;
+			}
+
 			if (int.TryParse(args.Get(0), out var questId) && ZoneServer.Instance.Data.QuestDb.TryFind(questId, out var quest))
 			{
 				if (!sender.Quests.IsActive(questId))
@@ -5272,6 +5277,12 @@ namespace Melia.Zone.Commands
 			if (!ZoneServer.Instance.World.NPCs.TryGetValue($"{warpData.ClassName}_{warpData.Zone}", out var npc))
 			{
 				Log.Debug("HandleInteWarp: Failed to find npc by class name '{0}': {1} : {2}", sender.Connection.Account.Name, commandName, warpData.ClassName);
+				return CommandResult.Okay;
+			}
+
+			if (sender.WasWarpInterrupted())
+			{
+				sender.ServerMessage(Localization.Get("The teleport was interrupted."));
 				return CommandResult.Okay;
 			}
 

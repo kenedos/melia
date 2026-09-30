@@ -10,6 +10,7 @@ using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Util;
 using Melia.Zone;
+using Melia.Zone.Buffs;
 using Melia.Zone.Buffs.Handlers;
 using Melia.Zone.Items.Effects;
 using Melia.Zone.Network;
@@ -1091,6 +1092,9 @@ public class CombatCalculationsScript : GeneralScript
 			&& attacker.Components != null
 			&& attacker.IsBuffActiveByKeyword(BuffTag.Cloaking))
 			attacker.StopBuffByTag(BuffTag.Cloaking);
+
+		if (attacker != null && attacker.Components != null)
+			ConditionalCloaking.Break(attacker);
 
 		var result = new SkillHitResult();
 		var perHitModifier = modifier.Clone();

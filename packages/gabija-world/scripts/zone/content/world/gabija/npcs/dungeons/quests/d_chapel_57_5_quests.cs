@@ -6,10 +6,12 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
+using Melia.Shared.Util;
 using Melia.Shared.World;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
@@ -34,7 +36,11 @@ public class DChapel575QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq07 = new QuestId(8525);
 
 	public const int HolyStoneChargeNeeded = 1000;
-	private const string HolyStoneActiveVar = "Gabija.Quests.Chaple575Mq07.StoneActive";
+	private const int HolyStoneMonsterId = 46219;
+	private const int HolyStoneLifeSeconds = 60;
+	private const int HolyStoneChargePerKill = 50;
+	private const float HolyStoneRange = 150;
+	private readonly static ConcurrentDictionary<long, Npc> HolyStones = new();
 	private readonly static Position HolyStoneArea = new Position(-858, 0, -173);
 	private readonly static QuestId Mq08 = new QuestId(8526);
 	private readonly static QuestId Mq09 = new QuestId(8527);
@@ -254,9 +260,8 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 				if (answer == "accept")
 				{
-					await dialog.Msg(L("When you place the Holy Stone, it will absorb the lives of the nearby demons automatically."));
-					await dialog.Msg(L("Defeat the demons that have already had their life absorbed."));
-					character.Variables.Temp.Remove(HolyStoneActiveVar);
+					await dialog.Msg(L("When you place the Holy Stone, the lives of the demons defeated near it will fill it."));
+					await dialog.Msg(L("Defeat the demons near the Holy Stone."));
 					character.Quests.Start(Mq07);
 					character.Inventory.Add(650716, 1, InventoryAddType.PickUp);
 				}
@@ -296,7 +301,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq07))
 			{
-				await dialog.Msg(L("Place the Holy Stone and let it draw the demons in."));
+				await dialog.Msg(L("Place the Holy Stone and defeat the demons near it."));
 				return;
 			}
 
@@ -372,6 +377,8 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				character.ServerMessage(L("You've attached the Holy Bomb onto Glizardon!"));
 				character.Quests.AddObjectiveProgress(Mq06, "bombGlizardon");
 				character.RemoveBuff(BuffId.CHAPLE575_MQ_06);
+				if (npc != null)
+					_ = character.PlayEffectToGround("F_light016", npc.Position, 2f, 2000f);
 			},
 		});
 
@@ -420,7 +427,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Places the empty Holy Stone to draw in the lives of the demons nearby.
+	/// Places the empty Holy Stone on the ground beside the character.
 	/// </summary>
 	[ScriptableFunction]
 	public ItemUseResult SCR_USE_CHAPLE575_MQ_07_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
@@ -437,53 +444,58 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			return ItemUseResult.OkayNotConsumed;
 		}
 
-		if (character.Variables.Temp.GetBool(HolyStoneActiveVar, false))
+		if (TryGetHolyStone(character, out _))
 		{
-			character.ServerMessage(L("The Holy Stone is already draining the demons."));
+			character.ServerMessage(L("The Holy Stone is already placed."));
 			return ItemUseResult.OkayNotConsumed;
 		}
 
-		character.Variables.Temp.SetBool(HolyStoneActiveVar, true);
-		character.PlayEffect("F_light018_yellow", 1f);
-		character.ServerMessage(L("You placed the Holy Stone. Lure the demons to charge it!"));
-		_ = DrainDemonsAsync(character, character.Position);
+		var stone = new Npc(HolyStoneMonsterId, L("Holy Stone"), character.Position.GetRelative(character.Direction, 30), character.Direction.Backwards);
+		stone.Layer = character.Layer;
+		stone.Faction = FactionType.Neutral;
+		stone.DisappearTime = GameClock.LocalNow.AddSeconds(HolyStoneLifeSeconds);
+		stone.VisibleTo = c => c == character;
+		stone.WithEffect("F_light055_blue", 2f, EffectLocation.Top).WithEffect("F_light055_blue", 8f, EffectLocation.Bottom);
+
+		character.Map.AddMonster(stone);
+		HolyStones[character.ObjectId] = stone;
+
+		character.ServerMessage(L("You placed the Holy Stone. Defeat the demons near it to charge it!"));
 
 		return ItemUseResult.OkayNotConsumed;
 	}
 
 	/// <summary>
-	/// Drains the demons near the placed Holy Stone, charging it while they slow to a halt.
+	/// Charges the character's Holy Stone when a demon dies near it.
 	/// </summary>
-	private static async Task DrainDemonsAsync(Character character, Position stonePosition)
+	[On("EntityKilled")]
+	public void OnEntityKilled(object sender, CombatEventArgs args)
 	{
-		var drained = new System.Collections.Generic.Dictionary<Mob, int>();
+		if (args.Target is not Mob mob || mob.Faction != FactionType.Monster)
+			return;
 
-		for (var i = 0; i < 60; ++i)
-		{
-			await Task.Delay(1000);
+		var character = mob.GetKillBeneficiary(args.Attacker);
+		if (character == null || !character.Quests.IsActive(Mq07) || character.Quests.IsCompletable(Mq07))
+			return;
 
-			if (!character.Quests.IsActive(Mq07) || character.Quests.IsCompletable(Mq07))
-				break;
+		if (!TryGetHolyStone(character, out var stone) || !mob.Position.InRange2D(stone.Position, HolyStoneRange))
+			return;
 
-			foreach (var mob in character.Map.GetAttackableEnemiesInPosition(character, stonePosition, 100).OfType<Mob>())
-			{
-				if (mob.Faction != FactionType.Monster || mob.IsDead)
-					continue;
+		character.Quests.AddObjectiveProgress(Mq07, "chargeStone", HolyStoneChargePerKill);
+		mob.PlayEffect("F_light015_violet1", 1f);
+	}
 
-				drained.TryGetValue(mob, out var ticks);
-				if (ticks >= 10)
-					continue;
+	/// <summary>
+	/// Returns the character's Holy Stone if it is still standing.
+	/// </summary>
+	private static bool TryGetHolyStone(Character character, out Npc stone)
+	{
+		if (HolyStones.TryGetValue(character.ObjectId, out stone) && stone.Map != null && stone.Map == character.Map && stone.DisappearTime > GameClock.LocalNow)
+			return true;
 
-				drained[mob] = ticks + 1;
-				character.Quests.AddObjectiveProgress(Mq07, "chargeStone", 10);
-				mob.PlayEffect("F_light015_violet1", 1f);
-
-				if (ticks + 1 >= 10)
-					mob.StartBuff(BuffId.Stun, TimeSpan.FromSeconds(8), character);
-			}
-		}
-
-		character.Variables.Temp.SetBool(HolyStoneActiveVar, false);
+		HolyStones.TryRemove(character.ObjectId, out _);
+		stone = null;
+		return false;
 	}
 }
 
@@ -649,7 +661,7 @@ public class Chaple575Mq07Quest : QuestScript
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "CHAPEL_VIDAS", "d_chapel_57_5", L("Talk to Follower Vaidas"), L("Vaidas is waiting for help at the Tenet Church B1."));
-		SetPhase(QuestStatus.InProgress, "CHAPEL_VIDAS", "d_chapel_57_5", L("Charge the Holy Stone"), L("Place the Holy Stone and defeat the demons it draws in."));
+		SetPhase(QuestStatus.InProgress, "CHAPEL_VIDAS", "d_chapel_57_5", L("Charge the Holy Stone"), L("Place the Holy Stone and defeat the demons near it."));
 		SetPhase(QuestStatus.Success, "CHAPEL_VIDAS", "d_chapel_57_5", L("Talk to Follower Vaidas"), L("Return to Vaidas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8524, QuestStatus.Completed));

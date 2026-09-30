@@ -114,6 +114,19 @@ namespace Melia.Zone.World.Actors.Characters
 		#endregion
 
 		#region Combat Methods
+		private static readonly TimeSpan WarpInterruptWindow = TimeSpan.FromSeconds(1.8);
+
+		private DateTime _lastDamagedTime = DateTime.MinValue;
+
+		/// <summary>
+		/// Returns true if the character took damage during the client's
+		/// warp animation that precedes a warp command.
+		/// </summary>
+		public bool WasWarpInterrupted()
+		{
+			return GameClock.Now - _lastDamagedTime < WarpInterruptWindow;
+		}
+
 		/// <summary>
 		/// Makes character take damage and kills them if their HP reached 0.
 		/// </summary>
@@ -135,6 +148,7 @@ namespace Melia.Zone.World.Actors.Characters
 
 			if (damage > 0)
 			{
+				_lastDamagedTime = GameClock.Now;
 				this.Components.Get<CombatComponent>().TryInterruptCasting(out _);
 				this.Components.Get<TimeActionComponent>().End(TimeActionResult.CancelledByHit);
 			}

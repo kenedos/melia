@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone.Buffs;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
@@ -1506,7 +1507,7 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected bool CanAccumulateHate(ICombatEntity entity)
 		{
-			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking))
+			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking) || ConditionalCloaking.IsHiddenFrom(this.Entity, entity))
 				return false;
 
 			// Dead pets should never accumulate hate
@@ -1534,7 +1535,7 @@ namespace Melia.Zone.Scripting.AI
 		/// <returns></returns>
 		protected bool CanBeHated(ICombatEntity entity)
 		{
-			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking))
+			if (entity.IsBuffActiveByKeyword(BuffTag.Cloaking) || ConditionalCloaking.IsHiddenFrom(this.Entity, entity))
 				return false;
 
 			// Dead pets should never be hated or targetted
