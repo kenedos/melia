@@ -3,13 +3,13 @@
 //---------------------------------------------------------------------------
 
 [
+{ name: "LaimaFormulas", enabled: true },
+
 // Player stats
 { name: "NoStatByLevel", enabled: false },
 { name: "IncreasedStatRatio", enabled: false },
 { name: "NewDefenseFormula", enabled: true },
 
-// Combat bonuses
-{ name: "AttackTypeBonusRevamp1", enabled: false },
-{ name: "AttackTypeBonusRevamp2", enabled: false },
+// Blocks
 { name: "NonNullifyBlocks", enabled: false },
 ]

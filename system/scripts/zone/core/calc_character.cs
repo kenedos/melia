@@ -26,6 +26,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_STR(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.STR(character);
+
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.STR_JOB);
@@ -48,6 +51,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CON(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.CON(character);
+
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.CON_JOB);
@@ -70,6 +76,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_INT(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.INT(character);
+
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.INT_JOB);
@@ -92,6 +101,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MNA(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MNA(character);
+
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.MNA_JOB);
@@ -114,6 +126,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DEX(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.DEX(character);
+
 		var properties = character.Properties;
 
 		var byJob = properties.GetFloat(PropertyName.DEX_JOB);
@@ -313,6 +328,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_STR_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.STR_JOB(character);
+
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -338,6 +356,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CON_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.CON_JOB(character);
+
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -363,6 +384,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_INT_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.INT_JOB(character);
+
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -388,6 +412,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MNA_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MNA_JOB(character);
+
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -413,6 +440,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DEX_JOB(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.DEX_JOB(character);
+
 		if (!Feature.IsEnabled("JobStatBonuses"))
 			return 0;
 
@@ -447,7 +477,7 @@ public class CharacterCalculationsScript : GeneralScript
 		// the classic system by simply choosing the default stat values
 		// as the ratio.
 
-		if (!Feature.IsEnabled(FeatureId.IncreasedStatRatio))
+		if (!Feature.IsEnabled("IncreasedStatRatio"))
 		{
 			switch (propertyName)
 			{
@@ -481,6 +511,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MHP(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MHP(character);
+
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv, 1);
@@ -491,11 +524,7 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var levels = level - 1;
 		var byLevel = Math.Floor(byJob + (((levels * 3.25f) + (levels * levels * 0.13f)) * rateByJob));
-		var byStat = 0d;
-		if (Feature.IsEnabled("NewCONFormula"))
-			byStat = Math.Floor(((stat * 0.003f) + (Math.Floor(stat / 10.0f) * 0.010f)) * byLevel);
-		else
-			byStat = Math.Floor((stat * 0.0065f) * byLevel);
+		var byStat = Math.Floor((stat * 0.0065f) * byLevel);
 
 		byStat *= 4.5f; // Custom to Laima
 
@@ -522,6 +551,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MSP(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MSP(character);
+
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv, 1);
@@ -533,9 +565,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var levels = level - 1;
 		var byLevel = Math.Floor(byJob + (((levels * 1.625f) + (levels * levels * 0.065f)) * rateByJob));
 
-		var byStat = 0d;
-		if (!Feature.IsEnabled("NewSPRFormula"))
-			byStat = Math.Floor((stat * 0.0065f) * byLevel);
+		var byStat = Math.Floor((stat * 0.0065f) * byLevel);
 
 		byStat *= 2.5f; // Custom to Laima
 
@@ -569,14 +599,15 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MaxSta(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MaxSta(character);
+
 		var properties = character.Properties;
 
 		var baseValue = 25;
 		var stat = properties.GetFloat(PropertyName.CON, 1);
 
-		var byStat = 0d;
-		if (!Feature.IsEnabled("NewCONFormula"))
-			byStat = stat * 0.05f;
+		var byStat = stat * 0.05f;
 
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.MSTA);
 		var byBonus = properties.GetFloat(PropertyName.MAXSTA_Bonus, 0);
@@ -607,6 +638,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_Sta_Run(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.Sta_Run(character);
+
 		var properties = character.Properties;
 
 		// Running costs 50 stamina per second by default
@@ -650,6 +684,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_Sta_Recover(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.Sta_Recover(character);
+
 		var properties = character.Properties;
 
 		//if (buffCursed?)
@@ -696,6 +733,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_Sta_Jump(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.Sta_Jump(character);
+
 		if (Feature.IsEnabled("FreeJumping"))
 			return 0;
 
@@ -721,6 +761,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RHP(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.RHP(character);
+
 		if (character.IsBuffActiveByKeyword(BuffTag.Curse, BuffTag.UnrecoverableHP))
 			return 0;
 
@@ -730,9 +773,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var mhp = properties.GetFloat(PropertyName.MHP, 1);
 		var jobHpRate = character.Job?.Data.RHpRate ?? 1;
 
-		var byStat = 0d;
-		if (!Feature.IsEnabled("NewCONFormula"))
-			byStat = Math.Floor(stat * 1.5f);
+		var byStat = Math.Floor(stat * 1.5f);
 
 		var byDefault = Math.Floor(mhp / 100f * jobHpRate);
 		var byItems = character.Inventory.GetEquipProperties(PropertyName.RHP);
@@ -754,6 +795,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RHPTIME(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.RHPTIME(character);
+
 		var properties = character.Properties;
 
 		// The recovery time is presumably the number of milliseconds
@@ -782,6 +826,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RSP(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.RSP(character);
+
 		if (character.IsBuffActiveByKeyword(BuffTag.Curse, BuffTag.Formation,
 			BuffTag.SpDrain, BuffTag.UnrecoverableSP, BuffTag.NoneRecoverableSP))
 			return 0;
@@ -791,9 +838,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var msp = properties.GetFloat(PropertyName.MSP, 1);
 		var jobSpRate = character.Job?.Data.RSpRate ?? 1;
 
-		var byStat = 0d;
-		if (!Feature.IsEnabled("NewSPRFormula"))
-			byStat = Math.Floor(stat * 1.5f);
+		var byStat = Math.Floor(stat * 1.5f);
 
 		var byDefault = Math.Floor(msp * 0.03f * jobSpRate);
 		var byItems = character.Inventory.GetEquipProperties(PropertyName.RSP);
@@ -815,6 +860,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_RSPTIME(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.RSPTIME(character);
+
 		var properties = character.Properties;
 
 		var baseValue = 20000;
@@ -838,6 +886,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MaxWeight(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MaxWeight(character);
+
 		var properties = character.Properties;
 
 		var value = 5000f;
@@ -904,6 +955,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MINPATK(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MINPATK(character);
+
 		var SCR_Get_Character_MAXPATK = ScriptableFunctions.Character.Get("SCR_Get_Character_MAXPATK");
 
 		var properties = character.Properties;
@@ -956,6 +1010,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MAXPATK(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MAXPATK(character);
+
 		var properties = character.Properties;
 
 		var stat = properties.GetFloat(PropertyName.STR, 1);
@@ -1005,6 +1062,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MINPATK_SUB(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MINPATK_SUB(character);
+
 		var SCR_Get_Character_MAXPATK_SUB = ScriptableFunctions.Character.Get("SCR_Get_Character_MAXPATK_SUB");
 
 		var properties = character.Properties;
@@ -1014,11 +1074,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var stat = properties.GetFloat(PropertyName.STR);
 
 		var byLevel = level / 2f;
-		var byStat = 0f;
-		if (Feature.IsEnabled("NewSTRFormula"))
-			byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * (byLevel * 0.05f));
-		else
-			byStat = stat * 1.25f;
+		var byStat = stat * 1.25f;
 
 		// We don't want item bonuses affecting subweapons because they will
 		// be added both to main weapon and subweapon if they do.
@@ -1057,6 +1113,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MAXPATK_SUB(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MAXPATK_SUB(character);
+
 		var properties = character.Properties;
 
 		var baseValue = 20;
@@ -1064,11 +1123,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var stat = properties.GetFloat(PropertyName.STR);
 
 		var byLevel = level / 2f;
-		var byStat = 0f;
-		if (Feature.IsEnabled("NewSTRFormula"))
-			byStat = (stat * 2f) + ((float)Math.Floor(stat / 10f) * (byLevel * 0.05f));
-		else
-			byStat = stat * 1.25f;
+		var byStat = stat * 1.25f;
 
 		// We don't want item bonuses affecting subweapons because they will
 		// be added both to main weapon and subweapon if they do.
@@ -1103,6 +1158,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MINMATK(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MINMATK(character);
+
 		var SCR_Get_Character_MAXMATK = ScriptableFunctions.Character.Get("SCR_Get_Character_MAXMATK");
 
 		var properties = character.Properties;
@@ -1150,6 +1208,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MAXMATK(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MAXMATK(character);
+
 		var properties = character.Properties;
 
 		var stat = properties.GetFloat(PropertyName.INT, 1);
@@ -1194,6 +1255,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DEF(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.DEF(character);
+
 		var properties = character.Properties;
 
 		var baseValue = 5;
@@ -1235,6 +1299,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MDEF(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MDEF(character);
+
 		var properties = character.Properties;
 		var con = properties.GetFloat(PropertyName.CON, 1);
 		var spr = properties.GetFloat(PropertyName.MNA, 1);
@@ -1270,6 +1337,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CRTATK(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.CRTATK(character);
+
 		var properties = character.Properties;
 
 		var stat = properties.GetFloat(PropertyName.DEX);
@@ -1277,16 +1347,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var baseValue = 5;
 
 		var level = properties.GetFloat(PropertyName.Lv);
-		var byStat = 0d;
-
-		if (!Feature.IsEnabled("NewDEXFormula"))
-		{
-			byStat = stat * 1.55f;
-		}
-		else
-		{
-			byStat = (stat * 2f) + (Math.Floor(stat / 10f) * (level * 0.05f));
-		}
+		var byStat = stat * 1.55f;
 
 		var byItem = character.Inventory.GetEquipProperties(PropertyName.CRTATK);
 
@@ -1310,6 +1371,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CRTHR(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.CRTHR(character);
+
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
@@ -1317,13 +1381,8 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var byLevel = level;
 		var byItem = 0f;
-		var byStat = 0f;
-
 		// Linear in DEX, so a committed crit build actually outruns the target's CRTDR
-		if (!Feature.IsEnabled("NewDEXFormula"))
-		{
-			byStat = stat * 0.6f;
-		}
+		var byStat = stat * 0.6f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.CRTHR);
 
@@ -1347,6 +1406,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_CRTDR(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.CRTDR(character);
+
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
@@ -1354,13 +1416,8 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var byLevel = level;
 		var byItem = 0f;
-		var byStat = 0f;
-
 		// Mirrors CRTHR, so an equal CON investment cancels an attacker's DEX
-		if (!Feature.IsEnabled("NewCONFormula"))
-		{
-			byStat = stat * 0.6f;
-		}
+		var byStat = stat * 0.6f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.CRTDR);
 
@@ -1384,6 +1441,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_HR(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.HR(character);
+
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
@@ -1391,11 +1451,8 @@ public class CharacterCalculationsScript : GeneralScript
 
 		// Below the monster level term, so an average monster is missed a little
 		var byLevel = level * 0.85f;
-		var byStat = 0f;
-
 		// Linear in DEX, so a full investment covers the most evasive monsters
-		if (!Feature.IsEnabled("NewDEXFormula"))
-			byStat = stat * 0.15f;
+		var byStat = stat * 0.15f;
 
 		var byItem = 0f;
 
@@ -1425,6 +1482,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_DR(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.DR(character);
+
 		// Highguard completely negates evasion
 		if (character.IsBuffActive(BuffId.HighGuard_Buff))
 			return 0;
@@ -1436,11 +1496,8 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var byLevel = level * 0.85f;
 
-		var byStat = 0d;
-
 		// Mirrors HR, so an equal DEX investment on both sides cancels out
-		if (!Feature.IsEnabled("NewDEXFormula"))
-			byStat = stat * 0.15f;
+		var byStat = stat * 0.15f;
 
 		var byItem = 0f;
 
@@ -1474,6 +1531,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_BLK(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.BLK(character);
+
 		var properties = character.Properties;
 
 		var blockEnablingBuff = character.IsBuffActive(BuffId.CrossGuard_Buff);
@@ -1490,9 +1550,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byLevel = level;
 
 		// Linear in CON, and mirrored by BLK_BREAK's STR term so the two cancel
-		var byStat = 0d;
-		if (!Feature.IsEnabled("NewCONFormula"))
-			byStat = stat * 0.8f;
+		var byStat = stat * 0.8f;
 		var byItem = 0f;
 
 		byItem += character.Inventory.GetEquipProperties(PropertyName.BLK);
@@ -1539,6 +1597,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_BLK_BREAK(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.BLK_BREAK(character);
+
 		var properties = character.Properties;
 
 		var level = properties.GetFloat(PropertyName.Lv);
@@ -1547,9 +1608,7 @@ public class CharacterCalculationsScript : GeneralScript
 		var byLevel = level;
 
 		// Deliberately below BLK, so shielded monsters stay relevant at level
-		var byStat = 0d;
-		if (!Feature.IsEnabled("NewSTRFormula"))
-			byStat = stat * 0.4f;
+		var byStat = stat * 0.4f;
 
 		var byItem = 0f;
 
@@ -1584,14 +1643,7 @@ public class CharacterCalculationsScript : GeneralScript
 
 		var byLevel = level;
 
-		var byStat = 0d;
-		if (!Feature.IsEnabled("NewINTFormula"))
-			byStat += statINT * 0.25f;
-
-		if (!Feature.IsEnabled("NewSPRFormula"))
-			byStat += statSPR * 1.25f;
-		else
-			byStat += (statSPR) + (Math.Floor(statSPR / 10f) * (byLevel * 0.03f));
+		var byStat = (statINT * 0.25f) + (statSPR * 1.25f);
 
 		var value = byLevel + byStat;
 
@@ -1614,6 +1666,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_SR(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.SR(character);
+
 		var properties = character.Properties;
 
 		var baseValue = 3;
@@ -1657,6 +1712,9 @@ public class CharacterCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Character_MSPD(Character character)
 	{
+		if (!Feature.IsEnabled("LaimaFormulas"))
+			return CharacterFormulas2016.MSPD(character);
+
 		var properties = character.Properties;
 
 		if (character.IsLocked(LockType.Movement))
