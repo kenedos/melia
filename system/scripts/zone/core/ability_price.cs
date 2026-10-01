@@ -7,6 +7,7 @@
 
 using System;
 using Melia.Shared.Data.Database;
+using Melia.Shared.Util;
 using Melia.Zone;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
@@ -603,7 +604,7 @@ internal class AbilityPriceTimeFunctionsScript : GeneralScript
 	[ScriptableFunction]
 	public static void ABIL_PARDONER5_PRICE(Character character, AbilityData abilityData, int abilityLevel, int maxLevel, out int price, out int time)
 	{
-		price = abilityLevel * 1 + RandomProvider.Get().Next(0, 99); // could be max 100
+		price = abilityLevel * 1 + GameRandom.Get().Next(0, 99); // could be max 100
 		time = 0;
 	}
 

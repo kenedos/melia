@@ -3,6 +3,12 @@
 //---------------------------------------------------------------------------
 
 [
+// Base features of the game that are presumed to always have been there.
+{ name: "Base", enabled: true, children: [
+	// Enables bonus stats from jobs
+	{ name: "JobStatBonuses", enabled: true },
+]},
+
 // Second Closed Beta Phase, which ran between Winter 2015 and Spring 2016.
 { name: "iCBT2", enabled: true, children: [
 	// Removes Centurion from the Swordman job tree
@@ -61,6 +67,24 @@
 		// Enables increased base stats per job and level, increasing
 		// stats automatically over time
 		{ name: "IncreasedStatRatio", enabled: true },
+
+		// Enables new STR formula
+		{ name: "NewSTRFormula", enabled: false },
+
+		// Enables new CON formula
+		{ name: "NewCONFormula", enabled: false },
+
+		// Enables new INT formula
+		{ name: "NewINTFormula", enabled: false },
+
+		// Enables new SPR formula
+		{ name: "NewSPRFormula", enabled: false },
+
+		// Enables new DEX formula
+		{ name: "NewDEXFormula", enabled: false },
+
+		// Enables new Defense formula
+		{ name: "NewDefenseFormula", enabled: false },
 	]},
 	
 	// Lowers ability costs
@@ -139,9 +163,42 @@
 		// member target selection wheel
 		{ name: "ClericHealPartySelect", enabled: true },
 	]},		
+
+	// Enables overriding skintones available at character creation
+	{ name: "OverrideSkintones", enabled: false },
+
+	// Enables day and night cycle
+	{ name: "DayNightCycle", enabled: true },
+
+	// Enables custom quest system
+	{ name: "CustomQuestSystem", enabled: true },
+
+	// Enables custom random options based off item grade
+	{ name: "GradeRandomOptions", enabled: true },
+
+	// Allows character resurrection in PvP Maps
+	{ name: "AllowPVPResurrection", enabled: true },
+
+	// Headgear enchants consume potential when used
+	{ name: "HeadgearEnchantsConsumePotential", enabled: false },
+
+	// Enables the service NPCs placed in the cities (stylist, exchanger,
+	// guild, arenas and so on)
+	{ name: "CustomNpcs", enabled: true },
+
+	// Enables Mixing Table system
+	{ name: "MixingTable", enabled: true },
+
+	// Grants all weapon/armor equip abilities to every character,
+	// allowing them to equip any weapon type their class supports
+	{ name: "UnlockAllWeaponTypes", enabled: true },
 ]},
 
 // Let's disable certain features for now to hide things that aren't
 // fully implemented
 { name: "GrowthEquipOnStart", enabled: false },
+{ name: "BattleManager", enabled: false },
+{ name: "BountyHunterSystem", enabled: false },
+{ name: "MobaSystem", enabled: false },
+{ name: "TerritoryWarSystem", enabled: false },
 ]

@@ -1,11 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
-// Collection Item Scripts
-//--- Description -----------------------------------------------------------
-// Scripts that handle item-collection related actions, such as registering
-// a new item to a collection.
-//---------------------------------------------------------------------------
-
-using Melia.Shared.Game.Const;
+﻿using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
 using Melia.Zone;
 using Melia.Zone.Events.Arguments;
@@ -21,8 +14,19 @@ public class CollectionItemScripts : GeneralScript
 	{
 		var collectionName = strArg;
 
-		if (ZoneServer.Instance.Data.CollectionDb.TryFindByClassName(collectionName, out var collectionData)
-			&& character.Collections.Add(collectionData.Id))
+		if (!ZoneServer.Instance.Data.CollectionDb.TryFindByClassName(collectionName, out var collectionData))
+			return ItemUseResult.Fail;
+
+		if (character.Collections.Has(collectionData.Id))
+		{
+			character.SystemMessage("AlreadyHaveCollection");
+			return ItemUseResult.Fail;
+		}
+
+		if (character.Collections.Count == 0)
+			character.ShowHelp("TUTO_COLLECTION");
+
+		if (character.Collections.Add(collectionData.Id))
 		{
 			character.SystemMessage("GetCollection");
 
@@ -33,26 +37,6 @@ public class CollectionItemScripts : GeneralScript
 		}
 
 		return ItemUseResult.Fail;
-	}
-
-	[ScriptableFunction]
-	public DialogTxResult SCR_PUT_COLLECTION(Character character, DialogTxArgs args)
-	{
-		var collectionId = args.NumArgs[0];
-		var item = args.TxItems[0].Item;
-
-		if (character.Collections.RegisterItem(collectionId, item.Id))
-		{
-			character.Inventory.Remove(item, 1, InventoryItemRemoveMsg.Destroyed);
-
-			// This is necessary for the collection to go through on the front end
-			Send.ZC_ITEM_INVENTORY_DIVISION_LIST(character);
-			Send.ZC_NORMAL.UpdateCollection(character, collectionId, item.Id);
-
-			return DialogTxResult.Okay;
-		}
-
-		return DialogTxResult.Fail;
 	}
 
 	[On("PlayerReady")]

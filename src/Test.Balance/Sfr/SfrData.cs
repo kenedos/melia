@@ -180,7 +180,7 @@ namespace Melia.Test.Balance.Sfr
 		/// <summary>
 		/// Path to the class list that bounds the pricer's scope.
 		/// </summary>
-		public static string GemClassesPath => Path.Combine(Root, "packages", "laima-core", "scripts", "zone", "core", "skill_gem_classes.cs");
+		public static string GemClassesPath => Path.Combine(Root, "system", "scripts", "zone", "core", "skill_gem_classes.cs");
 
 		/// <summary>
 		/// Path to the measured sweep, read only for the basic-attack rates.

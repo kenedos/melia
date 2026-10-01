@@ -49,7 +49,7 @@ public class AbilityUnlockedFunctionsScript : GeneralScript
 	/// level and the ability tree data.
 	/// </summary>
 	/// <remarks>
-	/// Not used on officials right now, included it just in case.
+	/// Not used in the game right now, included it just in case.
 	/// </remarks>
 	/// <param name="character"></param>
 	/// <param name="skillClassName"></param>
@@ -78,6 +78,22 @@ public class AbilityUnlockedFunctionsScript : GeneralScript
 		var rank = character.Jobs.GetCurrentRank();
 
 		return (rank >= minRank);
+	}
+
+	/// <summary>
+	/// Unlocks at a given base level.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <param name="argStr"></param>
+	/// <param name="minLevel"></param>
+	/// <param name="data"></param>
+	/// <returns></returns>
+	[ScriptableFunction]
+	public static bool UNLOCK_BASE_LEVEL(Character character, string argStr, int minLevel, AbilityData data)
+	{
+		var level = character.Level;
+
+		return (level >= minLevel);
 	}
 
 	/// <summary>

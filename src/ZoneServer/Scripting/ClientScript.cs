@@ -42,6 +42,9 @@ namespace Melia.Zone.Scripting
 		[On("PlayerReady")]
 		protected void OnPlayerReadyInternal(object sender, PlayerEventArgs e)
 		{
+			if (ZoneServer.Instance.Conf.World.DisabledClientScripts.Contains(this.GetType().Name))
+				return;
+
 			this.Ready(e.Character);
 		}
 

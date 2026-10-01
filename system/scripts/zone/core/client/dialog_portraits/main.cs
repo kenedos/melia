@@ -2,7 +2,7 @@
 // Dialog Portraits
 //--- Description -----------------------------------------------------------
 // Custom dialogues have certain restrictions, such as being unable
-// to define a portrait for custom text, because the official function
+// to define a portrait for custom text, because the game's function
 // overwrites that variable. This script cleans up the functions
 // responsible for this, to give scripters more freedom.
 //---------------------------------------------------------------------------

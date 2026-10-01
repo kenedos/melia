@@ -5,6 +5,8 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
@@ -14,6 +16,7 @@ using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
+using Yggdrasil.Geometry.Shapes;
 using static Melia.Shared.Util.TaskHelper;
 
 public class KillEventsScript : GeneralScript
@@ -27,11 +30,41 @@ public class KillEventsScript : GeneralScript
 
 	private void OnRootCrystalKilled(Mob mob, ICombatEntity attacker)
 	{
-		attacker.StartBuff(BuffId.RootCrystalMoveSpeed, 3, 0, TimeSpan.FromMinutes(10), attacker);
-		attacker.StartBuff(BuffId.RootCrystalCoolDown_BUFF, 0, 0, TimeSpan.FromMinutes(1), attacker);
+		var duration = TimeSpan.FromSeconds(10);
+		var applied = new HashSet<ICombatEntity>();
 
-		if (attacker is Character character)
-			CallSafe(this.MonsterHealStamina(mob, character, 100000));
+		void ApplyBuff(ICombatEntity target)
+		{
+			if (target == null || target.IsDead || !applied.Add(target))
+				return;
+			target.StartBuff(BuffId.RootCrystalMoveSpeed, 10, 0, duration, attacker);
+		}
+
+		ApplyBuff(attacker);
+
+		var character = mob.GetKillBeneficiary(attacker);
+		if (character == null)
+			return;
+
+		ApplyBuff(character);
+		CallSafe(this.MonsterHealStamina(mob, character, 100000));
+
+		var recipients = new List<Character> { character };
+		if (character.Connection?.Party != null)
+			recipients.AddRange(character.Map.GetPartyMembersInRange(character, 150).Where(m => m != character));
+
+		foreach (var recipient in recipients)
+		{
+			if (recipient != character)
+			{
+				ApplyBuff(recipient);
+				CallSafe(this.MonsterHealStamina(mob, recipient, 100000));
+			}
+
+			var area = new CircleF(recipient.Position, 150);
+			foreach (var minion in recipient.Map.GetAliveAlliedEntitiesIn(recipient, area).Where(e => e is Summon || e is Companion))
+				ApplyBuff(minion);
+		}
 	}
 
 	private async Task MonsterHealStamina(Mob mob, Character character, int staminaAmount)
@@ -40,7 +73,7 @@ public class KillEventsScript : GeneralScript
 
 		character.Properties.Stamina += staminaAmount;
 
-		// Officials don't seem to send ZC_STAMINA, but for some reason
+		// The game doesn't seem to send ZC_STAMINA, but for some reason
 		// the stamina doesn't update if we don't do that.
 		Send.ZC_ACTION_PKS(character, mob, 0, 2, 75);
 		Send.ZC_MON_STAMINA(character, mob, staminaAmount);

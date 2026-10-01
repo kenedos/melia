@@ -5,8 +5,12 @@
 //---------------------------------------------------------------------------
 
 using System.Globalization;
+using Melia.Shared.Network;
+using Melia.Zone;
 using Melia.Zone.Scripting;
+using Melia.Zone.Network;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.Characters.Components;
 using Yggdrasil.Logging;
 using Yggdrasil.Util.Commands;
 using static Melia.Zone.Scripting.Shortcuts;
@@ -17,13 +21,22 @@ public class CustomQuestSystemClientScript : ClientScript
 	{
 		this.LoadAllScripts();
 
-		AddChatCommand("quest", "<complete|cancel>", "", 0, 99, HandleQuest);
+		AddChatCommand("quest", "<complete|cancel|track|warp>", "", 0, 99, HandleQuest);
+		AddChatCommand("questsearch", "<text>", "", 0, 99, HandleQuestSearch);
 	}
 
 	protected override void Ready(Character character)
 	{
 		this.SendAllScripts(character);
 		character.Quests.UpdateClient();
+	}
+
+	private CommandResult HandleQuestSearch(Character sender, Character target, string message, string commandName, Arguments args)
+	{
+		var searchText = args.Count > 0 ? args.Get(0) : "";
+		var lua = "M_QUESTS_SET_SEARCH(\"" + searchText.Replace("\"", "\\\"") + "\")";
+		Send.ZC_EXEC_CLIENT_SCP(sender.Connection, lua);
+		return CommandResult.Okay;
 	}
 
 	private CommandResult HandleQuest(Character sender, Character target, string message, string commandName, Arguments args)
@@ -54,13 +67,45 @@ public class CustomQuestSystemClientScript : ClientScript
 		{
 			case "complete":
 			{
-				if (!quest.ObjectivesCompleted)
+				if (!ZoneServer.Instance.Conf.World.GetBool("quest_completion_from_ui", false))
 				{
-					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to complete a quest they didn't complete yet.", sender.Username);
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to complete a quest from the UI while it's disabled.", sender.Username);
+					return CommandResult.Okay;
+				}
+
+				if (!sender.Quests.IsCompletable(quest.Data.Id))
+				{
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to complete a quest that isn't completable.", sender.Username);
 					return CommandResult.Okay;
 				}
 
 				sender.Quests.Complete(quest);
+				break;
+			}
+			case "warp":
+			{
+				if (!ZoneServer.Instance.Conf.World.GetBool("quest_return_button", true))
+				{
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to warp back while the return button is disabled.", sender.Username);
+					return CommandResult.Okay;
+				}
+
+				if (!quest.ObjectivesCompleted)
+				{
+					Log.Debug("CustomQuestSystemClientScript: User '{0}' tried to warp back on a quest that isn't done.", sender.Username);
+					return CommandResult.Okay;
+				}
+
+				if (sender.WasWarpInterrupted())
+					return CommandResult.Okay;
+
+				if (!QuestComponent.TryGetPhaseDestination(quest, out var mapClassName, out var position))
+				{
+					sender.ServerMessage(L("There's nowhere to return to for this quest."));
+					return CommandResult.Okay;
+				}
+
+				sender.Warp(mapClassName, position);
 				break;
 			}
 			case "cancel":

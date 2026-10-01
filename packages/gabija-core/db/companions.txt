@@ -1,0 +1,25 @@
+// Melia
+// Database file
+// 
+// For reference only.
+// Values: id, className, name, rideMSPD, isPremium, canPet, canRide, endRideOnHit, [foodGroup], [buff]
+//---------------------------------------------------------------------------
+
+[
+{ id: 1, className: "GameStudio_None", name: "", rideMSPD: 0, isPremium: false, canPet: false, canRide: false, endRideOnHit: false },
+{ id: 2, className: "Mon_alpaka", name: "Alpaca", rideMSPD: 0, isPremium: false, canPet: true, canRide: false, endRideOnHit: false },
+{ id: 3, className: "Velhider", name: "Velheider", price: 110000, rideMSPD: 0, isPremium: false, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 0 },
+{ id: 4, className: "hoglan_Pet", name: "Hoglan", price: 453600, rideMSPD: 0, isPremium: false, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 0 },
+{ id: 5, className: "pet_hawk", name: "Hawk", price: 453600, rideMSPD: 0, isPremium: false, canPet: false, canRide: true, endRideOnHit: false },
+{ id: 6, className: "Piggy", name: "Pig", rideMSPD: 0, isPremium: false, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 6 },
+{ id: 7, className: "Lesser_panda", name: "Lesser Panda", rideMSPD: 0, isPremium: true, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 5 },
+{ id: 8, className: "Toucan", name: "Toucan", rideMSPD: 0, isPremium: true, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 8 },
+{ id: 9, className: "Guineapig", name: "Guinea Pig", rideMSPD: 0, isPremium: false, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 9 },
+{ id: 10, className: "barn_owl", name: "Owl", rideMSPD: 0, isPremium: false, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 10 },
+{ id: 11, className: "Piggy_baby", name: "Pig", rideMSPD: 0, isPremium: false, canPet: false, canRide: false, endRideOnHit: false, foodGroup: 6 },
+{ id: 12, className: "Lesser_panda_baby", name: "Lesser Panda", rideMSPD: 0, isPremium: false, canPet: false, canRide: false, endRideOnHit: false, foodGroup: 5 },
+{ id: 13, className: "guineapig_baby", name: "Guinea Pig", rideMSPD: 0, isPremium: false, canPet: false, canRide: false, endRideOnHit: false, foodGroup: 0 },
+{ id: 14, className: "penguin", name: "Penguin", rideMSPD: 0, isPremium: true, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 11 },
+{ id: 15, className: "parrotbill", name: "Battlebird", rideMSPD: 0, isPremium: true, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 12 },
+{ id: 16, className: "parrotbill_dummy", name: "Battlebird", rideMSPD: 0, isPremium: true, canPet: false, canRide: true, endRideOnHit: false, foodGroup: 12 },
+]

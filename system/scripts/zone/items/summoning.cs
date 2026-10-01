@@ -1,89 +1,20 @@
-﻿//--- Melia Script ----------------------------------------------------------
-// Summoning Scripts
-//--- Description -----------------------------------------------------------
-// Item scripts that handle summoning monsters using orbs.
-//---------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using Melia.Shared.L10N;
 using Melia.Shared.Scripting;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Shared.Util;
 using Melia.Zone;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Yggdrasil.Util;
-using Melia.Zone.Events.Arguments;
 
 public class SummoningItemScripts : GeneralScript
 {
-	[ScriptableFunction]
-	public ItemUseResult SCR_USE_SUMMONORB_FRIEND(Character character, Item item, string strArg, float numArg1, float numArg2)
-	{
-		var monsterClassName = strArg;
-		if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterClassName, out var monsterData))
-		{
-			character.ServerMessage(Localization.Get("Summoning the monster failed."));
-			return ItemUseResult.Fail;
-		}
-
-		// If the pet system is on and you try to resummon the same monster,
-		// it desummons it, otherwise we summon the new monster and desummon
-		// the old one. If the pet system is not enabled using an orb for a
-		// monster that's already out fails so you don't waste the orb.
-		if (character.Variables.Perm.TryGetInt("Melia.BlueOrbSummon.MonsterId", out var monsterClassId))
-		{
-			if (monsterData.Id == monsterClassId)
-			{
-				if (ZoneServer.Instance.Conf.World.BlueOrbPetSystem)
-				{
-					RemoveBlueOrbSummon(character);
-					ResetBlueOrbVariables(character);
-					return ItemUseResult.OkayNotConsumed;
-				}
-				else
-				{
-					character.ServerMessage(Localization.Get("This monster is already summoned."));
-					return ItemUseResult.OkayNotConsumed;
-				}
-			}
-		}
-
-		var monster = CreateMonster(monsterData.Id, FactionType.Law, "BasicMonster", character);
-		monster.Components.Get<AiComponent>()?.Script.SetMaster(character);
-		character.Map.AddMonster(monster);
-
-		character.Variables.Perm.SetInt("Melia.BlueOrbSummon.MonsterId", monsterData.Id);
-
-		if (ZoneServer.Instance.Conf.World.BlueOrbPetSystem)
-			return ItemUseResult.OkayNotConsumed;
-
-		character.Variables.Perm.Set("Melia.BlueOrbSummon.DisappearTime", monster.DisappearTime);
-		return ItemUseResult.Okay;
-	}
-
-	[ScriptableFunction]
-	public ItemUseResult SCR_USE_SUMMONORB_ENEMY(Character character, Item item, string strArg, float numArg1, float numArg2)
-	{
-		var monsterClassName = strArg;
-		if (!ZoneServer.Instance.Data.MonsterDb.TryFind(monsterClassName, out var monsterData))
-		{
-			character.ServerMessage(Localization.Get("Summoning the monster failed."));
-			return ItemUseResult.Fail;
-		}
-
-		var monster = CreateMonster(monsterData.Id, FactionType.Chaos, "BasicMonster", character);
-		character.Map.AddMonster(monster);
-
-		var worldconf = ZoneServer.Instance.Conf.World;
-		monster.PossiblyBecomeRare(worldconf.RedOrbJackpotRate, worldconf.RedOrbEliteRate);
-
-		return ItemUseResult.Okay;
-	}
-
 	[On("PlayerReady")]
 	public void OnPlayerReady(object sender, PlayerEventArgs args)
 	{
@@ -113,7 +44,7 @@ public class SummoningItemScripts : GeneralScript
 			}
 		}
 
-		var monster = CreateMonster(monsterClassId, FactionType.Law, "BasicMonster", character);
+		var monster = CreateMonster(monsterClassId, RelationType.Neutral, "BasicMonster", character);
 		monster.Components.Get<AiComponent>()?.Script.SetMaster(character);
 
 		if (character.Variables.Perm.TryGet<DateTime>("Melia.BlueOrbSummon.DisappearTime", out disappearTime))
@@ -155,19 +86,18 @@ public class SummoningItemScripts : GeneralScript
 	/// Creates the monster with the given parameters but doesn't spawn it.
 	/// </summary>
 	/// <param name="monsterClassId">The id of the monster to spawn.</param>
-	/// <param name="faction">The monster's faction.</param>
+	/// <param name="monsterType">The monster's type.</param>
 	/// <param name="aiName">The name of the AI to use for the monster.</param>
 	/// <param name="itemUser">The character that spawned the monster, used as reference for position and property overrides.</param>
 	/// <returns></returns>
-	private static Mob CreateMonster(int monsterClassId, FactionType faction, string aiName, Character itemUser)
+	private static Mob CreateMonster(int monsterClassId, RelationType monsterType, string aiName, Character itemUser)
 	{
 		var pos = GetRandomSpawnPosition(itemUser);
 
-		var monster = new Mob(monsterClassId);
-		monster.Faction = faction;
+		var monster = new Mob(monsterClassId, monsterType);
 		monster.Position = itemUser.Position;
 
-		if (!ZoneServer.Instance.Conf.World.BlueOrbPetSystem || faction == FactionType.Chaos)
+		if (!ZoneServer.Instance.Conf.World.BlueOrbPetSystem || monsterType == RelationType.Enemy)
 			monster.DisappearTime = DateTime.Now + TimeSpan.FromSeconds(180);
 
 		if (itemUser.Map.TryGetPropertyOverrides(monsterClassId, out var propertyOverrides))
@@ -186,7 +116,7 @@ public class SummoningItemScripts : GeneralScript
 	/// <returns></returns>
 	private static Position GetRandomSpawnPosition(Character character)
 	{
-		var rnd = RandomProvider.Get();
+		var rnd = GameRandom.Get();
 		var pos = character.Position;
 
 		for (var i = 0; i < 10; ++i)

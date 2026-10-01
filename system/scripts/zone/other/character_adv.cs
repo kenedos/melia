@@ -8,11 +8,11 @@
 using Melia.Shared.Scripting;
 using Melia.Shared.Game.Const;
 using Melia.Zone;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Items;
-using Melia.Zone.Events.Arguments;
 
 public class CharacterAdvancementScript : GeneralScript
 {
@@ -22,9 +22,7 @@ public class CharacterAdvancementScript : GeneralScript
 		var character = args.Character;
 		var newJobId = args.Character.JobId;
 
-		// Grant defaults if the player chose the class for the first time
-		if (character.Job.Circle == JobCircle.First)
-			GrantDefaults(character, newJobId);
+		GrantDefaults(character, newJobId);
 	}
 
 	private static void GrantDefaults(Character character, JobId jobId)
@@ -54,6 +52,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.THSword);
 
 				GiveItem(character, ItemId.Costume_Char1_2, 1);
+				GiveItem(character, ItemId.ChangeJob_TSW01_129, 1);
 				break;
 			}
 			case JobId.Peltasta:
@@ -90,6 +89,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.THSpear);
 
 				GiveItem(character, ItemId.Costume_Char1_5, 1);
+				GiveItem(character, ItemId.ChangeJob_TSP01_111, 1);
 				break;
 			}
 			case JobId.Barbarian:
@@ -101,6 +101,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.THSword);
 
 				GiveItem(character, ItemId.Costume_Char1_6, 1);
+				GiveItem(character, ItemId.ChangeJob_TSW01_129, 1);
 				break;
 			}
 			case JobId.Cataphract:
@@ -187,6 +188,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.CompanionRide);
 
 				GiveItem(character, ItemId.Costume_Char1_16, 1);
+				GiveItem(character, ItemId.ChangeJob_SWD01_137, 1);
 				break;
 			}
 			case JobId.Lancer:
@@ -246,6 +248,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.CompanionRide);
 
 				GiveItem(character, ItemId.Costume_Char3_7, 1);
+				GiveItem(character, ItemId.ChangeJob_SWD01_137, 1);
 				break;
 			}
 			case JobId.BlossomBlader:
@@ -257,6 +260,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.THSword);
 
 				GiveItem(character, ItemId.Costume_Char1_22_1, 1);
+				GiveItem(character, ItemId.ChangeJob_SWD01_137, 1);
 				break;
 			}
 			case JobId.Luchador:
@@ -363,9 +367,9 @@ public class CharacterAdvancementScript : GeneralScript
 			{
 				LearnSkill(character, SkillId.Magic_Attack);
 				LearnSkill(character, SkillId.Magic_Attack_TH);
-				LearnSkill(character, SkillId.Common_ForcedAttack);
-				LearnSkill(character, SkillId.Common_ForcedAttackCancel);
-				LearnSkill(character, SkillId.Common_SummonRemove);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttack);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttackCancel);
+				// LearnCommonSkill(character, SkillId.Common_SummonRemove);
 
 				GiveItem(character, ItemId.Costume_Char2_6, 1);
 				break;
@@ -382,9 +386,9 @@ public class CharacterAdvancementScript : GeneralScript
 			{
 				LearnSkill(character, SkillId.Magic_Attack);
 				LearnSkill(character, SkillId.Magic_Attack_TH);
-				LearnSkill(character, SkillId.Common_ForcedAttack);
-				LearnSkill(character, SkillId.Common_ForcedAttackCancel);
-				LearnSkill(character, SkillId.Common_SummonRemove);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttack);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttackCancel);
+				// LearnCommonSkill(character, SkillId.Common_SummonRemove);
 
 				GiveItem(character, ItemId.Costume_Char2_9, 1);
 				break;
@@ -467,9 +471,9 @@ public class CharacterAdvancementScript : GeneralScript
 			{
 				LearnSkill(character, SkillId.Magic_Attack);
 				LearnSkill(character, SkillId.Magic_Attack_TH);
-				LearnSkill(character, SkillId.Common_ForcedAttack);
-				LearnSkill(character, SkillId.Common_ForcedAttackCancel);
-				LearnSkill(character, SkillId.Common_SummonRemove);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttack);
+				// LearnCommonSkill(character, SkillId.Common_ForcedAttackCancel);
+				// LearnCommonSkill(character, SkillId.Common_SummonRemove);
 
 				GiveItem(character, ItemId.Costume_Char4_4, 1);
 				break;
@@ -533,9 +537,9 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.CrossBow_Attack);
 				LearnSkill(character, SkillId.Sword_Attack);
 				LearnSkill(character, SkillId.Musket_Attack);
-				LearnSkill(character, SkillId.Hunter_PetComeBack);
 
 				GiveItem(character, ItemId.Costume_Char3_2, 1);
+				GiveItem(character, ItemId.ChangeJob_TBW01_137, 1);
 				break;
 			}
 			case JobId.QuarrelShooter:
@@ -557,6 +561,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Musket_Attack);
 
 				GiveItem(character, ItemId.Costume_Char3_4, 1);
+				GiveItem(character, ItemId.ChangeJob_TBW01_137, 1);
 				break;
 			}
 			case JobId.Sapper:
@@ -565,9 +570,9 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.CrossBow_Attack);
 				LearnSkill(character, SkillId.Sword_Attack);
 				LearnSkill(character, SkillId.Musket_Attack);
-				LearnSkill(character, SkillId.Sapper_DetonateTraps);
 
 				GiveItem(character, ItemId.Costume_Char3_5, 1);
+				GiveItem(character, ItemId.ChangeJob_TBW01_137, 1);
 				break;
 			}
 			case JobId.Wugushi:
@@ -578,6 +583,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Musket_Attack);
 
 				GiveItem(character, ItemId.Costume_Char3_6, 1);
+				GiveItem(character, ItemId.ChangeJob_TBW01_137, 1);
 				break;
 			}
 			case JobId.Fletcher:
@@ -588,6 +594,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Musket_Attack);
 
 				GiveItem(character, ItemId.Costume_Char3_11, 1);
+				GiveItem(character, ItemId.ChangeJob_TBW01_137, 1);
 				break;
 			}
 			case JobId.PiedPiper:
@@ -618,6 +625,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Musket_Attack);
 
 				GiveItem(character, ItemId.Costume_Char3_14, 1);
+				GiveItem(character, ItemId.ChangeJob_TBW01_137, 1);
 				break;
 			}
 			case JobId.Cannoneer:
@@ -761,7 +769,6 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.Staff);
 				LearnAbility(character, AbilityId.Mace);
 				LearnAbility(character, AbilityId.THMace);
-				LearnAbility(character, AbilityId.Cleric36);
 				break;
 			}
 			case JobId.Priest:
@@ -770,6 +777,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_2, 1);
+				GiveItem(character, ItemId.ChangeJob_STF01_137, 1);
 				break;
 			}
 			case JobId.Krivis:
@@ -778,6 +786,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_3, 1);
+				GiveItem(character, ItemId.ChangeJob_STF01_137, 1);
 				break;
 			}
 			case JobId.Druid:
@@ -787,15 +796,18 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Lycan_Half_Attack);
 
 				GiveItem(character, ItemId.Costume_Char4_5, 1);
+				GiveItem(character, ItemId.ChangeJob_MAC01_136, 1);
 				break;
 			}
 			case JobId.Sadhu:
 			{
 				LearnSkill(character, SkillId.Hammer_Attack);
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
-				LearnSkill(character, SkillId.Sadhu_OutofBodyCancel);
+				// LearnSkill(character, SkillId.Sadhu_OutofBodyCancel);
+				LearnSkill(character, SkillId.Sadhu_EctoplasmAttack);
 
 				GiveItem(character, ItemId.Costume_Char4_6, 1);
+				GiveItem(character, ItemId.ChangeJob_MAC01_136, 1);
 				break;
 			}
 			case JobId.Dievdirbys:
@@ -804,6 +816,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_7, 1);
+				GiveItem(character, ItemId.ChangeJob_MAC01_136, 1);
 				break;
 			}
 			case JobId.Oracle:
@@ -812,17 +825,19 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_8, 1);
+				GiveItem(character, ItemId.ChangeJob_MAC01_136, 1);
 				break;
 			}
 			case JobId.Monk:
 			{
 				LearnSkill(character, SkillId.Hammer_Attack);
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
-				LearnSkill(character, SkillId.Monk_1InchPunch_DOT);
+				// LearnSkill(character, SkillId.Monk_1InchPunch_DOT);
 
 				LearnAbility(character, AbilityId.THMace);
 
 				GiveItem(character, ItemId.Costume_Char4_9, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			case JobId.Pardoner:
@@ -843,6 +858,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.Peltasta6);
 
 				GiveItem(character, ItemId.Costume_Char4_11, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			case JobId.Chaplain:
@@ -852,6 +868,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Binatio_Attack);
 
 				GiveItem(character, ItemId.Costume_Char4_12, 1);
+				GiveItem(character, ItemId.ChangeJob_MAC01_136, 1);
 				break;
 			}
 			case JobId.Shepherd:
@@ -868,6 +885,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_14, 1);
+				GiveItem(character, ItemId.ChangeJob_MAC01_136, 1);
 				break;
 			}
 			case JobId.Kabbalist:
@@ -876,6 +894,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_15, 1);
+				GiveItem(character, ItemId.ChangeJob_MAC01_136, 1);
 				break;
 			}
 			case JobId.Inquisitor:
@@ -884,6 +903,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_16, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			case JobId.Miko:
@@ -900,6 +920,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_20, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			case JobId.Exorcist:
@@ -908,6 +929,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Exorcist01, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			case JobId.Crusader:
@@ -918,6 +940,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.THMace);
 
 				GiveItem(character, ItemId.Costume_Char4_21_01, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			case JobId.Lama:
@@ -933,6 +956,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnAbility(character, AbilityId.THMace);
 
 				GiveItem(character, ItemId.Costume_Char4_22, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			case JobId.Pontifex:
@@ -941,6 +965,7 @@ public class CharacterAdvancementScript : GeneralScript
 				LearnSkill(character, SkillId.Hammer_Attack_TH);
 
 				GiveItem(character, ItemId.Costume_Char4_230, 1);
+				GiveItem(character, ItemId.ChangeJob_TMAC02_103, 1);
 				break;
 			}
 			// Scout
@@ -1256,6 +1281,15 @@ public class CharacterAdvancementScript : GeneralScript
 			return;
 
 		var skill = new Skill(character, skillId, 1);
+		character.Skills.Add(skill);
+	}
+
+	private static void LearnCommonSkill(Character character, SkillId skillId)
+	{
+		if (character.Skills.Has(skillId))
+			return;
+
+		var skill = new Skill(character, skillId, 1, isCommon: true);
 		character.Skills.Add(skill);
 	}
 

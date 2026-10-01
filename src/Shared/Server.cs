@@ -743,8 +743,9 @@ namespace Melia.Shared
 				writer.WriteLine("//---------------------------------------------------------------------------");
 				writer.WriteLine();
 
-				// System-only scripts not provided by packages
+				// System scripts that every package set relies on
 				writer.WriteLine("commands/**/*");
+				writer.WriteLine("require \"scripts_base.txt\"");
 
 				foreach (var (name, path) in packageScriptEntries)
 				{
@@ -976,6 +977,9 @@ namespace Melia.Shared
 
 			if (this.Packages.Packages.Count == 0)
 				Log.Info("  no packages enabled.");
+
+			if (this.Packages.HasConflicts)
+				ConsoleUtil.Exit(1);
 		}
 
 		/// <summary>

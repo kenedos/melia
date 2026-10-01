@@ -16,9 +16,8 @@
 	<Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 	<!-- Upstream packages; the runtime compiles every enabled package as one assembly -->
 	<ItemGroup>
-		<Compile Include="..\..\..\laima-core\scripts\zone\**\*.cs" Exclude="..\..\..\laima-core\scripts\zone\obj\**\*.cs;..\..\..\laima-core\scripts\zone\bin\**\*.cs" LinkBase="laima-core" />
+		<Compile Include="..\..\..\..\system\scripts\zone\**\*.cs" Exclude="..\..\..\..\system\scripts\zone\content\r1\**\*.cs;..\..\..\..\system\scripts\zone\content\test\**\*.cs;..\..\..\..\system\scripts\zone\obj\**\*.cs;..\..\..\..\system\scripts\zone\bin\**\*.cs" LinkBase="system" />
 		<Compile Include="..\..\..\laima-skills\scripts\zone\**\*.cs" Exclude="..\..\..\laima-skills\scripts\zone\obj\**\*.cs;..\..\..\laima-skills\scripts\zone\bin\**\*.cs" LinkBase="laima-skills" />
-		<Compile Include="..\..\..\world-shared\scripts\zone\**\*.cs" Exclude="..\..\..\world-shared\scripts\zone\obj\**\*.cs;..\..\..\world-shared\scripts\zone\bin\**\*.cs" LinkBase="world-shared" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\..\..\..\src\ZoneServer\ZoneServer.csproj" />

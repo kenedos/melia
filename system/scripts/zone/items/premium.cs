@@ -1,38 +1,70 @@
 ﻿//--- Melia Script ----------------------------------------------------------
-// Premium Item Scripts
+// Premium Items (Repair Kit...)
 //--- Description -----------------------------------------------------------
-// Item scripts related to premium items, such as tokens.
+// Item-related scripts that are defined as Premium group items.
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using Melia.Shared.Data.Database;
 using Melia.Shared.Game.Const;
+using Melia.Zone;
 using Melia.Zone.Network;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
+using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
+using Yggdrasil.Logging;
+using Yggdrasil.Util;
+using static Melia.Zone.Scripting.Shortcuts;
+using static Melia.Zone.Skills.Helpers.MonsterSkillHelper;
 
 public class PremiumItemScripts : GeneralScript
 {
 	[ScriptableFunction]
-	public ItemTxResult SCR_USE_ITEM_PREMIUM_TOKEN(Character character, Item item, int[] numArgs)
+	public ItemUseResult PREMIUM_REPAIR(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
-		var account = character.Connection.Account;
+		foreach (var equipItem in character.Inventory.GetEquip().Values)
+			equipItem.ModifyDurability(character, (int)item.Data.Script.NumArg1);
+		return ItemUseResult.Okay;
+	}
 
-		// The duration is saved on the item's script data. NumArg1 is the number
-		// of seconds. The purpose of NumArg2 is currently unknown.
-		var timeSeconds = item.Data.Script.NumArg1;
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_GOLDMORU_BOX(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		character.AddItem(ItemId.Moru_Gold, (int)numArg1);
+		return ItemUseResult.Okay;
+	}
 
-		var addTime = TimeSpan.FromSeconds(timeSeconds);
-		account.Premium.Token.Extend(addTime);
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_EXTEND_ACCOUNT_WAREHOUSE(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		character.ModifyAccountProperty(PropertyName.AccountWareHouseExtend, 1);
+		character.AddonMessage(AddonMessage.ACCOUNT_WAREHOUSE_ITEM_LIST);
+		character.AddonMessage(AddonMessage.ACCOUNT_UPDATE);
+		return ItemUseResult.Okay;
+	}
 
-		if (account.Premium.CanUseBuff)
-			character.StartBuff(BuffId.Premium_Token);
+	[ScriptableFunction]
+	public ItemUseResult SCR_USE_FREE_EXTEND_ACCOUNT_WAREHOUSE(Character character, Item item, string strArg, float numArg1, float numArg2)
+	{
+		var amount = (int)numArg2;
+		if (amount <= 0) amount = 1;
 
-		Send.ZC_SEND_PREMIUM_STATE(character.Connection, account.Premium.Token);
+		character.ModifyAccountProperty(PropertyName.AccountWareHouseExtendByItem, amount);
 
-		character.Inventory.Remove(item, 1, InventoryItemRemoveMsg.Used);
+		character.AddonMessage(AddonMessage.ACCOUNT_WAREHOUSE_ITEM_LIST);
+		character.AddonMessage(AddonMessage.ACCOUNT_UPDATE);
 
-		return ItemTxResult.Okay;
+		if (amount == 1)
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, ScpArgMsg("ACCOUNT_UPDATE1"), 5);
+		else if (amount == 2)
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, ScpArgMsg("ACCOUNT_UPDATE2"), 5);
+
+		return ItemUseResult.Okay;
 	}
 }

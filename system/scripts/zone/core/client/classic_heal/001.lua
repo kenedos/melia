@@ -8,6 +8,11 @@ Melia.Override("SKL_PARTY_TARGET_BY_KEY", function(original, actor, obj, dik, sh
 		-- Returning "0, 1" makes it cast the skill instantly
 		return 0, 1
 	end
+
+	if skill_name == 'Priest_Resurrection' then
+		-- Returning "0, 1" makes it cast the skill instantly
+		return 0, 1
+	end
 	
 	return original(actor, obj, dik, showHPGauge)
 

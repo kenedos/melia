@@ -1,0 +1,19 @@
+// Melia
+// Script List File
+//
+// Scripts loaded whenever packages are enabled. The upstream content
+// (content/r1, content/test) is left out, since the world packages
+// provide the content.
+//---------------------------------------------------------------------------
+
+const/**/*
+core/**/*
+items/**/*
+ais/**/*
+custom/**/*
+
+other/character_init.cs
+other/character_adv.cs
+other/kill_events.cs
+
+require "content/world/shared/scripts.txt"

@@ -69,6 +69,10 @@ Melia.Quests.RequestComplete = function(questObjectId)
 	ui.Chat("/quest complete " .. questObjectId)
 end
 
+Melia.Quests.RequestWarp = function(questObjectId)
+	M_QUESTS_WARP_START(questObjectId)
+end
+
 Melia.Quests.RequestCancel = function(questObjectId)
 	ui.Chat("/quest cancel " .. questObjectId)
 end

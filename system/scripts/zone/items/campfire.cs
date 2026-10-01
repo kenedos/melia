@@ -8,28 +8,30 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Melia.Shared.Game.Const;
 using Melia.Shared.L10N;
+using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
 using Melia.Shared.World;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Skills.SplashAreas;
-using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Maps;
-using static Melia.Shared.Util.TaskHelper;
+using Melia.Zone.World.Actors.Effects;
 
 public class CampfireActionScript : GeneralScript
 {
-	private const int CampfireMonsterId = MonsterId.Bonfire_1;
-	private const int FirewoodItemId = ItemId.Misc_CampfireKit;
+	private const int CampfireMonsterId = 46011;
+	private const int FirewoodItemId = 645337;
 	private const int AreaOfEffectSize = 150;
 	private const int MinDistanceToFires = 150;
 	private const int MaxDistanceToCreator = 50;
 	private readonly static TimeSpan CampfireDuration = TimeSpan.FromMinutes(5);
 	private readonly static TimeSpan BuffApplyCheckDelay = TimeSpan.FromSeconds(1);
+	private readonly static Dictionary<long, Mob> ActiveCampfires = new();
 
-	[ScriptableFunction]
+	[ScriptableFunction("SCR_PUT_CAMPFIRE")]
 	public CustomCommandResult SCR_PUT_CAMPFIRE(Character character, int numArg1, int numArg2, int numArg3)
 	{
 		var campfirePos = new Position(numArg1, 0, numArg2);
@@ -50,7 +52,7 @@ public class CampfireActionScript : GeneralScript
 			return CustomCommandResult.Okay;
 		}
 
-		if (AnyCampfiresNearby(character.Map, campfirePos))
+		if (AnyCampfiresNearby(character, campfirePos))
 		{
 			character.ServerMessage(Localization.Get("There is already a bonfire nearby."));
 			return CustomCommandResult.Okay;
@@ -69,56 +71,90 @@ public class CampfireActionScript : GeneralScript
 		return CustomCommandResult.Okay;
 	}
 
-	private static bool AnyCampfiresNearby(Map map, Position pos)
+	private static bool AnyCampfiresNearby(Character character, Position pos)
 	{
 		var area = new Circle(pos, MinDistanceToFires);
-		var monsters = map.GetActorsIn<Mob>(area);
+		var monsters = character.Map.GetActorsIn<Mob>(area);
 
-		var anyCampfires = monsters.Any(a => a.Id == CampfireMonsterId);
+		var ownCampfire = GetCampfire(character);
+		var anyCampfires = monsters.Exists(a => a.Id == CampfireMonsterId && a != ownCampfire);
 		return anyCampfires;
+	}
+
+	/// <summary>
+	/// Removes the character's campfire when they leave a map or log out.
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="args"></param>
+	[On("PlayerLeftMap")]
+	private void OnPlayerLeftMap(object sender, PlayerEventArgs args)
+	{
+		RemoveCampfire(args.Character);
+	}
+
+	private static Mob GetCampfire(Character character)
+	{
+		lock (ActiveCampfires)
+		{
+			if (ActiveCampfires.TryGetValue(character.ObjectId, out var campfire))
+				return campfire;
+		}
+
+		return null;
+	}
+
+	private static void RemoveCampfire(Character character)
+	{
+		Mob campfire;
+
+		lock (ActiveCampfires)
+		{
+			if (!ActiveCampfires.TryGetValue(character.ObjectId, out campfire))
+				return;
+
+			ActiveCampfires.Remove(character.ObjectId);
+		}
+
+		campfire.Map.RemoveMonster(campfire);
 	}
 
 	private static void CreateCampfire(Character creator, Position pos)
 	{
-		var campfireHandle = creator.Variables.Temp.GetInt("Melia.CampFire.Handle");
-		if (campfireHandle != 0 && creator.Map.TryGetMonster(campfireHandle, out var previousCampfire))
-		{
-			creator.Map.RemoveMonster(previousCampfire);
-		}
+		RemoveCampfire(creator);
 
-		var campfire = new Mob(CampfireMonsterId);
+		var campfire = new Mob(CampfireMonsterId, RelationType.Neutral);
 		campfire.Faction = FactionType.Neutral;
 		campfire.Position = pos;
 		campfire.Direction = creator.Direction;
 		campfire.Layer = creator.Layer;
-		campfire.DisappearTime = DateTime.Now.Add(CampfireDuration);
-		campfire.AttachEffect("F_bg_fire003", 1);
-		campfire.OnDisappear += () =>
-		{
-			creator.Variables.Temp.SetInt("Melia.CampFire.Handle", 0);
-		};
+		campfire.OwnerHandle = creator.Handle;
+		campfire.AddEffect(new AttachEffect("F_bg_fire003", 1, EffectLocation.Bottom));
+		campfire.DisappearTime = DateTime.Now + CampfireDuration;
 
-		creator.Map.AddMonster(campfire);
-		creator.Variables.Temp.SetInt("Melia.CampFire.Handle", campfire.Handle);
+		var map = creator.Map;
+		map.AddMonster(campfire);
 
-		CallSafe(ApplyBuff(creator, campfire));
+		lock (ActiveCampfires)
+			ActiveCampfires[creator.ObjectId] = campfire;
+
+		ApplyBuff(creator, campfire, map);
 	}
 
-	private static async Task ApplyBuff(Character creator, Mob campfire)
+	private static async void ApplyBuff(Character creator, Mob campfire, Map map)
 	{
 		var area = new Circle(creator.Position, AreaOfEffectSize);
 		var endTime = DateTime.Now + CampfireDuration;
 
 		IList<Character> characters;
 
-		while (DateTime.Now < endTime)
+		while (DateTime.Now < endTime && GetCampfire(creator) == campfire)
 		{
-			characters = creator.Map.GetActorsIn<Character>(area);
+			characters = map.GetActorsIn<Character>(area);
 
 			foreach (var character in characters)
 			{
 				if (character.IsSitting && !character.Buffs.Has(BuffId.campfire_Buff))
-					character.StartBuff(BuffId.campfire_Buff);
+					character.Buffs.Start(BuffId.campfire_Buff, TimeSpan.Zero);
 			}
 
 			await Task.Delay(BuffApplyCheckDelay);
@@ -128,9 +164,15 @@ public class CampfireActionScript : GeneralScript
 		// the campfire, which presumably means that they're killing
 		// it. The death packet doesn't appear to do anything visually
 		// though, so it would just be more packets than we need.
-		creator.Map.RemoveMonster(campfire);
+		lock (ActiveCampfires)
+		{
+			if (ActiveCampfires.TryGetValue(creator.ObjectId, out var activeCampfire) && activeCampfire == campfire)
+				ActiveCampfires.Remove(creator.ObjectId);
+		}
 
-		characters = creator.Map.GetActorsIn<Character>(area);
+		campfire.Map.RemoveMonster(campfire);
+
+		characters = map.GetActorsIn<Character>(area);
 		foreach (var character in characters)
 			character.Buffs.Stop(BuffId.campfire_Buff);
 	}

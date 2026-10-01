@@ -16,15 +16,14 @@ local function RemoveObsoleteUiElements()
 	local bodyGroup = GET_CHILD_RECURSIVELY(questFrame, "gb_body", "ui::CGroupBox")
 	local levelFilter1 = GET_CHILD_RECURSIVELY(questFrame, "progressLeveLFilterOpt_1", "ui::CRadioButton")
 	local levelFilter2 = GET_CHILD_RECURSIVELY(questFrame, "progressLeveLFilterOpt_2", "ui::CRadioButton")
-	
+
 	local top = tabCtrl:GetY() + 4
 	local bodyMargin = bodyGroup:GetMargin()
 
 	progressGroup:SetMargin(0, top, 0, 0)
-	searchGroup:SetMargin(0, 0, 0, 0)
+	searchGroup:SetMargin(0, 30, 0, 0)
 	bodyGroup:SetMargin(bodyMargin.left, searchGroup:GetY() + searchGroup:GetHeight(), bodyMargin.right, bodyMargin.bottom)
-	bodyGroup:Resize(bodyGroup:GetOriginalWidth(), bodyGroup:GetOriginalHeight() + tabCtrl:GetHeight() + statusFilterGroup:GetHeight())
-	
+
 	statusFilterGroup:SetVisible(false)
 	levelFilter1:SetVisible(false)
 	levelFilter2:SetVisible(false)

@@ -12,11 +12,18 @@ with any services provided by game developers or publishers, and we don't
 endorse such actions. We're here to learn and create, not to steal or
 destroy.
 
-This branch (`laima`) integrates the Laima expansion into Melia
-via a package system. Laima adds hundreds of implemented skills, buffs,
-instanced dungeons, a party system, player trading, and much more. All
-Laima content is toggled by a single config option, so you can run
-vanilla Melia or the full Laima experience.
+This project extends Melia (https://github.com/NoCode-NoLife/melia) with
+an expansion that adds hundreds of implemented skills, buffs, instanced
+dungeons, a party system, player trading, and much more. We provide
+multiple modular packages that sit on top of a shared built-in layer in
+the `system` folder that allows for further customization.
+
+Each package provides one kind of content: a game's rules and databases
+(core), the player's skills (skills), or a world's maps, NPCs and quests
+(world). Packages can be swapped freely and combined, so you can run
+different games and worlds side by side in any mix the packages allow.
+Leave the packages out entirely to run vanilla Melia. See Package System
+below.
 
 Client
 -----------------------------------------------------------------------------
@@ -24,8 +31,8 @@ Client
 Melia does not have a client of its own at this time. Instead, it's designed
 to be network compatible with the latest client of the international
 version of ToS, which is freely available on Steam.
-The Laima package additionally supports client version 390044 via
-the versioning system, which is the version this branch should be used with.
+The package system is intended to support client version 390044 via
+the versioning system, which is the version this project should be used with.
 
 Features
 -----------------------------------------------------------------------------
@@ -45,7 +52,7 @@ Features
 
 ### Laima Expansion Features (Package-Gated)
 
-When enabled via `packages.conf`, the Laima package adds:
+When packages are enabled via `packages.conf`, Laima adds:
 
 #### Combat & Skills
 
@@ -147,20 +154,49 @@ at runtime, enabling compatibility with different client builds.
 
 ### Package System
 
-A 3-tier content loading architecture:
+Content loads in three tiers, each one overriding the one before it:
 
-1. **system/** — Base Melia data and scripts (always loaded)
-2. **packages/** — Optional content packages (loaded when enabled)
+1. **system/** — Base Melia data and configuration, plus everything that is
+   not owned by a package type: the game systems (quests, party, gems,
+   mixing, ...), item, AI and monster skill scripts, client addons, the
+   formulas and their feature switches, and the track NPCs and instanced
+   dungeons. Features that can be switched with a conf or features entry
+   are implemented here, and the packages turn them on.
+2. **packages/** — Swappable building blocks, loaded in the order listed in
+   `enabled_packages`
 3. **user/** — Server operator customizations (highest priority)
 
-Toggle the Laima package by editing `packages.conf`:
+Every package declares a `type` in its `package.conf`. A server takes one
+package of each type, and refuses to start if two share one:
+
+| type | provides |
+| --- | --- |
+| `core` | The game's rules and databases: the mechanics profile (`db/features.txt`, `conf/world/*.conf`) and items, monsters, maps, exp, recipes, drops, global drops and companions |
+| `skills` | Player skill, buff, ability and pad handlers, with their databases |
+| `world` | NPCs, monster spawns, warps, quests, cutscene tracks, treasures, minigames, shops and the starting map |
+
+| package | type | what it is |
+| --- | --- | --- |
+| `laima-core` | core | Laima's game: the current client's data with Laima's item, monster, drop and recipe balance, exp curve, class circle system and rates |
+| `gabija-core` | core | The 2016 game, mirrored from the 2016 client data: items, recipes, monsters, exp, maps, companions and map ranks |
+| `laima-skills` | skills | Laima's player kit, usable with either core and either world |
+| `laima-world` | world | Laima's world: NPCs, spawns, warps, quests, treasures and minigames |
+| `gabija-world` | world | The 2016 world, rebuilt from the 2016 client: spawns, NPCs, warps, quests and tracks |
+
+Packages are interchangeable as long as they do not share a type, for
+example the 2016 world runs on either core:
+
 ```
-enabled_packages: laima
+enabled_packages: laima-core, laima-skills, laima-world     // Laima's server
+enabled_packages: gabija-core, laima-skills, gabija-world   // the 2016 server
+enabled_packages: laima-core, laima-skills, gabija-world    // 2016 world, Laima's rules
 ```
 
-Remove the line (or leave it empty) to run vanilla Melia. The package
-controls handler registration, database overlays, script loading, and
-all Laima-specific content.
+Remove the line (or leave it empty) to run vanilla Melia. The packages
+control handler registration, database overlays, script loading and
+configuration. Pair the client patch with the same packages.
+
+Every option and package is described in `system/conf/packages.conf`.
 
 Architecture
 -----------------------------------------------------------------------------
@@ -192,8 +228,8 @@ Installation
 * Copy `system/conf/database.conf` to `user/conf/`,
   adjust the necessary values and remove the rest.
 
-To enable the Laima expansion, set `enabled_packages: laima` in
-`packages.conf`.
+To enable the Laima expansion, set `enabled_packages` in `packages.conf`,
+for example `laima-core, laima-skills, laima-world`.
 
 Afterwards, you should be able to start Melia via the provided scripts or
 directly from the bin directories.
@@ -202,7 +238,7 @@ Balance Harness
 -----------------------------------------------------------------------------
 
 `src/Test.Balance` measures the skill roster on a headless zone server and
-writes what it finds to `packages/laima/db/skills_overrides.txt`. It prices
+writes what it finds to `packages/laima-skills/db/skills_overrides.txt`. It prices
 three things:
 
 - **Skill damage** — `factor` and `factorByLevel`

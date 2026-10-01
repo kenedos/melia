@@ -22,7 +22,7 @@ public class ClassicHealClientScript : ClientScript
 		// disabled. If it is, we override a client function that
 		// determines whether to show the target selection wheel
 		// to cast the skill instantly.
-		if (!Feature.IsEnabled(FeatureId.ClericHealPartySelect))
+		if (!Feature.IsEnabled("ClericHealPartySelect"))
 			this.SendAllScripts(character);
 	}
 }

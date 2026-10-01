@@ -1,4 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
+//--- Melia Script ----------------------------------------------------------
 // Companion Calculation Script
 //--- Description -----------------------------------------------------------
 // Functions that calculate companion-related values, such as properties.
@@ -34,7 +34,7 @@ public class CompanionCalculationsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_Companion_STR(Companion companion)
 	{
-		var baseValue = companion.Data.STR;
+		var baseValue = 5f;
 		var ownerValue = PET_STAT_BY_OWNER(companion, PropertyName.STR);
 
 		var result = baseValue + ownerValue;
@@ -52,7 +52,7 @@ public class CompanionCalculationsScript : GeneralScript
 	{
 		var ownerProperties = companion.Owner.Properties;
 
-		var baseValue = companion.Data.DEX;
+		var baseValue = 5f;
 		var ownerValue = ownerProperties.GetFloat(PropertyName.DEX) * PET_STAT_BY_OWNER_RATE;
 
 		var result = baseValue + ownerValue;
@@ -70,7 +70,7 @@ public class CompanionCalculationsScript : GeneralScript
 	{
 		var ownerProperties = companion.Owner.Properties;
 
-		var baseValue = companion.Data.CON;
+		var baseValue = 5f;
 		var ownerValue = ownerProperties.GetFloat(PropertyName.CON) * PET_STAT_BY_OWNER_RATE;
 
 		var result = baseValue + ownerValue;
@@ -88,7 +88,7 @@ public class CompanionCalculationsScript : GeneralScript
 	{
 		var ownerProperties = companion.Owner.Properties;
 
-		var baseValue = companion.Data.INT;
+		var baseValue = 5f;
 		var ownerValue = ownerProperties.GetFloat(PropertyName.INT) * PET_STAT_BY_OWNER_RATE;
 
 		var result = baseValue + ownerValue;
@@ -106,7 +106,7 @@ public class CompanionCalculationsScript : GeneralScript
 	{
 		var ownerProperties = companion.Owner.Properties;
 
-		var baseValue = companion.Data.MNA;
+		var baseValue = 5f;
 		var ownerValue = ownerProperties.GetFloat(PropertyName.MNA) * PET_STAT_BY_OWNER_RATE;
 
 		var result = baseValue + ownerValue;
@@ -126,16 +126,14 @@ public class CompanionCalculationsScript : GeneralScript
 		var baseValue = 20f;
 		var byLv = properties.GetFloat(PropertyName.Lv);
 		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.DEF);
-		var byTraining = properties.GetFloat(PropertyName.Stat_DEF);
-		var value = baseValue + byLv / 2f + byOwner + byTraining;
+		var byTraining = properties.GetFloat(PropertyName.Stat_DEF) * 3f;
+		var value = baseValue + byLv + byOwner + byTraining;
 
 		var owner = companion.Owner;
 		if (owner != null)
 		{
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
 				value *= 1.25f;
-			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -153,16 +151,14 @@ public class CompanionCalculationsScript : GeneralScript
 		var baseValue = 20f;
 		var byLv = properties.GetFloat(PropertyName.Lv);
 		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.MDEF);
-		var byTraining = properties.GetFloat(PropertyName.Stat_MDEF);
-		var value = baseValue + byLv / 2f + byOwner + byTraining;
+		var byTraining = properties.GetFloat(PropertyName.Stat_MDEF) * 3f;
+		var value = baseValue + byLv + byOwner + byTraining;
 
 		var owner = companion.Owner;
 		if (owner != null)
 		{
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
 				value *= 1.25f;
-			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -177,7 +173,7 @@ public class CompanionCalculationsScript : GeneralScript
 	public float SCR_Get_Companion_DR(Companion companion)
 	{
 		var properties = companion.Properties;
-		var byLv = properties.GetFloat(PropertyName.Lv);
+		var byLv = properties.GetFloat(PropertyName.Lv) / 2f;
 		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.DR);
 		var byTraining = properties.GetFloat(PropertyName.Stat_DR);
 		var value = byLv + byOwner + properties.GetFloat("DEX") + byTraining;
@@ -194,10 +190,10 @@ public class CompanionCalculationsScript : GeneralScript
 	public float SCR_Get_Companion_HR(Companion companion)
 	{
 		var properties = companion.Properties;
-		var byLv = properties.GetFloat(PropertyName.Lv);
+		var byLv = properties.GetFloat(PropertyName.Lv) / 2f;
 		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.HR);
 		var byTraining = properties.GetFloat(PropertyName.Stat_HR);
-		var value = byLv + byOwner + properties.GetFloat("DEX");
+		var value = byLv + byOwner + properties.GetFloat("DEX") + byTraining;
 
 		return (float)Math.Floor(value);
 	}
@@ -255,10 +251,12 @@ public class CompanionCalculationsScript : GeneralScript
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 1.25f;
+				delta += 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
+				delta -= 0.25f;
+			value *= 1f + delta;
 		}
 		if (companion.IsBuffActive(BuffId.BeastMaster_Buff))
 			value *= 1.25f;
@@ -276,24 +274,9 @@ public class CompanionCalculationsScript : GeneralScript
 	{
 		var properties = companion.Properties;
 
-		var addLv = companion.Data.Level;
-		var byTraining = properties.GetFloat(PropertyName.Stat_ATK);
-		var atk = properties.GetFloat(PropertyName.Lv) + companion.Data.STR + addLv + byTraining;
-
-		var average = PET_STAT_BY_OWNER(companion, PropertyName.MINPATK) + PET_STAT_BY_OWNER(companion, PropertyName.MAXPATK);
-		if (average != 0)
-			average /= 2;
-
-		var value = atk + average;
-
-		var owner = companion.Owner;
-		if (owner != null)
-		{
-			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 0.75f;
-			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 1.25f;
-		}
+		var minPatk = properties.GetFloat(PropertyName.MINPATK);
+		var maxPatk = properties.GetFloat(PropertyName.MAXPATK);
+		var value = (minPatk + maxPatk) / 2f;
 
 		return (float)Math.Floor(Math.Max(1, value));
 	}
@@ -307,11 +290,26 @@ public class CompanionCalculationsScript : GeneralScript
 	public float SCR_Get_Companion_MINPATK(Companion companion)
 	{
 		var properties = companion.Properties;
-		var byStat = companion.Data.PhysicalAttackMin;
-		var byBuff = properties.GetFloat(PropertyName.PATK_BM);
-		var value = byStat + byBuff;
+		var baseValue = 25f;
+		var byLevel = properties.GetFloat(PropertyName.Lv);
+		var byTraining = properties.GetFloat(PropertyName.Stat_ATK) * 2;
+		var byStr = properties.GetFloat(PropertyName.STR);
+		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.MINPATK);
+		var byBuff = properties.GetFloat(PropertyName.PATK_BM) + properties.GetFloat(PropertyName.ATK_BM);
+		var value = baseValue + byLevel + byTraining + byStr + byOwner + byBuff;
 
-		return (float)Math.Floor(value);
+		var owner = companion.Owner;
+		if (owner != null)
+		{
+			var delta = 0f;
+			if (owner.IsAbilityActive(AbilityId.CompMastery4))
+				delta -= 0.25f;
+			if (owner.IsAbilityActive(AbilityId.CompMastery5))
+				delta += 0.25f;
+			value *= 1f + delta;
+		}
+
+		return (float)Math.Floor(Math.Max(1, value));
 	}
 
 	/// <summary>
@@ -323,11 +321,26 @@ public class CompanionCalculationsScript : GeneralScript
 	public float SCR_Get_Companion_MAXPATK(Companion companion)
 	{
 		var properties = companion.Properties;
-		var byStat = companion.Data.PhysicalAttackMax;
-		var byBuff = properties.GetFloat(PropertyName.PATK_BM);
-		var value = byStat + byBuff;
+		var baseValue = 50f;
+		var byLevel = properties.GetFloat(PropertyName.Lv);
+		var byTraining = properties.GetFloat(PropertyName.Stat_ATK) * 2;
+		var byStr = properties.GetFloat(PropertyName.STR);
+		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.MAXPATK);
+		var byBuff = properties.GetFloat(PropertyName.PATK_BM) + properties.GetFloat(PropertyName.ATK_BM);
+		var value = baseValue + byLevel + byTraining + byStr + byOwner + byBuff;
 
-		return (float)Math.Floor(value);
+		var owner = companion.Owner;
+		if (owner != null)
+		{
+			var delta = 0f;
+			if (owner.IsAbilityActive(AbilityId.CompMastery4))
+				delta -= 0.25f;
+			if (owner.IsAbilityActive(AbilityId.CompMastery5))
+				delta += 0.25f;
+			value *= 1f + delta;
+		}
+
+		return (float)Math.Floor(Math.Max(1, value));
 	}
 
 	/// <summary>
@@ -339,18 +352,20 @@ public class CompanionCalculationsScript : GeneralScript
 	public float SCR_Get_Companion_MINMATK(Companion companion)
 	{
 		var properties = companion.Properties;
-		var byStat = companion.Data.MagicalAttackMin;
+		var baseValue = 25f;
 		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.MINMATK);
-		var byBuff = properties.GetFloat(PropertyName.PATK_BM);
-		var value = byStat + byOwner + byBuff;
+		var byBuff = properties.GetFloat(PropertyName.MATK_BM) + properties.GetFloat(PropertyName.ATK_BM);
+		var value = baseValue + byOwner + byBuff;
 
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 1.25f;
+				delta -= 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
+				delta += 0.25f;
+			value *= 1f + delta;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));
@@ -365,18 +380,20 @@ public class CompanionCalculationsScript : GeneralScript
 	public float SCR_Get_Companion_MAXMATK(Companion companion)
 	{
 		var properties = companion.Properties;
-		var byStat = companion.Data.MagicalAttackMax;
+		var baseValue = 50f;
 		var byOwner = PET_STAT_BY_OWNER(companion, PropertyName.MAXMATK);
-		var byBuff = properties.GetFloat(PropertyName.PATK_BM);
-		var value = byStat + byOwner + byBuff;
+		var byBuff = properties.GetFloat(PropertyName.MATK_BM) + properties.GetFloat(PropertyName.ATK_BM);
+		var value = baseValue + byOwner + byBuff;
 
 		var owner = companion.Owner;
 		if (owner != null)
 		{
+			var delta = 0f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery4))
-				value *= 1.25f;
+				delta -= 0.25f;
 			if (owner.IsAbilityActive(AbilityId.CompMastery5))
-				value *= 0.75f;
+				delta += 0.25f;
+			value *= 1f + delta;
 		}
 
 		return (float)Math.Floor(Math.Max(1, value));

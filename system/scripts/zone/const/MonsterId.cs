@@ -1,4 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
+//--- Melia Script ----------------------------------------------------------
 // Monster ids
 //--- Description -----------------------------------------------------------
 // Auto-generated list of monster ids for easy access.
@@ -3395,8 +3395,6 @@ public static class MonsterId
 	public const int RidePet_Chariot_White = 65034;
 	public const int RidePet_Ninetail = 65035;
 	public const int RidePet_Armadillo2 = 65036;
-	public const int RidePet_HinokiBath = 65037;
-	public const int RidePet_Arborday_Fairy = 65038;
 	public const int Ep17_1_Rockoff = 71012;
 	public const int Ep17_1_Tala_Sorcerer = 71013;
 	public const int Ep17_1_Flak_Green = 71014;
@@ -6504,17 +6502,6 @@ public static class MonsterId
 	public const int Boss_Laimara_Web = 71047;
 	public const int Boss_Laimara_Owl_Soul = 71048;
 	public const int Boss_Veliora_Owl_Soul = 71049;
-	public const int Ep18_1_Spion_White = 71100;
-	public const int Ep18_1_Cronewt_Mage_Blue = 71101;
-	public const int Ep18_1_Hohen_Orben_Red = 71102;
-	public const int Ep18_1_Lapasape_Brown = 71103;
-	public const int Ep18_1_Wendigo_Archer_Gray = 71104;
-	public const int Ep18_1_Tiny_Bow_Blue = 71105;
-	public const int Ep18_1_Hohen_Gulak_Blue = 71106;
-	public const int Ep18_1_Tiny_Mage_Brown = 71107;
-	public const int Ep18_1_Spion_Mage_White = 71108;
-	public const int Ep18_1_Harugal_Blue = 71109;
-	public const int Ep18_1_Kepari_Purple = 71110;
 	public const int Mon_Paladin_Follower1_2_Hp = 101001;
 	public const int Mon_Paladin_Follower1_3_Hp = 101002;
 	public const int Mon_Paladin_Follower1_3_Q = 103015;
@@ -8060,19 +8047,6 @@ public static class MonsterId
 	public const int Tosz_Colony_Flag_Orsha = 160277;
 	public const int Tosz_Colony_Flag_Pedimian = 160278;
 	public const int DemonLair_Ashark_Explosion_Core = 160279;
-	public const int Npc_Grimmark = 160280;
-	public const int Npc_Kneller = 160281;
-	public const int EP18_1_ZMEI_SEAL = 160282;
-	public const int Npc_Uriel_Cat = 160283;
-	public const int Npc_Justis = 160284;
-	public const int Katyn_Tombstone1 = 160285;
-	public const int Katyn_Tombstone2 = 160286;
-	public const int Katyn_Tombstone3 = 160287;
-	public const int Katyn_Tombstone4 = 160288;
-	public const int Katyn_Tombstone5 = 160289;
-	public const int Gacha_Machine_Sliver = 160290;
-	public const int D_Thron_19_HiddenTrigger = 160291;
-	public const int Npc_Commodore = 160292;
 	public const int E_Statue_Zemina = 161000;
 	public const int Npc_Kupole_Velcoffer = 161001;
 	public const int Npc_Teliavelis = 161002;

@@ -1,0 +1,10 @@
+// Laima Skills Package
+// Database file
+//---------------------------------------------------------------------------
+
+[
+{ name: "PierceNoSizeEffect", enabled: false },
+{ name: "CleaveApplyAggressor", enabled: false },
+{ name: "DirectClericHeal", enabled: false },
+{ name: "ClericHealPartySelect", enabled: false },
+]

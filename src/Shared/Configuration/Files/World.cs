@@ -264,6 +264,9 @@ namespace Melia.Shared.Configuration.Files
 		public int LogCleanupRetentionDays { get; protected set; }
 		public int LogCleanupIntervalHours { get; protected set; }
 
+		// misc.conf - Client scripts
+		public HashSet<string> DisabledClientScripts { get; protected set; }
+
 		// party.conf - Quest Sharing
 		public bool PartyQuestSharingEnabled { get; protected set; }
 		public float PartyQuestSharingRange { get; protected set; }
@@ -482,6 +485,8 @@ namespace Melia.Shared.Configuration.Files
 
 			this.LogCleanupRetentionDays = this.GetInt("log_cleanup_retention_days", 7);
 			this.LogCleanupIntervalHours = this.GetInt("log_cleanup_interval_hours", 6);
+
+			this.DisabledClientScripts = this.GetString("disabled_client_scripts", "").Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet();
 
 			this.GlobalDropSuperMobItemThreshold = this.GetBool("global_drop_super_mob_item_threshold", false);
 			this.GlobalDropSuperMobItemReroll = this.GetBool("global_drop_super_mob_item_reroll", false);

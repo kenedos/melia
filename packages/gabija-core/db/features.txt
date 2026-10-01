@@ -1,0 +1,28 @@
+// Gabija Core Package
+// Database file
+//
+// The mechanics of the 2016 release.
+//---------------------------------------------------------------------------
+
+[
+// Player stats
+{ name: "NoStatByLevel", enabled: false },
+{ name: "IncreasedStatRatio", enabled: false },
+{ name: "NewDefenseFormula", enabled: false },
+{ name: "IncreasedMaxWeight", enabled: false },
+{ name: "StaticInventoryWeight", enabled: false },
+
+// Movement
+{ name: "FreeRunning", enabled: false },
+{ name: "FreeDashingInCities", enabled: false },
+{ name: "DashingForAll", enabled: false },
+{ name: "FreeJumping", enabled: false },
+
+// Combat bonuses
+{ name: "AttributeBonusRevamp", enabled: false },
+{ name: "AttackTypeBonusRevamp1", enabled: false },
+{ name: "AttackTypeBonusRevamp2", enabled: false },
+{ name: "NonNullifyBlocks", enabled: false },
+{ name: "IncreasedBlockRate", enabled: false },
+{ name: "FlatGuardBonus", enabled: false },
+]

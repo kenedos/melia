@@ -10,6 +10,12 @@ Melia.World.Icons.Load = function(icons)
 	end
 end
 
+Melia.World.Icons.LoadMore = function(icons)
+	for i = 1, #icons do
+		Melia.World.Icons.Add(icons[i])
+	end
+end
+
 Melia.World.Icons.Add = function(icon)
 	table.insert(Melia.World.Icons.List, icon)
 end

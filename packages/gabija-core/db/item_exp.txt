@@ -1,0 +1,107 @@
+// Melia
+// Database file
+// 
+// The Equip EXP need to be changed on both client and server, because the
+// client uses its local EXP data for some calculations, like the required
+// required level items.
+//---------------------------------------------------------------------------
+
+[
+// Card
+//---------------------------------------------------------------------------
+{ group: "Card", level: 1, exp: 200, gainExp: 100 },
+{ group: "Card", level: 2, exp: 300, gainExp: 150 },
+{ group: "Card", level: 3, exp: 400, gainExp: 200 },
+{ group: "Card", level: 4, exp: 500, gainExp: 250 },
+{ group: "Card", level: 5, exp: 600, gainExp: 300 },
+{ group: "Card", level: 6, exp: 700, gainExp: 350 },
+{ group: "Card", level: 7, exp: 800, gainExp: 400 },
+{ group: "Card", level: 8, exp: 900, gainExp: 450 },
+{ group: "Card", level: 9, exp: 1000, gainExp: 500 },
+{ group: "Card", level: 10, exp: 1100, gainExp: 550 },
+
+// Card_dummy01
+//---------------------------------------------------------------------------
+{ group: "Card_dummy01", level: 1, exp: 0, gainExp: 2000 },
+
+// Card_dummy01_Event
+//---------------------------------------------------------------------------
+{ group: "Card_dummy01_Event", level: 1, exp: 0, gainExp: 1000 },
+
+// Equip
+//---------------------------------------------------------------------------
+{ group: "Equip", level: 1, exp: 0, gainExp: 20 },
+
+// Gem
+//---------------------------------------------------------------------------
+{ group: "Gem", level: 1, exp: 300, gainExp: 100 },
+{ group: "Gem", level: 2, exp: 900, gainExp: 300 },
+{ group: "Gem", level: 3, exp: 2700, gainExp: 900 },
+{ group: "Gem", level: 4, exp: 10800, gainExp: 2700 },
+{ group: "Gem", level: 5, exp: 43200, gainExp: 10800 },
+{ group: "Gem", level: 6, exp: 172800, gainExp: 43200 },
+{ group: "Gem", level: 7, exp: 864000, gainExp: 172800 },
+{ group: "Gem", level: 8, exp: 4320000, gainExp: 864000 },
+{ group: "Gem", level: 9, exp: 21600000, gainExp: 4320000 },
+{ group: "Gem", level: 10, exp: 0, gainExp: 4320000 },
+
+// Gem_Skill
+//---------------------------------------------------------------------------
+{ group: "Gem_Skill", level: 1, exp: 0, gainExp: 7350 },
+
+// GemExp_5000
+//---------------------------------------------------------------------------
+{ group: "GemExp_5000", level: 1, exp: 0, gainExp: 5000 },
+
+// GemExp_randomQuest1
+//---------------------------------------------------------------------------
+{ group: "GemExp_randomQuest1", level: 1, exp: 0, gainExp: 300 },
+
+// GemExp_randomQuest2
+//---------------------------------------------------------------------------
+{ group: "GemExp_randomQuest2", level: 1, exp: 0, gainExp: 1200 },
+
+// GemExp_randomQuest3
+//---------------------------------------------------------------------------
+{ group: "GemExp_randomQuest3", level: 1, exp: 0, gainExp: 3900 },
+
+// GemExp_randomQuest4
+//---------------------------------------------------------------------------
+{ group: "GemExp_randomQuest4", level: 1, exp: 0, gainExp: 14700 },
+
+// GemExp_Talt01
+//---------------------------------------------------------------------------
+{ group: "GemExp_Talt01", level: 1, exp: 0, gainExp: 100 },
+
+// GemExpStone01
+//---------------------------------------------------------------------------
+{ group: "GemExpStone01", level: 1, exp: 0, gainExp: 3000 },
+
+// GemExpStone02
+//---------------------------------------------------------------------------
+{ group: "GemExpStone02", level: 1, exp: 0, gainExp: 15500 },
+
+// GemExpStone03
+//---------------------------------------------------------------------------
+{ group: "GemExpStone03", level: 1, exp: 0, gainExp: 31000 },
+
+// GemExpStone04
+//---------------------------------------------------------------------------
+{ group: "GemExpStone04", level: 1, exp: 0, gainExp: 62000 },
+
+// GemExpStone05
+//---------------------------------------------------------------------------
+{ group: "GemExpStone05", level: 1, exp: 0, gainExp: 124000 },
+
+// GemExpStone09
+//---------------------------------------------------------------------------
+{ group: "GemExpStone09", level: 1, exp: 0, gainExp: 230700 },
+
+// GemExpStone10
+//---------------------------------------------------------------------------
+{ group: "GemExpStone10", level: 1, exp: 0, gainExp: 1094700 },
+
+// Misc
+//---------------------------------------------------------------------------
+{ group: "Misc", level: 1, exp: 0, gainExp: 5 },
+]
