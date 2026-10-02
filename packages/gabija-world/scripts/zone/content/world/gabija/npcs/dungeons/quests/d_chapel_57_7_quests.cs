@@ -6,11 +6,15 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
+using Melia.Shared.Scripting;
 using Melia.Shared.Util;
 using Melia.Shared.World;
+using Melia.Zone;
+using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
@@ -45,6 +49,9 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 	private readonly static Position AukaAltar = new Position(-942, 0, -106);
 	private readonly static Position SanctuaryMural = new Position(801, 0, -1250);
+
+	private const int AlgisEscortModelId = 11281;
+	private readonly static ConcurrentDictionary<long, Mob> BellTowerEscorts = new();
 
 	protected override void Load()
 	{
@@ -88,7 +95,10 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				);
 
 				if (answer == "accept")
+				{
 					character.Quests.Start(Mq02);
+					StartBellTowerEscort(character);
+				}
 
 				return;
 			}
@@ -103,7 +113,10 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("The Bell Tower is the best place to watch her from."));
-				character.Quests.ReplayQuestTrack(Mq02);
+				if (!HasBellTowerEscort(character))
+					StartBellTowerEscort(character);
+				else
+					character.Quests.ReplayQuestTrack(Mq02);
 				return;
 			}
 
@@ -122,6 +135,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02) && character.Quests.IsCompletable(Mq02))
 			{
 				await dialog.Msg(L("From here, we can see what Gesti is up to."));
+				StopBellTowerEscort(character);
 				await dialog.CompleteQuest(Mq02);
 				return;
 			}
@@ -529,6 +543,96 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 		character.ServerMessage(L("The Seal of Space turns in your hand. The wall folds away, revealing the sanctuary."));
 		character.Quests.StartQuestTrack(Mq10);
+	}
+
+	/// <summary>
+	/// Puts a Follower Algis on the character's heels for the walk from the
+	/// cathedral door to the Bell Tower. He stands on the base layer, so the
+	/// cutscene and the fight at the tower never show a second one.
+	/// </summary>
+	/// <param name="character"></param>
+	private static void StartBellTowerEscort(Character character)
+	{
+		StopBellTowerEscort(character);
+
+		if (character.Map?.ClassName != "d_chapel_57_7" || character.Layer != 0)
+			return;
+
+		if (!ZoneServer.Instance.Data.MonsterDb.TryFind(AlgisEscortModelId, out var data))
+			return;
+
+		var position = character.Position.GetRelative(character.Direction, 60);
+		if (character.Map.Ground.TryGetHeightAt(position, out var height))
+			position.Y = height;
+
+		var escort = new Mob(data.Id, RelationType.Friendly);
+		escort.Name = L("Follower Algis");
+		escort.Position = position;
+		escort.SpawnPosition = position;
+		escort.Direction = character.Direction;
+		escort.Layer = character.Layer;
+		escort.SetVisibilty(ActorVisibility.Individual, character.ObjectId);
+		escort.AssociatedHandle = character.Handle;
+
+		// He walks the length of the central hall, so he has to survive it.
+		var overrides = new PropertyOverrides();
+		overrides["Lv"] = 41;
+		overrides["MHP"] = 20000;
+		overrides["WlkMSPD"] = 110;
+		overrides["RunMSPD"] = 170;
+		escort.ApplyOverrides(overrides);
+
+		character.Map.AddMonster(escort, immediate: true);
+
+		if (QuestFollower.MakeAlly(escort, character) == null)
+			return;
+
+		BellTowerEscorts[character.ObjectId] = escort;
+		character.LookAround();
+	}
+
+	/// <summary>
+	/// Takes the character's Follower Algis off the map.
+	/// </summary>
+	/// <param name="character"></param>
+	private static void StopBellTowerEscort(Character character)
+	{
+		if (!BellTowerEscorts.TryRemove(character.ObjectId, out var escort))
+			return;
+
+		if (escort.Map != null)
+			escort.Map.RemoveMonster(escort);
+
+		character.LookAround();
+	}
+
+	/// <summary>
+	/// Returns whether the character's Follower Algis is still walking with him.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	private static bool HasBellTowerEscort(Character character)
+		=> BellTowerEscorts.TryGetValue(character.ObjectId, out var escort) && escort.Map != null && !escort.IsDead;
+
+	/// <summary>
+	/// Sends a returning character back to the Bell Tower with Algis.
+	/// </summary>
+	[On("PlayerEnteredMap")]
+	public void OnPlayerEnteredMap(object sender, PlayerEventArgs args)
+	{
+		var character = args.Character;
+
+		if (character.Map?.ClassName != "d_chapel_57_7" || character.Layer != 0)
+			return;
+
+		if (!character.Quests.IsActive(Mq02))
+		{
+			StopBellTowerEscort(character);
+			return;
+		}
+
+		if (!HasBellTowerEscort(character))
+			StartBellTowerEscort(character);
 	}
 
 	/// <summary>

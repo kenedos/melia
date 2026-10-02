@@ -34,6 +34,17 @@ public class CVoodooQuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Slate2))
 			{
+				var answer = await dialog.Select(L("This slate has been waiting a long time for someone to ask about it. Shall I open it for you?"),
+					Option(L("Show me what it says"), "accept"),
+					Option(L("Not yet"), "leave")
+				);
+
+				if (answer != "accept")
+				{
+					await dialog.Msg(L("Please use your time wisely. As no one sees your future better than yourself."));
+					return;
+				}
+
 				character.Quests.ReplayQuestTrack(Slate2);
 				return;
 			}

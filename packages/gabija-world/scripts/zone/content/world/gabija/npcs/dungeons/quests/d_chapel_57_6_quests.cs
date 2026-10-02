@@ -6,6 +6,7 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
@@ -32,8 +33,8 @@ public class DChapel576QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq041 = new QuestId(8730);
 	private readonly static QuestId Mq05 = new QuestId(8514);
 	private readonly static QuestId Mq06 = new QuestId(8515);
-	private const string PersuadedVar = "Gabija.Chapel576.Persuaded";
-	private const string EscortVar = "Gabija.Chapel576.Escort";
+	private const float LureRange = 200;
+	private readonly static Position ApsaugaAltarPosition = new Position(-526, 0, -1092);
 	private readonly static QuestId Mq07 = new QuestId(8451);
 	private readonly static QuestId Mq08 = new QuestId(8517);
 	private readonly static QuestId Mq09 = new QuestId(8518);
@@ -278,10 +279,6 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("If you lack self confidence, the possibility of getting caught is high."));
 					await dialog.Msg(L("Before you use this scroll, it is important to gain some confidence by fighting against demons."));
-					for (var i = 1; i <= 72; ++i)
-						character.Variables.Perm.Set(PersuadedVar + i, false);
-
-					character.Variables.Temp.SetInt(EscortVar, 0);
 					character.Quests.Start(Mq06);
 					character.Inventory.Add(650725, 1, InventoryAddType.PickUp);
 				}
@@ -347,11 +344,11 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq06))
-			{
-				await dialog.Msg(L("Defeat a demon to gain some confidence, then use the scroll and lure the demons to the Apsauga Altar."));
-				return;
-			}
+		if (character.Quests.IsActive(Mq06))
+		{
+			await dialog.Msg(L("Defeat a demon to gain some confidence, then use the scroll on a demon and bring it to the Apsauga Altar."));
+			return;
+		}
 
 			if (character.Quests.IsActive(Mq07))
 			{
@@ -456,6 +453,12 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Apsauga Altar"));
 
+			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
+			{
+				await dialog.Msg(L("The altar's orb answers the demons you bring before it."));
+				return;
+			}
+
 			await dialog.Msg(L("An altar of protection, standing silent in the dark."));
 		});
 
@@ -468,6 +471,7 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			Name = L("Orb Crystal"),
 			Map = "d_chapel_57_6",
 			Points = [(988, 262, 90), (1262, 292, 90), (1148, 256, 90), (1034, 297, 90), (820, 253, 90), (916, 291, 90), (824, 563, 90), (926, 554, 90), (978, 607, 90), (1070, 565, 90), (1159, 602, 90), (1237, 564, 90), (852, 303, 90), (1337, 553, 90), (1270, 614, 90), (1095, 285, 90), (120, 536, 90), (248, 597, 90), (169, 312, 90), (382, 537, 90), (365, 279, 90), (170, -193, 90), (343, 13, 90)],
+			Quest = Rp1,
 			IsActive = c => c.Quests.IsActive(Rp1) && !c.Quests.IsCompletable(Rp1),
 			TimedLabel = L("Collecting"),
 			TimedAnim = "SITGROPESET",
@@ -481,85 +485,9 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			},
 		});
 
-		// Hidden triggers
+		// The Apsauga Altar, which takes the lured demons in.
 		//-------------------------------------------------------------------------
-		// Demons that can be persuaded while disguised
-		//-------------------------------------------------------------------------
-		this.AddPersuadableDemon(1, true, -585, -286);
-		this.AddPersuadableDemon(2, true, -516, -975);
-		this.AddPersuadableDemon(3, true, -607, 582);
-		this.AddPersuadableDemon(4, true, -571, 1168);
-		this.AddPersuadableDemon(5, true, -381, 478);
-		this.AddPersuadableDemon(6, true, -522, 1955);
-		this.AddPersuadableDemon(7, true, 223, 366);
-		this.AddPersuadableDemon(8, true, 462, 496);
-		this.AddPersuadableDemon(9, true, -614, -455);
-		this.AddPersuadableDemon(10, true, -432, -409);
-		this.AddPersuadableDemon(11, true, 160, 433);
-		this.AddPersuadableDemon(12, true, 359, 577);
-		this.AddPersuadableDemon(13, true, -667, 292);
-		this.AddPersuadableDemon(14, true, -547, 192);
-		this.AddPersuadableDemon(15, true, -382, 309);
-		this.AddPersuadableDemon(16, true, -305, 186);
-		this.AddPersuadableDemon(17, true, -285, 629);
-		this.AddPersuadableDemon(18, true, -659, 706);
-		this.AddPersuadableDemon(19, true, -746, 405);
-		this.AddPersuadableDemon(20, true, -448, 648);
-		this.AddPersuadableDemon(21, true, -456, 1236);
-		this.AddPersuadableDemon(22, true, -579, 1384);
-		this.AddPersuadableDemon(23, true, -466, 1371);
-		this.AddPersuadableDemon(24, true, -637, 1228);
-		this.AddPersuadableDemon(25, true, -578, 1849);
-		this.AddPersuadableDemon(26, true, -403, 1872);
-		this.AddPersuadableDemon(27, true, -490, 2070);
-		this.AddPersuadableDemon(28, true, -676, 2061);
-		this.AddPersuadableDemon(29, true, -681, 1891);
-		this.AddPersuadableDemon(30, true, -365, 1996);
-		this.AddPersuadableDemon(31, true, -523, -1283);
-		this.AddPersuadableDemon(32, true, -375, -1274);
-		this.AddPersuadableDemon(33, true, -369, -999);
-		this.AddPersuadableDemon(34, true, -720, -1138);
-		this.AddPersuadableDemon(35, true, -325, -1160);
-		this.AddPersuadableDemon(36, true, -629, -882);
-		this.AddPersuadableDemon(37, false, -509, 1938);
-		this.AddPersuadableDemon(38, false, -513, 1657);
-		this.AddPersuadableDemon(39, false, -618, 1250);
-		this.AddPersuadableDemon(40, false, -475, 314);
-		this.AddPersuadableDemon(41, false, -420, 614);
-		this.AddPersuadableDemon(42, false, -718, 242);
-		this.AddPersuadableDemon(43, false, -532, -368);
-		this.AddPersuadableDemon(44, false, -573, -1163);
-		this.AddPersuadableDemon(45, false, -451, -989);
-		this.AddPersuadableDemon(46, false, 276, 444);
-		this.AddPersuadableDemon(47, false, -740, 583);
-		this.AddPersuadableDemon(48, false, -427, 1285);
-		this.AddPersuadableDemon(49, false, -654, 441);
-		this.AddPersuadableDemon(50, false, -278, 479);
-		this.AddPersuadableDemon(51, false, 216, 303);
-		this.AddPersuadableDemon(52, false, 273, 570);
-		this.AddPersuadableDemon(53, false, -633, -320);
-		this.AddPersuadableDemon(54, false, -596, -505);
-		this.AddPersuadableDemon(55, false, -613, -1004);
-		this.AddPersuadableDemon(56, false, -651, -1255);
-		this.AddPersuadableDemon(57, false, -308, -1209);
-		this.AddPersuadableDemon(58, false, -306, -972);
-		this.AddPersuadableDemon(59, false, -381, 1997);
-		this.AddPersuadableDemon(60, false, -654, 1932);
-		this.AddPersuadableDemon(61, false, -533, 1329);
-		this.AddPersuadableDemon(62, false, -532, 1102);
-		this.AddPersuadableDemon(63, false, -531, 653);
-		this.AddPersuadableDemon(64, true, -429, 1879);
-		this.AddPersuadableDemon(65, true, -623, 1357);
-		this.AddPersuadableDemon(66, true, -554, 2143);
-		this.AddPersuadableDemon(67, true, -573, 2052);
-		this.AddPersuadableDemon(68, true, -667, 1286);
-		this.AddPersuadableDemon(69, true, -365, 1990);
-		this.AddPersuadableDemon(70, true, -473, 1790);
-		this.AddPersuadableDemon(71, true, -693, 1896);
-		this.AddPersuadableDemon(72, true, -472, 1324);
-
-		// The Apsauga Altar, where the persuaded demons arrive.
-		AddQuestTrigger("CHAPEL576_MQ_06_LURE", "d_chapel_57_6", -526, -1092, 350, async args =>
+		AddQuestTrigger("CHAPEL576_MQ_06_LURE", "d_chapel_57_6", -526, -1092, LureRange, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -567,67 +495,31 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
 				return;
 
-			var waiting = character.Variables.Temp.GetInt(EscortVar, 0);
-			if (waiting > 0)
-			{
-				character.Variables.Temp.SetInt(EscortVar, 0);
-				character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("Approach closer to the the altar's orb"), 2);
+			var taken = 0;
 
-				for (var i = 0; i < waiting; ++i)
-					character.Quests.AddObjectiveProgress(Mq06, "lureDemons");
+			foreach (var ally in QuestFollower.AlliesInRange(character, ApsaugaAltarPosition, LureRange).ToList())
+			{
+				ally.PlayEffect("F_light003_blue", 2f);
+				character.Map.RemoveMonster(ally);
+				++taken;
 			}
+
+			if (taken == 0)
+			{
+				character.ServerMessage(L("Nothing followed you here. The orb only answers to the demons you lure."));
+				await Task.CompletedTask;
+				return;
+			}
+
+			for (var i = 0; i < taken; ++i)
+				character.Quests.AddObjectiveProgress(Mq06, "lureDemons");
+
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, LF("The altar took {0} of the demons you brought.", taken), 5);
+			character.LookAround();
 
 			await Task.CompletedTask;
 		});
 
-	}
-
-	/// <summary>
-	/// Adds one of the demons that follows a disguised Revelator to Apsauga Altar.
-	/// </summary>
-	/// <param name="number"></param>
-	/// <param name="isPawndel"></param>
-	/// <param name="x"></param>
-	/// <param name="z"></param>
-	private void AddPersuadableDemon(int number, bool isPawndel, double x, double z)
-	{
-		var monsterId = isPawndel ? 57028 : 57213;
-		var name = isPawndel ? L("Pawndel") : L("Pawnd");
-
-		AddConditionalNpc(monsterId, name, "CHAPLE576_MQ_06_DEMON" + number, "d_chapel_57_6", x, z, 90, c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06) && !c.Variables.Perm.GetBool(PersuadedVar + number, false), async dialog =>
-		{
-			var character = dialog.Player;
-
-			dialog.SetTitle(name);
-
-			if (!character.IsBuffActive(BuffId.CHAPLE576_MQ_06_1))
-				return;
-
-			if (character.Variables.Temp.GetInt(EscortVar, 0) >= 4)
-			{
-				character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("You talked to too many demons.{nl}The little demon suspects you."), 5);
-				return;
-			}
-
-			string[] pitches = [L("Gesti is looking for you"), L("I found something interesting"), L("There's a place we need to go to")];
-			string[] urgings = [L("Quick, follow me"), L("Hurry or you'll be late")];
-
-			var first = await dialog.Select(pitches[GameRandom.Get().Next(pitches.Length)], Option(L("What is it?"), "talk"), Option(L("It's nothing"), "leave"));
-			if (first != "talk")
-				return;
-
-			var second = await dialog.Select(urgings[GameRandom.Get().Next(urgings.Length)], Option(L("Then go without me"), "go"), Option(L("If you do not want to, just tell me"), "leave"));
-			if (second != "go")
-			{
-				await dialog.Msg(L("You are a little strange..."));
-				return;
-			}
-
-			character.Variables.Perm.Set(PersuadedVar + number, true);
-			character.Variables.Temp.SetInt(EscortVar, character.Variables.Temp.GetInt(EscortVar, 0) + 1);
-			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, name + L(" has been successfully persuaded!{nl}Bring it to the Apsauga Altar"), 3);
-			await dialog.Msg(L("Alright... Let's go"));
-		});
 	}
 
 	/// <summary>
@@ -662,7 +554,8 @@ public class DChapel576QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Transforms the character into a demon with the Demon Transform Scroll.
+	/// Works the Demon Transform Scroll, which either turns the character
+	/// into a demon or turns one of the map's own demons over to their side.
 	/// </summary>
 	[ScriptableFunction]
 	public ItemUseResult SCR_USE_CHAPLE576_MQ_06_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
@@ -685,12 +578,51 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			return ItemUseResult.OkayNotConsumed;
 		}
 
+		var target = FindLureTarget(character);
+
+		if (target != null)
+		{
+			if (QuestFollower.MakeAlly(target, character) == null)
+			{
+				character.ServerMessage(L("The demon slips away from the scroll."));
+				return ItemUseResult.OkayNotConsumed;
+			}
+
+			character.PlayEffect("F_smoke019_dark", 1f);
+			character.ServerMessage(L(target.Name + L(" has been caught by the scroll and now follows you!{nl}Bring it to the Apsauga Altar.")));
+			return ItemUseResult.OkayNotConsumed;
+		}
+
 		character.StopBuff(BuffId.CHAPLE576_MQ_06);
 		character.StartBuff(BuffId.CHAPLE576_MQ_06_1, 1, 0, TimeSpan.FromSeconds(100), character);
 		character.PlayEffect("F_smoke019_dark", 1f);
 		character.ServerMessage(L("Transformed! Persuade Pawndel and Pawnd and lure them to the Apsauga Altar!"));
 
 		return ItemUseResult.OkayNotConsumed;
+	}
+
+	/// <summary>
+	/// Returns the demon the character aimed the scroll at, or null when the
+	/// scroll was used on nothing a demon could be caught with.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	private static Mob FindLureTarget(Character character)
+	{
+		var handle = character.Variables.Temp.GetInt(Item.UseTargetVar, 0);
+		if (handle == 0 || !character.Map.TryGetMonster(handle, out var monster))
+			return null;
+
+		if (monster is not Mob mob || mob.IsDead || mob.Layer != character.Layer)
+			return null;
+
+		if (mob.Data.ClassName is not ("Pawndel" or "pawnd"))
+			return null;
+
+		if (!character.Position.InRange2D(mob.Position, 250))
+			return null;
+
+		return mob;
 	}
 }
 
@@ -854,14 +786,14 @@ public class Chaple576Mq06Quest : QuestScript
 	{
 		SetClientId(8515);
 		SetName(L("The Legendary Trick (2)"));
-		SetDescription(L("Use the transformation scroll to lure the demon sisters to the Apsauga Altar."));
+		SetDescription(L("Use the transformation scroll to win the demon sisters over and bring them to the Apsauga Altar."));
 		SetType(QuestType.Sub);
 		SetLocation("d_chapel_57_6");
 		SetAutoTracked(true);
 		SetCancelable(true);
 
 		SetPhase(QuestStatus.Possible, "CHAPEL576_DONATAS", "d_chapel_57_6", L("Talk to Follower Donatas"), L("Follower Donatas is waiting with the transformation scroll."));
-		SetPhase(QuestStatus.InProgress, "CHAPEL576_BASIC_2", "d_chapel_57_6", L("Lure Pawndel and Pawnd to the Apsauga Altar"), L("Transform into a demon and lure the sisters to the altar."));
+		SetPhase(QuestStatus.InProgress, "CHAPEL576_BASIC_2", "d_chapel_57_6", L("Lure Pawndel and Pawnd to the Apsauga Altar"), L("Use the scroll on the demons and bring them to the altar."));
 		SetPhase(QuestStatus.Success, "CHAPEL576_DONATAS", "d_chapel_57_6", L("Talk to Follower Donatas"), L("Return to Follower Donatas."));
 
 		AddPrerequisite(new QuestStatusPrerequisite(8514, QuestStatus.Completed));

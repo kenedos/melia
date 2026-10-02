@@ -160,9 +160,9 @@ namespace Melia.Zone.World.Actors.CombatEntities.Components
 			var prev = stamina;
 
 			// Drain stamina during movement, recover otherwise. A cutscene
-			// takes control away from the player, so a movement that was
-			// running when it started must not keep draining.
-			if (character.Movement.IsMoving && character.Tracks.ActiveTrack == null)
+			// moves the player too, and the game charges for that as it does
+			// for running.
+			if (character.Movement.IsMoving)
 			{
 				var runDrain = (int)character.Properties.GetFloat(PropertyName.Sta_Run, 0);
 				stamina = Math2.Clamp(0, maxStamina, stamina - runDrain);

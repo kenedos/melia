@@ -220,7 +220,10 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 		// Crystal Pillar
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(47233, L("Crystal Pillar"), "CMINE6_TO_KATYN7_1_START", "d_cmine_6", 2048, 1753, 243, c => !c.Quests.HasCompleted(Slate), async dialog =>
+		// The client hides the pillar for the whole progress phase; it only
+		// stays reachable once no cutscene is running, so a character who
+		// logged out mid-quest can still start it again.
+		AddConditionalNpc(47233, L("Crystal Pillar"), "CMINE6_TO_KATYN7_1_START", "d_cmine_6", 2048, 1753, 243, c => !c.Quests.HasCompleted(Slate) && c.Tracks.ActiveTrack == null, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -228,17 +231,8 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Slate))
 			{
-				if (!character.Quests.IsCompletable(Slate))
-				{
-					await dialog.Msg(L("The pillar is still closing itself around the slate."));
-					character.Quests.ReplayQuestTrack(Slate);
-					return;
-				}
-
-				await dialog.Msg(L("Acquired the Mysterious Slate that was inside the Crystal Pillar."));
-				await dialog.Msg(L("Return to Klaipeda and talk to Knight Commander Uska about it."));
-				await dialog.CompleteQuest(Slate);
-				character.LookAround();
+				await dialog.Msg(L("The pillar is still closing itself around the slate."));
+				character.Quests.ReplayQuestTrack(Slate);
 				return;
 			}
 
@@ -541,8 +535,7 @@ public class Cmine6ToKatyn71Quest : QuestScript
 		SetAutoTracked(true);
 
 		SetPhase(QuestStatus.Possible, "CMINE6_TO_KATYN7_1_START", "d_cmine_6", L("Check the Crystal Pillar in the Closed Area"));
-		SetPhase(QuestStatus.InProgress, "CMINE6_TO_KATYN7_1_START", "d_cmine_6", L("Obtained the Mysterious Slate"));
-		SetPhase(QuestStatus.Success, "CMINE6_TO_KATYN7_1_START", "d_cmine_6", L("Obtained the Mysterious Slate"));
+		SetPhase(QuestStatus.InProgress, "CMINE6_TO_KATYN7_1_START", "d_cmine_6", L("Obtained the Mysterious Slate"), L("Check out the Crystal Pillar in the Closed Area."));
 
 		SetTrack(QuestStatus.InProgress, QuestStatus.Success, "MINE_3_BOSS_2boss", 4000);
 
@@ -553,6 +546,18 @@ public class Cmine6ToKatyn71Quest : QuestScript
 		AddReward(new ItemReward("stonetablet01_noread", 1));
 		AddReward(new ItemReward("expCard2", 3));
 		AddReward(new StatPointReward(3));
+	}
+
+	/// <summary>
+	/// The pillar hands the slate over in the cutscene and there is nobody to
+	/// report to on this floor, so the quest ends where the track does.
+	/// </summary>
+	public override void OnSuccess(Character character, Quest quest)
+	{
+		base.OnSuccess(character, quest);
+
+		character.ServerMessage(L("Acquired the Mysterious Slate that was inside the Crystal Pillar."));
+		character.Quests.Complete(this.QuestId);
 	}
 }
 

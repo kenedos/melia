@@ -460,6 +460,7 @@ public class FGele574QuestNpcsScript : GeneralScript
 			Name = L("Demon Summoning Circle"),
 			Map = "f_gele_57_4",
 			Points = [(159, 796, 90), (302, 828, 90), (786, 1073, 90), (751, 930, 90), (596, 949, 90), (603, 1084, 90), (394, 626, 90), (204, 575, 90), (81, 674, 90)],
+			Quest = Mq08,
 			IsActive = c => c.Quests.IsActive(Mq08) && !c.Quests.IsCompletable(Mq08),
 			TimedLabel = L("Scribbling"),
 			TimedAnim = "MAKING",
@@ -469,12 +470,6 @@ public class FGele574QuestNpcsScript : GeneralScript
 			{
 				npc?.PlayEffect("F_wizard_shoggoth_cast_lineup", 2f);
 				character.ServerMessage(L("You scribbled on the Summoning Magic Circle"));
-
-				if (npc == null)
-					return;
-
-				foreach (var demon in character.Map.GetAttackableEnemiesInPosition(character, npc.Position, 100).OfType<Mob>().Where(m => m.Data.ClassName == "zombiegirl2_brown" || m.Data.ClassName == "zigri_yellow").Take(3))
-					character.Map.RemoveMonster(demon);
 			},
 		}, npc => npc.AddEffect(new AttachEffect("F_ground050_lineup", 7f, EffectLocation.Bottom)));
 

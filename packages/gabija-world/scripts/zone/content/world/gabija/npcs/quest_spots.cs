@@ -20,6 +20,7 @@ using Melia.Zone.World.Actors.Characters.Components;
 using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
+using Melia.Zone.World.Quests;
 using static Melia.Zone.Scripting.Shortcuts;
 
 /// <summary>
@@ -32,6 +33,14 @@ public class QuestSpotSpec
 	public string Name;
 	public string Map;
 	public (double X, double Z, double Direction)[] Points;
+
+	/// <summary>
+	/// The quest the points belong to. Their progress is only given up once
+	/// the character no longer has it, so a quest that has been handed in is
+	/// not reset by the next visibility check.
+	/// </summary>
+	public QuestId Quest = QuestId.Zero;
+
 	public Func<Character, bool> IsActive;
 	public Func<Character, int, bool> IsAvailable;
 	public Func<Character, string> Requirement;
@@ -129,14 +138,38 @@ public static class QuestSpots
 	private static bool IsConsumed(Dictionary<int, DateTime> consumed, int index)
 		=> consumed.TryGetValue(index, out var until) && until > DateTime.Now;
 
+	/// <summary>
+	/// Returns whether the character still holds the quest the points belong
+	/// to. A spec without a quest keeps its progress for as long as it lives.
+	/// </summary>
+	/// <param name="spec"></param>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	private static bool IsQuestHeld(QuestSpotSpec spec, Character character)
+		=> spec.Quest.Value == 0 || character.Quests.Has(spec.Quest);
+
+	/// <summary>
+	/// Gives back everything the character used up, for a quest they no longer
+	/// have.
+	/// </summary>
+	/// <param name="spec"></param>
+	/// <param name="character"></param>
+	private static void ResetProgress(QuestSpotSpec spec, Character character)
+	{
+		GetConsumed(spec, character).Clear();
+		character.Variables.Temp.SetInt(CountVar(spec.Prefix), 0);
+	}
+
 	private static bool IsVisible(QuestSpotSpec spec, Character character, int index)
 	{
-		if (!spec.IsActive(character))
+		if (!IsQuestHeld(spec, character))
 		{
-			GetConsumed(spec, character).Clear();
-			character.Variables.Temp.SetInt(CountVar(spec.Prefix), 0);
+			ResetProgress(spec, character);
 			return false;
 		}
+
+		if (!spec.IsActive(character))
+			return false;
 
 		if (spec.IsAvailable != null && !spec.IsAvailable(character, index))
 			return false;

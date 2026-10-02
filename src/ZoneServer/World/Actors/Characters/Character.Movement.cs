@@ -447,6 +447,16 @@ namespace Melia.Zone.World.Actors.Characters
 		/// </summary>
 		public override bool CanSee(IActor actor)
 		{
+			if (actor == null)
+				return false;
+
+			// A layer is a hard boundary; the client never draws another one,
+			// so this character cannot be hit by or hit what is standing on
+			// it. Checked ahead of the Always shortcut, which the cast of a
+			// cutscene relies on and which is set on every track actor.
+			if (actor.Layer != this.Layer)
+				return false;
+
 			// Checked ahead of the Always shortcut, since an NPC that is
 			// only there for part of a quest chain must stay away from
 			// everyone else regardless of its visibility flag.

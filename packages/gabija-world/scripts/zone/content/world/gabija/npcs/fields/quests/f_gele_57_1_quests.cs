@@ -14,6 +14,7 @@ using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Maps;
 using Melia.Zone.World.Quests;
@@ -35,6 +36,13 @@ public class FGele571QuestNpcsScript : GeneralScript
 	private readonly static QuestId ToGele = new QuestId(50006);
 
 	private const int BabyPantoId = 147451;
+
+	/// <summary>
+	/// The loop a Baby Panto holds while it waits to be approached. Its model
+	/// carries no event animation, so this is its own idle.
+	/// </summary>
+	private const string BabyPantoPose = "idle";
+
 	private readonly static Position MollyRallyPoint = new Position(-262.60f, 95.99f, 300.90f);
 
 	protected override void Load()
@@ -372,6 +380,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			Name = L("Pile of Grass"),
 			Map = "f_gele_57_1",
 			Points = [(-1385, 683, 90), (-1227, 118, 90), (-1200, 512, 90), (-1501, 399, 90), (-1506, 76, 90), (-1192, -129, 90), (-1480, -180, 90), (-1392, 130, 90), (-1538, -71, 90)],
+			Quest = Mq03,
 			IsActive = c => c.Quests.IsActive(Mq03) && !c.Quests.IsCompletable(Mq03),
 			TimedLabel = L("Investigating"),
 			TimedAnim = "SITGROPESET",
@@ -420,6 +429,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			Name = L("Plateau Sugar Beet Stems"),
 			Map = "f_gele_57_1",
 			Points = [(1461, 384, 90), (1247, 626, 90), (1321, 463, 90), (1560, 501, 90), (1625, 721, 90), (1484, 924, 90), (1370, 921, 90), (1202, 969, 90), (1003, 889, 90), (758, 893, 90), (572, 932, 90), (465, 992, 90), (448, 1161, 90), (434, 1290, 90), (802, 1411, 90), (934, 1316, 90), (922, 1127, 90), (1027, 1048, 90), (1586, 67, 90), (1665, -46, 90), (1848, -62, 90), (1960, 62, 90), (1570, 217, 90), (1917, 207, 90), (1810, 314, 90)],
+			Quest = Rp1,
 			IsActive = c => c.Quests.IsActive(Rp1) && !c.Quests.IsCompletable(Rp1),
 			TimedLabel = L("Removing"),
 			TimedAnim = "SITGROPESET",
@@ -434,7 +444,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 
 		// Baby Panto
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(147451, L("Baby Panto"), "GELE571_MQ_07", "f_gele_57_1", 980, 961, 90, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07), async dialog =>
+		var mq07Baby = AddConditionalNpc(147451, L("Baby Panto"), "GELE571_MQ_07", "f_gele_57_1", 980, 961, 90, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07), async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -449,6 +459,8 @@ public class FGele571QuestNpcsScript : GeneralScript
 			character.Quests.StartQuestTrack(Mq07);
 		});
 
+		mq07Baby?.AddEffect(new PlayAnimationEffect(BabyPantoPose));
+
 		// Baby Pantos on the sugar beet grounds
 		//-------------------------------------------------------------------------
 		QuestSpots.Add(new QuestSpotSpec
@@ -458,6 +470,7 @@ public class FGele571QuestNpcsScript : GeneralScript
 			Name = L("Baby Panto"),
 			Map = "f_gele_57_1",
 			Points = [(607, 528, 90), (757, 568, 90), (832, 389, 90), (779, 312, 90), (681, 297, 90), (565, 280, 90), (411, 323, 90), (376, 559, 90)],
+			Quest = Mq04,
 			IsActive = c => c.Quests.IsActive(Mq04) && !c.Quests.IsCompletable(Mq04),
 			TimedLabel = L("Luring Baby Panto"),
 			TimedAnim = "PET",
@@ -470,13 +483,19 @@ public class FGele571QuestNpcsScript : GeneralScript
 				if (npc != null)
 					RunToMolly(npc.Map, npc.Position);
 			},
-		});
+		}, npc => npc.AddEffect(new PlayAnimationEffect(BabyPantoPose)));
 
 		// Baby Pantos around the one Capria's guard is watching
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_1", "f_gele_57_1", 950, 963, 180, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07));
-		AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_2", "f_gele_57_1", 999, 995, 45, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07));
-		AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_3", "f_gele_57_1", 980, 1025, 135, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07));
+		foreach (var npc in new[]
+		{
+			AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_1", "f_gele_57_1", 950, 963, 180, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07)),
+			AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_2", "f_gele_57_1", 999, 995, 45, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07)),
+			AddConditionalNpc(BabyPantoId, L("Baby Panto"), "GELE571_MQ_07_1_3", "f_gele_57_1", 980, 1025, 135, c => c.Quests.IsActive(Mq07) && !c.Quests.IsCompletable(Mq07)),
+		})
+		{
+			npc?.AddEffect(new PlayAnimationEffect(BabyPantoPose));
+		}
 
 		// Hidden triggers
 		//-------------------------------------------------------------------------

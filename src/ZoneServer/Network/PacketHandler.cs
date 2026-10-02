@@ -1400,6 +1400,10 @@ namespace Melia.Zone.Network
 			// Try to execute script
 			var script = item.Data.Script;
 
+			// The client sends the clicked entity with every use, which is how a
+			// quest item is aimed at a monster or an object instead of the player.
+			character.Variables.Temp.SetInt(Item.UseTargetVar, handle);
+
 			if (!ScriptableFunctions.Item.TryGet(script.Function, out var scriptFunc))
 			{
 				character.ServerMessage(Localization.Get("This item has not been implemented yet."));

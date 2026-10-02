@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Mage Tower 2F Quest NPCs
 //--- Description -----------------------------------------------------------
 // The making of the Jewel of Prominence, and the sealed stones that ask for
@@ -472,6 +472,7 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 			Name = L("Flame Vapor"),
 			Map = "d_firetower_42",
 			Points = [(1931, -1195, 90), (2018, -1558, 90), (1711, -1458, 90), (1733, -1275, 90), (1532, -1376, 90), (1224, -1331, 90), (1157, -1482, 90)],
+			Quest = Mq02,
 			IsActive = c => c.Quests.IsActive(Mq02) && !c.Quests.IsCompletable(Mq02),
 			IsAvailable = (c, index) => VaporUntil.TryGetValue(c.ObjectId + "_" + index, out var until) && until > DateTime.Now,
 			TimedLabel = L("Collecting Flame Vapor"),

@@ -32,7 +32,9 @@ public class Chaple576Mq04Track : TrackScript
 
 		actors.Add(character);
 		actors.Add(AddTrackActor(character, 41372, -1050.65, -1.79, 441.78, 110, new TrackActorSpec { Ai = "BasicBoss", EndPosition = new Position(-1407.02f, 0.42f, 419.56f) }));
-		actors.Add(AddTrackActor(character, 147379, -1777.94, 0.42, 425.98, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
+		// See CHAPLE576_MQ_04_AFTER: the gate mesh only lines up with the world
+		// at the angle the same model is placed with on the map.
+		actors.Add(AddTrackActor(character, 147379, -1777.94, 0.42, 425.98, 91, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 
 		return actors.ToArray();
 	}

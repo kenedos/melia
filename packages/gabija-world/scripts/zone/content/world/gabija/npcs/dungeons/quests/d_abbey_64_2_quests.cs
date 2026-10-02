@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Novaha Annex Quest NPCs
 //--- Description -----------------------------------------------------------
 // The search for Edmundas in the Apega State Chamber, the experiment
@@ -244,6 +244,7 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 			Name = "UnvisibleName",
 			Map = "d_abbey_64_2",
 			Points = [(-626.12, -1187.33, 90), (-604.76, -1390.77, 90), (-414.76, -1400.41, 90), (-423.19, -1193.47, 90)],
+			Quest = Mq020,
 			IsActive = c => c.Quests.IsActive(Mq020) && !c.Quests.IsCompletable(Mq020),
 			TimedLabel = L("Destroying the Crystal Pillar"),
 			TimedAnim = "ABSORB",
@@ -444,6 +445,7 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 			Name = "UnvisibleName",
 			Map = "d_abbey_64_2",
 			Points = [(Belongings[0, 0], Belongings[0, 1], Belongings[0, 2]), (Belongings[1, 0], Belongings[1, 1], Belongings[1, 2]), (Belongings[2, 0], Belongings[2, 1], Belongings[2, 2]), (Belongings[3, 0], Belongings[3, 1], Belongings[3, 2])],
+			Quest = Sq020,
 			IsActive = c => c.Quests.IsActive(Sq020) && !c.Quests.IsCompletable(Sq020),
 			TimedLabel = L("Checking the suspicous pile of brackens"),
 			TimedAnim = "SITGROPESET",
@@ -560,6 +562,7 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 			Name = L("Holy Relic Fragment"),
 			Map = "d_abbey_64_2",
 			Points = [(901.02, 1273.66, 90), (899.23, 1029.13, 90), (815.78, 1564.17, 90), (1115.54, 1679.46, 90), (1116.20, 1442.01, 90), (604.71, 1644.89, 90), (535.81, 1384.64, 90)],
+			Quest = Sq040,
 			IsActive = c => c.Quests.IsActive(Sq040) && !c.Quests.IsCompletable(Sq040),
 			TimedLabel = L("Retrieving a Holy Relic fragment"),
 			TimedAnim = "SITGROPESET",
@@ -589,6 +592,7 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 			Name = "UnvisibleName",
 			Map = "d_abbey_64_2",
 			Points = [(RelicSpots[0, 0], RelicSpots[0, 1], RelicSpots[0, 2]), (RelicSpots[1, 0], RelicSpots[1, 1], RelicSpots[1, 2]), (RelicSpots[2, 0], RelicSpots[2, 1], RelicSpots[2, 2])],
+			Quest = Sq050,
 			IsActive = c => c.Quests.IsActive(Sq050) && !c.Quests.IsCompletable(Sq050),
 			Requirement = c => c.Inventory.CountItem(ItemId.ABBAY642_SQ5_ITEM01) == 0 ? L("You need the holy relic Monk Abels gave you.") : null,
 			TimedLabel = L("Placing the Holy Relic"),

@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Royal Mausoleum 2F Quest NPCs
 //--- Description -----------------------------------------------------------
 // The guardian statues that still hold their reason, the stone lanterns
@@ -283,6 +283,7 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 			Name = L("Guardian's Energy"),
 			Map = "d_zachariel_33",
 			Points = [(-1671, 173, 0), (-562, 111, 0), (-858, 296, 0), (-1546, 370, 0), (-1321, 318, 0), (-1528, 157, 0), (-1103, 206, 0), (-878, 134, 0)],
+			Quest = Sq01,
 			IsActive = c => c.Quests.IsActive(Sq01) && !c.Quests.IsCompletable(Sq01),
 			TimedLabel = L("Absorbing energy"),
 			TimedAnim = "MAKING",

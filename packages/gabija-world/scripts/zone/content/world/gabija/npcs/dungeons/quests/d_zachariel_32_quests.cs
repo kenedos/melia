@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Royal Mausoleum 1F Quest NPCs
 //--- Description -----------------------------------------------------------
 // The foundation stone, the epitaphs that explain the mausoleum's defenses,
@@ -80,6 +80,7 @@ public class DZachariel32QuestNpcsScript : GeneralScript
 			Name = L("Sleeping Boowook"),
 			Map = "d_zachariel_32",
 			Points = [(-11, -1206, 90), (-106, -1012, 90), (46, -552, 90), (88, -1006, 90), (-2, -690, 90), (168, -1062, 90), (28, -1397, 90), (333, -978, 90)],
+			Quest = Mq01,
 			IsActive = c => c.Quests.IsActive(Mq01) && !c.Quests.IsCompletable(Mq01),
 			TimedLabel = L("Waking up"),
 			TimedAnim = "ABSORB",

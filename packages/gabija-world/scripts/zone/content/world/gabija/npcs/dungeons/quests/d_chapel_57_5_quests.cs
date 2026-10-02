@@ -13,11 +13,13 @@ using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
 using Melia.Shared.Util;
 using Melia.Shared.World;
+using Melia.Zone;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
@@ -45,8 +47,18 @@ public class DChapel575QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq08 = new QuestId(8526);
 	private readonly static QuestId Mq09 = new QuestId(8527);
 
+	// The corridor the demon barrier stands in runs from z -844 to z -723 on
+	// both grounds, so a circle this wide seals it without touching the halls
+	// that open out further along.
+	private readonly static Position DemonBarrierPosition = new Position(363, 0, -783);
+	private const float DemonBarrierRadius = 68;
+	private MapBarrier DemonBarrier;
+
 	protected override void Load()
 	{
+		if (ZoneServer.Instance.World.TryGetMap("d_chapel_57_5", out var chapelBasement))
+			this.DemonBarrier = new MapBarrier(chapelBasement, "Chapel575DemonBarrier", DemonBarrierPosition, DemonBarrierRadius);
+
 		// Follower Tomas
 		//-------------------------------------------------------------------------
 		AddNpc(147399, L("Follower Tomas"), "CHAPEL_TOMAS", "d_chapel_57_5", -489, 618, 0, async dialog =>
@@ -250,20 +262,20 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
+			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
 			{
-				await dialog.Msg(L("I only have one empty Holy Stone."));
-				var answer = await dialog.SelectQuestOffer(Mq07, L("Can you help me to fill this stone, please?"),
-					Option(L("I can help you"), "accept"),
-					Option(L("Hold on a little longer"), "leave")
+				await dialog.Msg(L("It is reassuring to hear that Brother Tomas will be in charge of the altar."));
+				var answer = await dialog.SelectQuestOffer(Mq09, L("The demons have made a magic barrier at the basement's central altar. Break it and look for Brother Vaidutis."),
+					Option(L("I will go to the 1st floor"), "accept"),
+					Option(L("Look for another way"), "leave")
 				);
 
 				if (answer == "accept")
 				{
-					await dialog.Msg(L("When you place the Holy Stone, the lives of the demons defeated near it will fill it."));
-					await dialog.Msg(L("Defeat the demons near the Holy Stone."));
-					character.Quests.Start(Mq07);
-					character.Inventory.Add(650716, 1, InventoryAddType.PickUp);
+					await dialog.Msg(L("The altars in the church are made to stop demons. Of course, only we, the Paladins, know how to use them."));
+					character.Quests.Start(Mq09);
+					this.SetDemonBarrier(true);
+					character.LookAround();
 				}
 				return;
 			}
@@ -282,26 +294,28 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
+			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
-				await dialog.Msg(L("It is reassuring to hear that Brother Tomas will be in charge of the altar."));
-				var answer = await dialog.SelectQuestOffer(Mq09, L("The demons have made a magic barrier at the basement's central altar. Break it and look for Brother Vaidutis."),
-					Option(L("I will go to the 1st floor"), "accept"),
-					Option(L("Look for another way"), "leave")
+				await dialog.Msg(L("I only have one empty Holy Stone."));
+				var answer = await dialog.SelectQuestOffer(Mq07, L("Can you help me to fill this stone, please?"),
+					Option(L("I can help you"), "accept"),
+					Option(L("Hold on a little longer"), "leave")
 				);
 
 				if (answer == "accept")
 				{
-					await dialog.Msg(L("The altars in the church are made to stop demons. Of course, only we, the Paladins, know how to use them."));
-					character.Quests.Start(Mq09);
-					character.LookAround();
+					await dialog.Msg(L("When you place the Holy Stone, the lives of the demons defeated near it will fill it."));
+					await dialog.Msg(L("Defeat the demons near the Holy Stone."));
+					character.Quests.Start(Mq07);
+					character.Inventory.Add(650716, 1, InventoryAddType.PickUp);
 				}
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq07))
+			if (character.Quests.IsActive(Mq09))
 			{
-				await dialog.Msg(L("Place the Holy Stone and defeat the demons near it."));
+				await dialog.Msg(L("Break the barrier at the central altar and find Vaidutis."));
+				character.Quests.ClearQuestTrack(Mq09);
 				return;
 			}
 
@@ -311,10 +325,9 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq09))
+			if (character.Quests.IsActive(Mq07))
 			{
-				await dialog.Msg(L("Break the barrier at the central altar and find Vaidutis."));
-				character.Quests.ClearQuestTrack(Mq09);
+				await dialog.Msg(L("Place the Holy Stone and defeat the demons near it."));
 				return;
 			}
 
@@ -366,6 +379,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			Name = L("Glizardon"),
 			Map = "d_chapel_57_5",
 			Points = [(911, 450, 90), (543, 399, 90), (191, 258, 90)],
+			Quest = Mq06,
 			IsActive = c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06),
 			Requirement = c => c.IsBuffActive(BuffId.CHAPLE575_MQ_06) ? null : L("The Glizardon would notice you. Drink the Namott Holy Water first."),
 			TimedLabel = L("Attaching"),
@@ -384,7 +398,13 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 		// Underground Central Barrier
 		//-------------------------------------------------------------------------
-		AddConditionalNpc(40071, L("Underground Central Barrier"), "CHAPLE575_MQ_09", "d_chapel_57_5", 363, -782, 90, c => c.Quests.IsActive(Mq09) && !c.Quests.IsCompletable(Mq09), async dialog =>
+		// The fence in the gap is what the client draws and the barrier's
+		// obstacle is what the player actually walks into, so both go up
+		// together.
+		AddConditionalNpc(MonsterId.Block_Fence, "", "CHAPLE575_MQ_09_FENCE", "d_chapel_57_5", 363, -783, 0, IsDemonBarrierUp)
+			.WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
+
+		AddConditionalNpc(40071, L("Underground Central Barrier"), "CHAPLE575_MQ_09", "d_chapel_57_5", 363, -782, 90, IsDemonBarrierUp, async dialog =>
 		{
 			var character = dialog.Player;
 
@@ -399,6 +419,7 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 				character.ServerMessage(L("The barrier shudders and gives way. Something massive stirs behind it."));
 
+				this.SetDemonBarrier(false);
 				character.Quests.StartQuestTrack(Mq09);
 				return;
 			}
@@ -406,6 +427,38 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("A dark barrier blocks the way to the first floor."));
 		}).WithEffect("F_lineup021_alpha", 1f, EffectLocation.Bottom);
 
+	}
+
+	/// <summary>
+	/// Returns whether Gesti's barrier is still sealing the way up.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	private static bool IsDemonBarrierUp(Character character)
+		=> character.Quests.IsActive(Mq09) && !character.Quests.IsCompletable(Mq09);
+
+	/// <summary>
+	/// Puts the wall in the corridor up or takes it down.
+	/// </summary>
+	/// <param name="blocked"></param>
+	private void SetDemonBarrier(bool blocked)
+	{
+		this.DemonBarrier?.Set(blocked);
+	}
+
+	/// <summary>
+	/// Keeps the wall in step with the quest for a character coming back to the
+	/// floor.
+	/// </summary>
+	[On("PlayerEnteredMap")]
+	public void OnPlayerEnteredMap(object sender, PlayerEventArgs args)
+	{
+		var character = args.Character;
+
+		if (character.Map?.ClassName != "d_chapel_57_5")
+			return;
+
+		this.SetDemonBarrier(IsDemonBarrierUp(character));
 	}
 
 	/// <summary>

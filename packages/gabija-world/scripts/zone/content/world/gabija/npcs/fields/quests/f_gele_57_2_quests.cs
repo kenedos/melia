@@ -45,6 +45,7 @@ public class FGele572QuestNpcsScript : GeneralScript
 		Name = L("Demon Corrupted Land"),
 		Map = "f_gele_57_2",
 		Points = [(417, 454, 90), (565, 715, 90), (794, 1126, 90), (973, 851, 90), (1221, 1032, 90), (512, 133, 90), (406, -107, 90), (780, -174, 90)],
+		Quest = Mq06,
 		IsActive = c => c.Quests.IsActive(Mq06) && !c.Quests.IsCompletable(Mq06),
 		IsAvailable = (c, index) => RevealedLand.TryGetValue(c.ObjectId + "_" + index, out var until) && until > DateTime.Now,
 		TimedLabel = L("Purifying corrupted land"),

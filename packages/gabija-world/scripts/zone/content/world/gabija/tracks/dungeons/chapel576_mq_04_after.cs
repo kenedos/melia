@@ -30,7 +30,7 @@ public class Chaple576Mq04After : TrackScript
 
 		character.Movement.MoveTo(new Position(-1648.28f, 0.42f, 419.05f));
 
-		actors.Add(AddTrackActor(character, 40069, -1744.69, 0.42, 426.14, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
+		actors.Add(AddTrackActor(character, 40069, -1744.69, 0.42, 426.14, 91, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(AddTrackActor(character, 147390, -1880.05, -42.13, 395.60, 0, new TrackActorSpec
 		{
 			Name = L("Follower Algis"),
@@ -40,7 +40,11 @@ public class Chaple576Mq04After : TrackScript
 		}));
 		actors.Add(AddTrackActor(character, 20026, -1708.23, 0.42, 404.94, 0, new TrackActorSpec { Ai = "TrackWaitMonster" }));
 		actors.Add(character);
-		actors.Add(AddTrackActor(character, 147379, -1777.82, 0.42, 425.83, 0, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
+
+		// The client's track data faces this gate 1 degree off, but the same
+		// model stands at 91 in the world (see CHAPLE576_MQ_04), and the mesh
+		// reads as a wall only at that angle. Do not take the track's value.
+		actors.Add(AddTrackActor(character, 147379, -1777.82, 0.42, 425.83, 91, new TrackActorSpec { Ai = "TrackWaitMonster", Faction = FactionType.Our_Forces }));
 		actors.Add(AddTrackActor(character, 147399, -1911.56, -42.13, 390.54, 0, new TrackActorSpec
 		{
 			Name = L("Follower Donatas"),

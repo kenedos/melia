@@ -1,4 +1,4 @@
-//--- Melia Script ----------------------------------------------------------
+﻿//--- Melia Script ----------------------------------------------------------
 // Demon Prison District 5 Quest NPCs
 //--- Description -----------------------------------------------------------
 // The Vakarion Cathedral ritual that closes the dimensional crack, and the
@@ -368,6 +368,7 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 			Name = L("Small Dimensional Crack"),
 			Map = "d_velniasprison_51_5",
 			Points = [(1362, -25, 90), (1290, -315, 90), (1284, -139, 90), (1223, 97, 90), (1325, 212, 90), (1566, 206, 90), (1621, 17, 90), (1516, -59, 90), (1463, 85, 90), (1334, 381, 90)],
+			Quest = Sq03,
 			IsActive = c => c.Quests.IsActive(Sq03) && !c.Quests.IsCompletable(Sq03),
 			TimedLabel = L("Removing"),
 			TimedAnim = "MAKING",
