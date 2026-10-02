@@ -34,7 +34,7 @@ public class ExpCardScripts : GeneralScript
 			var item = txItem.Item;
 			var amount = txItem.Amount;
 
-			if (item.Data.Script.StrArg != "XpCard")
+			if (item.Data.Script?.StrArg != "XpCard" && item.Data.Script?.Function != "SCR_USE_ITEM_EXPCARD")
 				throw new ArgumentException($"Item '{item.Id}' is not an EXP card.");
 
 			var numArg1 = item.Data.Script.NumArg1;

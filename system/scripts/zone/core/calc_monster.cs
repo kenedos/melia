@@ -450,6 +450,9 @@ public class MonsterCalculationsFunctionsScript : GeneralScript
 	[ScriptableFunction]
 	public float SCR_Get_MON_RHP(Mob monster)
 	{
+		if (monster.CombatState.AttackState)
+			return 0;
+
 		if (monster.Properties.GetFloat(PropertyName.HPCount) > 0)
 			return 0;
 

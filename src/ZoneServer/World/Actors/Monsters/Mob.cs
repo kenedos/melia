@@ -392,7 +392,7 @@ namespace Melia.Zone.World.Actors.Monsters
 			}
 		}
 
-		private const float ShieldDamageRate = 2.5f;
+		private const float ShieldDamageRate = 5.0f;
 		private const float ShieldRegenRate = 0.05f;
 		private const float ShieldHpDamageRate = 0.5f;
 		private const float BossShieldRate = 100;
