@@ -11,7 +11,7 @@ namespace Melia.Zone.Buffs.Handlers.Scouts.Thaumaturge
 {
 	[Package("laima-skills")]
 	[BuffHandler(BuffId.Transmute_Debuff)]
-	public class Transmute_DebuffOverride : BuffHandler
+	public class Transmute_DebuffOverride : BuffHandler, ITransformationBuff
 	{
 		private static readonly string[] TransmuteForms = new[]
 		{

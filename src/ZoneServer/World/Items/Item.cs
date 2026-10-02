@@ -27,12 +27,6 @@ namespace Melia.Zone.World.Items
 	/// </summary>
 	public class Item : IPropertyObject
 	{
-		/// <summary>
-		/// The temporary character variable holding the handle of the entity the
-		/// client aimed the item being used at, or zero for a self use.
-		/// </summary>
-		public const string UseTargetVar = "Melia.ItemUse.Target";
-
 		private readonly List<Item> _gemSockets = new();
 
 		private const int DurabilityPerPoint = 100;

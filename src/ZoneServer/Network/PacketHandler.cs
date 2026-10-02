@@ -1400,10 +1400,6 @@ namespace Melia.Zone.Network
 			// Try to execute script
 			var script = item.Data.Script;
 
-			// The client sends the clicked entity with every use, which is how a
-			// quest item is aimed at a monster or an object instead of the player.
-			character.Variables.Temp.SetInt(Item.UseTargetVar, handle);
-
 			if (!ScriptableFunctions.Item.TryGet(script.Function, out var scriptFunc))
 			{
 				character.ServerMessage(Localization.Get("This item has not been implemented yet."));
@@ -1636,13 +1632,23 @@ namespace Melia.Zone.Network
 					return;
 				}
 
-				Log.Warning("CZ_CLICK_TRIGGER: User '{0}' tried to talk to an actual monster.", conn.Account.Name);
-				return;
+				// A monster is normally something to fight, not talk to. The
+				// few that carry a dialog name are the ones the client offers
+				// as conversation targets, which quests use to let a character
+				// approach a real map monster without it turning hostile.
+				//
+				// A mob has no dialog handler of its own the way an npc does,
+				// so the dialog it names has to be one that was registered.
+				if (string.IsNullOrEmpty(mob.DialogName)
+					|| !ZoneServer.Instance.DialogFunctions.TryGet(mob.DialogName, out _))
+				{
+					Log.Warning("CZ_CLICK_TRIGGER: User '{0}' tried to talk to an actual monster.", conn.Account.Name);
+					return;
+				}
 			}
-
-			// Attempt to get the dialog component
-			if (string.IsNullOrEmpty(monster.DialogName))
+			else if (string.IsNullOrEmpty(monster.DialogName))
 			{
+				// Attempt to get the dialog component
 				Log.Warning("CZ_CLICK_TRIGGER: User '{0}' tried to talk to a monster without dialog.", conn.Account.Name);
 				return;
 			}
@@ -1656,6 +1662,29 @@ namespace Melia.Zone.Network
 			}
 
 			character.StartDialog(monster);
+		}
+
+		/// <summary>
+		/// Sent when the client asks for a disguise to be dropped early, which
+		/// it offers while the character is being drawn as something else.
+		/// </summary>
+		/// <remarks>
+		/// The client offers no way to take the skin off, so the only way out
+		/// of one is to let it run out. This gives the player a way to end it
+		/// instead. The packet carries nothing worth reading, and says nothing
+		/// about what caused the disguise, so every one of them is ended.
+		/// </remarks>
+		/// <param name="conn"></param>
+		/// <param name="packet"></param>
+		[PacketHandler(Op.CZ_CANCEL_TRANSFORM_SKILL)]
+		public void CZ_CANCEL_TRANSFORM_SKILL(IZoneConnection conn, Packet packet)
+		{
+			var character = conn.SelectedCharacter;
+
+			if (character == null || character.IsOutOfBody())
+				return;
+
+			character.StopTransformation();
 		}
 
 		/// <summary>

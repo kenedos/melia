@@ -1,4 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
+//--- Melia Script ----------------------------------------------------------
 // Tenet Church 2F Quest NPCs
 //--- Description -----------------------------------------------------------
 // Follower Algis, the altars of the central hall and the sanctuary the
@@ -584,7 +584,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 		character.Map.AddMonster(escort, immediate: true);
 
-		if (QuestFollower.MakeAlly(escort, character) == null)
+		if (QuestAlly.MakeAlly(escort, character) == null)
 			return;
 
 		BellTowerEscorts[character.ObjectId] = escort;

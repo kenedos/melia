@@ -1,4 +1,4 @@
-﻿//--- Melia Script ----------------------------------------------------------
+//--- Melia Script ----------------------------------------------------------
 // Tenet Church 1F Quest NPCs
 //--- Description -----------------------------------------------------------
 // Vaidutis and Donatas at the church gate, and the altars and demons their
@@ -6,17 +6,23 @@
 //---------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
 using Melia.Shared.Util;
 using Melia.Shared.World;
+using Melia.Zone;
+using Melia.Zone.Buffs.Handlers;
 using Melia.Zone.Events.Arguments;
 using Melia.Zone.Scripting;
+using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.CombatEntities.Components;
+using Melia.Zone.World.Actors.Effects;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
@@ -33,8 +39,87 @@ public class DChapel576QuestNpcsScript : GeneralScript
 	private readonly static QuestId Mq041 = new QuestId(8730);
 	private readonly static QuestId Mq05 = new QuestId(8514);
 	private readonly static QuestId Mq06 = new QuestId(8515);
-	private const float LureRange = 200;
-	private readonly static Position ApsaugaAltarPosition = new Position(-526, 0, -1092);
+	private readonly static Position ApsaugaAltarPosition = new Position(-527, 0, -1088);
+
+	/// <summary>
+	/// How far around the altar counts as reaching it. A persuaded demon this
+	/// close is taken by the altar when it is used.
+	/// </summary>
+	private const float DeliveryRange = 200;
+
+	/// <summary>
+	/// How close a character has to be for a demon to hear them.
+	/// </summary>
+	private const float TalkRange = 40;
+
+	/// <summary>
+	/// How many demons one character may have walking with them at once. The
+	/// rest start to suspect the disguise.
+	/// </summary>
+	private const int MaxPersuadedDemons = 4;
+
+	/// <summary>
+	/// How long the Demon Transform Scroll hides the character for.
+	/// </summary>
+	private static readonly TimeSpan DisguiseDuration = TimeSpan.FromMinutes(5);
+
+	/// <summary>
+	/// The class name of the orb on top of the Apsauga Altar.
+	/// </summary>
+	private const string AltarOrbClassName = "holly_sphere_chapel_01";
+
+	/// <summary>
+	/// The name the altar orb's glow is stored under, so it can be taken off
+	/// again once the altar is done.
+	/// </summary>
+	private const string AltarOrbEffectName = "Gabija.Chaple576.Mq06.Orb";
+
+	/// <summary>
+	/// How many times a demon struggles at the altar before it goes down.
+	/// </summary>
+	private const int ChargeTicks = 7;
+
+	/// <summary>
+	/// How long one of those struggles lasts.
+	/// </summary>
+	private const int ChargeTickMilliseconds = 400;
+
+	/// <summary>
+	/// How long a trailing demon is given to walk into the altar's reach
+	/// after the player has already stepped into it.
+	/// </summary>
+	private const int ArrivalSettleMilliseconds = 2500;
+
+	/// <summary>
+	/// Holds where a demon is in the lure: walking to the altar with the
+	/// character, waiting at it, or being taken by it.
+	/// </summary>
+	public const string AllyStateVar = "Gabija.Chaple576.Mq06.AllyState";
+
+	/// <summary>
+	/// Holds how far through the altar's taking a demon is.
+	/// </summary>
+	public const string AllyChargeVar = "Gabija.Chaple576.Mq06.Charge";
+
+	/// <summary>
+	/// A demon still walking to the altar.
+	/// </summary>
+	private const int AllyStateFollowing = 0;
+
+	/// <summary>
+	/// A demon that reached the altar and is waiting to be handed over.
+	/// </summary>
+	private const int AllyStateArrived = 1;
+
+	/// <summary>
+	/// A demon the altar is taking.
+	/// </summary>
+	private const int AllyStateDelivered = 2;
+
+	/// <summary>
+	/// The map the disguise is meant for.
+	/// </summary>
+	private const string ChurchFirstFloor = "d_chapel_57_6";
 	private readonly static QuestId Mq07 = new QuestId(8451);
 	private readonly static QuestId Mq08 = new QuestId(8517);
 	private readonly static QuestId Mq09 = new QuestId(8518);
@@ -46,6 +131,10 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 	protected override void Load()
 	{
+		// The church's demons are real map monsters, and this is what lets the
+		// disguised character walk up and talk to one of them.
+		ZoneServer.Instance.DialogFunctions.Add(Chaple576Mq06Disguise.DemonDialogName, DemonDialog);
+
 		// Follower Vaidutis
 		//-------------------------------------------------------------------------
 		AddNpc(147400, L("Follower Vaidutis"), "CHAPEL_VIRGINIJA", "d_chapel_57_6", 961, -114, 0, async dialog =>
@@ -455,6 +544,20 @@ public class DChapel576QuestNpcsScript : GeneralScript
 
 			if (character.Quests.IsActive(Mq06) && !character.Quests.IsCompletable(Mq06))
 			{
+				// The demon only has to have reached the altar by the time the
+				// altar is used, so whether it got here is settled here rather
+				// than on the way in.
+				StopArrivedAllies(character);
+
+				var arrived = TakeArrivedAllies(character);
+
+				if (arrived.Count > 0)
+				{
+					await dialog.Msg(L("The altar's orb reaches out and draws the demons in."));
+					await DeliverAllies(character, arrived);
+					return;
+				}
+
 				await dialog.Msg(L("The altar's orb answers the demons you bring before it."));
 				return;
 			}
@@ -485,9 +588,9 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			},
 		});
 
-		// The Apsauga Altar, which takes the lured demons in.
+		// The Apsauga Altar, which stops the demons that were lured to it.
 		//-------------------------------------------------------------------------
-		AddQuestTrigger("CHAPEL576_MQ_06_LURE", "d_chapel_57_6", -526, -1092, LureRange, async args =>
+		AddQuestTrigger("CHAPEL576_MQ_06_LURE", "d_chapel_57_6", -526, -1092, DeliveryRange, async args =>
 		{
 			if (args.Initiator is not Character character)
 				return;
@@ -495,31 +598,243 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (!character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
 				return;
 
-			var taken = 0;
+			// Nothing is taken here. A demon that reaches the altar holds
+			// still and waits to be spoken to, and only that talk charges
+			// the altar, so the player is told to go and finish it.
+			var arrived = StopArrivedAllies(character);
 
-			foreach (var ally in QuestFollower.AlliesInRange(character, ApsaugaAltarPosition, LureRange).ToList())
-			{
-				ally.PlayEffect("F_light003_blue", 2f);
-				character.Map.RemoveMonster(ally);
-				++taken;
-			}
+			if (arrived > 0)
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("Talk to the monsters again.{nl}Let them come closer to the Apsauga Altar."), 2);
 
-			if (taken == 0)
+			// A demon trailing behind may only cross into the altar's reach
+			// after the player is already standing in it, so the stragglers
+			// get a second look once they have caught up.
+			await Task.Delay(ArrivalSettleMilliseconds);
+			StopArrivedAllies(character);
+		});
+	}
+
+	/// <summary>
+	/// Stops every one of the character's demons that has reached the altar, so
+	/// it waits there to be delivered.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns>How many demons stopped this time.</returns>
+	private static int StopArrivedAllies(Character character)
+	{
+		var stopped = 0;
+
+		foreach (var ally in QuestAlly.AlliesInRange(character, ApsaugaAltarPosition, DeliveryRange).ToList())
+		{
+			if (ally.Vars.GetInt(AllyStateVar, AllyStateFollowing) != AllyStateFollowing)
+				continue;
+
+			ally.Vars.SetInt(AllyStateVar, AllyStateArrived);
+			HaltAlly(ally);
+			++stopped;
+		}
+
+		return stopped;
+	}
+
+	/// <summary>
+	/// Stops a demon where it stands and keeps it there. Stopping the movement
+	/// on its own is not enough, since the follower script only pauses between
+	/// steps and would start walking again on the next one.
+	/// </summary>
+	/// <param name="ally"></param>
+	private static void HaltAlly(Mob ally)
+	{
+		if (ally.Components.TryGet<AiComponent>(out var ai))
+			ai.Script.Suspended = true;
+
+		ally.Components.Get<MovementComponent>()?.Stop();
+	}
+
+	/// <summary>
+	/// Collects the demons that are standing at the altar waiting to be taken
+	/// by it.
+	/// </summary>
+	/// <param name="character"></param>
+	private static List<Mob> TakeArrivedAllies(Character character)
+	{
+		return QuestAlly.AlliesInRange(character, ApsaugaAltarPosition, DeliveryRange)
+			.Where(ally => ally.Vars.GetInt(AllyStateVar, AllyStateFollowing) == AllyStateArrived)
+			.ToList();
+	}
+
+	/// <summary>
+	/// Hands the demons waiting at the altar over to it, which charges the
+	/// altar and takes them out of the map.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <param name="demons"></param>
+	private static async Task DeliverAllies(Character character, List<Mob> demons)
+	{
+		foreach (var demon in demons)
+		{
+			demon.Vars.SetInt(AllyStateVar, AllyStateDelivered);
+			demon.Vars.SetInt(AllyChargeVar, 0);
+			demon.Components.Get<MovementComponent>()?.Stop();
+
+			character.Quests.AddObjectiveProgress(Mq06, "lureDemons");
+		}
+
+		character.LookAround();
+
+		var orb = FindAltarOrb(character);
+
+		if (orb != null)
+			orb.AddEffect(AltarOrbEffectName, new PlayAnimationEffect("EVENT_LOOP"));
+
+		// They are all taken at once, so they are played out together rather
+		// than one after another.
+		await Task.WhenAll(demons.Select(demon => ChargeAltar(character, demon)));
+
+		orb?.RemoveEffect(AltarOrbEffectName);
+		character.LookAround();
+	}
+
+	/// <summary>
+	/// Plays one demon being taken by the altar, then removes it.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <param name="demon"></param>
+	private static async Task ChargeAltar(Character character, Mob demon)
+	{
+		// The demon struggles at the altar for a while before it goes down,
+		// which is what the altar's charge is counted over.
+		for (var i = 0; i < ChargeTicks; ++i)
+		{
+			demon.Vars.SetInt(AllyChargeVar, i + 1);
+			demon.AddEffect(new PlayAnimationEffect("STUN_EVENT"));
+			character.PlayEffect("F_light003_blue", 2f);
+
+			await Task.Delay(ChargeTickMilliseconds);
+
+			if (demon.IsDead || demon.Map == null)
+				return;
+		}
+
+		character.Map.RemoveMonster(demon);
+	}
+
+	/// <summary>
+	/// Returns the church's altar orb if it is standing on the character's
+	/// map, which is what lights up while the altar takes a demon.
+	/// </summary>
+	/// <param name="character"></param>
+	/// <returns></returns>
+	private static MonsterInName FindAltarOrb(Character character)
+	{
+		if (character?.Map == null || !ZoneServer.Instance.Data.MonsterDb.TryFind(AltarOrbClassName, out var orbData))
+			return null;
+
+		return character.Map.GetActorsInRange<MonsterInName>(ApsaugaAltarPosition, DeliveryRange, actor => actor.Id == orbData.Id)
+			.FirstOrDefault();
+	}
+
+	/// <summary>
+	/// Talks to one of the church's demons, either to win it over or to hand a
+	/// demon already waiting at the altar over to it.
+	/// </summary>
+	/// <param name="dialog"></param>
+	private static async Task DemonDialog(Dialog dialog)
+	{
+		var character = dialog.Player;
+
+		if (dialog.Trigger is not Mob demon)
+			return;
+
+		dialog.SetTitle(L("Demon"));
+
+		if (!character.Quests.IsActive(Mq06))
+		{
+			await dialog.Msg(L("The demon snarls and shows no interest in you."));
+			return;
+		}
+
+		var state = demon.Vars.GetInt(AllyStateVar, AllyStateFollowing);
+		var isOurs = demon.Vars.GetInt(QuestAlly.OwnerVar, 0) == character.Handle;
+
+		// A demon that is already spoken for turns the player away, unless it
+		// is this player's own demon waiting at the altar.
+		if (isOurs)
+		{
+			if (state == AllyStateArrived)
 			{
-				character.ServerMessage(L("Nothing followed you here. The orb only answers to the demons you lure."));
-				await Task.CompletedTask;
+				// The altar is what takes them, so talking to one only points
+				// the way there.
+				await dialog.Msg(L("The demon waits by the altar for it to take it."));
 				return;
 			}
 
-			for (var i = 0; i < taken; ++i)
-				character.Quests.AddObjectiveProgress(Mq06, "lureDemons");
+			if (state == AllyStateDelivered)
+			{
+				await dialog.Msg(L("The altar is already taking this one."));
+				return;
+			}
+		}
+		else if (state != AllyStateFollowing)
+		{
+			if (demon.Vars.GetInt(QuestAlly.OwnerVar, 0) != 0)
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, LF("{0} is already following someone else.", demon.Name), 2);
+			else
+				await dialog.Msg(L("The demon is already walking to the altar."));
 
-			character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, LF("The altar took {0} of the demons you brought.", taken), 5);
-			character.LookAround();
+			return;
+		}
 
-			await Task.CompletedTask;
-		});
+		// Only the disguised may win a demon over, and only while the disguise
+		// is still on them.
+		if (!character.IsBuffActive(BuffId.CHAPLE576_MQ_06_1))
+		{
+			await dialog.Msg(L("The demon bares its teeth at you."));
+			return;
+		}
 
+		if (demon.Position.Get2DDistance(character.Position) > TalkRange)
+		{
+			await dialog.Msg(L("The demon is too far off to hear you. Get closer."));
+			return;
+		}
+
+		if (QuestAlly.Allies(character).Count() >= MaxPersuadedDemons)
+		{
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("You talked to too many demons.{nl}The little demon suspects you."), 5);
+			return;
+		}
+
+		var open = await dialog.Select(
+			L("It is nothing."),
+			Option(L("Say something"), "talk"),
+			Option(L("Walk away"), "leave")
+		);
+
+		if (open != "talk")
+			return;
+
+		var close = await dialog.Select(
+			L("It is nothing."),
+			Option(L("Persuade it"), "persuade"),
+			Option(L("Give up"), "leave")
+		);
+
+		if (close != "persuade")
+		{
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, LF("{0} walks off.", demon.Name), 2);
+			return;
+		}
+
+		if (QuestAlly.MakeAlly(demon, character) == null)
+		{
+			await dialog.Msg(L("The demon slips away before you can say anything."));
+			return;
+		}
+
+		character.PlayEffect("F_smoke019_dark", 1f);
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, LF("{0} has been successfully persuaded!{{nl}}Bring it to the Apsauga Altar", demon.Name), 3);
+		character.ServerMessage(L("Alright... Let's go"));
 	}
 
 	/// <summary>
@@ -554,13 +869,17 @@ public class DChapel576QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
-	/// Works the Demon Transform Scroll, which either turns the character
-	/// into a demon or turns one of the map's own demons over to their side.
+	/// Works the Demon Transform Scroll, which hides the character inside a
+	/// demon's skin so the church's demons will speak to them.
 	/// </summary>
+	/// <remarks>
+	/// The scroll is worked on the character and not on a demon. Winning a
+	/// demon over is done by talking to it while disguised.
+	/// </remarks>
 	[ScriptableFunction]
 	public ItemUseResult SCR_USE_CHAPLE576_MQ_06_ITEM(Character character, Item item, string strArg, float numArg1, float numArg2)
 	{
-		if (character.Map.ClassName != "d_chapel_57_6" || character.Layer != 0 || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
+		if (character.Map.ClassName != ChurchFirstFloor || character.Layer != 0 || !character.Quests.IsActive(Mq06) || character.Quests.IsCompletable(Mq06))
 		{
 			character.ServerMessage(L("There is no need to transform now."));
 			return ItemUseResult.OkayNotConsumed;
@@ -578,51 +897,17 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			return ItemUseResult.OkayNotConsumed;
 		}
 
-		var target = FindLureTarget(character);
-
-		if (target != null)
-		{
-			if (QuestFollower.MakeAlly(target, character) == null)
-			{
-				character.ServerMessage(L("The demon slips away from the scroll."));
-				return ItemUseResult.OkayNotConsumed;
-			}
-
-			character.PlayEffect("F_smoke019_dark", 1f);
-			character.ServerMessage(L(target.Name + L(" has been caught by the scroll and now follows you!{nl}Bring it to the Apsauga Altar.")));
-			return ItemUseResult.OkayNotConsumed;
-		}
+		// The disguise is worn in place of the character's own appearance, so
+		// a mount has to be put away first.
+		if (character.IsBuffActive(BuffId.RidingCompanion))
+			character.StopBuff(BuffId.RidingCompanion);
 
 		character.StopBuff(BuffId.CHAPLE576_MQ_06);
-		character.StartBuff(BuffId.CHAPLE576_MQ_06_1, 1, 0, TimeSpan.FromSeconds(100), character);
+		character.StartBuff(BuffId.CHAPLE576_MQ_06_1, 1, 0, DisguiseDuration, character);
 		character.PlayEffect("F_smoke019_dark", 1f);
-		character.ServerMessage(L("Transformed! Persuade Pawndel and Pawnd and lure them to the Apsauga Altar!"));
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("You have transformed!{nl}Lure Pawndel and Pawnd to the Apsauga Altar!"), 3);
 
-		return ItemUseResult.OkayNotConsumed;
-	}
-
-	/// <summary>
-	/// Returns the demon the character aimed the scroll at, or null when the
-	/// scroll was used on nothing a demon could be caught with.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	private static Mob FindLureTarget(Character character)
-	{
-		var handle = character.Variables.Temp.GetInt(Item.UseTargetVar, 0);
-		if (handle == 0 || !character.Map.TryGetMonster(handle, out var monster))
-			return null;
-
-		if (monster is not Mob mob || mob.IsDead || mob.Layer != character.Layer)
-			return null;
-
-		if (mob.Data.ClassName is not ("Pawndel" or "pawnd"))
-			return null;
-
-		if (!character.Position.InRange2D(mob.Position, 250))
-			return null;
-
-		return mob;
+		return ItemUseResult.Okay;
 	}
 }
 
