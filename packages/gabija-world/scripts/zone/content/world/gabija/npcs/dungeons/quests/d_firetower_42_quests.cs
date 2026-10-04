@@ -613,6 +613,7 @@ public class Ftower42Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8478);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 2nd Floor (1)"));
 		SetDescription(L("The Jewel of Prominence is what can help the goddess, and its shell is on this floor."));
 		SetType(QuestType.Main);
@@ -640,6 +641,7 @@ public class Ftower42Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8479);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 2nd Floor (2)"));
 		SetDescription(L("The empty jewel has to be filled, and the reading room leaks the Flame Vapor it wants."));
 		SetType(QuestType.Main);
@@ -666,6 +668,7 @@ public class Ftower42Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8480);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 2nd Floor (3)"));
 		SetDescription(L("The vapor in the jewel is let out again, and what is left behind is the Essence of Fire."));
 		SetType(QuestType.Main);
@@ -692,6 +695,7 @@ public class Ftower42Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8481);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 2nd Floor (4)"));
 		SetDescription(L("The jewel still wants Flame Sources, and the fire-bearing monsters of the floor carry them."));
 		SetType(QuestType.Main);
@@ -721,6 +725,7 @@ public class Ftower42Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8482);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 2nd Floor (5)"));
 		SetDescription(L("Everything the jewel needs goes into the Flame Fusion Machine at the west end of the floor."));
 		SetType(QuestType.Main);
@@ -747,6 +752,7 @@ public class Ftower42Sq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8504);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Flame Fusion Room Archon"));
 		SetDescription(L("Something had been left sitting over the Flame Fusion Machine."));
 		SetType(QuestType.Sub);
@@ -812,6 +818,7 @@ public class Ftower42Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17008);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Sealed Soul (1)"));
 		SetDescription(L("The stone in the forum is watched by a Golem that does not leave it."));
 		SetType(QuestType.Sub);
@@ -840,6 +847,7 @@ public class Ftower42Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17009);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Sealed Soul (2)"));
 		SetDescription(L("The next piece of the same soul is guarded by the floor's Experimental Slimes."));
 		SetType(QuestType.Sub);
@@ -866,6 +874,7 @@ public class Ftower42Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17010);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Sealed Soul (3)"));
 		SetDescription(L("The broken Holy Ark has to be put back together before the soul in the stone is let go."));
 		SetType(QuestType.Sub);

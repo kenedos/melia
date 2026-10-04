@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.Scripting;
@@ -20,12 +21,14 @@ using Melia.Zone.Scripting.Dialogues;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Actors.Characters.Components;
+using Melia.Zone.World.Actors.CombatEntities.Components;
 using Melia.Zone.World.Actors.Monsters;
 using Melia.Zone.World.Items;
 using Melia.Zone.World.Quests;
 using Melia.Zone.World.Quests.Objectives;
 using Melia.Zone.World.Quests.Prerequisites;
 using Melia.Zone.World.Quests.Rewards;
+using Yggdrasil.Logging;
 using static Melia.Zone.Scripting.Shortcuts;
 
 public class DChapel577QuestNpcsScript : GeneralScript
@@ -50,11 +53,34 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	private readonly static Position AukaAltar = new Position(-942, 0, -106);
 	private readonly static Position SanctuaryMural = new Position(801, 0, -1250);
 
-	private const int AlgisEscortModelId = 11281;
-	private readonly static ConcurrentDictionary<long, Mob> BellTowerEscorts = new();
+	private const float GestiCatchRange = 80;
+	private const float GestiWarnRange = 150;
+	private const float GestiPatrolSpeed = 30;
+	private const float GestiHallMaxHeight = 50;
+	private const float GestiCatchHpRate = 0.25f;
+	private const int GestiTickMilliseconds = 1000;
+	private const int GestiCatchDelayMilliseconds = 1500;
+
+	private readonly static Position GestiReleasePosition = new Position(-701, 35.92f, -937);
+	private readonly static Position[] GestiRoute =
+	{
+		new Position(-368.97f, 35.92f, 137.85f),
+		new Position(-352.22f, 35.92f, -354.39f),
+		new Position(221.01f, 35.92f, -350.36f),
+		new Position(200.83f, 35.92f, 180.60f),
+	};
+
+	private readonly ConcurrentDictionary<int, DateTime> _gestiWarnedUntil = new();
+	private readonly ConcurrentDictionary<int, byte> _gestiCatching = new();
+	private CancellationTokenSource _gestiPatrol;
 
 	protected override void Load()
 	{
+		// Roaming Gesti
+		//-------------------------------------------------------------------------
+		var gesti = AddConditionalNpc(147371, L("Demon Queen Gesti"), "CHAPLE577_GESTI", "d_chapel_57_7", -352.36, 35.92, 106.88, 0, IsGestiRoaming);
+		this.StartGestiPatrol(gesti);
+
 		// Follower Algis at the cathedral door
 		//-------------------------------------------------------------------------
 		AddConditionalNpc(147390, L("Follower Algis"), "CHAPLE577_ARUNE_01", "d_chapel_57_7", -634, -934, 81, c => c.Quests.HasCompleted(Chapel576Mq041) && !c.Quests.IsCompletable(Mq02) && !c.Quests.HasCompleted(Mq02), async dialog =>
@@ -97,7 +123,6 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 				{
 					character.Quests.Start(Mq02);
-					StartBellTowerEscort(character);
 				}
 
 				return;
@@ -113,10 +138,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("The Bell Tower is the best place to watch her from."));
-				if (!HasBellTowerEscort(character))
-					StartBellTowerEscort(character);
-				else
-					character.Quests.ReplayQuestTrack(Mq02);
+				character.Quests.ReplayQuestTrack(Mq02);
 				return;
 			}
 
@@ -135,7 +157,6 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02) && character.Quests.IsCompletable(Mq02))
 			{
 				await dialog.Msg(L("From here, we can see what Gesti is up to."));
-				StopBellTowerEscort(character);
 				await dialog.CompleteQuest(Mq02);
 				return;
 			}
@@ -233,12 +254,46 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				{
 					await dialog.Msg(L("I'll ring a bell to let you know when Gesti gets close, so please listen for it."));
 
-					for (var i = 1; i <= PillarCount; ++i)
-						character.Variables.Perm.Set(PillarVar + i, false);
-					for (var i = 1; i <= FragmentCount; ++i)
-						character.Variables.Perm.Set(FragmentVar + i, false);
-
 					character.Quests.Start(Mq04);
+				}
+				return;
+			}
+
+			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
+			{
+				await dialog.Msg(L("All preparations have been made."));
+				var answer = await dialog.SelectQuestOffer(Mq09, L("The barriers of the church will soon weaken Gesti."),
+					Option(L("I trust you"), "accept"),
+					Option(L("About the Divine Sphere"), "explain"),
+					Option(L("I'm not yet ready"), "leave")
+				);
+
+				if (answer == "explain")
+				{
+					await dialog.Msg(L("This Divine Sphere is a holy weapon that will be used to fight against Gesti in Nefritas Cliff."));
+					await dialog.Msg(L("It has been handed down since the times of the first Paladin."));
+					return;
+				}
+
+				if (answer == "accept")
+					character.Quests.Start(Mq09);
+
+				return;
+			}
+
+			if (!character.Quests.Has(Mq10) && character.Quests.MeetsPrerequisites(Mq10))
+			{
+				await dialog.Msg(L("So you found the Seal of Space."));
+				var answer = await dialog.SelectQuestOffer(Mq10, L("Honestly, I did not believe it when my friend, the Paladin Master, said a Savior would come."),
+					Option(L("I'll go there"), "accept"),
+					Option(L("There is still more to do"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					await dialog.Msg(L("When you find the revelation, tell the Paladin Master of the story you've been through so far."));
+					await dialog.Msg(L("He must be the one most anxious about it."));
+					character.Quests.Start(Mq10);
 				}
 				return;
 			}
@@ -289,49 +344,24 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Mq09) && character.Quests.MeetsPrerequisites(Mq09))
-			{
-				await dialog.Msg(L("All preparations have been made."));
-				var answer = await dialog.SelectQuestOffer(Mq09, L("The barriers of the church will soon weaken Gesti."),
-					Option(L("I trust you"), "accept"),
-					Option(L("About the Divine Sphere"), "explain"),
-					Option(L("I'm not yet ready"), "leave")
-				);
-
-				if (answer == "explain")
-				{
-					await dialog.Msg(L("This Divine Sphere is a holy weapon that will be used to fight against Gesti in Nefritas Cliff."));
-					await dialog.Msg(L("It has been handed down since the times of the first Paladin."));
-					return;
-				}
-
-				if (answer == "accept")
-					character.Quests.Start(Mq09);
-
-				return;
-			}
-
-			if (!character.Quests.Has(Mq10) && character.Quests.MeetsPrerequisites(Mq10))
-			{
-				await dialog.Msg(L("So you found the Seal of Space."));
-				var answer = await dialog.SelectQuestOffer(Mq10, L("Honestly, I did not believe it when my friend, the Paladin Master, said a Savior would come."),
-					Option(L("I'll go there"), "accept"),
-					Option(L("There is still more to do"), "leave")
-				);
-
-				if (answer == "accept")
-				{
-					await dialog.Msg(L("When you find the revelation, tell the Paladin Master of the story you've been through so far."));
-					await dialog.Msg(L("He must be the one most anxious about it."));
-					character.Quests.Start(Mq10);
-				}
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq03))
 			{
 				await dialog.Msg(L("The Seal of Space is at the Sventove Central Altar. Move quietly."));
 				character.Quests.ReplayQuestTrack(Mq03);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq09))
+			{
+				await dialog.Msg(L("Gesti is trapped. Hold her while the Divine Sphere charges."));
+				character.Quests.ReplayQuestTrack(Mq09);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq10))
+			{
+				await dialog.Msg(L("The sanctuary is behind the seal. Find the revelation."));
+				character.Quests.ClearQuestTrack(Mq10);
 				return;
 			}
 
@@ -359,20 +389,6 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq07))
 			{
 				await dialog.Msg(L("Clean the Egnomes out of the Atgaila Chapel."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq09))
-			{
-				await dialog.Msg(L("Gesti is trapped. Hold her while the Divine Sphere charges."));
-				character.Quests.ReplayQuestTrack(Mq09);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq10))
-			{
-				await dialog.Msg(L("The sanctuary is behind the seal. Find the revelation."));
-				character.Quests.ClearQuestTrack(Mq10);
 				return;
 			}
 
@@ -488,6 +504,138 @@ public class DChapel577QuestNpcsScript : GeneralScript
 	}
 
 	/// <summary>
+	/// Stops the patrol of the roaming Gesti before the script is reloaded.
+	/// </summary>
+	public override void Dispose()
+	{
+		_gestiPatrol?.Cancel();
+		base.Dispose();
+	}
+
+	/// <summary>
+	/// Returns true while Gesti roams the central hall for the character.
+	/// </summary>
+	private static bool IsGestiRoaming(Character character)
+		=> character.Quests.HasCompleted(Mq03) && !character.Quests.IsCompletable(Mq09) && !character.Quests.HasCompleted(Mq09);
+
+	/// <summary>
+	/// Sets Gesti up to walk the loop around the central hall.
+	/// </summary>
+	private void StartGestiPatrol(Npc gesti)
+	{
+		if (gesti == null)
+			return;
+
+		gesti.AllowMovement = true;
+		gesti.Properties.SetFloat(PropertyName.WlkMSPD, GestiPatrolSpeed);
+		gesti.Properties.SetFloat(PropertyName.RunMSPD, GestiPatrolSpeed);
+		gesti.Properties.SetFloat(PropertyName.MSPD, GestiPatrolSpeed);
+		gesti.Components.Add(new MovementComponent(gesti));
+
+		_gestiPatrol = new CancellationTokenSource();
+		_ = this.RunGestiPatrolAsync(gesti, _gestiPatrol.Token);
+	}
+
+	/// <summary>
+	/// Walks Gesti along her route and watches the characters near her.
+	/// </summary>
+	private async Task RunGestiPatrolAsync(Npc gesti, CancellationToken cancel)
+	{
+		var next = 0;
+
+		while (!cancel.IsCancellationRequested)
+		{
+			try
+			{
+				if (gesti.Map == null || !gesti.Components.TryGet<MovementComponent>(out var movement))
+					return;
+
+				if (!movement.IsMoving)
+				{
+					var random = GameRandom.Get();
+					var waypoint = GestiRoute[next];
+					next = (next + 1) % GestiRoute.Length;
+
+					movement.MoveStraight(new Position(waypoint.X + random.Next(-20, 21), waypoint.Y, waypoint.Z + random.Next(-20, 21)));
+				}
+
+				foreach (var character in gesti.Map.GetCharacters())
+					this.WatchForGesti(gesti, character);
+
+				await Task.Delay(GestiTickMilliseconds, cancel);
+			}
+			catch (OperationCanceledException)
+			{
+				return;
+			}
+			catch (Exception ex)
+			{
+				Log.Error("Chaple577: Error while Gesti roams the central hall: {0}", ex);
+			}
+		}
+	}
+
+	/// <summary>
+	/// Rings the bell when Gesti gets close and catches a character she reaches.
+	/// </summary>
+	private void WatchForGesti(Npc gesti, Character character)
+	{
+		if (character.Layer != 0 || character.IsDead || character.Position.Y >= GestiHallMaxHeight || !IsGestiRoaming(character))
+			return;
+
+		var distance = character.Position.Get2DDistance(gesti.Position);
+
+		if (distance <= GestiCatchRange)
+		{
+			_ = this.CatchByGestiAsync(gesti, character);
+			return;
+		}
+
+		if (distance > GestiWarnRange)
+			return;
+
+		if (_gestiWarnedUntil.TryGetValue(character.Handle, out var until) && until > GameClock.LocalNow)
+			return;
+
+		_gestiWarnedUntil[character.Handle] = GameClock.LocalNow.AddSeconds(8);
+		character.PlaySound("chapel_bell_sound_01");
+		character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("Gesti is nearby{nl}Be careful not to get caught!"), 3);
+	}
+
+	/// <summary>
+	/// Sends a character Gesti caught back to Follower Algis at the cathedral door.
+	/// </summary>
+	private async Task CatchByGestiAsync(Npc gesti, Character character)
+	{
+		if (!_gestiCatching.TryAdd(character.Handle, 0))
+			return;
+
+		try
+		{
+			character.TimeActions.End(TimeActionResult.Cancelled);
+			character.AddonMessage(AddonMessage.NOTICE_Dm_Exclaimation, L("So, the Revelator has come here to die."), 3);
+			gesti.PlayEffect("F_spread_out004_dark", 1.5f);
+			character.PlayEffect("F_spread_out004_dark", 1f);
+
+			await Task.Delay(GestiCatchDelayMilliseconds);
+
+			if (character.Map != gesti.Map || character.Layer != 0)
+				return;
+
+			var remainingHp = Math.Max(1, (int)(character.MaxHp * GestiCatchHpRate));
+			if (character.Hp > remainingHp)
+				character.ModifyHp(remainingHp - character.Hp);
+
+			character.Warp(character.Map.ClassName, GestiReleasePosition);
+			character.ServerMessage(L("You barely managed to run away!"));
+		}
+		finally
+		{
+			_gestiCatching.TryRemove(character.Handle, out _);
+		}
+	}
+
+	/// <summary>
 	/// Drinks the Small Potion of Light, which keeps the demons from attacking for a while.
 	/// </summary>
 	[ScriptableFunction]
@@ -545,95 +693,6 @@ public class DChapel577QuestNpcsScript : GeneralScript
 		character.Quests.StartQuestTrack(Mq10);
 	}
 
-	/// <summary>
-	/// Puts a Follower Algis on the character's heels for the walk from the
-	/// cathedral door to the Bell Tower. He stands on the base layer, so the
-	/// cutscene and the fight at the tower never show a second one.
-	/// </summary>
-	/// <param name="character"></param>
-	private static void StartBellTowerEscort(Character character)
-	{
-		StopBellTowerEscort(character);
-
-		if (character.Map?.ClassName != "d_chapel_57_7" || character.Layer != 0)
-			return;
-
-		if (!ZoneServer.Instance.Data.MonsterDb.TryFind(AlgisEscortModelId, out var data))
-			return;
-
-		var position = character.Position.GetRelative(character.Direction, 60);
-		if (character.Map.Ground.TryGetHeightAt(position, out var height))
-			position.Y = height;
-
-		var escort = new Mob(data.Id, RelationType.Friendly);
-		escort.Name = L("Follower Algis");
-		escort.Position = position;
-		escort.SpawnPosition = position;
-		escort.Direction = character.Direction;
-		escort.Layer = character.Layer;
-		escort.SetVisibilty(ActorVisibility.Individual, character.ObjectId);
-		escort.AssociatedHandle = character.Handle;
-
-		// He walks the length of the central hall, so he has to survive it.
-		var overrides = new PropertyOverrides();
-		overrides["Lv"] = 41;
-		overrides["MHP"] = 20000;
-		overrides["WlkMSPD"] = 110;
-		overrides["RunMSPD"] = 170;
-		escort.ApplyOverrides(overrides);
-
-		character.Map.AddMonster(escort, immediate: true);
-
-		if (QuestAlly.MakeAlly(escort, character) == null)
-			return;
-
-		BellTowerEscorts[character.ObjectId] = escort;
-		character.LookAround();
-	}
-
-	/// <summary>
-	/// Takes the character's Follower Algis off the map.
-	/// </summary>
-	/// <param name="character"></param>
-	private static void StopBellTowerEscort(Character character)
-	{
-		if (!BellTowerEscorts.TryRemove(character.ObjectId, out var escort))
-			return;
-
-		if (escort.Map != null)
-			escort.Map.RemoveMonster(escort);
-
-		character.LookAround();
-	}
-
-	/// <summary>
-	/// Returns whether the character's Follower Algis is still walking with him.
-	/// </summary>
-	/// <param name="character"></param>
-	/// <returns></returns>
-	private static bool HasBellTowerEscort(Character character)
-		=> BellTowerEscorts.TryGetValue(character.ObjectId, out var escort) && escort.Map != null && !escort.IsDead;
-
-	/// <summary>
-	/// Sends a returning character back to the Bell Tower with Algis.
-	/// </summary>
-	[On("PlayerEnteredMap")]
-	public void OnPlayerEnteredMap(object sender, PlayerEventArgs args)
-	{
-		var character = args.Character;
-
-		if (character.Map?.ClassName != "d_chapel_57_7" || character.Layer != 0)
-			return;
-
-		if (!character.Quests.IsActive(Mq02))
-		{
-			StopBellTowerEscort(character);
-			return;
-		}
-
-		if (!HasBellTowerEscort(character))
-			StartBellTowerEscort(character);
-	}
 
 	/// <summary>
 	/// Adds one of the altar fragments scattered around the Sventove Central Hall.
@@ -652,7 +711,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			if (!character.Quests.IsActive(Mq04) || character.Variables.Perm.GetBool(FragmentVar + number, false))
 				return;
 
-			var collected = await character.TimeActions.StartAsync(L("Collecting"), L("Cancel"), "SITGROPESET2", TimeSpan.FromSeconds(2));
+			var collected = await character.TimeActions.StartAsync(L("Collecting"), L("Cancel"), "#SITGROPESET2", TimeSpan.FromSeconds(2));
 
 			if (collected != TimeActionResult.Completed)
 				return;
@@ -661,6 +720,21 @@ public class DChapel577QuestNpcsScript : GeneralScript
 			character.Inventory.Add(ItemId.CHAPLE577_MQ_03_ITEM, 1, InventoryAddType.PickUp);
 			character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've collected an altar fragment{nl}Insert it into one of the central pillars"), 3);
 		}).WithEffect("I_spread_out001_light", 1.5f, EffectLocation.Bottom).WithEffect("F_levitation022_light", 0.5f, EffectLocation.Bottom);
+	}
+
+	/// <summary>
+	/// Clears the character's fragment and pillar progress of the Sventove trap.
+	/// </summary>
+	public static void ResetPillarTrap(Character character)
+	{
+		for (var i = 1; i <= PillarCount; ++i)
+			character.Variables.Perm.Set(PillarVar + i, false);
+		for (var i = 1; i <= FragmentCount; ++i)
+			character.Variables.Perm.Set(FragmentVar + i, false);
+
+		var leftover = character.Inventory.CountItem(ItemId.CHAPLE577_MQ_03_ITEM);
+		if (leftover > 0)
+			character.Inventory.Remove(ItemId.CHAPLE577_MQ_03_ITEM, leftover, InventoryItemRemoveMsg.Destroyed);
 	}
 
 	/// <summary>
@@ -712,7 +786,7 @@ public class DChapel577QuestNpcsScript : GeneralScript
 		character.Inventory.Remove(ItemId.CHAPLE577_MQ_03_ITEM, 1, InventoryItemRemoveMsg.Given);
 		character.Variables.Perm.Set(PillarVar + number, true);
 		character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("You've inserted the fragment"), 3);
-		character.Quests.AddObjectiveProgress(Mq04, "insertPillars");
+		character.Quests.CompleteObjective(Mq04, "pillar" + number);
 	}
 }
 
@@ -727,6 +801,7 @@ public class Chaple577Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8528);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Gesti's Plan"));
 		SetDescription(L("Watch Gesti from the cathedral door and learn what she is after."));
 		SetType(QuestType.Main);
@@ -753,6 +828,7 @@ public class Chaple577Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8529);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recapture the Bell Tower"));
 		SetDescription(L("Occupy the Bell Tower, a good observation point over Gesti."));
 		SetType(QuestType.Main);
@@ -781,6 +857,7 @@ public class Chaple577Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8530);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Stolen Seal of Space"));
 		SetDescription(L("Gesti destroys the Sventove Central Altar and takes the Seal of Space."));
 		SetType(QuestType.Main);
@@ -807,6 +884,7 @@ public class Chaple577Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8531);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Cat and Mouse"));
 		SetDescription(L("Insert the altar fragments into the eight pillars of Sventove Central Hall."));
 		SetType(QuestType.Main);
@@ -820,9 +898,25 @@ public class Chaple577Mq04Quest : QuestScript
 
 		AddPrerequisite(new QuestStatusPrerequisite(8530, QuestStatus.Completed));
 
-		AddObjective("insertPillars", L("Make a trap at Sventove Central Hall"), new ManualObjective(8));
+		for (var i = 1; i <= 8; ++i)
+			AddObjective("pillar" + i, LF("Insert a fragment to the central pillar ({0})", i), new ManualObjective());
 
 		AddReward(new ItemReward("expCard3", 2));
+		AddReward(new TakeItemReward("CHAPLE577_MQ_03_ITEM", -1));
+	}
+
+	public override void OnStart(Character character, Quest quest)
+	{
+		base.OnStart(character, quest);
+		DChapel577QuestNpcsScript.ResetPillarTrap(character);
+		character.LookAround();
+	}
+
+	public override void OnCancel(Character character, Quest quest)
+	{
+		base.OnCancel(character, quest);
+		DChapel577QuestNpcsScript.ResetPillarTrap(character);
+		character.LookAround();
 	}
 }
 
@@ -833,6 +927,7 @@ public class Chaple577Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8532);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Malda Altar"));
 		SetDescription(L("Activate the Malda Altar to lure the demons to their demise."));
 		SetType(QuestType.Sub);
@@ -860,6 +955,7 @@ public class Chaple577Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8533);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Auka Altar"));
 		SetDescription(L("Charge the Auka Altar and shift the demons' attention to it."));
 		SetType(QuestType.Sub);
@@ -888,6 +984,7 @@ public class Chaple577Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8534);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Cleaning the Church"));
 		SetDescription(L("Defeat the Egnomes wandering inside the church."));
 		SetType(QuestType.Sub);
@@ -915,6 +1012,7 @@ public class Chaple577Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8536);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Trapped Gesti"));
 		SetDescription(L("Gesti is weakened by the central altar. Hold her while the Divine Sphere charges."));
 		SetType(QuestType.Main);
@@ -944,6 +1042,7 @@ public class Chaple577Mq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8537);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Hidden Sanctum's Revelation (1)"));
 		SetDescription(L("Use the Seal of Space on the pillar and take the revelation from the sanctuary."));
 		SetType(QuestType.Main);

@@ -852,6 +852,7 @@ public class Katyn10Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30049);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Messenger Running Away"));
 		SetDescription(L("Mardas told you to run because the surrounding areas are filled with demons. Go to Bastymosi Field and see what's really happening."));
 		SetType(QuestType.Main);
@@ -883,6 +884,7 @@ public class Katyn10Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30050);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Following the Light"));
 		SetDescription(L("Mardas says that the demons are gathering the light bead and getting them to somewhere else. Follow the light bead."));
 		SetType(QuestType.Main);
@@ -922,6 +924,7 @@ public class Katyn10Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30051);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Owl Sculpture in Danger"));
 		SetDescription(L("The light beads were delivered to the Owl Sculptures on top of a slope. Turn around and follow them to Bonewide Cliff."));
 		SetType(QuestType.Main);
@@ -952,6 +955,7 @@ public class Katyn10Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30052);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recover the Karolis Altar (1)"));
 		SetDescription(L("To save the Owl Sculptures possessed by the demons you must restore the energy of Karolis Forest. To do that, you'll have to reconstruct the Karolis Altar destroyed by the demons. Follow the will of the leading owls and find the Karolis Altar Crystal."));
 		SetType(QuestType.Main);
@@ -992,6 +996,7 @@ public class Katyn10Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30053);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recover the Karolis Altar (2)"));
 		SetDescription(L("The monsters have the fragments from the broken Karolis Altar. Defeat the monsters that have the fragments and collect them all."));
 		SetType(QuestType.Main);
@@ -1033,6 +1038,7 @@ public class Katyn10Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30054);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recover the Karolis Altar (3)"));
 		SetDescription(L("Restore the altar on the remains of the altar."));
 		SetType(QuestType.Main);
@@ -1062,6 +1068,7 @@ public class Katyn10Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30055);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Altar of the Forest"));
 		SetDescription(L("To spread out the forest's divine force, you need to find and light up all of Karolis' light rays. Hurry and light up all four of Karolis' rays before their light dies out."));
 		SetType(QuestType.Main);
@@ -1089,6 +1096,7 @@ public class Katyn10Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30056);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Gather the Strength of the Owl (1)"));
 		SetDescription(L("The Owl Chief Sculpture says that to ensure the utter destruction of the Mind Control Tower, the collected power from the Owl Sculptures are needed. Find the owl sculptures and get their power."));
 		SetType(QuestType.Main);
@@ -1116,6 +1124,7 @@ public class Katyn10Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30057);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Gather the Strength of the Owl (2)"));
 		SetDescription(L("Destroy the Mind Control Tower at Duoklu Hall with the power of the Owl Sculptures."));
 		SetType(QuestType.Main);
@@ -1143,6 +1152,7 @@ public class Katyn10Mq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30058);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Another Owl"));
 		SetDescription(L("Mardas is with the Owl Chief Sculpture. Listen to what he was saying."));
 		SetType(QuestType.Main);
@@ -1173,6 +1183,7 @@ public class Katyn10Mq11Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30059);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Energy of Karolis Springs"));
 		SetDescription(L("To save the Guide Owl Sculptures at Letas Stream, go to the birthplace of Karolis, where the energy of Karolis Springs is stronger, and collect that energy."));
 		SetType(QuestType.Main);
@@ -1214,6 +1225,7 @@ public class Katyn10Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30071);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Chest Locked By A Spell"));
 		SetDescription(L("The chest is locked with an unknown force. Defeat some monsters around it to fill the chest with magic."));
 		SetType(QuestType.Sub);
@@ -1243,6 +1255,7 @@ public class Katyn10Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60164);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Spirit-carrying Monster"));
 		SetDescription(L("The Gloomy Owl sculpture says that the monsters near Duokliu Hall have swallowed all of the spirits it is supposed to lead. Find and deal with the monsters that have swallowed the spirits to free them."));
 		SetType(QuestType.Repeat);

@@ -923,6 +923,7 @@ public class Rokas30Mq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20189);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rexipher, the Missing Historian (1)"));
 		SetDescription(L("Rexipher walked off with the symbols. Ask Liaison Officer Bale at King's Plateau who he was."));
 		SetType(QuestType.Main);
@@ -947,6 +948,7 @@ public class Rokas30Mq1BridgeQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20150);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rexipher, the Missing Historian (2)"));
 		SetDescription(L("Bale has never heard the name. Ask the historians instead."));
 		SetType(QuestType.Main);
@@ -971,6 +973,7 @@ public class Rokas30Mq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20190);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Rexipher's Identity"));
 		SetDescription(L("Cyrenia Odell knows the name Rexipher, but not as a historian."));
 		SetType(QuestType.Main);
@@ -1003,6 +1006,7 @@ public class Rokas30Mq2SubQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19350);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The dead body of the mercenary who has fallen"));
 		SetDescription(L("The Hogma that killed the mercenary are still on the road he fell on."));
 		SetType(QuestType.Sub);
@@ -1027,6 +1031,7 @@ public class Rokas30Mq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20191);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rexipher's True Colors (1)"));
 		SetDescription(L("A man wearing Rexipher's face is taking the altars of the Royal Mausoleum one by one."));
 		SetType(QuestType.Main);
@@ -1067,6 +1072,7 @@ public class Rokas30Mq5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20193);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rexipher's True Colors (2)"));
 		SetDescription(L("The Chesed Altar is gone. Wake the Gedulah Altar before Rexipher reaches it."));
 		SetType(QuestType.Main);
@@ -1093,6 +1099,7 @@ public class Rokas30Mq6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20194);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rexipher's True Colors (3)"));
 		SetDescription(L("The Tzedej Altar is next, and the Hogma statues around it are not statues."));
 		SetType(QuestType.Main);
@@ -1121,6 +1128,7 @@ public class Rokas30Mq6SubQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19360);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Tzedej Altar"));
 		SetDescription(L("The Tzedej Altar has never been woken, and the statues around it are waiting for whoever tries."));
 		SetType(QuestType.Sub);
@@ -1147,6 +1155,7 @@ public class Rokas30Mq7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20195);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rexipher's True Colors (4)"));
 		SetDescription(L("The Sviesa Altar is the last one still asleep. Wake it first."));
 		SetType(QuestType.Main);
@@ -1184,6 +1193,7 @@ public class Rokas30Mq8Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20196);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rexipher's True Colors (5)"));
 		SetDescription(L("Cyrenia Odell came up to the Sviesa Altar, and so did Rexipher."));
 		SetType(QuestType.Main);
@@ -1219,6 +1229,7 @@ public class Rokas30Hq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9110);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Colin's Favor"));
 		SetDescription(L("Colin wants an oration burned for the explorers who died in this valley."));
 		SetType(QuestType.Sub);
@@ -1245,6 +1256,7 @@ public class Rokas30Pipoti1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1053);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Stonemason Pipoti's Friend"));
 		SetDescription(L("Pipoti's colleague went into the Forest of Fireflies and never came back out."));
 		SetType(QuestType.Sub);
@@ -1274,6 +1286,7 @@ public class Rokas30Pipoti2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1054);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Treasure Map of the Stonemason's Family (1)"));
 		SetDescription(L("The first mark on the map is a locked chest with Yonazolem beside it."));
 		SetType(QuestType.Sub);
@@ -1305,6 +1318,7 @@ public class Rokas30Pipoti3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1055);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Treasure Map of the Stonemason's Family (2)"));
 		SetDescription(L("The second mark on the map, with Hogma Scouts already standing on it."));
 		SetType(QuestType.Sub);
@@ -1333,6 +1347,7 @@ public class Rokas30Pipoti4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1056);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Treasure Map of the Stonemason's Family (3)"));
 		SetDescription(L("The third mark on the map, and another empty chest to reach."));
 		SetType(QuestType.Sub);
@@ -1361,6 +1376,7 @@ public class Rokas30Pipoti5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1057);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Treasure Map of the Stonemason's Family (4)"));
 		SetDescription(L("The last mark on the map, and a Werewolf on the ridge above it."));
 		SetType(QuestType.Sub);

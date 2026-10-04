@@ -559,6 +559,7 @@ public class Zacha2fMq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20164);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Words of the King"));
 		SetDescription(L("The guardians broke the Royal Slate and are hoarding the pieces."));
 		SetType(QuestType.Main);
@@ -589,6 +590,7 @@ public class Zacha2fMq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20165);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Trick of the Demon (1)"));
 		SetDescription(L("A guardian out of its mind is trying to break the floor's stone lanterns."));
 		SetType(QuestType.Main);
@@ -619,6 +621,7 @@ public class Zacha2fMq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20184);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Trick of the Demon (2)"));
 		SetDescription(L("Rexipher breaks the lanterns himself and goes down to the third floor."));
 		SetType(QuestType.Main);
@@ -657,6 +660,7 @@ public class Zacha2fMq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20185);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Friend or Foe Error"));
 		SetDescription(L("The Echad of the upper gallery are cutting down anything that moves, their own included."));
 		SetType(QuestType.Sub);
@@ -685,6 +689,7 @@ public class Zacha2fMq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20186);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Deviated Guardian"));
 		SetDescription(L("Shnayim reads the Revelator as the intruder and holds the deep hall against them."));
 		SetType(QuestType.Sub);
@@ -714,6 +719,7 @@ public class Zacha2fSq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8433);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hidden Place (1)"));
 		SetDescription(L("The guardians' hidden energy opens the secret door of the west gallery."));
 		SetType(QuestType.Sub);
@@ -749,6 +755,7 @@ public class Zacha2fSq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8434);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hidden Place (2)"));
 		SetDescription(L("Tomb Lord stands between the secret door and what the Royal Family hid behind it."));
 		SetType(QuestType.Sub);
@@ -779,6 +786,7 @@ public class Zacha2fSq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8435);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Emergency (1)"));
 		SetDescription(L("The demons cut the regulatory magic source. The guardians of the gallery still carry some."));
 		SetType(QuestType.Sub);
@@ -807,6 +815,7 @@ public class Zacha2fSq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8436);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Emergency (2)"));
 		SetDescription(L("The gathered magic goes back into the mausoleum through its stone lantern."));
 		SetType(QuestType.Sub);
@@ -845,6 +854,7 @@ public class Zacha2fSq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8437);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Emergency (3)"));
 		SetDescription(L("The Magic Vessels have to hold until the regulatory magic flows again."));
 		SetType(QuestType.Sub);
@@ -873,6 +883,7 @@ public class Zacha33Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60172);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Protect the Royal Mausoleum"));
 		SetDescription(L("The essence out of the tainted guardians slows what is eating the mausoleum."));
 		SetType(QuestType.Repeat);

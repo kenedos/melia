@@ -828,6 +828,7 @@ public class Cathedral54Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20310);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Secret of the Machine"));
 		SetDescription(L("Maven built machines as well as chapels, and the demons never learned to read them."));
 		SetType(QuestType.Main);
@@ -855,6 +856,7 @@ public class Cathedral54Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20311);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Maven's Device (2)"));
 		SetDescription(L("The bishop has something urgent to say, and he says it at Uola Chapel."));
 		SetType(QuestType.Main);
@@ -880,6 +882,7 @@ public class Cathedral54Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20312);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Critical Situation"));
 		SetDescription(L("Naktis' servants reached the Holy Symbol of Spiritual Power first."));
 		SetType(QuestType.Main);
@@ -909,6 +912,7 @@ public class Cathedral54Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20313);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Karuna Altar Key"));
 		SetDescription(L("The symbol is empty of power, and the demons are full of it."));
 		SetType(QuestType.Main);
@@ -937,6 +941,7 @@ public class Cathedral54Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20314);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Dusty Old Books"));
 		SetDescription(L("Everything written about Naktis is on the floor of the reading room."));
 		SetType(QuestType.Sub);
@@ -964,6 +969,7 @@ public class Cathedral54Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20315);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Eyes Off for a Moment"));
 		SetDescription(L("The report Yosana owed Aden is inside a Stoulet somewhere."));
 		SetType(QuestType.Sub);
@@ -994,6 +1000,7 @@ public class Cathedral54Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20316);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("More and More"));
 		SetDescription(L("The reagent needs solvent, and the solvent has to be taken out of demons."));
 		SetType(QuestType.Sub);
@@ -1023,6 +1030,7 @@ public class Cathedral54Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20317);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Tremendous Effects"));
 		SetDescription(L("Priest Daram's reagent has never been tried on anything that could object."));
 		SetType(QuestType.Sub);
@@ -1050,6 +1058,7 @@ public class Cathedral54Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20318);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Surprise Attack"));
 		SetDescription(L("Riteris comes for the Karuna Altar the moment its key is gone."));
 		SetType(QuestType.Sub);
@@ -1079,6 +1088,7 @@ public class Cathedral56Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20329);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Adapting to Circumstances (1)"));
 		SetDescription(L("The fourth key cannot be taken honestly, so the bishop stops trying to."));
 		SetType(QuestType.Main);
@@ -1106,6 +1116,7 @@ public class Cathedral54Mq06Part3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20341);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Bishop's Last Mission (2)"));
 		SetDescription(L("The Revelation of the Great Cathedral, and the last thing Aurelius stayed for."));
 		SetType(QuestType.Main);
@@ -1138,6 +1149,7 @@ public class CathedralToVelniasprisonQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50027);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Demon Prison District 1"));
 		SetDescription(L("The Revelation of the Great Cathedral names the Fortress of the Land, and the road to it runs through Gytis."));
 		SetType(QuestType.Main);

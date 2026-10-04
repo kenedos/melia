@@ -839,6 +839,7 @@ public class FCastle651Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70400);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A New Plot"));
 		SetDescription(L("After hearing that you're a Revelator, Mage Melchioras seems to want to tell you something. Listen to what he has to say."));
 		SetType(QuestType.Main);
@@ -865,6 +866,7 @@ public class FCastle651Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70401);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Investigating the Protection Cast"));
 		SetDescription(L("You have decided to help Melchioras. Visit the spots marked on the map and use the compass to find the objects under the protection spell. The compass is activated only near the cast."));
 		SetType(QuestType.Main);
@@ -893,6 +895,7 @@ public class FCastle651Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70402);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("All For a Bigger Blow"));
 		SetDescription(L("According to Mihail, they need more magic concentration orbs to blast the Magic Power Supply Device. Defeat demons to charge the orbs."));
 		SetType(QuestType.Main);
@@ -923,6 +926,7 @@ public class FCastle651Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70403);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Starting in the Area"));
 		SetDescription(L("Mage Melchioras has asked you to dispel the protection spell placed north of the Amjene Sanctum. Use the amulet on the objects protected by the cast to release it."));
 		SetType(QuestType.Main);
@@ -985,6 +989,7 @@ public class FCastle651Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70405);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preparations Complete"));
 		SetDescription(L("Melchioras wants to meet up at Delmore Manor, where the Kruvina device is located. Join Mage Melchioras at Delmore Manor."));
 		SetType(QuestType.Main);
@@ -1009,6 +1014,7 @@ public class FCastle651Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70406);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Evidence in Ruins"));
 		SetDescription(L("Follower Andrea is looking to obtain information on Pag Amplers. Defeat Pag Amplers and collect any data you can from them."));
 		SetType(QuestType.Sub);
@@ -1070,6 +1076,7 @@ public class FCastle651Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70408);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Be Considerate to the Next Person"));
 		SetDescription(L("Follower Nuodas believes that clearing out some demons will probably help the residents of Delmore Castle. Defeat nearby demons."));
 		SetType(QuestType.Sub);
@@ -1097,6 +1104,7 @@ public class FCastle651Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70409);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reutilizing Resources"));
 		SetDescription(L("Follower Nuodas thinks the Revelators waste too many arrows. Defeat Charcoal Walkers and collect any arrows that can still be used."));
 		SetType(QuestType.Sub);

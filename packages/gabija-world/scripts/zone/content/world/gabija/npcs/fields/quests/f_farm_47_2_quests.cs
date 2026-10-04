@@ -979,6 +979,7 @@ public class Farm472Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40280);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unexpected Discovery (1)"));
 		SetDescription(L("Something shaped like a statue's head lies half buried beside the aqueduct road."));
 		SetType(QuestType.Sub);
@@ -1005,6 +1006,7 @@ public class Farm472Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40290);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unexpected Discovery (2)"));
 		SetDescription(L("An old chest stands in the field, and it will not open without breaking."));
 		SetType(QuestType.Sub);
@@ -1068,6 +1070,7 @@ public class Farm472Sq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40310);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unexpected Discovery (4)"));
 		SetDescription(L("The carved wing standing out of the ground belongs to the Corrupted wearing it."));
 		SetType(QuestType.Sub);
@@ -1098,6 +1101,7 @@ public class Farm472Sq045Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40315);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reading the Clue"));
 		SetDescription(L("Joana recognises the statue the four fragments make up."));
 		SetType(QuestType.Sub);
@@ -1135,6 +1139,7 @@ public class Farm472Sq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40320);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Irregular Stone Statue"));
 		SetDescription(L("Joana means to glue the statue back together, and wants sap off the monsters for it."));
 		SetType(QuestType.Sub);
@@ -1165,6 +1170,7 @@ public class Farm472Sq060Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40330);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Blessing After All"));
 		SetDescription(L("Joana wants the strange aura near Ramus Crossroads tested on a monster."));
 		SetType(QuestType.Sub);
@@ -1192,6 +1198,7 @@ public class Farm472Sq070Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40340);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Positive Evidence (1)"));
 		SetDescription(L("Varas' woodpile will not burn the magic circle without kindling that burns hard."));
 		SetType(QuestType.Sub);
@@ -1225,6 +1232,7 @@ public class Farm472Sq080Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40350);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Positive Evidence (2)"));
 		SetDescription(L("The remaining circles will come down faster with the goddess' own power, and Joana has a statue."));
 		SetType(QuestType.Sub);
@@ -1252,6 +1260,7 @@ public class Farm472Sq081Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40351);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Positive Evidence (3)"));
 		SetDescription(L("Set the Goddess Statue on the Tylila Path circle, then see what the field does."));
 		SetType(QuestType.Sub);
@@ -1280,6 +1289,7 @@ public class Farm472Sq090Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40360);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Restoring Willpower!"));
 		SetDescription(L("The monsters dragged Jugas' grain off, and the farm rent is still owed."));
 		SetType(QuestType.Repeat);
@@ -1309,6 +1319,7 @@ public class Vprison511MqPre01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60000);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Place Unreachable (1)"));
 		SetDescription(L("The portal mage at the restricted area is carrying the Demon Lord Hauberk, who has an offer."));
 		SetType(QuestType.Main);
@@ -1334,6 +1345,7 @@ public class Vprison511MqPre02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60001);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Place Unreachable (2)"));
 		SetDescription(L("Carry Hauberk's seal through the portal and into the first district of the Demon Prison."));
 		SetType(QuestType.Main);

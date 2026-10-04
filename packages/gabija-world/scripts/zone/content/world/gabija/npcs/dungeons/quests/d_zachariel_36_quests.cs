@@ -542,6 +542,7 @@ public class Zacha5fMq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8388);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Guardian's Jar (1)"));
 		SetDescription(L("The Medakia of the lower hall carry the mausoleum's own magic sources."));
 		SetType(QuestType.Main);
@@ -571,6 +572,7 @@ public class Zacha5fMq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8389);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Guardian's Jar (2)"));
 		SetDescription(L("Poured into the charged cubes, the sources make a false revelation for the demon to take."));
 		SetType(QuestType.Main);
@@ -597,6 +599,7 @@ public class Zacha5fMq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8390);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Guardian's Jar (3)"));
 		SetDescription(L("The soul pot has to stand where the mausoleum's will can fill it."));
 		SetType(QuestType.Main);
@@ -627,6 +630,7 @@ public class Zacha5fMq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8391);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Guardian's Jar (4)"));
 		SetDescription(L("Rexipher works out what the false revelation was and comes back for the real one."));
 		SetType(QuestType.Main);
@@ -665,6 +669,7 @@ public class Zacha5fMq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8392);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The King of the Great Humans"));
 		SetDescription(L("Great King Zachariel's will, and what Goddess Laima left with him."));
 		SetType(QuestType.Main);
@@ -706,6 +711,7 @@ public class Zacha5fEq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8419);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Guardian Stone Statue's Warning"));
 		SetDescription(L("Seven Venucelos in the lower hall are past coming back."));
 		SetType(QuestType.Sub);
@@ -743,6 +749,7 @@ public class Zacha5fEq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8420);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Guardian Stone Statue's Warning"));
 		SetDescription(L("Eight Venucelos hold the middle hall against anyone who disturbs the King."));
 		SetType(QuestType.Sub);
@@ -780,6 +787,7 @@ public class Zacha5fEq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8421);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hidden Treasure Chest"));
 		SetDescription(L("The floor around the side hall's chest is full of Medakia."));
 		SetType(QuestType.Sub);
@@ -817,6 +825,7 @@ public class Zacha5fEq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8422);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Empty Slate"));
 		SetDescription(L("The Revelator's name is scraped off the desk's slate, and the Rusrat know it."));
 		SetType(QuestType.Sub);
@@ -854,6 +863,7 @@ public class Zacha5fEq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8423);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Guardian Stone Statue's Warning"));
 		SetDescription(L("Mauros, Medakia and Rusrat hold the upper hall together."));
 		SetType(QuestType.Sub);
@@ -891,6 +901,7 @@ public class ZachaToFedimianQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50007);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Mage Tower"));
 		SetDescription(L("The Revelation of the Royal Mausoleum points at the Mage Tower. Fedimian is the road to it."));
 		SetType(QuestType.Main);

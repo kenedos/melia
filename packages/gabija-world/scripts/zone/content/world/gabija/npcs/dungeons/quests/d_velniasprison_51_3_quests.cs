@@ -439,6 +439,7 @@ public class Vprison513Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60018);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hauberk in the Maze (1)"));
 		SetDescription(L("Hauberk is looking for the thinnest part of the prison wall, and his servants are in the way."));
 		SetType(QuestType.Main);
@@ -468,6 +469,7 @@ public class Vprison513Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60019);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hauberk in the Maze (2)"));
 		SetDescription(L("Hauberk has given pieces of his own soul to his servants, which is exactly what Daiva wanted."));
 		SetType(QuestType.Main);
@@ -497,6 +499,7 @@ public class Vprison513Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60020);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hauberk in the Maze (3)"));
 		SetDescription(L("The Night Star Spectral Orb shows which of the demons at Idinga is carrying Hauberk."));
 		SetType(QuestType.Main);
@@ -524,6 +527,7 @@ public class Vprison513Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60021);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hauberk in the Maze (4)"));
 		SetDescription(L("Hauberk is driven up the Zinuma Passage and into Galutin Solitary Confinement, where Sigita is standing."));
 		SetType(QuestType.Main);
@@ -552,6 +556,7 @@ public class Vprison513Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60022);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hauberk in the Maze (5)"));
 		SetDescription(L("Hauberk is held down inside Galutin Solitary Confinement and sealed there with all four Kupoles on him."));
 		SetType(QuestType.Main);
@@ -580,6 +585,7 @@ public class Vprison513Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60036);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Eyes of the Goddess"));
 		SetDescription(L("Hauberk is sealed and his servants have fallen back to the Aklaga Isolation Area."));
 		SetType(QuestType.Sub);
@@ -607,6 +613,7 @@ public class Vprison513Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60037);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Hidden Betrayer"));
 		SetDescription(L("The servants that sold Hauberk out are waiting at the Ishidevi Hideout for a revival of their own."));
 		SetType(QuestType.Sub);
@@ -634,6 +641,7 @@ public class Vprison513Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60038);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demons at the Crossroads"));
 		SetDescription(L("Daiva wants the teeth of the Huradeti Crossroads demons as proof the district was held."));
 		SetType(QuestType.Sub);

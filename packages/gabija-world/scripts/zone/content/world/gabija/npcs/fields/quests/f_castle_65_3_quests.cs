@@ -1117,6 +1117,7 @@ public class FCastle653Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70440);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Chasing Lord Delmore (1)"));
 		SetDescription(L("Revelator Yane wants to split the group to chase after Delmore Rephaim. Ask Revelator Mihail to accompany you."));
 		SetType(QuestType.Main);
@@ -1141,6 +1142,7 @@ public class FCastle653Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70441);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Chasing Lord Delmore (2)"));
 		SetDescription(L("You are caught in Delmore Rephaim's trap. Fight demons to find the hidden magic core or defeat all demons to escape."));
 		SetType(QuestType.Main);
@@ -1170,6 +1172,7 @@ public class FCastle653Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70442);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unbreakable Barrier"));
 		SetDescription(L("Find Revelator Yane's group at the Tagika Crossroads and help them."));
 		SetType(QuestType.Main);
@@ -1199,6 +1202,7 @@ public class FCastle653Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70443);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Government Ruins"));
 		SetDescription(L("Go to the Government Ruins with Revelators Yane and Mihail."));
 		SetType(QuestType.Main);
@@ -1225,6 +1229,7 @@ public class FCastle653Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70444);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Shaman Doll and the Savior"));
 		SetDescription(L("Yane wants to impart demons souls onto a shaman doll and replace Melchioras with it. Hunt demons and collect their souls on the doll."));
 		SetType(QuestType.Main);
@@ -1255,6 +1260,7 @@ public class FCastle653Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70445);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lead to a Dead-end (1)"));
 		SetDescription(L("Mage Melchioras says Delmore Rephaim has escaped to the Odaginkas Vacant Lot. Go and chase Delmore Rephaim with Revelator Mihail."));
 		SetType(QuestType.Main);
@@ -1279,6 +1285,7 @@ public class FCastle653Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70446);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lead to a Dead-end (2)"));
 		SetDescription(L("Revelator Mihail wants to blow up the obstacle that's blocking the way with a bomb. Protect him from the incoming demon attacks while he finished setting up the bomb."));
 		SetType(QuestType.Main);
@@ -1308,6 +1315,7 @@ public class FCastle653Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70447);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Comforting Them"));
 		SetDescription(L("You've almost caught up with Delmore Rephaim now. Keep going and stop his plans!"));
 		SetType(QuestType.Main);
@@ -1337,6 +1345,7 @@ public class FCastle653Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70448);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("This is Only the Beginning"));
 		SetDescription(L("It's time to go back to where Melchioras and the Revelators are. Talk to Mage Melchioras at the Tagika Crossroads."));
 		SetType(QuestType.Main);
@@ -1361,6 +1370,7 @@ public class FCastle653Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70449);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("For It to Never Happen Again"));
 		SetDescription(L("Melchioras is worried about the backup Kruvina devices that are still around. Fill the crystal given to you by Melchioras with evil energy by defeating demons and place it on the devices."));
 		SetType(QuestType.Sub);
@@ -1389,6 +1399,7 @@ public class FCastle653Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70450);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Corners Well Polished"));
 		SetDescription(L("Mage Melchioras has asked you to destroy the remaining Magic Power Supply Device in Delmore Manor. Go back there and defeat demons to charge the crystal with demonic power, then place it on the supply device."));
 		SetType(QuestType.Sub);
@@ -1417,6 +1428,7 @@ public class FCastle653Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70451);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Finding Clues to the Plot"));
 		SetDescription(L("Revelator Yane wants you to help clear out some demons. Defeat demons nearby."));
 		SetType(QuestType.Sub);
@@ -1444,6 +1456,7 @@ public class FCastle653Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70452);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Thorough Procedure"));
 		SetDescription(L("Mage Melchioras seems interested in the magic amplifiers. Obtain some magic amplifiers from Black Maizes."));
 		SetType(QuestType.Sub);
@@ -1473,6 +1486,7 @@ public class FCastle653Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60177);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Dangerous Distraction"));
 		SetDescription(L("Revelator Mihail has asked you to defeat the Pag Emitters that are attacking people at Delmore Outskirts."));
 		SetType(QuestType.Repeat);
@@ -1500,6 +1514,7 @@ public class FCastle653Rp2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60178);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Good Day to Recover"));
 		SetDescription(L("Revelator Connor asked you to collect Maroulu Herbs Grass from the Fortress walls in order for the people with Melchioras to recover."));
 		SetType(QuestType.Repeat);
@@ -1528,6 +1543,7 @@ public class FCastle653Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50268);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Best of the Best"));
 		SetDescription(L("Revelator Mihail wants to know about your recent adventures. Tell him stories about your travels."));
 		SetType(QuestType.Sub);

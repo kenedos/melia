@@ -756,6 +756,7 @@ public class SiaulWestMeetTitasQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1001);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Knight Titas (1)"));
 		SetDescription(L("Ask the sentry the way to Klaipeda, then report to Knight Titas at the West Forest camp."));
 		SetType(QuestType.Main);
@@ -783,6 +784,7 @@ public class SiaulWestWestForestQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1002);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Knight Titas (2)"));
 		SetDescription(L("Knight Titas asks you to carry the assembly order to his soldiers before you leave for Klaipeda."));
 		SetType(QuestType.Main);
@@ -808,6 +810,7 @@ public class SiaulWestDrasius1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1003);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Scout (1)"));
 		SetDescription(L("Give the assembly order to the scout on the western road, and see him through the Kepa that swarm him."));
 		SetType(QuestType.Main);
@@ -836,6 +839,7 @@ public class SiaulWestStatusTuto1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20127);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Using Stats"));
 		SetDescription(L("The scout explains that a level up lets you raise one of your stats."));
 		SetType(QuestType.Main);
@@ -860,6 +864,7 @@ public class SiaulWestDrasius2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1004);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Scout (2)"));
 		SetDescription(L("The scout will not fall back until he has his belongings. Take them off the Leaf Bugs that stole them."));
 		SetType(QuestType.Main);
@@ -890,6 +895,7 @@ public class SiaulWestKnightQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1013);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Knight Titas (3)"));
 		SetDescription(L("The squad leader will pass on the rest of the order himself. Report that to Knight Titas."));
 		SetType(QuestType.Main);
@@ -917,6 +923,7 @@ public class SiaulWestMeetNaglisQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1014);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Searcher"));
 		SetDescription(L("Give the assembly order to the searcher up the northern road, and put down the Large Kepa that charges him."));
 		SetType(QuestType.Main);
@@ -945,6 +952,7 @@ public class SiaulWestOnionBigQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1023);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Bad Feeling"));
 		SetDescription(L("The searcher is sure another Large Kepa is hiding nearby. Go and find out."));
 		SetType(QuestType.Sub);
@@ -971,6 +979,7 @@ public class SiaulWestLaimonas1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1015);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Laimonas' Favor"));
 		SetDescription(L("Laimonas asks you to pay your respects at the Statue of Goddess Zemyna at the end of the eastern road."));
 		SetType(QuestType.Main);
@@ -997,6 +1006,7 @@ public class SiaulWestLaimonas32Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20128);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Way Back"));
 		SetDescription(L("A Mushcaria breaks in on your prayer at the statue."));
 		SetType(QuestType.Sub);
@@ -1024,6 +1034,7 @@ public class SiaulWestSoldier3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1020);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Squad Leader (1)"));
 		SetDescription(L("The squad leader will only fall back once his own task is done. Clear the Hanaming around his post."));
 		SetType(QuestType.Main);
@@ -1050,6 +1061,7 @@ public class SiaulWestHamingLeafQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1021);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Squad Leader (2)"));
 		SetDescription(L("Collect Hanaming Petals for the squad leader's survey so he can leave his post."));
 		SetType(QuestType.Main);
@@ -1080,6 +1092,7 @@ public class SiaulWestBossGolemQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1022);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Start of the Trouble"));
 		SetDescription(L("The squad leader's men are overdue at Delong Rest Stop. Go and look for them."));
 		SetType(QuestType.Sub);
@@ -1107,6 +1120,7 @@ public class SiaulWestLaimonas4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1018);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Road to Klaipeda (1)"));
 		SetDescription(L("Laimonas asks you to clear the Infrorocktors off the road to Klaipeda."));
 		SetType(QuestType.Sub);
@@ -1131,6 +1145,7 @@ public class SiaulWestWoodSpiritQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1019);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Road to Klaipeda (2)"));
 		SetDescription(L("A Rocktortuga is about to hit the Klaipeda checkpoint. Hold the line with the guards."));
 		SetType(QuestType.Sub);
@@ -1159,6 +1174,7 @@ public class SiaulWestHq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9100);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Military Support"));
 		SetDescription(L("Knight Titas sends you to Dvasia Peak, where Julian's unit is opening the road to the Great King's Gate."));
 		SetType(QuestType.Sub);
@@ -1185,6 +1201,7 @@ public class TutoSkillRunQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8350);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Let's Learn a Skill"));
 		SetDescription(L("The searcher points out that your attacks are lacking, and that a skill would serve you better."));
 		SetType(QuestType.Main);

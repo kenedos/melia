@@ -948,6 +948,7 @@ public class F3Cmlake83Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90001);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Corrupted Lake (1)"));
 		SetDescription(L("Elder Aloizard wants to return to where the village residents are but is worried about the monsters. Clear out some monsters nearby to help Elder Aloizard return."));
 		SetType(QuestType.Main);
@@ -978,6 +979,7 @@ public class F3Cmlake83Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90019);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Corrupted Lake (2)"));
 		SetDescription(L("If you're really set on helping Elder Aloizard, he will be waiting for you at the Collapsed Hall Lot. Go and find him there."));
 		SetType(QuestType.Main);
@@ -1001,6 +1003,7 @@ public class F3Cmlake83Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90002);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Corrupted Lake (3)"));
 		SetDescription(L("The elder's granddaughter says the village residents are suffering with the red water incident but have no way to solve it. Help them out by investigating the Wandering Sanctuary."));
 		SetType(QuestType.Main);
@@ -1027,6 +1030,7 @@ public class F3Cmlake83Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90003);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Corrupted Lake (4)"));
 		SetDescription(L("The elder's granddaughter says he took off with a group of village youth and disappeared. Search for Elder Aloizard around the Anga Hall area."));
 		SetType(QuestType.Main);
@@ -1089,6 +1093,7 @@ public class F3Cmlake83Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90005);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Corrupted Lake (6)"));
 		SetDescription(L("The burnt journal seems to contain important information. Go and find Elder Aloizard right away."));
 		SetType(QuestType.Main);
@@ -1114,6 +1119,7 @@ public class F3Cmlake83Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90006);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Offerings to the Goddess (1)"));
 		SetDescription(L("Samsonas believes the wrath of the goddesses is what caused the water to turn red. He proposes you collect some Rajatadpole meat to use as an offering."));
 		SetType(QuestType.Sub);
@@ -1143,6 +1149,7 @@ public class F3Cmlake83Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90007);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Offerings to the Goddess (2)"));
 		SetDescription(L("Samsonas is going to use this obelisk and has asked you to use one in another location. Go to the left side of the Vishikas Great Hall and make an offering to the obelisk there."));
 		SetType(QuestType.Sub);
@@ -1170,6 +1177,7 @@ public class F3Cmlake83Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90008);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("One-Way Street"));
 		SetDescription(L("Nikodemas says someone from the village wandered off and hasn't been back since. It seems they were headed towards the Drava Chapel Lot; go and look for them there."));
 		SetType(QuestType.Sub);
@@ -1199,6 +1207,7 @@ public class F3Cmlake83Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90009);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Accident Prevention"));
 		SetDescription(L("Scalvis is worried about the large number of monsters around. Defeat nearby monsters to make the area safer for the village residents."));
 		SetType(QuestType.Repeat);
@@ -1226,6 +1235,7 @@ public class F3Cmlake83Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50273);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Lost Object"));
 		SetDescription(L("The elder's granddaughter made friendship badges with her friends but lost them during an accident. Find the badges for her."));
 		SetType(QuestType.Sub);
@@ -1254,6 +1264,7 @@ public class F3Cmlake83Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60166);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Collect Antidote Sample"));
 		SetDescription(L("The Mayor's granddaughter has asked you to collect antidote samples after defeating Merog Stingers."));
 		SetType(QuestType.Repeat);

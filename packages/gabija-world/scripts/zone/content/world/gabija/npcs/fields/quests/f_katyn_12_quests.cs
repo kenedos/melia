@@ -927,6 +927,7 @@ public class Katyn12Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30060);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Saving the Guide Owl"));
 		SetDescription(L("The Owl Chief Sculpture requested you gather the energy of Karolis Springs and deliver it to the Guide Owl Sculptures. Go find the Guide Owl Sculptures."));
 		SetType(QuestType.Main);
@@ -955,6 +956,7 @@ public class Katyn12Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30061);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Sacred Tree of the Forest (1)"));
 		SetDescription(L("The Owl Chief Sculpture requested a divine branch of Letas in order to defeat the demons. Use the crystal containing the energy of Karolis Springs to find the holy tree of Letas and obtain a branch."));
 		SetType(QuestType.Main);
@@ -982,6 +984,7 @@ public class Katyn12Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30062);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Sacred Tree of the Forest (2)"));
 		SetDescription(L("The Guide Owl Sculpture tells you that the branch can purify the monsters and their energy. Absorb the purified energy and collect it."));
 		SetType(QuestType.Main);
@@ -1011,6 +1014,7 @@ public class Katyn12Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30063);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reliable Assistant"));
 		SetDescription(L("The Guide Owl Sculpture asks you to speak with Mardas."));
 		SetType(QuestType.Main);
@@ -1038,6 +1042,7 @@ public class Katyn12Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30064);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Forest Corrupted by the Demons"));
 		SetDescription(L("The first thing to do is eliminate the evil energy contaminating the forest. Set up the Namott of Suppression around the evil energy to clear it out."));
 		SetType(QuestType.Main);
@@ -1065,6 +1070,7 @@ public class Katyn12Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30065);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Away From the Watch"));
 		SetDescription(L("Mardas says you need to remove the magic circle keeping the Surveillance Spheres in order to access the black energy that's absorbing the forest's own energy. Avoid the Surveillance Spheres and destroy its magic circle."));
 		SetType(QuestType.Main);
@@ -1110,6 +1116,7 @@ public class Katyn12Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30066);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Eery Black Energy"));
 		SetDescription(L("At the end of the forked roads at Senyvas Yard, destroy the black energy that's absorbing the forest's own energy."));
 		SetType(QuestType.Main);
@@ -1137,6 +1144,7 @@ public class Katyn12Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30067);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Soul Starvation (1)"));
 		SetDescription(L("Mardas says the magic circles protecting Soul Starvation must be removed. The circles must be removed in the correct order, or they will become active again. Control each circle to figure out the order and remove them accordingly."));
 		SetType(QuestType.Main);
@@ -1178,6 +1186,7 @@ public class Katyn12Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30068);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Soul Starvation (2)"));
 		SetDescription(L("The magic circles protecting Soul Starvation are all disabled. Use the power of Namott of Suppression to destroy Soul Starvation."));
 		SetType(QuestType.Main);
@@ -1207,6 +1216,7 @@ public class Katyn12Mq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30069);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Peace in the Forest"));
 		SetDescription(L("Mardas says he will deliver the message to the Guide Owl after inspecting the situation. Go to the Guide Owl and return the Namott of Suppression and report that everything is solved."));
 		SetType(QuestType.Main);
@@ -1237,6 +1247,7 @@ public class Katyn12Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30072);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Story Left Behind by Eras"));
 		SetDescription(L("The sender of the letter is a person called Eras. It is supposed to go to a person called Jurus in Orsha."));
 		SetType(QuestType.Sub);
@@ -1265,6 +1276,7 @@ public class Katyn12Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30073);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Letas Altar"));
 		SetDescription(L("Letas Altar is weakened by the evil force from the nearby monsters. Defeat the nearby monsters."));
 		SetType(QuestType.Sub);
@@ -1301,6 +1313,7 @@ public class Katyn12Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50271);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Wandering Spirit"));
 		SetDescription(L("The spirit had been looking for an important object all along. Now that he has it back, help the spirit reach the Frail Owl Sculpture so he can finally move on."));
 		SetType(QuestType.Sub);
@@ -1329,6 +1342,7 @@ public class Katyn12Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60165);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fading Spirit"));
 		SetDescription(L("The Frail Owl sculpture asked you to bring back the fading spirits that ran away because of the monsters."));
 		SetType(QuestType.Repeat);

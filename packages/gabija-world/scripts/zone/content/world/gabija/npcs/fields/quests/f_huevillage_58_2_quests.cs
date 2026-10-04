@@ -421,6 +421,7 @@ public class Huevillage582Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20276);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Unopened Portal"));
 		SetDescription(L("The Andale Village elder sends you to the priest at Cerpe Crossroads, with Black Maize Venom as a gift."));
 		SetType(QuestType.Main);
@@ -448,6 +449,7 @@ public class Huevillage582Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20277);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Obelisk (1)"));
 		SetDescription(L("The dye that restores the Obelisk needs White Oak Sap. Draw it from the collection containers of White Oak Forest."));
 		SetType(QuestType.Main);
@@ -483,6 +485,7 @@ public class Huevillage582Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20278);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Obelisk (2)"));
 		SetDescription(L("Combine the venom and the sap at the Ershike Altar to make the dye."));
 		SetType(QuestType.Main);
@@ -512,6 +515,7 @@ public class Huevillage582Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20279);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Obelisk (3)"));
 		SetDescription(L("Write the erased letters back onto the Obelisk at Slepingas Stream."));
 		SetType(QuestType.Main);
@@ -540,6 +544,7 @@ public class Huevillage582Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20280);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Moldyhorn of Nefrito Valley"));
 		SetDescription(L("A strong energy runs with the water of Nefrito Valley."));
 		SetType(QuestType.Sub);
@@ -577,6 +582,7 @@ public class Huevillage582Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20281);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ominous Energy at Ershike Altar"));
 		SetDescription(L("The beasts of Cerpe Crossroads turned aggressive when the Ershike Altar began to fume."));
 		SetType(QuestType.Sub);
@@ -613,6 +619,7 @@ public class Huevillage582Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20282);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Slepingas Stream's Blue Woodspirit"));
 		SetDescription(L("Something has been circling the Obelisk of Slepingas Stream."));
 		SetType(QuestType.Sub);

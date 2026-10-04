@@ -649,6 +649,7 @@ public class Siauliai463Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16200);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Vilna Forest: The Monsters' Purpose (1)"));
 		SetDescription(L("Maras wants an undamaged comb out of the Saldus Bee Farm to test the honey theory with."));
 		SetType(QuestType.Main);
@@ -676,6 +677,7 @@ public class Siauliai463Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16210);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Vilna Forest: The Monsters' Purpose (2)"));
 		SetDescription(L("The comb is carried out among the monsters to see whether they come for it."));
 		SetType(QuestType.Main);
@@ -703,6 +705,7 @@ public class Siauliai463Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16220);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Vilna Forest: The Monsters' Purpose (3)"));
 		SetDescription(L("If it is not the honey then it is the altars, and the monsters have been gathering at Bichiu."));
 		SetType(QuestType.Main);
@@ -729,6 +732,7 @@ public class Siauliai463Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16230);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Altar of Vilna Forest (1)"));
 		SetDescription(L("The Gaudeji Altar on the right holds the same kind of piece, and Lamar is the one to show them to."));
 		SetType(QuestType.Main);
@@ -757,6 +761,7 @@ public class Siauliai463Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16240);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Altar of Vilna Forest (2)"));
 		SetDescription(L("Priest Raeli comes out to look at the pieces, and leaves again for the Uskis Arable Land."));
 		SetType(QuestType.Main);
@@ -785,6 +790,7 @@ public class Siauliai463Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16300);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Vilna Forest: The Northern Altar Cyclops"));
 		SetDescription(L("A Cyclops has taken the northern altar of the Vilna Forest for itself."));
 		SetType(QuestType.Sub);
@@ -822,6 +828,7 @@ public class Siauliai463Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16310);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Help My Farm Recover"));
 		SetDescription(L("Riesz left his farming tools at Shirsie Sunny Place with a Honeypin standing over them."));
 		SetType(QuestType.Sub);
@@ -853,6 +860,7 @@ public class Siauliai463Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16320);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Desirable Combs"));
 		SetDescription(L("Valda was told to gather combs from the Saldus Bee Farm and will not go near it."));
 		SetType(QuestType.Sub);

@@ -441,6 +441,7 @@ public class Rokas31PactEndQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9000);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Negotiation (1)"));
 		SetDescription(L("Rexipher will trade Cyrenia Odell for the guardian device at Sesija Entrance."));
 		SetType(QuestType.Main);
@@ -467,6 +468,7 @@ public class Rokas31Rexither1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9001);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Beholder of Sesija Entrance"));
 		SetDescription(L("Working the summoning device at Sesija Entrance calls its guardian up."));
 		SetType(QuestType.Sub);
@@ -496,6 +498,7 @@ public class Rokas31Rexither2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9002);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Negotiation (2)"));
 		SetDescription(L("Rexipher hands Cyrenia Odell back, and a Cactusvel with her."));
 		SetType(QuestType.Main);
@@ -524,6 +527,7 @@ public class Rokas31Rexither3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9003);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Swindler Rexipher"));
 		SetDescription(L("Rexipher is after what Zachariel hid in the Royal Mausoleum. Follow him in."));
 		SetType(QuestType.Main);
@@ -553,6 +557,7 @@ public class Rokas31Sub01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19370);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hogma's Treasure Chest"));
 		SetDescription(L("Opening the chest in the Traceless Ruins brings the Hogma of the crossroads down on it."));
 		SetType(QuestType.Sub);
@@ -591,6 +596,7 @@ public class Rokas31Sub02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19380);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Security Guard's Favor (1)"));
 		SetDescription(L("The guard lost the chest she was escorting in the Traceless Ruins."));
 		SetType(QuestType.Sub);
@@ -617,6 +623,7 @@ public class Rokas31Sub03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19390);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Security Guard's Favor (2)"));
 		SetDescription(L("A Hogma Captain is carrying the necklace the guard was escorting."));
 		SetType(QuestType.Sub);
@@ -646,6 +653,7 @@ public class Rokas31Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60169);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Too Much For One Person"));
 		SetDescription(L("The guard is short of the dirty pouches her order calls for."));
 		SetType(QuestType.Repeat);

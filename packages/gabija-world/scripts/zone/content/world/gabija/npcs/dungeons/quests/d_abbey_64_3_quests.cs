@@ -673,6 +673,7 @@ public class Abbay643Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50134);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Rose (1)"));
 		SetDescription(L("Edmundas wants to try and overload the device, but he is not sure what to use for that. For now, try and defeat Brown Hummingbirds and collect any black objects you can obtain, then bring them to Edmundas."));
 		SetType(QuestType.Main);
@@ -701,6 +702,7 @@ public class Abbay643Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50135);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Rose (2)"));
 		SetDescription(L("To bring Rose back to safety you need to overload the device and destroy it. Collect as much Brown Hummingbird mucus as you can."));
 		SetType(QuestType.Main);
@@ -729,6 +731,7 @@ public class Abbay643Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50136);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Rose (3)"));
 		SetDescription(L("Rose could be under the influence of the Mind Control Crystals. Obtain the protective barrier from the device inside the Main Hall Atrium and destroy the crystal."));
 		SetType(QuestType.Main);
@@ -755,6 +758,7 @@ public class Abbay643Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50137);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Rose (4)"));
 		SetDescription(L("The wizard wants to use Rose to spread out the giant bracken spores. Thwart the wizard's plans and rescue Rose at the Kilnuma Oratorium!"));
 		SetType(QuestType.Main);
@@ -783,6 +787,7 @@ public class Abbay643Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50144);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Demons' Goals"));
 		SetDescription(L("Traveling Merchant Rose believes she was able to read part of the wizard's mind when she was under mind contol. Listen to her testimony."));
 		SetType(QuestType.Main);
@@ -807,6 +812,7 @@ public class Abbay643Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50138);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Edmundas' Worry (1)"));
 		SetDescription(L("Edmundas is not fully recovered yet, and the monsters are worrying him. Defeat the monsters at Medie State Apartments for Edmundas and Rose."));
 		SetType(QuestType.Sub);
@@ -833,6 +839,7 @@ public class Abbay643Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50139);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Edmundas' Worry (2)"));
 		SetDescription(L("According to Edmundas, the Wizard Submaster in Orsha owes him a favor and might be able to help them. Go see the Wizard Submaster in Orsha and explain what happened to Edmundas and Rose."));
 		SetType(QuestType.Sub);
@@ -857,6 +864,7 @@ public class Abbay643Sq060Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50143);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Giant Bracken Spore"));
 		SetDescription(L("Remove the power sources of the giant bracken spore breeding device inside Sotras Chapel. To keep the power sources from reactivating, you will have to remove them in the correct order."));
 		SetType(QuestType.Sub);
@@ -883,6 +891,7 @@ public class Abbay643Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50261);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Good News"));
 		SetDescription(L("Rose wrote a letter to her village telling people there how she's doing. Take the letter and give it to Anne."));
 		SetType(QuestType.Sub);

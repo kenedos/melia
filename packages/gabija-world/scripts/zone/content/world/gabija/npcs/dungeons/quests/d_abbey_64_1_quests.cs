@@ -602,6 +602,7 @@ public class Abbay641Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50117);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Rescue (1)"));
 		SetDescription(L("The residents of the Croa Village seem to be locked inside the Special Reading Room. Ask the residents if they know a solution."));
 		SetType(QuestType.Main);
@@ -627,6 +628,7 @@ public class Abbay641Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50118);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Rescue (2)"));
 		SetDescription(L("Traveling Merchant Rose thinks it's best to rescue Monk Goss as the residents suggested. Head to the Ankel Small Corridor and rescue Monk Goss!"));
 		SetType(QuestType.Main);
@@ -656,6 +658,7 @@ public class Abbay641Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50119);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Rescue (3)"));
 		SetDescription(L("Monk Goss says the demons have created a magic circle which can only be opened by proving that you are a demon. This should be possible with some Green Apparition Essence."));
 		SetType(QuestType.Main);
@@ -684,6 +687,7 @@ public class Abbay641Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50120);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Rescue (4)"));
 		SetDescription(L("Monk Goss says opening the door is easy, although it does take some time. Protect Monk Goss while he opens the door to the Special Reading Room."));
 		SetType(QuestType.Main);
@@ -712,6 +716,7 @@ public class Abbay641Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50121);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Rescue (5)"));
 		SetDescription(L("Traveling Merchant Rose thinks it's best for the village residents to run away immediately. Help the people escape to safety."));
 		SetType(QuestType.Main);
@@ -741,6 +746,7 @@ public class Abbay641Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50122);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("An Exhausted Body (1)"));
 		SetDescription(L("Tilis was a victim of terrible experiments and their body is in poor condition. Give a stamina recovery potion to Experiment Victim Tilis."));
 		SetType(QuestType.Sub);
@@ -767,6 +773,7 @@ public class Abbay641Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50123);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("An Exhausted Body (2)"));
 		SetDescription(L("Experiment Victim Tilis wants you to help them escape the monastery. Defeat any demons nearby."));
 		SetType(QuestType.Sub);
@@ -793,6 +800,7 @@ public class Abbay641Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50124);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Keepsake"));
 		SetDescription(L("Experiment Victim Fils wants you to find the relics that belonged to the experiment victims who died. Go to the Raundona Circle Hall and collect the people's relics."));
 		SetType(QuestType.Sub);
@@ -821,6 +829,7 @@ public class Abbey642Hq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50277);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Remembering the Victims (2)"));
 		SetDescription(L("You have erected the tombstone. Carve a message to honor the victims on it."));
 		SetType(QuestType.Sub);

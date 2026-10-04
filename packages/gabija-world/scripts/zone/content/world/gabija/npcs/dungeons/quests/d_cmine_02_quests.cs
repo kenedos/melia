@@ -551,6 +551,7 @@ public class Mine2AlchemistQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4467);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purify the Toxic Fumes in 2F"));
 		SetDescription(L("The second floor's fumes are far worse than the first. Get every purifier on 2F running again."));
 		SetType(QuestType.Main);
@@ -577,6 +578,7 @@ public class Mine2Crystal2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4483);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Circulation Purifier Issues (1)"));
 		SetDescription(L("The circulation purifier cannot draw the fumes in. Its pipe in District 3 is blocked."));
 		SetType(QuestType.Sub);
@@ -603,6 +605,7 @@ public class Mine2Crystal3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4484);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Circulation Purifier Issues (2)"));
 		SetDescription(L("A Carapace has settled on the District 2 pipe and will not let anyone near it."));
 		SetType(QuestType.Sub);
@@ -643,6 +646,7 @@ public class Mine2Crystal4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4485);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Circulation Purifier Issues (3)"));
 		SetDescription(L("The District 2 pipe has been crushed. Work it back into shape and start the circulation purifier."));
 		SetType(QuestType.Sub);
@@ -669,6 +673,7 @@ public class Mine2Crystal5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4486);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Inoperable Auxiliary Purifier (1)"));
 		SetDescription(L("The auxiliary purifier is drawing no power at all."));
 		SetType(QuestType.Sub);
@@ -696,6 +701,7 @@ public class Mine2Crystal7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4488);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Inoperable Auxiliary Purifier (2)"));
 		SetDescription(L("The compass points to the magic supply device in District 4."));
 		SetType(QuestType.Sub);
@@ -722,6 +728,7 @@ public class Mine2Crystal10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4491);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Inoperable Auxiliary Purifier (3)"));
 		SetDescription(L("The magic supply device is seized with rust. Something on this floor will shift it."));
 		SetType(QuestType.Sub);
@@ -749,6 +756,7 @@ public class Mine2Crystal11Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4492);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Inoperable Auxiliary Purifier (4)"));
 		SetDescription(L("The magic supply device is turning again. Start the auxiliary purifier."));
 		SetType(QuestType.Sub);
@@ -775,6 +783,7 @@ public class Mine2Crystal14Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4495);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroyer of the Main Purifier (1)"));
 		SetDescription(L("Parts have been torn out of the main purifier and carried off."));
 		SetType(QuestType.Sub);
@@ -802,6 +811,7 @@ public class Mine2Crystal20Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4501);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroyer of the Main Purifier (2)"));
 		SetDescription(L("A Stone Whale dragged the main purifier's parts into District 6 and is sitting on them."));
 		SetType(QuestType.Sub);
@@ -831,6 +841,7 @@ public class Mine2Crystal21Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4502);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroyer of the Main Purifier (3)"));
 		SetDescription(L("Fit the recovered part and start the main purifier."));
 		SetType(QuestType.Sub);

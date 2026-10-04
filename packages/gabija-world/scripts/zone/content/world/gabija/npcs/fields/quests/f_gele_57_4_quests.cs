@@ -579,6 +579,7 @@ public class Gele574Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8601);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unwelcome Guest from the Forest"));
 		SetDescription(L("A Biteregina has built a hive at Rojus Plateau. Remove it and deal with the beast."));
 		SetType(QuestType.Sub);
@@ -607,6 +608,7 @@ public class Gele574Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8602);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Irritating Pricks"));
 		SetDescription(L("The Seedmias are attacking Erra from every direction. Drive them out."));
 		SetType(QuestType.Sub);
@@ -633,6 +635,7 @@ public class Gele574Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8603);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Immortal Nepenthes (1)"));
 		SetDescription(L("Erra needs the fat of the Mallardu to wake the sleeping Nepenthes."));
 		SetType(QuestType.Sub);
@@ -662,6 +665,7 @@ public class Gele574Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8604);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Immortal Nepenthes (2)"));
 		SetDescription(L("Wake the Nepenthes at Piene Field with the combustible fat, then take its sap."));
 		SetType(QuestType.Sub);
@@ -694,6 +698,7 @@ public class Gele574Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8605);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Watcher's Potential (1)"));
 		SetDescription(L("Try the elders' charm on the Pantos in Levanda Habitat."));
 		SetType(QuestType.Sub);
@@ -721,6 +726,7 @@ public class Gele574Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8606);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Watcher's Potential (2)"));
 		SetDescription(L("Burn the Panto Totem at Valyma Sanctum and use the stronger charm."));
 		SetType(QuestType.Sub);
@@ -751,6 +757,7 @@ public class Gele574Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8607);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("In the Name of the Goddess!"));
 		SetDescription(L("Alfonsas cannot hold the road to the Temple Courtyard alone. Thin the demons out."));
 		SetType(QuestType.Sub);
@@ -777,6 +784,7 @@ public class Gele574Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8608);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Obversion"));
 		SetDescription(L("Scribbling over the demon summoning circles tangles their formulas."));
 		SetType(QuestType.Sub);
@@ -803,6 +811,7 @@ public class Gele574Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8609);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Grown Apart From Hope"));
 		SetDescription(L("Gesti has gone into the Tenet Church. Follow her with Algis."));
 		SetType(QuestType.Main);

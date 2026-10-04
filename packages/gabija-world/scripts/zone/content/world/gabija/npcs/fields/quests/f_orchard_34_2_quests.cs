@@ -860,6 +860,7 @@ public class FOrchard342Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80029);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Guiding Girl (1)"));
 		SetDescription(L("The girl left visible traces. Follow her trace to find her."));
 		SetType(QuestType.Main);
@@ -887,6 +888,7 @@ public class FOrchard342Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80030);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Guiding Girl (2)"));
 		SetDescription(L("Druid Leja says the girl was being chased by ferrets. Defeat the ferrets and rescue the girl."));
 		SetType(QuestType.Main);
@@ -921,6 +923,7 @@ public class FOrchard342Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80031);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Girl (1)"));
 		SetDescription(L("While defeating ferrets, you got that strange sensation again. Follow that sensation, it will lead you to the girl."));
 		SetType(QuestType.Main);
@@ -950,6 +953,7 @@ public class FOrchard342Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80032);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Girl (2)"));
 		SetDescription(L("Druid Leja believes the ferrets are hiding the girl. She asks you to bring some Drowsy Herbs for her to make an incense to use on the ferrets."));
 		SetType(QuestType.Main);
@@ -978,6 +982,7 @@ public class FOrchard342Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80033);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Girl (3)"));
 		SetDescription(L("The girl kidnapped by the ferrets needs to be rescued. Throw the bag of incense to leave the ferrets disoriented, then take your chance and rescue the girl."));
 		SetType(QuestType.Main);
@@ -1015,6 +1020,7 @@ public class FOrchard342Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80034);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Goddess' Assignment (1)"));
 		SetDescription(L("The mysterious girl started running as soon as you freed her. Follow her trace to where she is."));
 		SetType(QuestType.Main);
@@ -1039,6 +1045,7 @@ public class FOrchard342Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80035);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Goddess' Assignment (2)"));
 		SetDescription(L("The mysterious girl is pointing to a shiny sapling. Have a look at the sapling."));
 		SetType(QuestType.Main);
@@ -1076,6 +1083,7 @@ public class FOrchard342Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80036);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Goddess' Assignment (3)"));
 		SetDescription(L("Found the Goddess' Orb under the mysterious seedling. Examine the Goddess' Orb."));
 		SetType(QuestType.Main);
@@ -1102,6 +1110,7 @@ public class FOrchard342Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80037);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recording the Behavior"));
 		SetDescription(L("Druid Benes has asked you to observe the behavior patterns of the ferrets for him. Use an empty scroll arround the ferrets to take notes."));
 		SetType(QuestType.Sub);
@@ -1130,6 +1139,7 @@ public class FOrchard342Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80038);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Blurred Barrier Between The Thing and I"));
 		SetDescription(L("The ferret transformation scroll given by Druid Benes allows you to turn into a ferret. Transform into one and find out why they have sided with the demons and are attacking humans."));
 		SetType(QuestType.Sub);
@@ -1158,6 +1168,7 @@ public class FOrchard342Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80039);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unbelievable Reality (1)"));
 		SetDescription(L("Druid Benes has asked you to set up the voodooed piece of wood shaped like an injured villager and watch the ferrets' reaction to it."));
 		SetType(QuestType.Sub);
@@ -1186,6 +1197,7 @@ public class FOrchard342Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80040);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unbelievable Reality (2)"));
 		SetDescription(L("Benes has asked you to spread a ferret-repelling scent around the entrance to the Bellai Forest Workshop."));
 		SetType(QuestType.Sub);

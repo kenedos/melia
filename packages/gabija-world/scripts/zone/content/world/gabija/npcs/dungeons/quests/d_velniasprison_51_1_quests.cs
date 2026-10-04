@@ -467,6 +467,7 @@ public class Vprison511Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60002);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Place Unreachable (3)"));
 		SetDescription(L("Kupole Audra meets the Revelator at the prison gate, and she has seen what is riding with them."));
 		SetType(QuestType.Main);
@@ -493,6 +494,7 @@ public class Vprison511Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60003);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Teeth of Revenge (1)"));
 		SetDescription(L("The demons of the Rituala Assembly Area are working Blut's escape loose."));
 		SetType(QuestType.Main);
@@ -519,6 +521,7 @@ public class Vprison511Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60004);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Teeth of Revenge (2)"));
 		SetDescription(L("Blut's marks are what carries his hold over the district, and the demons of the Bjaurer Hideout wear them."));
 		SetType(QuestType.Main);
@@ -548,6 +551,7 @@ public class Vprison511Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60005);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Teeth of Revenge (3)"));
 		SetDescription(L("Only a demon can take what Blut gathered, so Hauberk drains the altar while the player holds the room."));
 		SetType(QuestType.Main);
@@ -576,6 +580,7 @@ public class Vprison511Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60006);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Pride"));
 		SetDescription(L("The barrier comes down, and Blut is put down with Zydrone and Hauberk beside you."));
 		SetType(QuestType.Main);
@@ -604,6 +609,7 @@ public class Vprison511Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60029);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Shutting the Door"));
 		SetDescription(L("With Blut gone the demons of the district are making for the crack to the outside world."));
 		SetType(QuestType.Sub);
@@ -631,6 +637,7 @@ public class Vprison511Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60030);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("According To One's Duty"));
 		SetDescription(L("A human exploration team died in the hideout, and the demons still carry what they left."));
 		SetType(QuestType.Sub);
@@ -661,6 +668,7 @@ public class LowlvEyeofbaigaSq60Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90175);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Eye of Demon Lord (1)"));
 		SetDescription(L("The Linker Master's tracker has found a portal opening in the Bjaurer Hideout."));
 		SetType(QuestType.Sub);
@@ -699,6 +707,7 @@ public class LowlvEyeofbaigaSq70Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90176);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Eye of Demon Lord (2)"));
 		SetDescription(L("The tracker links the Revelator to whoever sends the Golems, and the Linker Master wants the account."));
 		SetType(QuestType.Sub);

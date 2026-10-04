@@ -788,6 +788,7 @@ public class Remains40Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8452);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Story (1)"));
 		SetDescription(L("Coben is looking for a brother he has not seen in years, and for the diary he left at the Abandoned Farm."));
 		SetType(QuestType.Sub);
@@ -816,6 +817,7 @@ public class Remains40Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8453);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Story (2)"));
 		SetDescription(L("The diary points at a monument at the Crumbled Chapel."));
 		SetType(QuestType.Sub);
@@ -843,6 +845,7 @@ public class Remains40Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8454);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Story (3)"));
 		SetDescription(L("The second monument is worn down, and Coben says Cockatrice Fat will bring the letters back."));
 		SetType(QuestType.Sub);
@@ -874,6 +877,7 @@ public class Remains40Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8455);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Story (4)"));
 		SetDescription(L("Coben has moved on to Negyvas Field, and the third monument stands in front of him."));
 		SetType(QuestType.Sub);
@@ -901,6 +905,7 @@ public class Remains40Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8456);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Story (5)"));
 		SetDescription(L("The fourth monument stands at the right side of Negyvas Field."));
 		SetType(QuestType.Sub);
@@ -931,6 +936,7 @@ public class Remains40Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8457);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Story (6)"));
 		SetDescription(L("Coben's brother left behind a jar that drinks magic, and it has to be charged before it is of any use."));
 		SetType(QuestType.Sub);
@@ -959,6 +965,7 @@ public class Remains40Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8458);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Old Story (7)"));
 		SetDescription(L("The last monument stands at the Karsta Hall Site, and something has been left to guard it."));
 		SetType(QuestType.Sub);
@@ -990,6 +997,7 @@ public class Remains40Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8459);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("New Market District (1)"));
 		SetDescription(L("The stonemasons called to rebuild Fedimian cannot get their carts past the Cockatrices."));
 		SetType(QuestType.Sub);
@@ -1016,6 +1024,7 @@ public class Remains40Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8460);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("New Market District (2)"));
 		SetDescription(L("A Moa took the stonemason's toolbox and fled to the Leipsna Chapel Site."));
 		SetType(QuestType.Sub);
@@ -1046,6 +1055,7 @@ public class Remains40Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8461);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preventive Measures (1)"));
 		SetDescription(L("A doctor on her way to Fedimian wants the disease-carrying Cockatrices thinned out first."));
 		SetType(QuestType.Sub);
@@ -1072,6 +1082,7 @@ public class Remains40Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8462);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preventive Measures (2)"));
 		SetDescription(L("The doctor wants dust samples off the Hallowventers before she names the cause."));
 		SetType(QuestType.Sub);
@@ -1102,6 +1113,7 @@ public class Remains40Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8463);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preventive Measures (3)"));
 		SetDescription(L("The Cockats past the Camp of Apiarists are already sick, and their tails are what the research needs."));
 		SetType(QuestType.Sub);
@@ -1132,6 +1144,7 @@ public class ToTheTower02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8472);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Gabija (2)"));
 		SetDescription(L("Grita will take you up the Mage Tower to the goddess who has been holding it alone."));
 		SetType(QuestType.Main);
@@ -1159,6 +1172,7 @@ public class Remains40Hq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19041);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Brother, Then"));
 		SetDescription(L("Coben hands over the key to what he was saving for a journey he will not take now."));
 		SetType(QuestType.Sub);
@@ -1189,6 +1203,7 @@ public class Remains40Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60183);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Thinking Ahead"));
 		SetDescription(L("The stonemason wants the Leipsna Chapel Site cleared so a trading post can stand there."));
 		SetType(QuestType.Repeat);

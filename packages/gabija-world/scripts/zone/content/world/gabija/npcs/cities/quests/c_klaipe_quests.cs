@@ -267,6 +267,7 @@ public class KlapedaGoToEastQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1027);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Bishop's Dream"));
 		SetDescription(L("Knight Commander Uska, who dreamed of the goddess, is looking for the people who came to Klaipeda."));
 		SetType(QuestType.Main);
@@ -291,6 +292,7 @@ public class EastPrepareQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20236);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Goddess's Dream (1)"));
 		SetDescription(L("Knight Commander Uska asks the Revelators to prepare for the journey to the eastern woods."));
 		SetType(QuestType.Main);
@@ -317,6 +319,7 @@ public class EastPrepare1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(40010);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Goddess's Dream (2)"));
 		SetDescription(L("The accessory merchant has been handing out gifts to the Revelators."));
 		SetType(QuestType.Main);
@@ -343,6 +346,7 @@ public class Cmine6ToKatyn72Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20051);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mysterious Slate (2)"));
 		SetDescription(L("Knight Commander Uska wants the slate from the Crystal Mine interpreted by the Bokor Master."));
 		SetType(QuestType.Main);
@@ -369,6 +373,7 @@ public class Cmine6ToKatyn73Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20052);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mysterious Slate (3)"));
 		SetDescription(L("The revelation points to Gele Plateau. The Miners' Village Mayor knows the way there."));
 		SetType(QuestType.Main);

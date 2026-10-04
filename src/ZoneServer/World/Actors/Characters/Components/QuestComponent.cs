@@ -477,6 +477,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 		/// <returns></returns>
 		private void Start(Quest quest)
 		{
+			this.UpdateClient_RemoveQuestSessionObject(quest);
 			this.InitialChecks(quest);
 
 			quest.Status = QuestStatus.InProgress;
@@ -884,6 +885,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
+			this.UpdateClient_RemoveQuestSessionObject(quest);
 			this.UpdateClient_CompleteQuest(quest);
 
 			// Raised after the client knows the new status, since handlers redraw the client's map icons from it.
@@ -918,6 +920,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 
 			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
+			this.UpdateClient_RemoveQuestSessionObject(quest);
 
 			ZoneServer.Instance.ServerEvents.PlayerAbandonedQuest.Raise(new PlayerAbandonedQuestEventArgs(this.Character, (int)quest.Data.Id.Value));
 		}
@@ -992,6 +995,7 @@ namespace Melia.Zone.World.Actors.Characters.Components
 			quest.Status = QuestStatus.Possible;
 			this.UpdateClient_QuestStatusProperty(quest);
 			this.UpdateClient_RemoveQuest(quest);
+			this.UpdateClient_RemoveQuestSessionObject(quest);
 
 			return true;
 		}
@@ -2172,6 +2176,19 @@ namespace Melia.Zone.World.Actors.Characters.Components
 				return;
 
 			Send.ZC_SESSION_OBJ_ADD(this.Character, questSessionObject, quest.QuestStaticData.Id);
+		}
+
+		/// <summary>
+		/// Destroys the quest's own session object and tells the client,
+		/// so a later run of the quest starts from zero counts.
+		/// </summary>
+		/// <param name="quest"></param>
+		private void UpdateClient_RemoveQuestSessionObject(Quest quest)
+		{
+			if (quest.SessionObjectStaticData == null)
+				return;
+
+			this.Character.RemoveSessionObject(quest.SessionObjectStaticData.Id);
 		}
 
 		/// <summary>

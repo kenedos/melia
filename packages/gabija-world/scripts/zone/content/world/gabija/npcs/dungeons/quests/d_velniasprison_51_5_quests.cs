@@ -506,6 +506,7 @@ public class Vprison515Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60023);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dimensional Crack (1)"));
 		SetDescription(L("The ritual at Vakarion Cathedral is begun, and Hauberk's soul alone will not fill the crack."));
 		SetType(QuestType.Main);
@@ -533,6 +534,7 @@ public class Vprison515Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60024);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dimensional Crack (2)"));
 		SetDescription(L("The Evening Star Rune is empty, and the demons of Ausura Chapel carry what fills it."));
 		SetType(QuestType.Main);
@@ -563,6 +565,7 @@ public class Vprison515Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60025);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dimensional Crack (3)"));
 		SetDescription(L("The rune is used on the demons of the Lankine Separation District, and the Kupoles come for them."));
 		SetType(QuestType.Main);
@@ -589,6 +592,7 @@ public class Vprison515Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60026);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dimensional Crack (4)"));
 		SetDescription(L("The same again at the Ishisula Broken District, which is where most of them went."));
 		SetType(QuestType.Main);
@@ -615,6 +619,7 @@ public class Vprison515Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60027);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dimensional Crack (5)"));
 		SetDescription(L("The Sealing Tokens of the Hehmastar demons hold more power than the demons do."));
 		SetType(QuestType.Main);
@@ -644,6 +649,7 @@ public class Vprison515Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60028);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dimensional Crack (6)"));
 		SetDescription(L("Vakarine and all six Kupoles seal the crack, and nothing may reach them while they do."));
 		SetType(QuestType.Main);
@@ -672,6 +678,7 @@ public class Vprison515Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60042);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dimensional Crack (7)"));
 		SetDescription(L("The crack is shut, and the Kupoles fall where they stood."));
 		SetType(QuestType.Main);
@@ -700,6 +707,7 @@ public class Vprison515Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60039);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Dead End"));
 		SetDescription(L("The demons are gathering at the Vanaga Monitor District and Sigita cannot stand up."));
 		SetType(QuestType.Sub);
@@ -727,6 +735,7 @@ public class Vprison515Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60040);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Food for Dionys"));
 		SetDescription(L("Dionys is recovering slowly, and the empty spirits of the Pasaru demons would help."));
 		SetType(QuestType.Sub);
@@ -757,6 +766,7 @@ public class Vprison515Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60041);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Eliminate the Small Gaps"));
 		SetDescription(L("Small cracks are opening in the Gavara Isolation District while the Kupoles are busy with the large one."));
 		SetType(QuestType.Sub);

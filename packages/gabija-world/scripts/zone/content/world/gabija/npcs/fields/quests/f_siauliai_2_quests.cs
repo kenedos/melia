@@ -697,6 +697,7 @@ public class SiaulEastCamp4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1031);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Camp in Danger"));
 		SetDescription(L("Monsters pour out of the eastern woods and threaten the outpost. Knight Ares wants the Poata that came for its young put down."));
 		SetType(QuestType.Sub);
@@ -726,6 +727,7 @@ public class SiaulEastReclaim1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1032);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Threats of the Eastern Woods"));
 		SetDescription(L("Knight Ares asks the Revelators to help settle the eastern woods before they can reach the mining village."));
 		SetType(QuestType.Main);
@@ -754,6 +756,7 @@ public class SiaulEastReclaim2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1033);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Border Guard's Request (1)"));
 		SetDescription(L("The border guard asks for help against the Chupacabra that threaten the unit."));
 		SetType(QuestType.Sub);
@@ -780,6 +783,7 @@ public class SiaulEastReclaim3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1034);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Border Guard's Request (2)"));
 		SetDescription(L("The supply depot has been overrun. Clear the Chupacabra out of it."));
 		SetType(QuestType.Sub);
@@ -808,6 +812,7 @@ public class SiaulEastReclaim6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1036);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nothing Goes as Planned (3)"));
 		SetDescription(L("The supply officer wants the Chupacabra that steal the supplies thinned out."));
 		SetType(QuestType.Sub);
@@ -834,6 +839,7 @@ public class SiaulEastReclaim7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1037);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nothing Goes as Planned (4)"));
 		SetDescription(L("The Weaver by the lower stream are disrupting the supply route. Clear them out."));
 		SetType(QuestType.Sub);
@@ -862,6 +868,7 @@ public class SiaulEastRequest1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1038);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ares' Commission (1)"));
 		SetDescription(L("Knight Ares wants the cause of the multiplying monsters found. Search the Popolion for a clue."));
 		SetType(QuestType.Main);
@@ -891,6 +898,7 @@ public class SiaulEastRequest2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1039);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ares' Commission (2)"));
 		SetDescription(L("The operations officer suspects the Vubbes are pushing in from the mining village. Scout the northern woods."));
 		SetType(QuestType.Main);
@@ -919,6 +927,7 @@ public class SiaulEastRequest4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1041);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Supply Soldier's Request (1)"));
 		SetDescription(L("The supply soldier needs Weaver Claws for the mining village shipment."));
 		SetType(QuestType.Sub);
@@ -948,6 +957,7 @@ public class SiaulEastRequest5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1042);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Supply Soldier's Request (2)"));
 		SetDescription(L("The supply soldier cannot work with the Pokubu raiding the supplies. Thin them out."));
 		SetType(QuestType.Sub);
@@ -975,6 +985,7 @@ public class SiaulEastRequest6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1043);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ares' Commission (3)"));
 		SetDescription(L("The scout found the Vubbe Fighter at the Nudegi logging camp. Deal with it before it grows bolder."));
 		SetType(QuestType.Main);
@@ -1003,6 +1014,7 @@ public class SiaulEastRequest7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1044);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Entering the Mining Village"));
 		SetDescription(L("The Vubbes have pushed the refugees back. Clear the monsters chasing them, then speak with Ares again."));
 		SetType(QuestType.Main);
@@ -1033,6 +1045,7 @@ public class Act2Diss1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4203);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nothing Goes as Planned (1)"));
 		SetDescription(L("Monsters stole the supplies bound for the mining village. Help the supply officer recover them."));
 		SetType(QuestType.Sub);
@@ -1059,6 +1072,7 @@ public class Act2Diss1_2BossQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20131);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nothing Goes as Planned (2)"));
 		SetDescription(L("A Tutu ambushes the supply officer. Put it down."));
 		SetType(QuestType.Sub);

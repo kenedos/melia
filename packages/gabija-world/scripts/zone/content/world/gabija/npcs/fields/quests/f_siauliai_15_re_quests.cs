@@ -725,6 +725,7 @@ public class Siauliai15Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50270);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Monsters after Monsters"));
 		SetDescription(L("Agent Pierneef wants you to deliver the activity report to the Lord of Orsha."));
 		SetType(QuestType.Sub);
@@ -752,6 +753,7 @@ public class Siau15reMq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60089);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Bishop (5)"));
 		SetDescription(L("Agent Cherasia seems to have found part of Priest Irma's journal while looking for the missing bishop. Try and recover the rest of the journal from monsters nearby."));
 		SetType(QuestType.Main);
@@ -782,6 +784,7 @@ public class Siau15reMq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60090);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Burnt Whereabouts (1)"));
 		SetDescription(L("Protect Agent Moren while he investigates. The more monsters you defeat in the area, the faster the agent will finish his investigation."));
 		SetType(QuestType.Main);
@@ -809,6 +812,7 @@ public class Siau15reMq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60091);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Burnt Whereabouts (2)"));
 		SetDescription(L("Agent Moren is convinced there might be other clues around. Look for leads in piles of grass with smoke coming out."));
 		SetType(QuestType.Main);
@@ -838,6 +842,7 @@ public class Siau15reMq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60092);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Imminent Danger (1)"));
 		SetDescription(L("Priest Pranas instructed Chaser Ulysses to investigate, but he finds it difficult because of the monsters. Go and investigate the Greate Stone Face Hill for them."));
 		SetType(QuestType.Main);
@@ -868,6 +873,7 @@ public class Siau15reMq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60093);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Imminent Danger (2)"));
 		SetDescription(L("Chaser Ulysses is worried about the demons and thinks it's best for you to go and help Priest Pranas instead. Go to Paupys Crossing and talk to Chaser Talbasi."));
 		SetType(QuestType.Main);
@@ -927,6 +933,7 @@ public class Siau15reSq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60095);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Removing the Odor"));
 		SetDescription(L("Agent Pierneef says the smell of defeated monsters is making other monsters go wild. Go to the Zbuka Inner Court and eliminate the smelly cart there."));
 		SetType(QuestType.Sub);
@@ -955,6 +962,7 @@ public class Siau15reSq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60096);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Turning Away"));
 		SetDescription(L("Chaser Germeja wants to give the monsters a stimulant drug that makes them fight each other. Use the stimulant on monsters."));
 		SetType(QuestType.Sub);
@@ -983,6 +991,7 @@ public class Siau15reSq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60097);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Monster Colony (1)"));
 		SetDescription(L("Chaser Raitis says they saw an unknown monster making a nest at Bonan Forest Road. Go destroy the nest and defeat some monsters there."));
 		SetType(QuestType.Sub);
@@ -1016,6 +1025,7 @@ public class Siau15reSq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60098);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Monster Colony (2)"));
 		SetDescription(L("You have defeated the monsters in Bonan Forest Road. Keep going and destroy the unknown monster nest."));
 		SetType(QuestType.Sub);

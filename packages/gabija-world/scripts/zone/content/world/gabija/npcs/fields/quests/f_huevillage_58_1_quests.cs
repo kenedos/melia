@@ -394,6 +394,7 @@ public class Huevillage581Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18100);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Searching for Goddess Saule"));
 		SetDescription(L("The portal to Goddess Saule is dead. Collect Purifying Stones from the Tanu to cleanse the Holy Pond."));
 		SetType(QuestType.Main);
@@ -423,6 +424,7 @@ public class Huevillage581Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18110);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purify the Holy Pond"));
 		SetDescription(L("The Purifying Stones are in the water. Set them working and report to the Old Man."));
 		SetType(QuestType.Main);
@@ -453,6 +455,7 @@ public class Huevillage581Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18120);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Search for the Missing Villager"));
 		SetDescription(L("A villager was sent to the portal and never came back. Find him on the lower path."));
 		SetType(QuestType.Main);
@@ -481,6 +484,7 @@ public class Huevillage581Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18130);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Checking the Portal"));
 		SetDescription(L("The villager cannot walk that far. Check the altar at Nugria Sanctum in his place."));
 		SetType(QuestType.Main);
@@ -507,6 +511,7 @@ public class Huevillage581Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18150);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nugria Sanctum's Moyabruka"));
 		SetDescription(L("Something has rooted itself under the altar of Nugria Sanctum."));
 		SetType(QuestType.Sub);
@@ -544,6 +549,7 @@ public class Huevillage581Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18160);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Removing Pollutants in Veidma Uphill"));
 		SetDescription(L("A source of corruption on the Veidma Uphill slope grows stronger with every beast around it."));
 		SetType(QuestType.Sub);
@@ -570,6 +576,7 @@ public class Huevillage581Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18170);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Holy Pond's Merregina"));
 		SetDescription(L("The corruption of the Holy Pond has a shape of its own under the water."));
 		SetType(QuestType.Sub);
@@ -609,6 +616,7 @@ public class Huevillage581Mq11Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18190);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Girl in Danger"));
 		SetDescription(L("The villagers were demons in disguise. Run for the portal at Nugria Sanctum."));
 		SetType(QuestType.Main);

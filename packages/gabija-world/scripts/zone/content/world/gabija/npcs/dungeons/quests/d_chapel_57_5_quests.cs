@@ -563,6 +563,7 @@ public class Chaple575Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8520);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nibble Nibble"));
 		SetDescription(L("The Yognomes are trying to eat the altar. Thin them out."));
 		SetType(QuestType.Sub);
@@ -590,6 +591,7 @@ public class Chaple575Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8521);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mark Territory"));
 		SetDescription(L("The Rodelins carry Eyes of Madness that hide a man from demons."));
 		SetType(QuestType.Sub);
@@ -619,6 +621,7 @@ public class Chaple575Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8522);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Church Underground Passage"));
 		SetDescription(L("An Unknocker guards the altar. Put it down so the barrier can be offset."));
 		SetType(QuestType.Main);
@@ -648,6 +651,7 @@ public class Chaple575Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8523);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Light Attack (1)"));
 		SetDescription(L("Tiberius needs Purified Essence for his Holy Bomb."));
 		SetType(QuestType.Sub);
@@ -678,6 +682,7 @@ public class Chaple575Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8524);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Light Attack (2)"));
 		SetDescription(L("Tiberius wants to test the Holy Bomb on a Glizardon."));
 		SetType(QuestType.Sub);
@@ -706,6 +711,7 @@ public class Chaple575Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8525);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Till the Last Drop"));
 		SetDescription(L("Vaidas only has one empty Holy Stone left. Fill it with demon lives."));
 		SetType(QuestType.Sub);
@@ -734,6 +740,7 @@ public class Chaple575Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8526);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bully"));
 		SetDescription(L("Defeat the Glizardons that roam the Tenet Church B1."));
 		SetType(QuestType.Sub);
@@ -762,6 +769,7 @@ public class Chaple575Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8527);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Beyond the Darkness"));
 		SetDescription(L("Break the barrier Gesti left at the basement's central altar and find Vaidutis."));
 		SetType(QuestType.Main);

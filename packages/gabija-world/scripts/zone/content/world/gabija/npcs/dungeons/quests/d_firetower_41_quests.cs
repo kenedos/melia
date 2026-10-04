@@ -591,6 +591,7 @@ public class Ftower41Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8473);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Gabija (3)"));
 		SetDescription(L("Light the signal in the left hallway so the goddess knows that help has reached the tower."));
 		SetType(QuestType.Main);
@@ -649,6 +650,7 @@ public class Ftower41Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8475);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Gabija (5)"));
 		SetDescription(L("The larger transport circle at the center of the floor was left as a trap."));
 		SetType(QuestType.Main);
@@ -677,6 +679,7 @@ public class Ftower41Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8476);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Gabija (6)"));
 		SetDescription(L("The tower's barrier device needs power, and the gem Grita hands over takes it from what dies near it."));
 		SetType(QuestType.Main);
@@ -704,6 +707,7 @@ public class Ftower41Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8477);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Agailla Flurry's Barrier"));
 		SetDescription(L("The barrier device at the end of the left hallway will close the floor once it runs again."));
 		SetType(QuestType.Main);
@@ -730,6 +734,7 @@ public class Ftower41Sq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8500);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lizard of Fire"));
 		SetDescription(L("Something was lying against the barrier device, and it did not wait to be looked at."));
 		SetType(QuestType.Sub);
@@ -767,6 +772,7 @@ public class Ftower41Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17002);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Young Magician Owyn (1)"));
 		SetDescription(L("A young magician is holding a stretch of the first floor by himself."));
 		SetType(QuestType.Sub);
@@ -793,6 +799,7 @@ public class Ftower41Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17003);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Young Magician Owyn (2)"));
 		SetDescription(L("Owyn will take the rest of the floor if the Drakes are taken off him."));
 		SetType(QuestType.Sub);
@@ -819,6 +826,7 @@ public class Ftower41Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17004);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Evidence of Bedazzlement (1)"));
 		SetDescription(L("Cordelier needs Black Coal Powder before she can read the seal in front of her."));
 		SetType(QuestType.Sub);
@@ -848,6 +856,7 @@ public class Ftower41Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17005);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Evidence of Bedazzlement (2)"));
 		SetDescription(L("The seal also wants Eternal Embers, and the Drakes carry them."));
 		SetType(QuestType.Sub);
@@ -878,6 +887,7 @@ public class Ftower41Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17006);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Evidence of Bedazzlement (3)"));
 		SetDescription(L("Something heavy moved in the reading room while Cordelier was working."));
 		SetType(QuestType.Sub);

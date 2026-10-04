@@ -876,6 +876,7 @@ public class SoutQ01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8067);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Investigating Miners' Village (1)"));
 		SetDescription(L("Reach the Miners' Village and find out from its mayor what happened."));
 		SetType(QuestType.Main);
@@ -906,6 +907,7 @@ public class SoutQ05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8071);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Aid Recovery"));
 		SetDescription(L("The Hunter needs help recovering the relief supplies the monsters stole."));
 		SetType(QuestType.Sub);
@@ -933,6 +935,7 @@ public class SoutQ07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8073);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mine Manager Brinker's Dedication (1)"));
 		SetDescription(L("Brinker is holding up a collapsing wall. Gather stones to shore it up."));
 		SetType(QuestType.Sub);
@@ -960,6 +963,7 @@ public class SoutQ08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8074);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mine Manager Brinker's Dedication (2)"));
 		SetDescription(L("Clear the monsters around the wall so Brinker can return to the village."));
 		SetType(QuestType.Sub);
@@ -986,6 +990,7 @@ public class SoutQ09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8075);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Healer Lady's Worry (1)"));
 		SetDescription(L("Bring the refugee couple by the Statue of Goddess Zemyna back to the Healer Lady."));
 		SetType(QuestType.Sub);
@@ -1012,6 +1017,7 @@ public class SoutQ10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8076);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Healer Lady's Worry (2)"));
 		SetDescription(L("The Healer Lady cannot travel with so many monsters about. Thin them out."));
 		SetType(QuestType.Sub);
@@ -1040,6 +1046,7 @@ public class SoutQ13Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8079);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Invasion of the Vubbes"));
 		SetDescription(L("The Vubbes have built a base outside the village. Drive them out."));
 		SetType(QuestType.Sub);
@@ -1068,6 +1075,7 @@ public class SoutQ14Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8080);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Kidnapped Villagers"));
 		SetDescription(L("The Vubbes took the villagers into the Crystal Mine. Save Vaidotas at the Vubbe Outpost first."));
 		SetType(QuestType.Main);
@@ -1096,6 +1104,7 @@ public class SoutQ15Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8081);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Suspicious Treasure Chest"));
 		SetDescription(L("A suspicious chest stands on the mining road. Open it and deal with what comes out."));
 		SetType(QuestType.Sub);
@@ -1125,6 +1134,7 @@ public class SoutQ16Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8082);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Mines"));
 		SetDescription(L("Blow up the wagons blocking the mine road and press on to Crystal Mine 1F."));
 		SetType(QuestType.Main);
@@ -1162,6 +1172,7 @@ public class SoutSuddPrebossQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8347);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Healer Lady's Worry (3)"));
 		SetDescription(L("Chafer blocks the road back to the village. Put it down."));
 		SetType(QuestType.Sub);
@@ -1359,6 +1370,7 @@ public class SoutQ31Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50004);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Soldier's Favor"));
 		SetDescription(L("Soldier Jace wants the mementos the Vubbes tore from his fallen comrades."));
 		SetType(QuestType.Repeat);
@@ -1388,6 +1400,7 @@ public class SoutQ32Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50005);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Stolen Food Supplies"));
 		SetDescription(L("The Vubbes made off with the village's food. Get it back."));
 		SetType(QuestType.Repeat);
@@ -1417,6 +1430,7 @@ public class SoutQ41Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50006);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Gele Plateau"));
 		SetDescription(L("The Mayor of the Miners' Village explains the road to Gele Plateau through Srautas Gorge."));
 		SetType(QuestType.Main);

@@ -1078,6 +1078,7 @@ public class Cathedral56Mq02_1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20342);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Adapting to Circumstances (2)"));
 		SetDescription(L("A demon's clothes are the first thing a demon transformation needs."));
 		SetType(QuestType.Main);
@@ -1106,6 +1107,7 @@ public class Cathedral56Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20330);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Adapting to Circumstances (3)"));
 		SetDescription(L("The Demon Transformation Scroll writes itself at the Altar of Intelligence, if it is left alone long enough."));
 		SetType(QuestType.Main);
@@ -1136,6 +1138,7 @@ public class Cathedral56Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20331);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Adapting to Circumstances (4)"));
 		SetDescription(L("The demons have to be told where the key is, and they have to be told by one of their own."));
 		SetType(QuestType.Main);
@@ -1172,6 +1175,7 @@ public class Cathedral56Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20332);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Adapting to Circumstances (5)"));
 		SetDescription(L("The trap at Apgaule Altar spends itself on Naktis' servants, and the fourth key is left in the open."));
 		SetType(QuestType.Main);
@@ -1210,6 +1214,7 @@ public class Cathedral56Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20333);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Last Key"));
 		SetDescription(L("The fifth secret is in the Small Reception Room, and it asks for an order as well as a count."));
 		SetType(QuestType.Main);
@@ -1239,6 +1244,7 @@ public class Cathedral56Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20334);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Pasala Altar"));
 		SetDescription(L("All five keys are in hand, and the hidden room is behind Pasala Altar."));
 		SetType(QuestType.Main);
@@ -1273,6 +1279,7 @@ public class Cathedral56Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20335);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The sealed door"));
 		SetDescription(L("The door to the hidden room is held shut by two candles in the Tikinciuju Gallery."));
 		SetType(QuestType.Main);
@@ -1348,6 +1355,7 @@ public class Cathedral56Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20337);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Naktis' Wrath"));
 		SetDescription(L("The Demon Lord of Curses has been waiting behind the door to Pasala Altar the whole time."));
 		SetType(QuestType.Sub);
@@ -1386,6 +1394,7 @@ public class Cathedral56Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20338);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Cursed Orb"));
 		SetDescription(L("The orbs cannot be broken, so they have to be carried out one at a time."));
 		SetType(QuestType.Sub);
@@ -1414,6 +1423,7 @@ public class Cathedral56Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20339);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Masquerade"));
 		SetDescription(L("Something at Maskuote Narthex is shaped like one of Maven's machines and is not one."));
 		SetType(QuestType.Sub);
@@ -1442,6 +1452,7 @@ public class Cathedral54Mq05Part3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20340);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Bishop's Last Mission (1)"));
 		SetDescription(L("Maven's last test stands between the portal and the revelation."));
 		SetType(QuestType.Main);
@@ -1470,6 +1481,7 @@ public class Cathedral56Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50002);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purifying the Great Cathedral"));
 		SetDescription(L("Priest Prosit has run out of patience with the demons walking the Sanctuary."));
 		SetType(QuestType.Repeat);

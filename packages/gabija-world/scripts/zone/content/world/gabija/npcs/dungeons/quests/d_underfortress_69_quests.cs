@@ -848,6 +848,7 @@ public class Underfortress69Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50079);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Confidence"));
 		SetDescription(L("The Monocle held on Premier Eminent shows what he really is."));
 		SetType(QuestType.Main);
@@ -878,6 +879,7 @@ public class Underfortress69Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50080);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Repair Parts"));
 		SetDescription(L("The device Ruklys broke can be rebuilt out of the traps on Ataka Side Road."));
 		SetType(QuestType.Main);
@@ -904,6 +906,7 @@ public class Underfortress69Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50081);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preparation (1)"));
 		SetDescription(L("The Slepti Watchtower foundation stone takes its letters back in demon blood."));
 		SetType(QuestType.Main);
@@ -974,6 +977,7 @@ public class Underfortress69Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50083);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Eminent's Identity"));
 		SetDescription(L("The magic circle lights, Eminent burns in it, and what he summons is left to fight."));
 		SetType(QuestType.Main);
@@ -1012,6 +1016,7 @@ public class Underfortress69Mq060Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50084);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Revelation of Fortress of the Land"));
 		SetDescription(L("The device opens the chamber, and Goddess Laima is waiting in it."));
 		SetType(QuestType.Main);
@@ -1041,6 +1046,7 @@ public class Underfortress69Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50085);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Grave Robber in History"));
 		SetDescription(L("Amanda is the first grave robber this far into the fortress and wants it written down."));
 		SetType(QuestType.Sub);
@@ -1132,6 +1138,7 @@ public class Underfortress69Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50269);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Notable Grave Robbers and Adventurers"));
 		SetDescription(L("Amanda has her stone and no tools, and the Dievdirbys Master keeps tools."));
 		SetType(QuestType.Sub);

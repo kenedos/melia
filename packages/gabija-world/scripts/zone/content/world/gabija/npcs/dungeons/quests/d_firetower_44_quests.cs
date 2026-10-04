@@ -556,6 +556,7 @@ public class Ftower44Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8488);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 4th Floor (1)"));
 		SetDescription(L("The Jewel of Prominence has not been right since Antares went up in the explosion."));
 		SetType(QuestType.Main);
@@ -589,6 +590,7 @@ public class Ftower44Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8489);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 4th Floor (2)"));
 		SetDescription(L("The goddess left a stabilizer on this floor for the day the tower's magic ran wild."));
 		SetType(QuestType.Main);
@@ -617,6 +619,7 @@ public class Ftower44Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8490);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 4th Floor (3)"));
 		SetDescription(L("Flame Crystals from the Large Central Brazier will settle the jewel for good."));
 		SetType(QuestType.Main);
@@ -646,6 +649,7 @@ public class Ftower44Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8491);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 4th Floor (4)"));
 		SetDescription(L("Grita works the control circle to settle the tower, and the floor comes for her while she does."));
 		SetType(QuestType.Main);
@@ -674,6 +678,7 @@ public class Ftower44Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8492);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mage Tower 4th Floor (5)"));
 		SetDescription(L("The stairs to the fifth floor are held by something that was left to hold them."));
 		SetType(QuestType.Main);
@@ -712,6 +717,7 @@ public class Ftower44Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17017);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Transmuter Furry Odd (1)"));
 		SetDescription(L("A transmuter in the resting area has run out of the mediators her work needs."));
 		SetType(QuestType.Sub);
@@ -741,6 +747,7 @@ public class Ftower44Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17018);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Transmuter Furry Odd (2)"));
 		SetDescription(L("Furry Odd moves on to the 1st Machinery Room and wants Hardened Black Crystals on the way."));
 		SetType(QuestType.Sub);
@@ -770,6 +777,7 @@ public class Ftower44Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17019);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Transmuter Furry Odd (3)"));
 		SetDescription(L("Furry Odd holds the Machinery Room door while the Yonazolem inside is dealt with."));
 		SetType(QuestType.Sub);
@@ -799,6 +807,7 @@ public class Ftower44Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17020);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Suspicious Seal"));
 		SetDescription(L("Another of the stones, this one beside the Magic Stabilizing Device."));
 		SetType(QuestType.Sub);
@@ -825,6 +834,7 @@ public class Ftower44Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17021);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Now It's Really Suspicious"));
 		SetDescription(L("The stone in the 2nd Machinery Room asks for the same thing as all the others."));
 		SetType(QuestType.Sub);
@@ -851,6 +861,7 @@ public class Firetower44Hq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19051);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Crafting and Materials"));
 		SetDescription(L("Furry Odd would rather see a bag of Drake Horns made into something than sold."));
 		SetType(QuestType.Sub);

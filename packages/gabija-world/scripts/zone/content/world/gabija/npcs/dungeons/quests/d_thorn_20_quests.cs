@@ -402,6 +402,7 @@ public class Thorn20Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20262);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Caught in the Middle"));
 		SetDescription(L("Rikaus has been spreading evil energy through Thorny Pillar Garden."));
 		SetType(QuestType.Sub);
@@ -430,6 +431,7 @@ public class Thorn20Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20263);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Art of Interference"));
 		SetDescription(L("The Merog Shamans hold their rituals west of the Believers' camp. Break them up."));
 		SetType(QuestType.Sub);
@@ -459,6 +461,7 @@ public class Thorn20Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20264);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Don't Panic"));
 		SetDescription(L("The Merogs turned Goddess Saule's altars into summoning circles. Break the crystals at their centre."));
 		SetType(QuestType.Sub);
@@ -487,6 +490,7 @@ public class Thorn20Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20266);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unexpected Research"));
 		SetDescription(L("Believer Simas wants the summoning circle broken, but not broken up."));
 		SetType(QuestType.Sub);

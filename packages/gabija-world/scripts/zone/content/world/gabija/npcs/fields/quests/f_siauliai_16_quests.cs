@@ -943,6 +943,7 @@ public class Siau16Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60070);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Journey Begins (1)"));
 		SetDescription(L("What a horrific dream. But it's time to head to Orsha. Talk to Settler Bowein by the Lemprasa Pond."));
 		SetType(QuestType.Main);
@@ -966,6 +967,7 @@ public class Siau16Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60071);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Journey Begins (2)"));
 		SetDescription(L("Press the M key to open the map. Confirm Settler Brophen's location, then go and talk to him."));
 		SetType(QuestType.Main);
@@ -995,6 +997,7 @@ public class Siau16Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60072);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Journey Begins (3)"));
 		SetDescription(L("Brophen says you can use Status Points by leveling up to become even stronger. Press the F1 key and distribute your new Status Point."));
 		SetType(QuestType.Main);
@@ -1019,6 +1022,7 @@ public class Siau16Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60073);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Journey Begins (4)"));
 		SetDescription(L("Settler Brophen says Settler Layla might know where the mayor is. He also asked you to deliver some grass leaf ointment to her."));
 		SetType(QuestType.Main);
@@ -1045,6 +1049,7 @@ public class Siau16Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60074);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Orsha (1)"));
 		SetDescription(L("Mayor Romanas believes in your talent and will make sure you're admitted into Orsha immediately. Officer Lutas is looking for you at the Orsha Migration Office."));
 		SetType(QuestType.Main);
@@ -1069,6 +1074,7 @@ public class Siau16Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60075);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Orsha (2)"));
 		SetDescription(L("A Poata suddenly appeared at the entrance to Orsha and it's threatening the settlers! Defeat the Poata and make the entrance to Orsha safe again."));
 		SetType(QuestType.Main);
@@ -1099,6 +1105,7 @@ public class Siau16Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60076);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Orsha (3)"));
 		SetDescription(L("Inesa Hamondale, the lord of Orsha, is looking for someone with skills. To find Urbonas, the bishop of Orsha, talk to Inesa Hamondale at the Central Plaza first."));
 		SetType(QuestType.Main);
@@ -1123,6 +1130,7 @@ public class Siau16Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60077);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Thankful Heart"));
 		SetDescription(L("Settler Izna wants to make some medicine for you as a token of appreciation. Defeat some Leaf Bugs around Ziedo Pond to obtain Red Leaves for the medicine."));
 		SetType(QuestType.Sub);
@@ -1151,6 +1159,7 @@ public class Siau16Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60078);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Something to Give"));
 		SetDescription(L("Settler Izna wants to make Stamina Pills for the new settlers arriving to Orsha. Defeat Chinencys around Ziedo Pond and collect the Rampar Mucus used to make Stamina pills."));
 		SetType(QuestType.Sub);
@@ -1179,6 +1188,7 @@ public class Siau16Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60079);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lost in the Forest (1)"));
 		SetDescription(L("Settler Izna believes some village residents have gotten lost on their way to Orsha. Go to Adata Highway and make a bonfire so they can spot the smoke and find their way."));
 		SetType(QuestType.Sub);
@@ -1204,6 +1214,7 @@ public class Siau16Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60080);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lost in the Forest (2)"));
 		SetDescription(L("Settler Izna thinks the bonfire may be hard to spot by the residents. Go to Adata Highway and set fire to the firewood there."));
 		SetType(QuestType.Sub);
@@ -1233,6 +1244,7 @@ public class Siau16Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60081);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("An Unowned Object"));
 		SetDescription(L("Settler Ivanayus is in desperate need of supplies and willing to settle for used ones. Go to the Lumberjack Cabin and collect useful objects."));
 		SetType(QuestType.Sub);
@@ -1259,6 +1271,7 @@ public class Siau16Sq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60082);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Statue of Goddess Zemyna"));
 		SetDescription(L("Settler Dallanas says the goddesses bless those who worship their statues. Worship the Statue of Goddess Zemyna at the Randoluma Rest Place and receive Her blessings."));
 		SetType(QuestType.Sub);
@@ -1284,6 +1297,7 @@ public class Siau16Sq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60083);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unsafe Safety Zone"));
 		SetDescription(L("Settler Dallanas was told to wait at the Randoluma Rest Place, but staying there proved impossible due to the amount of monsters. Go to the Randoluma Rest Place and defeat the monsters there."));
 		SetType(QuestType.Sub);
@@ -1309,6 +1323,7 @@ public class Siau16Sq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60084);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Settler Without Rest"));
 		SetDescription(L("Settler Dallanas says her people arrived at the Randoluma Rest Place but had to scatter because of the monsters. Go to Randoluma Rest Place and find the villagers hiding there."));
 		SetType(QuestType.Sub);

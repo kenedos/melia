@@ -849,6 +849,7 @@ public class FOrchard324Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80041);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Divine Encounter"));
 		SetDescription(L("Goddess Laima has asked you to rescue Goddess Lada from the demons and thwart their plans. She is being held captive by Demon Lord Zaura in the Seir Rainforest. Go find her."));
 		SetType(QuestType.Main);
@@ -875,6 +876,7 @@ public class FOrchard324Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80042);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Kidnapped Goddess"));
 		SetDescription(L("Goddess Lada says that, before destroying the Kruvina, you need to destroy the devices attached to Her. Talk to Goddess Lada."));
 		SetType(QuestType.Main);
@@ -926,6 +928,7 @@ public class FOrchard324Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80044);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroy Vitality Absorption Device"));
 		SetDescription(L("Goddess Lada believes that adding demon blood to the vitality absorption device will cause it to reverse and become deactivated."));
 		SetType(QuestType.Main);
@@ -953,6 +956,7 @@ public class FOrchard324Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80045);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Kruvina Suppressor"));
 		SetDescription(L("Goddess Lada told you that when you use the orb of the goddess to Kruvina suppressor, the magical energy would overload and it would stop working."));
 		SetType(QuestType.Main);
@@ -977,6 +981,7 @@ public class FOrchard324Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80046);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Thing That Should Not Let It Be"));
 		SetDescription(L("Goddess Lada says even an incomplete Kruvina can be used for evil and thinks it should be destroyed."));
 		SetType(QuestType.Main);
@@ -1007,6 +1012,7 @@ public class FOrchard324Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80047);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Goddess' Hidden Message"));
 		SetDescription(L("Goddess Lada says She heard the voice of Goddess Laima calling for you. Go to the statue of Goddess Laima in Zeraha."));
 		SetType(QuestType.Main);
@@ -1038,6 +1044,7 @@ public class FOrchard324Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80048);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Temple Rebuilding Preparation (1)"));
 		SetDescription(L("The village priest wants to rebuild the fallen temple to prepare for the return of Goddesses Laima and Lada. But first, you need to clear out the demons and purify the contaminated land. The village priest hopes you can help chase the demons away."));
 		SetType(QuestType.Sub);
@@ -1065,6 +1072,7 @@ public class FOrchard324Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80049);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Temple Rebuilding Preparation (2)"));
 		SetDescription(L("The village priest wants to purify the land contaminated with evil energy, but they aren't sure what to do, as it was contaminated on purpose. Go to Fedimian and ask the Masters there for advice on land purification."));
 		SetType(QuestType.Sub);
@@ -1125,6 +1133,7 @@ public class FOrchard324Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80051);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Flower Enriched With the Earth"));
 		SetDescription(L("The great priest of the village has asked you to plant the Earth Flower seeds and deliver the flower to Goddess Lada"));
 		SetType(QuestType.Sub);
@@ -1154,6 +1163,7 @@ public class FOrchard324Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60185);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hoping the Goddess Will Recover"));
 		SetDescription(L("Believer Dreka wishes to collect Ceyral Saplings for Goddess Rada to recover. Collect Ceyral Saplings from near Shulti Workshop and return to Dreka."));
 		SetType(QuestType.Repeat);

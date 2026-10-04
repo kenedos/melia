@@ -575,6 +575,7 @@ public class Underfortress68Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50072);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Past of the Spirits (1)"));
 		SetDescription(L("A Restraint Token starts with the eggs of the quarter's Infroholders."));
 		SetType(QuestType.Main);
@@ -602,6 +603,7 @@ public class Underfortress68Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50073);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Past of the Spirits (2)"));
 		SetDescription(L("The token needs demon bone to carry what the eggs hold."));
 		SetType(QuestType.Main);
@@ -631,6 +633,7 @@ public class Underfortress68Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50074);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Past of the Spirits (3)"));
 		SetDescription(L("The Absorption Orb has to be filled off the quarter's own demons."));
 		SetType(QuestType.Main);
@@ -718,6 +721,7 @@ public class Underfortress68Mq060Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50088);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Old Manager's Identity"));
 		SetDescription(L("The keeper gives his name at last: Premier Eminent, who served King Kadumel."));
 		SetType(QuestType.Main);
@@ -742,6 +746,7 @@ public class Underfortress68Mq070Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50089);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Doubt"));
 		SetDescription(L("Premier Eminent is seen on the battlefield giving the demons their orders."));
 		SetType(QuestType.Main);

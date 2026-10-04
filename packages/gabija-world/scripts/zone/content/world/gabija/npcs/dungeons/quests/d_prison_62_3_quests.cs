@@ -766,6 +766,7 @@ public class Prison623Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30040);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Prison Scout"));
 		SetDescription(L("Some areas in Ashaq Underground Prison 3F are glowing with an eery red energy. Go and have a look at them."));
 		SetType(QuestType.Sub);
@@ -800,6 +801,7 @@ public class Prison622Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50272);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Inmates' Secret Spots"));
 		SetDescription(L("You followed the suspicious notes and found a locking device. Read the notes carefully and enter the code to unlock the device."));
 		SetType(QuestType.Sub);
@@ -835,6 +837,7 @@ public class Prison623Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60136);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Deeper Place (1)"));
 		SetDescription(L("Priest Irma wants to release the spirit of the closest altar to clear out the energy of the cursed idol. With the power of the Revelators, release the spirit on your way to the Second Watchtower."));
 		SetType(QuestType.Main);
@@ -861,6 +864,7 @@ public class Prison623Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60137);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Deeper Place (2)"));
 		SetDescription(L("Priest Irma believes your only hope lies on the blessing spirit of the last remaining altar. Release the spirit bestowed on the Confession Altar in the Prayer Room."));
 		SetType(QuestType.Main);
@@ -887,6 +891,7 @@ public class Prison623Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60138);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Deeper Place (3)"));
 		SetDescription(L("Priest Irma believes the Idol will have become completely harmless now. Go to the Second Watchtower and destroy the cursed idol."));
 		SetType(QuestType.Main);
@@ -915,6 +920,7 @@ public class Prison623Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60139);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Deeper Place (4)"));
 		SetDescription(L("Demon Lord Marnox was hiding in the Penitence Room waiting to attack you! Defeat Demon Lord Marnox."));
 		SetType(QuestType.Main);
@@ -943,6 +949,7 @@ public class Prison623Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60140);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Everything Intact (1)"));
 		SetDescription(L("Priest Irma wants you to go and deliver the Demon Orders to Bishop Urbonas. Bring the orders to the room in Ashaq Underground Prison 1F where Bishop Urbonas is hiding."));
 		SetType(QuestType.Main);
@@ -969,6 +976,7 @@ public class Prison623Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60142);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Collecting Information"));
 		SetDescription(L("Priest Gelija is looking to do research on the demons' command hierarchy. Defeat demons to collect Marnox insignias."));
 		SetType(QuestType.Sub);
@@ -997,6 +1005,7 @@ public class Prison623Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60143);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Precious and Valuable"));
 		SetDescription(L("Priest Gelija is trying to help the injured but it seems they lost a pouch with medicine while running away. Find Priest Gelija's medicine pouch."));
 		SetType(QuestType.Sub);
@@ -1024,6 +1033,7 @@ public class Prison623Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60144);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Change of One's Thinking"));
 		SetDescription(L("While the cursed idol has been destroyed, its future still worries Priest Gelija. Cover any idol fragments with the cloth soaked in holy water to clear out their evil energy."));
 		SetType(QuestType.Sub);
@@ -1051,6 +1061,7 @@ public class Prison623Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60154);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Days to Forget"));
 		SetDescription(L("Priest Gelija has asked you to clear out the Varvs that have been terrorizing the priests in Ashaq Underground Prison. They are often found at the Felon Prison."));
 		SetType(QuestType.Repeat);

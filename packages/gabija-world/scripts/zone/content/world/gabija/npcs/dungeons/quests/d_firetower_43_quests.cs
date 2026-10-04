@@ -522,6 +522,7 @@ public class Ftower43Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8483);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lunatic Wizard (1)"));
 		SetDescription(L("Antares is loose on the third floor, and he throws his Red Infrorocktors at the landing."));
 		SetType(QuestType.Main);
@@ -550,6 +551,7 @@ public class Ftower43Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8484);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lunatic Wizard (2)"));
 		SetDescription(L("The first of the two Magic Control Valves stands in the Laboratory."));
 		SetType(QuestType.Main);
@@ -578,6 +580,7 @@ public class Ftower43Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8485);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lunatic Wizard (3)"));
 		SetDescription(L("Antares studied the flow of magic here, and what he wrote down is still on the Laboratory floor."));
 		SetType(QuestType.Main);
@@ -604,6 +607,7 @@ public class Ftower43Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8487);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Immobile Security Device"));
 		SetDescription(L("A Mineloader was set here as a guard, and it has not moved in years."));
 		SetType(QuestType.Sub);
@@ -641,6 +645,7 @@ public class Ftower43Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8516);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lunatic Wizard (4)"));
 		SetDescription(L("The defensive magic against the next explosion wants Red Infrorocktor cores."));
 		SetType(QuestType.Main);
@@ -670,6 +675,7 @@ public class Ftower43Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8499);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lunatic Wizard (5)"));
 		SetDescription(L("Antares reaches the second valve first, and he does not know the first one is already gone."));
 		SetType(QuestType.Main);
@@ -699,6 +705,7 @@ public class Ftower43Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17012);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What Kind of Sin (1)"));
 		SetDescription(L("A stone in the 1st Library wants the Red Infrorocktors that watch it taken off."));
 		SetType(QuestType.Sub);
@@ -725,6 +732,7 @@ public class Ftower43Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17013);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What Kind of Sin (2)"));
 		SetDescription(L("The other pieces of the same soul have lost the voices they called with."));
 		SetType(QuestType.Sub);
@@ -754,6 +762,7 @@ public class Ftower43Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17014);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Too Many Seals (1)"));
 		SetDescription(L("The stone in the Central Control Room has had enough of the Armas around it."));
 		SetType(QuestType.Sub);
@@ -780,6 +789,7 @@ public class Ftower43Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17015);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Too Many Seals (2)"));
 		SetDescription(L("The seal breaks when the Crystals of Restriction the Flask Mages carry are broken."));
 		SetType(QuestType.Sub);
@@ -810,6 +820,7 @@ public class Ftower43Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17016);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Scream in the Silence"));
 		SetDescription(L("A table in the office would rather not be found by the Gray Golem outside."));
 		SetType(QuestType.Sub);

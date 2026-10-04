@@ -924,6 +924,7 @@ public class Cathedral53Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20300);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Vessel for a Spirit (1)"));
 		SetDescription(L("Something pale is waiting in the Main Chamber, and it has been waiting a very long time."));
 		SetType(QuestType.Main);
@@ -954,6 +955,7 @@ public class Cathedral53Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20301);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Vessel for a Spirit (2)"));
 		SetDescription(L("A scripture whole enough to hold a spirit is somewhere in Pamaldu Groom."));
 		SetType(QuestType.Main);
@@ -983,6 +985,7 @@ public class Cathedral53Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20302);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Vessel for a Spirit (3)"));
 		SetDescription(L("The Spirit's Scripture is finished, and it should be tried once before it is trusted."));
 		SetType(QuestType.Main);
@@ -1010,6 +1013,7 @@ public class Cathedral53Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20303);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mercy and Salvation (1)"));
 		SetDescription(L("The first of Maven's five secrets is a count of candles in the Meile Oratorium."));
 		SetType(QuestType.Main);
@@ -1039,6 +1043,7 @@ public class Cathedral53Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20304);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mercy and Salvation (2)"));
 		SetDescription(L("The second relic is already in the hands of Naktis' servants."));
 		SetType(QuestType.Main);
@@ -1068,6 +1073,7 @@ public class Cathedral53Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20305);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mercy and Salvation (3)"));
 		SetDescription(L("Both relics go into the old altars of the Small Hall, and the first key comes out."));
 		SetType(QuestType.Main);
@@ -1096,6 +1102,7 @@ public class Cathedral53Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20306);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Endlessly Blasphemous"));
 		SetDescription(L("The words of the great bishops are lying on the floor where the demons walk."));
 		SetType(QuestType.Sub);
@@ -1123,6 +1130,7 @@ public class Cathedral53Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20307);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Well Hidden Holy Relics"));
 		SetDescription(L("Some relics hide from evil, and only the Orb of Divine Detection draws them out."));
 		SetType(QuestType.Sub);
@@ -1183,6 +1191,7 @@ public class Cathedral53Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50000);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Disintegration (1)"));
 		SetDescription(L("Priest Benedict wants the curse taken apart, and that starts with samples."));
 		SetType(QuestType.Sub);
@@ -1212,6 +1221,7 @@ public class Cathedral53Sq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50001);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Disintegration (2)"));
 		SetDescription(L("The first samples read backwards, so Benedict wants a different demon."));
 		SetType(QuestType.Sub);

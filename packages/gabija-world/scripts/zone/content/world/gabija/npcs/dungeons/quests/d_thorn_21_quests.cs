@@ -540,6 +540,7 @@ public class Thorn21Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20268);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Attack of the Infro Holders"));
 		SetDescription(L("Believer Bronius is being run down by the Infro Holders that followed him."));
 		SetType(QuestType.Sub);
@@ -568,6 +569,7 @@ public class Thorn21Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20269);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purify Kvailas Forest (1)"));
 		SetDescription(L("Believer Samantha cannot purify Thornbush Rest Place while the monsters keep coming at the altar."));
 		SetType(QuestType.Sub);
@@ -635,6 +637,7 @@ public class Thorn21Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20271);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Capturing Bramble (1)"));
 		SetDescription(L("The stimulant that holds off Bramble's evil energy needs Matsum's Flower Stamen."));
 		SetType(QuestType.Main);
@@ -703,6 +706,7 @@ public class Thorn21Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20273);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purify Kvailas Forest (2)"));
 		SetDescription(L("Believer Kazis wants the Altar of Purification on Karadas Path set working, Honeypin or no Honeypin."));
 		SetType(QuestType.Sub);
@@ -777,6 +781,7 @@ public class Thorn21Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20274);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Capturing Bramble (3)"));
 		SetDescription(L("Bramble and the revelation are in the depths of Giliaii Courtyard."));
 		SetType(QuestType.Main);
@@ -820,6 +825,7 @@ public class Thorn21Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20275);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Goddess Saule"));
 		SetDescription(L("Take the Revelation of Kvailas Forest from its stand and carry it back to Goddess Saule."));
 		SetType(QuestType.Main);

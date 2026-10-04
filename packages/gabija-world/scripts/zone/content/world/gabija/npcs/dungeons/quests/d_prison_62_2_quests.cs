@@ -725,6 +725,7 @@ public class Prison622Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60127);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Into the Hands (5)"));
 		SetDescription(L("For the cursed idol to be safely destroyed, its energy needs to clash with the orb's power. First, defeat demons around the idol in the Examination Room and have it absorb their power."));
 		SetType(QuestType.Main);
@@ -752,6 +753,7 @@ public class Prison622Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60128);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Into the Grip (2)"));
 		SetDescription(L("Priest Pranas heard about what happened to Priest Irma from the other priests. Rescue Priest Irma from the Solitary Confinement District."));
 		SetType(QuestType.Main);
@@ -780,6 +782,7 @@ public class Prison622Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60129);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Into the Grip (3)"));
 		SetDescription(L("Priest Irma says the Orb of Return is heavily damaged from having used it on Demon Lord Marnox. Defeat Wendigo Escapees nearby the Central Passage and use their magic energy to restore the Orb of Return."));
 		SetType(QuestType.Main);
@@ -807,6 +810,7 @@ public class Prison622Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60130);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Into the Grip (4)"));
 		SetDescription(L("Priest Irma wants you to charge the orb with power from the crystals in the Bird Room and the Supply Room. Walk near the crystals to have it absorb their power."));
 		SetType(QuestType.Main);
@@ -834,6 +838,7 @@ public class Prison622Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60131);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Into the Hands (6)"));
 		SetDescription(L("Priest Irma believes it's time to take back the Demon Orders and has asked you to meet her at Ashaq Underground Prison 3F."));
 		SetType(QuestType.Main);
@@ -859,6 +864,7 @@ public class Prison622Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60132);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What If Again (1)"));
 		SetDescription(L("Under the instruction of Bishop Urbonas, Priest Auranas has several emergency items prepared all around Ashaq Underground Prison. Go to the Watchtower and retrieve the shiny pearl powder left there by Auranas."));
 		SetType(QuestType.Sub);
@@ -886,6 +892,7 @@ public class Prison622Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60133);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What If Again (2)"));
 		SetDescription(L("According to Priest Auranas, using this orb will point out high-rank demons. Use the orb and defeat the demons signaled by it."));
 		SetType(QuestType.Sub);
@@ -913,6 +920,7 @@ public class Prison622Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60134);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Expel"));
 		SetDescription(L("Priest Draznie is looking for a safe place for the priests to take refuge. Defeat the monsters in the Special Prison District to make it a safe shelter for the priests."));
 		SetType(QuestType.Sub);
@@ -939,6 +947,7 @@ public class Prison622Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60135);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recruiting Prisoners"));
 		SetDescription(L("Priest Draznie thinks it's time to use the trap prepared by Priest Auranas. Lure the demons into the trap set up in the Solitary Cells area, where they should be easily defeated."));
 		SetType(QuestType.Sub);
@@ -965,6 +974,7 @@ public class Prison622Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60153);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Collect the Faulty Goods"));
 		SetDescription(L("Priest Draznie has asked you to collect some traps she set up a long time ago. According to her, most traps are set up in the Waiting Room and the Supply Room."));
 		SetType(QuestType.Repeat);

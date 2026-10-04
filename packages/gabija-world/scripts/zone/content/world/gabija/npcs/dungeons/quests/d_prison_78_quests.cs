@@ -988,6 +988,7 @@ public class Prison78Mq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30145);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Revelation Guardian Zanas(1)"));
 		SetDescription(L("A voice in a mysterious light is calling for the savior."));
 		SetType(QuestType.Main);
@@ -1014,6 +1015,7 @@ public class Prison78Mq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30146);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Revelation Guardian Zanas(2)"));
 		SetDescription(L("Protection Magic keeps the demon barriers from finding you."));
 		SetType(QuestType.Main);
@@ -1041,6 +1043,7 @@ public class Prison78Mq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30147);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Revelation Guardian Zanas(3)"));
 		SetDescription(L("A Teal Magic Stone lets Zanas be called without alerting the demons."));
 		SetType(QuestType.Main);
@@ -1068,6 +1071,7 @@ public class Prison78Mq4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30148);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bloody Magic Stone"));
 		SetDescription(L("Demon blood on the Teal Magic Stone hides its signal among the demons'."));
 		SetType(QuestType.Main);
@@ -1098,6 +1102,7 @@ public class Prison78Mq5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30149);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("How to beat stronger foes(1)"));
 		SetDescription(L("The Isolated Area's Secret Device hides a Magic Control Scroll."));
 		SetType(QuestType.Main);
@@ -1125,6 +1130,7 @@ public class Prison78Mq6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30150);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("How to beat stronger foes(2)"));
 		SetDescription(L("The Magic Control Scroll has to learn the magic it is meant to suppress."));
 		SetType(QuestType.Main);
@@ -1152,6 +1158,7 @@ public class Prison78Mq7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30151);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("How to beat stronger foes(3)"));
 		SetDescription(L("Mandara guards the Visiting Room behind a barrier that keeps rising."));
 		SetType(QuestType.Main);
@@ -1182,6 +1189,7 @@ public class Prison78Mq8Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30152);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Dominance Magic"));
 		SetDescription(L("King Kadumel's last card is an Orb of Dominance Magic behind a password."));
 		SetType(QuestType.Main);
@@ -1210,6 +1218,7 @@ public class Prison78Mq9Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30153);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Visiting Room Barrier"));
 		SetDescription(L("Zanas pays for the Dominance Magic with a piece of his own soul."));
 		SetType(QuestType.Main);
@@ -1236,6 +1245,7 @@ public class Prison78Sq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30195);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Prisoner Contraband"));
 		SetDescription(L("A prisoner boasted on the wall about a stash nobody could find."));
 		SetType(QuestType.Sub);
@@ -1264,6 +1274,7 @@ public class Prison78Sq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30196);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Visiting Room's Secret Device"));
 		SetDescription(L("The Jibuza Square device unlocked something somewhere in the Waiting Room."));
 		SetType(QuestType.Sub);

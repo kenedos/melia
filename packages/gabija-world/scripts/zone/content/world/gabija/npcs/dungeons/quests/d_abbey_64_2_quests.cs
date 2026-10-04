@@ -698,6 +698,7 @@ public class Abbay642Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50125);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Edmundas (1)"));
 		SetDescription(L("Traveling Merchant Rose went into hiding as the demons are after her. Search for the place where her brother Edmundas is being held captive in the Novaha Annex."));
 		SetType(QuestType.Main);
@@ -724,6 +725,7 @@ public class Abbay642Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50126);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Edmundas (2)"));
 		SetDescription(L("Edmundas says a wizard came into the room, causing him to feel pain all of a sudden. Go to the inner section of the Apega State Chamber and destroy the thing that's hurting Edmundas."));
 		SetType(QuestType.Main);
@@ -750,6 +752,7 @@ public class Abbay642Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50127);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Edmundas (3)"));
 		SetDescription(L("As you were about to destroy the protective barrier around Edmundas, a mysterious wizard appeared and kidnapped Rose! Hurry and destroy the wizard's Magic Stone of Pain!"));
 		SetType(QuestType.Main);
@@ -778,6 +781,7 @@ public class Abbay642Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50128);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue Edmundas (4)"));
 		SetDescription(L("Find a way to release Edmundas from the shackles in the State Chamber."));
 		SetType(QuestType.Main);
@@ -804,6 +808,7 @@ public class Abbay642Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50129);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Experiment (1)"));
 		SetDescription(L("Experiment Victim Hilbeth wants you to find his backpack of herbs. Go to the Tebeti Small Corridor and look for Hilbeth's backpack."));
 		SetType(QuestType.Sub);
@@ -831,6 +836,7 @@ public class Abbay642Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50130);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Experiment (2)"));
 		SetDescription(L("Hilbeth's family are being victims of demon experiments at the Collapsed Grand Corridor and need to be rescued. Go there and investigate."));
 		SetType(QuestType.Sub);
@@ -861,6 +867,7 @@ public class Abbay642Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50131);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Experiment (3)"));
 		SetDescription(L("Experiment Victim Hilbeth wants to stop any kind of experiment from happening again. As requested, destroy the remaining demon experiment facilities at the Errzze Oratorium."));
 		SetType(QuestType.Sub);
@@ -887,6 +894,7 @@ public class Abbay642Sq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50132);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Monk's Last Mission (1)"));
 		SetDescription(L("Monk Abels cannot turn a blind eye to the damage the demons have done. Go to Gaile Chapel and retrieve the holy relic fragments needed to purify the monastery."));
 		SetType(QuestType.Sub);
@@ -914,6 +922,7 @@ public class Abbay642Sq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50133);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Monk's Last Mission (2)"));
 		SetDescription(L("Monk Abels put his last efforts into restoring the holy relic. Use the relic to purify different locations in the monastery."));
 		SetType(QuestType.Sub);

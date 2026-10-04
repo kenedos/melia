@@ -506,6 +506,7 @@ public class Huevillage584Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18002);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Entrapped Goddess"));
 		SetDescription(L("A barrier holds the Saule Grand Shrine shut, and something is being held down behind it."));
 		SetType(QuestType.Main);
@@ -562,6 +563,7 @@ public class Huevillage584Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18003);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Drugys Courtyard's Binding Magic Circle"));
 		SetDescription(L("The binding magic circle of Drugys Courtyard is guarded by what feeds it."));
 		SetType(QuestType.Sub);
@@ -600,6 +602,7 @@ public class Huevillage584Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18004);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Vapsva Vacant Lot's Binding Magic Circle"));
 		SetDescription(L("The binding magic circle of Vapsva Vacant Lot is guarded by what feeds it."));
 		SetType(QuestType.Sub);
@@ -638,6 +641,7 @@ public class Huevillage584Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18005);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Release Goddess Saule (2)"));
 		SetDescription(L("The goddess needs the divine energy still left in the offering tools of the Altar Grand Corridor."));
 		SetType(QuestType.Main);
@@ -664,6 +668,7 @@ public class Huevillage584Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18006);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Release Goddess Saule (3)"));
 		SetDescription(L("The goddess cannot find Clymen while the demons around the shrine keep their hold."));
 		SetType(QuestType.Main);
@@ -690,6 +695,7 @@ public class Huevillage584Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18007);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Release Goddess Saule (4)"));
 		SetDescription(L("Clymen holds the key to the cage, behind a demon barrier on the Ishpirki Access Road."));
 		SetType(QuestType.Main);
@@ -722,6 +728,7 @@ public class Huevillage584Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18008);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Saule"));
 		SetDescription(L("Use the Confinement Key on the restraining sphere and free the goddess."));
 		SetType(QuestType.Main);
@@ -751,6 +758,7 @@ public class Huevillage584Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50003);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Kvailas Forest"));
 		SetDescription(L("Bramble took the revelation into the Thorn Forest. Make for Sirdgela Forest by way of Gate Route."));
 		SetType(QuestType.Main);
@@ -784,6 +792,7 @@ public class Huevillage584Mq11Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(18010);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Gateway of the Great King"));
 		SetDescription(L("Goddess Saule reads the Revelation of Kvailas Forest for you."));
 		SetType(QuestType.Main);

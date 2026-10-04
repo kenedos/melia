@@ -616,6 +616,7 @@ public class Siauliai461Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16600);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Addled Revelators"));
 		SetDescription(L("The Symbol of Austeja is in pieces, and the monsters of the wood carry them."));
 		SetType(QuestType.Main);
@@ -655,6 +656,7 @@ public class Siauliai461Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16610);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Symbol of Goddess Austeja"));
 		SetDescription(L("The fragments go back together on the Austeja Altar and nowhere else."));
 		SetType(QuestType.Main);
@@ -682,6 +684,7 @@ public class Siauliai461Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16620);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Revelators come First"));
 		SetDescription(L("The addled Revelators are walking on the village, and the symbol purifies them once they are down."));
 		SetType(QuestType.Main);
@@ -710,6 +713,7 @@ public class Siauliai461Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16630);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroyed Seal Tower (1)"));
 		SetDescription(L("The Rankis Seal is given what is left of the symbol's power."));
 		SetType(QuestType.Main);
@@ -744,6 +748,7 @@ public class Siauliai461Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16640);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroyed Seal Tower (2)"));
 		SetDescription(L("The Ranka Seal takes the last of the symbol, and Austeja comes to say where she is going."));
 		SetType(QuestType.Main);
@@ -782,6 +787,7 @@ public class Siauliai461Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16700);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Chafer of the Spring Light Woods"));
 		SetDescription(L("Something has been keeping out of sight behind the Austeja Altar."));
 		SetType(QuestType.Sub);
@@ -819,6 +825,7 @@ public class Siauliai461Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16710);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Tower's Destroyer"));
 		SetDescription(L("The marks on the Rankis Seal Tower are claws, and the Manticen that made them is still about."));
 		SetType(QuestType.Sub);
@@ -856,6 +863,7 @@ public class Siauliai461Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16720);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Merchant's Lost Wares"));
 		SetDescription(L("Dulke dropped his whole stock along the road and will not walk back down it."));
 		SetType(QuestType.Sub);
@@ -883,6 +891,7 @@ public class Siauliai461Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16730);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Securing a Safe Route"));
 		SetDescription(L("Emil wants the road to Vilna Forest walkable and is not waiting for the priests to do it."));
 		SetType(QuestType.Sub);
@@ -909,6 +918,7 @@ public class Siauliai461Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16740);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Medicine Made of Spring Light Grass"));
 		SetDescription(L("Spring Light Grass only shows itself to honey jelly, and Tiana has run out of both."));
 		SetType(QuestType.Sub);

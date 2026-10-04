@@ -572,6 +572,7 @@ public class Gele571Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17110);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Parts Thief"));
 		SetDescription(L("The Pantos at Mieguista Hill stole the cable car's gears. Take them back."));
 		SetType(QuestType.Sub);
@@ -601,6 +602,7 @@ public class Gele571Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17120);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Finding the Lever Handle Latches"));
 		SetDescription(L("The Pantos hid cable car parts in the grass at Mieguista Slope."));
 		SetType(QuestType.Sub);
@@ -628,6 +630,7 @@ public class Gele571Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17130);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lure the Baby Pantos"));
 		SetDescription(L("Molly believes the Pantos can be calmed, and asks you to lure a Baby Panto with sugar beets."));
 		SetType(QuestType.Sub);
@@ -655,6 +658,7 @@ public class Gele571Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17140);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Collecting Cable Car Parts"));
 		SetDescription(L("The Zignuts at Nepavy Grassland swallowed the cable car parts Matthew needs."));
 		SetType(QuestType.Sub);
@@ -684,6 +688,7 @@ public class Gele571Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17150);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Tyrant of the Srautas Gorge"));
 		SetDescription(L("Soil the Poata's nest at Margas Hill and defeat the beast before it wrecks the cable car."));
 		SetType(QuestType.Sub);
@@ -712,6 +717,7 @@ public class Gele571Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17160);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Stubborness"));
 		SetDescription(L("Molly wants to try persuading Capria with the Baby Pantos. It may not work."));
 		SetType(QuestType.Sub);
@@ -742,6 +748,7 @@ public class Gele571Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60151);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Justified Suspicion"));
 		SetDescription(L("Molly blames the Plateau Sugar Beets for the Pantos' strange behaviour."));
 		SetType(QuestType.Repeat);

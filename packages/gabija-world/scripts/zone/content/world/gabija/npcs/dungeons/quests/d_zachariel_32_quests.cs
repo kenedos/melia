@@ -542,6 +542,7 @@ public class Zacha1fMq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8600);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Collapsed Protection System"));
 		SetDescription(L("The foundation stone asks the Revelator to wake the guardians that sleep in the entrance hall."));
 		SetType(QuestType.Main);
@@ -578,6 +579,7 @@ public class Zacha1fMq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8211);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Guardian Purifying Device"));
 		SetDescription(L("The corrupted Boowook can't remember their mission. Defeat Boowook near the large cubes."));
 		SetType(QuestType.Sub);
@@ -606,6 +608,7 @@ public class Zacha1fMq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8212);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroying the Guardian Device"));
 		SetDescription(L("Two devices in the upper gallery keep calling corrupted guardians up."));
 		SetType(QuestType.Sub);
@@ -644,6 +647,7 @@ public class Zacha1fMq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8254);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recycling (1)"));
 		SetDescription(L("A guardian past repairing gives its power source back to the mausoleum."));
 		SetType(QuestType.Sub);
@@ -685,6 +689,7 @@ public class Zacha1fMq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8255);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recycling (2)"));
 		SetDescription(L("Achat is past purifying, and it keeps the far end of the first floor."));
 		SetType(QuestType.Sub);
@@ -723,6 +728,7 @@ public class Zacha1fSq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8428);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Light the Fire (1)"));
 		SetDescription(L("Burning stones out of the guardians will light the mausoleum's stone lantern."));
 		SetType(QuestType.Sub);
@@ -752,6 +758,7 @@ public class Zacha1fSq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8429);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Light the Fire (2)"));
 		SetDescription(L("A demon comes for the stone lantern the moment its fire is lit."));
 		SetType(QuestType.Sub);
@@ -781,6 +788,7 @@ public class Zacha1fSq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8430);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Liberation of Magic (1)"));
 		SetDescription(L("Activation stones out of the active guardians will break the mausoleum's regulators."));
 		SetType(QuestType.Sub);
@@ -810,6 +818,7 @@ public class Zacha1fSq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8431);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Liberation of Magic (2)"));
 		SetDescription(L("The first Magic Regulator of the Royal Mausoleum, broken with the stones' power."));
 		SetType(QuestType.Sub);
@@ -848,6 +857,7 @@ public class Zacha1fSq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8432);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Liberation of Magic (3)"));
 		SetDescription(L("The last Magic Regulator, and the end of the mausoleum's restraint on its own magic."));
 		SetType(QuestType.Sub);
@@ -886,6 +896,7 @@ public class Zacha32Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60170);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Vanished Glory"));
 		SetDescription(L("The guardian on the ground floor wants the corrupted ones cleared out of the upper galleries."));
 		SetType(QuestType.Repeat);

@@ -1009,6 +1009,7 @@ public class Prison82Mq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30184);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unexpected Situation(1)"));
 		SetDescription(L("A power far greater than Nebulas' own waits in the Interrogation Room."));
 		SetType(QuestType.Main);
@@ -1035,6 +1036,7 @@ public class Prison82Mq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30185);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unexpected Situation(2)"));
 		SetDescription(L("A repaired Observation Detector shows what has happened to the last barrier."));
 		SetType(QuestType.Main);
@@ -1068,6 +1070,7 @@ public class Prison82Mq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30186);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Zanas' Resolve(1)"));
 		SetDescription(L("Zanas means to pay his whole soul to break the last barrier."));
 		SetType(QuestType.Main);
@@ -1093,6 +1096,7 @@ public class Prison82Mq4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30187);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Zanas' Resolve(2)"));
 		SetDescription(L("The Incinerator's device strengthens the Dominance Magic on Energy Crystals."));
 		SetType(QuestType.Main);
@@ -1120,6 +1124,7 @@ public class Prison82Mq5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30188);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What needs to be done(1)"));
 		SetDescription(L("The way to the Incinerator has to be kept clear while Zanas works."));
 		SetType(QuestType.Main);
@@ -1155,6 +1160,7 @@ public class Prison82Mq6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30189);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What needs to be done(2)"));
 		SetDescription(L("Only Kadumel's own magic circles wake the Tower of Discipline's illusions."));
 		SetType(QuestType.Main);
@@ -1182,6 +1188,7 @@ public class Prison82Mq7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30190);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What needs to be done(3)"));
 		SetDescription(L("The Execution Grounds' device keeps a worn Gravity Stone behind three lights."));
 		SetType(QuestType.Main);
@@ -1210,6 +1217,7 @@ public class Prison82Mq8Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30191);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What needs to be done(4)"));
 		SetDescription(L("The worn Gravity Stone has to prove it still works on the demons."));
 		SetType(QuestType.Main);
@@ -1255,6 +1263,7 @@ public class Prison82Mq9Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30192);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("What needs to be done(5)"));
 		SetDescription(L("The Demon Summoning Crystals on the way to the Public Punishment Room give way to the Gravity Stone."));
 		SetType(QuestType.Main);
@@ -1292,6 +1301,7 @@ public class Prison82Mq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30193);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("His name is Zanas"));
 		SetDescription(L("Zanas gives the last of himself to the Dominance Magic, and Nebulas is left to face."));
 		SetType(QuestType.Main);
@@ -1323,6 +1333,7 @@ public class Prison82Mq11Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30194);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Revelation of Kalejimas"));
 		SetDescription(L("The four King's Jewels open the Confessional, and Goddess Laima speaks from it."));
 		SetType(QuestType.Main);
@@ -1352,6 +1363,7 @@ public class Prison82Sq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30203);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Interrogation Room's Secret Device"));
 		SetDescription(L("The device in the Room of Abyss opens only for the right answers."));
 		SetType(QuestType.Sub);
@@ -1380,6 +1392,7 @@ public class Prison82Sq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30204);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Will Not Forget"));
 		SetDescription(L("Something of Zanas still shines in the Incinerator."));
 		SetType(QuestType.Sub);

@@ -878,6 +878,7 @@ public class FOrchard323Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80018);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Helping Hand"));
 		SetDescription(L("Druid Leja got hurt trying to catch the ferrets that stole food from the village. Go to the place she instructed and collect herbs to help her regain her energy."));
 		SetType(QuestType.Main);
@@ -917,6 +918,7 @@ public class FOrchard323Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80019);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Mysterious Girl (1)"));
 		SetDescription(L("On your way to deliver the herbs requested by Druid Leja, you came across a mysterious girl. For now, deliver the herbs to Leja."));
 		SetType(QuestType.Main);
@@ -945,6 +947,7 @@ public class FOrchard323Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80020);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reclaiming Food"));
 		SetDescription(L("Retrieve the food which the ferrets had stolen for the villagers. You can get them back when you defeat ferrets."));
 		SetType(QuestType.Main);
@@ -984,6 +987,7 @@ public class FOrchard323Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80021);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Mysterious Girl (2)"));
 		SetDescription(L("As you were coming back after retrieving the food from the ferrets, you encountered the mysterious girl again. The girl saved the villagers and disappeared with the ray. Go meet the village elder with the retrieved food."));
 		SetType(QuestType.Main);
@@ -1012,6 +1016,7 @@ public class FOrchard323Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80022);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ferret-Controlling Totem"));
 		SetDescription(L("The village chief has been tricked by a false Revelator before and is wary of trusting you. Destroy the demon totems in the Banaga Forest Trail to prove you're a real Revelator."));
 		SetType(QuestType.Main);
@@ -1041,6 +1046,7 @@ public class FOrchard323Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80023);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Mysterious Girl (3)"));
 		SetDescription(L("The village chief told you of an old village legend and believes that the girl was sent by Laima. Follow the girl to Zeraha."));
 		SetType(QuestType.Main);
@@ -1075,6 +1081,7 @@ public class FOrchard323Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80024);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Thirst for Drinks"));
 		SetDescription(L("The villager says that the red water from the river has contaminated their fruit, but that the ferrets might know a way of making them safe to eat. Collect fruit juice from the ferrets."));
 		SetType(QuestType.Sub);
@@ -1104,6 +1111,7 @@ public class FOrchard323Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80025);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Putting Spices (1)"));
 		SetDescription(L("The villager is planning to contaminate the food stolen by the ferrets with red water. First, get some red water from the old well."));
 		SetType(QuestType.Sub);
@@ -1138,6 +1146,7 @@ public class FOrchard323Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80026);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Putting Spices (2)"));
 		SetDescription(L("The village resident asked you to contaminate the ferrets' meat jerky with the red water."));
 		SetType(QuestType.Sub);
@@ -1166,6 +1175,7 @@ public class FOrchard323Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80027);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Statue of Peace (1)"));
 		SetDescription(L("The elder's grandson explains that even though the demon totems are gone, the ferrets are still ferocious, Consult with Dievdirbys Widas about the way to revert the ferrets back to normal."));
 		SetType(QuestType.Sub);
@@ -1190,6 +1200,7 @@ public class FOrchard323Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(80028);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Statue of Peace (2)"));
 		SetDescription(L("Dievdirbys Widas says he carved a statue that radiates good energy based on the totem he made for the demons. Set up Widas' statue close to the ferrets and watch their reaction."));
 		SetType(QuestType.Sub);
@@ -1219,6 +1230,7 @@ public class FOrchard323Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60184);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Violent Rampage"));
 		SetDescription(L("Priest Rovli wishes to teach the Ferrets that are wrecking havoc on roads that lead to the major shrines a lesson. Teach the Ferrets in the surrounding area a lesson."));
 		SetType(QuestType.Repeat);
@@ -1245,6 +1257,7 @@ public class FOrchard323Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50275);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ferrets and Their Grabby Hands"));
 		SetDescription(L("The head of the village wants you to take back the rest of the offering tools from the ferrets. Defeat the ferrets and take back the tools."));
 		SetType(QuestType.Sub);

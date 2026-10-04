@@ -683,6 +683,7 @@ public class F3Cmlake84Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90011);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Clear the Corruption (2)"));
 		SetDescription(L("A resident of the village came running, saying the Hydra has appeared. Go and check the Jeneuam Corridor, where the Hydra is said to be."));
 		SetType(QuestType.Main);
@@ -712,6 +713,7 @@ public class F3Cmlake84Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90012);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Clear the Corruption (3)"));
 		SetDescription(L("Elder Aloizard believes that, with your help, they might have a chance to destroy the red gem on the Hydra's body. Go see Hunter Modis and find a way to lure the Hydra."));
 		SetType(QuestType.Main);
@@ -735,6 +737,7 @@ public class F3Cmlake84Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90013);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Clear the Corruption (4)"));
 		SetDescription(L("While Hunter Modis is making a trap to catch the Hydra, he wants you to collect Sawpent meat to use as bait."));
 		SetType(QuestType.Main);
@@ -771,6 +774,7 @@ public class F3Cmlake84Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90014);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Clear the Corruption (5)"));
 		SetDescription(L("You have collected enough bait. Now, collect blue herbs to disguise the scent of humans."));
 		SetType(QuestType.Main);
@@ -800,6 +804,7 @@ public class F3Cmlake84Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90015);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Clear the Corruption (6)"));
 		SetDescription(L("Hunter Modis has set up a trap at the Heralve Vacant Lot. Place the bait on the trap to lure the Tyronas Hydra and defeat it."));
 		SetType(QuestType.Main);
@@ -832,6 +837,7 @@ public class F3Cmlake84Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90016);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("You Can't Drink That"));
 		SetDescription(L("Someone from the village accidentally drank the contaminated red water. Go to the right side of Svaigulys Hill in Letas Stream and collect Markazi Flowers to ease their pain."));
 		SetType(QuestType.Sub);
@@ -861,6 +867,7 @@ public class F3Cmlake84Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90017);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recurrence Prevention (1)"));
 		SetDescription(L("Lanaldas wants to burn down the laboratory as retaliation. Go and collect lard from Black Rajapearlites to make flammable oil."));
 		SetType(QuestType.Sub);
@@ -891,6 +898,7 @@ public class F3Cmlake84Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90018);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recurrence Prevention (2)"));
 		SetDescription(L("Lanaldas wants you to burn down the laboratory to prevent future experiments. One is located in the Nesuga Small Corridor of the Absenta Reservoir, the other in the Wandering Sanctuary of the Pelke Shrine Ruins."));
 		SetType(QuestType.Sub);

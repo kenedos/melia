@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Melia.Shared.Game.Const;
 using Melia.Shared.World;
+using Melia.Zone.Network;
 using Melia.Zone.Scripting;
+using Melia.Zone.Skills.Combat;
 using Melia.Zone.World.Actors;
 using Melia.Zone.World.Actors.Characters;
 using Melia.Zone.World.Tracks;
@@ -53,6 +55,21 @@ public class Chaple577Mq03Track : TrackScript
 				track.Dialog.SetTitle(L("Demon Queen Gesti"));
 				track.Dialog.SetPortrait("Dlg_port_Gesti");
 				StartDialog(track, L("I can feel Laima's power."));
+				break;
+			case 24:
+				track.Actors[1].PlayEffect("F_spread_out004_dark", 1f, 1, EffectLocation.Bottom);
+				break;
+			case 25:
+				track.Actors[1].AttachEffect("F_spread_in022_blue", 0.5f, EffectLocation.Middle);
+				break;
+			case 28:
+				track.Actors[1].AttachEffect("F_light046_blue", 0.15f, EffectLocation.Middle);
+				break;
+			case 37:
+				Send.ZC_NORMAL.PlayForceEffect(ForceId.GetNew(), track.Actors[1], track.Actors[1], track.Actors[4], "I_light015_3", 2f, "arrow_cast", "", 1f, "arrow_blow", "SLOW", 30);
+				break;
+			case 40:
+				track.Actors[1].DetachEffect("F_light046_blue");
 				break;
 			case 42:
 				RemoveTrackActor(character, track, 1);

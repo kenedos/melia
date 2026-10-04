@@ -435,6 +435,7 @@ public class Siauliai464Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16000);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("It's the Honey (1)"));
 		SetDescription(L("Darren does not know whether the Rododun Apiary survived the monsters."));
 		SetType(QuestType.Main);
@@ -462,6 +463,7 @@ public class Siauliai464Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16010);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("It's the Honey (2)"));
 		SetDescription(L("An empty beehive off a sweet-smelling monster would draw the rest of them off the apiary."));
 		SetType(QuestType.Main);
@@ -491,6 +493,7 @@ public class Siauliai464Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16020);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ruined Brewery"));
 		SetDescription(L("Dorjen has set oil barrels out around Micolas Brewery, and means to use them."));
 		SetType(QuestType.Main);
@@ -519,6 +522,7 @@ public class Siauliai464Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16030);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Brewer's Last Hope"));
 		SetDescription(L("Dorjen will hear nothing until his signature mead is back out of the Honey Wine Warehouse."));
 		SetType(QuestType.Main);
@@ -547,6 +551,7 @@ public class Siauliai464Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16040);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Sweet Revenge"));
 		SetDescription(L("Dorjen will settle for the monsters that ruined the brewery being put down instead."));
 		SetType(QuestType.Main);
@@ -573,6 +578,7 @@ public class Siauliai464Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16100);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Apiary-invader Sparnas"));
 		SetDescription(L("A Sparnas has taken the Rododun Apiary for itself."));
 		SetType(QuestType.Sub);
@@ -610,6 +616,7 @@ public class Siauliai464Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16110);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Honey-eating Biteregina"));
 		SetDescription(L("A Biteregina has followed the smell of the Honey Wine Warehouse in."));
 		SetType(QuestType.Sub);
@@ -647,6 +654,7 @@ public class Siauliai464Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16120);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Dislike for Danger"));
 		SetDescription(L("Kirina followed Darren out to the farm and cannot see a way back through the monsters."));
 		SetType(QuestType.Sub);

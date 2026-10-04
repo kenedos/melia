@@ -597,6 +597,7 @@ public class Gele572Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17200);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Imminent Invasion"));
 		SetDescription(L("Knight Commander Uska sends you to meet the Paladin Master at Gele Plateau."));
 		SetType(QuestType.Main);
@@ -629,6 +630,7 @@ public class Gele572Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17220);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Natural Seeds"));
 		SetDescription(L("The shaman dolls need Mali seeds, and the Mali carry them along Labure Highway."));
 		SetType(QuestType.Sub);
@@ -658,6 +660,7 @@ public class Gele572Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17230);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unsettled Totems (1)"));
 		SetDescription(L("Molly wants the Panto totems broken with a shaman doll summon scroll."));
 		SetType(QuestType.Sub);
@@ -721,6 +724,7 @@ public class Gele572Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17240);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unsettled Totems (2)"));
 		SetDescription(L("Simorph has come for the broken totems. Defeat it."));
 		SetType(QuestType.Sub);
@@ -751,6 +755,7 @@ public class Gele572Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17250);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purifying Doll (1)"));
 		SetDescription(L("A shaman doll will find the demon-corrupted land on Labure Highway. Purify it."));
 		SetType(QuestType.Sub);
@@ -778,6 +783,7 @@ public class Gele572Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17260);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purifying Doll (2)"));
 		SetDescription(L("The Wild Carnivore is soaked in demonic energy. Put it down."));
 		SetType(QuestType.Sub);
@@ -809,6 +815,7 @@ public class Gele572Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17270);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Tie Tightly"));
 		SetDescription(L("The ritual rope hangs at the waist of the Panto Shaman. Take it."));
 		SetType(QuestType.Sub);
@@ -838,6 +845,7 @@ public class Gele572Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17280);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Two Birds with One Stone"));
 		SetDescription(L("Hunt the Mushcaria at Tustinti Plateau and take its Enchanted Mane."));
 		SetType(QuestType.Sub);

@@ -577,6 +577,7 @@ public class Underfortress67Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50063);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Special Powers Discovered by the Monocle (1)"));
 		SetDescription(L("The box the Monocle picked out of the quarter has demons in it rather than treasure."));
 		SetType(QuestType.Main);
@@ -606,6 +607,7 @@ public class Underfortress67Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50064);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Special Powers Discovered by the Monocle (2)"));
 		SetDescription(L("The quarter is too wide for one Monocle, so the search splits up."));
 		SetType(QuestType.Main);
@@ -632,6 +634,7 @@ public class Underfortress67Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50065);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Special Powers Discovered by the Monocle (3)"));
 		SetDescription(L("The great energy at the Leima Small Square turns out to be one old keeper."));
 		SetType(QuestType.Main);
@@ -656,6 +659,7 @@ public class Underfortress67Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50066);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fortress of the Land Manager"));
 		SetDescription(L("The keeper's traps take a certification ticket, and a ticket takes mushrooms."));
 		SetType(QuestType.Main);
@@ -684,6 +688,7 @@ public class Underfortress67Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50067);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Storage Quarter (1)"));
 		SetDescription(L("The keeper is too old to put the spell in himself, so Earth Crystals do it."));
 		SetType(QuestType.Main);
@@ -714,6 +719,7 @@ public class Underfortress67Mq060Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50068);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Storage Quarter (2)"));
 		SetDescription(L("The keeper goes on ahead, which leaves a moment to write Amanda her own way in."));
 		SetType(QuestType.Main);
@@ -772,6 +778,7 @@ public class Underfortress67Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50070);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Resentful Soldier's Spirit (1)"));
 		SetDescription(L("Opening the soldier's grave brings something else out with the spirit."));
 		SetType(QuestType.Sub);
@@ -800,6 +807,7 @@ public class Underfortress67Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50071);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Resentful Soldier's Spirit (2)"));
 		SetDescription(L("The ring belongs at a house inside the castle walls, and the spirit wants it there."));
 		SetType(QuestType.Sub);

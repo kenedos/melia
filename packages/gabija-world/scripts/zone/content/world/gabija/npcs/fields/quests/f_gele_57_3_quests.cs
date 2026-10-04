@@ -740,6 +740,7 @@ public class Gele573Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8538);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroyed Barrier"));
 		SetDescription(L("Collect the pieces of the barrier the demons destroyed at Mazas Rest Place."));
 		SetType(QuestType.Sub);
@@ -768,6 +769,7 @@ public class Gele573Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8539);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Out of Time..."));
 		SetDescription(L("Charge the Tree Guard Post Barrier with demon souls."));
 		SetType(QuestType.Sub);
@@ -795,6 +797,7 @@ public class Gele573Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8540);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Summoning Circle"));
 		SetDescription(L("Remove the demon summoning circles at Mairunas Knoll."));
 		SetType(QuestType.Sub);
@@ -821,6 +824,7 @@ public class Gele573Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8541);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To the Goddess at Once"));
 		SetDescription(L("Use the barrier's holy power to sever the demons' souls at Pumpura Hill."));
 		SetType(QuestType.Sub);
@@ -848,6 +852,7 @@ public class Gele573Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8542);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Kenneth's Protector"));
 		SetDescription(L("Defeat the demons around Kenneth while he rests."));
 		SetType(QuestType.Sub);
@@ -874,6 +879,7 @@ public class Gele573Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8543);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bull Hunting"));
 		SetDescription(L("A gigantic demon monster is coming. Follow Kayetonas and defeat the Minotaur."));
 		SetType(QuestType.Sub);
@@ -902,6 +908,7 @@ public class Gele573Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8544);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Foreseen Crisis (1)"));
 		SetDescription(L("The Paladin Master asks you to listen to Follower Algis about the Tenet Church."));
 		SetType(QuestType.Main);
@@ -929,6 +936,7 @@ public class Gele573Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8545);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Foreseen Crisis (3)"));
 		SetDescription(L("The Paladin Master is looking for you. Gesti has appeared."));
 		SetType(QuestType.Main);
@@ -958,6 +966,7 @@ public class Gele573Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8546);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Foreseen Crisis (2)"));
 		SetDescription(L("Clear the area while the Paladin Master focuses on the Divine Sphere."));
 		SetType(QuestType.Main);
@@ -986,6 +995,7 @@ public class Gele573Hq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9102);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Proving skills"));
 		SetDescription(L("Watcher James bets you cannot cut down forty monsters in the Owl Burial Ground."));
 		SetType(QuestType.Sub);
@@ -1015,6 +1025,7 @@ public class Gele573Hq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(9104);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The One Who Experienced Death"));
 		SetDescription(L("A monster is slaying people in the Tenet Church. Hunt the Chapparition."));
 		SetType(QuestType.Sub);
@@ -1041,6 +1052,7 @@ public class Chaple577Mq10AfterQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30031);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Hidden Sanctum's Revelation (2)"));
 		SetDescription(L("Tell the Paladin Master the story of the Tenet Church."));
 		SetType(QuestType.Main);

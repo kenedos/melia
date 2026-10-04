@@ -619,6 +619,7 @@ public class Prison621Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60116);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bishop Urbonas' Whereabouts (2)"));
 		SetDescription(L("Priest Pranas says he feels as if his body is being constricted. He did say the sensation felt stronger inside the Torture Material Room; go there and investigate."));
 		SetType(QuestType.Main);
@@ -643,6 +644,7 @@ public class Prison621Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60117);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bishop Urbonas' Whereabouts (3)"));
 		SetDescription(L("The idol inside the Torture Material Room is making the demons attack!"));
 		SetType(QuestType.Main);
@@ -671,6 +673,7 @@ public class Prison621Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60118);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bishop Urbonas' Whereabouts (7)"));
 		SetDescription(L("With the cursed idol destroyed, the curse on Ashaq Underground Prison 1F seems to have been lifted. Return to Priest Pranas."));
 		SetType(QuestType.Main);
@@ -695,6 +698,7 @@ public class Prison621Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60119);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bishop Urbonas' Whereabouts (4)"));
 		SetDescription(L("Priest Pranas believes the map left behind by Bishop Urbonas is the only hope you have. Take the track under the stairs to the right side of Pranas to get to the location marked on the map."));
 		SetType(QuestType.Main);
@@ -724,6 +728,7 @@ public class Prison621Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60120);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bishop Urbonas' Whereabouts (5)"));
 		SetDescription(L("Bishop Urbonas wonders if you're not a Revelator as the ones told in the legends yourself. Step on the Revelator magic circle to prove your identity as a Revelator."));
 		SetType(QuestType.Main);
@@ -750,6 +755,7 @@ public class Prison621Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60121);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bishop Urbonas' Whereabouts (6)"));
 		SetDescription(L("According to Urbonas, to destroy the cursed idol you need to defeat demons in Ashaq Underground Prison 1F and recharge the Orb of Return, then use it on the cursed idol."));
 		SetType(QuestType.Main);
@@ -778,6 +784,7 @@ public class Prison621Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60122);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Blackmail"));
 		SetDescription(L("Chaser Torvana has asked you to collect red crystals from demons. Go to the Torture Chamber and defeat Blue Dumaros and Blue Wendigos to collect red crystals."));
 		SetType(QuestType.Sub);
@@ -807,6 +814,7 @@ public class Prison621Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60123);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fight Poison With Poison"));
 		SetDescription(L("Chaser Torvana wants to beat the curse using the demons' evil energy. Obtain black wooden pieces from the demons in the Punishment Room."));
 		SetType(QuestType.Sub);
@@ -835,6 +843,7 @@ public class Prison621Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60124);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unidentified Package (1)"));
 		SetDescription(L("Chaser Daramaus believes the solution to lifting the curse might be in the unidentified packages carried around by the demons. Defeat Blue Dumaros and obtain their packages."));
 		SetType(QuestType.Sub);
@@ -868,6 +877,7 @@ public class Prison621Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60125);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unidentified Package (2)"));
 		SetDescription(L("You have collected enough unidentified packages. Use them on monsters to see what effect they possess."));
 		SetType(QuestType.Sub);
@@ -896,6 +906,7 @@ public class Prison622Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60126);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Into the Grip (1)"));
 		SetDescription(L("The Chasers have not yet recovered from the effects of the curse. Follow Priest Pranas into Ashaq Underground Prison 2F."));
 		SetType(QuestType.Main);
@@ -920,6 +931,7 @@ public class Prison623Mq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60141);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Everything Intact (2)"));
 		SetDescription(L("Bishop Urbonas believes the Lord of Orsha, Inesa Hamondale, will be worried about him. Return to Orsha and talk to Inesa Hamondale."));
 		SetType(QuestType.Main);

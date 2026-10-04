@@ -510,6 +510,7 @@ public class Mine1AlchemistQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4461);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Purify the Toxic Fumes in 1F"));
 		SetDescription(L("Vaidotas cannot go deeper while the first floor is full of toxic fumes. Get every purifier on 1F running again."));
 		SetType(QuestType.Main);
@@ -536,6 +537,7 @@ public class Mine1Crystal2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4463);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Incomplete Purifier"));
 		SetDescription(L("The entrance purifier is missing a part. Find a replacement and fit it."));
 		SetType(QuestType.Sub);
@@ -566,6 +568,7 @@ public class Mine1Crystal8Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4469);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fix the Central Purifier (1)"));
 		SetDescription(L("The central purifier has seized. Open its valve and see what is wrong."));
 		SetType(QuestType.Sub);
@@ -592,6 +595,7 @@ public class Mine1Crystal9Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4470);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fix the Central Purifier (2)"));
 		SetDescription(L("The compass points to District 4, where a spare purifier still holds the part the central one needs."));
 		SetType(QuestType.Sub);
@@ -630,6 +634,7 @@ public class Mine1Crystal10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4471);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Cyclops' Attack in the Crystal Mine"));
 		SetDescription(L("A Cyclops has broken into the crystal store and scattered the miners' baskets. Put it down."));
 		SetType(QuestType.Sub);
@@ -661,6 +666,7 @@ public class Mine1Crystal13Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4474);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Passage Purifier (1)"));
 		SetDescription(L("The passage purifier is cold and a part is missing from its housing."));
 		SetType(QuestType.Sub);
@@ -688,6 +694,7 @@ public class Mine1Crystal18Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4479);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Passage Purifier (2)"));
 		SetDescription(L("The compass points into District 6, where a Specter Monarch is hoarding the missing part."));
 		SetType(QuestType.Sub);
@@ -739,6 +746,7 @@ public class Mine1Crystal19Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4480);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Passage Purifier (3)"));
 		SetDescription(L("Fit the recovered part and start the passage purifier."));
 		SetType(QuestType.Sub);

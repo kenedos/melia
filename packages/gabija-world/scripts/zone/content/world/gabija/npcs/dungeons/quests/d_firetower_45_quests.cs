@@ -490,6 +490,7 @@ public class Ftower45MqProQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17027);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess' Tower"));
 		SetDescription(L("Helgasercle set four Magic Suppressors on the top floor, and every one of them has to come down."));
 		SetType(QuestType.Main);
@@ -517,6 +518,7 @@ public class Ftower45SqProQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17028);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Lord Helgasercle"));
 		SetDescription(L("With the suppressors down, what is left is the demon lord who set them."));
 		SetType(QuestType.Main);
@@ -544,6 +546,7 @@ public class Ftower45Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8493);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroy the 1st Magic Suppressor"));
 		SetDescription(L("The first of Helgasercle's suppressors stands in the Hall of Fire."));
 		SetType(QuestType.Sub);
@@ -587,6 +590,7 @@ public class Ftower45Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8494);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroy the 2nd Magic Suppressor"));
 		SetDescription(L("The second of Helgasercle's suppressors stands in the Reception Room."));
 		SetType(QuestType.Sub);
@@ -630,6 +634,7 @@ public class Ftower45Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8495);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroy the 3rd Magic Suppressor"));
 		SetDescription(L("The third of Helgasercle's suppressors stands in the Small Hall."));
 		SetType(QuestType.Sub);
@@ -673,6 +678,7 @@ public class Ftower45Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8496);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destroy the 4th Magic Suppressor"));
 		SetDescription(L("The last of Helgasercle's suppressors stands in the Reading Room."));
 		SetType(QuestType.Sub);
@@ -716,6 +722,7 @@ public class Ftower45Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8497);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Helgasercle Invading the Tower"));
 		SetDescription(L("With all four suppressors down, the demon lord who set them is the last thing in the way."));
 		SetType(QuestType.Sub);
@@ -764,6 +771,7 @@ public class Ftower45Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8498);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Gabija"));
 		SetDescription(L("The Jewel of Prominence goes into the mark at the center of the Keturidu Great Hall."));
 		SetType(QuestType.Main);
@@ -795,6 +803,7 @@ public class Ftower45Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17022);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hot-blooded Simon Shaw (1)"));
 		SetDescription(L("A well-dressed wizard is still holding the Hall of Fire, and his charms are inside the Black Drakes."));
 		SetType(QuestType.Sub);
@@ -853,6 +862,7 @@ public class Ftower45Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17024);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hot-blooded Simon Shaw (3)"));
 		SetDescription(L("Bearkaras is more than Simon Shaw can take on his own."));
 		SetType(QuestType.Sub);
@@ -882,6 +892,7 @@ public class Ftower45Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17025);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Truth of the Suspicious Seal Stone (1)"));
 		SetDescription(L("The last of the stones stands on the road to the Great Hall, and it knows the others."));
 		SetType(QuestType.Sub);
@@ -913,6 +924,7 @@ public class Ftower45Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(17026);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Truth of the Suspicious Seal Stone (2)"));
 		SetDescription(L("The last piece of the soul is held by the Stone Whale that was set over it."));
 		SetType(QuestType.Sub);
@@ -941,6 +953,7 @@ public class Firetower45Hq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19061);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Wizard and the Mage Tower (1)"));
 		SetDescription(L("Every wizard on the way up the tower sets a question, and Simon Shaw's is the last one left."));
 		SetType(QuestType.Sub);
@@ -972,6 +985,7 @@ public class Firetower45Hq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19062);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Wizard and the Mage Tower (2)"));
 		SetDescription(L("Simon Shaw would rather have his book back than hear an answer."));
 		SetType(QuestType.Sub);

@@ -1317,6 +1317,7 @@ public class Flash64Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8845);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Intensified Rampage"));
 		SetDescription(L("Something is drawing monsters onto the Kovos Hall Site and nobody knows what."));
 		SetType(QuestType.Sub);
@@ -1343,6 +1344,7 @@ public class Flash64Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8846);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Refreshing Work"));
 		SetDescription(L("The grave robbers have been taking the medicinal candy the headquarters sends out."));
 		SetType(QuestType.Sub);
@@ -1373,6 +1375,7 @@ public class Flash64Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8847);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Irrevocable Accident (1)"));
 		SetDescription(L("The guards caught by the Frost at the Stone Icicle Square are still dying there."));
 		SetType(QuestType.Sub);
@@ -1409,6 +1412,7 @@ public class Flash64Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8849);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Magical Opinion (1)"));
 		SetDescription(L("Edita's Liberation Elixir needs Dark Crystals out of the Vienti Fortress monsters."));
 		SetType(QuestType.Sub);
@@ -1438,6 +1442,7 @@ public class Flash64Sq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8850);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Magical Opinion (2)"));
 		SetDescription(L("The elixir pulls a soul out of a petrified victim, and it may remember what it saw."));
 		SetType(QuestType.Sub);
@@ -1496,6 +1501,7 @@ public class Flash64Sq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8852);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Value of the Alchemist"));
 		SetDescription(L("Saliamonas' Petrification Thawing Liquid has not been tried on anything yet."));
 		SetType(QuestType.Sub);
@@ -1523,6 +1529,7 @@ public class Flash64Sq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8853);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Interesting Copy"));
 		SetDescription(L("Saliamonas wants enough petrified samples to run every drug he can think of."));
 		SetType(QuestType.Sub);
@@ -1552,6 +1559,7 @@ public class Flash64Sq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8854);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lab Destroyer"));
 		SetDescription(L("The Rubabos of the Nebekia Fortress are pulling down the ruins Saliamonas works in."));
 		SetType(QuestType.Sub);
@@ -1578,6 +1586,7 @@ public class Flash64Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8855);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Secret Trade (1)"));
 		SetDescription(L("Amanda will take the Revelator into the Fortress of the Land for the right records."));
 		SetType(QuestType.Main);
@@ -1605,6 +1614,7 @@ public class Flash64Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8856);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Secret Trade (2)"));
 		SetDescription(L("The records go to Wilhelmina, and what comes back is a Silence Scroll."));
 		SetType(QuestType.Main);
@@ -1633,6 +1643,7 @@ public class Flash64Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8857);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Secret Trade (3)"));
 		SetDescription(L("The Gargoyle over the gathering place comes down quietly, with the scroll doing the quiet part."));
 		SetType(QuestType.Main);
@@ -1691,6 +1702,7 @@ public class JobMusketeer71Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30119);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Procuring Distance"));
 		SetDescription(L("A rifle is only worth carrying at the range it was made for."));
 		SetType(QuestType.Main);
@@ -1786,6 +1798,7 @@ public class Flash64Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50267);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Competitive to the Extreme"));
 		SetDescription(L("The Murmillo Master will be impressed by a strong monster put down in very little armour."));
 		SetType(QuestType.Sub);
@@ -1844,6 +1857,7 @@ public class JobMurmillo81Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90158);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Glory of a Gladiator"));
 		SetDescription(L("The Silva Griffin of the Grynas Trail is the Murmillo Master's idea of a simple task."));
 		SetType(QuestType.Main);
@@ -1873,6 +1887,7 @@ public class JobCannoneer81Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90161);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("De-Construction"));
 		SetDescription(L("Somebody has been leaving observation orbs around the kingdom camp on Steel Heights."));
 		SetType(QuestType.Main);
@@ -1902,6 +1917,7 @@ public class JobMusketeer81Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(90162);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fast and Precise"));
 		SetDescription(L("The practice poles west of the camp light up when they are worth shooting."));
 		SetType(QuestType.Main);

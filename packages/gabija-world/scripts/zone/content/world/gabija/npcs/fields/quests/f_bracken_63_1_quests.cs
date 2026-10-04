@@ -745,6 +745,7 @@ public class Bracken631Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50090);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nervous Vendor"));
 		SetDescription(L("Varas says his colleagues are hidden somewhere around the Herb Gatherers' Cabin. Save Varas' friends before the demons get to them."));
 		SetType(QuestType.Main);
@@ -777,6 +778,7 @@ public class Bracken631Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50091);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rose's Friends (1)"));
 		SetDescription(L("Rose wants to go find her friends who are still scattered around the area, but Laswi is too tired to help. Give Laswi a Stamina pill."));
 		SetType(QuestType.Main);
@@ -804,6 +806,7 @@ public class Bracken631Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50092);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rose's Friends (2)"));
 		SetDescription(L("Have Laswi smell the merchants' clothes and follow their scent to find each one. When you find them, tell them of Rose's whereabouts."));
 		SetType(QuestType.Main);
@@ -834,6 +837,7 @@ public class Bracken631Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50093);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rose's Friends (3)"));
 		SetDescription(L("Traveling Merchant Cassias was about to go back when the demons started attacking. Defeat all of the attacking demons."));
 		SetType(QuestType.Main);
@@ -864,6 +868,7 @@ public class Bracken631Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50094);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Vendor's Lost Baggage"));
 		SetDescription(L("Andres says he invested everything in his goods, but now they are lost. Look for Andres' goods at the Doholle Rest Place."));
 		SetType(QuestType.Sub);
@@ -893,6 +898,7 @@ public class Bracken631Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50095);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Nervous Vendor"));
 		SetDescription(L("Traveling Merchant Gomez is frightened by all the demons and monsters running wild. Defeat some monsters around the Herb Gatherers' Cabin to ease Gomez' anxiety."));
 		SetType(QuestType.Sub);
@@ -920,6 +926,7 @@ public class Bracken631Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50096);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Injured Herbalist (1)"));
 		SetDescription(L("Herbalist Tales requested you get some Ronjia Grass to use as a painkiller. Go to Nevaginga Hillside and collect Ronjia Grass."));
 		SetType(QuestType.Sub);
@@ -948,6 +955,7 @@ public class Bracken631Sq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50097);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Injured Herbalist (2)"));
 		SetDescription(L("Herbalist Tales thinks the Cleric Submaster might know of a way to heal their injuries. Go see the Cleric Submaster in Orsha and tell them about Herbalist Tales' symptoms."));
 		SetType(QuestType.Sub);
@@ -972,6 +980,7 @@ public class Bracken631Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60155);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Camping Preparations"));
 		SetDescription(L("The merchant wants to retrieve some blue coal they buried in Koru Jungle to help them make it through until the group has recovered. Go to Goram Shores and Saunu Brook and find the pieces of blue coal in the piles of dirt."));
 		SetType(QuestType.Repeat);

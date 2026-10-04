@@ -210,6 +210,7 @@ public class ToTheTower01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8471);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Gabija (1)"));
 		SetDescription(L("A magician has come to Fedimian looking for a Revelator, and she will not wait long."));
 		SetType(QuestType.Main);
@@ -238,6 +239,7 @@ public class Ftower45MqNextQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8512);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Pilgrim's Way"));
 		SetDescription(L("The Revelation of the Mage Tower names the Great Cathedral, and Pilgrim's Way is the road to it."));
 		SetType(QuestType.Sub);

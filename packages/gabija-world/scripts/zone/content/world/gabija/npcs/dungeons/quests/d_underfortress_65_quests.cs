@@ -478,6 +478,7 @@ public class Underfortress65Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50048);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Sentry Bailey"));
 		SetDescription(L("Amanda's Monocle finds nothing at the fortress gate but Royal Army guards."));
 		SetType(QuestType.Main);
@@ -502,6 +503,7 @@ public class Underfortress65Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50049);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Drawing Attention (1)"));
 		SetDescription(L("A Resounding Bomb starts with the herb that grows on the base camp's lower floor."));
 		SetType(QuestType.Main);
@@ -529,6 +531,7 @@ public class Underfortress65Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50050);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Drawing Attention (2)"));
 		SetDescription(L("The guards are carrying more bombs than anyone is counting."));
 		SetType(QuestType.Main);
@@ -584,6 +587,7 @@ public class Underfortress65Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50052);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Drawing Attention (4)"));
 		SetDescription(L("The bombs go off, the guard line walks off its posts, and the way in is open."));
 		SetType(QuestType.Main);

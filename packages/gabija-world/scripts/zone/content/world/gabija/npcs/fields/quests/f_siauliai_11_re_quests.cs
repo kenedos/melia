@@ -867,6 +867,7 @@ public class Siau11reMq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60099);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Large-Scale Search Operation (1)"));
 		SetDescription(L("Chaser Talbasi believes they can figure out what is going on once all of Priest Gelija's notes are collected. Defeat monsters at the Uninhabited Crossing and try to collect all of Priest Gelija's memos."));
 		SetType(QuestType.Main);
@@ -932,6 +933,7 @@ public class Siau11reMq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60101);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Large-Scale Search Operation (3)"));
 		SetDescription(L("Agent Larena believes Bishop Urbonas and the priests are on the move with a specific purpose. Take Jolly, a dog raised by the priests, and try to find their traces nearby."));
 		SetType(QuestType.Main);
@@ -961,6 +963,7 @@ public class Siau11reMq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60102);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Large-Scale Search Operation (4)"));
 		SetDescription(L("Chaser Sendal looks gravely injured. Talk to Chaser Sendal and find out what happened."));
 		SetType(QuestType.Main);
@@ -985,6 +988,7 @@ public class Siau11reMq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60103);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Large-Scale Search Operation (5)"));
 		SetDescription(L("Chaser Sendal and Priest Pranas encountered some demons while investigating Groundsle Hill. Chaser Sendal now wants you to help rescue Priest Pranas from the demons."));
 		SetType(QuestType.Main);
@@ -1015,6 +1019,7 @@ public class Siau11reMq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60104);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Large-Scale Search Operation (6)"));
 		SetDescription(L("Priest Pranas has asked you to find traces of Bishop Urbonas and return to Orsha. Search Groundsle Hill for any leads on Bishop Urbonas."));
 		SetType(QuestType.Main);
@@ -1043,6 +1048,7 @@ public class Siau11reSq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60105);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Support Activities"));
 		SetDescription(L("Agent Orwen wants you to defeat the monsters disturbing the agents' operations at the Naudingas Felled Area."));
 		SetType(QuestType.Sub);
@@ -1070,6 +1076,7 @@ public class Siau11reSq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60106);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Suspicious Location"));
 		SetDescription(L("Agent Orwen says the demons have created a series of unknown magic circles. Remove the magic circles created by the demons at the Naudingas Felled Area."));
 		SetType(QuestType.Sub);
@@ -1097,6 +1104,7 @@ public class Siau11reSq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60107);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preliminary Investigation (1)"));
 		SetDescription(L("Agent Notres thinks it doesn't make sense to move the people migrating to Orsha to the Deer Hooves Lot. First, they want you to check whether it would be possible to defeat the monsters there."));
 		SetType(QuestType.Sub);
@@ -1130,6 +1138,7 @@ public class Siau11reSq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60108);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preliminary Investigation (2)"));
 		SetDescription(L("Agent Notres has asked you to check whether the Deer Hooves Lot can be used to make a temporary settler camp. Go there and see whether it is safe."));
 		SetType(QuestType.Sub);
@@ -1161,6 +1170,7 @@ public class Siau11reSq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60109);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Corrupted Monster"));
 		SetDescription(L("Agent Notres was sent to collect blood from monsters in order to find out what is making them so ferocious. Defeat some monsters at Rohonsa Cliff and help collect their contaminated blood."));
 		SetType(QuestType.Sub);
@@ -1190,6 +1200,7 @@ public class Siau11reSq07Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60110);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Precious Life and Money"));
 		SetDescription(L("While Chaser Zegaus is glad Priest Pranas is safe, now they are injured and worried for their own safety. Defeat some monsters for Zegaus."));
 		SetType(QuestType.Sub);
@@ -1217,6 +1228,7 @@ public class Siau11reSq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60111);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("While You Were Gone"));
 		SetDescription(L("Chaser Zegaus seems to have lost a bag with medicine and bandages. Look around and search for the trackers' belongings."));
 		SetType(QuestType.Sub);
@@ -1245,6 +1257,7 @@ public class Prison621Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60115);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Bishop Urbonas' Whereabouts (1)"));
 		SetDescription(L("Priest Pranas says he will enter Ashaq Underground Prison 1F first with the Chasers. Follow Priest Pranas to Ashaq Underground Prison 1F."));
 		SetType(QuestType.Main);

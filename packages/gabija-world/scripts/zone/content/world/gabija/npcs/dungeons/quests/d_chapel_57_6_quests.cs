@@ -922,6 +922,7 @@ public class Chaple576Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8510);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Church Gate (1)"));
 		SetDescription(L("Vaidutis needs Power Crystals from the Corylus to make a Light Crystal."));
 		SetType(QuestType.Main);
@@ -951,6 +952,7 @@ public class Chaple576Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8511);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Church Gate (2)"));
 		SetDescription(L("Use the Light Crystal to break the demonic barrier at the church entrance."));
 		SetType(QuestType.Main);
@@ -1014,6 +1016,7 @@ public class Chaple576Mq041Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8730);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Entrance of the Cathedral (3)"));
 		SetDescription(L("The gate is open. Algis steps through to investigate the 1F."));
 		SetType(QuestType.Main);
@@ -1040,6 +1043,7 @@ public class Chaple576Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8514);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Legendary Trick (1)"));
 		SetDescription(L("Collect the clothing of Pawndel and Pawnd to make a transformation scroll."));
 		SetType(QuestType.Sub);
@@ -1070,6 +1074,7 @@ public class Chaple576Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8515);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Legendary Trick (2)"));
 		SetDescription(L("Use the transformation scroll to win the demon sisters over and bring them to the Apsauga Altar."));
 		SetType(QuestType.Sub);
@@ -1135,6 +1140,7 @@ public class Chaple576Mq08Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8517);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Get a Hold of Yourself! (2)"));
 		SetDescription(L("Convert the demons within reach of the Globejas Altar."));
 		SetType(QuestType.Sub);
@@ -1162,6 +1168,7 @@ public class Chaple576Mq09Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(8518);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Activate the Central Altar"));
 		SetDescription(L("Check the Central Altar and deal with what stopped it."));
 		SetType(QuestType.Sub);
@@ -1191,6 +1198,7 @@ public class Chaple576Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60156);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Thorough Preparations"));
 		SetDescription(L("Vaidutis has lost his Holy Stones. Gather orb crystals for new ones."));
 		SetType(QuestType.Repeat);

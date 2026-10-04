@@ -408,6 +408,7 @@ public class Mine3Resque1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1045);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rescue the Villagers"));
 		SetDescription(L("The villagers the Vubbe dragged off are held somewhere on the third floor. Find them."));
 		SetType(QuestType.Main);
@@ -437,6 +438,7 @@ public class Mine3Resque3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1047);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Netherbovine's Attack"));
 		SetDescription(L("A Netherbovine answers the mine crystal and comes up out of the dark."));
 		SetType(QuestType.Sub);
@@ -466,6 +468,7 @@ public class Mine3BossQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1048);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demons of the Closed Area"));
 		SetDescription(L("Something is sealed inside the crystal pillar of the closed area, and it is awake."));
 		SetType(QuestType.Sub);
@@ -495,6 +498,7 @@ public class Act4Mine3EnterQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(4220);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Crystal Wall of the Closed Area"));
 		SetDescription(L("The barrier stone will only give way to the magic stones the Vubbe carry."));
 		SetType(QuestType.Sub);
@@ -528,6 +532,7 @@ public class Cmine6ToKatyn71Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20050);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mysterious Slate (1)"));
 		SetDescription(L("The crystal pillar was holding a slate. Knight Commander Uska in Klaipeda may know what it is."));
 		SetType(QuestType.Main);
@@ -568,6 +573,7 @@ public class Cmine6Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60150);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Dangerous Mine"));
 		SetDescription(L("The third floor's purifier is running short of power. Charge a crystal and feed it in."));
 		SetType(QuestType.Repeat);

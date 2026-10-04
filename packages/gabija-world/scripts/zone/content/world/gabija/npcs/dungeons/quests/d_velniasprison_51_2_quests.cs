@@ -375,6 +375,7 @@ public class Vprison512Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60007);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ridding the Traitor (1)"));
 		SetDescription(L("Nuaele's reinforcements are still coming through the dimensional crack into the First Isolation Area."));
 		SetType(QuestType.Main);
@@ -402,6 +403,7 @@ public class Vprison512Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60008);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ridding the Traitor (2)"));
 		SetDescription(L("Nuaele's demons still wear the marks Hauberk gave them, and taking them back tells them who their master is."));
 		SetType(QuestType.Main);
@@ -431,6 +433,7 @@ public class Vprison512Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60009);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ridding the Traitor (3)"));
 		SetDescription(L("Hauberk's seal reads the minds of the demons in the Third Isolation Area, and Nuaele's plan with them."));
 		SetType(QuestType.Main);
@@ -457,6 +460,7 @@ public class Vprison512Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60010);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Ridding the Traitor (4)"));
 		SetDescription(L("The Harugals of the Fourth Isolation Area are the last servants Nuaele can rely on."));
 		SetType(QuestType.Main);
@@ -483,6 +487,7 @@ public class Vprison512Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60011);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lodged Stone"));
 		SetDescription(L("Aldona opens the way into Nuaele's territory, and Nuaele is put down in the middle of her own ritual."));
 		SetType(QuestType.Main);
@@ -514,6 +519,7 @@ public class Vprison512Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60031);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unreasonable Defeat"));
 		SetDescription(L("What is left of Nuaele's following is gathering in the First Isolation Area to carry on her will."));
 		SetType(QuestType.Sub);
@@ -541,6 +547,7 @@ public class Vprison512Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60032);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Recovering Prestige"));
 		SetDescription(L("Nuaele's fragments still hold the demons of the Fourth Isolation Area to her orders."));
 		SetType(QuestType.Sub);

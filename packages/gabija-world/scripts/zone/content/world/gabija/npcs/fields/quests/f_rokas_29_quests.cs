@@ -831,6 +831,7 @@ public class Rokas29Mq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20179);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Rexipher's Research (1)"));
 		SetDescription(L("Historian Rexipher waits along the path to the Royal Mausoleum, and wants the epitaphs of the Great King read."));
 		SetType(QuestType.Main);
@@ -862,6 +863,7 @@ public class Rokas29Mq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20180);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Rexipher's Research (2)"));
 		SetDescription(L("The next epitaph stands at Serno Highland, and it is guarded."));
 		SetType(QuestType.Main);
@@ -891,6 +893,7 @@ public class Rokas29Mq2BridgeQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19330);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Epitaph of Serno Highland"));
 		SetDescription(L("The epitaph at Serno Highland throws off its guardians the moment it is touched."));
 		SetType(QuestType.Sub);
@@ -917,6 +920,7 @@ public class Rokas29Mq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20181);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Rexipher's Research (3)"));
 		SetDescription(L("The third epitaph lies on the road to Dykyne Fork, and its guardian nearly takes Rexipher with it."));
 		SetType(QuestType.Main);
@@ -947,6 +951,7 @@ public class Rokas29Mq4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20182);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Rexipher's Research (3)"));
 		SetDescription(L("The third symbol is cut into the rock left of Dykyne Fork, and the Zinutekas guard it."));
 		SetType(QuestType.Main);
@@ -976,6 +981,7 @@ public class Rokas29Mq4BridgeQuest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(19340);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Epitaph at Dykyne Fork on the right"));
 		SetDescription(L("The epitaph left of Dykyne Fork sprouts Zinutekas before it can be read."));
 		SetType(QuestType.Sub);
@@ -1003,6 +1009,7 @@ public class Rokas29Mq5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20183);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Rexipher's Research (4)"));
 		SetDescription(L("One epitaph is left, on the lip of Apatinis Cliff."));
 		SetType(QuestType.Main);
@@ -1031,6 +1038,7 @@ public class Rokas29Mq6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20188);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Historian Rexipher's Research (5)"));
 		SetDescription(L("The symbols are covered over, and Rexipher wants Hogma teeth to grind them clean."));
 		SetType(QuestType.Main);
@@ -1061,6 +1069,7 @@ public class Rokas29Vacys1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1058);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Adventurer's Favor (1)"));
 		SetDescription(L("Monsters took the adventurer Varkis' bag, and his whole journey is written in it."));
 		SetType(QuestType.Sub);
@@ -1087,6 +1096,7 @@ public class Rokas29Vacys2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1059);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Adventurer's Favor (2)"));
 		SetDescription(L("Lithorex comes out of the rock face on top of Varkis."));
 		SetType(QuestType.Sub);
@@ -1115,6 +1125,7 @@ public class Rokas29Vacys3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1060);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Eternal Adventure (1)"));
 		SetDescription(L("Varkis' spirit cannot leave his research behind. The first cache is at Dykyne Fork."));
 		SetType(QuestType.Sub);
@@ -1141,6 +1152,7 @@ public class Rokas29Vacys4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1061);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Eternal Adventure (2)"));
 		SetDescription(L("Unknocker was sitting on the second cache at Neck Cliff of Snake."));
 		SetType(QuestType.Sub);
@@ -1172,6 +1184,7 @@ public class Rokas29Vacys5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1062);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Eternal Adventure (3)"));
 		SetDescription(L("The last cache is at Apatinis Cliff, and a Hogma patrol walks that line."));
 		SetType(QuestType.Sub);
@@ -1205,6 +1218,7 @@ public class Rokas29Vacys6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(1063);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Eternal Adventure (4)"));
 		SetDescription(L("Burn the finished research at Varkis' own camp and let him go."));
 		SetType(QuestType.Sub);

@@ -820,6 +820,7 @@ public class Bracken632Mq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50100);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Where Did Everybody Go? (2)"));
 		SetDescription(L("Rose says the beads belong to someone in the village called Anne, and that she would never leave them behind. It could be a lead; follow the trail beads on the ground."));
 		SetType(QuestType.Main);
@@ -848,6 +849,7 @@ public class Bracken632Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50101);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Where Did Everybody Go? (3)"));
 		SetDescription(L("Traveling Merchant Rose believes there might be other beads nearby. Look around and search for more beads or other clues."));
 		SetType(QuestType.Main);
@@ -875,6 +877,7 @@ public class Bracken632Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50102);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Where Did Everybody Go? (4)"));
 		SetDescription(L("Tess was being chased by demons. Defeat the demons that chased her."));
 		SetType(QuestType.Main);
@@ -905,6 +908,7 @@ public class Bracken632Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50103);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Where Did Everybody Go? (5)"));
 		SetDescription(L("Tess seems to be a resident of the Croa Village. Talk to her to find out what happened back at the village."));
 		SetType(QuestType.Main);
@@ -929,6 +933,7 @@ public class Bracken632Mq060Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50145);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Where Did Everybody Go? (6)"));
 		SetDescription(L("Rose is back to her senses after hearing your words of comfort. Talk to Rose about what to do next."));
 		SetType(QuestType.Main);
@@ -954,6 +959,7 @@ public class Bracken632Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50104);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Frightened Herbalist"));
 		SetDescription(L("Herbalist Ash wants to go back to Orsha but is scared of all the demons around. Defeat some demons nearby for Herbalist Ash."));
 		SetType(QuestType.Sub);
@@ -982,6 +988,7 @@ public class Bracken632Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50105);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Herbalist (1)"));
 		SetDescription(L("Herbalist Ash says they saw an unusual sight: a demon collecting herbs. They want to know what those herbs were. Go to Neneva Yard and collect a type of herb with small, thin leaves."));
 		SetType(QuestType.Sub);
@@ -1010,6 +1017,7 @@ public class Bracken632Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50106);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Herbalist (2)"));
 		SetDescription(L("Herbalist Ash wants to dry out all the Aconite to prevent the demons from using it. First, catch some Loktanuns and collect their acidic fluid."));
 		SetType(QuestType.Sub);
@@ -1038,6 +1046,7 @@ public class Bracken632Sq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50107);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Herbalist (3)"));
 		SetDescription(L("Spraying the Loktanun Fluid on the Aconite should dry it out. Go to Neneva Yard and spray the Aconite with the collected Loktanun fluid."));
 		SetType(QuestType.Sub);
@@ -1066,6 +1075,7 @@ public class Bracken632Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60162);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fallen Days"));
 		SetDescription(L("Collect Lapasape wand fragments to show that you have dealed with Lapasape Mages in order to calm Tess."));
 		SetType(QuestType.Repeat);
@@ -1095,6 +1105,7 @@ public class Abbey642Hq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50276);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Remembering the Victims (1)"));
 		SetDescription(L("Rona wants to erect a tombstone in the Novaha Monastery as a memorial to the victims of the demons' experiments. Unfortunately, she can't go there because of the monsters. Go to the Novaha Monastery and set up the memorial for her."));
 		SetType(QuestType.Sub);

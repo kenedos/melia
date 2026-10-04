@@ -775,6 +775,7 @@ public class Prison80Mq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30164);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Who am I(1)"));
 		SetDescription(L("The Hanging Room's device makes its illusions out of the magic it takes in."));
 		SetType(QuestType.Main);
@@ -802,6 +803,7 @@ public class Prison80Mq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30165);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Who am I(2)"));
 		SetDescription(L("Wearing a Red Socket Mage's shape, you hear what the demons know."));
 		SetType(QuestType.Main);
@@ -829,6 +831,7 @@ public class Prison80Mq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30166);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon identification"));
 		SetDescription(L("Only Grinender's Seal gets past the magic circle in the Common Room."));
 		SetType(QuestType.Main);
@@ -858,6 +861,7 @@ public class Prison80Mq4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30167);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Prison Movement(1)"));
 		SetDescription(L("The Teleport Magic Scrolls are locked behind the name of a goddess."));
 		SetType(QuestType.Main);
@@ -886,6 +890,7 @@ public class Prison80Mq5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30168);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Prison Movement(2)"));
 		SetDescription(L("One Teleport Magic Scroll for the Long Sentence Prison Cell, one kept by Zanas."));
 		SetType(QuestType.Main);
@@ -921,6 +926,7 @@ public class Prison80Mq6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30169);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The perfect massacre"));
 		SetDescription(L("The Long Sentence Prison Cell's defensive device cuts down whatever comes close."));
 		SetType(QuestType.Main);
@@ -956,6 +962,7 @@ public class Prison80Mq7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30170);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Through the front door"));
 		SetDescription(L("Grinender's Seal opens his own magic circle, and Grinender comes through it."));
 		SetType(QuestType.Main);
@@ -985,6 +992,7 @@ public class Prison80Mq8Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30171);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Deal with the stragglers in the Solitary Cells"));
 		SetDescription(L("With Grinender gone, only his stragglers are left in the Solitary Cells."));
 		SetType(QuestType.Main);
@@ -1012,6 +1020,7 @@ public class Prison80Mq9Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30172);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Six Crystals"));
 		SetDescription(L("The King's Green Jewel is locked behind six crystals that must shine at once."));
 		SetType(QuestType.Main);
@@ -1040,6 +1049,7 @@ public class Prison80Mq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30173);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Solitary Cell Barrier"));
 		SetDescription(L("The third demon barrier, and another piece of Zanas' soul for it."));
 		SetType(QuestType.Main);
@@ -1066,6 +1076,7 @@ public class Prison80Sq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30199);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Confiscated Prisoner Belongings"));
 		SetDescription(L("A prisoner's care package never made it past the guards."));
 		SetType(QuestType.Sub);

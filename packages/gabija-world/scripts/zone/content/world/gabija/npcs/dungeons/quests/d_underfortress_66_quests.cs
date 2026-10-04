@@ -719,6 +719,7 @@ public class Underfortress66Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50055);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Surrounded by Enemies"));
 		SetDescription(L("The Royal Army guards of the drill ground are being run down by the monsters."));
 		SetType(QuestType.Main);
@@ -807,6 +808,7 @@ public class Underfortress66Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50058);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reclaim the Camp (3)"));
 		SetDescription(L("The detachment walks the camp back with the Revelator behind its line."));
 		SetType(QuestType.Main);
@@ -871,6 +873,7 @@ public class Underfortress66Mq060Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50060);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Reclaim the Camp (5)"));
 		SetDescription(L("A Specter Monarch takes the whole detachment, and what is left of it speaks."));
 		SetType(QuestType.Main);
@@ -900,6 +903,7 @@ public class Underfortress66Mq070Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50061);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hidden Area"));
 		SetDescription(L("The officer's spirit points at a room behind the camp that nobody has looked into."));
 		SetType(QuestType.Main);

@@ -504,6 +504,7 @@ public class Huevillage583Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20283);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Andale Village Priest's Favor (1)"));
 		SetDescription(L("The priest wants Languid Herbs from Narvas Curved Path to build a bomb against the Upents."));
 		SetType(QuestType.Main);
@@ -531,6 +532,7 @@ public class Huevillage583Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20284);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Andale Village Priest's Favor (2)"));
 		SetDescription(L("The herbs alone will not do. Bring the Strongly Scented Soul Flower of Dvyni Wetland as well."));
 		SetType(QuestType.Main);
@@ -558,6 +560,7 @@ public class Huevillage583Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20285);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Creating the Languid Herb Bomb"));
 		SetDescription(L("The headman keeps his old explosives in the warehouse lot above the village."));
 		SetType(QuestType.Main);
@@ -586,6 +589,7 @@ public class Huevillage583Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20286);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Drowsy Scent"));
 		SetDescription(L("Set the Languid Herb Bomb among the sleeping Upents of Melagingas Hill."));
 		SetType(QuestType.Main);
@@ -646,6 +650,7 @@ public class Huevillage583Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(20288);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Dvyni Wetland's Colimencia"));
 		SetDescription(L("The wetland around the soul flowers has been trodden flat by something large."));
 		SetType(QuestType.Sub);

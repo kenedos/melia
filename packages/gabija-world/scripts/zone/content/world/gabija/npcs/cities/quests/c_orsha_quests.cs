@@ -726,6 +726,7 @@ public class OrshaHq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50258);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unusual Eyes"));
 		SetDescription(L("Accessory Merchant Jurus seems interested in your hair accessories. Talk to Accessory Merchant Jurus."));
 		SetType(QuestType.Sub);
@@ -752,6 +753,7 @@ public class Bracken631Sq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50098);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Injured Herbalist (3)"));
 		SetDescription(L("The Cleric Submaster gave you a medicine that can purify evil energy. Deliver the medicine to Herbalist Tales."));
 		SetType(QuestType.Sub);
@@ -780,6 +782,7 @@ public class Abbay643Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50140);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Edmundas' Worry (3)"));
 		SetDescription(L("The Wizard Submaster gave you a recipe for a Protection Barrier Crystal. Defeat Deadborn Scaps at the Novaha Institute to obtain their demon essences, then craft the Protection Barrier Crystal."));
 		SetType(QuestType.Sub);
@@ -817,6 +820,7 @@ public class Abbay643Sq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50141);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Edmundas' Worry (4)"));
 		SetDescription(L("The Protection Barrier Crystal is completed. Go back to Edmundas and place the crystal."));
 		SetType(QuestType.Sub);
@@ -843,6 +847,7 @@ public class OrshaMq1_01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60085);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Bishop (1)"));
 		SetDescription(L("Inesa Hamondale has asked you to find the bishop of Orsha, Urbonas, who is missing. Talk to Inesa Hamondale again."));
 		SetType(QuestType.Main);
@@ -867,6 +872,7 @@ public class OrshaMq1_02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60086);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Bishop (2)"));
 		SetDescription(L("Before you leave, Inesa Hamondale has asked you to worship the Statue of Goddess Ausrine in the Central Plaza, then collect her gift from the Item Merchant."));
 		SetType(QuestType.Main);
@@ -893,6 +899,7 @@ public class OrshaMq1_03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60087);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Bishop (3)"));
 		SetDescription(L("It seeems Inesa Hamondale has asked the Accessory Merchant to prepare another gift for you. Go find the Accessory Merchant in the Shopping District."));
 		SetType(QuestType.Main);
@@ -919,6 +926,7 @@ public class OrshaMq1_04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60088);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Missing Bishop (4)"));
 		SetDescription(L("News just came in from Agent Cherasia, who is searching for the missing bishop. Go find the agent in the Woods of the Linked Bridges."));
 		SetType(QuestType.Main);
@@ -944,6 +952,7 @@ public class OrshaMq2_01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60112);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dangerous Trace (1)"));
 		SetDescription(L("Most of the contents of Bishop Urbonas' journal remain unknown. For now, relay the journal as it is to Inesa Hamondale."));
 		SetType(QuestType.Main);
@@ -968,6 +977,7 @@ public class OrshaMq2_02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60113);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dangerous Trace (2)"));
 		SetDescription(L("Inesa Hamondale prepared a quick gift that will be useful for your journey. Before departing for Ashaq Underground Prison, visit the Item Merchant to collect it."));
 		SetType(QuestType.Main);
@@ -996,6 +1006,7 @@ public class OrshaMq2_03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60114);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Dangerous Trace (3)"));
 		SetDescription(L("Priest Pranas says he is going to gather a few talented Chasers and head to the entrance of Ashaq Underground Prison. Join him by the Gebene Cliff in Paupys Crossing."));
 		SetType(QuestType.Main);
@@ -1021,6 +1032,7 @@ public class OrshaMq3_01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60145);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Everything Intact (3)"));
 		SetDescription(L("Inesa Hamondale has asked you to return to Bishop Urbonas. Go see Bishop Urbonas and hear about the contents of the Demon Orders."));
 		SetType(QuestType.Main);

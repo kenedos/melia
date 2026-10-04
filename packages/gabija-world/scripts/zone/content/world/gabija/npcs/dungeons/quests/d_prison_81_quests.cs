@@ -791,6 +791,7 @@ public class Prison81Mq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30174);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Road Back(1)"));
 		SetDescription(L("Demon magic closes the way through the Workshop."));
 		SetType(QuestType.Main);
@@ -817,6 +818,7 @@ public class Prison81Mq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30175);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Road Back(2)"));
 		SetDescription(L("King Kadumel left teleportation magic in a cell, keyed to a sentence."));
 		SetType(QuestType.Main);
@@ -855,6 +857,7 @@ public class Prison81Mq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30176);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Restrained Spirit of Zanas(1)"));
 		SetDescription(L("Soul Stones of Restrainment will break the circle holding Zanas."));
 		SetType(QuestType.Main);
@@ -892,6 +895,7 @@ public class Prison81Mq4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30177);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Restrained Spirit of Zanas(2)"));
 		SetDescription(L("The Soul Stones break the Magic Circle of Restrainment."));
 		SetType(QuestType.Main);
@@ -952,6 +956,7 @@ public class Prison81Mq6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30179);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Shard Collection(2)"));
 		SetDescription(L("The Light Crystals of the Supply Room drive the evil energy out of the shards."));
 		SetType(QuestType.Main);
@@ -987,6 +992,7 @@ public class Prison81Mq7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30180);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Shard Collection(3)"));
 		SetDescription(L("A shard on every side opens the device holding the King's Yellow Jewel."));
 		SetType(QuestType.Main);
@@ -1019,6 +1025,7 @@ public class Prison81Mq8Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30181);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Destruction of the Workshop"));
 		SetDescription(L("The Punishment Room's device strikes the whole Workshop at once."));
 		SetType(QuestType.Main);
@@ -1046,6 +1053,7 @@ public class Prison81Mq9Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30182);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Workshop Barrier(1)"));
 		SetDescription(L("The monsters the blast missed stand between the two Zanas and the barrier."));
 		SetType(QuestType.Main);
@@ -1082,6 +1090,7 @@ public class Prison81Mq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30183);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Workshop Barrier(2)"));
 		SetDescription(L("The fourth demon barrier falls, and only one is left."));
 		SetType(QuestType.Main);
@@ -1108,6 +1117,7 @@ public class Prison81Sq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30200);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Letters of a Prisoner"));
 		SetDescription(L("A prisoner's letter to his parents never left the Inmate's Lounge."));
 		SetType(QuestType.Sub);
@@ -1136,6 +1146,7 @@ public class Prison81Sq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30202);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Workshop's Secret Device"));
 		SetDescription(L("A number rises on the device, and the monsters of the Workshop are how it is answered."));
 		SetType(QuestType.Sub);

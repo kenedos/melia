@@ -641,6 +641,7 @@ public class Bracken633Mq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50108);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Giant Bracken (1)"));
 		SetDescription(L("Traveling Merchant Rose saw a giant bracken attached to a device and thinks there might be a laboratory nearby. Find the demon laboratory and defeat the demons there."));
 		SetType(QuestType.Main);
@@ -707,6 +708,7 @@ public class Bracken633Mq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50110);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Mysterious Wizard"));
 		SetDescription(L("Rose was captured by demons and an unknown wizard. Rescue Traveling Merchant Rose."));
 		SetType(QuestType.Main);
@@ -740,6 +742,7 @@ public class Bracken633Mq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50111);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Deactivate"));
 		SetDescription(L("In order to turn off the giant bracken device it's power source needs to be removed. Use the monsters to stop the freezing magic circles and remove the power source."));
 		SetType(QuestType.Main);
@@ -767,6 +770,7 @@ public class Bracken633Mq050Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50112);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("To Novaha Monastery"));
 		SetDescription(L("Traveling Merchant Rose says there are demons guarding the entrance to the Novaha Monastery. Defeat the sentinel demons."));
 		SetType(QuestType.Main);
@@ -796,6 +800,7 @@ public class Bracken633Sq010Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50113);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Trapped Herbalist"));
 		SetDescription(L("Herbalist Talas seems to have gotten caught in the trap while running away from demons. Release Talas from the trap."));
 		SetType(QuestType.Sub);
@@ -823,6 +828,7 @@ public class Bracken633Sq020Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50114);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Cauldron (1)"));
 		SetDescription(L("Herbalist Talas saw the demons add a type of a poisonous plant to the cauldrons and tried to destroy them. Go to Ruivara Field and remove the demon cauldrons' protective barrier."));
 		SetType(QuestType.Sub);
@@ -850,6 +856,7 @@ public class Bracken633Sq030Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50115);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Demon Cauldron (2)"));
 		SetDescription(L("You have turned off all the protection shield creation devices. Destroy the cauldrons."));
 		SetType(QuestType.Sub);
@@ -877,6 +884,7 @@ public class Bracken633Sq040Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50116);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Potential Threat"));
 		SetDescription(L("Herbalist Talas wants to burn the demons' materials to prevent them from restarting their operation. Go to the Saloto Lowland and burn down the demons' boxes of poisonous herbs."));
 		SetType(QuestType.Sub);
@@ -904,6 +912,7 @@ public class Bracken633Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60163);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Cure-all Medicine"));
 		SetDescription(L("Herbalist Talas has become injured by a trap after coming to collect dry Dadania leaves at Badoca Hill. Go find dry Dadania leaves from Dadania bushes at Badoca Hill for Talas."));
 		SetType(QuestType.Repeat);

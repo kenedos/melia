@@ -736,6 +736,7 @@ public class FCastle652Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70420);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Unfortunate Distrust"));
 		SetDescription(L("Mage Melchioras seems to have split up from the group of Revelators. Talk to Mage Melchioras."));
 		SetType(QuestType.Main);
@@ -762,6 +763,7 @@ public class FCastle652Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70421);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Fast Return"));
 		SetDescription(L("Mage Melchioras believes there is a Magic Power Supply Device in the Rampart Reconstruction District. Go there and set up the crystal to reveal any hidden devices."));
 		SetType(QuestType.Main);
@@ -789,6 +791,7 @@ public class FCastle652Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70422);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Investigation Continues"));
 		SetDescription(L("Mage Melchioras says he felt a new Magic Power Supply Device. Go to the Buried Central Plaza and set up the crystal to reveal any hidden devices."));
 		SetType(QuestType.Main);
@@ -816,6 +819,7 @@ public class FCastle652Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70423);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Rash Judgement"));
 		SetDescription(L("This time, Mage Melchioras thinks there is a Magic Power Supply Device at the Handicraft Workshop Road. Go there and set up the crystal to reveal any hidden devices."));
 		SetType(QuestType.Main);
@@ -844,6 +848,7 @@ public class FCastle652Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70424);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Kruvina and the Revelators"));
 		SetDescription(L("Mage Melchioras says the Kruvina runs on human lives and gathering around it would be a fatal mistake. Go to the Palma Central Plaza and stop Yane from carrying out her plans!"));
 		SetType(QuestType.Main);
@@ -870,6 +875,7 @@ public class FCastle652Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70425);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("First Steps to Camp Defense"));
 		SetDescription(L("Bigs wants to create a barricade to protect Melchioras once he returns. Go to the Kalbos Vacant Lot and Handicraft Workshop Road and look in box piles for wood boards to use."));
 		SetType(QuestType.Sub);
@@ -899,6 +905,7 @@ public class FCastle652Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70426);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Eat or Be Eaten"));
 		SetDescription(L("Bigs hopes you will clear out the demons in the area for those who are now injured. As instructed, defeat any demons nearby."));
 		SetType(QuestType.Sub);
@@ -927,6 +934,7 @@ public class FCastle652Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70427);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("A Sorrowful Heart"));
 		SetDescription(L("Follower Wedge wants to make some medicine to help Melchioras recover his health later. Go and collect some thorn mushrooms from the Kalbos Empty Lot and Buried Central Plaza."));
 		SetType(QuestType.Sub);
@@ -956,6 +964,7 @@ public class FCastle652Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(70428);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hometown Secret"));
 		SetDescription(L("Follower Wedge wants to produce a monster repellent. Defeat Charogs and collect their sap to use as material for the repellent."));
 		SetType(QuestType.Sub);
@@ -986,6 +995,7 @@ public class FCastle652Rp1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60174);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Hidden Magic Devices"));
 		SetDescription(L("Follower Nedluss has asked you to destroy the magic devices that have been discovered within the Manor."));
 		SetType(QuestType.Repeat);
@@ -1013,6 +1023,7 @@ public class FCastle652Rp2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60175);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Efforts Towards Redemption"));
 		SetDescription(L("Follower Bigs says that he requires Condensed Magic from demons to help Melchioras. Defeat the demons from the surrounding area to collect condensed magic."));
 		SetType(QuestType.Repeat);

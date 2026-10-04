@@ -555,6 +555,7 @@ public class Vprison514Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60012);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Night Star"));
 		SetDescription(L("Vakarine is waiting behind the Corridor of Monitor, and she cannot come out to meet anyone."));
 		SetType(QuestType.Main);
@@ -612,6 +613,7 @@ public class Vprison514Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60014);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Evening Star Key (2)"));
 		SetDescription(L("Zydrone pours the goddess' power into the key at Oruarma Cathedral, and cannot defend herself while she does."));
 		SetType(QuestType.Main);
@@ -672,6 +674,7 @@ public class Vprison514Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60016);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Evening Star at Night"));
 		SetDescription(L("Dionys is put down so Aldona can take the Chain of Reversion off him, and Hauberk takes it instead."));
 		SetType(QuestType.Main);
@@ -701,6 +704,7 @@ public class Vprison514Mq06Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60017);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Planned Escape"));
 		SetDescription(L("Vakarine names what Hauberk carried off: the Chain of Reversion."));
 		SetType(QuestType.Main);
@@ -726,6 +730,7 @@ public class Vprison514Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60033);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Fury"));
 		SetDescription(L("Valtross is dead, and his servants are still loose in Oruarma Cathedral."));
 		SetType(QuestType.Sub);
@@ -753,6 +758,7 @@ public class Vprison514Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60034);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Dionys' Claws"));
 		SetDescription(L("The demons that fled Dionys near the Rearda Seal still have his claws in them."));
 		SetType(QuestType.Sub);
@@ -783,6 +789,7 @@ public class Vprison514Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(60035);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Lost Star"));
 		SetDescription(L("The Mark of Star broke apart when Dionys lost himself, and its pieces are still around the Rada Seal."));
 		SetType(QuestType.Sub);

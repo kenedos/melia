@@ -879,6 +879,7 @@ public class Siauliai462Mq0101Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16401);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Secret of the Farmland (1)"));
 		SetDescription(L("The village keeps a guardian stone at the edge of the fields for the nights the demons come."));
 		SetType(QuestType.Main);
@@ -908,6 +909,7 @@ public class Siauliai462Mq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16400);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Secret of the Farmland (2)"));
 		SetDescription(L("The bee trees near the village carry branches the goddess' power will hold."));
 		SetType(QuestType.Main);
@@ -934,6 +936,7 @@ public class Siauliai462Mq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16410);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Power Within the Bee Tree Branch"));
 		SetDescription(L("A branch driven into a weakened demon burns it to ash, and the ash is what the orb is made of."));
 		SetType(QuestType.Main);
@@ -962,6 +965,7 @@ public class Siauliai462Mq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16420);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Land Bestowed with the Goddess' Power (1)"));
 		SetDescription(L("The orb of ash has to be filled at Palama Cliff before it is worth anything."));
 		SetType(QuestType.Main);
@@ -995,6 +999,7 @@ public class Siauliai462Mq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16430);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Land Bestowed with the Goddess' Power (2)"));
 		SetDescription(L("The seal tower at Stulr Road is restored with the filled orb, and the goddess comes out to it."));
 		SetType(QuestType.Main);
@@ -1023,6 +1028,7 @@ public class Siauliai462Mq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16440);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Goddess Austeja's Situation"));
 		SetDescription(L("Everything at the apiary was the demons working at the seal that holds a Demon Lord under it."));
 		SetType(QuestType.Main);
@@ -1049,6 +1055,7 @@ public class Siauliai462Sq01Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16500);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The identity of the gigantic transformed plant"));
 		SetDescription(L("A stand of grass grew to the height of a house, and something is living inside it."));
 		SetType(QuestType.Sub);
@@ -1077,6 +1084,7 @@ public class Siauliai462Sq02Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16510);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Advent of Disaster"));
 		SetDescription(L("Demon Lord Taumas has come for the weakened Seal Tower himself."));
 		SetType(QuestType.Sub);
@@ -1114,6 +1122,7 @@ public class Siauliai462Sq03Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16520);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Scarecrow's Hand (1)"));
 		SetDescription(L("Druva wants oak planks for a scarecrow he means to hang a Fedimian charm on."));
 		SetType(QuestType.Sub);
@@ -1141,6 +1150,7 @@ public class Siauliai462Sq04Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16530);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Scarecrow's Hand (2)"));
 		SetDescription(L("The scarecrow goes up on Druva's own field, well out of sight of the village."));
 		SetType(QuestType.Sub);
@@ -1176,6 +1186,7 @@ public class Siauliai462Sq05Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(16540);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Half Honey, Half Monster"));
 		SetDescription(L("Logen lost every hive he had and would like the monsters to hear about it."));
 		SetType(QuestType.Sub);
@@ -1202,6 +1213,7 @@ public class PartyQ100Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50044);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Sealed Tower of the Goddess (1)"));
 		SetDescription(L("The Seal Tower is under attack again and the village cannot hold it alone."));
 		SetType(QuestType.Party);
@@ -1228,6 +1240,7 @@ public class PartyQ101Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50045);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Sealed Tower of the Goddess (2)"));
 		SetDescription(L("Austeja's Scripture is filled at the altar and then offered to the tower."));
 		SetType(QuestType.Party);
@@ -1252,6 +1265,7 @@ public class PartyQ102Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(50046);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("The Sealed Tower of the Goddess (3)"));
 		SetDescription(L("The filled scripture goes into the tower and restores the first seal."));
 		SetType(QuestType.Party);

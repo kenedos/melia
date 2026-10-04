@@ -837,6 +837,7 @@ public class Prison79Mq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30154);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Another Soul of Zanas(1)"));
 		SetDescription(L("The device hiding another piece of Zanas takes the power of the monsters."));
 		SetType(QuestType.Main);
@@ -866,6 +867,7 @@ public class Prison79Mq2Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30155);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Another Soul of Zanas(2)"));
 		SetDescription(L("Two opposite powers shut down the device in Warehouse No. 3."));
 		SetType(QuestType.Main);
@@ -893,6 +895,7 @@ public class Prison79Mq3Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30156);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Preparing for the worst"));
 		SetDescription(L("The secret device instructions float out of the junk under the Teal Magic Stone's light."));
 		SetType(QuestType.Main);
@@ -920,6 +923,7 @@ public class Prison79Mq4Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30157);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Storage Lamp(1)"));
 		SetDescription(L("Three lamps have to be lit before the King's Red Jewel comes out."));
 		SetType(QuestType.Main);
@@ -944,6 +948,7 @@ public class Prison79Mq5Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30158);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Storage Lamp(2)"));
 		SetDescription(L("The Blue Lamp burns only on the oil kept beside it."));
 		SetType(QuestType.Main);
@@ -972,6 +977,7 @@ public class Prison79Mq6Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30159);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Storage Lamp(3)"));
 		SetDescription(L("The monsters carry off the Red Lamp's oil for the smell of it."));
 		SetType(QuestType.Main);
@@ -1003,6 +1009,7 @@ public class Prison79Mq7Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30160);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Storage Lamp(4)"));
 		SetDescription(L("The Yellow Lamp lights when all five of its magic circles burn at once."));
 		SetType(QuestType.Main);
@@ -1031,6 +1038,7 @@ public class Prison79Mq8Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30161);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Storage Lamp(5)"));
 		SetDescription(L("The monsters gather around the device holding the King's Red Jewel."));
 		SetType(QuestType.Main);
@@ -1062,6 +1070,7 @@ public class Prison79Mq9Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30162);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Storage Room Barrier(1)"));
 		SetDescription(L("The way to Warehouse No. 4 has to be cleared for Zanas to follow."));
 		SetType(QuestType.Main);
@@ -1098,6 +1107,7 @@ public class Prison79Mq10Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30163);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Storage Room Barrier(2)"));
 		SetDescription(L("Zanas pays again for the Dominance Magic, and the second barrier falls."));
 		SetType(QuestType.Main);
@@ -1124,6 +1134,7 @@ public class Prison79Sq1Quest : QuestScript
 	protected override void Load()
 	{
 		SetClientId(30197);
+		SetUnlock(QuestUnlockType.AllAtOnce);
 		SetName(L("Supply Room's Secret Device"));
 		SetDescription(L("Something might still be inside the Central Assembly Area's Secret Device."));
 		SetType(QuestType.Sub);
