@@ -157,17 +157,17 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Crystal4) && character.Quests.MeetsPrerequisites(Crystal4))
-			{
-				await dialog.Msg(L("The pipe has been crushed. Work it back into shape."));
-				character.Quests.Start(Crystal4);
-				return;
-			}
-
 			if (character.Quests.IsActive(Crystal3))
 			{
 				await dialog.Msg(L("The Carapace will not let you near the pipe."));
 				character.Quests.ClearQuestTrack(Crystal3);
+				return;
+			}
+
+			if (!character.Quests.Has(Crystal4) && character.Quests.MeetsPrerequisites(Crystal4))
+			{
+				await dialog.Msg(L("The pipe has been crushed. Work it back into shape."));
+				character.Quests.Start(Crystal4);
 				return;
 			}
 
@@ -217,12 +217,6 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Crystal5))
-			{
-				await dialog.Msg(L("The purifier is drawing no power. Use the Mine Compass to find out why."));
-				return;
-			}
-
 			if (!character.Quests.Has(Crystal7) && character.Quests.MeetsPrerequisites(Crystal7))
 			{
 				await dialog.Msg(L("The Mine Compass points towards the Magic Supply Device in District 4."));
@@ -233,6 +227,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The Magic Supply Device is turning again. The Auxiliary Purifier is ready to start."));
 				character.Quests.Start(Crystal11);
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal5))
+			{
+				await dialog.Msg(L("The purifier is drawing no power. Use the Mine Compass to find out why."));
 				return;
 			}
 
@@ -287,16 +287,16 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Crystal7))
-			{
-				await dialog.Msg(L("The device is seized solid with rust. Use the Mine Compass to find a way to remove it."));
-				return;
-			}
-
 			if (!character.Quests.Has(Crystal10) && character.Quests.MeetsPrerequisites(Crystal10))
 			{
 				await dialog.Msg(L("The device is still seized with rust. Something on this floor will shift it."));
 				character.Quests.Start(Crystal10);
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal7))
+			{
+				await dialog.Msg(L("The device is seized solid with rust. Use the Mine Compass to find a way to remove it."));
 				return;
 			}
 
@@ -371,12 +371,6 @@ public class DCmine02QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Crystal14))
-			{
-				await dialog.Msg(L("Parts have been torn out of the purifier. Use the Mine Compass to find them."));
-				return;
-			}
-
 			if (!character.Quests.Has(Crystal20) && character.Quests.MeetsPrerequisites(Crystal20))
 			{
 				await dialog.Msg(L("The compass is pointing towards District 6."));
@@ -389,6 +383,12 @@ public class DCmine02QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("The recovered part fits the housing. Start the purifier."));
 				character.Quests.Start(Crystal21);
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal14))
+			{
+				await dialog.Msg(L("Parts have been torn out of the purifier. Use the Mine Compass to find them."));
 				return;
 			}
 

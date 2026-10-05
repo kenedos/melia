@@ -70,6 +70,20 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Reclaim1))
+			{
+				await dialog.Msg(L("If you cannot even deal with Pokubu, you had best give up on entering the mining village."));
+				character.Quests.ReplayQuestTrack(Reclaim1);
+				return;
+			}
+
+			if (character.Quests.IsActive(Request7))
+			{
+				await dialog.Msg(L("The Vubbes are pushing the refugees back. Clear the monsters chasing them."));
+				character.Quests.ReplayQuestTrack(Request7);
+				return;
+			}
+
 			if (!character.Quests.Has(Reclaim1) && character.Quests.MeetsPrerequisites(Reclaim1))
 			{
 				await dialog.Msg(L("You mean to go to the crystal mine to find the light of salvation? But now is not a good time. The Vubbe horde is pouring out of the crystal mine."));
@@ -139,13 +153,6 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				}
 			}
 
-			if (character.Quests.IsActive(Reclaim1))
-			{
-				await dialog.Msg(L("If you cannot even deal with Pokubu, you had best give up on entering the mining village."));
-				character.Quests.ReplayQuestTrack(Reclaim1);
-				return;
-			}
-
 			if (character.Quests.IsActive(Request1))
 			{
 				await dialog.Msg(L("The mining village is a problem, but if the eastern woods are like this too, I cannot guarantee Klaipeda's safety. We must hope the mining village holds."));
@@ -155,13 +162,6 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Camp4))
 			{
 				await dialog.Msg(L("It came for its cub. Watch for it near the camp."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Request7))
-			{
-				await dialog.Msg(L("The Vubbes are pushing the refugees back. Clear the monsters chasing them."));
-				character.Quests.ReplayQuestTrack(Request7);
 				return;
 			}
 
@@ -175,6 +175,20 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			var character = dialog.Player;
 
 			dialog.SetTitle(L("Outpost Border Guard"));
+
+			if (character.Quests.IsActive(Reclaim3))
+			{
+				if (!character.Quests.IsCompletable(Reclaim3))
+				{
+					await dialog.Msg(L("The mining village worries me, but things here are not good either. We must find a way before the monsters grow more."));
+					character.Quests.ClearQuestTrack(Reclaim3);
+					return;
+				}
+
+				await dialog.Msg(L("Finished already? I have never seen anyone win results so quickly."));
+				await dialog.CompleteQuest(Reclaim3);
+				return;
+			}
 
 			if (!character.Quests.Has(Reclaim2) && character.Quests.MeetsPrerequisites(Reclaim2))
 			{
@@ -199,19 +213,6 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Reclaim2))
-			{
-				if (!character.Quests.IsCompletable(Reclaim2))
-				{
-					await dialog.Msg(L("Where the Chupacabra are, other monsters always gather. The mining village worries me, but there are too many things to mind."));
-					return;
-				}
-
-				await dialog.Msg(L("Thank you. Thanks to you, I feel I have my strength back."));
-				await dialog.CompleteQuest(Reclaim2);
-				return;
-			}
-
 			if (!character.Quests.Has(Reclaim3) && character.Quests.MeetsPrerequisites(Reclaim3))
 			{
 				await dialog.Msg(L("Trusting your skill, I have one more request. The supply depot - I want its Chupacabra driven out as well."));
@@ -229,17 +230,16 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Reclaim3))
+			if (character.Quests.IsActive(Reclaim2))
 			{
-				if (!character.Quests.IsCompletable(Reclaim3))
+				if (!character.Quests.IsCompletable(Reclaim2))
 				{
-					await dialog.Msg(L("The mining village worries me, but things here are not good either. We must find a way before the monsters grow more."));
-					character.Quests.ClearQuestTrack(Reclaim3);
+					await dialog.Msg(L("Where the Chupacabra are, other monsters always gather. The mining village worries me, but there are too many things to mind."));
 					return;
 				}
 
-				await dialog.Msg(L("Finished already? I have never seen anyone win results so quickly."));
-				await dialog.CompleteQuest(Reclaim3);
+				await dialog.Msg(L("Thank you. Thanks to you, I feel I have my strength back."));
+				await dialog.CompleteQuest(Reclaim2);
 				return;
 			}
 
@@ -258,6 +258,34 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Every crate accounted for. They cannot have gone far, I said, and there you have it."));
 				await dialog.CompleteQuest(Act2Diss1);
+				return;
+			}
+
+			if (character.Quests.IsActive(Act2Diss1Boss))
+			{
+				if (!character.Quests.IsCompletable(Act2Diss1Boss))
+				{
+					await dialog.Msg(L("Look out - it is still there!"));
+					character.Quests.ReplayQuestTrack(Act2Diss1Boss);
+					return;
+				}
+
+				await dialog.Msg(L("Truly, that was nearly a disaster. How well that great bulk had hidden."));
+				await dialog.CompleteQuest(Act2Diss1Boss);
+				return;
+			}
+
+			if (character.Quests.IsActive(Reclaim7))
+			{
+				if (!character.Quests.IsCompletable(Reclaim7))
+				{
+					await dialog.Msg(L("This is not a situation I am used to. If it comes to it, we may have to give up our own supplies and fend for ourselves until the next shipment."));
+					character.Quests.ClearQuestTrack(Reclaim7);
+					return;
+				}
+
+				await dialog.Msg(L("Thank you. With the Revelator helping like this, we will not be outdone either."));
+				await dialog.CompleteQuest(Reclaim7);
 				return;
 			}
 
@@ -283,30 +311,10 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Act2Diss1))
-			{
-				await dialog.Msg(L("They cannot have gone far. If only a monster had stolen one and set it off, it would have been better."));
-				return;
-			}
-
 			if (!character.Quests.Has(Act2Diss1Boss) && character.Quests.MeetsPrerequisites(Act2Diss1Boss))
 			{
 				await dialog.Msg(L("That is the last of them... or so I thought. Something is moving in the brush."));
 				character.Quests.Start(Act2Diss1Boss);
-				return;
-			}
-
-			if (character.Quests.IsActive(Act2Diss1Boss))
-			{
-				if (!character.Quests.IsCompletable(Act2Diss1Boss))
-				{
-					await dialog.Msg(L("Look out - it is still there!"));
-					character.Quests.ReplayQuestTrack(Act2Diss1Boss);
-					return;
-				}
-
-				await dialog.Msg(L("Truly, that was nearly a disaster. How well that great bulk had hidden."));
-				await dialog.CompleteQuest(Act2Diss1Boss);
 				return;
 			}
 
@@ -327,19 +335,6 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Reclaim6))
-			{
-				if (!character.Quests.IsCompletable(Reclaim6))
-				{
-					await dialog.Msg(L("Finding why the monsters multiplied is all well and good, but the supplies to the mining village being cut off worries me more."));
-					return;
-				}
-
-				await dialog.Msg(L("Thank you. Now the work will go a little more easily."));
-				await dialog.CompleteQuest(Reclaim6);
-				return;
-			}
-
 			if (!character.Quests.Has(Reclaim7) && character.Quests.MeetsPrerequisites(Reclaim7))
 			{
 				await dialog.Msg(L("The Weaver movement by the lower stream looks suspicious. As if they mean to interfere with the supplies to the mining village."));
@@ -355,17 +350,22 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Reclaim7))
+			if (character.Quests.IsActive(Act2Diss1))
 			{
-				if (!character.Quests.IsCompletable(Reclaim7))
+				await dialog.Msg(L("They cannot have gone far. If only a monster had stolen one and set it off, it would have been better."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Reclaim6))
+			{
+				if (!character.Quests.IsCompletable(Reclaim6))
 				{
-					await dialog.Msg(L("This is not a situation I am used to. If it comes to it, we may have to give up our own supplies and fend for ourselves until the next shipment."));
-					character.Quests.ClearQuestTrack(Reclaim7);
+					await dialog.Msg(L("Finding why the monsters multiplied is all well and good, but the supplies to the mining village being cut off worries me more."));
 					return;
 				}
 
-				await dialog.Msg(L("Thank you. With the Revelator helping like this, we will not be outdone either."));
-				await dialog.CompleteQuest(Reclaim7);
+				await dialog.Msg(L("Thank you. Now the work will go a little more easily."));
+				await dialog.CompleteQuest(Reclaim6);
 				return;
 			}
 
@@ -380,16 +380,19 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Operations Officer"));
 
-			if (character.Quests.IsActive(Request1))
+			if (character.Quests.IsActive(Request2))
 			{
-				if (!character.Quests.IsCompletable(Request1))
+				if (!character.Quests.IsCompletable(Request2))
 				{
-					await dialog.Msg(L("It's very important to study the monsters at times like this. It's like weather forecasts where you try to understand the source to see what trends will happen."));
+					await dialog.Msg(L("We haven't searched the upper areas yet. Of course we should be sending troops, but I ask for your help as this is an urgent matter."));
+					character.Quests.ClearQuestTrack(Request2);
 					return;
 				}
 
-				await dialog.Msg(L("Were you sent by Aras? This is a piece of Vubbe clothing. Ah... I see..."));
-				await dialog.CompleteQuest(Request1);
+				await dialog.Msg(L("You saw a Vubbe Fighter but missed it? We also got a report of Vubbe Fighter appearing in the Southern area."));
+				await dialog.Msg(L("First, talk to the Search Scout by the bridge in the lower area of Bulves Farm. This will become a tedious, drawn out campaign if we let that Vubbe Fighter run loose."));
+				await dialog.CompleteQuest(Request2);
+				dialog.UnHideNPC("SIAUL_EAST_SOLDIER8");
 				return;
 			}
 
@@ -417,19 +420,16 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Request2))
+			if (character.Quests.IsActive(Request1))
 			{
-				if (!character.Quests.IsCompletable(Request2))
+				if (!character.Quests.IsCompletable(Request1))
 				{
-					await dialog.Msg(L("We haven't searched the upper areas yet. Of course we should be sending troops, but I ask for your help as this is an urgent matter."));
-					character.Quests.ClearQuestTrack(Request2);
+					await dialog.Msg(L("It's very important to study the monsters at times like this. It's like weather forecasts where you try to understand the source to see what trends will happen."));
 					return;
 				}
 
-				await dialog.Msg(L("You saw a Vubbe Fighter but missed it? We also got a report of Vubbe Fighter appearing in the Southern area."));
-				await dialog.Msg(L("First, talk to the Search Scout by the bridge in the lower area of Bulves Farm. This will become a tedious, drawn out campaign if we let that Vubbe Fighter run loose."));
-				await dialog.CompleteQuest(Request2);
-				dialog.UnHideNPC("SIAUL_EAST_SOLDIER8");
+				await dialog.Msg(L("Were you sent by Aras? This is a piece of Vubbe clothing. Ah... I see..."));
+				await dialog.CompleteQuest(Request1);
 				return;
 			}
 
@@ -465,19 +465,6 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Request4))
-			{
-				if (!character.Quests.IsCompletable(Request4))
-				{
-					await dialog.Msg(L("Honestly, a supply soldier having to gather the supplies himself is nonsense. This should have come from Klaipeda."));
-					return;
-				}
-
-				await dialog.Msg(L("Thank you. Unexpected help always feels good."));
-				await dialog.CompleteQuest(Request4);
-				return;
-			}
-
 			if (!character.Quests.Has(Request5) && character.Quests.MeetsPrerequisites(Request5))
 			{
 				await dialog.Msg(L("Truthfully, if not for the Pokubu, everything would be fine. They make such a nuisance that I have not done the supply recovery work properly - not a single one, in fact."));
@@ -490,6 +477,19 @@ public class FSiauliai2QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 					character.Quests.Start(Request5);
 
+				return;
+			}
+
+			if (character.Quests.IsActive(Request4))
+			{
+				if (!character.Quests.IsCompletable(Request4))
+				{
+					await dialog.Msg(L("Honestly, a supply soldier having to gather the supplies himself is nonsense. This should have come from Klaipeda."));
+					return;
+				}
+
+				await dialog.Msg(L("Thank you. Unexpected help always feels good."));
+				await dialog.CompleteQuest(Request4);
 				return;
 			}
 

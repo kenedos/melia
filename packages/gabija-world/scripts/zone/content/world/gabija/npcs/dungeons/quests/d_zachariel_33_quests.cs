@@ -104,6 +104,20 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("The guardian is still at the lanterns."));
+				character.Quests.ReplayQuestTrack(Mq02);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("He went down the lantern hall. Follow him."));
+				character.Quests.ReplayQuestTrack(Mq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq02, L("Those Guardians are trying to break a stone lantern of the Royal Mausoleum. Stop them. They are out of control."),
@@ -132,20 +146,6 @@ public class DZachariel33QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq03);
 					character.Quests.StartQuestTrack(Mq03);
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("The guardian is still at the lanterns."));
-				character.Quests.ReplayQuestTrack(Mq02);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("He went down the lantern hall. Follow him."));
-				character.Quests.ReplayQuestTrack(Mq03);
 				return;
 			}
 

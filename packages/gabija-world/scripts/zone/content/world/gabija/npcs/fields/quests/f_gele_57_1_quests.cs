@@ -187,6 +187,13 @@ public class FGele571QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq06))
+			{
+				await dialog.Msg(L("The Poata's nest is at Margas Hill. Soil it and it will come out."));
+				character.Quests.ClearQuestTrack(Mq06);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("I am looking for cable car parts, but I can't seem to find any."));
@@ -243,13 +250,6 @@ public class FGele571QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq06))
-			{
-				await dialog.Msg(L("The Poata's nest is at Margas Hill. Soil it and it will come out."));
-				character.Quests.ClearQuestTrack(Mq06);
-				return;
-			}
-
 			await dialog.Msg(L("The cable car has to cross the gorge again. One way or another."));
 		});
 
@@ -280,6 +280,13 @@ public class FGele571QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Did you destroy the roots, too?"));
 				await dialog.CompleteQuest(Rp1);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq07))
+			{
+				await dialog.Msg(L("Capria is out past the junction. Be careful - it is not the Panto you knew."));
+				character.Quests.ClearQuestTrack(Mq07);
 				return;
 			}
 
@@ -352,13 +359,6 @@ public class FGele571QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04))
 			{
 				await dialog.Msg(L("The Baby Pantos are gentle. Lure one and see for yourself."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq07))
-			{
-				await dialog.Msg(L("Capria is out past the junction. Be careful - it is not the Panto you knew."));
-				character.Quests.ClearQuestTrack(Mq07);
 				return;
 			}
 

@@ -393,6 +393,20 @@ public class FGele573QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq09))
+			{
+				await dialog.Msg(L("Hold the line while I focus on the Divine Sphere."));
+				character.Quests.ReplayQuestTrack(Mq09);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq08))
+			{
+				await dialog.Msg(L("Gesti is near. We end this here."));
+				character.Quests.ReplayQuestTrack(Mq08);
+				return;
+			}
+
 			if (!character.Quests.Has(Reveal2) && character.Quests.MeetsPrerequisites(Reveal2))
 			{
 				await dialog.Msg(L("So Gesti just ran away."));
@@ -460,29 +474,15 @@ public class FGele573QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Hq02))
-			{
-				await dialog.Msg(L("I will pray for that monster. If it even has a soul to listen to my prayer..."));
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq07))
 			{
 				await dialog.Msg(L("Follower Algis is beside me. Hear what he has to say."));
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq09))
+			if (character.Quests.IsActive(Hq02))
 			{
-				await dialog.Msg(L("Hold the line while I focus on the Divine Sphere."));
-				character.Quests.ReplayQuestTrack(Mq09);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq08))
-			{
-				await dialog.Msg(L("Gesti is near. We end this here."));
-				character.Quests.ReplayQuestTrack(Mq08);
+				await dialog.Msg(L("I will pray for that monster. If it even has a soul to listen to my prayer..."));
 				return;
 			}
 

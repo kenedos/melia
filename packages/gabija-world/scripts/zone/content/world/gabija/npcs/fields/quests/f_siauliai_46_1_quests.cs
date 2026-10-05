@@ -84,6 +84,14 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("The addled Revelators will march towards here soon."));
+				await dialog.Msg(L("Please purify them before anyone gets hurt."));
+				character.Quests.ReplayQuestTrack(Mq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Revelator. I assume you've heard the story from Goddess Austeja."));
@@ -157,14 +165,6 @@ public class FSiauliai461QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("The Austeja Altar is the only place the fragments will go back together."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("The addled Revelators will march towards here soon."));
-				await dialog.Msg(L("Please purify them before anyone gets hurt."));
-				character.Quests.ReplayQuestTrack(Mq03);
 				return;
 			}
 

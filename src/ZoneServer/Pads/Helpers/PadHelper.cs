@@ -355,11 +355,11 @@ namespace Melia.Zone.Pads.Helpers
 				var modifier = SkillModifier.MultiHit(multiHits);
 
 				var skillHitResult = SCR_SkillHit(caster, targetOwner, skill, modifier);
-				var damage = skillHitResult.Damage;
+				var damage = skillHitResult.Damage * damageMultiplier;
 
-				target.TakeDamage(damage * damageMultiplier, caster);
+				target.TakeDamage(damage, caster);
 
-				var hitInfo = new HitInfo(caster, target, skill, skillHitResult.Damage, skillHitResult.Result);
+				var hitInfo = new HitInfo(caster, target, skill, damage, skillHitResult.Result);
 				Send.ZC_HIT_INFO(caster, target, hitInfo);
 
 				if (effectName != null && effectName != "None")

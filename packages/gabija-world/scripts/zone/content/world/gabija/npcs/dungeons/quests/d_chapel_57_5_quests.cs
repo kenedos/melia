@@ -67,6 +67,14 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Follower Tomas"));
 
+			if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
+			{
+				await dialog.Msg(L("Great."));
+				await dialog.Msg(L("Please leave activating the altar to me and go meet Vaidas at Himnas Chapel."));
+				await dialog.CompleteQuest(Mq04);
+				return;
+			}
+
 			if (character.Quests.IsActive(Mq02) && character.Quests.IsCompletable(Mq02))
 			{
 				await dialog.Msg(L("You are indeed the Revelator."));
@@ -83,11 +91,26 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
+			if (character.Quests.IsActive(Mq04))
 			{
-				await dialog.Msg(L("Great."));
-				await dialog.Msg(L("Please leave activating the altar to me and go meet Vaidas at Himnas Chapel."));
-				await dialog.CompleteQuest(Mq04);
+				await dialog.Msg(L("The Unknocker guards the altar. I will lure it - strike then."));
+				character.Quests.ReplayQuestTrack(Mq04);
+				return;
+			}
+
+			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
+			{
+				await dialog.Msg(L("Don't worry, the barrier at the main entrance to the 1st floor can be offset by the church's power."));
+				var answer = await dialog.SelectQuestOffer(Mq04, L("That's what the altars are for."),
+					Option(L("I'm ready"), "accept"),
+					Option(L("I can't believe it"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					character.Quests.Start(Mq04);
+					await dialog.Msg(L("Attack the Unknocker when I lure it away from the altar."));
+				}
 				return;
 			}
 
@@ -119,22 +142,6 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
-			{
-				await dialog.Msg(L("Don't worry, the barrier at the main entrance to the 1st floor can be offset by the church's power."));
-				var answer = await dialog.SelectQuestOffer(Mq04, L("That's what the altars are for."),
-					Option(L("I'm ready"), "accept"),
-					Option(L("I can't believe it"), "leave")
-				);
-
-				if (answer == "accept")
-				{
-					character.Quests.Start(Mq04);
-					await dialog.Msg(L("Attack the Unknocker when I lure it away from the altar."));
-				}
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("The Yognomes are still at the altar. Thin them out."));
@@ -144,13 +151,6 @@ public class DChapel575QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq03))
 			{
 				await dialog.Msg(L("Kill the Rodelins and bring back their Eyes of Madness."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq04))
-			{
-				await dialog.Msg(L("The Unknocker guards the altar. I will lure it - strike then."));
-				character.Quests.ReplayQuestTrack(Mq04);
 				return;
 			}
 
@@ -238,6 +238,14 @@ public class DChapel575QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Follower Vaidas"));
 
+			if (character.Quests.IsActive(Mq09) && character.Quests.IsCompletable(Mq09))
+			{
+				await dialog.Msg(L("Is Brother Vaidutis alright?"));
+				await dialog.Msg(L("I would have been in serious trouble if not for your help."));
+				await dialog.Msg(L("Vaidutis went up to the 1st floor. Go to him."));
+				return;
+			}
+
 			if (character.Quests.IsActive(Mq07) && character.Quests.IsCompletable(Mq07))
 			{
 				await dialog.Msg(L("I have never seen a stone filled with this much holiness."));
@@ -254,11 +262,10 @@ public class DChapel575QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq09) && character.Quests.IsCompletable(Mq09))
+			if (character.Quests.IsActive(Mq09))
 			{
-				await dialog.Msg(L("Is Brother Vaidutis alright?"));
-				await dialog.Msg(L("I would have been in serious trouble if not for your help."));
-				await dialog.Msg(L("Vaidutis went up to the 1st floor. Go to him."));
+				await dialog.Msg(L("Break the barrier at the central altar and find Vaidutis."));
+				character.Quests.ClearQuestTrack(Mq09);
 				return;
 			}
 
@@ -309,13 +316,6 @@ public class DChapel575QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq07);
 					character.Inventory.Add(650716, 1, InventoryAddType.PickUp);
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq09))
-			{
-				await dialog.Msg(L("Break the barrier at the central altar and find Vaidutis."));
-				character.Quests.ClearQuestTrack(Mq09);
 				return;
 			}
 

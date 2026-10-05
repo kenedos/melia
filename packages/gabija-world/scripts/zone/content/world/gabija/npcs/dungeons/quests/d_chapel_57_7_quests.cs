@@ -98,6 +98,20 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq01))
+			{
+				await dialog.Msg(L("We need the Seal of Space before we move."));
+				character.Quests.ReplayQuestTrack(Mq01);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("The Bell Tower is the best place to watch her from."));
+				character.Quests.ReplayQuestTrack(Mq02);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("You need the Seal of Space in order to enter the hidden sanctuary."));
@@ -125,20 +139,6 @@ public class DChapel577QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq02);
 				}
 
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq01))
-			{
-				await dialog.Msg(L("We need the Seal of Space before we move."));
-				character.Quests.ReplayQuestTrack(Mq01);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("The Bell Tower is the best place to watch her from."));
-				character.Quests.ReplayQuestTrack(Mq02);
 				return;
 			}
 
@@ -177,6 +177,22 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq09) && character.Quests.IsCompletable(Mq09))
+			{
+				await dialog.Msg(L("Gesti fled, wounded. We have the church back."));
+				await dialog.Msg(L("But there are still more things left to do here."));
+				await dialog.CompleteQuest(Mq09);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq10) && character.Quests.IsCompletable(Mq10))
+			{
+				await dialog.Msg(L("It's the revelation."));
+				await dialog.Msg(L("Cherish it and do not show it to anyone else."));
+				await dialog.CompleteQuest(Mq10);
+				return;
+			}
+
 			if (character.Quests.IsActive(Mq05) && character.Quests.IsCompletable(Mq05))
 			{
 				await dialog.Msg(L("So you activated the Malda Altar?"));
@@ -201,19 +217,24 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq09) && character.Quests.IsCompletable(Mq09))
+			if (character.Quests.IsActive(Mq03))
 			{
-				await dialog.Msg(L("Gesti fled, wounded. We have the church back."));
-				await dialog.Msg(L("But there are still more things left to do here."));
-				await dialog.CompleteQuest(Mq09);
+				await dialog.Msg(L("The Seal of Space is at the Sventove Central Altar. Move quietly."));
+				character.Quests.ReplayQuestTrack(Mq03);
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq10) && character.Quests.IsCompletable(Mq10))
+			if (character.Quests.IsActive(Mq09))
 			{
-				await dialog.Msg(L("It's the revelation."));
-				await dialog.Msg(L("Cherish it and do not show it to anyone else."));
-				await dialog.CompleteQuest(Mq10);
+				await dialog.Msg(L("Gesti is trapped. Hold her while the Divine Sphere charges."));
+				character.Quests.ReplayQuestTrack(Mq09);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq10))
+			{
+				await dialog.Msg(L("The sanctuary is behind the seal. Find the revelation."));
+				character.Quests.ClearQuestTrack(Mq10);
 				return;
 			}
 
@@ -344,36 +365,9 @@ public class DChapel577QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("The Seal of Space is at the Sventove Central Altar. Move quietly."));
-				character.Quests.ReplayQuestTrack(Mq03);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq09))
-			{
-				await dialog.Msg(L("Gesti is trapped. Hold her while the Divine Sphere charges."));
-				character.Quests.ReplayQuestTrack(Mq09);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq10))
-			{
-				await dialog.Msg(L("The sanctuary is behind the seal. Find the revelation."));
-				character.Quests.ClearQuestTrack(Mq10);
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq04))
 			{
 				await dialog.Msg(LF("Insert the altar fragments into the eight pillars of the Sventove Central Hall. ({0}/{1})", PillarsInserted(character), PillarCount));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05))
-			{
-				await dialog.Msg(L("Activate the Malda Altar and lure the demons to it."));
 				return;
 			}
 
@@ -383,6 +377,12 @@ public class DChapel577QuestNpcsScript : GeneralScript
 
 				if (!character.Inventory.HasItem(ItemId.CHAPLE577_MQ_06_ITEM))
 					character.Inventory.Add(ItemId.CHAPLE577_MQ_06_ITEM, 1, InventoryAddType.PickUp);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq05))
+			{
+				await dialog.Msg(L("Activate the Malda Altar and lure the demons to it."));
 				return;
 			}
 

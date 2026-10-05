@@ -119,6 +119,12 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq030))
+			{
+				character.Quests.ReplayQuestTrack(Mq030);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq010) && character.Quests.MeetsPrerequisites(Mq010))
 			{
 				await dialog.Msg(L("Have you ever seen such a big bracken? I know this area is known for it, but even for a local like me, it's a first."));
@@ -169,12 +175,6 @@ public class FBracken633QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq020))
 			{
 				await dialog.Msg(L("Did you find anything? So there really is a laboratory. There could be more information about the device there."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq030))
-			{
-				character.Quests.ReplayQuestTrack(Mq030);
 				return;
 			}
 
@@ -386,12 +386,6 @@ public class FBracken633QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Sq010))
-			{
-				await this.FreeTalas(dialog);
-				return;
-			}
-
 			if (!character.Quests.Has(Sq020) && character.Quests.MeetsPrerequisites(Sq020))
 			{
 				await dialog.Msg(L("I did see something odd before I escaped. The demons were adding herbs to a cauldron."));
@@ -455,6 +449,12 @@ public class FBracken633QuestNpcsScript : GeneralScript
 					character.Quests.Start(Rp1);
 					character.LookAround();
 				}
+				return;
+			}
+
+			if (character.Quests.IsActive(Sq010))
+			{
+				await this.FreeTalas(dialog);
 				return;
 			}
 

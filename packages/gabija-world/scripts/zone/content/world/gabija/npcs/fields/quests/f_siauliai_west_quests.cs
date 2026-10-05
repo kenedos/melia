@@ -85,29 +85,6 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Knight Titas"));
 			dialog.SetPortrait("Dlg_port_WESTFOREST_MANAGER");
 
-			if (character.Quests.IsActive(MeetTitas))
-			{
-				await dialog.Msg(L("So the sentry sent you to me. The road to Klaipeda is not closed for fun - the woods are crawling with monsters since the Blessed Day."));
-				await dialog.CompleteQuest(MeetTitas);
-				return;
-			}
-
-			if (character.Quests.IsActive(WestForest))
-			{
-				await dialog.Msg(L("Glad you're willing. Follow the left-hand road out of the crossroads camp. You'll meet the soldiers soon enough."));
-				await dialog.CompleteQuest(WestForest);
-				return;
-			}
-
-			if (character.Quests.IsActive(Knight))
-			{
-				await dialog.Msg(L("So he'll pass the rest of the order down himself. Well done."));
-				await dialog.Msg(L("Klaipeda is a short walk from here along the Tenet Garden road. Don't forget to call on Uska."));
-
-				await dialog.CompleteQuest(Knight);
-				return;
-			}
-
 			if (!character.Quests.Has(WestForest) && character.Quests.MeetsPrerequisites(WestForest))
 			{
 				var answer = await dialog.SelectQuestOffer(WestForest, L("If you have time to spare, carry the assembly order to my soldiers. If not, go on to Klaipeda - I won't hold it against you."),
@@ -139,6 +116,29 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				}
 			}
 
+			if (character.Quests.IsActive(MeetTitas))
+			{
+				await dialog.Msg(L("So the sentry sent you to me. The road to Klaipeda is not closed for fun - the woods are crawling with monsters since the Blessed Day."));
+				await dialog.CompleteQuest(MeetTitas);
+				return;
+			}
+
+			if (character.Quests.IsActive(WestForest))
+			{
+				await dialog.Msg(L("Glad you're willing. Follow the left-hand road out of the crossroads camp. You'll meet the soldiers soon enough."));
+				await dialog.CompleteQuest(WestForest);
+				return;
+			}
+
+			if (character.Quests.IsActive(Knight))
+			{
+				await dialog.Msg(L("So he'll pass the rest of the order down himself. Well done."));
+				await dialog.Msg(L("Klaipeda is a short walk from here along the Tenet Garden road. Don't forget to call on Uska."));
+
+				await dialog.CompleteQuest(Knight);
+				return;
+			}
+
 			if (character.Quests.IsActive(Hq01))
 			{
 				await dialog.Msg(L("The person who is leading the mission at Dvasia Peak is Julian. Julian will really welcome me."));
@@ -156,6 +156,20 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Scout"));
 
+			if (character.Quests.IsActive(Drasius1))
+			{
+				if (!character.Quests.IsCompletable(Drasius1))
+				{
+					await dialog.Msg(L("Behind you! Don't let them surround us!"));
+					character.Quests.ReplayQuestTrack(Drasius1);
+					return;
+				}
+
+				await dialog.Msg(L("Ah - you're a Revelator. Fighting alongside you counts for something, so let me give you a good word of advice."));
+				await dialog.CompleteQuest(Drasius1);
+				return;
+			}
+
 			if (!character.Quests.Has(Drasius1) && character.Quests.MeetsPrerequisites(Drasius1))
 			{
 				await dialog.Msg(L("It's dangerous here. The monsters have bred out of all measure since the Blessed Day."));
@@ -168,20 +182,6 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				if (answer == "accept")
 					character.Quests.Start(Drasius1);
 
-				return;
-			}
-
-			if (character.Quests.IsActive(Drasius1))
-			{
-				if (!character.Quests.IsCompletable(Drasius1))
-				{
-					await dialog.Msg(L("Behind you! Don't let them surround us!"));
-					character.Quests.ReplayQuestTrack(Drasius1);
-					return;
-				}
-
-				await dialog.Msg(L("Ah - you're a Revelator. Fighting alongside you counts for something, so let me give you a good word of advice."));
-				await dialog.CompleteQuest(Drasius1);
 				return;
 			}
 
@@ -209,21 +209,6 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(StatusTuto))
-			{
-				if (!character.Quests.IsCompletable(StatusTuto))
-				{
-					await dialog.Msg(L("Open the inventory window with 'F2', then use the 'Lv1 EXP Card' by right clicking it. This will give you enough experience to level up."));
-					await dialog.Msg(L("When you've gained a level, open the info window with 'F1' and put the point somewhere. It matters that you decide early what you mean to become."));
-					return;
-				}
-
-				await dialog.Msg(L("It matters that you decide early what you mean to become. It's never an easy thing."));
-				await dialog.Msg(L("There. That's how it's done - simple enough. With the goddesses gone and nobody sure what comes next, you'll want to keep at it."));
-				await dialog.CompleteQuest(StatusTuto);
-				return;
-			}
-
 			if (!character.Quests.Has(Drasius2) && character.Quests.MeetsPrerequisites(Drasius2))
 			{
 				await dialog.Msg(L("That's right, you came to deliver the assembly order, didn't you?"));
@@ -238,6 +223,21 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 					character.Quests.Start(Drasius2);
 					await dialog.Msg(L("It'll be the Leaf Bugs at the Uoros Farm Ruins, no question. They robbed me once before."));
 				}
+				return;
+			}
+
+			if (character.Quests.IsActive(StatusTuto))
+			{
+				if (!character.Quests.IsCompletable(StatusTuto))
+				{
+					await dialog.Msg(L("Open the inventory window with 'F2', then use the 'Lv1 EXP Card' by right clicking it. This will give you enough experience to level up."));
+					await dialog.Msg(L("When you've gained a level, open the info window with 'F1' and put the point somewhere. It matters that you decide early what you mean to become."));
+					return;
+				}
+
+				await dialog.Msg(L("It matters that you decide early what you mean to become. It's never an easy thing."));
+				await dialog.Msg(L("There. That's how it's done - simple enough. With the goddesses gone and nobody sure what comes next, you'll want to keep at it."));
+				await dialog.CompleteQuest(StatusTuto);
 				return;
 			}
 
@@ -288,6 +288,20 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("There was one after all. My gut has never been wrong yet."));
 				await dialog.Msg(L("That's how I lived through the Blessed Day."));
 				await dialog.CompleteQuest(OnionBig);
+				return;
+			}
+
+			if (character.Quests.IsActive(MeetNaglis))
+			{
+				await dialog.Msg(L("Watch it - keep clear of its swing."));
+				character.Quests.ReplayQuestTrack(MeetNaglis);
+				return;
+			}
+
+			if (character.Quests.IsActive(OnionBig))
+			{
+				await dialog.Msg(L("West of here, along the old farm road. That's where I'd look."));
+				character.Quests.ClearQuestTrack(OnionBig);
 				return;
 			}
 
@@ -347,23 +361,9 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				}
 			}
 
-			if (character.Quests.IsActive(MeetNaglis))
-			{
-				await dialog.Msg(L("Watch it - keep clear of its swing."));
-				character.Quests.ReplayQuestTrack(MeetNaglis);
-				return;
-			}
-
 			if (character.Quests.IsActive(SkillTuto))
 			{
 				await dialog.Msg(L("Open the skill window with 'F3' and put a point into a skill. Any skill you can use will do."));
-				return;
-			}
-
-			if (character.Quests.IsActive(OnionBig))
-			{
-				await dialog.Msg(L("West of here, along the old farm road. That's where I'd look."));
-				character.Quests.ClearQuestTrack(OnionBig);
 				return;
 			}
 
@@ -399,6 +399,13 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("My men told me about it, and I'd been worried since."));
 				await dialog.Msg(L("With the world in this state, anything that ends well is a good end."));
 				await dialog.CompleteQuest(BossGolem);
+				return;
+			}
+
+			if (character.Quests.IsActive(BossGolem))
+			{
+				await dialog.Msg(L("One run-in with a golem will straighten them out."));
+				character.Quests.ClearQuestTrack(BossGolem);
 				return;
 			}
 
@@ -482,13 +489,6 @@ public class FSiauliaiWestQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(HamingLeaf))
 			{
 				await dialog.Msg(L("Revelator or goddess, nobody leaves before the task is done."));
-				return;
-			}
-
-			if (character.Quests.IsActive(BossGolem))
-			{
-				await dialog.Msg(L("One run-in with a golem will straighten them out."));
-				character.Quests.ClearQuestTrack(BossGolem);
 				return;
 			}
 

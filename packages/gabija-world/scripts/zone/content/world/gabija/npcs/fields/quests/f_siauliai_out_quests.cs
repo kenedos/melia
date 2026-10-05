@@ -60,19 +60,6 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(ToGele) && character.Quests.MeetsPrerequisites(ToGele))
-			{
-				await dialog.Msg(L("Go straight down from the Twin Bridge and you'll arrive at Srautas Gorge. Go further right through Srautas Gorge and you'll be able to get to Gele Plateau."));
-				character.Quests.Start(ToGele);
-				return;
-			}
-
-			if (character.Quests.IsActive(ToGele))
-			{
-				await dialog.Msg(L("Srautas Gorge lies down the Twin Bridge. The cable car there will carry you up to Gele Plateau."));
-				return;
-			}
-
 			if (character.Quests.IsActive(Sout01) && character.Quests.IsCompletable(Sout01))
 			{
 				await dialog.Msg(L("What do we do?"));
@@ -87,6 +74,36 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				await dialog.Msg(L("How can I express my gratitude."));
 				await dialog.Msg(L("I'm sure the goddess sent you to us."));
 				await dialog.CompleteQuest(Sout13);
+				return;
+			}
+
+			if (character.Quests.IsActive(Sout14))
+			{
+				await dialog.Msg(L("The goddess must have sent help..."));
+				await dialog.Msg(L("Follow the pathway on the right to find the Vubbe Outpost."));
+				character.Quests.ClearQuestTrack(Sout14);
+				return;
+			}
+
+			if (character.Quests.IsActive(Sout01))
+			{
+				await dialog.Msg(L("The Vubbes are still in the streets. Drive them off!"));
+				character.Quests.ClearQuestTrack(Sout01);
+				return;
+			}
+
+			if (character.Quests.IsActive(Sout13))
+			{
+				await dialog.Msg(L("To get to the Vubbe's base, go far right from here."));
+				await dialog.Msg(L("It is miserable that I can't do anything as a mayor."));
+				character.Quests.ClearQuestTrack(Sout13);
+				return;
+			}
+
+			if (!character.Quests.Has(ToGele) && character.Quests.MeetsPrerequisites(ToGele))
+			{
+				await dialog.Msg(L("Go straight down from the Twin Bridge and you'll arrive at Srautas Gorge. Go further right through Srautas Gorge and you'll be able to get to Gele Plateau."));
+				character.Quests.Start(ToGele);
 				return;
 			}
 
@@ -135,26 +152,9 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Sout14))
+			if (character.Quests.IsActive(ToGele))
 			{
-				await dialog.Msg(L("The goddess must have sent help..."));
-				await dialog.Msg(L("Follow the pathway on the right to find the Vubbe Outpost."));
-				character.Quests.ClearQuestTrack(Sout14);
-				return;
-			}
-
-			if (character.Quests.IsActive(Sout13))
-			{
-				await dialog.Msg(L("To get to the Vubbe's base, go far right from here."));
-				await dialog.Msg(L("It is miserable that I can't do anything as a mayor."));
-				character.Quests.ClearQuestTrack(Sout13);
-				return;
-			}
-
-			if (character.Quests.IsActive(Sout01))
-			{
-				await dialog.Msg(L("The Vubbes are still in the streets. Drive them off!"));
-				character.Quests.ClearQuestTrack(Sout01);
+				await dialog.Msg(L("Srautas Gorge lies down the Twin Bridge. The cable car there will carry you up to Gele Plateau."));
 				return;
 			}
 
@@ -311,6 +311,13 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(SoutSudd))
+			{
+				await dialog.Msg(L("Chafer is out there on the road back to the village. Please deal with it."));
+				character.Quests.ClearQuestTrack(SoutSudd);
+				return;
+			}
+
 			if (!character.Quests.Has(Sout09) && character.Quests.MeetsPrerequisites(Sout09))
 			{
 				await dialog.Msg(L("I came here to hide from the monsters, but even this area is becoming dangerous."));
@@ -373,13 +380,6 @@ public class FSiauliaiOutQuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sout10))
 			{
 				await dialog.Msg(L("In order for these people to safely return to the village, we have to defeat these monsters."));
-				return;
-			}
-
-			if (character.Quests.IsActive(SoutSudd))
-			{
-				await dialog.Msg(L("Chafer is out there on the road back to the village. Please deal with it."));
-				character.Quests.ClearQuestTrack(SoutSudd);
 				return;
 			}
 

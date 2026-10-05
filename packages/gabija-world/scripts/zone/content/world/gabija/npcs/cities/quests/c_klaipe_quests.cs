@@ -79,18 +79,6 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Slate3))
-			{
-				await dialog.Msg(L("Ask the mayor of the Miners' Village for directions to Gele Plateau."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Slate2))
-			{
-				await dialog.Msg(L("The Bokor Master lives at the end of Klaipeda's Residential Area. Ask her to interpret the slate."));
-				return;
-			}
-
 			if (!character.Quests.Has(GoToEast) && character.Quests.MeetsPrerequisites(GoToEast))
 			{
 				await dialog.Msg(L("Are you the Revelator who dreamed of the goddess? I am Uska, knight commander of Shaulley and Klaipeda."));
@@ -111,14 +99,6 @@ public class KlaipeQuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(GoToEast))
-			{
-				await dialog.Msg(L("The bishop said to send the Revelators to the crystal mine. The goddess told him so in a dream."));
-				await dialog.Msg(L("But the mining village is in open conflict with the Bube, so entry is restricted. Knight Ares in the eastern woods is in charge - go and meet him."));
-				await dialog.CompleteQuest(GoToEast);
-				return;
-			}
-
 			if (!character.Quests.Has(EastPrepare) && character.Quests.MeetsPrerequisites(EastPrepare))
 			{
 				await dialog.Msg(L("And yet, all over the kingdom, people have appeared who say they dreamed of the goddess. That is you - the Revelators."));
@@ -136,6 +116,26 @@ public class KlaipeQuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Well then. Set out for the eastern woods. Do not forget to pray at the Statue of Goddess Ausrine in the central plaza."));
 					await dialog.Msg(L("And be sure to call on the general merchant - I asked her to hold warp scrolls for the Revelators."));
 				}
+				return;
+			}
+
+			if (character.Quests.IsActive(Slate3))
+			{
+				await dialog.Msg(L("Ask the mayor of the Miners' Village for directions to Gele Plateau."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Slate2))
+			{
+				await dialog.Msg(L("The Bokor Master lives at the end of Klaipeda's Residential Area. Ask her to interpret the slate."));
+				return;
+			}
+
+			if (character.Quests.IsActive(GoToEast))
+			{
+				await dialog.Msg(L("The bishop said to send the Revelators to the crystal mine. The goddess told him so in a dream."));
+				await dialog.Msg(L("But the mining village is in open conflict with the Bube, so entry is restricted. Knight Ares in the eastern woods is in charge - go and meet him."));
+				await dialog.CompleteQuest(GoToEast);
 				return;
 			}
 

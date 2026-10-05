@@ -12,6 +12,8 @@ namespace Melia.Zone.Pads.Handlers
 	[PadHandler(PadName.gesti_Slow)]
 	public class gesti_Slow : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, ILeavePadHandler, IUpdatePadHandler
 	{
+		private const int SlowDurationMs = 2000;
+
 		public void Created(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
@@ -37,7 +39,7 @@ namespace Melia.Zone.Pads.Handlers
 			var initiator = args.Initiator;
 
 			if (!PadActivate(pad, initiator, RelationType.Enemy)) return;
-			PadTargetBuffMon(pad, initiator, RelationType.Enemy, 0, 0, BuffId.UC_slowdown, 1, 0, 0, 1, 100);
+			PadTargetBuffMon(pad, initiator, RelationType.Enemy, 0, 0, BuffId.UC_slowdown, 1, 0, SlowDurationMs, 1, 100);
 		}
 
 		public void Left(object sender, PadTriggerActorArgs args)
@@ -53,6 +55,7 @@ namespace Melia.Zone.Pads.Handlers
 		{
 			var pad = args.Trigger;
 
+			PadBuffEnemyMonster(pad, RelationType.Enemy, 0, 0, BuffId.UC_slowdown, 1, 0, SlowDurationMs, 1, 100);
 			PadDamageEnemy(pad, 0.3f, 0, 0, "F_hit_good", 0.3f);
 		}
 	}
@@ -60,6 +63,8 @@ namespace Melia.Zone.Pads.Handlers
 	[PadHandler(PadName.BW_gesti_slow)]
 	public class BW_gesti_slow : ICreatePadHandler, IDestroyPadHandler, IEnterPadHandler, ILeavePadHandler, IUpdatePadHandler
 	{
+		private const int SlowDurationMs = 2000;
+
 		public void Created(object sender, PadTriggerArgs args)
 		{
 			var pad = args.Trigger;
@@ -85,7 +90,7 @@ namespace Melia.Zone.Pads.Handlers
 			var initiator = args.Initiator;
 
 			if (!PadActivate(pad, initiator, RelationType.Enemy)) return;
-			PadTargetBuffMon(pad, initiator, RelationType.Enemy, 0, 0, BuffId.UC_slowdown, 1, 0, 0, 1, 100);
+			PadTargetBuffMon(pad, initiator, RelationType.Enemy, 0, 0, BuffId.UC_slowdown, 1, 0, SlowDurationMs, 1, 100);
 		}
 
 		public void Left(object sender, PadTriggerActorArgs args)
@@ -101,6 +106,7 @@ namespace Melia.Zone.Pads.Handlers
 		{
 			var pad = args.Trigger;
 
+			PadBuffEnemyMonster(pad, RelationType.Enemy, 0, 0, BuffId.UC_slowdown, 1, 0, SlowDurationMs, 1, 100);
 			PadDamageEnemy(pad, 0.3f, 0, 0, "F_hit_good", 0.3f);
 		}
 	}
@@ -132,6 +138,9 @@ namespace Melia.Zone.Pads.Handlers
 		{
 			var pad = args.Trigger;
 			var initiator = args.Initiator;
+
+			if (initiator.MoveType == MoveType.Flying || initiator.IsJumping())
+				return;
 
 			PadTargetDamage(pad, initiator, RelationType.Enemy, 1f, 0, 0);
 		}
@@ -165,6 +174,9 @@ namespace Melia.Zone.Pads.Handlers
 			var pad = args.Trigger;
 			var initiator = args.Initiator;
 
+			if (initiator.MoveType == MoveType.Flying || initiator.IsJumping())
+				return;
+
 			PadTargetDamage(pad, initiator, RelationType.Enemy, 1f, 0, 0);
 		}
 	}
@@ -196,6 +208,9 @@ namespace Melia.Zone.Pads.Handlers
 		{
 			var pad = args.Trigger;
 			var initiator = args.Initiator;
+
+			if (initiator.MoveType == MoveType.Flying || initiator.IsJumping())
+				return;
 
 			PadTargetDamage(pad, initiator, RelationType.Enemy, 1f, 0, 0);
 		}

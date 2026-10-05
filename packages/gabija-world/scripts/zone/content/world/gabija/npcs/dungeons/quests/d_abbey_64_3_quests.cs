@@ -91,6 +91,26 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Edmundas"));
 
+			if (character.Quests.IsCompletable(Mq010))
+			{
+				await dialog.Msg(L("Here it is! The mucus of a Hummingbird."));
+				await dialog.CompleteQuest(Mq010);
+
+				if (!character.Quests.HasCompleted(Mq010) || character.Quests.Has(Mq020))
+					return;
+			}
+
+			if (character.Quests.IsCompletable(Mq020))
+			{
+				await dialog.Msg(L("Success! The device overloaded and stopped working."));
+				await dialog.Msg(L("The next device is in the Main Hall Atrium. Let's meet up there."));
+				await dialog.CompleteQuest(Mq020);
+
+				if (character.Quests.HasCompleted(Mq020))
+					character.LookAround();
+				return;
+			}
+
 			if (character.Quests.IsActive(Mq010) && !character.Quests.IsCompletable(Mq010))
 			{
 				var options = new List<DialogOption>();
@@ -122,26 +142,6 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 				else if (handed == "mucus")
 					character.Quests.CompleteObjective(Mq010, "handOverMaterial");
 
-				return;
-			}
-
-			if (character.Quests.IsCompletable(Mq010))
-			{
-				await dialog.Msg(L("Here it is! The mucus of a Hummingbird."));
-				await dialog.CompleteQuest(Mq010);
-
-				if (!character.Quests.HasCompleted(Mq010) || character.Quests.Has(Mq020))
-					return;
-			}
-
-			if (character.Quests.IsCompletable(Mq020))
-			{
-				await dialog.Msg(L("Success! The device overloaded and stopped working."));
-				await dialog.Msg(L("The next device is in the Main Hall Atrium. Let's meet up there."));
-				await dialog.CompleteQuest(Mq020);
-
-				if (character.Quests.HasCompleted(Mq020))
-					character.LookAround();
 				return;
 			}
 
@@ -400,6 +400,12 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq040))
+			{
+				character.Quests.ReplayQuestTrack(Mq040);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq050) && character.Quests.MeetsPrerequisites(Mq050))
 			{
 				await dialog.Msg(L("I... I'm already infected with the spore. But don't worry. I'm qualified so I won't return to the goddesses."));
@@ -474,12 +480,6 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq040))
-			{
-				character.Quests.ReplayQuestTrack(Mq040);
-				return;
-			}
-
 			switch (GameRandom.Get().Next(3))
 			{
 				case 0: await dialog.Msg(L("It's alright. We found the townfolk and I am reunited with my brother... I am really happy even in this state.")); break;
@@ -494,19 +494,19 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Edmundas"));
 
-			if (character.Quests.IsCompletable(Sq010))
-			{
-				await dialog.Msg(L("You have been a lifesaver. With the goddesses gone, having you close has given me strength."));
-				await dialog.CompleteQuest(Sq010);
-				return;
-			}
-
 			if (character.Quests.IsCompletable(Sq040))
 			{
 				await dialog.Msg(L("As long as we're not cured from the spores we can't return to the village. We might just have to live here forever."));
 				await dialog.Msg(L("That's okay. I'm just grateful for the chance to be with Rose again."));
 				await dialog.Msg(L("Thank you for everything. I don't know if we'll ever meet again but I'm sure both of us will never forget you."));
 				await dialog.CompleteQuest(Sq040);
+				return;
+			}
+
+			if (character.Quests.IsCompletable(Sq010))
+			{
+				await dialog.Msg(L("You have been a lifesaver. With the goddesses gone, having you close has given me strength."));
+				await dialog.CompleteQuest(Sq010);
 				return;
 			}
 
@@ -546,15 +546,15 @@ public class DAbbey643QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Sq010))
-			{
-				await dialog.Msg(L("Usually I wouldn't have any trouble clearing out this many monsters... But that's when I'm in better condition. I'm afraid you'll have to..."));
-				return;
-			}
-
 			if (character.Quests.IsActive(Sq040))
 			{
 				await dialog.Msg(L("Set it up around here. I feel safe now knowing Dejamis made it for us."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Sq010))
+			{
+				await dialog.Msg(L("Usually I wouldn't have any trouble clearing out this many monsters... But that's when I'm in better condition. I'm afraid you'll have to..."));
 				return;
 			}
 

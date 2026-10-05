@@ -471,6 +471,14 @@ public class FCastle653QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsCompletable(Hq1))
+		{
+			await dialog.Msg(L("You've had an audience with Goddess Gabija in Mage Tower and Goddess Vakarine in the Demon Prison? My word..."));
+			await dialog.Msg(L("I'm glad to hear the goddesses are safe."));
+			await dialog.CompleteQuest(Hq1);
+			return;
+		}
+
 		if (character.Quests.IsCompletable(Rp1))
 		{
 			await dialog.Msg(L("That's a lot of monsters! Now all that is left is to set up the traps without them noticing."));
@@ -478,11 +486,13 @@ public class FCastle653QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Quests.IsCompletable(Hq1))
+		if (character.Quests.IsActive(Hq1))
 		{
-			await dialog.Msg(L("You've had an audience with Goddess Gabija in Mage Tower and Goddess Vakarine in the Demon Prison? My word..."));
-			await dialog.Msg(L("I'm glad to hear the goddesses are safe."));
-			await dialog.CompleteQuest(Hq1);
+			var told = await character.TimeActions.StartAsync(L("Telling him about your travels"), L("Cancel"), "TALK", TimeSpan.FromSeconds(3));
+			if (told != TimeActionResult.Completed)
+				return;
+
+			character.Quests.CompleteObjective(Hq1, "tellStories");
 			return;
 		}
 
@@ -505,20 +515,6 @@ public class FCastle653QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (!character.Quests.Has(Rp1) && character.Quests.MeetsPrerequisites(Rp1))
-		{
-			await dialog.Msg(L("I am thinking of setting up traps around the Delmore Outskirts but... I wasn't able to do anything due to the Pag Emitters coming from all over."));
-
-			var answer = await dialog.SelectQuestOffer(Rp1, L("Could you deal with some of them if they come near? I'm sure that setting up any traps will be much easier if you help."),
-				Option(L("I will defeat it"), "accept"),
-				Option(L("Ignore"), "leave")
-			);
-
-			if (answer == "accept")
-				character.Quests.Start(Rp1);
-			return;
-		}
-
 		if (!character.Quests.Has(Hq1) && character.Quests.MeetsPrerequisites(Hq1))
 		{
 			var answer = await dialog.SelectQuestOffer(Hq1, L("Revelator, so nice to see you again!"),
@@ -536,13 +532,17 @@ public class FCastle653QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Quests.IsActive(Hq1))
+		if (!character.Quests.Has(Rp1) && character.Quests.MeetsPrerequisites(Rp1))
 		{
-			var told = await character.TimeActions.StartAsync(L("Telling him about your travels"), L("Cancel"), "TALK", TimeSpan.FromSeconds(3));
-			if (told != TimeActionResult.Completed)
-				return;
+			await dialog.Msg(L("I am thinking of setting up traps around the Delmore Outskirts but... I wasn't able to do anything due to the Pag Emitters coming from all over."));
 
-			character.Quests.CompleteObjective(Hq1, "tellStories");
+			var answer = await dialog.SelectQuestOffer(Rp1, L("Could you deal with some of them if they come near? I'm sure that setting up any traps will be much easier if you help."),
+				Option(L("I will defeat it"), "accept"),
+				Option(L("Ignore"), "leave")
+			);
+
+			if (answer == "accept")
+				character.Quests.Start(Rp1);
 			return;
 		}
 
@@ -641,9 +641,6 @@ public class FCastle653QuestNpcsScript : GeneralScript
 
 		dialog.SetTitle(L("Revelator Yane"));
 
-		if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
-			character.Quests.CompleteObjective(Mq04, "goToRuins");
-
 		if (character.Quests.IsCompletable(Mq04))
 		{
 			await dialog.Msg(L("This altar... It's just another one of Delmore Rephaim's dirty tricks."));
@@ -667,6 +664,15 @@ public class FCastle653QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq04) && !character.Quests.IsCompletable(Mq04))
+			character.Quests.CompleteObjective(Mq04, "goToRuins");
+
+		if (character.Quests.IsActive(Mq05))
+		{
+			await dialog.Msg(L("When you become a Bokor you start by making your own shaman doll. I just never thought I'd be using mine to save a life..."));
+			return;
+		}
+
 		if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 		{
 			await dialog.Msg(L("I'm a Sadhu now, but I used to train with the Bokor Master. I made a shaman doll back then, if only I could put that in Melchioras' place right now..."));
@@ -684,12 +690,6 @@ public class FCastle653QuestNpcsScript : GeneralScript
 				if (character.Inventory.CountItem(ItemId.CASTLE65_3_MQ05_ITEM) == 0)
 					character.Inventory.Add(ItemId.CASTLE65_3_MQ05_ITEM, 1, InventoryAddType.PickUp);
 			}
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq05))
-		{
-			await dialog.Msg(L("When you become a Bokor you start by making your own shaman doll. I just never thought I'd be using mine to save a life..."));
 			return;
 		}
 
@@ -758,6 +758,20 @@ public class FCastle653QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq07))
+		{
+			await dialog.Msg(L("I think I can break it down with a bomb. Two minutes should be enough. Please hold back the demons."));
+			character.Quests.ReplayQuestTrack(Mq07);
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq08))
+		{
+			await dialog.Msg(L("The explosion is sure to make demons come running here. I'll try and stop them as much as I can; you take care of Delmore Rephaim."));
+			character.Quests.ReplayQuestTrack(Mq08);
+			return;
+		}
+
 		if (!character.Quests.Has(Mq08) && character.Quests.MeetsPrerequisites(Mq08))
 		{
 			character.Quests.Start(Mq08);
@@ -778,20 +792,6 @@ public class FCastle653QuestNpcsScript : GeneralScript
 				character.Quests.CompleteObjective(Mq09, "returnToMelchioras");
 				character.LookAround();
 			}
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq07))
-		{
-			await dialog.Msg(L("I think I can break it down with a bomb. Two minutes should be enough. Please hold back the demons."));
-			character.Quests.ReplayQuestTrack(Mq07);
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq08))
-		{
-			await dialog.Msg(L("The explosion is sure to make demons come running here. I'll try and stop them as much as I can; you take care of Delmore Rephaim."));
-			character.Quests.ReplayQuestTrack(Mq08);
 			return;
 		}
 

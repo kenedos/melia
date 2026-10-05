@@ -219,6 +219,20 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq01))
+		{
+			await dialog.Msg(L("I hope we can find something this time, too. I don't think I can rest now that I know it was someone who did this."));
+			character.Quests.ClearQuestTrack(Mq01);
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq02))
+		{
+			await dialog.Msg(L("A Hydra... Go now! I'll be with you soon!"));
+			character.Quests.ClearQuestTrack(Mq02);
+			return;
+		}
+
 		if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 		{
 			var told = await character.TimeActions.StartAsync(L("Telling him what the diary says"), L("Cancel"), "TALK", TimeSpan.FromSeconds(2));
@@ -284,20 +298,6 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Quests.IsActive(Mq01))
-		{
-			await dialog.Msg(L("I hope we can find something this time, too. I don't think I can rest now that I know it was someone who did this."));
-			character.Quests.ClearQuestTrack(Mq01);
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq02))
-		{
-			await dialog.Msg(L("A Hydra... Go now! I'll be with you soon!"));
-			character.Quests.ClearQuestTrack(Mq02);
-			return;
-		}
-
 		if (character.Quests.IsActive(Mq03))
 		{
 			await dialog.Msg(L("Go see Modis. He's an expert at setting straps, you know."));
@@ -346,10 +346,25 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsCompletable(Mq06))
+		{
+			await dialog.Msg(L("You mean you defeated the Hydra? Wow, your skills are impressive."));
+			await dialog.Msg(L("Hurry and go see the village chief. This is the best news we've had since after Medzio Diena."));
+			return;
+		}
+
 		if (character.Quests.IsCompletable(Sq01))
 		{
 			await dialog.Msg(L("Oh, that's it. Let's hope our friend has learned their lesson now."));
 			await dialog.CompleteQuest(Sq01);
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq06))
+		{
+			await dialog.Msg(L("I sure hope we're right after all. You're the only one we can trust now."));
+			await dialog.Msg(L("I pray that the goddesses give us strength..."));
+			character.Quests.ClearQuestTrack(Mq06);
 			return;
 		}
 
@@ -429,21 +444,6 @@ public class F3Cmlake84QuestNpcsScript : GeneralScript
 		if (character.Quests.IsActive(Mq05))
 		{
 			await dialog.Msg(L("For the bait you want to get some Black Sawpent meat. We need some herbs too, to disguise our scent."));
-			return;
-		}
-
-		if (character.Quests.IsCompletable(Mq06))
-		{
-			await dialog.Msg(L("You mean you defeated the Hydra? Wow, your skills are impressive."));
-			await dialog.Msg(L("Hurry and go see the village chief. This is the best news we've had since after Medzio Diena."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq06))
-		{
-			await dialog.Msg(L("I sure hope we're right after all. You're the only one we can trust now."));
-			await dialog.Msg(L("I pray that the goddesses give us strength..."));
-			character.Quests.ClearQuestTrack(Mq06);
 			return;
 		}
 

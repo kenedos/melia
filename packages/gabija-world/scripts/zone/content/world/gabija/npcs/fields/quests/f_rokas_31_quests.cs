@@ -83,6 +83,13 @@ public class FRokas31QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Rexither2))
+			{
+				await dialog.Msg(L("My summon is still on its feet. Deal with it if you want her back."));
+				character.Quests.ClearQuestTrack(Rexither2);
+				return;
+			}
+
 			if (!character.Quests.Has(Rexither2) && character.Quests.MeetsPrerequisites(Rexither2))
 			{
 				var answer = await dialog.SelectQuestOffer(Rexither2, L("Oh? The woman. I forgot. I will release her as promised. Do try to keep her alive."),
@@ -102,13 +109,6 @@ public class FRokas31QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(PactEnd))
 			{
 				await dialog.Msg(L("The device at Sesija Entrance is still standing. Nothing good will come out when you drag time."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Rexither2))
-			{
-				await dialog.Msg(L("My summon is still on its feet. Deal with it if you want her back."));
-				character.Quests.ClearQuestTrack(Rexither2);
 				return;
 			}
 

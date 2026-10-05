@@ -165,6 +165,13 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq040))
+			{
+				await dialog.Msg(L("We march on the camp on your word. Say when."));
+				character.Quests.ReplayQuestTrack(Mq040);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq020) && character.Quests.MeetsPrerequisites(Mq020))
 			{
 				await dialog.Msg(L("You guys should be punished according to kingdom orders in principle."));
@@ -229,13 +236,6 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq040))
-			{
-				await dialog.Msg(L("We march on the camp on your word. Say when."));
-				character.Quests.ReplayQuestTrack(Mq040);
-				return;
-			}
-
 			await dialog.Msg(L("A guard with half a detachment and a camp he has been pushed out of."));
 		});
 
@@ -267,6 +267,13 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Good."));
 				await dialog.Msg(L("Since the hideout is safe now, you can leave the Fortress of the Land."));
 				await dialog.CompleteQuest(Mq050);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq060))
+			{
+				await dialog.Msg(L("Leave while the way out is still quiet."));
+				character.Quests.ReplayQuestTrack(Mq060);
 				return;
 			}
 
@@ -307,13 +314,6 @@ public class DUnderfortress66QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq050))
 			{
 				await dialog.Msg(L("It will be simple if you could place a barricade."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq060))
-			{
-				await dialog.Msg(L("Leave while the way out is still quiet."));
-				character.Quests.ReplayQuestTrack(Mq060);
 				return;
 			}
 

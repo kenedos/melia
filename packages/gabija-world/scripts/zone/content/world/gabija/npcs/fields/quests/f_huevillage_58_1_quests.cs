@@ -133,6 +133,20 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("The water is still clouded. The stones have not finished their work."));
+				character.Quests.ReplayQuestTrack(Mq02);
+				return;
+			}
+
+			if (character.Quests.IsActive(Sq03))
+			{
+				await dialog.Msg(L("Merregina is still in the water."));
+				character.Quests.ReplayQuestTrack(Sq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq02, L("The stones lie on the bed of the pond, waiting to be set working."),
@@ -173,20 +187,6 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("The water is still clouded. The stones have not finished their work."));
-				character.Quests.ReplayQuestTrack(Mq02);
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq03))
-			{
-				await dialog.Msg(L("Merregina is still in the water."));
-				character.Quests.ReplayQuestTrack(Sq03);
-				return;
-			}
-
 			await dialog.Msg(L("The pond lies still, and the reeds along its edge stand undisturbed."));
 		});
 
@@ -216,6 +216,19 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("Behind you - they came out of the brush!"));
+				character.Quests.ClearQuestTrack(Mq03);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq04))
+			{
+				await dialog.Msg(L("My injuries are not that severe, don't worry. Please go on ahead and check the portal at the sanctum."));
+				return;
+			}
+
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("So you're the Revelator the headman spoke about."));
@@ -239,19 +252,6 @@ public class FHuevillage581QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("The portal can be opened from the altar at Nugria Sanctum."));
 					return;
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("Behind you - they came out of the brush!"));
-				character.Quests.ClearQuestTrack(Mq03);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq04))
-			{
-				await dialog.Msg(L("My injuries are not that severe, don't worry. Please go on ahead and check the portal at the sanctum."));
 				return;
 			}
 

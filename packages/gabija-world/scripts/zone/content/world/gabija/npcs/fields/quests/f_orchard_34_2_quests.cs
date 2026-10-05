@@ -234,6 +234,13 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq03))
+		{
+			character.Quests.ClearQuestTrack(Mq03);
+			await dialog.Msg(L("If Zaura didn't want you and the girl to meet... Then she might just be the key to rescuing Goddess Lada."));
+			return;
+		}
+
 		if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 		{
 			await dialog.Msg(L("What? You mean the girl could have been sent by Goddess Laima? I saw her running away from the ferrets to the Broken Bridge!"));
@@ -297,25 +304,6 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Quests.IsActive(Mq02))
-		{
-			await dialog.Msg(L("I should have gone after them... I'm so worried now. I hope she's okay..."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq03))
-		{
-			character.Quests.ClearQuestTrack(Mq03);
-			await dialog.Msg(L("If Zaura didn't want you and the girl to meet... Then she might just be the key to rescuing Goddess Lada."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq04))
-		{
-			await dialog.Msg(L("Be careful when you collect Drowsy Herbs. There's a reason why they call them that."));
-			return;
-		}
-
 		if (character.Quests.IsActive(Mq05))
 		{
 			if (character.Inventory.CountItem(ItemId.ORCHARD_342_MQ_05_ITEM) == 0)
@@ -326,6 +314,18 @@ public class FOrchard342QuestNpcsScript : GeneralScript
 
 			await dialog.Msg(L("Don't worry if you accidentally get a whiff of the herbs. I made sure it only affects ferrets."));
 			await dialog.Msg(L("Quick, save the girl! We can't let Zaura have his way with this!"));
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq02))
+		{
+			await dialog.Msg(L("I should have gone after them... I'm so worried now. I hope she's okay..."));
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq04))
+		{
+			await dialog.Msg(L("Be careful when you collect Drowsy Herbs. There's a reason why they call them that."));
 			return;
 		}
 

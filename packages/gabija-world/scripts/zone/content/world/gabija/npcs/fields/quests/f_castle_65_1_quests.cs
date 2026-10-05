@@ -184,6 +184,12 @@ public class FCastle651QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsCompletable(Mq05))
+		{
+			await dialog.Msg(L("Please let Mihail know that the orbs are ready. I hope everything goes as planned..."));
+			return;
+		}
+
 		if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 		{
 			await dialog.Msg(L("Are you planning on passing through Delmore Castle? If you do, I suggest turning around immediately."));
@@ -313,12 +319,6 @@ public class FCastle651QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Quests.IsCompletable(Mq05))
-		{
-			await dialog.Msg(L("Please let Mihail know that the orbs are ready. I hope everything goes as planned..."));
-			return;
-		}
-
 		if (character.Quests.IsActive(Mq05))
 		{
 			await dialog.Msg(L("I've tuned it so that the device will be destroyed with the smallest explosion possible... But run away from the orbs just in case you don't get caught in the explosion."));
@@ -350,6 +350,12 @@ public class FCastle651QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("That was quick. It seems as if Melchioras has finished his preparations as well."));
 			await dialog.Msg(L("Why don't you go to Mage Melchioras? I know what's going on, but you might want some explanation seeing as you've just arrived here."));
 			await dialog.CompleteQuest(Mq03);
+			return;
+		}
+
+		if (character.Quests.IsCompletable(Mq04))
+		{
+			await dialog.Msg(L("The rest of the protective spells have been taken care of. Now it's my turn."));
 			return;
 		}
 
@@ -393,12 +399,6 @@ public class FCastle651QuestNpcsScript : GeneralScript
 		{
 			await dialog.Msg(L("When I first arrived at Klaipeda... There were an incredible amount of Revelators gathered there."));
 			await dialog.Msg(L("Those people, what do you think they're doing now?"));
-			return;
-		}
-
-		if (character.Quests.IsCompletable(Mq04))
-		{
-			await dialog.Msg(L("The rest of the protective spells have been taken care of. Now it's my turn."));
 			return;
 		}
 

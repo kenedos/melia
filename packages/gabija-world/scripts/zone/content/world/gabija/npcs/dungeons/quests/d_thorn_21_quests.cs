@@ -177,22 +177,6 @@ public class DThorn21QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Believer Jurga"));
 
-			if (character.Quests.IsActive(Mq03) && character.Quests.IsCompletable(Mq03))
-			{
-				await dialog.Msg(L("I can feel Bramble suffering."));
-				await dialog.Msg(L("He is getting retribution for extracting all vigor from this land."));
-				await dialog.CompleteQuest(Mq03);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05) && character.Quests.IsCompletable(Mq05))
-			{
-				await dialog.Msg(L("It will be hard for Bramble to recover now."));
-				await dialog.Msg(L("We can save the dying trees as well."));
-				await dialog.CompleteQuest(Mq05);
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq04) && character.Quests.IsCompletable(Mq04))
 			{
 				await dialog.Msg(L("Great."));
@@ -208,6 +192,22 @@ public class DThorn21QuestNpcsScript : GeneralScript
 				await dialog.CompleteQuest(Mq09);
 				character.LookAround();
 				character.ServerMessage(L("Move to Giliaii Courtyard."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq03) && character.Quests.IsCompletable(Mq03))
+			{
+				await dialog.Msg(L("I can feel Bramble suffering."));
+				await dialog.Msg(L("He is getting retribution for extracting all vigor from this land."));
+				await dialog.CompleteQuest(Mq03);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq05) && character.Quests.IsCompletable(Mq05))
+			{
+				await dialog.Msg(L("It will be hard for Bramble to recover now."));
+				await dialog.Msg(L("We can save the dying trees as well."));
+				await dialog.CompleteQuest(Mq05);
 				return;
 			}
 

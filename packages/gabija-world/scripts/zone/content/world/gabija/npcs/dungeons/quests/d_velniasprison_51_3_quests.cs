@@ -58,6 +58,13 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq01))
+			{
+				await dialog.Msg(L("Hauberk is at the Nevirau Collapsed Area, and his servants are between you and him."));
+				character.Quests.ReplayQuestTrack(Mq01);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("So you've come, Savior."));
@@ -96,13 +103,6 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq01))
-			{
-				await dialog.Msg(L("Hauberk is at the Nevirau Collapsed Area, and his servants are between you and him."));
-				character.Quests.ReplayQuestTrack(Mq01);
-				return;
-			}
-
 			await dialog.Msg(L("A Kupole holding the gate of a maze she has walked more times than she can count."));
 		});
 
@@ -136,6 +136,13 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("I will stay here and pursue the remaining demons."));
 				await dialog.CompleteQuest(Sq01);
 				character.LookAround();
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq04))
+			{
+				await dialog.Msg(L("Drive him along the Zinuma Passage. Sigita is waiting at the far end of it."));
+				character.Quests.ReplayQuestTrack(Mq04);
 				return;
 			}
 
@@ -199,13 +206,6 @@ public class DVelniasprison513QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq03))
 			{
 				await dialog.Msg(L("If Hauberk gives up and tries to run away, I will do my best to stop him."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq04))
-			{
-				await dialog.Msg(L("Drive him along the Zinuma Passage. Sigita is waiting at the far end of it."));
-				character.Quests.ReplayQuestTrack(Mq04);
 				return;
 			}
 

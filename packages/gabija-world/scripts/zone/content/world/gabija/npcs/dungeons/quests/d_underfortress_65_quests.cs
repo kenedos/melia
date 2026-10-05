@@ -169,6 +169,13 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq050))
+			{
+				await dialog.Msg(L("We don't have time to waste. Let's hurry!"));
+				character.Quests.ReplayQuestTrack(Mq050);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq030) && character.Quests.MeetsPrerequisites(Mq030))
 			{
 				await dialog.Msg(L("Okay. Shall we start the work of the grave robbers?"));
@@ -233,13 +240,6 @@ public class DUnderfortress65QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq040))
 			{
 				await dialog.Msg(L("You should be careful since I can't guarantee their stability..."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq050))
-			{
-				await dialog.Msg(L("We don't have time to waste. Let's hurry!"));
-				character.Quests.ReplayQuestTrack(Mq050);
 				return;
 			}
 

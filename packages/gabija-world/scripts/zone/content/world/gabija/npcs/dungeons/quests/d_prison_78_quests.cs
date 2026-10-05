@@ -621,6 +621,14 @@ public class DPrison78QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq7))
+		{
+			await dialog.Msg(L("King Kadumel was one of Nebulas' minions."));
+			await dialog.Msg(L("Demon Lord Nebulas is far stronger than King Kadumel."));
+			character.Quests.ClearQuestTrack(Mq7);
+			return;
+		}
+
 		if (!character.Quests.Has(Mq6) && character.Quests.MeetsPrerequisites(Mq6))
 		{
 			await dialog.Msg(L("The spell that you want to suppress must be inscribed in Magic Control Scroll first."));
@@ -730,14 +738,6 @@ public class DPrison78QuestNpcsScript : GeneralScript
 		{
 			await dialog.Msg(L("The Magic Control Scroll will not completely subdue King Kadumel."));
 			await dialog.Msg(L("In Kalejimas Prison, there are five demon barriers."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq7))
-		{
-			await dialog.Msg(L("King Kadumel was one of Nebulas' minions."));
-			await dialog.Msg(L("Demon Lord Nebulas is far stronger than King Kadumel."));
-			character.Quests.ClearQuestTrack(Mq7);
 			return;
 		}
 

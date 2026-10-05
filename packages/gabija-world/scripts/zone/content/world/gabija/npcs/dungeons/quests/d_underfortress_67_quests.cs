@@ -60,6 +60,13 @@ public class DUnderfortress67QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq010))
+			{
+				await dialog.Msg(L("That box over there is what the Monocle picked out. Get whatever is in it off the demons."));
+				character.Quests.ReplayQuestTrack(Mq010);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq010) && character.Quests.MeetsPrerequisites(Mq010))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq010, L("Okay. Let's look around again with the Monocle. If you can see some special force, then there will be something like the treasure of Ruklys."),
@@ -92,13 +99,6 @@ public class DUnderfortress67QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Let's meet later."));
 					return;
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq010))
-			{
-				await dialog.Msg(L("That box over there is what the Monocle picked out. Get whatever is in it off the demons."));
-				character.Quests.ReplayQuestTrack(Mq010);
 				return;
 			}
 
@@ -174,20 +174,6 @@ public class DUnderfortress67QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Old Manager"));
 			dialog.SetPortrait("Dlg_port_Premier_Eminent");
 
-			if (character.Quests.IsActive(Mq030) && !character.Quests.IsCompletable(Mq030))
-			{
-				await dialog.Msg(L("Huh? Outsiders.. Who are you?"));
-				await dialog.Msg(L("How did you get past all the guards?"));
-
-				var explained = await character.TimeActions.StartAsync(L("Explaining the revelation..."), L("Cancel"), "TALK", TimeSpan.FromSeconds(1));
-
-				if (explained != TimeActionResult.Completed)
-					return;
-
-				character.Quests.CompleteObjective(Mq030, "findTheSquare");
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq030) && character.Quests.IsCompletable(Mq030))
 			{
 				await dialog.Msg(L("Yes! A revelation..."));
@@ -210,6 +196,20 @@ public class DUnderfortress67QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("What matters the most is ingredients and how you mix them."));
 				await dialog.CompleteQuest(Mq050);
 				character.ServerMessage(L("The Old Manager hands over a certification ticket. His devices will not attack you now."));
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq030) && !character.Quests.IsCompletable(Mq030))
+			{
+				await dialog.Msg(L("Huh? Outsiders.. Who are you?"));
+				await dialog.Msg(L("How did you get past all the guards?"));
+
+				var explained = await character.TimeActions.StartAsync(L("Explaining the revelation..."), L("Cancel"), "TALK", TimeSpan.FromSeconds(1));
+
+				if (explained != TimeActionResult.Completed)
+					return;
+
+				character.Quests.CompleteObjective(Mq030, "findTheSquare");
 				return;
 			}
 

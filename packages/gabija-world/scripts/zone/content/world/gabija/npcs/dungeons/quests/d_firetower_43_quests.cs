@@ -129,6 +129,20 @@ public class DFiretower43QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("The first valve is at the Laboratory, to the west."));
+				character.Quests.ClearQuestTrack(Mq02);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq06))
+			{
+				await dialog.Msg(L("The Central Control Room is east of here. Be careful of what he has already touched."));
+				character.Quests.ClearQuestTrack(Mq06);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				await dialog.Msg(L("Goddess Gabija is important, but the tower is in more trouble now. Antares may already be up to something."));
@@ -200,13 +214,6 @@ public class DFiretower43QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("The first valve is at the Laboratory, to the west."));
-				character.Quests.ClearQuestTrack(Mq02);
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq03))
 			{
 				await dialog.Msg(L("The research materials should be here somewhere..."));
@@ -216,13 +223,6 @@ public class DFiretower43QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq07))
 			{
 				await dialog.Msg(L("Ten cores. The Red Infrorocktors on this floor carry them."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq06))
-			{
-				await dialog.Msg(L("The Central Control Room is east of here. Be careful of what he has already touched."));
-				character.Quests.ClearQuestTrack(Mq06);
 				return;
 			}
 

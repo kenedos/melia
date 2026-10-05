@@ -110,7 +110,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			var padNames = new[] { PadName.gesti_spread1, PadName.gesti_spread2, PadName.gesti_spread3 };
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1100));
-			await EffectAndHit(skill, caster, originPos, new EffectHitConfig
+			await EffectAndHit(skill, caster, caster.Position, new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
 				PositionDelay = 0,
@@ -135,7 +135,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				{
 					await skill.Wait(TimeSpan.FromMilliseconds(padTimes[nextPad] - elapsed));
 					elapsed = padTimes[nextPad];
-					MonsterSkillCreatePad(caster, skill, originPos, 0f, padNames[nextPad]);
+					MonsterSkillCreatePad(caster, skill, caster.Position, 0f, padNames[nextPad]);
 					nextPad++;
 				}
 
@@ -150,7 +150,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			{
 				await skill.Wait(TimeSpan.FromMilliseconds(padTimes[nextPad] - elapsed));
 				elapsed = padTimes[nextPad];
-				MonsterSkillCreatePad(caster, skill, originPos, 0f, padNames[nextPad]);
+				MonsterSkillCreatePad(caster, skill, caster.Position, 0f, padNames[nextPad]);
 				nextPad++;
 			}
 		}
@@ -322,7 +322,7 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 				_ = EffectHitArrow(skill, caster, originPos, originPos.GetRelative(farPos, distance: 100f, angle: angle), arrowConfig);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(1800));
-			await EffectAndHit(skill, caster, originPos, new EffectHitConfig
+			await EffectAndHit(skill, caster, caster.Position, new EffectHitConfig
 			{
 				GroundEffect = EffectConfig.None,
 				PositionDelay = 0,
@@ -414,13 +414,13 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2000));
-			MonsterSkillCreatePad(caster, skill, originPos, 0f, PadName.gesti_spread1);
+			MonsterSkillCreatePad(caster, skill, caster.Position, 0f, PadName.gesti_spread1);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			MonsterSkillCreatePad(caster, skill, originPos, 0f, PadName.gesti_spread2);
+			MonsterSkillCreatePad(caster, skill, caster.Position, 0f, PadName.gesti_spread2);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			MonsterSkillCreatePad(caster, skill, originPos, 0f, PadName.gesti_spread3);
+			MonsterSkillCreatePad(caster, skill, caster.Position, 0f, PadName.gesti_spread3);
 		}
 	}
 
@@ -448,6 +448,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var skillTargets = SkillSelectEnemiesInCircle(caster, originPos.GetRelative(farPos, distance: 80f), 100f, 20);
+			if (!skillTargets.Contains(target))
+				skillTargets.Insert(0, target);
 			await skill.Wait(TimeSpan.FromMilliseconds(1500));
 
 			var missileConfig = new MissileConfig
@@ -467,7 +469,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 
 			foreach (var skillTarget in skillTargets)
 			{
-				var position = GetRelativePosition(PosType.TargetDistance, caster, skillTarget, distance: 0, rand: 40, height: 1);
+				var position = GetRelativePosition(PosType.Target, caster, skillTarget, rand: 40, height: 1);
+				_ = caster.PlayEffectToGround("F_sys_target_monster", position, 1f, 1300f);
 				_ = MissilePadThrow(skill, caster, position, missileConfig, 0f, PadName.gesti_Slow);
 			}
 		}
@@ -600,10 +603,10 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			await skill.Wait(TimeSpan.FromMilliseconds(2500));
-			MonsterSkillCreatePad(caster, skill, originPos, 0f, PadName.gesti_spread1);
+			MonsterSkillCreatePad(caster, skill, caster.Position, 0f, PadName.gesti_spread1);
 
 			await skill.Wait(TimeSpan.FromMilliseconds(500));
-			MonsterSkillCreatePad(caster, skill, originPos, 0f, PadName.gesti_spread2);
+			MonsterSkillCreatePad(caster, skill, caster.Position, 0f, PadName.gesti_spread2);
 		}
 	}
 
@@ -631,6 +634,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 		private async Task HandleSkill(ICombatEntity caster, ICombatEntity target, Skill skill, Position originPos, Position farPos)
 		{
 			var skillTargets = SkillSelectEnemiesInCircle(caster, originPos.GetRelative(farPos, distance: 80f), 150f, 20);
+			if (!skillTargets.Contains(target))
+				skillTargets.Insert(0, target);
 
 			var missileConfig = new MissileConfig
 			{
@@ -652,7 +657,8 @@ namespace Melia.Zone.Skills.Handlers.Monsters.Boss
 			{
 				for (var i = 0; i < 2; i++)
 				{
-					var position = GetRelativePosition(PosType.TargetDistance, caster, skillTarget, distance: 0, rand: 40, height: 1);
+					var position = GetRelativePosition(PosType.Target, caster, skillTarget, rand: 40, height: 1);
+					_ = caster.PlayEffectToGround("F_sys_target_monster", position, 1f, 1300f);
 					_ = MissilePadThrow(skill, caster, position, missileConfig, 0f, PadName.BW_gesti_slow);
 				}
 			}

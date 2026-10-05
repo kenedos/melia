@@ -94,6 +94,13 @@ public class DPrison81QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq1))
+			{
+				await dialog.Msg(L("The demons surely are showing suspicious signs."));
+				character.Quests.ReplayQuestTrack(Mq1);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq1) && character.Quests.MeetsPrerequisites(Mq1))
 			{
 				var talked = await character.TimeActions.StartAsync(L("Talking to Zanas' Spirit"), L("Cancel"), "TALK", TimeSpan.FromSeconds(2));
@@ -131,13 +138,6 @@ public class DPrison81QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Once you are across, find the Soul Stones of Restrainment on the monsters first."));
 					await dialog.Msg(L("You will need them to free my other soul, held at the watchtower."));
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq1))
-			{
-				await dialog.Msg(L("The demons surely are showing suspicious signs."));
-				character.Quests.ReplayQuestTrack(Mq1);
 				return;
 			}
 

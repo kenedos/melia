@@ -654,6 +654,13 @@ public class FSiauliai11ReQuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Sq03) || character.Quests.IsActive(Sq04))
+			{
+				await dialog.Msg(L("If they're going to keep the investigations a secret, they should at least write a line and keep to it. How much more unlucky can I get? I haven't held a sword since training camp..."));
+				character.Quests.ClearQuestTrack(Sq04);
+				return;
+			}
+
 			if (!character.Quests.Has(Sq03) && character.Quests.MeetsPrerequisites(Sq03))
 			{
 				await dialog.Msg(L("There is a lot of nonsense going on because all reports of the area are labeled as classified. I mean, they're planning on making a refugee camp near Deer Hooves Lot."));
@@ -685,13 +692,6 @@ public class FSiauliai11ReQuestNpcsScript : GeneralScript
 					character.Quests.Start(Sq05);
 					await dialog.Msg(L("By the goddesses, thank you so much. Just gather some blood from the monsters at Rohonsa Cliff."));
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq03) || character.Quests.IsActive(Sq04))
-			{
-				await dialog.Msg(L("If they're going to keep the investigations a secret, they should at least write a line and keep to it. How much more unlucky can I get? I haven't held a sword since training camp..."));
-				character.Quests.ClearQuestTrack(Sq04);
 				return;
 			}
 

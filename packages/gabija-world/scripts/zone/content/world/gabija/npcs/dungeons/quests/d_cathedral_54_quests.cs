@@ -173,6 +173,13 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Sq05))
+			{
+				await dialog.Msg(L("Naktis' servants have rushed in!"));
+				character.Quests.ReplayQuestTrack(Sq05);
+				return;
+			}
+
 			if (!character.Quests.Has(Sq05) && character.Quests.MeetsPrerequisites(Sq05))
 			{
 				var answer = await dialog.SelectQuestOffer(Sq05, L("Something has been at the Karuna Altar since the key was taken out of it."),
@@ -189,13 +196,6 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04))
 			{
 				await dialog.Msg(L("The altar waits. The symbol is still empty of power."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq05))
-			{
-				await dialog.Msg(L("Naktis' servants have rushed in!"));
-				character.Quests.ReplayQuestTrack(Sq05);
 				return;
 			}
 
@@ -521,6 +521,13 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq03))
+		{
+			await dialog.Msg(L("Seven of them are at the symbol. Drive every one of them off it."));
+			character.Quests.ReplayQuestTrack(Mq03);
+			return;
+		}
+
 		if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
 		{
 			var answer = await dialog.SelectQuestOffer(Mq03, L("You are late. Maven's secret here is already being attacked. If we lose the Holy Symbol of Spiritual Power, we will never be able to get the third key."),
@@ -574,13 +581,6 @@ public class DCathedral54QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("First, it would be better to find some documents at the Sanctuary."));
 				await dialog.Msg(L("I remember there are documents there about methods of disguising as demons."));
 			}
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq03))
-		{
-			await dialog.Msg(L("Seven of them are at the symbol. Drive every one of them off it."));
-			character.Quests.ReplayQuestTrack(Mq03);
 			return;
 		}
 

@@ -130,6 +130,13 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("Hmm? Do you hear something strange? I think something is coming this way..."));
+				character.Quests.ReplayQuestTrack(Mq02);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				await dialog.Msg(L("They said that the lord would send soldiers and officials to help if we managed to get here... I don't see any sign of them."));
@@ -191,13 +198,6 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 					character.Quests.CompleteObjective(Mq04, "deliver");
 					character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("Follow the road to the right to deliver the Grass Leaf Ointment to Settler Layla"), 8);
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("Hmm? Do you hear something strange? I think something is coming this way..."));
-				character.Quests.ReplayQuestTrack(Mq02);
 				return;
 			}
 
@@ -353,6 +353,13 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq06))
+			{
+				await dialog.Msg(L("Not enough manpower, too many refugees... Sometimes I think it might be easier fighting monsters like the soldiers."));
+				character.Quests.ReplayQuestTrack(Mq06);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq06) && character.Quests.MeetsPrerequisites(Mq06))
 			{
 				await dialog.Msg(L("Not enough manpower, too many refugees... Sometimes I think it might be easier fighting monsters like the soldiers."));
@@ -399,13 +406,6 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("I don't know... I haven't seen him for a couple of days. Why don't you try meeting the lord first since they are close?"));
 					character.AddonMessage(AddonMessage.NOTICE_Dm_Scroll, L("Follow the green arrow to move to Orsha"), 8);
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq06))
-			{
-				await dialog.Msg(L("Not enough manpower, too many refugees... Sometimes I think it might be easier fighting monsters like the soldiers."));
-				character.Quests.ReplayQuestTrack(Mq06);
 				return;
 			}
 
@@ -494,6 +494,14 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("Oh my, a big monster? I'm so sorry that I dragged you into something like this..."));
 				await dialog.Msg(L("The smoke is noticeable thanks to your efforts, but this is terrible. The fact that all we can do is wait here when such dangerous monsters are appearing... It makes no sense!"));
 				await dialog.CompleteQuest(Sq04);
+				return;
+			}
+
+			if (character.Quests.IsActive(Sq04))
+			{
+				await dialog.Msg(L("Official Lutas says that there are too many refugees to simply allow them entrance into Orsha."));
+				await dialog.Msg(L("That's why they've created smaller refugee camps near Orsha and are supplying them there. The firewood on Adata Highway was also supposed to be used in that fashion."));
+				character.Quests.ClearQuestTrack(Sq04);
 				return;
 			}
 
@@ -589,14 +597,6 @@ public class FSiauliai16QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sq03))
 			{
 				await dialog.Msg(L("I've met only a few people here. I don't know where all the others may have gone..."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq04))
-			{
-				await dialog.Msg(L("Official Lutas says that there are too many refugees to simply allow them entrance into Orsha."));
-				await dialog.Msg(L("That's why they've created smaller refugee camps near Orsha and are supplying them there. The firewood on Adata Highway was also supposed to be used in that fashion."));
-				character.Quests.ClearQuestTrack(Sq04);
 				return;
 			}
 

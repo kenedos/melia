@@ -271,6 +271,13 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq040))
+			{
+				await dialog.Msg(L("Every single one of the village residents was taken. What... What do I do now...?"));
+				character.Quests.ReplayQuestTrack(Mq040);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq050) && character.Quests.MeetsPrerequisites(Mq050))
 			{
 				await dialog.Msg(L("Everyone in the village was taken. The demons said they were going to use a type of bracken to feed us to the Divine Tree."));
@@ -308,13 +315,6 @@ public class FBracken632QuestNpcsScript : GeneralScript
 				if (answer == "accept")
 					character.Quests.Start(Rp1);
 
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq040))
-			{
-				await dialog.Msg(L("Every single one of the village residents was taken. What... What do I do now...?"));
-				character.Quests.ReplayQuestTrack(Mq040);
 				return;
 			}
 

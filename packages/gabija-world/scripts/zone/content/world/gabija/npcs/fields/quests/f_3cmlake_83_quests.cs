@@ -343,6 +343,13 @@ public class F3Cmlake83QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq03))
+		{
+			await dialog.Msg(L("You saved my life. Thank you, really."));
+			character.Quests.ClearQuestTrack(Mq03);
+			return;
+		}
+
 		if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 		{
 			await dialog.Msg(L("This is it, this disc. You know how the ground trembled earlier?"));
@@ -364,13 +371,6 @@ public class F3Cmlake83QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("My friend got hurt trying to protect me so we should stick together. Please do me this favor."));
 				character.LookAround();
 			}
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq03))
-		{
-			await dialog.Msg(L("You saved my life. Thank you, really."));
-			character.Quests.ClearQuestTrack(Mq03);
 			return;
 		}
 
@@ -398,6 +398,13 @@ public class F3Cmlake83QuestNpcsScript : GeneralScript
 		{
 			await dialog.Msg(L("Thank you! We should collect as much as we can until everyone has recovered."));
 			await dialog.CompleteQuest(Rp1);
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq03))
+		{
+			await dialog.Msg(L("You still can't find my grandfather? Sigh... If you do find him, make sure to bring him here."));
+			character.Quests.ClearQuestTrack(Mq03);
 			return;
 		}
 
@@ -526,13 +533,6 @@ public class F3Cmlake83QuestNpcsScript : GeneralScript
 		{
 			await dialog.Msg(L("I know I should take you there myself, but I feel like I'll just be a burden."));
 			await dialog.Msg(L("That day, too, all we did was get grandpa and run away from there."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq03))
-		{
-			await dialog.Msg(L("You still can't find my grandfather? Sigh... If you do find him, make sure to bring him here."));
-			character.Quests.ClearQuestTrack(Mq03);
 			return;
 		}
 

@@ -556,13 +556,6 @@ public class FRemains40QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Grita"));
 			dialog.SetPortrait("Dlg_port_Grita");
 
-			if (character.Quests.IsActive(ToTheTower1))
-			{
-				await dialog.Msg(L("You came. This is the entrance to the tower."));
-				await dialog.CompleteQuest(ToTheTower1);
-				return;
-			}
-
 			if (!character.Quests.Has(ToTheTower2) && character.Quests.MeetsPrerequisites(ToTheTower2))
 			{
 				var answer = await dialog.SelectQuestOffer(ToTheTower2, L("This is the entrance to the tower. I won't be able to use magic, but I will definitely take you to Goddess Gabija."),
@@ -583,6 +576,13 @@ public class FRemains40QuestNpcsScript : GeneralScript
 					character.Quests.CompleteObjective(ToTheTower2, "enterTheTower");
 					await dialog.Msg(L("The other magicians have either died or ran away. You are our last hope. Let's go."));
 				}
+				return;
+			}
+
+			if (character.Quests.IsActive(ToTheTower1))
+			{
+				await dialog.Msg(L("You came. This is the entrance to the tower."));
+				await dialog.CompleteQuest(ToTheTower1);
 				return;
 			}
 

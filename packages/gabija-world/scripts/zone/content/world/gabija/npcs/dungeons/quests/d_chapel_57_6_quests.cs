@@ -342,6 +342,13 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq09))
+			{
+				await dialog.Msg(L("The Central Altar is north. Check what has stopped it."));
+				character.Quests.ClearQuestTrack(Mq09);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("My plan is to let you disguise as a demon."));
@@ -433,11 +440,11 @@ public class DChapel576QuestNpcsScript : GeneralScript
 				return;
 			}
 
-		if (character.Quests.IsActive(Mq06))
-		{
-			await dialog.Msg(L("Defeat a demon to gain some confidence, then use the scroll on a demon and bring it to the Apsauga Altar."));
-			return;
-		}
+			if (character.Quests.IsActive(Mq06))
+			{
+				await dialog.Msg(L("Defeat a demon to gain some confidence, then use the scroll on a demon and bring it to the Apsauga Altar."));
+				return;
+			}
 
 			if (character.Quests.IsActive(Mq07))
 			{
@@ -448,13 +455,6 @@ public class DChapel576QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq08))
 			{
 				await dialog.Msg(L("Activate the Globejas Altar and fight the demons within its reach."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq09))
-			{
-				await dialog.Msg(L("The Central Altar is north. Check what has stopped it."));
-				character.Quests.ClearQuestTrack(Mq09);
 				return;
 			}
 

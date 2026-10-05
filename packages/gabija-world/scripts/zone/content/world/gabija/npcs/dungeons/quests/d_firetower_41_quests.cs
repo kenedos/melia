@@ -54,13 +54,6 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Grita"));
 			dialog.SetPortrait("Dlg_port_Grita");
 
-			if (character.Quests.IsActive(ToTheTower2))
-			{
-				await dialog.Msg(L("We made it inside. The tower is not what it was when I left it."));
-				await dialog.CompleteQuest(ToTheTower2);
-				return;
-			}
-
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq01, L("It seems that there are more monsters here now compared to when I moved out of the tower. I don't know what happened..."),
@@ -74,6 +67,13 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("Light the signal at the left hallway. Even if one is in danger, if one knows that help is coming, one will have the extra energy to endure longer."));
 					character.LookAround();
 				}
+				return;
+			}
+
+			if (character.Quests.IsActive(ToTheTower2))
+			{
+				await dialog.Msg(L("We made it inside. The tower is not what it was when I left it."));
+				await dialog.CompleteQuest(ToTheTower2);
 				return;
 			}
 
@@ -125,6 +125,27 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("That'll do! Let's hope there won't be as many monsters now."));
 				await dialog.CompleteQuest(Mq05);
 				character.LookAround();
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq01))
+			{
+				await dialog.Msg(L("The signal is at the left hallway. Light it and the goddess will know we came."));
+				character.Quests.ClearQuestTrack(Mq01);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("I hope the monsters haven't broken the magic circle yet."));
+				character.Quests.ClearQuestTrack(Mq02);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("The larger circle is at the center of the floor."));
+				character.Quests.ClearQuestTrack(Mq03);
 				return;
 			}
 
@@ -189,27 +210,6 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq05);
 					await dialog.Msg(L("It still seems okay. Work it and we can leave this floor behind."));
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq01))
-			{
-				await dialog.Msg(L("The signal is at the left hallway. Light it and the goddess will know we came."));
-				character.Quests.ClearQuestTrack(Mq01);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("I hope the monsters haven't broken the magic circle yet."));
-				character.Quests.ClearQuestTrack(Mq02);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("The larger circle is at the center of the floor."));
-				character.Quests.ClearQuestTrack(Mq03);
 				return;
 			}
 
@@ -411,6 +411,13 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Sq05))
+			{
+				await dialog.Msg(L("The reading room is east of here. Please look at the bookshelf."));
+				character.Quests.ClearQuestTrack(Sq05);
+				return;
+			}
+
 			if (!character.Quests.Has(Sq03) && character.Quests.MeetsPrerequisites(Sq03))
 			{
 				var answer = await dialog.SelectQuestOffer(Sq03, L("Black Coal Powder. With that, we can unleash the seal that is written on this recipe. But I can't just find it. I am sorry, but could you bring me that powder?"),
@@ -466,13 +473,6 @@ public class DFiretower41QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sq03) || character.Quests.IsActive(Sq04))
 			{
 				await dialog.Msg(L("The Phyracons carry the powder, the Drakes the embers. Neither will hand them over."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq05))
-			{
-				await dialog.Msg(L("The reading room is east of here. Please look at the bookshelf."));
-				character.Quests.ClearQuestTrack(Sq05);
 				return;
 			}
 

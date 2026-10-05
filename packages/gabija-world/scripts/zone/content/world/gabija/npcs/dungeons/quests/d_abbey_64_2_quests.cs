@@ -100,23 +100,6 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Edmundas"));
 
-			if (character.Quests.IsActive(Mq010) && !character.Quests.IsCompletable(Mq010))
-			{
-				await dialog.Msg(L("Are you here to... save me?"));
-				await dialog.Msg(L("Yes, I'm Edmundas but... um..."));
-				await dialog.Msg(L("Rose... in such a dangerous place?"));
-				await dialog.Msg(L("No... Rose... please take her and run away now..."));
-
-				var asked = await character.TimeActions.StartAsync(L("Asking about his identity"), L("Cancel"), "TALK", TimeSpan.FromSeconds(1.2));
-
-				if (asked != TimeActionResult.Completed)
-					return;
-
-				character.Quests.CompleteObjective(Mq010, "findEdmundas");
-				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've found Edmundas{nl}Tell Rose about this"), 3);
-				return;
-			}
-
 			if (character.Quests.IsCompletable(Mq030))
 			{
 				await dialog.Msg(L("Rose... she's...! That's why I told her to run... Why didn't she listen to me..."));
@@ -138,6 +121,35 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq010) && !character.Quests.IsCompletable(Mq010))
+			{
+				await dialog.Msg(L("Are you here to... save me?"));
+				await dialog.Msg(L("Yes, I'm Edmundas but... um..."));
+				await dialog.Msg(L("Rose... in such a dangerous place?"));
+				await dialog.Msg(L("No... Rose... please take her and run away now..."));
+
+				var asked = await character.TimeActions.StartAsync(L("Asking about his identity"), L("Cancel"), "TALK", TimeSpan.FromSeconds(1.2));
+
+				if (asked != TimeActionResult.Completed)
+					return;
+
+				character.Quests.CompleteObjective(Mq010, "findEdmundas");
+				character.AddonMessage(AddonMessage.NOTICE_Dm_Clear, L("You've found Edmundas{nl}Tell Rose about this"), 3);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq030))
+			{
+				character.Quests.ReplayQuestTrack(Mq030);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq040))
+			{
+				await dialog.Msg(L("There should be some device to shut this down around here somewhere. Please... before anything bad happens to Rose."));
+				return;
+			}
+
 			if (!character.Quests.Has(Mq040) && character.Quests.MeetsPrerequisites(Mq040))
 			{
 				await dialog.Msg(L("That wizard... He's going to do to Rose the same experiments he did on me... He's going to use her to spread the giant bracken spores."));
@@ -154,18 +166,6 @@ public class DAbbey642QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq040);
 				}
 
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq030))
-			{
-				character.Quests.ReplayQuestTrack(Mq030);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq040))
-			{
-				await dialog.Msg(L("There should be some device to shut this down around here somewhere. Please... before anything bad happens to Rose."));
 				return;
 			}
 		});

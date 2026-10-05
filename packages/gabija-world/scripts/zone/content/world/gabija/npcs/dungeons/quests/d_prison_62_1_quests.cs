@@ -81,18 +81,18 @@ public class DPrison621QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
-			{
-				character.Quests.Start(Mq04);
-				character.Quests.CompleteObjective(Mq04, "returnToPranas");
-			}
-
 			if (character.Quests.IsCompletable(Mq04))
 			{
 				await dialog.Msg(L("Has the curse been lifted? I suddenly feel a bit lighter now... How did you do that?"));
 				await dialog.Msg(L("What? The bishop... is alive? Let us not further delay ourselves and save him!"));
 				await dialog.CompleteQuest(Mq04);
 				return;
+			}
+
+			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
+			{
+				character.Quests.Start(Mq04);
+				character.Quests.CompleteObjective(Mq04, "returnToPranas");
 			}
 
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
@@ -327,18 +327,6 @@ public class DPrison621QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
-			{
-				character.Quests.Start(Mq03);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
-			{
-				character.Quests.ReplayQuestTrack(Mq03);
-				return;
-			}
-
 			if (character.Quests.IsCompletable(Mq07))
 			{
 				var used = await character.TimeActions.StartAsync(L("Using the Orb of Return..."), L("Cancel"), "MAKING", TimeSpan.FromSeconds(2));
@@ -355,6 +343,18 @@ public class DPrison621QuestNpcsScript : GeneralScript
 				}
 
 				character.LookAround();
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq03) && !character.Quests.IsCompletable(Mq03))
+			{
+				character.Quests.ReplayQuestTrack(Mq03);
+				return;
+			}
+
+			if (!character.Quests.Has(Mq03) && character.Quests.MeetsPrerequisites(Mq03))
+			{
+				character.Quests.Start(Mq03);
 				return;
 			}
 
@@ -411,6 +411,13 @@ public class DPrison621QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("All we could do was run even when all of us attacked him together... I see that a Revelator has remarkable powers."));
 				await dialog.Msg(L("To see all the priests alive and well... it's a relief. I assume that we shall meet in Orsha soon."));
 				await dialog.CompleteQuest(Prison623Mq06);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq06))
+			{
+				await dialog.Msg(L("I'm certain that the goddess led you here. All these coincidences are pointing towards you."));
+				character.Quests.ReplayQuestTrack(Mq06);
 				return;
 			}
 
@@ -474,13 +481,6 @@ public class DPrison621QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("I shall see you in Orsha then. I'll make my leave since the interpretation of the Demon Orders is a pressing matter."));
 					character.LookAround();
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq06))
-			{
-				await dialog.Msg(L("I'm certain that the goddess led you here. All these coincidences are pointing towards you."));
-				character.Quests.ReplayQuestTrack(Mq06);
 				return;
 			}
 

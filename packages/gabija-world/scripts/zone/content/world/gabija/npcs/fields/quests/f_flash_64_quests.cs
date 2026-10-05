@@ -176,6 +176,14 @@ public class FFlash64QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Wilhelmina Carriot"));
 
+			if (character.Quests.IsActive(Under67Sq010) && character.Quests.IsCompletable(Under67Sq010))
+			{
+				await dialog.Msg(L("These are readable. Ruklys' soldiers wrote more than I expected."));
+				await dialog.Msg(L("Here, I made copies for you. Kaliss pays for readable."));
+				await dialog.CompleteQuest(Under67Sq010);
+				return;
+			}
+
 			if (character.Quests.IsActive(Sq01) && character.Quests.IsCompletable(Sq01))
 			{
 				await dialog.Msg(L("You're as great as the rumors say."));
@@ -192,16 +200,6 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
-			{
-				await dialog.Msg(L("Finally, the records which weren't in hands of the Royal Army guards are here."));
-				character.Inventory.RemoveItem(ItemId.FLASH64_MQ_01_ITEM, RecordsNeeded);
-				character.Inventory.Add(ItemId.FLASH64_MQ_03_ITEM, 1, InventoryAddType.PickUp);
-				character.Quests.CompleteObjective(Mq02, "tradeRecords");
-				character.ServerMessage(L("Wilhelmina hands over a Silence Scroll. Take it back to Amanda."));
-				return;
-			}
-
 			if (character.Quests.IsActive(Under66Sq010) && character.Quests.IsCompletable(Under66Sq010))
 			{
 				await dialog.Msg(L("This is enough."));
@@ -210,19 +208,21 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Under67Sq010) && character.Quests.IsCompletable(Under67Sq010))
-			{
-				await dialog.Msg(L("These are readable. Ruklys' soldiers wrote more than I expected."));
-				await dialog.Msg(L("Here, I made copies for you. Kaliss pays for readable."));
-				await dialog.CompleteQuest(Under67Sq010);
-				return;
-			}
-
 			if (character.Quests.IsActive(Under67Hq1) && character.Quests.IsCompletable(Under67Hq1))
 			{
 				await dialog.Msg(L("This should be enough."));
 				await dialog.Msg(L("I'll select a few talented knights to enter the fortress."));
 				await dialog.CompleteQuest(Under67Hq1);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq02) && !character.Quests.IsCompletable(Mq02))
+			{
+				await dialog.Msg(L("Finally, the records which weren't in hands of the Royal Army guards are here."));
+				character.Inventory.RemoveItem(ItemId.FLASH64_MQ_01_ITEM, RecordsNeeded);
+				character.Inventory.Add(ItemId.FLASH64_MQ_03_ITEM, 1, InventoryAddType.PickUp);
+				character.Quests.CompleteObjective(Mq02, "tradeRecords");
+				character.ServerMessage(L("Wilhelmina hands over a Silence Scroll. Take it back to Amanda."));
 				return;
 			}
 
@@ -310,6 +310,12 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				}
 			}
 
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("Bring me those records and I will find you something that works on a Gargoyle."));
+				return;
+			}
+
 			if (character.Quests.IsActive(Sq01))
 			{
 				await dialog.Msg(L("I heard you have lots of battle experiences."));
@@ -325,12 +331,6 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sq03))
 			{
 				await dialog.Msg(L("I understand their loyalty for the kingdom, but when I see them make people do impossible things that lead to deaths..."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("Bring me those records and I will find you something that works on a Gargoyle."));
 				return;
 			}
 
@@ -609,6 +609,13 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("The Gargoyle is still sitting on the gathering place."));
+				character.Quests.ReplayQuestTrack(Mq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("So you are the famous Revelator, right?"));
@@ -674,13 +681,6 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("The Knights of Kaliss possesses many competent wizards. They will give us what we need."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("The Gargoyle is still sitting on the gathering place."));
-				character.Quests.ReplayQuestTrack(Mq03);
 				return;
 			}
 
@@ -846,9 +846,6 @@ public class FFlash64QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Murmillo Master"));
 			dialog.SetPortrait("Dlg_port_Feliksia");
 
-			if (!character.Quests.Has(Flash64Hq1))
-				character.Variables.Perm.SetBool(MurmilloTalkedVar, true);
-
 			if (character.Quests.IsActive(Murmillo8) && character.Quests.IsCompletable(Murmillo8))
 			{
 				await dialog.Msg(L("Hmm, you came earlier than I expected."));
@@ -881,6 +878,9 @@ public class FFlash64QuestNpcsScript : GeneralScript
 				}
 				return;
 			}
+
+			if (!character.Quests.Has(Flash64Hq1))
+				character.Variables.Perm.SetBool(MurmilloTalkedVar, true);
 
 			if (!character.Quests.Has(Flash64Hq1) && character.Quests.MeetsPrerequisites(Flash64Hq1))
 			{

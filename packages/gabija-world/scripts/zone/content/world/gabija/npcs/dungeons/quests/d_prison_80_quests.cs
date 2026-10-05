@@ -367,6 +367,13 @@ public class DPrison80QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq7))
+			{
+				await dialog.Msg(L("Upon disabling the demon magic circle, Grinender appeared. Defeat Grinender."));
+				character.Quests.ReplayQuestTrack(Mq7);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq8) && character.Quests.MeetsPrerequisites(Mq8))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq8, L("With Grinender no more, the remnants don't stand a chance. Let's wipe them off so that they won't hinder our quest to find the King's gem."),
@@ -401,13 +408,6 @@ public class DPrison80QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("However, the crystals lose their potency after a while."));
 					await dialog.Msg(L("So, please be hasty."));
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq7))
-			{
-				await dialog.Msg(L("Upon disabling the demon magic circle, Grinender appeared. Defeat Grinender."));
-				character.Quests.ReplayQuestTrack(Mq7);
 				return;
 			}
 

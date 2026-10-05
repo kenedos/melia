@@ -75,6 +75,20 @@ public class FGele574QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq01))
+			{
+				await dialog.Msg(L("The hive is at Rojus Plateau. Remove it and the Biteregina will come."));
+				character.Quests.ClearQuestTrack(Mq01);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq06))
+			{
+				await dialog.Msg(L("Burn the Panto Totem in Valyma Sanctum first, then use the charm."));
+				character.Quests.ClearQuestTrack(Mq06);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Biteregina, which used to live in the deep forest, has appeared here."));
@@ -130,23 +144,9 @@ public class FGele574QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq01))
-			{
-				await dialog.Msg(L("The hive is at Rojus Plateau. Remove it and the Biteregina will come."));
-				character.Quests.ClearQuestTrack(Mq01);
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq05))
 			{
 				await dialog.Msg(L("Try the charm on the Pantos in Levanda Habitat."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq06))
-			{
-				await dialog.Msg(L("Burn the Panto Totem in Valyma Sanctum first, then use the charm."));
-				character.Quests.ClearQuestTrack(Mq06);
 				return;
 			}
 
@@ -182,6 +182,13 @@ public class FGele574QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("You have done what no other could easily do."));
 				await dialog.Msg(L("The goddess must be proud of you."));
 				await dialog.CompleteQuest(Mq04);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq04))
+			{
+				await dialog.Msg(L("The Nepenthes is at Piene Field. Burn it and take the sap."));
+				character.Quests.ClearQuestTrack(Mq04);
 				return;
 			}
 
@@ -239,13 +246,6 @@ public class FGele574QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq03))
 			{
 				await dialog.Msg(L("The Mallardu carry the fat that will wake the Nepenthes."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq04))
-			{
-				await dialog.Msg(L("The Nepenthes is at Piene Field. Burn it and take the sap."));
-				character.Quests.ClearQuestTrack(Mq04);
 				return;
 			}
 

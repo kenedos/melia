@@ -386,20 +386,10 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Seal Tower"));
 
-			if (character.Quests.IsActive(Party100) && !character.Quests.IsCompletable(Party100))
+			if (character.Quests.IsActive(Party101) && character.Quests.IsCompletable(Party101))
 			{
-				var looked = await character.TimeActions.StartAsync(L("Looking the sealed tower over..."), L("Cancel"), "LOOK_SIT", TimeSpan.FromSeconds(2));
-
-				if (looked != TimeActionResult.Completed)
-					return;
-
-				character.Quests.ReplayQuestTrack(Party100);
-				return;
-			}
-
-			if (!character.Quests.Has(Party102) && character.Quests.MeetsPrerequisites(Party102))
-			{
-				await dialog.Msg(L("The tower still holds the scripture's power. Offer it to restore the seal."));
+				await dialog.Msg(L("The scripture is full, and the tower takes what it carries."));
+				await dialog.CompleteQuest(Party101);
 				character.Quests.Start(Party102);
 				return;
 			}
@@ -422,9 +412,14 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Party101) && !character.Quests.IsCompletable(Party101))
+			if (character.Quests.IsActive(Party100) && !character.Quests.IsCompletable(Party100))
 			{
-				await dialog.Msg(L("The scripture is still empty. Fill it at the altar first."));
+				var looked = await character.TimeActions.StartAsync(L("Looking the sealed tower over..."), L("Cancel"), "LOOK_SIT", TimeSpan.FromSeconds(2));
+
+				if (looked != TimeActionResult.Completed)
+					return;
+
+				character.Quests.ReplayQuestTrack(Party100);
 				return;
 			}
 
@@ -441,18 +436,17 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Party101) && character.Quests.IsCompletable(Party101))
-			{
-				await dialog.Msg(L("The scripture is full, and the tower takes what it carries."));
-				await dialog.CompleteQuest(Party101);
-				character.Quests.Start(Party102);
-				return;
-			}
-
 			if (character.Quests.IsActive(Sq02) && !character.Quests.IsCompletable(Sq02))
 			{
 				await dialog.Msg(L("Taumas is still standing over the tower."));
 				character.Quests.ReplayQuestTrack(Sq02);
+				return;
+			}
+
+			if (!character.Quests.Has(Party102) && character.Quests.MeetsPrerequisites(Party102))
+			{
+				await dialog.Msg(L("The tower still holds the scripture's power. Offer it to restore the seal."));
+				character.Quests.Start(Party102);
 				return;
 			}
 
@@ -469,6 +463,12 @@ public class FSiauliai462QuestNpcsScript : GeneralScript
 					character.ServerMessage(L("Demon Lord Taumas comes for the tower!"));
 					return;
 				}
+				return;
+			}
+
+			if (character.Quests.IsActive(Party101) && !character.Quests.IsCompletable(Party101))
+			{
+				await dialog.Msg(L("The scripture is still empty. Fill it at the altar first."));
 				return;
 			}
 

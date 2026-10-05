@@ -525,6 +525,13 @@ public class FRokas29QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Vacys2))
+			{
+				await dialog.Msg(L("Lithorex - get it off me!"));
+				character.Quests.ReplayQuestTrack(Vacys2);
+				return;
+			}
+
 			if (!character.Quests.Has(Vacys1) && character.Quests.MeetsPrerequisites(Vacys1))
 			{
 				await dialog.Msg(L("I'm screwed. Monsters took my bag."));
@@ -553,13 +560,6 @@ public class FRokas29QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Vacys1))
 			{
 				await dialog.Msg(L("The bag is somewhere south of here, below Serno Highland."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Vacys2))
-			{
-				await dialog.Msg(L("Lithorex - get it off me!"));
-				character.Quests.ReplayQuestTrack(Vacys2);
 				return;
 			}
 

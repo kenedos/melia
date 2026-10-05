@@ -43,20 +43,6 @@ public class DCmine01QuestNpcsScript : GeneralScript
 			dialog.SetTitle(L("Vaidotas"));
 			dialog.SetPortrait("Dlg_port_ALCHEMIST_1");
 
-			if (character.Quests.IsActive(ToTheMines) && !character.Quests.IsCompletable(ToTheMines))
-			{
-				await dialog.Msg(L("The Vubbes the blast drew in are still on the road. Deal with them first."));
-				return;
-			}
-
-			if (character.Quests.IsActive(ToTheMines))
-			{
-				await dialog.Msg(L("You made it through. I told you the explosives would be enough."));
-				await dialog.Msg(L("This is the Crystal Mine. The air down here is what killed every rescue party before us."));
-				await dialog.CompleteQuest(ToTheMines);
-				return;
-			}
-
 			if (character.Quests.IsActive(Alchemist) && character.Quests.IsCompletable(Alchemist))
 			{
 				await dialog.Msg(L("The air is clearing already. Every purifier on this floor is turning again."));
@@ -97,6 +83,20 @@ public class DCmine01QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("In that case, use the compass that I gave you to search for them."));
 				}
 
+				return;
+			}
+
+			if (character.Quests.IsActive(ToTheMines) && !character.Quests.IsCompletable(ToTheMines))
+			{
+				await dialog.Msg(L("The Vubbes the blast drew in are still on the road. Deal with them first."));
+				return;
+			}
+
+			if (character.Quests.IsActive(ToTheMines))
+			{
+				await dialog.Msg(L("You made it through. I told you the explosives would be enough."));
+				await dialog.Msg(L("This is the Crystal Mine. The air down here is what killed every rescue party before us."));
+				await dialog.CompleteQuest(ToTheMines);
 				return;
 			}
 
@@ -208,16 +208,16 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Crystal8))
-			{
-				await dialog.Msg(L("The valve is open, but the purifier still will not turn. Use the Mine Compass to find a replacement part."));
-				return;
-			}
-
 			if (!character.Quests.Has(Crystal9) && character.Quests.MeetsPrerequisites(Crystal9))
 			{
 				await dialog.Msg(L("The Central Purifier is still seized. The Mine Compass points to District 4."));
 				character.Quests.Start(Crystal9);
+				return;
+			}
+
+			if (character.Quests.IsActive(Crystal8))
+			{
+				await dialog.Msg(L("The valve is open, but the purifier still will not turn. Use the Mine Compass to find a replacement part."));
 				return;
 			}
 
@@ -324,6 +324,13 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Crystal18))
+			{
+				await dialog.Msg(L("The compass points to District 6. Search District 6 for the part."));
+				character.Quests.ClearQuestTrack(Crystal18);
+				return;
+			}
+
 			if (!character.Quests.Has(Crystal13) && character.Quests.MeetsPrerequisites(Crystal13))
 			{
 				var answer = await dialog.SelectQuestOffer(Crystal13, L("The Passage Purifier is cold. A part has been torn out of its housing."),
@@ -345,12 +352,6 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Crystal13))
-			{
-				await dialog.Msg(L("A part has been torn out of the housing. Use the Mine Compass to find it."));
-				return;
-			}
-
 			if (!character.Quests.Has(Crystal18) && character.Quests.MeetsPrerequisites(Crystal18))
 			{
 				await dialog.Msg(L("The Passage Purifier is still cold. The Mine Compass points to District 6."));
@@ -367,10 +368,9 @@ public class DCmine01QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Crystal18))
+			if (character.Quests.IsActive(Crystal13))
 			{
-				await dialog.Msg(L("The compass points to District 6. Search District 6 for the part."));
-				character.Quests.ClearQuestTrack(Crystal18);
+				await dialog.Msg(L("A part has been torn out of the housing. Use the Mine Compass to find it."));
 				return;
 			}
 

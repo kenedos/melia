@@ -125,6 +125,27 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq01))
+			{
+				await dialog.Msg(L("Stand with us. The ritual will not hold if it is only the goddess in it."));
+				character.Quests.ReplayQuestTrack(Mq01);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq06))
+			{
+				await dialog.Msg(L("The crack is still open. Stand between it and us."));
+				character.Quests.ReplayQuestTrack(Mq06);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq07))
+			{
+				await dialog.Msg(L("Hold a moment longer. The seal is nearly set."));
+				character.Quests.ReplayQuestTrack(Mq07);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq07) && character.Quests.MeetsPrerequisites(Mq07))
 			{
 				await dialog.Msg(L("The crack is holding. There is one more thing I must ask of you."));
@@ -199,13 +220,6 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq01))
-			{
-				await dialog.Msg(L("Stand with us. The ritual will not hold if it is only the goddess in it."));
-				character.Quests.ReplayQuestTrack(Mq01);
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("There is something I realized after meeting you."));
@@ -231,20 +245,6 @@ public class DVelniasprison515QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("We weren't able to monitor all the demons in the prison."));
 				await dialog.Msg(L("That's why we engraved Sealing Tokens on them so they couldn't unleash their power."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq06))
-			{
-				await dialog.Msg(L("The crack is still open. Stand between it and us."));
-				character.Quests.ReplayQuestTrack(Mq06);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq07))
-			{
-				await dialog.Msg(L("Hold a moment longer. The seal is nearly set."));
-				character.Quests.ReplayQuestTrack(Mq07);
 				return;
 			}
 

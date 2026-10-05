@@ -231,6 +231,13 @@ public class FGele572QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq05))
+			{
+				await dialog.Msg(L("With the totems broken, Simorph will come. Be ready."));
+				character.Quests.ClearQuestTrack(Mq05);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				await dialog.Msg(L("I can't stand seeing the Panto totems pressed with evil energy."));
@@ -291,13 +298,6 @@ public class FGele572QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04))
 			{
 				await dialog.Msg(L("Summon the shaman doll next to the Panto totems. It will break them for you."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05))
-			{
-				await dialog.Msg(L("With the totems broken, Simorph will come. Be ready."));
-				character.Quests.ClearQuestTrack(Mq05);
 				return;
 			}
 

@@ -213,6 +213,13 @@ public class DZachariel36QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("The Last Guardian"));
 
+			if (character.Quests.IsActive(Mq04))
+			{
+				await dialog.Msg(L("Rexipher is still standing. Put him down."));
+				character.Quests.ReplayQuestTrack(Mq04);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq04, L("Give me the soul pot. What is in it is the last thing standing between the evil presence and the revelation."),
@@ -245,13 +252,6 @@ public class DZachariel36QuestNpcsScript : GeneralScript
 					character.Quests.Start(ToFedimian);
 					await dialog.Msg(L("Take the road out of Zachariel Crossroads through the Tombstone Path. Fedimian is at the end of it."));
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq04))
-			{
-				await dialog.Msg(L("Rexipher is still standing. Put him down."));
-				character.Quests.ReplayQuestTrack(Mq04);
 				return;
 			}
 

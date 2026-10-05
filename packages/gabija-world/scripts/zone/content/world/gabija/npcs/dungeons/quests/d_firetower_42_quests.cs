@@ -330,6 +330,13 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Sq02))
+			{
+				await dialog.Msg(L("The Golem is still watching me."));
+				character.Quests.ReplayQuestTrack(Sq02);
+				return;
+			}
+
 			if (!character.Quests.Has(Sq02) && character.Quests.MeetsPrerequisites(Sq02))
 			{
 				var answer = await dialog.SelectQuestOffer(Sq02, L("I cannot say my name. Please defeat the observers and release the seal on me."),
@@ -355,13 +362,6 @@ public class DFiretower42QuestNpcsScript : GeneralScript
 					character.Quests.Start(Sq03);
 					await dialog.Msg(L("There are more of me on this floor. One of them will call you when this one is quiet."));
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq02))
-			{
-				await dialog.Msg(L("The Golem is still watching me."));
-				character.Quests.ReplayQuestTrack(Sq02);
 				return;
 			}
 

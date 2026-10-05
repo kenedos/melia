@@ -669,6 +669,14 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 		dialog.SetTitle(L("Bishop Aurelius' Spirit"));
 		dialog.SetPortrait("Dlg_port_aurelius");
 
+		if (character.Quests.IsActive(Mq08) && character.Quests.IsCompletable(Mq08))
+		{
+			await dialog.Msg(L("I am honored to be able to now guide you to the hidden room."));
+			await dialog.CompleteQuest(Mq08);
+			character.LookAround();
+			return;
+		}
+
 		if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 		{
 			var answer = await dialog.SelectQuestOffer(Mq04, L("So the demons went to Apgaule Altar without any complaints? Now then, it is time we follow them."),
@@ -729,14 +737,6 @@ public class DCathedral56QuestNpcsScript : GeneralScript
 				character.Quests.Start(Mq07);
 				await dialog.Msg(L("Two candlesticks hold the barrier up. Neither of them alone will do."));
 			}
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq08) && character.Quests.IsCompletable(Mq08))
-		{
-			await dialog.Msg(L("I am honored to be able to now guide you to the hidden room."));
-			await dialog.CompleteQuest(Mq08);
-			character.LookAround();
 			return;
 		}
 

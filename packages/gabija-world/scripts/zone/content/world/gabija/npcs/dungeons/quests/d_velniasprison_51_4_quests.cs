@@ -149,6 +149,13 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("The demons will come the moment I begin. Stand where they have to come past you."));
+				character.Quests.ReplayQuestTrack(Mq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				await dialog.Msg(L("Savior! I have been waiting for you."));
@@ -206,13 +213,6 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("The demons will come the moment I begin. Stand where they have to come past you."));
-				character.Quests.ReplayQuestTrack(Mq03);
-				return;
-			}
-
 			if (character.Quests.IsActive(Sq01))
 			{
 				await dialog.Msg(L("We, Kupoles are different."));
@@ -261,6 +261,13 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("If Vakarine recovers, then Dionys should also recover."));
 				await dialog.CompleteQuest(Sq03);
 				character.LookAround();
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq05))
+			{
+				await dialog.Msg(L("Dionys is still standing. Get him down and I will take the chain off him."));
+				character.Quests.ReplayQuestTrack(Mq05);
 				return;
 			}
 
@@ -360,13 +367,6 @@ public class DVelniasprison514QuestNpcsScript : GeneralScript
 			{
 				await dialog.Msg(L("Dionys is not someone we can face against."));
 				await dialog.Msg(L("Even Vakarine in her old days would not be able to do anything."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05))
-			{
-				await dialog.Msg(L("Dionys is still standing. Get him down and I will take the chain off him."));
-				character.Quests.ReplayQuestTrack(Mq05);
 				return;
 			}
 

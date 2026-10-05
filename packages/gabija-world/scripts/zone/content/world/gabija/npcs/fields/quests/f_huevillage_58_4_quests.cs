@@ -148,6 +148,20 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq08))
+			{
+				await dialog.Msg(L("The sphere is still closed. Turn the key once more."));
+				character.Quests.ReplayQuestTrack(Mq08);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq11))
+			{
+				await dialog.Msg(L("Hold the revelation up to the light and I will read it for you."));
+				character.Quests.ReplayQuestTrack(Mq11);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("The portal that you tried to open was a false gateway."));
@@ -277,24 +291,10 @@ public class FHuevillage584QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Mq08))
-			{
-				await dialog.Msg(L("The sphere is still closed. Turn the key once more."));
-				character.Quests.ReplayQuestTrack(Mq08);
-				return;
-			}
-
 			if (character.Quests.IsActive(Mq09))
 			{
 				await dialog.Msg(L("To retrieve the revelation, please go to Sirdgela Forest."));
 				await dialog.Msg(L("Now is the chance when the Demon Lord Bramble is recovering its power."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq11))
-			{
-				await dialog.Msg(L("Hold the revelation up to the light and I will read it for you."));
-				character.Quests.ReplayQuestTrack(Mq11);
 				return;
 			}
 

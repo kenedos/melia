@@ -250,26 +250,6 @@ public class DCmine6QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (!character.Quests.Has(Boss) && character.Quests.MeetsPrerequisites(Boss))
-			{
-				var answer = await dialog.SelectQuestOffer(Boss, L("Something is sealed in the Crystal Pillar. Examine the pillar."),
-					Option(L("Examine the seal"), "accept"),
-					Option(L("Leave it alone"), "leave")
-				);
-
-				if (answer == "accept")
-				{
-					var looked1048 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
-
-					if (looked1048 != TimeActionResult.Completed)
-						return;
-
-					character.Quests.Start(Boss);
-				}
-
-				return;
-			}
-
 			if (!character.Quests.Has(Slate) && character.Quests.HasCompleted(Boss) && character.Quests.MeetsPrerequisites(Slate))
 			{
 				var answer = await dialog.SelectQuestOffer(Slate, L("There is a huge Crystal Pillar in the closed area. Check out the Crystal Pillar."),
@@ -286,6 +266,26 @@ public class DCmine6QuestNpcsScript : GeneralScript
 
 					character.Quests.Start(Slate);
 					character.LookAround();
+				}
+
+				return;
+			}
+
+			if (!character.Quests.Has(Boss) && character.Quests.MeetsPrerequisites(Boss))
+			{
+				var answer = await dialog.SelectQuestOffer(Boss, L("Something is sealed in the Crystal Pillar. Examine the pillar."),
+					Option(L("Examine the seal"), "accept"),
+					Option(L("Leave it alone"), "leave")
+				);
+
+				if (answer == "accept")
+				{
+					var looked1048 = await character.TimeActions.StartAsync(L("Looking it over..."), L("Cancel"), "LOOK", TimeSpan.FromSeconds(3));
+
+					if (looked1048 != TimeActionResult.Completed)
+						return;
+
+					character.Quests.Start(Boss);
 				}
 
 				return;

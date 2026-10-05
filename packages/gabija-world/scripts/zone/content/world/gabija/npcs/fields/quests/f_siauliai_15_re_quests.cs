@@ -256,6 +256,13 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Chaser Ulysses"));
 
+			if (character.Quests.IsActive(Mq05))
+			{
+				await dialog.Msg(L("Revelator? I don't know what you're talking about. Do you perhaps mean the people like the Bokors or Oracles?"));
+				character.Quests.ClearQuestTrack(Mq05);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				await dialog.Msg(L("Priest Pranas? He's gone to Paupys Crossing."));
@@ -290,13 +297,6 @@ public class FSiauliai15ReQuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq06);
 					character.Quests.CompleteObjective(Mq06, "meetTalbasi");
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05))
-			{
-				await dialog.Msg(L("Revelator? I don't know what you're talking about. Do you perhaps mean the people like the Bokors or Oracles?"));
-				character.Quests.ClearQuestTrack(Mq05);
 				return;
 			}
 

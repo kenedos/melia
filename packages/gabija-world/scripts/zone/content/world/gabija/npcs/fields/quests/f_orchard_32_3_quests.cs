@@ -233,6 +233,13 @@ public class FOrchard323QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq02))
+		{
+			character.Quests.ClearQuestTrack(Mq02);
+			await dialog.Msg(L("Ow, ouch... Those darned ferrets have some sharp nails..."));
+			return;
+		}
+
 		if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 		{
 			await dialog.Msg(L("I don't think... I've seen you before. Hm... That's good."));
@@ -291,13 +298,6 @@ public class FOrchard323QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Quests.IsActive(Mq02))
-		{
-			character.Quests.ClearQuestTrack(Mq02);
-			await dialog.Msg(L("Ow, ouch... Those darned ferrets have some sharp nails..."));
-			return;
-		}
-
 		if (GameRandom.Get().NextDouble() >= 0.5)
 			await dialog.Msg(L("Ow, ouch... Those darned ferrets have some sharp nails..."));
 		else
@@ -345,6 +345,13 @@ public class FOrchard323QuestNpcsScript : GeneralScript
 			await dialog.Msg(L("They'll steal anything, those lousy ferrets. Thanks for bringing back our offering tools."));
 			await dialog.Msg(L("We can finally do a proper offering ceremony."));
 			await dialog.CompleteQuest(Hq1);
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq04))
+		{
+			character.Quests.ClearQuestTrack(Mq04);
+			await dialog.Msg(L("Your face doesn't look familiar... Please don't cause a commotion and just move along."));
 			return;
 		}
 
@@ -430,13 +437,6 @@ public class FOrchard323QuestNpcsScript : GeneralScript
 
 			if (answer == "accept")
 				character.Quests.Start(Hq1);
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq04))
-		{
-			character.Quests.ClearQuestTrack(Mq04);
-			await dialog.Msg(L("Your face doesn't look familiar... Please don't cause a commotion and just move along."));
 			return;
 		}
 

@@ -108,6 +108,13 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("The Magic Stabilizing Device is at the center of this floor."));
+				character.Quests.ClearQuestTrack(Mq02);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq02, L("If it stays like this, the Jewel of Prominence may break. There must be a stabilizing device somewhere here. Let's go."),
@@ -141,13 +148,6 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq01))
 			{
 				await dialog.Msg(L("What is happening to the Jewel of Prominence? It is very unstable."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("The Magic Stabilizing Device is at the center of this floor."));
-				character.Quests.ClearQuestTrack(Mq02);
 				return;
 			}
 
@@ -238,6 +238,13 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq05))
+			{
+				await dialog.Msg(L("The stairs up are at the west end. Something is standing across them."));
+				character.Quests.ClearQuestTrack(Mq05);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq05, L("Okay, go to the fifth floor. Please pass the Jewel of Prominence to Gabija!"),
@@ -256,13 +263,6 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq04))
 			{
 				await dialog.Msg(L("Keep them off me a little longer."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05))
-			{
-				await dialog.Msg(L("The stairs up are at the west end. Something is standing across them."));
-				character.Quests.ClearQuestTrack(Mq05);
 				return;
 			}
 
@@ -356,6 +356,13 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Sq03))
+			{
+				await dialog.Msg(L("It is still in there. I will hold the entrance."));
+				character.Quests.ClearQuestTrack(Sq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Sq03) && character.Quests.MeetsPrerequisites(Sq03))
 			{
 				await dialog.Msg(L("There's a problem. I think I saw a Yonazolem inside the Machinery Room... I can't handle it by myself."));
@@ -392,13 +399,6 @@ public class DFiretower44QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sq02))
 			{
 				await dialog.Msg(L("Ten Hardened Black Crystals. Take them off whatever you meet on the way."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq03))
-			{
-				await dialog.Msg(L("It is still in there. I will hold the entrance."));
-				character.Quests.ClearQuestTrack(Sq03);
 				return;
 			}
 

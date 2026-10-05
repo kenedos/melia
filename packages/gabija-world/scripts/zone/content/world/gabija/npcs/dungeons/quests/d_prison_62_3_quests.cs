@@ -123,6 +123,13 @@ public class DPrison623QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq03))
+			{
+				await dialog.Msg(L("I won't forget the arrogant gestures and expressions Marnox used when he caught me. He said that he could crush the Revelator or anything else that stands in his way..."));
+				character.Quests.ClearQuestTrack(Mq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("Do you... by any chance remember? I'm sure that the bishop would have mentioned it."));
@@ -202,13 +209,6 @@ public class DPrison623QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Mq02))
 			{
 				await dialog.Msg(L("Please be careful that Marnox doesn't notice you. That arrogant Demon Lord will not look on as he lost me."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq03))
-			{
-				await dialog.Msg(L("I won't forget the arrogant gestures and expressions Marnox used when he caught me. He said that he could crush the Revelator or anything else that stands in his way..."));
-				character.Quests.ClearQuestTrack(Mq03);
 				return;
 			}
 

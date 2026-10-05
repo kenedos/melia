@@ -91,6 +91,20 @@ public class FKatyn10QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq01))
+			{
+				await dialog.Msg(L("I have been chased from Delmore Castle by the demons. I refuse to be in the same situation ever again."));
+				character.Quests.ClearQuestTrack(Mq01);
+				return;
+			}
+
+			if (character.Quests.IsActive(Mq02))
+			{
+				await dialog.Msg(L("I don't know about the identity of the light bead. However, it does not have that same feeling that the demons produce."));
+				character.Quests.ReplayQuestTrack(Mq02);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq01) && character.Quests.MeetsPrerequisites(Mq01))
 			{
 				await dialog.Msg(L("I... didn't expect to see someone here.. You better escape as well."));
@@ -140,20 +154,6 @@ public class FKatyn10QuestNpcsScript : GeneralScript
 					await dialog.Msg(L("If it were anyone else, I would have stopped you but to you, words of warning will only fall flat. Not sure if it is bravery or recklessness..."));
 					await dialog.Msg(L("I should get some rest here for a little bit. I'm running out of breath. It's dangerous for me to stay with you, because I don't want to risk my life."));
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq01))
-			{
-				await dialog.Msg(L("I have been chased from Delmore Castle by the demons. I refuse to be in the same situation ever again."));
-				character.Quests.ClearQuestTrack(Mq01);
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq02))
-			{
-				await dialog.Msg(L("I don't know about the identity of the light bead. However, it does not have that same feeling that the demons produce."));
-				character.Quests.ReplayQuestTrack(Mq02);
 				return;
 			}
 
@@ -473,6 +473,12 @@ public class FKatyn10QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq10))
+		{
+			character.Quests.ReplayQuestTrack(Mq10);
+			return;
+		}
+
 		if (!character.Quests.Has(Mq04) && character.Quests.MeetsPrerequisites(Mq04))
 		{
 			await dialog.Msg(L("The light bead you saw is actually... a human soul. No memory and will of its own. A soul in its purest form. An essence of a soul."));
@@ -620,12 +626,6 @@ public class FKatyn10QuestNpcsScript : GeneralScript
 		{
 			await dialog.Msg(L("Actually, there is one owl a bit far from here... It's not responding."));
 			await dialog.Msg(L("I am worried about that child but.. The crisis on our hand requires our full attention."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq10))
-		{
-			character.Quests.ReplayQuestTrack(Mq10);
 			return;
 		}
 

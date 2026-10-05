@@ -255,6 +255,13 @@ public class FCastle652QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq01))
+		{
+			await dialog.Msg(L("There is now way I am wrong. I've designed it after all... If there is even a faint chance of that, I can only imagine that there is a new magic circle."));
+			character.Quests.ReplayQuestTrack(Mq01);
+			return;
+		}
+
 		if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 		{
 			await dialog.Msg(L("Thinking that it would be the same situation as when I ran was a mistake. I'm sure that there's a hidden Magic Power Supply Device somewhere."));
@@ -335,13 +342,6 @@ public class FCastle652QuestNpcsScript : GeneralScript
 
 				character.LookAround();
 			}
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq01))
-		{
-			await dialog.Msg(L("There is now way I am wrong. I've designed it after all... If there is even a faint chance of that, I can only imagine that there is a new magic circle."));
-			character.Quests.ReplayQuestTrack(Mq01);
 			return;
 		}
 

@@ -262,6 +262,13 @@ public class DVelniasprison511QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Mq05))
+			{
+				await dialog.Msg(L("Blut is across the barrier still. Hold the line with us."));
+				character.Quests.ReplayQuestTrack(Mq05);
+				return;
+			}
+
 			if (!character.Quests.Has(Mq05) && character.Quests.MeetsPrerequisites(Mq05))
 			{
 				var answer = await dialog.SelectQuestOffer(Mq05, L("We've locked Blut across this barrier."),
@@ -274,13 +281,6 @@ public class DVelniasprison511QuestNpcsScript : GeneralScript
 					character.Quests.Start(Mq05);
 					return;
 				}
-				return;
-			}
-
-			if (character.Quests.IsActive(Mq05))
-			{
-				await dialog.Msg(L("Blut is across the barrier still. Hold the line with us."));
-				character.Quests.ReplayQuestTrack(Mq05);
 				return;
 			}
 

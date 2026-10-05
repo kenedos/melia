@@ -252,6 +252,20 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Mq01))
+		{
+			character.Quests.ClearQuestTrack(Mq01);
+			character.ServerMessage(L("An unknown power seems to be blocking the way."));
+			return;
+		}
+
+		if (character.Quests.IsActive(Mq06))
+		{
+			character.Quests.ClearQuestTrack(Mq06);
+			await dialog.Msg(L("Demon Lord Zaura will never stand for this. May you be blessed in the name of the goddesses."));
+			return;
+		}
+
 		if (!character.Quests.Has(Mq02) && character.Quests.MeetsPrerequisites(Mq02))
 		{
 			await dialog.Msg(L("The reason behind the red water flowing in this forest and the contaminated crops... The plan to grow a giant bracken and spread the death spores..."));
@@ -362,13 +376,6 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 			return;
 		}
 
-		if (character.Quests.IsActive(Mq01))
-		{
-			character.Quests.ClearQuestTrack(Mq01);
-			character.ServerMessage(L("An unknown power seems to be blocking the way."));
-			return;
-		}
-
 		if (character.Quests.IsActive(Mq03))
 		{
 			await dialog.Msg(L("If only I can escape the Redemption Ward... I can get my energy back. Please hurry..."));
@@ -384,13 +391,6 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 		if (character.Quests.IsActive(Mq05))
 		{
 			await dialog.Msg(L("Please lend me just a little more of your strength. Only you can do this."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Mq06))
-		{
-			character.Quests.ClearQuestTrack(Mq06);
-			await dialog.Msg(L("Demon Lord Zaura will never stand for this. May you be blessed in the name of the goddesses."));
 			return;
 		}
 
@@ -567,6 +567,15 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 			return;
 		}
 
+		if (character.Quests.IsActive(Sq03))
+		{
+			if (character.Inventory.CountItem(ItemId.ORCHARD_324_SQ_SCROLL) == 0)
+				character.Inventory.Add(ItemId.ORCHARD_324_SQ_SCROLL, 1, InventoryAddType.PickUp);
+
+			await dialog.Msg(L("I can't understand why someone would side with the demons... How powerful is their evil energy, that even ferrets can't handle it?"));
+			return;
+		}
+
 		if (character.Quests.IsActive(Sq01))
 		{
 			await dialog.Msg(L("Goddess Lada is still not feeling well. We'll look after Her now."));
@@ -576,15 +585,6 @@ public class FOrchard324QuestNpcsScript : GeneralScript
 		if (character.Quests.IsActive(Sq02))
 		{
 			await dialog.Msg(L("One of the masters in Fedimian should be able to help us! I hope so..."));
-			return;
-		}
-
-		if (character.Quests.IsActive(Sq03))
-		{
-			if (character.Inventory.CountItem(ItemId.ORCHARD_324_SQ_SCROLL) == 0)
-				character.Inventory.Add(ItemId.ORCHARD_324_SQ_SCROLL, 1, InventoryAddType.PickUp);
-
-			await dialog.Msg(L("I can't understand why someone would side with the demons... How powerful is their evil energy, that even ferrets can't handle it?"));
 			return;
 		}
 

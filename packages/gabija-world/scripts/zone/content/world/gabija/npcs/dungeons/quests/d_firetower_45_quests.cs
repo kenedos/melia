@@ -246,6 +246,13 @@ public class DFiretower45QuestNpcsScript : GeneralScript
 				return;
 			}
 
+			if (character.Quests.IsActive(Sq03))
+			{
+				await dialog.Msg(L("It is still out there, past the hall."));
+				character.Quests.ClearQuestTrack(Sq03);
+				return;
+			}
+
 			if (!character.Quests.Has(Sq03) && character.Quests.MeetsPrerequisites(Sq03))
 			{
 				var answer = await dialog.SelectQuestOffer(Sq03, L("Bearkaras is still near here. You are our last hope. We are counting on you."),
@@ -299,13 +306,6 @@ public class DFiretower45QuestNpcsScript : GeneralScript
 				return;
 			}
 
-			if (character.Quests.IsActive(Sq03))
-			{
-				await dialog.Msg(L("It is still out there, past the hall."));
-				character.Quests.ClearQuestTrack(Sq03);
-				return;
-			}
-
 			if (character.Quests.IsActive(Hq02))
 			{
 				await dialog.Msg(L("The Laboratory on the third floor. The pages are all over its floor."));
@@ -336,6 +336,13 @@ public class DFiretower45QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("A part of me is within the barrier of this tower, and the rest of me were scattered throughout the world."));
 				await dialog.CompleteQuest(Sq05);
 				character.LookAround();
+				return;
+			}
+
+			if (character.Quests.IsActive(Sq05))
+			{
+				await dialog.Msg(L("Quickly... We should continue the contract."));
+				character.Quests.ClearQuestTrack(Sq05);
 				return;
 			}
 
@@ -379,13 +386,6 @@ public class DFiretower45QuestNpcsScript : GeneralScript
 			if (character.Quests.IsActive(Sq04))
 			{
 				await dialog.Msg(L("Fifteen of them. They watch this road from both sides."));
-				return;
-			}
-
-			if (character.Quests.IsActive(Sq05))
-			{
-				await dialog.Msg(L("Quickly... We should continue the contract."));
-				character.Quests.ClearQuestTrack(Sq05);
 				return;
 			}
 

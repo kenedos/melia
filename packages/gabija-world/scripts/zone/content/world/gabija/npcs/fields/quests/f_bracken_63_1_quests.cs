@@ -575,13 +575,6 @@ public class FBracken631QuestNpcsScript : GeneralScript
 
 			dialog.SetTitle(L("Herbalist Tales"));
 
-			if (character.Quests.IsCompletable(Sq030))
-			{
-				await dialog.Msg(L("You got it! Hand them over. They're probably a little bitter but I really need it."));
-				await dialog.CompleteQuest(Sq030);
-				return;
-			}
-
 			if (character.Quests.IsCompletable(Sq050))
 			{
 				var fed = await character.TimeActions.StartAsync(L("Giving the medicine to Herbalist Tales..."), L("Cancel"), "FEED", TimeSpan.FromSeconds(1));
@@ -593,6 +586,13 @@ public class FBracken631QuestNpcsScript : GeneralScript
 				await dialog.Msg(L("The medicine you brought seems to be working. My temperature should start to lower, too."));
 				await dialog.Msg(L("I thought I was about to return to the goddesses like this... You really saved my life."));
 				await dialog.CompleteQuest(Sq050);
+				return;
+			}
+
+			if (character.Quests.IsCompletable(Sq030))
+			{
+				await dialog.Msg(L("You got it! Hand them over. They're probably a little bitter but I really need it."));
+				await dialog.CompleteQuest(Sq030);
 				return;
 			}
 
